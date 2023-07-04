@@ -9,6 +9,8 @@
   (data (application lhs rhss))
   (data (abstraction arity body))
 
+  ; --------------------------------------------------------
+
   (define (term->datum $term)
     (term-depth->datum $term 0))
 
