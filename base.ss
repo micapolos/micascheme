@@ -7,7 +7,8 @@
     fold-indices
     string+
     switch
-    unpair)
+    unpair
+    throw)
 
   (import 
     (chezscheme))
@@ -138,6 +139,12 @@
               (let ((lhs (car #,tmp))
                     (rhs (cdr #,tmp)))
                 body ...)))))))
+
+  (define-syntax throw
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ name item ...) (identifier? #`name)
+          #`(error #f (format "~s" (list (quote name) #,@(syntax->list #`(item ...)))))))))
 
   ; --------------------------------------
 
