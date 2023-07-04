@@ -1,11 +1,13 @@
 (library (base)
   (export 
+    bind bind-true
     data
     define-aux-keyword
     obj=? record=? pair=? vector=? box=?
     displayln writeln
     fold-indices
     string+
+    list-set
     switch
     unpair
     throw)
@@ -145,6 +147,24 @@
       (syntax-case stx ()
         ((_ name item ...) (identifier? #`name)
           #`(error #f (format "~s" (list (quote name) #,@(syntax->list #`(item ...)))))))))
+
+  (define-syntax bind
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ (var expr) body ...)
+          #`(let ((var expr)) body ...)))))
+
+  (define-syntax bind-true
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ (var expr) body ...)
+          #`(bind (var expr) 
+            (cond (var body ...) (else #f)))))))
+
+  (define (list-set $list $index $obj)
+    (if (> $index 0)
+      (cons (car $list) (list-set (cdr $list) (- $index 1) $obj))
+      (cons $obj (cdr $list))))
 
   ; --------------------------------------
 
