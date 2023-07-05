@@ -1,4 +1,8 @@
-(import (micascheme) (typed) (type))
+(import 
+  (micascheme) 
+  (term)
+  (type) 
+  (typed))
 
 (check 
   (obj=?
@@ -8,8 +12,11 @@
         (arrow `(string ,(any-number)) (any-string))
         (arrow `(append ,(any-string) ,(any-string)) (any-string)))
       #`(append (string (length "foo")) " apples"))
-    (typed 
-      `(v2 (v1 (v0 "foo")) " apples")
+    (typed
+      (application! (variable 2)
+        (application! (variable 1) 
+          (application! (variable 0) "foo"))
+        " apples")
       (any-string))))
 
 (check

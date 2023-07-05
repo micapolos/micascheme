@@ -52,10 +52,12 @@
           (if $indexed-result-type
             (let* (($result-type (indexed-value $indexed-result-type))
                    ($result-index (indexed-index $indexed-result-type))
-                   ($var (v $result-index)))
-              (typed `(,$var ,@$arg-values) $result-type))
+                   ($var (variable $result-index)))
+              (typed 
+                (application $var $arg-values)
+                $result-type))
             (typed
-              `(,$id ,@$arg-values)
+              (application `list (cons $id $arg-values))
               `(,$id ,@$arg-types)))))
       (_
         (switch (syntax->datum $stx)
@@ -71,15 +73,17 @@
   ; --------------------------------------------------------
 
   (define (evaluate $env $stx)
-    (let* (($ids (map car $env))
+    (let* (($arity (length $env))
+           ($ids (map car $env))
            ($types (map cdr $env))
            ($typed (parse $types $stx))
-           ($let-items (map-indexed (lambda ($index $id) `(,(v $index) ,$id)) $ids)))
+           ($term (typed-value $typed))
+           ($type (typed-type $typed)))
       (typed
-        (eval 
-          `(let (,@$let-items) ,(typed-value $typed))
+        (eval-term
+          (application (abstraction $arity $term) (reverse $ids))
           (environment `(micascheme) `(type)))
-        (typed-type $typed))))
+        $type)))
 
   (define scheme-env
     (list 
