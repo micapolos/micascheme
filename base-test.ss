@@ -9,16 +9,6 @@
 
 ; === map-find-indexed ===
 
-(check
-  (obj=?
-    (map-find-indexed
-      (lambda (s) (and (> (string-length s) 3) (string-append s "!")))
-      (list "ala" "ma" "kota" "i" "psa"))
-    (indexed "kota!" 2)))
-
-(check
-  (obj=?
-    (map-find-indexed
-      (lambda (s) (and (> (string-length s) 5) (string-append s "!")))
-      (list "ala" "ma" "kota" "i" "psa"))
-    #f))
+(bind (fn (lambda (s) (and (> (string-length s) 3) (string-append s "!"))))
+  (check (obj=? (map-find-indexed fn (list "ala" "ma" "kocicę" "Lunę")) (indexed "kocicę!" 2)))
+  (check (obj=? (map-find-indexed fn (list "ala" "ma" "ul")) #f)))
