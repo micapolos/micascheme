@@ -15,6 +15,6 @@
 (check
   (equal?
     (eval-term
-      (application `string-append (list "Hello, " "world!"))
+      (application! `string-append "Hello, " "world!")
       (environment `(micascheme)))
     "Hello, world!"))
