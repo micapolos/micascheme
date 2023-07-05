@@ -3,7 +3,8 @@
     variable application abstraction
     match arrow matches?
     term->datum
-    typed parse evaluate)
+    typed parse evaluate
+    any-boolean any-string any-number)
 
   (import (micascheme))
 
@@ -47,9 +48,16 @@
 
   ; ---------------------------------------------------------
 
+  (data (any-boolean))
+  (data (any-number))
+  (data (any-string))
+  (data (any-type))
+
   (data (arrow lhs rhs))
+
   (data (hole))
 
+  ; TODO - Change argument order
   (define (matches? $lhs $rhs)
     (and (match `() $lhs $rhs) #t))
 
@@ -106,22 +114,15 @@
 
   (data (typed value type))
 
-  (define (evaluate $stx)
-    (let 
-      (($typed 
-        (parse 
-          (list 
-            (cons `string-length (arrow `string `number))
-            (cons `number->string (arrow `number `string)))
-          $stx)))
-      (typed 
-        (eval 
-          `(let 
-            ((v1 string-length)
-             (v0 number->string))
-            ,(typed-value $typed)) 
-          (environment `(micascheme) `(type)))
-        (typed-type $typed))))
+  ; ----------------------------------------------------------------
+
+  (define (v $index)
+    (string->symbol
+      (string-append "v"
+        (number->string $index))))
+
+  (define (parse-list $env $stxs)
+    (map (partial parse $env) $stxs))
 
   (define (parse-as $env $stx $as-type)
     (let* (($typed (parse $env $stx))
@@ -140,32 +141,51 @@
 
   (define (parse $env $stx)
     (syntax-case $stx (lambda)
-      ((lambda (type var) body)
-        (syntax-error $stx "Jeszcze tego nie umiem"))
-      ((lhs rhs)
-        (let* (($typed-proc (parse-proc $env #`lhs))
-               ($arrow (typed-type $typed-proc))
-               ($param-type (arrow-lhs $arrow))
-               ($typed-arg (parse-as $env #`rhs $param-type)))
+      ((id arg ...) (identifier? #`id)
+        (let* (($id (syntax->datum #`id))
+               ($args (syntax->list #`(arg ...)))
+               ($typed-args (parse-list $env $args))
+               ($arg-types (map typed-type $typed-args))
+               ($arg-values (map typed-value $typed-args))
+               ($type `(,$id ,@$arg-types))
+               ($indexed-result-type 
+                (map-find-indexed 
+                  (lambda ($env-type) 
+                    (and 
+                      (arrow? $env-type) 
+                      (matches? (arrow-lhs $env-type) $type) 
+                      (arrow-rhs $env-type)))
+                  $env)))
+          (if $indexed-result-type
+            (let* (($result-type (indexed-value $indexed-result-type))
+                   ($result-index (indexed-index $indexed-result-type))
+                   ($var (v $result-index)))
+              (typed `(,$var ,@$arg-values) $result-type))
             (typed
-              `(,(typed-value $typed-proc) ,(typed-value $typed-arg))
-              (arrow-rhs $arrow))))
+              `(,$id ,@$arg-values)
+              `(,$id ,@$arg-types)))))
       (_
         (switch (syntax->datum $stx)
           ((boolean? $boolean) 
-            (typed $boolean `boolean))
+            (typed $boolean (any-boolean)))
           ((number? $number)
-            (typed $number `number))
+            (typed $number (any-number)))
           ((string? $string) 
-            (typed $string `string))
+            (typed $string (any-string)))
           ((symbol? $symbol)
-            (bind ($index-type (associ $env 0 $symbol))
-              (if $index-type
-                (typed 
-                  (string->symbol 
-                    (string-append "v" 
-                      (number->string 
-                        (- (length $env) (car $index-type) 1))))
-                  (cdr $index-type))
-                (syntax-error $stx "unbound:"))))))))
+            (typed $symbol $symbol))))))
+
+  ; --------------------------------------------------------
+
+  (define (evaluate $env $stx)
+    (let* (($ids (map car $env))
+           ($types (map cdr $env))
+           ($typed (parse $types $stx))
+           ($let-items (map-indexed (lambda ($index $id) `(,(v $index) ,$id)) $ids)))
+      (typed
+        (eval 
+          `(let (,@$let-items) ,(typed-value $typed))
+          (environment `(micascheme) `(type)))
+        (typed-type $typed))))
+
 )

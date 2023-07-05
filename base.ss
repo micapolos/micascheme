@@ -2,17 +2,19 @@
   (export 
     bind bind-true
     check
-    data
+    data partial
     define-aux-keyword
     obj=? record=? pair=? vector=? box=?
     displayln writeln
-    fold-indices
+    fold-indices indices
+    find-index
     string+
     list-set
     switch
     unpair
     associ
     map-find-indexed
+    map-indexed
     indexed indexed? indexed-value indexed-index
     throw)
 
@@ -28,6 +30,10 @@
     (newline))
 
   (define string+ string-append)
+
+  (define (partial $proc . $partial-args)
+    (lambda $args
+      (apply $proc (append $partial-args $args))))
 
   (define-syntax define-aux-keyword
     (syntax-rules ()
@@ -61,6 +67,12 @@
 
   (define (fold-indices f folded size)
     (fold-indices-from f folded size 0))
+
+  (define (indices size)
+    (reverse (fold-indices (lambda ($list $index) (cons $index $list)) `() size)))
+
+  (define (map-indexed $proc $list)
+    (map $proc (indices (length $list)) $list))
 
   (define (obj=? a b)
     (cond
@@ -218,17 +230,20 @@
 
   (data (indexed value index))
 
-  (define map-find-indexed
-    (case-lambda
-      (($proc $list)
-        (map-find-indexed $proc $list 0))
-      (($proc $list $index)
-        (and
-          (not (null? $list))
-          (bind ($mapped ($proc (car $list)))
-            (if $mapped
-              (indexed $mapped $index)
-              (map-find-indexed $proc (cdr $list) (+ $index 1))))))))
+  (define (map-find-indexed $proc $list)
+    (map-find-indexed+ $proc $list 0))
+
+  (define (map-find-indexed+ $proc $list $index)
+    (and
+      (not (null? $list))
+      (bind ($mapped ($proc (car $list)))
+        (if $mapped
+          (indexed $mapped $index)
+          (map-find-indexed+ $proc (cdr $list) (+ $index 1))))))
+
+  (define (find-index $proc $list)
+    (bind-true ($indexed (map-find-indexed $proc $list))
+      (indexed-index $indexed)))
 
   ; --------------------------------------
 

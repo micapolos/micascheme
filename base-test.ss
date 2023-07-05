@@ -12,3 +12,15 @@
 (bind (fn (lambda (s) (and (> (string-length s) 3) (string-append s "!"))))
   (check (obj=? (map-find-indexed fn (list "ala" "ma" "kocicę" "Lunę")) (indexed "kocicę!" 2)))
   (check (obj=? (map-find-indexed fn (list "ala" "ma" "ul")) #f)))
+
+; === curry ===
+
+(check (equal? ((partial string-append "a" "b") "c" "d") "abcd"))
+
+; === indices ===
+
+(check (equal? (indices 3) (list 0 1 2)))
+
+; === map-indexed ===
+
+(check (equal? (map-indexed cons (list "a" "b" "c")) (list (cons 0 "a") (cons 1 "b") (cons 2 "c"))))
