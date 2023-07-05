@@ -123,6 +123,14 @@
           (environment `(micascheme) `(type)))
         (typed-type $typed))))
 
+  (define (parse-as $env $stx $as-type)
+    (let* (($typed (parse $env $stx))
+           ($type (typed-type $typed)))
+      (if (matches? $as-type $typed)
+        (typed (typed-value $typed) $as-type)
+        (syntax-error $stx
+          (format "should be ~s, is ~s:" $as-type $type)))))
+
   (define (parse $env $stx)
     (syntax-case $stx (lambda)
       ((lambda (type var) body)
