@@ -2,43 +2,32 @@
   (micascheme) 
   (type))
 
-(assert (equal? (term->datum `foo) `foo))
+(check (equal? (term->datum `foo) `foo))
 
-(assert (equal? (term->datum (abstraction `foo)) `(lambda (v0) foo)))
-(assert (equal? (term->datum (abstraction (variable 0))) `(lambda (v0) v0)))
-(assert (equal? (term->datum (abstraction (abstraction (variable 0)))) `(lambda (v0) (lambda (v1) v1))))
-(assert (equal? (term->datum (abstraction (abstraction (variable 1)))) `(lambda (v0) (lambda (v1) v0))))
+(check (equal? (term->datum (abstraction `foo)) `(lambda (v0) foo)))
+(check (equal? (term->datum (abstraction (variable 0))) `(lambda (v0) v0)))
+(check (equal? (term->datum (abstraction (abstraction (variable 0)))) `(lambda (v0) (lambda (v1) v1))))
+(check (equal? (term->datum (abstraction (abstraction (variable 1)))) `(lambda (v0) (lambda (v1) v0))))
 
-(assert (equal? (term->datum (application `foo `bar)) `(foo bar)))
+(check (equal? (term->datum (application `foo `bar)) `(foo bar)))
 
 ; --------------------------------------------------------------
 
-(assert (matches? `foo `foo))
-(assert (not (matches? `foo `bar)))
+(check (matches? `foo `foo))
+(check (not (matches? `foo `bar)))
 
-(assert (matches? (abstraction `foo) (abstraction `foo)))
-(assert (not (matches? (abstraction `foo) (abstraction `bar))))
+(check (matches? (abstraction `foo) (abstraction `foo)))
+(check (not (matches? (abstraction `foo) (abstraction `bar))))
 
-(assert (matches? (abstraction `foo) `foo))
-(assert (not (matches? (abstraction `foo) `bar)))
+(check (matches? (abstraction `foo) `foo))
+(check (not (matches? (abstraction `foo) `bar)))
 
-(assert (matches? (abstraction (variable 0)) `foo))
-(assert (matches? (abstraction (arrow (variable 0) (variable 0))) (arrow `foo `foo)))
-(assert (not (matches? (abstraction (arrow (variable 0) (variable 0))) (arrow `foo `bar))))
+(check (matches? (abstraction (variable 0)) `foo))
+(check (matches? (abstraction (arrow (variable 0) (variable 0))) (arrow `foo `foo)))
+(check (not (matches? (abstraction (arrow (variable 0) (variable 0))) (arrow `foo `bar))))
 
-(assert (matches? (abstraction (abstraction (arrow (variable 0) (variable 1)))) (arrow `foo `foo)))
-(assert (matches? (abstraction (abstraction (arrow (variable 0) (variable 1)))) (arrow `foo `bar)))
+(check (matches? (abstraction (abstraction (arrow (variable 0) (variable 1)))) (arrow `foo `foo)))
+(check (matches? (abstraction (abstraction (arrow (variable 0) (variable 1)))) (arrow `foo `bar)))
 
-(assert (matches? (abstraction (abstraction (variable 0))) (abstraction (abstraction (variable 0)))))
-(assert (not (matches? (abstraction (abstraction (variable 0))) (abstraction (abstraction (variable 1))))))
-
-; ---------------------------------------------------------------
-
-(writeln
-  (parse
-    (list (cons `string-length (arrow `string `number)))
-    #`(string-length "foo")))
-
-(writeln
-  (evaluate
-    #`(number->string (string-length "Hello, world!"))))
+(check (matches? (abstraction (abstraction (variable 0))) (abstraction (abstraction (variable 0)))))
+(check (not (matches? (abstraction (abstraction (variable 0))) (abstraction (abstraction (variable 1))))))

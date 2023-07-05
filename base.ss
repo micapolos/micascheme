@@ -1,6 +1,7 @@
 (library (base)
   (export 
     bind bind-true
+    check
     data
     define-aux-keyword
     obj=? record=? pair=? vector=? box=?
@@ -172,6 +173,44 @@
       ((null? $list) #f)
       ((equal? (caar $list) $obj) (cons $index (cdar $list)))
       (else (associ (cdr $list) (+ $index 1) $obj))))
+
+  (define-syntax check
+    (lambda (stx)
+      (syntax-case stx (not)
+        ((_ (not (pred arg ...)))
+          (let* ((args (syntax->list #`(arg ...)))
+                 (tmps (generate-temporaries #`(arg ...)))
+                 (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
+                 (ann (syntax->annotation stx))
+                 (source (annotation-source ann))
+                 (ann-string 
+                  (if ann 
+                    (format " source: ~a (<line>:<char>)\n" (source-file-descriptor-path (source-object-sfd source)))
+                    "")))
+            #`(let (#,@let-cases)
+              (or (not (pred #,@tmps))
+                (error `check 
+                  (format "\n~a   expr: ~s\n  value: ~s\n"
+                    #,ann-string
+                    (quote (check (not (pred arg ...))))
+                    (list (quote check) (list (quote not) (list (quote pred) #,@tmps)))))))))
+        ((_ (pred arg ...))
+          (let* ((args (syntax->list #`(arg ...)))
+                 (tmps (generate-temporaries #`(arg ...)))
+                 (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
+                 (ann (syntax->annotation stx))
+                 (source (annotation-source ann))
+                 (ann-string 
+                  (if ann 
+                    (format " source: ~a (<line>:<char>)\n" (source-file-descriptor-path (source-object-sfd source)))
+                    "")))
+            #`(let (#,@let-cases)
+              (or (pred #,@tmps)
+                (error `check 
+                  (format "\n~a   expr: ~s\n  value: ~s\n"
+                    #,ann-string
+                    (quote (check (pred arg ...)))
+                    (list (quote check) (list (quote pred) #,@tmps)))))))))))
 
   ; --------------------------------------
 
