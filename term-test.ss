@@ -9,3 +9,12 @@
 (check (equal? (term->datum (abstraction 2 (variable 1))) `(lambda (v0 v1) v0)))
 
 (check (equal? (term->datum (application `foo (list `bar `goo))) `(foo bar goo)))
+
+; === eval-term ===
+
+(check
+  (equal?
+    (eval-term
+      (application `string-append (list "Hello, " "world!"))
+      (environment `(micascheme)))
+    "Hello, world!"))

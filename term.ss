@@ -3,7 +3,7 @@
     abstraction abstraction? abstraction-arity abstraction-body
     application application? application-fn application-args
     variable variable? variable-index
-    term->datum)
+    term->datum eval-term)
 
   (import (micascheme))
 
@@ -51,4 +51,9 @@
     (map depth->datum 
       (map (partial + $depth)
         (indices $size))))
+
+  ; -----------------------------------------------
+
+  (define (eval-term $term $env)
+    (eval (term->datum $term) $env))
 )
