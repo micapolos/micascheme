@@ -24,3 +24,9 @@
 ; === map-indexed ===
 
 (check (equal? (map-indexed cons (list "a" "b" "c")) (list (cons 0 "a") (cons 1 "b") (cons 2 "c"))))
+
+; === iterate ===
+
+(bind ($fn (lambda (s) (string-append s "!")))
+  (check (equal? (iterate $fn "Hello" 0) "Hello"))
+  (check (equal? (iterate $fn "Hello" 3) "Hello!!!")))

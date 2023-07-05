@@ -1,50 +1,10 @@
 (library (type)
   (export 
-    variable application abstraction
     match arrow matches?
-    term->datum
     typed parse evaluate scheme-env
     any-boolean any-string any-number)
 
-  (import (micascheme))
-
-  (data (variable index))
-  (data (application lhs rhs))
-  (data (abstraction body))
-
-  ; --------------------------------------------------------
-
-  (define (term->datum $term)
-    (term-depth->datum $term 0))
-
-  (define (term-depth->datum $term $depth)
-    (switch $term
-      ((variable? $variable) (variable-depth->datum $variable $depth))
-      ((application? $application) (application-depth->datum $application $depth))
-      ((abstraction? $abstraction) (abstraction-depth->datum $abstraction $depth))
-      ((else $datum) $datum)))
-
-  (define (variable-depth->datum $variable $depth)
-    (let (($index (- $depth (variable-index $variable) 1)))
-      (if (< $index 0) 
-        (throw variable-depth->datum $variable $depth)
-        (depth->datum $index))))
-
-  (define (application-depth->datum $application $depth)
-    `(
-      ,(term-depth->datum (application-lhs $application) $depth)
-      ,(term-depth->datum (application-rhs $application) $depth)))
-
-  (define (abstraction-depth->datum $abstraction $depth)
-    `(lambda (,(depth->datum $depth))
-      ,(term-depth->datum 
-        (abstraction-body $abstraction) 
-        (+ $depth 1))))
-
-  (define (depth->datum $depth)
-    (string->symbol 
-      (string-append "v" 
-        (number->string $depth))))
+  (import (micascheme) (term))
 
   ; ---------------------------------------------------------
 
@@ -91,12 +51,14 @@
 
   (define (abstraction-match $env $abstraction $rhs)
     (if (abstraction? $rhs)
+      (and 
+        (= (abstraction-arity $abstraction) (abstraction-arity $rhs))
+        (match
+          (iterate (partial cons (hole)) $env (abstraction-arity $abstraction))
+          (abstraction-body $abstraction)
+          (abstraction-body $rhs)))
       (match 
-        (cons (hole) $env)
-        (abstraction-body $abstraction)
-        (abstraction-body $rhs))
-      (match 
-        (cons (hole) $env) 
+        (iterate (partial cons (hole)) $env (abstraction-arity $abstraction))
         (abstraction-body $abstraction) 
         $rhs)))
 

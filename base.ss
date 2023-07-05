@@ -6,7 +6,7 @@
     define-aux-keyword
     obj=? record=? pair=? vector=? box=?
     displayln writeln
-    fold-indices indices
+    fold-indices indices iterate
     find-index
     string+
     list-set
@@ -244,6 +244,11 @@
   (define (find-index $proc $list)
     (bind-true ($indexed (map-find-indexed $proc $list))
       (indexed-index $indexed)))
+
+  (define (iterate $proc $item $count)
+    (cond
+      ((= $count 0) $item)
+      (else (iterate $proc ($proc $item) (- $count 1)))))
 
   ; --------------------------------------
 
