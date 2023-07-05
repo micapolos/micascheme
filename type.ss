@@ -2,7 +2,8 @@
   (export 
     variable application abstraction
     match arrow matches?
-    term->datum)
+    term->datum
+    typed parse evaluate)
 
   (import (micascheme))
 
@@ -31,7 +32,7 @@
   (define (application-depth->datum $application $depth)
     `(
       ,(term-depth->datum (application-lhs $application) $depth)
-      ,@(term-depth->datum (application-rhs $application) $depth)))
+      ,(term-depth->datum (application-rhs $application) $depth)))
 
   (define (abstraction-depth->datum $abstraction $depth)
     `(lambda (,(depth->datum $depth))
@@ -93,4 +94,60 @@
 
   (define (obj-match $env $obj $rhs)
     (and (obj=? $obj $rhs) $env))
+
+  ; ----------------------------------------------------------------
+
+  (data (typed value type))
+
+  (define (evaluate $stx)
+    (let 
+      (($typed 
+        (parse 
+          (list 
+            (cons `string-length (arrow `string `number))
+            (cons `number->string (arrow `number `string)))
+          $stx)))
+      (typed 
+        (eval 
+          `(let 
+            ((v1 string-length)
+             (v0 number->string))
+            ,(typed-value $typed)) 
+          (environment `(micascheme) `(type)))
+        (typed-type $typed))))
+
+  (define (parse $env $stx)
+    (syntax-case $stx (lambda)
+      ((lambda (type var) body)
+        (syntax-error $stx "Jeszcze tego nie umiem"))
+      ((lhs rhs)
+        (let* (($typed-lhs (parse $env #`lhs))
+               ($typed-rhs (parse $env #`rhs))
+               ($lhs-type (typed-type $typed-lhs))
+               ($rhs-type (typed-type $typed-rhs)))
+          (unless (arrow? $lhs-type)
+            (syntax-error #`lhs (format "should be procedure, is ~s:" $lhs-type)))
+          (unless (matches? (arrow-lhs $lhs-type) $rhs-type)
+            (syntax-error #`rhs (format "should be ~s, is ~s:" $rhs-type (arrow-lhs $lhs-type))))
+          (typed 
+            `(,(typed-value $typed-lhs) ,(typed-value $typed-rhs))
+            (arrow-rhs $lhs-type))))
+      (_
+        (switch (syntax->datum $stx)
+          ((boolean? $boolean) 
+            (typed $boolean `boolean))
+          ((number? $number)
+            (typed $number `number))
+          ((string? $string) 
+            (typed $string `string))
+          ((symbol? $symbol)
+            (bind ($index-type (associ $env 0 $symbol))
+              (if $index-type
+                (typed 
+                  (string->symbol 
+                    (string-append "v" 
+                      (number->string 
+                        (- (length $env) (car $index-type) 1))))
+                  (cdr $index-type))
+                (syntax-error $stx "unbound:"))))))))
 )

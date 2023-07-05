@@ -10,6 +10,7 @@
     list-set
     switch
     unpair
+    associ
     throw)
 
   (import 
@@ -129,7 +130,7 @@
           ((i 0 (+ i 1))) 
           ((= i size) (void))
           (display " " port)
-          (display ((record-accessor rtd i) record) port))
+          (wr ((record-accessor rtd i) record) port))
         (display ")" port))))
 
   (define-syntax unpair
@@ -165,6 +166,12 @@
     (if (> $index 0)
       (cons (car $list) (list-set (cdr $list) (- $index 1) $obj))
       (cons $obj (cdr $list))))
+
+  (define (associ $list $index $obj)
+    (cond
+      ((null? $list) #f)
+      ((equal? (caar $list) $obj) (cons $index (cdar $list)))
+      (else (associ (cdr $list) (+ $index 1) $obj))))
 
   ; --------------------------------------
 

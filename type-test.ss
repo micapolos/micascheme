@@ -2,6 +2,17 @@
   (micascheme) 
   (type))
 
+(assert (equal? (term->datum `foo) `foo))
+
+(assert (equal? (term->datum (abstraction `foo)) `(lambda (v0) foo)))
+(assert (equal? (term->datum (abstraction (variable 0))) `(lambda (v0) v0)))
+(assert (equal? (term->datum (abstraction (abstraction (variable 0)))) `(lambda (v0) (lambda (v1) v1))))
+(assert (equal? (term->datum (abstraction (abstraction (variable 1)))) `(lambda (v0) (lambda (v1) v0))))
+
+(assert (equal? (term->datum (application `foo `bar)) `(foo bar)))
+
+; --------------------------------------------------------------
+
 (assert (matches? `foo `foo))
 (assert (not (matches? `foo `bar)))
 
@@ -20,3 +31,14 @@
 
 (assert (matches? (abstraction (abstraction (variable 0))) (abstraction (abstraction (variable 0)))))
 (assert (not (matches? (abstraction (abstraction (variable 0))) (abstraction (abstraction (variable 1))))))
+
+; ---------------------------------------------------------------
+
+(writeln
+  (parse
+    (list (cons `string-length (arrow `string `number)))
+    #`(string-length "foo")))
+
+(writeln
+  (evaluate
+    #`(number->string (string-length "Hello, world!"))))
