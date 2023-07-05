@@ -1,7 +1,8 @@
 (library (typed)
   (export 
-    typed parse evaluate scheme-env)
-  
+    typed typed? typed-value typed-type
+    parse evaluate)
+
   (import (micascheme) (term) (type))
 
   (data (typed value type))
