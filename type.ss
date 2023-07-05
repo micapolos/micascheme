@@ -3,7 +3,7 @@
     variable application abstraction
     match arrow matches?
     term->datum
-    typed parse evaluate
+    typed parse evaluate scheme-env
     any-boolean any-string any-number)
 
   (import (micascheme))
@@ -187,5 +187,11 @@
           `(let (,@$let-items) ,(typed-value $typed))
           (environment `(micascheme) `(type)))
         (typed-type $typed))))
+
+  (define scheme-env
+    (list 
+      (cons `string-length (arrow `(length ,(any-string)) (any-number)))
+      (cons `number->string (arrow `(string ,(any-number)) (any-string)))
+      (cons `string-append (arrow `(append ,(any-string) ,(any-string)) (any-string)))))
 
 )
