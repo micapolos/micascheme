@@ -12,6 +12,8 @@
     switch
     unpair
     associ
+    map-find-indexed
+    indexed indexed? indexed-value indexed-index
     throw)
 
   (import 
@@ -211,6 +213,22 @@
                     #,ann-string
                     (quote (check (pred arg ...)))
                     (list (quote check) (list (quote pred) #,@tmps)))))))))))
+
+  ; --------------------------------------
+
+  (data (indexed value index))
+
+  (define map-find-indexed
+    (case-lambda
+      (($proc $list)
+        (map-find-indexed $proc $list 0))
+      (($proc $list $index)
+        (and
+          (not (null? $list))
+          (bind ($mapped ($proc (car $list)))
+            (if $mapped
+              (indexed $mapped $index)
+              (map-find-indexed $proc (cdr $list) (+ $index 1))))))))
 
   ; --------------------------------------
 

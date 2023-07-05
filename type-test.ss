@@ -31,3 +31,9 @@
 
 (check (matches? (abstraction (abstraction (variable 0))) (abstraction (abstraction (variable 0)))))
 (check (not (matches? (abstraction (abstraction (variable 0))) (abstraction (abstraction (variable 1))))))
+
+(writeln
+  (parse
+    (list
+      (cons `string-length (arrow `string `number)))
+    #`string-length))

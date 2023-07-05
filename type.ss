@@ -131,22 +131,25 @@
         (syntax-error $stx
           (format "should be ~s, is ~s:" $as-type $type)))))
 
+  (define (parse-proc $env $stx)
+    (let* (($typed (parse $env $stx))
+           ($type (typed-type $typed)))
+      (and (arrow? $type)
+        (syntax-error $stx
+          (format "should be procedure, is ~s:" $type)))))
+
   (define (parse $env $stx)
     (syntax-case $stx (lambda)
       ((lambda (type var) body)
         (syntax-error $stx "Jeszcze tego nie umiem"))
       ((lhs rhs)
-        (let* (($typed-lhs (parse $env #`lhs))
-               ($typed-rhs (parse $env #`rhs))
-               ($lhs-type (typed-type $typed-lhs))
-               ($rhs-type (typed-type $typed-rhs)))
-          (unless (arrow? $lhs-type)
-            (syntax-error #`lhs (format "should be procedure, is ~s:" $lhs-type)))
-          (unless (matches? (arrow-lhs $lhs-type) $rhs-type)
-            (syntax-error #`rhs (format "should be ~s, is ~s:" $rhs-type (arrow-lhs $lhs-type))))
-          (typed 
-            `(,(typed-value $typed-lhs) ,(typed-value $typed-rhs))
-            (arrow-rhs $lhs-type))))
+        (let* (($typed-proc (parse-proc $env #`lhs))
+               ($arrow (typed-type $typed-proc))
+               ($param-type (arrow-lhs $arrow))
+               ($typed-arg (parse-as $env #`rhs $param-type)))
+            (typed
+              `(,(typed-value $typed-proc) ,(typed-value $typed-arg))
+              (arrow-rhs $arrow))))
       (_
         (switch (syntax->datum $stx)
           ((boolean? $boolean) 
