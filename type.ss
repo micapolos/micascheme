@@ -52,6 +52,13 @@
 
   (define (matches? $lhs $rhs)
     (and (match `() $lhs $rhs) #t))
+
+  (define (list-match $env $lhs $rhs)
+    (if (null? $lhs)
+      (and (null? $rhs) $env)
+      (and (not (null? $rhs))
+        (bind-true ($env (match $env (car $lhs) (car $rhs)))
+          (list-match $env (cdr $lhs) (cdr $rhs))))))
   
   (define (match $env $lhs $rhs)
     (switch $lhs
