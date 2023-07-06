@@ -36,10 +36,19 @@
 
   (define (depth-term->datum $depth $term)
     (switch $term
+      ((symbol? $symbol) `(quote ,$symbol))
+      ((boolean? $string) $string)
+      ((number? $number) $number)
+      ((string? $string) $string)
+      ((any-boolean? _) `(any-boolean))
+      ((any-number? _) `(any-number))
+      ((any-string? _) `(any-string))
+      ((any-type? _) `(any-type))
       ((variable? $variable) (depth-variable->datum $depth $variable))
       ((application? $application) (depth-application->datum $depth $application))
       ((abstraction? $abstraction) (depth-abstraction->datum $depth $abstraction))
-      ((else $datum) $datum)))
+      ((arrow? $arrow) (depth-arrow->datum $depth $arrow))
+      ((else _) (throw depth-term->datum $depth $term))))
 
   (define (depth-variable->datum $depth $variable)
     (let (($index (- $depth (variable-index $variable) 1)))
@@ -58,6 +67,11 @@
         ,(depth-term->datum 
           (+ $depth $arity)
           (abstraction-body $abstraction)))))
+
+  (define (depth-arrow->datum $depth $arrow)
+    `(arrow
+      ,(depth-term->datum $depth (arrow-lhs $arrow))
+      ,(depth-term->datum $depth (arrow-rhs $arrow))))
 
   (define (depth->datum $depth)
     (string->symbol 
