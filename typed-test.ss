@@ -24,7 +24,7 @@
 (check 
   (obj=? 
     (parse (list) #`foo)
-    (typed (application! `quote `foo) `foo)))
+    (typed #f `foo)))
 
 ; === native ===
 
