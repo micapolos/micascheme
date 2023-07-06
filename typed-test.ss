@@ -9,17 +9,17 @@
 (check 
   (obj=? 
     (parse! #t)
-    (typed #t (boolean-type))))
+    (typed #t boolean!)))
 
 (check 
   (obj=? 
     (parse! 123)
-    (typed 123 (number-type))))
+    (typed 123 number!)))
 
 (check 
   (obj=? 
     (parse! "foo")
-    (typed "foo" (string-type))))
+    (typed "foo" string!)))
 
 (check 
   (obj=? 
@@ -35,29 +35,29 @@
         (arrow (length string) number)))
     (typed
       (native `string-length)
-      (arrow! (length (string-type)) (number-type)))))
+      (arrow! (length string!) number!))))
 
 ; === types ===
 
 (check 
   (obj=? 
     (parse! boolean)
-    (typed (boolean-type) (type-type))))
+    (typed boolean! type!)))
 
 (check 
   (obj=? 
     (parse! number)
-    (typed (number-type) (type-type))))
+    (typed number! type!)))
 
 (check 
   (obj=? 
     (parse! string)
-    (typed (string-type) (type-type))))
+    (typed string! type!)))
 
 (check
   (obj=?
     (parse! (arrow (foo number) string))
-    (typed (arrow! (foo (number-type)) (string-type)) (type-type))))
+    (typed (arrow! (foo number!) string!) type!)))
 
 ; === tuple-typeure make ===
 
@@ -66,7 +66,7 @@
     (parse! (foo 10 "bar"))
     (typed
       (tuple! 10 "bar")
-      (tuple-type `foo (list (number-type) (string-type))))))
+      (tuple-type `foo (list number! string!)))))
 
 ; === use / get ===
 
@@ -75,7 +75,7 @@
     (parse! (use ("foo") (get string)))
     (typed
       (application! (abstraction 1 (variable 0)) "foo")
-      (string-type))))
+      string!)))
 
 ; === use / application ===
 
@@ -86,7 +86,7 @@
       (application!
         (abstraction 1 (application! (variable 0) "foo"))
         (native `string-length))
-      (number-type))))
+      number!)))
 
 ; === evaluate ===
 
@@ -100,4 +100,4 @@
          (native number->string (arrow (string number) string))
          (native string-append (arrow (append string string) string)))
         (append (string (length "foo")) " apples")))
-    (typed "3 apples" (string-type))))
+    (typed "3 apples" string!)))

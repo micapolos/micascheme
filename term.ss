@@ -21,7 +21,7 @@
     term->datum eval-term
 
     application! tuple! arrow! tuple-type!
-    boolean! number! string!)
+    boolean! number! string! type!)
 
   (import (micascheme))
 
@@ -150,6 +150,11 @@
     (lambda (stx)
       (syntax-case stx ()
         (_ #`(string-type)))))
+
+  (define-syntax type!
+    (lambda (stx)
+      (syntax-case stx ()
+        (_ #`(type-type)))))
 
   (define-syntax application!
     (lambda (stx)
