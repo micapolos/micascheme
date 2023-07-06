@@ -14,6 +14,10 @@
 (check (equal? (term->datum (any-boolean)) `(any-boolean)))
 (check (equal? (term->datum (any-number)) `(any-number)))
 (check (equal? (term->datum (any-string)) `(any-string)))
+
+(check (equal? (term->datum (any-tuple `foo (list))) `(any-tuple 'foo (list))))
+(check (equal? (term->datum (any-tuple `foo (list `t1 `t2))) `(any-tuple 'foo (list 't1 't2))))
+
 (check (equal? (term->datum (any-type)) `(any-type)))
 
 (check (equal? (term->datum (arrow `t1 `t2)) `(arrow 't1 't2)))

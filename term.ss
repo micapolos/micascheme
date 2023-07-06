@@ -9,6 +9,8 @@
     any-boolean any-boolean?
     any-number any-number?
     any-string any-string?
+    any-tuple any-tuple? any-tuple-types
+
     any-type any-type?
     
     arrow arrow? arrow-lhs arrow-rhs
@@ -31,6 +33,7 @@
   (data (any-boolean))
   (data (any-number))
   (data (any-string))
+  (data (any-tuple name types))
   (data (any-type))
 
   (data (arrow lhs rhs))
@@ -54,6 +57,7 @@
       ((any-boolean? _) `(any-boolean))
       ((any-number? _) `(any-number))
       ((any-string? _) `(any-string))
+      ((any-tuple? $any-tuple) (depth-any-tuple->datum $depth $any-tuple))
       ((any-type? _) `(any-type))
       ((variable? $variable) (depth-variable->datum $depth $variable))
       ((application? $application) (depth-application->datum $depth $application))
@@ -99,6 +103,14 @@
         ((1) (car $datums))
         ((2) `(cons ,(car $datums) ,(cadr $datums)))
         (else `(vector ,@$datums)))))
+
+  (define (depth-any-tuple->datum $depth $any-tuple)
+    `(any-tuple
+      (quote ,(any-tuple-name $any-tuple))
+      (list
+        ,@(depth-terms->datums
+          $depth
+          (any-tuple-types $any-tuple)))))
 
   (define (depth-tuple-get->datum $depth $tuple-get)
     (let* (($types (tuple-get-types $tuple-get))

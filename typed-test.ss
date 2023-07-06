@@ -62,7 +62,7 @@
     (parse (list) #`(foo 10 "bar"))
     (typed
       (make-tuple (list (any-number) (any-string)) (list 10 "bar"))
-      `(foo ,(any-number) ,(any-string)))))
+      (any-tuple `foo (list (any-number) (any-string))))))
 
 ; === application ===
 

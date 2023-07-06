@@ -112,7 +112,7 @@
             (else
               (typed
                 (make-tuple $arg-types $arg-values)
-                `(,$id ,@$arg-types))))))
+                (any-tuple $id $arg-types))))))
       (_
         (switch (syntax->datum $stx)
           ((boolean? $boolean) 
