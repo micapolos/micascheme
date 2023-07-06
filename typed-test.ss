@@ -64,6 +64,15 @@
       (make-tuple (list (any-number) (any-string)) (list 10 "bar"))
       (any-tuple `foo (list (any-number) (any-string))))))
 
+; === type make ===
+
+(check
+  (obj=?
+    (parse! (type (foo number string)))
+    (typed
+      (any-tuple `foo (list (any-number) (any-string)))
+      (any-type))))
+
 ; === application ===
 
 (check 

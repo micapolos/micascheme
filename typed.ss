@@ -2,7 +2,9 @@
   (export 
     typed typed? typed-value typed-type
     parse! parse env-parse evaluate
-    boolean number get)
+
+    ; aux keywords
+    boolean number get type)
 
   (import (micascheme) (term) (type))
 
@@ -53,15 +55,18 @@
   (define-aux-keyword boolean)
   (define-aux-keyword number)
   (define-aux-keyword get)
+  (define-aux-keyword type)
 
   (define (env-parse $env $type? $stx)
-    (syntax-case $stx (native boolean number string arrow get let)
-      ((native value type)
-        (if (identifier? #`value)
+    (syntax-case $stx (native type boolean number string arrow get let)
+      ((native $value $type)
+        (if (identifier? #`$value)
           (typed 
-            (native (syntax->datum #`value))
-            (env-parse-type $env #`type))
-          (syntax-error #`value "should be identifier:")))
+            (native (syntax->datum #`$value))
+            (env-parse-type $env #`$type))
+          (syntax-error #`$value "should be identifier:")))
+      ((type expr)
+        (typed (env-parse-type $env #`expr) (any-type)))
       (boolean
         (typed (any-boolean) (any-type)))
       (number 
@@ -74,8 +79,8 @@
             (env-parse-type $env #`lhs)
             (env-parse-type $env #`rhs))
           (any-type)))
-      ((get type)
-        (let* (($type (env-parse-type $env #`type))
+      ((get $type-stx)
+        (let* (($type (env-parse-type $env #`$type-stx))
                ($indexed-boolean (map-find-indexed (lambda ($env-type) (matches? $env-type $type)) $env)))
           (if $indexed-boolean
             (typed (variable (indexed-index $indexed-boolean)) $type)
@@ -118,9 +123,13 @@
                   (application $var $arg-values)
                   $result-type)))
             (else
-              (typed
-                (make-tuple $arg-types $arg-values)
-                (any-tuple $id $arg-types))))))
+              (if $type?
+                (typed
+                  (any-tuple $id $arg-values)
+                  (any-type))
+                (typed
+                  (make-tuple $arg-types $arg-values)
+                  (any-tuple $id $arg-types)))))))
       (_
         (switch (syntax->datum $stx)
           ((boolean? $boolean) 
