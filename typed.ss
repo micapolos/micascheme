@@ -1,7 +1,8 @@
 (library (typed)
   (export 
     typed typed? typed-value typed-type
-    parse! parse env-parse evaluate
+    parse! parse
+    evaluate! evaluate
 
     ; aux keywords
     boolean number get type)
@@ -143,7 +144,15 @@
 
   ; --------------------------------------------------------
 
-  (define (evaluate $env $stx)
+  (define-syntax evaluate!
+    (syntax-rules ()
+      ((_ expr)
+        (evaluate #'expr))))
+
+  (define (evaluate $stx)
+    (env-evaluate (list) $stx))
+
+  (define (env-evaluate $env $stx)
     (let* (($arity (length $env))
            ($ids (map car $env))
            ($types (map cdr $env))

@@ -79,24 +79,6 @@
       (any-tuple `foo (list (any-number) (any-string)))
       (any-type))))
 
-; === application ===
-
-(check 
-  (obj=?
-    (env-parse
-      (list 
-        (arrow (any-tuple `length (list (any-string))) (any-number))
-        (arrow (any-tuple `string (list (any-number))) (any-string))
-        (arrow (any-tuple `append (list (any-string) (any-string))) (any-string)))
-      #f
-      #`(append (string (length "foo")) " apples"))
-    (typed
-      (application! (variable 2)
-        (application! (variable 1) 
-          (application! (variable 0) "foo"))
-        " apples")
-      (any-string))))
-
 ; === let / get ===
 
 (check 
@@ -106,23 +88,22 @@
       (application! (abstraction 1 (variable 0)) "foo")
       (any-string))))
 
+; === let / application ===
+
+(check
+  (obj=?
+    (parse! (let ((native string-length (arrow (length string) number))) (length "foo")))
+    (typed
+      (application!
+        (abstraction 1 (application! (variable 0) "foo"))
+        (native `string-length))
+      (any-number))))
+
 ; === evaluate ===
 
-(check (obj=? (evaluate (list) #`foo) (typed #f `foo)))
+(check (obj=? (evaluate! foo) (typed #f `foo)))
 
-; (check
-;   (obj=?
-;     (evaluate
-;       (list (cons `real-time (arrow (any-tuple `time (list)) (any-number))))
-;       #`(time))
-;     (typed 12 (any-number))))
-
-; (check
-;   (obj=?
-;     (evaluate
-;       (list
-;         (cons `string-length (arrow (any-tuple `length (list (any-string))) (any-number)))
-;         (cons `number->string (arrow (any-tuple `string (list (any-number))) (any-string)))
-;         (cons `string-append (arrow (any-tuple `append (list (any-string) (any-string))) (any-string))))
-;       #`(append (string (length "foo")) " apples"))
-;     (typed "3 apples" (any-string))))
+(check
+  (obj=?
+    (evaluate! (let ((native string-length (arrow (length string) number))) (length "foo")))
+    (typed 3 (any-number))))
