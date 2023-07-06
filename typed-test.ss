@@ -105,5 +105,10 @@
 
 (check
   (obj=?
-    (evaluate! (use ((native string-length (arrow (length string) number))) (length "foo")))
-    (typed 3 (any-number))))
+    (evaluate!
+      (use
+        ((native string-length (arrow (length string) number))
+         (native number->string (arrow (string number) string))
+         (native string-append (arrow (append string string) string)))
+        (append (string (length "foo")) " apples")))
+    (typed "3 apples" (any-string))))
