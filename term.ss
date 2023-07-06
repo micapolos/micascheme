@@ -36,7 +36,7 @@
   (data (any-tuple name types))
   (data (any-type))
 
-  (data (arrow lhs rhs)) ; lhs is any-tuple, rhs is type
+  (data (arrow lhs rhs))
 
   (data (make-tuple types terms))
   (data (tuple-get types term index))
