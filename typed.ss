@@ -39,7 +39,7 @@
            ($type (typed-type $typed)))
       (unless (any-type? (typed-type $typed))
         (syntax-error $stx 
-          (format "should be type, is ~s:" $type)))
+          (format "should be type:")))
       $value))
 
   (define-aux-keyword native)
