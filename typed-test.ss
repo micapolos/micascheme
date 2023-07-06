@@ -79,7 +79,7 @@
 
 ; === use / get ===
 
-(check 
+(check
   (obj=?
     (parse! (use ("foo") (get string)))
     (typed
