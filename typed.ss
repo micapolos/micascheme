@@ -21,6 +21,16 @@
       (lambda ($type) (and (type-named? $type $symbol) $type))
       $env))
 
+  (define (env-arrow-indexed-type $env $symbol $arg-types)
+    (map-find-indexed 
+      (lambda ($type) 
+        (and 
+          (arrow? $type) 
+          (symbol=? (arrow-name $type) $symbol)
+          (list-matches? (arrow-params $type) $arg-types) 
+          (arrow-result $type)))
+      $env))
+
   ; ----------------------------------------------------------------
 
   (define (frame-symbol->indexed-types $frame $symbol)
@@ -153,15 +163,7 @@
                ($arg-types (map typed-type $typed-args))
                ($arg-values (map typed-value $typed-args))
                ($type (tuple-type $id $arg-types))
-               ($indexed-result-type 
-                (map-find-indexed 
-                  (lambda ($env-type) 
-                    (and 
-                      (arrow? $env-type) 
-                      (symbol=? (arrow-name $env-type) $id)
-                      (list-matches? (arrow-params $env-type) $arg-types) 
-                      (arrow-result $env-type)))
-                  $env)))
+               ($indexed-result-type (env-arrow-indexed-type $env $id $arg-types)))
           (cond
             ($indexed-result-type
               (let* (($result-type (indexed-value $indexed-result-type))
