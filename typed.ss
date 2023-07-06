@@ -102,16 +102,18 @@
                       (matches? (arrow-lhs $env-type) $type) 
                       (arrow-rhs $env-type)))
                   $env)))
-          (if $indexed-result-type
-            (let* (($result-type (indexed-value $indexed-result-type))
-                   ($result-index (indexed-index $indexed-result-type))
-                   ($var (variable $result-index)))
-              (typed 
-                (application $var $arg-values)
-                $result-type))
-            (typed
-              (application `list (cons (application! `quote $id) $arg-values))
-              `(,$id ,@$arg-types)))))
+          (cond
+            ($indexed-result-type
+              (let* (($result-type (indexed-value $indexed-result-type))
+                     ($result-index (indexed-index $indexed-result-type))
+                     ($var (variable $result-index)))
+                (typed 
+                  (application $var $arg-values)
+                  $result-type)))
+            (else
+              (typed
+                (application `list (cons (application! `quote $id) $arg-values))
+                `(,$id ,@$arg-types))))))
       (_
         (switch (syntax->datum $stx)
           ((boolean? $boolean) 
