@@ -23,6 +23,8 @@
   
   (define (match $env $lhs $rhs)
     (switch $lhs
+      ((native? $native)
+        (native-match $env $native $rhs))
       ((symbol? $symbol)
         (symbol-match $env $symbol $rhs))
       ((any-boolean? $any-boolean)
@@ -31,6 +33,8 @@
         (any-number-match $env $any-number $rhs))
       ((any-string? $any-string)
         (any-string-match $env $any-string $rhs))
+      ((any-type? $any-type)
+        (any-type-match $env $any-type $rhs))
       ((variable? $variable) 
         (variable-match $env $variable $rhs))
       ((abstraction? $abstraction) 
@@ -41,6 +45,9 @@
         (any-tuple-match $env $any-tuple $rhs))
       ((else $obj)
         (throw match $env $lhs $rhs))))
+
+  (define (native-match $env $native $rhs)
+    (and (native? $rhs) (equal? (native-term $native) (native-term $rhs))))
 
   (define (symbol-match $env $symbol $rhs)
     (and (symbol? $rhs) (symbol=? $symbol $rhs)))
@@ -53,6 +60,9 @@
 
   (define (any-string-match $env $any-string $rhs)
     (any-string? $rhs))
+
+  (define (any-type-match $env $any-type $rhs)
+    (any-type? $rhs))
 
   (define (variable-match $env $variable $rhs)
     (bind ($index (variable-index $variable))

@@ -5,8 +5,29 @@
 
 ; --------------------------------------------------------------
 
+(check (matches? (native `(foo bar)) (native `(foo bar))))
+(check (not (matches? (native `(foo bar)) (native `(foo gar)))))
+(check (not (matches? (native `(foo bar)) `(foo bar))))
+
 (check (matches? `foo `foo))
 (check (not (matches? `foo `bar)))
+
+(check (matches? (any-boolean) (any-boolean)))
+(check (not (matches? (any-boolean) `foo)))
+
+(check (matches? (any-number) (any-number)))
+(check (not (matches? (any-number) `foo)))
+
+(check (matches? (any-string) (any-string)))
+(check (not (matches? (any-string) `foo)))
+
+(check (matches? (any-type) (any-type)))
+(check (not (matches? (any-type) `foo)))
+
+(check (matches? (any-tuple `foo (list `t1 `t2)) (any-tuple `foo (list `t1 `t2))))
+(check (not (matches? (any-tuple `foo (list `t1 `t2)) (any-tuple `bar (list `t1 `t2)))))
+(check (not (matches? (any-tuple `foo (list `t1 `t2)) (any-tuple `foo (list `t1 `t3)))))
+(check (not (matches? (any-tuple `foo (list `t1 `t2)) `foo)))
 
 (check (matches? (abstraction 2 `foo) (abstraction 2`foo)))
 (check (not (matches? (abstraction 2 `foo) (abstraction 3 `foo))))
