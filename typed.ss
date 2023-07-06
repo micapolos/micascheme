@@ -1,7 +1,8 @@
 (library (typed)
   (export 
     typed typed? typed-value typed-type
-    parse evaluate)
+    parse evaluate
+    boolean number get)
 
   (import (micascheme) (term) (type))
 
@@ -32,14 +33,24 @@
         (syntax-error $stx
           (format "should be procedure, is ~s:" $type)))))
 
+  (define-aux-keyword boolean)
+  (define-aux-keyword number)
+  (define-aux-keyword get)
+
   (define (parse $env $stx)
-    (syntax-case $stx (boolean number string let)
+    (syntax-case $stx (boolean number string get let)
       ((boolean)
         (typed (any-boolean) (any-type)))
       ((number) 
         (typed (any-number) (any-type)))
       ((string) 
         (typed (any-string) (any-type)))
+      ((get type)
+        (let* (($type (typed-value (parse $env #`type)))
+               ($indexed-boolean (map-find-indexed (lambda ($env-type) (matches? $env-type $type)) $env)))
+          (if $indexed-boolean
+            (typed (variable (indexed-index $indexed-boolean)) $type)
+            (syntax-error $stx "unbound"))))
       ((let (expr ...) body)
         (let* (($exprs (syntax->list #`(expr ...)))
                ($body #`body)

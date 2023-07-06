@@ -4,10 +4,41 @@
   (type) 
   (typed))
 
-#;(check 
+; === literals ===
+
+(check 
+  (obj=? 
+    (parse (list) #`#t)
+    (typed #t (any-boolean))))
+
+(check 
+  (obj=? 
+    (parse (list) #`123)
+    (typed 123 (any-number))))
+
+(check 
+  (obj=? 
+    (parse (list) #`"foo")
+    (typed "foo" (any-string))))
+
+; === types ===
+
+(check 
   (obj=? 
     (parse (list) #`(boolean))
     (typed (any-boolean) (any-type))))
+
+(check 
+  (obj=? 
+    (parse (list) #`(number))
+    (typed (any-number) (any-type))))
+
+(check 
+  (obj=? 
+    (parse (list) #`(string))
+    (typed (any-string) (any-type))))
+
+; === application ===
 
 (check 
   (obj=?
@@ -23,6 +54,17 @@
           (application! (variable 0) "foo"))
         " apples")
       (any-string))))
+
+; === let / get ===
+
+(check 
+  (obj=?
+    (parse (list) #`(let ("foo") (get (string))))
+    (typed
+      (application! (abstraction 1 (variable 0)) "foo")
+      (any-string))))
+
+; === evaluate ===
 
 (check
   (obj=?
