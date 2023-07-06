@@ -79,20 +79,20 @@
       (any-tuple `foo (list (any-number) (any-string)))
       (any-type))))
 
-; === let / get ===
+; === use / get ===
 
 (check 
   (obj=?
-    (parse! (let ("foo") (get string)))
+    (parse! (use ("foo") (get string)))
     (typed
       (application! (abstraction 1 (variable 0)) "foo")
       (any-string))))
 
-; === let / application ===
+; === use / application ===
 
 (check
   (obj=?
-    (parse! (let ((native string-length (arrow (length string) number))) (length "foo")))
+    (parse! (use ((native string-length (arrow (length string) number))) (length "foo")))
     (typed
       (application!
         (abstraction 1 (application! (variable 0) "foo"))
@@ -105,5 +105,5 @@
 
 (check
   (obj=?
-    (evaluate! (let ((native string-length (arrow (length string) number))) (length "foo")))
+    (evaluate! (use ((native string-length (arrow (length string) number))) (length "foo")))
     (typed 3 (any-number))))
