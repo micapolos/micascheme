@@ -206,8 +206,8 @@
                 (error `check 
                   (format "\n~a   expr: ~s\n  value: ~s\n"
                     #,ann-string
-                    (quote (check (not (pred arg ...))))
-                    (list (quote check) (list (quote not) (list (quote pred) #,@tmps)))))))))
+                    (quote (not (pred arg ...)))
+                    (list (quote not) (list (quote pred) #,@tmps))))))))
         ((_ (pred arg ...))
           (let* ((args (syntax->list #`(arg ...)))
                  (tmps (generate-temporaries #`(arg ...)))
@@ -223,8 +223,8 @@
                 (error `check 
                   (format "\n~a   expr: ~s\n  value: ~s\n"
                     #,ann-string
-                    (quote (check (pred arg ...)))
-                    (list (quote check) (list (quote pred) #,@tmps)))))))))))
+                    (quote (pred arg ...))
+                    (list (quote pred) #,@tmps))))))))))
 
   ; --------------------------------------
 

@@ -4,6 +4,11 @@
   (type) 
   (typed))
 
+#;(check 
+  (obj=? 
+    (parse (list) #`(boolean))
+    (typed (any-boolean) (any-type))))
+
 (check 
   (obj=?
     (parse
