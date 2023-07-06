@@ -13,14 +13,14 @@
 
     any-type any-type?
     
-    arrow arrow? arrow-lhs arrow-rhs
+    arrow arrow? arrow-name arrow-params arrow-result
 
     make-tuple make-tuple? make-tuple-terms
     tuple-get tuple-get? tuple-get-size tuple-get-term tuple-get-index
 
     term->datum eval-term
 
-    application! tuple!)
+    application! tuple! arrow! any-tuple!)
 
   (import (micascheme))
 
@@ -36,7 +36,7 @@
   (data (any-tuple name types))
   (data (any-type))
 
-  (data (arrow lhs rhs))
+  (data (arrow name params result))
 
   (data (make-tuple terms))
   (data (tuple-get size term index))
@@ -90,8 +90,9 @@
 
   (define (depth-arrow->datum $depth $arrow)
     `(arrow
-      ,(depth-term->datum $depth (arrow-lhs $arrow))
-      ,(depth-term->datum $depth (arrow-rhs $arrow))))
+      (quote ,(arrow-name $arrow))
+      (list ,@(depth-terms->datums $depth (arrow-params $arrow)))
+      ,(depth-term->datum $depth (arrow-result $arrow))))
 
   (define (depth-make-tuple->datum $depth $make-tuple)
     (let* (($terms (make-tuple-terms $make-tuple))
@@ -143,8 +144,8 @@
   (define-syntax arrow!
     (lambda (stx)
       (syntax-case stx ()
-        ((_ name arg ... result)
-          #`(arrow (any-tuple! name arg ...) result)))))
+        ((_ (name arg ...) result)
+          #`(arrow (quote name) (list arg ...) result)))))
 
   (define-syntax tuple!
     (lambda (stx)
@@ -155,8 +156,8 @@
   (define-syntax any-tuple!
     (lambda (stx)
       (syntax-case stx ()
-        ((_ name arg ...)
-          #`(any-tuple name (list arg ...))))))
+        ((_ (name arg ...))
+          #`(any-tuple (quote name) (list arg ...))))))
 
   ; -----------------------------------------------
 

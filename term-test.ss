@@ -20,7 +20,7 @@
 
 (check (equal? (term->datum (any-type)) `(any-type)))
 
-(check (equal? (term->datum (arrow `t1 `t2)) `(arrow 't1 't2)))
+(check (equal? (term->datum (arrow `foo (list `t1 `t2) `t3)) `(arrow 'foo (list 't1 't2) 't3)))
 
 (check (equal? (term->datum (abstraction 2 `foo)) `(lambda (v0 v1) 'foo)))
 (check (equal? (term->datum (abstraction 2 (variable 0))) `(lambda (v0 v1) v1)))

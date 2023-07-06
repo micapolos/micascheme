@@ -90,9 +90,10 @@
   (define (arrow-match $env $arrow $rhs)
     (and
       (arrow? $rhs)
+      (symbol=? (arrow-name $arrow) (arrow-name $rhs))
       (bind-true 
-        ($env (match $env (arrow-lhs $arrow) (arrow-lhs $rhs)))
-        (match $env (arrow-rhs $arrow) (arrow-rhs $rhs)))))
+        ($env (list-match $env (arrow-params $arrow) (arrow-params $rhs)))
+        (match $env (arrow-result $arrow) (arrow-result $rhs)))))
 
   (define (any-tuple-match $env $any-tuple $rhs)
     (and

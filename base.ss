@@ -60,10 +60,10 @@
                 ((pred #,tmp)
                   (let ((var #,tmp)) body ...)) ...)))))))
 
-  (define (fold-indices-from f folded size index)
+  (define (fold-indices-from fn folded size index)
     (cond
       ((= index size) folded)
-      (else (fold-indices-from f (f folded index) size (+ index 1)))))
+      (else (fold-indices-from fn (fn folded index) size (+ index 1)))))
 
   (define (fold-indices f folded size)
     (fold-indices-from f folded size 0))

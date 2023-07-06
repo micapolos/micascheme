@@ -102,10 +102,11 @@
         (typed (any-number) (any-type)))
       (string
         (typed (any-string) (any-type)))
-      ((arrow lhs rhs)
+      ((arrow (name param ...) rhs)
         (typed
-          (arrow 
-            (env-parse-type $env #`lhs)
+          (arrow
+            (syntax->datum #`arg)
+            (map (partial env-parse-type $env) (syntax->list #`(param ...)))
             (env-parse-type $env #`rhs))
           (any-type)))
       ((get $type-stx)
@@ -140,8 +141,9 @@
                   (lambda ($env-type) 
                     (and 
                       (arrow? $env-type) 
-                      (matches? (arrow-lhs $env-type) $type) 
-                      (arrow-rhs $env-type)))
+                      (symbol=? (arrow-name $env-type) $id)
+                      (list-matches? (arrow-params $env-type) $arg-types) 
+                      (arrow-result $env-type)))
                   $env)))
           (cond
             ($indexed-result-type
