@@ -4,6 +4,18 @@
 
 (check (equal? (term->datum `foo) ''foo))
 
+(check (equal? (term->datum #f) #f))
+(check (equal? (term->datum #t) #t))
+(check (equal? (term->datum 123) 123))
+(check (equal? (term->datum "foo") "foo"))
+
+(check (equal? (term->datum (any-boolean)) `(any-boolean)))
+(check (equal? (term->datum (any-number)) `(any-number)))
+(check (equal? (term->datum (any-string)) `(any-string)))
+(check (equal? (term->datum (any-type)) `(any-type)))
+
+(check (equal? (term->datum (arrow `t1 `t2)) `(arrow 't1 't2)))
+
 (check (equal? (term->datum (abstraction 2 `foo)) `(lambda (v0 v1) 'foo)))
 (check (equal? (term->datum (abstraction 2 (variable 0))) `(lambda (v0 v1) v1)))
 (check (equal? (term->datum (abstraction 2 (variable 1))) `(lambda (v0 v1) v0)))
