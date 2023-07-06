@@ -50,12 +50,11 @@
   (define (parse $env $stx)
     (syntax-case $stx (native boolean number string arrow get let)
       ((native value type)
-        (let ()
-          (unless (identifier? #`value)
-            (syntax-error #`value "should be identifier:"))
+        (if (identifier? #`value)
           (typed 
             (syntax->datum #`value) 
-            (parse-type $env #`type))))
+            (parse-type $env #`type))
+          (syntax-error #`value "should be identifier:")))
       (boolean
         (typed (any-boolean) (any-type)))
       (number 
