@@ -16,6 +16,13 @@
   (data (env frames))
   (data (frame types))
 
+  (define (env-select-indexed-type $env $symbol)
+    (map-find-indexed 
+      (lambda ($type) (and (type-named? $type $symbol) $type))
+      $env))
+
+  ; ----------------------------------------------------------------
+
   (define (frame-symbol->indexed-types $frame $symbol)
     (define $indexed-types
       (map-indexed
@@ -180,10 +187,7 @@
           ((string? $string) 
             (typed $string (string-type)))
           ((symbol? $symbol)
-            (let* (($indexed-type 
-                    (map-find-indexed 
-                      (lambda ($type) (and (type-named? $type $symbol) $type))
-                      $env)))
+            (let* (($indexed-type (env-select-indexed-type $env $symbol)))
               (if $indexed-type
                 (typed 
                   (variable (indexed-index $indexed-type))
