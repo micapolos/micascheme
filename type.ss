@@ -1,7 +1,8 @@
 (library (type)
   (export 
     matches?
-    type-selector)
+    type-selector
+    type-selector-index)
 
   (import (micascheme) (term))
 
@@ -75,4 +76,15 @@
       ((any-type? _) `type)
       ((pair? $pair) (bind ($car (car $pair)) (and (symbol? $car) $car)))
       ((else $other) #f)))
+
+  (define (type-selector-index $type $selector)
+    (and (pair? $type)
+      (bind-true 
+        ($indexed
+          (map-find-indexed 
+            (lambda ($sub-type) 
+              (bind-true ($sub-selector (type-selector $sub-type))
+                (eq? $sub-selector $selector)))
+            (cdr $type)))
+        (indexed-index $indexed))))
 )

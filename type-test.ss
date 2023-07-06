@@ -34,3 +34,10 @@
 (check (eq? (type-selector (list `foo (any-number))) `foo))
 (check (eq? (type-selector `foo) `foo))
 (check (eq? (type-selector 123) #f))
+
+; ------------------------------------------
+
+(check (eq? (type-selector-index `(foo ,(any-string) ,(any-number)) `string) 0))
+(check (eq? (type-selector-index `(foo ,(any-string) ,(any-number)) `number) 1))
+(check (eq? (type-selector-index `(foo ,(any-string) ,(any-number)) `boolean) #f))
+(check (eq? (type-selector-index (any-string) `string) #f))
