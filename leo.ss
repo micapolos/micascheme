@@ -7,7 +7,7 @@
       (syntax-case stx ()
         ((leo expr)
           (let* (($expr #`expr)
-                 ($typed-term (parse (list) $expr))
+                 ($typed-term (parse $expr))
                  ($term (typed-value $typed-term))
                  ($datum (term->datum $term)))
             (datum->syntax #`leo $datum))))))

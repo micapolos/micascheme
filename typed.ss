@@ -1,7 +1,7 @@
 (library (typed)
   (export 
     typed typed? typed-value typed-type
-    parse evaluate
+    parse! parse env-parse evaluate
     boolean number get)
 
   (import (micascheme) (term) (type))
@@ -10,31 +10,39 @@
 
   ; ----------------------------------------------------------------
 
+  (define-syntax parse!
+    (syntax-rules ()
+      ((_ expr)
+        (parse #'expr))))
+
+  (define (parse $stx)
+    (env-parse (list) #f $stx))
+
   (define (v $index)
     (string->symbol
       (string-append "v"
         (number->string $index))))
 
-  (define (parse-list $env $stxs)
-    (map (partial parse $env) $stxs))
+  (define (env-parse-list $env $type? $stxs)
+    (map (partial env-parse $env $type?) $stxs))
 
-  (define (parse-as $env $stx $as-type)
-    (let* (($typed (parse $env $stx))
+  (define (env-parse-as $env $type? $stx $as-type)
+    (let* (($typed (env-parse $env $type? $stx))
            ($type (typed-type $typed)))
       (if (matches? $as-type $typed)
         (typed (typed-value $typed) $as-type)
         (syntax-error $stx
           (format "should be ~s, is ~s:" $as-type $type)))))
 
-  (define (parse-proc $env $stx)
-    (let* (($typed (parse $env $stx))
+  (define (env-parse-proc $env $type? $stx)
+    (let* (($typed (env-parse $env $type? $stx))
            ($type (typed-type $typed)))
       (and (arrow? $type)
         (syntax-error $stx
           (format "should be procedure, is ~s:" $type)))))
 
-  (define (parse-type $env $stx)
-    (let* (($typed (parse $env $stx))
+  (define (env-parse-type $env $stx)
+    (let* (($typed (env-parse $env #t $stx))
            ($value (typed-value $typed))
            ($type (typed-type $typed)))
       (unless (any-type? (typed-type $typed))
@@ -46,13 +54,13 @@
   (define-aux-keyword number)
   (define-aux-keyword get)
 
-  (define (parse $env $stx)
+  (define (env-parse $env $type? $stx)
     (syntax-case $stx (native boolean number string arrow get let)
       ((native value type)
         (if (identifier? #`value)
           (typed 
             (native (syntax->datum #`value))
-            (parse-type $env #`type))
+            (env-parse-type $env #`type))
           (syntax-error #`value "should be identifier:")))
       (boolean
         (typed (any-boolean) (any-type)))
@@ -63,11 +71,11 @@
       ((arrow lhs rhs)
         (typed
           (arrow 
-            (parse-type $env #`lhs)
-            (parse-type $env #`rhs))
+            (env-parse-type $env #`lhs)
+            (env-parse-type $env #`rhs))
           (any-type)))
       ((get type)
-        (let* (($type (parse-type $env #`type))
+        (let* (($type (env-parse-type $env #`type))
                ($indexed-boolean (map-find-indexed (lambda ($env-type) (matches? $env-type $type)) $env)))
           (if $indexed-boolean
             (typed (variable (indexed-index $indexed-boolean)) $type)
@@ -76,11 +84,11 @@
         (let* (($exprs (syntax->list #`(expr ...)))
                ($body #`body)
                ($arity (length $exprs))
-               ($typed-terms (parse-list $env $exprs))
+               ($typed-terms (env-parse-list $env $type? $exprs))
                ($terms (map typed-value $typed-terms))
                ($types (map typed-type $typed-terms))
                ($body-env (append (reverse $types) $env))
-               ($typed-body (parse $body-env $body))
+               ($typed-body (env-parse $body-env $type? $body))
                ($body-term (typed-value $typed-body))
                ($body-type (typed-type $typed-body)))
           (typed
@@ -89,7 +97,7 @@
       ((id arg ...) (identifier? #`id)
         (let* (($id (syntax->datum #`id))
                ($args (syntax->list #`(arg ...)))
-               ($typed-args (parse-list $env $args))
+               ($typed-args (env-parse-list $env $type? $args))
                ($arg-types (map typed-type $typed-args))
                ($arg-values (map typed-value $typed-args))
                ($type (any-tuple $id $arg-types))
@@ -130,7 +138,7 @@
     (let* (($arity (length $env))
            ($ids (map car $env))
            ($types (map cdr $env))
-           ($typed (parse $types $stx))
+           ($typed (env-parse $types #f $stx))
            ($term (typed-value $typed))
            ($type (typed-type $typed)))
       (typed

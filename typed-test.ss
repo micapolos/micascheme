@@ -8,58 +8,58 @@
 
 (check 
   (obj=? 
-    (parse (list) #`#t)
+    (parse! #t)
     (typed #t (any-boolean))))
 
 (check 
   (obj=? 
-    (parse (list) #`123)
+    (parse! 123)
     (typed 123 (any-number))))
 
 (check 
   (obj=? 
-    (parse (list) #`"foo")
+    (parse! "foo")
     (typed "foo" (any-string))))
 
 (check 
   (obj=? 
-    (parse (list) #`foo)
+    (parse! foo)
     (typed #f `foo)))
 
 ; === native ===
 
 (check
   (obj=?
-    (parse (list) #`(native pi number))
+    (parse! (native pi number))
     (typed (native `pi) (any-number))))
 
 ; === types ===
 
 (check 
   (obj=? 
-    (parse (list) #`boolean)
+    (parse! boolean)
     (typed (any-boolean) (any-type))))
 
 (check 
   (obj=? 
-    (parse (list) #`number)
+    (parse! number)
     (typed (any-number) (any-type))))
 
 (check 
   (obj=? 
-    (parse (list) #`string)
+    (parse! string)
     (typed (any-string) (any-type))))
 
 (check
   (obj=?
-    (parse (list) #`(arrow number string))
+    (parse! (arrow number string))
     (typed (arrow (any-number) (any-string)) (any-type))))
 
 ; === structure make ===
 
 (check
   (obj=?
-    (parse (list) #`(foo 10 "bar"))
+    (parse! (foo 10 "bar"))
     (typed
       (make-tuple (list (any-number) (any-string)) (list 10 "bar"))
       (any-tuple `foo (list (any-number) (any-string))))))
@@ -68,11 +68,12 @@
 
 (check 
   (obj=?
-    (parse
+    (env-parse
       (list 
         (arrow (any-tuple `length (list (any-string))) (any-number))
         (arrow (any-tuple `string (list (any-number))) (any-string))
         (arrow (any-tuple `append (list (any-string) (any-string))) (any-string)))
+      #f
       #`(append (string (length "foo")) " apples"))
     (typed
       (application! (variable 2)
@@ -85,7 +86,7 @@
 
 (check 
   (obj=?
-    (parse (list) #`(let ("foo") (get string)))
+    (parse! (let ("foo") (get string)))
     (typed
       (application! (abstraction 1 (variable 0)) "foo")
       (any-string))))
