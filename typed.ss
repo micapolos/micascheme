@@ -33,6 +33,15 @@
         (syntax-error $stx
           (format "should be procedure, is ~s:" $type)))))
 
+  (define (parse-type $env $stx)
+    (let* (($typed (parse $env $stx))
+           ($value (typed-value $typed))
+           ($type (typed-type $typed)))
+      (unless (any-type? (typed-type $typed))
+        (syntax-error $stx 
+          (format "should be type, is ~s:" $type)))
+      $value))
+
   (define-aux-keyword native)
   (define-aux-keyword boolean)
   (define-aux-keyword number)
@@ -41,9 +50,12 @@
   (define (parse $env $stx)
     (syntax-case $stx (native boolean number string arrow get let)
       ((native value type)
-        (typed 
-          (syntax->datum #`value) 
-          (typed-value (parse $env #`type))))
+        (let ()
+          (unless (identifier? #`value)
+            (syntax-error #`value "should be identifier:"))
+          (typed 
+            (syntax->datum #`value) 
+            (parse-type $env #`type))))
       (boolean
         (typed (any-boolean) (any-type)))
       (number 
@@ -53,11 +65,11 @@
       ((arrow lhs rhs)
         (typed
           (arrow 
-            (typed-value (parse $env #`lhs))
-            (typed-value (parse $env #`rhs)))
+            (parse-type $env #`lhs)
+            (parse-type $env #`rhs))
           (any-type)))
       ((get type)
-        (let* (($type (typed-value (parse $env #`type))) ; TODO: Check type to be (any-type)
+        (let* (($type (parse-type $env #`type))
                ($indexed-boolean (map-find-indexed (lambda ($env-type) (matches? $env-type $type)) $env)))
           (if $indexed-boolean
             (typed (variable (indexed-index $indexed-boolean)) $type)
