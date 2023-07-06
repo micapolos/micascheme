@@ -2,3 +2,4 @@
 (load "term-test.ss")
 (load "type-test.ss")
 (load "typed-test.ss")
+(load "leo-test.ss")

@@ -103,3 +103,5 @@
         (cons `string-append (arrow `(append ,(any-string) ,(any-string)) (any-string))))
       #`(append (string (length "foo")) " apples"))
     (typed "3 apples" (any-string))))
+
+(writeln (eval! 123))

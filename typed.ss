@@ -126,5 +126,4 @@
           (application (abstraction $arity $term) (reverse $ids))
           (environment `(micascheme) `(type)))
         $type)))
-
 )
