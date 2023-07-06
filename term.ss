@@ -137,14 +137,26 @@
   (define-syntax application!
     (lambda (stx)
       (syntax-case stx ()
-        ((_ fn args ...)
-          #`(application fn (list args ...))))))
+        ((_ fn arg ...)
+          #`(application fn (list arg ...))))))
+
+  (define-syntax arrow!
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ name arg ... result)
+          #`(arrow (any-tuple! name arg ...) result)))))
 
   (define-syntax tuple!
     (lambda (stx)
       (syntax-case stx ()
-        ((_ args ...)
-          #`(make-tuple (list args ...))))))
+        ((_ arg ...)
+          #`(make-tuple (list arg ...))))))
+
+  (define-syntax any-tuple!
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ name arg ...)
+          #`(any-tuple name (list arg ...))))))
 
   ; -----------------------------------------------
 
