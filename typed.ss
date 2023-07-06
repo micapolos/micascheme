@@ -77,7 +77,7 @@
     (let* (($typed (env-parse $env #t $stx))
            ($value (typed-value $typed))
            ($type (typed-type $typed)))
-      (unless (any-type? (typed-type $typed))
+      (unless (type-type? (typed-type $typed))
         (syntax-error $stx 
           (format "should be type:")))
       $value))
@@ -97,18 +97,18 @@
             (env-parse-type $env #`$type))
           (syntax-error #`$value "should be identifier:")))
       (boolean
-        (typed (any-boolean) (any-type)))
+        (typed (boolean-type) (type-type)))
       (number 
-        (typed (any-number) (any-type)))
+        (typed (number-type) (type-type)))
       (string
-        (typed (any-string) (any-type)))
+        (typed (string-type) (type-type)))
       ((arrow (name param ...) rhs)
         (typed
           (arrow
-            (syntax->datum #`arg)
+            (syntax->datum #`name)
             (map (partial env-parse-type $env) (syntax->list #`(param ...)))
             (env-parse-type $env #`rhs))
-          (any-type)))
+          (type-type)))
       ((get $type-stx)
         (let* (($type (env-parse-type $env #`$type-stx))
                ($indexed-boolean (map-find-indexed (lambda ($env-type) (matches? $env-type $type)) $env)))
@@ -135,7 +135,7 @@
                ($typed-args (env-parse-list $env $type? $args))
                ($arg-types (map typed-type $typed-args))
                ($arg-values (map typed-value $typed-args))
-               ($type (any-tuple $id $arg-types))
+               ($type (tuple-type $id $arg-types))
                ($indexed-result-type 
                 (map-find-indexed 
                   (lambda ($env-type) 
@@ -156,19 +156,19 @@
             (else
               (if $type?
                 (typed
-                  (any-tuple $id $arg-values)
-                  (any-type))
+                  (tuple-type $id $arg-values)
+                  (type-type))
                 (typed
                   (make-tuple $arg-values)
-                  (any-tuple $id $arg-types)))))))
+                  (tuple-type $id $arg-types)))))))
       (_
         (switch (syntax->datum $stx)
           ((boolean? $boolean) 
-            (typed $boolean (any-boolean)))
+            (typed $boolean (boolean-type)))
           ((number? $number)
-            (typed $number (any-number)))
+            (typed $number (number-type)))
           ((string? $string) 
-            (typed $string (any-string)))
+            (typed $string (string-type)))
           ((symbol? $symbol)
             (typed #f $symbol))))))
 

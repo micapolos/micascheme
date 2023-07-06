@@ -9,17 +9,17 @@
 (check 
   (obj=? 
     (parse! #t)
-    (typed #t (any-boolean))))
+    (typed #t (boolean-type))))
 
 (check 
   (obj=? 
     (parse! 123)
-    (typed 123 (any-number))))
+    (typed 123 (number-type))))
 
 (check 
   (obj=? 
     (parse! "foo")
-    (typed "foo" (any-string))))
+    (typed "foo" (string-type))))
 
 (check 
   (obj=? 
@@ -35,40 +35,38 @@
         (arrow (length string) number)))
     (typed
       (native `string-length)
-      (arrow
-        (any-tuple `length (list (any-string)))
-        (any-number)))))
+      (arrow! (length (string-type)) (number-type)))))
 
 ; === types ===
 
 (check 
   (obj=? 
     (parse! boolean)
-    (typed (any-boolean) (any-type))))
+    (typed (boolean-type) (type-type))))
 
 (check 
   (obj=? 
     (parse! number)
-    (typed (any-number) (any-type))))
+    (typed (number-type) (type-type))))
 
 (check 
   (obj=? 
     (parse! string)
-    (typed (any-string) (any-type))))
+    (typed (string-type) (type-type))))
 
 (check
   (obj=?
-    (parse! (arrow number string))
-    (typed (arrow (any-number) (any-string)) (any-type))))
+    (parse! (arrow (foo number) string))
+    (typed (arrow! (foo (number-type)) (string-type)) (type-type))))
 
-; === any-tupleure make ===
+; === tuple-typeure make ===
 
 (check
   (obj=?
     (parse! (foo 10 "bar"))
     (typed
       (tuple! 10 "bar")
-      (any-tuple `foo (list (any-number) (any-string))))))
+      (tuple-type `foo (list (number-type) (string-type))))))
 
 ; === use / get ===
 
@@ -77,7 +75,7 @@
     (parse! (use ("foo") (get string)))
     (typed
       (application! (abstraction 1 (variable 0)) "foo")
-      (any-string))))
+      (string-type))))
 
 ; === use / application ===
 
@@ -88,7 +86,7 @@
       (application!
         (abstraction 1 (application! (variable 0) "foo"))
         (native `string-length))
-      (any-number))))
+      (number-type))))
 
 ; === evaluate ===
 
@@ -102,4 +100,4 @@
          (native number->string (arrow (string number) string))
          (native string-append (arrow (append string string) string)))
         (append (string (length "foo")) " apples")))
-    (typed "3 apples" (any-string))))
+    (typed "3 apples" (string-type))))

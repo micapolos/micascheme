@@ -11,14 +11,14 @@
 (check (equal? (term->datum 123) 123))
 (check (equal? (term->datum "foo") "foo"))
 
-(check (equal? (term->datum (any-boolean)) `(any-boolean)))
-(check (equal? (term->datum (any-number)) `(any-number)))
-(check (equal? (term->datum (any-string)) `(any-string)))
+(check (equal? (term->datum (boolean-type)) `(boolean-type)))
+(check (equal? (term->datum (number-type)) `(number-type)))
+(check (equal? (term->datum (string-type)) `(string-type)))
 
-(check (equal? (term->datum (any-tuple `foo (list))) `(any-tuple 'foo (list))))
-(check (equal? (term->datum (any-tuple `foo (list `t1 `t2))) `(any-tuple 'foo (list 't1 't2))))
+(check (equal? (term->datum (tuple-type `foo (list))) `(tuple-type 'foo (list))))
+(check (equal? (term->datum (tuple-type `foo (list `t1 `t2))) `(tuple-type 'foo (list 't1 't2))))
 
-(check (equal? (term->datum (any-type)) `(any-type)))
+(check (equal? (term->datum (type-type)) `(type-type)))
 
 (check (equal? (term->datum (arrow `foo (list `t1 `t2) `t3)) `(arrow 'foo (list 't1 't2) 't3)))
 

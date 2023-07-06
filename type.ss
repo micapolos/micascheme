@@ -1,6 +1,6 @@
 (library (type)
   (export 
-    matches?
+    matches? list-matches?
     type-selector
     type-selector-index)
 
@@ -13,6 +13,9 @@
   ; TODO - Change argument order
   (define (matches? $lhs $rhs)
     (and (match `() $lhs $rhs) #t))
+
+  (define (list-matches? $lhss $rhss)
+    (andmap matches? $lhss $rhss))
 
   (define (list-match $env $lhs $rhs)
     (if (null? $lhs)
@@ -27,22 +30,22 @@
         (native-match $env $native $rhs))
       ((symbol? $symbol)
         (symbol-match $env $symbol $rhs))
-      ((any-boolean? $any-boolean)
-        (any-boolean-match $env $any-boolean $rhs))
-      ((any-number? $any-number)
-        (any-number-match $env $any-number $rhs))
-      ((any-string? $any-string)
-        (any-string-match $env $any-string $rhs))
-      ((any-type? $any-type)
-        (any-type-match $env $any-type $rhs))
+      ((boolean-type? $boolean-type)
+        (boolean-type-match $env $boolean-type $rhs))
+      ((number-type? $number-type)
+        (number-type-match $env $number-type $rhs))
+      ((string-type? $string-type)
+        (string-type-match $env $string-type $rhs))
+      ((type-type? $type-type)
+        (type-type-match $env $type-type $rhs))
       ((variable? $variable) 
         (variable-match $env $variable $rhs))
       ((abstraction? $abstraction) 
         (abstraction-match $env $abstraction $rhs))
       ((arrow? $arrow) 
         (arrow-match $env $arrow $rhs))
-      ((any-tuple? $any-tuple)
-        (any-tuple-match $env $any-tuple $rhs))
+      ((tuple-type? $tuple-type)
+        (tuple-type-match $env $tuple-type $rhs))
       ((else $obj)
         (throw match $env $lhs $rhs))))
 
@@ -52,17 +55,17 @@
   (define (symbol-match $env $symbol $rhs)
     (and (symbol? $rhs) (symbol=? $symbol $rhs)))
 
-  (define (any-boolean-match $env $any-boolean $rhs)
-    (any-boolean? $rhs))
+  (define (boolean-type-match $env $boolean-type $rhs)
+    (boolean-type? $rhs))
 
-  (define (any-number-match $env $any-number $rhs)
-    (any-number? $rhs))
+  (define (number-type-match $env $number-type $rhs)
+    (number-type? $rhs))
 
-  (define (any-string-match $env $any-string $rhs)
-    (any-string? $rhs))
+  (define (string-type-match $env $string-type $rhs)
+    (string-type? $rhs))
 
-  (define (any-type-match $env $any-type $rhs)
-    (any-type? $rhs))
+  (define (type-type-match $env $type-type $rhs)
+    (type-type? $rhs))
 
   (define (variable-match $env $variable $rhs)
     (bind ($index (variable-index $variable))
@@ -95,25 +98,25 @@
         ($env (list-match $env (arrow-params $arrow) (arrow-params $rhs)))
         (match $env (arrow-result $arrow) (arrow-result $rhs)))))
 
-  (define (any-tuple-match $env $any-tuple $rhs)
+  (define (tuple-type-match $env $tuple-type $rhs)
     (and
-      (any-tuple? $rhs)
+      (tuple-type? $rhs)
       (symbol=?
-        (any-tuple-name $any-tuple)
-        (any-tuple-name $rhs))
+        (tuple-type-name $tuple-type)
+        (tuple-type-name $rhs))
       (list-match $env
-        (any-tuple-types $any-tuple)
-        (any-tuple-types $rhs))))
+        (tuple-type-types $tuple-type)
+        (tuple-type-types $rhs))))
 
   ; ------------------------------------------------
 
   (define (type-selector $type)
     (switch $type
       ((symbol? $symbol) $symbol)
-      ((any-boolean? _) `boolean)
-      ((any-number? _) `number)
-      ((any-string? _) `string)
-      ((any-type? _) `type)
+      ((boolean-type? _) `boolean)
+      ((number-type? _) `number)
+      ((string-type? _) `string)
+      ((type-type? _) `type)
       ((pair? $pair) (bind ($car (car $pair)) (and (symbol? $car) $car)))
       ((else $other) #f)))
 

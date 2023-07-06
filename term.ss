@@ -6,12 +6,12 @@
     application application? application-fn application-args
     variable variable? variable-index
 
-    any-boolean any-boolean?
-    any-number any-number?
-    any-string any-string?
-    any-tuple any-tuple? any-tuple-name any-tuple-types
+    boolean-type boolean-type?
+    number-type number-type?
+    string-type string-type?
+    tuple-type tuple-type? tuple-type-name tuple-type-types
 
-    any-type any-type?
+    type-type type-type?
     
     arrow arrow? arrow-name arrow-params arrow-result
 
@@ -20,7 +20,7 @@
 
     term->datum eval-term
 
-    application! tuple! arrow! any-tuple!)
+    application! tuple! arrow! tuple-type!)
 
   (import (micascheme))
 
@@ -30,11 +30,11 @@
   (data (application fn args))
   (data (abstraction arity body))
 
-  (data (any-boolean))
-  (data (any-number))
-  (data (any-string))
-  (data (any-tuple name types))
-  (data (any-type))
+  (data (boolean-type))
+  (data (number-type))
+  (data (string-type))
+  (data (tuple-type name types))
+  (data (type-type))
 
   (data (arrow name params result))
 
@@ -54,11 +54,11 @@
       ((boolean? $string) $string)
       ((number? $number) $number)
       ((string? $string) $string)
-      ((any-boolean? _) `(any-boolean))
-      ((any-number? _) `(any-number))
-      ((any-string? _) `(any-string))
-      ((any-tuple? $any-tuple) (depth-any-tuple->datum $depth $any-tuple))
-      ((any-type? _) `(any-type))
+      ((boolean-type? _) `(boolean-type))
+      ((number-type? _) `(number-type))
+      ((string-type? _) `(string-type))
+      ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
+      ((type-type? _) `(type-type))
       ((variable? $variable) (depth-variable->datum $depth $variable))
       ((application? $application) (depth-application->datum $depth $application))
       ((abstraction? $abstraction) (depth-abstraction->datum $depth $abstraction))
@@ -104,13 +104,13 @@
         ((2) `(cons ,(car $datums) ,(cadr $datums)))
         (else `(vector ,@$datums)))))
 
-  (define (depth-any-tuple->datum $depth $any-tuple)
-    `(any-tuple
-      (quote ,(any-tuple-name $any-tuple))
+  (define (depth-tuple-type->datum $depth $tuple-type)
+    `(tuple-type
+      (quote ,(tuple-type-name $tuple-type))
       (list
         ,@(depth-terms->datums
           $depth
-          (any-tuple-types $any-tuple)))))
+          (tuple-type-types $tuple-type)))))
 
   (define (depth-tuple-get->datum $depth $tuple-get)
     (let* (($size (tuple-get-size $tuple-get))
@@ -153,11 +153,11 @@
         ((_ arg ...)
           #`(make-tuple (list arg ...))))))
 
-  (define-syntax any-tuple!
+  (define-syntax tuple-type!
     (lambda (stx)
       (syntax-case stx ()
         ((_ (name arg ...))
-          #`(any-tuple (quote name) (list arg ...))))))
+          #`(tuple-type (quote name) (list arg ...))))))
 
   ; -----------------------------------------------
 

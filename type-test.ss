@@ -12,22 +12,22 @@
 (check (matches? `foo `foo))
 (check (not (matches? `foo `bar)))
 
-(check (matches? (any-boolean) (any-boolean)))
-(check (not (matches? (any-boolean) `foo)))
+(check (matches? (boolean-type) (boolean-type)))
+(check (not (matches? (boolean-type) `foo)))
 
-(check (matches? (any-number) (any-number)))
-(check (not (matches? (any-number) `foo)))
+(check (matches? (number-type) (number-type)))
+(check (not (matches? (number-type) `foo)))
 
-(check (matches? (any-string) (any-string)))
-(check (not (matches? (any-string) `foo)))
+(check (matches? (string-type) (string-type)))
+(check (not (matches? (string-type) `foo)))
 
-(check (matches? (any-type) (any-type)))
-(check (not (matches? (any-type) `foo)))
+(check (matches? (type-type) (type-type)))
+(check (not (matches? (type-type) `foo)))
 
-(check (matches? (any-tuple `foo (list `t1 `t2)) (any-tuple `foo (list `t1 `t2))))
-(check (not (matches? (any-tuple `foo (list `t1 `t2)) (any-tuple `bar (list `t1 `t2)))))
-(check (not (matches? (any-tuple `foo (list `t1 `t2)) (any-tuple `foo (list `t1 `t3)))))
-(check (not (matches? (any-tuple `foo (list `t1 `t2)) `foo)))
+(check (matches? (tuple-type `foo (list `t1 `t2)) (tuple-type `foo (list `t1 `t2))))
+(check (not (matches? (tuple-type `foo (list `t1 `t2)) (tuple-type `bar (list `t1 `t2)))))
+(check (not (matches? (tuple-type `foo (list `t1 `t2)) (tuple-type `foo (list `t1 `t3)))))
+(check (not (matches? (tuple-type `foo (list `t1 `t2)) `foo)))
 
 (check (matches? (abstraction 2 `foo) (abstraction 2 `foo)))
 (check (not (matches? (abstraction 2 `foo) (abstraction 3 `foo))))
@@ -50,17 +50,17 @@
 
 ; ------------------------------------------
 
-(check (eq? (type-selector (any-boolean)) `boolean))
-(check (eq? (type-selector (any-number)) `number))
-(check (eq? (type-selector (any-string)) `string))
-(check (eq? (type-selector (any-type)) `type))
-(check (eq? (type-selector (list `foo (any-number))) `foo))
+(check (eq? (type-selector (boolean-type)) `boolean))
+(check (eq? (type-selector (number-type)) `number))
+(check (eq? (type-selector (string-type)) `string))
+(check (eq? (type-selector (type-type)) `type))
+(check (eq? (type-selector (list `foo (number-type))) `foo))
 (check (eq? (type-selector `foo) `foo))
 (check (eq? (type-selector 123) #f))
 
 ; ------------------------------------------
 
-(check (eq? (type-selector-index `(foo ,(any-string) ,(any-number)) `string) 0))
-(check (eq? (type-selector-index `(foo ,(any-string) ,(any-number)) `number) 1))
-(check (eq? (type-selector-index `(foo ,(any-string) ,(any-number)) `boolean) #f))
-(check (eq? (type-selector-index (any-string) `string) #f))
+(check (eq? (type-selector-index `(foo ,(string-type) ,(number-type)) `string) 0))
+(check (eq? (type-selector-index `(foo ,(string-type) ,(number-type)) `number) 1))
+(check (eq? (type-selector-index `(foo ,(string-type) ,(number-type)) `boolean) #f))
+(check (eq? (type-selector-index (string-type) `string) #f))
