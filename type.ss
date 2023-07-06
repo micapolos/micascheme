@@ -1,24 +1,10 @@
 (library (type)
   (export 
-    any-boolean any-boolean?
-    any-number any-number?
-    any-string any-string?
-    any-type any-type?
-    
-    arrow arrow? arrow-lhs arrow-rhs
-
     matches?)
 
   (import (micascheme) (term))
 
   ; ---------------------------------------------------------
-
-  (data (any-boolean))
-  (data (any-number))
-  (data (any-string))
-  (data (any-type))
-
-  (data (arrow lhs rhs))
 
   (data (hole))
 

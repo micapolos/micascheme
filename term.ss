@@ -3,6 +3,14 @@
     abstraction abstraction? abstraction-arity abstraction-body
     application application? application-fn application-args
     variable variable? variable-index
+
+    any-boolean any-boolean?
+    any-number any-number?
+    any-string any-string?
+    any-type any-type?
+    
+    arrow arrow? arrow-lhs arrow-rhs
+
     term->datum eval-term
 
     application!)
@@ -12,6 +20,13 @@
   (data (variable index))
   (data (application fn args))
   (data (abstraction arity body))
+
+  (data (any-boolean))
+  (data (any-number))
+  (data (any-string))
+  (data (any-type))
+
+  (data (arrow lhs rhs))
 
   (define (term->datum $term)
     (depth-term->datum 0 $term))
