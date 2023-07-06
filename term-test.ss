@@ -24,10 +24,10 @@
 
 (check (equal? (term->datum (application `foo (list `bar `goo))) `('foo 'bar 'goo)))
 
-(check (equal? (term->datum (make-tuple (list))) #f))
-(check (equal? (term->datum (make-tuple (list "foo"))) "foo"))
-(check (equal? (term->datum (make-tuple (list "foo" "bar"))) `(cons "foo" "bar")))
-(check (equal? (term->datum (make-tuple (list "foo" "bar" "goo"))) `(vector "foo" "bar" "goo")))
+(check (equal? (term->datum (make-tuple (list) (list))) #f))
+(check (equal? (term->datum (make-tuple (list `t1) (list "foo"))) "foo"))
+(check (equal? (term->datum (make-tuple (list `t1 `t2) (list "foo" "bar"))) `(cons "foo" "bar")))
+(check (equal? (term->datum (make-tuple (list `t1 `t2 `t3) (list "foo" "bar" "goo"))) `(vector "foo" "bar" "goo")))
 
 (check (equal? (term->datum (tuple-get (list `t1) `x 0)) ''x))
 (check (equal? (term->datum (tuple-get (list `t1 `t2) `x 0)) `(car 'x)))

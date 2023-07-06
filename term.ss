@@ -35,7 +35,7 @@
 
   (data (arrow lhs rhs))
 
-  (data (make-tuple types))
+  (data (make-tuple types terms))
   (data (tuple-get types term index))
 
   (define (term->datum $term)
@@ -91,8 +91,9 @@
 
   (define (depth-make-tuple->datum $depth $make-tuple)
     (let* (($types (make-tuple-types $make-tuple))
+           ($terms (make-tuple-terms $make-tuple))
            ($length (length $types))
-           ($datums (depth-terms->datums $depth $types)))
+           ($datums (depth-terms->datums $depth $terms)))
       (case $length
         ((0) #f)
         ((1) (car $datums))
