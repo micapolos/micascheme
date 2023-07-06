@@ -12,17 +12,17 @@
 (check (matches? `foo `foo))
 (check (not (matches? `foo `bar)))
 
-(check (matches? (boolean-type) (boolean-type)))
-(check (not (matches? (boolean-type) `foo)))
+(check (matches? boolean! boolean!))
+(check (not (matches? boolean! `foo)))
 
-(check (matches? (number-type) (number-type)))
-(check (not (matches? (number-type) `foo)))
+(check (matches? number! number!))
+(check (not (matches? number! `foo)))
 
-(check (matches? (string-type) (string-type)))
-(check (not (matches? (string-type) `foo)))
+(check (matches? string! string!))
+(check (not (matches? string! `foo)))
 
-(check (matches? (type-type) (type-type)))
-(check (not (matches? (type-type) `foo)))
+(check (matches? type! type!))
+(check (not (matches? type! `foo)))
 
 (check (matches? (tuple-type `foo (list `t1 `t2)) (tuple-type `foo (list `t1 `t2))))
 (check (not (matches? (tuple-type `foo (list `t1 `t2)) (tuple-type `bar (list `t1 `t2)))))
@@ -50,17 +50,17 @@
 
 ; ------------------------------------------
 
-(check (eq? (type-selector (boolean-type)) `boolean))
-(check (eq? (type-selector (number-type)) `number))
-(check (eq? (type-selector (string-type)) `string))
-(check (eq? (type-selector (type-type)) `type))
-(check (eq? (type-selector (list `foo (number-type))) `foo))
+(check (eq? (type-selector boolean!) `boolean))
+(check (eq? (type-selector number!) `number))
+(check (eq? (type-selector string!) `string))
+(check (eq? (type-selector type!) `type))
+(check (eq? (type-selector (list `foo number!)) `foo))
 (check (eq? (type-selector `foo) `foo))
 (check (eq? (type-selector 123) #f))
 
 ; ------------------------------------------
 
-(check (eq? (type-selector-index `(foo ,(string-type) ,(number-type)) `string) 0))
-(check (eq? (type-selector-index `(foo ,(string-type) ,(number-type)) `number) 1))
-(check (eq? (type-selector-index `(foo ,(string-type) ,(number-type)) `boolean) #f))
-(check (eq? (type-selector-index (string-type) `string) #f))
+(check (eq? (type-selector-index `(foo ,string! ,number!) `string) 0))
+(check (eq? (type-selector-index `(foo ,string! ,number!) `number) 1))
+(check (eq? (type-selector-index `(foo ,string! ,number!) `boolean) #f))
+(check (eq? (type-selector-index string! `string) #f))
