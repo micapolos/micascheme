@@ -24,3 +24,13 @@
 
 (check (matches? (abstraction 2 (variable 0)) (abstraction 2 (variable 0))))
 (check (not (matches? (abstraction 2 (variable 0)) (abstraction 2 (variable 1)))))
+
+; ------------------------------------------
+
+(check (eq? (type-selector (any-boolean)) `boolean))
+(check (eq? (type-selector (any-number)) `number))
+(check (eq? (type-selector (any-string)) `string))
+(check (eq? (type-selector (any-type)) `type))
+(check (eq? (type-selector (list `foo (any-number))) `foo))
+(check (eq? (type-selector `foo) `foo))
+(check (eq? (type-selector 123) #f))

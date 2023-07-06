@@ -1,6 +1,7 @@
 (library (type)
   (export 
-    matches?)
+    matches?
+    type-selector)
 
   (import (micascheme) (term))
 
@@ -63,4 +64,15 @@
   (define (obj-match $env $obj $rhs)
     (and (obj=? $obj $rhs) $env))
 
+  ; ------------------------------------------------
+
+  (define (type-selector $type)
+    (switch $type
+      ((symbol? $symbol) $symbol)
+      ((any-boolean? _) `boolean)
+      ((any-number? _) `number)
+      ((any-string? _) `string)
+      ((any-type? _) `type)
+      ((pair? $pair) (bind ($car (car $pair)) (and (symbol? $car) $car)))
+      ((else $other) #f)))
 )
