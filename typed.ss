@@ -13,6 +13,35 @@
 
   ; ----------------------------------------------------------------
 
+  (data (env frames))
+  (data (frame types))
+
+  (define (frame-symbol->indexed-types $frame $symbol)
+    (define $indexed-types
+      (map-indexed
+        (lambda ($index $type) (indexed $type $index))
+        (frame-types $frame)))
+    (filter
+      (lambda ($indexed-type)
+        (eq? (type-selector (indexed-value $indexed-type)) $symbol))
+      $indexed-types))
+
+  (define (frame-symbol-ref $frame $symbol)
+    (let* (($indexed-types (frame-symbol->indexed-types $frame $symbol))
+           ($length (length $indexed-types)))
+      (and
+        (= $length 1)
+        (car $indexed-types))))
+
+  (define (frame-symbol-index-ref $frame $symbol $index)
+    (let* (($indexed-types (frame-symbol->indexed-types $frame $symbol))
+           ($length (length $indexed-types)))
+      (and
+        (< $index $length)
+        (list-ref (reverse $indexed-types) $index))))
+
+  ; ----------------------------------------------------------------
+
   (define-syntax parse!
     (syntax-rules ()
       ((_ expr)
