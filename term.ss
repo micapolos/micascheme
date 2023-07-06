@@ -20,7 +20,7 @@
 
     term->datum eval-term
 
-    application!)
+    application! tuple!)
 
   (import (micascheme))
 
@@ -139,6 +139,12 @@
       (syntax-case stx ()
         ((_ fn args ...)
           #`(application fn (list args ...))))))
+
+  (define-syntax tuple!
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ args ...)
+          #`(make-tuple (list args ...))))))
 
   ; -----------------------------------------------
 

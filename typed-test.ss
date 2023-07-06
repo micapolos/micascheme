@@ -67,7 +67,7 @@
   (obj=?
     (parse! (foo 10 "bar"))
     (typed
-      (make-tuple (list 10 "bar"))
+      (tuple! 10 "bar")
       (any-tuple `foo (list (any-number) (any-string))))))
 
 ; === use / get ===
