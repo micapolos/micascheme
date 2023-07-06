@@ -111,7 +111,7 @@
                   $result-type)))
             (else
               (typed
-                (application `list (cons (application! `quote $id) $arg-values))
+                (make-tuple $arg-types $arg-values)
                 `(,$id ,@$arg-types))))))
       (_
         (switch (syntax->datum $stx)

@@ -61,8 +61,8 @@
   (obj=?
     (parse (list) #`(foo 10 "bar"))
     (typed
-      (application! `list (application! `quote `foo) 10 "bar")
-      (list `foo (any-number) (any-string)))))
+      (make-tuple (list (any-number) (any-string)) (list 10 "bar"))
+      `(foo ,(any-number) ,(any-string)))))
 
 ; === application ===
 
