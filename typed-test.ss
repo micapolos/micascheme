@@ -31,7 +31,7 @@
 (check
   (obj=?
     (parse (list) #`(native pi number))
-    (typed `pi (any-number))))
+    (typed (native `pi) (any-number))))
 
 ; === types ===
 

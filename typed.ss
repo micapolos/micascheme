@@ -51,7 +51,7 @@
       ((native value type)
         (if (identifier? #`value)
           (typed 
-            (syntax->datum #`value) 
+            (native (syntax->datum #`value))
             (parse-type $env #`type))
           (syntax-error #`value "should be identifier:")))
       (boolean
