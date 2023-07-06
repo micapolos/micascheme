@@ -1,5 +1,7 @@
 (library (term)
   (export
+    native native? native-term
+
     abstraction abstraction? abstraction-arity abstraction-body
     application application? application-fn application-args
     variable variable? variable-index
@@ -19,6 +21,8 @@
     application!)
 
   (import (micascheme))
+
+  (data (native term))
 
   (data (variable index))
   (data (application fn args))
@@ -42,6 +46,7 @@
 
   (define (depth-term->datum $depth $term)
     (switch $term
+      ((native? $native) (depth-native->datum $depth $native))
       ((symbol? $symbol) `(quote ,$symbol))
       ((boolean? $string) $string)
       ((number? $number) $number)
@@ -57,6 +62,9 @@
       ((make-tuple? $make-tuple) (depth-make-tuple->datum $depth $make-tuple))
       ((tuple-get? $tuple-get) (depth-tuple-get->datum $depth $tuple-get))
       ((else _) (throw depth-term->datum $depth $term))))
+
+  (define (depth-native->datum $depth $native)
+    (native-term $native))
 
   (define (depth-variable->datum $depth $variable)
     (let (($index (- $depth (variable-index $variable) 1)))

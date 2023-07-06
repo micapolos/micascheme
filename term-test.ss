@@ -2,6 +2,8 @@
 
 ; === term->datum ===
 
+(check (equal? (term->datum (native `string-append)) `string-append))
+
 (check (equal? (term->datum `foo) ''foo))
 
 (check (equal? (term->datum #f) #f))
@@ -36,9 +38,9 @@
 
 ; === eval-term ===
 
-; (check
-;   (equal?
-;     (eval-term
-;       (application! `string-append "Hello, " "world!")
-;       (environment `(micascheme)))
-;     "Hello, world!"))
+(check
+  (equal?
+    (eval-term
+      (application! (native `string-append) "Hello, " "world!")
+      (environment `(micascheme)))
+    "Hello, world!"))

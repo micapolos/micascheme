@@ -2,7 +2,7 @@
   (export 
     typed typed? typed-value typed-type
     parse evaluate
-    native boolean number get)
+    boolean number get)
 
   (import (micascheme) (term) (type))
 
@@ -42,7 +42,6 @@
           (format "should be type:")))
       $value))
 
-  (define-aux-keyword native)
   (define-aux-keyword boolean)
   (define-aux-keyword number)
   (define-aux-keyword get)
