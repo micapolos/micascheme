@@ -10,6 +10,18 @@
 
 (check (equal? (term->datum (application `foo (list `bar `goo))) `('foo 'bar 'goo)))
 
+(check (equal? (term->datum (make-tuple (list))) #f))
+(check (equal? (term->datum (make-tuple (list "foo"))) "foo"))
+(check (equal? (term->datum (make-tuple (list "foo" "bar"))) `(cons "foo" "bar")))
+(check (equal? (term->datum (make-tuple (list "foo" "bar" "goo"))) `(vector "foo" "bar" "goo")))
+
+(check (equal? (term->datum (tuple-get (list `t1) `x 0)) ''x))
+(check (equal? (term->datum (tuple-get (list `t1 `t2) `x 0)) `(car 'x)))
+(check (equal? (term->datum (tuple-get (list `t1 `t2) `x 1)) `(cdr 'x)))
+(check (equal? (term->datum (tuple-get (list `t1 `t2 `t3) `x 0)) `(vector-ref 'x 0)))
+(check (equal? (term->datum (tuple-get (list `t1 `t2 `t3) `x 1)) `(vector-ref 'x 1)))
+(check (equal? (term->datum (tuple-get (list `t1 `t2 `t3) `x 2)) `(vector-ref 'x 2)))
+
 ; === eval-term ===
 
 ; (check
