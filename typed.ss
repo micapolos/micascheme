@@ -183,7 +183,8 @@
             (let* (($indexed-type 
                     (map-find-indexed 
                       (lambda ($env-type) 
-                        (and (symbol=? (type-selector $env-type) $symbol) $env-type))
+                        (bind-true ($selector (type-selector $env-type))
+                          (and (symbol=? $selector $symbol) $env-type)))
                       $env)))
               (if $indexed-type
                 (typed 

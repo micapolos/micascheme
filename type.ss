@@ -117,7 +117,8 @@
       ((number-type? _) `number)
       ((string-type? _) `string)
       ((type-type? _) `type)
-      ((pair? $pair) (bind ($car (car $pair)) (and (symbol? $car) $car)))
+      ((arrow? _) `arrow)
+      ((tuple-type? $tuple-type) (tuple-type-name $tuple-type))
       ((else $other) #f)))
 
   (define (type-selector-index $type $selector)

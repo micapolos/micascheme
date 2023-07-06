@@ -54,7 +54,8 @@
 (check (eq? (type-selector number!) `number))
 (check (eq? (type-selector string!) `string))
 (check (eq? (type-selector type!) `type))
-(check (eq? (type-selector (list `foo number!)) `foo))
+(check (eq? (type-selector (arrow! (foo number!) string!)) `arrow))
+(check (eq? (type-selector (tuple-type! (foo number!))) `foo))
 (check (eq? (type-selector `foo) `foo))
 (check (eq? (type-selector 123) #f))
 
