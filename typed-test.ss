@@ -39,24 +39,29 @@
 
 ; === types ===
 
-(check 
+(check
   (obj=? 
-    (parse! boolean)
+    (parse! (type boolean))
     (typed boolean! type!)))
 
 (check 
   (obj=? 
-    (parse! number)
+    (parse! (type number))
     (typed number! type!)))
 
 (check 
   (obj=? 
-    (parse! string)
+    (parse! (type string))
     (typed string! type!)))
+
+(check 
+  (obj=? 
+    (parse! (type type))
+    (typed type! type!)))
 
 (check
   (obj=?
-    (parse! (arrow (foo number) string))
+    (parse! (type (arrow (foo number) string)))
     (typed (arrow! (foo number!) string!) type!)))
 
 ; === tuple! ===

@@ -5,7 +5,7 @@
     evaluate! evaluate
 
     ; aux keywords
-    boolean number get use)
+    boolean number get use type)
 
   (import (micascheme) (term) (type))
 
@@ -89,26 +89,30 @@
   (define-aux-keyword type)
 
   (define (env-parse $env $type? $stx)
-    (syntax-case $stx (native boolean number string lambda arrow get use)
+    (syntax-case $stx (native boolean number string lambda arrow get use type)
       ((native $value $type)
         (if (identifier? #`$value)
           (typed 
             (native (syntax->datum #`$value))
             (env-parse-type $env #`$type))
           (syntax-error #`$value "should be identifier:")))
-      (boolean
-        (typed (boolean-type) (type-type)))
-      (number 
-        (typed (number-type) (type-type)))
-      (string
-        (typed (string-type) (type-type)))
-      ((arrow (name param ...) rhs)
+      ((type expr)
+        (typed (env-parse-type $env #`expr) type!))
+      (boolean $type?
+        (typed boolean! type!))
+      (number $type?
+        (typed number! type!))
+      (string $type?
+        (typed string! type!))
+      (type $type?
+        (typed type! type!))
+      ((arrow (name param ...) rhs) $type?
         (typed
           (arrow
             (syntax->datum #`name)
             (map (partial env-parse-type $env) (syntax->list #`(param ...)))
             (env-parse-type $env #`rhs))
-          (type-type)))
+          type!))
       ((get $type-stx)
         (let* (($type (env-parse-type $env #`$type-stx))
                ($indexed-boolean (map-find-indexed (lambda ($env-type) (matches? $env-type $type)) $env)))
@@ -183,7 +187,16 @@
           ((string? $string) 
             (typed $string (string-type)))
           ((symbol? $symbol)
-            (typed #f $symbol))))))
+            (let* (($indexed-type 
+                    (map-find-indexed 
+                      (lambda ($env-type) 
+                        (and (symbol=? (type-selector $env-type) $symbol) $env-type))
+                      $env)))
+              (if $indexed-type
+                (typed 
+                  (variable (indexed-index $indexed-type))
+                  (indexed-value $indexed-type))
+                (typed #f $symbol))))))))
 
   ; --------------------------------------------------------
 
