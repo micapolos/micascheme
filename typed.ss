@@ -99,7 +99,7 @@
                 (application $var $arg-values)
                 $result-type))
             (typed
-              (application `list (cons $id $arg-values))
+              (application `list (cons (application! `quote $id) $arg-values))
               `(,$id ,@$arg-types)))))
       (_
         (switch (syntax->datum $stx)

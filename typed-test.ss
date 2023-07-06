@@ -50,6 +50,15 @@
     (parse (list) #`(string))
     (typed (any-string) (any-type))))
 
+; === structure make ===
+
+(check
+  (obj=?
+    (parse (list) #`(foo 10 "bar"))
+    (typed
+      (application! `list (application! `quote `foo) 10 "bar")
+      (list `foo (any-number) (any-string)))))
+
 ; === application ===
 
 (check 
