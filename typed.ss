@@ -92,7 +92,7 @@
                ($typed-args (parse-list $env $args))
                ($arg-types (map typed-type $typed-args))
                ($arg-values (map typed-value $typed-args))
-               ($type `(,$id ,@$arg-types))
+               ($type (any-tuple $id $arg-types))
                ($indexed-result-type 
                 (map-find-indexed 
                   (lambda ($env-type) 

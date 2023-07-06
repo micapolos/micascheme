@@ -70,9 +70,9 @@
   (obj=?
     (parse
       (list 
-        (arrow `(length ,(any-string)) (any-number))
-        (arrow `(string ,(any-number)) (any-string))
-        (arrow `(append ,(any-string) ,(any-string)) (any-string)))
+        (arrow (any-tuple `length (list (any-string))) (any-number))
+        (arrow (any-tuple `string (list (any-number))) (any-string))
+        (arrow (any-tuple `append (list (any-string) (any-string))) (any-string)))
       #`(append (string (length "foo")) " apples"))
     (typed
       (application! (variable 2)
@@ -92,14 +92,21 @@
 
 ; === evaluate ===
 
-; (check (obj=? (evaluate (list) #`foo) (typed `foo `foo)))
+(check (obj=? (evaluate (list) #`foo) (typed #f `foo)))
 
 ; (check
 ;   (obj=?
 ;     (evaluate
-;       (list 
-;         (cons `string-length (arrow `(length ,(any-string)) (any-number)))
-;         (cons `number->string (arrow `(string ,(any-number)) (any-string)))
-;         (cons `string-append (arrow `(append ,(any-string) ,(any-string)) (any-string))))
+;       (list (cons `real-time (arrow (any-tuple `time (list)) (any-number))))
+;       #`(time))
+;     (typed 12 (any-number))))
+
+; (check
+;   (obj=?
+;     (evaluate
+;       (list
+;         (cons `string-length (arrow (any-tuple `length (list (any-string))) (any-number)))
+;         (cons `number->string (arrow (any-tuple `string (list (any-number))) (any-string)))
+;         (cons `string-append (arrow (any-tuple `append (list (any-string) (any-string))) (any-string))))
 ;       #`(append (string (length "foo")) " apples"))
 ;     (typed "3 apples" (any-string))))
