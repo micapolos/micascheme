@@ -1,7 +1,7 @@
 (library (type)
   (export 
     matches? list-matches?
-    type-selector
+    type-selector type-named?
     type-selector-index)
 
   (import (micascheme) (term))
@@ -120,6 +120,10 @@
       ((arrow? _) `arrow)
       ((tuple-type? $tuple-type) (tuple-type-name $tuple-type))
       ((else $other) #f)))
+
+  (define (type-named? $type $symbol)
+    (bind-true ($selector (type-selector $type))
+      (symbol=? $selector $symbol)))
 
   (define (type-selector-index $type $selector)
     (and (pair? $type)
