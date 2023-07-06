@@ -9,7 +9,7 @@
     any-boolean any-boolean?
     any-number any-number?
     any-string any-string?
-    any-tuple any-tuple? any-tuple-types
+    any-tuple any-tuple? any-tuple-name any-tuple-types
 
     any-type any-type?
     

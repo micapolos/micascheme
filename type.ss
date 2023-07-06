@@ -23,14 +23,36 @@
   
   (define (match $env $lhs $rhs)
     (switch $lhs
+      ((symbol? $symbol)
+        (symbol-match $env $symbol $rhs))
+      ((any-boolean? $any-boolean)
+        (any-boolean-match $env $any-boolean $rhs))
+      ((any-number? $any-number)
+        (any-number-match $env $any-number $rhs))
+      ((any-string? $any-string)
+        (any-string-match $env $any-string $rhs))
       ((variable? $variable) 
         (variable-match $env $variable $rhs))
       ((abstraction? $abstraction) 
         (abstraction-match $env $abstraction $rhs))
       ((arrow? $arrow) 
         (arrow-match $env $arrow $rhs))
-      ((else $obj) 
-        (obj-match $env $obj $rhs))))
+      ((any-tuple? $any-tuple)
+        (any-tuple-match $env $any-tuple $rhs))
+      ((else $obj)
+        (throw match $env $lhs $rhs))))
+
+  (define (symbol-match $env $symbol $rhs)
+    (and (symbol? $rhs) (symbol=? $symbol $rhs)))
+
+  (define (any-boolean-match $env $any-boolean $rhs)
+    (any-boolean? $rhs))
+
+  (define (any-number-match $env $any-number $rhs)
+    (any-number? $rhs))
+
+  (define (any-string-match $env $any-string $rhs)
+    (any-string? $rhs))
 
   (define (variable-match $env $variable $rhs)
     (bind ($index (variable-index $variable))
@@ -62,8 +84,15 @@
         ($env (match $env (arrow-lhs $arrow) (arrow-lhs $rhs)))
         (match $env (arrow-rhs $arrow) (arrow-rhs $rhs)))))
 
-  (define (obj-match $env $obj $rhs)
-    (and (obj=? $obj $rhs) $env))
+  (define (any-tuple-match $env $any-tuple $rhs)
+    (and
+      (any-tuple? $rhs)
+      (symbol=?
+        (any-tuple-name $any-tuple)
+        (any-tuple-name $rhs))
+      (list-match $env
+        (any-tuple-types $any-tuple)
+        (any-tuple-types $rhs))))
 
   ; ------------------------------------------------
 
