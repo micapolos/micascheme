@@ -2,7 +2,7 @@
   (export 
     typed typed? typed-value typed-type
     parse evaluate
-    boolean number get)
+    native boolean number get)
 
   (import (micascheme) (term) (type))
 
@@ -33,20 +33,31 @@
         (syntax-error $stx
           (format "should be procedure, is ~s:" $type)))))
 
+  (define-aux-keyword native)
   (define-aux-keyword boolean)
   (define-aux-keyword number)
   (define-aux-keyword get)
 
   (define (parse $env $stx)
-    (syntax-case $stx (boolean number string get let)
+    (syntax-case $stx (native boolean number string arrow get let)
+      ((native value type)
+        (typed 
+          (syntax->datum #`value) 
+          (typed-value (parse $env #`type))))
       ((boolean)
         (typed (any-boolean) (any-type)))
       ((number) 
         (typed (any-number) (any-type)))
       ((string) 
         (typed (any-string) (any-type)))
+      ((arrow lhs rhs)
+        (typed
+          (arrow 
+            (typed-value (parse $env #`lhs))
+            (typed-value (parse $env #`rhs)))
+          (any-type)))
       ((get type)
-        (let* (($type (typed-value (parse $env #`type)))
+        (let* (($type (typed-value (parse $env #`type))) ; TODO: Check type to be (any-type)
                ($indexed-boolean (map-find-indexed (lambda ($env-type) (matches? $env-type $type)) $env)))
           (if $indexed-boolean
             (typed (variable (indexed-index $indexed-boolean)) $type)

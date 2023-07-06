@@ -21,6 +21,18 @@
     (parse (list) #`"foo")
     (typed "foo" (any-string))))
 
+(check
+  (obj=?
+    (parse (list) #`(arrow (number) (string)))
+    (typed (arrow (any-number) (any-string)) (any-type))))
+
+; === native ===
+
+(check
+  (obj=?
+    (parse (list) #`(native pi (number)))
+    (typed `pi (any-number))))
+
 ; === types ===
 
 (check 
