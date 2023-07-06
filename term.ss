@@ -20,7 +20,8 @@
 
     term->datum eval-term
 
-    application! tuple! arrow! tuple-type!)
+    application! tuple! arrow! tuple-type!
+    boolean! number! string!)
 
   (import (micascheme))
 
@@ -134,6 +135,21 @@
         (indices $size))))
 
   ; -----------------------------------------------
+
+  (define-syntax boolean!
+    (lambda (stx)
+      (syntax-case stx ()
+        (_ #`(boolean-type)))))
+
+  (define-syntax number!
+    (lambda (stx)
+      (syntax-case stx ()
+        (_ #`(number-type)))))
+
+  (define-syntax string!
+    (lambda (stx)
+      (syntax-case stx ()
+        (_ #`(string-type)))))
 
   (define-syntax application!
     (lambda (stx)
