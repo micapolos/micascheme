@@ -157,7 +157,7 @@
                   (any-tuple $id $arg-values)
                   (any-type))
                 (typed
-                  (make-tuple $arg-types $arg-values)
+                  (make-tuple $arg-values)
                   (any-tuple $id $arg-types)))))))
       (_
         (switch (syntax->datum $stx)

@@ -15,8 +15,8 @@
     
     arrow arrow? arrow-lhs arrow-rhs
 
-    make-tuple make-tuple? make-tuple-types
-    tuple-get tuple-get? tuple-get-types tuple-get-term tuple-get-index
+    make-tuple make-tuple? make-tuple-terms
+    tuple-get tuple-get? tuple-get-size tuple-get-term tuple-get-index
 
     term->datum eval-term
 
@@ -38,8 +38,8 @@
 
   (data (arrow lhs rhs))
 
-  (data (make-tuple types terms))
-  (data (tuple-get types term index))
+  (data (make-tuple terms))
+  (data (tuple-get size term index))
 
   (define (term->datum $term)
     (depth-term->datum 0 $term))
@@ -94,11 +94,10 @@
       ,(depth-term->datum $depth (arrow-rhs $arrow))))
 
   (define (depth-make-tuple->datum $depth $make-tuple)
-    (let* (($types (make-tuple-types $make-tuple))
-           ($terms (make-tuple-terms $make-tuple))
-           ($length (length $types))
+    (let* (($terms (make-tuple-terms $make-tuple))
+           ($size (length $terms))
            ($datums (depth-terms->datums $depth $terms)))
-      (case $length
+      (case $size
         ((0) #f)
         ((1) (car $datums))
         ((2) `(cons ,(car $datums) ,(cadr $datums)))
@@ -113,12 +112,11 @@
           (any-tuple-types $any-tuple)))))
 
   (define (depth-tuple-get->datum $depth $tuple-get)
-    (let* (($types (tuple-get-types $tuple-get))
+    (let* (($size (tuple-get-size $tuple-get))
            ($term (tuple-get-term $tuple-get))
            ($datum (depth-term->datum $depth $term))
-           ($index (tuple-get-index $tuple-get))
-           ($length (length $types)))
-      (case $length
+           ($index (tuple-get-index $tuple-get)))
+      (case $size
         ((0) #f)
         ((1) $datum)
         ((2) `(,(if (= $index 0) `car `cdr) ,$datum))
