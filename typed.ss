@@ -44,11 +44,17 @@
         (typed 
           (syntax->datum #`value) 
           (typed-value (parse $env #`type))))
-      ((boolean)
+      ; ((boolean)
+      ;   (typed (any-boolean) (any-type)))
+      ; ((number) 
+      ;   (typed (any-number) (any-type)))
+      ; ((string) 
+      ;   (typed (any-string) (any-type)))
+      (boolean
         (typed (any-boolean) (any-type)))
-      ((number) 
+      (number 
         (typed (any-number) (any-type)))
-      ((string) 
+      (string
         (typed (any-string) (any-type)))
       ((arrow lhs rhs)
         (typed

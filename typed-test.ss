@@ -26,34 +26,34 @@
     (parse (list) #`foo)
     (typed (application! `quote `foo) `foo)))
 
-(check
-  (obj=?
-    (parse (list) #`(arrow (number) (string)))
-    (typed (arrow (any-number) (any-string)) (any-type))))
-
 ; === native ===
 
 (check
   (obj=?
-    (parse (list) #`(native pi (number)))
+    (parse (list) #`(native pi number))
     (typed `pi (any-number))))
 
 ; === types ===
 
 (check 
   (obj=? 
-    (parse (list) #`(boolean))
+    (parse (list) #`boolean)
     (typed (any-boolean) (any-type))))
 
 (check 
   (obj=? 
-    (parse (list) #`(number))
+    (parse (list) #`number)
     (typed (any-number) (any-type))))
 
 (check 
   (obj=? 
-    (parse (list) #`(string))
+    (parse (list) #`string)
     (typed (any-string) (any-type))))
+
+(check
+  (obj=?
+    (parse (list) #`(arrow number string))
+    (typed (arrow (any-number) (any-string)) (any-type))))
 
 ; === structure make ===
 
@@ -85,7 +85,7 @@
 
 (check 
   (obj=?
-    (parse (list) #`(let ("foo") (get (string))))
+    (parse (list) #`(let ("foo") (get string)))
     (typed
       (application! (abstraction 1 (variable 0)) "foo")
       (any-string))))
@@ -103,5 +103,3 @@
         (cons `string-append (arrow `(append ,(any-string) ,(any-string)) (any-string))))
       #`(append (string (length "foo")) " apples"))
     (typed "3 apples" (any-string))))
-
-(writeln (eval! 123))
