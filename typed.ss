@@ -5,7 +5,7 @@
     evaluate! evaluate
 
     ; aux keywords
-    boolean number get use type)
+    boolean number use type)
 
   (import (micascheme) (term) (type))
 
@@ -84,12 +84,11 @@
 
   (define-aux-keyword boolean)
   (define-aux-keyword number)
-  (define-aux-keyword get)
   (define-aux-keyword use)
   (define-aux-keyword type)
 
   (define (env-parse $env $type? $stx)
-    (syntax-case $stx (native boolean number string lambda arrow get use type)
+    (syntax-case $stx (native boolean number string lambda arrow use type)
       ((native $value $type)
         (if (identifier? #`$value)
           (typed 
@@ -113,12 +112,6 @@
             (map (partial env-parse-type $env) (syntax->list #`(param ...)))
             (env-parse-type $env #`rhs))
           type!))
-      ((get $type-stx)
-        (let* (($type (env-parse-type $env #`$type-stx))
-               ($indexed-boolean (map-find-indexed (lambda ($env-type) (matches? $env-type $type)) $env)))
-          (if $indexed-boolean
-            (typed (variable (indexed-index $indexed-boolean)) $type)
-            (syntax-error $stx "unbound"))))
       ((lambda (name param ...) body)
         (let* (($name (syntax->datum #`name))
                ($params (syntax->list #`(param ...)))

@@ -77,7 +77,7 @@
 
 (check
   (obj=?
-    (parse! (lambda (id number string) (done (get string) (get number))))
+    (parse! (lambda (id number string) (done string number)))
     (typed
       (abstraction 2 (tuple! (variable 0) (variable 1)))
       (arrow! (id number! string!) (tuple-type! (done string! number!))))))
@@ -86,7 +86,7 @@
 
 (check
   (obj=?
-    (parse! (use ("foo") (get string)))
+    (parse! (use ("foo") string))
     (typed
       (application! (abstraction 1 (variable 0)) "foo")
       string!)))
