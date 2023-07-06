@@ -59,7 +59,7 @@
     (parse! (arrow (foo number) string))
     (typed (arrow! (foo number!) string!) type!)))
 
-; === tuple-typeure make ===
+; === tuple! ===
 
 (check
   (obj=?
@@ -67,6 +67,15 @@
     (typed
       (tuple! 10 "bar")
       (tuple-type `foo (list number! string!)))))
+
+; === lambda ===
+
+(check
+  (obj=?
+    (parse! (lambda (id number string) (done (get string) (get number))))
+    (typed
+      (abstraction 2 (tuple! (variable 0) (variable 1)))
+      (arrow! (id number! string!) (tuple-type! (done string! number!))))))
 
 ; === use / get ===
 

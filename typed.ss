@@ -89,7 +89,7 @@
   (define-aux-keyword type)
 
   (define (env-parse $env $type? $stx)
-    (syntax-case $stx (native boolean number string arrow get use)
+    (syntax-case $stx (native boolean number string lambda arrow get use)
       ((native $value $type)
         (if (identifier? #`$value)
           (typed 
@@ -115,6 +115,19 @@
           (if $indexed-boolean
             (typed (variable (indexed-index $indexed-boolean)) $type)
             (syntax-error $stx "unbound"))))
+      ((lambda (name param ...) body)
+        (let* (($name (syntax->datum #`name))
+               ($params (syntax->list #`(param ...)))
+               ($body #`body)
+               ($param-types (map (partial env-parse-type $env) $params))
+               ($arity (length $params))
+               ($body-env (append (reverse $param-types) $env))
+               ($typed-body (env-parse $body-env $type? $body))
+               ($body-term (typed-value $typed-body))
+               ($body-type (typed-type $typed-body)))
+          (typed
+            (abstraction $arity $body-term)
+            (arrow $name $param-types $body-type))))
       ((use (expr ...) body)
         (let* (($exprs (syntax->list #`(expr ...)))
                ($body #`body)
