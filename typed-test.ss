@@ -30,8 +30,14 @@
 
 (check
   (obj=?
-    (parse! (native pi number))
-    (typed (native `pi) (any-number))))
+    (parse!
+      (native string-length
+        (arrow (length string) number)))
+    (typed
+      (native `string-length)
+      (arrow
+        (any-tuple `length (list (any-string)))
+        (any-number)))))
 
 ; === types ===
 
