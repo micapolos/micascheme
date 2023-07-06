@@ -150,18 +150,11 @@
         (evaluate #'expr))))
 
   (define (evaluate $stx)
-    (env-evaluate (list) $stx))
-
-  (define (env-evaluate $env $stx)
-    (let* (($arity (length $env))
-           ($ids (map car $env))
-           ($types (map cdr $env))
-           ($typed (env-parse $types #f $stx))
+    (let* (($typed (parse $stx))
            ($term (typed-value $typed))
            ($type (typed-type $typed)))
       (typed
-        (eval-term
-          (application (abstraction $arity $term) (reverse $ids))
-          (environment `(micascheme) `(type)))
+        (eval-term $term
+          (environment `(micascheme) `(term) `(type)))
         $type)))
 )
