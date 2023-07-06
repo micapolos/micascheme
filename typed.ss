@@ -5,7 +5,7 @@
     evaluate! evaluate
 
     ; aux keywords
-    boolean number get use type)
+    boolean number get use)
 
   (import (micascheme) (term) (type))
 
@@ -60,15 +60,13 @@
   (define-aux-keyword type)
 
   (define (env-parse $env $type? $stx)
-    (syntax-case $stx (native type boolean number string arrow get use)
+    (syntax-case $stx (native boolean number string arrow get use)
       ((native $value $type)
         (if (identifier? #`$value)
           (typed 
             (native (syntax->datum #`$value))
             (env-parse-type $env #`$type))
           (syntax-error #`$value "should be identifier:")))
-      ((type expr)
-        (typed (env-parse-type $env #`expr) (any-type)))
       (boolean
         (typed (any-boolean) (any-type)))
       (number 
