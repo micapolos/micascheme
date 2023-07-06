@@ -21,6 +21,11 @@
     (parse (list) #`"foo")
     (typed "foo" (any-string))))
 
+(check 
+  (obj=? 
+    (parse (list) #`foo)
+    (typed (application! `quote `foo) `foo)))
+
 (check
   (obj=?
     (parse (list) #`(arrow (number) (string)))
@@ -86,6 +91,8 @@
       (any-string))))
 
 ; === evaluate ===
+
+(check (obj=? (evaluate (list) #`foo) (typed `foo `foo)))
 
 (check
   (obj=?

@@ -110,7 +110,7 @@
           ((string? $string) 
             (typed $string (any-string)))
           ((symbol? $symbol)
-            (typed $symbol $symbol))))))
+            (typed (application! `quote $symbol) $symbol))))))
 
   ; --------------------------------------------------------
 
