@@ -9,7 +9,7 @@
     any-boolean any-boolean?
     any-number any-number?
     any-string any-string?
-    any-tuple any-tuple? any-tuple-name any-tuple-types
+    struct struct? struct-name struct-types
 
     any-type any-type?
     
@@ -33,10 +33,10 @@
   (data (any-boolean))
   (data (any-number))
   (data (any-string))
-  (data (any-tuple name types))
+  (data (struct name types))
   (data (any-type))
 
-  (data (arrow lhs rhs))
+  (data (arrow lhs rhs)) ; lhs is struct, rhs is type
 
   (data (make-tuple types terms))
   (data (tuple-get types term index))
@@ -57,7 +57,7 @@
       ((any-boolean? _) `(any-boolean))
       ((any-number? _) `(any-number))
       ((any-string? _) `(any-string))
-      ((any-tuple? $any-tuple) (depth-any-tuple->datum $depth $any-tuple))
+      ((struct? $struct) (depth-struct->datum $depth $struct))
       ((any-type? _) `(any-type))
       ((variable? $variable) (depth-variable->datum $depth $variable))
       ((application? $application) (depth-application->datum $depth $application))
@@ -104,13 +104,13 @@
         ((2) `(cons ,(car $datums) ,(cadr $datums)))
         (else `(vector ,@$datums)))))
 
-  (define (depth-any-tuple->datum $depth $any-tuple)
-    `(any-tuple
-      (quote ,(any-tuple-name $any-tuple))
+  (define (depth-struct->datum $depth $struct)
+    `(struct
+      (quote ,(struct-name $struct))
       (list
         ,@(depth-terms->datums
           $depth
-          (any-tuple-types $any-tuple)))))
+          (struct-types $struct)))))
 
   (define (depth-tuple-get->datum $depth $tuple-get)
     (let* (($types (tuple-get-types $tuple-get))

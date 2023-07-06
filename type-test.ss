@@ -24,10 +24,10 @@
 (check (matches? (any-type) (any-type)))
 (check (not (matches? (any-type) `foo)))
 
-(check (matches? (any-tuple `foo (list `t1 `t2)) (any-tuple `foo (list `t1 `t2))))
-(check (not (matches? (any-tuple `foo (list `t1 `t2)) (any-tuple `bar (list `t1 `t2)))))
-(check (not (matches? (any-tuple `foo (list `t1 `t2)) (any-tuple `foo (list `t1 `t3)))))
-(check (not (matches? (any-tuple `foo (list `t1 `t2)) `foo)))
+(check (matches? (struct `foo (list `t1 `t2)) (struct `foo (list `t1 `t2))))
+(check (not (matches? (struct `foo (list `t1 `t2)) (struct `bar (list `t1 `t2)))))
+(check (not (matches? (struct `foo (list `t1 `t2)) (struct `foo (list `t1 `t3)))))
+(check (not (matches? (struct `foo (list `t1 `t2)) `foo)))
 
 (check (matches? (abstraction 2 `foo) (abstraction 2`foo)))
 (check (not (matches? (abstraction 2 `foo) (abstraction 3 `foo))))

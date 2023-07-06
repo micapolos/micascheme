@@ -134,7 +134,7 @@
                ($typed-args (env-parse-list $env $type? $args))
                ($arg-types (map typed-type $typed-args))
                ($arg-values (map typed-value $typed-args))
-               ($type (any-tuple $id $arg-types))
+               ($type (struct $id $arg-types))
                ($indexed-result-type 
                 (map-find-indexed 
                   (lambda ($env-type) 
@@ -154,11 +154,11 @@
             (else
               (if $type?
                 (typed
-                  (any-tuple $id $arg-values)
+                  (struct $id $arg-values)
                   (any-type))
                 (typed
                   (make-tuple $arg-types $arg-values)
-                  (any-tuple $id $arg-types)))))))
+                  (struct $id $arg-types)))))))
       (_
         (switch (syntax->datum $stx)
           ((boolean? $boolean) 

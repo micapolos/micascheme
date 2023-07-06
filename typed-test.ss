@@ -36,7 +36,7 @@
     (typed
       (native `string-length)
       (arrow
-        (any-tuple `length (list (any-string)))
+        (struct `length (list (any-string)))
         (any-number)))))
 
 ; === types ===
@@ -68,7 +68,7 @@
     (parse! (foo 10 "bar"))
     (typed
       (make-tuple (list (any-number) (any-string)) (list 10 "bar"))
-      (any-tuple `foo (list (any-number) (any-string))))))
+      (struct `foo (list (any-number) (any-string))))))
 
 ; === use / get ===
 

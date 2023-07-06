@@ -41,8 +41,8 @@
         (abstraction-match $env $abstraction $rhs))
       ((arrow? $arrow) 
         (arrow-match $env $arrow $rhs))
-      ((any-tuple? $any-tuple)
-        (any-tuple-match $env $any-tuple $rhs))
+      ((struct? $struct)
+        (struct-match $env $struct $rhs))
       ((else $obj)
         (throw match $env $lhs $rhs))))
 
@@ -94,15 +94,15 @@
         ($env (match $env (arrow-lhs $arrow) (arrow-lhs $rhs)))
         (match $env (arrow-rhs $arrow) (arrow-rhs $rhs)))))
 
-  (define (any-tuple-match $env $any-tuple $rhs)
+  (define (struct-match $env $struct $rhs)
     (and
-      (any-tuple? $rhs)
+      (struct? $rhs)
       (symbol=?
-        (any-tuple-name $any-tuple)
-        (any-tuple-name $rhs))
+        (struct-name $struct)
+        (struct-name $rhs))
       (list-match $env
-        (any-tuple-types $any-tuple)
-        (any-tuple-types $rhs))))
+        (struct-types $struct)
+        (struct-types $rhs))))
 
   ; ------------------------------------------------
 
