@@ -127,10 +127,4 @@
           (environment `(micascheme) `(type)))
         $type)))
 
-  (define scheme-env
-    (list 
-      (cons `string-length (arrow `(length ,(any-string)) (any-number)))
-      (cons `number->string (arrow `(string ,(any-number)) (any-string)))
-      (cons `string-append (arrow `(append ,(any-string) ,(any-string)) (any-string)))))
-
 )
