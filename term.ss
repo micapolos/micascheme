@@ -136,10 +136,15 @@
         (else `(vector-ref ,$datum ,$index)))))
 
   (define (depth-choice->datum $depth $choice)
-    `(choice
-      ,(choice-size $choice)
-      ,(choice-index $choice)
-      ,(depth-term->datum $depth (choice-term $choice))))
+    (let* (($size (choice-size $choice))
+           ($index (choice-index $choice))
+           ($term (choice-term $choice))
+           ($datum (depth-term->datum $depth $term)))
+      (case $size
+        ((0) `(throw empty-choice))
+        ((1) $datum)
+        ((2) `(cons ,(= $index 1) ,$datum))
+        (else `(cons ,$index ,$datum)))))
 
   (define (depth-choice-switch->datum $depth $choice-switch)
     `(choice-switch

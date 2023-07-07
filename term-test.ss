@@ -40,6 +40,13 @@
 (check (equal? (term->datum (tuple-ref 3 `x 1)) `(vector-ref 'x 1)))
 (check (equal? (term->datum (tuple-ref 3 `x 2)) `(vector-ref 'x 2)))
 
+(check (equal? (term->datum (choice 1 0 "foo")) "foo"))
+(check (equal? (term->datum (choice 2 0 "foo")) `(cons #f "foo")))
+(check (equal? (term->datum (choice 2 1 "foo")) `(cons #t "foo")))
+(check (equal? (term->datum (choice 3 0 "foo")) `(cons 0 "foo")))
+(check (equal? (term->datum (choice 3 1 "foo")) `(cons 1 "foo")))
+(check (equal? (term->datum (choice 3 2 "foo")) `(cons 2 "foo")))
+
 ; === eval-term ===
 
 (check
