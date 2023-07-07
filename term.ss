@@ -15,8 +15,8 @@
     
     function-type function-type? function-type-name function-type-params function-type-result
 
-    make-tuple make-tuple? make-tuple-terms
-    tuple-get tuple-get? tuple-get-size tuple-get-term tuple-get-index
+    tuple tuple? tuple-terms
+    tuple-ref tuple-ref? tuple-ref-size tuple-ref-term tuple-ref-index
 
     term->datum eval-term
 
@@ -39,8 +39,8 @@
 
   (data (function-type name params result))
 
-  (data (make-tuple terms))
-  (data (tuple-get size term index))
+  (data (tuple terms))
+  (data (tuple-ref size term index))
 
   (define (term->datum $term)
     (depth-term->datum 0 $term))
@@ -64,8 +64,8 @@
       ((application? $application) (depth-application->datum $depth $application))
       ((function? $function) (depth-function->datum $depth $function))
       ((function-type? $function-type) (depth-function-type->datum $depth $function-type))
-      ((make-tuple? $make-tuple) (depth-make-tuple->datum $depth $make-tuple))
-      ((tuple-get? $tuple-get) (depth-tuple-get->datum $depth $tuple-get))
+      ((tuple? $tuple) (depth-tuple->datum $depth $tuple))
+      ((tuple-ref? $tuple-ref) (depth-tuple-ref->datum $depth $tuple-ref))
       ((else _) (throw depth-term->datum $depth $term))))
 
   (define (depth-native->datum $depth $native)
@@ -95,8 +95,8 @@
       (list ,@(depth-terms->datums $depth (function-type-params $function-type)))
       ,(depth-term->datum $depth (function-type-result $function-type))))
 
-  (define (depth-make-tuple->datum $depth $make-tuple)
-    (let* (($terms (make-tuple-terms $make-tuple))
+  (define (depth-tuple->datum $depth $tuple)
+    (let* (($terms (tuple-terms $tuple))
            ($size (length $terms))
            ($datums (depth-terms->datums $depth $terms)))
       (case $size
@@ -113,11 +113,11 @@
           $depth
           (tuple-type-types $tuple-type)))))
 
-  (define (depth-tuple-get->datum $depth $tuple-get)
-    (let* (($size (tuple-get-size $tuple-get))
-           ($term (tuple-get-term $tuple-get))
+  (define (depth-tuple-ref->datum $depth $tuple-ref)
+    (let* (($size (tuple-ref-size $tuple-ref))
+           ($term (tuple-ref-term $tuple-ref))
            ($datum (depth-term->datum $depth $term))
-           ($index (tuple-get-index $tuple-get)))
+           ($index (tuple-ref-index $tuple-ref)))
       (case $size
         ((0) #f)
         ((1) $datum)
@@ -172,7 +172,7 @@
     (lambda (stx)
       (syntax-case stx ()
         ((_ arg ...)
-          #`(make-tuple (list arg ...))))))
+          #`(tuple (list arg ...))))))
 
   (define-syntax tuple-type!
     (lambda (stx)

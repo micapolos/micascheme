@@ -182,7 +182,7 @@
                   (tuple-type $id $arg-values)
                   (universe 0))
                 (typed
-                  (make-tuple $arg-values)
+                  (tuple $arg-values)
                   (tuple-type $id $arg-types)))))))
       (_
         (switch (syntax->datum $stx)

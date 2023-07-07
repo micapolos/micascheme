@@ -33,12 +33,12 @@
 (check (equal? (term->datum (tuple! "foo" "bar")) `(cons "foo" "bar")))
 (check (equal? (term->datum (tuple! "foo" "bar" "goo")) `(vector "foo" "bar" "goo")))
 
-(check (equal? (term->datum (tuple-get 1 `x 0)) ''x))
-(check (equal? (term->datum (tuple-get 2 `x 0)) `(car 'x)))
-(check (equal? (term->datum (tuple-get 2 `x 1)) `(cdr 'x)))
-(check (equal? (term->datum (tuple-get 3 `x 0)) `(vector-ref 'x 0)))
-(check (equal? (term->datum (tuple-get 3 `x 1)) `(vector-ref 'x 1)))
-(check (equal? (term->datum (tuple-get 3 `x 2)) `(vector-ref 'x 2)))
+(check (equal? (term->datum (tuple-ref 1 `x 0)) ''x))
+(check (equal? (term->datum (tuple-ref 2 `x 0)) `(car 'x)))
+(check (equal? (term->datum (tuple-ref 2 `x 1)) `(cdr 'x)))
+(check (equal? (term->datum (tuple-ref 3 `x 0)) `(vector-ref 'x 0)))
+(check (equal? (term->datum (tuple-ref 3 `x 1)) `(vector-ref 'x 1)))
+(check (equal? (term->datum (tuple-ref 3 `x 2)) `(vector-ref 'x 2)))
 
 ; === eval-term ===
 
