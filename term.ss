@@ -141,16 +141,26 @@
            ($term (choice-term $choice))
            ($datum (depth-term->datum $depth $term)))
       (case $size
-        ((0) `(throw empty-choice))
         ((1) $datum)
         ((2) `(cons ,(= $index 1) ,$datum))
         (else `(cons ,$index ,$datum)))))
 
   (define (depth-choice-switch->datum $depth $choice-switch)
-    `(choice-switch
-      ,(choice-size $choice-switch)
-      ,(depth-term->datum $depth (choice-switch-term $choice-switch))
-      (list ,@(depth-terms->datums $depth (choice-switch-cases $choice-switch)))))
+    (let* (($size (choice-switch-size $choice-switch))
+           ($term (choice-switch-term $choice-switch))
+           ($cases (choice-switch-cases $choice-switch))
+           ($datum (depth-term->datum $depth $term))
+           ($var (depth->datum $depth)))
+      `(let ((,$var ,$datum))
+        ,(case $size
+          ((1) (depth-term->datum (+ $depth 1) (car $cases)))
+          (else
+            (let* (($value-var (depth->datum (+ $depth 1)))
+                   ($branches (depth-terms->datums (+ $depth 2) $cases)))
+              `(let ((,$value-var (cdr ,$var)))
+                ,(case $size
+                  ((2) `(if (car ,$var) ,(car $branches) ,(cadr $branches)))
+                  (else `(index-switch (car ,$var) ,@$branches))))))))))
 
   (define (depth-choice-type->datum $depth $choice-type)
     `(choice-type

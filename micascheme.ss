@@ -1,6 +1,6 @@
 (library (micascheme)
   (export)
 
-  (import (chezscheme) (base) (infix))
+  (import (chezscheme) (base) (base-syntax) (infix))
 
-  (export (import (chezscheme) (base) (infix))))
+  (export (import (chezscheme) (base) (base-syntax) (infix))))
