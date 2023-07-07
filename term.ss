@@ -17,8 +17,8 @@
     tuple-type tuple-type? tuple-type-name tuple-type-types
 
     choice-type choice-type? choice-type-types
-    choice choice? choice-size choice-index choice-term
     choice-switch choice-switch? choice-switch-size choice-switch-term choice-switch-cases
+    select select? select-size select-index select-term
 
     universe universe? universe-depth
     
@@ -47,8 +47,8 @@
   (data (tuple-type name types))
 
   (data (choice-type types))
-  (data (choice size index term))
   (data (choice-switch size term cases))
+  (data (select size index term))
 
   (define (term->datum $term)
     (depth-term->datum 0 $term))
@@ -74,7 +74,7 @@
       ((tuple? $tuple) (depth-tuple->datum $depth $tuple))
       ((tuple-ref? $tuple-ref) (depth-tuple-ref->datum $depth $tuple-ref))
       ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
-      ((choice? $choice) (depth-choice->datum $depth $choice))
+      ((select? $select) (depth-select->datum $depth $select))
       ((choice-switch? $choice-switch) (depth-choice-switch->datum $depth $choice-switch))
       ((choice-type? $choice-type) (depth-choice-type->datum $depth $choice-type))
       ((else _) (throw depth-term->datum $depth $term))))
@@ -135,10 +135,10 @@
         ((2) `(,(if (= $index 0) `car `cdr) ,$datum))
         (else `(vector-ref ,$datum ,$index)))))
 
-  (define (depth-choice->datum $depth $choice)
-    (let* (($size (choice-size $choice))
-           ($index (choice-index $choice))
-           ($term (choice-term $choice))
+  (define (depth-select->datum $depth $select)
+    (let* (($size (select-size $select))
+           ($index (select-index $select))
+           ($term (select-term $select))
            ($datum (depth-term->datum $depth $term)))
       (case $size
         ((1) $datum)

@@ -147,7 +147,7 @@
       $value))
 
   (define (env-parse $env $phase $stx)
-    (syntax-case $stx (native boolean number string function function-type use type choice)
+    (syntax-case $stx (native boolean number string function function-type use type select)
       ((native $value $type)
         (typed 
           (native (syntax->datum #`$value))
@@ -196,7 +196,7 @@
           (typed
             (application (function $arity $body-term) $terms)
             $body-type)))
-      ((choice option ...)
+      ((select option ...)
         (let* (($options (map (partial env-parse-option $env $phase) (syntax->list #`(option ...))))
                ($size (length $options))
                ($types (map option-type $options))
@@ -206,7 +206,7 @@
             ((multi-selection? _) (syntax-error $stx "multi selection:"))
             ((selected? $selected)
               (typed
-                (choice 
+                (select 
                   $size
                   (selected-index $selected)
                   (selected-term $selected))
