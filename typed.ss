@@ -149,11 +149,9 @@
   (define (env-parse $env $phase $stx)
     (syntax-case $stx (native boolean number string function function-type use type)
       ((native $value $type)
-        (if (identifier? #`$value)
-          (typed 
-            (native (syntax->datum #`$value))
-            (env-parse-type $env #`$type))
-          (syntax-error #`$value "should be identifier:")))
+        (typed 
+          (native (syntax->datum #`$value))
+          (env-parse-type $env #`$type)))
       ((type expr)
         (typed (env-parse-type $env #`expr) type!))
       (boolean (phase-n? $phase 1)

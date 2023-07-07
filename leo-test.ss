@@ -2,7 +2,7 @@
 
 ; === natives
 
-(check (equal? (leo (native string-length (arrow (len string) number))) string-length))
+(check (equal? (leo (native (+ 1 2) number)) 3))
 
 ; === primitives
 
