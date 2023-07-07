@@ -96,6 +96,15 @@
       (tuple-ref 2 (tuple! (tuple! 10) (tuple! 20)) 0)
       (tuple-type! (x number!)))))
 
+; === choice ===
+
+(check
+  (obj=?
+    (parse! (choice (not boolean) (not number) "foo"))
+    (typed 
+      (choice 3 2 "foo")
+      (choice-type! boolean! number! string!))))
+
 ; === function ===
 
 (check

@@ -21,9 +21,18 @@
 
 (check (equal? (indices 3) (list 0 1 2)))
 
+; === indexed ===
+
+(check (equal? (indexed-value (indexed "a" 1)) "a"))
+(check (equal? (indexed-index (indexed "a" 1)) 1))
+
 ; === map-indexed ===
 
 (check (equal? (map-indexed cons (list "a" "b" "c")) (list (cons 0 "a") (cons 1 "b") (cons 2 "c"))))
+
+; === list-indexed ===
+
+(check (obj=? (list-indexed (list "a" "b" "c")) (list (indexed "a" 0) (indexed "b" 1) (indexed "c" 2))))
 
 ; === iterate ===
 

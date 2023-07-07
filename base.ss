@@ -14,7 +14,7 @@
     unpair
     associ
     map-find-indexed
-    map-indexed
+    map-indexed list-indexed
     indexed indexed? indexed-value indexed-index
     throw)
 
@@ -73,6 +73,9 @@
 
   (define (map-indexed $proc $list)
     (map $proc (indices (length $list)) $list))
+
+  (define (list-indexed $list)
+    (map-indexed (lambda ($index $value) (indexed $value $index)) $list))
 
   (define (obj=? a b)
     (cond
