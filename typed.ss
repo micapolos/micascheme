@@ -17,8 +17,8 @@
   (data (frame types))
   (data (phase depth))
 
-  (define (phase1? $phase)
-    (= (phase-depth $phase) 1))
+  (define (phase-n? $phase $depth)
+    (= (phase-depth $phase) $depth))
 
   (define (env-select-indexed-type $env $symbol)
     (map-find-indexed 
@@ -118,15 +118,15 @@
           (syntax-error #`$value "should be identifier:")))
       ((type expr)
         (typed (env-parse-type $env #`expr) type!))
-      (boolean (phase1? $phase)
+      (boolean (phase-n? $phase 1)
         (typed boolean! type!))
-      (number (phase1? $phase)
+      (number (phase-n? $phase 1)
         (typed number! type!))
-      (string (phase1? $phase)
+      (string (phase-n? $phase 1)
         (typed string! type!))
-      (type (phase1? $phase)
+      (type (phase-n? $phase 1)
         (typed type! type!))
-      ((arrow (name param ...) rhs) (phase1? $phase)
+      ((arrow (name param ...) rhs) (phase-n? $phase 1)
         (typed
           (arrow
             (syntax->datum #`name)
@@ -177,7 +177,7 @@
                   (application $var $arg-values)
                   $type)))
             (else
-              (if (phase1? $phase)
+              (if (phase-n? $phase 1)
                 (typed
                   (tuple-type $id $arg-values)
                   (universe 0))
