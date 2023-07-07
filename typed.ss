@@ -244,10 +244,11 @@
   (data (option-not type))
   (data (option-the typed))
 
-  (data (no-selection))
-  (data (selection index term))
-  (data (multi-selection))
-
+  (define (option-type $option)
+    (switch $option
+      ((option-not? $option-not) (option-not-type $option-not))
+      ((option-the? $option-the) (typed-type (option-the-typed $option-the)))))
+  
   (define (env-parse-option $env $phase $stx)
     (lambda (stx)
       (syntax-case stx (not the)
@@ -256,11 +257,12 @@
         ((the expr) 
           (option-the (env-parse $env $phase #`expr))))))
 
-  (define (option-type $option)
-    (switch $option
-      ((option-not? $option-not) (option-not-type $option-not))
-      ((option-the? $option-the) (typed-type (option-the-typed $option-the)))))
-  
+  ; ---------------------------------------------------------
+
+  (data (no-selection))
+  (data (selection index term))
+  (data (multi-selection))
+
   (define (options-selection $options)
     (let* (($indexed-options 
             (map-indexed 
