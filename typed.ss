@@ -61,6 +61,17 @@
         (< $index $length)
         (list-ref (reverse $indexed-types) $index))))
 
+  (define (env-resolve-application $env $symbol $arg-types $arg-values)
+    (bind-true ($indexed-type (env-function-type-indexed-type $env $symbol $arg-types))
+      (cond
+        ($indexed-type
+          (let* (($type (indexed-value $indexed-type))
+                 ($index (indexed-index $indexed-type))
+                 ($var (variable $index)))
+            (typed 
+              (application $var $arg-values)
+              $type))))))
+
   ; ----------------------------------------------------------------
 
   (define-syntax parse!
@@ -166,24 +177,16 @@
                ($typed-args (env-parse-list $env $phase $args))
                ($arg-types (map typed-type $typed-args))
                ($arg-values (map typed-value $typed-args))
-               ($type (tuple-type $id $arg-types))
-               ($indexed-type (env-function-type-indexed-type $env $id $arg-types)))
-          (cond
-            ($indexed-type
-              (let* (($type (indexed-value $indexed-type))
-                     ($index (indexed-index $indexed-type))
-                     ($var (variable $index)))
-                (typed 
-                  (application $var $arg-values)
-                  $type)))
-            (else
-              (if (phase-n? $phase 1)
-                (typed
-                  (tuple-type $id $arg-values)
-                  (universe 0))
-                (typed
-                  (tuple $arg-values)
-                  (tuple-type $id $arg-types)))))))
+               ($type (tuple-type $id $arg-types)))
+          (or 
+            (env-resolve-application $env $id $arg-types $arg-values)
+            (if (phase-n? $phase 1)
+              (typed
+                (tuple-type $id $arg-values)
+                (universe 0))
+              (typed
+                (tuple $arg-values)
+                (tuple-type $id $arg-types))))))
       (_
         (switch (syntax->datum $stx)
           ((boolean? $boolean) 
