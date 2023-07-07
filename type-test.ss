@@ -5,6 +5,23 @@
 
 ; --------------------------------------------------------------
 
+(check (type-is-static? `foo))
+(check (not (type-is-static? boolean!)))
+(check (not (type-is-static? number!)))
+(check (not (type-is-static? string!)))
+(check (not (type-is-static? (universe 0))))
+(check (not (type-is-static? (variable 0))))
+(check (type-is-static? (function 1 `foo)))
+(check (not (type-is-static? (function 1 (variable 0)))))
+(check (type-is-static? (function-type! (foo number!) `foo)))
+(check (not (type-is-static? (function-type! (foo number!) number!))))
+(check (not (type-is-static? (function-type! (foo number!) (variable 0)))))
+(check (type-is-static? (tuple-type! (vec `foo `bar))))
+(check (not (type-is-static? (tuple-type! (vec `foo number!)))))
+(check (not (type-is-static? (tuple-type! (vec number! `bar)))))
+
+; --------------------------------------------------------------
+
 (check (matches? (native `(foo bar)) (native `(foo bar))))
 (check (not (matches? (native `(foo bar)) (native `(foo gar)))))
 (check (not (matches? (native `(foo bar)) `(foo bar))))

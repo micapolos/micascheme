@@ -1,10 +1,27 @@
 (library (type)
   (export 
+    type-is-static?
     matches? list-matches?
     type-selector type-named?
     type-selector-index)
 
   (import (micascheme) (term))
+
+  ; ---------------------------------------------------------
+
+  (define (type-is-static? $type)
+    (switch $type
+      ((native? _) #f)
+      ((symbol? _) #t)
+      ((boolean-type? _) #f)
+      ((number-type? _) #f)
+      ((string-type? _) #f)
+      ((universe? _) #f)
+      ((variable? _) #f)
+      ((function? $function) (type-is-static? (function-body $function)))
+      ((function-type? $function-type) (type-is-static? (function-type-result $function-type)))
+      ((tuple-type? $tuple-type) (andmap type-is-static? (tuple-type-types $tuple-type)))
+      ((else $obj) (throw type-is-static? $obj))))
 
   ; ---------------------------------------------------------
 
