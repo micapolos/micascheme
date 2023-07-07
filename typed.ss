@@ -15,6 +15,10 @@
 
   (data (env frames))
   (data (frame types))
+  (data (phase depth))
+
+  (define (phase1? $phase)
+    (= (phase-depth $phase) 1))
 
   (define (env-select-indexed-type $env $symbol)
     (map-find-indexed 
@@ -65,33 +69,33 @@
         (parse #'expr))))
 
   (define (parse $stx)
-    (env-parse (list) #f $stx))
+    (env-parse (list) (phase 0) $stx))
 
   (define (v $index)
     (string->symbol
       (string-append "v"
         (number->string $index))))
 
-  (define (env-parse-list $env $type? $stxs)
-    (map (partial env-parse $env $type?) $stxs))
+  (define (env-parse-list $env $phase $stxs)
+    (map (partial env-parse $env $phase) $stxs))
 
-  (define (env-parse-as $env $type? $stx $as-type)
-    (let* (($typed (env-parse $env $type? $stx))
+  (define (env-parse-as $env $phase $stx $as-type)
+    (let* (($typed (env-parse $env $phase $stx))
            ($type (typed-type $typed)))
       (if (matches? $as-type $typed)
         (typed (typed-value $typed) $as-type)
         (syntax-error $stx
           (format "should be ~s, is ~s:" $as-type $type)))))
 
-  (define (env-parse-proc $env $type? $stx)
-    (let* (($typed (env-parse $env $type? $stx))
+  (define (env-parse-proc $env $phase $stx)
+    (let* (($typed (env-parse $env $phase $stx))
            ($type (typed-type $typed)))
       (and (arrow? $type)
         (syntax-error $stx
           (format "should be procedure, is ~s:" $type)))))
 
   (define (env-parse-type $env $stx)
-    (let* (($typed (env-parse $env #t $stx))
+    (let* (($typed (env-parse $env (phase 1) $stx))
            ($value (typed-value $typed))
            ($type (typed-type $typed)))
       (unless (and (universe? $type) (= (universe-depth $type) 0))
@@ -104,7 +108,7 @@
   (define-aux-keyword use)
   (define-aux-keyword type)
 
-  (define (env-parse $env $type? $stx)
+  (define (env-parse $env $phase $stx)
     (syntax-case $stx (native boolean number string lambda arrow use type)
       ((native $value $type)
         (if (identifier? #`$value)
@@ -114,15 +118,15 @@
           (syntax-error #`$value "should be identifier:")))
       ((type expr)
         (typed (env-parse-type $env #`expr) type!))
-      (boolean $type?
+      (boolean (phase1? $phase)
         (typed boolean! type!))
-      (number $type?
+      (number (phase1? $phase)
         (typed number! type!))
-      (string $type?
+      (string (phase1? $phase)
         (typed string! type!))
-      (type $type?
+      (type (phase1? $phase)
         (typed type! type!))
-      ((arrow (name param ...) rhs) $type?
+      ((arrow (name param ...) rhs) (phase1? $phase)
         (typed
           (arrow
             (syntax->datum #`name)
@@ -136,7 +140,7 @@
                ($param-types (map (partial env-parse-type $env) $params))
                ($arity (length $params))
                ($body-env (append (reverse $param-types) $env))
-               ($typed-body (env-parse $body-env $type? $body))
+               ($typed-body (env-parse $body-env $phase $body))
                ($body-term (typed-value $typed-body))
                ($body-type (typed-type $typed-body)))
           (typed
@@ -146,11 +150,11 @@
         (let* (($exprs (syntax->list #`(expr ...)))
                ($body #`body)
                ($arity (length $exprs))
-               ($typed-terms (env-parse-list $env $type? $exprs))
+               ($typed-terms (env-parse-list $env $phase $exprs))
                ($terms (map typed-value $typed-terms))
                ($types (map typed-type $typed-terms))
                ($body-env (append (reverse $types) $env))
-               ($typed-body (env-parse $body-env $type? $body))
+               ($typed-body (env-parse $body-env $phase $body))
                ($body-term (typed-value $typed-body))
                ($body-type (typed-type $typed-body)))
           (typed
@@ -159,7 +163,7 @@
       ((id arg ...) (identifier? #`id)
         (let* (($id (syntax->datum #`id))
                ($args (syntax->list #`(arg ...)))
-               ($typed-args (env-parse-list $env $type? $args))
+               ($typed-args (env-parse-list $env $phase $args))
                ($arg-types (map typed-type $typed-args))
                ($arg-values (map typed-value $typed-args))
                ($type (tuple-type $id $arg-types))
@@ -173,7 +177,7 @@
                   (application $var $arg-values)
                   $type)))
             (else
-              (if $type?
+              (if (phase1? $phase)
                 (typed
                   (tuple-type $id $arg-values)
                   (universe 0))
