@@ -30,24 +30,24 @@
 (check (not (matches? (tuple-type `foo (list `t1 `t2)) (tuple-type `foo (list `t1 `t3)))))
 (check (not (matches? (tuple-type `foo (list `t1 `t2)) `foo)))
 
-(check (matches? (abstraction 2 `foo) (abstraction 2 `foo)))
-(check (not (matches? (abstraction 2 `foo) (abstraction 3 `foo))))
-(check (not (matches? (abstraction 2 `foo) (abstraction 2 `bar))))
+(check (matches? (function 2 `foo) (function 2 `foo)))
+(check (not (matches? (function 2 `foo) (function 3 `foo))))
+(check (not (matches? (function 2 `foo) (function 2 `bar))))
 
-(check (matches? (abstraction 1 `foo) `foo))
-(check (not (matches? (abstraction 1 `foo) `bar)))
+(check (matches? (function 1 `foo) `foo))
+(check (not (matches? (function 1 `foo) `bar)))
 
-(check (matches? (abstraction 2 (variable 0)) `foo))
+(check (matches? (function 2 (variable 0)) `foo))
 
-(check (matches? (abstraction 2 (arrow! (f (variable 0)) (variable 0))) (arrow! (f `foo) `foo)))
-(check (not (matches? (abstraction 2 (arrow! (f (variable 0)) (variable 0))) (arrow! (g `foo) `foo))))
-(check (not (matches? (abstraction 1 (arrow! (f (variable 0)) (variable 0))) (arrow! (f `foo) `bar))))
+(check (matches? (function 2 (function-type! (f (variable 0)) (variable 0))) (function-type! (f `foo) `foo)))
+(check (not (matches? (function 2 (function-type! (f (variable 0)) (variable 0))) (function-type! (g `foo) `foo))))
+(check (not (matches? (function 1 (function-type! (f (variable 0)) (variable 0))) (function-type! (f `foo) `bar))))
 
-(check (matches? (abstraction 2 (arrow! (f (variable 0)) (variable 1))) (arrow! (f `foo) `foo)))
-(check (matches? (abstraction 2 (arrow! (f (variable 0)) (variable 1))) (arrow! (f `foo) `bar)))
+(check (matches? (function 2 (function-type! (f (variable 0)) (variable 1))) (function-type! (f `foo) `foo)))
+(check (matches? (function 2 (function-type! (f (variable 0)) (variable 1))) (function-type! (f `foo) `bar)))
 
-(check (matches? (abstraction 2 (variable 0)) (abstraction 2 (variable 0))))
-(check (not (matches? (abstraction 2 (variable 0)) (abstraction 2 (variable 1)))))
+(check (matches? (function 2 (variable 0)) (function 2 (variable 0))))
+(check (not (matches? (function 2 (variable 0)) (function 2 (variable 1)))))
 
 ; ------------------------------------------
 
@@ -55,7 +55,7 @@
 (check (eq? (type-selector number!) `number))
 (check (eq? (type-selector string!) `string))
 (check (eq? (type-selector (universe 3)) `universe))
-(check (eq? (type-selector (arrow! (foo number!) string!)) `function))
+(check (eq? (type-selector (function-type! (foo number!) string!)) `function))
 (check (eq? (type-selector (tuple-type! (foo number!))) `foo))
 (check (eq? (type-selector `foo) `foo))
 (check (eq? (type-selector 123) #f))

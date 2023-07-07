@@ -40,10 +40,10 @@
         (universe-match $env $universe $rhs))
       ((variable? $variable) 
         (variable-match $env $variable $rhs))
-      ((abstraction? $abstraction) 
-        (abstraction-match $env $abstraction $rhs))
-      ((arrow? $arrow) 
-        (arrow-match $env $arrow $rhs))
+      ((function? $function) 
+        (function-match $env $function $rhs))
+      ((function-type? $function-type) 
+        (function-type-match $env $function-type $rhs))
       ((tuple-type? $tuple-type)
         (tuple-type-match $env $tuple-type $rhs))
       ((else $obj)
@@ -79,26 +79,26 @@
           ((else $other) 
             (match $env $other $rhs))))))
 
-  (define (abstraction-match $env $abstraction $rhs)
-    (if (abstraction? $rhs)
+  (define (function-match $env $function $rhs)
+    (if (function? $rhs)
       (and 
-        (= (abstraction-arity $abstraction) (abstraction-arity $rhs))
+        (= (function-arity $function) (function-arity $rhs))
         (match
-          (iterate (partial cons (hole)) $env (abstraction-arity $abstraction))
-          (abstraction-body $abstraction)
-          (abstraction-body $rhs)))
+          (iterate (partial cons (hole)) $env (function-arity $function))
+          (function-body $function)
+          (function-body $rhs)))
       (match 
-        (iterate (partial cons (hole)) $env (abstraction-arity $abstraction))
-        (abstraction-body $abstraction) 
+        (iterate (partial cons (hole)) $env (function-arity $function))
+        (function-body $function) 
         $rhs)))
 
-  (define (arrow-match $env $arrow $rhs)
+  (define (function-type-match $env $function-type $rhs)
     (and
-      (arrow? $rhs)
-      (symbol=? (arrow-name $arrow) (arrow-name $rhs))
+      (function-type? $rhs)
+      (symbol=? (function-type-name $function-type) (function-type-name $rhs))
       (bind-true 
-        ($env (list-match $env (arrow-params $arrow) (arrow-params $rhs)))
-        (match $env (arrow-result $arrow) (arrow-result $rhs)))))
+        ($env (list-match $env (function-type-params $function-type) (function-type-params $rhs)))
+        (match $env (function-type-result $function-type) (function-type-result $rhs)))))
 
   (define (tuple-type-match $env $tuple-type $rhs)
     (and
@@ -119,7 +119,7 @@
       ((number-type? _) `number)
       ((string-type? _) `string)
       ((universe? _) `universe)
-      ((arrow? _) `function)
+      ((function-type? _) `function)
       ((tuple-type? $tuple-type) (tuple-type-name $tuple-type))
       ((else $other) #f)))
 

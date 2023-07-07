@@ -20,11 +20,11 @@
 
 (check (equal? (term->datum (universe 3)) `(universe 3)))
 
-(check (equal? (term->datum (arrow `foo (list `t1 `t2) `t3)) `(arrow 'foo (list 't1 't2) 't3)))
+(check (equal? (term->datum (function-type `foo (list `t1 `t2) `t3)) `(function-type 'foo (list 't1 't2) 't3)))
 
-(check (equal? (term->datum (abstraction 2 `foo)) `(lambda (v0 v1) 'foo)))
-(check (equal? (term->datum (abstraction 2 (variable 0))) `(lambda (v0 v1) v1)))
-(check (equal? (term->datum (abstraction 2 (variable 1))) `(lambda (v0 v1) v0)))
+(check (equal? (term->datum (function 2 `foo)) `(lambda (v0 v1) 'foo)))
+(check (equal? (term->datum (function 2 (variable 0))) `(lambda (v0 v1) v1)))
+(check (equal? (term->datum (function 2 (variable 1))) `(lambda (v0 v1) v0)))
 
 (check (equal? (term->datum (application `foo (list `bar `goo))) `('foo 'bar 'goo)))
 

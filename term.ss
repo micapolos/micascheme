@@ -2,7 +2,7 @@
   (export
     native native? native-term
 
-    abstraction abstraction? abstraction-arity abstraction-body
+    function function? function-arity function-body
     application application? application-fn application-args
     variable variable? variable-index
 
@@ -13,14 +13,14 @@
 
     universe universe? universe-depth
     
-    arrow arrow? arrow-name arrow-params arrow-result
+    function-type function-type? function-type-name function-type-params function-type-result
 
     make-tuple make-tuple? make-tuple-terms
     tuple-get tuple-get? tuple-get-size tuple-get-term tuple-get-index
 
     term->datum eval-term
 
-    application! tuple! arrow! tuple-type!
+    application! tuple! function-type! tuple-type!
     boolean! number! string! type!)
 
   (import (micascheme))
@@ -29,7 +29,7 @@
 
   (data (variable index))
   (data (application fn args))
-  (data (abstraction arity body))
+  (data (function arity body))
 
   (data (boolean-type))
   (data (number-type))
@@ -37,7 +37,7 @@
   (data (tuple-type name types))
   (data (universe depth))
 
-  (data (arrow name params result))
+  (data (function-type name params result))
 
   (data (make-tuple terms))
   (data (tuple-get size term index))
@@ -62,8 +62,8 @@
       ((universe? $universe) `(universe ,(universe-depth $universe)))
       ((variable? $variable) (depth-variable->datum $depth $variable))
       ((application? $application) (depth-application->datum $depth $application))
-      ((abstraction? $abstraction) (depth-abstraction->datum $depth $abstraction))
-      ((arrow? $arrow) (depth-arrow->datum $depth $arrow))
+      ((function? $function) (depth-function->datum $depth $function))
+      ((function-type? $function-type) (depth-function-type->datum $depth $function-type))
       ((make-tuple? $make-tuple) (depth-make-tuple->datum $depth $make-tuple))
       ((tuple-get? $tuple-get) (depth-tuple-get->datum $depth $tuple-get))
       ((else _) (throw depth-term->datum $depth $term))))
@@ -82,18 +82,18 @@
       ,(depth-term->datum $depth (application-fn $application))
       ,@(depth-terms->datums $depth (application-args $application))))
 
-  (define (depth-abstraction->datum $depth $abstraction)
-    (bind ($arity (abstraction-arity $abstraction))
+  (define (depth-function->datum $depth $function)
+    (bind ($arity (function-arity $function))
       `(lambda (,@(depth-size->datums $depth $arity))
         ,(depth-term->datum 
           (+ $depth $arity)
-          (abstraction-body $abstraction)))))
+          (function-body $function)))))
 
-  (define (depth-arrow->datum $depth $arrow)
-    `(arrow
-      (quote ,(arrow-name $arrow))
-      (list ,@(depth-terms->datums $depth (arrow-params $arrow)))
-      ,(depth-term->datum $depth (arrow-result $arrow))))
+  (define (depth-function-type->datum $depth $function-type)
+    `(function-type
+      (quote ,(function-type-name $function-type))
+      (list ,@(depth-terms->datums $depth (function-type-params $function-type)))
+      ,(depth-term->datum $depth (function-type-result $function-type))))
 
   (define (depth-make-tuple->datum $depth $make-tuple)
     (let* (($terms (make-tuple-terms $make-tuple))
@@ -162,11 +162,11 @@
         ((_ fn arg ...)
           #`(application fn (list arg ...))))))
 
-  (define-syntax arrow!
+  (define-syntax function-type!
     (lambda (stx)
       (syntax-case stx ()
         ((_ (name arg ...) result)
-          #`(arrow (quote name) (list arg ...) result)))))
+          #`(function-type (quote name) (list arg ...) result)))))
 
   (define-syntax tuple!
     (lambda (stx)

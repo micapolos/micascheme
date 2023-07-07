@@ -35,7 +35,7 @@
         (function (length string) number)))
     (typed
       (native `string-length)
-      (arrow! (length string!) number!))))
+      (function-type! (length string!) number!))))
 
 ; === types ===
 
@@ -62,7 +62,7 @@
 (check
   (obj=?
     (parse! (type (function (foo number) string)))
-    (typed (arrow! (foo number!) string!) type!)))
+    (typed (function-type! (foo number!) string!) type!)))
 
 ; === tuple! ===
 
@@ -79,8 +79,8 @@
   (obj=?
     (parse! (function (id number string) (done string number)))
     (typed
-      (abstraction 2 (tuple! (variable 0) (variable 1)))
-      (arrow! (id number! string!) (tuple-type! (done string! number!))))))
+      (function 2 (tuple! (variable 0) (variable 1)))
+      (function-type! (id number! string!) (tuple-type! (done string! number!))))))
 
 ; === use / get ===
 
@@ -88,7 +88,7 @@
   (obj=?
     (parse! (use ("foo") string))
     (typed
-      (application! (abstraction 1 (variable 0)) "foo")
+      (application! (function 1 (variable 0)) "foo")
       string!)))
 
 ; === use / application ===
@@ -100,7 +100,7 @@
         (length "foo")))
     (typed
       (application!
-        (abstraction 1 (application! (variable 0) "foo"))
+        (function 1 (application! (variable 0) "foo"))
         (native `string-length))
       number!)))
 

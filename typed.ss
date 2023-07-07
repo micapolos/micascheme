@@ -5,7 +5,7 @@
     evaluate! evaluate
 
     ; aux keywords
-    boolean number use type function)
+    boolean number use type)
 
   (import (micascheme) (term) (type))
 
@@ -25,14 +25,14 @@
       (lambda ($type) (and (type-named? $type $symbol) $type))
       $env))
 
-  (define (env-arrow-indexed-type $env $symbol $arg-types)
+  (define (env-function-type-indexed-type $env $symbol $arg-types)
     (map-find-indexed 
       (lambda ($type) 
         (and 
-          (arrow? $type) 
-          (symbol=? (arrow-name $type) $symbol)
-          (list-matches? (arrow-params $type) $arg-types) 
-          (arrow-result $type)))
+          (function-type? $type) 
+          (symbol=? (function-type-name $type) $symbol)
+          (list-matches? (function-type-params $type) $arg-types) 
+          (function-type-result $type)))
       $env))
 
   ; ----------------------------------------------------------------
@@ -90,7 +90,7 @@
   (define (env-parse-proc $env $phase $stx)
     (let* (($typed (env-parse $env $phase $stx))
            ($type (typed-type $typed)))
-      (and (arrow? $type)
+      (and (function-type? $type)
         (syntax-error $stx
           (format "should be procedure, is ~s:" $type)))))
 
@@ -107,10 +107,9 @@
   (define-aux-keyword number)
   (define-aux-keyword use)
   (define-aux-keyword type)
-  (define-aux-keyword function)
 
   (define (env-parse $env $phase $stx)
-    (syntax-case $stx (native boolean number string function arrow use type)
+    (syntax-case $stx (native boolean number string function function-type use type)
       ((native $value $type)
         (if (identifier? #`$value)
           (typed 
@@ -129,7 +128,7 @@
         (typed type! type!))
       ((function (name param ...) rhs) (phase-n? $phase 1)
         (typed
-          (arrow
+          (function-type
             (syntax->datum #`name)
             (map (partial env-parse-type $env) (syntax->list #`(param ...)))
             (env-parse-type $env #`rhs))
@@ -145,8 +144,8 @@
                ($body-term (typed-value $typed-body))
                ($body-type (typed-type $typed-body)))
           (typed
-            (abstraction $arity $body-term)
-            (arrow $name $param-types $body-type))))
+            (function $arity $body-term)
+            (function-type $name $param-types $body-type))))
       ((use (expr ...) body)
         (let* (($exprs (syntax->list #`(expr ...)))
                ($body #`body)
@@ -159,7 +158,7 @@
                ($body-term (typed-value $typed-body))
                ($body-type (typed-type $typed-body)))
           (typed
-            (application (abstraction $arity $body-term) $terms)
+            (application (function $arity $body-term) $terms)
             $body-type)))
       ((id arg ...) (identifier? #`id)
         (let* (($id (syntax->datum #`id))
@@ -168,7 +167,7 @@
                ($arg-types (map typed-type $typed-args))
                ($arg-values (map typed-value $typed-args))
                ($type (tuple-type $id $arg-types))
-               ($indexed-type (env-arrow-indexed-type $env $id $arg-types)))
+               ($indexed-type (env-function-type-indexed-type $env $id $arg-types)))
           (cond
             ($indexed-type
               (let* (($type (indexed-value $indexed-type))
