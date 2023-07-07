@@ -1,6 +1,5 @@
 (library (typed)
   (export 
-    typed typed? typed-value typed-type
     parse! parse
     evaluate! evaluate
 
@@ -13,8 +12,6 @@
   (define-aux-keyword number)
   (define-aux-keyword use)
   (define-aux-keyword type)
-
-  (data (typed value type))
 
   ; ----------------------------------------------------------------
 

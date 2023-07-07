@@ -22,6 +22,8 @@
 
     universe universe? universe-depth
     
+    typed typed? typed-value typed-type
+
     term->datum eval-term
 
     application! tuple! function-type! tuple-type! choice-type!
@@ -49,6 +51,8 @@
   (data (choice-type types))
   (data (choice-switch size term cases))
   (data (select size index term))
+
+  (data (typed value type))
 
   (define (term->datum $term)
     (depth-term->datum 0 $term))
