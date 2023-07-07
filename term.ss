@@ -16,6 +16,10 @@
     tuple-ref tuple-ref? tuple-ref-size tuple-ref-term tuple-ref-index
     tuple-type tuple-type? tuple-type-name tuple-type-types
 
+    choice-type? choice-type-types
+    choice? choice-size choice-index choice-term
+    choice-switch? choice-switch-size choice-switch-term choice-switch-cases
+
     universe universe? universe-depth
     
     term->datum eval-term
@@ -41,6 +45,10 @@
   (data (tuple terms))
   (data (tuple-ref size term index))
   (data (tuple-type name types))
+
+  (data (choice-type types))
+  (data (choice size index term))
+  (data (choice-switch size term cases))
 
   (define (term->datum $term)
     (depth-term->datum 0 $term))
