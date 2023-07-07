@@ -64,14 +64,37 @@
     (parse! (type (function (foo number) string)))
     (typed (function-type! (foo number!) string!) type!)))
 
-; === tuple! ===
+; === tuple ===
 
 (check
   (obj=?
     (parse! (foo 10 "bar"))
     (typed
       (tuple! 10 "bar")
-      (tuple-type `foo (list number! string!)))))
+      (tuple-type! (foo number! string!)))))
+
+; === tuple-get ===
+
+(check
+  (obj=?
+    (parse! (number (point 10 "foo")))
+    (typed
+      (tuple-ref 2 (tuple! 10 "foo") 0)
+      number!)))
+
+(check
+  (obj=?
+    (parse! (string (point 10 "foo")))
+    (typed
+      (tuple-ref 2 (tuple! 10 "foo") 1)
+      string!)))
+
+(check
+  (obj=?
+    (parse! (x (point (x 10) (y 20))))
+    (typed
+      (tuple-ref 2 (tuple! (tuple! 10) (tuple! 20)) 0)
+      (tuple-type! (x number!)))))
 
 ; === function ===
 

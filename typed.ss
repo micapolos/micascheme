@@ -61,16 +61,33 @@
         (< $index $length)
         (list-ref (reverse $indexed-types) $index))))
 
-  (define (env-resolve-application $env $symbol $arg-types $arg-values)
-    (bind-true ($indexed-type (env-function-type-indexed-type $env $symbol $arg-types))
+  (define (env-resolve-application $env $symbol $types $terms)
+    (bind-true ($indexed-type (env-function-type-indexed-type $env $symbol $types))
       (cond
         ($indexed-type
           (let* (($type (indexed-value $indexed-type))
                  ($index (indexed-index $indexed-type))
                  ($var (variable $index)))
             (typed 
-              (application $var $arg-values)
+              (application $var $terms)
               $type))))))
+
+  (define (resolve-tuple-ref $symbol $types $terms)
+    (and (= (length $types) 1)
+      (bind ($type (car $types))
+        (and (tuple-type? $type)
+          (bind-true 
+            ($indexed-type 
+              (map-find-indexed
+                (lambda ($field-type)
+                  (and (type-named? $field-type $symbol) $field-type))
+                (tuple-type-types $type)))
+            (typed 
+              (tuple-ref
+                (length (tuple-type-types $type))
+                (car $terms)
+                (indexed-index $indexed-type))
+              (indexed-value $indexed-type)))))))
 
   (define (phase-tuple $phase $symbol $types $terms)
     (bind ($phase-depth (phase-depth $phase))
@@ -190,6 +207,7 @@
                ($type (tuple-type $symbol $arg-types)))
           (or 
             (env-resolve-application $env $symbol $arg-types $arg-terms)
+            (resolve-tuple-ref $symbol $arg-types $arg-terms)
             (phase-tuple $phase $symbol $arg-types $arg-terms))))
       (_
         (switch (syntax->datum $stx)
