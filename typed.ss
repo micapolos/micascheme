@@ -205,10 +205,10 @@
   (define-syntax evaluate!
     (syntax-rules ()
       ((_ expr)
-        (evaluate #'expr))))
+        (evaluate (phase 0) #'expr))))
 
-  (define (evaluate $stx)
-    (let* (($typed (parse $stx))
+  (define (evaluate $phase $stx)
+    (let* (($typed (env-parse (list) $phase $stx))
            ($term (typed-value $typed))
            ($type (typed-type $typed)))
       (typed
