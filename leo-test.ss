@@ -19,7 +19,11 @@
 
 ; === tuples
 
+(check (equal? (leo x) #f))
+(check (equal? (leo (x)) #f))
+(check (equal? (leo (x 10)) 10))
 (check (equal? (leo (point (x 10) (y 20))) (cons 10 20)))
+(check (equal? (leo (point (x 10) (y 20) (z 30))) (vector 10 20 30)))
 (check (equal? (leo (x (point (x 10) (y 20)))) 10))
 (check (equal? (leo (y (point (x 10) (y 20)))) 20))
 (check (equal? (leo (number (x (point (x 10) (y 20))))) 10))
