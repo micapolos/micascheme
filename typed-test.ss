@@ -73,11 +73,11 @@
       (tuple! 10 "bar")
       (tuple-type `foo (list number! string!)))))
 
-; === lambda ===
+; === function ===
 
 (check
   (obj=?
-    (parse! (lambda (id number string) (done string number)))
+    (parse! (function (id number string) (done string number)))
     (typed
       (abstraction 2 (tuple! (variable 0) (variable 1)))
       (arrow! (id number! string!) (tuple-type! (done string! number!))))))

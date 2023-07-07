@@ -5,7 +5,7 @@
     evaluate! evaluate
 
     ; aux keywords
-    boolean number use type)
+    boolean number use type function)
 
   (import (micascheme) (term) (type))
 
@@ -107,9 +107,10 @@
   (define-aux-keyword number)
   (define-aux-keyword use)
   (define-aux-keyword type)
+  (define-aux-keyword function)
 
   (define (env-parse $env $phase $stx)
-    (syntax-case $stx (native boolean number string lambda arrow use type)
+    (syntax-case $stx (native boolean number string function arrow use type)
       ((native $value $type)
         (if (identifier? #`$value)
           (typed 
@@ -133,7 +134,7 @@
             (map (partial env-parse-type $env) (syntax->list #`(param ...)))
             (env-parse-type $env #`rhs))
           type!))
-      ((lambda (name param ...) body)
+      ((function (name param ...) body)
         (let* (($name (syntax->datum #`name))
                ($params (syntax->list #`(param ...)))
                ($body #`body)

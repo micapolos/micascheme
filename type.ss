@@ -119,7 +119,7 @@
       ((number-type? _) `number)
       ((string-type? _) `string)
       ((universe? _) `universe)
-      ((arrow? _) `arrow)
+      ((arrow? _) `function)
       ((tuple-type? $tuple-type) (tuple-type-name $tuple-type))
       ((else $other) #f)))
 

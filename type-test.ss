@@ -55,7 +55,7 @@
 (check (eq? (type-selector number!) `number))
 (check (eq? (type-selector string!) `string))
 (check (eq? (type-selector (universe 3)) `universe))
-(check (eq? (type-selector (arrow! (foo number!) string!)) `arrow))
+(check (eq? (type-selector (arrow! (foo number!) string!)) `function))
 (check (eq? (type-selector (tuple-type! (foo number!))) `foo))
 (check (eq? (type-selector `foo) `foo))
 (check (eq? (type-selector 123) #f))
