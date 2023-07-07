@@ -32,7 +32,7 @@
   (obj=?
     (parse!
       (native string-length
-        (arrow (length string) number)))
+        (function (length string) number)))
     (typed
       (native `string-length)
       (arrow! (length string!) number!))))
@@ -61,7 +61,7 @@
 
 (check
   (obj=?
-    (parse! (type (arrow (foo number) string)))
+    (parse! (type (function (foo number) string)))
     (typed (arrow! (foo number!) string!) type!)))
 
 ; === tuple! ===
@@ -95,7 +95,9 @@
 
 (check
   (obj=?
-    (parse! (use ((native string-length (arrow (length string) number))) (length "foo")))
+    (parse! 
+      (use ((native string-length (function (length string) number))) 
+        (length "foo")))
     (typed
       (application!
         (abstraction 1 (application! (variable 0) "foo"))
@@ -110,8 +112,8 @@
   (obj=?
     (evaluate!
       (use
-        ((native string-length (arrow (length string) number))
-         (native number->string (arrow (string number) string))
-         (native string-append (arrow (append string string) string)))
+        ((native string-length (function (length string) number))
+         (native number->string (function (string number) string))
+         (native string-append (function (append string string) string)))
         (append (string (length "foo")) " apples")))
     (typed "3 apples" string!)))

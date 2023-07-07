@@ -127,7 +127,7 @@
         (typed string! type!))
       (type (phase-n? $phase 1)
         (typed type! type!))
-      ((arrow (name param ...) rhs) (phase-n? $phase 1)
+      ((function (name param ...) rhs) (phase-n? $phase 1)
         (typed
           (arrow
             (syntax->datum #`name)

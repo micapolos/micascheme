@@ -6,8 +6,8 @@
   (equal?
     (leo
       (use
-        ((native string-length (arrow (length string) number))
-         (native number->string (arrow (string number) string))
-         (native string-append (arrow (append string string) string)))
+        ((native string-length (function (length string) number))
+         (native number->string (function (string number) string))
+         (native string-append (function (append string string) string)))
         (append (string (length "foo")) " apples")))
     "3 apples"))
