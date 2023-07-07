@@ -1,6 +1,31 @@
 (import (micascheme) (leo))
 
+; === natives
+
+(check (equal? (leo (native string-length (arrow (len string) number))) string-length))
+
+; === primitives
+
+(check (equal? (leo #t) #t))
+(check (equal? (leo 123) 123))
 (check (equal? (leo "foo") "foo"))
+
+; === types
+
+(check (obj=? (leo (type boolean)) boolean!))
+(check (obj=? (leo (type number)) number!))
+(check (obj=? (leo (type string)) string!))
+(check (obj=? (leo (type type)) type!))
+
+; === tuples
+
+(check (equal? (leo (point (x 10) (y 20))) (cons 10 20)))
+(check (equal? (leo (x (point (x 10) (y 20)))) 10))
+(check (equal? (leo (y (point (x 10) (y 20)))) 20))
+(check (equal? (leo (number (x (point (x 10) (y 20))))) 10))
+(check (equal? (leo (number (y (point (x 10) (y 20))))) 20))
+
+; === use / get
 
 (check
   (equal?
