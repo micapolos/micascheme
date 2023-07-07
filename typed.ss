@@ -163,15 +163,15 @@
                ($arg-types (map typed-type $typed-args))
                ($arg-values (map typed-value $typed-args))
                ($type (tuple-type $id $arg-types))
-               ($indexed-result-type (env-arrow-indexed-type $env $id $arg-types)))
+               ($indexed-type (env-arrow-indexed-type $env $id $arg-types)))
           (cond
-            ($indexed-result-type
-              (let* (($result-type (indexed-value $indexed-result-type))
-                     ($result-index (indexed-index $indexed-result-type))
-                     ($var (variable $result-index)))
+            ($indexed-type
+              (let* (($type (indexed-value $indexed-type))
+                     ($index (indexed-index $indexed-type))
+                     ($var (variable $index)))
                 (typed 
                   (application $var $arg-values)
-                  $result-type)))
+                  $type)))
             (else
               (if $type?
                 (typed
