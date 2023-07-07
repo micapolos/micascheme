@@ -16,9 +16,9 @@
     tuple-ref tuple-ref? tuple-ref-size tuple-ref-term tuple-ref-index
     tuple-type tuple-type? tuple-type-name tuple-type-types
 
-    choice-type? choice-type-types
-    choice? choice-size choice-index choice-term
-    choice-switch? choice-switch-size choice-switch-term choice-switch-cases
+    choice-type choice-type? choice-type-types
+    choice choice? choice-size choice-index choice-term
+    choice-switch choice-switch? choice-switch-size choice-switch-term choice-switch-cases
 
     universe universe? universe-depth
     
@@ -66,7 +66,6 @@
       ((boolean-type? _) `(boolean-type))
       ((number-type? _) `(number-type))
       ((string-type? _) `(string-type))
-      ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
       ((universe? $universe) `(universe ,(universe-depth $universe)))
       ((variable? $variable) (depth-variable->datum $depth $variable))
       ((application? $application) (depth-application->datum $depth $application))
@@ -74,6 +73,10 @@
       ((function-type? $function-type) (depth-function-type->datum $depth $function-type))
       ((tuple? $tuple) (depth-tuple->datum $depth $tuple))
       ((tuple-ref? $tuple-ref) (depth-tuple-ref->datum $depth $tuple-ref))
+      ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
+      ((choice? $choice) (depth-choice->datum $depth $choice))
+      ((choice-switch? $choice-switch) (depth-choice-switch->datum $depth $choice-switch))
+      ((choice-type? $choice-type) (depth-choice-type->datum $depth $choice-type))
       ((else _) (throw depth-term->datum $depth $term))))
 
   (define (depth-native->datum $depth $native)
@@ -131,6 +134,22 @@
         ((1) $datum)
         ((2) `(,(if (= $index 0) `car `cdr) ,$datum))
         (else `(vector-ref ,$datum ,$index)))))
+
+  (define (depth-choice->datum $depth $choice)
+    `(choice
+      ,(choice-size $choice)
+      ,(choice-index $choice)
+      ,(depth-term->datum $depth (choice-term $choice))))
+
+  (define (depth-choice-switch->datum $depth $choice-switch)
+    `(choice-switch
+      ,(choice-size $choice-switch)
+      ,(depth-term->datum $depth (choice-switch-term $choice-switch))
+      (list ,@(depth-terms->datums $depth (choice-switch-cases $choice-switch)))))
+
+  (define (depth-choice-type->datum $depth $choice-type)
+    `(choice-type
+      (list ,@(depth-terms->datums $depth (choice-type-types $choice-type)))))
 
   (define (depth->datum $depth)
     (string->symbol 

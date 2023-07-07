@@ -5,7 +5,7 @@
     evaluate! evaluate
 
     ; aux keywords
-    boolean number use type)
+    boolean number use type the)
 
   (import (micascheme) (term) (type))
 
@@ -145,9 +145,10 @@
   (define-aux-keyword number)
   (define-aux-keyword use)
   (define-aux-keyword type)
+  (define-aux-keyword the)
 
   (define (env-parse $env $phase $stx)
-    (syntax-case $stx (native boolean number string function function-type use type)
+    (syntax-case $stx (native boolean number string function function-type use type choice)
       ((native $value $type)
         (typed 
           (native (syntax->datum #`$value))
@@ -196,6 +197,21 @@
           (typed
             (application (function $arity $body-term) $terms)
             $body-type)))
+      ((choice (option ...))
+        (let* (($options (map (partial env-parse-option $env $phase) (syntax->list #`(option ...))))
+               ($size (length $options))
+               ($types (map option-type $options))
+               ($selection (options-selection $options)))
+          (switch $selection
+            ((no-selection? _) (syntax-error $stx "no selection:"))
+            ((multi-selection? _) (syntax-error $stx "multi selection:"))
+            ((selection? $selection)
+              (typed
+                (choice 
+                  $size
+                  (selection-index $selection)
+                  (selection-term $selection))
+                (choice-type $types))))))
       ((id arg ...) (identifier? #`id)
         (let* (($symbol (syntax->datum #`id))
                ($args (syntax->list #`(arg ...)))
@@ -223,6 +239,48 @@
                   (indexed-value $indexed-type))
                 (typed #f $symbol))))))))
 
+  ; ---------------------------------------------------------
+
+  (data (option-not type))
+  (data (option-the typed))
+
+  (data (no-selection))
+  (data (selection index term))
+  (data (multi-selection))
+
+  (define (env-parse-option $env $phase $stx)
+    (lambda (stx)
+      (syntax-case stx (not the)
+        ((not expr)
+          (option-not (env-parse-type $env #`expr)))
+        ((the expr) 
+          (option-the (env-parse $env $phase #`expr))))))
+
+  (define (option-type $option)
+    (switch $option
+      ((option-not? $option-not) (option-not-type $option-not))
+      ((option-the? $option-the) (typed-type (option-the-typed $option-the)))))
+  
+  (define (options-selection $options)
+    (let* (($indexed-options 
+            (map-indexed 
+              (lambda ($index $option) (indexed $option $index)) 
+              $options))
+           ($selections
+            (filter 
+              (lambda ($indexed-option) 
+                (switch (indexed-value $indexed-option)
+                  ((option-the? $option-the) 
+                    (selection 
+                      (indexed-index $indexed-option)
+                      (typed-value (option-the-typed $option-the))))
+                  ((option-not? _) #f)))
+            $indexed-options)))
+      (case (length $selections)
+        ((0) (no-selection))
+        ((1)  (car $selections))
+        (else (multi-selection)))))
+  
   ; --------------------------------------------------------
 
   (define-syntax evaluate!
