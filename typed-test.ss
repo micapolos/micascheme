@@ -96,7 +96,8 @@
 (check
   (obj=?
     (parse! 
-      (use ((native string-length (function (length string) number))) 
+      (use 
+        ((native string-length (function (length string) number))) 
         (length "foo")))
     (typed
       (application!
