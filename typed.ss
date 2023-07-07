@@ -72,6 +72,16 @@
               (application $var $arg-values)
               $type))))))
 
+  (define (phase-tuple $phase $symbol $types $terms)
+    (bind ($phase-depth (phase-depth $phase))
+      (if (> $phase-depth 0)
+        (typed
+          (tuple-type $symbol $terms)
+          (universe (- $phase-depth 1)))
+        (typed
+          (tuple $terms)
+          (tuple-type $symbol $types)))))
+
   ; ----------------------------------------------------------------
 
   (define-syntax parse!
@@ -180,13 +190,7 @@
                ($type (tuple-type $id $arg-types)))
           (or 
             (env-resolve-application $env $id $arg-types $arg-values)
-            (if (phase-n? $phase 1)
-              (typed
-                (tuple-type $id $arg-values)
-                (universe 0))
-              (typed
-                (tuple $arg-values)
-                (tuple-type $id $arg-types))))))
+            (phase-tuple $phase $id $arg-types $arg-values))))
       (_
         (switch (syntax->datum $stx)
           ((boolean? $boolean) 
