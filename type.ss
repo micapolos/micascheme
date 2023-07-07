@@ -36,8 +36,8 @@
         (number-type-match $env $number-type $rhs))
       ((string-type? $string-type)
         (string-type-match $env $string-type $rhs))
-      ((type-type? $type-type)
-        (type-type-match $env $type-type $rhs))
+      ((universe? $universe)
+        (universe-match $env $universe $rhs))
       ((variable? $variable) 
         (variable-match $env $variable $rhs))
       ((abstraction? $abstraction) 
@@ -64,8 +64,10 @@
   (define (string-type-match $env $string-type $rhs)
     (string-type? $rhs))
 
-  (define (type-type-match $env $type-type $rhs)
-    (type-type? $rhs))
+  (define (universe-match $env $universe $rhs)
+    (and 
+      (universe? $rhs)
+      (= (universe-depth $universe) (universe-depth $rhs))))
 
   (define (variable-match $env $variable $rhs)
     (bind ($index (variable-index $variable))
@@ -116,7 +118,7 @@
       ((boolean-type? _) `boolean)
       ((number-type? _) `number)
       ((string-type? _) `string)
-      ((type-type? _) `type)
+      ((universe? _) `universe)
       ((arrow? _) `arrow)
       ((tuple-type? $tuple-type) (tuple-type-name $tuple-type))
       ((else $other) #f)))

@@ -21,8 +21,9 @@
 (check (matches? string! string!))
 (check (not (matches? string! `foo)))
 
-(check (matches? type! type!))
-(check (not (matches? type! `foo)))
+(check (matches? (universe 0) (universe 0)))
+(check (not (matches? (universe 0) (universe 1))))
+(check (not (matches? (universe 0) `foo)))
 
 (check (matches? (tuple-type `foo (list `t1 `t2)) (tuple-type `foo (list `t1 `t2))))
 (check (not (matches? (tuple-type `foo (list `t1 `t2)) (tuple-type `bar (list `t1 `t2)))))
@@ -53,7 +54,7 @@
 (check (eq? (type-selector boolean!) `boolean))
 (check (eq? (type-selector number!) `number))
 (check (eq? (type-selector string!) `string))
-(check (eq? (type-selector type!) `type))
+(check (eq? (type-selector (universe 3)) `universe))
 (check (eq? (type-selector (arrow! (foo number!) string!)) `arrow))
 (check (eq? (type-selector (tuple-type! (foo number!))) `foo))
 (check (eq? (type-selector `foo) `foo))

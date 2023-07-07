@@ -18,7 +18,7 @@
 (check (equal? (term->datum (tuple-type `foo (list))) `(tuple-type 'foo (list))))
 (check (equal? (term->datum (tuple-type `foo (list `t1 `t2))) `(tuple-type 'foo (list 't1 't2))))
 
-(check (equal? (term->datum (type-type)) `(type-type)))
+(check (equal? (term->datum (universe 3)) `(universe 3)))
 
 (check (equal? (term->datum (arrow `foo (list `t1 `t2) `t3)) `(arrow 'foo (list 't1 't2) 't3)))
 

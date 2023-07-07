@@ -11,7 +11,7 @@
     string-type string-type?
     tuple-type tuple-type? tuple-type-name tuple-type-types
 
-    type-type type-type?
+    universe universe? universe-depth
     
     arrow arrow? arrow-name arrow-params arrow-result
 
@@ -35,7 +35,7 @@
   (data (number-type))
   (data (string-type))
   (data (tuple-type name types))
-  (data (type-type))
+  (data (universe depth))
 
   (data (arrow name params result))
 
@@ -59,7 +59,7 @@
       ((number-type? _) `(number-type))
       ((string-type? _) `(string-type))
       ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
-      ((type-type? _) `(type-type))
+      ((universe? $universe) `(universe ,(universe-depth $universe)))
       ((variable? $variable) (depth-variable->datum $depth $variable))
       ((application? $application) (depth-application->datum $depth $application))
       ((abstraction? $abstraction) (depth-abstraction->datum $depth $abstraction))
@@ -154,7 +154,7 @@
   (define-syntax type!
     (lambda (stx)
       (syntax-case stx ()
-        (_ #`(type-type)))))
+        (_ #`(universe 0)))))
 
   (define-syntax application!
     (lambda (stx)

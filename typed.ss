@@ -94,9 +94,9 @@
     (let* (($typed (env-parse $env #t $stx))
            ($value (typed-value $typed))
            ($type (typed-type $typed)))
-      (unless (type-type? (typed-type $typed))
+      (unless (and (universe? $type) (= (universe-depth $type) 0))
         (syntax-error $stx 
-          (format "should be type:")))
+          (format "should be universe 0:")))
       $value))
 
   (define-aux-keyword boolean)
@@ -176,7 +176,7 @@
               (if $type?
                 (typed
                   (tuple-type $id $arg-values)
-                  (type-type))
+                  (universe 0))
                 (typed
                   (make-tuple $arg-values)
                   (tuple-type $id $arg-types)))))))
