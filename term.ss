@@ -3,21 +3,21 @@
     native native? native-term
 
     function function? function-arity function-body
+    function-type function-type? function-type-name function-type-params function-type-result
+
     application application? application-fn application-args
     variable variable? variable-index
 
     boolean-type boolean-type?
     number-type number-type?
     string-type string-type?
+
+    tuple tuple? tuple-terms
+    tuple-ref tuple-ref? tuple-ref-size tuple-ref-term tuple-ref-index
     tuple-type tuple-type? tuple-type-name tuple-type-types
 
     universe universe? universe-depth
     
-    function-type function-type? function-type-name function-type-params function-type-result
-
-    tuple tuple? tuple-terms
-    tuple-ref tuple-ref? tuple-ref-size tuple-ref-term tuple-ref-index
-
     term->datum eval-term
 
     application! tuple! function-type! tuple-type!
@@ -34,13 +34,13 @@
   (data (boolean-type))
   (data (number-type))
   (data (string-type))
-  (data (tuple-type name types))
   (data (universe depth))
 
   (data (function-type name params result))
 
   (data (tuple terms))
   (data (tuple-ref size term index))
+  (data (tuple-type name types))
 
   (define (term->datum $term)
     (depth-term->datum 0 $term))
