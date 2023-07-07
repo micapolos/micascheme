@@ -24,10 +24,20 @@
 (check (equal? (leo (x 10)) 10))
 (check (equal? (leo (point (x 10) (y 20))) (cons 10 20)))
 (check (equal? (leo (point (x 10) (y 20) (z 30))) (vector 10 20 30)))
+
+; === tuple-ref
+
+(check (equal? (leo (number (x 10))) 10))
+(check (equal? (leo (string (x 10))) 10))
+
 (check (equal? (leo (x (point (x 10) (y 20)))) 10))
 (check (equal? (leo (y (point (x 10) (y 20)))) 20))
-(check (equal? (leo (number (x (point (x 10) (y 20))))) 10))
-(check (equal? (leo (number (y (point (x 10) (y 20))))) 20))
+(check (equal? (leo (z (point (x 10) (y 20)))) (cons 10 20)))
+
+(check (equal? (leo (x (point (x 10) (y 20) (z 30)))) 10))
+(check (equal? (leo (y (point (x 10) (y 20) (z 30)))) 20))
+(check (equal? (leo (z (point (x 10) (y 20) (z 30)))) 30))
+(check (equal? (leo (w (point (x 10) (y 20) (z 30)))) (vector 10 20 30)))
 
 ; === use / get
 
