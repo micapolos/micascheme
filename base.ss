@@ -23,10 +23,9 @@
   (define (writeln x) (write x) (newline))
 
   (define-syntax lets
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ decl ... body)
-          #`(let* (decl ...) body)))))
+    (syntax-rules ()
+      ((_ decl ... body)
+        (let* (decl ...) body))))
 
   (define-syntax and-lets
     (syntax-rules ()
