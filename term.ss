@@ -214,28 +214,24 @@
         (_ #`(universe 0)))))
 
   (define-syntax application!
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ fn arg ...)
-          #`(application fn (list arg ...))))))
+    (syntax-rules ()
+      ((_ fn arg ...)
+        (application fn (list arg ...)))))
 
   (define-syntax function-type!
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ (name arg ...) result)
-          #`(function-type (quote name) (list arg ...) result)))))
+    (syntax-rules ()
+      ((_ (name arg ...) result)
+        (function-type (quote name) (list arg ...) result))))
 
   (define-syntax tuple-type!
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ (name arg ...))
-          #`(tuple-type (quote name) (list arg ...))))))
+    (syntax-rules ()
+      ((_ (name arg ...))
+        (tuple-type (quote name) (list arg ...)))))
 
   (define-syntax choice-type!
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ arg ...)
-          #`(choice-type (list arg ...))))))
+    (syntax-rules ()
+      ((_ arg ...)
+        (choice-type (list arg ...)))))
 
   ; -----------------------------------------------
 
