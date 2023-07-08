@@ -14,10 +14,6 @@
 
     conditional conditional? conditional-condition conditional-consequent conditional-alternate
 
-    pair
-    pair-first pair-first? pair-first-pair
-    pair-second pair-second? pair-second-pair
-
     tuple tuple? tuple-items tuple!
     tuple-ref tuple-ref? tuple-ref-size tuple-ref-tuple tuple-ref-index
     tuple-type tuple-type? tuple-type-name tuple-type-types
@@ -49,10 +45,6 @@
   (data (conditional condition consequent alternate))
 
   (data (function-type name params result))
-
-  (define pair cons)
-  (data (pair-first pair))
-  (data (pair-second pair))
 
   (data (tuple items))
   (data (tuple-ref size tuple index))
@@ -86,9 +78,6 @@
       ((conditional? $conditional) (depth-conditional->datum $depth $conditional))
       ((function? $function) (depth-function->datum $depth $function))
       ((function-type? $function-type) (depth-function-type->datum $depth $function-type))
-      ((pair? $pair) (depth-pair->datum $depth $pair))
-      ((pair-first? $pair-first) (depth-pair-first->datum $depth $pair-first))
-      ((pair-second? $pair-second) (depth-pair-second->datum $depth $pair-second))
       ((tuple? $tuple) (depth-tuple->datum $depth $tuple))
       ((tuple-ref? $tuple-ref) (depth-tuple-ref->datum $depth $tuple-ref))
       ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
@@ -130,17 +119,6 @@
       (quote ,(function-type-name $function-type))
       (list ,@(depth-terms->datums $depth (function-type-params $function-type)))
       ,(depth-term->datum $depth (function-type-result $function-type))))
-
-  (define (depth-pair->datum $depth $pair)
-    `(cons 
-      ,(depth-term->datum $depth (car $pair))
-      ,(depth-term->datum $depth (cdr $pair))))
-
-  (define (depth-pair-first->datum $depth $pair-first)
-    `(car ,(depth-term->datum $depth (pair-first-pair $pair-first))))
-
-  (define (depth-pair-second->datum $depth $pair-second)
-    `(cdr ,(depth-term->datum $depth (pair-second-pair $pair-second))))
 
   (define (depth-tuple->datum $depth $tuple)
     (lets

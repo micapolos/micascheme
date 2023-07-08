@@ -30,10 +30,6 @@
 
 (check (equal? (term->datum (application `foo (list `bar `goo))) `('foo 'bar 'goo)))
 
-(check (equal? (term->datum (pair `p1 `p2)) `(cons 'p1 'p2)))
-(check (equal? (term->datum (pair-first `pair)) `(car 'pair)))
-(check (equal? (term->datum (pair-second `pair)) `(cdr 'pair)))
-
 (check (equal? (term->datum (tuple!)) #f))
 (check (equal? (term->datum (tuple! `t1)) ''t1))
 (check (equal? (term->datum (tuple! `t1 `t2)) `(cons 't1 't2)))
@@ -62,7 +58,7 @@
     (term->datum 
       (choice-switch 1 `foo 
         (list 
-          (pair "zero" (variable 0)))))
+          (tuple! "zero" (variable 0)))))
     `(let ((v0 'foo)) 
       (cons "zero" v0))))
 
@@ -71,8 +67,8 @@
     (term->datum 
       (choice-switch 2 `foo 
         (list 
-          (pair "zero" (variable 0))
-          (pair "one" (variable 0)))))
+          (tuple! "zero" (variable 0))
+          (tuple! "one" (variable 0)))))
     `(let ((v0 'foo)) 
       (let ((v1 (cdr v0))) 
         (if (car v0)
@@ -84,9 +80,9 @@
     (term->datum 
       (choice-switch 3 `foo 
         (list 
-          (pair "zero" (variable 0))
-          (pair "one" (variable 0))
-          (pair "two" (variable 0)))))
+          (tuple! "zero" (variable 0))
+          (tuple! "one" (variable 0))
+          (tuple! "two" (variable 0)))))
     `(let ((v0 'foo)) 
       (let ((v1 (cdr v0))) 
         (index-switch (car v0) 
