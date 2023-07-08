@@ -1,6 +1,6 @@
 (library (base)
   (export 
-    bind bind-true
+    bind bind-true bind*
     check
     data partial
     define-aux-keyword
@@ -172,6 +172,12 @@
       (syntax-case stx ()
         ((_ (var expr) body ...)
           #`(let ((var expr)) body ...)))))
+
+  (define-syntax bind*
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ decl ... body)
+          #`(let* (decl ...) body)))))
 
   (define-syntax bind-true
     (lambda (stx)

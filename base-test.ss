@@ -1,5 +1,12 @@
 (import (chezscheme) (base))
 
+; === bind ===
+
+(check (equal? (bind (x 1) (+ x 2)) 3))
+
+(check (equal? (bind* 1) 1))
+(check (equal? (bind* (x 1) (y (+ x 2)) y) 3))
+
 ; === associ ===
 
 (check (equal? (associ (list) 100 `a) #f))
