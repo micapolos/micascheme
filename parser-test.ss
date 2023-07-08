@@ -1,5 +1,6 @@
 (import 
   (micascheme) 
+  (variable)
   (term)
   (type) 
   (parser))
@@ -133,15 +134,19 @@
 
 ; === switch ===
 
-; (check
-;   (obj=?
-;     (parse! 
-;       (switch 
-;         (select (not boolean) (not number) "foo")
-;         (bool boolean)
-;         (num number)
-;         (str string)))
-;     ...))
+(check
+  (obj=?
+    (parse! 
+      (switch (select (not boolean) (not number) "foo") "boolean" "number" string))
+    (typed
+      (application 
+        (function 1
+          (application
+            (function 1
+              (ordinal-switch! (pair-first v1) "boolean" "number" v0))
+            (pair-second v0)))
+        (cons (ordinal 3 2) "foo"))
+      string!)))
 
 ; === function ===
 

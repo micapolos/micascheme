@@ -8,7 +8,7 @@
     ; aux keywords
     boolean number use type select)
 
-  (import (micascheme) (term) (type))
+  (import (micascheme) (variable) (term) (type))
 
   (data (typed value type))
 
@@ -232,13 +232,36 @@
             ((multi-selection? _) (syntax-error $stx "multi selection:"))
             ((selected? $selected)
               (typed
-                (cons 
+                (pair 
                   (ordinal $size (selected-index $selected))
                   (selected-term $selected))
                 (choice-type $types)))
             ((else $other) (throw non-selection $other)))))
       ((switch choice case ...)
-        (syntax-error $stx "Jeszcze nie umim switcha"))
+        (lets
+          ($choice #`choice)
+          ($typed-choice (env-parse $env $phase $choice))
+          ($choice-type (typed-type $typed-choice))
+          ($choice-term (typed-value $typed-choice))
+          ($cases (syntax->list #`(case ...)))
+          ($typed-cases
+            (map
+              (lambda ($case $type) (env-parse (cons $type $env) $phase $case))
+              $cases
+              (choice-type-types $choice-type)))
+          ; TODO: Validates $cases are not empty.
+          ($case-types (map typed-type $typed-cases))
+          ; TODO: Validate all $case-types are equal.
+          ($type (car $case-types))
+          ($case-terms (map typed-value $typed-cases))
+          (typed
+            (application 
+              (function 1 
+                (application
+                  (function 1 (ordinal-switch (pair-first v1) $case-terms))
+                  (pair-second v0)))
+              $choice-term)
+            $type)))
       ((id arg ...) (identifier? #`id)
         (lets
           ($symbol (syntax->datum #`id))

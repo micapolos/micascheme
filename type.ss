@@ -5,7 +5,7 @@
     type-selector type-named?
     type-selector-index)
 
-  (import (micascheme) (term))
+  (import (micascheme) (variable) (term))
 
   ; ---------------------------------------------------------
 
