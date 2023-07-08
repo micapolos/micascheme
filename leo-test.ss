@@ -1,49 +1,52 @@
 (import (micascheme) (leo) (variable) (term) (parser))
 
+(define-syntax-rule (check-leo $leo $value)
+  (check (obj=? (leo $leo) $value)))
+
 ; === natives
 
-(check (equal? (leo (native (+ 1 2) number)) 3))
+(check-leo (native (+ 1 2) number) 3)
 
 ; === primitives
 
-(check (equal? (leo #t) #t))
-(check (equal? (leo 123) 123))
-(check (equal? (leo "foo") "foo"))
+(check-leo #t #t)
+(check-leo 123 123)
+(check-leo "foo" "foo")
 
 ; === types
 
-(check (obj=? (leo (type boolean)) boolean!))
-(check (obj=? (leo (type number)) number!))
-(check (obj=? (leo (type string)) string!))
-(check (obj=? (leo (type type)) type!))
+(check-leo (type boolean) boolean!)
+(check-leo (type number) number!)
+(check-leo (type string) string!)
+(check-leo (type type) type!)
 
 ; === tuples
 
-(check (equal? (leo x) #f))
-(check (equal? (leo (x)) #f))
-(check (equal? (leo (x 10)) 10))
-(check (equal? (leo (point (x 10) (y 20))) (cons 10 20)))
-(check (equal? (leo (point (x 10) (y 20) (z 30))) (vector 10 20 30)))
+(check-leo x #f)
+(check-leo (x) #f)
+(check-leo (x 10) 10)
+(check-leo (point (x 10) (y 20)) (cons 10 20))
+(check-leo (point (x 10) (y 20) (z 30)) (vector 10 20 30))
 
 ; === tuple-ref
 
-(check (equal? (leo (number (x 10))) 10))
-(check (equal? (leo (string (x 10))) 10))
+(check-leo (number (x 10)) 10)
+(check-leo (string (x 10)) 10)
 
-(check (equal? (leo (x (point (x 10) (y 20)))) 10))
-(check (equal? (leo (y (point (x 10) (y 20)))) 20))
-(check (equal? (leo (z (point (x 10) (y 20)))) (cons 10 20)))
+(check-leo (x (point (x 10) (y 20))) 10)
+(check-leo (y (point (x 10) (y 20))) 20)
+(check-leo (z (point (x 10) (y 20))) (cons 10 20))
 
-(check (equal? (leo (x (point (x 10) (y 20) (z 30)))) 10))
-(check (equal? (leo (y (point (x 10) (y 20) (z 30)))) 20))
-(check (equal? (leo (z (point (x 10) (y 20) (z 30)))) 30))
-(check (equal? (leo (w (point (x 10) (y 20) (z 30)))) (vector 10 20 30)))
+(check-leo (x (point (x 10) (y 20) (z 30))) 10)
+(check-leo (y (point (x 10) (y 20) (z 30))) 20)
+(check-leo (z (point (x 10) (y 20) (z 30))) 30)
+(check-leo (w (point (x 10) (y 20) (z 30))) (vector 10 20 30))
 
 ; === select ===
 
-(check (equal? (leo (select #t (not number) (not string))) (cons 0 #t)))
-(check (equal? (leo (select (not boolean) 123 (not string))) (cons 1 123)))
-(check (equal? (leo (select (not boolean) (not number) "foo")) (cons 2 "foo")))
+(check-leo (select #t (not number) (not string)) (cons 0 #t))
+(check-leo (select (not boolean) 123 (not string)) (cons 1 123))
+(check-leo (select (not boolean) (not number) "foo") (cons 2 "foo"))
 
 ; === switch ===
 
