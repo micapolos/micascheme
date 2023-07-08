@@ -38,7 +38,7 @@
     (if (null? $lhs)
       (and (null? $rhs) $env)
       (and (not (null? $rhs))
-        (bind-true ($env (match $env (car $lhs) (car $rhs)))
+        (and-lets ($env (match $env (car $lhs) (car $rhs)))
           (list-match $env (cdr $lhs) (cdr $rhs))))))
   
   (define (match $env $lhs $rhs)
@@ -114,7 +114,7 @@
     (and
       (function-type? $rhs)
       (symbol=? (function-type-name $function-type) (function-type-name $rhs))
-      (bind-true 
+      (and-lets 
         ($env (list-match $env (function-type-params $function-type) (function-type-params $rhs)))
         (match $env (function-type-result $function-type) (function-type-result $rhs)))))
 
@@ -142,16 +142,16 @@
       ((else $other) #f)))
 
   (define (type-named? $type $symbol)
-    (bind-true ($selector (type-selector $type))
+    (and-lets ($selector (type-selector $type))
       (symbol=? $selector $symbol)))
 
   (define (type-selector-index $type $selector)
     (and (pair? $type)
-      (bind-true 
+      (and-lets 
         ($indexed
           (map-find-indexed 
             (lambda ($sub-type) 
-              (bind-true ($sub-selector (type-selector $sub-type))
+              (and-lets ($sub-selector (type-selector $sub-type))
                 (eq? $sub-selector $selector)))
             (cdr $type)))
         (indexed-index $indexed))))
