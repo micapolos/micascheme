@@ -80,7 +80,9 @@
 
   (define (resolve-tuple-ref $symbol $types $terms)
     (and (= (length $types) 1)
-      (lets ($type (car $types))
+      (lets 
+        ($term (car $terms))
+        ($type (car $types))
         (and (tuple-type? $type)
           (and-lets 
             ($indexed-type 
@@ -88,22 +90,33 @@
                 (lambda ($field-type)
                   (and (type-named? $field-type $symbol) $field-type))
                 (tuple-type-types $type)))
-            (typed 
-              (tuple-ref
-                (typed (car $terms) $type)
-                (indexed-index $indexed-type))
-              (indexed-value $indexed-type)))))))
+            (lets 
+              ($size (length (tuple-type-types $type)))
+              ($index (indexed-index $indexed-type))
+              ($type (indexed-value $indexed-type))
+              (typed 
+                (case $size
+                  ((0) #f)
+                  ((1) $term)
+                  ((2) ((if (= $index 0) pair-first pair-second) $term))
+                  (else (vector-get $term $index)))
+                (indexed-value $indexed-type))))))))
 
   (define (phase-tuple $phase $symbol $types $terms)
     (lets
       ($phase-depth (phase-depth $phase))
-      (if (> $phase-depth 0)
+      ($size (length $types))
+      (if (= $phase-depth 0)
+        (typed
+          (case $size
+            ((0) #f)
+            ((1) (car $terms))
+            ((2) (cons (car $terms) (cadr $terms)))
+            (else (list->vector $terms)))
+          (tuple-type $symbol $types))
         (typed
           (tuple-type $symbol $terms)
-          (universe (- $phase-depth 1)))
-        (typed
-          (tuple $symbol (map typed $terms $types))
-          (tuple-type $symbol $types)))))
+          (universe (- $phase-depth 1))))))
 
   ; ----------------------------------------------------------------
 

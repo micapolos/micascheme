@@ -68,46 +68,59 @@
 
 (check
   (obj=?
+    (parse! (foo))
+    (typed #f (tuple-type! (foo)))))
+
+(check
+  (obj=?
+    (parse! (foo 10))
+    (typed 10 (tuple-type! (foo number!)))))
+
+(check
+  (obj=?
     (parse! (foo 10 "bar"))
     (typed
-      (tuple! (foo (typed 10 number!) (typed "bar" string!)))
+      (pair 10 "bar")
       (tuple-type! (foo number! string!)))))
+
+(check
+  (obj=?
+    (parse! (foo 10 "bar" 20))
+    (typed
+      (vector 10 "bar" 20)
+      (tuple-type! (foo number! string! number!)))))
 
 ; === tuple-get ===
 
 (check
   (obj=?
+    (parse! (number (point 10)))
+    (typed 10 number!)))
+
+(check
+  (obj=?
     (parse! (number (point 10 "foo")))
-    (typed
-      (tuple-ref 
-        (typed 
-          (tuple! (point (typed 10 number!) (typed "foo" string!)))
-          (tuple-type! (point number! string!))) 
-        0)
-      number!)))
+    (typed (pair-first (cons 10 "foo")) number!)))
 
 (check
   (obj=?
     (parse! (string (point 10 "foo")))
-    (typed
-      (tuple-ref 
-        (typed 
-          (tuple! (point (typed 10 number!) (typed "foo" string!)))
-          (tuple-type! (point number! string!)))
-        1)
-      string!)))
+    (typed (pair-second (cons 10 "foo")) string!)))
 
 (check
   (obj=?
-    (parse! (x (point (x 10) (y 20))))
-    (typed
-      (tuple-ref 
-        (typed-tuple! 
-          (point
-            (typed-tuple! (x (typed! 10)))
-            (typed-tuple! (y (typed! 20)))))
-        0)
-      (tuple-type! (x number!)))))
+    (parse! (number (point 10 "foo" #t)))
+    (typed (vector-get (vector 10 "foo" #t) 0) number!)))
+
+(check
+  (obj=?
+    (parse! (string (point 10 "foo" #t)))
+    (typed (vector-get (vector 10 "foo" #t) 1) string!)))
+
+(check
+  (obj=?
+    (parse! (boolean (point 10 "foo" #t)))
+    (typed (vector-get (vector 10 "foo" #t) 2) boolean!)))
 
 ; === select ===
 
@@ -118,16 +131,14 @@
       (select 3 2 "foo")
       (choice-type! boolean! number! string!))))
 
-; === function ===
+; ; === function ===
 
 (check
   (obj=?
     (parse! (function (id number string) (done string number)))
-    (typed-function! (id number! string!)
-      (typed-tuple! 
-        (done
-          (typed (variable 0) string!) 
-          (typed (variable 1) number!))))))
+    (typed
+      (function 2 (pair (variable 0) (variable 1)))
+      (function-type! (id number! string!) (tuple-type! (done string! number!))))))
 
 ; === use / get ===
 
