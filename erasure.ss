@@ -2,6 +2,7 @@
   (export erase)
   (import 
     (micascheme)
+    (variable)
     (prefix (typed) t-)
     (term))
 
@@ -25,5 +26,6 @@
           (map erase (t-application-args $application))))
       ((t-tuple? $tuple)
         (tuple 
-          (map erase (t-tuple-items $tuple))))))
+          (map erase (t-tuple-items $tuple))))
+      ((else $other) (throw erase $typed))))
 )
