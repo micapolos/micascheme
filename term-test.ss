@@ -15,6 +15,8 @@
 (check (equal? (term->datum (number-type)) `(number-type)))
 (check (equal? (term->datum (string-type)) `(string-type)))
 
+(check (equal? (term->datum (conditional `cond `true `false)) `(if 'cond 'true 'false)))
+
 (check (equal? (term->datum (tuple-type `foo (list))) `(tuple-type 'foo (list))))
 (check (equal? (term->datum (tuple-type `foo (list `t1 `t2))) `(tuple-type 'foo (list 't1 't2))))
 

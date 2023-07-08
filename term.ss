@@ -12,6 +12,8 @@
     number-type number-type?
     string-type string-type?
 
+    conditional conditional? conditional-condition conditional-consequent conditional-alternate
+
     pair
     pair-first pair-first? pair-first-pair
     pair-second pair-second? pair-second-pair
@@ -43,6 +45,8 @@
   (data (number-type))
   (data (string-type))
   (data (universe depth))
+
+  (data (conditional condition consequent alternate))
 
   (data (function-type name params result))
 
@@ -79,6 +83,7 @@
       ((universe? $universe) `(universe ,(universe-depth $universe)))
       ((variable? $variable) (depth-variable->datum $depth $variable))
       ((application? $application) (depth-application->datum $depth $application))
+      ((conditional? $conditional) (depth-conditional->datum $depth $conditional))
       ((function? $function) (depth-function->datum $depth $function))
       ((function-type? $function-type) (depth-function-type->datum $depth $function-type))
       ((pair? $pair) (depth-pair->datum $depth $pair))
@@ -105,6 +110,12 @@
     `(
       ,(depth-term->datum $depth (application-fn $application))
       ,@(depth-terms->datums $depth (application-args $application))))
+
+  (define (depth-conditional->datum $depth $conditional)
+    `(if
+      ,(depth-term->datum $depth (conditional-condition $conditional))
+      ,(depth-term->datum $depth (conditional-consequent $conditional))
+      ,(depth-term->datum $depth (conditional-alternate $conditional))))
 
   (define (depth-function->datum $depth $function)
     (lets
