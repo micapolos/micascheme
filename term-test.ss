@@ -70,7 +70,7 @@
           (pair "one" (variable 0)))))
     `(let ((v0 'foo)) 
       (let ((v1 (cdr v0))) 
-        (if (car v0) 
+        (if (car v0)
           (cons "zero" v1) 
           (cons "one" v1))))))
 
@@ -89,7 +89,7 @@
           (cons "one" v1) 
           (cons "two" v1))))))
 
-; ; === eval-term ===
+; === eval-term ===
 
 (check
   (equal?
