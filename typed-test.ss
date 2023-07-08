@@ -131,14 +131,17 @@
       (select 3 2 "foo")
       (choice-type! boolean! number! string!))))
 
-; ; === function ===
+; === function ===
 
 (check
   (obj=?
     (parse! (function (id number string) (done string number)))
     (typed
-      (function 2 (pair (variable 0) (variable 1)))
-      (function-type! (id number! string!) (tuple-type! (done string! number!))))))
+      (function 2 
+        (pair (variable 0) (variable 1)))
+      (function-type! 
+        (id number! string!) 
+        (tuple-type! (done string! number!))))))
 
 ; === use / get ===
 
