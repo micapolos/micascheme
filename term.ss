@@ -26,16 +26,12 @@
 
     universe universe? universe-depth
     
-    typed typed? typed-value typed-type
-
     term->datum eval-term
 
     application! function-type! tuple-type! choice-type!
-    boolean! number! string! type! typed!)
+    boolean! number! string! type!)
 
   (import (micascheme))
-
-  (data (typed value type))
 
   (data (native term))
 
@@ -240,15 +236,6 @@
       (syntax-case stx ()
         ((_ arg ...)
           #`(choice-type (list arg ...))))))
-
-  (define-syntax typed!
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ literal)
-          (switch (syntax->datum #`literal)
-            ((boolean? $boolean) #`(typed #,$boolean boolean!))
-            ((number? $number) #`(typed #,$number number!))
-            ((string? $string) #`(typed #,$string string!)))))))
 
   ; -----------------------------------------------
 

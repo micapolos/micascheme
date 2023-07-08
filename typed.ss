@@ -3,10 +3,23 @@
     parse! parse
     evaluate! evaluate
 
+    typed typed? typed-value typed-type typed!
+
     ; aux keywords
     boolean number use type)
 
   (import (micascheme) (term) (type))
+
+  (data (typed value type))
+
+  (define-syntax typed!
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ literal)
+          (switch (syntax->datum #`literal)
+            ((boolean? $boolean) #`(typed #,$boolean boolean!))
+            ((number? $number) #`(typed #,$number number!))
+            ((string? $string) #`(typed #,$string string!)))))))
 
   (define-aux-keyword boolean)
   (define-aux-keyword number)
