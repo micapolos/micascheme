@@ -1,3 +1,3 @@
 (import (micascheme) (typed))
 
-(check (abstraction! `lhs `rhs (application! `fn `v0 `v1)))
+(check (function! `lhs `rhs (application! `fn `v0 `v1)))
