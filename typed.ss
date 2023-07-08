@@ -169,7 +169,7 @@
           (format "should be universe 0:")))))
 
   (define (env-parse $env $phase $stx)
-    (syntax-case $stx (native boolean number string function function-type use type select)
+    (syntax-case $stx (native boolean number string function function-type use type select switch)
       ((native $value $type)
         (typed 
           (native (syntax->datum #`$value))
@@ -236,6 +236,8 @@
                   (selected-term $selected))
                 (choice-type $types)))
             ((else $other) (throw non-selection $other)))))
+      ((switch choice case ...)
+        (syntax-error $stx "Jeszcze nie umim switcha"))
       ((id arg ...) (identifier? #`id)
         (lets
           ($symbol (syntax->datum #`id))

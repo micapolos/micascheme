@@ -131,6 +131,18 @@
       (cons (ordinal 3 2) "foo")
       (choice-type! boolean! number! string!))))
 
+; === switch ===
+
+; (check
+;   (obj=?
+;     (parse! 
+;       (switch 
+;         (select (not boolean) (not number) "foo")
+;         (bool boolean)
+;         (num number)
+;         (str string)))
+;     ...))
+
 ; === function ===
 
 (check
