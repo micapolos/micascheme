@@ -2,7 +2,7 @@
   (micascheme) 
   (term)
   (type) 
-  (typed))
+  (parser))
 
 ; === literals ===
 

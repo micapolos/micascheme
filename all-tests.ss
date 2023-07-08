@@ -2,5 +2,5 @@
 (load "base-syntax-test.ss")
 (load "term-test.ss")
 (load "type-test.ss")
-(load "typed-test.ss")
+(load "parser-test.ss")
 (load "leo-test.ss")
