@@ -106,11 +106,11 @@
   
   (assert (equal? (infix () string-length "abc") 3))
 
-  (assert (equal? (infix "a" string+) "a"))
-  (assert (equal? (infix "a" string+ ()) "a"))
-  (assert (equal? (infix "a" string+ "b") "ab"))
-  (assert (equal? (infix "a" string+ (: "b")) "ab"))
-  (assert (equal? (infix "a" string+ (: "b" "c")) "abc"))
+  (assert (equal? (infix "a" string-append) "a"))
+  (assert (equal? (infix "a" string-append ()) "a"))
+  (assert (equal? (infix "a" string-append "b") "ab"))
+  (assert (equal? (infix "a" string-append (: "b")) "ab"))
+  (assert (equal? (infix "a" string-append (: "b" "c")) "abc"))
 
-  (assert (equal? (infix ("a" string+ "b") string+ ("c" + "d")) "abcd"))
+  (assert (equal? (infix ("a" string-append "b") string-append ("c" + "d")) "abcd"))
 )

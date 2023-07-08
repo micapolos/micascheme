@@ -8,7 +8,6 @@
     displayln writeln
     fold-indices indices iterate
     find-index
-    string+
     list-set
     switch
     unpair
@@ -18,18 +17,10 @@
     indexed indexed? indexed-value indexed-index
     throw)
 
-  (import 
-    (chezscheme))
+  (import (chezscheme))
 
-  (define (displayln x)
-    (display x)
-    (newline))
-
-  (define (writeln x)
-    (write x)
-    (newline))
-
-  (define string+ string-append)
+  (define (displayln x) (display x) (newline))
+  (define (writeln x) (write x) (newline))
 
   (define-syntax lets
     (lambda (stx)
