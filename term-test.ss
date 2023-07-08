@@ -41,6 +41,13 @@
 (check (equal? (term->datum (ordinal-switch! `ordinal `v0 `v1)) `(if 'ordinal 'v0 'v1)))
 (check (equal? (term->datum (ordinal-switch! `ordinal `v0 `v1 `v2)) `(index-switch 'ordinal 'v0 'v1 'v2)))
 
+(check (equal? (term->datum (pair `a `b)) `(cons 'a 'b)))
+(check (equal? (term->datum (pair-first `pair)) `(car 'pair)))
+(check (equal? (term->datum (pair-second `pair)) `(cdr 'pair)))
+
+(check (equal? (term->datum (vector `a `b)) `(vector 'a 'b)))
+(check (equal? (term->datum (vector-get `vector `index)) `(vector-ref 'vector 'index)))
+
 (check (equal? (term->datum (tuple!)) #f))
 (check (equal? (term->datum (tuple! `t1)) ''t1))
 (check (equal? (term->datum (tuple! `t1 `t2)) `(cons 't1 't2)))

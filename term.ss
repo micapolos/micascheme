@@ -18,8 +18,8 @@
     ordinal-switch ordinal-switch? ordinal-switch-ordinal ordinal-switch-cases ordinal-switch!
     ordinal-type ordinal-type? ordinal-type-size
 
-    pair
-    pair-first pair-second
+    pair pair-first pair-second
+    vector-get
 
     tuple tuple? tuple-items tuple!
     tuple-ref tuple-ref? tuple-ref-size tuple-ref-tuple tuple-ref-index
@@ -59,6 +59,8 @@
   (data (pair-first pair))
   (data (pair-second pair))
 
+  (data (vector-get vector index))
+
   (data (tuple items))
   (data (tuple-ref size tuple index))
   (data (tuple-type name types))
@@ -95,6 +97,8 @@
       ((pair? $pair) (depth-pair->datum $depth $pair))
       ((pair-first? $pair-first) (depth-pair-first->datum $depth $pair-first))
       ((pair-second? $pair-second) (depth-pair-second->datum $depth $pair-second))
+      ((vector? $vector) (depth-vector->datum $depth $vector))
+      ((vector-get? $vector-get) (depth-vector-get->datum $depth $vector-get))
       ((tuple? $tuple) (depth-tuple->datum $depth $tuple))
       ((tuple-ref? $tuple-ref) (depth-tuple-ref->datum $depth $tuple-ref))
       ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
@@ -156,6 +160,14 @@
 
   (define (depth-ordinal-type->datum $depth $ordinal-type)
     `(ordinal-type ,(ordinal-type-size $ordinal-type)))
+
+  (define (depth-vector->datum $depth $vector)
+    `(vector ,@(depth-terms->datums $depth (vector->list $vector))))
+
+  (define (depth-vector-get->datum $depth $vector-get)
+    `(vector-ref 
+      ,(depth-term->datum $depth (vector-get-vector $vector-get))
+      ,(depth-term->datum $depth (vector-get-index $vector-get))))
 
   (define (depth-pair->datum $depth $pair)
     `(cons 
