@@ -11,6 +11,10 @@
     boolean-type boolean-type?
     number-type number-type?
     string-type string-type?
+    pair-type pair-type? pair-type-first pair-type-second
+
+    pair-first pair-first? pair-first-pair
+    pair-second pair-second? pair-second-pair
 
     tuple tuple? tuple-name tuple-items
     tuple-ref tuple-ref? tuple-ref-tuple tuple-ref-index
@@ -47,6 +51,10 @@
   (data (universe depth))
 
   (data (function-type name params result))
+
+  (data (pair-first pair))
+  (data (pair-second pair))
+  (data (pair-type first second))
 
   (data (tuple name items))
   (data (tuple-ref tuple index))
@@ -89,6 +97,10 @@
       ((application? $application) (depth-application->datum $depth $application))
       ((function? $function) (depth-function->datum $depth $function))
       ((function-type? $function-type) (depth-function-type->datum $depth $function-type))
+      ((pair? $pair) (depth-pair->datum $depth $pair))
+      ((pair-first? $pair-first) (depth-pair-first->datum $depth $pair-first))
+      ((pair-second? $pair-second) (depth-pair-second->datum $depth $pair-second))
+      ((pair-type? $pair-type) (depth-pair-type->datum $depth $pair-type))
       ((tuple? $tuple) (depth-tuple->datum $depth $tuple))
       ((tuple-ref? $tuple-ref) (depth-tuple-ref->datum $depth $tuple-ref))
       ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
@@ -124,6 +136,22 @@
       (quote ,(function-type-name $function-type))
       (list ,@(depth-terms->datums $depth (function-type-params $function-type)))
       ,(depth-term->datum $depth (function-type-result $function-type))))
+
+  (define (depth-pair->datum $depth $pair)
+    `(cons 
+      ,(depth-term->datum $depth (car $pair))
+      ,(depth-term->datum $depth (cdr $pair))))
+
+  (define (depth-pair-first->datum $depth $pair-first)
+    `(car ,(depth-term->datum $depth (pair-first-pair $pair-first))))
+
+  (define (depth-pair-second->datum $depth $pair-second)
+    `(cdr ,(depth-term->datum $depth (pair-second-pair $pair-second))))
+
+  (define (depth-pair-type->datum $depth $pair-type)
+    `(pair-type 
+      ,(depth-term->datum $depth (pair-type-first $pair-type))
+      ,(depth-term->datum $depth (pair-type-second $pair-type))))
 
   (define (depth-tuple->datum $depth $tuple)
     (lets

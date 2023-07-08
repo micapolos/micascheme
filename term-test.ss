@@ -28,6 +28,11 @@
 
 (check (equal? (term->datum (application `foo (list `bar `goo))) `('foo 'bar 'goo)))
 
+(check (equal? (term->datum (cons `p1 `p2)) `(cons 'p1 'p2)))
+(check (equal? (term->datum (pair-first `pair)) `(car 'pair)))
+(check (equal? (term->datum (pair-second `pair)) `(cdr 'pair)))
+(check (equal? (term->datum (pair-type `t1 `t2)) `(pair-type 't1 't2)))
+
 (check (equal? (term->datum (tuple! (foo))) #f))
 (check (equal? (term->datum (tuple! (foo (typed "foo" string!)))) "foo"))
 (check (equal? (term->datum (tuple! (foo (typed "foo" string!) (typed "bar" string!)))) `(cons "foo" "bar")))
