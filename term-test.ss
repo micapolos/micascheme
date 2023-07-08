@@ -34,12 +34,17 @@
 (check (equal? (term->datum (pair-first `pair)) `(car 'pair)))
 (check (equal? (term->datum (pair-second `pair)) `(cdr 'pair)))
 
-(check (equal? (term->datum (vector)) `(vector)))
-(check (equal? (term->datum (vector `t1)) `(vector 't1)))
-(check (equal? (term->datum (vector `t1 `t2)) `(vector 't1 't2)))
-(check (equal? (term->datum (vector `t1 `t2 `t3)) `(vector 't1 't2 't3)))
+(check (equal? (term->datum (tuple!)) #f))
+(check (equal? (term->datum (tuple! `t1)) ''t1))
+(check (equal? (term->datum (tuple! `t1 `t2)) `(cons 't1 't2)))
+(check (equal? (term->datum (tuple! `t1 `t2 `t3)) `(vector 't1 't2 't3)))
 
-(check (equal? (term->datum (vector-get `vector `index)) `(vector-ref 'vector 'index)))
+(check (equal? (term->datum (tuple-ref 1 `tuple 0)) ''tuple))
+(check (equal? (term->datum (tuple-ref 2 `tuple 0)) `(car 'tuple)))
+(check (equal? (term->datum (tuple-ref 2 `tuple 1)) `(cdr 'tuple)))
+(check (equal? (term->datum (tuple-ref 3 `tuple 0)) `(vector-ref 'tuple 0)))
+(check (equal? (term->datum (tuple-ref 3 `tuple 1)) `(vector-ref 'tuple 1)))
+(check (equal? (term->datum (tuple-ref 3 `tuple 2)) `(vector-ref 'tuple 2)))
 
 ; === select
 

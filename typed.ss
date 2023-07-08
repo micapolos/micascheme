@@ -108,11 +108,7 @@
               ($index (indexed-index $indexed-type))
               ($type (indexed-value $indexed-type))
               (typed 
-                (case $size
-                  ((0) #f)
-                  ((1) $term)
-                  ((2) ((if (= $index 0) pair-first pair-second) $term))
-                  (else (vector-get $term $index)))
+                (tuple-ref $size $term $index)
                 (indexed-value $indexed-type))))))))
 
   (define (phase-tuple $phase $symbol $types $terms)
@@ -121,11 +117,7 @@
       ($size (length $types))
       (if (= $phase-depth 0)
         (typed
-          (case $size
-            ((0) #f)
-            ((1) (car $terms))
-            ((2) (cons (car $terms) (cadr $terms)))
-            (else (list->vector $terms)))
+          (tuple $terms)
           (tuple-type $symbol $types))
         (typed
           (tuple-type $symbol $terms)
