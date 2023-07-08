@@ -4,7 +4,7 @@
     works?
     check
     data partial
-    define-aux-keyword
+    define-aux-keyword define-syntax-rule
     obj=? record=? pair=? vector=? box=?
     displayln writeln
     fold-indices indices iterate
@@ -25,10 +25,15 @@
 
   (define (works? expr) expr #t)
 
-  (define-syntax lets
+  (define-syntax define-syntax-rule
     (syntax-rules ()
-      ((_ decl ... body)
-        (let* (decl ...) body))))
+      ((_ (name param ...) body)
+        (define-syntax name
+          (syntax-rules ()
+            ((_ param ...) body))))))
+
+  (define-syntax-rule (lets decl ... body)
+    (let* (decl ...) body))
 
   (define-syntax and-lets
     (syntax-rules ()
@@ -41,12 +46,10 @@
     (lambda $args
       (apply $proc (append $partial-args $args))))
 
-  (define-syntax define-aux-keyword
-    (syntax-rules ()
-      ((_ aux)
-        (define-syntax aux
-          (lambda (stx)
-            (syntax-error stx "misplaced aux keyword"))))))
+  (define-syntax-rule (define-aux-keyword aux)
+    (define-syntax aux
+      (lambda (stx)
+        (syntax-error stx "misplaced aux keyword"))))
 
   (define-syntax switch
     (lambda (stx) 

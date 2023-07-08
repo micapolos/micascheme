@@ -222,55 +222,28 @@
 
   ; -----------------------------------------------
 
-  (define-syntax boolean!
-    (lambda (stx)
-      (syntax-case stx ()
-        (_ #`(boolean-type)))))
+  (define boolean! (boolean-type))
+  (define number! (number-type))
+  (define string! (string-type))
+  (define type! (universe 0))
 
-  (define-syntax number!
-    (lambda (stx)
-      (syntax-case stx ()
-        (_ #`(number-type)))))
+  (define-syntax-rule (application! fn arg ...)
+    (application fn (list arg ...)))
 
-  (define-syntax string!
-    (lambda (stx)
-      (syntax-case stx ()
-        (_ #`(string-type)))))
+  (define-syntax-rule (function-type! (name arg ...) result)
+    (function-type (quote name) (list arg ...) result))
 
-  (define-syntax type!
-    (lambda (stx)
-      (syntax-case stx ()
-        (_ #`(universe 0)))))
+  (define-syntax-rule (tuple! arg ...)
+    (tuple (list arg ...)))
 
-  (define-syntax application!
-    (syntax-rules ()
-      ((_ fn arg ...)
-        (application fn (list arg ...)))))
+  (define-syntax-rule (tuple-type! (name arg ...))
+    (tuple-type (quote name) (list arg ...)))
 
-  (define-syntax function-type!
-    (syntax-rules ()
-      ((_ (name arg ...) result)
-        (function-type (quote name) (list arg ...) result))))
+  (define-syntax-rule (choice-type! arg ...)
+    (choice-type (list arg ...)))
 
-  (define-syntax tuple!
-    (syntax-rules ()
-      ((_ arg ...)
-        (tuple (list arg ...)))))
-
-  (define-syntax tuple-type!
-    (syntax-rules ()
-      ((_ (name arg ...))
-        (tuple-type (quote name) (list arg ...)))))
-
-  (define-syntax choice-type!
-    (syntax-rules ()
-      ((_ arg ...)
-        (choice-type (list arg ...)))))
-
-  (define-syntax ordinal-switch!
-    (syntax-rules ()
-      ((_ ordinal arg ...)
-        (ordinal-switch ordinal (list arg ...)))))
+  (define-syntax-rule (ordinal-switch! ordinal arg ...)
+    (ordinal-switch ordinal (list arg ...)))
 
   ; -----------------------------------------------
 

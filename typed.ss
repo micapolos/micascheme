@@ -17,18 +17,12 @@
   (data (tuple name items))
   (data (tuple-ref tuple index))
 
-  (define-syntax function!
-    (syntax-rules ()
-      ((_ (name param ...) body)
-        (function (quote name) (list param ...) body))))
+  (define-syntax-rule (function! (name param ...) body)
+    (function (quote name) (list param ...) body))
 
-  (define-syntax application!
-    (syntax-rules ()
-      ((_ fn arg ...)
-        (application fn (list arg ...)))))
+  (define-syntax-rule (application! fn arg ...)
+    (application fn (list arg ...)))
 
-  (define-syntax tuple!
-    (syntax-rules ()
-      ((_ (name item ...))
-        (tuple (quote name) (list item ...)))))
+  (define-syntax-rule (tuple! (name item ...))
+    (tuple (quote name) (list item ...)))
 )

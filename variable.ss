@@ -4,18 +4,7 @@
 
   (data (variable index))
 
-  (define-syntax v0
-    (lambda (stx)
-      (syntax-case stx ()
-        (_ #`(variable 0)))))
-
-  (define-syntax v1
-    (lambda (stx)
-      (syntax-case stx ()
-        (_ #`(variable 1)))))
-
-  (define-syntax v2
-    (lambda (stx)
-      (syntax-case stx ()
-        (_ #`(variable 2)))))
+  (define v0 (variable 0))
+  (define v1 (variable 1))
+  (define v2 (variable 2))
 )
