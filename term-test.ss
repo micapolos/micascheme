@@ -73,11 +73,20 @@
 (check-eval (ordinal 3 0) 0)
 (check-eval (ordinal-switch! (ordinal 3 0) "one" "two" "three") "one")
 
-; (check-eval 
-;   (application 
-;     (function 1
-;       (application
-;         (function 1 (ordinal-switch! (pair-first v1) "boolean" "number" v0))
-;         (pair-second v0)))
-;     (cons (ordinal 3 2) "foo"))
-;   "foo")
+(check-eval 
+  (application!
+    (function 1
+      (application!
+        (function 1 (ordinal-switch! (pair-first v1) "boolean" "number" v0))
+        (pair-second v0)))
+    (cons (ordinal 3 1) "foo"))
+  "number")
+
+(check-eval 
+  (application!
+    (function 1
+      (application!
+        (function 1 (ordinal-switch! (pair-first v1) "boolean" "number" v0))
+        (pair-second v0)))
+    (cons (ordinal 3 2) "foo"))
+  "foo")
