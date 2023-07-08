@@ -30,6 +30,17 @@
 
 (check (equal? (term->datum (application `foo (list `bar `goo))) `('foo 'bar 'goo)))
 
+(check (equal? (term->datum (ordinal 1 0)) #f))
+(check (equal? (term->datum (ordinal 2 0)) #t))
+(check (equal? (term->datum (ordinal 2 1)) #f))
+(check (equal? (term->datum (ordinal 3 0)) 0))
+(check (equal? (term->datum (ordinal 3 1)) 1))
+(check (equal? (term->datum (ordinal 3 2)) 2))
+
+(check (equal? (term->datum (ordinal-switch! `ordinal `v0)) ''v0))
+(check (equal? (term->datum (ordinal-switch! `ordinal `v0 `v1)) `(if 'ordinal 'v0 'v1)))
+(check (equal? (term->datum (ordinal-switch! `ordinal `v0 `v1 `v2)) `(index-switch 'ordinal 'v0 'v1 'v2)))
+
 (check (equal? (term->datum (tuple!)) #f))
 (check (equal? (term->datum (tuple! `t1)) ''t1))
 (check (equal? (term->datum (tuple! `t1 `t2)) `(cons 't1 't2)))

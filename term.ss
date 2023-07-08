@@ -137,13 +137,13 @@
       ($value (ordinal-value $ordinal))
       (case $size
         ((1) #f)
-        ((2) (not (= $value 0)))
+        ((2) (= $value 0))
         (else $value))))
 
   (define (depth-ordinal-switch->datum $depth $ordinal-switch)
     (lets 
       ($ordinal (depth-term->datum $depth (ordinal-switch-ordinal $ordinal-switch)))
-      ($cases (depth-term->datum $depth (ordinal-switch-cases $ordinal-switch)))
+      ($cases (depth-terms->datums $depth (ordinal-switch-cases $ordinal-switch)))
       ($size (length $cases))
       (case $size
         ((1) (car $cases))
