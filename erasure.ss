@@ -22,5 +22,8 @@
       ((t-application? $application)
         (application
           (erase (t-application-fn $application))
-          (map erase (t-application-args $application))))))
+          (map erase (t-application-args $application))))
+      ((t-tuple? $tuple)
+        (tuple 
+          (map erase (t-tuple-items $tuple))))))
 )
