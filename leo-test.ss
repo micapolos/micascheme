@@ -1,4 +1,4 @@
-(import (micascheme) (leo))
+(import (micascheme) (leo) (variable) (term) (parser))
 
 ; === natives
 
@@ -38,6 +38,22 @@
 (check (equal? (leo (y (point (x 10) (y 20) (z 30)))) 20))
 (check (equal? (leo (z (point (x 10) (y 20) (z 30)))) 30))
 (check (equal? (leo (w (point (x 10) (y 20) (z 30)))) (vector 10 20 30)))
+
+; === select ===
+
+(check (equal? (leo (select #t (not number) (not string))) (cons 0 #t)))
+(check (equal? (leo (select (not boolean) 123 (not string))) (cons 1 123)))
+(check (equal? (leo (select (not boolean) (not number) "foo")) (cons 2 "foo")))
+
+; === switch ===
+
+; (check
+;   (equal? 
+;     (leo 
+;       (switch 
+;         (select (not boolean) (not number) "foo")
+;         "boolean" "number" string))
+;     "foo"))
 
 ; === use / get
 
