@@ -45,9 +45,10 @@
                 (partial-value value)
                 (- pos (partial-size value)))))
           (else value)))
-      (let* ((value (parser-value parser))
-             (consume (parser-fn parser))
-             (consumed (consume (string-ref string pos))))
+      (lets 
+        (value (parser-value parser))
+        (consume (parser-fn parser))
+        (consumed (consume (string-ref string pos)))
         (cond
           ((parser? consumed)
             (parse-pos consumed string (+ pos 1)))

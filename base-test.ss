@@ -4,8 +4,8 @@
 
 (check (equal? (bind (x 1) (+ x 2)) 3))
 
-(check (equal? (bind* 1) 1))
-(check (equal? (bind* (x 1) (y (+ x 2)) y) 3))
+(check (equal? (lets 1) 1))
+(check (equal? (lets (x 1) (y (+ x 2)) y) 3))
 
 ; === associ ===
 

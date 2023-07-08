@@ -50,15 +50,17 @@
       $indexed-types))
 
   (define (frame-symbol-ref $frame $symbol)
-    (let* (($indexed-types (frame-symbol->indexed-types $frame $symbol))
-           ($length (length $indexed-types)))
+    (lets 
+      ($indexed-types (frame-symbol->indexed-types $frame $symbol))
+      ($length (length $indexed-types))
       (and
         (= $length 1)
         (car $indexed-types))))
 
   (define (frame-symbol-index-ref $frame $symbol $index)
-    (let* (($indexed-types (frame-symbol->indexed-types $frame $symbol))
-           ($length (length $indexed-types)))
+    (lets 
+      ($indexed-types (frame-symbol->indexed-types $frame $symbol))
+      ($length (length $indexed-types))
       (and
         (< $index $length)
         (list-ref (reverse $indexed-types) $index))))
@@ -67,9 +69,10 @@
     (bind-true ($indexed-type (env-function-type-indexed-type $env $symbol $types))
       (cond
         ($indexed-type
-          (let* (($type (indexed-value $indexed-type))
-                 ($index (indexed-index $indexed-type))
-                 ($var (variable $index)))
+          (lets
+            ($type (indexed-value $indexed-type))
+            ($index (indexed-index $indexed-type))
+            ($var (variable $index))
             (typed 
               (application $var $terms)
               $type))))))
@@ -119,28 +122,31 @@
     (map (partial env-parse $env $phase) $stxs))
 
   (define (env-parse-as $env $phase $stx $as-type)
-    (let* (($typed (env-parse $env $phase $stx))
-           ($type (typed-type $typed)))
+    (lets
+      ($typed (env-parse $env $phase $stx))
+      ($type (typed-type $typed))
       (if (matches? $as-type $typed)
         (typed (typed-value $typed) $as-type)
         (syntax-error $stx
           (format "should be ~s, is ~s:" $as-type $type)))))
 
   (define (env-parse-proc $env $phase $stx)
-    (let* (($typed (env-parse $env $phase $stx))
-           ($type (typed-type $typed)))
+    (lets
+      ($typed (env-parse $env $phase $stx))
+      ($type (typed-type $typed))
       (and (function-type? $type)
         (syntax-error $stx
           (format "should be procedure, is ~s:" $type)))))
 
   (define (env-parse-type $env $stx)
-    (let* (($typed (env-parse $env (phase 1) $stx))
-           ($value (typed-value $typed))
-           ($type (typed-type $typed)))
-      (unless (and (universe? $type) (= (universe-depth $type) 0))
+    (lets
+      ($typed (env-parse $env (phase 1) $stx))
+      ($value (typed-value $typed))
+      ($type (typed-type $typed))
+      (if (and (universe? $type) (= (universe-depth $type) 0))
+        $value
         (syntax-error $stx 
-          (format "should be universe 0:")))
-      $value))
+          (format "should be universe 0:")))))
 
   (define (env-parse $env $phase $stx)
     (syntax-case $stx (native boolean number string function function-type use type select)
@@ -166,37 +172,40 @@
             (env-parse-type $env #`rhs))
           type!))
       ((function (name param ...) body)
-        (let* (($name (syntax->datum #`name))
-               ($params (syntax->list #`(param ...)))
-               ($body #`body)
-               ($param-types (map (partial env-parse-type $env) $params))
-               ($arity (length $params))
-               ($body-env (append (reverse $param-types) $env))
-               ($typed-body (env-parse $body-env $phase $body))
-               ($body-term (typed-value $typed-body))
-               ($body-type (typed-type $typed-body)))
+        (lets
+          ($name (syntax->datum #`name))
+          ($params (syntax->list #`(param ...)))
+          ($body #`body)
+          ($param-types (map (partial env-parse-type $env) $params))
+          ($arity (length $params))
+          ($body-env (append (reverse $param-types) $env))
+          ($typed-body (env-parse $body-env $phase $body))
+          ($body-term (typed-value $typed-body))
+          ($body-type (typed-type $typed-body))
           (typed
             (function $arity $body-term)
             (function-type $name $param-types $body-type))))
       ((use (expr ...) body)
-        (let* (($exprs (syntax->list #`(expr ...)))
-               ($body #`body)
-               ($arity (length $exprs))
-               ($typed-terms (env-parse-list $env $phase $exprs))
-               ($terms (map typed-value $typed-terms))
-               ($types (map typed-type $typed-terms))
-               ($body-env (append (reverse $types) $env))
-               ($typed-body (env-parse $body-env $phase $body))
-               ($body-term (typed-value $typed-body))
-               ($body-type (typed-type $typed-body)))
+        (lets
+          ($exprs (syntax->list #`(expr ...)))
+          ($body #`body)
+          ($arity (length $exprs))
+          ($typed-terms (env-parse-list $env $phase $exprs))
+          ($terms (map typed-value $typed-terms))
+          ($types (map typed-type $typed-terms))
+          ($body-env (append (reverse $types) $env))
+          ($typed-body (env-parse $body-env $phase $body))
+          ($body-term (typed-value $typed-body))
+          ($body-type (typed-type $typed-body))
           (typed
             (application (function $arity $body-term) $terms)
             $body-type)))
       ((select option ...)
-        (let* (($options (map (partial env-parse-option $env $phase) (syntax->list #`(option ...))))
-               ($size (length $options))
-               ($types (map option-type $options))
-               ($selection (options-selection $options)))
+        (lets
+          ($options (map (partial env-parse-option $env $phase) (syntax->list #`(option ...))))
+          ($size (length $options))
+          ($types (map option-type $options))
+          ($selection (options-selection $options))
           (switch $selection
             ((no-selection? _) (syntax-error $stx "no selection:"))
             ((multi-selection? _) (syntax-error $stx "multi selection:"))
@@ -209,12 +218,13 @@
                 (choice-type $types)))
             ((else $other) (throw non-selection $other)))))
       ((id arg ...) (identifier? #`id)
-        (let* (($symbol (syntax->datum #`id))
-               ($args (syntax->list #`(arg ...)))
-               ($typed-args (env-parse-list $env $phase $args))
-               ($arg-types (map typed-type $typed-args))
-               ($arg-terms (map typed-value $typed-args))
-               ($type (tuple-type $symbol $arg-types)))
+        (lets
+          ($symbol (syntax->datum #`id))
+          ($args (syntax->list #`(arg ...)))
+          ($typed-args (env-parse-list $env $phase $args))
+          ($arg-types (map typed-type $typed-args))
+          ($arg-terms (map typed-value $typed-args))
+          ($type (tuple-type $symbol $arg-types))
           (or 
             (env-resolve-application $env $symbol $arg-types $arg-terms)
             (resolve-tuple-ref $symbol $arg-types $arg-terms)
@@ -228,7 +238,8 @@
           ((string? $string) 
             (typed $string (string-type)))
           ((symbol? $symbol)
-            (let* (($indexed-type (env-select-indexed-type $env $symbol)))
+            (lets 
+              ($indexed-type (env-select-indexed-type $env $symbol))
               (if $indexed-type
                 (typed 
                   (variable (indexed-index $indexed-type))
@@ -268,8 +279,9 @@
       ((else $other) (throw non-option $other))))
 
   (define (options-selection $options)
-    (let* (($indexed-options (list-indexed $options))
-           ($selections (filter (lambda (x) x) (map indexed-option-selected $indexed-options))))
+    (lets
+      ($indexed-options (list-indexed $options))
+      ($selections (filter (lambda (x) x) (map indexed-option-selected $indexed-options)))
       (case (length $selections)
         ((0) (no-selection))
         ((1) (car $selections))
@@ -283,9 +295,10 @@
         (evaluate (phase 0) #'expr))))
 
   (define (evaluate $phase $stx)
-    (let* (($typed (env-parse (list) $phase $stx))
-           ($term (typed-value $typed))
-           ($type (typed-type $typed)))
+    (lets
+      ($typed (env-parse (list) $phase $stx))
+      ($term (typed-value $typed))
+      ($type (typed-type $typed))
       (typed
         (eval-term $term
           (environment `(micascheme) `(term) `(type)))

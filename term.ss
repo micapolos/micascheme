@@ -125,10 +125,11 @@
       ,(depth-term->datum $depth (function-type-result $function-type))))
 
   (define (depth-tuple->datum $depth $tuple)
-    (let* (($items (tuple-items $tuple))
-           ($terms (map typed-value $items))
-           ($size (length $terms))
-           ($datums (depth-terms->datums $depth $terms)))
+    (lets
+      ($items (tuple-items $tuple))
+      ($terms (map typed-value $items))
+      ($size (length $terms))
+      ($datums (depth-terms->datums $depth $terms))
       (case $size
         ((0) #f)
         ((1) (car $datums))
@@ -144,12 +145,13 @@
           (tuple-type-types $tuple-type)))))
 
   (define (depth-tuple-ref->datum $depth $tuple-ref)
-    (let* (($tuple (tuple-ref-tuple $tuple-ref))
-           ($type (typed-type $tuple))
-           ($term (typed-value $tuple))
-           ($size (length (tuple-type-types $type)))
-           ($datum (depth-term->datum $depth $term))
-           ($index (tuple-ref-index $tuple-ref)))
+    (lets
+      ($tuple (tuple-ref-tuple $tuple-ref))
+      ($type (typed-type $tuple))
+      ($term (typed-value $tuple))
+      ($size (length (tuple-type-types $type)))
+      ($datum (depth-term->datum $depth $term))
+      ($index (tuple-ref-index $tuple-ref))
       (case $size
         ((0) #f)
         ((1) $datum)
@@ -157,27 +159,30 @@
         (else `(vector-ref ,$datum ,$index)))))
 
   (define (depth-select->datum $depth $select)
-    (let* (($size (select-size $select))
-           ($index (select-index $select))
-           ($term (select-term $select))
-           ($datum (depth-term->datum $depth $term)))
+    (lets
+      ($size (select-size $select))
+      ($index (select-index $select))
+      ($term (select-term $select))
+      ($datum (depth-term->datum $depth $term))
       (case $size
         ((1) $datum)
         ((2) `(cons ,(= $index 1) ,$datum))
         (else `(cons ,$index ,$datum)))))
 
   (define (depth-choice-switch->datum $depth $choice-switch)
-    (let* (($size (choice-switch-size $choice-switch))
-           ($term (choice-switch-term $choice-switch))
-           ($cases (choice-switch-cases $choice-switch))
-           ($datum (depth-term->datum $depth $term))
-           ($var (depth->datum $depth)))
+    (lets
+      ($size (choice-switch-size $choice-switch))
+      ($term (choice-switch-term $choice-switch))
+      ($cases (choice-switch-cases $choice-switch))
+      ($datum (depth-term->datum $depth $term))
+      ($var (depth->datum $depth))
       `(let ((,$var ,$datum))
         ,(case $size
           ((1) (depth-term->datum (+ $depth 1) (car $cases)))
           (else
-            (let* (($value-var (depth->datum (+ $depth 1)))
-                   ($branches (depth-terms->datums (+ $depth 2) $cases)))
+            (lets 
+              ($value-var (depth->datum (+ $depth 1)))
+              ($branches (depth-terms->datums (+ $depth 2) $cases))
               `(let ((,$value-var (cdr ,$var)))
                 ,(case $size
                   ((2) `(if (car ,$var) ,(car $branches) ,(cadr $branches)))

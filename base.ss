@@ -1,6 +1,6 @@
 (library (base)
   (export 
-    bind bind-true bind*
+    bind bind-true lets
     check
     data partial
     define-aux-keyword
@@ -30,6 +30,25 @@
     (newline))
 
   (define string+ string-append)
+
+  (define-syntax bind
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ (var expr) body ...)
+          #`(let ((var expr)) body ...)))))
+
+  (define-syntax lets
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ decl ... body)
+          #`(let* (decl ...) body)))))
+
+  (define-syntax bind-true
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ (var expr) body ...)
+          #`(bind (var expr) 
+            (cond (var body ...) (else #f)))))))
 
   (define (partial $proc . $partial-args)
     (lambda $args
@@ -121,11 +140,12 @@
     (lambda (stx)
       (syntax-case stx ()
         ((_ (name field ...))
-          (let* ((name-string (symbol->string (syntax->datum #`name)))
-                 (record-name (datum->syntax #`name (string->symbol (string-append "%" name-string))))
-                 (rtd-name (datum->syntax #`name (string->symbol (string-append name-string "-rtd"))))
-                 (prefix-name (string-append name-string "-"))
-                 (predicate-name (datum->syntax #`name (string->symbol (string-append name-string "?")))))
+          (lets
+            (name-string (symbol->string (syntax->datum #`name)))
+            (record-name (datum->syntax #`name (string->symbol (string-append "%" name-string))))
+            (rtd-name (datum->syntax #`name (string->symbol (string-append name-string "-rtd"))))
+            (prefix-name (string-append name-string "-"))
+            (predicate-name (datum->syntax #`name (string->symbol (string-append name-string "?"))))
             #`(begin
               (define-record 
                 #,record-name
@@ -167,25 +187,6 @@
         ((_ name item ...) (identifier? #`name)
           #`(error #f (format "~s" (list (quote name) #,@(syntax->list #`(item ...)))))))))
 
-  (define-syntax bind
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ (var expr) body ...)
-          #`(let ((var expr)) body ...)))))
-
-  (define-syntax bind*
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ decl ... body)
-          #`(let* (decl ...) body)))))
-
-  (define-syntax bind-true
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ (var expr) body ...)
-          #`(bind (var expr) 
-            (cond (var body ...) (else #f)))))))
-
   (define (list-set $list $index $obj)
     (if (> $index 0)
       (cons (car $list) (list-set (cdr $list) (- $index 1) $obj))
@@ -201,15 +202,14 @@
     (lambda (stx)
       (syntax-case stx (not)
         ((_ (not (pred arg ...)))
-          (let* ((args (syntax->list #`(arg ...)))
-                 (tmps (generate-temporaries #`(arg ...)))
-                 (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
-                 (ann (syntax->annotation stx))
-                 (source (annotation-source ann))
-                 (ann-string 
-                  (if ann 
-                    (format " source: ~a (<line>:<char>)\n" (source-file-descriptor-path (source-object-sfd source)))
-                    "")))
+          (lets
+            (args (syntax->list #`(arg ...)))
+            (tmps (generate-temporaries #`(arg ...)))
+            (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
+            (ann (syntax->annotation stx))
+            (source (annotation-source ann))
+            (ann-string 
+            (if ann (format " source: ~a (<line>:<char>)\n" (source-file-descriptor-path (source-object-sfd source))) ""))
             #`(let (#,@let-cases)
               (or (not (pred #,@tmps))
                 (error `check 
@@ -218,15 +218,14 @@
                     (quote (not (pred arg ...)))
                     (list (quote not) (list (quote pred) #,@tmps))))))))
         ((_ (pred arg ...))
-          (let* ((args (syntax->list #`(arg ...)))
-                 (tmps (generate-temporaries #`(arg ...)))
-                 (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
-                 (ann (syntax->annotation stx))
-                 (source (annotation-source ann))
-                 (ann-string 
-                  (if ann 
-                    (format " source: ~a (<line>:<char>)\n" (source-file-descriptor-path (source-object-sfd source)))
-                    "")))
+          (lets
+            (args (syntax->list #`(arg ...)))
+            (tmps (generate-temporaries #`(arg ...)))
+            (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
+            (ann (syntax->annotation stx))
+            (source (annotation-source ann))
+            (ann-string 
+            (if ann (format " source: ~a (<line>:<char>)\n" (source-file-descriptor-path (source-object-sfd source))) ""))
             #`(let (#,@let-cases)
               (or (pred #,@tmps)
                 (error `check 
