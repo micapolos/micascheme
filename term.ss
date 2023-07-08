@@ -14,6 +14,10 @@
 
     conditional conditional? conditional-condition conditional-consequent conditional-alternate
 
+    ordinal ordinal? ordinal-size ordinal-value
+    ordinal-switch ordinal-switch? ordinal-switch-ordinal ordinal-switch-cases ordinal-switch!
+    ordinal-type ordinal-type? ordinal-type-size
+
     tuple tuple? tuple-items tuple!
     tuple-ref tuple-ref? tuple-ref-size tuple-ref-tuple tuple-ref-index
     tuple-type tuple-type? tuple-type-name tuple-type-types
@@ -45,6 +49,10 @@
   (data (conditional condition consequent alternate))
 
   (data (function-type name params result))
+
+  (data (ordinal size value))
+  (data (ordinal-switch ordinal cases))
+  (data (ordinal-type size))
 
   (data (tuple items))
   (data (tuple-ref size tuple index))
@@ -78,6 +86,9 @@
       ((conditional? $conditional) (depth-conditional->datum $depth $conditional))
       ((function? $function) (depth-function->datum $depth $function))
       ((function-type? $function-type) (depth-function-type->datum $depth $function-type))
+      ((ordinal? $ordinal) (depth-ordinal->datum $depth $ordinal))
+      ((ordinal-switch? $ordinal-switch) (depth-ordinal-switch->datum $depth $ordinal-switch))
+      ((ordinal-type? $ordinal-type) (depth-ordinal-type->datum $depth $ordinal-type))
       ((tuple? $tuple) (depth-tuple->datum $depth $tuple))
       ((tuple-ref? $tuple-ref) (depth-tuple-ref->datum $depth $tuple-ref))
       ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
@@ -120,6 +131,28 @@
       (list ,@(depth-terms->datums $depth (function-type-params $function-type)))
       ,(depth-term->datum $depth (function-type-result $function-type))))
 
+  (define (depth-ordinal->datum $depth $ordinal)
+    (lets
+      ($size (ordinal-size $ordinal))
+      ($value (ordinal-value $ordinal))
+      (case $size
+        ((1) #f)
+        ((2) (not (= $value 0)))
+        (else $value))))
+
+  (define (depth-ordinal-switch->datum $depth $ordinal-switch)
+    (lets 
+      ($ordinal (depth-term->datum $depth (ordinal-switch-ordinal $ordinal-switch)))
+      ($cases (depth-term->datum $depth (ordinal-switch-cases $ordinal-switch)))
+      ($size (length $cases))
+      (case $size
+        ((1) (car $cases))
+        ((2) `(if ,$ordinal ,(car $cases) ,(cadr $cases)))
+        (else `(index-switch ,$ordinal ,@$cases)))))
+
+  (define (depth-ordinal-type->datum $depth $ordinal-type)
+    `(ordinal-type ,(ordinal-type-size $ordinal-type)))
+  
   (define (depth-tuple->datum $depth $tuple)
     (lets
       ($items (depth-terms->datums $depth (tuple-items $tuple)))
@@ -238,6 +271,11 @@
     (syntax-rules ()
       ((_ arg ...)
         (choice-type (list arg ...)))))
+
+  (define-syntax ordinal-switch!
+    (syntax-rules ()
+      ((_ ordinal arg ...)
+        (ordinal-switch ordinal (list arg ...)))))
 
   ; -----------------------------------------------
 
