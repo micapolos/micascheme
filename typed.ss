@@ -231,9 +231,8 @@
             ((multi-selection? _) (syntax-error $stx "multi selection:"))
             ((selected? $selected)
               (typed
-                (select 
-                  $size
-                  (selected-index $selected)
+                (cons 
+                  (ordinal $size (selected-index $selected))
                   (selected-term $selected))
                 (choice-type $types)))
             ((else $other) (throw non-selection $other)))))

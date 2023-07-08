@@ -128,7 +128,7 @@
   (obj=?
     (parse! (select (not boolean) (not number) "foo"))
     (typed 
-      (select 3 2 "foo")
+      (cons (ordinal 3 2) "foo")
       (choice-type! boolean! number! string!))))
 
 ; === function ===
