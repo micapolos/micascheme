@@ -345,7 +345,7 @@
       ($term (typed-value $typed))
       ($type (typed-type $typed))
       (typed
-        (eval-term $term
+        (term-eval $term
           (environment `(micascheme) `(term) `(type)))
         $type)))
 )

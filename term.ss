@@ -28,7 +28,7 @@
 
     universe universe? universe-depth
     
-    term->datum eval-term
+    term->datum term-eval
 
     application! function-type! tuple-type! choice-type!
     boolean! number! string! type!)
@@ -247,6 +247,6 @@
 
   ; -----------------------------------------------
 
-  (define (eval-term $term $env)
+  (define (term-eval $term $env)
     (eval (term->datum $term) $env))
 )
