@@ -86,8 +86,7 @@
                 (tuple-type-types $type)))
             (typed 
               (tuple-ref
-                (length (tuple-type-types $type))
-                (car $terms)
+                (typed (car $terms) $type)
                 (indexed-index $indexed-type))
               (indexed-value $indexed-type)))))))
 
@@ -98,7 +97,7 @@
           (tuple-type $symbol $terms)
           (universe (- $phase-depth 1)))
         (typed
-          (tuple $terms)
+          (tuple $symbol (map typed $terms $types))
           (tuple-type $symbol $types)))))
 
   ; ----------------------------------------------------------------

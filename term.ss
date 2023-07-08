@@ -12,8 +12,8 @@
     number-type number-type?
     string-type string-type?
 
-    tuple tuple? tuple-terms
-    tuple-ref tuple-ref? tuple-ref-size tuple-ref-term tuple-ref-index
+    tuple tuple? tuple-name tuple-items
+    tuple-ref tuple-ref? tuple-ref-tuple tuple-ref-index
     tuple-type tuple-type? tuple-type-name tuple-type-types
 
     choice-type choice-type? choice-type-types
@@ -23,13 +23,17 @@
     universe universe? universe-depth
     
     typed typed? typed-value typed-type
+    typed-tuple typed-tuple!
+    typed-function typed-function!
 
     term->datum eval-term
 
     application! tuple! function-type! tuple-type! choice-type!
-    boolean! number! string! type!)
+    boolean! number! string! type! typed!)
 
   (import (micascheme))
+
+  (data (typed value type))
 
   (data (native term))
 
@@ -44,15 +48,25 @@
 
   (data (function-type name params result))
 
-  (data (tuple terms))
-  (data (tuple-ref size term index))
+  (data (tuple name items))
+  (data (tuple-ref tuple index))
   (data (tuple-type name types))
 
   (data (choice-type types))
   (data (choice-switch size term cases))
   (data (select size index term))
 
-  (data (typed value type))
+  ; --------------------------------------------------
+
+  (define (typed-tuple $name $items)
+    (typed
+      (tuple $name $items)
+      (tuple-type $name (map typed-type $items))))
+
+  (define (typed-function $name $param-types $body)
+    (typed
+      (function (length $param-types) (typed-value $body))
+      (function-type $name $param-types (typed-type $body))))
 
   (define (term->datum $term)
     (depth-term->datum 0 $term))
@@ -111,7 +125,8 @@
       ,(depth-term->datum $depth (function-type-result $function-type))))
 
   (define (depth-tuple->datum $depth $tuple)
-    (let* (($terms (tuple-terms $tuple))
+    (let* (($items (tuple-items $tuple))
+           ($terms (map typed-value $items))
            ($size (length $terms))
            ($datums (depth-terms->datums $depth $terms)))
       (case $size
@@ -129,8 +144,10 @@
           (tuple-type-types $tuple-type)))))
 
   (define (depth-tuple-ref->datum $depth $tuple-ref)
-    (let* (($size (tuple-ref-size $tuple-ref))
-           ($term (tuple-ref-term $tuple-ref))
+    (let* (($tuple (tuple-ref-tuple $tuple-ref))
+           ($type (typed-type $tuple))
+           ($term (typed-value $tuple))
+           ($size (length (tuple-type-types $type)))
            ($datum (depth-term->datum $depth $term))
            ($index (tuple-ref-index $tuple-ref)))
       (case $size
@@ -217,8 +234,8 @@
   (define-syntax tuple!
     (lambda (stx)
       (syntax-case stx ()
-        ((_ arg ...)
-          #`(tuple (list arg ...))))))
+        ((_ (name item ...))
+          #`(tuple (quote name) (list item ...))))))
 
   (define-syntax tuple-type!
     (lambda (stx)
@@ -231,6 +248,27 @@
       (syntax-case stx ()
         ((_ arg ...)
           #`(choice-type (list arg ...))))))
+
+  (define-syntax typed!
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ literal)
+          (switch (syntax->datum #`literal)
+            ((boolean? $boolean) #`(typed #,$boolean boolean!))
+            ((number? $number) #`(typed #,$number number!))
+            ((string? $string) #`(typed #,$string string!)))))))
+
+  (define-syntax typed-tuple!
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ (name item ...))
+          #`(typed-tuple (quote name) (list item ...))))))
+
+  (define-syntax typed-function!
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ (name param ...) body)
+          #`(typed-function (quote name) (list param ...) body)))))
 
   ; -----------------------------------------------
 

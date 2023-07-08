@@ -28,17 +28,17 @@
 
 (check (equal? (term->datum (application `foo (list `bar `goo))) `('foo 'bar 'goo)))
 
-(check (equal? (term->datum (tuple!)) #f))
-(check (equal? (term->datum (tuple! "foo")) "foo"))
-(check (equal? (term->datum (tuple! "foo" "bar")) `(cons "foo" "bar")))
-(check (equal? (term->datum (tuple! "foo" "bar" "goo")) `(vector "foo" "bar" "goo")))
+(check (equal? (term->datum (tuple! (foo))) #f))
+(check (equal? (term->datum (tuple! (foo (typed "foo" string!)))) "foo"))
+(check (equal? (term->datum (tuple! (foo (typed "foo" string!) (typed "bar" string!)))) `(cons "foo" "bar")))
+(check (equal? (term->datum (tuple! (foo (typed "foo" string!) (typed "bar" string!) (typed "goo" string!)))) `(vector "foo" "bar" "goo")))
 
-(check (equal? (term->datum (tuple-ref 1 `x 0)) ''x))
-(check (equal? (term->datum (tuple-ref 2 `x 0)) `(car 'x)))
-(check (equal? (term->datum (tuple-ref 2 `x 1)) `(cdr 'x)))
-(check (equal? (term->datum (tuple-ref 3 `x 0)) `(vector-ref 'x 0)))
-(check (equal? (term->datum (tuple-ref 3 `x 1)) `(vector-ref 'x 1)))
-(check (equal? (term->datum (tuple-ref 3 `x 2)) `(vector-ref 'x 2)))
+(check (equal? (term->datum (tuple-ref (typed `x (tuple-type! (foo number!))) 0)) ''x))
+(check (equal? (term->datum (tuple-ref (typed `x (tuple-type! (foo number! string!))) 0)) `(car 'x)))
+(check (equal? (term->datum (tuple-ref (typed `x (tuple-type! (foo number! string!))) 1)) `(cdr 'x)))
+(check (equal? (term->datum (tuple-ref (typed `x (tuple-type! (foo number! string! boolean!))) 0)) `(vector-ref 'x 0)))
+(check (equal? (term->datum (tuple-ref (typed `x (tuple-type! (foo number! string! boolean!))) 1)) `(vector-ref 'x 1)))
+(check (equal? (term->datum (tuple-ref (typed `x (tuple-type! (foo number! string! boolean!))) 2)) `(vector-ref 'x 2)))
 
 ; === select
 
@@ -53,27 +53,58 @@
 
 (check 
   (equal? 
-    (term->datum (choice-switch 1 `foo (list (tuple! `zero (variable 0))))) 
-    `(let ((v0 'foo)) (cons 'zero v0))))
+    (term->datum 
+      (choice-switch 1 `foo 
+        (list 
+          (tuple!
+            (foo 
+              (typed "zero" string!) 
+              (typed (variable 0) string!))))))
+    `(let ((v0 'foo)) 
+      (cons "zero" v0))))
 
 (check 
   (equal? 
     (term->datum 
       (choice-switch 2 `foo 
         (list 
-          (tuple! `zero (variable 0)) 
-          (tuple! `one (variable 0)))))
-    `(let ((v0 'foo)) (let ((v1 (cdr v0))) (if (car v0) (cons 'zero v1) (cons 'one v1))))))
+          (tuple! 
+            (foo 
+              (typed "zero" string!) 
+              (typed (variable 0) string!)))
+          (tuple! 
+            (foo 
+              (typed "one" string!) 
+              (typed (variable 0) string!))))))
+    `(let ((v0 'foo)) 
+      (let ((v1 (cdr v0))) 
+        (if (car v0) 
+          (cons "zero" v1) 
+          (cons "one" v1))))))
 
 (check 
   (equal? 
     (term->datum 
       (choice-switch 3 `foo 
         (list 
-          (tuple! `zero (variable 0))
-          (tuple! `one (variable 0))
-          (tuple! `two (variable 0)))))
-    `(let ((v0 'foo)) (let ((v1 (cdr v0))) (index-switch (car v0) (cons 'zero v1) (cons 'one v1) (cons 'two v1))))))
+          (tuple! 
+            (foo 
+              (typed "zero" string!) 
+              (typed (variable 0) string!)))
+          (tuple! 
+            (foo 
+              (typed "one" string!) 
+              (typed (variable 0) string!)))
+          (tuple! 
+            (foo 
+              (typed "two" string!) 
+              (typed (variable 0) string!))))))
+    `(let ((v0 'foo)) 
+      (let ((v1 (cdr v0))) 
+        (index-switch (car v0) 
+          (cons "zero" v1) 
+          (cons "one" v1) 
+          (cons "two" v1))))))
 
 ; === eval-term ===
 

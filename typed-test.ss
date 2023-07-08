@@ -70,7 +70,7 @@
   (obj=?
     (parse! (foo 10 "bar"))
     (typed
-      (tuple! 10 "bar")
+      (tuple! (foo (typed 10 number!) (typed "bar" string!)))
       (tuple-type! (foo number! string!)))))
 
 ; === tuple-get ===
@@ -79,21 +79,34 @@
   (obj=?
     (parse! (number (point 10 "foo")))
     (typed
-      (tuple-ref 2 (tuple! 10 "foo") 0)
+      (tuple-ref 
+        (typed 
+          (tuple! (point (typed 10 number!) (typed "foo" string!)))
+          (tuple-type! (point number! string!))) 
+        0)
       number!)))
 
 (check
   (obj=?
     (parse! (string (point 10 "foo")))
     (typed
-      (tuple-ref 2 (tuple! 10 "foo") 1)
+      (tuple-ref 
+        (typed 
+          (tuple! (point (typed 10 number!) (typed "foo" string!)))
+          (tuple-type! (point number! string!)))
+        1)
       string!)))
 
 (check
   (obj=?
     (parse! (x (point (x 10) (y 20))))
     (typed
-      (tuple-ref 2 (tuple! (tuple! 10) (tuple! 20)) 0)
+      (tuple-ref 
+        (typed-tuple! 
+          (point
+            (typed-tuple! (x (typed! 10)))
+            (typed-tuple! (y (typed! 20)))))
+        0)
       (tuple-type! (x number!)))))
 
 ; === select ===
@@ -110,9 +123,11 @@
 (check
   (obj=?
     (parse! (function (id number string) (done string number)))
-    (typed
-      (function 2 (tuple! (variable 0) (variable 1)))
-      (function-type! (id number! string!) (tuple-type! (done string! number!))))))
+    (typed-function! (id number! string!)
+      (typed-tuple! 
+        (done
+          (typed (variable 0) string!) 
+          (typed (variable 1) number!))))))
 
 ; === use / get ===
 
