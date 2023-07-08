@@ -127,7 +127,7 @@
 (check
   (obj=?
     (parse! (select (not boolean) (not number) "foo"))
-    (typed 
+    (typed
       (cons (ordinal 3 2) "foo")
       (choice-type! boolean! number! string!))))
 

@@ -53,54 +53,6 @@
 (check (equal? (term->datum (tuple-ref 3 `tuple 1)) `(vector-ref 'tuple 1)))
 (check (equal? (term->datum (tuple-ref 3 `tuple 2)) `(vector-ref 'tuple 2)))
 
-; === select
-
-(check (equal? (term->datum (select 1 0 "foo")) "foo"))
-(check (equal? (term->datum (select 2 0 "foo")) `(cons #f "foo")))
-(check (equal? (term->datum (select 2 1 "foo")) `(cons #t "foo")))
-(check (equal? (term->datum (select 3 0 "foo")) `(cons 0 "foo")))
-(check (equal? (term->datum (select 3 1 "foo")) `(cons 1 "foo")))
-(check (equal? (term->datum (select 3 2 "foo")) `(cons 2 "foo")))
-
-; === choice-switch
-
-(check 
-  (equal? 
-    (term->datum 
-      (choice-switch 1 `foo 
-        (list 
-          (tuple! "zero" (variable 0)))))
-    `(let ((v0 'foo)) 
-      (cons "zero" v0))))
-
-(check 
-  (equal? 
-    (term->datum 
-      (choice-switch 2 `foo 
-        (list 
-          (tuple! "zero" (variable 0))
-          (tuple! "one" (variable 0)))))
-    `(let ((v0 'foo)) 
-      (let ((v1 (cdr v0))) 
-        (if (car v0)
-          (cons "zero" v1) 
-          (cons "one" v1))))))
-
-(check 
-  (equal? 
-    (term->datum 
-      (choice-switch 3 `foo 
-        (list 
-          (tuple! "zero" (variable 0))
-          (tuple! "one" (variable 0))
-          (tuple! "two" (variable 0)))))
-    `(let ((v0 'foo)) 
-      (let ((v1 (cdr v0))) 
-        (index-switch (car v0) 
-          (cons "zero" v1) 
-          (cons "one" v1) 
-          (cons "two" v1))))))
-
 ; === eval-term ===
 
 (check

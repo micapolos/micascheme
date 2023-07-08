@@ -23,8 +23,6 @@
     tuple-type tuple-type? tuple-type-name tuple-type-types
 
     choice-type choice-type? choice-type-types
-    choice-switch choice-switch? choice-switch-size choice-switch-term choice-switch-cases
-    select select? select-size select-index select-term
 
     universe universe? universe-depth
     
@@ -59,9 +57,7 @@
   (data (tuple-type name types))
 
   (data (choice-type types))
-  (data (choice-switch size term cases))
-  (data (select size index term))
-
+  
   ; --------------------------------------------------
 
   (define (term->datum $term)
@@ -92,8 +88,6 @@
       ((tuple? $tuple) (depth-tuple->datum $depth $tuple))
       ((tuple-ref? $tuple-ref) (depth-tuple-ref->datum $depth $tuple-ref))
       ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
-      ((select? $select) (depth-select->datum $depth $select))
-      ((choice-switch? $choice-switch) (depth-choice-switch->datum $depth $choice-switch))
       ((choice-type? $choice-type) (depth-choice-type->datum $depth $choice-type))
       ((else _) (throw depth-term->datum $depth $term))))
 
@@ -180,36 +174,6 @@
         ,@(depth-terms->datums
           $depth
           (tuple-type-types $tuple-type)))))
-
-  (define (depth-select->datum $depth $select)
-    (lets
-      ($size (select-size $select))
-      ($index (select-index $select))
-      ($term (select-term $select))
-      ($datum (depth-term->datum $depth $term))
-      (case $size
-        ((1) $datum)
-        ((2) `(cons ,(= $index 1) ,$datum))
-        (else `(cons ,$index ,$datum)))))
-
-  (define (depth-choice-switch->datum $depth $choice-switch)
-    (lets
-      ($size (choice-switch-size $choice-switch))
-      ($term (choice-switch-term $choice-switch))
-      ($cases (choice-switch-cases $choice-switch))
-      ($datum (depth-term->datum $depth $term))
-      ($var (depth->datum $depth))
-      `(let ((,$var ,$datum))
-        ,(case $size
-          ((1) (depth-term->datum (+ $depth 1) (car $cases)))
-          (else
-            (lets 
-              ($value-var (depth->datum (+ $depth 1)))
-              ($branches (depth-terms->datums (+ $depth 2) $cases))
-              `(let ((,$value-var (cdr ,$var)))
-                ,(case $size
-                  ((2) `(if (car ,$var) ,(car $branches) ,(cadr $branches)))
-                  (else `(index-switch (car ,$var) ,@$branches))))))))))
 
   (define (depth-choice-type->datum $depth $choice-type)
     `(choice-type

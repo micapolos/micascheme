@@ -6,7 +6,7 @@
     typed typed? typed-value typed-type typed!
 
     ; aux keywords
-    boolean number use type)
+    boolean number use type select)
 
   (import (micascheme) (term) (type))
 
@@ -25,6 +25,7 @@
   (define-aux-keyword number)
   (define-aux-keyword use)
   (define-aux-keyword type)
+  (define-aux-keyword select)
 
   ; ----------------------------------------------------------------
 
