@@ -18,6 +18,9 @@
     ordinal-switch ordinal-switch? ordinal-switch-ordinal ordinal-switch-cases ordinal-switch!
     ordinal-type ordinal-type? ordinal-type-size
 
+    pair
+    pair-first pair-second
+
     tuple tuple? tuple-items tuple!
     tuple-ref tuple-ref? tuple-ref-size tuple-ref-tuple tuple-ref-index
     tuple-type tuple-type? tuple-type-name tuple-type-types
@@ -52,6 +55,10 @@
   (data (ordinal-switch ordinal cases))
   (data (ordinal-type size))
 
+  (define pair cons)
+  (data (pair-first pair))
+  (data (pair-second pair))
+
   (data (tuple items))
   (data (tuple-ref size tuple index))
   (data (tuple-type name types))
@@ -85,6 +92,9 @@
       ((ordinal? $ordinal) (depth-ordinal->datum $depth $ordinal))
       ((ordinal-switch? $ordinal-switch) (depth-ordinal-switch->datum $depth $ordinal-switch))
       ((ordinal-type? $ordinal-type) (depth-ordinal-type->datum $depth $ordinal-type))
+      ((pair? $pair) (depth-pair->datum $depth $pair))
+      ((pair-first? $pair-first) (depth-pair-first->datum $depth $pair-first))
+      ((pair-second? $pair-second) (depth-pair-second->datum $depth $pair-second))
       ((tuple? $tuple) (depth-tuple->datum $depth $tuple))
       ((tuple-ref? $tuple-ref) (depth-tuple-ref->datum $depth $tuple-ref))
       ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
@@ -146,7 +156,18 @@
 
   (define (depth-ordinal-type->datum $depth $ordinal-type)
     `(ordinal-type ,(ordinal-type-size $ordinal-type)))
-  
+
+  (define (depth-pair->datum $depth $pair)
+    `(cons 
+      ,(depth-term->datum $depth (car $pair))
+      ,(depth-term->datum $depth (cdr $pair))))
+
+  (define (depth-pair-first->datum $depth $pair-first)
+    `(car ,(depth-term->datum $depth (pair-first-pair $pair-first))))
+
+  (define (depth-pair-second->datum $depth $pair-second)
+    `(cdr ,(depth-term->datum $depth (pair-second-pair $pair-second))))
+
   (define (depth-tuple->datum $depth $tuple)
     (lets
       ($items (depth-terms->datums $depth (tuple-items $tuple)))
