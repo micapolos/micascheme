@@ -6,8 +6,7 @@
     function-type function-type? function-type-name function-type-params function-type-result
 
     application application? application-fn application-args
-    variable variable? variable-index
-
+    
     boolean-type boolean-type?
     number-type number-type?
     string-type string-type?
@@ -34,11 +33,10 @@
     application! function-type! tuple-type! choice-type!
     boolean! number! string! type!)
 
-  (import (micascheme))
+  (import (micascheme) (variable))
 
   (data (native term))
 
-  (data (variable index))
   (data (application fn args))
   (data (function arity body))
 

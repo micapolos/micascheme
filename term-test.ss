@@ -1,4 +1,4 @@
-(import (micascheme) (term))
+(import (micascheme) (variable) (term))
 
 ; === term->datum ===
 
