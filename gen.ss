@@ -22,7 +22,7 @@
 
   (define (gen-bind $gen $fn)
     (lambda ($state)
-      (bind ($stateful ($gen $state))
+      (lets ($stateful ($gen $state))
         (($fn (stateful-value $stateful)) (stateful-state $stateful)))))
 
   (define-syntax gen-bind!

@@ -2,8 +2,6 @@
 
 ; === bind ===
 
-(check (equal? (bind (x 1) (+ x 2)) 3))
-
 (check (equal? (lets 1) 1))
 (check (equal? (lets (x 1) (y (+ x 2)) y) 3))
 
@@ -16,7 +14,7 @@
 
 ; === map-find-indexed ===
 
-(bind (fn (lambda (s) (and (> (string-length s) 3) (string-append s "!"))))
+(let ((fn (lambda (s) (and (> (string-length s) 3) (string-append s "!")))))
   (check (obj=? (map-find-indexed fn (list "ala" "ma" "kocicę" "Lunę")) (indexed "kocicę!" 2)))
   (check (obj=? (map-find-indexed fn (list "ala" "ma" "ul")) #f)))
 
@@ -43,6 +41,6 @@
 
 ; === iterate ===
 
-(bind ($fn (lambda (s) (string-append s "!")))
+(let (($fn (lambda (s) (string-append s "!"))))
   (check (equal? (iterate $fn "Hello" 0) "Hello"))
   (check (equal? (iterate $fn "Hello" 3) "Hello!!!")))

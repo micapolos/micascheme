@@ -1,6 +1,6 @@
 (library (base)
   (export 
-    bind bind-true lets
+    bind-true lets
     check
     data partial
     define-aux-keyword
@@ -31,12 +31,6 @@
 
   (define string+ string-append)
 
-  (define-syntax bind
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ (var expr) body ...)
-          #`(let ((var expr)) body ...)))))
-
   (define-syntax lets
     (lambda (stx)
       (syntax-case stx ()
@@ -47,7 +41,7 @@
     (lambda (stx)
       (syntax-case stx ()
         ((_ (var expr) body ...)
-          #`(bind (var expr) 
+          #`(lets (var expr) 
             (cond (var body ...) (else #f)))))))
 
   (define (partial $proc . $partial-args)
@@ -244,7 +238,8 @@
   (define (map-find-indexed+ $proc $list $index)
     (and
       (not (null? $list))
-      (bind ($mapped ($proc (car $list)))
+      (lets 
+        ($mapped ($proc (car $list)))
         (if $mapped
           (indexed $mapped $index)
           (map-find-indexed+ $proc (cdr $list) (+ $index 1))))))

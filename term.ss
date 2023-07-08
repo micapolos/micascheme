@@ -112,7 +112,8 @@
       ,@(depth-terms->datums $depth (application-args $application))))
 
   (define (depth-function->datum $depth $function)
-    (bind ($arity (function-arity $function))
+    (lets
+      ($arity (function-arity $function))
       `(lambda (,@(depth-size->datums $depth $arity))
         ,(depth-term->datum 
           (+ $depth $arity)

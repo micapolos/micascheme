@@ -87,7 +87,8 @@
       (= (universe-depth $universe) (universe-depth $rhs))))
 
   (define (variable-match $env $variable $rhs)
-    (bind ($index (variable-index $variable))
+    (lets
+      ($index (variable-index $variable))
       (if (variable? $rhs)
         (= (variable-index $variable) (variable-index $rhs))
         (switch (list-ref $env $index)

@@ -79,7 +79,7 @@
 
   (define (resolve-tuple-ref $symbol $types $terms)
     (and (= (length $types) 1)
-      (bind ($type (car $types))
+      (lets ($type (car $types))
         (and (tuple-type? $type)
           (bind-true 
             ($indexed-type 
@@ -94,7 +94,8 @@
               (indexed-value $indexed-type)))))))
 
   (define (phase-tuple $phase $symbol $types $terms)
-    (bind ($phase-depth (phase-depth $phase))
+    (lets
+      ($phase-depth (phase-depth $phase))
       (if (> $phase-depth 0)
         (typed
           (tuple-type $symbol $terms)
