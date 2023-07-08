@@ -7,6 +7,8 @@
 
   (define (erase $typed)
     (switch $typed
+      ((number? $number) $number)
+      ((string? $string) $string)
       ((t-typed? $typed) 
         (erase (t-typed-value $typed)))
       ((t-native? $native)

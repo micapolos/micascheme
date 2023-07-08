@@ -1,6 +1,7 @@
 (library (base)
   (export 
     and-lets lets
+    works?
     check
     data partial
     define-aux-keyword
@@ -21,6 +22,8 @@
 
   (define (displayln x) (display x) (newline))
   (define (writeln x) (write x) (newline))
+
+  (define (works? expr) expr #t)
 
   (define-syntax lets
     (syntax-rules ()

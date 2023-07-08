@@ -3,16 +3,20 @@
     typed typed? typed-value typed-type
     native native? native-value native-type
     variable variable? variable-index v0 v1 v2
-    function function? function-params function-body function!
-    application application? application-fn application-args application!)
+    function function? function-name function-params function-body function!
+    application application? application-fn application-args application!
+    tuple tuple? tuple-name tuple-items tuple!
+    tuple-ref tuple-ref? tuple-ref-tuple tuple-ref-index)
 
-  (import (micascheme) (type))
+  (import (micascheme))
 
   (data (typed value type))
   (data (native value type))
   (data (variable index))
-  (data (function params body))
+  (data (function name params body))
   (data (application fn args))
+  (data (tuple name items))
+  (data (tuple-ref tuple index))
 
   (define-syntax v0
     (lambda (stx)
@@ -31,11 +35,16 @@
 
   (define-syntax function!
     (syntax-rules ()
-      ((_ param ... body)
-        (function (list param ...) body))))
+      ((_ (name param ...) body)
+        (function (quote name) (list param ...) body))))
 
   (define-syntax application!
     (syntax-rules ()
       ((_ fn arg ...)
         (application fn (list arg ...)))))
+
+  (define-syntax tuple!
+    (syntax-rules ()
+      ((_ (name item ...))
+        (tuple (quote name) (list item ...)))))
 )
