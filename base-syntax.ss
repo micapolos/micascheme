@@ -30,14 +30,7 @@
     (lambda (stx)
       (syntax-case stx ()
         ((_ (name field ...))
-          (lets
-            ($fields (syntax->list #`(field ...)))
-            #`(define-syntax-rule (name field ...)
-              #,(case (length $fields)
-                ((0) #f)
-                ((1) (car $fields))
-                ((2) #`(cons #,(car $fields) #,(cadr $fields)))
-                (else #`(vector #,@$fields)))))))))
+          (struct-constructor-syntax #`name (syntax->list #`(field ...)))))))
 
   (define-syntax define-struct-accessors
     (lambda (stx)

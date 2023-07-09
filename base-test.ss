@@ -44,3 +44,57 @@
 (let (($fn (lambda (s) (string-append s "!"))))
   (check (equal? (iterate $fn "Hello" 0) "Hello"))
   (check (equal? (iterate $fn "Hello" 3) "Hello!!!")))
+
+; === struct-constructor-syntax ===
+
+(check 
+  (equal? 
+    (syntax->datum (struct-constructor-syntax #`foo (list)))
+    `(define-syntax-rule (foo) #f)))
+
+(check 
+  (equal? 
+    (syntax->datum (struct-constructor-syntax #`foo (list #`string)))
+    `(define-syntax-rule (foo string) string)))
+
+(check 
+  (equal? 
+    (syntax->datum (struct-constructor-syntax #`foo (list #`string #`number)))
+    `(define-syntax-rule (foo string number) (cons string number))))
+
+(check 
+  (equal? 
+    (syntax->datum (struct-constructor-syntax #`foo (list #`string #`number #`boolean)))
+    `(define-syntax-rule (foo string number boolean) (vector string number boolean))))
+
+; === struct-accessor-syntax ===
+
+(check 
+  (equal? 
+    (syntax->datum (struct-accessor-syntax #`foo (list #`string) 0))
+    `(define-syntax-rule (foo-string expr) expr)))
+
+(check 
+  (equal? 
+    (syntax->datum (struct-accessor-syntax #`foo (list #`string #`number) 0))
+    `(define-syntax-rule (foo-string expr) (car expr))))
+
+(check 
+  (equal? 
+    (syntax->datum (struct-accessor-syntax #`foo (list #`string #`number) 1))
+    `(define-syntax-rule (foo-number expr) (cdr expr))))
+
+(check 
+  (equal? 
+    (syntax->datum (struct-accessor-syntax #`foo (list #`string #`number #`boolean) 0))
+    `(define-syntax-rule (foo-string expr) (vector-ref expr 0))))
+
+(check 
+  (equal? 
+    (syntax->datum (struct-accessor-syntax #`foo (list #`string #`number #`boolean) 1))
+    `(define-syntax-rule (foo-number expr) (vector-ref expr 1))))
+
+(check 
+  (equal? 
+    (syntax->datum (struct-accessor-syntax #`foo (list #`string #`number #`boolean) 2))
+    `(define-syntax-rule (foo-boolean expr) (vector-ref expr 2))))

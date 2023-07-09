@@ -16,7 +16,10 @@
     map-find-indexed
     map-indexed list-indexed
     indexed indexed? indexed-value indexed-index
-    throw)
+    throw
+
+    struct-constructor-syntax
+    struct-accessor-syntax)
 
   (import (chezscheme))
 
@@ -248,6 +251,33 @@
     (cond
       ((= $count 0) $item)
       (else (iterate $proc ($proc $item) (- $count 1)))))
+
+  ; --------------------------------------
+
+  (define (struct-constructor-syntax $name $fields)
+    #`(define-syntax-rule (#,$name #,@$fields)
+      #,(case (length $fields)
+        ((0) #f)
+        ((1) (car $fields))
+        ((2) #`(cons #,(car $fields) #,(cadr $fields)))
+        (else #`(vector #,@$fields)))))
+
+  (define (struct-accessor-syntax $name $fields $index)
+    (lets
+      ($name-string (symbol->string (syntax->datum $name)))
+      ($field (list-ref $fields $index))
+      ($field-string (symbol->string (syntax->datum $field)))
+      ($accessor-string (string-append $name-string "-" $field-string))
+      ($accessor (datum->syntax $field (string->symbol $accessor-string)))
+      (case (length $fields)
+        ((1) 
+          #`(define-syntax-rule (#,$accessor expr) expr))
+        ((2) 
+          #`(define-syntax-rule (#,$accessor expr)
+            (#,(if (= $index 0) #`car #`cdr) expr)))
+        (else
+          #`(define-syntax-rule (#,$accessor expr) 
+            (vector-ref expr #,$index))))))
 
   ; --------------------------------------
 
