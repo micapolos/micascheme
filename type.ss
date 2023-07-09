@@ -67,24 +67,31 @@
         (throw match $env $lhs $rhs))))
 
   (define (native-match $env $native $rhs)
-    (and (native? $rhs) (equal? (native-term $native) (native-term $rhs))))
+    (and 
+      (native? $rhs) 
+      (equal? (native-term $native) (native-term $rhs))
+      $env))
 
   (define (symbol-match $env $symbol $rhs)
-    (and (symbol? $rhs) (symbol=? $symbol $rhs)))
+    (and 
+      (symbol? $rhs) 
+      (symbol=? $symbol $rhs) 
+      $env))
 
   (define (boolean-type-match $env $boolean-type $rhs)
-    (boolean-type? $rhs))
+    (and (boolean-type? $rhs) $env))
 
   (define (number-type-match $env $number-type $rhs)
-    (number-type? $rhs))
+    (and (number-type? $rhs) $env))
 
   (define (string-type-match $env $string-type $rhs)
-    (string-type? $rhs))
+    (and (string-type? $rhs) $env))
 
   (define (universe-match $env $universe $rhs)
     (and 
       (universe? $rhs)
-      (= (universe-depth $universe) (universe-depth $rhs))))
+      (= (universe-depth $universe) (universe-depth $rhs))
+      $env))
 
   (define (variable-match $env $variable $rhs)
     (lets

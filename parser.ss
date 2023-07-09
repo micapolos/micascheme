@@ -176,7 +176,7 @@
           (format "should be universe 0:")))))
 
   (define (env-parse $env $phase $stx)
-    (syntax-case $stx (native boolean number string recursive function function-type use type select switch)
+    (syntax-case $stx (native boolean number string if recursive function function-type use type select switch)
       ((native $value $type)
         (typed 
           (native (syntax->datum #`$value))
@@ -245,6 +245,18 @@
           (typed
             (application (function $arity $body-term) $terms)
             $body-type)))
+      ((if condition consequent alternate)
+        (lets
+          ($condition (env-parse-as $env $phase #`condition boolean!))
+          ($consequent (env-parse $env $phase #`consequent))
+          ($type (typed-type $consequent))
+          ($alternate (env-parse-as $env $phase #`alternate $type))
+          (typed
+            (conditional 
+              (typed-value $condition)
+              (typed-value $consequent)
+              (typed-value $alternate))
+            $type)))
       ((select option ...)
         (lets
           ($options (map (partial env-parse-option $env $phase) (syntax->list #`(option ...))))
@@ -296,11 +308,11 @@
       (_
         (switch (syntax->datum $stx)
           ((boolean? $boolean) 
-            (typed $boolean (boolean-type)))
+            (typed $boolean boolean!))
           ((number? $number)
-            (typed $number (number-type)))
+            (typed $number number!))
           ((string? $string) 
-            (typed $string (string-type)))
+            (typed $string string!))
           ((symbol? $symbol)
             (lets 
               ($indexed-type (env-select-indexed-type $env $symbol))
