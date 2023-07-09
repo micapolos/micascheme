@@ -155,9 +155,9 @@
         (select (not boolean) (not number) "foo") 
         "boolean" "number" string))
     (typed
-      (application 
+      (application! 
         (function 1
-          (application
+          (application!
             (function 1
               (ordinal-switch! (pair-first v1) "boolean" "number" v0))
             (pair-second v0)))

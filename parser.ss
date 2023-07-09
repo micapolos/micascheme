@@ -252,12 +252,9 @@
           ($type (car $case-types))
           ($case-terms (map typed-value $typed-cases))
           (typed
-            (application 
-              (function 1 
-                (application
-                  (function 1 (ordinal-switch (pair-first v1) $case-terms))
-                  (pair-second v0)))
-              $choice-term)
+            (use! ($choice-term) 
+              (use! ((pair-second v0))
+                (ordinal-switch (pair-first v1) $case-terms)))
             $type)))
       ((id arg ...) (identifier? #`id)
         (lets
