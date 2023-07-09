@@ -14,9 +14,7 @@
 
     conditional conditional? conditional-condition conditional-consequent conditional-alternate
 
-    ordinal ordinal? ordinal-size ordinal-value
-    ordinal-switch ordinal-switch? ordinal-switch-ordinal ordinal-switch-cases ordinal-switch!
-    ordinal-type ordinal-type? ordinal-type-size
+    branch branch? branch-index branch-cases branch!
 
     pair pair-first pair-second
     vector-get
@@ -50,9 +48,7 @@
 
   (data (function-type name params result))
 
-  (data (ordinal size value))
-  (data (ordinal-switch ordinal cases))
-  (data (ordinal-type size))
+  (data (branch index cases))
 
   (define pair cons)
   (data (pair-first pair))
@@ -97,9 +93,7 @@
       ((conditional? $conditional) (depth-conditional->datum $depth $conditional))
       ((function? $function) (depth-function->datum $depth $function))
       ((function-type? $function-type) (depth-function-type->datum $depth $function-type))
-      ((ordinal? $ordinal) (depth-ordinal->datum $depth $ordinal))
-      ((ordinal-switch? $ordinal-switch) (depth-ordinal-switch->datum $depth $ordinal-switch))
-      ((ordinal-type? $ordinal-type) (depth-ordinal-type->datum $depth $ordinal-type))
+      ((branch? $branch) (depth-branch->datum $depth $branch))
       ((pair? $pair) (depth-pair->datum $depth $pair))
       ((pair-first? $pair-first) (depth-pair-first->datum $depth $pair-first))
       ((pair-second? $pair-second) (depth-pair-second->datum $depth $pair-second))
@@ -145,27 +139,10 @@
       (list ,@(depth-terms->datums $depth (function-type-params $function-type)))
       ,(depth-term->datum $depth (function-type-result $function-type))))
 
-  (define (depth-ordinal->datum $depth $ordinal)
-    (lets
-      ($size (ordinal-size $ordinal))
-      ($value (ordinal-value $ordinal))
-      (case $size
-        ((1) #f)
-        ((2) (= $value 0))
-        (else $value))))
-
-  (define (depth-ordinal-switch->datum $depth $ordinal-switch)
-    (lets 
-      ($ordinal (depth-term->datum $depth (ordinal-switch-ordinal $ordinal-switch)))
-      ($cases (depth-terms->datums $depth (ordinal-switch-cases $ordinal-switch)))
-      ($size (length $cases))
-      (case $size
-        ((1) (car $cases))
-        ((2) `(if ,$ordinal ,(car $cases) ,(cadr $cases)))
-        (else `(index-switch ,$ordinal ,@$cases)))))
-
-  (define (depth-ordinal-type->datum $depth $ordinal-type)
-    `(ordinal-type ,(ordinal-type-size $ordinal-type)))
+  (define (depth-branch->datum $depth $branch)
+    `(index-switch 
+      ,(depth-term->datum $depth (branch-index $branch))
+      ,@(depth-terms->datums $depth (branch-cases $branch))))
 
   (define (depth-vector->datum $depth $vector)
     `(vector ,@(depth-terms->datums $depth (vector->list $vector))))
@@ -253,8 +230,8 @@
   (define-syntax-rule (choice-type! arg ...)
     (choice-type (list arg ...)))
 
-  (define-syntax-rule (ordinal-switch! ordinal arg ...)
-    (ordinal-switch ordinal (list arg ...)))
+  (define-syntax-rule (branch! index case ...)
+    (branch index (list case ...)))
 
   ; -----------------------------------------------
 

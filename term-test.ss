@@ -40,16 +40,9 @@
 
 (check-datum (application `foo (list `bar `goo)) ('foo 'bar 'goo))
 
-(check-datum (ordinal 1 0) #f)
-(check-datum (ordinal 2 0) #t)
-(check-datum (ordinal 2 1) #f)
-(check-datum (ordinal 3 0) 0)
-(check-datum (ordinal 3 1) 1)
-(check-datum (ordinal 3 2) 2)
-
-(check-datum (ordinal-switch! `ordinal `v0) 'v0)
-(check-datum (ordinal-switch! `ordinal `v0 `v1) (if 'ordinal 'v0 'v1))
-(check-datum (ordinal-switch! `ordinal `v0 `v1 `v2) (index-switch 'ordinal 'v0 'v1 'v2))
+(check-datum (branch! `index `v0) (index-switch 'index 'v0))
+(check-datum (branch! `index `v0 `v1) (index-switch 'index 'v0 'v1))
+(check-datum (branch! `index `v0 `v1 `v2) (index-switch 'index 'v0 'v1 'v2))
 
 (check-datum (pair `a `b) (cons 'a 'b))
 (check-datum (pair-first `pair) (car 'pair))
@@ -77,23 +70,19 @@
 
 (check-eval (application! (native `string-append) "Hello, " "world!") "Hello, world!")
 
-(check-eval (ordinal 3 0) 0)
-(check-eval (ordinal-switch! (ordinal 3 0) "one" "two" "three") "one")
+(check-eval (branch! 0 "one" "two" "three") "one")
+(check-eval (branch! 1 "one" "two" "three") "two")
+(check-eval (branch! 2 "one" "two" "three") "three")
 
 (check-eval 
-  (application!
-    (function 1
-      (application!
-        (function 1 (ordinal-switch! (pair-first v1) "boolean" "number" v0))
-        (pair-second v0)))
-    (cons (ordinal 3 1) "foo"))
+  (use! ((cons 1 "foo"))
+    (use! ((pair-second v0))
+      (branch! (pair-first v1) "boolean" "number" v0)))
   "number")
 
 (check-eval 
-  (application!
-    (function 1
-      (application!
-        (function 1 (ordinal-switch! (pair-first v1) "boolean" "number" v0))
-        (pair-second v0)))
-    (cons (ordinal 3 2) "foo"))
+  (use! ((cons 2 "foo"))
+    (use! ((pair-second v0))
+      (branch! (pair-first v1) "boolean" "number" v0)))
   "foo")
+

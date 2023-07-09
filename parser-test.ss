@@ -157,7 +157,7 @@
     (typed
       (use! ((cons 2 "foo"))
         (use! ((pair-second v0))
-          (ordinal-switch! (pair-first v1) "boolean" "number" v0)))
+          (branch! (pair-first v1) "boolean" "number" v0)))
       string!)))
 
 ; === function ===

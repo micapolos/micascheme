@@ -254,7 +254,7 @@
           (typed
             (use! ($choice-term) 
               (use! ((pair-second v0))
-                (ordinal-switch (pair-first v1) $case-terms)))
+                (branch (pair-first v1) $case-terms)))
             $type)))
       ((id arg ...) (identifier? #`id)
         (lets
