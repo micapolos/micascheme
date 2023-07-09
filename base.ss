@@ -339,9 +339,8 @@
               (cons #,$selected-index #,$tmp)))
           (indices $size)
           $tmps))
-      #`(define-syntax name
-        (syntax-rules (not #,@$cases) 
-          #,@$rules))))
+      #`(define-syntax #,$name
+        (syntax-rules (not #,@$cases) #,@$rules))))
 
   ; --------------------------------------
 

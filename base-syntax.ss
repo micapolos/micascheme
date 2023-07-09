@@ -31,31 +31,19 @@
     (lambda (stx)
       (syntax-case stx ()
         ((_ (name field ...))
-          (struct-syntax #`name (syntax->list #`(field ...)) generate-temporary)))))
+          (struct-syntax 
+            #`name 
+            (syntax->list #`(field ...)) 
+            generate-temporary)))))
 
   (define-syntax define-one-of-constructor
     (lambda (stx)
       (syntax-case stx ()
         ((_ (name case ...))
-          (lets
-            ($cases (syntax->list #`(case ...)))
-            ($size (length $cases))
-            ($tmps (generate-temporaries $cases))
-            ($rules
-              (map
-                (lambda ($selected-index $tmp)
-                  #`(
-                    (_ 
-                      #,@(map-indexed
-                        (lambda ($index $case)
-                          (if (= $index $selected-index) $tmp #`(not #,$case)))
-                        $cases))
-                    (cons #,$selected-index #,$tmp)))
-                (indices $size)
-                $tmps))
-            #`(define-syntax name
-              (syntax-rules (not case ...) 
-                #,@$rules)))))))
+          (one-of-constructor-syntax 
+            #`name 
+            (syntax->list #`(case ...))
+            generate-temporary)))))
 
   (define-syntax define-one-of-switch
     (lambda (stx)
