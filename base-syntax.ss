@@ -7,7 +7,9 @@
     number->datum
     string->datum 
     define-data->datum
-    define-data)
+    define-data
+
+    define-one-of-constructor)
 
   (import (chezscheme) (base))
 
@@ -90,4 +92,29 @@
       (define-data-constructor name field ...)
       (define-data-accessors name field ...)
       (define-data->datum name field ...)))
+
+  (define-syntax define-one-of-constructor
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ (name case ...))
+          (lets
+            ($cases (syntax->list #`(case ...)))
+            ($size (length $cases))
+            ($tmps (generate-temporaries $cases))
+            ($rules
+              (map
+                (lambda ($selected-index $tmp)
+                  #`(
+                    (_ 
+                      #,@(map-indexed
+                        (lambda ($index $case)
+                          (if (= $index $selected-index) $tmp #`(not #,$case)))
+                        $cases))
+                    (cons #,$selected-index #,$tmp)))
+                (indices $size)
+                $tmps))
+            #`(define-syntax name
+              (syntax-rules (not case ...) 
+                #,@$rules)))))))
+
 )

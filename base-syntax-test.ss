@@ -71,3 +71,10 @@
 (check (equal? (data2->datum (data2 "foo" 128)) `(data2 "foo" 128)))
 (check (equal? (data3->datum (data3 "foo" 128 (data0))) `(data3 "foo" 128 (data0))))
 
+; === define-one-of-constructor ===
+
+(define-one-of-constructor (one-of-3 string number data0))
+
+(check (equal? (one-of-3 "foo" (not number) (not data0)) (cons 0 "foo")))
+(check (equal? (one-of-3 (not string) 128 (not data0)) (cons 1 128)))
+(check (equal? (one-of-3 (not string) (not number) (data0)) (cons 2 (data0))))

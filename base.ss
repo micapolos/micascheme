@@ -249,7 +249,6 @@
       ((= $count 0) $item)
       (else (iterate $proc ($proc $item) (- $count 1)))))
 
-
   ; --------------------------------------
 
   (data (foo a b))
