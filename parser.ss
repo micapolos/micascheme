@@ -6,7 +6,7 @@
     typed typed? typed-value typed-type typed!
 
     ; aux keywords
-    boolean number use type select)
+    boolean number type select)
 
   (import (micascheme) (variable) (term) (type))
 
@@ -23,7 +23,6 @@
 
   (define-aux-keyword boolean)
   (define-aux-keyword number)
-  (define-aux-keyword use)
   (define-aux-keyword type)
   (define-aux-keyword select)
 
@@ -232,9 +231,7 @@
             ((multi-selection? _) (syntax-error $stx "multi selection:"))
             ((selected? $selected)
               (typed
-                (pair 
-                  (ordinal $size (selected-index $selected))
-                  (selected-term $selected))
+                (pair (selected-index $selected) (selected-term $selected))
                 (choice-type $types)))
             ((else $other) (throw non-selection $other)))))
       ((switch choice case ...)

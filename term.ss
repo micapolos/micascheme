@@ -6,6 +6,7 @@
     function-type function-type? function-type-name function-type-params function-type-result
 
     application application? application-fn application-args
+    use use!
     
     boolean-type boolean-type?
     number-type number-type?
@@ -65,6 +66,13 @@
 
   (data (choice-type types))
   
+  ; --------------------------------------------------
+
+  (define (use $args $body)
+    (application 
+      (function (length $args) $body)
+      $args))
+
   ; --------------------------------------------------
 
   (define (term->datum $term)
@@ -229,6 +237,9 @@
 
   (define-syntax-rule (application! fn arg ...)
     (application fn (list arg ...)))
+
+  (define-syntax-rule (use! (arg ...) body)
+    (use (list arg ...) body))
 
   (define-syntax-rule (function-type! (name arg ...) result)
     (function-type (quote name) (list arg ...) result))

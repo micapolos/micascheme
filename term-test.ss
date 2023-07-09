@@ -1,5 +1,12 @@
 (import (micascheme) (variable) (term))
 
+; === utils ===
+
+(check 
+  (obj=? 
+    (use (list "foo" 128) (variable 0)) 
+    (application (function 2 (variable 0)) (list "foo" 128))))
+
 ; === term->datum ===
 
 (define-syntax-rule (check-datum $term $datum)

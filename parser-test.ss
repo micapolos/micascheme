@@ -127,9 +127,23 @@
 
 (check
   (obj=?
+    (parse! (select #t (not number) (not string)))
+    (typed
+      (cons 0 #t)
+      (choice-type! boolean! number! string!))))
+
+(check
+  (obj=?
+    (parse! (select (not boolean) 128 (not string)))
+    (typed
+      (cons 1 128)
+      (choice-type! boolean! number! string!))))
+
+(check
+  (obj=?
     (parse! (select (not boolean) (not number) "foo"))
     (typed
-      (cons (ordinal 3 2) "foo")
+      (cons 2 "foo")
       (choice-type! boolean! number! string!))))
 
 ; === switch ===
@@ -137,7 +151,9 @@
 (check
   (obj=?
     (parse! 
-      (switch (select (not boolean) (not number) "foo") "boolean" "number" string))
+      (switch 
+        (select (not boolean) (not number) "foo") 
+        "boolean" "number" string))
     (typed
       (application 
         (function 1
@@ -145,7 +161,7 @@
             (function 1
               (ordinal-switch! (pair-first v1) "boolean" "number" v0))
             (pair-second v0)))
-        (cons (ordinal 3 2) "foo"))
+        (cons 2 "foo"))
       string!)))
 
 ; === function ===
