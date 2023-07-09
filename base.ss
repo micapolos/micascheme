@@ -28,7 +28,8 @@
     struct-syntax
 
     one-of-constructor-syntax
-    one-of-switch-syntax)
+    one-of-switch-syntax
+    one-of->datum-syntax)
 
   (import (chezscheme))
 
@@ -376,6 +377,23 @@
                         #,($case-body $case))))
                   $cases))))))))
   
+  (define (one-of->datum-syntax $name $cases $generate-temporary)
+    (lets
+      ($name->datum (build-identifier ($string $name) (string-append $string "->datum")))
+      ($switch (build-identifier ($string $name) (string-append $string "-switch")))
+      ($tmp ($generate-temporary #`one-of))
+      ($case->datum (lambda ($case) (build-identifier ($string $case) (string-append $string "->datum"))))
+      ($case-pred (lambda ($case) (build-identifier ($string $case) (string-append $string "?"))))
+      ($tmps (map $generate-temporary $cases))
+      ($index-tmp (lambda ($index) (list-ref $tmps $index)))
+      ($case-pattern (lambda ($index $case) #`(#,($case-pred $case) #,($index-tmp $index))))
+      ($case-rule (lambda ($index $case) 
+        #`(#,($case-pattern $index $case) 
+        `(#,$name ,(#,($case->datum $case) #,($index-tmp $index))))))
+      #`(define (#,$name->datum #,$tmp)
+        (#,$switch #,$tmp 
+          #,@(map-indexed $case-rule $cases)))))
+
   ; --------------------------------------
 
   (data (foo a b))

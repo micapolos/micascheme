@@ -195,3 +195,14 @@
             ((0) (lets ($string $value) string-body)) 
             ((1) (lets ($number $value) number-body)) 
             ((2) (lets ($bar $value) bar-body)))))))))
+
+; === one-of->datum-syntax ===
+
+(check 
+  (equal? 
+    (syntax->datum (one-of->datum-syntax #`foo (list #`string #`number #`bar) generate-test-temporary))
+    `(define (foo->datum $one-of)
+      (foo-switch $one-of
+        ((string? $string) `(foo ,(string->datum $string)))
+        ((number? $number) `(foo ,(number->datum $number)))
+        ((bar? $bar) `(foo ,(bar->datum $bar)))))))

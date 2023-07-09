@@ -52,8 +52,18 @@
             (syntax->list #`(case ...))
             generate-temporary)))))
 
+  (define-syntax define-one-of->datum
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ (name case ...))
+          (one-of->datum-syntax 
+            #`name
+            (syntax->list #`(case ...))
+            generate-temporary)))))
+
   (define-syntax-rule (define-one-of name case ...)
     (begin
       (define-one-of-constructor name case ...)
-      (define-one-of-switch name case ...)))
+      (define-one-of-switch name case ...)
+      (define-one-of->datum name case ...)))
 )
