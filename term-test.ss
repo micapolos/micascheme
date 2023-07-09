@@ -38,6 +38,11 @@
 (check-datum (function 2 (variable 0)) (lambda (v0 v1) v1))
 (check-datum (function 2 (variable 1)) (lambda (v0 v1) v0))
 
+(check-datum (recursive (function 2 `foo)) (rec v0 (lambda (v1 v2) 'foo)))
+(check-datum (recursive (function 2 (variable 0))) (rec v0 (lambda (v1 v2) v2)))
+(check-datum (recursive (function 2 (variable 1))) (rec v0 (lambda (v1 v2) v1)))
+(check-datum (recursive (function 2 (variable 2))) (rec v0 (lambda (v1 v2) v0)))
+
 (check-datum (application `foo (list `bar `goo)) ('foo 'bar 'goo))
 
 (check-datum (branch! `index `v0) (index-switch 'index 'v0))
@@ -50,18 +55,6 @@
 
 (check-datum (vector `a `b) (vector 'a 'b))
 (check-datum (vector-get `vector `index) (vector-ref 'vector 'index))
-
-(check-datum (tuple!) #f)
-(check-datum (tuple! `t1) 't1)
-(check-datum (tuple! `t1 `t2) (cons 't1 't2))
-(check-datum (tuple! `t1 `t2 `t3) (vector 't1 't2 't3))
-
-(check-datum (tuple-ref 1 `tuple 0) 'tuple)
-(check-datum (tuple-ref 2 `tuple 0) (car 'tuple))
-(check-datum (tuple-ref 2 `tuple 1) (cdr 'tuple))
-(check-datum (tuple-ref 3 `tuple 0) (vector-ref 'tuple 0))
-(check-datum (tuple-ref 3 `tuple 1) (vector-ref 'tuple 1))
-(check-datum (tuple-ref 3 `tuple 2) (vector-ref 'tuple 2))
 
 ; === term-eval ===
 

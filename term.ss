@@ -3,6 +3,7 @@
     native native? native-term
 
     function function? function-arity function-body
+    recursive recursive? recursive-function
     function-type function-type? function-type-name function-type-params function-type-result
 
     application application? application-fn application-args
@@ -33,6 +34,7 @@
 
   (data (application fn args))
   (data (function arity body))
+  (data (recursive function))
 
   (data (boolean-type))
   (data (number-type))
@@ -85,6 +87,7 @@
       ((application? $application) (depth-application->datum $depth $application))
       ((conditional? $conditional) (depth-conditional->datum $depth $conditional))
       ((function? $function) (depth-function->datum $depth $function))
+      ((recursive? $recursive) (depth-recursive->datum $depth $recursive))
       ((function-type? $function-type) (depth-function-type->datum $depth $function-type))
       ((branch? $branch) (depth-branch->datum $depth $branch))
       ((pair? $pair) (depth-pair->datum $depth $pair))
@@ -120,9 +123,20 @@
     (lets
       ($arity (function-arity $function))
       `(lambda (,@(depth-size->datums $depth $arity))
-        ,(depth-term->datum 
+        ,(depth-term->datum
           (+ $depth $arity)
           (function-body $function)))))
+
+  (define (depth-recursive->datum $depth $recursive)
+    (lets
+      ($function (recursive-function $recursive))
+      ($arity (function-arity $function))
+      ($body-depth (+ $depth 1))
+      `(rec ,(depth->datum $depth)
+        (lambda (,@(depth-size->datums $body-depth $arity))
+          ,(depth-term->datum
+            (+ $body-depth $arity)
+            (function-body $function))))))
 
   (define (depth-function-type->datum $depth $function-type)
     `(function-type
