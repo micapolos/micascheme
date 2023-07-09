@@ -76,6 +76,30 @@
       (use
         ((native string-length (function (length string) number))
          (native number->string (function (string number) string))
+         (native string-append (function (append string string) string))
+         (native + (function (+ number number) number))
+         (native - (function (- number number) number))
+         (native < (function (< number number) boolean)))
+        (append (string (length "foo")) " apples")))
+    "3 apples"))
+
+; === natives
+
+(check
+  (equal?
+    (leo
+      (use
+        ((native not (function (not boolean) boolean))
+         (native = (function (= number number) boolean))
+         (native < (function (< number number) boolean))
+         (native > (function (> number number) boolean))
+         (native <= (function (<= number number) boolean))
+         (native >= (function (>= number number) boolean))
+         (native + (function (+ number number) number))
+         (native - (function (- number number) number))
+         (native = (function (= string string) boolean))
+         (native string-length (function (length string) number))
+         (native number->string (function (string number) string))
          (native string-append (function (append string string) string)))
         (append (string (length "foo")) " apples")))
     "3 apples"))
