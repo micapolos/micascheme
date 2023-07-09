@@ -29,7 +29,8 @@
 
     one-of-constructor-syntax
     one-of-switch-syntax
-    one-of->datum-syntax)
+    one-of->datum-syntax
+    one-of-syntax)
 
   (import (chezscheme))
 
@@ -329,24 +330,18 @@
 
   ; --------------------------------------
 
-  (define (one-of-constructor-syntax $name $cases $generate-temporary)
+  (define (one-of-constructor-syntax $name $cases $index)
     (lets
-      ($size (length $cases))
-      ($tmps (map $generate-temporary $cases))
-      ($rules
-        (map
-          (lambda ($selected-index $tmp)
-            #`(
-              (_ 
-                #,@(map-indexed
-                  (lambda ($index $case)
-                    (if (= $index $selected-index) $tmp #`(not #,$case)))
-                  $cases))
-              (cons #,$selected-index #,$tmp)))
-          (indices $size)
-          $tmps))
-      #`(define-syntax #,$name
-        (syntax-rules (not #,@$cases) #,@$rules))))
+      ($case (list-ref $cases $index))
+      ($constructor 
+        (datum->syntax $name 
+          (string->symbol 
+            (string-append 
+              (symbol->string (syntax->datum $case))
+              "-"
+              (symbol->string (syntax->datum $name))))))
+      #`(define-syntax-rule (#,$constructor one-of)
+        (cons #,$index one-of))))
 
   (define (one-of-switch-syntax $name $cases $generate-temporary)
     (lets
@@ -393,6 +388,14 @@
       #`(define (#,$name->datum #,$tmp)
         (#,$switch #,$tmp 
           #,@(map-indexed $case-rule $cases)))))
+
+  (define (one-of-syntax $name $cases $generate-temporary)
+    (lets
+      ($size (length $cases))
+      #`(begin
+        #,@(map (partial one-of-constructor-syntax $name $cases) (indices $size))
+        #,(one-of-switch-syntax $name $cases $generate-temporary)
+        #,(one-of->datum-syntax $name $cases $generate-temporary))))
 
   ; --------------------------------------
 

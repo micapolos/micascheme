@@ -33,13 +33,13 @@
 
 (define-one-of (one-of-3 string number struct0))
 
-(check (equal? (one-of-3 "foo" (not number) (not struct0)) (cons 0 "foo")))
-(check (equal? (one-of-3 (not string) 128 (not struct0)) (cons 1 128)))
-(check (equal? (one-of-3 (not string) (not number) (struct0)) (cons 2 (struct0))))
+(check (equal? (string-one-of-3 "foo") (cons 0 "foo")))
+(check (equal? (number-one-of-3 128) (cons 1 128)))
+(check (equal? (struct0-one-of-3 (struct0)) (cons 2 (struct0))))
 
 (check 
   (equal? 
-    (one-of-3-switch (one-of-3 "foo" (not number) (not struct0))
+    (one-of-3-switch (string-one-of-3 "foo")
       ((string? $string) (string-append "string " $string))
       ((number? $number) (string-append "number " (number->string $number)))
       ((struct0? $struct0) "struct0"))
@@ -47,7 +47,7 @@
 
 (check 
   (equal? 
-    (one-of-3-switch (one-of-3 (not string) 128 (not struct0))
+    (one-of-3-switch (number-one-of-3 128)
       ((string? $string) (string-append "string " $string))
       ((number? $number) (string-append "number " (number->string $number)))
       ((struct0? $struct0) "struct0"))
@@ -55,7 +55,7 @@
 
 (check 
   (equal? 
-    (one-of-3-switch (one-of-3 (not string) (not number) (struct0))
+    (one-of-3-switch (struct0-one-of-3 (struct0))
       ((string? $string) (string-append "string " $string))
       ((number? $number) (string-append "number " (number->string $number)))
       ((struct0? $struct0) "struct0"))
@@ -63,15 +63,15 @@
 
 (check 
   (equal? 
-    (one-of-3->datum (one-of-3 "foo" (not number) (not struct0)))
+    (one-of-3->datum (string-one-of-3 "foo"))
     `(one-of-3 "foo")))
 
 (check 
   (equal? 
-    (one-of-3->datum (one-of-3 (not string) 128 (not struct0)))
+    (one-of-3->datum (number-one-of-3 128))
     `(one-of-3 128)))
 
 (check 
   (equal? 
-    (one-of-3->datum (one-of-3 (not string) (not number) (struct0)))
+    (one-of-3->datum (struct0-one-of-3 (struct0)))
     `(one-of-3 (struct0))))

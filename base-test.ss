@@ -154,27 +154,21 @@
 
 (check 
   (equal? 
-    (syntax->datum (one-of-constructor-syntax #`foo (list #`string) generate-test-temporary))
-    `(define-syntax foo 
-      (syntax-rules (not string) 
-        ((_ $string) (cons 0 $string))))))
+    (syntax->datum (one-of-constructor-syntax #`foo (list #`string #`number #`bar) 0))
+    `(define-syntax-rule (string-foo one-of)
+      (cons 0 one-of))))
 
 (check 
   (equal? 
-    (syntax->datum (one-of-constructor-syntax #`foo (list #`string #`number) generate-test-temporary))
-    `(define-syntax foo 
-      (syntax-rules (not string number) 
-        ((_ $string (not number)) (cons 0 $string)) 
-        ((_ (not string) $number) (cons 1 $number))))))
+    (syntax->datum (one-of-constructor-syntax #`foo (list #`string #`number #`bar) 1))
+    `(define-syntax-rule (number-foo one-of)
+      (cons 1 one-of))))
 
 (check 
   (equal? 
-    (syntax->datum (one-of-constructor-syntax #`foo (list #`string #`number #`bar) generate-test-temporary))
-    `(define-syntax foo 
-      (syntax-rules (not string number bar) 
-        ((_ $string (not number) (not bar)) (cons 0 $string)) 
-        ((_ (not string) $number (not bar)) (cons 1 $number)) 
-        ((_ (not string) (not number) $bar) (cons 2 $bar))))))
+    (syntax->datum (one-of-constructor-syntax #`foo (list #`string #`number #`bar) 2))
+    `(define-syntax-rule (bar-foo one-of)
+      (cons 2 one-of))))
 
 ; === one-of-switch-syntax ===
 
@@ -206,3 +200,30 @@
         ((string? $string) `(foo ,(string->datum $string)))
         ((number? $number) `(foo ,(number->datum $number)))
         ((bar? $bar) `(foo ,(bar->datum $bar)))))))
+
+; === one-of-syntax ===
+
+(check 
+  (equal? 
+    (syntax->datum (one-of-syntax #`foo (list #`string #`number) generate-test-temporary))
+    `(begin 
+      (define-syntax-rule (string-foo one-of) (cons 0 one-of)) 
+      (define-syntax-rule (number-foo one-of) (cons 1 one-of)) 
+      (define-syntax foo-switch (syntax-rules (string? number?) 
+        ((_ one-of 
+          ((string? $string) string-body) 
+          ((number? $number) number-body))
+        (lets 
+          ($one-of one-of) 
+          ($index (car $one-of)) 
+          ($value (cdr $one-of)) 
+          (case $index 
+            ((0) (lets ($string $value) string-body)) 
+            ((1) (lets ($number $value) number-body))))))) 
+      (define (foo->datum $one-of) 
+        (foo-switch $one-of 
+          ((string? $string) (quasiquote (foo (unquote (string->datum $string))))) 
+          ((number? $number) (quasiquote (foo (unquote (number->datum $number))))))))))
+
+
+
