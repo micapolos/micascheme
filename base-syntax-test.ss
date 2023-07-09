@@ -75,4 +75,3 @@
   (equal? 
     (one-of-3->datum (one-of-3 (not string) (not number) (struct0)))
     `(one-of-3 (struct0))))
-
