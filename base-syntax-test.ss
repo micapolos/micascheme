@@ -46,3 +46,28 @@
 (check (equal? (tuple1->datum (tuple1 "foo")) `(tuple1 "foo")))
 (check (equal? (tuple2->datum (tuple2 "foo" 128)) `(tuple2 "foo" 128)))
 (check (equal? (tuple3->datum (tuple3 "foo" 128 (tuple0))) `(tuple3 "foo" 128 (tuple0))))
+
+; === define-data ===
+
+(define-data (data0))
+(define-data (data1 string))
+(define-data (data2 string number))
+(define-data (data3 string number data0))
+
+(check (equal? (data0) #f))
+(check (equal? (data1 "foo") "foo"))
+(check (equal? (data2 "foo" 128) (cons "foo" 128)))
+(check (equal? (data3 "foo" 128 (data0)) (vector "foo" 128 (data0))))
+
+(check (equal? (data1-string (data1 "foo")) "foo"))
+(check (equal? (data2-string (data2 "foo" 128)) "foo"))
+(check (equal? (data2-number (data2 "foo" 128)) 128))
+(check (equal? (data3-string (data3 "foo" 128 (data0))) "foo"))
+(check (equal? (data3-number (data3 "foo" 128 (data0))) 128))
+(check (equal? (data3-data0 (data3 "foo" 128 (data0))) (data0)))
+
+(check (equal? (data0->datum (data0)) `(data0)))
+(check (equal? (data1->datum (data1 "foo")) `(data1 "foo")))
+(check (equal? (data2->datum (data2 "foo" 128)) `(data2 "foo" 128)))
+(check (equal? (data3->datum (data3 "foo" 128 (data0))) `(data3 "foo" 128 (data0))))
+

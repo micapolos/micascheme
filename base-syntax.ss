@@ -6,7 +6,8 @@
     boolean->datum
     number->datum
     string->datum 
-    define-data->datum)
+    define-data->datum
+    define-data)
 
   (import (chezscheme) (base))
 
@@ -19,8 +20,6 @@
               (lambda ($index $branch) #`((#,$index) #,$branch))
               (syntax->list #`(branch ...)))
             (else default))))))
-
-  ; --------------------------------------
 
   (define-syntax define-data-constructor 
     (lambda (stx)
@@ -85,4 +84,10 @@
                     (lambda ($accessor $datum) #`(unquote (#,$datum (#,$accessor #,$tmp))))
                     $accessors
                     $datums)))))))))
+
+  (define-syntax-rule (define-data name field ...)
+    (begin
+      (define-data-constructor name field ...)
+      (define-data-accessors name field ...)
+      (define-data->datum name field ...)))
 )
