@@ -39,10 +39,8 @@
   (define (generate-temporary $obj) 
     (car (generate-temporaries (list $obj))))
 
-  (define (generate-test-temporary $obj) 
-    (string->symbol 
-      (string-append "$" 
-        (symbol->string (syntax->datum $obj)))))
+  (define (generate-test-temporary $obj)
+    (build-identifier ($string $obj) (string-append "$" $string)))
 
   (define-syntax define-syntax-rule
     (syntax-rules ()
@@ -156,10 +154,10 @@
         ((_ (name field ...))
           (lets
             (name-string (symbol->string (syntax->datum #`name)))
-            (record-name (datum->syntax #`name (string->symbol (string-append "%" name-string))))
-            (rtd-name (datum->syntax #`name (string->symbol (string-append name-string "-rtd"))))
+            (record-name (build-identifier ($string #`name) (string-append "%" $string)))
+            (rtd-name (build-identifier ($string #`name) (string-append $string "-rtd")))
             (prefix-name (string-append name-string "-"))
-            (predicate-name (datum->syntax #`name (string->symbol (string-append name-string "?"))))
+            (predicate-name (build-identifier ($string #`name) (string-append $string "?")))
             #`(begin
               (define-record 
                 #,record-name
@@ -310,7 +308,7 @@
       ($accessors (map (partial datum->syntax $name) (map string->symbol $accessor-strings)))
       ($datum-strings (map (lambda ($field-string) (string-append $field-string "->datum")) $field-strings))
       ($datums (map (partial datum->syntax $name) (map string->symbol $datum-strings)))
-      ($tmp ($generate-temporary `expr))
+      ($tmp ($generate-temporary #`expr))
       #`(define (#,$name->datum #,$tmp)
         (quasiquote
           (#,$name
