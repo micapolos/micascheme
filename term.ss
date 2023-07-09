@@ -12,17 +12,14 @@
     number-type number-type?
     string-type string-type?
 
-    conditional conditional? conditional-condition conditional-consequent conditional-alternate
-
-    branch branch? branch-index branch-cases branch!
-
     pair pair-first pair-second
     vector-get
 
-    tuple-type tuple-type? tuple-type-name tuple-type-types
-    
-    choice-type choice-type? choice-type-types
+    conditional conditional? conditional-condition conditional-consequent conditional-alternate
+    branch branch? branch-index branch-cases branch!
 
+    tuple-type tuple-type? tuple-type-name tuple-type-types
+    choice-type choice-type? choice-type-types
     universe universe? universe-depth
     
     term->datum term-eval
