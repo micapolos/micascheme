@@ -2,7 +2,11 @@
   (export
     index-switch
     define-data-constructor
-    define-data-accessors)
+    define-data-accessors
+    boolean->datum
+    number->datum
+    string->datum 
+    define-data->datum)
 
   (import (chezscheme) (base))
 
@@ -55,4 +59,30 @@
                       #`(define-syntax-rule (#,$accessor expr) (vector-ref expr #,$index)))
                     $accessors)))))))))
 
+  (define-syntax-rule (boolean->datum $boolean) $boolean)
+  (define-syntax-rule (number->datum $number) $number)
+  (define-syntax-rule (string->datum $string) $string)
+
+  (define-syntax define-data->datum 
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ (name field ...))
+          (lets
+            ($name-string (symbol->string (syntax->datum #`name)))
+            ($name->datum-string (string-append $name-string "->datum"))
+            ($name->datum (datum->syntax #`name (string->symbol $name->datum-string)))
+            ($fields (syntax->list #`(field ...)))
+            ($field-strings (map symbol->string (map syntax->datum $fields)))
+            ($accessor-strings (map (lambda ($field-string) (string-append $name-string "-" $field-string)) $field-strings))
+            ($accessors (map (partial datum->syntax #`name) (map string->symbol $accessor-strings)))
+            ($datum-strings (map (lambda ($field-string) (string-append $field-string "->datum")) $field-strings))
+            ($datums (map (partial datum->syntax #`name) (map string->symbol $datum-strings)))
+            ($tmp (car (generate-temporaries `(tmp))))
+            #`(define (#,$name->datum #,$tmp)
+              (quasiquote
+                (name
+                  #,@(map 
+                    (lambda ($accessor $datum) #`(unquote (#,$datum (#,$accessor #,$tmp))))
+                    $accessors
+                    $datums)))))))))
 )
