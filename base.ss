@@ -18,8 +18,13 @@
     indexed indexed? indexed-value indexed-index
     throw
 
+    generate-temporary
+    generate-test-temporary
+
     struct-constructor-syntax
-    struct-accessor-syntax)
+    struct-accessor-syntax
+    struct->datum-syntax
+    struct-syntax)
 
   (import (chezscheme))
 
@@ -27,6 +32,9 @@
   (define (writeln x) (write x) (newline))
 
   (define (works? expr) expr #t)
+
+  (define (generate-temporary $obj) (car (generate-temporaries (list $obj))))
+  (define (generate-test-temporary $obj) (syntax->datum $obj))
 
   (define-syntax define-syntax-rule
     (syntax-rules ()
@@ -278,6 +286,33 @@
         (else
           #`(define-syntax-rule (#,$accessor expr) 
             (vector-ref expr #,$index))))))
+
+  (define (struct->datum-syntax $name $fields $generate-temporary)
+    (lets
+      ($name-string (symbol->string (syntax->datum $name)))
+      ($name->datum-string (string-append $name-string "->datum"))
+      ($name->datum (datum->syntax $name (string->symbol $name->datum-string)))
+      ($field-strings (map symbol->string (map syntax->datum $fields)))
+      ($accessor-strings (map (lambda ($field-string) (string-append $name-string "-" $field-string)) $field-strings))
+      ($accessors (map (partial datum->syntax #`name) (map string->symbol $accessor-strings)))
+      ($datum-strings (map (lambda ($field-string) (string-append $field-string "->datum")) $field-strings))
+      ($datums (map (partial datum->syntax $name) (map string->symbol $datum-strings)))
+      ($tmp ($generate-temporary `$expr))
+      #`(define (#,$name->datum #,$tmp)
+        (quasiquote
+          (#,$name
+            #,@(map 
+              (lambda ($accessor $datum) #`(unquote (#,$datum (#,$accessor #,$tmp))))
+              $accessors
+              $datums))))))
+
+  (define (struct-syntax $name $fields $generate-temporary)
+    (lets
+      ($size (length $fields))
+      #`(begin
+        #,(struct-constructor-syntax $name $fields)
+        #,@(map (partial struct-accessor-syntax $name $fields) (indices $size))
+        #,(struct->datum-syntax $name $fields $generate-temporary))))
 
   ; --------------------------------------
 

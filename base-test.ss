@@ -60,12 +60,14 @@
 (check 
   (equal? 
     (syntax->datum (struct-constructor-syntax #`foo (list #`string #`number)))
-    `(define-syntax-rule (foo string number) (cons string number))))
+    `(define-syntax-rule (foo string number) 
+      (cons string number))))
 
 (check 
   (equal? 
-    (syntax->datum (struct-constructor-syntax #`foo (list #`string #`number #`boolean)))
-    `(define-syntax-rule (foo string number boolean) (vector string number boolean))))
+    (syntax->datum (struct-constructor-syntax #`foo (list #`string #`number #`bar)))
+    `(define-syntax-rule (foo string number bar) 
+      (vector string number bar))))
 
 ; === struct-accessor-syntax ===
 
@@ -86,15 +88,60 @@
 
 (check 
   (equal? 
-    (syntax->datum (struct-accessor-syntax #`foo (list #`string #`number #`boolean) 0))
+    (syntax->datum (struct-accessor-syntax #`foo (list #`string #`number #`bar) 0))
     `(define-syntax-rule (foo-string expr) (vector-ref expr 0))))
 
 (check 
   (equal? 
-    (syntax->datum (struct-accessor-syntax #`foo (list #`string #`number #`boolean) 1))
+    (syntax->datum (struct-accessor-syntax #`foo (list #`string #`number #`bar) 1))
     `(define-syntax-rule (foo-number expr) (vector-ref expr 1))))
 
 (check 
   (equal? 
-    (syntax->datum (struct-accessor-syntax #`foo (list #`string #`number #`boolean) 2))
-    `(define-syntax-rule (foo-boolean expr) (vector-ref expr 2))))
+    (syntax->datum (struct-accessor-syntax #`foo (list #`string #`number #`bar) 2))
+    `(define-syntax-rule (foo-bar expr) (vector-ref expr 2))))
+
+; === struct->datum-syntax ===
+
+(check 
+  (equal? 
+    (syntax->datum (struct->datum-syntax #`foo (list) generate-test-temporary))
+    `(define (foo->datum $expr) `(foo))))
+
+(check 
+  (equal? 
+    (syntax->datum (struct->datum-syntax #`foo (list #`string) generate-test-temporary))
+    `(define (foo->datum $expr) 
+      `(foo 
+        ,(string->datum (foo-string $expr))))))
+
+(check 
+  (equal? 
+    (syntax->datum (struct->datum-syntax #`foo (list #`string #`number) generate-test-temporary))
+    `(define (foo->datum $expr) 
+      `(foo 
+        ,(string->datum (foo-string $expr))
+        ,(number->datum (foo-number $expr))))))
+
+(check 
+  (equal? 
+    (syntax->datum (struct->datum-syntax #`foo (list #`string #`number #`bar) generate-test-temporary))
+    `(define (foo->datum $expr) 
+      `(foo 
+        ,(string->datum (foo-string $expr))
+        ,(number->datum (foo-number $expr))
+        ,(bar->datum (foo-bar $expr))))))
+
+; === struct->syntax ===
+
+(check 
+  (equal? 
+    (syntax->datum (struct-syntax #`foo (list #`string #`number) generate-test-temporary))
+    `(begin 
+      (define-syntax-rule (foo string number) (cons string number)) 
+      (define-syntax-rule (foo-string expr) (car expr))
+      (define-syntax-rule (foo-number expr) (cdr expr)) 
+      (define (foo->datum $expr) 
+        `(foo 
+          ,(string->datum (foo-string $expr))
+          ,(number->datum (foo-number $expr)))))))
