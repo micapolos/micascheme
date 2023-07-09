@@ -28,9 +28,9 @@
 
 ; === if ===
 
-; (check-parse
-;   (if #t "foo" "bar")
-;   (typed (conditional #t "foo" "bar") string!))
+(check-parse
+  (if #t "foo" "bar")
+  (typed (conditional #t "foo" "bar") string!))
 
 ; === types ===
 

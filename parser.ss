@@ -152,7 +152,7 @@
     (lets
       ($typed (env-parse $env $phase $stx))
       ($type (typed-type $typed))
-      (if (matches? $as-type $typed)
+      (if (matches? $as-type $type)
         (typed (typed-value $typed) $as-type)
         (syntax-error $stx
           (format "should be ~s, is ~s:" $as-type $type)))))
