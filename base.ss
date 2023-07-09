@@ -294,7 +294,7 @@
       ($name->datum (datum->syntax $name (string->symbol $name->datum-string)))
       ($field-strings (map symbol->string (map syntax->datum $fields)))
       ($accessor-strings (map (lambda ($field-string) (string-append $name-string "-" $field-string)) $field-strings))
-      ($accessors (map (partial datum->syntax #`name) (map string->symbol $accessor-strings)))
+      ($accessors (map (partial datum->syntax $name) (map string->symbol $accessor-strings)))
       ($datum-strings (map (lambda ($field-string) (string-append $field-string "->datum")) $field-strings))
       ($datums (map (partial datum->syntax $name) (map string->symbol $datum-strings)))
       ($tmp ($generate-temporary `$expr))
