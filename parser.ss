@@ -221,7 +221,7 @@
           ($result-type (env-parse-type $env $result))
           ($param-types (map (partial env-parse-type $env) $params))
           ($arity (length $params))
-          ($function-type (function-type `recurse $param-types $result-type))
+          ($function-type (function-type $name $param-types $result-type))
           ($body-env (append (reverse $param-types) (cons $function-type $env)))
           ($typed-body (env-parse $body-env $phase $body))
           ($body-term (typed-value $typed-body))

@@ -97,14 +97,16 @@
 
 ; === fib
 
-; (check
-;   (equal?
-;     (leo
-;       (use
-;         ((native < (function (< number number) boolean))
-;          (native + (function (+ number number) number))
-;          (native - (function (- number number) number)))
-;         (recursive number
-;           (function (fib number)
-;             (if (< number 2) number (+ (fib (- number 2)) (fib (- number 1))))))))
-;     "3 apples"))
+(check
+  (equal?
+    (leo
+      (use
+        ((native < (function (< number number) boolean))
+         (native + (function (+ number number) number))
+         (native - (function (- number number) number)))
+        (use
+          ((recursive number
+            (function (fib number)
+              (if (< number 2) number (+ (fib (- number 2)) (fib (- number 1)))))))
+          (fib 10))))
+    55))
