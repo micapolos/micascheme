@@ -19,10 +19,8 @@
     pair pair-first pair-second
     vector-get
 
-    tuple tuple? tuple-items tuple!
-    tuple-ref tuple-ref? tuple-ref-size tuple-ref-tuple tuple-ref-index
     tuple-type tuple-type? tuple-type-name tuple-type-types
-
+    
     choice-type choice-type? choice-type-types
 
     universe universe? universe-depth
@@ -56,8 +54,6 @@
 
   (data (vector-get vector index))
 
-  (data (tuple items))
-  (data (tuple-ref size tuple index))
   (data (tuple-type name types))
 
   (data (choice-type types))
@@ -99,8 +95,6 @@
       ((pair-second? $pair-second) (depth-pair-second->datum $depth $pair-second))
       ((vector? $vector) (depth-vector->datum $depth $vector))
       ((vector-get? $vector-get) (depth-vector-get->datum $depth $vector-get))
-      ((tuple? $tuple) (depth-tuple->datum $depth $tuple))
-      ((tuple-ref? $tuple-ref) (depth-tuple-ref->datum $depth $tuple-ref))
       ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
       ((choice-type? $choice-type) (depth-choice-type->datum $depth $choice-type))
       ((else _) (throw depth-term->datum $depth $term))))
@@ -163,26 +157,6 @@
   (define (depth-pair-second->datum $depth $pair-second)
     `(cdr ,(depth-term->datum $depth (pair-second-pair $pair-second))))
 
-  (define (depth-tuple->datum $depth $tuple)
-    (lets
-      ($items (depth-terms->datums $depth (tuple-items $tuple)))
-      ($size (length $items))
-      (case $size
-        ((0) #f)
-        ((1) (car $items))
-        ((2) `(cons ,(car $items) ,(cadr $items)))
-        (else `(vector ,@$items)))))
-
-  (define (depth-tuple-ref->datum $depth $tuple-ref)
-    (lets
-      ($size (tuple-ref-size $tuple-ref))
-      ($tuple (depth-term->datum $depth (tuple-ref-tuple $tuple-ref)))
-      ($index (tuple-ref-index $tuple-ref))
-      (case $size
-        ((1) $tuple)
-        ((2) `(,(if (= $index 0) `car `cdr) ,$tuple))
-        (else `(vector-ref ,$tuple ,$index)))))
-
   (define (depth-tuple-type->datum $depth $tuple-type)
     `(tuple-type
       (quote ,(tuple-type-name $tuple-type))
@@ -220,9 +194,6 @@
 
   (define-syntax-rule (function-type! (name arg ...) result)
     (function-type (quote name) (list arg ...) result))
-
-  (define-syntax-rule (tuple! arg ...)
-    (tuple (list arg ...)))
 
   (define-syntax-rule (tuple-type! (name arg ...))
     (tuple-type (quote name) (list arg ...)))
