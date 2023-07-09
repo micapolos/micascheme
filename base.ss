@@ -16,8 +16,7 @@
     map-find-indexed
     map-indexed list-indexed
     indexed indexed? indexed-value indexed-index
-    throw
-    define-data-constructor)
+    throw)
 
   (import (chezscheme))
 
@@ -250,20 +249,6 @@
       ((= $count 0) $item)
       (else (iterate $proc ($proc $item) (- $count 1)))))
 
-  ; --------------------------------------
-
-  (define-syntax define-data-constructor 
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ (name field ...))
-          (lets
-            ($fields (syntax->list #`(field ...)))
-            #`(define (name field ...)
-              #,(case (length $fields)
-                ((0) #f)
-                ((1) (car $fields))
-                ((2) #`(cons #,(car $fields) #,(cadr $fields)))
-                (else #`(vector #,@$fields)))))))))
 
   ; --------------------------------------
 
