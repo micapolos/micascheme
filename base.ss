@@ -27,7 +27,8 @@
     struct->datum-syntax
     struct-syntax
 
-    one-of-constructor-syntax)
+    one-of-constructor-syntax
+    one-of-switch-syntax)
 
   (import (chezscheme))
 
@@ -346,15 +347,35 @@
       #`(define-syntax #,$name
         (syntax-rules (not #,@$cases) #,@$rules))))
 
-  ; (define (one-of-switch-syntax $name $cases $generate-temporary)
-  ;   (lets
-  ;     ($name-string (symbol->string (syntax->datum $name)))
-  ;     ($switch (datum->syntax $name (symbol->string (string-append $name-string "-switch"))))
-  ;     ($one-of-tmp (generate-temporary `one-of))
-  ;     #`(define-syntax-rules 
-  ;       (#,$switch $,$one-of-tmp)
-  ;       (index-switch))))
-
+  (define (one-of-switch-syntax $name $cases $generate-temporary)
+    (lets
+      ($name-string (symbol->string (syntax->datum $name)))
+      ($switch (build-identifier ($string $name) (string-append $string "-switch")))
+      ($one-of ($generate-temporary #`one-of))
+      ($index ($generate-temporary #`index))
+      ($value ($generate-temporary #`value))
+      ($case-pred (lambda ($case) (build-identifier ($string $case) (string-append $string "?"))))
+      ($tmps (map $generate-temporary $cases))
+      ($index-tmp (lambda ($index) (list-ref $tmps $index)))
+      ($case-body (lambda ($case) (build-identifier ($string $case) (string-append $string "-body"))))
+      ($case-pattern (lambda ($index $case) #`(#,($case-pred $case) #,($index-tmp $index))))
+      ($case-rule (lambda ($index $case) #`(#,($case-pattern $index $case) #,($case-body $case))))
+      #`(define-syntax #,$switch
+        (syntax-rules (#,@(map $case-pred $cases))
+          ((_ one-of #,@(map-indexed $case-rule $cases))
+            (lets
+              (#,$one-of one-of)
+              (#,$index (car #,$one-of))
+              (#,$value (cdr #,$one-of))
+              (case #,$index
+                #,@(map-indexed 
+                  (lambda ($case-index $case)
+                    #`((#,$case-index) 
+                      (lets
+                        (#,($index-tmp $case-index) #,$value)
+                        #,($case-body $case))))
+                  $cases))))))))
+  
   ; --------------------------------------
 
   (data (foo a b))

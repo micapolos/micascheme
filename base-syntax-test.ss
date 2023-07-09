@@ -29,10 +29,34 @@
 (check (equal? (struct2->datum (struct2 "foo" 128)) `(struct2 "foo" 128)))
 (check (equal? (struct3->datum (struct3 "foo" 128 (struct0))) `(struct3 "foo" 128 (struct0))))
 
-; === define-one-of-constructor ===
+; === define-one-of ===
 
-(define-one-of-constructor (one-of-3 string number struct0))
+(define-one-of (one-of-3 string number struct0))
 
 (check (equal? (one-of-3 "foo" (not number) (not struct0)) (cons 0 "foo")))
 (check (equal? (one-of-3 (not string) 128 (not struct0)) (cons 1 128)))
 (check (equal? (one-of-3 (not string) (not number) (struct0)) (cons 2 (struct0))))
+
+(check 
+  (equal? 
+    (one-of-3-switch (one-of-3 "foo" (not number) (not struct0))
+      ((string? $string) (string-append "string " $string))
+      ((number? $number) (string-append "number " (number->string $number)))
+      ((struct0? $struct0) "struct0"))
+    "string foo"))
+
+(check 
+  (equal? 
+    (one-of-3-switch (one-of-3 (not string) 128 (not struct0))
+      ((string? $string) (string-append "string " $string))
+      ((number? $number) (string-append "number " (number->string $number)))
+      ((struct0? $struct0) "struct0"))
+    "number 128"))
+
+(check 
+  (equal? 
+    (one-of-3-switch (one-of-3 (not string) (not number) (struct0))
+      ((string? $string) (string-append "string " $string))
+      ((number? $number) (string-append "number " (number->string $number)))
+      ((struct0? $struct0) "struct0"))
+    "struct0"))

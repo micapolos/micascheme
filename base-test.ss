@@ -176,3 +176,22 @@
         ((_ (not string) $number (not bar)) (cons 1 $number)) 
         ((_ (not string) (not number) $bar) (cons 2 $bar))))))
 
+; === one-of-switch-syntax ===
+
+(check 
+  (equal? 
+    (syntax->datum (one-of-switch-syntax #`foo (list #`string #`number #`bar) generate-test-temporary))
+    `(define-syntax foo-switch 
+      (syntax-rules (string? number? bar?) 
+        ((_ one-of 
+          ((string? $string) string-body) 
+          ((number? $number) number-body) 
+          ((bar? $bar) bar-body))
+        (lets 
+          ($one-of one-of) 
+          ($index (car $one-of)) 
+          ($value (cdr $one-of)) 
+          (case $index 
+            ((0) (lets ($string $value) string-body)) 
+            ((1) (lets ($number $value) number-body)) 
+            ((2) (lets ($bar $value) bar-body)))))))))

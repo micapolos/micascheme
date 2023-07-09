@@ -1,14 +1,12 @@
 (library (base-syntax)
   (export
     index-switch
+    
     boolean->datum
     number->datum
-    string->datum 
-    define-struct
+    string->datum
 
-    define-one-of-constructor
-    define-one-of-switch
-    define-one-of->datum
+    define-struct
     define-one-of)
 
   (import (chezscheme) (base))
@@ -49,19 +47,13 @@
     (lambda (stx)
       (syntax-case stx ()
         ((_ (name case ...))
-          "foo"))))
-
-  (define-syntax define-one-of->datum
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ (name case ...))
-          "foo"))))
+          (one-of-switch-syntax 
+            #`name
+            (syntax->list #`(case ...))
+            generate-temporary)))))
 
   (define-syntax-rule (define-one-of name case ...)
     (begin
       (define-one-of-constructor name case ...)
-      (define-one-of-switch name case ...)
-      (define-one-of->datum name case ...)))
-
-
+      (define-one-of-switch name case ...)))
 )
