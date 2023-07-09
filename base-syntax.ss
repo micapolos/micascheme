@@ -1,15 +1,18 @@
 (library (base-syntax)
   (export
     index-switch
-    define-data-constructor
-    define-data-accessors
+    define-struct-constructor
+    define-struct-accessors
     boolean->datum
     number->datum
     string->datum 
-    define-data->datum
-    define-data
+    define-struct->datum
+    define-struct
 
-    define-one-of-constructor)
+    define-one-of-constructor
+    define-one-of-switch
+    define-one-of->datum
+    define-one-of)
 
   (import (chezscheme) (base))
 
@@ -23,7 +26,7 @@
               (syntax->list #`(branch ...)))
             (else default))))))
 
-  (define-syntax define-data-constructor 
+  (define-syntax define-struct-constructor 
     (lambda (stx)
       (syntax-case stx ()
         ((_ (name field ...))
@@ -36,7 +39,7 @@
                 ((2) #`(cons #,(car $fields) #,(cadr $fields)))
                 (else #`(vector #,@$fields)))))))))
 
-  (define-syntax define-data-accessors
+  (define-syntax define-struct-accessors
     (lambda (stx)
       (syntax-case stx ()
         ((_ (name field ...))
@@ -64,7 +67,7 @@
   (define-syntax-rule (number->datum $number) $number)
   (define-syntax-rule (string->datum $string) $string)
 
-  (define-syntax define-data->datum 
+  (define-syntax define-struct->datum 
     (lambda (stx)
       (syntax-case stx ()
         ((_ (name field ...))
@@ -87,11 +90,11 @@
                     $accessors
                     $datums)))))))))
 
-  (define-syntax-rule (define-data name field ...)
+  (define-syntax-rule (define-struct name field ...)
     (begin
-      (define-data-constructor name field ...)
-      (define-data-accessors name field ...)
-      (define-data->datum name field ...)))
+      (define-struct-constructor name field ...)
+      (define-struct-accessors name field ...)
+      (define-struct->datum name field ...)))
 
   (define-syntax define-one-of-constructor
     (lambda (stx)
@@ -116,5 +119,24 @@
             #`(define-syntax name
               (syntax-rules (not case ...) 
                 #,@$rules)))))))
+
+  (define-syntax define-one-of-switch
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ (name case ...))
+          "foo"))))
+
+  (define-syntax define-one-of->datum
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ (name case ...))
+          "foo"))))
+
+  (define-syntax-rule (define-one-of name case ...)
+    (begin
+      (define-one-of-constructor name case ...)
+      (define-one-of-switch name case ...)
+      (define-one-of->datum name case ...)))
+
 
 )
