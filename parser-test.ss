@@ -70,25 +70,25 @@
 (check
   (obj=?
     (parse! (foo))
-    (typed (tuple!) (tuple-type! (foo)))))
+    (typed #f (tuple-type! (foo)))))
 
 (check
   (obj=?
     (parse! (foo 10))
-    (typed (tuple! 10) (tuple-type! (foo number!)))))
+    (typed 10 (tuple-type! (foo number!)))))
 
 (check
   (obj=?
     (parse! (foo 10 "bar"))
     (typed
-      (tuple! 10 "bar")
+      (cons 10 "bar")
       (tuple-type! (foo number! string!)))))
 
 (check
   (obj=?
     (parse! (foo 10 "bar" 20))
     (typed
-      (tuple! 10 "bar" 20)
+      (vector 10 "bar" 20)
       (tuple-type! (foo number! string! number!)))))
 
 ; === tuple-ref ===
@@ -96,32 +96,32 @@
 (check
   (obj=?
     (parse! (number (point 10)))
-    (typed (tuple-ref 1 (tuple! 10) 0) number!)))
+    (typed 10 number!)))
 
 (check
   (obj=?
     (parse! (number (point 10 "foo")))
-    (typed (tuple-ref 2 (tuple! 10 "foo") 0) number!)))
+    (typed (pair-first (cons 10 "foo")) number!)))
 
 (check
   (obj=?
     (parse! (string (point 10 "foo")))
-    (typed (tuple-ref 2 (tuple! 10 "foo") 1) string!)))
+    (typed (pair-second (cons 10 "foo")) string!)))
 
 (check
   (obj=?
     (parse! (number (point 10 "foo" #t)))
-    (typed (tuple-ref 3 (tuple! 10 "foo" #t) 0) number!)))
+    (typed (vector-get (vector 10 "foo" #t) 0) number!)))
 
 (check
   (obj=?
     (parse! (string (point 10 "foo" #t)))
-    (typed (tuple-ref 3 (tuple! 10 "foo" #t) 1) string!)))
+    (typed (vector-get (vector 10 "foo" #t) 1) string!)))
 
 (check
   (obj=?
     (parse! (boolean (point 10 "foo" #t)))
-    (typed (tuple-ref 3 (tuple! 10 "foo" #t) 2) boolean!)))
+    (typed (vector-get (vector 10 "foo" #t) 2) boolean!)))
 
 ; === select ===
 
@@ -167,7 +167,7 @@
     (parse! (function (id number string) (done string number)))
     (typed
       (function 2 
-        (tuple! (variable 0) (variable 1)))
+        (cons (variable 0) (variable 1)))
       (function-type! 
         (id number! string!) 
         (tuple-type! (done string! number!))))))
