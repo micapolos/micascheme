@@ -97,7 +97,7 @@
          (native >= (function (>= number number) boolean))
          (native + (function (+ number number) number))
          (native - (function (- number number) number))
-         (native = (function (= string string) boolean))
+         (native string=? (function (= string string) boolean))
          (native string-length (function (length string) number))
          (native number->string (function (string number) string))
          (native string-append (function (append string string) string)))
