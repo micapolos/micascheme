@@ -20,6 +20,7 @@
 
     generate-temporary
     generate-test-temporary
+    build-identifier
 
     struct-constructor-syntax
     struct-accessor-syntax
@@ -49,6 +50,11 @@
         (define-syntax name
           (syntax-rules ()
             ((_ param ...) body))))))
+
+  (define-syntax-rule (build-identifier ($var $id) $body)
+    (datum->syntax $id
+      (string->symbol 
+        (lets ($var (symbol->string (syntax->datum $id))) $body))))
 
   (define-syntax-rule (lets decl ... body)
     (let* (decl ...) body))
@@ -341,6 +347,15 @@
           $tmps))
       #`(define-syntax #,$name
         (syntax-rules (not #,@$cases) #,@$rules))))
+
+  ; (define (one-of-switch-syntax $name $cases $generate-temporary)
+  ;   (lets
+  ;     ($name-string (symbol->string (syntax->datum $name)))
+  ;     ($switch (datum->syntax $name (symbol->string (string-append $name-string "-switch"))))
+  ;     ($one-of-tmp (generate-temporary `one-of))
+  ;     #`(define-syntax-rules 
+  ;       (#,$switch $,$one-of-tmp)
+  ;       (index-switch))))
 
   ; --------------------------------------
 

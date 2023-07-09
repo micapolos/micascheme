@@ -5,6 +5,10 @@
 (check (equal? (lets 1) 1))
 (check (equal? (lets (x 1) (y (+ x 2)) y) 3))
 
+; === build-identifier ===
+
+(check (equal? (syntax->datum (build-identifier (s #`dupa) (string-append s "-jasiu"))) `dupa-jasiu))
+
 ; === associ ===
 
 (check (equal? (associ (list) 100 `a) #f))
