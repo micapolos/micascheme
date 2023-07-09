@@ -172,6 +172,18 @@
         (id number! string!) 
         (tuple-type! (done string! number!))))))
 
+; === recursive function ===
+
+(check
+  (obj=?
+    (parse! 
+      (recursive string
+        (function (id number string) string)))
+    (typed
+      (recursive 
+        (function 2 (variable 0)))
+      (function-type! (id number! string!) string!))))
+
 ; === use / get ===
 
 (check

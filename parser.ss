@@ -176,7 +176,7 @@
           (format "should be universe 0:")))))
 
   (define (env-parse $env $phase $stx)
-    (syntax-case $stx (native boolean number string function function-type use type select switch)
+    (syntax-case $stx (native boolean number string recursive function function-type use type select switch)
       ((native $value $type)
         (typed 
           (native (syntax->datum #`$value))
@@ -211,6 +211,24 @@
           ($body-type (typed-type $typed-body))
           (typed
             (function $arity $body-term)
+            (function-type $name $param-types $body-type))))
+      ((recursive result (function (name param ...) body))
+        (lets
+          ($result #`result)
+          ($name (syntax->datum #`name))
+          ($params (syntax->list #`(param ...)))
+          ($body #`body)
+          ($result-type (env-parse-type $env $result))
+          ($param-types (map (partial env-parse-type $env) $params))
+          ($arity (length $params))
+          ($function-type (function-type `recurse $param-types $result-type))
+          ($body-env (append (reverse $param-types) (cons $function-type $env)))
+          ($typed-body (env-parse $body-env $phase $body))
+          ($body-term (typed-value $typed-body))
+          ($body-type (typed-type $typed-body))
+          ($unused (unless (matches? $result-type $body-type) (syntax-error $stx "recursive type mismatch")))
+          (typed
+            (recursive (function $arity $body-term))
             (function-type $name $param-types $body-type))))
       ((use (expr ...) body)
         (lets
@@ -350,3 +368,4 @@
           (environment `(micascheme) `(term) `(type)))
         $type)))
 )
+
