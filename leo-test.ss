@@ -50,7 +50,23 @@
 
 ; === switch ===
 
-(check-leo (switch (select (not boolean) (not number) "foo") "boolean" "number" string) "foo")
+(check-leo 
+  (switch 
+    (select #t (not number) (not string)) 
+    "boolean" "number" string) 
+  "boolean")
+
+(check-leo 
+  (switch 
+    (select (not boolean) 128 (not string))
+    "boolean" "number" string) 
+  "number")
+
+(check-leo 
+  (switch 
+    (select (not boolean) (not number) "foo") 
+    "boolean" "number" string) 
+  "foo")
 
 ; === use / get
 
