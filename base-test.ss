@@ -44,3 +44,15 @@
 (let (($fn (lambda (s) (string-append s "!"))))
   (check (equal? (iterate $fn "Hello" 0) "Hello"))
   (check (equal? (iterate $fn "Hello" 3) "Hello!!!")))
+
+; === define-data-constructor ===
+
+(define-data-constructor (tuple0))
+(define-data-constructor (tuple1 field1))
+(define-data-constructor (tuple2 field1 field2))
+(define-data-constructor (tuple3 field1 field2 field3))
+
+(check (equal? (tuple0) #f))
+(check (equal? (tuple1 "foo") "foo"))
+(check (equal? (tuple2 "foo" 128) (cons "foo" 128)))
+(check (equal? (tuple3 "foo" 128 #t) (vector "foo" 128 #t)))
