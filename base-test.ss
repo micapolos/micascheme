@@ -145,3 +145,30 @@
         `(foo 
           ,(string->datum (foo-string $expr))
           ,(number->datum (foo-number $expr)))))))
+
+; === one-of-constructor-syntax ===
+
+(check 
+  (equal? 
+    (syntax->datum (one-of-constructor-syntax #`foo (list #`string) generate-test-temporary))
+    `(define-syntax name 
+      (syntax-rules (not string) 
+        ((_ $string) (cons 0 $string))))))
+
+(check 
+  (equal? 
+    (syntax->datum (one-of-constructor-syntax #`foo (list #`string #`number) generate-test-temporary))
+    `(define-syntax name 
+      (syntax-rules (not string number) 
+        ((_ $string (not number)) (cons 0 $string)) 
+        ((_ (not string) $number) (cons 1 $number))))))
+
+(check 
+  (equal? 
+    (syntax->datum (one-of-constructor-syntax #`foo (list #`string #`number #`bar) generate-test-temporary))
+    `(define-syntax name 
+      (syntax-rules (not string number bar) 
+        ((_ $string (not number) (not bar)) (cons 0 $string)) 
+        ((_ (not string) $number (not bar)) (cons 1 $number)) 
+        ((_ (not string) (not number) $bar) (cons 2 $bar))))))
+

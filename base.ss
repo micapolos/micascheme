@@ -24,7 +24,9 @@
     struct-constructor-syntax
     struct-accessor-syntax
     struct->datum-syntax
-    struct-syntax)
+    struct-syntax
+
+    one-of-constructor-syntax)
 
   (import (chezscheme))
 
@@ -33,8 +35,13 @@
 
   (define (works? expr) expr #t)
 
-  (define (generate-temporary $obj) (car (generate-temporaries (list $obj))))
-  (define (generate-test-temporary $obj) (syntax->datum $obj))
+  (define (generate-temporary $obj) 
+    (car (generate-temporaries (list $obj))))
+
+  (define (generate-test-temporary $obj) 
+    (string->symbol 
+      (string-append "$" 
+        (symbol->string (syntax->datum $obj)))))
 
   (define-syntax define-syntax-rule
     (syntax-rules ()
@@ -297,7 +304,7 @@
       ($accessors (map (partial datum->syntax $name) (map string->symbol $accessor-strings)))
       ($datum-strings (map (lambda ($field-string) (string-append $field-string "->datum")) $field-strings))
       ($datums (map (partial datum->syntax $name) (map string->symbol $datum-strings)))
-      ($tmp ($generate-temporary `$expr))
+      ($tmp ($generate-temporary `expr))
       #`(define (#,$name->datum #,$tmp)
         (quasiquote
           (#,$name
@@ -313,6 +320,28 @@
         #,(struct-constructor-syntax $name $fields)
         #,@(map (partial struct-accessor-syntax $name $fields) (indices $size))
         #,(struct->datum-syntax $name $fields $generate-temporary))))
+
+  ; --------------------------------------
+
+  (define (one-of-constructor-syntax $name $cases $generate-temporary)
+    (lets
+      ($size (length $cases))
+      ($tmps (map $generate-temporary $cases))
+      ($rules
+        (map
+          (lambda ($selected-index $tmp)
+            #`(
+              (_ 
+                #,@(map-indexed
+                  (lambda ($index $case)
+                    (if (= $index $selected-index) $tmp #`(not #,$case)))
+                  $cases))
+              (cons #,$selected-index #,$tmp)))
+          (indices $size)
+          $tmps))
+      #`(define-syntax name
+        (syntax-rules (not #,@$cases) 
+          #,@$rules))))
 
   ; --------------------------------------
 
