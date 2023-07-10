@@ -36,6 +36,29 @@
     (typed-tuple! (foo (typed! "bar") (typed! 128) (typed! #t)))
     (typed (vector "bar" 128 #t) (tuple-type! (foo string! number! boolean!)))))
 
+; === typed-choice! ===
+
+(check
+  (obj=?
+    (typed-choice! (typed! "foo"))
+    (typed
+      (cons 0 "foo")
+      (choice-type! string!))))
+
+(check
+  (obj=?
+    (typed-choice! (not number!) (typed! "foo"))
+    (typed
+      (cons 1 "foo")
+      (choice-type! number! string!))))
+
+(check
+  (obj=?
+    (typed-choice! (not boolean!) (not number!) (typed! "foo"))
+    (typed
+      (cons 2 "foo")
+      (choice-type! boolean! number! string!))))
+
 ; === literals ===
 
 (check-parse #t (typed #t boolean!))

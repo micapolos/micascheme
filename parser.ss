@@ -6,8 +6,10 @@
     typed typed? typed-value typed-type typed!
 
     typed-tuple typed-tuple!
-    typed-wrap
+    typed-choice!
 
+    typed-wrap
+    
     ; aux keywords
     boolean number type select)
 
@@ -40,6 +42,27 @@
 
   (define-syntax-rule (typed-tuple! ($name $typed ...))
     (typed-tuple (quote $name) (list $typed ...)))
+
+  (define (typed-choice $options)
+    (lets
+      ($size (length $options))
+      ($types (map option-type $options))
+      ($selection (options-selection $options))
+      (switch $selection
+        ((no-selection? _) (throw typed-choice $options `no-selection))
+        ((multi-selection? _) (throw typed-choice $options `multi-selection))
+        ((selected? $selected)
+          (typed
+            (pair (selected-index $selected) (selected-term $selected))
+            (choice-type $types))))))
+
+  (define-syntax typed-option!
+    (syntax-rules (not) 
+      ((_ (not type)) (option-not type))
+      ((_ typed) (option-the typed))))
+
+  (define-syntax-rule (typed-choice! option ...)
+    (typed-choice (list (typed-option! option) ...)))
 
   ; ----------------------------------------------------------------
 
