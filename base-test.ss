@@ -1,5 +1,11 @@
 (import (chezscheme) (base))
 
+; === single ===
+
+(check (equal? (single (list)) #f))
+(check (equal? (single (list "a")) "a"))
+(check (equal? (single (list "a" "b")) #f))
+
 ; === bind ===
 
 (check (equal? (lets 1) 1))

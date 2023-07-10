@@ -5,10 +5,18 @@
 
     typed typed? typed-value typed-type typed!
 
+    typed-tuple typed-tuple!
+    typed-wrap
+
     ; aux keywords
     boolean number type select)
 
   (import (micascheme) (variable) (term) (type))
+
+  (define-aux-keyword boolean)
+  (define-aux-keyword number)
+  (define-aux-keyword type)
+  (define-aux-keyword select)
 
   (data (typed value type))
 
@@ -21,10 +29,17 @@
             ((number? $number) #`(typed #,$number number!))
             ((string? $string) #`(typed #,$string string!)))))))
 
-  (define-aux-keyword boolean)
-  (define-aux-keyword number)
-  (define-aux-keyword type)
-  (define-aux-keyword select)
+  (define (typed-tuple $name $typed-list)
+    (typed
+      (case (length $typed-list)
+        ((0) #f)
+        ((1) (typed-value (car $typed-list)))
+        ((2) (cons (typed-value (car $typed-list)) (typed-value (cadr $typed-list))))
+        (else (list->vector (map typed-value $typed-list))))
+      (tuple-type $name (map typed-type $typed-list))))
+
+  (define-syntax-rule (typed-tuple! ($name $typed ...))
+    (typed-tuple (quote $name) (list $typed ...)))
 
   ; ----------------------------------------------------------------
 
@@ -362,6 +377,35 @@
         ((0) (no-selection))
         ((1) (car $selections))
         (else (multi-selection)))))
+
+  ; --------------------------------------------------------
+
+  (define (typed-wrap $typed $to-type)
+    (lets
+      ($type (typed-type $typed))
+      ($term (typed-value $typed))
+      (switch $to-type
+        ((choice-type? $to-choice-type)
+          (and-lets
+            ($index (choice-type-index-of $to-choice-type $type))
+            (typed (pair $index $term) $to-choice-type)))
+        ((tuple-type? $to-tuple-type)
+          (and 
+            (tuple-type? $type)
+            (symbol=? (tuple-type-name $type) (tuple-type-name $to-tuple-type))
+            (and-lets 
+              ($single-to-type (single (tuple-type-types $to-tuple-type)))
+              ($single-type (single (tuple-type-types $type)))
+              ($tuple-wrap (typed-wrap $single-type $single-to-type))
+              (typed 
+                (typed-value $tuple-wrap) 
+                (tuple-type 
+                  (tuple-type-name $type) 
+                  (list (typed-type $tuple-wrap)))))))
+        ((else $other) 
+          (and 
+            (obj=? $type $other) 
+            $typed)))))
   
   ; --------------------------------------------------------
 

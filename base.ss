@@ -1,5 +1,6 @@
 (library (base)
   (export 
+    single
     and-lets lets
     works?
     check
@@ -38,6 +39,12 @@
   (define (writeln x) (write x) (newline))
 
   (define (works? expr) expr #t)
+
+  (define (single $list)
+    (and 
+      (pair? $list) 
+      (null? (cdr $list)) 
+      (car $list)))
 
   (define (generate-temporary $obj) 
     (car (generate-temporaries (list $obj))))
