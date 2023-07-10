@@ -6,7 +6,7 @@
 
 (check 
   (equal? 
-    (type-term (tuple-type! (foo string! number!)))
+    (type-term (tuple-type! foo string! number!))
     (cons 3 (cons `foo (list (type-term string!) (type-term number!))))))
 
 (check 

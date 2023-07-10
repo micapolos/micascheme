@@ -19,22 +19,22 @@
 (check 
   (obj=? 
     (typed-tuple! (foo))
-    (typed #f (tuple-type! (foo)))))
+    (typed #f (tuple-type! foo))))
 
 (check 
   (obj=? 
     (typed-tuple! (foo (typed! "bar")))
-    (typed "bar" (tuple-type! (foo string!)))))
+    (typed "bar" (tuple-type! foo string!))))
 
 (check 
   (obj=? 
     (typed-tuple! (foo (typed! "bar") (typed! 128)))
-    (typed (cons "bar" 128) (tuple-type! (foo string! number!)))))
+    (typed (cons "bar" 128) (tuple-type! foo string! number!))))
 
 (check 
   (obj=? 
     (typed-tuple! (foo (typed! "bar") (typed! 128) (typed! #t)))
-    (typed (vector "bar" 128 #t) (tuple-type! (foo string! number! boolean!)))))
+    (typed (vector "bar" 128 #t) (tuple-type! foo string! number! boolean!))))
 
 ; === typed-choice! ===
 
@@ -98,23 +98,23 @@
 
 (check-parse 
   (foo) 
-  (typed #f (tuple-type! (foo))))
+  (typed #f (tuple-type! foo)))
 
 (check-parse 
   (foo 10) 
-  (typed 10 (tuple-type! (foo number!))))
+  (typed 10 (tuple-type! foo number!)))
 
 (check-parse
   (foo 10 "bar")
   (typed
     (cons 10 "bar")
-    (tuple-type! (foo number! string!))))
+    (tuple-type! foo number! string!)))
 
 (check-parse
   (foo 10 "bar" 20)
   (typed
     (vector 10 "bar" 20)
-    (tuple-type! (foo number! string! number!))))
+    (tuple-type! foo number! string! number!)))
 
 ; === tuple-ref ===
 
@@ -183,7 +183,7 @@
       (cons (variable 0) (variable 1)))
     (function-type! 
       (id number! string!) 
-      (tuple-type! (done string! number!)))))
+      (tuple-type! done string! number!))))
 
 ; === recursive function ===
 

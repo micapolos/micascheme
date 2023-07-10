@@ -206,7 +206,7 @@
   (define-syntax-rule (function-type! (name arg ...) result)
     (function-type (quote name) (list arg ...) result))
 
-  (define-syntax-rule (tuple-type! (name arg ...))
+  (define-syntax-rule (tuple-type! name arg ...)
     (tuple-type (quote name) (list arg ...)))
 
   (define-syntax-rule (choice-type! arg ...)
