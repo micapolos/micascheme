@@ -1,6 +1,6 @@
 (library (leo)
   (export leo)
-  (import (micascheme) (variable) (term) (type) (parser))
+  (import (micascheme) (variable) (term) (type) (compiler))
 
   (define-syntax leo
     (lambda (stx)

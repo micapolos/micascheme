@@ -1,4 +1,4 @@
-(library (parser)
+(library (compiler)
   (export 
     parse! parse
     evaluate! evaluate

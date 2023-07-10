@@ -3,7 +3,7 @@
   (variable)
   (term)
   (type) 
-  (parser))
+  (compiler))
 
 (define-syntax-rule (check-parse lhs rhs)
   (check (obj=? (parse! lhs) rhs)))

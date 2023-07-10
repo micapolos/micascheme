@@ -1,4 +1,4 @@
-(import (micascheme) (leo) (variable) (term) (parser))
+(import (micascheme) (leo) (variable) (term) (compiler))
 
 (define-syntax-rule (check-leo $leo $value)
   (check (obj=? (leo $leo) $value)))
