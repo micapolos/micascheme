@@ -200,7 +200,7 @@
   (define-syntax-rule (application! fn arg ...)
     (application fn (list arg ...)))
 
-  (define-syntax-rule (use! (arg ...) body)
+  (define-syntax-rule (use! arg ... body)
     (use (list arg ...) body))
 
   (define-syntax-rule (function-type! (name arg ...) result)

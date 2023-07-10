@@ -68,14 +68,14 @@
 (check-eval (branch! 2 "one" "two" "three") "three")
 
 (check-eval 
-  (use! ((cons 1 "foo"))
-    (use! ((pair-second v0))
+  (use! (cons 1 "foo")
+    (use! (pair-second v0)
       (branch! (pair-first v1) "boolean" "number" v0)))
   "number")
 
 (check-eval 
-  (use! ((cons 2 "foo"))
-    (use! ((pair-second v0))
+  (use! (cons 2 "foo")
+    (use! (pair-second v0)
       (branch! (pair-first v1) "boolean" "number" v0)))
   "foo")
 

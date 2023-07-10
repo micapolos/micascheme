@@ -262,7 +262,7 @@
           (typed
             (recursive (function $arity $body-term))
             (function-type $name $param-types $body-type))))
-      ((use (expr ...) body)
+      ((use expr ... body)
         (lets
           ($exprs (syntax->list #`(expr ...)))
           ($body #`body)
@@ -323,8 +323,8 @@
           ($type (car $case-types))
           ($case-terms (map typed-value $typed-cases))
           (typed
-            (use! ($choice-term) 
-              (use! ((pair-second v0))
+            (use! $choice-term
+              (use! (pair-second v0)
                 (branch (pair-first v1) $case-terms)))
             $type)))
       ((id arg ...) (identifier? #`id)

@@ -169,8 +169,8 @@
       (select (not boolean) (not number) "foo") 
       "boolean" "number" string)
   (typed
-    (use! ((cons 2 "foo"))
-      (use! ((pair-second v0))
+    (use! (cons 2 "foo")
+      (use! (pair-second v0)
         (branch! (pair-first v1) "boolean" "number" v0)))
     string!))
 
@@ -197,7 +197,7 @@
 ; === use / get ===
 
 (check-parse
-  (use ("foo") string)
+  (use "foo" string)
   (typed
     (application! (function 1 (variable 0)) "foo")
     string!))
@@ -206,7 +206,7 @@
 
 (check-parse
   (use 
-    ((native string-length (function (length string) number))) 
+    (native string-length (function (length string) number))
     (length "foo"))
   (typed
     (application!
@@ -234,8 +234,8 @@
   (obj=?
     (evaluate!
       (use
-        ((native string-length (function (length string) number))
-         (native number->string (function (string number) string))
-         (native string-append (function (append string string) string)))
+        (native string-length (function (length string) number))
+        (native number->string (function (string number) string))
+        (native string-append (function (append string string) string))
         (append (string (length "foo")) " apples")))
     (typed "3 apples" string!)))
