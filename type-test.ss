@@ -1,5 +1,6 @@
 (import 
   (micascheme) 
+  (variable)
   (term)
   (type))
 
@@ -83,3 +84,9 @@
 (check (eq? (type-selector-index `(foo ,string! ,number!) `number) 1))
 (check (eq? (type-selector-index `(foo ,string! ,number!) `boolean) #f))
 (check (eq? (type-selector-index string! `string) #f))
+
+; ------------------------------------------
+
+(check (eq? (choice-type-index-of (choice-type! boolean! number!) boolean!) 0))
+(check (eq? (choice-type-index-of (choice-type! boolean! number!) number!) 1))
+(check (eq? (choice-type-index-of (choice-type! boolean! number!) string!) #f))

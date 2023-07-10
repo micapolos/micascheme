@@ -3,7 +3,8 @@
     type-is-static?
     matches? list-matches?
     type-selector type-named?
-    type-selector-index)
+    type-selector-index
+    choice-type-index-of)
 
   (import (micascheme) (variable) (term))
 
@@ -162,4 +163,11 @@
                 (eq? $sub-selector $selector)))
             (cdr $type)))
         (indexed-index $indexed))))
+
+  ; -------------------------------------------------
+
+  (define (choice-type-index-of $choice-type $type)
+    (and-lets 
+      ($indexed (map-find-indexed (partial obj=? $type) (choice-type-types $choice-type)))
+      (indexed-index $indexed)))
 )
