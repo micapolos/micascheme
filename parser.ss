@@ -309,15 +309,17 @@
           ($typed-choice (env-parse $env $phase $choice))
           ($choice-type (typed-type $typed-choice))
           ($choice-term (typed-value $typed-choice))
+          ($choice-types (choice-type-types $choice-type))
           ($cases (syntax->list #`(case ...)))
-          ($typed-cases
+          ($head-typed-case (env-parse (cons (car $choice-types) $env) $phase (car $cases)))
+          ($head-type (typed-type $head-typed-case))
+          ($tail-typed-cases
             (map
-              (lambda ($case $type) (env-parse (cons $type $env) $phase $case))
-              $cases
-              (choice-type-types $choice-type)))
-          ; TODO: Validates $cases are not empty.
+              (lambda ($case $type) (env-parse-as (cons $type $env) $phase $case $head-type))
+              (cdr $cases)
+              (cdr $choice-types)))
+          ($typed-cases (cons $head-typed-case $tail-typed-cases))
           ($case-types (map typed-type $typed-cases))
-          ; TODO: Validate all $case-types are equal.
           ($type (car $case-types))
           ($case-terms (map typed-value $typed-cases))
           (typed
