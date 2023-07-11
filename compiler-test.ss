@@ -20,14 +20,14 @@
 
 ; === native ===
 
-(lets 
+(lets
   ($typed (parse! (native string-length (function (length string) number))))
   ($term (typed-value $typed))
   ($type (typed-type $typed))
-  (begin 
-    (check (obj=? $type (function-type! (length string!) number!)))
+  (begin
     (check (native? $term))
-    (check (equal? (syntax->datum (native-value $term)) `string-length))))
+    (check (symbol=? (syntax->datum (native-value $term)) `string-length))
+    (check (obj=? $type (function-type! (length string!) number!)))))
 
 ; === if ===
 
