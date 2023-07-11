@@ -3,7 +3,7 @@
     single
     and-lets lets
     works?
-    check
+    check checking?
     data partial
     define-aux-keyword define-syntax-rule
     obj=? record=? pair=? vector=? box=?
