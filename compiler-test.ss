@@ -247,17 +247,3 @@
   (obj=?
     (typed-wrap (typed "foo" string!) (choice-type! boolean! number! string!))
     (typed (cons 2 "foo") (choice-type! boolean! number! string!))))
-
-; === evaluate ===
-
-(check (obj=? (evaluate! foo) (typed #f `foo)))
-
-(check
-  (obj=?
-    (evaluate!
-      (use
-        (native string-length (function (length string) number))
-        (native number->string (function (string number) string))
-        (native string-append (function (append string string) string))
-        (append (string (length "foo")) " apples")))
-    (typed "3 apples" string!)))

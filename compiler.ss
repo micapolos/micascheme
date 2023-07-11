@@ -1,7 +1,6 @@
 (library (compiler)
   (export 
     parse! parse
-    evaluate! evaluate
 
     typed typed? typed-value typed-type typed!
 
@@ -457,22 +456,5 @@
           (and 
             (obj=? $type $other) 
             $typed)))))
-  
-  ; --------------------------------------------------------
-
-  (define-syntax evaluate!
-    (syntax-rules ()
-      ((_ expr)
-        (evaluate (phase 0) #'expr))))
-
-  (define (evaluate $phase $stx)
-    (lets
-      ($typed (env-parse (list) $phase $stx))
-      ($term (typed-value $typed))
-      ($type (typed-type $typed))
-      (typed
-        (term-eval $term
-          (environment `(micascheme) `(term) `(type)))
-        $type)))
 )
 

@@ -77,9 +77,6 @@
         (native string-length (function (length string) number))
         (native number->string (function (string number) string))
         (native string-append (function (append string string) string))
-        (native + (function (+ number number) number))
-        (native - (function (- number number) number))
-        (native < (function (< number number) boolean))
         (append (string (length "foo")) " apples")))
     "3 apples"))
 
@@ -110,4 +107,3 @@
               (if (< number 2) number (+ (fib (- number 2)) (fib (- number 1))))))
           (fib 10))))
     55))
-
