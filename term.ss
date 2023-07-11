@@ -74,7 +74,9 @@
 
   (define (env-push $env)
     (cons
-      (build-identifier ($string #`v) (string-append $string (number->string (length $env))))
+      (generate-temporary
+        (build-identifier ($string #`v)
+          (string-append $string (number->string (length $env)))))
       $env))
 
   (define (env-arity-push $env $arity)

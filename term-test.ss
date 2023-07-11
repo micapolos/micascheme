@@ -34,14 +34,14 @@
 
 (check-datum (function-type `foo (list `t1 `t2) `t3) (function-type 'foo (list 't1 't2) 't3))
 
-(check-datum (function 2 `foo) (lambda (v0 v1) 'foo))
-(check-datum (function 2 (variable 0)) (lambda (v0 v1) v1))
-(check-datum (function 2 (variable 1)) (lambda (v0 v1) v0))
+(check-datum (function 2 `foo) (lambda ($v0 $v1) 'foo))
+(check-datum (function 2 (variable 0)) (lambda ($v0 $v1) $v1))
+(check-datum (function 2 (variable 1)) (lambda ($v0 $v1) $v0))
 
-(check-datum (recursive (function 2 `foo)) (rec v0 (lambda (v1 v2) 'foo)))
-(check-datum (recursive (function 2 (variable 0))) (rec v0 (lambda (v1 v2) v2)))
-(check-datum (recursive (function 2 (variable 1))) (rec v0 (lambda (v1 v2) v1)))
-(check-datum (recursive (function 2 (variable 2))) (rec v0 (lambda (v1 v2) v0)))
+(check-datum (recursive (function 2 `foo)) (rec $v0 (lambda ($v1 $v2) 'foo)))
+(check-datum (recursive (function 2 (variable 0))) (rec $v0 (lambda ($v1 $v2) $v2)))
+(check-datum (recursive (function 2 (variable 1))) (rec $v0 (lambda ($v1 $v2) $v1)))
+(check-datum (recursive (function 2 (variable 2))) (rec $v0 (lambda ($v1 $v2) $v0)))
 
 (check-datum (application `foo (list `bar `goo)) ('foo 'bar 'goo))
 

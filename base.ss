@@ -20,7 +20,6 @@
     throw
 
     generate-temporary
-    generate-test-temporary
     build-identifier
 
     struct-constructor-syntax
@@ -47,10 +46,9 @@
       (car $list)))
 
   (define (generate-temporary $obj) 
-    (car (generate-temporaries (list $obj))))
-
-  (define (generate-test-temporary $obj)
-    (build-identifier ($string $obj) (string-append "$" $string)))
+    (if checking?
+      (build-identifier ($string $obj) (string-append "$" $string))
+      (car (generate-temporaries (list $obj)))))
 
   (define-syntax define-syntax-rule
     (syntax-rules ()
@@ -220,6 +218,8 @@
       ((equal? (caar $list) $obj) (cons $index (cdar $list)))
       (else (associ (cdr $list) (+ $index 1) $obj))))
 
+  (define checking? (make-thread-parameter #f))
+
   (define-syntax check
     (lambda (stx)
       (syntax-case stx (not)
@@ -233,7 +233,7 @@
             (ann-string 
             (if ann (format " source: ~a (<line>:<char>)\n" (source-file-descriptor-path (source-object-sfd source))) ""))
             #`(let (#,@let-cases)
-              (or (not (pred #,@tmps))
+              (or (parameterize ((checking? #t)) (not (pred #,@tmps)))
                 (error `check 
                   (format "\n~a   expr: ~s\n  value: ~s\n"
                     #,ann-string
@@ -249,7 +249,7 @@
             (ann-string 
             (if ann (format " source: ~a (<line>:<char>)\n" (source-file-descriptor-path (source-object-sfd source))) ""))
             #`(let (#,@let-cases)
-              (or (pred #,@tmps)
+              (or (parameterize ((checking? #t)) (pred #,@tmps))
                 (error `check 
                   (format "\n~a   expr: ~s\n  value: ~s\n"
                     #,ann-string
@@ -308,7 +308,7 @@
           #`(define-syntax-rule (#,$accessor expr) 
             (vector-ref expr #,$index))))))
 
-  (define (struct->datum-syntax $name $fields $generate-temporary)
+  (define (struct->datum-syntax $name $fields)
     (lets
       ($name-string (symbol->string (syntax->datum $name)))
       ($name->datum-string (string-append $name-string "->datum"))
@@ -318,7 +318,7 @@
       ($accessors (map (partial datum->syntax $name) (map string->symbol $accessor-strings)))
       ($datum-strings (map (lambda ($field-string) (string-append $field-string "->datum")) $field-strings))
       ($datums (map (partial datum->syntax $name) (map string->symbol $datum-strings)))
-      ($tmp ($generate-temporary #`expr))
+      ($tmp (generate-temporary #`expr))
       #`(define (#,$name->datum #,$tmp)
         (quasiquote
           (#,$name
@@ -327,13 +327,13 @@
               $accessors
               $datums))))))
 
-  (define (struct-syntax $name $fields $generate-temporary)
+  (define (struct-syntax $name $fields)
     (lets
       ($size (length $fields))
       #`(begin
         #,(struct-constructor-syntax $name $fields)
         #,@(map (partial struct-accessor-syntax $name $fields) (indices $size))
-        #,(struct->datum-syntax $name $fields $generate-temporary))))
+        #,(struct->datum-syntax $name $fields))))
 
   ; --------------------------------------
 
@@ -350,15 +350,15 @@
       #`(define-syntax-rule (#,$constructor one-of)
         (cons #,$index one-of))))
 
-  (define (one-of-switch-syntax $name $cases $generate-temporary)
+  (define (one-of-switch-syntax $name $cases)
     (lets
       ($name-string (symbol->string (syntax->datum $name)))
       ($switch (build-identifier ($string $name) (string-append $string "-switch")))
-      ($one-of ($generate-temporary #`one-of))
-      ($index ($generate-temporary #`index))
-      ($value ($generate-temporary #`value))
+      ($one-of (generate-temporary #`one-of))
+      ($index (generate-temporary #`index))
+      ($value (generate-temporary #`value))
       ($case-pred (lambda ($case) (build-identifier ($string $case) (string-append $string "?"))))
-      ($tmps (map $generate-temporary $cases))
+      ($tmps (map generate-temporary $cases))
       ($index-tmp (lambda ($index) (list-ref $tmps $index)))
       ($case-body (lambda ($case) (build-identifier ($string $case) (string-append $string "-body"))))
       ($case-pattern (lambda ($index $case) #`(#,($case-pred $case) #,($index-tmp $index))))
@@ -379,14 +379,14 @@
                         #,($case-body $case))))
                   $cases))))))))
   
-  (define (one-of->datum-syntax $name $cases $generate-temporary)
+  (define (one-of->datum-syntax $name $cases)
     (lets
       ($name->datum (build-identifier ($string $name) (string-append $string "->datum")))
       ($switch (build-identifier ($string $name) (string-append $string "-switch")))
-      ($tmp ($generate-temporary #`one-of))
+      ($tmp (generate-temporary #`one-of))
       ($case->datum (lambda ($case) (build-identifier ($string $case) (string-append $string "->datum"))))
       ($case-pred (lambda ($case) (build-identifier ($string $case) (string-append $string "?"))))
-      ($tmps (map $generate-temporary $cases))
+      ($tmps (map generate-temporary $cases))
       ($index-tmp (lambda ($index) (list-ref $tmps $index)))
       ($case-pattern (lambda ($index $case) #`(#,($case-pred $case) #,($index-tmp $index))))
       ($case-rule (lambda ($index $case) 
@@ -396,13 +396,13 @@
         (#,$switch #,$tmp 
           #,@(map-indexed $case-rule $cases)))))
 
-  (define (one-of-syntax $name $cases $generate-temporary)
+  (define (one-of-syntax $name $cases)
     (lets
       ($size (length $cases))
       #`(begin
         #,@(map (partial one-of-constructor-syntax $name $cases) (indices $size))
-        #,(one-of-switch-syntax $name $cases $generate-temporary)
-        #,(one-of->datum-syntax $name $cases $generate-temporary))))
+        #,(one-of-switch-syntax $name $cases)
+        #,(one-of->datum-syntax $name $cases))))
 
   ; --------------------------------------
 

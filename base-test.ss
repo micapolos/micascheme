@@ -115,19 +115,19 @@
 
 (check 
   (equal? 
-    (syntax->datum (struct->datum-syntax #`foo (list) generate-test-temporary))
+    (syntax->datum (struct->datum-syntax #`foo (list)))
     `(define (foo->datum $expr) `(foo))))
 
 (check 
   (equal? 
-    (syntax->datum (struct->datum-syntax #`foo (list #`string) generate-test-temporary))
+    (syntax->datum (struct->datum-syntax #`foo (list #`string)))
     `(define (foo->datum $expr) 
       `(foo 
         ,(string->datum (foo-string $expr))))))
 
 (check 
   (equal? 
-    (syntax->datum (struct->datum-syntax #`foo (list #`string #`number) generate-test-temporary))
+    (syntax->datum (struct->datum-syntax #`foo (list #`string #`number)))
     `(define (foo->datum $expr) 
       `(foo 
         ,(string->datum (foo-string $expr))
@@ -135,7 +135,7 @@
 
 (check 
   (equal? 
-    (syntax->datum (struct->datum-syntax #`foo (list #`string #`number #`bar) generate-test-temporary))
+    (syntax->datum (struct->datum-syntax #`foo (list #`string #`number #`bar)))
     `(define (foo->datum $expr) 
       `(foo 
         ,(string->datum (foo-string $expr))
@@ -146,7 +146,7 @@
 
 (check 
   (equal? 
-    (syntax->datum (struct-syntax #`foo (list #`string #`number) generate-test-temporary))
+    (syntax->datum (struct-syntax #`foo (list #`string #`number)))
     `(begin 
       (define-syntax-rule (foo string number) (cons string number)) 
       (define-syntax-rule (foo-string expr) (car expr))
@@ -180,7 +180,7 @@
 
 (check 
   (equal? 
-    (syntax->datum (one-of-switch-syntax #`foo (list #`string #`number #`bar) generate-test-temporary))
+    (syntax->datum (one-of-switch-syntax #`foo (list #`string #`number #`bar)))
     `(define-syntax foo-switch 
       (syntax-rules (string? number? bar?) 
         ((_ one-of 
@@ -200,7 +200,7 @@
 
 (check 
   (equal? 
-    (syntax->datum (one-of->datum-syntax #`foo (list #`string #`number #`bar) generate-test-temporary))
+    (syntax->datum (one-of->datum-syntax #`foo (list #`string #`number #`bar)))
     `(define (foo->datum $one-of)
       (foo-switch $one-of
         ((string? $string) `(foo ,(string->datum $string)))
@@ -211,7 +211,7 @@
 
 (check 
   (equal? 
-    (syntax->datum (one-of-syntax #`foo (list #`string #`number) generate-test-temporary))
+    (syntax->datum (one-of-syntax #`foo (list #`string #`number)))
     `(begin 
       (define-syntax-rule (string-foo one-of) (cons 0 one-of)) 
       (define-syntax-rule (number-foo one-of) (cons 1 one-of)) 
