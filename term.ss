@@ -1,6 +1,6 @@
 (library (term)
   (export
-    native native? native-syntax
+    native native? native-value
 
     function function? function-arity function-body
     recursive recursive? recursive-function
@@ -30,7 +30,7 @@
 
   (import (micascheme) (variable))
 
-  (data (native syntax))
+  (data (native value))
 
   (data (application fn args))
   (data (function arity body))
@@ -113,7 +113,7 @@
       ((else _) (throw env-term->syntax $env $term))))
 
   (define (env-native->syntax $env $native)
-    (native-syntax $native))
+    (native-value $native))
 
   (define (env-variable->syntax $env $variable)
     (list-ref $env (variable-index $variable)))

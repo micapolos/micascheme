@@ -70,7 +70,7 @@
   (define (native-match $env $native $rhs)
     (and 
       (native? $rhs) 
-      (equal? (native-syntax $native) (native-syntax $rhs))
+      (equal? (native-value $native) (native-value $rhs))
       $env))
 
   (define (symbol-match $env $symbol $rhs)
