@@ -23,7 +23,7 @@
     choice-type choice-type? choice-type-types
     universe universe? universe-depth
     
-    term->datum term-eval
+    term->datum term->syntax term-eval
 
     application! function-type! tuple-type! choice-type!
     boolean! number! string! type!)
@@ -67,126 +67,130 @@
   ; --------------------------------------------------
 
   (define (term->datum $term)
-    (depth-term->datum 0 $term))
+    (syntax->datum (depth-term->syntax 0 $term)))
 
-  (define (depth-terms->datums $depth $terms)
-    (map (partial depth-term->datum $depth) $terms))
+  (define (term->syntax $term)
+    (depth-term->syntax 0 $term))
 
-  (define (depth-term->datum $depth $term)
+  (define (depth-terms->syntaxes $depth $terms)
+    (map (partial depth-term->syntax $depth) $terms))
+
+  (define (depth-term->syntax $depth $term)
     (switch $term
-      ((native? $native) (depth-native->datum $depth $native))
+      ((native? $native) (depth-native->syntax $depth $native))
       ((symbol? $symbol) `(quote ,$symbol))
       ((boolean? $string) $string)
       ((number? $number) $number)
       ((string? $string) $string)
-      ((boolean-type? _) `(boolean-type))
-      ((number-type? _) `(number-type))
-      ((string-type? _) `(string-type))
-      ((universe? $universe) `(universe ,(universe-depth $universe)))
-      ((variable? $variable) (depth-variable->datum $depth $variable))
-      ((application? $application) (depth-application->datum $depth $application))
-      ((conditional? $conditional) (depth-conditional->datum $depth $conditional))
-      ((function? $function) (depth-function->datum $depth $function))
-      ((recursive? $recursive) (depth-recursive->datum $depth $recursive))
-      ((function-type? $function-type) (depth-function-type->datum $depth $function-type))
-      ((branch? $branch) (depth-branch->datum $depth $branch))
-      ((pair? $pair) (depth-pair->datum $depth $pair))
-      ((pair-first? $pair-first) (depth-pair-first->datum $depth $pair-first))
-      ((pair-second? $pair-second) (depth-pair-second->datum $depth $pair-second))
-      ((vector? $vector) (depth-vector->datum $depth $vector))
-      ((vector-get? $vector-get) (depth-vector-get->datum $depth $vector-get))
-      ((tuple-type? $tuple-type) (depth-tuple-type->datum $depth $tuple-type))
-      ((choice-type? $choice-type) (depth-choice-type->datum $depth $choice-type))
-      ((else _) (throw depth-term->datum $depth $term))))
+      ((boolean-type? _) #`(boolean-type))
+      ((number-type? _) #`(number-type))
+      ((string-type? _) #`(string-type))
+      ((universe? $universe) #`(universe #,(universe-depth $universe)))
+      ((variable? $variable) (depth-variable->syntax $depth $variable))
+      ((application? $application) (depth-application->syntax $depth $application))
+      ((conditional? $conditional) (depth-conditional->syntax $depth $conditional))
+      ((function? $function) (depth-function->syntax $depth $function))
+      ((recursive? $recursive) (depth-recursive->syntax $depth $recursive))
+      ((function-type? $function-type) (depth-function-type->syntax $depth $function-type))
+      ((branch? $branch) (depth-branch->syntax $depth $branch))
+      ((pair? $pair) (depth-pair->syntax $depth $pair))
+      ((pair-first? $pair-first) (depth-pair-first->syntax $depth $pair-first))
+      ((pair-second? $pair-second) (depth-pair-second->syntax $depth $pair-second))
+      ((vector? $vector) (depth-vector->syntax $depth $vector))
+      ((vector-get? $vector-get) (depth-vector-get->syntax $depth $vector-get))
+      ((tuple-type? $tuple-type) (depth-tuple-type->syntax $depth $tuple-type))
+      ((choice-type? $choice-type) (depth-choice-type->syntax $depth $choice-type))
+      ((else _) (throw depth-term->syntax $depth $term))))
 
-  (define (depth-native->datum $depth $native)
+  (define (depth-native->syntax $depth $native)
     (native-term $native))
 
-  (define (depth-variable->datum $depth $variable)
+  (define (depth-variable->syntax $depth $variable)
     (let (($index (- $depth (variable-index $variable) 1)))
       (if (< $index 0) 
-        (throw depth-variable->datum $depth $variable)
-        (depth->datum $index))))
+        (throw depth-variable->syntax $depth $variable)
+        (depth->syntax $index))))
 
-  (define (depth-application->datum $depth $application)
-    `(
-      ,(depth-term->datum $depth (application-fn $application))
-      ,@(depth-terms->datums $depth (application-args $application))))
+  (define (depth-application->syntax $depth $application)
+    #`(
+      #,(depth-term->syntax $depth (application-fn $application))
+      #,@(depth-terms->syntaxes $depth (application-args $application))))
 
-  (define (depth-conditional->datum $depth $conditional)
-    `(if
-      ,(depth-term->datum $depth (conditional-condition $conditional))
-      ,(depth-term->datum $depth (conditional-consequent $conditional))
-      ,(depth-term->datum $depth (conditional-alternate $conditional))))
+  (define (depth-conditional->syntax $depth $conditional)
+    #`(if
+      #,(depth-term->syntax $depth (conditional-condition $conditional))
+      #,(depth-term->syntax $depth (conditional-consequent $conditional))
+      #,(depth-term->syntax $depth (conditional-alternate $conditional))))
 
-  (define (depth-function->datum $depth $function)
+  (define (depth-function->syntax $depth $function)
     (lets
       ($arity (function-arity $function))
-      `(lambda (,@(depth-size->datums $depth $arity))
-        ,(depth-term->datum
+      #`(lambda (#,@(depth-size->syntaxes $depth $arity))
+        #,(depth-term->syntax
           (+ $depth $arity)
           (function-body $function)))))
 
-  (define (depth-recursive->datum $depth $recursive)
+  (define (depth-recursive->syntax $depth $recursive)
     (lets
       ($function (recursive-function $recursive))
       ($arity (function-arity $function))
       ($body-depth (+ $depth 1))
-      `(rec ,(depth->datum $depth)
-        (lambda (,@(depth-size->datums $body-depth $arity))
-          ,(depth-term->datum
+      #`(rec #,(depth->syntax $depth)
+        (lambda (#,@(depth-size->syntaxes $body-depth $arity))
+          #,(depth-term->syntax
             (+ $body-depth $arity)
             (function-body $function))))))
 
-  (define (depth-function-type->datum $depth $function-type)
-    `(function-type
-      (quote ,(function-type-name $function-type))
-      (list ,@(depth-terms->datums $depth (function-type-params $function-type)))
-      ,(depth-term->datum $depth (function-type-result $function-type))))
+  (define (depth-function-type->syntax $depth $function-type)
+    #`(function-type
+      (quote #,(function-type-name $function-type))
+      (list #,@(depth-terms->syntaxes $depth (function-type-params $function-type)))
+      #,(depth-term->syntax $depth (function-type-result $function-type))))
 
-  (define (depth-branch->datum $depth $branch)
-    `(index-switch 
-      ,(depth-term->datum $depth (branch-index $branch))
-      ,@(depth-terms->datums $depth (branch-cases $branch))))
+  (define (depth-branch->syntax $depth $branch)
+    #`(index-switch
+      #,(depth-term->syntax $depth (branch-index $branch))
+      #,@(depth-terms->syntaxes $depth (branch-cases $branch))))
 
-  (define (depth-vector->datum $depth $vector)
-    `(vector ,@(depth-terms->datums $depth (vector->list $vector))))
+  (define (depth-vector->syntax $depth $vector)
+    #`(vector #,@(depth-terms->syntaxes $depth (vector->list $vector))))
 
-  (define (depth-vector-get->datum $depth $vector-get)
-    `(vector-ref 
-      ,(depth-term->datum $depth (vector-get-vector $vector-get))
-      ,(depth-term->datum $depth (vector-get-index $vector-get))))
+  (define (depth-vector-get->syntax $depth $vector-get)
+    #`(vector-ref
+      #,(depth-term->syntax $depth (vector-get-vector $vector-get))
+      #,(depth-term->syntax $depth (vector-get-index $vector-get))))
 
-  (define (depth-pair->datum $depth $pair)
-    `(cons 
-      ,(depth-term->datum $depth (car $pair))
-      ,(depth-term->datum $depth (cdr $pair))))
+  (define (depth-pair->syntax $depth $pair)
+    #`(cons
+      #,(depth-term->syntax $depth (car $pair))
+      #,(depth-term->syntax $depth (cdr $pair))))
 
-  (define (depth-pair-first->datum $depth $pair-first)
-    `(car ,(depth-term->datum $depth (pair-first-pair $pair-first))))
+  (define (depth-pair-first->syntax $depth $pair-first)
+    #`(car #,(depth-term->syntax $depth (pair-first-pair $pair-first))))
 
-  (define (depth-pair-second->datum $depth $pair-second)
-    `(cdr ,(depth-term->datum $depth (pair-second-pair $pair-second))))
+  (define (depth-pair-second->syntax $depth $pair-second)
+    #`(cdr #,(depth-term->syntax $depth (pair-second-pair $pair-second))))
 
-  (define (depth-tuple-type->datum $depth $tuple-type)
-    `(tuple-type
-      (quote ,(tuple-type-name $tuple-type))
+  (define (depth-tuple-type->syntax $depth $tuple-type)
+    #`(tuple-type
+      (quote #,(tuple-type-name $tuple-type))
       (list
-        ,@(depth-terms->datums
+        #,@(depth-terms->syntaxes
           $depth
           (tuple-type-types $tuple-type)))))
 
-  (define (depth-choice-type->datum $depth $choice-type)
-    `(choice-type
-      (list ,@(depth-terms->datums $depth (choice-type-types $choice-type)))))
+  (define (depth-choice-type->syntax $depth $choice-type)
+    #`(choice-type
+      (list #,@(depth-terms->syntaxes $depth (choice-type-types $choice-type)))))
 
-  (define (depth->datum $depth)
-    (string->symbol 
-      (string-append "v" 
-        (number->string $depth))))
+  (define (depth->syntax $depth)
+    (datum->syntax #`depth->syntax
+      (string->symbol
+        (string-append "v"
+          (number->string $depth)))))
 
-  (define (depth-size->datums $depth $size)
-    (map depth->datum 
+  (define (depth-size->syntaxes $depth $size)
+    (map depth->syntax
       (map (partial + $depth)
         (indices $size))))
 
