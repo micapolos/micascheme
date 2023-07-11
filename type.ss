@@ -6,7 +6,7 @@
     type-selector-index
     choice-type-index-of)
 
-  (import (micascheme) (variable) (term))
+  (import (micascheme) (term))
 
   ; ---------------------------------------------------------
 

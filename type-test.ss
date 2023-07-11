@@ -1,8 +1,4 @@
-(import 
-  (micascheme) 
-  (variable)
-  (term)
-  (type))
+(import (micascheme) (term) (type))
 
 ; --------------------------------------------------------------
 

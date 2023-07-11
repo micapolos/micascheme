@@ -1,6 +1,5 @@
 (import 
   (micascheme) 
-  (variable)
   (term)
   (type) 
   (compiler))

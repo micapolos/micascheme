@@ -2,6 +2,7 @@
   (export
     native native? native-value
 
+    variable variable? variable-index v0 v1 v2
     function function? function-arity function-body
     recursive recursive? recursive-function
     function-type function-type? function-type-name function-type-params function-type-result
@@ -28,9 +29,11 @@
     application! function-type! tuple-type! choice-type!
     boolean! number! string! type!)
 
-  (import (micascheme) (variable))
+  (import (micascheme))
 
   (data (native value))
+
+  (data (variable index))
 
   (data (application fn args))
   (data (function arity body))
@@ -58,6 +61,10 @@
   (data (choice-type types))
   
   ; --------------------------------------------------
+
+  (define v0 (variable 0))
+  (define v1 (variable 1))
+  (define v2 (variable 2))
 
   (define (use $args $body)
     (application 

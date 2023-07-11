@@ -15,7 +15,7 @@
     ; aux keywords
     boolean number type select)
 
-  (import (micascheme) (variable) (term) (type))
+  (import (micascheme) (term) (type))
 
   (define-aux-keyword boolean)
   (define-aux-keyword number)

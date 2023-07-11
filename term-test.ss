@@ -1,4 +1,4 @@
-(import (micascheme) (variable) (term))
+(import (micascheme) (term))
 
 ; === utils ===
 
@@ -6,6 +6,10 @@
   (obj=? 
     (use (list "foo" 128) (variable 0)) 
     (application (function 2 (variable 0)) (list "foo" 128))))
+
+(check (obj=? v0 (variable 0)))
+(check (obj=? v1 (variable 1)))
+(check (obj=? v2 (variable 2)))
 
 ; === term->datum ===
 
