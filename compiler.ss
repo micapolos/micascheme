@@ -7,6 +7,8 @@
 
     typed-tuple typed-tuple!
     typed-choice!
+    typed-function typed-function!
+    typed-application typed-application!
 
     typed-wrap
     
@@ -63,6 +65,22 @@
 
   (define-syntax-rule (typed-choice! option ...)
     (typed-choice (list (typed-option! option) ...)))
+
+  (define (typed-function $name $params $body)
+    (typed
+      (function (length $params) (typed-value $body))
+      (function-type $name $params (typed-type $body))))
+
+  (define-syntax-rule (typed-function! (name param ...) body)
+    (typed-function (quote name) (list param ...) body))
+
+  (define (typed-application $fn $args)
+    (typed
+      (application (typed-value $fn) (map typed-value $args))
+      (function-type-result (typed-type $fn))))
+
+  (define-syntax-rule (typed-application! fn arg ...)
+    (typed-application fn (list arg ...)))
 
   ; ----------------------------------------------------------------
 
@@ -189,13 +207,15 @@
         (syntax-error $stx
           (format "should be ~s, is ~s:" $as-type $type)))))
 
-  (define (env-parse-proc $env $phase $stx)
+  (define (env-parse-function $env $phase $stx)
     (lets
       ($typed (env-parse $env $phase $stx))
+      ($term (typed-value $typed))
       ($type (typed-type $typed))
-      (and (function-type? $type)
+      (if (function-type? $type)
+        (typed $term $type)
         (syntax-error $stx
-          (format "should be procedure, is ~s:" $type)))))
+          (format "should be function, is ~s:" $type)))))
 
   (define (env-parse-type $env $stx)
     (lets
@@ -208,7 +228,7 @@
           (format "should be universe 0:")))))
 
   (define (env-parse $env $phase $stx)
-    (syntax-case $stx (native boolean number string if recursive function function-type use type select switch)
+    (syntax-case $stx (apply native boolean number string if recursive function function-type use type select switch)
       ((native $value $type)
         (typed 
           (native (syntax->datum #`$value))
@@ -244,6 +264,18 @@
           (typed
             (function $arity $body-term)
             (function-type $name $param-types $body-type))))
+      ((apply fn arg ...)
+        (lets
+          ($function #`fn)
+          ($typed-function (env-parse-function $env $phase $function))
+          ($function (typed-value $typed-function))
+          ($function-type (typed-type $typed-function))
+          ($params (function-type-params $function-type))
+          ($args (syntax->list #`(arg ...)))
+          ($typed-args (map (partial env-parse-as $env $phase) $args $params))
+          (typed
+            (application $function (map typed-value $typed-args))
+            (function-type-result $function-type))))
       ((recursive result (function (name param ...) body))
         (lets
           ($result #`result)

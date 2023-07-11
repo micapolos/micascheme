@@ -59,6 +59,15 @@
       (cons 2 "foo")
       (choice-type! boolean! number! string!))))
 
+; === typed-function ===
+
+(check
+  (obj=?
+    (typed-function! (foo string! number!) (typed! #t))
+    (typed
+      (function 2 #t)
+      (function-type! (foo string! number!) boolean!))))
+
 ; === literals ===
 
 (check-parse #t (typed #t boolean!))
@@ -178,12 +187,26 @@
 
 (check-parse
   (function (id number string) (done string number))
-  (typed
-    (function 2 
-      (cons (variable 0) (variable 1)))
-    (function-type! 
-      (id number! string!) 
-      (tuple-type! done string! number!))))
+  (typed-function!
+    (id number! string!)
+    (typed-tuple!
+      (done
+        (typed (variable 0) string!)
+        (typed (variable 1) number!)))))
+
+; === apply ===
+
+(check-parse
+  (apply (function (id number string) (done string number)) 128 "foo")
+  (typed-application!
+    (typed-function!
+      (id number! string!)
+      (typed-tuple!
+        (done
+          (typed (variable 0) string!)
+          (typed (variable 1) number!))))
+    (typed! 128)
+    (typed! "foo")))
 
 ; === recursive function ===
 
