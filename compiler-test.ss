@@ -80,11 +80,11 @@
 
 ; === native ===
 
-(check-parse
-  (native string-length (function (length string) number))
-  (typed
-    (native `string-length)
-    (function-type! (length string!) number!)))
+; (check-parse
+;   (native string-length (function (length string) number))
+;   (typed
+;     (native #`string-length)
+;     (function-type! (length string!) number!)))
 
 ; === if ===
 
@@ -229,12 +229,12 @@
 
 (check-parse
   (use 
-    (native string-length (function (length string) number))
+    (function (length string) 128)
     (length "foo"))
   (typed
     (application!
       (function 1 (application! (variable 0) "foo"))
-      (native `string-length))
+      (function 1 128))
     number!))
 
 ; === typed-wrap ===

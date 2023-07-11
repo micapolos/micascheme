@@ -231,7 +231,7 @@
     (syntax-case $stx (apply native boolean number string if recursive function function-type use type select switch)
       ((native $value $type)
         (typed 
-          (native (syntax->datum #`$value))
+          (native #`$value)
           (env-parse-type $env #`$type)))
       ((type expr)
         (typed (env-parse-type $env #`expr) type!))

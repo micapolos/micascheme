@@ -10,6 +10,5 @@
             ($expr #`expr)
             ($typed-term (parse $expr))
             ($term (typed-value $typed-term))
-            ($datum (term->datum $term))
-            (datum->syntax #`leo $datum))))))
+            (term->syntax $term))))))
 )
