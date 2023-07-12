@@ -31,8 +31,7 @@
         ((_ (name field ...))
           (struct-syntax 
             #`name 
-            (syntax->list #`(field ...)) 
-            generate-temporary)))))
+            (syntax->list #`(field ...)))))))
 
   (define-syntax define-one-of-constructor
     (lambda (stx)
@@ -40,8 +39,7 @@
         ((_ (name case ...))
           (one-of-constructor-syntax 
             #`name 
-            (syntax->list #`(case ...))
-            generate-temporary)))))
+            (syntax->list #`(case ...)))))))
 
   (define-syntax define-one-of-switch
     (lambda (stx)
@@ -49,8 +47,7 @@
         ((_ (name case ...))
           (one-of-switch-syntax 
             #`name
-            (syntax->list #`(case ...))
-            generate-temporary)))))
+            (syntax->list #`(case ...)))))))
 
   (define-syntax define-one-of->datum
     (lambda (stx)
@@ -58,8 +55,7 @@
         ((_ (name case ...))
           (one-of->datum-syntax 
             #`name
-            (syntax->list #`(case ...))
-            generate-temporary)))))
+            (syntax->list #`(case ...)))))))
 
   (define-syntax define-one-of
     (lambda (stx)
@@ -67,6 +63,5 @@
         ((_ (name case ...))
           (one-of-syntax 
             #`name
-            (syntax->list #`(case ...))
-            generate-temporary)))))
+            (syntax->list #`(case ...)))))))
 )

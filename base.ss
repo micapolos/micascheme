@@ -3,7 +3,7 @@
     single
     and-lets lets
     works?
-    check checking?
+    check checking? test-all
     data partial
     define-aux-keyword define-syntax-rule
     obj=? record=? pair=? vector=? box=?
@@ -61,6 +61,10 @@
     (datum->syntax $id
       (string->symbol 
         (lets ($var (symbol->string (syntax->datum $id))) $body))))
+
+  (define-syntax-rule (test-all file ...) 
+    (begin
+      (let () (load file)) ...))
 
   (define-syntax-rule (lets decl ... body)
     (let* (decl ...) body))

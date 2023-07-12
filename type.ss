@@ -58,10 +58,10 @@
         (universe-match $env $universe $rhs))
       ((variable? $variable) 
         (variable-match $env $variable $rhs))
-      ((function? $function) 
-        (function-match $env $function $rhs))
       ((function-type? $function-type) 
         (function-type-match $env $function-type $rhs))
+      ((forall? $forall)
+        (forall-match $env $forall $rhs))
       ((tuple-type? $tuple-type)
         (tuple-type-match $env $tuple-type $rhs))
       ((else $obj)
@@ -105,19 +105,6 @@
           ((else $other) 
             (match $env $other $rhs))))))
 
-  (define (function-match $env $function $rhs)
-    (if (function? $rhs)
-      (and 
-        (= (function-arity $function) (function-arity $rhs))
-        (match
-          (iterate (partial cons (hole)) $env (function-arity $function))
-          (function-body $function)
-          (function-body $rhs)))
-      (match 
-        (iterate (partial cons (hole)) $env (function-arity $function))
-        (function-body $function) 
-        $rhs)))
-
   (define (function-type-match $env $function-type $rhs)
     (and
       (function-type? $rhs)
@@ -125,6 +112,17 @@
       (and-lets 
         ($env (list-match $env (function-type-params $function-type) (function-type-params $rhs)))
         (match $env (function-type-result $function-type) (function-type-result $rhs)))))
+
+  (define (forall-match $env $forall $rhs)
+    (lets
+      ($arity (forall-arity $forall))
+      ($body (forall-body $forall))
+      ($env (iterate (partial cons (hole)) $env $arity))
+      (if (forall? $rhs)
+        (and 
+          (= $arity (forall-arity $rhs))
+          (match $env $body (forall-body $rhs)))
+        (match $env $body $rhs))))
 
   (define (tuple-type-match $env $tuple-type $rhs)
     (and

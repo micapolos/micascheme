@@ -44,24 +44,24 @@
 (check (not (matches? (tuple-type `foo (list `t1 `t2)) (tuple-type `foo (list `t1 `t3)))))
 (check (not (matches? (tuple-type `foo (list `t1 `t2)) `foo)))
 
-(check (matches? (function 2 `foo) (function 2 `foo)))
-(check (not (matches? (function 2 `foo) (function 3 `foo))))
-(check (not (matches? (function 2 `foo) (function 2 `bar))))
+(check (matches? (forall 2 `foo) (forall 2 `foo)))
+(check (not (matches? (forall 2 `foo) (forall 3 `foo))))
+(check (not (matches? (forall 2 `foo) (forall 2 `bar))))
 
-(check (matches? (function 1 `foo) `foo))
-(check (not (matches? (function 1 `foo) `bar)))
+(check (matches? (forall 1 `foo) `foo))
+(check (not (matches? (forall 1 `foo) `bar)))
 
-(check (matches? (function 2 (variable 0)) `foo))
+(check (matches? (forall 2 (variable 0)) `foo))
 
-(check (matches? (function 2 (function-type! (f (variable 0)) (variable 0))) (function-type! (f `foo) `foo)))
-(check (not (matches? (function 2 (function-type! (f (variable 0)) (variable 0))) (function-type! (g `foo) `foo))))
-(check (not (matches? (function 1 (function-type! (f (variable 0)) (variable 0))) (function-type! (f `foo) `bar))))
+(check (matches? (forall 2 (function-type! (f (variable 0)) (variable 0))) (function-type! (f `foo) `foo)))
+(check (not (matches? (forall 2 (function-type! (f (variable 0)) (variable 0))) (function-type! (g `foo) `foo))))
+(check (not (matches? (forall 1 (function-type! (f (variable 0)) (variable 0))) (function-type! (f `foo) `bar))))
 
-(check (matches? (function 2 (function-type! (f (variable 0)) (variable 1))) (function-type! (f `foo) `foo)))
-(check (matches? (function 2 (function-type! (f (variable 0)) (variable 1))) (function-type! (f `foo) `bar)))
+(check (matches? (forall 2 (function-type! (f (variable 0)) (variable 1))) (function-type! (f `foo) `foo)))
+(check (matches? (forall 2 (function-type! (f (variable 0)) (variable 1))) (function-type! (f `foo) `bar)))
 
-(check (matches? (function 2 (variable 0)) (function 2 (variable 0))))
-(check (not (matches? (function 2 (variable 0)) (function 2 (variable 1)))))
+(check (matches? (forall 2 (variable 0)) (forall 2 (variable 0))))
+(check (not (matches? (forall 2 (variable 0)) (forall 2 (variable 1)))))
 
 ; ------------------------------------------
 
