@@ -1,5 +1,8 @@
 (library (base)
   (export 
+    list-get
+    list-get-overflow list-get-overflow? list-get-overflow-index
+
     single
     and-lets lets
     works?
@@ -291,6 +294,15 @@
     (cond
       ((= $count 0) $item)
       (else (iterate $proc ($proc $item) (- $count 1)))))
+
+  (data (list-get-overflow index))
+
+  (define (list-get $list $index)
+    (if (null? $list)
+      (list-get-overflow $index)
+      (if (= $index 0)
+        (car $list)
+        (list-get (cdr $list) (- $index 1)))))
 
   ; --------------------------------------
 

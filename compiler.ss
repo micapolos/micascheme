@@ -17,20 +17,61 @@
 
   ; ----------------------------------------------------------------
 
-  (data (compiler frames parent))
   (data (frame types))
+  (data (scope frames))
+  (data (compiler scope parent-opt))
 
-  (define null-compiler (compiler `() #f))
+  (define-syntax-rule (frame! type ...)
+    (frame (list type ...)))
 
-  (define (compiler-update-parent $compiler $fn)
-    (compiler
-      (compiler-frames $compiler)
-      ($fn (or (compiler-parent $compiler) null-compiler))))
+  (define-syntax-rule (scope! frame ...)
+    (scope (list frame ...)))
+
+  ; ----------------------------------------------------------------
+
+  (define (frame-size $frame)
+    (length (frame-types $frame)))
+
+  (define (frame-push-type $frame $type)
+    (frame (cons $type (frame-types $frame))))
+
+  (define (frame-typed-variables-from $frame $index)
+    (map-indexed
+      (lambda ($type-index $type) 
+        (typed (variable (+ $type-index $index)) $type))
+      (frame-types $frame)))
+
+  (define (frame-resolve-all-from $frame $resolve $index)
+    (filter $resolve (frame-typed-variables-from $frame $index)))
+
+  ; ----------------------------------------------------------------
+
+  (define (scope-push-frame $scope $frame)
+    (scope (cons $frame (scope-frames $scope))))
+
+  (define (scope-resolve-all-from $scope $resolve $index)
+    (switch (scope-frames $scope)
+      ((null? $null) `())
+      ((else $frame-pair)
+        (lets 
+          ($frame (car $frame-pair))
+          ($frames (cdr $frame-pair))
+          ($resolved (frame-resolve-all-from $frame $resolve $index))
+          (cond
+            ((null? $resolved) (scope-resolve-all-from (scope $frames) $resolve (+ $index (frame-size $frame))))
+            (else $resolved))))))
+
+  ; ----------------------------------------------------------------
+
+  (define null-compiler (compiler (scope!) #f))
+
+  (define (compiler-parent $compiler)
+    (or (compiler-parent-opt $compiler) null-compiler))
 
   (define (compiler-push-frame $compiler $frame)
     (compiler 
-      (cons $frame (compiler-frames $compiler))
-      (compiler-parent $compiler)))
+      (scope-push-frame (compiler-scope $compiler) $frame)
+      (compiler-parent-opt $compiler)))
 
   ; ----------------------------------------------------------------
 

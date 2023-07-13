@@ -6,6 +6,13 @@
 (check (equal? (single (list "a")) "a"))
 (check (equal? (single (list "a" "b")) #f))
 
+; === list-safe-ref ===
+
+(check (obj=? (list-get (list "a" "b") 0) "a"))
+(check (obj=? (list-get (list "a" "b") 1) "b"))
+(check (obj=? (list-get (list "a" "b") 2) (list-get-overflow 0)))
+(check (obj=? (list-get (list "a" "b") 3) (list-get-overflow 1)))
+
 ; === bind ===
 
 (check (equal? (lets 1) 1))
