@@ -17,8 +17,23 @@
 
   ; ----------------------------------------------------------------
 
-  (data (env frames))
+  (data (compiler frames parent))
   (data (frame types))
+
+  (define null-compiler (compiler `() #f))
+
+  (define (compiler-update-parent $compiler $fn)
+    (compiler
+      (compiler-frames $compiler)
+      ($fn (or (compiler-parent $compiler) null-compiler))))
+
+  (define (compiler-push-frame $compiler $frame)
+    (compiler 
+      (cons $frame (compiler-frames $compiler))
+      (compiler-parent $compiler)))
+
+  ; ----------------------------------------------------------------
+
   (data (phase depth))
 
   (define (phase-n? $phase $depth)
