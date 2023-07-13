@@ -19,6 +19,7 @@
       ((string-type? _) #f)
       ((universe? _) #f)
       ((variable? _) #f)
+      ((forall? $forall) (type-is-static? (forall-body $forall)))
       ((function? $function) (type-is-static? (function-body $function)))
       ((function-type? $function-type) (type-is-static? (function-type-result $function-type)))
       ((tuple-type? $tuple-type) (andmap type-is-static? (tuple-type-types $tuple-type)))
