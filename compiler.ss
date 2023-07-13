@@ -3,7 +3,7 @@
     compile! leo-compile
     
     ; aux keywords
-    boolean number type select)
+    boolean number type select nth first second)
 
   (import (micascheme) (term) (type) (typed))
 
@@ -11,6 +11,9 @@
   (define-aux-keyword number)
   (define-aux-keyword type)
   (define-aux-keyword select)
+  (define-aux-keyword nth)
+  (define-aux-keyword first)
+  (define-aux-keyword second)
 
   ; ----------------------------------------------------------------
 
@@ -158,7 +161,7 @@
           (format "should be universe 0:")))))
 
   (define (env-compile $env $phase $stx)
-    (syntax-case $stx (apply native boolean number string if recursive function function-type use type select switch)
+    (syntax-case $stx (apply nth first second native boolean number string if recursive function function-type use type select switch)
       ((native $value $type)
         (typed 
           (native #`$value)
@@ -251,6 +254,15 @@
               (typed-value $consequent)
               (typed-value $alternate))
             $type)))
+      ((nth num name expr)
+        (lets
+          ($num (syntax->datum #`num))
+          ($unused (unless (number? $num) (syntax-error #`num "should be number")))
+          "TODO"))
+      ((first name expr)
+        "TODO")
+      ((second name expr)
+        "TODO")
       ((select option ...)
         (lets
           ($options (map (partial env-compile-option $env $phase) (syntax->list #`(option ...))))

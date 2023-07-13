@@ -118,6 +118,33 @@
 
   ; --------------------------------------------------------
 
+  (define (typed-tuple-ref-index-opt $typed-tuple $index)
+    (lets
+      ($type (typed-type $typed-tuple))
+      ($term (typed-value $typed-tuple))
+      ($tuple-types (tuple-type-types $type))
+      ($size (length $tuple-types))
+      (and (< $index $size)
+        (typed
+          (case $size
+            ((1) $term)
+            ((2) ((if (= $index 0) pair-first pair-second) $term))
+            (else (vector-get $term $index)))
+          (list-ref $tuple-types $index)))))
+
+  ; --------------------------------------------------------
+
+  (define (typed-tuple-ref-symbol-opt $typed-tuple $symbol)
+    (lets
+      ($type (typed-type $typed-tuple))
+      ($term (typed-value $typed-tuple))
+      (lets
+        ($index (type-selector-index $type $symbol))
+        (and $index
+          (typed-tuple-ref-index-opt $typed-tuple $index)))))
+
+  ; --------------------------------------------------------
+
   (define (typed-wrap $typed $to-type)
     (lets
       ($type (typed-type $typed))

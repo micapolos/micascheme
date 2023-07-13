@@ -10,7 +10,7 @@
     displayln writeln
     fold-indices indices iterate
     find-index
-    list-set
+    list-set list-ref-opt
     switch
     unpair
     associ
@@ -210,6 +210,13 @@
       (syntax-case stx ()
         ((_ name item ...) (identifier? #`name)
           #`(error #f (format "~s" (list (quote name) #,@(syntax->list #`(item ...)))))))))
+
+  (define (list-ref-opt $list $index)
+    (and
+      (pair? $list)
+      (if (= $index 0)
+        (car $list)
+        (list-ref-opt (cdr $list) (- $index 1)))))
 
   (define (list-set $list $index $obj)
     (if (> $index 0)

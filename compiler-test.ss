@@ -94,6 +94,20 @@
   (boolean (point 10 "foo" #t))
   (typed (vector-get (vector 10 "foo" #t) 2) boolean!))
 
+; === tuple first ===
+
+; (check-compile
+;   (first number (point 10 "foo" 20))
+;   (typed (pair-first (vector 10 "foo" 20)) number!))
+
+; (check-compile
+;   (second number (point 10 "foo" 20))
+;   (typed (pair-second (vector 10 "foo" 20)) number!))
+
+; (check-compile
+;   (nth 2 number (point 10 "foo" 20))
+;   (typed (pair-second (vector 10 "foo" 20)) number!))
+
 ; === select ===
 
 (check-compile

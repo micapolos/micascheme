@@ -45,6 +45,12 @@
 
 (check (equal? (map-indexed cons (list "a" "b" "c")) (list (cons 0 "a") (cons 1 "b") (cons 2 "c"))))
 
+; === list-ref-opt ===
+
+(check (equal? (list-ref-opt (list "a" "b") 0) "a"))
+(check (equal? (list-ref-opt (list "a" "b") 1) "b"))
+(check (equal? (list-ref-opt (list "a" "b") 2) #f))
+
 ; === list-indexed ===
 
 (check (obj=? (list-indexed (list "a" "b" "c")) (list (indexed "a" 0) (indexed "b" 1) (indexed "c" 2))))
