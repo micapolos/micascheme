@@ -2,9 +2,11 @@
   (export
     null-seq cons-seq item-seq
     seq-next
+    seq=?
     list->seq seq->list seq
     seq-append
-    seq-flat-map seq-map)
+    seq-flat-map seq-map
+    indexed-seq-from indexed-seq)
 
   (import (chezscheme) (base))
 
@@ -16,7 +18,19 @@
   (define (seq-next $seq) ($seq))
 
   (define (item-seq $item)
-    (lambda () (cons-seq $item null-seq)))
+    (lambda () (cons $item null-seq)))
+
+  (define (seq=? $lhs $rhs)
+    (lets
+      ($lhs-next (seq-next $lhs))
+      ($rhs-next (seq-next $rhs))
+      (cond
+        ((null? $lhs-next) (null? $rhs-next))
+        (else
+          (and
+            (pair? $rhs-next)
+            (obj=? (car $lhs-next) (car $rhs-next))
+            (seq=? (cdr $lhs-next) (cdr $rhs-next)))))))
 
   (define (list->seq $list)
     (lambda ()
@@ -30,7 +44,7 @@
   (define (seq-fold $fn $init $seq)
     (switch (seq-next $seq)
       ((null? _) $init)
-      ((else $pair) (seq-fold $fn ($fn (car $pair)) (cdr $pair)))))
+      ((else $pair) (seq-fold $fn ($fn $init (car $pair)) (cdr $pair)))))
 
   (define (seq->list $seq)
     (reverse
@@ -40,26 +54,42 @@
         $seq)))
 
   (define-syntax-rule (seq item ...)
-    (list->seq (syntax->list #`(item ...))))
+    (list->seq (list item ...)))
 
   (define (seq-append $lhs $rhs)
     (lambda ()
       (switch (seq-next $lhs)
         ((null? _) (seq-next $rhs))
         ((else $pair)
-          (lets
+          (cons
             (car $pair)
             (seq-append (cdr $pair) $rhs))))))
 
-  (define (seq-flat-map $seq $fn)
+  (define (seq-flat-map $fn $seq)
     (lambda ()
       (switch (seq-next $seq)
-        ((null? _) null-seq)
-        ((pair? $pair)
-          (seq-next (seq-append ($fn (car $pair)) (seq-flat-map (cdr $pair) $fn)))))))
+        ((null? $null) $null)
+        ((else $pair)
+          (seq-next
+            (seq-append
+              ($fn (car $pair))
+              (seq-flat-map $fn (cdr $pair))))))))
 
-  (define (seq-map $seq $fn)
-    (seq-flat-map $seq
-      (lambda ($item)
-        (item-seq $item))))
+  (define (seq-map $fn $seq)
+    (lambda ()
+      (switch (seq-next $seq)
+        ((null? $null) $null)
+        ((else $pair) (cons ($fn (car $pair)) (seq-map $fn (cdr $pair)))))))
+
+  (define (indexed-seq-from $seq $index)
+    (lambda ()
+      (switch (seq-next $seq)
+        ((null? $null) $null)
+        ((else $pair)
+          (cons
+            (indexed (car $pair) $index)
+            (indexed-seq-from (cdr $pair) (+ $index 1)))))))
+
+  (define (indexed-seq $seq)
+    (indexed-seq-from $seq 0))
 )
