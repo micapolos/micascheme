@@ -2,6 +2,7 @@
 
 (test-all
   "base-test.ss"
+  "seq-test.ss"
   "base-syntax-test.ss"
   "term-test.ss"
   "type-test.ss"
