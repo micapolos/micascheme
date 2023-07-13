@@ -1,6 +1,6 @@
 (library (compiler)
   (export 
-    parse! parse
+    compile! leo-compile
     
     ; aux keywords
     boolean number type select)
@@ -112,34 +112,34 @@
 
   ; ----------------------------------------------------------------
 
-  (define-syntax parse!
+  (define-syntax compile!
     (syntax-rules ()
       ((_ expr)
-        (parse #'expr))))
+        (leo-compile #'expr))))
 
-  (define (parse $stx)
-    (env-parse (list) (phase 0) $stx))
+  (define (leo-compile $stx)
+    (env-compile (list) (phase 0) $stx))
 
   (define (v $index)
     (string->symbol
       (string-append "v"
         (number->string $index))))
 
-  (define (env-parse-list $env $phase $stxs)
-    (map (partial env-parse $env $phase) $stxs))
+  (define (env-compile-list $env $phase $stxs)
+    (map (partial env-compile $env $phase) $stxs))
 
-  (define (env-parse-as $env $phase $stx $as-type)
+  (define (env-compile-as $env $phase $stx $as-type)
     (lets
-      ($typed (env-parse $env $phase $stx))
+      ($typed (env-compile $env $phase $stx))
       ($type (typed-type $typed))
       (if (matches? $as-type $type)
         (typed (typed-value $typed) $as-type)
         (syntax-error $stx
           (format "should be ~s, is ~s:" $as-type $type)))))
 
-  (define (env-parse-function $env $phase $stx)
+  (define (env-compile-function $env $phase $stx)
     (lets
-      ($typed (env-parse $env $phase $stx))
+      ($typed (env-compile $env $phase $stx))
       ($term (typed-value $typed))
       ($type (typed-type $typed))
       (if (function-type? $type)
@@ -147,9 +147,9 @@
         (syntax-error $stx
           (format "should be function, is ~s:" $type)))))
 
-  (define (env-parse-type $env $stx)
+  (define (env-compile-type $env $stx)
     (lets
-      ($typed (env-parse $env (phase 1) $stx))
+      ($typed (env-compile $env (phase 1) $stx))
       ($value (typed-value $typed))
       ($type (typed-type $typed))
       (if (and (universe? $type) (= (universe-depth $type) 0))
@@ -157,14 +157,14 @@
         (syntax-error $stx 
           (format "should be universe 0:")))))
 
-  (define (env-parse $env $phase $stx)
+  (define (env-compile $env $phase $stx)
     (syntax-case $stx (apply native boolean number string if recursive function function-type use type select switch)
       ((native $value $type)
         (typed 
           (native #`$value)
-          (env-parse-type $env #`$type)))
+          (env-compile-type $env #`$type)))
       ((type expr)
-        (typed (env-parse-type $env #`expr) type!))
+        (typed (env-compile-type $env #`expr) type!))
       (boolean (phase-n? $phase 1)
         (typed boolean! type!))
       (number (phase-n? $phase 1)
@@ -177,18 +177,18 @@
         (typed
           (function-type
             (syntax->datum #`name)
-            (map (partial env-parse-type $env) (syntax->list #`(param ...)))
-            (env-parse-type $env #`rhs))
+            (map (partial env-compile-type $env) (syntax->list #`(param ...)))
+            (env-compile-type $env #`rhs))
           type!))
       ((function (name param ...) body)
         (lets
           ($name (syntax->datum #`name))
           ($params (syntax->list #`(param ...)))
           ($body #`body)
-          ($param-types (map (partial env-parse-type $env) $params))
+          ($param-types (map (partial env-compile-type $env) $params))
           ($arity (length $params))
           ($body-env (append (reverse $param-types) $env))
-          ($typed-body (env-parse $body-env $phase $body))
+          ($typed-body (env-compile $body-env $phase $body))
           ($body-term (typed-value $typed-body))
           ($body-type (typed-type $typed-body))
           (typed
@@ -197,12 +197,12 @@
       ((apply fn arg ...)
         (lets
           ($function #`fn)
-          ($typed-function (env-parse-function $env $phase $function))
+          ($typed-function (env-compile-function $env $phase $function))
           ($function (typed-value $typed-function))
           ($function-type (typed-type $typed-function))
           ($params (function-type-params $function-type))
           ($args (syntax->list #`(arg ...)))
-          ($typed-args (map (partial env-parse-as $env $phase) $args $params))
+          ($typed-args (map (partial env-compile-as $env $phase) $args $params))
           (typed
             (application $function (map typed-value $typed-args))
             (function-type-result $function-type))))
@@ -212,12 +212,12 @@
           ($name (syntax->datum #`name))
           ($params (syntax->list #`(param ...)))
           ($body #`body)
-          ($result-type (env-parse-type $env $result))
-          ($param-types (map (partial env-parse-type $env) $params))
+          ($result-type (env-compile-type $env $result))
+          ($param-types (map (partial env-compile-type $env) $params))
           ($arity (length $params))
           ($function-type (function-type $name $param-types $result-type))
           ($body-env (append (reverse $param-types) (cons $function-type $env)))
-          ($typed-body (env-parse $body-env $phase $body))
+          ($typed-body (env-compile $body-env $phase $body))
           ($body-term (typed-value $typed-body))
           ($body-type (typed-type $typed-body))
           ($unused (unless (matches? $result-type $body-type) (syntax-error $stx "recursive type mismatch")))
@@ -229,11 +229,11 @@
           ($exprs (syntax->list #`(expr ...)))
           ($body #`body)
           ($arity (length $exprs))
-          ($typed-terms (env-parse-list $env $phase $exprs))
+          ($typed-terms (env-compile-list $env $phase $exprs))
           ($terms (map typed-value $typed-terms))
           ($types (map typed-type $typed-terms))
           ($body-env (append (reverse $types) $env))
-          ($typed-body (env-parse $body-env $phase $body))
+          ($typed-body (env-compile $body-env $phase $body))
           ($body-term (typed-value $typed-body))
           ($body-type (typed-type $typed-body))
           (typed
@@ -241,10 +241,10 @@
             $body-type)))
       ((if condition consequent alternate)
         (lets
-          ($condition (env-parse-as $env $phase #`condition boolean!))
-          ($consequent (env-parse $env $phase #`consequent))
+          ($condition (env-compile-as $env $phase #`condition boolean!))
+          ($consequent (env-compile $env $phase #`consequent))
           ($type (typed-type $consequent))
-          ($alternate (env-parse-as $env $phase #`alternate $type))
+          ($alternate (env-compile-as $env $phase #`alternate $type))
           (typed
             (conditional 
               (typed-value $condition)
@@ -253,7 +253,7 @@
             $type)))
       ((select option ...)
         (lets
-          ($options (map (partial env-parse-option $env $phase) (syntax->list #`(option ...))))
+          ($options (map (partial env-compile-option $env $phase) (syntax->list #`(option ...))))
           ($size (length $options))
           ($types (map option-type $options))
           ($selection (options-selection $options))
@@ -268,16 +268,16 @@
       ((switch choice case ...)
         (lets
           ($choice #`choice)
-          ($typed-choice (env-parse $env $phase $choice))
+          ($typed-choice (env-compile $env $phase $choice))
           ($choice-type (typed-type $typed-choice))
           ($choice-term (typed-value $typed-choice))
           ($choice-types (choice-type-types $choice-type))
           ($cases (syntax->list #`(case ...)))
-          ($head-typed-case (env-parse (cons (car $choice-types) $env) $phase (car $cases)))
+          ($head-typed-case (env-compile (cons (car $choice-types) $env) $phase (car $cases)))
           ($head-type (typed-type $head-typed-case))
           ($tail-typed-cases
             (map
-              (lambda ($case $type) (env-parse-as (cons $type $env) $phase $case $head-type))
+              (lambda ($case $type) (env-compile-as (cons $type $env) $phase $case $head-type))
               (cdr $cases)
               (cdr $choice-types)))
           ($typed-cases (cons $head-typed-case $tail-typed-cases))
@@ -293,7 +293,7 @@
         (lets
           ($symbol (syntax->datum #`id))
           ($args (syntax->list #`(arg ...)))
-          ($typed-args (env-parse-list $env $phase $args))
+          ($typed-args (env-compile-list $env $phase $args))
           ($arg-types (map typed-type $typed-args))
           ($arg-terms (map typed-value $typed-args))
           ($type (tuple-type $symbol $arg-types))
@@ -318,11 +318,11 @@
                   (indexed-value $indexed-type))
                 (typed #f $symbol))))))))
 
-  (define (env-parse-option $env $phase $stx)
+  (define (env-compile-option $env $phase $stx)
     (syntax-case $stx (not)
       ((not expr)
-        (option-not (env-parse-type $env #`expr)))
+        (option-not (env-compile-type $env #`expr)))
       (expr
-        (option-the (env-parse $env $phase #`expr)))))
+        (option-the (env-compile $env $phase #`expr)))))
 )
 

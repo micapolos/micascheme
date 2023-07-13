@@ -5,23 +5,23 @@
   (typed)
   (compiler))
 
-(define-syntax-rule (check-parse lhs rhs)
-  (check (obj=? (parse! lhs) rhs)))
+(define-syntax-rule (check-compile lhs rhs)
+  (check (obj=? (compile! lhs) rhs)))
 
 ; === literals ===
 
-(check-parse #t (typed! #t))
+(check-compile #t (typed! #t))
 
-(check-parse 123 (typed! 123))
+(check-compile 123 (typed! 123))
 
-(check-parse "foo" (typed! "foo"))
+(check-compile "foo" (typed! "foo"))
 
-(check-parse foo (typed #f `foo))
+(check-compile foo (typed #f `foo))
 
 ; === native ===
 
 (lets
-  ($typed (parse! (native string-length (function (length string) number))))
+  ($typed (compile! (native string-length (function (length string) number))))
   ($term (typed-value $typed))
   ($type (typed-type $typed))
   (begin
@@ -31,38 +31,38 @@
 
 ; === if ===
 
-(check-parse
+(check-compile
   (if #t "foo" "bar")
   (typed (conditional #t "foo" "bar") string!))
 
 ; === types ===
 
-(check-parse (type boolean) (typed boolean! type!))
-(check-parse (type number) (typed number! type!))
-(check-parse (type string) (typed string! type!))
-(check-parse (type type) (typed type! type!))
+(check-compile (type boolean) (typed boolean! type!))
+(check-compile (type number) (typed number! type!))
+(check-compile (type string) (typed string! type!))
+(check-compile (type type) (typed type! type!))
 
-(check-parse
+(check-compile
   (type (function (foo number) string))
   (typed (function-type! (foo number!) string!) type!))
 
 ; === tuple ===
 
-(check-parse 
+(check-compile 
   (foo) 
   (typed #f (tuple-type! foo)))
 
-(check-parse 
+(check-compile 
   (foo 10) 
   (typed 10 (tuple-type! foo number!)))
 
-(check-parse
+(check-compile
   (foo 10 "bar")
   (typed
     (cons 10 "bar")
     (tuple-type! foo number! string!)))
 
-(check-parse
+(check-compile
   (foo 10 "bar" 20)
   (typed
     (vector 10 "bar" 20)
@@ -70,45 +70,45 @@
 
 ; === tuple-ref ===
 
-(check-parse
+(check-compile
   (number (point 10))
   (typed 10 number!))
 
-(check-parse
+(check-compile
   (number (point 10 "foo"))
   (typed (pair-first (cons 10 "foo")) number!))
 
-(check-parse
+(check-compile
   (string (point 10 "foo"))
   (typed (pair-second (cons 10 "foo")) string!))
 
-(check-parse
+(check-compile
   (number (point 10 "foo" #t))
   (typed (vector-get (vector 10 "foo" #t) 0) number!))
 
-(check-parse
+(check-compile
   (string (point 10 "foo" #t))
   (typed (vector-get (vector 10 "foo" #t) 1) string!))
 
-(check-parse
+(check-compile
   (boolean (point 10 "foo" #t))
   (typed (vector-get (vector 10 "foo" #t) 2) boolean!))
 
 ; === select ===
 
-(check-parse
+(check-compile
   (select #t (not number) (not string))
   (typed
     (cons 0 #t)
     (choice-type! boolean! number! string!)))
 
-(check-parse
+(check-compile
   (select (not boolean) 128 (not string))
   (typed
     (cons 1 128)
     (choice-type! boolean! number! string!)))
 
-(check-parse
+(check-compile
   (select (not boolean) (not number) "foo")
   (typed
     (cons 2 "foo")
@@ -116,7 +116,7 @@
 
 ; === switch ===
 
-(check-parse
+(check-compile
   (switch 
       (select (not boolean) (not number) "foo") 
       "boolean" "number" string)
@@ -128,7 +128,7 @@
 
 ; === function ===
 
-(check-parse
+(check-compile
   (function (id number string) (done string number))
   (typed-function!
     (id number! string!)
@@ -139,7 +139,7 @@
 
 ; === apply ===
 
-(check-parse
+(check-compile
   (apply (function (id number string) (done string number)) 128 "foo")
   (typed-application!
     (typed-function!
@@ -153,7 +153,7 @@
 
 ; === recursive function ===
 
-(check-parse
+(check-compile
   (recursive string (function (id number string) string))
   (typed
     (recursive 
@@ -162,7 +162,7 @@
 
 ; === use / get ===
 
-(check-parse
+(check-compile
   (use "foo" string)
   (typed
     (application! (function 1 (variable 0)) "foo")
@@ -170,7 +170,7 @@
 
 ; === use / application ===
 
-(check-parse
+(check-compile
   (use 
     (function (length string) 128)
     (length "foo"))

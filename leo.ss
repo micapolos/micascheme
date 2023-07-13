@@ -8,7 +8,7 @@
         ((leo expr)
           (lets 
             ($expr #`expr)
-            ($typed-term (parse $expr))
+            ($typed-term (leo-compile $expr))
             ($term (typed-value $typed-term))
             (term->syntax $term))))))
 )

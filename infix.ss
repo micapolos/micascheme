@@ -16,7 +16,7 @@
       (data (partial stxs))
       (data (colon stxs))
 
-      (define (parse-stxs stx)
+      (define (compile-stxs stx)
         (define (result+ result stx)
           (switch result
             ((complete? complete)
@@ -26,25 +26,25 @@
                 (_ 
                   (partial 
                     (append 
-                      (parse-stxs stx) 
+                      (compile-stxs stx) 
                       (complete-stxs complete))))))
             ((partial? partial) 
               (complete 
                 (list 
                   #`(
                     #,@(partial-stxs partial)
-                    #,@(parse-stxs stx)))))
+                    #,@(compile-stxs stx)))))
             ((colon? c) 
               (colon 
                 (append
                   (colon-stxs c)
-                  (parse-stxs stx)))))) ; TODO: O(n^2) cost!!!
+                  (compile-stxs stx)))))) ; TODO: O(n^2) cost!!!
         (syntax-case stx (:)
           (() (list))
           ((: item ...)
-            (apply append (map parse-stxs (syntax->list #`(item ...)))))
+            (apply append (map compile-stxs (syntax->list #`(item ...)))))
           ((first rest ...) 
-            (switch (fold-left result+ (complete (parse-stxs #`first)) (syntax->list #`(rest ...)))
+            (switch (fold-left result+ (complete (compile-stxs #`first)) (syntax->list #`(rest ...)))
               ((complete? complete) 
                 (complete-stxs complete))
               ((partial? partial)
@@ -61,7 +61,7 @@
       (syntax-case stx ()
         ((_ item ...)
           #`(begin
-            #,@(parse-stxs #`(item ...)))))))
+            #,@(compile-stxs #`(item ...)))))))
 
   (define-syntax infix:
     (lambda (stx)
