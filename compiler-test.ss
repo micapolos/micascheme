@@ -193,3 +193,11 @@
       (function 1 (application! (variable 0) "foo"))
       (function 1 128))
     number!))
+
+; === lets ===
+
+(check-compile
+  (lets 10 20 30)
+  (typed 
+    (application! (function 1 (application! (function 1 30) 20)) 10) 
+    (number-type)))

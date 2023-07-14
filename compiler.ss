@@ -236,7 +236,7 @@
             (env-compile-bind* $env $phase (cdr $stxs) $fn))))))
     
   (define (env-compile $env $phase $stx)
-    (syntax-case $stx (apply nth first second native boolean number string if recursive function function-type use type select switch)
+    (syntax-case $stx (apply nth first second lets native boolean number string if recursive function function-type use type select switch)
       ((native $value $type)
         (typed 
           (native #`$value)
@@ -376,6 +376,10 @@
               (use! (pair-second v0)
                 (branch (pair-first v1) $case-terms)))
             $type)))
+      ((lets arg ... expr)
+        (env-compile-bind* $env $phase (syntax->list #`(arg ...))
+          (lambda ($env)
+            (env-compile $env $phase #`expr))))
       ((id arg ...) (identifier? #`id)
         (lets
           ($symbol (syntax->datum #`id))
@@ -388,27 +392,6 @@
             (env-resolve-application $env $symbol $arg-types $arg-terms)
             (resolve-tuple-ref $symbol $arg-types $arg-terms)
             (phase-tuple $phase $symbol $arg-types $arg-terms))))
-      ; This is sequential approach, but is problematic
-      ; ((id arg ...) (identifier? #`id)
-      ;   (lets
-      ;     ($symbol (syntax->datum #`id))
-      ;     ($stxs (syntax->list #`(arg ...)))
-      ;     (env-compile-bind* $env $phase (syntax->list #`(arg ...))
-      ;       (lambda ($env)
-      ;         (lets
-      ;           ($typed-args 
-      ;             (reverse
-      ;               (map 
-      ;                 (lambda ($index)
-      ;                   (typed (variable $index) (list-ref $env $index)))
-      ;                 (indices (length $stxs)))))
-      ;           ($arg-types (map typed-type $typed-args))
-      ;           ($arg-terms (map typed-value $typed-args))
-      ;           ($type (tuple-type $symbol $arg-types))
-      ;           (or 
-      ;             (env-resolve-application $env $symbol $arg-types $arg-terms)
-      ;             (resolve-tuple-ref $symbol $arg-types $arg-terms)
-      ;             (phase-tuple $phase $symbol $arg-types $arg-terms)))))))
       (_
         (switch (syntax->datum $stx)
           ((boolean? $boolean) 

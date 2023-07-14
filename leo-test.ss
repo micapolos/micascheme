@@ -80,6 +80,21 @@
         (append (string (length "foo")) " apples")))
     "3 apples"))
 
+; === lets ===
+
+(check
+  (equal?
+    (leo
+      (lets
+        (native string-length (function (length string) number))
+        (native number->string (function (string number) string))
+        (native string-append (function (append string string) string))
+        "foo"
+        (length string)
+        (string number)
+        (append string " apples")))
+    "3 apples"))
+
 ; === fib
 
 (check
