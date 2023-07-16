@@ -2,23 +2,30 @@
 
 ; --------------------------------------------------------------
 
-(check (type-is-static? `foo))
-(check (not (type-is-static? boolean!)))
-(check (not (type-is-static? number!)))
-(check (not (type-is-static? string!)))
-(check (not (type-is-static? (universe 0))))
-(check (not (type-is-static? (variable 0))))
-(check (type-is-static? (forall 2 `foo)))
-(check (not (type-is-static? (forall 2 number!))))
-(check (type-is-static? (function 1 `foo)))
-(check (not (type-is-static? (function 1 (variable 0)))))
-(check (type-is-static? (function-type! (foo number!) `foo)))
-(check (not (type-is-static? (function-type! (foo number!) number!))))
-(check (not (type-is-static? (function-type! (foo number!) (variable 0)))))
-(check (type-is-static? (tuple-type! foo)))
-(check (type-is-static? (tuple-type! vec `foo `bar)))
-(check (not (type-is-static? (tuple-type! vec `foo number!))))
-(check (not (type-is-static? (tuple-type! vec number! `bar))))
+(check (type-static? `foo))
+(check (not (type-static? boolean!)))
+(check (not (type-static? number!)))
+(check (not (type-static? string!)))
+(check (not (type-static? (universe 0))))
+(check (not (type-static? (variable 0))))
+(check (type-static? (forall 2 `foo)))
+(check (not (type-static? (forall 2 number!))))
+(check (type-static? (function 1 `foo)))
+(check (not (type-static? (function 1 (variable 0)))))
+(check (type-static? (function-type! (foo number!) `foo)))
+(check (not (type-static? (function-type! (foo number!) number!))))
+(check (not (type-static? (function-type! (foo number!) (variable 0)))))
+(check (type-static? (tuple-type! foo)))
+(check (type-static? (tuple-type! vec `foo `bar)))
+(check (not (type-static? (tuple-type! vec `foo number!))))
+(check (not (type-static? (tuple-type! vec number! `bar))))
+
+; --------------------------------------------------------------
+
+(check 
+  (obj=? 
+    (types-indexed (list string! `foo number! boolean!))
+    (list (indexed string! 0) (indexed number! 2) (indexed boolean! 3))))
 
 ; --------------------------------------------------------------
 

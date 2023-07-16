@@ -1,6 +1,7 @@
 (library (type)
   (export 
-    type-is-static?
+    type-static? type-dynamic?
+    types-indexed
     matches? list-matches?
     type-selector type-named?
     type-selector-index
@@ -10,7 +11,7 @@
 
   ; ---------------------------------------------------------
 
-  (define (type-is-static? $type)
+  (define (type-static? $type)
     (switch $type
       ((native? _) #f)
       ((symbol? _) #t)
@@ -19,11 +20,22 @@
       ((string-type? _) #f)
       ((universe? _) #f)
       ((variable? _) #f)
-      ((forall? $forall) (type-is-static? (forall-body $forall)))
-      ((function? $function) (type-is-static? (function-body $function)))
-      ((function-type? $function-type) (type-is-static? (function-type-result $function-type)))
-      ((tuple-type? $tuple-type) (andmap type-is-static? (tuple-type-types $tuple-type)))
-      ((else $obj) (throw type-is-static? $obj))))
+      ((forall? $forall) (type-static? (forall-body $forall)))
+      ((function? $function) (type-static? (function-body $function)))
+      ((function-type? $function-type) (type-static? (function-type-result $function-type)))
+      ((tuple-type? $tuple-type) (andmap type-static? (tuple-type-types $tuple-type)))
+      ((else $obj) (throw type-static? $obj))))
+
+  (define (type-dynamic? $type)
+    (not (type-static? $type)))
+  
+  ; ---------------------------------------------------------
+
+  (define (types-indexed $types)
+    (filter 
+      (lambda ($indexed) 
+        (and (type-dynamic? (indexed-value $indexed)) $indexed))
+      (list-indexed $types)))
 
   ; ---------------------------------------------------------
 
