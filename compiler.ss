@@ -236,7 +236,7 @@
             (env-compile-bind* $env $phase (cdr $stxs) $fn))))))
     
   (define (env-compile $env $phase $stx)
-    (syntax-case $stx (apply nth first second lets native boolean number string if recursive function function-type use type select switch)
+    (syntax-case $stx (apply nth first second lets native forall boolean number string if recursive function function-type use type select switch)
       ((native $value $type)
         (typed 
           (native #`$value)
@@ -380,6 +380,13 @@
         (env-compile-bind* $env $phase (syntax->list #`(arg ...))
           (lambda ($env)
             (env-compile $env $phase #`expr))))
+      ((forall (param ...) body) (phase-n? $phase 1)
+        (lets
+          ($params (syntax->list #`(param ...)))
+          ($body #`body)
+          ($param-types (map (partial env-compile-type $env) $params))
+          ($body-type (env-compile-type $env $body)) ; TODO: $enb
+          (forall (length $param-types) $body-type)))
       ((id arg ...) (identifier? #`id)
         (lets
           ($symbol (syntax->datum #`id))
