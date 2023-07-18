@@ -11,9 +11,13 @@
     application application? application-fn application-args
     use use!
     
-    boolean-type boolean-type?
-    number-type number-type?
-    string-type string-type?
+    boolean-type boolean-type? boolean!
+    number-type number-type? number!
+    string-type string-type? string!
+
+    term-type term-type? term!
+    list-type list-type? list-type-item
+    pair-type pair-type? pair-type-first pair-type-second
 
     pair pair-first pair-second
     vector-get
@@ -23,12 +27,11 @@
 
     tuple-type tuple-type? tuple-type-name tuple-type-types
     choice-type choice-type? choice-type-types
-    universe universe? universe-depth
+    universe universe? universe-depth type!
     
     term->datum term->syntax term-eval
 
-    application! function-type! tuple-type! choice-type!
-    boolean! number! string! type!)
+    application! function-type! tuple-type! choice-type!)
 
   (import (micascheme))
 
@@ -44,6 +47,10 @@
   (data (number-type))
   (data (string-type))
   (data (universe depth))
+  
+  (data (term-type))
+  (data (list-type item))
+  (data (pair-type first second))
 
   (data (conditional condition consequent alternate))
 
@@ -204,6 +211,7 @@
   (define number! (number-type))
   (define string! (string-type))
   (define type! (universe 0))
+  (define term! (term-type))
 
   (define-syntax-rule (application! fn arg ...)
     (application fn (list arg ...)))

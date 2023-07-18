@@ -422,5 +422,24 @@
         (option-not (env-compile-type $env #`expr)))
       (expr
         (option-the (env-compile $env $phase #`expr)))))
+
+  ; =====================================================================
+
+  (define typed-env
+    (list
+      (typed #`string-append (function-type! (append string! string!) string!))
+      (typed #`string-length (function-type! (length string!) number!))
+      (typed #`number->string (function-type! (string number!) number!))
+      (typed #`+ (function-type! (+ number! number!) number!))
+      (typed #`- (function-type! (- number! number!) number!))
+
+      ; pair
+      (typed #`cons (forall 2 (function-type! (pair (variable 1) (variable 0)) (pair-type (variable 1) (variable 0)))))
+      (typed #`car (forall 2 (function-type! (first (pair (variable 1) (variable 0))) (variable 1))))
+      (typed #`cdr (forall 2 (function-type! (second (pair (variable 1) (variable 0))) (variable 0))))
+
+      ; list
+      (typed #`() (forall 1 (function-type! (list-of (variable 0)) (list-type (variable 0)))))
+      (typed #`cons (forall 1 (function-type! (link (variable 0) (list (variable 0))) (list-type (variable 0)))))))
 )
 
