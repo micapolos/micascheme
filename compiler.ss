@@ -434,19 +434,39 @@
 
   (define typed-env
     (list
-      (typed #`string-append (tuple-type! append (function-type! (string! string!) string!)))
-      (typed #`string-length (tuple-type! length (function-type! (string!) number!)))
-      (typed #`number->string (tuple-type! string (function-type! (number!) number!)))
-      (typed #`+ (tuple-type + (function-type! (number! number!) number!)))
-      (typed #`- (tuple-type - (function-type! (number! number!) number!)))
+      (typed 
+        (native #`string-append) 
+        (tuple-type! append (function-type! (string! string!) string!)))
+      (typed 
+        (native #`string-length)
+        (tuple-type! length (function-type! (string!) number!)))
+      (typed 
+        (native #`number->string)
+        (tuple-type! string (function-type! (number!) number!)))
+      (typed 
+        (native #`+)
+        (tuple-type + (function-type! (number! number!) number!)))
+      (typed 
+        (native #`-)
+        (tuple-type - (function-type! (number! number!) number!)))
 
       ; pair
-      (typed #`cons (function 2 (tuple-type! pair (function-type! ((variable 1) (variable 0)) (pair-type (variable 1) (variable 0))))))
-      (typed #`car (function 2 (tuple-type! first (function-type! ((pair (variable 1) (variable 0))) (variable 1)))))
-      (typed #`cdr (function 2 (tuple-type! second (function-type! ((pair (variable 1) (variable 0))) (variable 0)))))
+      (typed 
+        (native #`cons)
+        (function 2 (tuple-type! pair (function-type! ((variable 1) (variable 0)) (pair-type (variable 1) (variable 0))))))
+      (typed 
+        (native #`car)
+        (function 2 (tuple-type! first (function-type! ((pair (variable 1) (variable 0))) (variable 1)))))
+      (typed 
+        (native #`cdr)
+        (function 2 (tuple-type! second (function-type! ((pair (variable 1) (variable 0))) (variable 0)))))
 
       ; list
-      (typed #`() (function 1 (tuple-type! list-of (function-type! ((variable 0)) (list-type (variable 0))))))
-      (typed #`cons (function 1 (tuple-type! link (function-type! ((variable 0) (list (variable 0))) (list-type (variable 0))))))))
+      (typed 
+        (native #`()) 
+        (function 1 (tuple-type! list-of (function-type! ((variable 0)) (list-type (variable 0))))))
+      (typed 
+        (native #`cons)
+        (function 1 (tuple-type! link (function-type! ((variable 0) (list (variable 0))) (list-type (variable 0))))))))
 )
 
