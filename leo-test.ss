@@ -74,9 +74,9 @@
   (equal?
     (leo
       (use
-        (native string-length (function (length string) number))
-        (native number->string (function (string number) string))
-        (native string-append (function (append string string) string))
+        (native string-length (length (function (string) number)))
+        (native number->string (string (function (number) string)))
+        (native string-append (append (function (string string) string)))
         (append (string (length "foo")) " apples")))
     "3 apples"))
 
@@ -86,9 +86,9 @@
   (equal?
     (leo
       (lets
-        (native string-length (function (length string) number))
-        (native number->string (function (string number) string))
-        (native string-append (function (append string string) string))
+        (native string-length (length (function (string) number)))
+        (native number->string (string (function (number) string)))
+        (native string-append (append (function (string string) string)))
         "foo"
         (length string)
         (string number)
@@ -101,12 +101,12 @@
   (equal?
     (leo
       (use
-        (native < (function (< number number) boolean))
-        (native + (function (+ number number) number))
-        (native - (function (- number number) number))
+        (native < (< (function (number number) boolean)))
+        (native + (+ (function (number number) number)))
+        (native - (- (function (number number) number)))
         (use
           (recursive number
-            (function (fib number)
-              (if (< number 2) number (+ (fib (- number 2)) (fib (- number 1))))))
-          (fib 10))))
+            (function (number)
+              (if (< number 2) number (+ (apply (variable 1) (- number 2)) (apply (variable 1) (- number 1))))))
+          (apply (variable 0) 10))))
     55))

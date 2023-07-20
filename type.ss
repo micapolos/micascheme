@@ -121,7 +121,6 @@
   (define (function-type-match $env $function-type $rhs)
     (and
       (function-type? $rhs)
-      (symbol=? (function-type-name $function-type) (function-type-name $rhs))
       (and-lets 
         ($env (list-match $env (function-type-params $function-type) (function-type-params $rhs)))
         (match $env (function-type-result $function-type) (function-type-result $rhs)))))

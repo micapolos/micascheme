@@ -12,9 +12,9 @@
 (check (not (type-static? (forall 2 number!))))
 (check (type-static? (function 1 `foo)))
 (check (not (type-static? (function 1 (variable 0)))))
-(check (type-static? (function-type! (foo number!) `foo)))
-(check (not (type-static? (function-type! (foo number!) number!))))
-(check (not (type-static? (function-type! (foo number!) (variable 0)))))
+(check (type-static? (function-type! (number!) `foo)))
+(check (not (type-static? (function-type! (number!) number!))))
+(check (not (type-static? (function-type! (number!) (variable 0)))))
 (check (type-static? (tuple-type! foo)))
 (check (type-static? (tuple-type! vec `foo `bar)))
 (check (not (type-static? (tuple-type! vec `foo number!))))
@@ -63,12 +63,11 @@
 
 (check (matches? (forall 2 (variable 0)) `foo))
 
-(check (matches? (forall 2 (function-type! (f (variable 0)) (variable 0))) (function-type! (f `foo) `foo)))
-(check (not (matches? (forall 2 (function-type! (f (variable 0)) (variable 0))) (function-type! (g `foo) `foo))))
-(check (not (matches? (forall 1 (function-type! (f (variable 0)) (variable 0))) (function-type! (f `foo) `bar))))
+(check (matches? (forall 2 (function-type! ((variable 0)) (variable 0))) (function-type! (`foo) `foo)))
+(check (not (matches? (forall 1 (function-type! ((variable 0)) (variable 0))) (function-type! (`foo) `bar))))
 
-(check (matches? (forall 2 (function-type! (f (variable 0)) (variable 1))) (function-type! (f `foo) `foo)))
-(check (matches? (forall 2 (function-type! (f (variable 0)) (variable 1))) (function-type! (f `foo) `bar)))
+(check (matches? (forall 2 (function-type! ((variable 0)) (variable 1))) (function-type! (`foo) `foo)))
+(check (matches? (forall 2 (function-type! ((variable 0)) (variable 1))) (function-type! (`foo) `bar)))
 
 (check (matches? (forall 2 (variable 0)) (forall 2 (variable 0))))
 (check (not (matches? (forall 2 (variable 0)) (forall 2 (variable 1)))))
@@ -79,7 +78,7 @@
 (check (eq? (type-selector number!) `number))
 (check (eq? (type-selector string!) `string))
 (check (eq? (type-selector (universe 3)) `universe))
-(check (eq? (type-selector (function-type! (foo number!) string!)) `function))
+(check (eq? (type-selector (function-type! (number!) string!)) `function))
 (check (eq? (type-selector (tuple-type! foo number!)) `foo))
 (check (eq? (type-selector `foo) `foo))
 (check (eq? (type-selector 123) #f))

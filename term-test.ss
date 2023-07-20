@@ -36,7 +36,7 @@
 
 (check-datum (universe 3) (universe 3))
 
-(check-datum (function-type `foo (list `t1 `t2) `t3) (function-type 'foo (list 't1 't2) 't3))
+(check-datum (function-type (list `t1 `t2) `t3) (function-type (list 't1 't2) 't3))
 
 (check-datum (function 2 `foo) (lambda ($v0 $v1) 'foo))
 (check-datum (function 2 (variable 0)) (lambda ($v0 $v1) $v1))

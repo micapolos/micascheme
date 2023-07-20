@@ -82,13 +82,13 @@
   (define-syntax-rule (typed-choice! option ...)
     (typed-choice (list (typed-option! option) ...)))
 
-  (define (typed-function $name $params $body)
+  (define (typed-function $params $body)
     (typed
       (function (length $params) (typed-value $body))
-      (function-type $name $params (typed-type $body))))
+      (function-type $params (typed-type $body))))
 
-  (define-syntax-rule (typed-function! (name param ...) body)
-    (typed-function (quote name) (list param ...) body))
+  (define-syntax-rule (typed-function! (param ...) body)
+    (typed-function (list param ...) body))
 
   (define (typed-application $fn $args)
     (typed

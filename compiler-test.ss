@@ -21,13 +21,13 @@
 ; === native ===
 
 (lets
-  ($typed (compile! (native string-length (function (length string) number))))
+  ($typed (compile! (native string-length (length (function (string) number)))))
   ($term (typed-value $typed))
   ($type (typed-type $typed))
   (begin
     (check (native? $term))
     (check (symbol=? (syntax->datum (native-value $term)) `string-length))
-    (check (obj=? $type (function-type! (length string!) number!)))))
+    (check (obj=? $type (tuple-type! length (function-type! (string!) number!))))))
 
 ; === if ===
 
@@ -43,8 +43,8 @@
 (check-compile (type type) (typed type! type!))
 
 (check-compile
-  (type (function (foo number) string))
-  (typed (function-type! (foo number!) string!) type!))
+  (type (function (number) string))
+  (typed (function-type! (number!) string!) type!))
 
 ; === tuple ===
 
@@ -84,12 +84,12 @@
 
 ; === implicit tuple ===
 
-(check-compile 
-  (foo) 
+(check-compile
+  (foo)
   (typed #f (tuple-type! foo)))
 
-(check-compile 
-  (foo 10) 
+(check-compile
+  (foo 10)
   (typed 10 (tuple-type! foo number!)))
 
 (check-compile
@@ -167,8 +167,8 @@
 ; === switch ===
 
 (check-compile
-  (switch 
-      (select (not boolean) (not number) "foo") 
+  (switch
+      (select (not boolean) (not number) "foo")
       "boolean" "number" string)
   (typed
     (use! (cons 2 "foo")
@@ -179,9 +179,9 @@
 ; === function ===
 
 (check-compile
-  (function (id number string) (done string number))
+  (function (number string) (done string number))
   (typed-function!
-    (id number! string!)
+    (number! string!)
     (typed-tuple!
       (done
         (typed (variable 0) string!)
@@ -190,10 +190,10 @@
 ; === apply ===
 
 (check-compile
-  (apply (function (id number string) (done string number)) 128 "foo")
+  (apply (function (number string) (done string number)) 128 "foo")
   (typed-application!
     (typed-function!
-      (id number! string!)
+      (number! string!)
       (typed-tuple!
         (done
           (typed (variable 0) string!)
@@ -204,11 +204,11 @@
 ; === recursive function ===
 
 (check-compile
-  (recursive string (function (id number string) string))
+  (recursive string (function (number string) string))
   (typed
-    (recursive 
+    (recursive
       (function 2 (variable 0)))
-    (function-type! (id number! string!) string!)))
+    (function-type! (number! string!) string!)))
 
 ; === use / get ===
 
@@ -221,22 +221,22 @@
 ; === variable ===
 
 (check-compile
-  (function (foo string number) (variable 0))
+  (function (string number) (variable 0))
   (typed
     (function 2 (variable 0))
-    (function-type! (foo string! number!) number!)))
+    (function-type! (string! number!) number!)))
 
 (check-compile
-  (function (foo string number) (variable 1))
+  (function (string number) (variable 1))
   (typed
     (function 2 (variable 1))
-    (function-type! (foo string! number!) string!)))
+    (function-type! (string! number!) string!)))
 
 ; === use / application ===
 
 (check-compile
-  (use 
-    (function (length string) 128)
+  (use
+    (length (function (string) 128))
     (length "foo"))
   (typed
     (application!
@@ -248,6 +248,6 @@
 
 (check-compile
   (lets 10 20 30)
-  (typed 
-    (application! (function 1 (application! (function 1 30) 20)) 10) 
+  (typed
+    (application! (function 1 (application! (function 1 30) 20)) 10)
     (number-type)))

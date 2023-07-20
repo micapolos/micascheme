@@ -5,7 +5,7 @@
     variable variable? variable-index v0 v1 v2
     function function? function-arity function-body
     recursive recursive? recursive-function
-    function-type function-type? function-type-name function-type-params function-type-result
+    function-type function-type? function-type-params function-type-result
     forall forall? forall-arity forall-body
 
     application application? application-fn application-args
@@ -54,7 +54,7 @@
 
   (data (conditional condition consequent alternate))
 
-  (data (function-type name params result))
+  (data (function-type params result))
   (data (forall arity body))
 
   (data (branch index cases))
@@ -165,7 +165,6 @@
 
   (define (env-function-type->syntax $env $function-type)
     #`(function-type
-      (quote #,(function-type-name $function-type))
       (list #,@(env-terms->syntaxes $env (function-type-params $function-type)))
       #,(env-term->syntax $env (function-type-result $function-type))))
 
@@ -219,8 +218,8 @@
   (define-syntax-rule (use! arg ... body)
     (use (list arg ...) body))
 
-  (define-syntax-rule (function-type! (name arg ...) result)
-    (function-type (quote name) (list arg ...) result))
+  (define-syntax-rule (function-type! (arg ...) result)
+    (function-type (list arg ...) result))
 
   (define-syntax-rule (tuple-type! name arg ...)
     (tuple-type (quote name) (list arg ...)))
