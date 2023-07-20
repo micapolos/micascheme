@@ -243,7 +243,7 @@
             (env-compile-bind* $env $phase (cdr $stxs) $fn))))))
     
   (define (env-compile $env $phase $stx)
-    (syntax-case $stx (get tuple apply nth variable first second lets native forall boolean number string if recursive function function-type use type select switch)
+    (syntax-case $stx (get tuple apply nth variable first second lets native boolean number string if recursive function function-type use type select switch)
       ((native $value $type)
         (typed 
           (native #`$value)
@@ -395,13 +395,13 @@
         (env-compile-bind* $env $phase (syntax->list #`(arg ...))
           (lambda ($env)
             (env-compile $env $phase #`expr))))
-      ((forall (param ...) body) (phase-n? $phase 1)
+      ((function (param ...) body) (phase-n? $phase 1)
         (lets
           ($params (syntax->list #`(param ...)))
           ($body #`body)
           ($param-types (map (partial env-compile-type $env) $params))
           ($body-type (env-compile-type $env $body)) ; TODO: $enb
-          (forall (length $param-types) $body-type)))
+          (function (length $param-types) $body-type)))
       ((variable index)
         (lets
           ($index (syntax->datum #`index))
@@ -453,12 +453,12 @@
       (typed #`- (tuple-type - (function-type! (number! number!) number!)))
 
       ; pair
-      (typed #`cons (forall 2 (tuple-type! pair (function-type! ((variable 1) (variable 0)) (pair-type (variable 1) (variable 0))))))
-      (typed #`car (forall 2 (tuple-type! first (function-type! ((pair (variable 1) (variable 0))) (variable 1)))))
-      (typed #`cdr (forall 2 (tuple-type! second (function-type! ((pair (variable 1) (variable 0))) (variable 0)))))
+      (typed #`cons (function 2 (tuple-type! pair (function-type! ((variable 1) (variable 0)) (pair-type (variable 1) (variable 0))))))
+      (typed #`car (function 2 (tuple-type! first (function-type! ((pair (variable 1) (variable 0))) (variable 1)))))
+      (typed #`cdr (function 2 (tuple-type! second (function-type! ((pair (variable 1) (variable 0))) (variable 0)))))
 
       ; list
-      (typed #`() (forall 1 (tuple-type! list-of (function-type! ((variable 0)) (list-type (variable 0))))))
-      (typed #`cons (forall 1 (tuple-type! link (function-type! ((variable 0) (list (variable 0))) (list-type (variable 0))))))))
+      (typed #`() (function 1 (tuple-type! list-of (function-type! ((variable 0)) (list-type (variable 0))))))
+      (typed #`cons (function 1 (tuple-type! link (function-type! ((variable 0) (list (variable 0))) (list-type (variable 0))))))))
 )
 
