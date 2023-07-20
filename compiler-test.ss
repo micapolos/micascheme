@@ -182,19 +182,19 @@
     (application! (function 1 (variable 0)) "foo")
     string!))
 
-; === use / variable ===
+; === variable ===
 
 (check-compile
-  (use "foo" 128 (variable 0))
+  (function (foo string number) (variable 0))
   (typed
-    (application! (function 2 (variable 0)) "foo" 128)
-    number!))
+    (function 2 (variable 0))
+    (function-type! (foo string! number!) number!)))
 
 (check-compile
-  (use "foo" 128 (variable 1))
+  (function (foo string number) (variable 1))
   (typed
-    (application! (function 2 (variable 1)) "foo" 128)
-    string!))
+    (function 2 (variable 1))
+    (function-type! (foo string! number!) string!)))
 
 ; === use / application ===
 
