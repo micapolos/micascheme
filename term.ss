@@ -6,7 +6,6 @@
     function function? function-arity function-body
     recursive recursive? recursive-function
     function-type function-type? function-type-params function-type-result
-    forall forall? forall-arity forall-body
 
     application application? application-fn application-args
     use use!
@@ -55,7 +54,6 @@
   (data (conditional condition consequent alternate))
 
   (data (function-type params result))
-  (data (forall arity body))
 
   (data (branch index cases))
 
