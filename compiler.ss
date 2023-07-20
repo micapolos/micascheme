@@ -3,7 +3,7 @@
     compile! leo-compile
     
     ; aux keywords
-    boolean number type select nth first second tuple get)
+    boolean number type select nth first second tuple get choice)
 
   (import (micascheme) (term) (type) (typed))
 
@@ -16,6 +16,7 @@
   (define-aux-keyword second)
   (define-aux-keyword tuple)
   (define-aux-keyword get)
+  (define-aux-keyword choice)
 
   ; ----------------------------------------------------------------
 
@@ -255,7 +256,7 @@
             (env-compile-bind* $env $phase (cdr $stxs) $fn))))))
     
   (define (env-compile $env $phase $stx)
-    (syntax-case $stx (get tuple apply nth variable first second lets native boolean number string if recursive function function-type use type select switch)
+    (syntax-case $stx (get tuple apply nth variable first choice second lets native boolean number string if recursive function function-type use type select switch)
       ((native $value $type)
         (typed 
           (native #`$value)
@@ -367,9 +368,9 @@
                 (pair (selected-index $selected) (selected-term $selected))
                 (choice-type $types)))
             ((else $other) (throw non-selection $other)))))
-      ((switch choice case ...)
+      ((switch $choice case ...)
         (lets
-          ($choice #`choice)
+          ($choice #`$choice)
           ($typed-choice (env-compile $env $phase $choice))
           ($choice-type (typed-type $typed-choice))
           ($choice-term (typed-value $typed-choice))
@@ -406,6 +407,10 @@
         (lets
           ($index (syntax->datum #`index))
           (typed (variable $index) (env-type-ref $env $index))))
+      ((choice arg ...)
+        (typed
+          (choice-type (map typed-value (env-compile-list $env $phase (syntax->list #`(arg ...)))))
+          type!))
       ((id arg ...) (identifier? #`id)
         (lets
           ($symbol (syntax->datum #`id))
@@ -433,7 +438,12 @@
                 (typed 
                   (variable (indexed-index $indexed-type))
                   (indexed-value $indexed-type))
-                (typed #f $symbol))))))))
+                (case $symbol
+                  ((boolean) (typed boolean! type!))
+                  ((number) (typed number! type!))
+                  ((string) (typed string! type!))
+                  ((type) (typed type! (universe 1)))
+                  (else (typed #f $symbol))))))))))
 
   (define (env-compile-option $env $phase $stx)
     (syntax-case $stx (not)

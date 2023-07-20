@@ -11,11 +11,13 @@
 ; === literals ===
 
 (check-compile #t (typed! #t))
-
 (check-compile 123 (typed! 123))
-
 (check-compile "foo" (typed! "foo"))
 
+(check-compile boolean (typed boolean! type!))
+(check-compile number (typed number! type!))
+(check-compile string (typed string! type!))
+(check-compile type (typed type! (universe 1)))
 (check-compile foo (typed #f `foo))
 
 ; === native ===
@@ -252,3 +254,11 @@
   (typed
     (application! (function 1 (application! (function 1 30) 20)) 10)
     (number-type)))
+
+; === choice ===
+
+(check-compile
+  (choice 128 number "foo" string)
+  (typed
+    (choice-type! 128 number! "foo" string!)
+    type!))
