@@ -8,4 +8,5 @@
   "type-test.ss"
   "typed-test.ss"
   "compiler-test.ss"
+  "decompiler-test.ss"
   "leo-test.ss")

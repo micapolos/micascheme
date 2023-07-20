@@ -31,6 +31,7 @@
       (syntax-case stx ()
         ((_ literal)
           (switch (syntax->datum #`literal)
+            ((symbol? $symbol) #`(typed #f (quote literal)))
             ((boolean? $boolean) #`(typed #,$boolean boolean!))
             ((number? $number) #`(typed #,$number number!))
             ((string? $string) #`(typed #,$string string!)))))))

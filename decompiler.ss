@@ -1,4 +1,4 @@
-(library (decompile)
+(library (decompiler)
   (export decompile)
   (import (micascheme) (term) (typed))
 

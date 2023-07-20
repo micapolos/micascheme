@@ -6,6 +6,7 @@
 
 ; === typed! ===
 
+(check (obj=? (typed! foo) (typed #f `foo)))
 (check (obj=? (typed! #t) (typed #t boolean!)))
 (check (obj=? (typed! 128) (typed 128 number!)))
 (check (obj=? (typed! "foo") (typed "foo" string!)))
