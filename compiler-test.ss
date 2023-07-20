@@ -48,6 +48,42 @@
 
 ; === tuple ===
 
+(check-compile
+  (tuple foo)
+  (typed #f (tuple-type! foo)))
+
+(check-compile
+  (tuple foo 10)
+  (typed 10 (tuple-type! foo number!)))
+
+(check-compile
+  (tuple foo 10 "bar")
+  (typed
+    (cons 10 "bar")
+    (tuple-type! foo number! string!)))
+
+(check-compile
+  (tuple foo 10 "bar" 20)
+  (typed
+    (vector 10 "bar" 20)
+    (tuple-type! foo number! string! number!)))
+
+; === tuple get ===
+
+(check-compile
+  (get (tuple foo 10) 0)
+  (typed-tuple-ref (typed-tuple! (foo (typed! 10))) 0))
+
+(check-compile
+  (get (tuple foo 10 "foo") 0)
+  (typed-tuple-ref (typed-tuple! (foo (typed! 10) (typed! "foo"))) 0))
+
+(check-compile
+  (get (tuple foo 10 "foo") 1)
+  (typed-tuple-ref (typed-tuple! (foo (typed! 10) (typed! "foo"))) 1))
+
+; === implicit tuple ===
+
 (check-compile 
   (foo) 
   (typed #f (tuple-type! foo)))

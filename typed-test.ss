@@ -32,6 +32,38 @@
     (typed-tuple! (foo (typed! "bar") (typed! 128) (typed! #t)))
     (typed (vector "bar" 128 #t) (tuple-type! foo string! number! boolean!))))
 
+; === typed-tuple-ref ===
+
+(check
+  (obj=?
+    (typed-tuple-ref (typed `tuple (tuple-type! foo string!)) 0)
+    (typed `tuple string!)))
+
+(check
+  (obj=?
+    (typed-tuple-ref (typed `tuple (tuple-type! foo string! number!)) 0)
+    (typed (pair-first `tuple) string!)))
+
+(check
+  (obj=?
+    (typed-tuple-ref (typed `tuple (tuple-type! foo string! number!)) 1)
+    (typed (pair-second `tuple) number!)))
+
+(check
+  (obj=?
+    (typed-tuple-ref (typed `tuple (tuple-type! foo string! number! boolean!)) 0)
+    (typed (vector-get `tuple 0) string!)))
+
+(check
+  (obj=?
+    (typed-tuple-ref (typed `tuple (tuple-type! foo string! number! boolean!)) 1)
+    (typed (vector-get `tuple 1) number!)))
+
+(check
+  (obj=?
+    (typed-tuple-ref (typed `tuple (tuple-type! foo string! number! boolean!)) 2)
+    (typed (vector-get `tuple 2) boolean!)))
+
 ; === typed-choice! ===
 
 (check

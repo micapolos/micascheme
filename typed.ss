@@ -7,6 +7,8 @@
     typed-function typed-function!
     typed-application typed-application!
 
+    typed-tuple-ref
+
     option-not option-not? option-not-type
     option-the option-the? option-the-typed
     option-type
@@ -44,6 +46,20 @@
 
   (define-syntax-rule (typed-tuple! ($name $typed ...))
     (typed-tuple (quote $name) (list $typed ...)))
+
+  (define (typed-tuple-ref $typed-tuple $index)
+    (lets
+      ($tuple-type (typed-type $typed-tuple))
+      ($term (typed-value $typed-tuple))
+      ($types (tuple-type-types $tuple-type))
+      ($type (list-ref $types $index))
+      ($size (length $types))
+      (typed
+        (case $size
+          ((1) $term)
+          ((2) ((if (= $index 0) pair-first pair-second) $term))
+          (else (vector-get $term $index)))
+        $type)))
 
   (define (typed-choice $options)
     (lets
