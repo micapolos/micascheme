@@ -10,6 +10,7 @@
 (check-decompile (typed! boolean) boolean!)
 (check-decompile (typed! number) number!)
 (check-decompile (typed! string) string!)
+(check-decompile (typed! type) type!)
 (check-decompile (typed! foo) `foo)
 
 (check-decompile 
@@ -27,3 +28,7 @@
 (check-decompile 
   (typed-tuple! (foo (typed! 128) (typed! "foo") (typed! #t))) 
   (tuple-type! (foo 128 "foo" #t)))
+
+(check-decompile 
+  (typed-tuple! (choice (typed! number) (typed! string) (typed! boolean)))
+  (choice-type! number! string! boolean!))

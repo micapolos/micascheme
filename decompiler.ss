@@ -21,7 +21,7 @@
           (lets
             ($name (tuple-type-name $tuple-type))
             ($types (tuple-type-types $tuple-type))
-            (tuple-type $name
+            ($decompiled-types 
               (case (length $types)
                 ((0) 
                   (list))
@@ -34,6 +34,9 @@
                     (decompile (typed (cdr $value) (cadr $types)))))
                 (else 
                   (map decompile 
-                    (map typed (vector->list $value) $types)))))))
+                    (map typed (vector->list $value) $types)))))
+            (case $name
+              ((choice) (choice-type $decompiled-types))
+              (else (tuple-type $name $decompiled-types)))))
         ((else $other) $other))))
 )
