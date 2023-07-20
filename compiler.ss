@@ -75,6 +75,18 @@
       (scope-push-frame (compiler-scope $compiler) $frame)
       (compiler-parent-opt $compiler)))
 
+  ; ---------------------------------------------------------------
+
+  (data (env types))
+
+  (define null-env (env `()))
+
+  (define (env-plus-type $env $type)
+    (env (cons $type (env-types $env))))
+
+  (define (env-type-ref $env $index)
+    (list-ref (env-types $env) $index))
+
   ; ----------------------------------------------------------------
 
   (data (phase depth))
@@ -85,7 +97,7 @@
   (define (env-select-indexed-type $env $symbol)
     (map-find-indexed 
       (lambda ($type) (and (type-named? $type $symbol) $type))
-      $env))
+      (env-types $env)))
 
   (define (env-function-type-indexed-type $env $symbol $arg-types)
     (map-find-indexed 
@@ -100,7 +112,7 @@
               (function-type? $type)
               (list-matches? (function-type-params $type) $arg-types)
               (function-type-result $type)))))
-      $env))
+      (env-types $env)))
 
   ; ----------------------------------------------------------------
 
@@ -184,7 +196,7 @@
         (leo-compile #'expr))))
 
   (define (leo-compile $stx)
-    (env-compile (list) (phase 0) $stx))
+    (env-compile null-env (phase 0) $stx))
 
   (define (v $index)
     (string->symbol
@@ -227,7 +239,7 @@
     (lets
       ($arg (env-compile $env $phase $stx))
       ($arg-type (typed-type $arg))
-      ($typed-body ($fn (cons $arg-type $env)))
+      ($typed-body ($fn (env-plus-type $env $arg-type)))
       (typed
         (application!
           (function 1 (typed-value $typed-body))
@@ -270,8 +282,8 @@
           ($body #`body)
           ($param-types (map (partial env-compile-type $env) $params))
           ($arity (length $params))
-          ($body-env (append (reverse $param-types) $env))
-          ($typed-body (env-compile $body-env $phase $body))
+          ($env (fold-left env-plus-type $env $param-types))
+          ($typed-body (env-compile $env $phase $body))
           ($body-term (typed-value $typed-body))
           ($body-type (typed-type $typed-body))
           (typed
@@ -292,7 +304,7 @@
       ((recursive $type $body)
         (lets
           ($type (env-compile-type $env #`$type))
-          ($typed (env-compile-as (cons $type $env) $phase #`$body $type))
+          ($typed (env-compile-as (env-plus-type $env $type) $phase #`$body $type))
           (typed (recursive (typed-value $typed)) $type)))
       ((tuple name arg ...)
         (typed-tuple
@@ -313,8 +325,8 @@
           ($typed-terms (env-compile-list $env $phase $exprs))
           ($terms (map typed-value $typed-terms))
           ($types (map typed-type $typed-terms))
-          ($body-env (append (reverse $types) $env))
-          ($typed-body (env-compile $body-env $phase $body))
+          ($env (fold-left env-plus-type $env $types))
+          ($typed-body (env-compile $env $phase $body))
           ($body-term (typed-value $typed-body))
           ($body-type (typed-type $typed-body))
           (typed
@@ -363,11 +375,11 @@
           ($choice-term (typed-value $typed-choice))
           ($choice-types (choice-type-types $choice-type))
           ($cases (syntax->list #`(case ...)))
-          ($head-typed-case (env-compile (cons (car $choice-types) $env) $phase (car $cases)))
+          ($head-typed-case (env-compile (env-plus-type $env (car $choice-types)) $phase (car $cases)))
           ($head-type (typed-type $head-typed-case))
           ($tail-typed-cases
             (map
-              (lambda ($case $type) (env-compile-as (cons $type $env) $phase $case $head-type))
+              (lambda ($case $type) (env-compile-as (env-plus-type $env $type) $phase $case $head-type))
               (cdr $cases)
               (cdr $choice-types)))
           ($typed-cases (cons $head-typed-case $tail-typed-cases))
@@ -393,7 +405,7 @@
       ((variable index)
         (lets
           ($index (syntax->datum #`index))
-          (typed (variable $index) (list-ref $env $index))))
+          (typed (variable $index) (env-type-ref $env $index))))
       ((id arg ...) (identifier? #`id)
         (lets
           ($symbol (syntax->datum #`id))

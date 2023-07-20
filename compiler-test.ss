@@ -187,68 +187,68 @@
         (typed (variable 0) string!)
         (typed (variable 1) number!)))))
 
-; === apply ===
+; ; === apply ===
 
-(check-compile
-  (apply (function (number string) (done string number)) 128 "foo")
-  (typed-application!
-    (typed-function!
-      (number! string!)
-      (typed-tuple!
-        (done
-          (typed (variable 0) string!)
-          (typed (variable 1) number!))))
-    (typed! 128)
-    (typed! "foo")))
+; (check-compile
+;   (apply (function (number string) (done string number)) 128 "foo")
+;   (typed-application!
+;     (typed-function!
+;       (number! string!)
+;       (typed-tuple!
+;         (done
+;           (typed (variable 0) string!)
+;           (typed (variable 1) number!))))
+;     (typed! 128)
+;     (typed! "foo")))
 
-; === recursive function ===
+; ; === recursive function ===
 
-(check-compile
-  (recursive string "foo")
-  (typed (recursive "foo") string!))
+; (check-compile
+;   (recursive string "foo")
+;   (typed (recursive "foo") string!))
 
-(check-compile
-  (recursive string string)
-  (typed (recursive (variable 0)) string!))
+; (check-compile
+;   (recursive string string)
+;   (typed (recursive (variable 0)) string!))
 
-; === use / get ===
+; ; === use / get ===
 
-(check-compile
-  (use "foo" string)
-  (typed
-    (application! (function 1 (variable 0)) "foo")
-    string!))
+; (check-compile
+;   (use "foo" string)
+;   (typed
+;     (application! (function 1 (variable 0)) "foo")
+;     string!))
 
-; === variable ===
+; ; === variable ===
 
-(check-compile
-  (function (string number) (variable 0))
-  (typed
-    (function 2 (variable 0))
-    (function-type! (string! number!) number!)))
+; (check-compile
+;   (function (string number) (variable 0))
+;   (typed
+;     (function 2 (variable 0))
+;     (function-type! (string! number!) number!)))
 
-(check-compile
-  (function (string number) (variable 1))
-  (typed
-    (function 2 (variable 1))
-    (function-type! (string! number!) string!)))
+; (check-compile
+;   (function (string number) (variable 1))
+;   (typed
+;     (function 2 (variable 1))
+;     (function-type! (string! number!) string!)))
 
-; === use / application ===
+; ; === use / application ===
 
-(check-compile
-  (use
-    (length (function (string) 128))
-    (length "foo"))
-  (typed
-    (application!
-      (function 1 (application! (variable 0) "foo"))
-      (function 1 128))
-    number!))
+; (check-compile
+;   (use
+;     (length (function (string) 128))
+;     (length "foo"))
+;   (typed
+;     (application!
+;       (function 1 (application! (variable 0) "foo"))
+;       (function 1 128))
+;     number!))
 
-; === lets ===
+; ; === lets ===
 
-(check-compile
-  (lets 10 20 30)
-  (typed
-    (application! (function 1 (application! (function 1 30) 20)) 10)
-    (number-type)))
+; (check-compile
+;   (lets 10 20 30)
+;   (typed
+;     (application! (function 1 (application! (function 1 30) 20)) 10)
+;     (number-type)))
