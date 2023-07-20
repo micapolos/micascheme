@@ -289,23 +289,11 @@
           (typed
             (application $function (map typed-value $typed-args))
             (function-type-result $function-type))))
-      ((recursive result (function (param ...) body))
+      ((recursive $type $body)
         (lets
-          ($result #`result)
-          ($params (syntax->list #`(param ...)))
-          ($body #`body)
-          ($result-type (env-compile-type $env $result))
-          ($param-types (map (partial env-compile-type $env) $params))
-          ($arity (length $params))
-          ($function-type (function-type $param-types $result-type))
-          ($body-env (append (reverse $param-types) (cons $function-type $env)))
-          ($typed-body (env-compile $body-env $phase $body))
-          ($body-term (typed-value $typed-body))
-          ($body-type (typed-type $typed-body))
-          ($unused (unless (matches? $result-type $body-type) (syntax-error $stx "recursive type mismatch")))
-          (typed
-            (recursive (function $arity $body-term))
-            (function-type $param-types $body-type))))
+          ($type (env-compile-type $env #`$type))
+          ($typed (env-compile-as (cons $type $env) $phase #`$body $type))
+          (typed (recursive (typed-value $typed)) $type)))
       ((tuple name arg ...)
         (typed-tuple
           (syntax->datum #`name)

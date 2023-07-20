@@ -204,11 +204,12 @@
 ; === recursive function ===
 
 (check-compile
-  (recursive string (function (number string) string))
-  (typed
-    (recursive
-      (function 2 (variable 0)))
-    (function-type! (number! string!) string!)))
+  (recursive string "foo")
+  (typed (recursive "foo") string!))
+
+(check-compile
+  (recursive string string)
+  (typed (recursive (variable 0)) string!))
 
 ; === use / get ===
 

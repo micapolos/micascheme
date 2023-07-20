@@ -4,7 +4,7 @@
 
     variable variable? variable-index v0 v1 v2
     function function? function-arity function-body
-    recursive recursive? recursive-function
+    recursive recursive? recursive-body
     function-type function-type? function-type-params function-type-result
 
     application application? application-fn application-args
@@ -40,7 +40,7 @@
 
   (data (application fn args))
   (data (function arity body))
-  (data (recursive function))
+  (data (recursive body))
 
   (data (boolean-type))
   (data (number-type))
@@ -153,13 +153,9 @@
 
   (define (env-recursive->syntax $env $recursive)
     (lets
-      ($function (recursive-function $recursive))
-      ($arity (function-arity $function))
-      ($env (iterate env-push (env-push $env) $arity))
-      #`(rec #,(list-ref $env $arity)
-        (lambda (#,@(map (partial list-ref $env) (reverse (indices $arity))))
-          #,(env-term->syntax $env
-            (function-body $function))))))
+      ($env (env-push $env))
+      #`(rec #,(list-ref $env 0)
+        #,(env-term->syntax $env (recursive-body $recursive)))))
 
   (define (env-function-type->syntax $env $function-type)
     #`(function-type

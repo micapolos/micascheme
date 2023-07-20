@@ -105,8 +105,9 @@
         (native + (+ (function (number number) number)))
         (native - (- (function (number number) number)))
         (use
-          (recursive number
-            (function (number)
-              (if (< number 2) number (+ (apply (variable 1) (- number 2)) (apply (variable 1) (- number 1))))))
-          (apply (variable 0) 10))))
+          (recursive 
+            (fib (function (number) number))
+            (fib (function (number)
+              (if (< number 2) number (+ (fib (- number 2)) (fib (- number 1)))))))
+          (fib 10))))
     55))
