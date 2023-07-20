@@ -27,7 +27,7 @@
   (begin
     (check (native? $term))
     (check (symbol=? (syntax->datum (native-value $term)) `string-length))
-    (check (obj=? $type (tuple-type! length (function-type! (string!) number!))))))
+    (check (obj=? $type (tuple-type! (length (function-type! (string!) number!)))))))
 
 ; === if ===
 
@@ -50,23 +50,23 @@
 
 (check-compile
   (tuple foo)
-  (typed #f (tuple-type! foo)))
+  (typed #f (tuple-type! (foo))))
 
 (check-compile
   (tuple foo 10)
-  (typed 10 (tuple-type! foo number!)))
+  (typed 10 (tuple-type! (foo number!))))
 
 (check-compile
   (tuple foo 10 "bar")
   (typed
     (cons 10 "bar")
-    (tuple-type! foo number! string!)))
+    (tuple-type! (foo number! string!))))
 
 (check-compile
   (tuple foo 10 "bar" 20)
   (typed
     (vector 10 "bar" 20)
-    (tuple-type! foo number! string! number!)))
+    (tuple-type! (foo number! string! number!))))
 
 ; === tuple get ===
 
@@ -86,23 +86,23 @@
 
 (check-compile
   (foo)
-  (typed #f (tuple-type! foo)))
+  (typed #f (tuple-type! (foo))))
 
 (check-compile
   (foo 10)
-  (typed 10 (tuple-type! foo number!)))
+  (typed 10 (tuple-type! (foo number!))))
 
 (check-compile
   (foo 10 "bar")
   (typed
     (cons 10 "bar")
-    (tuple-type! foo number! string!)))
+    (tuple-type! (foo number! string!))))
 
 (check-compile
   (foo 10 "bar" 20)
   (typed
     (vector 10 "bar" 20)
-    (tuple-type! foo number! string! number!)))
+    (tuple-type! (foo number! string! number!))))
 
 ; === tuple-ref ===
 

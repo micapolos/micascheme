@@ -15,10 +15,10 @@
 (check (type-static? (function-type! (number!) `foo)))
 (check (not (type-static? (function-type! (number!) number!))))
 (check (not (type-static? (function-type! (number!) (variable 0)))))
-(check (type-static? (tuple-type! foo)))
-(check (type-static? (tuple-type! vec `foo `bar)))
-(check (not (type-static? (tuple-type! vec `foo number!))))
-(check (not (type-static? (tuple-type! vec number! `bar))))
+(check (type-static? (tuple-type! (foo))))
+(check (type-static? (tuple-type! (vec `foo `bar))))
+(check (not (type-static? (tuple-type! (vec `foo number!)))))
+(check (not (type-static? (tuple-type! (vec number! `bar)))))
 
 ; --------------------------------------------------------------
 
@@ -79,7 +79,7 @@
 (check (eq? (type-selector string!) `string))
 (check (eq? (type-selector (universe 3)) `universe))
 (check (eq? (type-selector (function-type! (number!) string!)) `function))
-(check (eq? (type-selector (tuple-type! foo number!)) `foo))
+(check (eq? (type-selector (tuple-type! (foo number!))) `foo))
 (check (eq? (type-selector `foo) `foo))
 (check (eq? (type-selector 123) #f))
 

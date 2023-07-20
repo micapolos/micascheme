@@ -15,53 +15,53 @@
 (check 
   (obj=? 
     (typed-tuple! (foo))
-    (typed #f (tuple-type! foo))))
+    (typed #f (tuple-type! (foo)))))
 
 (check 
   (obj=? 
     (typed-tuple! (foo (typed! "bar")))
-    (typed "bar" (tuple-type! foo string!))))
+    (typed "bar" (tuple-type! (foo string!)))))
 
 (check 
   (obj=? 
     (typed-tuple! (foo (typed! "bar") (typed! 128)))
-    (typed (cons "bar" 128) (tuple-type! foo string! number!))))
+    (typed (cons "bar" 128) (tuple-type! (foo string! number!)))))
 
 (check 
   (obj=? 
     (typed-tuple! (foo (typed! "bar") (typed! 128) (typed! #t)))
-    (typed (vector "bar" 128 #t) (tuple-type! foo string! number! boolean!))))
+    (typed (vector "bar" 128 #t) (tuple-type! (foo string! number! boolean!)))))
 
 ; === typed-tuple-ref ===
 
 (check
   (obj=?
-    (typed-tuple-ref (typed `tuple (tuple-type! foo string!)) 0)
+    (typed-tuple-ref (typed `tuple (tuple-type! (foo string!))) 0)
     (typed `tuple string!)))
 
 (check
   (obj=?
-    (typed-tuple-ref (typed `tuple (tuple-type! foo string! number!)) 0)
+    (typed-tuple-ref (typed `tuple (tuple-type! (foo string! number!))) 0)
     (typed (pair-first `tuple) string!)))
 
 (check
   (obj=?
-    (typed-tuple-ref (typed `tuple (tuple-type! foo string! number!)) 1)
+    (typed-tuple-ref (typed `tuple (tuple-type! (foo string! number!))) 1)
     (typed (pair-second `tuple) number!)))
 
 (check
   (obj=?
-    (typed-tuple-ref (typed `tuple (tuple-type! foo string! number! boolean!)) 0)
+    (typed-tuple-ref (typed `tuple (tuple-type! (foo string! number! boolean!))) 0)
     (typed (vector-get `tuple 0) string!)))
 
 (check
   (obj=?
-    (typed-tuple-ref (typed `tuple (tuple-type! foo string! number! boolean!)) 1)
+    (typed-tuple-ref (typed `tuple (tuple-type! (foo string! number! boolean!))) 1)
     (typed (vector-get `tuple 1) number!)))
 
 (check
   (obj=?
-    (typed-tuple-ref (typed `tuple (tuple-type! foo string! number! boolean!)) 2)
+    (typed-tuple-ref (typed `tuple (tuple-type! (foo string! number! boolean!))) 2)
     (typed (vector-get `tuple 2) boolean!)))
 
 ; === typed-choice! ===
