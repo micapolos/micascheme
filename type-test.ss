@@ -12,9 +12,9 @@
 (check (not (type-static? (function 2 number!))))
 (check (type-static? (function 1 `foo)))
 (check (not (type-static? (function 1 (variable 0)))))
-(check (type-static? (function-type! (number!) `foo)))
-(check (not (type-static? (function-type! (number!) number!))))
-(check (not (type-static? (function-type! (number!) (variable 0)))))
+(check (type-static? (function-type! (fn number!) `foo)))
+(check (not (type-static? (function-type! (fn number!) number!))))
+(check (not (type-static? (function-type! (fn number!) (variable 0)))))
 (check (type-static? (tuple-type! (foo))))
 (check (type-static? (tuple-type! (vec `foo `bar))))
 (check (not (type-static? (tuple-type! (vec `foo number!)))))
@@ -63,11 +63,11 @@
 
 (check (matches? (function 2 (variable 0)) `foo))
 
-(check (matches? (function 2 (function-type! ((variable 0)) (variable 0))) (function-type! (`foo) `foo)))
-(check (not (matches? (function 1 (function-type! ((variable 0)) (variable 0))) (function-type! (`foo) `bar))))
+(check (matches? (function 2 (function-type! (fn (variable 0)) (variable 0))) (function-type! (fn `foo) `foo)))
+(check (not (matches? (function 1 (function-type! (fn (variable 0)) (variable 0))) (function-type! (fn `foo) `bar))))
 
-(check (matches? (function 2 (function-type! ((variable 0)) (variable 1))) (function-type! (`foo) `foo)))
-(check (matches? (function 2 (function-type! ((variable 0)) (variable 1))) (function-type! (`foo) `bar)))
+(check (matches? (function 2 (function-type! (fn (variable 0)) (variable 1))) (function-type! (fn `foo) `foo)))
+(check (matches? (function 2 (function-type! (fn (variable 0)) (variable 1))) (function-type! (fn `foo) `bar)))
 
 (check (matches? (function 2 (variable 0)) (function 2 (variable 0))))
 (check (not (matches? (function 2 (variable 0)) (function 2 (variable 1)))))
@@ -78,7 +78,7 @@
 (check (eq? (type-selector number!) `number))
 (check (eq? (type-selector string!) `string))
 (check (eq? (type-selector (universe 3)) `universe))
-(check (eq? (type-selector (function-type! (number!) string!)) `function))
+(check (eq? (type-selector (function-type! (fn number!) string!)) `fn))
 (check (eq? (type-selector (tuple-type! (foo number!))) `foo))
 (check (eq? (type-selector `foo) `foo))
 (check (eq? (type-selector 123) #f))

@@ -104,15 +104,10 @@
     (map-find-indexed 
       (lambda ($type) 
         (and
-          (tuple-type? $type)
-          (symbol=? (tuple-type-name $type) $symbol)
-          (= (length (tuple-type-types $type)) 1)
-          (lets
-            ($type (car (tuple-type-types $type)))
-            (and
-              (function-type? $type)
-              (list-matches? (function-type-params $type) $arg-types)
-              (function-type-result $type)))))
+          (function-type? $type)
+          (symbol=? (function-type-name $type) $symbol)
+          (list-matches? (function-type-params $type) $arg-types)
+          (function-type-result $type)))
       (env-types $env)))
 
   ; ----------------------------------------------------------------
@@ -271,14 +266,16 @@
         (typed string! type!))
       (type (phase-n? $phase 1)
         (typed type! type!))
-      ((function (param ...) rhs) (phase-n? $phase 1)
+      ((function (name param ...) rhs) (phase-n? $phase 1)
         (typed
           (function-type
+            (syntax->datum #`name)
             (map (partial env-compile-type $env) (syntax->list #`(param ...)))
             (env-compile-type $env #`rhs))
           type!))
-      ((function (param ...) body)
+      ((function (name param ...) body)
         (lets
+          ($name (syntax->datum #`name))
           ($params (syntax->list #`(param ...)))
           ($body #`body)
           ($param-types (map (partial env-compile-type $env) $params))
@@ -289,7 +286,7 @@
           ($body-type (typed-type $typed-body))
           (typed
             (function $arity $body-term)
-            (function-type $param-types $body-type))))
+            (function-type $name $param-types $body-type))))
       ((apply fn arg ...)
         (lets
           ($function #`fn)
@@ -458,37 +455,37 @@
     (list
       (typed 
         (native #`string-append) 
-        (tuple-type! (append (function-type! (string! string!) string!))))
+        (function-type! (append string! string!) string!))
       (typed 
         (native #`string-length)
-        (tuple-type! (length (function-type! (string!) number!))))
+        (function-type! (length string!) number!))
       (typed 
         (native #`number->string)
-        (tuple-type! (string (function-type! (number!) number!))))
+        (function-type! (string number!) number!))
       (typed 
         (native #`+)
-        (tuple-type! (+ (function-type! (number! number!) number!))))
+        (function-type! (+ number! number!) number!))
       (typed 
         (native #`-)
-        (tuple-type! (- (function-type! (number! number!) number!))))
+        (function-type! (- number! number!) number!))
 
       ; pair
       (typed 
         (native #`cons)
-        (function 2 (tuple-type! (pair (function-type! ((variable 1) (variable 0)) (pair-type (variable 1) (variable 0)))))))
+        (function 2 (function-type! (pair (variable 1) (variable 0)) (pair-type (variable 1) (variable 0)))))
       (typed 
         (native #`car)
-        (function 2 (tuple-type! (first (function-type! ((pair (variable 1) (variable 0))) (variable 1))))))
+        (function 2 (function-type! (first (pair (variable 1) (variable 0))) (variable 1))))
       (typed 
         (native #`cdr)
-        (function 2 (tuple-type! (second (function-type! ((pair (variable 1) (variable 0))) (variable 0))))))
+        (function 2 (function-type! (second (pair (variable 1) (variable 0))) (variable 0))))
 
       ; list
       (typed 
         (native #`()) 
-        (function 1 (tuple-type! (list-of (function-type! ((variable 0)) (list-type (variable 0)))))))
+        (function 1 (function-type! (list-of (variable 0)) (list-type (variable 0)))))
       (typed 
         (native #`cons)
-        (function 1 (tuple-type! (link (function-type! ((variable 0) (list (variable 0))) (list-type (variable 0)))))))))
+        (function 1 (function-type! (link (variable 0) (list (variable 0))) (list-type (variable 0)))))))
 )
 

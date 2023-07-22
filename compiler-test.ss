@@ -23,13 +23,13 @@
 ; === native ===
 
 (lets
-  ($typed (compile! (native string-length (length (function (string) number)))))
+  ($typed (compile! (native string-length (function (length string) number))))
   ($term (typed-value $typed))
   ($type (typed-type $typed))
   (begin
     (check (native? $term))
     (check (symbol=? (syntax->datum (native-value $term)) `string-length))
-    (check (obj=? $type (tuple-type! (length (function-type! (string!) number!)))))))
+    (check (obj=? $type (function-type! (length string!) number!)))))
 
 ; === if ===
 
@@ -45,8 +45,8 @@
 (check-compile (type type) (typed type! type!))
 
 (check-compile
-  (type (function (number) string))
-  (typed (function-type! (number!) string!) type!))
+  (type (function (fn number) string))
+  (typed (function-type! (fn number!) string!) type!))
 
 ; === tuple ===
 
@@ -181,9 +181,9 @@
 ; === function ===
 
 (check-compile
-  (function (number string) (done string number))
+  (function (fn number string) (done string number))
   (typed-function!
-    (number! string!)
+    (fn number! string!)
     (typed-tuple!
       (done
         (typed (variable 0) string!)
@@ -192,10 +192,10 @@
 ; === apply ===
 
 (check-compile
-  (apply (function (number string) (done string number)) 128 "foo")
+  (apply (function (fn number string) (done string number)) 128 "foo")
   (typed-application!
     (typed-function!
-      (number! string!)
+      (fn number! string!)
       (typed-tuple!
         (done
           (typed (variable 0) string!)
@@ -224,22 +224,22 @@
 ; === variable ===
 
 (check-compile
-  (function (string number) (variable 0))
+  (function (fn string number) (variable 0))
   (typed
     (function 2 (variable 0))
-    (function-type! (string! number!) number!)))
+    (function-type! (fn string! number!) number!)))
 
 (check-compile
-  (function (string number) (variable 1))
+  (function (fn string number) (variable 1))
   (typed
     (function 2 (variable 1))
-    (function-type! (string! number!) string!)))
+    (function-type! (fn string! number!) string!)))
 
 ; === use / application ===
 
 (check-compile
   (use
-    (length (function (string) 128))
+    (function (length string) 128)
     (length "foo"))
   (typed
     (application!

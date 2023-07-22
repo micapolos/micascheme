@@ -120,6 +120,7 @@
   (define (function-type-match $env $function-type $rhs)
     (and
       (function-type? $rhs)
+      (symbol=? (function-type-name $function-type) (function-type-name $rhs))
       (and-lets 
         ($env (list-match $env (function-type-params $function-type) (function-type-params $rhs)))
         (match $env (function-type-result $function-type) (function-type-result $rhs)))))
@@ -154,7 +155,7 @@
       ((number-type? _) `number)
       ((string-type? _) `string)
       ((universe? _) `universe)
-      ((function-type? _) `function)
+      ((function-type? $function-type) (function-type-name $function-type))
       ((tuple-type? $tuple-type) (tuple-type-name $tuple-type))
       ((else $other) #f)))
 

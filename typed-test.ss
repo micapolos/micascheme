@@ -92,10 +92,10 @@
 
 (check
   (obj=?
-    (typed-function! (string! number!) (typed! #t))
+    (typed-function! (fn string! number!) (typed! #t))
     (typed
       (function 2 #t)
-      (function-type! (string! number!) boolean!))))
+      (function-type! (fn string! number!) boolean!))))
 
 ; === typed-wrap ===
 
