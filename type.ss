@@ -6,7 +6,10 @@
     type-selector type-named?
     type-selector-index
     choice-type-index-of
-    types-find-from)
+    
+    type-mapping type-mapping? type-mapping-type type-mapping-index
+    types-mapping types-mapping? types-mapping-type-mappings types-mapping-size
+    make-types-mapping)
 
   (import (micascheme) (term))
 
@@ -28,6 +31,29 @@
 
   (define (type-dynamic? $type)
     (not (type-static? $type)))
+
+  ; ---------------------------------------------------------
+
+  (data (type-mapping type index))
+  (data (types-mapping type-mappings size))
+
+  (define (types-mapping-from $reversed-type-mappings $types $index)
+    (cond
+      ((null? $types) 
+        (types-mapping 
+          (reverse $reversed-type-mappings) 
+          $index))
+      (else 
+        (lets
+          ($type (car $types))
+          ($dynamic? (type-dynamic? $type))
+          (types-mapping-from
+            (cons (type-mapping $type (and $dynamic? $index)) $reversed-type-mappings)
+            (cdr $types)
+            (+ $index (if $dynamic? 1 0)))))))
+  
+  (define (make-types-mapping $types)
+    (types-mapping-from (list) $types 0))
   
   ; ---------------------------------------------------------
 
@@ -36,17 +62,6 @@
       (lambda ($indexed) 
         (and (type-dynamic? (indexed-value $indexed)) $indexed))
       (list-indexed $types)))
-
-  ; returns #f or (box #f) or (box index)
-  (define (types-find-from $types $fn $index)
-    (and (pair? $types)
-      (lets
-        ($type (car $types))
-        ($types (cdr $types))
-        ($static? (type-static? $type))
-        (cond
-          (($fn $type) (box (if $static? #f $index)))
-          (else (types-find-from $types $fn (+ $index (if $static? 0 1))))))))
 
   ; ---------------------------------------------------------
 
