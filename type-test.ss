@@ -22,6 +22,13 @@
 
 ; --------------------------------------------------------------
 
+(check (obj=? (types-find-from (list string! `foo number!) (partial obj=? string!) 3) (box 3)))
+(check (obj=? (types-find-from (list string! `foo number!) (partial obj=? `foo) 3) (box #f)))
+(check (obj=? (types-find-from (list string! `foo number!) (partial obj=? number!) 3) (box 4)))
+(check (obj=? (types-find-from (list string! `foo number!) (partial obj=? boolean!) 3) #f))
+
+; --------------------------------------------------------------
+
 (check 
   (obj=? 
     (types-indexed (list string! `foo number! boolean!))

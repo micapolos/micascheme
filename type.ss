@@ -5,7 +5,8 @@
     matches? list-matches?
     type-selector type-named?
     type-selector-index
-    choice-type-index-of)
+    choice-type-index-of
+    types-find-from)
 
   (import (micascheme) (term))
 
@@ -35,6 +36,17 @@
       (lambda ($indexed) 
         (and (type-dynamic? (indexed-value $indexed)) $indexed))
       (list-indexed $types)))
+
+  ; returns #f or (box #f) or (box index)
+  (define (types-find-from $types $fn $index)
+    (and (pair? $types)
+      (lets
+        ($type (car $types))
+        ($types (cdr $types))
+        ($static? (type-static? $type))
+        (cond
+          (($fn $type) (box (if $static? #f $index)))
+          (else (types-find-from $types $fn (+ $index (if $static? 0 1))))))))
 
   ; ---------------------------------------------------------
 
