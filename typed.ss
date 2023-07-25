@@ -2,8 +2,6 @@
   (export 
     typed typed? typed-value typed-type typed!
 
-    types-resolve
-
     typed-tuple typed-tuple!
     typed-choice!
     typed-function typed-function!
@@ -38,19 +36,6 @@
             ((number? $number) #`(typed #,$number number!))
             ((string? $string) #`(typed #,$string string!)))))))
 
-  (define (types-resolve-from $types $fn $index)
-    (and (pair? $types)
-      (lets
-        ($type (car $types))
-        ($dynamic? (type-dynamic? $type))
-        ($value (and $dynamic? (variable $index)))
-        (or 
-          ($fn (typed $value $type))
-          (types-resolve-from (cdr $types) $fn (+ $index (if $dynamic? 1 0)))))))
-
-  (define (types-resolve $types $fn)
-    (types-resolve-from $types $fn 0))
-
   (define (typed-list-dynamic-values $typed-list)
     (map typed-value
       (filter 
@@ -63,7 +48,7 @@
   (define (typed-tuple $name $typed-list)
     (lets
       ($types (map typed-type $typed-list))
-      ($values (typed-list-dynamic-values $typed-list))
+      ($values (map typed-value $typed-list))
       (typed
         (case (length $values)
           ((0) #f)

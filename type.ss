@@ -5,12 +5,7 @@
     matches? list-matches?
     type-selector type-named?
     type-selector-index
-    choice-type-index-of
-    
-    type-binding type-binding? type-binding-type type-binding-index
-    type-scope type-scope? type-scope-bindings type-scope-size
-
-    types-type-scope)
+    choice-type-index-of)
 
   (import (micascheme) (term))
 
@@ -32,28 +27,6 @@
 
   (define (type-dynamic? $type)
     (not (type-static? $type)))
-
-  ; ---------------------------------------------------------
-
-  (data (type-binding type index))
-  (data (type-scope bindings size))
-
-  (define (type-binding-at $type $size)
-    (type-binding $type (and (type-dynamic? $type) $size)))
-
-  (define null-type-scope (type-scope (list) 0))
-
-  (define (type-scope-plus $scope $type)
-    (lets
-      ($type-bindings (type-scope-bindings $scope))
-      ($size (type-scope-size $scope))
-      ($type-binding (type-binding-at $type $size))
-      (type-scope 
-        (cons $type-binding $type-bindings)
-        (+ $size (if (type-binding-index $type-binding) 1 0)))))
-
-  (define (types-type-scope $types)
-    (reverse (fold-left type-scope-plus null-type-scope $types)))
 
   ; ---------------------------------------------------------
 

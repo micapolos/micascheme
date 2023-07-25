@@ -24,20 +24,6 @@
 
 (check 
   (obj=? 
-    (types-type-scope (list string! `foo number! `bar boolean!))
-    (type-scope
-      (list
-        (type-binding string! 0)
-        (type-binding `foo #f)
-        (type-binding number! 1)
-        (type-binding `bar #f)
-        (type-binding boolean! 2))
-      3)))
-
-; --------------------------------------------------------------
-
-(check 
-  (obj=? 
     (types-indexed (list string! `foo number! boolean!))
     (list (indexed string! 0) (indexed number! 2) (indexed boolean! 3))))
 
