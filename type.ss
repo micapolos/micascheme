@@ -7,9 +7,10 @@
     type-selector-index
     choice-type-index-of
     
-    type-mapping type-mapping? type-mapping-type type-mapping-index
-    types-mapping types-mapping? types-mapping-type-mappings types-mapping-size
-    make-types-mapping)
+    type-binding type-binding? type-binding-type type-binding-index
+    type-scope type-scope? type-scope-bindings type-scope-size
+
+    types-type-scope)
 
   (import (micascheme) (term))
 
@@ -34,27 +35,26 @@
 
   ; ---------------------------------------------------------
 
-  (data (type-mapping type index))
-  (data (types-mapping type-mappings size))
+  (data (type-binding type index))
+  (data (type-scope bindings size))
 
-  (define (types-mapping-from $reversed-type-mappings $types $index)
-    (cond
-      ((null? $types) 
-        (types-mapping 
-          (reverse $reversed-type-mappings) 
-          $index))
-      (else 
-        (lets
-          ($type (car $types))
-          ($dynamic? (type-dynamic? $type))
-          (types-mapping-from
-            (cons (type-mapping $type (and $dynamic? $index)) $reversed-type-mappings)
-            (cdr $types)
-            (+ $index (if $dynamic? 1 0)))))))
-  
-  (define (make-types-mapping $types)
-    (types-mapping-from (list) $types 0))
-  
+  (define (type-binding-at $type $size)
+    (type-binding $type (and (type-dynamic? $type) $size)))
+
+  (define null-type-scope (type-scope (list) 0))
+
+  (define (type-scope-plus $scope $type)
+    (lets
+      ($type-bindings (type-scope-bindings $scope))
+      ($size (type-scope-size $scope))
+      ($type-binding (type-binding-at $type $size))
+      (type-scope 
+        (cons $type-binding $type-bindings)
+        (+ $size (if (type-binding-index $type-binding) 1 0)))))
+
+  (define (types-type-scope $types)
+    (reverse (fold-left type-scope-plus null-type-scope $types)))
+
   ; ---------------------------------------------------------
 
   (define (types-indexed $types)

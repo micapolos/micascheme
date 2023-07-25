@@ -17,6 +17,7 @@
     switch
     unpair
     associ
+    filter-map
     map-find-indexed
     map-indexed list-indexed
     indexed indexed? indexed-value indexed-index
@@ -119,6 +120,9 @@
 
   (define (map-indexed $proc $list)
     (map $proc (indices (length $list)) $list))
+
+  (define (filter-map $proc . $list)
+    (filter (lambda (x) x) (apply map (cons $proc $list))))
 
   (define (list-indexed $list)
     (map-indexed (lambda ($index $value) (indexed $value $index)) $list))

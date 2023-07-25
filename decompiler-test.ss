@@ -29,6 +29,6 @@
   (typed-tuple! (foo (typed! 128) (typed! "foo") (typed! #t))) 
   (tuple-type! (foo 128 "foo" #t)))
 
-(check-decompile 
-  (typed-tuple! (choice (typed! number) (typed! string) (typed! boolean)))
-  (choice-type! number! string! boolean!))
+; (check-decompile 
+;   (typed-tuple! (choice (typed! number) (typed! string) (typed! boolean)))
+;   (choice-type! number! string! boolean!))

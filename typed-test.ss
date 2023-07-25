@@ -11,6 +11,26 @@
 (check (obj=? (typed! 128) (typed 128 number!)))
 (check (obj=? (typed! "foo") (typed "foo" string!)))
 
+; === types-resolve ===
+
+(check
+  (obj=? 
+    (types-resolve (list number! `static string!) 
+      (lambda ($typed) (and (obj=? (typed-type $typed) number!) $typed)))
+    (typed (variable 0) number!)))
+
+(check
+  (obj=? 
+    (types-resolve (list number! `static string!) 
+      (lambda ($typed) (and (obj=? (typed-type $typed) `static) $typed)))
+    (typed #f `static)))
+
+(check
+  (obj=? 
+    (types-resolve (list number! `static string!) 
+      (lambda ($typed) (and (obj=? (typed-type $typed) string!) $typed)))
+    (typed (variable 1) string!)))
+
 ; === typed-tuple! ===
 
 (check 
@@ -20,8 +40,18 @@
 
 (check 
   (obj=? 
+    (typed-tuple! (foo (typed! static)))
+    (typed #f (tuple-type! (foo `static)))))
+
+(check 
+  (obj=? 
     (typed-tuple! (foo (typed! "bar")))
     (typed "bar" (tuple-type! (foo string!)))))
+
+(check 
+  (obj=? 
+    (typed-tuple! (foo (typed! static1) (typed! "bar") (typed! static2)))
+    (typed "bar" (tuple-type! (foo `static1 string! `static2)))))
 
 (check 
   (obj=? 
@@ -30,8 +60,18 @@
 
 (check 
   (obj=? 
+    (typed-tuple! (foo (typed! static1) (typed! "bar") (typed! static2) (typed! 128) (typed! static3)))
+    (typed (cons "bar" 128) (tuple-type! (foo `static1 string! `static2 number! `static3)))))
+
+(check 
+  (obj=? 
     (typed-tuple! (foo (typed! "bar") (typed! 128) (typed! #t)))
     (typed (vector "bar" 128 #t) (tuple-type! (foo string! number! boolean!)))))
+
+(check 
+  (obj=? 
+    (typed-tuple! (foo (typed! static1) (typed! "bar") (typed! static2) (typed! 128) (typed! static3) (typed! #t) (typed! static4)))
+    (typed (vector "bar" 128 #t) (tuple-type! (foo `static1 string! `static2 number! `static3 boolean! `static4)))))
 
 ; === typed-tuple-ref ===
 

@@ -2,6 +2,8 @@
   (export 
     typed typed? typed-value typed-type typed!
 
+    types-resolve
+
     typed-tuple typed-tuple!
     typed-choice!
     typed-function typed-function!
@@ -36,14 +38,39 @@
             ((number? $number) #`(typed #,$number number!))
             ((string? $string) #`(typed #,$string string!)))))))
 
+  (define (types-resolve-from $types $fn $index)
+    (and (pair? $types)
+      (lets
+        ($type (car $types))
+        ($dynamic? (type-dynamic? $type))
+        ($value (and $dynamic? (variable $index)))
+        (or 
+          ($fn (typed $value $type))
+          (types-resolve-from (cdr $types) $fn (+ $index (if $dynamic? 1 0)))))))
+
+  (define (types-resolve $types $fn)
+    (types-resolve-from $types $fn 0))
+
+  (define (typed-list-dynamic-values $typed-list)
+    (map typed-value
+      (filter 
+        (lambda ($typed) 
+          (and
+            (type-dynamic? (typed-type $typed))
+            $typed))
+        $typed-list)))
+  
   (define (typed-tuple $name $typed-list)
-    (typed
-      (case (length $typed-list)
-        ((0) #f)
-        ((1) (typed-value (car $typed-list)))
-        ((2) (cons (typed-value (car $typed-list)) (typed-value (cadr $typed-list))))
-        (else (list->vector (map typed-value $typed-list))))
-      (tuple-type $name (map typed-type $typed-list))))
+    (lets
+      ($types (map typed-type $typed-list))
+      ($values (typed-list-dynamic-values $typed-list))
+      (typed
+        (case (length $values)
+          ((0) #f)
+          ((1) (car $values))
+          ((2) (cons (car $values) (cadr $values)))
+          (else (list->vector $values)))
+        (tuple-type $name $types))))
 
   (define-syntax-rule (typed-tuple! ($name $typed ...))
     (typed-tuple (quote $name) (list $typed ...)))

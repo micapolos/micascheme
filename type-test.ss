@@ -24,14 +24,14 @@
 
 (check 
   (obj=? 
-    (make-types-mapping (list string! `foo number! `bar boolean!))
-    (types-mapping
+    (types-type-scope (list string! `foo number! `bar boolean!))
+    (type-scope
       (list
-        (type-mapping string! 0)
-        (type-mapping `foo #f)
-        (type-mapping number! 1)
-        (type-mapping `bar #f)
-        (type-mapping boolean! 2))
+        (type-binding string! 0)
+        (type-binding `foo #f)
+        (type-binding number! 1)
+        (type-binding `bar #f)
+        (type-binding boolean! 2))
       3)))
 
 ; --------------------------------------------------------------
