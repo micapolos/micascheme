@@ -393,13 +393,6 @@
         (env-compile-bind* $env $phase (syntax->list #`(arg ...))
           (lambda ($env)
             (env-compile $env $phase #`expr))))
-      ((function (param ...) body) (phase-n? $phase 1)
-        (lets
-          ($params (syntax->list #`(param ...)))
-          ($body #`body)
-          ($param-types (map (partial env-compile-type $env) $params))
-          ($body-type (env-compile-type $env $body)) ; TODO: $enb
-          (function (length $param-types) $body-type)))
       ((variable index)
         (lets
           ($index (syntax->datum #`index))
