@@ -1,6 +1,7 @@
 (library (term)
   (export
     native native? native-value
+    global global? global-library global-identifier global!
 
     variable variable? variable-index v0 v1 v2
     function function? function-arity function-body
@@ -36,6 +37,8 @@
 
   (data (native value))
 
+  (data (global library identifier))
+
   (data (variable index))
 
   (data (application fn args))
@@ -66,6 +69,11 @@
   (data (tuple-type name types))
 
   (data (choice-type types))
+
+  ; --------------------------------------------------
+
+  (define-syntax-rule (global! library identifier)
+    (global (quote library) (quote identifier)))
   
   ; --------------------------------------------------
 
