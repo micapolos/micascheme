@@ -93,8 +93,13 @@
 
   (data (phase depth))
 
-  (define (phase-n? $phase $depth)
+  (define (phase-depth=? $phase $depth)
     (= (phase-depth $phase) $depth))
+
+  (define (next-phase $phase)
+    (phase (+ (phase-depth $phase) 1)))
+
+  ; ----------------------------------------------------------------
 
   (define (env-select-indexed-type $env $symbol)
     (map-find-indexed 
@@ -259,13 +264,13 @@
           (env-compile-type $env #`$type)))
       ((type expr)
         (typed (env-compile-type $env #`expr) type!))
-      (boolean (phase-n? $phase 1)
+      (boolean (phase-depth=? $phase 1)
         (typed boolean! type!))
-      (number (phase-n? $phase 1)
+      (number (phase-depth=? $phase 1)
         (typed number! type!))
-      (string (phase-n? $phase 1)
+      (string (phase-depth=? $phase 1)
         (typed string! type!))
-      (type (phase-n? $phase 1)
+      (type (phase-depth=? $phase 1)
         (typed type! type!))
       ((any (function (name param ...) rhs))
         (typed
