@@ -3,6 +3,8 @@
     list-get
     list-get-overflow list-get-overflow? list-get-overflow-index
 
+    failure failure? failure-value failure!
+
     single
     and-lets lets
     works?
@@ -273,6 +275,13 @@
                     #,ann-string
                     (quote (pred arg ...))
                     (list (quote pred) #,@tmps))))))))))
+
+  ; --------------------------------------
+
+  (data (failure value))
+
+  (define-syntax-rule (failure! value)
+    (failure (quote value)))
 
   ; --------------------------------------
 

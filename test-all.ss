@@ -9,4 +9,5 @@
   "typed-test.ss"
   "compiler-test.ss"
   "decompiler-test.ss"
-  "leo-test.ss")
+  "leo-test.ss"
+  "parser-test.ss")
