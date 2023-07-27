@@ -3,7 +3,7 @@
     compile! leo-compile
     
     ; aux keywords
-    boolean number type select nth first second tuple get choice)
+    boolean number type select nth first second tuple get choice any)
 
   (import (micascheme) (term) (type) (typed))
 
@@ -17,6 +17,7 @@
   (define-aux-keyword tuple)
   (define-aux-keyword get)
   (define-aux-keyword choice)
+  (define-aux-keyword any)
 
   ; ----------------------------------------------------------------
 
@@ -251,7 +252,7 @@
             (env-compile-bind* $env $phase (cdr $stxs) $fn))))))
     
   (define (env-compile $env $phase $stx)
-    (syntax-case $stx (get tuple apply nth variable first choice second lets native boolean number string if recursive function function-type use type select switch)
+    (syntax-case $stx (any get tuple apply nth variable first choice second lets native boolean number string if recursive function function-type use type select switch)
       ((native $value $type)
         (typed 
           (native #`$value)
@@ -266,7 +267,7 @@
         (typed string! type!))
       (type (phase-n? $phase 1)
         (typed type! type!))
-      ((function (name param ...) rhs) (phase-n? $phase 1)
+      ((any (function (name param ...) rhs))
         (typed
           (function-type
             (syntax->datum #`name)

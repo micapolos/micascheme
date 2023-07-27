@@ -23,7 +23,7 @@
 ; === native ===
 
 (lets
-  ($typed (compile! (native string-length (function (length string) number))))
+  ($typed (compile! (native string-length (any (function (length string) number)))))
   ($term (typed-value $typed))
   ($type (typed-type $typed))
   (begin
@@ -45,7 +45,7 @@
 (check-compile (type type) (typed type! type!))
 
 (check-compile
-  (type (function (fn number) string))
+  (type (any (function (fn number) string)))
   (typed (function-type! (fn number!) string!) type!))
 
 ; === tuple ===
