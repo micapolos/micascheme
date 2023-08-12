@@ -248,5 +248,9 @@
           ((string? $string) (quasiquote (foo (unquote (string->datum $string))))) 
           ((number? $number) (quasiquote (foo (unquote (number->datum $number))))))))))
 
+; === stack ===
 
-
+(check (equal? (stack) (list)))
+(check (equal? (stack 1 2 3) (list 3 2 1)))
+(check (equal? (top (stack 1 2 3)) 3))
+(check (equal? (pop (stack 1 2 3)) (stack 1 2)))

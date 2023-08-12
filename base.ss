@@ -25,6 +25,8 @@
     indexed indexed? indexed-value indexed-index
     throw
 
+    stack push top pop
+
     generate-temporary
     build-identifier
 
@@ -44,6 +46,16 @@
   (define (writeln x) (write x) (newline))
 
   (define (works? expr) expr #t)
+
+  (define (push $stack $item) (cons $item $stack))
+  (define (top $stack) (car $stack))
+  (define (pop $stack) (cdr $stack))
+
+  (define-syntax stack
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $item ...) 
+          #`(list #,@(reverse (syntax->list #`($item ...))))))))
 
   (define (single $list)
     (and 

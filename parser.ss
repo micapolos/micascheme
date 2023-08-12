@@ -9,7 +9,11 @@
     parser-bind
 
     the
-    char)
+    char
+    single-char
+
+    make-parser
+    define-parser)
 
   (import (micascheme))
 
@@ -39,6 +43,9 @@
 
   ; --- combinators
 
+  (define (value-parser $value)
+    (parser! $value ($char (failure $char))))
+
   (define (parser-bind $parser $fn)
     (switch (parser-value $parser)
       ((eof-object? $eof-object)
@@ -63,4 +70,39 @@
 
   (define char
     (parser! (eof-object) ($char (the $char))))
+
+  (define (single-char $char)
+    (parser (void)
+      (lambda ($new-char)
+        (cond 
+          ((char=? $new-char $char) 
+            (parser (void) 
+              (lambda ($new-char) 
+                (failure (eof-object)))))
+          (else (failure `(single ,$char)))))))
+
+  (define-syntax make-parser
+    (lambda ($syntax)
+      (syntax-case $syntax (lets)
+        ((_ (lets $binding ... $body))
+          (fold-right 
+            (lambda ($binding $parser)
+              (syntax-case $binding ()
+                (($var $body)
+                  #`(parser-bind (make-parser $body)
+                    (lambda ($var) #,$parser)))))
+            #`(make-parser $body)
+            (syntax->list #`($binding ...))))
+        ((_ $body) 
+          (switch (syntax->datum #`$body)
+            ((char? $char) #`(single-char #,$char))
+            ((string? $string) (failure "todo"))
+            ((else $other) #`$body))))))
+
+  (define-syntax define-parser
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $id $body)
+          #`(define $id
+            (make-parser $body))))))
 )
