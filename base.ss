@@ -5,7 +5,7 @@
 
     failure failure? failure-value failure!
 
-    single
+    single? single
     and-lets lets
     works?
     check checking? test-all
@@ -58,10 +58,12 @@
           #`(list #,@(reverse (syntax->list #`($item ...))))))))
 
   (define (single $list)
-    (and 
+    (and (single? $list) (car $list)))
+
+  (define (single? $list)
+    (and
       (pair? $list) 
-      (null? (cdr $list)) 
-      (car $list)))
+      (null? (cdr $list))))
 
   (define (generate-temporary $obj) 
     (if checking?

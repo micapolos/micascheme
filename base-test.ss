@@ -2,6 +2,10 @@
 
 ; === single ===
 
+(check (equal? (single? (list)) #f))
+(check (equal? (single? (list "a")) #t))
+(check (equal? (single? (list "a" "b")) #f))
+
 (check (equal? (single (list)) #f))
 (check (equal? (single (list "a")) "a"))
 (check (equal? (single (list "a" "b")) #f))
@@ -71,6 +75,20 @@
 (let (($fn (lambda (s) (string-append s "!"))))
   (check (equal? (iterate $fn "Hello" 0) "Hello"))
   (check (equal? (iterate $fn "Hello" 3) "Hello!!!")))
+
+; === index-switch ===
+
+(check (equal? (index-switch (string-length "") `other) `other))
+(check (equal? (index-switch (string-length "a") `other) `other))
+
+(check (equal? (index-switch (string-length "") `zero `other) `zero))
+(check (equal? (index-switch (string-length "a")  `zero `other) `other))
+(check (equal? (index-switch (string-length "ab")  `zero `other) `other))
+
+(check (equal? (index-switch (string-length "")  `zero `one `other) `zero))
+(check (equal? (index-switch (string-length "a")  `zero `one `other) `one))
+(check (equal? (index-switch (string-length "ab")  `zero `one `other) `other))
+(check (equal? (index-switch (string-length "abc")  `zero `one `other) `other))
 
 ; === struct-constructor-syntax ===
 
