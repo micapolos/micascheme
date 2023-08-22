@@ -27,6 +27,55 @@
 
 ; index-switch-syntax
 
-(check (equal? (syntax->datum (index-switch-syntax #`index (list #`a))) `a)) 
-(check (equal? (syntax->datum (index-switch-syntax #`index (list #`a #`b))) `(if index a b)))
-(check (equal? (syntax->datum (index-switch-syntax #`index (list #`a #`b #`c))) `(case index ((0) a) ((1) b) (else c))))
+(check
+  (equal?
+    (syntax->datum (index-switch-syntax #`index (list #`a)))
+    `a))
+
+(check
+  (equal?
+    (syntax->datum (index-switch-syntax #`index (list #`a #`b)))
+    `(if index a b)))
+
+(check
+  (equal?
+    (syntax->datum (index-switch-syntax #`index (list #`a #`b #`c)))
+    `(case index
+      ((0) a)
+      ((1) b)
+      (else c))))
+
+; indexed-syntax
+
+(check (equal? (syntax->datum (indexed-syntax 0 1 #`a)) `a))
+(check (equal? (syntax->datum (indexed-syntax 0 2 #`a)) `(cons #t a)))
+(check (equal? (syntax->datum (indexed-syntax 1 2 #`b)) `(cons #f b)))
+(check (equal? (syntax->datum (indexed-syntax 0 3 #`a)) `(cons 0 a)))
+(check (equal? (syntax->datum (indexed-syntax 1 3 #`b)) `(cons 1 b)))
+(check (equal? (syntax->datum (indexed-syntax 2 3 #`c)) `(cons 2 c)))
+
+; indexed-switch-syntax
+
+(check
+  (equal?
+    (syntax->datum (indexed-switch-syntax #`indexed #`$value (list #`a)))
+    `(lets ($value indexed) a)))
+
+(check
+  (equal?
+    (syntax->datum (indexed-switch-syntax #`indexed #`$value (list #`a #`b)))
+    `(lets
+      ($indexed indexed)
+      ($value (cdr $indexed))
+      (if (car $indexed) a b))))
+
+(check
+  (equal?
+    (syntax->datum (indexed-switch-syntax #`indexed #`$value (list #`a #`b #`c)))
+    `(lets
+      ($indexed indexed)
+      ($value (cdr $indexed))
+      (case (car $indexed)
+        ((0) a)
+        ((1) b)
+        (else c)))))

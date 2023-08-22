@@ -3,7 +3,9 @@
     tuple-syntax 
     tuple-ref-syntax
     index-syntax
-    index-switch-syntax)
+    index-switch-syntax
+    indexed-syntax
+    indexed-switch-syntax)
   (import (micascheme))
 
   (define (tuple-syntax $syntaxes)
@@ -39,4 +41,23 @@
                 #,(if (= $index $last-index) #`else #`(#,$index))
                 #,$case))
             $cases))))))
+
+  (define (indexed-syntax $index $size $value-syntax)
+    (case $size
+      ((1) $value-syntax)
+      (else #`(cons #,(index-syntax $index $size) #,$value-syntax))))
+
+  (define (indexed-switch-syntax $indexed-syntax $value-identifier $case-syntaxes)
+    (case (length $case-syntaxes)
+      ((1)
+        #`(lets
+          (#,$value-identifier #,$indexed-syntax)
+          #,(car $case-syntaxes)))
+      (else
+        (lets
+          ($indexed-identifier (generate-temporary #`indexed))
+          #`(lets
+            (#,$indexed-identifier #,$indexed-syntax)
+            (#,$value-identifier (cdr #,$indexed-identifier))
+            #,(index-switch-syntax #`(car #,$indexed-identifier) $case-syntaxes))))))
 )
