@@ -1,60 +1,110 @@
 (library (leo2)
   (export
-    binding binding? binding-identifier binding-type binding-syntax binding-value
-    term term? term-types term-syntax term-value
-    leo leo? leo-bindings leo-terms leo-parent-option
+    typed typed? typed-value typed-type
 
-    syntax-list-leo)
-  (import (micascheme))
+    variable variable? variable-index
+    arrow! arrow arrow? arrow-params arrow-results
+    struct! struct struct? struct-name struct-values
+    enum! enum enum? enum-name enum-values
+    string! any-string any-string?
+    number! any-number any-number?
+    anything! anything anything?
+
+    type-static? type-dynamic? types-dynamic?
+
+    indexing indexing? indexing-size indexing-index-options
+    empty-indexing indexing-reverse indexing-ref
+    indexing+type types-indexing types-indexed)
+  
+  (import (micascheme) (syntax))
 
   (data (typed value type))
 
-  (data (term types syntax values))
-  (data (binding term identifiers))
-  (data (leo bindings terms parent-option))
-
   (data (variable index))
-  (data (abstraction params results))
-  (data (application fn args))
+  (data (arrow params results))
   (data (struct name values))
   (data (enum name values))
 
   (data (any-string))
   (data (any-number))
+  (data (anything))
 
-  (define empty-leo (leo (list) (list) #f))
+  (define-syntax-rule (struct! $name $value ...)
+    (struct (quote $name) (list $value ...)))
 
-  (define (syntax-list-leo $syntax-list)
-    (fold-left leo+syntax empty-leo $syntax-list))
+  (define-syntax-rule (enum! $name $value ...)
+    (enum (quote $name) (list $value ...)))
 
-  (define (leo-syntax-term $leo $syntax)
-    (syntax-case (syntax-normalize $syntax) (lambda)
-      ((lambda ($param ...) $body ...)
-        (syntax-error $syntax "todo lambda"))
-      (($identifier $arg ...) (identifier? #`$identifier)
-        (syntax-error $syntax "todo field"))
-      ($other 
-        (switch (syntax->datum #`$other)
-          ((string? $string) (term (list (any-string)) $syntax (list $string)))
-          ((number? $number) (term (list (any-number)) $syntax (list $number)))
-          ((else $other) (syntax-error $syntax))))))
+  (define-syntax-rule (arrow! ($param ...) $result ...)
+    (arrow (list $param ...) (list $result ...)))
 
-  (define (leo+syntaxes $leo $syntaxes)
-    (fold-left leo+syntax $leo $syntaxes))
+  (define anything! (anything))
+  (define string! (any-string))
+  (define number! (any-number))
 
-  (define (leo+syntax $leo $syntax)
-    (leo+term
-      $leo
-      (leo-syntax-term $leo $syntax)))
+  ; --- type-static? type-dynamic?
 
-  (define (leo+term $leo $term)
-    (leo
-      (leo-bindings $leo)
-      (push (leo-terms $leo) $term)
-      (leo-parent-option $leo)))
+  (define (types-dynamic? $types)
+    (exists type-dynamic? $types))
 
-  (define (syntax-normalize $syntax)
-    (syntax-case $syntax ()
-      ($identifier (identifier? #`$identifier) #`($identifier))
-      ($other #`$other)))
+  (define (type-static? $type)
+    (not (type-dynamic? $type)))
+
+  (define (type-dynamic? $type)
+    (switch $type
+      ((variable? _) #t)
+      ((arrow? $arrow) (arrow-dynamic? $arrow))
+      ((struct? $struct) (struct-dynamic? $struct))
+      ((enum? $enum) (enum-dynamic? $enum))
+      ((any-string? _) #t)
+      ((any-number? _) #t)
+      ((anything? _) #t)
+      ((else $other) (throw type-dynamic? $other))))
+
+  (define (arrow-dynamic? $arrow)
+    (types-dynamic? (arrow-results $arrow)))
+
+  (define (struct-dynamic? $struct)
+    (types-dynamic? (struct-values $struct)))
+
+  (define (enum-dynamic? $enum)
+    (lets 
+      ($values (enum-values $enum))
+      (case (length $values)
+        ((1) (type-dynamic? (car $values)))
+        (else #t))))
+
+  (define (typed-dynamic? $typed) 
+    (type-dynamic? (typed-type $typed)))
+
+  (define (typed-static? $typed) 
+    (type-static? (typed-type $typed)))
+
+  ; --- indexing
+
+  (data (indexing size index-options))
+
+  (define empty-indexing (indexing 0 (list)))
+
+  (define (indexing-reverse $indexing)
+    (indexing
+      (indexing-size $indexing)
+      (reverse (indexing-index-options $indexing))))
+
+  (define (indexing+type $indexing $type)
+    (lets 
+      ($size (indexing-size $indexing))
+      ($index-options (indexing-index-options $indexing))
+      (if (type-dynamic? $type)
+        (indexing (+ $size 1) (cons $size $index-options))
+        (indexing $size (cons #f $index-options)))))
+
+  (define (indexing-ref $indexing $index)
+    (list-ref (indexing-index-options $indexing) $index))
+
+  (define (types-indexing $types)
+    (indexing-reverse (fold-left indexing+type empty-indexing $types)))
+
+  (define (types-indexed $types)
+    (map indexed $types (indexing-index-options (types-indexing $types))))
 )
