@@ -351,7 +351,7 @@
       ((nth num name expr)
         (lets
           ($num (syntax->datum #`num))
-          ($unused (unless (number? $num) (syntax-error #`num "should be number")))
+          (do (unless (number? $num) (syntax-error #`num "should be number")))
           "TODO"))
       ((first name expr)
         "TODO")
