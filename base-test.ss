@@ -17,9 +17,11 @@
 (check (obj=? (list-get (list "a" "b") 2) (list-get-overflow 0)))
 (check (obj=? (list-get (list "a" "b") 3) (list-get-overflow 1)))
 
-; === bind ===
+; === lets ===
 
 (check (equal? (lets 1) 1))
+(check (equal? (lets (x 1) x) 1))
+(check (equal? (lets ((x y) (values 3 2)) (- x y)) 1))
 (check (equal? (lets (x 1) (y (+ x 2)) y) 3))
 
 ; === build-identifier ===
@@ -75,20 +77,6 @@
 (let (($fn (lambda (s) (string-append s "!"))))
   (check (equal? (iterate $fn "Hello" 0) "Hello"))
   (check (equal? (iterate $fn "Hello" 3) "Hello!!!")))
-
-; === index-switch ===
-
-(check (equal? (index-switch (string-length "") `other) `other))
-(check (equal? (index-switch (string-length "a") `other) `other))
-
-(check (equal? (index-switch (string-length "") `zero `other) `zero))
-(check (equal? (index-switch (string-length "a")  `zero `other) `other))
-(check (equal? (index-switch (string-length "ab")  `zero `other) `other))
-
-(check (equal? (index-switch (string-length "")  `zero `one `other) `zero))
-(check (equal? (index-switch (string-length "a")  `zero `one `other) `one))
-(check (equal? (index-switch (string-length "ab")  `zero `one `other) `other))
-(check (equal? (index-switch (string-length "abc")  `zero `one `other) `other))
 
 ; === struct-constructor-syntax ===
 

@@ -86,8 +86,18 @@
     (begin
       (let () (load file)) ...))
 
-  (define-syntax-rule (lets decl ... body)
-    (let* (decl ...) body))
+  (define-syntax lets
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $decl $decls ... $result)
+          (syntax-case #`$decl ()
+            ((($id ...) $expr)
+              #`(let-values ((($id ...) $expr))
+                (lets $decls ... $result)))
+            (($id $expr)
+              #`(let (($id $expr))
+                (lets $decls ... $result)))))
+        ((_ $result) #`$result))))
 
   (define-syntax and-lets
     (syntax-rules ()
