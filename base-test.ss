@@ -23,6 +23,7 @@
 (check (equal? (lets (x 1) x) 1))
 (check (equal? (lets ((x y) (values 3 2)) (- x y)) 1))
 (check (equal? (lets (x 1) (y (+ x 2)) y) 3))
+(check (equal? (lets (x (box 1)) (do (set-box! x 2)) (unbox x)) 2))
 
 ; === build-identifier ===
 

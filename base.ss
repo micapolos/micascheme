@@ -90,13 +90,16 @@
     (lambda ($syntax)
       (syntax-case $syntax ()
         ((_ $decl $decls ... $result)
-          (syntax-case #`$decl ()
+          (syntax-case #`$decl (do)
             ((($id ...) $expr)
               #`(let-values ((($id ...) $expr))
                 (lets $decls ... $result)))
             (($id $expr)
               #`(let (($id $expr))
-                (lets $decls ... $result)))))
+                (lets $decls ... $result)))
+            ($expr
+              #`(begin $expr
+              (lets $decls ... $result)))))
         ((_ $result) #`$result))))
 
   (define-syntax and-lets
