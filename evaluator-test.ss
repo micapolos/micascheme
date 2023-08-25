@@ -1,49 +1,62 @@
 (import (micascheme) (evaluator))
 
-; empty bindings 
+; construction
+
+(lets 
+  ($evaluator (empty-evaluator (environment `(micascheme))))
+  ($evaluator (evaluator-push $evaluator `a "Hello, "))
+  ($evaluator (evaluator-push $evaluator `b "world!"))
+  (check 
+    (equal? 
+      (evaluator-bindings $evaluator) 
+      (stack 
+        (cons `a "Hello, ") 
+        (cons `b "world!")))))
+
+; evaluate empty
 
 (check 
   (equal? 
     (evaluate 
-      (evaluator (environment `(micascheme)) (list))
+      (evaluator (environment `(micascheme)) (stack))
       `(string-append "Hello, " "world!"))
     "Hello, world!"))
 
-; non-empty bindings 
+; evaluate bindings 
 
 (check
   (equal? 
     (evaluate 
       (evaluator
         (environment `(micascheme))
-        (list
+        (stack
           (cons `a "Hello, ") 
           (cons `b "world!")))
       `(string-append a b))
     "Hello, world!"))
 
-; redefine binding
+; evaluate redefined bindings
 
 (check
   (equal? 
     (evaluate 
       (evaluator
         (environment `(micascheme))
-        (list
+        (stack
           (cons `a "Hello, ") 
           (cons `b "world!")
           (cons `a "Goodbye, ")))
       `(string-append a b))
     "Goodbye, world!"))
 
-; redefine environment
+; evaluate redefined environment
 
 (check
   (equal? 
     (evaluate 
       (evaluator
         (environment `(micascheme))
-        (list 
+        (stack 
           (cons `+ (lambda (a b) (string-append a b)))))
       `(+ "Hello, " "world!"))
     "Hello, world!"))

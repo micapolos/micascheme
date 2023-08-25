@@ -1,17 +1,28 @@
 (library (evaluator)
   (export 
     evaluator evaluator? evaluator-environment evaluator-bindings
+    empty-evaluator evaluator-push
     evaluate)
   (import (micascheme))
 
   (data (evaluator environment bindings))
 
+  (define (empty-evaluator $environment)
+    (evaluator $environment (list)))
+
+  (define (evaluator-push $evaluator $symbol $value)
+    (evaluator 
+      (evaluator-environment $evaluator)
+      (cons 
+        (cons $symbol $value)
+        (evaluator-bindings $evaluator))))
+
   (define (evaluate $evaluator $datum)
-    (fold-left
-      (lambda ($value $arg) ($value $arg))
+    (fold-right
+      (lambda ($arg $value) ($value $arg))
       (eval
-        (fold-right
-          (lambda ($param $datum) `(lambda (,$param) ,$datum))
+        (fold-left
+          (lambda ($datum $param) `(lambda (,$param) ,$datum))
           $datum
           (map car (evaluator-bindings $evaluator)))
         (evaluator-environment $evaluator))
