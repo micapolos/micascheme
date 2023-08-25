@@ -10,4 +10,6 @@
   "compiler-test.ss"
   "decompiler-test.ss"
   "leo-test.ss"
-  "parser-test.ss")
+  "parser-test.ss"
+  "syntax.ss"
+  "value.ss")
