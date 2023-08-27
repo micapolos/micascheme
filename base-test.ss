@@ -51,14 +51,14 @@
       (fib 10))
     55))
 
-; === base-do ===
+; === script ===
 
-(check (equal? (base-do "foo") "foo"))
-(check (equal? (base-do "foo" (string-length)) 3))
-(check (equal? (base-do "foo" (string-append "bar")) "foobar"))
-(check (equal? (base-do "foo" (string-append "bar")) "foobar"))
-(check (equal? (base-do "foo" (string-append "bar") (string-append "goo")) "foobargoo"))
-(check (equal? (base-do "foo" (string-append "bar" "goo")) "foobargoo"))
+(check (equal? (script "foo") "foo"))
+(check (equal? (script "foo" (string-length)) 3))
+(check (equal? (script "foo" (string-append "bar")) "foobar"))
+(check (equal? (script "foo" (string-append "bar")) "foobar"))
+(check (equal? (script "foo" (string-append "bar") (string-append "goo")) "foobargoo"))
+(check (equal? (script "foo" (string-append "bar" "goo")) "foobargoo"))
 
 ; === build-identifier ===
 
