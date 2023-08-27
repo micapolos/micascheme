@@ -6,6 +6,7 @@
     failure failure? failure-value failure!
 
     single? single
+    base-do
     and-lets lets
     works?
     check checking? test-all
@@ -111,6 +112,15 @@
       ((_ (val expr) decl ... body)
         (let ((val expr)) 
           (and val (and-lets decl ... body))))))
+
+  (define-syntax base-do
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $target $op1 $op2 ...)
+          (syntax-case #`$op1 ()
+            (($name $arg ...)
+              #`(base-do ($name $target $arg ...) $op2 ...))))
+        ((_ $target) #`$target))))
 
   (define (partial $proc . $partial-args)
     (lambda $args

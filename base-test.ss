@@ -51,6 +51,15 @@
       (fib 10))
     55))
 
+; === base-do ===
+
+(check (equal? (base-do "foo") "foo"))
+(check (equal? (base-do "foo" (string-length)) 3))
+(check (equal? (base-do "foo" (string-append "bar")) "foobar"))
+(check (equal? (base-do "foo" (string-append "bar")) "foobar"))
+(check (equal? (base-do "foo" (string-append "bar") (string-append "goo")) "foobargoo"))
+(check (equal? (base-do "foo" (string-append "bar" "goo")) "foobargoo"))
+
 ; === build-identifier ===
 
 (check (equal? (syntax->datum (build-identifier (s #`dupa) (string-append s "-jasiu"))) `dupa-jasiu))
