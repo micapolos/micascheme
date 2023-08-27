@@ -41,7 +41,7 @@
   (define (compile-term $compiler $syntax)
     (syntax-case $syntax (variable struct)
       ((variable $index) 
-        (binding->term
+        (binding->term 
           (list-ref
             (compiler-bindings $compiler)
             (syntax->datum #`$index))))
