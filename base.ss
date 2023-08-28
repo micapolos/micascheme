@@ -5,6 +5,7 @@
 
     failure failure? failure-value failure!
 
+    from
     single? single
     script
     and-lets lets
@@ -112,6 +113,14 @@
       ((_ (val expr) decl ... body)
         (let ((val expr)) 
           (and val (and-lets decl ... body))))))
+
+  (define-syntax from
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $package-spec $identifier)
+          #`(let ()
+            (import-only (only $package-spec $identifier))
+            $identifier)))))
 
   (define-syntax script
     (lambda ($syntax)

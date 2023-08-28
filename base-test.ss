@@ -1,5 +1,10 @@
 (import (chezscheme) (base))
 
+; === from ===
+
+(check (equal? (from (base-from-testing) foo) "foo"))
+(check (equal? (from (base-from-testing) single?) "single? override"))
+
 ; === single ===
 
 (check (equal? (single? (list)) #f))
