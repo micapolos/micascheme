@@ -300,7 +300,12 @@
             (ann (syntax->annotation stx))
             (source (annotation-source ann))
             (ann-string 
-            (if ann (format " source: ~a (<line>:<char>)\n" (source-file-descriptor-path (source-object-sfd source))) ""))
+              (if ann
+                (format " source: ~a (~a:~a)\n"
+                  (source-file-descriptor-path (source-object-sfd source))
+                  (source-object-line source)
+                  (source-object-column source))
+                ""))
             #`(let (#,@let-cases)
               (or (parameterize ((checking? #t)) (not (pred #,@tmps)))
                 (error `check 
@@ -316,7 +321,12 @@
             (ann (syntax->annotation stx))
             (source (annotation-source ann))
             (ann-string 
-            (if ann (format " source: ~a (<line>:<char>)\n" (source-file-descriptor-path (source-object-sfd source))) ""))
+              (if ann
+                (format " source: ~a (~a:~a)\n"
+                  (source-file-descriptor-path (source-object-sfd source))
+                  (source-object-line source)
+                  (source-object-column source))
+                ""))
             #`(let (#,@let-cases)
               (or (parameterize ((checking? #t)) (pred #,@tmps))
                 (error `check 
