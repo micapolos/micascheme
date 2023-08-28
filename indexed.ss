@@ -108,6 +108,4 @@
               #`(choice #,@$values-syntax-list))))
         ((selection? $selection)
           )
-
-
 )
