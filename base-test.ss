@@ -1,4 +1,4 @@
-(import (chezscheme) (base))
+(import (scheme) (base))
 
 ; === from ===
 

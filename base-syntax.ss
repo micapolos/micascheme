@@ -9,7 +9,7 @@
     define-struct
     define-one-of)
 
-  (import (chezscheme) (base))
+  (import (scheme) (base))
 
   (define-syntax index-switch
     (lambda (stx)

@@ -4,7 +4,7 @@
     infix infix: 
     := ->
     is being)
-  (import (chezscheme) (base))
+  (import (scheme) (base))
 
   ; --------------------------------------------------
 

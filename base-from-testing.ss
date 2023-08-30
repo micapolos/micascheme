@@ -1,6 +1,6 @@
 (library (base-from-testing)
   (export foo single?)
-  (import (chezscheme))
+  (import (scheme))
 
   (define foo "foo")
   (define single? "single? override")

@@ -42,7 +42,7 @@
     one-of->datum-syntax
     one-of-syntax)
 
-  (import (chezscheme))
+  (import (scheme))
 
   (define (displayln x) (display x) (newline))
   (define (writeln x) (write x) (newline))

@@ -1,10 +1,10 @@
 (import (micascheme) (monad))
 
-; monad-return
+; monad-pure
 
 (check 
   (equal? 
-    (monad-return option-monad "foo") 
+    (monad-pure option-monad "foo") 
     "foo"))
 
 ; monad-bind
@@ -63,3 +63,45 @@
 (check (equal? (monad-lift option-monad string-append "a" #f) #f))
 (check (equal? (monad-lift option-monad string-append #f "b") #f))
 (check (equal? (monad-lift option-monad string-append #f #f) #f))
+
+; listing monad
+
+(check
+  (equal?
+    (listing-run
+      (monad-bind listing-monad (monad-pure listing-monad "foo")
+        (lambda ($foo)
+          (monad-map listing-monad (monad-pure listing-monad "bar")
+            (lambda ($bar)
+              (string-append $foo $bar))))))
+    (cons "foobar" (list "foobar" "bar" "foo"))))
+
+; monadic
+
+(check
+  (equal?
+    (listing-run (monadic listing-monad (listing "foo")))
+    (cons "foo" (list "foo"))))
+
+(check
+  (equal?
+    (listing-run (monadic listing-monad (pure "foo")))
+    (cons "foo" (list "foo"))))
+
+(check
+  (equal?
+    (listing-run (monadic listing-monad (lets (pure "foo"))))
+    (cons "foo" (list "foo"))))
+
+(define-monadic (plus $a $b)
+  (pure (+ $a $b)))
+
+(check
+  (equal?
+    (listing-run
+      (monadic listing-monad
+        (lets
+          ($foo (pure "foo"))
+          ($bar (pure "bar"))
+          (pure (string-append $foo $bar)))))
+    (cons "foobar" (list "foobar" "bar" "foo"))))

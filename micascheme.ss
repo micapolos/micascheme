@@ -2,14 +2,14 @@
   (export)
 
   (import 
-    (except (chezscheme) do)
+    (except (scheme) do)
     (rename (base) (script do))
     (base-syntax)
     (infix))
 
   (export
     (import 
-      (except (chezscheme) do)
+      (except (scheme) do)
       (rename (base) (script do))
       (base-syntax)
       (infix))))
