@@ -52,8 +52,11 @@
   ($processor (indented-processor (string-processor)))
   (begin
     (check (equal? (processor-process $processor "") ""))
-    ;(check (equal? (processor-process $processor " ") #f))
-    ;(check (equal? (processor-process $processor "  ") ""))
+    (check (equal? (processor-process $processor " ") #f))
+    (check (equal? (processor-process $processor "  ") #f))
+    (check (equal? (processor-process $processor "  \n") "\n"))
+    (check (equal? (processor-process $processor "  a") #f))
+    ;(check (equal? (processor-process $processor "  a\n") "a\n"))
     ))
 
 ; ---------------------------------------------------------

@@ -122,27 +122,30 @@
       (processor
         (and $state-opt (cons 0 $state-opt))
         (lambda ($indented $char)
+          (and $indented
           (lets
             ($indent (car $indented))
             ($body (cdr $indented))
-            (case $char
-              ((#\space)
-                (if (< $indent indent-size)
-                  (cons (+ $indent 1) $body)
-                  (cons $indent ($push-fn $body $char))))
-              ((#\newline)
-                (and
-                  (or (= $indent 0) (= $indent indent-size))
-                  (cons 0 ($push-fn $body $char))))
-              (else 
-                (and
-                  (= $indent indent-size)
-                  (cons (+ $indent 1) ($push-fn $body $char)))))))
+            (and $body
+              (case $char
+                ((#\space)
+                  (if (< $indent indent-size)
+                    (cons (+ $indent 1) $body)
+                    (cons $indent ($push-fn $body $char))))
+                ((#\newline)
+                  (and
+                    (or (= $indent 0) (= $indent indent-size))
+                    (cons 0 ($push-fn $body $char))))
+                (else 
+                  (and
+                    (= $indent indent-size)
+                    (cons (+ $indent 1) ($push-fn $body $char)))))))))
         (lambda ($indented)
-          (lets
-            ($indent (car $indented))
-            ($body (cdr $indented))
-            (and (zero? $indent) ($finish-fn $body)))))))
+          (and $indented
+            (lets
+              ($indent (car $indented))
+              ($body (cdr $indented))
+              (and (zero? $indent) $body ($finish-fn $body))))))))
 
   ; ----------------------------------------------------------
 
