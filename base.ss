@@ -1,5 +1,7 @@
 (library (base)
   (export 
+    identity
+
     list-get
     list-get-overflow list-get-overflow? list-get-overflow-index
 
@@ -21,7 +23,7 @@
     switch
     unpair
     associ
-    filter-map
+    filter-map filter-opts
     map-find-indexed
     map-indexed list-indexed
     indexed indexed? indexed-value indexed-index
@@ -43,6 +45,8 @@
     one-of-syntax)
 
   (import (scheme))
+
+  (define identity (lambda (x) x))
 
   (define (displayln x) (display x) (newline))
   (define (writeln x) (write x) (newline))
@@ -174,6 +178,9 @@
 
   (define (filter-map $proc . $list)
     (filter (lambda (x) x) (apply map (cons $proc $list))))
+
+  (define (filter-opts $opts)
+    (filter identity $opts))
 
   (define (list-indexed $list)
     (map-indexed (lambda ($index $value) (indexed $value $index)) $list))

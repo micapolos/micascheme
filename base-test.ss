@@ -94,6 +94,10 @@
 
 (check (equal? (filter-map (lambda (a b) (and a b)) (list #f #t #f #t) (list 1 2 3 4)) (list 2 4)))
 
+; === filter-opts ===
+
+(check (equal? (filter-opts (list 1 #f "foo" #f #t)) (list 1 "foo" #t)))
+
 ; === indexed ===
 
 (check (equal? (indexed-value (indexed "a" 1)) "a"))
