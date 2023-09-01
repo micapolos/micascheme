@@ -24,7 +24,7 @@
 
     indented-parser indented-parser? indented-parser-space-count indented-parser-body-parser
     empty-indented-parser indented-parser-push indented-parser-body-parser-opt
-    )
+  )
 
   (import (micascheme))
 
@@ -134,9 +134,8 @@
       ($push-fn (processor-push-fn $processor))
       ($finish-fn (processor-finish-fn $processor))
       (processor
-        (and $state-opt (cons 0 $state-opt))
+        (cons 0 $state-opt)
         (lambda ($indented $char)
-          (and $indented
           (lets
             ($indent (car $indented))
             ($body (cdr $indented))
@@ -145,21 +144,21 @@
                 ((#\space)
                   (if (< $indent indent-size)
                     (cons (+ $indent 1) $body)
-                    (cons $indent ($push-fn $body $char))))
+                    (cons $indent (and $body ($push-fn $body $char)))))
                 ((#\newline)
                   (and
                     (or (= $indent 0) (= $indent indent-size))
-                    (cons 0 ($push-fn $body $char))))
+                    (cons 0 (and $body ($push-fn $body $char)))))
                 (else 
                   (and
                     (= $indent indent-size)
-                    (cons (+ $indent 1) ($push-fn $body $char)))))))))
+                    (cons (+ $indent 1) (and $body ($push-fn $body $char)))))))))
         (lambda ($indented)
           (and $indented
             (lets
               ($indent (car $indented))
               ($body (cdr $indented))
-              (and (zero? $indent) $body ($finish-fn $body))))))))
+              (and (zero? $indent) (and $body ($finish-fn $body)))))))))
 
   ; ----------------------------------------------------------
 
