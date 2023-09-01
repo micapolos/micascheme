@@ -8,7 +8,7 @@
     positive-integer-processor
     word-processor
     oneof-processor
-    indented-processor
+    indent-processor
 
     string-parser string-parser? string-parser-char-stack
     empty-string-parser string-parser-push string-parser-finish
@@ -128,7 +128,7 @@
 
   (define indent-size 2)
 
-  (define (indented-processor $processor)
+  (define (indent-processor $processor)
     (lets
       ($state-opt (processor-state-opt $processor))
       ($push-fn (processor-push-fn $processor))

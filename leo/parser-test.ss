@@ -56,7 +56,7 @@
 ; ---------------------------------------------------------
 
 (lets
-  ($processor (indented-processor (string-processor)))
+  ($processor (indent-processor (string-processor)))
   (begin
     (check (equal? (processor-process $processor "") ""))
     (check (equal? (processor-process $processor " ") #f))
