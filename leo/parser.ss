@@ -139,26 +139,24 @@
           (lets
             ($indent (car $indented))
             ($body (cdr $indented))
-            (and $body
-              (case $char
-                ((#\space)
-                  (if (< $indent indent-size)
-                    (cons (+ $indent 1) $body)
-                    (cons $indent (and $body ($push-fn $body $char)))))
-                ((#\newline)
-                  (and
-                    (or (= $indent 0) (= $indent indent-size))
-                    (cons 0 (and $body ($push-fn $body $char)))))
-                (else 
-                  (and
-                    (= $indent indent-size)
-                    (cons (+ $indent 1) (and $body ($push-fn $body $char)))))))))
+            (case $char
+              ((#\space)
+                (if (< $indent indent-size)
+                  (cons (+ $indent 1) $body)
+                  (cons $indent (and $body ($push-fn $body $char)))))
+              ((#\newline)
+                (and
+                  (or (= $indent 0) (= $indent indent-size))
+                  (cons 0 (and $body ($push-fn $body $char)))))
+              (else 
+                (and
+                  (= $indent indent-size)
+                  (cons (+ $indent 1) (and $body ($push-fn $body $char))))))))
         (lambda ($indented)
-          (and $indented
-            (lets
-              ($indent (car $indented))
-              ($body (cdr $indented))
-              (and (zero? $indent) (and $body ($finish-fn $body)))))))))
+          (lets
+            ($indent (car $indented))
+            ($body (cdr $indented))
+            (and (zero? $indent) (and $body ($finish-fn $body))))))))
 
   ; ----------------------------------------------------------
 
