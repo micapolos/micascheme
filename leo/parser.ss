@@ -4,6 +4,7 @@
     processor-process
 
     string-processor
+    line-processor
     positive-integer-processor
     word-processor
     oneof-processor
@@ -53,6 +54,19 @@
         (push $char-stack $char))
       (lambda ($char-stack) 
         (list->string (reverse $char-stack)))))
+
+  ; ----------------------------------------------------------
+
+  (define (line-processor)
+    (processor
+      (stack)
+      (lambda ($char-stack-or-line $char)
+        (and (not (string? $char-stack-or-line))
+          (case $char
+            ((#\newline) (list->string (reverse $char-stack-or-line)))
+            (else (push $char-stack-or-line $char)))))
+      (lambda ($char-stack-or-line)
+        (and (string? $char-stack-or-line) $char-stack-or-line))))
 
   ; ----------------------------------------------------------
 

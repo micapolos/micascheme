@@ -20,6 +20,13 @@
 
 ; ---------------------------------------------------------
 
+(check (equal? (processor-process (line-processor) "") #f))
+(check (equal? (processor-process (line-processor) "\n") ""))
+(check (equal? (processor-process (line-processor) "foo") #f))
+(check (equal? (processor-process (line-processor) "foo\n") "foo"))
+
+; ---------------------------------------------------------
+
 (check (equal? (processor-process (positive-integer-processor) "") #f))
 (check (equal? (processor-process (positive-integer-processor) "012") 12))
 (check (equal? (processor-process (positive-integer-processor) "012a") #f))
