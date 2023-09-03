@@ -2,7 +2,7 @@
   (export
     parser parser? parser parser-push-fn parser-finish-fn
     parser-push parser-finish
-    parser-of parser-bind parser-map
+    parser-with parser-bind parser-map
     parse
 
     char-parser
@@ -29,7 +29,7 @@
   (define (parser-finish $parser)
     ((parser-finish-fn $parser)))
 
-  (define (parser-of $value)
+  (define (parser-with $value)
     (parser 
       (lambda ($char) #f) 
       (lambda () $value)))
@@ -52,7 +52,7 @@
   (define (parser-map $parser $fn)
     (parser-bind $parser 
       (lambda ($item) 
-        (parser-of ($fn $item)))))
+        (parser-with ($fn $item)))))
 
   ; ----------------------------------------------------------
 
@@ -181,7 +181,7 @@
 
   (define (fold-parser $folded $parser $fn)
     (oneof-parser
-      (parser-of $folded)
+      (parser-with $folded)
       (parser-bind $parser
         (lambda ($item)
           (fold-parser ($fn $folded $item) $parser $fn)))))

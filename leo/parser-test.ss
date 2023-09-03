@@ -1,8 +1,8 @@
 (import (micascheme) (leo parser))
 
-(check (equal? (parse (parser-of "foo") "") "foo"))
-(check (equal? (parse (parser-of "foo") "a") #f))
-(check (equal? (parse (parser-of "foo") "foo") #f))
+(check (equal? (parse (parser-with "foo") "") "foo"))
+(check (equal? (parse (parser-with "foo") "a") #f))
+(check (equal? (parse (parser-with "foo") "foo") #f))
 
 ; ---------------------------------------------------------
 
@@ -46,7 +46,7 @@
       (lambda ($positive-integer)
         (parser-bind (word-parser)
           (lambda ($word)
-            (parser-of 
+            (parser-with 
               (string-append
                 (symbol->string $word)
                 ": "
