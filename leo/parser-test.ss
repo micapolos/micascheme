@@ -1,49 +1,34 @@
 (import (micascheme) (leo parser))
 
-(define (string-push $string $char)
-  (string-append $string (string $char)))
-
-(define (word-push $string $char)
-  (and
-    (char-alphabetic? $char)
-    (string-append $string (string $char))))
-
-(define (number-push $string $char)
-  (and
-    (char-numeric? $char)
-    (string-append $string (string $char))))
+(check (equal? (parse (parser-of "foo") "") "foo"))
+(check (equal? (parse (parser-of "foo") "a") #f))
+(check (equal? (parse (parser-of "foo") "foo") #f))
 
 ; ---------------------------------------------------------
 
-(check (equal? (parser-process (parser-of "foo") "") "foo"))
-(check (equal? (parser-process (parser-of "foo") "a") #f))
-(check (equal? (parser-process (parser-of "foo") "foo") #f))
+(check (equal? (parse (string-parser) "") ""))
+(check (equal? (parse (string-parser) "$a1") "$a1"))
 
 ; ---------------------------------------------------------
 
-(check (equal? (parser-process (string-parser) "") ""))
-(check (equal? (parser-process (string-parser) "$a1") "$a1"))
+(check (equal? (parse (line-parser) "") #f))
+(check (equal? (parse (line-parser) "\n") ""))
+(check (equal? (parse (line-parser) "foo") #f))
+(check (equal? (parse (line-parser) "foo\n") "foo"))
 
 ; ---------------------------------------------------------
 
-(check (equal? (parser-process (line-parser) "") #f))
-(check (equal? (parser-process (line-parser) "\n") ""))
-(check (equal? (parser-process (line-parser) "foo") #f))
-(check (equal? (parser-process (line-parser) "foo\n") "foo"))
+(check (equal? (parse (positive-integer-parser) "") #f))
+(check (equal? (parse (positive-integer-parser) "012") 12))
+(check (equal? (parse (positive-integer-parser) "012a") #f))
+(check (equal? (parse (positive-integer-parser) "-012") #f))
 
 ; ---------------------------------------------------------
 
-(check (equal? (parser-process (positive-integer-parser) "") #f))
-(check (equal? (parser-process (positive-integer-parser) "012") 12))
-(check (equal? (parser-process (positive-integer-parser) "012a") #f))
-(check (equal? (parser-process (positive-integer-parser) "-012") #f))
-
-; ---------------------------------------------------------
-
-(check (equal? (parser-process (word-parser) "") #f))
-(check (equal? (parser-process (word-parser) "foo") `foo))
-(check (equal? (parser-process (word-parser) "1") #f))
-(check (equal? (parser-process (word-parser) "foo1") #f))
+(check (equal? (parse (word-parser) "") #f))
+(check (equal? (parse (word-parser) "foo") `foo))
+(check (equal? (parse (word-parser) "1") #f))
+(check (equal? (parse (word-parser) "foo1") #f))
 
 ; ---------------------------------------------------------
 
@@ -54,20 +39,19 @@
         (word-parser)
         (positive-integer-parser))))
   (begin
-    (check (equal? (parser-process $parser "") #f))
-    (check (equal? (parser-process $parser "foo") `foo))
-    (check (equal? (parser-process $parser "123") 123))
-    (check (equal? (parser-process $parser "$1") #f))))
+    (check (equal? (parse $parser "") #f))
+    (check (equal? (parse $parser "foo") `foo))
+    (check (equal? (parse $parser "123") 123))
+    (check (equal? (parse $parser "$1") #f))))
 
 ; ---------------------------------------------------------
 
 (lets
   ($parser (indent-parser (string-parser)))
   (begin
-    (check (equal? (parser-process $parser "") ""))
-    (check (equal? (parser-process $parser " ") #f))
-    (check (equal? (parser-process $parser "  ") #f))
-    (check (equal? (parser-process $parser "  \n") "\n"))
-    (check (equal? (parser-process $parser "  a") #f))
-    ;(check (equal? (parser-process $parser "  a\n") "a\n"))
-    ))
+    (check (equal? (parse $parser "") ""))
+    (check (equal? (parse $parser " ") #f))
+    (check (equal? (parse $parser "  ") #f))
+    (check (equal? (parse $parser "  \n") "\n"))
+    (check (equal? (parse $parser "  a") #f))
+    (check (equal? (parse $parser "  a\n") "a\n"))))

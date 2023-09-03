@@ -1,9 +1,10 @@
 (library (leo parser)
   (export
-    parser parser? parser-state-opt parser-push-fn parser-finish-fn
-    parser-process
+    parser parser? parser parser-push-fn parser-finish-fn
+    parser-push parser-finish
+    parser-of parser-bind
+    parse
 
-    parser-of
     string-parser
     line-parser
     positive-integer-parser
@@ -16,64 +17,81 @@
 
   ; ----------------------------------------------------------
 
-  (data (parser state-opt push-fn finish-fn))
+  (data (parser push-fn finish-fn))
 
-  (define (parser-process $parser $string)
-    (lets
-      ($state-opt (parser-state-opt $parser))
-      ($push-fn (parser-push-fn $parser))
-      ($finish-fn (parser-finish-fn $parser))
-      ($state-opt
-        (fold-left
-          (lambda ($state-opt $char)
-            (and $state-opt ($push-fn $state-opt $char)))
-          $state-opt
-          (string->list $string)))
-      (and $state-opt ($finish-fn $state-opt))))
+  (define (parser-push $parser $char)
+    ((parser-push-fn $parser) $char))
 
-  ; ----------------------------------------------------------
+  (define (parser-finish $parser)
+    ((parser-finish-fn $parser)))
 
   (define (parser-of $value)
+    (parser 
+      (lambda ($char) #f) 
+      (lambda () $value)))
+
+  (define (parser-bind $parser $fn)
     (parser
-      `()
-      (lambda (_ $char) #f)
-      (lambda (_) $value)))
+      (lambda ($char)
+        (lets
+          ($push-parser (parser-push $parser $char))
+          (or $push-parser
+            (opt-lift parser-push
+              (opt-lift $fn (parser-finish $parser))
+              $char))))
+      (lambda ()
+        (opt-lift parser-finish
+          (opt-lift $fn 
+            (parser-finish $parser))))))
+
+  (define (parse $parser $string)
+    (opt-lift parser-finish
+      (fold-left
+        (lambda ($parser-opt $char)
+          (opt-lift parser-push $parser-opt (opt $char)))
+        $parser
+        (string->list $string))))
 
   ; ----------------------------------------------------------
 
-  (define (string-parser)
+  (define (make-string-parser $char-stack)
     (parser
-      (stack)
-      (lambda ($char-stack $char) 
-        (push $char-stack $char))
-      (lambda ($char-stack) 
+      (lambda ($char)
+        (make-string-parser (push $char-stack $char)))
+      (lambda ()
         (list->string (reverse $char-stack)))))
 
+  (define (string-parser)
+    (make-string-parser (stack)))
+
   ; ----------------------------------------------------------
 
-  (define (line-parser)
+  (define (make-line-parser $char-stack-or-line)
     (parser
-      (stack)
-      (lambda ($char-stack-or-line $char)
+      (lambda ($char)
         (and (not (string? $char-stack-or-line))
-          (case $char
-            ((#\newline) (list->string (reverse $char-stack-or-line)))
-            (else (push $char-stack-or-line $char)))))
-      (lambda ($char-stack-or-line)
+          (make-line-parser
+            (case $char
+              ((#\newline) (list->string (reverse $char-stack-or-line)))
+              (else (push $char-stack-or-line $char))))))
+      (lambda ()
         (and (string? $char-stack-or-line) $char-stack-or-line))))
 
+  (define (line-parser)
+    (make-line-parser (stack)))
+
   ; ----------------------------------------------------------
 
-  (define (positive-integer-parser)
+  (define (make-positive-integer-parser $digit-stack)
     (parser
-      (stack)
-      (lambda ($digit-stack $char)
+      (lambda ($char)
         (and
           (char-numeric? $char)
-          (push 
-            $digit-stack
-            (- (char->integer $char) (char->integer #\0)))))
-      (lambda ($digit-stack) 
+          (make-positive-integer-parser 
+            (push 
+              $digit-stack
+              (- (char->integer $char) (char->integer #\0))))))
+      (lambda () 
         (and
           (not (null? $digit-stack))
           (fold-left 
@@ -81,74 +99,68 @@
             0
             (reverse $digit-stack))))))
 
+  (define (positive-integer-parser)
+    (make-positive-integer-parser (stack)))
+
   ; ----------------------------------------------------------
 
-  (define (word-parser)
+  (define (make-word-parser $letter-stack)
     (parser
-      (stack)
-      (lambda ($letter-stack $char)
+      (lambda ($char)
         (and
           (char-alphabetic? $char)
-          (push $letter-stack $char)))
-      (lambda ($letter-stack) 
+          (make-word-parser (push $letter-stack $char))))
+      (lambda () 
         (and
           (not (null? $letter-stack))
           (string->symbol (list->string (reverse $letter-stack)))))))
 
+  (define (word-parser)
+    (make-word-parser (stack)))
+
   ; ----------------------------------------------------------
 
   (define (oneof-parser $parsers)
-    (lets
-      ($push-fns (map parser-push-fn $parsers))
-      ($finish-fns (map parser-finish-fn $parsers))
+    (and (not (null? $parsers))
       (parser
-        (map parser-state-opt $parsers)
-        (lambda ($state-opts $char)
-          (map
-            (lambda ($state-opt $push-fn)
-              (and $state-opt ($push-fn $state-opt $char)))
-            $state-opts
-            $push-fns))
-        (lambda ($state-opts)
-          (single
+        (lambda ($char)
+          (oneof-parser
             (filter-opts
               (map
-                (lambda ($state-opt $finish-fn)
-                  (and $state-opt ($finish-fn $state-opt)))
-                $state-opts
-                $finish-fns)))))))
+                (lambda ($parser) (parser-push $parser $char))
+                $parsers))))
+        (lambda ()
+          (single (filter-opts (map parser-finish $parsers)))))))
 
   ; ----------------------------------------------------------
 
   (define indent-size 2)
 
+  (define (make-indent-parser $indent $parser)
+    (parser
+      (lambda ($char)
+        (case $char
+          ((#\space)
+            (if (< $indent indent-size)
+              (make-indent-parser (+ $indent 1) $parser)
+              (opt-lift make-indent-parser 
+                (opt $indent)
+                (parser-push $parser $char))))
+          ((#\newline)
+            (and 
+              (or (= $indent 0) (= $indent indent-size)) 0)
+              (opt-lift make-indent-parser 0 (parser-push $parser $char)))
+          (else 
+            (and
+              (= $indent indent-size)
+              (opt-lift make-indent-parser
+                (opt $indent)
+                (parser-push $parser $char))))))
+      (lambda ()
+        (and 
+          (zero? $indent)
+          (parser-finish $parser)))))
+
   (define (indent-parser $parser)
-    (lets
-      ($state-opt (parser-state-opt $parser))
-      ($push-fn (parser-push-fn $parser))
-      ($finish-fn (parser-finish-fn $parser))
-      (parser
-        (cons 0 $state-opt)
-        (lambda ($indented $char)
-          (lets
-            ($indent (car $indented))
-            ($body (cdr $indented))
-            (case $char
-              ((#\space)
-                (if (< $indent indent-size)
-                  (cons (+ $indent 1) $body)
-                  (cons $indent (and $body ($push-fn $body $char)))))
-              ((#\newline)
-                (and
-                  (or (= $indent 0) (= $indent indent-size))
-                  (cons 0 (and $body ($push-fn $body $char)))))
-              (else 
-                (and
-                  (= $indent indent-size)
-                  (cons (+ $indent 1) (and $body ($push-fn $body $char))))))))
-        (lambda ($indented)
-          (lets
-            ($indent (car $indented))
-            ($body (cdr $indented))
-            (and (zero? $indent) (and $body ($finish-fn $body))))))))
+    (make-indent-parser 0 $parser))
 )
