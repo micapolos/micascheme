@@ -7,12 +7,12 @@
 
     failure failure? failure-value failure!
 
-    pure
+    opt
     from
     single? single
     script
     and-lets lets
-    opt-apply
+    opt-lift
     works?
     check checking? test-all
     data partial
@@ -146,7 +146,7 @@
       (lambda (stx)
         (syntax-error stx "misplaced aux keyword"))))
 
-  (define-aux-keyword pure)
+  (define-aux-keyword opt)
 
   (define-syntax switch
     (lambda (stx) 
@@ -186,26 +186,26 @@
   (define (filter-opts $opts)
     (filter identity $opts))
 
-  (define-syntax opt-apply
+  (define-syntax opt-lift
     (lambda ($syntax)
       (syntax-case $syntax ()
         ((_ $fn $spec ...)
           (lets
-            ($pure-arg-pairs
+            ($opt-arg-pairs
               (map
                 (lambda ($spec)
-                  (syntax-case $spec (pure)
-                    ((pure $arg) (cons #t #`$arg))
+                  (syntax-case $spec (opt)
+                    ((opt $arg) (cons #t #`$arg))
                     ($arg (cons #f #`$arg))))
                 (syntax->list #`($spec ...))))
-            ($pures (map car $pure-arg-pairs))
-            ($args (map cdr $pure-arg-pairs))
+            ($opts (map car $opt-arg-pairs))
+            ($args (map cdr $opt-arg-pairs))
             ($tmps (generate-temporaries $args))
             ($opt-tmps
               (filter (lambda (x) x)
                 (map
-                  (lambda ($pure $tmp) (and (not $pure) $tmp))
-                  $pures $tmps)))
+                  (lambda ($opt $tmp) (and (not $opt) $tmp))
+                  $opts $tmps)))
             #`(lets
               #,@(map (lambda ($tmp $arg) #`(#,$tmp #,$arg)) $tmps $args)
               (and #,@$opt-tmps ($fn #,@$tmps))))))))

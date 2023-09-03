@@ -98,16 +98,16 @@
 
 (check (equal? (filter-opts (list 1 #f "foo" #f #t)) (list 1 "foo" #t)))
 
-; === opt-apply ===
+; === opt-lift ===
 
-(check (equal? (opt-apply list "a" "b") (list "a" "b")))
-(check (equal? (opt-apply list #f "b") #f))
-(check (equal? (opt-apply list "a" #f) #f))
-(check (equal? (opt-apply list #f #f) #f))
+(check (equal? (opt-lift list "a" "b") (list "a" "b")))
+(check (equal? (opt-lift list #f "b") #f))
+(check (equal? (opt-lift list "a" #f) #f))
+(check (equal? (opt-lift list #f #f) #f))
 
-(check (equal? (opt-apply list (pure "a") (pure "b")) (list "a" "b")))
-(check (equal? (opt-apply list (pure #f) (pure "b")) (list #f "b")))
-(check (equal? (opt-apply list (pure "a") #f) #f))
+(check (equal? (opt-lift list (opt "a") (opt "b")) (list "a" "b")))
+(check (equal? (opt-lift list (opt #f) (opt "b")) (list #f "b")))
+(check (equal? (opt-lift list (opt "a") #f) #f))
 
 ; === indexed ===
 
