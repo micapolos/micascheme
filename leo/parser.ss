@@ -2,14 +2,18 @@
   (export
     parser parser? parser parser-push-fn parser-finish-fn
     parser-push parser-finish
-    parser-of parser-bind
+    parser-of parser-bind parser-map
     parse
 
+    char-parser
     string-parser
+    exact-parser
     line-parser
     positive-integer-parser
     word-parser
     oneof-parser
+    fold-parser
+    stack-parser
     indent-parser
   )
 
@@ -35,7 +39,8 @@
       (lambda ($char)
         (lets
           ($push-parser (parser-push $parser $char))
-          (or $push-parser
+          (if $push-parser
+            (parser-bind $push-parser $fn)
             (opt-lift parser-push
               (opt-lift $fn (parser-finish $parser))
               $char))))
@@ -44,6 +49,13 @@
           (opt-lift $fn 
             (parser-finish $parser))))))
 
+  (define (parser-map $parser $fn)
+    (parser-bind $parser 
+      (lambda ($item) 
+        (parser-of ($fn $item)))))
+
+  ; ----------------------------------------------------------
+
   (define (parse $parser $string)
     (opt-lift parser-finish
       (fold-left
@@ -51,6 +63,20 @@
           (opt-lift parser-push $parser-opt (opt $char)))
         $parser
         (string->list $string))))
+
+  ; ----------------------------------------------------------
+
+  (define (make-char-parser $char-opt)
+    (parser
+      (lambda ($char) 
+        (and 
+          (not $char-opt) 
+          (make-char-parser $char)))
+      (lambda () 
+        $char-opt)))
+
+  (define (char-parser)
+    (make-char-parser #f))
 
   ; ----------------------------------------------------------
 
@@ -63,6 +89,22 @@
 
   (define (string-parser)
     (make-string-parser (stack)))
+
+  ; ----------------------------------------------------------
+
+  (define (make-exact-parser $string $index)
+    (parser
+      (lambda ($char)
+        (and 
+          (< $index (string-length $string))
+          (char=? $char (string-ref $string $index))
+          (make-exact-parser $string (+ $index 1))))
+      (lambda () 
+        (= $index (string-length $string)))))
+          
+
+  (define (exact-parser $string)
+    (make-exact-parser $string 0))
 
   ; ----------------------------------------------------------
 
@@ -120,17 +162,32 @@
 
   ; ----------------------------------------------------------
 
-  (define (oneof-parser $parsers)
+  (define (make-oneof-parser $parsers)
     (and (not (null? $parsers))
       (parser
         (lambda ($char)
-          (oneof-parser
+          (make-oneof-parser
             (filter-opts
               (map
                 (lambda ($parser) (parser-push $parser $char))
                 $parsers))))
         (lambda ()
           (single (filter-opts (map parser-finish $parsers)))))))
+
+  (define-syntax-rule (oneof-parser $parser ...)
+    (make-oneof-parser (list $parser ...)))
+
+  ; ----------------------------------------------------------
+
+  (define (fold-parser $folded $parser $fn)
+    (oneof-parser
+      (parser-of $folded)
+      (parser-bind $parser
+        (lambda ($item)
+          (fold-parser ($fn $folded $item) $parser $fn)))))
+
+  (define (stack-parser $parser)
+    (fold-parser (stack) $parser push))
 
   ; ----------------------------------------------------------
 
