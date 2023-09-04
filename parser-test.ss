@@ -156,6 +156,21 @@
 ; ---------------------------------------------------------
 
 (lets
+  ($separator-stack-parser 
+    (separator-stack-parser 
+      (positive-integer-parser) 
+      (exact-parser ",")))
+  (begin
+    (check (obj=? (parse $separator-stack-parser "") (stack)))
+    (check (obj=? (parse $separator-stack-parser "1") (stack 1)))
+    (check (obj=? (parse $separator-stack-parser "12") (stack 12)))
+    (check (obj=? (parse $separator-stack-parser "12,3") (stack 12 3)))
+    (check (obj=? (parse $separator-stack-parser "12,34") (stack 12 34)))
+    (check (obj=? (parse $separator-stack-parser "12,34,5") (stack 12 34 5)))
+    (check (obj=? (parse $separator-stack-parser "12,34,56") (stack 12 34 56)))))
+
+; ---------------------------------------------------------
+(lets
   ($non-empty-stack-parser (non-empty-stack-parser (line-parser)))
   (begin
     (check (obj=? (parse $non-empty-stack-parser "") (parse-error 1 1)))
@@ -327,12 +342,15 @@
 (lets
   ($indent-parser (indent-parser (string-parser)))
   (begin
-    (check (obj=? (parse $indent-parser "") ""))
+    (check (obj=? (parse $indent-parser "") (parse-error 1 1)))
     (check (obj=? (parse $indent-parser " ") (parse-error 1 2)))
-    (check (obj=? (parse $indent-parser "  ") (parse-error 1 3)))
-    (check (obj=? (parse $indent-parser "  \n") "\n"))
-    (check (obj=? (parse $indent-parser "  a") (parse-error 1 4)))
-    (check (obj=? (parse $indent-parser "  a\n") "a\n"))))
+    (check (obj=? (parse $indent-parser "  ") ""))
+    (check (obj=? (parse $indent-parser "  a") "a"))
+    (check (obj=? (parse $indent-parser "  ab") "ab"))
+    (check (obj=? (parse $indent-parser "  ab\n") (parse-error 2 1)))
+    (check (obj=? (parse $indent-parser "  ab\n ") (parse-error 2 2)))
+    (check (obj=? (parse $indent-parser "  ab\n  ") "ab\n"))
+    (check (obj=? (parse $indent-parser "  ab\n  c") "ab\nc"))))
 
 ; ---------------------------------------------------------
 

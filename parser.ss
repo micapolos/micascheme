@@ -25,6 +25,7 @@
     oneof-parser
     fold-parser
     stack-parser
+    separator-stack-parser
     non-empty-stack-parser
     indent-parser
 
@@ -363,6 +364,16 @@
       ($first $parser)
       (fold-parser (stack $first) $parser push)))
 
+  (define (separator-stack-parser $item-parser $separator-parser)
+    (oneof-parser
+      (parser (stack))
+      (parser-lets
+        ($first $item-parser)
+        (fold-parser
+          (stack $first)
+          (parser-lets (skip $separator-parser) $item-parser)
+          push))))
+
   ; ----------------------------------------------------------
 
   (define indent-size 2)
@@ -389,7 +400,7 @@
                 (parser-push $parser $char))))))
       (lambda ()
         (and 
-          (zero? $indent)
+          (= $indent indent-size)
           (parser-finish $parser)))))
 
   (define (indent-parser $parser)
