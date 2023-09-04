@@ -66,7 +66,61 @@
     (check (obj=? (parse $oneof-parser "aa") "aa"))
     (check (obj=? (parse $oneof-parser "ab") "ab"))
     (check (obj=? (parse $oneof-parser "ac") (parse-error 1 3)))
-    (check (obj=? (parse $oneof-parser "ad") (parse-error 1 2)))))
+    (check (obj=? (parse $oneof-parser "ad") (parse-error 1 2)))
+    (check (obj=? (parse $oneof-parser "acd") (parse-error 1 3)))))
+
+; ---------------------------------------------------------
+
+(lets
+  ($select-parser 
+    (select-parser
+      (exact-parser "(")
+      (selected (exact-parser "foo"))
+      (exact-parser ")")))
+  (begin
+    (check (obj=? (parse $select-parser "") (parse-error 1 1)))
+    (check (obj=? (parse $select-parser "f") (parse-error 1 1)))
+    (check (obj=? (parse $select-parser "(") (parse-error 1 2)))
+    (check (obj=? (parse $select-parser "(boo") (parse-error 1 2)))
+    (check (obj=? (parse $select-parser "(fos") (parse-error 1 4)))
+    (check (obj=? (parse $select-parser "(foo") (parse-error 1 5)))
+    (check (obj=? (parse $select-parser "(foo)") "foo"))
+    (check (obj=? (parse $select-parser "(foo]") (parse-error 1 5)))
+    (check (obj=? (parse $select-parser "(foo)?") (parse-error 1 6)))))
+
+; ---------------------------------------------------------
+
+(lets
+  ($fold-parser 
+    (fold-parser (stack) (line-parser) push))
+  (begin
+    (check (obj=? (parse $fold-parser "") (stack)))
+    (check (obj=? (parse $fold-parser "foo") (parse-error 1 4)))
+    (check (obj=? (parse $fold-parser "foo\n") (stack "foo")))
+    (check (obj=? (parse $fold-parser "foo\nbar") (parse-error 2 4)))
+    (check (obj=? (parse $fold-parser "foo\nbar\n") (stack "foo" "bar")))))
+
+; ---------------------------------------------------------
+
+(lets
+  ($stack-parser (stack-parser (line-parser)))
+  (begin
+    (check (obj=? (parse $stack-parser "") (stack)))
+    (check (obj=? (parse $stack-parser "foo") (parse-error 1 4)))
+    (check (obj=? (parse $stack-parser "foo\n") (stack "foo")))
+    (check (obj=? (parse $stack-parser "foo\nbar") (parse-error 2 4)))
+    (check (obj=? (parse $stack-parser "foo\nbar\n") (stack "foo" "bar")))))
+
+; ---------------------------------------------------------
+
+(lets
+  ($non-empty-stack-parser (non-empty-stack-parser (line-parser)))
+  (begin
+    (check (obj=? (parse $non-empty-stack-parser "") (parse-error 1 1)))
+    (check (obj=? (parse $non-empty-stack-parser "foo") (parse-error 1 4)))
+    (check (obj=? (parse $non-empty-stack-parser "foo\n") (stack "foo")))
+    (check (obj=? (parse $non-empty-stack-parser "foo\nbar") (parse-error 2 4)))
+    (check (obj=? (parse $non-empty-stack-parser "foo\nbar\n") (stack "foo" "bar")))))
 
 ; ---------------------------------------------------------
 
@@ -80,13 +134,14 @@
 (check (obj=? (parse (digit-parser) "") (parse-error 1 1)))
 (check (obj=? (parse (digit-parser) "0") 0))
 (check (obj=? (parse (digit-parser) "9") 9))
+(check (obj=? (parse (digit-parser) "a") (parse-error 1 1)))
 (check (obj=? (parse (digit-parser) "10") (parse-error 1 2)))
 
 ; ---------------------------------------------------------
 
 (check (obj=? (parse (letter-parser) "") (parse-error 1 1)))
 (check (obj=? (parse (letter-parser) "a") #\a))
-(check (obj=? (parse (letter-parser) "1") (parse-error 1 2))) ; wrong!!!
+(check (obj=? (parse (letter-parser) "1") (parse-error 1 1)))
 (check (obj=? (parse (letter-parser) "ab") (parse-error 1 2)))
 
 ; ---------------------------------------------------------
@@ -105,15 +160,15 @@
 
 (check (obj=? (parse (positive-integer-parser) "") (parse-error 1 1)))
 (check (obj=? (parse (positive-integer-parser) "012") 12))
-(check (obj=? (parse (positive-integer-parser) "012a") (parse-error 1 5))) ; wrong!!!
-(check (obj=? (parse (positive-integer-parser) "-012") (parse-error 1 2))) ; wrong!!!
+(check (obj=? (parse (positive-integer-parser) "012a") (parse-error 1 4)))
+(check (obj=? (parse (positive-integer-parser) "-012") (parse-error 1 1)))
 
 ; ---------------------------------------------------------
 
 (check (obj=? (parse (word-parser) "") (parse-error 1 1)))
 (check (obj=? (parse (word-parser) "foo") `foo))
-(check (obj=? (parse (word-parser) "1") (parse-error 1 2))) ; wrong!!!
-(check (obj=? (parse (word-parser) "foo1") (parse-error 1 5))) ; wrong!!!
+(check (obj=? (parse (word-parser) "1") (parse-error 1 1)))
+(check (obj=? (parse (word-parser) "foo1") (parse-error 1 4)))
 
 ; ---------------------------------------------------------
 
@@ -129,8 +184,8 @@
     (check (obj=? (parse $bind-parser-2 "123") (parse-error 1 4)))
     (check (obj=? (parse $bind-parser-2 "123m") (cons 123 `m)))
     (check (obj=? (parse $bind-parser-2 "123cm") (cons 123 `cm)))
-    (check (obj=? (parse $bind-parser-2 "123!") (parse-error 1 5))) ; wrong!!!
-    (check (obj=? (parse $bind-parser-2 "123cm!") (parse-error 1 5))))) ; wrong!!!
+    (check (obj=? (parse $bind-parser-2 "123!") (parse-error 1 4)))
+    (check (obj=? (parse $bind-parser-2 "123cm!") (parse-error 1 6)))))
 
 ; ---------------------------------------------------------
 
@@ -210,9 +265,9 @@
 (lets
   ($map-parser (parser-map (line-parser) string-length))
   (begin
-    (check (obj=? (parse $map-parser "foo") #f))
+    (check (obj=? (parse $map-parser "foo") (parse-error 1 4)))
     (check (obj=? (parse $map-parser "foo\n") 3))
-    (check (obj=? (parse $map-parser "foo\nbar") #f))))
+    (check (obj=? (parse $map-parser "foo\nbar") (parse-error 2 1)))))
 
 ; ---------------------------------------------------------
 
@@ -227,44 +282,10 @@
       (word-parser) 
       (positive-integer-parser)))
   (begin
-    (check (obj=? (parse $oneof-parser "") #f))
+    (check (obj=? (parse $oneof-parser "") (parse-error 1 1)))
     (check (obj=? (parse $oneof-parser "foo") `foo))
     (check (obj=? (parse $oneof-parser "123") 123))
-    (check (obj=? (parse $oneof-parser "$1") #f))))
-
-; ---------------------------------------------------------
-
-(lets
-  ($fold-parser 
-    (fold-parser (stack) (line-parser) push))
-  (begin
-    (check (obj=? (parse $fold-parser "") (stack)))
-    (check (obj=? (parse $fold-parser "foo") #f))
-    (check (obj=? (parse $fold-parser "foo\n") (stack "foo")))
-    (check (obj=? (parse $fold-parser "foo\nbar") #f))
-    (check (obj=? (parse $fold-parser "foo\nbar\n") (stack "foo" "bar")))))
-
-; ---------------------------------------------------------
-
-(lets
-  ($stack-parser (stack-parser (line-parser)))
-  (begin
-    (check (obj=? (parse $stack-parser "") (stack)))
-    (check (obj=? (parse $stack-parser "foo") #f))
-    (check (obj=? (parse $stack-parser "foo\n") (stack "foo")))
-    (check (obj=? (parse $stack-parser "foo\nbar") #f))
-    (check (obj=? (parse $stack-parser "foo\nbar\n") (stack "foo" "bar")))))
-
-; ---------------------------------------------------------
-
-(lets
-  ($non-empty-stack-parser (non-empty-stack-parser (line-parser)))
-  (begin
-    (check (obj=? (parse $non-empty-stack-parser "") #f))
-    (check (obj=? (parse $non-empty-stack-parser "foo") #f))
-    (check (obj=? (parse $non-empty-stack-parser "foo\n") (stack "foo")))
-    (check (obj=? (parse $non-empty-stack-parser "foo\nbar") #f))
-    (check (obj=? (parse $non-empty-stack-parser "foo\nbar\n") (stack "foo" "bar")))))
+    (check (obj=? (parse $oneof-parser "$1") (parse-error 1 1)))))
 
 ; ---------------------------------------------------------
 
@@ -272,27 +293,27 @@
   ($indent-parser (indent-parser (string-parser)))
   (begin
     (check (obj=? (parse $indent-parser "") ""))
-    (check (obj=? (parse $indent-parser " ") #f))
-    (check (obj=? (parse $indent-parser "  ") #f))
+    (check (obj=? (parse $indent-parser " ") (parse-error 1 2)))
+    (check (obj=? (parse $indent-parser "  ") (parse-error 1 3)))
     (check (obj=? (parse $indent-parser "  \n") "\n"))
-    (check (obj=? (parse $indent-parser "  a") #f))
+    (check (obj=? (parse $indent-parser "  a") (parse-error 1 4)))
     (check (obj=? (parse $indent-parser "  a\n") "a\n"))))
 
 ; ---------------------------------------------------------
 
-(check (obj=? (parse (string-literal-char-parser) "") #f))
+(check (obj=? (parse (string-literal-char-parser) "") (parse-error 1 1)))
 (check (obj=? (parse (string-literal-char-parser) "a") #\a))
-(check (obj=? (parse (string-literal-char-parser) "\\") #f))
-(check (obj=? (parse (string-literal-char-parser) "\"") #f))
+(check (obj=? (parse (string-literal-char-parser) "\\") (parse-error 1 2)))
+(check (obj=? (parse (string-literal-char-parser) "\"") (parse-error 1 1)))
 (check (obj=? (parse (string-literal-char-parser) "\\n") #\newline))
 (check (obj=? (parse (string-literal-char-parser) "\\t") #\tab))
 (check (obj=? (parse (string-literal-char-parser) "\\\\") #\\))
-(check (obj=? (parse (string-literal-char-parser) "ab") #f))
+(check (obj=? (parse (string-literal-char-parser) "ab") (parse-error 1 2)))
 
 ; ---------------------------------------------------------
 
-(check (obj=? (parse (literal-string-parser) "") #f))
-(check (obj=? (parse (literal-string-parser) "\"") #f))
+(check (obj=? (parse (literal-string-parser) "") (parse-error 1 1)))
+(check (obj=? (parse (literal-string-parser) "\"") (parse-error 1 2)))
 (check (obj=? (parse (literal-string-parser) "\"\"") ""))
 (check (obj=? (parse (literal-string-parser) "\"\\\"\"") "\""))
 (check (obj=? (parse (literal-string-parser) "\"foo\"") "foo"))

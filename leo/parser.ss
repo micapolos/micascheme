@@ -11,6 +11,7 @@
     make-parser
     define-parser
 
+    select-parser
     char-parser
     string-parser
     digit-parser
@@ -25,7 +26,7 @@
     non-empty-stack-parser
     indent-parser
 
-    parsed pure skip
+    parsed pure skip selected
 
     string-literal-char-parser
     literal-string-parser
@@ -36,6 +37,7 @@
   ; ----------------------------------------------------------
 
   (define-aux-keyword parsed)
+  (define-aux-keyword selected)
   (define-aux-keyword pure)
   (define-aux-keyword skip)
 
@@ -82,6 +84,39 @@
     (parser-bind $parser 
       (lambda ($item) 
         (parser ($fn $item)))))
+
+  ; ----------------------------------------------------------
+
+  (define-syntax select-parser
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $item ...)
+          (lets
+            ($items
+              (map
+                (lambda ($item)
+                  (syntax-case $item (selected)
+                    ((selected $item) (cons #t #`$item))
+                    ($item (cons #f #`$item))))
+                (syntax->list #`($item ...))))
+            ($selected
+              (single
+                (filter 
+                  (lambda ($item)
+                    (and (car $item) (cdr $item)))
+                  $items)))
+            (if (not $selected)
+              (syntax-error $syntax "nothing selected")
+              (lets
+                ($var (generate-temporary #`selected))
+                #`(parser-lets
+                  #,@(map
+                    (lambda ($item)
+                      #`(
+                        #,(if (car $item) $var #`skip)
+                        #,(cdr $item)))
+                    $items)
+                  (parser #,$var)))))))))
 
   ; ----------------------------------------------------------
 
@@ -240,11 +275,12 @@
   ; ----------------------------------------------------------
 
   (define (digit-parser)
-    (parser-bind (char-parser)
+    (thunk
       (lambda ($char)
         (and
           (char-numeric? $char)
-          (parser (- (char->integer $char) (char->integer #\0)))))))
+          (parser (- (char->integer $char) (char->integer #\0)))))
+      (lambda () #f)))
 
   ; ----------------------------------------------------------
 
@@ -260,10 +296,12 @@
   ; ----------------------------------------------------------
 
   (define (letter-parser)
-    (parser-bind (char-parser)
+    (thunk
       (lambda ($char)
-        (and (char-alphabetic? $char) 
-          (parser $char)))))
+        (and 
+          (char-alphabetic? $char)
+          (parser $char)))
+      (lambda () #f)))
 
   ; ----------------------------------------------------------
   
@@ -359,20 +397,22 @@
   ; ----------------------------------------------------------
 
   (define (string-literal-char-parser)
-    (parser-bind (char-parser)
+    (thunk
       (lambda ($char)
         (case $char
-          ((#\\) 
-            (parser-bind (char-parser)
+          ((#\\)
+            (thunk
               (lambda ($char)
                 (case $char
                   ((#\\) (parser #\\))
                   ((#\n) (parser #\newline))
                   ((#\t) (parser #\tab))
                   ((#\") (parser #\"))
-                  (else #f)))))
+                  (else #f)))
+              (lambda () #f)))
           ((#\") #f)
-          (else (parser $char))))))
+          (else (parser $char))))
+      (lambda () #f)))
 
   (define (literal-string-parser)
     (parser-lets
