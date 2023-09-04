@@ -86,7 +86,8 @@
 
   (define (listing-bind $listing $fn)
     (lambda ($list)
-      (unpair ($listing $list) $value $list
+      (lets
+        (($value $list) (pair-values ($listing $list)))
         (($fn $value) $list))))
 
   (define (listing-run $listing) 

@@ -1,9 +1,5 @@
 (import (scheme) (base))
 
-; === enum ===
-
-(enum (shape square circle))
-
 ; === data ===
 
 (data (point x y))
@@ -73,6 +69,14 @@
       (fib (rec (lambda (n) (if (< n 2) n (+ (fib (- n 2)) (fib (- n 1)))))))
       (fib 10))
     55))
+
+; === pair-values ===
+
+(lets
+  (($car $cdr) (pair-values (cons 1 2)))
+  (begin
+    (check (equal? $car 1))
+    (check (equal? $cdr 2))))
 
 ; === script ===
 

@@ -16,7 +16,7 @@
     opt-lift
     works?
     check checking? test-all
-    data enum
+    data
     partial
     define-aux-keyword define-syntax-rule
     obj=? record=? pair=? vector=? box=?
@@ -25,7 +25,7 @@
     find-index
     list-set list-ref-opt
     switch
-    unpair
+    unpair pair-values
     associ
     filter-map filter-opts
     map-find-indexed
@@ -281,14 +281,6 @@
                   (record-writer td (record-pretty-writer td #,name-string))
                   td))))))))
 
-  ; For now, just for documentation purposes.
-  (define-syntax enum
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ ($name $item ...))
-          (for-all identifier? (syntax->list #`($name $item ...)))
-          #`(begin)))))
-
   (define (record-pretty-writer rtd name)
     (lambda (record port wr)
       (let ((size (vector-length (record-type-field-names rtd))))
@@ -310,6 +302,9 @@
               (let ((lhs (car #,tmp))
                     (rhs (cdr #,tmp)))
                 body ...)))))))
+
+  (define (pair-values $pair)
+    (values (car $pair) (cdr $pair)))
 
   (define-syntax throw
     (lambda (stx)
