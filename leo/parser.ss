@@ -1,9 +1,8 @@
 (library (leo parser)
   (export
-    parse-position parse-position? parse-position-line parse-position-column
-    start-parse-position parse-position-push
+    parse-error parse-error? parse-error-line parse-error-column
 
-    parser parse-error
+    parser
     parser-push parser-finish
     parser parser-bind parser-map
     parser-lets
@@ -62,8 +61,6 @@
   (define (parser-finish $parser)
     (parser-thunk-do ($thunk $parser)
       (thunk-finish $thunk)))
-
-  (define (parse-error) #f)
 
   (define (parser $value)
     (thunk 
@@ -156,27 +153,30 @@
 
   ; ----------------------------------------------------------
 
-  (data (parse-position line column))
+  (data (parse-error line column))
 
-  (define (start-parse-position)
-    (parse-position 1 1))
-
-  (define (parse-position-push $parse-position $char)
-    (case $char
-      ((#\newline)
-        (parse-position
-          (+ (parse-position-line $parse-position) 1)
-          1))
-      (else
-        (parse-position
-          (parse-position-line $parse-position)
-          (+ (parse-position-column $parse-position) 1)))))
-
-  ; ----------------------------------------------------------
+  (define (parse-from $parser $string $index $line $column)
+    (parser-thunk-do ($thunk $parser)
+      (cond
+        ((= $index (string-length $string))
+          (or
+            (thunk-finish $thunk)
+            (parse-error $line $column)))
+        (else
+          (lets
+            ($char (string-ref $string $index))
+            ($parser (thunk-push $thunk $char))
+            (if (not $parser)
+              (parse-error $line $column)
+              (parse-from
+                $parser
+                $string
+                (+ $index 1)
+                (if (char=? $char #\newline) (+ $line 1) $line)
+                (if (char=? $char #\newline) 1 (+ $column 1)))))))))
 
   (define (parse $parser $string)
-    (parser-finish
-      (fold-left parser-push $parser (string->list $string))))
+    (parse-from $parser $string 0 1 1))
 
   ; ----------------------------------------------------------
 
