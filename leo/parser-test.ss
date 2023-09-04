@@ -125,10 +125,15 @@
   (define-parser expr
     (lets
       ($number1 positive-integer)
-      (skip "-")
+      ($op
+        (oneof 
+          (lets (skip "+") (parsed +)) 
+          (lets (skip "-") (parsed -))))
       ($number2 positive-integer)
-      (parsed (- $number1 $number2))))
-  (check (equal? (parse (make-parser expr) "3-2") 1)))
+      (parsed ($op $number1 $number2))))
+  (begin
+    (check (equal? (parse (make-parser expr) "3-2") 1))
+    (check (equal? (parse (make-parser expr) "3+2") 5))))
 
 ; ---------------------------------------------------------
 
