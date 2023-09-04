@@ -7,6 +7,7 @@
 
     failure failure? failure-value failure!
 
+    false?
     opt
     from
     single? single
@@ -15,7 +16,8 @@
     opt-lift
     works?
     check checking? test-all
-    data partial
+    data enum
+    partial
     define-aux-keyword define-syntax-rule
     obj=? record=? pair=? vector=? box=?
     displayln writeln
@@ -148,6 +150,9 @@
 
   (define-aux-keyword opt)
 
+  (define (false? $value)
+    (not $value))
+
   (define-syntax switch
     (lambda (stx) 
       (syntax-case stx (else)
@@ -275,6 +280,14 @@
                 (let ((td (type-descriptor #,record-name)))
                   (record-writer td (record-pretty-writer td #,name-string))
                   td))))))))
+
+  ; For now, just for documentation purposes.
+  (define-syntax enum
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ ($name $item ...))
+          (for-all identifier? (syntax->list #`($name $item ...)))
+          #`(begin)))))
 
   (define (record-pretty-writer rtd name)
     (lambda (record port wr)

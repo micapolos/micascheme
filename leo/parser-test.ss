@@ -1,8 +1,11 @@
 (import (micascheme) (leo parser))
 
-(check (equal? (parse (parser-with "foo") "") "foo"))
-(check (equal? (parse (parser-with "foo") "a") #f))
-(check (equal? (parse (parser-with "foo") "foo") #f))
+(check (equal? (parse (parse-error) "") #f))
+(check (equal? (parse (parse-error) "foo") #f))
+
+(check (equal? (parse (parser "foo") "") "foo"))
+(check (equal? (parse (parser "foo") "a") #f))
+(check (equal? (parse (parser "foo") "foo") #f))
 
 ; ---------------------------------------------------------
 
@@ -48,53 +51,57 @@
 ; ---------------------------------------------------------
 
 (lets
-  ($parser
+  ($bind-parser
     (parser-bind (positive-integer-parser)
       (lambda ($positive-integer)
         (parser-bind (word-parser)
           (lambda ($word)
-            (parser-with 
+            (parser 
               (string-append
                 (symbol->string $word)
                 ": "
                 (number->string $positive-integer))))))))
   (begin
-    (check (equal? (parse $parser "") #f))
-    (check (equal? (parse $parser "123") #f))
-    (check (equal? (parse $parser "123m") "m: 123"))
-    (check (equal? (parse $parser "123cm") "cm: 123"))
-    (check (equal? (parse $parser "123!") #f))
-    (check (equal? (parse $parser "123cm!") #f))))
+    (check (equal? (parse $bind-parser "") #f))
+    (check (equal? (parse $bind-parser "123") #f))
+    (check (equal? (parse $bind-parser "123m") "m: 123"))
+    (check (equal? (parse $bind-parser "123cm") "cm: 123"))
+    (check (equal? (parse $bind-parser "123!") #f))
+    (check (equal? (parse $bind-parser "123cm!") #f))))
 
 ; ---------------------------------------------------------
 
 (lets
-  ($parser
+  ($increment-parser
     (parser-lets 
       ($number (positive-integer-parser))
       (parser (+ $number 1))))
-  (check (equal? (parse $parser "12") 13)))
+  (check (equal? (parse $increment-parser "12") 13)))
 
 (lets
-  ($parser
+  ($starred-parser
     (parser-lets 
-      ($skip (exact-parser "- "))
+      ($skip (exact-parser "* "))
       (positive-integer-parser)))
-  (check (equal? (parse $parser "- 123") 123)))
+  (check (equal? (parse $starred-parser "* 123") 123)))
 
 (lets
-  ($parser
+  ($subtract-parser
     (parser-lets 
       ($number1 (positive-integer-parser))
       (skip (exact-parser " - "))
       ($number2 (positive-integer-parser))
       (parser (- $number1 $number2))))
-  (check (equal? (parse $parser "3 - 2") 1)))
+  (check (equal? (parse $subtract-parser "3 - 2") 1)))
 
 ; ---------------------------------------------------------
 
 (lets
   ($parser (make-parser "foo"))
+  (check (equal? (parse $parser "foo") "foo")))
+
+(lets
+  ($parser (make-parser (pure (string-parser))))
   (check (equal? (parse $parser "foo") "foo")))
 
 (lets
@@ -138,11 +145,11 @@
 ; ---------------------------------------------------------
 
 (lets
-  ($parser (parser-map (line-parser) string-length))
+  ($map-parser (parser-map (line-parser) string-length))
   (begin
-    (check (equal? (parse $parser "foo") #f))
-    (check (equal? (parse $parser "foo\n") 3))
-    (check (equal? (parse $parser "foo\nbar") #f))))
+    (check (equal? (parse $map-parser "foo") #f))
+    (check (equal? (parse $map-parser "foo\n") 3))
+    (check (equal? (parse $map-parser "foo\nbar") #f))))
 
 ; ---------------------------------------------------------
 
@@ -153,44 +160,83 @@
 
 ; ---------------------------------------------------------
 
+(check (equal? (oneof-parser) (parse-error)))
+(check (equal? (oneof-parser (parse-error)) (parse-error)))
+(check (equal? (oneof-parser (parse-error) (parse-error)) (parse-error)))
+
 (lets
-  ($parser (oneof-parser (word-parser) (positive-integer-parser)))
+  ($oneof-parser 
+    (oneof-parser 
+      (parse-error) 
+      (word-parser) 
+      (positive-integer-parser)))
   (begin
-    (check (equal? (parse $parser "") #f))
-    (check (equal? (parse $parser "foo") `foo))
-    (check (equal? (parse $parser "123") 123))
-    (check (equal? (parse $parser "$1") #f))))
+    (check (equal? (parse $oneof-parser "") #f))
+    (check (equal? (parse $oneof-parser "foo") `foo))
+    (check (equal? (parse $oneof-parser "123") 123))
+    (check (equal? (parse $oneof-parser "$1") #f))))
 
 ; ---------------------------------------------------------
 
 (lets
-  ($parser (fold-parser (stack) (line-parser) push))
+  ($fold-parser 
+    (fold-parser (stack) (line-parser) push))
   (begin
-    (check (equal? (parse $parser "") (stack)))
-    (check (equal? (parse $parser "foo") #f))
-    (check (equal? (parse $parser "foo\n") (stack "foo")))
-    (check (equal? (parse $parser "foo\nbar") #f))
-    (check (equal? (parse $parser "foo\nbar\n") (stack "foo" "bar")))))
+    (check (equal? (parse $fold-parser "") (stack)))
+    (check (equal? (parse $fold-parser "foo") #f))
+    (check (equal? (parse $fold-parser "foo\n") (stack "foo")))
+    (check (equal? (parse $fold-parser "foo\nbar") #f))
+    (check (equal? (parse $fold-parser "foo\nbar\n") (stack "foo" "bar")))))
 
 ; ---------------------------------------------------------
 
 (lets
-  ($parser (stack-parser (line-parser)))
+  ($stack-parser (stack-parser (line-parser)))
   (begin
-    (check (equal? (parse $parser "") (stack)))
-    (check (equal? (parse $parser "foo") #f))
-    (check (equal? (parse $parser "foo\n") (stack "foo")))
-    (check (equal? (parse $parser "foo\nbar") #f))
-    (check (equal? (parse $parser "foo\nbar\n") (stack "foo" "bar")))))
+    (check (equal? (parse $stack-parser "") (stack)))
+    (check (equal? (parse $stack-parser "foo") #f))
+    (check (equal? (parse $stack-parser "foo\n") (stack "foo")))
+    (check (equal? (parse $stack-parser "foo\nbar") #f))
+    (check (equal? (parse $stack-parser "foo\nbar\n") (stack "foo" "bar")))))
 
 ; ---------------------------------------------------------
 
 (lets
-  ($parser (indent-parser (string-parser)))
+  ($non-empty-stack-parser (non-empty-stack-parser (line-parser)))
   (begin
-    (check (equal? (parse $parser "") ""))
-    (check (equal? (parse $parser " ") #f))
-    (check (equal? (parse $parser "  ") #f))
-    (check (equal? (parse $parser "  \n") "\n"))
-    (check (equal? (parse $parser "  a") #f))
-    (check (equal? (parse $parser "  a\n") "a\n"))))
+    (check (equal? (parse $non-empty-stack-parser "") #f))
+    (check (equal? (parse $non-empty-stack-parser "foo") #f))
+    (check (equal? (parse $non-empty-stack-parser "foo\n") (stack "foo")))
+    (check (equal? (parse $non-empty-stack-parser "foo\nbar") #f))
+    (check (equal? (parse $non-empty-stack-parser "foo\nbar\n") (stack "foo" "bar")))))
+
+; ---------------------------------------------------------
+
+(lets
+  ($indent-parser (indent-parser (string-parser)))
+  (begin
+    (check (equal? (parse $indent-parser "") ""))
+    (check (equal? (parse $indent-parser " ") #f))
+    (check (equal? (parse $indent-parser "  ") #f))
+    (check (equal? (parse $indent-parser "  \n") "\n"))
+    (check (equal? (parse $indent-parser "  a") #f))
+    (check (equal? (parse $indent-parser "  a\n") "a\n"))))
+
+; ---------------------------------------------------------
+
+(check (equal? (parse (string-literal-char-parser) "") #f))
+(check (equal? (parse (string-literal-char-parser) "a") #\a))
+(check (equal? (parse (string-literal-char-parser) "\\") #f))
+(check (equal? (parse (string-literal-char-parser) "\"") #f))
+(check (equal? (parse (string-literal-char-parser) "\\n") #\newline))
+(check (equal? (parse (string-literal-char-parser) "\\t") #\tab))
+(check (equal? (parse (string-literal-char-parser) "\\\\") #\\))
+(check (equal? (parse (string-literal-char-parser) "ab") #f))
+
+; ---------------------------------------------------------
+
+(check (equal? (parse (literal-string-parser) "") #f))
+(check (equal? (parse (literal-string-parser) "\"") #f))
+(check (equal? (parse (literal-string-parser) "\"\"") ""))
+(check (equal? (parse (literal-string-parser) "\"\\\"\"") "\""))
+(check (equal? (parse (literal-string-parser) "\"foo\"") "foo"))

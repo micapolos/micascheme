@@ -1,5 +1,23 @@
 (import (scheme) (base))
 
+; === enum ===
+
+(enum (shape square circle))
+
+; === data ===
+
+(data (point x y))
+(check (obj=? (point 1 2) (point 1 2)))
+(check (obj=? (point? (point 1 2)) #t))
+(check (obj=? (point-x (point 1 2)) 1))
+(check (obj=? (point-y (point 1 2)) 2))
+
+; === false? ===
+
+(check (equal? (false? #f) #t))
+(check (equal? (false? #t) #f))
+(check (equal? (false? 123) #f))
+
 ; === from ===
 
 (check (equal? (from (base-from-testing) foo) "foo"))
