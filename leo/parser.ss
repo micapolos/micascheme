@@ -1,5 +1,8 @@
 (library (leo parser)
   (export
+    parse-position parse-position? parse-position-line parse-position-column
+    start-parse-position parse-position-push
+
     parser parse-error
     parser-push parser-finish
     parser parser-bind parser-map
@@ -150,6 +153,24 @@
             (make-parser $body)))
         ((_ $name $body)
           #`(define-parser ($name) $body)))))
+
+  ; ----------------------------------------------------------
+
+  (data (parse-position line column))
+
+  (define (start-parse-position)
+    (parse-position 1 1))
+
+  (define (parse-position-push $parse-position $char)
+    (case $char
+      ((#\newline)
+        (parse-position
+          (+ (parse-position-line $parse-position) 1)
+          1))
+      (else
+        (parse-position
+          (parse-position-line $parse-position)
+          (+ (parse-position-column $parse-position) 1)))))
 
   ; ----------------------------------------------------------
 

@@ -1,7 +1,15 @@
 (import (micascheme) (leo parser))
 
-(check (equal? (parse (parse-error) "") #f))
-(check (equal? (parse (parse-error) "foo") #f))
+; ---------------------------------------------------------
+
+(check (obj=? (start-parse-position) (parse-position 1 1)))
+(check (obj=? (parse-position-push (parse-position 3 5) #\newline) (parse-position 4 1)))
+(check (obj=? (parse-position-push (parse-position 3 5) #\a) (parse-position 3 6)))
+
+; ---------------------------------------------------------
+
+(check (equal? (parse #f "") #f))
+(check (equal? (parse #f "foo") #f))
 
 (check (equal? (parse (parser "foo") "") "foo"))
 (check (equal? (parse (parser "foo") "a") #f))
@@ -167,28 +175,14 @@
 
 ; ---------------------------------------------------------
 
-(check 
-  (equal? 
-    (oneof-parser) 
-    (parse-error)))
-
-(check 
-  (equal? 
-    (oneof-parser 
-      (parse-error)) 
-    (parse-error)))
-
-(check
-  (equal? 
-    (oneof-parser 
-      (parse-error) 
-      (parse-error)) 
-    (parse-error)))
+(check (equal? (oneof-parser) #f))
+(check (equal? (oneof-parser #f) #f))
+(check (equal? (oneof-parser #f #f) #f))
 
 (lets
   ($oneof-parser 
     (oneof-parser 
-      (parse-error) 
+      #f 
       (word-parser) 
       (positive-integer-parser)))
   (begin
