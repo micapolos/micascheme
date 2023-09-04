@@ -25,10 +25,10 @@
 
 ; ---------------------------------------------------------
 
-(check (equal? (parse (exact-parser "") "") #t))
+(check (equal? (parse (exact-parser "") "") ""))
 (check (equal? (parse (exact-parser "") "foo") #f))
 (check (equal? (parse (exact-parser "foo") "fo") #f))
-(check (equal? (parse (exact-parser "foo") "foo") #t))
+(check (equal? (parse (exact-parser "foo") "foo") "foo"))
 (check (equal? (parse (exact-parser "foo") "foot") #f))
 
 ; ---------------------------------------------------------
@@ -90,6 +90,45 @@
       ($number2 (positive-integer-parser))
       (parser (- $number1 $number2))))
   (check (equal? (parse $parser "3 - 2") 1)))
+
+; ---------------------------------------------------------
+
+(lets
+  ($parser (make-parser "foo"))
+  (check (equal? (parse $parser "foo") "foo")))
+
+(lets
+  ($parser (make-parser string))
+  (check (equal? (parse $parser "foo") "foo")))
+
+(lets
+  ($parser (make-parser (stack char)))
+  (check (equal? (parse $parser "foo") (stack #\f #\o #\o))))
+
+(lets
+  ($parser (make-parser (parsed 12.4)))
+  (check (equal? (parse $parser "") 12.4)))
+
+(lets
+  ($parser 
+    (make-parser 
+      (lets
+        ($number1 positive-integer)
+        (skip "-")
+        ($number2 positive-integer)
+        (parsed (- $number1 $number2)))))
+  (check (equal? (parse $parser "3-2") 1)))
+
+; ---------------------------------------------------------
+
+(begin
+  (define-parser expr
+    (lets
+      ($number1 positive-integer)
+      (skip "-")
+      ($number2 positive-integer)
+      (parsed (- $number1 $number2))))
+  (check (equal? (parse (make-parser expr) "3-2") 1)))
 
 ; ---------------------------------------------------------
 

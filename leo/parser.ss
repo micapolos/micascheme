@@ -6,6 +6,9 @@
     parser-lets
     parse
 
+    make-parser
+    define-parser
+
     char-parser
     string-parser
     digit-parser
@@ -17,11 +20,16 @@
     fold-parser
     stack-parser
     indent-parser
+
+    parsed skip
   )
 
   (import (micascheme))
 
   ; ----------------------------------------------------------
+
+  (define-aux-keyword parsed)
+  (define-aux-keyword skip)
 
   (data (parser push-fn finish-fn))
 
@@ -79,6 +87,51 @@
 
   ; ----------------------------------------------------------
 
+  (meta define (parser-identifier $id)
+    (build-identifier ($string $id) 
+      (string-append $string "-parser")))
+
+  (define-syntax make-parser
+    (lambda ($syntax)
+      (syntax-case $syntax (skip parsed lets)
+        ((_ (parsed $body)) 
+          #`(parser-with $body))
+        ((_ (lets $body))
+          #`(make-parser $body))
+        ((_ (lets (skip $expr) $decl ... $body))
+          #`(parser-bind 
+            (make-parser $expr)
+            (lambda (_)
+              (make-parser (lets $decl ... $body)))))
+        ((_ (lets ($var $expr) $decl ... $body))
+          #`(parser-bind
+            (make-parser $expr)
+            (lambda ($var)
+              (make-parser (lets $decl ... $body)))))
+        ((_ ($id $arg ...)) (identifier? #`$id)
+          #`(
+            #,(parser-identifier #`$id)
+            #,@(map
+              (lambda ($arg) #`(make-parser #,$arg))
+              (syntax->list #`($arg ...)))))
+        ((_ $id) (identifier? #`$id)
+          #`(make-parser ($id)))
+        ((_ $constant)
+          (switch (syntax->datum #`$constant)
+            ((string? $string) #`(exact-parser (quote #,$string)))
+            ((else $other) $other))))))
+
+  (define-syntax define-parser
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ ($name $arg ...) $body) (identifier? #`$name)
+          #`(define (#,(parser-identifier #`$name) $arg ...) 
+            (make-parser $body)))
+        ((_ $name $body)
+          #`(define-parser ($name) $body)))))
+
+  ; ----------------------------------------------------------
+
   (define (parse $parser $string)
     (opt-lift parser-finish
       (fold-left
@@ -122,9 +175,10 @@
           (< $index (string-length $string))
           (char=? $char (string-ref $string $index))
           (make-exact-parser $string (+ $index 1))))
-      (lambda () 
-        (= $index (string-length $string)))))
-          
+      (lambda ()
+        (and
+          (= $index (string-length $string))
+          $string))))
 
   (define (exact-parser $string)
     (make-exact-parser $string 0))
