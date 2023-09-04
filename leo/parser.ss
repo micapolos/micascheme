@@ -323,11 +323,11 @@
 
   ; ----------------------------------------------------------
 
-  (define (make-oneof-parser $parsers)
+  (define (make-oneof-parser $parsers $else)
     (lets
       ($thunks (filter-opts $parsers))
       (case (length $thunks)
-        ((0) #f)
+        ((0) $else)
         ((1) (car $thunks))
         (else 
           (thunk
@@ -336,14 +336,25 @@
                 (map 
                   (lambda ($thunk) 
                     (thunk-push $thunk $char))
-                  $thunks)))
+                  $thunks)
+                (parser-push $else $char)))
             (lambda ()
-              (single 
-                (filter-opts 
-                  (map thunk-finish $thunks)))))))))
+              (lets
+                ($values
+                  (filter-opts 
+                    (map thunk-finish $thunks)))
+                (case (length $values)
+                  ((0) (parser-finish $else))
+                  ((1) (car $values))
+                  (else #f)))))))))
 
-  (define-syntax-rule (oneof-parser $parser ...)
-    (make-oneof-parser (list $parser ...)))
+  (define-syntax oneof-parser
+    (lambda ($syntax)
+      (syntax-case $syntax (else)
+        ((_ $parser ... (else $else))
+          #`(make-oneof-parser (list $parser ...) $else))
+        ((_ $parser ...)
+          #`(oneof-parser $parser ... (else #f))))))
 
   ; ----------------------------------------------------------
 

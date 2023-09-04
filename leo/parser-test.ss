@@ -69,6 +69,18 @@
     (check (obj=? (parse $oneof-parser "ad") (parse-error 1 2)))
     (check (obj=? (parse $oneof-parser "acd") (parse-error 1 3)))))
 
+(lets
+  ($oneof-parser 
+    (oneof-parser 
+      (exact-parser "a")
+      (exact-parser "b")
+      (else (char-parser))))
+  (begin
+    (check (obj=? (parse $oneof-parser "") (parse-error 1 1)))
+    (check (obj=? (parse $oneof-parser "a") "a"))
+    (check (obj=? (parse $oneof-parser "b") "b"))
+    (check (obj=? (parse $oneof-parser "c") #\c))))
+
 ; ---------------------------------------------------------
 
 (lets
