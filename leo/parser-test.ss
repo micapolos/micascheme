@@ -11,6 +11,36 @@
 
 ; ---------------------------------------------------------
 
+(lets
+  ($bind-char-parser 
+    (bind-char-parser $char
+      (and (char-numeric? $char)
+        (parser (string $char)))))
+  (begin
+    (check (obj=? (parse $bind-char-parser "") (parse-error 1 1)))
+    (check (obj=? (parse $bind-char-parser "1") "1"))
+    (check (obj=? (parse $bind-char-parser "12") (parse-error 1 2)))
+    (check (obj=? (parse $bind-char-parser "a") (parse-error 1 1)))))
+
+; ---------------------------------------------------------
+
+(check (obj=? (parse (char-parser) "") (parse-error 1 1)))
+(check (obj=? (parse (char-parser) "a") #\a))
+(check (obj=? (parse (char-parser) "1") #\1))
+(check (obj=? (parse (char-parser) "ab") (parse-error 1 2)))
+
+; ---------------------------------------------------------
+
+(lets
+  ($exact-char-parser (exact-char-parser #\a))
+  (begin
+    (check (obj=? (parse $exact-char-parser "") (parse-error 1 1)))
+    (check (obj=? (parse $exact-char-parser "a") #\a))
+    (check (obj=? (parse $exact-char-parser "ab") (parse-error 1 2)))
+    (check (obj=? (parse $exact-char-parser "b") (parse-error 1 1)))))
+
+; ---------------------------------------------------------
+
 (check (obj=? (parse (exact-parser "") "") ""))
 (check (obj=? (parse (exact-parser "") "foo") (parse-error 1 1)))
 (check (obj=? (parse (exact-parser "foo") "fo") (parse-error 1 3)))
@@ -133,13 +163,6 @@
     (check (obj=? (parse $non-empty-stack-parser "foo\n") (stack "foo")))
     (check (obj=? (parse $non-empty-stack-parser "foo\nbar") (parse-error 2 4)))
     (check (obj=? (parse $non-empty-stack-parser "foo\nbar\n") (stack "foo" "bar")))))
-
-; ---------------------------------------------------------
-
-(check (obj=? (parse (char-parser) "") (parse-error 1 1)))
-(check (obj=? (parse (char-parser) "a") #\a))
-(check (obj=? (parse (char-parser) "1") #\1))
-(check (obj=? (parse (char-parser) "ab") (parse-error 1 2)))
 
 ; ---------------------------------------------------------
 
