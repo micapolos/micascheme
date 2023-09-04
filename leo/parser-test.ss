@@ -13,6 +13,13 @@
 
 ; ---------------------------------------------------------
 
+(check (equal? (parse (digit-parser) "") #f))
+(check (equal? (parse (digit-parser) "0") 0))
+(check (equal? (parse (digit-parser) "9") 9))
+(check (equal? (parse (digit-parser) "10") #f))
+
+; ---------------------------------------------------------
+
 (check (equal? (parse (string-parser) "") ""))
 (check (equal? (parse (string-parser) "$a1") "$a1"))
 
@@ -58,6 +65,31 @@
     (check (equal? (parse $parser "123cm") "cm: 123"))
     (check (equal? (parse $parser "123!") #f))
     (check (equal? (parse $parser "123cm!") #f))))
+
+; ---------------------------------------------------------
+
+(lets
+  ($parser
+    (parser-lets 
+      ($number (positive-integer-parser))
+      (parser (+ $number 1))))
+  (check (equal? (parse $parser "12") 13)))
+
+(lets
+  ($parser
+    (parser-lets 
+      ($skip (exact-parser "- "))
+      (positive-integer-parser)))
+  (check (equal? (parse $parser "- 123") 123)))
+
+(lets
+  ($parser
+    (parser-lets 
+      ($number1 (positive-integer-parser))
+      (skip (exact-parser " - "))
+      ($number2 (positive-integer-parser))
+      (parser (- $number1 $number2))))
+  (check (equal? (parse $parser "3 - 2") 1)))
 
 ; ---------------------------------------------------------
 
@@ -118,5 +150,3 @@
     (check (equal? (parse $parser "  \n") "\n"))
     (check (equal? (parse $parser "  a") #f))
     (check (equal? (parse $parser "  a\n") "a\n"))))
-
-; ---------------------------------------------------------

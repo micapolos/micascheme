@@ -3,10 +3,12 @@
     parser parser? parser parser-push-fn parser-finish-fn
     parser-push parser-finish
     parser-with parser-bind parser-map
+    parser-lets
     parse
 
     char-parser
     string-parser
+    digit-parser
     exact-parser
     line-parser
     positive-integer-parser
@@ -53,6 +55,27 @@
     (parser-bind $parser 
       (lambda ($item) 
         (parser-with ($fn $item)))))
+
+  ; ----------------------------------------------------------
+
+  (define-syntax parser-lets
+    (lambda ($syntax)
+      (syntax-case $syntax (skip parser)
+        ((_ (skip $expr) $decl ... $body)
+          #`(parser-bind $expr
+            (lambda (_)
+              (parser-lets $decl ... $body))))
+        ((_ ($var (parser $expr)) $decl ... $body)
+          #`(lets ($var $expr)
+            (parser-lets $decl ... $body)))
+        ((_ ($var $expr) $decl ... $body)
+          #`(parser-bind $expr
+            (lambda ($var)
+              (parser-lets $decl ... $body))))
+        ((_ (parser $body)) 
+          #`(parser-with $body))
+        ((_ $body)
+          #`$body))))
 
   ; ----------------------------------------------------------
 
@@ -121,6 +144,15 @@
 
   (define (line-parser)
     (make-line-parser (stack)))
+
+  ; ----------------------------------------------------------
+
+  (define (digit-parser)
+    (parser-bind (char-parser)
+      (lambda ($char)
+        (and
+          (char-numeric? $char)
+          (parser-with (- (char->integer $char) (char->integer #\0)))))))
 
   ; ----------------------------------------------------------
 
