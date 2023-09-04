@@ -23,6 +23,13 @@
 
 ; ---------------------------------------------------------
 
+(check (equal? (parse (letter-parser) "") #f))
+(check (equal? (parse (letter-parser) "a") #\a))
+(check (equal? (parse (letter-parser) "1") #f))
+(check (equal? (parse (letter-parser) "ab") #f))
+
+; ---------------------------------------------------------
+
 (check (equal? (parse (string-parser) "") ""))
 (check (equal? (parse (string-parser) "$a1") "$a1"))
 
@@ -47,6 +54,13 @@
 (check (equal? (parse (positive-integer-parser) "012") 12))
 (check (equal? (parse (positive-integer-parser) "012a") #f))
 (check (equal? (parse (positive-integer-parser) "-012") #f))
+
+; ---------------------------------------------------------
+
+(check (equal? (parse (word-parser) "") #f))
+(check (equal? (parse (word-parser) "foo") `foo))
+(check (equal? (parse (word-parser) "1") #f))
+(check (equal? (parse (word-parser) "foo1") #f))
 
 ; ---------------------------------------------------------
 
@@ -153,16 +167,23 @@
 
 ; ---------------------------------------------------------
 
-(check (equal? (parse (word-parser) "") #f))
-(check (equal? (parse (word-parser) "foo") `foo))
-(check (equal? (parse (word-parser) "1") #f))
-(check (equal? (parse (word-parser) "foo1") #f))
+(check 
+  (equal? 
+    (oneof-parser) 
+    (parse-error)))
 
-; ---------------------------------------------------------
+(check 
+  (equal? 
+    (oneof-parser 
+      (parse-error)) 
+    (parse-error)))
 
-(check (equal? (oneof-parser) (parse-error)))
-(check (equal? (oneof-parser (parse-error)) (parse-error)))
-(check (equal? (oneof-parser (parse-error) (parse-error)) (parse-error)))
+(check
+  (equal? 
+    (oneof-parser 
+      (parse-error) 
+      (parse-error)) 
+    (parse-error)))
 
 (lets
   ($oneof-parser 

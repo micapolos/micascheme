@@ -12,6 +12,7 @@
     char-parser
     string-parser
     digit-parser
+    letter-parser
     exact-parser
     line-parser
     positive-integer-parser
@@ -70,17 +71,12 @@
     (parser-thunk-do ($thunk $parser)
       (thunk
         (lambda ($char)
-          (lets
-            ($push-parser (thunk-push $thunk $char))
-            (if $push-parser
-              (parser-bind $push-parser $fn)
-              (parser-push
-                (opt-lift $fn (thunk-finish $thunk))
-                $char))))
+          (or
+            (parser-bind (thunk-push $thunk $char) $fn)
+            (parser-push (opt-lift $fn (thunk-finish $thunk)) $char)))
         (lambda ()
           (parser-finish
-            (opt-lift $fn
-              (thunk-finish $thunk)))))))
+            (opt-lift $fn (thunk-finish $thunk)))))))
 
   (define (parser-map $parser $fn)
     (parser-bind $parser 
@@ -231,23 +227,6 @@
 
   ; ----------------------------------------------------------
 
-  (define (make-positive-integer-parser $digit-stack)
-    (thunk
-      (lambda ($char)
-        (and
-          (char-numeric? $char)
-          (make-positive-integer-parser 
-            (push 
-              $digit-stack
-              (- (char->integer $char) (char->integer #\0))))))
-      (lambda () 
-        (and
-          (not (null? $digit-stack))
-          (fold-left 
-            (lambda ($integer $digit) (+ (* $integer 10) $digit))
-            0
-            (reverse $digit-stack))))))
-
   (define (positive-integer-parser)
     (parser-lets
       ($digit-stack (non-empty-stack-parser (digit-parser)))
@@ -259,6 +238,14 @@
 
   ; ----------------------------------------------------------
 
+  (define (letter-parser)
+    (parser-bind (char-parser)
+      (lambda ($char)
+        (and (char-alphabetic? $char) 
+          (parser $char)))))
+
+  ; ----------------------------------------------------------
+  
   (define (make-word-parser $letter-stack)
     (thunk
       (lambda ($char)
@@ -271,7 +258,9 @@
           (string->symbol (list->string (reverse $letter-stack)))))))
 
   (define (word-parser)
-    (make-word-parser (stack)))
+    (parser-lets
+      ($letter-stack (non-empty-stack-parser (letter-parser)))
+      (parser (string->symbol (list->string (reverse $letter-stack))))))
 
   ; ----------------------------------------------------------
 
@@ -365,16 +354,9 @@
           (else (parser $char))))))
 
   (define (literal-string-parser)
-    (parser-bind (exact-parser "\"")
-      (lambda (_)
-        (parser-bind (stack-parser (string-literal-char-parser))
-          (lambda ($char-stack)
-            (parser-bind (exact-parser "\"")
-              (lambda (_)
-                (parser (list->string (reverse $char-stack))))))))))
-    ; (parser-lets
-    ;   (skip (exact-parser "\""))
-    ;   ($char-stack (stack-parser (string-literal-char-parser)))
-    ;   (skip (exact-parser "\""))
-    ;   (parser (list->string (reverse $char-stack)))))
+    (parser-lets
+      (skip (exact-parser "\""))
+      ($char-stack (stack-parser (string-literal-char-parser)))
+      (skip (exact-parser "\""))
+      (parser (list->string (reverse $char-stack)))))
 )
