@@ -414,10 +414,14 @@
           (else (parser $char))))
       (lambda () #f)))
 
-  (define (literal-string-parser)
+  (define (string-literal-body-parser)
     (parser-lets
-      (skip (exact-parser "\""))
       ($char-stack (stack-parser (string-literal-char-parser)))
-      (skip (exact-parser "\""))
       (parser (list->string (reverse $char-stack)))))
+
+  (define (literal-string-parser)
+    (select-parser
+      (exact-parser "\"")
+      (selected (string-literal-body-parser))
+      (exact-parser "\"")))
 )
