@@ -7,11 +7,12 @@
     (except (parser) line-parser))
 
   (define (script-parser)
-    (parser-map
-      (separator-stack-parser 
-        (line-parser)
-        (exact-char-parser #\newline))
-      reverse))
+    (parser-map (line-stack-parser) reverse))
+
+  (define (line-stack-parser)
+    (separator-stack-parser
+      (line-parser)
+      (exact-char-parser #\newline)))
 
   (define (line-parser)
     (oneof-parser
