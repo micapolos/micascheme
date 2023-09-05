@@ -72,16 +72,25 @@
       (lambda ($char) #f) 
       (lambda () $value)))
 
+  (define (parser-bind-with $parser $fn-parser $fn)
+    (cond
+      ((not $parser) $fn-parser)
+      (else
+        (lets
+          ($thunk $parser)
+          ($finished (thunk-finish $thunk))
+          ($fn-parser (or (and $finished ($fn $finished)) $fn-parser))
+          (thunk
+            (lambda ($char)
+              (parser-bind-with
+                (thunk-push $thunk $char)
+                (parser-push $fn-parser $char)
+                $fn))
+            (lambda ()
+              (parser-finish $fn-parser)))))))
+
   (define (parser-bind $parser $fn)
-    (parser-thunk-do ($thunk $parser)
-      (thunk
-        (lambda ($char)
-          (or
-            (parser-bind (thunk-push $thunk $char) $fn)
-            (parser-push (opt-lift $fn (thunk-finish $thunk)) $char)))
-        (lambda ()
-          (parser-finish
-            (opt-lift $fn (thunk-finish $thunk)))))))
+    (parser-bind-with $parser #f $fn))
 
   (define (parser-map $parser $fn)
     (parser-bind $parser 
