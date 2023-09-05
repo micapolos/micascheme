@@ -13,5 +13,5 @@
   "parser-test.ss"
   "syntax-test.ss"
   "value-test.ss"
-  "leo/compiler-test.ss"
+  "leo/parser-test.ss"
 )
