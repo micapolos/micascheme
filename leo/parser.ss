@@ -2,9 +2,7 @@
   (export 
     script-parser
     line-parser)
-  (import 
-    (micascheme) 
-    (except (parser) line-parser))
+  (import (micascheme) (parser))
 
   (define (script-parser)
     (parser-map (line-stack-parser) reverse))
@@ -12,7 +10,7 @@
   (define (line-stack-parser)
     (separator-stack-parser
       (line-parser)
-      (exact-char-parser #\newline)))
+      (newline-parser)))
 
   (define (line-parser)
     (oneof-parser
@@ -39,12 +37,13 @@
       (newline-rhs-parser)))
 
   (define (space-rhs-parser)
-    (parser-map
-      (parser-lets (skip (exact-char-parser #\space)) (line-parser))
-      list))
+    (parser-lets 
+      (skip (space-parser))
+      ($line (line-parser))
+      (parser (list $line))))
 
   (define (newline-rhs-parser)
     (parser-lets
-      (skip (exact-char-parser #\newline))
+      (skip (newline-parser))
       (indent-parser (script-parser))))
 )

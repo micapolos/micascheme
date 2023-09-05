@@ -134,24 +134,24 @@
 
 (lets
   ($fold-parser 
-    (fold-parser (stack) (line-parser) push))
+    (fold-parser (stack) (newline-ended-parser (positive-integer-parser)) push))
   (begin
     (check (obj=? (parse $fold-parser "") (stack)))
-    (check (obj=? (parse $fold-parser "foo") (parse-error 1 4)))
-    (check (obj=? (parse $fold-parser "foo\n") (stack "foo")))
-    (check (obj=? (parse $fold-parser "foo\nbar") (parse-error 2 4)))
-    (check (obj=? (parse $fold-parser "foo\nbar\n") (stack "foo" "bar")))))
+    (check (obj=? (parse $fold-parser "12") (parse-error 1 3)))
+    (check (obj=? (parse $fold-parser "12\n") (stack 12)))
+    (check (obj=? (parse $fold-parser "12\n34") (parse-error 2 3)))
+    (check (obj=? (parse $fold-parser "12\n34\n") (stack 12 34)))))
 
 ; ---------------------------------------------------------
 
 (lets
-  ($stack-parser (stack-parser (line-parser)))
+  ($stack-parser (stack-parser (newline-ended-parser (positive-integer-parser))))
   (begin
     (check (obj=? (parse $stack-parser "") (stack)))
-    (check (obj=? (parse $stack-parser "foo") (parse-error 1 4)))
-    (check (obj=? (parse $stack-parser "foo\n") (stack "foo")))
-    (check (obj=? (parse $stack-parser "foo\nbar") (parse-error 2 4)))
-    (check (obj=? (parse $stack-parser "foo\nbar\n") (stack "foo" "bar")))))
+    (check (obj=? (parse $stack-parser "12") (parse-error 1 3)))
+    (check (obj=? (parse $stack-parser "12\n") (stack 12)))
+    (check (obj=? (parse $stack-parser "12\n34") (parse-error 2 3)))
+    (check (obj=? (parse $stack-parser "12\n34\n") (stack 12 34)))))
 
 ; ---------------------------------------------------------
 
@@ -170,14 +170,18 @@
     (check (obj=? (parse $separator-stack-parser "12,34,56") (stack 12 34 56)))))
 
 ; ---------------------------------------------------------
+
 (lets
-  ($non-empty-stack-parser (non-empty-stack-parser (line-parser)))
+  ($non-empty-stack-parser 
+    (non-empty-stack-parser 
+      (newline-ended-parser 
+        (positive-integer-parser))))
   (begin
     (check (obj=? (parse $non-empty-stack-parser "") (parse-error 1 1)))
-    (check (obj=? (parse $non-empty-stack-parser "foo") (parse-error 1 4)))
-    (check (obj=? (parse $non-empty-stack-parser "foo\n") (stack "foo")))
-    (check (obj=? (parse $non-empty-stack-parser "foo\nbar") (parse-error 2 4)))
-    (check (obj=? (parse $non-empty-stack-parser "foo\nbar\n") (stack "foo" "bar")))))
+    (check (obj=? (parse $non-empty-stack-parser "12") (parse-error 1 3)))
+    (check (obj=? (parse $non-empty-stack-parser "12\n") (stack 12)))
+    (check (obj=? (parse $non-empty-stack-parser "12\n34") (parse-error 2 3)))
+    (check (obj=? (parse $non-empty-stack-parser "12\n34\n") (stack 12 34)))))
 
 ; ---------------------------------------------------------
 
@@ -198,13 +202,6 @@
 
 (check (obj=? (parse (string-parser) "") ""))
 (check (obj=? (parse (string-parser) "$a1") "$a1"))
-
-; ---------------------------------------------------------
-
-(check (obj=? (parse (line-parser) "") (parse-error 1 1)))
-(check (obj=? (parse (line-parser) "\n") ""))
-(check (obj=? (parse (line-parser) "foo") (parse-error 1 4)))
-(check (obj=? (parse (line-parser) "foo\n") "foo"))
 
 ; ---------------------------------------------------------
 
@@ -313,11 +310,10 @@
 ; ---------------------------------------------------------
 
 (lets
-  ($map-parser (parser-map (line-parser) string-length))
+  ($map-parser (parser-map (positive-integer-parser) number->string))
   (begin
-    (check (obj=? (parse $map-parser "foo") (parse-error 1 4)))
-    (check (obj=? (parse $map-parser "foo\n") 3))
-    (check (obj=? (parse $map-parser "foo\nbar") (parse-error 2 1)))))
+    (check (obj=? (parse $map-parser "128a") (parse-error 1 4)))
+    (check (obj=? (parse $map-parser "128") "128"))))
 
 ; ---------------------------------------------------------
 

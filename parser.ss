@@ -11,6 +11,10 @@
     make-parser
     define-parser
 
+    space-parser
+    newline-parser
+    newline-ended-parser
+
     bind-char-parser
     exact-char-parser
     select-parser
@@ -19,7 +23,6 @@
     digit-parser
     letter-parser
     exact-parser
-    line-parser
     positive-integer-parser
     word-parser
     oneof-parser
@@ -263,18 +266,13 @@
 
   ; ----------------------------------------------------------
 
-  (define (make-line-parser $char-stack-or-line)
-    (thunk
-      (and (string? $char-stack-or-line) $char-stack-or-line)
-      (lambda ($char)
-        (and (not (string? $char-stack-or-line))
-          (make-line-parser
-            (case $char
-              ((#\newline) (list->string (reverse $char-stack-or-line)))
-              (else (push $char-stack-or-line $char))))))))
+  (define (space-parser) (exact-char-parser #\space))
+  (define (newline-parser) (exact-char-parser #\newline))
 
-  (define (line-parser)
-    (make-line-parser (stack)))
+  (define (newline-ended-parser $parser)
+    (select-parser
+      (selected $parser)
+      (newline-parser)))
 
   ; ----------------------------------------------------------
 

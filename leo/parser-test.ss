@@ -1,7 +1,4 @@
-(import 
-  (micascheme) 
-  (only (parser) parse parse-error) 
-  (leo parser))
+(import (micascheme) (parser) (leo parser))
 
 (check (obj=? (parse (script-parser) "") `()))
 (check (obj=? (parse (script-parser) "foo") `(foo)))
