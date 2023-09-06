@@ -6,6 +6,7 @@
     number! any-number any-number?
     named! named named? named-name named-value
     tuple! tuple tuple? tuple-items
+    access access? access-tuple access-type
     choice! choice choice? choice-items
     function! function function? function-params function-body
     application! application application? application-function application-args
@@ -20,6 +21,7 @@
   (data (any-number))
   (data (named name value))
   (data (tuple items))
+  (data (access tuple type))
   (data (choice items))
   (data (function params body))
   (data (application function args))

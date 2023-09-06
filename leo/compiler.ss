@@ -46,6 +46,15 @@
               ((2) `(cons ,(car $values) ,(cadr $values)))
               (else `(vector ,@$values)))
             (tuple $types))))
+      ((access? $access)
+        (lets
+          ($tuple (access-tuple $access))
+          ($type (access-type $access))
+          ($compiled-tuple (compile $compiler $tuple))
+          ($compiled-type (compile $compiler $type))
+          ($tuple-type (typed-type $compiled-tuple))
+          (do (unless (tuple? $tuple-type) (throw not-tuple $tuple)))
+          `todo))
       ((variable? $variable)
         (lets
           ($types (compiler-types $compiler))
