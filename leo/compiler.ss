@@ -1,22 +1,28 @@
 (library (leo compiler)
   (export
-    compiler! compiler compiler? compiler-types
+    compiler! compiler compiler? compiler-types compiler-tmp-count
     compile)
   (import
     (except (micascheme) compile)
     (leo value))
 
-  (data (compiler types))
+  (data (compiler types tmp-count))
 
   (define (compiler+type $compiler $type)
     (compiler
-      (push (compiler-types $compiler) $type)))
+      (push (compiler-types $compiler) $type)
+      (compiler-tmp-count $compiler)))
+
+  (define (compiler+tmp $compiler)
+    (compiler
+      (compiler-types $compiler)
+      (+ (compiler-tmp-count $compiler) 1)))
 
   (define (compiler+types $compiler $types)
     (fold-left compiler+type $compiler $types))
 
   (define-syntax-rule (compiler! $type ...)
-    (compiler (stack $type ...)))
+    (compiler (stack $type ...) 0))
 
   (define (compile $compiler $value)
     (switch $value
@@ -27,6 +33,12 @@
         (typed $number number!))
       ((string? $string)
         (typed $string string!))
+      ((typeof? $typeof)
+        (lets
+          ($value (typeof-value $typeof))
+          ($compiled (compile $compiler $value))
+          ($type (typed-type $compiled))
+          (typed $type type!)))
       ((named? $named)
         (lets
           ($compiled (compile $compiler (named-value $named)))
@@ -75,6 +87,57 @@
               ((2) `(,(if (zero? $index) `car `cdr) ,$value))
               (else `(vector-ref ,$value ,$index)))
             $type)))
+      ((choice-switch? $choice-switch)
+        (lets
+          ($choice (choice-switch-choice $choice-switch))
+          ($cases (choice-switch-cases $choice-switch))
+          (do (when (null? $cases) (throw no-cases $choice-switch)))
+          ($compiled-choice (compile $compiler $choice))
+          ($value (typed-value $compiled-choice))
+          ($type (typed-type $compiled-choice))
+          (do (unless (choice? $type) (throw not-choice $choice)))
+          ($choice-types (choice-items $type))
+          (do
+            (unless
+              (= (length $cases) (length $choice-types))
+              (throw choice-switch-cases-mismatch $choice-switch)))
+          ($case-compilers (map (partial compiler+type $compiler) $choice-types))
+          ($compiled-cases (map compile $case-compilers $cases))
+          ($case-values (map typed-value $compiled-cases))
+          ($case-types (map typed-type $compiled-cases))
+          ($result-type (car $case-types))
+          (do
+            (unless
+              (for-all (lambda ($case-type) (obj=? $case-type $result-type)) $case-types)
+              (throw incompatible-case-types $choice-switch $case-types)))
+          ($variable (typed-value (compile (car $case-compilers) (variable (car $choice-types)))))
+          ($length (length $cases))
+          ($last-index (- $length 1))
+          (typed
+            (case (length $cases)
+              ((1)
+                `(lets
+                  (,$variable ,$value)
+                  ,(car $case-values)))
+              ((2)
+                `(lets
+                  ($tmp ,$value)
+                  (,$variable (cdr $tmp))
+                  (if (car $tmp)
+                    ,(car $case-values)
+                    ,(cadr $case-values))))
+              (else
+                `(lets
+                  ($tmp ,$value)
+                  (,$variable (cdr $tmp))
+                  (case (car $tmp)
+                    ,@(map-indexed
+                      (lambda ($index $value)
+                        `(
+                          ,(if (= $index $last-index) `else `(,$index))
+                          ,$value))
+                      $case-values)))))
+            $result-type)))
       ((variable? $variable)
         (lets
           ($types (compiler-types $compiler))
@@ -123,5 +186,6 @@
               ,(typed-value $compiled-function)
               ,@(map typed-value $compiled-args))
             (function-body $function-type))))
-      ((else $other) (throw compile $other))))
+      ((else $other)
+        (throw compile $other))))
 )

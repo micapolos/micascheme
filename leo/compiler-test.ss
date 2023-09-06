@@ -31,6 +31,13 @@
 
 (check
   (obj=?
+    (compile (compiler!) (typeof (typed `v `t)))
+    (typed `t type!)))
+
+; -----------------------------------------
+
+(check
+  (obj=?
     (compile (compiler!) (named! foo (typed `v1 `t1)))
     (typed `v1 (named! foo `t1))))
 
@@ -94,6 +101,47 @@
   (obj=?
     (compile (compiler!) (tuple-get (typed `v (tuple! `t1 `t2 `t3)) `t3))
     (typed `(vector-ref v 2) `t3)))
+
+; -----------------------------------------
+
+(check
+  (obj=?
+    (compile (compiler!)
+      (choice-switch! (typed `choice (choice! `t1))
+        (typeof (variable `t1))))
+    (typed
+      `(lets (v0 choice) t1)
+      type!)))
+
+(check
+  (obj=?
+    (compile (compiler!)
+      (choice-switch! (typed `choice (choice! `t1 `t2))
+        (typeof (variable `t1))
+        (typeof (variable `t2))))
+    (typed
+      `(lets
+        ($tmp choice)
+        (v0 (cdr $tmp))
+        (if (car $tmp) t1 t2))
+      type!)))
+
+(check
+  (obj=?
+    (compile (compiler!)
+      (choice-switch! (typed `choice (choice! `t1 `t2 `t3))
+        (typeof (variable `t1))
+        (typeof (variable `t2))
+        (typeof (variable `t3))))
+    (typed
+      `(lets
+        ($tmp choice)
+        (v0 (cdr $tmp))
+        (case (car $tmp)
+          ((0) t1)
+          ((1) t2)
+          (else t3)))
+      type!)))
 
 ; -----------------------------------------
 
