@@ -5,14 +5,17 @@
     string! any-string any-string?
     number! any-number any-number?
     named! named named? named-name named-value
+    named-get named-get? named-get-named
     tuple! tuple tuple? tuple-items
-    access access? access-tuple access-type
+    tuple-get tuple-get? tuple-get-tuple tuple-get-type
     choice! choice choice? choice-items
     function! function function? function-params function-body
     application! application application? application-function application-args
     variable variable? variable-type
     recursion recursion? recursion-body
-    typed typed? typed-value typed-type)
+    typed typed? typed-value typed-type
+
+    typed-values)
   (import (micascheme))
 
   (data (anything))
@@ -20,8 +23,9 @@
   (data (any-string))
   (data (any-number))
   (data (named name value))
+  (data (named-get named))
   (data (tuple items))
-  (data (access tuple type))
+  (data (tuple-get tuple type))
   (data (choice items))
   (data (function params body))
   (data (application function args))
@@ -49,4 +53,7 @@
 
   (define-syntax-rule (application! $fn $arg ...)
     (application $fn (list $arg ...)))
+
+  (define (typed-values $typed)
+    (values (typed-value $typed) (typed-type $typed)))
 )

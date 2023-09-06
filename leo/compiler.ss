@@ -33,6 +33,13 @@
           (typed
             (typed-value $compiled)
             (named (named-name $named) (typed-type $compiled)))))
+      ((named-get? $named-get)
+        (lets
+          ($named (named-get-named $named-get))
+          ($compiled (compile $compiler $named))
+          (($value $type) (typed-values $compiled))
+          (do (unless (named? $type) (throw not-named $named-get)))
+          (typed $value (named-value $type))))
       ((tuple? $tuple)
         (lets
           ($items (tuple-items $tuple))
@@ -46,15 +53,27 @@
               ((2) `(cons ,(car $values) ,(cadr $values)))
               (else `(vector ,@$values)))
             (tuple $types))))
-      ((access? $access)
+      ((tuple-get? $tuple-get)
         (lets
-          ($tuple (access-tuple $access))
-          ($type (access-type $access))
+          ($tuple (tuple-get-tuple $tuple-get))
+          ($type (tuple-get-type $tuple-get))
           ($compiled-tuple (compile $compiler $tuple))
-          ($compiled-type (compile $compiler $type))
+          ($value (typed-value $compiled-tuple))
           ($tuple-type (typed-type $compiled-tuple))
           (do (unless (tuple? $tuple-type) (throw not-tuple $tuple)))
-          `todo))
+          ($types (tuple-items $tuple-type))
+          ($index
+            (find-index
+              (lambda ($indexed-type) (obj=? $type $indexed-type))
+              $types))
+          (do (unless $index (throw tuple-get-type-not-found $type)))
+          (typed
+            (case (length $types)
+              ((0) (throw impossible))
+              ((1) $value)
+              ((2) `(,(if (zero? $index) `car `cdr) ,$value))
+              (else `(vector-ref ,$value ,$index)))
+            $type)))
       ((variable? $variable)
         (lets
           ($types (compiler-types $compiler))

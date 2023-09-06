@@ -3,10 +3,14 @@
   (leo value)
   (leo compiler))
 
+; -----------------------------------------
+
 (check
   (obj=?
     (compile (compiler!) (typed `v `t))
     (typed `v `t)))
+
+; -----------------------------------------
 
 (check
   (obj=?
@@ -23,10 +27,21 @@
     (compile (compiler!) "foo")
     (typed "foo" string!)))
 
+; -----------------------------------------
+
 (check
   (obj=?
     (compile (compiler!) (named! foo (typed `v1 `t1)))
     (typed `v1 (named! foo `t1))))
+
+; -----------------------------------------
+
+(check
+  (obj=?
+    (compile (compiler!) (named-get (typed `v (named! foo `t))))
+    (typed `v `t)))
+
+; -----------------------------------------
 
 (check
   (obj=?
@@ -48,6 +63,40 @@
     (compile (compiler!) (tuple! (typed `v1 `t1) (typed `v2 `t2) (typed `v3 `t3)))
     (typed `(vector v1 v2 v3) (tuple! `t1 `t2 `t3))))
 
+; -----------------------------------------
+
+(check
+  (obj=?
+    (compile (compiler!) (tuple-get (typed `v (tuple! `t1)) `t1))
+    (typed `v `t1)))
+
+(check
+  (obj=?
+    (compile (compiler!) (tuple-get (typed `v (tuple! `t1 `t2)) `t1))
+    (typed `(car v) `t1)))
+
+(check
+  (obj=?
+    (compile (compiler!) (tuple-get (typed `v (tuple! `t1 `t2)) `t2))
+    (typed `(cdr v) `t2)))
+
+(check
+  (obj=?
+    (compile (compiler!) (tuple-get (typed `v (tuple! `t1 `t2 `t3)) `t1))
+    (typed `(vector-ref v 0) `t1)))
+
+(check
+  (obj=?
+    (compile (compiler!) (tuple-get (typed `v (tuple! `t1 `t2 `t3)) `t2))
+    (typed `(vector-ref v 1) `t2)))
+
+(check
+  (obj=?
+    (compile (compiler!) (tuple-get (typed `v (tuple! `t1 `t2 `t3)) `t3))
+    (typed `(vector-ref v 2) `t3)))
+
+; -----------------------------------------
+
 (check
   (obj=?
     (compile (compiler! `t1 `t2) (variable `t1))
@@ -57,6 +106,8 @@
   (obj=?
     (compile (compiler! `t1! `t2) (variable `t2))
     (typed `v1 `t2)))
+
+; -----------------------------------------
 
 (check
   (obj=?
@@ -71,6 +122,8 @@
     (typed
       `(lambda (v0 v1) v1)
       (function! (`t1 `t2) `t2))))
+
+; -----------------------------------------
 
 (check
   (obj=?
