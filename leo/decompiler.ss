@@ -17,9 +17,9 @@
       ($value (typed-value $typed))
       ($type (typed-type $typed))
       (switch $type
-        ((boolean-type? _) $value)
-        ((number-type? _) $value)
-        ((string-type? _) $value)
+        ((any-boolean? _) $value)
+        ((any-number? _) $value)
+        ((any-string? _) $value)
         ((named? $named)
           (named
             (named-name $named)
@@ -55,6 +55,6 @@
                   (typed
                     (cdr $value)
                     (list-ref $types (car $value))))))))
-        ((else $other) 
-          (throw invalid-type $type)))))
+        ((else $other)
+          (typed $value $type)))))
 )

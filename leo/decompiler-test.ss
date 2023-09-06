@@ -1,7 +1,13 @@
-(import 
-  (micascheme) 
+(import
+  (micascheme)
   (leo value)
   (leo decompiler))
+
+(check
+  (obj=?
+    (decompile (empty-decompiler)
+      (typed `v1 `t1))
+    (typed `v1 `t1)))
 
 (check
   (obj=?
@@ -30,7 +36,7 @@
 (check
   (obj=?
     (decompile (empty-decompiler)
-      (typed #f (tuple!)))
+      (typed (void) (tuple!)))
     (tuple!)))
 
 (check
