@@ -37,7 +37,8 @@
         (lets
           ($named (named-get-named $named-get))
           ($compiled (compile $compiler $named))
-          (($value $type) (typed-values $compiled))
+          ($value (typed-value $compiled))
+          ($type (typed-type $compiled))
           (do (unless (named? $type) (throw not-named $named-get)))
           (typed $value (named-value $type))))
       ((tuple? $tuple)
