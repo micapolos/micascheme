@@ -1,6 +1,5 @@
 (library (leo value)
   (export
-    anything! anything anything?
     type! any-type any-type?
     boolean! any-boolean any-boolean?
     string! any-string any-string?
@@ -21,7 +20,6 @@
     typed-values)
   (import (micascheme))
 
-  (data (anything))
   (data (any-type))
   (data (any-boolean))
   (data (any-string))
@@ -40,7 +38,6 @@
 
   (data (typed value type))
 
-  (define anything! (anything))
   (define type! (any-type))
   (define boolean! (any-boolean))
   (define string! (any-string))
