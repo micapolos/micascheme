@@ -32,34 +32,31 @@
   (define (field-parser $mode)
     (parser-lets
       ($word (word-parser))
-      ($rhs (rhs-parser $mode $word))
+      ($rhs (rhs-parser $mode))
       (cond
         ((null? $rhs) (parser $word))
         (else (parser (cons $word $rhs))))))
 
-  (define (rhs-parser $mode $word)
+  (define (rhs-parser $mode)
     (case $mode
       ((multiline)
         (oneof-parser
           (parser (list))
-          (space-rhs-parser $mode $word)
+          (space-rhs-parser $mode)
           (parenthesized-rhs-parser)
           (newline-rhs-parser)
           (colon-rhs-parser $mode)))
       ((parenthesis colon)
         (oneof-parser
           (parser (list))
-          (space-rhs-parser $mode $word)
+          (space-rhs-parser $mode)
           (parenthesized-rhs-parser)
           (colon-rhs-parser $mode)))))
 
-  (define (space-rhs-parser $mode $word)
+  (define (space-rhs-parser $mode)
     (parser-lets 
       (skip (space-parser))
-      ($line
-        (case $word
-          ((text) (parser-until-newline (string-parser)))
-          (else (line-parser $mode))))
+      ($line (line-parser $mode))
       (parser (list $line))))
 
   (define (newline-rhs-parser)

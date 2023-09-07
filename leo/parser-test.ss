@@ -41,8 +41,6 @@
 (check (obj=? (parse (script-parser) "foo bar\ngoo gar\n") `((foo bar) (goo gar))))
 (check (obj=? (parse (script-parser) "foo\n  bar\ngoo\n  gar\n") `((foo bar) (goo gar))))
 
-(check (obj=? (parse (script-parser) "text Hello, world!\nthe end\n") `((text "Hello, world!") (the end))))
-
 (check
   (obj=?
     (parse (script-parser) "\n\npoint\n  x: 10\n\n  y: 20\nplus point\n\n\n  x: 30\n  y: 40\n\n\n")
