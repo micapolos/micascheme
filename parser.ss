@@ -25,9 +25,11 @@
     oneof-parser
     fold-parser
     stack-parser
-    separator-stack-parser
+    separated-stack-parser
     non-empty-stack-parser
+    non-empty-separated-stack-parser
     indent-parser
+    skip-empty-lines-parser
 
     pure skip selected
 
@@ -299,7 +301,7 @@
       ($first $parser)
       (fold-parser (stack $first) $parser push)))
 
-  (define (separator-stack-parser $item-parser $separator-parser)
+  (define (separated-stack-parser $item-parser $separator-parser)
     (oneof-parser
       (parser (stack))
       (parser-lets
@@ -308,6 +310,14 @@
           (stack $first)
           (parser-lets (skip $separator-parser) $item-parser)
           push))))
+
+  (define (non-empty-separated-stack-parser $item-parser $separator-parser)
+    (parser-lets
+      ($first $item-parser)
+      (fold-parser
+        (stack $first)
+        (parser-lets (skip $separator-parser) $item-parser)
+        push)))
 
   ; ----------------------------------------------------------
 
@@ -339,6 +349,29 @@
 
   (define (indent-parser $parser)
     (make-indent-parser 0 $parser))
+
+  ; ----------------------------------------------------------
+
+  (define skip-empty-lines-parser
+    (case-lambda
+      (($parser)
+        (skip-empty-lines-parser $parser #t))
+      (($parser $skip-newline?)
+        (parser-thunk-do ($thunk $parser)
+          (thunk
+            (thunk-parsed-opt $thunk)
+            (lambda ($char)
+              (case $char
+                ((#\newline)
+                  (skip-empty-lines-parser
+                    (if $skip-newline?
+                      $thunk
+                      (thunk-push $thunk $char))
+                    #t))
+                (else
+                  (skip-empty-lines-parser
+                    (thunk-push $thunk $char)
+                    #f)))))))))
 
   ; ----------------------------------------------------------
 

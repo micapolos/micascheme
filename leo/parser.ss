@@ -8,7 +8,7 @@
     (parser-map (line-stack-parser) reverse))
 
   (define (line-stack-parser)
-    (separator-stack-parser
+    (separated-stack-parser
       (line-parser)
       (newline-parser)))
 

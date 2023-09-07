@@ -147,18 +147,18 @@
 ; ---------------------------------------------------------
 
 (lets
-  ($separator-stack-parser 
-    (separator-stack-parser 
+  ($separated-stack-parser
+    (separated-stack-parser
       (positive-integer-parser) 
       (exact-parser ",")))
   (begin
-    (check (obj=? (parse $separator-stack-parser "") (stack)))
-    (check (obj=? (parse $separator-stack-parser "1") (stack 1)))
-    (check (obj=? (parse $separator-stack-parser "12") (stack 12)))
-    (check (obj=? (parse $separator-stack-parser "12,3") (stack 12 3)))
-    (check (obj=? (parse $separator-stack-parser "12,34") (stack 12 34)))
-    (check (obj=? (parse $separator-stack-parser "12,34,5") (stack 12 34 5)))
-    (check (obj=? (parse $separator-stack-parser "12,34,56") (stack 12 34 56)))))
+    (check (obj=? (parse $separated-stack-parser "") (stack)))
+    (check (obj=? (parse $separated-stack-parser "1") (stack 1)))
+    (check (obj=? (parse $separated-stack-parser "12") (stack 12)))
+    (check (obj=? (parse $separated-stack-parser "12,3") (stack 12 3)))
+    (check (obj=? (parse $separated-stack-parser "12,34") (stack 12 34)))
+    (check (obj=? (parse $separated-stack-parser "12,34,5") (stack 12 34 5)))
+    (check (obj=? (parse $separated-stack-parser "12,34,56") (stack 12 34 56)))))
 
 ; ---------------------------------------------------------
 
@@ -173,6 +173,22 @@
     (check (obj=? (parse $non-empty-stack-parser "12\n") (stack 12)))
     (check (obj=? (parse $non-empty-stack-parser "12\n34") (parse-error 2 3)))
     (check (obj=? (parse $non-empty-stack-parser "12\n34\n") (stack 12 34)))))
+
+; ---------------------------------------------------------
+
+(lets
+  ($non-empty-separated-stack-parser
+    (non-empty-separated-stack-parser
+      (positive-integer-parser)
+      (exact-parser ",")))
+  (begin
+    (check (obj=? (parse $non-empty-separated-stack-parser "") (parse-error 1 1)))
+    (check (obj=? (parse $non-empty-separated-stack-parser "1") (stack 1)))
+    (check (obj=? (parse $non-empty-separated-stack-parser "12") (stack 12)))
+    (check (obj=? (parse $non-empty-separated-stack-parser "12,3") (stack 12 3)))
+    (check (obj=? (parse $non-empty-separated-stack-parser "12,34") (stack 12 34)))
+    (check (obj=? (parse $non-empty-separated-stack-parser "12,34,5") (stack 12 34 5)))
+    (check (obj=? (parse $non-empty-separated-stack-parser "12,34,56") (stack 12 34 56)))))
 
 ; ---------------------------------------------------------
 
@@ -300,6 +316,20 @@
     (check (obj=? (parse $indent-parser "  ab\n ") (parse-error 2 2)))
     (check (obj=? (parse $indent-parser "  ab\n  ") "ab\n"))
     (check (obj=? (parse $indent-parser "  ab\n  c") "ab\nc"))))
+
+(lets
+  ($skip-empty-lines-parser (skip-empty-lines-parser (string-parser)))
+  (begin
+    (check (obj=? (parse $skip-empty-lines-parser "") ""))
+    (check (obj=? (parse $skip-empty-lines-parser "ab") "ab"))
+    (check (obj=? (parse $skip-empty-lines-parser "\n") ""))
+    (check (obj=? (parse $skip-empty-lines-parser "\n\n") ""))
+    (check (obj=? (parse $skip-empty-lines-parser "\n\nab") "ab"))
+    (check (obj=? (parse $skip-empty-lines-parser "ab\ncd") "ab\ncd"))
+    (check (obj=? (parse $skip-empty-lines-parser "ab\n\ncd") "ab\ncd"))
+    (check (obj=? (parse $skip-empty-lines-parser "ab\n\n\ncd") "ab\ncd"))
+    (check (obj=? (parse $skip-empty-lines-parser "ab\n\n") "ab\n"))
+    (check (obj=? (parse $skip-empty-lines-parser "ab\n\n\n") "ab\n"))))
 
 ; ---------------------------------------------------------
 
