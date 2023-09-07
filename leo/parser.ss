@@ -5,7 +5,11 @@
   (import (micascheme) (parser))
 
   (define (script-parser)
-    (parser-map (line-stack-parser) reverse))
+    (parser-map
+      (skip-empty-lines-parser
+        (stack-parser
+          (newline-ended-parser (line-parser))))
+      reverse))
 
   (define (line-stack-parser)
     (separated-stack-parser
@@ -58,7 +62,8 @@
   (define (newline-rhs-parser)
     (parser-lets
       (skip (newline-parser))
-      (indent-parser (script-parser))))
+      ($line-stack (indent-parser (line-stack-parser)))
+      (parser (reverse $line-stack))))
 
   (define (colon-rhs-parser $mode)
     (parser-lets
