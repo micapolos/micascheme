@@ -12,15 +12,15 @@
 ; ---------------------------------------------------------
 
 (lets
-  ($bind-char-parser 
-    (bind-char-parser $char
+  ($char-parser-bind
+    (char-parser-bind $char
       (and (char-numeric? $char)
         (parser (string $char)))))
   (begin
-    (check (obj=? (parse $bind-char-parser "") (parse-error 1 1)))
-    (check (obj=? (parse $bind-char-parser "1") "1"))
-    (check (obj=? (parse $bind-char-parser "12") (parse-error 1 2)))
-    (check (obj=? (parse $bind-char-parser "a") (parse-error 1 1)))))
+    (check (obj=? (parse $char-parser-bind "") (parse-error 1 1)))
+    (check (obj=? (parse $char-parser-bind "1") "1"))
+    (check (obj=? (parse $char-parser-bind "12") (parse-error 1 2)))
+    (check (obj=? (parse $char-parser-bind "a") (parse-error 1 1)))))
 
 ; ---------------------------------------------------------
 
@@ -110,25 +110,6 @@
     (check (obj=? (parse $oneof-parser "a") "a"))
     (check (obj=? (parse $oneof-parser "b") "b"))
     (check (obj=? (parse $oneof-parser "c") #\c))))
-
-; ---------------------------------------------------------
-
-(lets
-  ($select-parser 
-    (select-parser
-      (exact-parser "(")
-      (selected (exact-parser "foo"))
-      (exact-parser ")")))
-  (begin
-    (check (obj=? (parse $select-parser "") (parse-error 1 1)))
-    (check (obj=? (parse $select-parser "f") (parse-error 1 1)))
-    (check (obj=? (parse $select-parser "(") (parse-error 1 2)))
-    (check (obj=? (parse $select-parser "(boo") (parse-error 1 2)))
-    (check (obj=? (parse $select-parser "(fos") (parse-error 1 4)))
-    (check (obj=? (parse $select-parser "(foo") (parse-error 1 5)))
-    (check (obj=? (parse $select-parser "(foo)") "foo"))
-    (check (obj=? (parse $select-parser "(foo]") (parse-error 1 5)))
-    (check (obj=? (parse $select-parser "(foo)?") (parse-error 1 6)))))
 
 ; ---------------------------------------------------------
 
@@ -258,54 +239,6 @@
       ($number2 (positive-integer-parser))
       (parser (- $number1 $number2))))
   (check (obj=? (parse $subtract-parser "3 - 2") 1)))
-
-; ---------------------------------------------------------
-
-(lets
-  ($parser (make-parser "foo"))
-  (check (obj=? (parse $parser "foo") "foo")))
-
-(lets
-  ($parser (make-parser (pure (string-parser))))
-  (check (obj=? (parse $parser "foo") "foo")))
-
-(lets
-  ($parser (make-parser string))
-  (check (obj=? (parse $parser "foo") "foo")))
-
-(lets
-  ($parser (make-parser (stack char)))
-  (check (obj=? (parse $parser "foo") (stack #\f #\o #\o))))
-
-(lets
-  ($parser (make-parser (parsed 12.4)))
-  (check (obj=? (parse $parser "") 12.4)))
-
-(lets
-  ($parser 
-    (make-parser 
-      (lets
-        ($number1 positive-integer)
-        (skip "-")
-        ($number2 positive-integer)
-        (parsed (- $number1 $number2)))))
-  (check (obj=? (parse $parser "3-2") 1)))
-
-; ---------------------------------------------------------
-
-(begin
-  (define-parser expr
-    (lets
-      ($number1 positive-integer)
-      ($op
-        (oneof 
-          (lets (skip "+") (parsed +)) 
-          (lets (skip "-") (parsed -))))
-      ($number2 positive-integer)
-      (parsed ($op $number1 $number2))))
-  (begin
-    (check (obj=? (parse (make-parser expr) "3-2") 1))
-    (check (obj=? (parse (make-parser expr) "3+2") 5))))
 
 ; ---------------------------------------------------------
 

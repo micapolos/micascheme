@@ -3,21 +3,16 @@
     parse-error parse-error? parse-error-line parse-error-column
 
     parser
-    parser-result parser-push
     parser parser-bind parser-map
     parser-lets
     parse
-
-    make-parser
-    define-parser
 
     space-parser
     newline-parser
     newline-ended-parser
 
-    bind-char-parser
+    char-parser-bind
     exact-char-parser
-    select-parser
     char-parser
     string-parser
     digit-parser
@@ -32,7 +27,7 @@
     non-empty-stack-parser
     indent-parser
 
-    parsed pure skip selected
+    pure skip selected
 
     string-literal-char-parser
     literal-string-parser
@@ -42,14 +37,14 @@
 
   ; ----------------------------------------------------------
 
-  (define-aux-keyword parsed)
   (define-aux-keyword selected)
   (define-aux-keyword pure)
   (define-aux-keyword skip)
 
   ; ----------------------------------------------------------
 
-  (data (thunk result push-fn))
+  (data (parsed value))
+  (data (thunk parsed-opt push-fn))
 
   (define (thunk-push $thunk $char)
     ((thunk-push-fn $thunk) $char))
@@ -63,12 +58,12 @@
     (parser-thunk-do ($thunk $parser)
       (thunk-push $thunk $char)))
 
-  (define (parser-result $parser)
+  (define (parser-parsed-opt $parser)
     (parser-thunk-do ($thunk $parser)
-      (thunk-result $thunk)))
+      (thunk-parsed-opt $thunk)))
 
   (define (parser $value)
-    (thunk $value (lambda ($char) #f)))
+    (thunk (parsed $value) (lambda ($char) #f)))
 
   (define (parser-bind-with $parser $fn-parser $fn)
     (cond
@@ -76,10 +71,10 @@
       (else
         (lets
           ($thunk $parser)
-          ($result (thunk-result $thunk))
-          ($fn-parser (or (and $result ($fn $result)) $fn-parser))
+          ($parsed-opt (thunk-parsed-opt $thunk))
+          ($fn-parser (or (and $parsed-opt ($fn (parsed-value $parsed-opt))) $fn-parser))
           (thunk
-            (parser-result $fn-parser)
+            (parser-parsed-opt $fn-parser)
             (lambda ($char)
               (parser-bind-with
                 (thunk-push $thunk $char)
@@ -93,39 +88,6 @@
     (parser-bind $parser 
       (lambda ($item) 
         (parser ($fn $item)))))
-
-  ; ----------------------------------------------------------
-
-  (define-syntax select-parser
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $item ...)
-          (lets
-            ($items
-              (map
-                (lambda ($item)
-                  (syntax-case $item (selected)
-                    ((selected $item) (cons #t #`$item))
-                    ($item (cons #f #`$item))))
-                (syntax->list #`($item ...))))
-            ($selected
-              (single
-                (filter 
-                  (lambda ($item)
-                    (and (car $item) (cdr $item)))
-                  $items)))
-            (if (not $selected)
-              (syntax-error $syntax "nothing selected")
-              (lets
-                ($var (generate-temporary #`selected))
-                #`(parser-lets
-                  #,@(map
-                    (lambda ($item)
-                      #`(
-                        #,(if (car $item) $var #`skip)
-                        #,(cdr $item)))
-                    $items)
-                  (parser #,$var)))))))))
 
   ; ----------------------------------------------------------
 
@@ -150,62 +112,17 @@
 
   ; ----------------------------------------------------------
 
-  (meta define (parser-identifier $id)
-    (build-identifier ($string $id) 
-      (string-append $string "-parser")))
-
-  (define-syntax make-parser
-    (lambda ($syntax)
-      (syntax-case $syntax (skip pure parsed lets)
-        ((_ (pure $body))
-          #`$body)
-        ((_ (parsed $body)) 
-          #`(parser $body))
-        ((_ (lets $body))
-          #`(make-parser $body))
-        ((_ (lets (skip $expr) $decl ... $body))
-          #`(parser-bind 
-            (make-parser $expr)
-            (lambda (_)
-              (make-parser (lets $decl ... $body)))))
-        ((_ (lets ($var $expr) $decl ... $body))
-          #`(parser-bind
-            (make-parser $expr)
-            (lambda ($var)
-              (make-parser (lets $decl ... $body)))))
-        ((_ ($id $arg ...)) (identifier? #`$id)
-          #`(
-            #,(parser-identifier #`$id)
-            #,@(map
-              (lambda ($arg) #`(make-parser #,$arg))
-              (syntax->list #`($arg ...)))))
-        ((_ $id) (identifier? #`$id)
-          #`(make-parser ($id)))
-        ((_ $constant)
-          (switch (syntax->datum #`$constant)
-            ((string? $string) #`(exact-parser (quote #,$string)))
-            ((else $other) $other))))))
-
-  (define-syntax define-parser
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ ($name $arg ...) $body) (identifier? #`$name)
-          #`(define (#,(parser-identifier #`$name) $arg ...) 
-            (make-parser $body)))
-        ((_ $name $body)
-          #`(define-parser ($name) $body)))))
-
-  ; ----------------------------------------------------------
-
   (data (parse-error line column))
 
   (define (parse-from $parser $string $index $line $column)
     (parser-thunk-do ($thunk $parser)
       (cond
         ((= $index (string-length $string))
-          (or
-            (thunk-result $thunk)
-            (parse-error $line $column)))
+          (lets
+            ($parsed-opt (thunk-parsed-opt $thunk))
+            (if $parsed-opt
+              (parsed-value $parsed-opt)
+              (parse-error $line $column))))
         (else
           (lets
             ($char (string-ref $string $index))
@@ -224,24 +141,24 @@
 
   ; ----------------------------------------------------------
 
-  (define-syntax-rule (bind-char-parser $char $body)
+  (define-syntax-rule (char-parser-bind $char $body)
     (thunk #f (lambda ($char) $body)))
 
   (define (exact-char-parser $exact-char)
-    (bind-char-parser $char
+    (char-parser-bind $char
       (and 
         (char=? $char $exact-char) 
         (parser $char))))
 
   (define (char-parser)
-    (bind-char-parser $char
+    (char-parser-bind $char
       (parser $char)))
 
   ; ----------------------------------------------------------
 
   (define (make-string-parser $char-stack)
     (thunk
-      (list->string (reverse $char-stack))
+      (parsed (list->string (reverse $char-stack)))
       (lambda ($char)
         (make-string-parser (push $char-stack $char)))))
 
@@ -254,7 +171,7 @@
     (thunk
       (and
         (= $index (string-length $string))
-        $string)
+        (parsed $string))
       (lambda ($char)
         (and 
           (< $index (string-length $string))
@@ -270,14 +187,15 @@
   (define (newline-parser) (exact-char-parser #\newline))
 
   (define (newline-ended-parser $parser)
-    (select-parser
-      (selected $parser)
-      (newline-parser)))
+    (parser-lets
+      ($value $parser)
+      (skip (newline-parser))
+      (parser $value)))
 
   ; ----------------------------------------------------------
 
   (define (digit-parser)
-    (bind-char-parser $char
+    (char-parser-bind $char
       (and
         (char-numeric? $char)
         (parser (- (char->integer $char) (char->integer #\0))))))
@@ -296,7 +214,7 @@
   ; ----------------------------------------------------------
 
   (define (letter-parser)
-    (bind-char-parser $char
+    (char-parser-bind $char
       (and 
         (char-alphabetic? $char)
         (parser $char))))
@@ -319,10 +237,10 @@
         (else 
           (thunk
             (lets
-              ($results (filter-opts (map thunk-result $thunks)))
-              (case (length $results)
-                ((0) (parser-result $else))
-                ((1) (car $results))
+              ($values (map parsed-value (filter-opts (map thunk-parsed-opt $thunks))))
+              (case (length $values)
+                ((0) (parser-parsed-opt $else))
+                ((1) (parsed (car $values)))
                 (else #f)))
             (lambda ($char)
               (make-oneof-parser
@@ -375,7 +293,7 @@
     (thunk
       (and
         (= $indent indent-size)
-        (parser-result $parser))
+        (parser-parsed-opt $parser))
       (lambda ($char)
         (case $char
           ((#\space)
@@ -401,10 +319,10 @@
   ; ----------------------------------------------------------
 
   (define (string-literal-char-parser)
-    (bind-char-parser $char
+    (char-parser-bind $char
       (case $char
         ((#\\)
-          (bind-char-parser $char
+          (char-parser-bind $char
             (case $char
               ((#\\) (parser #\\))
               ((#\n) (parser #\newline))
@@ -420,8 +338,9 @@
       (parser (list->string (reverse $char-stack)))))
 
   (define (literal-string-parser)
-    (select-parser
-      (exact-parser "\"")
-      (selected (string-literal-body-parser))
-      (exact-parser "\"")))
+    (parser-lets
+      (skip (exact-parser "\""))
+      ($string (string-literal-body-parser))
+      (skip (exact-parser "\""))
+      (parser $string)))
 )
