@@ -12,6 +12,7 @@
     colon-parser
     comma-parser
     newline-ended-parser
+    parser-until-newline
 
     opt-parser
     char-parser-bind
@@ -175,6 +176,19 @@
 
   (define (string-parser)
     (make-string-parser (stack)))
+
+  ; ----------------------------------------------------------
+
+  (define (parser-until-newline $parser)
+    (parser-thunk-do ($thunk $parser)
+      (thunk
+        (thunk-parsed-opt $thunk)
+        (lambda ($char)
+          (case $char
+            ((#\newline) #f)
+            (else
+              (parser-until-newline
+                (thunk-push $thunk $char))))))))
 
   ; ----------------------------------------------------------
 

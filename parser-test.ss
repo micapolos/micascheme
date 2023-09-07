@@ -136,6 +136,15 @@
 ; ---------------------------------------------------------
 
 (lets
+  ($parser-until-newline (parser-until-newline (string-parser)))
+  (begin
+    (check (obj=? (parse $parser-until-newline "") ""))
+    (check (obj=? (parse $parser-until-newline "abc") "abc"))
+    (check (obj=? (parse $parser-until-newline "abc\n") (parse-error 1 4)))))
+
+; ---------------------------------------------------------
+
+(lets
   ($stack-parser (stack-parser (newline-ended-parser (positive-integer-parser))))
   (begin
     (check (obj=? (parse $stack-parser "") (stack)))
