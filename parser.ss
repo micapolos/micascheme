@@ -324,28 +324,29 @@
   (define indent-size 2)
 
   (define (make-indent-parser $indent $parser)
-    (thunk
-      (and
-        (= $indent indent-size)
-        (parser-parsed-opt $parser))
-      (lambda ($char)
-        (case $char
-          ((#\space)
-            (if (< $indent indent-size)
-              (make-indent-parser (+ $indent 1) $parser)
-              (opt-lift make-indent-parser 
-                (opt $indent)
-                (parser-push $parser $char))))
-          ((#\newline)
-            (and 
-              (or (= $indent 0) (= $indent indent-size)) 0)
-              (opt-lift make-indent-parser 0 (parser-push $parser $char)))
-          (else 
-            (and
-              (= $indent indent-size)
-              (opt-lift make-indent-parser
-                (opt $indent)
-                (parser-push $parser $char))))))))
+    (parser-thunk-do ($thunk $parser)
+      (thunk
+        (and
+          (= $indent indent-size)
+          (thunk-parsed-opt $thunk))
+        (lambda ($char)
+          (case $char
+            ((#\space)
+              (if (< $indent indent-size)
+                (make-indent-parser (+ $indent 1) $thunk)
+                (opt-lift make-indent-parser
+                  (opt $indent)
+                  (thunk-push $thunk $char))))
+            ((#\newline)
+              (and
+                (or (= $indent 0) (= $indent indent-size)) 0)
+                (opt-lift make-indent-parser 0 (thunk-push $thunk $char)))
+            (else
+              (and
+                (= $indent indent-size)
+                (opt-lift make-indent-parser
+                  (opt $indent)
+                  (thunk-push $thunk $char)))))))))
 
   (define (indent-parser $parser)
     (make-indent-parser 0 $parser))
