@@ -11,6 +11,7 @@
     newline-parser
     newline-ended-parser
 
+    opt-parser
     char-parser-bind
     exact-char-parser
     char-parser
@@ -138,6 +139,11 @@
 
   (define (parse $parser $string)
     (parse-from $parser $string 0 1 1))
+
+  ; ----------------------------------------------------------
+
+  (define (opt-parser $parser)
+    (oneof-parser (parser #f) $parser))
 
   ; ----------------------------------------------------------
 

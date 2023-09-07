@@ -114,6 +114,16 @@
 ; ---------------------------------------------------------
 
 (lets
+  ($opt-parser (opt-parser (exact-parser "foo")))
+  (begin
+    (check (obj=? (parse $opt-parser "") #f))
+    (check (obj=? (parse $opt-parser "fo") (parse-error 1 3)))
+    (check (obj=? (parse $opt-parser "foo") "foo"))
+    (check (obj=? (parse $opt-parser "fooo") (parse-error 1 4)))))
+
+; ---------------------------------------------------------
+
+(lets
   ($fold-parser 
     (fold-parser (stack) (newline-ended-parser (positive-integer-parser)) push))
   (begin
