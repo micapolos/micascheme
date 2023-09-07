@@ -16,6 +16,7 @@
     opt-lift
     works?
     check checking? test-all
+    ensure
     data
     partial
     define-aux-keyword define-syntax-rule
@@ -377,6 +378,18 @@
                     #,ann-string
                     (quote (pred arg ...))
                     (list (quote pred) #,@tmps))))))))))
+
+  (define-syntax ensure
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $pred $expr) (identifier? #`$pred)
+          (lets
+            ($tmp (car (generate-temporaries `(tmp))))
+            #`(lets
+              (#,$tmp $expr)
+              (if ($pred #,$tmp)
+                #,$tmp
+                (throw ensure (quote $pred) #,$tmp))))))))
 
   ; --------------------------------------
 
