@@ -9,6 +9,8 @@
 
     space-parser
     newline-parser
+    colon-parser
+    comma-parser
     newline-ended-parser
 
     opt-parser
@@ -194,6 +196,8 @@
 
   (define (space-parser) (exact-char-parser #\space))
   (define (newline-parser) (exact-char-parser #\newline))
+  (define (colon-parser) (exact-char-parser #\:))
+  (define (comma-parser) (exact-char-parser #\,))
 
   (define (newline-ended-parser $parser)
     (parser-lets

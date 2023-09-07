@@ -26,6 +26,11 @@
 
 (check (obj=? (parse (line-parser) "foo\n  128\n  \"foo\"") `(foo 128 "foo")))
 
+(check (obj=? (parse (line-parser) "foo: 128") `(foo 128)))
+(check (obj=? (parse (line-parser) "foo: 128, bar") `(foo 128 bar)))
+(check (obj=? (parse (line-parser) "foo: 128, bar, \"goo\"") `(foo 128 bar "goo")))
+(check (obj=? (parse (line-parser) "foo: 128, bar goo, zar") `(foo 128 (bar goo) zar)))
+
 (check
   (obj=?
     (parse (script-parser) "point\n  x 10\n  y 20\nplus point\n  x 30\n  y 40")

@@ -19,7 +19,6 @@
 
   (define (atom-parser)
     (oneof-parser
-      (word-parser)
       (literal-string-parser)
       (integer-parser)))
 
@@ -33,8 +32,10 @@
 
   (define (rhs-parser)
     (oneof-parser
+      (parser (list))
       (space-rhs-parser)
-      (newline-rhs-parser)))
+      (newline-rhs-parser)
+      (colon-rhs-parser)))
 
   (define (space-rhs-parser)
     (parser-lets 
@@ -46,4 +47,41 @@
     (parser-lets
       (skip (newline-parser))
       (indent-parser (script-parser))))
+
+  (define (colon-rhs-parser)
+    (parser-lets
+      (skip (colon-parser))
+      (skip (space-parser))
+      ($line-stack
+        (non-empty-separated-stack-parser
+          (simple-line-parser)
+          (parser-lets
+            (skip (comma-parser))
+            (skip (space-parser))
+            (parser #t))))
+      (parser (reverse $line-stack))))
+
+  (define (simple-line-parser)
+    (oneof-parser
+      (atom-parser)
+      (simple-field-parser)))
+
+  (define (simple-field-parser)
+    (parser-lets
+      ($word (word-parser))
+      ($rhs (simple-rhs-parser))
+      (cond
+        ((null? $rhs) (parser $word))
+        (else (parser (cons $word $rhs))))))
+
+  (define (simple-rhs-parser)
+    (oneof-parser
+      (parser (list))
+      (simple-space-rhs-parser)))
+
+  (define (simple-space-rhs-parser)
+    (parser-lets
+      (skip (space-parser))
+      ($line (simple-line-parser))
+      (parser (list $line))))
 )
