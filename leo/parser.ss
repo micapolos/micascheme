@@ -9,38 +9,50 @@
 
   (define (line-stack-parser)
     (separated-stack-parser
-      (line-parser)
+      (line-parser `multiline)
       (newline-parser)))
 
-  (define (line-parser)
-    (oneof-parser
-      (atom-parser)
-      (field-parser)))
+  (define line-parser
+    (case-lambda
+      (() (line-parser `multiline))
+      (($mode)
+        (oneof-parser
+          (atom-parser)
+          (field-parser $mode)))))
 
   (define (atom-parser)
     (oneof-parser
       (literal-string-parser)
       (integer-parser)))
 
-  (define (field-parser)
+  (define (field-parser $mode)
     (parser-lets
       ($word (word-parser))
-      ($rhs (rhs-parser))
+      ($rhs (rhs-parser $mode))
       (cond
         ((null? $rhs) (parser $word))
         (else (parser (cons $word $rhs))))))
 
-  (define (rhs-parser)
-    (oneof-parser
-      (parser (list))
-      (space-rhs-parser)
-      (newline-rhs-parser)
-      (colon-rhs-parser)))
+  (define (rhs-parser $mode)
+    (case $mode
+      ((multiline)
+        (oneof-parser
+          (parser (list))
+          (space-rhs-parser $mode)
+          (parenthesized-rhs-parser)
+          (newline-rhs-parser)
+          (colon-rhs-parser $mode)))
+      ((parenthesis colon)
+        (oneof-parser
+          (parser (list))
+          (space-rhs-parser $mode)
+          (parenthesized-rhs-parser)
+          (colon-rhs-parser $mode)))))
 
-  (define (space-rhs-parser)
+  (define (space-rhs-parser $mode)
     (parser-lets 
       (skip (space-parser))
-      ($line (line-parser))
+      ($line (line-parser $mode))
       (parser (list $line))))
 
   (define (newline-rhs-parser)
@@ -48,40 +60,46 @@
       (skip (newline-parser))
       (indent-parser (script-parser))))
 
-  (define (colon-rhs-parser)
+  (define (colon-rhs-parser $mode)
+    (parser-lets
+      (skip (colon-separator-parser))
+      ($line-stack
+        (case $mode
+          ((multiline colon)
+            (non-empty-separated-stack-parser
+              (line-parser `colon)
+              (comma-separator-parser)))
+          ((parenthesis)
+            (parser-lets
+              ($line (line-parser `colon))
+              (parser (stack $line))))))
+      (parser (reverse $line-stack))))
+
+  (define (parenthesized-rhs-parser)
+    (parser-lets
+      ($line-stack
+        (parenthesized-parser
+          (separated-stack-parser
+            (line-parser `parenthesis)
+            (comma-separator-parser))))
+      (parser (reverse $line-stack))))
+
+  (define (comma-separator-parser)
+    (parser-lets
+      (skip (comma-parser))
+      (skip (space-parser))
+      (parser #t)))
+
+  (define (colon-separator-parser)
     (parser-lets
       (skip (colon-parser))
       (skip (space-parser))
-      ($line-stack
-        (non-empty-separated-stack-parser
-          (simple-line-parser)
-          (parser-lets
-            (skip (comma-parser))
-            (skip (space-parser))
-            (parser #t))))
-      (parser (reverse $line-stack))))
+      (parser #t)))
 
-  (define (simple-line-parser)
-    (oneof-parser
-      (atom-parser)
-      (simple-field-parser)))
-
-  (define (simple-field-parser)
+  (define (parenthesized-parser $parser)
     (parser-lets
-      ($word (word-parser))
-      ($rhs (simple-rhs-parser))
-      (cond
-        ((null? $rhs) (parser $word))
-        (else (parser (cons $word $rhs))))))
-
-  (define (simple-rhs-parser)
-    (oneof-parser
-      (parser (list))
-      (simple-space-rhs-parser)))
-
-  (define (simple-space-rhs-parser)
-    (parser-lets
-      (skip (space-parser))
-      ($line (simple-line-parser))
-      (parser (list $line))))
+      (skip (exact-char-parser #\())
+      ($item $parser)
+      (skip (exact-char-parser #\)))
+      (parser $item)))
 )
