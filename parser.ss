@@ -215,6 +215,12 @@
       0
       (reverse $digit-stack)))
 
+  (define (digit-stack-fraction $digit-stack)
+    (fold-left
+      (lambda ($integer $digit) (/ (+ $integer $digit) 10))
+      0
+      $digit-stack))
+
   (define (positive-integer-parser)
     (parser-lets
       ($digit-stack (non-empty-stack-parser (digit-parser)))
@@ -222,12 +228,12 @@
 
   (define (integer-parser)
     (parser-lets
-      ($negative?
+      ($multiplier
         (oneof-parser
-          (parser-lets (skip (exact-char-parser #\-)) (parser #t))
-          (parser-lets (skip (opt-parser (exact-char-parser #\+))) (parser #f))))
-      ($positive-integer (positive-integer-parser))
-      (parser (if $negative? (- $positive-integer) $positive-integer))))
+          (parser-lets (skip (exact-char-parser #\-)) (parser -1))
+          (parser-lets (skip (opt-parser (exact-char-parser #\+))) (parser 1))))
+      ($digit-stack (non-empty-stack-parser (digit-parser)))
+      (parser (* $multiplier (digit-stack-number $digit-stack)))))
 
   ; ----------------------------------------------------------
 
