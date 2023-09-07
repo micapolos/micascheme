@@ -20,6 +20,7 @@
     letter-parser
     exact-parser
     positive-integer-parser
+    integer-parser
     word-parser
     oneof-parser
     fold-parser
@@ -208,14 +209,25 @@
 
   ; ----------------------------------------------------------
 
+  (define (digit-stack-number $digit-stack)
+    (fold-left
+      (lambda ($integer $digit) (+ (* $integer 10) $digit))
+      0
+      (reverse $digit-stack)))
+
   (define (positive-integer-parser)
     (parser-lets
       ($digit-stack (non-empty-stack-parser (digit-parser)))
-      (parser 
-        (fold-left 
-          (lambda ($integer $digit) (+ (* $integer 10) $digit))
-          0
-          (reverse $digit-stack)))))
+      (parser (digit-stack-number $digit-stack))))
+
+  (define (integer-parser)
+    (parser-lets
+      ($negative?
+        (oneof-parser
+          (parser-lets (skip (exact-char-parser #\-)) (parser #t))
+          (parser-lets (skip (opt-parser (exact-char-parser #\+))) (parser #f))))
+      ($positive-integer (positive-integer-parser))
+      (parser (if $negative? (- $positive-integer) $positive-integer))))
 
   ; ----------------------------------------------------------
 

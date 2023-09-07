@@ -203,6 +203,16 @@
 
 ; ---------------------------------------------------------
 
+(check (obj=? (parse (integer-parser) "") (parse-error 1 1)))
+(check (obj=? (parse (integer-parser) "012") 12))
+(check (obj=? (parse (integer-parser) "012a") (parse-error 1 4)))
+(check (obj=? (parse (integer-parser) "-012") -12))
+(check (obj=? (parse (integer-parser) "+012") 12))
+(check (obj=? (parse (integer-parser) "-") (parse-error 1 2)))
+(check (obj=? (parse (integer-parser) "+") (parse-error 1 2)))
+
+; ---------------------------------------------------------
+
 (check (obj=? (parse (word-parser) "") (parse-error 1 1)))
 (check (obj=? (parse (word-parser) "foo") `foo))
 (check (obj=? (parse (word-parser) "1") (parse-error 1 1)))
