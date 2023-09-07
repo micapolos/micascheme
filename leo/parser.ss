@@ -19,8 +19,9 @@
 
   (define (atom-parser)
     (oneof-parser
+      (word-parser)
       (literal-string-parser)
-      (positive-integer-parser)))
+      (integer-parser)))
 
   (define (field-parser)
     (parser-lets
@@ -32,7 +33,6 @@
 
   (define (rhs-parser)
     (oneof-parser
-      (parser (list))
       (space-rhs-parser)
       (newline-rhs-parser)))
 

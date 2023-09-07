@@ -11,6 +11,8 @@
 (check (obj=? (parse (line-parser) "") (parse-error 1 1)))
 
 (check (obj=? (parse (line-parser) "128") 128))
+(check (obj=? (parse (line-parser) "-128") -128))
+(check (obj=? (parse (line-parser) "+128") 128))
 (check (obj=? (parse (line-parser) "\"foo\"") "foo"))
 (check (obj=? (parse (line-parser) "foo") `foo))
 
