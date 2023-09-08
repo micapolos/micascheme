@@ -3,7 +3,9 @@
     reader reader? reader-value reader-append-fn reader-begin-fn reader-end-fn
     reader-append reader-begin reader-end
     reader-read reader-read-list
-    reader-eval)
+    reader-eval
+
+    list-reader)
   (import (micascheme))
 
   (data (reader value append-fn begin-fn end-fn))
@@ -34,5 +36,29 @@
         (reader-append $reader $other))))
 
   (define-syntax-rule (reader-eval $reader $item ...)
-    (reader-value (reader-read-list $reader (list (quote $item) ...))))
+    (reader-end (reader-read-list $reader (list (quote $item) ...))))
+
+  (define list-reader
+    (case-lambda
+      (()
+        (list-reader identity))
+      (($end-fn)
+        (list-reader (stack) $end-fn))
+      (($stack $end-fn)
+        (reader $stack
+          (lambda ($appended-item)
+            (list-reader
+              (push $stack $appended-item)
+              $end-fn))
+          (lambda ($begin-symbol)
+            (list-reader
+              (lambda ($list)
+                (list-reader
+                  (push $stack
+                    (if (null? $list)
+                      $begin-symbol
+                      `(,$begin-symbol ,@$list)))
+                  $end-fn))))
+          (lambda ($end-stack)
+            ($end-fn (reverse $end-stack)))))))
 )

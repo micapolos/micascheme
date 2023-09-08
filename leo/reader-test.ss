@@ -1,59 +1,48 @@
 (import (micascheme) (leo reader))
 
+(check
+  (equal?
+    (reader-eval (list-reader)
+      12
+      negate
+      (add 13)
+      (add
+        5
+        negate
+        (subtract 3)))
+    `(
+      12
+      negate
+      (add 13)
+      (add
+        5
+        negate
+        (subtract 3)))))
+
 (define calculator-reader
   (case-lambda
-    (() (calculator-reader #f (lambda (_) (throw end))))
+    (()
+      (calculator-reader identity))
+    (($end-fn)
+      (calculator-reader #f $end-fn))
     (($value $end-fn)
-      (switch $value
-        ((false? _)
-          (reader #f
-            (lambda ($appended-value)
-              (calculator-reader $appended-value $end-fn))
-            (lambda ($begin-symbol)
+      (reader $value
+        (lambda ($append-value)
+          (calculator-reader $append-value $end-fn))
+        (lambda ($begin-symbol)
+          (calculator-reader
+            (lambda ($end-value)
               (case $begin-symbol
-                ((pi)
-                  (calculator-reader #f
-                    (lambda ($ended-value)
-                      (switch $ended-value
-                        ((false? _) (calculator-reader 3.14159 $end-fn))
-                        ((else $other) (calculator-reader `(pi ,$other) $end-fn))))))
-                (else
-                  (calculator-reader #f
-                    (lambda ($ended-value)
-                      (calculator-reader `(,$begin-symbol ,$ended-value) $end-fn))))))
-            $end-fn))
-        ((number? $number)
-          (reader $number
-            (lambda ($appended-value)
-              (calculator-reader `(,$number ,$appended-value) $end-fn))
-            (lambda ($begin-symbol)
-              (case $begin-symbol
-                ((add)
-                  (calculator-reader #f
-                    (lambda ($ended-value)
-                      (switch $ended-value
-                        ((number? $ended-number) (calculator-reader (+ $number $ended-number) $end-fn))
-                        ((else $other) (calculator-reader `($number (,$begin-symbol ,$other)) $end-fn))))))
-                ((negate)
-                  (calculator-reader #f
-                    (lambda ($ended-value)
-                      (switch $ended-value
-                        ((false? _) (calculator-reader (- $number) $end-fn))
-                        ((else $other) (calculator-reader `($number (,$begin-symbol ,$other)) $end-fn))))))
-                (else
-                  (calculator-reader #f
-                    (lambda ($ended-value)
-                      (calculator-reader `($number (,$begin-symbol ,$ended-value)) $end-fn))))))
-            $end-fn))
-        ((else $other)
-          (throw calculator $other))))))
+                ((one) (calculator-reader 1 $end-fn))
+                ((add) (calculator-reader (+ $value $end-value) $end-fn))
+                ((negate) (calculator-reader (- $value) $end-fn))))))
+        $end-fn))))
 
 (check
   (equal?
     (reader-eval (calculator-reader)
-      pi
-      (add pi)
-      negate
-      (add 100)
+      10
+      (add one)
+      (add 100 (add 200))
       negate)
-    -93.71682))
+    -311))
