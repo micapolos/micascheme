@@ -19,7 +19,7 @@
     works?
     check checking? test-all
     ensure
-    data get
+    data get is?
     partial
     define-aux-keyword define-syntax-rule
     obj=? record=? pair=? vector=? box=?
@@ -100,7 +100,7 @@
     (begin
       (let () (load file)) ...))
 
-  (define (bind-if $data $obj $fn)
+  (define (bind-if $pred $obj $fn)
     (if ($pred $obj) ($fn $obj) $obj))
 
   (define (null-or-pair? $obj)
@@ -303,10 +303,25 @@
           (and (identifier? #`$record-name) (identifier? #`$field-name))
           (lets
             ($getter-identifier
-              (build-identifier ($record-string #`$record-name)
-                (build-identifier ($field-string #`$field-name)
-                  (string-append $record-string "-" $field-string))))
+              (lets
+                ($record-string (symbol->string (syntax->datum #`$record-name)))
+                ($field-string (symbol->string (syntax->datum #`$field-name)))
+                ($get-string (string-append $record-string "-" $field-string))
+                (datum->syntax #`$record-name (string->symbol $get-string))))
             #`(#,$getter-identifier $expr))))))
+
+  (define-syntax is?
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $record-name $expr)
+          (and (identifier? #`$record-name))
+          (lets
+            ($pred-identifier
+              (lets
+                ($record-string (symbol->string (syntax->datum #`$record-name)))
+                ($pred-string (string-append $record-string "?"))
+                (datum->syntax #`$record-name (string->symbol $pred-string))))
+            #`(#,$pred-identifier $expr))))))
 
   (define (record-pretty-writer rtd name)
     (lambda (record port wr)

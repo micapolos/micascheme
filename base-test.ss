@@ -8,6 +8,16 @@
 (check (obj=? (point-x (point 1 2)) 1))
 (check (obj=? (point-y (point 1 2)) 2))
 
+; === get ===
+
+(check (obj=? (get point x (point 10 20)) 10))
+(check (obj=? (get point y (point 10 20)) 20))
+
+; === is? ===
+
+(check (obj=? (is? point (point 10 20)) #t))
+(check (obj=? (is? point 10) #f))
+
 ; === false? ===
 
 (check (equal? (false? #f) #t))
