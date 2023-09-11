@@ -19,7 +19,7 @@
     works?
     check checking? test-all
     ensure
-    data get is?
+    data
     partial
     define-aux-keyword define-syntax-rule
     obj=? record=? pair=? vector=? box=?
@@ -295,33 +295,6 @@
                 (let ((td (type-descriptor #,record-name)))
                   (record-writer td (record-pretty-writer td #,name-string))
                   td))))))))
-
-  (define-syntax get
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $record-name $field-name $expr)
-          (and (identifier? #`$record-name) (identifier? #`$field-name))
-          (lets
-            ($getter-identifier
-              (lets
-                ($record-string (symbol->string (syntax->datum #`$record-name)))
-                ($field-string (symbol->string (syntax->datum #`$field-name)))
-                ($get-string (string-append $record-string "-" $field-string))
-                (datum->syntax #`$record-name (string->symbol $get-string))))
-            #`(#,$getter-identifier $expr))))))
-
-  (define-syntax is?
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $record-name $expr)
-          (and (identifier? #`$record-name))
-          (lets
-            ($pred-identifier
-              (lets
-                ($record-string (symbol->string (syntax->datum #`$record-name)))
-                ($pred-string (string-append $record-string "?"))
-                (datum->syntax #`$record-name (string->symbol $pred-string))))
-            #`(#,$pred-identifier $expr))))))
 
   (define (record-pretty-writer rtd name)
     (lambda (record port wr)
