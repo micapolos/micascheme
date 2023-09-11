@@ -14,6 +14,12 @@
 (check (equal? (false? #t) #f))
 (check (equal? (false? 123) #f))
 
+; === null-or-pair? ===
+
+(check (equal? (null-or-pair? `()) #t))
+(check (equal? (null-or-pair? (cons 1 2)) #t))
+(check (equal? (null-or-pair? 123) #f))
+
 ; === from ===
 
 (check (equal? (from (base-from-testing) foo) "foo"))
@@ -35,6 +41,35 @@
 (check (obj=? (list-get (list "a" "b") 1) "b"))
 (check (obj=? (list-get (list "a" "b") 2) (list-get-overflow 0)))
 (check (obj=? (list-get (list "a" "b") 3) (list-get-overflow 1)))
+
+; === bind-if ===
+
+(check (equal? (bind-if string? "foo" string-length) 3))
+(check (equal? (bind-if string? 128 string-length) 128))
+
+; === fold-while ===
+
+(check
+  (obj=?
+    (fold-while string?
+      (lambda ($string $char)
+        (if (char-alphabetic? $char)
+          (string-append $string (string $char))
+          (failure $char)))
+      ""
+      (list #\a #\b))
+    "ab"))
+
+(check
+  (obj=?
+    (fold-while string?
+      (lambda ($string $char)
+        (if (char-alphabetic? $char)
+          (string-append $string (string $char))
+          (failure $char)))
+      ""
+      (list #\a #\b #\1 #\2 #\3))
+    (failure #\1)))
 
 ; === lets ===
 

@@ -8,10 +8,12 @@
     failure failure? failure-value failure!
 
     false?
+    null-or-pair?
     opt
     from
     single? single
     script
+    bind-if
     and-lets lets
     opt-lift
     works?
@@ -23,6 +25,7 @@
     obj=? record=? pair=? vector=? box=?
     displayln writeln
     fold-indices indices iterate
+    fold-while
     find-index
     list-set list-ref-opt
     switch
@@ -96,6 +99,12 @@
   (define-syntax-rule (test-all file ...) 
     (begin
       (let () (load file)) ...))
+
+  (define (bind-if $pred $obj $fn)
+    (if ($pred $obj) ($fn $obj) $obj))
+
+  (define (null-or-pair? $obj)
+    (or (null? $obj) (pair? $obj)))
 
   (define-syntax lets
     (lambda ($syntax)
@@ -179,6 +188,11 @@
 
   (define (fold-indices f folded size)
     (fold-indices-from f folded size 0))
+
+  (define (fold-while $pred $fn $initial $list)
+    (cond
+      ((or (null? $list) (not ($pred $initial))) $initial)
+      (else (fold-while $pred $fn ($fn $initial (car $list)) (cdr $list)))))
 
   (define (indices size)
     (reverse (fold-indices (lambda ($list $index) (cons $index $list)) `() size)))
