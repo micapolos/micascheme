@@ -19,7 +19,7 @@
     works?
     check checking? test-all
     ensure
-    data
+    data get
     partial
     define-aux-keyword define-syntax-rule
     obj=? record=? pair=? vector=? box=?
@@ -100,7 +100,7 @@
     (begin
       (let () (load file)) ...))
 
-  (define (bind-if $pred $obj $fn)
+  (define (bind-if $data $obj $fn)
     (if ($pred $obj) ($fn $obj) $obj))
 
   (define (null-or-pair? $obj)
@@ -295,6 +295,18 @@
                 (let ((td (type-descriptor #,record-name)))
                   (record-writer td (record-pretty-writer td #,name-string))
                   td))))))))
+
+  (define-syntax get
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $record-name $field-name $expr)
+          (and (identifier? #`$record-name) (identifier? #`$field-name))
+          (lets
+            ($getter-identifier
+              (build-identifier ($record-string #`$record-name)
+                (build-identifier ($field-string #`$field-name)
+                  (string-append $record-string "-" $field-string))))
+            #`(#,$getter-identifier $expr))))))
 
   (define (record-pretty-writer rtd name)
     (lambda (record port wr)
