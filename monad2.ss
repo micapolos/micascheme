@@ -9,7 +9,7 @@
     time-timed
     timing
 
-    opt-monad ensuring timing)
+    identity-monad opt-monad ensuring timing)
   (import (micascheme))
 
   (data (monad check-fn pure-fn bind-fn))
@@ -35,13 +35,25 @@
       (else
         ($fn $value))))
 
-  (define-syntax-case monad-lets ()
+  (define-syntax-case monad-lets (do)
+    ((_ $monad (do $result))
+      #`(monad-ensure $monad $result))
     ((_ $monad $result)
       #`(monad-ensure $monad $result))
+    ((_ $monad (do $expr) $case2 ... $result)
+      #`(monad-let $monad $expr
+        (lambda (_)
+          (monad-lets $monad $case2 ... $result))))
     ((_ $monad ($var $expr) $case2 ... $result)
       #`(monad-let $monad $expr
         (lambda ($var)
           (monad-lets $monad $case2 ... $result)))))
+
+  (define identity-monad
+    (monad
+      (lambda ($value) #t)
+      (lambda ($value) $value)
+      (lambda ($value $fn) ($fn $value))))
 
   (define opt-monad
     (monad

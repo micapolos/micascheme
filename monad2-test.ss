@@ -7,11 +7,18 @@
 
 (check
   (obj=?
-    (monad-lets opt-monad
-      ($x "Hello, ")
-      ($y "world!")
-      (string-append $x $y))
-    "Hello, world!"))
+    (monad-lets opt-monad (do 128))
+    128))
+
+(check
+  (obj=?
+    (monad-lets identity-monad
+      ($box (box ""))
+      ($x "foo")
+      (do (set-box! $box $x))
+      ($y (string-append "unboxed: " (unbox $box)))
+      (do $y))
+    "unboxed: foo"))
 
 (check
   (obj=?
