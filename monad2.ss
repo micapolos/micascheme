@@ -29,9 +29,11 @@
       (monad-pure $monad $value)))
 
   (define (monad-let $monad $value $fn)
-    (monad-bind $monad
-      (monad-ensure $monad $value)
-      $fn))
+    (cond
+      ((monad-check? $monad $value)
+        (monad-bind $monad $value $fn))
+      (else
+        ($fn $value))))
 
   (define-syntax-case monad-lets ()
     ((_ $monad $result)
