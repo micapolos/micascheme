@@ -74,8 +74,11 @@
 ; === lets ===
 
 (check (equal? (lets 1) 1))
+(check (equal? (lets (do 1)) 1))
 
 (check (equal? (lets (x 1) x) 1))
+(check (equal? (lets (x 1) (do x)) 1))
+
 (check (equal? (lets ((x) 1) x) 1))
 
 (check (equal? (lets (() (values)) 1) 1))

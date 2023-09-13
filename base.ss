@@ -21,7 +21,7 @@
     ensure
     data
     partial
-    define-aux-keyword define-syntax-rule
+    define-aux-keyword define-syntax-rule define-syntax-case
     obj=? record=? pair=? vector=? box=?
     displayln writeln
     fold-indices indices iterate
@@ -91,6 +91,21 @@
           (syntax-rules ()
             ((_ param ...) body))))))
 
+  (define-syntax define-syntax-case
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ ($name $param ...) $body)
+          #`(define-syntax-case ($name $param ...) () $body))
+        ((_ ($name $param ...) $keywords $body)
+          #`(define-syntax-case $name $keywords
+            ((_ $param ...) $body)))
+        ((_ $name $keywords $case ...)
+          (let (($tmp (car (generate-temporaries `(tmp)))))
+            #`(define-syntax $name
+              (lambda (#,$tmp)
+                (syntax-case #,$tmp $keywords
+                  $case ...))))))))
+
   (define-syntax-rule (build-identifier ($var $id) $body)
     (datum->syntax $id
       (string->symbol 
@@ -108,7 +123,7 @@
 
   (define-syntax lets
     (lambda ($syntax)
-      (syntax-case $syntax ()
+      (syntax-case $syntax (do)
         ((_ $decl $decls ... $result)
           (syntax-case #`$decl (do rec)
             ((($id ...) $expr)
@@ -123,6 +138,7 @@
             ($expr
               #`(begin $expr
               (lets $decls ... $result)))))
+        ((_ (do $result)) #`$result)
         ((_ $result) #`$result))))
 
   (define-syntax and-lets
