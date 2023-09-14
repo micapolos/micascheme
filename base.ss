@@ -37,7 +37,7 @@
     indexed indexed? indexed-value indexed-index
     throw
 
-    stack push top pop
+    stack push push-list top pop
 
     generate-temporary
     build-identifier
@@ -62,6 +62,7 @@
   (define (works? expr) expr #t)
 
   (define (push $stack $item) (cons $item $stack))
+  (define (push-list $stack $list) (fold-left push $stack $list))
   (define (top $stack) (car $stack))
   (define (pop $stack) (cdr $stack))
 
