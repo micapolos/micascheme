@@ -13,13 +13,25 @@
 (check (equal? (leo (with "foo")) "foo"))
 (check (equal? (leo (with "foo") (with "bar") (string-append)) "foobar"))
 (check (equal? (leo (string-append (with "foo") (with "bar"))) "foobar"))
+(check (equal? (leo (string-append: "foo" "bar")) "foobar"))
 
 (check (equal? ((leo (doing "foo"))) "foo"))
 (check (equal? ((leo $x (doing $x (string-length))) "foo") 3))
 (check (equal? ((leo $a (with $b) (doing $a (string-append $b))) "foo" "bar") "foobar"))
 
-(check (equal? (leo "foo" (get string-length)) 3))
-(check (equal? (leo "foo" (do string-length)) 3))
+(check
+  (equal?
+    (leo
+      "foo"
+      (get string-length))
+    3))
+
+(check
+  (equal?
+    (leo
+      "foo"
+      (do string-length))
+    3))
 
 (check
   (equal?
@@ -61,6 +73,17 @@
         (splice
           ("5" (string-append "6"))
           ("7" (string-append "8")))))
+    "12345678"))
+
+(check
+  (equal?
+    (leo
+      (splice
+        ("1" (string-append "2"))
+        ("3" (string-append "4")))
+      (string-append:
+        ("5" (string-append "6"))
+        ("7" (string-append "8"))))
     "12345678"))
 
 (check

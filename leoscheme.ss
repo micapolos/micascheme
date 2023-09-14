@@ -86,10 +86,20 @@
               (map syntax-leo
                 (syntax->list #`($item ...)))))
           (($id $item ...) (identifier? #`$id)
-            (list
-              #`($id
-                #,@(reverse $leos)
-                #,@(syntax-leos #`($item ...)))))
+            (lets
+              ($id-symbol (syntax->datum #`$id))
+              ($id-string (symbol->string $id-symbol))
+              ($colon? (char=? (string-ref $id-string (- (string-length $id-string) 1)) #\:))
+              ($new-id
+                (if $colon?
+                  (build-identifier ($string #`$id) (substring $string 0 (- (string-length $string) 1)))
+                  #`$id))
+              (list
+                #`(#,$new-id
+                  #,@(reverse $leos)
+                  #,@(cond
+                    ($colon? (map syntax-leo (syntax->list #`($item ...))))
+                    (else (syntax-leos #`($item ...))))))))
           ($other
             (push $leos #`$other))))
 
