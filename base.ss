@@ -42,6 +42,8 @@
     generate-temporary
     build-identifier
 
+    fract
+
     struct-constructor-syntax
     struct-accessor-syntax
     struct->datum-syntax
@@ -462,6 +464,11 @@
       (if (= $index 0)
         (car $list)
         (list-get (cdr $list) (- $index 1)))))
+
+  ; --------------------------------------
+
+  (define (fract $number)
+    (- $number (floor $number)))
 
   ; --------------------------------------
 
