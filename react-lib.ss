@@ -1,5 +1,5 @@
 (library (react-lib)
-  (export noise message osc rect audio mouse-x mouse-y space? frames mix sine square pulse triangle make)
+  (export noise message osc rect audio mouse-x mouse-y space? frames mix sine square pulse triangle make steps)
   (import (micascheme))
 
   (define-aux-keyword noise)
@@ -29,4 +29,7 @@
 
   (define (pulse $x $w)
     (if (< $x $w) 0 1))
+
+  (define (steps $t $n)
+    (min (- $n 1) (max 0 (inexact->exact (floor (* $t $n))))))
 )

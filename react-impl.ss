@@ -36,7 +36,6 @@
           ((i 0 (+ i 1)))
           ((= i (vector-length $noise-vector)) (void))
           (vector-set! $noise-vector i (random 1.0)))
-        (define $noise-index 0)
 
         (define $audio-spec
           (make-ftype-pointer SDL_AudioSpec
@@ -79,12 +78,8 @@
                     ((i 0 (+ i 1)))
                     ((>= i $len) (void))
                     #,@(map sampler-syntax (filter sampler? $statements))
-                    (set! $noise-index (+ $noise-index 1))
-                    (if (= $noise-index (vector-length $noise-vector))
-                      (set! $noise-index 0))
                     (let*
                       (($index i)
-                       ($noise (vector-ref $noise-vector $noise-index))
                        ($audio-opt #,(single (map stream-syntax (filter stream? $statements))))
                        ($value
                         (inexact->exact
@@ -101,7 +96,7 @@
         (ftype-set! SDL_AudioSpec (freq) $audio-spec $sample-freq)
         (ftype-set! SDL_AudioSpec (format) $audio-spec AUDIO-S8)
         (ftype-set! SDL_AudioSpec (channels) $audio-spec 1)
-        (ftype-set! SDL_AudioSpec (samples) $audio-spec 256)
+        (ftype-set! SDL_AudioSpec (samples) $audio-spec 64)
         (ftype-set! SDL_AudioSpec (callback) $audio-spec $callback)
         (ftype-set! SDL_AudioSpec (userdata) $audio-spec 0)
 
@@ -256,7 +251,12 @@
       (noise
         (lets
           ($noise (car (generate-temporaries `(noise))))
-          (built (stack) #`$noise)))
+          (built
+            (stack
+              (initializer #`(define #,$noise 0))
+              (sampler #`(set! #,$noise (+ #,$noise 1)))
+              (sampler #`(if (= #,$noise (vector-length $noise-vector)) (set! #,$noise 0))))
+            #`(vector-ref $noise-vector #,$noise))))
       ($other
         (built-general-expression $syntax built-sampler-expression))))
 
@@ -266,7 +266,7 @@
         (built-general-expression $syntax built-updater-expression))))
 
   (define (built-general-expression $syntax $recurse)
-    (syntax-case $syntax (if seconds frames mouse-x mouse-y space?)
+    (syntax-case $syntax (if seconds frames mouse-x mouse-y space? vector)
       ((if $cond $true $false)
         (built-bind ($recurse #`$cond)
           (lambda ($cond)
@@ -287,6 +287,14 @@
         (built (stack) #`$mouse-y))
       (space?
         (built (stack) #`$space?))
+      ((vector $item ...)
+        (lets
+          ($vector (car (generate-temporaries `(vector))))
+          (built
+            (stack
+              (initializer
+                #`(define #,$vector (vector $item ...))))
+            $vector)))
       (($item ...)
         (lets
           ($builts (map $recurse (syntax->list #`($item ...))))

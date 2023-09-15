@@ -1,16 +1,21 @@
 (import (micascheme) (react))
 
 (react
-  (rect 0 0 mouse-x mouse-y)
-  (rect mouse-x mouse-y 40 40)
-  (message mouse-x)
-  (message mouse-y)
-  (message space?)
   (audio
-    (*
-      (/ mouse-y 480)
-      (- 1 (osc (if space? 8 4)))
-      (mix
-        (osc (* mouse-x 1))
-        (osc (* mouse-x 1.005))
-        (osc (* mouse-x 1.001))))))
+    (mix
+      (*
+        (- 1 (osc 4))
+        (osc
+          (vector-ref
+            (vector 220 330 440 440)
+            (steps (osc 1) 4))))
+      (*
+        (- 1 (osc 2))
+        (osc
+          (vector-ref
+            (vector 660 880 783 880 660 660 783 440)
+            (steps (osc 0.25) 8))))
+      (*
+        (- 1 (osc 8))
+        (- 1 (* 0.5 (osc 4)))
+        (osc 110)))))
