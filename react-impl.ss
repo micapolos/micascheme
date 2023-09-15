@@ -14,12 +14,16 @@
         (sdl-set-main-ready!)
         (sdl-init SDL-INIT-VIDEO)
 
+        (define $sample-freq 22050)
+
         (define $window
-          (sdl-create-window "chezscheme"
+          (sdl-create-window "Leonardo"
             SDL-WINDOWPOS-UNDEFINED
             SDL-WINDOWPOS-UNDEFINED
             640
             480))
+
+        ;(SDL_SetWindowFullscreen $window SDL-WINDOW-FULLSCREEN-DESKTOP)
 
         (define $renderer
           (sdl-create-renderer $window
@@ -27,46 +31,66 @@
             SDL-RENDERER-ACCELERATED
             SDL-RENDERER-PRESENT-VSYNC))
 
+        (define $noise-vector (make-vector 4096))
+        (do!
+          ((i 0 (+ i 1)))
+          ((= i (vector-length $noise-vector)) (void))
+          (vector-set! $noise-vector i (random 1.0)))
+        (define $noise-index 0)
+
         (define $audio-spec
           (make-ftype-pointer SDL_AudioSpec
             (foreign-alloc (ftype-sizeof SDL_AudioSpec))))
 
-        (define $phase1 0)
-        (define $phase2 0)
-        (define $phase3 0)
-        (define $osc 0)
-        (define $frame-count 0)
+        (define $mutex (make-mutex))
+
+        (define $shared-space? #f)
+        (define $shared-mouse-x 0)
+        (define $shared-mouse-y 0)
+        (define $shared-frame-count 0)
+        (define $shared-seconds 0)
+
+        (define $space? #f)
+        (define $mouse-x #f)
+        (define $mouse-y #f)
+        (define $frame-count #f)
+        (define $seconds #f)
+        (define $quit? #f)
 
         (define $callback
           (lets
             ($callable
               (foreign-callable __collect_safe
                 (lambda ($userdata $buffer $len)
+                  (define $space? #f)
+                  (define $mouse-x #f)
+                  (define $mouse-y #f)
+                  (define $frame-count #f)
+                  (define $seconds #f)
+
+                  (with-mutex $mutex
+                    (set! $space? $shared-space?)
+                    (set! $mouse-x $shared-mouse-x)
+                    (set! $mouse-y $shared-mouse-y)
+                    (set! $frame-count $shared-frame-count)
+                    (set! $seconds $shared-seconds))
+
                   (do!
                     ((i 0 (+ i 1)))
                     ((>= i $len) (void))
                     #,@(map sampler-syntax (filter sampler? $statements))
-                    (set! $phase1 (fract (+ $phase1 (* (/ $mouse-x 60) 0.0025))))
-                    (set! $phase2 (fract (+ $phase2 (* (/ $mouse-x 60) 0.001253))))
-                    (set! $phase3 (fract (+ $phase3 (* (/ $mouse-x 60) 0.001258))))
-                    (cond
-                      ($space-pressed?
-                        (set! $phase1 (fract (+ $phase1 (* 1 0.0025))))
-                        (set! $phase2 (fract (+ $phase2 (* 1 0.001253))))
-                        (set! $phase3 (fract (+ $phase3 (* 1 0.001258)))))
-                      (else (void)))
-                    (set! $osc (fract (+ $osc (* (/ $mouse-y 120) 0.0001))))
+                    (set! $noise-index (+ $noise-index 1))
+                    (if (= $noise-index (vector-length $noise-vector))
+                      (set! $noise-index 0))
                     (let*
-                      (($pi2 (* (asin 1) 4))
-                       ($index i)
+                      (($index i)
+                       ($noise (vector-ref $noise-vector $noise-index))
                        ($audio-opt #,(single (map stream-syntax (filter stream? $statements))))
                        ($value
                         (inexact->exact
                           (floor
                             (-
-                              (*
-                                (fract (or $audio-opt (/ (+ $phase1 $phase2 $phase3) 3)))
-                                255)
+                              (* (min 1 (max 0 (or $audio-opt 0.5))) 255)
                               128)))))
                       (foreign-set! `integer-8 $buffer $index $value))))
                 (void* void* int)
@@ -74,49 +98,58 @@
             (do (lock-object $callable))
             (foreign-callable-entry-point $callable)))
 
-        (displayln $callback)
-
-        (ftype-set! SDL_AudioSpec (freq) $audio-spec 22050)
+        (ftype-set! SDL_AudioSpec (freq) $audio-spec $sample-freq)
         (ftype-set! SDL_AudioSpec (format) $audio-spec AUDIO-S8)
         (ftype-set! SDL_AudioSpec (channels) $audio-spec 1)
-        (ftype-set! SDL_AudioSpec (samples) $audio-spec 512)
+        (ftype-set! SDL_AudioSpec (samples) $audio-spec 256)
         (ftype-set! SDL_AudioSpec (callback) $audio-spec $callback)
         (ftype-set! SDL_AudioSpec (userdata) $audio-spec 0)
 
         (define $open-audio-result
           (SDL_OpenAudio $audio-spec (make-ftype-pointer SDL_AudioSpec 0)))
 
-        (display "$open-audio-result: ")
-        (displayln $open-audio-result)
-
         (foreign-free (ftype-pointer-address $audio-spec))
 
         (SDL_PauseAudio 0)
-
-        (define $space-pressed? #f)
-
-        (define $mouse-x 0)
-        (define $mouse-y 0)
 
         (define (process-events-and-quit?)
           (sdl-poll-event)
           (cond
             ((sdl-event-none?) #f)
             ((sdl-event-quit?) #t)
-            ((sdl-event-key-up? SDLK-SPACE) (set! $space-pressed? #f) #f)
-            ((sdl-event-key-down? SDLK-SPACE) (set! $space-pressed? #t) #f)
+            ((sdl-event-key-up? SDLK-SPACE) (set! $shared-space? #f) #f)
+            ((sdl-event-key-down? SDLK-SPACE) (set! $shared-space? #t) #f)
             ((sdl-event-mouse-motion?)
-              (set! $mouse-x (sdl-event-mouse-motion-x))
-              (set! $mouse-y (sdl-event-mouse-motion-y))
+              (set! $shared-mouse-x (sdl-event-mouse-motion-x))
+              (set! $shared-mouse-y (sdl-event-mouse-motion-y))
               #f)
            (else (process-events-and-quit?))))
 
         #,@(map initializer-syntax (filter initializer? $statements))
 
         (define (game-loop)
+          (define $space? #f)
+          (define $mouse-x #f)
+          (define $mouse-y #f)
+          (define $frame-count #f)
+          (define $seconds #f)
+
           (display "\x1B;[2J")
           (display "\x1B;[0;0H")
-          (displayln "Leonardo, v0.1")
+
+          (set! $quit?
+            (with-mutex $mutex
+              (set! $shared-frame-count (+ $shared-frame-count 1))
+              (set! $shared-seconds (seconds))
+
+              (set! $space? $shared-space?)
+              (set! $mouse-x $shared-mouse-x)
+              (set! $mouse-y $shared-mouse-y)
+              (set! $frame-count $shared-frame-count)
+              (set! $seconds $shared-seconds)
+
+              (process-events-and-quit?)))
+
           ; #,@(map (lambda ($syntax) #`(writeln (quote (init #,$syntax))))
           ;   (map initializer-syntax
           ;     (filter initializer? $statements)))
@@ -129,23 +162,19 @@
           ; #,@(map (lambda ($syntax) #`(writeln (quote (audio #,$syntax))))
           ;   (map stream-syntax
           ;     (filter stream? $statements)))
-          ;(displayln (format "Mouse: ~s ~s" $mouse-x $mouse-y))
 
           (sdl-set-render-draw-color! $renderer 0 0 0 255)
           (sdl-render-clear $renderer)
 
-          (sdl-set-render-draw-color! $renderer 0 100 0 255)
+          (sdl-set-render-draw-color! $renderer 255 255 255 255)
 
           #,@(map updater-syntax (filter updater? $statements))
 
           (sdl-render-present $renderer)
 
-          (set! $frame-count (+ $frame-count 1))
-
-          (if (not (process-events-and-quit?)) (game-loop)))
+          (if (not $quit?) (game-loop)))
 
         (game-loop)
-        (displayln "Goodbye.")
 
         (SDL_PauseAudio 1)
         (SDL_CloseAudio)
@@ -173,7 +202,7 @@
         (built-value $fn-built))))
 
   (define (statements+syntax $statements $syntax)
-    (syntax-case $syntax (message audio rect)
+    (syntax-case $syntax (message audio rect make)
       ((message $value)
         (built-statements
           (built-bind (built-updater-expression #`$value)
@@ -213,7 +242,7 @@
         (syntax-error $syntax))))
 
   (define (built-sampler-expression $syntax)
-    (syntax-case $syntax (osc)
+    (syntax-case $syntax (osc noise)
       ((osc $freq)
         (built-bind (built-sampler-expression #`$freq)
           (lambda ($freq)
@@ -222,8 +251,12 @@
               (built
                 (stack
                   (initializer #`(define #,$osc 0.0))
-                  (sampler #`(set! #,$osc (fract (+ #,$osc (/ #,$freq 22050.0))))))
+                  (sampler #`(set! #,$osc (fract (+ #,$osc (/ #,$freq $sample-freq))))))
                 $osc)))))
+      (noise
+        (lets
+          ($noise (car (generate-temporaries `(noise))))
+          (built (stack) #`$noise)))
       ($other
         (built-general-expression $syntax built-sampler-expression))))
 
@@ -233,7 +266,7 @@
         (built-general-expression $syntax built-updater-expression))))
 
   (define (built-general-expression $syntax $recurse)
-    (syntax-case $syntax (if seconds frames mouse-x mouse-y space-pressed?)
+    (syntax-case $syntax (if seconds frames mouse-x mouse-y space?)
       ((if $cond $true $false)
         (built-bind ($recurse #`$cond)
           (lambda ($cond)
@@ -245,15 +278,15 @@
                       (stack)
                       #`(if #,$cond #,$true #,$false)))))))))
       (seconds
-        (built (stack) #`(seconds)))
+        (built (stack) #`$seconds))
       (frames
         (built (stack) #`$frame-count))
       (mouse-x
         (built (stack) #`$mouse-x))
       (mouse-y
         (built (stack) #`$mouse-y))
-      (space-pressed?
-        (built (stack) #`$space-pressed?))
+      (space?
+        (built (stack) #`$space?))
       (($item ...)
         (lets
           ($builts (map $recurse (syntax->list #`($item ...))))

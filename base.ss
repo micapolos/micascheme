@@ -13,6 +13,7 @@
     from
     single? single
     script
+    pi pi2
     bind-if
     and-lets lets
     opt-lift
@@ -327,6 +328,9 @@
           (display " " port)
           (wr ((record-accessor rtd i) record) port))
         (display ")" port))))
+
+  (define pi (* (asin 1) 2))
+  (define pi2 (* (asin 1) 4))
 
   (define (seconds)
     (lets
