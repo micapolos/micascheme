@@ -23,6 +23,66 @@
           SDL-RENDERER-ACCELERATED
           SDL-RENDERER-PRESENT-VSYNC))
 
+      (define $audio-spec
+        (make-ftype-pointer SDL_AudioSpec
+          (foreign-alloc (ftype-sizeof SDL_AudioSpec))))
+
+      (define $phase1 0)
+      (define $phase2 0)
+      (define $phase3 0)
+      (define $osc 0)
+
+      (define $callback
+        (lets
+          ($callable
+            (foreign-callable __collect_safe
+              (lambda ($userdata $bytevector $len)
+                (display "Audio callback: ")
+                (displayln $len)
+                (do!
+                  ((i 0 (+ i 1)))
+                  ((>= (* i 2) $len) (void))
+                  (set! $phase1 (fract (+ $phase1 0.00125)))
+                  (set! $phase2 (fract (+ $phase2 0.001253)))
+                  (set! $phase3 (fract (+ $phase3 0.001258)))
+                  (set! $osc (fract (+ $osc 0.0001)))
+                  (let*
+                    (($pi2 (* (asin 1) 4))
+                     ($index (* i 2))
+                     ($value
+                      (inexact->exact
+                        (round
+                          (* (sin (* $pi2 $osc)) 10000
+                            (+
+                              $phase1
+                              $phase2
+                              $phase3))))))
+                    (foreign-set! `integer-16 $bytevector $index $value)
+                    )))
+              (void* void* int)
+              void))
+          (do (lock-object $callable))
+          (foreign-callable-entry-point $callable)))
+
+      (displayln $callback)
+
+      (ftype-set! SDL_AudioSpec (freq) $audio-spec 44100)
+      (ftype-set! SDL_AudioSpec (format) $audio-spec AUDIO-S16)
+      (ftype-set! SDL_AudioSpec (channels) $audio-spec 1)
+      (ftype-set! SDL_AudioSpec (samples) $audio-spec 1024)
+      (ftype-set! SDL_AudioSpec (callback) $audio-spec $callback)
+      (ftype-set! SDL_AudioSpec (userdata) $audio-spec 0)
+
+      (define $open-audio-result
+        (SDL_OpenAudio $audio-spec (make-ftype-pointer SDL_AudioSpec 0)))
+
+      (display "$open-audio-result: ")
+      (displayln $open-audio-result)
+
+      (foreign-free (ftype-pointer-address $audio-spec))
+
+      (SDL_PauseAudio 0)
+
       (define (process-events-and-quit?)
         (sdl-poll-event)
         (cond
@@ -31,9 +91,10 @@
          (else (process-events-and-quit?))))
 
       (define (game-loop)
-        (display "\x1B;[2J")
-        (display "\x1B;[0;0H")
-        (displayln "Leonardo, v0.1")
+        ; (display "\x1B;[2J")
+        ; (display "\x1B;[0;0H")
+        ; (displayln "Leonardo, v0.1")
+
         #,@(build $syntax)
 
         (sdl-set-render-draw-color! $renderer 0 0 0 255)
@@ -52,6 +113,9 @@
 
       (game-loop)
       (displayln "Goodbye.")
+
+      (SDL_PauseAudio 1)
+      (SDL_CloseAudio)
 
       (sdl-destroy-renderer $renderer)
       (sdl-destroy-window $window)

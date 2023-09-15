@@ -9,7 +9,7 @@
 
   (export
     (import 
-      (except (scheme) do)
+      (rename (scheme) (do do!))
       (rename (base) (script do))
       (base-syntax)
       (infix))))
