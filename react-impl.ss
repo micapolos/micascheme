@@ -36,28 +36,32 @@
         (lets
           ($callable
             (foreign-callable __collect_safe
-              (lambda ($userdata $bytevector $len)
-                (display "Audio callback: ")
-                (displayln $len)
+              (lambda ($userdata $buffer $len)
                 (do!
                   ((i 0 (+ i 1)))
-                  ((>= (* i 2) $len) (void))
-                  (set! $phase1 (fract (+ $phase1 0.00125)))
-                  (set! $phase2 (fract (+ $phase2 0.001253)))
-                  (set! $phase3 (fract (+ $phase3 0.001258)))
+                  ((>= i $len) (void))
+                  (set! $phase1 (fract (+ $phase1 (* 2 0.0025))))
+                  (set! $phase2 (fract (+ $phase2 (* 2 0.001253))))
+                  (set! $phase3 (fract (+ $phase3 (* 2 0.001258))))
+                  (cond
+                    ($space-pressed
+                      (set! $phase1 (fract (+ $phase1 (* 1 0.0025))))
+                      (set! $phase2 (fract (+ $phase2 (* 1 0.001253))))
+                      (set! $phase3 (fract (+ $phase3 (* 1 0.001258)))))
+                    (else (void)))
                   (set! $osc (fract (+ $osc 0.0001)))
                   (let*
                     (($pi2 (* (asin 1) 4))
-                     ($index (* i 2))
+                     ($index i)
                      ($value
                       (inexact->exact
                         (round
-                          (* (sin (* $pi2 $osc)) 10000
+                          (* (sin (* $pi2 $osc)) 127 0.33
                             (+
                               $phase1
                               $phase2
                               $phase3))))))
-                    (foreign-set! `integer-16 $bytevector $index $value)
+                    (foreign-set! `integer-8 $buffer $index $value)
                     )))
               (void* void* int)
               void))
@@ -66,10 +70,10 @@
 
       (displayln $callback)
 
-      (ftype-set! SDL_AudioSpec (freq) $audio-spec 44100)
-      (ftype-set! SDL_AudioSpec (format) $audio-spec AUDIO-S16)
+      (ftype-set! SDL_AudioSpec (freq) $audio-spec 22050)
+      (ftype-set! SDL_AudioSpec (format) $audio-spec AUDIO-S8)
       (ftype-set! SDL_AudioSpec (channels) $audio-spec 1)
-      (ftype-set! SDL_AudioSpec (samples) $audio-spec 1024)
+      (ftype-set! SDL_AudioSpec (samples) $audio-spec 512)
       (ftype-set! SDL_AudioSpec (callback) $audio-spec $callback)
       (ftype-set! SDL_AudioSpec (userdata) $audio-spec 0)
 
@@ -83,17 +87,21 @@
 
       (SDL_PauseAudio 0)
 
+      (define $space-pressed #f)
+
       (define (process-events-and-quit?)
         (sdl-poll-event)
         (cond
          ((sdl-event-none?) #f)
          ((sdl-event-quit?) #t)
+         ((sdl-event-key-up? SDLK-SPACE) (set! $space-pressed #f) #f)
+         ((sdl-event-key-down? SDLK-SPACE) (set! $space-pressed #t) #f)
          (else (process-events-and-quit?))))
 
       (define (game-loop)
-        ; (display "\x1B;[2J")
-        ; (display "\x1B;[0;0H")
-        ; (displayln "Leonardo, v0.1")
+        (display "\x1B;[2J")
+        (display "\x1B;[0;0H")
+        (displayln "Leonardo, v0.1")
 
         #,@(build $syntax)
 
