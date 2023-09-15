@@ -16,6 +16,7 @@
     bind-if
     and-lets lets
     opt-lift
+    seconds
     works?
     check checking? test-all
     ensure
@@ -326,6 +327,13 @@
           (display " " port)
           (wr ((record-accessor rtd i) record) port))
         (display ")" port))))
+
+  (define (seconds)
+    (lets
+      ($time (current-time `time-monotonic))
+      (+
+        (time-second $time)
+        (/ (time-nanosecond $time) 1000000000.0))))
 
   (define-syntax unpair
     (lambda (stx)
