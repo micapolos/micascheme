@@ -315,6 +315,26 @@
               (define #,rtd-name
                 (let ((td (type-descriptor #,record-name)))
                   (record-writer td (record-pretty-writer td #,name-string))
+                  (record-type-equal-procedure
+                    td
+                    (lambda (a b eq)
+                      (and
+                      #,@(map
+                        (lambda (field)
+                          (lets
+                            (fld (build-identifier (s field) (string-append name-string "-" s)))
+                            #`(eq (#,fld a) (#,fld b))))
+                        (syntax->list #`(field ...))))))
+                  (record-type-hash-procedure
+                    td
+                    (lambda (a hash)
+                      (+
+                      #,@(map
+                        (lambda (field)
+                          (lets
+                            (fld (build-identifier (s field) (string-append name-string "-" s)))
+                            #`(hash (#,fld a))))
+                        (syntax->list #`(field ...))))))
                   td))))))))
 
   (define (record-pretty-writer rtd name)

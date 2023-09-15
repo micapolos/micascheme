@@ -3,10 +3,18 @@
 ; === data ===
 
 (data (point x y))
+(data (point2 x y))
 (check (obj=? (point 1 2) (point 1 2)))
 (check (obj=? (point? (point 1 2)) #t))
 (check (obj=? (point-x (point 1 2)) 1))
 (check (obj=? (point-y (point 1 2)) 2))
+
+(check (equal? (point 1 2) (point 1 2)))
+(check (not (equal? (point 1 2) (point 1 3))))
+(check (not (equal? (point 1 2) (point2 1 2))))
+
+(check (= (equal-hash (point 1 2)) (equal-hash (point 1 2))))
+(check (not (= (equal-hash (point 1 2)) (equal-hash (point 1 3)))))
 
 ; === false? ===
 
