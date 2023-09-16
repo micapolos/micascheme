@@ -34,11 +34,11 @@
 ; types-indexing
 
 (check 
-  (obj=? 
+  (equal?
     (types-indexing (list)) 
     (indexing 0 (list))))
 
 (check
-  (obj=? 
+  (equal?
     (types-indexing (list dynamic-type static-type dynamic-type dynamic-type static-type))
     (indexing 3 (list 0 #f 1 2 #f))))

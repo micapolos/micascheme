@@ -77,7 +77,7 @@
           ($types (tuple-items $tuple-type))
           ($index
             (find-index
-              (lambda ($indexed-type) (obj=? $type $indexed-type))
+              (lambda ($indexed-type) (equal? $type $indexed-type))
               $types))
           (do (unless $index (throw tuple-get-type-not-found $type)))
           (typed
@@ -108,7 +108,7 @@
           ($result-type (car $case-types))
           (do
             (unless
-              (for-all (lambda ($case-type) (obj=? $case-type $result-type)) $case-types)
+              (for-all (lambda ($case-type) (equal? $case-type $result-type)) $case-types)
               (throw incompatible-case-types $choice-switch $case-types)))
           ($variable (typed-value (compile (car $case-compilers) (variable (car $choice-types)))))
           ($length (length $cases))
@@ -144,7 +144,7 @@
           ($type (variable-type $variable))
           ($index
             (find-index
-              (lambda ($indexed-type) (obj=? $type $indexed-type))
+              (lambda ($indexed-type) (equal? $type $indexed-type))
               $types))
           (if (not $index)
             (throw not-found $variable)
@@ -179,7 +179,7 @@
               (throw not-function $function-type)))
           (do
             (unless
-              (for-all obj=? (map typed-type $compiled-args) (function-params $function-type))
+              (for-all equal? (map typed-type $compiled-args) (function-params $function-type))
               (throw illegal-arg-types)))
           (typed
             `(

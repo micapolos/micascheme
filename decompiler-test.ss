@@ -1,7 +1,7 @@
 (import (micascheme) (decompiler) (term) (typed))
 
 (define-syntax-rule (check-decompile $typed $expected)
-  (check (obj=? (decompile $typed) $expected)))
+  (check (equal? (decompile $typed) $expected)))
 
 (check-decompile (typed! #f) #f)
 (check-decompile (typed! 128) 128)

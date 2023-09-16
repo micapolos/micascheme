@@ -1,17 +1,17 @@
 (import (micascheme) (monad2))
 
 (check
-  (obj=?
+  (equal?
     (monad-lets opt-monad 128)
     128))
 
 (check
-  (obj=?
+  (equal?
     (monad-lets opt-monad (do 128))
     128))
 
 (check
-  (obj=?
+  (equal?
     (monad-lets identity-monad
       ($box (box ""))
       ($x "foo")
@@ -21,7 +21,7 @@
     "unboxed: foo"))
 
 (check
-  (obj=?
+  (equal?
     (monad-lets opt-monad
       ($x #f)
       ($y "world!")
@@ -29,7 +29,7 @@
     #f))
 
 (check
-  (obj=?
+  (equal?
     (monad-lets opt-monad
       ($x "Hello, ")
       ($y #f)
@@ -37,7 +37,7 @@
     #f))
 
 (check
-  (obj=?
+  (equal?
     (monad-lets opt-monad
       ($x #f)
       ($y #f)
@@ -51,6 +51,6 @@
     (monad-lets timing
       ($time time-timed)
       (+ $time 1)))
-  (do (check (obj=? (timed-get $timed 1) 2)))
-  (do (check (obj=? (timed-get $timed 2) 3)))
+  (do (check (equal? (timed-get $timed 1) 2)))
+  (do (check (equal? (timed-get $timed 2) 3)))
   (void))

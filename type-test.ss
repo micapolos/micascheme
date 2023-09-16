@@ -23,7 +23,7 @@
 ; --------------------------------------------------------------
 
 (check 
-  (obj=? 
+  (equal?
     (types-indexed (list string! `foo number! boolean!))
     (list (indexed string! 0) (indexed number! 2) (indexed boolean! 3))))
 

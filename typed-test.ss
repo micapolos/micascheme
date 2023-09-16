@@ -6,83 +6,83 @@
 
 ; === typed! ===
 
-(check (obj=? (typed! #t) (typed #t boolean!)))
-(check (obj=? (typed! 128) (typed 128 number!)))
-(check (obj=? (typed! "foo") (typed "foo" string!)))
-(check (obj=? (typed! foo) (typed #f 'foo)))
+(check (equal? (typed! #t) (typed #t boolean!)))
+(check (equal? (typed! 128) (typed 128 number!)))
+(check (equal? (typed! "foo") (typed "foo" string!)))
+(check (equal? (typed! foo) (typed #f 'foo)))
 
 ; === typed-tuple! ===
 
 (check 
-  (obj=? 
+  (equal?
     (typed-tuple! (foo))
     (typed #f (tuple-type! (foo)))))
 
 (check 
-  (obj=? 
+  (equal?
     (typed-tuple! (foo (typed! "bar")))
     (typed "bar" (tuple-type! (foo string!)))))
 
 (check 
-  (obj=? 
+  (equal?
     (typed-tuple! (foo (typed! "bar") (typed! 128)))
     (typed (cons "bar" 128) (tuple-type! (foo string! number!)))))
 
 (check 
-  (obj=? 
+  (equal?
     (typed-tuple! (foo (typed! "bar") (typed! 128) (typed! #t)))
     (typed (vector "bar" 128 #t) (tuple-type! (foo string! number! boolean!)))))
 
 ; === typed-tuple-ref ===
 
 (check
-  (obj=?
+  (equal?
     (typed-tuple-ref (typed `tuple (tuple-type! (foo string!))) 0)
     (typed `tuple string!)))
 
 (check
-  (obj=?
+  (equal?
     (typed-tuple-ref (typed `tuple (tuple-type! (foo string! number!))) 0)
     (typed (pair-first `tuple) string!)))
 
 (check
-  (obj=?
+  (equal?
     (typed-tuple-ref (typed `tuple (tuple-type! (foo string! number!))) 1)
     (typed (pair-second `tuple) number!)))
 
 (check
-  (obj=?
+  (equal?
     (typed-tuple-ref (typed `tuple (tuple-type! (foo string! number! boolean!))) 0)
     (typed (vector-get `tuple 0) string!)))
 
 (check
-  (obj=?
+  (equal?
     (typed-tuple-ref (typed `tuple (tuple-type! (foo string! number! boolean!))) 1)
     (typed (vector-get `tuple 1) number!)))
 
 (check
-  (obj=?
+  (equal?
     (typed-tuple-ref (typed `tuple (tuple-type! (foo string! number! boolean!))) 2)
     (typed (vector-get `tuple 2) boolean!)))
 
 ; === typed-choice! ===
 
 (check
-  (obj=?
+  (equal?
     (typed-choice! (typed! "foo"))
     (typed
       (cons 0 "foo")
       (choice-type! string!))))
 
 (check
-  (obj=?
+  (equal?
     (typed-choice! (not number!) (typed! "foo"))
     (typed
       (cons 1 "foo")
       (choice-type! number! string!))))
 
 (check
-  (obj=?
+  (equal?
     (typed-choice! (not boolean!) (not number!) (typed! "foo"))
     (typed
       (cons 2 "foo")
@@ -91,7 +91,7 @@
 ; === typed-function ===
 
 (check
-  (obj=?
+  (equal?
     (typed-function! (fn string! number!) (typed! #t))
     (typed
       (function 2 #t)
@@ -100,11 +100,11 @@
 ; === typed-wrap ===
 
 (check
-  (obj=?
+  (equal?
     (typed-wrap (typed "foo" string!) (choice-type! boolean! number! string!))
     (typed (cons 2 "foo") (choice-type! boolean! number! string!))))
 
 (check
-  (obj=?
+  (equal?
     (typed-wrap (typed "foo" string!) (choice-type! boolean! number! string!))
     (typed (cons 2 "foo") (choice-type! boolean! number! string!))))

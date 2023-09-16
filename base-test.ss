@@ -4,14 +4,10 @@
 
 (data (point x y))
 (data (point2 x y))
-(check (obj=? (point 1 2) (point 1 2)))
-(check (obj=? (point? (point 1 2)) #t))
-(check (obj=? (point-x (point 1 2)) 1))
-(check (obj=? (point-y (point 1 2)) 2))
-
 (check (equal? (point 1 2) (point 1 2)))
-(check (not (equal? (point 1 2) (point 1 3))))
-(check (not (equal? (point 1 2) (point2 1 2))))
+(check (equal? (point? (point 1 2)) #t))
+(check (equal? (point-x (point 1 2)) 1))
+(check (equal? (point-y (point 1 2)) 2))
 
 (check (= (equal-hash (point 1 2)) (equal-hash (point 1 2))))
 (check (not (= (equal-hash (point 1 2)) (equal-hash (point 1 3)))))
@@ -45,10 +41,10 @@
 
 ; === list-safe-ref ===
 
-(check (obj=? (list-get (list "a" "b") 0) "a"))
-(check (obj=? (list-get (list "a" "b") 1) "b"))
-(check (obj=? (list-get (list "a" "b") 2) (list-get-overflow 0)))
-(check (obj=? (list-get (list "a" "b") 3) (list-get-overflow 1)))
+(check (equal? (list-get (list "a" "b") 0) "a"))
+(check (equal? (list-get (list "a" "b") 1) "b"))
+(check (equal? (list-get (list "a" "b") 2) (list-get-overflow 0)))
+(check (equal? (list-get (list "a" "b") 3) (list-get-overflow 1)))
 
 ; === bind-if ===
 
@@ -58,7 +54,7 @@
 ; === fold-while ===
 
 (check
-  (obj=?
+  (equal?
     (fold-while string?
       (lambda ($string $char)
         (if (char-alphabetic? $char)
@@ -69,7 +65,7 @@
     "ab"))
 
 (check
-  (obj=?
+  (equal?
     (fold-while string?
       (lambda ($string $char)
         (if (char-alphabetic? $char)
@@ -147,8 +143,8 @@
 ; === map-find-indexed ===
 
 (let ((fn (lambda (s) (and (> (string-length s) 3) (string-append s "!")))))
-  (check (obj=? (map-find-indexed fn (list "ala" "ma" "kocicę" "Lunę")) (indexed "kocicę!" 2)))
-  (check (obj=? (map-find-indexed fn (list "ala" "ma" "ul")) #f)))
+  (check (equal? (map-find-indexed fn (list "ala" "ma" "kocicę" "Lunę")) (indexed "kocicę!" 2)))
+  (check (equal? (map-find-indexed fn (list "ala" "ma" "ul")) #f)))
 
 ; === curry ===
 
@@ -194,7 +190,7 @@
 
 ; === list-indexed ===
 
-(check (obj=? (list-indexed (list "a" "b" "c")) (list (indexed "a" 0) (indexed "b" 1) (indexed "c" 2))))
+(check (equal? (list-indexed (list "a" "b" "c")) (list (indexed "a" 0) (indexed "b" 1) (indexed "c" 2))))
 
 ; === iterate ===
 

@@ -6,7 +6,7 @@
   (compiler))
 
 (define-syntax-rule (check-compile lhs rhs)
-  (check (obj=? (compile! lhs) rhs)))
+  (check (equal? (compile! lhs) rhs)))
 
 ; === literals ===
 
@@ -29,7 +29,7 @@
   (begin
     (check (native? $term))
     (check (symbol=? (syntax->datum (native-value $term)) `string-length))
-    (check (obj=? $type (function-type! (length string!) number!)))))
+    (check (equal? $type (function-type! (length string!) number!)))))
 
 ; === if ===
 

@@ -26,7 +26,7 @@
         (else
           (and
             (pair? $rhs-next)
-            (obj=? (car $lhs-next) (car $rhs-next))
+            (equal? (car $lhs-next) (car $rhs-next))
             (seq=? (cdr $lhs-next) (cdr $rhs-next)))))))
 
   (define (list->seq $list)

@@ -1,7 +1,7 @@
 (import (micascheme) (leo) (term) (compiler))
 
 (define-syntax-rule (check-leo $leo $value)
-  (check (obj=? (leo $leo) $value)))
+  (check (equal? (leo $leo) $value)))
 
 ; === natives
 

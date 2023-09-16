@@ -24,7 +24,6 @@
     data
     partial
     define-aux-keyword define-syntax-rule define-syntax-case
-    obj=? record=? pair=? vector=? box=?
     displayln writeln
     fold-indices indices iterate
     fold-while
@@ -253,47 +252,6 @@
 
   (define (list-indexed $list)
     (map-indexed (lambda ($index $value) (indexed $value $index)) $list))
-
-  (define (obj=? a b)
-    (equal? a b))
-    ; (cond
-    ;   ((record? a) (and (record? b) (record=? a b)))
-    ;   ((string? a) (and (string? b) (string=? a b)))
-    ;   ((pair? a) (and (pair? b) (pair=? a b)))
-    ;   ((bytevector? a) (and (bytevector? b) (bytevector=? a b)))
-    ;   ((vector? a) (and (vector? b) (vector=? a b)))
-    ;   ((box? a) (and (box? b) (box=? a b)))
-    ;   (else (eqv? a b))))
-
-  (define (pair=? pair-a pair-b)
-    (and 
-      (obj=? (car pair-a) (car pair-b))
-      (obj=? (cdr pair-a) (cdr pair-b))))
-
-  (define (box=? box-a box-b)
-    (obj=? (unbox box-a) (unbox box-b)))
-
-  (define (record=? a b)
-    (let ((rtd-a (record-rtd a))
-          (rtd-b (record-rtd b)))
-      (and
-        (eq? rtd-a rtd-b)
-        (fold-indices
-          (lambda (eq index)
-            (let ((get (record-accessor rtd-a index)))
-              (and eq (obj=? (get a) (get b)))))
-          #t
-          (vector-length (record-type-field-names rtd-a))))))
-
-  (define (vector=? vector-a vector-b)
-    (let ((length-a (vector-length vector-a))
-          (length-b (vector-length vector-b)))
-      (and (= length-a length-b)
-        (fold-indices
-          (lambda (eq index)
-            (and eq (obj=? (vector-ref vector-a index) (vector-ref vector-b index))))
-          #t
-          length-a))))
 
   (define-syntax data
     (lambda (stx)
@@ -678,10 +636,10 @@
         ((else e) (cons `other e)))
       (cons `other #f)))
 
-  (assert (record=? (foo 1 2) (foo 1 2)))
+;  (assert (equal? (foo 1 2) (foo 1 2)))
 
-  (assert (not (record=? (foo 1 2) (foo 1 3))))
-  (assert (not (record=? (foo 1 2) (bar 1 2))))
+  (assert (not (equal? (foo 1 2) (foo 1 3))))
+  (assert (not (equal? (foo 1 2) (bar 1 2))))
 
   (assert (= (unpair (cons 3 2) l r (- l r)) 1))
 )

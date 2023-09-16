@@ -198,6 +198,6 @@
                   (list (typed-type $tuple-wrap)))))))
         ((else $other) 
           (and 
-            (obj=? $type $other) 
+            (equal? $type $other)
             $typed)))))
 )

@@ -178,6 +178,6 @@
 
   (define (choice-type-index-of $choice-type $type)
     (and-lets 
-      ($indexed (map-find-indexed (partial obj=? $type) (choice-type-types $choice-type)))
+      ($indexed (map-find-indexed (partial equal? $type) (choice-type-types $choice-type)))
       (indexed-index $indexed)))
 )

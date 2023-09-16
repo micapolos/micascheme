@@ -1,7 +1,7 @@
 (import (base) (seq))
 
 (define-syntax-rule (check-seq= $lhs $rhs)
-  (check (obj=? (seq->list $lhs) (seq->list $rhs))))
+  (check (equal? (seq->list $lhs) (seq->list $rhs))))
 
 (check-seq= (seq) (seq))
 (check-seq= (seq 1) (seq 1))
