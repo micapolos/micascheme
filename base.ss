@@ -255,14 +255,15 @@
     (map-indexed (lambda ($index $value) (indexed $value $index)) $list))
 
   (define (obj=? a b)
-    (cond
-      ((record? a) (and (record? b) (record=? a b)))
-      ((string? a) (and (string? b) (string=? a b)))
-      ((pair? a) (and (pair? b) (pair=? a b)))
-      ((bytevector? a) (and (bytevector? b) (bytevector=? a b)))
-      ((vector? a) (and (vector? b) (vector=? a b)))
-      ((box? a) (and (box? b) (box=? a b)))
-      (else (eqv? a b))))
+    (equal? a b))
+    ; (cond
+    ;   ((record? a) (and (record? b) (record=? a b)))
+    ;   ((string? a) (and (string? b) (string=? a b)))
+    ;   ((pair? a) (and (pair? b) (pair=? a b)))
+    ;   ((bytevector? a) (and (bytevector? b) (bytevector=? a b)))
+    ;   ((vector? a) (and (vector? b) (vector=? a b)))
+    ;   ((box? a) (and (box? b) (box=? a b)))
+    ;   (else (eqv? a b))))
 
   (define (pair=? pair-a pair-b)
     (and 
