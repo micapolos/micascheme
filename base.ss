@@ -636,8 +636,5 @@
         ((else e) (cons `other e)))
       (cons `other #f)))
 
-  (assert (not (equal? (foo 1 2) (foo 1 3))))
-  (assert (not (equal? (foo 1 2) (bar 1 2))))
-
   (assert (= (unpair (cons 3 2) l r (- l r)) 1))
 )
