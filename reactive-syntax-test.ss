@@ -4,12 +4,21 @@
 (define-aux-keyword osc)
 
 (define (test-context)
-  (lookup-context
+  (context
+    (stack
+      (cons #`$string "bar")
+      (cons #`$number 128)
+      (cons #`$string "foo"))
     (lambda ($id)
       (cond
         ((free-identifier=? $id #`counter) (reactive-counter))
         ((free-identifier=? $id #`osc) reactive-osc)
         (else #f)))))
+
+(check (equal? (context-ref (test-context) #`$number) 128))
+(check (equal? (context-ref (test-context) #`$string) "foo"))
+(check (equal? (context-ref (test-context) #`osc) reactive-osc))
+(check (equal? (context-ref (test-context) #`$absent) #f))
 
 (check
   (equal?

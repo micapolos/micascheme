@@ -1,7 +1,7 @@
 (library (reactive-syntax)
   (export
     context context? context-lookup-fn
-    empty-context lookup-context context-bind
+    empty-context lookup-context context-bind context-ref
 
     unit unit? unit-declarations unit-initializers unit-updaters
     empty-unit
@@ -35,10 +35,17 @@
   (define (lookup-context $fn)
     (context (stack) $fn))
 
-  (define (context-bind $context $id $value)
+  (define (context-bind $context $id $reactive)
     (context
-      (push (context-bindings $context) (cons $id $value))
+      (push (context-bindings $context) (cons $id $reactive))
       (context-lookup-fn $context)))
+
+  (define (context-ref $context $id)
+    (or
+      (lets
+        ($ass (assp (partial free-identifier=? $id) (context-bindings $context)))
+        (and $ass (cdr $ass)))
+      ((context-lookup-fn $context) $id)))
 
   (define (empty-unit)
     (unit (stack) (stack) (stack)))
@@ -124,7 +131,7 @@
               #`(#,@(reverse $stack))))))
       ($id (identifier? #`$id)
         (or
-          ((context-lookup-fn $context) #`$id)
+          (context-ref $context #`$id)
           (syntax-reactive $context #`(pure $id))))
       (($item ...)
         (syntax-reactive $context #`(apply $item ...)))
