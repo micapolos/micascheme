@@ -1,7 +1,7 @@
 (library (reactive-syntax)
   (export
     context context? context-lookup-fn
-    empty-context
+    empty-context lookup-context context-bind
 
     unit unit? unit-declarations unit-initializers unit-updaters
     empty-unit
@@ -25,12 +25,20 @@
     pure value)
   (import (micascheme))
 
-  (data (context lookup-fn))
+  (data (context bindings lookup-fn))
   (data (unit declarations initializers updaters))
   (data (reactive unit value))
 
   (define (empty-context)
-    (context (lambda ($id) #f)))
+    (lookup-context (lambda (_) #f)))
+
+  (define (lookup-context $fn)
+    (context (stack) $fn))
+
+  (define (context-bind $context $id $value)
+    (context
+      (push (context-bindings $context) (cons $id $value))
+      (context-lookup-fn $context)))
 
   (define (empty-unit)
     (unit (stack) (stack) (stack)))

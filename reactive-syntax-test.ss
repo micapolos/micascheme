@@ -4,7 +4,7 @@
 (define-aux-keyword osc)
 
 (define (test-context)
-  (context
+  (lookup-context
     (lambda ($id)
       (cond
         ((free-identifier=? $id #`counter) (reactive-counter))
