@@ -97,20 +97,25 @@
         (pure-reactive #`$body))
       ((value $var $init $update) (identifier? #`$var)
         (lets
-          ($tmp (car (generate-temporaries `(tmp))))
-          (reactive
-            (unit
-              (stack #`(define #,$tmp))
-              (stack #`(set! #,$tmp (lets ($var #,$tmp) $init)))
-              (stack #`(set! #,$tmp (lets ($var #,$tmp) $update))))
-            #`(lets ($var #,$tmp) $var))))
+          ($tmp (generate-temporary #`$var))
+          ($context (context-bind $context #`$var (pure-reactive $tmp)))
+          (reactive-bind (syntax-reactive $context #`$init)
+            (lambda ($init)
+              (reactive-bind (syntax-reactive $context #`$update)
+                (lambda ($update)
+                  (reactive
+                    (unit
+                      (stack #`(define #,$tmp))
+                      (stack #`(set! #,$tmp #,$init))
+                      (stack #`(set! #,$tmp #,$update)))
+                    $tmp)))))))
       ((lets $body)
         (syntax-reactive $context #`$body))
       ((lets ($var $expr) $rest ... $body) (identifier? #`$var)
         (reactive-bind (syntax-reactive $context #`$expr)
           (lambda ($expr)
             (lets
-              ($tmp (generate-temporary #`tmp))
+              ($tmp (generate-temporary #`$var))
               ($context (context-bind $context #`$var (pure-reactive $tmp)))
               (reactive-bind (syntax-reactive $context #`(lets $rest ... $body))
                 (lambda ($body)

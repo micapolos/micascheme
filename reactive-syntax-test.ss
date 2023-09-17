@@ -56,7 +56,7 @@
       (declarations (define $counter))
       (initializers (set! $counter 0))
       (updaters (set! $counter (+ $counter 1)))
-      (value (let (($tmp $counter)) (+ $tmp $tmp))))))
+      (value (let (($$n $counter)) (+ $$n $$n))))))
 
 (check
   (equal?
@@ -73,10 +73,24 @@
       (syntax-reactive
         (empty-context)
         #`(+
-          (value x 0 (+ x 1))
+          (value c 0 (+ c 1))
           (value x 0 (+ x 100))))
       5)
     (vector 0 101 202 303 404)))
+
+(check
+  (equal?
+    (reactive->datum
+      (syntax-reactive
+        (empty-context)
+        #`(lets
+          ($counter (value c 0 (+ c 1)))
+          (value x 0 (+ x $counter)))))
+    `(reactive
+      (declarations (define $c) (define $x))
+      (initializers (set! $c 0) (set! $x 0))
+      (updaters (set! $c (+ $c 1)) (set! $x (+ $x $$counter)))
+      (value (let (($$counter $c)) $x)))))
 
 (check
   (equal?
