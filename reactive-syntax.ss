@@ -117,11 +117,16 @@
             (lets
               ($tmp (generate-temporary #`$var))
               ($context (context-bind $context #`$var (pure-reactive $tmp)))
-              (reactive-bind (syntax-reactive $context #`(lets $rest ... $body))
-                (lambda ($body)
-                  (pure-reactive
-                    #`(let ((#,$tmp #,$expr))
-                      #,$body))))))))
+              ($reactive
+                (reactive
+                  (unit
+                    (stack #`(define #,$tmp))
+                    (stack #`(set! #,$tmp #,$expr))
+                    (stack #`(set! #,$tmp #,$expr)))
+                  $tmp))
+              (reactive-bind $reactive
+                (lambda (_)
+                  (syntax-reactive $context #`(lets $rest ... $body))))))))
       ((apply $item ...)
         (reactive-bind
           (fold-left

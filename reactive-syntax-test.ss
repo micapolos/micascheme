@@ -53,10 +53,16 @@
           ($n counter)
           (+ $n $n))))
     `(reactive
-      (declarations (define $counter))
-      (initializers (set! $counter 0))
-      (updaters (set! $counter (+ $counter 1)))
-      (value (let (($$n $counter)) (+ $$n $$n))))))
+      (declarations
+        (define $counter)
+        (define $$n))
+      (initializers
+        (set! $counter 0)
+        (set! $$n $counter))
+      (updaters
+        (set! $counter (+ $counter 1))
+        (set! $$n $counter))
+      (value (+ $$n $$n)))))
 
 (check
   (equal?
@@ -87,10 +93,19 @@
           ($counter (value c 0 (+ c 1)))
           (value x 0 (+ x $counter)))))
     `(reactive
-      (declarations (define $c) (define $x))
-      (initializers (set! $c 0) (set! $x 0))
-      (updaters (set! $c (+ $c 1)) (set! $x (+ $x $$counter)))
-      (value (let (($$counter $c)) $x)))))
+      (declarations
+        (define $c)
+        (define $$counter)
+        (define $x))
+      (initializers
+        (set! $c 0)
+        (set! $$counter $c)
+        (set! $x 0))
+      (updaters
+        (set! $c (+ $c 1))
+        (set! $$counter $c)
+        (set! $x (+ $x $$counter)))
+      (value $x))))
 
 (check
   (equal?
@@ -108,7 +123,19 @@
       (syntax-reactive
         (test-context)
         #`(lets
-          ($n counter)
-          (+ $n $n)))
+          ($counter (value c 0 (+ c 1)))
+          (+ $counter $counter)))
       5)
     (vector 0 2 4 6 8)))
+
+
+(check
+  (equal?
+    (reactive->vector
+      (syntax-reactive
+        (test-context)
+        #`(lets
+          ($counter (value $n 0 (+ $n 1)))
+          (value $acc 0 (+ $acc $counter))))
+      5)
+    (vector 0 1 3 6 10)))
