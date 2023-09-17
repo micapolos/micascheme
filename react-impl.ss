@@ -7,9 +7,11 @@
   (data (sampler syntax))
   (data (stream syntax))
 
-  (define (react-syntax $syntax)
+  (define-aux-keyword react)
+
+  (define (react-syntax $lookup $syntax)
     (lets
-      ($statements (build $syntax))
+      ($statements (build $lookup $syntax))
       #`(begin
         (sdl-set-main-ready!)
         (sdl-init SDL-INIT-VIDEO)
@@ -145,18 +147,18 @@
 
               (process-events-and-quit?)))
 
-          ; #,@(map (lambda ($syntax) #`(writeln (quote (init #,$syntax))))
-          ;   (map initializer-syntax
-          ;     (filter initializer? $statements)))
-          ; #,@(map (lambda ($syntax) #`(writeln (quote (updater #,$syntax))))
-          ;   (map updater-syntax
-          ;     (filter updater? $statements)))
-          ; #,@(map (lambda ($syntax) #`(writeln (quote (sampler #,$syntax))))
-          ;   (map sampler-syntax
-          ;     (filter sampler? $statements)))
-          ; #,@(map (lambda ($syntax) #`(writeln (quote (audio #,$syntax))))
-          ;   (map stream-syntax
-          ;     (filter stream? $statements)))
+          #,@(map (lambda ($syntax) #`(writeln (quote (init #,$syntax))))
+            (map initializer-syntax
+              (filter initializer? $statements)))
+          #,@(map (lambda ($syntax) #`(writeln (quote (updater #,$syntax))))
+            (map updater-syntax
+              (filter updater? $statements)))
+          #,@(map (lambda ($syntax) #`(writeln (quote (sampler #,$syntax))))
+            (map sampler-syntax
+              (filter sampler? $statements)))
+          #,@(map (lambda ($syntax) #`(writeln (quote (audio #,$syntax))))
+            (map stream-syntax
+              (filter stream? $statements)))
 
           (sdl-set-render-draw-color! $renderer 0 0 0 255)
           (sdl-render-clear $renderer)
@@ -178,10 +180,10 @@
         (sdl-destroy-window $window)
         (sdl-quit))))
 
-  (define (build $syntax)
+  (define (build $lookup $syntax)
     (reverse
       (fold-left
-        statements+syntax
+        (partial statements+syntax $lookup)
         (stack)
         (syntax->list $syntax))))
 
@@ -196,11 +198,16 @@
           (reverse (built-statements $fn-built)))
         (built-value $fn-built))))
 
-  (define (statements+syntax $statements $syntax)
-    (syntax-case $syntax (message audio rect make)
+  (define (statements+syntax $lookup $statements $syntax)
+    (syntax-case $syntax (message audio rect make define)
+      ((define $id $body) (identifier? #`$id)
+        #`(begin
+          (define-aux-keyword $id)
+          (define-property $id react
+            #,(built-sampler-expression $lookup #`$body))))
       ((message $value)
         (built-statements
-          (built-bind (built-updater-expression #`$value)
+          (built-bind (built-updater-expression $lookup #`$value)
             (lambda ($value)
               (built
                 (push $statements
@@ -208,20 +215,20 @@
                 #`(void))))))
       ((audio $value)
         (built-statements
-          (built-bind (built-sampler-expression #`$value)
+          (built-bind (built-sampler-expression $lookup #`$value)
             (lambda ($value)
               (built
                 (push $statements (stream $value))
                 #`(void))))))
       ((rect $x $y $w $h)
         (built-statements
-          (built-bind (built-updater-expression #`$x)
+          (built-bind (built-updater-expression $lookup #`$x)
             (lambda ($x)
-              (built-bind (built-updater-expression #`$y)
+              (built-bind (built-updater-expression $lookup #`$y)
                 (lambda ($y)
-                  (built-bind (built-updater-expression #`$w)
+                  (built-bind (built-updater-expression $lookup #`$w)
                     (lambda ($w)
-                      (built-bind (built-updater-expression #`$h)
+                      (built-bind (built-updater-expression $lookup #`$h)
                         (lambda ($h)
                           (built
                             (push $statements
@@ -236,10 +243,10 @@
       ($other
         (syntax-error $syntax))))
 
-  (define (built-sampler-expression $syntax)
+  (define (built-sampler-expression $lookup $syntax)
     (syntax-case $syntax (osc noise)
       ((osc $freq)
-        (built-bind (built-sampler-expression #`$freq)
+        (built-bind (built-sampler-expression $lookup #`$freq)
           (lambda ($freq)
             (lets
               ($osc (car (generate-temporaries `(osc))))
@@ -258,21 +265,35 @@
               (sampler #`(if (= #,$noise (vector-length $noise-vector)) (set! #,$noise 0))))
             #`(vector-ref $noise-vector #,$noise))))
       ($other
-        (built-general-expression $syntax built-sampler-expression))))
+        (built-general-expression $lookup $syntax built-sampler-expression))))
 
-  (define (built-updater-expression $syntax)
+  (define (built-updater-expression $lookup $syntax)
     (syntax-case $syntax ()
       ($other
-        (built-general-expression $syntax built-updater-expression))))
+        (built-general-expression $lookup $syntax built-updater-expression))))
 
-  (define (built-general-expression $syntax $recurse)
-    (syntax-case $syntax (if seconds frames mouse-x mouse-y space? vector)
+  (define (built-general-expression $lookup $syntax $recurse)
+    (syntax-case $syntax (if seconds frames mouse-x mouse-y space? vector lets)
+      ((lets $body)
+        (built-general-expression $lookup #`$body $recurse))
+      ((lets ($var $expr) $rest ...)
+        (lets
+          ($built-expr ($recurse $lookup #`$expr))
+          ($built-rest ($recurse $lookup #`(lets $rest ...)))
+          (built
+            (append
+              (built-statements $built-rest)
+              (stack
+                (initializer #`(define $var #f))
+                (sampler #`(set! $var #,(built-value $built-expr))))
+              (built-statements $built-expr))
+            (built-value $built-rest))))
       ((if $cond $true $false)
-        (built-bind ($recurse #`$cond)
+        (built-bind ($recurse $lookup #`$cond)
           (lambda ($cond)
-            (built-bind ($recurse #`$true)
+            (built-bind ($recurse $lookup #`$true)
               (lambda ($true)
-                (built-bind ($recurse #`$false)
+                (built-bind ($recurse $lookup #`$false)
                   (lambda ($false)
                     (built
                       (stack)
@@ -297,10 +318,16 @@
             $vector)))
       (($item ...)
         (lets
-          ($builts (map $recurse (syntax->list #`($item ...))))
+          ($builts (map (partial $recurse $lookup) (syntax->list #`($item ...))))
           (built
             (apply append (map built-statements $builts))
             #`(#,@(map built-value $builts)))))
+      ($id (identifier? #`$id)
+        (switch ($lookup #`$id #`react)
+          ((false? _)
+            (built (stack) #`$id))
+          ((else $property)
+            (built (car $property) (cdr $property)))))
       ($other
         (built (stack) #`$other))))
 )

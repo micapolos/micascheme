@@ -5,6 +5,8 @@
   (message (format "Time: ~,2f seconds" seconds))
   (message (format "Mouse: ~s ~s" mouse-x mouse-y))
   (message (format "Space: ~a" (if space? "yes" "no")))
+  (define main-osc (osc 4))
+
   (rect
     (- mouse-x 15)
     (- mouse-y 15)
