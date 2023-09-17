@@ -31,7 +31,7 @@
         #`counter))
     `(reactive
       (declarations (define $counter))
-      (initializers (set! $counter -1))
+      (initializers (set! $counter 0))
       (updaters (set! $counter (+ $counter 1)))
       (value $counter))))
 
@@ -45,7 +45,7 @@
           (+ $n $n))))
     `(reactive
       (declarations (define $counter))
-      (initializers (set! $counter -1))
+      (initializers (set! $counter 0))
       (updaters (set! $counter (+ $counter 1)))
       (value (let (($n $counter)) (+ $n $n))))))
 

@@ -152,8 +152,8 @@
         (do!
           ((#,$index 0 (+ #,$index 1)))
           ((= #,$index #,$size) #,$vector)
-          #,@(reverse (unit-updaters $unit))
-          (vector-set! #,$vector #,$index #,$value)))))
+          (vector-set! #,$vector #,$index #,$value)
+          #,@(reverse (unit-updaters $unit))))))
 
   (define (reactive->vector $reactive $size)
     (eval
@@ -166,7 +166,7 @@
       (reactive
         (unit
           (stack #`(define #,$counter))
-          (stack #`(set! #,$counter -1))
+          (stack #`(set! #,$counter 0))
           (stack #`(set! #,$counter (+ #,$counter 1))))
         $counter)))
 
@@ -178,7 +178,7 @@
           (reactive
             (unit
               (stack #`(define #,$osc))
-              (stack #`(set! #,$osc (- #,$delta)))
+              (stack #`(set! #,$osc 0.0))
               (stack #`(set! #,$osc (fract (+ #,$osc #,$delta)))))
             $osc)))))
 )
