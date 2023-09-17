@@ -22,7 +22,7 @@
     syntax-transform
     syntax-list-transform
 
-    pure value)
+    pure iterator)
   (import (micascheme))
 
   (data (context bindings lookup-fn))
@@ -86,13 +86,13 @@
             10)))))
 
   (define-aux-keyword pure)
-  (define-aux-keyword value)
+  (define-aux-keyword iterator)
 
   (define (syntax-reactive $context $syntax)
-    (syntax-case $syntax (value lets reactive var init update apply pure)
+    (syntax-case $syntax (iterator lets reactive apply pure)
       ((pure $body)
         (pure-reactive #`$body))
-      ((value $var $init $update) (identifier? #`$var)
+      ((iterator $var $init $update) (identifier? #`$var)
         (lets
           ($tmp (generate-temporary #`$var))
           ($context (context-bind $context #`$var (pure-reactive $tmp)))

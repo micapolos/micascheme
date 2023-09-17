@@ -11,6 +11,8 @@
   "decompiler-test.ss"
   "leo-test.ss"
   "parser-test.ss"
+  "reactive-syntax-test.ss"
+  "reactive-test.ss"
   "syntax-test.ss"
   "value-test.ss"
   "leo/parser-test.ss"
