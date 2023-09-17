@@ -85,7 +85,7 @@
       (null? (cdr $list))))
 
   (define (generate-temporary $obj) 
-    (if checking?
+    (if (checking?)
       (build-identifier ($string $obj) (string-append "$" $string))
       (car (generate-temporaries (list $obj)))))
 
@@ -375,14 +375,15 @@
                   (source-object-line source)
                   (source-object-column source))
                 ""))
-            #`(let (#,@let-cases)
-              (or
-                (parameterize ((checking? #t)) (not (pred #,@tmps)))
-                (error `check 
-                  (format "\n~a   expr: ~s\n  value: ~s\n"
-                    #,ann-string
-                    (quote (not (pred arg ...)))
-                    (list (quote not) (list (quote pred) #,@tmps))))))))
+            #`(parameterize ((checking? #t))
+              (let (#,@let-cases)
+                (or
+                  (not (pred #,@tmps))
+                  (error `check
+                    (format "\n~a   expr: ~s\n  value: ~s\n"
+                      #,ann-string
+                      (quote (not (pred arg ...)))
+                      (list (quote not) (list (quote pred) #,@tmps)))))))))
         ((_ (pred arg ...))
           (lets
             (args (syntax->list #`(arg ...)))
@@ -397,14 +398,15 @@
                   (source-object-line source)
                   (source-object-column source))
                 ""))
-            #`(let (#,@let-cases)
-              (or
-                (parameterize ((checking? #t)) (pred #,@tmps))
-                (error `check 
-                  (format "\n~a   expr: ~s\n  value: ~s\n"
-                    #,ann-string
-                    (quote (pred arg ...))
-                    (list (quote pred) #,@tmps))))))))))
+            #`(parameterize ((checking? #t))
+              (let (#,@let-cases)
+                (or
+                  (pred #,@tmps)
+                  (error `check
+                    (format "\n~a   expr: ~s\n  value: ~s\n"
+                      #,ann-string
+                      (quote (pred arg ...))
+                      (list (quote pred) #,@tmps)))))))))))
 
   (define-syntax ensure
     (lambda ($syntax)
