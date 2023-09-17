@@ -97,7 +97,7 @@
       (define-aux-keyword counter)
       (define-property counter reactive
         (reactive
-          (unit
+          (deps
             (stack #'(define $n))
             (stack #'(set! $n 0))
             (stack #'(set! $n (+ $n 1))))
