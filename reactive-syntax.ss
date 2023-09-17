@@ -136,9 +136,9 @@
       ($vector (generate-temporary #`vector))
       ($index (generate-temporary #`index))
       #`(let ()
+        (define #,$vector (make-vector #,$size))
         #,@(reverse (unit-declarations $unit))
         #,@(reverse (unit-initializers $unit))
-        (define #,$vector (make-vector #,$size))
         (do!
           ((#,$index 0 (+ #,$index 1)))
           ((= #,$index #,$size) #,$vector)
@@ -155,8 +155,8 @@
       ($counter (generate-temporary #`counter))
       (reactive
         (unit
-          (stack #`(define #,$counter -1))
-          (stack)
+          (stack #`(define #,$counter))
+          (stack #`(set! #,$counter -1))
           (stack #`(set! #,$counter (+ #,$counter 1))))
         $counter)))
 )
