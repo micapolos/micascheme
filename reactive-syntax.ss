@@ -141,7 +141,6 @@
       ($item
         (syntax-reactive $context #`(pure $item)))))
 
-
   (define (reactive-syntax $reactive)
     (lets
       ($unit (reactive-unit $reactive))
