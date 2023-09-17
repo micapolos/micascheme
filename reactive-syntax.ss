@@ -13,7 +13,7 @@
 
     syntax-reactive
     reactive-syntax
-    reactive-datum
+    reactive->datum
     reactive->vector-syntax
     reactive->vector
     reactive-counter
@@ -127,7 +127,7 @@
           (stack #,@(reverse (unit-updaters $unit))))
         #,(reactive-value $reactive))))
 
-  (define (reactive-datum $reactive)
+  (define (reactive->datum $reactive)
     (lets
       ($unit (reactive-unit $reactive))
       ($value (reactive-value $reactive))

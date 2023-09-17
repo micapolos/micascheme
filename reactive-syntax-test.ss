@@ -13,7 +13,7 @@
 
 (check
   (equal?
-    (reactive-datum
+    (reactive->datum
       (syntax-reactive
         (empty-context)
         #`128))
@@ -25,7 +25,7 @@
 
 (check
   (equal?
-    (reactive-datum
+    (reactive->datum
       (syntax-reactive
         (test-context)
         #`counter))
@@ -37,7 +37,7 @@
 
 (check
   (equal?
-    (reactive-datum
+    (reactive->datum
       (syntax-reactive
         (test-context)
         #`(lets
