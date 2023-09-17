@@ -9,6 +9,7 @@
     reactive-bind
 
     syntax-reactive
+    reactive-datum
     reactive-vector-syntax
     reactive-vector
     counter)
@@ -39,13 +40,15 @@
         (reactive-value $fn-reactive))))
 
   (define (syntax-reactive $syntax)
-    (syntax-case $syntax (lets)
+    (syntax-case $syntax (lets counter)
+      (counter
+        (counter))
       ((lets $body)
         (syntax-reactive #`$body))
       ((lets ($var $expr) $rest ... $body)
         (reactive-bind (syntax-reactive #`$expr)
           (lambda ($expr)
-            (reactive-bind (syntax-reactive #`(let $rest ... $body))
+            (reactive-bind (syntax-reactive #`(lets $rest ... $body))
               (lambda ($body)
                 (pure-reactive
                   #`(let (($var #,$expr))
@@ -67,6 +70,18 @@
               #`(#,@(reverse $stack))))))
       ($other
         (pure-reactive #`$other))))
+
+  (define (reactive-datum $reactive)
+    (lets
+      ($unit (reactive-unit $reactive))
+      ($value (reactive-value $reactive))
+      ($vector (generate-temporary #`vector))
+      ($index (generate-temporary #`index))
+      `(reactive
+        (declarations ,@(reverse (map syntax->datum (unit-declarations $unit))))
+        (initializers ,@(reverse (map syntax->datum (unit-initializers $unit))))
+        (updaters ,@(reverse (map syntax->datum (unit-updaters $unit))))
+        (value ,(syntax->datum (reactive-value $reactive))))))
 
   (define (reactive-vector-syntax $reactive $size)
     (lets
