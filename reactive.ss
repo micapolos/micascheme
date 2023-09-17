@@ -8,7 +8,7 @@
         ((_ $item ...)
           (lambda ($lookup)
             (syntax-list-transform
-              (context
+              (lookup-context
                 (lambda ($id)
                   ($lookup $id #`reactive)))
               (syntax->list #`($item ...))))))))

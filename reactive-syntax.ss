@@ -106,14 +106,17 @@
             #`(lets ($var #,$tmp) $var))))
       ((lets $body)
         (syntax-reactive $context #`$body))
-      ((lets ($var $expr) $rest ... $body)
+      ((lets ($var $expr) $rest ... $body) (identifier? #`$var)
         (reactive-bind (syntax-reactive $context #`$expr)
           (lambda ($expr)
-            (reactive-bind (syntax-reactive $context #`(lets $rest ... $body))
-              (lambda ($body)
-                (pure-reactive
-                  #`(let (($var #,$expr))
-                    #,$body)))))))
+            (lets
+              ($tmp (generate-temporary #`tmp))
+              ($context (context-bind $context #`$var (pure-reactive $tmp)))
+              (reactive-bind (syntax-reactive $context #`(lets $rest ... $body))
+                (lambda ($body)
+                  (pure-reactive
+                    #`(let ((#,$tmp #,$expr))
+                      #,$body))))))))
       ((apply $item ...)
         (reactive-bind
           (fold-left

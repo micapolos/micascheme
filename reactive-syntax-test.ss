@@ -56,7 +56,7 @@
       (declarations (define $counter))
       (initializers (set! $counter 0))
       (updaters (set! $counter (+ $counter 1)))
-      (value (let (($n $counter)) (+ $n $n))))))
+      (value (let (($tmp $counter)) (+ $tmp $tmp))))))
 
 (check
   (equal?
