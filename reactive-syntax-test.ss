@@ -3,22 +3,22 @@
 (define-aux-keyword counter)
 (define-aux-keyword osc)
 
-(define (test-context)
-  (context
-    (stack
-      (cons #`$string "bar")
-      (cons #`$number 128)
-      (cons #`$string "foo"))
-    (lambda ($id)
-      (cond
-        ((free-identifier=? $id #`counter) (reactive-counter))
-        ((free-identifier=? $id #`osc) reactive-osc)
-        (else #f)))))
+(let ()
+  (define $context
+    (context
+      (stack
+        (cons #`$string "bar")
+        (cons #`$number 128)
+        (cons #`$string "foo"))
+      (lambda ($id)
+        (cond
+          ((free-identifier=? $id #`$char) #\a)
+          (else #f)))))
 
-(check (equal? (context-ref (test-context) #`$number) 128))
-(check (equal? (context-ref (test-context) #`$string) "foo"))
-(check (equal? (context-ref (test-context) #`osc) reactive-osc))
-(check (equal? (context-ref (test-context) #`$absent) #f))
+  (check (equal? (context-ref $context #`$number) 128))
+  (check (equal? (context-ref $context #`$string) "foo"))
+  (check (equal? (context-ref $context #`$char) #\a))
+  (check (equal? (context-ref $context #`$absent) #f)))
 
 (check
   (equal?
@@ -36,33 +36,33 @@
   (equal?
     (reactive->datum
       (syntax-reactive
-        (test-context)
-        #`counter))
+        (empty-context)
+        #`(unit n 0 (+ n 1))))
     `(reactive
-      (declarations (define $counter))
-      (initializers (set! $counter 0))
-      (updaters (set! $counter (+ $counter 1)))
-      (value $counter))))
+      (declarations (define $n))
+      (initializers (set! $n 0))
+      (updaters (set! $n (+ $n 1)))
+      (value $n))))
 
 (check
   (equal?
     (reactive->datum
       (syntax-reactive
-        (test-context)
+        (empty-context)
         #`(lets
-          (n counter)
-          (+ n n))))
+          (counter (unit n 0 (+ n 1)))
+          (+ counter counter))))
     `(reactive
       (declarations
-        (define $counter)
-        (define $n))
+        (define $n)
+        (define $counter))
       (initializers
-        (set! $counter 0)
-        (set! $n $counter))
+        (set! $n 0)
+        (set! $counter $n))
       (updaters
-        (set! $counter (+ $counter 1))
-        (set! $n $counter))
-      (value (+ $n $n)))))
+        (set! $n (+ $n 1))
+        (set! $counter $n))
+      (value (+ $counter $counter)))))
 
 (check
   (equal?
@@ -155,7 +155,7 @@
   (equal?
     (reactive->vector
       (syntax-reactive
-        (test-context)
+        (empty-context)
         #`(lets
           ($counter (unit c 0 (+ c 1)))
           (+ $counter $counter)))
@@ -166,7 +166,7 @@
   (equal?
     (reactive->vector
       (syntax-reactive
-        (test-context)
+        (empty-context)
         #`(lets
           ($counter (unit $n 0 (+ $n 1)))
           (unit $acc 0 (+ $acc $counter))))
