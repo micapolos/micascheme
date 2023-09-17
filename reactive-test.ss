@@ -1,4 +1,4 @@
 (import (micascheme) (reactive))
 
 (reactive
-  (iterator n 0 (+ n 1)))
+  (unit n 0 (+ n 1)))

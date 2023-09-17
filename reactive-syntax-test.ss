@@ -70,8 +70,8 @@
       (syntax-reactive
         (empty-context)
         #`(lets
-          (counter (iterator c 0 (+ c 1)))
-          (iterator x 0 (+ x counter)))))
+          (counter (unit c 0 (+ c 1)))
+          (unit x 0 (+ x counter)))))
     `(reactive
       (declarations
         (define $c)
@@ -92,7 +92,7 @@
     (syntax->datum
       (syntax-transform
         (empty-context)
-        #`(define counter (iterator n 0 (+ n 1)))))
+        #`(define counter (unit n 0 (+ n 1)))))
     `(begin
       (define-aux-keyword counter)
       (define-property counter reactive
@@ -108,7 +108,7 @@
     (syntax->datum
       (syntax-transform
         (empty-context)
-        #`(iterator x 0 (+ x 1))))
+        #`(unit x 0 (+ x 1))))
     `(writeln
       (let ()
         (define $vector (make-vector 10))
@@ -125,7 +125,7 @@
     (reactive->vector
       (syntax-reactive
         (empty-context)
-        #`(iterator $val 0 (+ $val 1)))
+        #`(unit $val 0 (+ $val 1)))
       5)
     (vector 0 1 2 3 4)))
 
@@ -135,8 +135,8 @@
       (syntax-reactive
         (empty-context)
         #`(+
-          (iterator c 0 (+ c 1))
-          (iterator x 0 (+ x 100))))
+          (unit c 0 (+ c 1))
+          (unit x 0 (+ x 100))))
       5)
     (vector 0 101 202 303 404)))
 
@@ -157,7 +157,7 @@
       (syntax-reactive
         (test-context)
         #`(lets
-          ($counter (iterator c 0 (+ c 1)))
+          ($counter (unit c 0 (+ c 1)))
           (+ $counter $counter)))
       5)
     (vector 0 2 4 6 8)))
@@ -168,7 +168,7 @@
       (syntax-reactive
         (test-context)
         #`(lets
-          ($counter (iterator $n 0 (+ $n 1)))
-          (iterator $acc 0 (+ $acc $counter))))
+          ($counter (unit $n 0 (+ $n 1)))
+          (unit $acc 0 (+ $acc $counter))))
       5)
     (vector 0 1 3 6 10)))
