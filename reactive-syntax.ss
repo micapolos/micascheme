@@ -14,8 +14,8 @@
     syntax-reactive
     reactive-syntax
     reactive-datum
-    reactive-vector-syntax
-    reactive-vector
+    reactive->vector-syntax
+    reactive->vector
     reactive-counter
     reactive-osc
 
@@ -68,7 +68,7 @@
         #`(writeln
           `(
             #,@(vector->list
-              (reactive-vector
+              (reactive->vector
                 (syntax-reactive $context #`$other)
                 10))
             #,(datum->syntax #`+ `...))))))
@@ -139,7 +139,7 @@
         (updaters ,@(reverse (map syntax->datum (unit-updaters $unit))))
         (value ,(syntax->datum (reactive-value $reactive))))))
 
-  (define (reactive-vector-syntax $reactive $size)
+  (define (reactive->vector-syntax $reactive $size)
     (lets
       ($unit (reactive-unit $reactive))
       ($value (reactive-value $reactive))
@@ -155,9 +155,9 @@
           #,@(reverse (unit-updaters $unit))
           (vector-set! #,$vector #,$index #,$value)))))
 
-  (define (reactive-vector $reactive $size)
+  (define (reactive->vector $reactive $size)
     (eval
-      (syntax->datum (reactive-vector-syntax $reactive $size))
+      (syntax->datum (reactive->vector-syntax $reactive $size))
       (environment `(micascheme))))
 
   (define (reactive-counter)

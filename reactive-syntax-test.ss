@@ -51,17 +51,17 @@
 
 (check
   (equal?
-    (reactive-vector (reactive-counter) 5)
+    (reactive->vector (reactive-counter) 5)
     (vector 0 1 2 3 4)))
 
 (check
   (equal?
-    (reactive-vector (reactive-osc (pure-reactive 0.25)) 6)
+    (reactive->vector (reactive-osc (pure-reactive 0.25)) 6)
     (vector 0.0 0.25 0.5 0.75 0.0 0.25)))
 
 (check
   (equal?
-    (reactive-vector
+    (reactive->vector
       (syntax-reactive
         (test-context)
         #`(lets
