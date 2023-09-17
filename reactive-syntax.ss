@@ -81,12 +81,9 @@
             #,(reactive-syntax (syntax-reactive $context #`$body)))))
       ($other
         #`(writeln
-          `(
-            #,@(vector->list
-              (reactive->vector
-                (syntax-reactive $context #`$other)
-                10))
-            #,(datum->syntax #`+ `...))))))
+          #,(reactive->vector-syntax
+            (syntax-reactive $context #`$other)
+            10)))))
 
   (define-aux-keyword pure)
   (define-aux-keyword value)
@@ -159,10 +156,10 @@
       ($index (generate-temporary #`index))
       #`(reactive
         (unit
-          (stack #,@(reverse (unit-declarations $unit)))
-          (stack #,@(reverse (unit-initializers $unit)))
-          (stack #,@(reverse (unit-updaters $unit))))
-        #,(reactive-value $reactive))))
+          (stack #,@(map (lambda ($) #`(syntax #,$)) (reverse (unit-declarations $unit))))
+          (stack #,@(map (lambda ($) #`(syntax #,$)) (reverse (unit-initializers $unit))))
+          (stack #,@(map (lambda ($) #`(syntax #,$)) (reverse (unit-updaters $unit)))))
+        (syntax #,(reactive-value $reactive)))))
 
   (define (reactive->datum $reactive)
     (lets
