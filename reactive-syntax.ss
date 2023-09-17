@@ -22,7 +22,7 @@
     syntax-transform
     syntax-list-transform
 
-    pure)
+    pure value)
   (import (micascheme))
 
   (data (context lookup-fn))
@@ -74,11 +74,21 @@
             #,(datum->syntax #`+ `...))))))
 
   (define-aux-keyword pure)
+  (define-aux-keyword value)
 
   (define (syntax-reactive $context $syntax)
-    (syntax-case $syntax (lets reactive var init update apply pure)
+    (syntax-case $syntax (value lets reactive var init update apply pure)
       ((pure $body)
         (pure-reactive #`$body))
+      ((value $var $init $update)
+        (lets
+          ($value (generate-temporary #`value))
+          (reactive
+            (unit
+              (stack #`(define #,$value))
+              (stack #`(set! #,$value #,$init))
+              (stack #`(set! #,$value #,$update)))
+            $value)))
       ((lets $body)
         (syntax-reactive $context #`$body))
       ((lets ($var $expr) $rest ... $body)
