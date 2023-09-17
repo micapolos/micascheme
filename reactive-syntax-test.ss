@@ -28,7 +28,6 @@
         #`128))
     `(reactive
       (declarations)
-      (initializers)
       (updaters)
       (value 128))))
 
@@ -39,8 +38,7 @@
         (empty-context)
         #`(unit n 0 (+ n 1))))
     `(reactive
-      (declarations (define $n))
-      (initializers (set! $n 0))
+      (declarations (define $n 0))
       (updaters (set! $n (+ $n 1)))
       (value $n))))
 
@@ -54,11 +52,8 @@
           (+ counter counter))))
     `(reactive
       (declarations
-        (define $n)
-        (define $counter))
-      (initializers
-        (set! $n 0)
-        (set! $counter $n))
+        (define $n 0)
+        (define $counter $n))
       (updaters
         (set! $n (+ $n 1))
         (set! $counter $n))
@@ -74,13 +69,9 @@
           (unit x 0 (+ x counter)))))
     `(reactive
       (declarations
-        (define $c)
-        (define $counter)
-        (define $x))
-      (initializers
-        (set! $c 0)
-        (set! $counter $c)
-        (set! $x 0))
+        (define $c 0)
+        (define $counter $c)
+        (define $x 0))
       (updaters
         (set! $c (+ $c 1))
         (set! $counter $c)
@@ -98,8 +89,7 @@
       (define-property counter reactive
         (reactive
           (deps
-            (stack #'(define $n))
-            (stack #'(set! $n 0))
+            (stack #'(define $n 0))
             (stack #'(set! $n (+ $n 1))))
           #'$n)))))
 
@@ -112,8 +102,7 @@
     `(writeln
       (let ()
         (define $vector (make-vector 10))
-        (define $x)
-        (set! $x 0)
+        (define $x 0)
         (do!
           (($index 0 (+ $index 1)))
           ((= $index 10) $vector)

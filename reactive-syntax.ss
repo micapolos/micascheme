@@ -3,7 +3,7 @@
     context context? context-lookup-fn
     empty-context lookup-context context-bind context-ref
 
-    deps deps? deps-declarations deps-initializers deps-updaters
+    deps deps? deps-declarations deps-updaters
     empty-deps
     deps+
 
@@ -26,7 +26,7 @@
   (import (micascheme))
 
   (data (context bindings lookup-fn))
-  (data (deps declarations initializers updaters))
+  (data (deps declarations updaters))
   (data (reactive deps value))
 
   (define (empty-context)
@@ -48,12 +48,11 @@
       ((context-lookup-fn $context) $id)))
 
   (define (empty-deps)
-    (deps (stack) (stack) (stack)))
+    (deps (stack) (stack)))
 
   (define (deps+ $a $b)
     (deps
       (push-all (deps-declarations $a) (deps-declarations $b))
-      (push-all (deps-initializers $a) (deps-initializers $b))
       (push-all (deps-updaters $a) (deps-updaters $b))))
 
   (define (pure-reactive $value)
@@ -102,8 +101,7 @@
                 (lambda ($update)
                   (reactive
                     (deps
-                      (stack #`(define #,$tmp))
-                      (stack #`(set! #,$tmp #,$init))
+                      (stack #`(define #,$tmp #,$init))
                       (stack #`(set! #,$tmp #,$update)))
                     $tmp)))))))
       ((lets $body)
@@ -117,8 +115,7 @@
               ($reactive
                 (reactive
                   (deps
-                    (stack #`(define #,$tmp))
-                    (stack #`(set! #,$tmp #,$expr))
+                    (stack #`(define #,$tmp #,$expr))
                     (stack #`(set! #,$tmp #,$expr)))
                   $tmp))
               (reactive-bind $reactive
@@ -157,7 +154,6 @@
       #`(reactive
         (deps
           (stack #,@(map (lambda ($) #`(syntax #,$)) (reverse (deps-declarations $deps))))
-          (stack #,@(map (lambda ($) #`(syntax #,$)) (reverse (deps-initializers $deps))))
           (stack #,@(map (lambda ($) #`(syntax #,$)) (reverse (deps-updaters $deps)))))
         (syntax #,(reactive-value $reactive)))))
 
@@ -169,7 +165,6 @@
       ($index (generate-temporary #`index))
       `(reactive
         (declarations ,@(reverse (map syntax->datum (deps-declarations $deps))))
-        (initializers ,@(reverse (map syntax->datum (deps-initializers $deps))))
         (updaters ,@(reverse (map syntax->datum (deps-updaters $deps))))
         (value ,(syntax->datum (reactive-value $reactive))))))
 
@@ -182,7 +177,6 @@
       #`(let ()
         (define #,$vector (make-vector #,$size))
         #,@(reverse (deps-declarations $deps))
-        #,@(reverse (deps-initializers $deps))
         (do!
           ((#,$index 0 (+ #,$index 1)))
           ((= #,$index #,$size) #,$vector)
@@ -199,8 +193,7 @@
       ($counter (generate-temporary #`counter))
       (reactive
         (deps
-          (stack #`(define #,$counter))
-          (stack #`(set! #,$counter 0))
+          (stack #`(define #,$counter 0))
           (stack #`(set! #,$counter (+ #,$counter 1))))
         $counter)))
 
@@ -211,8 +204,7 @@
           ($osc (generate-temporary #`osc))
           (reactive
             (deps
-              (stack #`(define #,$osc))
-              (stack #`(set! #,$osc 0.0))
+              (stack #`(define #,$osc 0.0))
               (stack #`(set! #,$osc (fract (+ #,$osc #,$delta)))))
             $osc)))))
 )
