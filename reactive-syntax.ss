@@ -1,5 +1,8 @@
 (library (reactive-syntax)
   (export
+    context context? context-lookup-fn
+    empty-context
+
     unit unit? unit-declarations unit-initializers unit-updaters
     empty-unit
     unit+
@@ -9,14 +12,22 @@
     reactive-bind
 
     syntax-reactive
+    reactive-syntax
     reactive-datum
     reactive-vector-syntax
     reactive-vector
-    counter)
+    reactive-counter
+
+    syntax-transform
+    syntax-list-transform)
   (import (micascheme))
 
+  (data (context lookup-fn))
   (data (unit declarations initializers updaters))
   (data (reactive unit value))
+
+  (define (empty-context)
+    (context (lambda ($id) #f)))
 
   (define (empty-unit)
     (unit (stack) (stack) (stack)))
@@ -39,16 +50,34 @@
           (reactive-unit $fn-reactive))
         (reactive-value $fn-reactive))))
 
-  (define (syntax-reactive $syntax)
-    (syntax-case $syntax (lets counter)
-      (counter
-        (counter))
+  (define (syntax-list-transform $context $syntax-list)
+    #`(begin
+      #,@(map (partial syntax-transform $context) $syntax-list)))
+
+  (define (syntax-transform $context $syntax)
+    (syntax-case $syntax (define)
+      ((define $id $body) (identifier? #`$id)
+        #`(begin
+          (define-aux-keyword $id)
+          (define-property $id reactive
+            #,(reactive-syntax (syntax-reactive $context #`$body)))))
+      ($other
+        #`(writeln
+          `(
+            #,@(vector->list
+              (reactive-vector
+                (syntax-reactive $context #`$other)
+                10))
+            #,(datum->syntax #`+ `...))))))
+
+  (define (syntax-reactive $context $syntax)
+    (syntax-case $syntax (lets reactive var init update)
       ((lets $body)
-        (syntax-reactive #`$body))
+        (syntax-reactive $context #`$body))
       ((lets ($var $expr) $rest ... $body)
-        (reactive-bind (syntax-reactive #`$expr)
+        (reactive-bind (syntax-reactive $context #`$expr)
           (lambda ($expr)
-            (reactive-bind (syntax-reactive #`(lets $rest ... $body))
+            (reactive-bind (syntax-reactive $context #`(lets $rest ... $body))
               (lambda ($body)
                 (pure-reactive
                   #`(let (($var #,$expr))
@@ -59,7 +88,7 @@
             (lambda ($stack $syntax)
               (reactive-bind $stack
                 (lambda ($stack)
-                  (reactive-bind (syntax-reactive $syntax)
+                  (reactive-bind (syntax-reactive $context $syntax)
                     (lambda ($item)
                       (pure-reactive
                         (push $stack $item)))))))
@@ -68,8 +97,25 @@
           (lambda ($stack)
             (pure-reactive
               #`(#,@(reverse $stack))))))
+      ($id (identifier? #`$id)
+        (or
+          ((context-lookup-fn $context) #`$id)
+          (pure-reactive #`$id)))
       ($other
         (pure-reactive #`$other))))
+
+  (define (reactive-syntax $reactive)
+    (lets
+      ($unit (reactive-unit $reactive))
+      ($value (reactive-value $reactive))
+      ($vector (generate-temporary #`vector))
+      ($index (generate-temporary #`index))
+      #`(reactive
+        (unit
+          (stack #,@(reverse (unit-declarations $unit)))
+          (stack #,@(reverse (unit-initializers $unit)))
+          (stack #,@(reverse (unit-updaters $unit))))
+        #,(reactive-value $reactive))))
 
   (define (reactive-datum $reactive)
     (lets
@@ -104,7 +150,7 @@
       (syntax->datum (reactive-vector-syntax $reactive $size))
       (environment `(micascheme))))
 
-  (define (counter)
+  (define (reactive-counter)
     (lets
       ($counter (generate-temporary #`counter))
       (reactive

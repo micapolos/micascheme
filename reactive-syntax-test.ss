@@ -1,8 +1,20 @@
 (import (micascheme) (reactive-syntax))
 
+(define-aux-keyword counter)
+
+(define (counter-context)
+  (context
+    (lambda ($id)
+      (and
+        (free-identifier=? $id #`counter)
+        (reactive-counter)))))
+
 (check
   (equal?
-    (reactive-datum (syntax-reactive #`128))
+    (reactive-datum
+      (syntax-reactive
+        (empty-context)
+        #`128))
     `(reactive
       (declarations)
       (initializers)
@@ -11,7 +23,10 @@
 
 (check
   (equal?
-    (reactive-datum (syntax-reactive #`counter))
+    (reactive-datum
+      (syntax-reactive
+        (counter-context)
+        #`counter))
     `(reactive
       (declarations (define $counter -1))
       (initializers)
@@ -22,6 +37,7 @@
   (equal?
     (reactive-datum
       (syntax-reactive
+        (counter-context)
         #`(lets
           ($n counter)
           (+ $n $n))))
@@ -33,16 +49,16 @@
 
 (check
   (equal?
-    (reactive-vector (counter) 5)
+    (reactive-vector (reactive-counter) 5)
     (vector 0 1 2 3 4)))
 
 (check
   (equal?
     (reactive-vector
       (syntax-reactive
+        (counter-context)
         #`(lets
           ($n counter)
           (+ $n $n)))
       5)
     (vector 0 2 4 6 8)))
-
