@@ -108,7 +108,7 @@
                     $tmp)))))))
       ((lets $body)
         (syntax-reactive $context #`$body))
-      ((lets ($var $expr) $rest ... $body) (identifier? #`$var)
+      ((lets (($var $param ...) $expr) $rest ... $body) (identifier? #`$var)
         (reactive-bind (syntax-reactive $context #`$expr)
           (lambda ($expr)
             (lets
@@ -124,6 +124,8 @@
               (reactive-bind $reactive
                 (lambda (_)
                   (syntax-reactive $context #`(lets $rest ... $body))))))))
+      ((lets ($var $expr) $rest ... $body) (identifier? #`$var)
+        (syntax-reactive $context #`(lets (($var) $expr) $rest ... $body)))
       ((apply $item ...)
         (reactive-bind
           (fold-left
