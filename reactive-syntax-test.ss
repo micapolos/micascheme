@@ -51,6 +51,26 @@
 
 (check
   (equal?
+    (reactive->vector
+      (syntax-reactive
+        (empty-context)
+        #`(value $val 0 (+ $val 1)))
+      5)
+    (vector 0 1 2 3 4)))
+
+(check
+  (equal?
+    (reactive->vector
+      (syntax-reactive
+        (empty-context)
+        #`(+
+          (value x 0 (+ x 1))
+          (value x 0 (+ x 100))))
+      5)
+    (vector 0 101 202 303 404)))
+
+(check
+  (equal?
     (reactive->vector (reactive-counter) 5)
     (vector 0 1 2 3 4)))
 

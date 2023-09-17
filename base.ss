@@ -376,7 +376,8 @@
                   (source-object-column source))
                 ""))
             #`(let (#,@let-cases)
-              (or (parameterize ((checking? #t)) (not (pred #,@tmps)))
+              (or
+                (parameterize ((checking? #t)) (not (pred #,@tmps)))
                 (error `check 
                   (format "\n~a   expr: ~s\n  value: ~s\n"
                     #,ann-string
@@ -397,7 +398,8 @@
                   (source-object-column source))
                 ""))
             #`(let (#,@let-cases)
-              (or (parameterize ((checking? #t)) (pred #,@tmps))
+              (or
+                (parameterize ((checking? #t)) (pred #,@tmps))
                 (error `check 
                   (format "\n~a   expr: ~s\n  value: ~s\n"
                     #,ann-string

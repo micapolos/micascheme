@@ -80,15 +80,15 @@
     (syntax-case $syntax (value lets reactive var init update apply pure)
       ((pure $body)
         (pure-reactive #`$body))
-      ((value $var $init $update)
+      ((value $var $init $update) (identifier? #`$var)
         (lets
-          ($value (generate-temporary #`value))
+          ($tmp (car (generate-temporaries `(tmp))))
           (reactive
             (unit
-              (stack #`(define #,$value))
-              (stack #`(set! #,$value #,$init))
-              (stack #`(set! #,$value #,$update)))
-            $value)))
+              (stack #`(define #,$tmp))
+              (stack #`(set! #,$tmp (lets ($var #,$tmp) $init)))
+              (stack #`(set! #,$tmp (lets ($var #,$tmp) $update))))
+            #`(lets ($var #,$tmp) $var))))
       ((lets $body)
         (syntax-reactive $context #`$body))
       ((lets ($var $expr) $rest ... $body)
