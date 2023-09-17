@@ -17,9 +17,12 @@
     reactive-vector-syntax
     reactive-vector
     reactive-counter
+    reactive-osc
 
     syntax-transform
-    syntax-list-transform)
+    syntax-list-transform
+
+    pure)
   (import (micascheme))
 
   (data (context lookup-fn))
@@ -70,8 +73,12 @@
                 10))
             #,(datum->syntax #`+ `...))))))
 
+  (define-aux-keyword pure)
+
   (define (syntax-reactive $context $syntax)
-    (syntax-case $syntax (lets reactive var init update)
+    (syntax-case $syntax (lets reactive var init update apply pure)
+      ((pure $body)
+        (pure-reactive #`$body))
       ((lets $body)
         (syntax-reactive $context #`$body))
       ((lets ($var $expr) $rest ... $body)
@@ -82,7 +89,7 @@
                 (pure-reactive
                   #`(let (($var #,$expr))
                     #,$body)))))))
-      (($item ...)
+      ((apply $item ...)
         (reactive-bind
           (fold-left
             (lambda ($stack $syntax)
@@ -100,9 +107,12 @@
       ($id (identifier? #`$id)
         (or
           ((context-lookup-fn $context) #`$id)
-          (pure-reactive #`$id)))
-      ($other
-        (pure-reactive #`$other))))
+          (syntax-reactive $context #`(pure $id))))
+      (($item ...)
+        (syntax-reactive $context #`(apply $item ...)))
+      ($item
+        (syntax-reactive $context #`(pure $item)))))
+
 
   (define (reactive-syntax $reactive)
     (lets
@@ -159,4 +169,16 @@
           (stack #`(set! #,$counter -1))
           (stack #`(set! #,$counter (+ #,$counter 1))))
         $counter)))
+
+  (define (reactive-osc $delta)
+    (reactive-bind $delta
+      (lambda ($delta)
+        (lets
+          ($osc (generate-temporary #`osc))
+          (reactive
+            (unit
+              (stack #`(define #,$osc))
+              (stack #`(set! #,$osc (- #,$delta)))
+              (stack #`(set! #,$osc (fract (+ #,$osc #,$delta)))))
+            $osc)))))
 )

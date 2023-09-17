@@ -1,13 +1,15 @@
 (import (micascheme) (reactive-syntax))
 
 (define-aux-keyword counter)
+(define-aux-keyword osc)
 
-(define (counter-context)
+(define (test-context)
   (context
     (lambda ($id)
-      (and
-        (free-identifier=? $id #`counter)
-        (reactive-counter)))))
+      (cond
+        ((free-identifier=? $id #`counter) (reactive-counter))
+        ((free-identifier=? $id #`osc) reactive-osc)
+        (else #f)))))
 
 (check
   (equal?
@@ -25,7 +27,7 @@
   (equal?
     (reactive-datum
       (syntax-reactive
-        (counter-context)
+        (test-context)
         #`counter))
     `(reactive
       (declarations (define $counter))
@@ -37,7 +39,7 @@
   (equal?
     (reactive-datum
       (syntax-reactive
-        (counter-context)
+        (test-context)
         #`(lets
           ($n counter)
           (+ $n $n))))
@@ -54,9 +56,14 @@
 
 (check
   (equal?
+    (reactive-vector (reactive-osc (pure-reactive 0.25)) 6)
+    (vector 0.0 0.25 0.5 0.75 0.0 0.25)))
+
+(check
+  (equal?
     (reactive-vector
       (syntax-reactive
-        (counter-context)
+        (test-context)
         #`(lets
           ($n counter)
           (+ $n $n)))
