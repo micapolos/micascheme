@@ -156,19 +156,12 @@
                   (syntax-reactive $context #`(lets $rest ... $body))))))))
       ((apply $item ...)
         (reactive-bind
-          (fold-left
-            (lambda ($stack $syntax)
-              (reactive-bind $stack
-                (lambda ($stack)
-                  (reactive-bind (syntax-reactive $context $syntax)
-                    (lambda ($item)
-                      (pure-reactive
-                        (push $stack $item)))))))
-            (pure-reactive (stack))
-            (syntax->list #`($item ...)))
-          (lambda ($stack)
-            (pure-reactive
-              #`(#,@(reverse $stack))))))
+          (reactive-list
+            (map
+              (partial syntax-reactive $context)
+              (syntax->list #`($item ...))))
+          (lambda ($list)
+            (pure-reactive #`(#,@$list)))))
       ($id (identifier? #`$id)
         (or
           (context-ref $context #`$id)
