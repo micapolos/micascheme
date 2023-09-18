@@ -12,8 +12,6 @@
     reactive-bind
     reactive-list
 
-    function function? function-proc
-
     syntax-reactive
     reactive-syntax
     reactive->datum
@@ -31,7 +29,6 @@
   (data (context bindings lookup-fn))
   (data (deps declarations updaters))
   (data (reactive deps value))
-  (data (function proc))
 
   (define (empty-context)
     (lookup-context (lambda (_) #f)))
@@ -120,15 +117,14 @@
                       (stack #`(set! #,$tmp #,$update)))
                     $tmp)))))))
       ((lambda ($param ...) $body)
-        (function
-          (lambda $reactives
-            (reactive-bind
-              (reactive-list $reactives)
-              (lambda ($items)
-                (lets
-                  ($params (syntax->list #`($param ...)))
-                  ($context (fold-left context-bind $context $params (map pure-reactive $items)))
-                  (syntax-reactive $context #`$body)))))))
+        (lambda $reactives
+          (reactive-bind
+            (reactive-list $reactives)
+            (lambda ($items)
+              (lets
+                ($params (syntax->list #`($param ...)))
+                ($context (fold-left context-bind $context $params (map pure-reactive $items)))
+                (syntax-reactive $context #`$body))))))
       ((lets $body)
         (syntax-reactive $context #`$body))
       ((lets ($var $expr) $rest ... $body) (identifier? #`$var)

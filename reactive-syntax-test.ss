@@ -59,10 +59,9 @@
   (equal?
     (reactive->datum
       (
-        (function-proc
-          (syntax-reactive
-            (empty-context)
-            #`(lambda (d) (unit n 0 (+ n d)))))
+        (syntax-reactive
+          (empty-context)
+          #`(lambda (d) (unit n 0 (+ n d))))
         (reactive
           (deps
             (stack #`(define $arg 0))
