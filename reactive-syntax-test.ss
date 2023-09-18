@@ -149,6 +149,24 @@
     (syntax->datum
       (syntax-transform
         (empty-context)
+        #`(define (osc dt) (unit t 0 (+ t dt)))))
+    `(begin
+      (define-aux-keyword osc)
+      (define-property osc reactive
+        (lambda (dt)
+          (reactive-bind dt
+            (lambda ($dt)
+              (reactive
+                (deps
+                  (stack (syntax (define $t 0)))
+                  (stack (syntax (set! $t (+ $t $dt)))))
+                (syntax $t)))))))))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-transform
+        (empty-context)
         #`(unit x 0 (+ x 1))))
     `(writeln
       (let ()

@@ -85,13 +85,33 @@
 
   (define (syntax-transform $context $syntax)
     (syntax-case $syntax (define)
-      ((define $id $body) (identifier? #`$id)
+      ((define $id $body)
+        (identifier? #`$id)
         #`(begin
           (define-aux-keyword $id)
           (define-property $id reactive
             #,(reactive-syntax
               (syntax-reactive $context
                 #`$body)))))
+      ((define ($id $param ...) $body)
+        (for-all identifier? (syntax->list #`($id $param ...)))
+        #`(begin
+          (define-aux-keyword $id)
+          (define-property $id reactive
+            #,(lets
+              ($params (syntax->list #`($param ...)))
+              ($tmps (map generate-temporary (syntax->list $params)))
+              ($context (fold-left context-bind $context $params (map pure-reactive $tmps)))
+              ($reactive-body (syntax-reactive $context #`$body))
+              ($body-syntax (reactive-syntax $reactive-body))
+              ($bind-syntax
+                (fold-left
+                  (lambda ($syntax $param $tmp)
+                    #`(reactive-bind #,$param
+                      (lambda (#,$tmp) #,$syntax)))
+                  $body-syntax
+                  $params $tmps))
+              #`(lambda ($param ...) #,$bind-syntax)))))
       ($other
         #`(writeln
           #,(reactive->vector-syntax
