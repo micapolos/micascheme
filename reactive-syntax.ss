@@ -12,6 +12,8 @@
     reactive-bind
     reactive-list
 
+    function function? function-proc
+
     syntax-reactive
     reactive-syntax
     reactive->datum
@@ -117,26 +119,16 @@
                       (stack #`(define #,$tmp #,$init))
                       (stack #`(set! #,$tmp #,$update)))
                     $tmp)))))))
-      ; ((lambda ($param ...) $body)
-      ;   (function
-      ;     (lambda $reactives
-      ;       (reactive-bind
-      ;         )
-      ;       (fold-left
-      ;         (lambda ($stack $reactive)
-      ;           (reactive-bind $stack
-      ;             (lambda ($stack)
-      ;               (reactive-bind $reactive
-      ;                 (lambda ($item)
-      ;                   (pure-reactive
-      ;                     (push $stack $item)))))))
-      ;         (pure-reactive (stack))
-      ;         $reactives)
-      ;   (lets
-      ;     ($params (syntax->list #`($param ...)))
-      ;     ($tmps (map generate-temporary $params))
-      ;     ($context (fold-left context-bind $context $params (map pure-reactive $tmps)))
-      ;     ($reactive-body (syntax-reactive $context #`$body))
+      ((lambda ($param ...) $body)
+        (function
+          (lambda $reactives
+            (reactive-bind
+              (reactive-list $reactives)
+              (lambda ($items)
+                (lets
+                  ($params (syntax->list #`($param ...)))
+                  ($context (fold-left context-bind $context $params (map pure-reactive $items)))
+                  (syntax-reactive $context #`$body)))))))
       ((lets $body)
         (syntax-reactive $context #`$body))
       ((lets ($var $expr) $rest ... $body) (identifier? #`$var)

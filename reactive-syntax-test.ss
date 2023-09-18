@@ -58,6 +58,28 @@
 (check
   (equal?
     (reactive->datum
+      (
+        (function-proc
+          (syntax-reactive
+            (empty-context)
+            #`(lambda (d) (unit n 0 (+ n d)))))
+        (reactive
+          (deps
+            (stack #`(define $arg 0))
+            (stack #`(set! $arg (+ $arg 1))))
+          #`$arg)))
+    `(reactive
+      (declarations
+        (define $arg 0)
+        (define $n 0))
+      (updaters
+        (set! $arg (+ $arg 1))
+        (set! $n (+ $n $arg)))
+      (value $n))))
+
+(check
+  (equal?
+    (reactive->datum
       (syntax-reactive
         (empty-context)
         #`(lets
