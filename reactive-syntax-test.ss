@@ -1,8 +1,5 @@
 (import (micascheme) (reactive-syntax))
 
-(define-aux-keyword counter)
-(define-aux-keyword osc)
-
 (let ()
   (define $context
     (context
@@ -158,9 +155,9 @@
             (lambda ($dt)
               (reactive
                 (deps
-                  (stack (syntax (define $t 0)))
-                  (stack (syntax (set! $t (+ $t $dt)))))
-                (syntax $t)))))))))
+                  (stack #'(define $t 0))
+                  (stack #'(set! $t (+ $t $dt))))
+                #'$t))))))))
 
 (check
   (equal?
