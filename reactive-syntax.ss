@@ -142,14 +142,22 @@
               (reactive-bind $reactive
                 (lambda (_)
                   (syntax-reactive $context #`(lets $rest ... $body))))))))
-      ((apply $item ...)
-        (reactive-bind
-          (reactive-list
+      ((apply $fn $arg ...)
+        (lets
+          ($fn (syntax-reactive $context #`$fn))
+          ($args
             (map
               (partial syntax-reactive $context)
-              (syntax->list #`($item ...))))
-          (lambda ($list)
-            (pure-reactive #`(#,@$list)))))
+              (syntax->list #`($arg ...))))
+          (switch $fn
+            ((reactive? $reactive-fn)
+              (reactive-bind $reactive-fn
+                (lambda ($fn)
+                  (reactive-bind (reactive-list $args)
+                    (lambda ($args)
+                      (pure-reactive #`(#,$fn #,@$args)))))))
+            ((else $proc)
+              (apply $proc $args)))))
       ($id (identifier? #`$id)
         (or
           (context-ref $context #`$id)

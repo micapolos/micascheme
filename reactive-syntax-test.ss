@@ -81,6 +81,23 @@
     (reactive->datum
       (syntax-reactive
         (empty-context)
+        #`(apply
+          (lambda (d) (unit n 0 (+ n d)))
+          (unit x 0 (+ x 1)))))
+    `(reactive
+      (declarations
+        (define $x 0)
+        (define $n 0))
+      (updaters
+        (set! $x (+ $x 1))
+        (set! $n (+ $n $x)))
+      (value $n))))
+
+(check
+  (equal?
+    (reactive->datum
+      (syntax-reactive
+        (empty-context)
         #`(lets
           (counter (unit n 0 (+ n 1)))
           (+ counter counter))))
