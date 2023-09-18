@@ -1,4 +1,7 @@
 (import (micascheme) (reactive))
 
 (reactive
-  (unit n 0 (+ n 1)))
+  (define zero 0)
+  (define counter (unit x 0 (+ x 1)))
+  ;(define (osc d) (unit x 0 (+ x d)))
+  )

@@ -89,7 +89,9 @@
         #`(begin
           (define-aux-keyword $id)
           (define-property $id reactive
-            #,(reactive-syntax (syntax-reactive $context #`$body)))))
+            #,(reactive-syntax
+              (syntax-reactive $context
+                #`$body)))))
       ($other
         #`(writeln
           #,(reactive->vector-syntax
