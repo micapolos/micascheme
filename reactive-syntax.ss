@@ -10,6 +10,7 @@
     reactive reactive? reactive-deps reactive-value
     pure-reactive
     reactive-bind
+    reactive-list
 
     syntax-reactive
     reactive-syntax
@@ -28,6 +29,7 @@
   (data (context bindings lookup-fn))
   (data (deps declarations updaters))
   (data (reactive deps value))
+  (data (function proc))
 
   (define (empty-context)
     (lookup-context (lambda (_) #f)))
@@ -67,6 +69,17 @@
           (reactive-deps $fn-reactive))
         (reactive-value $fn-reactive))))
 
+  (define (reactive-list $reactives)
+    (cond
+      ((null? $reactives)
+        (pure-reactive (list)))
+      (else
+        (reactive-bind (car $reactives)
+          (lambda ($car)
+            (reactive-bind (reactive-list (cdr $reactives))
+              (lambda ($cdr)
+                (pure-reactive (cons $car $cdr)))))))))
+
   (define (syntax-list-transform $context $syntax-list)
     #`(begin
       #,@(map (partial syntax-transform $context) $syntax-list)))
@@ -88,7 +101,7 @@
   (define-aux-keyword unit)
 
   (define (syntax-reactive $context $syntax)
-    (syntax-case $syntax (unit lets reactive apply pure)
+    (syntax-case $syntax (unit lets reactive apply pure lambda)
       ((pure $body)
         (pure-reactive #`$body))
       ((unit $var $init $update) (identifier? #`$var)
@@ -104,6 +117,26 @@
                       (stack #`(define #,$tmp #,$init))
                       (stack #`(set! #,$tmp #,$update)))
                     $tmp)))))))
+      ; ((lambda ($param ...) $body)
+      ;   (function
+      ;     (lambda $reactives
+      ;       (reactive-bind
+      ;         )
+      ;       (fold-left
+      ;         (lambda ($stack $reactive)
+      ;           (reactive-bind $stack
+      ;             (lambda ($stack)
+      ;               (reactive-bind $reactive
+      ;                 (lambda ($item)
+      ;                   (pure-reactive
+      ;                     (push $stack $item)))))))
+      ;         (pure-reactive (stack))
+      ;         $reactives)
+      ;   (lets
+      ;     ($params (syntax->list #`($param ...)))
+      ;     ($tmps (map generate-temporary $params))
+      ;     ($context (fold-left context-bind $context $params (map pure-reactive $tmps)))
+      ;     ($reactive-body (syntax-reactive $context #`$body))
       ((lets $body)
         (syntax-reactive $context #`$body))
       ((lets ($var $expr) $rest ... $body) (identifier? #`$var)

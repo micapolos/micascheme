@@ -34,6 +34,19 @@
 (check
   (equal?
     (reactive->datum
+      (reactive-list
+        (list
+          (reactive (deps (stack #`def1) (stack #`update1)) #`value1)
+          (reactive (deps (stack #`def2) (stack #`update2)) #`value2)
+          (reactive (deps (stack #`def3) (stack #`update3)) #`value3))))
+    `(reactive
+      (declarations def1 def2 def3)
+      (updaters update1 update2 update3)
+      (value (value1 value2 value3)))))
+
+(check
+  (equal?
+    (reactive->datum
       (syntax-reactive
         (empty-context)
         #`(unit n 0 (+ n 1))))
