@@ -19,6 +19,48 @@
 
 (check
   (equal?
+    (syntax->datum
+      (reactive-syntax
+        (reactive
+          (deps
+            (stack #`def1 #`def2)
+            (stack #`fn1 #`fn2))
+          #`val)))
+    `(reactive
+      (deps
+        (stack (syntax def1) (syntax def2))
+        (stack (syntax fn1) (syntax fn2)))
+      (syntax val))))
+
+(check
+  (equal?
+    (syntax->datum
+      (reactive-syntax
+        (template 2
+          (lambda ($1 $2)
+            (reactive-bind $1
+              (lambda ($1)
+                (reactive-bind $2
+                  (lambda ($2)
+                    (reactive
+                      (deps
+                        (stack #`(def #,$1) #`(def #,$2))
+                        (stack #`(update! #,$1) #`(update! #,$2)))
+                    #`value)))))))))
+    `(template 2
+      (lambda ($reactive0 $reactive1)
+        (reactive-bind $reactive0
+          (lambda ($value0)
+            (reactive-bind $reactive1
+              (lambda ($value1)
+                (reactive
+                  (deps
+                    (stack (syntax (def $value0)) (syntax (def $value1)))
+                    (stack (syntax (update! $value0)) (syntax (update! $value1))))
+                  (syntax value))))))))))
+
+(check
+  (equal?
     (reactive->datum
       (syntax-reactive
         (empty-context)
@@ -56,9 +98,10 @@
   (equal?
     (reactive->datum
       (
-        (syntax-reactive
-          (empty-context)
-          #`(lambda (d) (unit n 0 (+ n d))))
+        (template-fn
+          (syntax-reactive
+            (empty-context)
+            #`(lambda (d) (unit n 0 (+ n d)))))
         (reactive
           (deps
             (stack #`(define $arg 0))
@@ -146,18 +189,38 @@
     (syntax->datum
       (syntax-transform
         (empty-context)
+        #`(define osc (lambda (dt) (unit t 0 (+ t dt))))))
+    `(begin
+      (define-aux-keyword osc)
+      (define-property osc reactive
+        (template 1
+          (lambda ($reactive0)
+            (reactive-bind $reactive0
+              (lambda ($value0)
+                (reactive
+                  (deps
+                    (stack #'(define $t 0))
+                    (stack #'(set! $t (+ $t $value0))))
+                  #'$t)))))))))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-transform
+        (empty-context)
         #`(define (osc dt) (unit t 0 (+ t dt)))))
     `(begin
       (define-aux-keyword osc)
       (define-property osc reactive
-        (lambda (dt)
-          (reactive-bind dt
-            (lambda ($dt)
-              (reactive
-                (deps
-                  (stack #'(define $t 0))
-                  (stack #'(set! $t (+ $t $dt))))
-                #'$t))))))))
+        (template 1
+          (lambda ($reactive0)
+            (reactive-bind $reactive0
+              (lambda ($value0)
+                (reactive
+                  (deps
+                    (stack (syntax (define $t 0)))
+                    (stack (syntax (set! $t (+ $t $value0)))))
+                  (syntax $t))))))))))
 
 (check
   (equal?
@@ -225,5 +288,16 @@
         #`(lets
           ($counter (unit $n 0 (+ $n 1)))
           (unit $acc 0 (+ $acc $counter))))
+      5)
+    (vector 0 1 3 6 10)))
+
+(check
+  (equal?
+    (reactive->vector
+      (syntax-reactive
+        (empty-context)
+        #`(apply
+          (lambda (dt) (unit t 0 (+ t dt)))
+          (unit x 0 (+ x 1))))
       5)
     (vector 0 1 3 6 10)))
