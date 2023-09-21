@@ -153,6 +153,11 @@
               (sequential-bind $sequential
                 (lambda (_)
                   (syntax-sequential $context #`(lets $rest ... $body))))))))
+      ((lets (($var $param ...) $expr) $rest ... $body) (identifier? #`$var)
+        (lets
+          ($template (template (syntax->list #`($param ...)) #`$expr))
+          ($context (context-bind $context #`$var $template))
+          (syntax-sequential $context #`(lets $rest ... $body))))
       ((apply $fn $arg ...)
         (lets
           ($fn (syntax-sequential $context #`$fn))

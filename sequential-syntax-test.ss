@@ -106,6 +106,19 @@
       (syntax-sequential
         (empty-context)
         #`(lets
+          ((osc dx) (sequence 0 x (fract (+ x dx))))
+          (osc 0.25))))
+    `(sequential
+      (declarations (define $x 0))
+      (updaters (set! $x (fract (+ $x 0.25))))
+      (value $x))))
+
+(check
+  (equal?
+    (sequential->datum
+      (syntax-sequential
+        (empty-context)
+        #`(lets
           (counter (sequence 0 c (+ c 1)))
           (sequence 0 x (+ x counter)))))
     `(sequential
