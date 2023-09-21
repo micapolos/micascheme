@@ -34,33 +34,6 @@
 
 (check
   (equal?
-    (syntax->datum
-      (reactive-syntax
-        (template 2
-          (lambda ($1 $2)
-            (reactive-bind $1
-              (lambda ($1)
-                (reactive-bind $2
-                  (lambda ($2)
-                    (reactive
-                      (deps
-                        (stack #`(def #,$1) #`(def #,$2))
-                        (stack #`(update! #,$1) #`(update! #,$2)))
-                    #`value)))))))))
-    `(template 2
-      (lambda ($reactive0 $reactive1)
-        (reactive-bind $reactive0
-          (lambda ($value0)
-            (reactive-bind $reactive1
-              (lambda ($value1)
-                (reactive
-                  (deps
-                    (stack (syntax (def $value0)) (syntax (def $value1)))
-                    (stack (syntax (update! $value0)) (syntax (update! $value1))))
-                  (syntax value))))))))))
-
-(check
-  (equal?
     (reactive->datum
       (syntax-reactive
         (empty-context)
@@ -97,40 +70,17 @@
 (check
   (equal?
     (reactive->datum
-      (
-        (template-fn
-          (syntax-reactive
-            (empty-context)
-            #`(lambda (d) (unit n 0 (+ n d)))))
-        (reactive
-          (deps
-            (stack #`(define $arg 0))
-            (stack #`(set! $arg (+ $arg 1))))
-          #`$arg)))
-    `(reactive
-      (declarations
-        (define $arg 0)
-        (define $n 0))
-      (updaters
-        (set! $arg (+ $arg 1))
-        (set! $n (+ $n $arg)))
-      (value $n))))
-
-(check
-  (equal?
-    (reactive->datum
-      (syntax-reactive
-        (empty-context)
+      (syntax-reactive (empty-context)
         #`(apply
           (lambda (d) (unit n 0 (+ n d)))
-          (unit x 0 (+ x 1)))))
+          (unit v 0 (+ v 1)))))
     `(reactive
       (declarations
-        (define $x 0)
+        (define $v 0)
         (define $n 0))
       (updaters
-        (set! $x (+ $x 1))
-        (set! $n (+ $n $x)))
+        (set! $v (+ $v 1))
+        (set! $n (+ $n $v)))
       (value $n))))
 
 (check
@@ -193,15 +143,9 @@
     `(begin
       (define-aux-keyword osc)
       (define-property osc reactive
-        (template 1
-          (lambda ($reactive0)
-            (reactive-bind $reactive0
-              (lambda ($value0)
-                (reactive
-                  (deps
-                    (stack #'(define $t 0))
-                    (stack #'(set! $t (+ $t $value0))))
-                  #'$t)))))))))
+        (template
+          (list (syntax dt))
+          (syntax (unit t 0 (+ t dt))))))))
 
 (check
   (equal?
@@ -212,15 +156,8 @@
     `(begin
       (define-aux-keyword osc)
       (define-property osc reactive
-        (template 1
-          (lambda ($reactive0)
-            (reactive-bind $reactive0
-              (lambda ($value0)
-                (reactive
-                  (deps
-                    (stack (syntax (define $t 0)))
-                    (stack (syntax (set! $t (+ $t $value0)))))
-                  (syntax $t))))))))))
+        (template (list (syntax dt))
+          (syntax (unit t 0 (+ t dt))))))))
 
 (check
   (equal?

@@ -12,7 +12,7 @@
     reactive-bind
     reactive-list
 
-    template template? template-arity template-fn
+    template template? template-params template-body
 
     syntax-reactive
     reactive-syntax
@@ -31,7 +31,7 @@
   (data (context bindings lookup-fn))
   (data (deps declarations updaters))
   (data (reactive deps value))
-  (data (template arity fn))
+  (data (template params body))
 
   (define (empty-context)
     (lookup-context (lambda (_) #f)))
@@ -131,16 +131,8 @@
                       (stack #`(set! #,$tmp #,$update)))
                     $tmp)))))))
       ((lambda ($param ...) $body)
-        (template
-          (length (syntax->list #`($param ...)))
-          (lambda $reactives
-            (reactive-bind
-              (reactive-list $reactives)
-              (lambda ($items)
-                (lets
-                  ($params (syntax->list #`($param ...)))
-                  ($context (fold-left context-bind $context $params (map pure-reactive $items)))
-                  (syntax-reactive $context #`$body)))))))
+        (for-all identifier? (syntax->list #`($param ...)))
+        (template (syntax->list #`($param ...)) #`$body))
       ((lets $body)
         (syntax-reactive $context #`$body))
       ((lets ($var $expr) $rest ... $body) (identifier? #`$var)
@@ -173,7 +165,10 @@
                     (lambda ($args)
                       (pure-reactive #`(#,$fn #,@$args)))))))
             ((template? $template)
-              (apply (template-fn $template) $args)))))
+              (lets
+                ($params (template-params $template))
+                ($context (fold-left context-bind $context $params $args))
+                (syntax-reactive $context (template-body $template)))))))
       ($id (identifier? #`$id)
         (or
           (context-ref $context #`$id)
@@ -198,36 +193,9 @@
             (syntax #,(reactive-value $reactive)))))
       ((template? $template)
         (lets
-          ($arity (template-arity $template))
-          ($body-fn (template-fn $template))
-          ($reactive-tmps
-            (map
-              (lambda ($index)
-                (generate-temporary
-                  (datum->syntax #`+
-                    (string->symbol
-                      (string-append "reactive" (number->string $index))))))
-              (indices $arity)))
-          ($value-tmps
-            (map
-              (lambda ($index)
-                (generate-temporary
-                  (datum->syntax #`+
-                    (string->symbol
-                      (string-append "value" (number->string $index))))))
-              (indices $arity)))
-          ($reactive-body (apply $body-fn (map pure-reactive $value-tmps)))
-          ($body-syntax (reactive-syntax $reactive-body))
-          ($bind-syntax
-            (fold-left
-              (lambda ($syntax $reactive-tmp $value-tmp)
-                #`(reactive-bind #,$reactive-tmp
-                  (lambda (#,$value-tmp) #,$syntax)))
-              $body-syntax
-              (reverse $reactive-tmps)
-              (reverse $value-tmps)))
-          #`(template #,$arity
-            (lambda (#,@$reactive-tmps) #,$bind-syntax))))))
+          #`(template
+            (list #,@(map (lambda ($param) #`(syntax #,$param)) (template-params $template)))
+            (syntax #,(template-body $template)))))))
 
   (define (reactive->datum $reactive)
     (lets
