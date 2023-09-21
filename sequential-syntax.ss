@@ -25,7 +25,7 @@
     syntax-transform
     syntax-list-transform
 
-    pure sequence)
+    sequence)
   (import (micascheme))
 
   (data (context bindings lookup-fn))
@@ -112,13 +112,10 @@
             (syntax-sequential $context #`$other)
             10)))))
 
-  (define-aux-keyword pure)
   (define-aux-keyword sequence)
 
   (define (syntax-sequential $context $syntax)
-    (syntax-case $syntax (sequence lets sequential apply pure)
-      ((pure $body)
-        (pure-sequential #`$body))
+    (syntax-case $syntax (sequence lets)
       ((sequence $init $var $update) (identifier? #`$var)
         (lets
           ($tmp (generate-temporary #`$var))
@@ -158,7 +155,7 @@
               #`$expr))
           ($context (context-bind $context #`$var $template))
           (syntax-sequential $context #`(lets $rest ... $body))))
-      ((apply $fn $arg ...)
+      (($fn $arg ...)
         (lets
           ($fn (syntax-sequential $context #`$fn))
           ($args
@@ -184,11 +181,9 @@
       ($id (identifier? #`$id)
         (or
           (context-ref $context #`$id)
-          (syntax-sequential $context #`(pure $id))))
-      (($item ...)
-        (syntax-sequential $context #`(apply $item ...)))
+          (pure-sequential #`$id)))
       ($item
-        (syntax-sequential $context #`(pure $item)))))
+        (pure-sequential #`$item))))
 
   (define (sequential-syntax $sequential)
     (switch $sequential

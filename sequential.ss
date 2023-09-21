@@ -1,7 +1,7 @@
 (library (sequential)
   (export (rename (sequential-top-level sequential)))
   (import (micascheme) (sequential-syntax))
-  (export (import (only (sequential-syntax) pure sequence)))
+  (export (import (only (sequential-syntax) sequence)))
 
   (define-syntax sequential-top-level
     (lambda ($syntax)
