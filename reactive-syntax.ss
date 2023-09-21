@@ -51,6 +51,9 @@
         (and $ass (cdr $ass)))
       ((context-lookup-fn $context) $id)))
 
+  (define (context-clean $context)
+    (context (stack) (context-lookup-fn $context)))
+
   (define (empty-deps)
     (deps (stack) (stack)))
 
@@ -167,7 +170,11 @@
             ((template? $template)
               (lets
                 ($params (template-params $template))
-                ($context (fold-left context-bind $context $params $args))
+                ($context
+                  (fold-left
+                    context-bind
+                    (context-clean $context)
+                    $params $args))
                 (syntax-reactive $context (template-body $template)))))))
       ($id (identifier? #`$id)
         (or
