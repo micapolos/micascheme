@@ -51,11 +51,11 @@
         (define $shared-frame-count 0)
         (define $shared-seconds 0)
 
-        (define $space? #f)
-        (define $mouse-x #f)
-        (define $mouse-y #f)
-        (define $frame-count #f)
-        (define $seconds #f)
+        (define $space? $shared-space?)
+        (define $mouse-x $shared-mouse-x)
+        (define $mouse-y $shared-mouse-y)
+        (define $frame-count $shared-frame-count)
+        (define $seconds $shared-seconds)
         (define $quit? #f)
 
         (define $callback
@@ -107,8 +107,6 @@
 
         (foreign-free (ftype-pointer-address $audio-spec))
 
-        (SDL_PauseAudio 0)
-
         (define (process-events-and-quit?)
           (sdl-poll-event)
           (cond
@@ -147,18 +145,18 @@
 
               (process-events-and-quit?)))
 
-          #,@(map (lambda ($syntax) #`(writeln (quote (init #,$syntax))))
-            (map initializer-syntax
-              (filter initializer? $statements)))
-          #,@(map (lambda ($syntax) #`(writeln (quote (updater #,$syntax))))
-            (map updater-syntax
-              (filter updater? $statements)))
-          #,@(map (lambda ($syntax) #`(writeln (quote (sampler #,$syntax))))
-            (map sampler-syntax
-              (filter sampler? $statements)))
-          #,@(map (lambda ($syntax) #`(writeln (quote (audio #,$syntax))))
-            (map stream-syntax
-              (filter stream? $statements)))
+          ; #,@(map (lambda ($syntax) #`(writeln (quote (init #,$syntax))))
+          ;   (map initializer-syntax
+          ;     (filter initializer? $statements)))
+          ; #,@(map (lambda ($syntax) #`(writeln (quote (updater #,$syntax))))
+          ;   (map updater-syntax
+          ;     (filter updater? $statements)))
+          ; #,@(map (lambda ($syntax) #`(writeln (quote (sampler #,$syntax))))
+          ;   (map sampler-syntax
+          ;     (filter sampler? $statements)))
+          ; #,@(map (lambda ($syntax) #`(writeln (quote (audio #,$syntax))))
+          ;   (map stream-syntax
+          ;     (filter stream? $statements)))
 
           (sdl-set-render-draw-color! $renderer 0 0 0 255)
           (sdl-render-clear $renderer)
@@ -170,6 +168,8 @@
           (sdl-render-present $renderer)
 
           (if (not $quit?) (game-loop)))
+
+        (SDL_PauseAudio 0)
 
         (game-loop)
 

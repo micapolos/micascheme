@@ -157,6 +157,7 @@
       (define-aux-keyword osc)
       (define-property osc sequential
         (template
+          (stack)
           (list (syntax dt))
           (syntax (sequence 0 t (+ t dt))))))))
 
@@ -169,7 +170,9 @@
     `(begin
       (define-aux-keyword osc)
       (define-property osc sequential
-        (template (list (syntax dt))
+        (template
+          (stack)
+          (list (syntax dt))
           (syntax (sequence 0 t (+ t dt))))))))
 
 (check

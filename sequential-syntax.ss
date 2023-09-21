@@ -1,6 +1,6 @@
 (library (sequential-syntax)
   (export
-    context context? context-lookup-fn
+    context context? context-bindings context-lookup-fn
     empty-context lookup-context context-bind context-ref
 
     deps deps? deps-declarations deps-updaters
@@ -12,7 +12,7 @@
     sequential-bind
     sequential-list
 
-    template template? template-params template-body
+    template template? template-bindings template-params template-body
 
     syntax-sequential
     sequential-syntax
@@ -31,7 +31,7 @@
   (data (context bindings lookup-fn))
   (data (deps declarations updaters))
   (data (sequential deps value))
-  (data (template params body))
+  (data (template bindings params body))
 
   (define (empty-context)
     (lookup-context (lambda (_) #f)))
@@ -135,7 +135,7 @@
                     $tmp)))))))
       ((lambda ($param ...) $body)
         (for-all identifier? (syntax->list #`($param ...)))
-        (template (syntax->list #`($param ...)) #`$body))
+        (template (stack) (syntax->list #`($param ...)) #`$body))
       ((lets $body)
         (syntax-sequential $context #`$body))
       ((lets ($var $expr) $rest ... $body) (identifier? #`$var)
@@ -155,7 +155,11 @@
                   (syntax-sequential $context #`(lets $rest ... $body))))))))
       ((lets (($var $param ...) $expr) $rest ... $body) (identifier? #`$var)
         (lets
-          ($template (template (syntax->list #`($param ...)) #`$expr))
+          ($template
+            (template
+              (context-bindings $context)
+              (syntax->list #`($param ...))
+              #`$expr))
           ($context (context-bind $context #`$var $template))
           (syntax-sequential $context #`(lets $rest ... $body))))
       ((apply $fn $arg ...)
@@ -178,7 +182,7 @@
                 ($context
                   (fold-left
                     context-bind
-                    (context-clean $context)
+                    (context (template-bindings $template) (context-lookup-fn $context))
                     $params $args))
                 (syntax-sequential $context (template-body $template)))))))
       ($id (identifier? #`$id)
@@ -206,6 +210,7 @@
       ((template? $template)
         (lets
           #`(template
+            (stack) ; TODO???
             (list #,@(map (lambda ($param) #`(syntax #,$param)) (template-params $template)))
             (syntax #,(template-body $template)))))))
 
