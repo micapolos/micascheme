@@ -3,4 +3,4 @@
 (reactive
   zero
   counter
-  (osc2 0.25))
+  (osc 0.25))
