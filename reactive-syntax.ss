@@ -25,7 +25,7 @@
     syntax-transform
     syntax-list-transform
 
-    pure unit)
+    pure sequence)
   (import (micascheme))
 
   (data (context bindings lookup-fn))
@@ -111,13 +111,13 @@
             10)))))
 
   (define-aux-keyword pure)
-  (define-aux-keyword unit)
+  (define-aux-keyword sequence)
 
   (define (syntax-reactive $context $syntax)
-    (syntax-case $syntax (unit lets reactive apply pure lambda)
+    (syntax-case $syntax (sequence lets reactive apply pure lambda)
       ((pure $body)
         (pure-reactive #`$body))
-      ((unit $var $init $update) (identifier? #`$var)
+      ((sequence $var $init $update) (identifier? #`$var)
         (lets
           ($tmp (generate-temporary #`$var))
           ($context (context-bind $context #`$var (pure-reactive $tmp)))

@@ -61,7 +61,7 @@
     (reactive->datum
       (syntax-reactive
         (empty-context)
-        #`(unit n 0 (+ n 1))))
+        #`(sequence n 0 (+ n 1))))
     `(reactive
       (declarations (define $n 0))
       (updaters (set! $n (+ $n 1)))
@@ -72,8 +72,8 @@
     (reactive->datum
       (syntax-reactive (empty-context)
         #`(apply
-          (lambda (d) (unit n 0 (+ n d)))
-          (unit v 0 (+ v 1)))))
+          (lambda (d) (sequence n 0 (+ n d)))
+          (sequence v 0 (+ v 1)))))
     `(reactive
       (declarations
         (define $v 0)
@@ -89,7 +89,7 @@
       (syntax-reactive
         (empty-context)
         #`(lets
-          (counter (unit n 0 (+ n 1)))
+          (counter (sequence n 0 (+ n 1)))
           (+ counter counter))))
     `(reactive
       (declarations
@@ -106,8 +106,8 @@
       (syntax-reactive
         (empty-context)
         #`(lets
-          (counter (unit c 0 (+ c 1)))
-          (unit x 0 (+ x counter)))))
+          (counter (sequence c 0 (+ c 1)))
+          (sequence x 0 (+ x counter)))))
     `(reactive
       (declarations
         (define $c 0)
@@ -124,7 +124,7 @@
     (syntax->datum
       (syntax-transform
         (empty-context)
-        #`(define counter (unit n 0 (+ n 1)))))
+        #`(define counter (sequence n 0 (+ n 1)))))
     `(begin
       (define-aux-keyword counter)
       (define-property counter reactive
@@ -139,32 +139,32 @@
     (syntax->datum
       (syntax-transform
         (empty-context)
-        #`(define osc (lambda (dt) (unit t 0 (+ t dt))))))
+        #`(define osc (lambda (dt) (sequence t 0 (+ t dt))))))
     `(begin
       (define-aux-keyword osc)
       (define-property osc reactive
         (template
           (list (syntax dt))
-          (syntax (unit t 0 (+ t dt))))))))
+          (syntax (sequence t 0 (+ t dt))))))))
 
 (check
   (equal?
     (syntax->datum
       (syntax-transform
         (empty-context)
-        #`(define (osc dt) (unit t 0 (+ t dt)))))
+        #`(define (osc dt) (sequence t 0 (+ t dt)))))
     `(begin
       (define-aux-keyword osc)
       (define-property osc reactive
         (template (list (syntax dt))
-          (syntax (unit t 0 (+ t dt))))))))
+          (syntax (sequence t 0 (+ t dt))))))))
 
 (check
   (equal?
     (syntax->datum
       (syntax-transform
         (empty-context)
-        #`(unit x 0 (+ x 1))))
+        #`(sequence x 0 (+ x 1))))
     `(writeln
       (let ()
         (define $vector (make-vector 10))
@@ -180,7 +180,7 @@
     (reactive->vector
       (syntax-reactive
         (empty-context)
-        #`(unit $val 0 (+ $val 1)))
+        #`(sequence $val 0 (+ $val 1)))
       5)
     (vector 0 1 2 3 4)))
 
@@ -190,8 +190,8 @@
       (syntax-reactive
         (empty-context)
         #`(+
-          (unit c 0 (+ c 1))
-          (unit x 0 (+ x 100))))
+          (sequence c 0 (+ c 1))
+          (sequence x 0 (+ x 100))))
       5)
     (vector 0 101 202 303 404)))
 
@@ -212,7 +212,7 @@
       (syntax-reactive
         (empty-context)
         #`(lets
-          ($counter (unit c 0 (+ c 1)))
+          ($counter (sequence c 0 (+ c 1)))
           (+ $counter $counter)))
       5)
     (vector 0 2 4 6 8)))
@@ -223,8 +223,8 @@
       (syntax-reactive
         (empty-context)
         #`(lets
-          ($counter (unit $n 0 (+ $n 1)))
-          (unit $acc 0 (+ $acc $counter))))
+          ($counter (sequence $n 0 (+ $n 1)))
+          (sequence $acc 0 (+ $acc $counter))))
       5)
     (vector 0 1 3 6 10)))
 
@@ -234,7 +234,7 @@
       (syntax-reactive
         (empty-context)
         #`(apply
-          (lambda (dt) (unit t 0 (+ t dt)))
-          (unit x 0 (+ x 1))))
+          (lambda (dt) (sequence t 0 (+ t dt)))
+          (sequence x 0 (+ x 1))))
       5)
     (vector 0 1 3 6 10)))

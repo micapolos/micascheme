@@ -4,5 +4,5 @@
 
   (reactive
     (define zero 0)
-    (define counter (unit n 0 (+ 1 n)))
-    (define (osc dt) (unit x 0 (fract (+ x dt))))))
+    (define counter (sequence n 0 (+ 1 n)))
+    (define (osc dt) (sequence x 0 (fract (+ x dt))))))

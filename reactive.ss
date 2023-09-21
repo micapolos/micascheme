@@ -1,7 +1,7 @@
 (library (reactive)
   (export (rename (reactive-top-level reactive)))
   (import (micascheme) (reactive-syntax))
-  (export (import (only (reactive-syntax) pure unit)))
+  (export (import (only (reactive-syntax) pure sequence)))
 
   (define-syntax reactive-top-level
     (lambda ($syntax)
