@@ -211,6 +211,7 @@
       ((audio $value)
         (lets
           ($context (empty-context))
+          ($context (context-bind $context #`sample-rate (pure-sequential #`$sample-freq)))
           ($context (context-bind $context #`space? (pure-sequential #`$space?)))
           ($context (context-bind $context #`mouse-x (pure-sequential #`$mouse-x)))
           ($context (context-bind $context #`mouse-y (pure-sequential #`$mouse-y)))
