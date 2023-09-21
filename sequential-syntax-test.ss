@@ -70,22 +70,6 @@
 (check
   (equal?
     (sequential->datum
-      (syntax-sequential (empty-context)
-        #`(apply
-          (lambda (d) (sequence 0 n (+ n d)))
-          (sequence 0 v (+ v 1)))))
-    `(sequential
-      (declarations
-        (define $v 0)
-        (define $n 0))
-      (updaters
-        (set! $v (+ $v 1))
-        (set! $n (+ $n $v)))
-      (value $n))))
-
-(check
-  (equal?
-    (sequential->datum
       (syntax-sequential
         (empty-context)
         #`(lets
@@ -146,20 +130,6 @@
             (stack #'(define $n 0))
             (stack #'(set! $n (+ $n 1))))
           #'$n)))))
-
-(check
-  (equal?
-    (syntax->datum
-      (syntax-transform
-        (empty-context)
-        #`(define osc (lambda (dt) (sequence 0 t (+ t dt))))))
-    `(begin
-      (define-aux-keyword osc)
-      (define-property osc sequential
-        (template
-          (stack)
-          (list (syntax dt))
-          (syntax (sequence 0 t (+ t dt))))))))
 
 (check
   (equal?
@@ -241,16 +211,5 @@
         #`(lets
           ($counter (sequence 0 $n (+ $n 1)))
           (sequence 0 $acc (+ $acc $counter))))
-      5)
-    (vector 0 1 3 6 10)))
-
-(check
-  (equal?
-    (sequential->vector
-      (syntax-sequential
-        (empty-context)
-        #`(apply
-          (lambda (dt) (sequence 0 t (+ t dt)))
-          (sequence 0 x (+ x 1))))
       5)
     (vector 0 1 3 6 10)))

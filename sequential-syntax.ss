@@ -105,8 +105,7 @@
           (define-aux-keyword $id)
           (define-property $id sequential
             #,(sequential-syntax
-              (syntax-sequential $context
-                #`(lambda ($param ...) $body))))))
+              (template (stack) (syntax->list #`($param ...)) #`$body)))))
       ($other
         #`(writeln
           #,(sequential->vector-syntax
@@ -117,7 +116,7 @@
   (define-aux-keyword sequence)
 
   (define (syntax-sequential $context $syntax)
-    (syntax-case $syntax (sequence lets sequential apply pure lambda)
+    (syntax-case $syntax (sequence lets sequential apply pure)
       ((pure $body)
         (pure-sequential #`$body))
       ((sequence $init $var $update) (identifier? #`$var)
@@ -133,9 +132,6 @@
                       (stack #`(define #,$tmp #,$init))
                       (stack #`(set! #,$tmp #,$update)))
                     $tmp)))))))
-      ((lambda ($param ...) $body)
-        (for-all identifier? (syntax->list #`($param ...)))
-        (template (stack) (syntax->list #`($param ...)) #`$body))
       ((lets $body)
         (syntax-sequential $context #`$body))
       ((lets ($var $expr) $rest ... $body) (identifier? #`$var)
