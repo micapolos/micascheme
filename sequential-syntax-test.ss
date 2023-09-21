@@ -61,7 +61,7 @@
     (sequential->datum
       (syntax-sequential
         (empty-context)
-        #`(sequence n 0 (+ n 1))))
+        #`(sequence 0 n (+ n 1))))
     `(sequential
       (declarations (define $n 0))
       (updaters (set! $n (+ $n 1)))
@@ -72,8 +72,8 @@
     (sequential->datum
       (syntax-sequential (empty-context)
         #`(apply
-          (lambda (d) (sequence n 0 (+ n d)))
-          (sequence v 0 (+ v 1)))))
+          (lambda (d) (sequence 0 n (+ n d)))
+          (sequence 0 v (+ v 1)))))
     `(sequential
       (declarations
         (define $v 0)
@@ -89,7 +89,7 @@
       (syntax-sequential
         (empty-context)
         #`(lets
-          (counter (sequence n 0 (+ n 1)))
+          (counter (sequence 0 n (+ n 1)))
           (+ counter counter))))
     `(sequential
       (declarations
@@ -106,8 +106,8 @@
       (syntax-sequential
         (empty-context)
         #`(lets
-          (counter (sequence c 0 (+ c 1)))
-          (sequence x 0 (+ x counter)))))
+          (counter (sequence 0 c (+ c 1)))
+          (sequence 0 x (+ x counter)))))
     `(sequential
       (declarations
         (define $c 0)
@@ -124,7 +124,7 @@
     (syntax->datum
       (syntax-transform
         (empty-context)
-        #`(define counter (sequence n 0 (+ n 1)))))
+        #`(define counter (sequence 0 n (+ n 1)))))
     `(begin
       (define-aux-keyword counter)
       (define-property counter sequential
@@ -139,32 +139,32 @@
     (syntax->datum
       (syntax-transform
         (empty-context)
-        #`(define osc (lambda (dt) (sequence t 0 (+ t dt))))))
+        #`(define osc (lambda (dt) (sequence 0 t (+ t dt))))))
     `(begin
       (define-aux-keyword osc)
       (define-property osc sequential
         (template
           (list (syntax dt))
-          (syntax (sequence t 0 (+ t dt))))))))
+          (syntax (sequence 0 t (+ t dt))))))))
 
 (check
   (equal?
     (syntax->datum
       (syntax-transform
         (empty-context)
-        #`(define (osc dt) (sequence t 0 (+ t dt)))))
+        #`(define (osc dt) (sequence 0 t (+ t dt)))))
     `(begin
       (define-aux-keyword osc)
       (define-property osc sequential
         (template (list (syntax dt))
-          (syntax (sequence t 0 (+ t dt))))))))
+          (syntax (sequence 0 t (+ t dt))))))))
 
 (check
   (equal?
     (syntax->datum
       (syntax-transform
         (empty-context)
-        #`(sequence x 0 (+ x 1))))
+        #`(sequence 0 x (+ x 1))))
     `(writeln
       (let ()
         (define $vector (make-vector 10))
@@ -180,7 +180,7 @@
     (sequential->vector
       (syntax-sequential
         (empty-context)
-        #`(sequence $val 0 (+ $val 1)))
+        #`(sequence 0 $val (+ $val 1)))
       5)
     (vector 0 1 2 3 4)))
 
@@ -190,8 +190,8 @@
       (syntax-sequential
         (empty-context)
         #`(+
-          (sequence c 0 (+ c 1))
-          (sequence x 0 (+ x 100))))
+          (sequence 0 c (+ c 1))
+          (sequence 0 x (+ x 100))))
       5)
     (vector 0 101 202 303 404)))
 
@@ -212,7 +212,7 @@
       (syntax-sequential
         (empty-context)
         #`(lets
-          ($counter (sequence c 0 (+ c 1)))
+          ($counter (sequence 0 c (+ c 1)))
           (+ $counter $counter)))
       5)
     (vector 0 2 4 6 8)))
@@ -223,8 +223,8 @@
       (syntax-sequential
         (empty-context)
         #`(lets
-          ($counter (sequence $n 0 (+ $n 1)))
-          (sequence $acc 0 (+ $acc $counter))))
+          ($counter (sequence 0 $n (+ $n 1)))
+          (sequence 0 $acc (+ $acc $counter))))
       5)
     (vector 0 1 3 6 10)))
 
@@ -234,7 +234,7 @@
       (syntax-sequential
         (empty-context)
         #`(apply
-          (lambda (dt) (sequence t 0 (+ t dt)))
-          (sequence x 0 (+ x 1))))
+          (lambda (dt) (sequence 0 t (+ t dt)))
+          (sequence 0 x (+ x 1))))
       5)
     (vector 0 1 3 6 10)))

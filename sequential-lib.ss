@@ -5,10 +5,10 @@
   (sequential
     (define zero 0)
 
-    (define counter (sequence n 0 (+ 1 n)))
+    (define counter (sequence 0 n (+ 1 n)))
 
     (define (osc dt)
-      (sequence x 0 (fract (+ x dt))))
+      (sequence 0 x (fract (+ x dt))))
 
     (define (variable init set? value)
-      (sequence x init (if set? value x)))))
+      (sequence init x (if set? value x)))))

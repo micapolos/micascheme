@@ -120,7 +120,7 @@
     (syntax-case $syntax (sequence lets sequential apply pure lambda)
       ((pure $body)
         (pure-sequential #`$body))
-      ((sequence $var $init $update) (identifier? #`$var)
+      ((sequence $init $var $update) (identifier? #`$var)
         (lets
           ($tmp (generate-temporary #`$var))
           ($context (context-bind $context #`$var (pure-sequential $tmp)))
