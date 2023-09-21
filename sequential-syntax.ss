@@ -1,4 +1,4 @@
-(library (reactive-syntax)
+(library (sequential-syntax)
   (export
     context context? context-lookup-fn
     empty-context lookup-context context-bind context-ref
@@ -7,20 +7,20 @@
     empty-deps
     deps+
 
-    reactive reactive? reactive-deps reactive-value
-    pure-reactive
-    reactive-bind
-    reactive-list
+    sequential sequential? sequential-deps sequential-value
+    pure-sequential
+    sequential-bind
+    sequential-list
 
     template template? template-params template-body
 
-    syntax-reactive
-    reactive-syntax
-    reactive->datum
-    reactive->vector-syntax
-    reactive->vector
-    reactive-counter
-    reactive-osc
+    syntax-sequential
+    sequential-syntax
+    sequential->datum
+    sequential->vector-syntax
+    sequential->vector
+    sequential-counter
+    sequential-osc
 
     syntax-transform
     syntax-list-transform
@@ -30,7 +30,7 @@
 
   (data (context bindings lookup-fn))
   (data (deps declarations updaters))
-  (data (reactive deps value))
+  (data (sequential deps value))
   (data (template params body))
 
   (define (empty-context)
@@ -39,9 +39,9 @@
   (define (lookup-context $fn)
     (context (stack) $fn))
 
-  (define (context-bind $context $id $reactive)
+  (define (context-bind $context $id $sequential)
     (context
-      (push (context-bindings $context) (cons $id $reactive))
+      (push (context-bindings $context) (cons $id $sequential))
       (context-lookup-fn $context)))
 
   (define (context-ref $context $id)
@@ -62,28 +62,28 @@
       (push-all (deps-declarations $a) (deps-declarations $b))
       (push-all (deps-updaters $a) (deps-updaters $b))))
 
-  (define (pure-reactive $value)
-    (reactive (empty-deps) $value))
+  (define (pure-sequential $value)
+    (sequential (empty-deps) $value))
 
-  (define (reactive-bind $reactive $fn)
+  (define (sequential-bind $sequential $fn)
     (lets
-      ($fn-reactive ($fn (reactive-value $reactive)))
-      (reactive
+      ($fn-sequential ($fn (sequential-value $sequential)))
+      (sequential
         (deps+
-          (reactive-deps $reactive)
-          (reactive-deps $fn-reactive))
-        (reactive-value $fn-reactive))))
+          (sequential-deps $sequential)
+          (sequential-deps $fn-sequential))
+        (sequential-value $fn-sequential))))
 
-  (define (reactive-list $reactives)
+  (define (sequential-list $sequentials)
     (cond
-      ((null? $reactives)
-        (pure-reactive (list)))
+      ((null? $sequentials)
+        (pure-sequential (list)))
       (else
-        (reactive-bind (car $reactives)
+        (sequential-bind (car $sequentials)
           (lambda ($car)
-            (reactive-bind (reactive-list (cdr $reactives))
+            (sequential-bind (sequential-list (cdr $sequentials))
               (lambda ($cdr)
-                (pure-reactive (cons $car $cdr)))))))))
+                (pure-sequential (cons $car $cdr)))))))))
 
   (define (syntax-list-transform $context $syntax-list)
     #`(begin
@@ -95,40 +95,40 @@
         (identifier? #`$id)
         #`(begin
           (define-aux-keyword $id)
-          (define-property $id reactive
-            #,(reactive-syntax
-              (syntax-reactive $context
+          (define-property $id sequential
+            #,(sequential-syntax
+              (syntax-sequential $context
                 #`$body)))))
       ((define ($id $param ...) $body)
         (for-all identifier? (syntax->list #`($id $param ...)))
         #`(begin
           (define-aux-keyword $id)
-          (define-property $id reactive
-            #,(reactive-syntax
-              (syntax-reactive $context
+          (define-property $id sequential
+            #,(sequential-syntax
+              (syntax-sequential $context
                 #`(lambda ($param ...) $body))))))
       ($other
         #`(writeln
-          #,(reactive->vector-syntax
-            (syntax-reactive $context #`$other)
+          #,(sequential->vector-syntax
+            (syntax-sequential $context #`$other)
             10)))))
 
   (define-aux-keyword pure)
   (define-aux-keyword sequence)
 
-  (define (syntax-reactive $context $syntax)
-    (syntax-case $syntax (sequence lets reactive apply pure lambda)
+  (define (syntax-sequential $context $syntax)
+    (syntax-case $syntax (sequence lets sequential apply pure lambda)
       ((pure $body)
-        (pure-reactive #`$body))
+        (pure-sequential #`$body))
       ((sequence $var $init $update) (identifier? #`$var)
         (lets
           ($tmp (generate-temporary #`$var))
-          ($context (context-bind $context #`$var (pure-reactive $tmp)))
-          (reactive-bind (syntax-reactive $context #`$init)
+          ($context (context-bind $context #`$var (pure-sequential $tmp)))
+          (sequential-bind (syntax-sequential $context #`$init)
             (lambda ($init)
-              (reactive-bind (syntax-reactive $context #`$update)
+              (sequential-bind (syntax-sequential $context #`$update)
                 (lambda ($update)
-                  (reactive
+                  (sequential
                     (deps
                       (stack #`(define #,$tmp #,$init))
                       (stack #`(set! #,$tmp #,$update)))
@@ -137,36 +137,36 @@
         (for-all identifier? (syntax->list #`($param ...)))
         (template (syntax->list #`($param ...)) #`$body))
       ((lets $body)
-        (syntax-reactive $context #`$body))
+        (syntax-sequential $context #`$body))
       ((lets ($var $expr) $rest ... $body) (identifier? #`$var)
-        (reactive-bind (syntax-reactive $context #`$expr)
+        (sequential-bind (syntax-sequential $context #`$expr)
           (lambda ($expr)
             (lets
               ($tmp (generate-temporary #`$var))
-              ($context (context-bind $context #`$var (pure-reactive $tmp)))
-              ($reactive
-                (reactive
+              ($context (context-bind $context #`$var (pure-sequential $tmp)))
+              ($sequential
+                (sequential
                   (deps
                     (stack #`(define #,$tmp #,$expr))
                     (stack #`(set! #,$tmp #,$expr)))
                   $tmp))
-              (reactive-bind $reactive
+              (sequential-bind $sequential
                 (lambda (_)
-                  (syntax-reactive $context #`(lets $rest ... $body))))))))
+                  (syntax-sequential $context #`(lets $rest ... $body))))))))
       ((apply $fn $arg ...)
         (lets
-          ($fn (syntax-reactive $context #`$fn))
+          ($fn (syntax-sequential $context #`$fn))
           ($args
             (map
-              (partial syntax-reactive $context)
+              (partial syntax-sequential $context)
               (syntax->list #`($arg ...))))
           (switch $fn
-            ((reactive? $reactive-fn)
-              (reactive-bind $reactive-fn
+            ((sequential? $sequential-fn)
+              (sequential-bind $sequential-fn
                 (lambda ($fn)
-                  (reactive-bind (reactive-list $args)
+                  (sequential-bind (sequential-list $args)
                     (lambda ($args)
-                      (pure-reactive #`(#,$fn #,@$args)))))))
+                      (pure-sequential #`(#,$fn #,@$args)))))))
             ((template? $template)
               (lets
                 ($params (template-params $template))
@@ -175,50 +175,50 @@
                     context-bind
                     (context-clean $context)
                     $params $args))
-                (syntax-reactive $context (template-body $template)))))))
+                (syntax-sequential $context (template-body $template)))))))
       ($id (identifier? #`$id)
         (or
           (context-ref $context #`$id)
-          (syntax-reactive $context #`(pure $id))))
+          (syntax-sequential $context #`(pure $id))))
       (($item ...)
-        (syntax-reactive $context #`(apply $item ...)))
+        (syntax-sequential $context #`(apply $item ...)))
       ($item
-        (syntax-reactive $context #`(pure $item)))))
+        (syntax-sequential $context #`(pure $item)))))
 
-  (define (reactive-syntax $reactive)
-    (switch $reactive
-      ((reactive? $reactive)
+  (define (sequential-syntax $sequential)
+    (switch $sequential
+      ((sequential? $sequential)
         (lets
-          ($deps (reactive-deps $reactive))
-          ($value (reactive-value $reactive))
+          ($deps (sequential-deps $sequential))
+          ($value (sequential-value $sequential))
           ($vector (generate-temporary #`vector))
           ($index (generate-temporary #`index))
-          #`(reactive
+          #`(sequential
             (deps
               (stack #,@(map (lambda ($) #`(syntax #,$)) (reverse (deps-declarations $deps))))
               (stack #,@(map (lambda ($) #`(syntax #,$)) (reverse (deps-updaters $deps)))))
-            (syntax #,(reactive-value $reactive)))))
+            (syntax #,(sequential-value $sequential)))))
       ((template? $template)
         (lets
           #`(template
             (list #,@(map (lambda ($param) #`(syntax #,$param)) (template-params $template)))
             (syntax #,(template-body $template)))))))
 
-  (define (reactive->datum $reactive)
+  (define (sequential->datum $sequential)
     (lets
-      ($deps (reactive-deps $reactive))
-      ($value (reactive-value $reactive))
+      ($deps (sequential-deps $sequential))
+      ($value (sequential-value $sequential))
       ($vector (generate-temporary #`vector))
       ($index (generate-temporary #`index))
-      `(reactive
+      `(sequential
         (declarations ,@(reverse (map syntax->datum (deps-declarations $deps))))
         (updaters ,@(reverse (map syntax->datum (deps-updaters $deps))))
-        (value ,(syntax->datum (reactive-value $reactive))))))
+        (value ,(syntax->datum (sequential-value $sequential))))))
 
-  (define (reactive->vector-syntax $reactive $size)
+  (define (sequential->vector-syntax $sequential $size)
     (lets
-      ($deps (reactive-deps $reactive))
-      ($value (reactive-value $reactive))
+      ($deps (sequential-deps $sequential))
+      ($value (sequential-value $sequential))
       ($vector (generate-temporary #`vector))
       ($index (generate-temporary #`index))
       #`(let ()
@@ -230,26 +230,26 @@
           (vector-set! #,$vector #,$index #,$value)
           #,@(reverse (deps-updaters $deps))))))
 
-  (define (reactive->vector $reactive $size)
+  (define (sequential->vector $sequential $size)
     (eval
-      (syntax->datum (reactive->vector-syntax $reactive $size))
+      (syntax->datum (sequential->vector-syntax $sequential $size))
       (environment `(micascheme))))
 
-  (define (reactive-counter)
+  (define (sequential-counter)
     (lets
       ($counter (generate-temporary #`counter))
-      (reactive
+      (sequential
         (deps
           (stack #`(define #,$counter 0))
           (stack #`(set! #,$counter (+ #,$counter 1))))
         $counter)))
 
-  (define (reactive-osc $delta)
-    (reactive-bind $delta
+  (define (sequential-osc $delta)
+    (sequential-bind $delta
       (lambda ($delta)
         (lets
           ($osc (generate-temporary #`osc))
-          (reactive
+          (sequential
             (deps
               (stack #`(define #,$osc 0.0))
               (stack #`(set! #,$osc (fract (+ #,$osc #,$delta)))))

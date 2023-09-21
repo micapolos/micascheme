@@ -1,8 +1,8 @@
-(library (reactive-lib)
+(library (sequential-lib)
   (export zero counter osc)
-  (import (micascheme) (reactive))
+  (import (micascheme) (sequential))
 
-  (reactive
+  (sequential
     (define zero 0)
     (define counter (sequence n 0 (+ 1 n)))
     (define (osc dt) (sequence x 0 (fract (+ x dt))))))

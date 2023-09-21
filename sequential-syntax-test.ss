@@ -1,4 +1,4 @@
-(import (micascheme) (reactive-syntax))
+(import (micascheme) (sequential-syntax))
 
 (let ()
   (define $context
@@ -20,13 +20,13 @@
 (check
   (equal?
     (syntax->datum
-      (reactive-syntax
-        (reactive
+      (sequential-syntax
+        (sequential
           (deps
             (stack #`def1 #`def2)
             (stack #`fn1 #`fn2))
           #`val)))
-    `(reactive
+    `(sequential
       (deps
         (stack (syntax def1) (syntax def2))
         (stack (syntax fn1) (syntax fn2)))
@@ -34,47 +34,47 @@
 
 (check
   (equal?
-    (reactive->datum
-      (syntax-reactive
+    (sequential->datum
+      (syntax-sequential
         (empty-context)
         #`128))
-    `(reactive
+    `(sequential
       (declarations)
       (updaters)
       (value 128))))
 
 (check
   (equal?
-    (reactive->datum
-      (reactive-list
+    (sequential->datum
+      (sequential-list
         (list
-          (reactive (deps (stack #`def1) (stack #`update1)) #`value1)
-          (reactive (deps (stack #`def2) (stack #`update2)) #`value2)
-          (reactive (deps (stack #`def3) (stack #`update3)) #`value3))))
-    `(reactive
+          (sequential (deps (stack #`def1) (stack #`update1)) #`value1)
+          (sequential (deps (stack #`def2) (stack #`update2)) #`value2)
+          (sequential (deps (stack #`def3) (stack #`update3)) #`value3))))
+    `(sequential
       (declarations def1 def2 def3)
       (updaters update1 update2 update3)
       (value (value1 value2 value3)))))
 
 (check
   (equal?
-    (reactive->datum
-      (syntax-reactive
+    (sequential->datum
+      (syntax-sequential
         (empty-context)
         #`(sequence n 0 (+ n 1))))
-    `(reactive
+    `(sequential
       (declarations (define $n 0))
       (updaters (set! $n (+ $n 1)))
       (value $n))))
 
 (check
   (equal?
-    (reactive->datum
-      (syntax-reactive (empty-context)
+    (sequential->datum
+      (syntax-sequential (empty-context)
         #`(apply
           (lambda (d) (sequence n 0 (+ n d)))
           (sequence v 0 (+ v 1)))))
-    `(reactive
+    `(sequential
       (declarations
         (define $v 0)
         (define $n 0))
@@ -85,13 +85,13 @@
 
 (check
   (equal?
-    (reactive->datum
-      (syntax-reactive
+    (sequential->datum
+      (syntax-sequential
         (empty-context)
         #`(lets
           (counter (sequence n 0 (+ n 1)))
           (+ counter counter))))
-    `(reactive
+    `(sequential
       (declarations
         (define $n 0)
         (define $counter $n))
@@ -102,13 +102,13 @@
 
 (check
   (equal?
-    (reactive->datum
-      (syntax-reactive
+    (sequential->datum
+      (syntax-sequential
         (empty-context)
         #`(lets
           (counter (sequence c 0 (+ c 1)))
           (sequence x 0 (+ x counter)))))
-    `(reactive
+    `(sequential
       (declarations
         (define $c 0)
         (define $counter $c)
@@ -127,8 +127,8 @@
         #`(define counter (sequence n 0 (+ n 1)))))
     `(begin
       (define-aux-keyword counter)
-      (define-property counter reactive
-        (reactive
+      (define-property counter sequential
+        (sequential
           (deps
             (stack #'(define $n 0))
             (stack #'(set! $n (+ $n 1))))
@@ -142,7 +142,7 @@
         #`(define osc (lambda (dt) (sequence t 0 (+ t dt))))))
     `(begin
       (define-aux-keyword osc)
-      (define-property osc reactive
+      (define-property osc sequential
         (template
           (list (syntax dt))
           (syntax (sequence t 0 (+ t dt))))))))
@@ -155,7 +155,7 @@
         #`(define (osc dt) (sequence t 0 (+ t dt)))))
     `(begin
       (define-aux-keyword osc)
-      (define-property osc reactive
+      (define-property osc sequential
         (template (list (syntax dt))
           (syntax (sequence t 0 (+ t dt))))))))
 
@@ -177,8 +177,8 @@
 
 (check
   (equal?
-    (reactive->vector
-      (syntax-reactive
+    (sequential->vector
+      (syntax-sequential
         (empty-context)
         #`(sequence $val 0 (+ $val 1)))
       5)
@@ -186,8 +186,8 @@
 
 (check
   (equal?
-    (reactive->vector
-      (syntax-reactive
+    (sequential->vector
+      (syntax-sequential
         (empty-context)
         #`(+
           (sequence c 0 (+ c 1))
@@ -198,18 +198,18 @@
 
 (check
   (equal?
-    (reactive->vector (reactive-counter) 5)
+    (sequential->vector (sequential-counter) 5)
     (vector 0 1 2 3 4)))
 
 (check
   (equal?
-    (reactive->vector (reactive-osc (pure-reactive 0.25)) 6)
+    (sequential->vector (sequential-osc (pure-sequential 0.25)) 6)
     (vector 0.0 0.25 0.5 0.75 0.0 0.25)))
 
 (check
   (equal?
-    (reactive->vector
-      (syntax-reactive
+    (sequential->vector
+      (syntax-sequential
         (empty-context)
         #`(lets
           ($counter (sequence c 0 (+ c 1)))
@@ -219,8 +219,8 @@
 
 (check
   (equal?
-    (reactive->vector
-      (syntax-reactive
+    (sequential->vector
+      (syntax-sequential
         (empty-context)
         #`(lets
           ($counter (sequence $n 0 (+ $n 1)))
@@ -230,8 +230,8 @@
 
 (check
   (equal?
-    (reactive->vector
-      (syntax-reactive
+    (sequential->vector
+      (syntax-sequential
         (empty-context)
         #`(apply
           (lambda (dt) (sequence t 0 (+ t dt)))
