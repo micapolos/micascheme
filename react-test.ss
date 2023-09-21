@@ -1,11 +1,10 @@
-(import (micascheme) (react))
+(import (micascheme) (react) (sequential))
 
 (react
   (message (format "Frames: ~s" frames))
   (message (format "Time: ~,2f seconds" seconds))
   (message (format "Mouse: ~s ~s" mouse-x mouse-y))
   (message (format "Space: ~a" (if space? "yes" "no")))
-  (define main-osc (osc 4))
 
   (rect
     (- mouse-x 15)
@@ -16,13 +15,16 @@
     (+ 240 -30 (* (cos seconds) 200))
     60 60)
   (audio
-    (*
-      (min 1 (/ mouse-y 480))
-      (mix
-        (* (max 0 (- 1 (* 8 (osc 8)))) noise)
-        (osc (* 1.000 mouse-x))
-        (osc (* 1.005 mouse-x))
-        (osc (* 1.010 mouse-x))
-      )
-      (- 1 (osc (if space? 8 4)))))
+    (lets
+      (freq 110)
+      (freq (if space? (* freq 1.5) freq))
+      (freq (sequence freq prev (- freq (* 0.999 (- freq prev)))))
+      (dx (/ freq 22050))
+      (osc1 (sequence 0 x (fract (+ x dx))))
+      (osc2 (sequence 0 x (fract (+ x (* dx 1.005)))))
+      (osc3 (sequence 0 x (fract (+ x (* dx 1.010)))))
+      (freq 8)
+      (dx (/ freq 22050))
+      (beat (- 1 (sequence 0 x (fract (+ x dx)))))
+      (* beat (/ (+ osc1 osc2 osc3) 3))))
 )

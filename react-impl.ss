@@ -1,6 +1,6 @@
 (library (react-impl)
   (export react-syntax)
-  (import (micascheme) (sdl) (react-lib))
+  (import (micascheme) (sdl) (react-lib) (sequential-syntax))
 
   (data (initializer syntax))
   (data (updater syntax))
@@ -199,12 +199,7 @@
         (built-value $fn-built))))
 
   (define (statements+syntax $lookup $statements $syntax)
-    (syntax-case $syntax (message audio rect make define)
-      ((define $id $body) (identifier? #`$id)
-        #`(begin
-          (define-aux-keyword $id)
-          (define-property $id react
-            #,(built-sampler-expression $lookup #`$body))))
+    (syntax-case $syntax (message audio audio2 rect make define)
       ((message $value)
         (built-statements
           (built-bind (built-updater-expression $lookup #`$value)
@@ -214,12 +209,17 @@
                   (updater #`(displayln #,$value)))
                 #`(void))))))
       ((audio $value)
-        (built-statements
-          (built-bind (built-sampler-expression $lookup #`$value)
-            (lambda ($value)
-              (built
-                (push $statements (stream $value))
-                #`(void))))))
+        (lets
+          ($context (empty-context))
+          ($context (context-bind $context #`space? (pure-sequential #`$space?)))
+          ($context (context-bind $context #`mouse-x (pure-sequential #`$mouse-x)))
+          ($context (context-bind $context #`mouse-y (pure-sequential #`$mouse-y)))
+          ($sequential (syntax-sequential $context #`$value))
+          ($deps (sequential-deps $sequential))
+          (append
+            (stack (stream (sequential-value $sequential)))
+            (map initializer (deps-declarations $deps))
+            (map sampler (deps-updaters $deps)))))
       ((rect $x $y $w $h)
         (built-statements
           (built-bind (built-updater-expression $lookup #`$x)
@@ -242,30 +242,6 @@
                             #`(void))))))))))))
       ($other
         (syntax-error $syntax))))
-
-  (define (built-sampler-expression $lookup $syntax)
-    (syntax-case $syntax (osc noise)
-      ((osc $freq)
-        (built-bind (built-sampler-expression $lookup #`$freq)
-          (lambda ($freq)
-            (lets
-              ($osc (car (generate-temporaries `(osc))))
-              (built
-                (stack
-                  (initializer #`(define #,$osc 0.0))
-                  (sampler #`(set! #,$osc (fract (+ #,$osc (/ #,$freq $sample-freq))))))
-                $osc)))))
-      (noise
-        (lets
-          ($noise (car (generate-temporaries `(noise))))
-          (built
-            (stack
-              (initializer #`(define #,$noise 0))
-              (sampler #`(set! #,$noise (+ #,$noise 1)))
-              (sampler #`(if (= #,$noise (vector-length $noise-vector)) (set! #,$noise 0))))
-            #`(vector-ref $noise-vector #,$noise))))
-      ($other
-        (built-general-expression $lookup $syntax built-sampler-expression))))
 
   (define (built-updater-expression $lookup $syntax)
     (syntax-case $syntax ()
