@@ -17,13 +17,15 @@
         (sdl-init SDL-INIT-VIDEO)
 
         (define $sample-freq 22050)
+        (define $window-width 640)
+        (define $window-height 480)
 
         (define $window
           (sdl-create-window "Leonardo"
             SDL-WINDOWPOS-UNDEFINED
             SDL-WINDOWPOS-UNDEFINED
-            640
-            480))
+            $window-width
+            $window-height))
 
         ;(SDL_SetWindowFullscreen $window SDL-WINDOW-FULLSCREEN-DESKTOP)
 
@@ -43,6 +45,12 @@
           (make-ftype-pointer SDL_AudioSpec
             (foreign-alloc (ftype-sizeof SDL_AudioSpec))))
 
+        (define space-pressed? (make-thread-parameter #f))
+        (define mouse-x (make-thread-parameter 0))
+        (define mouse-y (make-thread-parameter 0))
+        (define canvas-width (make-thread-parameter $window-width))
+        (define canvas-height (make-thread-parameter $window-height))
+
         (define $mutex (make-mutex))
 
         (define $shared-space? #f)
@@ -50,8 +58,8 @@
         (define $shared-mouse-y 0)
         (define $shared-frame-count 0)
         (define $shared-seconds 0)
-        (define $shared-canvas-width 640)
-        (define $shared-canvas-height 480)
+        (define $shared-canvas-width $window-width)
+        (define $shared-canvas-height $window-height)
 
         (define $space? $shared-space?)
         (define $mouse-x $shared-mouse-x)
@@ -67,22 +75,7 @@
             ($callable
               (foreign-callable __collect_safe
                 (lambda ($userdata $buffer $len)
-                  (define $space? #f)
-                  (define $mouse-x #f)
-                  (define $mouse-y #f)
-                  (define $frame-count #f)
-                  (define $seconds #f)
-                  (define $canvas-width #f)
-                  (define $canvas-height #f)
-
-                  (with-mutex $mutex
-                    (set! $space? $shared-space?)
-                    (set! $mouse-x $shared-mouse-x)
-                    (set! $mouse-y $shared-mouse-y)
-                    (set! $frame-count $shared-frame-count)
-                    (set! $seconds $shared-seconds)
-                    (set! $canvas-width $shared-canvas-width)
-                    (set! $canvas-height $shared-canvas-height))
+                  (with-mutex $mutex (void))
 
                   (do!
                     ((i 0 (+ i 1)))
@@ -120,11 +113,19 @@
           (cond
             ((sdl-event-none?) #f)
             ((sdl-event-quit?) #t)
-            ((sdl-event-key-up? SDLK-SPACE) (set! $shared-space? #f) #f)
-            ((sdl-event-key-down? SDLK-SPACE) (set! $shared-space? #t) #f)
+            ((sdl-event-key-up? SDLK-SPACE)
+             (set! $shared-space? #f)
+             (space-pressed? #f)
+             #f)
+            ((sdl-event-key-down? SDLK-SPACE)
+              (set! $shared-space? #t)
+              (space-pressed? #t)
+              #f)
             ((sdl-event-mouse-motion?)
               (set! $shared-mouse-x (sdl-event-mouse-motion-x))
               (set! $shared-mouse-y (sdl-event-mouse-motion-y))
+              (mouse-x (sdl-event-mouse-motion-x))
+              (mouse-y (sdl-event-mouse-motion-y))
               #f)
            (else (process-events-and-quit?))))
 
@@ -136,8 +137,8 @@
           (define $mouse-y #f)
           (define $frame-count #f)
           (define $seconds #f)
-          (define $canvas-width 640)
-          (define $canvas-height 480)
+          (define $canvas-width #f)
+          (define $canvas-height #f)
 
           (display "\x1B;[2J")
           (display "\x1B;[0;0H")
@@ -228,11 +229,11 @@
         (lets
           ($context (empty-context))
           ($context (context-bind $context #`sample-rate (pure-sequential #`$sample-freq)))
-          ($context (context-bind $context #`space? (pure-sequential #`$space?)))
-          ($context (context-bind $context #`mouse-x (pure-sequential #`$mouse-x)))
-          ($context (context-bind $context #`mouse-y (pure-sequential #`$mouse-y)))
-          ($context (context-bind $context #`canvas-width (pure-sequential #`$canvas-width)))
-          ($context (context-bind $context #`canvas-height (pure-sequential #`$canvas-height)))
+          ($context (context-bind $context #`space? (pure-sequential #`(space-pressed?))))
+          ($context (context-bind $context #`mouse-x (pure-sequential #`(mouse-x))))
+          ($context (context-bind $context #`mouse-y (pure-sequential #`(mouse-y))))
+          ($context (context-bind $context #`canvas-width (pure-sequential #`(canvas-width))))
+          ($context (context-bind $context #`canvas-height (pure-sequential #`(canvas-height))))
           ($sequential (syntax-sequential $context #`$value))
           ($deps (sequential-deps $sequential))
           (append
