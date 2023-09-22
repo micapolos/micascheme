@@ -50,12 +50,16 @@
         (define $shared-mouse-y 0)
         (define $shared-frame-count 0)
         (define $shared-seconds 0)
+        (define $shared-canvas-width 640)
+        (define $shared-canvas-height 480)
 
         (define $space? $shared-space?)
         (define $mouse-x $shared-mouse-x)
         (define $mouse-y $shared-mouse-y)
         (define $frame-count $shared-frame-count)
         (define $seconds $shared-seconds)
+        (define $canvas-width $shared-canvas-width)
+        (define $canvas-height $shared-canvas-height)
         (define $quit? #f)
 
         (define $callback
@@ -68,13 +72,17 @@
                   (define $mouse-y #f)
                   (define $frame-count #f)
                   (define $seconds #f)
+                  (define $canvas-width #f)
+                  (define $canvas-height #f)
 
                   (with-mutex $mutex
                     (set! $space? $shared-space?)
                     (set! $mouse-x $shared-mouse-x)
                     (set! $mouse-y $shared-mouse-y)
                     (set! $frame-count $shared-frame-count)
-                    (set! $seconds $shared-seconds))
+                    (set! $seconds $shared-seconds)
+                    (set! $canvas-width $shared-canvas-width)
+                    (set! $canvas-height $shared-canvas-height))
 
                   (do!
                     ((i 0 (+ i 1)))
@@ -128,19 +136,27 @@
           (define $mouse-y #f)
           (define $frame-count #f)
           (define $seconds #f)
+          (define $canvas-width 640)
+          (define $canvas-height 480)
 
           (display "\x1B;[2J")
           (display "\x1B;[0;0H")
 
           (set! $quit?
             (with-mutex $mutex
+              (define $output-size (sdl-get-renderer-output-size $renderer))
+
               (set! $shared-frame-count (+ $shared-frame-count 1))
               (set! $shared-seconds (seconds))
+              (set! $shared-canvas-width (car $output-size))
+              (set! $shared-canvas-height (cadr $output-size))
 
               (set! $space? $shared-space?)
               (set! $mouse-x $shared-mouse-x)
               (set! $mouse-y $shared-mouse-y)
               (set! $frame-count $shared-frame-count)
+              (set! $canvas-width $shared-canvas-width)
+              (set! $canvas-height $shared-canvas-height)
               (set! $seconds $shared-seconds)
 
               (process-events-and-quit?)))
@@ -215,9 +231,12 @@
           ($context (context-bind $context #`space? (pure-sequential #`$space?)))
           ($context (context-bind $context #`mouse-x (pure-sequential #`$mouse-x)))
           ($context (context-bind $context #`mouse-y (pure-sequential #`$mouse-y)))
+          ($context (context-bind $context #`canvas-width (pure-sequential #`$canvas-width)))
+          ($context (context-bind $context #`canvas-height (pure-sequential #`$canvas-height)))
           ($sequential (syntax-sequential $context #`$value))
           ($deps (sequential-deps $sequential))
           (append
+            $statements
             (stack (stream (sequential-value $sequential)))
             (map initializer (deps-declarations $deps))
             (map sampler (deps-updaters $deps)))))
@@ -283,6 +302,10 @@
         (built (stack) #`$mouse-x))
       (mouse-y
         (built (stack) #`$mouse-y))
+      (canvas-width
+        (built (stack) #`$canvas-width))
+      (canvas-height
+        (built (stack) #`$canvas-height))
       (space?
         (built (stack) #`$space?))
       ((vector $item ...)

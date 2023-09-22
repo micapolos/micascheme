@@ -10,6 +10,8 @@
     space?
     frames
     mix
+    modulate
+    inverse
     sine
     square
     pulse
@@ -31,8 +33,14 @@
   (define-aux-keyword sample-rate)
   (define-aux-keyword make)
 
+  (define (inverse $value)
+    (- 1 $value))
+
   (define (mix . $values)
     (/ (apply + $values) (length $values)))
+
+  (define (modulate . $values)
+    (apply * $values))
 
   (define (sine $x)
     (* 0.5 (+ (sin (* $x pi2)) 1)))

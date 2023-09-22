@@ -1,6 +1,12 @@
 (import (micascheme) (react) (sequential))
 
 (react
+  (rect 0 0 mouse-x mouse-y)
+  (rect
+    mouse-x
+    mouse-y
+    (- canvas-width mouse-x)
+    (- canvas-height mouse-y))
   (audio
     (lets
       ((sawtooth freq)
@@ -22,5 +28,5 @@
       (freq (glissando freq))
 
       (tone (fatty freq))
-      (beat (- 1 (sawtooth 6)))
-      (* tone beat))))
+      (beat (inverse (sawtooth 6)))
+      (modulate tone beat))))
