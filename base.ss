@@ -17,7 +17,7 @@
     bind-if
     and-lets lets
     opt-lift
-    seconds
+    current-seconds
     works?
     check checking? test-all
     ensure
@@ -312,7 +312,7 @@
   (define pi (* (asin 1) 2))
   (define pi2 (* (asin 1) 4))
 
-  (define (seconds)
+  (define (current-seconds)
     (lets
       ($time (current-time `time-monotonic))
       (+

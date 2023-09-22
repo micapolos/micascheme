@@ -147,7 +147,7 @@
               (define $output-size (sdl-get-renderer-output-size $renderer))
 
               (set! $shared-frame-count (+ $shared-frame-count 1))
-              (set! $shared-seconds (seconds))
+              (set! $shared-seconds (current-seconds))
               (set! $shared-canvas-width (car $output-size))
               (set! $shared-canvas-height (cadr $output-size))
 
