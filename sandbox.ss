@@ -8,11 +8,10 @@
           (fract (+ prev (/ freq sample-rate)))))
 
       ((fatty freq)
-        (lets
-          (a (sawtooth freq))
-          (b (sawtooth (* freq 1.0025)))
-          (c (sawtooth (* freq 1.0050)))
-          (/ (+ a b c) 3)))
+        (mix
+          (sawtooth (* freq 1.0000))
+          (sawtooth (* freq 1.0025))
+          (sawtooth (* freq 1.0050))))
 
       ((glissando freq)
         (sequence freq prev
