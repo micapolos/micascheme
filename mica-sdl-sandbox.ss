@@ -15,13 +15,14 @@
         (define $flash? #f)
         (define $mouse-x 0)
         (define $mouse-y 0)
+        (define $event-counter 0)
         (run-sdl-audio
           22050
           AUDIO-S8
           1
           64
           ($bytevector
-            ;(writeln (format "Sound samples: ~a" (bytevector-length $bytevector)))
+            (displayln (format "Sound samples: ~a" (bytevector-length $bytevector)))
             (do!
               (($index 0 (+ $index 1)))
               ((= $index (bytevector-length $bytevector)) (void))
@@ -33,10 +34,12 @@
               $window
               -1
               SDL-RENDERER-ACCELERATED
-              ;SDL-RENDERER-PRESENT-VSYNC
+              SDL-RENDERER-PRESENT-VSYNC
               ($renderer
                 (SDL_PauseAudio 0)
                 (run-sdl-event-loop
+                  (displayln (format "Event counter: ~a" $event-counter))
+                  (set! $event-counter (+ $event-counter 1))
                   (cond
                     ((sdl-event-mouse-motion?)
                       (set! $mouse-x (sdl-event-mouse-motion-x))
@@ -46,7 +49,7 @@
                     ((sdl-event-key-up? SDLK-SPACE)
                       (set! $flash? #f))
                     ((sdl-event-none?)
-                      ;(writeln (format "Render: ~s" (current-seconds)))
+                      (displayln (format "Render: ~s" (current-seconds)))
                       (if $flash?
                         (sdl-set-render-draw-color! $renderer 255 255 255 255)
                         (sdl-set-render-draw-color! $renderer 0 0 0 255))
