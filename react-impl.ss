@@ -14,7 +14,7 @@
       ($statements (build $lookup $syntax))
       #`(begin
         (sdl-set-main-ready!)
-        (sdl-init SDL-INIT-VIDEO)
+        (sdl-init SDL-INIT-VIDEO SDL-INIT-EVENTS SDL-INIT-AUDIO)
 
         (define $sample-freq 22050)
         (define $window-width 640)
