@@ -12,37 +12,46 @@
       640 480
       ($window
         (define $sample 0)
+        (define $flash? #f)
+        (define $mouse-x 0)
+        (define $mouse-y 0)
         (run-sdl-audio
           22050
           AUDIO-S8
           1
           64
           ($bytevector
-            (writeln (format "Sound: ~s" (current-seconds)))
+            ;(writeln (format "Sound samples: ~a" (bytevector-length $bytevector)))
             (do!
               (($index 0 (+ $index 1)))
               ((= $index (bytevector-length $bytevector)) (void))
               (bytevector-s8-set! $bytevector $index $sample)
-              (set! $sample (if (= $sample 127) 0 (+ $sample 1)))))
+              (set! $sample (+ $sample (if $flash? 2 1)))
+              (if (> $sample 127) (set! $sample (- $sample 256)))))
           (
-            (SDL_PauseAudio 0)
             (run-sdl-renderer
               $window
               -1
               SDL-RENDERER-ACCELERATED
-              SDL-RENDERER-PRESENT-VSYNC
+              ;SDL-RENDERER-PRESENT-VSYNC
               ($renderer
-                (define $flash? #f)
+                (SDL_PauseAudio 0)
                 (run-sdl-event-loop
                   (cond
+                    ((sdl-event-mouse-motion?)
+                      (set! $mouse-x (sdl-event-mouse-motion-x))
+                      (set! $mouse-y (sdl-event-mouse-motion-y)))
                     ((sdl-event-key-down? SDLK-SPACE)
                       (set! $flash? #t))
                     ((sdl-event-key-up? SDLK-SPACE)
                       (set! $flash? #f))
                     ((sdl-event-none?)
-                      (writeln (format "Render: ~s" (current-seconds)))
+                      ;(writeln (format "Render: ~s" (current-seconds)))
                       (if $flash?
                         (sdl-set-render-draw-color! $renderer 255 255 255 255)
                         (sdl-set-render-draw-color! $renderer 0 0 0 255))
                       (sdl-render-clear $renderer)
-                      (sdl-render-present $renderer))))))))))))
+                      (sdl-set-render-draw-color! $renderer 255 0 0 255)
+                      (sdl-render-fill-rect $renderer (make-sdl-rect 0 0 $mouse-x $mouse-y))
+                      (sdl-render-present $renderer))))
+                (SDL_PauseAudio 1)))))))))
