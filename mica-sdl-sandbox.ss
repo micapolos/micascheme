@@ -4,10 +4,10 @@
 (define $flash? #f)
 (define $mouse-x 0)
 (define $mouse-y 0)
-(define $event-counter 0)
+(define $audio-buffer-size 1024)
 
 (define (render-audio $bytevector)
-  (displayln (format "Sound samples: ~a" (bytevector-length $bytevector)))
+  ;(displayln (format "Sound samples: ~a" (bytevector-length $bytevector)))
   (do!
     (($index 0 (+ $index 1)))
     ((= $index (bytevector-length $bytevector)) (void))
@@ -16,7 +16,7 @@
     (if (> $sample 127) (set! $sample (- $sample 256)))))
 
 (define (render $renderer)
-  (displayln (format "Render: ~s" (current-seconds)))
+  ;(displayln (format "Render: ~s" (current-seconds)))
   (if $flash?
     (sdl-set-render-draw-color! $renderer 255 255 255 255)
     (sdl-set-render-draw-color! $renderer 0 0 0 255))
@@ -36,22 +36,20 @@
       SDL-WINDOWPOS-CENTERED
       640 480
       ($window
-        (run-sdl-audio
+        (run-sdl-audio-device
           22050
           AUDIO-S8
           1
-          64
+          $audio-buffer-size
           ($bytevector (render-audio $bytevector))
-          (
+          ($audio-device
             (run-sdl-renderer
               $window
               -1
               SDL-RENDERER-ACCELERATED
               ($renderer
-                (SDL_PauseAudio 0)
+                (sdl-pause-audio-device $audio-device #f)
                 (run-sdl-event-loop
-                  (displayln (format "Event counter: ~a" $event-counter))
-                  (set! $event-counter (+ $event-counter 1))
                   (cond
                     ((sdl-event-mouse-motion?)
                       (set! $mouse-x (sdl-event-mouse-motion-x))
@@ -62,4 +60,4 @@
                       (set! $flash? #f))
                     ((sdl-event-none?)
                       (render $renderer))))
-                (SDL_PauseAudio 1)))))))))
+                      (sdl-pause-audio-device $audio-device #t)))))))))

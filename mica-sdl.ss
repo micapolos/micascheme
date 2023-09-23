@@ -3,8 +3,11 @@
     run-sdl
     run-sdl-window
     run-sdl-renderer
-    run-sdl-audio
-    run-sdl-event-loop)
+    run-sdl-event-loop
+    run-sdl-audio-device
+    sdl-pause-audio-device
+    sdl-queued-audio-size
+    sdl-queue-audio)
 
   (import (micascheme) (sdl))
 
@@ -40,7 +43,11 @@
           (lambda () $body ...)
           (lambda () (sdl-destroy-renderer $renderer))))))
 
-  (define-syntax-rule (run-sdl-audio $freq $format $channels $samples ($bytevector $callback ...) ($body ...))
+  (define-syntax-rule
+    (run-sdl-audio-device
+      $freq $format $channels $samples
+      ($bytevector $callback ...)
+      ($audio-device $body ...))
     (begin
       (define $callable
         (foreign-callable __collect_safe
@@ -55,13 +62,19 @@
                   (bytevector-u8-ref $tmp-bytevector $index)))))
           (void* void* int)
           void))
+      (define $desired-audio-spec-address (foreign-alloc (ftype-sizeof SDL_AudioSpec)))
+      (define $obtained-audio-spec-address (foreign-alloc (ftype-sizeof SDL_AudioSpec)))
       (lock-object $callable)
       (dynamic-wind
         (lambda () #f)
         (lambda ()
           (define $audio-spec
             (make-ftype-pointer SDL_AudioSpec
-              (foreign-alloc (ftype-sizeof SDL_AudioSpec))))
+              $desired-audio-spec-address))
+          (define $obtained-audio-spec
+            (make-ftype-pointer SDL_AudioSpec
+              $obtained-audio-spec-address))
+
           (ftype-set! SDL_AudioSpec (freq) $audio-spec $freq)
           (ftype-set! SDL_AudioSpec (format) $audio-spec $format)
           (ftype-set! SDL_AudioSpec (channels) $audio-spec $channels)
@@ -69,18 +82,34 @@
           (ftype-set! SDL_AudioSpec (callback) $audio-spec (foreign-callable-entry-point $callable))
           (ftype-set! SDL_AudioSpec (userdata) $audio-spec 0)
 
-          (switch (SDL_OpenAudio $audio-spec (make-ftype-pointer SDL_AudioSpec 0))
-            ((zero? _)
+          (switch
+            (SDL_OpenAudioDevice #f 0 $audio-spec $obtained-audio-spec 0)
+            ((zero? _) (sdl-error))
+            ((else $audio-device)
               (dynamic-wind
                 (lambda () #f)
-                (lambda () $body ...)
-                (lambda () (SDL_CloseAudio))))
-            ((else _) (sdl-error))))
-        (lambda () (unlock-object $callable)))))
+                (lambda ()
+                  (define $buffer-size (ftype-ref SDL_AudioSpec (size) $obtained-audio-spec))
+                  ;(displayln (format "Audio buffer size: ~a" $buffer-size))
+                  $body ...)
+                (lambda () (SDL_CloseAudioDevice $audio-device))))))
+        (lambda ()
+          (foreign-free $obtained-audio-spec-address)
+          (foreign-free $desired-audio-spec-address)
+          (unlock-object $callable)))))
 
   (define-syntax-rule (run-sdl-event-loop $body ...)
     (do!
       (($event (sdl-poll-event) (sdl-poll-event)))
       ((sdl-event-quit?) (void))
       $body ...))
+
+  (define-syntax-rule (sdl-pause-audio-device $audio-device $pause?)
+    (SDL_PauseAudioDevice $audio-device (if $pause? 1 0)))
+
+  (define-syntax-rule (sdl-queue-audio $audio-device $bytevector)
+    (SDL_QueueAudio $audio-device $bytevector (bytevector-length $bytevector)))
+
+  (define-syntax-rule (sdl-queued-audio-size $audio-device)
+    (SDL_GetQueuedAudioSize $audio-device))
 )
