@@ -1,6 +1,6 @@
 (library (react-impl)
   (export react-syntax)
-  (import (micascheme) (sdl) (react-lib) (sequential-syntax))
+  (import (micascheme) (mica-sdl) (react-lib) (sequential-syntax))
 
   (data (initializer syntax))
   (data (updater syntax))
@@ -14,151 +14,114 @@
       ($statements (build $lookup $syntax))
       #`(begin
         (sdl-set-main-ready!)
-        (sdl-init SDL-INIT-VIDEO SDL-INIT-EVENTS SDL-INIT-AUDIO)
+        (run-sdl SDL-INIT-VIDEO SDL-INIT-EVENTS SDL-INIT-AUDIO
+          (
+            (define $sample-freq 22050)
+            (define $window-width 640)
+            (define $window-height 480)
 
-        (define $sample-freq 22050)
-        (define $window-width 640)
-        (define $window-height 480)
+            (run-sdl-window
+              "Leonardo"
+              SDL-WINDOWPOS-UNDEFINED
+              SDL-WINDOWPOS-UNDEFINED
+              $window-width
+              $window-height
+              ($window
+                ;(SDL_SetWindowFullscreen $window SDL-WINDOW-FULLSCREEN-DESKTOP)
 
-        (define $window
-          (sdl-create-window "Leonardo"
-            SDL-WINDOWPOS-UNDEFINED
-            SDL-WINDOWPOS-UNDEFINED
-            $window-width
-            $window-height))
+                (run-sdl-renderer
+                  $window
+                  -1
+                  SDL-RENDERER-ACCELERATED
+                  ($renderer
+                    (define $noise-vector
+                      (lets
+                        ($vector (make-vector 4096))
+                        (do!
+                          ((i 0 (+ i 1)))
+                          ((= i (vector-length $vector)) (void))
+                          (vector-set! $vector i (random 1.0)))
+                        $vector))
 
-        ;(SDL_SetWindowFullscreen $window SDL-WINDOW-FULLSCREEN-DESKTOP)
+                    (define param-space-pressed? (make-thread-parameter #f))
+                    (define param-mouse-x (make-thread-parameter 0))
+                    (define param-mouse-y (make-thread-parameter 0))
+                    (define param-canvas-width (make-thread-parameter $window-width))
+                    (define param-canvas-height (make-thread-parameter $window-height))
+                    (define param-frame-count (make-thread-parameter 0))
+                    (define param-seconds (make-thread-parameter 0))
 
-        (define $renderer
-          (sdl-create-renderer $window
-            -1
-            SDL-RENDERER-ACCELERATED))
+                    (define $quit? #f)
 
-        (define $noise-vector (make-vector 4096))
-        (do!
-          ((i 0 (+ i 1)))
-          ((= i (vector-length $noise-vector)) (void))
-          (vector-set! $noise-vector i (random 1.0)))
+                    #,@(map initializer-syntax (filter initializer? $statements))
 
-        (define $audio-spec
-          (make-ftype-pointer SDL_AudioSpec
-            (foreign-alloc (ftype-sizeof SDL_AudioSpec))))
+                    (run-sdl-audio-device
+                      22050
+                      AUDIO-S8
+                      1
+                      64
+                      ($bytevector
+                        (do!
+                          ((i 0 (+ i 1)))
+                          ((>= i (bytevector-length $bytevector)) (void))
+                          #,@(map sampler-syntax (filter sampler? $statements))
+                          (let*
+                            (($index i)
+                             ($audio-opt #,(single (map stream-syntax (filter stream? $statements))))
+                             ($value
+                              (inexact->exact
+                                (floor
+                                  (-
+                                    (* (min 1 (max 0 (or $audio-opt 0.5))) 255)
+                                    128)))))
+                            (bytevector-s8-set! $bytevector $index $value))))
+                      ($audio-device
+                        (sdl-pause-audio-device $audio-device #f)
 
-        (define param-space-pressed? (make-thread-parameter #f))
-        (define param-mouse-x (make-thread-parameter 0))
-        (define param-mouse-y (make-thread-parameter 0))
-        (define param-canvas-width (make-thread-parameter $window-width))
-        (define param-canvas-height (make-thread-parameter $window-height))
-        (define param-frame-count (make-thread-parameter 0))
-        (define param-seconds (make-thread-parameter 0))
+                        (run-sdl-event-loop
+                          (cond
+                            ((sdl-event-key-up? SDLK-SPACE)
+                             (param-space-pressed? #f)
+                             #f)
+                            ((sdl-event-key-down? SDLK-SPACE)
+                              (param-space-pressed? #t)
+                              #f)
+                            ((sdl-event-mouse-motion?)
+                              (param-mouse-x (sdl-event-mouse-motion-x))
+                              (param-mouse-y (sdl-event-mouse-motion-y))
+                              #f)
+                            ((sdl-event-none?)
+                              ; (display "\x1B;[2J")
+                              ; (display "\x1B;[0;0H")
 
-        (define $audio-started? #f)
-        (define $quit? #f)
+                              (param-canvas-width (car (sdl-get-renderer-output-size $renderer)))
+                              (param-canvas-height (cadr (sdl-get-renderer-output-size $renderer)))
+                              (param-frame-count (+ (param-frame-count) 1))
+                              (param-seconds (current-seconds))
 
-        (define $callback
-          (lets
-            ($callable
-              (foreign-callable __collect_safe
-                (lambda ($userdata $buffer $len)
-                  (do!
-                    ((i 0 (+ i 1)))
-                    ((>= i $len) (void))
-                    #,@(map sampler-syntax (filter sampler? $statements))
-                    (let*
-                      (($index i)
-                       ($audio-opt #,(single (map stream-syntax (filter stream? $statements))))
-                       ($value
-                        (inexact->exact
-                          (floor
-                            (-
-                              (* (min 1 (max 0 (or $audio-opt 0.5))) 255)
-                              128)))))
-                      (foreign-set! `integer-8 $buffer $index $value))))
-                (void* void* int)
-                void))
-            (do (lock-object $callable))
-            (foreign-callable-entry-point $callable)))
+                              ; #,@(map (lambda ($syntax) #`(writeln (quote (init #,$syntax))))
+                              ;   (map initializer-syntax
+                              ;     (filter initializer? $statements)))
+                              ; #,@(map (lambda ($syntax) #`(writeln (quote (updater #,$syntax))))
+                              ;   (map updater-syntax
+                              ;     (filter updater? $statements)))
+                              ; #,@(map (lambda ($syntax) #`(writeln (quote (sampler #,$syntax))))
+                              ;   (map sampler-syntax
+                              ;     (filter sampler? $statements)))
+                              ; #,@(map (lambda ($syntax) #`(writeln (quote (audio #,$syntax))))
+                              ;   (map stream-syntax
+                              ;     (filter stream? $statements)))
 
-        (ftype-set! SDL_AudioSpec (freq) $audio-spec $sample-freq)
-        (ftype-set! SDL_AudioSpec (format) $audio-spec AUDIO-S8)
-        (ftype-set! SDL_AudioSpec (channels) $audio-spec 1)
-        (ftype-set! SDL_AudioSpec (samples) $audio-spec 1024)
-        (ftype-set! SDL_AudioSpec (callback) $audio-spec $callback)
-        (ftype-set! SDL_AudioSpec (userdata) $audio-spec 0)
+                              (sdl-set-render-draw-color! $renderer 0 0 0 255)
+                              (sdl-render-clear $renderer)
 
-        (define $open-audio-result
-          (SDL_OpenAudio $audio-spec (make-ftype-pointer SDL_AudioSpec 0)))
+                              (sdl-set-render-draw-color! $renderer 255 255 255 255)
 
-        (foreign-free (ftype-pointer-address $audio-spec))
+                              #,@(map updater-syntax (filter updater? $statements))
 
-        (define (process-events-and-quit?)
-          (sdl-poll-event)
-          (cond
-            ((sdl-event-none?) #f)
-            ((sdl-event-quit?) #t)
-            ((sdl-event-key-up? SDLK-SPACE)
-             (param-space-pressed? #f)
-             #f)
-            ((sdl-event-key-down? SDLK-SPACE)
-              (param-space-pressed? #t)
-              #f)
-            ((sdl-event-mouse-motion?)
-              (param-mouse-x (sdl-event-mouse-motion-x))
-              (param-mouse-y (sdl-event-mouse-motion-y))
-              #f)
-           (else (process-events-and-quit?))))
+                              (sdl-render-present $renderer))))
 
-        #,@(map initializer-syntax (filter initializer? $statements))
-
-        (define (game-loop)
-          (display "\x1B;[2J")
-          (display "\x1B;[0;0H")
-
-          (set! $quit? (process-events-and-quit?))
-
-          (param-canvas-width (car (sdl-get-renderer-output-size $renderer)))
-          (param-canvas-height (cadr (sdl-get-renderer-output-size $renderer)))
-          (param-frame-count (+ (param-frame-count) 1))
-          (param-seconds (current-seconds))
-
-          (if (not $audio-started?)
-            (SDL_PauseAudio 0)
-            (set! $audio-started? #t))
-
-          ; #,@(map (lambda ($syntax) #`(writeln (quote (init #,$syntax))))
-          ;   (map initializer-syntax
-          ;     (filter initializer? $statements)))
-          ; #,@(map (lambda ($syntax) #`(writeln (quote (updater #,$syntax))))
-          ;   (map updater-syntax
-          ;     (filter updater? $statements)))
-          ; #,@(map (lambda ($syntax) #`(writeln (quote (sampler #,$syntax))))
-          ;   (map sampler-syntax
-          ;     (filter sampler? $statements)))
-          ; #,@(map (lambda ($syntax) #`(writeln (quote (audio #,$syntax))))
-          ;   (map stream-syntax
-          ;     (filter stream? $statements)))
-
-          (sdl-set-render-draw-color! $renderer 0 0 0 255)
-          (sdl-render-clear $renderer)
-
-          (sdl-set-render-draw-color! $renderer 255 255 255 255)
-
-          #,@(map updater-syntax (filter updater? $statements))
-
-          (sdl-render-present $renderer)
-
-          (sleep (make-time `time-duration 1000 0))
-
-          (if (not $quit?) (game-loop)))
-
-        (game-loop)
-
-        (SDL_PauseAudio 1)
-        (SDL_CloseAudio)
-
-        (sdl-destroy-renderer $renderer)
-        (sdl-destroy-window $window)
-        (sdl-quit))))
+                        (sdl-pause-audio-device $audio-device #t))))))))))))
 
   (define (build $lookup $syntax)
     (reverse
