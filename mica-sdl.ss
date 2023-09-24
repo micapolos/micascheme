@@ -17,6 +17,8 @@
   (define (sdl-error)
     (error `sdl (sdl-get-error)))
 
+  (define $audio-mutex (make-mutex))
+
   (define-syntax-rule (run-sdl $flag $flags ... ($body ...))
     (case (sdl-init $flag $flags ...)
       ((0)
@@ -54,14 +56,15 @@
         (foreign-callable __collect_safe
           (lambda ($userdata $buffer $len)
             ;(displayln "Audio callback...")
-            (lets
-              ($tmp-bytevector (make-bytevector $len))
-              (do ((lambda ($bytevector) $callback ...) $tmp-bytevector))
-              (do!
-                (($index 0 (+ $index 1)))
-                ((>= $index $len) (void))
-                (foreign-set! `unsigned-8 $buffer $index
-                  (bytevector-u8-ref $tmp-bytevector $index)))))
+            (with-mutex $audio-mutex
+              (lets
+                ($tmp-bytevector (make-bytevector $len))
+                (do ((lambda ($bytevector) $callback ...) $tmp-bytevector))
+                (do!
+                  (($index 0 (+ $index 1)))
+                  ((>= $index $len) (void))
+                  (foreign-set! `unsigned-8 $buffer $index
+                    (bytevector-u8-ref $tmp-bytevector $index))))))
           (void* void* int)
           void))
       (define $desired-audio-spec-address (foreign-alloc (ftype-sizeof SDL_AudioSpec)))
@@ -115,16 +118,17 @@
   (define-syntax-rule (sdl-queued-audio-size $audio-device)
     (SDL_GetQueuedAudioSize $audio-device))
 
-  ; TODO: Dead-locks. Fix it!!!
+  ; TODO: SDL_LockAudioDevice dead-locks. Fix it!!!
   (define-syntax-rule (run-sdl-locked-audio-device $audio-device ($body ...))
-    (dynamic-wind
-      (lambda ()
-        ;(displayln "Locking audio...")
-        ;(SDL_LockAudioDevice $audio-device)
-        (void))
-      (lambda () $body ...)
-      (lambda ()
-        ;(displayln "Unlocking audio...")
-        ;(SDL_UnlockAudioDevice $audio-device)
-        (void))))
+    (with-mutex $audio-mutex $body ...))
+    ; (dynamic-wind
+    ;   (lambda ()
+    ;     ;(displayln "Locking audio...")
+    ;     ;(SDL_LockAudioDevice $audio-device)
+    ;     (void))
+    ;   (lambda () $body ...)
+    ;   (lambda ()
+    ;     ;(displayln "Unlocking audio...")
+    ;     ;(SDL_UnlockAudioDevice $audio-device)
+    ;     (void))))
 )
