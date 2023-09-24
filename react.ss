@@ -11,5 +11,9 @@
       (syntax-case $syntax ()
         ((_ $item ...)
           (lambda ($lookup)
-            (react-syntax $lookup #`($item ...)))))))
+            (lets
+              ($syntax (react-syntax $lookup #`($item ...)))
+              #`(begin
+                (pretty-print (quote #,$syntax))
+                #,$syntax)))))))
 )

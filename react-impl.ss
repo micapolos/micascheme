@@ -216,6 +216,25 @@
           (map sampler (deps-updaters $deps)))
         (sequential-value $sequential))))
 
+  (define (built-main-expression $lookup $syntax)
+    (lets
+      ($context (empty-context))
+      ($context (context-bind $context #`sample-rate (pure-sequential #`$sample-freq)))
+      ($context (context-bind $context #`space? (pure-sequential #`$space-pressed?)))
+      ($context (context-bind $context #`mouse-x (pure-sequential #`$mouse-x)))
+      ($context (context-bind $context #`mouse-y (pure-sequential #`$mouse-y)))
+      ($context (context-bind $context #`canvas-width (pure-sequential #`$canvas-width)))
+      ($context (context-bind $context #`canvas-height (pure-sequential #`$canvas-height)))
+      ($context (context-bind $context #`frames (pure-sequential #`$frame-count)))
+      ($context (context-bind $context #`seconds (pure-sequential #`$seconds)))
+      ($sequential (syntax-sequential $context $syntax))
+      ($deps (sequential-deps $sequential))
+      (built
+        (append
+          (map initializer (deps-declarations $deps))
+          (map sampler (deps-updaters $deps)))
+        (sequential-value $sequential))))
+
   (define (built-updater-expression $lookup $syntax)
     (syntax-case $syntax ()
       ($other
