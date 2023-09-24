@@ -7,6 +7,8 @@
     audio
     mouse-x
     mouse-y
+    canvas-width
+    canvas-height
     space?
     frames
     mix
@@ -28,6 +30,8 @@
   (define-aux-keyword osc)
   (define-aux-keyword mouse-x)
   (define-aux-keyword mouse-y)
+  (define-aux-keyword canvas-width)
+  (define-aux-keyword canvas-height)
   (define-aux-keyword space?)
   (define-aux-keyword frames)
   (define-aux-keyword sample-rate)

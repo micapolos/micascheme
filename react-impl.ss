@@ -89,15 +89,12 @@
                         (run-sdl-event-loop
                           (cond
                             ((sdl-event-key-up? SDLK-SPACE)
-                             (set! $space-pressed? #f)
-                             #f)
+                             (set! $space-pressed? #f))
                             ((sdl-event-key-down? SDLK-SPACE)
-                              (set! $space-pressed? #t)
-                              #f)
+                              (set! $space-pressed? #t))
                             ((sdl-event-mouse-motion?)
                               (set! $mouse-x (sdl-event-mouse-motion-x))
-                              (set! $mouse-y (sdl-event-mouse-motion-y))
-                              #f)
+                              (set! $mouse-y (sdl-event-mouse-motion-y)))
                             ((sdl-event-none?)
                               (set! $canvas-width (car (sdl-get-renderer-output-size $renderer)))
                               (set! $canvas-height (cadr (sdl-get-renderer-output-size $renderer)))
@@ -162,7 +159,7 @@
     (syntax-case $syntax (message audio audio2 rect make define)
       ((message $value)
         (built-statements
-          (built-bind (built-updater-expression $lookup #`$value)
+          (built-bind (built-main-expression $lookup #`$value)
             (lambda ($value)
               (built
                 (push $statements
@@ -176,13 +173,13 @@
             (stream (built-value $built-audio)))))
       ((rect $x $y $w $h)
         (built-statements
-          (built-bind (built-updater-expression $lookup #`$x)
+          (built-bind (built-main-expression $lookup #`$x)
             (lambda ($x)
-              (built-bind (built-updater-expression $lookup #`$y)
+              (built-bind (built-main-expression $lookup #`$y)
                 (lambda ($y)
-                  (built-bind (built-updater-expression $lookup #`$w)
+                  (built-bind (built-main-expression $lookup #`$w)
                     (lambda ($w)
-                      (built-bind (built-updater-expression $lookup #`$h)
+                      (built-bind (built-main-expression $lookup #`$h)
                         (lambda ($h)
                           (built
                             (push $statements
@@ -232,74 +229,6 @@
       (built
         (append
           (map initializer (deps-declarations $deps))
-          (map sampler (deps-updaters $deps)))
+          (map updater (deps-updaters $deps)))
         (sequential-value $sequential))))
-
-  (define (built-updater-expression $lookup $syntax)
-    (syntax-case $syntax ()
-      ($other
-        (built-general-expression $lookup $syntax built-updater-expression))))
-
-  (define (built-general-expression $lookup $syntax $recurse)
-    (syntax-case $syntax (if seconds frames mouse-x mouse-y space? vector lets)
-      ((lets $body)
-        (built-general-expression $lookup #`$body $recurse))
-      ((lets ($var $expr) $rest ...)
-        (lets
-          ($built-expr ($recurse $lookup #`$expr))
-          ($built-rest ($recurse $lookup #`(lets $rest ...)))
-          (built
-            (append
-              (built-statements $built-rest)
-              (stack
-                (initializer #`(define $var #f))
-                (sampler #`(set! $var #,(built-value $built-expr))))
-              (built-statements $built-expr))
-            (built-value $built-rest))))
-      ((if $cond $true $false)
-        (built-bind ($recurse $lookup #`$cond)
-          (lambda ($cond)
-            (built-bind ($recurse $lookup #`$true)
-              (lambda ($true)
-                (built-bind ($recurse $lookup #`$false)
-                  (lambda ($false)
-                    (built
-                      (stack)
-                      #`(if #,$cond #,$true #,$false)))))))))
-      (seconds
-        (built (stack) #`$seconds))
-      (frames
-        (built (stack) #`$frame-count))
-      (mouse-x
-        (built (stack) #`$mouse-x))
-      (mouse-y
-        (built (stack) #`$mouse-y))
-      (canvas-width
-        (built (stack) #`$canvas-width))
-      (canvas-height
-        (built (stack) #`$canvas-height))
-      (space?
-        (built (stack) #`$space-pressed?))
-      ((vector $item ...)
-        (lets
-          ($vector (car (generate-temporaries `(vector))))
-          (built
-            (stack
-              (initializer
-                #`(define #,$vector (vector $item ...))))
-            $vector)))
-      (($item ...)
-        (lets
-          ($builts (map (partial $recurse $lookup) (syntax->list #`($item ...))))
-          (built
-            (apply append (map built-statements $builts))
-            #`(#,@(map built-value $builts)))))
-      ($id (identifier? #`$id)
-        (switch ($lookup #`$id #`react)
-          ((false? _)
-            (built (stack) #`$id))
-          ((else $property)
-            (built (car $property) (cdr $property)))))
-      ($other
-        (built (stack) #`$other))))
 )

@@ -104,9 +104,7 @@
     (do!
       (($event (sdl-poll-event) (sdl-poll-event)))
       ((sdl-event-quit?) (void))
-      $body ...
-      ; some sleep is necessary not to stall the audio thread
-      (sleep (make-time `time-duration 1000 0))))
+      $body ...))
 
   (define-syntax-rule (sdl-pause-audio-device $audio-device $pause?)
     (SDL_PauseAudioDevice $audio-device (if $pause? 1 0)))
@@ -117,13 +115,16 @@
   (define-syntax-rule (sdl-queued-audio-size $audio-device)
     (SDL_GetQueuedAudioSize $audio-device))
 
+  ; TODO: Dead-locks. Fix it!!!
   (define-syntax-rule (run-sdl-locked-audio-device $audio-device ($body ...))
     (dynamic-wind
       (lambda ()
         ;(displayln "Locking audio...")
-        (SDL_LockAudioDevice $audio-device))
+        ;(SDL_LockAudioDevice $audio-device)
+        (void))
       (lambda () $body ...)
       (lambda ()
         ;(displayln "Unlocking audio...")
-        (SDL_UnlockAudioDevice $audio-device))))
+        ;(SDL_UnlockAudioDevice $audio-device)
+        (void))))
 )
