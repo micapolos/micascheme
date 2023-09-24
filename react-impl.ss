@@ -170,22 +170,10 @@
                 #`(void))))))
       ((audio $value)
         (lets
-          ($context (empty-context))
-          ($context (context-bind $context #`sample-rate (pure-sequential #`$sample-freq)))
-          ($context (context-bind $context #`space? (pure-sequential #`$audio-space-pressed?)))
-          ($context (context-bind $context #`mouse-x (pure-sequential #`$audio-mouse-x)))
-          ($context (context-bind $context #`mouse-y (pure-sequential #`$audio-mouse-y)))
-          ($context (context-bind $context #`canvas-width (pure-sequential #`$audio-canvas-width)))
-          ($context (context-bind $context #`canvas-height (pure-sequential #`$audio-canvas-height)))
-          ($context (context-bind $context #`frames (pure-sequential #`$audio-frame-count)))
-          ($context (context-bind $context #`seconds (pure-sequential #`$audio-seconds)))
-          ($sequential (syntax-sequential $context #`$value))
-          ($deps (sequential-deps $sequential))
-          (append
-            (stack (stream (sequential-value $sequential)))
-            (map initializer (deps-declarations $deps))
-            (map sampler (deps-updaters $deps))
-            $statements)))
+          ($built-audio (built-audio-expression $lookup #`$value))
+          (push
+            (push-all $statements (built-statements $built-audio))
+            (stream (built-value $built-audio)))))
       ((rect $x $y $w $h)
         (built-statements
           (built-bind (built-updater-expression $lookup #`$x)
@@ -208,6 +196,25 @@
                             #`(void))))))))))))
       ($other
         (syntax-error $syntax))))
+
+  (define (built-audio-expression $lookup $syntax)
+    (lets
+      ($context (empty-context))
+      ($context (context-bind $context #`sample-rate (pure-sequential #`$sample-freq)))
+      ($context (context-bind $context #`space? (pure-sequential #`$audio-space-pressed?)))
+      ($context (context-bind $context #`mouse-x (pure-sequential #`$audio-mouse-x)))
+      ($context (context-bind $context #`mouse-y (pure-sequential #`$audio-mouse-y)))
+      ($context (context-bind $context #`canvas-width (pure-sequential #`$audio-canvas-width)))
+      ($context (context-bind $context #`canvas-height (pure-sequential #`$audio-canvas-height)))
+      ($context (context-bind $context #`frames (pure-sequential #`$audio-frame-count)))
+      ($context (context-bind $context #`seconds (pure-sequential #`$audio-seconds)))
+      ($sequential (syntax-sequential $context $syntax))
+      ($deps (sequential-deps $sequential))
+      (built
+        (append
+          (map initializer (deps-declarations $deps))
+          (map sampler (deps-updaters $deps)))
+        (sequential-value $sequential))))
 
   (define (built-updater-expression $lookup $syntax)
     (syntax-case $syntax ()
