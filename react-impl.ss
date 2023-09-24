@@ -165,10 +165,10 @@
           ($sequential (syntax-sequential $context #`$value))
           ($deps (sequential-deps $sequential))
           (append
-            $statements
             (stack (stream (sequential-value $sequential)))
             (map initializer (deps-declarations $deps))
-            (map sampler (deps-updaters $deps)))))
+            (map sampler (deps-updaters $deps))
+            $statements)))
       ((rect $x $y $w $h)
         (built-statements
           (built-bind (built-updater-expression $lookup #`$x)
