@@ -105,6 +105,7 @@
       (($event (sdl-poll-event) (sdl-poll-event)))
       ((sdl-event-quit?) (void))
       $body ...
+      ; some sleep is necessary not to stall the audio thread
       (sleep (make-time `time-duration 1000 0))))
 
   (define-syntax-rule (sdl-pause-audio-device $audio-device $pause?)
