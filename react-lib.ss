@@ -10,6 +10,7 @@
     canvas-width
     canvas-height
     space?
+    seconds
     frames
     mix
     modulate
@@ -33,6 +34,7 @@
   (define-aux-keyword canvas-width)
   (define-aux-keyword canvas-height)
   (define-aux-keyword space?)
+  (define-aux-keyword seconds)
   (define-aux-keyword frames)
   (define-aux-keyword sample-rate)
   (define-aux-keyword make)
