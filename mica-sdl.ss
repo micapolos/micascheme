@@ -5,6 +5,7 @@
     run-sdl-renderer
     run-sdl-event-loop
     run-sdl-audio-device
+    run-sdl-locked-audio-device
     sdl-pause-audio-device
     sdl-queued-audio-size
     sdl-queue-audio)
@@ -52,6 +53,7 @@
       (define $callable
         (foreign-callable __collect_safe
           (lambda ($userdata $buffer $len)
+            ;(displayln "Audio callback...")
             (lets
               ($tmp-bytevector (make-bytevector $len))
               (do ((lambda ($bytevector) $callback ...) $tmp-bytevector))
@@ -102,7 +104,8 @@
     (do!
       (($event (sdl-poll-event) (sdl-poll-event)))
       ((sdl-event-quit?) (void))
-      $body ...))
+      $body ...
+      (sleep (make-time `time-duration 1000 0))))
 
   (define-syntax-rule (sdl-pause-audio-device $audio-device $pause?)
     (SDL_PauseAudioDevice $audio-device (if $pause? 1 0)))
@@ -112,4 +115,14 @@
 
   (define-syntax-rule (sdl-queued-audio-size $audio-device)
     (SDL_GetQueuedAudioSize $audio-device))
+
+  (define-syntax-rule (run-sdl-locked-audio-device $audio-device ($body ...))
+    (dynamic-wind
+      (lambda ()
+        ;(displayln "Locking audio...")
+        (SDL_LockAudioDevice $audio-device))
+      (lambda () $body ...)
+      (lambda ()
+        ;(displayln "Unlocking audio...")
+        (SDL_UnlockAudioDevice $audio-device))))
 )

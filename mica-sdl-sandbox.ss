@@ -1,19 +1,21 @@
 (import (micascheme) (sdl) (mica-sdl))
 
-(define $sample 0)
 (define $flash? #f)
 (define $mouse-x 0)
 (define $mouse-y 0)
-(define $audio-buffer-size 1024)
+
+(define $audio-buffer-size 64)
+(define $audio-sample 0)
+(define $audio-flash? #f)
 
 (define (render-audio $bytevector)
   ;(displayln (format "Sound samples: ~a" (bytevector-length $bytevector)))
   (do!
     (($index 0 (+ $index 1)))
     ((= $index (bytevector-length $bytevector)) (void))
-    (bytevector-s8-set! $bytevector $index $sample)
-    (set! $sample (+ $sample (if $flash? 2 1)))
-    (if (> $sample 127) (set! $sample (- $sample 256)))))
+    (bytevector-s8-set! $bytevector $index $audio-sample)
+    (set! $audio-sample (+ $audio-sample (if $audio-flash? 2 1)))
+    (if (> $audio-sample 127) (set! $audio-sample (- $audio-sample 256)))))
 
 (define (render $renderer)
   ;(displayln (format "Render: ~s" (current-seconds)))
@@ -47,6 +49,7 @@
               $window
               -1
               SDL-RENDERER-ACCELERATED
+              SDL-RENDERER-PRESENT-VSYNC
               ($renderer
                 (sdl-pause-audio-device $audio-device #f)
                 (run-sdl-event-loop
@@ -59,5 +62,8 @@
                     ((sdl-event-key-up? SDLK-SPACE)
                       (set! $flash? #f))
                     ((sdl-event-none?)
+                      (run-sdl-locked-audio-device $audio-device
+                        (
+                          (set! $audio-flash? $flash?)))
                       (render $renderer))))
-                      (sdl-pause-audio-device $audio-device #t)))))))))
+                (sdl-pause-audio-device $audio-device #t)))))))))

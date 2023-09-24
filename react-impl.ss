@@ -32,8 +32,7 @@
         (define $renderer
           (sdl-create-renderer $window
             -1
-            SDL-RENDERER-ACCELERATED
-            SDL-RENDERER-PRESENT-VSYNC))
+            SDL-RENDERER-ACCELERATED))
 
         (define $noise-vector (make-vector 4096))
         (do!
@@ -83,7 +82,7 @@
         (ftype-set! SDL_AudioSpec (freq) $audio-spec $sample-freq)
         (ftype-set! SDL_AudioSpec (format) $audio-spec AUDIO-S8)
         (ftype-set! SDL_AudioSpec (channels) $audio-spec 1)
-        (ftype-set! SDL_AudioSpec (samples) $audio-spec 64)
+        (ftype-set! SDL_AudioSpec (samples) $audio-spec 1024)
         (ftype-set! SDL_AudioSpec (callback) $audio-spec $callback)
         (ftype-set! SDL_AudioSpec (userdata) $audio-spec 0)
 
@@ -147,6 +146,8 @@
           #,@(map updater-syntax (filter updater? $statements))
 
           (sdl-render-present $renderer)
+
+          (sleep (make-time `time-duration 1000 0))
 
           (if (not $quit?) (game-loop)))
 
