@@ -64,6 +64,91 @@
 (check (equal? (monad-lift option-monad string-append #f "b") #f))
 (check (equal? (monad-lift option-monad string-append #f #f) #f))
 
+; monad-stack-box
+
+(define cons-monad-1 (cons-monad 1))
+(define cons-monad-2 (cons-monad 2))
+
+(check
+  (equal?
+    (monad-stack-box
+      (stack)
+      (stack)
+      "foo")
+    (box "foo")))
+
+(check
+  (equal?
+    (monad-stack-box
+      (stack)
+      (stack cons-monad-1)
+      "foo")
+    (box (cons 1 "foo"))))
+
+(check
+  (equal?
+    (monad-stack-box
+      (stack cons-monad-1)
+      (stack)
+      "foo")
+    #f))
+
+(check
+  (equal?
+    (monad-stack-box
+      (stack)
+      (stack cons-monad-1 cons-monad-2)
+      "foo")
+    (box (cons 2 (cons 1 "foo")))))
+
+(check
+  (equal?
+    (monad-stack-box
+      (stack cons-monad-1 cons-monad-2)
+      (stack)
+      "foo")
+    #f))
+
+(check
+  (equal?
+    (monad-stack-box
+      (stack cons-monad-1)
+      (stack cons-monad-1)
+      (cons 1 "foo"))
+    (box (cons 1 "foo"))))
+
+(check
+  (equal?
+    (monad-stack-box
+      (stack cons-monad-1 cons-monad-2)
+      (stack cons-monad-1 cons-monad-2)
+      (cons 2 (cons 1 "foo")))
+    (box (cons 2 (cons 1 "foo")))))
+
+(check
+  (equal?
+    (monad-stack-box
+      (stack cons-monad-1)
+      (stack cons-monad-1 cons-monad-2)
+      (cons 1 "foo"))
+    (box (cons 2 (cons 1 "foo")))))
+
+(check
+  (equal?
+    (monad-stack-box
+      (stack cons-monad-1)
+      (stack cons-monad-2 cons-monad-1)
+      (cons 1 "foo"))
+    (box (cons 1 (cons 2 "foo")))))
+
+(check
+  (equal?
+    (monad-stack-box
+      (stack cons-monad-1 cons-monad-2)
+      (stack cons-monad-2 cons-monad-1)
+      (cons 2 (cons 1 "foo")))
+    #f))
+
 ; listing monad
 
 (check

@@ -3,7 +3,9 @@
     monad monad? monad-pure-fn monad-bind-fn
     monad-pure monad-bind monad-map monad-sequence monad-lift monad-apply
     monadic pure define-monadic
+    monad-stack-box
     option-monad 
+    cons-monad
     listing listing-bind listing-run listing-monad)
   (import (micascheme))
 
@@ -44,6 +46,35 @@
           (lambda ($args)
             (apply $fn $args))))))
 
+  ; monad-stack
+
+  (define (monad-stack-boxer-opt $from-monad-stack $to-monad-stack)
+    (cond
+      ((null? $to-monad-stack)
+        (and (null? $from-monad-stack) identity))
+      (else
+        (cond
+          ((and (not (null? $from-monad-stack)) (equal? (car $from-monad-stack) (car $to-monad-stack)))
+            (lets
+              ($monad-stack-boxer-opt (monad-stack-boxer-opt (cdr $from-monad-stack) (cdr $to-monad-stack)))
+              (and $monad-stack-boxer-opt
+                (lambda ($monadic)
+                  (monad-map (car $from-monad-stack) $monadic
+                    (lambda ($value)
+                      ($monad-stack-boxer-opt $value)))))))
+          (else
+            (lets
+              ($monad-stack-boxer-opt (monad-stack-boxer-opt $from-monad-stack (cdr $to-monad-stack)))
+              (and $monad-stack-boxer-opt
+                (lambda ($value)
+                  (monad-pure (car $to-monad-stack)
+                    ($monad-stack-boxer-opt $value))))))))))
+
+  (define (monad-stack-box $from-monad-stack $to-monad-stack $monadic)
+    (lets
+      ($monad-stack-boxer-opt (monad-stack-boxer-opt $from-monad-stack $to-monad-stack))
+      (and $monad-stack-boxer-opt (box ($monad-stack-boxer-opt $monadic)))))
+
   ; syntaxes
 
   (define-aux-keyword pure)
@@ -71,7 +102,12 @@
               (lambda (#,$monad $param ...) 
                 (monadic #,$monad $body))))))))
 
-  ; monads
+  ; monad-stack
+
+  (define (cons-monad $car)
+    (monad
+      (lambda ($value) (cons $car $value))
+      (lambda ($pair $fn) ($fn (cdr $pair)))))
 
   (define option-monad 
     (monad
