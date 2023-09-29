@@ -13,7 +13,7 @@
 
     parse-typed-list parse-typed
 
-    get type boolean number)
+    get type boolean number bind)
   (import (micascheme))
 
   (data (typed box-opt syntax type))
@@ -25,10 +25,14 @@
   (data (struct name items))
   (data (function-type params result))
 
+  (define-aux-keyword bind)
   (define-aux-keyword get)
   (define-aux-keyword type)
   (define-aux-keyword boolean)
   (define-aux-keyword number)
+
+  (define tico-environment
+    (copy-environment (environment `(micascheme))))
 
   (define (empty-context)
     (lambda ($type) #f))
@@ -65,12 +69,26 @@
             (or
               (context-ref $context (parse-type $context #`$type))
               (syntax-error $syntax "not found")))
-          ((begin $expr)
-            (parse-typed $context #`$expr))
-          ((begin $decl $decl2 ... $expr)
-            (parse-typed
-              (parse-declaration $context #`$decl)
-              #`(begin $decl2 ... $expr)))
+          ((begin $body)
+            (parse-typed $context #`$body))
+          ((begin $expr $expr2 ... $body)
+            (lets
+              ($typed-expr (parse-typed $context #`$expr))
+              ($tmp (generate-temporary))
+              ($expr-box-opt (typed-box-opt $typed-expr))
+              (do (when $expr-box-opt
+                (define-top-level-value
+                  (syntax->datum $tmp)
+                  (unbox $expr-box-opt)
+                  tico-environment)))
+              ($binding (typed $expr-box-opt $tmp (typed-type $typed-expr)))
+              ($context (context-push $context $binding))
+              ($typed-body (parse-typed $context #`(begin $expr2 ... $body)))
+              (typed
+                (typed-box-opt $typed-body)
+                #`(let ((#,$tmp #,(typed-syntax $typed-expr)))
+                  #,(typed-syntax $typed-body))
+                (typed-type $typed-body))))
           ; ((lambda ($param ...) $body)
           ;   (lets
           ;     ($param-types (map (partial parse-type $context) (syntax->list #`($param ...))))

@@ -20,6 +20,7 @@
     current-seconds
     works?
     check checking? test-all
+    with-generate-temporary-seed
     ensure
     data
     partial
@@ -84,10 +85,31 @@
       (pair? $list) 
       (null? (cdr $list))))
 
-  (define (generate-temporary $obj) 
-    (if (checking?)
-      (build-identifier ($string $obj) (string-append "$" $string))
-      (car (generate-temporaries (list $obj)))))
+  (define generate-temporary
+    (case-lambda
+      (() (generate-temporary #`tmp))
+      (($obj)
+        (or
+          (generate-seeded-temporary)
+          (if (checking?)
+            (build-identifier ($string $obj) (string-append "$" $string))
+            (car (generate-temporaries (list $obj))))))))
+
+  (define generate-temporary-seed-opt
+    (make-thread-parameter #f))
+
+  (define (generate-seeded-temporary)
+    (lets
+      ($seed-opt (generate-temporary-seed-opt))
+      (and $seed-opt
+        (let ()
+          (generate-temporary-seed-opt (cons (car $seed-opt) (+ (cdr $seed-opt) 1)))
+          (datum->syntax #`+
+            (string->symbol
+              (string-append
+                (symbol->string (car $seed-opt))
+                "-"
+                (number->string (cdr $seed-opt)))))))))
 
   (define-syntax define-syntax-rule
     (syntax-rules ()
@@ -110,6 +132,10 @@
               (lambda (#,$tmp)
                 (syntax-case #,$tmp $keywords
                   $case ...))))))))
+
+  (define-syntax-rule (with-generate-temporary-seed $prefix $body ...)
+    (parameterize ((generate-temporary-seed-opt (cons (quote $prefix) 0)))
+      $body ...))
 
   (define-syntax-rule (build-identifier ($var $id) $body)
     (datum->syntax $id

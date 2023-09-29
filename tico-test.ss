@@ -49,64 +49,61 @@
 
 ; begin
 
-(check
-  (equal?
-    (typed-unsyntax (parse-typed #`(begin "foo")))
-    (typed
-      (box "foo")
-      `"foo"
-      (string-type))))
+(with-generate-temporary-seed $tmp
+  (check
+    (equal?
+      (typed-unsyntax
+        (parse-typed
+          #`(begin 128)))
+      (typed
+        (box 128)
+        128
+        (number-type)))))
 
-(check
-  (equal?
-    (typed-unsyntax
-      (parse-typed
-        #`(begin
-          (define (my 128))
-          (get (my number)))))
-    (typed
-      (box (struct `my (list 128)))
-      `(struct 'my (list 128))
-      (struct `my (list (number-type))))))
+(with-generate-temporary-seed $tmp
+  (check
+    (equal?
+      (typed-unsyntax
+        (parse-typed
+          #`(begin
+            128
+            (get number))))
+      (typed
+        (box 128)
+        `(let (($tmp-0 128)) $tmp-0)
+        (number-type)))))
 
-(check
-  (equal?
-    (typed-unsyntax
-      (parse-typed
-        #`(begin
-          (define (my 128))
-          (define (my "foo"))
-          (get (my number)))))
-    (typed
-      (box (struct `my (list 128)))
-      `(struct 'my (list 128))
-      (struct `my (list (number-type))))))
+(with-generate-temporary-seed $tmp
+  (check
+    (equal?
+      (typed-unsyntax
+        (parse-typed
+          #`(begin
+            128
+            "foo"
+            (get number))))
+      (typed
+        (box 128)
+        `(let (($tmp-0 128))
+          (let (($tmp-1 "foo"))
+            $tmp-0))
+        (number-type)))))
 
-(check
-  (equal?
-    (typed-unsyntax
-      (parse-typed
-        #`(begin
-          (define (my 128))
-          (define (my "foo"))
-          (get (my string)))))
-    (typed
-      (box (struct `my (list "foo")))
-      `(struct 'my (list "foo"))
-      (struct `my (list (string-type))))))
-
-(check
-  (equal?
-    (typed-unsyntax
-      (parse-typed
-        #`(begin
-          (define (my "bar"))
-          (define (my "foo"))
-          (get (my string)))))
-    (typed
-      (box (struct `my (list "foo")))
-      `(struct 'my (list "foo"))
-      (struct `my (list (string-type))))))
+(with-generate-temporary-seed $tmp
+  (check
+    (equal?
+      (typed-unsyntax
+        (parse-typed
+          #`(begin
+            128
+            129
+            (get number))))
+      (typed
+        (box 129)
+        `(let (($tmp-0 128))
+          (let (($tmp-1 129))
+            $tmp-1))
+        (number-type)))))
 
 ; get
 
