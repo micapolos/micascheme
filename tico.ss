@@ -10,6 +10,7 @@
     number-type number-type?
     string-type string-type?
     struct struct? struct-name struct-items
+    function-type function-type? function-type-params function-type-result
 
     parse-typed-list parse-typed
 
@@ -89,23 +90,27 @@
                 #`(let ((#,$tmp #,(typed-syntax $typed-expr)))
                   #,(typed-syntax $typed-body))
                 (typed-type $typed-body))))
-          ; ((lambda ($param ...) $body)
-          ;   (lets
-          ;     ($param-types (map (partial parse-type $context) (syntax->list #`($param ...))))
-          ;     ($param-typed-list
-          ;       (map
-          ;         (lambda ($param-type)
-          ;           (typed
-          ;             #f
-          ;             #`???
-          ;             $param-type)
-          ;         $param-types)))
-          ;     ($context (fold-left context-push $context $param-typed-list))
-          ;     ($typed-body (parse-typed $context #`$body))
-          ;     (typed
-          ;       #f ; todo make it compile-time constant if possible
-          ;       #`(lambda ($param ...) ...)
-          ;       (function-type $param-types (typed-type $typed-body)))))
+          ((lambda ($param ...) $body)
+            (lets
+              ($param-types (map (partial parse-type $context) (syntax->list #`($param ...))))
+              ($param-tmps
+                (reverse
+                  (fold-left
+                    (lambda ($stack _) (push $stack (generate-temporary)))
+                    (stack)
+                    $param-types)))
+              ($bindings
+                (map
+                  (lambda ($param-type $param-tmp) (typed #f $param-tmp $param-type))
+                  $param-types
+                  $param-tmps))
+              ($context (fold-left context-push $context $bindings))
+              ($typed-body (parse-typed $context #`$body))
+              (typed
+                #f ; todo make it compile-time constant if possible
+                #`(lambda (#,@$param-tmps)
+                  #,(typed-syntax $typed-body))
+                (function-type $param-types (typed-type $typed-body)))))
           (($name $arg ...) (identifier? #`$name)
             (lets
               ($symbol (syntax->datum #`$name))
@@ -122,13 +127,6 @@
               ((number? $number) (typed (box $number) #`$item (number-type)))
               ((string? $string) (typed (box $string) #`$item (string-type)))))
           (else (syntax-error $syntax "dupa"))))))
-
-  (define (parse-declaration $context $syntax)
-    (syntax-case $syntax (define)
-      ((define $item)
-        (context-push $context (parse-typed $context #`$item)))
-      (else
-        (syntax-error $syntax "invalid declaration"))))
 
   (define (parse-type $context $syntax)
     (lets

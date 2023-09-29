@@ -105,21 +105,18 @@
             $tmp-1))
         (number-type)))))
 
-; get
+; lambda
 
-(check
-  (equal?
-    (typed-unsyntax
-      (parse-typed
-        (lambda ($type)
-          (and
-            (equal? $type (struct `my (list (number-type))))
-            (typed
-              (box (struct `my (list 128)))
-              #`(struct 'foo (list 128))
-              (struct `foo (list (number-type))))))
-        #`(get (my number))))
-    (typed
-      (box (struct `my (list 128)))
-      `(struct 'foo (list 128))
-      (struct `foo (list (number-type))))))
+(with-generate-temporary-seed $tmp
+  (check
+    (equal?
+      (typed-unsyntax
+        (parse-typed
+          #`(lambda (number string boolean)
+            (get string))))
+      (typed
+        #f
+        `(lambda ($tmp-0 $tmp-1 $tmp-2) $tmp-1)
+        (function-type
+          (list (number-type) (string-type) (boolean-type))
+          (string-type))))))
