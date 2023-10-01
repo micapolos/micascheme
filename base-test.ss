@@ -47,6 +47,18 @@
 (check (equal? (push-list (stack 1 2 3) (list 4 5 6)) (stack 1 2 3 4 5 6)))
 (check (equal? (push-all (stack 1 2 3) (stack 4 5 6)) (stack 1 2 3 4 5 6)))
 
+(with-generate-temporary-seed $tmp
+  (check
+    (equal?
+      (map syntax->datum (gen-stack generate-temporary 3))
+      (stack `$tmp-0 `$tmp-1 `$tmp-2))))
+
+(with-generate-temporary-seed $tmp
+  (check
+    (equal?
+      (map syntax->datum (gen-list generate-temporary 3))
+      (list `$tmp-0 `$tmp-1 `$tmp-2))))
+
 ; === list-safe-ref ===
 
 (check (equal? (list-get (list "a" "b") 0) "a"))
@@ -136,6 +148,12 @@
       (fib (rec (lambda (n) (if (< n 2) n (+ (fib (- n 2)) (fib (- n 1)))))))
       (fib 10))
     55))
+
+; === checking-once ===
+
+(check (equal? (let (($fn (checking-once 123))) ($fn)) 123))
+
+;(check (equal? (let (($fn (checking-once 123))) ($fn) ($fn)) 123))
 
 ; === pair-values ===
 

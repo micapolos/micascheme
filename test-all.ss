@@ -18,4 +18,5 @@
   "leo/parser-test.ss"
   "leo/compiler-test.ss"
   "leo/decompiler-test.ss"
+  "tico/term-test.ss"
 )

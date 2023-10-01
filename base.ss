@@ -12,6 +12,7 @@
     null-or-pair?
     opt
     from
+    checking-once
     single? single
     script
     pi pi2
@@ -21,6 +22,7 @@
     current-seconds
     works?
     check checking? test-all
+    generate-symbol
     with-generate-temporary-seed
     ensure
     data
@@ -41,6 +43,7 @@
     throw
 
     stack push push-list push-all top pop
+    gen-stack gen-list
 
     generate-temporary
     build-identifier
@@ -78,6 +81,16 @@
         ((_ $item ...) 
           #`(list #,@(reverse (syntax->list #`($item ...))))))))
 
+  (define (gen-stack $proc $size)
+    (iterate
+      (lambda ($stack)
+        (push $stack ($proc)))
+      (stack)
+      $size))
+
+  (define (gen-list $proc $size)
+    (reverse (gen-stack $proc $size)))
+
   (define (single $list)
     (and (single? $list) (car $list)))
 
@@ -85,6 +98,9 @@
     (and
       (pair? $list) 
       (null? (cdr $list))))
+
+  (define (generate-symbol)
+    (syntax->datum (generate-temporary)))
 
   (define generate-temporary
     (case-lambda
@@ -155,6 +171,14 @@
 
   (define (null-or-pair? $obj)
     (or (null? $obj) (pair? $obj)))
+
+  (define-syntax-rule (checking-once $body)
+    (let ()
+      (define $applied? #f)
+      (lambda ()
+        (when $applied? (error `checking-once "called twice" (quote $body)))
+        (set! $applied? #t)
+        $body)))
 
   (define-syntax lets
     (lambda ($syntax)

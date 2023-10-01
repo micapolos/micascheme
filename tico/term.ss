@@ -11,6 +11,7 @@
   (data (variable index))
   (data (function arity body))
   (data (application function args))
+  (data (thunk datum free-variable-count))
 
   (define (term->value $term)
     (eval
