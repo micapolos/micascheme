@@ -14,7 +14,7 @@
 
     syntax->typed
 
-    number boolean)
+    get number boolean doing native)
   (import (micascheme) (tico term) (tico type))
 
   (data (scope types))
@@ -23,21 +23,19 @@
 
   (data (parser context args))
 
+  (define-aux-keyword get)
   (define-aux-keyword number)
   (define-aux-keyword boolean)
+  (define-aux-keyword doing)
+  (define-aux-keyword native)
 
-  (define (typed-cast-opt $typed $type)
-    (and
-      (type-matches? (typed-type $typed) $type)
-      $typed))
-
-  (define (typed-resolve $typed $args)
-    (switch (typed-type $typed)
-      ((function-type? $function-type)
-        (map typed-cast-opt
-          $args
-          (function-type-params $function-type)))
-      ((else $other) #f)))
+  ; (define (typed-resolve $typed $args)
+  ;   (switch (typed-type $typed)
+  ;     ((function-type? $function-type)
+  ;       (map typed-cast-opt
+  ;         $args
+  ;         (function-type-params $function-type)))
+  ;     ((else $other) #f)))
 
   (define (empty-scope) (scope (stack)))
 
@@ -48,14 +46,12 @@
         $type)))
 
   (define (scope-type-ref $scope $type)
-    (or
-      (map-find-indexed
-        (lambda ($found-type $index)
-          (typed-cast-opt
-            (typed (variable $index) $found-type)
-            $type))
-        (scope-types $scope))
-      (error `scope-type-ref "not found" $type)))
+    (lets
+      ($index
+        (find-index
+          (partial type-matches? $type)
+          (scope-types $scope)))
+      (and $index (typed (variable $index) $type))))
 
   (define (empty-context)
     (context (empty-scope) #f))
@@ -73,10 +69,10 @@
   (define (scope-resolve-args $scope $args)
     $args)
 
-  (define (context-syntax-list->typed $context $syntaxes)
+  (define (context-syntax-list->typed $context $syntax-list)
     (or
-      (single (context-syntax-list->typed-list $context $syntaxes))
-      (error `no-single-typed "dupa")))
+      (single (context-syntax-list->typed-list $context $syntax-list))
+      (syntax-error #`(#,@$syntax-list) "no single typed")))
 
   (define (context-syntax-list->typed-list $context $syntaxes)
     (reverse
@@ -89,11 +85,11 @@
   (define (parser+syntax $parser $syntax)
     (lets
       ($context (parser-context $parser))
-      ($types (parser-args $parser))
+      ($args (parser-args $parser))
       (parser $context
         (scope-resolve-args
           (context-scope $context)
-          (push $types (context-syntax->typed $context $syntax))))))
+          (push $args (context-syntax->typed $context $syntax))))))
 
   (define (context-syntaxes-bind $context $syntaxes $fn)
     (switch $syntaxes
@@ -117,7 +113,11 @@
     (context-syntax->typed (empty-context) $syntax))
 
   (define (context-syntax->typed $context $syntax)
-    (syntax-case $syntax (begin get function apply)
+    (syntax-case $syntax (begin get function apply doing native)
+      ((native $value $type)
+        (typed
+          (syntax->datum #`$value)
+          (context-syntax->type $context #`$type)))
       ((begin $item ...)
         (context-syntax-list->typed $context
           (syntax->list #`($item ...))))
@@ -125,13 +125,14 @@
         (scope-type-ref
           (context-scope $context)
           (context-syntax->type $context #`$type)))
-      ((function ($param ...) $body)
+      ((function $param ... (doing $body ...))
         (lets
           ($param-types (context-syntax-list->types $context (syntax->list #`($param ...))))
+          ($arity (length $param-types))
           ($context (fold-left context+type $context $param-types))
-          ($typed-body (context-syntax-list->typed $context #`$body))
+          ($typed-body (context-syntax-list->typed $context (syntax->list #`($body ...))))
           (typed
-            (function (length $param-types) (typed-value $typed-body))
+            (function $arity (typed-value $typed-body))
             (function-type $param-types (typed-type $typed-body)))))
       (($name $item ...) (identifier? #`$name)
         (lets
@@ -145,20 +146,35 @@
           (typed
             (application `list $values)
             (struct-type $name $types))))
+      ($name (identifier? #`$name)
+        (typed
+          (application `list (list))
+          (struct-type (syntax->datum #`$name) (list))))
       ($other
         (switch (syntax->datum $syntax)
           ((boolean? $boolean) (typed $boolean (boolean-type)))
           ((number? $number) (typed $number (number-type)))
-          ((string? $string) (typed $string (string-type)))))))
+          ((string? $string) (typed $string (string-type)))
+          ((else $other) (syntax-error $syntax "dupa"))))))
 
   ; TODO: Evaluate in type context.
   (define (context-syntax->type $context $syntax)
-    (syntax-case $syntax (number string boolean)
+    (syntax-case $syntax (number string boolean function doing)
       (boolean (boolean-type))
       (number (number-type))
-      (string (string-type))))
+      (string (string-type))
+      ((function $param ... (giving $body ...))
+        (function-type
+          (context-syntax-list->types $context (syntax->list #`($param ...)))
+          (context-syntax-list->type $context (syntax->list #`($body ...)))))
+      (else (syntax-error $syntax "invalid type"))))
 
   ; TODO: Evaluate in type context.
   (define (context-syntax-list->types $context $syntax-list)
     (map (partial context-syntax->type $context) $syntax-list))
+
+  (define (context-syntax-list->type $context $syntax-list)
+    (or
+      (single (context-syntax-list->types $context $syntax-list))
+      (syntax-error #`(#,@$syntax-list) "no single type")))
 )
