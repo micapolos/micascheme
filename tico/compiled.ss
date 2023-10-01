@@ -4,11 +4,11 @@
     compiled compiled? compiled-type compiled-term compiled-free-variable-count compiled-constant-opt
 
     value-type-compiled
-    boolean-compiled
-    number-compiled
-    string-compiled
-    compiled-application
-    )
+    compiled-boolean
+    compiled-number
+    compiled-string
+    compiled-struct
+    compiled-application)
   (import (micascheme) (tico term) (tico type))
 
   (data (constant value))
@@ -17,14 +17,28 @@
   (define (value-type-compiled $value $type)
     (compiled $type $value 0 (constant $value)))
 
-  (define (boolean-compiled $boolean)
+  (define (compiled-boolean $boolean)
     (value-type-compiled $boolean (boolean-type)))
 
-  (define (number-compiled $number)
+  (define (compiled-number $number)
     (value-type-compiled $number (number-type)))
 
-  (define (string-compiled $string)
+  (define (compiled-string $string)
     (value-type-compiled $string (string-type)))
+
+  (define (compiled-struct $name $items)
+    (compiled
+      (struct-type $name
+        (map compiled-type $items))
+      (application `list
+        (map compiled-term $items))
+      (apply max (map compiled-free-variable-count $items))
+      (lets
+        ($item-constant-opts (map compiled-constant-opt $items))
+        (and
+          (for-all identity $item-constant-opts)
+          (constant
+            (map constant-value $item-constant-opts))))))
 
   (define (compiled-application $target $args)
     (compiled

@@ -2,6 +2,19 @@
 
 (check
   (equal?
+    (compiled-struct `foo
+      (list
+        (compiled-boolean #f)
+        (compiled-number 128)
+        (compiled-string "foo")))
+    (compiled
+      (struct-type `foo (list (boolean-type) (number-type) (string-type)))
+      (application `list (list #f 128 "foo"))
+      0
+      (constant (list #f 128 "foo")))))
+
+(check
+  (equal?
     (compiled-application
       (compiled
         (function-type
@@ -11,8 +24,8 @@
         0
         (constant string-append))
       (list
-        (string-compiled "foo")
-        (string-compiled "bar")))
+        (compiled-string "foo")
+        (compiled-string "bar")))
     (compiled
       (string-type)
       (application `string-append (list "foo" "bar"))
