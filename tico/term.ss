@@ -27,13 +27,7 @@
         (list-ref $scope (variable-index $variable)))
       ((function? $function)
         (lets
-          ($tmps
-            (reverse
-              (iterate
-                (lambda ($tmps)
-                  (push $tmps (syntax->datum (generate-temporary))))
-                (stack)
-                (function-arity $function))))
+          ($tmps (gen-list generate-symbol (function-arity $function)))
           `(lambda (,@$tmps)
             ,(scope-term->datum
               (push-list $scope $tmps)
