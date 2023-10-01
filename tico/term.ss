@@ -3,8 +3,9 @@
     variable variable? variable-index
     function function? function-arity function-body
     application application? application-function application-args
-    term->datum scope-term->datum
-    term->value)
+    term->datum
+    term->value
+    term->free-variable-count)
   (import (micascheme))
 
   (data (variable index))
@@ -42,4 +43,24 @@
           ,@(map (partial scope-term->datum $scope) (application-args $application))))
       ((else $other)
         $other)))
+
+  (define (term->free-variable-count $term)
+    (depth-term->free-variable-count 0 $term))
+
+  (define (depth-term->free-variable-count $depth $term)
+    (switch $term
+      ((variable? $variable)
+        (max 0 (- (variable-index $variable) $depth -1)))
+      ((function? $function)
+        (depth-term->free-variable-count
+          (+ $depth (function-arity $function))
+          (function-body $function)))
+      ((application? $application)
+        (max
+          (depth-term->free-variable-count $depth (application-function $application))
+          (apply max
+            (map
+              (partial depth-term->free-variable-count $depth)
+              (application-args $application)))))
+      ((else $other) 0)))
 )
