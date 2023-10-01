@@ -14,7 +14,7 @@
 
     syntax->typed
 
-    get number boolean doing native)
+    get number boolean doing native take)
   (import (micascheme) (tico term) (tico type))
 
   (data (scope types))
@@ -28,6 +28,7 @@
   (define-aux-keyword boolean)
   (define-aux-keyword doing)
   (define-aux-keyword native)
+  (define-aux-keyword take)
 
   ; (define (typed-resolve $typed $args)
   ;   (switch (typed-type $typed)
@@ -85,29 +86,27 @@
   (define (parser+syntax $parser $syntax)
     (lets
       ($context (parser-context $parser))
+      ($scope (context-scope $context))
       ($args (parser-args $parser))
-      (syntax-case $syntax (get)
-        ((get $type)
-          (case (length $args)
-            ((0)
-              (parser $context
-                (list
-                  (scope-type-ref
-                    (context-scope $context)
-                    (context-syntax->type $context #`$type)))))
-            ((1)
-              (parser $context
-                (list
-                  (typed-type-ref
-                    (car $args)
-                    (context-syntax->type $context #`$type)))))
-            (else
-              (syntax-error $syntax "get not implemented on args"))))
+      (syntax-case $syntax (get do)
+        ((get $body ...)
+          (lets
+            ($type (context-syntax-list->type $context (syntax->list #`($body ...))))
+            (parser $context
+              (list
+                (case (length $args)
+                  ((0) (scope-type-ref $scope $type))
+                  ((1) (typed-type-ref (car $args) $type))
+                  (else (syntax-error $syntax "get not implemented on args")))))))
+        ((do $body ...)
+          (syntax-error $syntax "not implemented"))
         ($other
-          (parser $context
-            (scope-resolve-args
-              (context-scope $context)
-              (push $args (context-syntax->typed $context $syntax))))))))
+          (lets
+            ($arg (context-syntax->typed $context #`$other))
+            (parser $context
+              (case (length $args)
+                ((0) (list $arg))
+                (else (scope-resolve-args (context-scope $context) (push $args $arg))))))))))
 
   (define (context-syntaxes-bind $context $syntaxes $fn)
     (switch $syntaxes
@@ -131,12 +130,12 @@
     (context-syntax->typed (empty-context) $syntax))
 
   (define (context-syntax->typed $context $syntax)
-    (syntax-case $syntax (begin get function apply doing native)
+    (syntax-case $syntax (take get function apply doing native)
       ((native $value $type)
         (typed
           (syntax->datum #`$value)
           (context-syntax->type $context #`$type)))
-      ((begin $item ...)
+      ((take $item ...)
         (context-syntax-list->typed $context
           (syntax->list #`($item ...))))
       ((function $param ... (doing $body ...))

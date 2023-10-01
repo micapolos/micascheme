@@ -47,12 +47,12 @@
 
 (check
   (equal?
-    (syntax->typed #`(begin "foo"))
+    (syntax->typed #`(take "foo"))
     (typed "foo" (string-type))))
 
 (check
   (equal?
-    (syntax->typed #`(begin (foo #f 128 "foo") (get string)))
+    (syntax->typed #`(take (foo #f 128 "foo") (get string)))
     (typed
       (application `list-ref
         (list
