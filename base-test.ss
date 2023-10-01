@@ -83,6 +83,23 @@
       (list #\a #\b #\1 #\2 #\3))
     (failure #\1)))
 
+; === fallible-let ===
+
+(check
+  (equal?
+    (fallible-let ($number 128) (+ $number 1))
+    129))
+
+(check
+  (equal?
+    (fallible-let ($number 128) (failure `dupa))
+    (failure `dupa)))
+
+(check
+  (equal?
+    (fallible-let ($number (failure `dupa)) (+ $number 1))
+    (failure `dupa)))
+
 ; === lets ===
 
 (check (equal? (lets 1) 1))

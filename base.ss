@@ -6,6 +6,7 @@
     list-get-overflow list-get-overflow? list-get-overflow-index
 
     failure failure? failure-value failure!
+    fallible-bind fallible-let
 
     false?
     null-or-pair?
@@ -87,7 +88,10 @@
 
   (define generate-temporary
     (case-lambda
-      (() (generate-temporary #`tmp))
+      (()
+        (or
+          (generate-seeded-temporary)
+          (car (generate-temporaries `(tmp)))))
       (($obj)
         (or
           (generate-seeded-temporary)
@@ -452,6 +456,16 @@
 
   (define-syntax-rule (failure! value)
     (failure (quote value)))
+
+  (define (fallible-bind $fallible $fn)
+    (switch $fallible
+      ((failure? $failure) $failure)
+      ((else $success) ($fn $success))))
+
+  (define-syntax-rule (fallible-let ($success $fallible) $body ...)
+    (fallible-bind $fallible
+      (lambda ($success)
+        $body ...)))
 
   ; --------------------------------------
 
