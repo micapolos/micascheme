@@ -6,11 +6,14 @@
     (tico type)
     (leo reader))
 
-  (data (context))
+  (data (context depth bindings))
+
+  (define (empty-context)
+    (context 0 (stack)))
 
   (define-syntax-rule (read-typed $item ...)
     (reader-eval
-      (context->typed-reader (context) identity)
+      (context->typed-reader (empty-context) identity)
       $item ...))
 
   (define (context->typed-reader $context $end-fn)
@@ -39,6 +42,18 @@
       ; begin-fn
       (lambda ($name)
         (case $name
+          ((take)
+            (context->args-reader $context
+              (lambda ($args)
+                (context-arg-stack->args-reader $context
+                  (push-list $arg-stack $args)
+                  $end-fn))))
+          ((do)
+            (context->args-reader $context
+              (lambda ($args)
+                (context-arg-stack->args-reader $context
+                  (reverse $args)
+                  $end-fn))))
           (else
             (context->args-reader $context
               (lambda ($args)
@@ -51,4 +66,42 @@
       ; end-fn
       (lambda ($args)
         ($end-fn (reverse $args)))))
+
+  (define (type-reader $end-fn)
+    (type-stack-reader
+      (lambda ($type-stack)
+        ($end-fn
+          (or
+            (single $type-stack)
+            (error `non-single-type "dupa"))))))
+
+  (define (type-stack-reader $end-fn)
+    (type-stack->push-reader (stack) $end-fn))
+
+  (define (type-stack->push-reader $type-stack $end-fn)
+    (reader
+      $type-stack
+      (lambda ($datum)
+        (error `append "dupa"))
+      (lambda ($symbol)
+        (case $symbol
+          ((boolean)
+            (type-stack-reader
+              (lambda (_)
+                (type-stack->push-reader
+                  (push $type-stack (boolean-type))
+                  $end-fn))))
+          ((number)
+            (type-stack-reader
+              (lambda (_)
+                (type-stack->push-reader
+                  (push $type-stack (number-type))
+                  $end-fn))))
+          ((string)
+            (type-stack-reader
+              (lambda (_)
+                (type-stack->push-reader
+                  (push $type-stack (string-type))
+                  $end-fn))))))
+      $end-fn))
 )

@@ -33,3 +33,17 @@
     (typed
       (application `list (list #f 128 "foo"))
       (struct-type `tuple (list (boolean-type) (number-type) (string-type))))))
+
+(check
+  (equal?
+    (read-typed (tuple #f (take 128 "foo")))
+    (typed
+      (application `list (list #f 128 "foo"))
+      (struct-type `tuple (list (boolean-type) (number-type) (string-type))))))
+
+(check
+  (equal?
+    (read-typed (tuple #f (do 128 "foo")))
+    (typed
+      (application `list (list 128 "foo"))
+      (struct-type `tuple (list (number-type) (string-type))))))
