@@ -23,6 +23,21 @@
 
 (check
   (equal?
+    (read-compiled (type boolean))
+    (type-compiled (boolean-type))))
+
+(check
+  (equal?
+    (read-compiled (type number))
+    (type-compiled (number-type))))
+
+(check
+  (equal?
+    (read-compiled (type string))
+    (type-compiled (string-type))))
+
+(check
+  (equal?
     (read-compiled (tuple #f 128 "foo"))
     (compiled-struct `tuple
       (list

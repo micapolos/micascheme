@@ -4,11 +4,13 @@
     compiled compiled? compiled-type compiled-term compiled-free-variable-count compiled-constant-opt
 
     value-type-compiled
+    type-compiled
     compiled-boolean
     compiled-number
     compiled-string
     compiled-struct
-    compiled-application)
+    compiled-application
+    compiled-as-type)
   (import (micascheme) (tico term) (tico type))
 
   (data (constant value))
@@ -16,6 +18,9 @@
 
   (define (value-type-compiled $value $type)
     (compiled $type $value 0 (constant $value)))
+
+  (define (type-compiled $type)
+    (value-type-compiled $type (type-type)))
 
   (define (compiled-boolean $boolean)
     (value-type-compiled $boolean (boolean-type)))
@@ -25,6 +30,18 @@
 
   (define (compiled-string $string)
     (value-type-compiled $string (string-type)))
+
+  (define (compiled-as-type $compiled)
+    (lets
+      ($type (compiled-type $compiled))
+      (cond
+        ((equal? $type (struct-type `boolean (list)))
+          (type-compiled (boolean-type)))
+        ((equal? $type (struct-type `number (list)))
+          (type-compiled (number-type)))
+        ((equal? $type (struct-type `string (list)))
+          (type-compiled (string-type)))
+        (else (error `compiled-as-type "dupa" $compiled)))))
 
   (define (compiled-struct $name $items)
     (compiled

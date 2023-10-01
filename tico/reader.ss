@@ -55,6 +55,13 @@
                 (context-arg-stack->args-reader $context
                   (reverse $args)
                   $end-fn))))
+          ((type)
+            (context->args-reader $context
+              (lambda ($args)
+                (context-arg-stack->args-reader $context
+                  (push-list $arg-stack
+                    (map compiled-as-type $args))
+                  $end-fn))))
           (else
             (context->args-reader $context
               (lambda ($args)

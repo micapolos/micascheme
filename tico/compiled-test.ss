@@ -15,6 +15,19 @@
 
 (check
   (equal?
+    (compiled-struct `foo
+      (list
+        (compiled (boolean-type) `$boolean 3 #f)
+        (compiled (number-type) `$number 5 #f)
+        (compiled-string "foo")))
+    (compiled
+      (struct-type `foo (list (boolean-type) (number-type) (string-type)))
+      (application `list (list `$boolean `$number "foo"))
+      5
+      #f)))
+
+(check
+  (equal?
     (compiled-application
       (compiled
         (function-type
