@@ -86,10 +86,28 @@
     (lets
       ($context (parser-context $parser))
       ($args (parser-args $parser))
-      (parser $context
-        (scope-resolve-args
-          (context-scope $context)
-          (push $args (context-syntax->typed $context $syntax))))))
+      (syntax-case $syntax (get)
+        ((get $type)
+          (case (length $args)
+            ((0)
+              (parser $context
+                (list
+                  (scope-type-ref
+                    (context-scope $context)
+                    (context-syntax->type $context #`$type)))))
+            ((1)
+              (parser $context
+                (list
+                  (typed-type-ref
+                    (car $args)
+                    (context-syntax->type $context #`$type)))))
+            (else
+              (syntax-error $syntax "get not implemented on args"))))
+        ($other
+          (parser $context
+            (scope-resolve-args
+              (context-scope $context)
+              (push $args (context-syntax->typed $context $syntax))))))))
 
   (define (context-syntaxes-bind $context $syntaxes $fn)
     (switch $syntaxes
@@ -121,10 +139,6 @@
       ((begin $item ...)
         (context-syntax-list->typed $context
           (syntax->list #`($item ...))))
-      ((get $type)
-        (scope-type-ref
-          (context-scope $context)
-          (context-syntax->type $context #`$type)))
       ((function $param ... (doing $body ...))
         (lets
           ($param-types (context-syntax-list->types $context (syntax->list #`($param ...))))
@@ -177,4 +191,19 @@
     (or
       (single (context-syntax-list->types $context $syntax-list))
       (syntax-error #`(#,@$syntax-list) "no single type")))
+
+  (define (typed-type-ref $typed $type)
+    (switch (typed-type $typed)
+      ((struct-type? $struct-type)
+        (lets
+          ($index
+            (find-index
+              (partial type-matches? $type)
+              (struct-type-items $struct-type)))
+          (and $index
+            (typed
+              (application `list-ref (list (typed-value $typed) $index))
+              (list-ref (struct-type-items $struct-type) $index)))))
+      ((else $other)
+        (error `typed-type-ref "not possible"))))
 )

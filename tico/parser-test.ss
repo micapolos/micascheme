@@ -52,6 +52,16 @@
 
 (check
   (equal?
+    (syntax->typed #`(begin (foo #f 128 "foo") (get string)))
+    (typed
+      (application `list-ref
+        (list
+          (application `list (list #f 128 "foo"))
+          2))
+      (string-type))))
+
+(check
+  (equal?
     (syntax->typed #`(function (doing 128)))
     (typed
       (function 0 128)
