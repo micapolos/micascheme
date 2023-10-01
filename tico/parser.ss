@@ -9,7 +9,6 @@
     scope+type
     scope-type-ref
 
-    typed typed? typed-value typed-type
     parser parser? parser-context parser-args
 
     syntax->typed
@@ -19,7 +18,6 @@
 
   (data (scope types))
   (data (context scope type-context-opt))
-  (data (typed value type))
 
   (data (parser context args))
 
