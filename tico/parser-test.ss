@@ -2,7 +2,7 @@
 
 (check
   (equal?
-    (syntax->typed #`(native fn (function number string (doing boolean))))
+    (syntax->typed #`(native fn (function number string (giving boolean))))
     (typed
       `fn
       (function-type

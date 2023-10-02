@@ -11,22 +11,13 @@
 
     parser parser? parser-context parser-args
 
-    syntax->typed
-
-    get number boolean doing native take)
+    syntax->typed)
   (import (micascheme) (tico term) (tico type))
 
   (data (scope types))
   (data (context scope type-context-opt))
 
   (data (parser context args))
-
-  (define-aux-keyword get)
-  (define-aux-keyword number)
-  (define-aux-keyword boolean)
-  (define-aux-keyword doing)
-  (define-aux-keyword native)
-  (define-aux-keyword take)
 
   ; (define (typed-resolve $typed $args)
   ;   (switch (typed-type $typed)
@@ -86,8 +77,9 @@
       ($context (parser-context $parser))
       ($scope (context-scope $context))
       ($args (parser-args $parser))
-      (syntax-case $syntax (get do)
-        ((get $body ...)
+      (syntax-case $syntax ()
+        (($get $body ...)
+          (identifier-named? #`$get get)
           (lets
             ($type (context-syntax-list->type $context (syntax->list #`($body ...))))
             (parser $context
@@ -96,7 +88,8 @@
                   ((0) (scope-type-ref $scope $type))
                   ((1) (typed-type-ref (car $args) $type))
                   (else (syntax-error $syntax "get not implemented on args")))))))
-        ((do $body ...)
+        (($do $body ...)
+          (identifier-named? #`$do do)
           (syntax-error $syntax "not implemented"))
         ($other
           (lets
@@ -128,15 +121,20 @@
     (context-syntax->typed (empty-context) $syntax))
 
   (define (context-syntax->typed $context $syntax)
-    (syntax-case $syntax (take get function apply doing native)
-      ((native $value $type)
+    (syntax-case $syntax ()
+      (($native $value $type)
+        (identifier-named? #`$native native)
         (typed
           (syntax->datum #`$value)
           (context-syntax->type $context #`$type)))
-      ((take $item ...)
+      (($take $item ...)
+        (identifier-named? #`$take take)
         (context-syntax-list->typed $context
           (syntax->list #`($item ...))))
-      ((function $param ... (doing $body ...))
+      (($function $param ... ($doing $body ...))
+        (and
+          (identifier-named? #`$function function)
+          (identifier-named? #`$doing doing))
         (lets
           ($param-types (context-syntax-list->types $context (syntax->list #`($param ...))))
           ($arity (length $param-types))
@@ -170,11 +168,20 @@
 
   ; TODO: Evaluate in type context.
   (define (context-syntax->type $context $syntax)
-    (syntax-case $syntax (number string boolean function doing)
-      (boolean (boolean-type))
-      (number (number-type))
-      (string (string-type))
-      ((function $param ... (giving $body ...))
+    (syntax-case $syntax ()
+      ($boolean
+        (identifier-named? #`$boolean boolean)
+        (boolean-type))
+      ($number
+        (identifier-named? #`$number number)
+        (number-type))
+      ($string
+        (identifier-named? #`$string string)
+        (string-type))
+      (($function $param ... ($giving $body ...))
+        (and
+          (identifier-named? #`$function function)
+          (identifier-named? #`$giving giving))
         (function-type
           (context-syntax-list->types $context (syntax->list #`($param ...)))
           (context-syntax-list->type $context (syntax->list #`($body ...)))))
