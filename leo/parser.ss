@@ -1,10 +1,22 @@
 (library (leo parser)
   (export 
     script-parser
-    line-parser)
+    line-parser
+    parse-script
+    read-script
+    load-script)
   (import (micascheme) (parser))
 
   (data (env value atom-parser))
+
+  (define (parse-script $string)
+    (parse (script-parser) $string))
+
+  (define (read-script $port)
+    (parse-script (get-string-all $port)))
+
+  (define (load-script $filename)
+    (call-with-input-file $filename read-script))
 
   (define (default-env)
     (env (stack) (atom-parser)))

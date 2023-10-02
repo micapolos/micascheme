@@ -30,8 +30,7 @@
 
   (define (context-arg-stack->args-reader $context $arg-stack $end-fn)
     (reader $arg-stack
-      ; append-fn
-      (lambda ($item)
+      (lambda ($item) ; append
         (context-arg-stack->args-reader $context
           (push $arg-stack
             (switch $item
@@ -40,8 +39,7 @@
               ((string? $string) (compiled-string $string))
               ((else $other) (error `append "invalid" $item))))
           $end-fn))
-      ; begin-fn
-      (lambda ($name)
+      (lambda ($name) ; begin
         (case $name
           ((take)
             (context->args-reader $context
@@ -68,7 +66,6 @@
                 (context-arg-stack->args-reader $context
                   (push $arg-stack (compiled-struct $name $args))
                   $end-fn))))))
-      ; end-fn
-      (lambda ($args)
+      (lambda ($args) ; end
         ($end-fn (reverse $args)))))
 )

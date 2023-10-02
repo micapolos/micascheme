@@ -45,3 +45,7 @@
   (equal?
     (parse (script-parser) "\n\npoint\n  x: 10\n\n  y: 20\nplus point\n\n\n  x: 30\n  y: 40\n\n\n")
     `((point (x 10) (y 20)) (plus (point (x 30) (y 40))))))
+
+(check (equal? (parse-script "foo\n") `(foo)))
+(check (equal? (read-script (open-input-string "foo\n")) `(foo)))
+(check (equal? (load-script "leo/parser-test-script.leo") `(foo)))
