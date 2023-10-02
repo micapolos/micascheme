@@ -41,6 +41,7 @@
     map-indexed list-indexed
     indexed indexed? indexed-value indexed-index
     throw
+    identifier-named?
 
     stack push push-list push-all top pop
     gen-stack gen-list
@@ -473,6 +474,14 @@
               (if ($pred #,$tmp)
                 #,$tmp
                 (throw ensure (quote $pred) #,$tmp))))))))
+
+  (define-syntax identifier-named?
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $syntax $name) (identifier? #`$name)
+          #`(and
+            (identifier? $syntax)
+            (symbol=? (syntax->datum $syntax) (quote $name)))))))
 
   ; --------------------------------------
 
