@@ -7,7 +7,6 @@
     function-type function-type? function-type-params function-type-body
     struct-type struct-type? struct-type-name struct-type-items
     enum-type enum-type? enum-type-name enum-type-items
-    typed typed? typed-value typed-type
 
     type-matches?)
   (import (micascheme))
@@ -19,8 +18,6 @@
   (data (function-type params body))
   (data (struct-type name items))
   (data (enum-type name items))
-
-  (data (typed value type))
 
   (define (type-matches? $type $pattern)
     (equal? $type $pattern))

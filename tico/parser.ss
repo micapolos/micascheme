@@ -1,6 +1,7 @@
 (library (tico parser)
   (export
     context context? context-scope context-type-context-opt
+    typed typed? typed-value typed-type
     empty-context
     context+type
 
@@ -14,6 +15,7 @@
     syntax->typed)
   (import (micascheme) (tico term) (tico type))
 
+  (data (typed value type))
   (data (scope types))
   (data (context scope type-context-opt))
 

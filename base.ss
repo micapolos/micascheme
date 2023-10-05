@@ -25,7 +25,7 @@
     generate-symbol
     with-generate-temporary-seed
     ensure
-    data
+    data enum
     partial
     define-aux-keyword define-syntax-rule define-syntax-case
     displayln writeln
@@ -351,6 +351,16 @@
                             #`(hash (#,fld a))))
                         (syntax->list #`(field ...))))))
                   td))))))))
+
+  ;; for documentation purposes
+  (define-syntax enum
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ ($name $item ...))
+          (and
+            (identifier? #`$name)
+            (for-all identifier? (syntax->list #`($item ...))))
+          #`(begin)))))
 
   (define (record-pretty-writer rtd name)
     (lambda (record port wr)

@@ -12,6 +12,10 @@
 (check (= (equal-hash (point 1 2)) (equal-hash (point 1 2))))
 (check (not (= (equal-hash (point 1 2)) (equal-hash (point 1 3)))))
 
+; === enum ===
+
+(enum (foo number string))
+
 ; === false? ===
 
 (check (equal? (false? #f) #t))
