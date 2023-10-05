@@ -7,4 +7,8 @@
   (data (compile-time value))
   (data (runtime term free-variable-count))
   (enum (thunk comptime runtime))
+
+  (define (runtimes-flatten $runtimes)
+    (runtime
+      )
 )

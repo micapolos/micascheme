@@ -14,6 +14,7 @@
     from
     checking-once
     single? single
+    bindings-eval
     script
     pi pi2
     bind-if
@@ -543,6 +544,28 @@
       (if (= $index 0)
         (car $list)
         (list-get (cdr $list) (- $index 1)))))
+
+  ; --------------------------------------
+
+  (define bindings-parameter
+    (make-thread-parameter (stack)))
+
+  (define evaluate-environment
+    (lets
+      ($environment (copy-environment (scheme-environment)))
+      (do (define-top-level-value `bindings-parameter bindings-parameter $environment))
+      $environment))
+
+  (define (bindings-eval $bindings $datum)
+    (lets
+      ($datum
+        `(let-values
+          ((
+            (,@(map car $bindings))
+            (apply values (map cdr (bindings-parameter)))))
+          ,$datum))
+      (parameterize ((bindings-parameter $bindings))
+        (eval $datum evaluate-environment))))
 
   ; --------------------------------------
 

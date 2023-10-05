@@ -432,3 +432,21 @@
 
 (check (equal? (identifier-named? #`foo foo) #t))
 (check (equal? (identifier-named? #`foo bar) #f))
+
+; === bindings-eval ===
+
+(check
+  (equal?
+    (bindings-eval
+      (list)
+      `(string-append "foo" "bar"))
+    "foobar"))
+
+(check
+  (equal?
+    (bindings-eval
+      (list
+        (cons `foo "foo")
+        (cons `bar "bar"))
+      `(string-append foo bar))
+    "foobar"))
