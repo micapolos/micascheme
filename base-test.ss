@@ -193,6 +193,12 @@
   (check (equal? (map-find-indexed fn (list "ala" "ma" "kocicę" "Lunę")) (indexed "kocicę!" 2)))
   (check (equal? (map-find-indexed fn (list "ala" "ma" "ul")) #f)))
 
+; === intercalate ===
+
+(check (equal? (intercalate (list) 0) (list)))
+(check (equal? (intercalate (list 1) 0) (list 1)))
+(check (equal? (intercalate (list 1 2 3) 0) (list 1 0 2 0 3)))
+
 ; === curry ===
 
 (check (equal? ((partial string-append "a" "b") "c" "d") "abcd"))
