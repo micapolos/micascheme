@@ -3,6 +3,7 @@
     monad monad? monad-pure-fn monad-bind-fn
     monad-pure monad-bind monad-map monad-sequence monad-lift monad-apply
     monadic pure define-monadic
+    monad-lets
     monad-stack-box
     option-monad 
     cons-monad
@@ -45,6 +46,23 @@
         (monad-map $monad (monad-sequence $monad $monadic-args)
           (lambda ($args)
             (apply $fn $args))))))
+
+  (define-syntax monad-lets
+    (lambda ($syntax)
+      (syntax-case $syntax (pure)
+        ((_ $monad (pure $result))
+          #`(monad-pure $monad $result))
+        ((_ $monad $result)
+          #`$result)
+        ((_ $monad ($var (pure $body)) $decl ... $result)
+          #`(monad-bind $monad (monad-pure $monad $body)
+            (lambda ($var)
+              (monad-lets $monad $decl ... $result))))
+        ((_ $monad ($var $body) $decl ... $result)
+          #`(monad-bind $monad $body
+            (lambda ($var)
+              (monad-lets $monad $decl ... $result)))))))
+
 
   ; monad-stack
 

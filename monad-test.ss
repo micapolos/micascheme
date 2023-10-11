@@ -64,6 +64,40 @@
 (check (equal? (monad-lift option-monad string-append #f "b") #f))
 (check (equal? (monad-lift option-monad string-append #f #f) #f))
 
+; monad-lets
+
+(check
+  (equal?
+    (monad-lets (cons-monad `foo) (cons `foo 128))
+    (cons `foo 128)))
+
+(check
+  (equal?
+    (monad-lets (cons-monad `foo) (pure 128))
+    (cons `foo 128)))
+
+(check
+  (equal?
+    (monad-lets (cons-monad `foo)
+      ($foo (cons `foo "foo"))
+      (pure (string-append $foo "!")))
+    (cons `foo "foo!")))
+
+(check
+  (equal?
+    (monad-lets (cons-monad `foo)
+      ($foo (pure "foo"))
+      (pure (string-append $foo "!")))
+    (cons `foo "foo!")))
+
+(check
+  (equal?
+    (monad-lets (cons-monad `foo)
+      ($foo (pure "foo"))
+      ($bar (pure "!"))
+      (pure (string-append $foo $bar)))
+    (cons `foo "foo!")))
+
 ; monad-stack-box
 
 (define cons-monad-1 (cons-monad 1))
