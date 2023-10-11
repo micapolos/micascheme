@@ -1,10 +1,10 @@
 (library (fstack)
   (export
-    fstack-run
-    fstack-block
-    fstack-local
-    fstack-lambda
-    fstack-define)
+    frun
+    fblock
+    flocal
+    flambda
+    fdefine)
   (import (micascheme))
 
   (define fstack-address-parameter
@@ -13,7 +13,7 @@
   (define fstack-top-parameter
     (make-thread-parameter #f))
 
-  (define-syntax-rule (fstack-run $size $body ...)
+  (define-syntax-rule (frun $size $body ...)
     (lets
       ($address (foreign-alloc $size))
       (parameterize
@@ -24,24 +24,24 @@
           (lambda () $body ...)
           (lambda () (foreign-free $address))))))
 
-  (define-syntax-rule (fstack-block $body ...)
+  (define-syntax-rule (fblock $body ...)
     (parameterize ((fstack-address-parameter (fstack-address-parameter)))
       $body ...))
 
-  (define-syntax-rule (fstack-lambda ($param ...) $body ...)
+  (define-syntax-rule (flambda ($param ...) $body ...)
     (lambda ($param ...)
-      (fstack-block $body ...)))
+      (fblock $body ...)))
 
-  (define-syntax-rule (fstack-define ($name $param ...) $body ...)
+  (define-syntax-rule (fdefine ($name $param ...) $body ...)
     (define $name
-      (fstack-lambda ($param ...) $body ...)))
+      (flambda ($param ...) $body ...)))
 
-  (define-syntax-rule (fstack-local $ftype $var)
+  (define-syntax-rule (flocal $ftype $var)
     (define $var
       (lets
         ($pointer (make-ftype-pointer $ftype (fstack-address-parameter)))
         (do (fstack-address-parameter (+ (fstack-address-parameter) (ftype-sizeof $ftype))))
         (if (> (fstack-address-parameter) (fstack-top-parameter))
-          (error `fstack-define "fstack overflow"))
+          (error `fdefine "fstack overflow"))
         $pointer)))
 )

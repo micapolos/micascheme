@@ -28,10 +28,10 @@
 
 (check
   (equal?
-    (fstack-run 16
-      (fstack-local vec $vec)
-      (fstack-block
-        (fstack-local vec $vec2)
+    (frun 16
+      (flocal vec $vec)
+      (fblock
+        (flocal vec $vec2)
         (vec-set $vec2 3.0 4.0)
         (vec-multiply $vec2 2)
         (vec-copy $vec $vec2))
