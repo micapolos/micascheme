@@ -548,7 +548,6 @@
 
   ; --------------------------------------
 
-<<<<<<< HEAD
   (define bindings-parameter
     (make-thread-parameter (stack)))
 
@@ -568,7 +567,7 @@
           ,$datum))
       (parameterize ((bindings-parameter $bindings))
         (eval $datum evaluate-environment))))
-=======
+
   (define (push-intercalated $stack $item $list)
     (cond
       ((null? $list) $stack)
@@ -582,7 +581,6 @@
 
   (define (intercalate $list $item)
     (reverse (push-intercalated (stack) $item $list)))
->>>>>>> f43eb16 (mico-c)
 
   ; --------------------------------------
 
