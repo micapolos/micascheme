@@ -2,6 +2,8 @@
   (export
     fstack-run
     fstack-block
+    fstack-local
+    fstack-lambda
     fstack-define)
   (import (micascheme))
 
@@ -22,11 +24,19 @@
           (lambda () $body ...)
           (lambda () (foreign-free $address))))))
 
-  (define-syntax-rule (fstack-block $fstack $body ...)
+  (define-syntax-rule (fstack-block $body ...)
     (parameterize ((fstack-address-parameter (fstack-address-parameter)))
       $body ...))
 
-  (define-syntax-rule (fstack-define $ftype $var)
+  (define-syntax-rule (fstack-lambda ($param ...) $body ...)
+    (lambda ($param ...)
+      (fstack-block $body ...)))
+
+  (define-syntax-rule (fstack-define ($name $param ...) $body ...)
+    (define $name
+      (fstack-lambda ($param ...) $body ...)))
+
+  (define-syntax-rule (fstack-local $ftype $var)
     (define $var
       (lets
         ($pointer (make-ftype-pointer $ftype (fstack-address-parameter)))
