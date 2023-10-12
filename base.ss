@@ -30,7 +30,7 @@
     partial
     define-aux-keyword define-syntax-rule define-syntax-case
     displayln writeln
-    fold-indices indices iterate
+    indices iterate
     fold-while
     find-index
     list-set list-ref-opt
@@ -259,21 +259,12 @@
                 ((pred #,tmp)
                   (let ((var #,tmp)) body ...)) ...)))))))
 
-  (define (fold-indices-from fn folded size index)
-    (cond
-      ((= index size) folded)
-      (else (fold-indices-from fn (fn folded index) size (+ index 1)))))
-
-  (define (fold-indices f folded size)
-    (fold-indices-from f folded size 0))
-
   (define (fold-while $pred $fn $initial $list)
     (cond
       ((or (null? $list) (not ($pred $initial))) $initial)
       (else (fold-while $pred $fn ($fn $initial (car $list)) (cdr $list)))))
 
-  (define (indices size)
-    (reverse (fold-indices (lambda ($list $index) (cons $index $list)) `() size)))
+  (define indices iota)
 
   (define (map-indexed $proc $list)
     (map $proc (indices (length $list)) $list))
