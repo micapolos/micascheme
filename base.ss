@@ -416,6 +416,17 @@
 
   (define checking? (make-thread-parameter #f))
 
+  (meta define (syntax->location-string $syntax)
+    (lets
+      ($annotation (syntax->annotation $syntax))
+      (or
+        (and $annotation
+          (lets
+            ($source (annotation-source $annotation))
+            (($path $line $column) (locate-source-object-source $source #t #t))
+            (format " source: ~a (~a:~a)\n" $path $line $column)))
+        "")))
+
   (define-syntax check
     (lambda (stx)
       (syntax-case stx (not)
@@ -426,13 +437,7 @@
             (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
             (ann (syntax->annotation stx))
             (source (annotation-source ann))
-            (ann-string 
-              (if ann
-                (format " source: ~a (~a:~a)\n"
-                  (source-file-descriptor-path (source-object-sfd source))
-                  (source-object-line source)
-                  (source-object-column source))
-                ""))
+            (ann-string (syntax->location-string stx))
             #`(parameterize ((checking? #t))
               (let (#,@let-cases)
                 (or
@@ -449,13 +454,7 @@
             (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
             (ann (syntax->annotation stx))
             (source (annotation-source ann))
-            (ann-string 
-              (if ann
-                (format " source: ~a (~a:~a)\n"
-                  (source-file-descriptor-path (source-object-sfd source))
-                  (source-object-line source)
-                  (source-object-column source))
-                ""))
+            (ann-string (syntax->location-string stx))
             #`(parameterize ((checking? #t))
               (let (#,@let-cases)
                 (or
