@@ -26,7 +26,7 @@
     (($end-fn)
       (calculator-reader #f $end-fn))
     (($value $end-fn)
-      (reader $value
+      (reader
         (lambda ($append-value)
           (calculator-reader $append-value $end-fn))
         (lambda ($begin-symbol)
@@ -36,7 +36,8 @@
                 ((one) (calculator-reader 1 $end-fn))
                 ((add) (calculator-reader (+ $value $end-value) $end-fn))
                 ((negate) (calculator-reader (- $value) $end-fn))))))
-        $end-fn))))
+        (lambda ()
+          ($end-fn $value))))))
 
 (check
   (equal?

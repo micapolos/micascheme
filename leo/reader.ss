@@ -1,6 +1,6 @@
 (library (leo reader)
   (export
-    reader reader? reader-value reader-append-fn reader-begin-fn reader-end-fn
+    reader reader? reader-append-fn reader-begin-fn reader-end-fn
     reader-append reader-begin reader-end
     reader-read reader-read-list
     reader-eval
@@ -8,7 +8,7 @@
     list-reader)
   (import (micascheme))
 
-  (data (reader value append-fn begin-fn end-fn))
+  (data (reader append-fn begin-fn end-fn))
 
   (define (reader-append $reader $value)
     ((reader-append-fn $reader) $value))
@@ -17,7 +17,7 @@
     ((reader-begin-fn $reader) $symbol))
 
   (define (reader-end $reader)
-    ((reader-end-fn $reader) (reader-value $reader)))
+    ((reader-end-fn $reader)))
 
   (define (reader-read-list $reader $list)
     (fold-left reader-read $reader $list))
@@ -45,7 +45,7 @@
       (($end-fn)
         (list-reader (stack) $end-fn))
       (($stack $end-fn)
-        (reader $stack
+        (reader
           (lambda ($appended-item)
             (list-reader
               (push $stack $appended-item)
@@ -59,6 +59,7 @@
                       $begin-symbol
                       `(,$begin-symbol ,@$list)))
                   $end-fn))))
-          (lambda ($end-stack)
-            ($end-fn (reverse $end-stack)))))))
+          (lambda ()
+            ($end-fn
+              (reverse $stack)))))))
 )
