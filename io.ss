@@ -7,9 +7,9 @@
 
     io-monad
 
-    make-variable
-    variable-get
-    variable-set)
+    io-var
+    io-get
+    io-set)
   (import (micascheme) (monad))
 
   (data (io proc))
@@ -29,12 +29,12 @@
   (define io-monad
     (monad pure-io io-bind))
 
-  (define (make-variable $value)
+  (define (io-var $value)
     (unsafe-io (box $value)))
 
-  (define (variable-set $variable $value)
-    (unsafe-io (set-box! $variable $value)))
+  (define (io-set $var $value)
+    (unsafe-io (set-box! $var $value)))
 
-  (define (variable-get $variable)
-    (unsafe-io (unbox $variable)))
+  (define (io-get $var)
+    (unsafe-io (unbox $var)))
 )

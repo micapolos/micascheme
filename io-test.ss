@@ -18,12 +18,12 @@
   (equal?
     (io-unsafe-run
       (monad-lets io-monad
-        ($var1 (make-variable "foo"))
-        ($var2 (make-variable "bar"))
-        ($value1 (variable-get $var1))
-        ($value2 (variable-get $var2))
-        (_ (variable-set $var1 (string-append $value1 "+")))
-        ($value1 (variable-get $var1))
-        (_ (variable-set $var2 (string-append $value1 $value2)))
-        (variable-get $var2)))
+        ($var1 (io-var "foo"))
+        ($var2 (io-var "bar"))
+        ($value1 (io-get $var1))
+        ($value2 (io-get $var2))
+        (_ (io-set $var1 (string-append $value1 "+")))
+        ($value1 (io-get $var1))
+        (_ (io-set $var2 (string-append $value1 $value2)))
+        (io-get $var2)))
     "foo+bar"))
