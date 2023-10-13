@@ -1,0 +1,12 @@
+(import (micascheme) (tico type))
+
+(check (equal? (type-static? (static 123)) #t))
+(check (equal? (type-static? (anything)) #f))
+(check (equal? (type-static? (any-boolean)) #f))
+(check (equal? (type-static? (any-number)) #f))
+(check (equal? (type-static? (any-string)) #f))
+(check (equal? (type-static? (any-list (static 128))) #f))
+(check (equal? (type-static? (any-function (list (static 128)) (static 128))) #t))
+(check (equal? (type-static? (any-function (list (static 128)) (anything))) #f))
+(check (equal? (type-static? (struct `foo (list (static 128)))) #t))
+(check (equal? (type-static? (struct `foo (list (static 128) (anything)))) #f))

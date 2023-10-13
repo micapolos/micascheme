@@ -1,6 +1,7 @@
 (library (symbolizer)
   (export
     symbolize
+    symbolized-bound?
     symbolized-value
     symbolized-eval)
   (import (micascheme))
@@ -13,6 +14,9 @@
       ($symbol (generate-symbol))
       (define-top-level-value $symbol $value symbolize-environment)
       $symbol))
+
+  (define (symbolized-bound? $symbol)
+    (top-level-bound? $symbol symbolize-environment))
 
   (define (symbolized-value $symbol)
     (top-level-value $symbol symbolize-environment))

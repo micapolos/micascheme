@@ -6,6 +6,7 @@
     monad-lets
     monad-stack-box
     option-monad 
+    fallible-monad
     cons-monad
     listing listing-bind listing-run listing-monad)
   (import (micascheme))
@@ -133,6 +134,17 @@
         (or $value (throw option-monad-pure $value)))
       (lambda ($option $fn)
         (and $option ($fn $option)))))
+
+  (define fallible-monad
+    (monad
+      (lambda ($value)
+        (switch $value
+          ((failure? $failure) (throw fallible $failure))
+          ((else $success) $success)))
+      (lambda ($fallible $fn)
+        (switch $fallible
+          ((failure? $failure) $failure)
+          ((else $success) ($fn $success))))))
 
   (define (listing $value)
     (lambda ($list) 
