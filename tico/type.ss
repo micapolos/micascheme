@@ -1,24 +1,19 @@
 (library (tico type)
   (export
-    type-type type-type?
-    boolean-type boolean-type?
-    number-type number-type?
-    string-type string-type?
-    function-type function-type? function-type-params function-type-body
-    struct-type struct-type? struct-type-name struct-type-items
-    enum-type enum-type? enum-type-name enum-type-items
-
-    type-matches?)
+    anything anything?
+    any-boolean any-boolean?
+    any-number any-number?
+    any-string any-string?
+    any-list any-list? any-list-item
+    any-function any-function? any-function-input any-function-output
+    field field? field-name field-body)
   (import (micascheme))
 
-  (data (type-type))
-  (data (boolean-type))
-  (data (number-type))
-  (data (string-type))
-  (data (function-type params body))
-  (data (struct-type name items))
-  (data (enum-type name items))
-
-  (define (type-matches? $type $pattern)
-    (equal? $type $pattern))
+  (data (anything))
+  (data (any-boolean))
+  (data (any-number))
+  (data (any-string))
+  (data (any-list item))
+  (data (any-function input output))
+  (data (field name body))
 )

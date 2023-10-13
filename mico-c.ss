@@ -1,6 +1,6 @@
 (library (mico-c)
   (export
-    typed typed? typed-value typed-type
+    typed typed? typed-term typed-type
     arrow arrow? arrow-params arrow-body
     syntax->typed-c
     syntax->type)
@@ -54,9 +54,9 @@
               (syntax-error $syntax "type mismatch")))
           (typed
             (string-append
-              (typed-value $typed-fn)
+              (typed-term $typed-fn)
               "("
-              (apply string-append (intercalate (map typed-value $typed-args) ", "))
+              (apply string-append (intercalate (map typed-term $typed-args) ", "))
               ")")
             $body-type)))
       ($literal

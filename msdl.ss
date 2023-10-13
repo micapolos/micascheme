@@ -7,7 +7,7 @@
   (define SDL2
     (load-shared-object
       (let (($machine-type (machine-type)))
-        (case machine-type
+        (case $machine-type
           ((i3nt ti3nt a6nt ta6nt) "SDL2.dll")
           ((i3le ti3le a6le ta6le) "libSDL2.so")
           ((i3osx ti3osx a6osx ta6osx) "libSDL2.dylib")

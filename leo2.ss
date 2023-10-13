@@ -16,7 +16,7 @@
     empty-indexing indexing-reverse indexing-ref
     indexing+type types-indexing types-indexed)
   
-  (import (micascheme) (syntax))
+  (import (except (micascheme) enum) (syntax))
 
   (data (typed value type))
 

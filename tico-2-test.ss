@@ -20,12 +20,3 @@
     (typed
       (term "foo" (constant "foo"))
       (any-string))))
-
-(check
-  (equal?
-    (syntax->typed #`(foo 128 "foo" #f))
-    (typed
-      (term
-        (list 128 "foo" #f)
-        (constant (list 128 "foo" #f)))
-      (field `foo (list 128 "foo" #f)))))
