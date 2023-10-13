@@ -5,8 +5,8 @@
 (with-generate-temporary-seed $tmp
   (check
     (equal?
-      (term->datum `foo)
-      `foo)))
+      (term->datum (native 128))
+      128)))
 
 (with-generate-temporary-seed $tmp
   (check
@@ -29,8 +29,13 @@
 (with-generate-temporary-seed $tmp
   (check
     (equal?
-      (term->datum (function 2 (application `string-append (list (variable 1) (variable 0)))))
-      `(lambda ($tmp-0 $tmp-1) (string-append $tmp-0 $tmp-1)))))
+      (term->datum
+        (function 2
+          (application
+            (native `string-append)
+            (list (variable 1) (variable 0)))))
+      `(lambda ($tmp-0 $tmp-1)
+        (string-append $tmp-0 $tmp-1)))))
 
 ; term->value
 
@@ -39,16 +44,17 @@
     (term->value
       (application
         (function 2
-          (application `string-append
+          (application
+            (native `string-append)
             (list (variable 1) (variable 0))))
-        (list "foo" "bar")))
+        (list (native "foo") (native "bar"))))
     "foobar"))
 
 ; term->free-variable-count
 
 (check
   (equal?
-    (term->free-variable-count `foo)
+    (term->free-variable-count (native `foo))
     0))
 
 (check

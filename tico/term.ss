@@ -1,5 +1,6 @@
 (library (tico term)
   (export
+    native native? native-value
     variable variable? variable-index
     function function? function-arity function-body
     application application? application-function application-args
@@ -8,6 +9,7 @@
     term->free-variable-count)
   (import (micascheme))
 
+  (data (native value))
   (data (variable index))
   (data (function arity body))
   (data (application function args))
@@ -22,6 +24,8 @@
 
   (define (scope-term->datum $scope $term)
     (switch $term
+      ((native? $native)
+        (native-value $native))
       ((variable? $variable)
         (list-ref $scope (variable-index $variable)))
       ((function? $function)
@@ -36,13 +40,15 @@
           ,(scope-term->datum $scope (application-function $application))
           ,@(map (partial scope-term->datum $scope) (application-args $application))))
       ((else $other)
-        $other)))
+        (failure `(not (term? ,$other))))))
 
   (define (term->free-variable-count $term)
     (depth-term->free-variable-count 0 $term))
 
   (define (depth-term->free-variable-count $depth $term)
     (switch $term
+      ((native? $native)
+        0)
       ((variable? $variable)
         (max 0 (- (variable-index $variable) $depth -1)))
       ((function? $function)
@@ -56,5 +62,6 @@
             (map
               (partial depth-term->free-variable-count $depth)
               (application-args $application)))))
-      ((else $other) 0)))
+      ((else $other)
+        (failure `(not (term? ,$other))))))
 )
