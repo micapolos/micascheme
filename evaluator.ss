@@ -17,7 +17,7 @@
 
   (define (evaluate $evaluator $datum)
     (fold-right
-      (lambda ($arg $value) ($value $arg))
+      (lambda ($arg $fn) ($fn $arg))
       (eval
         (fold-left
           (lambda ($datum $param) `(lambda (,$param) ,$datum))

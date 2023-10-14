@@ -14,16 +14,14 @@
 
   (data (anything))
   (data (nothing))
-  (data (any-boolean))
-  (data (any-number))
-  (data (any-string))
-  (data (any-list item))
+  (data (any-native))
   (data (any-function params result))
   (data (struct name items))
   (data (struct-get target type))
   (data (variable type))
   (data (function params body))
   (data (application target args))
+  (data (native value))
 
   (data (evaluated type term))
   (data (thunk scope function))
@@ -58,6 +56,8 @@
 
   (define (term-evaluate $scope $term)
     (switch $term
+      ((native? $native)
+        (evaluated (any-native) $native))
       ((variable? $variable)
         (switch (scope-ref $scope (variable-type $variable))
           ((variable? $variable)
