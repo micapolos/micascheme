@@ -7,6 +7,9 @@
   "term-test.ss"
   "compiler-test.ss"
   "decompiler-test.ss"
+  "evaluator-test.ss"
+  "fstack-test.ss"
+  "io-test.ss"
   "leo-test.ss"
   "leo2-test.ss"
   "leoscheme-test.ss"
@@ -27,5 +30,4 @@
   "leo/parser-test.ss"
   "leo/compiler-test.ss"
   "leo/decompiler-test.ss"
-  "tico/term-test.ss"
 )

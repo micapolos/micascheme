@@ -4,8 +4,8 @@
 
 (lets 
   ($evaluator (empty-evaluator (environment `(micascheme))))
-  ($evaluator (evaluator-push $evaluator `a "Hello, "))
-  ($evaluator (evaluator-push $evaluator `b "world!"))
+  ($evaluator (evaluator-push $evaluator (cons `a "Hello, ")))
+  ($evaluator (evaluator-push $evaluator (cons `b "world!")))
   (check 
     (equal? 
       (evaluator-bindings $evaluator) 

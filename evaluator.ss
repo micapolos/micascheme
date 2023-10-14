@@ -10,12 +10,10 @@
   (define (empty-evaluator $environment)
     (evaluator $environment (list)))
 
-  (define (evaluator-push $evaluator $symbol $value)
+  (define (evaluator-push $evaluator $binding)
     (evaluator 
       (evaluator-environment $evaluator)
-      (cons 
-        (cons $symbol $value)
-        (evaluator-bindings $evaluator))))
+      (cons $binding (evaluator-bindings $evaluator))))
 
   (define (evaluate $evaluator $datum)
     (fold-right
