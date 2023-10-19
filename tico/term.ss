@@ -31,28 +31,13 @@
       ((null? _)
         (throws `not-bound $pattern))
       ((else $pair)
-        (unpair $pair $term $scope
+        (unpair $pair $evaluated $scope
           (cond
-            ((type-matches? $evaluated $) $term)
-            (else (scope-ref $terms $pattern)))))))
+            ((term-matches? (evaluated-type $evaluated) $pattern) $evaluated)
+            (else (scope-ref $scope $pattern)))))))
 
   (define (term-matches? $term $pattern)
-    (switch $pattern
-      ((anything? _) #t)
-      ((any-boolean? _)
-        (or
-          (boolean? $term)
-          (any-boolean? $term)))
-      ((any-number? _)
-        (or
-          (number? $term)
-          (any-number? $term)))
-      ((any-string? _)
-        (or
-          (string? $term)
-          (any-string? $term)))
-      ((else $other)
-        (equal? $other $pattern))))
+    (equal? $term $pattern))
 
   (define (term-evaluate $scope $term)
     (switch $term
