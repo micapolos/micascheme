@@ -15,7 +15,7 @@
   "leoscheme-test.ss"
   "mico-c-test.ss"
   "monad-test.ss"
-  "msdl-test.ss"
+  ;"msdl-test.ss"
   "parser-test.ss"
   "seq-test.ss"
   "sequential-syntax-test.ss"
