@@ -70,13 +70,7 @@
         (type-dynamic? (function-type-result $function-type)))
       ((else $other) #t)))
 
-  ; --- generate-symbol ---
-
-  (define (types->generate-symbols $types)
-    (map type->generate-symbol $types))
-
-  (define (type->generate-symbol $type)
-    (generate-symbol))
+  ; --- variable ---
 
   (define (bindings-variable-index->compiled $bindings $variable $index)
     (switch $bindings
@@ -97,13 +91,13 @@
             (else
               (bindings-variable-index->compiled $bindings $variable $index)))))))
 
-  ; --- function ---
+  ; --- abstraction ---
 
   (define (bindings-abstraction->bind-compiled $bindings $abstraction $bindings-term->compiled)
     (lets
       ($params (abstraction-params $abstraction))
       ($arity (length $params))
-      ($symbols (types->generate-symbols $params))
+      ($symbols (generate-symbols $arity))
       ($compiled-body
         ($bindings-term->compiled
           (push-list $bindings (map binding $symbols $params))
