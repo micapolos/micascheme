@@ -9,19 +9,19 @@
   (equal?
     (bindings-term->compiled
       (stack
-        (binding `foo `foo-type)
-        (binding `bar `bar-type))
-      (variable `foo-type))
-    (compiled (typed `foo-type `foo) 2)))
+        (binding `t1 `v1)
+        (binding `t2 `v2))
+      (variable `t1))
+    (compiled (typed `t1 `v1) 2)))
 
 (check
   (equal?
     (bindings-term->compiled
       (stack
-        (binding `foo `foo-type)
-        (binding `bar `bar-type))
-      (variable `bar-type))
-    (compiled (typed `bar-type `bar) 1)))
+        (binding `t1 `v1)
+        (binding `t2 `v2))
+      (variable `t2))
+    (compiled (typed `t2 `v2) 1)))
 
 (with-generate-temporary-seed tmp
   (check

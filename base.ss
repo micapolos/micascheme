@@ -44,6 +44,7 @@
     intercalate
     throw
     identifier-named?
+    todo
 
     stack push push-list push-all top pop
     gen-stack gen-list
@@ -492,6 +493,9 @@
           #`(and
             (identifier? $syntax)
             (symbol=? (syntax->datum $syntax) (quote $name)))))))
+
+  (define (todo)
+    (throw todo))
 
   ; --------------------------------------
 
