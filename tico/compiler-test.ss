@@ -3,7 +3,7 @@
 (check
   (equal?
     (term->compiled (native `string "foo"))
-    (compiled `string (thunk "foo" 0))))
+    (compiled (typed `string "foo") 0)))
 
 (check
   (equal?
@@ -12,7 +12,7 @@
         (binding `foo `foo-type)
         (binding `bar `bar-type))
       (variable `foo-type))
-    (compiled `foo-type (thunk `foo 2))))
+    (compiled (typed `foo-type `foo) 2)))
 
 (check
   (equal?
@@ -21,17 +21,17 @@
         (binding `foo `foo-type)
         (binding `bar `bar-type))
       (variable `bar-type))
-    (compiled `bar-type (thunk `bar 1))))
+    (compiled (typed `bar-type `bar) 1)))
 
 (with-generate-temporary-seed tmp
   (check
     (equal?
       (term->compiled (abstraction (list `t1 `t2) (variable `t1)))
       (compiled
-        (function-type (list `t1 `t2) `t1)
-        (thunk
-          `(lambda (tmp-0 tmp-1) tmp-0)
-          0)))))
+        (typed
+          (function-type (list `t1 `t2) `t1)
+          `(lambda (tmp-0 tmp-1) tmp-0))
+        0))))
 
 (check
   (equal?
@@ -42,8 +42,8 @@
           (native `t1 `a1)
           (native `t2 `a2))))
     (compiled
-      `t3
-      (thunk `(fn a1 a2) 0))))
+      (typed `t3 `(fn a1 a2))
+      0)))
 
 (check
   (equal?
@@ -53,5 +53,7 @@
           (native `t1 `v1)
           (native `t2 `v2))))
     (compiled
-      (struct `foo (list `t1 `t2))
-      (thunk `(list v1 v2) 0))))
+      (typed
+        (struct `foo (list `t1 `t2))
+        `(list v1 v2))
+      0)))

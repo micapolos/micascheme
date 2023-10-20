@@ -9,8 +9,8 @@
     struct struct? struct-name struct-items
     function-type function-type? function-type-params function-type-result
 
-    thunk thunk? thunk-datum thunk-free-variable-count
-    compiled compiled? compiled-type compiled-thunk
+    compiled compiled? compiled-typed compiled-free-variable-count
+    typed typed? typed-type typed-value
     binding binding? binding-type binding-symbol
 
     bindings-term->compiled
@@ -26,8 +26,8 @@
   (data (struct name items))
   (data (function-type params result))
 
-  (data (thunk datum free-variable-count))
-  (data (compiled type thunk))
+  (data (compiled typed free-variable-count))
+  (data (typed type value))
   (data (binding symbol type))
 
   (define (type-matches-binding? $type $binding)
@@ -40,8 +40,10 @@
     (switch $term
       ((native? $native)
         (compiled
-          (native-typ $native)
-          (thunk (native-datum $native) 0)))
+          (typed
+            (native-typ $native)
+            (native-datum $native))
+          0))
       ((variable? $variable)
         (bindings-variable-index->compiled $bindings $variable 0))
       ((abstraction? $abstraction)
@@ -53,14 +55,14 @@
             (bindings-term->compiled
               (push-list $bindings (map binding $symbols $params))
               (abstraction-body $abstraction)))
-          ($body-thunk (compiled-thunk $compiled-body))
+          ($typed-body (compiled-typed $compiled-body))
           (compiled
-            (function-type $params (compiled-type $compiled-body))
-            (thunk
-              `(lambda (,@$symbols) ,(thunk-datum $body-thunk))
-              (max
-                (- (thunk-free-variable-count $body-thunk) $arity)
-                0)))))
+            (typed
+              (function-type $params (typed-type $typed-body))
+              `(lambda (,@$symbols) ,(typed-value $typed-body)))
+            (max
+              (- (compiled-free-variable-count $compiled-body) $arity)
+              0))))
       ((application? $application)
         (compiled-apply
           (bindings-term->compiled $bindings (application-target $application))
@@ -103,8 +105,10 @@
           (cond
             ((equal? (variable-type $variable) (binding-type $binding))
               (compiled
-                (binding-type $binding)
-                (thunk (binding-symbol $binding) $index)))
+                (typed
+                  (binding-type $binding)
+                  (binding-symbol $binding))
+                $index))
             (else
               (bindings-variable-index->compiled $bindings $variable $index)))))))
 
@@ -112,12 +116,12 @@
 
   (define (compiled-apply $target $args)
     (compiled
-      (type-apply
-        (compiled-type $target)
-        (map compiled-type $args))
-      (thunk-apply
-        (compiled-thunk $target)
-        (map compiled-thunk $args))))
+      (typed-apply
+        (compiled-typed $target)
+        (map compiled-typed $args))
+      (apply max
+        (compiled-free-variable-count $target)
+        (map compiled-free-variable-count $args))))
 
   (define (type-apply $target $args)
     (lets
@@ -126,27 +130,23 @@
         (throw function-apply)))
       (function-type-result $function-type)))
 
-  (define (thunk-apply $target $args)
-    (thunk
-      (datum-apply
-        (thunk-datum $target)
-        (map thunk-datum $args))
-      (apply max
-        (thunk-free-variable-count $target)
-        (map thunk-free-variable-count $args))))
-
-  (define (datum-apply $target $args)
-    `(,$target ,@$args))
+  (define (typed-apply $target $args)
+    (typed
+      (type-apply
+        (typed-type $target)
+        (map typed-type $args))
+      `(
+        ,(typed-value $target)
+        ,@(map typed-value $args))))
 
   ; --- struct ---
 
   (define (compiled-struct $name $items)
-    (compiled
-      (struct $name (map compiled-type $items))
-      (thunk-struct (map compiled-thunk $items))))
-
-  (define (thunk-struct $items)
-    (thunk
-      `(list ,@(map thunk-datum $items))
-      (apply max (map thunk-free-variable-count $items))))
+    (lets
+      ($typed-items (map compiled-typed $items))
+      (compiled
+        (typed
+          (struct $name (map typed-type $typed-items))
+          `(list ,@(map typed-value $typed-items)))
+        (apply max (map compiled-free-variable-count $items)))))
 )
