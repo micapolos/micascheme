@@ -63,6 +63,12 @@
       (map syntax->datum (gen-list generate-temporary 3))
       (list `$tmp-0 `$tmp-1 `$tmp-2))))
 
+(with-generate-temporary-seed tmp
+  (check
+    (equal?
+      (generate-symbols 3)
+      (list `tmp-0 `tmp-1 `tmp-2))))
+
 ; === list-safe-ref ===
 
 (check (equal? (list-get (list "a" "b") 0) "a"))

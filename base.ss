@@ -23,7 +23,7 @@
     current-seconds
     works?
     check checking? test-all
-    generate-symbol
+    generate-symbol generate-symbols
     with-generate-temporary-seed
     ensure
     data enum
@@ -104,6 +104,14 @@
 
   (define (generate-symbol)
     (syntax->datum (generate-temporary)))
+
+  (define (generate-symbols $count)
+    (reverse
+      (iterate
+        (lambda ($stack)
+          (push $stack (generate-symbol)))
+        (stack)
+        $count)))
 
   (define generate-temporary
     (case-lambda
