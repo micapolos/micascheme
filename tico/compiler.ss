@@ -47,22 +47,7 @@
       ((variable? $variable)
         (bindings-variable-index->compiled $bindings $variable 0))
       ((abstraction? $abstraction)
-        (lets
-          ($params (abstraction-params $abstraction))
-          ($arity (length $params))
-          ($symbols (types->generate-symbols $params))
-          ($compiled-body
-            (bindings-term->compiled
-              (push-list $bindings (map binding $symbols $params))
-              (abstraction-body $abstraction)))
-          ($typed-body (compiled-typed $compiled-body))
-          (compiled
-            (typed
-              (function-type $params (typed-type $typed-body))
-              `(lambda (,@$symbols) ,(typed-value $typed-body)))
-            (max
-              (- (compiled-free-variable-count $compiled-body) $arity)
-              0))))
+        (bindings-abstraction->bind-compiled $bindings $abstraction bindings-term->compiled))
       ((application? $application)
         (compiled-apply
           (bindings-term->compiled $bindings (application-target $application))
@@ -111,6 +96,26 @@
                 $index))
             (else
               (bindings-variable-index->compiled $bindings $variable $index)))))))
+
+  ; --- function ---
+
+  (define (bindings-abstraction->bind-compiled $bindings $abstraction $bindings-term->compiled)
+    (lets
+      ($params (abstraction-params $abstraction))
+      ($arity (length $params))
+      ($symbols (types->generate-symbols $params))
+      ($compiled-body
+        ($bindings-term->compiled
+          (push-list $bindings (map binding $symbols $params))
+          (abstraction-body $abstraction)))
+      ($typed-body (compiled-typed $compiled-body))
+      (compiled
+        (typed
+          (function-type $params (typed-type $typed-body))
+          `(lambda (,@$symbols) ,(typed-value $typed-body)))
+        (max
+          (- (compiled-free-variable-count $compiled-body) $arity)
+          0))))
 
   ; --- apply ---
 
