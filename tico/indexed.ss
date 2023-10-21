@@ -1,15 +1,17 @@
 (library (tico indexed)
   (export
     variable variable? variable-index
-    abstraction abstraction? abstraction-arity abstraction-body
+    abstraction abstraction? abstraction-body
     application application? application-target application-args
     thunk thunk? thunk-bindings thunk-term
     term-evaluate)
   (import (micascheme))
 
   (data (variable index))
-  (data (abstraction arity body))
+  (data (abstraction body))
   (data (application target args))
+  (data (evaluated value))
+  (data (compiled evaluated-opt datum depth))
   (data (thunk bindings term))
 
   (define (term-evaluate $term)
@@ -51,7 +53,7 @@
             ((0) $term)
             (else
               (application
-                (abstraction $arity $term)
+                (abstraction $term)
                 (reverse $bindings))))))
       ((else $other) $other)))
 )
