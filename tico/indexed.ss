@@ -4,6 +4,7 @@
     variable variable? variable-index
     abstraction abstraction? abstraction-arity abstraction-body
     application application? application-target application-args
+    assertion assertion? assertion-condition assertion-body
     thunk thunk? thunk-bindings thunk-term
     term-evaluate)
   (import (micascheme))
@@ -12,6 +13,8 @@
   (data (variable index))
   (data (abstraction arity body))
   (data (application target args))
+  (data (assertion condition body))
+  (data (compiled datum depth))
   (data (hole))
   (data (thunk bindings term))
 
@@ -25,9 +28,8 @@
     (switch $term
       ((evaluated? $evaluated) $evaluated)
       ((variable? $variable)
-        (switch (list-ref-opt $bindings (variable-index $variable))
+        (switch (list-ref $bindings (variable-index $variable))
           ((hole? _) $variable)
-          ((false? _) $variable)
           ((else $other) $other)))
       ((abstraction? $abstraction)
         (thunk $bindings
@@ -43,6 +45,11 @@
         (term-apply
           (bindings-term->value $bindings (application-target $application))
           (map (partial bindings-term->value $bindings) (application-args $application))))
+      ((assertion? $assertion)
+        (cond
+          ((equal? (bindings-term->value $bindings (assertion-condition $assertion)) (evaluated #t))
+            (bindings-term->value $bindings (assertion-body $assertion)))
+          (else (throw assertion-failed (assertion-condition $assertion)))))
       ((else $other) (throw not-term $other))))
 
   (define (term-apply $target $args)
