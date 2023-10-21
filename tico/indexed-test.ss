@@ -1,21 +1,41 @@
 (import (micascheme) (tico indexed))
 
-(check (equal? (term-evaluate "foo") "foo"))
-
 (check
   (equal?
-    (term-evaluate (application string-append (list "foo" "bar")))
-    "foobar"))
-
-(check
-  (equal?
-    (term-evaluate (abstraction 2 "foo"))
-    (abstraction 2 "foo")))
+    (term-evaluate (evaluated "foo"))
+    (evaluated "foo")))
 
 (check
   (equal?
     (term-evaluate
       (application
-        (abstraction 2 (application string-append (list (variable 1) (variable 0))))
-        (list "foo" "bar")))
-    "foobar"))
+        (evaluated string-append)
+        (list
+          (evaluated "foo")
+          (evaluated "bar"))))
+    (evaluated "foobar")))
+
+(check
+  (equal?
+    (term-evaluate (abstraction 2 (evaluated "foo")))
+    (abstraction 2 (evaluated "foo"))))
+
+(check
+  (equal?
+    (term-evaluate
+      (abstraction 2
+        (application
+          (evaluated string-append)
+          (list (evaluated "foo") (evaluated "bar")))))
+    (abstraction 2 (evaluated "foobar"))))
+
+(check
+  (equal?
+    (term-evaluate
+      (application
+        (abstraction 2
+          (application
+            (evaluated string-append)
+            (list (variable 1) (variable 0))))
+        (list (evaluated "foo") (evaluated "bar"))))
+    (evaluated "foobar")))

@@ -1,5 +1,6 @@
 (library (tico indexed)
   (export
+    evaluated evaluated? evaluated-value
     variable variable? variable-index
     abstraction abstraction? abstraction-arity abstraction-body
     application application? application-target application-args
@@ -7,9 +8,11 @@
     term-evaluate)
   (import (micascheme))
 
+  (data (evaluated value))
   (data (variable index))
   (data (abstraction arity body))
   (data (application target args))
+  (data (hole))
   (data (expansion body))
   (data (thunk bindings term))
 
@@ -21,16 +24,26 @@
 
   (define (bindings-term->value $bindings $term)
     (switch $term
+      ((evaluated? $evaluated) $evaluated)
       ((variable? $variable)
-        (list-ref $bindings (variable-index $variable)))
+        (switch (list-ref $bindings (variable-index $variable))
+          ((hole? _) $variable)
+          ((else $other) $other)))
       ((abstraction? $abstraction)
-        (thunk $bindings $abstraction))
+        (thunk $bindings
+          (abstraction
+            (abstraction-arity $abstraction)
+            (bindings-term->value
+              (iterate
+                (lambda ($bindings) (push $bindings (hole)))
+                $bindings
+                (abstraction-arity $abstraction))
+              (abstraction-body $abstraction)))))
       ((application? $application)
         (term-apply
           (bindings-term->value $bindings (application-target $application))
           (map (partial bindings-term->value $bindings) (application-args $application))))
-      ((else $other)
-        $other)))
+      ((else $other) (throw not-term $other))))
 
   (define (term-apply $target $args)
     (switch $target
@@ -38,8 +51,17 @@
         (bindings-term->value
           (push-list (thunk-bindings $thunk) $args)
           (abstraction-body (thunk-term $thunk))))
+      ((evaluated? $evaluated)
+        (cond
+          ((for-all evaluated? $args)
+            (evaluated
+              (apply
+                (evaluated-value $evaluated)
+                (map evaluated-value $args))))
+          (else
+            (application $evaluated $args))))
       ((else $other)
-        (apply $other $args))))
+        (application $other $args))))
 
   (define (value->term $value)
     (switch $value
@@ -54,5 +76,6 @@
               (application
                 (abstraction $arity $term)
                 (reverse $bindings))))))
-      ((else $other) $other)))
+      ((evaluated? $evaluated) $evaluated)
+      ((else $other) (throw not-term $other))))
 )
