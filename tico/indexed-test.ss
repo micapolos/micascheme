@@ -44,12 +44,3 @@
             (list (variable 1) (variable 0))))
         (list (evaluated "foo") (evaluated "bar"))))
     (evaluated "foobar")))
-
-(check
-  (equal?
-    (term-evaluate
-      (expansion
-        (application
-          (evaluated evaluated)
-          (list (evaluated "foo")))))
-    (evaluated "foo")))

@@ -4,7 +4,6 @@
     variable variable? variable-index
     abstraction abstraction? abstraction-arity abstraction-body
     application application? application-target application-args
-    expansion expansion? expansion-body
     thunk thunk? thunk-bindings thunk-term
     term-evaluate)
   (import (micascheme))
@@ -14,7 +13,6 @@
   (data (abstraction arity body))
   (data (application target args))
   (data (hole))
-  (data (expansion body))
   (data (thunk bindings term))
 
   (define (term-evaluate $term)
@@ -45,10 +43,6 @@
         (term-apply
           (bindings-term->value $bindings (application-target $application))
           (map (partial bindings-term->value $bindings) (application-args $application))))
-      ((expansion? $expansion)
-        (bindings-term->value $bindings
-          (evaluated-value
-            (bindings-term->value $bindings (expansion-body $expansion)))))
       ((else $other) (throw not-term $other))))
 
   (define (term-apply $target $args)
