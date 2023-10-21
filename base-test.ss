@@ -247,6 +247,13 @@
 (check (equal? (list-ref-opt (list "a" "b") 1) "b"))
 (check (equal? (list-ref-opt (list "a" "b") 2) #f))
 
+; === list-drop ===
+
+(check (equal? (list-drop (list "a" "b") 0) (list "a" "b")))
+(check (equal? (list-drop (list "a" "b") 1) (list "b")))
+(check (equal? (list-drop (list "a" "b") 2) (list)))
+(check (equal? (list-drop (list "a" "b") 3) #f))
+
 ; === list-indexed ===
 
 (check (equal? (list-indexed (list "a" "b" "c")) (list (indexed "a" 0) (indexed "b" 1) (indexed "c" 2))))

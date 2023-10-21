@@ -8,13 +8,13 @@
     struct struct? struct-name struct-items
     function-type function-type? function-type-params function-type-result
 
-    compiled compiled? compiled-typed compiled-free-variable-count
     typed typed? typed-type typed-value
     binding binding? binding-type binding-value
     thunk thunk? thunk-value thunk-free-variable-count
+    constant constant? constant-value
 
-    bindings-term->compiled
-    term->compiled)
+    bindings-term->typed-thunk
+    term->typed-thunk)
   (import
     (micascheme)
     (evaluator))
@@ -27,40 +27,36 @@
   (data (struct name items))
   (data (function-type params result))
 
-  (data (compiled typed free-variable-count))
   (data (thunk value free-variable-count))
+  (data (constant value))
   (data (typed type value))
   (data (binding type value))
-
-  (data (evaluated value))
 
   (define (type-matches-binding? $type $binding)
     (equal? $type (binding-type $binding)))
 
-  (define (term->compiled $term)
-    (bindings-term->compiled (stack) $term))
+  (define (term->typed-thunk $term)
+    (bindings-term->typed-thunk (stack) $term))
 
-  (define (bindings-term->compiled $bindings $term)
+  (define (bindings-term->typed-thunk $bindings $term)
     (switch $term
       ((native? $native)
-        (compiled
-          (typed
-            (native-type $native)
-            (native-value $native))
-          0))
+        (typed
+          (native-type $native)
+          (thunk (native-value $native) 0)))
       ((variable? $variable)
-        (bindings-variable-index->compiled $bindings $variable 0))
+        (bindings-variable-index->typed-thunk $bindings $variable 0))
       ((abstraction? $abstraction)
-        (bindings-abstraction->bind-compiled $bindings $abstraction bindings-term->compiled))
+        (bindings-abstraction->typed-thunk $bindings $abstraction))
       ((application? $application)
-        (compiled-apply
-          (bindings-term->compiled $bindings (application-target $application))
-          (map (partial bindings-term->compiled $bindings) (application-args $application))))
+        (typed-thunk-apply
+          (bindings-term->typed-thunk $bindings (application-target $application))
+          (map (partial bindings-term->typed-thunk $bindings) (application-args $application))))
       ((struct? $struct)
-        (compiled-struct
+        (typed-thunk-struct
           (struct-name $struct)
           (map
-            (partial bindings-term->compiled $bindings)
+            (partial bindings-term->typed-thunk $bindings)
             (struct-items $struct))))
       ((else $other)
         (throw not-term $other))))
@@ -75,10 +71,10 @@
 
   ; --- variable ---
 
-  (define (bindings-variable->compiled $bindings $variable)
-    (bindings-variable-index->compiled $bindings $variable 0))
+  (define (bindings-variable->typed-thunk $bindings $variable)
+    (bindings-variable-index->typed-thunk $bindings $variable 0))
 
-  (define (bindings-variable-index->compiled $bindings $variable $index)
+  (define (bindings-variable-index->typed-thunk $bindings $variable $index)
     (switch $bindings
       ((null? _)
         (throw not-bound $variable))
@@ -89,44 +85,43 @@
           ($bindings (cdr $pair))
           (cond
             ((equal? (variable-type $variable) (binding-type $binding))
-              (compiled
-                (typed
-                  (binding-type $binding)
-                  (binding-value $binding))
-                $index))
+              (typed
+                (binding-type $binding)
+                (thunk (binding-value $binding) $index)))
             (else
-              (bindings-variable-index->compiled $bindings $variable $index)))))))
+              (bindings-variable-index->typed-thunk $bindings $variable $index)))))))
 
   ; --- abstraction ---
 
-  (define (bindings-abstraction->bind-compiled $bindings $abstraction $bindings-term->compiled)
+  (define (bindings-abstraction->typed-thunk $bindings $abstraction)
     (lets
       ($params (abstraction-params $abstraction))
       ($arity (length $params))
       ($symbols (generate-symbols $arity))
-      ($compiled-body
-        ($bindings-term->compiled
+      ($typed-body-thunk
+        (bindings-term->typed-thunk
           (push-list $bindings (map binding $params $symbols))
           (abstraction-body $abstraction)))
-      ($typed-body (compiled-typed $compiled-body))
-      (compiled
-        (typed
-          (function-type $params (typed-type $typed-body))
-          `(lambda (,@$symbols) ,(typed-value $typed-body)))
-        (max
-          (- (compiled-free-variable-count $compiled-body) $arity)
-          0))))
+      ($body-type (typed-type $typed-body-thunk))
+      ($body-thunk (typed-value $typed-body-thunk))
+      (typed
+        (function-type $params $body-type)
+        (thunk
+          `(lambda (,@$symbols) ,(thunk-value $body-thunk))
+          (max
+            (- (thunk-free-variable-count $body-thunk) $arity)
+            0)))))
 
   ; --- apply ---
 
-  (define (compiled-apply $target $args)
-    (compiled
-      (typed-apply
-        (compiled-typed $target)
-        (map compiled-typed $args))
-      (apply max
-        (compiled-free-variable-count $target)
-        (map compiled-free-variable-count $args))))
+  (define (typed-thunk-apply $target $args)
+    (typed
+      (type-apply
+        (typed-type $target)
+        (map typed-type $args))
+      (thunk-apply
+        (typed-value $target)
+        (map typed-value $args))))
 
   (define (type-apply $target $args)
     (lets
@@ -135,25 +130,34 @@
         (throw function-apply)))
       (function-type-result $function-type)))
 
-  (define (typed-apply $target $args)
-    (typed
-      (type-apply
-        (typed-type $target)
-        (map typed-type $args))
-      `(
-        ,(typed-value $target)
-        ,@(map typed-value $args))))
+  (define (thunk-apply $target $args)
+    (thunk
+      (datum-apply
+        (thunk-value $target)
+        (map thunk-value $args))
+      (free-variable-count-apply
+        (thunk-free-variable-count $target)
+        (map thunk-free-variable-count $args))))
+
+  (define (datum-apply $target $args)
+    `(,$target ,@$args))
+
+  (define (free-variable-count-apply $target $args)
+    (apply max $target $args))
 
   ; --- struct ---
 
-  (define (compiled-struct $name $items)
+  (define (typed-thunk-struct $name $items)
     (lets
-      ($typed-items (map compiled-typed $items))
-      (compiled
-        (typed
-          (struct $name (map typed-type $typed-items))
-          `(list ,@(map typed-value $typed-items)))
-        (apply max (map compiled-free-variable-count $items)))))
+      ($types (map typed-type $items))
+      ($thunks (map typed-value $items))
+      ($datums (map thunk-value $thunks))
+      ($free-variable-counts (map thunk-free-variable-count $thunks))
+      (typed
+        (struct $name $types)
+        (thunk
+          `(list ,@$datums)
+          (apply max $free-variable-counts)))))
 
   ; --- evaluation ---
 
@@ -162,31 +166,28 @@
       ((native? $native)
         (typed
           (native-type $native)
-          (evaluated
+          (constant
             (bindings-datum->value $evaluator-bindings (native-value $native)))))
       ((variable? $variable)
         (lets
-          ($compiled (bindings-variable->compiled $compiler-bindings $variable))
-          ($typed (compiled-typed $compiled))
-          ($type (typed-type $typed))
-          ($datum (typed-value $typed))
-          ($free-variable-count (compiled-free-variable-count $compiled))
+          ($typed-thunk (bindings-variable->typed-thunk $compiler-bindings $variable))
+          ($type (typed-type $typed-thunk))
+          ($thunk (typed-value $typed-thunk))
+          ($datum (thunk-value $thunk))
+          ($free-variable-count (thunk-free-variable-count $thunk))
           (typed $type
             (cond
-              ((= (compiled-free-variable-count $compiled) 0)
+              ((= $free-variable-count 0)
                 (bindings-datum->value $evaluator-bindings $datum))
               (else
                 (thunk $datum $free-variable-count))))))
       ((application? $application)
-        (lets
-          ($typed-evaluated-target
-            (bindings-term->evaluate $evaluator-bindings $compiler-bindings
-              (application-target $application)))
-          ($typed-evaluated-args
-            (map
-              (partial bindings-term->evaluate $evaluator-bindings $compiler-bindings)
-              (application-args $application)))
-          (todo)))
+        (evaluated-apply
+          (bindings-term->evaluate $evaluator-bindings $compiler-bindings
+            (application-target $application))
+          (map
+            (partial bindings-term->evaluate $evaluator-bindings $compiler-bindings)
+            (application-args $application))))
       ((else $other)
         (throw invalid-term $other))))
 
@@ -199,4 +200,24 @@
     (evaluate
       (evaluator (environment `(micascheme)) $bindings)
       $datum))
+
+  ; --- devaluation ---
+
+  (define (type-value->term $type $value)
+    (switch $type
+      ((native-type? $native-type)
+        (native $value))
+      ((struct? $struct)
+        (struct
+          (struct-name $struct)
+          (map type-value->term
+            (struct-items $struct)
+            $value)))
+      ((else $other)
+        (throw `invalid-type $type))))
+
+  (define (typed-value->term $typed-value)
+    (type-value->term
+      (typed-type $typed-value)
+      (typed-value $typed-value)))
 )

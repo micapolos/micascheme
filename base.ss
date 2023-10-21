@@ -33,7 +33,7 @@
     indices iterate
     fold-while
     find-index
-    list-set list-ref-opt
+    list-set list-ref-opt list-drop
     switch
     unpair pair-values
     associ
@@ -411,6 +411,11 @@
       (if (= $index 0)
         (car $list)
         (list-ref-opt (cdr $list) (- $index 1)))))
+
+  (define (list-drop $list $count)
+    (cond
+      ((= $count 0) $list)
+      (else (and (pair? $list) (list-drop (cdr $list) (- $count 1))))))
 
   (define (list-set $list $index $obj)
     (if (> $index 0)
