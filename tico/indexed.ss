@@ -11,7 +11,6 @@
   (data (abstraction arity body))
   (data (application target args))
   (data (thunk bindings term))
-  (enum (term variable abstraction application native))
 
   (define (term-evaluate $term)
     (value->term (term->value $term)))
