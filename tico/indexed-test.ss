@@ -9,13 +9,13 @@
 
 (check
   (equal?
-    (term-evaluate (abstraction "foo"))
-    (abstraction "foo")))
+    (term-evaluate (abstraction 2 "foo"))
+    (abstraction 2 "foo")))
 
 (check
   (equal?
     (term-evaluate
       (application
-        (abstraction (application string-append (list (variable 1) (variable 0))))
+        (abstraction 2 (application string-append (list (variable 1) (variable 0))))
         (list "foo" "bar")))
     "foobar"))
