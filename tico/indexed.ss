@@ -4,6 +4,7 @@
     variable variable? variable-index
     abstraction abstraction? abstraction-arity abstraction-body
     application application? application-target application-args
+    expansion expansion? expansion-body
     assertion assertion? assertion-condition assertion-body
     thunk thunk? thunk-bindings thunk-term
     term-evaluate)
@@ -13,6 +14,7 @@
   (data (variable index))
   (data (abstraction arity body))
   (data (application target args))
+  (data (expansion body))
   (data (assertion condition body))
   (data (compiled datum depth))
   (data (hole))
@@ -45,6 +47,10 @@
         (term-apply
           (bindings-term->value $bindings (application-target $application))
           (map (partial bindings-term->value $bindings) (application-args $application))))
+      ((expansion? $expansion)
+        (bindings-term->value $bindings
+          (evaluated-value
+            (bindings-term->value $bindings (expansion-body $expansion)))))
       ((assertion? $assertion)
         (cond
           ((equal? (bindings-term->value $bindings (assertion-condition $assertion)) (evaluated #t))

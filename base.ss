@@ -12,7 +12,9 @@
     null-or-pair?
     opt
     from
+    once-proc
     checking-once
+    raises?
     single? single
     bindings-eval
     script
@@ -184,6 +186,14 @@
   (define (null-or-pair? $obj)
     (or (null? $obj) (pair? $obj)))
 
+  (define-syntax-rule (once-proc $proc)
+    (let ()
+      (define $applied? #f)
+      (lambda ()
+        (when $applied? (throw once-proc $proc))
+        (set! $applied? #t)
+        ($proc))))
+
   (define-syntax-rule (checking-once $body)
     (let ()
       (define $applied? #f)
@@ -191,6 +201,13 @@
         (when $applied? (error `checking-once "called twice" (quote $body)))
         (set! $applied? #t)
         $body)))
+
+  (define (raises? $proc)
+    (call/cc
+      (lambda (cont)
+        (with-exception-handler
+          (lambda (_) (cont #t))
+          (lambda () ($proc) #f)))))
 
   (define-syntax lets
     (lambda ($syntax)
