@@ -28,24 +28,11 @@
     (syntax-case $syntax ()
       (($symbol $args ...)
         (identifier? (syntax $symbol))
-        (lets
-          ($compileds
-            (map
-              (partial context-syntax->compiled $context)
-              (syntax->list (syntax ($args ...)))))
-          ($types (map compiled-type $compileds))
-          ($combos (filter-opts (map compiled-combo-opt $compileds)))
-          ($constant-opts (map combo-constant-opt $combos))
-          ($expressions (map combo-expression $combos))
-          (compiled
-            (struct-type (syntax->datum (syntax $symbol)) $types)
-            (and
-              (not (null? $combos))
-              (combo
-                (and
-                  (for-all identity $constant-opts)
-                  (constant (tuple-value (map constant-value $constant-opts))))
-                (tuple-expression $expressions))))))
+        (compiled-struct
+          (syntax->datum (syntax $symbol))
+          (map
+            (partial context-syntax->compiled $context)
+            (syntax->list (syntax ($args ...))))))
       ($other
         (switch (syntax->datum (syntax $other))
           ((boolean? $boolean)
@@ -55,6 +42,22 @@
           ((string? $string)
             (compiled-literal (string-type) $string))
           ((else _) (syntax-error $syntax))))))
+
+  (define (compiled-struct $name $fields)
+    (lets
+      ($types (map compiled-type $fields))
+      ($combos (filter-opts (map compiled-combo-opt $fields)))
+      ($constant-opts (map combo-constant-opt $combos))
+      ($expressions (map combo-expression $combos))
+      (compiled
+        (struct-type $name $types)
+        (and
+          (not (null? $combos))
+          (combo
+            (and
+              (for-all identity $constant-opts)
+              (constant (tuple-value (map constant-value $constant-opts))))
+            (tuple-expression $expressions))))))
 
   (define (compiled-literal $type $literal)
     (compiled $type (combo (constant $literal) $literal)))
