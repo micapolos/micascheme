@@ -17,7 +17,8 @@
     term->typed-thunk)
   (import
     (micascheme)
-    (evaluator))
+    (evaluator)
+    (tico expression))
 
   (data (variable type))
   (data (abstraction params body))
@@ -225,60 +226,6 @@
       (typed-type $typed-value)
       (typed-value $typed-value)))
 
-  ; --- indirection ---
-
-  (define (lambda-expression $arity $fn)
-    (lets
-      ($params (generate-symbols $arity))
-      `(lambda (,@$params)
-        ,($fn $params))))
-
-  (define (apply-expression $target $args)
-    `(,$target ,$args))
-
-  (define (let-expression $expression $fn)
-    (lets
-      ($symbol (generate-symbol))
-      `(let ((,$symbol ,$expression))
-        ,($fn $symbol))))
-
-  (define (bind-expression $expression $fn)
-    (switch $expression
-      ((symbol? $symbol) ($fn $symbol))
-      ((else $other) (let-expression $expression $fn))))
-
-  ; --- tuple packing / unpacking ---
-
-  (define (tuple-expression $expressions)
-    (case (length $expressions)
-      ((0) #f)
-      ((1) (car $expressions))
-      ((2) `(cons ,(car $expressions) ,(cadr $expressions)))
-      (else `(vector ,@(list->vector $expressions)))))
-
-  (define (tuple-ref-expression $arity $tuple $index)
-    (case $arity
-      ((0) `(throw error))
-      ((1) $tuple)
-      ((2) `(,(if (zero? $index) `car `cdr) $tuple))
-      (else `(vector-ref ,$tuple ,$index))))
-
-  ; --- selector / switch ---
-
-  (define (selector-expression $arity $index)
-    (case $arity
-      ((0) `(throw error))
-      ((1) #f)
-      ((2) (zero? $index))
-      (else $index)))
-
-  (define (switch-expression $selector $expressions)
-    (case (length $expressions)
-      ((0) `(throw error))
-      ((1) (car $expressions))
-      ((2) `(if ,$selector ,@$expressions))
-      (else `(index-switch ,$selector ,@expressions))))
-
   ; --- type-static? ---
 
   (define (type-static? $type)
@@ -334,4 +281,14 @@
           (tuple-ref-expression
             (typed-value $typed-tuple)
             $index-opt)))))
+
+  (define (parser-parse-syntax $parser $syntax)
+    (syntax-case $syntax ()
+      (($define $name $expr)
+        (and
+          (identifier-named? (syntax $define) define)
+          (identifier? (syntax $name)))
+        (todo))
+      ($other )
+
 )
