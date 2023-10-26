@@ -42,6 +42,18 @@
 
 (check
   (equal?
+    (datum->compiled `(struct vec (scheme number n) (scheme string s)))
+    (compiled
+      (struct-type `vec (list (number-type) (string-type)))
+      (expr (tuple-expression (list `n `s))))))
+
+(check
+  (raises?
+    (lambda ()
+      (datum->compiled `(struct "not-name" (scheme number n) (scheme string s))))))
+
+(check
+  (equal?
     (datum->compiled `(vec (scheme number n) (scheme string s)))
     (compiled
       (struct-type `vec (list (number-type) (string-type)))

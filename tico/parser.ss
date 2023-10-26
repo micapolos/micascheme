@@ -47,13 +47,16 @@
         (identifier-named? (syntax $type) type)
         (value-compiled
           (compiled-type (context-syntax->compiled $context (syntax $expr)))))
-      (($symbol $args ...)
-        (identifier? (syntax $symbol))
+      (($struct $name $fields ...)
+        (identifier-named? (syntax $struct) struct)
         (compiled-struct
-          (syntax->datum (syntax $symbol))
+          (ensure symbol? (syntax->datum (syntax $name)))
           (map
             (partial context-syntax->compiled $context)
-            (syntax->list (syntax ($args ...))))))
+            (syntax->list (syntax ($fields ...))))))
+      (($symbol $args ...)
+        (identifier? (syntax $symbol))
+        (context-syntax->compiled $context (syntax (struct $symbol $args ...))))
       ($other
         (switch (syntax->datum (syntax $other))
           ((boolean? $boolean)
