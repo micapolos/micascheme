@@ -23,9 +23,7 @@
 (check
   (equal?
     (datum->compiled `(scheme number n))
-    (compiled
-      (number-type)
-      (combo #f `n))))
+    (compiled (number-type) (expr `n))))
 
 (check
   (equal?
@@ -47,8 +45,7 @@
     (datum->compiled `(vec (scheme number n) (scheme string s)))
     (compiled
       (struct-type `vec (list (number-type) (string-type)))
-      (combo #f
-        (tuple-expression (list `n `s))))))
+      (expr (tuple-expression (list `n `s))))))
 
 (check
   (equal?

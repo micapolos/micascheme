@@ -1,8 +1,7 @@
 (library (tico parser)
   (export
-    compiled compiled? compiled-type compiled-combo-opt
-    combo combo? combo-constant-opt combo-expression
-    constant constant? constant-value
+    compiled compiled? compiled-type compiled-expr-opt
+    expr expr? expr-datum
 
     syntax->compiled datum->compiled)
   (import
@@ -12,9 +11,8 @@
     (tico type))
 
   (data (context))
-  (data (constant value))
-  (data (combo constant-opt expression))
-  (data (compiled type combo-opt))
+  (data (compiled type expr-opt))
+  (data (expr datum))
 
   (define null-context (context))
 
@@ -35,11 +33,11 @@
       ($string
         (identifier-named? (syntax $string) string)
         (compiled (value-type (string-type)) #f))
-      (($scheme $type $value)
+      (($scheme $type $expr)
         (identifier-named? (syntax $scheme) scheme)
         (compiled
           (context-syntax->type $context (syntax $type))
-          (combo #f (syntax->datum (syntax $value)))))
+          (expr (syntax->datum (syntax $expr)))))
       (($type $expr)
         (identifier-named? (syntax $type) type)
         (compiled
@@ -55,44 +53,27 @@
       ($other
         (switch (syntax->datum (syntax $other))
           ((boolean? $boolean)
-            (compiled-literal (boolean-type) $boolean))
+            (compiled (value-type $boolean) #f))
           ((number? $number)
-            (compiled-literal (number-type) $number))
+            (compiled (value-type $number) #f))
           ((string? $string)
-            (compiled-literal (string-type) $string))
+            (compiled (value-type $string) #f))
           ((else _) (syntax-error $syntax))))))
 
   (define (compiled-struct $name $fields)
     (lets
       ($types (map compiled-type $fields))
-      ($combos (filter-opts (map compiled-combo-opt $fields)))
-      ($constant-opts (map combo-constant-opt $combos))
-      ($expressions (map combo-expression $combos))
+      ($exprs (filter-opts (map compiled-expr-opt $fields)))
       (compiled
         (struct-type $name $types)
         (and
-          (not (null? $combos))
-          (combo
-            (and
-              (for-all identity $constant-opts)
-              (constant (tuple-value (map constant-value $constant-opts))))
-            (tuple-expression $expressions))))))
-
-  (define (compiled-literal $type $literal)
-    (compiled (value-type $literal) #f))
+          (not (null? $exprs))
+          (expr (tuple-expression (map expr-datum $exprs)))))))
 
   (define (context-syntax->type $context $syntax)
-    (compiled-constant-type
-      (context-syntax->compiled $context $syntax)))
-
-  (define (compiled-constant-type $compiled)
-    (type-constant-opt->type
-      (compiled-type $compiled)
-      (opt-lift combo-constant-opt (compiled-combo-opt $compiled))))
-
-  (define (type-constant-opt->type $type $constant-opt)
-    (switch $type
+    (switch (compiled-type (context-syntax->compiled $context $syntax))
       ((value-type? $value-type)
         (value-type-value $value-type))
-      ((else $other) (todo))))
+      ((else $other)
+        (throw not-type $other))))
 )
