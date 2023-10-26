@@ -32,6 +32,10 @@
   (data (typed type value))
   (data (binding type value))
 
+  (data (evaluator bindings))
+  (data (compiler bindings))
+  (data (parser evaluator compiler))
+
   (define (type-matches-binding? $type $binding)
     (equal? $type (binding-type $binding)))
 
@@ -220,4 +224,114 @@
     (type-value->term
       (typed-type $typed-value)
       (typed-value $typed-value)))
+
+  ; --- indirection ---
+
+  (define (lambda-expression $arity $fn)
+    (lets
+      ($params (generate-symbols $arity))
+      `(lambda (,@$params)
+        ,($fn $params))))
+
+  (define (apply-expression $target $args)
+    `(,$target ,$args))
+
+  (define (let-expression $expression $fn)
+    (lets
+      ($symbol (generate-symbol))
+      `(let ((,$symbol ,$expression))
+        ,($fn $symbol))))
+
+  (define (bind-expression $expression $fn)
+    (switch $expression
+      ((symbol? $symbol) ($fn $symbol))
+      ((else $other) (let-expression $expression $fn))))
+
+  ; --- tuple packing / unpacking ---
+
+  (define (tuple-expression $expressions)
+    (case (length $expressions)
+      ((0) #f)
+      ((1) (car $expressions))
+      ((2) `(cons ,(car $expressions) ,(cadr $expressions)))
+      (else `(vector ,@(list->vector $expressions)))))
+
+  (define (tuple-ref-expression $arity $tuple $index)
+    (case $arity
+      ((0) `(throw error))
+      ((1) $tuple)
+      ((2) `(,(if (zero? $index) `car `cdr) $tuple))
+      (else `(vector-ref ,$tuple ,$index))))
+
+  ; --- selector / switch ---
+
+  (define (selector-expression $arity $index)
+    (case $arity
+      ((0) `(throw error))
+      ((1) #f)
+      ((2) (zero? $index))
+      (else $index)))
+
+  (define (switch-expression $selector $expressions)
+    (case (length $expressions)
+      ((0) `(throw error))
+      ((1) (car $expressions))
+      ((2) `(if ,$selector ,@$expressions))
+      (else `(index-switch ,$selector ,@expressions))))
+
+  ; --- type-static? ---
+
+  (define (type-static? $type)
+    (switch $type
+      ((struct? $struct)
+        (for-all type-static? (struct-items $struct)))
+      ((function-type? $function-type)
+        (type-static? (function-type-result $function-type)))
+      ((else $other) #t)))
+
+  (define (type-dynamic? $type)
+    (not (type-static? $type)))
+
+  (define (type-contains? $type $other)
+    (equal? $type $other))
+
+  ; --- typed-expression ---
+
+  (define (typed-dynamic? $typed)
+    (type-dynamic? (typed-type $typed)))
+
+  ;; return (typed type index-opt) / #f
+  (define (types-ref $types $selector-type)
+    (types-ref-from $types $selector-type 0))
+
+  (define (types-ref-from $types $selector-type $index)
+    (cond
+      ((null? $types) #f)
+      (else
+        (unpair $types $type $types
+          (lets
+            ($dynamic? (type-dynamic? $type))
+            (cond
+              ((type-contains? $selector-type $type)
+                (typed $type (if $dynamic? $index #f)))
+              (else
+                (types-ref-from $types $selector-type
+                  (if $dynamic? (+ $index 1) $index)))))))))
+
+  (define (typed-tuple-expression $typed-expressions)
+    (typed
+      (map typed-type $typed-expressions)
+      (tuple-expression (map typed-value (filter typed-dynamic? $typed-expressions)))))
+
+  (define (typed-tuple-ref-expression $typed-tuple $type)
+    (lets
+      ($typed-index-opt (types-ref (typed-type $typed-tuple) $type))
+      ($typed-index (or $typed-index (throw ref)))
+      ($index-opt (typed-value $typed-index))
+      (typed
+        (typed-type $typed-index)
+        (and $index-opt
+          (tuple-ref-expression
+            (typed-value $typed-tuple)
+            $index-opt)))))
 )
