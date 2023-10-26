@@ -26,6 +26,20 @@
 
   (define (context-syntax->compiled $context $syntax)
     (syntax-case $syntax ()
+      ($boolean
+        (identifier-named? (syntax $boolean) boolean)
+        (compiled (value-type (boolean-type)) #f))
+      ($number
+        (identifier-named? (syntax $number) number)
+        (compiled (value-type (number-type)) #f))
+      ($string
+        (identifier-named? (syntax $string) string)
+        (compiled (value-type (string-type)) #f))
+      (($scheme $type $value)
+        (identifier-named? (syntax $scheme) scheme)
+        (compiled
+          (context-syntax->type $context (syntax $type))
+          (combo #f (syntax->datum (syntax $value)))))
       (($symbol $args ...)
         (identifier? (syntax $symbol))
         (compiled-struct
@@ -60,5 +74,20 @@
             (tuple-expression $expressions))))))
 
   (define (compiled-literal $type $literal)
-    (compiled $type (combo (constant $literal) $literal)))
+    (compiled (value-type $literal) #f))
+
+  (define (context-syntax->type $context $syntax)
+    (compiled-constant-type
+      (context-syntax->compiled $context $syntax)))
+
+  (define (compiled-constant-type $compiled)
+    (type-constant-opt->type
+      (compiled-type $compiled)
+      (opt-lift combo-constant-opt (compiled-combo-opt $compiled))))
+
+  (define (type-constant-opt->type $type $constant-opt)
+    (switch $type
+      ((value-type? $value-type)
+        (value-type-value $value-type))
+      ((else $other) (todo))))
 )

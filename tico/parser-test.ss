@@ -7,33 +7,48 @@
 
 (check
   (equal?
-    (datum->compiled #f)
+    (datum->compiled `boolean)
+    (compiled (value-type (boolean-type)) #f)))
+
+(check
+  (equal?
+    (datum->compiled `number)
+    (compiled (value-type (number-type)) #f)))
+
+(check
+  (equal?
+    (datum->compiled `string)
+    (compiled (value-type (string-type)) #f)))
+
+(check
+  (equal?
+    (datum->compiled `(scheme number n))
     (compiled
-      (boolean-type)
-      (combo (constant #f) #f))))
+      (number-type)
+      (combo #f `n))))
+
+(check
+  (equal?
+    (datum->compiled #f)
+    (compiled (value-type #f) #f)))
 
 (check
   (equal?
     (datum->compiled 128)
-    (compiled
-      (number-type)
-      (combo (constant 128) 128))))
+    (compiled (value-type 128) #f)))
 
 (check
   (equal?
     (datum->compiled "foo")
-    (compiled
-      (string-type)
-      (combo (constant "foo") "foo"))))
+    (compiled (value-type "foo") #f)))
 
 (check
   (equal?
-    (datum->compiled `(vec 1 2))
+    (datum->compiled `(vec (scheme number n) (scheme string s)))
     (compiled
-      (struct-type `vec (list (number-type) (number-type)))
-      (combo
-        (constant (tuple-value (list 1 2)))
-        (tuple-expression (list 1 2))))))
+      (struct-type `vec (list (number-type) (string-type)))
+      (combo #f
+        (tuple-expression (list `n `s))))))
 
 (check
   (raises?
