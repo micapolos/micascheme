@@ -40,6 +40,11 @@
         (compiled
           (context-syntax->type $context (syntax $type))
           (combo #f (syntax->datum (syntax $value)))))
+      (($type $expr)
+        (identifier-named? (syntax $type) type)
+        (compiled
+          (value-type (compiled-type (context-syntax->compiled $context (syntax $expr))))
+          #f))
       (($symbol $args ...)
         (identifier? (syntax $symbol))
         (compiled-struct

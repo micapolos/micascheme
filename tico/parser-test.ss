@@ -51,6 +51,11 @@
         (tuple-expression (list `n `s))))))
 
 (check
+  (equal?
+    (datum->compiled `(type (scheme number 1)))
+    (compiled (value-type (number-type)) #f)))
+
+(check
   (raises?
     (lambda ()
       (datum->compiled `()))))
