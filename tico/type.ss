@@ -28,5 +28,5 @@
       ((lambda-type? $lambda-type)
         (type-dynamic? (lambda-type-result $lambda-type)))
       ((else $other)
-        (throw unknown-type $type))))
+        (throw not-type $other))))
 )
