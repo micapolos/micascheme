@@ -7,8 +7,6 @@
     struct-type struct-type? struct-type-name struct-type-fields
     lambda-type lambda-type? lambda-type-params lambda-type-result
 
-    typed typed? typed-type typed-value
-
     type-dynamic?)
   (import (micascheme))
 
@@ -18,8 +16,6 @@
   (data (string-type))
   (data (struct-type name fields))
   (data (lambda-type params result))
-
-  (data (typed type value))
 
   (define (type-dynamic? $type)
     (switch $type
