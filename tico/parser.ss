@@ -16,6 +16,9 @@
 
   (define null-context (context))
 
+  (define (value-compiled $value)
+    (compiled (value-type $value) #f))
+
   (define (datum->compiled $datum)
     (syntax->compiled (datum->syntax #`+ $datum)))
 
@@ -26,13 +29,13 @@
     (syntax-case $syntax ()
       ($boolean
         (identifier-named? (syntax $boolean) boolean)
-        (compiled (value-type (boolean-type)) #f))
+        (value-compiled (boolean-type)))
       ($number
         (identifier-named? (syntax $number) number)
-        (compiled (value-type (number-type)) #f))
+        (value-compiled (number-type)))
       ($string
         (identifier-named? (syntax $string) string)
-        (compiled (value-type (string-type)) #f))
+        (value-compiled (string-type)))
       (($scheme $type $expr)
         (identifier-named? (syntax $scheme) scheme)
         (compiled
@@ -40,9 +43,8 @@
           (expr (syntax->datum (syntax $expr)))))
       (($type $expr)
         (identifier-named? (syntax $type) type)
-        (compiled
-          (value-type (compiled-type (context-syntax->compiled $context (syntax $expr))))
-          #f))
+        (value-compiled
+          (compiled-type (context-syntax->compiled $context (syntax $expr)))))
       (($symbol $args ...)
         (identifier? (syntax $symbol))
         (compiled-struct
@@ -53,12 +55,13 @@
       ($other
         (switch (syntax->datum (syntax $other))
           ((boolean? $boolean)
-            (compiled (value-type $boolean) #f))
+            (value-compiled $boolean))
           ((number? $number)
-            (compiled (value-type $number) #f))
+            (value-compiled $number))
           ((string? $string)
-            (compiled (value-type $string) #f))
-          ((else _) (syntax-error $syntax))))))
+            (value-compiled $string))
+          ((else _)
+            (syntax-error $syntax))))))
 
   (define (compiled-struct $name $fields)
     (lets
