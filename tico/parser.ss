@@ -1,6 +1,8 @@
 (library (tico parser)
   (export
     compiled compiled? compiled-type compiled-expr-opt
+    value-compiled
+
     expr expr? expr-datum
 
     syntax->compiled datum->compiled)

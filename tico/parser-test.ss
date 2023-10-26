@@ -8,17 +8,17 @@
 (check
   (equal?
     (datum->compiled `boolean)
-    (compiled (value-type (boolean-type)) #f)))
+    (value-compiled (boolean-type))))
 
 (check
   (equal?
     (datum->compiled `number)
-    (compiled (value-type (number-type)) #f)))
+    (value-compiled (number-type))))
 
 (check
   (equal?
     (datum->compiled `string)
-    (compiled (value-type (string-type)) #f)))
+    (value-compiled (string-type))))
 
 (check
   (equal?
@@ -28,17 +28,17 @@
 (check
   (equal?
     (datum->compiled #f)
-    (compiled (value-type #f) #f)))
+    (value-compiled #f)))
 
 (check
   (equal?
     (datum->compiled 128)
-    (compiled (value-type 128) #f)))
+    (value-compiled 128)))
 
 (check
   (equal?
     (datum->compiled "foo")
-    (compiled (value-type "foo") #f)))
+    (value-compiled "foo")))
 
 (check
   (equal?
@@ -50,7 +50,7 @@
 (check
   (equal?
     (datum->compiled `(type (scheme number 1)))
-    (compiled (value-type (number-type)) #f)))
+    (value-compiled (number-type))))
 
 (check
   (raises?
