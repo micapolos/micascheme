@@ -22,6 +22,9 @@
 
   (define null-context (context))
 
+  (define (context-push-types $context $types)
+    $context)
+
   (define (value-compiled $value)
     (compiled (value-type $value) #f))
 
@@ -61,6 +64,17 @@
         (compiled
           (context-syntax->type $context (syntax $type))
           (datum-packet (syntax->datum (syntax $expr)))))
+      (($lambda ($params ...) $body)
+        (identifier-named? (syntax $lambda) lambda)
+        (lets
+          ($params (map (partial context-syntax->type $context) (syntax->list (syntax ($params ...)))))
+          ($context (context-push-types $context $params))
+          ($compiled-body (context-syntax->compiled $context (syntax $body)))
+          (compiled
+            (lambda-type $params (compiled-type $compiled-body))
+            (packet
+              (expression `todo 0)
+              (constant `todo)))))
       (($type $expr)
         (identifier-named? (syntax $type) type)
         (value-compiled
