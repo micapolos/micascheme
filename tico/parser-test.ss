@@ -22,8 +22,12 @@
 
 (check
   (equal?
-    (datum->compiled `(scheme number n))
-    (compiled (number-type) (expr `n))))
+    (datum->compiled `(scheme string (string-append "a" "b")))
+    (compiled
+      (string-type)
+      (packet
+        (expression `(string-append "a" "b") 0)
+        (constant "ab")))))
 
 (check
   (equal?
@@ -42,10 +46,15 @@
 
 (check
   (equal?
-    (datum->compiled `(struct vec (scheme number n) (scheme string s)))
+    (datum->compiled
+      `(struct vec
+        (scheme number (+ 1 2))
+        (scheme string (string-append "a" "b"))))
     (compiled
       (struct-type `vec (list (number-type) (string-type)))
-      (expr (tuple-expression (list `n `s))))))
+      (packet
+        (expression (tuple-expression (list `(+ 1 2) `(string-append "a" "b"))) 0)
+        (constant (tuple-value (list 3 "ab")))))))
 
 (check
   (raises?
@@ -54,10 +63,15 @@
 
 (check
   (equal?
-    (datum->compiled `(vec (scheme number n) (scheme string s)))
+    (datum->compiled
+      `(vec
+        (scheme number (+ 1 2))
+        (scheme string (string-append "a" "b"))))
     (compiled
       (struct-type `vec (list (number-type) (string-type)))
-      (expr (tuple-expression (list `n `s))))))
+      (packet
+        (expression (tuple-expression (list `(+ 1 2) `(string-append "a" "b"))) 0)
+        (constant (tuple-value (list 3 "ab")))))))
 
 (check
   (equal?

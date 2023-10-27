@@ -1,25 +1,43 @@
 (library (tico parser)
   (export
-    compiled compiled? compiled-type compiled-expr-opt
+    compiled compiled? compiled-type compiled-packet-opt
+    packet packet? packet-expression packet-constant-opt
+    expression expression? expression-datum expression-depth
+    constant constant? constant-value
     value-compiled
-
-    expr expr? expr-datum
 
     syntax->compiled datum->compiled)
   (import
     (micascheme)
-    (tico expression)
+    (rename (tico expression) (tuple-expression tuple-datum))
     (tico value)
-    (tico type))
+    (tico type)
+    (evaluator))
 
   (data (context))
-  (data (compiled type expr-opt))
-  (data (expr datum))
+  (data (compiled type packet-opt))
+  (data (packet expression constant-opt))
+  (data (expression datum depth))
+  (data (constant value))
 
   (define null-context (context))
 
   (define (value-compiled $value)
     (compiled (value-type $value) #f))
+
+  (define (datum-packet $datum)
+    (packet
+      (datum-expression $datum)
+      (datum-constant $datum)))
+
+  (define (datum-expression $datum)
+    (expression $datum 0))
+
+  (define (datum-constant $datum)
+    (constant
+      (evaluate
+        (evaluator (environment `(micascheme)) (stack))
+        $datum)))
 
   (define (datum->compiled $datum)
     (syntax->compiled (datum->syntax #`+ $datum)))
@@ -42,7 +60,7 @@
         (identifier-named? (syntax $scheme) scheme)
         (compiled
           (context-syntax->type $context (syntax $type))
-          (expr (syntax->datum (syntax $expr)))))
+          (datum-packet (syntax->datum (syntax $expr)))))
       (($type $expr)
         (identifier-named? (syntax $type) type)
         (value-compiled
@@ -71,12 +89,27 @@
   (define (compiled-struct $name $fields)
     (lets
       ($types (map compiled-type $fields))
-      ($exprs (filter-opts (map compiled-expr-opt $fields)))
+      ($packets (filter-opts (map compiled-packet-opt $fields)))
       (compiled
         (struct-type $name $types)
         (and
-          (not (null? $exprs))
-          (expr (tuple-expression (map expr-datum $exprs)))))))
+          (not (null? $packets))
+          (tuple-packet $packets)))))
+
+  (define (tuple-packet $packets)
+    (packet
+      (tuple-expression (map packet-expression $packets))
+      (tuple-constant-opt (map packet-constant-opt $packets))))
+
+  (define (tuple-expression $expressions)
+    (expression
+      (tuple-datum (map expression-datum $expressions))
+      (apply max (map expression-depth $expressions))))
+
+  (define (tuple-constant-opt $constant-opts)
+    (and
+      (for-all identity $constant-opts)
+      (constant (tuple-value (map constant-value $constant-opts)))))
 
   (define (context-syntax->type $context $syntax)
     (switch (compiled-type (context-syntax->compiled $context $syntax))
