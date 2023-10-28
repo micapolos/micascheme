@@ -1,6 +1,7 @@
 (library (tico type)
   (export
     value-type value-type? value-type-value
+    type-type type-type?
     boolean-type boolean-type?
     number-type number-type?
     string-type string-type?
@@ -11,6 +12,7 @@
   (import (micascheme))
 
   (data (value-type value))
+  (data (type-type))
   (data (boolean-type))
   (data (number-type))
   (data (string-type))
