@@ -85,6 +85,10 @@
 
   (define (scope-syntax->thunk $scope $syntax)
     (syntax-case $syntax ()
+      ($identifier
+        (identifier? #'$identifier)
+        (scope-symbol->thunk $scope
+          (syntax->datum #'$identifier)))
       (($let (($param $arg) ...) $body)
         (identifier-named? #'$let let)
         (lets
@@ -120,19 +124,6 @@
                 (lambda ($param $arg-datum) `(,$param ,$arg-datum))
                 $params $arg-datums))
               ,$body-datum))))
-      (($assert $condition $body)
-        (identifier-named? #'$assert assert)
-        (lets
-          ($condition-thunk (scope-syntax->thunk $scope #'$condition))
-          (switch (thunk-value $condition-thunk)
-            ((constant? $constant)
-              (cond
-                ((constant-value $constant)
-                  (scope-syntax->thunk $scope #'$body))
-                (else
-                  (syntax-error #'$condition "assertion failed"))))
-            ((variable? $variable)
-              (syntax-error #'$condition "not a constant")))))
       (($lambda ($param ...) $body)
         (identifier-named? #'$lambda lambda)
         (lets
@@ -171,16 +162,25 @@
                       (constant (scope-evaluate $scope $datum))
                       (variable $index)))))
               $datum))))
+      (($assert $condition $body)
+        (identifier-named? #'$assert assert)
+        (lets
+          ($condition-thunk (scope-syntax->thunk $scope #'$condition))
+          (switch (thunk-value $condition-thunk)
+            ((constant? $constant)
+              (cond
+                ((constant-value $constant)
+                  (scope-syntax->thunk $scope #'$body))
+                (else
+                  (syntax-error #'$condition "assertion failed"))))
+            ((variable? $variable)
+              (syntax-error #'$condition "not a constant")))))
       (($fn $arg ...)
         (thunk-apply
           (scope-syntax->thunk $scope #'$fn)
           (map
             (partial scope-syntax->thunk $scope)
             (syntax->list #'($arg ...)))))
-      ($identifier
-        (identifier? #'$identifier)
-        (scope-symbol->thunk $scope
-          (syntax->datum #'$identifier)))
       ($other
         (switch (syntax->datum #'$other)
           ((boolean? $boolean)
