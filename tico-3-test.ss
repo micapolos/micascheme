@@ -34,83 +34,6 @@
       `+)
     (variable 2)))
 
-; --- compiler
-
-(check
-  (equal?
-    (app
-      (compiler `(+ a b))
-      (stack (cons `a "a") (cons `b "b")))
-    (compiled
-      (stack (cons `a "a") (cons `b "b"))
-      `(+ a b))))
-
-(check
-  (equal?
-    (app
-      (compiler+binding
-        (compiler `(+ a b))
-        (cons `c "c"))
-      (stack (cons `a "a") (cons `b "b")))
-    (compiled
-      (stack (cons `a "a") (cons `b "b") (cons `c "c"))
-      `(+ a b))))
-
-(check
-  (equal?
-    (compiler-compiled
-      (compilers-flatten
-        (list
-          (compiler+binding
-            (compiler 10)
-            (cons `a "a"))
-          (compiler+binding
-            (compiler 20)
-            (cons `b "b")))))
-    (compiled
-      (stack (cons `a "a") (cons `b "b"))
-      `(10 20))))
-
-; --- thunk-compiler->symbolize
-
-(check
-  (equal?
-    (with-generate-temporary-seed $tmp
-      (compiler-compiled
-        (thunk-compiler->symbolize
-          (compiler (thunk (constant "foo") 'constant-string)))))
-    (compiled
-      (stack)
-      (thunk (constant "foo") 'constant-string))))
-
-(check
-  (equal?
-    (compiler-compiled
-      (thunk-compiler->symbolize
-        (compiler (thunk (constant "foo") "foo"))))
-    (compiled
-      (stack)
-      (thunk (constant "foo") "foo"))))
-
-(check
-  (equal?
-    (with-generate-temporary-seed $tmp
-      (compiler-compiled
-        (thunk-compiler->symbolize
-          (compiler (thunk (constant "foo") `(dynamic-string))))))
-    (compiled
-      (stack (cons `$tmp-0 (thunk "foo" `(dynamic-string))))
-      (thunk (constant "foo") `$tmp-0))))
-
-(check
-  (equal?
-    (compiler-compiled
-      (thunk-compiler->symbolize
-        (compiler (thunk (variable 3) `(some-string)))))
-    (compiled
-      (stack)
-      (thunk (variable 3) `(some-string)))))
-
 ; --- datum->thunk
 
 (check
@@ -149,10 +72,9 @@
           (string-append "ba" "r"))))
     (thunk
       "foobar"
-      `(lets
-        ($tmp-0 (string-append "fo" "o"))
-        ($tmp-1 (string-append "ba" "r"))
-        (string-append $tmp-0 $tmp-1)))))
+      `(string-append
+          (string-append "fo" "o")
+          (string-append "ba" "r")))))
 
 (let (($thunk (syntax->thunk #`(lambda ($x $y) "foo"))))
   (check (equal? (thunk-datum $thunk) `(lambda ($x $y) "foo")))
@@ -175,10 +97,8 @@
   (check
     (equal?
       (thunk-datum $thunk)
-      `(lets
-        ($tmp-0 (string-append "!" "?"))
-        (lambda ($x $y)
-          (string-append $x $y $tmp-0)))))
+      `(lambda ($x $y)
+        (string-append $x $y (string-append "!" "?")))))
   (check
     (equal?
       (app (thunk-value $thunk) "foo" "bar")

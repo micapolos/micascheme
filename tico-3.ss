@@ -6,13 +6,9 @@
     hole hole?
     thunk thunk? thunk-value thunk-datum
 
-    compiled compiled? compiled-bindings compiled-value
-    compiler compiler-compiled compiler+binding compiler-bind compilers-flatten
-
     environment->scope
     scope+value scope-value
-    syntax->thunk
-    thunk-compiler->symbolize)
+    syntax->thunk)
   (import
     (micascheme)
     (evaluator))
@@ -22,39 +18,7 @@
   (data (hole))
   (data (scope environment bindings))
 
-  (data (compiled bindings value))
-
   (data (thunk value datum))
-
-  (define (compiler-compiled $compiler)
-    (app $compiler (stack)))
-
-  (define (compiler $value)
-    (lambda ($bindings)
-      (compiled $bindings $value)))
-
-  (define (compiler+binding $compiler $binding)
-    (lambda ($bindings)
-      (app $compiler (push $bindings $binding))))
-
-  (define (compiler-bind $compiler $fn)
-    (lambda ($bindings)
-      (lets
-        ($compiled (app $compiler $bindings))
-        (app
-          ($fn (compiled-value $compiled))
-          (compiled-bindings $compiled)))))
-
-  (define (compilers-flatten $compilers)
-    (switch $compilers
-      ((null? _) (compiler (list)))
-      ((pair? $pair)
-        (unpair $pair $compiler $compilers
-          (compiler-bind $compiler
-            (lambda ($value)
-              (compiler-bind (compilers-flatten $compilers)
-                (lambda ($values)
-                  (compiler (cons $value $values))))))))))
 
   (define (environment->scope $environment)
     (scope $environment (stack)))
@@ -110,16 +74,16 @@
         ((variable? $variable) (hole)))))
 
   (define (syntax->thunk $syntax)
-    (compiled-thunk->thunk
-      (compiler-compiled
-        (syntax->thunk-compiler $syntax))))
+    (lets
+      ($thunk
+        (scope-syntax->thunk
+          (environment->scope (environment `(micascheme)))
+          $syntax))
+      (thunk
+        (constant-value (ensure constant? (thunk-value $thunk)))
+        (thunk-datum $thunk))))
 
-  (define (syntax->thunk-compiler $syntax)
-    (scope-syntax->thunk-compiler
-      (environment->scope (environment `(micascheme)))
-      $syntax))
-
-  (define (scope-syntax->thunk-compiler $scope $syntax)
+  (define (scope-syntax->thunk $scope $syntax)
     (syntax-case $syntax ()
       ; ((($lambda ($param ...) $body) $arg ...)
       ;   (identifier-named? (syntax $lambda) lambda)
@@ -163,18 +127,17 @@
       ;                 (thunk-datum $body-thunk)))))))))
       (($assert $condition $body)
         (identifier-named? #'$assert assert)
-        (compiler-bind
-          (scope-syntax->thunk-compiler $scope #'$condition)
-          (lambda ($condition-thunk)
-            (switch (thunk-value $condition-thunk)
-              ((constant? $constant)
-                (cond
-                  ((constant-value $constant)
-                    (scope-syntax->thunk-compiler $scope #'$body))
-                  (else
-                    (syntax-error #'$condition "assertion failed"))))
-              ((variable? $variable)
-                (syntax-error #'$condition "not a constant"))))))
+        (lets
+          ($condition-thunk (scope-syntax->thunk $scope #'$condition))
+          (switch (thunk-value $condition-thunk)
+            ((constant? $constant)
+              (cond
+                ((constant-value $constant)
+                  (scope-syntax->thunk $scope #'$body))
+                (else
+                  (syntax-error #'$condition "assertion failed"))))
+            ((variable? $variable)
+              (syntax-error #'$condition "not a constant")))))
       (($lambda ($param ...) $body)
         (identifier-named? (syntax $lambda) lambda)
         (lets
@@ -190,90 +153,45 @@
               $params))
           ($scope
             (fold-left scope+binding $scope $bindings))
-          (compiler-bind
-            (thunk-compiler->symbolize
-              (scope-syntax->thunk-compiler $scope (syntax $body)))
-            (lambda ($body-thunk)
-              (lets
-                ($environment (scope-environment $scope))
-                ($datum
-                  `(lambda (,@$params)
-                    ,(thunk-datum $body-thunk)))
-                (switch (thunk-value $body-thunk)
-                  ((constant? $constant)
-                    (environment-datum->thunk-compiler $environment $datum))
-                  ((variable? $variable)
-                    (lets
-                      ($index (- (variable-index $variable) $arity))
-                      (if (< $index 0)
-                        (environment-datum->thunk-compiler $environment $datum)
-                        (compiler (thunk (variable $index) $datum)))))))))))
+          ($body-thunk (scope-syntax->thunk $scope (syntax $body)))
+          (lets
+            ($environment (scope-environment $scope))
+            ($datum
+              `(lambda (,@$params)
+                ,(thunk-datum $body-thunk)))
+            (thunk
+              (switch (thunk-value $body-thunk)
+                ((constant? $constant)
+                  (constant (scope-evaluate $scope $datum)))
+                ((variable? $variable)
+                  (lets
+                    ($index (- (variable-index $variable) $arity))
+                    (if (< $index 0)
+                      (constant (scope-evaluate $scope $datum))
+                      (variable $index)))))
+              $datum))))
       (($fn $arg ...)
-        (thunk-compiler-apply
-          (scope-syntax->thunk-compiler $scope (syntax $fn))
+        (thunk-apply
+          (scope-syntax->thunk $scope (syntax $fn))
           (map
-            (partial scope-syntax->thunk-compiler $scope)
+            (partial scope-syntax->thunk $scope)
             (syntax->list (syntax ($arg ...))))))
       ($identifier
         (identifier? (syntax $identifier))
         (lets
           ($symbol (syntax->datum (syntax $identifier)))
           ($value (scope-value $scope $symbol))
-          (compiler (thunk $value $symbol))))
+          (thunk $value $symbol)))
       ($other
         (switch (syntax->datum (syntax $other))
           ((boolean? $boolean)
-            (compiler (thunk (constant $boolean) $boolean)))
+            (thunk (constant $boolean) $boolean))
           ((number? $number)
-            (compiler (thunk (constant $number) $number)))
+            (thunk (constant $number) $number))
           ((string? $string)
-            (compiler (thunk (constant $string) $string)))
+            (thunk (constant $string) $string))
           ((else _)
             (syntax-error (syntax $other)))))))
-
-  (define (thunk-compiler->symbolize $thunk-compiler)
-    (compiler-bind $thunk-compiler
-      (lambda ($thunk)
-        (switch (thunk-value $thunk)
-          ((variable? _)
-            (compiler $thunk))
-          ((constant? $constant)
-            (switch (thunk-datum $thunk)
-              ((symbol? _) (compiler $thunk))
-              ((boolean? _) (compiler $thunk))
-              ((number? _) (compiler $thunk))
-              ((string? _) (compiler $thunk))
-              ((else $datum)
-                (lets
-                  ($symbol (generate-symbol))
-                  (compiler+binding
-                    (compiler (thunk $constant $symbol))
-                    (cons $symbol
-                      (thunk (constant-value $constant) $datum)))))))))))
-
-  (define (environment-datum->thunk-compiler $environment $datum)
-    (lambda ($bindings)
-      (compiled $bindings
-        (thunk
-          (constant
-            (evaluate
-              (evaluator
-                $environment
-                (map
-                  (lambda ($binding)
-                    (cons
-                      (car $binding)
-                      (thunk-value (cdr $binding))))
-                  $bindings))
-              $datum))
-          $datum))))
-
-  (define (thunk-compiler-apply $fn-thunk-compiler $arg-thunk-compilers)
-    (compiler-bind (thunk-compiler->symbolize $fn-thunk-compiler)
-      (lambda ($fn-thunk)
-        (compiler-bind (compilers-flatten (map thunk-compiler->symbolize $arg-thunk-compilers))
-          (lambda ($arg-thunks)
-            (compiler (thunk-apply $fn-thunk $arg-thunks)))))))
 
   (define (thunk-apply $fn-thunk $arg-thunks)
     (thunk
@@ -297,24 +215,4 @@
 
   (define (datum-apply $fn-datum $arg-datums)
     `(,$fn-datum ,@$arg-datums))
-
-  (define (compiled-thunk->thunk $compiled)
-    (lets
-      ($bindings (compiled-bindings $compiled))
-      ($thunk (compiled-value $compiled))
-      ($datum (thunk-datum $thunk))
-      (thunk
-        (constant-value (ensure constant? (thunk-value $thunk)))
-        (cond
-          ((null? $bindings) $datum)
-          (else
-            `(lets
-              ,@(reverse
-                (map
-                  (lambda ($binding)
-                    `(
-                      ,(car $binding)
-                      ,(thunk-datum (cdr $binding))))
-                  (compiled-bindings $compiled)))
-              ,(thunk-datum $thunk)))))))
 )
