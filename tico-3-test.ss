@@ -147,6 +147,7 @@
   (check (equal? (thunk-datum $thunk) `(lambda ($x $y) (string-append "foo" "bar"))))
   (check (equal? (app (thunk-value $thunk) "goo" "gar") "foobar")))
 
+; --- assert
 
 (check
   (equal?
