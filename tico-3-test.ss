@@ -78,17 +78,28 @@
     (with-generate-temporary-seed $tmp
       (compiler-compiled
         (thunk-compiler->symbolize
-          (compiler
-            (thunk
-              (variable 3)
-              `(string-append "foo" "bar"))))))
+          (compiler (thunk (variable 3) `(some-string))))))
     (compiled
-      (stack
-        (cons `$tmp-0 `(string-append "foo" "bar")))
-      (thunk
-        (variable 3)
-        `$tmp-0))))
+      (stack (cons `$tmp-0 `(some-string)))
+      (thunk (variable 3) `$tmp-0))))
 
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (compiler-compiled
+        (thunk-compiler->symbolize
+          (compiler (thunk (variable 3) `$string)))))
+    (compiled (stack)
+      (thunk (variable 3) `$string))))
+
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (compiler-compiled
+        (thunk-compiler->symbolize
+          (compiler (thunk (variable 3) "foo")))))
+    (compiled (stack)
+      (thunk (variable 3) "foo"))))
 
 ; --- datum->thunk
 
