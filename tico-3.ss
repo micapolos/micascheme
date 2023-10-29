@@ -175,13 +175,16 @@
       ($other
         (switch (syntax->datum #'$other)
           ((boolean? $boolean)
-            (thunk (constant $boolean) $boolean))
+            (literal->thunk $boolean))
           ((number? $number)
-            (thunk (constant $number) $number))
+            (literal->thunk $number))
           ((string? $string)
-            (thunk (constant $string) $string))
+            (literal->thunk $string))
           ((else _)
             (syntax-error #'$other))))))
+
+  (define (literal->thunk $literal)
+    (thunk (constant $literal) $literal))
 
   (define (scope-symbol->thunk $scope $symbol)
     (thunk (scope-value $scope $symbol) $symbol))
