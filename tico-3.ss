@@ -161,8 +161,7 @@
                     ($symbol (generate-symbol))
                     (constant
                       (evaluate
-                        (evaluator
-                          (scope-environment $scope)
+                        (evaluator $environment
                           (stack (cons $symbol (constant-value $constant))))
                         `(lambda (,@$params) ,$symbol)))))
                 ((variable? $variable)
