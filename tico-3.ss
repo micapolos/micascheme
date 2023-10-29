@@ -253,9 +253,9 @@
                       (thunk (constant-value $constant) $datum)))))))))))
 
   (define (thunk-compiler-apply $fn-thunk-compiler $arg-thunk-compilers)
-    (compiler-bind $fn-thunk-compiler
+    (compiler-bind (thunk-compiler->symbolize $fn-thunk-compiler)
       (lambda ($fn-thunk)
-        (compiler-bind (compilers-flatten $arg-thunk-compilers)
+        (compiler-bind (compilers-flatten (map thunk-compiler->symbolize $arg-thunk-compilers))
           (lambda ($arg-thunks)
             (compiler (thunk-apply $fn-thunk $arg-thunks)))))))
 
@@ -293,8 +293,12 @@
           ((null? $bindings) $datum)
           (else
             `(lets
-              ,@(map
-                (lambda ($binding) `(,(car $binding) ,(cdr $binding)))
-                (compiled-bindings $compiled))
-              (thunk-datum $thunk)))))))
+              ,@(reverse
+                (map
+                  (lambda ($binding)
+                    `(
+                      ,(car $binding)
+                      ,(thunk-datum (cdr $binding))))
+                  (compiled-bindings $compiled)))
+              ,(thunk-datum $thunk)))))))
 )

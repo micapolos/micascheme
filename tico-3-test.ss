@@ -140,6 +140,20 @@
       "foobar"
       `(string-append "foo" "bar"))))
 
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (syntax->thunk
+        #`(string-append
+          (string-append "fo" "o")
+          (string-append "ba" "r"))))
+    (thunk
+      "foobar"
+      `(lets
+        ($tmp-0 (string-append "fo" "o"))
+        ($tmp-1 (string-append "ba" "r"))
+        (string-append $tmp-0 $tmp-1)))))
+
 (let (($thunk (syntax->thunk #`(lambda ($x $y) "foo"))))
   (check (equal? (thunk-datum $thunk) `(lambda ($x $y) "foo")))
   (check (equal? (app (thunk-value $thunk) 1 2) "foo")))
@@ -152,7 +166,6 @@
   (check (equal? (thunk-datum $thunk) `(lambda ($x $y) (string-append $x $y))))
   (check (equal? (app (thunk-value $thunk) "foo" "bar") "foobar")))
 
-; TODO: symbolize!!!
 (let (($thunk (syntax->thunk #`(lambda ($x $y) (string-append "foo" "bar")))))
   (check (equal? (thunk-datum $thunk) `(lambda ($x $y) (string-append "foo" "bar"))))
   (check (equal? (app (thunk-value $thunk) "goo" "gar") "foobar")))
