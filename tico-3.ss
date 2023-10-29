@@ -4,15 +4,15 @@
     constant constant? constant-value
     variable variable? variable-index
     hole hole?
-    thunk thunk? thunk-runtime thunk-bindings thunk-datum
+    thunk thunk? thunk-value thunk-datum
 
     compiled compiled? compiled-bindings compiled-value
-    compiled-thunk-datum
     compiler compiler-compiled compiler+binding compiler-bind compilers-flatten
 
     environment->scope
     scope+value scope-value
-    syntax->thunk)
+    syntax->thunk
+    thunk-compiler->symbolize)
   (import
     (micascheme)
     (evaluator))
@@ -24,7 +24,7 @@
 
   (data (compiled bindings value))
 
-  (data (thunk runtime bindings datum))
+  (data (thunk value datum))
 
   (define (compiler-compiled $compiler)
     (app $compiler (stack)))
@@ -105,146 +105,176 @@
 
   (define (symbol-thunk->binding $symbol $thunk)
     (cons $symbol
-      (switch (thunk-runtime $thunk)
+      (switch (thunk-value $thunk)
         ((constant? $constant) $constant)
         ((variable? $variable) (hole)))))
 
-  (define (syntax->thunk $datum)
-    (scope-syntax->thunk
-      (environment->scope (environment `(micascheme)))
-      $datum))
+  (define (syntax->thunk $syntax)
+    (compiled-thunk->thunk
+      (compiler-compiled
+        (syntax->thunk-compiler $syntax))))
 
-  (define (scope-syntax->thunk $scope $datum)
+  (define (syntax->thunk-compiler $syntax)
+    (scope-syntax->thunk-compiler
+      (environment->scope (environment `(micascheme)))
+      $syntax))
+
+  (define (scope-syntax->thunk-compiler $scope $datum)
     (syntax-case $datum ()
-      ((($lambda ($param ...) $body) $arg ...)
-        (identifier-named? (syntax $lambda) lambda)
-        (lets
-          ($arg-thunks
-            (map
-              (partial scope-syntax->thunk $scope)
-              (syntax->list (syntax ($arg ...)))))
-          ($arity (length $arg-thunks))
-          ($params
-            (map syntax->datum
-              (map
-                (lambda ($param) (ensure identifier? $param))
-                (syntax->list (syntax ($param ...))))))
-          ($bindings
-            (map symbol-thunk->binding $params $arg-thunks))
-          ($scope
-            (scope+bindings $scope $bindings))
-          ($body-thunk
-            (scope-syntax->thunk $scope
-              (syntax->datum (syntax $body))))
-          (switch (thunk-runtime $body-thunk)
-            ((constant? $constant)
-              (thunk
-                $constant
-                (thunk-bindings $body-thunk)
-                (thunk-datum $body-thunk)))
-            ((variable? $variable)
-              (lets
-                ($index (- (variable-index $variable) $arity))
-                (cond
-                  ((>= $index 0)
-                    (thunk
-                      (variable $index)
-                      (thunk-bindings $body-thunk)
-                      (thunk-datum $body-thunk)))
-                  (else
-                    (thunk
-                      (constant (scope-evaluate $scope (thunk-datum $body-thunk)))
-                      (thunk-bindings $body-thunk)
-                      (thunk-datum $body-thunk)))))))))
-      (($lambda ($param ...) $body)
-        (identifier-named? (syntax $lambda) lambda)
-        (lets
-          ($params
-            (map syntax->datum
-              (map
-                (lambda ($param) (ensure identifier? $param))
-                (syntax->list (syntax ($param ...))))))
-          ($arity (length $params))
-          ($scope
-            (fold-left scope+binding $scope
-              (map
-                (lambda ($param)
-                  (cons $param (hole)))
-                $params)))
-          ($body-thunk
-            (scope-syntax->thunk $scope
-              (syntax->datum (syntax $body))))
-          ($datum
-            `(lambda (,@$params)
-              ,(thunk-datum $body-thunk)))
-          (thunk
-            (switch (thunk-runtime $body-thunk)
-              ((constant? $constant)
-                (constant (evaluate (thunk-bindings $body-thunk) $datum)))
-              ((variable? $variable)
-                (lets
-                  ($index (- (variable-index $variable) $arity))
-                  (if (< $index 0)
-                    (constant (evaluate (thunk-bindings $body-thunk) $datum))
-                    (variable $index)))))
-            (thunk-bindings $body-thunk)
-            $datum)))
+      ; ((($lambda ($param ...) $body) $arg ...)
+      ;   (identifier-named? (syntax $lambda) lambda)
+      ;   (lets
+      ;     ($arg-thunks
+      ;       (map
+      ;         (partial scope-syntax->thunk $scope)
+      ;         (syntax->list (syntax ($arg ...)))))
+      ;     ($arity (length $arg-thunks))
+      ;     ($params
+      ;       (map syntax->datum
+      ;         (map
+      ;           (lambda ($param) (ensure identifier? $param))
+      ;           (syntax->list (syntax ($param ...))))))
+      ;     ($bindings
+      ;       (map symbol-thunk->binding $params $arg-thunks))
+      ;     ($scope
+      ;       (scope+bindings $scope $bindings))
+      ;     ($body-thunk
+      ;       (scope-syntax->thunk $scope
+      ;         (syntax->datum (syntax $body))))
+      ;     (switch (thunk-runtime $body-thunk)
+      ;       ((constant? $constant)
+      ;         (thunk
+      ;           $constant
+      ;           (thunk-bindings $body-thunk)
+      ;           (thunk-datum $body-thunk)))
+      ;       ((variable? $variable)
+      ;         (lets
+      ;           ($index (- (variable-index $variable) $arity))
+      ;           (cond
+      ;             ((>= $index 0)
+      ;               (thunk
+      ;                 (variable $index)
+      ;                 (thunk-bindings $body-thunk)
+      ;                 (thunk-datum $body-thunk)))
+      ;             (else
+      ;               (thunk
+      ;                 (constant (scope-evaluate $scope (thunk-datum $body-thunk)))
+      ;                 (thunk-bindings $body-thunk)
+      ;                 (thunk-datum $body-thunk)))))))))
+      ; (($lambda ($param ...) $body)
+      ;   (identifier-named? (syntax $lambda) lambda)
+      ;   (lets
+      ;     ($params
+      ;       (map syntax->datum
+      ;         (map
+      ;           (lambda ($param) (ensure identifier? $param))
+      ;           (syntax->list (syntax ($param ...))))))
+      ;     ($arity (length $params))
+      ;     ($scope
+      ;       (fold-left scope+binding $scope
+      ;         (map
+      ;           (lambda ($param)
+      ;             (cons $param (hole)))
+      ;           $params)))
+      ;     ($body-thunk
+      ;       (scope-syntax->thunk $scope
+      ;         (syntax->datum (syntax $body))))
+      ;     ($datum
+      ;       `(lambda (,@$params)
+      ;         ,(thunk-datum $body-thunk)))
+      ;     (thunk
+      ;       (switch (thunk-runtime $body-thunk)
+      ;         ((constant? $constant)
+      ;           (constant (evaluate (thunk-bindings $body-thunk) $datum)))
+      ;         ((variable? $variable)
+      ;           (lets
+      ;             ($index (- (variable-index $variable) $arity))
+      ;             (if (< $index 0)
+      ;               (constant (evaluate (thunk-bindings $body-thunk) $datum))
+      ;               (variable $index)))))
+      ;       (thunk-bindings $body-thunk)
+      ;       $datum)))
       (($fn $arg ...)
-        (thunk-apply
-          (scope-syntax->thunk $scope (syntax $fn))
+        (thunk-compiler-apply
+          (scope-syntax->thunk-compiler $scope (syntax $fn))
           (map
-            (partial scope-syntax->thunk $scope)
+            (partial scope-syntax->thunk-compiler $scope)
             (syntax->list (syntax ($arg ...))))))
       ($identifier
         (identifier? (syntax $identifier))
         (lets
           ($symbol (syntax->datum (syntax $identifier)))
           ($value (scope-value $scope $symbol))
-          (thunk $value (stack) $symbol)))
+          (compiler (thunk $value $symbol))))
       ($other
         (switch (syntax->datum (syntax $other))
           ((boolean? $boolean)
-            (thunk (constant $boolean) (stack) $boolean))
+            (compiler (thunk (constant $boolean) $boolean)))
           ((number? $number)
-            (thunk (constant $number) (stack) $number))
+            (compiler (thunk (constant $number) $number)))
           ((string? $string)
-            (thunk (constant $string) (stack) $string))
+            (compiler (thunk (constant $string) $string)))
           ((else _)
             (syntax-error (syntax $other)))))))
 
+  (define (thunk-compiler->symbolize $thunk-compiler)
+    (compiler-bind $thunk-compiler
+      (lambda ($thunk)
+        (switch (thunk-datum $thunk)
+          ((symbol? $symbol) (compiler $thunk))
+          ((boolean? $symbol) (compiler $thunk))
+          ((number? $symbol) (compiler $thunk))
+          ((string? $symbol) (compiler $thunk))
+          ((else $other)
+            (lets
+              ($symbol (generate-symbol))
+              (compiler+binding
+                (compiler (thunk (thunk-value $thunk) $symbol))
+                (cons $symbol (thunk-datum $thunk)))))))))
+
+  (define (thunk-compiler-apply $fn-thunk-compiler $arg-thunk-compilers)
+    (compiler-bind $fn-thunk-compiler
+      (lambda ($fn-thunk)
+        (compiler-bind (compilers-flatten $arg-thunk-compilers)
+          (lambda ($arg-thunks)
+            (compiler (thunk-apply $fn-thunk $arg-thunks)))))))
+
   (define (thunk-apply $fn-thunk $arg-thunks)
     (thunk
-      (runtime-apply
-        (thunk-runtime $fn-thunk)
-        (map thunk-runtime $arg-thunks))
-      (bindings-apply
-        (thunk-bindings $fn-thunk)
-        (map thunk-bindings $arg-thunks))
+      (value-apply
+        (thunk-value $fn-thunk)
+        (map thunk-value $arg-thunks))
       (datum-apply
         (thunk-datum $fn-thunk)
         (map thunk-datum $arg-thunks))))
 
-  (define (runtime-apply $fn-runtime $arg-runtimes)
-    (if (and (constant? $fn-runtime) (for-all constant? $arg-runtimes))
+  (define (value-apply $fn-value $arg-values)
+    (if (and (constant? $fn-value) (for-all constant? $arg-values))
       (constant
         (apply
-          (constant-value $fn-runtime)
-          (map constant-value $arg-runtimes)))
+          (constant-value $fn-value)
+          (map constant-value $arg-values)))
       (variable
         (apply max
           (map variable-index
-            (filter variable? (cons $fn-runtime $arg-runtimes)))))))
-
-  (define (bindings-apply $fn-bindings $arg-bindings-list)
-    (fold-left push-all $fn-bindings $arg-bindings-list))
+            (filter variable? (cons $fn-value $arg-values)))))))
 
   (define (datum-apply $fn-datum $arg-datums)
     `(,$fn-datum ,@$arg-datums))
 
-  (define (compiled-thunk-datum $compiled)
-    `(lets
-      ,@(map
-        (lambda ($binding) `(,(car $binding) ,(cdr $binding)))
-        (compiled-bindings $compiled))
-      (thunk-datum (parsed-thunk $compiled))))
+  (define (compiled-thunk->thunk $compiled)
+    (lets
+      ($bindings (compiled-bindings $compiled))
+      ($thunk (compiled-value $compiled))
+      ($datum (thunk-datum $thunk))
+      (thunk
+        (constant-value (ensure constant? (thunk-value $thunk)))
+        (cond
+          ((null? $bindings) $datum)
+          (else
+            `(lets
+              ,@(map
+                (lambda ($binding) `(,(car $binding) ,(cdr $binding)))
+                (compiled-bindings $compiled))
+              (thunk-datum $thunk)))))))
 )

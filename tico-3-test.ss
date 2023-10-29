@@ -71,32 +71,50 @@
       (stack (cons `a "a") (cons `b "b"))
       `(10 20))))
 
+; --- thunk-compiler->symbolize
+
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (compiler-compiled
+        (thunk-compiler->symbolize
+          (compiler
+            (thunk
+              (variable 3)
+              `(string-append "foo" "bar"))))))
+    (compiled
+      (stack
+        (cons `$tmp-0 `(string-append "foo" "bar")))
+      (thunk
+        (variable 3)
+        `$tmp-0))))
+
+
 ; --- datum->thunk
 
 (check
   (equal?
     (syntax->thunk #`#f)
-    (thunk (constant #f) (stack) #f)))
+    (thunk #f #f)))
 
 (check
   (equal?
     (syntax->thunk #`123)
-    (thunk (constant 123) (stack) 123)))
+    (thunk 123 123)))
 
 (check
   (equal?
     (syntax->thunk #`"foo")
-    (thunk (constant "foo") (stack) "foo")))
+    (thunk "foo" "foo")))
 
 (check
   (equal?
     (syntax->thunk #`string-append)
-    (thunk (constant string-append) (stack) `string-append)))
+    (thunk string-append `string-append)))
 
 (check
   (equal?
     (syntax->thunk #`(string-append "foo" "bar"))
     (thunk
-      (constant "foobar")
-      (stack)
+      "foobar"
       `(string-append "foo" "bar"))))
