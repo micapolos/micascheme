@@ -161,6 +161,20 @@
       ;                 (constant (scope-evaluate $scope (thunk-datum $body-thunk)))
       ;                 (thunk-bindings $body-thunk)
       ;                 (thunk-datum $body-thunk)))))))))
+      (($assert $condition $body)
+        (identifier-named? #'$assert assert)
+        (compiler-bind
+          (scope-syntax->thunk-compiler $scope #'$condition)
+          (lambda ($condition-thunk)
+            (switch (thunk-value $condition-thunk)
+              ((constant? $constant)
+                (cond
+                  ((constant-value $constant)
+                    (scope-syntax->thunk-compiler $scope #'$body))
+                  (else
+                    (syntax-error #'$condition "assertion failed"))))
+              ((variable? $variable)
+                (syntax-error #'$condition "not a constant"))))))
       (($lambda ($param ...) $body)
         (identifier-named? (syntax $lambda) lambda)
         (lets
