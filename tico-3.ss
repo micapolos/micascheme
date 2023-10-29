@@ -157,7 +157,14 @@
             (thunk
               (switch (thunk-value $body-thunk)
                 ((constant? $constant)
-                  (constant (scope-evaluate $scope $datum)))
+                  (lets
+                    ($symbol (generate-symbol))
+                    (constant
+                      (evaluate
+                        (evaluator
+                          (scope-environment $scope)
+                          (stack (cons $symbol (constant-value $constant))))
+                        `(lambda (,@$params) ,$symbol)))))
                 ((variable? $variable)
                   (lets
                     ($index (- (variable-index $variable) $arity))
