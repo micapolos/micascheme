@@ -235,17 +235,22 @@
   (define (thunk-compiler->symbolize $thunk-compiler)
     (compiler-bind $thunk-compiler
       (lambda ($thunk)
-        (switch (thunk-datum $thunk)
-          ((symbol? $symbol) (compiler $thunk))
-          ((boolean? $symbol) (compiler $thunk))
-          ((number? $symbol) (compiler $thunk))
-          ((string? $symbol) (compiler $thunk))
-          ((else $other)
-            (lets
-              ($symbol (generate-symbol))
-              (compiler+binding
-                (compiler (thunk (thunk-value $thunk) $symbol))
-                (cons $symbol (thunk-datum $thunk)))))))))
+        (switch (thunk-value $thunk)
+          ((variable? _)
+            (compiler $thunk))
+          ((constant? $constant)
+            (switch (thunk-datum $thunk)
+              ((symbol? _) (compiler $thunk))
+              ((boolean? _) (compiler $thunk))
+              ((number? _) (compiler $thunk))
+              ((string? _) (compiler $thunk))
+              ((else $datum)
+                (lets
+                  ($symbol (generate-symbol))
+                  (compiler+binding
+                    (compiler (thunk $constant $symbol))
+                    (cons $symbol
+                      (thunk (constant-value $constant) $datum)))))))))))
 
   (define (thunk-compiler-apply $fn-thunk-compiler $arg-thunk-compilers)
     (compiler-bind $fn-thunk-compiler
