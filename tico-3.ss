@@ -170,10 +170,8 @@
             (syntax->list #'($arg ...)))))
       ($identifier
         (identifier? #'$identifier)
-        (lets
-          ($symbol (syntax->datum #'$identifier))
-          ($value (scope-value $scope $symbol))
-          (thunk $value $symbol)))
+        (scope-symbol->thunk $scope
+          (syntax->datum #'$identifier)))
       ($other
         (switch (syntax->datum #'$other)
           ((boolean? $boolean)
@@ -184,6 +182,9 @@
             (thunk (constant $string) $string))
           ((else _)
             (syntax-error #'$other))))))
+
+  (define (scope-symbol->thunk $scope $symbol)
+    (thunk (scope-value $scope $symbol) $symbol))
 
   (define (thunk-apply $fn-thunk $arg-thunks)
     (thunk
