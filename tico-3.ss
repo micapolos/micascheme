@@ -71,7 +71,7 @@
     (cons $symbol
       (switch (thunk-value $thunk)
         ((constant? $constant) $constant)
-        ((variable? $variable) (hole)))))
+        ((variable? _) (hole)))))
 
   (define (syntax->thunk $syntax)
     (lets
@@ -85,46 +85,38 @@
 
   (define (scope-syntax->thunk $scope $syntax)
     (syntax-case $syntax ()
-      ; ((($lambda ($param ...) $body) $arg ...)
-      ;   (identifier-named? (syntax $lambda) lambda)
-      ;   (lets
-      ;     ($arg-thunks
-      ;       (map
-      ;         (partial scope-syntax->thunk $scope)
-      ;         (syntax->list (syntax ($arg ...)))))
-      ;     ($arity (length $arg-thunks))
-      ;     ($params
-      ;       (map syntax->datum
-      ;         (map
-      ;           (lambda ($param) (ensure identifier? $param))
-      ;           (syntax->list (syntax ($param ...))))))
-      ;     ($bindings
-      ;       (map symbol-thunk->binding $params $arg-thunks))
-      ;     ($scope
-      ;       (scope+bindings $scope $bindings))
-      ;     ($body-thunk
-      ;       (scope-syntax->thunk $scope
-      ;         (syntax->datum (syntax $body))))
-      ;     (switch (thunk-runtime $body-thunk)
-      ;       ((constant? $constant)
-      ;         (thunk
-      ;           $constant
-      ;           (thunk-bindings $body-thunk)
-      ;           (thunk-datum $body-thunk)))
-      ;       ((variable? $variable)
-      ;         (lets
-      ;           ($index (- (variable-index $variable) $arity))
-      ;           (cond
-      ;             ((>= $index 0)
-      ;               (thunk
-      ;                 (variable $index)
-      ;                 (thunk-bindings $body-thunk)
-      ;                 (thunk-datum $body-thunk)))
-      ;             (else
-      ;               (thunk
-      ;                 (constant (scope-evaluate $scope (thunk-datum $body-thunk)))
-      ;                 (thunk-bindings $body-thunk)
-      ;                 (thunk-datum $body-thunk)))))))))
+      ((($lambda ($param ...) $body) $arg ...)
+        (identifier-named? #'$lambda lambda)
+        (lets
+          ($arg-thunks
+            (map
+              (partial scope-syntax->thunk $scope)
+              (syntax->list #'($arg ...))))
+          ($arity (length $arg-thunks))
+          ($params
+            (map syntax->datum
+              (map
+                (lambda ($param) (ensure identifier? $param))
+                (syntax->list #'($param ...)))))
+          ($bindings
+            (map symbol-thunk->binding $params $arg-thunks))
+          ($scope
+            (scope+bindings $scope $bindings))
+          ($body-thunk
+            (scope-syntax->thunk $scope #'$body))
+          ($body-datum (thunk-datum $body-thunk))
+          (thunk
+            (switch (thunk-value $body-thunk)
+              ((constant? $constant) $constant)
+              ((variable? $variable)
+                (lets
+                  ($index (- (variable-index $variable) $arity))
+                  (cond
+                    ((< $index 0) (constant (scope-evaluate $scope $body-datum)))
+                    (else (variable $index))))))
+            `(
+              (lambda (,@$params) ,$body-datum)
+              ,@(map thunk-datum $arg-thunks)))))
       (($assert $condition $body)
         (identifier-named? #'$assert assert)
         (lets
@@ -139,13 +131,13 @@
             ((variable? $variable)
               (syntax-error #'$condition "not a constant")))))
       (($lambda ($param ...) $body)
-        (identifier-named? (syntax $lambda) lambda)
+        (identifier-named? #'$lambda lambda)
         (lets
           ($params
             (map syntax->datum
               (map
                 (lambda ($param) (ensure identifier? $param))
-                (syntax->list (syntax ($param ...))))))
+                (syntax->list #'($param ...)))))
           ($arity (length $params))
           ($bindings
             (map
@@ -153,7 +145,7 @@
               $params))
           ($scope
             (fold-left scope+binding $scope $bindings))
-          ($body-thunk (scope-syntax->thunk $scope (syntax $body)))
+          ($body-thunk (scope-syntax->thunk $scope #'$body))
           (lets
             ($environment (scope-environment $scope))
             ($datum
@@ -172,18 +164,18 @@
               $datum))))
       (($fn $arg ...)
         (thunk-apply
-          (scope-syntax->thunk $scope (syntax $fn))
+          (scope-syntax->thunk $scope #'$fn)
           (map
             (partial scope-syntax->thunk $scope)
-            (syntax->list (syntax ($arg ...))))))
+            (syntax->list #'($arg ...)))))
       ($identifier
-        (identifier? (syntax $identifier))
+        (identifier? #'$identifier)
         (lets
-          ($symbol (syntax->datum (syntax $identifier)))
+          ($symbol (syntax->datum #'$identifier))
           ($value (scope-value $scope $symbol))
           (thunk $value $symbol)))
       ($other
-        (switch (syntax->datum (syntax $other))
+        (switch (syntax->datum #'$other)
           ((boolean? $boolean)
             (thunk (constant $boolean) $boolean))
           ((number? $number)
@@ -191,7 +183,7 @@
           ((string? $string)
             (thunk (constant $string) $string))
           ((else _)
-            (syntax-error (syntax $other)))))))
+            (syntax-error #'$other))))))
 
   (define (thunk-apply $fn-thunk $arg-thunks)
     (thunk

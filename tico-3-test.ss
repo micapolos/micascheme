@@ -116,6 +116,22 @@
   (check (equal? (app (thunk-value $thunk) "foo") "foo!")))
 
 (check
+  (equal?
+    (syntax->thunk
+      #`(
+        (lambda ($x $y)
+          (assert
+            (equal? $x $y)
+            (string-append $x $y)))
+        "foo" "foo"))
+    (thunk
+      "foofoo"
+      `(
+        (lambda ($x $y)
+          (string-append $x $y))
+        "foo" "foo"))))
+
+(check
   (raises?
     (lambda ()
       (syntax->thunk #`(assert (= 1 2) "foo")))))
