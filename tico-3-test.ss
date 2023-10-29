@@ -129,3 +129,20 @@
     (thunk
       "foobar"
       `(string-append "foo" "bar"))))
+
+(let (($thunk (syntax->thunk #`(lambda ($x $y) "foo"))))
+  (check (equal? (thunk-datum $thunk) `(lambda ($x $y) "foo")))
+  (check (equal? (app (thunk-value $thunk) 1 2) "foo")))
+
+(let (($thunk (syntax->thunk #`(lambda ($x $y) $x))))
+  (check (equal? (thunk-datum $thunk) `(lambda ($x $y) $x)))
+  (check (equal? (app (thunk-value $thunk) "foo" "bar") "foo")))
+
+(let (($thunk (syntax->thunk #`(lambda ($x $y) (string-append $x $y)))))
+  (check (equal? (thunk-datum $thunk) `(lambda ($x $y) (string-append $x $y))))
+  (check (equal? (app (thunk-value $thunk) "foo" "bar") "foobar")))
+
+; TODO: symbolize!!!
+(let (($thunk (syntax->thunk #`(lambda ($x $y) (string-append "foo" "bar")))))
+  (check (equal? (thunk-datum $thunk) `(lambda ($x $y) (string-append "foo" "bar"))))
+  (check (equal? (app (thunk-value $thunk) "goo" "gar") "foobar")))

@@ -119,8 +119,8 @@
       (environment->scope (environment `(micascheme)))
       $syntax))
 
-  (define (scope-syntax->thunk-compiler $scope $datum)
-    (syntax-case $datum ()
+  (define (scope-syntax->thunk-compiler $scope $syntax)
+    (syntax-case $syntax ()
       ; ((($lambda ($param ...) $body) $arg ...)
       ;   (identifier-named? (syntax $lambda) lambda)
       ;   (lets
@@ -161,39 +161,40 @@
       ;                 (constant (scope-evaluate $scope (thunk-datum $body-thunk)))
       ;                 (thunk-bindings $body-thunk)
       ;                 (thunk-datum $body-thunk)))))))))
-      ; (($lambda ($param ...) $body)
-      ;   (identifier-named? (syntax $lambda) lambda)
-      ;   (lets
-      ;     ($params
-      ;       (map syntax->datum
-      ;         (map
-      ;           (lambda ($param) (ensure identifier? $param))
-      ;           (syntax->list (syntax ($param ...))))))
-      ;     ($arity (length $params))
-      ;     ($scope
-      ;       (fold-left scope+binding $scope
-      ;         (map
-      ;           (lambda ($param)
-      ;             (cons $param (hole)))
-      ;           $params)))
-      ;     ($body-thunk
-      ;       (scope-syntax->thunk $scope
-      ;         (syntax->datum (syntax $body))))
-      ;     ($datum
-      ;       `(lambda (,@$params)
-      ;         ,(thunk-datum $body-thunk)))
-      ;     (thunk
-      ;       (switch (thunk-runtime $body-thunk)
-      ;         ((constant? $constant)
-      ;           (constant (evaluate (thunk-bindings $body-thunk) $datum)))
-      ;         ((variable? $variable)
-      ;           (lets
-      ;             ($index (- (variable-index $variable) $arity))
-      ;             (if (< $index 0)
-      ;               (constant (evaluate (thunk-bindings $body-thunk) $datum))
-      ;               (variable $index)))))
-      ;       (thunk-bindings $body-thunk)
-      ;       $datum)))
+      (($lambda ($param ...) $body)
+        (identifier-named? (syntax $lambda) lambda)
+        (lets
+          ($params
+            (map syntax->datum
+              (map
+                (lambda ($param) (ensure identifier? $param))
+                (syntax->list (syntax ($param ...))))))
+          ($arity (length $params))
+          ($bindings
+            (map
+              (lambda ($param) (cons $param (hole)))
+              $params))
+          ($scope
+            (fold-left scope+binding $scope $bindings))
+          (compiler-bind
+            (scope-syntax->thunk-compiler $scope (syntax $body))
+            (lambda ($body-thunk)
+              (lets
+                ($datum
+                  `(lambda (,@$params)
+                    ,(thunk-datum $body-thunk)))
+                (compiler
+                  (thunk
+                    (switch (thunk-value $body-thunk)
+                      ((constant? $constant)
+                        (constant (scope-evaluate $scope $datum)))
+                      ((variable? $variable)
+                        (lets
+                          ($index (- (variable-index $variable) $arity))
+                          (if (< $index 0)
+                            (constant (scope-evaluate $scope $datum))
+                            (variable $index)))))
+                    $datum)))))))
       (($fn $arg ...)
         (thunk-compiler-apply
           (scope-syntax->thunk-compiler $scope (syntax $fn))
