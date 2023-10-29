@@ -85,13 +85,14 @@
 
   (define (scope-syntax->thunk $scope $syntax)
     (syntax-case $syntax ()
-      ((($lambda ($param ...) $body) $arg ...)
-        (identifier-named? #'$lambda lambda)
+      (($let (($param $arg) ...) $body)
+        (identifier-named? #'$let let)
         (lets
           ($arg-thunks
             (map
               (partial scope-syntax->thunk $scope)
               (syntax->list #'($arg ...))))
+          ($arg-datums (map thunk-datum $arg-thunks))
           ($arity (length $arg-thunks))
           ($params
             (map syntax->datum
@@ -114,9 +115,11 @@
                   (cond
                     ((< $index 0) (constant (scope-evaluate $scope $body-datum)))
                     (else (variable $index))))))
-            `(
-              (lambda (,@$params) ,$body-datum)
-              ,@(map thunk-datum $arg-thunks)))))
+            `(let
+              (,@(map
+                (lambda ($param $arg-datum) `(,$param ,$arg-datum))
+                $params $arg-datums))
+              ,$body-datum))))
       (($assert $condition $body)
         (identifier-named? #'$assert assert)
         (lets

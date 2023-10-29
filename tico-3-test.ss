@@ -118,18 +118,14 @@
 (check
   (equal?
     (syntax->thunk
-      #`(
-        (lambda ($x $y)
-          (assert
-            (equal? $x $y)
-            (string-append $x $y)))
-        "foo" "foo"))
+      #`(let (($x "foo") ($y "foo"))
+        (assert
+          (equal? $x $y)
+          (string-append $x $y))))
     (thunk
       "foofoo"
-      `(
-        (lambda ($x $y)
-          (string-append $x $y))
-        "foo" "foo"))))
+      `(let (($x "foo") ($y "foo"))
+        (string-append $x $y)))))
 
 (check
   (raises?
