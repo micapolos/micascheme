@@ -104,6 +104,35 @@
       (app (thunk-value $thunk) "foo" "bar")
       "foobar!?")))
 
+; --- compile-time
+
+(check
+  (equal?
+    (syntax->thunk #`(compile-time (string-append "foo" "bar")))
+    (thunk "foobar" "foobar")))
+
+(check
+  (equal?
+    (syntax->thunk
+      #`(
+        (lambda ($x $y)
+          (compile-time (string-append "foo" "bar")))
+        "goo" "gar"))
+    (thunk
+      "foobar"
+      `(
+        (lambda ($x $y) "foobar")
+        "goo" "gar"))))
+
+(check
+  (raises?
+    (lambda ()
+      (syntax->thunk
+        #`(
+          (lambda ($x $y)
+            (compile-time (string-append $x $y)))
+          "goo" "gar")))))
+
 ; --- assert
 
 (check

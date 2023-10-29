@@ -162,6 +162,13 @@
                       (constant (scope-evaluate $scope $datum))
                       (variable $index)))))
               $datum))))
+      (($compile-time $body)
+        (identifier-named? #'$compile-time compile-time)
+        (switch (thunk-value (scope-syntax->thunk $scope #'$body))
+          ((constant? $constant)
+            (thunk $constant (value->datum (constant-value $constant))))
+          ((variable? _)
+            (syntax-error #'$body "not compile-time"))))
       (($assert $condition $body)
         (identifier-named? #'$assert assert)
         (lets
@@ -217,6 +224,19 @@
         (apply max
           (map variable-index
             (filter variable? (cons $fn-value $arg-values)))))))
+
+  (define (value->datum $value)
+    (switch $value
+      ((null? _) `())
+      ((boolean? $boolean) $boolean)
+      ((number? $number) $number)
+      ((string? $string) $string)
+      ((pair? $pair)
+        `(cons
+          ,(value->datum (car $pair))
+          ,(value->datum (cdr $pair))))
+      ((else $other)
+        (throw value->datum $other))))
 
   (define (datum-apply $fn-datum $arg-datums)
     `(,$fn-datum ,@$arg-datums))
