@@ -16,6 +16,10 @@
 
 (enum (foo number string))
 
+; === app ===
+
+(check (equal? (app (lambda (x y) (string-append x y)) "foo" "bar") "foobar"))
+
 ; === false? ===
 
 (check (equal? (false? #f) #t))
@@ -211,6 +215,23 @@
 (let ((fn (lambda (s) (and (> (string-length s) 3) (string-append s "!")))))
   (check (equal? (map-find-indexed fn (list "ala" "ma" "kocicę" "Lunę")) (indexed "kocicę!" 2)))
   (check (equal? (map-find-indexed fn (list "ala" "ma" "ul")) #f)))
+
+; === indexed-find ===
+
+(let ()
+  (define $proc
+    (lambda ($index $string)
+      (and
+        (= (string-length $string) 3)
+        (cons $index $string))))
+  (check
+    (equal?
+      (indexed-find $proc (list "Luna" "kot" "lis"))
+      (cons 1 "kot")))
+  (check
+    (equal?
+      (indexed-find $proc (list "Luna" "pies"))
+      #f)))
 
 ; === intercalate ===
 

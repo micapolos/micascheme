@@ -15,6 +15,7 @@
     once-proc
     checking-once
     raises?
+    app
     single? single
     bindings-eval
     script
@@ -42,6 +43,7 @@
     filter-map filter-opts
     map-find-indexed
     map-indexed list-indexed
+    indexed-find
     indexed indexed? indexed-value indexed-index
     intercalate
     throw
@@ -256,6 +258,9 @@
   (define (partial $proc . $partial-args)
     (lambda $args
       (apply $proc (append $partial-args $args))))
+
+  (define-syntax-rule (app $fn $arg ...)
+    ($fn $arg ...))
 
   (define-syntax-rule (define-aux-keyword aux)
     (define-syntax aux
@@ -555,6 +560,16 @@
   (define (find-index $proc $list)
     (and-lets ($indexed (map-find-indexed $proc $list))
       (indexed-index $indexed)))
+
+  (define (indexed-find+ $proc $list $index)
+    (and
+      (not (null? $list))
+      (or
+        ($proc $index (car $list))
+        (indexed-find+ $proc (cdr $list) (+ $index 1)))))
+
+  (define (indexed-find $proc $list)
+    (indexed-find+ $proc $list 0))
 
   (define (iterate $proc $item $count)
     (cond
