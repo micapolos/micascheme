@@ -166,9 +166,23 @@
   (check (equal? (thunk-datum $thunk) `(lambda ($x $y) (string-append $x $y))))
   (check (equal? (app (thunk-value $thunk) "foo" "bar") "foobar")))
 
-(let (($thunk (syntax->thunk #`(lambda ($x $y) (string-append "foo" "bar")))))
-  (check (equal? (thunk-datum $thunk) `(lambda ($x $y) (string-append "foo" "bar"))))
-  (check (equal? (app (thunk-value $thunk) "goo" "gar") "foobar")))
+(let
+  (($thunk
+    (with-generate-temporary-seed $tmp
+      (syntax->thunk
+        #`(lambda ($x $y)
+          (string-append $x $y (string-append "!" "?")))))))
+  (check
+    (equal?
+      (thunk-datum $thunk)
+      `(lets
+        ($tmp-0 (string-append "!" "?"))
+        (lambda ($x $y)
+          (string-append $x $y $tmp-0)))))
+  (check
+    (equal?
+      (app (thunk-value $thunk) "foo" "bar")
+      "foobar!?")))
 
 ; --- assert
 

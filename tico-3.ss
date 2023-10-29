@@ -191,24 +191,23 @@
           ($scope
             (fold-left scope+binding $scope $bindings))
           (compiler-bind
-            (scope-syntax->thunk-compiler $scope (syntax $body))
+            (thunk-compiler->symbolize
+              (scope-syntax->thunk-compiler $scope (syntax $body)))
             (lambda ($body-thunk)
               (lets
+                ($environment (scope-environment $scope))
                 ($datum
                   `(lambda (,@$params)
                     ,(thunk-datum $body-thunk)))
-                (compiler
-                  (thunk
-                    (switch (thunk-value $body-thunk)
-                      ((constant? $constant)
-                        (constant (scope-evaluate $scope $datum)))
-                      ((variable? $variable)
-                        (lets
-                          ($index (- (variable-index $variable) $arity))
-                          (if (< $index 0)
-                            (constant (scope-evaluate $scope $datum))
-                            (variable $index)))))
-                    $datum)))))))
+                (switch (thunk-value $body-thunk)
+                  ((constant? $constant)
+                    (environment-datum->thunk-compiler $environment $datum))
+                  ((variable? $variable)
+                    (lets
+                      ($index (- (variable-index $variable) $arity))
+                      (if (< $index 0)
+                        (environment-datum->thunk-compiler $environment $datum)
+                        (compiler (thunk (variable $index) $datum)))))))))))
       (($fn $arg ...)
         (thunk-compiler-apply
           (scope-syntax->thunk-compiler $scope (syntax $fn))
@@ -251,6 +250,23 @@
                     (compiler (thunk $constant $symbol))
                     (cons $symbol
                       (thunk (constant-value $constant) $datum)))))))))))
+
+  (define (environment-datum->thunk-compiler $environment $datum)
+    (lambda ($bindings)
+      (compiled $bindings
+        (thunk
+          (constant
+            (evaluate
+              (evaluator
+                $environment
+                (map
+                  (lambda ($binding)
+                    (cons
+                      (car $binding)
+                      (thunk-value (cdr $binding))))
+                  $bindings))
+              $datum))
+          $datum))))
 
   (define (thunk-compiler-apply $fn-thunk-compiler $arg-thunk-compilers)
     (compiler-bind (thunk-compiler->symbolize $fn-thunk-compiler)
