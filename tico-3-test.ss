@@ -39,28 +39,30 @@
 (check
   (equal?
     (syntax->thunk #`#f)
-    (thunk #f #f)))
+    (thunk (constant #f) #f)))
 
 (check
   (equal?
     (syntax->thunk #`123)
-    (thunk 123 123)))
+    (thunk (constant 123) 123)))
 
 (check
   (equal?
     (syntax->thunk #`"foo")
-    (thunk "foo" "foo")))
+    (thunk (constant "foo") "foo")))
 
 (check
   (equal?
     (syntax->thunk #`string-append)
-    (thunk string-append `string-append)))
+    (thunk
+      (constant string-append)
+      `string-append)))
 
 (check
   (equal?
     (syntax->thunk #`(string-append "foo" "bar"))
     (thunk
-      "foobar"
+      (constant "foobar")
       `(string-append "foo" "bar"))))
 
 (check
@@ -71,7 +73,7 @@
           (string-append "fo" "o")
           (string-append "ba" "r"))))
     (thunk
-      "foobar"
+      (constant "foobar")
       `(string-append
           (string-append "fo" "o")
           (string-append "ba" "r")))))
@@ -82,19 +84,19 @@
 (check
   (equal?
     (syntax->thunk #`(if (= 1 1) "ok" (throw not-ok)))
-    (thunk "ok" "ok")))
+    (thunk (constant "ok") "ok")))
 
 (check
   (equal?
     (syntax->thunk #`(if (= 1 2) (throw ok) "not-ok"))
-    (thunk "not-ok" "not-ok")))
+    (thunk (constant "not-ok") "not-ok")))
 
 (check
   (equal?
     (syntax->thunk
       #`((lambda ($x) (string-append $x (if (= 1 1) "!" "?"))) "foo"))
     (thunk
-      "foo!"
+      (constant "foo!")
       `((lambda ($x) (string-append $x "!")) "foo"))))
 
 (check
@@ -102,36 +104,36 @@
     (syntax->thunk
       #`((lambda ($x) (string-append $x (if (= 1 2) "!" "?"))) "foo"))
     (thunk
-      "foo?"
+      (constant "foo?")
       `((lambda ($x) (string-append $x "?")) "foo"))))
 
 (check
   (equal?
     (syntax->thunk #`((lambda ($x) (if $x "ok" "not-ok")) (= 1 1)))
     (thunk
-      "ok"
+      (constant "ok")
       `((lambda ($x) (if $x "ok" "not-ok")) (= 1 1)))))
 
 (check
   (equal?
     (syntax->thunk #`((lambda ($x) (if $x "ok" "not-ok")) (= 1 2)))
     (thunk
-      "not-ok"
+      (constant "not-ok")
       `((lambda ($x) (if $x "ok" "not-ok")) (= 1 2)))))
 
 ; --- lambda
 
 (let (($thunk (syntax->thunk #`(lambda ($x $y) "foo"))))
   (check (equal? (thunk-datum $thunk) `(lambda ($x $y) "foo")))
-  (check (equal? (app (thunk-value $thunk) 1 2) "foo")))
+  (check (equal? (app (constant-value (thunk-value $thunk)) 1 2) "foo")))
 
 (let (($thunk (syntax->thunk #`(lambda ($x $y) $x))))
   (check (equal? (thunk-datum $thunk) `(lambda ($x $y) $x)))
-  (check (equal? (app (thunk-value $thunk) "foo" "bar") "foo")))
+  (check (equal? (app (constant-value (thunk-value $thunk)) "foo" "bar") "foo")))
 
 (let (($thunk (syntax->thunk #`(lambda ($x $y) (string-append $x $y)))))
   (check (equal? (thunk-datum $thunk) `(lambda ($x $y) (string-append $x $y))))
-  (check (equal? (app (thunk-value $thunk) "foo" "bar") "foobar")))
+  (check (equal? (app (constant-value (thunk-value $thunk)) "foo" "bar") "foobar")))
 
 (let
   (($thunk
@@ -146,7 +148,7 @@
         (string-append $x $y (string-append "!" "?")))))
   (check
     (equal?
-      (app (thunk-value $thunk) "foo" "bar")
+      (app (constant-value (thunk-value $thunk)) "foo" "bar")
       "foobar!?")))
 
 ; --- compile-time
@@ -154,7 +156,7 @@
 (check
   (equal?
     (syntax->thunk #`(compile-time (string-append "foo" "bar")))
-    (thunk "foobar" "foobar")))
+    (thunk (constant "foobar") "foobar")))
 
 (check
   (equal?
@@ -164,7 +166,7 @@
           (compile-time (string-append "foo" "bar")))
         "goo" "gar"))
     (thunk
-      "foobar"
+      (constant "foobar")
       `(
         (lambda ($x $y) "foobar")
         "goo" "gar"))))
@@ -183,11 +185,11 @@
 (check
   (equal?
     (syntax->thunk #`(testing (= 1 1) "foo"))
-    (thunk "foo" "foo")))
+    (thunk (constant "foo") "foo")))
 
 (let (($thunk (syntax->thunk #`(lambda ($x) (testing (= 1 1) (string-append $x "!"))))))
   (check (equal? (thunk-datum $thunk) `(lambda ($x) (string-append $x "!"))))
-  (check (equal? (app (thunk-value $thunk) "foo") "foo!")))
+  (check (equal? (app (constant-value (thunk-value $thunk)) "foo") "foo!")))
 
 (check
   (equal?
@@ -197,7 +199,7 @@
           (equal? $x $y)
           (string-append $x $y))))
     (thunk
-      "foofoo"
+      (constant "foofoo")
       `(let (($x "foo") ($y "foo"))
         (string-append $x $y)))))
 

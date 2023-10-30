@@ -73,14 +73,9 @@
         ((variable? _) (hole)))))
 
   (define (syntax->thunk $syntax)
-    (lets
-      ($thunk
-        (scope-syntax->thunk
-          (environment->scope (environment `(micascheme)))
-          $syntax))
-      (thunk
-        (constant-value (ensure constant? (thunk-value $thunk)))
-        (thunk-datum $thunk))))
+    (scope-syntax->thunk
+      (environment->scope (environment `(micascheme)))
+      $syntax))
 
   (define (scope-syntax->thunk $scope $syntax)
     (syntax-case $syntax ()
