@@ -338,6 +338,12 @@
       (constant '())
       ''())))
 
+; non-procedure-transformer
+(check
+  (raises?
+    (lambda ()
+      (syntax->thunk #'syntax-case))))
+
 (check
   (equal?
     (thunk-datum

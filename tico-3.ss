@@ -60,8 +60,9 @@
               (scope-environment $scope))))
         ((top-level-syntax? $symbol)
           (transformer
-            (top-level-syntax $symbol
-              (scope-environment $scope))))
+            (switch (top-level-syntax $symbol (scope-environment $scope))
+              ((procedure? $procedure) $procedure)
+              ((else $other) (throw not-transformer-procedure $symbol)))))
         (else
           (throw not-bound $symbol)))))
 
