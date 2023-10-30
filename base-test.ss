@@ -503,3 +503,12 @@
         (cons `bar "bar"))
       `(string-append foo bar))
     "foobar"))
+
+; === todo ===
+
+(check (raises? (lambda () (todo))))
+(check (raises? (lambda () TODO)))
+
+; === null ===
+
+(check (equal? null `()))

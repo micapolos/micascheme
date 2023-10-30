@@ -48,7 +48,8 @@
     intercalate
     throw
     identifier-named?
-    todo
+    todo TODO
+    null
 
     stack push push-list push-all top pop
     gen-stack gen-list
@@ -523,6 +524,18 @@
 
   (define (todo)
     (throw todo))
+
+  (define-syntax TODO
+    (lambda ($syntax)
+      (cond
+        ((identifier? $syntax) (syntax (todo)))
+        (else (syntax-error $syntax)))))
+
+  (define-syntax null
+    (lambda ($syntax)
+      (cond
+        ((identifier? $syntax) (syntax '()))
+        (else (syntax-error $syntax)))))
 
   ; --------------------------------------
 

@@ -72,6 +72,15 @@
     (syntax->thunk #`"foo")
     (thunk (constant "foo") "foo")))
 
+; --- quote
+
+(check
+  (equal?
+    (syntax->thunk #`(quote (string-append "foo" "bar")))
+    (thunk
+      (constant `(string-append "foo" "bar"))
+      `(quote (string-append "foo" "bar")))))
+
 ; --- native
 
 (check
@@ -321,6 +330,13 @@
       (syntax->thunk #`(lambda (x) (testing (= x 1) "foo"))))))
 
 ; --- transformers
+
+(check
+  (equal?
+    (syntax->thunk #`null)
+    (thunk
+      (constant `())
+      `(quote ()))))
 
 (check
   (equal?
