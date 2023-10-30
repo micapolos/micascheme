@@ -34,7 +34,7 @@
       `+)
     (variable 2)))
 
-; --- datum->thunk
+; --- literals
 
 (check
   (equal?
@@ -58,6 +58,8 @@
       (constant string-append)
       `string-append)))
 
+; --- application
+
 (check
   (equal?
     (syntax->thunk #`(string-append "foo" "bar"))
@@ -77,7 +79,6 @@
       `(string-append
           (string-append "fo" "o")
           (string-append "ba" "r")))))
-
 
 ; --- if
 
