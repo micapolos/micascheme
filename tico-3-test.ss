@@ -178,14 +178,14 @@
             (compile-time (string-append $x $y)))
           "goo" "gar")))))
 
-; --- assert
+; --- testing
 
 (check
   (equal?
-    (syntax->thunk #`(assert (= 1 1) "foo"))
+    (syntax->thunk #`(testing (= 1 1) "foo"))
     (thunk "foo" "foo")))
 
-(let (($thunk (syntax->thunk #`(lambda ($x) (assert (= 1 1) (string-append $x "!"))))))
+(let (($thunk (syntax->thunk #`(lambda ($x) (testing (= 1 1) (string-append $x "!"))))))
   (check (equal? (thunk-datum $thunk) `(lambda ($x) (string-append $x "!"))))
   (check (equal? (app (thunk-value $thunk) "foo") "foo!")))
 
@@ -193,7 +193,7 @@
   (equal?
     (syntax->thunk
       #`(let (($x "foo") ($y "foo"))
-        (assert
+        (testing
           (equal? $x $y)
           (string-append $x $y))))
     (thunk
@@ -204,14 +204,14 @@
 (check
   (raises?
     (lambda ()
-      (syntax->thunk #`(assert (= 1 2) "foo")))))
+      (syntax->thunk #`(testing (= 1 2) "foo")))))
 
 (check
   (raises?
     (lambda ()
-      (syntax->thunk #`(lambda (x) (assert (= 1 2) "foo"))))))
+      (syntax->thunk #`(lambda (x) (testing (= 1 2) "foo"))))))
 
 (check
   (raises?
     (lambda ()
-      (syntax->thunk #`(lambda (x) (assert (= x 1) "foo"))))))
+      (syntax->thunk #`(lambda (x) (testing (= x 1) "foo"))))))
