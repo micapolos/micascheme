@@ -91,6 +91,22 @@
 
 (check
   (equal?
+    (syntax->thunk
+      #`((lambda ($x) (string-append $x (if (= 1 1) "!" "?"))) "foo"))
+    (thunk
+      "foo!"
+      `((lambda ($x) (string-append $x "!")) "foo"))))
+
+(check
+  (equal?
+    (syntax->thunk
+      #`((lambda ($x) (string-append $x (if (= 1 2) "!" "?"))) "foo"))
+    (thunk
+      "foo?"
+      `((lambda ($x) (string-append $x "?")) "foo"))))
+
+(check
+  (equal?
     (syntax->thunk #`((lambda ($x) (if $x "ok" "not-ok")) (= 1 1)))
     (thunk
       "ok"
