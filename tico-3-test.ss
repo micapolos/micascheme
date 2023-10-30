@@ -8,6 +8,11 @@
     (constant +)))
 
 (check
+  (equal?
+    (scope-value (scope env (stack)) `cond)
+    (transformer (top-level-syntax `cond env))))
+
+(check
   (raises?
     (lambda ()
       (scope-value
@@ -21,6 +26,17 @@
           (cons `+ (constant "foo"))))
       `+)
     (constant "foo")))
+
+(let
+  (($transformer (lambda ($syntax) $syntax)))
+  (check
+    (equal?
+      (scope-value
+        (scope env
+          (stack
+            (cons `cond (transformer $transformer))))
+        `cond)
+      (transformer $transformer))))
 
 (check
   (equal?
@@ -218,3 +234,10 @@
   (raises?
     (lambda ()
       (syntax->thunk #`(lambda (x) (testing (= x 1) "foo"))))))
+
+; --- transformers
+
+(check
+  (equal?
+    (thunk-datum (syntax->thunk #`(lambda ($x) (cond ($x "foo") (else "bar")))))
+    `(lambda ($x) (if $x "foo" "bar"))))

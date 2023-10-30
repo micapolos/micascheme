@@ -2,6 +2,7 @@
   (export
     scope scope? scope-environment scope-bindings
     constant constant? constant-value
+    transformer transformer? transformer-value
     variable variable? variable-index
     hole hole?
     thunk thunk? thunk-value thunk-datum
@@ -14,6 +15,7 @@
     (evaluator))
 
   (data (constant value))
+  (data (transformer value))
   (data (variable index))
   (data (hole))
   (data (scope environment bindings))
@@ -47,10 +49,20 @@
             (symbol=? $symbol (car $binding))
             (switch (cdr $binding)
               ((constant? $constant) $constant)
+              ((transformer? $transformer) $transformer)
               ((hole? _) (variable $index)))))
         (scope-bindings $scope))
-      (constant
-        (top-level-value $symbol (scope-environment $scope)))))
+      (cond
+        ((top-level-bound? $symbol)
+          (constant
+            (top-level-value $symbol
+              (scope-environment $scope))))
+        ((top-level-syntax? $symbol)
+          (transformer
+            (top-level-syntax $symbol
+              (scope-environment $scope))))
+        (else
+          (throw not-bound $symbol)))))
 
   (define (scope-evaluate $scope $datum)
     (evaluate
@@ -83,6 +95,9 @@
         (identifier? #'$identifier)
         (scope-symbol->thunk $scope
           (syntax->datum #'$identifier)))
+      (($begin $body)
+        (identifier-named? #'$begin begin)
+        (scope-syntax->thunk $scope #'$body))
       (($if $cond $then $else)
         (identifier-named? #'$if if)
         (thunk-if
@@ -182,11 +197,19 @@
             ((variable? $variable)
               (syntax-error #'$condition "not a constant")))))
       (($fn $arg ...)
-        (thunk-apply
-          (scope-syntax->thunk $scope #'$fn)
-          (map
-            (partial scope-syntax->thunk $scope)
-            (syntax->list #'($arg ...)))))
+        (lets
+          ($fn-thunk (scope-syntax->thunk $scope #'$fn))
+          (switch (thunk-value $fn-thunk)
+            ((transformer? $transformer)
+              (scope-syntax->thunk $scope
+                (app
+                  (transformer-value $transformer)
+                  #'($fn $arg ...))))
+            ((else _)
+              (thunk-apply $fn-thunk
+                (map
+                  (partial scope-syntax->thunk $scope)
+                  (syntax->list #'($arg ...))))))))
       ($other
         (switch (syntax->datum #'$other)
           ((boolean? $boolean)
