@@ -219,10 +219,8 @@
         (apply
           (constant-value $fn-value)
           (map constant-value $arg-values)))
-      (variable
-        (apply max
-          (map variable-index
-            (filter variable? (cons $fn-value $arg-values)))))))
+      (values->variable
+        (cons $fn-value $arg-values))))
 
   (define (value->datum $value)
     (switch $value
@@ -254,14 +252,11 @@
 
   (define (variable-thunk-if $cond-thunk $then-thunk $else-thunk)
     (thunk
-      (variable
-        (apply max
-          (map variable-index
-            (filter variable?
-              (list
-                (thunk-value $cond-thunk)
-                (thunk-value $then-thunk)
-                (thunk-value $else-thunk))))))
+      (values->variable
+        (list
+          (thunk-value $cond-thunk)
+          (thunk-value $then-thunk)
+          (thunk-value $else-thunk)))
       (datum-if
         (thunk-datum $cond-thunk)
         (thunk-datum $then-thunk)
@@ -269,4 +264,10 @@
 
   (define (datum-if $cond-datum $then-datum $else-datum)
     `(if ,$cond-datum ,$then-datum ,$else-datum))
+
+  (define (values->variable $values)
+    (variable
+      (apply max
+        (map variable-index
+          (filter variable? $values)))))
 )
