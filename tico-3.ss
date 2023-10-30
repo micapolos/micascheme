@@ -156,28 +156,68 @@
           ($scope
             (fold-left scope+binding $scope $bindings))
           ($body-thunk (scope-syntax->thunk $scope #'$body))
-          (lets
-            ($environment (scope-environment $scope))
-            ($datum
-              `(lambda (,@$params)
-                ,(thunk-datum $body-thunk)))
-            (thunk
-              (switch (thunk-value $body-thunk)
-                ((constant? $constant)
-                  (lets
-                    ($symbol (generate-symbol))
-                    (constant
-                      (evaluate
-                        (evaluator $environment
-                          (stack (cons $symbol (constant-value $constant))))
-                        `(lambda (,@$params) ,$symbol)))))
-                ((variable? $variable)
-                  (lets
-                    ($index (- (variable-index $variable) $arity))
-                    (if (< $index 0)
-                      (constant (scope-evaluate $scope $datum))
-                      (variable $index)))))
-              $datum))))
+          ($environment (scope-environment $scope))
+          ($datum
+            `(lambda (,@$params)
+              ,(thunk-datum $body-thunk)))
+          (thunk
+            (switch (thunk-value $body-thunk)
+              ((constant? $constant)
+                (lets
+                  ($symbol (generate-symbol))
+                  (constant
+                    (evaluate
+                      (evaluator $environment
+                        (stack (cons $symbol (constant-value $constant))))
+                      `(lambda (,@$params) ,$symbol)))))
+              ((variable? $variable)
+                (lets
+                  ($index (- (variable-index $variable) $arity))
+                  (if (< $index 0)
+                    (constant (scope-evaluate $scope $datum))
+                    (variable $index)))))
+            $datum)))
+      (($lambda $rec ($param ...) $body)
+        (identifier-named? #'$lambda lambda)
+        (lets
+          ($fn-param (syntax->datum (ensure identifier? #'$rec)))
+          ($params
+            (map syntax->datum
+              (map
+                (lambda ($param) (ensure identifier? $param))
+                (syntax->list #'($param ...)))))
+          ($arity (+ (length $params) 1))
+          ($bindings
+            (cons
+              (cons $fn-param (hole))
+              (map
+                (lambda ($param) (cons $param (hole)))
+                $params)))
+          ($scope
+            (fold-left scope+binding $scope $bindings))
+          ($body-thunk (scope-syntax->thunk $scope #'$body))
+          ($environment (scope-environment $scope))
+          ($datum
+            `(rec ,$fn-param
+              (lambda (,@$params)
+                ,(thunk-datum $body-thunk))))
+          (thunk
+            (switch (thunk-value $body-thunk)
+              ((constant? $constant)
+                (lets
+                  ($symbol (generate-symbol))
+                  (constant
+                    (evaluate
+                      (evaluator $environment
+                        (stack (cons $symbol (constant-value $constant))))
+                      `(rec ,$fn-param (lambda (,@$params) ,$symbol))))))
+              ((variable? $variable)
+                (lets
+                  ($index (- (variable-index $variable) $arity))
+                  (if (< $index 0)
+                    (constant (scope-evaluate $scope $datum))
+                    (variable $index)))))
+            $datum)))
       (($compile-time $body)
         (identifier-named? #'$compile-time compile-time)
         (switch (thunk-value (scope-syntax->thunk $scope #'$body))

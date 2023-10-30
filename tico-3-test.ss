@@ -168,6 +168,39 @@
       (app (constant-value (thunk-value $thunk)) "foo" "bar")
       "foobar!?")))
 
+; --- rec lambda
+
+(let
+  (($thunk
+    (syntax->thunk
+      #`(lambda fib (n)
+          (if (< n 2) n (+ (fib (- n 2)) (fib (- n 1))))))))
+  (check
+    (equal?
+      (thunk-datum $thunk)
+      `(rec fib
+        (lambda (n)
+          (if (< n 2) n (+ (fib (- n 2)) (fib (- n 1))))))))
+  (check
+    (equal?
+      ((constant-value (thunk-value $thunk)) 10)
+      55)))
+
+(check
+  (equal?
+    (syntax->thunk
+      #`(
+        (lambda fib (n)
+          (if (< n 2) n (+ (fib (- n 2)) (fib (- n 1)))))
+        10))
+    (thunk
+      (constant 55)
+      `(
+        (rec fib
+          (lambda (n)
+            (if (< n 2) n (+ (fib (- n 2)) (fib (- n 1))))))
+        10))))
+
 ; --- compile-time
 
 (check
@@ -187,6 +220,16 @@
       `(
         (lambda ($x $y) "foobar")
         "goo" "gar"))))
+
+(check
+  (equal?
+    (syntax->thunk
+      #`(compile-time
+        (
+          (lambda fib (n)
+            (if (< n 2) n (+ (fib (- n 2)) (fib (- n 1)))))
+          10)))
+    (thunk (constant 55) 55)))
 
 (check
   (raises?
