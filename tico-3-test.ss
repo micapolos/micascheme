@@ -78,8 +78,8 @@
   (equal?
     (syntax->thunk #`(quote (string-append "foo" "bar")))
     (thunk
-      (constant `(string-append "foo" "bar"))
-      `(quote (string-append "foo" "bar")))))
+      (constant '(string-append "foo" "bar"))
+      '(quote (string-append "foo" "bar")))))
 
 ; --- native
 
@@ -333,10 +333,10 @@
 
 (check
   (equal?
-    (syntax->thunk #`null)
+    (syntax->thunk #'null)
     (thunk
-      (constant `())
-      `(quote ()))))
+      (constant '())
+      ''())))
 
 (check
   (equal?
