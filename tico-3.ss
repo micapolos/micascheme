@@ -224,6 +224,13 @@
                     (constant (scope-evaluate $scope $datum))
                     (variable $index)))))
             $datum)))
+      (($apply $fn $arg ...)
+        (identifier-named? #'$apply apply)
+        (thunk-apply
+          (scope-syntax->thunk $scope #'$fn)
+          (map
+            (partial scope-syntax->thunk $scope)
+            (syntax->list #'($arg ...)))))
       (($compile-time $body)
         (identifier-named? #'$compile-time compile-time)
         (switch (thunk-value (scope-syntax->thunk $scope #'$body))

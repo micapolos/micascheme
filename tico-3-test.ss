@@ -97,7 +97,7 @@
       (constant string-append)
       `string-append)))
 
-; --- application
+; --- apply
 
 (check
   (equal?
@@ -108,11 +108,18 @@
 
 (check
   (equal?
+    (syntax->thunk #`(apply string-append "foo" "bar"))
+    (thunk
+      (constant "foobar")
+      `(string-append "foo" "bar"))))
+
+(check
+  (equal?
     (with-generate-temporary-seed $tmp
       (syntax->thunk
-        #`(string-append
-          (string-append "fo" "o")
-          (string-append "ba" "r"))))
+        #`(apply string-append
+          (apply string-append "fo" "o")
+          (apply string-append "ba" "r"))))
     (thunk
       (constant "foobar")
       `(string-append
