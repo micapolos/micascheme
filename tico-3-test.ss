@@ -126,6 +126,18 @@
           (string-append "fo" "o")
           (string-append "ba" "r")))))
 
+; --- expand
+
+(check
+  (equal?
+    (syntax->thunk
+      #`(expand
+        (native (lambda ($x $y) #`(string-append #,$x #,$y)))
+        "foo" "bar"))
+    (thunk
+      (constant "foobar")
+      `(string-append "foo" "bar"))))
+
 ; --- if
 
 (check

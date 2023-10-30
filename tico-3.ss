@@ -90,6 +90,13 @@
       (environment->scope (environment `(micascheme)))
       $syntax))
 
+  (define (scope-syntax->value $scope $syntax)
+    (switch (thunk-value (scope-syntax->thunk $scope $syntax))
+      ((constant? $constant)
+        (constant-value $constant))
+      ((else $other)
+        (syntax-error $syntax "not compile-time"))))
+
   (define (scope-syntax->thunk $scope $syntax)
     (syntax-case $syntax ()
       ($identifier
@@ -230,6 +237,12 @@
           (scope-syntax->thunk $scope #'$fn)
           (map
             (partial scope-syntax->thunk $scope)
+            (syntax->list #'($arg ...)))))
+      (($expand $fn $arg ...)
+        (identifier-named? #'$expand expand)
+        (scope-syntax->thunk $scope
+          (apply
+            (scope-syntax->value $scope #'$fn)
             (syntax->list #'($arg ...)))))
       (($compile-time $body)
         (identifier-named? #'$compile-time compile-time)
