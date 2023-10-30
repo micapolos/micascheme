@@ -1,4 +1,5 @@
 (library (tico-3)
+  ; Untyped scheme-like language with compile-time evaluation and transformers
   (export
     scope scope? scope-environment scope-bindings
     constant constant? constant-value
