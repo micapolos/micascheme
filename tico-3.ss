@@ -17,7 +17,6 @@
   (data (variable index))
   (data (hole))
   (data (scope environment bindings))
-
   (data (thunk value datum))
 
   (define (environment->scope $environment)
