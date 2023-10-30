@@ -263,20 +263,28 @@
                 (else (syntax-error #'$condition "not a boolean"))))
             ((variable? $variable)
               (syntax-error #'$condition "not a constant")))))
-      (($fn $arg ...)
+      (($name $arg ...)
+        (identifier? #'$name)
         (lets
-          ($fn-thunk (scope-syntax->thunk $scope #'$fn))
-          (switch (thunk-value $fn-thunk)
+          ($symbol (syntax->datum #'$name))
+          (switch (scope-value $scope $symbol)
             ((transformer? $transformer)
               (scope-syntax->thunk $scope
                 (app
                   (transformer-value $transformer)
-                  #'($fn $arg ...))))
-            ((else _)
-              (thunk-apply $fn-thunk
+                  #`($name $arg ...))))
+            ((else $other)
+              (thunk-apply
+                (thunk $other (syntax->datum #'$name))
                 (map
                   (partial scope-syntax->thunk $scope)
                   (syntax->list #'($arg ...))))))))
+      (($fn $arg ...)
+        (thunk-apply
+          (scope-syntax->thunk $scope #'$fn)
+          (map
+            (partial scope-syntax->thunk $scope)
+            (syntax->list #'($arg ...)))))
       ($other
         (switch (syntax->datum #'$other)
           ((boolean? $boolean)
