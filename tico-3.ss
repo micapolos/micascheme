@@ -89,6 +89,12 @@
         (identifier? #'$identifier)
         (scope-symbol->thunk $scope
           (syntax->datum #'$identifier)))
+      (($if $cond $then $else)
+        (identifier-named? #'$if if)
+        (thunk-if
+          (scope-syntax->thunk $scope #'$cond)
+          (lambda () (scope-syntax->thunk $scope #'$then))
+          (lambda () (scope-syntax->thunk $scope #'$else))))
       (($let (($param $arg) ...) $body)
         (identifier-named? #'$let let)
         (lets
@@ -240,4 +246,34 @@
 
   (define (datum-apply $fn-datum $arg-datums)
     `(,$fn-datum ,@$arg-datums))
+
+  (define (thunk-if $cond-thunk $then-thunk-fn $else-thunk-fn)
+    (switch (thunk-value $cond-thunk)
+      ((constant? $constant)
+        (if (constant-value $constant)
+          (app $then-thunk-fn)
+          (app $else-thunk-fn)))
+      ((variable? $variable)
+        (variable-thunk-if
+          $cond-thunk
+          (app $then-thunk-fn)
+          (app $else-thunk-fn)))))
+
+  (define (variable-thunk-if $cond-thunk $then-thunk $else-thunk)
+    (thunk
+      (variable
+        (apply max
+          (map variable-index
+            (filter variable?
+              (list
+                (thunk-value $cond-thunk)
+                (thunk-value $then-thunk)
+                (thunk-value $else-thunk))))))
+      (datum-if
+        (thunk-datum $cond-thunk)
+        (thunk-datum $then-thunk)
+        (thunk-datum $else-thunk))))
+
+  (define (datum-if $cond-datum $then-datum $else-datum)
+    `(if ,$cond-datum ,$then-datum ,$else-datum))
 )

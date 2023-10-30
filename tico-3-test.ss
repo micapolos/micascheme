@@ -76,6 +76,35 @@
           (string-append "fo" "o")
           (string-append "ba" "r")))))
 
+
+; --- if
+
+(check
+  (equal?
+    (syntax->thunk #`(if (= 1 1) "ok" (throw not-ok)))
+    (thunk "ok" "ok")))
+
+(check
+  (equal?
+    (syntax->thunk #`(if (= 1 2) (throw ok) "not-ok"))
+    (thunk "not-ok" "not-ok")))
+
+(check
+  (equal?
+    (syntax->thunk #`((lambda ($x) (if $x "ok" "not-ok")) (= 1 1)))
+    (thunk
+      "ok"
+      `((lambda ($x) (if $x "ok" "not-ok")) (= 1 1)))))
+
+(check
+  (equal?
+    (syntax->thunk #`((lambda ($x) (if $x "ok" "not-ok")) (= 1 2)))
+    (thunk
+      "not-ok"
+      `((lambda ($x) (if $x "ok" "not-ok")) (= 1 2)))))
+
+; --- lambda
+
 (let (($thunk (syntax->thunk #`(lambda ($x $y) "foo"))))
   (check (equal? (thunk-datum $thunk) `(lambda ($x $y) "foo")))
   (check (equal? (app (thunk-value $thunk) 1 2) "foo")))
