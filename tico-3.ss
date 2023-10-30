@@ -184,7 +184,7 @@
               (case (constant-value $constant)
                 ((#t) (scope-syntax->thunk $scope #'$body))
                 ((#f) (syntax-error #'$condition "test failed"))
-                (else (syntax-error #'$condition "not boolean"))))
+                (else (syntax-error #'$condition "not a boolean"))))
             ((variable? $variable)
               (syntax-error #'$condition "not a constant")))))
       (($fn $arg ...)
