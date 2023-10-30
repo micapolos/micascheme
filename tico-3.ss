@@ -94,8 +94,14 @@
     (syntax-case $syntax ()
       ($identifier
         (identifier? #'$identifier)
-        (scope-symbol->thunk $scope
+        (scope-symbol->identifier-thunk
+          $scope
           (syntax->datum #'$identifier)))
+      (($native $body)
+        (identifier-named? #'$native native)
+        (scope-datum->native-thunk
+          $scope
+          (syntax->datum #'$body)))
       (($begin $body)
         (identifier-named? #'$begin begin)
         (scope-syntax->thunk $scope #'$body))
@@ -265,8 +271,13 @@
   (define (literal->thunk $literal)
     (thunk (constant $literal) $literal))
 
-  (define (scope-symbol->thunk $scope $symbol)
+  (define (scope-symbol->identifier-thunk $scope $symbol)
     (thunk (scope-value $scope $symbol) $symbol))
+
+  (define (scope-datum->native-thunk $scope $datum)
+    (thunk
+      (constant (scope-evaluate $scope $datum))
+      $datum))
 
   (define (thunk-apply $fn-thunk $arg-thunks)
     (thunk

@@ -50,7 +50,7 @@
       `+)
     (variable 2)))
 
-; --- literals
+; --- literal
 
 (check
   (equal?
@@ -66,6 +66,24 @@
   (equal?
     (syntax->thunk #`"foo")
     (thunk (constant "foo") "foo")))
+
+; --- native
+
+(check
+  (equal?
+    (syntax->thunk
+      #`(native (string-append "foo" "bar")))
+    (thunk
+      (constant "foobar")
+      `(string-append "foo" "bar"))))
+
+(check
+  (raises?
+    (lambda ()
+      (syntax->thunk
+        #`(native unbound)))))
+
+; --- identifier
 
 (check
   (equal?
