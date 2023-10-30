@@ -64,6 +64,11 @@
 
 (check
   (equal?
+    (syntax->thunk #`#\space)
+    (thunk (constant #\space) #\space)))
+
+(check
+  (equal?
     (syntax->thunk #`"foo")
     (thunk (constant "foo") "foo")))
 

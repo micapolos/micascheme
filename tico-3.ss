@@ -263,6 +263,8 @@
             (literal->thunk $boolean))
           ((number? $number)
             (literal->thunk $number))
+          ((char? $char)
+            (literal->thunk $char))
           ((string? $string)
             (literal->thunk $string))
           ((else _)
@@ -302,6 +304,7 @@
       ((null? _) `())
       ((boolean? $boolean) $boolean)
       ((number? $number) $number)
+      ((char? $char) $char)
       ((string? $string) $string)
       ((pair? $pair)
         `(cons
