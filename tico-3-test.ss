@@ -239,5 +239,11 @@
 
 (check
   (equal?
-    (thunk-datum (syntax->thunk #`(lambda ($x) (cond ($x "foo") (else "bar")))))
-    `(lambda ($x) (if $x "foo" "bar"))))
+    (thunk-datum
+      (syntax->thunk
+        #`(lambda ($x)
+          (cond
+            ($x "foo")
+            (else "bar")))))
+    `(lambda ($x)
+      (if $x "foo" "bar"))))
