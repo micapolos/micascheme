@@ -263,10 +263,10 @@
                 (else (syntax-error #'$condition "not a boolean"))))
             ((variable? $variable)
               (syntax-error #'$condition "not a constant")))))
-      (($name $arg ...)
-        (identifier? #'$name)
+      (($identifier $arg ...)
+        (identifier? #'$identifier)
         (lets
-          ($symbol (syntax->datum #'$name))
+          ($symbol (syntax->datum #'$identifier))
           (switch (scope-value $scope $symbol)
             ((transformer? $transformer)
               (scope-syntax->thunk $scope
@@ -275,7 +275,7 @@
                   #`($name $arg ...))))
             ((else $other)
               (thunk-apply
-                (thunk $other (syntax->datum #'$name))
+                (thunk $other $symbol)
                 (map
                   (partial scope-syntax->thunk $scope)
                   (syntax->list #'($arg ...))))))))
