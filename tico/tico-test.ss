@@ -42,37 +42,34 @@
 
 (check
   (equal?
-    (tico-items
-      (native
-        (+ 1 2)
-        (string-append "foo" "bar")))
+    (tico-items (native "+" "(+ 1 2)"))
     (stack
-      (native->item '(+ 1 2))
-      (native->item '(string-append "foo" "bar")))))
+      (native->item '+)
+      (native->item '(+ 1 2)))))
 
 ; --- native apply
 
 (check
   (equal?
-    (tico-item (native (lambda () "foo")) apply)
+    (tico-item (native "(lambda () 128)") apply)
     (typed
       (native-type)
       (phased
-        '((lambda () "foo"))
-        (constant "foo")))))
+        '((lambda () 128))
+        (constant 128)))))
 
 (check
   (equal?
     (tico-item
-      (native (lambda ($x $y) (string-append "foo" "bar")))
+      (native "-")
       (apply
-        (native "foo")
-        (native "bar")))
+        (native "3")
+        (native "2")))
     (typed
       (native-type)
       (phased
-        '((lambda ($x $y) (string-append "foo" "bar")) "foo" "bar")
-        (constant "foobar")))))
+        '(- 3 2)
+        (constant 1)))))
 
 (check
   (raises?

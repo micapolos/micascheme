@@ -126,17 +126,14 @@
         (native-items-reader
           $scope
           (push $items
-            (scope-native->item $scope $literal))
+            (switch $literal
+              ((string? $string)
+                (scope-native->item $scope (string->native $string)))
+              ((else $other)
+                (throw not-string $other))))
           $end-fn))
       (lambda ($symbol)
-        (list-reader
-          (lambda ($list)
-            (native-items-reader
-              $scope
-              (push $items
-                (scope-native->item $scope
-                  `(,$symbol ,@$list)))
-              $end-fn))))
+        (throw not-native $symbol))
       (lambda ()
         (app $end-fn $items))))
 
@@ -199,7 +196,8 @@
       (native-type)
       (phased
         $native
-        (constant (eval $native (scope-environment $scope))))))
+        (constant
+          (eval $native (scope-environment $scope))))))
 
   (define (native->item $native)
     (scope-native->item (empty-scope) $native))
@@ -239,4 +237,15 @@
     (or
       (single $items)
       (throw not-item $items)))
+
+  (define (string->native $string)
+    (lets
+      ($port (open-input-string $string))
+      (switch (read $port)
+        ((eof-object? _)
+          (throw not-datum $string))
+        ((else $datum)
+          (switch (read $port)
+            ((eof-object? _) $datum)
+            ((else _) (throw not-datum $string)))))))
 )
