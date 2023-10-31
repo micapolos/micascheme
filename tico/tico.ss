@@ -57,13 +57,6 @@
                   $scope
                   (push-all $items $native-items)
                   $end-fn))))
-          ((quote)
-            (quote-items-reader (stack)
-              (lambda ($quote-items)
-                (items-reader
-                  $scope
-                  (push-all $items $quote-items)
-                  $end-fn))))
           ((do)
             (items-reader
               (scope+items $scope $items)
@@ -91,21 +84,6 @@
       (lambda ()
         (app $end-fn $items))))
 
-  (define (quote-items-reader $items $end-fn)
-    (reader
-      (lambda ($literal)
-        (quote-items-reader
-          (push $items (datum->item $literal))
-          $end-fn))
-      (lambda ($symbol)
-        (list-reader
-          (lambda ($list)
-            (quote-items-reader
-              (push $items
-                (datum->item (struct-type $symbol $list)))
-              $end-fn))))
-      (lambda ()
-        (app $end-fn $items))))
 
   (define (native-items-reader $scope $items $end-fn)
     (reader
@@ -190,9 +168,6 @@
 
   (define (native->item $native)
     (scope-native->item (empty-scope) $native))
-
-  (define (datum->item $item)
-    (typed (value-type $item) #f))
 
   (define (type-literal->item $type $literal)
     (typed $type

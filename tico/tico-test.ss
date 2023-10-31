@@ -50,22 +50,6 @@
       (native->item '(+ 1 2))
       (native->item '(string-append "foo" "bar")))))
 
-; --- quote
-
-(check
-  (equal?
-    (tico-item (quote 128))
-    (typed
-      (value-type 128)
-      #f)))
-
-(check
-  (equal?
-    (tico-item (quote (x 10 20)))
-    (typed
-      (value-type (struct-type 'x (list 10 20)))
-      #f)))
-
 ; --- literals
 
 (check
