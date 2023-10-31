@@ -24,11 +24,11 @@
   (data (hole))
   (data (variable index))
 
-  (define (default-environment)
+  (define (native-environment)
     (environment `(micascheme)))
 
   (define (empty-scope)
-    (scope (default-environment) (stack)))
+    (scope (native-environment) (stack)))
 
   (define-syntax-rule (tico-item $body ...)
     (car (ensure single? (tico-items $body ...))))
