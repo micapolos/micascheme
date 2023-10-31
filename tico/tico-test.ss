@@ -50,6 +50,21 @@
       (native->item '(+ 1 2))
       (native->item '(string-append "foo" "bar")))))
 
+; --- native apply
+
+(check
+  (equal?
+    (tico-item
+      (native (lambda ($x $y) (string-append $x $y)))
+      (apply
+        (native "foo")
+        (native "bar")))
+    (typed
+      (native-type)
+      (phased
+        '((lambda ($x $y) (string-append $x $y)) "foo" "bar")
+        (constant "foobar")))))
+
 ; --- literals
 
 (check

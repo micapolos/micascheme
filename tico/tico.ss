@@ -64,7 +64,42 @@
               (lambda ($do-items)
                 (items-reader $scope $do-items $end-fn))))
           ((doing) TODO)
-          ((apply) TODO)
+          ((apply)
+            (lets
+              ($item (items->item $items))
+              ($item-type
+                (switch (typed-type $item)
+                  ((native-type? $native-type) $native-type)
+                  ((lambda-type? $lambda-type) $lambda-type)
+                  ((else $other) (throw not-lambda $item))))
+              ($item-value (typed-value $item))
+              (items-reader $scope (stack)
+                (lambda ($apply-items)
+                  (lets
+                    ($apply-items (reverse $apply-items))
+                    ($apply-types (map typed-type $apply-items))
+                    ($apply-values (map typed-value $apply-items))
+                    ($phased-list (filter-opts (cons $item-value $apply-values)))
+                    ($compiled-list (map phased-compiled $phased-list))
+                    ($evaluated-list (map phased-evaluated $phased-list))
+                    (items-reader
+                      $scope
+                      (stack
+                        (typed
+                          (switch $item-type
+                            ((native-type? $native-type)
+                              $native-type)
+                            ((lambda-type? $lambda-type)
+                              (lambda-type-result $lambda-type)))
+                          (phased
+                            $compiled-list
+                            (and
+                              (for-all constant? $evaluated-list)
+                              (constant
+                                (apply
+                                  (constant-value (car $evaluated-list))
+                                  (map constant-value (cdr $evaluated-list))))))))
+                      $end-fn))))))
           ((take)
             (items-reader $scope (stack)
               (lambda ($take-items)
@@ -199,4 +234,9 @@
 
   (define (constant-tuple $constants)
     (constant (tuple-value (map constant-value $constants))))
+
+  (define (items->item $items)
+    (or
+      (single $items)
+      (throw not-item $items)))
 )

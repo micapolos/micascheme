@@ -33,8 +33,7 @@
       ((string-type? _) #t)
       ((struct-type? $struct-type)
         (exists type-dynamic? (struct-type-fields $struct-type)))
-      ((lambda-type? $lambda-type)
-        (type-dynamic? (lambda-type-result $lambda-type)))
+      ((lambda-type? $lambda-type) #t)
       ((else $other)
         (throw not-type $other))))
 
