@@ -3,6 +3,17 @@
   (tico tico)
   (tico type))
 
+; --- native->item
+
+(check
+  (equal?
+    (native->item '(+ 1 2))
+    (typed
+      (native-type)
+      (phased
+        '(+ 1 2)
+        (constant 3)))))
+
 ; --- literal->item
 
 (check
@@ -26,6 +37,18 @@
     (typed (string-type) (phased "foo" (constant "foo")))))
 
 (check (raises? (lambda () (literal->item `()))))
+
+; --- native
+
+(check
+  (equal?
+    (tico-items
+      (native
+        (+ 1 2)
+        (string-append "foo" "bar")))
+    (stack
+      (native->item '(+ 1 2))
+      (native->item '(string-append "foo" "bar")))))
 
 ; --- quote
 

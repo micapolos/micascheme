@@ -7,6 +7,7 @@
     variable variable? variable-index
     hole hole?
 
+    native->item
     literal->item
     tico-item tico-items)
   (import
@@ -23,15 +24,19 @@
   (data (hole))
   (data (variable index))
 
+  (define (default-environment)
+    (environment `(micascheme)))
+
+  (define (empty-scope)
+    (scope (default-environment) (stack)))
+
   (define-syntax-rule (tico-item $body ...)
     (car (ensure single? (tico-items $body ...))))
 
   (define-syntax-rule (tico-items $body ...)
     (reader-eval
       (items-reader
-        (scope
-          (environment `(micascheme))
-          (stack))
+        (empty-scope)
         (stack)
         identity)
       $body ...))
@@ -45,6 +50,13 @@
           $end-fn))
       (lambda ($symbol)
         (case $symbol
+          ((native)
+            (native-items-reader $scope (stack)
+              (lambda ($native-items)
+                (items-reader
+                  $scope
+                  (push-all $items $native-items)
+                  $end-fn))))
           ((quote)
             (quote-items-reader (stack)
               (lambda ($quote-items)
@@ -91,6 +103,26 @@
             (quote-items-reader
               (push $items
                 (datum->item (struct-type $symbol $list)))
+              $end-fn))))
+      (lambda ()
+        (app $end-fn $items))))
+
+  (define (native-items-reader $scope $items $end-fn)
+    (reader
+      (lambda ($literal)
+        (native-items-reader
+          $scope
+          (push $items
+            (scope-native->item $scope $literal))
+          $end-fn))
+      (lambda ($symbol)
+        (list-reader
+          (lambda ($list)
+            (native-items-reader
+              $scope
+              (push $items
+                (scope-native->item $scope
+                  `(,$symbol ,@$list)))
               $end-fn))))
       (lambda ()
         (app $end-fn $items))))
@@ -148,6 +180,16 @@
         (type-literal->item (string-type) $string))
       ((else $other)
         (throw invalid-literal $literal))))
+
+  (define (scope-native->item $scope $native)
+    (typed
+      (native-type)
+      (phased
+        $native
+        (constant (eval $native (scope-environment $scope))))))
+
+  (define (native->item $native)
+    (scope-native->item (empty-scope) $native))
 
   (define (datum->item $item)
     (typed (value-type $item) #f))
