@@ -140,6 +140,8 @@
     (switch $literal
       ((boolean? $boolean)
         (type-literal->item (boolean-type) $boolean))
+      ((char? $char)
+        (type-literal->item (char-type) $char))
       ((number? $number)
         (type-literal->item (number-type) $number))
       ((string? $string)

@@ -6,6 +6,7 @@
     boolean-type boolean-type?
     number-type number-type?
     string-type string-type?
+    char-type char-type?
     struct-type struct-type? struct-type-name struct-type-fields
     lambda-type lambda-type? lambda-type-params lambda-type-result
 

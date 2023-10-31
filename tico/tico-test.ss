@@ -17,6 +17,11 @@
 
 (check
   (equal?
+    (literal->item #\a)
+    (typed (char-type) (phased #\a (constant #\a)))))
+
+(check
+  (equal?
     (literal->item "foo")
     (typed (string-type) (phased "foo" (constant "foo")))))
 
@@ -49,6 +54,11 @@
   (equal?
     (tico-item 128)
     (literal->item 128)))
+
+(check
+  (equal?
+    (tico-item #\a)
+    (literal->item #\a)))
 
 (check
   (equal?
