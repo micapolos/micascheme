@@ -54,16 +54,38 @@
 
 (check
   (equal?
+    (tico-item (native (lambda () "foo")) apply)
+    (typed
+      (native-type)
+      (phased
+        '((lambda () "foo"))
+        (constant "foo")))))
+
+(check
+  (equal?
     (tico-item
-      (native (lambda ($x $y) (string-append $x $y)))
+      (native (lambda ($x $y) (string-append "foo" "bar")))
       (apply
         (native "foo")
         (native "bar")))
     (typed
       (native-type)
       (phased
-        '((lambda ($x $y) (string-append $x $y)) "foo" "bar")
+        '((lambda ($x $y) (string-append "foo" "bar")) "foo" "bar")
         (constant "foobar")))))
+
+(check
+  (raises?
+    (lambda ()
+      (tico-item apply))))
+
+(check
+  (raises?
+    (lambda ()
+      (tico-item
+        (native "foo")
+        (native "bar")
+        apply))))
 
 ; --- literals
 
