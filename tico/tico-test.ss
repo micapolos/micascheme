@@ -42,8 +42,19 @@
 
 (check
   (equal?
-    (tico-items (native "+" "(+ 1 2)"))
+    (tico-items
+      (native
+        "#f"
+        "128"
+        "\"foo\""
+        "#\\a"
+        "+"
+        "(+ 1 2)"))
     (stack
+      (native->item #f)
+      (native->item 128)
+      (native->item "foo")
+      (native->item #\a)
       (native->item '+)
       (native->item '(+ 1 2)))))
 
