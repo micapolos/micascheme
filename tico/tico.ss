@@ -42,6 +42,13 @@
           $end-fn))
       (lambda ($symbol)
         (case $symbol
+          ((quote)
+            (quote-items-reader (stack)
+              (lambda ($quote-items)
+                (items-reader
+                  $scope
+                  (push-list $item-stack $quote-items)
+                  $end-fn))))
           ((do)
             (items-reader
               (scope+items $scope (reverse $item-stack))
@@ -67,6 +74,22 @@
                   $scope
                   (push $item-stack (struct-item $symbol $struct-items))
                   $end-fn))))))
+      (lambda ()
+        (app $end-fn (reverse $item-stack)))))
+
+  (define (quote-items-reader $item-stack $end-fn)
+    (reader
+      (lambda ($literal)
+        (quote-items-reader
+          (push $item-stack (datum->item $literal))
+          $end-fn))
+      (lambda ($symbol)
+        (list-reader
+          (lambda ($list)
+            (quote-items-reader
+              (push $item-stack
+                (datum->item (struct-type $symbol $list)))
+              $end-fn))))
       (lambda ()
         (app $end-fn (reverse $item-stack)))))
 
@@ -100,6 +123,9 @@
         (type-literal->item (string-type) $string))
       ((else $other)
         (throw invalid-literal $literal))))
+
+  (define (datum->item $item)
+    (typed (value-type $item) #f))
 
   (define (type-literal->item $type $literal)
     (typed $type

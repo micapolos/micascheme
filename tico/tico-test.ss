@@ -5,6 +5,20 @@
 
 (check
   (equal?
+    (tico-item (quote 128))
+    (typed
+      (value-type 128)
+      #f)))
+
+(check
+  (equal?
+    (tico-item (quote (x 10 20)))
+    (typed
+      (value-type (struct-type 'x (list 10 20)))
+      #f)))
+
+(check
+  (equal?
     (tico-item #f)
     (typed
       (boolean-type)

@@ -1,6 +1,7 @@
 (library (tico type)
   (export
     value-type value-type? value-type-value
+    native-type native-type?
     type-type type-type?
     boolean-type boolean-type?
     number-type number-type?
@@ -12,6 +13,7 @@
   (import (micascheme))
 
   (data (value-type value))
+  (data (native-type))
   (data (type-type))
   (data (boolean-type))
   (data (number-type))
@@ -23,6 +25,7 @@
   (define (type-dynamic? $type)
     (switch $type
       ((value-type? _) #f)
+      ((native-type? _) #t)
       ((boolean-type? _) #t)
       ((number-type? _) #t)
       ((string-type? _) #t)
