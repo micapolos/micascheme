@@ -14,6 +14,11 @@
         '(+ 1 2)
         (constant 3)))))
 
+(check
+  (raises?
+    (lambda ()
+      (native->item 'foo))))
+
 ; --- literal->item
 
 (check
