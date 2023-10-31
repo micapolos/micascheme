@@ -5,7 +5,9 @@
     phased phased? phased-compiled phased-evaluated
     constant constant? constant-value
     variable variable? variable-index
+    hole hole?
 
+    literal->item
     tico-item tico-items)
   (import
     (micascheme)
@@ -18,6 +20,7 @@
   (data (typed type value))
   (data (phased compiled evaluated))
   (data (constant value))
+  (data (hole))
   (data (variable index))
 
   (define-syntax-rule (tico-item $body ...)
@@ -33,12 +36,12 @@
         identity)
       $body ...))
 
-  (define (items-reader $scope $item-stack $end-fn)
+  (define (items-reader $scope $items $end-fn)
     (reader
       (lambda ($literal)
         (items-reader
           $scope
-          (push $item-stack (literal->item $literal))
+          (push $items (literal->item $literal))
           $end-fn))
       (lambda ($symbol)
         (case $symbol
@@ -47,17 +50,14 @@
               (lambda ($quote-items)
                 (items-reader
                   $scope
-                  (push-list $item-stack $quote-items)
+                  (push-all $items $quote-items)
                   $end-fn))))
           ((do)
             (items-reader
-              (scope+items $scope (reverse $item-stack))
+              (scope+items $scope $items)
               (stack)
               (lambda ($do-items)
-                (items-reader
-                  $scope
-                  (reverse $do-items)
-                  $end-fn))))
+                (items-reader $scope $do-items $end-fn))))
           ((doing) TODO)
           ((apply) TODO)
           ((take)
@@ -65,43 +65,66 @@
               (lambda ($take-items)
                 (items-reader
                   $scope
-                  (push-list $item-stack $take-items)
+                  (push-all $items $take-items)
                   $end-fn))))
           (else
             (items-reader $scope (stack)
               (lambda ($struct-items)
                 (items-reader
                   $scope
-                  (push $item-stack (struct-item $symbol $struct-items))
+                  (scope-items->items $scope
+                    (push $items
+                      (struct-item $symbol (reverse $struct-items))))
                   $end-fn))))))
       (lambda ()
-        (app $end-fn (reverse $item-stack)))))
+        (app $end-fn $items))))
 
-  (define (quote-items-reader $item-stack $end-fn)
+  (define (quote-items-reader $items $end-fn)
     (reader
       (lambda ($literal)
         (quote-items-reader
-          (push $item-stack (datum->item $literal))
+          (push $items (datum->item $literal))
           $end-fn))
       (lambda ($symbol)
         (list-reader
           (lambda ($list)
             (quote-items-reader
-              (push $item-stack
+              (push $items
                 (datum->item (struct-type $symbol $list)))
               $end-fn))))
       (lambda ()
-        (app $end-fn (reverse $item-stack)))))
+        (app $end-fn $items))))
+
+  (define (scope-items->items $scope $items)
+    $items)
+
+  (define (bindings-type->item $bindings $type)
+    (indexed-find
+      (lambda ($index $binding)
+        (binding-type-index->item $binding $type $index))
+      $bindings))
+
+  (define (binding-type-index->item $binding $type $index)
+    (and
+      (type-matches? $type (typed-type $binding))
+      (typed $type
+        (lets
+          ($phased (typed-value $binding))
+          (and $phased
+            (phased
+              (phased-compiled $phased)
+              (switch (phased-evaluated $phased)
+                ((constant? $constant) $constant)
+                ((hole? $hole) (variable $index)))))))))
 
   (define (scope+items $scope $items)
-    (fold-left scope+item $scope $items))
+    (fold-left scope+binding $scope
+      (map item->binding (reverse $items))))
 
-  (define (scope+item $scope $item)
+  (define (scope+binding $scope $binding)
     (scope
       (scope-environment $scope)
-      (push
-        (scope-bindings $scope)
-        (item->binding $item))))
+      (push (scope-bindings $scope) $binding)))
 
   (define (item->binding $item)
     (typed

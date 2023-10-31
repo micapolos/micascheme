@@ -9,7 +9,8 @@
     struct-type struct-type? struct-type-name struct-type-fields
     lambda-type lambda-type? lambda-type-params lambda-type-result
 
-    type-dynamic?)
+    type-dynamic?
+    type-matches?)
   (import (micascheme))
 
   (data (value-type value))
@@ -35,4 +36,7 @@
         (type-dynamic? (lambda-type-result $lambda-type)))
       ((else $other)
         (throw not-type $other))))
+
+  (define (type-matches? $type $pattern)
+    (equal? $type $pattern))
 )
