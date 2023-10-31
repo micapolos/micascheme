@@ -16,6 +16,7 @@
   (data (boolean-type))
   (data (number-type))
   (data (string-type))
+  (data (char-type))
   (data (struct-type name fields))
   (data (lambda-type params result))
 
