@@ -1,78 +1,74 @@
 (library (tico tico)
-  (export)
+  (export
+    scope scope? scope-environment scope-bindings
+    typed typed? typed-type typed-value
+    phased phased? phased-compiled phased-evaluated
+    constant constant? constant-value
+    variable variable? variable-index
+
+    tico-item tico-items)
   (import
     (micascheme)
+    (leo reader)
     (tico type)
+    (tico expression)
     (tico value))
 
-  (data (scope environment items))
-  (data (item type value))
-  (data (thunk datum value))
+  (data (scope environment bindings))
+  (data (typed type value))
+  (data (phased compiled evaluated))
   (data (constant value))
   (data (variable index))
-  (data (hole))
-  (data (symbolic symbol value))
 
-  (define (take-reader $scope $items $end-fn)
+  (define-syntax-rule (tico-item $body ...)
+    (car (ensure single? (tico-items $body ...))))
+
+  (define-syntax-rule (tico-items $body ...)
+    (reader-eval
+      (items-reader
+        (scope
+          (environment `(micascheme))
+          (stack))
+        (stack)
+        identity)
+      $body ...))
+
+  (define (items-reader $scope $item-stack $end-fn)
     (reader
       (lambda ($literal)
-        (take-reader
+        (items-reader
           $scope
-          (push $items (literal->item $literal))
+          (push $item-stack (literal->item $literal))
           $end-fn))
       (lambda ($symbol)
         (case $symbol
           ((do)
-            (take-reader
-              (scope+items $scope $items)
+            (items-reader
+              (scope+items $scope (reverse $item-stack))
               (stack)
-              (lambda ($take-items)
-                (take-reader
+              (lambda ($do-items)
+                (items-reader
                   $scope
-                  $take-items
+                  (reverse $do-items)
                   $end-fn))))
           ((doing) TODO)
           ((apply) TODO)
           ((take)
-            (take-reader $scope (stack)
+            (items-reader $scope (stack)
               (lambda ($take-items)
-                (take-reader
+                (items-reader
                   $scope
-                  (push $items $take-items)
+                  (push-list $item-stack $take-items)
                   $end-fn))))
-          ((make)
-            (make-reader $scope (stack)
-              (lambda ($make-items)
-                (take-reader
-                  $scope
-                  (push $items (struct-item $symbol $top-level-items))
-                  $end-fn)))))
           (else
-            (take-reader $scope (stack)
-              (lambda ($top-level-items)
-                (top-level-reader
+            (items-reader $scope (stack)
+              (lambda ($struct-items)
+                (items-reader
                   $scope
-                  (push $items (struct-item $symbol $top-level-items))
+                  (push $item-stack (struct-item $symbol $struct-items))
                   $end-fn))))))
       (lambda ()
-        (app $end-fn $items))))
-
-  (define (make-reader $scope $items $end-fn)
-    (reader
-      (lambda ($literal)
-        (make-reader
-          $scope
-          (push $items (literal->item $literal))
-          $end-fn))
-      (lambda ($symbol)
-        (take-reader $scope (stack)
-          (lambda ($top-level-items)
-            (make-reader
-              $scope
-              (push $items (struct-item $symbol $top-level-items))
-              $end-fn))))
-      (lambda ()
-        (app $end-fn $items))))
+        (app $end-fn (reverse $item-stack)))))
 
   (define (scope+items $scope $items)
     (fold-left scope+item $scope $items))
@@ -81,18 +77,18 @@
     (scope
       (scope-environment $scope)
       (push
-        (scope-items $scope)
-        (binding-item $item))))
+        (scope-bindings $scope)
+        (item->binding $item))))
 
-  (define (thunk-item->binding-item $item)
-    (item
-      (item-type $item)
-      (thunk->binding (item-value $item))))
+  (define (item->binding $item)
+    (typed
+      (typed-type $item)
+      (phased->binding (typed-value $item))))
 
-  (define (thunk->binding $thunk)
-    (switch (thunk-value $thunk)
+  (define (phased->binding $phased)
+    (switch (phased-evaluated $phased)
       ((constant? $constant) $constant)
-      ((variable? _) (hole))))
+      ((variable? _) #f)))
 
   (define (literal->item $literal)
     (switch $literal
@@ -107,18 +103,32 @@
 
   (define (type-literal->item $type $literal)
     (typed $type
-      (thunk $literal
+      (phased
+        $literal
         (constant $literal))))
 
   (define (struct-item $symbol $items)
-    (item
+    (typed
       (struct-type $symbol
-        (map item-type $items))
-      (tuple-value
-        (filter item-value-opt $items))))
+        (map typed-type $items))
+      (phased-tuple
+        (filter typed-value $items))))
 
-  (define (tuple-value $values)
-    (value
-      (tuple-expression (map value-comptime $values))
-      (runtime-tuple (map value-runtime $values))))
+  (define (phased-tuple $phaseds)
+    (and
+      (not (null? $phaseds))
+      (phased
+        (compiled-tuple (map phased-compiled $phaseds))
+        (evaluated-tuple (map phased-evaluated $phaseds)))))
+
+  (define (compiled-tuple $compileds)
+    (tuple-expression $compileds))
+
+  (define (evaluated-tuple $evaluated)
+    (and
+      (for-all constant? $evaluated)
+      (constant-tuple $evaluated)))
+
+  (define (constant-tuple $constants)
+    (constant (tuple-value (map constant-value $constants))))
 )
