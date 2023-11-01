@@ -10,6 +10,10 @@
     char-type
     struct-type struct-type? struct-type-name struct-type-fields
     lambda-type lambda-type? lambda-type-params lambda-type-result
+    abstraction abstraction? abstraction-arity abstraction-body
+    recursion recursion? recursion-items
+    application application? application-target application-args
+    var var? var-index
 
     type-dynamic?
     types-arity
@@ -22,6 +26,10 @@
   (data (native-type))
   (data (struct-type name fields))
   (data (lambda-type params result))
+  (data (abstraction arity body))
+  (data (application target args))
+  (data (recursion items))
+  (data (var index))
 
   (define (boolean-type)
     (struct-type 'boolean (list (native-type))))
