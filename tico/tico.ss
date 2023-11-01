@@ -7,8 +7,8 @@
     variable variable? variable-index
     hole hole?
 
-    native->item
-    literal->item
+    native-item
+    literal-item
     struct-item
     tico-item tico-items)
   (import
@@ -47,7 +47,7 @@
       (lambda ($literal)
         (items-reader
           $scope
-          (push $items (literal->item $literal))
+          (push $items (literal-item $literal))
           $end-fn))
       (lambda ($symbol)
         (case $symbol
@@ -136,7 +136,7 @@
           (push $items
             (switch $literal
               ((string? $string)
-                (scope-native->item $scope (string->native $string)))
+                (scope-native-item $scope (string->native $string)))
               ((else $other)
                 (throw not-string $other))))
           $end-fn))
@@ -201,20 +201,20 @@
       ((constant? $constant) $constant)
       ((variable? _) #f)))
 
-  (define (literal->item $literal)
+  (define (literal-item $literal)
     (switch $literal
       ((boolean? $boolean)
-        (type-literal->item (boolean-type) $boolean))
+        (type-literal-item (boolean-type) $boolean))
       ((char? $char)
-        (type-literal->item (char-type) $char))
+        (type-literal-item (char-type) $char))
       ((number? $number)
-        (type-literal->item (number-type) $number))
+        (type-literal-item (number-type) $number))
       ((string? $string)
-        (type-literal->item (string-type) $string))
+        (type-literal-item (string-type) $string))
       ((else $other)
         (throw invalid-literal $literal))))
 
-  (define (scope-native->item $scope $native)
+  (define (scope-native-item $scope $native)
     (typed
       (native-type)
       (phased
@@ -222,10 +222,10 @@
         (constant
           (eval $native (scope-environment $scope))))))
 
-  (define (native->item $native)
-    (scope-native->item (empty-scope) $native))
+  (define (native-item $native)
+    (scope-native-item (empty-scope) $native))
 
-  (define (type-literal->item $type $literal)
+  (define (type-literal-item $type $literal)
     (typed $type
       (phased
         $literal

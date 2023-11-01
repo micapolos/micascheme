@@ -3,11 +3,11 @@
   (tico tico)
   (tico type))
 
-; --- native->item
+; --- native-item
 
 (check
   (equal?
-    (native->item '(+ 1 2))
+    (native-item '(+ 1 2))
     (typed
       (native-type)
       (phased
@@ -17,31 +17,31 @@
 (check
   (raises?
     (lambda ()
-      (native->item 'foo))))
+      (native-item 'foo))))
 
-; --- literal->item
+; --- literal-item
 
 (check
   (equal?
-    (literal->item #f)
+    (literal-item #f)
     (typed (boolean-type) (phased #f (constant #f)))))
 
 (check
   (equal?
-    (literal->item 128)
+    (literal-item 128)
     (typed (number-type) (phased 128 (constant 128)))))
 
 (check
   (equal?
-    (literal->item #\a)
+    (literal-item #\a)
     (typed (char-type) (phased #\a (constant #\a)))))
 
 (check
   (equal?
-    (literal->item "foo")
+    (literal-item "foo")
     (typed (string-type) (phased "foo" (constant "foo")))))
 
-(check (raises? (lambda () (literal->item `()))))
+(check (raises? (lambda () (literal-item `()))))
 
 ; --- struct-item
 
@@ -54,7 +54,7 @@
 
 (check
   (equal?
-    (struct-item 'foo (list (literal->item "foo")))
+    (struct-item 'foo (list (literal-item "foo")))
     (typed
       (struct-type 'foo (list (string-type)))
       (phased
@@ -63,7 +63,7 @@
 
 (check
   (equal?
-    (struct-item 'foo (list (literal->item "foo") (literal->item 10)))
+    (struct-item 'foo (list (literal-item "foo") (literal-item 10)))
     (typed
       (struct-type 'foo (list (string-type) (number-type)))
       (phased
@@ -72,7 +72,7 @@
 
 (check
   (equal?
-    (struct-item 'foo (list (literal->item "foo") (literal->item 10) (native->item '+)))
+    (struct-item 'foo (list (literal-item "foo") (literal-item 10) (native-item '+)))
     (typed
       (struct-type 'foo (list (string-type) (number-type) (native-type)))
       (phased
@@ -92,12 +92,12 @@
         "+"
         "(+ 1 2)"))
     (stack
-      (native->item #f)
-      (native->item 128)
-      (native->item "foo")
-      (native->item #\a)
-      (native->item '+)
-      (native->item '(+ 1 2)))))
+      (native-item #f)
+      (native-item 128)
+      (native-item "foo")
+      (native-item #\a)
+      (native-item '+)
+      (native-item '(+ 1 2)))))
 
 ; --- native apply
 
@@ -141,22 +141,22 @@
 (check
   (equal?
     (tico-item #f)
-    (literal->item #f)))
+    (literal-item #f)))
 
 (check
   (equal?
     (tico-item 128)
-    (literal->item 128)))
+    (literal-item 128)))
 
 (check
   (equal?
     (tico-item #\a)
-    (literal->item #\a)))
+    (literal-item #\a)))
 
 (check
   (equal?
     (tico-item "foo")
-    (literal->item "foo")))
+    (literal-item "foo")))
 
 ; --- take
 
@@ -171,10 +171,10 @@
       10 20
       (take 30 40))
     (stack
-      (literal->item 10)
-      (literal->item 20)
-      (literal->item 30)
-      (literal->item 40))))
+      (literal-item 10)
+      (literal-item 20)
+      (literal-item 30)
+      (literal-item 40))))
 
 ; --- struct
 
@@ -191,19 +191,19 @@
 (check
   (equal?
     (tico-item (struct (x 10)))
-    (struct-item 'x (list (literal->item 10)))))
+    (struct-item 'x (list (literal-item 10)))))
 
 (check
   (equal?
     (tico-item (struct (x 10 "foo")))
-    (struct-item 'x (list (literal->item 10) (literal->item "foo")))))
+    (struct-item 'x (list (literal-item 10) (literal-item "foo")))))
 
 (check
   (equal?
     (tico-items (struct (x 10) (y "foo")))
     (stack
-      (struct-item 'x (list (literal->item 10)))
-      (struct-item 'y (list (literal->item "foo"))))))
+      (struct-item 'x (list (literal-item 10)))
+      (struct-item 'y (list (literal-item "foo"))))))
 
 ; --- ordering
 
@@ -211,6 +211,6 @@
   (equal?
     (tico-items #f 1 "foo")
     (stack
-      (literal->item #f)
-      (literal->item 1)
-      (literal->item "foo"))))
+      (literal-item #f)
+      (literal-item 1)
+      (literal-item "foo"))))
