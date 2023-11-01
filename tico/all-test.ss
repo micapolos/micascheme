@@ -5,4 +5,4 @@
   (tico value)
   (tico expression)
   (tico datum)
-  (tico tico))
+  (tico reader))
