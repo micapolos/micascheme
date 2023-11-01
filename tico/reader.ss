@@ -77,6 +77,13 @@
                   $scope
                   (push-all $items $native-items)
                   $end-fn))))
+          ((typeof)
+            (items-reader $scope (stack)
+              (lambda ($typeof-items)
+                (items-reader
+                  $scope
+                  (push-all $items (map item->typeof-item $typeof-items))
+                  $end-fn))))
           ((do)
             (lets
               ($arity (length $items))
@@ -370,6 +377,15 @@
           (switch (read $port)
             ((eof-object? _) $datum)
             ((else _) (throw not-datum $string)))))))
+
+  (define (item->typeof-item $item)
+    (typed
+      (type-type)
+      (lets
+        ($type (typed-type $item))
+        (phased
+          (value->datum $type)
+          (constant $type)))))
 
   (define (item->evaluated-type $item)
     (lets

@@ -174,6 +174,35 @@
     (lambda ()
       (tico-item (compile (native "string-append"))))))
 
+; --- typeof
+
+(check
+  (equal?
+    (tico-item (typeof x))
+    (typed
+      (type-type)
+      (phased
+        `(struct-type 'x (list))
+        (constant (struct-type 'x (list)))))))
+
+(check
+  (equal?
+    (tico-item (typeof (native "128")))
+    (typed
+      (type-type)
+      (phased
+        `(native-type)
+        (constant (native-type))))))
+
+(check
+  (equal?
+    (tico-item (typeof (x (native "128"))))
+    (typed
+      (type-type)
+      (phased
+        `(struct-type 'x (list (native-type)))
+        (constant (struct-type 'x (list (native-type))))))))
+
 ; --- native apply
 
 (check
