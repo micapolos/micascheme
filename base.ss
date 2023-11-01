@@ -25,7 +25,7 @@
     opt-lift
     current-seconds
     works?
-    check checking? test-all
+    check checking?
     generate-symbol generate-symbols
     with-generate-temporary-seed
     ensure
@@ -178,10 +178,6 @@
     (datum->syntax $id
       (string->symbol 
         (lets ($var (symbol->string (syntax->datum $id))) $body))))
-
-  (define-syntax-rule (test-all file ...) 
-    (begin
-      (let () (load file)) ...))
 
   (define (bind-if $pred $obj $fn)
     (if ($pred $obj) ($fn $obj) $obj))
