@@ -9,7 +9,7 @@
     string-type
     char-type
     struct struct? struct-name struct-fields
-    lambda-type lambda-type? lambda-type-params lambda-type-result
+    arrow arrow? arrow-params arrow-result
     abstraction abstraction? abstraction-arity abstraction-body
     recursion recursion? recursion-items
     application application? application-target application-args
@@ -25,7 +25,7 @@
   (data (type-type))
   (data (native-type))
   (data (struct name fields))
-  (data (lambda-type params result))
+  (data (arrow params result))
   (data (abstraction arity body))
   (data (application target args))
   (data (recursion items))
@@ -50,7 +50,7 @@
       ((type-type? _) #t)
       ((struct? $struct)
         (exists type-dynamic? (struct-fields $struct)))
-      ((lambda-type? $lambda-type) #t)
+      ((arrow? $arrow) #t)
       ((else $other)
         (throw not-type $other))))
 
@@ -80,15 +80,15 @@
           (types-match?
             (struct-fields $type)
             (struct-fields $struct))))
-      ((lambda-type? $lambda-type)
+      ((arrow? $arrow)
         (and
-          (lambda-type? $type)
+          (arrow? $type)
           (types-match?
-            (lambda-type-params $type)
-            (lambda-type-params $lambda-type))
+            (arrow-params $type)
+            (arrow-params $arrow))
           (type-matches?
-            (lambda-type-result $lambda-type)
-            (lambda-type-result $type))))
+            (arrow-result $arrow)
+            (arrow-result $type))))
       ((else $other)
         (throw not-type $pattern))))
 

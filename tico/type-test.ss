@@ -5,7 +5,7 @@
 (check (equal? (type-dynamic? (type-type)) #t))
 (check (equal? (type-dynamic? (struct `foo (list (value-type "foo") (value-type "bar")))) #f))
 (check (equal? (type-dynamic? (struct `foo (list (value-type "foo") (number-type)))) #t))
-(check (equal? (type-dynamic? (lambda-type (list (value-type "foo")) (value-type "bar"))) #t))
+(check (equal? (type-dynamic? (arrow (list (value-type "foo")) (value-type "bar"))) #t))
 (check (raises? (lambda () (type-dynamic? `not-type))))
 
 ; --- types-arity
@@ -100,33 +100,33 @@
 
 (check
   (type-matches? 
-    (lambda-type (list (any-type) (native-type)) (value-type "foo"))
-    (lambda-type (list (any-type) (native-type)) (value-type "foo"))))
+    (arrow (list (any-type) (native-type)) (value-type "foo"))
+    (arrow (list (any-type) (native-type)) (value-type "foo"))))
 
 (check
   (type-matches? 
-    (lambda-type (list (value-type "foo") (native-type)) (value-type "foo"))
-    (lambda-type (list (any-type) (native-type)) (value-type "foo"))))
+    (arrow (list (value-type "foo") (native-type)) (value-type "foo"))
+    (arrow (list (any-type) (native-type)) (value-type "foo"))))
 
 (check
   (type-matches? 
-    (lambda-type (list (any-type) (native-type)) (any-type))
-    (lambda-type (list (any-type) (native-type)) (value-type "foo"))))
+    (arrow (list (any-type) (native-type)) (any-type))
+    (arrow (list (any-type) (native-type)) (value-type "foo"))))
 
 (check
   (not
     (type-matches? 
-      (lambda-type (list (any-type) (value-type "foo")) (value-type "foo"))
-      (lambda-type (list (any-type) (native-type)) (value-type "foo")))))
+      (arrow (list (any-type) (value-type "foo")) (value-type "foo"))
+      (arrow (list (any-type) (native-type)) (value-type "foo")))))
 
 (check
   (not
     (type-matches? 
-      (lambda-type (list (any-type) (native-type)) (value-type "bar"))
-      (lambda-type (list (any-type) (native-type)) (value-type "foo")))))
+      (arrow (list (any-type) (native-type)) (value-type "bar"))
+      (arrow (list (any-type) (native-type)) (value-type "foo")))))
 
 (check
   (not
     (type-matches? 
       (native-type)
-      (lambda-type (list (any-type) (native-type)) (value-type "foo")))))
+      (arrow (list (any-type) (native-type)) (value-type "foo")))))

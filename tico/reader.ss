@@ -164,7 +164,7 @@
               ($item-type
                 (switch (typed-type $item)
                   ((native-type? $native-type) $native-type)
-                  ((lambda-type? $lambda-type) $lambda-type)
+                  ((arrow? $arrow) $arrow)
                   ((else $other) (throw not-lambda $item))))
               ($item-value (typed-value $item))
               (items-reader $scope (stack)
@@ -183,8 +183,8 @@
                           (switch $item-type
                             ((native-type? $native-type)
                               $native-type)
-                            ((lambda-type? $lambda-type)
-                              (lambda-type-result $lambda-type)))
+                            ((arrow? $arrow)
+                              (arrow-result $arrow)))
                           (phased
                             $compiled-list
                             (and

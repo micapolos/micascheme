@@ -20,5 +20,5 @@
 
 (check 
 	(equal? 
-		(value->datum (lambda-type (list "foo" "bar") "zoo"))
-		`(lambda-type (list "foo" "bar") "zoo")))
+		(value->datum (arrow (list "foo" "bar") "zoo"))
+		`(arrow (list "foo" "bar") "zoo")))

@@ -30,10 +30,10 @@
         `(struct
           ,(value->datum (struct-name $struct))
           (list ,@(map value->datum (struct-fields $struct)))))
-      ((lambda-type? $lambda-type)
-        `(lambda-type 
-          (list ,@(map value->datum (lambda-type-params $lambda-type)))
-          ,(value->datum (lambda-type-result $lambda-type))))
+      ((arrow? $arrow)
+        `(arrow
+          (list ,@(map value->datum (arrow-params $arrow)))
+          ,(value->datum (arrow-result $arrow))))
       ((else $other)
         (throw value->datum $value))))
 
