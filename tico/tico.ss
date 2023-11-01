@@ -63,6 +63,7 @@
               (stack)
               (lambda ($do-items)
                 (items-reader $scope $do-items $end-fn))))
+          ((get) TODO)
           ((doing) TODO)
           ((apply)
             (lets
