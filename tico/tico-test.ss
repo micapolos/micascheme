@@ -137,6 +137,11 @@
       (item-compile (struct-item 'x (list (literal-item 10) (literal-item 20) (literal-item 30))))
       (item-compile (native-item "foobar")))))
 
+(check
+  (raises?
+    (lambda ()
+      (tico-item (compile (native "string-append"))))))
+
 ; --- native apply
 
 (check
