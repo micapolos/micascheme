@@ -3,8 +3,8 @@
 (check (equal? (type-dynamic? (value-type "foo")) #f))
 (check (equal? (type-dynamic? (native-type)) #t))
 (check (equal? (type-dynamic? (type-type)) #t))
-(check (equal? (type-dynamic? (struct-type `foo (list (value-type "foo") (value-type "bar")))) #f))
-(check (equal? (type-dynamic? (struct-type `foo (list (value-type "foo") (number-type)))) #t))
+(check (equal? (type-dynamic? (struct `foo (list (value-type "foo") (value-type "bar")))) #f))
+(check (equal? (type-dynamic? (struct `foo (list (value-type "foo") (number-type)))) #t))
 (check (equal? (type-dynamic? (lambda-type (list (value-type "foo")) (value-type "bar"))) #t))
 (check (raises? (lambda () (type-dynamic? `not-type))))
 
@@ -60,43 +60,43 @@
 
 (check
   (type-matches? 
-    (struct-type 'foo (list (any-type) (native-type)))
-    (struct-type 'foo (list (any-type) (native-type)))))
+    (struct 'foo (list (any-type) (native-type)))
+    (struct 'foo (list (any-type) (native-type)))))
 
 (check
   (type-matches? 
-    (struct-type 'foo (list (value-type "foo") (native-type)))
-    (struct-type 'foo (list (any-type) (native-type)))))
+    (struct 'foo (list (value-type "foo") (native-type)))
+    (struct 'foo (list (any-type) (native-type)))))
 
 (check
   (not
     (type-matches? 
-      (struct-type 'bar (list (any-type) (native-type)))
-      (struct-type 'foo (list (any-type) (native-type))))))
+      (struct 'bar (list (any-type) (native-type)))
+      (struct 'foo (list (any-type) (native-type))))))
 
 (check
   (not
     (type-matches? 
-      (struct-type 'foo (list (any-type)))
-      (struct-type 'foo (list (any-type) (native-type))))))
+      (struct 'foo (list (any-type)))
+      (struct 'foo (list (any-type) (native-type))))))
 
 (check
   (not
     (type-matches? 
-      (struct-type 'foo (list (any-type) (native-type)))
-      (struct-type 'foo (list (any-type))))))
+      (struct 'foo (list (any-type) (native-type)))
+      (struct 'foo (list (any-type))))))
 
 (check
   (not
     (type-matches? 
-      (struct-type 'foo (list (any-type) (value-type "foo")))
-      (struct-type 'foo (list (any-type) (native-type))))))
+      (struct 'foo (list (any-type) (value-type "foo")))
+      (struct 'foo (list (any-type) (native-type))))))
 
 (check
   (not
     (type-matches? 
       (native-type)
-      (struct-type 'foo (list (any-type) (native-type))))))
+      (struct 'foo (list (any-type) (native-type))))))
 
 (check
   (type-matches? 

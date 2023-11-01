@@ -15,26 +15,26 @@
 (check 
   (equal? 
     (types-values->types 
-      (list (native-type) (struct-type 'foo (list)) (native-type))
+      (list (native-type) (struct 'foo (list)) (native-type))
       (list (number-type) (boolean-type)))
-    (list (number-type) (struct-type 'foo (list)) (boolean-type))))
+    (list (number-type) (struct 'foo (list)) (boolean-type))))
 
 ; --- type-value->type
 
 (check 
   (equal? 
     (type-value->type
-      (struct-type 'foo 
+      (struct 'foo
         (list 
           (native-type)
-          (struct-type 'bar (list)) 
-          (struct-type 'zoo (list (native-type)))))
+          (struct 'bar (list))
+          (struct 'zoo (list (native-type)))))
       (cons (number-type) (boolean-type)))
-    (struct-type 'foo
+    (struct 'foo
       (list 
         (number-type) 
-        (struct-type 'bar (list)) 
-        (struct-type 'zoo (list (boolean-type)))))))
+        (struct 'bar (list))
+        (struct 'zoo (list (boolean-type)))))))
 
 ; --- native-item
 
@@ -102,14 +102,14 @@
   (equal?
     (struct-item 'foo (list))
     (typed
-      (struct-type 'foo (list))
+      (struct 'foo (list))
       #f)))
 
 (check
   (equal?
     (struct-item 'foo (list (literal-item "foo")))
     (typed
-      (struct-type 'foo (list (string-type)))
+      (struct 'foo (list (string-type)))
       (phased
         "foo"
         (constant "foo")))))
@@ -118,7 +118,7 @@
   (equal?
     (struct-item 'foo (list (literal-item "foo") (literal-item 10)))
     (typed
-      (struct-type 'foo (list (string-type) (number-type)))
+      (struct 'foo (list (string-type) (number-type)))
       (phased
         `(cons "foo" 10)
         (constant (cons "foo" 10))))))
@@ -127,7 +127,7 @@
   (equal?
     (struct-item 'foo (list (literal-item "foo") (literal-item 10) (native-item '+)))
     (typed
-      (struct-type 'foo (list (string-type) (number-type) (native-type)))
+      (struct 'foo (list (string-type) (number-type) (native-type)))
       (phased
         `(vector "foo" 10 +)
         (constant (vector "foo" 10 +))))))
@@ -139,7 +139,7 @@
     (item-compile
       (struct-item 'foo (list (literal-item 10) (literal-item "bar"))))
     (typed
-      (struct-type 'foo (list (number-type) (string-type)))
+      (struct 'foo (list (number-type) (string-type)))
       (phased
         `(cons 10 "bar")
         (constant (cons 10 "bar"))))))
@@ -200,7 +200,7 @@
 (check
   (equal?
     (tico-item (typeof x))
-    (type-item (struct-type 'x (list)))))
+    (type-item (struct 'x (list)))))
 
 (check
   (equal?
@@ -210,14 +210,14 @@
 (check
   (equal?
     (tico-item (typeof (x (native "128"))))
-    (type-item (struct-type 'x (list (native-type))))))
+    (type-item (struct 'x (list (native-type))))))
 
 ; --- type
 
 (check
   (equal?
     (tico-item (type x))
-    (type-item (struct-type 'x (list)))))
+    (type-item (struct 'x (list)))))
 
 (check
   (equal?

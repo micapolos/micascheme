@@ -371,7 +371,7 @@
 
   (define (struct-item $symbol $items)
     (typed
-      (struct-type $symbol
+      (struct $symbol
         (map typed-type $items))
       (phased-tuple
         (filter-opts (map typed-value $items)))))
@@ -444,11 +444,11 @@
         (value-type-value $value-type))
       ((native-type? _)
         $value)
-      ((struct-type? $struct-type)
-        (struct-type
-          (struct-type-name $struct-type)
+      ((struct? $struct)
+        (struct
+          (struct-name $struct)
           (lets
-            ($fields (struct-type-fields $struct-type))
+            ($fields (struct-fields $struct))
             ($arity (types-arity $fields))
             ($values (value-arity->values $value $arity))
             (types-values->types $fields $values))))

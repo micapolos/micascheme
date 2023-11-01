@@ -8,7 +8,7 @@
     number-type
     string-type
     char-type
-    struct-type struct-type? struct-type-name struct-type-fields
+    struct struct? struct-name struct-fields
     lambda-type lambda-type? lambda-type-params lambda-type-result
     abstraction abstraction? abstraction-arity abstraction-body
     recursion recursion? recursion-items
@@ -24,7 +24,7 @@
   (data (value-type value))
   (data (type-type))
   (data (native-type))
-  (data (struct-type name fields))
+  (data (struct name fields))
   (data (lambda-type params result))
   (data (abstraction arity body))
   (data (application target args))
@@ -32,24 +32,24 @@
   (data (var index))
 
   (define (boolean-type)
-    (struct-type 'boolean (list (native-type))))
+    (struct 'boolean (list (native-type))))
 
   (define (number-type)
-    (struct-type 'number (list (native-type))))
+    (struct 'number (list (native-type))))
 
   (define (string-type)
-    (struct-type 'string (list (native-type))))
+    (struct 'string (list (native-type))))
 
   (define (char-type)
-    (struct-type 'char (list (native-type))))
+    (struct 'char (list (native-type))))
 
   (define (type-dynamic? $type)
     (switch $type
       ((value-type? _) #f)
       ((native-type? _) #t)
       ((type-type? _) #t)
-      ((struct-type? $struct-type)
-        (exists type-dynamic? (struct-type-fields $struct-type)))
+      ((struct? $struct)
+        (exists type-dynamic? (struct-fields $struct)))
       ((lambda-type? $lambda-type) #t)
       ((else $other)
         (throw not-type $other))))
@@ -71,15 +71,15 @@
         (type-type? $type))
       ((native-type? _)
         (native-type? $type))
-      ((struct-type? $struct-type)
+      ((struct? $struct)
         (and
-          (struct-type? $type)
+          (struct? $type)
           (symbol=? 
-            (struct-type-name $type)
-            (struct-type-name $struct-type))
+            (struct-name $type)
+            (struct-name $struct))
           (types-match?
-            (struct-type-fields $type)
-            (struct-type-fields $struct-type))))
+            (struct-fields $type)
+            (struct-fields $struct))))
       ((lambda-type? $lambda-type)
         (and
           (lambda-type? $type)

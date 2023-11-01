@@ -26,10 +26,10 @@
         `(native-type))
       ((value-type? $value-type)
         `(value-type ,(value->datum (value-type-value $value-type))))
-      ((struct-type? $struct-type)
-        `(struct-type 
-          ,(value->datum (struct-type-name $struct-type))
-          (list ,@(map value->datum (struct-type-fields $struct-type)))))
+      ((struct? $struct)
+        `(struct
+          ,(value->datum (struct-name $struct))
+          (list ,@(map value->datum (struct-fields $struct)))))
       ((lambda-type? $lambda-type)
         `(lambda-type 
           (list ,@(map value->datum (lambda-type-params $lambda-type)))

@@ -1,15 +1,15 @@
 (library (tico typed-expression)
   (export
-    struct-typed-expression)
+    structd-expression)
   (import
     (micascheme)
     (tico type)
     (tico typed)
     (tico expression))
 
-  (define (struct-typed-expression $symbol $typed-expressions)
+  (define (structd-expression $symbol $typed-expressions)
     (typed
-      (struct-type $symbol
+      (struct $symbol
         (map typed-type $typed-expressions))
       (tuple-expression
         (typed-list->dynamic-values $typed-expressions))))

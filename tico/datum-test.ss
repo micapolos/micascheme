@@ -15,8 +15,8 @@
 
 (check 
 	(equal? 
-		(value->datum (struct-type 'foo (list "foo" "bar")))
-		`(struct-type 'foo (list "foo" "bar"))))
+		(value->datum (struct 'foo (list "foo" "bar")))
+		`(struct 'foo (list "foo" "bar"))))
 
 (check 
 	(equal? 
