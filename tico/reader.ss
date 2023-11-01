@@ -140,7 +140,17 @@
                       $scope 
                       (stack $item) 
                       $end-fn))))))
-          ((get) TODO)
+          ((get) 
+            (items-reader $scope (stack)
+              (lambda ($get-items)
+                (lets
+                  ($get-item (items->item $get-items))
+                  ($get-type (item->evaluated-type $get-item))
+                  ($item (scope-type->item $scope $get-type))
+                  (items-reader 
+                    $scope
+                    (push $items $item)
+                    $end-fn)))))
           ((doing) TODO)
           ((apply)
             (lets
@@ -246,6 +256,9 @@
 
   (define (scope-items->items $scope $items)
     $items)
+
+  (define (scope-type->item $scope $type)
+    TODO)
 
   (define (bindings-type->item $bindings $type)
     (indexed-find
