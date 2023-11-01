@@ -11,6 +11,7 @@
     lambda-type lambda-type? lambda-type-params lambda-type-result
 
     type-dynamic?
+    types-arity
     type-matches? types-match?)
   (import (micascheme))
 
@@ -41,6 +42,9 @@
       ((lambda-type? $lambda-type) #t)
       ((else $other)
         (throw not-type $other))))
+
+  (define (types-arity $types)
+    (length (filter type-dynamic? $types)))
 
   (define (type-matches? $type $pattern)
     (switch $pattern

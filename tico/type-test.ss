@@ -6,6 +6,10 @@
 (check (equal? (type-dynamic? (lambda-type (list (value-type "foo")) (value-type "bar"))) #t))
 (check (raises? (lambda () (type-dynamic? `not-type))))
 
+; --- types-arity
+
+(check (equal? (types-arity (list (native-type) (value-type "foo") (native-type))) 2))
+
 ; --- type-matches?
 
 (check

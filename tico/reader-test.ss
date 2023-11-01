@@ -3,6 +3,38 @@
   (tico reader)
   (tico type))
 
+; --- value-arity->values
+
+(check (equal? (value-arity->values "foo" 1) (list "foo")))
+(check (equal? (value-arity->values (cons "foo" "bar") 2) (list "foo" "bar")))
+(check (equal? (value-arity->values (vector "foo" "bar" "zoo") 3) (list "foo" "bar" "zoo")))
+
+; --- types-values->types
+
+(check 
+  (equal? 
+    (types-values->types 
+      (list (native-type) (struct-type 'foo (list)) (native-type))
+      (list (number-type) (boolean-type)))
+    (list (number-type) (struct-type 'foo (list)) (boolean-type))))
+
+; --- type-value->type
+
+(check 
+  (equal? 
+    (type-value->type
+      (struct-type 'foo 
+        (list 
+          (native-type)
+          (struct-type 'bar (list)) 
+          (struct-type 'zoo (list (native-type)))))
+      (cons (number-type) (boolean-type)))
+    (struct-type 'foo
+      (list 
+        (number-type) 
+        (struct-type 'bar (list)) 
+        (struct-type 'zoo (list (boolean-type)))))))
+
 ; --- native-item
 
 (check

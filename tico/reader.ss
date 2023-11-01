@@ -11,9 +11,14 @@
     literal-item
     struct-item
     item-compile
-    tico-item tico-items tico-eval)
+    tico-item tico-items tico-eval
+
+    value-arity->values
+    type-value->type
+    types-values->types)
   (import
     (micascheme)
+    (evaluator)
     (leo reader)
     (leo parser)
     (tico type)
@@ -365,4 +370,63 @@
           (switch (read $port)
             ((eof-object? _) $datum)
             ((else _) (throw not-datum $string)))))))
+
+  (define (item->evaluated-type $item)
+    (lets
+      ($type (typed-type $item))
+      ($value (typed-value $item))
+      (or
+        (and $value (type-phased->type $type $value))
+        $type)))
+
+  (define (type-phased->type $type $phased)
+    (switch (phased-evaluated $phased)
+      ((constant? $constant)
+        (type-value->type $type (constant-value $constant)))
+      ((variable? _)
+        (throw type-phased->type $type $phased))))
+
+  (define (type-value->type $type $value)
+    (switch $type
+      ((value-type? $value-type) 
+        (value-type-value $value-type))
+      ((native-type? _)
+        $value)
+      ((struct-type? $struct-type)
+        (struct-type
+          (struct-type-name $struct-type)
+          (lets
+            ($fields (struct-type-fields $struct-type))
+            ($arity (types-arity $fields))
+            ($values (value-arity->values $value $arity))
+            (types-values->types $fields $values))))
+      ((else $other)
+        (throw type-value->type $other))))
+
+  (define (types-values->types $types $values)
+    (switch $types
+      ((null? _) (list))
+      ((pair? $pair)
+        (unpair $pair $type $types
+          (cond
+            ((type-dynamic? $type) 
+              (cons 
+                (type-value->type $type (car $values))
+                (types-values->types $types (cdr $values))))
+            (else 
+              (cons $type
+                (types-values->types $types $values))))))))
+
+  (define (value-arity->values $value $arity)
+    (lets
+      ($symbol (generate-symbol))
+      (evaluate
+        (evaluator
+          (native-environment)
+          (stack (cons $symbol $value)))
+        `(list
+          ,@(map 
+            (lambda ($index)
+              (tuple-ref-expression $arity $symbol $index))
+            (indices $arity))))))
 )
