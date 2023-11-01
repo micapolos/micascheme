@@ -43,6 +43,42 @@
 
 (check (raises? (lambda () (literal->item `()))))
 
+; --- struct-item
+
+(check
+  (equal?
+    (struct-item 'foo (list))
+    (typed
+      (struct-type 'foo (list))
+      #f)))
+
+(check
+  (equal?
+    (struct-item 'foo (list (literal->item "foo")))
+    (typed
+      (struct-type 'foo (list (string-type)))
+      (phased
+        "foo"
+        (constant "foo")))))
+
+(check
+  (equal?
+    (struct-item 'foo (list (literal->item "foo") (literal->item 10)))
+    (typed
+      (struct-type 'foo (list (string-type) (number-type)))
+      (phased
+        `(cons "foo" 10)
+        (constant (cons "foo" 10))))))
+
+(check
+  (equal?
+    (struct-item 'foo (list (literal->item "foo") (literal->item 10) (native->item '+)))
+    (typed
+      (struct-type 'foo (list (string-type) (number-type) (native-type)))
+      (phased
+        `(vector "foo" 10 +)
+        (constant (vector "foo" 10 +))))))
+
 ; --- native
 
 (check
@@ -150,43 +186,24 @@
 (check
   (equal?
     (tico-item (struct x))
-    (typed
-      (struct-type 'x (list))
-      #f)))
+    (struct-item 'x (list))))
 
 (check
   (equal?
     (tico-item (struct (x 10)))
-    (typed
-      (struct-type 'x (list (number-type)))
-      (phased 10 (constant 10)))))
+    (struct-item 'x (list (literal->item 10)))))
 
 (check
   (equal?
     (tico-item (struct (x 10 "foo")))
-    (typed
-      (struct-type 'x (list (number-type) (string-type)))
-      (phased `(cons 10 "foo") (constant (cons 10 "foo"))))))
-
-(check
-  (equal?
-    (tico-item (struct (x 10 "foo" #f)))
-    (typed
-      (struct-type 'x (list (number-type) (string-type) (boolean-type)))
-      (phased
-        `(vector 10 "foo" #f)
-        (constant (vector 10 "foo" #f))))))
+    (struct-item 'x (list (literal->item 10) (literal->item "foo")))))
 
 (check
   (equal?
     (tico-items (struct (x 10) (y "foo")))
     (stack
-      (typed
-        (struct-type 'x (list (number-type)))
-        (phased 10 (constant 10)))
-      (typed
-        (struct-type 'y (list (string-type)))
-        (phased "foo" (constant "foo"))))))
+      (struct-item 'x (list (literal->item 10)))
+      (struct-item 'y (list (literal->item "foo"))))))
 
 ; --- ordering
 

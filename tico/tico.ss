@@ -9,6 +9,7 @@
 
     native->item
     literal->item
+    struct-item
     tico-item tico-items)
   (import
     (micascheme)
