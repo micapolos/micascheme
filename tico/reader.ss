@@ -275,10 +275,10 @@
   (define (bindings-type->item $bindings $type)
     (indexed-find
       (lambda ($index $binding)
-        (binding-type-index->item $binding $type $index))
+        (binding-type-index->item-opt $binding $type $index))
       $bindings))
 
-  (define (binding-type-index->item $binding $type $index)
+  (define (binding-type-index->item-opt $binding $type $index)
     (and
       (type-matches? $type (typed-type $binding))
       (typed $type
