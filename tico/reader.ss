@@ -11,6 +11,7 @@
     literal-item
     struct-item
     item-compile
+    type-item
     tico-item tico-items tico-eval
 
     value-arity->values
@@ -34,7 +35,7 @@
   (data (variable index))
 
   (define (native-environment)
-    (environment `(micascheme)))
+    (environment `(micascheme) `(tico type)))
 
   (define (empty-scope)
     (scope (native-environment) (stack)))
@@ -83,6 +84,13 @@
                 (items-reader
                   $scope
                   (push-all $items (map item->typeof-item $typeof-items))
+                  $end-fn))))
+          ((type)
+            (items-reader $scope (stack)
+              (lambda ($type-items)
+                (items-reader
+                  $scope
+                  (push-all $items (map item->type-item $type-items))
                   $end-fn))))
           ((do)
             (lets
@@ -379,13 +387,17 @@
             ((else _) (throw not-datum $string)))))))
 
   (define (item->typeof-item $item)
+    (type-item (typed-type $item)))
+
+  (define (item->type-item $item)
+    (type-item (item->evaluated-type $item)))
+
+  (define (type-item $type)
     (typed
       (type-type)
-      (lets
-        ($type (typed-type $item))
-        (phased
-          (value->datum $type)
-          (constant $type)))))
+      (phased
+        (value->datum $type)
+        (constant $type))))
 
   (define (item->evaluated-type $item)
     (lets

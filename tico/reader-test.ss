@@ -75,6 +75,26 @@
 
 (check (raises? (lambda () (literal-item `()))))
 
+; --- type-item
+
+(check
+  (equal?
+    (type-item "foo")
+    (typed
+      (type-type)
+      (phased
+        "foo"
+        (constant "foo")))))
+
+(check
+  (equal?
+    (type-item (native-type))
+    (typed
+      (type-type)
+      (phased
+        `(native-type)
+        (constant (native-type))))))
+
 ; --- struct-item
 
 (check
@@ -179,29 +199,34 @@
 (check
   (equal?
     (tico-item (typeof x))
-    (typed
-      (type-type)
-      (phased
-        `(struct-type 'x (list))
-        (constant (struct-type 'x (list)))))))
+    (type-item (struct-type 'x (list)))))
 
 (check
   (equal?
     (tico-item (typeof (native "128")))
-    (typed
-      (type-type)
-      (phased
-        `(native-type)
-        (constant (native-type))))))
+    (type-item (native-type))))
 
 (check
   (equal?
     (tico-item (typeof (x (native "128"))))
-    (typed
-      (type-type)
-      (phased
-        `(struct-type 'x (list (native-type)))
-        (constant (struct-type 'x (list (native-type))))))))
+    (type-item (struct-type 'x (list (native-type))))))
+
+; --- type
+
+(check
+  (equal?
+    (tico-item (type x))
+    (type-item (struct-type 'x (list)))))
+
+(check
+  (equal?
+    (tico-item (type (native "128")))
+    (type-item 128)))
+
+(check
+  (equal?
+    (tico-item (type (native "(native-type)")))
+    (type-item (native-type))))
 
 ; --- native apply
 
