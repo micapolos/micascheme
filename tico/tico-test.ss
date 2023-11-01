@@ -122,6 +122,24 @@
     (tico-item "foo")
     (literal->item "foo")))
 
+; --- take
+
+(check
+  (equal?
+    (tico-items take)
+    (stack)))
+
+(check
+  (equal?
+    (tico-items
+      10 20
+      (take 30 40))
+    (stack
+      (literal->item 10)
+      (literal->item 20)
+      (literal->item 30)
+      (literal->item 40))))
+
 ; --- struct
 
 (check
