@@ -1,6 +1,8 @@
 (import (micascheme) (tico type))
 
+(check (equal? (type-dynamic? (value-type "foo")) #f))
 (check (equal? (type-dynamic? (native-type)) #t))
+(check (equal? (type-dynamic? (type-type)) #t))
 (check (equal? (type-dynamic? (struct-type `foo (list (value-type "foo") (value-type "bar")))) #f))
 (check (equal? (type-dynamic? (struct-type `foo (list (value-type "foo") (number-type)))) #t))
 (check (equal? (type-dynamic? (lambda-type (list (value-type "foo")) (value-type "bar"))) #t))
@@ -44,6 +46,17 @@
     (type-matches? 
       (value-type "foo")
       (native-type))))
+
+(check
+  (type-matches? 
+    (type-type)
+    (type-type)))
+
+(check
+  (not
+    (type-matches? 
+      (value-type "foo")
+      (type-type))))
 
 (check
   (type-matches? 

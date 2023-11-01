@@ -3,6 +3,7 @@
     any-type any-type?
     value-type value-type? value-type-value
     native-type native-type?
+    type-type type-type?
     boolean-type
     number-type
     string-type
@@ -17,6 +18,7 @@
 
   (data (any-type))
   (data (value-type value))
+  (data (type-type))
   (data (native-type))
   (data (struct-type name fields))
   (data (lambda-type params result))
@@ -37,6 +39,7 @@
     (switch $type
       ((value-type? _) #f)
       ((native-type? _) #t)
+      ((type-type? _) #t)
       ((struct-type? $struct-type)
         (exists type-dynamic? (struct-type-fields $struct-type)))
       ((lambda-type? $lambda-type) #t)
@@ -56,6 +59,8 @@
           (equal? 
             (value-type-value $type)
             (value-type-value $value-type))))
+      ((type-type? _)
+        (type-type? $type))
       ((native-type? _)
         (native-type? $type))
       ((struct-type? $struct-type)
