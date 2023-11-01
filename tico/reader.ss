@@ -147,9 +147,16 @@
                   ($get-item (items->item $get-items))
                   ($get-type (item->evaluated-type $get-item))
                   ($item (scope-type->item $scope $get-type))
-                  (items-reader 
+                  (items-reader
                     $scope
-                    (push $items $item)
+                    (stack
+                      (case (length $items)
+                        ((0)
+                          (scope-type->item $scope $get-type))
+                        ((1)
+                          (item-type->item (car $items) $get-type))
+                        (else 
+                          (throw get-multiple-items))))
                     $end-fn)))))
           ((doing) TODO)
           ((apply)
@@ -258,6 +265,9 @@
     $items)
 
   (define (scope-type->item $scope $type)
+    TODO)
+
+  (define (item-type->item $item $type)
     TODO)
 
   (define (bindings-type->item $bindings $type)
