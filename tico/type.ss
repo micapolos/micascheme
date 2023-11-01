@@ -1,5 +1,6 @@
 (library (tico type)
   (export
+    any-type any-type?
     value-type value-type? value-type-value
     native-type native-type?
     boolean-type
@@ -10,9 +11,10 @@
     lambda-type lambda-type? lambda-type-params lambda-type-result
 
     type-dynamic?
-    type-matches?)
+    type-matches? types-match?)
   (import (micascheme))
 
+  (data (any-type))
   (data (value-type value))
   (data (native-type))
   (data (struct-type name fields))
@@ -41,5 +43,40 @@
         (throw not-type $other))))
 
   (define (type-matches? $type $pattern)
-    (equal? $type $pattern))
+    (switch $pattern
+      ((any-type? _) 
+        #t)
+      ((value-type? $value-type)
+        (and
+          (value-type? $type)
+          (equal? 
+            (value-type-value $type)
+            (value-type-value $value-type))))
+      ((native-type? _)
+        (native-type? $type))
+      ((struct-type? $struct-type)
+        (and
+          (struct-type? $type)
+          (symbol=? 
+            (struct-type-name $type)
+            (struct-type-name $struct-type))
+          (types-match?
+            (struct-type-fields $type)
+            (struct-type-fields $struct-type))))
+      ((lambda-type? $lambda-type)
+        (and
+          (lambda-type? $type)
+          (types-match?
+            (lambda-type-params $type)
+            (lambda-type-params $lambda-type))
+          (type-matches?
+            (lambda-type-result $lambda-type)
+            (lambda-type-result $type))))
+      ((else $other)
+        (throw not-type $pattern))))
+
+  (define (types-match? $types $patterns)
+    (and
+      (= (length $types) (length $patterns))
+      (for-all type-matches? $types $patterns)))
 )
