@@ -1,5 +1,4 @@
-circle
-  center point
-    x 10
-    y 20
-  radius 30
+native "string-append"
+apply
+  native "\"Hello, \""
+  native "\"world!\""
