@@ -358,3 +358,7 @@
 (check (equal? (parse (literal-string-parser) "\"\"") ""))
 (check (equal? (parse (literal-string-parser) "\"\\\"\"") "\""))
 (check (equal? (parse (literal-string-parser) "\"foo\"") "foo"))
+
+; ---------------------------------------------------------
+
+(check (equal? (parse-port (string-parser) (open-input-string "$a1")) "$a1"))

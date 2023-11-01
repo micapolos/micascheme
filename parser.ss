@@ -5,7 +5,7 @@
     parser
     parser parser-bind parser-map
     parser-lets
-    parse
+    parse parse-port
 
     space-parser
     newline-parser
@@ -121,30 +121,33 @@
 
   (data (parse-error line column))
 
-  (define (parse-from $parser $string $index $line $column)
+  (define (parse $parser $string)
+    (parse-port $parser (open-input-string $string)))
+
+  (define (parse-port $parser $port)
+    (parse-port-from 
+      $parser $port 0 1 1))
+
+  (define (parse-port-from $parser $port $index $line $column)
     (parser-thunk-do ($thunk $parser)
-      (cond
-        ((= $index (string-length $string))
+      (switch (read-char $port)
+        ((eof-object? _)
           (lets
             ($parsed-opt (thunk-parsed-opt $thunk))
             (if $parsed-opt
               (parsed-value $parsed-opt)
               (parse-error $line $column))))
-        (else
+        ((char? $char)
           (lets
-            ($char (string-ref $string $index))
             ($parser (thunk-push $thunk $char))
             (if (not $parser)
               (parse-error $line $column)
-              (parse-from
+              (parse-port-from
                 $parser
-                $string
+                $port
                 (+ $index 1)
                 (if (char=? $char #\newline) (+ $line 1) $line)
                 (if (char=? $char #\newline) 1 (+ $column 1)))))))))
-
-  (define (parse $parser $string)
-    (parse-from $parser $string 0 1 1))
 
   ; ----------------------------------------------------------
 
