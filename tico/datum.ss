@@ -1,10 +1,11 @@
 (library (tico datum)
   (export value->datum)
-  (import (micascheme))
+  (import (micascheme) (tico type))
 
   (define (value->datum $value)
     (switch $value
       ((null? $null) $null)
+      ((symbol? $symbol) `(quote ,$symbol))
       ((boolean? $boolean) $boolean)
       ((number? $number) $number)
       ((string? $string) $string)
@@ -15,6 +16,24 @@
           ,(value->datum (cdr $pair))))
       ((vector? $vector)
         `(vector ,@(map value->datum (vector->list $vector))))
+      ((type-type? _)
+        `(type-type))
+      ((any-type? _)
+        `(any-type))
+      ((native-type? _)
+        `(native-type))
+      ((native-type? _)
+        `(native-type))
+      ((value-type? $value-type)
+        `(value-type ,(value->datum (value-type-value $value-type))))
+      ((struct-type? $struct-type)
+        `(struct-type 
+          ,(value->datum (struct-type-name $struct-type))
+          (list ,@(map value->datum (struct-type-fields $struct-type)))))
+      ((lambda-type? $lambda-type)
+        `(lambda-type 
+          (list ,@(map value->datum (lambda-type-params $lambda-type)))
+          ,(value->datum (lambda-type-result $lambda-type))))
       ((else $other)
         (throw value->datum $value))))
 
