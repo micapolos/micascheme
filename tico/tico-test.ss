@@ -124,7 +124,8 @@
         x
         (x 10)
         (x 10 20)
-        (x 10 20 30)))
+        (x 10 20 30)
+        (native "(string-append \"foo\" \"bar\")")))
     (stack
       (item-compile (literal-item #f))
       (item-compile (literal-item 128))
@@ -133,7 +134,8 @@
       (item-compile (struct-item 'x (list)))
       (item-compile (struct-item 'x (list (literal-item 10))))
       (item-compile (struct-item 'x (list (literal-item 10) (literal-item 20))))
-      (item-compile (struct-item 'x (list (literal-item 10) (literal-item 20) (literal-item 30)))))))
+      (item-compile (struct-item 'x (list (literal-item 10) (literal-item 20) (literal-item 30))))
+      (item-compile (native-item "foobar")))))
 
 ; --- native apply
 
