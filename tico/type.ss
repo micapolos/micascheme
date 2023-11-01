@@ -12,7 +12,6 @@
     arrow arrow? arrow-params arrow-result
     abstraction abstraction? abstraction-arity abstraction-body
     recursion recursion? recursion-items
-    application application? application-target application-args
     var var? var-index
 
     type-dynamic?
@@ -27,7 +26,6 @@
   (data (struct name fields))
   (data (arrow params result))
   (data (abstraction arity body))
-  (data (application target args))
   (data (recursion items))
   (data (var index))
 
