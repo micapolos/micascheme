@@ -265,7 +265,9 @@
     $items)
 
   (define (scope-type->item $scope $type)
-    TODO)
+    (bindings-type->item
+      (scope-bindings $scope)
+      $type))
 
   (define (item-type->item $item $type)
     TODO)

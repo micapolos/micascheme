@@ -334,7 +334,7 @@
       (struct-item 'x (list (literal-item 10)))
       (struct-item 'y (list (literal-item "foo"))))))
 
-; --- do
+; --- do / get
 
 (check
   (equal?
@@ -353,6 +353,26 @@
       (string-type)
       (phased
         `(let (($tmp-0 10) ($tmp-1 20)) "foo")
+        (constant "foo")))))
+
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (tico-item 10 "foo" (do (get (native "(number-type)")))))
+    (typed
+      (number-type)
+      (phased
+        `(let (($tmp-0 10) ($tmp-1 "foo")) $tmp-0)
+        (constant 10)))))
+
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (tico-item 10 "foo" (do (get (native "(string-type)")))))
+    (typed
+      (string-type)
+      (phased
+        `(let (($tmp-0 10) ($tmp-1 "foo")) $tmp-1)
         (constant "foo")))))
 
 ; --- ordering
