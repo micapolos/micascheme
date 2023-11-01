@@ -100,6 +100,13 @@
                                   (constant-value (car $evaluated-list))
                                   (map constant-value (cdr $evaluated-list))))))))
                       $end-fn))))))
+          ((struct)
+            (struct-items-reader $scope (stack)
+              (lambda ($struct-items)
+                (items-reader
+                  $scope
+                  (push-all $items $struct-items)
+                  $end-fn))))
           ((take)
             (items-reader $scope (stack)
               (lambda ($take-items)
@@ -119,7 +126,6 @@
       (lambda ()
         (app $end-fn $items))))
 
-
   (define (native-items-reader $scope $items $end-fn)
     (reader
       (lambda ($literal)
@@ -134,6 +140,21 @@
           $end-fn))
       (lambda ($symbol)
         (throw not-native $symbol))
+      (lambda ()
+        (app $end-fn $items))))
+
+  (define (struct-items-reader $scope $items $end-fn)
+    (reader
+      (lambda ($literal)
+        (throw not-struct $literal))
+      (lambda ($symbol)
+        (items-reader $scope (stack)
+          (lambda ($struct-items)
+            (struct-items-reader
+              $scope
+              (push $items
+                (struct-item $symbol (reverse $struct-items)))
+              $end-fn))))
       (lambda ()
         (app $end-fn $items))))
 
@@ -213,22 +234,22 @@
       (struct-type $symbol
         (map typed-type $items))
       (phased-tuple
-        (filter typed-value $items))))
+        (filter-opts (map typed-value $items)))))
 
-  (define (phased-tuple $phaseds)
+  (define (phased-tuple $phased-list)
     (and
-      (not (null? $phaseds))
+      (not (null? $phased-list))
       (phased
-        (compiled-tuple (map phased-compiled $phaseds))
-        (evaluated-tuple (map phased-evaluated $phaseds)))))
+        (compiled-tuple (map phased-compiled $phased-list))
+        (evaluated-tuple (map phased-evaluated $phased-list)))))
 
-  (define (compiled-tuple $compileds)
-    (tuple-expression $compileds))
+  (define (compiled-tuple $compiled-list)
+    (tuple-expression $compiled-list))
 
-  (define (evaluated-tuple $evaluated)
+  (define (evaluated-tuple $evaluated-list)
     (and
-      (for-all constant? $evaluated)
-      (constant-tuple $evaluated)))
+      (for-all constant? $evaluated-list)
+      (constant-tuple $evaluated-list)))
 
   (define (constant-tuple $constants)
     (constant (tuple-value (map constant-value $constants))))

@@ -122,6 +122,54 @@
     (tico-item "foo")
     (literal->item "foo")))
 
+; --- struct
+
+(check
+  (equal?
+    (tico-items (struct))
+    (stack)))
+
+(check
+  (equal?
+    (tico-item (struct x))
+    (typed
+      (struct-type 'x (list))
+      #f)))
+
+(check
+  (equal?
+    (tico-item (struct (x 10)))
+    (typed
+      (struct-type 'x (list (number-type)))
+      (phased 10 (constant 10)))))
+
+(check
+  (equal?
+    (tico-item (struct (x 10 "foo")))
+    (typed
+      (struct-type 'x (list (number-type) (string-type)))
+      (phased `(cons 10 "foo") (constant (cons 10 "foo"))))))
+
+(check
+  (equal?
+    (tico-item (struct (x 10 "foo" #f)))
+    (typed
+      (struct-type 'x (list (number-type) (string-type) (boolean-type)))
+      (phased
+        `(vector 10 "foo" #f)
+        (constant (vector 10 "foo" #f))))))
+
+(check
+  (equal?
+    (tico-items (struct (x 10) (y "foo")))
+    (stack
+      (typed
+        (struct-type 'x (list (number-type)))
+        (phased 10 (constant 10)))
+      (typed
+        (struct-type 'y (list (string-type)))
+        (phased "foo" (constant "foo"))))))
+
 ; --- ordering
 
 (check
