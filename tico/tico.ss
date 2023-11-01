@@ -10,13 +10,15 @@
     native-item
     literal-item
     struct-item
+    item-compile
     tico-item tico-items)
   (import
     (micascheme)
     (leo reader)
     (tico type)
     (tico expression)
-    (tico value))
+    (tico value)
+    (tico datum))
 
   (data (scope environment bindings))
   (data (typed type value))
@@ -116,6 +118,14 @@
                   $scope
                   (push-all $items $take-items)
                   $end-fn))))
+          ((compile)
+            (items-reader $scope (stack)
+              (lambda ($compile-items)
+                (items-reader
+                  $scope
+                  (push-all $items
+                    (map item-compile $compile-items))
+                  $end-fn))))
           (else
             (items-reader $scope (stack)
               (lambda ($struct-items)
@@ -213,6 +223,20 @@
         (type-literal-item (string-type) $string))
       ((else $other)
         (throw invalid-literal $literal))))
+
+  (define (item-compile $item)
+    (typed
+      (typed-type $item)
+      (opt-lift phased-compile (typed-value $item))))
+
+  (define (phased-compile $phased)
+    (switch (phased-evaluated $phased)
+      ((constant? $constant)
+        (phased
+          (value->datum (constant-value $constant))
+          $constant))
+      ((else $other)
+        (throw not-constant))))
 
   (define (scope-native-item $scope $native)
     (typed

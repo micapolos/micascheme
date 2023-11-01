@@ -79,6 +79,18 @@
         `(vector "foo" 10 +)
         (constant (vector "foo" 10 +))))))
 
+; --- item-compile
+
+(check
+  (equal?
+    (item-compile
+      (struct-item 'foo (list (literal-item 10) (literal-item "bar"))))
+    (typed
+      (struct-type 'foo (list (number-type) (string-type)))
+      (phased
+        `(cons 10 "bar")
+        (constant (cons 10 "bar"))))))
+
 ; --- native
 
 (check
@@ -98,6 +110,30 @@
       (native-item #\a)
       (native-item '+)
       (native-item '(+ 1 2)))))
+
+; --- compile
+
+(check
+  (equal?
+    (tico-items
+      (compile
+        #f
+        128
+        "foo"
+        #\a
+        x
+        (x 10)
+        (x 10 20)
+        (x 10 20 30)))
+    (stack
+      (item-compile (literal-item #f))
+      (item-compile (literal-item 128))
+      (item-compile (literal-item "foo"))
+      (item-compile (literal-item #\a))
+      (item-compile (struct-item 'x (list)))
+      (item-compile (struct-item 'x (list (literal-item 10))))
+      (item-compile (struct-item 'x (list (literal-item 10) (literal-item 20))))
+      (item-compile (struct-item 'x (list (literal-item 10) (literal-item 20) (literal-item 30)))))))
 
 ; --- native apply
 
