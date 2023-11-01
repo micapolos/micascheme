@@ -73,11 +73,53 @@
                   (push-all $items $native-items)
                   $end-fn))))
           ((do)
-            (items-reader
-              (scope+items $scope $items)
-              (stack)
-              (lambda ($do-items)
-                (items-reader $scope $do-items $end-fn))))
+            (lets
+              ($arity (length $items))
+              ($bindings (items->bindings $items))
+              ($let-entries
+                (reverse
+                  (filter-opts
+                    (map
+                      (lambda ($item $binding) 
+                        (and-lets
+                          ($item-phased (typed-value $item))
+                          ($binding-phased (typed-value $binding))
+                          `(
+                            ,(phased-compiled $binding-phased)
+                            ,(phased-compiled $item-phased))))
+                      $items
+                      $bindings))))
+              ($do-scope (fold-left scope+binding $scope $bindings))
+              (items-reader $do-scope (stack)
+                (lambda ($do-items)
+                  (lets
+                    ($do-item (items->item $do-items))
+                    ($do-type (typed-type $do-item))
+                    ($do-phased (typed-value $do-item))
+                    ($item 
+                      (typed
+                        (typed-type $do-item)
+                        (and $do-phased
+                          (lets
+                            ($compiled 
+                              `(let (,@$let-entries)
+                                ,(phased-compiled $do-phased)))
+                            (phased $compiled
+                              (switch (phased-evaluated $do-phased)
+                                ((constant? $constant) $constant)
+                                ((variable? $variable)
+                                  (lets
+                                    ($index (- (variable-index $variable) $arity))
+                                    (cond
+                                      ((< $index 0) 
+                                        (constant
+                                          (scope-compiled->evaluate $scope $compiled)))
+                                      (else 
+                                        (variable $index)))))))))))
+                    (items-reader
+                      $scope 
+                      (stack $item) 
+                      $end-fn))))))
           ((get) TODO)
           ((doing) TODO)
           ((apply)
@@ -204,6 +246,9 @@
                 ((constant? $constant) $constant)
                 ((hole? $hole) (variable $index)))))))))
 
+  (define (scope-compiled->evaluate $scope $compiled)
+    TODO)
+
   (define (scope+items $scope $items)
     (fold-left scope+binding $scope
       (map item->binding (reverse $items))))
@@ -213,15 +258,28 @@
       (scope-environment $scope)
       (push (scope-bindings $scope) $binding)))
 
+  (define (item->param $item)
+    (lets
+      ($value (typed-value $item))
+      (and $value (generate-symbol))))
+
+  (define (items->params $items)
+    (filter item->param $items))
+
+  (define (items->bindings $items)
+    (reverse (map item->binding (reverse $items))))
+
   (define (item->binding $item)
     (typed
       (typed-type $item)
-      (phased->binding (typed-value $item))))
+      (opt-lift phased->binding (typed-value $item))))
 
   (define (phased->binding $phased)
-    (switch (phased-evaluated $phased)
-      ((constant? $constant) $constant)
-      ((variable? _) #f)))
+    (phased
+      (generate-symbol)
+      (switch (phased-evaluated $phased)
+        ((constant? $constant) $constant)
+        ((variable? _) (hole)))))
 
   (define (literal-item $literal)
     (switch $literal

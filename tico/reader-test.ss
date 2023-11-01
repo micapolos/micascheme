@@ -248,6 +248,27 @@
       (struct-item 'x (list (literal-item 10)))
       (struct-item 'y (list (literal-item "foo"))))))
 
+; --- do
+
+(check
+  (equal?
+    (tico-item (do "foo"))
+    (typed
+      (string-type)
+      (phased
+        `(let () "foo")
+        (constant "foo")))))
+
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (tico-item 10 20 (do "foo")))
+    (typed
+      (string-type)
+      (phased
+        `(let (($tmp-0 10) ($tmp-1 20)) "foo")
+        (constant "foo")))))
+
 ; --- ordering
 
 (check
