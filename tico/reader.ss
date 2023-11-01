@@ -1,7 +1,6 @@
 (library (tico reader)
   (export
     scope scope? scope-environment scope-bindings
-    typed typed? typed-type typed-value
     phased phased? phased-compiled phased-evaluated
     constant constant? constant-value
     variable variable? variable-index
@@ -23,12 +22,12 @@
     (leo reader)
     (leo parser)
     (tico type)
+    (tico typed)
     (tico expression)
     (tico value)
     (tico datum))
 
   (data (scope environment bindings))
-  (data (typed type value))
   (data (phased compiled evaluated))
   (data (constant value))
   (data (hole))

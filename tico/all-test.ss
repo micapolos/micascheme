@@ -2,7 +2,9 @@
 
 (test
   (tico type)
-  (tico value)
+  (tico typed)
   (tico expression)
+  (tico typed-expression)
+  (tico value)
   (tico datum)
   (tico reader))

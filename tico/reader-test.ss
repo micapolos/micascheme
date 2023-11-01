@@ -1,7 +1,8 @@
 (import
   (micascheme)
   (tico reader)
-  (tico type))
+  (tico type)
+  (tico typed))
 
 ; --- value-arity->values
 
