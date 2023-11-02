@@ -263,11 +263,6 @@
   (define (scope-items->items $scope $items)
     $items)
 
-  (define (scope-get $scope $pattern)
-    (bindings-type->item
-      (scope-bindings $scope)
-      $pattern))
-
   (define (item-get $item $pattern)
     (lets
       ($type (typed-type $item))
@@ -300,10 +295,13 @@
         ((else $other)
           (throw not-struct $other)))))
 
-  (define (bindings-type->item $bindings $type)
+  (define (scope-get $scope $pattern)
+    (bindings-get (scope-bindings $scope) $pattern))
+
+  (define (bindings-get $bindings $pattern)
     (indexed-find
       (lambda ($index $binding)
-        (binding-type-index->item-opt $binding $type $index))
+        (binding-type-index->item-opt $binding $pattern $index))
       $bindings))
 
   (define (binding-type-index->item-opt $binding $type $index)
