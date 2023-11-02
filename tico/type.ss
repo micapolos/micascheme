@@ -76,9 +76,11 @@
           (symbol=? 
             (struct-name $type)
             (struct-name $struct))
-          (types-match?
-            (struct-fields $type)
-            (struct-fields $struct))))
+          (or
+            (null? (struct-fields $struct))
+            (types-match?
+              (struct-fields $type)
+              (struct-fields $struct)))))
       ((arrow? $arrow)
         (and
           (arrow? $type)

@@ -59,7 +59,18 @@
       (type-type))))
 
 (check
-  (type-matches? 
+  (type-matches?
+    (struct 'foo (list (any-type) (value-type "foo")))
+    (struct 'foo (list))))
+
+(check
+  (not
+    (type-matches?
+      (struct 'foo (list (any-type) (value-type "foo")))
+      (struct 'bar (list)))))
+
+(check
+  (type-matches?
     (struct 'foo (list (any-type) (native-type)))
     (struct 'foo (list (any-type) (native-type)))))
 
