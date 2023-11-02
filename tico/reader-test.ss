@@ -157,6 +157,15 @@
         (constant 128)))))
 
 (check
+  (equal?
+    (item-get
+      (struct-item 'foo (list (struct-item 'empty (list))))
+      (struct 'empty (list)))
+    (typed
+      (struct 'empty (list))
+      #f)))
+
+(check
   (raises?
     (lambda ()
       (item-get
