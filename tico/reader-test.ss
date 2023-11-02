@@ -132,6 +132,37 @@
         `(vector "foo" 10 +)
         (constant (vector "foo" 10 +))))))
 
+; --- item-get
+
+(check
+  (equal?
+    (item-get
+      (struct-item 'foo (list (literal-item "foo") (literal-item 128)))
+      (string-type))
+    (typed
+      (string-type)
+      (phased
+        `(car (cons "foo" 128))
+        (constant "foo")))))
+
+(check
+  (equal?
+    (item-get
+      (struct-item 'foo (list (literal-item "foo") (literal-item 128)))
+      (number-type))
+    (typed
+      (number-type)
+      (phased
+        `(cdr (cons "foo" 128))
+        (constant 128)))))
+
+(check
+  (raises?
+    (lambda ()
+      (item-get
+        (struct-item 'foo (list (literal-item "foo") (literal-item 128)))
+        (boolean-type)))))
+
 ; --- item-compile
 
 (check
@@ -334,6 +365,27 @@
     (stack
       (struct-item 'x (list (literal-item 10)))
       (struct-item 'y (list (literal-item "foo"))))))
+
+; --- struct / get
+
+(check
+  (equal?
+    (tico-item (x 10 "foo") (get number))
+    (item-get
+      (struct-item 'x (list (literal-item 10) (literal-item "foo")))
+      (struct 'number (list)))))
+
+(check
+  (equal?
+    (tico-item (x 10 "foo") (get string))
+    (item-get
+      (struct-item 'x (list (literal-item 10) (literal-item "foo")))
+      (struct 'string (list)))))
+
+(check
+  (raises?
+    (lambda ()
+      (tico-item (x 10 "foo") (get boolean)))))
 
 ; --- do / get
 

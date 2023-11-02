@@ -9,6 +9,7 @@
     native-item
     literal-item
     struct-item
+    item-get
     item-compile
     type-item
     tico-item tico-items tico-eval
@@ -153,7 +154,7 @@
                         ((0)
                           (scope-type->item $scope $get-type))
                         ((1)
-                          (item-type->item (car $items) $get-type))
+                          (item-get (car $items) $get-type))
                         (else 
                           (throw get-multiple-items))))
                     $end-fn)))))
@@ -268,8 +269,37 @@
       (scope-bindings $scope)
       $type))
 
-  (define (item-type->item $item $type)
-    TODO)
+  (define (item-get $item $pattern)
+    (lets
+      ($type (typed-type $item))
+      ($value (typed-value $item))
+      (switch $type
+        ((struct? $struct)
+          (lets
+            ($fields (struct-fields $struct))
+            ($arity (types-arity $fields))
+            ($indexed-type (indexed-type-matching $fields $pattern))
+            (cond
+              ($indexed-type
+                (lets
+                  ($type (indexed-value $indexed-type))
+                  ($index (indexed-index $indexed-type))
+                  (typed $type
+                    (and $index
+                      (phased
+                        (tuple-ref-expression $arity (phased-compiled $value) $index)
+                        (switch (phased-evaluated $value)
+                          ((constant? $constant)
+                            (constant
+                              (tuple-ref-value
+                                $arity
+                                (constant-value $constant)
+                                $index)))
+                          ((variable? $variable) $variable)))))))
+              (else
+                (throw not-found $item $pattern)))))
+        ((else $other)
+          (throw not-struct $other)))))
 
   (define (bindings-type->item $bindings $type)
     (indexed-find
