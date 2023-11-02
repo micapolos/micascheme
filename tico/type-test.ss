@@ -170,3 +170,28 @@
     (equal?
       (indexed-type-matching $types (struct 'x (list (any-type))))
       (indexed (struct 'x (list (native-type))) 1))))
+
+; --- indexed-type-ref
+
+(let
+  (($types
+    (list
+      (native-type)
+      (struct 'x (list))
+      (struct 'x (list (native-type))))))
+  (check
+    (equal?
+      (indexed-type-ref $types 0)
+      (indexed (native-type) 0)))
+  (check
+    (equal?
+      (indexed-type-ref $types 1)
+      (indexed (struct 'x (list)) #f)))
+  (check
+    (equal?
+      (indexed-type-ref $types 2)
+      (indexed (struct 'x (list (native-type))) 1)))
+  (check
+    (equal?
+      (indexed-type-ref $types 3)
+      #f)))
