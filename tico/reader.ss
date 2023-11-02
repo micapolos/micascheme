@@ -146,13 +146,12 @@
                 (lets
                   ($get-item (items->item $get-items))
                   ($get-type (item->evaluated-type $get-item))
-                  ($item (scope-type->item $scope $get-type))
                   (items-reader
                     $scope
                     (stack
                       (case (length $items)
                         ((0)
-                          (scope-type->item $scope $get-type))
+                          (scope-get $scope $get-type))
                         ((1)
                           (item-get (car $items) $get-type))
                         (else 
@@ -264,10 +263,10 @@
   (define (scope-items->items $scope $items)
     $items)
 
-  (define (scope-type->item $scope $type)
+  (define (scope-get $scope $pattern)
     (bindings-type->item
       (scope-bindings $scope)
-      $type))
+      $pattern))
 
   (define (item-get $item $pattern)
     (lets
