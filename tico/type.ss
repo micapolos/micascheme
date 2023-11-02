@@ -17,8 +17,7 @@
     type-dynamic?
     types-arity
     type-matches? types-match?
-    indexed-type-matching
-    indexed-type-ref)
+    indexed-type-matching)
   (import (micascheme))
 
   (data (any-type))
@@ -115,21 +114,4 @@
 
   (define (indexed-type-matching $types $pattern)
     (indexed-type-matching-from $types $pattern 0))
-
-  (define (indexed-type-ref-from $types $index $from)
-    (switch $types
-      ((null? _) #f)
-      ((pair? $pair)
-        (unpair $pair $type $types
-          (lets
-            ($dynamic? (type-dynamic? $type))
-            (cond
-              ((zero? $index)
-                (indexed $type (and $dynamic? $from)))
-              (else
-                (indexed-type-ref-from $types (- $index 1)
-                  (if $dynamic? (+ $from 1) $from)))))))))
-
-  (define (indexed-type-ref $types $index)
-    (indexed-type-ref-from $types $index 0))
 )
