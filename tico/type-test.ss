@@ -130,3 +130,32 @@
     (type-matches? 
       (native-type)
       (arrow (list (any-type) (native-type)) (value-type "foo")))))
+
+; --- indexed-type-matching
+
+(let
+  (($types
+    (list
+      (native-type)
+      (struct 'x (list))
+      (struct 'x (list (native-type))))))
+  (check
+    (equal?
+      (indexed-type-matching $types (native-type))
+      (indexed (native-type) 0)))
+  (check
+    (equal?
+      (indexed-type-matching $types (struct 'x (list)))
+      (indexed (struct 'x (list)) #f)))
+  (check
+    (equal?
+      (indexed-type-matching $types (struct 'x (list (native-type))))
+      (indexed (struct 'x (list (native-type))) 1)))
+  (check
+    (equal?
+      (indexed-type-matching $types (any-type))
+      (indexed (native-type) 0)))
+  (check
+    (equal?
+      (indexed-type-matching $types (struct 'x (list (any-type))))
+      (indexed (struct 'x (list (native-type))) 1))))
