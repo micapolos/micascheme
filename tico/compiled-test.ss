@@ -329,3 +329,37 @@
       (packet
         (comptime '$tmp-0)
         (runtime (hole))))))
+
+; locals-pattern->typed-variable-opt
+
+(let
+  (($locals
+    (locals
+      (typed (value-type 't) #f)
+      (typed (number-type) (packet (comptime '$num) (runtime (hole))))
+      (typed (string-type) (packet (comptime '$str) (runtime (constant "foo")))))))
+
+  (check
+    (equal?
+      (locals-pattern->typed-variable-opt $locals (value-type 't))
+      (typed (value-type 't) #f)))
+
+  (check
+    (equal?
+      (locals-pattern->typed-variable-opt $locals (number-type))
+      (typed (number-type) (packet (comptime '$num) (runtime (variable 1))))))
+
+  (check
+    (equal?
+      (locals-pattern->typed-variable-opt $locals (string-type))
+      (typed (string-type) (packet (comptime '$str) (runtime (constant "foo"))))))
+
+  (check
+    (equal?
+      (locals-pattern->typed-variable-opt $locals (any-type))
+      (typed (string-type) (packet (comptime '$str) (runtime (constant "foo"))))))
+
+  (check
+    (equal?
+      (locals-pattern->typed-variable-opt $locals (boolean-type))
+      #f)))

@@ -7,7 +7,7 @@
     hole hole?
     compiled compiled? compiled-globals compiled-value
 
-    globals comptime runtime
+    globals locals comptime runtime
 
     pure-compiled
     compiled-with-value
@@ -26,6 +26,7 @@
     literal->compiled
     literal-typed
     literal-packet
+    locals-pattern->typed-variable-opt
 
     compiled-struct
     typed-struct
@@ -54,7 +55,11 @@
   (data (hole))
   (data (compiled globals value))
 
+  ;(alias (global (symbolic symbol (packet datum value))))
+  ;(alias (local (typed (type) (packet symbol (oneof (constant value) hole)))))
+
   (define-syntax-rule (globals $item ...) (stack $item ...))
+  (define-syntax-rule (locals $item ...) (stack $item ...))
   (define-syntax-rule (global $item) $item)
   (define-syntax-rule (comptime $item) $item)
   (define-syntax-rule (runtime $item) $item)
@@ -246,6 +251,32 @@
                 (switch (packet-runtime $packet)
                   ((constant? $constant) $constant)
                   ((variable? $variable) (hole))))))))))
+
+  (define (locals-pattern->typed-variable-opt $locals $pattern)
+    (locals-pattern-index->typed-variable-opt $locals $pattern 0))
+
+  (define (locals-pattern-index->typed-variable-opt $locals $pattern $index)
+    (and (pair? $locals)
+      (or
+        (local-pattern-index->typed-variable-opt
+          (car $locals) $pattern $index)
+        (locals-pattern-index->typed-variable-opt
+          (cdr $locals) $pattern (+ $index 1)))))
+
+  (define (local-pattern-index->typed-variable-opt $local $pattern $index)
+    (lets
+      ($type (typed-type $local))
+      (and (type-matches? $type $pattern)
+        (typed $type
+          (and (type-dynamic? $type)
+            (lets
+              ($local-packet (typed-value $local))
+              (packet
+                (comptime (packet-comptime $local-packet))
+                (runtime
+                  (switch (packet-runtime $local-packet)
+                    ((constant? $constant) $constant)
+                    ((hole? $hole) (variable $index)))))))))))
 
   ; (define (locals-compiled-lambda $locals $compiled-params $body-fn)
   ;   (compiled-lets
