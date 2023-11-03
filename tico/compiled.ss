@@ -1,4 +1,4 @@
-(library (tico compiler)
+(library (tico compiled)
   (export)
   (import
     (micascheme)

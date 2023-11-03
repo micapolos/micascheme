@@ -1,3 +1,3 @@
 (import
   (micascheme)
-  (tico compiler))
+  (tico compiled))
