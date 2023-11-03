@@ -2,6 +2,8 @@
   (micascheme)
   (tico compiled))
 
+; --- literal->compiled
+
 (check
   (equal?
     (type-literal->compiled (number-type) 128)
@@ -41,6 +43,8 @@
     (literal->compiled "foo")
     (string->compiled "foo")))
 
+; --- compiled-lets
+
 (check
   (equal?
     (compiled-lets
@@ -48,6 +52,8 @@
       ($number (compiled (stack 'g2) 128))
       (compiled (stack 'g3) (cons $string $number)))
     (compiled (stack 'g1 'g2 'g3) (cons "foo" 128))))
+
+; --- compiled-globalize
 
 (check
   (equal?
