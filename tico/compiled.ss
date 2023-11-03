@@ -24,6 +24,8 @@
     number->compiled
     string->compiled
     literal->compiled
+    literal-typed
+    literal-packet
 
     compiled-struct
     typed-struct
@@ -103,7 +105,6 @@
                   (packet-with-runtime $packet
                     (constant-value $constant)))))))
         ((variable? $variable) $compiled))))
-
   (define (packet-with-comptime $packet $comptime)
     (packet $comptime (packet-runtime $packet)))
 
@@ -118,6 +119,16 @@
         (compiled-bind $compiled
           (lambda ($value)
             (compiled-lets $decl ... $body))))))
+
+  (define (literal-typed $literal)
+    (typed
+      (literal-type $literal)
+      (literal-packet $literal)))
+
+  (define (literal-packet $literal)
+    (packet
+      (comptime $literal)
+      (runtime (constant $literal))))
 
   (define (type-literal->compiled $type $literal)
     (pure-compiled
@@ -197,9 +208,14 @@
     (packet-comptime (typed-value $typed)))
 
   (define (compiled-comptime $compiled)
-    `(lets
-      ,@(reverse (map symbolic-comptime (compiled-globals $compiled)))
-      ,(typed-comptime (compiled-value $compiled))))
+    (lets
+      ($comptime (typed-comptime (compiled-value $compiled)))
+      (switch (compiled-globals $compiled)
+        ((null? _) $comptime)
+        ((else $globals)
+          `(lets
+            ,@(reverse (map symbolic-comptime $globals))
+            ,$comptime)))))
 
   (define (comptime->runtime $globals $comptime)
     (evaluate
