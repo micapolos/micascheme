@@ -20,3 +20,18 @@
         (typed (value-type "foo") 'static)
         (typed (native-type) 'native2)))
     (list 'native1 'native2)))
+
+(check
+  (equal?
+    (typed-map-value
+      (typed (value-type 'foo) #f)
+      (lambda ($value) (throw not-expected)))
+    (typed (value-type 'foo) #f)))
+
+(check
+  (equal?
+    (typed-map-value
+      (typed (string-type) "foo")
+      (lambda ($value)
+        (string-append $value "!")))
+    (typed (string-type) "foo!")))

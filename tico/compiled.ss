@@ -369,4 +369,37 @@
               (constant (comptime->runtime $globals $comptime)))
             (else
               (variable $index)))))))
+
+  ; --- compiled-application
+
+  (define (compiled-application $compiled-target $compiled-args)
+    (lets
+      ($compiled-proc
+        (compiled-lets
+          ($typed-target $compiled-target)
+          ($typed-args (compiled-flatten $compiled-args))
+          (pure-compiled
+            (lambda ($globals)
+              (typed-application $globals $typed-target $typed-args)))))
+      (app
+        (compiled-value $compiled-proc)
+        (compiled-globals $compiled-proc))))
+
+  (define (typed-application $globals $typed-target $typed-args)
+    (lets
+      ($target-type (typed-type $typed-target))
+      ($arg-types (map typed-type $typed-args))
+      (switch $target-type
+        ((arrow? $arrow)
+          (typed
+            (arrow-result $arrow)
+            (and (type-dynamic? $arrow)
+              (packet-application $globals
+                (typed-value $typed-target)
+                (typed-list->dynamic-values $typed-args)))))
+        ((else $other)
+          (throw not-arrow $target-type)))))
+
+  (define (packet-application $globals $packet-target $packet-args)
+    TODO)
 )
