@@ -1,6 +1,7 @@
 (library (tico typed)
   (export
     typed typed? typed-type typed-value
+    typed-with-value
     typed-dynamic?
     typed-list->dynamic-values)
   (import
@@ -8,6 +9,9 @@
     (tico type))
 
   (data (typed type value))
+
+  (define (typed-with-value $typed $value)
+    (typed (typed-type $typed) $value))
 
   (define (typed-dynamic? $typed)
     (and (type-dynamic? (typed-type $typed)) $typed))

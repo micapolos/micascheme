@@ -1,5 +1,6 @@
 (import
   (micascheme)
+  (tico typed)
   (tico compiled))
 
 ; --- literal->compiled

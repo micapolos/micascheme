@@ -1,7 +1,6 @@
 (library (tico compiled)
   (export
     symbolic symbolic? symbolic-symbol symbolic-value
-    typed typed? typed-type typed-value
     packet packet? packet-comptime packet-runtime
     constant constant? constant-value
     variable variable? variable-index
@@ -15,10 +14,10 @@
     compiled+global
     compiled-bind
     compiled-lets
+    compiled-flatten
     compiled-globalize
 
     packet-with-comptime
-    typed-with-value
 
     type-literal->compiled
     boolean->compiled
@@ -31,10 +30,12 @@
     compiled-comptime)
   (import
     (micascheme)
-    (tico type))
+    (tico type)
+    (tico typed)
+    (tico expression)
+    (evaluator))
 
   (data (symbolic symbol value))
-  (data (typed type value))
   (data (packet comptime runtime))
   (data (constant value))
   (data (variable index))
@@ -69,6 +70,14 @@
         (push-all $globals (compiled-globals $fn-compiled))
         (compiled-value $fn-compiled))))
 
+  (define (compiled-flatten $list)
+    (if (null? $list)
+      (pure-compiled (list))
+      (compiled-lets
+        ($car (car $list))
+        ($cdr (compiled-flatten (cdr $list)))
+        (pure-compiled (cons $car $cdr)))))
+
   (define (compiled-globalize $compiled)
     (lets
       ($typed (compiled-value $compiled))
@@ -87,9 +96,6 @@
                     (constant-value $constant)))))))
         ((variable? $variable) $compiled))))
 
-  (define (typed-with-value $typed $value)
-    (typed (typed-type $typed) $value))
-
   (define (packet-with-comptime $packet $comptime)
     (packet $comptime (packet-runtime $packet)))
 
@@ -106,8 +112,7 @@
             (compiled-lets $decl ... $body))))))
 
   (define (type-literal->compiled $type $literal)
-    (compiled
-      (globals)
+    (pure-compiled
       (typed
         $type
         (packet
@@ -134,6 +139,31 @@
       ((else $other)
         (throw not-literal $other))))
 
+  (define (compiled-struct $name $compiled-items)
+    (compiled-lets
+      ($typed-items (compiled-flatten $compiled-items))
+      (lets
+        ($types (map typed-type $typed-items))
+        ($packets (typed-list->dynamic-values $typed-items))
+        ($comptimes (map packet-comptime $packets))
+        ($runtimes (map packet-runtime $packets))
+        ($comptime (comptime (tuple-expression $comptimes)))
+        (pure-compiled
+          (typed
+            (struct $name $types)
+            (packet
+              $comptime
+              (runtime
+                (or
+                  (and
+                    (for-all constant? $runtimes)
+                    (globals-comptime->runtime
+                      (stack) $comptime))
+                  (variable
+                    (apply max
+                      (map variable-index
+                        (filter variable? $runtimes))))))))))))
+
   (define (symbolic-comptime $symbolic)
     `(
       ,(symbolic-symbol $symbolic)
@@ -146,4 +176,16 @@
     `(lets
       ,@(reverse (map symbolic-comptime (compiled-globals $compiled)))
       ,(typed-comptime (compiled-value $compiled))))
+
+  (define (globals-comptime->runtime $globals $comptime)
+    (evaluate
+      (evaluator
+        (environment `(micascheme))
+        (map
+          (lambda ($symbolic)
+            (cons
+              (symbolic-symbol $symbolic)
+              (packet-runtime (symbolic-value $symbolic))))
+          $globals))
+      $comptime))
 )
