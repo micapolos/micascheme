@@ -1,5 +1,22 @@
 (library (tico compiled)
-  (export)
+  (export
+    symbolic symbolic? symbolic-symbol symbolic-value
+    typed typed? typed-type typed-value
+    packet packet? packet-comptime packet-runtime
+    constant constant? constant-value
+    variable variable? variable-index
+    hole hole?
+    compiled compiled? compiled-globals compiled-value
+
+    globals comptime runtime
+
+    compiled-pure compiled-bind compiled-lets
+
+    type-literal->compiled
+    boolean->compiled
+    number->compiled
+    string->compiled
+    literal->compiled)
   (import
     (micascheme)
     (tico type))
@@ -26,6 +43,15 @@
       (compiled
         (push-all $globals (compiled-globals $fn-compiled))
         (compiled-value $fn-compiled))))
+
+  (define-syntax compiled-lets
+    (syntax-rules ()
+      ((_ $body) $body)
+      ((_ ($value $compiled) $decl ... $body)
+        (identifier? #'$value)
+        (compiled-bind $compiled
+          (lambda ($value)
+            (compiled-lets $decl ... $body))))))
 
   (define (type-literal->compiled $type $literal)
     (compiled
