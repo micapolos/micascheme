@@ -7,4 +7,5 @@
   (tico typed-expression)
   (tico value)
   (tico datum)
-  (tico reader))
+  (tico reader)
+  (tico compiler))
