@@ -339,26 +339,31 @@
       (typed (number-type) (packet (comptime '$num) (runtime (hole))))
       (typed (string-type) (packet (comptime '$str) (runtime (constant "foo")))))))
 
+  ; static type
   (check
     (equal?
       (locals-pattern->typed-variable-opt $locals (value-type 't))
       (typed (value-type 't) #f)))
 
+  ; dynamic variable type
   (check
     (equal?
       (locals-pattern->typed-variable-opt $locals (number-type))
       (typed (number-type) (packet (comptime '$num) (runtime (variable 1))))))
 
+  ; dynamic constant type
   (check
     (equal?
       (locals-pattern->typed-variable-opt $locals (string-type))
       (typed (string-type) (packet (comptime '$str) (runtime (constant "foo"))))))
 
+  ; any-type match
   (check
     (equal?
       (locals-pattern->typed-variable-opt $locals (any-type))
       (typed (string-type) (packet (comptime '$str) (runtime (constant "foo"))))))
 
+  ; mismatch
   (check
     (equal?
       (locals-pattern->typed-variable-opt $locals (boolean-type))
