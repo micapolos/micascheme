@@ -58,6 +58,8 @@
       ((type-type? _) #t)
       ((struct? $struct)
         (exists type-dynamic? (struct-fields $struct)))
+      ((arrow? $arrow)
+        (type-dynamic? (arrow-result $arrow)))
       ((arrow? $arrow) #t)
       ((else $other)
         (throw not-type $other))))

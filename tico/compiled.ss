@@ -17,6 +17,12 @@
     compiled-flatten
     compiled-globalize
 
+    compiled-map-constant
+    typed-map-constant
+    packet-map-constant
+    runtime-map-constant
+    constant-map
+
     packet-with-comptime
 
     type-literal->compiled
@@ -26,6 +32,9 @@
     literal->compiled
     literal-typed
     literal-packet
+
+    compiled-lambda
+    typed-lambda
 
     locals->typed-variable-opt
     locals->typed-variable
@@ -128,6 +137,27 @@
         (compiled-bind $compiled
           (lambda ($value)
             (compiled-lets $decl ... $body))))))
+
+  (define (compiled-map-constant $compiled $fn)
+    (compiled-with-value $compiled
+      (typed-map-constant (compiled-value $compiled) $fn)))
+
+  (define (typed-map-constant $typed $fn)
+    (typed-with-value $typed
+      (and (typed-value $typed)
+        (packet-map-constant (typed-value $typed) $fn))))
+
+  (define (packet-map-constant $packet $fn)
+    (packet-with-runtime $packet
+      (runtime-map-constant (packet-runtime $packet) $fn)))
+
+  (define (runtime-map-constant $runtime $fn)
+    (switch $runtime
+      ((constant? $constant) (constant-map $constant $fn))
+      ((variable? $variable) $variable)))
+
+  (define (constant-map $constant $fn)
+    (constant ($fn (constant-value $constant))))
 
   (define (literal-typed $literal)
     (typed
@@ -290,6 +320,42 @@
                   (switch (packet-runtime $local-packet)
                     ((constant? $constant) $constant)
                     ((hole? $hole) (variable $index)))))))))))
+
+  (define (compiled-lambda $param-locals $compiled-body)
+    (lets
+      ($globals (compiled-globals $compiled-body))
+      ($typed-body (compiled-value $compiled-body))
+      (compiled-with-value $compiled-body
+        (typed-lambda $globals $param-locals $typed-body))))
+
+  (define (typed-lambda $globals $param-locals $typed-body)
+    (lets
+      ($body-type (typed-type $typed-body))
+      ($param-types (map typed-type $param-locals))
+      ($arrow (arrow (reverse $param-types) $body-type))
+      (typed $arrow
+        (and (type-dynamic? $arrow)
+          (lets
+            ($param-packets (typed-list->dynamic-values $param-locals))
+            ($param-symbols (map packet-comptime $param-packets))
+            ($body-packet (typed-value $typed-body))
+            ($comptime
+              `(lambda (,@(reverse $param-symbols))
+                ,(packet-comptime $body-packet)))
+            ($runtime
+              (switch (packet-runtime $body-packet)
+                ((constant? $constant)
+                  (constant (comptime->runtime $globals $comptime)))
+                ((variable? $variable)
+                  (lets
+                    ($arity (length $param-locals))
+                    ($index (- (variable-index $variable) $arity))
+                    (cond
+                      ((< $index 0)
+                        (constant (comptime->runtime $globals $comptime)))
+                      (else
+                        (variable $index)))))))
+            (packet $comptime $runtime))))))
 
   ; (define (locals-compiled-lambda $locals $compiled-params $body-fn)
   ;   (compiled-lets

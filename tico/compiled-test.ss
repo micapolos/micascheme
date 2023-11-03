@@ -368,3 +368,67 @@
     (equal?
       (locals->typed-variable-opt $locals (boolean-type))
       #f)))
+
+; --- typed-lambda
+
+; constant dynamic lambda
+(check
+  (equal?
+    (typed-map-constant
+      (typed-lambda
+        (globals
+          (symbolic 'plus (packet (comptime 'string-append) (runtime string-append))))
+        (locals
+          (typed (number-type) (packet (comptime '$number) (runtime (hole))))
+          (typed (value-type 'foo) #f)
+          (typed (string-type) (packet (comptime '$string) (runtime (hole)))))
+        (typed
+          (string-type)
+          (packet
+            (comptime '(plus (number->string $number) $string))
+            (runtime (variable 1)))))
+      (lambda ($proc)
+        (app $proc 10 "20")))
+    (typed
+      (arrow (list (number-type) (value-type 'foo) (string-type)) (string-type))
+      (packet
+        (comptime
+          '(lambda ($number $string)
+            (plus (number->string $number) $string)))
+        (runtime (constant "1020"))))))
+
+; constant static lambda
+(check
+  (equal?
+    (typed-map-constant
+      (typed-lambda (globals)
+        (locals
+          (typed (number-type) (packet (comptime '$number) (runtime (hole))))
+          (typed (string-type) (packet (comptime '$string) (runtime (hole)))))
+        (typed (value-type 'foo) #f))
+      (lambda ($proc)
+        (app $proc 10 "20")))
+    (typed
+      (arrow (list (number-type) (string-type)) (value-type 'foo))
+      #f)))
+
+; free lambda
+(check
+  (equal?
+    (typed-lambda (globals)
+      (locals
+        (typed (number-type) (packet (comptime '$number) (runtime (hole))))
+        (typed (string-type) (packet (comptime '$string) (runtime (hole)))))
+      (typed
+        (string-type)
+        (packet
+          (comptime '(plus (number->string $number) $string))
+          (runtime (variable 5)))))
+    (typed
+      (arrow (list (number-type) (string-type)) (string-type))
+      (packet
+        (comptime
+          '(lambda ($number $string)
+            (plus (number->string $number) $string)))
+        (runtime
+          (variable 3))))))
