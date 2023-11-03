@@ -159,15 +159,15 @@
         (throw not-literal $other))))
 
   (define (compiled-struct $name $compiled-items)
-    (compiled-lets
-      ($typed-items (compiled-flatten $compiled-items))
-      (pure-compiled
-        (typed-struct
-          (apply append (reverse (map compiled-globals $compiled-items)))
-          $name
-          $typed-items))))
+    (lets
+      ($items-compiled (compiled-flatten $compiled-items))
+      ($globals (compiled-globals $items-compiled))
+      (compiled-lets
+        ($typed-items $items-compiled)
+        (pure-compiled
+          (typed-struct $name $globals $typed-items)))))
 
-  (define (typed-struct $globals $name $typed-items)
+  (define (typed-struct $name $globals $typed-items)
     (lets
       ($types (map typed-type $typed-items))
       ($packets (typed-list->dynamic-values $typed-items))
@@ -195,6 +195,7 @@
         (variable-struct (filter variable? $runtimes)))))
 
   (define (variable-struct $variables)
+    (unless (not (null? $variables)) (throw null? $variables))
     (variable
       (apply max
         (map variable-index $variables))))

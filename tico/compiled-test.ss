@@ -1,7 +1,9 @@
 (import
   (micascheme)
+  (tico type)
   (tico typed)
-  (tico compiled))
+  (tico compiled)
+  (tico expression))
 
 ; --- literal->compiled
 
@@ -128,7 +130,128 @@
       ($bar bar)
       goo)))
 
-; --- compiled-struct
+; --- struct
+
+(check 
+  (equal? 
+    (variable-struct (list (variable 2) (variable 3)))
+    (variable 3)))
+
+(check
+  (raises?
+    (lambda ()
+      (variable-struct (list)))))
+
+(check
+  (equal?
+    (runtime-struct
+      (globals 
+        (symbolic 'foo 
+          (packet (comptime "foo") (runtime "foo")))
+        (symbolic 'bar
+          (packet (comptime "bar") (runtime "bar"))))
+      `(cons foo bar)
+      (list 
+        (runtime (constant "foo"))
+        (runtime (constant "bar"))))
+    (runtime
+      (constant
+        (comptime->runtime
+          (globals 
+            (symbolic 'foo 
+              (packet (comptime "foo") (runtime "foo")))
+            (symbolic 'bar
+              (packet (comptime "bar") (runtime "bar"))))
+          `(cons foo bar))))))
+
+(check
+  (equal?
+    (runtime-struct
+      (globals 
+        (symbolic 'bar
+          (packet (comptime "bar") (runtime "bar"))))
+      `(cons foo bar)
+      (list 
+        (runtime (variable 3))
+        (runtime (constant "bar"))))
+    (runtime
+      (variable 3))))
+
+(check
+  (equal?
+    (comptime-struct
+      (list
+        (comptime 'foo)
+        (comptime 'bar)))
+    (comptime
+      (tuple-expression
+        (list 'foo 'bar)))))
+
+(check
+  (equal?
+    (packet-struct
+      (globals 
+        (symbolic 'bar
+          (packet (comptime "bar") (runtime "bar"))))
+      (list
+        (packet
+          (comptime 'foo)
+          (runtime (variable 3)))
+        (packet
+          (comptime 'bar)
+          (runtime (constant "bar")))))
+    (packet
+      (comptime-struct
+        (list (comptime 'foo) (comptime 'bar)))
+      (runtime-struct 
+        (globals
+          (symbolic 'bar
+            (packet (comptime "bar") (runtime "bar"))))
+        (comptime-struct 
+          (list 
+            (comptime 'foo) 
+            (comptime 'bar)))
+        (list 
+          (runtime (variable 3)) 
+          (runtime (constant "bar")))))))
+
+(check
+  (equal?
+    (typed-struct 'my-struct
+      (globals
+        (symbolic 'bar
+          (packet (comptime "bar") (runtime "bar"))))
+      (list
+        (typed 
+          (number-type)
+          (packet
+            (comptime 'foo)
+            (runtime (variable 3))))
+        (typed 
+          (struct 'empty (list))
+          #f)
+        (typed 
+          (string-type)
+          (packet
+            (comptime 'bar)
+            (runtime (constant "bar"))))))
+    (typed
+      (struct 'my-struct
+        (list
+          (number-type)
+          (struct 'empty (list))
+          (string-type)))
+      (packet-struct
+        (globals
+          (symbolic 'bar
+            (packet (comptime "bar") (runtime "bar"))))
+        (list
+          (packet
+            (comptime 'foo)
+            (runtime (variable 3)))
+          (packet
+            (comptime 'bar)
+            (runtime (constant "bar"))))))))
 
 (check
   (equal?

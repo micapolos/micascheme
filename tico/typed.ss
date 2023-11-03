@@ -14,7 +14,9 @@
     (typed (typed-type $typed) $value))
 
   (define (typed-dynamic? $typed)
-    (and (type-dynamic? (typed-type $typed)) $typed))
+    (and 
+      (type-dynamic? (typed-type $typed)) 
+      $typed))
 
   (define (typed-list->dynamic-values $typed-list)
     (map typed-value (filter typed-dynamic? $typed-list)))

@@ -73,5 +73,5 @@
     (compiler-lets
       ($typed-items (compiler-flatten $compilers))
       ($globals (globals-compiler))
-      (compiler (typed-struct $globals $name $typed-items))))
+      (compiler (typed-struct $name $globals $typed-items))))
 )
