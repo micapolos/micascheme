@@ -35,6 +35,7 @@
 
     compiled-lambda
     typed-lambda
+    packet-lambda
 
     locals->typed-variable-opt
     locals->typed-variable
@@ -335,27 +336,37 @@
       ($arrow (arrow (reverse $param-types) $body-type))
       (typed $arrow
         (and (type-dynamic? $arrow)
-          (lets
-            ($param-packets (typed-list->dynamic-values $param-locals))
-            ($param-symbols (map packet-comptime $param-packets))
-            ($body-packet (typed-value $typed-body))
-            ($comptime
-              `(lambda (,@(reverse $param-symbols))
-                ,(packet-comptime $body-packet)))
-            ($runtime
-              (switch (packet-runtime $body-packet)
-                ((constant? $constant)
-                  (constant (comptime->runtime $globals $comptime)))
-                ((variable? $variable)
-                  (lets
-                    ($arity (length $param-locals))
-                    ($index (- (variable-index $variable) $arity))
-                    (cond
-                      ((< $index 0)
-                        (constant (comptime->runtime $globals $comptime)))
-                      (else
-                        (variable $index)))))))
-            (packet $comptime $runtime))))))
+          (packet-lambda $globals
+            (typed-list->dynamic-values $param-locals)
+            (typed-value $typed-body))))))
+
+  (define (packet-lambda $globals $param-packets $body-packet)
+    (lets
+      ($comptime
+        (comptime-lambda
+          (map packet-comptime $param-packets)
+          (packet-comptime $body-packet)))
+      (packet $comptime
+        (runtime-lambda $globals $comptime
+          (map packet-runtime $param-packets)
+          (packet-runtime $body-packet)))))
+
+  (define (comptime-lambda $params $body)
+    `(lambda (,@(reverse $params)) ,$body))
+
+  (define (runtime-lambda $globals $comptime $runtime-params $body-runtime)
+    (switch $body-runtime
+      ((constant? $constant)
+        (constant (comptime->runtime $globals $comptime)))
+      ((variable? $variable)
+        (lets
+          ($arity (length $runtime-params))
+          ($index (- (variable-index $variable) $arity))
+          (cond
+            ((< $index 0)
+              (constant (comptime->runtime $globals $comptime)))
+            (else
+              (variable $index)))))))
 
   ; (define (locals-compiled-lambda $locals $compiled-params $body-fn)
   ;   (compiled-lets
