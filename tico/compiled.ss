@@ -79,15 +79,18 @@
                   (packet-with-comptime $packet (comptime $symbol))))
               (global
                 (symbolic $symbol
-                  (constant-value $constant))))))
-        ((variable? $variable)
-          $variable))))
+                  (packet-with-runtime $packet
+                    (constant-value $constant)))))))
+        ((variable? $variable) $compiled))))
 
   (define (typed-with-value $typed $value)
     (typed (typed-type $typed) $value))
 
   (define (packet-with-comptime $packet $comptime)
     (packet $comptime (packet-runtime $packet)))
+
+  (define (packet-with-runtime $packet $runtime)
+    (packet (packet-comptime $packet) $runtime))
 
   (define-syntax compiled-lets
     (syntax-rules ()
@@ -126,4 +129,12 @@
         (string->compiled $string))
       ((else $other)
         (throw not-literal $other))))
+
+  ; (define (compiled-datum $compiled)
+  ;   `(lets
+  ;     ))
+
+  ; (define (symbolic-datum $global)
+  ;   `(lets
+  ;     ))
 )

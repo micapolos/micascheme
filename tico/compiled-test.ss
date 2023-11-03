@@ -53,10 +53,52 @@
   (equal?
     (with-generate-temporary-seed $tmp
       (compiled-globalize
-        (string->compiled "foo")))
+        (compiled
+          (globals
+            (symbolic 'g1
+              (packet
+                (comptime 'foo)
+                (runtime "foo"))))
+          (typed `t
+            (packet
+              (comptime `bar)
+              (runtime (constant "bar")))))))
     (compiled
-      (globals (symbolic '$tmp-0 "foo"))
-      (typed (string-type)
+      (globals
+        (symbolic 'g1
+          (packet
+            (comptime 'foo)
+            (runtime "foo")))
+        (symbolic '$tmp-0
+          (packet
+            (comptime 'bar)
+            (runtime "bar"))))
+      (typed `t
         (packet
           (comptime '$tmp-0)
-          (runtime (constant "foo")))))))
+          (runtime (constant "bar")))))))
+
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (compiled-globalize
+        (compiled
+          (globals
+            (symbolic 'g1
+              (packet
+                (comptime 'foo)
+                (runtime "foo"))))
+          (typed `t
+            (packet
+              (comptime `bar)
+              (runtime (variable 3)))))))
+    (compiled
+      (globals
+        (symbolic 'g1
+          (packet
+            (comptime 'foo)
+            (runtime "foo"))))
+      (typed `t
+        (packet
+          (comptime `bar)
+          (runtime (variable 3)))))))
