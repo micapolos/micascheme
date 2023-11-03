@@ -37,6 +37,12 @@
     typed-lambda
     packet-lambda
 
+    compiled-application
+    typed-application
+    packet-application
+    comptime-application
+    runtime-application
+
     locals->typed-variable-opt
     locals->typed-variable
 
@@ -381,9 +387,11 @@
           (pure-compiled
             (lambda ($globals)
               (typed-application $globals $typed-target $typed-args)))))
-      (app
-        (compiled-value $compiled-proc)
-        (compiled-globals $compiled-proc))))
+      (compiled
+        (compiled-globals $compiled-proc)
+        (app
+          (compiled-value $compiled-proc)
+          (compiled-globals $compiled-proc)))))
 
   (define (typed-application $globals $typed-target $typed-args)
     (lets
@@ -401,5 +409,26 @@
           (throw not-arrow $target-type)))))
 
   (define (packet-application $globals $packet-target $packet-args)
-    TODO)
+    (lets
+      ($comptime
+        (comptime-application
+          (packet-comptime $packet-target)
+          (map packet-comptime $packet-args)))
+      (packet $comptime
+        (runtime-application $globals $comptime
+          (packet-runtime $packet-target)
+          (map packet-runtime $packet-args)))))
+
+  (define (comptime-application $target $args)
+    `(,$target ,@$args))
+
+  (define (runtime-application $globals $comptime $target $args)
+    (cond
+      ((for-all constant? (cons $target $args))
+        (constant (comptime->runtime $globals $comptime)))
+      (else
+        (variable
+          (apply max
+            (map variable-index
+              (filter variable? (cons $target $args))))))))
 )

@@ -432,3 +432,97 @@
             (plus (number->string $number) $string)))
         (runtime
           (variable 3))))))
+
+; --- compiled-application
+
+; constant application
+(check
+  (equal?
+    (compiled-application
+      (compiled
+        (globals
+          (symbolic '+ (packet (comptime 'string-append) (runtime string-append))))
+        (typed
+          (arrow (list (string-type) (string-type)) (string-type))
+          (packet (comptime '+) (runtime (constant string-append)))))
+      (list
+        (compiled
+          (globals
+            (symbolic 's1 (packet (comptime "foo") (runtime "foo"))))
+          (typed (string-type)
+            (packet (comptime 's1) (runtime (constant "foo")))))
+        (compiled
+          (globals
+            (symbolic 's2 (packet (comptime "bar") (runtime "bar"))))
+          (typed (string-type)
+            (packet (comptime 's2) (runtime (constant "bar")))))))
+    (compiled
+      (globals
+        (symbolic '+ (packet (comptime 'string-append) (runtime string-append)))
+        (symbolic 's1 (packet (comptime "foo") (runtime "foo")))
+        (symbolic 's2 (packet (comptime "bar") (runtime "bar"))))
+      (typed
+        (string-type)
+        (packet
+          (comptime '(+ s1 s2))
+          (runtime (constant "foobar")))))))
+
+; variable application
+(check
+  (equal?
+    (compiled-application
+      (compiled
+        (globals
+          (symbolic '+ (packet (comptime 'string-append) (runtime string-append))))
+        (typed
+          (arrow (list (string-type) (string-type)) (string-type))
+          (packet (comptime '+) (runtime (constant string-append)))))
+      (list
+        (compiled
+          (globals
+            (symbolic 's1 (packet (comptime "foo") (runtime "foo"))))
+          (typed (string-type)
+            (packet (comptime 's1) (runtime (variable 3)))))
+        (compiled
+          (globals
+            (symbolic 's2 (packet (comptime "bar") (runtime "bar"))))
+          (typed (string-type)
+            (packet (comptime 's2) (runtime (variable 2)))))))
+    (compiled
+      (globals
+        (symbolic '+ (packet (comptime 'string-append) (runtime string-append)))
+        (symbolic 's1 (packet (comptime "foo") (runtime "foo")))
+        (symbolic 's2 (packet (comptime "bar") (runtime "bar"))))
+      (typed
+        (string-type)
+        (packet
+          (comptime '(+ s1 s2))
+          (runtime (variable 3)))))))
+
+; static result
+(check
+  (equal?
+    (compiled-application
+      (compiled
+        (globals
+          (symbolic '+ (packet (comptime 'string-append) (runtime string-append))))
+        (typed
+          (arrow (list (string-type) (string-type)) (value-type 'static))
+          (packet (comptime '+) (runtime (constant string-append)))))
+      (list
+        (compiled
+          (globals
+            (symbolic 's1 (packet (comptime "foo") (runtime "foo"))))
+          (typed (string-type)
+            (packet (comptime 's1) (runtime (constant "foo")))))
+        (compiled
+          (globals
+            (symbolic 's2 (packet (comptime "bar") (runtime "bar"))))
+          (typed (string-type)
+            (packet (comptime 's2) (runtime (constant "bar")))))))
+    (compiled
+      (globals
+        (symbolic '+ (packet (comptime 'string-append) (runtime string-append)))
+        (symbolic 's1 (packet (comptime "foo") (runtime "foo")))
+        (symbolic 's2 (packet (comptime "bar") (runtime "bar"))))
+      (typed (value-type 'static) #f))))
