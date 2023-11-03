@@ -254,6 +254,8 @@
                   ((constant? $constant) $constant)
                   ((variable? $variable) (hole))))))))))
 
+  ; --- compiled-variable
+
   (define (locals->compiled-variable $locals $pattern)
     (pure-compiled
       (locals->typed-variable $locals $pattern)))
@@ -264,17 +266,17 @@
       (throw variable-not-found $pattern)))
 
   (define (locals->typed-variable-opt $locals $pattern)
-    (locals-index->typed-variable-opt $locals $pattern 0))
+    (locals-index->typed-variable-opt $locals 0 $pattern))
 
-  (define (locals-index->typed-variable-opt $locals $pattern $index)
+  (define (locals-index->typed-variable-opt $locals $index $pattern)
     (and (pair? $locals)
       (or
         (local-index->typed-variable-opt
-          (car $locals) $pattern $index)
+          (car $locals) $index $pattern)
         (locals-index->typed-variable-opt
-          (cdr $locals) $pattern (+ $index 1)))))
+          (cdr $locals) (+ $index 1) $pattern))))
 
-  (define (local-index->typed-variable-opt $local $pattern $index)
+  (define (local-index->typed-variable-opt $local $index $pattern)
     (lets
       ($type (typed-type $local))
       (and (type-matches? $type $pattern)
