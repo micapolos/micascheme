@@ -24,7 +24,11 @@
     boolean->compiled
     number->compiled
     string->compiled
-    literal->compiled)
+    literal->compiled
+
+    symbolic-comptime
+    typed-comptime
+    compiled-comptime)
   (import
     (micascheme)
     (tico type))
@@ -130,11 +134,16 @@
       ((else $other)
         (throw not-literal $other))))
 
-  ; (define (compiled-datum $compiled)
-  ;   `(lets
-  ;     ))
+  (define (symbolic-comptime $symbolic)
+    `(
+      ,(symbolic-symbol $symbolic)
+      ,(packet-comptime (symbolic-value $symbolic))))
 
-  ; (define (symbolic-datum $global)
-  ;   `(lets
-  ;     ))
+  (define (typed-comptime $typed)
+    (packet-comptime (typed-value $typed)))
+
+  (define (compiled-comptime $compiled)
+    `(lets
+      ,@(reverse (map symbolic-comptime (compiled-globals $compiled)))
+      ,(typed-comptime (compiled-value $compiled))))
 )

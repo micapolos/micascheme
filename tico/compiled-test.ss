@@ -108,3 +108,21 @@
         (packet
           (comptime `bar)
           (runtime (variable 3)))))))
+
+; --- compiled-comptime
+
+(check
+  (equal?
+    (compiled-comptime
+      (compiled
+        (globals
+          (symbolic '$foo (packet (comptime 'foo) (runtime "foo")))
+          (symbolic '$bar (packet (comptime 'bar) (runtime "bar"))))
+        (typed `t
+          (packet
+            (comptime 'goo)
+            (runtime (constant "goo"))))))
+    '(lets
+      ($foo foo)
+      ($bar bar)
+      goo)))
