@@ -8,5 +8,4 @@
   (tico value)
   (tico datum)
   (tico reader)
-  (tico compiled)
-  (tico compiler))
+  (tico compiled))
