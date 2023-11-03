@@ -37,7 +37,9 @@
     comptime->runtime
     symbolic-comptime
     typed-comptime
-    compiled-comptime)
+    compiled-comptime
+
+    typed-local)
   (import
     (micascheme)
     (tico type)
@@ -229,4 +231,49 @@
               (packet-runtime (symbolic-value $symbolic))))
           $globals))
       $comptime))
+
+  (define (typed-local $typed)
+    (lets
+      ($type (typed-type $typed))
+      (typed $type
+        (and (type-dynamic? $type)
+          (lets
+            ($packet (typed-value $typed))
+            ($symbol (generate-symbol))
+            (packet
+              (comptime $symbol)
+              (runtime
+                (switch (packet-runtime $packet)
+                  ((constant? $constant) $constant)
+                  ((variable? $variable) (hole))))))))))
+
+  ; (define (locals-compiled-lambda $locals $compiled-params $body-fn)
+  ;   (compiled-lets
+  ;     ($typed-params (compiled-flatten $compiled-params))
+  ;     (lets
+  ;       ($compiled-body ($body-fn (push-all $locals $typed-params)))
+  ;       ($globals (compiled-globals $compiled-body))
+  ;       (compiled-lets
+  ;         ($body-typed $compiled-body)
+  ;         (lets
+  ;           ($param-types (map typed-type $typed-params))
+  ;           ($param-packets (typed-list->dynamic-values $typed-params))
+  ;           ($param-symbols (map packet-comptime $param-packets))
+  ;           ($body-type (typed-type $body-typed))
+  ;           ($body-value (typed-value $body-typed))
+  ;           (pure-compiled
+  ;             (typed
+  ;               (arrow $param-types $body-type)
+  ;               (and (type-dynamic? $body-type)
+  ;                 (lets
+  ;                   ($comptime
+  ;                     `(lambda (,@$param-symbols)
+  ;                       ,(packet-comptime $body-value)))
+  ;                   ($runtime
+  ;                     (switch (packet-runtime $body-value)
+  ;                       ((constant? $constant)
+  ;                         (comptime->runtime $globals $comptime))
+  ;                       ((variable? $variable) )
+  ;                     (comptime->runtime $globals $comptime))
+  ;                   (packet $comptime $runtime))))))))))
 )

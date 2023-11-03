@@ -289,3 +289,43 @@
         (packet
           (comptime '(vector $tmp-0 n $tmp-1))
           (runtime (variable 3)))))))
+
+; --- typed-local
+
+; typed-static
+(check
+  (equal?
+    (typed-local (typed (value-type "foo") #f))
+    (typed (value-type "foo") #f)))
+
+; typed-dynamic
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (typed-local
+        (typed
+          (string-type)
+          (packet
+            (comptime 'foo)
+            (runtime (constant "foo"))))))
+    (typed
+      (string-type)
+      (packet
+        (comptime '$tmp-0)
+        (runtime (constant "foo"))))))
+
+; typed-variable
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (typed-local
+        (typed
+          (string-type)
+          (packet
+            (comptime 'foo)
+            (runtime (variable 3))))))
+    (typed
+      (string-type)
+      (packet
+        (comptime '$tmp-0)
+        (runtime (hole))))))
