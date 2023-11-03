@@ -25,6 +25,12 @@
     string->compiled
     literal->compiled
 
+    compiled-struct
+    typed-struct
+    packet-struct
+    comptime-struct
+    variable-struct
+
     symbolic-comptime
     typed-comptime
     compiled-comptime)
@@ -142,27 +148,43 @@
   (define (compiled-struct $name $compiled-items)
     (compiled-lets
       ($typed-items (compiled-flatten $compiled-items))
-      (lets
-        ($types (map typed-type $typed-items))
-        ($packets (typed-list->dynamic-values $typed-items))
-        ($comptimes (map packet-comptime $packets))
-        ($runtimes (map packet-runtime $packets))
-        ($comptime (comptime (tuple-expression $comptimes)))
-        (pure-compiled
-          (typed
-            (struct $name $types)
-            (packet
-              $comptime
-              (runtime
-                (or
-                  (and
-                    (for-all constant? $runtimes)
-                    (globals-comptime->runtime
-                      (stack) $comptime))
-                  (variable
-                    (apply max
-                      (map variable-index
-                        (filter variable? $runtimes))))))))))))
+      (pure-compiled
+        (typed-struct
+          (apply append (reverse (map compiled-globals $compiled-items)))
+          $name
+          $typed-items))))
+
+  (define (typed-struct $globals $name $typed-items)
+    (lets
+      ($types (map typed-type $typed-items))
+      ($packets (typed-list->dynamic-values $typed-items))
+      (typed
+        (struct $name $types)
+        (packet-struct $globals $packets))))
+
+  (define (packet-struct $globals $packets)
+    (lets
+      ($comptimes (map packet-comptime $packets))
+      ($runtimes (map packet-runtime $packets))
+      ($comptime (comptime-struct $comptimes))
+      (packet $comptime
+        (runtime-struct $globals $comptime $runtimes))))
+
+  (define (comptime-struct $comptimes)
+    (comptime (tuple-expression $comptimes)))
+
+  (define (runtime-struct $globals $comptime $runtimes)
+    (runtime
+      (or
+        (and
+          (for-all constant? $runtimes)
+          (constant (comptime->runtime $globals $comptime)))
+        (variable-struct (filter variable? $runtimes)))))
+
+  (define (variable-struct $variables)
+    (variable
+      (apply max
+        (map variable-index $variables))))
 
   (define (symbolic-comptime $symbolic)
     `(
@@ -177,7 +199,7 @@
       ,@(reverse (map symbolic-comptime (compiled-globals $compiled)))
       ,(typed-comptime (compiled-value $compiled))))
 
-  (define (globals-comptime->runtime $globals $comptime)
+  (define (comptime->runtime $globals $comptime)
     (evaluate
       (evaluator
         (environment `(micascheme))

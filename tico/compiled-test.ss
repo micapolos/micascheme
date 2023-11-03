@@ -127,3 +127,42 @@
       ($foo foo)
       ($bar bar)
       goo)))
+
+; --- compiled-struct
+
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (compiled-struct 'foo
+        (list
+          (compiled-globalize (boolean->compiled #f))
+          (compiled-globalize (number->compiled 128))
+          (compiled-globalize (string->compiled "foo")))))
+    (compiled
+      (globals
+        (symbolic '$tmp-0 (packet (comptime #f) (runtime #f)))
+        (symbolic '$tmp-1 (packet (comptime 128) (runtime 128)))
+        (symbolic '$tmp-2 (packet (comptime "foo") (runtime "foo"))))
+      (typed
+        (struct 'foo (list (boolean-type) (number-type) (string-type)))
+        (packet
+          (comptime '(vector $tmp-0 $tmp-1 $tmp-2))
+          (runtime (constant (vector #f 128 "foo"))))))))
+
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (compiled-struct 'foo
+        (list
+          (compiled-globalize (boolean->compiled #f))
+          (pure-compiled (typed (number-type) (packet (comptime 'n) (runtime (variable 3)))))
+          (compiled-globalize (string->compiled "foo")))))
+    (compiled
+      (globals
+        (symbolic '$tmp-0 (packet (comptime #f) (runtime #f)))
+        (symbolic '$tmp-1 (packet (comptime "foo") (runtime "foo"))))
+      (typed
+        (struct 'foo (list (boolean-type) (number-type) (string-type)))
+        (packet
+          (comptime '(vector $tmp-0 n $tmp-1))
+          (runtime (variable 3)))))))
