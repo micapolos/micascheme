@@ -431,4 +431,13 @@
           (apply max
             (map variable-index
               (filter variable? (cons $target $args))))))))
+
+  ; --- compiled-do
+
+  (define (compiled-do $compiled-items $compiled-body)
+    (compiled-application
+      (compiled-lambda
+        (map typed-local (map compiled-value $compiled-items))
+        $compiled-body)
+      $compiled-items))
 )
