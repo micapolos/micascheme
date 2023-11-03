@@ -10,10 +10,15 @@
 
     globals comptime runtime
 
-    value->compiled
+    pure-compiled
+    compiled-with-value
     compiled+global
     compiled-bind
     compiled-lets
+    compiled-globalize
+
+    packet-with-comptime
+    typed-with-value
 
     type-literal->compiled
     boolean->compiled
@@ -33,11 +38,17 @@
   (data (compiled globals value))
 
   (define-syntax-rule (globals $item ...) (stack $item ...))
+  (define-syntax-rule (global $item) $item)
   (define-syntax-rule (comptime $item) $item)
   (define-syntax-rule (runtime $item) $item)
 
-  (define (value->compiled $value)
+  (define (pure-compiled $value)
     (compiled (globals) $value))
+
+  (define (compiled-with-value $compiled $value)
+    (compiled
+      (compiled-globals $compiled)
+      $value))
 
   (define (compiled+global $compiled $global)
     (compiled
@@ -53,6 +64,30 @@
       (compiled
         (push-all $globals (compiled-globals $fn-compiled))
         (compiled-value $fn-compiled))))
+
+  (define (compiled-globalize $compiled)
+    (lets
+      ($typed (compiled-value $compiled))
+      ($packet (typed-value $typed))
+      (switch (packet-runtime $packet)
+        ((constant? $constant)
+          (lets
+            ($symbol (generate-symbol))
+            (compiled+global
+              (compiled-with-value $compiled
+                (typed-with-value $typed
+                  (packet-with-comptime $packet (comptime $symbol))))
+              (global
+                (symbolic $symbol
+                  (constant-value $constant))))))
+        ((variable? $variable)
+          $variable))))
+
+  (define (typed-with-value $typed $value)
+    (typed (typed-type $typed) $value))
+
+  (define (packet-with-comptime $packet $comptime)
+    (packet $comptime (packet-runtime $packet)))
 
   (define-syntax compiled-lets
     (syntax-rules ()

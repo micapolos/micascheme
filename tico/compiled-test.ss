@@ -48,3 +48,15 @@
       ($number (compiled (stack 'g2) 128))
       (compiled (stack 'g3) (cons $string $number)))
     (compiled (stack 'g1 'g2 'g3) (cons "foo" 128))))
+
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (compiled-globalize
+        (string->compiled "foo")))
+    (compiled
+      (globals (symbolic '$tmp-0 "foo"))
+      (typed (string-type)
+        (packet
+          (comptime '$tmp-0)
+          (runtime (constant "foo")))))))
