@@ -26,7 +26,9 @@
     literal->compiled
     literal-typed
     literal-packet
-    locals-pattern->typed-variable-opt
+
+    locals->typed-variable-opt
+    locals->typed-variable
 
     compiled-struct
     typed-struct
@@ -252,18 +254,27 @@
                   ((constant? $constant) $constant)
                   ((variable? $variable) (hole))))))))))
 
-  (define (locals-pattern->typed-variable-opt $locals $pattern)
-    (locals-pattern-index->typed-variable-opt $locals $pattern 0))
+  (define (locals->compiled-variable $locals $pattern)
+    (pure-compiled
+      (locals->typed-variable $locals $pattern)))
 
-  (define (locals-pattern-index->typed-variable-opt $locals $pattern $index)
+  (define (locals->typed-variable $locals $pattern)
+    (or
+      (locals->typed-variable-opt $locals $pattern)
+      (throw variable-not-found $pattern)))
+
+  (define (locals->typed-variable-opt $locals $pattern)
+    (locals-index->typed-variable-opt $locals $pattern 0))
+
+  (define (locals-index->typed-variable-opt $locals $pattern $index)
     (and (pair? $locals)
       (or
-        (local-pattern-index->typed-variable-opt
+        (local-index->typed-variable-opt
           (car $locals) $pattern $index)
-        (locals-pattern-index->typed-variable-opt
+        (locals-index->typed-variable-opt
           (cdr $locals) $pattern (+ $index 1)))))
 
-  (define (local-pattern-index->typed-variable-opt $local $pattern $index)
+  (define (local-index->typed-variable-opt $local $pattern $index)
     (lets
       ($type (typed-type $local))
       (and (type-matches? $type $pattern)
