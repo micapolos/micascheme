@@ -10,7 +10,10 @@
 
     globals comptime runtime
 
-    compiled-pure compiled-bind compiled-lets
+    value->compiled
+    compiled+global
+    compiled-bind
+    compiled-lets
 
     type-literal->compiled
     boolean->compiled
@@ -33,8 +36,15 @@
   (define-syntax-rule (comptime $item) $item)
   (define-syntax-rule (runtime $item) $item)
 
-  (define (compiled-pure $value)
+  (define (value->compiled $value)
     (compiled (globals) $value))
+
+  (define (compiled+global $compiled $global)
+    (compiled
+      (push
+        (compiled-globals $compiled)
+        $global)
+      (compiled-value $compiled)))
 
   (define (compiled-bind $compiled $fn)
     (lets

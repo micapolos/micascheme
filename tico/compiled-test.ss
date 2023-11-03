@@ -40,3 +40,11 @@
   (equal?
     (literal->compiled "foo")
     (string->compiled "foo")))
+
+(check
+  (equal?
+    (compiled-lets
+      ($string (compiled (stack 'g1) "foo"))
+      ($number (compiled (stack 'g2) 128))
+      (compiled (stack 'g3) (cons $string $number)))
+    (compiled (stack 'g1 'g2 'g3) (cons "foo" 128))))
