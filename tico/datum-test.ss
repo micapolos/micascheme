@@ -7,6 +7,12 @@
 
 (check
 	(equal?
+		(with-generate-temporary-seed $tmp
+			(datum-params 2))
+		'($tmp-0 $tmp-1)))
+
+(check
+	(equal?
 		(datum-abstraction (list 'v1 'v2) '(+ v1 v2))
 		'(lambda (v1 v2) (+ v1 v2))))
 
