@@ -17,4 +17,5 @@
   (tico type)
   (tico typed)
   (tico typed-expression)
+  (tico typing)
   (tico variable))
