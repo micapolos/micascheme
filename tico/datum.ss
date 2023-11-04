@@ -2,6 +2,7 @@
   (export
     datum-application
     datum-abstraction
+    lets-datum
     arity-abstraction
     datum-tuple
     arity-datum-ref
@@ -26,6 +27,11 @@
       ((1) (car $items))
       ((2) `(cons ,(car $items) ,(cadr $items)))
       (else `(vector ,@$items))))
+
+  (define (lets-datum $declarations $body)
+    (switch $declarations
+      ((null? _) $body)
+      ((pair? $pair) `(lets ,@$pair ,$body))))
 
   (define (arity-datum-ref $arity $datum $index)
     (case $arity
@@ -74,5 +80,4 @@
           ,(value->datum (arrow-result $arrow))))
       ((else $other)
         (throw value->datum $value))))
-
 )

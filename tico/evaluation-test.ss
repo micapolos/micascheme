@@ -3,7 +3,9 @@
   (tico evaluation)
   (tico constant)
   (tico dependency)
-  (tico variable))
+  (tico variable)
+  (tico packet)
+  (tico datum))
 
 (check
   (equal?
@@ -61,3 +63,36 @@
         (test-dependency d2)
         (test-dependency d3)
         (test-dependency d4)))))
+
+(check
+  (equal?
+    (evaluation-abstraction
+      2
+      (constant "foo")
+      (lambda () (throw error)))
+    (constant "foo")))
+
+(check
+  (equal?
+    (evaluation-abstraction
+      2
+      (variable 3
+        (stack
+          (dependency 'v1 (packet "foo" "foo"))
+          (dependency 'v2 (packet "bar" "bar"))))
+      (lambda () (throw error)))
+    (variable 1
+      (stack
+        (dependency 'v1 (packet "foo" "foo"))
+        (dependency 'v2 (packet "bar" "bar"))))))
+
+(check
+  (equal?
+    (evaluation-abstraction
+      2
+      (variable 1
+        (stack
+          (dependency 'v1 (packet "foo" "foo"))
+          (dependency 'v2 (packet "bar" "bar"))))
+      (lambda () '(string-append "foo" "bar")))
+    (constant "foobar")))

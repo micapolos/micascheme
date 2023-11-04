@@ -4,7 +4,9 @@
   (tico constant)
   (tico variable)
   (tico dependency)
-  (tico packet))
+  (tico packet)
+  (tico datum)
+  (tico evaluation))
 
 (check
   (equal?
@@ -29,28 +31,16 @@
     (compilation-top-level-datum
       (compilation
         '(+ a b)
-        (variable 1 (stack))))
-    '(+ a b)))
-
-(check
-  (equal?
-    (compilation-top-level-datum
-      (compilation
-        '(+ a b)
         (variable 1
           (stack
             (dependency 'a (literal->packet 1))
             (dependency 'b (literal->packet 2))))))
-    '(lets
-      (a 1)
-      (b 2)
-      (+ a b))))
-
-(check
-  (equal?
-    (compilation-value
-      (datum->compilation '(+ 1 2)))
-    3))
+    (lets-datum
+      (map dependency-lets-datum
+        (list
+          (dependency 'a (literal->packet 1))
+          (dependency 'b (literal->packet 2))))
+      '(+ a b))))
 
 ; --- compilation->generate-dependency-opt
 
@@ -95,3 +85,26 @@
           (dependency '$tmp-0 (datum->packet 'string-append))
           (dependency '$tmp-1 (datum->packet "bar"))
           (test-dependency d1))))))
+
+; --- compilation-abstraction
+
+(check
+  (equal?
+    (compilation-abstraction
+      (list 'v1 'v2)
+      (compilation '(string-append v1 v2)
+        (variable 1
+          (stack
+            (dependency 'v1 (packet "foo" "foo"))
+            (dependency 'v2 (packet "bar" "bar"))))))
+    (compilation
+      (datum-abstraction
+        (list 'v1 'v2)
+        '(string-append v1 v2))
+      (evaluation-abstraction
+        2
+        (variable 1
+          (stack
+            (dependency 'v1 (packet "foo" "foo"))
+            (dependency 'v2 (packet "bar" "bar"))))
+        (lambda () '(string-append v1 v2))))))

@@ -1,13 +1,15 @@
 (library (tico evaluation)
   (export
     evaluation-application
+    evaluation-abstraction
     evaluation-lets-datums
     evaluation-value)
   (import
     (micascheme)
     (tico constant)
     (tico variable)
-    (tico dependency))
+    (tico dependency)
+    (tico datum))
 
   (enum (evaluation constant variable))
 
@@ -41,4 +43,15 @@
                 (cons
                   (app $constant-dependencies-fn)
                   (map variable-dependencies $variables)))))))))
+
+  (define (evaluation-abstraction $arity $body-evaluation $body-datum-fn)
+    (switch $body-evaluation
+      ((constant? $constant) $constant)
+      ((variable? $variable)
+        (or
+          (variable-promote $variable $arity)
+          (datum->constant
+            (lets-datum
+              (reverse (map dependency-lets-datum (variable-dependencies $variable)))
+              (app $body-datum-fn)))))))
 )

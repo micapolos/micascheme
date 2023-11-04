@@ -9,7 +9,8 @@
     compilation-value
 
     compilation->generate-dependency-opt
-    compilation-application)
+    compilation-application
+    compilation-abstraction)
   (import
     (micascheme)
     (tico constant)
@@ -29,12 +30,9 @@
     (compilation $datum (datum->constant $datum)))
 
   (define (compilation-top-level-datum $compilation)
-    (lets
-      ($datum (compilation-datum $compilation))
-      (switch (evaluation-lets-datums (compilation-evaluation $compilation))
-        ((null? _) $datum)
-        ((pair? $pair)
-          `(lets ,@$pair ,$datum)))))
+    (lets-datum
+      (evaluation-lets-datums (compilation-evaluation $compilation))
+      (compilation-datum $compilation)))
 
   (define (compilation-value $compilation)
     (evaluation-value
@@ -62,4 +60,14 @@
           (filter-opts
             (map compilation->generate-dependency-opt
               (reverse (cons $target $args))))))))
+
+  (define (compilation-abstraction $param-symbols $body-compilation)
+    (compilation
+      (datum-abstraction
+        $param-symbols
+        (compilation-datum $body-compilation))
+      (evaluation-abstraction
+        (length $param-symbols)
+        (compilation-evaluation $body-compilation)
+        (lambda () (compilation-datum $body-compilation)))))
 )

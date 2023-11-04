@@ -55,3 +55,13 @@
 	(equal? 
 		(value->datum (arrow (list "foo" "bar") "zoo"))
 		`(arrow (list "foo" "bar") "zoo")))
+
+(check
+	(equal?
+		(lets-datum (list) 'c)
+		'c))
+
+(check
+	(equal?
+		(lets-datum (list '(a 1) '(b 2)) 'c)
+		'(lets (a 1) (b 2) c)))
