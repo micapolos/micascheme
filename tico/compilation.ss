@@ -5,6 +5,7 @@
     literal->compilation
     datum->compilation
 
+    compilation-top-level-datum
     compilation-value
 
     compilation->generate-dependency-opt
@@ -26,6 +27,14 @@
 
   (define (datum->compilation $datum)
     (compilation $datum (datum->constant $datum)))
+
+  (define (compilation-top-level-datum $compilation)
+    (lets
+      ($datum (compilation-datum $compilation))
+      (switch (evaluation-lets-datums (compilation-evaluation $compilation))
+        ((null? _) $datum)
+        ((pair? $pair)
+          `(lets ,@$pair ,$datum)))))
 
   (define (compilation-value $compilation)
     (evaluation-value

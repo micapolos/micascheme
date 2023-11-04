@@ -21,5 +21,11 @@
 
 (check
   (equal?
+    (dependency-lets-datum
+      (dependency 'foo (test-packet bar)))
+    '(foo bar)))
+
+(check
+  (equal?
     (test-dependency foo)
     (dependency 'foo (test-packet foo))))

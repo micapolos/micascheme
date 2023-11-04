@@ -6,6 +6,17 @@
 
 (check
   (equal?
+    (variable-lets-datums
+      (variable 3
+        (stack
+          (dependency 'a1 (packet 'b1 "c1"))
+          (dependency 'a2 (packet 'b2 "c2")))))
+    (list
+      '(a1 b1)
+      '(a2 b2))))
+
+(check
+  (equal?
     (variable-promote
       (variable 3
         (stack

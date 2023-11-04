@@ -20,6 +20,34 @@
 
 (check
   (equal?
+    (compilation-top-level-datum
+      (datum->compilation '(+ 1 2)))
+    '(+ 1 2)))
+
+(check
+  (equal?
+    (compilation-top-level-datum
+      (compilation
+        '(+ a b)
+        (variable 1 (stack))))
+    '(+ a b)))
+
+(check
+  (equal?
+    (compilation-top-level-datum
+      (compilation
+        '(+ a b)
+        (variable 1
+          (stack
+            (dependency 'a (literal->packet 1))
+            (dependency 'b (literal->packet 2))))))
+    '(lets
+      (a 1)
+      (b 2)
+      (+ a b))))
+
+(check
+  (equal?
     (compilation-value
       (datum->compilation '(+ 1 2)))
     3))

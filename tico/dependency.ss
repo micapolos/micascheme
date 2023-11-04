@@ -2,6 +2,7 @@
   (export
     dependency dependency? dependency-symbol dependency-packet
     test-dependency
+    dependency-lets-datum
     tuple-dependencies)
   (import
     (micascheme)
@@ -16,6 +17,12 @@
           #`(dependency
             (quote $name)
             (test-packet $name))))))
+
+  (define (dependency-lets-datum $dependency)
+    `(
+      ,(dependency-symbol $dependency)
+      ,(packet-datum
+        (dependency-packet $dependency))))
 
   (define (tuple-dependencies $dependencies-list)
     (apply append (reverse $dependencies-list)))

@@ -1,6 +1,7 @@
 (library (tico evaluation)
   (export
     evaluation-application
+    evaluation-lets-datums
     evaluation-value)
   (import
     (micascheme)
@@ -9,6 +10,13 @@
     (tico dependency))
 
   (enum (evaluation constant variable))
+
+  (define (evaluation-lets-datums $evaluation)
+    (switch $evaluation
+      ((constant? _)
+        (list))
+      ((variable? $variable)
+        (variable-lets-datums $variable))))
 
   (define (evaluation-value $evaluation)
     (switch $evaluation

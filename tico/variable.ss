@@ -1,6 +1,7 @@
 (library (tico variable)
   (export
     variable variable? variable-index variable-dependencies
+    variable-lets-datums
     variable-promote
     variables-index)
   (import
@@ -8,6 +9,11 @@
     (tico dependency))
 
   (data (variable index dependencies))
+
+  (define (variable-lets-datums $variable)
+    (reverse
+      (map dependency-lets-datum
+        (variable-dependencies $variable))))
 
   (define (variable-promote $variable $size)
     (lets

@@ -15,6 +15,19 @@
 
 (check
   (equal?
+    (evaluation-lets-datums
+      (variable 1 (stack (test-dependency dep))))
+    (variable-lets-datums
+      (variable 1 (stack (test-dependency dep))))))
+
+(check
+  (equal?
+    (evaluation-lets-datums
+      (constant "foo"))
+    (list)))
+
+(check
+  (equal?
     (evaluation-value (constant "foo"))
     "foo"))
 
