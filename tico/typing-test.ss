@@ -22,6 +22,18 @@
 
 (check
   (equal?
+    (typing-datum
+      (type-datum->typing (number-type) '(+ 1 2)))
+    '(+ 1 2)))
+
+(check
+  (equal?
+    (typing-value
+      (type-datum->typing (number-type) '(+ 1 2)))
+    3))
+
+(check
+  (equal?
     (typing-application
       (type-datum->typing
         (arrow (list (number-type)) (string-type))

@@ -5,6 +5,9 @@
     literal->typing
     type-datum->typing
 
+    typing-datum
+    typing-value
+
     typing-application)
   (import
     (micascheme)
@@ -24,6 +27,14 @@
       (layout-datum->layment
         (type->layout $type)
         $datum)))
+
+  (define (typing-datum $typing)
+    (layment-datum
+      (typing-layment $typing)))
+
+  (define (typing-value $typing)
+    (layment-value
+      (typing-layment $typing)))
 
   (define (typing-application $target $args)
     (typing

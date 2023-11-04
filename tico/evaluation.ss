@@ -1,6 +1,7 @@
 (library (tico evaluation)
   (export
-    evaluation-application)
+    evaluation-application
+    evaluation-value)
   (import
     (micascheme)
     (tico constant)
@@ -8,6 +9,13 @@
     (tico dependency))
 
   (enum (evaluation constant variable))
+
+  (define (evaluation-value $evaluation)
+    (switch $evaluation
+      ((constant? $constant)
+        (constant-value $constant))
+      ((variable? $variable)
+        (throw evaluation-value $evaluation))))
 
   (define (evaluation-application $target $args $constant-dependencies-fn)
     (lets

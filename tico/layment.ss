@@ -8,6 +8,9 @@
     literal->layment
     layout-datum->layment
 
+    layment-datum
+    layment-value
+
     layment-application)
   (import
     (micascheme)
@@ -35,6 +38,14 @@
 
   (define (layout-datum->layment $layout $datum)
     (layment $layout (datum->compilation $datum)))
+
+  (define (layment-datum $layment)
+    (compilation-datum
+      (layment-compilation $layment)))
+
+  (define (layment-value $layment)
+    (compilation-value
+      (layment-compilation $layment)))
 
   (define (layment-not-empty? $layment)
     (layout-not-empty? (layment-layout $layment)))

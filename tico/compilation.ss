@@ -5,6 +5,8 @@
     literal->compilation
     datum->compilation
 
+    compilation-value
+
     compilation->generate-dependency-opt
     compilation-application)
   (import
@@ -24,6 +26,10 @@
 
   (define (datum->compilation $datum)
     (compilation $datum (datum->constant $datum)))
+
+  (define (compilation-value $compilation)
+    (evaluation-value
+      (compilation-evaluation $compilation)))
 
   (define (compilation->generate-dependency-opt $compilation)
     (switch (compilation-evaluation $compilation)

@@ -18,6 +18,12 @@
     (literal->compilation "foo")
     (compilation "foo" (constant "foo"))))
 
+(check
+  (equal?
+    (compilation-value
+      (datum->compilation '(+ 1 2)))
+    3))
+
 ; --- compilation->generate-dependency-opt
 
 (check

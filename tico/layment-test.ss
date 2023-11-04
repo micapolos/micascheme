@@ -35,6 +35,22 @@
       (simple-layout)
       (literal->compilation "foo"))))
 
+(check
+  (equal?
+    (layment-datum
+      (layout-datum->layment
+        (type->layout (number-type))
+        '(+ 1 2)))
+    '(+ 1 2)))
+
+(check
+  (equal?
+    (layment-value
+      (layout-datum->layment
+        (type->layout (number-type))
+        '(+ 1 2)))
+    3))
+
 ; --- layment-application
 
 (check
