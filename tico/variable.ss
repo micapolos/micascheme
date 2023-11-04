@@ -3,7 +3,8 @@
     variable variable? variable-index variable-dependencies
     variable-lets-datums
     variable-promote
-    variables-index)
+    variable-index-flatten
+    variable-flatten)
   (import
     (micascheme)
     (tico dependency))
@@ -22,6 +23,13 @@
         (variable $index
           (variable-dependencies $variable)))))
 
-  (define (variables-index $variables)
-    (apply max (map variable-index $variables)))
+  (define (variable-index-flatten $indices)
+    (apply max $indices))
+
+  (define (variable-flatten $variables)
+    (variable
+      (variable-index-flatten
+        (map variable-index $variables))
+      (dependencies-flatten
+        (map variable-dependencies $variables))))
 )

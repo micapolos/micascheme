@@ -5,7 +5,7 @@
 
 (check
   (equal?
-    (tuple-dependencies
+    (dependencies-flatten
       (list
         (stack
           (test-dependency d1)

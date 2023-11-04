@@ -3,7 +3,7 @@
     dependency dependency? dependency-symbol dependency-packet
     test-dependency
     dependency-lets-datum
-    tuple-dependencies)
+    dependencies-flatten)
   (import
     (micascheme)
     (tico packet))
@@ -24,6 +24,6 @@
       ,(packet-datum
         (dependency-packet $dependency))))
 
-  (define (tuple-dependencies $dependencies-list)
+  (define (dependencies-flatten $dependencies-list)
     (apply append (reverse $dependencies-list)))
 )

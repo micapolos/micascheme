@@ -53,26 +53,29 @@
 
 (check
   (equal?
-    (variables-index
-      (list
-        (variable 1 (stack))
-        (variable 3 (stack))
-        (variable 2 (stack))))
+    (variable-index-flatten
+      (list 1 3 2))
     3))
 
-; (check
-;   (equal?
-;     (tuple-variable
-;       (list
-;         (variable 3
-;           (stack
-;             (dependency 'v1 (packet '(string-append "foo" "bar") "foobar"))))
-;         (variable 5
-;           (stack
-;             (dependency 'v2 (packet '(+ 1 2) 3))
-;             (dependency 'v3 (packet '(+ 4 5) 9))))))
-;     (variable 5
-;       (stack
-;         (dependency 'v1 (packet '(string-append "foo" "bar") "foobar"))
-;         (dependency 'v2 (packet '(+ 1 2) 3))
-;         (dependency 'v3 (packet '(+ 4 5) 9))))))
+(check
+  (equal?
+    (variable-flatten
+      (list
+        (variable 1
+          (stack
+            (test-dependency d1)
+            (test-dependency d2)))
+        (variable 3
+          (stack
+            (test-dependency d3)
+            (test-dependency d4)))))
+    (variable
+      (variable-index-flatten (list 1 3))
+      (dependencies-flatten
+        (list
+          (stack
+            (test-dependency d1)
+            (test-dependency d2))
+          (stack
+            (test-dependency d3)
+            (test-dependency d4)))))))

@@ -8,6 +8,7 @@
     (micascheme)
     (tico constant)
     (tico variable)
+    (tico parameter)
     (tico dependency)
     (tico datum))
 
@@ -37,12 +38,14 @@
           (lets
             ($variables (filter variable? $evaluations))
             ($constants (filter constant? $evaluations))
+            ($parameters (ensure null? (filter parameter? $evaluations)))
+            ($variable (variable-flatten $variables))
             (variable
-              (variables-index $variables)
-              (tuple-dependencies
-                (cons
+              (variable-index $variable)
+              (dependencies-flatten
+                (list
                   (app $constant-dependencies-fn)
-                  (map variable-dependencies $variables)))))))))
+                  (variable-dependencies $variable)))))))))
 
   (define (evaluation-abstraction $arity $body-evaluation $body-datum-fn)
     (switch $body-evaluation
