@@ -1,7 +1,7 @@
 (library (tico datum)
   (export
     datum-application
-    datum-params
+    generate-datum-params
     datum-abstraction
     generate-datum-abstraction
     lets-datum
@@ -13,10 +13,10 @@
 
   (define (generate-datum-abstraction $arity $fn)
     (lets
-      ($params (datum-params $arity))
+      ($params (generate-datum-params $arity))
       (datum-abstraction $params ($fn $params))))
 
-  (define (datum-params $arity)
+  (define (generate-datum-params $arity)
     (generate-symbols $arity))
 
   (define (datum-abstraction $params $body)

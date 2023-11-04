@@ -8,7 +8,7 @@
 (check
 	(equal?
 		(with-generate-temporary-seed $tmp
-			(datum-params 2))
+			(generate-datum-params 2))
 		'($tmp-0 $tmp-1)))
 
 (check
