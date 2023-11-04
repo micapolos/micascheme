@@ -33,6 +33,7 @@
     literal->compiled
     literal-typed
     literal-packet
+    native-compiled
 
     compiled-lambda
     typed-lambda
@@ -211,6 +212,14 @@
         (string->compiled $string))
       ((else $other)
         (throw not-literal $other))))
+
+  (define (native-compiled $type $datum)
+    (pure-compiled
+      (typed $type
+        (and (type-dynamic? $type)
+          (packet
+            (comptime $datum)
+            (comptime->runtime (globals) $datum))))))
 
   (define (compiled-struct $name $compiled-items)
     (lets

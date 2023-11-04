@@ -2,15 +2,21 @@
   (export
     compiler
     compiler-compiled
+    compiler-datum
     compiler+global
     compiler-bind
     compiler-lets
     compiler-flatten
     compiler-globalize
+
     literal-compiler
-    globals-compiler)
+    native-compiler
+    globals-compiler
+
+    application-compiler)
   (import
     (micascheme)
+    (tico typed)
     (tico compiled))
 
   (define (compiler $value)
@@ -22,6 +28,13 @@
       (compiled $globals
         (literal-typed $literal))))
 
+  (define (native-compiler $type $datum)
+    (lambda ($globals)
+      (compiled $globals
+        (typed $type
+          (packet $datum
+            (comptime->runtime (globals) $datum))))))
+
   (define (compiler+global $compiler $global)
     (lambda ($globals)
       (app $compiler
@@ -29,6 +42,10 @@
 
   (define (compiler-compiled $compiler)
     (app $compiler (globals)))
+
+  (define (compiler-datum $compiler)
+    (compiled-comptime
+      (compiler-compiled $compiler)))
 
   (define (compiler-bind $compiler $fn)
     (lambda ($globals)
@@ -63,4 +80,13 @@
     (lambda ($globals)
       (compiled-globalize
         (app $compiler $globals))))
+
+  ; --- application-compiler
+
+  (define (application-compiler $target-compiler $arg-compilers)
+    (compiler-lets
+      ($typed-target $target-compiler)
+      ($typed-args (compiler-flatten $arg-compilers))
+      ($globals (globals-compiler))
+      (compiler (typed-application $globals $typed-target $typed-args))))
 )
