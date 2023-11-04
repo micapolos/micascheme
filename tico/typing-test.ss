@@ -6,7 +6,7 @@
   (equal?
     (literal->typing "foo")
     (typing
-      (literal-type "foo")
+      (literal->type "foo")
       (literal->layment "foo"))))
 
 (check
@@ -19,3 +19,21 @@
       (layout-datum->layment
         (type->layout (string-type))
         '(string-append "foo" "bar")))))
+
+(check
+  (equal?
+    (typing-application
+      (type-datum->typing
+        (arrow (list (number-type)) (string-type))
+        'number->string)
+      (list
+        (literal->typing 10)))
+    (typing
+      (type-application
+        (arrow (list (number-type)) (string-type))
+        (list (literal->type 10)))
+      (layment-application
+        (layout-datum->layment
+          (type->layout (arrow (list (number-type)) (string-type)))
+          'number->string)
+        (list (literal->layment 10))))))

@@ -8,7 +8,7 @@
     number-type
     string-type
     char-type
-    literal-type
+    literal->type
     struct struct? struct-name struct-fields
     arrow arrow? arrow-params arrow-result
     abstraction abstraction? abstraction-arity abstraction-body
@@ -45,13 +45,13 @@
   (define (char-type)
     (struct 'char (list (native-type))))
 
-  (define (literal-type $literal)
+  (define (literal->type $literal)
     (switch $literal
       ((boolean? _) (boolean-type))
       ((number? _) (number-type))
       ((string? _) (string-type))
       ((char? _) (char-type))
-      ((else $other) (throw literal-type $literal))))
+      ((else $other) (throw literal->type $literal))))
 
   (define (type-dynamic? $type)
     (switch $type

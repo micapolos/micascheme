@@ -177,7 +177,7 @@
 
   (define (literal-typed $literal)
     (typed
-      (literal-type $literal)
+      (literal->type $literal)
       (literal-packet $literal)))
 
   (define (literal-packet $literal)
