@@ -46,6 +46,7 @@
 
   (define (evaluation-abstraction $arity $body-evaluation $body-datum-fn)
     (switch $body-evaluation
+      ((constant? $constant) $constant)
       ((variable? $variable)
         (or
           (variable-promote $variable $arity)
@@ -53,5 +54,6 @@
             (lets-datum
               (reverse (map dependency-lets-datum (variable-dependencies $variable)))
               (app $body-datum-fn)))))
-      ((else $other) $other)))
+      ((else $other)
+        (throw evaluation-abstraction $other))))
 )
