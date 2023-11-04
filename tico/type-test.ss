@@ -171,3 +171,33 @@
     (equal?
       (indexed-type-matching $types (struct 'x (list (any-type))))
       (indexed (struct 'x (list (native-type))) 1))))
+
+; --- type-application
+
+(check
+  (equal?
+    (type-application
+      (arrow (list (string-type) (number-type)) (boolean-type))
+      (list (string-type) (number-type)))
+    (boolean-type)))
+
+(check
+  (equal?
+    (type-application
+      (arrow (list (any-type) (number-type)) (boolean-type))
+      (list (string-type) (number-type)))
+    (boolean-type)))
+
+(check
+  (raises?
+    (lambda ()
+      (type-application
+        (arrow (list (string-type) (number-type)) (boolean-type))
+        (list (string-type))))))
+
+(check
+  (raises?
+    (lambda ()
+      (type-application
+        (arrow (list (string-type) (number-type)) (boolean-type))
+        (list (string-type) (any-type))))))

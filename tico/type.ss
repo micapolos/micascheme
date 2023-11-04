@@ -15,6 +15,8 @@
     recursion recursion? recursion-items
     var var? var-index
 
+    type-application
+
     type-dynamic?
     types-arity
     type-matches? types-match?
@@ -63,6 +65,15 @@
       ((arrow? $arrow) #t)
       ((else $other)
         (throw not-type $other))))
+
+  (define (type-application $target $args)
+    (lets
+      ($arrow (ensure arrow? $target))
+      (cond
+        ((types-match? $args (arrow-params $arrow))
+          (arrow-result $arrow))
+        (else
+          (throw type-application $target $args)))))
 
   (define (types-arity $types)
     (length (filter type-dynamic? $types)))
