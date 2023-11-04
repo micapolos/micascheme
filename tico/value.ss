@@ -1,5 +1,6 @@
 (library (tico value)
   (export
+    value-application
     tuple-value
     tuple-ref-value)
   (import
@@ -9,6 +10,9 @@
 
   (define (value-environment)
     (environment `(micascheme) `(tico expression)))
+
+  (define (value-application $target $args)
+    (apply $target $args))
 
   (define (tuple-value $values)
     (lets

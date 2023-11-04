@@ -1,8 +1,21 @@
 (library (tico variable)
-  (export)
+  (export
+    variable variable? variable-index variable-dependencies
+    variable-promote
+    variables-index)
   (import
     (micascheme)
-    (tico binding))
+    (tico dependency))
 
-  (data (variable index bindings))
+  (data (variable index dependencies))
+
+  (define (variable-promote $variable $size)
+    (lets
+      ($index (- (variable-index $variable) $size))
+      (and (>= $index 0)
+        (variable $index
+          (variable-dependencies $variable)))))
+
+  (define (variables-index $variables)
+    (apply max (map variable-index $variables)))
 )

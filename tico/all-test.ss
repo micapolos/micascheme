@@ -1,12 +1,12 @@
 (import (micascheme))
 
 (test
-  (tico binding)
   (tico compilation)
   (tico compiled)
   (tico compiler)
   (tico constant)
   (tico datum)
+  (tico dependency)
   (tico evaluation)
   (tico expression)
   (tico typed-expression)
