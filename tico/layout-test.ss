@@ -7,6 +7,44 @@
 (check (equal? (layout-not-empty? (simple-layout)) #t))
 (check (equal? (layout-not-empty? (tuple-layout (list))) #t))
 
+; --- layout-abstraction
+
+(check
+  (equal?
+    (layout-abstraction
+      (list (empty-layout) (simple-layout))
+      (tuple-layout (list (simple-layout))))
+    (lambda-layout
+      (list (empty-layout) (simple-layout))
+      (tuple-layout (list (simple-layout))))))
+
+(check
+  (equal?
+    (layout-abstraction
+      (list (empty-layout) (simple-layout))
+      (empty-layout))
+    (empty-layout)))
+
+; --- layout-application
+
+(check
+  (equal?
+    (layout-application
+      (lambda-layout
+        (list (empty-layout) (simple-layout))
+        (tuple-layout (list (simple-layout))))
+      (list (empty-layout) (simple-layout)))
+    (tuple-layout (list (simple-layout)))))
+
+(check
+  (equal?
+    (layout-application
+      (empty-layout)
+      (list (empty-layout) (simple-layout)))
+    (empty-layout)))
+
+; --- type->layout
+
 (check
   (equal?
     (type->layout (value-type "foo"))
