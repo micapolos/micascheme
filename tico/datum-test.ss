@@ -15,9 +15,10 @@
 		(with-generate-temporary-seed $tmp
 			(generate-datum-abstraction 2
 				(lambda ($params)
-					(cons 'done $params))))
-		'(lambda ($tmp-0 $tmp-1)
-			(done $tmp-0 $tmp-1))))
+					`(done ,@$params))))
+		(datum-abstraction
+			(list '$tmp-0 '$tmp-1)
+			'(done $tmp-0 $tmp-1))))
 
 (check (equal? (datum->value '(string-append "foo" "bar")) "foobar"))
 
