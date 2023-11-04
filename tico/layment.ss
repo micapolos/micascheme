@@ -65,5 +65,6 @@
         (layment-compilation $target)
         (layments->compilations $args))))
 
-  (define (layment-abstraction) TODO)
+  (define (layment-abstraction $param-layouts $body-compilation)
+    TODO)
 )
