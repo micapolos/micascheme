@@ -7,7 +7,10 @@
 
     layout-not-empty?
     tuple-or-empty-layout
-    type->layout)
+    type->layout
+
+    layout-application
+    layout-abstraction)
   (import
     (micascheme)
     (tico type))
@@ -25,6 +28,20 @@
   (define (layout-not-empty? $layout)
     (not (empty-layout? $layout)))
 
+  (define (layout-abstraction $param-layouts $body-layout)
+    (cond
+      ((layout-not-empty? $body-layout)
+        (lambda-layout $param-layouts $body-layout))
+      (else
+        (empty-layout))))
+
+  (define (layout-application $target $args)
+    (switch $target
+      ((lambda-layout? $lambda-layout)
+        (lambda-layout-body $lambda-layout))
+      ((empty-layout? _)
+        (empty-layout))))
+
   (define (type->layout $type)
     (switch $type
       ((value-type? _)
@@ -37,12 +54,9 @@
         (tuple-or-empty-layout
           (map type->layout (struct-fields $struct))))
       ((arrow? $arrow)
-        (switch (type->layout (arrow-result $arrow))
-          ((empty-layout? _) (empty-layout))
-          ((else $result-layout)
-            (lambda-layout
-              (map type->layout (arrow-params $arrow))
-              $result-layout))))
+        (layout-abstraction
+          (map type->layout (arrow-params $arrow))
+          (type->layout (arrow-result $arrow))))
       ((else $type)
         (throw type->layout $type))))
 )

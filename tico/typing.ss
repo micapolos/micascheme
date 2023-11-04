@@ -8,7 +8,8 @@
     typing-datum
     typing-value
 
-    typing-application)
+    typing-application
+    typing-abstraction)
   (import
     (micascheme)
     (tico type)
@@ -44,4 +45,11 @@
       (layment-application
         (typing-layment $target)
         (map typing-layment $args))))
+
+  (define (typing-abstraction $param-types $body-typing)
+    (typing
+      (arrow $param-types (typing-type $body-typing))
+      (layment-abstraction
+        (map type->layout $param-types)
+        (typing-layment $body-typing))))
 )

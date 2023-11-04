@@ -11,7 +11,8 @@
     layment-datum
     layment-value
 
-    layment-application)
+    layment-application
+    layment-abstraction)
   (import
     (micascheme)
     (tico datum)
@@ -54,12 +55,14 @@
     (map layment-compilation (filter layment-not-empty? $layments)))
 
   (define (layment-application $target $args)
-    (lets
-      ($lambda-layout (ensure lambda-layout? (layment-layout $target)))
-      ($arg-layouts (map layment-layout $args))
-      (make-layment
-        ($layout (lambda-layout-body $lambda-layout))
-        (compilation-application
-          (layment-compilation $target)
-          (layments->compilations $args)))))
+    (make-layment
+      ($layout
+        (layout-application
+          (layment-layout $target)
+          (map layment-layout $args)))
+      (compilation-application
+        (layment-compilation $target)
+        (layments->compilations $args))))
+
+  (define (layment-abstraction) TODO)
 )
