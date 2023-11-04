@@ -13,7 +13,7 @@
 (check
 	(equal?
 		(with-generate-temporary-seed $tmp
-			(arity-abstraction 2
+			(generate-datum-abstraction 2
 				(lambda ($params)
 					(cons 'done $params))))
 		'(lambda ($tmp-0 $tmp-1)

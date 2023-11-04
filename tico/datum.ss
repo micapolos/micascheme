@@ -2,15 +2,15 @@
   (export
     datum-application
     datum-abstraction
+    generate-datum-abstraction
     lets-datum
-    arity-abstraction
     datum-tuple
     arity-datum-ref
     value->datum
     datum->value)
   (import (micascheme) (tico type))
 
-  (define (arity-abstraction $arity $fn)
+  (define (generate-datum-abstraction $arity $fn)
     (lets
       ($params (generate-symbols $arity))
       (datum-abstraction $params ($fn $params))))
