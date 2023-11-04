@@ -8,6 +8,7 @@
     compiled compiled? compiled-globals compiled-value
 
     globals locals comptime runtime
+    symbol-global
 
     pure-compiled
     compiled-with-value
@@ -82,6 +83,12 @@
   (define-syntax-rule (comptime $item) $item)
   (define-syntax-rule (runtime $item) $item)
 
+  (define (symbol-global $symbol)
+    (symbolic $symbol
+      (packet
+        (comptime (quote $symbol))
+        (runtime $symbol))))
+
   (define (pure-compiled $value)
     (compiled (globals) $value))
 
@@ -130,6 +137,7 @@
                   (packet-with-runtime $packet
                     (constant-value $constant)))))))
         ((variable? $variable) $compiled))))
+
   (define (packet-with-comptime $packet $comptime)
     (packet $comptime (packet-runtime $packet)))
 
