@@ -2,8 +2,6 @@
 
 (test
   (tico compilation)
-  (tico compiled)
-  (tico compiler)
   (tico constant)
   (tico datum)
   (tico dependency)
@@ -16,6 +14,5 @@
   (tico value)
   (tico type)
   (tico typed)
-  (tico typed-expression)
   (tico typing)
   (tico variable))
