@@ -26,11 +26,13 @@
   (define (empty-layment)
     (layment (empty-layout) #f))
 
-  (define-syntax-rule (make-layment ($var $layout) $body)
+  (define-syntax-case (make-layment $layout $body)
     (lets
-      ($var $layout)
-      (layment $var
-        (and (layout-not-empty? $var) $body))))
+      ($var (generate-temporary))
+      #`(lets
+        (#,$var $layout)
+        (layment #,$var
+          (and (layout-not-empty? #,$var) $body)))))
 
   (define (literal->layment $literal)
     (layment
@@ -56,10 +58,9 @@
 
   (define (layment-application $target $args)
     (make-layment
-      ($layout
-        (layout-application
-          (layment-layout $target)
-          (map layment-layout $args)))
+      (layout-application
+        (layment-layout $target)
+        (map layment-layout $args))
       (compilation-application
         (layment-compilation $target)
         (layments->compilations $args))))

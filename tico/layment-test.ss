@@ -23,13 +23,13 @@
 
 (check
   (equal?
-    (make-layment ($layout (empty-layout))
+    (make-layment (empty-layout)
       (throw error))
     (layment (empty-layout) #f)))
 
 (check
   (equal?
-    (make-layment ($layout (simple-layout))
+    (make-layment (simple-layout)
       (literal->compilation "foo"))
     (layment
       (simple-layout)
