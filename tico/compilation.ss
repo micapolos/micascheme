@@ -46,7 +46,7 @@
           (packet
             (compilation-datum $compilation)
             (constant-value $constant))))
-      ((variable? _) #f)))
+      ((else _) #f)))
 
   (define (compilation-application $target $args)
     (compilation

@@ -15,17 +15,17 @@
 
   (define (evaluation-lets-datums $evaluation)
     (switch $evaluation
-      ((constant? _)
-        (list))
       ((variable? $variable)
-        (variable-lets-datums $variable))))
+        (variable-lets-datums $variable))
+      ((else _)
+        (list))))
 
   (define (evaluation-value $evaluation)
     (switch $evaluation
       ((constant? $constant)
         (constant-value $constant))
-      ((variable? $variable)
-        (throw evaluation-value $evaluation))))
+      ((else $other)
+        (throw evaluation-value $other))))
 
   (define (evaluation-application $target $args $constant-dependencies-fn)
     (lets
@@ -46,12 +46,12 @@
 
   (define (evaluation-abstraction $arity $body-evaluation $body-datum-fn)
     (switch $body-evaluation
-      ((constant? $constant) $constant)
       ((variable? $variable)
         (or
           (variable-promote $variable $arity)
           (datum->constant
             (lets-datum
               (reverse (map dependency-lets-datum (variable-dependencies $variable)))
-              (app $body-datum-fn)))))))
+              (app $body-datum-fn)))))
+      ((else $other) $other)))
 )

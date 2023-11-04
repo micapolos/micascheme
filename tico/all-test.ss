@@ -10,6 +10,7 @@
   (tico layment)
   (tico layout)
   (tico packet)
+  (tico parameter)
   (tico reader)
   (tico value)
   (tico type)
