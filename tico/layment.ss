@@ -14,6 +14,7 @@
     generate-parameter-layment
     layment-application
     layment-parameter
+    layment-variable
     layment-abstraction
     layment-struct)
   (import
@@ -76,6 +77,11 @@
     (layment
       (layment-layout $layment)
       (compilation-parameter (layment-compilation $layment))))
+
+  (define (layment-variable $layment $index)
+    (layment
+      (layment-layout $layment)
+      (compilation-variable (layment-compilation $layment) $index)))
 
   (define (layment-abstraction $param-layouts $body-compilation)
     TODO)

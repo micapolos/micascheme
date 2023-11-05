@@ -13,10 +13,13 @@
     generate-parameter-typing
     typing-application
     typing-parameter
+    typing-variable
     typing-abstraction
     typing-struct
     typing-native
-    typing-inline)
+    typing-inline
+
+    typing-not-empty?)
   (import
     (micascheme)
     (tico type)
@@ -69,6 +72,11 @@
       (typing-type $typing)
       (layment-parameter (typing-layment $typing))))
 
+  (define (typing-variable $typing $index)
+    (typing
+      (typing-type $typing)
+      (layment-variable (typing-layment $typing) $index)))
+
   (define (typing-abstraction $param-types $body-typing)
     (typing
       (arrow $param-types (typing-type $body-typing))
@@ -96,4 +104,7 @@
     (type-datum->typing
       (typing-type $typing)
       (value->datum (typing-value $typing))))
+
+  (define (typing-not-empty? $typing)
+    (layment-not-empty? (typing-layment $typing)))
 )

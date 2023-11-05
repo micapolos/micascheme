@@ -14,7 +14,9 @@
     compilation-application
     compilation-abstraction
     compilation-struct
-    compilation-parameter)
+
+    compilation-parameter
+    compilation-variable)
   (import
     (micascheme)
     (tico constant)
@@ -82,6 +84,17 @@
         (generate-parameter-compilation))
       ((parameter? $parameter)
         (throw compilation-parameter $compilation))))
+
+  (define (compilation-variable $compilation $index)
+    (switch (compilation-evaluation $compilation)
+      ((constant? $constant)
+        $compilation)
+      ((variable? $variable)
+        (throw compilation-variable $compilation))
+      ((parameter? $parameter)
+        (compilation
+          (compilation-datum $compilation)
+          (variable $index (stack))))))
 
   (define (compilation-application $target $args)
     (compilation
