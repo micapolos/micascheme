@@ -1,7 +1,7 @@
 (library (tico reader-2)
   (export
     typings-reader
-    top-level-reader
+    read-typings
     read-typing)
   (import
     (micascheme)
@@ -32,10 +32,13 @@
   (define typings-reader
     (top-level-reader (stack) (stack) identity))
 
+  (define-syntax-rule (read-typings $body ...)
+    (reader-eval
+      typings-reader
+      $body ...))
+
   (define-syntax-rule (read-typing $body ...)
     (car
       (ensure single?
-        (reader-eval
-          typings-reader
-          $body ...))))
+        (read-typings $body ...))))
 )
