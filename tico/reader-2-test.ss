@@ -41,3 +41,11 @@
         (list
           (literal->typing 4)
           (literal->typing 5))))))
+
+(check
+  (equal?
+    (read-typings 1 2 (do 3 4))
+    (stack
+      (literal->typing 3)
+      (literal->typing 4))))
+
