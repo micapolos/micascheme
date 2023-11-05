@@ -65,3 +65,26 @@
     (layout-datum->layment
       (simple-layout)
       '(string-append "foo" "bar"))))
+
+; --- layment-struct
+
+(check
+  (equal?
+    (layment-struct 'foo (list))
+    (make-layment (empty-layout) #f)))
+
+(check
+  (equal?
+    (layment-struct 'foo
+      (list
+        (literal->layment 128)
+        (literal->layment "foo")))
+    (make-layment
+      (layout-struct 'foo
+        (list
+          (literal->layout 128)
+          (literal->layout "foo")))
+      (compilation-struct 'foo
+        (list
+          (literal->compilation 128)
+          (literal->compilation "foo"))))))

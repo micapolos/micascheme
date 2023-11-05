@@ -9,6 +9,7 @@
     tuple-or-empty-layout
     type->layout
 
+    literal->layout
     layout-application
     layout-abstraction
     layout-struct)
@@ -20,6 +21,9 @@
   (data (simple-layout))
   (data (tuple-layout items))
   (data (lambda-layout params body))
+
+  (define (literal->layout $literal)
+    (simple-layout))
 
   (define (tuple-or-empty-layout $layouts)
     (if (for-all empty-layout? $layouts)

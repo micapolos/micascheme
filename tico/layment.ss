@@ -37,7 +37,7 @@
 
   (define (literal->layment $literal)
     (layment
-      (simple-layout)
+      (literal->layout $literal)
       (literal->compilation $literal)))
 
   (define (layout-datum->layment $layout $datum)

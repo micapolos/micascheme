@@ -7,6 +7,13 @@
 (check (equal? (layout-not-empty? (simple-layout)) #t))
 (check (equal? (layout-not-empty? (tuple-layout (list))) #t))
 
+; --- literal->layout
+
+(check
+  (equal?
+    (literal->layout "foo")
+    (simple-layout)))
+
 ; --- layout-abstraction
 
 (check
