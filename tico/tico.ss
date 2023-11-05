@@ -6,7 +6,16 @@
   (import
     (micascheme)
     (leo parser)
-    (tico reader))
+    (leo reader)
+    (tico reader)
+    (tico typing))
+
+  (define (tico-eval $datum)
+    (typing-value
+      (car
+        (ensure single?
+          (reader-end
+            (reader-read-list typings-reader $datum))))))
 
   (define (tico-parse $string)
     (tico-eval (parse-script $string)))
