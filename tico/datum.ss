@@ -39,7 +39,7 @@
 
   (define (tuple-ref-datum $arity $datum $index)
     (case $arity
-      ((0) '(throw error))
+      ((0) (throw error))
       ((1) $datum)
       ((2) `(,(if (zero? $index) `car `cdr) ,$datum))
       (else `(vector-ref ,$datum ,$index))))
