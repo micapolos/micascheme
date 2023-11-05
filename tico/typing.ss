@@ -1,6 +1,7 @@
 (library (tico typing)
   (export
     typing typing? typing-type typing-layment
+    static-typing
 
     literal->typing
     type-datum->typing
@@ -18,6 +19,12 @@
     (tico layout))
 
   (data (typing type layment))
+
+  (define (static-typing $type)
+    (typing $type
+      (make-layment
+        (type->layout $type)
+        (throw not-static))))
 
   (define (literal->typing $literal)
     (typing

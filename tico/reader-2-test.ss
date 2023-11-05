@@ -5,6 +5,11 @@
 
 (check
   (equal?
+    (read-typing foo)
+    (static-typing (struct 'foo (list)))))
+
+(check
+  (equal?
     (read-typing "foo")
     (literal->typing "foo")))
 

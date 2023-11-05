@@ -70,7 +70,7 @@
     TODO)
 
   (define (layment-struct $name $field-layments)
-    (layment
+    (make-layment
       (layout-struct $name
         (map layment-layout $field-layments))
       (compilation-struct $name

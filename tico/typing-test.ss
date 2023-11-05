@@ -9,6 +9,13 @@
 
 (check
   (equal?
+    (static-typing (value-type "foo"))
+    (typing
+      (value-type "foo")
+      (layment (empty-layout) #f))))
+
+(check
+  (equal?
     (literal->typing "foo")
     (typing
       (literal->type "foo")
