@@ -1,5 +1,8 @@
 (library (tico reader-2)
-  (export)
+  (export
+    typings-reader
+    top-level-reader
+    read-typing)
   (import
     (micascheme)
     (leo reader)
@@ -19,8 +22,20 @@
           (lambda ($symbol-typings)
             (top-level-reader
               $locals
-              (typing-struct $symbol $symbol-typings)
+              (push $typings
+                (typing-struct $symbol
+                  (reverse $symbol-typings)))
               $end-fn))))
       (lambda ()
         ($end-fn $typings))))
+
+  (define typings-reader
+    (top-level-reader (stack) (stack) identity))
+
+  (define-syntax-rule (read-typing $body ...)
+    (car
+      (ensure single?
+        (reader-eval
+          typings-reader
+          $body ...))))
 )
