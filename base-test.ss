@@ -19,6 +19,12 @@
 (check (equal? (foolik? (foolik 123)) #t))
 (check (equal? (foolik? (foolik "foo")) #t))
 
+(check (equal? (foolik 123) (foolik 123)))
+(check (not (equal? (foolik 123) (foolik 124))))
+
+(check (equal? (equal-hash (foolik 123)) (equal-hash (foolik 123))))
+(check (not (equal? (equal-hash (foolik 123)) (equal-hash (foolik 124)))))
+
 (check (equal? (foolik-body (foolik "foo")) "foo"))
 
 (check

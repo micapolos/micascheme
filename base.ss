@@ -336,23 +336,20 @@
         ((_ (name field ...))
           (lets
             (name-string (symbol->string (syntax->datum #`name)))
+            (tmp (car (generate-temporaries '(tmp))))
             (record-name (build-identifier ($string #`name) (string-append "%" $string)))
             (rtd-name (build-identifier ($string #`name) (string-append $string "-rtd")))
             (prefix-name (string-append name-string "-"))
             (predicate-name (build-identifier ($string #`name) (string-append $string "?")))
             #`(begin
-              (define-record 
-                #,record-name
-                ((immutable field) ...)
-                ()
-                ((constructor name) 
-                 (prefix #,prefix-name) 
-                 (predicate #,predicate-name)))
               (define #,rtd-name
-                (let ((td (type-descriptor #,record-name)))
-                  (record-writer td (record-pretty-writer td #,name-string))
+                (let ((#,tmp
+                  (make-record-type #,name-string
+                    (list '(immutable field) ...))))
+                  (record-writer #,tmp
+                    (record-pretty-writer #,tmp #,name-string))
                   (record-type-equal-procedure
-                    td
+                    #,tmp
                     (lambda (a b eq)
                       (and
                       #,@(map
@@ -362,7 +359,7 @@
                             #`(eq (#,fld a) (#,fld b))))
                         (syntax->list #`(field ...))))))
                   (record-type-hash-procedure
-                    td
+                    #,tmp
                     (lambda (a hash)
                       (+
                       #,@(map
@@ -371,9 +368,18 @@
                             (fld (build-identifier (s field) (string-append name-string "-" s)))
                             #`(hash (#,fld a))))
                         (syntax->list #`(field ...))))))
-                  td))))))))
+                  #,tmp))
+              (define name
+                (record-constructor #,rtd-name))
+              (define #,predicate-name
+                (record-predicate #,rtd-name))
+              #,@(map
+                (lambda (index f)
+                  #`(define #,(build-identifier (s f) (string-append prefix-name s))
+                    (record-accessor #,rtd-name #,index)))
+                (iota (length (syntax->list #'(field ...))))
+                (syntax->list #'(field ...)))))))))
 
-  ;; for documentation purposes
   (define-syntax enum
     (lambda ($syntax)
       (syntax-case $syntax ()
@@ -383,14 +389,12 @@
             (for-all identifier? (syntax->list #`($item ...))))
           (lets
             ($name #'$name)
+            ($name-string (symbol->string (syntax->datum $name)))
             ($record-name
               (build-identifier
                 ($string $name)
                 (string-append $string "%")))
-            ($name-prefix
-              (string-append
-                (symbol->string (syntax->datum $name))
-                "-"))
+            ($name-prefix (string-append $name-string"-"))
             ($name-predicate
               (build-identifier
                 ($string $name)
@@ -403,17 +407,32 @@
               (build-identifier
                 ($string $name)
                 (string-append $string "-body")))
+            ($rtd-tmp (car (generate-temporaries '(rtd))))
             ($name-tmp (car (generate-temporaries '(name))))
             ($case-tmp (car (generate-temporaries '(case))))
             ($dots (datum->syntax #'+ '...))
             #`(begin
-              (define-record
-                #,$record-name
-                ((immutable body))
-                ()
-                ((constructor #,$name)
-                 (prefix #,$name-prefix)
-                 (predicate #,$name-predicate)))
+              (define #,$record-name
+                (let ((#,$rtd-tmp
+                  (make-record-type #,$name-string
+                    (list '(immutable body)))))
+                  (record-writer #,$rtd-tmp
+                    (record-pretty-writer #,$rtd-tmp #,$name-string))
+                  (record-type-equal-procedure
+                    #,$rtd-tmp
+                    (lambda (a b eq)
+                      (eq (#,$name-body a) (#,$name-body b))))
+                  (record-type-hash-procedure
+                    #,$rtd-tmp
+                    (lambda (a hash)
+                      (hash (#,$name-body a))))
+                  #,$rtd-tmp))
+              (define #,$name
+                (record-constructor #,$record-name))
+              (define #,$name-predicate
+                (record-predicate #,$record-name))
+              (define #,$name-body
+                (record-accessor #,$record-name 0))
               (define-syntax-rule (#,$name-switch #,$name-tmp #,$case-tmp #,$dots)
                 (switch (#,$name-body #,$name-tmp)
                   #,$case-tmp #,$dots))))))))
