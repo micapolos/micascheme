@@ -67,13 +67,17 @@
         (throw not-type $other))))
 
   (define (type-application $target $args)
-    (lets
-      ($arrow (ensure arrow? $target))
-      (cond
-        ((types-match? $args (arrow-params $arrow))
-          (arrow-result $arrow))
-        (else
-          (throw type-application $target $args)))))
+    (switch $target
+      ((arrow? $arrow)
+        (cond
+          ((types-match? $args (arrow-params $arrow))
+            (arrow-result $arrow))
+          (else
+            (throw type-application $target $args))))
+      ((native-type? _)
+        (native-type))
+      ((else $other)
+        (throw type-application $target $args))))
 
   (define (types-arity $types)
     (length (filter type-dynamic? $types)))

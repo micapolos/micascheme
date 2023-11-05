@@ -177,6 +177,13 @@
 (check
   (equal?
     (type-application
+      (native-type)
+      (list (string-type) (number-type)))
+    (native-type)))
+
+(check
+  (equal?
+    (type-application
       (arrow (list (string-type) (number-type)) (boolean-type))
       (list (string-type) (number-type)))
     (boolean-type)))
