@@ -37,12 +37,12 @@
       ((null? _) $body)
       ((pair? $pair) `(lets ,@$pair ,$body))))
 
-  (define (tuple-ref-datum $arity $datum $index)
+  (define (tuple-ref-datum $arity $tuple $index)
     (case $arity
       ((0) (throw error))
-      ((1) $datum)
-      ((2) `(,(if (zero? $index) `car `cdr) ,$datum))
-      (else `(vector-ref ,$datum ,$index))))
+      ((1) $tuple)
+      ((2) `(,(if (zero? $index) `car `cdr) ,$tuple))
+      (else `(vector-ref ,$tuple ,$index))))
 
   (define datum-environment
     (environment '(micascheme) '(tico type)))
