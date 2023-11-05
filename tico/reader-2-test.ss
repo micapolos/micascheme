@@ -20,3 +20,12 @@
       (list
         (literal->typing 128)
         (literal->typing "foo")))))
+
+(check
+  (equal?
+    (read-typings 1 2 (take 3 4))
+    (stack
+      (literal->typing 1)
+      (literal->typing 2)
+      (literal->typing 3)
+      (literal->typing 4))))

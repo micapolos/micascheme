@@ -6,7 +6,8 @@
   (import
     (micascheme)
     (leo reader)
-    (tico typing))
+    (tico typing)
+    (tico type))
 
   (define (top-level-reader $locals $typings $end-fn)
     (reader
@@ -16,16 +17,43 @@
           (push $typings (literal->typing $literal))
           $end-fn))
       (lambda ($symbol)
-        (top-level-reader
-          $locals
-          (stack)
-          (lambda ($symbol-typings)
+        (case $symbol
+          ((take)
+            (top-level-reader $locals (stack)
+              (lambda ($take-typings)
+                (top-level-reader
+                  $locals
+                  (push-all $typings $take-typings)
+                  $end-fn))))
+          ((do)
             (top-level-reader
-              $locals
-              (push $typings
-                (typing-struct $symbol
-                  (reverse $symbol-typings)))
-              $end-fn))))
+              (push-all $locals $typings)
+              (stack)
+              (lambda ($body-typings)
+                (top-level-reader
+                  $locals
+                  $body-typings
+                  $end-fn))))
+          ((apply)
+            (top-level-reader $locals (stack)
+              (lambda ($arg-typings)
+                (top-level-reader $locals
+                  (map
+                    (lambda ($typing)
+                      (typing-application $typing
+                        (reverse $arg-typings)))
+                    $typings)
+                  $end-fn))))
+          ((doing) TODO)
+          (else
+            (top-level-reader $locals (stack)
+              (lambda ($symbol-typings)
+                (top-level-reader
+                  $locals
+                  (push $typings
+                    (typing-struct $symbol
+                      (reverse $symbol-typings)))
+                  $end-fn))))))
       (lambda ()
         ($end-fn $typings))))
 
