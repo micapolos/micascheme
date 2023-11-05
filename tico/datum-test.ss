@@ -28,7 +28,7 @@
 
 (check (equal? (datum->value '(string-append "foo" "bar")) "foobar"))
 
-(check (equal? (datum-tuple (list)) #f))
+(check (raises? (lambda () (datum-tuple (list)))))
 (check (equal? (datum-tuple (list 'v1)) 'v1))
 (check (equal? (datum-tuple (list 'v1 'v2)) '(cons v1 v2)))
 (check (equal? (datum-tuple (list 'v1 'v2 'v3)) '(vector v1 v2 v3)))
