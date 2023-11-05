@@ -57,3 +57,20 @@
       (literal->typing 3)
       (literal->typing 4))))
 
+(check
+  (equal?
+    (read-typings
+      (native "+")
+      (native "*")
+      (apply 3 4))
+    (stack
+      (typing-application
+        (native->typing '+)
+        (list
+          (literal->typing 3)
+          (literal->typing 4)))
+      (typing-application
+        (native->typing '*)
+        (list
+          (literal->typing 3)
+          (literal->typing 4))))))
