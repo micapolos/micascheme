@@ -13,7 +13,9 @@
     typing-application
     typing-abstraction
     typing-struct
-    typing-native)
+    typing-native
+
+    typing-inline)
   (import
     (micascheme)
     (tico type)
@@ -79,4 +81,9 @@
 
   (define (native->typing $datum)
     (type-datum->typing (native-type) $datum))
+
+  (define (typing-inline $typing)
+    (type-datum->typing
+      (typing-type $typing)
+      (value->datum (typing-value $typing))))
 )

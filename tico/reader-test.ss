@@ -13,6 +13,17 @@
 
 (check
   (equal?
+    (read-typings
+      (inline
+        (native
+          "(+ 1 2)"
+          "(string-append \"foo\" \"bar\")")))
+    (stack
+      (type-datum->typing (native-type) 3)
+      (type-datum->typing (native-type) "foobar"))))
+
+(check
+  (equal?
     (read-typing foo)
     (static-typing (struct 'foo (list)))))
 

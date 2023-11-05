@@ -10,7 +10,7 @@
     (tico expression))
 
   (define (value-environment)
-    (environment `(micascheme) `(tico expression)))
+    (environment '(micascheme)))
 
   (define (value-application $target $args)
     (apply $target $args))

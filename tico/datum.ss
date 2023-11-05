@@ -75,8 +75,6 @@
         `(any-type))
       ((native-type? _)
         `(native-type))
-      ((native-type? _)
-        `(native-type))
       ((value-type? $value-type)
         `(value-type ,(value->datum (value-type-value $value-type))))
       ((struct? $struct)

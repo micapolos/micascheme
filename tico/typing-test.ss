@@ -61,3 +61,13 @@
           (type->layout (arrow (list (number-type)) (string-type)))
           'number->string)
         (list (literal->layment 10))))))
+
+(check
+  (equal?
+    (typing-inline
+      (type-datum->typing
+        (number-type)
+        '(+ 1 2)))
+    (type-datum->typing
+      (number-type)
+      3)))
