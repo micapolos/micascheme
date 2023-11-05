@@ -27,7 +27,7 @@
 
   (define (datum-tuple $items)
     (case (length $items)
-      ((0) #f)
+      ((0) (throw error))
       ((1) (car $items))
       ((2) `(cons ,(car $items) ,(cadr $items)))
       (else `(vector ,@$items))))
