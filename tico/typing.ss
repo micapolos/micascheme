@@ -3,6 +3,7 @@
     typing typing? typing-type typing-layment
     static-typing
 
+    native->typing
     literal->typing
     type-datum->typing
 
@@ -11,12 +12,14 @@
 
     typing-application
     typing-abstraction
-    typing-struct)
+    typing-struct
+    typing-native)
   (import
     (micascheme)
     (tico type)
     (tico layment)
-    (tico layout))
+    (tico layout)
+    (tico datum))
 
   (data (typing type layment))
 
@@ -67,4 +70,13 @@
         (map typing-type $field-typings))
       (layment-struct $name
         (map typing-layment $field-typings))))
+
+  (define (typing-native $typing)
+    (native->typing
+      (string->read-datum
+        (ensure string?
+          (typing-value $typing)))))
+
+  (define (native->typing $datum)
+    (type-datum->typing (native-type) $datum))
 )

@@ -9,7 +9,8 @@
     tuple-ref-datum
     value->datum
     datum->value
-    datum-struct)
+    datum-struct
+    string->read-datum)
   (import (micascheme) (tico type))
 
   (define (generate-datum-abstraction $arity $fn)
@@ -88,4 +89,15 @@
           ,(value->datum (arrow-result $arrow))))
       ((else $other)
         (throw value->datum $value))))
+
+  (define (string->read-datum $string)
+    (lets
+      ($port (open-input-string $string))
+      (switch (read $port)
+        ((eof-object? _)
+          (throw not-datum $string))
+        ((else $datum)
+          (switch (read $port)
+            ((eof-object? _) $datum)
+            ((else _) (throw not-datum $string)))))))
 )

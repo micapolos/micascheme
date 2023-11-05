@@ -18,6 +18,14 @@
           $end-fn))
       (lambda ($symbol)
         (case $symbol
+          ((native)
+            (top-level-reader $locals (stack)
+              (lambda ($native-typings)
+                (top-level-reader
+                  $locals
+                  (push-all $typings
+                    (map typing-native $native-typings))
+                  $end-fn))))
           ((take)
             (top-level-reader $locals (stack)
               (lambda ($take-typings)

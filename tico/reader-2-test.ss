@@ -5,6 +5,14 @@
 
 (check
   (equal?
+    (read-typings (native "1" "(+ 1 2)" "+"))
+    (stack
+      (native->typing 1)
+      (native->typing '(+ 1 2))
+      (native->typing '+))))
+
+(check
+  (equal?
     (read-typing foo)
     (static-typing (struct 'foo (list)))))
 
