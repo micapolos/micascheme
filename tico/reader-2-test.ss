@@ -32,9 +32,12 @@
 
 (check
   (equal?
-    (read-typings 1 2 (with (take 1) (take 2)))
+    (read-typings 1 2 (with 3 (take 4 5)))
     (stack
       (literal->typing 1)
       (literal->typing 2)
-      (typing-struct 'take (list (literal->typing 1)))
-      (typing-struct 'take (list (literal->typing 2))))))
+      (literal->typing 3)
+      (typing-struct 'take
+        (list
+          (literal->typing 4)
+          (literal->typing 5))))))
