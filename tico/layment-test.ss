@@ -88,3 +88,12 @@
         (list
           (literal->compilation 128)
           (literal->compilation "foo"))))))
+
+; --- layment parameter
+
+(check
+  (equal?
+    (layment-parameter (literal->layment "foo"))
+    (layment
+      (literal->layout "foo")
+      (literal->compilation "foo"))))

@@ -10,7 +10,9 @@
     typing-datum
     typing-value
 
+    generate-parameter-typing
     typing-application
+    typing-parameter
     typing-abstraction
     typing-struct
     typing-native
@@ -57,6 +59,15 @@
       (layment-application
         (typing-layment $target)
         (map typing-layment $args))))
+
+  (define (generate-parameter-typing $type)
+    (typing $type
+      (generate-parameter-layment (type->layout $type))))
+
+  (define (typing-parameter $typing)
+    (typing
+      (typing-type $typing)
+      (layment-parameter (typing-layment $typing))))
 
   (define (typing-abstraction $param-types $body-typing)
     (typing

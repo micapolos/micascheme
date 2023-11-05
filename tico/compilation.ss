@@ -9,9 +9,12 @@
     compilation-value
 
     compilation->generate-dependency-opt
+    generate-parameter-compilation
+
     compilation-application
     compilation-abstraction
-    compilation-struct)
+    compilation-struct
+    compilation-parameter)
   (import
     (micascheme)
     (tico constant)
@@ -67,6 +70,18 @@
           (variable-dependencies $variable)))
       ((parameter? $other)
         (throw compilation->datum-variable $other))))
+
+  (define (generate-parameter-compilation)
+    (compilation (generate-symbol) (parameter)))
+
+  (define (compilation-parameter $compilation)
+    (switch (compilation-evaluation $compilation)
+      ((constant? $constant)
+        $compilation)
+      ((variable? $variable)
+        (generate-parameter-compilation))
+      ((parameter? $parameter)
+        (throw compilation-parameter $compilation))))
 
   (define (compilation-application $target $args)
     (compilation

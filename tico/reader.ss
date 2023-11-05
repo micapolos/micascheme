@@ -7,60 +7,61 @@
     (micascheme)
     (leo reader)
     (tico typing)
-    (tico type))
+    (tico type)
+    (tico binding))
 
-  (define (top-level-reader $locals $typings $end-fn)
+  (define (top-level-reader $bindings $typings $end-fn)
     (reader
       (lambda ($literal)
         (top-level-reader
-          $locals
+          $bindings
           (push $typings (literal->typing $literal))
           $end-fn))
       (lambda ($symbol)
         (case $symbol
           ((native)
-            (top-level-reader $locals (stack)
+            (top-level-reader $bindings (stack)
               (lambda ($native-typings)
                 (top-level-reader
-                  $locals
+                  $bindings
                   (push-all $typings
                     (map typing-native $native-typings))
                   $end-fn))))
           ((inline)
-            (top-level-reader $locals (stack)
+            (top-level-reader $bindings (stack)
               (lambda ($inline-typings)
                 (top-level-reader
-                  $locals
+                  $bindings
                   (push-all $typings
                     (map typing-inline $inline-typings))
                   $end-fn))))
           ((take)
-            (top-level-reader $locals (stack)
+            (top-level-reader $bindings (stack)
               (lambda ($take-typings)
                 (top-level-reader
-                  $locals
+                  $bindings
                   (push-all $typings $take-typings)
                   $end-fn))))
           ((with)
-            (with-reader $locals (stack)
+            (with-reader $bindings (stack)
               (lambda ($with-typings)
                 (top-level-reader
-                  $locals
+                  $bindings
                   (push-all $typings $with-typings)
                   $end-fn))))
           ((do)
             (top-level-reader
-              (push-all $locals $typings)
+              (push-all $bindings (map typing->binding $typings))
               (stack)
               (lambda ($body-typings)
                 (top-level-reader
-                  $locals
+                  $bindings
                   $body-typings
                   $end-fn))))
           ((apply)
-            (top-level-reader $locals (stack)
+            (top-level-reader $bindings (stack)
               (lambda ($arg-typings)
-                (top-level-reader $locals
+                (top-level-reader $bindings
                   (map
                     (lambda ($typing)
                       (typing-application $typing
@@ -69,10 +70,10 @@
                   $end-fn))))
           ((doing) TODO)
           (else
-            (top-level-reader $locals (stack)
+            (top-level-reader $bindings (stack)
               (lambda ($symbol-typings)
                 (top-level-reader
-                  $locals
+                  $bindings
                   (push $typings
                     (typing-struct $symbol
                       (reverse $symbol-typings)))
@@ -80,17 +81,17 @@
       (lambda ()
         ($end-fn $typings))))
 
-  (define (with-reader $locals $typings $end-fn)
+  (define (with-reader $bindings $typings $end-fn)
     (reader
       (lambda ($literal)
         (with-reader
-          $locals
+          $bindings
           (push $typings (literal->typing $literal))
           $end-fn))
       (lambda ($symbol)
-        (top-level-reader $locals (stack)
+        (top-level-reader $bindings (stack)
           (lambda ($arg-typings)
-            (with-reader $locals
+            (with-reader $bindings
               (push $typings
                 (typing-struct $symbol
                   (reverse $arg-typings)))

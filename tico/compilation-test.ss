@@ -7,7 +7,8 @@
   (tico packet)
   (tico datum)
   (tico evaluation)
-  (tico variable))
+  (tico variable)
+  (tico parameter))
 
 (check
   (equal?
@@ -143,3 +144,18 @@
           (test-dependency d3)
           (test-dependency d4)
           (dependency '$tmp-1 (packet '(identity "bar") "bar")))))))
+
+; --- generate-parameter-compilation
+
+(check
+  (equal?
+    (compilation-parameter (literal->compilation "foo"))
+    (literal->compilation "foo")))
+
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (compilation-parameter
+        (compilation 'foo (test-variable 3))))
+    (with-generate-temporary-seed $tmp
+      (generate-parameter-compilation))))

@@ -11,7 +11,9 @@
     layment-datum
     layment-value
 
+    generate-parameter-layment
     layment-application
+    layment-parameter
     layment-abstraction
     layment-struct)
   (import
@@ -65,6 +67,15 @@
       (compilation-application
         (layment-compilation $target)
         (layments->compilations $args))))
+
+  (define (generate-parameter-layment $layout)
+    (layment $layout
+      (generate-parameter-compilation)))
+
+  (define (layment-parameter $layment)
+    (layment
+      (layment-layout $layment)
+      (compilation-parameter (layment-compilation $layment))))
 
   (define (layment-abstraction $param-layouts $body-compilation)
     TODO)

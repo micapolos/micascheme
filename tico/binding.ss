@@ -1,7 +1,8 @@
 (library (tico binding)
   (export
     binding binding? binding-switch
-    binding-matches?)
+    binding-matches?
+    typing->binding)
   (import
     (micascheme)
     (tico typing)
@@ -16,4 +17,7 @@
         (type-matches? (typing-type) $pattern))
       ((expanding? $expanding)
         TODO)))
+
+  (define (typing->binding $typing)
+    (binding (typing-parameter $typing)))
 )
