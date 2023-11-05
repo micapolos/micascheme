@@ -2,7 +2,6 @@
   (export
     evaluation-application
     evaluation-abstraction
-    evaluation-struct
     evaluation-lets-datums
     evaluation-value)
   (import
@@ -60,21 +59,4 @@
               (app $body-datum-fn)))))
       ((else $other)
         (throw evaluation-abstraction $other))))
-
-  (define (evaluation-struct $name $field-evaluations $constant-dependencies-fn)
-    (cond
-      ((for-all constant? $field-evaluations)
-        (constant-struct $name $field-evaluations))
-      (else
-        (lets
-          ($variables (filter variable? $field-evaluations))
-          ($constants (filter constant? $field-evaluations))
-          ($parameters (ensure null? (filter parameter? $field-evaluations)))
-          ($variable (variable-flatten $variables))
-          (variable
-            (variable-index $variable)
-            (dependencies-flatten
-              (list
-                (app $constant-dependencies-fn)
-                (variable-dependencies $variable))))))))
 )
