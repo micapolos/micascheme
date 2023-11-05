@@ -2,7 +2,9 @@
   (export
     dependency dependency? dependency-symbol dependency-packet
     test-dependency
+    test-dependencies
     dependency-lets-datum
+    dependencies+
     dependencies-flatten)
   (import
     (micascheme)
@@ -18,12 +20,18 @@
             (quote $name)
             (test-packet $name))))))
 
+  (define-syntax-rule (test-dependencies $name ...)
+    (stack (test-dependency $name) ...))
+
   (define (dependency-lets-datum $dependency)
     `(
       ,(dependency-symbol $dependency)
       ,(packet-datum
         (dependency-packet $dependency))))
 
+  (define (dependencies+ $first $second)
+    (push-all $first $second))
+
   (define (dependencies-flatten $dependencies-list)
-    (apply append (reverse $dependencies-list)))
+    (fold-left dependencies+ (stack) $dependencies-list))
 )

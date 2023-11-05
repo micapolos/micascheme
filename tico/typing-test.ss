@@ -1,6 +1,11 @@
 (import
   (micascheme)
-  (tico typing))
+  (tico typing)
+  (tico type)
+  (tico layment)
+  (tico layout)
+  (tico compilation)
+  (tico variable))
 
 (check
   (equal?

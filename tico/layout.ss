@@ -10,7 +10,8 @@
     type->layout
 
     layout-application
-    layout-abstraction)
+    layout-abstraction
+    layout-struct)
   (import
     (micascheme)
     (tico type))
@@ -41,6 +42,9 @@
         (lambda-layout-body $lambda-layout))
       ((empty-layout? _)
         (empty-layout))))
+
+  (define (layout-struct $name $field-layouts)
+    (tuple-or-empty-layout $field-layouts))
 
   (define (type->layout $type)
     (switch $type

@@ -9,7 +9,8 @@
     typing-value
 
     typing-application
-    typing-abstraction)
+    typing-abstraction
+    typing-struct)
   (import
     (micascheme)
     (tico type)
@@ -52,4 +53,11 @@
       (layment-abstraction
         (map type->layout $param-types)
         (typing-layment $body-typing))))
+
+  (define (typing-struct $name $field-typings)
+    (typing
+      (struct $name
+        (map typing-type $field-typings))
+      (layment-struct $name
+        (map typing-layment $field-typings))))
 )

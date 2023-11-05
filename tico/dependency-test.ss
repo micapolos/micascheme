@@ -5,14 +5,13 @@
 
 (check
   (equal?
-    (dependencies-flatten
-      (list
-        (stack
-          (test-dependency d1)
-          (test-dependency d2))
-        (stack
-          (test-dependency d3)
-          (test-dependency d4))))
+    (dependencies+
+      (stack
+        (test-dependency d1)
+        (test-dependency d2))
+      (stack
+        (test-dependency d3)
+        (test-dependency d4)))
     (stack
       (test-dependency d1)
       (test-dependency d2)
@@ -29,3 +28,10 @@
   (equal?
     (test-dependency foo)
     (dependency 'foo (test-packet foo))))
+
+(check
+  (equal?
+    (test-dependencies d1 d2)
+    (stack
+      (test-dependency d1)
+      (test-dependency d2))))

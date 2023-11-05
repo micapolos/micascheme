@@ -12,7 +12,8 @@
     layment-value
 
     layment-application
-    layment-abstraction)
+    layment-abstraction
+    layment-struct)
   (import
     (micascheme)
     (tico datum)
@@ -67,4 +68,11 @@
 
   (define (layment-abstraction $param-layouts $body-compilation)
     TODO)
+
+  (define (layment-struct $name $field-layments)
+    (layment
+      (layout-struct $name
+        (map layment-layout $field-layments))
+      (compilation-struct $name
+        (map layment-compilation $field-layments))))
 )

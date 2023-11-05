@@ -6,7 +6,8 @@
   (tico dependency)
   (tico packet)
   (tico datum)
-  (tico evaluation))
+  (tico evaluation)
+  (tico variable))
 
 (check
   (equal?
@@ -108,3 +109,37 @@
             (dependency 'v1 (packet "foo" "foo"))
             (dependency 'v2 (packet "bar" "bar"))))
         (lambda () '(string-append v1 v2))))))
+
+; --- compilation-struct
+
+(check
+  (equal?
+    (compilation-struct 'x
+      (list
+        (compilation "foo" (constant "foo"))
+        (compilation "bar" (constant "bar"))))
+    (compilation
+      (datum-struct 'x (list "foo" "bar"))
+      (constant-struct 'x (list (constant "foo") (constant "bar"))))))
+
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (compilation-struct 'x
+        (list
+          (compilation 'foo (test-variable 1 d1 d2))
+          (compilation '(identity "foo") (constant "foo"))
+          (compilation 'bar (test-variable 2 d3 d4))
+          (compilation '(identity "bar") (constant "bar")))))
+    (compilation
+      (datum-struct 'x
+        (list 'foo '$tmp-0 'bar '$tmp-1))
+      (variable
+        (variable-index-flatten (list 1 2))
+        (stack
+          (test-dependency d1)
+          (test-dependency d2)
+          (dependency '$tmp-0 (packet '(identity "foo") "foo"))
+          (test-dependency d3)
+          (test-dependency d4)
+          (dependency '$tmp-1 (packet '(identity "bar") "bar")))))))

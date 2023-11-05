@@ -6,6 +6,14 @@
 
 (check
   (equal?
+    (test-variable 3 d1 d2)
+    (variable 3
+      (stack
+        (test-dependency d1)
+        (test-dependency d2)))))
+
+(check
+  (equal?
     (variable-lets-datums
       (variable 3
         (stack
@@ -17,65 +25,42 @@
 
 (check
   (equal?
-    (variable-promote
-      (variable 3
-        (stack
-          (test-dependency foo)
-          (test-dependency bar)))
-      2)
-    (variable 1
-      (stack
-        (test-dependency foo)
-        (test-dependency bar)))))
+    (variable-promote (test-variable 3 d1 d2) 2)
+    (test-variable 1 d1 d2)))
 
 (check
   (equal?
-    (variable-promote
-      (variable 3
-        (stack
-          (test-dependency foo)
-          (test-dependency bar)))
-      3)
-    (variable 0
-      (stack
-        (test-dependency foo)
-        (test-dependency bar)))))
+    (variable-promote (test-variable 3 d1 d2) 3)
+    (test-variable 0 d1 d2)))
 
 (check
   (equal?
-    (variable-promote
-      (variable 3
-        (stack
-          (test-dependency foo)
-          (test-dependency bar)))
-      4)
+    (variable-promote (test-variable 3 d1 d2) 4)
     #f))
 
+(check (equal? (variable-index+ 2 4) 4))
+(check (equal? (variable-index+ 4 2) 4))
+(check (equal? (variable-index+ 2 2) 2))
+
 (check
   (equal?
-    (variable-index-flatten
-      (list 1 3 2))
-    3))
+    (variable+
+      (test-variable 2 d1 d2)
+      (test-variable 3 d3 d4))
+    (test-variable 3 d1 d2 d3 d4)))
 
 (check
   (equal?
     (variable-flatten
       (list
-        (variable 1
-          (stack
-            (test-dependency d1)
-            (test-dependency d2)))
-        (variable 3
-          (stack
-            (test-dependency d3)
-            (test-dependency d4)))))
-    (variable
-      (variable-index-flatten (list 1 3))
-      (dependencies-flatten
-        (list
-          (stack
-            (test-dependency d1)
-            (test-dependency d2))
-          (stack
-            (test-dependency d3)
-            (test-dependency d4)))))))
+        (test-variable 1 d1 d2)
+        (test-variable 3 d3 d4)
+        (test-variable 2 d5 d6)))
+    (test-variable 3 d1 d2 d3 d4 d5 d6)))
+
+(check
+  (equal?
+    (variable+dependencies
+      (test-variable 1 d1 d2)
+      (test-dependencies d3 d4))
+    (test-variable 1 d1 d2 d3 d4)))

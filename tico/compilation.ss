@@ -10,7 +10,8 @@
 
     compilation->generate-dependency-opt
     compilation-application
-    compilation-abstraction)
+    compilation-abstraction
+    compilation-struct)
   (import
     (micascheme)
     (tico constant)
@@ -19,7 +20,8 @@
     (tico dependency)
     (tico packet)
     (tico datum)
-    (tico evaluation))
+    (tico evaluation)
+    (tico parameter))
 
   (data (compilation datum evaluation))
 
@@ -48,6 +50,24 @@
             (constant-value $constant))))
       ((else _) #f)))
 
+  (define (compilation->datum-dependencies $compilation)
+    (switch (compilation-evaluation $compilation)
+      ((constant? $constant)
+        (lets
+          ($symbol (generate-symbol))
+          (cons $symbol
+            (stack
+              (dependency $symbol
+                (packet
+                  (compilation-datum $compilation)
+                  (constant-value $constant)))))))
+      ((variable? $variable)
+        (cons
+          (compilation-datum $compilation)
+          (variable-dependencies $variable)))
+      ((parameter? $other)
+        (throw compilation->datum-variable $other))))
+
   (define (compilation-application $target $args)
     (compilation
       (datum-application
@@ -70,4 +90,28 @@
         (length $param-symbols)
         (compilation-evaluation $body-compilation)
         (lambda () (compilation-datum $body-compilation)))))
+
+  (define (compilation-struct $name $compilations)
+    (lets
+      ($datums (map compilation-datum $compilations))
+      ($evaluations (map compilation-evaluation $compilations))
+      ($constants (filter constant? $evaluations))
+      ($variables (filter variable? $evaluations))
+      ($parameters (ensure null? (filter parameter? $evaluations)))
+      (cond
+        ((for-all constant? $evaluations)
+          (compilation
+            (datum-struct $name $datums)
+            (constant-struct $name $constants)))
+        (else
+          (lets
+            ($datum-dependencies-list
+              (reverse (map compilation->datum-dependencies (reverse $compilations))))
+            ($datums (map car $datum-dependencies-list))
+            ($dependencies-list (map cdr $datum-dependencies-list))
+            (compilation
+              (datum-struct $name $datums)
+              (variable
+                (variable-index-flatten (map variable-index $variables))
+                (dependencies-flatten $dependencies-list))))))))
 )

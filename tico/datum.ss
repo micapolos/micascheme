@@ -8,7 +8,8 @@
     datum-tuple
     tuple-ref-datum
     value->datum
-    datum->value)
+    datum->value
+    datum-struct)
   (import (micascheme) (tico type))
 
   (define (generate-datum-abstraction $arity $fn)
@@ -31,6 +32,9 @@
       ((1) (car $items))
       ((2) `(cons ,(car $items) ,(cadr $items)))
       (else `(vector ,@$items))))
+
+  (define (datum-struct $name $field-datums)
+    (datum-tuple $field-datums))
 
   (define (lets-datum $declarations $body)
     (switch $declarations

@@ -2,7 +2,8 @@
   (export
     constant constant? constant-value
     datum->constant
-    constant-application)
+    constant-application
+    constant-struct)
   (import
     (micascheme)
     (tico datum)
@@ -18,4 +19,9 @@
       (value-application
         (constant-value $target)
         (map constant-value $args))))
+
+  (define (constant-struct $name $field-values)
+    (constant
+      (value-struct $name
+        (map constant-value $field-values))))
 )

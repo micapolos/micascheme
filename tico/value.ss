@@ -1,6 +1,7 @@
 (library (tico value)
   (export
     value-application
+    value-struct
     tuple-value
     tuple-ref-value)
   (import
@@ -13,6 +14,9 @@
 
   (define (value-application $target $args)
     (apply $target $args))
+
+  (define (value-struct $name $field-values)
+    (tuple-value $field-values))
 
   (define (tuple-value $values)
     (lets
