@@ -14,7 +14,26 @@
 
 ; === enum ===
 
-(enum (foo number string))
+(enum (foolik number string))
+
+(check (equal? (foolik? (foolik 123)) #t))
+(check (equal? (foolik? (foolik "foo")) #t))
+
+(check (equal? (foolik-body (foolik "foo")) "foo"))
+
+(check
+  (equal?
+    (foolik-switch (foolik "foo")
+      ((string? $string) (string-append $string "!"))
+      ((number? $number) (number->string $number)))
+    "foo!"))
+
+(check
+  (equal?
+    (foolik-switch (foolik 128)
+      ((string? $string) (string-append $string "!"))
+      ((number? $number) (number->string $number)))
+    "128"))
 
 ; === app ===
 

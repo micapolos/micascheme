@@ -1,18 +1,14 @@
 (library (tico binding)
   (export
-    binding binding? binding-body
-    binding-switch
+    binding binding? binding-switch
     binding-matches?)
   (import
     (micascheme)
     (tico typing)
     (tico type))
 
-  (data (binding body))
+  (enum (binding typing expanding))
   (data (expanding))
-
-  (define-syntax-rule (binding-switch $binding $case ...)
-    (switch (binding-body $binding) $case ...))
 
   (define (binding-matches? $binding $pattern)
     (binding-switch $binding

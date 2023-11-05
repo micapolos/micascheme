@@ -381,7 +381,42 @@
           (and
             (identifier? #`$name)
             (for-all identifier? (syntax->list #`($item ...))))
-          #`(begin)))))
+          (lets
+            ($name #'$name)
+            ($record-name
+              (build-identifier
+                ($string $name)
+                (string-append $string "%")))
+            ($name-prefix
+              (string-append
+                (symbol->string (syntax->datum $name))
+                "-"))
+            ($name-predicate
+              (build-identifier
+                ($string $name)
+                (string-append $string "?")))
+            ($name-switch
+              (build-identifier
+                ($string $name)
+                (string-append $string "-switch")))
+            ($name-body
+              (build-identifier
+                ($string $name)
+                (string-append $string "-body")))
+            ($name-tmp (car (generate-temporaries '(name))))
+            ($case-tmp (car (generate-temporaries '(case))))
+            ($dots (datum->syntax #'+ '...))
+            #`(begin
+              (define-record
+                #,$record-name
+                ((immutable body))
+                ()
+                ((constructor #,$name)
+                 (prefix #,$name-prefix)
+                 (predicate #,$name-predicate)))
+              (define-syntax-rule (#,$name-switch #,$name-tmp #,$case-tmp #,$dots)
+                (switch (#,$name-body #,$name-tmp)
+                  #,$case-tmp #,$dots))))))))
 
   (define (record-pretty-writer rtd name)
     (lambda (record port wr)

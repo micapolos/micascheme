@@ -12,7 +12,7 @@
     (tico dependency)
     (tico datum))
 
-  (enum (evaluation constant variable))
+  ;(enum (evaluation constant variable))
 
   (define (evaluation-lets-datums $evaluation)
     (switch $evaluation
