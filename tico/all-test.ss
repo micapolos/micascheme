@@ -1,6 +1,7 @@
 (import (micascheme))
 
 (test
+  (tico binding)
   (tico compilation)
   (tico constant)
   (tico datum)

@@ -14,7 +14,6 @@
     typing-abstraction
     typing-struct
     typing-native
-
     typing-inline)
   (import
     (micascheme)
