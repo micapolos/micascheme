@@ -29,3 +29,12 @@
       (literal->typing 2)
       (literal->typing 3)
       (literal->typing 4))))
+
+(check
+  (equal?
+    (read-typings 1 2 (with (take 1) (take 2)))
+    (stack
+      (literal->typing 1)
+      (literal->typing 2)
+      (typing-struct 'take (list (literal->typing 1)))
+      (typing-struct 'take (list (literal->typing 2))))))

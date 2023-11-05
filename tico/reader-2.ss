@@ -25,6 +25,13 @@
                   $locals
                   (push-all $typings $take-typings)
                   $end-fn))))
+          ((with)
+            (with-reader $locals (stack)
+              (lambda ($with-typings)
+                (top-level-reader
+                  $locals
+                  (push-all $typings $with-typings)
+                  $end-fn))))
           ((do)
             (top-level-reader
               (push-all $locals $typings)
@@ -54,6 +61,24 @@
                     (typing-struct $symbol
                       (reverse $symbol-typings)))
                   $end-fn))))))
+      (lambda ()
+        ($end-fn $typings))))
+
+  (define (with-reader $locals $typings $end-fn)
+    (reader
+      (lambda ($literal)
+        (with-reader
+          $locals
+          (push $typings (literal->typing $literal))
+          $end-fn))
+      (lambda ($symbol)
+        (top-level-reader $locals (stack)
+          (lambda ($arg-typings)
+            (with-reader $locals
+              (push $typings
+                (typing-struct $symbol
+                  (reverse $arg-typings)))
+              $end-fn))))
       (lambda ()
         ($end-fn $typings))))
 
