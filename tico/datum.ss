@@ -6,7 +6,7 @@
     generate-datum-abstraction
     lets-datum
     datum-tuple
-    arity-datum-ref
+    tuple-ref-datum
     value->datum
     datum->value)
   (import (micascheme) (tico type))
@@ -37,7 +37,7 @@
       ((null? _) $body)
       ((pair? $pair) `(lets ,@$pair ,$body))))
 
-  (define (arity-datum-ref $arity $datum $index)
+  (define (tuple-ref-datum $arity $datum $index)
     (case $arity
       ((0) '(throw error))
       ((1) $datum)

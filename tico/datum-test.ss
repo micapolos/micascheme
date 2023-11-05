@@ -33,12 +33,12 @@
 (check	(equal? (datum-tuple (list 'v1 'v2)) '(cons v1 v2)))
 (check	(equal? (datum-tuple (list 'v1 'v2 'v3)) '(vector v1 v2 v3)))
 
-(check	(equal? (arity-datum-ref 1 'v 0) 'v))
-(check	(equal? (arity-datum-ref 2 'v 0) '(car v)))
-(check	(equal? (arity-datum-ref 2 'v 1) '(cdr v)))
-(check	(equal? (arity-datum-ref 3 'v 0) '(vector-ref v 0)))
-(check	(equal? (arity-datum-ref 3 'v 1) '(vector-ref v 1)))
-(check	(equal? (arity-datum-ref 3 'v 2) '(vector-ref v 2)))
+(check	(equal? (tuple-ref-datum 1 'v 0) 'v))
+(check	(equal? (tuple-ref-datum 2 'v 0) '(car v)))
+(check	(equal? (tuple-ref-datum 2 'v 1) '(cdr v)))
+(check	(equal? (tuple-ref-datum 3 'v 0) '(vector-ref v 0)))
+(check	(equal? (tuple-ref-datum 3 'v 1) '(vector-ref v 1)))
+(check	(equal? (tuple-ref-datum 3 'v 2) '(vector-ref v 2)))
 
 (check (equal? (value->datum #f) #f))
 (check (equal? (value->datum 128) 128))
