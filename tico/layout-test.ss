@@ -5,15 +5,14 @@
 
 (check (equal? (layout-empty? (empty-layout)) #t))
 (check (equal? (layout-empty? (simple-layout)) #f))
+(check (equal? (layout-empty? (native-layout)) #f))
 (check (equal? (layout-empty? (struct-layout (stack (empty-layout)) 0)) #t))
 (check (equal? (layout-empty? (struct-layout (stack (simple-layout)) 1)) #f))
 (check (equal? (layout-empty? (lambda-layout (stack) (empty-layout))) #t))
 (check (equal? (layout-empty? (lambda-layout (stack) (simple-layout))) #f))
-(check (equal? (layout-empty? (tuple-layout (list))) #f))
 
 (check (equal? (layout-not-empty? (empty-layout)) #f))
 (check (equal? (layout-not-empty? (simple-layout)) #t))
-(check (equal? (layout-not-empty? (tuple-layout (list))) #t))
 
 ; --- literal->layout
 
@@ -51,17 +50,10 @@
   (equal?
     (layout-abstraction
       (list (empty-layout) (simple-layout))
-      (tuple-layout (list (simple-layout))))
+      (simple-layout))
     (lambda-layout
-      (list (empty-layout) (simple-layout))
-      (tuple-layout (list (simple-layout))))))
-
-(check
-  (equal?
-    (layout-abstraction
-      (list (empty-layout) (simple-layout))
-      (empty-layout))
-    (empty-layout)))
+      (make-struct-layout (list (empty-layout) (simple-layout)))
+      (simple-layout))))
 
 ; --- layout-application
 
@@ -70,16 +62,9 @@
     (layout-application
       (lambda-layout
         (list (empty-layout) (simple-layout))
-        (tuple-layout (list (simple-layout))))
+        (make-struct-layout (stack (simple-layout))))
       (list (empty-layout) (simple-layout)))
-    (tuple-layout (list (simple-layout)))))
-
-(check
-  (equal?
-    (layout-application
-      (empty-layout)
-      (list (empty-layout) (simple-layout)))
-    (empty-layout)))
+    (make-struct-layout (stack (simple-layout)))))
 
 ; --- type->layout
 
@@ -91,7 +76,7 @@
 (check
   (equal?
     (type->layout (native-type))
-    (simple-layout)))
+    (native-layout)))
 
 (check
   (equal?
@@ -111,14 +96,19 @@
 (check
   (equal?
     (type->layout (struct 'foo (list (native-type) (value-type "foo") (native-type))))
-    (layout-struct 'foo (list (simple-layout) (empty-layout) (simple-layout)))))
+    (layout-struct 'foo (list (native-layout) (empty-layout) (native-layout)))))
 
 (check
   (equal?
-    (type->layout (arrow (list (native-type) (value-type "foo") (native-type)) (native-type)))
-    (lambda-layout (list (simple-layout) (empty-layout) (simple-layout)) (simple-layout))))
-
-(check
-  (equal?
-    (type->layout (arrow (list (native-type) (value-type "foo") (native-type)) (value-type "foo")))
-    (empty-layout)))
+    (type->layout
+      (arrow
+        (list
+          (value-type "foo")
+          (native-type))
+        (native-type)))
+    (lambda-layout
+      (make-struct-layout
+        (list
+          (empty-layout)
+          (native-layout)))
+      (native-layout))))

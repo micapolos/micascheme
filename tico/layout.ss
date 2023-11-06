@@ -2,7 +2,7 @@
   (export
     empty-layout empty-layout?
     simple-layout simple-layout?
-    tuple-layout tuple-layout? tuple-layout-items
+    native-layout native-layout?
     struct-layout struct-layout? struct-layout-fields struct-layout-size
     layout-field layout-field? layout-field-layout layout-field-index-opt
     lambda-layout lambda-layout? lambda-layout-params lambda-layout-body
@@ -13,7 +13,6 @@
 
     layout-empty?
     layout-not-empty?
-    tuple-or-empty-layout
     type->layout
 
     literal->layout
@@ -25,8 +24,8 @@
     (tico type))
 
   (data (empty-layout))
-  (data (simple-layout))
-  (data (tuple-layout items)) ; TODO: replace with struct-layout
+  (data (simple-layout)) ; TODO: Remove it?
+  (data (native-layout))
   (data (struct-layout fields size))
   (data (layout-field layout index-opt))
   (data (lambda-layout params body))
@@ -34,16 +33,11 @@
   (define (literal->layout $literal)
     (simple-layout))
 
-  (define (tuple-or-empty-layout $layouts)
-    (if (for-all empty-layout? $layouts)
-      (empty-layout)
-      (tuple-layout $layouts)))
-
   (define (layout-empty? $layout)
     (switch $layout
       ((empty-layout? _) #t)
+      ((native-layout? _) #f)
       ((simple-layout? _) #f)
-      ((tuple-layout? _) #f)
       ((struct-layout? $struct-layout)
         (zero? (struct-layout-size $struct-layout)))
       ((lambda-layout? $lambda-layout)
@@ -77,18 +71,18 @@
     (not (layout-empty? $layout)))
 
   (define (layout-abstraction $param-layouts $body-layout)
-    (cond
-      ((layout-not-empty? $body-layout)
-        (lambda-layout $param-layouts $body-layout))
-      (else
-        (empty-layout))))
+    (lambda-layout
+      (make-struct-layout $param-layouts)
+      $body-layout))
 
   (define (layout-application $target $args)
     (switch $target
       ((lambda-layout? $lambda-layout)
         (lambda-layout-body $lambda-layout))
-      ((empty-layout? _)
-        (empty-layout))))
+      ((native-layout? _)
+        (native-layout))
+      ((else $other)
+        (throw layout-application $target))))
 
   (define (layout-struct $name $field-layouts)
     (make-struct-layout (reverse $field-layouts)))
@@ -98,7 +92,7 @@
       ((value-type? _)
         (empty-layout))
       ((native-type? _)
-        (simple-layout))
+        (native-layout))
       ((type-type? _)
         (simple-layout))
       ((struct? $struct)
