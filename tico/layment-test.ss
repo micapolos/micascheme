@@ -72,7 +72,9 @@
 (check
   (equal?
     (layment-struct 'foo (list))
-    (make-layment (empty-layout) #f)))
+    (make-layment
+      (layout-struct 'foo (list))
+      (throw error))))
 
 (check
   (equal?

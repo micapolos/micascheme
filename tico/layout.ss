@@ -91,7 +91,7 @@
         (empty-layout))))
 
   (define (layout-struct $name $field-layouts)
-    (tuple-or-empty-layout $field-layouts))
+    (make-struct-layout (reverse $field-layouts)))
 
   (define (type->layout $type)
     (switch $type
@@ -102,7 +102,7 @@
       ((type-type? _)
         (simple-layout))
       ((struct? $struct)
-        (tuple-or-empty-layout
+        (layout-struct (struct-name $struct)
           (map type->layout (struct-fields $struct))))
       ((arrow? $arrow)
         (layout-abstraction

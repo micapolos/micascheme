@@ -101,17 +101,17 @@
 (check
   (equal?
     (type->layout (struct 'foo (list)))
-    (empty-layout)))
+    (layout-struct 'foo (list))))
 
 (check
   (equal?
     (type->layout (struct 'foo (list (value-type "foo") (value-type "bar"))))
-    (empty-layout)))
+    (layout-struct 'foo (list (empty-layout) (empty-layout)))))
 
 (check
   (equal?
     (type->layout (struct 'foo (list (native-type) (value-type "foo") (native-type))))
-    (tuple-layout (list (simple-layout) (empty-layout) (simple-layout)))))
+    (layout-struct 'foo (list (simple-layout) (empty-layout) (simple-layout)))))
 
 (check
   (equal?
