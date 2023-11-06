@@ -117,12 +117,18 @@
       (apply 3 4))
     (stack
       (typing-application
-        (native->typing '+)
+        (read-typing
+          (take
+            (native "+")
+            (as number number (giving number))))
         (list
-          (literal->typing 3)
-          (literal->typing 4)))
+          (read-typing 3)
+          (read-typing 4)))
       (typing-application
-        (native->typing '*)
+        (read-typing
+          (take
+            (native "*")
+            (as number number (giving number))))
         (list
-          (literal->typing 3)
-          (literal->typing 4))))))
+          (read-typing 3)
+          (read-typing 4))))))

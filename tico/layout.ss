@@ -80,8 +80,6 @@
     (switch $target
       ((lambda-layout? $lambda-layout)
         (lambda-layout-body $lambda-layout))
-      ((native-layout? _)
-        (native-layout))
       ((else $other)
         (throw layout-application $target))))
 
