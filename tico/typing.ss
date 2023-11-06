@@ -5,6 +5,10 @@
 
     native->typing
     literal->typing
+    type->typing
+    boolean-typing
+    number-typing
+    string-typing
     type-datum->typing
 
     typing-datum
@@ -43,6 +47,18 @@
     (typing
       (literal->type $literal)
       (literal->layment $literal)))
+
+  (define (type->typing $type)
+    (static-typing (value-type $type)))
+
+  (define (boolean-typing)
+    (type->typing (boolean-type)))
+
+  (define (number-typing)
+    (type->typing (number-type)))
+
+  (define (string-typing)
+    (type->typing (string-type)))
 
   (define (type-datum->typing $type $datum)
     (typing $type
@@ -140,10 +156,10 @@
       ($type (typing-type $typing))
         (cond
           ((equal? $type (struct 'boolean (list)))
-            (static-typing (value-type (boolean-type))))
+            (boolean-typing))
           ((equal? $type (struct 'number (list)))
-            (static-typing (value-type (number-type))))
+            (number-typing))
           ((equal? $type (struct 'string (list)))
-            (static-typing (value-type (string-type))))
+            (string-typing))
           (else $typing))))
 )

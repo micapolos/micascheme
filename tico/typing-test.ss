@@ -23,6 +23,15 @@
 
 (check
   (equal?
+    (type->typing (number-type))
+    (static-typing (value-type (number-type)))))
+
+(check (equal? (boolean-typing) (type->typing (boolean-type))))
+(check (equal? (number-typing) (type->typing (number-type))))
+(check (equal? (string-typing) (type->typing (string-type))))
+
+(check
+  (equal?
     (type-datum->typing
       (string-type)
       '(string-append "foo" "bar"))
@@ -128,24 +137,18 @@
 
 (check
   (equal?
-    (typing-resolve
-      (static-typing (struct 'boolean (list))))
-    (static-typing
-      (value-type (boolean-type)))))
+    (typing-resolve (static-typing (struct 'boolean (list))))
+    (boolean-typing)))
 
 (check
   (equal?
-    (typing-resolve
-      (static-typing (struct 'number (list))))
-    (static-typing
-      (value-type (number-type)))))
+    (typing-resolve (static-typing (struct 'number (list))))
+    (number-typing)))
 
 (check
   (equal?
-    (typing-resolve
-      (static-typing (struct 'string (list))))
-    (static-typing
-      (value-type (string-type)))))
+    (typing-resolve (static-typing (struct 'string (list))))
+    (string-typing)))
 
 (check
   (equal?
