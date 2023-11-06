@@ -57,8 +57,7 @@
       ((pair? $pair)
         (unpair $pair $selector-typing $selector-typings
           (stack
-            (fold-left
-              typing-get
+            (typing-get
               (bindings-get $bindings $selector-typing)
               $selector-typings))))))
 

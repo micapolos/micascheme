@@ -104,6 +104,11 @@
 
 (check
   (equal?
+    (read-typing 1 "foo" (do (get string)))
+    (read-typing "foo")))
+
+(check
+  (equal?
     (read-typings
       (take
         (native "+")
