@@ -108,8 +108,12 @@
 (check
   (equal?
     (read-typings
-      (native "+")
-      (native "*")
+      (take
+        (native "+")
+        (as number number (giving number)))
+      (take
+        (native "*")
+        (as number number (giving number)))
       (apply 3 4))
     (stack
       (typing-application

@@ -76,8 +76,6 @@
             (arrow-result $arrow))
           (else
             (throw type-application $target $args))))
-      ((native-type? _)
-        (native-type))
       ((else $other)
         (throw type-application $target $args))))
 
