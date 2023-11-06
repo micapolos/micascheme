@@ -49,6 +49,17 @@
                   $bindings
                   (push-all $typings $with-typings)
                   $end-fn))))
+          ((get)
+            (top-level-reader $bindings (stack)
+              (lambda ($get-typings)
+                (top-level-reader
+                  $bindings
+                  (switch $bindings
+                    ((null? _)
+                      (typings-get $typings $get-typings))
+                    ((pair? $bindings)
+                      TODO))
+                  $end-fn))))
           ((do)
             (top-level-reader
               (push-all $bindings (map typing->binding $typings))

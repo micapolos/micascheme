@@ -90,3 +90,36 @@
             (empty-layment)
             (literal->layment 10)))
         2))))
+
+(check
+  (equal?
+    (typings-get
+      (stack
+        (typing-struct 'point
+          (list
+            (typing-struct 'x (list (literal->typing 10)))
+            (typing-struct 'y (list (literal->typing 20)))))
+        (typing-struct 'point
+          (list
+            (typing-struct 'x (list (literal->typing 30)))
+            (typing-struct 'y (list (literal->typing 40))))))
+      (stack
+        (typing-struct 'x (list))
+        (static-typing (value-type (number-type)))))
+    (stack
+      (typing-ref
+        (typing-ref
+          (typing-struct 'point
+            (list
+              (typing-struct 'x (list (literal->typing 10)))
+              (typing-struct 'y (list (literal->typing 20)))))
+          (struct 'x (list)))
+        (number-type))
+      (typing-ref
+        (typing-ref
+          (typing-struct 'point
+            (list
+              (typing-struct 'x (list (literal->typing 30)))
+              (typing-struct 'y (list (literal->typing 40)))))
+          (struct 'x (list)))
+        (number-type)))))

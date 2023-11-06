@@ -64,6 +64,18 @@
 
 (check
   (equal?
+    (read-typings
+      (point (x 10) (y 20))
+      (point (x 30) (y 40))
+      (get x))
+    (typings-get
+      (read-typings
+        (point (x 10) (y 20))
+        (point (x 30) (y 40)))
+      (read-typings x))))
+
+(check
+  (equal?
     (read-typings 1 2 (do 3 4))
     (stack
       (literal->typing 3)

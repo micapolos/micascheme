@@ -19,6 +19,7 @@
     typing-ref
     typing-native
     typing-inline
+    typings-get
 
     typing-not-empty?)
   (import
@@ -102,6 +103,18 @@
         (layment-ref
           (typing-layment $typing)
           (indexed-index $indexed-type)))))
+
+  (define (typings-get $typings $selectors)
+    (lets
+      ($patterns
+        (reverse
+          (map type-value
+            (map typing-type $selectors))))
+      (fold-left push (stack)
+        (map
+          (lambda ($typing)
+            (fold-left typing-ref $typing $patterns))
+          (reverse $typings)))))
 
   (define (typing-native $typing)
     (native->typing
