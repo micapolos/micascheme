@@ -63,7 +63,7 @@
                   $bindings
                   (switch $typings
                     ((null? _)
-                      TODO)
+                      (bindings-get* $bindings $get-typings))
                     ((pair? $typings)
                       (stack (typings-get $typings $get-typings))))
                   $end-fn))))

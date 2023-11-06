@@ -1,10 +1,12 @@
 (library (tico binding)
   (export
     binding binding? binding-switch
+    generate-parameter-binding
     binding-match
     bindings-match
     binding-not-empty?
-    typing->binding)
+    typing->binding
+    bindings-get*)
   (import
     (micascheme)
     (tico typing)
@@ -21,6 +23,9 @@
     (binding-switch $binding
       ((typing? $typing) (typing-not-empty? $typing))
       ((expanding? _) #f)))
+
+  (define (generate-parameter-binding $type)
+    (binding (generate-parameter-typing $type)))
 
   (define (binding-match $binding $pattern $index)
     (binding-switch $binding
@@ -41,4 +46,20 @@
 
   (define (bindings-match $bindings $pattern)
     (bindings-match-from $bindings $pattern 0))
+
+  (define (bindings-get $bindings $selector-typing)
+    (bindings-match $bindings
+      (typing->type $selector-typing)))
+
+  (define (bindings-get* $bindings $selector-typings)
+    (switch (reverse $selector-typings)
+      ((null? _) (stack))
+      ((pair? $pair)
+        (unpair $pair $selector-typing $selector-typings
+          (stack
+            (fold-left
+              typing-get
+              (bindings-get $bindings $selector-typing)
+              $selector-typings))))))
+
 )

@@ -24,11 +24,13 @@
     typing-ref
     typing-native
     typing-inline
+    typing-get
     typings-get
     typing-as
     typings-giving
 
     typing-not-empty?
+    typing->type
 
     typing-resolve)
   (import
@@ -125,11 +127,14 @@
           (typing-layment $typing)
           (indexed-index $indexed-type)))))
 
-  (define (typings-get $typings $selector-typings)
-    (fold-left
-      typing-ref
-      (single-typing $typings)
+  (define (typing-get $typing $selector-typings)
+    (fold-left typing-ref $typing
       (reverse (map typing->type $selector-typings))))
+
+  (define (typings-get $typings $selector-typings)
+    (typing-get
+      (single-typing $typings)
+      $selector-typings))
 
   (define (typing-native $typing)
     (native->typing
