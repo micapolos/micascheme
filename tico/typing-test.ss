@@ -71,3 +71,22 @@
     (type-datum->typing
       (number-type)
       3)))
+
+(check
+  (equal?
+    (typing-ref
+      (typing-struct 'foo
+        (list
+          (literal->typing "foo")
+          (static-typing (value-type 'empty))
+          (literal->typing 10)))
+      (number-type))
+    (typing
+      (number-type)
+      (layment-ref
+        (layment-struct 'foo
+          (list
+            (literal->layment "foo")
+            (empty-layment)
+            (literal->layment 10)))
+        2))))

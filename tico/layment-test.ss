@@ -81,11 +81,13 @@
     (layment-struct 'foo
       (list
         (literal->layment 128)
+        (empty-layment)
         (literal->layment "foo")))
     (make-layment
       (layout-struct 'foo
         (list
           (literal->layout 128)
+          (empty-layout)
           (literal->layout "foo")))
       (compilation-struct 'foo
         (list
@@ -100,15 +102,27 @@
 ;       (layment-struct 'foo
 ;         (list
 ;           (literal->layment "foo")
-;           ;(empty-layment)
+;           (empty-layment)
 ;           (literal->layment "bar")))
-;       0)
-;     (make-layment
-;       (layout-ref
-;         (layout-struct 'foo
-;           (literal->layout "foo")
-;           (literal->layout "bar"))
-;       (literal->layment "foo")))
+;       2)
+;     (lets
+;       ($layout-field
+;         (layout-ref
+;           (layout-struct 'foo
+;             (list
+;               (literal->layout "foo")
+;               (empty-layout)
+;               (literal->layout "bar")))
+;           2))
+;       (make-layment
+;         (layout-field-layout $layout-field)
+;         (compilation-ref
+;           2
+;           (compilation-struct 'foo
+;             (list
+;               (literal->compilation "foo")
+;               (literal->compilation "bar")))
+;           (layout-field-index-opt $layout-field))))))
 
 ; --- layment parameter
 

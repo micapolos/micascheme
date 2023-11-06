@@ -19,6 +19,7 @@
 
     type-dynamic?
     types-arity
+    type-ref
     type-matches? types-match?
     indexed-type-matching)
   (import (micascheme))
@@ -140,4 +141,12 @@
 
   (define (indexed-type-matching $types $pattern)
     (indexed-type-matching-from $types $pattern 0))
+
+  (define (type-ref $type $pattern)
+    (indexed-find
+      (lambda ($index $type)
+        (and
+          (type-matches? $type $pattern)
+          (indexed $type $index)))
+      (struct-fields $type)))
 )

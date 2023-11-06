@@ -112,3 +112,42 @@
           (empty-layout)
           (native-layout)))
       (native-layout))))
+
+(check
+  (equal?
+    (layout-ref
+      (layout-struct 'foo
+        (list
+          (literal->layout "foo")
+          (empty-layout)
+          (literal->layout 10)))
+      0)
+    (layout-field
+      (literal->layout "foo")
+      0)))
+
+(check
+  (equal?
+    (layout-ref
+      (layout-struct 'foo
+        (list
+          (literal->layout "foo")
+          (empty-layout)
+          (literal->layout 10)))
+      1)
+    (layout-field
+      (empty-layout)
+      #f)))
+
+(check
+  (equal?
+    (layout-ref
+      (layout-struct 'foo
+        (list
+          (literal->layout "foo")
+          (empty-layout)
+          (literal->layout 10)))
+      2)
+    (layout-field
+      (literal->layout 10)
+      1)))

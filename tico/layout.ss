@@ -88,8 +88,10 @@
   (define (layout-struct $name $field-layouts)
     (make-struct-layout (reverse $field-layouts)))
 
-  (define (layout-ref $target $index)
-    (list-ref (struct-layout-fields $target) $index))
+  (define (layout-ref $layout $index)
+    (list-ref
+      (struct-layout-fields $layout)
+      (- (length (struct-layout-fields $layout)) $index 1)))
 
   (define (type->layout $type)
     (switch $type

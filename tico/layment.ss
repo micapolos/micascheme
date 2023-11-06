@@ -92,7 +92,8 @@
       (layout-struct $name
         (map layment-layout $field-layments))
       (compilation-struct $name
-        (map layment-compilation $field-layments))))
+        (filter-opts
+          (map layment-compilation $field-layments)))))
 
   (define (layment-ref $layment $index)
     (lets

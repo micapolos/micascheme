@@ -16,6 +16,7 @@
     typing-variable
     typing-abstraction
     typing-struct
+    typing-ref
     typing-native
     typing-inline
 
@@ -90,6 +91,17 @@
         (map typing-type $field-typings))
       (layment-struct $name
         (map typing-layment $field-typings))))
+
+  (define (typing-ref $typing $pattern)
+    (lets
+      ($indexed-type
+        (ensure indexed?
+          (type-ref (typing-type $typing) $pattern)))
+      (typing
+        (indexed-value $indexed-type)
+        (layment-ref
+          (typing-layment $typing)
+          (indexed-index $indexed-type)))))
 
   (define (typing-native $typing)
     (native->typing

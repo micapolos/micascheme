@@ -208,3 +208,16 @@
       (type-application
         (arrow (list (string-type) (number-type)) (boolean-type))
         (list (string-type) (any-type))))))
+
+; --- type-ref
+
+(check
+  (equal?
+    (type-ref
+      (struct 'foo
+        (list
+          (number-type)
+          (value-type 'empty)
+          (string-type)))
+      (string-type))
+    (indexed (string-type) 2)))
