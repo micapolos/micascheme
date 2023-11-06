@@ -18,7 +18,8 @@
     literal->layout
     layout-application
     layout-abstraction
-    layout-struct)
+    layout-struct
+    layout-ref)
   (import
     (micascheme)
     (tico type))
@@ -86,6 +87,9 @@
 
   (define (layout-struct $name $field-layouts)
     (make-struct-layout (reverse $field-layouts)))
+
+  (define (layout-ref $target $index)
+    (list-ref (struct-layout-fields $target) $index))
 
   (define (type->layout $type)
     (switch $type

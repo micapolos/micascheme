@@ -92,6 +92,24 @@
           (literal->compilation 128)
           (literal->compilation "foo"))))))
 
+; --- layment-ref
+
+; (check
+;   (equal?
+;     (layment-ref
+;       (layment-struct 'foo
+;         (list
+;           (literal->layment "foo")
+;           ;(empty-layment)
+;           (literal->layment "bar")))
+;       0)
+;     (make-layment
+;       (layout-ref
+;         (layout-struct 'foo
+;           (literal->layout "foo")
+;           (literal->layout "bar"))
+;       (literal->layment "foo")))
+
 ; --- layment parameter
 
 (check

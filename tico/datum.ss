@@ -10,6 +10,7 @@
     value->datum
     datum->value
     datum-struct
+    datum-ref
     string->read-datum)
   (import (micascheme) (tico type))
 
@@ -36,6 +37,13 @@
 
   (define (datum-struct $name $field-datums)
     (datum-tuple $field-datums))
+
+  (define (datum-ref $arity $target $index)
+    (case $arity
+      ((0) `(throw error))
+      ((1) $target)
+      ((2) `(,(if (zero? $index) `car `cdr) ,$target))
+      (else `(vector-ref ,$target ,$index))))
 
   (define (lets-datum $declarations $body)
     (switch $declarations

@@ -16,7 +16,8 @@
     layment-parameter
     layment-variable
     layment-abstraction
-    layment-struct)
+    layment-struct
+    layment-ref)
   (import
     (micascheme)
     (tico datum)
@@ -92,4 +93,15 @@
         (map layment-layout $field-layments))
       (compilation-struct $name
         (map layment-compilation $field-layments))))
+
+  (define (layment-ref $layment $index)
+    (lets
+      ($layout (layment-layout $layment))
+      ($layout-field (layout-ref $layout $index))
+      (make-layment
+        (layout-field-layout $layout-field)
+        (compilation-ref
+          (struct-layout-size $layout)
+          (layment-compilation $layment)
+          (layout-field-index-opt $layout-field)))))
 )

@@ -3,7 +3,8 @@
     constant constant? constant-value
     datum->constant
     constant-application
-    constant-struct)
+    constant-struct
+    constant-ref)
   (import
     (micascheme)
     (tico datum)
@@ -24,4 +25,8 @@
     (constant
       (value-struct $name
         (map constant-value $field-values))))
+
+  (define (constant-ref $arity $target $index)
+    (constant
+      (value-ref $arity (constant-value $target) $index)))
 )

@@ -14,6 +14,7 @@
     compilation-application
     compilation-abstraction
     compilation-struct
+    compilation-ref
 
     compilation-parameter
     compilation-variable)
@@ -142,4 +143,15 @@
               (variable
                 (variable-index-flatten (map variable-index $variables))
                 (dependencies-flatten $dependencies-list))))))))
+
+  (define (compilation-ref $arity $target $index)
+    (compilation
+      (datum-ref $arity (compilation-datum $target) $index)
+      (switch (compilation-evaluation $target)
+        ((constant? $constant)
+          (constant-ref $arity $constant $index))
+        ((variable? $variable)
+          $variable)
+        ((parameter? $parameter)
+          (throw compilation-ref $parameter)))))
 )

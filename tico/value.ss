@@ -2,12 +2,14 @@
   (export
     value-application
     value-struct
+    value-ref
     tuple-value
     tuple-ref-value)
   (import
     (micascheme)
     (evaluator)
-    (tico expression))
+    (tico expression)
+    (tico datum))
 
   (define (value-environment)
     (environment '(micascheme)))
@@ -18,6 +20,9 @@
   (define (value-struct $name $field-values)
     (tuple-value $field-values))
 
+  (define (value-ref $arity $target $index)
+    (tuple-ref-value $arity $target $index))
+
   (define (tuple-value $values)
     (lets
       ($symbols (generate-symbols (length $values)))
@@ -25,7 +30,7 @@
         (evaluator
           (value-environment)
           (map cons $symbols $values))
-        (tuple-expression $symbols))))
+        (datum-tuple $symbols))))
 
   (define (tuple-ref-value $arity $tuple $index)
     (lets
@@ -35,5 +40,5 @@
           (value-environment)
           (stack
             (cons $symbol $tuple)))
-        (tuple-ref-expression $arity $symbol $index))))
+        (datum-ref $arity $symbol $index))))
 )
