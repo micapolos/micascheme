@@ -2,7 +2,8 @@
   (micascheme)
   (tico layout)
   (tico layment)
-  (tico compilation))
+  (tico compilation)
+  (tico type))
 
 (check
   (equal?

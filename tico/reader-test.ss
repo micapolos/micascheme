@@ -1,7 +1,8 @@
 (import
   (micascheme)
   (tico reader)
-  (tico typing))
+  (tico typing)
+  (tico type))
 
 (check
   (equal?

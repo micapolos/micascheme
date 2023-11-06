@@ -3,7 +3,13 @@
     empty-layout empty-layout?
     simple-layout simple-layout?
     tuple-layout tuple-layout? tuple-layout-items
+    struct-layout struct-layout? struct-layout-fields struct-layout-size
+    layout-field layout-field? layout-field-layout layout-field-index-opt
     lambda-layout lambda-layout? lambda-layout-params lambda-layout-body
+
+    empty-struct-layout
+    struct-layout+layout
+    make-struct-layout
 
     layout-not-empty?
     tuple-or-empty-layout
@@ -20,6 +26,8 @@
   (data (empty-layout))
   (data (simple-layout))
   (data (tuple-layout items))
+  (data (struct-layout fields size))
+  (data (layout-field layout index-opt))
   (data (lambda-layout params body))
 
   (define (literal->layout $literal)
@@ -30,8 +38,40 @@
       (empty-layout)
       (tuple-layout $layouts)))
 
+  (define (layout-empty? $layout)
+    (switch $layout
+      ((empty-layout? _) #t)
+      ((simple-layout? _) #f)
+      ((tuple-layout? _) #f)
+      ((struct-layout? $struct-layout) (zero? (struct-layout-size $struct-layout)))
+      ((lambda-layout? _) #f)
+      ((else $other) #f))) ; (throw not-layout $other))))
+
+  (define empty-struct-layout
+    (struct-layout (stack) 0))
+
+  (define (struct-layout+layout $struct-layout $layout)
+    (lets
+      ($fields (struct-layout-fields $struct-layout))
+      ($size (struct-layout-size $struct-layout))
+      (cond
+        ((layout-empty? $layout)
+          (struct-layout
+            (push $fields (layout-field $layout #f))
+            $size))
+        (else
+          (struct-layout
+            (push $fields (layout-field $layout $size))
+            (+ $size 1))))))
+
+  (define (make-struct-layout $layouts)
+    (fold-left
+      struct-layout+layout
+      empty-struct-layout
+      (reverse $layouts)))
+
   (define (layout-not-empty? $layout)
-    (not (empty-layout? $layout)))
+    (not (layout-empty? $layout)))
 
   (define (layout-abstraction $param-layouts $body-layout)
     (cond
