@@ -23,6 +23,13 @@
 
 (check
   (equal?
+    (read-typing number string (giving boolean))
+    (typings-giving
+      (read-typings number string)
+      (read-typing boolean))))
+
+(check
+  (equal?
     (read-typings
       (inline
         (native

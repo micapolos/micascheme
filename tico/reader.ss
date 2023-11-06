@@ -86,8 +86,16 @@
                         (reverse $arg-typings)))
                     $typings)
                   $end-fn))))
-          ((doing) TODO)
-          ((giving) TODO)
+          ((doing)
+            TODO)
+          ((giving)
+            (top-level-reader $bindings (stack)
+              (lambda ($result-typings)
+                (top-level-reader $bindings
+                  (stack
+                    (typings-giving $typings
+                      (car (ensure single? $result-typings))))
+                  $end-fn))))
           (else
             (top-level-reader $bindings (stack)
               (lambda ($symbol-typings)

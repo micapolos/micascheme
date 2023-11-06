@@ -163,3 +163,17 @@
     (type-datum->typing
       (number-type)
       '(+ 1 2))))
+
+(check
+  (equal?
+    (typings-giving
+      (list
+        (number-typing)
+        (string-typing))
+      (boolean-typing))
+    (type->typing
+      (arrow
+        (list
+          (number-type)
+          (string-type))
+        (boolean-type)))))

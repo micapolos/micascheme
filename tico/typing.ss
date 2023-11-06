@@ -25,6 +25,7 @@
     typing-inline
     typings-get
     typing-as
+    typings-giving
 
     typing-not-empty?
 
@@ -180,4 +181,10 @@
       (make-layment
         (type->layout $type)
         $compilation)))
+
+  (define (typings-giving $param-typings $result-typing)
+    (type->typing
+      (arrow
+        (map typing->type $param-typings)
+        (typing->type $result-typing))))
 )
