@@ -11,6 +11,7 @@
     struct-layout+layout
     make-struct-layout
 
+    layout-empty?
     layout-not-empty?
     tuple-or-empty-layout
     type->layout
@@ -43,8 +44,10 @@
       ((empty-layout? _) #t)
       ((simple-layout? _) #f)
       ((tuple-layout? _) #f)
-      ((struct-layout? $struct-layout) (zero? (struct-layout-size $struct-layout)))
-      ((lambda-layout? _) #f)
+      ((struct-layout? $struct-layout)
+        (zero? (struct-layout-size $struct-layout)))
+      ((lambda-layout? $lambda-layout)
+        (layout-empty? (lambda-layout-body $lambda-layout)))
       ((else $other) #f))) ; (throw not-layout $other))))
 
   (define empty-struct-layout

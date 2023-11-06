@@ -3,6 +3,14 @@
   (tico layout)
   (tico type))
 
+(check (equal? (layout-empty? (empty-layout)) #t))
+(check (equal? (layout-empty? (simple-layout)) #f))
+(check (equal? (layout-empty? (struct-layout (stack (empty-layout)) 0)) #t))
+(check (equal? (layout-empty? (struct-layout (stack (simple-layout)) 1)) #f))
+(check (equal? (layout-empty? (lambda-layout (stack) (empty-layout))) #t))
+(check (equal? (layout-empty? (lambda-layout (stack) (simple-layout))) #f))
+(check (equal? (layout-empty? (tuple-layout (list))) #f))
+
 (check (equal? (layout-not-empty? (empty-layout)) #f))
 (check (equal? (layout-not-empty? (simple-layout)) #t))
 (check (equal? (layout-not-empty? (tuple-layout (list))) #t))
@@ -15,6 +23,11 @@
     (simple-layout)))
 
 ; --- make-struct-layout
+
+(check
+  (equal?
+    empty-struct-layout
+    (struct-layout (stack) 0)))
 
 (check
   (equal?
