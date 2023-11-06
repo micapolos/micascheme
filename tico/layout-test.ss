@@ -19,7 +19,7 @@
 (check
   (equal?
     (literal->layout "foo")
-    (simple-layout)))
+    (type->layout (string-type))))
 
 ; --- make-struct-layout
 

@@ -24,6 +24,7 @@
     typing-native
     typing-inline
     typings-get
+    typing-as
 
     typing-not-empty?
 
@@ -126,8 +127,7 @@
     (lets
       ($patterns
         (reverse
-          (map type-value
-            (map typing-type $selectors))))
+          (map typing->type $selectors)))
       (fold-left push (stack)
         (map
           (lambda ($typing)
@@ -162,4 +162,22 @@
           ((equal? $type (struct 'string (list)))
             (string-typing))
           (else $typing))))
+
+  (define (typing->type $typing)
+    (type-value (typing-type $typing)))
+
+  (define (typing-as $typing $type-typing)
+    (switch (typing-type $typing)
+      ((native-type? _)
+        (type-compilation->layment
+          (typing->type $type-typing)
+          (layment-compilation (typing-layment $typing))))
+      ((else $other)
+        TODO)))
+
+  (define (type-compilation->layment $type $compilation)
+    (typing $type
+      (make-layment
+        (type->layout $type)
+        $compilation)))
 )

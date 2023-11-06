@@ -154,3 +154,12 @@
   (equal?
     (typing-resolve (literal->typing 10))
     (literal->typing 10)))
+
+(check
+  (equal?
+    (typing-as
+      (native->typing '(+ 1 2))
+      (number-typing))
+    (type-datum->typing
+      (number-type)
+      '(+ 1 2))))

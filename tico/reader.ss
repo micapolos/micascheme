@@ -27,6 +27,13 @@
                   (push-all $typings
                     (map typing-native $native-typings))
                   $end-fn))))
+          ((as)
+            (top-level-reader $bindings (stack)
+              (lambda ($as-typings)
+                (top-level-reader
+                  $bindings
+                  (map typing-as $typings $as-typings)
+                  $end-fn))))
           ((inline)
             (top-level-reader $bindings (stack)
               (lambda ($inline-typings)

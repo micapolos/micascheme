@@ -32,7 +32,7 @@
   (data (lambda-layout params body))
 
   (define (literal->layout $literal)
-    (simple-layout))
+    (type->layout (literal->type $literal)))
 
   (define (layout-empty? $layout)
     (switch $layout

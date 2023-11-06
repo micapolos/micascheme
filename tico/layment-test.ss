@@ -14,7 +14,7 @@
   (equal?
     (literal->layment "foo")
     (layment
-      (simple-layout)
+      (literal->layout "foo")
       (literal->compilation "foo"))))
 
 (check

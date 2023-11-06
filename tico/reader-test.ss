@@ -15,6 +15,15 @@
 (check
   (equal?
     (read-typings
+      (native "\"foo\"" "(+ 1 2)")
+      (as string number))
+    (stack
+      (literal->typing "foo")
+      (type-datum->typing (number-type) '(+ 1 2)))))
+
+(check
+  (equal?
+    (read-typings
       (inline
         (native
           "(+ 1 2)"
