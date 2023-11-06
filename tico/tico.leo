@@ -1,11 +1,15 @@
+native "string-append"
+as
+  string
+  append string
+  giving string
 x "Hello, "
 y "world!"
 do
-  native "string-append"
-  as
+  get
     string
-    string
+    append string
     giving string
   apply
     get: x, string
-    take get: y, string
+    append get: y, string

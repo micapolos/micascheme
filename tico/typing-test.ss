@@ -154,7 +154,7 @@
 (check
   (equal?
     (typings-giving
-      (list
+      (stack
         (number-typing)
         (string-typing))
       (boolean-typing))

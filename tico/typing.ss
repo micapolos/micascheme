@@ -186,7 +186,7 @@
   (define (typings-giving $param-typings $result-typing)
     (type->typing
       (arrow
-        (map typing->type $param-typings)
+        (reverse (map typing->type $param-typings))
         (typing->type $result-typing))))
 
   (define (single-typing $typings)
