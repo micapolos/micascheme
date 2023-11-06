@@ -88,14 +88,11 @@
 
 (check
   (equal?
-    (read-typings
+    (read-typing
       (point (x 10) (y 20))
-      (point (x 30) (y 40))
       (get x number))
     (typings-get
-      (read-typings
-        (point (x 10) (y 20))
-        (point (x 30) (y 40)))
+      (read-typings (point (x 10) (y 20)))
       (read-typings x number))))
 
 (check

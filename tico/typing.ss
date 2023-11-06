@@ -10,6 +10,7 @@
     number-typing
     string-typing
     type-datum->typing
+    single-typing
 
     typing-datum
     typing-value
@@ -124,16 +125,11 @@
           (typing-layment $typing)
           (indexed-index $indexed-type)))))
 
-  (define (typings-get $typings $selectors)
-    (lets
-      ($patterns
-        (reverse
-          (map typing->type $selectors)))
-      (fold-left push (stack)
-        (map
-          (lambda ($typing)
-            (fold-left typing-ref $typing $patterns))
-          (reverse $typings)))))
+  (define (typings-get $typings $selector-typings)
+    (fold-left
+      typing-ref
+      (single-typing $typings)
+      (reverse (map typing->type $selector-typings))))
 
   (define (typing-native $typing)
     (native->typing
@@ -187,4 +183,7 @@
       (arrow
         (map typing->type $param-typings)
         (typing->type $result-typing))))
+
+  (define (single-typing $typings)
+    (car (ensure single? $typings)))
 )

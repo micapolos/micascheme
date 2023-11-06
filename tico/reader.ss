@@ -61,11 +61,11 @@
               (lambda ($get-typings)
                 (top-level-reader
                   $bindings
-                  (switch $bindings
+                  (switch $typings
                     ((null? _)
-                      (typings-get $typings $get-typings))
-                    ((pair? $bindings)
-                      TODO))
+                      TODO)
+                    ((pair? $typings)
+                      (stack (typings-get $typings $get-typings))))
                   $end-fn))))
           ((do)
             (top-level-reader
