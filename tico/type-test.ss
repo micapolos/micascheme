@@ -221,3 +221,22 @@
           (string-type)))
       (string-type))
     (indexed (string-type) 2)))
+
+; --- type-value
+
+(check
+  (equal?
+    (type-value (value-type (number-type)))
+    (number-type)))
+
+(check
+  (equal?
+    (type-value
+      (struct 'foo
+        (list
+          (value-type (number-type))
+          (value-type (string-type)))))
+    (struct 'foo
+      (list
+        (number-type)
+        (string-type)))))

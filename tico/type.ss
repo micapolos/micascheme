@@ -14,6 +14,7 @@
     abstraction abstraction? abstraction-arity abstraction-body
     recursion recursion? recursion-items
     var var? var-index
+    type-value
 
     type-application
 
@@ -149,4 +150,15 @@
           (type-matches? $type $pattern)
           (indexed $type $index)))
       (struct-fields $type)))
+
+  (define (type-value $type)
+    (switch $type
+      ((value-type? $value-type)
+        (value-type-value $value-type))
+      ((struct? $struct)
+        (struct
+          (struct-name $struct)
+          (map type-value (struct-fields $struct))))
+      ((else $other)
+        (throw type-value $other))))
 )
