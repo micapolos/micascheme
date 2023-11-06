@@ -45,7 +45,7 @@
       ((else $other) #f))) ; (throw not-layout $other))))
 
   (define empty-struct-layout
-    (struct-layout (stack) 0))
+    (struct-layout (list) 0))
 
   (define (struct-layout+layout $struct-layout $layout)
     (lets
