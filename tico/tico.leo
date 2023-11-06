@@ -1,15 +1,11 @@
-native "string-append"
-as
-  string
-  append string
-  giving string
-x "Hello, "
-y "world!"
-do
-  get
+take
+  native "string-append"
+  as
     string
     append string
     giving string
-  apply
-    get: x, string
-    append get: y, string
+do
+  "Hello"
+  append ", "
+  append "world"
+  append "!"

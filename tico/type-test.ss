@@ -117,13 +117,13 @@
 
 (check
   (type-matches? 
-    (arrow (list (value-type "foo") (native-type)) (value-type "foo"))
-    (arrow (list (any-type) (native-type)) (value-type "foo"))))
+    (arrow (list (any-type) (native-type)) (value-type "foo"))
+    (arrow (list (value-type "foo") (native-type)) (value-type "foo"))))
 
 (check
   (type-matches? 
-    (arrow (list (any-type) (native-type)) (any-type))
-    (arrow (list (any-type) (native-type)) (value-type "foo"))))
+    (arrow (list (any-type) (native-type)) (value-type "foo"))
+    (arrow (list (any-type) (native-type)) (any-type))))
 
 (check
   (not

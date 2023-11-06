@@ -101,10 +101,11 @@
               (lambda ($symbol-typings)
                 (top-level-reader
                   $bindings
-                  (push $typings
-                    (typing-resolve
-                      (typing-struct $symbol
-                        (reverse $symbol-typings))))
+                  (bindings-resolve $bindings
+                    (push $typings
+                      (typing-resolve
+                        (typing-struct $symbol
+                          (reverse $symbol-typings)))))
                   $end-fn))))))
       (lambda ()
         ($end-fn $typings))))

@@ -6,7 +6,9 @@
     bindings-match
     binding-not-empty?
     typing->binding
-    bindings-get*)
+    bindings-get*
+    bindings-resolve-opt
+    bindings-resolve)
   (import
     (micascheme)
     (tico typing)
@@ -61,4 +63,20 @@
               (bindings-get $bindings $selector-typing)
               $selector-typings))))))
 
+  (define (bindings-resolve-opt $bindings $typings)
+    (lets
+      ($target-typing
+        (bindings-match $bindings
+          (arrow
+            (reverse (map typing-type $typings))
+            (any-type))))
+      (and $target-typing
+        (stack
+          (typing-application $target-typing
+            (reverse $typings))))))
+
+  (define (bindings-resolve $bindings $typings)
+    (or
+      (bindings-resolve-opt $bindings $typings)
+      $typings))
 )

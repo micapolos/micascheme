@@ -111,11 +111,11 @@
         (and
           (arrow? $type)
           (types-match?
-            (arrow-params $type)
-            (arrow-params $arrow))
+            (arrow-params $arrow)
+            (arrow-params $type))
           (type-matches?
-            (arrow-result $arrow)
-            (arrow-result $type))))
+            (arrow-result $type)
+            (arrow-result $arrow))))
       ((else $other)
         (throw not-type $pattern))))
 
