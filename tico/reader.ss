@@ -80,14 +80,16 @@
                     $typings)
                   $end-fn))))
           ((doing) TODO)
+          ((giving) TODO)
           (else
             (top-level-reader $bindings (stack)
               (lambda ($symbol-typings)
                 (top-level-reader
                   $bindings
                   (push $typings
-                    (typing-struct $symbol
-                      (reverse $symbol-typings)))
+                    (typing-resolve
+                      (typing-struct $symbol
+                        (reverse $symbol-typings))))
                   $end-fn))))))
       (lambda ()
         ($end-fn $typings))))
@@ -104,8 +106,9 @@
           (lambda ($arg-typings)
             (with-reader $bindings
               (push $typings
-                (typing-struct $symbol
-                  (reverse $arg-typings)))
+                (typing-resolve
+                  (typing-struct $symbol
+                    (reverse $arg-typings))))
               $end-fn))))
       (lambda ()
         ($end-fn $typings))))

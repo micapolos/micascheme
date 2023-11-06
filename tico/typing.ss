@@ -21,7 +21,9 @@
     typing-inline
     typings-get
 
-    typing-not-empty?)
+    typing-not-empty?
+
+    typing-resolve)
   (import
     (micascheme)
     (tico type)
@@ -132,4 +134,16 @@
 
   (define (typing-not-empty? $typing)
     (layment-not-empty? (typing-layment $typing)))
+
+  (define (typing-resolve $typing)
+    (lets
+      ($type (typing-type $typing))
+        (cond
+          ((equal? $type (struct 'boolean (list)))
+            (static-typing (value-type (boolean-type))))
+          ((equal? $type (struct 'number (list)))
+            (static-typing (value-type (number-type))))
+          ((equal? $type (struct 'string (list)))
+            (static-typing (value-type (string-type))))
+          (else $typing))))
 )

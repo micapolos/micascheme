@@ -123,3 +123,31 @@
               (typing-struct 'y (list (literal->typing 40)))))
           (struct 'x (list)))
         (number-type)))))
+
+; --- typing-resolve
+
+(check
+  (equal?
+    (typing-resolve
+      (static-typing (struct 'boolean (list))))
+    (static-typing
+      (value-type (boolean-type)))))
+
+(check
+  (equal?
+    (typing-resolve
+      (static-typing (struct 'number (list))))
+    (static-typing
+      (value-type (number-type)))))
+
+(check
+  (equal?
+    (typing-resolve
+      (static-typing (struct 'string (list))))
+    (static-typing
+      (value-type (string-type)))))
+
+(check
+  (equal?
+    (typing-resolve (literal->typing 10))
+    (literal->typing 10)))

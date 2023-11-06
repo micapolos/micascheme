@@ -35,6 +35,14 @@
 
 (check
   (equal?
+    (read-typings boolean number string)
+    (stack
+      (static-typing (value-type (boolean-type)))
+      (static-typing (value-type (number-type)))
+      (static-typing (value-type (string-type))))))
+
+(check
+  (equal?
     (read-typing (x 128 "foo"))
     (typing-struct 'x
       (list
@@ -67,12 +75,12 @@
     (read-typings
       (point (x 10) (y 20))
       (point (x 30) (y 40))
-      (get x))
+      (get x number))
     (typings-get
       (read-typings
         (point (x 10) (y 20))
         (point (x 30) (y 40)))
-      (read-typings x))))
+      (read-typings x number))))
 
 (check
   (equal?
