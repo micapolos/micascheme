@@ -26,7 +26,7 @@
 
   (data (empty-layout))
   (data (simple-layout))
-  (data (tuple-layout items))
+  (data (tuple-layout items)) ; TODO: replace with struct-layout
   (data (struct-layout fields size))
   (data (layout-field layout index-opt))
   (data (lambda-layout params body))
