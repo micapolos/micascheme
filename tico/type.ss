@@ -75,10 +75,11 @@
         (throw not-type $other))))
 
   (define (type-application-opt $target $args)
-    (and
-      (arrow? $target)
-      (types-match? $args (arrow-params $target))
-      (arrow-result $target)))
+    (switch-opt $target
+      ((arrow? $arrow)
+        (and
+          (types-match? $args (arrow-params $arrow))
+          (arrow-result $arrow)))))
 
   (define (type-application $target $args)
     (or
@@ -86,10 +87,11 @@
       (throw type-application $target $args)))
 
   (define (type-access-opt $target $pattern)
-    (and
-      (property? $target)
-      (type-matches? (property-body $target) $pattern)
-      (property-body $target)))
+    (switch-opt $target
+      ((property? $property)
+        (and
+          (type-matches? (property-body $property) $pattern)
+          (property-body $property)))))
 
   (define (type-access $target $pattern)
     (or
