@@ -93,6 +93,10 @@
         `(arrow
           (list ,@(map value->datum (arrow-params $arrow)))
           ,(value->datum (arrow-result $arrow))))
+      ((property? $property)
+        `(property
+          (list ,@(map value->datum (property-params $property)))
+          ,(value->datum (property-body $property))))
       ((else $other)
         (throw value->datum $value))))
 

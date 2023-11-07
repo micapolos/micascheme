@@ -63,6 +63,11 @@
 	  (value->datum (arrow (list "foo" "bar") "zoo"))
   		`(arrow (list "foo" "bar") "zoo")))
 
+(check 
+ 	(equal?
+	  (value->datum (property (list "foo" "bar") "zoo"))
+  		`(property (list "foo" "bar") "zoo")))
+
 (check
  	(equal?
 	  (lets-datum (list) 'c)
