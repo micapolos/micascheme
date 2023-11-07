@@ -38,6 +38,7 @@
     find-index
     list-set list-ref-opt list-drop
     switch switch-opt
+    or-throw
     unpair pair-values
     associ
     filter-map filter-opts
@@ -485,6 +486,18 @@
       (syntax-case stx ()
         ((_ name item ...) (identifier? #`name)
           #`(error #f (format "~s" (list (quote name) #,@(syntax->list #`(item ...)))))))))
+
+  (define-syntax or-throw
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ ($target $arg ...))
+          (identifier? #'$target)
+          #'(or
+            ($target $arg ...)
+            (throw $target $arg ...)))
+        ((_ $other)
+          #'(or $other
+            (throw error $other))))))
 
   (define (list-ref-opt $list $index)
     (and
