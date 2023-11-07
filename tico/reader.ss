@@ -88,12 +88,12 @@
                   $end-fn))))
           ((doing)
             TODO)
-          ((giving)
+          ((promising)
             (top-level-reader $bindings (stack)
               (lambda ($result-typings)
                 (top-level-reader $bindings
                   (stack
-                    (typings-giving $typings
+                    (typings-promising $typings
                       (car (ensure single? $result-typings))))
                   $end-fn))))
           (else

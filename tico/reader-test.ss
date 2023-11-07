@@ -37,8 +37,8 @@
     (read-typing
       (a number)
       (a string)
-      (giving (a boolean)))
-    (typings-giving
+      (promising (a boolean)))
+    (typings-promising
       (read-typings (a number) (a string))
       (read-typing (a boolean)))))
 
@@ -118,17 +118,17 @@
     (read-typings
       (take
         (native "+")
-        (as number number (giving number)))
+        (as number number (promising number)))
       (take
         (native "*")
-        (as number number (giving number)))
+        (as number number (promising number)))
       (apply 3 4))
     (stack
       (typing-application
         (read-typing
           (take
             (native "+")
-            (as number number (giving number))))
+            (as number number (promising number))))
         (list
           (read-typing 3)
           (read-typing 4)))
@@ -136,7 +136,7 @@
         (read-typing
           (take
             (native "*")
-            (as number number (giving number))))
+            (as number number (promising number))))
         (list
           (read-typing 3)
           (read-typing 4))))))

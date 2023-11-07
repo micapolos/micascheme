@@ -3,7 +3,7 @@ take
   as
     a string
     append a string
-    giving a string
+    promising a string
 do
   "Hello"
   append ", "

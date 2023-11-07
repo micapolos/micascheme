@@ -153,7 +153,7 @@
 
 (check
   (equal?
-    (typings-giving
+    (typings-promising
       (stack
         (number-typing)
         (string-typing))

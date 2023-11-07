@@ -27,7 +27,7 @@
     typing-get
     typings-get
     typing-as
-    typings-giving
+    typings-promising
 
     typing-not-empty?
     typing->type
@@ -183,7 +183,7 @@
         (type->layout $type)
         $compilation)))
 
-  (define (typings-giving $param-typings $result-typing)
+  (define (typings-promising $param-typings $result-typing)
     (type->typing
       (arrow
         (reverse (map typing->type $param-typings))
