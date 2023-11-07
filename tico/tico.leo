@@ -4,6 +4,16 @@ and
     string
     append string
     promising string
+and
+  native "string-length"
+  as
+    string
+    offering length number
+and
+  native "number->string"
+  as
+    number
+    offering string
 and first "Hello"
 and second "world"
 do

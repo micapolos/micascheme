@@ -208,10 +208,15 @@
         (typing->type $result-typing))))
 
   (define (typings-offering $typings $offering-typings)
-    (map
-      (partial typing-property
-        (typing->type (or-throw (single $typings))))
-      (map typing->type $offering-typings)))
+    (lets
+      ($owners (map typing->type $typings))
+      ($bodies (map typing->type $offering-typings))
+      (map type->typing
+        (apply append
+          (map
+            (lambda ($owner)
+              (map (partial property $owner) $bodies))
+            $owners)))))
 
   (define (single-typing $typings)
     (car (ensure single? $typings)))

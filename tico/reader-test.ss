@@ -41,6 +41,13 @@
 
 (check
   (equal?
+    (read-typings number string (offering number boolean))
+    (typings-offering
+      (read-typings number string)
+      (read-typings number boolean))))
+
+(check
+  (equal?
     (read-typings
       (prepare
         (native
