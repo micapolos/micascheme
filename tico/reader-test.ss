@@ -70,7 +70,7 @@
 
 (check
   (equal?
-    (read-typings 1 2 (take 3 4))
+    (read-typings 1 2 (and 3 4))
     (stack
       (literal->typing 1)
       (literal->typing 2)
@@ -79,12 +79,12 @@
 
 (check
   (equal?
-    (read-typings 1 2 (with 3 (take 4 5)))
+    (read-typings 1 2 (with 3 (and 4 5)))
     (stack
       (literal->typing 1)
       (literal->typing 2)
       (literal->typing 3)
-      (typing-struct 'take
+      (typing-struct 'and
         (list
           (literal->typing 4)
           (literal->typing 5))))))
@@ -113,17 +113,17 @@
 (check
   (equal?
     (read-typings
-      (take
+      (and
         (native "+")
         (as number number (promising number)))
-      (take
+      (and
         (native "*")
         (as number number (promising number)))
       (apply 3 4))
     (stack
       (typing-application
         (read-typing
-          (take
+          (and
             (native "+")
             (as number number (promising number))))
         (list
@@ -131,7 +131,7 @@
           (read-typing 4)))
       (typing-application
         (read-typing
-          (take
+          (and
             (native "*")
             (as number number (promising number))))
         (list
