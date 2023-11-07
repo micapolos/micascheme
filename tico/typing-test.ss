@@ -124,17 +124,17 @@
 
 (check
   (equal?
-    (typing-resolve (static-typing (struct 'a (list (struct 'boolean (list))))))
+    (typing-resolve (static-typing (struct 'boolean (list))))
     (boolean-typing)))
 
 (check
   (equal?
-    (typing-resolve (static-typing (struct 'a (list (struct 'number (list))))))
+    (typing-resolve (static-typing (struct 'number (list))))
     (number-typing)))
 
 (check
   (equal?
-    (typing-resolve (static-typing (struct 'a (list (struct 'string (list))))))
+    (typing-resolve (static-typing (struct 'string (list))))
     (string-typing)))
 
 (check

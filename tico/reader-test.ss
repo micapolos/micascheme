@@ -14,10 +14,7 @@
 
 (check
   (equal?
-    (read-typings
-      (a boolean)
-      (a number)
-      (a string))
+    (read-typings boolean number string)
     (stack
       (static-typing (value-type (boolean-type)))
       (static-typing (value-type (number-type)))
@@ -27,7 +24,7 @@
   (equal?
     (read-typings
       (native "\"foo\"" "(+ 1 2)")
-      (as (a string) (a number)))
+      (as string number))
     (stack
       (literal->typing "foo")
       (type-datum->typing (number-type) '(+ 1 2)))))
@@ -35,12 +32,12 @@
 (check
   (equal?
     (read-typing
-      (a number)
-      (a string)
-      (promising (a boolean)))
+      number
+      string
+      (promising boolean))
     (typings-promising
-      (read-typings (a number) (a string))
-      (read-typing (a boolean)))))
+      (read-typings number string)
+      (read-typing boolean))))
 
 (check
   (equal?
