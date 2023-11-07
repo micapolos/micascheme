@@ -1,21 +1,21 @@
-and
+take
   native "string-append"
   as
     string
     append string
     promising string
-and
+take
   native "string-length"
   as
     string
     offering length number
-and
+take
   native "number->string"
   as
     number
     offering string
-and first "Hello"
-and second "world"
+take first "Hello"
+take second "world"
 do
   get: first, string
   append ", "
