@@ -102,6 +102,13 @@
                 (top-level-reader $bindings
                   (typings-offering $typings $offering-typings)
                   $end-fn))))
+          ((type)
+            (top-level-reader $bindings (stack)
+              (lambda ($type-typings)
+                (top-level-reader $bindings
+                  (push-all $typings 
+                    (map typing->type-typing $type-typings))
+                  $end-fn))))
           (else
             (top-level-reader $bindings (stack)
               (lambda ($symbol-typings)

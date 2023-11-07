@@ -16,6 +16,10 @@ take
     offering string
 take first "Hello"
 take second "world"
+type
+  point
+    x number
+    y number
 do
   get: first, string
   append ", "

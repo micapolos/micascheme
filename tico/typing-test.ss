@@ -5,7 +5,8 @@
   (tico layment)
   (tico layout)
   (tico compilation)
-  (tico variable))
+  (tico variable)
+  (tico datum))
 
 (check
   (equal?

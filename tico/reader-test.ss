@@ -22,6 +22,15 @@
 
 (check
   (equal?
+    (read-typings 10 (type boolean number string))
+    (stack
+      (read-typing 10)
+      (typing->type-typing (read-typing boolean))
+      (typing->type-typing (read-typing number))
+      (typing->type-typing (read-typing string)))))
+
+(check
+  (equal?
     (read-typings
       (native "\"foo\"" "(+ 1 2)")
       (as string number))
