@@ -42,7 +42,7 @@
 (check
   (equal?
     (read-typings
-      (inline
+      (prepare
         (native
           "(+ 1 2)"
           "(string-append \"foo\" \"bar\")")))

@@ -23,7 +23,7 @@
     typing-struct
     typing-ref
     typing-native
-    typing-inline
+    typing-prepare
     typing-get
     typings-get
     typing-as
@@ -145,7 +145,7 @@
   (define (native->typing $datum)
     (type-datum->typing (native-type) $datum))
 
-  (define (typing-inline $typing)
+  (define (typing-prepare $typing)
     (type-datum->typing
       (typing-type $typing)
       (value->datum (typing-value $typing))))

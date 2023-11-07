@@ -34,13 +34,13 @@
                   $bindings
                   (map typing-as $typings $as-typings)
                   $end-fn))))
-          ((inline)
+          ((prepare)
             (top-level-reader $bindings (stack)
-              (lambda ($inline-typings)
+              (lambda ($prepare-typings)
                 (top-level-reader
                   $bindings
                   (push-all $typings
-                    (map typing-inline $inline-typings))
+                    (map typing-prepare $prepare-typings))
                   $end-fn))))
           ((take)
             (top-level-reader $bindings (stack)

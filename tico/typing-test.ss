@@ -73,7 +73,7 @@
 
 (check
   (equal?
-    (typing-inline
+    (typing-prepare
       (type-datum->typing
         (number-type)
         '(+ 1 2)))
