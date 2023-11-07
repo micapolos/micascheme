@@ -64,6 +64,11 @@
               $selector-typings))))))
 
   (define (bindings-resolve-opt $bindings $typings)
+    (or
+      (bindings-resolve-application-opt $bindings $typings)
+      (bindings-resolve-access-opt $bindings $typings)))
+
+  (define (bindings-resolve-application-opt $bindings $typings)
     (lets
       ($target-typing
         (bindings-match $bindings
@@ -74,6 +79,9 @@
         (stack
           (typing-application $target-typing
             (reverse $typings))))))
+
+  (define (bindings-resolve-access-opt $bindings $typings)
+    #f)
 
   (define (bindings-resolve $bindings $typings)
     (or

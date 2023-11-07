@@ -113,13 +113,13 @@
         (map type->layout $param-types)
         (typing-layment $body-typing))))
 
-  (define (typing-property $owner-type $body-typing)
+  (define (typing-property $param-types $body-typing)
     (lets
       ($body-type (typing-type $body-typing))
-      ($type (property $owner-type $body-type))
+      ($type (property $param-types $body-type))
       (typing $type
         (layment-abstraction
-          (list (type->layout $type))
+          (map type->layout $param-types)
           (typing-layment $body-typing)))))
 
   (define (typing-access $typing $type)
@@ -209,14 +209,10 @@
 
   (define (typings-offering $typings $offering-typings)
     (lets
-      ($owners (map typing->type $typings))
+      ($params (map typing->type (reverse $typings)))
       ($bodies (map typing->type $offering-typings))
       (map type->typing
-        (apply append
-          (map
-            (lambda ($owner)
-              (map (partial property $owner) $bodies))
-            $owners)))))
+        (map (partial property $params) $bodies))))
 
   (define (single-typing $typings)
     (car (ensure single? $typings)))

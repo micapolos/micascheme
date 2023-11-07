@@ -6,8 +6,10 @@
 (check (equal? (layout-empty? (empty-layout)) #t))
 (check (equal? (layout-empty? (simple-layout)) #f))
 (check (equal? (layout-empty? (native-layout)) #f))
+
 (check (equal? (layout-empty? (struct-layout (stack (empty-layout)) 0)) #t))
 (check (equal? (layout-empty? (struct-layout (stack (simple-layout)) 1)) #f))
+
 (check (equal? (layout-empty? (lambda-layout (stack) (empty-layout))) #t))
 (check (equal? (layout-empty? (lambda-layout (stack) (simple-layout))) #f))
 
@@ -116,9 +118,13 @@
 (check
   (equal?
     (type->layout
-      (property (string-type) (number-type)))
+      (property 
+        (list (string-type) (boolean-type)) 
+        (number-type)))
     (layout-abstraction
-      (list (type->layout (string-type)))
+      (list 
+        (type->layout (string-type))
+        (type->layout (boolean-type)))
       (type->layout (number-type)))))
 
 ; --- layout-ref

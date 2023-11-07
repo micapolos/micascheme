@@ -11,7 +11,7 @@
     literal->type
     struct struct? struct-name struct-fields
     arrow arrow? arrow-params arrow-result
-    property property? property-owner property-body
+    property property? property-params property-body
     abstraction abstraction? abstraction-arity abstraction-body
     recursion recursion? recursion-items
     var var? var-index
@@ -36,7 +36,7 @@
   (data (native-type))
   (data (struct name fields))
   (data (arrow params result))
-  (data (property owner body))
+  (data (property params body))
   (data (abstraction arity body))
   (data (recursion items))
   (data (var index))
@@ -137,9 +137,9 @@
       ((property? $property)
         (and
           (property $type)
-          (type-matches?
-            (property-owner $property)
-            (property-owner $type))
+          (types-match?
+            (property-params $property)
+            (property-params $type))
           (type-matches?
             (property-body $type)
             (property-body $property))))

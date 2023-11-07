@@ -171,7 +171,11 @@
       (stack (number-typing) (string-typing))
       (stack (number-typing) (boolean-typing)))
     (stack
-      (type->typing (property (number-type) (number-type)))
-      (type->typing (property (number-type) (boolean-type)))
-      (type->typing (property (string-type) (number-type)))
-      (type->typing (property (string-type) (boolean-type))))))
+      (type->typing 
+        (property 
+          (list (number-type) (string-type))
+          (number-type)))
+      (type->typing 
+        (property 
+          (list (number-type) (string-type))
+          (boolean-type))))))
