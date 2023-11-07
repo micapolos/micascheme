@@ -35,6 +35,7 @@
 
     typing-not-empty?
     typing->type
+    typing->type-typing
 
     typing-resolve)
   (import
@@ -189,6 +190,12 @@
 
   (define (typing->type $typing)
     (type-value (typing-type $typing)))
+
+  (define (typing->type-typing $typing)
+    (type-datum->typing 
+      (value->datum 
+        (type-value 
+          (typing-type $typing)))))
 
   (define (typing-as $typing $type-typing)
     (switch (typing-type $typing)
