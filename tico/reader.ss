@@ -42,12 +42,12 @@
                   (push-all $typings
                     (map typing-prepare $prepare-typings))
                   $end-fn))))
-          ((take)
+          ((and)
             (top-level-reader $bindings (stack)
-              (lambda ($take-typings)
+              (lambda ($and-typings)
                 (top-level-reader
                   $bindings
-                  (push-all $typings $take-typings)
+                  (push-all $typings $and-typings)
                   $end-fn))))
           ((with)
             (with-reader $bindings (stack)

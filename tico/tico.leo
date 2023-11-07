@@ -1,11 +1,13 @@
-take
+and
   native "string-append"
   as
     string
     append string
     promising string
+and first "Hello"
+and second "world"
 do
-  "Hello"
+  get: first, string
   append ", "
-  append "world"
+  append get: second, string
   append "!"
