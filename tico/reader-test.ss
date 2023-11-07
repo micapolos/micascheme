@@ -14,7 +14,10 @@
 
 (check
   (equal?
-    (read-typings 10 (comment 1 2 3) 20)
+    (read-typings 
+      10 
+      (comment (this is a comment) 10 "foo")
+      20)
     (stack
       (read-typing 10)
       (read-typing 20))))

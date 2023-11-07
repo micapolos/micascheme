@@ -1,3 +1,7 @@
+comment
+  this is a comment
+  numbers: 10, 20, 30
+  strings: "foo", "bar"
 take
   native "string-append"
   as
