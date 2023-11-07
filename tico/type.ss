@@ -70,7 +70,8 @@
         (exists type-dynamic? (struct-fields $struct)))
       ((arrow? $arrow)
         (type-dynamic? (arrow-result $arrow)))
-      ((arrow? $arrow) #t)
+      ((property? $property)
+        (type-dynamic? (property-body $property)))
       ((else $other)
         (throw not-type $other))))
 
@@ -86,7 +87,7 @@
       (type-application-opt $target $args)))
 
   (define (type-access-opt $target $pattern)
-    (switch-opt $target
+    (switch $target
       ((property? $property)
         (and
           (type-matches? (property-body $property) $pattern)

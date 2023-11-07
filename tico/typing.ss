@@ -28,6 +28,10 @@
     typings-get
     typing-as
     typings-promising
+    typing-property
+    typings-offering
+    typing-access
+    typings-access
 
     typing-not-empty?
     typing->type
@@ -109,6 +113,20 @@
         (map type->layout $param-types)
         (typing-layment $body-typing))))
 
+  (define (typing-property $owner-type $body-typing)
+    (lets
+      ($body-type (typing-type $body-typing))
+      ($type (property $owner-type $body-type))
+      (typing $type
+        (layment-abstraction
+          (list (type->layout $type))
+          (typing-layment $body-typing)))))
+
+  (define (typing-access $typing $type)
+    (typing
+      (type-access (typing-type $typing) $type)
+      (layment-application (typing-layment $typing) (list))))
+
   (define (typing-struct $name $field-typings)
     (typing
       (struct $name
@@ -189,6 +207,17 @@
         (reverse (map typing->type $param-typings))
         (typing->type $result-typing))))
 
+  (define (typings-offering $typings $offering-typings)
+    (map
+      (partial typing-property
+        (typing->type (or-throw (single $typings))))
+      (map typing->type $offering-typings)))
+
   (define (single-typing $typings)
     (car (ensure single? $typings)))
+
+  (define (typings-access $typings $selector-typings)
+    (map
+      (partial typing-access (or-throw (single $typings)))
+      (map typing->type $selector-typings)))
 )

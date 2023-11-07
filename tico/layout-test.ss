@@ -115,6 +115,16 @@
 
 (check
   (equal?
+    (type->layout
+      (property (string-type) (number-type)))
+    (layout-abstraction
+      (list (type->layout (string-type)))
+      (type->layout (number-type)))))
+
+; --- layout-ref
+
+(check
+  (equal?
     (layout-ref
       (layout-struct 'foo
         (list

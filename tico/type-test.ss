@@ -3,10 +3,16 @@
 (check (equal? (type-dynamic? (value-type "foo")) #f))
 (check (equal? (type-dynamic? (native-type)) #t))
 (check (equal? (type-dynamic? (type-type)) #t))
+
 (check (equal? (type-dynamic? (struct `foo (list (value-type "foo") (value-type "bar")))) #f))
 (check (equal? (type-dynamic? (struct `foo (list (value-type "foo") (number-type)))) #t))
+
 (check (equal? (type-dynamic? (arrow (list (value-type "foo")) (value-type "bar"))) #f))
 (check (equal? (type-dynamic? (arrow (list (value-type "foo")) (native-type))) #t))
+
+(check (equal? (type-dynamic? (property (string-type) (number-type))) #t))
+(check (equal? (type-dynamic? (property (string-type) (value-type 'empty))) #f))
+
 (check (raises? (lambda () (type-dynamic? `not-type))))
 
 ; --- types-arity

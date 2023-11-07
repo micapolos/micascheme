@@ -96,6 +96,12 @@
                     (typings-promising $typings
                       (car (ensure single? $result-typings))))
                   $end-fn))))
+          ((offering)
+            (top-level-reader $bindings (stack)
+              (lambda ($offering-typings)
+                (top-level-reader $bindings
+                  (typings-offering $typings $offering-typings)
+                  $end-fn))))
           (else
             (top-level-reader $bindings (stack)
               (lambda ($symbol-typings)
