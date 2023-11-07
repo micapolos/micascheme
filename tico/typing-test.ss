@@ -175,3 +175,12 @@
         (property 
           (list (number-type) (string-type))
           (boolean-type))))))
+
+(check
+  (equal?
+    (typing->type-typing
+      (typing-struct 'foo (list (string-typing))))
+    (type-datum->typing
+      (type-type)
+      (value->datum 
+        (struct 'foo (list (string-type)))))))

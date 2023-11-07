@@ -193,6 +193,7 @@
 
   (define (typing->type-typing $typing)
     (type-datum->typing 
+      (type-type)
       (value->datum 
         (type-value 
           (typing-type $typing)))))
