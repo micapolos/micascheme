@@ -14,6 +14,13 @@
 
 (check
   (equal?
+    (read-typings 10 (comment 1 2 3) 20)
+    (stack
+      (read-typing 10)
+      (read-typing 20))))
+
+(check
+  (equal?
     (read-typings boolean number string)
     (stack
       (static-typing (value-type (boolean-type)))

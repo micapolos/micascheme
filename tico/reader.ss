@@ -109,6 +109,10 @@
                   (push-all $typings 
                     (map typing->type-typing $type-typings))
                   $end-fn))))
+          ((comment)
+            (comment-reader
+              (lambda (_)
+                (top-level-reader $bindings $typings $end-fn))))
           (else
             (top-level-reader $bindings (stack)
               (lambda ($symbol-typings)
@@ -141,6 +145,17 @@
               $end-fn))))
       (lambda ()
         ($end-fn $typings))))
+
+  (define (comment-reader $end-fn)
+    (reader
+      (lambda ($literal) 
+        (comment-reader $end-fn))
+      (lambda ($symbol)
+        (comment-reader
+          (lambda (_)
+            (comment-reader $end-fn))))
+      (lambda ()
+        ($end-fn #f))))
 
   (define typings-reader
     (top-level-reader (stack) (stack) identity))
