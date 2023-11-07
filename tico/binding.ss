@@ -89,7 +89,7 @@
               (bindings-match $bindings
                 (property
                   (reverse (map typing-type $typings))
-                  (typing-type $typing))))
+                  (typing-type $typing)))) ; TODO: This must already be (type-type) with a runtime value.
             (and $target-typing
               (stack
                 (typing-access $target-typing
