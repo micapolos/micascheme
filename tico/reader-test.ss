@@ -41,10 +41,10 @@
 
 (check
   (equal?
-    (read-typings number string (offering number boolean))
+    (read-typings number string (offering boolean))
     (typings-offering
       (read-typings number string)
-      (read-typings number boolean))))
+      (read-typings boolean))))
 
 (check
   (equal?

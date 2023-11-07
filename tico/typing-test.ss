@@ -169,12 +169,8 @@
   (equal?
     (typings-offering
       (stack (number-typing) (string-typing))
-      (stack (number-typing) (boolean-typing)))
+      (stack (boolean-typing)))
     (stack
-      (type->typing 
-        (property 
-          (list (number-type) (string-type))
-          (number-type)))
       (type->typing 
         (property 
           (list (number-type) (string-type))

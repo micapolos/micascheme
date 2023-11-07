@@ -210,9 +210,8 @@
   (define (typings-offering $typings $offering-typings)
     (lets
       ($params (map typing->type (reverse $typings)))
-      ($bodies (map typing->type $offering-typings))
-      (map type->typing
-        (map (partial property $params) $bodies))))
+      ($body (typing->type (or-throw (single $offering-typings))))
+      (stack (type->typing (property $params $body)))))
 
   (define (single-typing $typings)
     (car (ensure single? $typings)))
