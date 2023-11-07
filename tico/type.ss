@@ -86,16 +86,16 @@
     (or-throw
       (type-application-opt $target $args)))
 
-  (define (type-access-opt $target $pattern)
+  (define (type-access-opt $target $args)
     (switch $target
       ((property? $property)
         (and
-          (type-matches? (property-body $property) $pattern)
+          (types-match? $args (property-params $property))
           (property-body $property)))))
 
-  (define (type-access $target $pattern)
+  (define (type-access $target $args)
     (or-throw
-      (type-access-opt $target $pattern)))
+      (type-access-opt $target $args)))
 
   (define (types-arity $types)
     (length (filter type-dynamic? $types)))
@@ -136,7 +136,7 @@
             (arrow-result $arrow))))
       ((property? $property)
         (and
-          (property $type)
+          (property? $type)
           (types-match?
             (property-params $property)
             (property-params $type))

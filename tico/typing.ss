@@ -122,10 +122,14 @@
           (map type->layout $param-types)
           (typing-layment $body-typing)))))
 
-  (define (typing-access $typing $type)
+  (define (typing-access $typing $args)
     (typing
-      (type-access (typing-type $typing) $type)
-      (layment-application (typing-layment $typing) (list))))
+      (type-access
+        (typing-type $typing)
+        (map typing-type $args))
+      (layment-application
+        (typing-layment $typing)
+        (map typing-layment $args))))
 
   (define (typing-struct $name $field-typings)
     (typing

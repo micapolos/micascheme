@@ -81,7 +81,19 @@
             (reverse $typings))))))
 
   (define (bindings-resolve-access-opt $bindings $typings)
-    #f)
+    (switch-opt $typings
+      ((pair? $pair)
+        (unpair $pair $typing $typings
+          (lets
+            ($target-typing
+              (bindings-match $bindings
+                (property
+                  (reverse (map typing-type $typings))
+                  (typing-type $typing))))
+            (and $target-typing
+              (stack
+                (typing-access $target-typing
+                  (reverse $typings)))))))))
 
   (define (bindings-resolve $bindings $typings)
     (or
