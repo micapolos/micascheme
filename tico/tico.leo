@@ -1,9 +1,9 @@
 take
   native "string-append"
   as
-    string
-    append string
-    giving string
+    a string
+    append a string
+    giving a string
 do
   "Hello"
   append ", "

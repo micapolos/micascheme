@@ -15,18 +15,32 @@
 (check
   (equal?
     (read-typings
+      (a boolean)
+      (a number)
+      (a string))
+    (stack
+      (static-typing (value-type (boolean-type)))
+      (static-typing (value-type (number-type)))
+      (static-typing (value-type (string-type))))))
+
+(check
+  (equal?
+    (read-typings
       (native "\"foo\"" "(+ 1 2)")
-      (as string number))
+      (as (a string) (a number)))
     (stack
       (literal->typing "foo")
       (type-datum->typing (number-type) '(+ 1 2)))))
 
 (check
   (equal?
-    (read-typing number string (giving boolean))
+    (read-typing
+      (a number)
+      (a string)
+      (giving (a boolean)))
     (typings-giving
-      (read-typings number string)
-      (read-typing boolean))))
+      (read-typings (a number) (a string))
+      (read-typing (a boolean)))))
 
 (check
   (equal?
@@ -48,14 +62,6 @@
   (equal?
     (read-typing "foo")
     (literal->typing "foo")))
-
-(check
-  (equal?
-    (read-typings boolean number string)
-    (stack
-      (static-typing (value-type (boolean-type)))
-      (static-typing (value-type (number-type)))
-      (static-typing (value-type (string-type))))))
 
 (check
   (equal?

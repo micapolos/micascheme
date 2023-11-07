@@ -157,11 +157,11 @@
     (lets
       ($type (typing-type $typing))
         (cond
-          ((equal? $type (struct 'boolean (list)))
+          ((equal? $type (struct 'a (list (struct 'boolean (list)))))
             (boolean-typing))
-          ((equal? $type (struct 'number (list)))
+          ((equal? $type (struct 'a (list (struct 'number (list)))))
             (number-typing))
-          ((equal? $type (struct 'string (list)))
+          ((equal? $type (struct 'a (list (struct 'string (list)))))
             (string-typing))
           (else $typing))))
 
