@@ -16,7 +16,7 @@
     checking-once
     raises?
     app
-    single? single
+    single? single force-single
     bindings-eval
     script
     pi pi2
@@ -37,7 +37,7 @@
     fold-while
     find-index
     list-set list-ref-opt list-drop
-    switch
+    switch switch-opt
     unpair pair-values
     associ
     filter-map filter-opts
@@ -107,6 +107,9 @@
     (and
       (pair? $list) 
       (null? (cdr $list))))
+
+  (define (force-single $list)
+    (car (ensure single? $list)))
 
   (define (generate-symbol)
     (syntax->datum (generate-temporary)))
@@ -286,6 +289,11 @@
               (cond
                 ((pred #,tmp)
                   (let ((var #,tmp)) body ...)) ...)))))))
+
+  (define-syntax-rule (switch-opt $expr (($pred $var) $body ...) ...)
+    (switch $expr
+      (($pred $var) $body ...) ...
+      ((else _) #f)))
 
   (define (fold-while $pred $fn $initial $list)
     (cond

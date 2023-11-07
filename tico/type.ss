@@ -11,12 +11,17 @@
     literal->type
     struct struct? struct-name struct-fields
     arrow arrow? arrow-params arrow-result
+    property property? property-owner property-body
     abstraction abstraction? abstraction-arity abstraction-body
     recursion recursion? recursion-items
     var var? var-index
     type-value
 
+    type-application-opt
     type-application
+
+    type-access
+    type-access-opt
 
     type-dynamic?
     types-arity
@@ -31,6 +36,7 @@
   (data (native-type))
   (data (struct name fields))
   (data (arrow params result))
+  (data (property owner body))
   (data (abstraction arity body))
   (data (recursion items))
   (data (var index))
@@ -68,16 +74,27 @@
       ((else $other)
         (throw not-type $other))))
 
+  (define (type-application-opt $target $args)
+    (and
+      (arrow? $target)
+      (types-match? $args (arrow-params $target))
+      (arrow-result $target)))
+
   (define (type-application $target $args)
-    (switch $target
-      ((arrow? $arrow)
-        (cond
-          ((types-match? $args (arrow-params $arrow))
-            (arrow-result $arrow))
-          (else
-            (throw type-application $target $args))))
-      ((else $other)
-        (throw type-application $target $args))))
+    (or
+      (type-application-opt $target $args)
+      (throw type-application $target $args)))
+
+  (define (type-access-opt $target $pattern)
+    (and
+      (property? $target)
+      (type-matches? (property-body $target) $pattern)
+      (property-body $target)))
+
+  (define (type-access $target $pattern)
+    (or
+      (type-access-opt $target $pattern)
+      (throw type-access $target $pattern)))
 
   (define (types-arity $types)
     (length (filter type-dynamic? $types)))
@@ -116,6 +133,15 @@
           (type-matches?
             (arrow-result $type)
             (arrow-result $arrow))))
+      ((property? $property)
+        (and
+          (property $type)
+          (type-matches?
+            (property-owner $property)
+            (property-owner $type))
+          (type-matches?
+            (property-body $type)
+            (property-body $property))))
       ((else $other)
         (throw not-type $pattern))))
 
