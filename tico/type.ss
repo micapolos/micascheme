@@ -82,9 +82,8 @@
           (arrow-result $arrow)))))
 
   (define (type-application $target $args)
-    (or
-      (type-application-opt $target $args)
-      (throw type-application $target $args)))
+    (or-throw
+      (type-application-opt $target $args)))
 
   (define (type-access-opt $target $pattern)
     (switch-opt $target
@@ -94,9 +93,8 @@
           (property-body $property)))))
 
   (define (type-access $target $pattern)
-    (or
-      (type-access-opt $target $pattern)
-      (throw type-access $target $pattern)))
+    (or-throw
+      (type-access-opt $target $pattern)))
 
   (define (types-arity $types)
     (length (filter type-dynamic? $types)))
