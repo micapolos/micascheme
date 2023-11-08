@@ -21,6 +21,7 @@
     typing-variable
     typing-abstraction
     typing-struct
+    typing-type-struct
     typing-ref
     typing-native
     typing-prepare
@@ -138,6 +139,10 @@
         (map typing-type $field-typings))
       (layment-struct $name
         (map typing-layment $field-typings))))
+
+  ; TODO: Implement type struct
+  (define (typing-type-struct $name $field-typings)
+    (typing-struct $name $field-typings))
 
   (define (typing-ref $typing $pattern)
     (lets
