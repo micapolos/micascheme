@@ -10,54 +10,65 @@
     (tico type)
     (tico binding))
 
-  (define (top-level-reader $bindings $typings $end-fn)
+  (define recursive-top-level-reader
+    (rec $recurse
+      (lambda ($bindings $end-fn)
+        (top-level-reader $bindings (stack) $recurse $end-fn))))
+
+  (define (top-level-reader $bindings $typings $recurse $end-fn)
     (reader
       (lambda ($literal)
         (top-level-reader
           $bindings
           (push $typings (literal->typing $literal))
+          $recurse
           $end-fn))
       (lambda ($symbol)
         (case $symbol
           ((native)
-            (top-level-reader $bindings (stack)
+            (top-level-reader $bindings (stack) $recurse
               (lambda ($native-typings)
                 (top-level-reader
                   $bindings
                   (push-all $typings
-                    (map typing-native $native-typings))
+                    (map typing-native $native-typings)) 
+                  $recurse
                   $end-fn))))
           ((as)
-            (top-level-reader $bindings (stack)
+            (top-level-reader $bindings (stack) $recurse
               (lambda ($as-typings)
                 (top-level-reader
                   $bindings
                   (map typing-as $typings $as-typings)
+                  $recurse
                   $end-fn))))
           ((prepare)
-            (top-level-reader $bindings (stack)
+            (top-level-reader $bindings (stack) $recurse
               (lambda ($prepare-typings)
                 (top-level-reader
                   $bindings
                   (push-all $typings
                     (map typing-prepare $prepare-typings))
+                  $recurse
                   $end-fn))))
           ((take)
-            (top-level-reader $bindings (stack)
+            (top-level-reader $bindings (stack) $recurse
               (lambda ($take-typings)
                 (top-level-reader
                   $bindings
                   (push-all $typings $take-typings)
+                  $recurse
                   $end-fn))))
           ((with)
-            (with-reader $bindings (stack)
+            (with-reader $bindings (stack) $recurse
               (lambda ($with-typings)
                 (top-level-reader
                   $bindings
                   (push-all $typings $with-typings)
+                  $recurse
                   $end-fn))))
           ((get)
-            (top-level-reader $bindings (stack)
+            (top-level-reader $bindings (stack) $recurse
               (lambda ($get-typings)
                 (top-level-reader
                   $bindings
@@ -66,18 +77,21 @@
                       (bindings-get* $bindings $get-typings))
                     ((pair? $typings)
                       (stack (typings-get $typings $get-typings))))
+                  $recurse
                   $end-fn))))
           ((do)
             (top-level-reader
               (push-all $bindings (map typing->binding $typings))
               (stack)
+              $recurse
               (lambda ($body-typings)
                 (top-level-reader
                   $bindings
                   $body-typings
+                  $recurse
                   $end-fn))))
           ((apply)
-            (top-level-reader $bindings (stack)
+            (top-level-reader $bindings (stack) $recurse
               (lambda ($arg-typings)
                 (top-level-reader $bindings
                   (map
@@ -85,36 +99,43 @@
                       (typing-application $typing
                         (reverse $arg-typings)))
                     $typings)
+                  $recurse
                   $end-fn))))
           ((doing)
             TODO)
           ((promising)
-            (top-level-reader $bindings (stack)
+            (top-level-reader $bindings (stack) $recurse
               (lambda ($result-typings)
-                (top-level-reader $bindings
+                (top-level-reader 
+                  $bindings
                   (stack
                     (typings-promising $typings
                       (car (ensure single? $result-typings))))
+                  $recurse
                   $end-fn))))
           ((offering)
-            (top-level-reader $bindings (stack)
+            (top-level-reader $bindings (stack) $recurse
               (lambda ($offering-typings)
-                (top-level-reader $bindings
+                (top-level-reader 
+                  $bindings
                   (typings-offering $typings $offering-typings)
+                  $recurse
                   $end-fn))))
           ((type)
-            (top-level-reader $bindings (stack)
+            (top-level-reader $bindings (stack) $recurse
               (lambda ($type-typings)
-                (top-level-reader $bindings
+                (top-level-reader 
+                  $bindings
                   (push-all $typings 
                     (map typing->type-typing $type-typings))
+                  $recurse
                   $end-fn))))
           ((comment)
             (comment-reader
-              (lambda (_)
-                (top-level-reader $bindings $typings $end-fn))))
+              (lambda ($commented)
+                (top-level-reader $bindings $typings $recurse $end-fn))))
           (else
-            (top-level-reader $bindings (stack)
+            (top-level-reader $bindings (stack) $recurse
               (lambda ($symbol-typings)
                 (top-level-reader
                   $bindings
@@ -122,26 +143,30 @@
                     (push $typings
                       (typing-resolve
                         (typing-struct $symbol
-                          (reverse $symbol-typings)))))
+                          (reverse $symbol-typings))))) 
+                  $recurse
                   $end-fn))))))
       (lambda ()
         ($end-fn $typings))))
 
-  (define (with-reader $bindings $typings $end-fn)
+  (define (with-reader $bindings $typings $recurse $end-fn)
     (reader
       (lambda ($literal)
         (with-reader
           $bindings
           (push $typings (literal->typing $literal))
+          $recurse
           $end-fn))
       (lambda ($symbol)
-        (top-level-reader $bindings (stack)
+        (top-level-reader $bindings (stack) $recurse
           (lambda ($arg-typings)
-            (with-reader $bindings
+            (with-reader 
+              $bindings
               (push $typings
                 (typing-resolve
                   (typing-struct $symbol
                     (reverse $arg-typings))))
+              $recurse
               $end-fn))))
       (lambda ()
         ($end-fn $typings))))
@@ -158,7 +183,7 @@
         ($end-fn #f))))
 
   (define typings-reader
-    (top-level-reader (stack) (stack) identity))
+    (recursive-top-level-reader (stack) identity))
 
   (define-syntax-rule (read-typings $body ...)
     (reader-eval
