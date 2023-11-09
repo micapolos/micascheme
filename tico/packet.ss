@@ -14,7 +14,7 @@
     (lambda ($syntax)
       (syntax-case $syntax ()
         ((_ $name) (identifier? #'$name)
-          #`(packet (quote $name) (quote $name))))))
+          #`(packet (quote (quote $name)) (quote $name))))))
 
   (define (literal->packet $literal)
     (packet $literal $literal))

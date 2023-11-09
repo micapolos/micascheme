@@ -32,7 +32,9 @@
   (data (compilation datum evaluation))
 
   (define (literal->compilation $literal)
-    (compilation $literal (constant $literal)))
+    (compilation
+      (literal->datum $literal)
+      (constant $literal)))
 
   (define (datum->compilation $datum)
     (compilation $datum (datum->constant $datum)))
@@ -110,15 +112,18 @@
             (map compilation->generate-dependency-opt
               (reverse (cons $target $args))))))))
 
-  (define (compilation-abstraction $param-symbols $body-compilation)
+  (define (compilation-abstraction $param-compilations $body-compilation)
     (compilation
       (datum-abstraction
-        $param-symbols
+        (map compilation-datum $param-compilations)
         (compilation-datum $body-compilation))
       (evaluation-abstraction
-        (length $param-symbols)
+        (length $param-compilations)
         (compilation-evaluation $body-compilation)
-        (lambda () (compilation-datum $body-compilation)))))
+        (lambda ()
+          (datum-abstraction
+            (map compilation-datum $param-compilations)
+            (compilation-datum $body-compilation))))))
 
   (define (compilation-struct $name $compilations)
     (lets

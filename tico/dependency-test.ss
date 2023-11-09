@@ -22,7 +22,7 @@
   (equal?
     (dependency-lets-datum
       (dependency 'foo (test-packet bar)))
-    '(foo bar)))
+    '(foo 'bar)))
 
 (check
   (equal?

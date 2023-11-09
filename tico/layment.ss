@@ -70,8 +70,17 @@
         (layment-compilation $target)
         (layments->compilations $args))))
 
+  (define (layment-abstraction $param-layments $body-layment)
+    (make-layment
+      (layout-abstraction
+        (map layment-layout $param-layments)
+        (layment-layout $body-layment))
+      (compilation-abstraction
+        (filter-opts (map layment-compilation $param-layments))
+        (layment-compilation $body-layment))))
+
   (define (generate-parameter-layment $layout)
-    (layment $layout
+    (make-layment $layout
       (generate-parameter-compilation)))
 
   (define (layment-parameter $layment)
@@ -83,9 +92,6 @@
     (layment
       (layment-layout $layment)
       (compilation-variable (layment-compilation $layment) $index)))
-
-  (define (layment-abstraction $param-layouts $body-compilation)
-    TODO)
 
   (define (layment-struct $name $field-layments)
     (make-layment

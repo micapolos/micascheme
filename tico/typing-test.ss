@@ -185,3 +185,17 @@
       (type-type)
       (value->datum 
         (struct 'foo (list (string-type)))))))
+
+(check
+  (equal?
+    (make-list-typing 3 (string-type))
+    (type-datum->typing
+      (make-list-type 3 (string-type))
+      'list)))
+
+(check
+  (equal?
+    (make-struct-typing)
+    (type-datum->typing
+      (make-struct-type)
+      'struct)))

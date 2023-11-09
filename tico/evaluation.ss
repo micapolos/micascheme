@@ -57,6 +57,6 @@
             (lets-datum
               (reverse (map dependency-lets-datum (variable-dependencies $variable)))
               (app $body-datum-fn)))))
-      ((else $other)
-        (throw evaluation-abstraction $other))))
+      ((parameter? $parameter)
+        (throw evaluation-abstraction $parameter))))
 )

@@ -76,23 +76,14 @@
   (equal?
     (evaluation-abstraction
       2
-      (variable 3
-        (stack
-          (dependency 'v1 (packet "foo" "foo"))
-          (dependency 'v2 (packet "bar" "bar"))))
+      (variable 3 (test-dependencies d1 d2))
       (lambda () (throw error)))
-    (variable 1
-      (stack
-        (dependency 'v1 (packet "foo" "foo"))
-        (dependency 'v2 (packet "bar" "bar"))))))
+    (variable 1 (test-dependencies d1 d2))))
 
 (check
   (equal?
     (evaluation-abstraction
       2
-      (variable 1
-        (stack
-          (dependency 'v1 (packet "foo" "foo"))
-          (dependency 'v2 (packet "bar" "bar"))))
+      (variable 1 (test-dependencies d1 d2))
       (lambda () '(string-append "foo" "bar")))
     (constant "foobar")))

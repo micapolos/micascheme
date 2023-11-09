@@ -110,6 +110,8 @@
         (layout-abstraction
           (map type->layout (property-params $property))
           (type->layout (property-body $property))))
+      ((list-type? $list-type)
+        (simple-layout))
       ((else $type)
         (throw type->layout $type))))
 )

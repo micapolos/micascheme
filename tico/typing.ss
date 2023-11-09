@@ -20,6 +20,7 @@
     typing-parameter
     typing-variable
     typing-abstraction
+    let-typing
     typing-struct
     typing-ref
     typing-native
@@ -37,7 +38,10 @@
     typing->type
     typing->type-typing
 
-    typing-resolve)
+    typing-resolve
+
+    make-list-typing
+    make-struct-typing)
   (import
     (micascheme)
     (tico type)
@@ -95,7 +99,8 @@
 
   (define (generate-parameter-typing $type)
     (typing $type
-      (generate-parameter-layment (type->layout $type))))
+      (generate-parameter-layment
+        (type->layout $type))))
 
   (define (typing-parameter $typing)
     (typing
@@ -232,4 +237,48 @@
     (map
       (partial typing-access (or-throw (single $typings)))
       (map typing->type $selector-typings)))
+
+  (define (let-typing $typings $fn)
+    (lets
+      ($types (map typing-type $typings))
+      ($parameter-typings (map generate-parameter-typing $types))
+      ($variable-typings
+        (map
+          typing-variable
+          $parameter-typings
+          (reverse (indices (length $parameter-typings)))))
+      (typing-application
+        (typing-abstraction $types ($fn $variable-typings))
+        $typings)))
+
+  (define (make-list-typing $arity $type)
+    (type-datum->typing
+      (arrow
+        (make-list $arity $type)
+        (list-type $type))
+      'list))
+
+  (define (make-struct-typing)
+    (type-datum->typing
+      (make-struct-type)
+      'struct))
+
+  (define (struct-typing $struct)
+    (lets
+      ($fields (struct-fields $struct))
+      (let-typing
+        (map type-typing $fields)
+        (lambda ($field-typings)
+          (typing-application
+            (make-struct-typing)
+            (list
+              (literal->typing (struct-name $struct))
+              (typing-application
+                (make-list-typing (length $fields) (type-type))
+                $field-typings)))))))
+
+  (define (type-typing $typing)
+    (switch (typing-type $typing)
+      ((struct? $struct) (struct-typing $struct))
+      ((else $other) TODO)))
 )

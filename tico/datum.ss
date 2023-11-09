@@ -1,5 +1,6 @@
 (library (tico datum)
   (export
+    literal->datum
     datum-application
     generate-datum-params
     datum-abstraction
@@ -13,6 +14,15 @@
     datum-ref
     string->read-datum)
   (import (micascheme) (tico type))
+
+  (define (literal->datum $literal)
+    (switch $literal
+      ((boolean? $boolean) $boolean)
+      ((number? $number) $number)
+      ((string? $string) $string)
+      ((char? $char) $char)
+      ((symbol? $symbol) `(quote ,$symbol))
+      ((else $other) (throw literal->datum $literal))))
 
   (define (generate-datum-abstraction $arity $fn)
     (lets

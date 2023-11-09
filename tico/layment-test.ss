@@ -3,7 +3,9 @@
   (tico layout)
   (tico layment)
   (tico compilation)
-  (tico type))
+  (tico parameter)
+  (tico type)
+  (tico variable))
 
 (check
   (equal?
@@ -66,6 +68,37 @@
     (layout-datum->layment
       (simple-layout)
       '(string-append "foo" "bar"))))
+
+; --- layment-abstraction
+
+(check
+  (equal?
+    (layment-application
+      (layment-abstraction
+        (list
+          (make-layment (simple-layout) (compilation 'v1 (parameter)))
+          (make-layment (simple-layout) (compilation 'v2 (parameter))))
+        (make-layment
+          (simple-layout)
+          (compilation 'v1 (variable 0 (stack)))))
+      (list
+        (literal->layment "foo")
+        (literal->layment "bar")))
+    (make-layment
+      (layout-application
+        (layout-abstraction
+          (list (simple-layout) (simple-layout))
+          (simple-layout))
+        (list (simple-layout) (simple-layout)))
+      (compilation-application
+        (compilation-abstraction
+          (list
+            (compilation 'v1 (parameter))
+            (compilation 'v2 (parameter)))
+          (compilation 'v1 (variable 0 (stack))))
+        (list
+          (literal->compilation "foo")
+          (literal->compilation "bar"))))))
 
 ; --- layment-struct
 

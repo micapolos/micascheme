@@ -1,5 +1,11 @@
 (import (micascheme) (tico datum) (tico type))
 
+(check (equal? (literal->datum #f) #f))
+(check (equal? (literal->datum 128) 128))
+(check (equal? (literal->datum "foo") "foo"))
+(check (equal? (literal->datum #\space) #\space))
+(check (equal? (literal->datum 'foo) ''foo))
+
 (check
   (equal?
   	(datum-application 'fn (list 'v1 'v2))

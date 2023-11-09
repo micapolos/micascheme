@@ -15,5 +15,5 @@
 (check
   (equal?
     (test-packet foo)
-    (literal->packet 'foo)))
+    (packet ''foo 'foo)))
 

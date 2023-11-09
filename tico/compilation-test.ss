@@ -92,24 +92,24 @@
 
 (check
   (equal?
-    (compilation-abstraction
-      (list 'v1 'v2)
-      (compilation '(string-append v1 v2)
-        (variable 1
-          (stack
-            (dependency 'v1 (packet "foo" "foo"))
-            (dependency 'v2 (packet "bar" "bar"))))))
+    (compilation-application
+      (compilation-abstraction
+        (list
+          (compilation 'v1 (parameter))
+          (compilation 'v2 (parameter)))
+        (compilation
+          '(string-append v1 v2)
+          (variable 1 (test-dependencies d1 d2))))
+      (list
+        (literal->compilation "foo")
+        (literal->compilation "bar")))
     (compilation
-      (datum-abstraction
-        (list 'v1 'v2)
-        '(string-append v1 v2))
-      (evaluation-abstraction
-        2
-        (variable 1
-          (stack
-            (dependency 'v1 (packet "foo" "foo"))
-            (dependency 'v2 (packet "bar" "bar"))))
-        (lambda () '(string-append v1 v2))))))
+      (datum-application
+        (datum-abstraction
+          (list 'v1 'v2)
+          '(string-append v1 v2))
+        (list "foo" "bar"))
+      (constant "foobar"))))
 
 ; --- compilation-struct
 

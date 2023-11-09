@@ -239,3 +239,10 @@
       (list
         (number-type)
         (string-type)))))
+
+(check
+  (equal?
+    (make-list-type 3 (string-type))
+    (arrow
+      (list (string-type) (string-type) (string-type))
+      (list-type (string-type)))))
