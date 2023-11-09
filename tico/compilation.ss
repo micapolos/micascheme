@@ -113,17 +113,32 @@
               (reverse (cons $target $args))))))))
 
   (define (compilation-abstraction $param-compilations $body-compilation)
-    (compilation
-      (datum-abstraction
-        (map compilation-datum $param-compilations)
-        (compilation-datum $body-compilation))
-      (evaluation-abstraction
-        (length $param-compilations)
-        (compilation-evaluation $body-compilation)
-        (lambda ()
+    (switch (compilation-evaluation $body-compilation)
+      ((constant? $constant)
+        (compilation
           (datum-abstraction
             (map compilation-datum $param-compilations)
-            (compilation-datum $body-compilation))))))
+            (compilation-datum $body-compilation))
+          (constant-abstraction
+            (length $param-compilations)
+            $constant)))
+      ((variable? $variable)
+        (switch (variable-promote $variable (length $param-compilations))
+          ((variable? $variable)
+            (compilation
+              (datum-abstraction
+                (map compilation-datum $param-compilations)
+                (compilation-datum $body-compilation))
+              $variable))
+          ((false? _)
+            (datum->compilation
+              (dependencies-lets
+                (variable-dependencies $variable)
+                (datum-abstraction
+                  (map compilation-datum $param-compilations)
+                  (compilation-datum $body-compilation)))))))
+      ((parameter? $parameter)
+        (throw compilation-abstraction $param-compilations $body-compilation))))
 
   (define (compilation-struct $name $compilations)
     (lets

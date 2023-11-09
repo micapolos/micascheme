@@ -11,3 +11,5 @@
 (check (equal? (tuple-ref-value 3 (vector "foo" "bar" "zoo") 0) "foo"))
 (check (equal? (tuple-ref-value 3 (vector "foo" "bar" "zoo") 1) "bar"))
 (check (equal? (tuple-ref-value 3 (vector "foo" "bar" "zoo") 2) "zoo"))
+
+(check (equal? (app (value-abstraction 2 "foo") 1 2) "foo"))

@@ -1,6 +1,7 @@
 (library (tico value)
   (export
     value-application
+    value-abstraction
     value-struct
     value-ref
     tuple-value
@@ -16,6 +17,17 @@
 
   (define (value-application $target $args)
     (apply $target $args))
+
+  (define (value-abstraction $arity $body)
+    (lets
+      ($body-symbol (generate-symbol))
+      (evaluate
+        (evaluator
+          (value-environment)
+          (list (cons $body-symbol $body)))
+        (datum-abstraction
+          (generate-symbols $arity)
+          $body-symbol))))
 
   (define (value-struct $name $field-values)
     (tuple-value $field-values))

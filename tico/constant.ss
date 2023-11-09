@@ -3,6 +3,7 @@
     constant constant? constant-value
     datum->constant
     constant-application
+    constant-abstraction
     constant-struct
     constant-ref)
   (import
@@ -20,6 +21,10 @@
       (value-application
         (constant-value $target)
         (map constant-value $args))))
+
+  (define (constant-abstraction $arity $body)
+    (constant
+      (value-abstraction $arity (constant-value $body))))
 
   (define (constant-struct $name $field-values)
     (constant

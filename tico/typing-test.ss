@@ -74,13 +74,22 @@
 
 ; (check
 ;   (equal?
-;     (let-typing
-;       (list
-;         (literal->typing "foo")
-;         (literal->typing "bar"))
-;       (lambda ($typings)
-;         (literal->typing "foobar")))
-;     123))
+;     (with-generate-temporary-seed $tmp
+;       (let-typing
+;         (list
+;           (literal->typing "foo")
+;           (literal->typing "bar"))
+;         (lambda ($typings)
+;           (literal->typing "foobar"))))
+;     (typing-application
+;       (typing-abstraction
+;         (list
+;           (typing-variable (literal->typing "foo") 1)
+;           (typing-variable (literal->typing "foo") 0))
+;         (typing)
+;         $parameter-typings ($fn $variable-typings))
+;       (literal->typing "foo")
+;       (literal->typing "bar"))))
 
 (check
   (equal?

@@ -63,27 +63,3 @@
         (test-dependency d2)
         (test-dependency d3)
         (test-dependency d4)))))
-
-(check
-  (equal?
-    (evaluation-abstraction
-      2
-      (constant "foo")
-      (lambda () (throw error)))
-    (constant "foo")))
-
-(check
-  (equal?
-    (evaluation-abstraction
-      2
-      (variable 3 (test-dependencies d1 d2))
-      (lambda () (throw error)))
-    (variable 1 (test-dependencies d1 d2))))
-
-(check
-  (equal?
-    (evaluation-abstraction
-      2
-      (variable 1 (test-dependencies d1 d2))
-      (lambda () '(string-append "foo" "bar")))
-    (constant "foobar")))

@@ -4,8 +4,10 @@
     test-dependency
     test-dependencies
     dependency-lets-datum
+    dependencies-lets
     dependencies+
-    dependencies-flatten)
+    dependencies-flatten
+    dependency-value-binding)
   (import
     (micascheme)
     (tico packet))
@@ -29,9 +31,21 @@
       ,(packet-datum
         (dependency-packet $dependency))))
 
+  (define (dependencies-lets $dependencies $body-datum)
+    (lets
+      ($dependencies (reverse $dependencies))
+      `(lets
+        ,@(map dependency-lets-datum $dependencies)
+        ,$body-datum)))
+
   (define (dependencies+ $first $second)
     (push-all $first $second))
 
   (define (dependencies-flatten $dependencies-list)
     (fold-left dependencies+ (stack) $dependencies-list))
+
+  (define (dependency-value-binding $dependency)
+    (cons
+      (dependency-symbol $dependency)
+      (packet-value (dependency-packet $dependency))))
 )

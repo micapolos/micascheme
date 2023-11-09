@@ -97,19 +97,55 @@
         (list
           (compilation 'v1 (parameter))
           (compilation 'v2 (parameter)))
+        (literal->compilation "foobar"))
+      (list
+        (literal->compilation "foo")
+        (literal->compilation "bar")))
+    (datum->compilation
+      (datum-application
+        (datum-abstraction
+          (list 'v1 'v2)
+          "foobar")
+        (list "foo" "bar")))))
+
+(check
+  (equal?
+    (compilation-application
+      (compilation-abstraction
+        (list
+          (compilation 'v1 (parameter))
+          (compilation 'v2 (parameter)))
         (compilation
           '(string-append v1 v2)
           (variable 1 (test-dependencies d1 d2))))
       (list
         (literal->compilation "foo")
         (literal->compilation "bar")))
+    (compilation-application
+      (datum->compilation
+        (dependencies-lets
+          (test-dependencies d1 d2)
+          (datum-abstraction
+            (list 'v1 'v2)
+            '(string-append v1 v2))))
+      (list
+        (literal->compilation "foo")
+        (literal->compilation "bar")))))
+
+(check
+  (equal?
+    (compilation-abstraction
+      (list
+        (compilation 'v1 (parameter))
+        (compilation 'v2 (parameter)))
+      (compilation
+        '(string-append v1 v2)
+        (variable 3 (test-dependencies d1 d2))))
     (compilation
-      (datum-application
-        (datum-abstraction
-          (list 'v1 'v2)
-          '(string-append v1 v2))
-        (list "foo" "bar"))
-      (constant "foobar"))))
+      (datum-abstraction
+        (list 'v1 'v2)
+        '(string-append v1 v2))
+      (variable 1 (test-dependencies d1 d2)))))
 
 ; --- compilation-struct
 

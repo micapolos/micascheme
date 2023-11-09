@@ -26,6 +26,16 @@
 
 (check
   (equal?
+    (dependencies-lets
+      (test-dependencies d1 d2)
+      `(string-append v1 v2))
+    '(lets
+      (d1 'd1)
+      (d2 'd2)
+      (string-append v1 v2))))
+
+(check
+  (equal?
     (test-dependency foo)
     (dependency 'foo (test-packet foo))))
 

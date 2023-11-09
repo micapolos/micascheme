@@ -1,7 +1,6 @@
 (library (tico evaluation)
   (export
     evaluation-application
-    evaluation-abstraction
     evaluation-lets-datums
     evaluation-value)
   (import
@@ -46,17 +45,4 @@
                 (list
                   (app $constant-dependencies-fn)
                   (variable-dependencies $variable)))))))))
-
-  (define (evaluation-abstraction $arity $body-evaluation $body-datum-fn)
-    (switch $body-evaluation
-      ((constant? $constant) $constant)
-      ((variable? $variable)
-        (or
-          (variable-promote $variable $arity)
-          (datum->constant
-            (lets-datum
-              (reverse (map dependency-lets-datum (variable-dependencies $variable)))
-              (app $body-datum-fn)))))
-      ((parameter? $parameter)
-        (throw evaluation-abstraction $parameter))))
 )
