@@ -72,6 +72,16 @@
           'number->string)
         (list (literal->layment 10))))))
 
+; (check
+;   (equal?
+;     (let-typing
+;       (list
+;         (literal->typing "foo")
+;         (literal->typing "bar"))
+;       (lambda ($typings)
+;         (literal->typing "foobar")))
+;     123))
+
 (check
   (equal?
     (typing-prepare
