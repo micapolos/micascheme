@@ -3,6 +3,7 @@
   (tico compilation)
   (tico constant)
   (tico variable)
+  (tico global)
   (tico dependency)
   (tico packet)
   (tico datum)
@@ -12,10 +13,30 @@
 
 (check
   (equal?
+    (compilation-value (compilation 'string-append (global)))
+    string-append))
+
+(check
+  (equal?
+    (compilation-value (compilation 'foo (constant 3)))
+    3))
+
+(check
+  (raises?
+    (lambda ()
+      (compilation-value (compilation 'foo (variable 1 (stack)))))))
+
+(check
+  (raises?
+    (lambda ()
+      (compilation-value (compilation 'foo (parameter))))))
+
+(check
+  (equal?
     (datum->compilation '(string-append "foo" "bar"))
     (compilation
       '(string-append "foo" "bar")
-      (datum->constant '(string-append "foo" "bar")))))
+      (global))))
 
 (check
   (equal?
@@ -69,7 +90,7 @@
       (list
         (literal->compilation "foo")
         (literal->compilation "bar")))
-    (datum->compilation
+    (datum->constant-compilation
       '(string-append "foo" "bar"))))
 
 (check
@@ -84,8 +105,7 @@
       '(string-append foo "bar")
       (variable 1
         (stack
-          (dependency '$tmp-0 (datum->packet 'string-append))
-          (dependency '$tmp-1 (datum->packet "bar"))
+          (dependency '$tmp-0 (datum->packet "bar"))
           (test-dependency d1))))))
 
 ; --- compilation-abstraction
@@ -101,7 +121,7 @@
       (list
         (literal->compilation "foo")
         (literal->compilation "bar")))
-    (datum->compilation
+    (datum->constant-compilation
       (datum-application
         (datum-abstraction
           (list 'v1 'v2)
@@ -187,6 +207,11 @@
   (equal?
     (compilation-parameter (literal->compilation "foo"))
     (literal->compilation "foo")))
+
+(check
+  (equal?
+    (compilation-parameter (datum->compilation "foo"))
+    (datum->compilation "foo")))
 
 (check
   (equal?

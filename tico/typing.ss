@@ -10,6 +10,7 @@
     number-typing
     string-typing
     type-datum->typing
+    type-datum->constant-typing
     single-typing
 
     typing-datum
@@ -77,6 +78,12 @@
   (define (type-datum->typing $type $datum)
     (typing $type
       (layout-datum->layment
+        (type->layout $type)
+        $datum)))
+
+  (define (type-datum->constant-typing $type $datum)
+    (typing $type
+      (layout-datum->constant-layment
         (type->layout $type)
         $datum)))
 

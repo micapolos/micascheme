@@ -30,16 +30,6 @@
 
 (check
   (equal?
-    (evaluation-value (constant "foo"))
-    "foo"))
-
-(check
-  (raises?
-    (lambda ()
-      (evaluation-value (variable 1 (stack))))))
-
-(check
-  (equal?
     (evaluation-application
       (variable 1
         (stack

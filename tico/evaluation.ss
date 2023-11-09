@@ -1,15 +1,15 @@
 (library (tico evaluation)
   (export
     evaluation-application
-    evaluation-lets-datums
-    evaluation-value)
+    evaluation-lets-datums)
   (import
     (micascheme)
     (tico constant)
     (tico variable)
     (tico parameter)
     (tico dependency)
-    (tico datum))
+    (tico datum)
+    (tico global))
 
   ;(enum (evaluation constant variable parameter))
 
@@ -20,13 +20,6 @@
       ((else _)
         (list))))
 
-  (define (evaluation-value $evaluation)
-    (switch $evaluation
-      ((constant? $constant)
-        (constant-value $constant))
-      ((else $other)
-        (throw evaluation-value $other))))
-
   (define (evaluation-application $target $args $constant-dependencies-fn)
     (lets
       ($evaluations (cons $target $args))
@@ -36,7 +29,7 @@
         (else
           (lets
             ($variables (filter variable? $evaluations))
-            ($constants (filter constant? $evaluations))
+            ($globals (ensure null? (filter global? $evaluations)))
             ($parameters (ensure null? (filter parameter? $evaluations)))
             ($variable (variable-flatten $variables))
             (variable

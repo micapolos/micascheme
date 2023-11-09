@@ -80,16 +80,12 @@
 ;           (literal->typing "foo")
 ;           (literal->typing "bar"))
 ;         (lambda ($typings)
-;           (literal->typing "foobar"))))
-;     (typing-application
-;       (typing-abstraction
-;         (list
-;           (typing-variable (literal->typing "foo") 1)
-;           (typing-variable (literal->typing "foo") 0))
-;         (typing)
-;         $parameter-typings ($fn $variable-typings))
-;       (literal->typing "foo")
-;       (literal->typing "bar"))))
+;           (typing-application
+;             (type-datum->typing
+;               (arrow (list (string-type) (string-type)) (string-type))
+;               'string-append)
+;             $typings))))
+;     123))
 
 (check
   (equal?

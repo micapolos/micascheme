@@ -45,7 +45,7 @@
       (native "\"foo\"" "(+ 1 2)")
       (as string number))
     (stack
-      (literal->typing "foo")
+      (type-datum->typing (string-type) "foo")
       (type-datum->typing (number-type) '(+ 1 2)))))
 
 (check

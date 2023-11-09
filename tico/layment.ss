@@ -7,6 +7,7 @@
     empty-layment
     literal->layment
     layout-datum->layment
+    layout-datum->constant-layment
 
     layment-datum
     layment-value
@@ -47,6 +48,9 @@
   (define (layout-datum->layment $layout $datum)
     (layment $layout (datum->compilation $datum)))
 
+  (define (layout-datum->constant-layment $layout $datum)
+    (layment $layout (datum->constant-compilation $datum)))
+
   (define (layment-datum $layment)
     (compilation-top-level-datum
       (layment-compilation $layment)))
@@ -59,7 +63,8 @@
     (layout-not-empty? (layment-layout $layment)))
 
   (define (layments->compilations $layments)
-    (map layment-compilation (filter layment-not-empty? $layments)))
+    (map layment-compilation
+      (filter layment-not-empty? $layments)))
 
   (define (layment-application $target $args)
     (make-layment

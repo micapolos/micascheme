@@ -4,6 +4,7 @@
 
     literal->compilation
     datum->compilation
+    datum->constant-compilation
 
     compilation-top-level-datum
     compilation-value
@@ -23,6 +24,7 @@
     (tico constant)
     (tico constant)
     (tico variable)
+    (tico global)
     (tico dependency)
     (tico packet)
     (tico datum)
@@ -37,6 +39,9 @@
       (constant $literal)))
 
   (define (datum->compilation $datum)
+    (compilation $datum (global)))
+
+  (define (datum->constant-compilation $datum)
     (compilation $datum (datum->constant $datum)))
 
   (define (compilation-top-level-datum $compilation)
@@ -45,8 +50,13 @@
       (compilation-datum $compilation)))
 
   (define (compilation-value $compilation)
-    (evaluation-value
-      (compilation-evaluation $compilation)))
+    (switch (compilation-evaluation $compilation)
+      ((constant? $constant)
+        (constant-value $constant))
+      ((global? $global)
+        (datum->value (compilation-datum $compilation)))
+      ((else _)
+        (throw compilation-value $compilation))))
 
   (define (compilation->generate-dependency-opt $compilation)
     (switch (compilation-evaluation $compilation)
@@ -69,6 +79,7 @@
                 (packet
                   (compilation-datum $compilation)
                   (constant-value $constant)))))))
+      ((global? $global) (stack))
       ((variable? $variable)
         (cons
           (compilation-datum $compilation)
@@ -83,6 +94,8 @@
     (switch (compilation-evaluation $compilation)
       ((constant? $constant)
         $compilation)
+      ((global? $global)
+        $compilation)
       ((variable? $variable)
         (generate-parameter-compilation))
       ((parameter? $parameter)
@@ -92,6 +105,8 @@
     (switch (compilation-evaluation $compilation)
       ((constant? $constant)
         $compilation)
+      ((global? $global)
+        $compilation)
       ((variable? $variable)
         (throw compilation-variable $compilation))
       ((parameter? $parameter)
@@ -99,14 +114,21 @@
           (compilation-datum $compilation)
           (variable $index (stack))))))
 
+  (define (compilation-constantize $compilation)
+    (switch (compilation-evaluation $compilation)
+      ((global? $global)
+        (datum->constant-compilation
+          (compilation-datum $compilation)))
+      ((else $other) $compilation)))
+
   (define (compilation-application $target $args)
     (compilation
       (datum-application
         (compilation-datum $target)
         (map compilation-datum $args))
       (evaluation-application
-        (compilation-evaluation $target)
-        (map compilation-evaluation $args)
+        (compilation-evaluation (compilation-constantize $target))
+        (map compilation-evaluation (map compilation-constantize $args))
         (lambda ()
           (filter-opts
             (map compilation->generate-dependency-opt
