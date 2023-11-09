@@ -11,4 +11,5 @@
       (sequence 0 x (fract (+ x dt))))
 
     (define (variable init set? value)
-      (sequence init x (if set? value x)))))
+      (sequence init x (if set? value x))))
+)
