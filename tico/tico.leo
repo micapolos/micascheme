@@ -1,4 +1,4 @@
-load tico core
+load tico natives
 take first "Hello"
 take second "world"
 do
