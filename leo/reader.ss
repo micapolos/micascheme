@@ -6,6 +6,7 @@
     reader-eval
 
     fold-reader
+    reader-map
     list-reader)
   (import (micascheme))
 
@@ -38,6 +39,21 @@
 
   (define-syntax-rule (reader-eval $reader $item ...)
     (reader-end (reader-read-list $reader (list (quote $item) ...))))
+
+  (define (reader-map $fn $reader)
+    (reader
+      (lambda ($literal)
+        (reader-map $fn
+          (reader-append $reader $literal)))
+      (lambda ($symbol)
+        (reader-map $fn
+          (reader-begin $reader $symbol)))
+      (lambda ()
+        (switch (reader-end $reader)
+          ((reader? $reader)
+            (reader-map $fn $reader))
+          ((else $other)
+            ($fn $other))))))
 
   (define (fold-reader $folded $append $child-reader $end)
     (reader

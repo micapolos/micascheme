@@ -19,6 +19,13 @@
         negate
         (subtract 3)))))
 
+(check
+  (equal?
+    (reader-eval
+      (reader-map box (list-reader))
+      "foo" 128 foo (bar 10 20))
+    (box '("foo" 128 foo (bar 10 20)))))
+
 (define calculator-reader
   (case-lambda
     (()
