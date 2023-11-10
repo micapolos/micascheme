@@ -1,6 +1,8 @@
 comment
-  this is a core library
-  and contains native mappings
+  this library
+  contains
+    native functions
+    like: "+", "-", "string-append"
 take
   native "+"
   as
