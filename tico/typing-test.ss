@@ -24,6 +24,13 @@
 
 (check
   (equal?
+    (variable-typing (boolean-type) 'foo 1)
+    (typing (boolean-type)
+      (variable-layment (type->layout (boolean-type))
+        'foo 1))))
+
+(check
+  (equal?
     (type->typing (number-type))
     (static-typing (value-type (number-type)))))
 
@@ -214,3 +221,39 @@
     (type-datum->typing
       (make-struct-type)
       'struct)))
+
+; --- typing-assert
+
+(check
+  (equal?
+    (typing-assert (type-datum->typing (boolean-type) '(= 1 1)))
+    (void)))
+
+; not boolean
+(check
+  (raises?
+    (lambda ()
+      (typing-assert (type-datum->typing (string-type) "foo")))))
+
+; not true
+(check
+  (raises?
+    (lambda ()
+      (typing-assert (type-datum->typing (boolean-type) '(= 1 2))))))
+
+; non value
+(check
+  (raises?
+    (lambda ()
+      (typing-assert (variable-typing (boolean-type) 'foo 1)))))
+
+; --- typings-resolve-assert
+
+(check
+  (equal?
+    (typings-resolve-assert
+      (stack (literal->typing "lhs"))
+      (stack
+        (literal->typing #t)
+        (type-datum->typing (boolean-type) '(= 1 1))))
+    (stack (literal->typing "lhs"))))

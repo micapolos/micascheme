@@ -47,6 +47,14 @@
                   (map typing-as $typings $as-typings)
                   $recurse
                   $end-fn))))
+          ((assert)
+            (($recurse $bindings
+              (lambda ($assert-typings)
+                (top-level-reader
+                  $bindings
+                  (typings-resolve-assert $typings $assert-typings)
+                  $recurse
+                  $end-fn)))))
           ((prepare)
             ($recurse $bindings
               (lambda ($prepare-typings)

@@ -5,6 +5,7 @@
     literal->compilation
     datum->compilation
     datum->constant-compilation
+    variable-compilation
 
     compilation-top-level-datum
     compilation-value
@@ -113,6 +114,9 @@
         (compilation
           (compilation-datum $compilation)
           (variable $index (stack))))))
+
+  (define (variable-compilation $datum $index)
+    (compilation $datum (variable $index (stack))))
 
   (define (compilation-constantize $compilation)
     (switch (compilation-evaluation $compilation)

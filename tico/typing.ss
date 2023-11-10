@@ -5,6 +5,7 @@
 
     native->typing
     literal->typing
+    variable-typing
     type->typing
     boolean-typing
     number-typing
@@ -34,6 +35,8 @@
     typings-offering
     typing-access
     typings-access
+    typings-resolve-assert
+    typing-assert
 
     typing-not-empty?
     typing->type
@@ -62,6 +65,10 @@
     (typing
       (literal->type $literal)
       (literal->layment $literal)))
+
+  (define (variable-typing $type $datum $index)
+    (typing $type
+      (variable-layment (type->layout $type) $datum $index)))
 
   (define (type->typing $type)
     (static-typing (value-type $type)))
@@ -290,4 +297,14 @@
     (switch (typing-type $typing)
       ((struct? $struct) (struct-typing $struct))
       ((else $other) TODO)))
+
+  (define (typings-resolve-assert $lhs-typings $rhs-typings)
+    (for-each typing-assert $rhs-typings)
+    $lhs-typings)
+
+  (define (typing-assert $typing)
+    (unless (type-matches? (typing-type $typing) (boolean-type))
+      (throw assertion-not-boolean (typing-datum $typing)))
+    (unless (typing-value $typing)
+      (throw assertiong-failed (typing-datum $typing))))
 )

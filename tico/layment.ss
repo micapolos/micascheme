@@ -6,6 +6,7 @@
     make-layment
     empty-layment
     literal->layment
+    variable-layment
     layout-datum->layment
     layout-datum->constant-layment
 
@@ -44,6 +45,10 @@
     (layment
       (literal->layout $literal)
       (literal->compilation $literal)))
+
+  (define (variable-layment $layout $datum $index)
+    (make-layment $layout
+      (variable-compilation $datum $index)))
 
   (define (layout-datum->layment $layout $datum)
     (layment $layout (datum->compilation $datum)))
