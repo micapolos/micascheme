@@ -166,6 +166,24 @@
 
 (check
   (equal?
+    (with-generate-temporary-seed $tmp
+      (read-typing
+        string number
+        (doing (get string))
+        (apply "foo" 128)))
+    (with-generate-temporary-seed $tmp
+      (lets
+        ($params
+          (list
+            (generate-parameter-typing (string-type))
+            (generate-parameter-typing (number-type))))
+        (typing-application
+          (typing-abstraction $params
+            (variable-typing (string-type) '$tmp-0 1))
+          (reverse (read-typings "foo" 128)))))))
+
+(check
+  (equal?
     (read-typings
       "foo" "bar"
       (assert

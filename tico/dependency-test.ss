@@ -27,6 +27,13 @@
 (check
   (equal?
     (dependencies-lets
+      (test-dependencies)
+      `(string-append v1 v2))
+    '(string-append v1 v2)))
+
+(check
+  (equal?
+    (dependencies-lets
       (test-dependencies d1 d2)
       `(string-append v1 v2))
     '(lets

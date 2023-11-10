@@ -34,9 +34,12 @@
   (define (dependencies-lets $dependencies $body-datum)
     (lets
       ($dependencies (reverse $dependencies))
-      `(lets
-        ,@(map dependency-lets-datum $dependencies)
-        ,$body-datum)))
+      (switch $dependencies
+        ((null? _) $body-datum)
+        ((else $dependencies)
+          `(lets
+            ,@(map dependency-lets-datum $dependencies)
+            ,$body-datum)))))
 
   (define (dependencies+ $first $second)
     (push-all $first $second))

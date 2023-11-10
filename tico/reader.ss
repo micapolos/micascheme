@@ -104,7 +104,19 @@
                     $typings)
                   $end))))
           ((doing)
-            TODO)
+            (lets
+              ($param-types (map typing->type (reverse $typings)))
+              ($param-typings (map generate-parameter-typing $param-types))
+              (top-level-reader
+                (push-list $bindings (map binding $param-typings))
+                (stack)
+                (lambda ($doing-typings)
+                  (top-level-reader
+                    $bindings
+                    (stack
+                      (typing-abstraction $param-typings
+                        (force-single $doing-typings)))
+                    $end)))))
           ((promising)
             (top-level-reader $bindings (stack)
               (lambda ($result-typings)
