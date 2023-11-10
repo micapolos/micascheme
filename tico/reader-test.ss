@@ -176,3 +176,13 @@
       (read-typings
         (take (native "#t") (as boolean))
         (take (native "(= 1 1)") (as boolean))))))
+
+(check
+  (equal?
+    (read-typings "start" (load (tico (included foo bar))) "end")
+    (stack
+      (literal->typing "start")
+      (literal->typing "foo")
+      (literal->typing "bar")
+      (literal->typing "end"))))
+

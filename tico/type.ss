@@ -32,9 +32,7 @@
     indexed-type-matching
 
     make-list-of
-    make-struct-type
-
-    type-paths)
+    make-struct-type)
   (import
     (micascheme)
     (tico path))
@@ -213,19 +211,4 @@
     (arrow
       (list (symbol-type) (list-of (type-type)))
       (type-type)))
-
-  ; path is a list of symbols
-  (define (type-paths $type)
-    (switch $type
-      ((struct? $struct)
-        (lets
-          ($name (struct-name $struct))
-          (switch (struct-fields $struct)
-            ((null? _) (stack (make-path $name #f)))
-            ((else $fields)
-              (map
-                (partial make-path $name)
-                (apply append (map type-paths $fields)))))))
-      ((else $other)
-        (throw not-path $type))))
 )

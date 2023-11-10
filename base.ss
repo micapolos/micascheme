@@ -53,6 +53,7 @@
     null
 
     stack push push-list push-all top pop
+    flatten
     gen-stack gen-list
 
     generate-temporary
@@ -84,6 +85,7 @@
   (define (push-all $stack $stack2) (append $stack2 $stack))
   (define (top $stack) (car $stack))
   (define (pop $stack) (cdr $stack))
+  (define (flatten $lists) (apply append $lists))
 
   (define-syntax stack
     (lambda ($syntax)

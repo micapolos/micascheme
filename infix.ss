@@ -42,7 +42,7 @@
         (syntax-case stx (:)
           (() (list))
           ((: item ...)
-            (apply append (map compile-stxs (syntax->list #`(item ...)))))
+            (flatten (map compile-stxs (syntax->list #`(item ...)))))
           ((first rest ...) 
             (switch (fold-left result+ (complete (compile-stxs #`first)) (syntax->list #`(rest ...)))
               ((complete? complete) 
