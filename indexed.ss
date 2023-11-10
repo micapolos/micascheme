@@ -43,7 +43,7 @@
       ($terms (map typed-term $typed-list))
       ($types-list (map typed-types $typed-list))
       ($identifiers-list (map types-generate-temporaries $types-list))
-      ($identifiers (apply append $identifiers-list))
+      ($identifiers (flatten $identifiers-list))
       ($let-entries 
         (map 
           (lambda ($identifiers $term) #`((#,@$identifiers) $term))
