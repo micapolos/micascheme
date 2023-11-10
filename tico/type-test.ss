@@ -246,3 +246,26 @@
     (arrow
       (list (string-type) (string-type) (string-type))
       (list-of (string-type)))))
+
+; --- type-paths
+
+(check
+  (equal?
+    (type-paths
+      (struct 'a1
+        (stack
+          (struct 'b1
+            (stack
+              (struct 'c1 (stack))
+              (struct 'c2 (stack))))
+          (struct 'foo (stack))
+          (struct 'b2
+            (stack
+              (struct 'd1 (stack))
+              (struct 'd2 (stack)))))))
+    (stack
+      '(a1 b1 c1)
+      '(a1 b1 c2)
+      '(a1 foo)
+      '(a1 b2 d1)
+      '(a1 b2 d2))))

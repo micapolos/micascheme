@@ -30,6 +30,14 @@
           $end-fn))
       (lambda ($symbol)
         (case $symbol
+          ((include)
+            ($recurse $bindings
+              (lambda ($include-typings)
+                (top-level-reader
+                  $bindings
+                  TODO
+                  $recurse
+                  $end-fn))))
           ((native)
             ($recurse $bindings
               (lambda ($native-typings)
