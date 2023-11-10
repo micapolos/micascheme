@@ -1,8 +1,6 @@
-comment
-  this library
-  contains
-    native functions
-    like: "+", "-", "string-append"
+comment contains
+  native functions
+  like: "+", "-", "string-append"
 take
   native "+"
   as
