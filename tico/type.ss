@@ -35,7 +35,9 @@
     make-struct-type
 
     type-paths)
-  (import (micascheme))
+  (import
+    (micascheme)
+    (tico path))
 
   (data (any-type))
   (data (value-type value))
@@ -219,10 +221,10 @@
         (lets
           ($name (struct-name $struct))
           (switch (struct-fields $struct)
-            ((null? _) (stack (list $name)))
+            ((null? _) (stack (make-path $name #f)))
             ((else $fields)
               (map
-                (partial cons $name)
+                (partial make-path $name)
                 (apply append (map type-paths $fields)))))))
       ((else $other)
         (throw not-path $type))))

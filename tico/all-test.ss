@@ -13,6 +13,7 @@
   (tico layout)
   (tico packet)
   (tico parameter)
+  (tico path)
   (tico reader)
   (tico value)
   (tico tico)

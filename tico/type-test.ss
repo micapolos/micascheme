@@ -264,8 +264,8 @@
               (struct 'd1 (stack))
               (struct 'd2 (stack)))))))
     (stack
-      '(a1 b1 c1)
-      '(a1 b1 c2)
-      '(a1 foo)
-      '(a1 b2 d1)
-      '(a1 b2 d2))))
+      (path a1 b1 c1)
+      (path a1 b1 c2)
+      (path a1 foo)
+      (path a1 b2 d1)
+      (path a1 b2 d2))))
