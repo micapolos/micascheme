@@ -2,6 +2,7 @@
   (export
     typing typing? typing-type typing-layment
     static-typing
+    test-typing
 
     native->typing
     literal->typing
@@ -54,6 +55,11 @@
     (tico datum))
 
   (data (typing type layment))
+
+  (define-syntax-rule (test-typing $name)
+    (type-datum->typing
+      (test-type $name)
+      (quote $name)))
 
   (define (static-typing $type)
     (typing $type

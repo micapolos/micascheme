@@ -18,6 +18,9 @@
     var var? var-index
     type-value
 
+    test-type
+    static-test-type
+
     type-application-opt
     type-application
     type-abstraction
@@ -45,6 +48,12 @@
   (data (abstraction arity body))
   (data (recursion items))
   (data (var index))
+
+  (define-syntax-rule (static-test-type $name)
+    (struct (quote $name) (list)))
+
+  (define-syntax-rule (test-type $name)
+    (struct (quote $name) (list (native-type))))
 
   (define (boolean-type)
     (struct 'boolean (list (native-type))))

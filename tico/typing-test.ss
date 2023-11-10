@@ -10,6 +10,13 @@
 
 (check
   (equal?
+    (test-typing foo)
+    (type-datum->typing
+      (test-type foo)
+      'foo)))
+
+(check
+  (equal?
     (static-typing (value-type "foo"))
     (typing
       (value-type "foo")

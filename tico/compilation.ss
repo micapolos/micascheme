@@ -1,6 +1,7 @@
 (library (tico compilation)
   (export
     compilation compilation? compilation-datum compilation-evaluation
+    test-compilation
 
     literal->compilation
     datum->compilation
@@ -33,6 +34,9 @@
     (tico parameter))
 
   (data (compilation datum evaluation))
+
+  (define-syntax-rule (test-compilation $name)
+    (datum->compilation (quote $name)))
 
   (define (literal->compilation $literal)
     (compilation

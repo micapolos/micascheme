@@ -13,6 +13,11 @@
 
 (check
   (equal?
+    (test-compilation a)
+    (datum->compilation 'a)))
+
+(check
+  (equal?
     (compilation-value (compilation 'string-append (global)))
     string-append))
 

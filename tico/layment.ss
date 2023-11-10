@@ -2,6 +2,7 @@
   (export
     layment layment? layment-layout layment-compilation
     layment-not-empty?
+    test-layment
 
     make-layment
     empty-layment
@@ -29,6 +30,11 @@
     (tico compilation))
 
   (data (layment layout compilation))
+
+  (define-syntax-rule (test-layment $name)
+    (make-layment
+      (simple-layout)
+      (test-compilation $name)))
 
   (define (empty-layment)
     (layment (empty-layout) #f))

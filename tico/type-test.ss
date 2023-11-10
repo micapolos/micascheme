@@ -1,5 +1,15 @@
 (import (micascheme) (tico type))
 
+(check
+  (equal?
+    (test-type a)
+    (struct 'a (list (native-type)))))
+
+(check
+  (equal?
+    (static-test-type a)
+    (struct 'a (list))))
+
 ; --- type-matches?
 
 (check

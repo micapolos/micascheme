@@ -9,6 +9,13 @@
 
 (check
   (equal?
+    (test-layment foo)
+    (make-layment
+      (simple-layout)
+      (test-compilation foo))))
+
+(check
+  (equal?
     (empty-layment)
     (layment (empty-layout) #f)))
 
