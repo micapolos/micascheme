@@ -5,6 +5,8 @@
     reader-read reader-read-list
     reader-eval
 
+    fold-reader
+    datums-reader
     list-reader)
   (import (micascheme))
 
@@ -37,6 +39,34 @@
 
   (define-syntax-rule (reader-eval $reader $item ...)
     (reader-end (reader-read-list $reader (list (quote $item) ...))))
+
+  (define (fold-reader $folded $append $child-reader $end)
+    (reader
+      (lambda ($literal)
+        (fold-reader
+          ($append $folded $literal)
+          $append
+          $child-reader
+          $end))
+      (lambda ($symbol)
+        ($child-reader $symbol
+          (lambda ($child-item)
+            (fold-reader
+              ($append $folded $child-item)
+              $append
+              $child-reader
+              $end))))
+      (lambda ()
+        ($end $folded))))
+
+  (define (datums-reader $end)
+    (fold-reader (stack) push
+      (lambda ($symbol $end)
+        (datums-reader
+          (lambda ($list)
+            ($end (cons $symbol $list)))))
+      (lambda ($stack)
+        ($end (reverse $stack)))))
 
   (define list-reader
     (case-lambda
