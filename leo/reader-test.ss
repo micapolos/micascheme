@@ -47,8 +47,3 @@
       (add 100 (add 200))
       negate)
     -311))
-
-(check
-  (equal?
-    (reader-eval (datums-reader identity) 1 2 (x 3 4))
-    `(1 2 (x 3 4))))

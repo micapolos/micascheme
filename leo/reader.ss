@@ -6,7 +6,6 @@
     reader-eval
 
     fold-reader
-    datums-reader
     list-reader)
   (import (micascheme))
 
@@ -59,37 +58,21 @@
       (lambda ()
         ($end $folded))))
 
-  (define (datums-reader $end)
-    (fold-reader (stack) push
-      (lambda ($symbol $end)
-        (datums-reader
-          (lambda ($list)
-            ($end (cons $symbol $list)))))
-      (lambda ($stack)
-        ($end (reverse $stack)))))
-
   (define list-reader
     (case-lambda
       (()
         (list-reader identity))
-      (($end-fn)
-        (list-reader (stack) $end-fn))
-      (($stack $end-fn)
-        (reader
-          (lambda ($appended-item)
-            (list-reader
-              (push $stack $appended-item)
-              $end-fn))
-          (lambda ($begin-symbol)
+      (($end)
+        (list-reader (stack) $end))
+      (($stack $end)
+        (fold-reader $stack push
+          (lambda ($symbol $end)
             (list-reader
               (lambda ($list)
-                (list-reader
-                  (push $stack
-                    (if (null? $list)
-                      $begin-symbol
-                      `(,$begin-symbol ,@$list)))
-                  $end-fn))))
-          (lambda ()
-            ($end-fn
-              (reverse $stack)))))))
+                ($end
+                  (if (null? $list)
+                    $symbol
+                    (cons $symbol $list))))))
+          (lambda ($stack)
+            ($end (reverse $stack)))))))
 )
