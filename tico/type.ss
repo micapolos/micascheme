@@ -4,7 +4,7 @@
     value-type value-type? value-type-value
     native-type native-type?
     type-type type-type?
-    list-type list-type? list-type-item-type
+    list-of list-of? list-of-item-type
     boolean-type
     number-type
     string-type
@@ -31,7 +31,7 @@
     type-matches? types-match?
     indexed-type-matching
 
-    make-list-type
+    make-list-of
     make-struct-type)
   (import (micascheme))
 
@@ -39,7 +39,7 @@
   (data (value-type value))
   (data (type-type))
   (data (native-type))
-  (data (list-type item-type))
+  (data (list-of item-type))
   (data (struct name fields))
   (data (arrow params result))
   (data (property params body))
@@ -200,13 +200,13 @@
       ((else $other)
         (throw type-value $other))))
 
-  (define (make-list-type $arity $item-type)
+  (define (make-list-of $arity $item-type)
     (arrow
       (make-list $arity $item-type)
-      (list-type $item-type)))
+      (list-of $item-type)))
 
   (define (make-struct-type)
     (arrow
-      (list (symbol-type) (list-type (type-type)))
+      (list (symbol-type) (list-of (type-type)))
       (type-type)))
 )

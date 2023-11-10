@@ -242,7 +242,7 @@
 
 (check
   (equal?
-    (make-list-type 3 (string-type))
+    (make-list-of 3 (string-type))
     (arrow
       (list (string-type) (string-type) (string-type))
-      (list-type (string-type)))))
+      (list-of (string-type)))))

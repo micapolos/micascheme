@@ -16,7 +16,7 @@
     string-type string-type? string!
 
     term-type term-type? term!
-    list-type list-type? list-type-item
+    list-of list-of? list-of-item
     pair-type pair-type? pair-type-first pair-type-second
 
     pair pair-first pair-second
@@ -51,7 +51,7 @@
   (data (universe depth))
   
   (data (term-type))
-  (data (list-type item))
+  (data (list-of item))
   (data (pair-type first second))
 
   (data (conditional condition consequent alternate))

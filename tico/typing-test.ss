@@ -212,7 +212,7 @@
   (equal?
     (make-list-typing 3 (string-type))
     (type-datum->typing
-      (make-list-type 3 (string-type))
+      (make-list-of 3 (string-type))
       'list)))
 
 (check

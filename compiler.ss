@@ -482,9 +482,9 @@
       ; list
       (typed 
         (native #`()) 
-        (function 1 (function-type! (list-of (variable 0)) (list-type (variable 0)))))
+        (function 1 (function-type! (list-of (variable 0)) (list-of (variable 0)))))
       (typed 
         (native #`cons)
-        (function 1 (function-type! (link (variable 0) (list (variable 0))) (list-type (variable 0)))))))
+        (function 1 (function-type! (link (variable 0) (list (variable 0))) (list-of (variable 0)))))))
 )
 

@@ -271,7 +271,7 @@
     (type-datum->typing
       (arrow
         (make-list $arity $type)
-        (list-type $type))
+        (list-of $type))
       'list))
 
   (define (make-struct-typing)
