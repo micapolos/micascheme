@@ -48,13 +48,13 @@
                   $recurse
                   $end-fn))))
           ((assert)
-            (($recurse $bindings
+            ($recurse $bindings
               (lambda ($assert-typings)
                 (top-level-reader
                   $bindings
                   (typings-resolve-assert $typings $assert-typings)
                   $recurse
-                  $end-fn)))))
+                  $end-fn))))
           ((prepare)
             ($recurse $bindings
               (lambda ($prepare-typings)

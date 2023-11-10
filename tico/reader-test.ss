@@ -163,3 +163,16 @@
         (list
           (read-typing 3)
           (read-typing 4))))))
+
+(check
+  (equal?
+    (read-typings
+      "foo" "bar"
+      (assert
+        (take (native "#t") (as boolean))
+        (take (native "(= 1 1)") (as boolean))))
+    (typings-resolve-assert
+      (read-typings "foo" "bar")
+      (read-typings
+        (take (native "#t") (as boolean))
+        (take (native "(= 1 1)") (as boolean))))))
