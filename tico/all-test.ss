@@ -18,6 +18,5 @@
   (tico value)
   (tico tico)
   (tico type)
-  (tico typed)
   (tico typing)
   (tico variable))

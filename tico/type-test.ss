@@ -1,24 +1,5 @@
 (import (micascheme) (tico type))
 
-(check (equal? (type-dynamic? (value-type "foo")) #f))
-(check (equal? (type-dynamic? (native-type)) #t))
-(check (equal? (type-dynamic? (type-type)) #t))
-
-(check (equal? (type-dynamic? (struct `foo (list (value-type "foo") (value-type "bar")))) #f))
-(check (equal? (type-dynamic? (struct `foo (list (value-type "foo") (number-type)))) #t))
-
-(check (equal? (type-dynamic? (arrow (list (value-type "foo")) (value-type "bar"))) #f))
-(check (equal? (type-dynamic? (arrow (list (value-type "foo")) (native-type))) #t))
-
-(check (equal? (type-dynamic? (property (string-type) (number-type))) #t))
-(check (equal? (type-dynamic? (property (string-type) (value-type 'empty))) #f))
-
-(check (raises? (lambda () (type-dynamic? `not-type))))
-
-; --- types-arity
-
-(check (equal? (types-arity (list (native-type) (value-type "foo") (native-type))) 2))
-
 ; --- type-matches?
 
 (check
@@ -148,35 +129,6 @@
     (type-matches? 
       (native-type)
       (arrow (list (any-type) (native-type)) (value-type "foo")))))
-
-; --- indexed-type-matching
-
-(let
-  (($types
-    (list
-      (native-type)
-      (struct 'x (list))
-      (struct 'x (list (native-type))))))
-  (check
-    (equal?
-      (indexed-type-matching $types (native-type))
-      (indexed (native-type) 0)))
-  (check
-    (equal?
-      (indexed-type-matching $types (struct 'x (list)))
-      (indexed (struct 'x (list)) #f)))
-  (check
-    (equal?
-      (indexed-type-matching $types (struct 'x (list (native-type))))
-      (indexed (struct 'x (list (native-type))) 1)))
-  (check
-    (equal?
-      (indexed-type-matching $types (any-type))
-      (indexed (native-type) 0)))
-  (check
-    (equal?
-      (indexed-type-matching $types (struct 'x (list (any-type))))
-      (indexed (struct 'x (list (native-type))) 1))))
 
 ; --- type-application
 

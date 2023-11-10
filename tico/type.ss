@@ -25,11 +25,8 @@
     type-access
     type-access-opt
 
-    type-dynamic?
-    types-arity
     type-ref
     type-matches? types-match?
-    indexed-type-matching
 
     make-list-of
     make-struct-type)
@@ -73,20 +70,6 @@
       ((symbol? _) (symbol-type))
       ((else $other) (throw literal->type $literal))))
 
-  (define (type-dynamic? $type)
-    (switch $type
-      ((value-type? _) #f)
-      ((native-type? _) #t)
-      ((type-type? _) #t)
-      ((struct? $struct)
-        (exists type-dynamic? (struct-fields $struct)))
-      ((arrow? $arrow)
-        (type-dynamic? (arrow-result $arrow)))
-      ((property? $property)
-        (type-dynamic? (property-body $property)))
-      ((else $other)
-        (throw not-type $other))))
-
   (define (type-application-opt $target $args)
     (switch-opt $target
       ((arrow? $arrow)
@@ -111,9 +94,6 @@
   (define (type-access $target $args)
     (or-throw
       (type-access-opt $target $args)))
-
-  (define (types-arity $types)
-    (length (filter type-dynamic? $types)))
 
   (define (type-matches? $type $pattern)
     (switch $pattern
@@ -165,23 +145,6 @@
     (and
       (= (length $types) (length $patterns))
       (for-all type-matches? $types $patterns)))
-
-  (define (indexed-type-matching-from $types $pattern $from)
-    (switch $types
-      ((null? _) #f)
-      ((pair? $pair)
-        (unpair $pair $type $types
-          (lets
-            ($dynamic? (type-dynamic? $type))
-            (cond
-              ((type-matches? $type $pattern)
-                (indexed $type (and $dynamic? $from)))
-              (else
-                (indexed-type-matching-from $types $pattern
-                  (if $dynamic? (+ $from 1) $from)))))))))
-
-  (define (indexed-type-matching $types $pattern)
-    (indexed-type-matching-from $types $pattern 0))
 
   (define (type-ref $type $pattern)
     (indexed-find
