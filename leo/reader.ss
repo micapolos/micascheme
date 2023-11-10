@@ -4,6 +4,7 @@
     reader-append reader-begin reader-end
     reader-read reader-read-list
     reader-eval
+    define-reader
 
     fold-reader
     reader-map
@@ -55,7 +56,13 @@
           ((else $other)
             ($fn $other))))))
 
-  (define (fold-reader $folded $append $child-reader $end)
+  (define-syntax-rule (define-reader ($name $arg ... $end) $body)
+    (define $name
+      (case-lambda
+        (($arg ...) ($name $arg ... identity))
+        (($arg ... $end) $body))))
+
+  (define-reader (fold-reader $folded $append $child-reader $end)
     (reader
       (lambda ($literal)
         (fold-reader
@@ -74,21 +81,15 @@
       (lambda ()
         ($end $folded))))
 
-  (define list-reader
-    (case-lambda
-      (()
-        (list-reader identity))
-      (($end)
-        (list-reader (stack) $end))
-      (($stack $end)
-        (fold-reader $stack push
-          (lambda ($symbol $end)
-            (list-reader
-              (lambda ($list)
-                ($end
-                  (if (null? $list)
-                    $symbol
-                    (cons $symbol $list))))))
-          (lambda ($stack)
-            ($end (reverse $stack)))))))
+  (define-reader (list-reader $end)
+    (fold-reader (stack) push
+      (lambda ($symbol $end)
+        (list-reader
+          (lambda ($list)
+            ($end
+              (if (null? $list)
+                $symbol
+                (cons $symbol $list))))))
+      (lambda ($stack)
+        ($end (reverse $stack)))))
 )
