@@ -20,4 +20,9 @@
         (push
           (block-entries $block)
           $entry))))
+
+  (define (block-begin $block)
+    (block
+      (block-bindings $block)
+      (stack)))
 )

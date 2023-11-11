@@ -7,6 +7,7 @@
     datum-abstraction
     generate-datum-abstraction
     lets-datum
+    let-datum
     datum-tuple
     tuple-ref-datum
     value->datum
@@ -63,6 +64,11 @@
     (switch $declarations
       ((null? _) $body)
       ((pair? $pair) `(lets ,@$pair ,$body))))
+
+  (define (let-datum $declarations $body)
+    (switch $declarations
+      ((null? _) $body)
+      ((pair? $pair) `(let (,@$pair) ,$body))))
 
   (define (tuple-ref-datum $arity $tuple $index)
     (case $arity
