@@ -97,7 +97,7 @@
 
 (check
   (equal?
-    (read-typings 1 2 (take 3 4))
+    (read-typings 1 2 (the 3 4))
     (stack
       (literal->typing 1)
       (literal->typing 2)
@@ -106,12 +106,12 @@
 
 (check
   (equal?
-    (read-typings 1 2 (with 3 (take 4 5)))
+    (read-typings 1 2 (with 3 (the 4 5)))
     (stack
       (literal->typing 1)
       (literal->typing 2)
       (literal->typing 3)
-      (typing-struct 'take
+      (typing-struct 'the
         (list
           (literal->typing 4)
           (literal->typing 5))))))
@@ -141,17 +141,17 @@
 (check
   (equal?
     (read-typings
-      (take
+      (the
         (native "+")
         (as number number (promising number)))
-      (take
+      (the
         (native "*")
         (as number number (promising number)))
       (apply 3 4))
     (stack
       (typing-application
         (read-typing
-          (take
+          (the
             (native "+")
             (as number number (promising number))))
         (list
@@ -159,7 +159,7 @@
           (read-typing 4)))
       (typing-application
         (read-typing
-          (take
+          (the
             (native "*")
             (as number number (promising number))))
         (list
@@ -189,13 +189,13 @@
     (read-typings
       "foo" "bar"
       (assert
-        (take (native "#t") (as boolean))
-        (take (native "(= 1 1)") (as boolean))))
+        (the (native "#t") (as boolean))
+        (the (native "(= 1 1)") (as boolean))))
     (typings-resolve-assert
       (read-typings "foo" "bar")
       (read-typings
-        (take (native "#t") (as boolean))
-        (take (native "(= 1 1)") (as boolean))))))
+        (the (native "#t") (as boolean))
+        (the (native "(= 1 1)") (as boolean))))))
 
 (check
   (equal?

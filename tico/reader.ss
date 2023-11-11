@@ -60,12 +60,12 @@
                   (push-all $typings
                     (map typing-prepare $prepare-typings))
                   $end))))
-          ((take)
+          ((the)
             (top-level-reader $bindings (stack)
-              (lambda ($take-typings)
+              (lambda ($the-typings)
                 (top-level-reader
                   $bindings
-                  (push-all $typings $take-typings)
+                  (push-all $typings $the-typings)
                   $end))))
           ((with)
             (with-reader $bindings (stack)

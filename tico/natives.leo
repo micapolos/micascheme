@@ -1,36 +1,48 @@
 comment contains
   native functions
   like: "+", "-", "string-append"
-take
+the
+  native "="
+  as
+    number
+    equals number
+    promising boolean
+the
   native "+"
   as
     number
     plus number
     promising number
-take
+the
   native "-"
   as
     number
     minus number
     promising number
-take
+the
   native "*"
   as
     number
     times number
     promising number
-take
+the
+  native "string=?"
+  as
+    string
+    equals string
+    promising boolean
+the
   native "string-append"
   as
     string
-    append string
+    plus string
     promising string
-take
+the
   native "string-length"
   as
     string
     offering length number
-take
+the
   native "number->string"
   as
     number
