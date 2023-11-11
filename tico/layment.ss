@@ -63,7 +63,7 @@
     (layment $layout (datum->constant-compilation $datum)))
 
   (define (layment-datum $layment)
-    (compilation-top-level-datum
+    (compilation-datum
       (layment-compilation $layment)))
 
   (define (layment-value $layment)

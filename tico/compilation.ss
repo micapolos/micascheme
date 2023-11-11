@@ -8,10 +8,8 @@
     datum->constant-compilation
     variable-compilation
 
-    compilation-top-level-datum
     compilation-value
 
-    compilation->generate-dependency-opt
     generate-parameter-compilation
 
     compilation-application
@@ -27,8 +25,6 @@
     (tico constant)
     (tico variable)
     (tico global)
-    (tico dependency)
-    (tico packet)
     (tico datum)
     (tico evaluation)
     (tico parameter))
@@ -49,11 +45,6 @@
   (define (datum->constant-compilation $datum)
     (compilation $datum (datum->constant $datum)))
 
-  (define (compilation-top-level-datum $compilation)
-    (lets-datum
-      (evaluation-lets-datums (compilation-evaluation $compilation))
-      (compilation-datum $compilation)))
-
   (define (compilation-value $compilation)
     (switch (compilation-evaluation $compilation)
       ((constant? $constant)
@@ -62,35 +53,6 @@
         (datum->value (compilation-datum $compilation)))
       ((else _)
         (throw compilation-value $compilation))))
-
-  (define (compilation->generate-dependency-opt $compilation)
-    (switch (compilation-evaluation $compilation)
-      ((constant? $constant)
-        (dependency
-          (generate-symbol)
-          (packet
-            (compilation-datum $compilation)
-            (constant-value $constant))))
-      ((else _) #f)))
-
-  (define (compilation->datum-dependencies $compilation)
-    (switch (compilation-evaluation $compilation)
-      ((constant? $constant)
-        (lets
-          ($symbol (generate-symbol))
-          (cons $symbol
-            (stack
-              (dependency $symbol
-                (packet
-                  (compilation-datum $compilation)
-                  (constant-value $constant)))))))
-      ((global? $global) (stack))
-      ((variable? $variable)
-        (cons
-          (compilation-datum $compilation)
-          (variable-dependencies $variable)))
-      ((parameter? $other)
-        (throw compilation->datum-variable $other))))
 
   (define (generate-parameter-compilation)
     (compilation (generate-symbol) (parameter)))
@@ -119,10 +81,10 @@
       ((parameter? $parameter)
         (compilation
           (compilation-datum $compilation)
-          (variable $index (stack))))))
+          (variable $index)))))
 
   (define (variable-compilation $datum $index)
-    (compilation $datum (variable $index (stack))))
+    (compilation $datum (variable $index)))
 
   (define (compilation-constantize $compilation)
     (switch (compilation-evaluation $compilation)
@@ -138,11 +100,7 @@
         (map compilation-datum $args))
       (evaluation-application
         (compilation-evaluation (compilation-constantize $target))
-        (map compilation-evaluation (map compilation-constantize $args))
-        (lambda ()
-          (filter-opts
-            (ordered-map compilation->generate-dependency-opt
-              (reverse (cons $target $args))))))))
+        (map compilation-evaluation (map compilation-constantize $args)))))
 
   (define (compilation-abstraction $param-compilations $body-compilation)
     (switch (compilation-evaluation $body-compilation)
@@ -164,11 +122,9 @@
               $variable))
           ((false? _)
             (datum->compilation
-              (dependencies-lets
-                (variable-dependencies $variable)
-                (datum-abstraction
-                  (map compilation-datum $param-compilations)
-                  (compilation-datum $body-compilation)))))))
+              (datum-abstraction
+                (map compilation-datum $param-compilations)
+                (compilation-datum $body-compilation))))))
       ((parameter? $parameter)
         (throw compilation-abstraction $param-compilations $body-compilation))))
 
@@ -186,15 +142,11 @@
             (constant-struct $name $constants)))
         (else
           (lets
-            ($datum-dependencies-list
-              (reverse (map compilation->datum-dependencies (reverse $compilations))))
-            ($datums (map car $datum-dependencies-list))
-            ($dependencies-list (map cdr $datum-dependencies-list))
+            ($datums (map compilation-datum $compilations))
             (compilation
               (datum-struct $name $datums)
               (variable
-                (variable-index-flatten (map variable-index $variables))
-                (dependencies-flatten $dependencies-list))))))))
+                (variable-index-flatten (map variable-index $variables)))))))))
 
   (define (compilation-ref $arity $target $index)
     (compilation

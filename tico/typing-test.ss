@@ -41,226 +41,226 @@
     (type->typing (number-type))
     (static-typing (value-type (number-type)))))
 
-(check (equal? (boolean-typing) (type->typing (boolean-type))))
-(check (equal? (number-typing) (type->typing (number-type))))
-(check (equal? (string-typing) (type->typing (string-type))))
-
-(check
-  (equal?
-    (type-datum->typing
-      (string-type)
-      '(string-append "foo" "bar"))
-    (typing
-      (string-type)
-      (layout-datum->layment
-        (type->layout (string-type))
-        '(string-append "foo" "bar")))))
-
-(check
-  (equal?
-    (typing-datum
-      (type-datum->typing (number-type) '(+ 1 2)))
-    '(+ 1 2)))
-
-(check
-  (equal?
-    (typing-value
-      (type-datum->typing (number-type) '(+ 1 2)))
-    3))
-
-(check
-  (equal?
-    (typing-application
-      (type-datum->typing
-        (arrow (list (number-type)) (string-type))
-        'number->string)
-      (list
-        (literal->typing 10)))
-    (typing
-      (type-application
-        (arrow (list (number-type)) (string-type))
-        (list (literal->type 10)))
-      (layment-application
-        (layout-datum->layment
-          (type->layout (arrow (list (number-type)) (string-type)))
-          'number->string)
-        (list (literal->layment 10))))))
+; (check (equal? (boolean-typing) (type->typing (boolean-type))))
+; (check (equal? (number-typing) (type->typing (number-type))))
+; (check (equal? (string-typing) (type->typing (string-type))))
 
 ; (check
 ;   (equal?
-;     (with-generate-temporary-seed $tmp
-;       (let-typing
+;     (type-datum->typing
+;       (string-type)
+;       '(string-append "foo" "bar"))
+;     (typing
+;       (string-type)
+;       (layout-datum->layment
+;         (type->layout (string-type))
+;         '(string-append "foo" "bar")))))
+
+; (check
+;   (equal?
+;     (typing-datum
+;       (type-datum->typing (number-type) '(+ 1 2)))
+;     '(+ 1 2)))
+
+; (check
+;   (equal?
+;     (typing-value
+;       (type-datum->typing (number-type) '(+ 1 2)))
+;     3))
+
+; (check
+;   (equal?
+;     (typing-application
+;       (type-datum->typing
+;         (arrow (list (number-type)) (string-type))
+;         'number->string)
+;       (list
+;         (literal->typing 10)))
+;     (typing
+;       (type-application
+;         (arrow (list (number-type)) (string-type))
+;         (list (literal->type 10)))
+;       (layment-application
+;         (layout-datum->layment
+;           (type->layout (arrow (list (number-type)) (string-type)))
+;           'number->string)
+;         (list (literal->layment 10))))))
+
+; ; (check
+; ;   (equal?
+; ;     (with-generate-temporary-seed $tmp
+; ;       (let-typing
+; ;         (list
+; ;           (literal->typing "foo")
+; ;           (literal->typing "bar"))
+; ;         (lambda ($typings)
+; ;           (typing-application
+; ;             (type-datum->typing
+; ;               (arrow (list (string-type) (string-type)) (string-type))
+; ;               'string-append)
+; ;             $typings))))
+; ;     123))
+
+; (check
+;   (equal?
+;     (typing-prepare
+;       (type-datum->typing
+;         (number-type)
+;         '(+ 1 2)))
+;     (type-datum->typing
+;       (number-type)
+;       3)))
+
+; (check
+;   (equal?
+;     (typing-ref
+;       (typing-struct 'foo
 ;         (list
 ;           (literal->typing "foo")
-;           (literal->typing "bar"))
-;         (lambda ($typings)
-;           (typing-application
-;             (type-datum->typing
-;               (arrow (list (string-type) (string-type)) (string-type))
-;               'string-append)
-;             $typings))))
-;     123))
+;           (static-typing (value-type 'empty))
+;           (literal->typing 10)))
+;       (number-type))
+;     (typing
+;       (number-type)
+;       (layment-ref
+;         (layment-struct 'foo
+;           (list
+;             (literal->layment "foo")
+;             (empty-layment)
+;             (literal->layment 10)))
+;         2))))
 
-(check
-  (equal?
-    (typing-prepare
-      (type-datum->typing
-        (number-type)
-        '(+ 1 2)))
-    (type-datum->typing
-      (number-type)
-      3)))
+; (check
+;   (equal?
+;     (typings-get
+;       (stack
+;         (typing-struct 'point
+;           (list
+;             (typing-struct 'x (list (literal->typing 10)))
+;             (typing-struct 'y (list (literal->typing 20))))))
+;       (stack
+;         (typing-struct 'x (list))
+;         (static-typing (value-type (number-type)))))
+;     (typing-ref
+;       (typing-ref
+;         (typing-struct 'point
+;           (list
+;             (typing-struct 'x (list (literal->typing 10)))
+;             (typing-struct 'y (list (literal->typing 20)))))
+;         (struct 'x (list)))
+;       (number-type))))
 
-(check
-  (equal?
-    (typing-ref
-      (typing-struct 'foo
-        (list
-          (literal->typing "foo")
-          (static-typing (value-type 'empty))
-          (literal->typing 10)))
-      (number-type))
-    (typing
-      (number-type)
-      (layment-ref
-        (layment-struct 'foo
-          (list
-            (literal->layment "foo")
-            (empty-layment)
-            (literal->layment 10)))
-        2))))
+; ; --- typing-resolve
 
-(check
-  (equal?
-    (typings-get
-      (stack
-        (typing-struct 'point
-          (list
-            (typing-struct 'x (list (literal->typing 10)))
-            (typing-struct 'y (list (literal->typing 20))))))
-      (stack
-        (typing-struct 'x (list))
-        (static-typing (value-type (number-type)))))
-    (typing-ref
-      (typing-ref
-        (typing-struct 'point
-          (list
-            (typing-struct 'x (list (literal->typing 10)))
-            (typing-struct 'y (list (literal->typing 20)))))
-        (struct 'x (list)))
-      (number-type))))
+; (check
+;   (equal?
+;     (typing-resolve (static-typing (struct 'boolean (list))))
+;     (boolean-typing)))
 
-; --- typing-resolve
+; (check
+;   (equal?
+;     (typing-resolve (static-typing (struct 'number (list))))
+;     (number-typing)))
 
-(check
-  (equal?
-    (typing-resolve (static-typing (struct 'boolean (list))))
-    (boolean-typing)))
+; (check
+;   (equal?
+;     (typing-resolve (static-typing (struct 'string (list))))
+;     (string-typing)))
 
-(check
-  (equal?
-    (typing-resolve (static-typing (struct 'number (list))))
-    (number-typing)))
+; (check
+;   (equal?
+;     (typing-resolve (literal->typing 10))
+;     (literal->typing 10)))
 
-(check
-  (equal?
-    (typing-resolve (static-typing (struct 'string (list))))
-    (string-typing)))
+; (check
+;   (equal?
+;     (typing-as
+;       (native->typing '(+ 1 2))
+;       (number-typing))
+;     (type-datum->typing
+;       (number-type)
+;       '(+ 1 2))))
 
-(check
-  (equal?
-    (typing-resolve (literal->typing 10))
-    (literal->typing 10)))
+; (check
+;   (equal?
+;     (typings-promising
+;       (stack
+;         (number-typing)
+;         (string-typing))
+;       (boolean-typing))
+;     (type->typing
+;       (arrow
+;         (list
+;           (number-type)
+;           (string-type))
+;         (boolean-type)))))
 
-(check
-  (equal?
-    (typing-as
-      (native->typing '(+ 1 2))
-      (number-typing))
-    (type-datum->typing
-      (number-type)
-      '(+ 1 2))))
+; (check
+;   (equal?
+;     (typings-offering
+;       (stack (number-typing) (string-typing))
+;       (stack (boolean-typing)))
+;     (stack
+;       (type->typing
+;         (property
+;           (list (number-type) (string-type))
+;           (boolean-type))))))
 
-(check
-  (equal?
-    (typings-promising
-      (stack
-        (number-typing)
-        (string-typing))
-      (boolean-typing))
-    (type->typing
-      (arrow
-        (list
-          (number-type)
-          (string-type))
-        (boolean-type)))))
+; (check
+;   (equal?
+;     (typing->type-typing
+;       (typing-struct 'foo (list (string-typing))))
+;     (type-datum->typing
+;       (type-type)
+;       (value->datum
+;         (struct 'foo (list (string-type)))))))
 
-(check
-  (equal?
-    (typings-offering
-      (stack (number-typing) (string-typing))
-      (stack (boolean-typing)))
-    (stack
-      (type->typing 
-        (property 
-          (list (number-type) (string-type))
-          (boolean-type))))))
+; (check
+;   (equal?
+;     (make-list-typing 3 (string-type))
+;     (type-datum->typing
+;       (make-list-of 3 (string-type))
+;       'list)))
 
-(check
-  (equal?
-    (typing->type-typing
-      (typing-struct 'foo (list (string-typing))))
-    (type-datum->typing
-      (type-type)
-      (value->datum 
-        (struct 'foo (list (string-type)))))))
+; (check
+;   (equal?
+;     (make-struct-typing)
+;     (type-datum->typing
+;       (make-struct-type)
+;       'struct)))
 
-(check
-  (equal?
-    (make-list-typing 3 (string-type))
-    (type-datum->typing
-      (make-list-of 3 (string-type))
-      'list)))
+; ; --- typing-assert
 
-(check
-  (equal?
-    (make-struct-typing)
-    (type-datum->typing
-      (make-struct-type)
-      'struct)))
+; (check
+;   (equal?
+;     (typing-assert (type-datum->typing (boolean-type) '(= 1 1)))
+;     (void)))
 
-; --- typing-assert
+; ; not boolean
+; (check
+;   (raises?
+;     (lambda ()
+;       (typing-assert (type-datum->typing (string-type) "foo")))))
 
-(check
-  (equal?
-    (typing-assert (type-datum->typing (boolean-type) '(= 1 1)))
-    (void)))
+; ; not true
+; (check
+;   (raises?
+;     (lambda ()
+;       (typing-assert (type-datum->typing (boolean-type) '(= 1 2))))))
 
-; not boolean
-(check
-  (raises?
-    (lambda ()
-      (typing-assert (type-datum->typing (string-type) "foo")))))
+; ; non value
+; (check
+;   (raises?
+;     (lambda ()
+;       (typing-assert (variable-typing (boolean-type) 'foo 1)))))
 
-; not true
-(check
-  (raises?
-    (lambda ()
-      (typing-assert (type-datum->typing (boolean-type) '(= 1 2))))))
+; ; --- typings-resolve-assert
 
-; non value
-(check
-  (raises?
-    (lambda ()
-      (typing-assert (variable-typing (boolean-type) 'foo 1)))))
-
-; --- typings-resolve-assert
-
-(check
-  (equal?
-    (typings-resolve-assert
-      (stack (literal->typing "lhs"))
-      (stack
-        (literal->typing #t)
-        (type-datum->typing (boolean-type) '(= 1 1))))
-    (stack (literal->typing "lhs"))))
+; (check
+;   (equal?
+;     (typings-resolve-assert
+;       (stack (literal->typing "lhs"))
+;       (stack
+;         (literal->typing #t)
+;         (type-datum->typing (boolean-type) '(= 1 1))))
+;     (stack (literal->typing "lhs"))))

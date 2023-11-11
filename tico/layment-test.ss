@@ -87,7 +87,7 @@
           (make-layment (simple-layout) (compilation 'v2 (parameter))))
         (make-layment
           (simple-layout)
-          (compilation 'v1 (variable 0 (stack)))))
+          (compilation 'v1 (variable 0))))
       (list
         (literal->layment "foo")
         (literal->layment "bar")))
@@ -102,7 +102,7 @@
           (list
             (compilation 'v1 (parameter))
             (compilation 'v2 (parameter)))
-          (compilation 'v1 (variable 0 (stack))))
+          (compilation 'v1 (variable 0)))
         (list
           (literal->compilation "foo")
           (literal->compilation "bar"))))))
