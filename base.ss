@@ -39,7 +39,7 @@
     fold-while
     find-index
     list-set list-ref-opt list-drop
-    switch switch-opt
+    switch switch-opt switch-exclusive
     or-throw
     unpair pair-values
     associ
@@ -310,6 +310,13 @@
     (switch $expr
       (($pred $var) $body ...) ...
       ((else _) #f)))
+
+  (define-syntax-rule (switch-exclusive $expr (($pred $var) $body ...) ...)
+    (switch $expr
+      (($pred $var) $body ...) ...
+      ((else _)
+        (throw non-exclusive
+          (quote (switch $expr $pred ...))))))
 
   (define (fold-while $pred $fn $initial $list)
     (cond

@@ -187,6 +187,30 @@
       ((string? $string) (string-append $string "!"))
       ((number? $number) (number->string $number)))
     #f))
+
+; === switch-exclusive
+
+(check
+  (equal?
+    (switch-exclusive (string-append "foo" "bar")
+      ((string? $string) (string-append $string "!"))
+      ((number? $number) (number->string $number)))
+    "foobar!"))
+
+(check
+  (equal?
+    (switch-exclusive (+ 1 2)
+      ((string? $string) (string-append $string "!"))
+      ((number? $number) (number->string $number)))
+    "3"))
+
+(check
+  (raises?
+    (lambda ()
+      (switch-exclusive #\a
+        ((string? $string) (string-append $string "!"))
+        ((number? $number) (number->string $number))))))
+
 ; === fold-while ===
 
 (check
