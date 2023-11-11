@@ -1,4 +1,4 @@
-load tico natives
+load tico core
 do
   "Hello, "
   plus "world!"
