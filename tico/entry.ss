@@ -1,15 +1,15 @@
 (library (tico entry)
   (export
-    entry entry? entry-parameter entry-argument
-    typing->entry)
+    entry entry? entry-parameters entry-arguments
+    typings->entry)
   (import
     (micascheme)
     (tico typing))
 
-  (data (entry parameter argument))
+  (data (entry parameters arguments))
 
-  (define (typing->entry $typing)
+  (define (typings->entry $typings)
     (entry
-      (typing-parameter $typing)
-      $typing))
+      (ordered-map typing-parameter $typings)
+      $typings))
 )

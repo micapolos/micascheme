@@ -1,7 +1,7 @@
 (library (tico block)
   (export
     block block? block-bindings block-entries
-    block-define)
+    block-use-typings)
   (import
     (micascheme)
     (tico binding)
@@ -10,13 +10,13 @@
 
   (data (block bindings entries))
 
-  (define (block-define $block $typing)
+  (define (block-use-typings $block $typings)
     (lets
-      ($entry (typing->entry $typing))
+      ($entry (typings->entry $typings))
       (block
-        (push
+        (push-list
           (block-bindings $block)
-          (binding (entry-parameter $entry)))
+          (map binding (map entry-parameters $entry)))
         (push
           (block-entries $block)
           $entry))))

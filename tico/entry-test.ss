@@ -5,9 +5,15 @@
 (check
   (equal?
     (with-tmps
-      (typing->entry
-        (test-typing t1)))
+      (typings->entry
+        (list
+          (test-typing t1)
+          (test-typing t2))))
     (with-tmps
       (entry
-        (typing-parameter (test-typing t1))
-        (test-typing t1)))))
+        (list
+          (typing-parameter (test-typing t1))
+          (typing-parameter (test-typing t2)))
+        (list
+          (test-typing t1)
+          (test-typing t2))))))
