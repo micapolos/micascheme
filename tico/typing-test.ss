@@ -13,7 +13,7 @@
     (test-typing foo)
     (type-datum->typing
       (test-type foo)
-      'foo)))
+      (test-datum foo))))
 
 (check
   (equal?

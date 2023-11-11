@@ -12,7 +12,6 @@
     number-typing
     string-typing
     type-datum->typing
-    type-datum->constant-typing
     single-typing
 
     typing-datum
@@ -60,7 +59,7 @@
   (define-syntax-rule (test-typing $name)
     (type-datum->typing
       (test-type $name)
-      (quote $name)))
+      (test-datum $name)))
 
   (define (static-typing $type)
     (typing $type
@@ -92,12 +91,6 @@
   (define (type-datum->typing $type $datum)
     (typing $type
       (layout-datum->layment
-        (type->layout $type)
-        $datum)))
-
-  (define (type-datum->constant-typing $type $datum)
-    (typing $type
-      (layout-datum->constant-layment
         (type->layout $type)
         $datum)))
 

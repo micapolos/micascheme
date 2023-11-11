@@ -5,7 +5,6 @@
 
     literal->compilation
     datum->compilation
-    datum->constant-compilation
     variable-compilation
 
     compilation-value
@@ -24,7 +23,6 @@
     (tico constant)
     (tico constant)
     (tico variable)
-    (tico global)
     (tico datum)
     (tico evaluation)
     (tico parameter)
@@ -33,7 +31,7 @@
   (data (compilation datum evaluation))
 
   (define-syntax-rule (test-compilation $name)
-    (datum->compilation (quote $name)))
+    (datum->compilation (test-datum $name)))
 
   (define (literal->compilation $literal)
     (compilation
@@ -41,17 +39,14 @@
       (constant $literal)))
 
   (define (datum->compilation $datum)
-    (compilation $datum (global)))
-
-  (define (datum->constant-compilation $datum)
     (compilation $datum (datum->constant $datum)))
 
   (define (compilation-value $compilation)
-    (switch-exclusive (compilation-evaluation $compilation)
+    (switch (compilation-evaluation $compilation)
       ((constant? $constant)
         (constant-value $constant))
-      ((global? $global)
-        (datum->value (compilation-datum $compilation)))))
+      ((else $other)
+        (throw compilation-value $compilation))))
 
   (define (generate-parameter-compilation)
     (compilation (generate-symbol) (parameter)))
@@ -62,8 +57,6 @@
       (switch-exclusive (compilation-evaluation $compilation)
         ((constant? $constant)
           $constant)
-        ((global? $global)
-          $global)
         ((variable? $variable)
           (parameter))
         ((extern? $extern)
@@ -74,8 +67,6 @@
   (define (compilation-variable $compilation $index)
     (switch-exclusive (compilation-evaluation $compilation)
       ((constant? $constant)
-        $compilation)
-      ((global? $global)
         $compilation)
       ((variable? $variable)
         (throw compilation-variable $compilation))
@@ -91,24 +82,17 @@
   (define (variable-compilation $datum $index)
     (compilation $datum (variable $index)))
 
-  (define (compilation-constantize $compilation)
-    (switch (compilation-evaluation $compilation)
-      ((global? $global)
-        (datum->constant-compilation
-          (compilation-datum $compilation)))
-      ((else $other) $compilation)))
-
   (define (compilation-application $target $args)
     (compilation
       (datum-application
         (compilation-datum $target)
         (map compilation-datum $args))
       (evaluation-application
-        (compilation-evaluation (compilation-constantize $target))
-        (map compilation-evaluation (map compilation-constantize $args)))))
+        (compilation-evaluation $target)
+        (map compilation-evaluation $args))))
 
   (define (compilation-abstraction $param-compilations $body-compilation)
-    (switch-exclusive (compilation-evaluation (compilation-constantize $body-compilation))
+    (switch-exclusive (compilation-evaluation $body-compilation)
       ((constant? $constant)
         (compilation
           (datum-abstraction

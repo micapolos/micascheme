@@ -1,5 +1,6 @@
 (library (tico datum)
   (export
+    test-datum
     literal->datum
     datum-application
     generate-datum-params
@@ -14,6 +15,9 @@
     datum-ref
     string->read-datum)
   (import (micascheme) (tico type))
+
+  (define-syntax-rule (test-datum $name)
+    (quote (quote $name)))
 
   (define (literal->datum $literal)
     (switch $literal

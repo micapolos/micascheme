@@ -9,7 +9,6 @@
     literal->layment
     variable-layment
     layout-datum->layment
-    layout-datum->constant-layment
 
     layment-datum
     layment-value
@@ -58,9 +57,6 @@
 
   (define (layout-datum->layment $layout $datum)
     (layment $layout (datum->compilation $datum)))
-
-  (define (layout-datum->constant-layment $layout $datum)
-    (layment $layout (datum->constant-compilation $datum)))
 
   (define (layment-datum $layment)
     (compilation-datum

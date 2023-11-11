@@ -3,7 +3,6 @@
   (tico compilation)
   (tico constant)
   (tico variable)
-  (tico global)
   (tico datum)
   (tico evaluation)
   (tico variable)
@@ -11,13 +10,8 @@
 
 (check
   (equal?
-    (test-compilation a)
-    (datum->compilation 'a)))
-
-(check
-  (equal?
-    (compilation-value (compilation 'string-append (global)))
-    string-append))
+    (test-compilation foo)
+    (datum->compilation ''foo)))
 
 (check
   (equal?
@@ -39,7 +33,7 @@
     (datum->compilation '(string-append "foo" "bar"))
     (compilation
       '(string-append "foo" "bar")
-      (global))))
+      (datum->constant '(string-append "foo" "bar")))))
 
 (check
   (equal?
@@ -55,7 +49,7 @@
       (list
         (literal->compilation "foo")
         (literal->compilation "bar")))
-    (datum->constant-compilation
+    (datum->compilation
       '(string-append "foo" "bar"))))
 
 (check
@@ -83,7 +77,7 @@
       (list
         (literal->compilation "foo")
         (literal->compilation "bar")))
-    (datum->constant-compilation
+    (datum->compilation
       (datum-application
         (datum-abstraction
           (list 'v1 'v2)

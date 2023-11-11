@@ -72,7 +72,7 @@
       (list
         (literal->layment "foo")
         (literal->layment "bar")))
-    (layout-datum->constant-layment
+    (layout-datum->layment
       (simple-layout)
       '(string-append "foo" "bar"))))
 

@@ -7,7 +7,6 @@
     (tico variable)
     (tico parameter)
     (tico datum)
-    (tico global)
     (tico extern))
 
   ;(enum (evaluation constant variable parameter))
@@ -23,7 +22,6 @@
         (else
           (lets
             ($variables (filter variable? $evaluations))
-            ($globals (ensure null? (filter global? $evaluations)))
             ($parameters (ensure null? (filter parameter? $evaluations)))
             ($variable (variable-flatten $variables))
             (variable
