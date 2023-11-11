@@ -25,8 +25,7 @@
     (tico variable)
     (tico datum)
     (tico evaluation)
-    (tico parameter)
-    (tico extern))
+    (tico parameter))
 
   (data (compilation datum evaluation))
 
@@ -59,10 +58,8 @@
           $constant)
         ((variable? $variable)
           (parameter))
-        ((extern? $extern)
-          $extern)
         ((parameter? $parameter)
-          (throw compilation-parameter $compilation)))))
+          (parameter)))))
 
   (define (compilation-variable $compilation $index)
     (switch-exclusive (compilation-evaluation $compilation)
@@ -70,10 +67,6 @@
         $compilation)
       ((variable? $variable)
         (throw compilation-variable $compilation))
-      ((extern? $extern)
-        (compilation
-          (compilation-datum $compilation)
-          $extern))
       ((parameter? $parameter)
         (compilation
           (compilation-datum $compilation)
@@ -114,14 +107,12 @@
               (datum-abstraction
                 (map compilation-datum $param-compilations)
                 (compilation-datum $body-compilation))))))
-      ((extern? $extern)
+      ((parameter? $parameter)
         (compilation
           (datum-abstraction
             (map compilation-datum $param-compilations)
             (compilation-datum $body-compilation))
-          (extern)))
-      ((parameter? $parameter)
-        (throw compilation-abstraction $param-compilations $body-compilation))))
+          $parameter))))
 
   (define (compilation-struct $name $compilations)
     (lets

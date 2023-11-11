@@ -9,7 +9,6 @@
   (tico entry)
   (tico evaluation)
   (tico expression)
-  (tico extern)
   (tico layment)
   (tico layout)
   (tico parameter)

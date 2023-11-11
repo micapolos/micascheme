@@ -1,3 +1,0 @@
-(import
-  (micascheme)
-  (tico extern))
