@@ -45,10 +45,12 @@
 
 (check
   (equal?
-    (with-generate-temporary-seed $tmp
+    (with-tmps
       (bindings-match
-        (stack
-          (binding (typing-parameter (literal->typing 128)))
-          (generate-parameter-binding (string-type)))
+        (reverse
+          (list
+            (binding (typing-parameter (literal->typing 128)))
+            (generate-parameter-binding (string-type))))
         (number-type)))
-    (literal->typing 128)))
+    (with-tmps
+      (typing-variable (typing-parameter (literal->typing 128)) 1))))

@@ -28,6 +28,7 @@
     typing-ref
     typing-native
     typing-prepare
+    typings-do
     typing-get
     typings-get
     typing-as
@@ -313,4 +314,9 @@
       (throw assertion-not-boolean (typing-datum $typing)))
     (unless (typing-value $typing)
       (throw assertiong-failed (typing-datum $typing))))
+
+  (define (typings-do $parameter-typings $argument-typings $body-typing)
+    (typing-application
+      (typing-abstraction $parameter-typings $body-typing)
+      $argument-typings))
 )

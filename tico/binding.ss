@@ -8,7 +8,8 @@
     typing->binding
     bindings-get*
     bindings-resolve-opt
-    bindings-resolve)
+    bindings-resolve
+    bindings-do)
   (import
     (micascheme)
     (tico typing)
@@ -99,4 +100,14 @@
     (or
       (bindings-resolve-opt $bindings $typings)
       $typings))
+
+  (define (bindings-do $bindings $typings $fn)
+    (lets
+      ($parameter-typings (map typing-parameter $typings))
+      (typings-do
+        $parameter-typings
+        $typings
+        ($fn
+          (push-list $bindings
+            (map binding $parameter-typings))))))
 )

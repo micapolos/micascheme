@@ -1,6 +1,8 @@
 (library (tico reader)
   (export
     typings-reader
+    bindings-read-typings
+    bindings-read-typing
     read-typings
     read-typing)
   (import
@@ -84,14 +86,21 @@
                       (stack (typings-get $typings $get-typings))))
                   $end))))
           ((do)
-            (top-level-reader
-              (push-all $bindings (map typing->binding $typings))
-              (stack)
-              (lambda ($body-typings)
-                (top-level-reader
-                  $bindings
-                  $body-typings
-                  $end))))
+            (lets
+              ($argument-typings (reverse $typings))
+              ($parameter-typings (map typing-parameter $argument-typings))
+              (top-level-reader
+                (push-list $bindings (map binding $parameter-typings))
+                (stack)
+                (lambda ($body-typings)
+                  (top-level-reader
+                    $bindings
+                    (stack
+                      (typings-do
+                        $parameter-typings
+                        $argument-typings
+                        (force-single $body-typings)))
+                    $end)))))
           ((apply)
             (top-level-reader $bindings (stack)
               (lambda ($arg-typings)
@@ -195,13 +204,19 @@
   (define typings-reader
     (top-level-reader (stack) (stack) identity))
 
-  (define-syntax-rule (read-typings $body ...)
+  (define-syntax-rule (bindings-read-typings $bindings $body ...)
     (reader-eval
-      typings-reader
+      (top-level-reader $bindings (stack) identity)
       $body ...))
 
-  (define-syntax-rule (read-typing $body ...)
+  (define-syntax-rule (bindings-read-typing $bindings $body ...)
     (car
       (ensure single?
-        (read-typings $body ...))))
+        (bindings-read-typings $bindings $body ...))))
+
+  (define-syntax-rule (read-typings $body ...)
+    (bindings-read-typings (stack) $body ...))
+
+  (define-syntax-rule (read-typing $body ...)
+    (bindings-read-typing (stack) $body ...))
 )

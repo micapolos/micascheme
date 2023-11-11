@@ -2,7 +2,8 @@
   (micascheme)
   (tico reader)
   (tico typing)
-  (tico type))
+  (tico type)
+  (tico binding))
 
 (check
   (equal?
@@ -126,15 +127,16 @@
 
 (check
   (equal?
-    (read-typings 1 2 (do 3 4))
-    (stack
-      (literal->typing 3)
-      (literal->typing 4))))
-
-(check
-  (equal?
-    (read-typing 1 "foo" (do (get string)))
-    (read-typing "foo")))
+    (with-tmps
+      (read-typing
+        128 "foo"
+        (do (get string))))
+    (with-tmps
+      (bindings-do (stack)
+        (reverse (read-typings 128 "foo"))
+        (lambda ($bindings)
+          (bindings-read-typing $bindings
+            (get string)))))))
 
 (check
   (equal?

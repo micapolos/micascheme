@@ -210,18 +210,26 @@
 
 (check
   (equal?
-    (compilation-parameter (literal->compilation "foo"))
-    (literal->compilation "foo")))
+    (with-tmps
+      (compilation-parameter
+        (literal->compilation "foo")))
+    (with-tmps
+      (compilation (generate-symbol)
+        (compilation-evaluation (literal->compilation "foo"))))))
 
 (check
   (equal?
-    (compilation-parameter (datum->compilation "foo"))
-    (datum->compilation "foo")))
+    (with-tmps
+      (compilation-parameter
+        (datum->compilation 'string-append)))
+    (with-tmps
+      (compilation (generate-symbol)
+        (compilation-evaluation (datum->compilation 'string-append))))))
 
 (check
   (equal?
-    (with-generate-temporary-seed $tmp
+    (with-tmps
       (compilation-parameter
         (compilation 'foo (test-variable 3))))
-    (with-generate-temporary-seed $tmp
+    (with-tmps
       (generate-parameter-compilation))))

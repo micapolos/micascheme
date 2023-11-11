@@ -28,6 +28,7 @@
     check checking?
     generate-symbol generate-symbols
     with-generate-temporary-seed
+    with-tmps
     ensure
     data enum
     partial
@@ -179,6 +180,9 @@
   (define-syntax-rule (with-generate-temporary-seed $prefix $body ...)
     (parameterize ((generate-temporary-seed-opt (cons (quote $prefix) 0)))
       $body ...))
+
+  (define-syntax-rule (with-tmps $body ...)
+    (with-generate-temporary-seed $tmp $body ...))
 
   (define-syntax-rule (build-identifier ($var $id) $body)
     (datum->syntax $id

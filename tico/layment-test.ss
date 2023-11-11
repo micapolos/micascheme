@@ -168,7 +168,10 @@
 
 (check
   (equal?
-    (layment-parameter (literal->layment "foo"))
-    (layment
-      (literal->layout "foo")
-      (literal->compilation "foo"))))
+    (with-tmps
+      (layment-parameter (literal->layment "foo")))
+    (with-tmps
+      (make-layment
+        (layment-layout (literal->layment "foo"))
+        (compilation-parameter
+          (layment-compilation (literal->layment "foo")))))))

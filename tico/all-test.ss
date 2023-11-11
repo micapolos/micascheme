@@ -6,6 +6,7 @@
   (tico constant)
   (tico datum)
   (tico dependency)
+  (tico entry)
   (tico evaluation)
   (tico expression)
   (tico global)
