@@ -27,7 +27,8 @@
     (tico global)
     (tico datum)
     (tico evaluation)
-    (tico parameter))
+    (tico parameter)
+    (tico extern))
 
   (data (compilation datum evaluation))
 
@@ -46,13 +47,11 @@
     (compilation $datum (datum->constant $datum)))
 
   (define (compilation-value $compilation)
-    (switch (compilation-evaluation $compilation)
+    (switch-exclusive (compilation-evaluation $compilation)
       ((constant? $constant)
         (constant-value $constant))
       ((global? $global)
-        (datum->value (compilation-datum $compilation)))
-      ((else _)
-        (throw compilation-value $compilation))))
+        (datum->value (compilation-datum $compilation)))))
 
   (define (generate-parameter-compilation)
     (compilation (generate-symbol) (parameter)))
@@ -60,24 +59,30 @@
   (define (compilation-parameter $compilation)
     (compilation
       (generate-symbol)
-      (switch (compilation-evaluation $compilation)
+      (switch-exclusive (compilation-evaluation $compilation)
         ((constant? $constant)
           $constant)
         ((global? $global)
           $global)
         ((variable? $variable)
           (parameter))
+        ((extern? $extern)
+          $extern)
         ((parameter? $parameter)
           (throw compilation-parameter $compilation)))))
 
   (define (compilation-variable $compilation $index)
-    (switch (compilation-evaluation $compilation)
+    (switch-exclusive (compilation-evaluation $compilation)
       ((constant? $constant)
         $compilation)
       ((global? $global)
         $compilation)
       ((variable? $variable)
         (throw compilation-variable $compilation))
+      ((extern? $extern)
+        (compilation
+          (compilation-datum $compilation)
+          $extern))
       ((parameter? $parameter)
         (compilation
           (compilation-datum $compilation)
@@ -103,7 +108,7 @@
         (map compilation-evaluation (map compilation-constantize $args)))))
 
   (define (compilation-abstraction $param-compilations $body-compilation)
-    (switch (compilation-evaluation $body-compilation)
+    (switch-exclusive (compilation-evaluation $body-compilation)
       ((constant? $constant)
         (compilation
           (datum-abstraction
@@ -113,7 +118,7 @@
             (length $param-compilations)
             $constant)))
       ((variable? $variable)
-        (switch (variable-promote $variable (length $param-compilations))
+        (switch-exclusive (variable-promote $variable (length $param-compilations))
           ((variable? $variable)
             (compilation
               (datum-abstraction
@@ -151,7 +156,7 @@
   (define (compilation-ref $arity $target $index)
     (compilation
       (datum-ref $arity (compilation-datum $target) $index)
-      (switch (compilation-evaluation $target)
+      (switch-exclusive (compilation-evaluation $target)
         ((constant? $constant)
           (constant-ref $arity $constant $index))
         ((variable? $variable)

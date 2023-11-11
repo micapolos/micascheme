@@ -7,7 +7,8 @@
     (tico variable)
     (tico parameter)
     (tico datum)
-    (tico global))
+    (tico global)
+    (tico extern))
 
   ;(enum (evaluation constant variable parameter))
 
@@ -17,6 +18,8 @@
       (cond
         ((for-all constant? $evaluations)
           (constant-application $target $args))
+        ((exists extern? $evaluations)
+          (extern))
         (else
           (lets
             ($variables (filter variable? $evaluations))
