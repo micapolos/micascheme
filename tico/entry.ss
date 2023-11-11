@@ -2,8 +2,8 @@
   (export
     entry entry? entry-parameters entry-arguments
     typings->entry
-    entry-let-datum
-    entries-let-datum)
+    entry-let
+    entries-let)
   (import
     (micascheme)
     (tico typing)
@@ -16,21 +16,17 @@
       (ordered-map typing-parameter $typings)
       $typings))
 
-  (define (typing-let-entry-datum $parameter-typing $argument-typing)
-    `(
-      ,(typing-datum $parameter-typing)
-      ,(typing-datum $argument-typing)))
-
-  (define (entry-let-datum $entry $body-typing)
-    (let-datum
-      (map typing-let-entry-datum
+  (define (entry-let $entry $body)
+    (typing-application
+      (typing-abstraction
         (entry-parameters $entry)
-        (entry-arguments $entry))
-      (typing-datum $body-typing)))
+        $body)
+      (entry-arguments $entry)))
 
-  (define (entries-let-datum $entries $body-typing)
-    (fold-right
-      entry-let-datum
-      $body-typing
-      $entries))
+  (define (entries-let $entries $body)
+    (fold-left
+      (lambda ($body $entry)
+        (entry-let $entry $body))
+      $body
+      (reverse $entries)))
 )

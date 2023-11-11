@@ -9,6 +9,7 @@
 
     compilation-value
 
+    parameter-compilation
     generate-parameter-compilation
 
     compilation-application
@@ -47,8 +48,11 @@
       ((else $other)
         (throw compilation-value $compilation))))
 
+  (define (parameter-compilation $symbol)
+    (compilation $symbol (parameter)))
+
   (define (generate-parameter-compilation)
-    (compilation (generate-symbol) (parameter)))
+    (parameter-compilation (generate-symbol)))
 
   (define (compilation-parameter $compilation)
     (compilation

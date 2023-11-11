@@ -17,6 +17,7 @@
     typing-datum
     typing-value
 
+    parameter-typing
     generate-parameter-typing
     typing-application
     typing-parameter
@@ -110,6 +111,13 @@
       (layment-application
         (typing-layment $target)
         (map typing-layment $args))))
+
+  (define (parameter-typing $type $datum)
+    (typing
+      $type
+      (parameter-layment
+        (type->layout $type)
+        $datum)))
 
   (define (generate-parameter-typing $type)
     (typing $type

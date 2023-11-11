@@ -13,6 +13,7 @@
     layment-datum
     layment-value
 
+    parameter-layment
     generate-parameter-layment
     layment-application
     layment-parameter
@@ -90,6 +91,10 @@
       (compilation-abstraction
         (filter-opts (map layment-compilation $param-layments))
         (layment-compilation $body-layment))))
+
+  (define (parameter-layment $layout $datum)
+    (make-layment $layout
+      (parameter-compilation $datum)))
 
   (define (generate-parameter-layment $layout)
     (make-layment $layout
