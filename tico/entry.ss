@@ -1,7 +1,9 @@
 (library (tico entry)
   (export
     entry entry? entry-parameters entry-arguments
-    typings->entry)
+    typings->entry
+    entry-let-datum
+    entries-let-datum)
   (import
     (micascheme)
     (tico typing)
@@ -25,4 +27,10 @@
         (entry-parameters $entry)
         (entry-arguments $entry))
       (typing-datum $body-typing)))
+
+  (define (entries-let-datum $entries $body-typing)
+    (fold-right
+      entry-let-datum
+      $body-typing
+      $entries))
 )
