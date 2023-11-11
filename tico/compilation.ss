@@ -108,7 +108,7 @@
         (map compilation-evaluation (map compilation-constantize $args)))))
 
   (define (compilation-abstraction $param-compilations $body-compilation)
-    (switch-exclusive (compilation-evaluation $body-compilation)
+    (switch-exclusive (compilation-evaluation (compilation-constantize $body-compilation))
       ((constant? $constant)
         (compilation
           (datum-abstraction
@@ -130,6 +130,12 @@
               (datum-abstraction
                 (map compilation-datum $param-compilations)
                 (compilation-datum $body-compilation))))))
+      ((extern? $extern)
+        (compilation
+          (datum-abstraction
+            (map compilation-datum $param-compilations)
+            (compilation-datum $body-compilation))
+          (extern)))
       ((parameter? $parameter)
         (throw compilation-abstraction $param-compilations $body-compilation))))
 
