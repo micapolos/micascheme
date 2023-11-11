@@ -2,6 +2,7 @@
 
 (test
   (tico binding)
+  (tico block)
   (tico compilation)
   (tico constant)
   (tico datum)

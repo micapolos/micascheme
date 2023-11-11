@@ -19,6 +19,7 @@
     single? single force-single
     bindings-eval
     script
+    ordered-map
     pi pi2
     bind-if
     and-lets lets
@@ -125,6 +126,14 @@
           (push $stack (generate-symbol)))
         (stack)
         $count)))
+
+  (define (ordered-map $fn $list)
+    (switch $list
+      ((null? _) (list))
+      ((else $pair)
+        (cons
+          ($fn (car $pair))
+          (ordered-map $fn (cdr $pair))))))
 
   (define generate-temporary
     (case-lambda

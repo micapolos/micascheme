@@ -264,7 +264,7 @@
   (define (let-typing $typings $fn)
     (lets
       ($types (map typing-type $typings))
-      ($parameter-typings (map generate-parameter-typing $types))
+      ($parameter-typings (ordered-map generate-parameter-typing $types))
       ($variable-typings
         (map
           typing-variable

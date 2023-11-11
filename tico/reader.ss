@@ -88,7 +88,7 @@
           ((do)
             (lets
               ($argument-typings (reverse $typings))
-              ($parameter-typings (map typing-parameter $argument-typings))
+              ($parameter-typings (ordered-map typing-parameter $argument-typings))
               (top-level-reader
                 (push-list $bindings (map binding $parameter-typings))
                 (stack)
@@ -115,7 +115,7 @@
           ((doing)
             (lets
               ($param-types (map typing->type (reverse $typings)))
-              ($param-typings (map generate-parameter-typing $param-types))
+              ($param-typings (ordered-map generate-parameter-typing $param-types))
               (top-level-reader
                 (push-list $bindings (map binding $param-typings))
                 (stack)

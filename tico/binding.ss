@@ -103,7 +103,7 @@
 
   (define (bindings-do $bindings $typings $fn)
     (lets
-      ($parameter-typings (map typing-parameter $typings))
+      ($parameter-typings (ordered-map typing-parameter $typings))
       (typings-do
         $parameter-typings
         $typings

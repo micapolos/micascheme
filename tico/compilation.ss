@@ -141,7 +141,7 @@
         (map compilation-evaluation (map compilation-constantize $args))
         (lambda ()
           (filter-opts
-            (map compilation->generate-dependency-opt
+            (ordered-map compilation->generate-dependency-opt
               (reverse (cons $target $args))))))))
 
   (define (compilation-abstraction $param-compilations $body-compilation)

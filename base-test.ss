@@ -614,3 +614,13 @@
 ; === null ===
 
 (check (equal? null `()))
+
+; === ordered-map ===
+
+(check
+  (equal?
+    (with-tmps
+      (ordered-map
+        (lambda (_) (generate-symbol))
+        (indices 8)))
+    '($tmp-0 $tmp-1 $tmp-2 $tmp-3 $tmp-4 $tmp-5 $tmp-6 $tmp-7)))
