@@ -15,15 +15,15 @@
     (leo parser)
     (leo reader))
 
-  (define (typing-reader $bindings $end)
-    (top-level-reader $bindings (stack)
+  (define-reader (typing-reader $bindings $end)
+    (push-typings-reader $bindings (stack)
       (lambda ($typings)
         ($end (or-throw (single $typings))))))
 
-  (define (top-level-reader $bindings $typings $end)
+  (define-reader (push-typings-reader $bindings $typings $end)
     (reader
       (lambda ($literal)
-        (top-level-reader
+        (push-typings-reader
           $bindings
           (push $typings (literal->typing $literal))
           $end))
@@ -33,12 +33,12 @@
             (paths-reader
               (lambda ($paths)
                 (reader-read-list
-                  (top-level-reader $bindings $typings $end)
+                  (push-typings-reader $bindings $typings $end)
                   (flatten (map load-script (map path-filename $paths)))))))
           ((native)
             (typing-reader $bindings
               (lambda ($native-typing)
-                (top-level-reader
+                (push-typings-reader
                   $bindings
                   (push $typings
                     (typing-native $native-typing))
@@ -48,14 +48,14 @@
               ($typing (or-throw (single $typings)))
               (typing-reader $bindings
                 (lambda ($as-typing)
-                  (top-level-reader
+                  (push-typings-reader
                     $bindings
                     (stack (typing-as $typing $as-typing))
                     $end)))))
           ((assert)
             (typing-reader $bindings
               (lambda ($assert-typing)
-                (top-level-reader
+                (push-typings-reader
                   $bindings
                   (lets
                     (do (typing-assert $assert-typing))
@@ -64,7 +64,7 @@
           ((prepare)
             (typing-reader $bindings
               (lambda ($prepare-typing)
-                (top-level-reader
+                (push-typings-reader
                   $bindings
                   (push $typings
                     (typing-prepare $prepare-typing))
@@ -72,21 +72,21 @@
           ((the)
             (typing-reader $bindings
               (lambda ($the-typing)
-                (top-level-reader
+                (push-typings-reader
                   $bindings
                   (push $typings $the-typing)
                   $end))))
           ((with)
-            (with-reader $bindings (stack)
+            (push-with-typings-reader $bindings (stack)
               (lambda ($with-typings)
-                (top-level-reader
+                (push-typings-reader
                   $bindings
                   (push-all $typings $with-typings)
                   $end))))
           ((get)
-            (top-level-reader $bindings (stack)
+            (push-typings-reader $bindings (stack)
               (lambda ($get-typings)
-                (top-level-reader
+                (push-typings-reader
                   $bindings
                   (switch $typings
                     ((null? _)
@@ -101,7 +101,7 @@
               (typing-reader
                 (push-list $bindings (map binding $parameter-typings))
                 (lambda ($body-typing)
-                  (top-level-reader
+                  (push-typings-reader
                     $bindings
                     (stack
                       (typings-do
@@ -112,9 +112,9 @@
           ((apply)
             (lets
               ($typing (or-throw (single $typings)))
-              (top-level-reader $bindings (stack)
+              (push-typings-reader $bindings (stack)
                 (lambda ($arg-typings)
-                  (top-level-reader
+                  (push-typings-reader
                     $bindings
                     (stack
                       (typing-application $typing
@@ -127,7 +127,7 @@
               (typing-reader
                 (push-list $bindings (map binding $param-typings))
                 (lambda ($doing-typing)
-                  (top-level-reader
+                  (push-typings-reader
                     $bindings
                     (stack
                       (typing-abstraction $param-typings $doing-typing))
@@ -135,7 +135,7 @@
           ((promising)
             (typing-reader $bindings
               (lambda ($result-typing)
-                (top-level-reader 
+                (push-typings-reader
                   $bindings
                   (stack
                     (typings-promising $typings $result-typing))
@@ -143,7 +143,7 @@
           ((offering)
             (typing-reader $bindings
               (lambda ($offering-typing)
-                (top-level-reader 
+                (push-typings-reader
                   $bindings
                   (stack
                     (typings-offering
@@ -153,7 +153,7 @@
           ((type)
             (typing-reader $bindings
               (lambda ($type-typing)
-                (top-level-reader 
+                (push-typings-reader
                   $bindings
                   (push $typings
                     (typing->type-typing $type-typing))
@@ -161,14 +161,14 @@
           ((comment)
             (comment-reader
               (lambda ($commented)
-                (top-level-reader
+                (push-typings-reader
                   $bindings
                   $typings
                   $end))))
           (else
-            (top-level-reader $bindings (stack)
+            (push-typings-reader $bindings (stack)
               (lambda ($symbol-typings)
-                (top-level-reader
+                (push-typings-reader
                   $bindings
                   (bindings-resolve $bindings
                     (push $typings
@@ -178,17 +178,17 @@
       (lambda ()
         ($end $typings))))
 
-  (define (with-reader $bindings $typings $end)
+  (define-reader (push-with-typings-reader $bindings $typings $end)
     (reader
       (lambda ($literal)
-        (with-reader
+        (push-with-typings-reader
           $bindings
           (push $typings (literal->typing $literal))
           $end))
       (lambda ($symbol)
-        (top-level-reader $bindings (stack)
+        (push-typings-reader $bindings (stack)
           (lambda ($arg-typings)
-            (with-reader 
+            (push-with-typings-reader
               $bindings
               (push $typings
                 (typing-resolve
@@ -198,7 +198,7 @@
       (lambda ()
         ($end $typings))))
 
-  (define (comment-reader $end)
+  (define-reader (comment-reader $end)
     (reader
       (lambda ($literal) 
         (comment-reader $end))
@@ -210,11 +210,11 @@
         ($end #f))))
 
   (define typings-reader
-    (top-level-reader (stack) (stack) identity))
+    (push-typings-reader (stack) (stack) identity))
 
   (define-syntax-rule (bindings-read-typings $bindings $body ...)
     (reader-eval
-      (top-level-reader $bindings (stack) identity)
+      (push-typings-reader $bindings (stack) identity)
       $body ...))
 
   (define-syntax-rule (bindings-read-typing $bindings $body ...)
