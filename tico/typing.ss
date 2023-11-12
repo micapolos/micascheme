@@ -38,7 +38,6 @@
     typings-offering
     typing-access
     typings-access
-    typings-resolve-assert
     typing-assert
 
     typing-not-empty?
@@ -311,10 +310,6 @@
     (switch (typing-type $typing)
       ((struct? $struct) (struct-typing $struct))
       ((else $other) TODO)))
-
-  (define (typings-resolve-assert $lhs-typings $rhs-typings)
-    (for-each typing-assert $rhs-typings)
-    $lhs-typings)
 
   (define (typing-assert $typing)
     (unless (type-matches? (typing-type $typing) (boolean-type))

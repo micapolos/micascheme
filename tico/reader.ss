@@ -54,7 +54,9 @@
               (lambda ($assert-typings)
                 (top-level-reader
                   $bindings
-                  (typings-resolve-assert $typings $assert-typings)
+                  (lets
+                    (do (typing-assert (or-throw (single $assert-typings))))
+                    $typings)
                   $end))))
           ((prepare)
             (top-level-reader $bindings (stack)

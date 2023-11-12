@@ -253,14 +253,3 @@
   (raises?
     (lambda ()
       (typing-assert (variable-typing (boolean-type) 'foo 1)))))
-
-; --- typings-resolve-assert
-
-(check
-  (equal?
-    (typings-resolve-assert
-      (stack (literal->typing "lhs"))
-      (stack
-        (literal->typing #t)
-        (type-datum->typing (boolean-type) '(= 1 1))))
-    (stack (literal->typing "lhs"))))

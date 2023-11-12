@@ -185,14 +185,8 @@
   (equal?
     (read-typings
       "foo" "bar"
-      (assert
-        (the (native "#t") (as boolean))
-        (the (native "(= 1 1)") (as boolean))))
-    (typings-resolve-assert
-      (read-typings "foo" "bar")
-      (read-typings
-        (the (native "#t") (as boolean))
-        (the (native "(= 1 1)") (as boolean))))))
+      (assert (native "(= 1 1)") (as boolean)))
+    (read-typings "foo" "bar")))
 
 (check
   (equal?
