@@ -44,7 +44,10 @@
               (lambda ($as-typings)
                 (top-level-reader
                   $bindings
-                  (map typing-as $typings $as-typings)
+                  (stack
+                    (typing-as
+                      (or-throw (single $typings))
+                      (or-throw (single $as-typings))))
                   $end))))
           ((assert)
             (top-level-reader $bindings (stack)
