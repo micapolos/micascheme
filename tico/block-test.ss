@@ -6,7 +6,7 @@
 
 (check
   (equal?
-    (block->typing
+    (block-let
       (block
         (list
           (entry

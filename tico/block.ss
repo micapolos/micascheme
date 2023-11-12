@@ -1,18 +1,18 @@
 (library (tico block)
   (export
-    block block? block-entries block-typings
+    block block? block-entries block-args
     empty-block
     block-update-entries
-    block-update-typings
-    block+typing
-    block->typing)
+    block-update-args
+    block+arg
+    block-let)
   (import
     (micascheme)
     (tico binding)
     (tico typing)
     (tico entry))
 
-  (data (block entries typings))
+  (data (block entries args))
 
   (define (empty-block)
     (block (stack) (stack)))
@@ -20,20 +20,20 @@
   (define (block-update-entries $block $fn)
     (block
       ($fn (block-entries $block))
-      (block-typings $block)))
+      (block-args $block)))
 
-  (define (block-update-typings $block $fn)
+  (define (block-update-args $block $fn)
     (block
       (block-entries $block)
-      ($fn (block-typings $block))))
+      ($fn (block-args $block))))
 
-  (define (block+typing $block $typing)
-    (block-update-typings $block
-      (lambda ($typings)
-        (push $typings $typing))))
+  (define (block+arg $block $arg)
+    (block-update-args $block
+      (lambda ($args)
+        (push $args $arg))))
 
-  (define (block->typing $block $fn)
+  (define (block-let $block $fn)
     (entries-let
       (block-entries $block)
-      ($fn (block-typings $block))))
+      ($fn (block-args $block))))
 )
