@@ -1,6 +1,19 @@
 (import
   (micascheme)
-  (tico entry))
+  (tico entry)
+  (tico typing)
+  (tico type))
+
+(check
+  (equal?
+    (test-entry e1 e2)
+    (entry
+      (list
+        (test-parameter-typing e1)
+        (test-parameter-typing e2))
+      (list
+        (test-typing e1)
+        (test-typing e2)))))
 
 (check
   (equal?

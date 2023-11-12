@@ -5,7 +5,8 @@
     block-update-entries
     block-update-args
     block+arg
-    block-let)
+    block-let
+    block-struct)
   (import
     (micascheme)
     (tico binding)
@@ -36,4 +37,7 @@
     (entries-let
       (block-entries $block)
       ($fn (block-args $block))))
+
+  (define (block-struct $name $block)
+    (block-let $block (partial typing-struct $name)))
 )

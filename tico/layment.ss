@@ -3,6 +3,7 @@
     layment layment? layment-layout layment-compilation
     layment-not-empty?
     test-layment
+    test-parameter-layment
 
     make-layment
     empty-layment
@@ -35,6 +36,11 @@
     (make-layment
       (simple-layout)
       (test-compilation $name)))
+
+  (define-syntax-rule (test-parameter-layment $name)
+    (make-layment
+      (simple-layout)
+      (test-parameter-compilation $name)))
 
   (define (empty-layment)
     (layment (empty-layout) #f))

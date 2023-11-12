@@ -1,6 +1,7 @@
 (library (tico datum)
   (export
     test-datum
+    test-parameter-datum
     literal->datum
     datum-application
     generate-datum-params
@@ -19,6 +20,9 @@
 
   (define-syntax-rule (test-datum $name)
     (quote (quote $name)))
+
+  (define-syntax-rule (test-parameter-datum $name)
+    (quote $name))
 
   (define (literal->datum $literal)
     (switch $literal

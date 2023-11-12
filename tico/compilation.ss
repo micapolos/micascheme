@@ -2,6 +2,7 @@
   (export
     compilation compilation? compilation-datum compilation-evaluation
     test-compilation
+    test-parameter-compilation
 
     literal->compilation
     datum->compilation
@@ -32,6 +33,11 @@
 
   (define-syntax-rule (test-compilation $name)
     (datum->compilation (test-datum $name)))
+
+  (define-syntax-rule (test-parameter-compilation $name)
+    (compilation
+      (test-parameter-datum $name)
+      (parameter)))
 
   (define (literal->compilation $literal)
     (compilation

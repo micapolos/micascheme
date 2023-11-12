@@ -3,6 +3,7 @@
     typing typing? typing-type typing-layment
     static-typing
     test-typing
+    test-parameter-typing
 
     native->typing
     literal->typing
@@ -61,6 +62,11 @@
     (type-datum->typing
       (test-type $name)
       (test-datum $name)))
+
+  (define-syntax-rule (test-parameter-typing $name)
+    (typing
+      (test-type $name)
+      (test-parameter-layment $name)))
 
   (define (static-typing $type)
     (typing $type

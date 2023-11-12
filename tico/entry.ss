@@ -1,6 +1,7 @@
 (library (tico entry)
   (export
     entry entry? entry-parameters entry-arguments
+    test-entry
     typings->entry
     entry-let
     entries-let)
@@ -10,6 +11,11 @@
     (tico datum))
 
   (data (entry parameters arguments))
+
+  (define-syntax-rule (test-entry $name ...)
+    (entry
+      (list (test-parameter-typing $name) ...)
+      (list (test-typing $name) ...)))
 
   (define (typings->entry $typings)
     (entry

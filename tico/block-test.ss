@@ -2,6 +2,7 @@
   (micascheme)
   (tico block)
   (tico typing)
+  (tico type)
   (tico entry))
 
 (check
@@ -46,3 +47,24 @@
           (variable-typing (number-type) '$number 1)
           (variable-typing (string-type) '$string 2)
           (variable-typing (string-type) '$string2 0))))))
+
+(check
+  (equal?
+    (block-struct 'foo
+      (block
+        (list
+          (test-entry e1 e2)
+          (test-entry e3 e4))
+        (list
+          (test-typing t1)
+          (test-typing t2))))
+    (block-let
+      (block
+        (list
+          (test-entry e1 e2)
+          (test-entry e3 e4))
+        (list
+          (test-typing t1)
+          (test-typing t2)))
+      (lambda ($typings)
+        (typing-struct 'foo $typings)))))
