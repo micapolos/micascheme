@@ -7,11 +7,8 @@
 
 (check
   (equal?
-    (read-typings (native "1" "(+ 1 2)" "+"))
-    (stack
-      (native->typing 1)
-      (native->typing '(+ 1 2))
-      (native->typing '+))))
+    (read-typing (native "(+ 1 2)"))
+    (native->typing '(+ 1 2))))
 
 (check
   (equal?
@@ -43,11 +40,12 @@
 (check
   (equal?
     (read-typings
-      (native "\"foo\"" "(+ 1 2)")
-      (as string number))
+      (native "(+ 1 2)")
+      (as number))
     (stack
-      (type-datum->typing (string-type) "foo")
-      (type-datum->typing (number-type) '(+ 1 2)))))
+      (type-datum->typing
+        (number-type)
+        '(+ 1 2)))))
 
 (check
   (equal?
@@ -70,9 +68,8 @@
   (equal?
     (read-typings
       (prepare
-        (native
-          "(+ 1 2)"
-          "(string-append \"foo\" \"bar\")")))
+        (native "(+ 1 2)")
+        (native "(string-append \"foo\" \"bar\")")))
     (stack
       (type-datum->typing (native-type) 3)
       (type-datum->typing (native-type) "foobar"))))

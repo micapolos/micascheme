@@ -35,8 +35,9 @@
               (lambda ($native-typings)
                 (top-level-reader
                   $bindings
-                  (push-all $typings
-                    (map typing-native $native-typings)) 
+                  (push $typings
+                    (typing-native
+                      (or-throw (single $native-typings))))
                   $end))))
           ((as)
             (top-level-reader $bindings (stack)
