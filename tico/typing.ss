@@ -38,7 +38,7 @@
     typings-offering
     typing-access
     typings-access
-    typing-imply
+    typing-assert
 
     typing-not-empty?
     typing->type
@@ -306,12 +306,11 @@
                 (make-list-typing (length $fields) (type-type))
                 $field-typings)))))))
 
-  (define (typing-imply $proposition-typing $body-typing)
-    (unless (type-matches? (typing-type $proposition-typing) (boolean-type))
-      (throw not-proposition (typing-datum $proposition-typing)))
-    (unless (typing-value $proposition-typing)
-      (throw proposition-failed (typing-datum $proposition-typing)))
-    $body-typing)
+  (define (typing-assert $typing)
+    (unless (type-matches? (typing-type $typing) (boolean-type))
+      (throw not-boolean (typing-datum $typing)))
+    (unless (typing-value $typing)
+      (throw assertiong-failed (typing-datum $typing))))
 
   (define (type-typing $typing)
     (switch (typing-type $typing)
