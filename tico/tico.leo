@@ -1,4 +1,4 @@
 load tico core
-do
-  "Hello, "
-  plus "world!"
+
+"Hello, "
+plus "world!"
