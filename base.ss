@@ -516,10 +516,10 @@
           (identifier? #'$target)
           #'(or
             ($target $arg ...)
-            (throw $target $arg ...)))
+            (throw or-throw ($target $arg ...))))
         ((_ $other)
           #'(or $other
-            (throw error $other))))))
+            (throw or-throw $other))))))
 
   (define (list-ref-opt $list $index)
     (and
