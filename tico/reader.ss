@@ -49,14 +49,15 @@
                       (or-throw (single $typings))
                       (or-throw (single $as-typings))))
                   $end))))
-          ((assert)
+          ((imply)
             (top-level-reader $bindings (stack)
-              (lambda ($assert-typings)
+              (lambda ($imply-typings)
                 (top-level-reader
                   $bindings
-                  (lets
-                    (do (typing-assert (or-throw (single $assert-typings))))
-                    $typings)
+                  (stack
+                    (typing-imply
+                      (or-throw (single $typings))
+                      (or-throw (single $imply-typings))))
                   $end))))
           ((prepare)
             (top-level-reader $bindings (stack)

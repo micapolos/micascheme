@@ -159,10 +159,19 @@
 
 (check
   (equal?
-    (read-typings
-      "foo" "bar"
-      (assert (native "(= 1 1)") (as boolean)))
-    (read-typings "foo" "bar")))
+    (read-typing
+      (native "(= 1 1)")
+      (as boolean)
+      (imply "OK"))
+    (read-typing "OK")))
+
+(check
+  (raises?
+    (lambda ()
+      (read-typing
+        (native "(= 1 2)")
+        (as boolean)
+        (imply "OK")))))
 
 (check
   (equal?

@@ -38,7 +38,7 @@
     typings-offering
     typing-access
     typings-access
-    typing-assert
+    typing-imply
 
     typing-not-empty?
     typing->type
@@ -306,16 +306,17 @@
                 (make-list-typing (length $fields) (type-type))
                 $field-typings)))))))
 
+  (define (typing-imply $proposition-typing $body-typing)
+    (unless (type-matches? (typing-type $proposition-typing) (boolean-type))
+      (throw not-proposition (typing-datum $proposition-typing)))
+    (unless (typing-value $proposition-typing)
+      (throw proposition-failed (typing-datum $proposition-typing)))
+    $body-typing)
+
   (define (type-typing $typing)
     (switch (typing-type $typing)
       ((struct? $struct) (struct-typing $struct))
       ((else $other) TODO)))
-
-  (define (typing-assert $typing)
-    (unless (type-matches? (typing-type $typing) (boolean-type))
-      (throw assertion-not-boolean (typing-datum $typing)))
-    (unless (typing-value $typing)
-      (throw assertiong-failed (typing-datum $typing))))
 
   (define (typings-do $parameter-typings $argument-typings $body-typing)
     (typing-application

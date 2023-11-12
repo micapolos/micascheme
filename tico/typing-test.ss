@@ -228,27 +228,35 @@
       (make-struct-type)
       'struct)))
 
-; --- typing-assert
+; --- typing-imply
 
 (check
   (equal?
-    (typing-assert (type-datum->typing (boolean-type) '(= 1 1)))
-    (void)))
+    (typing-imply
+      (type-datum->typing (boolean-type) '(= 1 1))
+      (test-typing ok))
+    (test-typing ok)))
 
 ; not boolean
 (check
   (raises?
     (lambda ()
-      (typing-assert (type-datum->typing (string-type) "foo")))))
+      (typing-imply
+        (type-datum->typing (string-type) "foo")
+        (test-typing ok)))))
 
 ; not true
 (check
   (raises?
     (lambda ()
-      (typing-assert (type-datum->typing (boolean-type) '(= 1 2))))))
+      (typing-imply
+        (type-datum->typing (boolean-type) '(= 1 2))
+        (test-typing ok)))))
 
-; non value
+; not compile-time constant
 (check
   (raises?
     (lambda ()
-      (typing-assert (variable-typing (boolean-type) 'foo 1)))))
+      (typing-imply
+        (variable-typing (boolean-type) 'foo 1)
+        (test-typing ok)))))
