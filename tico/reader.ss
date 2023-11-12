@@ -1,10 +1,10 @@
 (library (tico reader)
   (export
-    typings-reader
     bindings-read-typings
     bindings-read-typing
     read-typings
-    read-typing)
+    read-typing
+    typing-reader)
   (import
     (micascheme)
     (leo reader)
@@ -12,20 +12,30 @@
     (tico type)
     (tico binding)
     (tico path)
+    (tico block)
     (leo parser)
     (leo reader))
 
-  (define-reader (typing-reader $bindings $end)
-    (push-typings-reader $bindings (stack)
-      (lambda ($typings)
-        ($end (or-throw (single $typings))))))
+  (define-reader (typings-reader $bindings $end)
+    (push-block-reader $bindings (empty-block)
+      (lambda ($block)
+        ($end
+          (block-end-typings $block)))))
 
-  (define-reader (push-typings-reader $bindings $typings $end)
+  (define-reader (typing-reader $bindings $end)
+    (push-block-reader $bindings (empty-block)
+      (lambda ($block)
+        ($end
+          (block-let $block
+            (lambda ($typings)
+              (or-throw (single $typings))))))))
+
+  (define-reader (push-block-reader $bindings $block $end)
     (reader
       (lambda ($literal)
-        (push-typings-reader
+        (push-block-reader
           $bindings
-          (push $typings (literal->typing $literal))
+          (block+typing $block (literal->typing $literal))
           $end))
       (lambda ($symbol)
         (case $symbol
@@ -33,77 +43,80 @@
             (paths-reader
               (lambda ($paths)
                 (reader-read-list
-                  (push-typings-reader $bindings $typings $end)
+                  (push-block-reader $bindings $block $end)
                   (flatten (map load-script (map path-filename $paths)))))))
           ((native)
             (typing-reader $bindings
               (lambda ($native-typing)
-                (push-typings-reader
+                (push-block-reader
                   $bindings
-                  (push $typings
+                  (block+typing $block
                     (typing-native $native-typing))
                   $end))))
           ((as)
             (lets
-              ($typing (or-throw (single $typings)))
+              ($typing (block-typing $block))
               (typing-reader $bindings
                 (lambda ($as-typing)
-                  (push-typings-reader
+                  (push-block-reader
                     $bindings
-                    (stack (typing-as $typing $as-typing))
+                    (block-with-typing $block
+                      (typing-as $typing $as-typing))
                     $end)))))
           ((assert)
             (typing-reader $bindings
               (lambda ($assert-typing)
-                (push-typings-reader
+                (push-block-reader
                   $bindings
                   (lets
                     (do (typing-assert $assert-typing))
-                    $typings)
+                    $block)
                   $end))))
           ((prepare)
             (typing-reader $bindings
               (lambda ($prepare-typing)
-                (push-typings-reader
+                (push-block-reader
                   $bindings
-                  (push $typings
+                  (block+typing $block
                     (typing-prepare $prepare-typing))
                   $end))))
           ((the)
             (typing-reader $bindings
               (lambda ($the-typing)
-                (push-typings-reader
+                (push-block-reader
                   $bindings
-                  (push $typings $the-typing)
+                  (block+typing $block $the-typing)
                   $end))))
           ((with)
             (push-with-typings-reader $bindings (stack)
               (lambda ($with-typings)
-                (push-typings-reader
+                (push-block-reader
                   $bindings
-                  (push-all $typings $with-typings)
+                  (block+typings $block (reverse $with-typings))
                   $end))))
           ((get)
-            (push-typings-reader $bindings (stack)
+            (typings-reader $bindings
               (lambda ($get-typings)
-                (push-typings-reader
+                (push-block-reader
                   $bindings
-                  (switch $typings
-                    ((null? _)
-                      (bindings-get* $bindings $get-typings))
-                    ((pair? $typings)
-                      (stack (typings-get $typings $get-typings))))
+                  (block-update-typings $block
+                    (lambda ($block-typings)
+                    (switch $block-typings
+                      ((null? _)
+                        (bindings-get* $bindings $get-typings))
+                      ((pair? $block-typings)
+                        (stack (typings-get $block-typings $get-typings))))))
                   $end))))
           ((do)
             (lets
-              ($argument-typings (reverse $typings))
+              ($argument-typings (reverse (block-typings $block)))
               ($parameter-typings (ordered-map typing-parameter $argument-typings))
               (typing-reader
                 (push-list $bindings (map binding $parameter-typings))
                 (lambda ($body-typing)
-                  (push-typings-reader
+                  (push-block-reader
                     $bindings
-                    (stack
+                    (block-with-typing $block
                       (typings-do
                         $parameter-typings
                         $argument-typings
@@ -111,72 +124,77 @@
                     $end)))))
           ((apply)
             (lets
-              ($typing (or-throw (single $typings)))
-              (push-typings-reader $bindings (stack)
+              ($typing (block-typing $block))
+              (typings-reader $bindings
                 (lambda ($arg-typings)
-                  (push-typings-reader
+                  (push-block-reader
                     $bindings
-                    (stack
+                    (block-with-typing $block
                       (typing-application $typing
                         (reverse $arg-typings)))
                     $end)))))
           ((doing)
             (lets
-              ($param-types (map typing->type (reverse $typings)))
+              ($param-types (map typing->type (reverse (block-typings $block))))
               ($param-typings (ordered-map generate-parameter-typing $param-types))
               (typing-reader
                 (push-list $bindings (map binding $param-typings))
                 (lambda ($doing-typing)
-                  (push-typings-reader
+                  (push-block-reader
                     $bindings
-                    (stack
+                    (block-with-typing $block
                       (typing-abstraction $param-typings $doing-typing))
                     $end)))))
           ((promising)
             (typing-reader $bindings
               (lambda ($result-typing)
-                (push-typings-reader
+                (push-block-reader
                   $bindings
-                  (stack
-                    (typings-promising $typings $result-typing))
+                  (block-with-typing $block
+                    (typing-promising
+                      (reverse (block-typings $block))
+                      $result-typing))
                   $end))))
           ((offering)
             (typing-reader $bindings
               (lambda ($offering-typing)
-                (push-typings-reader
+                (push-block-reader
                   $bindings
-                  (stack
-                    (typings-offering
-                      (reverse $typings)
+                  (block-with-typing $block
+                    (typing-offering
+                      (reverse (block-typings $block))
                       $offering-typing))
                   $end))))
           ((type)
             (typing-reader $bindings
               (lambda ($type-typing)
-                (push-typings-reader
+                (push-block-reader
                   $bindings
-                  (push $typings
+                  (block+typing $block
                     (typing->type-typing $type-typing))
                   $end))))
           ((comment)
             (comment-reader
               (lambda ($commented)
-                (push-typings-reader
+                (push-block-reader
                   $bindings
-                  $typings
+                  $block
                   $end))))
           (else
-            (push-typings-reader $bindings (stack)
+            (typings-reader $bindings
               (lambda ($symbol-typings)
-                (push-typings-reader
+                (push-block-reader
                   $bindings
-                  (bindings-resolve $bindings
-                    (push $typings
-                      (typing-resolve
-                        (typing-struct $symbol (reverse $symbol-typings)))))
+                  (block-with-typings $block
+                    (bindings-resolve $bindings
+                      (push
+                        (block-typings $block)
+                        (typing-resolve
+                          (typing-struct $symbol
+                            (reverse $symbol-typings))))))
                   $end))))))
       (lambda ()
-        ($end $typings))))
+        ($end $block))))
 
   (define-reader (push-with-typings-reader $bindings $typings $end)
     (reader
@@ -186,7 +204,7 @@
           (push $typings (literal->typing $literal))
           $end))
       (lambda ($symbol)
-        (push-typings-reader $bindings (stack)
+        (typings-reader $bindings
           (lambda ($arg-typings)
             (push-with-typings-reader
               $bindings
@@ -209,12 +227,9 @@
       (lambda ()
         ($end #f))))
 
-  (define typings-reader
-    (push-typings-reader (stack) (stack) identity))
-
   (define-syntax-rule (bindings-read-typings $bindings $body ...)
     (reader-eval
-      (push-typings-reader $bindings (stack) identity)
+      (push-block-reader $bindings (empty-block) block-end-typings)
       $body ...))
 
   (define-syntax-rule (bindings-read-typing $bindings $body ...)

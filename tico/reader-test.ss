@@ -12,8 +12,8 @@
 
 (check
   (equal?
-    (read-typings 
-      10 
+    (read-typings
+      10
       (comment (this is a comment) 10 "foo")
       20)
     (stack
@@ -22,11 +22,8 @@
 
 (check
   (equal?
-    (read-typings boolean number string)
-    (stack
-      (static-typing (value-type (boolean-type)))
-      (static-typing (value-type (number-type)))
-      (static-typing (value-type (string-type))))))
+    (read-typing string)
+    (static-typing (value-type (string-type)))))
 
 (check
   (equal?
@@ -49,14 +46,14 @@
       number
       string
       (promising boolean))
-    (typings-promising
-      (read-typings number string)
+    (typing-promising
+      (reverse (read-typings number string))
       (read-typing boolean))))
 
 (check
   (equal?
     (read-typing number string (offering boolean))
-    (typings-offering
+    (typing-offering
       (reverse (read-typings number string))
       (read-typing boolean))))
 

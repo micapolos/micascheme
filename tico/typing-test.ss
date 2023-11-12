@@ -183,8 +183,8 @@
 
 (check
   (equal?
-    (typings-promising
-      (stack
+    (typing-promising
+      (list
         (number-typing)
         (string-typing))
       (boolean-typing))
@@ -197,7 +197,7 @@
 
 (check
   (equal?
-    (typings-offering
+    (typing-offering
       (list (number-typing) (string-typing))
       (boolean-typing))
     (type->typing

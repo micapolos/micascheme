@@ -33,9 +33,9 @@
     typing-get
     typings-get
     typing-as
-    typings-promising
+    typing-promising
     typing-property
-    typings-offering
+    typing-offering
     typing-access
     typings-access
     typing-assert
@@ -247,13 +247,13 @@
         (type->layout $type)
         $compilation)))
 
-  (define (typings-promising $param-typings $result-typing)
+  (define (typing-promising $param-typings $result-typing)
     (type->typing
       (arrow
-        (reverse (map typing->type $param-typings))
+        (map typing->type $param-typings)
         (typing->type $result-typing))))
 
-  (define (typings-offering $typings $offering-typing)
+  (define (typing-offering $typings $offering-typing)
     (lets
       ($params (map typing->type $typings))
       ($body (typing->type $offering-typing))

@@ -12,10 +12,8 @@
 
   (define (tico-eval $datum)
     (typing-value
-      (car
-        (ensure single?
-          (reader-end
-            (reader-read-list typings-reader $datum))))))
+      (reader-end
+        (reader-read-list (typing-reader (stack)) $datum))))
 
   (define (tico-parse $string)
     (tico-eval (parse-script $string)))

@@ -1,10 +1,15 @@
 (library (tico block)
   (export
-    block block? block-entries block-args
+    block block? block-entries block-typings
     empty-block
+    block-end-typings
     block-update-entries
-    block-update-args
-    block+arg
+    block-update-typings
+    block-typing
+    block-with-typing
+    block-with-typings
+    block+typing
+    block+typings
     block-let
     block-struct)
   (import
@@ -13,7 +18,7 @@
     (tico typing)
     (tico entry))
 
-  (data (block entries args))
+  (data (block entries typings))
 
   (define (empty-block)
     (block (stack) (stack)))
@@ -21,22 +26,45 @@
   (define (block-update-entries $block $fn)
     (block
       ($fn (block-entries $block))
-      (block-args $block)))
+      (block-typings $block)))
 
-  (define (block-update-args $block $fn)
+  (define (block-update-typings $block $fn)
     (block
       (block-entries $block)
-      ($fn (block-args $block))))
+      ($fn (block-typings $block))))
 
-  (define (block+arg $block $arg)
-    (block-update-args $block
-      (lambda ($args)
-        (push $args $arg))))
+  (define (block-end-typings $block)
+    (and
+      (null? (block-entries $block))
+      (block-typings $block)))
+
+  (define (block-typing $block)
+    (or-throw (single (block-typings $block))))
+
+  (define (block+typing $block $typing)
+    (block-update-typings $block
+      (lambda ($typings)
+        (push $typings $typing))))
+
+  (define (block+typings $block $typings)
+    (block-update-typings $block
+      (lambda ($block-typings)
+        (push-list $block-typings $typings))))
+
+  (define (block-with-typing $block $typing)
+    (block-update-typings $block
+      (lambda (_)
+        (stack $typing))))
+
+  (define (block-with-typings $block $typings)
+    (block-update-typings $block
+      (lambda (_)
+        $typings)))
 
   (define (block-let $block $fn)
     (entries-let
       (block-entries $block)
-      ($fn (block-args $block))))
+      ($fn (block-typings $block))))
 
   (define (block-struct $name $block)
     (block-let $block (partial typing-struct $name)))
