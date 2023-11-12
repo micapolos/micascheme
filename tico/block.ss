@@ -4,7 +4,7 @@
     empty-block
     block-update-entries
     block-update-typings
-    block-push-typing
+    block+typing
     block->typing)
   (import
     (micascheme)
@@ -27,7 +27,7 @@
       (block-entries $block)
       ($fn (block-typings $block))))
 
-  (define (block-push-typing $block $typing)
+  (define (block+typing $block $typing)
     (block-update-typings $block
       (lambda ($typings)
         (push $typings $typing))))
