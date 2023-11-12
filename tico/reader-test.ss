@@ -179,3 +179,16 @@
       (literal->typing "bar")
       (literal->typing "end"))))
 
+(check
+  (equal?
+    (typing-value
+      (read-typing
+        (use
+          (native "string-append")
+          (as
+            string
+            (plus string)
+            (promising string)))
+        "foo"
+        (plus "bar")))
+    "foobar"))

@@ -13,6 +13,7 @@
     (tico binding)
     (tico path)
     (tico block)
+    (tico entry)
     (leo parser)
     (leo reader))
 
@@ -39,6 +40,24 @@
           $end))
       (lambda ($symbol)
         (case $symbol
+          ((use)
+            (lets
+              (do
+                (unless
+                  (null? (block-typings $block))
+                  (throw can-not-use)))
+              (typing-reader $bindings
+                (lambda ($use-typing)
+                  (lets
+                    ($parameter (typing-parameter $use-typing))
+                    (push-block-reader
+                      (push $bindings
+                        (binding $parameter))
+                      (block+entry $block
+                        (entry
+                          (list $parameter)
+                          (list $use-typing)))
+                      $end))))))
           ((load)
             (paths-reader
               (lambda ($paths)
@@ -229,13 +248,13 @@
 
   (define-syntax-rule (bindings-read-typings $bindings $body ...)
     (reader-eval
-      (push-block-reader $bindings (empty-block) block-end-typings)
+      (typings-reader $bindings)
       $body ...))
 
   (define-syntax-rule (bindings-read-typing $bindings $body ...)
-    (car
-      (ensure single?
-        (bindings-read-typings $bindings $body ...))))
+    (reader-eval
+      (typing-reader $bindings)
+      $body ...))
 
   (define-syntax-rule (read-typings $body ...)
     (bindings-read-typings (stack) $body ...))

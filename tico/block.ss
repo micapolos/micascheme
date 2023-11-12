@@ -5,9 +5,11 @@
     block-end-typings
     block-update-entries
     block-update-typings
+    block+entry
     block-typing
     block-with-typing
     block-with-typings
+    block+entry
     block+typing
     block+typings
     block-let
@@ -28,15 +30,19 @@
       ($fn (block-entries $block))
       (block-typings $block)))
 
+  (define (block+entry $block $entry)
+    (block-update-entries $block
+      (lambda ($entries)
+        (push $entries $entry))))
+
   (define (block-update-typings $block $fn)
     (block
       (block-entries $block)
       ($fn (block-typings $block))))
 
   (define (block-end-typings $block)
-    (and
-      (null? (block-entries $block))
-      (block-typings $block)))
+    (ensure null? (block-entries $block))
+    (block-typings $block))
 
   (define (block-typing $block)
     (or-throw (single (block-typings $block))))
