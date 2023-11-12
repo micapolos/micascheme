@@ -30,12 +30,8 @@
 
 (check
   (equal?
-    (read-typings 10 (type boolean number string))
-    (stack
-      (read-typing 10)
-      (typing->type-typing (read-typing boolean))
-      (typing->type-typing (read-typing number))
-      (typing->type-typing (read-typing string)))))
+    (read-typing (type boolean))
+    (typing->type-typing (read-typing boolean))))
 
 (check
   (equal?
@@ -59,20 +55,17 @@
 
 (check
   (equal?
-    (read-typings number string (offering boolean))
+    (read-typing number string (offering boolean))
     (typings-offering
-      (read-typings number string)
-      (read-typings boolean))))
+      (reverse (read-typings number string))
+      (read-typing boolean))))
 
 (check
   (equal?
     (read-typings
-      (prepare
-        (native "(+ 1 2)")
-        (native "(string-append \"foo\" \"bar\")")))
+      (prepare (native "(+ 1 2)")))
     (stack
-      (type-datum->typing (native-type) 3)
-      (type-datum->typing (native-type) "foobar"))))
+      (type-datum->typing (native-type) 3))))
 
 (check
   (equal?
@@ -94,24 +87,22 @@
 
 (check
   (equal?
-    (read-typings 1 2 (the 3 4))
+    (read-typings 1 2 (the 3))
     (stack
       (literal->typing 1)
       (literal->typing 2)
-      (literal->typing 3)
-      (literal->typing 4))))
+      (literal->typing 3))))
 
 (check
   (equal?
-    (read-typings 1 2 (with 3 (the 4 5)))
+    (read-typings 1 2 (with 3 (the 4)))
     (stack
       (literal->typing 1)
       (literal->typing 2)
       (literal->typing 3)
       (typing-struct 'the
         (list
-          (literal->typing 4)
-          (literal->typing 5))))))
+          (literal->typing 4))))))
 
 (check
   (equal?
@@ -138,30 +129,15 @@
 (check
   (equal?
     (read-typings
-      (the
-        (native "+")
-        (as number number (promising number)))
-      (the
-        (native "*")
-        (as number number (promising number)))
+      (native "+")
+      (as number number (promising number))
       (apply 3 4))
     (stack
       (typing-application
         (read-typing
-          (the
-            (native "+")
-            (as number number (promising number))))
-        (list
-          (read-typing 3)
-          (read-typing 4)))
-      (typing-application
-        (read-typing
-          (the
-            (native "*")
-            (as number number (promising number))))
-        (list
-          (read-typing 3)
-          (read-typing 4))))))
+          (native "+")
+          (as number number (promising number)))
+        (reverse (read-typings 3 4))))))
 
 (check
   (equal?

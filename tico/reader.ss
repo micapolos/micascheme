@@ -63,15 +63,17 @@
               (lambda ($prepare-typings)
                 (top-level-reader
                   $bindings
-                  (push-all $typings
-                    (map typing-prepare $prepare-typings))
+                  (push $typings
+                    (typing-prepare
+                      (or-throw
+                        (single $prepare-typings))))
                   $end))))
           ((the)
             (top-level-reader $bindings (stack)
               (lambda ($the-typings)
                 (top-level-reader
                   $bindings
-                  (push-all $typings $the-typings)
+                  (push $typings (or-throw (single $the-typings)))
                   $end))))
           ((with)
             (with-reader $bindings (stack)
@@ -105,18 +107,17 @@
                       (typings-do
                         $parameter-typings
                         $argument-typings
-                        (force-single $body-typings)))
+                        (or-throw (single $body-typings))))
                     $end)))))
           ((apply)
             (top-level-reader $bindings (stack)
               (lambda ($arg-typings)
                 (top-level-reader
                   $bindings
-                  (map
-                    (lambda ($typing)
-                      (typing-application $typing
-                        (reverse $arg-typings)))
-                    $typings)
+                  (stack
+                    (typing-application
+                      (or-throw (single $typings))
+                      (reverse $arg-typings)))
                   $end))))
           ((doing)
             (lets
@@ -130,7 +131,7 @@
                     $bindings
                     (stack
                       (typing-abstraction $param-typings
-                        (force-single $doing-typings)))
+                        (or-throw (single $doing-typings))))
                     $end)))))
           ((promising)
             (top-level-reader $bindings (stack)
@@ -146,15 +147,19 @@
               (lambda ($offering-typings)
                 (top-level-reader 
                   $bindings
-                  (typings-offering $typings $offering-typings)
+                  (stack
+                    (typings-offering
+                      (reverse $typings)
+                      (or-throw (single $offering-typings))))
                   $end))))
           ((type)
             (top-level-reader $bindings (stack)
               (lambda ($type-typings)
                 (top-level-reader 
                   $bindings
-                  (push-all $typings 
-                    (map typing->type-typing $type-typings))
+                  (push $typings
+                    (typing->type-typing
+                      (or-throw (single $type-typings))))
                   $end))))
           ((comment)
             (comment-reader

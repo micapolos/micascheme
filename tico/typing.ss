@@ -253,11 +253,11 @@
         (reverse (map typing->type $param-typings))
         (typing->type $result-typing))))
 
-  (define (typings-offering $typings $offering-typings)
+  (define (typings-offering $typings $offering-typing)
     (lets
-      ($params (map typing->type (reverse $typings)))
-      ($body (typing->type (or-throw (single $offering-typings))))
-      (stack (type->typing (property $params $body)))))
+      ($params (map typing->type $typings))
+      ($body (typing->type $offering-typing))
+      (type->typing (property $params $body))))
 
   (define (single-typing $typings)
     (car (ensure single? $typings)))
