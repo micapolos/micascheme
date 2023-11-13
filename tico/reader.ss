@@ -176,15 +176,17 @@
                       $result-typing))
                   $end))))
           ((offering)
-            (typing-reader $bindings
-              (lambda ($offering-typing)
-                (push-block-reader
-                  $bindings
-                  (block-with-typing $block
-                    (typing-offering
-                      (reverse (block-typings $block))
-                      $offering-typing))
-                  $end))))
+            (lets
+              ($typing (block-typing $block))
+              (typing-reader $bindings
+                (lambda ($offering-typing)
+                  (push-block-reader
+                    $bindings
+                    (block-with-typing $block
+                      (typing-offering
+                        $typing
+                        $offering-typing))
+                    $end)))))
           ((type)
             (typing-reader $bindings
               (lambda ($type-typing)

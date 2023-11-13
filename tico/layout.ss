@@ -108,7 +108,7 @@
           (type->layout (arrow-result $arrow))))
       ((property? $property)
         (layout-abstraction
-          (map type->layout (property-params $property))
+          (list (type->layout (property-param $property)))
           (type->layout (property-body $property))))
       ((list-of? $list-of)
         (simple-layout))

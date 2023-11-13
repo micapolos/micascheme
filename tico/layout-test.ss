@@ -119,12 +119,10 @@
   (equal?
     (type->layout
       (property 
-        (list (string-type) (boolean-type)) 
+        (string-type)
         (number-type)))
     (layout-abstraction
-      (list 
-        (type->layout (string-type))
-        (type->layout (boolean-type)))
+      (list (type->layout (string-type)))
       (type->layout (number-type)))))
 
 ; --- layout-ref

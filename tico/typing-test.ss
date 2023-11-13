@@ -198,11 +198,11 @@
 (check
   (equal?
     (typing-offering
-      (list (number-typing) (string-typing))
+      (number-typing)
       (boolean-typing))
     (type->typing
       (property
-        (list (number-type) (string-type))
+        (number-type)
         (boolean-type)))))
 
 (check

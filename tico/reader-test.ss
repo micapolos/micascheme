@@ -52,9 +52,9 @@
 
 (check
   (equal?
-    (read-typing number string (offering boolean))
+    (read-typing number (offering boolean))
     (typing-offering
-      (reverse (read-typings number string))
+      (read-typing number)
       (read-typing boolean))))
 
 (check

@@ -73,8 +73,8 @@
 
 (check 
  	(equal?
-	  (value->datum (property (list "foo" "bar") "zoo"))
-  		`(property (list "foo" "bar") "zoo")))
+	  (value->datum (property "foo" "zoo"))
+  	`(property "foo" "zoo")))
 
 (check
  	(equal?

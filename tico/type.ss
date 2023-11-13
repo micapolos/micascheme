@@ -12,7 +12,7 @@
     literal->type
     struct struct? struct-name struct-fields
     arrow arrow? arrow-params arrow-result
-    property property? property-params property-body
+    property property? property-param property-body
     abstraction abstraction? abstraction-arity abstraction-body
     recursion recursion? recursion-items
     var var? var-index
@@ -44,7 +44,7 @@
   (data (list-of item-type))
   (data (struct name fields))
   (data (arrow params result))
-  (data (property params body))
+  (data (property param body))
   (data (abstraction arity body))
   (data (recursion items))
   (data (var index))
@@ -93,16 +93,16 @@
   (define (type-abstraction $param-types $body-type)
     (arrow $param-types $body-type))
 
-  (define (type-access-opt $target $args)
+  (define (type-access-opt $target $arg)
     (switch $target
       ((property? $property)
         (and
-          (types-match? $args (property-params $property))
+          (type-matches? $arg (property-param $property))
           (property-body $property)))))
 
-  (define (type-access $target $args)
+  (define (type-access $target $arg)
     (or-throw
-      (type-access-opt $target $args)))
+      (type-access-opt $target $arg)))
 
   (define (type-matches? $type $pattern)
     (switch $pattern
@@ -141,9 +141,9 @@
       ((property? $property)
         (and
           (property? $type)
-          (types-match?
-            (property-params $property)
-            (property-params $type))
+          (type-matches?
+            (property-param $property)
+            (property-param $type))
           (type-matches?
             (property-body $type)
             (property-body $property))))

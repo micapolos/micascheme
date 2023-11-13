@@ -148,23 +148,23 @@
         (map typing-layment $param-typings)
         (typing-layment $body-typing))))
 
-  (define (typing-property $param-types $body-typing)
+  (define (typing-property $param-type $body-typing)
     (lets
       ($body-type (typing-type $body-typing))
-      ($type (property $param-types $body-type))
+      ($type (property $param-type $body-type))
       (typing $type
         (layment-abstraction
-          (map type->layout $param-types)
+          (list (type->layout $param-type))
           (typing-layment $body-typing)))))
 
-  (define (typing-access $typing $args)
+  (define (typing-access $typing $arg)
     (typing
       (type-access
         (typing-type $typing)
-        (map typing-type $args))
+        (typing-type $arg))
       (layment-application
         (typing-layment $typing)
-        (map typing-layment $args))))
+        (list (typing-layment $arg)))))
 
   (define (typing-struct $name $field-typings)
     (typing
@@ -251,11 +251,11 @@
         (map typing->type $param-typings)
         (typing->type $result-typing))))
 
-  (define (typing-offering $typings $offering-typing)
+  (define (typing-offering $typing $offering-typing)
     (lets
-      ($params (map typing->type $typings))
+      ($param (typing->type $typing))
       ($body (typing->type $offering-typing))
-      (type->typing (property $params $body))))
+      (type->typing (property $param $body))))
 
   (define (single-typing $typings)
     (car (ensure single? $typings)))
