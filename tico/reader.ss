@@ -120,11 +120,12 @@
                   $bindings
                   (block-update-typings $block
                     (lambda ($block-typings)
-                    (switch $block-typings
-                      ((null? _)
-                        (bindings-get* $bindings $get-typings))
-                      ((pair? $block-typings)
-                        (stack (typings-get $block-typings $get-typings))))))
+                      (stack
+                        (switch $block-typings
+                          ((null? _)
+                            (bindings-get* $bindings $get-typings))
+                          ((pair? $block-typings)
+                            (typings-get $block-typings $get-typings))))))
                   $end))))
           ((do)
             (lets

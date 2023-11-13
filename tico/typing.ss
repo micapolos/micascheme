@@ -174,10 +174,8 @@
         (map typing-layment $field-typings))))
 
   (define (typing-ref $typing $pattern)
-    (lets
-      ($indexed-type
-        (ensure indexed?
-          (type-ref (typing-type $typing) $pattern)))
+    (and-lets
+      ($indexed-type (type-ref (typing-type $typing) $pattern))
       (typing
         (indexed-value $indexed-type)
         (layment-ref

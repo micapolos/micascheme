@@ -56,13 +56,12 @@
 
   (define (bindings-get* $bindings $selector-typings)
     (switch (reverse $selector-typings)
-      ((null? _) (stack))
+      ((null? _) (throw not-bound $selector-typings))
       ((pair? $pair)
         (unpair $pair $selector-typing $selector-typings
-          (stack
-            (typing-get
-              (bindings-get $bindings $selector-typing)
-              $selector-typings))))))
+          (typing-get
+            (bindings-get $bindings $selector-typing)
+            $selector-typings)))))
 
   (define (bindings-resolve-opt $bindings $typings)
     (or
@@ -110,4 +109,15 @@
         ($fn
           (push-list $bindings
             (map binding $parameter-typings))))))
+
+  (define (bindings-typing-ref $bindings $typing $pattern)
+    (or
+      (typing-ref $typing $pattern)
+      (and-lets
+        ($property-typing
+          (bindings-match $bindings
+            (property
+              (typing-type $typing)
+              (any-type))))
+        (typing-access $property-typing $pattern))))
 )
