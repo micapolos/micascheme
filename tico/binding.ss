@@ -6,10 +6,13 @@
     bindings-match
     binding-not-empty?
     typing->binding
-    bindings-get*
+    bindings-ref
+    bindings-get
     bindings-resolve-opt
     bindings-resolve
-    bindings-do)
+    bindings-do
+    bindings-typing-ref
+    bindings-typing-get)
   (import
     (micascheme)
     (tico typing)
@@ -50,16 +53,18 @@
   (define (bindings-match $bindings $pattern)
     (bindings-match-from $bindings $pattern 0))
 
-  (define (bindings-get $bindings $pattern)
-    (bindings-match $bindings $pattern))
+  (define (bindings-ref $bindings $pattern)
+    (or
+      (bindings-match $bindings $pattern)
+      (throw bindings-ref $bindings $pattern)))
 
-  (define (bindings-get* $bindings $patterns)
+  (define (bindings-get $bindings $patterns)
     (switch $patterns
       ((null? _) (throw empty-patterns))
       ((pair? $pair)
         (unpair $pair $pattern $patterns
           (typing-get
-            (bindings-get $bindings $pattern)
+            (bindings-ref $bindings $pattern)
             $patterns)))))
 
   (define (bindings-resolve-opt $bindings $typings)
@@ -119,4 +124,10 @@
               (typing-type $typing)
               (any-type))))
         (typing-access $property-typing $pattern))))
+
+  (define (bindings-typing-get $bindings $typing $patterns)
+    (fold-left
+      (partial bindings-typing-ref $bindings)
+      $typing
+      $patterns))
 )

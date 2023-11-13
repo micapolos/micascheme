@@ -125,9 +125,11 @@
                         (stack
                           (switch $block-typings
                             ((null? _)
-                              (bindings-get* $bindings $patterns))
+                              (bindings-get $bindings $patterns))
                             ((pair? $block-typings)
-                              (typing-get (or-throw (single $block-typings)) $patterns))))))
+                              (bindings-typing-get $bindings
+                                (or-throw (single $block-typings))
+                                $patterns))))))
                     $end)))))
           ((do)
             (lets
