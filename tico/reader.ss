@@ -116,17 +116,19 @@
           ((get)
             (typings-reader $bindings
               (lambda ($get-typings)
-                (push-block-reader
-                  $bindings
-                  (block-update-typings $block
-                    (lambda ($block-typings)
-                      (stack
-                        (switch $block-typings
-                          ((null? _)
-                            (bindings-get* $bindings $get-typings))
-                          ((pair? $block-typings)
-                            (typings-get $block-typings $get-typings))))))
-                  $end))))
+                (lets
+                  ($patterns (reverse (map typing->type $get-typings)))
+                  (push-block-reader
+                    $bindings
+                    (block-update-typings $block
+                      (lambda ($block-typings)
+                        (stack
+                          (switch $block-typings
+                            ((null? _)
+                              (bindings-get* $bindings $patterns))
+                            ((pair? $block-typings)
+                              (typing-get (or-throw (single $block-typings)) $patterns))))))
+                    $end)))))
           ((do)
             (lets
               ($argument-typings (reverse (block-typings $block)))

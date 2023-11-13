@@ -132,15 +132,14 @@
 
 (check
   (equal?
-    (typings-get
-      (stack
-        (typing-struct 'point
-          (list
-            (typing-struct 'x (list (literal->typing 10)))
-            (typing-struct 'y (list (literal->typing 20))))))
-      (stack
-        (typing-struct 'x (list))
-        (static-typing (value-type (number-type)))))
+    (typing-get
+      (typing-struct 'point
+        (list
+          (typing-struct 'x (list (literal->typing 10)))
+          (typing-struct 'y (list (literal->typing 20)))))
+      (list
+        (struct 'x (list))
+        (number-type)))
     (typing-ref
       (typing-ref
         (typing-struct 'point

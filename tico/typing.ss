@@ -31,7 +31,6 @@
     typing-prepare
     typings-do
     typing-get
-    typings-get
     typing-as
     typing-promising
     typing-property
@@ -182,14 +181,8 @@
           (typing-layment $typing)
           (indexed-index $indexed-type)))))
 
-  (define (typing-get $typing $selector-typings)
-    (fold-left typing-ref $typing
-      (reverse (map typing->type $selector-typings))))
-
-  (define (typings-get $typings $selector-typings)
-    (typing-get
-      (single-typing $typings)
-      $selector-typings))
+  (define (typing-get $typing $patterns)
+    (fold-left typing-ref $typing $patterns))
 
   (define (typing-native $typing)
     (native->typing

@@ -50,18 +50,17 @@
   (define (bindings-match $bindings $pattern)
     (bindings-match-from $bindings $pattern 0))
 
-  (define (bindings-get $bindings $selector-typing)
-    (bindings-match $bindings
-      (typing->type $selector-typing)))
+  (define (bindings-get $bindings $pattern)
+    (bindings-match $bindings $pattern))
 
-  (define (bindings-get* $bindings $selector-typings)
-    (switch (reverse $selector-typings)
-      ((null? _) (throw not-bound $selector-typings))
+  (define (bindings-get* $bindings $patterns)
+    (switch $patterns
+      ((null? _) (throw empty-patterns))
       ((pair? $pair)
-        (unpair $pair $selector-typing $selector-typings
+        (unpair $pair $pattern $patterns
           (typing-get
-            (bindings-get $bindings $selector-typing)
-            $selector-typings)))))
+            (bindings-get $bindings $pattern)
+            $patterns)))))
 
   (define (bindings-resolve-opt $bindings $typings)
     (or

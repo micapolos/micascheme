@@ -105,10 +105,19 @@
   (equal?
     (read-typing
       (point (x 10) (y 20))
+      (get x))
+    (typing-ref
+      (read-typing (point (x 10) (y 20)))
+      (typing->type (read-typing x)))))
+
+(check
+  (equal?
+    (read-typing
+      (point (x 10) (y 20))
       (get x number))
-    (typings-get
-      (read-typings (point (x 10) (y 20)))
-      (read-typings x number))))
+    (typing-get
+      (read-typing (point (x 10) (y 20)))
+      (reverse (map typing->type (read-typings x number))))))
 
 (check
   (equal?
