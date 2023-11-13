@@ -106,7 +106,9 @@
             (property
               (typing-type $typing)
               (any-type))))
-        (typing-access $property-typing $pattern))))
+        (typing-access
+          $property-typing
+          $typing))))
 
   (define (bindings-typing-get $bindings $typing $patterns)
     (fold-left
