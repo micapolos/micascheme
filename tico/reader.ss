@@ -114,23 +114,26 @@
                   (block+typings $block (reverse $with-typings))
                   $end))))
           ((get)
-            (typings-reader $bindings
-              (lambda ($get-typings)
-                (lets
-                  ($patterns (reverse (map typing->type $get-typings)))
-                  (push-block-reader
-                    $bindings
-                    (block-update-typings $block
-                      (lambda ($block-typings)
-                        (stack
-                          (switch $block-typings
-                            ((null? _)
-                              (bindings-get $bindings $patterns))
-                            ((pair? $block-typings)
-                              (bindings-typing-get $bindings
-                                (or-throw (single $block-typings))
-                                $patterns))))))
-                    $end)))))
+            (lets
+              ($typing-opt
+                (switch (block-typings $block)
+                  ((null? _) #f)
+                  ((pair? $pair) (or-throw (single $pair)))))
+              (typings-reader $bindings
+                (lambda ($get-typings)
+                  (lets
+                    ($patterns (reverse (map typing->type $get-typings)))
+                    (push-block-reader
+                      $bindings
+                      (block-update-typings $block
+                        (lambda ($block-typings)
+                          (stack
+                            (switch-exclusive $typing-opt
+                              ((typing? $typing)
+                                (bindings-typing-get $bindings $typing $patterns))
+                              ((false? _)
+                                (bindings-get $bindings $patterns))))))
+                      $end))))))
           ((do)
             (lets
               ($argument-typings (reverse (block-typings $block)))
