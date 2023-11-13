@@ -36,7 +36,6 @@
     typing-property
     typing-offering
     typing-access
-    typings-access
     typing-assert
 
     typing-not-empty?
@@ -252,11 +251,6 @@
 
   (define (single-typing $typings)
     (car (ensure single? $typings)))
-
-  (define (typings-access $typings $selector-typings)
-    (map
-      (partial typing-access (or-throw (single $typings)))
-      (map typing->type $selector-typings)))
 
   (define (let-typing $typings $fn)
     (lets

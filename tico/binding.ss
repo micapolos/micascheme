@@ -68,9 +68,7 @@
             $patterns)))))
 
   (define (bindings-resolve-opt $bindings $typings)
-    (or
-      (bindings-resolve-application-opt $bindings $typings)
-      (bindings-resolve-access-opt $bindings $typings)))
+    (bindings-resolve-application-opt $bindings $typings))
 
   (define (bindings-resolve-application-opt $bindings $typings)
     (lets
@@ -83,21 +81,6 @@
         (stack
           (typing-application $target-typing
             (reverse $typings))))))
-
-  (define (bindings-resolve-access-opt $bindings $typings)
-    (switch-opt $typings
-      ((pair? $pair)
-        (unpair $pair $typing $typings
-          (lets
-            ($target-typing
-              (bindings-match $bindings
-                (property
-                  (reverse (map typing-type $typings))
-                  (typing-type $typing)))) ; TODO: This must already be (type-type) with a runtime value.
-            (and $target-typing
-              (stack
-                (typing-access $target-typing
-                  (reverse $typings)))))))))
 
   (define (bindings-resolve $bindings $typings)
     (or
