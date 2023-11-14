@@ -24,5 +24,5 @@
 	(equal?
 		(writer-string 
 			(indent-writer (char-stack-writer) 2)
-			"foo\nbar\n")
-		"foo\n  bar\n  "))
+			"foo\n\nbar\n")
+		"foo\n  \n  bar\n  "))
