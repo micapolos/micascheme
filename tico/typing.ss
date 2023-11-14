@@ -43,6 +43,8 @@
     typing->type-typing
 
     typing-resolve
+    typings-resolve
+    typings-resolve-get
 
     make-list-typing
     make-struct-typing)
@@ -211,6 +213,23 @@
           ((equal? $type (struct 'string (list)))
             (string-typing))
           (else $typing))))
+
+  (define (typings-resolve $typings)
+    (typings-resolve-get $typings))
+
+  (define (typings-resolve-get $typings)
+    (and
+      (= (length $typings) 2)
+      (lets
+        ($target-typing (cadr $typings))
+        ($selector-typing (car $typings))
+        (switch-opt (typing-type $selector-typing)
+          ((struct? $selector-struct)
+            (and
+              (symbol=? (struct-name $selector-struct) 'get)
+              (and-lets
+                ($selector-type (single (struct-fields $selector-struct)))
+                (typing-ref $target-typing (type-value $selector-type)))))))))
 
   (define (typing->type $typing)
     (type-value (typing-type $typing)))

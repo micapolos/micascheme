@@ -251,3 +251,43 @@
   (raises?
     (lambda ()
       (typing-assert (variable-typing (boolean-type) 'foo 1)))))
+
+; --- typings-resolve-get
+
+(check
+  (equal?
+    (typings-resolve-get
+      (stack
+        (typing-struct 'foo
+          (list
+            (literal->typing "foo")
+            (typing-struct 'x (list (literal->typing 10)))))
+        (typing-struct 'get
+          (list
+            (type->typing (string-type))))))
+    (typing-ref
+      (typing-struct 'foo
+        (list
+          (literal->typing "foo")
+          (typing-struct 'x (list (literal->typing 10)))))
+      (string-type))))
+
+(check
+  (equal?
+    (typings-resolve-get
+      (stack
+        (typing-struct 'foo
+          (list
+            (literal->typing "foo")
+            (typing-struct 'x (list (literal->typing 10)))))
+        (typing-struct 'get
+          (list
+            (typing-struct 'x (list))))))
+    (typing-ref
+      (typing-struct 'foo
+        (list
+          (literal->typing "foo")
+          (typing-struct 'x (list (literal->typing 10)))))
+      (struct 'x (list)))))
+
+
