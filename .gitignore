@@ -22,6 +22,9 @@ DerivedData/
 *.perspectivev3
 !default.perspectivev3
 
+## Compiled scheme files
+*.so
+
 ## Obj-C/Swift specific
 *.hmap
 
