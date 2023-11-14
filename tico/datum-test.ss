@@ -57,7 +57,7 @@
 (check (equal? (value->datum (vector 1 2 3)) `(vector 1 2 3)))
 
 (check (equal? (value->datum (any-type)) `(any-type)))
-(check (equal? (value->datum (native-type)) `(native-type)))
+(check (equal? (value->datum (unchecked-type)) `(unchecked-type)))
 (check (equal? (value->datum (type-type)) `(type-type)))
 (check (equal? (value->datum (value-type "foo")) `(value-type "foo")))
 

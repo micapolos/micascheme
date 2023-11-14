@@ -2,7 +2,7 @@
   (export
     any-type any-type?
     value-type value-type? value-type-value
-    native-type native-type?
+    unchecked-type unchecked-type?
     type-type type-type?
     list-of list-of? list-of-item-type
     boolean-type
@@ -40,7 +40,7 @@
   (data (any-type))
   (data (value-type value))
   (data (type-type))
-  (data (native-type))
+  (data (unchecked-type))
   (data (list-of item-type))
   (data (struct name fields))
   (data (arrow params result))
@@ -53,22 +53,22 @@
     (struct (quote $name) (list)))
 
   (define-syntax-rule (test-type $name)
-    (struct (quote $name) (list (native-type))))
+    (struct (quote $name) (list (unchecked-type))))
 
   (define (boolean-type)
-    (struct 'boolean (list (native-type))))
+    (struct 'boolean (list (unchecked-type))))
 
   (define (number-type)
-    (struct 'number (list (native-type))))
+    (struct 'number (list (unchecked-type))))
 
   (define (string-type)
-    (struct 'string (list (native-type))))
+    (struct 'string (list (unchecked-type))))
 
   (define (char-type)
-    (struct 'char (list (native-type))))
+    (struct 'char (list (unchecked-type))))
 
   (define (symbol-type)
-    (struct 'symbol (list (native-type))))
+    (struct 'symbol (list (unchecked-type))))
 
   (define (literal->type $literal)
     (switch $literal
@@ -116,8 +116,8 @@
             (value-type-value $value-type))))
       ((type-type? _)
         (type-type? $type))
-      ((native-type? _)
-        (native-type? $type))
+      ((unchecked-type? _)
+        (unchecked-type? $type))
       ((struct? $struct)
         (and
           (struct? $type)

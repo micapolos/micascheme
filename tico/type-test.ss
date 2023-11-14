@@ -3,7 +3,7 @@
 (check
   (equal?
     (test-type a)
-    (struct 'a (list (native-type)))))
+    (struct 'a (list (unchecked-type)))))
 
 (check
   (equal?
@@ -31,19 +31,19 @@
 (check
   (not
     (type-matches? 
-      (native-type) 
+      (unchecked-type)
       (value-type "foo"))))
 
 (check
   (type-matches? 
-    (native-type)
-    (native-type)))
+    (unchecked-type)
+    (unchecked-type)))
 
 (check
   (not
     (type-matches? 
       (value-type "foo")
-      (native-type))))
+      (unchecked-type))))
 
 (check
   (type-matches? 
@@ -69,76 +69,76 @@
 
 (check
   (type-matches?
-    (struct 'foo (list (any-type) (native-type)))
-    (struct 'foo (list (any-type) (native-type)))))
+    (struct 'foo (list (any-type) (unchecked-type)))
+    (struct 'foo (list (any-type) (unchecked-type)))))
 
 (check
   (type-matches? 
-    (struct 'foo (list (value-type "foo") (native-type)))
-    (struct 'foo (list (any-type) (native-type)))))
+    (struct 'foo (list (value-type "foo") (unchecked-type)))
+    (struct 'foo (list (any-type) (unchecked-type)))))
 
 (check
   (not
     (type-matches? 
-      (struct 'bar (list (any-type) (native-type)))
-      (struct 'foo (list (any-type) (native-type))))))
+      (struct 'bar (list (any-type) (unchecked-type)))
+      (struct 'foo (list (any-type) (unchecked-type))))))
 
 (check
   (not
     (type-matches? 
       (struct 'foo (list (any-type)))
-      (struct 'foo (list (any-type) (native-type))))))
+      (struct 'foo (list (any-type) (unchecked-type))))))
 
 (check
   (not
     (type-matches? 
-      (struct 'foo (list (any-type) (native-type)))
+      (struct 'foo (list (any-type) (unchecked-type)))
       (struct 'foo (list (any-type))))))
 
 (check
   (not
     (type-matches? 
       (struct 'foo (list (any-type) (value-type "foo")))
-      (struct 'foo (list (any-type) (native-type))))))
+      (struct 'foo (list (any-type) (unchecked-type))))))
 
 (check
   (not
     (type-matches? 
-      (native-type)
-      (struct 'foo (list (any-type) (native-type))))))
+      (unchecked-type)
+      (struct 'foo (list (any-type) (unchecked-type))))))
 
 (check
   (type-matches? 
-    (arrow (list (any-type) (native-type)) (value-type "foo"))
-    (arrow (list (any-type) (native-type)) (value-type "foo"))))
+    (arrow (list (any-type) (unchecked-type)) (value-type "foo"))
+    (arrow (list (any-type) (unchecked-type)) (value-type "foo"))))
 
 (check
   (type-matches? 
-    (arrow (list (any-type) (native-type)) (value-type "foo"))
-    (arrow (list (value-type "foo") (native-type)) (value-type "foo"))))
+    (arrow (list (any-type) (unchecked-type)) (value-type "foo"))
+    (arrow (list (value-type "foo") (unchecked-type)) (value-type "foo"))))
 
 (check
   (type-matches? 
-    (arrow (list (any-type) (native-type)) (value-type "foo"))
-    (arrow (list (any-type) (native-type)) (any-type))))
+    (arrow (list (any-type) (unchecked-type)) (value-type "foo"))
+    (arrow (list (any-type) (unchecked-type)) (any-type))))
 
 (check
   (not
     (type-matches? 
       (arrow (list (any-type) (value-type "foo")) (value-type "foo"))
-      (arrow (list (any-type) (native-type)) (value-type "foo")))))
+      (arrow (list (any-type) (unchecked-type)) (value-type "foo")))))
 
 (check
   (not
     (type-matches? 
-      (arrow (list (any-type) (native-type)) (value-type "bar"))
-      (arrow (list (any-type) (native-type)) (value-type "foo")))))
+      (arrow (list (any-type) (unchecked-type)) (value-type "bar"))
+      (arrow (list (any-type) (unchecked-type)) (value-type "foo")))))
 
 (check
   (not
     (type-matches? 
-      (native-type)
-      (arrow (list (any-type) (native-type)) (value-type "foo")))))
+      (unchecked-type)
+      (arrow (list (any-type) (unchecked-type)) (value-type "foo")))))
 
 ; --- type-application
 

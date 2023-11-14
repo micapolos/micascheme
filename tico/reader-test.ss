@@ -62,7 +62,7 @@
     (read-typings
       (prepare (native "(+ 1 2)")))
     (stack
-      (type-datum->typing (native-type) 3))))
+      (type-datum->typing (unchecked-type) 3))))
 
 (check
   (equal?

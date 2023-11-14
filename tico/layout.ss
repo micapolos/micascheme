@@ -95,7 +95,7 @@
     (switch $type
       ((value-type? _)
         (empty-layout))
-      ((native-type? _)
+      ((unchecked-type? _)
         (native-layout))
       ((type-type? _)
         (simple-layout))

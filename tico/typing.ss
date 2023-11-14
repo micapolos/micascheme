@@ -192,7 +192,7 @@
           (typing-value $typing)))))
 
   (define (native->typing $datum)
-    (type-datum->typing (native-type) $datum))
+    (type-datum->typing (unchecked-type) $datum))
 
   (define (typing-prepare $typing)
     (type-datum->typing
@@ -243,7 +243,7 @@
 
   (define (typing-as $typing $type-typing)
     (switch (typing-type $typing)
-      ((native-type? _)
+      ((unchecked-type? _)
         (type-compilation->layment
           (typing->type $type-typing)
           (layment-compilation (typing-layment $typing))))

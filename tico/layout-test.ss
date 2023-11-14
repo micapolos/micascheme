@@ -77,7 +77,7 @@
 
 (check
   (equal?
-    (type->layout (native-type))
+    (type->layout (unchecked-type))
     (native-layout)))
 
 (check
@@ -97,7 +97,7 @@
 
 (check
   (equal?
-    (type->layout (struct 'foo (list (native-type) (value-type "foo") (native-type))))
+    (type->layout (struct 'foo (list (unchecked-type) (value-type "foo") (unchecked-type))))
     (layout-struct 'foo (list (native-layout) (empty-layout) (native-layout)))))
 
 (check
@@ -106,8 +106,8 @@
       (arrow
         (list
           (value-type "foo")
-          (native-type))
-        (native-type)))
+          (unchecked-type))
+        (unchecked-type)))
     (lambda-layout
       (make-struct-layout
         (list
