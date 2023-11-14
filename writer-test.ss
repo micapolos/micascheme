@@ -19,3 +19,10 @@
 			(trim-end-writer (char-stack-writer))
 			"foo bar \n  goo \n  \n")
 		"foo bar\n  goo\n\n"))
+
+(check
+	(equal?
+		(writer-string 
+			(indent-writer (char-stack-writer) 2)
+			"foo\nbar\n")
+		"foo\n  bar\n  "))

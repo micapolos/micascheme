@@ -6,7 +6,8 @@
 		writer-write-string
 		writer-string->value
 		char-stack-writer
-		trim-end-writer)
+		trim-end-writer
+		indent-writer)
 	(import (micascheme))
 
 	(data (writer value proc))
@@ -52,4 +53,20 @@
 									(writer-write-char
 										(writer-write-chars $writer (reverse $end-whitespaces))
 										$char)))))))))
+
+	(define (indent-writer $writer $indent-size)
+		(writer
+			(writer-value $writer)
+			(lambda ($char)
+				(cond
+					((char=? $char #\newline)
+						(indent-writer
+							(writer-write-chars 
+								(writer-write-char $writer $char)
+								(make-list $indent-size #\space))
+							$indent-size))
+					(else 
+						(indent-writer 
+							(writer-write-char $writer $char)
+							$indent-size))))))
 )
