@@ -26,6 +26,7 @@
   (type)
   (typed)
   (value)
+  (writer)
   (z80)
   (leo all)
   (tico all)
