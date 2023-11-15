@@ -208,3 +208,21 @@
     (arrow
       (list (string-type) (string-type) (string-type))
       (list-of (string-type)))))
+
+; --- type-line
+
+(check (equal? (type-line (boolean-type)) 'boolean))
+(check (equal? (type-line (number-type)) 'number))
+(check (equal? (type-line (string-type)) 'string))
+(check (equal? (type-line (char-type)) 'char))
+(check (equal? (type-line (symbol-type)) 'symbol))
+
+(check (equal? (type-line (struct 'foo (list))) 'foo))
+(check 
+  (equal? 
+    (type-line 
+      (struct 'foo 
+        (list
+          (string-type) 
+          (number-type))))
+    '(foo string number)))

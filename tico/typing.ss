@@ -325,4 +325,30 @@
     (typing-application
       (typing-abstraction $parameter-typings $body-typing)
       $argument-typings))
+
+  (define (typings-lines $typings)
+    (map typing-line $typings))
+
+  (define (typing-line $typing)
+    (switch (typing-type $typing)
+      ((struct? $struct)
+        (switch (struct-fields $struct)
+          ((null? _) (struct-name $struct))
+          ((else $fields)
+            `(
+              ,(struct-name struct)
+              ,@(map typing-line $fields)))))
+      ((else $other)
+        (cond
+          ((equal? $other (boolean-type))
+            (typing-datum $typing))
+          ((equal? $other (number-type))
+            (typing-datum $typing))
+          ((equal? $other (string-type))
+            (typing-datum $typing))
+          ((equal? $other (char-type))
+            (typing-datum $typing))
+          ((equal? $other (symbol-type))
+            (typing-datum $typing))
+          (else (type-line $other))))))
 )

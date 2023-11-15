@@ -10,6 +10,7 @@
     number-type
     string-type
     char-type
+    symbol-type
     literal->type
     struct struct? struct-name struct-fields
     arrow arrow? arrow-params arrow-result
@@ -33,7 +34,10 @@
     type-matches? types-match?
 
     make-list-of
-    make-struct-type)
+    make-struct-type
+
+    type-line
+    types-lines)
   (import
     (micascheme)
     (tico path))
@@ -191,4 +195,44 @@
     (arrow
       (list (symbol-type) (list-of (type-type)))
       (type-type)))
+
+  (define (types-lines $types)
+    (map type-line $types))
+
+  (define (type-line $type)
+    (cond
+      ((equal? $type (boolean-type)) 'boolean)
+      ((equal? $type (number-type)) 'number)
+      ((equal? $type (string-type)) 'string)
+      ((equal? $type (char-type)) 'char)
+      ((equal? $type (symbol-type)) 'symbol)
+      (else 
+        (switch $type
+          ((any-type? _) 
+            'any)
+          ((value-type? $value-type)
+            `(value ,(value-type-value $value-type)))
+          ((type-type? _) 
+            `type)
+          ((unchecked-type? _)
+            `unchecked)
+          ((native-type? $native-type)
+            `(native ,(native-type-value $native-type)))
+          ((struct? $struct)
+            (switch (struct-fields $struct)
+              ((null? _) 
+                (struct-name $struct))
+              ((else $fields)
+                `(
+                  ,(struct-name $struct)
+                  ,@(types-lines $fields)))))
+          ((arrow? $arrow)
+            `(arrow
+              ,@(map type-line (arrow-params $arrow))
+              (promising ,(type-line (arrow-result $arrow)))))
+          ((property? $property)
+            `(property
+              ,(type-line (property-param $property))
+              (offering ,(type-line (property-body $property)))))
+          ((else $other) $other)))))
 )
