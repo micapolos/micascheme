@@ -4,7 +4,8 @@
     writer-write-char
     writer-write-string
     chars-writer
-    indented-writer)
+    indented-writer
+    trim-end-writer)
   (import (micascheme))
 
   (data (writer value write-char-proc))
@@ -23,20 +24,47 @@
           (lambda ($char)
             (chars-writer (push $chars $char)))))))
 
-  (define (indented-writer $writer $size)
-    (writer
-      $writer
-      (lambda ($char)
-        (lets
-          ($writer
-            (writer-write-char $writer $char))
-          ($writer
+  (define indented-writer
+    (case-lambda
+      (() (indented-writer 2))
+      (($size) (indented-writer $size (chars-writer)))
+      (($size $writer)
+        (writer $writer
+          (lambda ($char)
+            (lets
+              ($writer
+                (writer-write-char $writer $char))
+              ($writer
+                (cond
+                  ((char=? $char #\newline)
+                    (fold-left
+                      writer-write-char
+                      $writer
+                      (make-list $size #\space)))
+                  (else $writer)))
+              (indented-writer $size $writer)))))))
+
+  (define trim-end-writer
+    (case-lambda
+      (() (trim-end-writer (chars-writer)))
+      (($writer) (trim-end-writer $writer (stack)))
+      (($writer $trimmed-whitespaces)
+        (writer $writer
+          (lambda ($char)
             (cond
               ((char=? $char #\newline)
-                (fold-left
-                  writer-write-char
+                (trim-end-writer
+                  (writer-write-char $writer $char)))
+              ((char-whitespace? $char)
+                (trim-end-writer
                   $writer
-                  (make-list $size #\space)))
-              (else $writer)))
-          (indented-writer $writer $size)))))
+                  (push $trimmed-whitespaces $char)))
+              (else
+                (trim-end-writer
+                  (writer-write-char
+                    (fold-left
+                      writer-write-char
+                      $writer
+                      (reverse $trimmed-whitespaces))
+                    $char)))))))))
 )

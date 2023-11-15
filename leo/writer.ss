@@ -48,7 +48,7 @@
               (else
                 (writer-value
                   (writer-write-newline-datums
-                    (indented-writer $writer 2)
+                    (indented-writer 2 $writer)
                     $datums)))))))
       ((else $other)
         (writer-write-string $writer
