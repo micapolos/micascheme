@@ -15,6 +15,7 @@
     struct struct? struct-name struct-fields
     arrow arrow? arrow-params arrow-result
     property property? property-param property-body
+    const const? const-params const-body
     abstraction abstraction? abstraction-arity abstraction-body
     recursion recursion? recursion-items
     var var? var-index
@@ -52,6 +53,7 @@
   (data (struct name fields))
   (data (arrow params result))
   (data (property param body))
+  (data (const params body))
   (data (abstraction arity body))
   (data (recursion items))
   (data (var index))
@@ -160,6 +162,15 @@
           (type-matches?
             (property-body $type)
             (property-body $property))))
+      ((const? $const)
+        (and
+          (const? $type)
+          (types-match?
+            (const-params $const)
+            (const-params $type))
+          (type-matches?
+            (const-body $type)
+            (const-body $const))))
       ((else $other)
         (throw not-type $pattern))))
 
