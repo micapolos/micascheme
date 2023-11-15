@@ -1,5 +1,6 @@
 (library (leo writing-reader)
 	(export
+    writing-reader
 		script-string)
 	(import
 		(micascheme)
