@@ -7,4 +7,4 @@
   (leo parser)
   (leo reader)
   (leo writer)
-  (leo writer-reader))
+  (leo writing-reader))
