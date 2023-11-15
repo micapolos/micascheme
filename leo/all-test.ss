@@ -5,4 +5,5 @@
   (leo decompiler)
   (leo evaluator)
   (leo parser)
-  (leo reader))
+  (leo reader)
+  (leo writer))
