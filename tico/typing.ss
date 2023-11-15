@@ -283,7 +283,7 @@
   (define (typing-being $typing $being-typing)
     (lets
       ($key (typing->type $typing))
-      ($value (typing->type $being-typing))
+      ($value $being-typing)
       (type->typing (constant-type $key $value))))
 
   (define (single-typing $typings)

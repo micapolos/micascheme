@@ -226,12 +226,12 @@
 (check
   (equal?
     (typing-being
-      (number-typing)
-      (boolean-typing))
+      (type->typing (struct 'foo (list)))
+      (literal->typing 123))
     (type->typing
       (constant-type
-        (number-type)
-        (boolean-type)))))
+        (struct 'foo (list))
+        (literal->typing 123)))))
 
 (check
   (equal?

@@ -59,10 +59,10 @@
 
 (check
   (equal?
-    (read-typing number (being boolean))
+    (read-typing (happy number) (being 7))
     (typing-being
-      (read-typing number)
-      (read-typing boolean))))
+      (read-typing (happy number))
+      (read-typing 7))))
 
 (check
   (equal?
