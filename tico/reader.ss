@@ -194,6 +194,18 @@
                         $typing
                         $offering-typing))
                     $end)))))
+          ((being)
+            (lets
+              ($typing (block-typing $block))
+              (typing-reader $bindings
+                (lambda ($being-typing)
+                  (push-block-reader
+                    $bindings
+                    (block-with-typing $block
+                      (typing-being
+                        $typing
+                        $being-typing))
+                    $end)))))
           ((type)
             (typing-reader $bindings
               (lambda ($type-typing)

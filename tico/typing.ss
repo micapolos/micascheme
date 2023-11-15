@@ -36,6 +36,7 @@
     typing-promising
     typing-property
     typing-offering
+    typing-being
     typing-access
     typing-assert
 
@@ -278,6 +279,12 @@
       ($param (typing->type $typing))
       ($body (typing->type $offering-typing))
       (type->typing (property $param $body))))
+
+  (define (typing-being $typing $being-typing)
+    (lets
+      ($key (typing->type $typing))
+      ($value (typing->type $being-typing))
+      (type->typing (constant-type $key $value))))
 
   (define (single-typing $typings)
     (car (ensure single? $typings)))

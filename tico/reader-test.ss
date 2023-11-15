@@ -59,6 +59,13 @@
 
 (check
   (equal?
+    (read-typing number (being boolean))
+    (typing-being
+      (read-typing number)
+      (read-typing boolean))))
+
+(check
+  (equal?
     (read-typings
       (prepare (native "(+ 1 2)")))
     (stack

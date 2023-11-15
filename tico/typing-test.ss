@@ -225,6 +225,16 @@
 
 (check
   (equal?
+    (typing-being
+      (number-typing)
+      (boolean-typing))
+    (type->typing
+      (constant-type
+        (number-type)
+        (boolean-type)))))
+
+(check
+  (equal?
     (typing->type-typing
       (typing-struct 'foo (list (string-typing))))
     (type-datum->typing
