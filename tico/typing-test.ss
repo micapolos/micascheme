@@ -113,6 +113,25 @@
 
 (check
   (equal?
+    (typing-ref-index
+      (typing-struct 'foo
+        (list
+          (literal->typing "foo")
+          (static-typing (value-type 'empty))
+          (literal->typing 10)))
+      2)
+    (typing
+      (number-type)
+      (layment-ref
+        (layment-struct 'foo
+          (list
+            (literal->layment "foo")
+            (empty-layment)
+            (literal->layment 10)))
+        2))))
+
+(check
+  (equal?
     (typing-ref
       (typing-struct 'foo
         (list
@@ -290,4 +309,19 @@
           (typing-struct 'x (list (literal->typing 10)))))
       (struct 'x (list)))))
 
+; --- typing-line
 
+(check
+  (equal?
+    (typing-line (literal->typing 10))
+    10))
+
+(check
+  (equal?
+    (typing-line (literal->typing "foo"))
+    "foo"))
+
+(check
+  (equal?
+    (typing-line (typing-struct 'foo (list)))
+    'foo))

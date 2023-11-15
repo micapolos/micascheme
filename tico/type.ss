@@ -31,6 +31,7 @@
     type-access-opt
 
     type-ref
+    type-ref-index
     type-matches? types-match?
 
     make-list-of
@@ -174,6 +175,9 @@
           (type-matches? $type $pattern)
           (indexed $type $index)))
       (struct-fields $type)))
+
+  (define (type-ref-index $type $index)
+    (list-ref (struct-fields $type) $index))
 
   (define (type-value $type)
     (switch $type

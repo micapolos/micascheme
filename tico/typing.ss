@@ -27,6 +27,7 @@
     let-typing
     typing-struct
     typing-ref
+    typing-ref-index
     typing-native
     typing-prepare
     typings-do
@@ -47,7 +48,10 @@
     typings-resolve-get
 
     make-list-typing
-    make-struct-typing)
+    make-struct-typing
+
+    typing-line
+    typings-lines)
   (import
     (micascheme)
     (tico type)
@@ -181,6 +185,13 @@
         (layment-ref
           (typing-layment $typing)
           (indexed-index $indexed-type)))))
+
+  (define (typing-ref-index $typing $index)
+    (typing
+      (type-ref-index (typing-type $typing) $index)
+      (layment-ref
+        (typing-layment $typing)
+        $index)))
 
   (define (typing-get $typing $patterns)
     (fold-left typing-ref $typing $patterns))
@@ -330,25 +341,36 @@
     (map typing-line $typings))
 
   (define (typing-line $typing)
-    (switch (typing-type $typing)
-      ((struct? $struct)
-        (switch (struct-fields $struct)
-          ((null? _) (struct-name $struct))
-          ((else $fields)
-            `(
-              ,(struct-name struct)
-              ,@(map typing-line $fields)))))
-      ((else $other)
-        (cond
-          ((equal? $other (boolean-type))
-            (typing-datum $typing))
-          ((equal? $other (number-type))
-            (typing-datum $typing))
-          ((equal? $other (string-type))
-            (typing-datum $typing))
-          ((equal? $other (char-type))
-            (typing-datum $typing))
-          ((equal? $other (symbol-type))
-            (typing-datum $typing))
-          (else (type-line $other))))))
+    (lets
+      ($type (typing-type $typing))
+      (cond
+        ((equal? $type (boolean-type))
+          (typing-value $typing))
+        ((equal? $type (number-type))
+          (typing-value $typing))
+        ((equal? $type (string-type))
+          (typing-value $typing))
+        ((equal? $type (char-type))
+          (typing-value $typing))
+        ((equal? $type (symbol-type))
+          (typing-value $typing))
+        (else
+          (switch $type
+            ((struct? $struct)
+              (switch (struct-fields $struct)
+                ((null? _) (struct-name $struct))
+                ((else $fields)
+                  `(
+                    ,(struct-name struct)
+                    ,@(let-typing $typing
+                      (lambda ($typing)
+                        (map typing-line
+                          (typing-value
+                            (map
+                              (partial typing-ref-index $typing)
+                              (indices (length $fields)))))))))))
+            ((else $type)
+              `(native
+                ,(format "~s"
+                  (typing-datum $typing)))))))))
 )
