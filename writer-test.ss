@@ -4,5 +4,5 @@
 
 (check
   (equal?
-    (writer-value (writer-write-string (chars-writer) "foo"))
-    (stack #\f #\o #\o)))
+    (do-writer-string $writer (writer-write-string $writer "foo"))
+    "foo"))

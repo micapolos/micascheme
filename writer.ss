@@ -5,7 +5,8 @@
     writer-write-string
     chars-writer
     indented-writer
-    trim-end-writer)
+    trim-end-writer
+    do-writer-string)
   (import (micascheme))
 
   (data (writer value write-char-proc))
@@ -15,6 +16,9 @@
 
   (define (writer-write-string $writer $string)
     (fold-left writer-write-char $writer (string->list $string)))
+
+  (define-syntax-rule (do-writer-string $writer $body)
+    (list->string (reverse (writer-value (lets ($writer (chars-writer)) $body)))))
 
   (define chars-writer
     (case-lambda

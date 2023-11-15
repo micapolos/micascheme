@@ -1,6 +1,7 @@
 (library (leo writer-reader)
 	(export
-		writer-reader)
+		writer-reader
+		script-string)
 	(import
 		(micascheme)
 		(writer)
@@ -15,6 +16,10 @@
   (define (writer-write-literal $writer $literal)
     (writer-write-string $writer (format "~s" $literal)))
 
+  (define-syntax-rule (script-string $item ...)
+  	(do-writer-string $writer
+  		(reader-eval (writer-reader $writer) $item ...)))
+
   (define-reader (writers-reader $writers $end)
     (lets
       ($empty? (writers-empty? $writers))
@@ -27,13 +32,11 @@
               #f ; empty?
               (writer-write-literal
                 (if $empty?
-                  (writer-write-char $newline-writer #\newline)
-                  $newline-writer)
+                	$newline-writer
+                  (writer-write-char $newline-writer #\newline))
                 $literal)
               (and $empty? $space-writer-opt
-                (writer-write-literal
-                  (writer-write-char $space-writer-opt #\space)
-                  $literal)))
+                (writer-write-literal $space-writer-opt $literal)))
             $end))
         (lambda ($symbol)
           (writers-reader
@@ -41,11 +44,11 @@
               #t ; $empty?
               (indented-writer 2
                 (writer-write-symbol
-                  (if $empty? (writer-write-char $newline-writer #\newline) $newline-writer)
+                  (if $empty? $newline-writer (writer-write-char $newline-writer #\newline))
                   $symbol))
               (and $empty? $space-writer-opt
                 (writer-write-symbol
-                  $space-writer-opt
+                  (writer-write-char $space-writer-opt #\space)
                   $symbol)))
             (lambda ($symbol-writers)
               (writer-reader
