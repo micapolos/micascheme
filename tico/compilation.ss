@@ -16,6 +16,7 @@
 
     compilation-application
     compilation-abstraction
+    compilation-list
     compilation-struct
     compilation-ref
 
@@ -144,7 +145,7 @@
       ($evaluations (map compilation-evaluation $compilations))
       ($constants (filter constant? $evaluations))
       ($variables (filter variable? $evaluations))
-      ($parameters (ensure null? (filter parameter? $evaluations)))
+      ($parameters (filter parameter? $evaluations))
       (cond
         ((for-all constant? $evaluations)
           (compilation
@@ -155,8 +156,34 @@
             ($datums (map compilation-datum $compilations))
             (compilation
               (datum-struct $name $datums)
-              (variable
-                (variable-index-flatten (map variable-index $variables)))))))))
+              (cond
+                ((null? $parameters)
+                  (variable
+                    (variable-index-flatten (map variable-index $variables))))
+                (else (parameter)))))))))
+
+  (define (compilation-list $compilations)
+    (lets
+      ($datums (map compilation-datum $compilations))
+      ($evaluations (map compilation-evaluation $compilations))
+      ($constants (filter constant? $evaluations))
+      ($variables (filter variable? $evaluations))
+      ($parameters (filter parameter? $evaluations))
+      (cond
+        ((for-all constant? $evaluations)
+          (compilation
+            (datum-list $datums)
+            (constant-list $constants)))
+        (else
+          (lets
+            ($datums (map compilation-datum $compilations))
+            (compilation
+              (datum-list $datums)
+              (cond
+                ((null? $parameters)
+                  (variable
+                    (variable-index-flatten (map variable-index $variables))))
+                (else (parameter)))))))))
 
   (define (compilation-ref $arity $target $index)
     (compilation
