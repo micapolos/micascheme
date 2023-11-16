@@ -12,6 +12,7 @@
     char-type
     symbol-type
     literal->type
+    list-type list-type? list-type-items
     struct struct? struct-name struct-fields
     arrow arrow? arrow-params arrow-result
     property property? property-param property-body
@@ -54,6 +55,7 @@
   (data (native-type value))
   (data (list-of item-type))
   (data (struct name fields))
+  (data (list-type items))
   (data (arrow params result))
   (data (property param body))
   (data (constant-type key value))
@@ -147,6 +149,12 @@
           (equal?
             (native-type-value $type)
             (native-type-value $native-type))))
+      ((list-type? $list-type)
+        (and
+          (list-type? $type)
+          (types-match?
+            (list-type-items $type)
+            (list-type-items $list-type))))
       ((struct? $struct)
         (and
           (struct? $type)

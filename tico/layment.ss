@@ -21,6 +21,7 @@
     layment-parameter
     layment-variable
     layment-abstraction
+    layment-list
     layment-struct
     layment-ref)
   (import
@@ -122,6 +123,14 @@
     (layment
       (layment-layout $layment)
       (compilation-variable (layment-compilation $layment) $index)))
+
+  (define (layment-list $layments)
+    (make-layment
+      (layout-list
+        (map layment-layout $layments))
+      (compilation-list
+        (filter-opts
+          (map layment-compilation $layments)))))
 
   (define (layment-struct $name $field-layments)
     (make-layment

@@ -133,6 +133,24 @@
         (number-type)))
     (type->layout (number-type))))
 
+; --- layout-list
+
+(check
+  (equal?
+    (layout-list
+      (list
+        (simple-layout)
+        (empty-layout)
+        (simple-layout)
+        (simple-layout)))
+    (struct-layout
+      (list
+        (layout-field (simple-layout) 0)
+        (layout-field (empty-layout) #f)
+        (layout-field (simple-layout) 1)
+        (layout-field (simple-layout) 2))
+      3)))
+
 ; --- layout-ref
 
 (check

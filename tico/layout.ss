@@ -18,6 +18,7 @@
     literal->layout
     layout-application
     layout-abstraction
+    layout-list
     layout-struct
     layout-ref)
   (import
@@ -82,6 +83,13 @@
         (lambda-layout-body $lambda-layout))
       ((else $other)
         (throw layout-application $target))))
+
+  (define (layout-list $layouts)
+    (lets
+      ($struct-layout (make-struct-layout (reverse $layouts)))
+      (struct-layout
+        (reverse (struct-layout-fields $struct-layout))
+        (struct-layout-size $struct-layout))))
 
   (define (layout-struct $name $field-layouts)
     (make-struct-layout (reverse $field-layouts)))
