@@ -13,10 +13,14 @@
     tuple-ref-datum
     value->datum
     datum->value
+    bindings-datum->value
     datum-struct
     datum-ref
     string->read-datum)
-  (import (micascheme) (tico type))
+  (import
+    (micascheme)
+    (tico type)
+    (evaluator))
 
   (define-syntax-rule (test-datum $name)
     (quote (quote $name)))
@@ -86,6 +90,11 @@
 
   (define (datum->value $datum)
     (eval $datum datum-environment))
+
+  (define (bindings-datum->value $bindings $datum)
+    (evaluate
+      (evaluator datum-environment $bindings)
+      $datum))
 
   (define (value->datum $value)
     (switch $value

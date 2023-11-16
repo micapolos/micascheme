@@ -36,6 +36,16 @@
 
 (check (equal? (datum->value '(string-append "foo" "bar")) "foobar"))
 
+(check
+	(equal?
+		(bindings-datum->value
+			(stack
+				(cons 'foo "xxx")
+				(cons 'bar "bar")
+				(cons 'foo "foo"))
+			'(string-append foo bar))
+		"foobar"))
+
 (check (raises? (lambda () (datum-tuple (list)))))
 (check (equal? (datum-tuple (list 'v1)) 'v1))
 (check (equal? (datum-tuple (list 'v1 'v2)) '(cons v1 v2)))
