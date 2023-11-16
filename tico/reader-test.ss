@@ -152,24 +152,25 @@
           (as number number (promising number)))
         (reverse (read-typings 3 4))))))
 
-; (check
-;   (equal?
-;     (with-generate-temporary-seed $tmp
-;       (read-typing
-;         string
-;         exclamate
-;         (doing (exclamated (get string)))
-;         (apply "foo")))
-;     (with-generate-temporary-seed $tmp
-;       (lets
-;         ($params
-;           (list
-;             (generate-parameter-typing (string-type))
-;             (generate-parameter-typing (struct 'exclamate (list)))))
-;         (typing-application
-;           (typing-abstraction $params
-;             (variable-typing (string-type) '$tmp-0 1))
-;           (reverse (read-typings "foo" exclamate)))))))
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (read-typing
+        string
+        exclamate
+        (doing (exclamated (get string)))
+        (apply "foo" exclamate)))
+    (with-generate-temporary-seed $tmp
+      (lets
+        ($params
+          (list
+            (generate-parameter-typing (string-type))
+            (generate-parameter-typing (struct 'exclamate (list)))))
+        (typing-application
+          (typing-abstraction $params
+            (typing-struct 'exclamated
+              (list (variable-typing (string-type) '$tmp-0 0))))
+          (reverse (read-typings "foo" exclamate)))))))
 
 (check
   (equal?
