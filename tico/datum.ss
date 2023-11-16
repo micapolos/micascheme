@@ -15,6 +15,7 @@
     datum->value
     bindings-datum->value
     datum-struct
+    datum-list
     datum-ref
     string->read-datum)
   (import
@@ -60,6 +61,9 @@
 
   (define (datum-struct $name $field-datums)
     (datum-tuple $field-datums))
+
+  (define (datum-list $datums)
+    `(list ,@$datums))
 
   (define (datum-ref $arity $target $index)
     (case $arity
