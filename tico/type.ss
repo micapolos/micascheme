@@ -31,6 +31,9 @@
     type-access
     type-access-opt
 
+    type-constant-access-opt
+    type-constant-access
+
     type-ref
     type-ref-index
     type-matches? types-match?
@@ -113,6 +116,17 @@
     (or-throw
       (type-access-opt $target $arg)))
 
+  (define (type-constant-access-opt $target $arg)
+    (switch $target
+      ((constant-type? $constant-type)
+        (and
+          (type-matches? $arg (constant-type-key $constant-type))
+          (constant-type-value $constant-type)))))
+
+  (define (type-constant-access $target $arg)
+    (or-throw
+      (type-constant-access-opt $target $arg)))
+
   (define (type-matches? $type $pattern)
     (switch $pattern
       ((any-type? _) 
@@ -165,7 +179,7 @@
       ((constant-type? $constant-type)
         (and
           (constant-type? $type)
-          (types-match?
+          (type-matches?
             (constant-type-key $constant-type)
             (constant-type-key $type))
           (type-matches?

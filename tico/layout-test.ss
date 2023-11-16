@@ -125,6 +125,14 @@
       (list (type->layout (string-type)))
       (type->layout (number-type)))))
 
+(check
+  (equal?
+    (type->layout
+      (constant-type
+        (struct 'foo (list))
+        (number-type)))
+    (type->layout (number-type))))
+
 ; --- layout-ref
 
 (check

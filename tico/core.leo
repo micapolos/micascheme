@@ -3,15 +3,15 @@ comment contains
   like: "+", "-", "string-append"
 
 use
-  native "(lambda () #t)"
+  native "#t"
   as
     true
-    promising boolean
+    being boolean
 use
-  native "(lambda () #f)"
+  native "#f"
   as
     false
-    promising boolean
+    being boolean
 use
   native "not"
   as

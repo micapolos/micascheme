@@ -225,13 +225,43 @@
 
 (check
   (equal?
-    (typing-being
+    (typing-constant
       (type->typing (struct 'foo (list)))
       (literal->typing 123))
+    (typing
+      (constant-type
+        (struct 'foo (list))
+        (number-type))
+      (typing-layment
+        (literal->typing 123)))))
+
+(check
+  (equal?
+    (typing-being
+      (type->typing (struct 'foo (list)))
+      (type->typing (number-type)))
     (type->typing
       (constant-type
         (struct 'foo (list))
-        (literal->typing 123)))))
+        (number-type)))))
+
+(check
+  (equal?
+    (typing-constant-access
+      (typing-constant
+        (type->typing (struct 'foo (list)))
+        (literal->typing 123))
+      (typing-struct 'foo (list)))
+    (literal->typing 123)))
+
+(check
+  (raises?
+    (lambda ()
+      (typing-constant-access
+        (typing-constant
+          (type->typing (struct 'foo (list)))
+          (literal->typing 123))
+        (typing-struct 'bar (list))))))
 
 (check
   (equal?

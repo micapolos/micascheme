@@ -68,7 +68,9 @@
             $patterns)))))
 
   (define (bindings-resolve-opt $bindings $typings)
-    (bindings-resolve-application-opt $bindings $typings))
+    (or
+      (bindings-resolve-application-opt $bindings $typings)
+      (bindings-resolve-constant-access-opt $bindings $typings)))
 
   (define (bindings-resolve-application-opt $bindings $typings)
     (lets
@@ -81,6 +83,17 @@
         (stack
           (typing-application $target-typing
             (reverse $typings))))))
+
+  (define (bindings-resolve-constant-access-opt $bindings $typings)
+    (and-lets
+      ($typing (single $typings))
+      ($target-typing
+        (bindings-match $bindings
+          (constant-type
+            (typing-type $typing)
+            (any-type))))
+      (stack
+        (typing-constant-access $target-typing $typing))))
 
   (define (bindings-resolve $bindings $typings)
     (or

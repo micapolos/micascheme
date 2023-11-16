@@ -23,6 +23,7 @@
     typing-application
     typing-parameter
     typing-variable
+    typing-constant
     typing-abstraction
     let-typing
     typing-struct
@@ -39,6 +40,7 @@
     typing-being
     typing-access
     typing-assert
+    typing-constant-access
 
     typing-not-empty?
     typing->type
@@ -144,6 +146,13 @@
       (typing-type $typing)
       (layment-variable (typing-layment $typing) $index)))
 
+  (define (typing-constant $key-typing $value-typing)
+    (typing
+      (constant-type
+        (typing->type $key-typing)
+        (typing-type $value-typing))
+      (typing-layment $value-typing)))
+
   (define (typing-abstraction $param-typings $body-typing)
     (typing
       (type-abstraction
@@ -170,6 +179,13 @@
       (layment-application
         (typing-layment $typing)
         (list (typing-layment $arg)))))
+
+  (define (typing-constant-access $typing $arg)
+    (typing
+      (type-constant-access
+        (typing-type $typing)
+        (typing-type $arg))
+      (typing-layment $typing)))
 
   (define (typing-struct $name $field-typings)
     (typing
@@ -280,11 +296,11 @@
       ($body (typing->type $offering-typing))
       (type->typing (property $param $body))))
 
-  (define (typing-being $typing $being-typing)
-    (lets
-      ($key (typing->type $typing))
-      ($value $being-typing)
-      (type->typing (constant-type $key $value))))
+  (define (typing-being $key-typing $value-typing)
+    (type->typing
+      (constant-type
+        (typing->type $key-typing)
+        (typing->type $value-typing))))
 
   (define (single-typing $typings)
     (car (ensure single? $typings)))

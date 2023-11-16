@@ -59,10 +59,10 @@
 
 (check
   (equal?
-    (read-typing (happy number) (being 7))
+    (read-typing foo (being number))
     (typing-being
-      (read-typing (happy number))
-      (read-typing 7))))
+      (read-typing foo)
+      (read-typing number))))
 
 (check
   (equal?
@@ -219,3 +219,13 @@
         "foo"
         (get length number)))
     3))
+
+(check
+  (equal?
+    (typing-value
+      (read-typing
+        (use
+          (native "128")
+          (as foo (being number)))
+        foo))
+    128))
