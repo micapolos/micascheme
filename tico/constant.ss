@@ -2,6 +2,7 @@
   (export
     constant constant? constant-value
     datum->constant
+    bindings-datum->constant
     constant-application
     constant-abstraction
     constant-struct
@@ -15,6 +16,10 @@
 
   (define (datum->constant $datum)
     (constant (datum->value $datum)))
+
+  (define (bindings-datum->constant $bindings $datum)
+    (constant
+      (bindings-datum->value $bindings $datum)))
 
   (define (constant-application $target $args)
     (constant

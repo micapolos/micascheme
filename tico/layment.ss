@@ -10,6 +10,7 @@
     literal->layment
     variable-layment
     layout-datum->layment
+    bindings-layout-datum->layment
 
     layment-datum
     layment-value
@@ -64,6 +65,12 @@
 
   (define (layout-datum->layment $layout $datum)
     (layment $layout (datum->compilation $datum)))
+
+  (define (bindings-layout-datum->layment $binding-layments $layout $datum)
+    (layment $layout
+      (bindings-datum->compilation
+        (filter-opts (map layment-compilation $binding-layments))
+        $datum)))
 
   (define (layment-datum $layment)
     (compilation-datum

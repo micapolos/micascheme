@@ -5,7 +5,8 @@
   (tico compilation)
   (tico parameter)
   (tico type)
-  (tico variable))
+  (tico variable)
+  (tico constant))
 
 (check
   (equal?
@@ -30,6 +31,25 @@
   (equal?
     (layout-datum->layment (simple-layout) "foo")
     (layment (simple-layout) (datum->compilation "foo"))))
+
+(check
+  (equal?
+    (bindings-layout-datum->layment
+      (stack
+        (make-layment (simple-layout) (compilation 'foo (constant "foo")))
+        (make-layment (empty-layout) (compilation 'foo (constant "foo")))
+        (make-layment (simple-layout) (compilation 'foo (parameter)))
+        (make-layment (simple-layout) (compilation 'bar (constant "bar"))))
+      (simple-layout)
+      '(string-append foo bar))
+    (layment
+      (simple-layout)
+      (bindings-datum->compilation
+        (stack
+          (compilation 'foo (constant "foo"))
+          (compilation 'foo (parameter))
+          (compilation 'bar (constant "bar")))
+        '(string-append foo bar)))))
 
 (check
   (equal?

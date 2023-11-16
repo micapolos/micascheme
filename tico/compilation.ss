@@ -6,6 +6,7 @@
 
     literal->compilation
     datum->compilation
+    bindings-datum->compilation
     variable-compilation
 
     compilation-value
@@ -46,6 +47,19 @@
 
   (define (datum->compilation $datum)
     (compilation $datum (datum->constant $datum)))
+
+  (define (compilation-binding-opt $compilation)
+    (switch-opt (compilation-evaluation $compilation)
+      ((constant? $constant)
+        (cons
+          (compilation-datum $compilation)
+          (constant-value $constant)))))
+
+  (define (bindings-datum->compilation $binding-compilations $datum)
+    (compilation $datum
+      (bindings-datum->constant
+        (filter-opts (map compilation-binding-opt $binding-compilations))
+        $datum)))
 
   (define (compilation-value $compilation)
     (switch (compilation-evaluation $compilation)

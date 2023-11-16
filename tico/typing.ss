@@ -13,6 +13,7 @@
     number-typing
     string-typing
     type-datum->typing
+    bindings-type-datum->typing
     single-typing
 
     typing-datum
@@ -104,6 +105,13 @@
   (define (type-datum->typing $type $datum)
     (typing $type
       (layout-datum->layment
+        (type->layout $type)
+        $datum)))
+
+  (define (bindings-type-datum->typing $binding-typings $type $datum)
+    (typing $type
+      (bindings-layout-datum->layment
+        (map typing-layment $binding-typings)
         (type->layout $type)
         $datum)))
 

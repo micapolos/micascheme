@@ -37,6 +37,22 @@
 
 (check
   (equal?
+    (bindings-datum->compilation
+      (stack
+        (compilation 'foo (constant "foo"))
+        (compilation 'goo (parameter))
+        (compilation 'bar (constant "bar")))
+      '(string-append "foo" "bar"))
+    (compilation
+      '(string-append "foo" "bar")
+      (bindings-datum->constant
+        (stack
+          (cons 'foo "foo")
+          (cons 'bar "bar"))
+        '(string-append "foo" "bar")))))
+
+(check
+  (equal?
     (literal->compilation "foo")
     (compilation "foo" (constant "foo"))))
 
