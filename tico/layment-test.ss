@@ -67,10 +67,16 @@
   (equal?
     (layment-application
       (layout-datum->layment
-        (lambda-layout (list (simple-layout) (simple-layout)) (simple-layout))
+        (lambda-layout
+          (list
+            (simple-layout)
+            (empty-layout)
+            (simple-layout))
+          (simple-layout))
         'string-append)
       (list
         (literal->layment "foo")
+        (empty-layment)
         (literal->layment "bar")))
     (layout-datum->layment
       (simple-layout)

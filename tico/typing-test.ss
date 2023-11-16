@@ -72,19 +72,64 @@
   (equal?
     (typing-application
       (type-datum->typing
-        (arrow (list (number-type)) (string-type))
+        (arrow
+          (list
+            (number-type)
+            (struct 'foo (list)))
+          (string-type))
         'number->string)
       (list
-        (literal->typing 10)))
+        (literal->typing 10)
+        (typing-struct 'foo (list))))
     (typing
       (type-application
-        (arrow (list (number-type)) (string-type))
-        (list (literal->type 10)))
+        (arrow
+          (list
+            (number-type)
+            (struct 'foo (list)))
+          (string-type))
+        (list
+          (literal->type 10)
+          (struct 'foo (list))))
       (layment-application
         (layout-datum->layment
-          (type->layout (arrow (list (number-type)) (string-type)))
+          (type->layout
+            (arrow
+              (list
+                (number-type)
+                (struct 'foo (list)))
+              (string-type)))
           'number->string)
-        (list (literal->layment 10))))))
+        (list
+          (literal->layment 10)
+          (layment-struct 'foo (list)))))))
+
+(check
+  (equal?
+    (typing-abstraction
+      (list
+        (parameter-typing (string-type) '$string)
+        (parameter-typing (struct 'exclamate (list)) '$empty))
+      (typing-struct 'exclamated
+        (list
+          (typing-variable (parameter-typing (string-type) '$string) 1))))
+    (typing
+      (type-abstraction
+        (list
+          (typing-type (parameter-typing (string-type) '$string))
+          (typing-type (parameter-typing (struct 'exclamate (list)) '$empty)))
+        (typing-type
+          (typing-struct 'exclamated
+            (list
+              (typing-variable (parameter-typing (string-type) '$string) 1)))))
+      (layment-abstraction
+        (list
+          (typing-layment (parameter-typing (string-type) '$string))
+          (typing-layment (parameter-typing (struct 'exclamate (list)) '$empty)))
+        (typing-layment
+          (typing-struct 'exclamated
+            (list
+              (typing-variable (parameter-typing (string-type) '$string) 1))))))))
 
 ; (check
 ;   (equal?
