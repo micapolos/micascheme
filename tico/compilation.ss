@@ -21,7 +21,11 @@
     compilation-ref
 
     compilation-parameter
-    compilation-variable)
+    compilation-variable
+
+    empty-compilation-scope
+    compilation-scope-push
+    compilation-scope-ref)
   (import
     (micascheme)
     (tico constant)
@@ -195,4 +199,23 @@
           $variable)
         ((parameter? $parameter)
           (throw compilation-ref $parameter)))))
+
+  (define (empty-compilation-scope)
+    (compilation (stack) (stack)))
+
+  (define (compilation-scope-push $compilation-scope $compilation)
+    (compilation
+      (push
+        (compilation-datum $compilation-scope)
+        (compilation-datum $compilation))
+      (push
+        (compilation-evaluation $compilation-scope)
+        (compilation-evaluation $compilation))))
+
+  (define (compilation-scope-ref $compilation-scope $index)
+    (compilation-variable
+      (compilation
+        (list-ref (compilation-datum $compilation-scope) $index)
+        (list-ref (compilation-evaluation $compilation-scope) $index))
+      $index))
 )

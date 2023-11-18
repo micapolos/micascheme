@@ -23,7 +23,11 @@
     layment-abstraction
     layment-list
     layment-struct
-    layment-ref)
+    layment-ref
+
+    empty-layment-scope
+    layment-scope-push
+    layment-scope-ref)
   (import
     (micascheme)
     (tico datum)
@@ -149,5 +153,30 @@
         (compilation-ref
           (struct-layout-size $layout)
           (layment-compilation $layment)
+          (layout-field-index-opt $layout-field)))))
+
+  (define (empty-layment-scope)
+    (make-layment
+      (empty-layout-scope)
+      (empty-compilation-scope)))
+
+  (define (layment-scope-push $layment-scope $layment)
+    (make-layment
+      (layout-scope-push
+        (layment-layout $layment-scope)
+        (layment-layout $layment))
+      (compilation-scope-push
+        (layment-compilation $layment-scope)
+        (layment-compilation $layment))))
+
+  (define (layment-scope-ref $layment-scope $index)
+    (lets
+      ($layout-field
+        (layout-scope-ref
+          (layment-layout $layment-scope)))
+      (make-layment
+        (layout-field-layout $layout-field)
+        (compilation-scope-ref
+          (layment-compilation $layment-scope)
           (layout-field-index-opt $layout-field)))))
 )

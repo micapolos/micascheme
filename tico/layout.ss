@@ -20,7 +20,11 @@
     layout-abstraction
     layout-list
     layout-struct
-    layout-ref)
+    layout-ref
+
+    empty-layout-scope
+    layout-scope-push
+    layout-scope-ref)
   (import
     (micascheme)
     (tico type))
@@ -124,4 +128,13 @@
         (simple-layout))
       ((else $type)
         (throw type->layout $type))))
+
+  (define (empty-layout-scope)
+    empty-struct-layout)
+
+  (define (layout-scope-push $layout-scope $layout)
+    (struct-layout+layout $layout-scope $layout))
+
+  (define (layout-scope-ref $layout-scope $index)
+    (list-ref (struct-layout-fields $layout-scope) $index))
 )

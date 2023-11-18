@@ -56,7 +56,11 @@
     make-struct-typing
 
     typing-line
-    typings-lines)
+    typings-lines
+
+    empty-typing-scope
+    typing-scope-push
+    typing-scope-ref)
   (import
     (micascheme)
     (tico type)
@@ -410,4 +414,21 @@
               `(native
                 ,(format "~s"
                   (typing-datum $typing)))))))))
+
+  (define (empty-typing-scope)
+    (typing (stack) (empty-layout-scope)))
+
+  (define (typing-scope-push $typing-scope $typing)
+    (typing
+      (push
+        (typing-type $typing-scope)
+        (typing-type $typing))
+      (layment-scope-push
+        (typing-layment $typing-scope)
+        (typing-layment $typing))))
+
+  (define (typing-scope-ref $typing-scope $index)
+    (typing
+      (list-ref (typing-type $typing-scope) $index)
+      (layment-scope-ref (typing-layment $typing-scope) $index)))
 )
