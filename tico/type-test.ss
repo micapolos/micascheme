@@ -58,40 +58,6 @@
 
 (check
   (type-matches?
-    (list-type (list (any-type) (unchecked-type)))
-    (list-type (list (any-type) (unchecked-type)))))
-
-(check
-  (type-matches? 
-    (list-type (list (value-type "foo") (unchecked-type)))
-    (list-type (list (any-type) (unchecked-type)))))
-
-(check
-  (not
-    (type-matches? 
-      (list-type (list (any-type)))
-      (list-type (list (any-type) (unchecked-type))))))
-
-(check
-  (not
-    (type-matches? 
-      (list-type (list (any-type) (unchecked-type)))
-      (list-type (list (any-type))))))
-
-(check
-  (not
-    (type-matches? 
-      (list-type (list (any-type) (value-type "foo")))
-      (list-type (list (any-type) (unchecked-type))))))
-
-(check
-  (not
-    (type-matches? 
-      (unchecked-type)
-      (list-type (list (any-type) (unchecked-type))))))
-
-(check
-  (type-matches?
     (struct 'foo (list (any-type) (value-type "foo")))
     (struct 'foo (list))))
 

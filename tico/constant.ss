@@ -5,7 +5,6 @@
     bindings-datum->constant
     constant-application
     constant-abstraction
-    constant-list
     constant-struct
     constant-ref)
   (import
@@ -36,10 +35,6 @@
     (constant
       (value-struct $name
         (map constant-value $field-values))))
-
-  (define (constant-list $constants)
-    (constant
-      (map constant-value $constants)))
 
   (define (constant-ref $arity $target $index)
     (constant

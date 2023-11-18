@@ -27,7 +27,6 @@
     typing-constant
     typing-abstraction
     let-typing
-    typing-list
     typing-struct
     typing-ref
     typing-ref-index
@@ -199,11 +198,6 @@
         (typing-type $typing)
         (typing-type $arg))
       (typing-layment $typing)))
-
-  (define (typing-list $typings)
-    (typing
-      (list-type (map typing-type $typings))
-      (layment-list (map typing-layment $typings))))
 
   (define (typing-struct $name $field-typings)
     (typing

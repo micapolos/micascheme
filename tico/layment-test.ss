@@ -133,33 +133,6 @@
           (literal->compilation "foo")
           (literal->compilation "bar"))))))
 
-; --- layment-list
-
-(check
-  (equal?
-    (layment-list (list))
-    (make-layment
-      (layout-list (list))
-      (throw error))))
-
-(check
-  (equal?
-    (layment-list
-      (list
-        (literal->layment 128)
-        (empty-layment)
-        (literal->layment "foo")))
-    (make-layment
-      (layout-list
-        (list
-          (literal->layout 128)
-          (empty-layout)
-          (literal->layout "foo")))
-      (compilation-list
-        (list
-          (literal->compilation 128)
-          (literal->compilation "foo"))))))
-
 ; --- layment-struct
 
 (check

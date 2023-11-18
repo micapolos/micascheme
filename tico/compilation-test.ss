@@ -137,41 +137,6 @@
         '(string-append v1 v2))
       (variable 1))))
 
-; --- compilation-list
-
-(check
-  (equal?
-    (compilation-list
-      (list
-        (compilation 'v1 (constant "foo"))
-        (compilation 'v2 (parameter))
-        (compilation 'v3 (variable 1))))
-    (compilation
-      (datum-list (list 'v1 'v2 'v3))
-      (parameter))))
-
-(check
-  (equal?
-    (compilation-list
-      (list
-        (compilation 'v1 (constant "foo"))
-        (compilation 'v2 (variable 1))
-        (compilation 'v3 (variable 3))))
-    (compilation
-      (datum-list (list 'v1 'v2 'v3))
-      (variable 3))))
-
-(check
-  (equal?
-    (compilation-list
-      (list
-        (compilation 'v1 (constant "foo"))
-        (compilation 'v2 (constant "bar"))
-        (compilation 'v3 (constant "goo"))))
-    (compilation
-      (datum-list (list 'v1 'v2 'v3))
-      (constant-list (list (constant "foo") (constant "bar") (constant "goo"))))))
-
 ; --- compilation-struct
 
 (check
