@@ -24,7 +24,8 @@
 
     empty-compilation-scope
     compilation-scope-push
-    compilation-scope-ref)
+    compilation-scope-ref
+    compilation-scope-bindings)
   (import
     (micascheme)
     (tico constant)
@@ -194,4 +195,14 @@
         (list-ref (compilation-datum $compilation-scope) $index)
         (list-ref (compilation-evaluation $compilation-scope) $index))
       $index))
+
+  (define (compilation-scope-bindings $compilation-scope)
+    (filter-opts
+      (map
+        (lambda ($datum $evaluation)
+          (switch-opt $evaluation
+            ((constant? $constant)
+              (cons $datum (constant-value $constant)))))
+        (compilation-datum $compilation-scope)
+        (compilation-evaluation $compilation-scope))))
 )

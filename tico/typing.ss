@@ -3,6 +3,7 @@
     typing typing? typing-type typing-layment
     static-typing
     test-typing
+    test-static-typing
     test-parameter-typing
 
     native->typing
@@ -72,6 +73,11 @@
   (define-syntax-rule (test-typing $name)
     (type-datum->typing
       (test-type $name)
+      (test-datum $name)))
+
+  (define-syntax-rule (test-static-typing $name)
+    (type-datum->typing
+      (static-test-type $name)
       (test-datum $name)))
 
   (define-syntax-rule (test-parameter-typing $name)
@@ -410,7 +416,7 @@
                   (typing-datum $typing)))))))))
 
   (define (empty-typing-scope)
-    (typing (stack) (empty-layout-scope)))
+    (typing (stack) (empty-layment-scope)))
 
   (define (typing-scope-push $typing-scope $typing)
     (typing

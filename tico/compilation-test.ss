@@ -191,3 +191,29 @@
         (compilation 'foo (variable 3))))
     (with-tmps
       (generate-parameter-compilation))))
+
+; --- compilation-scope
+
+(lets
+  ($scope (empty-compilation-scope))
+  ($scope (compilation-scope-push $scope (compilation 'v1 (parameter))))
+  ($scope (compilation-scope-push $scope (compilation 'v2 (constant "foo"))))
+  ($scope (compilation-scope-push $scope (compilation 'v3 (constant "bar"))))
+  (do
+    (check
+      (equal?
+        (compilation-scope-ref $scope 0)
+        (compilation 'v3 (constant "bar")))))
+  (do
+    (check
+      (equal?
+        (compilation-scope-ref $scope 1)
+        (compilation 'v2 (constant "foo")))))
+  (do
+    (check
+      (equal?
+        (compilation-scope-ref $scope 2)
+        (compilation 'v1 (variable 2)))))
+  (void))
+
+

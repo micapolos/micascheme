@@ -68,7 +68,7 @@
       (variable-compilation $datum $index)))
 
   (define (layout-datum->layment $layout $datum)
-    (layment $layout (datum->compilation $datum)))
+    (make-layment $layout (datum->compilation $datum)))
 
   (define (bindings-layout-datum->layment $binding-layments $layout $datum)
     (layment $layout
@@ -123,7 +123,7 @@
       (compilation-parameter (layment-compilation $layment))))
 
   (define (layment-variable $layment $index)
-    (layment
+    (make-layment
       (layment-layout $layment)
       (compilation-variable (layment-compilation $layment) $index)))
 
@@ -147,27 +147,31 @@
           (layout-field-index-opt $layout-field)))))
 
   (define (empty-layment-scope)
-    (make-layment
+    (layment
       (empty-layout-scope)
       (empty-compilation-scope)))
 
   (define (layment-scope-push $layment-scope $layment)
-    (make-layment
+    (layment
       (layout-scope-push
         (layment-layout $layment-scope)
         (layment-layout $layment))
-      (compilation-scope-push
-        (layment-compilation $layment-scope)
-        (layment-compilation $layment))))
+      (lets
+        ($compilation-scope (layment-compilation $layment-scope))
+        ($compilation (layment-compilation $layment))
+        (if $compilation
+          (compilation-scope-push $compilation-scope $compilation)
+          $compilation-scope))))
 
   (define (layment-scope-ref $layment-scope $index)
     (lets
-      ($layout-field
-        (layout-scope-ref
-          (layment-layout $layment-scope)))
-      (make-layment
+      ($struct-layout (layment-layout $layment-scope))
+      ($layout-field (layout-scope-ref $struct-layout $index))
+      (layment
         (layout-field-layout $layout-field)
-        (compilation-scope-ref
-          (layment-compilation $layment-scope)
-          (layout-field-index-opt $layout-field)))))
+        (and-lets
+          ($index (layout-field-index-opt $layout-field))
+          (compilation-scope-ref
+            (layment-compilation $layment-scope)
+            (- (struct-layout-size $struct-layout) $index 1))))))
 )

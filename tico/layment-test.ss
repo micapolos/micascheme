@@ -17,6 +17,13 @@
 
 (check
   (equal?
+    (test-parameter-layment foo)
+    (make-layment
+      (simple-layout)
+      (test-parameter-compilation foo))))
+
+(check
+  (equal?
     (empty-layment)
     (layment (empty-layout) #f)))
 
@@ -201,3 +208,34 @@
         (layment-layout (literal->layment "foo"))
         (compilation-parameter
           (layment-compilation (literal->layment "foo")))))))
+
+; --- layment-scope
+
+(lets
+  ($scope (empty-layment-scope))
+  ($scope (layment-scope-push $scope (layment (simple-layout) (compilation 'v1 (parameter)))))
+  ($scope (layment-scope-push $scope (layment (simple-layout) (compilation 'v2 (constant "foo")))))
+  ($scope (layment-scope-push $scope (layment (empty-layout) #f)))
+  ($scope (layment-scope-push $scope (layment (simple-layout) (compilation 'v3 (constant "bar")))))
+  (do
+    (check
+      (equal?
+        (layment-scope-ref $scope 0)
+        (layment (simple-layout) (compilation 'v3 (constant "bar"))))))
+  (do
+    (check
+      (equal?
+        (layment-scope-ref $scope 1)
+        (layment (empty-layout) #f))))
+  (do
+    (check
+      (equal?
+        (layment-scope-ref $scope 2)
+        (layment (simple-layout) (compilation 'v2 (constant "foo"))))))
+  (do
+    (check
+      (equal?
+        (layment-scope-ref $scope 3)
+        (layment (simple-layout) (compilation 'v1 (variable 2))))))
+  (void))
+

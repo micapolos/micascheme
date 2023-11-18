@@ -17,6 +17,13 @@
 
 (check
   (equal?
+    (test-static-typing foo)
+    (type-datum->typing
+      (static-test-type foo)
+      (test-datum foo))))
+
+(check
+  (equal?
     (static-typing (value-type "foo"))
     (typing
       (value-type "foo")
@@ -410,3 +417,33 @@
   (equal?
     (typing-line (typing-struct 'foo (list)))
     'foo))
+
+; --- typing-scope
+
+(lets
+  ($scope (empty-typing-scope))
+  ($scope (typing-scope-push $scope (test-parameter-typing t1)))
+  ($scope (typing-scope-push $scope (test-typing t2)))
+  ($scope (typing-scope-push $scope (test-static-typing t3)))
+  ($scope (typing-scope-push $scope (test-parameter-typing t4)))
+  (do
+    (check
+      (equal?
+        (typing-scope-ref $scope 0)
+        (typing-variable (test-parameter-typing t4) 0))))
+  (do
+    (check
+      (equal?
+        (typing-scope-ref $scope 1)
+        (typing-variable (test-static-typing t3) #f))))
+  (do
+    (check
+      (equal?
+        (typing-scope-ref $scope 2)
+        (typing-variable (test-typing t2) 1))))
+  (do
+    (check
+      (equal?
+        (typing-scope-ref $scope 3)
+        (typing-variable (test-parameter-typing t1) 2))))
+  (void))
