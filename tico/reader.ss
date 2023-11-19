@@ -4,7 +4,8 @@
     bindings-read-typing
     read-typings
     read-typing
-    typing-reader)
+    typing-reader
+    typings-reader)
   (import
     (micascheme)
     (leo reader)

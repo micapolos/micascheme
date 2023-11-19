@@ -6,7 +6,8 @@
   (tico layout)
   (tico compilation)
   (tico variable)
-  (tico datum))
+  (tico datum)
+  (leo writing-reader))
 
 (check
   (equal?
@@ -417,6 +418,17 @@
   (equal?
     (typing-line (typing-struct 'foo (list)))
     'foo))
+
+; --- typings-string
+
+(check
+  (equal?
+    (typing-string
+      (typing-struct 'foo
+        (list
+          (literal->typing 20)
+          (literal->typing 30))))
+    (script-string (foo 20 30))))
 
 ; --- typing-scope
 

@@ -56,20 +56,25 @@
     make-list-typing
     make-struct-typing
 
-    typing-line
-    typings-lines
-
     empty-typing-scope
     typing-scope-push
     typing-scope
     typing-scope-ref
-    typing-scope-type-ref)
+    typing-scope-type-ref
+
+    typing-line
+    typings-script
+    typing-string
+    typings-string)
   (import
     (micascheme)
     (tico type)
     (tico layment)
     (tico layout)
-    (tico datum))
+    (tico datum)
+    (writing)
+    (leo reader)
+    (leo writing-reader))
 
   (data (typing type layment))
 
@@ -388,43 +393,6 @@
       (scope-typing-abstraction $scope $parameter-typings $body-typing)
       $argument-typings))
 
-  (define (typings-lines $typings)
-    (map typing-line $typings))
-
-  (define (typing-line $typing)
-    (lets
-      ($type (typing-type $typing))
-      (cond
-        ((equal? $type (boolean-type))
-          (typing-value $typing))
-        ((equal? $type (number-type))
-          (typing-value $typing))
-        ((equal? $type (string-type))
-          (typing-value $typing))
-        ((equal? $type (char-type))
-          (typing-value $typing))
-        ((equal? $type (symbol-type))
-          (typing-value $typing))
-        (else
-          (switch $type
-            ((struct? $struct)
-              (switch (struct-fields $struct)
-                ((null? _) (struct-name $struct))
-                ((else $fields)
-                  `(
-                    ,(struct-name struct)
-                    ,@(let-typing $typing
-                      (lambda ($typing)
-                        (map typing-line
-                          (typing-value
-                            (map
-                              (partial typing-ref-index $typing)
-                              (indices (length $fields)))))))))))
-            ((else $type)
-              `(native
-                ,(format "~s"
-                  (typing-datum $typing)))))))))
-
   (define (empty-typing-scope)
     (typing (stack) (empty-layment-scope)))
 
@@ -454,4 +422,51 @@
       (typing-scope-ref
         $typing-scope
         (indexed-index $indexed-type))))
+
+  (define (typings-script $typings)
+    (map typing-line $typings))
+
+  (define (typing-line $typing)
+    (lets
+      ($type (typing-type $typing))
+      (cond
+        ((type-matches? $type (boolean-type))
+          `(boolean
+            ,(if (typing-value $typing) 'true 'false)))
+        ((type-matches? $type (number-type))
+          (typing-value $typing))
+        ((type-matches? $type (string-type))
+          (typing-value $typing))
+        ((type-matches? $type (char-type))
+          (typing-value $typing))
+        (else
+          (switch $type
+            ((struct? $struct)
+              (lets
+                ($name (struct-name $struct))
+                (switch (struct-fields $struct)
+                  ((null? _) $name)
+                  ((else $fields)
+                    `(
+                      ,$name
+                      ,@(map typing-line
+                        (map
+                          (partial typing-ref-index $typing)
+                          (enumerate $fields))))))))
+            ((else $other)
+              TODO))))))
+
+  (define (typing-string $typing)
+    (writing-string
+      (reader-end
+        (reader-read
+          (writing-reader)
+          (typing-line $typing)))))
+
+  (define (typings-string $typings)
+    (writing-string
+      (reader-end
+        (reader-read-list
+          (writing-reader)
+          (typings-script $typings)))))
 )
