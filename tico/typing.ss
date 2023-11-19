@@ -23,6 +23,7 @@
     parameter-typing
     generate-parameter-typing
     typing-application
+    typing-args-application
     typing-parameter
     typing-variable
     typing-constant
@@ -150,6 +151,16 @@
       (layment-application
         (typing-layment $target)
         (map typing-layment $args))))
+
+  (define (typing-args-application $scope $target $args)
+    (typing
+      (type-args-application
+        (typing-type $target)
+        (typing-type $args))
+      (layment-args-application
+        (typing-layment $scope)
+        (typing-layment $target)
+        (typing-layment $args))))
 
   (define (parameter-typing $type $datum)
     (typing

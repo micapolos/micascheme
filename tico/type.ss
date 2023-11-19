@@ -27,6 +27,7 @@
 
     type-application-opt
     type-application
+    type-args-application
     type-abstraction
 
     type-access
@@ -104,6 +105,17 @@
   (define (type-application $target $args)
     (or-throw
       (type-application-opt $target $args)))
+
+  (define (type-args-application $target $args)
+    (switch $target
+      ((arrow? $arrow)
+        (and
+          (types-match?
+            (args-type-items $args)
+            (arrow-params $arrow))
+          (arrow-result $arrow)))
+      ((else $other)
+        (throw type-args-application))))
 
   (define (type-abstraction $param-types $body-type)
     (arrow $param-types $body-type))
