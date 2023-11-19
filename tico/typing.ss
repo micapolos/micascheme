@@ -381,9 +381,9 @@
       ((struct? $struct) (struct-typing $struct))
       ((else $other) TODO)))
 
-  (define (typings-do $parameter-typings $argument-typings $body-typing)
+  (define (typings-do $scope $parameter-typings $argument-typings $body-typing)
     (typing-application
-      (typing-abstraction $parameter-typings $body-typing)
+      (scope-typing-abstraction $scope $parameter-typings $body-typing)
       $argument-typings))
 
   (define (typings-lines $typings)

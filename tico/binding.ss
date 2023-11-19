@@ -10,7 +10,6 @@
     bindings-get
     bindings-resolve-opt
     bindings-resolve
-    bindings-do
     bindings-typing-ref
     bindings-typing-get
     bindings-typing-scope)
@@ -100,16 +99,6 @@
     (or
       (bindings-resolve-opt $bindings $typings)
       $typings))
-
-  (define (bindings-do $bindings $typings $fn)
-    (lets
-      ($parameter-typings (ordered-map typing-parameter $typings))
-      (typings-do
-        $parameter-typings
-        $typings
-        ($fn
-          (push-list $bindings
-            (map binding $parameter-typings))))))
 
   (define (bindings-typing-ref $bindings $typing $pattern)
     (or

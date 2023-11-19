@@ -128,19 +128,6 @@
 
 (check
   (equal?
-    (with-tmps
-      (read-typing
-        128 "foo"
-        (do (get string))))
-    (with-tmps
-      (bindings-do (stack)
-        (reverse (read-typings 128 "foo"))
-        (lambda ($bindings)
-          (bindings-read-typing $bindings
-            (get string)))))))
-
-(check
-  (equal?
     (read-typings
       (native "+")
       (as number number (promising number))

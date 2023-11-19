@@ -145,6 +145,7 @@
                     $bindings
                     (block-with-typing $block
                       (typings-do
+                        (bindings-typing-scope $bindings)
                         $parameter-typings
                         $argument-typings
                         $body-typing))
