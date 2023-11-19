@@ -4,6 +4,7 @@
       (path! path)
       (path make-path))
     path? path-symbol path-child-path-opt
+    list->path
     path-filename
     paths-reader)
   (import
@@ -11,6 +12,9 @@
     (leo reader))
 
   (data (path symbol child-path-opt))
+
+  (define (list->path $list)
+    (fold-right path #f $list))
 
   (define-syntax path!
     (lambda ($syntax)

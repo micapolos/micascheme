@@ -10,6 +10,11 @@
 
 (check
   (equal?
+    (list->path (list 'foo 'bar))
+    (path foo bar)))
+
+(check
+  (equal?
     (path-filename (path foo bar))
     "foo/bar.leo"))
 
