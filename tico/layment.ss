@@ -20,6 +20,7 @@
     layment-application
     layment-parameter
     layment-variable
+    scope-layment-abstraction
     layment-abstraction
     layment-struct
     layment-ref
@@ -101,11 +102,16 @@
         (layments->compilations $args))))
 
   (define (layment-abstraction $param-layments $body-layment)
+    (scope-layment-abstraction
+      (empty-layment-scope) $param-layments $body-layment))
+
+  (define (scope-layment-abstraction $scope $param-layments $body-layment)
     (make-layment
       (layout-abstraction
         (map layment-layout $param-layments)
         (layment-layout $body-layment))
-      (compilation-abstraction
+      (scope-compilation-abstraction
+        (layment-compilation $scope)
         (filter-opts (map layment-compilation $param-layments))
         (layment-compilation $body-layment))))
 

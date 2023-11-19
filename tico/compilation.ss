@@ -15,6 +15,7 @@
     generate-parameter-compilation
 
     compilation-application
+    scope-compilation-abstraction
     compilation-abstraction
     compilation-struct
     compilation-ref
@@ -114,6 +115,9 @@
         (map compilation-evaluation $args))))
 
   (define (compilation-abstraction $param-compilations $body-compilation)
+    (scope-compilation-abstraction (empty-compilation-scope) $param-compilations $body-compilation))
+
+  (define (scope-compilation-abstraction $scope $param-compilations $body-compilation)
     (switch-exclusive (compilation-evaluation $body-compilation)
       ((constant? $constant)
         (compilation
@@ -132,7 +136,8 @@
                 (compilation-datum $body-compilation))
               $variable))
           ((false? _)
-            (datum->compilation
+            (bindings-datum->compilation
+              (compilation-scope-bindings $scope)
               (datum-abstraction
                 (map compilation-datum $param-compilations)
                 (compilation-datum $body-compilation))))))

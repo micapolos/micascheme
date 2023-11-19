@@ -26,6 +26,7 @@
     typing-parameter
     typing-variable
     typing-constant
+    scope-typing-abstraction
     typing-abstraction
     let-typing
     typing-struct
@@ -172,11 +173,18 @@
       (typing-layment $value-typing)))
 
   (define (typing-abstraction $param-typings $body-typing)
+    (scope-typing-abstraction
+      (empty-typing-scope)
+      $param-typings
+      $body-typing))
+
+  (define (scope-typing-abstraction $scope $param-typings $body-typing)
     (typing
       (type-abstraction
         (map typing-type $param-typings)
         (typing-type $body-typing))
-      (layment-abstraction
+      (scope-layment-abstraction
+        (typing-layment $scope)
         (map typing-layment $param-typings)
         (typing-layment $body-typing))))
 

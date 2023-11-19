@@ -170,7 +170,10 @@
                   (push-block-reader
                     $bindings
                     (block-with-typing $block
-                      (typing-abstraction $param-typings $doing-typing))
+                      (scope-typing-abstraction
+                        (bindings-typing-scope $bindings)
+                        $param-typings
+                        $doing-typing))
                     $end)))))
           ((promising)
             (typing-reader $bindings

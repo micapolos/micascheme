@@ -12,7 +12,8 @@
     bindings-resolve
     bindings-do
     bindings-typing-ref
-    bindings-typing-get)
+    bindings-typing-get
+    bindings-typing-scope)
   (import
     (micascheme)
     (tico typing)
@@ -128,4 +129,10 @@
       (partial bindings-typing-ref $bindings)
       $typing
       $patterns))
+
+  (define (bindings-typing-scope $bindings)
+    (fold-left
+      typing-scope-push
+      (empty-typing-scope)
+      (filter typing? (reverse $bindings))))
 )
