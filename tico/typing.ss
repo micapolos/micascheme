@@ -220,6 +220,14 @@
         (typing-type $arg))
       (typing-layment $typing)))
 
+  (define (typing-args $scope $typings)
+    (typing
+      (args-type
+        (map typing-type $typings))
+      (layment-args
+        (typing-layment $scope)
+        (map typing-layment $typings))))
+
   (define (typing-struct $name $field-typings)
     (typing
       (struct $name

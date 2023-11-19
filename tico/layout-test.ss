@@ -23,6 +23,29 @@
     (literal->layout "foo")
     (type->layout (string-type))))
 
+; --- layout-args
+
+(check
+  (equal?
+    (layout-args (list))
+    empty-struct-layout))
+
+(check
+  (equal?
+    (layout-args
+      (list
+        (simple-layout)
+        (empty-layout)
+        (simple-layout)
+        (simple-layout)))
+    (struct-layout
+      (stack
+        (layout-field (simple-layout) 0)
+        (layout-field (empty-layout) #f)
+        (layout-field (simple-layout) 1)
+        (layout-field (simple-layout) 2))
+      3)))
+
 ; --- make-struct-layout
 
 (check

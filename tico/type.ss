@@ -5,6 +5,7 @@
     unchecked-type unchecked-type?
     native-type native-type? native-type-value
     type-type type-type?
+    args-type args-type? args-type-items
     list-of list-of? list-of-item-type
     boolean-type
     number-type
@@ -53,6 +54,7 @@
   (data (type-type))
   (data (unchecked-type))
   (data (native-type value))
+  (data (args-type items))
   (data (list-of item-type))
   (data (struct name fields))
   (data (arrow params result))

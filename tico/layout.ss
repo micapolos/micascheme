@@ -18,6 +18,7 @@
     literal->layout
     layout-application
     layout-abstraction
+    layout-args
     layout-struct
     layout-ref
 
@@ -86,6 +87,12 @@
         (lambda-layout-body $lambda-layout))
       ((else $other)
         (throw layout-application $target))))
+
+  (define (layout-args $layouts)
+    (fold-left
+      struct-layout+layout
+      empty-struct-layout
+      $layouts))
 
   (define (layout-struct $name $field-layouts)
     (make-struct-layout (reverse $field-layouts)))

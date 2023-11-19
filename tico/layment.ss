@@ -22,6 +22,7 @@
     layment-variable
     scope-layment-abstraction
     layment-abstraction
+    layment-args
     layment-struct
     layment-ref
 
@@ -132,6 +133,15 @@
     (make-layment
       (layment-layout $layment)
       (compilation-variable (layment-compilation $layment) $index)))
+
+  (define (layment-args $scope $layments)
+    (make-layment
+      (layout-args
+        (map layment-layout $layments))
+      (compilation-args
+        (layment-compilation $scope)
+        (filter-opts
+          (map layment-compilation $layments)))))
 
   (define (layment-struct $name $field-layments)
     (make-layment

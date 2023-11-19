@@ -141,6 +141,37 @@
           (literal->compilation "foo")
           (literal->compilation "bar"))))))
 
+; --- layment-args
+
+(check
+  (equal?
+    (layment-args
+      (empty-layment-scope)
+      (list))
+    (make-layment
+      (layout-args (list))
+      (throw error))))
+
+(check
+  (equal?
+    (layment-args
+      (empty-layment-scope)
+      (list
+        (literal->layment 128)
+        (empty-layment)
+        (variable-layment (simple-layout) 'foo 1)))
+    (make-layment
+      (layout-args
+        (list
+          (literal->layout 128)
+          (empty-layout)
+          (simple-layout)))
+      (compilation-args
+        (empty-compilation-scope)
+        (list
+          (literal->compilation 128)
+          (variable-compilation 'foo 1))))))
+
 ; --- layment-struct
 
 (check
