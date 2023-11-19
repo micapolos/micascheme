@@ -5,6 +5,7 @@
     read-typings
     read-typing
     typing-reader
+    args-typing-reader
     typings-reader)
   (import
     (micascheme)
@@ -33,6 +34,15 @@
             $block
             (lambda ($typings)
               (or-throw (single $typings))))))))
+
+  (define-reader (args-typing-reader $bindings $end)
+    (push-block-reader $bindings (empty-block)
+      (lambda ($block)
+        ($end
+          (block-let
+            (bindings-typing-scope $bindings)
+            $block
+            typing-args)))))
 
   (define-reader (push-block-reader $bindings $block $end)
     (reader

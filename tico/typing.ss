@@ -29,6 +29,7 @@
     scope-typing-abstraction
     typing-abstraction
     let-typing
+    typing-args
     typing-struct
     typing-ref
     typing-ref-index
