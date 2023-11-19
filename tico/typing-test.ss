@@ -421,11 +421,12 @@
 ; --- typing-scope
 
 (lets
-  ($scope (empty-typing-scope))
-  ($scope (typing-scope-push $scope (test-parameter-typing t1)))
-  ($scope (typing-scope-push $scope (test-typing t2)))
-  ($scope (typing-scope-push $scope (test-static-typing t3)))
-  ($scope (typing-scope-push $scope (test-parameter-typing t4)))
+  ($scope
+    (typing-scope
+      (test-parameter-typing t1)
+      (test-typing t2)
+      (test-static-typing t3)
+      (test-parameter-typing t4)))
   (do
     (check
       (equal?

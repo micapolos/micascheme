@@ -61,7 +61,9 @@
 
     empty-typing-scope
     typing-scope-push
-    typing-scope-ref)
+    typing-scope
+    typing-scope-ref
+    typing-scope-type-ref)
   (import
     (micascheme)
     (tico type)
@@ -439,4 +441,19 @@
     (typing
       (list-ref (typing-type $typing-scope) $index)
       (layment-scope-ref (typing-layment $typing-scope) $index)))
+
+  (define-syntax-rule (typing-scope $item ...)
+    (fold-left typing-scope-push (empty-typing-scope) (list $item ...)))
+
+  (define (typing-scope-type-ref $typing-scope $type)
+    (and-lets
+      ($indexed-type
+        (types-match
+          (typing-type $typing-scope)
+          $type))
+      (typing
+        (indexed-value $indexed-type)
+        (layment-scope-ref
+          (typing-layment $typing-scope)
+          (indexed-index $indexed-type)))))
 )
