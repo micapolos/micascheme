@@ -451,9 +451,7 @@
         (types-match
           (typing-type $typing-scope)
           $type))
-      (typing
-        (indexed-value $indexed-type)
-        (layment-scope-ref
-          (typing-layment $typing-scope)
-          (indexed-index $indexed-type)))))
+      (typing-scope-ref
+        $typing-scope
+        (indexed-index $indexed-type))))
 )

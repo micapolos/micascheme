@@ -447,4 +447,10 @@
       (equal?
         (typing-scope-ref $scope 3)
         (typing-variable (test-parameter-typing t1) 2))))
+
+  (do
+    (check
+      (equal?
+        (typing-scope-type-ref $scope (test-type t2))
+        (typing-scope-ref $scope 2))))
   (void))
