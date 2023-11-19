@@ -16,6 +16,7 @@
     generate-parameter-compilation
 
     compilation-application
+    compilation-args-application
     compilation-abstraction
     compilation-args
     compilation-struct
@@ -121,6 +122,22 @@
       (evaluation-application
         (compilation-evaluation $target)
         (map compilation-evaluation $args))))
+
+  (define (compilation-args-application $scope $target $args)
+    (lets
+      ($datum
+        (datum-args-application
+        (compilation-datum $target)
+        (compilation-datum $args)))
+      ($evaluation-opt
+        (evaluation-args-application-opt
+          (compilation-evaluation $target)
+          (compilation-evaluation $args)))
+      (compilation $datum
+        (or $evaluation-opt
+          (bindings-datum->constant
+            (compilation-scope-bindings $scope)
+            $datum)))))
 
   (define (compilation-abstraction $scope $param-compilations $body-compilation)
     (switch-exclusive (compilation-evaluation $body-compilation)

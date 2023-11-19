@@ -72,6 +72,24 @@
     (literal->compilation "foo")
     (compilation "foo" (constant "foo"))))
 
+; --- compilation-args-application
+
+(check
+  (equal?
+    (compilation-args-application
+      (empty-compilation-scope)
+      (compilation 'string-append (variable 1))
+      (compilation-args
+        (empty-compilation-scope)
+        (list
+          (literal->compilation "foo")
+          (literal->compilation "bar"))))
+    (compilation
+      (datum-args-application
+        'string-append
+        (datum-args (list "foo" "bar")))
+      (variable 1))))
+
 ; --- compilation-application
 
 (check

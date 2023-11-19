@@ -15,6 +15,15 @@
 
 (check
   (equal?
+  	(datum-args-application
+  		'list
+  		(datum-args (list 'v1 'v2)))
+  	'(call-with-values
+  		(lambda () (values v1 v2))
+  		list)))
+
+(check
+  (equal?
   	(datum-application 'fn (list 'v1 'v2))
   	'(fn v1 v2)))
 

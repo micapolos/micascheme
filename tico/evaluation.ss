@@ -1,6 +1,7 @@
 (library (tico evaluation)
   (export
-    evaluation-application)
+    evaluation-application
+    evaluation-args-application-opt)
   (import
     (micascheme)
     (tico constant)
@@ -22,6 +23,18 @@
           (lets
             ($variables (filter variable? $evaluations))
             ($parameters (ensure null? (filter parameter? $evaluations)))
+            ($variable (variable-flatten $variables))
+            (variable (variable-index $variable)))))))
+
+  (define (evaluation-args-application-opt $target $args)
+    (lets
+      ($evaluations (list $target $args))
+      (cond
+        ((for-all constant? $evaluations) #f)
+        ((exists parameter? $evaluations) (parameter))
+        (else
+          (lets
+            ($variables (filter variable? $evaluations))
             ($variable (variable-flatten $variables))
             (variable (variable-index $variable)))))))
 )

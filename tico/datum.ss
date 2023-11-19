@@ -4,6 +4,7 @@
     test-parameter-datum
     literal->datum
     datum-application
+    datum-args-application
     generate-datum-params
     datum-abstraction
     generate-datum-abstraction
@@ -51,6 +52,9 @@
 
   (define (datum-application $target $args)
     `(,$target ,@$args))
+
+  (define (datum-args-application $target $args)
+    `(call-with-values ,$args ,$target))
 
   (define (datum-tuple $items)
     (case (length $items)
