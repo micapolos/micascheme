@@ -145,7 +145,7 @@
         (list-ref (reverse $indexed-types) $index))))
 
   (define (env-resolve-application $env $symbol $types $terms)
-    (and-lets 
+    (opt-lets
       ($indexed-type (env-function-type-indexed-type $env $symbol $types))
       (cond
         ($indexed-type
@@ -163,7 +163,7 @@
         ($term (car $terms))
         ($type (car $types))
         (and (tuple-type? $type)
-          (and-lets 
+          (opt-lets
             ($indexed-type 
               (map-find-indexed
                 (lambda ($field-type)

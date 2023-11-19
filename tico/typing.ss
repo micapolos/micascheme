@@ -223,7 +223,7 @@
         (map typing-layment $field-typings))))
 
   (define (typing-ref $typing $pattern)
-    (and-lets
+    (opt-lets
       ($indexed-type (type-ref (typing-type $typing) $pattern))
       (typing
         (indexed-value $indexed-type)
@@ -283,7 +283,7 @@
           ((struct? $selector-struct)
             (and
               (symbol=? (struct-name $selector-struct) 'get)
-              (and-lets
+              (opt-lets
                 ($selector-type (single (struct-fields $selector-struct)))
                 (typing-ref $target-typing (type-value $selector-type)))))))))
 
@@ -446,7 +446,7 @@
     (fold-left typing-scope-push (empty-typing-scope) (list $item ...)))
 
   (define (typing-scope-type-ref $typing-scope $type)
-    (and-lets
+    (opt-lets
       ($indexed-type
         (types-match
           (typing-type $typing-scope)

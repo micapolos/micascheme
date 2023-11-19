@@ -175,7 +175,7 @@
       ($layout-field (layout-scope-ref $struct-layout $index))
       (layment
         (layout-field-layout $layout-field)
-        (and-lets
+        (opt-lets
           ($index (layout-field-index-opt $layout-field))
           (compilation-scope-ref
             (layment-compilation $layment-scope)

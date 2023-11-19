@@ -59,7 +59,7 @@
   ; ----------------------------------------------------------
 
   (define-syntax-rule (parser-thunk-do ($thunk $parser) $body)
-    (and-lets ($thunk $parser) $body))
+    (opt-lets ($thunk $parser) $body))
 
   (define (parser-push $parser $char)
     (parser-thunk-do ($thunk $parser)

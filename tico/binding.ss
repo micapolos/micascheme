@@ -85,7 +85,7 @@
             (reverse $typings))))))
 
   (define (bindings-resolve-constant-access-opt $bindings $typings)
-    (and-lets
+    (opt-lets
       ($typing (single $typings))
       ($target-typing
         (bindings-match $bindings
@@ -103,7 +103,7 @@
   (define (bindings-typing-ref $bindings $typing $pattern)
     (or
       (typing-ref $typing $pattern)
-      (and-lets
+      (opt-lets
         ($property-typing
           (bindings-match $bindings
             (property

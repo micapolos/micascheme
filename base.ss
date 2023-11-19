@@ -22,7 +22,7 @@
     ordered-map
     pi pi2
     bind-if
-    and-lets lets
+    opt-lets lets
     opt-lift
     current-seconds
     works?
@@ -247,12 +247,12 @@
         ((_ (do $result)) #`$result)
         ((_ $result) #`$result))))
 
-  (define-syntax and-lets
+  (define-syntax opt-lets
     (syntax-rules ()
       ((_ body) body)
       ((_ (val expr) decl ... body)
         (let ((val expr)) 
-          (and val (and-lets decl ... body))))))
+          (and val (opt-lets decl ... body))))))
 
   (define-syntax from
     (lambda ($syntax)
@@ -664,7 +664,7 @@
           (map-find-indexed+ $proc (cdr $list) (+ $index 1))))))
 
   (define (find-index $proc $list)
-    (and-lets ($indexed (map-find-indexed $proc $list))
+    (opt-lets ($indexed (map-find-indexed $proc $list))
       (indexed-index $indexed)))
 
   (define (indexed-find+ $proc $list $index)
