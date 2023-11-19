@@ -140,6 +140,25 @@
       (unchecked-type)
       (arrow (list (any-type) (unchecked-type)) (value-type "foo")))))
 
+; --- types-match
+
+(check
+  (equal?
+    (types-match (stack) (any-type))
+    #f))
+
+(check
+  (equal?
+    (types-match
+      (stack
+        (struct 'foo (list (string-type)))
+        (number-type)
+        (string-type))
+      (struct 'foo (list (any-type))))
+    (indexed
+      (struct' foo (list (string-type)))
+      2)))
+
 ; --- type-application
 
 (check
