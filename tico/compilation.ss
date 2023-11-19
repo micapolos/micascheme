@@ -7,6 +7,7 @@
     literal->compilation
     datum->compilation
     bindings-datum->compilation
+    scope-datum->compilation
     variable-compilation
 
     compilation-value
@@ -26,7 +27,8 @@
     empty-compilation-scope
     compilation-scope-push
     compilation-scope-ref
-    compilation-scope-bindings)
+    compilation-scope-bindings
+    compilation-scope)
   (import
     (micascheme)
     (tico constant)
@@ -65,6 +67,12 @@
     (compilation $datum
       (bindings-datum->constant
         (filter-opts (map compilation-binding-opt $binding-compilations))
+        $datum)))
+
+  (define (scope-datum->compilation $scope $datum)
+    (compilation $datum
+      (bindings-datum->constant
+        (compilation-scope-bindings $scope)
         $datum)))
 
   (define (compilation-value $compilation)
@@ -210,4 +218,10 @@
               (cons $datum (constant-value $constant)))))
         (compilation-datum $compilation-scope)
         (compilation-evaluation $compilation-scope))))
+
+  (define-syntax-rule (compilation-scope $item ...)
+    (fold-left
+      compilation-scope-push
+      (empty-compilation-scope)
+      (list $item ...)))
 )

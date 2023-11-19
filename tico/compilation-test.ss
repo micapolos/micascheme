@@ -53,6 +53,22 @@
 
 (check
   (equal?
+    (scope-datum->compilation
+      (compilation-scope
+        (compilation 'foo (constant "foo"))
+        (compilation 'goo (parameter))
+        (compilation 'bar (constant "bar")))
+      '(string-append "foo" "bar"))
+    (compilation
+      '(string-append "foo" "bar")
+      (bindings-datum->constant
+        (stack
+          (cons 'foo "foo")
+          (cons 'bar "bar"))
+        '(string-append "foo" "bar")))))
+
+(check
+  (equal?
     (literal->compilation "foo")
     (compilation "foo" (constant "foo"))))
 
@@ -195,10 +211,11 @@
 ; --- compilation-scope
 
 (lets
-  ($scope (empty-compilation-scope))
-  ($scope (compilation-scope-push $scope (compilation 'v1 (parameter))))
-  ($scope (compilation-scope-push $scope (compilation 'v2 (constant "foo"))))
-  ($scope (compilation-scope-push $scope (compilation 'v3 (constant "bar"))))
+  ($scope
+    (compilation-scope
+      (compilation 'v1 (parameter))
+      (compilation 'v2 (constant "foo"))
+      (compilation 'v3 (constant "bar"))))
   (do
     (check
       (equal?
