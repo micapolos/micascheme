@@ -27,7 +27,9 @@
     (push-block-reader $bindings (empty-block)
       (lambda ($block)
         ($end
-          (block-let $block
+          (block-let
+            (bindings-typing-scope $bindings)
+            $block
             (lambda ($typings)
               (or-throw (single $typings))))))))
 

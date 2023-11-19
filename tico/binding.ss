@@ -123,5 +123,8 @@
     (fold-left
       typing-scope-push
       (empty-typing-scope)
-      (filter typing? (reverse $bindings))))
+      (filter typing?
+        (map
+          binding-body
+          (reverse $bindings)))))
 )

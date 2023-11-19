@@ -8,6 +8,7 @@
 (check
   (equal?
     (block-let
+      (empty-typing-scope)
       (block
         (list
           (entry
@@ -29,6 +30,7 @@
       (lambda ($typings)
         (typing-struct 'foo $typings)))
     (entries-let
+      (empty-typing-scope)
       (list
         (entry
           (list
@@ -59,6 +61,7 @@
           (test-typing t1)
           (test-typing t2))))
     (block-let
+      (empty-typing-scope)
       (block
         (list
           (test-entry e1 e2)

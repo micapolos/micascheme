@@ -23,6 +23,5 @@
             ($variables (filter variable? $evaluations))
             ($parameters (ensure null? (filter parameter? $evaluations)))
             ($variable (variable-flatten $variables))
-            (variable
-              (variable-index $variable)))))))
+            (variable (variable-index $variable)))))))
 )

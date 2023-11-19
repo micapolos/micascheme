@@ -34,6 +34,7 @@
 (check
   (equal?
     (entry-let
+      (empty-typing-scope)
       (entry
         (list
           (parameter-typing (string-type) 's)
@@ -55,6 +56,7 @@
 (check
   (equal?
     (entries-let
+      (empty-typing-scope)
       (list
         (entry
           (list
