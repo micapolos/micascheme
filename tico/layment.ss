@@ -110,7 +110,7 @@
       (layout-abstraction
         (map layment-layout $param-layments)
         (layment-layout $body-layment))
-      (scope-compilation-abstraction
+      (compilation-abstraction
         (layment-compilation $scope)
         (filter-opts (map layment-compilation $param-layments))
         (layment-compilation $body-layment))))

@@ -132,6 +132,7 @@
         (list (simple-layout) (simple-layout)))
       (compilation-application
         (compilation-abstraction
+          (empty-compilation-scope)
           (list
             (compilation 'v1 (parameter))
             (compilation 'v2 (parameter)))

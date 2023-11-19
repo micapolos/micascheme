@@ -58,14 +58,14 @@
         (compilation 'foo (constant "foo"))
         (compilation 'goo (parameter))
         (compilation 'bar (constant "bar")))
-      '(string-append "foo" "bar"))
+      '(string-append foo bar))
     (compilation
-      '(string-append "foo" "bar")
+      '(string-append foo bar)
       (bindings-datum->constant
         (stack
           (cons 'foo "foo")
           (cons 'bar "bar"))
-        '(string-append "foo" "bar")))))
+        '(string-append foo bar)))))
 
 (check
   (equal?
@@ -102,6 +102,33 @@
   (equal?
     (compilation-application
       (compilation-abstraction
+        (compilation-scope
+          (compilation 'excl (constant "!")))
+        (list
+          (compilation 'foo (parameter))
+          (compilation 'bar (parameter)))
+        (compilation-struct 'foo
+          (list
+            (compilation 'foo (variable 1))
+            (compilation 'bar (variable 0))
+            (compilation 'excl (constant "!")))))
+      (list
+        (literal->compilation "foo")
+        (literal->compilation "bar")))
+    (scope-datum->compilation
+      (compilation-scope
+        (compilation 'excl (constant "!")))
+      (datum-application
+        (datum-abstraction
+          (list 'foo 'bar)
+          (datum-struct 'foo (list 'foo 'bar 'excl)))
+        (list "foo" "bar")))))
+
+(check
+  (equal?
+    (compilation-application
+      (compilation-abstraction
+        (empty-compilation-scope)
         (list
           (compilation 'v1 (parameter))
           (compilation 'v2 (parameter)))
@@ -120,6 +147,7 @@
   (equal?
     (compilation-application
       (compilation-abstraction
+        (empty-compilation-scope)
         (list
           (compilation 'v1 (parameter))
           (compilation 'v2 (parameter)))
@@ -141,6 +169,7 @@
 (check
   (equal?
     (compilation-abstraction
+      (empty-compilation-scope)
       (list
         (compilation 'v1 (parameter))
         (compilation 'v2 (parameter)))
@@ -231,6 +260,11 @@
       (equal?
         (compilation-scope-ref $scope 2)
         (compilation 'v1 (variable 2)))))
+  (do
+    (check
+      (equal?
+        (compilation-scope-bindings $scope)
+        (stack
+          (cons 'v2 "foo")
+          (cons 'v3 "bar")))))
   (void))
-
-
