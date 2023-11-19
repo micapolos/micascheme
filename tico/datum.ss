@@ -10,6 +10,7 @@
     lets-datum
     let-datum
     datum-tuple
+    datum-args
     tuple-ref-datum
     value->datum
     datum->value
@@ -57,6 +58,9 @@
       ((1) (car $items))
       ((2) `(cons ,(car $items) ,(cadr $items)))
       (else `(vector ,@$items))))
+
+  (define (datum-args $datums)
+    `(lambda () (values ,@$datums)))
 
   (define (datum-struct $name $field-datums)
     (datum-tuple $field-datums))

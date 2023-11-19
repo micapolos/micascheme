@@ -182,6 +182,53 @@
         '(string-append v1 v2))
       (variable 1))))
 
+; --- compilation-args
+
+(check
+  (equal?
+    (compilation-args
+      (empty-compilation-scope)
+      (list
+        (compilation 'foo (constant "foo"))
+        (compilation 'bar (variable 1))
+        (compilation 'goo (parameter))))
+    (compilation
+      (datum-args (list 'foo 'bar 'goo))
+      (parameter))))
+
+(check
+  (equal?
+    (compilation-args
+      (empty-compilation-scope)
+      (list
+        (compilation 'foo (constant "foo"))
+        (compilation 'bar (variable 1))
+        (compilation 'goo (variable 2))))
+    (compilation
+      (datum-args (list 'foo 'bar 'goo))
+      (variable 2))))
+
+(lets
+  ($compilation
+    (compilation-args
+      (compilation-scope
+        (compilation 'foo (constant "foo"))
+        (compilation 'bar (constant "bar")))
+      (list
+        (compilation '(string-append foo bar) (constant "foobar"))
+        (compilation "!" (constant "!")))))
+  (do
+    (check
+      (equal?
+        (call-with-values (compilation-value $compilation) string-append)
+        "foobar!")))
+  (do
+    (check
+      (equal?
+        (compilation-datum $compilation)
+        (datum-args (list '(string-append foo bar) "!")))))
+  (void))
+
 ; --- compilation-struct
 
 (check

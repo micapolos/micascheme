@@ -1,7 +1,8 @@
 (import
   (micascheme)
   (tico constant)
-  (tico datum))
+  (tico datum)
+  (tico value))
 
 (check
   (equal?
