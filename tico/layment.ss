@@ -145,12 +145,11 @@
       (layment-layout $layment)
       (compilation-variable (layment-compilation $layment) $index)))
 
-  (define (layment-args $scope $layments)
+  (define (layment-args $layments)
     (make-layment
       (layout-args
         (map layment-layout $layments))
       (compilation-args
-        (layment-compilation $scope)
         (filter-opts
           (map layment-compilation $layments)))))
 

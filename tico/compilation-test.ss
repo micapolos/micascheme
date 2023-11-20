@@ -80,7 +80,6 @@
       (empty-compilation-scope)
       (compilation 'string-append (variable 1))
       (compilation-args
-        (empty-compilation-scope)
         (list
           (literal->compilation "foo")
           (literal->compilation "bar"))))
@@ -205,7 +204,6 @@
 (check
   (equal?
     (compilation-args
-      (empty-compilation-scope)
       (list
         (compilation 'foo (constant "foo"))
         (compilation 'bar (variable 1))
@@ -217,7 +215,6 @@
 (check
   (equal?
     (compilation-args
-      (empty-compilation-scope)
       (list
         (compilation 'foo (constant "foo"))
         (compilation 'bar (variable 1))
@@ -225,27 +222,6 @@
     (compilation
       (datum-args (list 'foo 'bar 'goo))
       (variable 2))))
-
-(lets
-  ($compilation
-    (compilation-args
-      (compilation-scope
-        (compilation 'foo (constant "foo"))
-        (compilation 'bar (constant "bar")))
-      (list
-        (compilation '(string-append foo bar) (constant "foobar"))
-        (compilation "!" (constant "!")))))
-  (do
-    (check
-      (equal?
-        (call-with-values (compilation-value $compilation) string-append)
-        "foobar!")))
-  (do
-    (check
-      (equal?
-        (compilation-datum $compilation)
-        (datum-args (list '(string-append foo bar) "!")))))
-  (void))
 
 ; --- compilation-struct
 

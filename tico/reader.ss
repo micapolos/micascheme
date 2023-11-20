@@ -43,9 +43,7 @@
             (bindings-typing-scope $bindings)
             $block
             (lambda ($typings)
-              (typing-args
-                (bindings-typing-scope $bindings)
-                (reverse $typings))))))))
+              (typing-args (reverse $typings))))))))
 
   (define-reader (push-block-reader $bindings $block $end)
     (reader

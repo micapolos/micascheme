@@ -204,18 +204,18 @@
                     (variable-index-flatten (map variable-index $variables))))
                 (else (parameter)))))))))
 
-  (define (compilation-args $scope $compilations)
+  (define (compilation-args $compilations)
     (lets
       ($datum (datum-args (map compilation-datum $compilations)))
       ($evaluations (map compilation-evaluation $compilations))
       (cond
+        ; TODO: Use datum-args, and evaluate with constants
         ((for-all constant? $evaluations)
           (compilation $datum
             (constant
               (lambda ()
                 (apply values
                   (map constant-value $evaluations))))))
-          ; (scope-datum->compilation $scope $datum))
         (else
           (compilation $datum
             (cond

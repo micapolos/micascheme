@@ -146,7 +146,6 @@
 (check
   (equal?
     (layment-args
-      (empty-layment-scope)
       (list))
     (make-layment
       (layout-args (list))
@@ -155,7 +154,6 @@
 (check
   (equal?
     (layment-args
-      (empty-layment-scope)
       (list
         (literal->layment 128)
         (empty-layment)
@@ -167,7 +165,6 @@
           (empty-layout)
           (simple-layout)))
       (compilation-args
-        (empty-compilation-scope)
         (list
           (literal->compilation 128)
           (variable-compilation 'foo 1))))))
