@@ -65,8 +65,10 @@
     typing-scope-type-ref
 
     typing-line
+    args-typing-script
     typings-script
     typing-string
+    args-typing-string
     typings-string)
   (import
     (micascheme)
@@ -461,17 +463,6 @@
           (typing-value $typing))
         (else
           (switch $type
-            ((args-type? $args-type)
-              (typing-value
-                (typing-args-application
-                  (empty-typing-scope) ; TODO???
-                  (type-datum->typing
-                    (arrow
-                      (args-type-items $args-type)
-                      (unchecked-type))
-                    '(lambda $items
-                      (map (from (tico typing) typing-line) $items)))
-                  $typing)))
             ((struct? $struct)
               (lets
                 ($name (struct-name $struct))
@@ -486,6 +477,26 @@
                           (enumerate $fields))))))))
             ((else $other)
               TODO))))))
+
+  (define (args-typing-script $typing)
+    (lets
+      ($args-type (ensure args-type? (typing-type $typing)))
+      (typing-value
+        (typing-args-application
+          (empty-typing-scope)
+          (type-datum->typing
+            (arrow
+              (args-type-items $args-type)
+              (unchecked-type))
+            '(lambda $items $items))
+          $typing))))
+
+  (define (args-typing-string $typing)
+    (writing-string
+      (reader-end
+        (reader-read-list
+          (writing-reader)
+          (args-typing-script $typing)))))
 
   (define (typing-string $typing)
     (writing-string

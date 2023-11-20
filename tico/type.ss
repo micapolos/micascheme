@@ -110,6 +110,7 @@
     (switch $target
       ((arrow? $arrow)
         (and
+          (args-type? $args)
           (types-match?
             (args-type-items $args)
             (arrow-params $arrow))

@@ -8,7 +8,7 @@
   (tico reader))
 
 (display
-  (typing-string
+  (args-typing-string
     (reader-end
       (reader-read-list
         (args-typing-reader (stack))
