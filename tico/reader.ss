@@ -42,7 +42,10 @@
           (block-let
             (bindings-typing-scope $bindings)
             $block
-            typing-args)))))
+            (lambda ($typings)
+              (typing-args
+                (bindings-typing-scope $bindings)
+                $typings)))))))
 
   (define-reader (push-block-reader $bindings $block $end)
     (reader

@@ -118,6 +118,10 @@
         (native-layout))
       ((type-type? _)
         (simple-layout))
+      ((args-type? $args-type)
+        (layout-args
+          (map type->layout
+            (args-type-items $args-type))))
       ((struct? $struct)
         (layout-struct (struct-name $struct)
           (map type->layout (struct-fields $struct))))

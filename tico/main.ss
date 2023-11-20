@@ -11,7 +11,7 @@
   (typing-string
     (reader-end
       (reader-read-list
-        (typing-reader (stack))
+        (args-typing-reader (stack))
         (load-script
           (path-filename
             (list->path

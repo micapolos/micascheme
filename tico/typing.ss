@@ -461,6 +461,17 @@
           (typing-value $typing))
         (else
           (switch $type
+            ((args-type? $args-type)
+              (typing-value
+                (typing-args-application
+                  (empty-typing-scope) ; TODO???
+                  (type-datum->typing
+                    (arrow
+                      (args-type-items $args-type)
+                      (unchecked-type))
+                    '(lambda $items
+                      (map (from (tico typing) typing-line) $items)))
+                  $typing)))
             ((struct? $struct)
               (lets
                 ($name (struct-name $struct))
