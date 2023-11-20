@@ -304,6 +304,13 @@
 
 ; --- compilation-scope
 
+(check
+  (equal?
+    (test-compilation-scope foo bar)
+    (compilation-scope
+      (test-compilation foo)
+      (test-compilation bar))))
+
 (lets
   ($scope
     (compilation-scope

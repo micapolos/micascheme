@@ -3,6 +3,7 @@
     compilation compilation? compilation-datum compilation-evaluation
     test-compilation
     test-parameter-compilation
+    test-compilation-scope
 
     literal->compilation
     datum->compilation
@@ -29,7 +30,8 @@
     compilation-scope-push
     compilation-scope-ref
     compilation-scope-bindings
-    compilation-scope)
+    compilation-scope
+    test-compilation-scope)
   (import
     (micascheme)
     (tico constant)
@@ -48,6 +50,10 @@
     (compilation
       (test-parameter-datum $name)
       (parameter)))
+
+  (define-syntax-rule (test-compilation-scope $name ...)
+    (compilation-scope
+      (test-compilation $name) ...))
 
   (define (literal->compilation $literal)
     (compilation
