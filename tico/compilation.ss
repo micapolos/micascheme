@@ -210,12 +210,12 @@
       ($evaluations (map compilation-evaluation $compilations))
       (cond
         ((for-all constant? $evaluations)
-          ; (compilation $datum
-          ;   (constant
-          ;     (lambda ()
-          ;       (apply values
-          ;         (map constant-value $evaluations))))))
-          (scope-datum->compilation $scope $datum))
+          (compilation $datum
+            (constant
+              (lambda ()
+                (apply values
+                  (map constant-value $evaluations))))))
+          ; (scope-datum->compilation $scope $datum))
         (else
           (compilation $datum
             (cond
