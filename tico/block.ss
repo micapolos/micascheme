@@ -67,12 +67,18 @@
       (lambda (_)
         $typings)))
 
-  (define (block-let $scope $block $fn)
+  (define (block-let $scope $block $body-fn)
     (entries-let
       $scope
       (block-entries $block)
-      ($fn (block-typings $block))))
+      (lambda ($scope)
+        ($body-fn $scope
+          (block-typings $block)))))
 
   (define (block-struct $name $block)
-    (block-let (empty-typing-scope) $block (partial typing-struct $name)))
+    (block-let
+      (empty-typing-scope)
+      $block
+      (lambda ($scope $typings)
+        (typing-struct $name (reverse $typings)))))
 )

@@ -27,7 +27,7 @@
           (variable-typing (number-type) '$number 1)
           (variable-typing (string-type) '$string 2)
           (variable-typing (string-type) '$string2 0)))
-      (lambda ($typings)
+      (lambda ($scope $typings)
         (typing-struct 'foo $typings)))
     (entries-let
       (empty-typing-scope)
@@ -44,11 +44,12 @@
           (list
             (literal->typing 128)
             (variable-typing (string-type) '$string 0))))
-      (typing-struct 'foo
-        (list
-          (variable-typing (number-type) '$number 1)
-          (variable-typing (string-type) '$string 2)
-          (variable-typing (string-type) '$string2 0))))))
+      (lambda ($scope)
+        (typing-struct 'foo
+          (list
+            (variable-typing (number-type) '$number 1)
+            (variable-typing (string-type) '$string 2)
+            (variable-typing (string-type) '$string2 0)))))))
 
 (check
   (equal?
@@ -69,5 +70,5 @@
         (list
           (test-typing t1)
           (test-typing t2)))
-      (lambda ($typings)
-        (typing-struct 'foo $typings)))))
+      (lambda ($scope $typings)
+        (typing-struct 'foo (reverse $typings))))))

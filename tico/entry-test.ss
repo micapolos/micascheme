@@ -42,7 +42,8 @@
         (list
           (literal->typing "foo")
           (literal->typing 128)))
-      (variable-typing (string-type) 's 1))
+      (lambda ($scope)
+        (variable-typing (string-type) 's 1)))
     (typing-application
       (typing-abstraction
         (list
@@ -72,7 +73,8 @@
           (list
             (variable-typing (string-type) 's1 1)
             (variable-typing (number-type) 'n1 0))))
-      (variable-typing (string-type) 's2 1))
+      (lambda ($scope)
+        (variable-typing (string-type) 's2 1)))
     (typing-application
       (typing-abstraction
         (list

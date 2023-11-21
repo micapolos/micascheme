@@ -22,22 +22,24 @@
       (ordered-map typing-parameter $typings)
       $typings))
 
-  (define (entry-let $scope $entry $body)
+  (define (entry-let $scope $entry $body-fn)
     (typing-application
       (scope-typing-abstraction
         $scope
         (entry-parameters $entry)
-        $body)
+        ($body-fn (fold-left typing-scope-push $scope (entry-parameters $entry))))
       (entry-arguments $entry)))
 
-  (define (entries-let $scope $entries $body)
+  (define (entries-let $scope $entries $body-fn)
     (switch $entries
-      ((null? _) $body)
+      ((null? _)
+        ($body-fn $scope))
       ((pair? $pair)
         (unpair $pair $entry $entries
           (entry-let $scope $entry
-            (entries-let
-              (fold-left typing-scope-push $scope (entry-parameters $entry))
-              $entries
-              $body))))))
+            (lambda ($scope)
+              (entries-let
+                $scope
+                $entries
+                $body-fn)))))))
 )

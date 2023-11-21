@@ -32,7 +32,7 @@
           (block-let
             (bindings-typing-scope $bindings)
             $block
-            (lambda ($typings)
+            (lambda ($scope $typings)
               (or-throw (single $typings))))))))
 
   (define-reader (args-typing-reader $bindings $end)
@@ -42,7 +42,7 @@
           (block-let
             (bindings-typing-scope $bindings)
             $block
-            (lambda ($typings)
+            (lambda ($scope $typings)
               (typing-args (reverse $typings))))))))
 
   (define-reader (push-block-reader $bindings $block $end)
