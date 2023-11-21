@@ -224,3 +224,32 @@
           ($bar (pure "bar"))
           (pure (string-append $foo $bar)))))
     (cons "foobar" (list "foobar" "bar" "foo"))))
+
+; --- define-monad
+
+(let ()
+  (define (linear=? $linear-a $linear-b)
+    (and
+      (equal? ($linear-a 0.0) ($linear-b 0.0))
+      (equal? ($linear-a 1.0) ($linear-b 1.0))
+      (equal? ($linear-a 2.0) ($linear-b 2.0))))
+
+  (define-monad linear
+    ((pure $value)
+      (lambda ($time) $value))
+    ((bind $linear $fn)
+      (lambda ($time)
+        (($fn ($linear $time)) $time))))
+
+  (check (linear=? (linear 10) (linear 10)))
+
+  (check
+    (linear=?
+      (linear-lets
+        ($sin sin)
+        ($cos cos)
+        (linear (+ (* $sin $sin) (* $cos $cos))))
+      (lambda ($time)
+        (+
+          (* (sin $time) (sin $time))
+          (* (cos $time) (cos $time)))))))

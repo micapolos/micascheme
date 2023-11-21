@@ -8,7 +8,8 @@
     option-monad 
     fallible-monad
     cons-monad
-    listing listing-bind listing-run listing-monad)
+    listing listing-bind listing-run listing-monad
+    define-monad)
   (import (micascheme))
 
   (data (monad pure-fn bind-fn))
@@ -64,6 +65,34 @@
             (lambda ($var)
               (monad-lets $monad $decl ... $result)))))))
 
+  (define-syntax define-monad
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $name
+          (($pure $pure-value) $pure-body)
+          (($bind $bind-monadic $bind-fn) $bind-body))
+          (and
+            (identifier? #'$name)
+            (identifier-named? #'$pure pure)
+            (identifier? #'$pure-param)
+            (identifier-named? #'$bind bind)
+            (identifier? #'$bind-monadic)
+            (identifier? #'$bind-fn))
+          (lets
+            ($pure-name #'$name)
+            ($bind-name (build-identifier ($s #'$name) (string-append $s "-bind")))
+            ($lets-name (build-identifier ($s #'$name) (string-append $s "-lets")))
+            ($... (datum->syntax #'+ '...))
+            #`(begin
+              (define (#,$pure-name $pure-value) $pure-body)
+              (define (#,$bind-name $bind-monadic $bind-fn) $bind-body)
+              (define-syntax #,$lets-name
+                (syntax-rules ()
+                  ((_ $result) $result)
+                  ((_ ($var $body) $decl #,$... $result)
+                    (#,$bind-name $body
+                      (lambda ($var)
+                        (#,$lets-name $decl #,$... $result))))))))))))
 
   ; monad-stack
 
