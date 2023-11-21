@@ -54,7 +54,7 @@
     `(,$target ,@$args))
 
   (define (datum-args-application $target $args)
-    `(call-with-values ,$args ,$target))
+    `(,$target ,@$args))
 
   (define (datum-tuple $items)
     (case (length $items)
@@ -63,8 +63,7 @@
       ((2) `(cons ,(car $items) ,(cadr $items)))
       (else `(vector ,@$items))))
 
-  (define (datum-args $datums)
-    `(lambda () (values ,@$datums)))
+  (define (datum-args $datums) $datums)
 
   (define (datum-struct $name $field-datums)
     (datum-tuple $field-datums))
