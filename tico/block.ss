@@ -13,7 +13,8 @@
     block+typing
     block+typings
     block-let
-    block-struct)
+    block-struct
+    block-string)
   (import
     (micascheme)
     (tico binding)
@@ -81,4 +82,7 @@
       $block
       (lambda ($scope $typings)
         (typing-struct $name (reverse $typings)))))
+
+  (define (block-string $block)
+    (typings-string (reverse (block-typings $block))))
 )

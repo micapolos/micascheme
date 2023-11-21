@@ -1,6 +1,7 @@
 (import
   (micascheme)
   (tico tico)
+  (tico block)
   (tico typing)
   (tico path)
   (leo parser)
@@ -8,10 +9,10 @@
   (tico reader))
 
 (display
-  (args-typing-string
+  (block-string
     (reader-end
       (reader-read-list
-        (args-typing-reader (stack))
+        (push-block-reader (stack) (empty-block))
         (load-script
           (path-filename
             (list->path

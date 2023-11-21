@@ -6,7 +6,8 @@
     read-typing
     typing-reader
     args-typing-reader
-    typings-reader)
+    typings-reader
+    push-block-reader)
   (import
     (micascheme)
     (leo reader)
