@@ -123,6 +123,24 @@
                   $bindings
                   (block+typing $block $the-typing)
                   $end))))
+          ; TODO: Currently it does not work because we don't support typing-args
+          ((then)
+            (lets
+              ($typings (reverse (block-typings $block)))
+              ($parameters (map typing-parameter $typings))
+              (typing-reader
+                (push-list $bindings (map binding $parameters))
+                (lambda ($then-typing)
+                  (push-block-reader
+                    $bindings
+                    (block
+                      (push
+                        (block-entries $block)
+                        (entry $parameters $typings))
+                      (push
+                        (reverse $parameters)
+                        $then-typing))
+                    $end)))))
           ((with)
             (push-with-typings-reader $bindings (stack)
               (lambda ($with-typings)
