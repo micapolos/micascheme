@@ -272,7 +272,7 @@
           ((type-type? _) 
             `type)
           ((unchecked-type? _)
-            `unchecked)
+            `primitive)
           ((native-type? $native-type)
             `(native ,(native-type-value $native-type)))
           ((struct? $struct)

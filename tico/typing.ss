@@ -292,6 +292,8 @@
             (number-typing))
           ((equal? $type (struct 'string (list)))
             (string-typing))
+          ((equal? $type (struct 'a (list (struct 'primitive (list)))))
+            (type->typing (unchecked-type)))
           (else $typing))))
 
   (define (typings-resolve $typings)
@@ -460,6 +462,12 @@
           (typing-value $typing))
         (else
           (switch $type
+            ((value-type? $value-type)
+              `(type ,(type-line (value-type-value $value-type))))
+            ((unchecked-type? _)
+              `(primitive ,(typing-value $typing)))
+            ((arrow? $arrow)
+              (type-line $arrow))
             ((struct? $struct)
               (lets
                 ($name (struct-name $struct))
@@ -473,7 +481,7 @@
                           (partial typing-ref-index $typing)
                           (enumerate $fields))))))))
             ((else $other)
-              TODO))))))
+              (throw typing-line $typing)))))))
 
   (define (typing-string $typing)
     (writing-string

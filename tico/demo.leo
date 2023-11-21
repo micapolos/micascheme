@@ -1,4 +1,4 @@
 load tico core
 
-"foo"
-"bar"
+"Hello, "
+plus "world!"
