@@ -18,7 +18,8 @@
     (tico block)
     (tico entry)
     (leo parser)
-    (leo reader))
+    (leo reader)
+    (tico datum))
 
   (define-reader (typings-reader $bindings $end)
     (push-block-reader $bindings (empty-block)
@@ -80,12 +81,13 @@
                   (push-block-reader $bindings $block $end)
                   (flatten (map load-script (map path-filename $paths)))))))
           ((native)
-            (typing-reader $bindings
-              (lambda ($native-typing)
+            (push-natives-reader (stack)
+              (lambda ($natives)
                 (push-block-reader
                   $bindings
-                  (block+typing $block
-                    (typing-native $native-typing))
+                  (block+typings $block
+                    (map native->typing
+                      (reverse $natives)))
                   $end))))
           ((as)
             (lets
@@ -275,6 +277,19 @@
               $end))))
       (lambda ()
         ($end $typings))))
+
+  (define-reader (push-natives-reader $natives $end)
+    (reader
+      (lambda ($literal)
+        (push-natives-reader
+          (push $natives
+            (string->read-datum
+              (ensure string? $literal)))
+          $end))
+      (lambda ($symbol)
+        (throw native-symbol))
+      (lambda ()
+        ($end $natives))))
 
   (define-reader (comment-reader $end)
     (reader

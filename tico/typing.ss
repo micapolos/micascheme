@@ -34,7 +34,6 @@
     typing-struct
     typing-ref
     typing-ref-index
-    typing-native
     typing-prepare
     typings-do
     typing-get
@@ -264,12 +263,6 @@
 
   (define (typing-get $typing $patterns)
     (fold-left typing-ref $typing $patterns))
-
-  (define (typing-native $typing)
-    (native->typing
-      (string->read-datum
-        (ensure string?
-          (typing-value $typing)))))
 
   (define (native->typing $datum)
     (type-datum->typing (unchecked-type) $datum))

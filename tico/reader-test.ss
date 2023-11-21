@@ -7,8 +7,11 @@
 
 (check
   (equal?
-    (read-typing (native "(+ 1 2)"))
-    (native->typing '(+ 1 2))))
+    (read-typings (native "#f" "(+ 1 2)" "string-append"))
+    (stack
+      (native->typing #f)
+      (native->typing '(+ 1 2))
+      (native->typing 'string-append))))
 
 (check
   (equal?
