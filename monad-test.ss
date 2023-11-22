@@ -228,8 +228,8 @@
 ; --- define-monad
 
 (let ()
-  (define-syntax-rule (linear $time $body)
-    (lambda ($time) $body))
+  (define-syntax-rule (linear $x $body)
+    (lambda ($x) $body))
 
   (define (linear=? $linear-a $linear-b)
     (and
@@ -239,15 +239,15 @@
 
   (define-monad linear
     ((pure $value)
-      (lambda ($time) $value))
+      (lambda (_) $value))
     ((bind $linear $fn)
-      (linear $time
-        (($fn ($linear $time)) $time))))
+      (linear $x
+        (($fn ($linear $x)) $x))))
 
   (check
     (linear=?
-      (linear $time (* 2 $time))
-      (linear $time (* 2 $time))))
+      (linear $x (* 2 $x))
+      (linear $x (* 2 $x))))
 
   (check
     (linear=?
@@ -255,7 +255,7 @@
         ($sin sin)
         ($cos cos)
         (pure (+ (* $sin $sin) (* $cos $cos))))
-      (linear $time
+      (linear $x
         (+
-          (* (sin $time) (sin $time))
-          (* (cos $time) (cos $time)))))))
+          (* (sin $x) (sin $x))
+          (* (cos $x) (cos $x)))))))
