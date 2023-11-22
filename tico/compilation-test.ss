@@ -211,7 +211,6 @@
       (datum-args (list 'foo 'bar))
       (constant (list "foo" "bar")))))
 
-
 (check
   (equal?
     (compilation-args
