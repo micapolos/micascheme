@@ -206,6 +206,17 @@
     (compilation-args
       (list
         (compilation 'foo (constant "foo"))
+        (compilation 'bar (constant "bar"))))
+    (compilation
+      (datum-args (list 'foo 'bar))
+      (constant (list "foo" "bar")))))
+
+
+(check
+  (equal?
+    (compilation-args
+      (list
+        (compilation 'foo (constant "foo"))
         (compilation 'bar (variable 1))
         (compilation 'goo (parameter))))
     (compilation

@@ -141,11 +141,6 @@
           (compilation-evaluation $args)))
       (compilation $datum
         (or $evaluation-opt
-          ; (compilation $datum
-          ;   (constant
-          ;     (call-with-values
-          ;       (constant-value (compilation-evaluation $args))
-          ;       (constant-value (compilation-evaluation $target)))))))))
           (bindings-datum->constant
             (compilation-scope-bindings $scope)
             $datum)))))
@@ -209,13 +204,9 @@
       ($datum (datum-args (map compilation-datum $compilations)))
       ($evaluations (map compilation-evaluation $compilations))
       (cond
-        ; TODO: Use datum-args, and evaluate with constants
         ((for-all constant? $evaluations)
           (compilation $datum
-            (constant
-              (lambda ()
-                (apply values
-                  (map constant-value $evaluations))))))
+            (constant (map constant-value $evaluations))))
         (else
           (compilation $datum
             (cond
