@@ -239,7 +239,7 @@
 
   (define-monad linear
     ((pure $value)
-      (lambda (_) $value))
+      (linear _ $value))
     ((bind $linear $fn)
       (linear $x
         (($fn ($linear $x)) $x))))
