@@ -79,7 +79,7 @@
             (identifier? #'$bind-monadic)
             (identifier? #'$bind-fn))
           (lets
-            ($pure-name #'$name)
+            ($pure-name (build-identifier ($s #'$name) (string-append "pure-" $s)))
             ($bind-name (build-identifier ($s #'$name) (string-append $s "-bind")))
             ($lets-name (build-identifier ($s #'$name) (string-append $s "-lets")))
             ($... (datum->syntax #'+ '...))
@@ -87,10 +87,13 @@
               (define (#,$pure-name $pure-value) $pure-body)
               (define (#,$bind-name $bind-monadic $bind-fn) $bind-body)
               (define-syntax #,$lets-name
-                (syntax-rules ()
-                  ((_ $result) $result)
+                (syntax-rules (pure)
+                  ((_ (pure $result))
+                    (#,$pure-name $result))
+                  ((_ $result)
+                    $result)
                   ((_ ($var $body) $decl #,$... $result)
-                    (#,$bind-name $body
+                    (#,$bind-name (#,$lets-name $body)
                       (lambda ($var)
                         (#,$lets-name $decl #,$... $result))))))))))))
 
