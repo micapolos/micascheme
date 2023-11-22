@@ -254,7 +254,10 @@
       (linear-lets
         ($sin sin)
         ($cos cos)
-        (pure (+ (* $sin $sin) (* $cos $cos))))
+        (pure
+          (+
+            (* $sin $sin)
+            (* $cos $cos))))
       (linear $x
         (+
           (* (sin $x) (sin $x))
