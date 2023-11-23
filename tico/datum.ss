@@ -18,7 +18,8 @@
     bindings-datum->value
     datum-struct
     datum-ref
-    string->read-datum)
+    string->read-datum
+    let-values-entry-datum)
   (import
     (micascheme)
     (tico type)
@@ -102,6 +103,9 @@
     (evaluate
       (evaluator datum-environment $bindings)
       $datum))
+
+  (define (let-values-entry-datum $param-datums $arg-datums)
+    `((,@$param-datums) (values ,@$arg-datums)))
 
   (define (value->datum $value)
     (switch $value

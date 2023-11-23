@@ -489,4 +489,9 @@
         (reader-read-list
           (writing-reader)
           (typings-script $typings)))))
+
+  (define (list-typing $typings)
+    (typing
+      (map typing-type $typings)
+      (list-layment (map typing-layment $typings))))
 )

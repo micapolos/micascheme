@@ -326,3 +326,43 @@
           (cons 'v2 "foo")
           (cons 'v3 "bar")))))
   (void))
+
+; --- list-compilation
+
+(check
+  (equal?
+    (list-compilation
+      (list
+        (test-compilation c1)
+        (test-compilation c2)))
+    (compilation
+      (list
+        (compilation-datum (test-compilation c1))
+        (compilation-datum (test-compilation c2)))
+      (list
+        (compilation-evaluation (test-compilation c1))
+        (compilation-evaluation (test-compilation c2))))))
+
+(check
+  (equal?
+    (compilation->list-compilation
+      (test-compilation foo))
+    (list-compilation
+      (list (test-compilation foo)))))
+
+(check
+  (equal?
+    (list-compilation->let-values-entry-datum
+      (list-compilation
+        (list
+          (compilation 'p1 (constant "foo"))
+          (compilation 'p2 (variable 1))
+          (compilation 'p3 (parameter))))
+      (list-compilation
+        (list
+          (compilation 'a1 (constant "foo"))
+          (compilation 'a2 (variable 1))
+          (compilation 'a3 (parameter)))))
+    (let-values-entry-datum
+      (list 'p1 'p2 'p3)
+      (list 'a1 'a2 'a3))))

@@ -29,7 +29,9 @@
 
     empty-layment-scope
     layment-scope-push
-    layment-scope-ref)
+    layment-scope-ref
+
+    list-layment)
   (import
     (micascheme)
     (tico datum)
@@ -200,4 +202,12 @@
           (compilation-scope-ref
             (layment-compilation $layment-scope)
             (- (struct-layout-size $struct-layout) $index 1))))))
+
+  (define (list-layment $layments)
+    (layment
+      (list-layout
+        (map layment-layout $layments))
+      (list-compilation
+        (filter-opts
+          (map layment-compilation $layments)))))
 )

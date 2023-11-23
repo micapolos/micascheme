@@ -107,3 +107,10 @@
  	(equal?
 	  (lets-datum (list '(a 1) '(b 2)) 'c)
 		  '(lets (a 1) (b 2) c)))
+
+(check
+	(equal?
+		(let-values-entry-datum
+			(list 'p1 'p2 'p3)
+			(list 'v1 'v2 'v3))
+		'((p1 p2 p3) (values v1 v2 v3))))

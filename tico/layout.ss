@@ -8,6 +8,7 @@
     lambda-layout lambda-layout? lambda-layout-params lambda-layout-body
 
     empty-struct-layout
+    struct-layout-reverse
     struct-layout+layout
     make-struct-layout
 
@@ -25,7 +26,9 @@
 
     empty-layout-scope
     layout-scope-push
-    layout-scope-ref)
+    layout-scope-ref
+
+    list-layout)
   (import
     (micascheme)
     (tico type))
@@ -53,6 +56,11 @@
 
   (define empty-struct-layout
     (struct-layout (list) 0))
+
+  (define (struct-layout-reverse $struct-layout)
+    (struct-layout
+      (reverse (struct-layout-fields $struct-layout))
+      (struct-layout-size $struct-layout)))
 
   (define (struct-layout+layout $struct-layout $layout)
     (lets
@@ -101,6 +109,13 @@
       struct-layout+layout
       empty-struct-layout
       $layouts))
+
+  (define (list-layout $layouts)
+    (struct-layout-reverse
+      (fold-left
+        struct-layout+layout
+        empty-struct-layout
+        $layouts)))
 
   (define (layout-struct $name $field-layouts)
     (make-struct-layout (reverse $field-layouts)))
