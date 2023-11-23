@@ -197,27 +197,27 @@
       (literal->layout 10)
       1)))
 
-; --- layout-scope
+; --- stack-layout
 
 (lets
-  ($scope (empty-layout-scope))
-  ($scope (layout-scope-push $scope (simple-layout)))
-  ($scope (layout-scope-push $scope (empty-layout)))
-  ($scope (layout-scope-push $scope (native-layout)))
+  ($scope (empty-stack-layout))
+  ($scope (stack-layout-push $scope (simple-layout)))
+  ($scope (stack-layout-push $scope (empty-layout)))
+  ($scope (stack-layout-push $scope (native-layout)))
   (do
     (check
       (equal?
-        (layout-scope-ref $scope 0)
+        (stack-layout-ref $scope 0)
         (layout-field (native-layout) 1))))
   (do
     (check
       (equal?
-        (layout-scope-ref $scope 1)
+        (stack-layout-ref $scope 1)
         (layout-field (empty-layout) #f))))
   (do
     (check
       (equal?
-        (layout-scope-ref $scope 2)
+        (stack-layout-ref $scope 2)
         (layout-field (simple-layout) 0))))
   (void))
 

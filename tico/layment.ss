@@ -27,9 +27,9 @@
     layment-struct
     layment-ref
 
-    empty-layment-scope
-    layment-scope-push
-    layment-scope-ref)
+    empty-stack-layment
+    stack-layment-push
+    stack-layment-ref)
   (import
     (micascheme)
     (tico datum)
@@ -115,7 +115,7 @@
 
   (define (layment-abstraction $param-layments $body-layment)
     (scope-layment-abstraction
-      (empty-layment-scope) $param-layments $body-layment))
+      (empty-stack-layment) $param-layments $body-layment))
 
   (define (scope-layment-abstraction $scope $param-layments $body-layment)
     (make-layment
@@ -172,32 +172,32 @@
           (layment-compilation $layment)
           (layout-field-index-opt $layout-field)))))
 
-  (define (empty-layment-scope)
+  (define (empty-stack-layment)
     (layment
-      (empty-layout-scope)
-      (empty-compilation-scope)))
+      (empty-stack-layout)
+      (empty-stack-compilation)))
 
-  (define (layment-scope-push $layment-scope $layment)
+  (define (stack-layment-push $stack-layment $layment)
     (layment
-      (layout-scope-push
-        (layment-layout $layment-scope)
+      (stack-layout-push
+        (layment-layout $stack-layment)
         (layment-layout $layment))
       (lets
-        ($compilation-scope (layment-compilation $layment-scope))
+        ($stack-compilation (layment-compilation $stack-layment))
         ($compilation (layment-compilation $layment))
         (if $compilation
-          (compilation-scope-push $compilation-scope $compilation)
-          $compilation-scope))))
+          (stack-compilation-push $stack-compilation $compilation)
+          $stack-compilation))))
 
-  (define (layment-scope-ref $layment-scope $index)
+  (define (stack-layment-ref $stack-layment $index)
     (lets
-      ($struct-layout (layment-layout $layment-scope))
-      ($layout-field (layout-scope-ref $struct-layout $index))
+      ($struct-layout (layment-layout $stack-layment))
+      ($layout-field (stack-layout-ref $struct-layout $index))
       (layment
         (layout-field-layout $layout-field)
         (opt-lets
           ($index (layout-field-index-opt $layout-field))
-          (compilation-scope-ref
-            (layment-compilation $layment-scope)
+          (stack-compilation-ref
+            (layment-compilation $stack-layment)
             (- (struct-layout-size $struct-layout) $index 1))))))
 )

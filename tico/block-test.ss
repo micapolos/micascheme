@@ -8,7 +8,7 @@
 (check
   (equal?
     (block-let
-      (empty-typing-scope)
+      (empty-stack-typing)
       (block
         (list
           (entry
@@ -30,7 +30,7 @@
       (lambda ($scope $typings)
         (typing-struct 'foo $typings)))
     (entries-let
-      (empty-typing-scope)
+      (empty-stack-typing)
       (list
         (entry
           (list
@@ -62,7 +62,7 @@
           (test-typing t1)
           (test-typing t2))))
     (block-let
-      (empty-typing-scope)
+      (empty-stack-typing)
       (block
         (list
           (test-entry e1 e2)

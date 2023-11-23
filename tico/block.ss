@@ -78,7 +78,7 @@
 
   (define (block-struct $name $block)
     (block-let
-      (empty-typing-scope)
+      (empty-stack-typing)
       $block
       (lambda ($scope $typings)
         (typing-struct $name (reverse $typings)))))

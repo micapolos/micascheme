@@ -430,11 +430,11 @@
           (literal->typing 30))))
     (script-string (foo 20 30))))
 
-; --- typing-scope
+; --- stack-typing
 
 (lets
   ($scope
-    (typing-scope
+    (stack-typing
       (test-parameter-typing t1)
       (test-typing t2)
       (test-static-typing t3)
@@ -442,27 +442,27 @@
   (do
     (check
       (equal?
-        (typing-scope-ref $scope 0)
+        (stack-typing-ref $scope 0)
         (typing-variable (test-parameter-typing t4) 0))))
   (do
     (check
       (equal?
-        (typing-scope-ref $scope 1)
+        (stack-typing-ref $scope 1)
         (typing-variable (test-static-typing t3) #f))))
   (do
     (check
       (equal?
-        (typing-scope-ref $scope 2)
+        (stack-typing-ref $scope 2)
         (typing-variable (test-typing t2) 1))))
   (do
     (check
       (equal?
-        (typing-scope-ref $scope 3)
+        (stack-typing-ref $scope 3)
         (typing-variable (test-parameter-typing t1) 2))))
 
   (do
     (check
       (equal?
-        (typing-scope-type-ref $scope (test-type t2))
-        (typing-scope-ref $scope 2))))
+        (stack-typing-type-ref $scope (test-type t2))
+        (stack-typing-ref $scope 2))))
   (void))

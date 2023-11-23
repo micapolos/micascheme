@@ -54,7 +54,7 @@
 (check
   (equal?
     (scope-datum->compilation
-      (compilation-scope
+      (stack-compilation
         (compilation 'foo (constant "foo"))
         (compilation 'goo (parameter))
         (compilation 'bar (constant "bar")))
@@ -77,7 +77,7 @@
 (check
   (equal?
     (compilation-args-application
-      (empty-compilation-scope)
+      (empty-stack-compilation)
       (compilation 'string-append (variable 1))
       (compilation-args
         (list
@@ -119,7 +119,7 @@
   (equal?
     (compilation-application
       (compilation-abstraction
-        (compilation-scope
+        (stack-compilation
           (compilation 'excl (constant "!")))
         (list
           (compilation 'foo (parameter))
@@ -133,7 +133,7 @@
         (literal->compilation "foo")
         (literal->compilation "bar")))
     (scope-datum->compilation
-      (compilation-scope
+      (stack-compilation
         (compilation 'excl (constant "!")))
       (datum-application
         (datum-abstraction
@@ -145,7 +145,7 @@
   (equal?
     (compilation-application
       (compilation-abstraction
-        (empty-compilation-scope)
+        (empty-stack-compilation)
         (list
           (compilation 'v1 (parameter))
           (compilation 'v2 (parameter)))
@@ -164,7 +164,7 @@
   (equal?
     (compilation-application
       (compilation-abstraction
-        (empty-compilation-scope)
+        (empty-stack-compilation)
         (list
           (compilation 'v1 (parameter))
           (compilation 'v2 (parameter)))
@@ -186,7 +186,7 @@
 (check
   (equal?
     (compilation-abstraction
-      (empty-compilation-scope)
+      (empty-stack-compilation)
       (list
         (compilation 'v1 (parameter))
         (compilation 'v2 (parameter)))
@@ -288,40 +288,40 @@
     (with-tmps
       (generate-parameter-compilation))))
 
-; --- compilation-scope
+; --- stack-compilation
 
 (check
   (equal?
-    (test-compilation-scope foo bar)
-    (compilation-scope
+    (test-stack-compilation foo bar)
+    (stack-compilation
       (test-compilation foo)
       (test-compilation bar))))
 
 (lets
   ($scope
-    (compilation-scope
+    (stack-compilation
       (compilation 'v1 (parameter))
       (compilation 'v2 (constant "foo"))
       (compilation 'v3 (constant "bar"))))
   (do
     (check
       (equal?
-        (compilation-scope-ref $scope 0)
+        (stack-compilation-ref $scope 0)
         (compilation 'v3 (constant "bar")))))
   (do
     (check
       (equal?
-        (compilation-scope-ref $scope 1)
+        (stack-compilation-ref $scope 1)
         (compilation 'v2 (constant "foo")))))
   (do
     (check
       (equal?
-        (compilation-scope-ref $scope 2)
+        (stack-compilation-ref $scope 2)
         (compilation 'v1 (variable 2)))))
   (do
     (check
       (equal?
-        (compilation-scope-bindings $scope)
+        (stack-compilation-bindings $scope)
         (stack
           (cons 'v2 "foo")
           (cons 'v3 "bar")))))

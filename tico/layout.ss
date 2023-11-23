@@ -24,9 +24,9 @@
     layout-struct
     layout-ref
 
-    empty-layout-scope
-    layout-scope-push
-    layout-scope-ref
+    empty-stack-layout
+    stack-layout-push
+    stack-layout-ref
 
     list-layout)
   (import
@@ -155,12 +155,12 @@
       ((else $type)
         (throw type->layout $type))))
 
-  (define (empty-layout-scope)
+  (define (empty-stack-layout)
     empty-struct-layout)
 
-  (define (layout-scope-push $layout-scope $layout)
-    (struct-layout+layout $layout-scope $layout))
+  (define (stack-layout-push $stack-layout $layout)
+    (struct-layout+layout $stack-layout $layout))
 
-  (define (layout-scope-ref $layout-scope $index)
-    (list-ref (struct-layout-fields $layout-scope) $index))
+  (define (stack-layout-ref $stack-layout $index)
+    (list-ref (struct-layout-fields $stack-layout) $index))
 )

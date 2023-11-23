@@ -32,7 +32,7 @@
       (lambda ($block)
         ($end
           (block-let
-            (bindings-typing-scope $bindings)
+            (bindings-stack-typing $bindings)
             $block
             (lambda ($scope $typings)
               (or-throw (single $typings))))))))
@@ -42,7 +42,7 @@
       (lambda ($block)
         ($end
           (block-let
-            (bindings-typing-scope $bindings)
+            (bindings-stack-typing $bindings)
             $block
             (lambda ($scope $typings)
               (typing-args (reverse $typings))))))))
@@ -180,7 +180,7 @@
                     $bindings
                     (block-with-typing $block
                       (typings-do
-                        (bindings-typing-scope $bindings)
+                        (bindings-stack-typing $bindings)
                         $parameter-typings
                         $argument-typings
                         $body-typing))
@@ -207,7 +207,7 @@
                     $bindings
                     (block-with-typing $block
                       (scope-typing-abstraction
-                        (bindings-typing-scope $bindings)
+                        (bindings-stack-typing $bindings)
                         $param-typings
                         $doing-typing))
                     $end)))))

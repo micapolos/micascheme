@@ -27,7 +27,7 @@
       (scope-typing-abstraction
         $scope
         (entry-parameters $entry)
-        ($body-fn (fold-left typing-scope-push $scope (entry-parameters $entry))))
+        ($body-fn (fold-left stack-typing-push $scope (entry-parameters $entry))))
       (entry-arguments $entry)))
 
   (define (entries-let $scope $entries $body-fn)

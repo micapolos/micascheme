@@ -57,11 +57,11 @@
     make-list-typing
     make-struct-typing
 
-    empty-typing-scope
-    typing-scope-push
-    typing-scope
-    typing-scope-ref
-    typing-scope-type-ref
+    empty-stack-typing
+    stack-typing-push
+    stack-typing
+    stack-typing-ref
+    stack-typing-type-ref
 
     typing-line
     typings-script
@@ -192,7 +192,7 @@
 
   (define (typing-abstraction $param-typings $body-typing)
     (scope-typing-abstraction
-      (empty-typing-scope)
+      (empty-stack-typing)
       $param-typings
       $body-typing))
 
@@ -407,34 +407,34 @@
       (scope-typing-abstraction $scope $parameter-typings $body-typing)
       $argument-typings))
 
-  (define (empty-typing-scope)
-    (typing (stack) (empty-layment-scope)))
+  (define (empty-stack-typing)
+    (typing (stack) (empty-stack-layment)))
 
-  (define (typing-scope-push $typing-scope $typing)
+  (define (stack-typing-push $stack-typing $typing)
     (typing
       (push
-        (typing-type $typing-scope)
+        (typing-type $stack-typing)
         (typing-type $typing))
-      (layment-scope-push
-        (typing-layment $typing-scope)
+      (stack-layment-push
+        (typing-layment $stack-typing)
         (typing-layment $typing))))
 
-  (define (typing-scope-ref $typing-scope $index)
+  (define (stack-typing-ref $stack-typing $index)
     (typing
-      (list-ref (typing-type $typing-scope) $index)
-      (layment-scope-ref (typing-layment $typing-scope) $index)))
+      (list-ref (typing-type $stack-typing) $index)
+      (stack-layment-ref (typing-layment $stack-typing) $index)))
 
-  (define-syntax-rule (typing-scope $item ...)
-    (fold-left typing-scope-push (empty-typing-scope) (list $item ...)))
+  (define-syntax-rule (stack-typing $item ...)
+    (fold-left stack-typing-push (empty-stack-typing) (list $item ...)))
 
-  (define (typing-scope-type-ref $typing-scope $type)
+  (define (stack-typing-type-ref $stack-typing $type)
     (opt-lets
       ($indexed-type
         (types-match
-          (typing-type $typing-scope)
+          (typing-type $stack-typing)
           $type))
-      (typing-scope-ref
-        $typing-scope
+      (stack-typing-ref
+        $stack-typing
         (indexed-index $indexed-type))))
 
   (define (typings-script $typings)

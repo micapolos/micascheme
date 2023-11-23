@@ -3,7 +3,7 @@
     compilation compilation? compilation-datum compilation-evaluation
     test-compilation
     test-parameter-compilation
-    test-compilation-scope
+    test-stack-compilation
 
     literal->compilation
     datum->compilation
@@ -26,14 +26,14 @@
     compilation-parameter
     compilation-variable
 
-    empty-compilation-scope
-    compilation-scope-push
-    compilation-scope-ref
-    compilation-scope-bindings
-    compilation-scope
-    test-compilation-scope
+    empty-stack-compilation
+    stack-compilation-push
+    stack-compilation-ref
+    stack-compilation-bindings
+    stack-compilation
+    test-stack-compilation
 
-    compilation-scope->let-values-entry-datum)
+    stack-compilation->let-values-entry-datum)
   (import
     (micascheme)
     (tico constant)
@@ -53,8 +53,8 @@
       (test-parameter-datum $name)
       (parameter)))
 
-  (define-syntax-rule (test-compilation-scope $name ...)
-    (compilation-scope
+  (define-syntax-rule (test-stack-compilation $name ...)
+    (stack-compilation
       (test-compilation $name) ...))
 
   (define (literal->compilation $literal)
@@ -81,7 +81,7 @@
   (define (scope-datum->compilation $scope $datum)
     (compilation $datum
       (bindings-datum->constant
-        (compilation-scope-bindings $scope)
+        (stack-compilation-bindings $scope)
         $datum)))
 
   (define (compilation-value $compilation)
@@ -144,7 +144,7 @@
       (compilation $datum
         (or $evaluation-opt
           (bindings-datum->constant
-            (compilation-scope-bindings $scope)
+            (stack-compilation-bindings $scope)
             $datum)))))
 
   (define (compilation-abstraction $scope $param-compilations $body-compilation)
@@ -230,42 +230,42 @@
         ((parameter? $parameter)
           (throw compilation-ref $parameter)))))
 
-  (define (empty-compilation-scope)
+  (define (empty-stack-compilation)
     (compilation (stack) (stack)))
 
-  (define (compilation-scope-push $compilation-scope $compilation)
+  (define (stack-compilation-push $stack-compilation $compilation)
     (compilation
       (push
-        (compilation-datum $compilation-scope)
+        (compilation-datum $stack-compilation)
         (compilation-datum $compilation))
       (push
-        (compilation-evaluation $compilation-scope)
+        (compilation-evaluation $stack-compilation)
         (compilation-evaluation $compilation))))
 
-  (define (compilation-scope-ref $compilation-scope $index)
+  (define (stack-compilation-ref $stack-compilation $index)
     (compilation-variable
       (compilation
-        (list-ref (compilation-datum $compilation-scope) $index)
-        (list-ref (compilation-evaluation $compilation-scope) $index))
+        (list-ref (compilation-datum $stack-compilation) $index)
+        (list-ref (compilation-evaluation $stack-compilation) $index))
       $index))
 
-  (define (compilation-scope-bindings $compilation-scope)
+  (define (stack-compilation-bindings $stack-compilation)
     (filter-opts
       (map
         (lambda ($datum $evaluation)
           (switch-opt $evaluation
             ((constant? $constant)
               (cons $datum (constant-value $constant)))))
-        (compilation-datum $compilation-scope)
-        (compilation-evaluation $compilation-scope))))
+        (compilation-datum $stack-compilation)
+        (compilation-evaluation $stack-compilation))))
 
-  (define-syntax-rule (compilation-scope $item ...)
+  (define-syntax-rule (stack-compilation $item ...)
     (fold-left
-      compilation-scope-push
-      (empty-compilation-scope)
+      stack-compilation-push
+      (empty-stack-compilation)
       (list $item ...)))
 
-  (define (compilation-scope->let-values-entry-datum $parameter $argument)
+  (define (stack-compilation->let-values-entry-datum $parameter $argument)
     (let-values-entry-datum
       (compilation-datum $parameter)
       (compilation-datum $argument)))

@@ -12,7 +12,7 @@
     bindings-resolve
     bindings-typing-ref
     bindings-typing-get
-    bindings-typing-scope)
+    bindings-stack-typing)
   (import
     (micascheme)
     (tico typing)
@@ -119,10 +119,10 @@
       $typing
       $patterns))
 
-  (define (bindings-typing-scope $bindings)
+  (define (bindings-stack-typing $bindings)
     (fold-left
-      typing-scope-push
-      (empty-typing-scope)
+      stack-typing-push
+      (empty-stack-typing)
       (filter typing?
         (map
           binding-body
