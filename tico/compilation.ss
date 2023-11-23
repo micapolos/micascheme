@@ -33,9 +33,7 @@
     compilation-scope
     test-compilation-scope
 
-    list-compilation
-    compilation->list-compilation
-    list-compilation->let-values-entry-datum)
+    compilation-scope->let-values-entry-datum)
   (import
     (micascheme)
     (tico constant)
@@ -267,16 +265,8 @@
       (empty-compilation-scope)
       (list $item ...)))
 
-  (define (list-compilation $compilations)
-    (compilation
-      (map compilation-datum $compilations)
-      (map compilation-evaluation $compilations)))
-
-  (define (compilation->list-compilation $compilation)
-    (list-compilation (list $compilation)))
-
-  (define (list-compilation->let-values-entry-datum $parameter-list-compilation $argument-list-compilation)
+  (define (compilation-scope->let-values-entry-datum $parameter $argument)
     (let-values-entry-datum
-      (compilation-datum $parameter-list-compilation)
-      (compilation-datum $argument-list-compilation)))
+      (compilation-datum $parameter)
+      (compilation-datum $argument)))
 )
