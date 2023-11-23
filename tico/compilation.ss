@@ -31,9 +31,7 @@
     stack-compilation-ref
     stack-compilation-bindings
     stack-compilation
-    test-stack-compilation
-
-    stack-compilation->let-values-entry-datum)
+    test-stack-compilation)
   (import
     (micascheme)
     (tico constant)
@@ -264,9 +262,4 @@
       stack-compilation-push
       (empty-stack-compilation)
       (list $item ...)))
-
-  (define (stack-compilation->let-values-entry-datum $parameter $argument)
-    (let-values-entry-datum
-      (compilation-datum $parameter)
-      (compilation-datum $argument)))
 )
