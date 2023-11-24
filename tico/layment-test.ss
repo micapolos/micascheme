@@ -105,9 +105,13 @@
         (literal->layment "foo")
         (empty-layment)
         (literal->layment "bar")))
-    (layout-datum->layment
+    (make-layment
       (simple-layout)
-      '(string-append "foo" "bar"))))
+      (compilation-application
+        (datum->compilation 'string-append)
+        (list
+          (literal->compilation "foo")
+          (literal->compilation "bar"))))))
 
 ; --- layment-abstraction
 

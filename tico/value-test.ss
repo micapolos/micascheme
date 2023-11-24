@@ -13,3 +13,14 @@
 (check (equal? (tuple-ref-value 3 (vector "foo" "bar" "zoo") 2) "zoo"))
 
 (check (equal? (app (value-abstraction 2 "foo") 1 2) "foo"))
+
+(check
+  (equal?
+    (value-application
+      string-append
+      (list
+        "a"
+        (slice (list))
+        (slice (list "b"))
+        (slice (list "c" "d"))))
+    (string-append "a" "b" "c" "d")))

@@ -100,7 +100,9 @@
         (literal->compilation "foo")
         (literal->compilation "bar")))
     (datum->compilation
-      '(string-append "foo" "bar"))))
+      (datum-application
+        'string-append
+        (list "foo" "bar")))))
 
 (check
   (equal?
@@ -111,7 +113,9 @@
           (compilation 'foo (variable 1))
           (literal->compilation "bar"))))
     (compilation
-      '(string-append foo "bar")
+      (datum-application
+        'string-append
+        (list 'foo "bar"))
       (variable 1))))
 
 ; --- compilation-abstraction

@@ -58,7 +58,7 @@
     `(lambda (,@$params) ,$body))
 
   (define (datum-application $target $args)
-    `(,$target ,@$args))
+    `(app-splicing ,$target ,@$args))
 
   (define (datum-args-application $target $args)
     `(,$target ,@$args))
