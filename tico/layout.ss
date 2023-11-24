@@ -21,6 +21,7 @@
     layout-args-application
     layout-abstraction
     layout-args
+    layout-slice
     layout-struct
     layout-ref
 
@@ -109,6 +110,11 @@
       struct-layout+layout
       empty-struct-layout
       $layouts))
+
+  (define (layout-slice . $layouts)
+    (cond
+      ((for-all layout-empty? $layouts) (empty-layout))
+      (else (simple-layout))))
 
   (define (list-layout $layouts)
     (struct-layout-reverse

@@ -145,6 +145,21 @@
           (literal->compilation "foo")
           (literal->compilation "bar"))))))
 
+; --- layment-slice
+
+(check
+  (equal?
+    (layment-slice)
+    (make-layment (layout-slice) (compilation-slice))))
+
+(check
+  (equal?
+    (layment-slice
+      (test-layment t1))
+    (make-layment
+      (layout-slice (layment-layout (test-layment t1)))
+      (compilation-slice (layment-compilation (test-layment t1))))))
+
 ; --- layment-args
 
 (check

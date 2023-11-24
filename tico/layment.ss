@@ -24,6 +24,7 @@
     scope-layment-abstraction
     layment-abstraction
     layment-args
+    layment-slice
     layment-struct
     layment-ref
 
@@ -152,6 +153,11 @@
       (compilation-args
         (filter-opts
           (map layment-compilation $layments)))))
+
+  (define (layment-slice . $layments)
+    (make-layment
+      (apply layout-slice (map layment-layout $layments))
+      (apply compilation-slice (map layment-compilation $layments))))
 
   (define (layment-struct $name $field-layments)
     (make-layment
