@@ -19,7 +19,8 @@
     datum-struct
     datum-ref
     string->read-datum
-    let-values-entry-datum)
+    let-values-entry-datum
+    let-values-datum)
   (import
     (micascheme)
     (tico type)
@@ -106,6 +107,9 @@
 
   (define (let-values-entry-datum $param-datums $arg-datums)
     `((,@$param-datums) (values ,@$arg-datums)))
+
+  (define (let-values-datum $entries $body)
+    `(let-values (,@$entries) ,$body))
 
   (define (value->datum $value)
     (switch $value

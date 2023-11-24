@@ -114,3 +114,12 @@
 			(list 'p1 'p2 'p3)
 			(list 'v1 'v2 'v3))
 		'((p1 p2 p3) (values v1 v2 v3))))
+
+(check
+	(equal?
+		(let-values-datum
+			(list '((p1 p2) f1) '((p3 p4) f2))
+			'foo)
+		'(let-values
+			(((p1 p2) f1) ((p3 p4) f2))
+				foo)))
