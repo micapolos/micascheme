@@ -35,7 +35,7 @@
             (bindings-stack-typing $bindings)
             $block
             (lambda ($scope $typings)
-              (or-throw (single $typings))))))))
+              (single-typing $typings)))))))
 
   (define-reader (args-typing-reader $bindings $end)
     (push-block-reader $bindings (empty-block)
