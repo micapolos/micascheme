@@ -47,6 +47,9 @@
             (lambda ($scope $typings)
               (typing-args (reverse $typings))))))))
 
+  (define-reader (block-reader $bindings $end)
+    (push-block-reader $bindings (empty-block) $end))
+
   (define-reader (push-block-reader $bindings $block $end)
     (reader
       (lambda ($literal)
@@ -188,13 +191,17 @@
           ((apply)
             (lets
               ($typing (block-typing $block))
-              (typings-reader $bindings
-                (lambda ($arg-typings)
+              (block-reader $bindings
+                (lambda ($arg-block)
                   (push-block-reader
                     $bindings
                     (block-with-typing $block
-                      (typing-application $typing
-                        (reverse $arg-typings)))
+                      (block-let
+                        (bindings-stack-typing $bindings)
+                        $arg-block
+                        (lambda ($scope $typings)
+                          (typing-application $typing
+                            (reverse $typings)))))
                     $end)))))
           ((doing)
             (lets
@@ -261,17 +268,21 @@
                   $block
                   $end))))
           (else
-            (typings-reader $bindings
-              (lambda ($symbol-typings)
+            (block-reader $bindings
+              (lambda ($symbol-block)
                 (push-block-reader
                   $bindings
                   (block-with-typings $block
                     (bindings-resolve $bindings
                       (push
                         (block-typings $block)
-                        (typing-resolve
-                          (typing-struct $symbol
-                            (reverse $symbol-typings))))))
+                        (block-let
+                          (bindings-stack-typing $bindings)
+                          $symbol-block
+                          (lambda ($scope $typings)
+                            (typing-resolve
+                              (typing-struct $symbol
+                                (reverse $typings))))))))
                   $end))))))
       (lambda ()
         ($end $block))))
