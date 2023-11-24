@@ -62,6 +62,16 @@
 
 (check
   (equal?
+    (slice)
+    (list->slice (list))))
+
+(check
+  (equal?
+    (slice 1)
+    1))
+
+(check
+  (equal?
     (slice 1 2 3)
     (list->slice (list 1 2 3))))
 

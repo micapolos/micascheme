@@ -688,8 +688,10 @@
 
   (data (slice items))
 
-  (define-syntax-rule (slice! $item ...)
-    (slice (list $item ...)))
+  (define (slice! . $items)
+    (case (length $items)
+      ((1) (car $items))
+      (else (slice $items))))
 
   (define (splice-value $value)
     (switch $value

@@ -73,6 +73,52 @@
     (literal->compilation "foo")
     (compilation "foo" (constant "foo"))))
 
+; --- compilation-slice
+
+(check
+  (equal?
+    (compilation-slice)
+    (compilation
+      (datum-slice)
+      (constant (slice)))))
+
+(check
+  (equal?
+    (compilation-slice
+      (literal->compilation "foo"))
+    (compilation
+      (datum-slice "foo")
+      (constant (slice "foo")))))
+
+(check
+  (equal?
+    (compilation-slice
+      (literal->compilation "foo")
+      (literal->compilation "bar"))
+    (compilation
+      (datum-slice "foo" "bar")
+      (constant (slice "foo" "bar")))))
+
+(check
+  (equal?
+    (compilation-slice
+      (variable-compilation 'foo 1)
+      (literal->compilation "bar")
+      (variable-compilation 'goo 3))
+    (compilation
+      (datum-slice 'foo "bar" 'goo)
+      (variable 3))))
+
+(check
+  (equal?
+    (compilation-slice
+      (variable-compilation 'foo 1)
+      (literal->compilation "bar")
+      (parameter-compilation 'goo))
+    (compilation
+      (datum-slice 'foo "bar" 'goo)
+      (parameter))))
+
 ; --- compilation-args-application
 
 (check
