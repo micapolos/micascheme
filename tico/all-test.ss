@@ -6,6 +6,7 @@
   (tico compilation)
   (tico constant)
   (tico datum)
+  (tico definition)
   (tico entry)
   (tico evaluation)
   (tico expression)

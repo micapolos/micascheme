@@ -8,7 +8,9 @@
   (import
     (micascheme)
     (tico typing)
-    (tico datum))
+    (tico datum)
+    (tico layment)
+    (tico compilation))
 
   (data (entry parameters arguments))
 
@@ -22,13 +24,34 @@
       (ordered-map typing-parameter $typings)
       $typings))
 
-  (define (entry-let $scope $entry $body-fn)
-    (typing-application
-      (scope-typing-abstraction
-        $scope
-        (entry-parameters $entry)
-        ($body-fn (fold-left stack-typing-push $scope (entry-parameters $entry))))
+  (define (entry-let-entries-datum $entry)
+    (map
+      (lambda ($param $arg)
+        `(
+          ,(typing-datum $param)
+          ,(typing-datum $arg)))
+      (entry-parameters $entry)
       (entry-arguments $entry)))
+
+  (define (entry-let $scope $entry $body-fn)
+    (lets
+      ($body-typing
+        ($body-fn
+          (fold-left
+            stack-typing-push
+            $scope
+            (entry-parameters $entry))))
+      ($body-layment (typing-layment $body-typing))
+      ($body-compilation (layment-compilation $body-layment))
+      (typing
+        (typing-type $body-typing)
+        (make-layment
+          (layment-layout $body-layment)
+          (compilation
+            (let-datum
+              (entry-let-entries-datum $entry)
+              (compilation-datum $body-compilation))
+            (compilation-evaluation $body-compilation))))))
 
   (define (entries-let $scope $entries $body-fn)
     (switch $entries

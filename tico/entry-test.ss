@@ -2,6 +2,11 @@
   (micascheme)
   (tico entry)
   (tico typing)
+  (tico layment)
+  (tico variable)
+  (tico typing)
+  (tico compilation)
+  (tico layout)
   (tico type))
 
 (check
@@ -44,15 +49,11 @@
           (literal->typing 128)))
       (lambda ($scope)
         (variable-typing (string-type) 's 1)))
-    (typing-application
-      (typing-abstraction
-        (list
-          (parameter-typing (string-type) 's)
-          (parameter-typing (number-type) 'n))
-        (variable-typing (string-type) 's 1))
-      (list
-        (literal->typing "foo")
-        (literal->typing 128)))))
+    (typing (string-type)
+      (layment (type->layout (string-type))
+        (compilation
+          '(let ((s "foo") (n 128)) s)
+          (variable 1))))))
 
 (check
   (equal?
@@ -75,21 +76,8 @@
             (variable-typing (number-type) 'n1 0))))
       (lambda ($scope)
         (variable-typing (string-type) 's2 1)))
-    (typing-application
-      (typing-abstraction
-        (list
-          (parameter-typing (string-type) 's1)
-          (parameter-typing (number-type) 'n1))
-        (typing-application
-          (typing-abstraction
-            (list
-              (parameter-typing (string-type) 's2)
-              (parameter-typing (number-type) 'n2))
-            (variable-typing (string-type) 's2 1))
-          (list
-            (variable-typing (string-type) 's1 1)
-            (variable-typing (number-type) 'n1 0))))
-      (list
-        (literal->typing "foo")
-        (literal->typing 128)))))
-
+    (typing (string-type)
+      (layment (type->layout (string-type))
+        (compilation
+          '(let ([s1 "foo"] [n1 128]) (let ([s2 s1] [n2 n1]) s2))
+          (variable 1))))))
