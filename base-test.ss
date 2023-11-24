@@ -45,6 +45,19 @@
 
 (check (equal? (app (lambda (x y) (string-append x y)) "foo" "bar") "foobar"))
 
+; === arity-app ===
+
+(check
+  (equal?
+    (arity-app
+      (lambda (a b c d e f g) (string-append a b c d e f g))
+      "a"
+      (0 (values))
+      (1 (values "b"))
+      (2 (values "c" "d"))
+      (3 (values "e" "f" "g")))
+    "abcdefg"))
+
 ; === or-throw ===
 
 (check
