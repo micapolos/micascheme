@@ -6,6 +6,7 @@
   (tico datum)
   (tico evaluation)
   (tico variable)
+  (tico definition)
   (tico parameter))
 
 (check
@@ -326,3 +327,18 @@
           (cons 'v2 "foo")
           (cons 'v3 "bar")))))
   (void))
+
+(check
+  (equal?
+    (compilation-definitions-do
+      (list
+        (definition
+          (parameter-compilation 'foo)
+          (datum->compilation "foo"))
+        (definition
+          (parameter-compilation 'bar)
+          (datum->compilation "bar")))
+      (compilation 'foo (variable 1)))
+    (compilation
+      '(let ((foo "foo") (bar "bar")) foo)
+      (variable 1))))

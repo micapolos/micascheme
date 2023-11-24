@@ -1,4 +1,8 @@
-(import (micascheme) (tico datum) (tico type))
+(import
+	(micascheme)
+	(tico datum)
+	(tico type)
+	(tico definition))
 
 (check (equal? (test-datum foo) ''foo))
 
@@ -123,3 +127,16 @@
 		'(let-values
 			(((p1 p2) f1) ((p3 p4) f2))
 				foo)))
+
+(check
+	(equal?
+		(datum-definition-let-entry (definition 'param 'expr))
+		'(param expr)))
+
+(check
+	(equal?
+		(datum-definitions-let-entries
+			(list
+				(definition 'p1 'e1)
+				(definition 'p2 'e2)))
+		'((p1 e1) (p2 e2))))

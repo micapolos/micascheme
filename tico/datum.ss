@@ -20,10 +20,13 @@
     datum-ref
     string->read-datum
     let-values-entry-datum
-    let-values-datum)
+    let-values-datum
+    datum-definition-let-entry
+    datum-definitions-let-entries)
   (import
     (micascheme)
     (tico type)
+    (tico definition)
     (evaluator))
 
   (define-syntax-rule (test-datum $name)
@@ -158,4 +161,12 @@
           (switch (read $port)
             ((eof-object? _) $datum)
             ((else _) (throw not-datum $string)))))))
+
+  (define (datum-definition-let-entry $datum-definition)
+    `(
+      ,(definition-key $datum-definition)
+      ,(definition-value $datum-definition)))
+
+  (define (datum-definitions-let-entries $datum-definitions)
+    `(,@(map datum-definition-let-entry $datum-definitions)))
 )

@@ -25,6 +25,7 @@
 
     compilation-parameter
     compilation-variable
+    compilation-definitions-do
 
     empty-stack-compilation
     stack-compilation-push
@@ -39,7 +40,8 @@
     (tico variable)
     (tico datum)
     (tico evaluation)
-    (tico parameter))
+    (tico parameter)
+    (tico definition))
 
   (data (compilation datum evaluation))
 
@@ -262,4 +264,14 @@
       stack-compilation-push
       (empty-stack-compilation)
       (list $item ...)))
+
+  (define (compilation-definition->datum-definition $compilation-definition)
+    (definition-map compilation-datum $compilation-definition))
+
+  (define (compilation-definitions-do $compilation-definitions $body-compilation)
+    (compilation
+      `(let
+        ,(datum-definitions-let-entries (map compilation-definition->datum-definition $compilation-definitions))
+        ,(compilation-datum $body-compilation))
+      (compilation-evaluation $body-compilation)))
 )
