@@ -16,6 +16,11 @@
     checking-once
     raises?
     app app-splicing
+    (rename
+      (slice list->slice)
+      (slice! slice))
+    slice? slice-items
+    splice-value splice
     single? single force-single
     bindings-eval
     script
@@ -678,6 +683,21 @@
     (fallible-bind $fallible
       (lambda ($success)
         $body ...)))
+
+  ; --------------------------------------
+
+  (data (slice items))
+
+  (define-syntax-rule (slice! $item ...)
+    (slice (list $item ...)))
+
+  (define (splice-value $value)
+    (switch $value
+      ((slice? $slice) (slice-items $slice))
+      ((else $value) (list $value))))
+
+  (define (splice . $values)
+    (apply append (map splice-value $values)))
 
   ; --------------------------------------
 

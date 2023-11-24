@@ -1,7 +1,5 @@
 (library (tico value)
   (export
-    slice slice? slice-items
-    value-items
     value-application
     value-abstraction
     value-struct
@@ -14,18 +12,11 @@
     (tico expression)
     (tico datum))
 
-  (data (slice items))
-
-  (define (value-items $value)
-    (switch $value
-      ((slice? $slice) (slice-items $slice))
-      ((else $value) (list $value))))
-
   (define (value-environment)
     (environment '(micascheme)))
 
   (define (value-application $target $args)
-    (apply $target (apply append (map value-items $args))))
+    (apply $target (apply splice $args)))
 
   (define (value-abstraction $arity $body)
     (lets

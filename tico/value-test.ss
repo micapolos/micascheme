@@ -20,7 +20,7 @@
       string-append
       (list
         "a"
-        (slice (list))
-        (slice (list "b"))
-        (slice (list "c" "d"))))
+        (slice)
+        (slice "b")
+        (slice "c" "d")))
     (string-append "a" "b" "c" "d")))

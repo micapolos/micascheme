@@ -58,6 +58,37 @@
       (3 (values "e" "f" "g")))
     "abcdefg"))
 
+; === slice ===
+
+(check
+  (equal?
+    (slice 1 2 3)
+    (list->slice (list 1 2 3))))
+
+(check
+  (equal?
+    (slice-items (slice 1 2 3))
+    (list 1 2 3)))
+
+; === splice-value ===
+
+(check
+  (equal?
+    (splice-value 1)
+    (list 1)))
+
+(check
+  (equal?
+    (splice-value (slice 3 4))
+    (list 3 4)))
+
+; === splice ===
+
+(check
+  (equal?
+    (splice 1 (slice) (slice 2) (slice 3 4))
+    (list 1 2 3 4)))
+
 ; === or-throw ===
 
 (check
