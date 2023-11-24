@@ -50,7 +50,7 @@
 (check
   (equal?
     (arity-app
-      (lambda (a b c d e f g) (string-append a b c d e f g))
+      string-append
       "a"
       (0 (values))
       (1 (values "b"))
