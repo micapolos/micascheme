@@ -175,3 +175,17 @@
 					(definition 'a2 'b2))
 				(list 'v1)))
 		'(let ((a1 b1) (a2 b2)) v1)))
+
+; --- values and slices
+
+(check (equal? (values-datum (list)) '(values)))
+(check (equal? (values-datum (list 'a)) 'a))
+(check (equal? (values-datum (list 'a 'b)) '(values a b)))
+
+(check (equal? (arity-slice-datum 0 'a) '(0 a)))
+(check (equal? (arity-slice-datum 1 'a) 'a))
+(check (equal? (arity-slice-datum 2 'a) '(2 a)))
+
+(check (equal? (datum-slice) (arity-slice-datum 0 (values-datum (list)))))
+(check (equal? (datum-slice 'a) (arity-slice-datum 1 (values-datum (list 'a)))))
+(check (equal? (datum-slice 'a 'b) (arity-slice-datum 2 (values-datum (list 'a 'b)))))

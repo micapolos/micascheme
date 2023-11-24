@@ -23,7 +23,10 @@
     let-values-datum
     datum-definition-let-entry
     datum-definitions-let-entries
-    packet-datum)
+    packet-datum
+    values-datum
+    datum-slice
+    arity-slice-datum)
   (import
     (micascheme)
     (tico type)
@@ -187,4 +190,19 @@
           `(let
             ,(datum-definitions-let-entries $other)
             ,$items-datum)))))
+
+  (define (arity-slice-datum $arity $datum)
+    (case $arity
+      ((1) $datum)
+      (else `(,$arity ,$datum))))
+
+  (define (values-datum $datums)
+    (case (length $datums)
+      ((1) (car $datums))
+      (else `(values ,@$datums))))
+
+  (define (datum-slice . $datums)
+    (lets
+      ($arity (length $datums))
+      (arity-slice-datum $arity (values-datum $datums))))
 )
