@@ -22,11 +22,13 @@
     let-values-entry-datum
     let-values-datum
     datum-definition-let-entry
-    datum-definitions-let-entries)
+    datum-definitions-let-entries
+    packet-datum)
   (import
     (micascheme)
     (tico type)
     (tico definition)
+    (tico packet)
     (evaluator))
 
   (define-syntax-rule (test-datum $name)
@@ -169,4 +171,20 @@
 
   (define (datum-definitions-let-entries $datum-definitions)
     `(,@(map datum-definition-let-entry $datum-definitions)))
+
+  (define (packet-datum $packet)
+    (lets
+      ($definitions (packet-definitions $packet))
+      ($items (packet-items $packet))
+      ($items-datum
+        (case (length $items)
+          ((0) '(void))
+          ((1) (car $items))
+          (else `(values ,@$items))))
+      (switch $definitions
+        ((null? _) $items-datum)
+        ((else $other)
+          `(let
+            ,(datum-definitions-let-entries $other)
+            ,$items-datum)))))
 )

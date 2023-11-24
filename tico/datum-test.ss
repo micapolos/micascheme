@@ -2,7 +2,8 @@
 	(micascheme)
 	(tico datum)
 	(tico type)
-	(tico definition))
+	(tico definition)
+	(tico packet))
 
 (check (equal? (test-datum foo) ''foo))
 
@@ -140,3 +141,37 @@
 				(definition 'p1 'e1)
 				(definition 'p2 'e2)))
 		'((p1 e1) (p2 e2))))
+
+(check
+	(equal?
+		(packet-datum
+			(packet
+				(list)
+				(list)))
+		'(void)))
+
+(check
+	(equal?
+		(packet-datum
+			(packet
+				(list)
+				(list 'v1)))
+		'v1))
+
+(check
+	(equal?
+		(packet-datum
+			(packet
+				(list)
+				(list 'v1 'v2)))
+		'(values v1 v2)))
+
+(check
+	(equal?
+		(packet-datum
+			(packet
+				(list
+					(definition 'a1 'b1)
+					(definition 'a2 'b2))
+				(list 'v1)))
+		'(let ((a1 b1) (a2 b2)) v1)))
