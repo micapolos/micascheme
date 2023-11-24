@@ -15,7 +15,7 @@
     once-proc
     checking-once
     raises?
-    app arity-app
+    app app-splicing
     single? single force-single
     bindings-eval
     script
@@ -278,7 +278,7 @@
   (define-syntax-rule (app $fn $arg ...)
     ($fn $arg ...))
 
-  (define-syntax arity-app
+  (define-syntax app-splicing
     (lambda ($syntax)
       (syntax-case $syntax ()
         ((_ $fn $item ...)

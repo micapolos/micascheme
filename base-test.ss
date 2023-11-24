@@ -45,11 +45,11 @@
 
 (check (equal? (app (lambda (x y) (string-append x y)) "foo" "bar") "foobar"))
 
-; === arity-app ===
+; === app-splicing ===
 
 (check
   (equal?
-    (arity-app
+    (app-splicing
       string-append
       "a"
       (0 (values))
