@@ -15,7 +15,7 @@
     once-proc
     checking-once
     raises?
-    app app-splicing
+    app app-values
     (rename
       (slice list->slice)
       (slice! slice))
@@ -283,7 +283,7 @@
   (define-syntax-rule (app $fn $arg ...)
     ($fn $arg ...))
 
-  (define-syntax app-splicing
+  (define-syntax app-values
     (lambda ($syntax)
       (syntax-case $syntax ()
         ((_ $fn $item ...)

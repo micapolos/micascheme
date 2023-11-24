@@ -28,7 +28,7 @@
 (check
   (equal?
   	(datum-application 'fn (list 'v1 'v2))
-  	'(app-splicing fn v1 v2)))
+  	'(app-values fn v1 v2)))
 
 (check
  	(equal?
