@@ -1,6 +1,7 @@
 (library (tico constant)
   (export
-    constant constant? constant-value
+    constant constant? constant-values
+    constant-value
     datum->constant
     bindings-datum->constant
     constant-arity
@@ -11,13 +12,17 @@
     constant-ref)
   (import
     (micascheme)
+    (tico arity)
     (tico datum)
     (tico value))
 
-  (data (constant value))
+  (data (constant . values))
+
+  (define (constant-value $constant)
+    (force-single (constant-values $constant)))
 
   (define (constant-arity $constant)
-    (value-arity (constant-value $constant)))
+    (arity (length (constant-values $constant))))
 
   (define (datum->constant $datum)
     (bindings-datum->constant (stack) $datum))
