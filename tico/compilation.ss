@@ -1,7 +1,6 @@
 (library (tico compilation)
   (export
     compilation compilation? compilation-datum compilation-evaluation
-    compilation-arity
     test-compilation
     test-parameter-compilation
     test-stack-compilation
@@ -59,36 +58,15 @@
     (stack-compilation
       (test-compilation $name) ...))
 
-  (define (compilation-arity $compilation)
-    (or
-      (switch-opt (compilation-datum $compilation)
-        ((pair? $pair)
-          (switch-opt (car $pair)
-            ((nonnegative-integer? $number) (arity $number)))))
-      (arity 1)))
-
-  (define (compilation-raw-datum $compilation)
-    (switch (compilation-datum $compilation)
-      ((pair? $pair)
-        (switch (car $pair)
-          ((nonnegative-integer? _) (cdr $pair))
-          ((else $other) $other)))
-      ((else $other) $other)))
-
   (define (literal->compilation $literal)
     (compilation
       (literal->datum $literal)
       (argument $literal)))
 
   (define (datum->compilation $datum)
-    (compilation $datum (datum->argument $datum)))
-
-  (define (compilation-binding-opt $compilation)
-    (switch-opt (compilation-evaluation $compilation)
-      ((argument? $argument)
-        (cons
-          (compilation-datum $compilation)
-          (argument-value $argument)))))
+    (scope-datum->compilation
+      (empty-stack-compilation)
+      $datum))
 
   (define (bindings-datum->compilation $binding-compilations $datum)
     (compilation $datum
@@ -101,6 +79,13 @@
       (bindings-datum->argument
         (stack-compilation-bindings $scope)
         $datum)))
+
+  (define (compilation-binding-opt $compilation)
+    (switch-opt (compilation-evaluation $compilation)
+      ((argument? $argument)
+        (cons
+          (compilation-datum $compilation)
+          (argument-value $argument)))))
 
   (define (compilation-value $compilation)
     (switch (compilation-evaluation $compilation)
