@@ -165,27 +165,9 @@
             $datum)))))
 
   (define (compilation-struct $name $compilations)
-    (lets
-      ($datums (map compilation-datum $compilations))
-      ($evaluations (map compilation-evaluation $compilations))
-      ($constants (filter constant? $evaluations))
-      ($variables (filter variable? $evaluations))
-      ($parameters (filter parameter? $evaluations))
-      (cond
-        ((for-all constant? $evaluations)
-          (compilation
-            (datum-struct $name $datums)
-            (constant-struct $name $constants)))
-        (else
-          (lets
-            ($datums (map compilation-datum $compilations))
-            (compilation
-              (datum-struct $name $datums)
-              (cond
-                ((null? $parameters)
-                  (variable
-                    (variable-index-flatten (map variable-index $variables))))
-                (else (parameter)))))))))
+    (compilation
+      (datum-struct $name (map compilation-datum $compilations))
+      (evaluation-struct $name (map compilation-evaluation $compilations))))
 
   (define (compilation-args $compilations)
     (lets

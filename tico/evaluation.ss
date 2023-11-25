@@ -1,6 +1,7 @@
 (library (tico evaluation)
   (export
     evaluation-application
+    evaluation-struct
     evaluation-args-application-opt
     evaluation-promote)
   (import
@@ -26,6 +27,19 @@
             ($parameters (ensure null? (filter parameter? $evaluations)))
             ($variable (variable-flatten $variables))
             (variable (variable-index $variable)))))))
+
+  (define (evaluation-struct $name $evaluations)
+    (cond
+      ((for-all constant? $evaluations)
+        (constant-struct $name $evaluations))
+      ((exists parameter? $evaluations)
+        (parameter))
+      (else
+        (lets
+          ($variables (filter variable? $evaluations))
+          ($parameters (ensure null? (filter parameter? $evaluations)))
+          ($variable (variable-flatten $variables))
+          (variable (variable-index $variable))))))
 
   (define (evaluation-args-application-opt $target $args)
     (lets
