@@ -69,10 +69,9 @@
       $datum))
 
   (define (bindings-datum->compilation $binding-compilations $datum)
-    (compilation $datum
-      (bindings-datum->argument
-        (filter-opts (map compilation-binding-opt $binding-compilations))
-        $datum)))
+    (scope-datum->compilation
+      (apply stack-compilation $binding-compilations)
+      $datum))
 
   (define (scope-datum->compilation $scope $datum)
     (compilation $datum
