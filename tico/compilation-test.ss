@@ -164,6 +164,27 @@
         (list 'foo "bar"))
       (variable 1))))
 
+(check
+  (equal?
+    (compilation-application
+      (datum->compilation 'string-append)
+      (list
+        (literal->compilation "foo")
+        (compilation-slice
+          (literal->compilation "bar")
+          (literal->compilation "goo"))))
+    (compilation
+      (datum-application
+        'string-append
+        (list "foo" (datum-slice "bar" "goo")))
+      (evaluation-application
+        (constant string-append)
+        (list
+          (constant "foo")
+          (constant-slice
+            (constant "bar")
+            (constant "goo")))))))
+
 ; --- compilation-abstraction
 
 (check
