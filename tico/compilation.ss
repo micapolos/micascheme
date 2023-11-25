@@ -1,6 +1,7 @@
 (library (tico compilation)
   (export
     compilation compilation? compilation-datum compilation-evaluation
+    compilation-arity
     test-compilation
     test-parameter-compilation
     test-stack-compilation
@@ -36,6 +37,7 @@
     test-stack-compilation)
   (import
     (micascheme)
+    (tico arity)
     (tico argument)
     (tico argument)
     (tico variable)
@@ -57,6 +59,22 @@
   (define-syntax-rule (test-stack-compilation $name ...)
     (stack-compilation
       (test-compilation $name) ...))
+
+  (define (compilation-arity $compilation)
+    (or
+      (switch-opt (compilation-datum $compilation)
+        ((pair? $pair)
+          (switch-opt (car $pair)
+            ((nonnegative-integer? $number) (arity $number)))))
+      (arity 1)))
+
+  (define (compilation-raw-datum $compilation)
+    (switch (compilation-datum $compilation)
+      ((pair? $pair)
+        (switch (car $pair)
+          ((nonnegative-integer? _) (cdr $pair))
+          ((else $other) $other)))
+      ((else $other) $other)))
 
   (define (literal->compilation $literal)
     (compilation
