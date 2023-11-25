@@ -311,6 +311,26 @@
       (variable
         (variable-index-flatten (list 1 2))))))
 
+(check
+  (equal?
+    (compilation-struct 'x
+      (list
+        (compilation "foo" (constant "foo"))
+        (compilation-slice
+          (compilation "bar" (constant "bar"))
+          (compilation "goo" (constant "goo")))))
+    (compilation
+      (datum-struct 'x
+        (list
+          "foo"
+          (datum-slice "bar" "goo")))
+      (constant-struct 'x
+        (list
+          (constant "foo")
+          (constant-slice
+            (constant "bar")
+            (constant "goo")))))))
+
 ; --- generate-parameter-compilation
 
 (check

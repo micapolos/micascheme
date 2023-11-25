@@ -37,6 +37,7 @@
 
   (define (tuple-value $values)
     (lets
+      ($values (apply splice $values))
       ($symbols (generate-symbols (length $values)))
       (evaluate
         (evaluator
