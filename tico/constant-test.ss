@@ -7,8 +7,12 @@
   (tico index)
   (tico tuple))
 
+; --- constant-arity
+
 (check (equal? (constant-arity (constant)) (value-arity (list))))
 (check (equal? (constant-arity (constant 1 2 3)) (arity 3)))
+
+; --- constants-values
 
 (check
   (equal?
@@ -18,6 +22,8 @@
         (constant 1)
         (constant 2 3)))
     (list 1 2 3)))
+
+; --- datum->constant
 
 (check
   (equal?
