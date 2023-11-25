@@ -43,19 +43,19 @@
   (equal?
     (bindings-layout-datum->layment
       (stack
-        (make-layment (simple-layout) (compilation 'foo (argument "foo")))
-        (make-layment (empty-layout) (compilation 'foo (argument "foo")))
-        (make-layment (simple-layout) (compilation 'foo (parameter)))
-        (make-layment (simple-layout) (compilation 'bar (argument "bar"))))
+        (make-layment (simple-layout) (argument-compilation 'foo (argument "foo")))
+        (make-layment (empty-layout) (argument-compilation 'foo (argument "foo")))
+        (make-layment (simple-layout) (parameter-compilation 'foo))
+        (make-layment (simple-layout) (argument-compilation 'bar (argument "bar"))))
       (simple-layout)
       '(string-append foo bar))
     (layment
       (simple-layout)
       (bindings-datum->compilation
         (stack
-          (compilation 'foo (argument "foo"))
-          (compilation 'foo (parameter))
-          (compilation 'bar (argument "bar")))
+          (argument-compilation 'foo (argument "foo"))
+          (parameter-compilation 'foo)
+          (argument-compilation 'bar (argument "bar")))
         '(string-append foo bar)))))
 
 (check
@@ -120,11 +120,11 @@
     (layment-application
       (layment-abstraction
         (list
-          (make-layment (simple-layout) (compilation 'v1 (parameter)))
-          (make-layment (simple-layout) (compilation 'v2 (parameter))))
+          (make-layment (simple-layout) (parameter-compilation 'v1))
+          (make-layment (simple-layout) (parameter-compilation 'v2)))
         (make-layment
           (simple-layout)
-          (compilation 'v1 (variable 0))))
+          (variable-compilation 'v1 0)))
       (list
         (literal->layment "foo")
         (literal->layment "bar")))
@@ -138,9 +138,9 @@
         (compilation-abstraction
           (empty-stack-compilation)
           (list
-            (compilation 'v1 (parameter))
-            (compilation 'v2 (parameter)))
-          (compilation 'v1 (variable 0)))
+            (parameter-compilation 'v1)
+            (parameter-compilation 'v2))
+          (variable-compilation 'v1 0))
         (list
           (literal->compilation "foo")
           (literal->compilation "bar"))))))
@@ -202,33 +202,33 @@
 
 ; --- layment-ref
 
-; (check
-;   (equal?
-;     (layment-ref
-;       (layment-struct 'foo
-;         (list
-;           (literal->layment "foo")
-;           (empty-layment)
-;           (literal->layment "bar")))
-;       2)
-;     (lets
-;       ($layout-field
-;         (layout-ref
-;           (layout-struct 'foo
-;             (list
-;               (literal->layout "foo")
-;               (empty-layout)
-;               (literal->layout "bar")))
-;           2))
-;       (make-layment
-;         (layout-field-layout $layout-field)
-;         (compilation-ref
-;           2
-;           (compilation-struct 'foo
-;             (list
-;               (literal->compilation "foo")
-;               (literal->compilation "bar")))
-;           (layout-field-index-opt $layout-field))))))
+(check
+  (equal?
+    (layment-ref
+      (layment-struct 'foo
+        (list
+          (literal->layment "foo")
+          (empty-layment)
+          (literal->layment "bar")))
+      2)
+    (lets
+      ($layout-field
+        (layout-ref
+          (layout-struct 'foo
+            (list
+              (literal->layout "foo")
+              (empty-layout)
+              (literal->layout "bar")))
+          2))
+      (make-layment
+        (layout-field-layout $layout-field)
+        (compilation-ref
+          2
+          (compilation-struct 'foo
+            (list
+              (literal->compilation "foo")
+              (literal->compilation "bar")))
+          (layout-field-index-opt $layout-field))))))
 
 ; --- layment parameter
 
@@ -246,15 +246,15 @@
 
 (lets
   ($scope (empty-stack-layment))
-  ($scope (stack-layment-push $scope (layment (simple-layout) (compilation 'v1 (parameter)))))
-  ($scope (stack-layment-push $scope (layment (simple-layout) (compilation 'v2 (argument "foo")))))
+  ($scope (stack-layment-push $scope (layment (simple-layout) (parameter-compilation 'v1))))
+  ($scope (stack-layment-push $scope (layment (simple-layout) (argument-compilation 'v2 (argument "foo")))))
   ($scope (stack-layment-push $scope (layment (empty-layout) #f)))
-  ($scope (stack-layment-push $scope (layment (simple-layout) (compilation 'v3 (argument "bar")))))
+  ($scope (stack-layment-push $scope (layment (simple-layout) (argument-compilation 'v3 (argument "bar")))))
   (do
     (check
       (equal?
         (stack-layment-ref $scope 0)
-        (layment (simple-layout) (compilation 'v3 (argument "bar"))))))
+        (layment (simple-layout) (argument-compilation 'v3 (argument "bar"))))))
   (do
     (check
       (equal?
@@ -264,10 +264,10 @@
     (check
       (equal?
         (stack-layment-ref $scope 2)
-        (layment (simple-layout) (compilation 'v2 (argument "foo"))))))
+        (layment (simple-layout) (argument-compilation 'v2 (argument "foo"))))))
   (do
     (check
       (equal?
         (stack-layment-ref $scope 3)
-        (layment (simple-layout) (compilation 'v1 (variable 2))))))
+        (layment (simple-layout) (variable-compilation 'v1 2)))))
   (void))

@@ -51,9 +51,9 @@
         (variable-typing (string-type) 's 1)))
     (typing (string-type)
       (layment (type->layout (string-type))
-        (compilation
+        (variable-compilation
           '(let ((s "foo") (n 128)) s)
-          (variable 1))))))
+          1)))))
 
 (check
   (equal?
@@ -78,6 +78,6 @@
         (variable-typing (string-type) 's2 1)))
     (typing (string-type)
       (layment (type->layout (string-type))
-        (compilation
+        (variable-compilation
           '(let ([s1 "foo"] [n1 128]) (let ([s2 s1] [n2 n1]) s2))
-          (variable 1))))))
+          1)))))

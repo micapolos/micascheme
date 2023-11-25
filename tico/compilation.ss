@@ -1,6 +1,6 @@
 (library (tico compilation)
   (export
-    compilation compilation? compilation-datum compilation-evaluation
+    compilation compilation? compilation-arity compilation-datum compilation-evaluation
     test-compilation
     test-parameter-compilation
     test-stack-compilation
@@ -9,11 +9,13 @@
     datum->compilation
     bindings-datum->compilation
     scope-datum->compilation
-    variable-compilation
 
     compilation-value
 
+    argument-compilation
+    variable-compilation
     parameter-compilation
+
     generate-parameter-compilation
 
     compilation-application
@@ -44,13 +46,14 @@
     (tico parameter)
     (tico definition))
 
-  (data (compilation datum evaluation))
+  (data (compilation arity datum evaluation))
 
   (define-syntax-rule (test-compilation $name)
     (datum->compilation (test-datum $name)))
 
   (define-syntax-rule (test-parameter-compilation $name)
     (compilation
+      (arity 1)
       (test-parameter-datum $name)
       (parameter)))
 
@@ -60,6 +63,7 @@
 
   (define (literal->compilation $literal)
     (compilation
+      (arity 1)
       (literal->datum $literal)
       (argument $literal)))
 
@@ -80,7 +84,7 @@
           (stack-compilation-bindings $scope)
           $datum))
       (compilation
-        ;(argument-arity $argument)
+        (argument-arity $argument)
         $datum
         $argument)))
 
@@ -99,13 +103,20 @@
         (throw compilation-value $compilation))))
 
   (define (parameter-compilation $symbol)
-    (compilation $symbol (parameter)))
+    (compilation (arity 1) $symbol (parameter)))
+
+  (define (argument-compilation $datum $argument)
+    (compilation
+      (argument-arity $argument)
+      $datum
+      $argument))
 
   (define (generate-parameter-compilation)
     (parameter-compilation (generate-symbol)))
 
   (define (compilation-parameter $compilation)
     (compilation
+      (arity 1) ; TODO: Check it
       (generate-symbol)
       (switch-exclusive (compilation-evaluation $compilation)
         ((argument? $argument)
@@ -123,14 +134,16 @@
         (throw compilation-variable $compilation))
       ((parameter? $parameter)
         (compilation
+          (arity 1)
           (compilation-datum $compilation)
           (variable $index)))))
 
   (define (variable-compilation $datum $index)
-    (compilation $datum (variable $index)))
+    (compilation (arity 1) $datum (variable $index)))
 
   (define (compilation-application $target $args)
     (compilation
+      (arity 1) ; TODO: Make it a parameter
       (datum-application
         (compilation-datum $target)
         (map compilation-datum $args))
@@ -148,7 +161,9 @@
         (evaluation-args-application-opt
           (compilation-evaluation $target)
           (compilation-evaluation $args)))
-      (compilation $datum
+      (compilation
+        (arity 1)
+        $datum
         (or $evaluation-opt
           (bindings-datum->argument
             (stack-compilation-bindings $scope)
@@ -161,6 +176,7 @@
           (map compilation-datum $param-compilations)
           (compilation-datum $body-compilation)))
       (compilation
+        (arity 1)
         $datum
         (or
           (evaluation-promote
@@ -172,6 +188,7 @@
 
   (define (compilation-struct $name $compilations)
     (compilation
+      (arity 1)
       (datum-struct $name (map compilation-datum $compilations))
       (evaluation-struct $name (map compilation-evaluation $compilations))))
 
@@ -181,10 +198,14 @@
       ($evaluations (map compilation-evaluation $compilations))
       (cond
         ((for-all argument? $evaluations)
-          (compilation $datum
+          (compilation
+            (arity 1)
+            $datum
             (argument (map argument-value $evaluations))))
         (else
-          (compilation $datum
+          (compilation
+            (arity 1)
+            $datum
             (cond
               ((null? (filter parameter? $evaluations))
                 (variable
@@ -195,6 +216,7 @@
 
   (define (compilation-ref $arity $target $index)
     (compilation
+      (arity 1)
       (datum-ref $arity (compilation-datum $target) $index)
       (switch-exclusive (compilation-evaluation $target)
         ((argument? $argument)
@@ -205,10 +227,13 @@
           (throw compilation-ref $parameter)))))
 
   (define (empty-stack-compilation)
-    (compilation (stack) (stack)))
+    (compilation (arity 0) (stack) (stack)))
 
   (define (stack-compilation-push $stack-compilation $compilation)
     (compilation
+      (arity+
+        (compilation-arity $stack-compilation)
+        (compilation-arity $compilation))
       (push
         (compilation-datum $stack-compilation)
         (compilation-datum $compilation))
@@ -219,6 +244,7 @@
   (define (stack-compilation-ref $stack-compilation $index)
     (compilation-variable
       (compilation
+        (arity 1)
         (list-ref (compilation-datum $stack-compilation) $index)
         (list-ref (compilation-evaluation $stack-compilation) $index))
       $index))
@@ -244,6 +270,7 @@
 
   (define (compilation-definitions-do $compilation-definitions $body-compilation)
     (compilation
+      (arity 1)
       `(let
         ,(datum-definitions-let-entries (map compilation-definition->datum-definition $compilation-definitions))
         ,(compilation-datum $body-compilation))

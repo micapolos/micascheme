@@ -1,5 +1,6 @@
 (import
   (micascheme)
+  (tico arity)
   (tico compilation)
   (tico argument)
   (tico variable)
@@ -16,23 +17,24 @@
 
 (check
   (equal?
-    (compilation-value (compilation 'foo (argument 3)))
+    (compilation-value (argument-compilation 'foo (argument 3)))
     3))
 
 (check
   (raises?
     (lambda ()
-      (compilation-value (compilation 'foo (variable 1 (stack)))))))
+      (compilation-value (variable-compilation 'foo 1)))))
 
 (check
   (raises?
     (lambda ()
-      (compilation-value (compilation 'foo (parameter))))))
+      (compilation-value (parameter-compilation 'foo)))))
 
 (check
   (equal?
     (datum->compilation '(string-append "foo" "bar"))
     (compilation
+      (arity 1)
       '(string-append "foo" "bar")
       (datum->argument '(string-append "foo" "bar")))))
 
@@ -40,11 +42,12 @@
   (equal?
     (bindings-datum->compilation
       (stack
-        (compilation 'foo (argument "foo"))
-        (compilation 'goo (parameter))
-        (compilation 'bar (argument "bar")))
+        (argument-compilation 'foo (argument "foo"))
+        (parameter-compilation 'goo)
+        (argument-compilation 'bar (argument "bar")))
       '(string-append "foo" "bar"))
     (compilation
+      (arity 1)
       '(string-append "foo" "bar")
       (bindings-datum->argument
         (stack
@@ -56,11 +59,12 @@
   (equal?
     (scope-datum->compilation
       (stack-compilation
-        (compilation 'foo (argument "foo"))
-        (compilation 'goo (parameter))
-        (compilation 'bar (argument "bar")))
+        (argument-compilation 'foo (argument "foo"))
+        (parameter-compilation 'goo)
+        (argument-compilation 'bar (argument "bar")))
       '(string-append foo bar))
     (compilation
+      (arity 1)
       '(string-append foo bar)
       (bindings-datum->argument
         (stack
@@ -71,7 +75,7 @@
 (check
   (equal?
     (literal->compilation "foo")
-    (compilation "foo" (argument "foo"))))
+    (compilation (arity 1) "foo" (argument "foo"))))
 
 ; --- compilation-args-application
 
@@ -79,12 +83,13 @@
   (equal?
     (compilation-args-application
       (empty-stack-compilation)
-      (compilation 'string-append (variable 1))
+      (variable-compilation 'string-append 1)
       (compilation-args
         (list
           (literal->compilation "foo")
           (literal->compilation "bar"))))
     (compilation
+      (arity 1)
       (datum-args-application
         'string-append
         (datum-args (list "foo" "bar")))
@@ -110,13 +115,13 @@
       (compilation-application
         (datum->compilation 'string-append)
         (list
-          (compilation 'foo (variable 1))
+          (variable-compilation 'foo 1)
           (literal->compilation "bar"))))
-    (compilation
+    (variable-compilation
       (datum-application
         'string-append
         (list 'foo "bar"))
-      (variable 1))))
+      1)))
 
 ; --- compilation-abstraction
 
@@ -125,21 +130,21 @@
     (compilation-application
       (compilation-abstraction
         (stack-compilation
-          (compilation 'excl (argument "!")))
+          (argument-compilation 'excl (argument "!")))
         (list
-          (compilation 'foo (parameter))
-          (compilation 'bar (parameter)))
+          (parameter-compilation 'foo)
+          (parameter-compilation 'bar))
         (compilation-struct 'foo
           (list
-            (compilation 'foo (variable 1))
-            (compilation 'bar (variable 0))
-            (compilation 'excl (argument "!")))))
+            (variable-compilation 'foo 1)
+            (variable-compilation 'bar 0)
+            (argument-compilation 'excl (argument "!")))))
       (list
         (literal->compilation "foo")
         (literal->compilation "bar")))
     (scope-datum->compilation
       (stack-compilation
-        (compilation 'excl (argument "!")))
+        (argument-compilation 'excl (argument "!")))
       (datum-application
         (datum-abstraction
           (list 'foo 'bar)
@@ -152,8 +157,8 @@
       (compilation-abstraction
         (empty-stack-compilation)
         (list
-          (compilation 'v1 (parameter))
-          (compilation 'v2 (parameter)))
+          (parameter-compilation 'v1)
+          (parameter-compilation 'v2))
         (literal->compilation "foobar"))
       (list
         (literal->compilation "foo")
@@ -171,11 +176,9 @@
       (compilation-abstraction
         (empty-stack-compilation)
         (list
-          (compilation 'v1 (parameter))
-          (compilation 'v2 (parameter)))
-        (compilation
-          '(string-append v1 v2)
-          (variable 1)))
+          (parameter-compilation 'v1)
+          (parameter-compilation 'v2))
+        (variable-compilation '(string-append v1 v2) 1))
       (list
         (literal->compilation "foo")
         (literal->compilation "bar")))
@@ -193,16 +196,14 @@
     (compilation-abstraction
       (empty-stack-compilation)
       (list
-        (compilation 'v1 (parameter))
-        (compilation 'v2 (parameter)))
-      (compilation
-        '(string-append v1 v2)
-        (variable 3)))
-    (compilation
+        (parameter-compilation 'v1)
+        (parameter-compilation 'v2))
+      (variable-compilation '(string-append v1 v2) 3))
+    (variable-compilation
       (datum-abstraction
         (list 'v1 'v2)
         '(string-append v1 v2))
-      (variable 1))))
+      1)))
 
 ; --- compilation-args
 
@@ -210,9 +211,9 @@
   (equal?
     (compilation-args
       (list
-        (compilation 'foo (argument "foo"))
-        (compilation 'bar (argument "bar"))))
-    (compilation
+        (argument-compilation 'foo (argument "foo"))
+        (argument-compilation 'bar (argument "bar"))))
+    (argument-compilation
       (datum-args (list 'foo 'bar))
       (argument (list "foo" "bar")))))
 
@@ -220,23 +221,22 @@
   (equal?
     (compilation-args
       (list
-        (compilation 'foo (argument "foo"))
-        (compilation 'bar (variable 1))
-        (compilation 'goo (parameter))))
-    (compilation
-      (datum-args (list 'foo 'bar 'goo))
-      (parameter))))
+        (argument-compilation 'foo (argument "foo"))
+        (variable-compilation 'bar 1)
+        (parameter-compilation 'goo)))
+    (parameter-compilation
+      (datum-args (list 'foo 'bar 'goo)))))
 
 (check
   (equal?
     (compilation-args
       (list
-        (compilation 'foo (argument "foo"))
-        (compilation 'bar (variable 1))
-        (compilation 'goo (variable 2))))
-    (compilation
+        (argument-compilation 'foo (argument "foo"))
+        (variable-compilation 'bar 1)
+        (variable-compilation 'goo 2)))
+    (variable-compilation
       (datum-args (list 'foo 'bar 'goo))
-      (variable 2))))
+      2)))
 
 ; --- compilation-struct
 
@@ -244,9 +244,9 @@
   (equal?
     (compilation-struct 'x
       (list
-        (compilation "foo" (argument "foo"))
-        (compilation "bar" (argument "bar"))))
-    (compilation
+        (argument-compilation "foo" (argument "foo"))
+        (argument-compilation "bar" (argument "bar"))))
+    (argument-compilation
       (datum-struct 'x (list "foo" "bar"))
       (argument-struct 'x (list (argument "foo") (argument "bar"))))))
 
@@ -255,15 +255,14 @@
     (with-generate-temporary-seed $tmp
       (compilation-struct 'x
         (list
-          (compilation 'foo (variable 1))
-          (compilation '(identity "foo") (argument "foo"))
-          (compilation 'bar (variable 2))
-          (compilation '(identity "bar") (argument "bar")))))
-    (compilation
+          (variable-compilation 'foo 1)
+          (argument-compilation '(identity "foo") (argument "foo"))
+          (variable-compilation 'bar 2)
+          (argument-compilation '(identity "bar") (argument "bar")))))
+    (variable-compilation
       (datum-struct 'x
         (list 'foo '(identity "foo") 'bar '(identity "bar")))
-      (variable
-        (variable-index-flatten (list 1 2))))))
+      (variable-index-flatten (list 1 2)))))
 
 ; --- generate-parameter-compilation
 
@@ -273,7 +272,9 @@
       (compilation-parameter
         (literal->compilation "foo")))
     (with-tmps
-      (compilation (generate-symbol)
+      (compilation
+        (arity 1)
+        (generate-symbol)
         (compilation-evaluation (literal->compilation "foo"))))))
 
 (check
@@ -282,14 +283,16 @@
       (compilation-parameter
         (datum->compilation 'string-append)))
     (with-tmps
-      (compilation (generate-symbol)
+      (compilation
+        (arity 1)
+        (generate-symbol)
         (compilation-evaluation (datum->compilation 'string-append))))))
 
 (check
   (equal?
     (with-tmps
       (compilation-parameter
-        (compilation 'foo (variable 3))))
+        (variable-compilation 'foo 3)))
     (with-tmps
       (generate-parameter-compilation))))
 
@@ -305,24 +308,24 @@
 (lets
   ($scope
     (stack-compilation
-      (compilation 'v1 (parameter))
-      (compilation 'v2 (argument "foo"))
-      (compilation 'v3 (argument "bar"))))
+      (parameter-compilation 'v1)
+      (argument-compilation 'v2 (argument "foo"))
+      (argument-compilation 'v3 (argument "bar"))))
   (do
     (check
       (equal?
         (stack-compilation-ref $scope 0)
-        (compilation 'v3 (argument "bar")))))
+        (argument-compilation 'v3 (argument "bar")))))
   (do
     (check
       (equal?
         (stack-compilation-ref $scope 1)
-        (compilation 'v2 (argument "foo")))))
+        (argument-compilation 'v2 (argument "foo")))))
   (do
     (check
       (equal?
         (stack-compilation-ref $scope 2)
-        (compilation 'v1 (variable 2)))))
+        (variable-compilation 'v1 2))))
   (do
     (check
       (equal?
@@ -342,7 +345,7 @@
         (definition
           (parameter-compilation 'bar)
           (datum->compilation "bar")))
-      (compilation 'foo (variable 1)))
-    (compilation
+      (variable-compilation 'foo 1))
+    (variable-compilation
       '(let ((foo "foo") (bar "bar")) foo)
-      (variable 1))))
+      1)))

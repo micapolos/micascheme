@@ -7,6 +7,7 @@
     entries-let)
   (import
     (micascheme)
+    (tico arity)
     (tico typing)
     (tico datum)
     (tico layment)
@@ -48,6 +49,7 @@
         (make-layment
           (layment-layout $body-layment)
           (compilation
+            (arity 1)
             (let-datum
               (entry-let-entries-datum $entry)
               (compilation-datum $body-compilation))
