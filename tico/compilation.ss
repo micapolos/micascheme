@@ -52,20 +52,16 @@
     (datum->compilation (test-datum $name)))
 
   (define-syntax-rule (test-parameter-compilation $name)
-    (compilation
-      (arity 1)
-      (test-parameter-datum $name)
-      (parameter)))
+    (parameter-compilation
+      (test-parameter-datum $name)))
 
   (define-syntax-rule (test-stack-compilation $name ...)
     (stack-compilation
       (test-compilation $name) ...))
 
   (define (literal->compilation $literal)
-    (compilation
-      (arity 1)
-      (literal->datum $literal)
-      (argument $literal)))
+    (datum->compilation
+      (literal->datum $literal)))
 
   (define (datum->compilation $datum)
     (scope-datum->compilation
@@ -133,10 +129,8 @@
       ((variable? $variable)
         (throw compilation-variable $compilation))
       ((parameter? $parameter)
-        (compilation
-          (arity 1)
-          (compilation-datum $compilation)
-          (variable $index)))))
+        (variable-compilation
+          (compilation-datum $compilation) $index))))
 
   (define (variable-compilation $datum $index)
     (compilation (arity 1) $datum (variable $index)))
@@ -198,8 +192,7 @@
       ($evaluations (map compilation-evaluation $compilations))
       (cond
         ((for-all argument? $evaluations)
-          (compilation
-            (arity 1)
+          (argument-compilation
             $datum
             (argument (map argument-value $evaluations))))
         (else
