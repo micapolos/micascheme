@@ -92,7 +92,10 @@
       ((pair? $pair) `(let (,@$pair) ,$body))))
 
   (define datum-environment
-    (environment '(micascheme) '(tico type) '(tico tuple)))
+    (environment
+      '(micascheme)
+      '(tico type)
+      '(tico tuple)))
 
   (define (datum->value $datum)
     (eval $datum datum-environment))
