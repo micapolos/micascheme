@@ -1,11 +1,11 @@
 (import (micascheme))
 
 (test
+  (tico argument)
   (tico arity)
   (tico binding)
   (tico block)
   (tico compilation)
-  (tico argument)
   (tico datum)
   (tico definition)
   (tico entry)
