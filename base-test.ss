@@ -72,65 +72,6 @@
       (2 (values "c" "d")))
     "abcd"))
 
-; === app-splicing ===
-
-(check
-  (equal?
-    (app-splicing string-append "a" "b" "c")
-    "abc"))
-
-(check
-  (equal?
-    (app-splicing
-      string-append
-      "a"
-      (0 (values))
-      (1 (values "b"))
-      (2 (values "c" "d"))
-      (3 (values "e" "f" "g")))
-    "abcdefg"))
-
-; === slice ===
-
-(check
-  (equal?
-    (slice)
-    (list->slice (list))))
-
-(check
-  (equal?
-    (slice 1)
-    1))
-
-(check
-  (equal?
-    (slice 1 2 3)
-    (list->slice (list 1 2 3))))
-
-(check
-  (equal?
-    (slice-items (slice 1 2 3))
-    (list 1 2 3)))
-
-; === splice-value ===
-
-(check
-  (equal?
-    (splice-value 1)
-    (list 1)))
-
-(check
-  (equal?
-    (splice-value (slice 3 4))
-    (list 3 4)))
-
-; === splice ===
-
-(check
-  (equal?
-    (splice 1 (slice) (slice 2) (slice 3 4))
-    (list 1 2 3 4)))
-
 ; === or-throw ===
 
 (check

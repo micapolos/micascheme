@@ -58,40 +58,6 @@
 
 (check
   (type-matches?
-    (slice (any-type) (unchecked-type))
-    (slice (any-type) (unchecked-type))))
-
-(check
-  (type-matches?
-    (slice (value-type "foo") (unchecked-type))
-    (slice (any-type) (unchecked-type))))
-
-(check
-  (not
-    (type-matches?
-      (slice (any-type))
-      (slice (any-type) (unchecked-type)))))
-
-(check
-  (not
-    (type-matches?
-      (slice (unchecked-type) (any-type))
-      (slice (unchecked-type)))))
-
-(check
-  (not
-    (type-matches?
-      (slice (any-type) (value-type "foo"))
-      (slice (any-type) (unchecked-type)))))
-
-(check
-  (not
-    (type-matches?
-      (unchecked-type)
-      (slice (any-type) (unchecked-type)))))
-
-(check
-  (type-matches?
     (struct 'foo (list (any-type) (value-type "foo")))
     (struct 'foo (list))))
 

@@ -24,9 +24,7 @@
     datum-definition-let-entry
     datum-definitions-let-entries
     packet-datum
-    values-datum
-    datum-slice
-    arity-slice-datum)
+    values-datum)
   (import
     (micascheme)
     (tico type)
@@ -62,13 +60,13 @@
     `(lambda (,@$params) ,$body))
 
   (define (datum-application $target $args)
-    `(app-splicing ,$target ,@$args))
+    `(,$target ,@$args))
 
   (define (datum-args-application $target $args)
     `(,$target ,@$args))
 
   (define (datum-tuple $items)
-    `(app-splicing tuple ,@$items))
+    `(tuple ,@$items))
 
   (define (tuple-ref-datum $arity $tuple $index)
     `(tuple-ref ,$arity ,$tuple ,$index))
@@ -183,18 +181,8 @@
             ,(datum-definitions-let-entries $other)
             ,$items-datum)))))
 
-  (define (arity-slice-datum $arity $datum)
-    (case $arity
-      ((1) $datum)
-      (else `(,$arity ,$datum))))
-
   (define (values-datum $datums)
     (case (length $datums)
       ((1) (car $datums))
       (else `(values ,@$datums))))
-
-  (define (datum-slice . $datums)
-    (lets
-      ($arity (length $datums))
-      (arity-slice-datum $arity (values-datum $datums))))
 )

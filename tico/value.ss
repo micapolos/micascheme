@@ -21,7 +21,7 @@
     (arity (length $value)))
 
   (define (value-application $target $args)
-    (apply $target (apply splice $args)))
+    (apply $target $args))
 
   (define (value-abstraction $arity $body)
     (lets
@@ -42,7 +42,6 @@
 
   (define (tuple-value $values)
     (lets
-      ($values (apply splice $values))
       ($symbols (generate-symbols (length $values)))
       (evaluate
         (evaluator

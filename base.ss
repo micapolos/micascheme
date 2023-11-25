@@ -16,12 +16,6 @@
     checking-once
     raises?
     app values-app
-    (rename
-      (slice list->slice)
-      (slice! slice))
-    slice? slice-items
-    splice-value splice
-    app-splicing
     single? single force-single
     bindings-eval
     script
@@ -305,38 +299,6 @@
                     (lambda ($tmps $expr) #`((#,@$tmps) #,$expr))
                     $tmps $exprs))
                 (#,@(apply append $tmps))))))))
-
-  (define-syntax app-splicing
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $fn $item ...)
-          (lets
-            ($arity-expr-pairs
-              (map
-                (lambda ($item)
-                  (syntax-case $item ()
-                    (($number $expr)
-                      (lets
-                        ($datum (syntax->datum #'$number))
-                        (and (integer? $datum) (nonnegative? $datum)))
-                      (cons (syntax->datum #'$number) #'$expr))
-                    ($expr
-                      (cons 1 #'$expr))))
-                (syntax->list #'($item ...))))
-            ($arities (map car $arity-expr-pairs))
-            ($exprs (map cdr $arity-expr-pairs))
-            (cond
-              ((for-all (lambda ($arity) (= $arity 1)) $arities)
-                #`($fn #,@$exprs))
-              (else
-                (lets
-                  ($tmps (map generate-temporaries (map iota $arities)))
-                  #`(let-values
-                      (
-                        #,@(map
-                          (lambda ($tmps $expr) #`((#,@$tmps) #,$expr))
-                          $tmps $exprs))
-                      ($fn #,@(apply append $tmps)))))))))))
 
   (define-syntax-rule (define-aux-keyword aux)
     (define-syntax aux
@@ -745,23 +707,6 @@
     (fallible-bind $fallible
       (lambda ($success)
         $body ...)))
-
-  ; --------------------------------------
-
-  (data (slice items))
-
-  (define (slice! . $items)
-    (case (length $items)
-      ((1) (car $items))
-      (else (slice $items))))
-
-  (define (splice-value $value)
-    (switch $value
-      ((slice? $slice) (slice-items $slice))
-      ((else $value) (list $value))))
-
-  (define (splice . $values)
-    (apply append (map splice-value $values)))
 
   ; --------------------------------------
 

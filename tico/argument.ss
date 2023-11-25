@@ -6,7 +6,6 @@
     datum->argument
     bindings-datum->argument
     argument-arity
-    argument-slice
     argument-application
     argument-application-2
     argument-abstraction
@@ -51,9 +50,6 @@
         `(call-with-values
           (lambda () ,$datum)
           list))))
-
-  (define (argument-slice . $arguments)
-    (argument (apply slice (map argument-value $arguments))))
 
   (define (argument-application $target $args)
     (argument

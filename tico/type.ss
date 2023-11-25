@@ -163,12 +163,6 @@
           (equal?
             (native-type-value $type)
             (native-type-value $native-type))))
-      ((slice? $slice)
-        (and
-          (slice? $type)
-          (types-match?
-            (slice-items $type)
-            (slice-items $slice))))
       ((struct? $struct)
         (and
           (struct? $type)

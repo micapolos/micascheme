@@ -28,7 +28,7 @@
 (check
   (equal?
   	(datum-application 'fn (list 'v1 'v2))
-  	'(app-splicing fn v1 v2)))
+  	'(fn v1 v2)))
 
 (check
  	(equal?
@@ -63,11 +63,10 @@
 			'(string-append foo bar))
 		"foobar"))
 
-(check (equal? (datum-tuple (list)) '(app-splicing tuple)))
-(check (equal? (datum-tuple (list 'v1)) '(app-splicing tuple v1)))
-(check (equal? (datum-tuple (list 'v1 'v2)) '(app-splicing tuple v1 v2)))
-(check (equal? (datum-tuple (list 'v1 'v2 'v3)) '(app-splicing tuple v1 v2 v3)))
-(check (equal? (datum-tuple (list 'v1 (datum-slice 'v2 'v3))) '(app-splicing tuple v1 (2 (values v2 v3)))))
+(check (equal? (datum-tuple (list)) '(tuple)))
+(check (equal? (datum-tuple (list 'v1)) '(tuple v1)))
+(check (equal? (datum-tuple (list 'v1 'v2)) '(tuple v1 v2)))
+(check (equal? (datum-tuple (list 'v1 'v2 'v3)) '(tuple v1 v2 v3)))
 
 (check (equal? (tuple-ref-datum 1 'v 0) '(tuple-ref 1 v 0)))
 (check (equal? (tuple-ref-datum 2 'v 0) '(tuple-ref 2 v 0)))
@@ -177,16 +176,8 @@
 				(list 'v1)))
 		'(let ((a1 b1) (a2 b2)) v1)))
 
-; --- values and slices
+; --- values-datum
 
 (check (equal? (values-datum (list)) '(values)))
 (check (equal? (values-datum (list 'a)) 'a))
 (check (equal? (values-datum (list 'a 'b)) '(values a b)))
-
-(check (equal? (arity-slice-datum 0 'a) '(0 a)))
-(check (equal? (arity-slice-datum 1 'a) 'a))
-(check (equal? (arity-slice-datum 2 'a) '(2 a)))
-
-(check (equal? (datum-slice) (arity-slice-datum 0 (values-datum (list)))))
-(check (equal? (datum-slice 'a) (arity-slice-datum 1 (values-datum (list 'a)))))
-(check (equal? (datum-slice 'a 'b) (arity-slice-datum 2 (values-datum (list 'a 'b)))))
