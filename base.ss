@@ -288,7 +288,7 @@
       (syntax-case $syntax ()
         ((_ $fn $item ...)
           (lets
-            ($tmps-expr-pairs
+            ($arity-expr-pairs
               (map
                 (lambda ($item)
                   (syntax-case $item ()
@@ -296,24 +296,24 @@
                       (lets
                         ($datum (syntax->datum #'$number))
                         (and (integer? $datum) (nonnegative? $datum)))
-                      (cons
-                        (generate-temporaries (iota (syntax->datum #'$number)))
-                        #'$expr))
+                      (cons (syntax->datum #'$number) #'$expr))
                     ($expr
-                      (cons
-                        (generate-temporaries '(0))
-                        #'$expr))))
+                      (cons 1 #'$expr))))
                 (syntax->list #'($item ...))))
-            #`(let-values
-                (
-                  #,@(map
-                    (lambda ($tmps-expr-pair)
-                      #`(
-                        (#,@(car $tmps-expr-pair))
-                        #,(cdr $tmps-expr-pair)))
-                    $tmps-expr-pairs))
-                ($fn
-                  #,@(apply append (map car $tmps-expr-pairs)))))))))
+            ($arities (map car $arity-expr-pairs))
+            ($exprs (map cdr $arity-expr-pairs))
+            (cond
+              ((for-all (lambda ($arity) (= $arity 1)) $arities)
+                #`($fn #,@$exprs))
+              (else
+                (lets
+                  ($tmps (map generate-temporaries (map iota $arities)))
+                  #`(let-values
+                      (
+                        #,@(map
+                          (lambda ($tmps $expr) #`((#,@$tmps) #,$expr))
+                          $tmps $exprs))
+                      ($fn #,@(apply append $tmps)))))))))))
 
   (define-syntax-rule (define-aux-keyword aux)
     (define-syntax aux
