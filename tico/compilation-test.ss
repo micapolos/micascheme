@@ -73,52 +73,6 @@
     (literal->compilation "foo")
     (compilation "foo" (argument "foo"))))
 
-; --- compilation-slice
-
-(check
-  (equal?
-    (compilation-slice)
-    (compilation
-      (datum-slice)
-      (argument (slice)))))
-
-(check
-  (equal?
-    (compilation-slice
-      (literal->compilation "foo"))
-    (compilation
-      (datum-slice "foo")
-      (argument (slice "foo")))))
-
-(check
-  (equal?
-    (compilation-slice
-      (literal->compilation "foo")
-      (literal->compilation "bar"))
-    (compilation
-      (datum-slice "foo" "bar")
-      (argument (slice "foo" "bar")))))
-
-(check
-  (equal?
-    (compilation-slice
-      (variable-compilation 'foo 1)
-      (literal->compilation "bar")
-      (variable-compilation 'goo 3))
-    (compilation
-      (datum-slice 'foo "bar" 'goo)
-      (variable 3))))
-
-(check
-  (equal?
-    (compilation-slice
-      (variable-compilation 'foo 1)
-      (literal->compilation "bar")
-      (parameter-compilation 'goo))
-    (compilation
-      (datum-slice 'foo "bar" 'goo)
-      (parameter))))
-
 ; --- compilation-args-application
 
 (check
@@ -163,27 +117,6 @@
         'string-append
         (list 'foo "bar"))
       (variable 1))))
-
-(check
-  (equal?
-    (compilation-application
-      (datum->compilation 'string-append)
-      (list
-        (literal->compilation "foo")
-        (compilation-slice
-          (literal->compilation "bar")
-          (literal->compilation "goo"))))
-    (compilation
-      (datum-application
-        'string-append
-        (list "foo" (datum-slice "bar" "goo")))
-      (evaluation-application
-        (argument string-append)
-        (list
-          (argument "foo")
-          (argument-slice
-            (argument "bar")
-            (argument "goo")))))))
 
 ; --- compilation-abstraction
 
@@ -331,26 +264,6 @@
         (list 'foo '(identity "foo") 'bar '(identity "bar")))
       (variable
         (variable-index-flatten (list 1 2))))))
-
-(check
-  (equal?
-    (compilation-struct 'x
-      (list
-        (compilation "foo" (argument "foo"))
-        (compilation-slice
-          (compilation "bar" (argument "bar"))
-          (compilation "goo" (argument "goo")))))
-    (compilation
-      (datum-struct 'x
-        (list
-          "foo"
-          (datum-slice "bar" "goo")))
-      (argument-struct 'x
-        (list
-          (argument "foo")
-          (argument-slice
-            (argument "bar")
-            (argument "goo")))))))
 
 ; --- generate-parameter-compilation
 

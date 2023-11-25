@@ -23,7 +23,6 @@
     compilation-args
     compilation-struct
     compilation-ref
-    compilation-slice
 
     compilation-parameter
     compilation-variable
@@ -204,23 +203,6 @@
                     (map variable-index
                       (filter variable? $evaluations)))))
               (else (parameter))))))))
-
-  (define (compilation-slice . $compilations)
-    (lets
-      ($datums (map compilation-datum $compilations))
-      ($evaluations (map compilation-evaluation $compilations))
-      (compilation
-        (apply datum-slice $datums)
-        (cond
-          ((for-all argument? $evaluations)
-            (apply argument-slice $evaluations))
-          ((null? (filter parameter? $evaluations))
-            (variable
-              (variable-index-flatten
-                (map variable-index
-                  (filter variable? $evaluations)))))
-          (else
-            (parameter))))))
 
   (define (compilation-ref $arity $target $index)
     (compilation

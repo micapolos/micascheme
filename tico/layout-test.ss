@@ -23,12 +23,6 @@
     (literal->layout "foo")
     (type->layout (string-type))))
 
-; --- layout-slice
-
-(check (equal? (layout-slice) (empty-layout)))
-(check (equal? (layout-slice (simple-layout)) (simple-layout)))
-(check (equal? (layout-slice (simple-layout) (native-layout)) (simple-layout)))
-
 ; --- layout-args
 
 (check

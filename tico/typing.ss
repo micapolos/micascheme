@@ -31,7 +31,6 @@
     typing-abstraction
     let-typing
     typing-args
-    typing-slice
     typing-struct
     typing-ref
     typing-ref-index
@@ -238,11 +237,6 @@
         (map typing-type $typings))
       (layment-args
         (map typing-layment $typings))))
-
-  (define (typing-slice . $typings)
-    (typing
-      (apply slice (map typing-type $typings))
-      (apply layment-slice (map typing-layment $typings))))
 
   (define (typing-struct $name $field-typings)
     (typing
