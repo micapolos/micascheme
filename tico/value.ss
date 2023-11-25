@@ -1,5 +1,6 @@
 (library (tico value)
   (export
+    value-arity
     value-application
     value-abstraction
     value-struct
@@ -9,11 +10,15 @@
   (import
     (micascheme)
     (evaluator)
+    (tico arity)
     (tico expression)
     (tico datum))
 
   (define (value-environment)
     (environment '(micascheme) '(tico tuple)))
+
+  (define (value-arity $value)
+    (arity (length $value)))
 
   (define (value-application $target $args)
     (apply $target (apply splice $args)))

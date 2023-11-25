@@ -1,4 +1,7 @@
-(import (micascheme) (tico value))
+(import (micascheme) (tico value) (tico arity))
+
+(check (equal? (value-arity (list)) (arity 0)))
+(check (equal? (value-arity (list 1 2 3)) (arity 3)))
 
 ;(check (equal? (tuple-value (list)) #f))
 (check (equal? (tuple-value (list "foo")) "foo"))

@@ -3,6 +3,7 @@
     constant constant? constant-value
     datum->constant
     bindings-datum->constant
+    constant-arity
     constant-slice
     constant-application
     constant-abstraction
@@ -14,6 +15,9 @@
     (tico value))
 
   (data (constant value))
+
+  (define (constant-arity $constant)
+    (value-arity (constant-value $constant)))
 
   (define (datum->constant $datum)
     (bindings-datum->constant (stack) $datum))

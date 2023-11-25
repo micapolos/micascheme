@@ -4,6 +4,9 @@
   (tico datum)
   (tico value))
 
+(check (equal? (constant-arity (constant (list))) (value-arity (list))))
+(check (equal? (constant-arity (constant (list 1 2 3))) (value-arity (list 1 2 3))))
+
 (check
   (equal?
     (datum->constant '(string-append "foo" "bar"))
