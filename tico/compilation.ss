@@ -229,11 +229,11 @@
         (compilation-datum $stack-compilation)
         (compilation-evaluation $stack-compilation))))
 
-  (define-syntax-rule (stack-compilation $item ...)
+  (define (stack-compilation . $compilations)
     (fold-left
       stack-compilation-push
       (empty-stack-compilation)
-      (list $item ...)))
+      $compilations))
 
   (define (compilation-definition->datum-definition $compilation-definition)
     (definition-map compilation-datum $compilation-definition))

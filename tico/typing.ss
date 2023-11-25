@@ -424,8 +424,8 @@
       (list-ref (typing-type $stack-typing) $index)
       (stack-layment-ref (typing-layment $stack-typing) $index)))
 
-  (define-syntax-rule (stack-typing $item ...)
-    (fold-left stack-typing-push (empty-stack-typing) (list $item ...)))
+  (define (stack-typing . $typings)
+    (fold-left stack-typing-push (empty-stack-typing) $typings))
 
   (define (stack-typing-type-ref $stack-typing $type)
     (opt-lets
