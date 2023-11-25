@@ -16,7 +16,7 @@
   (data (constant value))
 
   (define (datum->constant $datum)
-    (constant (datum->value $datum)))
+    (bindings-datum->constant (stack) $datum))
 
   (define (bindings-datum->constant $bindings $datum)
     (constant

@@ -98,7 +98,7 @@
       '(tico tuple)))
 
   (define (datum->value $datum)
-    (eval $datum datum-environment))
+    (bindings-datum->value (stack) $datum))
 
   (define (bindings-datum->value $bindings $datum)
     (evaluate
