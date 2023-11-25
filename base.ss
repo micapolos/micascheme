@@ -424,9 +424,14 @@
   (define-syntax data
     (lambda (stx)
       (syntax-case stx ()
-        ((_ (name field ...))
+        ((_ (name field ... . list-field))
           (lets
             (fields (syntax->list #'(field ...)))
+            (list-field-opt
+              (and
+                (not (null? (syntax->datum #'list-field)))
+                #'list-field))
+            (all-fields (append fields (or (and list-field-opt (list list-field-opt)) '())))
             (name-string (symbol->string (syntax->datum #`name)))
             (tmp (car (generate-temporaries '(tmp))))
             (record-name (build-identifier ($string #`name) (string-append "%" $string)))
@@ -439,11 +444,19 @@
                   (build-identifier ($string $field)
                     (string-append name-string "-" $string)))
                 fields))
+            (list-accessor-opt
+              (and list-field-opt
+                (build-identifier ($string list-field-opt)
+                  (string-append name-string "-" $string))))
             #`(begin
               (define #,rtd-name
                 (let ((#,tmp
                   (make-record-type #,name-string
-                    (list '(immutable field) ...))))
+                    (list
+                      #,@(map
+                        (lambda ($field)
+                          #`(quote (immutable #,$field)))
+                        all-fields)))))
                   (record-writer #,tmp
                     (lambda (record port wr)
                       (display "(" port)
@@ -454,6 +467,13 @@
                             (display " " port)
                             (wr (#,accessor record) port)))
                         accessors)
+                      #,(if list-accessor-opt
+                        #`(for-each
+                            (lambda ($item)
+                              (display " " port)
+                              (wr $item port))
+                            (#,list-accessor-opt record))
+                        #`(begin (void)))
                       (display ")" port)))
                   (record-type-equal-procedure
                     #,tmp
@@ -464,7 +484,7 @@
                           (lets
                             (fld (build-identifier (s field) (string-append name-string "-" s)))
                             #`(eq (#,fld a) (#,fld b))))
-                        (syntax->list #`(field ...))))))
+                        all-fields))))
                   (record-type-hash-procedure
                     #,tmp
                     (lambda (a hash)
@@ -474,18 +494,21 @@
                           (lets
                             (fld (build-identifier (s field) (string-append name-string "-" s)))
                             #`(hash (#,fld a))))
-                        (syntax->list #`(field ...))))))
+                        all-fields))))
                   #,tmp))
-              (define name
-                (record-constructor #,rtd-name))
+              #,(if list-field-opt
+                #`(define (name field ... . list-field-opt)
+                  ((record-constructor #,rtd-name) field ... list-field-opt))
+                #`(define name
+                  (record-constructor #,rtd-name)))
               (define #,predicate-name
                 (record-predicate #,rtd-name))
               #,@(map
                 (lambda (index f)
                   #`(define #,(build-identifier (s f) (string-append prefix-name s))
                     (record-accessor #,rtd-name #,index)))
-                (iota (length (syntax->list #'(field ...))))
-                (syntax->list #'(field ...)))))))))
+                (iota (length all-fields))
+                all-fields)))))))
 
   (define-syntax enum
     (lambda ($syntax)
