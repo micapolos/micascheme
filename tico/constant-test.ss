@@ -2,7 +2,8 @@
   (micascheme)
   (tico constant)
   (tico datum)
-  (tico value))
+  (tico value)
+  (tico arity))
 
 (check (equal? (constant-arity (constant)) (value-arity (list))))
 (check (equal? (constant-arity (constant 1 2 3)) (arity 3)))
@@ -56,3 +57,27 @@
       (constant-abstraction 2 (constant "foo"))
       (list (constant 10) (constant 20)))
     (constant "foo")))
+
+(check
+  (equal?
+    (constant-application-2
+      (constant string-append)
+      (list (constant "foo") (constant "bar")))
+    (constant "foobar")))
+
+(check
+  (equal?
+    (constant-application-2
+      (constant string-append "foo")
+      (list
+        (constant)
+        (constant "bar")
+        (constant "goo" "zoo")))
+    (constant "foobargoozoo")))
+
+(check
+  (raises?
+    (lambda ()
+      (constant-application-2
+        (constant)
+        (list)))))

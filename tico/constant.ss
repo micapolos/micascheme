@@ -8,6 +8,7 @@
     constant-arity
     constant-slice
     constant-application
+    constant-application-2
     constant-abstraction
     constant-struct
     constant-ref)
@@ -42,7 +43,9 @@
     (apply constant
       (evaluate
         (evaluator constant-environment $bindings)
-        `(call-with-values (lambda () ,$datum) list))))
+        `(call-with-values
+          (lambda () ,$datum)
+          list))))
 
   (define (constant-slice . $constants)
     (constant (apply slice (map constant-value $constants))))
@@ -52,6 +55,16 @@
       (value-application
         (constant-value $target)
         (map constant-value $args))))
+
+  (define (constant-application-2 $target $args)
+    (lets
+      ($values (constants-values (cons $target $args)))
+      (do (unless (pair? $values) (throw constant-application-2 $target $args)))
+      ($target (car $values))
+      ($args (cdr $values))
+      (call-with-values
+        (lambda () (apply $target $args))
+        constant)))
 
   (define (constant-abstraction $arity $body)
     (constant
