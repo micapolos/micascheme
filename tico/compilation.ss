@@ -18,6 +18,7 @@
 
     generate-parameter-compilation
 
+    compilation-application-datum
     compilation-application
     compilation-args-application
     compilation-abstraction
@@ -58,6 +59,14 @@
   (define-syntax-rule (test-stack-compilation $name ...)
     (stack-compilation
       (test-compilation $name) ...))
+
+  (define (compilation-application-datum $compilation)
+    (lets
+      ($arity-value (arity-value (compilation-arity $compilation)))
+      ($datum (compilation-datum $compilation))
+      (case $arity-value
+        ((1) $datum)
+        (else `(,$arity-value ,$datum)))))
 
   (define (literal->compilation $literal)
     (datum->compilation

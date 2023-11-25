@@ -95,6 +95,26 @@
         (datum-args (list "foo" "bar")))
       (variable 1))))
 
+; --- compilation-application-datum
+
+(check
+  (equal?
+    (compilation-application-datum
+      (argument-compilation '(foo) (argument)))
+    '(0 (foo))))
+
+(check
+  (equal?
+    (compilation-application-datum
+      (argument-compilation '(foo) (argument "foo")))
+    '(foo)))
+
+(check
+  (equal?
+    (compilation-application-datum
+      (argument-compilation '(foo) (argument "foo" "bar")))
+    '(2 (foo))))
+
 ; --- compilation-application
 
 (check
