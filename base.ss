@@ -29,6 +29,7 @@
     bind-if
     opt-lets lets
     opt-lift
+    nonnegative-integer?
     current-seconds
     works?
     check checking?
@@ -282,6 +283,9 @@
 
   (define-syntax-rule (app $fn $arg ...)
     ($fn $arg ...))
+
+  (define (nonnegative-integer? $obj)
+    (and (integer? $obj) (nonnegative? $obj)))
 
   (define-syntax app-values
     (lambda ($syntax)

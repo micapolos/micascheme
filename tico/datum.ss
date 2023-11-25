@@ -32,6 +32,7 @@
     (tico type)
     (tico definition)
     (tico packet)
+    (tico tuple)
     (evaluator))
 
   (define-syntax-rule (test-datum $name)
@@ -67,11 +68,10 @@
     `(,$target ,@$args))
 
   (define (datum-tuple $items)
-    (case (length $items)
-      ((0) (throw error))
-      ((1) (car $items))
-      ((2) `(cons ,(car $items) ,(cadr $items)))
-      (else `(vector ,@$items))))
+    `(app-values tuple ,@$items))
+
+  (define (tuple-ref-datum $arity $tuple $index)
+    `(tuple-ref ,$arity ,$tuple ,$index))
 
   (define (datum-args $datums) $datums)
 
@@ -79,11 +79,7 @@
     (datum-tuple $field-datums))
 
   (define (datum-ref $arity $target $index)
-    (case $arity
-      ((0) `(throw error))
-      ((1) $target)
-      ((2) `(,(if (zero? $index) `car `cdr) ,$target))
-      (else `(vector-ref ,$target ,$index))))
+    `(tuple-ref ,$arity ,$target ,$index))
 
   (define (lets-datum $declarations $body)
     (switch $declarations
@@ -95,15 +91,8 @@
       ((null? _) $body)
       ((pair? $pair) `(let (,@$pair) ,$body))))
 
-  (define (tuple-ref-datum $arity $tuple $index)
-    (case $arity
-      ((0) (throw error))
-      ((1) $tuple)
-      ((2) `(,(if (zero? $index) `car `cdr) ,$tuple))
-      (else `(vector-ref ,$tuple ,$index))))
-
   (define datum-environment
-    (environment '(micascheme) '(tico type)))
+    (environment '(micascheme) '(tico type) '(tico tuple)))
 
   (define (datum->value $datum)
     (eval $datum datum-environment))

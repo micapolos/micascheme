@@ -18,6 +18,7 @@
   (tico reader)
   (tico value)
   (tico tico)
+  (tico tuple)
   (tico type)
   (tico typing)
   (tico variable))

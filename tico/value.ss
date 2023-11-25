@@ -13,7 +13,7 @@
     (tico datum))
 
   (define (value-environment)
-    (environment '(micascheme)))
+    (environment '(micascheme) '(tico tuple)))
 
   (define (value-application $target $args)
     (apply $target (apply splice $args)))
