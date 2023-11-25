@@ -222,21 +222,20 @@
 
   (define (compilation-slice . $compilations)
     (lets
-      ($datum (apply datum-slice (map compilation-datum $compilations)))
+      ($datums (map compilation-datum $compilations))
       ($evaluations (map compilation-evaluation $compilations))
-      (cond
-        ((for-all constant? $evaluations)
-          (compilation $datum
-            (apply constant-slice $evaluations)))
-        (else
-          (compilation $datum
-            (cond
-              ((null? (filter parameter? $evaluations))
-                (variable
-                  (variable-index-flatten
-                    (map variable-index
-                      (filter variable? $evaluations)))))
-              (else (parameter))))))))
+      (compilation
+        (apply datum-slice $datums)
+        (cond
+          ((for-all constant? $evaluations)
+            (apply constant-slice $evaluations))
+          ((null? (filter parameter? $evaluations))
+            (variable
+              (variable-index-flatten
+                (map variable-index
+                  (filter variable? $evaluations)))))
+          (else
+            (parameter))))))
 
   (define (compilation-ref $arity $target $index)
     (compilation
