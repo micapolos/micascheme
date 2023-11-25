@@ -3,7 +3,9 @@
   (tico constant)
   (tico datum)
   (tico value)
-  (tico arity))
+  (tico arity)
+  (tico index)
+  (tico tuple))
 
 (check (equal? (constant-arity (constant)) (value-arity (list))))
 (check (equal? (constant-arity (constant 1 2 3)) (arity 3)))
@@ -51,6 +53,8 @@
           (cons 'bar "bar"))
         '(string-append "foo" "bar")))))
 
+; --- constant-application
+
 (check
   (equal?
     (constant-application
@@ -81,3 +85,55 @@
       (constant-application-2
         (constant)
         (list)))))
+
+; --- constant-abstraction
+
+(check
+  (equal?
+    (constant-application
+      (constant-abstraction-2 2
+        (list (constant "res")))
+      (list
+        (constant "arg1")
+        (constant "arg2")))
+    (constant "res")))
+
+(check
+  (equal?
+    (constant-application-2
+      (constant-abstraction-2 2
+        (list
+          (constant)
+          (constant "res1")
+          (constant "res2" "res3")))
+      (list
+        (constant "arg1")
+        (constant "arg2")))
+    (constant "res1" "res2" "res3")))
+
+; --- constant-tuple
+
+(check
+  (equal?
+    (constant-tuple
+      (list
+        (constant)
+        (constant "foo")
+        (constant 128 #f)))
+    (constant
+      (tuple "foo" 128 #f))))
+
+; --- constant-tuple-ref
+
+(check
+  (equal?
+    (constant-tuple-ref
+      (arity 3)
+      (constant-tuple
+        (list
+          (constant)
+          (constant "foo")
+          (constant 128 #f)))
+      (index 1))
+    (constant
+      (tuple-ref 3 (tuple "foo" 128 #f) 1))))
