@@ -74,10 +74,15 @@
       $datum))
 
   (define (scope-datum->compilation $scope $datum)
-    (compilation $datum
-      (bindings-datum->argument
-        (stack-compilation-bindings $scope)
-        $datum)))
+    (lets
+      ($argument
+        (bindings-datum->argument
+          (stack-compilation-bindings $scope)
+          $datum))
+      (compilation
+        ;(argument-arity $argument)
+        $datum
+        $argument)))
 
   (define (compilation-binding-opt $compilation)
     (switch-opt (compilation-evaluation $compilation)
