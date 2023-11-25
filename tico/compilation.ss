@@ -149,35 +149,20 @@
             $datum)))))
 
   (define (compilation-abstraction $scope $param-compilations $body-compilation)
-    (switch-exclusive (compilation-evaluation $body-compilation)
-      ((constant? $constant)
-        (compilation
-          (datum-abstraction
-            (map compilation-datum $param-compilations)
-            (compilation-datum $body-compilation))
-          (constant-abstraction
-            (length $param-compilations)
-            $constant)))
-      ((variable? $variable)
-        (switch-exclusive (variable-promote $variable (length $param-compilations))
-          ((variable? $variable)
-            (compilation
-              (datum-abstraction
-                (map compilation-datum $param-compilations)
-                (compilation-datum $body-compilation))
-              $variable))
-          ((false? _)
-            (scope-datum->compilation
-              $scope
-              (datum-abstraction
-                (map compilation-datum $param-compilations)
-                (compilation-datum $body-compilation))))))
-      ((parameter? $parameter)
-        (compilation
-          (datum-abstraction
-            (map compilation-datum $param-compilations)
-            (compilation-datum $body-compilation))
-          $parameter))))
+    (lets
+      ($datum
+        (datum-abstraction
+          (map compilation-datum $param-compilations)
+          (compilation-datum $body-compilation)))
+      (compilation
+        $datum
+        (or
+          (evaluation-promote
+            (compilation-evaluation $body-compilation)
+            (length $param-compilations))
+          (bindings-datum->constant
+            (stack-compilation-bindings $scope)
+            $datum)))))
 
   (define (compilation-struct $name $compilations)
     (lets

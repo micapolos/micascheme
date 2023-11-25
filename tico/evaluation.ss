@@ -1,7 +1,8 @@
 (library (tico evaluation)
   (export
     evaluation-application
-    evaluation-args-application-opt)
+    evaluation-args-application-opt
+    evaluation-promote)
   (import
     (micascheme)
     (tico constant)
@@ -37,4 +38,10 @@
             ($variables (filter variable? $evaluations))
             ($variable (variable-flatten $variables))
             (variable (variable-index $variable)))))))
+
+  (define (evaluation-promote $evaluation $arity)
+    (switch-exclusive $evaluation
+      ((constant? $constant) #f)
+      ((variable? $variable) (variable-promote $variable $arity))
+      ((parameter? $parameter) $parameter)))
 )

@@ -11,11 +11,10 @@
 
   (data (variable index))
 
-  (define (variable-promote $variable $size)
+  (define (variable-promote $variable $arity)
     (lets
-      ($index (- (variable-index $variable) $size))
-      (and (>= $index 0)
-        (variable $index))))
+      ($index (- (variable-index $variable) $arity))
+      (and (>= $index 0) (variable $index))))
 
   (define (variable-index-flatten $indices)
     (apply max $indices))
