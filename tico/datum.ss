@@ -4,6 +4,7 @@
     test-parameter-datum
     literal->datum
     datum-application
+    datum-values-application
     datum-args-application
     generate-datum-params
     datum-abstraction
@@ -61,6 +62,9 @@
 
   (define (datum-application $target $args)
     `(,$target ,@$args))
+
+  (define (datum-values-application $target $args)
+    `(values-app ,$target ,@$args))
 
   (define (datum-args-application $target $args)
     `(,$target ,@$args))

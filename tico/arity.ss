@@ -1,5 +1,7 @@
 (library (tico arity)
-  (export arity arity? arity-value
+  (export
+    arity arity? arity-value
+    arity-single?
     arity+)
   (import (micascheme))
 
@@ -10,4 +12,7 @@
       (+
         (arity-value $arity-a)
         (arity-value $arity-b))))
+
+  (define (arity-single? $arity)
+    (= (arity-value $arity) 1))
 )

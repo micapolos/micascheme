@@ -99,19 +99,19 @@
 
 (check
   (equal?
-    (compilation-application-datum
+    (compilation-arity-datum
       (argument-compilation '(foo) (argument)))
     '(0 (foo))))
 
 (check
   (equal?
-    (compilation-application-datum
+    (compilation-arity-datum
       (argument-compilation '(foo) (argument "foo")))
-    '(foo)))
+    '(1 (foo))))
 
 (check
   (equal?
-    (compilation-application-datum
+    (compilation-arity-datum
       (argument-compilation '(foo) (argument "foo" "bar")))
     '(2 (foo))))
 
@@ -128,6 +128,22 @@
       (datum-application
         'string-append
         (list "foo" "bar")))))
+
+(check
+  (equal?
+    (compilation-application
+      (datum->compilation '(values string-append "foo"))
+      (list
+        (datum->compilation '(values))
+        (datum->compilation "bar")
+        (datum->compilation '(values "goo" "zoo"))))
+    (datum->compilation
+      (datum-values-application
+        (compilation-arity-datum (datum->compilation '(values string-append "foo")))
+        (list
+          (compilation-arity-datum (datum->compilation '(values)))
+          (compilation-arity-datum (datum->compilation "bar"))
+          (compilation-arity-datum (datum->compilation '(values "goo" "zoo"))))))))
 
 (check
   (equal?

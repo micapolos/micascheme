@@ -18,7 +18,7 @@
 
     generate-parameter-compilation
 
-    compilation-application-datum
+    compilation-arity-datum
     compilation-application
     compilation-args-application
     compilation-abstraction
@@ -60,13 +60,10 @@
     (stack-compilation
       (test-compilation $name) ...))
 
-  (define (compilation-application-datum $compilation)
-    (lets
-      ($arity-value (arity-value (compilation-arity $compilation)))
-      ($datum (compilation-datum $compilation))
-      (case $arity-value
-        ((1) $datum)
-        (else `(,$arity-value ,$datum)))))
+  (define (compilation-arity-datum $compilation)
+    `(
+      ,(arity-value (compilation-arity $compilation))
+      ,(compilation-datum $compilation)))
 
   (define (literal->compilation $literal)
     (datum->compilation
@@ -145,14 +142,23 @@
     (compilation (arity 1) $datum (variable $index)))
 
   (define (compilation-application $target $args)
-    (compilation
-      (arity 1) ; TODO: Make it a parameter
-      (datum-application
-        (compilation-datum $target)
-        (map compilation-datum $args))
-      (evaluation-application
-        (compilation-evaluation $target)
-        (map compilation-evaluation $args))))
+    (lets
+      ($compilations (cons $target $args))
+      ($arities (map compilation-arity $compilations))
+      (compilation
+        (arity 1) ; TODO: Make it a parameter
+        (cond
+          ((for-all arity-single? $arities)
+            (datum-application
+              (compilation-datum $target)
+              (map compilation-datum $args)))
+          (else
+            (datum-values-application
+              (compilation-arity-datum $target)
+              (map compilation-arity-datum $args))))
+        (evaluation-application
+          (compilation-evaluation $target)
+          (map compilation-evaluation $args)))))
 
   (define (compilation-args-application $scope $target $args)
     (lets

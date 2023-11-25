@@ -31,6 +31,11 @@
   	'(fn v1 v2)))
 
 (check
+  (equal?
+  	(datum-values-application '(1 fn) (list '(2 v1) '(0 v2)))
+  	'(values-app (1 fn) (2 v1) (0 v2))))
+
+(check
  	(equal?
 	  (with-generate-temporary-seed $tmp
    		(generate-datum-params 2))
