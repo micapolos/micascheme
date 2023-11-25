@@ -139,21 +139,6 @@
             (list
               (typing-variable (parameter-typing (string-type) '$string) 1))))))))
 
-; (check
-;   (equal?
-;     (with-generate-temporary-seed $tmp
-;       (let-typing
-;         (list
-;           (literal->typing "foo")
-;           (literal->typing "bar"))
-;         (lambda ($typings)
-;           (typing-application
-;             (type-datum->typing
-;               (arrow (list (string-type) (string-type)) (string-type))
-;               'string-append)
-;             $typings))))
-;     123))
-
 (check
   (equal?
     (typing-prepare
