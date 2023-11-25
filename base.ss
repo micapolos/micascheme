@@ -426,19 +426,35 @@
       (syntax-case stx ()
         ((_ (name field ...))
           (lets
+            (fields (syntax->list #'(field ...)))
             (name-string (symbol->string (syntax->datum #`name)))
             (tmp (car (generate-temporaries '(tmp))))
             (record-name (build-identifier ($string #`name) (string-append "%" $string)))
             (rtd-name (build-identifier ($string #`name) (string-append $string "-rtd")))
             (prefix-name (string-append name-string "-"))
             (predicate-name (build-identifier ($string #`name) (string-append $string "?")))
+            (accessors
+              (map
+                (lambda ($field)
+                  (build-identifier ($string $field)
+                    (string-append name-string "-" $string)))
+                fields))
             #`(begin
               (define #,rtd-name
                 (let ((#,tmp
                   (make-record-type #,name-string
                     (list '(immutable field) ...))))
                   (record-writer #,tmp
-                    (record-pretty-writer #,tmp #,name-string))
+                    (lambda (record port wr)
+                      (display "(" port)
+                      (display #,name-string port)
+                      #,@(map
+                        (lambda (accessor)
+                          #`(begin
+                            (display " " port)
+                            (wr (#,accessor record) port)))
+                        accessors)
+                      (display ")" port)))
                   (record-type-equal-procedure
                     #,tmp
                     (lambda (a b eq)
