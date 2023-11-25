@@ -159,6 +159,19 @@
         (list 'foo "bar"))
       1)))
 
+(check
+  (equal?
+    (with-generate-temporary-seed $tmp
+      (compilation-application
+        (parameter-compilation 'string-append)
+        (list
+          (variable-compilation 'foo 1)
+          (literal->compilation "bar"))))
+    (parameter-compilation
+      (datum-application
+        'string-append
+        (list 'foo "bar")))))
+
 ; --- compilation-abstraction
 
 (check
