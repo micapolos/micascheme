@@ -49,6 +49,11 @@
 
 (check
   (equal?
+    (app-values string-append "a" "b" "c")
+    "abc"))
+
+(check
+  (equal?
     (app-values
       string-append
       "a"
