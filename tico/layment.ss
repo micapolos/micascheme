@@ -35,7 +35,7 @@
     (micascheme)
     (tico datum)
     (tico layout)
-    (tico constant)
+    (tico argument)
     (tico variable)
     (tico compilation))
 

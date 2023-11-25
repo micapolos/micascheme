@@ -36,8 +36,8 @@
     test-stack-compilation)
   (import
     (micascheme)
-    (tico constant)
-    (tico constant)
+    (tico argument)
+    (tico argument)
     (tico variable)
     (tico datum)
     (tico evaluation)
@@ -61,34 +61,34 @@
   (define (literal->compilation $literal)
     (compilation
       (literal->datum $literal)
-      (constant $literal)))
+      (argument $literal)))
 
   (define (datum->compilation $datum)
-    (compilation $datum (datum->constant $datum)))
+    (compilation $datum (datum->argument $datum)))
 
   (define (compilation-binding-opt $compilation)
     (switch-opt (compilation-evaluation $compilation)
-      ((constant? $constant)
+      ((argument? $argument)
         (cons
           (compilation-datum $compilation)
-          (constant-value $constant)))))
+          (argument-value $argument)))))
 
   (define (bindings-datum->compilation $binding-compilations $datum)
     (compilation $datum
-      (bindings-datum->constant
+      (bindings-datum->argument
         (filter-opts (map compilation-binding-opt $binding-compilations))
         $datum)))
 
   (define (scope-datum->compilation $scope $datum)
     (compilation $datum
-      (bindings-datum->constant
+      (bindings-datum->argument
         (stack-compilation-bindings $scope)
         $datum)))
 
   (define (compilation-value $compilation)
     (switch (compilation-evaluation $compilation)
-      ((constant? $constant)
-        (constant-value $constant))
+      ((argument? $argument)
+        (argument-value $argument))
       ((else $other)
         (throw compilation-value $compilation))))
 
@@ -102,8 +102,8 @@
     (compilation
       (generate-symbol)
       (switch-exclusive (compilation-evaluation $compilation)
-        ((constant? $constant)
-          $constant)
+        ((argument? $argument)
+          $argument)
         ((variable? $variable)
           (parameter))
         ((parameter? $parameter)
@@ -111,7 +111,7 @@
 
   (define (compilation-variable $compilation $index)
     (switch-exclusive (compilation-evaluation $compilation)
-      ((constant? $constant)
+      ((argument? $argument)
         $compilation)
       ((variable? $variable)
         (throw compilation-variable $compilation))
@@ -144,7 +144,7 @@
           (compilation-evaluation $args)))
       (compilation $datum
         (or $evaluation-opt
-          (bindings-datum->constant
+          (bindings-datum->argument
             (stack-compilation-bindings $scope)
             $datum)))))
 
@@ -160,7 +160,7 @@
           (evaluation-promote
             (compilation-evaluation $body-compilation)
             (length $param-compilations))
-          (bindings-datum->constant
+          (bindings-datum->argument
             (stack-compilation-bindings $scope)
             $datum)))))
 
@@ -174,9 +174,9 @@
       ($datum (datum-args (map compilation-datum $compilations)))
       ($evaluations (map compilation-evaluation $compilations))
       (cond
-        ((for-all constant? $evaluations)
+        ((for-all argument? $evaluations)
           (compilation $datum
-            (constant (map constant-value $evaluations))))
+            (argument (map argument-value $evaluations))))
         (else
           (compilation $datum
             (cond
@@ -194,8 +194,8 @@
       (compilation
         (apply datum-slice $datums)
         (cond
-          ((for-all constant? $evaluations)
-            (apply constant-slice $evaluations))
+          ((for-all argument? $evaluations)
+            (apply argument-slice $evaluations))
           ((null? (filter parameter? $evaluations))
             (variable
               (variable-index-flatten
@@ -208,8 +208,8 @@
     (compilation
       (datum-ref $arity (compilation-datum $target) $index)
       (switch-exclusive (compilation-evaluation $target)
-        ((constant? $constant)
-          (constant-ref $arity $constant $index))
+        ((argument? $argument)
+          (argument-ref $arity $argument $index))
         ((variable? $variable)
           $variable)
         ((parameter? $parameter)
@@ -239,8 +239,8 @@
       (map
         (lambda ($datum $evaluation)
           (switch-opt $evaluation
-            ((constant? $constant)
-              (cons $datum (constant-value $constant)))))
+            ((argument? $argument)
+              (cons $datum (argument-value $argument)))))
         (compilation-datum $stack-compilation)
         (compilation-evaluation $stack-compilation))))
 

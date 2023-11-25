@@ -1,22 +1,22 @@
 (import
   (micascheme)
   (tico evaluation)
-  (tico constant)
+  (tico argument)
   (tico variable)
   (tico datum))
 
 (check
   (equal?
     (evaluation-application
-      (constant string-append)
-      (list (constant "foo") (constant "bar")))
-    (constant "foobar")))
+      (argument string-append)
+      (list (argument "foo") (argument "bar")))
+    (argument "foobar")))
 
 (check
   (equal?
     (evaluation-application
       (variable 1)
       (list
-        (constant "foo")
+        (argument "foo")
         (variable 3)))
     (variable 3)))

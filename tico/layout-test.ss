@@ -157,7 +157,7 @@
 (check
   (equal?
     (type->layout
-      (constant-type
+      (argument-type
         (struct 'foo (list))
         (number-type)))
     (type->layout (number-type))))

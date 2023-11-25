@@ -263,11 +263,11 @@
 
 (check
   (equal?
-    (typing-constant
+    (typing-argument
       (type->typing (struct 'foo (list)))
       (literal->typing 123))
     (typing
-      (constant-type
+      (argument-type
         (struct 'foo (list))
         (number-type))
       (typing-layment
@@ -279,14 +279,14 @@
       (type->typing (struct 'foo (list)))
       (type->typing (number-type)))
     (type->typing
-      (constant-type
+      (argument-type
         (struct 'foo (list))
         (number-type)))))
 
 (check
   (equal?
-    (typing-constant-access
-      (typing-constant
+    (typing-argument-access
+      (typing-argument
         (type->typing (struct 'foo (list)))
         (literal->typing 123))
       (typing-struct 'foo (list)))
@@ -295,8 +295,8 @@
 (check
   (raises?
     (lambda ()
-      (typing-constant-access
-        (typing-constant
+      (typing-argument-access
+        (typing-argument
           (type->typing (struct 'foo (list)))
           (literal->typing 123))
         (typing-struct 'bar (list))))))

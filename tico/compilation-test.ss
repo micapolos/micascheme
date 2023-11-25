@@ -1,7 +1,7 @@
 (import
   (micascheme)
   (tico compilation)
-  (tico constant)
+  (tico argument)
   (tico variable)
   (tico datum)
   (tico evaluation)
@@ -16,7 +16,7 @@
 
 (check
   (equal?
-    (compilation-value (compilation 'foo (constant 3)))
+    (compilation-value (compilation 'foo (argument 3)))
     3))
 
 (check
@@ -34,19 +34,19 @@
     (datum->compilation '(string-append "foo" "bar"))
     (compilation
       '(string-append "foo" "bar")
-      (datum->constant '(string-append "foo" "bar")))))
+      (datum->argument '(string-append "foo" "bar")))))
 
 (check
   (equal?
     (bindings-datum->compilation
       (stack
-        (compilation 'foo (constant "foo"))
+        (compilation 'foo (argument "foo"))
         (compilation 'goo (parameter))
-        (compilation 'bar (constant "bar")))
+        (compilation 'bar (argument "bar")))
       '(string-append "foo" "bar"))
     (compilation
       '(string-append "foo" "bar")
-      (bindings-datum->constant
+      (bindings-datum->argument
         (stack
           (cons 'foo "foo")
           (cons 'bar "bar"))
@@ -56,13 +56,13 @@
   (equal?
     (scope-datum->compilation
       (stack-compilation
-        (compilation 'foo (constant "foo"))
+        (compilation 'foo (argument "foo"))
         (compilation 'goo (parameter))
-        (compilation 'bar (constant "bar")))
+        (compilation 'bar (argument "bar")))
       '(string-append foo bar))
     (compilation
       '(string-append foo bar)
-      (bindings-datum->constant
+      (bindings-datum->argument
         (stack
           (cons 'foo "foo")
           (cons 'bar "bar"))
@@ -71,7 +71,7 @@
 (check
   (equal?
     (literal->compilation "foo")
-    (compilation "foo" (constant "foo"))))
+    (compilation "foo" (argument "foo"))))
 
 ; --- compilation-slice
 
@@ -80,7 +80,7 @@
     (compilation-slice)
     (compilation
       (datum-slice)
-      (constant (slice)))))
+      (argument (slice)))))
 
 (check
   (equal?
@@ -88,7 +88,7 @@
       (literal->compilation "foo"))
     (compilation
       (datum-slice "foo")
-      (constant (slice "foo")))))
+      (argument (slice "foo")))))
 
 (check
   (equal?
@@ -97,7 +97,7 @@
       (literal->compilation "bar"))
     (compilation
       (datum-slice "foo" "bar")
-      (constant (slice "foo" "bar")))))
+      (argument (slice "foo" "bar")))))
 
 (check
   (equal?
@@ -178,12 +178,12 @@
         'string-append
         (list "foo" (datum-slice "bar" "goo")))
       (evaluation-application
-        (constant string-append)
+        (argument string-append)
         (list
-          (constant "foo")
-          (constant-slice
-            (constant "bar")
-            (constant "goo")))))))
+          (argument "foo")
+          (argument-slice
+            (argument "bar")
+            (argument "goo")))))))
 
 ; --- compilation-abstraction
 
@@ -192,7 +192,7 @@
     (compilation-application
       (compilation-abstraction
         (stack-compilation
-          (compilation 'excl (constant "!")))
+          (compilation 'excl (argument "!")))
         (list
           (compilation 'foo (parameter))
           (compilation 'bar (parameter)))
@@ -200,13 +200,13 @@
           (list
             (compilation 'foo (variable 1))
             (compilation 'bar (variable 0))
-            (compilation 'excl (constant "!")))))
+            (compilation 'excl (argument "!")))))
       (list
         (literal->compilation "foo")
         (literal->compilation "bar")))
     (scope-datum->compilation
       (stack-compilation
-        (compilation 'excl (constant "!")))
+        (compilation 'excl (argument "!")))
       (datum-application
         (datum-abstraction
           (list 'foo 'bar)
@@ -277,17 +277,17 @@
   (equal?
     (compilation-args
       (list
-        (compilation 'foo (constant "foo"))
-        (compilation 'bar (constant "bar"))))
+        (compilation 'foo (argument "foo"))
+        (compilation 'bar (argument "bar"))))
     (compilation
       (datum-args (list 'foo 'bar))
-      (constant (list "foo" "bar")))))
+      (argument (list "foo" "bar")))))
 
 (check
   (equal?
     (compilation-args
       (list
-        (compilation 'foo (constant "foo"))
+        (compilation 'foo (argument "foo"))
         (compilation 'bar (variable 1))
         (compilation 'goo (parameter))))
     (compilation
@@ -298,7 +298,7 @@
   (equal?
     (compilation-args
       (list
-        (compilation 'foo (constant "foo"))
+        (compilation 'foo (argument "foo"))
         (compilation 'bar (variable 1))
         (compilation 'goo (variable 2))))
     (compilation
@@ -311,11 +311,11 @@
   (equal?
     (compilation-struct 'x
       (list
-        (compilation "foo" (constant "foo"))
-        (compilation "bar" (constant "bar"))))
+        (compilation "foo" (argument "foo"))
+        (compilation "bar" (argument "bar"))))
     (compilation
       (datum-struct 'x (list "foo" "bar"))
-      (constant-struct 'x (list (constant "foo") (constant "bar"))))))
+      (argument-struct 'x (list (argument "foo") (argument "bar"))))))
 
 (check
   (equal?
@@ -323,9 +323,9 @@
       (compilation-struct 'x
         (list
           (compilation 'foo (variable 1))
-          (compilation '(identity "foo") (constant "foo"))
+          (compilation '(identity "foo") (argument "foo"))
           (compilation 'bar (variable 2))
-          (compilation '(identity "bar") (constant "bar")))))
+          (compilation '(identity "bar") (argument "bar")))))
     (compilation
       (datum-struct 'x
         (list 'foo '(identity "foo") 'bar '(identity "bar")))
@@ -336,21 +336,21 @@
   (equal?
     (compilation-struct 'x
       (list
-        (compilation "foo" (constant "foo"))
+        (compilation "foo" (argument "foo"))
         (compilation-slice
-          (compilation "bar" (constant "bar"))
-          (compilation "goo" (constant "goo")))))
+          (compilation "bar" (argument "bar"))
+          (compilation "goo" (argument "goo")))))
     (compilation
       (datum-struct 'x
         (list
           "foo"
           (datum-slice "bar" "goo")))
-      (constant-struct 'x
+      (argument-struct 'x
         (list
-          (constant "foo")
-          (constant-slice
-            (constant "bar")
-            (constant "goo")))))))
+          (argument "foo")
+          (argument-slice
+            (argument "bar")
+            (argument "goo")))))))
 
 ; --- generate-parameter-compilation
 
@@ -393,18 +393,18 @@
   ($scope
     (stack-compilation
       (compilation 'v1 (parameter))
-      (compilation 'v2 (constant "foo"))
-      (compilation 'v3 (constant "bar"))))
+      (compilation 'v2 (argument "foo"))
+      (compilation 'v3 (argument "bar"))))
   (do
     (check
       (equal?
         (stack-compilation-ref $scope 0)
-        (compilation 'v3 (constant "bar")))))
+        (compilation 'v3 (argument "bar")))))
   (do
     (check
       (equal?
         (stack-compilation-ref $scope 1)
-        (compilation 'v2 (constant "foo")))))
+        (compilation 'v2 (argument "foo")))))
   (do
     (check
       (equal?

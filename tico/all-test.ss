@@ -5,7 +5,7 @@
   (tico binding)
   (tico block)
   (tico compilation)
-  (tico constant)
+  (tico argument)
   (tico datum)
   (tico definition)
   (tico entry)

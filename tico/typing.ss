@@ -26,7 +26,7 @@
     typing-args-application
     typing-parameter
     typing-variable
-    typing-constant
+    typing-argument
     scope-typing-abstraction
     typing-abstraction
     let-typing
@@ -45,7 +45,7 @@
     typing-being
     typing-access
     typing-assert
-    typing-constant-access
+    typing-argument-access
 
     typing-not-empty?
     typing->type
@@ -184,9 +184,9 @@
       (typing-type $typing)
       (layment-variable (typing-layment $typing) $index)))
 
-  (define (typing-constant $key-typing $value-typing)
+  (define (typing-argument $key-typing $value-typing)
     (typing
-      (constant-type
+      (argument-type
         (typing->type $key-typing)
         (typing-type $value-typing))
       (typing-layment $value-typing)))
@@ -225,9 +225,9 @@
         (typing-layment $typing)
         (list (typing-layment $arg)))))
 
-  (define (typing-constant-access $typing $arg)
+  (define (typing-argument-access $typing $arg)
     (typing
-      (type-constant-access
+      (type-argument-access
         (typing-type $typing)
         (typing-type $arg))
       (typing-layment $typing)))
@@ -351,7 +351,7 @@
 
   (define (typing-being $key-typing $value-typing)
     (type->typing
-      (constant-type
+      (argument-type
         (typing->type $key-typing)
         (typing->type $value-typing))))
 

@@ -7,34 +7,34 @@
     evaluation-promote)
   (import
     (micascheme)
-    (tico constant)
+    (tico argument)
     (tico variable)
     (tico parameter)
     (tico datum))
 
-  ;(enum (evaluation constant variable parameter))
+  ;(enum (evaluation argument variable parameter))
 
   (define (evaluations-combine $evaluations)
     (cond
-      ((for-all constant? $evaluations) #f)
+      ((for-all argument? $evaluations) #f)
       ((exists parameter? $evaluations) (parameter))
       (else (variable-flatten (filter variable? $evaluations)))))
 
   (define (evaluation-application $target $args)
     (or
       (evaluations-combine (cons $target $args))
-      (constant-application $target $args)))
+      (argument-application $target $args)))
 
   (define (evaluation-struct $name $evaluations)
     (or
       (evaluations-combine $evaluations)
-      (constant-struct $name $evaluations)))
+      (argument-struct $name $evaluations)))
 
   (define (evaluation-args-application-opt $target $args)
     (lets
       ($evaluations (list $target $args))
       (cond
-        ((for-all constant? $evaluations) #f)
+        ((for-all argument? $evaluations) #f)
         ((exists parameter? $evaluations) (parameter))
         (else
           (lets
@@ -44,7 +44,7 @@
 
   (define (evaluation-promote $evaluation $arity)
     (switch-exclusive $evaluation
-      ((constant? $constant) #f)
+      ((argument? $argument) #f)
       ((variable? $variable) (variable-promote $variable $arity))
       ((parameter? $parameter) $parameter)))
 )

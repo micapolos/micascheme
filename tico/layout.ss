@@ -154,8 +154,8 @@
         (layout-abstraction
           (list (type->layout (property-param $property)))
           (type->layout (property-body $property))))
-      ((constant-type? $constant-type)
-        (type->layout (constant-type-value $constant-type)))
+      ((argument-type? $argument-type)
+        (type->layout (argument-type-value $argument-type)))
       ((list-of? $list-of)
         (simple-layout))
       ((else $type)
