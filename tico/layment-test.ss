@@ -1,5 +1,6 @@
 (import
   (micascheme)
+  (tico arity)
   (tico layout)
   (tico layment)
   (tico compilation)
@@ -133,7 +134,7 @@
       (layout-application
         (layout-abstraction
           (list (simple-layout) (simple-layout))
-          (simple-layout))
+          (list (simple-layout)))
         (list (simple-layout) (simple-layout)))
       (compilation-application
         (arity 1)

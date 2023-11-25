@@ -99,10 +99,10 @@
   (define (layout-not-empty? $layout)
     (not (layout-empty? $layout)))
 
-  (define (layout-abstraction $param-layouts $body-layout)
+  (define (layout-abstraction $param-layouts $body-layouts)
     (lambda-layout
       (make-struct-layout $param-layouts)
-      $body-layout))
+      (make-struct-layout $body-layouts)))
 
   (define (layout-application $target $args)
     (switch $target
@@ -157,11 +157,11 @@
       ((arrow? $arrow)
         (layout-abstraction
           (map type->layout (arrow-params $arrow))
-          (type->layout (arrow-result $arrow))))
+          (list (type->layout (arrow-result $arrow)))))
       ((property? $property)
         (layout-abstraction
           (list (type->layout (property-param $property)))
-          (type->layout (property-body $property))))
+          (list (type->layout (property-body $property)))))
       ((argument-type? $argument-type)
         (type->layout (argument-type-value $argument-type)))
       ((list-of? $list-of)

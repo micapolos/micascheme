@@ -1,5 +1,6 @@
 (import
   (micascheme)
+  (tico arity)
   (tico layout)
   (tico type))
 
@@ -91,10 +92,10 @@
   (equal?
     (layout-abstraction
       (list (empty-layout) (simple-layout))
-      (simple-layout))
+      (list (simple-layout)))
     (lambda-layout
       (make-struct-layout (list (empty-layout) (simple-layout)))
-      (simple-layout))))
+      (make-struct-layout (list (simple-layout))))))
 
 ; --- layout-application
 
@@ -147,22 +148,22 @@
           (value-type "foo")
           (unchecked-type))
         (unchecked-type)))
-    (lambda-layout
-      (make-struct-layout
-        (list
-          (empty-layout)
-          (native-layout)))
-      (native-layout))))
+    (layout-abstraction
+      (list
+        (empty-layout)
+        (native-layout))
+      (list
+        (native-layout)))))
 
 (check
   (equal?
     (type->layout
-      (property 
+      (property
         (string-type)
         (number-type)))
     (layout-abstraction
       (list (type->layout (string-type)))
-      (type->layout (number-type)))))
+      (list (type->layout (number-type))))))
 
 (check
   (equal?

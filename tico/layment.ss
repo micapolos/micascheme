@@ -124,7 +124,7 @@
     (make-layment
       (layout-abstraction
         (map layment-layout $param-layments)
-        (layment-layout $body-layment))
+        (list (layment-layout $body-layment)))
       (compilation-abstraction
         (layment-compilation $scope)
         (filter-opts (map layment-compilation $param-layments))
