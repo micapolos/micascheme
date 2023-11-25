@@ -45,16 +45,16 @@
 
 (check (equal? (app (lambda (x y) (string-append x y)) "foo" "bar") "foobar"))
 
-; === app-values ===
+; === values-app ===
 
 (check
   (equal?
-    (app-splicing
-      string-append
+    (values-app
+      (2 (values string-append "a"))
       (0 (values))
-      (1 (values "a"))
-      (2 (values "b" "c")))
-    "abc"))
+      (1 (values "b"))
+      (2 (values "c" "d")))
+    "abcd"))
 
 ; === app-splicing ===
 

@@ -15,7 +15,7 @@
     once-proc
     checking-once
     raises?
-    app app-values
+    app values-app
     (rename
       (slice list->slice)
       (slice! slice))
@@ -288,10 +288,10 @@
   (define (nonnegative-integer? $obj)
     (and (integer? $obj) (nonnegative? $obj)))
 
-  (define-syntax app-values
+  (define-syntax values-app
     (lambda ($syntax)
       (syntax-case $syntax ()
-        ((_ $fn ($arity $expr) ...)
+        ((_ ($arity $expr) ...)
           (and
             (for-all integer? (datum ($arity ...)))
             (for-all nonnegative? (datum ($arity ...))))
@@ -304,7 +304,7 @@
                   #,@(map
                     (lambda ($tmps $expr) #`((#,@$tmps) #,$expr))
                     $tmps $exprs))
-                ($fn #,@(apply append $tmps))))))))
+                (#,@(apply append $tmps))))))))
 
   (define-syntax app-splicing
     (lambda ($syntax)
