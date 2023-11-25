@@ -1,5 +1,6 @@
 (library (tico evaluation)
   (export
+    evaluations-combine
     evaluation-application
     evaluation-struct
     evaluation-args-application-opt
@@ -13,33 +14,21 @@
 
   ;(enum (evaluation constant variable parameter))
 
+  (define (evaluations-combine $evaluations)
+    (cond
+      ((for-all constant? $evaluations) #f)
+      ((exists parameter? $evaluations) (parameter))
+      (else (variable-flatten (filter variable? $evaluations)))))
+
   (define (evaluation-application $target $args)
-    (lets
-      ($evaluations (cons $target $args))
-      (cond
-        ((for-all constant? $evaluations)
-          (constant-application $target $args))
-        ((exists parameter? $evaluations)
-          (parameter))
-        (else
-          (lets
-            ($variables (filter variable? $evaluations))
-            ($parameters (ensure null? (filter parameter? $evaluations)))
-            ($variable (variable-flatten $variables))
-            (variable (variable-index $variable)))))))
+    (or
+      (evaluations-combine (cons $target $args))
+      (constant-application $target $args)))
 
   (define (evaluation-struct $name $evaluations)
-    (cond
-      ((for-all constant? $evaluations)
-        (constant-struct $name $evaluations))
-      ((exists parameter? $evaluations)
-        (parameter))
-      (else
-        (lets
-          ($variables (filter variable? $evaluations))
-          ($parameters (ensure null? (filter parameter? $evaluations)))
-          ($variable (variable-flatten $variables))
-          (variable (variable-index $variable))))))
+    (or
+      (evaluations-combine $evaluations)
+      (constant-struct $name $evaluations)))
 
   (define (evaluation-args-application-opt $target $args)
     (lets
