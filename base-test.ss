@@ -49,12 +49,23 @@
 
 (check
   (equal?
-    (app-values string-append "a" "b" "c")
+    (app-splicing
+      string-append
+      (0 (values))
+      (1 (values "a"))
+      (2 (values "b" "c")))
+    "abc"))
+
+; === app-splicing ===
+
+(check
+  (equal?
+    (app-splicing string-append "a" "b" "c")
     "abc"))
 
 (check
   (equal?
-    (app-values
+    (app-splicing
       string-append
       "a"
       (0 (values))

@@ -62,13 +62,13 @@
     `(lambda (,@$params) ,$body))
 
   (define (datum-application $target $args)
-    `(app-values ,$target ,@$args))
+    `(app-splicing ,$target ,@$args))
 
   (define (datum-args-application $target $args)
     `(,$target ,@$args))
 
   (define (datum-tuple $items)
-    `(app-values tuple ,@$items))
+    `(app-splicing tuple ,@$items))
 
   (define (tuple-ref-datum $arity $tuple $index)
     `(tuple-ref ,$arity ,$tuple ,$index))

@@ -21,6 +21,7 @@
       (slice! slice))
     slice? slice-items
     splice-value splice
+    app-splicing
     single? single force-single
     bindings-eval
     script
@@ -288,6 +289,24 @@
     (and (integer? $obj) (nonnegative? $obj)))
 
   (define-syntax app-values
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $fn ($arity $expr) ...)
+          (and
+            (for-all integer? (datum ($arity ...)))
+            (for-all nonnegative? (datum ($arity ...))))
+          (lets
+            ($arities (map syntax->datum (syntax->list #'($arity ...))))
+            ($exprs (syntax->list #'($expr ...)))
+            ($tmps (map generate-temporaries (map iota $arities)))
+            #`(let-values
+                (
+                  #,@(map
+                    (lambda ($tmps $expr) #`((#,@$tmps) #,$expr))
+                    $tmps $exprs))
+                ($fn #,@(apply append $tmps))))))))
+
+  (define-syntax app-splicing
     (lambda ($syntax)
       (syntax-case $syntax ()
         ((_ $fn $item ...)

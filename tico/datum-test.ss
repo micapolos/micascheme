@@ -28,7 +28,7 @@
 (check
   (equal?
   	(datum-application 'fn (list 'v1 'v2))
-  	'(app-values fn v1 v2)))
+  	'(app-splicing fn v1 v2)))
 
 (check
  	(equal?
@@ -63,11 +63,11 @@
 			'(string-append foo bar))
 		"foobar"))
 
-(check (equal? (datum-tuple (list)) '(app-values tuple)))
-(check (equal? (datum-tuple (list 'v1)) '(app-values tuple v1)))
-(check (equal? (datum-tuple (list 'v1 'v2)) '(app-values tuple v1 v2)))
-(check (equal? (datum-tuple (list 'v1 'v2 'v3)) '(app-values tuple v1 v2 v3)))
-(check (equal? (datum-tuple (list 'v1 (datum-slice 'v2 'v3))) '(app-values tuple v1 (2 (values v2 v3)))))
+(check (equal? (datum-tuple (list)) '(app-splicing tuple)))
+(check (equal? (datum-tuple (list 'v1)) '(app-splicing tuple v1)))
+(check (equal? (datum-tuple (list 'v1 'v2)) '(app-splicing tuple v1 v2)))
+(check (equal? (datum-tuple (list 'v1 'v2 'v3)) '(app-splicing tuple v1 v2 v3)))
+(check (equal? (datum-tuple (list 'v1 (datum-slice 'v2 'v3))) '(app-splicing tuple v1 (2 (values v2 v3)))))
 
 (check (equal? (tuple-ref-datum 1 'v 0) '(tuple-ref 1 v 0)))
 (check (equal? (tuple-ref-datum 2 'v 0) '(tuple-ref 2 v 0)))
