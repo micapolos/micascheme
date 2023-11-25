@@ -2,6 +2,7 @@
   (export
     constant constant? constant-values
     constant-value
+    constants-values
     datum->constant
     bindings-datum->constant
     constant-arity
@@ -14,9 +15,19 @@
     (micascheme)
     (tico arity)
     (tico datum)
-    (tico value))
+    (tico value)
+    (evaluator))
 
   (data (constant . values))
+
+  (define constant-environment
+    (environment
+      '(micascheme)
+      '(tico type)
+      '(tico tuple)))
+
+  (define (constants-values $constants)
+    (apply append (map constant-values $constants)))
 
   (define (constant-value $constant)
     (force-single (constant-values $constant)))
@@ -28,8 +39,10 @@
     (bindings-datum->constant (stack) $datum))
 
   (define (bindings-datum->constant $bindings $datum)
-    (constant
-      (bindings-datum->value $bindings $datum)))
+    (apply constant
+      (evaluate
+        (evaluator constant-environment $bindings)
+        `(call-with-values (lambda () ,$datum) list))))
 
   (define (constant-slice . $constants)
     (constant (apply slice (map constant-value $constants))))

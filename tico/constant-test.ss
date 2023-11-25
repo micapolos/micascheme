@@ -9,8 +9,32 @@
 
 (check
   (equal?
+    (constants-values
+      (list
+        (constant)
+        (constant 1)
+        (constant 2 3)))
+    (list 1 2 3)))
+
+(check
+  (equal?
     (datum->constant '(string-append "foo" "bar"))
     (constant (datum->value '(string-append "foo" "bar")))))
+
+(check
+  (equal?
+    (datum->constant '(values))
+    (constant)))
+
+(check
+  (equal?
+    (datum->constant '(values 1))
+    (constant 1)))
+
+(check
+  (equal?
+    (datum->constant '(values 1 2))
+    (constant 1 2)))
 
 (check
   (equal?
