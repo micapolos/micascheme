@@ -3,6 +3,7 @@
     constant constant? constant-value
     datum->constant
     bindings-datum->constant
+    constant-slice
     constant-application
     constant-abstraction
     constant-struct
@@ -20,6 +21,9 @@
   (define (bindings-datum->constant $bindings $datum)
     (constant
       (bindings-datum->value $bindings $datum)))
+
+  (define (constant-slice . $constants)
+    (constant (apply slice (map constant-value $constants))))
 
   (define (constant-application $target $args)
     (constant

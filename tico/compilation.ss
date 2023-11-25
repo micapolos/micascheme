@@ -227,7 +227,7 @@
       (cond
         ((for-all constant? $evaluations)
           (compilation $datum
-            (constant (apply slice (map constant-value $evaluations)))))
+            (apply constant-slice $evaluations)))
         (else
           (compilation $datum
             (cond
