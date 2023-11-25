@@ -1,6 +1,7 @@
 (import (micascheme))
 
 (test
+  (tico arity)
   (tico binding)
   (tico block)
   (tico compilation)
@@ -10,6 +11,7 @@
   (tico entry)
   (tico evaluation)
   (tico expression)
+  (tico index)
   (tico layment)
   (tico layout)
   (tico packet)
