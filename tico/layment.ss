@@ -95,13 +95,16 @@
       (filter layment-not-empty? $layments)))
 
   (define (layment-application $target $args)
-    (make-layment
-      (layout-application
-        (layment-layout $target)
-        (map layment-layout $args))
-      (compilation-application
-        (layment-compilation $target)
-        (layments->compilations $args))))
+    (lets
+      ($layout
+        (layout-application
+          (layment-layout $target)
+          (map layment-layout $args)))
+      (make-layment $layout
+        (compilation-application
+          (layout-arity $layout)
+          (layment-compilation $target)
+          (layments->compilations $args)))))
 
   (define (layment-args-application $scope $target $args)
     (make-layment

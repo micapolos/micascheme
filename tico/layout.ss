@@ -14,6 +14,7 @@
 
     layout-empty?
     layout-not-empty?
+    layout-arity
     type->layout
 
     literal->layout
@@ -31,6 +32,7 @@
     list-layout)
   (import
     (micascheme)
+    (tico arity)
     (tico type))
 
   (data (empty-layout))
@@ -53,6 +55,18 @@
       ((lambda-layout? $lambda-layout)
         (layout-empty? (lambda-layout-body $lambda-layout)))
       ((else $other) #f))) ; (throw not-layout $other))))
+
+  (define (layout-arity $layout)
+    (switch-exclusive $layout
+      ((empty-layout? _) (arity 0))
+      ((native-layout? _) (arity 1))
+      ((simple-layout? _) (arity 1))
+      ((struct-layout? $struct-layout)
+        (arity (struct-layout-size $struct-layout)))
+      ((lambda-layout? $lambda-layout)
+        (if (layout-empty? (lambda-layout-body $lambda-layout))
+          (arity 0)
+          (arity 1)))))
 
   (define empty-struct-layout
     (struct-layout (list) 0))

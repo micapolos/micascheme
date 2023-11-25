@@ -3,6 +3,8 @@
   (tico layout)
   (tico type))
 
+; --- layout-empty?
+
 (check (equal? (layout-empty? (empty-layout)) #t))
 (check (equal? (layout-empty? (simple-layout)) #f))
 (check (equal? (layout-empty? (native-layout)) #f))
@@ -15,6 +17,20 @@
 
 (check (equal? (layout-not-empty? (empty-layout)) #f))
 (check (equal? (layout-not-empty? (simple-layout)) #t))
+
+; --- layout-arity
+
+(check (equal? (layout-arity (empty-layout)) (arity 0)))
+(check (equal? (layout-arity (simple-layout)) (arity 1)))
+(check (equal? (layout-arity (native-layout)) (arity 1)))
+
+(check (equal? (layout-arity (struct-layout (stack (empty-layout)) 0)) (arity 0)))
+(check (equal? (layout-arity (struct-layout (stack (simple-layout)) 1)) (arity 1)))
+(check (equal? (layout-arity (struct-layout (stack (simple-layout) (simple-layout)) 2)) (arity 2)))
+
+(check (equal? (layout-arity (lambda-layout (stack) (empty-layout))) (arity 0)))
+(check (equal? (layout-arity (lambda-layout (stack) (simple-layout))) (arity 1)))
+
 
 ; --- literal->layout
 

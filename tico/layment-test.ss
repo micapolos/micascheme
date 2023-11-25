@@ -108,6 +108,7 @@
     (make-layment
       (simple-layout)
       (compilation-application
+        (arity 1)
         (datum->compilation 'string-append)
         (list
           (literal->compilation "foo")
@@ -135,6 +136,7 @@
           (simple-layout))
         (list (simple-layout) (simple-layout)))
       (compilation-application
+        (arity 1)
         (compilation-abstraction
           (empty-stack-compilation)
           (list

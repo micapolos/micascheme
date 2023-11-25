@@ -141,12 +141,12 @@
   (define (variable-compilation $datum $index)
     (compilation (arity 1) $datum (variable $index)))
 
-  (define (compilation-application $target $args)
+  (define (compilation-application $arity $target $args)
     (lets
       ($compilations (cons $target $args))
       ($arities (map compilation-arity $compilations))
       (compilation
-        (arity 1) ; TODO: Make it a parameter
+        $arity
         (cond
           ((for-all arity-single? $arities)
             (datum-application

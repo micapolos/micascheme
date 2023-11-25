@@ -120,6 +120,7 @@
 (check
   (equal?
     (compilation-application
+      (arity 1)
       (datum->compilation 'string-append)
       (list
         (literal->compilation "foo")
@@ -132,6 +133,7 @@
 (check
   (equal?
     (compilation-application
+      (arity 1)
       (datum->compilation '(values string-append "foo"))
       (list
         (datum->compilation '(values))
@@ -149,6 +151,7 @@
   (equal?
     (with-generate-temporary-seed $tmp
       (compilation-application
+        (arity 1)
         (datum->compilation 'string-append)
         (list
           (variable-compilation 'foo 1)
@@ -163,6 +166,7 @@
   (equal?
     (with-generate-temporary-seed $tmp
       (compilation-application
+        (arity 1)
         (parameter-compilation 'string-append)
         (list
           (variable-compilation 'foo 1)
@@ -177,6 +181,7 @@
 (check
   (equal?
     (compilation-application
+      (arity 1)
       (compilation-abstraction
         (stack-compilation
           (argument-compilation 'excl (argument "!")))
@@ -203,6 +208,7 @@
 (check
   (equal?
     (compilation-application
+      (arity 1)
       (compilation-abstraction
         (empty-stack-compilation)
         (list
@@ -222,6 +228,7 @@
 (check
   (equal?
     (compilation-application
+      (arity 1)
       (compilation-abstraction
         (empty-stack-compilation)
         (list
@@ -232,6 +239,7 @@
         (literal->compilation "foo")
         (literal->compilation "bar")))
     (compilation-application
+      (arity 1)
       (datum->compilation
         (datum-abstraction
           (list 'v1 'v2)
