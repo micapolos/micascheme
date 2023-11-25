@@ -7,9 +7,7 @@
     bindings-datum->argument
     argument-arity
     argument-application
-    argument-application-2
     argument-abstraction
-    argument-abstraction-2
     argument-tuple
     argument-tuple-ref
     argument-struct
@@ -52,26 +50,16 @@
           list))))
 
   (define (argument-application $target $args)
-    (argument
-      (value-application
-        (argument-value $target)
-        (map argument-value $args))))
-
-  (define (argument-application-2 $target $args)
     (lets
       ($values (arguments-values (cons $target $args)))
-      (do (unless (pair? $values) (throw argument-application-2 $target $args)))
+      (do (unless (pair? $values) (throw argument-application $target $args)))
       ($target (car $values))
       ($args (cdr $values))
       (call-with-values
         (lambda () (apply $target $args))
         argument)))
 
-  (define (argument-abstraction $arity $body)
-    (argument
-      (value-abstraction $arity (argument-value $body))))
-
-  (define (argument-abstraction-2 $arity $body-arguments)
+  (define (argument-abstraction $arity $body-arguments)
     (lets
       ($body-values (arguments-values $body-arguments))
       ($body-symbols (generate-symbols (length $body-values)))

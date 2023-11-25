@@ -64,20 +64,20 @@
 (check
   (equal?
     (argument-application
-      (argument-abstraction 2 (argument "foo"))
+      (argument-abstraction 2 (list (argument "foo")))
       (list (argument 10) (argument 20)))
     (argument "foo")))
 
 (check
   (equal?
-    (argument-application-2
+    (argument-application
       (argument string-append)
       (list (argument "foo") (argument "bar")))
     (argument "foobar")))
 
 (check
   (equal?
-    (argument-application-2
+    (argument-application
       (argument string-append "foo")
       (list
         (argument)
@@ -88,7 +88,7 @@
 (check
   (raises?
     (lambda ()
-      (argument-application-2
+      (argument-application
         (argument)
         (list)))))
 
@@ -97,7 +97,7 @@
 (check
   (equal?
     (argument-application
-      (argument-abstraction-2 2
+      (argument-abstraction 2
         (list (argument "res")))
       (list
         (argument "arg1")
@@ -106,8 +106,8 @@
 
 (check
   (equal?
-    (argument-application-2
-      (argument-abstraction-2 2
+    (argument-application
+      (argument-abstraction 2
         (list
           (argument)
           (argument "res1")
