@@ -14,6 +14,13 @@
 
 (check (equal? (point-unpack (point "a" "b" ) string-append) "ab"))
 
+(check
+  (equal?
+    (lets
+      ((point x y) (point "a" "b"))
+      (string-append x y))
+    "ab"))
+
 ; === data vararg ===
 
 (data (vpoint x y . v))
@@ -31,6 +38,13 @@
 (check (not (= (equal-hash (vpoint 1 2 3 4)) (equal-hash (vpoint 1 2 3 5)))))
 
 (check (equal? (vpoint-unpack (vpoint "a" "b" "c" "d") string-append) "abcd"))
+
+(check
+  (equal?
+    (lets
+      ((vpoint x y . z) (vpoint "a" "b" "c" "d"))
+      (string-append x y (apply string-append z)))
+    "abcd"))
 
 ; === enum ===
 

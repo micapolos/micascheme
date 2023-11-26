@@ -197,7 +197,7 @@
   (define-syntax-rule (build-identifier ($var $id) $body)
     (datum->syntax $id
       (string->symbol 
-        (lets ($var (symbol->string (syntax->datum $id))) $body))))
+        (let (($var (symbol->string (syntax->datum $id)))) $body))))
 
   (define (bind-if $pred $obj $fn)
     (if ($pred $obj) ($fn $obj) $obj))
@@ -236,6 +236,20 @@
             (((values $id ...) $expr)
               #`(let-values ((($id ...) $expr))
                 (lets $decls ... $result)))
+            ((($name $id ...) $expr)
+              #`(
+                #,(build-identifier ($string #'$name)
+                  (string-append $string "-unpack"))
+                $expr
+                (lambda ($id ...)
+                  (lets $decls ... $result))))
+            ((($name $id ... . $last-id) $expr)
+              #`(
+                #,(build-identifier ($string #'$name)
+                  (string-append $string "-unpack"))
+                $expr
+                (lambda ($id ... . $last-id)
+                  (lets $decls ... $result))))
             (($id (rec $expr))
               #`(letrec (($id $expr))
                 (lets $decls ... $result)))
