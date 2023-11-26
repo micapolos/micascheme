@@ -190,21 +190,21 @@
         (typing-type $value-typing))
       (typing-layment $value-typing)))
 
-  (define (typing-abstraction $param-typings $body-typing)
+  (define (typing-abstraction $param-typings $body-typings)
     (scope-typing-abstraction
       (empty-stack-typing)
       $param-typings
-      $body-typing))
+      $body-typings))
 
-  (define (scope-typing-abstraction $scope $param-typings $body-typing)
+  (define (scope-typing-abstraction $scope $param-typings $body-typings)
     (typing
       (type-abstraction
         (map typing-type $param-typings)
-        (list (typing-type $body-typing)))
+        (map typing-type $body-typings))
       (scope-layment-abstraction
         (typing-layment $scope)
         (map typing-layment $param-typings)
-        (list (typing-layment $body-typing)))))
+        (map typing-layment $body-typings))))
 
   (define (typing-property $param-type $body-typing)
     (lets
@@ -362,7 +362,9 @@
           $parameter-typings
           (reverse (indices (length $parameter-typings)))))
       (typing-application
-        (typing-abstraction $parameter-typings ($fn $variable-typings))
+        (typing-abstraction
+          $parameter-typings
+          (list ($fn $variable-typings)))
         $typings)))
 
   (define (make-list-typing $arity $type)
@@ -404,7 +406,10 @@
 
   (define (typings-do $scope $parameter-typings $argument-typings $body-typing)
     (typing-application
-      (scope-typing-abstraction $scope $parameter-typings $body-typing)
+      (scope-typing-abstraction
+        $scope
+        $parameter-typings
+        (list $body-typing))
       $argument-typings))
 
   (define (empty-stack-typing)

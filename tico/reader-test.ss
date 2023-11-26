@@ -159,8 +159,9 @@
         (typing-application
           (typing-abstraction
             $params
-            (typing-struct 'exclamated
-              (list (variable-typing (string-type) '$tmp-0 0))))
+            (list
+              (typing-struct 'exclamated
+                (list (variable-typing (string-type) '$tmp-0 0)))))
           (reverse (read-typings "foo" exclamate)))))))
 
 (check
@@ -178,8 +179,9 @@
             (generate-parameter-typing (string-type))
             (generate-parameter-typing (struct 'and (list (number-type))))))
         (typing-application
-          (typing-abstraction $params
-            (variable-typing (string-type) '$tmp-0 1))
+          (typing-abstraction
+            $params
+            (list (variable-typing (string-type) '$tmp-0 1)))
           (reverse (read-typings "foo" (and 128))))))))
 
 (check

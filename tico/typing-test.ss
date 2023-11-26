@@ -121,9 +121,10 @@
       (list
         (parameter-typing (string-type) '$string)
         (parameter-typing (struct 'exclamate (list)) '$empty))
-      (typing-struct 'exclamated
-        (list
-          (typing-variable (parameter-typing (string-type) '$string) 1))))
+      (list
+        (typing-struct 'exclamated
+          (list
+            (typing-variable (parameter-typing (string-type) '$string) 1)))))
     (typing
       (type-abstraction
         (list

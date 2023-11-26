@@ -216,7 +216,7 @@
                       (scope-typing-abstraction
                         (bindings-stack-typing $bindings)
                         $param-typings
-                        $doing-typing))
+                        (list $doing-typing)))
                     $end)))))
           ((promising)
             (typing-reader $bindings
