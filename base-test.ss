@@ -85,6 +85,36 @@
       ((number? $number) (number->string $number)))
     "128"))
 
+; === world ===
+
+(let ()
+  (world
+    (linear
+      ((enter $value)
+        (lambda (_) $value))
+      ((bind $linear $fn)
+        (lambda ($x)
+          (($fn ($linear $x)) $x)))))
+
+  (define (linear-at $linear $x)
+    ($linear $x))
+
+  (check
+    (equal?
+      (linear-at (linear 10) 128)
+      10))
+
+  (check
+    (equal?
+      (linear-at
+        (linear-bind sin
+          (lambda ($sin)
+            (linear (+ $sin 1))))
+        10)
+      (+ 1 (sin 10))))
+
+  (void))
+
 ; === app ===
 
 (check (equal? (app (lambda (x y) (string-append x y)) "foo" "bar") "foobar"))
