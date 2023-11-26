@@ -143,7 +143,8 @@
           (list
             (parameter-compilation 'v1)
             (parameter-compilation 'v2))
-          (variable-compilation 'v1 0))
+          (list
+            (variable-compilation 'v1 0)))
         (list
           (literal->compilation "foo")
           (literal->compilation "bar"))))))

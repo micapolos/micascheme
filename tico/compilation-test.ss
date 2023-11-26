@@ -188,11 +188,12 @@
         (list
           (parameter-compilation 'foo)
           (parameter-compilation 'bar))
-        (compilation-struct 'foo
-          (list
-            (variable-compilation 'foo 1)
-            (variable-compilation 'bar 0)
-            (argument-compilation 'excl (argument "!")))))
+        (list
+          (compilation-struct 'foo
+            (list
+              (variable-compilation 'foo 1)
+              (variable-compilation 'bar 0)
+              (argument-compilation 'excl (argument "!"))))))
       (list
         (literal->compilation "foo")
         (literal->compilation "bar")))
@@ -214,7 +215,8 @@
         (list
           (parameter-compilation 'v1)
           (parameter-compilation 'v2))
-        (literal->compilation "foobar"))
+        (list
+          (literal->compilation "foobar")))
       (list
         (literal->compilation "foo")
         (literal->compilation "bar")))
@@ -234,7 +236,8 @@
         (list
           (parameter-compilation 'v1)
           (parameter-compilation 'v2))
-        (variable-compilation '(string-append v1 v2) 1))
+        (list
+          (variable-compilation '(string-append v1 v2) 1)))
       (list
         (literal->compilation "foo")
         (literal->compilation "bar")))
@@ -255,12 +258,108 @@
       (list
         (parameter-compilation 'v1)
         (parameter-compilation 'v2))
-      (variable-compilation '(string-append v1 v2) 3))
+      (list
+        (variable-compilation '(string-append v1 v2) 3)))
     (variable-compilation
       (datum-abstraction
         (list 'v1 'v2)
         '(string-append v1 v2))
       1)))
+
+(check
+  (equal?
+    (compilation-abstraction
+      (empty-stack-compilation)
+      (list
+        (parameter-compilation 'v1)
+        (parameter-compilation 'v2))
+      (list
+        (variable-compilation '(string-append v1 v2) 3)))
+    (variable-compilation
+      (datum-abstraction
+        (list 'v1 'v2)
+        '(string-append v1 v2))
+      1)))
+
+(check
+  (equal?
+    (compilation-application
+      (arity 2)
+      (compilation-abstraction
+        (empty-stack-compilation)
+        (list
+          (parameter-compilation 'v1)
+          (parameter-compilation 'v2))
+        (list
+          (literal->compilation "foo")
+          (literal->compilation "bar")))
+      (list
+        (literal->compilation "v1")
+        (literal->compilation "v2")))
+    (compilation
+      (arity 2)
+      '((lambda (v1 v2) (values "foo" "bar")) "v1" "v2")
+      (argument "foo" "bar"))))
+
+(check
+  (equal?
+    (compilation-application
+      (arity 2)
+      (compilation-abstraction
+        (empty-stack-compilation)
+        (list
+          (parameter-compilation 'v1)
+          (parameter-compilation 'v2))
+        (list
+          (variable-compilation 'v1 1)
+          (variable-compilation 'v2 0)))
+      (list
+        (literal->compilation "v1")
+        (literal->compilation "v2")))
+    (compilation
+      (arity 2)
+      '((lambda (v1 v2) (values v1 v2)) "v1" "v2")
+      (argument "v1" "v2"))))
+
+(check
+  (equal?
+    (compilation-application
+      (arity 2)
+      (compilation-abstraction
+        (empty-stack-compilation)
+        (list
+          (parameter-compilation 'v1)
+          (parameter-compilation 'v2))
+        (list
+          (variable-compilation 'v3 3)
+          (variable-compilation 'v4 2)))
+      (list
+        (literal->compilation "v1")
+        (literal->compilation "v2")))
+    (compilation
+      (arity 2)
+      '((lambda (v1 v2) (values v3 v4)) "v1" "v2")
+      (variable 1))))
+
+(check
+  (equal?
+    (compilation-application
+      (arity 2)
+      (compilation-abstraction
+        (empty-stack-compilation)
+        (list
+          (parameter-compilation 'v1)
+          (parameter-compilation 'v2))
+        (list
+          (parameter-compilation 'v3)
+          (parameter-compilation 'v4)))
+      (list
+        (literal->compilation "v1")
+        (literal->compilation "v2")))
+    (compilation
+      (arity 2)
+      '((lambda (v1 v2) (values v3 v4)) "v1" "v2")
+      (parameter))))
 
 ; --- compilation-args
 

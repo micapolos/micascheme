@@ -128,7 +128,7 @@
       (compilation-abstraction
         (layment-compilation $scope)
         (filter-opts (map layment-compilation $param-layments))
-        (layment-compilation $body-layment))))
+        (list (layment-compilation $body-layment)))))
 
   (define (parameter-layment $layout $datum)
     (make-layment $layout

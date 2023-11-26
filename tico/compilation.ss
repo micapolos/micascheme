@@ -178,22 +178,27 @@
             (stack-compilation-bindings $scope)
             $datum)))))
 
-  (define (compilation-abstraction $scope $param-compilations $body-compilation)
+  (define (compilation-abstraction $scope $param-compilations $body-compilations)
     (lets
       ($datum
         (datum-abstraction
           (map compilation-datum $param-compilations)
-          (compilation-datum $body-compilation)))
+          (values-datum (map compilation-datum $body-compilations))))
       (compilation
         (arity 1)
         $datum
-        (or
-          (evaluation-promote
-            (compilation-evaluation $body-compilation)
-            (length $param-compilations))
-          (bindings-datum->argument
-            (stack-compilation-bindings $scope)
-            $datum)))))
+        (lets
+          ($evaluation-opt
+            (evaluations-combine
+              (map compilation-evaluation $body-compilations)))
+          ($evaluation-opt
+            (and $evaluation-opt
+              (evaluation-promote $evaluation-opt
+                (length $param-compilations))))
+          (or $evaluation-opt
+            (bindings-datum->argument
+              (stack-compilation-bindings $scope)
+              $datum))))))
 
   (define (compilation-struct $name $compilations)
     (compilation
