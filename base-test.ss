@@ -12,8 +12,6 @@
 (check (= (equal-hash (point 1 2)) (equal-hash (point 1 2))))
 (check (not (= (equal-hash (point 1 2)) (equal-hash (point 1 3)))))
 
-(check (equal? (point-unpack (point "a" "b" ) string-append) "ab"))
-
 (check
   (equal?
     (lets
@@ -43,8 +41,6 @@
 
 (check (= (equal-hash (vpoint 1 2 3 4)) (equal-hash (vpoint 1 2 3 4))))
 (check (not (= (equal-hash (vpoint 1 2 3 4)) (equal-hash (vpoint 1 2 3 5)))))
-
-(check (equal? (vpoint-unpack (vpoint "a" "b" "c" "d") string-append) "abcd"))
 
 (check
   (equal?

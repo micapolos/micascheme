@@ -230,69 +230,101 @@
 
   (define-syntax lets
     (lambda ($syntax)
-      (syntax-case $syntax (do)
-        ((_ $decl $decls ... $result)
-          (syntax-case #`$decl (do rec values)
-            (((values $id ...) $expr)
-              #`(let-values ((($id ...) $expr))
-                (lets $decls ... $result)))
-            ((($name $spec ...) $expr)
-              (identifier? #'$name)
-              (let*
-                (
-                  ($id-spec-pairs
-                    (map
-                      (lambda ($spec)
-                        (cond
-                          ((identifier? $spec) (cons $spec #f))
-                          (else
-                            (let
-                              (($tmp (car (generate-temporaries '(tmp)))))
-                              (cons $tmp #`(#,$spec #,$tmp))))))
-                      (syntax->list #'($spec ...))))
-                  ($ids (map car $id-spec-pairs))
-                  ($specs (filter (lambda (t) t) (map cdr $id-spec-pairs))))
-                #`(
-                  #,(build-identifier ($string #'$name)
-                    (string-append $string "-unpack"))
-                  $expr
-                  (lambda (#,@$ids)
-                    (lets #,@$specs $decls ... $result)))))
-            ((($name $spec ... . $last-id) $expr)
-              (and
+      (lambda (lookup)
+        (syntax-case $syntax (do)
+          ((_ $decl $decls ... $result)
+            (syntax-case #`$decl (do rec values)
+              (((values $id ...) $expr)
+                #`(let-values ((($id ...) $expr))
+                  (lets $decls ... $result)))
+              ((($name $spec ...) $expr)
                 (identifier? #'$name)
-                (identifier? #'$last-id))
-              (let*
-                (
-                  ($id-spec-pairs
-                    (map
-                      (lambda ($spec)
-                        (cond
-                          ((identifier? $spec) (cons $spec #f))
-                          (else
-                            (let
-                              (($tmp (car (generate-temporaries '(tmp)))))
-                              (cons $tmp #`(#,$spec #,$tmp))))))
-                      (syntax->list #'($spec ...))))
-                  ($ids (map car $id-spec-pairs))
-                  ($specs (filter (lambda (t) t) (map cdr $id-spec-pairs))))
-                #`(
-                  #,(build-identifier ($string #'$name)
-                    (string-append $string "-unpack"))
-                  $expr
-                  (lambda (#,@$ids . $last-id)
-                    (lets #,@$specs $decls ... $result)))))
-            (($id (rec $expr))
-              #`(letrec (($id $expr))
-                (lets $decls ... $result)))
-            (($id $expr)
-              #`(let (($id $expr))
-                (lets $decls ... $result)))
-            ($expr
-              #`(begin $expr
-              (lets $decls ... $result)))))
-        ((_ (do $result)) #`$result)
-        ((_ $result) #`$result))))
+                (let*
+                  (
+                    ($accessors (lookup #'$name #'data-accessors))
+                    ($tmp (car (generate-temporaries '(tmp))))
+                    ($id-spec-pairs
+                      (map
+                        (lambda ($spec)
+                          (cond
+                            ((identifier? $spec) (cons $spec #f))
+                            (else
+                              (let
+                                (($tmp (car (generate-temporaries '(tmp)))))
+                                (cons $tmp #`(#,$spec #,$tmp))))))
+                        (syntax->list #'($spec ...))))
+                    ($ids (map car $id-spec-pairs))
+                    ($specs (filter (lambda (t) t) (map cdr $id-spec-pairs))))
+                  (unless $accessors
+                    (syntax-error #'$name "not data"))
+                  (unless (= (length $accessors) (length $ids))
+                    (syntax-error #'($name $spec ...) "illegal number of matchers"))
+                  #`(let ((#,$tmp $expr))
+                    (let
+                      (#,@(map
+                        (lambda ($id $accessor)
+                          #`(
+                            #,$id
+                            (
+                              #,(datum->syntax #'$name $accessor)
+                              #,$tmp)))
+                        $ids
+                        $accessors))
+                      (lets #,@$specs $decls ... $result)))))
+              ((($name $spec ... . $last-id) $expr)
+                (identifier? #'$name)
+                (let*
+                  (
+                    ($accessors (lookup #'$name #'data-accessors))
+                    ($tail-accessor (lookup #'$name #'data-tail-accessor))
+                    ($tmp (car (generate-temporaries '(tmp))))
+                    ($id-spec-pairs
+                      (map
+                        (lambda ($spec)
+                          (cond
+                            ((identifier? $spec) (cons $spec #f))
+                            (else
+                              (let
+                                (($tmp (car (generate-temporaries '(tmp)))))
+                                (cons $tmp #`(#,$spec #,$tmp))))))
+                        (syntax->list #'($spec ...))))
+                    ($ids (map car $id-spec-pairs))
+                    ($specs (filter (lambda (t) t) (map cdr $id-spec-pairs))))
+                  (unless $accessors
+                    (syntax-error #'$name "not data"))
+                  (unless $tail-accessor
+                    (syntax-error #'$name "data without tail"))
+                  (unless (= (length $accessors) (length $ids))
+                    (syntax-error #'($name $spec ...) "illegal number of matchers"))
+                  #`(let ((#,$tmp $expr))
+                    (let
+                      (
+                        #,@(map
+                          (lambda ($id $accessor)
+                            #`(
+                              #,$id
+                              (
+                                #,(datum->syntax #'$name $accessor)
+                                #,$tmp)))
+                          $ids
+                          $accessors)
+                        (
+                          $last-id
+                          (
+                            #,(datum->syntax #'$name $tail-accessor)
+                            #,$tmp)))
+                      (lets #,@$specs $decls ... $result)))))
+              (($id (rec $expr))
+                #`(letrec (($id $expr))
+                  (lets $decls ... $result)))
+              (($id $expr)
+                #`(let (($id $expr))
+                  (lets $decls ... $result)))
+              ($expr
+                #`(begin $expr
+                (lets $decls ... $result)))))
+          ((_ (do $result)) #`$result)
+          ((_ $result) #`$result)))))
 
   (define-syntax opt-lets
     (syntax-rules ()
@@ -429,7 +461,8 @@
   (define (list-indexed $list)
     (map-indexed (lambda ($index $value) (indexed $value $index)) $list))
 
-  (define-aux-keyword data-fields)
+  (define-aux-keyword data-accessors)
+  (define-aux-keyword data-tail-accessor)
 
   (define-syntax data
     (lambda (stx)
@@ -448,7 +481,6 @@
             (rtd-name (build-identifier ($string #`name) (string-append $string "-rtd")))
             (prefix-name (string-append name-string "-"))
             (predicate-name (build-identifier ($string #`name) (string-append $string "?")))
-            (unpack-name (build-identifier ($string #`name) (string-append $string "-unpack")))
             (accessors
               (map
                 (lambda ($field)
@@ -516,20 +548,10 @@
                   ((record-constructor #,rtd-name) field ... list-field-opt))
                 #`(define name
                   (record-constructor #,rtd-name)))
-              (define (#,unpack-name $record $fn)
-                #,(if list-accessor-opt
-                  #`(apply $fn
-                    (list*
-                      #,@(map
-                        (lambda ($accessor) #`(#,$accessor $record))
-                        accessors)
-                      (#,list-accessor-opt $record)))
-                  #`($fn
-                    #,@(map
-                      (lambda ($accessor) #`(#,$accessor $record))
-                      accessors))))
-              (define-property name data-fields
-                (quote (#,@fields)))
+              (define-property name data-accessors
+                (quote (#,@accessors)))
+              (define-property name data-tail-accessor
+                (quote #,list-accessor-opt))
               (define #,predicate-name
                 (record-predicate #,rtd-name))
               #,@(map
