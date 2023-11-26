@@ -291,11 +291,11 @@
 (check (equal? (lets (x 1) x) 1))
 (check (equal? (lets (x 1) (do x)) 1))
 
-(check (equal? (lets ((x) 1) x) 1))
+(check (equal? (lets ((values x) 1) x) 1))
 
-(check (equal? (lets (() (values)) 1) 1))
-(check (equal? (lets ((x) (values 1)) x) 1))
-(check (equal? (lets ((x y) (values 3 2)) (- x y)) 1))
+(check (equal? (lets ((values) (values)) 1) 1))
+(check (equal? (lets ((values x) (values 1)) x) 1))
+(check (equal? (lets ((values x y) (values 3 2)) (- x y)) 1))
 
 (check
   (equal?
@@ -342,7 +342,7 @@
 ; === pair-values ===
 
 (lets
-  (($car $cdr) (pair-values (cons 1 2)))
+  ((values $car $cdr) (pair-values (cons 1 2)))
   (begin
     (check (equal? $car 1))
     (check (equal? $cdr 2))))

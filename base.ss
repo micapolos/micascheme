@@ -232,8 +232,8 @@
     (lambda ($syntax)
       (syntax-case $syntax (do)
         ((_ $decl $decls ... $result)
-          (syntax-case #`$decl (do rec)
-            ((($id ...) $expr)
+          (syntax-case #`$decl (do rec values)
+            (((values $id ...) $expr)
               #`(let-values ((($id ...) $expr))
                 (lets $decls ... $result)))
             (($id (rec $expr))
@@ -631,7 +631,7 @@
         (and $annotation
           (lets
             ($source (annotation-source $annotation))
-            (($path $line $column) (locate-source-object-source $source #t #t))
+            ((values $path $line $column) (locate-source-object-source $source #t #t))
             (format " source: ~a (~a:~a)\n" $path $line $column)))
         "")))
 
