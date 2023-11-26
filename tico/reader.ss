@@ -186,7 +186,7 @@
                         (bindings-stack-typing $bindings)
                         $parameter-typings
                         $argument-typings
-                        $body-typing))
+                        (list $body-typing)))
                     $end)))))
           ((apply)
             (lets

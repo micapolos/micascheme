@@ -404,12 +404,12 @@
       ((struct? $struct) (struct-typing $struct))
       ((else $other) TODO)))
 
-  (define (typings-do $scope $parameter-typings $argument-typings $body-typing)
+  (define (typings-do $scope $parameter-typings $argument-typings $body-typings)
     (typing-application
       (scope-typing-abstraction
         $scope
         $parameter-typings
-        (list $body-typing))
+        $body-typings)
       $argument-typings))
 
   (define (empty-stack-typing)
