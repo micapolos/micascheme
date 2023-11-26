@@ -429,6 +429,8 @@
   (define (list-indexed $list)
     (map-indexed (lambda ($index $value) (indexed $value $index)) $list))
 
+  (define-aux-keyword data-fields)
+
   (define-syntax data
     (lambda (stx)
       (syntax-case stx ()
@@ -526,6 +528,8 @@
                     #,@(map
                       (lambda ($accessor) #`(#,$accessor $record))
                       accessors))))
+              (define-property name data-fields
+                (quote (#,@fields)))
               (define #,predicate-name
                 (record-predicate #,rtd-name))
               #,@(map
