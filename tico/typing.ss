@@ -368,7 +368,7 @@
       (typing-application
         (typing-abstraction
           $parameter-typings
-          (list ($fn $variable-typings)))
+          ($fn $variable-typings))
         $typings)))
 
   (define (make-list-typing $arity $type)
@@ -389,13 +389,14 @@
       (let-typing
         (map type-typing $fields)
         (lambda ($field-typings)
-          (typing-application
-            (make-struct-typing)
-            (list
-              (literal->typing (struct-name $struct))
-              (typing-application
-                (make-list-typing (length $fields) (type-type))
-                $field-typings)))))))
+          (list
+            (typing-application
+              (make-struct-typing)
+              (list
+                (literal->typing (struct-name $struct))
+                (typing-application
+                  (make-list-typing (length $fields) (type-type))
+                  $field-typings))))))))
 
   (define (typing-assert $typing)
     (unless (type-matches? (typing-type $typing) (boolean-type))
