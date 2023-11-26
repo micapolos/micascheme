@@ -32,7 +32,7 @@
     with-generate-temporary-seed
     with-tmps
     ensure
-    data enum world
+    data enum
     partial
     define-aux-keyword define-syntax-rule define-syntax-case
     displayln writeln
@@ -617,24 +617,6 @@
               (define-syntax-rule (#,$name-switch #,$name-tmp #,$case-tmp #,$dots)
                 (switch (#,$name-body #,$name-tmp)
                   #,$case-tmp #,$dots))))))))
-
-  (define-syntax world
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ ($name (($enter $enter-value) $enter-body) (($bind $bind-value $bind-fn) $bind-body)))
-          (identifier? #'$name)
-          (let ()
-            (unless (equal? (datum $enter) 'enter)
-              (syntax-error #'$enter "expected enter, got"))
-            (unless (equal? (datum $bind) 'bind)
-              (syntax-error #'$bind "expected enter, got"))
-            (let*
-              (($bind-name (build-identifier ($string #'$name) (string-append $string "-bind"))))
-              #`(begin
-                (define ($name $enter-value)
-                  $enter-body)
-                (define (#,$bind-name $bind-value $bind-fn)
-                  $bind-body))))))))
 
   (define (record-pretty-writer rtd name)
     (lambda (record port wr)
