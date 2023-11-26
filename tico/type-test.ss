@@ -109,36 +109,58 @@
 
 (check
   (type-matches? 
-    (arrow (list (any-type) (unchecked-type)) (value-type "foo"))
-    (arrow (list (any-type) (unchecked-type)) (value-type "foo"))))
+    (arrow
+      (list (any-type) (unchecked-type))
+      (list (value-type "foo")))
+    (arrow
+      (list (any-type) (unchecked-type))
+      (list (value-type "foo")))))
 
 (check
   (type-matches? 
-    (arrow (list (any-type) (unchecked-type)) (value-type "foo"))
-    (arrow (list (value-type "foo") (unchecked-type)) (value-type "foo"))))
+    (arrow
+      (list (any-type) (unchecked-type))
+      (list (value-type "foo")))
+    (arrow
+      (list (value-type "foo") (unchecked-type))
+      (list (value-type "foo")))))
 
 (check
   (type-matches? 
-    (arrow (list (any-type) (unchecked-type)) (value-type "foo"))
-    (arrow (list (any-type) (unchecked-type)) (any-type))))
+    (arrow
+      (list (any-type) (unchecked-type))
+      (list (value-type "foo")))
+    (arrow
+      (list (any-type) (unchecked-type))
+      (list (any-type)))))
 
 (check
   (not
     (type-matches? 
-      (arrow (list (any-type) (value-type "foo")) (value-type "foo"))
-      (arrow (list (any-type) (unchecked-type)) (value-type "foo")))))
+      (arrow
+        (list (any-type) (value-type "foo"))
+        (list (value-type "foo")))
+      (arrow
+        (list (any-type) (unchecked-type))
+        (list (value-type "foo"))))))
 
 (check
   (not
     (type-matches? 
-      (arrow (list (any-type) (unchecked-type)) (value-type "bar"))
-      (arrow (list (any-type) (unchecked-type)) (value-type "foo")))))
+      (arrow
+        (list (any-type) (unchecked-type))
+        (list (value-type "bar")))
+      (arrow
+        (list (any-type) (unchecked-type))
+        (list (value-type "foo"))))))
 
 (check
   (not
     (type-matches? 
       (unchecked-type)
-      (arrow (list (any-type) (unchecked-type)) (value-type "foo")))))
+      (arrow
+        (list (any-type) (unchecked-type))
+        (list (value-type "foo"))))))
 
 ; --- types-match
 
@@ -164,14 +186,18 @@
 (check
   (equal?
     (type-application
-      (arrow (list (string-type) (number-type)) (boolean-type))
+      (arrow
+        (list (string-type) (number-type))
+        (list (boolean-type)))
       (list (string-type) (number-type)))
     (boolean-type)))
 
 (check
   (equal?
     (type-application
-      (arrow (list (any-type) (number-type)) (boolean-type))
+      (arrow
+        (list (any-type) (number-type))
+        (list (boolean-type)))
       (list (string-type) (number-type)))
     (boolean-type)))
 
@@ -179,14 +205,18 @@
   (raises?
     (lambda ()
       (type-application
-        (arrow (list (string-type) (number-type)) (boolean-type))
+        (arrow
+          (list (string-type) (number-type))
+          (list (boolean-type)))
         (list (string-type))))))
 
 (check
   (raises?
     (lambda ()
       (type-application
-        (arrow (list (string-type) (number-type)) (boolean-type))
+        (arrow
+          (list (string-type) (number-type))
+          (list (boolean-type)))
         (list (string-type) (any-type))))))
 
 ; --- type-ref
@@ -226,7 +256,7 @@
     (make-list-of 3 (string-type))
     (arrow
       (list (string-type) (string-type) (string-type))
-      (list-of (string-type)))))
+      (list (list-of (string-type))))))
 
 ; --- type-line
 

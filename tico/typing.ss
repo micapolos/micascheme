@@ -200,7 +200,7 @@
     (typing
       (type-abstraction
         (map typing-type $param-typings)
-        (typing-type $body-typing))
+        (list (typing-type $body-typing)))
       (scope-layment-abstraction
         (typing-layment $scope)
         (map typing-layment $param-typings)
@@ -335,7 +335,7 @@
     (type->typing
       (arrow
         (map typing->type $param-typings)
-        (typing->type $result-typing))))
+        (list (typing->type $result-typing)))))
 
   (define (typing-offering $typing $offering-typing)
     (lets
@@ -369,7 +369,7 @@
     (type-datum->typing
       (arrow
         (make-list $arity $type)
-        (list-of $type))
+        (list (list-of $type)))
       'list))
 
   (define (make-struct-typing)

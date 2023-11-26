@@ -142,7 +142,7 @@
       ((arrow? $arrow)
         `(arrow
           (list ,@(map value->datum (arrow-params $arrow)))
-          ,(value->datum (arrow-result $arrow))))
+          (list ,@(map value->datum (arrow-results $arrow)))))
       ((property? $property)
         `(property
           ,(value->datum (property-param $property))

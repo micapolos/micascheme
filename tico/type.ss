@@ -14,7 +14,7 @@
     symbol-type
     literal->type
     struct struct? struct-name struct-fields
-    arrow arrow? arrow-params arrow-result
+    arrow arrow? arrow-params arrow-results
     property property? property-param property-body
     argument-type argument-type? argument-type-key argument-type-value
     abstraction abstraction? abstraction-arity abstraction-body
@@ -58,7 +58,7 @@
   (data (args-type items))
   (data (list-of item-type))
   (data (struct name fields))
-  (data (arrow params result))
+  (data (arrow params results))
   (data (property param body))
   (data (argument-type key value))
   (data (abstraction arity body))
@@ -100,7 +100,7 @@
       ((arrow? $arrow)
         (and
           (types-match? $args (arrow-params $arrow))
-          (arrow-result $arrow)))))
+          (force-single (arrow-results $arrow))))))
 
   (define (type-application $target $args)
     (or-throw
@@ -114,12 +114,12 @@
           (types-match?
             (args-type-items $args)
             (arrow-params $arrow))
-          (arrow-result $arrow)))
+          (arrow-results $arrow)))
       ((else $other)
         (throw type-args-application))))
 
-  (define (type-abstraction $param-types $body-type)
-    (arrow $param-types $body-type))
+  (define (type-abstraction $param-types $body-types)
+    (arrow $param-types $body-types))
 
   (define (type-access-opt $target $arg)
     (switch $target
@@ -180,9 +180,9 @@
           (types-match?
             (arrow-params $arrow)
             (arrow-params $type))
-          (type-matches?
-            (arrow-result $type)
-            (arrow-result $arrow))))
+          (types-match?
+            (arrow-results $type)
+            (arrow-results $arrow))))
       ((property? $property)
         (and
           (property? $type)
@@ -246,12 +246,12 @@
   (define (make-list-of $arity $item-type)
     (arrow
       (make-list $arity $item-type)
-      (list-of $item-type)))
+      (list (list-of $item-type))))
 
   (define (make-struct-type)
     (arrow
       (list (symbol-type) (list-of (type-type)))
-      (type-type)))
+      (list (type-type))))
 
   (define (types-lines $types)
     (map type-line $types))
@@ -286,7 +286,7 @@
           ((arrow? $arrow)
             `(arrow
               ,@(map type-line (arrow-params $arrow))
-              (promising ,(type-line (arrow-result $arrow)))))
+              (promising ,@(types-lines (arrow-results $arrow)))))
           ((property? $property)
             `(property
               ,(type-line (property-param $property))

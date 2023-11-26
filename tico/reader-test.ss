@@ -157,7 +157,8 @@
             (generate-parameter-typing (string-type))
             (generate-parameter-typing (struct 'exclamate (list)))))
         (typing-application
-          (typing-abstraction $params
+          (typing-abstraction
+            $params
             (typing-struct 'exclamated
               (list (variable-typing (string-type) '$tmp-0 0))))
           (reverse (read-typings "foo" exclamate)))))))
@@ -220,23 +221,23 @@
         (plus "bar")))
     "foobar"))
 
-; (check
-;   (equal?
-;     (typing-value
-;       (read-typing
-;         (use
-;           (native "string-length")
-;           (as string (offering (length number))))
-;         "foo"
-;         (get length number)))
-;     3))
+(check
+  (equal?
+    (typing-value
+      (read-typing
+        (use
+          (native "string-length")
+          (as string (offering (length number))))
+        "foo"
+        (get length number)))
+    3))
 
-; (check
-;   (equal?
-;     (typing-value
-;       (read-typing
-;         (use
-;           (native "128")
-;           (as foo (being number)))
-;         foo))
-;     128))
+(check
+  (equal?
+    (typing-value
+      (read-typing
+        (use
+          (native "128")
+          (as foo (being number)))
+        foo))
+    128))

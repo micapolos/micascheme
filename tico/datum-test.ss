@@ -100,8 +100,9 @@
 
 (check 
  	(equal?
-	  (value->datum (arrow (list "foo" "bar") "zoo"))
-  		`(arrow (list "foo" "bar") "zoo")))
+	  (value->datum
+	  	(arrow (list "foo" "bar") (list "zoo")))
+  		`(arrow (list "foo" "bar") (list "zoo"))))
 
 (check 
  	(equal?

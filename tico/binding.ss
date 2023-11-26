@@ -78,7 +78,7 @@
         (bindings-match $bindings
           (arrow
             (reverse (map typing-type $typings))
-            (any-type))))
+            (list (any-type)))))
       (and $target-typing
         (stack
           (typing-application $target-typing

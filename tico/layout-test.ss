@@ -147,7 +147,8 @@
         (list
           (value-type "foo")
           (unchecked-type))
-        (unchecked-type)))
+        (list
+          (unchecked-type))))
     (layout-abstraction
       (list
         (empty-layout)

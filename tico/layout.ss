@@ -157,7 +157,7 @@
       ((arrow? $arrow)
         (layout-abstraction
           (map type->layout (arrow-params $arrow))
-          (list (type->layout (arrow-result $arrow)))))
+          (map type->layout (arrow-results $arrow))))
       ((property? $property)
         (layout-abstraction
           (list (type->layout (property-param $property)))

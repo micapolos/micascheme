@@ -84,7 +84,8 @@
           (list
             (number-type)
             (struct 'foo (list)))
-          (string-type))
+          (list
+            (string-type)))
         'number->string)
       (list
         (literal->typing 10)
@@ -95,7 +96,8 @@
           (list
             (number-type)
             (struct 'foo (list)))
-          (string-type))
+          (list
+            (string-type)))
         (list
           (literal->type 10)
           (struct 'foo (list))))
@@ -106,7 +108,8 @@
               (list
                 (number-type)
                 (struct 'foo (list)))
-              (string-type)))
+              (list
+                (string-type))))
           'number->string)
         (list
           (literal->layment 10)
@@ -126,10 +129,11 @@
         (list
           (typing-type (parameter-typing (string-type) '$string))
           (typing-type (parameter-typing (struct 'exclamate (list)) '$empty)))
-        (typing-type
-          (typing-struct 'exclamated
-            (list
-              (typing-variable (parameter-typing (string-type) '$string) 1)))))
+        (list
+          (typing-type
+            (typing-struct 'exclamated
+              (list
+                (typing-variable (parameter-typing (string-type) '$string) 1))))))
       (layment-abstraction
         (list
           (typing-layment (parameter-typing (string-type) '$string))
@@ -250,7 +254,8 @@
         (list
           (number-type)
           (string-type))
-        (boolean-type)))))
+        (list
+          (boolean-type))))))
 
 (check
   (equal?
