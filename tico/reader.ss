@@ -226,7 +226,7 @@
                   (block-with-typing $block
                     (typing-promising
                       (reverse (block-typings $block))
-                      $result-typing))
+                      (list $result-typing)))
                   $end))))
           ((offering)
             (lets

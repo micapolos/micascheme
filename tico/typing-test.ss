@@ -249,14 +249,17 @@
       (list
         (number-typing)
         (string-typing))
-      (boolean-typing))
+      (list
+        (boolean-typing)
+        (char-typing)))
     (type->typing
       (arrow
         (list
           (number-type)
           (string-type))
         (list
-          (boolean-type))))))
+          (boolean-type)
+          (char-type))))))
 
 (check
   (equal?

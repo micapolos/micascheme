@@ -13,6 +13,7 @@
     boolean-typing
     number-typing
     string-typing
+    char-typing
     type-datum->typing
     bindings-type-datum->typing
     single-typing
@@ -120,6 +121,9 @@
 
   (define (string-typing)
     (type->typing (string-type)))
+
+  (define (char-typing)
+    (type->typing (char-type)))
 
   (define (type-datum->typing $type $datum)
     (typing $type
@@ -331,11 +335,11 @@
         (type->layout $type)
         $compilation)))
 
-  (define (typing-promising $param-typings $result-typing)
+  (define (typing-promising $param-typings $result-typings)
     (type->typing
       (arrow
         (map typing->type $param-typings)
-        (list (typing->type $result-typing)))))
+        (map typing->type $result-typings))))
 
   (define (typing-offering $typing $offering-typing)
     (lets

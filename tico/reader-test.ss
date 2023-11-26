@@ -51,7 +51,7 @@
       (promising boolean))
     (typing-promising
       (reverse (read-typings number string))
-      (read-typing boolean))))
+      (reverse (read-typings boolean)))))
 
 (check
   (equal?
