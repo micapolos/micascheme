@@ -35,7 +35,7 @@
     data enum
     partial
     define-aux-keyword define-syntax-rule define-syntax-case
-    displayln writeln
+    displayln writeln logging
     indices iterate
     fold-while
     find-index
@@ -80,6 +80,19 @@
 
   (define (displayln x) (display x) (newline))
   (define (writeln x) (write x) (newline))
+
+  (define-syntax logging
+    (syntax-rules ()
+      ((_ $value)
+        (let ()
+          (writeln $value)
+          $value))
+      ((_ $label $value)
+        (let ()
+          (display (symbol->string (quote $label)))
+          (display ": ")
+          (writeln $value)
+          $value))))
 
   (define (works? expr) expr #t)
 
