@@ -400,6 +400,7 @@
             (rtd-name (build-identifier ($string #`name) (string-append $string "-rtd")))
             (prefix-name (string-append name-string "-"))
             (predicate-name (build-identifier ($string #`name) (string-append $string "?")))
+            (unpack-name (build-identifier ($string #`name) (string-append $string "-unpack")))
             (accessors
               (map
                 (lambda ($field)
@@ -410,6 +411,10 @@
               (and list-field-opt
                 (build-identifier ($string list-field-opt)
                   (string-append name-string "-" $string))))
+            (all-accessors
+              (if list-accessor-opt
+                (append accessors (list list-accessor-opt))
+                accessors))
             #`(begin
               (define #,rtd-name
                 (let ((#,tmp
@@ -463,6 +468,18 @@
                   ((record-constructor #,rtd-name) field ... list-field-opt))
                 #`(define name
                   (record-constructor #,rtd-name)))
+              (define (#,unpack-name $record $fn)
+                #,(if list-accessor-opt
+                  #`(apply $fn
+                    (list*
+                      #,@(map
+                        (lambda ($accessor) #`(#,$accessor $record))
+                        accessors)
+                      (#,list-accessor-opt $record)))
+                  #`($fn
+                    #,@(map
+                      (lambda ($accessor) #`(#,$accessor $record))
+                      accessors))))
               (define #,predicate-name
                 (record-predicate #,rtd-name))
               #,@(map
