@@ -116,19 +116,21 @@
         (layment-compilation $target)
         (layment-compilation $args))))
 
-  (define (layment-abstraction $param-layments $body-layment)
+  (define (layment-abstraction $param-layments $body-layments)
     (scope-layment-abstraction
-      (empty-stack-layment) $param-layments $body-layment))
+      (empty-stack-layment)
+      $param-layments
+      $body-layments))
 
-  (define (scope-layment-abstraction $scope $param-layments $body-layment)
+  (define (scope-layment-abstraction $scope $param-layments $body-layments)
     (make-layment
       (layout-abstraction
         (map layment-layout $param-layments)
-        (list (layment-layout $body-layment)))
+        (map layment-layout $body-layments))
       (compilation-abstraction
         (layment-compilation $scope)
         (filter-opts (map layment-compilation $param-layments))
-        (list (layment-compilation $body-layment)))))
+        (map layment-compilation $body-layments))))
 
   (define (parameter-layment $layout $datum)
     (make-layment $layout

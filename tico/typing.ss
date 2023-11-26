@@ -204,7 +204,7 @@
       (scope-layment-abstraction
         (typing-layment $scope)
         (map typing-layment $param-typings)
-        (typing-layment $body-typing))))
+        (list (typing-layment $body-typing)))))
 
   (define (typing-property $param-type $body-typing)
     (lets
@@ -213,7 +213,7 @@
       (typing $type
         (layment-abstraction
           (list (type->layout $param-type))
-          (typing-layment $body-typing)))))
+          (list (typing-layment $body-typing))))))
 
   (define (typing-access $typing $arg)
     (typing

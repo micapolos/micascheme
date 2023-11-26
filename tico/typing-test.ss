@@ -134,10 +134,11 @@
         (list
           (typing-layment (parameter-typing (string-type) '$string))
           (typing-layment (parameter-typing (struct 'exclamate (list)) '$empty)))
-        (typing-layment
-          (typing-struct 'exclamated
-            (list
-              (typing-variable (parameter-typing (string-type) '$string) 1))))))))
+        (list
+          (typing-layment
+            (typing-struct 'exclamated
+              (list
+                (typing-variable (parameter-typing (string-type) '$string) 1)))))))))
 
 (check
   (equal?

@@ -124,9 +124,10 @@
         (list
           (make-layment (simple-layout) (parameter-compilation 'v1))
           (make-layment (simple-layout) (parameter-compilation 'v2)))
-        (make-layment
-          (simple-layout)
-          (variable-compilation 'v1 0)))
+        (list
+          (make-layment
+            (simple-layout)
+            (variable-compilation 'v1 0))))
       (list
         (literal->layment "foo")
         (literal->layment "bar")))
