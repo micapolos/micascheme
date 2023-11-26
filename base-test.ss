@@ -21,6 +21,13 @@
       (string-append x y))
     "ab"))
 
+(check
+  (equal?
+    (lets
+      ((point x (point y z)) (point "a" (point "b" "c")))
+      (string-append x y z))
+    "abc"))
+
 ; === data vararg ===
 
 (data (vpoint x y . v))
@@ -45,6 +52,13 @@
       ((vpoint x y . z) (vpoint "a" "b" "c" "d"))
       (string-append x y (apply string-append z)))
     "abcd"))
+
+(check
+  (equal?
+    (lets
+      ((vpoint x (vpoint y z . t1) . t2) (vpoint "a" (vpoint "b" "c" "d" "e") "f" "g"))
+      (string-append x y z (apply string-append t1) (apply string-append t2)))
+    "abcdefg"))
 
 ; === enum ===
 

@@ -236,20 +236,52 @@
             (((values $id ...) $expr)
               #`(let-values ((($id ...) $expr))
                 (lets $decls ... $result)))
-            ((($name $id ...) $expr)
-              #`(
-                #,(build-identifier ($string #'$name)
-                  (string-append $string "-unpack"))
-                $expr
-                (lambda ($id ...)
-                  (lets $decls ... $result))))
-            ((($name $id ... . $last-id) $expr)
-              #`(
-                #,(build-identifier ($string #'$name)
-                  (string-append $string "-unpack"))
-                $expr
-                (lambda ($id ... . $last-id)
-                  (lets $decls ... $result))))
+            ((($name $spec ...) $expr)
+              (identifier? #'$name)
+              (let*
+                (
+                  ($id-spec-pairs
+                    (map
+                      (lambda ($spec)
+                        (cond
+                          ((identifier? $spec) (cons $spec #f))
+                          (else
+                            (let
+                              (($tmp (car (generate-temporaries '(tmp)))))
+                              (cons $tmp #`(#,$spec #,$tmp))))))
+                      (syntax->list #'($spec ...))))
+                  ($ids (map car $id-spec-pairs))
+                  ($specs (filter (lambda (t) t) (map cdr $id-spec-pairs))))
+                #`(
+                  #,(build-identifier ($string #'$name)
+                    (string-append $string "-unpack"))
+                  $expr
+                  (lambda (#,@$ids)
+                    (lets #,@$specs $decls ... $result)))))
+            ((($name $spec ... . $last-id) $expr)
+              (and
+                (identifier? #'$name)
+                (identifier? #'$last-id))
+              (let*
+                (
+                  ($id-spec-pairs
+                    (map
+                      (lambda ($spec)
+                        (cond
+                          ((identifier? $spec) (cons $spec #f))
+                          (else
+                            (let
+                              (($tmp (car (generate-temporaries '(tmp)))))
+                              (cons $tmp #`(#,$spec #,$tmp))))))
+                      (syntax->list #'($spec ...))))
+                  ($ids (map car $id-spec-pairs))
+                  ($specs (filter (lambda (t) t) (map cdr $id-spec-pairs))))
+                #`(
+                  #,(build-identifier ($string #'$name)
+                    (string-append $string "-unpack"))
+                  $expr
+                  (lambda (#,@$ids . $last-id)
+                    (lets #,@$specs $decls ... $result)))))
             (($id (rec $expr))
               #`(letrec (($id $expr))
                 (lets $decls ... $result)))
