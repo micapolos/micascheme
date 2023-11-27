@@ -22,7 +22,8 @@
     var var? var-index
     type-value
 
-    args-types->types
+    type-flatten
+    types-flatten
 
     test-type
     static-test-type
@@ -295,6 +296,13 @@
               (offering ,(type-line (property-body $property)))))
           ((else $other) $other)))))
 
-  (define (args-types->types $args-types)
-    (apply append (map args-type-items $args-types)))
+  (define (type-flatten $type)
+    (switch $type
+      ((args-type? $args-type)
+        (args-type-items $args-type))
+      ((else $other)
+        (list $other))))
+
+  (define (types-flatten $types)
+    (apply append (map type-flatten $types)))
 )

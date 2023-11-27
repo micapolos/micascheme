@@ -280,12 +280,16 @@
 
 (check
   (equal?
-    (args-types->types
+    (types-flatten
       (list
+        (any-type)
         (args-type (list))
         (args-type (list (boolean-type)))
-        (args-type (list (string-type) (number-type)))))
+        (args-type (list (string-type) (number-type)))
+        (struct 'foo (list))))
     (list
+      (any-type)
       (boolean-type)
       (string-type)
-      (number-type))))
+      (number-type)
+      (struct 'foo (list)))))
