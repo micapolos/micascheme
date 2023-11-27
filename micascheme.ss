@@ -8,7 +8,8 @@
     (rename (base)
       (script do))
     (base-syntax)
-    (base-transformers)
+    (binder)
+    (define-syntax)
     (infix))
 
   (export
@@ -19,7 +20,8 @@
         (do do!))
       (rename (base) (script do))
       (base-syntax)
-      (base-transformers)
+      (binder)
+      (define-syntax)
       (infix)))
 
   (define cons scheme-cons)

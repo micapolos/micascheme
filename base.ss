@@ -73,7 +73,10 @@
     one-of->datum-syntax
     one-of-syntax)
 
-  (import (scheme) (base-transformers))
+  (import
+    (scheme)
+    (define-syntax)
+    (binder))
 
   (define identity (lambda (x) x))
 
