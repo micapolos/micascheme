@@ -25,6 +25,7 @@
   (pair)
   (parser)
   (procedure)
+  (script)
   (seq)
   (sequential-syntax)
   (sequential)

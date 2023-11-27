@@ -1,4 +1,4 @@
-(import (scheme) (list) (check) (data) (lets) (stack) (generate))
+(import (scheme) (list) (check) (data) (lets) (stack) (generate) (failure))
 
 ; === null-or-pair? ===
 
@@ -99,15 +99,6 @@
 
 (check (not (raises? (lambda () 128))))
 (check (raises? (lambda () (throw error))))
-
-; === script ===
-
-(check (equal? (script "foo") "foo"))
-(check (equal? (script "foo" (string-length)) 3))
-(check (equal? (script "foo" (string-append "bar")) "foobar"))
-(check (equal? (script "foo" (string-append "bar")) "foobar"))
-(check (equal? (script "foo" (string-append "bar") (string-append "goo")) "foobargoo"))
-(check (equal? (script "foo" (string-append "bar" "goo")) "foobargoo"))
 
 ; === associ ===
 

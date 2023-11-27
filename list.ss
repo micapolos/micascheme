@@ -6,7 +6,6 @@
     null-or-pair?
     opt
     single? single force-single
-    script
     ordered-map
     bind-if
     opt-lets
@@ -75,15 +74,6 @@
       ((_ (val expr) decl ... body)
         (let ((val expr)) 
           (and val (opt-lets decl ... body))))))
-
-  (define-syntax script
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $target $op1 $op2 ...)
-          (syntax-case #`$op1 ()
-            (($name $arg ...)
-              #`(script ($name $target $arg ...) $op2 ...))))
-        ((_ $target) #`$target))))
 
   (define-aux-keyword opt)
 
