@@ -2,8 +2,7 @@
 
 (test
   (boolean)
-  (seq)
-  (term)
+  (binder)
   (compiler)
   (decompiler)
   (evaluator)
@@ -34,6 +33,7 @@
   (stack)
   (switch)
   (symbolizer)
+  (term)
   (throw)
   (tico)
   (tico-2)
