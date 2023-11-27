@@ -7,7 +7,7 @@
   (import
     (scheme)
     (base)
-    (define-syntax)
+    (syntax)
     (data)
     (switch))
 

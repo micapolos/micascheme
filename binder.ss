@@ -4,7 +4,7 @@
     transform-binder)
   (import
     (scheme)
-    (define-syntax))
+    (syntax))
 
   (define-aux-keyword accessors)
   (define-aux-keyword tail-accessor)

@@ -1,4 +1,4 @@
-(import (micascheme) (syntax))
+(import (micascheme) (leo-syntax))
 
 ; tuple-syntax
 

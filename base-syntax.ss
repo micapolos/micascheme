@@ -9,7 +9,7 @@
   (import
     (scheme)
     (base)
-    (define-syntax))
+    (syntax))
 
   (define-syntax test
     (lambda ($syntax)

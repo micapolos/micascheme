@@ -2,7 +2,7 @@
   (export data enum)
   (import
     (scheme)
-    (define-syntax)
+    (syntax)
     (binder)
     (identifier)
     (lets)

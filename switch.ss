@@ -2,7 +2,7 @@
   (export switch switch-opt switch-exclusive index-switch)
   (import
     (scheme)
-    (define-syntax)
+    (syntax)
     (throw)
     (lets))
 

@@ -4,7 +4,7 @@
     build-identifier)
   (import
     (scheme)
-    (define-syntax))
+    (syntax))
 
   (define-syntax identifier-named?
     (lambda ($syntax)

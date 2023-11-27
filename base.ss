@@ -59,7 +59,7 @@
 
   (import
     (scheme)
-    (define-syntax)
+    (syntax)
     (binder)
     (check)
     (identifier)

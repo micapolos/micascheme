@@ -1,4 +1,4 @@
-(import (check) (data) (define-syntax))
+(import (check) (data) (syntax))
 
 ; === data ===
 
