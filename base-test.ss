@@ -1,4 +1,4 @@
-(import (scheme) (base))
+(import (scheme) (base) (check))
 
 ; === data ===
 

@@ -27,7 +27,6 @@
     nonnegative-integer?
     current-seconds
     works?
-    check checking?
     generate-symbol generate-symbols
     with-generate-temporary-seed
     with-tmps
@@ -76,7 +75,8 @@
   (import
     (scheme)
     (define-syntax)
-    (binder))
+    (binder)
+    (check))
 
   (define identity (lambda (x) x))
 
@@ -613,57 +613,6 @@
       ((null? $list) #f)
       ((equal? (caar $list) $obj) (cons $index (cdar $list)))
       (else (associ (cdr $list) (+ $index 1) $obj))))
-
-  (define checking? (make-thread-parameter #f))
-
-  (meta define (syntax->location-string $syntax)
-    (lets
-      ($annotation (syntax->annotation $syntax))
-      (or
-        (and $annotation
-          (lets
-            ($source (annotation-source $annotation))
-            ((values $path $line $column) (locate-source-object-source $source #t #t))
-            (format " source: ~a (~a:~a)\n" $path $line $column)))
-        "")))
-
-  (define-syntax check
-    (lambda (stx)
-      (syntax-case stx (not)
-        ((_ (not (pred arg ...)))
-          (lets
-            (args (syntax->list #`(arg ...)))
-            (tmps (generate-temporaries #`(arg ...)))
-            (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
-            (ann (syntax->annotation stx))
-            (source (annotation-source ann))
-            (ann-string (syntax->location-string stx))
-            #`(parameterize ((checking? #t))
-              (let (#,@let-cases)
-                (or
-                  (not (pred #,@tmps))
-                  (error `check
-                    (format "\n~a   expr: ~s\n  value: ~s\n"
-                      #,ann-string
-                      (quote (not (pred arg ...)))
-                      (list (quote not) (list (quote pred) #,@tmps)))))))))
-        ((_ (pred arg ...))
-          (lets
-            (args (syntax->list #`(arg ...)))
-            (tmps (generate-temporaries #`(arg ...)))
-            (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
-            (ann (syntax->annotation stx))
-            (source (annotation-source ann))
-            (ann-string (syntax->location-string stx))
-            #`(parameterize ((checking? #t))
-              (let (#,@let-cases)
-                (or
-                  (pred #,@tmps)
-                  (error `check
-                    (format "\n~a   expr: ~s\n  value: ~s\n"
-                      #,ann-string
-                      (quote (pred arg ...))
-                      (list (quote pred) #,@tmps)))))))))))
 
   (define-syntax ensure
     (lambda ($syntax)

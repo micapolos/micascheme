@@ -9,6 +9,7 @@
       (script do))
     (base-syntax)
     (binder)
+    (check)
     (define-syntax)
     (infix))
 
@@ -21,6 +22,7 @@
       (rename (base) (script do))
       (base-syntax)
       (binder)
+      (check)
       (define-syntax)
       (infix)))
 
