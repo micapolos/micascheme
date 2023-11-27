@@ -18,7 +18,6 @@
     parameter-layment
     generate-parameter-layment
     layment-application
-    layment-args-application
     layment-parameter
     layment-variable
     scope-layment-abstraction
@@ -105,16 +104,6 @@
           (layout-arity $layout)
           (layment-compilation $target)
           (layments->compilations $args)))))
-
-  (define (layment-args-application $scope $target $args)
-    (make-layment
-      (layout-args-application
-        (layment-layout $target)
-        (layment-layout $args))
-      (compilation-args-application
-        (layment-compilation $scope)
-        (layment-compilation $target)
-        (layment-compilation $args))))
 
   (define (layment-abstraction $param-layments $body-layments)
     (scope-layment-abstraction

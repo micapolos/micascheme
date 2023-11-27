@@ -19,7 +19,6 @@
 
     literal->layout
     layout-application
-    layout-args-application
     layout-abstraction
     layout-args
     layout-struct
@@ -105,13 +104,6 @@
       (make-struct-layout $body-layouts)))
 
   (define (layout-application $target $args)
-    (switch $target
-      ((lambda-layout? $lambda-layout)
-        (lambda-layout-body $lambda-layout))
-      ((else $other)
-        (throw layout-application $target))))
-
-  (define (layout-args-application $target $args)
     (switch $target
       ((lambda-layout? $lambda-layout)
         (lambda-layout-body $lambda-layout))

@@ -22,6 +22,7 @@
     var var? var-index
     type-value
 
+    maybe-args-type
     type-flatten
     types-flatten
 
@@ -30,7 +31,6 @@
 
     type-application-opt
     type-application
-    type-args-application
     type-abstraction
 
     type-access
@@ -112,18 +112,6 @@
   (define (type-application $target $args)
     (or-throw
       (type-application-opt $target $args)))
-
-  (define (type-args-application $target $args)
-    (switch $target
-      ((arrow? $arrow)
-        (and
-          (args-type? $args)
-          (types-match?
-            (args-type-items $args)
-            (arrow-params $arrow))
-          (arrow-results $arrow)))
-      ((else $other)
-        (throw type-args-application))))
 
   (define (type-abstraction $param-types $body-types)
     (arrow $param-types $body-types))

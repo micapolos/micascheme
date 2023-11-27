@@ -20,13 +20,6 @@
 
 (check
   (equal?
-  	(datum-args-application
-  		'list
-  		(datum-args (list 'v1 'v2)))
-  	'(list v1 v2)))
-
-(check
-  (equal?
   	(datum-application 'fn (list 'v1 'v2))
   	'(fn v1 v2)))
 

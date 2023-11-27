@@ -77,24 +77,6 @@
     (literal->compilation "foo")
     (compilation (arity 1) "foo" (argument "foo"))))
 
-; --- compilation-args-application
-
-(check
-  (equal?
-    (compilation-args-application
-      (empty-stack-compilation)
-      (variable-compilation 'string-append 1)
-      (compilation-args
-        (list
-          (literal->compilation "foo")
-          (literal->compilation "bar"))))
-    (compilation
-      (arity 1)
-      (datum-args-application
-        'string-append
-        (datum-args (list "foo" "bar")))
-      (variable 1))))
-
 ; --- compilation-application-datum
 
 (check

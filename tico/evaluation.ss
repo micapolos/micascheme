@@ -3,7 +3,6 @@
     evaluations-combine
     evaluation-application
     evaluation-struct
-    evaluation-args-application-opt
     evaluation-promote)
   (import
     (micascheme)
@@ -29,18 +28,6 @@
     (or
       (evaluations-combine $evaluations)
       (argument-struct $name $evaluations)))
-
-  (define (evaluation-args-application-opt $target $args)
-    (lets
-      ($evaluations (list $target $args))
-      (cond
-        ((for-all argument? $evaluations) #f)
-        ((exists parameter? $evaluations) (parameter))
-        (else
-          (lets
-            ($variables (filter variable? $evaluations))
-            ($variable (variable-flatten $variables))
-            (variable (variable-index $variable)))))))
 
   (define (evaluation-promote $evaluation $arity)
     (switch-exclusive $evaluation

@@ -20,7 +20,6 @@
 
     compilation-arity-datum
     compilation-application
-    compilation-args-application
     compilation-abstraction
     compilation-args
     compilation-struct
@@ -159,24 +158,6 @@
         (evaluation-application
           (compilation-evaluation $target)
           (map compilation-evaluation $args)))))
-
-  (define (compilation-args-application $scope $target $args)
-    (lets
-      ($datum
-        (datum-args-application
-        (compilation-datum $target)
-        (compilation-datum $args)))
-      ($evaluation-opt
-        (evaluation-args-application-opt
-          (compilation-evaluation $target)
-          (compilation-evaluation $args)))
-      (compilation
-        (arity 1)
-        $datum
-        (or $evaluation-opt
-          (bindings-datum->argument
-            (stack-compilation-bindings $scope)
-            $datum)))))
 
   (define (compilation-abstraction $scope $param-compilations $body-compilations)
     (lets

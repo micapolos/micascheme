@@ -24,7 +24,6 @@
     parameter-typing
     generate-parameter-typing
     typing-application
-    typing-args-application
     typing-parameter
     typing-variable
     typing-argument
@@ -155,16 +154,6 @@
         (typing-layment $target)
         (map typing-layment $args))))
 
-  (define (typing-args-application $scope $target $args)
-    (typing
-      (type-args-application
-        (typing-type $target)
-        (typing-type $args))
-      (layment-args-application
-        (typing-layment $scope)
-        (typing-layment $target)
-        (typing-layment $args))))
-
   (define (parameter-typing $type $datum)
     (typing
       $type
@@ -237,14 +226,14 @@
 
   (define (typing-args $typings)
     (typing
-      (args-type
+      (maybe-args-type
         (map typing-type $typings))
       (layment-args
         (map typing-layment $typings))))
 
   (define (typing-struct $name $field-typings)
     (typing
-      (struct $name
+      (type-struct $name
         (map typing-type $field-typings))
       (layment-struct $name
         (map typing-layment $field-typings))))
