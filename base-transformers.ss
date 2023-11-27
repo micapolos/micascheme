@@ -1,7 +1,7 @@
 (library (base-transformers)
   (export
-    define-binders
-    transform-binders
+    define-binder
+    transform-binder
     define-syntax-rule
     define-syntax-case
     define-aux-keyword)
@@ -37,7 +37,7 @@
   (define-aux-keyword accessors)
   (define-aux-keyword tail-accessor)
 
-  (define-syntax define-binders
+  (define-syntax define-binder
     (lambda ($syntax)
       (syntax-case $syntax ()
         ((_ ($name $accessor ...))
@@ -47,7 +47,7 @@
             (define-property $name accessors (quote ($accessor ...)))
             (define-property $name tail-accessor (quote $tail-accessor)))))))
 
-  (define (transform-binders $lookup $pattern $expr $body)
+  (define (transform-binder $lookup $pattern $expr $body)
     (syntax-case $pattern ()
       (($name $spec ...)
         (identifier? #'$name)
@@ -84,7 +84,7 @@
                 $accessors))
               #,(fold-left
                 (lambda ($body $spec)
-                  (transform-binders
+                  (transform-binder
                     $lookup
                     (car $spec)
                     (cdr $spec)
@@ -135,7 +135,7 @@
                     #,$tmp)))
               #,(fold-left
                 (lambda ($body $spec)
-                  (transform-binders
+                  (transform-binder
                     $lookup
                     (car $spec)
                     (cdr $spec)

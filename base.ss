@@ -228,13 +228,13 @@
                 #`(let-values ((($id ...) $expr))
                   (lets $decls ... $result)))
               ((($name $spec ...) $expr)
-                (transform-binders
+                (transform-binder
                   lookup
                   #'($name $spec ...)
                   #'$expr
                   #'(lets $decls ... $result)))
               ((($name $spec ... . $last-id) $expr)
-                (transform-binders
+                (transform-binder
                   lookup
                   #'($name $spec ... . $last-id)
                   #'$expr
@@ -464,11 +464,11 @@
                 #`(begin
                   (define (name field ... . list-field-opt)
                     ((record-constructor #,rtd-name) field ... list-field-opt))
-                  (define-binders (name #,@accessors . #,list-accessor-opt)))
+                  (define-binder (name #,@accessors . #,list-accessor-opt)))
                 #`(begin
                   (define name
                     (record-constructor #,rtd-name))
-                  (define-binders (name #,@accessors))))
+                  (define-binder (name #,@accessors))))
               (define #,predicate-name
                 (record-predicate #,rtd-name))
               #,@(map

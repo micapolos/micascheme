@@ -23,5 +23,5 @@
       (infix)))
 
   (define cons scheme-cons)
-  (define-binders (cons car cdr))
+  (define-binder (cons car cdr))
 )
