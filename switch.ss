@@ -3,7 +3,8 @@
   (import
     (scheme)
     (define-syntax)
-    (throw))
+    (throw)
+    (lets))
 
   (define-syntax switch
     (lambda (stx)
@@ -35,14 +36,13 @@
         (throw non-exclusive
           (quote (switch $expr $pred ...))))))
 
-  (define-syntax index-switch
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ expr branch ... default)
-          #`(case expr
-            #,@(map
-              (lambda ($index $branch) #`((#,$index) #,$branch))
-              (iota (length (syntax->list #`(branch ...))))
-              (syntax->list #`(branch ...)))
-            (else default))))))
+  (define-syntax-case (index-switch expr branch ... default)
+    (lets
+      ($branches (syntax->list #`(branch ...)))
+      #`(case expr
+        #,@(map
+          (lambda ($index $branch) #`((#,$index) #,$branch))
+          (enumerate $branches)
+          $branches)
+        (else default))))
 )
