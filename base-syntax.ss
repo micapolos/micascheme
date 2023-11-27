@@ -10,7 +10,7 @@
     define-struct
     define-one-of)
 
-  (import (scheme) (base))
+  (import (scheme) (base) (base-transformers))
 
   (define-syntax index-switch
     (lambda (stx)

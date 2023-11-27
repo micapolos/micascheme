@@ -4,7 +4,7 @@
     infix infix: 
     := ->
     is being)
-  (import (scheme) (base))
+  (import (scheme) (base) (base-transformers))
 
   ; --------------------------------------------------
 

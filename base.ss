@@ -34,7 +34,6 @@
     ensure
     data enum
     partial
-    define-aux-keyword define-syntax-rule define-syntax-case
     displayln writeln logging
     indices iterate
     fold-while
@@ -178,28 +177,6 @@
                 "-"
                 (number->string (cdr $seed-opt)))))))))
 
-  (define-syntax define-syntax-rule
-    (syntax-rules ()
-      ((_ (name param ...) body)
-        (define-syntax name
-          (syntax-rules ()
-            ((_ param ...) body))))))
-
-  (define-syntax define-syntax-case
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ ($name $param ...) $body)
-          #`(define-syntax-case ($name $param ...) () $body))
-        ((_ ($name $param ...) $keywords $body)
-          #`(define-syntax-case $name $keywords
-            ((_ $param ...) $body)))
-        ((_ $name $keywords $case ...)
-          (let (($tmp (car (generate-temporaries `(tmp)))))
-            #`(define-syntax $name
-              (lambda (#,$tmp)
-                (syntax-case #,$tmp $keywords
-                  $case ...))))))))
-
   (define-syntax-rule (with-generate-temporary-seed $prefix $body ...)
     (parameterize ((generate-temporary-seed-opt (cons (quote $prefix) 0)))
       $body ...))
@@ -325,11 +302,6 @@
                     (lambda ($tmps $expr) #`((#,@$tmps) #,$expr))
                     $tmps $exprs))
                 (#,@(apply append $tmps))))))))
-
-  (define-syntax-rule (define-aux-keyword aux)
-    (define-syntax aux
-      (lambda (stx)
-        (syntax-error stx "misplaced aux keyword"))))
 
   (define-aux-keyword opt)
 
