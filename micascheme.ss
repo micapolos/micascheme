@@ -20,7 +20,8 @@
     (number)
     (stack)
     (iterate)
-    (generate))
+    (generate)
+    (test))
 
   (export
     cons
@@ -42,7 +43,8 @@
       (number)
       (stack)
       (iterate)
-      (generate)))
+      (generate)
+      (test)))
 
   (define cons scheme-cons)
   (define-binder (cons car cdr))
