@@ -8,8 +8,13 @@
     (scheme)
     (lets))
 
-  (define (displayln x) (display x) (newline))
-  (define (writeln x) (write x) (newline))
+  (define (displayln x)
+    (display x)
+    (newline))
+
+  (define (writeln x)
+    (write x)
+    (newline))
 
   (define-syntax logging
     (syntax-rules ()
@@ -30,5 +35,4 @@
       (+
         (time-second $time)
         (/ (time-nanosecond $time) 1000000000.0))))
-
 )
