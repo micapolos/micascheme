@@ -19,7 +19,6 @@
     bindings-eval
     script
     ordered-map
-    pi pi2
     bind-if
     opt-lets
     opt-lift
@@ -53,9 +52,7 @@
     gen-stack gen-list
 
     generate-temporary
-    build-identifier
-
-    fract)
+    build-identifier)
 
   (import
     (scheme)
@@ -299,9 +296,6 @@
   (define (list-indexed $list)
     (map-indexed (lambda ($index $value) (indexed $value $index)) $list))
 
-  (define pi (* (asin 1) 2))
-  (define pi2 (* (asin 1) 4))
-
   (define (current-seconds)
     (lets
       ($time (current-time `time-monotonic))
@@ -468,11 +462,6 @@
 
   (define (intercalate $list $item)
     (reverse (push-intercalated (stack) $item $list)))
-
-  ; --------------------------------------
-
-  (define (fract $number)
-    (- $number (floor $number)))
 
   ; --------------------------------------
 
