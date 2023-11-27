@@ -1,7 +1,6 @@
 (import (micascheme))
 
 (test
-  (list)
   (boolean)
   (seq)
   (term)
@@ -17,6 +16,7 @@
   (leo-syntax)
   (leo2)
   (lets)
+  (list)
   (micascheme)
   (mico-c)
   (monad)
