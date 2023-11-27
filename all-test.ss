@@ -3,7 +3,6 @@
 (test
   (base)
   (seq)
-  (base-syntax)
   (term)
   (compiler)
   (decompiler)
