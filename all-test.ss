@@ -9,6 +9,7 @@
   (decompiler)
   (evaluator)
   (fstack)
+  (identifier)
   (io)
   (leo)
   (leo2)

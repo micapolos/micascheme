@@ -380,10 +380,6 @@
 (check (equal? (script "foo" (string-append "bar") (string-append "goo")) "foobargoo"))
 (check (equal? (script "foo" (string-append "bar" "goo")) "foobargoo"))
 
-; === build-identifier ===
-
-(check (equal? (syntax->datum (build-identifier (s #`dupa) (string-append s "-jasiu"))) `dupa-jasiu))
-
 ; === associ ===
 
 (check (equal? (associ (list) 100 `a) #f))
@@ -661,11 +657,6 @@
 (check (equal? (stack 1 2 3) (list 3 2 1)))
 (check (equal? (top (stack 1 2 3)) 3))
 (check (equal? (pop (stack 1 2 3)) (stack 1 2)))
-
-; === identifier-named? ===
-
-(check (equal? (identifier-named? #`foo foo) #t))
-(check (equal? (identifier-named? #`foo bar) #f))
 
 ; === bindings-eval ===
 

@@ -10,6 +10,7 @@
     (base-syntax)
     (binder)
     (check)
+    (identifier)
     (define-syntax)
     (infix))
 
