@@ -100,14 +100,6 @@
 (check (not (raises? (lambda () 128))))
 (check (raises? (lambda () (throw error))))
 
-; === pair-values ===
-
-(lets
-  ((values $car $cdr) (pair-values (cons 1 2)))
-  (begin
-    (check (equal? $car 1))
-    (check (equal? $cdr 2))))
-
 ; === script ===
 
 (check (equal? (script "foo") "foo"))
@@ -215,10 +207,3 @@
         (lambda (_) (generate-symbol))
         (indices 8)))
     '($tmp-0 $tmp-1 $tmp-2 $tmp-3 $tmp-4 $tmp-5 $tmp-6 $tmp-7)))
-
-; === unpair
-
-(check
-  (=
-    (unpair (cons 3 2) l r (- l r))
-    1))

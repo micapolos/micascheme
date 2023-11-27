@@ -22,6 +22,7 @@
   (monad)
   ;(msdl)
   (number)
+  (pair)
   (parser)
   (procedure)
   (seq)

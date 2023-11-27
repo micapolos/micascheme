@@ -15,7 +15,6 @@
     fold-while
     find-index
     list-set list-ref-opt list-drop
-    unpair pair-values
     associ
     filter-map filter-opts
     map-find-indexed
@@ -130,19 +129,6 @@
 
   (define (list-indexed $list)
     (map-indexed (lambda ($index $value) (indexed $value $index)) $list))
-
-  (define-syntax unpair
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ expr lhs rhs body ...)
-          (let ((tmp (car (generate-temporaries `(tmp)))))
-            #`(let ((#,tmp expr))
-              (let ((lhs (car #,tmp))
-                    (rhs (cdr #,tmp)))
-                body ...)))))))
-
-  (define (pair-values $pair)
-    (values (car $pair) (cdr $pair)))
 
   (define (list-ref-opt $list $index)
     (and
