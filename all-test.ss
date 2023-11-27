@@ -8,6 +8,7 @@
   (compiler)
   (decompiler)
   (evaluator)
+  (failure)
   (from)
   (fstack)
   (identifier)
