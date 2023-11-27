@@ -296,24 +296,6 @@
 (check (equal? (top (stack 1 2 3)) 3))
 (check (equal? (pop (stack 1 2 3)) (stack 1 2)))
 
-; === bindings-eval ===
-
-(check
-  (equal?
-    (bindings-eval
-      (list)
-      `(string-append "foo" "bar"))
-    "foobar"))
-
-(check
-  (equal?
-    (bindings-eval
-      (list
-        (cons `foo "foo")
-        (cons `bar "bar"))
-      `(string-append foo bar))
-    "foobar"))
-
 ; === todo ===
 
 (check (raises? (lambda () (todo))))
