@@ -1,7 +1,8 @@
 (library (pair)
   (export
     unpair
-    pair-values)
+    pair-values
+    null-or-pair?)
   (import (scheme))
 
   (define-syntax unpair
@@ -16,4 +17,7 @@
 
   (define (pair-values $pair)
     (values (car $pair) (cdr $pair)))
+
+  (define (null-or-pair? $obj)
+    (or (null? $obj) (pair? $obj)))
 )

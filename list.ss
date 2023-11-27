@@ -3,7 +3,6 @@
     list-get
     list-get-overflow list-get-overflow? list-get-overflow-index
 
-    null-or-pair?
     opt
     single? single force-single
     ordered-map
@@ -64,9 +63,6 @@
 
   (define (bind-if $pred $obj $fn)
     (if ($pred $obj) ($fn $obj) $obj))
-
-  (define (null-or-pair? $obj)
-    (or (null? $obj) (pair? $obj)))
 
   (define-syntax opt-lets
     (syntax-rules ()
