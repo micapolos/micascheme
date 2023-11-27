@@ -6,7 +6,6 @@
     failure failure? failure-value failure!
     fallible-bind fallible-let
 
-    false?
     null-or-pair?
     opt
     single? single force-single
@@ -36,6 +35,7 @@
     (scheme)
     (syntax)
     (binder)
+    (boolean)
     (check)
     (identifier)
     (procedure)
@@ -91,9 +91,6 @@
         ((_ $target) #`$target))))
 
   (define-aux-keyword opt)
-
-  (define (false? $value)
-    (not $value))
 
   (define (fold-while $pred $fn $initial $list)
     (cond

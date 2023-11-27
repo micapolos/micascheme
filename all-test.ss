@@ -2,6 +2,7 @@
 
 (test
   (base)
+  (boolean)
   (seq)
   (term)
   (compiler)
