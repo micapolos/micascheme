@@ -8,7 +8,11 @@
     seq-flat-map seq-map
     indexed-seq-from indexed-seq)
 
-  (import (scheme) (base))
+  (import
+    (scheme)
+    (base)
+    (lets)
+    (switch))
 
   (define null-seq (lambda () `()))
 

@@ -10,9 +10,13 @@
     (base-syntax)
     (binder)
     (check)
+    (data)
     (identifier)
+    (lets)
     (define-syntax)
-    (infix))
+    (infix)
+    (switch)
+    (throw))
 
   (export
     cons
@@ -24,8 +28,13 @@
       (base-syntax)
       (binder)
       (check)
+      (data)
+      (identifier)
+      (lets)
       (define-syntax)
-      (infix)))
+      (infix)
+      (switch)
+      (throw)))
 
   (define cons scheme-cons)
   (define-binder (cons car cdr))

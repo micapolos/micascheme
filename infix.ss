@@ -4,7 +4,12 @@
     infix infix: 
     := ->
     is being)
-  (import (scheme) (base) (define-syntax))
+  (import
+    (scheme)
+    (base)
+    (define-syntax)
+    (data)
+    (switch))
 
   ; --------------------------------------------------
 

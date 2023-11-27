@@ -1,10 +1,18 @@
 (library (check)
   (export
     checking?
-    check)
+    check
+    raises?)
   (import (scheme))
 
   (define checking? (make-thread-parameter #f))
+
+  (define (raises? $proc)
+    (call/cc
+      (lambda (cont)
+        (with-exception-handler
+          (lambda (_) (cont #t))
+          (lambda () ($proc) #f)))))
 
   (meta define (syntax->location-string $syntax)
     (let
