@@ -11,6 +11,7 @@
   (from)
   (fstack)
   (identifier)
+  (indexed)
   (io)
   (leo)
   (leo-syntax)

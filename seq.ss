@@ -10,6 +10,7 @@
 
   (import
     (scheme)
+    (indexed)
     (list)
     (lets)
     (switch))

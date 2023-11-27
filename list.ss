@@ -18,7 +18,6 @@
     map-find-indexed
     map-indexed list-indexed
     indexed-find
-    indexed indexed? indexed-value indexed-index
     intercalate
     null
 
@@ -31,6 +30,7 @@
     (boolean)
     (check)
     (identifier)
+    (indexed)
     (procedure)
     (data)
     (lets)
@@ -146,8 +146,6 @@
         (else (syntax-error $syntax)))))
 
   ; --------------------------------------
-
-  (data (indexed value index))
 
   (define (map-find-indexed $proc $list)
     (map-find-indexed+ $proc $list 0))
