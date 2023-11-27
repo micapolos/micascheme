@@ -12,6 +12,7 @@
   (io)
   (leo)
   (leo2)
+  (micascheme)
   (mico-c)
   (monad)
   ;(msdl)

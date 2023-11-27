@@ -33,6 +33,7 @@
     with-tmps
     ensure
     data enum
+    data-accessors
     partial
     define-aux-keyword define-syntax-rule define-syntax-case
     displayln writeln logging
@@ -474,8 +475,10 @@
   (define (list-indexed $list)
     (map-indexed (lambda ($index $value) (indexed $value $index)) $list))
 
-  (define-aux-keyword data-accessors)
   (define-aux-keyword data-tail-accessor)
+
+  (define-syntax-rule (data-accessors ($name $accessor ...))
+    (define-property $name data-accessors (quote ($accessor ...))))
 
   (define-syntax data
     (lambda (stx)
