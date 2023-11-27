@@ -43,7 +43,6 @@
     indexed-find
     indexed indexed? indexed-value indexed-index
     intercalate
-    identifier-named?
     todo TODO
     null
 
