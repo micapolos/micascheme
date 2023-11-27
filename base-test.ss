@@ -42,18 +42,6 @@
 (check (equal? (single (list "a")) "a"))
 (check (equal? (single (list "a" "b")) #f))
 
-(with-generate-temporary-seed $tmp
-  (check
-    (equal?
-      (map syntax->datum (gen-stack generate-temporary 3))
-      (stack `$tmp-0 `$tmp-1 `$tmp-2))))
-
-(with-generate-temporary-seed $tmp
-  (check
-    (equal?
-      (map syntax->datum (gen-list generate-temporary 3))
-      (list `$tmp-0 `$tmp-1 `$tmp-2))))
-
 (with-generate-temporary-seed tmp
   (check
     (equal?

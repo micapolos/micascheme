@@ -42,8 +42,7 @@
     todo TODO
     null
 
-    flatten
-    gen-stack gen-list)
+    flatten)
 
   (import
     (scheme)
@@ -80,16 +79,6 @@
   (define (works? expr) expr #t)
 
   (define (flatten $lists) (apply append $lists))
-
-  (define (gen-stack $proc $size)
-    (iterate
-      (lambda ($stack)
-        (push $stack ($proc)))
-      (stack)
-      $size))
-
-  (define (gen-list $proc $size)
-    (reverse (gen-stack $proc $size)))
 
   (define (single $list)
     (and (single? $list) (car $list)))
