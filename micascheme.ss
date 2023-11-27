@@ -8,6 +8,7 @@
     (rename (base)
       (script do))
     (base-syntax)
+    (base-transformers)
     (infix))
 
   (export
@@ -18,8 +19,9 @@
         (do do!))
       (rename (base) (script do))
       (base-syntax)
+      (base-transformers)
       (infix)))
 
   (define cons scheme-cons)
-  (data-accessors (cons car cdr))
+  (binders (cons car cdr))
 )
