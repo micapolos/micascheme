@@ -1,5 +1,5 @@
 (library (switch)
-  (export switch switch-opt switch-exclusive)
+  (export switch switch-opt switch-exclusive index-switch)
   (import
     (scheme)
     (define-syntax)
@@ -34,4 +34,15 @@
       ((else _)
         (throw non-exclusive
           (quote (switch $expr $pred ...))))))
+
+  (define-syntax index-switch
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ expr branch ... default)
+          #`(case expr
+            #,@(map
+              (lambda ($index $branch) #`((#,$index) #,$branch))
+              (iota (length (syntax->list #`(branch ...))))
+              (syntax->list #`(branch ...)))
+            (else default))))))
 )

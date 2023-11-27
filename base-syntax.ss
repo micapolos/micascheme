@@ -1,6 +1,5 @@
 (library (base-syntax)
   (export
-    index-switch
     test
     
     boolean->datum
@@ -11,16 +10,6 @@
     (scheme)
     (base)
     (define-syntax))
-
-  (define-syntax index-switch
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ expr branch ... default)
-          #`(case expr
-            #,@(map-indexed
-              (lambda ($index $branch) #`((#,$index) #,$branch))
-              (syntax->list #`(branch ...)))
-            (else default))))))
 
   (define-syntax test
     (lambda ($syntax)
