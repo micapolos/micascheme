@@ -17,7 +17,8 @@
     (infix)
     (switch)
     (throw)
-    (number))
+    (number)
+    (stack))
 
   (export
     cons
@@ -36,7 +37,8 @@
       (infix)
       (switch)
       (throw)
-      (number)))
+      (number)
+      (stack)))
 
   (define cons scheme-cons)
   (define-binder (cons car cdr))

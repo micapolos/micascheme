@@ -45,7 +45,6 @@
     todo TODO
     null
 
-    stack push push-list push-all top pop
     flatten
     gen-stack gen-list
 
@@ -61,7 +60,8 @@
     (data)
     (lets)
     (throw)
-    (switch))
+    (switch)
+    (stack))
 
   (define identity (lambda (x) x))
 
@@ -81,20 +81,14 @@
           (writeln $value)
           $value))))
 
+  (define (iterate $proc $item $count)
+    (cond
+      ((= $count 0) $item)
+      (else (iterate $proc ($proc $item) (- $count 1)))))
+
   (define (works? expr) expr #t)
 
-  (define (push $stack $item) (cons $item $stack))
-  (define (push-list $stack $list) (fold-left push $stack $list))
-  (define (push-all $stack $stack2) (append $stack2 $stack))
-  (define (top $stack) (car $stack))
-  (define (pop $stack) (cdr $stack))
   (define (flatten $lists) (apply append $lists))
-
-  (define-syntax stack
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $item ...) 
-          #`(list #,@(reverse (syntax->list #`($item ...))))))))
 
   (define (gen-stack $proc $size)
     (iterate
@@ -410,11 +404,6 @@
 
   (define (indexed-find $proc $list)
     (indexed-find+ $proc $list 0))
-
-  (define (iterate $proc $item $count)
-    (cond
-      ((= $count 0) $item)
-      (else (iterate $proc ($proc $item) (- $count 1)))))
 
   (data (list-get-overflow index))
 

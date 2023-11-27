@@ -1,4 +1,4 @@
-(import (scheme) (base) (check) (data) (lets))
+(import (scheme) (base) (check) (data) (lets) (stack))
 
 ; === app ===
 
@@ -41,14 +41,6 @@
 (check (equal? (single (list)) #f))
 (check (equal? (single (list "a")) "a"))
 (check (equal? (single (list "a" "b")) #f))
-
-; == stack ===
-
-(check (equal? (stack) (list)))
-(check (equal? (stack 1 2 3) (list 3 2 1)))
-(check (equal? (push (stack 1 2 3) 4) (stack 1 2 3 4)))
-(check (equal? (push-list (stack 1 2 3) (list 4 5 6)) (stack 1 2 3 4 5 6)))
-(check (equal? (push-all (stack 1 2 3) (stack 4 5 6)) (stack 1 2 3 4 5 6)))
 
 (with-generate-temporary-seed $tmp
   (check
@@ -288,13 +280,6 @@
 (let (($fn (lambda (s) (string-append s "!"))))
   (check (equal? (iterate $fn "Hello" 0) "Hello"))
   (check (equal? (iterate $fn "Hello" 3) "Hello!!!")))
-
-; === stack ===
-
-(check (equal? (stack) (list)))
-(check (equal? (stack 1 2 3) (list 3 2 1)))
-(check (equal? (top (stack 1 2 3)) 3))
-(check (equal? (pop (stack 1 2 3)) (stack 1 2)))
 
 ; === todo ===
 
