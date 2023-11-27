@@ -1,4 +1,4 @@
-(import (check) (throw))
+(import (check) (throw) (base))
 
 ; === or-throw ===
 
@@ -12,13 +12,13 @@
     (lambda ()
       (or-throw #f))))
 
-; (check
-;   (equal?
-;     (or-throw (single (list 1)))
-;     1))
+(check
+  (equal?
+    (or-throw (single (list 1)))
+    1))
 
-; (check
-;   (raises?
-;     (lambda ()
-;       (or-throw (single (list))))))
+(check
+  (raises?
+    (lambda ()
+      (or-throw (single (list))))))
 
