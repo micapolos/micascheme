@@ -6,7 +6,7 @@
     is being)
   (import
     (scheme)
-    (base)
+    (list)
     (syntax)
     (data)
     (switch))

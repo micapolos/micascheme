@@ -1,7 +1,7 @@
 (import (micascheme))
 
 (test
-  (base)
+  (list)
   (boolean)
   (seq)
   (term)

@@ -5,7 +5,7 @@
     (rename
       (except (scheme) do)
       (cons scheme-cons))
-    (rename (base)
+    (rename (list)
       (script do))
     (binder)
     (boolean)
@@ -32,7 +32,7 @@
       (rename
         (except (scheme) cons)
         (do do!))
-      (rename (base) (script do))
+      (rename (list) (script do))
       (binder)
       (boolean)
       (check)

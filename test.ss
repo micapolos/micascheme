@@ -1,6 +1,6 @@
 (library (test)
   (export test)
-  (import (scheme) (base))
+  (import (scheme) (list))
 
   (define-syntax test
     (lambda ($syntax)
