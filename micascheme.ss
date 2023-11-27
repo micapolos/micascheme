@@ -18,7 +18,9 @@
     (switch)
     (throw)
     (number)
-    (stack))
+    (stack)
+    (iterate)
+    (generate))
 
   (export
     cons
@@ -38,7 +40,9 @@
       (switch)
       (throw)
       (number)
-      (stack)))
+      (stack)
+      (iterate)
+      (generate)))
 
   (define cons scheme-cons)
   (define-binder (cons car cdr))

@@ -1,4 +1,4 @@
-(import (scheme) (base) (check) (data) (lets) (stack))
+(import (scheme) (base) (check) (data) (lets) (stack) (generate))
 
 ; === app ===
 
@@ -274,12 +274,6 @@
 ; === list-indexed ===
 
 (check (equal? (list-indexed (list "a" "b" "c")) (list (indexed "a" 0) (indexed "b" 1) (indexed "c" 2))))
-
-; === iterate ===
-
-(let (($fn (lambda (s) (string-append s "!"))))
-  (check (equal? (iterate $fn "Hello" 0) "Hello"))
-  (check (equal? (iterate $fn "Hello" 3) "Hello!!!")))
 
 ; === todo ===
 
