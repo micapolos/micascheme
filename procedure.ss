@@ -1,9 +1,12 @@
 (library (procedure)
   (export
+    identity
     once-proc
     checking-once
     app
-    values-app)
+    values-app
+    partial
+    todo TODO)
   (import
     (scheme)
     (lets)
@@ -46,4 +49,19 @@
                     (lambda ($tmps $expr) #`((#,@$tmps) #,$expr))
                     $tmps $exprs))
                 (#,@(apply append $tmps))))))))
+
+  (define (partial $proc . $partial-args)
+    (lambda $args
+      (apply $proc (append $partial-args $args))))
+
+  (define (todo)
+    (throw todo))
+
+  (define-syntax TODO
+    (lambda ($syntax)
+      (cond
+        ((identifier? $syntax) (syntax (todo)))
+        (else (syntax-error $syntax)))))
+
+  (define identity (lambda (x) x))
 )

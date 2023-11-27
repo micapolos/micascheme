@@ -2,7 +2,8 @@
   (export
     checking?
     check
-    raises?)
+    raises?
+    works?)
   (import (scheme))
 
   (define checking? (make-thread-parameter #f))
@@ -13,6 +14,8 @@
         (with-exception-handler
           (lambda (_) (cont #t))
           (lambda () ($proc) #f)))))
+
+  (define (works? expr) expr #t)
 
   (meta define (syntax->location-string $syntax)
     (let

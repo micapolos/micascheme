@@ -176,10 +176,6 @@
 (check (equal? (intercalate (list 1) 0) (list 1)))
 (check (equal? (intercalate (list 1 2 3) 0) (list 1 0 2 0 3)))
 
-; === curry ===
-
-(check (equal? ((partial string-append "a" "b") "c" "d") "abcd"))
-
 ; === indices ===
 
 (check (equal? (indices 3) (list 0 1 2)))
@@ -228,11 +224,6 @@
 ; === list-indexed ===
 
 (check (equal? (list-indexed (list "a" "b" "c")) (list (indexed "a" 0) (indexed "b" 1) (indexed "c" 2))))
-
-; === todo ===
-
-(check (raises? (lambda () (todo))))
-(check (raises? (lambda () TODO)))
 
 ; === null ===
 

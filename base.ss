@@ -1,7 +1,5 @@
 (library (base)
   (export 
-    identity
-
     list-get
     list-get-overflow list-get-overflow? list-get-overflow-index
 
@@ -11,16 +9,13 @@
     false?
     null-or-pair?
     opt
-    app values-app
     single? single force-single
     script
     ordered-map
     bind-if
     opt-lets
     opt-lift
-    works?
     ensure
-    partial
     indices
     fold-while
     find-index
@@ -33,7 +28,6 @@
     indexed-find
     indexed indexed? indexed-value indexed-index
     intercalate
-    todo TODO
     null
 
     flatten)
@@ -52,10 +46,6 @@
     (stack)
     (generate)
     (number))
-
-  (define identity (lambda (x) x))
-
-  (define (works? expr) expr #t)
 
   (define (flatten $lists) (apply append $lists))
 
@@ -99,10 +89,6 @@
             (($name $arg ...)
               #`(script ($name $target $arg ...) $op2 ...))))
         ((_ $target) #`$target))))
-
-  (define (partial $proc . $partial-args)
-    (lambda $args
-      (apply $proc (append $partial-args $args))))
 
   (define-aux-keyword opt)
 
@@ -199,15 +185,6 @@
               (if ($pred #,$tmp)
                 #,$tmp
                 (throw ensure (quote $pred) #,$tmp))))))))
-
-  (define (todo)
-    (throw todo))
-
-  (define-syntax TODO
-    (lambda ($syntax)
-      (cond
-        ((identifier? $syntax) (syntax (todo)))
-        (else (syntax-error $syntax)))))
 
   (define-syntax null
     (lambda ($syntax)

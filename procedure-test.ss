@@ -44,3 +44,13 @@
       (1 (values "b"))
       (2 (values "c" "d")))
     "abcd"))
+
+; === partial ===
+
+(check (equal? ((partial string-append "a" "b") "c" "d") "abcd"))
+
+; === todo ===
+
+(check (raises? (lambda () (todo))))
+(check (raises? (lambda () TODO)))
+
