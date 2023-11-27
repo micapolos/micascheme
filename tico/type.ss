@@ -39,6 +39,7 @@
     type-argument-access-opt
     type-argument-access
 
+    type-struct
     type-ref
     type-ref-index
     type-matches? types-match?
@@ -226,6 +227,9 @@
 
   (define (types-match $types $pattern)
     (types-match-from $types $pattern 0))
+
+  (define (type-struct $name $items)
+    (struct $name (types-flatten $items)))
 
   (define (type-ref $type $pattern)
     (indexed-find

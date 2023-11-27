@@ -239,6 +239,18 @@
           (list (boolean-type)))
         (list (string-type) (any-type))))))
 
+; --- type-struct
+
+(check
+  (equal?
+    (type-struct 'foo
+      (list
+        (args-type (list))
+        (string-type)
+        (args-type (list (boolean-type) (number-type)))))
+    (struct 'foo
+      (list (string-type) (boolean-type) (number-type)))))
+
 ; --- type-ref
 
 (check
@@ -296,7 +308,7 @@
           (number-type))))
     '(foo string number)))
 
-; --- args-types->types
+; --- types-flatten
 
 (check
   (equal?
