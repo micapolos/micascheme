@@ -332,3 +332,10 @@
         (lambda (_) (generate-symbol))
         (indices 8)))
     '($tmp-0 $tmp-1 $tmp-2 $tmp-3 $tmp-4 $tmp-5 $tmp-6 $tmp-7)))
+
+; === unpair
+
+(check
+  (=
+    (unpair (cons 3 2) l r (- l r))
+    1))
