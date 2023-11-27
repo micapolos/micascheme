@@ -27,11 +27,6 @@
 (check (equal? (null-or-pair? (cons 1 2)) #t))
 (check (equal? (null-or-pair? 123) #f))
 
-; === from ===
-
-(check (equal? (from (base-from-testing) foo) "foo"))
-(check (equal? (from (base-from-testing) single?) "single? override"))
-
 ; === single ===
 
 (check (equal? (single? (list)) #f))

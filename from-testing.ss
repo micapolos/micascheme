@@ -1,4 +1,4 @@
-(library (base-from-testing)
+(library (from-testing)
   (export foo single?)
   (import (scheme))
 
