@@ -1,6 +1,6 @@
 (library (base-transformers)
   (export
-    binders
+    define-binders
     transform-binders
     define-syntax-rule
     define-syntax-case
@@ -37,7 +37,7 @@
   (define-aux-keyword accessors)
   (define-aux-keyword tail-accessor)
 
-  (define-syntax binders
+  (define-syntax define-binders
     (lambda ($syntax)
       (syntax-case $syntax ()
         ((_ ($name $accessor ...))
