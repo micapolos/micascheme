@@ -102,8 +102,11 @@
     (switch-opt $target
       ((arrow? $arrow)
         (and
-          (types-match? $args (arrow-params $arrow))
-          (force-single (arrow-results $arrow))))))
+          (types-match?
+            (types-flatten $args)
+            (arrow-params $arrow))
+          (maybe-args-type
+            (arrow-results $arrow))))))
 
   (define (type-application $target $args)
     (or-throw
@@ -295,6 +298,11 @@
               ,(type-line (property-param $property))
               (offering ,(type-line (property-body $property)))))
           ((else $other) $other)))))
+
+  (define (maybe-args-type $types)
+    (case (length $types)
+      ((1) (car $types))
+      (else (args-type $types))))
 
   (define (type-flatten $type)
     (switch $type

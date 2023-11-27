@@ -196,6 +196,26 @@
   (equal?
     (type-application
       (arrow
+        (list (string-type) (number-type))
+        (list (boolean-type) (char-type)))
+      (list (string-type) (number-type)))
+    (args-type (list (boolean-type) (char-type)))))
+
+(check
+  (equal?
+    (type-application
+      (arrow
+        (list (string-type) (number-type))
+        (list (boolean-type) (char-type)))
+      (list
+        (args-type (list))
+        (args-type (list (string-type) (number-type)))))
+    (args-type (list (boolean-type) (char-type)))))
+
+(check
+  (equal?
+    (type-application
+      (arrow
         (list (any-type) (number-type))
         (list (boolean-type)))
       (list (string-type) (number-type)))
