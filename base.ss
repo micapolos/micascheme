@@ -44,6 +44,7 @@
     (binder)
     (check)
     (identifier)
+    (procedure)
     (data)
     (lets)
     (throw)
@@ -102,27 +103,6 @@
   (define (partial $proc . $partial-args)
     (lambda $args
       (apply $proc (append $partial-args $args))))
-
-  (define-syntax-rule (app $fn $arg ...)
-    ($fn $arg ...))
-
-  (define-syntax values-app
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ ($arity $expr) ...)
-          (and
-            (for-all integer? (datum ($arity ...)))
-            (for-all nonnegative? (datum ($arity ...))))
-          (lets
-            ($arities (map syntax->datum (syntax->list #'($arity ...))))
-            ($exprs (syntax->list #'($expr ...)))
-            ($tmps (map generate-temporaries (map iota $arities)))
-            #`(let-values
-                (
-                  #,@(map
-                    (lambda ($tmps $expr) #`((#,@$tmps) #,$expr))
-                    $tmps $exprs))
-                (#,@(apply append $tmps))))))))
 
   (define-aux-keyword opt)
 

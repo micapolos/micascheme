@@ -1,20 +1,5 @@
 (import (scheme) (base) (check) (data) (lets) (stack) (generate))
 
-; === app ===
-
-(check (equal? (app (lambda (x y) (string-append x y)) "foo" "bar") "foobar"))
-
-; === values-app ===
-
-(check
-  (equal?
-    (values-app
-      (2 (values string-append "a"))
-      (0 (values))
-      (1 (values "b"))
-      (2 (values "c" "d")))
-    "abcd"))
-
 ; === false? ===
 
 (check (equal? (false? #f) #t))
