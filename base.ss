@@ -55,17 +55,7 @@
     generate-temporary
     build-identifier
 
-    fract
-
-    struct-constructor-syntax
-    struct-accessor-syntax
-    struct->datum-syntax
-    struct-syntax
-
-    one-of-constructor-syntax
-    one-of-switch-syntax
-    one-of->datum-syntax
-    one-of-syntax)
+    fract)
 
   (import
     (scheme)
@@ -483,129 +473,6 @@
 
   (define (fract $number)
     (- $number (floor $number)))
-
-  ; --------------------------------------
-
-  (define (struct-constructor-syntax $name $fields)
-    #`(define-syntax-rule (#,$name #,@$fields)
-      #,(case (length $fields)
-        ((0) #f)
-        ((1) (car $fields))
-        ((2) #`(cons #,(car $fields) #,(cadr $fields)))
-        (else #`(vector #,@$fields)))))
-
-  (define (struct-accessor-syntax $name $fields $index)
-    (lets
-      ($name-string (symbol->string (syntax->datum $name)))
-      ($field (list-ref $fields $index))
-      ($field-string (symbol->string (syntax->datum $field)))
-      ($accessor-string (string-append $name-string "-" $field-string))
-      ($accessor (datum->syntax $field (string->symbol $accessor-string)))
-      (case (length $fields)
-        ((1) 
-          #`(define-syntax-rule (#,$accessor expr) expr))
-        ((2) 
-          #`(define-syntax-rule (#,$accessor expr)
-            (#,(if (= $index 0) #`car #`cdr) expr)))
-        (else
-          #`(define-syntax-rule (#,$accessor expr) 
-            (vector-ref expr #,$index))))))
-
-  (define (struct->datum-syntax $name $fields)
-    (lets
-      ($name-string (symbol->string (syntax->datum $name)))
-      ($name->datum-string (string-append $name-string "->datum"))
-      ($name->datum (datum->syntax $name (string->symbol $name->datum-string)))
-      ($field-strings (map symbol->string (map syntax->datum $fields)))
-      ($accessor-strings (map (lambda ($field-string) (string-append $name-string "-" $field-string)) $field-strings))
-      ($accessors (map (partial datum->syntax $name) (map string->symbol $accessor-strings)))
-      ($datum-strings (map (lambda ($field-string) (string-append $field-string "->datum")) $field-strings))
-      ($datums (map (partial datum->syntax $name) (map string->symbol $datum-strings)))
-      ($tmp (generate-temporary #`expr))
-      #`(define (#,$name->datum #,$tmp)
-        (quasiquote
-          (#,$name
-            #,@(map 
-              (lambda ($accessor $datum) #`(unquote (#,$datum (#,$accessor #,$tmp))))
-              $accessors
-              $datums))))))
-
-  (define (struct-syntax $name $fields)
-    (lets
-      ($size (length $fields))
-      #`(begin
-        #,(struct-constructor-syntax $name $fields)
-        #,@(map (partial struct-accessor-syntax $name $fields) (indices $size))
-        #,(struct->datum-syntax $name $fields))))
-
-  ; --------------------------------------
-
-  (define (one-of-constructor-syntax $name $cases $index)
-    (lets
-      ($case (list-ref $cases $index))
-      ($constructor 
-        (datum->syntax $name 
-          (string->symbol 
-            (string-append 
-              (symbol->string (syntax->datum $case))
-              "-"
-              (symbol->string (syntax->datum $name))))))
-      #`(define-syntax-rule (#,$constructor one-of)
-        (cons #,$index one-of))))
-
-  (define (one-of-switch-syntax $name $cases)
-    (lets
-      ($name-string (symbol->string (syntax->datum $name)))
-      ($switch (build-identifier ($string $name) (string-append $string "-switch")))
-      ($one-of (generate-temporary #`one-of))
-      ($index (generate-temporary #`index))
-      ($value (generate-temporary #`value))
-      ($case-pred (lambda ($case) (build-identifier ($string $case) (string-append $string "?"))))
-      ($tmps (map generate-temporary $cases))
-      ($index-tmp (lambda ($index) (list-ref $tmps $index)))
-      ($case-body (lambda ($case) (build-identifier ($string $case) (string-append $string "-body"))))
-      ($case-pattern (lambda ($index $case) #`(#,($case-pred $case) #,($index-tmp $index))))
-      ($case-rule (lambda ($index $case) #`(#,($case-pattern $index $case) #,($case-body $case))))
-      #`(define-syntax #,$switch
-        (syntax-rules (#,@(map $case-pred $cases))
-          ((_ one-of #,@(map-indexed $case-rule $cases))
-            (lets
-              (#,$one-of one-of)
-              (#,$index (car #,$one-of))
-              (#,$value (cdr #,$one-of))
-              (case #,$index
-                #,@(map-indexed 
-                  (lambda ($case-index $case)
-                    #`((#,$case-index) 
-                      (lets
-                        (#,($index-tmp $case-index) #,$value)
-                        #,($case-body $case))))
-                  $cases))))))))
-  
-  (define (one-of->datum-syntax $name $cases)
-    (lets
-      ($name->datum (build-identifier ($string $name) (string-append $string "->datum")))
-      ($switch (build-identifier ($string $name) (string-append $string "-switch")))
-      ($tmp (generate-temporary #`one-of))
-      ($case->datum (lambda ($case) (build-identifier ($string $case) (string-append $string "->datum"))))
-      ($case-pred (lambda ($case) (build-identifier ($string $case) (string-append $string "?"))))
-      ($tmps (map generate-temporary $cases))
-      ($index-tmp (lambda ($index) (list-ref $tmps $index)))
-      ($case-pattern (lambda ($index $case) #`(#,($case-pred $case) #,($index-tmp $index))))
-      ($case-rule (lambda ($index $case) 
-        #`(#,($case-pattern $index $case) 
-        `(#,$name ,(#,($case->datum $case) #,($index-tmp $index))))))
-      #`(define (#,$name->datum #,$tmp)
-        (#,$switch #,$tmp 
-          #,@(map-indexed $case-rule $cases)))))
-
-  (define (one-of-syntax $name $cases)
-    (lets
-      ($size (length $cases))
-      #`(begin
-        #,@(map (partial one-of-constructor-syntax $name $cases) (indices $size))
-        #,(one-of-switch-syntax $name $cases)
-        #,(one-of->datum-syntax $name $cases))))
 
   ; --------------------------------------
 
