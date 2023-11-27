@@ -99,23 +99,4 @@
       (syntax-case stx (as)
         ((_ body ...)
           #`(lambda body ...)))))
-
-  ; --------------------------------------
-
-  (assert (equal? (infix "a") "a"))
-  
-  (assert (equal? (infix "abc" string-length) 3))
-  (assert (equal? (infix "abc" string-length ()) 3))
-  (assert (equal? (infix "abc" string-length () number->string) "3"))
-  (assert (equal? (infix "abc" string-length () number->string ()) "3"))
-  
-  (assert (equal? (infix () string-length "abc") 3))
-
-  (assert (equal? (infix "a" string-append) "a"))
-  (assert (equal? (infix "a" string-append ()) "a"))
-  (assert (equal? (infix "a" string-append "b") "ab"))
-  (assert (equal? (infix "a" string-append (: "b")) "ab"))
-  (assert (equal? (infix "a" string-append (: "b" "c")) "abc"))
-
-  (assert (equal? (infix ("a" string-append "b") string-append ("c" + "d")) "abcd"))
 )

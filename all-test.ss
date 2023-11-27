@@ -12,6 +12,7 @@
   (fstack)
   (identifier)
   (indexed)
+  (infix)
   (io)
   (leo)
   (leo-syntax)
