@@ -1,6 +1,8 @@
 (library (throw)
-  (export throw or-throw)
-  (import (scheme))
+  (export ensure throw or-throw)
+  (import
+    (scheme)
+    (lets))
 
   (define-syntax throw
     (lambda (stx)
@@ -20,4 +22,16 @@
         ((_ $other)
           #'(or $other
             (throw or-throw $other))))))
+
+  (define-syntax ensure
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $pred $expr) (identifier? #`$pred)
+          (lets
+            ($tmp (car (generate-temporaries `(tmp))))
+            #`(lets
+              (#,$tmp $expr)
+              (if ($pred #,$tmp)
+                #,$tmp
+                (throw ensure (quote $pred) #,$tmp))))))))
 )

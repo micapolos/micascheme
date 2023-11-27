@@ -11,7 +11,6 @@
     bind-if
     opt-lets
     opt-lift
-    ensure
     indices
     fold-while
     find-index
@@ -167,18 +166,6 @@
       ((null? $list) #f)
       ((equal? (caar $list) $obj) (cons $index (cdar $list)))
       (else (associ (cdr $list) (+ $index 1) $obj))))
-
-  (define-syntax ensure
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $pred $expr) (identifier? #`$pred)
-          (lets
-            ($tmp (car (generate-temporaries `(tmp))))
-            #`(lets
-              (#,$tmp $expr)
-              (if ($pred #,$tmp)
-                #,$tmp
-                (throw ensure (quote $pred) #,$tmp))))))))
 
   (define-syntax null
     (lambda ($syntax)
