@@ -19,6 +19,7 @@
     (throw)
     (number)
     (stack)
+    (system)
     (generate)
     (test))
 
@@ -41,6 +42,7 @@
       (throw)
       (number)
       (stack)
+      (system)
       (generate)
       (test)))
 
