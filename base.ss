@@ -11,8 +11,6 @@
     false?
     null-or-pair?
     opt
-    once-proc
-    checking-once
     app values-app
     single? single force-single
     script
@@ -84,22 +82,6 @@
 
   (define (null-or-pair? $obj)
     (or (null? $obj) (pair? $obj)))
-
-  (define-syntax-rule (once-proc $proc)
-    (let ()
-      (define $applied? #f)
-      (lambda ()
-        (when $applied? (throw once-proc $proc))
-        (set! $applied? #t)
-        ($proc))))
-
-  (define-syntax-rule (checking-once $body)
-    (let ()
-      (define $applied? #f)
-      (lambda ()
-        (when $applied? (error `checking-once "called twice" (quote $body)))
-        (set! $applied? #t)
-        $body)))
 
   (define-syntax opt-lets
     (syntax-rules ()

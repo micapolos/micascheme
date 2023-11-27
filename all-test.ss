@@ -21,6 +21,7 @@
   ;(msdl)
   (number)
   (parser)
+  (procedure)
   (seq)
   (sequential-syntax)
   (sequential)
