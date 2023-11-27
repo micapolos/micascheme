@@ -22,6 +22,8 @@
     var var? var-index
     type-value
 
+    args-types->types
+
     test-type
     static-test-type
 
@@ -292,4 +294,7 @@
               ,(type-line (property-param $property))
               (offering ,(type-line (property-body $property)))))
           ((else $other) $other)))))
+
+  (define (args-types->types $args-types)
+    (apply append (map args-type-items $args-types)))
 )

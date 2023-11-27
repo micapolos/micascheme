@@ -275,3 +275,17 @@
           (string-type) 
           (number-type))))
     '(foo string number)))
+
+; --- args-types->types
+
+(check
+  (equal?
+    (args-types->types
+      (list
+        (args-type (list))
+        (args-type (list (boolean-type)))
+        (args-type (list (string-type) (number-type)))))
+    (list
+      (boolean-type)
+      (string-type)
+      (number-type))))
