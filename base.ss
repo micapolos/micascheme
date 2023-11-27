@@ -54,7 +54,7 @@
     (switch)
     (stack)
     (generate)
-    (iterate))
+    (number))
 
   (define identity (lambda (x) x))
 

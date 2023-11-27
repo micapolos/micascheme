@@ -19,7 +19,6 @@
     (throw)
     (number)
     (stack)
-    (iterate)
     (generate)
     (test))
 
@@ -42,7 +41,6 @@
       (throw)
       (number)
       (stack)
-      (iterate)
       (generate)
       (test)))
 

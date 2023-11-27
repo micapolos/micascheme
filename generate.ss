@@ -7,7 +7,7 @@
   (import
     (scheme)
     (identifier)
-    (iterate)
+    (number)
     (stack)
     (check)
     (lets)
