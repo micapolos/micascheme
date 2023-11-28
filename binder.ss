@@ -10,14 +10,13 @@
   (define-aux-keyword tail-accessor)
 
   (define-syntax define-binder
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ ($name $accessor ...))
-          #`(define-property $name accessors (quote ($accessor ...))))
-        ((_ ($name $accessor ... . $tail-accessor))
-          #`(begin
-            (define-property $name accessors (quote ($accessor ...)))
-            (define-property $name tail-accessor (quote $tail-accessor)))))))
+    (syntax-rules ()
+      ((_ ($name $accessor ...))
+        (define-property $name accessors (quote ($accessor ...))))
+      ((_ ($name $accessor ... . $tail-accessor))
+        (begin
+          (define-property $name accessors (quote ($accessor ...)))
+          (define-property $name tail-accessor (quote $tail-accessor))))))
 
   (define (transform-binder $lookup $pattern $expr $body)
     (syntax-case $pattern ()
