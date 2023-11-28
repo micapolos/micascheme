@@ -6,11 +6,7 @@
   (import
     (scheme))
 
-  (define-syntax stack
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $item ...)
-          #`(list #,@(reverse (syntax->list #`($item ...))))))))
+  (define (stack . $items) (reverse $items))
 
   (define (push $stack $item) (cons $item $stack))
   (define (push-list $stack $list) (fold-left push $stack $list))

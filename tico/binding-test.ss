@@ -40,7 +40,7 @@
         (number-type)))
     (typing (number-type)
       (layment (type->layout (number-type))
-        (variable-compilation '$tmp-1
+        (variable-compilation '$tmp-0
           1)))))
 
 (check
