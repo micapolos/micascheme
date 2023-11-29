@@ -4,8 +4,7 @@
     writeln
     logging
     current-seconds
-    pretty-print-current
-    loop-current)
+    keep-pretty-printing-current)
   (import
     (scheme)
     (lets)
@@ -33,14 +32,10 @@
           (writeln $value)
           $value))))
 
-  (define (pretty-print-current $current)
-    (unsafe-current
+  (define (keep-pretty-printing-current $current)
+    (do () (#f)
       (pretty-print
         (unsafe-current-get $current))))
-
-  (define (loop-current $current)
-    (do () (#f)
-      (unsafe-current-get $current)))
 
   (define current-seconds
     (unsafe-current
