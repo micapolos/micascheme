@@ -26,6 +26,8 @@
   (pair)
   (parser)
   (procedure)
+  (proof)
+  (proven)
   (random)
   (script)
   (seq)

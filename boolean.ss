@@ -1,8 +1,7 @@
 (library (boolean)
-  (export
-    false?)
+  (export false? true?)
   (import (scheme))
 
-  (define (false? $value)
-    (not $value))
+  (define (false? $value) (not $value))
+  (define (true? $value) (not (false? $value)))
 )
