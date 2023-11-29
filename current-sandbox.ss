@@ -1,6 +1,10 @@
 (import (micascheme))
 
-(run-current
-  (lets (in current)
-    ($a (print-current current-seconds))
-    (print-current current-random)))
+(loop-current
+  (lets
+    (in current
+      ($percent (current-random-below 100))
+      (pretty-print-current
+        (current
+          (string-append
+            (number->string $percent) "%"))))))
