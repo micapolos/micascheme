@@ -58,7 +58,9 @@
             ;(displayln "Audio callback...")
             (with-mutex $audio-mutex
               (let (($tmp-bytevector (make-bytevector $len)))
-                ((lambda ($bytevector) $callback ...) $tmp-bytevector)
+                (app
+                  (lambda ($bytevector) $callback ...)
+                  $tmp-bytevector)
                 (do
                   (($index 0 (+ $index 1)))
                   ((>= $index $len) (void))
