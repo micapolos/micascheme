@@ -1,10 +1,14 @@
 (library (binder)
   (export
     define-binder
-    transform-binder)
+    transform-binder
+    transform-monad)
   (import
     (scheme)
-    (syntax))
+    (boolean)
+    (identifier)
+    (syntax)
+    (switch))
 
   (define-aux-keyword accessors)
   (define-aux-keyword tail-accessor)
@@ -113,4 +117,18 @@
                     $body))
                 $body
                 (reverse $specs))))))))
+
+  (define (transform-monad $monad $expr $var $body)
+    (switch $monad
+      ((identifier? $identifier)
+        #`(
+          #,(build-identifier ($string $monad) (string-append $string "-bind"))
+          #,$expr
+          (lambda (#,$var) #,$body)))
+      ((else $other)
+        (switch (syntax->datum $other)
+          ((false? _)
+            #`(let ((#,$var #,$expr)) #,$body))
+          ((else _)
+            (syntax-error $monad "not a monad"))))))
 )

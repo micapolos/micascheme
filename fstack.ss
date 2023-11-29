@@ -41,7 +41,8 @@
       (lets
         ($pointer (make-ftype-pointer $ftype (fstack-address-parameter)))
         (do (fstack-address-parameter (+ (fstack-address-parameter) (ftype-sizeof $ftype))))
-        (if (> (fstack-address-parameter) (fstack-top-parameter))
-          (error `flocal "fstack overflow"))
+        (do
+          (if (> (fstack-address-parameter) (fstack-top-parameter))
+            (error `flocal "fstack overflow")))
         $pointer)))
 )
