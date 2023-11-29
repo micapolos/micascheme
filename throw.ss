@@ -2,7 +2,6 @@
   (export ensure throw or-throw)
   (import
     (scheme)
-    (lets)
     (syntax))
 
   (define-syntax-rule (throw name item ...)
@@ -19,8 +18,8 @@
           (throw or-throw $other)))))
 
   (define-syntax-rule (ensure $pred $expr)
-    (lets
-      ($tmp $expr)
+    (let
+      (($tmp $expr))
       (cond
         (($pred $tmp) $tmp)
         (else (throw ensure (quote $pred) $tmp)))))

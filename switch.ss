@@ -3,8 +3,7 @@
   (import
     (scheme)
     (syntax)
-    (throw)
-    (lets))
+    (throw))
 
   (define-syntax switch
     (syntax-rules (else)
@@ -34,8 +33,8 @@
           (quote (switch $expr $pred ...))))))
 
   (define-syntax-case (index-switch expr branch ... default)
-    (lets
-      ($branches (syntax->list #`(branch ...)))
+    (let
+      (($branches (syntax->list #`(branch ...))))
       #`(case expr
         #,@(map
           (lambda ($index $branch) #`((#,$index) #,$branch))
