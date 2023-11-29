@@ -1,4 +1,4 @@
-(import (scheme) (list) (check) (data) (lets) (stack) (generate) (failure))
+(import (scheme) (list) (check) (data) (lets) (stack) (indexed) (generate) (failure))
 
 ; === single ===
 
