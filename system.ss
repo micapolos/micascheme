@@ -3,10 +3,14 @@
     displayln
     writeln
     logging
-    current-seconds)
+    current-seconds
+    current-sleep
+    print-current
+    run-current)
   (import
     (scheme)
     (lets)
+    (number)
     (current))
 
   (define (displayln x)
@@ -29,6 +33,22 @@
           (display ": ")
           (writeln $value)
           $value))))
+
+  (define (current-sleep $seconds)
+    (unsafe-current
+      (sleep
+        (make-time 'time-duration
+          (exact (floor (* (fract $seconds) 1000000000)))
+          (exact (floor $seconds))))))
+
+  (define (print-current $current)
+    (unsafe-current
+      (pretty-print
+        (unsafe-current-get $current))))
+
+  (define (run-current $current)
+    (do () (#f)
+      (unsafe-current-get $current)))
 
   (define current-seconds
     (unsafe-current

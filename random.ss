@@ -12,10 +12,10 @@
     (unsafe-current
       (random $number)))
 
-  (define (current-random)
+  (define current-random
     (current-random-below 1.0))
 
-  (define (current-random-seed)
+  (define current-random-seed
     (unsafe-current
       (random-seed)))
 

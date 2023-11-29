@@ -5,14 +5,14 @@
     (unsafe-current-get
       (lets
         (in current
-          ($random-seed (current-random-seed))
-          ($random1a (current-random))
-          ($random2a (current-random))
-          ($random3a (current-random))
+          ($random-seed current-random-seed)
+          ($random1a current-random)
+          ($random2a current-random)
+          ($random3a current-random)
           (do (set-current-random-seed $random-seed))
-          ($random1b (current-random))
-          ($random2b (current-random))
-          ($random3b (current-random))
+          ($random1b current-random)
+          ($random2b current-random)
+          ($random3b current-random)
           (current
             (cons
               (list $random1a $random2a $random3a)
