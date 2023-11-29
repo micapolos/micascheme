@@ -26,7 +26,6 @@
   (data (struct name items))
   (data (function-type params result))
 
-  (define-aux-keyword bind)
   (define-aux-keyword get)
   (define-aux-keyword type)
   (define-aux-keyword boolean)

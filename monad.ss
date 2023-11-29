@@ -2,7 +2,7 @@
   (export
     monad monad? monad-pure-fn monad-bind-fn
     monad-pure monad-bind monad-map monad-sequence monad-lift monad-apply
-    monadic pure define-monadic
+    monadic pure bind define-monadic
     monad-lets
     monad-stack-box
     option-monad 
@@ -78,15 +78,13 @@
 
   (define-syntax define-monad
     (lambda ($syntax)
-      (syntax-case $syntax ()
+      (syntax-case $syntax (pure bind)
         ((_ $name
-          (($pure $pure-value) $pure-body)
-          (($bind $bind-monadic $bind-fn) $bind-body))
+          ((pure $pure-value) $pure-body)
+          ((bind $bind-monadic $bind-fn) $bind-body))
           (and
             (identifier? #'$name)
-            (identifier-named? #'$pure pure)
             (identifier? #'$pure-param)
-            (identifier-named? #'$bind bind)
             (identifier? #'$bind-monadic)
             (identifier? #'$bind-fn))
           (lets
@@ -140,6 +138,7 @@
   ; syntaxes
 
   (define-aux-keyword pure)
+  (define-aux-keyword bind)
 
   (define-syntax monadic
     (syntax-rules (pure lets)
