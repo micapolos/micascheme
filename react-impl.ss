@@ -35,9 +35,8 @@
                   SDL-RENDERER-ACCELERATED
                   ($renderer
                     (define $noise-vector
-                      (lets
-                        ($vector (make-vector 4096))
-                        (do!
+                      (let (($vector (make-vector 4096)))
+                        (do
                           ((i 0 (+ i 1)))
                           ((= i (vector-length $vector)) (void))
                           (vector-set! $vector i (random 1.0)))
@@ -69,7 +68,7 @@
                       1
                       64
                       ($bytevector
-                        (do!
+                        (do
                           ((i 0 (+ i 1)))
                           ((>= i (bytevector-length $bytevector)) (void))
                           #,@(map sampler-syntax (filter sampler? $statements))

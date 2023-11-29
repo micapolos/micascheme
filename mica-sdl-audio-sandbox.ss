@@ -8,7 +8,7 @@
 
 (define (render-audio $bytevector)
   ;(displayln (format "Sound samples: ~a" (bytevector-length $bytevector)))
-  (do!
+  (do
     (($index 0 (+ $index 1)))
     ((= $index (bytevector-length $bytevector)) (void))
     (bytevector-s8-set! $bytevector $index $audio-sample)
@@ -26,7 +26,7 @@
       ($bytevector (render-audio $bytevector))
       ($audio-device
         (sdl-pause-audio-device $audio-device #f)
-        (do!
+        (do
           ()
           (#f (void))
           (set! $tick? (not $tick?))

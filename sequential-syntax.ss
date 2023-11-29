@@ -225,7 +225,7 @@
       #`(let ()
         (define #,$vector (make-vector #,$size))
         #,@(reverse (deps-declarations $deps))
-        (do!
+        (do
           ((#,$index 0 (+ #,$index 1)))
           ((= #,$index #,$size) #,$vector)
           (vector-set! #,$vector #,$index #,$value)

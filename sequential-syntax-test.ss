@@ -155,7 +155,7 @@
       (let ()
         (define $vector (make-vector 10))
         (define $x 0)
-        (do!
+        (do
           (($index 0 (+ $index 1)))
           ((= $index 10) $vector)
           (vector-set! $vector $index $x)

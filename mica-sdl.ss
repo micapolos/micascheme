@@ -57,10 +57,9 @@
           (lambda ($userdata $buffer $len)
             ;(displayln "Audio callback...")
             (with-mutex $audio-mutex
-              (lets
-                ($tmp-bytevector (make-bytevector $len))
-                (do ((lambda ($bytevector) $callback ...) $tmp-bytevector))
-                (do!
+              (let (($tmp-bytevector (make-bytevector $len)))
+                ((lambda ($bytevector) $callback ...) $tmp-bytevector)
+                (do
                   (($index 0 (+ $index 1)))
                   ((>= $index $len) (void))
                   (foreign-set! `unsigned-8 $buffer $index
@@ -104,7 +103,7 @@
           (unlock-object $callable)))))
 
   (define-syntax-rule (run-sdl-event-loop $body ...)
-    (do!
+    (do
       (($event (sdl-poll-event) (sdl-poll-event)))
       ((sdl-event-quit?) (void))
       $body ...))
