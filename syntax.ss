@@ -32,5 +32,5 @@
 
   (define-syntax-rule (define-aux-keyword aux)
     (define-syntax-rule aux
-      (syntax-error stx "misplaced aux keyword")))
+      (syntax-error (quote aux) "misplaced aux keyword")))
 )

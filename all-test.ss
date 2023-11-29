@@ -33,6 +33,7 @@
   (stack)
   (switch)
   (symbolizer)
+  (syntax)
   (term)
   (throw)
   (tico)
