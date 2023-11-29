@@ -4,7 +4,9 @@
     writeln
     logging
     current-seconds
-    keep-pretty-printing-current)
+    current-file-string
+    pretty-print-current
+    display-current)
   (import
     (scheme)
     (lets)
@@ -32,10 +34,21 @@
           (writeln $value)
           $value))))
 
-  (define (keep-pretty-printing-current $current)
+  (define (pretty-print-current $current)
     (do () (#f)
-      (pretty-print
-        (unsafe-current-get $current))))
+      (display "\x1B;[2J")
+      (display "\x1B;[0;0H")
+      (pretty-print (unsafe-current-get $current))))
+
+  (define (display-current $current)
+    (do () (#f)
+      (display "\x1B;[2J")
+      (display "\x1B;[0;0H")
+      (display (unsafe-current-get $current))))
+
+  (define (current-file-string $path)
+    (unsafe-current
+      (call-with-input-file $path get-string-all)))
 
   (define current-seconds
     (unsafe-current
