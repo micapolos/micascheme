@@ -4,7 +4,8 @@
     unsafe-current-get
 
     current
-    current-bind)
+    current-bind
+    current-lets)
   (import
     (scheme)
     (lets)

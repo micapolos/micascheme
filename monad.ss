@@ -90,9 +90,13 @@
           (lets
             ($pure-name #'$name)
             ($bind-name (build-identifier ($string #'$name) (string-append $string "-bind")))
+            ($lets-name (build-identifier ($string #'$name) (string-append $string "-lets")))
+            ($... (datum->syntax #'+ '...))
             #`(begin
               (define (#,$pure-name $pure-var) $pure-body)
-              (define (#,$bind-name $bind-var $bind-fn) $bind-body)))))))
+              (define (#,$bind-name $bind-var $bind-fn) $bind-body)
+              (define-syntax-rule (#,$lets-name $item #,$...)
+                (lets (in $name $item #,$...)))))))))
 
   ; monad-stack
 
