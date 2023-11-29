@@ -26,3 +26,29 @@
           (do (set-current $var2 (string-append $value1 $value2)))
           (get-current $var2))))
     "foo+bar"))
+
+(lets
+  ((cons $randoms-a $randoms-b)
+    (unsafe-current-get
+      (lets
+        (in current
+          ($random-seed (current-random-seed))
+          ($random1a (current-random))
+          ($random2a (current-random))
+          ($random3a (current-random))
+          (do (set-current-random-seed $random-seed))
+          ($random1b (current-random))
+          ($random2b (current-random))
+          ($random3b (current-random))
+          (current
+            (cons
+              (list $random1a $random2a $random3a)
+              (list $random1b $random2b $random3b)))))))
+  ((cons $first-random $other-randoms) $randoms-a)
+  (do (check (equal? $randoms-a $randoms-b)))
+  (do
+    (check
+      (for-all
+        (lambda ($other-random) (not (= $other-random $first-random)))
+        $other-randoms)))
+  (void))
