@@ -34,7 +34,7 @@
     indent-parser
     skip-empty-lines-parser
 
-    pure skip selected
+    skip selected
 
     string-literal-char-parser
     literal-string-parser
@@ -45,7 +45,6 @@
   ; ----------------------------------------------------------
 
   (define-aux-keyword selected)
-  (define-aux-keyword pure)
   (define-aux-keyword skip)
 
   ; ----------------------------------------------------------
