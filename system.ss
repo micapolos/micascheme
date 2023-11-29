@@ -3,8 +3,7 @@
     displayln
     writeln
     logging
-    current-seconds
-    current-time-seconds)
+    current-seconds)
   (import
     (scheme)
     (lets)
@@ -31,14 +30,11 @@
           (writeln $value)
           $value))))
 
-  (define current-time-seconds
-    (unsafe-current (current-time)))
-
-  ; TODO: Remove it
-  (define (current-seconds)
-    (lets
-      ($time (current-time `time-monotonic))
-      (+
-        (time-second $time)
-        (/ (time-nanosecond $time) 1000000000.0))))
+  (define current-seconds
+    (unsafe-current
+      (lets
+        ($time (current-time `time-monotonic))
+        (+
+          (time-second $time)
+          (/ (time-nanosecond $time) 1000000000.0)))))
 )

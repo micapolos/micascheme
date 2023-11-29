@@ -18,7 +18,7 @@
     (if (> $audio-sample 127) (set! $audio-sample (- $audio-sample 256)))))
 
 (define (render $renderer)
-  ;(displayln (format "Render: ~s" (current-seconds)))
+  ;(displayln (format "Render: ~s" (unsafe-current-get current-seconds)))
   (if $flash?
     (sdl-set-render-draw-color! $renderer 255 255 255 255)
     (sdl-set-render-draw-color! $renderer 0 0 0 255))

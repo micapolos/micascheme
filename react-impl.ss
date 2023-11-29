@@ -98,7 +98,7 @@
                               (set! $canvas-width (car (sdl-get-renderer-output-size $renderer)))
                               (set! $canvas-height (cadr (sdl-get-renderer-output-size $renderer)))
                               (set! $frame-count (+ $frame-count 1))
-                              (set! $seconds (current-seconds))
+                              (set! $seconds (unsafe-current-get current-seconds))
 
                               (run-sdl-locked-audio-device $audio-device
                                 (
