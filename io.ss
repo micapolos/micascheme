@@ -1,40 +1,26 @@
 (library (io)
   (export
-    unsafe-io
-    io-unsafe-run
-    (rename (pure-io io))
-    io-bind
-
-    io-monad
-
+    io io-bind
     io-var
     io-get
     io-set)
-  (import (micascheme) (monad))
+  (import (micascheme))
 
-  (data (io proc))
+  (define (io-run $io) ($io))
 
-  (define-syntax-rule (unsafe-io $body ...)
-    (io (lambda () $body ...)))
-
-  (define (io-unsafe-run $io)
-    ((io-proc $io)))
-
-  (define (pure-io $value)
-    (unsafe-io $value))
-
-  (define (io-bind $io $fn)
-    (unsafe-io (io-unsafe-run ($fn (io-unsafe-run $io)))))
-
-  (define io-monad
-    (monad pure-io io-bind))
+  (define-monad io
+    ((pure $value)
+      (lambda () $value))
+    ((bind $value $fn)
+      (lambda ()
+        (app ($fn (app $value))))))
 
   (define (io-var $value)
-    (unsafe-io (box $value)))
+    (lambda () (box $value)))
 
   (define (io-set $var $value)
-    (unsafe-io (set-box! $var $value)))
+    (lambda () (set-box! $var $value)))
 
   (define (io-get $var)
-    (unsafe-io (unbox $var)))
+    (lambda () (unbox $var)))
 )

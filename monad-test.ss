@@ -1,4 +1,4 @@
-(import (micascheme) (monad))
+(import (micascheme) (monad) (lets))
 
 ; monad-pure
 
@@ -228,9 +228,6 @@
 ; --- define-monad
 
 (let ()
-  (define-syntax-rule (linear $x $body)
-    (lambda ($x) $body))
-
   (define (linear=? $linear-a $linear-b)
     (and
       (equal? ($linear-a 0.0) ($linear-b 0.0))
@@ -239,26 +236,24 @@
 
   (define-monad linear
     ((pure $value)
-      (linear _ $value))
+      (lambda ($x) $value))
     ((bind $linear $fn)
-      (linear $x
-        (($fn ($linear $x)) $x))))
+      (lambda ($x)
+        (app ($fn (app $linear $x)) $x))))
+
+  (check (linear=? sin sin))
 
   (check
     (linear=?
-      (linear $x (* 2 $x))
-      (linear $x (* 2 $x))))
-
-  (check
-    (linear=?
-      (linear-lets
-        ($sin sin)
-        ($cos cos)
-        (pure
-          (+
-            (* $sin $sin)
-            (* $cos $cos))))
-      (linear $x
+      (lets
+        (in linear
+          ($sin sin)
+          ($cos cos)
+          (linear
+            (+
+              (* $sin $sin)
+              (* $cos $cos)))))
+      (lambda ($x)
         (+
           (* (sin $x) (sin $x))
           (* (cos $x) (cos $x)))))))
