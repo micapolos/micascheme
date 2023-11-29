@@ -10,7 +10,18 @@
     cons-monad
     listing listing-bind listing-run listing-monad
     define-monad)
-  (import (micascheme))
+  (import
+    (scheme)
+    (data)
+    (generate)
+    (identifier)
+    (lets)
+    (procedure)
+    (throw)
+    (switch)
+    (failure)
+    (pair)
+    (syntax))
 
   (data (monad pure-fn bind-fn))
 
