@@ -25,4 +25,5 @@
   (tico tuple)
   (tico type)
   (tico typing)
-  (tico variable))
+  (tico variable)
+  (tico variable-2))
