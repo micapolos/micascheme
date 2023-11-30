@@ -19,6 +19,7 @@
   (tico path)
   (tico reader)
   (tico reference)
+  (tico sizing)
   (tico value)
   (tico term)
   (tico thunk)
