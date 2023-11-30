@@ -21,6 +21,8 @@
           (cons 'foo "foo")
           (cons 'bar "bar"))))))
 
+; === reference-promote
+
 (check
   (equal?
     (reference-promote
@@ -74,3 +76,24 @@
           (cons 'bar "bar")))
       (arity 6))
     #f))
+
+; === reference-append
+
+(check
+  (equal?
+    (reference-append
+      (reference (index 1) (list))
+      (reference (index 5) (list (cons 'foo "foo")))
+      (reference (index 3) (list (cons 'bar "bar") (cons 'goo "goo"))))
+    (reference
+      (index 5)
+      (list (cons 'foo "foo") (cons 'bar "bar") (cons 'goo "goo")))))
+
+(check
+  (equal?
+    (reference-append
+      (reference (index 1) (list))
+      (reference #f (list (cons 'foo "foo")))
+      (reference (index 3) (list (cons 'bar "bar") (cons 'goo "goo"))))
+    (reference #f
+      (list (cons 'foo "foo") (cons 'bar "bar") (cons 'goo "goo")))))
