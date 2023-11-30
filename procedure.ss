@@ -10,7 +10,6 @@
     todo TODO)
   (import
     (scheme)
-    (lets)
     (syntax)
     (throw))
 
@@ -43,10 +42,11 @@
           (and
             (for-all integer? (datum ($arity ...)))
             (for-all nonnegative? (datum ($arity ...))))
-          (lets
-            ($arities (map syntax->datum (syntax->list #'($arity ...))))
-            ($exprs (syntax->list #'($expr ...)))
-            ($tmps (map generate-temporaries (map iota $arities)))
+          (let*
+            (
+              ($arities (map syntax->datum (syntax->list #'($arity ...))))
+              ($exprs (syntax->list #'($expr ...)))
+              ($tmps (map generate-temporaries (map iota $arities))))
             #`(let-values
                 (
                   #,@(map

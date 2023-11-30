@@ -56,9 +56,9 @@
 
 ; === run ===
 
-(lets
-  ($box (box 10))
-  (run
-    (check (equal? (unbox $box) 10))
-    (set-box! $box 11)
-    (check (equal? (unbox $box) 11))))
+(run
+  (define $box (box 10))
+  (check (equal? (unbox $box) 10))
+  (set-box! $box 11)
+  (run) ; empty run
+  (check (equal? (unbox $box) 11)))

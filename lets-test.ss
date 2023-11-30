@@ -1,10 +1,10 @@
 (import (check) (lets))
 
 (check (equal? (lets 1) 1))
-(check (equal? (lets (do 1)) 1))
+(check (equal? (lets (run 1)) 1))
 
 (check (equal? (lets (x 1) x) 1))
-(check (equal? (lets (x 1) (do x)) 1))
+(check (equal? (lets (x 1) (run x)) 1))
 
 (check (equal? (lets ((values x) 1) x) 1))
 
@@ -41,10 +41,10 @@
 
 (lets
   ((string-data $number $length $chars) "123")
-  (do (check (equal? $number 123)))
-  (do (check (equal? $length 3)))
-  (do (check (equal? $chars (list #\1 #\2 #\3))))
-  (void))
+  (run
+    (check (equal? $number 123))
+    (check (equal? $length 3))
+    (check (equal? $chars (list #\1 #\2 #\3)))))
 
 ; --- in
 
@@ -64,7 +64,7 @@
           ($cos cos)
           ($const (linear 10))
           (_ (linear "ignored"))
-          (do (linear "ignored"))
+          (run (linear "ignored"))
           (linear (+ $sin $cos $const))))
       128)
     (+ (sin 128) (cos 128) 10)))
