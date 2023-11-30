@@ -2,14 +2,18 @@
 
 (lets
   ($resolution
-    (resolution 2
+    (resolution
+      (index 2)
       (list
         (cons 'foo "foo")
         (cons 'bar "bar"))))
   (run
     (check (resolution? $resolution))
     (check (not (resolution? 'foo)))
-    (check (equal? (resolution-depth-opt $resolution) 2))
+    (check
+      (equal?
+        (resolution-index-opt $resolution)
+        (index 2)))
     (check
       (equal?
         (resolution-bindings $resolution)
@@ -24,7 +28,7 @@
         (list
           (cons 'foo "foo")
           (cons 'bar "bar")))
-      128)
+      (arity 128))
     (resolution #f
       (list
         (cons 'foo "foo")
@@ -33,12 +37,14 @@
 (check
   (equal?
     (resolution-promote
-      (resolution 5
+      (resolution
+        (index 5)
         (list
           (cons 'foo "foo")
           (cons 'bar "bar")))
-      2)
-    (resolution 3
+      (arity 2))
+    (resolution
+      (index 3)
       (list
         (cons 'foo "foo")
         (cons 'bar "bar")))))
@@ -46,12 +52,14 @@
 (check
   (equal?
     (resolution-promote
-      (resolution 5
+      (resolution
+        (index 5)
         (list
           (cons 'foo "foo")
           (cons 'bar "bar")))
-      5)
-    (resolution 0
+      (arity 5))
+    (resolution
+      (index 0)
       (list
         (cons 'foo "foo")
         (cons 'bar "bar")))))
@@ -59,9 +67,10 @@
 (check
   (equal?
     (resolution-promote
-      (resolution 5
+      (resolution
+        (index 5)
         (list
           (cons 'foo "foo")
           (cons 'bar "bar")))
-      6)
+      (arity 6))
     #f))
