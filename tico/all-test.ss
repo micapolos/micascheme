@@ -18,6 +18,7 @@
   (tico parameter)
   (tico path)
   (tico reader)
+  (tico resolution)
   (tico value)
   (tico thunk)
   (tico tico)
