@@ -55,7 +55,7 @@
               ((number? _) number?)
               ((symbol? _)
                 (switch ($lookup #'$other)
-                  ((true? $proof) $proof)
+                  ((not-false? $proof) $proof)
                   ((else _) (syntax-error #'$other "unproven"))))
               ((else _)
                 (syntax-error #'$other "unproven"))))))))
