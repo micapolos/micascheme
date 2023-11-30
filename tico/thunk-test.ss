@@ -3,10 +3,7 @@
   (tico thunk))
 
 (lets
-  ($thunk
-    (thunk
-      (arity 1)
-      '(string-append foo bar)))
+  ($thunk (thunk (arity 1) '(string-append foo bar)))
   (run
     (check (thunk? $thunk))
     (check (not (thunk? 128)))
