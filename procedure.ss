@@ -1,5 +1,6 @@
 (library (procedure)
   (export
+    run
     identity
     once-proc
     checking-once
@@ -12,6 +13,9 @@
     (lets)
     (syntax)
     (throw))
+
+  (define-syntax-rule (run $item ...)
+    (let () $item ... (void)))
 
   (define-syntax-rule (once-proc $proc)
     (let ()

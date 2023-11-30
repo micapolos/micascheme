@@ -19,6 +19,7 @@
   (tico path)
   (tico reader)
   (tico value)
+  (tico thunk)
   (tico tico)
   (tico tuple)
   (tico type)

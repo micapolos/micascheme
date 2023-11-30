@@ -54,3 +54,11 @@
 (check (raises? (lambda () (todo))))
 (check (raises? (lambda () TODO)))
 
+; === run ===
+
+(lets
+  ($box (box 10))
+  (run
+    (check (equal? (unbox $box) 10))
+    (set-box! $box 11)
+    (check (equal? (unbox $box) 11))))
