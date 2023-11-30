@@ -24,7 +24,7 @@
   (equal?
     (lets
       (x (box 1))
-      (do (set-box! x 2))
+      (_ (set-box! x 2))
       (unbox x))
     2))
 
