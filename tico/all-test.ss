@@ -20,6 +20,7 @@
   (tico reader)
   (tico reference)
   (tico value)
+  (tico term)
   (tico thunk)
   (tico tico)
   (tico tuple)
