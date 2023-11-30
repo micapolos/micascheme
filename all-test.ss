@@ -30,7 +30,6 @@
   (proof)
   (proven)
   (random)
-  (script)
   (seq)
   (sequential-syntax)
   (sequential)

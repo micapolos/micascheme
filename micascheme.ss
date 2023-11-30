@@ -5,7 +5,6 @@
     (rename
       (scheme)
       (cons scheme-cons))
-    (script)
     (binder)
     (boolean)
     (check)
