@@ -52,7 +52,7 @@
   (define (argument-application $target $args)
     (lets
       ($values (arguments-values (cons $target $args)))
-      (do (unless (pair? $values) (throw argument-application $target $args)))
+      (run (unless (pair? $values) (throw argument-application $target $args)))
       ($target (car $values))
       ($args (cdr $values))
       (call-with-values

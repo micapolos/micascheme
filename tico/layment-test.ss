@@ -255,24 +255,20 @@
   ($scope (stack-layment-push $scope (layment (simple-layout) (argument-compilation 'v2 (argument "foo")))))
   ($scope (stack-layment-push $scope (layment (empty-layout) #f)))
   ($scope (stack-layment-push $scope (layment (simple-layout) (argument-compilation 'v3 (argument "bar")))))
-  (do
+  (run
     (check
       (equal?
         (stack-layment-ref $scope 0)
-        (layment (simple-layout) (argument-compilation 'v3 (argument "bar"))))))
-  (do
+        (layment (simple-layout) (argument-compilation 'v3 (argument "bar")))))
     (check
       (equal?
         (stack-layment-ref $scope 1)
-        (layment (empty-layout) #f))))
-  (do
+        (layment (empty-layout) #f)))
     (check
       (equal?
         (stack-layment-ref $scope 2)
-        (layment (simple-layout) (argument-compilation 'v2 (argument "foo"))))))
-  (do
+        (layment (simple-layout) (argument-compilation 'v2 (argument "foo")))))
     (check
       (equal?
         (stack-layment-ref $scope 3)
-        (layment (simple-layout) (variable-compilation 'v1 2)))))
-  (void))
+        (layment (simple-layout) (variable-compilation 'v1 2))))))

@@ -61,7 +61,7 @@
         (case $symbol
           ((use)
             (lets
-              (do
+              (run
                 (unless
                   (null? (block-typings $block))
                   (throw can-not-use)))
@@ -108,7 +108,7 @@
                 (push-block-reader
                   $bindings
                   (lets
-                    (do (typing-assert $assert-typing))
+                    (run (typing-assert $assert-typing))
                     $block)
                   $end))))
           ((prepare)

@@ -6,7 +6,7 @@
   (import
     (scheme)
     (current)
-    (lets))
+    (procedure))
 
   (define (current-variable $value)
     (unsafe-current (box $value)))
@@ -17,7 +17,5 @@
 
   (define (set-current $variable $value)
     (unsafe-current
-      (lets
-        (do (set-box! $variable $value))
-        (void))))
+      (run (set-box! $variable $value))))
 )

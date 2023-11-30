@@ -140,23 +140,23 @@
   (define (context->bytevector $context)
     (lets
       ($bytevector (make-bytevector (context-address $context)))
-      (do
+      (run
         (for-each
           (lambda ($index $byte)
             (bytevector-u8-set! $bytevector $index $byte))
           (indices (context-address $context))
           (reverse (context-bytes $context))))
       ($label-addresses (context-label-addresses $context))
-      (do
+      (run
         (for-each
           (lambda ($address-label)
             (lets
               ($address (car $address-label))
               ($label (cdr $address-label))
               ($value (cdr (assq $label $label-addresses)))
-              (do (bytevector-u8-set! $bytevector $address (bitwise-and $value #xFF)))
-              (do (bytevector-u8-set! $bytevector (+ $address 1) (bitwise-arithmetic-shift-right $value 8)))
-              (void)))
+              (run
+                (bytevector-u8-set! $bytevector $address (bitwise-and $value #xFF)))
+                (bytevector-u8-set! $bytevector (+ $address 1) (bitwise-arithmetic-shift-right $value 8))))
           (context-address-labels $context)))
       (bytevector->immutable-bytevector $bytevector)))
 

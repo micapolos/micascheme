@@ -222,22 +222,19 @@
   ($scope (stack-layout-push $scope (simple-layout)))
   ($scope (stack-layout-push $scope (empty-layout)))
   ($scope (stack-layout-push $scope (native-layout)))
-  (do
+  (run
     (check
       (equal?
         (stack-layout-ref $scope 0)
-        (layout-field (native-layout) 1))))
-  (do
+        (layout-field (native-layout) 1)))
     (check
       (equal?
         (stack-layout-ref $scope 1)
-        (layout-field (empty-layout) #f))))
-  (do
+        (layout-field (empty-layout) #f)))
     (check
       (equal?
         (stack-layout-ref $scope 2)
-        (layout-field (simple-layout) 0))))
-  (void))
+        (layout-field (simple-layout) 0)))))
 
 ; --- list-layout
 

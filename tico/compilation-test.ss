@@ -449,29 +449,25 @@
       (parameter-compilation 'v1)
       (argument-compilation 'v2 (argument "foo"))
       (argument-compilation 'v3 (argument "bar"))))
-  (do
+  (run
     (check
       (equal?
         (stack-compilation-ref $scope 0)
-        (argument-compilation 'v3 (argument "bar")))))
-  (do
+        (argument-compilation 'v3 (argument "bar"))))
     (check
       (equal?
         (stack-compilation-ref $scope 1)
-        (argument-compilation 'v2 (argument "foo")))))
-  (do
+        (argument-compilation 'v2 (argument "foo"))))
     (check
       (equal?
         (stack-compilation-ref $scope 2)
-        (variable-compilation 'v1 2))))
-  (do
+        (variable-compilation 'v1 2)))
     (check
       (equal?
         (stack-compilation-bindings $scope)
         (stack
           (cons 'v2 "foo")
-          (cons 'v3 "bar")))))
-  (void))
+          (cons 'v3 "bar"))))))
 
 (check
   (equal?

@@ -13,7 +13,7 @@
       (lambda (lookup)
         (syntax-case $syntax (in values rec)
           ((_ (in $monad $item ...))
-            (syntax-case #'($item ...) (do run)
+            (syntax-case #'($item ...) (run)
               (($decl $decls ... $result)
                 (syntax-case #'$decl ()
                   ((($name $spec ...) $expr)
@@ -34,9 +34,6 @@
                     (transform-monad #'$monad #'$expr #'$value
                       #'(let (($id $value))
                         (lets (in $monad $decls ... $result)))))))
-              ; TODO: Remove
-              (((do $result))
-                #'(lets (in $monad $result)))
               (((run $result))
                 #'(lets (in $monad $result)))
               (($result)
