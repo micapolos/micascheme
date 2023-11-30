@@ -1,49 +1,49 @@
-(import (micascheme) (tico resolution))
+(import (micascheme) (tico reference))
 
 (lets
-  ($resolution
-    (resolution
+  ($reference
+    (reference
       (index 2)
       (list
         (cons 'foo "foo")
         (cons 'bar "bar"))))
   (run
-    (check (resolution? $resolution))
-    (check (not (resolution? 'foo)))
+    (check (reference? $reference))
+    (check (not (reference? 'foo)))
     (check
       (equal?
-        (resolution-index-opt $resolution)
+        (reference-index-opt $reference)
         (index 2)))
     (check
       (equal?
-        (resolution-bindings $resolution)
+        (reference-bindings $reference)
         (list
           (cons 'foo "foo")
           (cons 'bar "bar"))))))
 
 (check
   (equal?
-    (resolution-promote
-      (resolution #f
+    (reference-promote
+      (reference #f
         (list
           (cons 'foo "foo")
           (cons 'bar "bar")))
       (arity 128))
-    (resolution #f
+    (reference #f
       (list
         (cons 'foo "foo")
         (cons 'bar "bar")))))
 
 (check
   (equal?
-    (resolution-promote
-      (resolution
+    (reference-promote
+      (reference
         (index 5)
         (list
           (cons 'foo "foo")
           (cons 'bar "bar")))
       (arity 2))
-    (resolution
+    (reference
       (index 3)
       (list
         (cons 'foo "foo")
@@ -51,14 +51,14 @@
 
 (check
   (equal?
-    (resolution-promote
-      (resolution
+    (reference-promote
+      (reference
         (index 5)
         (list
           (cons 'foo "foo")
           (cons 'bar "bar")))
       (arity 5))
-    (resolution
+    (reference
       (index 0)
       (list
         (cons 'foo "foo")
@@ -66,8 +66,8 @@
 
 (check
   (equal?
-    (resolution-promote
-      (resolution
+    (reference-promote
+      (reference
         (index 5)
         (list
           (cons 'foo "foo")
