@@ -9,3 +9,8 @@
     (check (not (thunk? 128)))
     (check (equal? (thunk-arity $thunk) (arity 1)))
     (check (equal? (thunk-datum $thunk) '(string-append foo bar)))))
+
+(check
+  (equal?
+    (thunk-values-app-datum (thunk (arity 3) '(foo)))
+    '(3 (foo))))
