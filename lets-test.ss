@@ -46,6 +46,17 @@
     (check (equal? $length 3))
     (check (equal? $chars (list #\1 #\2 #\3)))))
 
+(define-binder
+  (custom-accessors
+    (lambda ($string) (string-append $string "!"))
+    (lambda ($string) (string-append $string "?"))))
+
+(lets
+  ((custom-accessors $exclamated $questioned) "Hello")
+  (run
+    (check (equal? $exclamated "Hello!"))
+    (check (equal? $questioned "Hello?"))))
+
 ; --- in
 
 (define (linear $value)
