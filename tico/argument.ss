@@ -50,14 +50,12 @@
           list))))
 
   (define (argument-application $target $args)
-    (lets
-      ($values (arguments-values (cons $target $args)))
-      (run (unless (pair? $values) (throw argument-application $target $args)))
-      ($target (car $values))
-      ($args (cdr $values))
-      (call-with-values
-        (lambda () (apply $target $args))
-        argument)))
+    (call-with-values
+      (lambda ()
+        (apply
+          (argument-value $target)
+          (arguments-values $args)))
+      argument))
 
   (define (argument-abstraction $arity $body-arguments)
     (lets

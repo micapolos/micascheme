@@ -78,12 +78,12 @@
 (check
   (equal?
     (argument-application
-      (argument string-append "foo")
+      (argument string-append)
       (list
         (argument)
-        (argument "bar")
-        (argument "goo" "zoo")))
-    (argument "foobargoozoo")))
+        (argument "foo")
+        (argument "bar" "gar")))
+    (argument "foobargar")))
 
 (check
   (raises?
