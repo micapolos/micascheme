@@ -198,3 +198,14 @@
 		(with-tmps (datum-parameter (arity 2)))
 		(with-tmps `(values ,@(generate-symbols 2)))))
 
+; --- datum-bimbing-datum
+
+(check
+	(equal?
+		(datum-bimbing-datum (bimbing 'foo "foo"))
+		'(foo "foo")))
+
+(check
+	(equal?
+		(datum-bimbing-datum (bimbing '(values foo bar) '(foo-bar)))
+		'((values foo bar) (foo-bar))))

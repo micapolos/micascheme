@@ -483,3 +483,21 @@
     (variable-compilation
       '(let ((foo "foo") (bar "bar")) foo)
       1)))
+
+; --- compilation-datum-bimbing
+
+(check
+  (equal?
+    (compilation-datum-bimbing
+      (bimbing
+        (compilation
+          (arity 3)
+          '(values a b c)
+          (parameter))
+        (compilation
+          (arity 3)
+          '(three-values)
+          (variable 1))))
+    (bimbing
+      '(values a b c)
+      '(three-values))))

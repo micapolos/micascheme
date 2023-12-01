@@ -27,6 +27,7 @@
 
     compilation-parameter
     compilation-bimbing
+    compilation-datum-bimbing
     compilation-variable
     compilation-definitions-do
 
@@ -271,4 +272,11 @@
     (bimbing
       (compilation-parameter $compilation)
       $compilation))
+
+  (define (compilation-datum-bimbing $compilation-bimbing)
+    (lets
+      ((bimbing $key-compilation $value-compilation) $compilation-bimbing)
+        (bimbing
+          (compilation-datum $key-compilation)
+          (compilation-datum $value-compilation))))
 )
