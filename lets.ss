@@ -9,7 +9,7 @@
   (define-syntax lets
     (lambda ($syntax)
       (lambda ($lookup)
-        (syntax-case $syntax (run values rec)
+        (syntax-case $syntax (values rec)
           ((_ ((values $id ...) $expr) $decls ... $result)
             #'(call-with-values
               (lambda () $expr)
@@ -35,8 +35,6 @@
               (($id $expr)
                 #`(let (($id $expr))
                   (lets $decls ... $result)))))
-          ((_ (run $result))
-            #'(lets $result))
           ((_ $result)
             #'$result)))))
 )

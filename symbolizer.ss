@@ -12,7 +12,7 @@
   (define (symbolize $value)
     (lets
       ($symbol (generate-symbol))
-      (run (define-top-level-value $symbol $value symbolize-environment))
+      (_ (define-top-level-value $symbol $value symbolize-environment))
       $symbol))
 
   (define (symbolized-bound? $symbol)

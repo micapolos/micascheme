@@ -1,10 +1,8 @@
 (import (check) (lets))
 
 (check (equal? (lets 1) 1))
-(check (equal? (lets (run 1)) 1))
 
 (check (equal? (lets (x 1) x) 1))
-(check (equal? (lets (x 1) (run x)) 1))
 
 (check (equal? (lets ((values x) 1) x) 1))
 

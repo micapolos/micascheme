@@ -51,7 +51,7 @@
           ($compiled (compile $compiler $named))
           ($value (typed-value $compiled))
           ($type (typed-type $compiled))
-          (run (unless (named? $type) (throw not-named $named-get)))
+          (_ (unless (named? $type) (throw not-named $named-get)))
           (typed $value (named-value $type))))
       ((tuple? $tuple)
         (lets
@@ -73,13 +73,13 @@
           ($compiled-tuple (compile $compiler $tuple))
           ($value (typed-value $compiled-tuple))
           ($tuple-type (typed-type $compiled-tuple))
-          (run (unless (tuple? $tuple-type) (throw not-tuple $tuple)))
+          (_ (unless (tuple? $tuple-type) (throw not-tuple $tuple)))
           ($types (tuple-items $tuple-type))
           ($index
             (find-index
               (lambda ($indexed-type) (equal? $type $indexed-type))
               $types))
-          (run (unless $index (throw tuple-get-type-not-found $type)))
+          (_ (unless $index (throw tuple-get-type-not-found $type)))
           (typed
             (case (length $types)
               ((0) (throw impossible))
@@ -91,13 +91,13 @@
         (lets
           ($choice (choice-switch-choice $choice-switch))
           ($cases (choice-switch-cases $choice-switch))
-          (run (when (null? $cases) (throw no-cases $choice-switch)))
+          (_ (when (null? $cases) (throw no-cases $choice-switch)))
           ($compiled-choice (compile $compiler $choice))
           ($value (typed-value $compiled-choice))
           ($type (typed-type $compiled-choice))
           (run (unless (choice? $type) (throw not-choice $choice)))
           ($choice-types (choice-items $type))
-          (run
+          (_
             (unless
               (= (length $cases) (length $choice-types))
               (throw choice-switch-cases-mismatch $choice-switch)))
@@ -106,7 +106,7 @@
           ($case-values (map typed-value $compiled-cases))
           ($case-types (map typed-type $compiled-cases))
           ($result-type (car $case-types))
-          (run
+          (_
             (unless
               (for-all (lambda ($case-type) (equal? $case-type $result-type)) $case-types)
               (throw incompatible-case-types $choice-switch $case-types)))
@@ -173,11 +173,11 @@
           ($compiled-function (compile $compiler $function))
           ($compiled-args (map (partial compile $compiler) $args))
           ($function-type (typed-type $compiled-function))
-          (run
+          (_
             (unless
               (function? $function-type)
               (throw not-function $function-type)))
-          (run
+          (_
             (unless
               (for-all equal? (map typed-type $compiled-args) (function-params $function-type))
               (throw illegal-arg-types)))

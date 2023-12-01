@@ -76,7 +76,7 @@
               ($typed-expr (parse-typed $context #`$expr))
               ($tmp (generate-temporary))
               ($expr-box-opt (typed-box-opt $typed-expr))
-              (run (when $expr-box-opt
+              (_ (when $expr-box-opt
                 (define-top-level-value
                   (syntax->datum $tmp)
                   (unbox $expr-box-opt)

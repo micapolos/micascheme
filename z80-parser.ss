@@ -140,14 +140,14 @@
   (define (context->bytevector $context)
     (lets
       ($bytevector (make-bytevector (context-address $context)))
-      (run
+      (_
         (for-each
           (lambda ($index $byte)
             (bytevector-u8-set! $bytevector $index $byte))
           (indices (context-address $context))
           (reverse (context-bytes $context))))
       ($label-addresses (context-label-addresses $context))
-      (run
+      (_
         (for-each
           (lambda ($address-label)
             (lets
