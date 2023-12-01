@@ -138,7 +138,7 @@
     (or
       (transform-accessors-opt $lookup $pattern $expr $body)
       (transform-binder-opt $lookup $pattern $expr $body)
-      (syntax-error #'$name "not allowed in lets")))
+      (syntax-error #'$pattern "invalid pattern")))
 
   (define (transform-monad $monad $expr $var $body)
     (switch $monad
