@@ -17,20 +17,24 @@
       ,(arity-value (thunk-arity $thunk))
       ,(thunk-datum $thunk)))
 
-  (define (thunks-app-datum-opt $thunks)
+  (define (thunks-app-datum-opt $target-datum $thunks)
     (and
       (for-all arity-single? (map thunk-arity $thunks))
-      `(app ,@(map thunk-datum $thunks))))
+      `(app
+        ,$target-datum
+        ,@(map thunk-datum $thunks))))
 
-  (define (thunks-values-app-datum $thunks)
-    `(values-app ,@(map thunk-values-app-datum $thunks)))
+  (define (thunks-values-app-datum $target-datum $thunks)
+    `(values-app
+      ,$target-datum
+      ,@(map thunk-values-app-datum $thunks)))
 
-  (define (thunks-app-datum $thunks)
+  (define (thunks-app-datum $target-datum $thunks)
     (or
-      (thunks-app-datum-opt $thunks)
-      (thunks-values-app-datum $thunks)))
+      (thunks-app-datum-opt $target-datum $thunks)
+      (thunks-values-app-datum $target-datum $thunks)))
 
   (define (thunk-application $arity $target-thunk $arg-thunks)
     (thunk $arity
-      (thunks-app-datum (cons $target-thunk $arg-thunks))))
+      (thunks-app-datum $target-thunk $arg-thunks)))
 )
