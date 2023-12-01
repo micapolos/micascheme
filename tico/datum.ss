@@ -12,6 +12,7 @@
     let-datum
     datum-tuple
     datum-args
+    datum-parameter
     tuple-ref-datum
     value->datum
     datum->value
@@ -27,6 +28,7 @@
     values-datum)
   (import
     (micascheme)
+    (tico arity)
     (tico type)
     (tico definition)
     (tico packet)
@@ -47,6 +49,11 @@
       ((char? $char) $char)
       ((symbol? $symbol) `(quote ,$symbol))
       ((else $other) (throw literal->datum $literal))))
+
+  (define (datum-parameter $arity)
+    (switch (arity-value $arity)
+      ((one? _) (generate-symbol))
+      ((else $count) `(values ,@(generate-symbols $count)))))
 
   (define (generate-datum-abstraction $arity $fn)
     (lets

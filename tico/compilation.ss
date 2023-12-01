@@ -122,18 +122,8 @@
       ((compilation $arity $datum $evaluation) $compilation)
       (compilation
         $arity
-        (switch (arity-value $arity)
-          ((one? _)
-            (generate-symbol))
-          ((else $other)
-            `(values ,@(generate-symbols (arity-value $arity)))))
-        (switch-exclusive $evaluation
-          ((argument? $argument)
-            $argument)
-          ((variable? $variable)
-            (parameter))
-          ((parameter? $parameter)
-            (parameter))))))
+        (datum-parameter $arity)
+        (evaluation-parameter $evaluation))))
 
   (define (compilation-variable $compilation $index)
     (switch-exclusive (compilation-evaluation $compilation)

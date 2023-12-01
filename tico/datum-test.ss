@@ -180,3 +180,21 @@
 (check (equal? (values-datum (list)) '(values)))
 (check (equal? (values-datum (list 'a)) 'a))
 (check (equal? (values-datum (list 'a 'b)) '(values a b)))
+
+; --- datum-parameter
+
+(check
+	(equal?
+		(datum-parameter (arity 0))
+		'(values)))
+
+(check
+	(equal?
+		(with-tmps (datum-parameter (arity 1)))
+		(with-tmps (generate-symbol))))
+
+(check
+	(equal?
+		(with-tmps (datum-parameter (arity 2)))
+		(with-tmps `(values ,@(generate-symbols 2)))))
+

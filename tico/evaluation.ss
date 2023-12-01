@@ -3,7 +3,8 @@
     evaluations-combine
     evaluation-application
     evaluation-struct
-    evaluation-promote)
+    evaluation-promote
+    evaluation-parameter)
   (import
     (micascheme)
     (tico argument)
@@ -34,4 +35,11 @@
       ((argument? $argument) #f)
       ((variable? $variable) (variable-promote $variable $arity))
       ((parameter? $parameter) $parameter)))
+
+  (define (evaluation-parameter $evaluation)
+    (switch-exclusive $evaluation
+      ((argument? $argument) $argument)
+      ((variable? _) (parameter))
+      ((parameter? _) (parameter))))
+
 )
