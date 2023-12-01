@@ -15,13 +15,12 @@
   (equal?
     (unsafe-current-get
       (lets
-        (in current
-          ($var1 (current-variable "foo"))
-          ($var2 (current-variable "bar"))
-          ($value1 (get-current $var1))
-          ($value2 (get-current $var2))
-          (run (set-current $var1 (string-append $value1 "+")))
-          ($value1 (get-current $var1))
-          (run (set-current $var2 (string-append $value1 $value2)))
-          (get-current $var2))))
+        ((current $var1) (current-variable "foo"))
+        ((current $var2) (current-variable "bar"))
+        ((current $value1) (get-current $var1))
+        ((current $value2) (get-current $var2))
+        ((current _) (set-current $var1 (string-append $value1 "+")))
+        ((current $value1) (get-current $var1))
+        ((current _) (set-current $var2 (string-append $value1 $value2)))
+        (get-current $var2)))
     "foo+bar"))

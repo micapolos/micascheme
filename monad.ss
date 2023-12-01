@@ -97,9 +97,7 @@
               (define (#,$pure-name $pure-var) $pure-body)
               (define (#,$bind-name $bind-var $bind-fn) $bind-body)
               (define-binder $name
-                (lambda ($bind-var $bind-fn) $bind-body))
-              (define-syntax-rule (#,$lets-name $item #,$...)
-                (lets (in $name $item #,$...)))))))))
+                (lambda ($bind-var $bind-fn) $bind-body))))))))
 
   ; monad-stack
 

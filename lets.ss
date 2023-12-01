@@ -1,42 +1,15 @@
 (library (lets)
-  (export lets in)
+  (export lets)
   (import
     (scheme)
     (binder)
     (syntax)
     (procedure))
 
-  (define-aux-keyword in)
-
   (define-syntax lets
     (lambda ($syntax)
-      (lambda (lookup)
-        (syntax-case $syntax (in values rec)
-          ((_ (in $monad $item ...))
-            (syntax-case #'($item ...) (run)
-              (($decl $decls ... $result)
-                (syntax-case #'$decl ()
-                  ((($name $spec ...) $expr)
-                    (transform-monad #'$monad #'$expr #'$value
-                      (transform-lets
-                        lookup
-                        #'($name $spec ...)
-                        #'$value
-                        #'(lets (in $monad $decls ... $result)))))
-                  ((($name $spec ... . $last-id) $expr)
-                    (transform-monad #'$monad #'$expr #'$value
-                      (transform-lets
-                        lookup
-                        #'($name $spec ... . $last-id)
-                        #'$value
-                        #'(lets (in $monad $decls ... $result)))))
-                  (($id $expr)
-                    (transform-monad #'$monad #'$expr #'$id
-                      #'(lets (in $monad $decls ... $result))))))
-              (((run $result))
-                #'(lets (in $monad $result)))
-              (($result)
-                #'$result)))
+      (lambda ($lookup)
+        (syntax-case $syntax (run values rec)
           ((_ ((values $id ...) $expr) $decls ... $result)
             #'(call-with-values
               (lambda () $expr)
@@ -45,6 +18,25 @@
           ((_ ($id (rec $expr)) $decls ... $result)
             #'(letrec (($id $expr))
               (lets $decls ... $result)))
-          ((_ $item ...)
-            #'(lets (in #f $item ...)))))))
+          ((_ $decl $decls ... $result)
+            (syntax-case #'$decl ()
+              ((($name $spec ...) $expr)
+                (transform-lets
+                  $lookup
+                  #'($name $spec ...)
+                  #'$expr
+                  #'(lets $decls ... $result)))
+              ((($name $spec ... . $last-id) $expr)
+                (transform-lets
+                  $lookup
+                  #'($name $spec ... . $last-id)
+                  #'$expr
+                  #'(lets $decls ... $result)))
+              (($id $expr)
+                #`(let (($id $expr))
+                  (lets $decls ... $result)))))
+          ((_ (run $result))
+            #'(lets $result))
+          ((_ $result)
+            #'$result)))))
 )

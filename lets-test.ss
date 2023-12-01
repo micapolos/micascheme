@@ -86,26 +86,3 @@
       ((opt b) #f)
       (string-append a b))
     #f))
-
-; --- in
-
-(define (linear $value)
-  (lambda (_) $value))
-
-(define (linear-bind $linear $fn)
-  (lambda ($x)
-    (app ($fn (app $linear $x)) $x)))
-
-(check
-  (equal?
-    (app
-      (lets
-        (in linear
-          ($sin sin)
-          ($cos cos)
-          ($const (linear 10))
-          (_ (linear "ignored"))
-          (run (linear "ignored"))
-          (linear (+ $sin $cos $const))))
-      128)
-    (+ (sin 128) (cos 128) 10)))
