@@ -35,9 +35,9 @@
       (fib 10))
     55))
 
-; --- binder
+; --- accessors
 
-(define-binder (string-data string->number string-length string->list))
+(define-accessors (string-data string->number string-length string->list))
 
 (lets
   ((string-data $number $length $chars) "123")
@@ -46,7 +46,7 @@
     (check (equal? $length 3))
     (check (equal? $chars (list #\1 #\2 #\3)))))
 
-(define-binder
+(define-accessors
   (custom-accessors
     (lambda ($string) (string-append $string "!"))
     (lambda ($string) (string-append $string "?"))))
@@ -56,6 +56,36 @@
   (run
     (check (equal? $exclamated "Hello!"))
     (check (equal? $questioned "Hello?"))))
+
+; --- binder
+
+(define-binder opt
+  (lambda ($opt $fn)
+    (and $opt ($fn $opt))))
+
+(check
+  (equal?
+    (lets
+      ((opt a) "foo")
+      ((opt b) "bar")
+      (string-append a b))
+    "foobar"))
+
+(check
+  (equal?
+    (lets
+      ((opt a) #f)
+      ((opt b) "bar")
+      (string-append a b))
+    #f))
+
+(check
+  (equal?
+    (lets
+      ((opt a) "foo")
+      ((opt b) #f)
+      (string-append a b))
+    #f))
 
 ; --- in
 

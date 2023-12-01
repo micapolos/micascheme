@@ -91,11 +91,11 @@
                 #`(begin
                   (define (name field ... . list-field-opt)
                     ((record-constructor #,rtd-name) field ... list-field-opt))
-                  (define-binder (name #,@accessors . #,list-accessor-opt)))
+                  (define-accessors (name #,@accessors . #,list-accessor-opt)))
                 #`(begin
                   (define name
                     (record-constructor #,rtd-name))
-                  (define-binder (name #,@accessors))))
+                  (define-accessors (name #,@accessors))))
               (define #,predicate-name
                 (record-predicate #,rtd-name))
               #,@(map

@@ -62,5 +62,5 @@
       (variable)))
 
   (define cons scheme-cons)
-  (define-binder (cons car cdr))
+  (define-accessors (cons car cdr))
 )
