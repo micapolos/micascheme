@@ -26,6 +26,7 @@
     compilation-ref
 
     compilation-parameter
+    compilation-bimbing
     compilation-variable
     compilation-definitions-do
 
@@ -40,6 +41,7 @@
     (tico arity)
     (tico argument)
     (tico argument)
+    (tico bimbing)
     (tico variable)
     (tico datum)
     (tico evaluation)
@@ -116,16 +118,22 @@
     (parameter-compilation (generate-symbol)))
 
   (define (compilation-parameter $compilation)
-    (compilation
-      (arity 1) ; TODO: Check it
-      (generate-symbol)
-      (switch-exclusive (compilation-evaluation $compilation)
-        ((argument? $argument)
-          $argument)
-        ((variable? $variable)
-          (parameter))
-        ((parameter? $parameter)
-          (parameter)))))
+    (lets
+      ((compilation $arity $datum $evaluation) $compilation)
+      (compilation
+        $arity
+        (switch (arity-value $arity)
+          ((one? _)
+            (generate-symbol))
+          ((else $other)
+            `(values ,@(generate-symbols (arity-value $arity)))))
+        (switch-exclusive $evaluation
+          ((argument? $argument)
+            $argument)
+          ((variable? $variable)
+            (parameter))
+          ((parameter? $parameter)
+            (parameter))))))
 
   (define (compilation-variable $compilation $index)
     (switch-exclusive (compilation-evaluation $compilation)
@@ -268,4 +276,9 @@
         ,(datum-definitions-let-entries (map compilation-definition->datum-definition $compilation-definitions))
         ,(compilation-datum $body-compilation))
       (compilation-evaluation $body-compilation)))
+
+  (define (compilation-bimbing $compilation)
+    (bimbing
+      (compilation-parameter $compilation)
+      $compilation))
 )
