@@ -16,11 +16,11 @@
   (define-syntax define-binder
     (syntax-rules ()
       ((_ ($name $accessor ...))
-        (define-property $name accessors (quote ($accessor ...))))
+        (define-property $name accessors (list (syntax $accessor) ...)))
       ((_ ($name $accessor ... . $tail-accessor))
         (begin
-          (define-property $name accessors (quote ($accessor ...)))
-          (define-property $name tail-accessor (quote $tail-accessor))))))
+          (define-property $name accessors (list (syntax $accessor) ...))
+          (define-property $name tail-accessor (syntax $tail-accessor))))))
 
   (define (transform-binder $lookup $pattern $expr $body)
     (syntax-case $pattern ()
@@ -50,11 +50,7 @@
             (let
               (#,@(map
                 (lambda ($id $accessor)
-                  #`(
-                    #,$id
-                    (
-                      #,(datum->syntax #'$name $accessor)
-                      #,$tmp)))
+                  #`(#,$id (#,$accessor #,$tmp)))
                 $ids
                 $accessors))
               #,(fold-left
@@ -96,18 +92,10 @@
               (
                 #,@(map
                   (lambda ($id $accessor)
-                    #`(
-                      #,$id
-                      (
-                        #,(datum->syntax #'$name $accessor)
-                        #,$tmp)))
+                    #`(#,$id (#,$accessor #,$tmp)))
                   $ids
                   $accessors)
-                (
-                  $last-id
-                  (
-                    #,(datum->syntax #'$name $tail-accessor)
-                    #,$tmp)))
+                ($last-id (#,$tail-accessor #,$tmp)))
               #,(fold-left
                 (lambda ($body $spec)
                   (transform-binder
