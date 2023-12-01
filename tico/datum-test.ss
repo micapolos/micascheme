@@ -25,8 +25,8 @@
 
 (check
   (equal?
-  	(datum-values-application '(1 fn) (list '(2 v1) '(0 v2)))
-  	'(values-app (1 fn) (2 v1) (0 v2))))
+  	(datum-values-application 'fn (list '(2 v1) '(0 v2)))
+  	'(values-app fn (2 v1) (0 v2))))
 
 (check
  	(equal?

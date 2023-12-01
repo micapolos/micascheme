@@ -38,7 +38,7 @@
   (define-syntax values-app
     (lambda ($syntax)
       (syntax-case $syntax ()
-        ((_ ($arity $expr) ...)
+        ((_ $fn ($arity $expr) ...)
           (and
             (for-all integer? (datum ($arity ...)))
             (for-all nonnegative? (datum ($arity ...))))
@@ -52,7 +52,7 @@
                   #,@(map
                     (lambda ($tmps $expr) #`((#,@$tmps) #,$expr))
                     $tmps $exprs))
-                (#,@(apply append $tmps))))))))
+                ($fn #,@(apply append $tmps))))))))
 
   (define (partial $proc . $partial-args)
     (lambda $args

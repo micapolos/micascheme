@@ -142,8 +142,7 @@
 
   (define (compilation-application $arity $target $args)
     (lets
-      ($compilations (cons $target $args))
-      ($arities (map compilation-arity $compilations))
+      ($arities (map compilation-arity $args))
       (compilation
         $arity
         (cond
@@ -153,7 +152,7 @@
               (map compilation-datum $args)))
           (else
             (datum-values-application
-              (compilation-arity-datum $target)
+              (compilation-datum $target)
               (map compilation-arity-datum $args))))
         (evaluation-application
           (compilation-evaluation $target)

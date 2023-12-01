@@ -116,18 +116,18 @@
   (equal?
     (compilation-application
       (arity 1)
-      (datum->compilation '(values string-append "foo"))
+      (datum->compilation 'string-append)
       (list
         (datum->compilation '(values))
-        (datum->compilation "bar")
-        (datum->compilation '(values "goo" "zoo"))))
+        (datum->compilation "foo")
+        (datum->compilation '(values "bar" "gar"))))
     (datum->compilation
       (datum-values-application
-        (compilation-arity-datum (datum->compilation '(values string-append "foo")))
+        (compilation-datum (datum->compilation 'string-append))
         (list
           (compilation-arity-datum (datum->compilation '(values)))
-          (compilation-arity-datum (datum->compilation "bar"))
-          (compilation-arity-datum (datum->compilation '(values "goo" "zoo"))))))))
+          (compilation-arity-datum (datum->compilation "foo"))
+          (compilation-arity-datum (datum->compilation '(values "bar" "gar"))))))))
 
 (check
   (equal?

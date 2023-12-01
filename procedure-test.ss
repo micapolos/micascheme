@@ -39,11 +39,11 @@
 (check
   (equal?
     (values-app
-      (2 (values string-append "a"))
+      string-append
       (0 (values))
-      (1 (values "b"))
-      (2 (values "c" "d")))
-    "abcd"))
+      (1 (values "a"))
+      (2 (values "b" "c")))
+    "abc"))
 
 ; === partial ===
 
