@@ -271,4 +271,18 @@
         (+
           (* (sin $x) (sin $x))
           (* (cos $x) (cos $x))))))
+
+  (check
+    (linear=?
+      (lets
+        ((linear $sin) sin)
+        ((linear $cos) cos)
+        (linear
+          (+
+            (* $sin $sin)
+            (* $cos $cos))))
+      (lambda ($x)
+        (+
+          (* (sin $x) (sin $x))
+          (* (cos $x) (cos $x))))))
 )
