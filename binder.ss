@@ -2,7 +2,7 @@
   (export
     define-accessors
     define-binder
-    transform-binder
+    transform-lets
     transform-monad)
   (import
     (scheme)
@@ -48,96 +48,97 @@
             #`(#,$binder #,$expr
               (lambda $id #,$body)))))))
 
-
-  (define (transform-binder $lookup $pattern $expr $body)
+  (define (transform-accessors-opt $lookup $pattern $expr $body)
     (syntax-case $pattern ()
       (($name $spec ...)
         (identifier? #'$name)
         (let (($accessors ($lookup #'$name #'accessors)))
-          (cond
-            ($accessors
-              (let*
-                (
-                  ($tmp (car (generate-temporaries '(tmp))))
-                  ($id-spec-pairs
-                    (map
-                      (lambda ($spec)
-                        (cond
-                          ((identifier? $spec) (cons $spec #f))
-                          (else
-                            (let
-                              (($tmp (car (generate-temporaries '(tmp)))))
-                              (cons $tmp (cons $spec $tmp))))))
-                      (syntax->list #'($spec ...))))
-                  ($ids (map car $id-spec-pairs))
-                  ($specs (filter (lambda (t) t) (map cdr $id-spec-pairs))))
-                (unless $accessors
-                  (syntax-error #'$name "not data"))
-                (unless (= (length $accessors) (length $ids))
-                  (syntax-error #'($name $spec ...) "illegal number of matchers"))
-                #`(let ((#,$tmp #,$expr))
-                  (let
-                    (#,@(map
+          (and $accessors
+            (let*
+              (
+                ($tmp (car (generate-temporaries '(tmp))))
+                ($id-spec-pairs
+                  (map
+                    (lambda ($spec)
+                      (cond
+                        ((identifier? $spec) (cons $spec #f))
+                        (else
+                          (let
+                            (($tmp (car (generate-temporaries '(tmp)))))
+                            (cons $tmp (cons $spec $tmp))))))
+                    (syntax->list #'($spec ...))))
+                ($ids (map car $id-spec-pairs))
+                ($specs (filter (lambda (t) t) (map cdr $id-spec-pairs))))
+              (unless $accessors
+                (syntax-error #'$name "not data"))
+              (unless (= (length $accessors) (length $ids))
+                (syntax-error #'($name $spec ...) "illegal number of matchers"))
+              #`(let ((#,$tmp #,$expr))
+                (let
+                  (#,@(map
+                    (lambda ($id $accessor)
+                      #`(#,$id (#,$accessor #,$tmp)))
+                    $ids
+                    $accessors))
+                  #,(fold-left
+                    (lambda ($body $spec)
+                      (transform-lets
+                        $lookup
+                        (car $spec)
+                        (cdr $spec)
+                        $body))
+                    $body
+                    (reverse $specs))))))))
+      (($name $spec ... . $last-id)
+        (identifier? #'$name)
+        (let (($accessors ($lookup #'$name #'accessors)))
+          (and $accessors
+            (let*
+              (
+                ($tail-accessor ($lookup #'$name #'tail-accessor))
+                ($tmp (car (generate-temporaries '(tmp))))
+                ($id-spec-pairs
+                  (map
+                    (lambda ($spec)
+                      (cond
+                        ((identifier? $spec) (cons $spec #f))
+                        (else
+                          (let
+                            (($tmp (car (generate-temporaries '(tmp)))))
+                            (cons $tmp (cons $spec $tmp))))))
+                    (syntax->list #'($spec ...))))
+                ($ids (map car $id-spec-pairs))
+                ($specs (filter (lambda (t) t) (map cdr $id-spec-pairs))))
+              (unless $accessors
+                (syntax-error #'$name "not data"))
+              (unless $tail-accessor
+                (syntax-error #'$name "data without tail"))
+              (unless (= (length $accessors) (length $ids))
+                (syntax-error #'($name $spec ...) "illegal number of matchers"))
+              #`(let ((#,$tmp #,$expr))
+                (let
+                  (
+                    #,@(map
                       (lambda ($id $accessor)
                         #`(#,$id (#,$accessor #,$tmp)))
                       $ids
-                      $accessors))
-                    #,(fold-left
-                      (lambda ($body $spec)
-                        (transform-binder
-                          $lookup
-                          (car $spec)
-                          (cdr $spec)
-                          $body))
-                      $body
-                      (reverse $specs))))))
-          (else
-            (or
-              (transform-binder-opt $lookup $pattern $expr $body)
-              (syntax-error #'$name "not binder"))))))
-      (($name $spec ... . $last-id)
-        (identifier? #'$name)
-        (let*
-          (
-            ($accessors ($lookup #'$name #'accessors))
-            ($tail-accessor ($lookup #'$name #'tail-accessor))
-            ($tmp (car (generate-temporaries '(tmp))))
-            ($id-spec-pairs
-              (map
-                (lambda ($spec)
-                  (cond
-                    ((identifier? $spec) (cons $spec #f))
-                    (else
-                      (let
-                        (($tmp (car (generate-temporaries '(tmp)))))
-                        (cons $tmp (cons $spec $tmp))))))
-                (syntax->list #'($spec ...))))
-            ($ids (map car $id-spec-pairs))
-            ($specs (filter (lambda (t) t) (map cdr $id-spec-pairs))))
-          (unless $accessors
-            (syntax-error #'$name "not data"))
-          (unless $tail-accessor
-            (syntax-error #'$name "data without tail"))
-          (unless (= (length $accessors) (length $ids))
-            (syntax-error #'($name $spec ...) "illegal number of matchers"))
-          #`(let ((#,$tmp #,$expr))
-            (let
-              (
-                #,@(map
-                  (lambda ($id $accessor)
-                    #`(#,$id (#,$accessor #,$tmp)))
-                  $ids
-                  $accessors)
-                ($last-id (#,$tail-accessor #,$tmp)))
-              #,(fold-left
-                (lambda ($body $spec)
-                  (transform-binder
-                    $lookup
-                    (car $spec)
-                    (cdr $spec)
-                    $body))
-                $body
-                (reverse $specs))))))))
+                      $accessors)
+                    ($last-id (#,$tail-accessor #,$tmp)))
+                  #,(fold-left
+                    (lambda ($body $spec)
+                      (transform-lets
+                        $lookup
+                        (car $spec)
+                        (cdr $spec)
+                        $body))
+                    $body
+                    (reverse $specs))))))))))
+
+  (define (transform-lets $lookup $pattern $expr $body)
+    (or
+      (transform-accessors-opt $lookup $pattern $expr $body)
+      (transform-binder-opt $lookup $pattern $expr $body)
+      (syntax-error #'$name "not allowed in lets")))
 
   (define (transform-monad $monad $expr $var $body)
     (switch $monad

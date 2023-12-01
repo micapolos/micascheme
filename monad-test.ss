@@ -270,4 +270,5 @@
       (lambda ($x)
         (+
           (* (sin $x) (sin $x))
-          (* (cos $x) (cos $x)))))))
+          (* (cos $x) (cos $x))))))
+)

@@ -18,14 +18,14 @@
                 (syntax-case #'$decl ()
                   ((($name $spec ...) $expr)
                     (transform-monad #'$monad #'$expr #'$value
-                      (transform-binder
+                      (transform-lets
                         lookup
                         #'($name $spec ...)
                         #'$value
                         #'(lets (in $monad $decls ... $result)))))
                   ((($name $spec ... . $last-id) $expr)
                     (transform-monad #'$monad #'$expr #'$value
-                      (transform-binder
+                      (transform-lets
                         lookup
                         #'($name $spec ... . $last-id)
                         #'$value
