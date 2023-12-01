@@ -13,8 +13,12 @@
     (syntax)
     (throw))
 
-  (define-syntax-rule (run $item ...)
-    (let () $item ... (void)))
+  (define-syntax run
+    (syntax-rules ()
+      ((_)
+        (let () (void)))
+      ((_ $item ...)
+        (let () $item ...))))
 
   (define-syntax-rule (once-proc $proc)
     (let ()
