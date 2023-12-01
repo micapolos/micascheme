@@ -31,19 +31,20 @@
                         #'$value
                         #'(lets (in $monad $decls ... $result)))))
                   (($id $expr)
-                    (transform-monad #'$monad #'$expr #'$value
-                      #'(let (($id $value))
-                        (lets (in $monad $decls ... $result)))))))
+                    (transform-monad #'$monad #'$expr #'$id
+                      #'(lets (in $monad $decls ... $result))))))
               (((run $result))
                 #'(lets (in $monad $result)))
               (($result)
                 #'$result)))
           ((_ ((values $id ...) $expr) $decls ... $result)
-            #'(let-values ((($id ...) $expr))
-              (lets $decls ... $result)))
+            #'(call-with-values
+              (lambda () $expr)
+              (lambda ($id ...)
+                (lets $decls ... $result))))
           ((_ ($id (rec $expr)) $decls ... $result)
             #'(letrec (($id $expr))
-              (lets (in $monad $decls ... $result))))
+              (lets $decls ... $result)))
           ((_ $item ...)
             #'(lets (in #f $item ...)))))))
 )
