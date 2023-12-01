@@ -3,6 +3,7 @@
 (test
   (tico argument)
   (tico arity)
+  (tico bimbing)
   (tico binding)
   (tico block)
   (tico compilation)
