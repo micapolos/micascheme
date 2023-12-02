@@ -279,7 +279,7 @@
 
   (define (compilation-argument $compilation)
     (argument
-      (compilation-parameter $compilation)
+      (compilation-parameters $compilation)
       $compilation))
 
   (define (compilation-datum-argument $compilation-argument)

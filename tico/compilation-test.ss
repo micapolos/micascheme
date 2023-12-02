@@ -504,6 +504,28 @@
       '(let ((foo "foo") (bar "bar")) foo)
       1)))
 
+; --- compilation-argument
+
+(check
+  (equal?
+    (with-tmps
+      (compilation-argument
+        (compilation
+          (arity 3)
+          '(three-values)
+          (constant "foo" "bar" "goo"))))
+    (with-tmps
+      (argument
+        (compilation-parameters
+          (compilation
+            (arity 3)
+            '(three-values)
+            (constant "foo" "bar" "goo")))
+        (compilation
+            (arity 3)
+            '(three-values)
+            (constant "foo" "bar" "goo"))))))
+
 ; --- compilation-datum-argument
 
 (check
