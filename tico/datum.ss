@@ -27,7 +27,9 @@
     packet-datum
     values-datum
     argument-datum
-    arguments-lets-datum)
+    arguments-lets-datum
+    datum-arguments-application
+    datum-arguments-tuple)
   (import
     (micascheme)
     (tico argument)
@@ -215,4 +217,10 @@
       $datum-arguments
       (lambda ($params)
         (datum-application $target-datum $params))))
+
+  (define (datum-arguments-tuple $datum-arguments)
+    (arguments-lets-datum
+      $datum-arguments
+      (lambda ($params)
+        (datum-tuple $params))))
 )

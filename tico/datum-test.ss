@@ -233,3 +233,38 @@
 			,(argument-datum (argument (list 'foo) "foo"))
 			,(argument-datum (argument (list 'bar 'gar) '(values "bar" "gar")))
 			(string-append foo bar gar))))
+
+; --- datum-arguments-application
+
+(check
+	(equal?
+		(datum-arguments-application
+			'string-append
+			(list
+				(argument (list) '(void))
+				(argument (list 'foo) "foo")
+				(argument (list 'bar 'gar) '(values "bar" "gar"))))
+		(arguments-lets-datum
+			(list
+				(argument (list) '(void))
+				(argument (list 'foo) "foo")
+				(argument (list 'bar 'gar) '(values "bar" "gar")))
+			(lambda ($params)
+				(datum-application 'string-append $params)))))
+
+; --- datum-arguments-tuple
+
+(check
+	(equal?
+		(datum-arguments-tuple
+			(list
+				(argument (list) '(void))
+				(argument (list 'foo) "foo")
+				(argument (list 'bar 'gar) '(values "bar" "gar"))))
+		(arguments-lets-datum
+			(list
+				(argument (list) '(void))
+				(argument (list 'foo) "foo")
+				(argument (list 'bar 'gar) '(values "bar" "gar")))
+			(lambda ($params)
+				(datum-tuple $params)))))
