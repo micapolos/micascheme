@@ -1,9 +1,11 @@
 (library (failure)
   (export
-    failure failure? failure-items
-    make-failure
-    failure-push
-    failable failable-bind failable-with)
+    failure failure? failure-value
+    failable
+    failable-bind
+    failable-bind-failure
+    failable-failure
+    failable-recover)
   (import
     (scheme)
     (data)
@@ -11,9 +13,10 @@
     (monad)
     (function)
     (stack)
+    (binder)
     (syntax))
 
-  (data (failure . items))
+  (data (failure value))
 
   (define-monad failable
     ((pure $value) $value)
@@ -22,11 +25,21 @@
         ((failure? $failure) $failure)
         ((else $success) ($fn $success)))))
 
-  (function (failure-push (failure $items) $entry)
-    (make-failure (push $items $entry)))
-
-  (define-syntax-rule (failable-with $item $failable)
+  (define (failable-bind-failure $failable $fn)
     (switch $failable
-      ((failure? $failure) (failure-push $failure ((lambda () $item))))
+      ((failure? $failure) ($fn $failure))
+      ((else $success) $success)))
+
+  (define-aux-keyword failable-failure)
+
+  (define-binder failable-failure
+    (lambda ($failable $fn)
+      (switch $failable
+        ((failure? $failure) ($fn (failure-value $failure)))
+        ((else $success) $success))))
+
+  (define (failable-recover $failable $fn)
+    (switch $failable
+      ((failure? $failure) ($fn $failure))
       ((else $success) $success)))
 )

@@ -23,7 +23,14 @@
 
 (check
   (equal?
-    (failable-with 'error-1
-      (failable-with 'error-2
-        (failure 'origin)))
-    (failure 'error-1 'error-2 'origin)))
+    (lets
+      ((failable-failure $value) 128)
+      (failure `(fatal ,$value)))
+    128))
+
+(check
+  (equal?
+    (lets
+      ((failable-failure $value) (failure 'error))
+      (failure `(fatal ,$value)))
+    (failure '(fatal error))))
