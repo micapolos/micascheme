@@ -188,7 +188,7 @@
   (define (listing-bind $listing $fn)
     (lambda ($list)
       (lets
-        ((values $value $list) (pair-values ($listing $list)))
+        ((pair $value $list) ($listing $list))
         (($fn $value) $list))))
 
   (define (listing-run $listing) 
