@@ -13,6 +13,7 @@
     datum-tuple
     datum-args
     datum-parameter
+    datum-parameters
     tuple-ref-datum
     value->datum
     datum->value
@@ -59,6 +60,9 @@
     (switch (arity-value $arity)
       ((one? _) (generate-symbol))
       ((else $count) `(values ,@(generate-symbols $count)))))
+
+  (define (datum-parameters $arity)
+    (generate-symbols (arity-value $arity)))
 
   (define (generate-datum-abstraction $arity $fn)
     (lets

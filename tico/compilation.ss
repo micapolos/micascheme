@@ -26,6 +26,7 @@
     compilation-ref
 
     compilation-parameter
+    compilation-parameters
     compilation-argument
     compilation-datum-argument
     compilation-variable
@@ -125,6 +126,14 @@
         $arity
         (datum-parameter $arity)
         (evaluation-parameter $evaluation))))
+
+  (define (compilation-parameters $compilation)
+    (lets
+      ((compilation $arity $datum $evaluation) $compilation)
+      (map compilation
+        (make-list (arity-value $arity) (arity 1))
+        (datum-parameters $arity)
+        (evaluation-parameters $arity $evaluation))))
 
   (define (compilation-variable $compilation $index)
     (switch-exclusive (compilation-evaluation $compilation)

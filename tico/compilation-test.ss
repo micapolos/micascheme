@@ -9,6 +9,7 @@
   (tico variable)
   (tico definition)
   (tico parameter)
+  (tico evaluation)
   (tico argument))
 
 (check
@@ -434,6 +435,24 @@
         (variable-compilation 'foo 3)))
     (with-tmps
       (generate-parameter-compilation))))
+
+; --- compilation-parameters
+
+(check
+  (equal?
+    (with-tmps
+      (compilation-parameters
+        (compilation
+          (arity 3)
+          '(three-values)
+          (constant "foo" "bar" "goo"))))
+    (with-tmps
+      (map compilation
+        (make-list 3 (arity 1))
+        (datum-parameters (arity 3))
+        (evaluation-parameters
+          (arity 3)
+          (constant "foo" "bar" "goo"))))))
 
 ; --- stack-compilation
 

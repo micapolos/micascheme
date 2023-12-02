@@ -143,3 +143,9 @@
       (index 1))
     (constant
       (tuple-ref 3 (tuple "foo" 128 #f) 1))))
+
+; --- constant-parameters
+
+(check (equal? (constant-parameters (constant)) (list)))
+(check (equal? (constant-parameters (constant "foo")) (list (constant "foo"))))
+(check (equal? (constant-parameters (constant "foo" "bar")) (list (constant "foo") (constant "bar"))))

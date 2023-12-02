@@ -200,6 +200,13 @@
 		(with-tmps (datum-parameter (arity 2)))
 		(with-tmps `(values ,@(generate-symbols 2)))))
 
+; --- datum-parameters
+
+(check
+	(equal?
+		(with-tmps (datum-parameters (arity 2)))
+		(with-tmps (generate-symbols 2))))
+
 ; --- argument-datum
 
 (check

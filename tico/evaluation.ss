@@ -4,9 +4,11 @@
     evaluation-application
     evaluation-struct
     evaluation-promote
-    evaluation-parameter)
+    evaluation-parameter
+    evaluation-parameters)
   (import
     (micascheme)
+    (tico arity)
     (tico constant)
     (tico variable)
     (tico parameter)
@@ -42,4 +44,14 @@
       ((variable? _) (parameter))
       ((parameter? _) (parameter))))
 
+  (define (evaluation-parameters $arity $evaluation)
+    (lets
+      ((arity $size) $arity)
+      (switch-exclusive $evaluation
+        ((constant? $constant)
+          (constant-parameters $constant))
+        ((variable? _)
+          (make-list $size (parameter)))
+        ((parameter? _)
+          (make-list $size (parameter))))))
 )

@@ -11,7 +11,8 @@
     constant-tuple
     constant-tuple-ref
     constant-struct
-    constant-ref)
+    constant-ref
+    constant-parameters)
   (import
     (micascheme)
     (tico tuple)
@@ -104,4 +105,7 @@
             ,(arity-value $arity)
             ,$symbol
             ,(index-value $index))))))
+
+  (define (constant-parameters $constant)
+    (map constant (constant-values $constant)))
 )
