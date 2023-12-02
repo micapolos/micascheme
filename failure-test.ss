@@ -1,18 +1,24 @@
-(import (check) (failure))
+(import (check) (failure) (lets))
 
 ; === failable-let ===
 
 (check
   (equal?
-    (failable-let ($number 128) (+ $number 1))
+    (lets
+      ((failable $number) 128)
+      (+ $number 1))
     129))
 
 (check
   (equal?
-    (failable-let ($number 128) (failure `dupa))
+    (lets
+      ((failable $number) 128)
+      (failure 'dupa))
     (failure `dupa)))
 
 (check
   (equal?
-    (failable-let ($number (failure `dupa)) (+ $number 1))
-    (failure `dupa)))
+    (lets
+      ((failable $number) (failure 'dupa))
+      (+ $number 1))
+    (failure 'dupa)))

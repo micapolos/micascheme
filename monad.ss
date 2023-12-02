@@ -6,7 +6,6 @@
     monad-lets
     monad-stack-box
     option-monad 
-    failable-monad
     cons-monad
     listing listing-bind listing-run listing-monad
     define-monad)
@@ -20,7 +19,6 @@
     (procedure)
     (throw)
     (switch)
-    (failure)
     (pair)
     (syntax))
 
@@ -169,17 +167,6 @@
         (or $value (throw option-monad-pure $value)))
       (lambda ($option $fn)
         (and $option ($fn $option)))))
-
-  (define failable-monad
-    (monad
-      (lambda ($value)
-        (switch $value
-          ((failure? $failure) (throw failable $failure))
-          ((else $success) $success)))
-      (lambda ($failable $fn)
-        (switch $failable
-          ((failure? $failure) $failure)
-          ((else $success) ($fn $success))))))
 
   (define (listing $value)
     (lambda ($list) 
