@@ -65,4 +65,7 @@
 
   (define cons scheme-cons)
   (define-accessors (cons car cdr))
+  (define-binder cons
+    (lambda ($pair $fn)
+      ($fn (car $pair) (cdr $pair))))
 )

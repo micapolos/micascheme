@@ -11,23 +11,23 @@
 
   (data (variable index))
 
-  (define (variable-promote $variable $arity)
+  (function (variable-promote (variable $index) $arity)
     (lets
-      ($index (- (variable-index $variable) $arity))
+      ($index (- $index $arity))
       (and (>= $index 0) (variable $index))))
 
-  (define (variable-index-flatten $indices)
+  (function (variable-index-flatten $indices)
     (apply max $indices))
 
-  (define (variable-index+ $first $second)
+  (function (variable-index+ $first $second)
     (max $first $second))
 
-  (define (variable+ $first-variable $second-variable)
+  (function (variable+ (variable $first-index) (variable $second-index))
     (variable
       (variable-index+
-        (variable-index $first-variable)
-        (variable-index $second-variable))))
+        $first-index
+        $second-index)))
 
-  (define (variable-flatten $variables)
-    (fold-left variable+ (car $variables) (cdr $variables)))
+  (function (variable-flatten (cons $first-variable $other-variables))
+    (fold-left variable+ $first-variable $other-variables))
 )
