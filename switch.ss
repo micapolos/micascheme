@@ -6,19 +6,21 @@
     (throw))
 
   (define-syntax switch
-    (syntax-rules (else)
-      ((_ expr ((pred var) body) ... ((else else-var) else-body))
-        (let ((tmp expr))
-          (cond
-            ((pred tmp)
-              (let ((var tmp)) body)) ...
-            (else
-              (let ((else-var tmp)) else-body)))))
-      ((_ expr ((pred var) body) ...)
-        (let ((tmp expr))
-          (cond
-            ((pred tmp)
-              (let ((var tmp)) body)) ...)))))
+    (lambda ($syntax)
+      (lambda ($lookup)
+        (syntax-case $syntax (else)
+          ((_ expr ((pred var) body) ... ((else else-var) else-body))
+            #`(let ((tmp expr))
+              (cond
+                ((pred tmp)
+                  (let ((var tmp)) body)) ...
+                (else
+                  (let ((else-var tmp)) else-body)))))
+          ((_ expr ((pred var) body) ...)
+            #`(let ((tmp expr))
+              (cond
+                ((pred tmp)
+                  (let ((var tmp)) body)) ...)))))))
 
   (define-syntax-rule (switch-opt $expr (($pred $var) $body) ...)
     (switch $expr
