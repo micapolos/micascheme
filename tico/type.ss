@@ -29,6 +29,7 @@
     test-type
     static-test-type
 
+    failable-type-application
     type-application-opt
     type-application
     type-abstraction
@@ -108,6 +109,21 @@
             (arrow-params $arrow))
           (maybe-args-type
             (arrow-results $arrow))))))
+
+  (define (failable-type-application $target $args)
+    (switch $target
+      ((arrow? $arrow)
+        (cond
+          ((types-match? (types-flatten $args) (arrow-params $arrow))
+            (maybe-args-type (arrow-results $arrow)))
+          (else
+            (failure
+              `(invalid
+                (arguments
+                  (expected ,@(arrow-params $arrow))
+                  (actual ,@$args)))))))
+      ((else $other)
+        (failure `(not (arrow? ,$other))))))
 
   (define (type-application $target $args)
     (or-throw
