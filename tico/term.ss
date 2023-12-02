@@ -21,7 +21,7 @@
   (data (ref-term target index))
   (data (values-term items))
 
-  (define (term-constant-arity $term)
+  (function (term-constant-arity $term)
     (switch-exclusive $term
       ((native-term? $native-term)
         (native-term-arity $native-term))

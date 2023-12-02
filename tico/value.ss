@@ -14,16 +14,16 @@
     (tico expression)
     (tico datum))
 
-  (define (value-environment)
+  (function (value-environment)
     (environment '(micascheme) '(tico tuple)))
 
-  (define (value-arity $value)
+  (function (value-arity $value)
     (arity (length $value)))
 
-  (define (value-application $target $args)
+  (function (value-application $target $args)
     (apply $target $args))
 
-  (define (value-abstraction $arity $body)
+  (function (value-abstraction $arity $body)
     (lets
       ($body-symbol (generate-symbol))
       (evaluate
@@ -34,13 +34,13 @@
           (generate-symbols $arity)
           $body-symbol))))
 
-  (define (value-struct $name $field-values)
+  (function (value-struct $name $field-values)
     (tuple-value $field-values))
 
-  (define (value-ref $arity $target $index)
+  (function (value-ref $arity $target $index)
     (tuple-ref-value $arity $target $index))
 
-  (define (tuple-value $values)
+  (function (tuple-value $values)
     (lets
       ($symbols (generate-symbols (length $values)))
       (evaluate
@@ -49,7 +49,7 @@
           (map cons $symbols $values))
         (datum-tuple $symbols))))
 
-  (define (tuple-ref-value $arity $tuple $index)
+  (function (tuple-ref-value $arity $tuple $index)
     (lets
       ($symbol (generate-symbol))
       (evaluate

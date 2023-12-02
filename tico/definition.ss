@@ -6,7 +6,7 @@
 
   (data (definition key value))
 
-  (define (definition-map $fn $definition)
+  (function (definition-map $fn $definition)
     (definition
       ($fn (definition-key $definition))
       ($fn (definition-value $definition))))

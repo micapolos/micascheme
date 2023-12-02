@@ -94,58 +94,58 @@
       (test-type $name)
       (test-parameter-layment $name)))
 
-  (define (static-typing $type)
+  (function (static-typing $type)
     (typing $type
       (make-layment
         (type->layout $type)
         (throw not-static))))
 
-  (define (literal->typing $literal)
+  (function (literal->typing $literal)
     (typing
       (literal->type $literal)
       (literal->layment $literal)))
 
-  (define (variable-typing $type $datum $index)
+  (function (variable-typing $type $datum $index)
     (typing $type
       (variable-layment (type->layout $type) $datum $index)))
 
-  (define (type->typing $type)
+  (function (type->typing $type)
     (static-typing (value-type $type)))
 
-  (define (boolean-typing)
+  (function (boolean-typing)
     (type->typing (boolean-type)))
 
-  (define (number-typing)
+  (function (number-typing)
     (type->typing (number-type)))
 
-  (define (string-typing)
+  (function (string-typing)
     (type->typing (string-type)))
 
-  (define (char-typing)
+  (function (char-typing)
     (type->typing (char-type)))
 
-  (define (type-datum->typing $type $datum)
+  (function (type-datum->typing $type $datum)
     (typing $type
       (layout-datum->layment
         (type->layout $type)
         $datum)))
 
-  (define (bindings-type-datum->typing $binding-typings $type $datum)
+  (function (bindings-type-datum->typing $binding-typings $type $datum)
     (typing $type
       (bindings-layout-datum->layment
         (map typing-layment $binding-typings)
         (type->layout $type)
         $datum)))
 
-  (define (typing-datum $typing)
+  (function (typing-datum $typing)
     (layment-datum
       (typing-layment $typing)))
 
-  (define (typing-value $typing)
+  (function (typing-value $typing)
     (layment-value
       (typing-layment $typing)))
 
-  (define (typing-application $target $args)
+  (function (typing-application $target $args)
     (typing
       (type-application
         (typing-type $target)
@@ -154,42 +154,42 @@
         (typing-layment $target)
         (map typing-layment $args))))
 
-  (define (parameter-typing $type $datum)
+  (function (parameter-typing $type $datum)
     (typing
       $type
       (parameter-layment
         (type->layout $type)
         $datum)))
 
-  (define (generate-parameter-typing $type)
+  (function (generate-parameter-typing $type)
     (typing $type
       (generate-parameter-layment
         (type->layout $type))))
 
-  (define (typing-parameter $typing)
+  (function (typing-parameter $typing)
     (typing
       (typing-type $typing)
       (layment-parameter (typing-layment $typing))))
 
-  (define (typing-variable $typing $index)
+  (function (typing-variable $typing $index)
     (typing
       (typing-type $typing)
       (layment-variable (typing-layment $typing) $index)))
 
-  (define (typing-constant $key-typing $value-typing)
+  (function (typing-constant $key-typing $value-typing)
     (typing
       (constant-type
         (typing->type $key-typing)
         (typing-type $value-typing))
       (typing-layment $value-typing)))
 
-  (define (typing-abstraction $param-typings $body-typings)
+  (function (typing-abstraction $param-typings $body-typings)
     (scope-typing-abstraction
       (empty-stack-typing)
       $param-typings
       $body-typings))
 
-  (define (scope-typing-abstraction $scope $param-typings $body-typings)
+  (function (scope-typing-abstraction $scope $param-typings $body-typings)
     (typing
       (type-abstraction
         (map typing-type $param-typings)
@@ -199,7 +199,7 @@
         (map typing-layment $param-typings)
         (map typing-layment $body-typings))))
 
-  (define (typing-property $param-type $body-typing)
+  (function (typing-property $param-type $body-typing)
     (lets
       ($body-type (typing-type $body-typing))
       ($type (property $param-type $body-type))
@@ -208,7 +208,7 @@
           (list (type->layout $param-type))
           (list (typing-layment $body-typing))))))
 
-  (define (typing-access $typing $arg)
+  (function (typing-access $typing $arg)
     (typing
       (type-access
         (typing-type $typing)
@@ -217,28 +217,28 @@
         (typing-layment $typing)
         (list (typing-layment $arg)))))
 
-  (define (typing-constant-access $typing $arg)
+  (function (typing-constant-access $typing $arg)
     (typing
       (type-constant-access
         (typing-type $typing)
         (typing-type $arg))
       (typing-layment $typing)))
 
-  (define (typing-args $typings)
+  (function (typing-args $typings)
     (typing
       (maybe-args-type
         (map typing-type $typings))
       (layment-args
         (map typing-layment $typings))))
 
-  (define (typing-struct $name $field-typings)
+  (function (typing-struct $name $field-typings)
     (typing
       (type-struct $name
         (map typing-type $field-typings))
       (layment-struct $name
         (map typing-layment $field-typings))))
 
-  (define (typing-ref $typing $pattern)
+  (function (typing-ref $typing $pattern)
     (opt-lets
       ($indexed-type (type-ref (typing-type $typing) $pattern))
       (typing
@@ -247,28 +247,28 @@
           (typing-layment $typing)
           (indexed-index $indexed-type)))))
 
-  (define (typing-ref-index $typing $index)
+  (function (typing-ref-index $typing $index)
     (typing
       (type-ref-index (typing-type $typing) $index)
       (layment-ref
         (typing-layment $typing)
         $index)))
 
-  (define (typing-get $typing $patterns)
+  (function (typing-get $typing $patterns)
     (fold-left typing-ref $typing $patterns))
 
-  (define (native->typing $datum)
+  (function (native->typing $datum)
     (type-datum->typing (unchecked-type) $datum))
 
-  (define (typing-prepare $typing)
+  (function (typing-prepare $typing)
     (type-datum->typing
       (typing-type $typing)
       (value->datum (typing-value $typing))))
 
-  (define (typing-not-empty? $typing)
+  (function (typing-not-empty? $typing)
     (layment-not-empty? (typing-layment $typing)))
 
-  (define (typing-resolve $typing)
+  (function (typing-resolve $typing)
     (lets
       ($type (typing-type $typing))
         (cond
@@ -282,10 +282,10 @@
             (type->typing (unchecked-type)))
           (else $typing))))
 
-  (define (typings-resolve $typings)
+  (function (typings-resolve $typings)
     (typings-resolve-get $typings))
 
-  (define (typings-resolve-get $typings)
+  (function (typings-resolve-get $typings)
     (and
       (= (length $typings) 2)
       (lets
@@ -299,17 +299,17 @@
                 ($selector-type (single (struct-fields $selector-struct)))
                 (typing-ref $target-typing (type-value $selector-type)))))))))
 
-  (define (typing->type $typing)
+  (function (typing->type $typing)
     (type-value (typing-type $typing)))
 
-  (define (typing->type-typing $typing)
+  (function (typing->type-typing $typing)
     (type-datum->typing 
       (type-type)
       (value->datum 
         (type-value 
           (typing-type $typing)))))
 
-  (define (typing-as $typing $type-typing)
+  (function (typing-as $typing $type-typing)
     (switch (typing-type $typing)
       ((unchecked-type? _)
         (type-compilation->layment
@@ -318,34 +318,34 @@
       ((else $other)
         TODO)))
 
-  (define (type-compilation->layment $type $compilation)
+  (function (type-compilation->layment $type $compilation)
     (typing $type
       (make-layment
         (type->layout $type)
         $compilation)))
 
-  (define (typing-promising $param-typings $result-typings)
+  (function (typing-promising $param-typings $result-typings)
     (type->typing
       (arrow
         (map typing->type $param-typings)
         (map typing->type $result-typings))))
 
-  (define (typing-offering $typing $offering-typing)
+  (function (typing-offering $typing $offering-typing)
     (lets
       ($param (typing->type $typing))
       ($body (typing->type $offering-typing))
       (type->typing (property $param $body))))
 
-  (define (typing-being $key-typing $value-typing)
+  (function (typing-being $key-typing $value-typing)
     (type->typing
       (constant-type
         (typing->type $key-typing)
         (typing->type $value-typing))))
 
-  (define (single-typing $typings)
+  (function (single-typing $typings)
     (car (ensure single? $typings)))
 
-  (define (let-typing $typings $fn)
+  (function (let-typing $typings $fn)
     (lets
       ($types (map typing-type $typings))
       ($parameter-typings (ordered-map generate-parameter-typing $types))
@@ -360,19 +360,19 @@
           ($fn $variable-typings))
         $typings)))
 
-  (define (make-list-typing $arity $type)
+  (function (make-list-typing $arity $type)
     (type-datum->typing
       (arrow
         (make-list $arity $type)
         (list (list-of $type)))
       'list))
 
-  (define (make-struct-typing)
+  (function (make-struct-typing)
     (type-datum->typing
       (make-struct-type)
       'struct))
 
-  (define (struct-typing $struct)
+  (function (struct-typing $struct)
     (lets
       ($fields (struct-fields $struct))
       (let-typing
@@ -387,18 +387,19 @@
                   (make-list-typing (length $fields) (type-type))
                   $field-typings))))))))
 
-  (define (typing-assert $typing)
-    (unless (type-matches? (typing-type $typing) (boolean-type))
-      (throw not-boolean (typing-datum $typing)))
-    (unless (typing-value $typing)
-      (throw assertiong-failed (typing-datum $typing))))
+  (function (typing-assert $typing)
+    (run
+      (unless (type-matches? (typing-type $typing) (boolean-type))
+        (throw not-boolean (typing-datum $typing)))
+      (unless (typing-value $typing)
+        (throw assertiong-failed (typing-datum $typing)))))
 
-  (define (type-typing $typing)
+  (function (type-typing $typing)
     (switch (typing-type $typing)
       ((struct? $struct) (struct-typing $struct))
       ((else $other) TODO)))
 
-  (define (typings-do $scope $parameter-typings $constant-typings $body-typings)
+  (function (typings-do $scope $parameter-typings $constant-typings $body-typings)
     (typing-application
       (scope-typing-abstraction
         $scope
@@ -406,10 +407,10 @@
         $body-typings)
       $constant-typings))
 
-  (define (empty-stack-typing)
+  (function (empty-stack-typing)
     (typing (stack) (empty-stack-layment)))
 
-  (define (stack-typing-push $stack-typing $typing)
+  (function (stack-typing-push $stack-typing $typing)
     (typing
       (push
         (typing-type $stack-typing)
@@ -418,15 +419,15 @@
         (typing-layment $stack-typing)
         (typing-layment $typing))))
 
-  (define (stack-typing-ref $stack-typing $index)
+  (function (stack-typing-ref $stack-typing $index)
     (typing
       (list-ref (typing-type $stack-typing) $index)
       (stack-layment-ref (typing-layment $stack-typing) $index)))
 
-  (define (stack-typing . $typings)
+  (function (stack-typing . $typings)
     (fold-left stack-typing-push (empty-stack-typing) $typings))
 
-  (define (stack-typing-type-ref $stack-typing $type)
+  (function (stack-typing-type-ref $stack-typing $type)
     (opt-lets
       ($indexed-type
         (types-match
@@ -436,10 +437,10 @@
         $stack-typing
         (indexed-index $indexed-type))))
 
-  (define (typings-script $typings)
+  (function (typings-script $typings)
     (map typing-line $typings))
 
-  (define (typing-line $typing)
+  (function (typing-line $typing)
     (lets
       ($type (typing-type $typing))
       (cond
@@ -475,14 +476,14 @@
             ((else $other)
               (throw typing-line $typing)))))))
 
-  (define (typing-string $typing)
+  (function (typing-string $typing)
     (writing-string
       (reader-end
         (reader-read
           (writing-reader)
           (typing-line $typing)))))
 
-  (define (typings-string $typings)
+  (function (typings-string $typings)
     (writing-string
       (reader-end
         (reader-read-list

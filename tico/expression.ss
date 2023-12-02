@@ -11,16 +11,16 @@
     switch-expression)
   (import (micascheme))
 
-  (define (lambda-expression $arity $fn)
+  (function (lambda-expression $arity $fn)
     (lets
       ($params (generate-symbols $arity))
       `(lambda (,@$params)
         ,($fn $params))))
 
-  (define (apply-expression $target $args)
+  (function (apply-expression $target $args)
     `(,$target ,@$args))
 
-  (define (let-expression $expressions $fn)
+  (function (let-expression $expressions $fn)
     (lets
       ($params (generate-symbols (length $expressions)))
       `(let
@@ -31,14 +31,14 @@
 
   ; --- tuple packing / unpacking ---
 
-  (define (tuple-expression $expressions)
+  (function (tuple-expression $expressions)
     (case (length $expressions)
       ((0) #f)
       ((1) (car $expressions))
       ((2) `(cons ,(car $expressions) ,(cadr $expressions)))
       (else `(vector ,@$expressions))))
 
-  (define (tuple-ref-expression $arity $tuple $index)
+  (function (tuple-ref-expression $arity $tuple $index)
     (case $arity
       ((0) `(throw error))
       ((1) $tuple)
@@ -47,14 +47,14 @@
 
   ; --- selector / switch ---
 
-  (define (selector-expression $arity $index)
+  (function (selector-expression $arity $index)
     (case $arity
       ((0) `(throw error))
       ((1) #f)
       ((2) (zero? $index))
       (else $index)))
 
-  (define (switch-expression $selector $expressions)
+  (function (switch-expression $selector $expressions)
     (case (length $expressions)
       ((0) `(throw error))
       ((1) (car $expressions))

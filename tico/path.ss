@@ -13,7 +13,7 @@
 
   (data (path symbol child-path-opt))
 
-  (define (list->path $list)
+  (function (list->path $list)
     (fold-right path #f $list))
 
   (define-syntax path!
@@ -27,7 +27,7 @@
           #'(path (quote $name)
             (path! $name* ...))))))
 
-  (define (path-filename $path)
+  (function (path-filename $path)
     (string-append
       (symbol->string (path-symbol $path))
       (switch (path-child-path-opt $path)

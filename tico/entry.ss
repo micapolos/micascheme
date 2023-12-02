@@ -20,12 +20,12 @@
       (list (test-parameter-typing $name) ...)
       (list (test-typing $name) ...)))
 
-  (define (typings->entry $typings)
+  (function (typings->entry $typings)
     (entry
       (ordered-map typing-parameter $typings)
       $typings))
 
-  (define (entry-let-entries-datum $entry)
+  (function (entry-let-entries-datum $entry)
     (map
       (lambda ($param $arg)
         `(
@@ -34,7 +34,7 @@
       (entry-parameters $entry)
       (entry-constants $entry)))
 
-  (define (entry-let $scope $entry $body-fn)
+  (function (entry-let $scope $entry $body-fn)
     (lets
       ($body-typing
         ($body-fn
@@ -55,7 +55,7 @@
               (compilation-datum $body-compilation))
             (compilation-evaluation $body-compilation))))))
 
-  (define (entries-let $scope $entries $body-fn)
+  (function (entries-let $scope $entries $body-fn)
     (switch $entries
       ((null? _)
         ($body-fn $scope))

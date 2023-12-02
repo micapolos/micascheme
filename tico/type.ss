@@ -75,22 +75,22 @@
   (define-syntax-rule (test-type $name)
     (struct (quote $name) (list (unchecked-type))))
 
-  (define (boolean-type)
+  (function (boolean-type)
     (struct 'boolean (list (unchecked-type))))
 
-  (define (number-type)
+  (function (number-type)
     (struct 'number (list (unchecked-type))))
 
-  (define (string-type)
+  (function (string-type)
     (struct 'string (list (unchecked-type))))
 
-  (define (char-type)
+  (function (char-type)
     (struct 'char (list (unchecked-type))))
 
-  (define (symbol-type)
+  (function (symbol-type)
     (struct 'symbol (list (unchecked-type))))
 
-  (define (literal->type $literal)
+  (function (literal->type $literal)
     (switch $literal
       ((boolean? _) (boolean-type))
       ((number? _) (number-type))
@@ -99,7 +99,7 @@
       ((symbol? _) (symbol-type))
       ((else $other) (throw literal->type $literal))))
 
-  (define (type-application-opt $target $args)
+  (function (type-application-opt $target $args)
     (switch-opt $target
       ((arrow? $arrow)
         (and
@@ -109,36 +109,36 @@
           (maybe-args-type
             (arrow-results $arrow))))))
 
-  (define (type-application $target $args)
+  (function (type-application $target $args)
     (or-throw
       (type-application-opt $target $args)))
 
-  (define (type-abstraction $param-types $body-types)
+  (function (type-abstraction $param-types $body-types)
     (arrow $param-types $body-types))
 
-  (define (type-access-opt $target $arg)
+  (function (type-access-opt $target $arg)
     (switch $target
       ((property? $property)
         (and
           (type-matches? $arg (property-param $property))
           (property-body $property)))))
 
-  (define (type-access $target $arg)
+  (function (type-access $target $arg)
     (or-throw
       (type-access-opt $target $arg)))
 
-  (define (type-constant-access-opt $target $arg)
+  (function (type-constant-access-opt $target $arg)
     (switch $target
       ((constant-type? $constant-type)
         (and
           (type-matches? $arg (constant-type-key $constant-type))
           (constant-type-value $constant-type)))))
 
-  (define (type-constant-access $target $arg)
+  (function (type-constant-access $target $arg)
     (or-throw
       (type-constant-access-opt $target $arg)))
 
-  (define (type-matches? $type $pattern)
+  (function (type-matches? $type $pattern)
     (switch $pattern
       ((any-type? _) 
         #t)
@@ -199,12 +199,12 @@
       ((else $other)
         (throw not-type $pattern))))
 
-  (define (types-match? $types $patterns)
+  (function (types-match? $types $patterns)
     (and
       (= (length $types) (length $patterns))
       (for-all type-matches? $types $patterns)))
 
-  (define (types-match-from $types $pattern $index)
+  (function (types-match-from $types $pattern $index)
     (switch $types
       ((null? _) #f)
       ((pair? $pair)
@@ -213,13 +213,13 @@
             (and (type-matches? $type $pattern) (indexed $type $index))
             (types-match-from $types $pattern (add1 $index)))))))
 
-  (define (types-match $types $pattern)
+  (function (types-match $types $pattern)
     (types-match-from $types $pattern 0))
 
-  (define (type-struct $name $items)
+  (function (type-struct $name $items)
     (struct $name (types-flatten $items)))
 
-  (define (type-ref $type $pattern)
+  (function (type-ref $type $pattern)
     (indexed-find
       (lambda ($index $type)
         (and
@@ -227,10 +227,10 @@
           (indexed $type $index)))
       (struct-fields $type)))
 
-  (define (type-ref-index $type $index)
+  (function (type-ref-index $type $index)
     (list-ref (struct-fields $type) $index))
 
-  (define (type-value $type)
+  (function (type-value $type)
     (switch $type
       ((value-type? $value-type)
         (value-type-value $value-type))
@@ -241,20 +241,20 @@
       ((else $other)
         (throw type-value $other))))
 
-  (define (make-list-of $arity $item-type)
+  (function (make-list-of $arity $item-type)
     (arrow
       (make-list $arity $item-type)
       (list (list-of $item-type))))
 
-  (define (make-struct-type)
+  (function (make-struct-type)
     (arrow
       (list (symbol-type) (list-of (type-type)))
       (list (type-type))))
 
-  (define (types-lines $types)
+  (function (types-lines $types)
     (map type-line $types))
 
-  (define (type-line $type)
+  (function (type-line $type)
     (cond
       ((equal? $type (boolean-type)) 'boolean)
       ((equal? $type (number-type)) 'number)
@@ -291,18 +291,18 @@
               (offering ,(type-line (property-body $property)))))
           ((else $other) $other)))))
 
-  (define (maybe-args-type $types)
+  (function (maybe-args-type $types)
     (case (length $types)
       ((1) (car $types))
       (else (args-type $types))))
 
-  (define (type-flatten $type)
+  (function (type-flatten $type)
     (switch $type
       ((args-type? $args-type)
         (args-type-items $args-type))
       ((else $other)
         (list $other))))
 
-  (define (types-flatten $types)
+  (function (types-flatten $types)
     (apply append (map type-flatten $types)))
 )

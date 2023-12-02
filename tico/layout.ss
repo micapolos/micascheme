@@ -41,10 +41,10 @@
   (data (layout-field layout index-opt))
   (data (lambda-layout params body))
 
-  (define (literal->layout $literal)
+  (function (literal->layout $literal)
     (type->layout (literal->type $literal)))
 
-  (define (layout-empty? $layout)
+  (function (layout-empty? $layout)
     (switch $layout
       ((empty-layout? _) #t)
       ((native-layout? _) #f)
@@ -55,7 +55,7 @@
         (layout-empty? (lambda-layout-body $lambda-layout)))
       ((else $other) #f))) ; (throw not-layout $other))))
 
-  (define (layout-arity $layout)
+  (function (layout-arity $layout)
     (switch-exclusive $layout
       ((empty-layout? _) (arity 0))
       ((native-layout? _) (arity 1))
@@ -70,12 +70,12 @@
   (define empty-struct-layout
     (struct-layout (list) 0))
 
-  (define (struct-layout-reverse $struct-layout)
+  (function (struct-layout-reverse $struct-layout)
     (struct-layout
       (reverse (struct-layout-fields $struct-layout))
       (struct-layout-size $struct-layout)))
 
-  (define (struct-layout+layout $struct-layout $layout)
+  (function (struct-layout+layout $struct-layout $layout)
     (lets
       ($fields (struct-layout-fields $struct-layout))
       ($size (struct-layout-size $struct-layout))
@@ -89,49 +89,49 @@
             (push $fields (layout-field $layout $size))
             (+ $size 1))))))
 
-  (define (make-struct-layout $layouts)
+  (function (make-struct-layout $layouts)
     (fold-left
       struct-layout+layout
       empty-struct-layout
       (reverse $layouts)))
 
-  (define (layout-not-empty? $layout)
+  (function (layout-not-empty? $layout)
     (not (layout-empty? $layout)))
 
-  (define (layout-abstraction $param-layouts $body-layouts)
+  (function (layout-abstraction $param-layouts $body-layouts)
     (lambda-layout
       (make-struct-layout $param-layouts)
       (make-struct-layout $body-layouts)))
 
-  (define (layout-application $target $args)
+  (function (layout-application $target $args)
     (switch $target
       ((lambda-layout? $lambda-layout)
         (lambda-layout-body $lambda-layout))
       ((else $other)
         (throw layout-application $target))))
 
-  (define (layout-args $layouts)
+  (function (layout-args $layouts)
     (fold-left
       struct-layout+layout
       empty-struct-layout
       $layouts))
 
-  (define (list-layout $layouts)
+  (function (list-layout $layouts)
     (struct-layout-reverse
       (fold-left
         struct-layout+layout
         empty-struct-layout
         $layouts)))
 
-  (define (layout-struct $name $field-layouts)
+  (function (layout-struct $name $field-layouts)
     (make-struct-layout (reverse $field-layouts)))
 
-  (define (layout-ref $layout $index)
+  (function (layout-ref $layout $index)
     (list-ref
       (struct-layout-fields $layout)
       (- (length (struct-layout-fields $layout)) $index 1)))
 
-  (define (type->layout $type)
+  (function (type->layout $type)
     (switch $type
       ((value-type? _)
         (empty-layout))
@@ -161,12 +161,12 @@
       ((else $type)
         (throw type->layout $type))))
 
-  (define (empty-stack-layout)
+  (function (empty-stack-layout)
     empty-struct-layout)
 
-  (define (stack-layout-push $stack-layout $layout)
+  (function (stack-layout-push $stack-layout $layout)
     (struct-layout+layout $stack-layout $layout))
 
-  (define (stack-layout-ref $stack-layout $index)
+  (function (stack-layout-ref $stack-layout $index)
     (list-ref (struct-layout-fields $stack-layout) $index))
 )
