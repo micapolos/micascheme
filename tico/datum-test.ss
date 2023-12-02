@@ -228,8 +228,8 @@
 				(argument (list 'bar 'gar) '(values "bar" "gar")))
 			(lambda ($params)
 				`(string-append ,@$params)))
-		'(lets
-			((values) (void))
-			(foo "foo")
-			((values bar gar) (values "bar" "gar"))
+		`(lets
+			,(argument-datum (argument (list) '(void)))
+			,(argument-datum (argument (list 'foo) "foo"))
+			,(argument-datum (argument (list 'bar 'gar) '(values "bar" "gar")))
 			(string-append foo bar gar))))
