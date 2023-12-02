@@ -7,5 +7,5 @@
   (run
     (check (argument? $argument))
     (check (not (argument? "foo")))
-    (check (equal? (argument-keys $argument) (list 'foo 'bar)))
+    (check (equal? (argument-key $argument) (list 'foo 'bar)))
     (check (equal? (argument-value $argument) '(values "foo" "bar")))))

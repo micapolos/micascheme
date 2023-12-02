@@ -2,10 +2,10 @@
   (export
     argument
     argument?
-    argument-keys
+    argument-key
     argument-value)
   (import
     (micascheme))
 
-  (data (argument keys value))
+  (data (argument key value))
 )

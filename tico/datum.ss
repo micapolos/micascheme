@@ -214,7 +214,7 @@
   (define (arguments-lets-datum $datum-arguments $fn)
     `(lets
       ,@(map argument-datum $datum-arguments)
-      ,($fn (apply append (map argument-keys $datum-arguments)))))
+      ,($fn (apply append (map argument-key $datum-arguments)))))
 
   (define (datum-arguments-application $target-datum $datum-arguments)
     (arguments-lets-datum
