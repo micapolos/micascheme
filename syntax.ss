@@ -1,9 +1,13 @@
 (library (syntax)
   (export
+    syntax-null?
     define-syntax-rule
     define-syntax-case
     define-aux-keyword)
   (import (scheme))
+
+  (define (syntax-null? $syntax)
+    (null? (syntax->datum $syntax)))
 
   (define-syntax define-syntax-rule
     (syntax-rules ()

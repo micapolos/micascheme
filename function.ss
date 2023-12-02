@@ -5,13 +5,14 @@
     (generate)
     (binder)
     (lets)
+    (syntax)
     (switch))
 
   (define-syntax function
     (lambda ($syntax)
       (lambda ($lookup)
         (syntax-case $syntax ()
-          ((_ ($name $decl ...) $body)
+          ((_ ($name $decl ... . $tail-decl) $body)
             (identifier? #'$name)
             (lets
               ($bindings
@@ -23,8 +24,16 @@
                       ((else $decl)
                         (cons (generate-temporary) $decl))))
                   (syntax->list #'($decl ...))))
+              ($tail-binding
+                (switch #'$tail-decl
+                  ((syntax-null? $null)
+                    (cons $null #f))
+                  ((identifier? $identifier)
+                    (cons $identifier #f))
+                  ((else $other)
+                    (cons (generate-temporary) #'$other))))
               #`(define $name
-                (lambda (#,@(map car $bindings))
+                (lambda (#,@(map car $bindings) . #,(car $tail-binding))
                   #,(fold-left
                     (lambda ($body $binding)
                       (lets
@@ -39,5 +48,5 @@
                               $body))
                           $body)))
                     #'$body
-                    (reverse $bindings))))))))))
+                    (cons $tail-binding (reverse $bindings)))))))))))
 )

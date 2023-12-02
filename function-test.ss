@@ -12,7 +12,20 @@
   (function (plus (cons a b) (cons c d))
     (string-append a b c d))
 
+  (function (plus-tail a b . c)
+    (string-append a b (apply string-append c)))
+
   (check
     (equal?
       (plus (cons "foo" "bar") (cons "!" "?"))
+      "foobar!?"))
+
+  (check
+    (equal?
+      (plus-tail "foo" "bar")
+      "foobar"))
+
+  (check
+    (equal?
+      (plus-tail "foo" "bar" "!" "?")
       "foobar!?")))
