@@ -19,24 +19,12 @@
       ($name
         (identifier? #'$name)
         #`(let (($name #,$expr)) #,$body))
-      (($name $id ...)
-        (for-all identifier? (syntax->list #'($name $id ...)))
-        (let (($binder ($lookup #'$name #'binder)))
-          (and $binder
-            #`(#,$binder #,$expr
-              (lambda ($id ...) #,$body)))))
       (($name $id ... . $tail-id)
-        (for-all identifier? (syntax->list #'($name $id ...)))
+        (identifier? #'$name)
         (let (($binder ($lookup #'$name #'binder)))
           (and $binder
             #`(#,$binder #,$expr
-              (lambda ($id ... . $tail-id) #,$body)))))
-      (($name . $id)
-        (for-all identifier? (syntax->list #'($name $id)))
-        (let (($binder ($lookup #'$name #'binder)))
-          (and $binder
-            #`(#,$binder #,$expr
-              (lambda $id #,$body)))))))
+              (lambda ($id ... . $tail-id) #,$body)))))))
 
   (define (transform-binder $lookup $pattern $expr $body)
     (or
