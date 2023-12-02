@@ -33,8 +33,11 @@
                   #'$expr
                   #'(lets $decls ... $result)))
               (($id $expr)
-                #`(let (($id $expr))
-                  (lets $decls ... $result)))))
+                (transform-binder
+                  $lookup
+                  #'$id
+                  #'$expr
+                  #'(lets $decls ... $result)))))
           ((_ $result)
             #'$result)))))
 )

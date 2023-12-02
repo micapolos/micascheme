@@ -30,6 +30,9 @@
 
   (define (transform-binder-opt $lookup $pattern $expr $body)
     (syntax-case $pattern ()
+      ($name
+        (identifier? #'$name)
+        #`(let (($name #,$expr)) #,$body))
       (($name $id ...)
         (for-all identifier? (syntax->list #'($name $id ...)))
         (let (($binder ($lookup #'$name #'binder)))
