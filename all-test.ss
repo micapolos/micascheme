@@ -8,6 +8,7 @@
   (current)
   (decompiler)
   (evaluator)
+  (failable)
   (failure)
   (from)
   (fstack)
