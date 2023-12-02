@@ -33,6 +33,29 @@
       ((number? $number) (number->string $number)))
     (void)))
 
+(run
+  (define-binder number-with-one
+    (lambda ($number $fn)
+      ($fn $number 1)))
+
+  (define-binder string-with-excl
+    (lambda ($string $fn)
+      ($fn $string "!")))
+
+  (check
+    (equal?
+      (switch "foo"
+        ((string? (string-with-excl $s1 $s2)) (string-append $s1 $s2))
+        ((number? (number-with-one $n1 $n2)) (+ $n1 $n2)))
+      "foo!"))
+
+  (check
+    (equal?
+      (switch 128
+        ((string? (string-with-excl $s1 $s2)) (string-append $s1 $s2))
+        ((else (number-with-one $n1 $n2)) (+ $n1 $n2)))
+      129)))
+
 ; === switch-opt
 
 (check

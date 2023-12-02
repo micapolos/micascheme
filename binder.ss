@@ -7,8 +7,7 @@
     (scheme)
     (boolean)
     (identifier)
-    (syntax)
-    (switch))
+    (syntax))
 
   (define-aux-keyword binder)
 

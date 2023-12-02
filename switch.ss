@@ -3,6 +3,8 @@
   (import
     (scheme)
     (syntax)
+    (binder)
+    (procedure)
     (throw))
 
   (define-syntax switch
@@ -12,15 +14,28 @@
           ((_ expr ((pred var) body) ... ((else else-var) else-body))
             #`(let ((tmp expr))
               (cond
-                ((pred tmp)
-                  (let ((var tmp)) body)) ...
+                #,@(map
+                  (lambda ($pred $decl $body)
+                    #`(
+                      (#,$pred tmp)
+                      #,(transform-binder $lookup $decl #'tmp $body)))
+                  (syntax->list #'(pred ...))
+                  (syntax->list #'(var ...))
+                  (syntax->list #'(body ...)))
                 (else
-                  (let ((else-var tmp)) else-body)))))
+                  (let ((else-tmp tmp))
+                    #,(transform-binder $lookup #'else-var #'else-tmp #'else-body))))))
           ((_ expr ((pred var) body) ...)
             #`(let ((tmp expr))
               (cond
-                ((pred tmp)
-                  (let ((var tmp)) body)) ...)))))))
+                #,@(map
+                  (lambda ($pred $decl $body)
+                    #`(
+                      (#,$pred tmp)
+                      #,(transform-binder $lookup $decl #'tmp $body)))
+                  (syntax->list #'(pred ...))
+                  (syntax->list #'(var ...))
+                  (syntax->list #'(body ...))))))))))
 
   (define-syntax-rule (switch-opt $expr (($pred $var) $body) ...)
     (switch $expr
