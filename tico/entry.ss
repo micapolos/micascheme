@@ -59,12 +59,11 @@
     (switch $entries
       ((null? _)
         ($body-fn $scope))
-      ((pair? $pair)
-        (unpair $pair $entry $entries
-          (entry-let $scope $entry
-            (lambda ($scope)
-              (entries-let
-                $scope
-                $entries
-                $body-fn)))))))
+      ((pair? (pair $entry $entries))
+        (entry-let $scope $entry
+          (lambda ($scope)
+            (entries-let
+              $scope
+              $entries
+              $body-fn))))))
 )

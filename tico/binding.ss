@@ -43,8 +43,8 @@
         TODO)))
 
   (define (bindings-match-from $bindings $pattern $index)
-    (and (not (null? $bindings))
-      (unpair $bindings $binding $bindings
+    (switch-opt $bindings
+      ((pair? (pair $binding $bindings))
         (or
           (binding-match $binding $pattern $index)
           (bindings-match-from $bindings $pattern
@@ -61,11 +61,10 @@
   (define (bindings-get $bindings $patterns)
     (switch $patterns
       ((null? _) (throw empty-patterns))
-      ((pair? $pair)
-        (unpair $pair $pattern $patterns
-          (typing-get
-            (bindings-ref $bindings $pattern)
-            $patterns)))))
+      ((pair? (pair $pattern $patterns))
+        (typing-get
+          (bindings-ref $bindings $pattern)
+          $patterns))))
 
   (define (bindings-resolve-opt $bindings $typings)
     (or

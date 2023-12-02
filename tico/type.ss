@@ -207,11 +207,10 @@
   (define (types-match-from $types $pattern $index)
     (switch $types
       ((null? _) #f)
-      ((pair? $pair)
-        (unpair $pair $type $types
-          (or
-            (and (type-matches? $type $pattern) (indexed $type $index))
-            (types-match-from $types $pattern (add1 $index)))))))
+      ((pair? (pair $type $types))
+        (or
+          (and (type-matches? $type $pattern) (indexed $type $index))
+          (types-match-from $types $pattern (add1 $index))))))
 
   (define (types-match $types $pattern)
     (types-match-from $types $pattern 0))

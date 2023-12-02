@@ -1,12 +1,5 @@
 (import (check) (pair))
 
-; === unpair
-
-(check
-  (=
-    (unpair (cons 3 2) l r (- l r))
-    1))
-
 ; === pair-values ===
 
 (lets
