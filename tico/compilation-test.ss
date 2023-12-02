@@ -8,7 +8,9 @@
   (tico evaluation)
   (tico variable)
   (tico definition)
-  (tico parameter))
+  (tico parameter)
+  (tico bimbing)
+  (tico paco))
 
 (check
   (equal?

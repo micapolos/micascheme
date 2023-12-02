@@ -26,10 +26,12 @@
     datum-definitions-let-entries
     packet-datum
     values-datum
-    datum-bimbing-datum)
+    datum-bimbing-datum
+    datum-paco-lets-datum)
   (import
     (micascheme)
     (tico bimbing)
+    (tico paco)
     (tico arity)
     (tico type)
     (tico definition)
@@ -199,4 +201,11 @@
     (lets
       ((bimbing $key-datum $value-datum) $datum-bimbing)
       `(,$key-datum ,$value-datum)))
+
+  (define (datum-paco-lets-datum $datum-paco $body-datum)
+    (lets
+      ($datum-bimbings (reverse (paco-bimbings $datum-paco)))
+      `(lets
+        ,@(map datum-bimbing-datum $datum-bimbings)
+        ,$body-datum)))
 )

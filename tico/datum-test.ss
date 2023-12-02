@@ -3,7 +3,10 @@
 	(tico datum)
 	(tico type)
 	(tico definition)
-	(tico packet))
+	(tico packet)
+	(tico bimbing)
+	(tico paco)
+	(tico arity))
 
 (check (equal? (test-datum foo) ''foo))
 
@@ -209,3 +212,20 @@
 	(equal?
 		(datum-bimbing-datum (bimbing '(values foo bar) '(foo-bar)))
 		'((values foo bar) (foo-bar))))
+
+; --- datum-paco-lets-datum
+
+(check
+	(equal?
+		(datum-paco-lets-datum
+			(paco
+				(stack
+					(bimbing 'foo "foo")
+					(bimbing 'bar "bar")
+					(bimbing '(values v1 v2 v3) '(three-values))))
+			'(string-append foo bar v1 v2 v3))
+		'(lets
+			(foo "foo")
+			(bar "bar")
+			((values v1 v2 v3) (three-values))
+			(string-append foo bar v1 v2 v3))))

@@ -43,6 +43,7 @@
     (tico argument)
     (tico argument)
     (tico bimbing)
+    (tico paco)
     (tico variable)
     (tico datum)
     (tico evaluation)
@@ -279,4 +280,9 @@
         (bimbing
           (compilation-datum $key-compilation)
           (compilation-datum $value-compilation))))
+
+  (define (compilation-datum-paco $compilation-paco)
+    (paco
+      (map compilation-datum-bimbing
+        (paco-bimbings $compilation-paco))))
 )
