@@ -15,23 +15,21 @@
           ((_ ($name $decl ... . $tail-decl) $body)
             (identifier? #'$name)
             (lets
+              (binding
+                (lambda ($decl)
+                  (switch $decl
+                    ((identifier? $identifier)
+                      (cons $identifier #f))
+                    ((else $other)
+                      (cons (generate-temporary) $other)))))
               ($bindings
-                (map
-                  (lambda ($decl)
-                    (switch $decl
-                      ((identifier? $identifier)
-                        (cons $identifier #f))
-                      ((else $decl)
-                        (cons (generate-temporary) $decl))))
-                  (syntax->list #'($decl ...))))
+                (map binding (syntax->list #'($decl ...))))
               ($tail-binding
                 (switch #'$tail-decl
                   ((syntax-null? $null)
                     (cons $null #f))
-                  ((identifier? $identifier)
-                    (cons $identifier #f))
                   ((else $other)
-                    (cons (generate-temporary) #'$other))))
+                    (binding $other))))
               #`(define $name
                 (lambda (#,@(map car $bindings) . #,(car $tail-binding))
                   #,(fold-left
