@@ -18,26 +18,12 @@
           ((_ ($id (rec $expr)) $decls ... $result)
             #'(letrec (($id $expr))
               (lets $decls ... $result)))
-          ((_ $decl $decls ... $result)
-            (syntax-case #'$decl ()
-              ((($name $spec ...) $expr)
-                (transform-lets
-                  $lookup
-                  #'($name $spec ...)
-                  #'$expr
-                  #'(lets $decls ... $result)))
-              ((($name $spec ... . $last-id) $expr)
-                (transform-lets
-                  $lookup
-                  #'($name $spec ... . $last-id)
-                  #'$expr
-                  #'(lets $decls ... $result)))
-              (($id $expr)
-                (transform-binder
-                  $lookup
-                  #'$id
-                  #'$expr
-                  #'(lets $decls ... $result)))))
+          ((_ ($name $expr) $decls ... $result)
+            (transform-binder
+              $lookup
+              #'$name
+              #'$expr
+              #'(lets $decls ... $result)))
           ((_ $result)
             #'$result)))))
 )
