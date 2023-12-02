@@ -20,14 +20,13 @@
       ($name
         (identifier? #'$name)
         #`(let (($name #,$expr)) #,$body))
-      (($name $id ... . $tail-id)
+      (($name . $params)
         (identifier? #'$name)
         (let (($binder ($lookup #'$name #'binder)))
           (or
             (and $binder
               #`(#,$binder #,$expr
-                (lambda ($id ... . $tail-id)
-                  #,$body)))
+                #,(transform-binder-params $lookup #'$params $body)))
             (syntax-error #'$name "undefined binder"))))))
 
   (define (binding $decl)
