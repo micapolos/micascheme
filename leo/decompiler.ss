@@ -4,7 +4,7 @@
     empty-decompiler
     decompile)
   (import 
-    (except (micascheme) function)
+    (except (micascheme) function pair)
     (leo value))
 
   (data (decompiler types))

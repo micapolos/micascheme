@@ -28,6 +28,6 @@
         $first-index
         $second-index)))
 
-  (function (variable-flatten (cons $first-variable $other-variables))
+  (function (variable-flatten (pair $first-variable $other-variables))
     (fold-left variable+ $first-variable $other-variables))
 )

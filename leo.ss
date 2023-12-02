@@ -1,7 +1,7 @@
 (library (leo)
   (export leo)
   (import
-    (except (micascheme) function)
+    (except (micascheme) function pair)
     (term)
     (type)
     (typed)

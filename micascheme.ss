@@ -2,9 +2,7 @@
   (export)
 
   (import 
-    (rename
-      (scheme)
-      (cons scheme-cons))
+    (scheme)
     (binder)
     (boolean)
     (check)
@@ -35,7 +33,7 @@
   (export
     cons
     (import 
-      (except (scheme) cons)
+      (scheme)
       (binder)
       (boolean)
       (check)
@@ -62,10 +60,4 @@
       (test)
       (throw)
       (variable)))
-
-  (define cons scheme-cons)
-  (define-accessors (cons car cdr))
-  (define-binder cons
-    (lambda ($pair $fn)
-      ($fn (car $pair) (cdr $pair))))
 )

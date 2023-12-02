@@ -6,7 +6,7 @@
     boolean number type select nth first second tuple get choice any)
 
   (import
-    (except (micascheme) function)
+    (except (micascheme) function pair)
     (term)
     (type)
     (typed))

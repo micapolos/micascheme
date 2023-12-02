@@ -2,8 +2,11 @@
   (export
     unpair
     pair-values
-    null-or-pair?)
-  (import (scheme))
+    null-or-pair?
+    pair)
+  (import
+    (scheme)
+    (binder))
 
   (define-syntax unpair
     (lambda (stx)
@@ -20,4 +23,10 @@
 
   (define (null-or-pair? $obj)
     (or (null? $obj) (pair? $obj)))
+
+  (define pair cons)
+
+  (define-binder pair
+    (lambda ($pair $fn)
+      ($fn (car $pair) (cdr $pair))))
 )

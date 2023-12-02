@@ -23,7 +23,7 @@
     typed-wrap)
 
   (import
-    (except (micascheme) function)
+    (except (micascheme) function pair)
     (term)
     (type))
 

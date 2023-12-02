@@ -14,7 +14,7 @@
 
     syntax->typed)
   (import
-    (except (micascheme) function))
+    (except (micascheme) function pair))
 
   (data (anything))
   (data (any-boolean))

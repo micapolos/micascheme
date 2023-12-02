@@ -1,7 +1,7 @@
 (library (decompiler)
   (export decompile)
   (import
-    (except (micascheme) function)
+    (except (micascheme) function pair)
     (term)
     (typed))
 
