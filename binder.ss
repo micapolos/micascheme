@@ -25,6 +25,7 @@
           (or
             (and $binder
               #`(#,$binder #,$expr
-                (lambda ($id ... . $tail-id) #,$body)))
-            (syntax-error $pattern "no binder for"))))))
+                (lambda ($id ... . $tail-id)
+                  #,$body)))
+            (syntax-error #'$name "undefined binder"))))))
 )
