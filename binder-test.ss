@@ -1,5 +1,5 @@
-(import (check) (binder) (lets))
+(import (check) (binder))
 
-(define-accessors (string-binder string->number string-length string->list))
-
-(define-accessors (string-binder-vararg string->number string-length . string->list))
+(define-binder number-and-string
+  (lambda ($number $fn)
+    ($fn $number (number->string $number))))

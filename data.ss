@@ -90,12 +90,10 @@
               #,(if list-field-opt
                 #`(begin
                   (define (name field ... . list-field-opt)
-                    ((record-constructor #,rtd-name) field ... list-field-opt))
-                  (define-accessors (name #,@accessors . #,list-accessor-opt)))
+                    ((record-constructor #,rtd-name) field ... list-field-opt)))
                 #`(begin
                   (define name
-                    (record-constructor #,rtd-name))
-                  (define-accessors (name #,@accessors))))
+                    (record-constructor #,rtd-name))))
               (define #,predicate-name
                 (record-predicate #,rtd-name))
               (define-binder name
