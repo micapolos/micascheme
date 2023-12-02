@@ -1,5 +1,5 @@
 (import
-  (except (micascheme) function pair)
+  (except (micascheme) pair)
   (tico-2))
 
 (check

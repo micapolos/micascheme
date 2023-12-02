@@ -10,7 +10,7 @@
 
   (data (reference index-opt bindings))
 
-  (function (reference-promote $reference $arity)
+  (define (reference-promote $reference $arity)
     (switch (reference-index-opt $reference)
       ((false? _) $reference)
       ((else $index)
@@ -20,7 +20,7 @@
               (index $value)
               (reference-bindings $reference)))))))
 
-  (function (reference-append . $references)
+  (define (reference-append . $references)
     (reference
       (lets
         ($indices (map reference-index-opt $references))

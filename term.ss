@@ -33,7 +33,7 @@
 
     application! function-type! tuple-type! choice-type!)
 
-  (import (except (micascheme) function pair))
+  (import (except (micascheme) pair))
 
   (data (native value))
 

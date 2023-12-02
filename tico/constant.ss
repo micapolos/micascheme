@@ -30,19 +30,19 @@
       '(tico type)
       '(tico tuple)))
 
-  (function (constants-values $constants)
+  (define (constants-values $constants)
     (apply append (map constant-values $constants)))
 
-  (function (constant-value $constant)
+  (define (constant-value $constant)
     (force-single (constant-values $constant)))
 
-  (function (constant-arity $constant)
+  (define (constant-arity $constant)
     (arity (length (constant-values $constant))))
 
-  (function (datum->constant $datum)
+  (define (datum->constant $datum)
     (bindings-datum->constant (stack) $datum))
 
-  (function (bindings-datum->constant $bindings $datum)
+  (define (bindings-datum->constant $bindings $datum)
     (apply constant
       (evaluate
         (evaluator constant-environment $bindings)
@@ -50,7 +50,7 @@
           (lambda () ,$datum)
           list))))
 
-  (function (constant-application $target $args)
+  (define (constant-application $target $args)
     (call-with-values
       (lambda ()
         (apply
@@ -58,7 +58,7 @@
           (constants-values $args)))
       constant))
 
-  (function (constant-abstraction $arity $body-constants)
+  (define (constant-abstraction $arity $body-constants)
     (lets
       ($body-values (constants-values $body-constants))
       ($body-symbols (generate-symbols (length $body-values)))
@@ -72,12 +72,12 @@
               ((1) (car $body-symbols))
               (else `(values ,@$body-symbols))))))))
 
-  (function (constant-struct $name $field-values)
+  (define (constant-struct $name $field-values)
     (constant
       (value-struct $name
         (map constant-value $field-values))))
 
-  (function (constant-tuple $constants)
+  (define (constant-tuple $constants)
     (lets
       ($values (constants-values $constants))
       ($symbols (generate-symbols (length $values)))
@@ -88,11 +88,11 @@
             (map cons $symbols $values))
           `(tuple ,@$symbols)))))
 
-  (function (constant-ref $arity $target $index)
+  (define (constant-ref $arity $target $index)
     (constant
       (value-ref $arity (constant-value $target) $index)))
 
-  (function (constant-tuple-ref $arity $tuple-constant $index)
+  (define (constant-tuple-ref $arity $tuple-constant $index)
     (lets
       ($value (constant-value $tuple-constant))
       ($symbol (generate-symbol))
@@ -106,6 +106,6 @@
             ,$symbol
             ,(index-value $index))))))
 
-  (function (constant-parameters $constant)
+  (define (constant-parameters $constant)
     (map constant (constant-values $constant)))
 )

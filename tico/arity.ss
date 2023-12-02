@@ -7,9 +7,9 @@
 
   (data (arity value))
 
-  (function (arity+ (arity a) (arity b))
+  (define (arity+ (arity a) (arity b))
     (arity (+ a b)))
 
-  (function (arity-single? (arity n))
+  (define (arity-single? (arity n))
     (= n 1))
 )

@@ -19,7 +19,7 @@
 
     typed-values)
   (import
-    (except (micascheme) function pair))
+    (except (micascheme) pair))
 
   (data (any-type))
   (data (any-boolean))

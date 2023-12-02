@@ -2,7 +2,7 @@
   (export)
 
   (import 
-    (scheme)
+    (except (scheme) define)
     (binder)
     (boolean)
     (check)
@@ -10,7 +10,7 @@
     (data)
     (failure)
     (from)
-    (function)
+    (rename (function) (function define))
     (generate)
     (identifier)
     (indexed)
@@ -33,7 +33,7 @@
   (export
     cons
     (import 
-      (scheme)
+      (except (scheme) define)
       (binder)
       (boolean)
       (check)
@@ -41,7 +41,7 @@
       (data)
       (failure)
       (from)
-      (function)
+      (rename (function) (function define))
       (generate)
       (identifier)
       (infix)

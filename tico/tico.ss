@@ -10,17 +10,17 @@
     (tico reader)
     (tico typing))
 
-  (function (tico-eval $datum)
+  (define (tico-eval $datum)
     (typing-value
       (reader-end
         (reader-read-list (typing-reader (stack)) $datum))))
 
-  (function (tico-parse $string)
+  (define (tico-parse $string)
     (tico-eval (parse-script $string)))
 
-  (function (tico-read $port)
+  (define (tico-read $port)
     (tico-eval (read-script $port)))
 
-  (function (tico-load $filename)
+  (define (tico-load $filename)
     (tico-eval (load-script $filename)))
 )

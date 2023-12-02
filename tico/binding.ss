@@ -22,18 +22,18 @@
   (enum (binding typing expanding))
   (data (expanding))
 
-  (function (typing->binding $typing)
+  (define (typing->binding $typing)
     (binding (typing-parameter $typing)))
 
-  (function (binding-not-empty? $binding)
+  (define (binding-not-empty? $binding)
     (binding-switch $binding
       ((typing? $typing) (typing-not-empty? $typing))
       ((expanding? _) #f)))
 
-  (function (generate-parameter-binding $type)
+  (define (generate-parameter-binding $type)
     (binding (generate-parameter-typing $type)))
 
-  (function (binding-match $binding $pattern $index)
+  (define (binding-match $binding $pattern $index)
     (binding-switch $binding
       ((typing? $typing)
         (and
@@ -42,7 +42,7 @@
       ((expanding? $expanding)
         TODO)))
 
-  (function (bindings-match-from $bindings $pattern $index)
+  (define (bindings-match-from $bindings $pattern $index)
     (and (not (null? $bindings))
       (unpair $bindings $binding $bindings
         (or
@@ -50,15 +50,15 @@
           (bindings-match-from $bindings $pattern
             (+ $index (if (binding-not-empty? $binding) 1 0)))))))
 
-  (function (bindings-match $bindings $pattern)
+  (define (bindings-match $bindings $pattern)
     (bindings-match-from $bindings $pattern 0))
 
-  (function (bindings-ref $bindings $pattern)
+  (define (bindings-ref $bindings $pattern)
     (or
       (bindings-match $bindings $pattern)
       (throw bindings-ref $bindings $pattern)))
 
-  (function (bindings-get $bindings $patterns)
+  (define (bindings-get $bindings $patterns)
     (switch $patterns
       ((null? _) (throw empty-patterns))
       ((pair? $pair)
@@ -67,12 +67,12 @@
             (bindings-ref $bindings $pattern)
             $patterns)))))
 
-  (function (bindings-resolve-opt $bindings $typings)
+  (define (bindings-resolve-opt $bindings $typings)
     (or
       (bindings-resolve-application-opt $bindings $typings)
       (bindings-resolve-constant-access-opt $bindings $typings)))
 
-  (function (bindings-resolve-application-opt $bindings $typings)
+  (define (bindings-resolve-application-opt $bindings $typings)
     (lets
       ($target-typing
         (bindings-match $bindings
@@ -84,7 +84,7 @@
           (typing-application $target-typing
             (reverse $typings))))))
 
-  (function (bindings-resolve-constant-access-opt $bindings $typings)
+  (define (bindings-resolve-constant-access-opt $bindings $typings)
     (opt-lets
       ($typing (single $typings))
       ($target-typing
@@ -95,12 +95,12 @@
       (stack
         (typing-constant-access $target-typing $typing))))
 
-  (function (bindings-resolve $bindings $typings)
+  (define (bindings-resolve $bindings $typings)
     (or
       (bindings-resolve-opt $bindings $typings)
       $typings))
 
-  (function (bindings-typing-ref $bindings $typing $pattern)
+  (define (bindings-typing-ref $bindings $typing $pattern)
     (or
       (typing-ref $typing $pattern)
       (opt-lets
@@ -113,13 +113,13 @@
           $property-typing
           $typing))))
 
-  (function (bindings-typing-get $bindings $typing $patterns)
+  (define (bindings-typing-get $bindings $typing $patterns)
     (fold-left
       (partial bindings-typing-ref $bindings)
       $typing
       $patterns))
 
-  (function (bindings-stack-typing $bindings)
+  (define (bindings-stack-typing $bindings)
     (fold-left
       stack-typing-push
       (empty-stack-typing)

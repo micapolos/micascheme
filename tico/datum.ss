@@ -47,7 +47,7 @@
   (define-syntax-rule (test-parameter-datum $name)
     (quote $name))
 
-  (function (literal->datum $literal)
+  (define (literal->datum $literal)
     (switch $literal
       ((boolean? $boolean) $boolean)
       ((number? $number) $number)
@@ -56,51 +56,51 @@
       ((symbol? $symbol) `(quote ,$symbol))
       ((else $other) (throw literal->datum $literal))))
 
-  (function (datum-parameter $arity)
+  (define (datum-parameter $arity)
     (switch (arity-value $arity)
       ((one? _) (generate-symbol))
       ((else $count) `(values ,@(generate-symbols $count)))))
 
-  (function (datum-parameters $arity)
+  (define (datum-parameters $arity)
     (generate-symbols (arity-value $arity)))
 
-  (function (generate-datum-abstraction $arity $fn)
+  (define (generate-datum-abstraction $arity $fn)
     (lets
       ($params (generate-datum-params $arity))
       (datum-abstraction $params ($fn $params))))
 
-  (function (generate-datum-params $arity)
+  (define (generate-datum-params $arity)
     (generate-symbols $arity))
 
-  (function (datum-abstraction $params $body)
+  (define (datum-abstraction $params $body)
     `(lambda (,@$params) ,$body))
 
-  (function (datum-application $target $args)
+  (define (datum-application $target $args)
     `(,$target ,@$args))
 
-  (function (datum-values-application $target $args)
+  (define (datum-values-application $target $args)
     `(values-app ,$target ,@$args))
 
-  (function (datum-tuple $items)
+  (define (datum-tuple $items)
     `(tuple ,@$items))
 
-  (function (tuple-ref-datum $arity $tuple $index)
+  (define (tuple-ref-datum $arity $tuple $index)
     `(tuple-ref ,$arity ,$tuple ,$index))
 
-  (function (datum-args $datums) $datums)
+  (define (datum-args $datums) $datums)
 
-  (function (datum-struct $name $field-datums)
+  (define (datum-struct $name $field-datums)
     (datum-tuple $field-datums))
 
-  (function (datum-ref $arity $target $index)
+  (define (datum-ref $arity $target $index)
     `(tuple-ref ,$arity ,$target ,$index))
 
-  (function (lets-datum $declarations $body)
+  (define (lets-datum $declarations $body)
     (switch $declarations
       ((null? _) $body)
       ((pair? $pair) `(lets ,@$pair ,$body))))
 
-  (function (let-datum $declarations $body)
+  (define (let-datum $declarations $body)
     (switch $declarations
       ((null? _) $body)
       ((pair? $pair) `(let (,@$pair) ,$body))))
@@ -111,21 +111,21 @@
       '(tico type)
       '(tico tuple)))
 
-  (function (datum->value $datum)
+  (define (datum->value $datum)
     (bindings-datum->value (stack) $datum))
 
-  (function (bindings-datum->value $bindings $datum)
+  (define (bindings-datum->value $bindings $datum)
     (evaluate
       (evaluator datum-environment $bindings)
       $datum))
 
-  (function (let-values-entry-datum $param-datums $arg-datums)
+  (define (let-values-entry-datum $param-datums $arg-datums)
     `((,@$param-datums) (values ,@$arg-datums)))
 
-  (function (let-values-datum $entries $body)
+  (define (let-values-datum $entries $body)
     `(let-values (,@$entries) ,$body))
 
-  (function (value->datum $value)
+  (define (value->datum $value)
     (switch $value
       ((null? $null) $null)
       ((symbol? $symbol) `(quote ,$symbol))
@@ -162,7 +162,7 @@
       ((else $other)
         (throw value->datum $value))))
 
-  (function (string->read-datum $string)
+  (define (string->read-datum $string)
     (lets
       ($port (open-input-string $string))
       (switch (read $port)
@@ -173,15 +173,15 @@
             ((eof-object? _) $datum)
             ((else _) (throw not-datum $string)))))))
 
-  (function (datum-definition-let-entry $datum-definition)
+  (define (datum-definition-let-entry $datum-definition)
     `(
       ,(definition-key $datum-definition)
       ,(definition-value $datum-definition)))
 
-  (function (datum-definitions-let-entries $datum-definitions)
+  (define (datum-definitions-let-entries $datum-definitions)
     `(,@(map datum-definition-let-entry $datum-definitions)))
 
-  (function (packet-datum $packet)
+  (define (packet-datum $packet)
     (lets
       ($definitions (packet-definitions $packet))
       ($items (packet-items $packet))
@@ -197,12 +197,12 @@
             ,(datum-definitions-let-entries $other)
             ,$items-datum)))))
 
-  (function (values-datum $datums)
+  (define (values-datum $datums)
     (case (length $datums)
       ((1) (car $datums))
       (else `(values ,@$datums))))
 
-  (function (argument-datum $datum-argument)
+  (define (argument-datum $datum-argument)
     (lets
       ((argument $key-datums $value-datum) $datum-argument)
       `(
@@ -211,18 +211,18 @@
           (else `(values ,@$key-datums)))
         ,$value-datum)))
 
-  (function (arguments-lets-datum $datum-arguments $fn)
+  (define (arguments-lets-datum $datum-arguments $fn)
     `(lets
       ,@(map argument-datum $datum-arguments)
       ,($fn (apply append (map argument-keys $datum-arguments)))))
 
-  (function (datum-arguments-application $target-datum $datum-arguments)
+  (define (datum-arguments-application $target-datum $datum-arguments)
     (arguments-lets-datum
       $datum-arguments
       (lambda ($params)
         (datum-application $target-datum $params))))
 
-  (function (datum-arguments-tuple $datum-arguments)
+  (define (datum-arguments-tuple $datum-arguments)
     (arguments-lets-datum
       $datum-arguments
       (lambda ($params)

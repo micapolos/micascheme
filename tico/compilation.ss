@@ -63,26 +63,26 @@
     (stack-compilation
       (test-compilation $name) ...))
 
-  (function (compilation-arity-datum $compilation)
+  (define (compilation-arity-datum $compilation)
     `(
       ,(arity-value (compilation-arity $compilation))
       ,(compilation-datum $compilation)))
 
-  (function (literal->compilation $literal)
+  (define (literal->compilation $literal)
     (datum->compilation
       (literal->datum $literal)))
 
-  (function (datum->compilation $datum)
+  (define (datum->compilation $datum)
     (scope-datum->compilation
       (empty-stack-compilation)
       $datum))
 
-  (function (bindings-datum->compilation $binding-compilations $datum)
+  (define (bindings-datum->compilation $binding-compilations $datum)
     (scope-datum->compilation
       (apply stack-compilation $binding-compilations)
       $datum))
 
-  (function (scope-datum->compilation $scope $datum)
+  (define (scope-datum->compilation $scope $datum)
     (lets
       ($constant
         (bindings-datum->constant
@@ -93,33 +93,33 @@
         $datum
         $constant)))
 
-  (function (compilation-binding-opt $compilation)
+  (define (compilation-binding-opt $compilation)
     (switch-opt (compilation-evaluation $compilation)
       ((constant? $constant)
         (cons
           (compilation-datum $compilation)
           (constant-value $constant)))))
 
-  (function (compilation-value $compilation)
+  (define (compilation-value $compilation)
     (switch (compilation-evaluation $compilation)
       ((constant? $constant)
         (constant-value $constant))
       ((else $other)
         (throw compilation-value $compilation))))
 
-  (function (parameter-compilation $symbol)
+  (define (parameter-compilation $symbol)
     (compilation (arity 1) $symbol (parameter)))
 
-  (function (constant-compilation $datum $constant)
+  (define (constant-compilation $datum $constant)
     (compilation
       (constant-arity $constant)
       $datum
       $constant))
 
-  (function (generate-parameter-compilation)
+  (define (generate-parameter-compilation)
     (parameter-compilation (generate-symbol)))
 
-  (function (compilation-parameter $compilation)
+  (define (compilation-parameter $compilation)
     (lets
       ((compilation $arity $datum $evaluation) $compilation)
       (compilation
@@ -127,7 +127,7 @@
         (datum-parameter $arity)
         (evaluation-parameter $evaluation))))
 
-  (function (compilation-parameters $compilation)
+  (define (compilation-parameters $compilation)
     (lets
       ((compilation $arity $datum $evaluation) $compilation)
       (map compilation
@@ -135,7 +135,7 @@
         (datum-parameters $arity)
         (evaluation-parameters $arity $evaluation))))
 
-  (function (compilation-variable $compilation $index)
+  (define (compilation-variable $compilation $index)
     (switch-exclusive (compilation-evaluation $compilation)
       ((constant? $constant)
         $compilation)
@@ -145,10 +145,10 @@
         (variable-compilation
           (compilation-datum $compilation) $index))))
 
-  (function (variable-compilation $datum $index)
+  (define (variable-compilation $datum $index)
     (compilation (arity 1) $datum (variable $index)))
 
-  (function (compilation-application $arity $target $args)
+  (define (compilation-application $arity $target $args)
     (lets
       ($arities (map compilation-arity $args))
       (compilation
@@ -166,7 +166,7 @@
           (compilation-evaluation $target)
           (map compilation-evaluation $args)))))
 
-  (function (compilation-abstraction $scope $param-compilations $body-compilations)
+  (define (compilation-abstraction $scope $param-compilations $body-compilations)
     (lets
       ($datum
         (datum-abstraction
@@ -188,13 +188,13 @@
               (stack-compilation-bindings $scope)
               $datum))))))
 
-  (function (compilation-struct $name $compilations)
+  (define (compilation-struct $name $compilations)
     (compilation
       (arity 1)
       (datum-struct $name (map compilation-datum $compilations))
       (evaluation-struct $name (map compilation-evaluation $compilations))))
 
-  (function (compilation-args $compilations)
+  (define (compilation-args $compilations)
     (lets
       ($datum (datum-args (map compilation-datum $compilations)))
       ($evaluations (map compilation-evaluation $compilations))
@@ -215,7 +215,7 @@
                       (filter variable? $evaluations)))))
               (else (parameter))))))))
 
-  (function (compilation-ref $arity $target $index)
+  (define (compilation-ref $arity $target $index)
     (compilation
       (arity 1)
       (datum-ref $arity (compilation-datum $target) $index)
@@ -227,10 +227,10 @@
         ((parameter? $parameter)
           (throw compilation-ref $parameter)))))
 
-  (function (empty-stack-compilation)
+  (define (empty-stack-compilation)
     (compilation (arity 0) (stack) (stack)))
 
-  (function (stack-compilation-push $stack-compilation $compilation)
+  (define (stack-compilation-push $stack-compilation $compilation)
     (compilation
       (arity+
         (compilation-arity $stack-compilation)
@@ -242,7 +242,7 @@
         (compilation-evaluation $stack-compilation)
         (compilation-evaluation $compilation))))
 
-  (function (stack-compilation-ref $stack-compilation $index)
+  (define (stack-compilation-ref $stack-compilation $index)
     (compilation-variable
       (compilation
         (arity 1)
@@ -250,7 +250,7 @@
         (list-ref (compilation-evaluation $stack-compilation) $index))
       $index))
 
-  (function (stack-compilation-bindings $stack-compilation)
+  (define (stack-compilation-bindings $stack-compilation)
     (filter-opts
       (map
         (lambda ($datum $evaluation)
@@ -260,16 +260,16 @@
         (compilation-datum $stack-compilation)
         (compilation-evaluation $stack-compilation))))
 
-  (function (stack-compilation . $compilations)
+  (define (stack-compilation . $compilations)
     (fold-left
       stack-compilation-push
       (empty-stack-compilation)
       $compilations))
 
-  (function (compilation-definition->datum-definition $compilation-definition)
+  (define (compilation-definition->datum-definition $compilation-definition)
     (definition-map compilation-datum $compilation-definition))
 
-  (function (compilation-definitions-do $compilation-definitions $body-compilation)
+  (define (compilation-definitions-do $compilation-definitions $body-compilation)
     (compilation
       (arity 1)
       `(let
@@ -277,12 +277,12 @@
         ,(compilation-datum $body-compilation))
       (compilation-evaluation $body-compilation)))
 
-  (function (compilation-argument $compilation)
+  (define (compilation-argument $compilation)
     (argument
       (compilation-parameters $compilation)
       $compilation))
 
-  (function (compilation-datum-argument $compilation-argument)
+  (define (compilation-datum-argument $compilation-argument)
     (lets
       ((argument $key-compilation $value-compilation) $compilation-argument)
         (argument

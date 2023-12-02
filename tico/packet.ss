@@ -8,7 +8,7 @@
 
   (data (packet definitions items))
 
-  (function (packet-map $fn (packet $definitions $items))
+  (define (packet-map $fn (packet $definitions $items))
     (packet
       (map (partial definition-map $fn) $definitions)
       (map $fn $items)))

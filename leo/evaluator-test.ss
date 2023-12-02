@@ -1,5 +1,5 @@
 (import
-  (except (micascheme) function pair)
+  (except (micascheme) pair)
   (leo evaluator))
 
 (check (equal? (evaluate (evaluated `v `t)) (evaluated `v `t)))

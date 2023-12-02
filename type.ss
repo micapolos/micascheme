@@ -8,7 +8,7 @@
     choice-type-index-of)
 
   (import
-    (except (micascheme) function pair)
+    (except (micascheme) pair)
     (term))
 
   ; ---------------------------------------------------------

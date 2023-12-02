@@ -9,8 +9,9 @@
 (define (vec-y $vec) (ftype-ref vec (y) $vec))
 
 (define (vec-set $vec $x $y)
-  (ftype-set! vec (x) $vec $x)
-  (ftype-set! vec (y) $vec $y))
+  (run
+    (ftype-set! vec (x) $vec $x)
+    (ftype-set! vec (y) $vec $y)))
 
 (define (vec-copy $vec $vec2)
   (vec-set $vec (vec-x $vec2) (vec-y $vec2)))

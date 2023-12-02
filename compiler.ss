@@ -6,7 +6,7 @@
     boolean number type select nth first second tuple get choice any)
 
   (import
-    (except (micascheme) function pair)
+    (except (micascheme) pair)
     (term)
     (type)
     (typed))
@@ -123,14 +123,15 @@
   ; ----------------------------------------------------------------
 
   (define (frame-symbol->indexed-types $frame $symbol)
-    (define $indexed-types
-      (map-indexed
-        (lambda ($index $type) (indexed $type $index))
-        (frame-types $frame)))
-    (filter
-      (lambda ($indexed-type)
-        (eq? (type-selector (indexed-value $indexed-type)) $symbol))
-      $indexed-types))
+    (lets
+      ($indexed-types
+        (map-indexed
+          (lambda ($index $type) (indexed $type $index))
+          (frame-types $frame)))
+      (filter
+        (lambda ($indexed-type)
+          (eq? (type-selector (indexed-value $indexed-type)) $symbol))
+        $indexed-types)))
 
   (define (frame-symbol-ref $frame $symbol)
     (lets 

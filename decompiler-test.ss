@@ -1,5 +1,5 @@
 (import
-  (except (micascheme) function pair)
+  (except (micascheme) pair)
   (decompiler)
   (term)
   (typed))
