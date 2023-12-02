@@ -2,5 +2,5 @@
 
 (check
   (equal?
-    (term-argument-arity (variable-term (index 2)))
+    (term-constant-arity (variable-term (index 2)))
     1))

@@ -174,8 +174,8 @@
                       $end))))))
           ((do)
             (lets
-              ($argument-typings (reverse (block-typings $block)))
-              ($parameter-typings (ordered-map typing-parameter $argument-typings))
+              ($constant-typings (reverse (block-typings $block)))
+              ($parameter-typings (ordered-map typing-parameter $constant-typings))
               (typing-reader
                 (push-list $bindings (map binding $parameter-typings))
                 (lambda ($body-typing)
@@ -185,7 +185,7 @@
                       (typings-do
                         (bindings-stack-typing $bindings)
                         $parameter-typings
-                        $argument-typings
+                        $constant-typings
                         (list $body-typing)))
                     $end)))))
           ((apply)

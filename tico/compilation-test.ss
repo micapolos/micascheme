@@ -2,15 +2,14 @@
   (micascheme)
   (tico arity)
   (tico compilation)
-  (tico argument)
+  (tico constant)
   (tico variable)
   (tico datum)
   (tico evaluation)
   (tico variable)
   (tico definition)
   (tico parameter)
-  (tico bimbing)
-  (tico paco))
+  (tico argument))
 
 (check
   (equal?
@@ -19,7 +18,7 @@
 
 (check
   (equal?
-    (compilation-value (argument-compilation 'foo (argument 3)))
+    (compilation-value (constant-compilation 'foo (constant 3)))
     3))
 
 (check
@@ -38,20 +37,20 @@
     (compilation
       (arity 1)
       '(string-append "foo" "bar")
-      (datum->argument '(string-append "foo" "bar")))))
+      (datum->constant '(string-append "foo" "bar")))))
 
 (check
   (equal?
     (bindings-datum->compilation
       (stack
-        (argument-compilation 'foo (argument "foo"))
+        (constant-compilation 'foo (constant "foo"))
         (parameter-compilation 'goo)
-        (argument-compilation 'bar (argument "bar")))
+        (constant-compilation 'bar (constant "bar")))
       '(string-append "foo" "bar"))
     (compilation
       (arity 1)
       '(string-append "foo" "bar")
-      (bindings-datum->argument
+      (bindings-datum->constant
         (stack
           (cons 'foo "foo")
           (cons 'bar "bar"))
@@ -61,14 +60,14 @@
   (equal?
     (scope-datum->compilation
       (stack-compilation
-        (argument-compilation 'foo (argument "foo"))
+        (constant-compilation 'foo (constant "foo"))
         (parameter-compilation 'goo)
-        (argument-compilation 'bar (argument "bar")))
+        (constant-compilation 'bar (constant "bar")))
       '(string-append foo bar))
     (compilation
       (arity 1)
       '(string-append foo bar)
-      (bindings-datum->argument
+      (bindings-datum->constant
         (stack
           (cons 'foo "foo")
           (cons 'bar "bar"))
@@ -77,26 +76,26 @@
 (check
   (equal?
     (literal->compilation "foo")
-    (compilation (arity 1) "foo" (argument "foo"))))
+    (compilation (arity 1) "foo" (constant "foo"))))
 
 ; --- compilation-application-datum
 
 (check
   (equal?
     (compilation-arity-datum
-      (argument-compilation '(foo) (argument)))
+      (constant-compilation '(foo) (constant)))
     '(0 (foo))))
 
 (check
   (equal?
     (compilation-arity-datum
-      (argument-compilation '(foo) (argument "foo")))
+      (constant-compilation '(foo) (constant "foo")))
     '(1 (foo))))
 
 (check
   (equal?
     (compilation-arity-datum
-      (argument-compilation '(foo) (argument "foo" "bar")))
+      (constant-compilation '(foo) (constant "foo" "bar")))
     '(2 (foo))))
 
 ; --- compilation-application
@@ -168,7 +167,7 @@
       (arity 1)
       (compilation-abstraction
         (stack-compilation
-          (argument-compilation 'excl (argument "!")))
+          (constant-compilation 'excl (constant "!")))
         (list
           (parameter-compilation 'foo)
           (parameter-compilation 'bar))
@@ -177,13 +176,13 @@
             (list
               (variable-compilation 'foo 1)
               (variable-compilation 'bar 0)
-              (argument-compilation 'excl (argument "!"))))))
+              (constant-compilation 'excl (constant "!"))))))
       (list
         (literal->compilation "foo")
         (literal->compilation "bar")))
     (scope-datum->compilation
       (stack-compilation
-        (argument-compilation 'excl (argument "!")))
+        (constant-compilation 'excl (constant "!")))
       (datum-application
         (datum-abstraction
           (list 'foo 'bar)
@@ -283,7 +282,7 @@
     (compilation
       (arity 2)
       '((lambda (v1 v2) (values "foo" "bar")) "v1" "v2")
-      (argument "foo" "bar"))))
+      (constant "foo" "bar"))))
 
 (check
   (equal?
@@ -303,7 +302,7 @@
     (compilation
       (arity 2)
       '((lambda (v1 v2) (values v1 v2)) "v1" "v2")
-      (argument "v1" "v2"))))
+      (constant "v1" "v2"))))
 
 (check
   (equal?
@@ -351,17 +350,17 @@
   (equal?
     (compilation-args
       (list
-        (argument-compilation 'foo (argument "foo"))
-        (argument-compilation 'bar (argument "bar"))))
-    (argument-compilation
+        (constant-compilation 'foo (constant "foo"))
+        (constant-compilation 'bar (constant "bar"))))
+    (constant-compilation
       (datum-args (list 'foo 'bar))
-      (argument (list "foo" "bar")))))
+      (constant (list "foo" "bar")))))
 
 (check
   (equal?
     (compilation-args
       (list
-        (argument-compilation 'foo (argument "foo"))
+        (constant-compilation 'foo (constant "foo"))
         (variable-compilation 'bar 1)
         (parameter-compilation 'goo)))
     (parameter-compilation
@@ -371,7 +370,7 @@
   (equal?
     (compilation-args
       (list
-        (argument-compilation 'foo (argument "foo"))
+        (constant-compilation 'foo (constant "foo"))
         (variable-compilation 'bar 1)
         (variable-compilation 'goo 2)))
     (variable-compilation
@@ -384,11 +383,11 @@
   (equal?
     (compilation-struct 'x
       (list
-        (argument-compilation "foo" (argument "foo"))
-        (argument-compilation "bar" (argument "bar"))))
-    (argument-compilation
+        (constant-compilation "foo" (constant "foo"))
+        (constant-compilation "bar" (constant "bar"))))
+    (constant-compilation
       (datum-struct 'x (list "foo" "bar"))
-      (argument-struct 'x (list (argument "foo") (argument "bar"))))))
+      (constant-struct 'x (list (constant "foo") (constant "bar"))))))
 
 (check
   (equal?
@@ -396,9 +395,9 @@
       (compilation-struct 'x
         (list
           (variable-compilation 'foo 1)
-          (argument-compilation '(identity "foo") (argument "foo"))
+          (constant-compilation '(identity "foo") (constant "foo"))
           (variable-compilation 'bar 2)
-          (argument-compilation '(identity "bar") (argument "bar")))))
+          (constant-compilation '(identity "bar") (constant "bar")))))
     (variable-compilation
       (datum-struct 'x
         (list 'foo '(identity "foo") 'bar '(identity "bar")))
@@ -449,17 +448,17 @@
   ($scope
     (stack-compilation
       (parameter-compilation 'v1)
-      (argument-compilation 'v2 (argument "foo"))
-      (argument-compilation 'v3 (argument "bar"))))
+      (constant-compilation 'v2 (constant "foo"))
+      (constant-compilation 'v3 (constant "bar"))))
   (run
     (check
       (equal?
         (stack-compilation-ref $scope 0)
-        (argument-compilation 'v3 (argument "bar"))))
+        (constant-compilation 'v3 (constant "bar"))))
     (check
       (equal?
         (stack-compilation-ref $scope 1)
-        (argument-compilation 'v2 (argument "foo"))))
+        (constant-compilation 'v2 (constant "foo"))))
     (check
       (equal?
         (stack-compilation-ref $scope 2)
@@ -486,12 +485,12 @@
       '(let ((foo "foo") (bar "bar")) foo)
       1)))
 
-; --- compilation-datum-bimbing
+; --- compilation-datum-argument
 
 (check
   (equal?
-    (compilation-datum-bimbing
-      (bimbing
+    (compilation-datum-argument
+      (argument
         (compilation
           (arity 3)
           '(values a b c)
@@ -500,6 +499,6 @@
           (arity 3)
           '(three-values)
           (variable 1))))
-    (bimbing
+    (argument
       '(values a b c)
       '(three-values))))

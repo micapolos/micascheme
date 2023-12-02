@@ -26,7 +26,7 @@
     typing-application
     typing-parameter
     typing-variable
-    typing-argument
+    typing-constant
     scope-typing-abstraction
     typing-abstraction
     let-typing
@@ -44,7 +44,7 @@
     typing-being
     typing-access
     typing-assert
-    typing-argument-access
+    typing-constant-access
 
     typing-not-empty?
     typing->type
@@ -176,9 +176,9 @@
       (typing-type $typing)
       (layment-variable (typing-layment $typing) $index)))
 
-  (define (typing-argument $key-typing $value-typing)
+  (define (typing-constant $key-typing $value-typing)
     (typing
-      (argument-type
+      (constant-type
         (typing->type $key-typing)
         (typing-type $value-typing))
       (typing-layment $value-typing)))
@@ -217,9 +217,9 @@
         (typing-layment $typing)
         (list (typing-layment $arg)))))
 
-  (define (typing-argument-access $typing $arg)
+  (define (typing-constant-access $typing $arg)
     (typing
-      (type-argument-access
+      (type-constant-access
         (typing-type $typing)
         (typing-type $arg))
       (typing-layment $typing)))
@@ -338,7 +338,7 @@
 
   (define (typing-being $key-typing $value-typing)
     (type->typing
-      (argument-type
+      (constant-type
         (typing->type $key-typing)
         (typing->type $value-typing))))
 
@@ -398,13 +398,13 @@
       ((struct? $struct) (struct-typing $struct))
       ((else $other) TODO)))
 
-  (define (typings-do $scope $parameter-typings $argument-typings $body-typings)
+  (define (typings-do $scope $parameter-typings $constant-typings $body-typings)
     (typing-application
       (scope-typing-abstraction
         $scope
         $parameter-typings
         $body-typings)
-      $argument-typings))
+      $constant-typings))
 
   (define (empty-stack-typing)
     (typing (stack) (empty-stack-layment)))

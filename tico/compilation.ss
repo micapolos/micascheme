@@ -12,7 +12,7 @@
 
     compilation-value
 
-    argument-compilation
+    constant-compilation
     variable-compilation
     parameter-compilation
 
@@ -26,8 +26,8 @@
     compilation-ref
 
     compilation-parameter
-    compilation-bimbing
-    compilation-datum-bimbing
+    compilation-argument
+    compilation-datum-argument
     compilation-variable
     compilation-definitions-do
 
@@ -40,10 +40,9 @@
   (import
     (micascheme)
     (tico arity)
+    (tico constant)
+    (tico constant)
     (tico argument)
-    (tico argument)
-    (tico bimbing)
-    (tico paco)
     (tico variable)
     (tico datum)
     (tico evaluation)
@@ -84,37 +83,37 @@
 
   (define (scope-datum->compilation $scope $datum)
     (lets
-      ($argument
-        (bindings-datum->argument
+      ($constant
+        (bindings-datum->constant
           (stack-compilation-bindings $scope)
           $datum))
       (compilation
-        (argument-arity $argument)
+        (constant-arity $constant)
         $datum
-        $argument)))
+        $constant)))
 
   (define (compilation-binding-opt $compilation)
     (switch-opt (compilation-evaluation $compilation)
-      ((argument? $argument)
+      ((constant? $constant)
         (cons
           (compilation-datum $compilation)
-          (argument-value $argument)))))
+          (constant-value $constant)))))
 
   (define (compilation-value $compilation)
     (switch (compilation-evaluation $compilation)
-      ((argument? $argument)
-        (argument-value $argument))
+      ((constant? $constant)
+        (constant-value $constant))
       ((else $other)
         (throw compilation-value $compilation))))
 
   (define (parameter-compilation $symbol)
     (compilation (arity 1) $symbol (parameter)))
 
-  (define (argument-compilation $datum $argument)
+  (define (constant-compilation $datum $constant)
     (compilation
-      (argument-arity $argument)
+      (constant-arity $constant)
       $datum
-      $argument))
+      $constant))
 
   (define (generate-parameter-compilation)
     (parameter-compilation (generate-symbol)))
@@ -129,7 +128,7 @@
 
   (define (compilation-variable $compilation $index)
     (switch-exclusive (compilation-evaluation $compilation)
-      ((argument? $argument)
+      ((constant? $constant)
         $compilation)
       ((variable? $variable)
         (throw compilation-variable $compilation))
@@ -176,7 +175,7 @@
               (evaluation-promote $evaluation-opt
                 (length $param-compilations))))
           (or $evaluation-opt
-            (bindings-datum->argument
+            (bindings-datum->constant
               (stack-compilation-bindings $scope)
               $datum))))))
 
@@ -191,10 +190,10 @@
       ($datum (datum-args (map compilation-datum $compilations)))
       ($evaluations (map compilation-evaluation $compilations))
       (cond
-        ((for-all argument? $evaluations)
-          (argument-compilation
+        ((for-all constant? $evaluations)
+          (constant-compilation
             $datum
-            (argument (map argument-value $evaluations))))
+            (constant (map constant-value $evaluations))))
         (else
           (compilation
             (arity 1)
@@ -212,8 +211,8 @@
       (arity 1)
       (datum-ref $arity (compilation-datum $target) $index)
       (switch-exclusive (compilation-evaluation $target)
-        ((argument? $argument)
-          (argument-ref $arity $argument $index))
+        ((constant? $constant)
+          (constant-ref $arity $constant $index))
         ((variable? $variable)
           $variable)
         ((parameter? $parameter)
@@ -247,8 +246,8 @@
       (map
         (lambda ($datum $evaluation)
           (switch-opt $evaluation
-            ((argument? $argument)
-              (cons $datum (argument-value $argument)))))
+            ((constant? $constant)
+              (cons $datum (constant-value $constant)))))
         (compilation-datum $stack-compilation)
         (compilation-evaluation $stack-compilation))))
 
@@ -269,20 +268,15 @@
         ,(compilation-datum $body-compilation))
       (compilation-evaluation $body-compilation)))
 
-  (define (compilation-bimbing $compilation)
-    (bimbing
+  (define (compilation-argument $compilation)
+    (argument
       (compilation-parameter $compilation)
       $compilation))
 
-  (define (compilation-datum-bimbing $compilation-bimbing)
+  (define (compilation-datum-argument $compilation-argument)
     (lets
-      ((bimbing $key-compilation $value-compilation) $compilation-bimbing)
-        (bimbing
+      ((argument $key-compilation $value-compilation) $compilation-argument)
+        (argument
           (compilation-datum $key-compilation)
           (compilation-datum $value-compilation))))
-
-  (define (compilation-datum-paco $compilation-paco)
-    (paco
-      (map compilation-datum-bimbing
-        (paco-bimbings $compilation-paco))))
 )

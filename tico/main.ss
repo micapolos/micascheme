@@ -17,4 +17,4 @@
           (path-filename
             (list->path
               (map string->symbol
-                (command-line-arguments)))))))))
+                (command-line-constants)))))))))

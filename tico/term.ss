@@ -8,7 +8,7 @@
     ref-term ref-term? ref-term-target ref-term-index
     values-term values-term? values-term-items
 
-    term-argument-arity)
+    term-constant-arity)
   (import
     (micascheme)
     (tico arity))
@@ -21,7 +21,7 @@
   (data (ref-term target index))
   (data (values-term items))
 
-  (define (term-argument-arity $term)
+  (define (term-constant-arity $term)
     (switch-exclusive $term
       ((native-term? $native-term)
         (native-term-arity $native-term))
@@ -29,7 +29,7 @@
         (application-term-arity $application-term))
       ((values-term? $values-term)
         (apply +
-          (map term-argument-arity
+          (map term-constant-arity
             (values-term-items $values-term))))
       ((abstraction-term? _) 1)
       ((variable-term? _) 1)

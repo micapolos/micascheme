@@ -16,7 +16,7 @@
     struct struct? struct-name struct-fields
     arrow arrow? arrow-params arrow-results
     property property? property-param property-body
-    argument-type argument-type? argument-type-key argument-type-value
+    constant-type constant-type? constant-type-key constant-type-value
     abstraction abstraction? abstraction-arity abstraction-body
     recursion recursion? recursion-items
     var var? var-index
@@ -36,8 +36,8 @@
     type-access
     type-access-opt
 
-    type-argument-access-opt
-    type-argument-access
+    type-constant-access-opt
+    type-constant-access
 
     type-struct
     type-ref
@@ -64,7 +64,7 @@
   (data (struct name fields))
   (data (arrow params results))
   (data (property param body))
-  (data (argument-type key value))
+  (data (constant-type key value))
   (data (abstraction arity body))
   (data (recursion items))
   (data (var index))
@@ -127,16 +127,16 @@
     (or-throw
       (type-access-opt $target $arg)))
 
-  (define (type-argument-access-opt $target $arg)
+  (define (type-constant-access-opt $target $arg)
     (switch $target
-      ((argument-type? $argument-type)
+      ((constant-type? $constant-type)
         (and
-          (type-matches? $arg (argument-type-key $argument-type))
-          (argument-type-value $argument-type)))))
+          (type-matches? $arg (constant-type-key $constant-type))
+          (constant-type-value $constant-type)))))
 
-  (define (type-argument-access $target $arg)
+  (define (type-constant-access $target $arg)
     (or-throw
-      (type-argument-access-opt $target $arg)))
+      (type-constant-access-opt $target $arg)))
 
   (define (type-matches? $type $pattern)
     (switch $pattern
@@ -187,15 +187,15 @@
           (type-matches?
             (property-body $type)
             (property-body $property))))
-      ((argument-type? $argument-type)
+      ((constant-type? $constant-type)
         (and
-          (argument-type? $type)
+          (constant-type? $type)
           (type-matches?
-            (argument-type-key $argument-type)
-            (argument-type-key $type))
+            (constant-type-key $constant-type)
+            (constant-type-key $type))
           (type-matches?
-            (argument-type-value $type)
-            (argument-type-value $argument-type))))
+            (constant-type-value $type)
+            (constant-type-value $constant-type))))
       ((else $other)
         (throw not-type $pattern))))
 

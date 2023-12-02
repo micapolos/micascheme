@@ -4,8 +4,7 @@
 	(tico type)
 	(tico definition)
 	(tico packet)
-	(tico bimbing)
-	(tico paco)
+	(tico argument)
 	(tico arity))
 
 (check (equal? (test-datum foo) ''foo))
@@ -201,28 +200,27 @@
 		(with-tmps (datum-parameter (arity 2)))
 		(with-tmps `(values ,@(generate-symbols 2)))))
 
-; --- datum-bimbing-datum
+; --- datum-argument-datum
 
 (check
 	(equal?
-		(datum-bimbing-datum (bimbing 'foo "foo"))
+		(datum-argument-datum (argument 'foo "foo"))
 		'(foo "foo")))
 
 (check
 	(equal?
-		(datum-bimbing-datum (bimbing '(values foo bar) '(foo-bar)))
+		(datum-argument-datum (argument '(values foo bar) '(foo-bar)))
 		'((values foo bar) (foo-bar))))
 
-; --- datum-paco-lets-datum
+; --- datum-arguments-lets-datum
 
 (check
 	(equal?
-		(datum-paco-lets-datum
-			(paco
-				(stack
-					(bimbing 'foo "foo")
-					(bimbing 'bar "bar")
-					(bimbing '(values v1 v2 v3) '(three-values))))
+		(datum-arguments-lets-datum
+			(list
+				(argument 'foo "foo")
+				(argument 'bar "bar")
+				(argument '(values v1 v2 v3) '(three-values)))
 			'(string-append foo bar v1 v2 v3))
 		'(lets
 			(foo "foo")

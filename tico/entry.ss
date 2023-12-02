@@ -1,6 +1,6 @@
 (library (tico entry)
   (export
-    entry entry? entry-parameters entry-arguments
+    entry entry? entry-parameters entry-constants
     test-entry
     typings->entry
     entry-let
@@ -13,7 +13,7 @@
     (tico layment)
     (tico compilation))
 
-  (data (entry parameters arguments))
+  (data (entry parameters constants))
 
   (define-syntax-rule (test-entry $name ...)
     (entry
@@ -32,7 +32,7 @@
           ,(typing-datum $param)
           ,(typing-datum $arg)))
       (entry-parameters $entry)
-      (entry-arguments $entry)))
+      (entry-constants $entry)))
 
   (define (entry-let $scope $entry $body-fn)
     (lets

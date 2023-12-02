@@ -7,7 +7,7 @@
   (tico parameter)
   (tico type)
   (tico variable)
-  (tico argument))
+  (tico constant))
 
 (check
   (equal?
@@ -44,19 +44,19 @@
   (equal?
     (bindings-layout-datum->layment
       (stack
-        (make-layment (simple-layout) (argument-compilation 'foo (argument "foo")))
-        (make-layment (empty-layout) (argument-compilation 'foo (argument "foo")))
+        (make-layment (simple-layout) (constant-compilation 'foo (constant "foo")))
+        (make-layment (empty-layout) (constant-compilation 'foo (constant "foo")))
         (make-layment (simple-layout) (parameter-compilation 'foo))
-        (make-layment (simple-layout) (argument-compilation 'bar (argument "bar"))))
+        (make-layment (simple-layout) (constant-compilation 'bar (constant "bar"))))
       (simple-layout)
       '(string-append foo bar))
     (layment
       (simple-layout)
       (bindings-datum->compilation
         (stack
-          (argument-compilation 'foo (argument "foo"))
+          (constant-compilation 'foo (constant "foo"))
           (parameter-compilation 'foo)
-          (argument-compilation 'bar (argument "bar")))
+          (constant-compilation 'bar (constant "bar")))
         '(string-append foo bar)))))
 
 (check
@@ -252,14 +252,14 @@
 (lets
   ($scope (empty-stack-layment))
   ($scope (stack-layment-push $scope (layment (simple-layout) (parameter-compilation 'v1))))
-  ($scope (stack-layment-push $scope (layment (simple-layout) (argument-compilation 'v2 (argument "foo")))))
+  ($scope (stack-layment-push $scope (layment (simple-layout) (constant-compilation 'v2 (constant "foo")))))
   ($scope (stack-layment-push $scope (layment (empty-layout) #f)))
-  ($scope (stack-layment-push $scope (layment (simple-layout) (argument-compilation 'v3 (argument "bar")))))
+  ($scope (stack-layment-push $scope (layment (simple-layout) (constant-compilation 'v3 (constant "bar")))))
   (run
     (check
       (equal?
         (stack-layment-ref $scope 0)
-        (layment (simple-layout) (argument-compilation 'v3 (argument "bar")))))
+        (layment (simple-layout) (constant-compilation 'v3 (constant "bar")))))
     (check
       (equal?
         (stack-layment-ref $scope 1)
@@ -267,7 +267,7 @@
     (check
       (equal?
         (stack-layment-ref $scope 2)
-        (layment (simple-layout) (argument-compilation 'v2 (argument "foo")))))
+        (layment (simple-layout) (constant-compilation 'v2 (constant "foo")))))
     (check
       (equal?
         (stack-layment-ref $scope 3)
