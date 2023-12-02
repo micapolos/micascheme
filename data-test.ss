@@ -33,6 +33,7 @@
 (check (equal? (vpoint 1 2) (vpoint 1 2)))
 (check (equal? (vpoint 1 2 3) (vpoint 1 2 3)))
 (check (equal? (vpoint 1 2 3 4) (vpoint 1 2 3 4)))
+(check (equal? (vpoint 1 2 3 4) (make-vpoint 1 2 (list 3 4))))
 (check (equal? (vpoint? (vpoint 1 2 3 4)) #t))
 (check (equal? (vpoint-x (vpoint 1 2 3 4)) 1))
 (check (equal? (vpoint-y (vpoint 1 2 3 4)) 2))

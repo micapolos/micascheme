@@ -22,6 +22,7 @@
             (name-string (symbol->string (syntax->datum #`name)))
             (tmp (car (generate-temporaries '(tmp))))
             (record-name (build-identifier ($string #`name) (string-append "%" $string)))
+            (make-name (build-identifier ($string #`name) (string-append "make-" $string)))
             (rtd-name (build-identifier ($string #`name) (string-append $string "-rtd")))
             (prefix-name (string-append name-string "-"))
             (predicate-name (build-identifier ($string #`name) (string-append $string "?")))
@@ -90,7 +91,9 @@
               #,(if list-field-opt
                 #`(begin
                   (define (name field ... . list-field-opt)
-                    ((record-constructor #,rtd-name) field ... list-field-opt)))
+                    ((record-constructor #,rtd-name) field ... list-field-opt))
+                  (define #,make-name
+                    (record-constructor #,rtd-name)))
                 #`(begin
                   (define name
                     (record-constructor #,rtd-name))))
