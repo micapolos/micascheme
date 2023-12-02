@@ -26,8 +26,8 @@
     datum-definitions-let-entries
     packet-datum
     values-datum
-    datum-argument-datum
-    datum-arguments-lets-datum)
+    argument-datum
+    arguments-lets-datum)
   (import
     (micascheme)
     (tico argument)
@@ -196,13 +196,13 @@
       ((1) (car $datums))
       (else `(values ,@$datums))))
 
-  (define (datum-argument-datum $datum-argument)
+  (define (argument-datum $datum-argument)
     (lets
       ((argument $key-datum $value-datum) $datum-argument)
       `(,$key-datum ,$value-datum)))
 
-  (define (datum-arguments-lets-datum $datum-arguments $body-datum)
+  (define (arguments-lets-datum $datum-arguments $body-datum)
     `(lets
-      ,@(map datum-argument-datum $datum-arguments)
+      ,@(map argument-datum $datum-arguments)
       ,$body-datum))
 )

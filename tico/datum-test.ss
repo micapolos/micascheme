@@ -200,23 +200,23 @@
 		(with-tmps (datum-parameter (arity 2)))
 		(with-tmps `(values ,@(generate-symbols 2)))))
 
-; --- datum-argument-datum
+; --- argument-datum
 
 (check
 	(equal?
-		(datum-argument-datum (argument 'foo "foo"))
+		(argument-datum (argument 'foo "foo"))
 		'(foo "foo")))
 
 (check
 	(equal?
-		(datum-argument-datum (argument '(values foo bar) '(foo-bar)))
+		(argument-datum (argument '(values foo bar) '(foo-bar)))
 		'((values foo bar) (foo-bar))))
 
-; --- datum-arguments-lets-datum
+; --- arguments-lets-datum
 
 (check
 	(equal?
-		(datum-arguments-lets-datum
+		(arguments-lets-datum
 			(list
 				(argument 'foo "foo")
 				(argument 'bar "bar")
