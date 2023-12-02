@@ -204,13 +204,18 @@
 
 (check
 	(equal?
-		(argument-datum (argument 'foo "foo"))
-		'(foo "foo")))
+		(argument-datum (argument (list) '(void)))
+		'((values) (void))))
 
 (check
 	(equal?
-		(argument-datum (argument '(values foo bar) '(foo-bar)))
-		'((values foo bar) (foo-bar))))
+		(argument-datum (argument (list 'foo) '(one-value)))
+		'(foo (one-value))))
+
+(check
+	(equal?
+		(argument-datum (argument (list 'foo 'bar) '(two-values)))
+		'((values foo bar) (two-values))))
 
 ; --- arguments-lets-datum
 
@@ -218,12 +223,13 @@
 	(equal?
 		(arguments-lets-datum
 			(list
-				(argument 'foo "foo")
-				(argument 'bar "bar")
-				(argument '(values v1 v2 v3) '(three-values)))
-			'(string-append foo bar v1 v2 v3))
+				(argument (list) '(void))
+				(argument (list 'foo) "foo")
+				(argument (list 'bar 'gar) '(values "bar" "gar")))
+			(lambda ($params)
+				`(string-append ,@$params)))
 		'(lets
+			((values) (void))
 			(foo "foo")
-			(bar "bar")
-			((values v1 v2 v3) (three-values))
-			(string-append foo bar v1 v2 v3))))
+			((values bar gar) (values "bar" "gar"))
+			(string-append foo bar gar))))

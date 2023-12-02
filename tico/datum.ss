@@ -198,11 +198,21 @@
 
   (define (argument-datum $datum-argument)
     (lets
-      ((argument $key-datum $value-datum) $datum-argument)
-      `(,$key-datum ,$value-datum)))
+      ((argument $key-datums $value-datum) $datum-argument)
+      `(
+        ,(cond
+          ((single? $key-datums) (car $key-datums))
+          (else `(values ,@$key-datums)))
+        ,$value-datum)))
 
-  (define (arguments-lets-datum $datum-arguments $body-datum)
+  (define (arguments-lets-datum $datum-arguments $fn)
     `(lets
       ,@(map argument-datum $datum-arguments)
-      ,$body-datum))
+      ,($fn (apply append (map argument-keys $datum-arguments)))))
+
+  (define (datum-arguments-application $target-datum $datum-arguments)
+    (arguments-lets-datum
+      $datum-arguments
+      (lambda ($params)
+        (datum-application $target-datum $params))))
 )
