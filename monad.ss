@@ -6,7 +6,7 @@
     monad-lets
     monad-stack-box
     option-monad 
-    fallible-monad
+    failable-monad
     cons-monad
     listing listing-bind listing-run listing-monad
     define-monad)
@@ -170,14 +170,14 @@
       (lambda ($option $fn)
         (and $option ($fn $option)))))
 
-  (define fallible-monad
+  (define failable-monad
     (monad
       (lambda ($value)
         (switch $value
-          ((failure? $failure) (throw fallible $failure))
+          ((failure? $failure) (throw failable $failure))
           ((else $success) $success)))
-      (lambda ($fallible $fn)
-        (switch $fallible
+      (lambda ($failable $fn)
+        (switch $failable
           ((failure? $failure) $failure)
           ((else $success) ($fn $success))))))
 

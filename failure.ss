@@ -1,7 +1,7 @@
 (library (failure)
   (export
     failure failure? failure-value failure!
-    fallible-bind fallible-let)
+    failable-bind failable-let)
   (import
     (scheme)
     (data)
@@ -13,13 +13,13 @@
   (define-syntax-rule (failure! value)
     (failure (quote value)))
 
-  (define (fallible-bind $fallible $fn)
-    (switch $fallible
+  (define (failable-bind $failable $fn)
+    (switch $failable
       ((failure? $failure) $failure)
       ((else $success) ($fn $success))))
 
-  (define-syntax-rule (fallible-let ($success $fallible) $body ...)
-    (fallible-bind $fallible
+  (define-syntax-rule (failable-let ($success $failable) $body ...)
+    (failable-bind $failable
       (lambda ($success)
         $body ...)))
 )
