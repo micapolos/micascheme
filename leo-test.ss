@@ -1,4 +1,8 @@
-(import (micascheme) (leo) (term) (compiler))
+(import
+  (except (micascheme) function)
+  (leo)
+  (term)
+  (compiler))
 
 (define-syntax-rule (check-leo $leo $value)
   (check (equal? (leo $leo) $value)))

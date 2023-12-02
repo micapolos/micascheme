@@ -5,7 +5,11 @@
     ; aux keywords
     boolean number type select nth first second tuple get choice any)
 
-  (import (micascheme) (term) (type) (typed))
+  (import
+    (except (micascheme) function)
+    (term)
+    (type)
+    (typed))
 
   (define-aux-keyword boolean)
   (define-aux-keyword number)

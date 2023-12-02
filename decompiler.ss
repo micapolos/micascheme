@@ -1,6 +1,9 @@
 (library (decompiler)
   (export decompile)
-  (import (micascheme) (term) (typed))
+  (import
+    (except (micascheme) function)
+    (term)
+    (typed))
 
   (define (decompile $typed)
     (lets 

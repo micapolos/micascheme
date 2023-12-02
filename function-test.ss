@@ -9,10 +9,10 @@
     (lambda ($pair $fn)
       ($fn (car $pair) (cdr $pair))))
 
-  (function (plus (cons a b) c)
-    (string-append a b c))
+  (function (plus (cons a b) (cons c d))
+    (string-append a b c d))
 
   (check
     (equal?
-      (plus (cons "foo" "bar") "!")
-      "foobar!")))
+      (plus (cons "foo" "bar") (cons "!" "?"))
+      "foobar!?")))

@@ -1,4 +1,8 @@
-(import (micascheme) (decompiler) (term) (typed))
+(import
+  (except (micascheme) function)
+  (decompiler)
+  (term)
+  (typed))
 
 (define-syntax-rule (check-decompile $typed $expected)
   (check (equal? (decompile $typed) $expected)))

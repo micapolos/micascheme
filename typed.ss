@@ -22,7 +22,10 @@
 
     typed-wrap)
 
-  (import (micascheme) (term) (type))
+  (import
+    (except (micascheme) function)
+    (term)
+    (type))
 
   (data (typed value type))
 

@@ -18,7 +18,8 @@
     typed typed? typed-value typed-type
 
     typed-values)
-  (import (micascheme))
+  (import
+    (except (micascheme) function))
 
   (data (any-type))
   (data (any-boolean))

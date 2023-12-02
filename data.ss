@@ -98,6 +98,13 @@
                   (define-accessors (name #,@accessors))))
               (define #,predicate-name
                 (record-predicate #,rtd-name))
+              (define-binder name
+                (lambda ($record $fn)
+                  ($fn
+                    #,@(map
+                      (lambda (accessor)
+                        #`(#,accessor $record))
+                      all-accessors))))
               #,@(map
                 (lambda (index f)
                   #`(define #,(build-identifier (s f) (string-append prefix-name s))

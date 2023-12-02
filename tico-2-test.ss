@@ -1,4 +1,6 @@
-(import (micascheme) (tico-2))
+(import
+  (except (micascheme) function)
+  (tico-2))
 
 (check
   (equal?

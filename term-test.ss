@@ -1,4 +1,6 @@
-(import (micascheme) (term))
+(import
+  (except (micascheme) function)
+  (term))
 
 ; === utils ===
 

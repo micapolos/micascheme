@@ -7,7 +7,8 @@
 
     tuple! tuple tuple? tuple-items
     evaluate)
-  (import (micascheme))
+  (import
+    (except (micascheme) function))
 
   (data (boolean-type))
   (data (number-type))

@@ -1,5 +1,5 @@
 (import
-  (micascheme)
+  (except (micascheme) function)
   (leo value)
   (leo decompiler))
 

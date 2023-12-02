@@ -55,7 +55,7 @@
   (define (transform-binder $lookup $pattern $expr $body)
     (or
       (transform-binder-opt $lookup $pattern $expr $body)
-      (syntax-error #'$pattern "no binder for")))
+      (syntax-error $pattern "no binder for")))
 
   (define (transform-accessors-opt $lookup $pattern $expr $body)
     (syntax-case $pattern ()

@@ -1,4 +1,7 @@
-(import (micascheme) (term) (type))
+(import
+  (except (micascheme) function)
+  (term)
+  (type))
 
 ; --------------------------------------------------------------
 

@@ -7,12 +7,9 @@
 
   (data (arity value))
 
-  (define (arity+ $arity-a $arity-b)
-    (arity
-      (+
-        (arity-value $arity-a)
-        (arity-value $arity-b))))
+  (function (arity+ (arity a) (arity b))
+    (arity (+ a b)))
 
-  (define (arity-single? $arity)
-    (= (arity-value $arity) 1))
+  (function (arity-single? (arity n))
+    (= n 1))
 )

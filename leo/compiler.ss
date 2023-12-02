@@ -3,7 +3,7 @@
     compiler! compiler compiler? compiler-types compiler-tmp-count
     compile)
   (import
-    (except (micascheme) compile)
+    (except (micascheme) compile function)
     (leo value))
 
   (data (compiler types tmp-count))

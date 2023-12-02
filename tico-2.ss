@@ -13,7 +13,8 @@
     generic generic? generic-params generic-body
 
     syntax->typed)
-  (import (micascheme))
+  (import
+    (except (micascheme) function))
 
   (data (anything))
   (data (any-boolean))

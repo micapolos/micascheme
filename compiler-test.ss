@@ -1,5 +1,5 @@
 (import 
-  (micascheme) 
+  (except (micascheme) function)
   (term)
   (type)
   (typed)
