@@ -3,6 +3,7 @@
     define-accessors
     define-binder
     transform-lets
+    transform-binder
     transform-monad)
   (import
     (scheme)
@@ -47,6 +48,11 @@
           (and $binder
             #`(#,$binder #,$expr
               (lambda $id #,$body)))))))
+
+  (define (transform-binder $lookup $pattern $expr $body)
+    (or
+      (transform-binder-opt $lookup $pattern $expr $body)
+      (syntax-error #'$pattern "no binder for")))
 
   (define (transform-accessors-opt $lookup $pattern $expr $body)
     (syntax-case $pattern ()

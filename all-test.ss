@@ -11,6 +11,7 @@
   (failure)
   (from)
   (fstack)
+  (function)
   (identifier)
   (indexed)
   (infix)
