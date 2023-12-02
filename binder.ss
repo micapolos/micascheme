@@ -14,7 +14,7 @@
   (define-syntax-rule (define-binder $name $binder)
     (define-property $name binder (syntax $binder)))
 
-  (define (transform-binder-opt $lookup $pattern $expr $body)
+  (define (transform-binder $lookup $pattern $expr $body)
     (syntax-case $pattern ()
       ($name
         (identifier? #'$name)
@@ -22,12 +22,9 @@
       (($name $id ... . $tail-id)
         (identifier? #'$name)
         (let (($binder ($lookup #'$name #'binder)))
-          (and $binder
-            #`(#,$binder #,$expr
-              (lambda ($id ... . $tail-id) #,$body)))))))
-
-  (define (transform-binder $lookup $pattern $expr $body)
-    (or
-      (transform-binder-opt $lookup $pattern $expr $body)
-      (syntax-error $pattern "no binder for")))
+          (or
+            (and $binder
+              #`(#,$binder #,$expr
+                (lambda ($id ... . $tail-id) #,$body)))
+            (syntax-error $pattern "no binder for"))))))
 )
