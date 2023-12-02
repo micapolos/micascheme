@@ -25,14 +25,14 @@
       (ordered-map typing-parameter $typings)
       $typings))
 
-  (function (entry-let-entries-datum $entry)
+  (function (entry-let-entries-datum (entry $parameters $constants))
     (map
       (lambda ($param $arg)
         `(
           ,(typing-datum $param)
           ,(typing-datum $arg)))
-      (entry-parameters $entry)
-      (entry-constants $entry)))
+      $parameters
+      $constants))
 
   (function (entry-let $scope $entry $body-fn)
     (lets
