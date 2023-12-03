@@ -1,5 +1,6 @@
 (library (list)
   (export 
+    mica-list
     list-get
     list-get-overflow list-get-overflow? list-get-overflow-index
 
@@ -39,6 +40,12 @@
     (stack)
     (generate)
     (number))
+
+  (define mica-list list)
+
+  (define-binder mica-list
+    (lambda ($list $fn)
+      (apply $fn $list)))
 
   (define (flatten $lists) (apply append $lists))
 

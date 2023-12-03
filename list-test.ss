@@ -1,5 +1,14 @@
 (import (scheme) (list) (check) (data) (lets) (stack) (indexed) (generate) (failure))
 
+; === binder ===
+
+(lets
+  ((mica-list a b . c) (list "a" "b" "c" "d"))
+  (run
+    (check (equal? a "a"))
+    (check (equal? b "b"))
+    (check (equal? c (list "c" "d")))))
+
 ; === single ===
 
 (check (equal? (single? (list)) #f))

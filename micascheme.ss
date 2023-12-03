@@ -2,7 +2,7 @@
   (export)
 
   (import 
-    (except (scheme) define)
+    (except (scheme) define list)
     (binder)
     (boolean)
     (check)
@@ -17,7 +17,7 @@
     (indexed)
     (infix)
     (lets)
-    (list)
+    (rename (list) (mica-list list))
     (monad)
     (number)
     (pair)
@@ -34,7 +34,7 @@
   (export
     cons
     (import 
-      (except (scheme) define)
+      (except (scheme) define list)
       (binder)
       (boolean)
       (check)
@@ -49,7 +49,7 @@
       (infix)
       (indexed)
       (lets)
-      (list)
+      (rename (list) (mica-list list))
       (number)
       (monad)
       (pair)
