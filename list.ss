@@ -1,6 +1,6 @@
 (library (list)
   (export 
-    mica-list
+    bindable-list
     list-get
     list-get-overflow list-get-overflow? list-get-overflow-index
 
@@ -41,9 +41,9 @@
     (generate)
     (number))
 
-  (define mica-list list)
+  (define bindable-list list)
 
-  (define-binder mica-list
+  (define-binder bindable-list
     (lambda ($list $fn)
       (apply $fn $list)))
 

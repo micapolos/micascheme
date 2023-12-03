@@ -3,7 +3,7 @@
 ; === binder ===
 
 (lets
-  ((mica-list a b . c) (list "a" "b" "c" "d"))
+  ((bindable-list a b . c) (list "a" "b" "c" "d"))
   (run
     (check (equal? a "a"))
     (check (equal? b "b"))
