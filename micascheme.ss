@@ -2,7 +2,11 @@
   (export)
 
   (import 
-    (except (scheme) define list)
+    (except (scheme)
+      define
+      list
+      set-car!
+      set-cdr!)
     (binder)
     (boolean)
     (check)
@@ -34,7 +38,11 @@
   (export
     cons
     (import 
-      (except (scheme) define list)
+      (except (scheme)
+        define
+        list
+        set-car!
+        set-cdr!)
       (binder)
       (boolean)
       (check)
