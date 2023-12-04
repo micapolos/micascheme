@@ -3,8 +3,7 @@
     parse-error parse-error? parse-error-line parse-error-column
 
     parser
-    parser parser-bind parser-map
-    parser-lets
+    parser parser-bind
     parse parse-port
 
     space-parser
@@ -90,33 +89,8 @@
     ((bind $parser $fn)
       (parser-bind-with $parser #f $fn)))
 
-  (define (parser-map $parser $fn)
-    (parser-bind $parser 
-      (lambda ($item) 
-        (parser ($fn $item)))))
-
   ; ----------------------------------------------------------
 
-  (define-syntax parser-lets
-    (lambda ($syntax)
-      (syntax-case $syntax (skip parser)
-        ((_ (skip $expr) $decl ... $body)
-          #`(parser-bind $expr
-            (lambda (_)
-              (parser-lets $decl ... $body))))
-        ((_ ($var (parser $expr)) $decl ... $body)
-          #`(lets ($var $expr)
-            (parser-lets $decl ... $body)))
-        ((_ ($var $expr) $decl ... $body)
-          #`(parser-bind $expr
-            (lambda ($var)
-              (parser-lets $decl ... $body))))
-        ((_ (parser $body)) 
-          #`(parser $body))
-        ((_ $body)
-          #`$body))))
-
-  ; ----------------------------------------------------------
 
   (data (parse-error line column))
 
@@ -216,9 +190,9 @@
   (define (comma-parser) (exact-char-parser #\,))
 
   (define (newline-ended-parser $parser)
-    (parser-lets
-      ($value $parser)
-      (skip (newline-parser))
+    (lets
+      ((parser $value) $parser)
+      ((parser _) (newline-parser))
       (parser $value)))
 
   ; ----------------------------------------------------------
@@ -244,18 +218,24 @@
       $digit-stack))
 
   (define (positive-integer-parser)
-    (parser-lets
-      ($digit-stack (non-empty-stack-parser (digit-parser)))
+    (lets
+      ((parser $digit-stack) (non-empty-stack-parser (digit-parser)))
       (parser (digit-stack-number $digit-stack))))
 
   (define (integer-parser)
-    (parser-lets
-      ($multiplier
+    (lets
+      ((parser $multiplier)
         (oneof-parser
-          (parser-lets (skip (exact-char-parser #\-)) (parser -1))
-          (parser-lets (skip (opt-parser (exact-char-parser #\+))) (parser 1))))
-      ($digit-stack (non-empty-stack-parser (digit-parser)))
-      (parser (* $multiplier (digit-stack-number $digit-stack)))))
+          (lets
+            ((parser _) (exact-char-parser #\-))
+            (parser -1))
+          (lets
+            ((parser _) (opt-parser (exact-char-parser #\+)))
+            (parser 1))))
+      ((parser $digit-stack)
+        (non-empty-stack-parser (digit-parser)))
+      (parser
+        (* $multiplier (digit-stack-number $digit-stack)))))
 
   ; ----------------------------------------------------------
 
@@ -268,9 +248,11 @@
   ; ----------------------------------------------------------
   
   (define (word-parser)
-    (parser-lets
-      ($letter-stack (non-empty-stack-parser (letter-parser)))
-      (parser (string->symbol (list->string (reverse $letter-stack))))))
+    (lets
+      ((parser $letter-stack)
+        (non-empty-stack-parser (letter-parser)))
+      (parser
+        (string->symbol (list->string (reverse $letter-stack))))))
 
   ; ----------------------------------------------------------
 
@@ -317,26 +299,30 @@
     (fold-parser (stack) $parser push))
 
   (define (non-empty-stack-parser $parser)
-    (parser-lets
-      ($first $parser)
+    (lets
+      ((parser $first) $parser)
       (fold-parser (stack $first) $parser push)))
 
   (define (separated-stack-parser $item-parser $separator-parser)
     (oneof-parser
       (parser (stack))
-      (parser-lets
-        ($first $item-parser)
+      (lets
+        ((parser $first) $item-parser)
         (fold-parser
           (stack $first)
-          (parser-lets (skip $separator-parser) $item-parser)
+          (lets
+            ((parser _) $separator-parser)
+            $item-parser)
           push))))
 
   (define (non-empty-separated-stack-parser $item-parser $separator-parser)
-    (parser-lets
-      ($first $item-parser)
+    (lets
+      ((parser $first) $item-parser)
       (fold-parser
         (stack $first)
-        (parser-lets (skip $separator-parser) $item-parser)
+        (lets
+          ((parser _) $separator-parser)
+          $item-parser)
         push)))
 
   ; ----------------------------------------------------------
@@ -411,14 +397,14 @@
         (else (parser $char)))))
 
   (define (string-literal-body-parser)
-    (parser-lets
-      ($char-stack (stack-parser (string-literal-char-parser)))
+    (lets
+      ((parser $char-stack) (stack-parser (string-literal-char-parser)))
       (parser (list->string (reverse $char-stack)))))
 
   (define (literal-string-parser)
-    (parser-lets
-      (skip (exact-parser "\""))
-      ($string (string-literal-body-parser))
-      (skip (exact-parser "\""))
+    (lets
+      ((parser _) (exact-parser "\""))
+      ((parser $string) (string-literal-body-parser))
+      ((parser _) (exact-parser "\""))
       (parser $string)))
 )

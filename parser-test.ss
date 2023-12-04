@@ -264,34 +264,26 @@
 
 (lets
   ($increment-parser
-    (parser-lets 
-      ($number (positive-integer-parser))
+    (lets
+      ((parser $number) (positive-integer-parser))
       (parser (+ $number 1))))
   (check (equal? (parse $increment-parser "12") 13)))
 
 (lets
   ($starred-parser
-    (parser-lets 
-      ($skip (exact-parser "* "))
+    (lets
+      ((parser _) (exact-parser "* "))
       (positive-integer-parser)))
   (check (equal? (parse $starred-parser "* 123") 123)))
 
 (lets
   ($subtract-parser
-    (parser-lets 
-      ($number1 (positive-integer-parser))
-      (skip (exact-parser " - "))
-      ($number2 (positive-integer-parser))
+    (lets
+      ((parser $number1) (positive-integer-parser))
+      ((parser _) (exact-parser " - "))
+      ((parser $number2) (positive-integer-parser))
       (parser (- $number1 $number2))))
   (check (equal? (parse $subtract-parser "3 - 2") 1)))
-
-; ---------------------------------------------------------
-
-(lets
-  ($map-parser (parser-map (positive-integer-parser) number->string))
-  (begin
-    (check (equal? (parse $map-parser "128a") (parse-error 1 4)))
-    (check (equal? (parse $map-parser "128") "128"))))
 
 ; ---------------------------------------------------------
 

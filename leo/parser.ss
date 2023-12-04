@@ -25,11 +25,12 @@
     (case-lambda
       (() (script-parser (default-env)))
       (($env)
-        (parser-map
-          (skip-empty-lines-parser
-            (stack-parser
-              (newline-ended-parser (line-parser $env `multiline))))
-          reverse))))
+        (lets
+          ((parser $lines)
+            (skip-empty-lines-parser
+              (stack-parser
+                (newline-ended-parser (line-parser $env `multiline)))))
+          (parser (reverse $lines))))))
 
   (define (line-stack-parser $env)
     (separated-stack-parser
@@ -50,9 +51,9 @@
       (integer-parser)))
 
   (define (field-parser $env $mode)
-    (parser-lets
-      ($word (word-parser))
-      ($rhs (rhs-parser $env $mode))
+    (lets
+      ((parser $word) (word-parser))
+      ((parser $rhs) (rhs-parser $env $mode))
       (cond
         ((null? $rhs) (parser $word))
         (else (parser (cons $word $rhs))))))
@@ -74,35 +75,35 @@
           (colon-rhs-parser $env $mode)))))
 
   (define (space-rhs-parser $env $mode)
-    (parser-lets
-      (skip (space-parser))
-      ($line (line-parser $env $mode))
+    (lets
+      ((parser _) (space-parser))
+      ((parser $line) (line-parser $env $mode))
       (parser (list $line))))
 
   (define (newline-rhs-parser $env)
-    (parser-lets
-      (skip (newline-parser))
-      ($line-stack (indent-parser (line-stack-parser $env)))
+    (lets
+      ((parser _) (newline-parser))
+      ((parser $line-stack) (indent-parser (line-stack-parser $env)))
       (parser (reverse $line-stack))))
 
   (define (colon-rhs-parser $env $mode)
-    (parser-lets
-      (skip (colon-separator-parser))
-      ($line-stack
+    (lets
+      ((parser _) (colon-separator-parser))
+      ((parser $line-stack)
         (case $mode
           ((multiline colon)
             (non-empty-separated-stack-parser
               (line-parser $env `colon)
               (comma-separator-parser)))
           ((parenthesis)
-            (parser-lets
-              ($line (line-parser $env `colon))
+            (lets
+              ((parser $line) (line-parser $env `colon))
               (parser (stack $line))))))
       (parser (reverse $line-stack))))
 
   (define (parenthesized-rhs-parser $env)
-    (parser-lets
-      ($line-stack
+    (lets
+      ((parser $line-stack)
         (parenthesized-parser
           (separated-stack-parser
             (line-parser $env `parenthesis)
@@ -110,21 +111,21 @@
       (parser (reverse $line-stack))))
 
   (define (comma-separator-parser)
-    (parser-lets
-      (skip (comma-parser))
-      (skip (space-parser))
+    (lets
+      ((parser _) (comma-parser))
+      ((parser _) (space-parser))
       (parser #t)))
 
   (define (colon-separator-parser)
-    (parser-lets
-      (skip (colon-parser))
-      (skip (space-parser))
+    (lets
+      ((parser _) (colon-parser))
+      ((parser _) (space-parser))
       (parser #t)))
 
   (define (parenthesized-parser $parser)
-    (parser-lets
-      (skip (exact-char-parser #\())
-      ($item $parser)
-      (skip (exact-char-parser #\)))
+    (lets
+      ((parser _) (exact-char-parser #\())
+      ((parser $item) $parser)
+      ((parser _) (exact-char-parser #\)))
       (parser $item)))
 )
