@@ -68,9 +68,6 @@
     (parser-thunk-do ($thunk $parser)
       (thunk-parsed-opt $thunk)))
 
-  (define (parser $value)
-    (thunk (parsed $value) (lambda ($char) #f)))
-
   (define (parser-bind-with $parser $fn-parser $fn)
     (cond
       ((not $parser) $fn-parser)
@@ -87,8 +84,11 @@
                 (parser-push $fn-parser $char)
                 $fn)))))))
 
-  (define (parser-bind $parser $fn)
-    (parser-bind-with $parser #f $fn))
+  (define-monad parser
+    ((pure $value)
+      (thunk (parsed $value) (lambda ($char) #f)))
+    ((bind $parser $fn)
+      (parser-bind-with $parser #f $fn)))
 
   (define (parser-map $parser $fn)
     (parser-bind $parser 
