@@ -1,9 +1,10 @@
 (library (fluent)
-  (export
-    fluent)
+  (export fluent)
   (import
     (scheme)
     (syntax))
+
+  (define-aux-keyword as)
 
   (define-syntax fluent
     (lambda ($syntax)
@@ -15,7 +16,11 @@
                 #'(values $value ...))
               (($first-item $item ...)
                 #`(fluent
-                  #,(syntax-case #'$first-item (fluent values)
+                  #,(syntax-case #'$first-item (let fluent values)
+                    ((let $identifier $item ...)
+                      #'(values
+                        (let (($identifier $value ...))
+                          (fluent $item ...))))
                     ((fluent $sub-item ...)
                       #'(values $value ... (fluent $sub-item ...)))
                     ((values $sub-item ...)
@@ -23,9 +28,6 @@
                     (($identifier $arg ...)
                       (identifier? #'$identifier)
                       #'(values ($identifier $value ... $arg ...)))
-                    ($identifier
-                      (identifier? #'$identifier)
-                      #'(values ($identifier $value ...)))
                     ($other
                       #'(values $value ... $other)))
                   $item ...))))
