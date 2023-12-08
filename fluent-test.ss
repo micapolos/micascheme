@@ -1,7 +1,6 @@
 (import
   (check)
-  (fluent)
-  (procedure))
+  (fluent))
 
 (check (equal? (fluent #f) #f))
 (check (equal? (fluent 128) 128))
@@ -65,10 +64,9 @@
         ", "
         $string-2
         (string-append)))
-    (call-with-values
-      (lambda () (values "foo" "bar"))
-      (lambda ($string-1 $string-2)
-        (string-append $string-1 ", " $string-2)))))
+    (
+      (lambda ($string-1 $string-2) (string-append $string-1 ", " $string-2))
+      "foo" "bar")))
 
 (check
   (equal?

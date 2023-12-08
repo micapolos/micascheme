@@ -18,9 +18,7 @@
                     ((let (values $identifier ...) $item ...)
                       (for-all identifier? (syntax->list #'($identifier ...)))
                       #'(values
-                        (call-with-values
-                          (lambda () (values $value ...))
-                          (lambda ($identifier ...) (fluent $item ...)))))
+                        ((lambda ($identifier ...) (fluent $item ...)) $value ...)))
                     ((let $identifier $item ...)
                       (identifier? #'$identifier)
                       #'(values
