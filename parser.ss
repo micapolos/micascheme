@@ -18,6 +18,7 @@
     exact-char-parser
     char-parser
     string-parser
+    digit-char-parser
     digit-parser
     letter-parser
     exact-parser
@@ -194,6 +195,14 @@
       ((parser $value) $parser)
       ((parser _) (newline-parser))
       (parser $value)))
+
+  ; ----------------------------------------------------------
+
+  (define (digit-char-parser)
+    (char-parser-bind $char
+      (and
+        (char-numeric? $char)
+        (parser $char))))
 
   ; ----------------------------------------------------------
 

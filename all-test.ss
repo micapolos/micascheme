@@ -51,5 +51,6 @@
   (writing)
   (z80)
   (leo all)
+  (scheme all)
   (tico all)
 )
