@@ -5,7 +5,10 @@
     parse-script
     read-script
     load-script)
-  (import (micascheme) (parser))
+  (import
+    (micascheme)
+    (parser)
+    (scheme parser))
 
   (data (env value atom-parser))
 
