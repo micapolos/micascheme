@@ -45,6 +45,31 @@
 (check
   (equal?
     (fluent
+      (let $foo "foo")
+      (let $bar "bar")
+      (let $foobar
+        $foo
+        ", "
+        $bar
+        (string-append))
+      $foobar)
+    "foo, bar"))
+
+(check
+  (equal?
+    (fluent
+      "foo"
+      (do $string
+        $string
+        ", "
+        $string
+        (string-append)))
+    (let (($string "foo"))
+      (string-append $string ", " $string))))
+
+(check
+  (equal?
+    (fluent
       "foo"
       (do $string
         $string
