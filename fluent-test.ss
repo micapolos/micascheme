@@ -6,34 +6,31 @@
 (check (equal? (fluent #f) #f))
 (check (equal? (fluent 128) 128))
 (check (equal? (fluent "foo") "foo"))
-(check (equal? (fluent 'foo) 'foo))
+(check (equal? (fluent foo (quote)) 'foo))
 (check (equal? (fluent +) +))
 
 (check (equal? (call-with-values (lambda () (fluent)) list) (list)))
 (check (equal? (call-with-values (lambda () (fluent "foo" "bar")) list) (list "foo" "bar")))
 
 (check (equal? (fluent string-append) string-append))
-(check (equal? (fluent (string-append)) (string-append)))
-(check (equal? (fluent (string-append "a")) (string-append "a")))
-(check (equal? (fluent (string-append "a" "b")) (string-append "a" "b")))
+(check (equal? (fluent (string-append)) ""))
+(check (equal? (fluent (string-append "a")) "a"))
 
-(check (equal? (fluent "a" (string-append)) (string-append "a")))
+(check (equal? (fluent "a" (string-append)) "a"))
 
-(check (equal? (fluent "a" (string-append)) (string-append "a")))
-(check (equal? (fluent "a" (string-append "b")) (string-append "a" "b")))
-(check (equal? (fluent "a" (string-append "b" "c")) (string-append "a" "b" "c")))
+(check (equal? (fluent "a" (string-append)) "a"))
+(check (equal? (fluent "a" (string-append "b")) "ab"))
 
-(check (equal? (fluent "a" "b" (string-append)) (string-append "a" "b")))
-(check (equal? (fluent "a" "b" (string-append "c")) (string-append "a" "b" "c")))
-(check (equal? (fluent "a" "b" (string-append "c" "d")) (string-append "a" "b" "c" "d")))
+(check (equal? (fluent "a" "b" (string-append)) "ab"))
+(check (equal? (fluent "a" "b" (string-append "c")) "abc"))
+(check (equal? (fluent "a" "b" (string-append "c" (string-append "d"))) "abcd"))
 
 (check
   (equal?
     (fluent
       "a"
-      (fluent 3 (- 2))
-      (cons))
-    (cons "a" (- 3 2))))
+      (cons 3 (- 2)))
+    (cons "a" 1)))
 
 (check
   (equal?
@@ -41,7 +38,7 @@
       "a"
       (values "b" (string-append "c" "d"))
       (string-append))
-    (string-append "a" "b" (string-append "c" "d"))))
+    "abcd"))
 
 (check
   (equal?
@@ -52,8 +49,7 @@
         ", "
         $string
         (string-append)))
-    (let (($string "foo"))
-      (string-append $string ", " $string))))
+    "foo, foo"))
 
 (check
   (equal?
@@ -64,8 +60,7 @@
         ", "
         $string
         (string-append)))
-    (let (($string "foo"))
-      (string-append $string ", " $string))))
+    "foo, foo"))
 
 (check
   (equal?
@@ -76,9 +71,7 @@
         ", "
         $string-2
         (string-append)))
-    (
-      (lambda ($string-1 $string-2) (string-append $string-1 ", " $string-2))
-      "foo" "bar")))
+    "foo, bar"))
 
 ; (check
 ;   (equal?
@@ -104,12 +97,7 @@
           (number->string))
         ")"
         (string-append)))
-    (let (($string (string-append "Hello, " "world!")))
-      (string-append
-        $string
-        " ("
-        (number->string (string-length $string))
-        ")"))))
+    "Hello, world! (13)"))
 
 (check
   (equal?

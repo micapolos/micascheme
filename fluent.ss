@@ -51,10 +51,15 @@
                     #'(fluent
                       (values $value ... $sub-item ...)
                       $item ...))
+                  (($identifier)
+                    (identifier? #'$identifier)
+                    #'(fluent
+                      (values ($identifier $value ...))
+                      $item ...))
                   (($identifier $arg ...)
                     (identifier? #'$identifier)
                     #'(fluent
-                      (values ($identifier $value ... $arg ...))
+                      (values ($identifier $value ... (fluent $arg ...)))
                       $item ...))
                   ($other
                     #'(fluent
