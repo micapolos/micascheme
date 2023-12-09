@@ -3,7 +3,7 @@
 (fluent
   "foo"
   (string-append "bar")
-  (do $string
+  (let $string
     $string
     (string-append $string))
   (displayln))
