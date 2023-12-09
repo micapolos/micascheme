@@ -60,6 +60,11 @@
                     #'(fluent
                       (values ($identifier $value ...))
                       $item ...))
+                  (($identifier (values $arg ...))
+                    (identifier? #'$identifier)
+                    #'(fluent
+                      (values ($identifier $value ... $arg ...))
+                      $item ...))
                   (($identifier $arg ...)
                     (identifier? #'$identifier)
                     #'(fluent
