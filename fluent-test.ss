@@ -76,12 +76,24 @@
 (check
   (equal?
     (fluent
+      string-append
+      (apply "a" "b" "c"))
+    "abc"))
+
+(check
+  (equal?
+    (fluent
+      string-append
+      (apply))
+    ""))
+
+(check
+  (equal?
+    (fluent
       $a $b
       (lambda $a (string-append $b))
       (apply "a" "b"))
-    (
-      (lambda ($a $b) (string-append $a $b))
-      "a" "b")))
+    "ab"))
 
 (check
   (equal?
