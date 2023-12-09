@@ -70,6 +70,20 @@
 (check
   (equal?
     (fluent
+      "("
+      (let (values $foo $bar)
+        (fluent "foo")
+        (fluent "bar"))
+      $foo
+      ", "
+      $bar
+      ")"
+      (string-append))
+    "(foo, bar)"))
+
+(check
+  (equal?
+    (fluent
       "foo"
       (do $string
         $string

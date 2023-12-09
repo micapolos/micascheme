@@ -6,6 +6,15 @@
 
   (define-aux-keyword body)
 
+  (meta define (params $spec)
+    (syntax-case $spec (values)
+      ($identifier
+        (identifier? #'$identifier)
+        #'($identifier))
+      ((values $identifier ...)
+        (for-all identifier? (syntax->list #'($identifier ...)))
+        #'($identifier ...))))
+
   (define-syntax fluent
     (lambda ($syntax)
       (lambda ($lookup)
@@ -23,26 +32,12 @@
                         #`(body
                           ($binding ...
                             ((#,@$tmps) (values $value ...))
-                            (
-                              #,(syntax-case #'$spec (values)
-                                ($identifier
-                                  (identifier? #'$identifier)
-                                  #'($identifier))
-                                ((values $identifier ...)
-                                  (for-all identifier? (syntax->list #'($identifier ...)))
-                                  #'($identifier ...)))
-                              (fluent $body ...)))
+                            (#,(params #'$spec) (fluent $body ...)))
                           #,@$tmps)))
-                    ((do (values $identifier ...) $item ...)
-                      (for-all identifier? (syntax->list #'($identifier ...)))
-                      #'(body
-                        ($binding ...)
-                        ((lambda ($identifier ...) (fluent $item ...)) $value ...)))
-                    ((do $identifier $item ...)
-                      (identifier? #'$identifier)
-                      #'(body
-                        ($binding ...)
-                        ((lambda ($identifier) (fluent $item ...)) $value ...)))
+                    ((do $spec $item ...)
+                      #`(let-values
+                        ((#,(params #'$spec) (values $value ...)))
+                        (fluent $item ...)))
                     ((lambda $body ...)
                       #'(body
                         ($binding ...)
