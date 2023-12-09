@@ -1,4 +1,5 @@
 (import
+  (scheme)
   (check)
   (fluent))
 
@@ -45,9 +46,9 @@
 (check
   (equal?
     (fluent
-      (let $foo "foo")
-      (let $bar "bar")
-      (let $foobar
+      (define $foo "foo")
+      (define $bar "bar")
+      (define $foobar
         $foo
         ", "
         $bar
@@ -59,7 +60,7 @@
   (equal?
     (fluent
       "("
-      (let $foo "f" "o" "o" (string-append))
+      (define $foo "f" "o" "o" (string-append))
       $foo
       ", "
       $foo
@@ -71,7 +72,7 @@
   (equal?
     (fluent
       "("
-      (let (values $foo $bar)
+      (define (values $foo $bar)
         (fluent "foo")
         (fluent "bar"))
       $foo
@@ -85,7 +86,7 @@
   (equal?
     (fluent
       "foo"
-      (do $string
+      (let $string
         $string
         ", "
         $string
@@ -97,7 +98,7 @@
   (equal?
     (fluent
       "foo"
-      (do $string
+      (let $string
         $string
         ", "
         $string
@@ -109,7 +110,7 @@
   (equal?
     (fluent
       "foo" "bar"
-      (do (values $string-1 $string-2)
+      (let (values $string-1 $string-2)
         $string-1
         ", "
         $string-2
@@ -133,7 +134,7 @@
     (fluent
       "Hello, "
       (string-append "world!")
-      (do $string
+      (let $string
         $string
         " ("
         (fluent

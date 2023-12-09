@@ -26,15 +26,15 @@
                   (values $value ...)))
               (($first-item $item ...)
                 #`(fluent
-                  #,(syntax-case #'$first-item (let do fluent values lambda)
-                    ((let $spec $body ...)
+                  #,(syntax-case #'$first-item (define let fluent values lambda)
+                    ((define $spec $body ...)
                       (let (($tmps (generate-temporaries (syntax->list #'($value ...)))))
                         #`(body
                           ($binding ...
                             ((#,@$tmps) (values $value ...))
                             (#,(params #'$spec) (fluent $body ...)))
                           #,@$tmps)))
-                    ((do $spec $item ...)
+                    ((let $spec $item ...)
                       #`(let-values
                         ((#,(params #'$spec) (values $value ...)))
                         (fluent $item ...)))
