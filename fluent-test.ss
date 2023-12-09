@@ -57,8 +57,7 @@
 (check
   (equal?
     (fluent
-      "foo"
-      "bar"
+      "foo" "bar"
       (do (values $string-1 $string-2)
         $string-1
         ", "
@@ -71,12 +70,8 @@
 (check
   (equal?
     (fluent
-      $a
-      $b
-      (lambda
-        $a
-        $b
-        (string-append))
+      $a $b
+      (lambda $a $b (string-append))
       (app "a" "b"))
     (app
       (lambda ($a $b) (string-append $a $b))
