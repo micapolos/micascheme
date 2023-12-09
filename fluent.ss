@@ -24,7 +24,7 @@
               (()
                 #'(values $value ...))
               (($first-item $item ...)
-                (syntax-case #'$first-item (define let fluent values lambda)
+                (syntax-case #'$first-item (define let fluent values lambda apply)
                   ((define $spec $body ...)
                     (let (($tmps (generate-temporaries (syntax->list #'($value ...)))))
                       #`(let-values
@@ -42,6 +42,10 @@
                   ((lambda $body ...)
                     #'(fluent
                       (values (lambda ($value ...) (fluent $body ...)))
+                      $item ...))
+                  ((apply $sub-item ...)
+                    #'(fluent
+                      (values ($value ... $sub-item ...))
                       $item ...))
                   ((fluent $sub-item ...)
                     #'(fluent
