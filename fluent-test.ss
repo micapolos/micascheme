@@ -25,12 +25,7 @@
 (check (equal? (fluent "a" "b" (string-append "c")) "abc"))
 (check (equal? (fluent "a" "b" (string-append "c" (string-append "d"))) "abcd"))
 
-(check
-  (equal?
-    (fluent
-      "a"
-      (cons 3 (- 2)))
-    (cons "a" 1)))
+; === values
 
 (check
   (equal?
@@ -39,6 +34,35 @@
       (values "b" (string-append "c" "d"))
       (string-append))
     "abcd"))
+
+; === lambda
+
+(check
+  (equal?
+    (
+      (fluent
+        $a $b
+        (lambda $a (string-append $b)))
+      "a" "b")
+    "ab"))
+
+; === apply
+
+(check
+  (equal?
+    (fluent
+      string-append
+      (apply "a" "b" "c"))
+    "abc"))
+
+(check
+  (equal?
+    (fluent
+      string-append
+      (apply))
+    ""))
+
+; === let
 
 (check
   (equal?
@@ -76,28 +100,6 @@
 (check
   (equal?
     (fluent
-      string-append
-      (apply "a" "b" "c"))
-    "abc"))
-
-(check
-  (equal?
-    (fluent
-      string-append
-      (apply))
-    ""))
-
-(check
-  (equal?
-    (fluent
-      $a $b
-      (lambda $a (string-append $b))
-      (apply "a" "b"))
-    "ab"))
-
-(check
-  (equal?
-    (fluent
       "Hello, "
       (string-append "world!")
       (let $string
@@ -110,6 +112,8 @@
         ")"
         (string-append)))
     "Hello, world! (13)"))
+
+; === define
 
 (check
   (equal?
