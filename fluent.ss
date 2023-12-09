@@ -14,16 +14,15 @@
                 #'(values $value ...))
               (($first-item $item ...)
                 #`(fluent
-                  #,(syntax-case #'$first-item (let fluent values lambda)
-                    ((let (values $identifier ...) $item ...)
+                  #,(syntax-case #'$first-item (do fluent values lambda)
+                    ((do (values $identifier ...) $item ...)
                       (for-all identifier? (syntax->list #'($identifier ...)))
                       #'(values
                         ((lambda ($identifier ...) (fluent $item ...)) $value ...)))
-                    ((let $identifier $item ...)
+                    ((do $identifier $item ...)
                       (identifier? #'$identifier)
                       #'(values
-                        (let (($identifier $value ...))
-                          (fluent $item ...))))
+                        ((lambda ($identifier) (fluent $item ...)) $value ...)))
                     ((lambda $body ...)
                       #'(values
                         (lambda ($value ...)
