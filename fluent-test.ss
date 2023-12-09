@@ -122,7 +122,7 @@
   (equal?
     (fluent
       $a $b
-      (lambda $a $b (string-append))
+      (lambda $a (string-append $b))
       (app "a" "b"))
     (app
       (lambda ($a $b) (string-append $a $b))
