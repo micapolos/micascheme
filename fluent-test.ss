@@ -46,6 +46,74 @@
 (check
   (equal?
     (fluent
+      "foo"
+      (let $string
+        $string
+        ", "
+        $string
+        (string-append)))
+    (let (($string "foo"))
+      (string-append $string ", " $string))))
+
+(check
+  (equal?
+    (fluent
+      "foo"
+      (let $string
+        $string
+        ", "
+        $string
+        (string-append)))
+    (let (($string "foo"))
+      (string-append $string ", " $string))))
+
+(check
+  (equal?
+    (fluent
+      "foo" "bar"
+      (let (values $string-1 $string-2)
+        $string-1
+        ", "
+        $string-2
+        (string-append)))
+    (
+      (lambda ($string-1 $string-2) (string-append $string-1 ", " $string-2))
+      "foo" "bar")))
+
+; (check
+;   (equal?
+;     (fluent
+;       $a $b
+;       (lambda $a (string-append $b))
+;       (app "a" "b"))
+;     (app
+;       (lambda ($a $b) (string-append $a $b))
+;       "a" "b")))
+
+(check
+  (equal?
+    (fluent
+      "Hello, "
+      (string-append "world!")
+      (let $string
+        $string
+        " ("
+        (fluent
+          $string
+          (string-length)
+          (number->string))
+        ")"
+        (string-append)))
+    (let (($string (string-append "Hello, " "world!")))
+      (string-append
+        $string
+        " ("
+        (number->string (string-length $string))
+        ")"))))
+
+(check
+  (equal?
+    (fluent
       (define $foo "foo")
       (define $bar "bar")
       (define $foobar
@@ -81,71 +149,3 @@
       ")"
       (string-append))
     "(foo, bar)"))
-
-(check
-  (equal?
-    (fluent
-      "foo"
-      (let $string
-        $string
-        ", "
-        $string
-        (string-append)))
-    (let (($string "foo"))
-      (string-append $string ", " $string))))
-
-(check
-  (equal?
-    (fluent
-      "foo"
-      (let $string
-        $string
-        ", "
-        $string
-        (string-append)))
-    (let (($string "foo"))
-      (string-append $string ", " $string))))
-
-(check
-  (equal?
-    (fluent
-      "foo" "bar"
-      (let (values $string-1 $string-2)
-        $string-1
-        ", "
-        $string-2
-        (string-append)))
-    (
-      (lambda ($string-1 $string-2) (string-append $string-1 ", " $string-2))
-      "foo" "bar")))
-
-(check
-  (equal?
-    (fluent
-      $a $b
-      (lambda $a (string-append $b))
-      (app "a" "b"))
-    (app
-      (lambda ($a $b) (string-append $a $b))
-      "a" "b")))
-
-(check
-  (equal?
-    (fluent
-      "Hello, "
-      (string-append "world!")
-      (let $string
-        $string
-        " ("
-        (fluent
-          $string
-          (string-length)
-          (number->string))
-        ")"
-        (string-append)))
-    (let (($string (string-append "Hello, " "world!")))
-      (string-append
-        $string
-        " ("
-        (number->string (string-length $string))
-        ")"))))

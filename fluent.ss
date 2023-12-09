@@ -18,49 +18,48 @@
   (define-syntax fluent
     (lambda ($syntax)
       (lambda ($lookup)
-        (syntax-case $syntax (body)
-          ((_ (body ($binding ...) $value ...) $item ...)
+        (syntax-case $syntax (values)
+          ((_ (values $value ...) $item ...)
             (syntax-case #'($item ...) ()
               (()
-                #'(let*-values ($binding ...)
-                  (values $value ...)))
+                #'(values $value ...))
               (($first-item $item ...)
-                #`(fluent
-                  #,(syntax-case #'$first-item (define let fluent values lambda)
-                    ((define $spec $body ...)
-                      (let (($tmps (generate-temporaries (syntax->list #'($value ...)))))
-                        #`(body
-                          ($binding ...
-                            ((#,@$tmps) (values $value ...))
-                            (#,(params #'$spec) (fluent $body ...)))
-                          #,@$tmps)))
-                    ((let $spec $item ...)
+                (syntax-case #'$first-item (define let fluent values lambda)
+                  ((define $spec $body ...)
+                    (let (($tmps (generate-temporaries (syntax->list #'($value ...)))))
                       #`(let-values
-                        ((#,(params #'$spec) (values $value ...)))
-                        (fluent $item ...)))
-                    ((lambda $body ...)
-                      #'(body
-                        ($binding ...)
-                        (lambda ($value ...)
-                          (fluent $body ...))))
-                    ((fluent $sub-item ...)
-                      #'(body
-                        ($binding ...)
-                        $value ... (fluent $sub-item ...)))
-                    ((values $sub-item ...)
-                      #'(body
-                        ($binding ...)
-                        $value ... $sub-item ...))
-                    (($identifier $arg ...)
-                      (identifier? #'$identifier)
-                      #'(body
-                        ($binding ...)
-                        ($identifier $value ... $arg ...)))
-                    ($other
-                      #'(body
-                        ($binding ...)
-                        $value ... $other)))
-                  $item ...))))
+                        (
+                          ((#,@$tmps) (values $value ...))
+                          (#,(params #'$spec) (fluent $body ...)))
+                        (fluent (values #,@$tmps) $item ...))))
+                  ((let $spec $sub-item ...)
+                    #`(fluent
+                      (values
+                        (let-values
+                          ((#,(params #'$spec) (values $value ...)))
+                          (fluent $sub-item ...)))
+                      $item ...))
+                  ((lambda $body ...)
+                    #'(fluent
+                      (values (lambda ($value ...) (fluent $body ...)))
+                      $item ...))
+                  ((fluent $sub-item ...)
+                    #'(fluent
+                      (values $value ... (fluent $sub-item ...))
+                      $item ...))
+                  ((values $sub-item ...)
+                    #'(fluent
+                      (values $value ... $sub-item ...)
+                      $item ...))
+                  (($identifier $arg ...)
+                    (identifier? #'$identifier)
+                    #'(fluent
+                      (values ($identifier $value ... $arg ...))
+                      $item ...))
+                  ($other
+                    #'(fluent
+                      (values $value ... $other)
+                      $item ...))))))
           ((_ $item ...)
-            #'(fluent (body ()) $item ...))))))
+            #'(fluent (values) $item ...))))))
 )
