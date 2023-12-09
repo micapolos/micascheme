@@ -58,6 +58,18 @@
 (check
   (equal?
     (fluent
+      "("
+      (let $foo "f" "o" "o" (string-append))
+      $foo
+      ", "
+      $foo
+      ")"
+      (string-append))
+    "(foo, foo)"))
+
+(check
+  (equal?
+    (fluent
       "foo"
       (do $string
         $string

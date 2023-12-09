@@ -4,48 +4,68 @@
     (scheme)
     (syntax))
 
+  (define-aux-keyword body)
+
   (define-syntax fluent
     (lambda ($syntax)
       (lambda ($lookup)
-        (syntax-case $syntax (let values)
-          ((_ (let $entry ...) (values $value ...) $item ...)
+        (syntax-case $syntax (body)
+          ((_ (body ($binding ...) $value ...) $item ...)
             (syntax-case #'($item ...) ()
               (()
-                #'(let* ($entry ...)
+                #'(let*-values ($binding ...)
                   (values $value ...)))
               (($first-item $item ...)
                 #`(fluent
-                  #,(syntax-case #'$first-item (let)
-                    ((let $identifier $body ...)
-                      (identifier? #'$identifier)
-                      #`(let $entry ... ($identifier (fluent $body ...))))
-                    ($other
-                      #'(let $entry ...)))
                   #,(syntax-case #'$first-item (let do fluent values lambda)
-                    ((let $item ...)
-                      #'(values))
+                    ((let $spec $body ...)
+                      (let (($tmps (generate-temporaries (syntax->list #'($value ...)))))
+                        #`(body
+                          ($binding ...
+                            ((#,@$tmps) (values $value ...))
+                            (
+                              #,(syntax-case #'$spec (values)
+                                ($identifier
+                                  (identifier? #'$identifier)
+                                  #'($identifier))
+                                ((values $identifier ...)
+                                  (for-all identifier? (syntax->list #'($identifier ...)))
+                                  #'($identifier ...)))
+                              (fluent $body ...)))
+                          #,@$tmps)))
                     ((do (values $identifier ...) $item ...)
                       (for-all identifier? (syntax->list #'($identifier ...)))
-                      #'(values
+                      #'(body
+                        ($binding ...)
                         ((lambda ($identifier ...) (fluent $item ...)) $value ...)))
                     ((do $identifier $item ...)
                       (identifier? #'$identifier)
-                      #'(values
+                      #'(body
+                        ($binding ...)
                         ((lambda ($identifier) (fluent $item ...)) $value ...)))
                     ((lambda $body ...)
-                      #'(values
+                      #'(body
+                        ($binding ...)
                         (lambda ($value ...)
                           (fluent $body ...))))
                     ((fluent $sub-item ...)
-                      #'(values $value ... (fluent $sub-item ...)))
+                      #'(body
+                        ($binding ...)
+                        $value ... (fluent $sub-item ...)))
                     ((values $sub-item ...)
-                      #'(values $value ... $sub-item ...))
+                      #'(body
+                        ($binding ...)
+                        $value ... $sub-item ...))
                     (($identifier $arg ...)
                       (identifier? #'$identifier)
-                      #'(values ($identifier $value ... $arg ...)))
+                      #'(body
+                        ($binding ...)
+                        ($identifier $value ... $arg ...)))
                     ($other
-                      #'(values $value ... $other)))
+                      #'(body
+                        ($binding ...)
+                        $value ... $other)))
                   $item ...))))
           ((_ $item ...)
-            #'(fluent (let) (values) $item ...))))))
+            #'(fluent (body ()) $item ...))))))
 )
