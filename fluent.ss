@@ -1,10 +1,11 @@
 (library (fluent)
-  (export fluent)
+  (export fluent as in)
   (import
     (scheme)
     (syntax))
 
-  (define-aux-keyword body)
+  (define-aux-keyword as)
+  (define-aux-keyword in)
 
   (meta define (params $spec)
     (syntax-case $spec (values)
@@ -20,11 +21,18 @@
       (lambda ($lookup)
         (syntax-case $syntax (values)
           ((_ (values $value ...) $item ...)
-            (syntax-case #'($item ...) ()
+            (syntax-case #'($item ...) (as in)
               (()
                 #'(values $value ...))
+              (((as $param ...) (in $body ...) $item ...)
+                #'(fluent
+                  (values
+                    (let-values
+                      ((($param ...) (values $value ...)))
+                      (fluent $body ...)))
+                  $item ...))
               (($first-item $item ...)
-                (syntax-case #'$first-item (define let fluent values lambda apply)
+                (syntax-case #'$first-item (define fluent values lambda apply)
                   ((define $spec $body ...)
                     (let (($tmps (generate-temporaries (syntax->list #'($value ...)))))
                       #`(let-values
@@ -32,13 +40,6 @@
                           ((#,@$tmps) (values $value ...))
                           (#,(params #'$spec) (fluent $body ...)))
                         (fluent (values #,@$tmps) $item ...))))
-                  ((let $spec $sub-item ...)
-                    #`(fluent
-                      (values
-                        (let-values
-                          ((#,(params #'$spec) (values $value ...)))
-                          (fluent $sub-item ...)))
-                      $item ...))
                   ((lambda $body ...)
                     #'(fluent
                       (values (lambda ($value ...) (fluent $body ...)))

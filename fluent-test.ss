@@ -68,8 +68,8 @@
   (equal?
     (fluent
       "foo"
-      (let $string
-        $string
+      (as $string)
+      (in $string
         ", "
         $string
         (string-append)))
@@ -79,8 +79,8 @@
   (equal?
     (fluent
       "foo"
-      (let $string
-        $string
+      (as $string)
+      (in $string
         ", "
         $string
         (string-append)))
@@ -90,7 +90,8 @@
   (equal?
     (fluent
       "foo" "bar"
-      (let (values $string-1 $string-2)
+      (as $string-1 $string-2)
+      (in
         $string-1
         ", "
         $string-2
@@ -102,7 +103,8 @@
     (fluent
       "Hello, "
       (string-append "world!")
-      (let $string
+      (as $string)
+      (in
         $string
         " ("
         (fluent
