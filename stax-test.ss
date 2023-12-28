@@ -1,5 +1,5 @@
 (import
-  (except (micascheme) push pop)
+  (except (micascheme) push pop load)
   (stax))
 
 (run

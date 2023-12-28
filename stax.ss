@@ -1,9 +1,10 @@
 (library (stax)
   (export
     poke peek
+    resize load store
     push pop)
   (import
-    (except (micascheme) push pop))
+    (except (micascheme) push pop load))
 
   (define mem (make-bytevector #x10000 0))
   (define sp #xFFFF)
@@ -14,13 +15,22 @@
   (define (peek $addr)
     (bytevector-u8-ref mem $addr))
 
+  (define (load $offset)
+    (peek (+ sp $offset)))
+
+  (define (store $offset $byte)
+    (poke (+ sp $offset) $byte))
+
+  (define (resize $offset)
+    (set! sp (- sp $offset)))
+
   (define (push $byte)
     (run
-      (poke sp $byte)
-      (set! sp (sub1 sp))))
+      (store 0 $byte)
+      (resize 1)))
 
   (define (pop)
     (run
-      (set! sp (add1 sp))
-      (peek sp)))
+      (resize -1)
+      (load 0)))
 )
