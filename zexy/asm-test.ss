@@ -45,6 +45,11 @@
 (check-op (ld hl (#x1234)) (#x2a #x34 #x12))
 (check-op (ld sp (#x1234)) (#xed #b01111011 #x34 #x12))
 
+(check-op (ld (#x1234) bc) (#xed #b01000011 #x34 #x12))
+(check-op (ld (#x1234) de) (#xed #b01010011 #x34 #x12))
+(check-op (ld (#x1234) hl) (#x22 #x34 #x12))
+(check-op (ld (#x1234) sp) (#xed #b01110011 #x34 #x12))
+
 (check-op (add b) (#b10000000))
 (check-op (add c) (#b10000001))
 (check-op (add d) (#b10000010))

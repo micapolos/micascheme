@@ -83,6 +83,7 @@
       ($lhs-inm (inm $lhs))
       ($rhs-inm (inm $rhs))
       ($lhs-rr (rr-sp $lhs))
+      ($rhs-rr (rr-sp $rhs))
       (or
         ; 8-bit
         (and $lhs-r $rhs-r (asm-ld-r-r $asm $lhs-r $rhs-r))
@@ -102,6 +103,8 @@
         (and $lhs-rr $rhs-nm (asm-ld-rr-nm $asm $lhs-rr $rhs-nm))
         (and (== $lhs hl) $rhs-inm (asm-ld-hl-inm $asm $rhs-inm))
         (and $lhs-rr $rhs-inm (asm-ld-rr-inm $asm $lhs-rr $rhs-inm))
+        (and $lhs-inm (== $rhs hl) (asm-ld-inm-hl $asm $lhs-inm))
+        (and $lhs-inm $rhs-rr (asm-ld-inm-rr $asm $lhs-inm $rhs-rr))
       )))
 
   (define (asm-ld-r-r $asm $r1 $r2)
@@ -158,6 +161,19 @@
     (asm... $asm
       #xed
       (bor #b01001011 (shl $rr 4))
+      (lsb $inm)
+      (msb $inm)))
+
+  (define (asm-ld-inm-hl $asm $inm)
+    (asm... $asm
+      #x22
+      (lsb $inm)
+      (msb $inm)))
+
+  (define (asm-ld-inm-rr $asm $inm $rr)
+    (asm... $asm
+      #xed
+      (bor #b01000011 (shl $rr 4))
       (lsb $inm)
       (msb $inm)))
 
