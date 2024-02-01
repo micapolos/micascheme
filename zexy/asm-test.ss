@@ -64,6 +64,24 @@
 (check-op (or #x12) (#b11110110 #x12))
 (check-op (cp #x12) (#b11111110 #x12))
 
+(check-op (inc b) (#b00000100))
+(check-op (inc c) (#b00001100))
+(check-op (inc d) (#b00010100))
+(check-op (inc e) (#b00011100))
+(check-op (inc h) (#b00100100))
+(check-op (inc l) (#b00101100))
+(check-op (inc (hl)) (#b00110100))
+(check-op (inc a) (#b00111100))
+
+(check-op (dec b) (#b00000101))
+(check-op (dec c) (#b00001101))
+(check-op (dec d) (#b00010101))
+(check-op (dec e) (#b00011101))
+(check-op (dec h) (#b00100101))
+(check-op (dec l) (#b00101101))
+(check-op (dec (hl)) (#b00110101))
+(check-op (dec a) (#b00111101))
+
 (check-op (call #x1234) (#b11001101 #x34 #x12))
 
 (check-op (call nz #x1234) (#b11000100 #x34 #x12))

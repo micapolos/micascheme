@@ -42,6 +42,8 @@
               ((djnz) (asm-djnz1 $asm #'$arg))
               ((push) (asm-push1 $asm #'$arg))
               ((pop) (asm-pop1 $asm #'$arg))
+              ((inc) (asm-inc1 $asm #'$arg))
+              ((dec) (asm-dec1 $asm #'$arg))
               (else #f))))
         (($op $lhs $rhs) (identifier? #'$op)
           (case (datum $op)
@@ -141,6 +143,22 @@
 
   (define (asm-alu-n $asm $alu $n)
     (asm... $asm (bor #b11000110 (shl $alu 3)) $n))
+
+  (define (asm-inc1 $asm $arg)
+    (lets
+      ($r (r-hl $arg))
+      (and $r (asm-inc-r $asm $r))))
+
+  (define (asm-inc-r $asm $r)
+    (asm... $asm (bor #b00000100 (shl $r 3))))
+
+  (define (asm-dec1 $asm $arg)
+    (lets
+      ($r (r-hl $arg))
+      (and $r (asm-dec-r $asm $r))))
+
+  (define (asm-dec-r $asm $r)
+    (asm... $asm (bor #b00000101 (shl $r 3))))
 
   (define (asm-call1 $asm $arg)
     (lets
