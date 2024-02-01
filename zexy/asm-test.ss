@@ -17,6 +17,14 @@
 (check-op (ld h l) (#b01100101))
 (check-op (ld a b) (#b01111000))
 
+(check-op (ld b #x13) (#b00000110 #x13))
+(check-op (ld l #x13) (#b00101110 #x13))
+(check-op (ld a #x13) (#b00111110 #x13))
+
+(check-op (ld b (hl)) (#b01000110))
+(check-op (ld l (hl)) (#b01101110))
+(check-op (ld a (hl)) (#b01111110))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))

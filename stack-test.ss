@@ -9,3 +9,4 @@
 (check (equal? (push-list (stack 1 2 3) (list 4 5 6)) (stack 1 2 3 4 5 6)))
 (check (equal? (push-all (stack 1 2 3) (stack 4 5 6)) (stack 1 2 3 4 5 6)))
 
+(check (equal? (push... (stack 1 2 3) 4 5 6) (stack 1 2 3 4 5 6)))

@@ -22,8 +22,7 @@
             (else #f)))
         (($op $lhs $rhs) (identifier? #'$op)
           (case (datum $op)
-            ((ld)
-              (push-ld $stack #'$lhs #'$rhs))
+            ((ld) (push-ld $stack #'$lhs #'$rhs))
             (else #f)))
         (else #f))
       (syntax-error $syntax)))
@@ -35,28 +34,52 @@
     (push $stack #xc9))
 
   (define (push-ld $stack $lhs $rhs)
-    (or
-      (push-ld-r-r $stack $lhs $rhs)))
-
-  (define (push-ld-r-r $stack $lhs $rhs)
     (lets
-      ($r1 (r $lhs))
-      ($r2 (r $rhs))
-      (and $r1 $r2
-        (push $stack
-          (ior #b01000000 (shl $r1 3) $r2)))))
+      ($lhs-r (r $lhs))
+      ($rhs-r (r $rhs))
+      ($rhs-n (n $rhs))
+      ($lhs-ihl? (ihl? $lhs))
+      ($rhs-ihl? (ihl? $rhs))
+      (or
+        (and $lhs-r $rhs-r (push-ld-r-r $stack $lhs-r $rhs-r))
+        (and $lhs-r $rhs-n (push-ld-r-n $stack $lhs-r $rhs-n))
+        (and $lhs-r $rhs-ihl? (push-ld-r-ihl $stack $lhs-r)))))
+
+  (define (push-ld-r-r $stack $r1 $r2)
+    (push $stack
+      (ior #b01000000 (shl $r1 3) $r2)))
+
+  (define (push-ld-r-n $stack $r $n)
+    (push... $stack
+      (ior #b00000110 (shl $r 3))
+      $n))
+
+  (define (push-ld-r-ihl $stack $r)
+    (push $stack
+      (ior #b01000110 (shl $r 3))))
 
   (define (r $syntax)
+    (case (syntax->datum $syntax)
+      ((b) #b000)
+      ((c) #b001)
+      ((d) #b010)
+      ((e) #b011)
+      ((h) #b100)
+      ((l) #b101)
+      ((a) #b111)
+      (else #f)))
+
+  (define (n $syntax)
+    (lets
+      ($datum (syntax->datum $syntax))
+      (and
+        (integer? $datum)
+        (>= $datum #x00)
+        (<= $datum #xff)
+        $datum)))
+
+  (define (ihl? $syntax)
     (syntax-case $syntax ()
-      ($r
-        (identifier? #'$r)
-        (case (datum $r)
-          ((b) #b000)
-          ((c) #b001)
-          ((d) #b010)
-          ((e) #b011)
-          ((h) #b100)
-          ((l) #b101)
-          ((a) #b111)
-          (else #f)))))
+      (($op) (identifier-named? #'$op hl))
+      (else #f)))
 )
