@@ -9,7 +9,6 @@
         (list $u8s ...)))))
 
 (check-op (nop) (#x0))
-(check-op (ret) (#xc9))
 
 (check-op (ld b c) (#b01000001))
 (check-op (ld d e) (#b01010011))
@@ -37,6 +36,18 @@
 (check-op (ld (bc) a) (#b00000010))
 (check-op (ld (de) a) (#b00010010))
 (check-op (ld (#x1234) a) (#b00110010 #x34 #x12))
+
+(check-op (call #x1234) (#b11001101 #x34 #x12))
+
+(check-op (call nz #x1234) (#b11000100 #x34 #x12))
+(check-op (call c #x1234) (#b11011100 #x34 #x12))
+(check-op (call m #x1234) (#b11111100 #x34 #x12))
+
+(check-op (ret) (#b11001001))
+
+(check-op (ret nz) (#b11000000))
+(check-op (ret c) (#b11011000))
+(check-op (ret m) (#b11111000))
 
 ; ---------------------------------------------------
 

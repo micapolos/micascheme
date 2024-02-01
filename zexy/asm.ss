@@ -31,20 +31,34 @@
             ((nop) (asm-nop $asm))
             ((ret) (asm-ret $asm))
             (else #f)))
+        (($op $arg) (identifier? #'$op)
+          (case (datum $op)
+            ((call) (asm-call1 $asm #'$arg))
+            ((ret) (asm-ret1 $asm #'$arg))
+            (else #f)))
         (($op $lhs $rhs) (identifier? #'$op)
           (case (datum $op)
-            ((ld) (asm-ld $asm #'$lhs #'$rhs))
+            ((ld) (asm-ld2 $asm #'$lhs #'$rhs))
+            ((call) (asm-call2 $asm #'$lhs #'$rhs))
             (else #f)))
         (else #f))
       (syntax-error $syntax)))
 
   (define (asm-nop $asm)
-    (asm... $asm #x0))
+    (asm... $asm #b00000000))
 
   (define (asm-ret $asm)
-    (asm... $asm #xc9))
+    (asm... $asm #b11001001))
 
-  (define (asm-ld $asm $lhs $rhs)
+  (define (asm-ret1 $asm $arg)
+    (lets
+      ($c (c $arg))
+      (and $c (asm-ret-c $asm $c))))
+
+  (define (asm-ret-c $asm $c)
+    (asm... $asm (bor #b11000000 (shl $c 3))))
+
+  (define (asm-ld2 $asm $lhs $rhs)
     (lets
       ($lhs-r (r $lhs))
       ($rhs-r (r $rhs))
@@ -105,6 +119,23 @@
   (define (asm-ld-inm-a $asm $nm)
     (asm... $asm #b00110010 (lsb $nm) (msb $nm)))
 
+  (define (asm-call1 $asm $arg)
+    (lets
+      ($nm (nm $arg))
+      (and $nm (asm-call-nm $asm $nm))))
+
+  (define (asm-call2 $asm $lhs $rhs)
+    (lets
+      ($c (c $lhs))
+      ($nm (nm $rhs))
+      (and $nm (asm-call-c-nm $asm $c $nm))))
+
+  (define (asm-call-nm $asm $nm)
+    (asm... $asm #b11001101 (lsb $nm) (msb $nm)))
+
+  (define (asm-call-c-nm $asm $c $nm)
+    (asm... $asm (bor #b11000100 (shl $c 3)) (lsb $nm) (msb $nm)))
+
   (define (r $syntax)
     (case (syntax->datum $syntax)
       ((b) #b000)
@@ -114,6 +145,18 @@
       ((h) #b100)
       ((l) #b101)
       ((a) #b111)
+      (else #f)))
+
+  (define (c $syntax)
+    (case (syntax->datum $syntax)
+      ((nz) #b000)
+      ((z) #b001)
+      ((nc) #b010)
+      ((c) #b011)
+      ((po) #b100)
+      ((pe) #b101)
+      ((p) #b110)
+      ((m) #b111)
       (else #f)))
 
   (define (n $syntax)
