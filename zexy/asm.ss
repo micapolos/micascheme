@@ -105,6 +105,7 @@
         (and $lhs-rr $rhs-inm (asm-ld-rr-inm $asm $lhs-rr $rhs-inm))
         (and $lhs-inm (== $rhs hl) (asm-ld-inm-hl $asm $lhs-inm))
         (and $lhs-inm $rhs-rr (asm-ld-inm-rr $asm $lhs-inm $rhs-rr))
+        (and (== $lhs sp) (== $rhs hl) (asm-ld-sp-hl $asm))
       )))
 
   (define (asm-ld-r-r $asm $r1 $r2)
@@ -176,6 +177,9 @@
       (bor #b01000011 (shl $rr 4))
       (lsb $inm)
       (msb $inm)))
+
+  (define (asm-ld-sp-hl $asm)
+    (asm... $asm #xf9))
 
   (define (asm-alu2 $asm $lhs $rhs)
     (lets

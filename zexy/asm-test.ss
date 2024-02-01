@@ -50,6 +50,8 @@
 (check-op (ld (#x1234) hl) (#x22 #x34 #x12))
 (check-op (ld (#x1234) sp) (#xed #b01110011 #x34 #x12))
 
+(check-op (ld sp hl) (#xf9))
+
 (check-op (add b) (#b10000000))
 (check-op (add c) (#b10000001))
 (check-op (add d) (#b10000010))
