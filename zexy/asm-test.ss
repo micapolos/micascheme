@@ -53,6 +53,14 @@
 (check-op (rst #x8) (#b11001111))
 (check-op (rst #x38) (#b11111111))
 
+(check-op (jp #x1234) (#b11000011 #x34 #x12))
+
+(check-op (jp (hl)) (#b11101001))
+
+(check-op (jp nz #x1234) (#b11000010 #x34 #x12))
+(check-op (jp c #x1234) (#b11011010 #x34 #x12))
+(check-op (jp m #x1234) (#b11111010 #x34 #x12))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))

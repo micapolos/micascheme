@@ -36,11 +36,13 @@
             ((call) (asm-call1 $asm #'$arg))
             ((ret) (asm-ret1 $asm #'$arg))
             ((rst) (asm-rst1 $asm #'$arg))
+            ((jp) (asm-jp1 $asm #'$arg))
             (else #f)))
         (($op $lhs $rhs) (identifier? #'$op)
           (case (datum $op)
             ((ld) (asm-ld2 $asm #'$lhs #'$rhs))
             ((call) (asm-call2 $asm #'$lhs #'$rhs))
+            ((jp) (asm-jp2 $asm #'$lhs #'$rhs))
             (else #f)))
         (else #f))
       (syntax-error $syntax)))
@@ -144,6 +146,28 @@
 
   (define (asm-rst-p $asm $p)
     (asm... $asm (bor #b11000111 $p)))
+
+  (define (asm-jp1 $asm $arg)
+    (lets
+      ($nm (nm $arg))
+      (or
+        (and $nm (asm-jp-nm $asm $nm))
+        (and (== $arg (hl)) (asm-jp-ihl $asm)))))
+
+  (define (asm-jp2 $asm $lhs $rhs)
+    (lets
+      ($c (c $lhs))
+      ($nm (nm $rhs))
+      (and $nm (asm-jp-c-nm $asm $c $nm))))
+
+  (define (asm-jp-nm $asm $nm)
+    (asm... $asm #b11000011 (lsb $nm) (msb $nm)))
+
+  (define (asm-jp-ihl $asm)
+    (asm... $asm #b11101001))
+
+  (define (asm-jp-c-nm $asm $c $nm)
+    (asm... $asm (bor #b11000010 (shl $c 3)) (lsb $nm) (msb $nm)))
 
   (define (r $syntax)
     (case (syntax->datum $syntax)
