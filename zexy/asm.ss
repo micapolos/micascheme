@@ -49,34 +49,61 @@
       ($lhs-r (r $lhs))
       ($rhs-r (r $rhs))
       ($rhs-n (n $rhs))
-      ($lhs-ihl? (ihl? $lhs))
-      ($rhs-ihl? (ihl? $rhs))
+      ($rhs-nm (nm $rhs))
+      ($lhs-inm (inm $lhs))
+      ($rhs-inm (inm $rhs))
       (or
         (and $lhs-r $rhs-r (asm-ld-r-r $asm $lhs-r $rhs-r))
         (and $lhs-r $rhs-n (asm-ld-r-n $asm $lhs-r $rhs-n))
-        (and $lhs-r $rhs-ihl? (asm-ld-r-ihl $asm $lhs-r))
-        (and $lhs-ihl? $rhs-r (asm-ld-ihl-r $asm $rhs-r))
-        (and $lhs-ihl? $rhs-n (asm-ld-ihl-n $asm $rhs-n)))))
+        (and $lhs-r (== $rhs (hl)) (asm-ld-r-ihl $asm $lhs-r))
+        (and (== $lhs (hl)) $rhs-r (asm-ld-ihl-r $asm $rhs-r))
+        (and (== $lhs (hl)) $rhs-n (asm-ld-ihl-n $asm $rhs-n))
+        (and (== $lhs (hl)) $rhs-n (asm-ld-ihl-n $asm $rhs-n))
+        (and (== $lhs a) (== $rhs (bc)) (asm-ld-a-ibc $asm))
+        (and (== $lhs a) (== $rhs (de)) (asm-ld-a-ide $asm))
+        (and (== $lhs a) $rhs-inm (asm-ld-a-inm $asm $rhs-inm))
+        (and (== $lhs (bc)) (== $rhs a) (asm-ld-ibc-a $asm))
+        (and (== $lhs (de)) (== $rhs a) (asm-ld-ide-a $asm))
+        (and $lhs-inm (== $rhs a) (asm-ld-inm-a $asm $lhs-inm))
+        )))
 
   (define (asm-ld-r-r $asm $r1 $r2)
     (asm... $asm
-      (ior #b01000000 (shl $r1 3) $r2)))
+      (bor #b01000000 (shl $r1 3) $r2)))
 
   (define (asm-ld-r-n $asm $r $n)
     (asm... $asm
-      (ior #b00000110 (shl $r 3))
+      (bor #b00000110 (shl $r 3))
       $n))
 
   (define (asm-ld-r-ihl $asm $r)
     (asm... $asm
-      (ior #b01000110 (shl $r 3))))
+      (bor #b01000110 (shl $r 3))))
 
   (define (asm-ld-ihl-r $asm $r)
     (asm... $asm
-      (ior #b01110000 $r)))
+      (bor #b01110000 $r)))
 
   (define (asm-ld-ihl-n $asm $n)
     (asm... $asm #b00110110 $n))
+
+  (define (asm-ld-a-ibc $asm)
+    (asm... $asm #b00001010))
+
+  (define (asm-ld-a-ide $asm)
+    (asm... $asm #b00011010))
+
+  (define (asm-ld-a-inm $asm $nm)
+    (asm... $asm #b00111010 (lsb $nm) (msb $nm)))
+
+  (define (asm-ld-ibc-a $asm)
+    (asm... $asm #b00000010))
+
+  (define (asm-ld-ide-a $asm)
+    (asm... $asm #b00010010))
+
+  (define (asm-ld-inm-a $asm $nm)
+    (asm... $asm #b00110010 (lsb $nm) (msb $nm)))
 
   (define (r $syntax)
     (case (syntax->datum $syntax)
@@ -98,8 +125,20 @@
         (<= $datum #xff)
         $datum)))
 
-  (define (ihl? $syntax)
+  (define (nm $syntax)
+    (lets
+      ($datum (syntax->datum $syntax))
+      (and
+        (integer? $datum)
+        (>= $datum #x0000)
+        (<= $datum #xffff)
+        $datum)))
+
+  (define (inm $syntax)
     (syntax-case $syntax ()
-      (($op) (identifier-named? #'$op hl))
+      (($op) (nm #'$op))
       (else #f)))
+
+  (define-syntax-rule (== $syntax $datum)
+    (equal? (syntax->datum $syntax) '$datum))
 )

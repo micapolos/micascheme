@@ -1,8 +1,11 @@
 (library (zexy bin)
-  (export ior shl shr)
+  (export band bor shl shr msb lsb)
   (import (micascheme))
 
-  (define-syntax ior (identifier-syntax bitwise-ior))
+  (define-syntax bor (identifier-syntax bitwise-ior))
+  (define-syntax band (identifier-syntax bitwise-and))
   (define-syntax shl (identifier-syntax bitwise-arithmetic-shift-left))
   (define-syntax shr (identifier-syntax bitwise-arithmetic-shift-right))
+  (define (msb $nm) (band (shr $nm 8) #xff))
+  (define (lsb $nm) (band $nm #xff))
 )

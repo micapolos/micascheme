@@ -30,6 +30,14 @@
 
 (check-op (ld (hl) #x13) (#b00110110 #x13))
 
+(check-op (ld a (bc)) (#b00001010))
+(check-op (ld a (de)) (#b00011010))
+(check-op (ld a (#x1234)) (#b00111010 #x34 #x12))
+
+(check-op (ld (bc) a) (#b00000010))
+(check-op (ld (de) a) (#b00010010))
+(check-op (ld (#x1234) a) (#b00110010 #x34 #x12))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))
