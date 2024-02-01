@@ -3,9 +3,8 @@
 (define-syntax-rule (check-op $syntax ($u8s ...))
   (check
     (equal?
-      (u8-list->bytevector
-        (reverse
-          (push-op (stack) #'$syntax)))
+      (asm-bytevector
+        (asm-op (empty-asm) #'$syntax))
       (u8-list->bytevector
         (list $u8s ...)))))
 
@@ -30,9 +29,8 @@
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))
   (check
     (equal?
-      (u8-list->bytevector
-        (reverse
-          (push-ops (stack) (list #'$syntax ...))))
+      (asm-bytevector
+        (asm-ops (empty-asm) (list #'$syntax ...)))
       (u8-list->bytevector
         (list $u8s ...)))))
 
