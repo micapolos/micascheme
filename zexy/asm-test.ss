@@ -64,6 +64,18 @@
 (check-op (djnz #x12) (#b00010000 #x12))
 (check-op (djnz #xfe) (#b00010000 #xfe))
 
+(check-op (push bc) (#b11000101))
+(check-op (push de) (#b11010101))
+(check-op (push hl) (#b11100101))
+(check-op (push af) (#b11110101))
+
+(check-op (push #x1234) (#xed #x8a #x34 #x12))
+
+(check-op (pop bc) (#b11000001))
+(check-op (pop de) (#b11010001))
+(check-op (pop hl) (#b11100001))
+(check-op (pop af) (#b11110001))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))

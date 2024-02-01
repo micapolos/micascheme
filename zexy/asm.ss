@@ -38,6 +38,8 @@
             ((rst) (asm-rst1 $asm #'$arg))
             ((jp) (asm-jp1 $asm #'$arg))
             ((djnz) (asm-djnz1 $asm #'$arg))
+            ((push) (asm-push1 $asm #'$arg))
+            ((pop) (asm-pop1 $asm #'$arg))
             (else #f)))
         (($op $lhs $rhs) (identifier? #'$op)
           (case (datum $op)
@@ -178,6 +180,28 @@
   (define (asm-djnz-e $asm $e)
     (asm... $asm #b00010000 $e))
 
+  (define (asm-push1 $asm $arg)
+    (lets
+      ($rr (rr-af $arg))
+      ($nm (nm $arg))
+      (or
+        (and $rr (asm-push-rr $asm $rr))
+        (and $nm (asm-push-nm $asm $nm)))))
+
+  (define (asm-push-rr $asm $rr)
+    (asm... $asm (bor #b11000101 (shl $rr 4))))
+
+  (define (asm-push-nm $asm $nm)
+    (asm... $asm #xed #x8a (lsb $nm) (msb $nm)))
+
+  (define (asm-pop1 $asm $arg)
+    (lets
+      ($rr (rr-af $arg))
+      (and $rr (asm-pop-rr $asm $rr))))
+
+  (define (asm-pop-rr $asm $rr)
+    (asm... $asm (bor #b11000001 (shl $rr 4))))
+
   (define (r $syntax)
     (case (syntax->datum $syntax)
       ((b) #b000)
@@ -187,6 +211,22 @@
       ((h) #b100)
       ((l) #b101)
       ((a) #b111)
+      (else #f)))
+
+  (define (rr-af $syntax)
+    (case (syntax->datum $syntax)
+      ((bc) #b00)
+      ((de) #b01)
+      ((hl) #b10)
+      ((af) #b11)
+      (else #f)))
+
+  (define (rr-sp $syntax)
+    (case (syntax->datum $syntax)
+      ((bc) #b00)
+      ((de) #b01)
+      ((hl) #b10)
+      ((sp) #b11)
       (else #f)))
 
   (define (c $syntax)
