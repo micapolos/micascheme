@@ -35,6 +35,7 @@
           (case (datum $op)
             ((call) (asm-call1 $asm #'$arg))
             ((ret) (asm-ret1 $asm #'$arg))
+            ((rst) (asm-rst1 $asm #'$arg))
             (else #f)))
         (($op $lhs $rhs) (identifier? #'$op)
           (case (datum $op)
@@ -136,6 +137,14 @@
   (define (asm-call-c-nm $asm $c $nm)
     (asm... $asm (bor #b11000100 (shl $c 3)) (lsb $nm) (msb $nm)))
 
+  (define (asm-rst1 $asm $arg)
+    (lets
+      ($p (p $arg))
+      (and $p (asm-rst-p $asm $p))))
+
+  (define (asm-rst-p $asm $p)
+    (asm... $asm (bor #b11000111 $p)))
+
   (define (r $syntax)
     (case (syntax->datum $syntax)
       ((b) #b000)
@@ -167,6 +176,13 @@
         (>= $datum #x00)
         (<= $datum #xff)
         $datum)))
+
+  (define (p $syntax)
+    (lets
+      ($n (n $syntax))
+      (and $n
+        (zero? (band $n #b11000111))
+        $n)))
 
   (define (nm $syntax)
     (lets

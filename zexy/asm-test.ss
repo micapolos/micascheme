@@ -49,6 +49,10 @@
 (check-op (ret c) (#b11011000))
 (check-op (ret m) (#b11111000))
 
+(check-op (rst #x0) (#b11000111))
+(check-op (rst #x8) (#b11001111))
+(check-op (rst #x38) (#b11111111))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))
