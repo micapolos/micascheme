@@ -28,8 +28,16 @@
       (syntax-case $syntax ()
         (($op) (identifier? #'$op)
           (case (datum $op)
-            ((nop) (asm-nop $asm))
             ((ret) (asm-ret $asm))
+            ((daa) (asm-daa $asm))
+            ((cpl) (asm-cpl $asm))
+            ((neg) (asm-neg $asm))
+            ((ccf) (asm-ccf $asm))
+            ((scf) (asm-scf $asm))
+            ((nop) (asm-nop $asm))
+            ((halt) (asm-halt $asm))
+            ((di) (asm-di $asm))
+            ((ei) (asm-ei $asm))
             (else #f)))
         (($op $arg) (identifier? #'$op)
           (or
@@ -44,6 +52,7 @@
               ((pop) (asm-pop1 $asm #'$arg))
               ((inc) (asm-inc1 $asm #'$arg))
               ((dec) (asm-dec1 $asm #'$arg))
+              ((im) (asm-im1 $asm #'$arg))
               (else #f))))
         (($op $lhs $rhs) (identifier? #'$op)
           (case (datum $op)
@@ -53,9 +62,6 @@
             (else #f)))
         (else #f))
       (syntax-error $syntax)))
-
-  (define (asm-nop $asm)
-    (asm... $asm #b00000000))
 
   (define (asm-ret $asm)
     (asm... $asm #b11001001))
@@ -236,6 +242,27 @@
 
   (define (asm-pop-rr $asm $rr)
     (asm... $asm (bor #b11000001 (shl $rr 4))))
+
+  (define (asm-daa $asm) (asm... $asm #x27))
+  (define (asm-cpl $asm) (asm... $asm #x2f))
+  (define (asm-neg $asm) (asm... $asm #xed #x44))
+  (define (asm-ccf $asm) (asm... $asm #x3f))
+  (define (asm-scf $asm) (asm... $asm #x37))
+  (define (asm-nop $asm) (asm... $asm #x00))
+  (define (asm-halt $asm) (asm... $asm #x76))
+  (define (asm-di $asm) (asm... $asm #xf3))
+  (define (asm-ei $asm) (asm... $asm #xfb))
+
+  (define (asm-im1 $asm $arg)
+    (case (syntax->datum $arg)
+      ((0) (asm-im-0 $asm))
+      ((1) (asm-im-1 $asm))
+      ((2) (asm-im-2 $asm))
+      (else #f)))
+
+  (define (asm-im-0 $asm) (asm... $asm #xed #x46))
+  (define (asm-im-1 $asm) (asm... $asm #xed #x56))
+  (define (asm-im-2 $asm) (asm... $asm #xed #x5e))
 
   (define (r $syntax)
     (case (syntax->datum $syntax)

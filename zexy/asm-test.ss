@@ -8,8 +8,6 @@
       (u8-list->bytevector
         (list $u8s ...)))))
 
-(check-op (nop) (#x0))
-
 (check-op (ld b c) (#b01000001))
 (check-op (ld d e) (#b01010011))
 (check-op (ld h l) (#b01100101))
@@ -120,6 +118,19 @@
 (check-op (pop de) (#b11010001))
 (check-op (pop hl) (#b11100001))
 (check-op (pop af) (#b11110001))
+
+(check-op (daa) (#x27))
+(check-op (cpl) (#x2f))
+(check-op (neg) (#xed #x44))
+(check-op (ccf) (#x3f))
+(check-op (scf) (#x37))
+(check-op (nop) (#x00))
+(check-op (halt) (#x76))
+(check-op (di) (#xf3))
+(check-op (ei) (#xfb))
+(check-op (im 0) (#xed #x46))
+(check-op (im 1) (#xed #x56))
+(check-op (im 2) (#xed #x5e))
 
 ; ---------------------------------------------------
 
