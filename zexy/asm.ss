@@ -32,15 +32,17 @@
             ((ret) (asm-ret $asm))
             (else #f)))
         (($op $arg) (identifier? #'$op)
-          (case (datum $op)
-            ((call) (asm-call1 $asm #'$arg))
-            ((ret) (asm-ret1 $asm #'$arg))
-            ((rst) (asm-rst1 $asm #'$arg))
-            ((jp) (asm-jp1 $asm #'$arg))
-            ((djnz) (asm-djnz1 $asm #'$arg))
-            ((push) (asm-push1 $asm #'$arg))
-            ((pop) (asm-pop1 $asm #'$arg))
-            (else #f)))
+          (or
+            (asm-alu2 $asm #'$op #'$arg)
+            (case (datum $op)
+              ((call) (asm-call1 $asm #'$arg))
+              ((ret) (asm-ret1 $asm #'$arg))
+              ((rst) (asm-rst1 $asm #'$arg))
+              ((jp) (asm-jp1 $asm #'$arg))
+              ((djnz) (asm-djnz1 $asm #'$arg))
+              ((push) (asm-push1 $asm #'$arg))
+              ((pop) (asm-pop1 $asm #'$arg))
+              (else #f))))
         (($op $lhs $rhs) (identifier? #'$op)
           (case (datum $op)
             ((ld) (asm-ld2 $asm #'$lhs #'$rhs))
@@ -124,6 +126,21 @@
 
   (define (asm-ld-inm-a $asm $nm)
     (asm... $asm #b00110010 (lsb $nm) (msb $nm)))
+
+  (define (asm-alu2 $asm $lhs $rhs)
+    (lets
+      ($alu (alu $lhs))
+      ($r (r $rhs))
+      ($n (n $rhs))
+      (or
+        (and $alu $r (asm-alu-r $asm $alu $r))
+        (and $alu $n (asm-alu-n $asm $alu $n)))))
+
+  (define (asm-alu-r $asm $alu $r)
+    (asm... $asm (bor #b10000000 (shl $alu 3) $r)))
+
+  (define (asm-alu-n $asm $alu $n)
+    (asm... $asm (bor #b11000110 (shl $alu 3)) $n))
 
   (define (asm-call1 $asm $arg)
     (lets
@@ -269,6 +286,18 @@
   (define (inm $syntax)
     (syntax-case $syntax ()
       (($op) (nm #'$op))
+      (else #f)))
+
+  (define (alu $syntax)
+    (case (syntax->datum $syntax)
+      ((add) #b000)
+      ((adc) #b001)
+      ((sub) #b010)
+      ((sbc) #b011)
+      ((and) #b100)
+      ((xor) #b101)
+      ((or) #b110)
+      ((cp) #b111)
       (else #f)))
 
   (define-syntax-rule (== $syntax $datum)

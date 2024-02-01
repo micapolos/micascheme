@@ -37,6 +37,32 @@
 (check-op (ld (de) a) (#b00010010))
 (check-op (ld (#x1234) a) (#b00110010 #x34 #x12))
 
+(check-op (add b) (#b10000000))
+(check-op (add c) (#b10000001))
+(check-op (add d) (#b10000010))
+(check-op (add e) (#b10000011))
+(check-op (add h) (#b10000100))
+(check-op (add l) (#b10000101))
+(check-op (add a) (#b10000111))
+
+(check-op (add b) (#b10000000))
+(check-op (adc b) (#b10001000))
+(check-op (sub b) (#b10010000))
+(check-op (sbc b) (#b10011000))
+(check-op (and b) (#b10100000))
+(check-op (xor b) (#b10101000))
+(check-op (or b) (#b10110000))
+(check-op (cp b) (#b10111000))
+
+(check-op (add #x12) (#b11000110 #x12))
+(check-op (adc #x12) (#b11001110 #x12))
+(check-op (sub #x12) (#b11010110 #x12))
+(check-op (sbc #x12) (#b11011110 #x12))
+(check-op (and #x12) (#b11100110 #x12))
+(check-op (xor #x12) (#b11101110 #x12))
+(check-op (or #x12) (#b11110110 #x12))
+(check-op (cp #x12) (#b11111110 #x12))
+
 (check-op (call #x1234) (#b11001101 #x34 #x12))
 
 (check-op (call nz #x1234) (#b11000100 #x34 #x12))
