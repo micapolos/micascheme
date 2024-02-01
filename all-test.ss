@@ -54,4 +54,5 @@
   (leo all)
   (scheme all)
   (tico all)
+  (zexy all)
 )
