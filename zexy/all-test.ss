@@ -1,4 +1,4 @@
 (import (micascheme))
 
 (test
-  (zexy asm all))
+  (zexy asm))
