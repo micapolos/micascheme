@@ -61,6 +61,9 @@
 (check-op (jp c #x1234) (#b11011010 #x34 #x12))
 (check-op (jp m #x1234) (#b11111010 #x34 #x12))
 
+(check-op (djnz #x12) (#b00010000 #x12))
+(check-op (djnz #xfe) (#b00010000 #xfe))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))

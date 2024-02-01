@@ -37,6 +37,7 @@
             ((ret) (asm-ret1 $asm #'$arg))
             ((rst) (asm-rst1 $asm #'$arg))
             ((jp) (asm-jp1 $asm #'$arg))
+            ((djnz) (asm-djnz1 $asm #'$arg))
             (else #f)))
         (($op $lhs $rhs) (identifier? #'$op)
           (case (datum $op)
@@ -169,6 +170,14 @@
   (define (asm-jp-c-nm $asm $c $nm)
     (asm... $asm (bor #b11000010 (shl $c 3)) (lsb $nm) (msb $nm)))
 
+  (define (asm-djnz1 $asm $arg)
+    (lets
+      ($e (n $arg))
+      (and $e (asm-djnz-e $asm $e))))
+
+  (define (asm-djnz-e $asm $e)
+    (asm... $asm #b00010000 $e))
+
   (define (r $syntax)
     (case (syntax->datum $syntax)
       ((b) #b000)
@@ -197,9 +206,9 @@
       ($datum (syntax->datum $syntax))
       (and
         (integer? $datum)
-        (>= $datum #x00)
-        (<= $datum #xff)
-        $datum)))
+        (>= $datum -127)
+        (<= $datum 255)
+        (band $datum #xff))))
 
   (define (p $syntax)
     (lets
