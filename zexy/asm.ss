@@ -100,6 +100,8 @@
 
         ; 16-bit
         (and $lhs-rr $rhs-nm (asm-ld-rr-nm $asm $lhs-rr $rhs-nm))
+        (and (== $lhs hl) $rhs-inm (asm-ld-hl-inm $asm $rhs-inm))
+        (and $lhs-rr $rhs-inm (asm-ld-rr-inm $asm $lhs-rr $rhs-inm))
       )))
 
   (define (asm-ld-r-r $asm $r1 $r2)
@@ -145,6 +147,19 @@
       (bor #b00000001 (shl $rr 4))
       (lsb $nm)
       (msb $nm)))
+
+  (define (asm-ld-hl-inm $asm $inm)
+    (asm... $asm
+      #x2a
+      (lsb $inm)
+      (msb $inm)))
+
+  (define (asm-ld-rr-inm $asm $rr $inm)
+    (asm... $asm
+      #xed
+      (bor #b01001011 (shl $rr 4))
+      (lsb $inm)
+      (msb $inm)))
 
   (define (asm-alu2 $asm $lhs $rhs)
     (lets
