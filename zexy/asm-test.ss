@@ -43,6 +43,7 @@
 (check-op (add e) (#b10000011))
 (check-op (add h) (#b10000100))
 (check-op (add l) (#b10000101))
+(check-op (add (hl)) (#b10000110))
 (check-op (add a) (#b10000111))
 
 (check-op (add b) (#b10000000))

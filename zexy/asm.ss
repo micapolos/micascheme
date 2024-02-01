@@ -130,7 +130,7 @@
   (define (asm-alu2 $asm $lhs $rhs)
     (lets
       ($alu (alu $lhs))
-      ($r (r $rhs))
+      ($r (r-hl $rhs))
       ($n (n $rhs))
       (or
         (and $alu $r (asm-alu-r $asm $alu $r))
@@ -229,6 +229,11 @@
       ((l) #b101)
       ((a) #b111)
       (else #f)))
+
+  (define (r-hl $syntax)
+    (or
+      (r $syntax)
+      (and (== $syntax (hl)) #b110)))
 
   (define (rr-af $syntax)
     (case (syntax->datum $syntax)
