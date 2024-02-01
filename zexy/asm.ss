@@ -44,7 +44,7 @@
   (define (asm-ret $asm)
     (asm... $asm #xc9))
 
-  (define (asm-ld $stack $lhs $rhs)
+  (define (asm-ld $asm $lhs $rhs)
     (lets
       ($lhs-r (r $lhs))
       ($rhs-r (r $rhs))
@@ -52,9 +52,11 @@
       ($lhs-ihl? (ihl? $lhs))
       ($rhs-ihl? (ihl? $rhs))
       (or
-        (and $lhs-r $rhs-r (asm-ld-r-r $stack $lhs-r $rhs-r))
-        (and $lhs-r $rhs-n (asm-ld-r-n $stack $lhs-r $rhs-n))
-        (and $lhs-r $rhs-ihl? (asm-ld-r-ihl $stack $lhs-r)))))
+        (and $lhs-r $rhs-r (asm-ld-r-r $asm $lhs-r $rhs-r))
+        (and $lhs-r $rhs-n (asm-ld-r-n $asm $lhs-r $rhs-n))
+        (and $lhs-r $rhs-ihl? (asm-ld-r-ihl $asm $lhs-r))
+        (and $lhs-ihl? $rhs-r (asm-ld-ihl-r $asm $rhs-r))
+        (and $lhs-ihl? $rhs-n (asm-ld-ihl-n $asm $rhs-n)))))
 
   (define (asm-ld-r-r $asm $r1 $r2)
     (asm... $asm
@@ -68,6 +70,13 @@
   (define (asm-ld-r-ihl $asm $r)
     (asm... $asm
       (ior #b01000110 (shl $r 3))))
+
+  (define (asm-ld-ihl-r $asm $r)
+    (asm... $asm
+      (ior #b01110000 $r)))
+
+  (define (asm-ld-ihl-n $asm $n)
+    (asm... $asm #b00110110 $n))
 
   (define (r $syntax)
     (case (syntax->datum $syntax)
