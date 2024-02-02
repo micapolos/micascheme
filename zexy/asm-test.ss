@@ -301,6 +301,11 @@
 (check-op (in (c))   (#xed #b01110000))
 (check-op (in a (c)) (#xed #b01111000))
 
+(check-op (ind) (#xed #xaa))
+(check-op (indr) (#xed #xba))
+(check-op (ini) (#xed #xa2))
+(check-op (inir) (#xed #xb2))
+
 (check-op (out (#x12) a) (#xd3 #x12))
 
 (check-op (out (c) b) (#xed #b01000001))
@@ -311,6 +316,11 @@
 (check-op (out (c) l) (#xed #b01101001))
 (check-op (out (c) 0) (#xed #b01110001))
 (check-op (out (c) a) (#xed #b01111001))
+
+(check-op (outi) (#xed #xa3))
+(check-op (otir) (#xed #xb3))
+(check-op (outd) (#xed #xab))
+(check-op (otdr) (#xed #xbb))
 
 ; ---------------------------------------------------
 

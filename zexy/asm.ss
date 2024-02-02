@@ -29,22 +29,29 @@
         (($op) (identifier? #'$op)
           (case (datum $op)
             ((ret) (asm... $asm #xc9))
+
             ((daa) (asm... $asm #x27))
             ((cpl) (asm... $asm #x2f))
             ((neg) (asm... $asm #xed #x44))
             ((ccf) (asm... $asm #x3f))
             ((scf) (asm... $asm #x37))
+
             ((nop) (asm... $asm #x00))
             ((halt) (asm... $asm #x76))
+
             ((di) (asm... $asm #xf3))
             ((ei) (asm... $asm #xfb))
+
             ((exx) (asm... $asm #xd9))
+
             ((rla) (asm... $asm #x17))
             ((rlca) (asm... $asm #x07))
             ((rra) (asm... $asm #x1f))
             ((rrca) (asm... $asm #x0f))
+
             ((rld) (asm... $asm #xed #x6f))
             ((rrd) (asm... $asm #xed #x67))
+
             ((cpd) (asm... $asm #xed #xa9))
             ((cpdr) (asm... $asm #xed #xb9))
             ((cpi) (asm... $asm #xed #xa1))
@@ -53,6 +60,17 @@
             ((lddr) (asm... $asm #xed #xb8))
             ((ldi) (asm... $asm #xed #xa0))
             ((ldir) (asm... $asm #xed #xb0))
+
+            ((ind) (asm... $asm #xed #xaa))
+            ((indr) (asm... $asm #xed #xba))
+            ((ini) (asm... $asm #xed #xa2))
+            ((inir) (asm... $asm #xed #xb2))
+
+            ((outi) (asm... $asm #xed #xa3))
+            ((otir) (asm... $asm #xed #xb3))
+            ((outd) (asm... $asm #xed #xab))
+            ((otdr) (asm... $asm #xed #xbb))
+
             (else #f)))
         (($op $arg) (identifier? #'$op)
           (or
