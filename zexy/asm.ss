@@ -9,43 +9,16 @@
     (micascheme)
     (zexy bin))
 
-  (data (asm stack org labels))
+  (data (asm stack))
 
   (define (empty-asm)
-    (asm (stack) 0 (stack)))
+    (asm (stack)))
 
   (define (asm-bytevector $asm)
     (u8-list->bytevector (reverse (asm-stack $asm))))
 
   (define (asm-u8 $asm $u8)
-    (asm
-      (push (asm-stack $asm) $u8)
-      (inc-nm (asm-org $asm))
-      (asm-labels $asm)))
-
-  (define (asm-org-nm $asm $nm)
-    (asm
-      (asm-stack $asm)
-      $nm
-      (asm-labels $asm)))
-
-  (define (asm-label $asm $symbol)
-    (asm
-      (asm-stack $asm)
-      (asm-org $asm)
-      (push (asm-labels $asm) (cons $symbol (asm-org $asm)))))
-
-  (define (asm-n-expr $asm $syntax)
-    (asm
-      (asm-stack $asm)
-      (asm-org $asm)
-      (asm-labels $asm)))
-
-  (define (asm-nm-expr $asm $syntax)
-    (asm
-      (asm-stack $asm)
-      (asm-org $asm)
-      (asm-labels $asm)))
+    (asm (push (asm-stack $asm) $u8)))
 
   (define-syntax-rule (asm... $asm $u8 ...)
     (fold-left asm-u8 $asm (list $u8 ...)))
@@ -62,8 +35,6 @@
   (define (asm-op $asm $syntax)
     (or
       (syntax-case $syntax ()
-        ($label (identifier? #'$label)
-          (asm-label $asm (datum $label)))
         (($op $arg ...)
           (lets
             ($proc
@@ -128,7 +99,6 @@
             (asm-aluop1 $asm #'$op #'$arg)
             (asm-rotop1 $asm #'$op #'$arg)
             (case (datum $op)
-              ((org) (asm-org1 $asm #'$arg))
               ((call) (asm-call1 $asm #'$arg))
               ((ret) (asm-ret1 $asm #'$arg))
               ((rst) (asm-rst1 $asm #'$arg))
@@ -184,11 +154,6 @@
       (or
         (and $nm (asm-u16 $asm $nm))
         (syntax-error $arg))))
-
-  (define (asm-org1 $asm $arg)
-    (lets
-      ($nm (nm $arg))
-      (and $nm (asm-org-nm $asm $nm))))
 
   (define (asm-ret1 $asm $arg)
     (lets
