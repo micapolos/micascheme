@@ -39,6 +39,10 @@
             ((di) (asm-di $asm))
             ((ei) (asm-ei $asm))
             ((exx) (asm-exx $asm))
+            ((rla) (asm... $asm #x17))
+            ((rlca) (asm... $asm #x07))
+            ((rra) (asm... $asm #x1f))
+            ((rrca) (asm... $asm #x0f))
             (else #f)))
         (($op $arg) (identifier? #'$op)
           (or

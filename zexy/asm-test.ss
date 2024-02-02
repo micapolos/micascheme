@@ -273,6 +273,11 @@
 (check-op (srl (hl)) (#xcb #b00111110))
 (check-op (srl a) (#xcb #b00111111))
 
+(check-op (rla) (#x017))
+(check-op (rlca) (#x07))
+(check-op (rra) (#x1f))
+(check-op (rrca) (#x0f))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))
