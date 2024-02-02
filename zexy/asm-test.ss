@@ -278,6 +278,9 @@
 (check-op (rra) (#x1f))
 (check-op (rrca) (#x0f))
 
+(check-op (rld) (#xed #x6f))
+(check-op (rrd) (#xed #x67))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))

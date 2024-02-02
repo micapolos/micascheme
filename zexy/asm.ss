@@ -43,6 +43,8 @@
             ((rlca) (asm... $asm #x07))
             ((rra) (asm... $asm #x1f))
             ((rrca) (asm... $asm #x0f))
+            ((rld) (asm... $asm #xed #x6f))
+            ((rrd) (asm... $asm #xed #x67))
             (else #f)))
         (($op $arg) (identifier? #'$op)
           (or
