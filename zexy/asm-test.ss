@@ -1,12 +1,12 @@
 (import (check) (zexy asm))
 
-(define-syntax-rule (check-op $syntax ($u8s ...))
+(define-syntax-rule (check-op $syntax ($op ...))
   (check
     (equal?
       (asm-bytevector
         (asm-op (empty-asm) #'$syntax))
       (u8-list->bytevector
-        (list $u8s ...)))))
+        (list $op ...)))))
 
 (check-op (db) ())
 (check-op (db #x12) (#x12))
