@@ -20,13 +20,13 @@
   (define (asm-u8 $asm $u8)
     (asm
       (push (asm-stack $asm) $u8)
-      (add1 (asm-org $asm))
+      (inc-nm (asm-org $asm))
       (asm-labels $asm)))
 
   (define (asm-org-nm $asm $nm)
     (asm
       (asm-stack $asm)
-      (inc-nm (asm-org $asm))
+      $nm
       (asm-labels $asm)))
 
   (define (asm-label $asm $symbol)
