@@ -338,6 +338,16 @@
 (check-op (outd) (#xed #xab))
 (check-op (otdr) (#xed #xbb))
 
+(check-op (add hl a) (#xed #b00110001))
+(check-op (add de a) (#xed #b00110010))
+(check-op (add bc a) (#xed #b00110011))
+
+(check-op (add hl #x1234) (#xed #b00110100 #x34 #x12))
+(check-op (add de #x1234) (#xed #b00110101 #x34 #x12))
+(check-op (add bc #x1234) (#xed #b00110110 #x34 #x12))
+
+(check-op (swapnib) (#xed #x23))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))

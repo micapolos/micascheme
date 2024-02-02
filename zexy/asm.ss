@@ -93,6 +93,8 @@
             ((outd) (asm... $asm #xed #xab))
             ((otdr) (asm... $asm #xed #xbb))
 
+            ((swapnib) (asm... $asm #xed #x23))
+
             (else #f)))
         (($op $arg) (identifier? #'$op)
           (or
@@ -317,7 +319,17 @@
     (lets
       ($lhs-hl? (== $lhs hl))
       ($rhs-rr (rr-sp $rhs))
-      (and $lhs-hl? $rhs-rr (asm-add-hl-rr $asm $rhs-rr))))
+      ($rhs-nm (nm $rhs))
+      (or
+        (and $lhs-hl? $rhs-rr (asm-add-hl-rr $asm $rhs-rr))
+
+        (and (== $lhs hl) (== $rhs a) (asm... $asm #xed #b00110001))
+        (and (== $lhs de) (== $rhs a) (asm... $asm #xed #b00110010))
+        (and (== $lhs bc) (== $rhs a) (asm... $asm #xed #b00110011))
+
+        (and (== $lhs hl) $rhs-nm (asm... $asm #xed #b00110100 (lsb $rhs-nm) (msb $rhs-nm)))
+        (and (== $lhs de) $rhs-nm (asm... $asm #xed #b00110101 (lsb $rhs-nm) (msb $rhs-nm)))
+        (and (== $lhs bc) $rhs-nm (asm... $asm #xed #b00110110 (lsb $rhs-nm) (msb $rhs-nm))))))
 
   (define (asm-add-hl-rr $asm $rr)
     (asm... $asm (bor #b00001001 (shl $rr 4))))
