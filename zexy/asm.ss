@@ -202,18 +202,30 @@
   (define (asm-inc1 $asm $arg)
     (lets
       ($r (r-hl $arg))
-      (and $r (asm-inc-r $asm $r))))
+      ($rr (rr-sp $arg))
+      (or
+        (and $r (asm-inc-r $asm $r))
+        (and $rr (asm-inc-rr $asm $rr)))))
 
   (define (asm-inc-r $asm $r)
     (asm... $asm (bor #b00000100 (shl $r 3))))
 
+  (define (asm-inc-rr $asm $rr)
+    (asm... $asm (bor #b00000011 (shl $rr 4))))
+
   (define (asm-dec1 $asm $arg)
     (lets
       ($r (r-hl $arg))
-      (and $r (asm-dec-r $asm $r))))
+      ($rr (rr-sp $arg))
+      (or
+        (and $r (asm-dec-r $asm $r))
+        (and $rr (asm-dec-rr $asm $rr)))))
 
   (define (asm-dec-r $asm $r)
     (asm... $asm (bor #b00000101 (shl $r 3))))
+
+  (define (asm-dec-rr $asm $rr)
+    (asm... $asm (bor #b00001011 (shl $rr 4))))
 
   (define (asm-add2 $asm $lhs $rhs)
     (lets
