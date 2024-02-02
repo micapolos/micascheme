@@ -281,6 +281,15 @@
 (check-op (rld) (#xed #x6f))
 (check-op (rrd) (#xed #x67))
 
+(check-op (cpd) (#xed #xa9))
+(check-op (cpdr) (#xed #xb9))
+(check-op (cpi) (#xed #xa1))
+(check-op (cpir) (#xed #xb1))
+(check-op (ldd) (#xed #xa8))
+(check-op (lddr) (#xed #xb8))
+(check-op (ldi) (#xed #xa0))
+(check-op (ldir) (#xed #xb0))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))
