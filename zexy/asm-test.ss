@@ -290,6 +290,28 @@
 (check-op (ldi) (#xed #xa0))
 (check-op (ldir) (#xed #xb0))
 
+(check-op (in a (#x12)) (#xdb #x12))
+
+(check-op (in b (c)) (#xed #b01000000))
+(check-op (in c (c)) (#xed #b01001000))
+(check-op (in d (c)) (#xed #b01010000))
+(check-op (in e (c)) (#xed #b01011000))
+(check-op (in h (c)) (#xed #b01100000))
+(check-op (in l (c)) (#xed #b01101000))
+(check-op (in (c))   (#xed #b01110000))
+(check-op (in a (c)) (#xed #b01111000))
+
+(check-op (out (#x12) a) (#xd3 #x12))
+
+(check-op (out (c) b) (#xed #b01000001))
+(check-op (out (c) c) (#xed #b01001001))
+(check-op (out (c) d) (#xed #b01010001))
+(check-op (out (c) e) (#xed #b01011001))
+(check-op (out (c) h) (#xed #b01100001))
+(check-op (out (c) l) (#xed #b01101001))
+(check-op (out (c) 0) (#xed #b01110001))
+(check-op (out (c) a) (#xed #b01111001))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))

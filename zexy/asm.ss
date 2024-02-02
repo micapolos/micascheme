@@ -69,6 +69,7 @@
               ((inc) (asm-inc1 $asm #'$arg))
               ((dec) (asm-dec1 $asm #'$arg))
               ((im) (asm-im1 $asm #'$arg))
+              ((in) (asm-in1 $asm #'$arg))
               (else #f))))
         (($op $lhs $rhs) (identifier? #'$op)
           (or
@@ -81,6 +82,8 @@
               ((adc) (asm-adc2 $asm #'$lhs #'$rhs))
               ((sbc) (asm-sbc2 $asm #'$lhs #'$rhs))
               ((ex) (asm-ex2 $asm #'$lhs #'$rhs))
+              ((in) (asm-in2 $asm #'$lhs #'$rhs))
+              ((out) (asm-out2 $asm #'$lhs #'$rhs))
               (else #f))))
         (else #f))
       (syntax-error $syntax)))
@@ -372,6 +375,31 @@
   (define (asm-ex-de-hl $asm) (asm... $asm #xeb))
   (define (asm-ex-isp-hl $asm) (asm... $asm #xe3))
 
+  (define (asm-in1 $asm $arg)
+    (and (== $arg (c)) (asm... $asm #xed #x70)))
+
+  (define (asm-in2 $asm $lhs $rhs)
+    (lets
+      ($lhs-r (r $lhs))
+      ($rhs-in (iin $rhs))
+      (or
+        (and (== $lhs a) $rhs-in
+          (asm... $asm #xdb $rhs-in))
+        (and $lhs-r (== $rhs (c))
+          (asm... $asm #xed (bor #b01000000 (shl $lhs-r 3)))))))
+
+  (define (asm-out2 $asm $lhs $rhs)
+    (lets
+      ($lhs-in (iin $lhs))
+      ($rhs-r (r $rhs))
+      (or
+        (and $lhs-in (== $rhs a)
+          (asm... $asm #xd3 $lhs-in))
+        (and (== $lhs (c)) $rhs-r
+          (asm... $asm #xed (bor #b01000001 (shl $rhs-r 3))))
+        (and (== $lhs (c)) (= (n $rhs) 0)
+          (asm... $asm #xed #x71)))))
+
   (define (asm-bitop2 $asm $op $lhs $rhs)
     (lets
       ($op (bitop $op))
@@ -456,6 +484,11 @@
         (>= $datum -127)
         (<= $datum 255)
         (band $datum #xff))))
+
+  (define (iin $syntax)
+    (syntax-case $syntax ()
+      (($op) (n #'$op))
+      (else #f)))
 
   (define (p $syntax)
     (lets
