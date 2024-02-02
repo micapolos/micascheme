@@ -174,6 +174,12 @@
 (check-op (im 1) (#xed #x56))
 (check-op (im 2) (#xed #x5e))
 
+(check-op (ex af af2) (#x08))
+(check-op (ex de hl) (#xeb))
+(check-op (ex (sp) hl) (#xe3))
+
+(check-op (exx) (#xd9))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))

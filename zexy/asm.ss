@@ -38,6 +38,7 @@
             ((halt) (asm-halt $asm))
             ((di) (asm-di $asm))
             ((ei) (asm-ei $asm))
+            ((exx) (asm-exx $asm))
             (else #f)))
         (($op $arg) (identifier? #'$op)
           (or
@@ -62,6 +63,7 @@
             ((add) (asm-add2 $asm #'$lhs #'$rhs))
             ((adc) (asm-adc2 $asm #'$lhs #'$rhs))
             ((sbc) (asm-sbc2 $asm #'$lhs #'$rhs))
+            ((ex) (asm-ex2 $asm #'$lhs #'$rhs))
             (else #f)))
         (else #f))
       (syntax-error $syntax)))
@@ -355,6 +357,18 @@
   (define (asm-im-0 $asm) (asm... $asm #xed #x46))
   (define (asm-im-1 $asm) (asm... $asm #xed #x56))
   (define (asm-im-2 $asm) (asm... $asm #xed #x5e))
+
+  (define (asm-ex2 $asm $lhs $rhs)
+    (or
+      (and (== $lhs af) (== $rhs af2) (asm-ex-af-af2 $asm))
+      (and (== $lhs de) (== $rhs hl) (asm-ex-de-hl $asm))
+      (and (== $lhs (sp)) (== $rhs hl) (asm-ex-isp-hl $asm))))
+
+  (define (asm-ex-af-af2 $asm) (asm... $asm #x08))
+  (define (asm-ex-de-hl $asm) (asm... $asm #xeb))
+  (define (asm-ex-isp-hl $asm) (asm... $asm #xe3))
+
+  (define (asm-exx $asm) (asm... $asm #xd9))
 
   (define (r $syntax)
     (case (syntax->datum $syntax)
