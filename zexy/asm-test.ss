@@ -97,6 +97,21 @@
 (check-op (dec (hl)) (#b00110101))
 (check-op (dec a) (#b00111101))
 
+(check-op (add hl bc) (#b00001001))
+(check-op (add hl de) (#b00011001))
+(check-op (add hl hl) (#b00101001))
+(check-op (add hl sp) (#b00111001))
+
+(check-op (adc hl bc) (#xed #b01001010))
+(check-op (adc hl de) (#xed #b01011010))
+(check-op (adc hl hl) (#xed #b01101010))
+(check-op (adc hl sp) (#xed #b01111010))
+
+(check-op (sbc hl bc) (#xed #b01000010))
+(check-op (sbc hl de) (#xed #b01010010))
+(check-op (sbc hl hl) (#xed #b01100010))
+(check-op (sbc hl sp) (#xed #b01110010))
+
 (check-op (call #x1234) (#b11001101 #x34 #x12))
 
 (check-op (call nz #x1234) (#b11000100 #x34 #x12))

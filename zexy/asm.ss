@@ -59,6 +59,9 @@
             ((ld) (asm-ld2 $asm #'$lhs #'$rhs))
             ((call) (asm-call2 $asm #'$lhs #'$rhs))
             ((jp) (asm-jp2 $asm #'$lhs #'$rhs))
+            ((add) (asm-add2 $asm #'$lhs #'$rhs))
+            ((adc) (asm-adc2 $asm #'$lhs #'$rhs))
+            ((sbc) (asm-sbc2 $asm #'$lhs #'$rhs))
             (else #f)))
         (else #f))
       (syntax-error $syntax)))
@@ -211,6 +214,37 @@
 
   (define (asm-dec-r $asm $r)
     (asm... $asm (bor #b00000101 (shl $r 3))))
+
+  (define (asm-add2 $asm $lhs $rhs)
+    (lets
+      ($lhs-hl? (== $lhs hl))
+      ($rhs-rr (rr-sp $rhs))
+      (and $lhs-hl? $rhs-rr (asm-add-hl-rr $asm $rhs-rr))))
+
+  (define (asm-add-hl-rr $asm $rr)
+    (asm... $asm (bor #b00001001 (shl $rr 4))))
+
+  (define (asm-adc2 $asm $lhs $rhs)
+    (lets
+      ($lhs-hl? (== $lhs hl))
+      ($rhs-rr (rr-sp $rhs))
+      (and $lhs-hl? $rhs-rr (asm-adc-hl-rr $asm $rhs-rr))))
+
+  (define (asm-adc-hl-rr $asm $rr)
+    (asm... $asm
+      #xed
+      (bor #b01001010 (shl $rr 4))))
+
+  (define (asm-sbc2 $asm $lhs $rhs)
+    (lets
+      ($lhs-hl? (== $lhs hl))
+      ($rhs-rr (rr-sp $rhs))
+      (and $lhs-hl? $rhs-rr (asm-sbc-hl-rr $asm $rhs-rr))))
+
+  (define (asm-sbc-hl-rr $asm $rr)
+    (asm... $asm
+      #xed
+      (bor #b01000010 (shl $rr 4))))
 
   (define (asm-call1 $asm $arg)
     (lets
