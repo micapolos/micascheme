@@ -546,7 +546,7 @@
   (define (n $syntax)
     (lets
       ($datum (syntax->datum $syntax))
-      (switch $datum
+      (switch-opt $datum
         ((integer? $integer)
           (and
             (>= $integer -127)
