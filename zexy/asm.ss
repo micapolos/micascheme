@@ -9,10 +9,10 @@
     (micascheme)
     (zexy bin))
 
-  (data (asm stack size org labels))
+  (data (asm stack org labels))
 
   (define (empty-asm)
-    (asm (stack) 0 #x2000 (stack)))
+    (asm (stack) #x2000 (stack)))
 
   (define (asm-bytevector $asm)
     (u8-list->bytevector (reverse (asm-stack $asm))))
@@ -20,28 +20,24 @@
   (define (asm-u8 $asm $u8)
     (asm
       (push (asm-stack $asm) $u8)
-      (add1 (asm-size $asm))
       (add1 (asm-org $asm))
       (asm-labels $asm)))
 
   (define (asm-label $asm $symbol)
     (asm
       (asm-stack $asm)
-      (asm-size $asm)
       (asm-org $asm)
-      (push (asm-labels $asm) (cons $symbol (asm-size $asm)))))
+      (push (asm-labels $asm) (cons $symbol (asm-org $asm)))))
 
   (define (asm-n-expr $asm $syntax)
     (asm
       (asm-stack $asm)
-      (asm-size $asm)
       (asm-org $asm)
       (asm-labels $asm)))
 
   (define (asm-nm-expr $asm $syntax)
     (asm
       (asm-stack $asm)
-      (asm-size $asm)
       (asm-org $asm)
       (asm-labels $asm)))
 
