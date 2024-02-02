@@ -1,4 +1,4 @@
-(library (zexy bin)
+(library (zexy math)
   (export band bor shl shr msb lsb inc-nm)
   (import (micascheme))
 

@@ -7,7 +7,7 @@
     asm-ops)
   (import
     (micascheme)
-    (zexy bin))
+    (zexy math))
 
   (data (asm stack))
 
