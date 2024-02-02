@@ -12,7 +12,7 @@
   (data (asm stack org labels))
 
   (define (empty-asm)
-    (asm (stack) #x2000 (stack)))
+    (asm (stack) 0 (stack)))
 
   (define (asm-bytevector $asm)
     (u8-list->bytevector (reverse (asm-stack $asm))))
@@ -21,6 +21,12 @@
     (asm
       (push (asm-stack $asm) $u8)
       (add1 (asm-org $asm))
+      (asm-labels $asm)))
+
+  (define (asm-org-nm $asm $nm)
+    (asm
+      (asm-stack $asm)
+      (inc-nm (asm-org $asm))
       (asm-labels $asm)))
 
   (define (asm-label $asm $symbol)
@@ -122,6 +128,7 @@
             (asm-aluop1 $asm #'$op #'$arg)
             (asm-rotop1 $asm #'$op #'$arg)
             (case (datum $op)
+              ((org) (asm-org1 $asm #'$arg))
               ((call) (asm-call1 $asm #'$arg))
               ((ret) (asm-ret1 $asm #'$arg))
               ((rst) (asm-rst1 $asm #'$arg))
@@ -177,6 +184,11 @@
       (or
         (and $nm (asm-u16 $asm $nm))
         (syntax-error $arg))))
+
+  (define (asm-org1 $asm $arg)
+    (lets
+      ($nm (nm $arg))
+      (and $nm (asm-org-nm $asm $nm))))
 
   (define (asm-ret1 $asm $arg)
     (lets
