@@ -561,18 +561,12 @@
               $integer))))))
 
   (define (str $syntax)
-    (lets
-      ($datum (syntax->datum $syntax))
-      (and
-        (string? $datum)
-        $datum)))
+    (switch-opt (syntax->datum $syntax)
+      ((string? $string) $string)))
 
   (define (chr $syntax)
-    (lets
-      ($datum (syntax->datum $syntax))
-      (and
-        (char? $datum)
-        (char->integer $datum))))
+    (switch-opt (syntax->datum $syntax)
+      ((char? $char) (char->integer $char))))
 
   (define (iin $syntax)
     (syntax-case $syntax ()
