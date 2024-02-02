@@ -20,11 +20,33 @@
   (define-syntax-rule (asm... $asm $u8 ...)
     (asm (push... (asm-stack $asm) $u8 ...)))
 
+  (define (asm-u8 $asm $u8)
+    (asm... $asm $u8))
+
+  (define (asm-u16 $asm $u16)
+    (asm... $asm (lsb $u16) (msb $u16)))
+
+  (define (asm-str $asm $str)
+    (fold-left asm-u8 $asm (bytevector->u8-list (string->utf8 $str))))
+
   (define (asm-ops $asm $syntax-list)
     (fold-left asm-op $asm $syntax-list))
 
   (define (asm-op $asm $syntax)
     (or
+      (syntax-case $syntax ()
+        (($op $arg ...)
+          (lets
+            ($proc
+              (case (datum $op)
+                ((defb db) asm-db...)
+                ((defw dw) asm-dw...)
+                ((defw dz) asm-dz...)
+                (else #f)))
+            (and $proc
+              (apply $proc
+                (cons $asm (syntax->list #'($arg ...)))))))
+        (else #f))
       (syntax-case $syntax ()
         (($op) (identifier? #'$op)
           (case (datum $op)
@@ -105,6 +127,33 @@
               (else #f))))
         (else #f))
       (syntax-error $syntax)))
+
+  (define (asm-db... $asm . $args)
+    (fold-left asm-db1 $asm $args))
+
+  (define (asm-dz... $asm . $args)
+    (asm-u8 (fold-left asm-db1 $asm $args) #x0))
+
+  (define (asm-dw... $asm . $args)
+    (fold-left asm-dw1 $asm $args))
+
+  (define (asm-db1 $asm $arg)
+    (lets
+      ($n (n $arg))
+      ($chr (chr $arg))
+      ($str (str $arg))
+      (or
+        (and $n (asm-u8 $asm $n))
+        (and $chr (asm-u8 $asm $chr))
+        (and $str (asm-str $asm $str))
+        (syntax-error $arg))))
+
+  (define (asm-dw1 $asm $arg)
+    (lets
+      ($nm (nm $arg))
+      (or
+        (and $nm (asm-u16 $asm $nm))
+        (syntax-error $arg))))
 
   (define (asm-ret1 $asm $arg)
     (lets
@@ -502,6 +551,20 @@
         (>= $datum -127)
         (<= $datum 255)
         (band $datum #xff))))
+
+  (define (str $syntax)
+    (lets
+      ($datum (syntax->datum $syntax))
+      (and
+        (string? $datum)
+        $datum)))
+
+  (define (chr $syntax)
+    (lets
+      ($datum (syntax->datum $syntax))
+      (and
+        (char? $datum)
+        (char->integer $datum))))
 
   (define (iin $syntax)
     (syntax-case $syntax ()

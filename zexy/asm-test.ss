@@ -8,6 +8,22 @@
       (u8-list->bytevector
         (list $u8s ...)))))
 
+(check-op (db) ())
+(check-op (db #x12) (#x12))
+(check-op (db #\a) (97))
+(check-op (db "a ") (97 32))
+(check-op (db #x12 #\a " ") (#x12 97 32))
+
+(check-op (dz) (0))
+(check-op (dz #x12) (#x12 0))
+(check-op (dz #\a) (97 0))
+(check-op (dz "a ") (97 32 0))
+(check-op (dz #x12 #\a " ") (#x12 97 32 0))
+
+(check-op (dw) ())
+(check-op (dw #x1234) (#x34 #x12))
+(check-op (dw #x1234 #x5678) (#x34 #x12 #x78 #x56))
+
 (check-op (ld b c) (#b01000001))
 (check-op (ld d e) (#b01010011))
 (check-op (ld h l) (#b01100101))
