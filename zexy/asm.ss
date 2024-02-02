@@ -546,11 +546,19 @@
   (define (n $syntax)
     (lets
       ($datum (syntax->datum $syntax))
-      (and
-        (integer? $datum)
-        (>= $datum -127)
-        (<= $datum 255)
-        (band $datum #xff))))
+      (switch $datum
+        ((integer? $integer)
+          (and
+            (>= $integer -127)
+            (<= $integer 255)
+            (band $integer #xff)))
+        ((char? $char)
+          (lets
+            ($integer (char->integer $char))
+            (and
+              (>= $integer 0)
+              (<= $integer 255)
+              $integer))))))
 
   (define (str $syntax)
     (lets
