@@ -1,5 +1,5 @@
 (import (micascheme))
 
 (test
-  (zexy asm)
-  (zexy env))
+  (zexy env)
+  (zexy asm))

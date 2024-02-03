@@ -10,19 +10,22 @@
     (zexy math)
     (zexy env))
 
-  (data (asm stack org env))
+  (data (asm stack org env imports))
 
   (define (empty-asm)
-    (asm (stack) 0 (empty-env)))
+    (asm (stack) 0 (empty-env) (stack)))
 
   (define (asm-with-stack $asm $stack)
-    (asm $stack (asm-org $asm) (asm-env $asm)))
+    (asm $stack (asm-org $asm) (asm-env $asm) (stack)))
 
   (define (asm-with-org $asm $org)
-    (asm (asm-stack $asm) $org (asm-env $asm)))
+    (asm (asm-stack $asm) $org (asm-env $asm) (stack)))
 
   (define (asm-with-env $asm $env)
-    (asm (asm-stack $asm) (asm-org $asm) $env))
+    (asm (asm-stack $asm) (asm-org $asm) $env (stack)))
+
+  (define (asm-with-imports $asm $env $imports)
+    (asm (asm-stack $asm) (asm-org $asm) (asm-env $env) $imports))
 
   (define (asm-bytevector $asm)
     (u8-list->bytevector
@@ -81,22 +84,19 @@
         (syntax-error $syntax))))
 
   (define (asm+ $asm $syntax $size)
-    (asm
-      (push (asm-stack $asm) $syntax)
-      (nm+ (asm-org $asm) $size)
-      (asm-env $asm)))
+    (fluent $asm
+      (asm-with-stack (push (asm-stack $asm) $syntax))
+      (asm-with-org (nm+ (asm-org $asm) $size))))
 
   (define (asm-u8 $asm $u8)
-    (asm
-      (push (asm-stack $asm) #`(db #,$u8))
-      (inc-nm (asm-org $asm))
-      (asm-env $asm)))
+    (fluent $asm
+      (asm-with-stack (push (asm-stack $asm) #`(db #,$u8)))
+      (asm-with-org (inc-nm (asm-org $asm)))))
 
   (define (asm-u16 $asm $u16)
-    (asm
-      (push (asm-stack $asm) #`(dw #,$u16))
-      (nm+ (asm-org $asm) 2)
-      (asm-env $asm)))
+    (fluent $asm
+      (asm-with-stack (push (asm-stack $asm) #`(dw #,$u16)))
+      (asm-with-org (nm+ (asm-org $asm) 2))))
 
   (define-syntax-rule (asm... $asm $u8 ...)
     (fold-left asm-u8 $asm (list $u8 ...)))
