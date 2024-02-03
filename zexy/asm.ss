@@ -60,9 +60,6 @@
                 #,(env-reduce (asm-env $asm) #'$value)))))
         (asm-stack $asm))))
 
-  (define (asm-local... $asm . $args)
-    (asm-local $asm $args))
-
   (define (asm-local $asm $ops)
     (lets
       ($local-asm
@@ -150,10 +147,11 @@
       (syntax-case $syntax ()
         ($op (identifier? #'$op)
           (asm+label $asm (datum $op)))
+        (($local $arg ...)
+          (identifier-named? #'$local local)
+          (asm-local $asm (syntax->list #'($arg ...))))
         (($op $arg ...)
           (case (datum $op)
-            ((local)
-              (apply asm-local... $asm (syntax->list #'($arg ...))))
             (else
               (lets
                 ($proc
