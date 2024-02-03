@@ -3,6 +3,7 @@
     env env? env-stack
     env...
     empty-env
+    env-contains?
     env-put
     env-get
     env-eval)
@@ -23,6 +24,9 @@
       (push
         (env-stack $env)
         (cons $label $value))))
+
+  (define (env-contains? $env $label)
+    (not-false? (assq $label (env-stack $env))))
 
   (define (env-get $env $label)
     (lets
