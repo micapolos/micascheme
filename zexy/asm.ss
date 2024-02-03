@@ -50,6 +50,34 @@
                     (else (syntax-error $syntax))))))
             (asm-stack $asm))))))
 
+  (define (asm-reduce $asm)
+    (asm-with-stack $asm
+      (map
+        (lambda ($syntax)
+          (syntax-case $syntax ()
+            (($op $value)
+              #`(#,#'$op
+                #,(env-reduce (asm-env $asm) #'$value)))))
+        (asm-stack $asm))))
+
+  (define (asm-local... $asm . $args)
+    (asm-local $asm $args))
+
+  (define (asm-local $asm $ops)
+    (lets
+      ($local-asm
+        (asm-reduce
+          (asm-ops
+            (asm-with-stack $asm (stack))
+            $ops)))
+      (fluent $asm
+        (asm-with-stack
+          (push-all
+            (asm-stack $asm)
+            (asm-stack $local-asm)))
+        (asm-with-org (asm-org $local-asm))
+        (asm-with-imports (asm-imports $local-asm)))))
+
   (define (asm-eval $asm $syntax)
     (env-eval (asm-env $asm) $syntax))
 
@@ -123,17 +151,21 @@
         ($op (identifier? #'$op)
           (asm+label $asm (datum $op)))
         (($op $arg ...)
-          (lets
-            ($proc
-              (case (datum $op)
-                ((defb db) asm-db...)
-                ((defw dw) asm-dw...)
-                ((defw dz) asm-dz...)
-                ((import) asm-import...)
-                (else #f)))
-            (and $proc
-              (apply $proc
-                (cons $asm (syntax->list #'($arg ...)))))))
+          (case (datum $op)
+            ((local)
+              (apply asm-local... $asm (syntax->list #'($arg ...))))
+            (else
+              (lets
+                ($proc
+                  (case (datum $op)
+                    ((defb db) asm-db...)
+                    ((defw dw) asm-dw...)
+                    ((defw dz) asm-dz...)
+                    ((import) asm-import...)
+                    (else #f)))
+                (and $proc
+                  (apply $proc
+                    (cons $asm (syntax->list #'($arg ...)))))))))
         (else #f))
       (syntax-case $syntax ()
         (($op) (identifier? #'$op)

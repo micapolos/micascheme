@@ -23,4 +23,11 @@
     (check (equal? (env-eval $env #'(+ foo bar)) (+ 30 20)))
     (check (equal? (env-eval $env #'(- foo bar)) (- 30 20)))
     (check (equal? (env-eval $env #'(* foo bar)) (* 30 20)))
-    (check (equal? (env-eval $env #'(shl foo 2)) (shl 30 2)))))
+    (check (equal? (env-eval $env #'(shl foo 2)) (shl 30 2)))
+
+    (check
+      (equal?
+        (syntax->datum
+          (env-reduce $env #'(shl (+ foo goo) (+ 1 2))))
+        '(shl (+ 30 goo) 3)))))
+

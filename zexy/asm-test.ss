@@ -433,6 +433,17 @@
   loop
   (#x10 #x00))
 
+; === local
+
+(check-ops
+  (val foo #x12)
+  (db foo)
+  (local
+    (val foo #x34)
+    (db foo))
+  (db foo)
+  (#x12 #x34 #x12))
+
 ; import
 
 (check-ops

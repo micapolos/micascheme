@@ -6,7 +6,8 @@
     env-contains?
     env-put
     env-get
-    env-eval)
+    env-eval
+    env-reduce)
   (import
     (micascheme)
     (zexy math))
@@ -34,28 +35,37 @@
       (and $ass (env-eval $env (cdr $ass)))))
 
   (define (env-eval $env $syntax)
+    (switch (env-reduce $env $syntax)
+      ((number? $number) $number)
+      ((else _) (syntax-error $syntax))))
+
+  (define (env-reduce $env $syntax)
     (syntax-case $syntax ()
       (($op $arg ...)
-        (apply
-          (case (datum $op)
-            ((+) +)
-            ((-) -)
-            ((*) *)
-            ((shl) shl)
-            ((shr) shr)
-            ((and) band)
-            ((or) bor)
-            ((xor) bxor)
-            (else (syntax-error #'$op "unknown operator")))
-          (map
-            (partial env-eval $env)
-            (syntax->list #'($arg ...)))))
+        (lets
+          ($proc
+            (case (datum $op)
+              ((+) +)
+              ((-) -)
+              ((*) *)
+              ((shl) shl)
+              ((shr) shr)
+              ((and) band)
+              ((or) bor)
+              ((xor) bxor)
+              (else #f)))
+          ($reduced
+            (map
+              (partial env-reduce $env)
+              (syntax->list #'($arg ...))))
+          (or
+            (and $proc (for-all number? $reduced)
+              (apply $proc $reduced))
+            #`(#,#'$op #,@$reduced))))
       ($op
         (switch (datum $op)
           ((number? $number) $number)
-          ((else $other)
-            (or
-              (env-get $env $other)
-              (syntax-error #'$op "undefined")))))
-      (else (syntax-error $syntax))))
+          ((symbol? $symbol)
+            (or (env-get $env $symbol) #'$op))
+          ((else $other) $other)))))
 )
