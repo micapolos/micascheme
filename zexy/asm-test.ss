@@ -358,7 +358,26 @@
       (u8-list->bytevector
         (list $u8s ...)))))
 
+; labels
+
 (check-ops
-  (nop)
-  (ret)
-  (#x0 #xc9))
+  foo
+  bar
+  ())
+
+(check-ops
+  foo (db #x12 #x34)
+  (#x12 #x34))
+
+(check-ops
+  foo (dw foo)
+  bar (dw bar)
+  foo (dw foo)
+  (#x04 #x00 #x02 #x00 #x04 #x00))
+
+(check-ops
+  (org #x1200)
+  foo (dw foo)
+  bar (dw bar)
+  foo (dw foo)
+  (#x04 #x12 #x02 #x12 #x04 #x12))

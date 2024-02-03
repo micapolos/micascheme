@@ -42,6 +42,12 @@
                     (else (syntax-error $syntax))))))
             (asm-stack $asm))))))
 
+  (define (asm+ $asm $syntax $size)
+    (asm
+      (push (asm-stack $asm) $syntax)
+      (nm+ (asm-org $asm) $size)
+      (asm-env $asm)))
+
   (define (asm-u8 $asm $u8)
     (asm
       (push (asm-stack $asm) #`(db #,$u8))
@@ -73,6 +79,8 @@
   (define (asm-op $asm $syntax)
     (or
       (syntax-case $syntax ()
+        ($op (identifier? #'$op)
+          (asm+label $asm (datum $op)))
         (($op $arg ...)
           (lets
             ($proc
@@ -139,6 +147,7 @@
             (asm-aluop1 $asm #'$op #'$arg)
             (asm-rotop1 $asm #'$op #'$arg)
             (case (datum $op)
+              ((org) (asm-org1 $asm #'$arg))
               ((call) (asm-call1 $asm #'$arg))
               ((ret) (asm-ret1 $asm #'$arg))
               ((rst) (asm-rst1 $asm #'$arg))
@@ -186,14 +195,13 @@
         (and $n (asm-u8 $asm $n))
         (and $chr (asm-u8 $asm $chr))
         (and $str (asm-str $asm $str))
-        (syntax-error $arg))))
+        (and $n (asm-u8 $asm $n)))))
 
   (define (asm-dw1 $asm $arg)
-    (lets
-      ($nm (nm $arg))
-      (or
-        (and $nm (asm-u16 $asm $nm))
-        (syntax-error $arg))))
+    (asm+ $asm #`(dw #,$arg) 2))
+
+  (define (asm-org1 $asm $arg)
+    (asm-with-org $asm (env-eval (asm-env $asm) $arg)))
 
   (define (asm-ret1 $asm $arg)
     (lets
