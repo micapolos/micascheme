@@ -226,13 +226,12 @@
 
   (define (asm-db $asm $arg)
     (lets
-      ($n (n $arg))
       ($chr (chr $arg))
       ($str (str $arg))
       (or
-        (and $n (asm-u8 $asm $n))
         (and $chr (asm-u8 $asm $chr))
-        (and $str (asm-str $asm $str)))))
+        (and $str (asm-str $asm $str))
+        (asm+ $asm #`(db #,$arg) 1))))
 
   (define (asm-de $asm $arg)
     (asm+ $asm #`(de #,$arg) 1))
@@ -261,16 +260,17 @@
       ($rhs-rr (rr-sp $rhs))
       (or
         ; 8-bit
-        (and $lhs-r $rhs-r (asm-ld-r-r $asm $lhs-r $rhs-r))
+        (and (== $lhs a) (== $rhs (bc)) (asm-ld-a-ibc $asm))
+        (and (== $lhs a) (== $rhs (de)) (asm-ld-a-ide $asm))
         (and $lhs-r (== $rhs (hl)) (asm-ld-r-ihl $asm $lhs-r))
+
+        (and (== $lhs a) $rhs-i (asm-ld-a-inm $asm $rhs-i))
+        (and $lhs-r $rhs-r (asm-ld-r-r $asm $lhs-r $rhs-r))
         (and $lhs-r (asm-ld-r-n $asm $lhs-r $rhs))
 
         (and (== $lhs (hl)) $rhs-r (asm-ld-ihl-r $asm $rhs-r))
         (and (== $lhs (hl)) (asm-ld-ihl-n $asm $rhs))
 
-        (and (== $lhs a) (== $rhs (bc)) (asm-ld-a-ibc $asm))
-        (and (== $lhs a) (== $rhs (de)) (asm-ld-a-ide $asm))
-        (and (== $lhs a) $rhs-i (asm-ld-a-inm $asm $rhs-i))
         (and (== $lhs (bc)) (== $rhs a) (asm-ld-ibc-a $asm))
         (and (== $lhs (de)) (== $rhs a) (asm-ld-ide-a $asm))
         (and $lhs-i (== $rhs a) (asm-ld-inm-a $asm $lhs-i))
@@ -406,7 +406,6 @@
     (lets
       ($lhs-hl? (== $lhs hl))
       ($rhs-rr (rr-sp $rhs))
-      ($rhs-nm (nm $rhs))
       (or
         (and $lhs-hl? $rhs-rr (asm-add-hl-rr $asm $rhs-rr))
 
@@ -414,9 +413,21 @@
         (and (== $lhs de) (== $rhs a) (asm... $asm #xed #b00110010))
         (and (== $lhs bc) (== $rhs a) (asm... $asm #xed #b00110011))
 
-        (and (== $lhs hl) $rhs-nm (asm... $asm #xed #b00110100 (lsb $rhs-nm) (msb $rhs-nm)))
-        (and (== $lhs de) $rhs-nm (asm... $asm #xed #b00110101 (lsb $rhs-nm) (msb $rhs-nm)))
-        (and (== $lhs bc) $rhs-nm (asm... $asm #xed #b00110110 (lsb $rhs-nm) (msb $rhs-nm))))))
+        (and (== $lhs hl)
+          (fluent $asm
+            (asm-db #xed)
+            (asm-db #b00110100)
+            (asm-dw $rhs)))
+        (and (== $lhs de)
+          (fluent $asm
+            (asm-db #xed)
+            (asm-db #b00110101)
+            (asm-dw $rhs)))
+        (and (== $lhs bc)
+          (fluent $asm
+            (asm-db #xed)
+            (asm-db #b00110110)
+            (asm-dw $rhs))))))
 
   (define (asm-add-hl-rr $asm $rr)
     (asm... $asm (bor #b00001001 (shl $rr 4))))
@@ -449,8 +460,7 @@
   (define (asm-call2 $asm $lhs $rhs)
     (lets
       ($c (c $lhs))
-      ($nm (nm $rhs))
-      (and $nm (asm-call-c-nm $asm $c $nm))))
+      (and $c (asm-call-c-nm $asm $c $rhs))))
 
   (define (asm-call-nm $asm $nm)
     (fluent $asm
@@ -458,7 +468,9 @@
       (asm-dw $nm)))
 
   (define (asm-call-c-nm $asm $c $nm)
-    (asm... $asm (bor #b11000100 (shl $c 3)) (lsb $nm) (msb $nm)))
+    (fluent $asm
+      (asm-db (bor #b11000100 (shl $c 3)))
+      (asm-dw $nm)))
 
   (define (asm-rst1 $asm $arg)
     (lets
@@ -469,26 +481,27 @@
     (asm... $asm (bor #b11000111 $p)))
 
   (define (asm-jp1 $asm $arg)
-    (lets
-      ($nm (nm $arg))
-      (or
-        (and $nm (asm-jp-nm $asm $nm))
-        (and (== $arg (hl)) (asm-jp-ihl $asm)))))
+    (or
+      (and (== $arg (hl)) (asm-jp-ihl $asm))
+      (and (asm-jp-nm $asm $arg))))
 
   (define (asm-jp2 $asm $lhs $rhs)
     (lets
       ($c (c $lhs))
-      ($nm (nm $rhs))
-      (and $nm (asm-jp-c-nm $asm $c $nm))))
+      (and $c (asm-jp-c-nm $asm $c $rhs))))
 
   (define (asm-jp-nm $asm $nm)
-    (asm... $asm #b11000011 (lsb $nm) (msb $nm)))
+    (fluent $asm
+      (asm-db #b11000011)
+      (asm-dw $nm)))
 
   (define (asm-jp-ihl $asm)
     (asm... $asm #b11101001))
 
   (define (asm-jp-c-nm $asm $c $nm)
-    (asm... $asm (bor #b11000010 (shl $c 3)) (lsb $nm) (msb $nm)))
+    (fluent $asm
+      (asm-db (bor #b11000010 (shl $c 3)))
+      (asm-dw $nm)))
 
   (define (asm-djnz1 $asm $arg)
     (asm-djnz-e $asm $arg))
@@ -501,16 +514,18 @@
   (define (asm-push1 $asm $arg)
     (lets
       ($rr (rr-af $arg))
-      ($nm (nm $arg))
       (or
         (and $rr (asm-push-rr $asm $rr))
-        (and $nm (asm-push-nm $asm $nm)))))
+        (asm-push-nm $asm $arg))))
 
   (define (asm-push-rr $asm $rr)
     (asm... $asm (bor #b11000101 (shl $rr 4))))
 
   (define (asm-push-nm $asm $nm)
-    (asm... $asm #xed #x8a (lsb $nm) (msb $nm)))
+    (fluent $asm
+      (asm-db #xed)
+      (asm-db #x8a)
+      (asm-dw $nm)))
 
   (define (asm-pop1 $asm $arg)
     (lets
@@ -556,15 +571,21 @@
 
   (define (asm-out2 $asm $lhs $rhs)
     (lets
-      ($lhs-in (iin $lhs))
+      ($lhs-i (i $lhs))
       ($rhs-r (r $rhs))
       (or
-        (and $lhs-in (== $rhs a)
-          (asm... $asm #xd3 $lhs-in))
         (and (== $lhs (c)) $rhs-r
-          (asm... $asm #xed (bor #b01000001 (shl $rhs-r 3))))
-        (and (== $lhs (c)) (= (n $rhs) 0)
-          (asm... $asm #xed #x71)))))
+          (fluent $asm
+            (asm-db #xed)
+            (asm-db (bor #b01000001 (shl $rhs-r 3)))))
+        (and (== $lhs (c)) (== $rhs 0)
+          (fluent $asm
+            (asm-db #xed)
+            (asm-db #x71)))
+        (and $lhs-i (== $rhs a)
+          (fluent $asm
+            (asm-db #xd3)
+            (asm-db $lhs-i))))))
 
   (define (asm-bitop2 $asm $op $lhs $rhs)
     (lets
@@ -683,20 +704,6 @@
       (and $n
         (zero? (band $n #b11000111))
         $n)))
-
-  (define (nm $syntax)
-    (lets
-      ($datum (syntax->datum $syntax))
-      (and
-        (integer? $datum)
-        (>= $datum #x0000)
-        (<= $datum #xffff)
-        $datum)))
-
-  (define (inm $syntax)
-    (syntax-case $syntax ()
-      (($op) (nm #'$op))
-      (else #f)))
 
   (define (aluop $syntax)
     (case (syntax->datum $syntax)
