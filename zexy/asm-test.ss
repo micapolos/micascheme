@@ -444,13 +444,13 @@
   (db foo)
   (#x12 #x34 #x12))
 
-; === block
+; === define
 
 (check-ops
   (org #x2000)
   (val foo #x12)
   (db foo)
-  (block goo
+  (proc goo
     (val foo #x34)
     (db foo))
   (db foo)

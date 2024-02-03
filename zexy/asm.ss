@@ -75,7 +75,7 @@
         (asm-with-org (asm-org $local-asm))
         (asm-with-imports (asm-imports $local-asm)))))
 
-  (define (asm-block $asm $label $ops)
+  (define (asm-proc $asm $label $ops)
     (fluent $asm
       (asm+label $label)
       (asm-local $ops)))
@@ -155,13 +155,13 @@
         (($local $arg ...)
           (identifier-named? #'$local local)
           (asm-local $asm (syntax->list #'($arg ...))))
-        (($block $arg ...)
-          (identifier-named? #'$block block)
+        (($proc $arg ...)
+          (identifier-named? #'$proc proc)
           (syntax-case #'($arg ...) ()
             (($label $arg ...)
-              (asm-block $asm (label #'$label) (syntax->list #'($arg ...))))
+              (asm-proc $asm (label #'$label) (syntax->list #'($arg ...))))
             (else
-              (syntax-error #'$block "label expected"))))
+              (syntax-error #'$proc "label expected after"))))
         (($op $arg ...)
           (case (datum $op)
             (else
