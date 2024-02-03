@@ -348,6 +348,9 @@
 
 (check-op (swapnib) (#xed #x23))
 
+(check-op (nextreg #x12 a) (#xed #x92 #x12))
+(check-op (nextreg #x12 #x34) (#xed #x91 #x12 #x34))
+
 ; ---------------------------------------------------
 
 (define-syntax-rule (check-ops $syntax ... ($u8s ...))
@@ -390,4 +393,3 @@
   (call foo)
   foo (ret)
   (#xcd #x03 #x12 #xc9))
-

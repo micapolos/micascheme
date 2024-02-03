@@ -211,6 +211,7 @@
               ((ex) (asm-ex2 $asm #'$lhs #'$rhs))
               ((in) (asm-in2 $asm #'$lhs #'$rhs))
               ((out) (asm-out2 $asm #'$lhs #'$rhs))
+              ((nextreg) (asm-nextreg2 $asm #'$lhs #'$rhs))
               (else #f))))
         (else #f))
       (syntax-error $syntax)))
@@ -622,6 +623,19 @@
     (asm... $asm
       #xcb
       (bor (shl $op 3) $r)))
+
+  (define (asm-nextreg2 $asm $lhs $rhs)
+    (or
+      (and (== $rhs a)
+        (fluent $asm
+          (asm-db #xed)
+          (asm-db #x92)
+          (asm-db $lhs)))
+      (fluent $asm
+          (asm-db #xed)
+          (asm-db #x91)
+          (asm-db $lhs)
+          (asm-db $rhs))))
 
   (define (r $syntax)
     (case (syntax->datum $syntax)
