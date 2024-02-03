@@ -562,12 +562,16 @@
   (define (asm-in2 $asm $lhs $rhs)
     (lets
       ($lhs-r (r $lhs))
-      ($rhs-in (iin $rhs))
+      ($rhs-i (i $rhs))
       (or
-        (and (== $lhs a) $rhs-in
-          (asm... $asm #xdb $rhs-in))
         (and $lhs-r (== $rhs (c))
-          (asm... $asm #xed (bor #b01000000 (shl $lhs-r 3)))))))
+          (fluent $asm
+            (asm-db #xed)
+            (asm-db (bor #b01000000 (shl $lhs-r 3)))))
+        (and (== $lhs a) $rhs-i
+          (fluent $asm
+            (asm-db #xdb)
+            (asm-db $rhs-i))))))
 
   (define (asm-out2 $asm $lhs $rhs)
     (lets
@@ -668,23 +672,6 @@
       (($op) #'$op)
       (else #f)))
 
-  (define (n $syntax)
-    (lets
-      ($datum (syntax->datum $syntax))
-      (switch-opt $datum
-        ((integer? $integer)
-          (and
-            (>= $integer -127)
-            (<= $integer 255)
-            (band $integer #xff)))
-        ((char? $char)
-          (lets
-            ($integer (char->integer $char))
-            (and
-              (>= $integer 0)
-              (<= $integer 255)
-              $integer))))))
-
   (define (str $syntax)
     (switch-opt (syntax->datum $syntax)
       ((string? $string) $string)))
@@ -693,17 +680,13 @@
     (switch-opt (syntax->datum $syntax)
       ((char? $char) (char->integer $char))))
 
-  (define (iin $syntax)
-    (syntax-case $syntax ()
-      (($op) (n #'$op))
-      (else #f)))
-
   (define (p $syntax)
     (lets
-      ($n (n $syntax))
-      (and $n
-        (zero? (band $n #b11000111))
-        $n)))
+      ($p (syntax->datum $syntax))
+      (and
+        (integer? $p)
+        (zero? (band $p #b11000111))
+        $p)))
 
   (define (aluop $syntax)
     (case (syntax->datum $syntax)
