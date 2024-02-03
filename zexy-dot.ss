@@ -1,25 +1,33 @@
 (import (zexy))
 
 (compile-zexy "~/nextsync/dot/zexy"
-  (ld a #\z)
-  (rst #x10)
+  (org #x2000)
 
-  (ld a #\e)
-  (rst #x10)
+  (di)
 
-  (ld a #\x)
-  (rst #x10)
+  (val port-ula #xfe)
 
-  (ld a #\y)
-  (rst #x10)
+  (ld hl #xffff)
+  (ld d #b00000010)
 
-  (ld a #\return)
-  (rst #x10)
+loop-hl
+  (ld b h)
+  (inc b)
 
-  (ld a #\>)
-  (rst #x10)
+loop-b
+  (djnz loop-b)
 
-  (ld a #\return)
-  (rst #x10)
+  ; emit border and sound
+  (ld a d)
+  (out (#xfe) a)
+  (xor #b00011111)
+  (ld d a)
+
+  (dec hl)
+  (ld a h)
+  (or l)
+  (jp nz loop-hl)
+
+  (ei)
 
   (ret))

@@ -162,8 +162,8 @@
 (check-op (jp c #x1234) (#b11011010 #x34 #x12))
 (check-op (jp m #x1234) (#b11111010 #x34 #x12))
 
-(check-op (djnz 2) (#b00010000 #x02))
-(check-op (djnz -2) (#b00010000 #xfe))
+(check-op (djnz 2) (#x10 #x02))
+(check-op (djnz -2) (#x10 #xfe))
 
 (check-op (push bc) (#b11000101))
 (check-op (push de) (#b11010101))
@@ -423,3 +423,12 @@
   (call foo)
   foo (ret)
   (#xcd #x03 #x12 #xc9))
+
+(check-ops
+  loop (djnz loop)
+  (#x10 #xfe))
+
+(check-ops
+  (djnz loop)
+  loop
+  (#x10 #x00))

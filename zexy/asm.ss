@@ -237,8 +237,12 @@
         (and $str (asm-str $asm $str))
         (asm+ $asm #`(db #,$arg) 1))))
 
-  (define (asm-de $asm $arg)
-    (asm+ $asm #`(de #,$arg) 1))
+  (define (asm-de $asm $arg $offset)
+    (switch (syntax->datum $arg)
+      ((symbol? $symbol)
+        (asm+ $asm #`(de (- #,$arg #,(asm-org $asm) #,$offset)) 1))
+      ((else $other)
+        (asm+ $asm #`(de #,$arg) 1))))
 
   (define (asm-dw $asm $arg)
     (asm+ $asm #`(dw #,$arg) 2))
@@ -518,7 +522,7 @@
   (define (asm-djnz-e $asm $e)
     (fluent $asm
       (asm-db #x10)
-      (asm-de $e)))
+      (asm-de $e 1)))
 
   (define (asm-push1 $asm $arg)
     (lets
