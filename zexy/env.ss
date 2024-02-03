@@ -50,6 +50,4 @@
               (env-get $env $other)
               (syntax-error #'$op "undefined")))))
       (else (syntax-error $syntax))))
-
-
 )
