@@ -440,3 +440,10 @@
   (import "zexy/asm-test-imported.asm.ss")
   (db bar)
   (#x12 #x34))
+
+(check-ops
+  (val bar #x34)
+  (import "zexy/asm-test-imported.asm.ss")
+  (import "zexy/asm-test-imported.asm.ss")
+  (db bar)
+  (#x12 #x34))

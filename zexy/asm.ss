@@ -16,13 +16,13 @@
     (asm (stack) 0 (empty-env) (stack)))
 
   (define (asm-with-stack $asm $stack)
-    (asm $stack (asm-org $asm) (asm-env $asm) (stack)))
+    (asm $stack (asm-org $asm) (asm-env $asm) (asm-imports $asm)))
 
   (define (asm-with-org $asm $org)
-    (asm (asm-stack $asm) $org (asm-env $asm) (stack)))
+    (asm (asm-stack $asm) $org (asm-env $asm) (asm-imports $asm)))
 
   (define (asm-with-env $asm $env)
-    (asm (asm-stack $asm) (asm-org $asm) $env (stack)))
+    (asm (asm-stack $asm) (asm-org $asm) $env (asm-imports $asm)))
 
   (define (asm-with-imports $asm $imports)
     (asm (asm-stack $asm) (asm-org $asm) (asm-env $asm) $imports))
