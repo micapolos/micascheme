@@ -7,33 +7,62 @@
     asm-ops)
   (import
     (micascheme)
-    (zexy math))
+    (zexy math)
+    (zexy env))
 
-  (data (asm stack org labels))
+  (data (asm stack org env))
 
   (define (empty-asm)
-    (asm (stack) 0 (stack)))
+    (asm (stack) 0 (empty-env)))
 
   (define (asm-with-stack $asm $stack)
-    (asm $stack (asm-org $asm) (asm-labels $asm)))
+    (asm $stack (asm-org $asm) (asm-env $asm)))
 
   (define (asm-with-org $asm $org)
-    (asm (asm-stack $asm) $org (asm-labels $asm)))
+    (asm (asm-stack $asm) $org (asm-env $asm)))
 
-  (define (asm-with-labels $asm $labels)
-    (asm (asm-stack $asm) (asm-org $asm) $labels))
+  (define (asm-with-env $asm $env)
+    (asm (asm-stack $asm) (asm-org $asm) $env))
 
   (define (asm-bytevector $asm)
-    (u8-list->bytevector (reverse (asm-stack $asm))))
+    (u8-list->bytevector
+      (apply append
+        (reverse
+          (map
+            (lambda ($syntax)
+              (syntax-case $syntax ()
+                (($op $value)
+                  (case (datum $op)
+                    ((db)
+                      (list (env-eval (asm-env $asm) #'$value)))
+                    ((dw)
+                      (lets
+                        ($nm (env-eval (asm-env $asm) #'$value))
+                        (list (lsb $nm) (msb $nm))))
+                    (else (syntax-error $syntax))))))
+            (asm-stack $asm))))))
 
   (define (asm-u8 $asm $u8)
-    (asm-with-stack $asm (push (asm-stack $asm) $u8)))
+    (asm
+      (push (asm-stack $asm) #`(db #,$u8))
+      (inc-nm (asm-org $asm))
+      (asm-env $asm)))
+
+  (define (asm-u16 $asm $u16)
+    (asm
+      (push (asm-stack $asm) #`(dw #,$u16))
+      (nm+ (asm-org $asm) 2)
+      (asm-env $asm)))
 
   (define-syntax-rule (asm... $asm $u8 ...)
     (fold-left asm-u8 $asm (list $u8 ...)))
 
-  (define (asm-u16 $asm $u16)
-    (asm... $asm (lsb $u16) (msb $u16)))
+  (define (asm+label $asm $label)
+    (asm-with-env $asm
+      (env-put
+        (asm-env $asm)
+        $label
+        (asm-org $asm))))
 
   (define (asm-str $asm $str)
     (fold-left asm-u8 $asm (bytevector->u8-list (string->utf8 $str))))
