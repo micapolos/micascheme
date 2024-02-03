@@ -27,7 +27,7 @@
   (define (env-get $env $label)
     (lets
       ($ass (assq $label (env-stack $env)))
-      (and $ass (cdr $ass))))
+      (and $ass (env-eval $env (cdr $ass)))))
 
   (define (env-eval $env $syntax)
     (syntax-case $syntax ()

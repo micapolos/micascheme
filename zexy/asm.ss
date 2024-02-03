@@ -102,11 +102,11 @@
     (fold-left asm-u8 $asm (list $u8 ...)))
 
   (define (asm+label $asm $label)
+    (asm-val $asm $label (asm-org $asm)))
+
+  (define (asm-val $asm $label $value)
     (asm-with-env $asm
-      (env-put
-        (asm-env $asm)
-        $label
-        (asm-org $asm))))
+      (env-put (asm-env $asm) $label $value)))
 
   (define (asm-str $asm $str)
     (fold-left asm-u8 $asm (bytevector->u8-list (string->utf8 $str))))
@@ -186,6 +186,7 @@
             (asm-rotop1 $asm #'$op #'$arg)
             (case (datum $op)
               ((org) (asm-org1 $asm #'$arg))
+
               ((call) (asm-call1 $asm #'$arg))
               ((ret) (asm-ret1 $asm #'$arg))
               ((rst) (asm-rst1 $asm #'$arg))
@@ -202,6 +203,8 @@
           (or
             (asm-bitop2 $asm #'$op #'$lhs #'$rhs)
             (case (datum $op)
+              ((val) (asm-val2 $asm #'$lhs #'$rhs))
+
               ((ld) (asm-ld2 $asm #'$lhs #'$rhs))
               ((call) (asm-call2 $asm #'$lhs #'$rhs))
               ((jp) (asm-jp2 $asm #'$lhs #'$rhs))
@@ -242,6 +245,11 @@
 
   (define (asm-org1 $asm $arg)
     (asm-with-org $asm (env-eval (asm-env $asm) $arg)))
+
+  (define (asm-val2 $asm $lhs $rhs)
+    (and
+      (identifier? $lhs)
+      (asm-val $asm (syntax->datum $lhs) $rhs)))
 
   (define (asm-ret1 $asm $arg)
     (lets

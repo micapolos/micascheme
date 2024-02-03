@@ -362,6 +362,36 @@
         (list $u8s ...)))))
 
 (check-ops
+  (val foo #x12)
+  (db foo)
+  (#x12))
+
+(check-ops
+  (val foo #x12)
+  (val bar #x34)
+  (db (+ foo bar))
+  (#x46))
+
+(check-ops
+  (val foo #x12)
+  (val bar #x34)
+  (val goo (+ foo bar))
+  (db goo)
+  (#x46))
+
+(check-ops
+  (val foo #x12)
+  (val bar #x34)
+  (db (+ foo bar))
+  (#x46))
+
+(check-ops
+  (val foo #x12)
+  (val bar #x34)
+  (dw (+ foo bar))
+  (#x46 #x00))
+
+(check-ops
   foo
   bar
   ())
