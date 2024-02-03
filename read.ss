@@ -1,5 +1,6 @@
 (library (read)
   (export
+    path-source-file-descriptor
     load-syntax-list)
   (import
     (scheme)
@@ -15,12 +16,21 @@
         ((else $syntax)
           (push-read-syntax (push $stack $syntax) $port $sfd $pos)))))
 
-  (define (load-syntax-list $path)
+  (define (path-source-file-descriptor $path)
     (lets
       ($binary-port (open-file-input-port $path))
-      ($sfd (make-source-file-descriptor $path $binary-port))
-      (_ (close-port $binary-port))
-      (call-with-input-file $path
-        (lambda ($port)
-          (reverse (push-read-syntax (stack) $port $sfd 0))))))
+      (dynamic-wind
+        (lambda () #f)
+        (lambda () (make-source-file-descriptor $path $binary-port))
+        (lambda () (close-port $binary-port)))))
+
+  (define (load-syntax-list $path)
+    (call-with-input-file $path
+      (lambda ($port)
+        (reverse
+          (push-read-syntax
+            (stack)
+            $port
+            (path-source-file-descriptor $path)
+            0)))))
 )

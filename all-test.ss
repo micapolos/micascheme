@@ -33,6 +33,7 @@
   (proof)
   (proven)
   (random)
+  (read)
   (seq)
   (sequential-syntax)
   (sequential)
