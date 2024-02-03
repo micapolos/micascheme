@@ -432,3 +432,11 @@
   (djnz loop)
   loop
   (#x10 #x00))
+
+; import
+
+(check-ops
+  (val bar #x34)
+  (import "zexy/asm-test-imported.asm.ss")
+  (db bar)
+  (#x12 #x34))

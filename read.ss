@@ -14,7 +14,7 @@
       (switch $obj
         ((eof-object? _) $stack)
         ((else $syntax)
-          (push-read-syntax (push $stack $syntax) $port $sfd $pos)))))
+          (push-read-syntax (push $stack (datum->syntax #'+ $syntax)) $port $sfd $pos)))))
 
   (define (path-source-file-descriptor $path)
     (lets

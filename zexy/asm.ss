@@ -24,8 +24,11 @@
   (define (asm-with-env $asm $env)
     (asm (asm-stack $asm) (asm-org $asm) $env (stack)))
 
-  (define (asm-with-imports $asm $env $imports)
-    (asm (asm-stack $asm) (asm-org $asm) (asm-env $env) $imports))
+  (define (asm-with-imports $asm $imports)
+    (asm (asm-stack $asm) (asm-org $asm) (asm-env $asm) $imports))
+
+  (define (asm+bytevector $asm $bytevector)
+    (fold-left asm-u8 $asm (bytevector->u8-list $bytevector)))
 
   (define (asm-bytevector $asm)
     (u8-list->bytevector
@@ -126,6 +129,7 @@
                 ((defb db) asm-db...)
                 ((defw dw) asm-dw...)
                 ((defw dz) asm-dz...)
+                ((import) asm-import...)
                 (else #f)))
             (and $proc
               (apply $proc
@@ -228,6 +232,9 @@
   (define (asm-dw... $asm . $args)
     (fold-left asm-dw $asm $args))
 
+  (define (asm-import... $asm . $args)
+    (fold-left asm-import1 $asm $args))
+
   (define (asm-db $asm $arg)
     (lets
       ($chr (chr $arg))
@@ -246,6 +253,22 @@
 
   (define (asm-dw $asm $arg)
     (asm+ $asm #`(dw #,$arg) 2))
+
+  (define (asm-import1 $asm $arg)
+    (switch (syntax->datum $arg)
+      ((string? $string)
+        (asm-import $asm $string))
+      ((else $other)
+        (syntax-error $arg "invalid import"))))
+
+  (define (asm-import $asm $path)
+    (cond
+      ((member $path (asm-imports $asm)) $asm)
+      (else
+        (asm-ops
+          (asm-with-imports $asm
+            (push (asm-imports $asm) $path))
+          (load-syntax-list $path)))))
 
   (define (asm-org1 $asm $arg)
     (asm-with-org $asm (env-eval (asm-env $asm) $arg)))
