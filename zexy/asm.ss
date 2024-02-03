@@ -9,16 +9,25 @@
     (micascheme)
     (zexy math))
 
-  (data (asm stack))
+  (data (asm stack org labels))
 
   (define (empty-asm)
-    (asm (stack)))
+    (asm (stack) 0 (stack)))
+
+  (define (asm-with-stack $asm $stack)
+    (asm $stack (asm-org $asm) (asm-labels $asm)))
+
+  (define (asm-with-org $asm $org)
+    (asm (asm-stack $asm) $org (asm-labels $asm)))
+
+  (define (asm-with-labels $asm $labels)
+    (asm (asm-stack $asm) (asm-org $asm) $labels))
 
   (define (asm-bytevector $asm)
     (u8-list->bytevector (reverse (asm-stack $asm))))
 
   (define (asm-u8 $asm $u8)
-    (asm (push (asm-stack $asm) $u8)))
+    (asm-with-stack $asm (push (asm-stack $asm) $u8)))
 
   (define-syntax-rule (asm... $asm $u8 ...)
     (fold-left asm-u8 $asm (list $u8 ...)))
