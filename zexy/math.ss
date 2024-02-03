@@ -1,7 +1,8 @@
 (library (zexy math)
-  (export band bor shl shr msb lsb inc-nm nm+)
+  (export band bxor bor shl shr msb lsb inc-nm nm+)
   (import (micascheme))
 
+  (define-syntax bxor (identifier-syntax bitwise-xor))
   (define-syntax bor (identifier-syntax bitwise-ior))
   (define-syntax band (identifier-syntax bitwise-and))
   (define-syntax shl (identifier-syntax bitwise-arithmetic-shift-left))

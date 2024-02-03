@@ -38,6 +38,10 @@
             ((-) -)
             ((*) *)
             ((shl) shl)
+            ((shr) shr)
+            ((and) band)
+            ((or) bor)
+            ((xor) bxor)
             (else (syntax-error #'$op "unknown operator")))
           (map
             (partial env-eval $env)
