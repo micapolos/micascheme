@@ -75,6 +75,11 @@
         (asm-with-org (asm-org $local-asm))
         (asm-with-imports (asm-imports $local-asm)))))
 
+  (define (asm-block $asm $label $ops)
+    (fluent $asm
+      (asm+label $label)
+      (asm-local $ops)))
+
   (define (asm-eval $asm $syntax)
     (env-eval (asm-env $asm) $syntax))
 
@@ -150,6 +155,13 @@
         (($local $arg ...)
           (identifier-named? #'$local local)
           (asm-local $asm (syntax->list #'($arg ...))))
+        (($block $arg ...)
+          (identifier-named? #'$block block)
+          (syntax-case #'($arg ...) ()
+            (($label $arg ...)
+              (asm-block $asm (label #'$label) (syntax->list #'($arg ...))))
+            (else
+              (syntax-error #'$block "label expected"))))
         (($op $arg ...)
           (case (datum $op)
             (else
@@ -750,6 +762,11 @@
     (syntax-case $syntax ()
       (($op) #'$op)
       (else #f)))
+
+  (define (label $syntax)
+    (switch (syntax->datum $syntax)
+      ((symbol? $symbol) $symbol)
+      ((else _) (syntax-error $syntax "invalid label"))))
 
   (define (str $syntax)
     (switch-opt (syntax->datum $syntax)

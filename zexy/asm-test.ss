@@ -444,6 +444,19 @@
   (db foo)
   (#x12 #x34 #x12))
 
+; === block
+
+(check-ops
+  (org #x2000)
+  (val foo #x12)
+  (db foo)
+  (block goo
+    (val foo #x34)
+    (db foo))
+  (db foo)
+  (dw goo)
+  (#x12 #x34 #x12 #x01 #x20))
+
 ; import
 
 (check-ops
