@@ -1,6 +1,13 @@
 (library (zexy next)
   (export
-    make-next next? next-mmus next-banks
+    make-next next?
+    next-z80
+    next-mmus
+    next-banks
+
+    next-run
+
+    next-bank
     next-rd next-wr
     next-in next-out
 
@@ -8,14 +15,20 @@
     next-print
     next-println)
   (import
-    (zexy base))
+    (zexy base)
+    (zexy z80))
+
 
   (define-record next () (
+    ((immutable z80) (make-z80))
     ((immutable mmus) (make-bytevector 8))
     ((immutable banks) (build-immutable-vector #x100 make-bank))))
 
   (define (make-bank $index)
     (make-bytevector #x2000))
+
+  (define (next-bank $next $index)
+    (vector-ref (next-banks $next) $index))
 
   (define (next-rd $next $addr)
     (bytevector-u8-ref
@@ -54,4 +67,11 @@
   (define (next-println $next $string)
     (next-print $next $string)
     (next-print-char $next #\newline))
+
+  (define (next-run $next)
+    (z80-run (next-z80 $next)
+      (partial next-rd $next)
+      (partial next-wr $next)
+      (partial next-in $next)
+      (partial next-out $next)))
 )

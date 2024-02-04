@@ -32,7 +32,7 @@
       (unsigned-16 ix)
       (unsigned-16 iy)))
 
-  (define (z80-run $z80 $mem $in $out)
+  (define (z80-run $z80 $rd $wr $in $out)
     (define-syntax-rule (define-macro $params $body ...)
       (define-syntax-rule $params
         (begin $body ...)))
@@ -74,15 +74,9 @@
         (set! $h $n)
         (set! $l $m)))
 
-    (define-macro (mem $addr)
-      (bytevector-u8-ref $mem $addr))
-
-    (define-macro (mem! $addr $value)
-      (bytevector-u8-set! $mem $addr $value))
-
     (define-macro (fetch)
       (let ()
-        (define $value (mem $pc))
+        (define $value ($rd $pc))
         (set! $pc (fxand (fx+ $pc 1) #xffff))
         $value))
 
@@ -96,13 +90,13 @@
       (set! $r (fetch)))
 
     (define-macro (ld-r-ihl $r)
-      (set! $r (mem (rr $h $l))))
+      (set! $r ($rd (rr $h $l))))
 
     (define-macro (ld-ihl-r $r)
-      (mem! (rr $h $l) $r))
+      ($wr (rr $h $l) $r))
 
     (define-macro (ld-ihl-n)
-      (mem! (rr $h $l) (fetch)))
+      ($wr (rr $h $l) (fetch)))
 
     (define-macro (ld-rr-nm $h $l)
       (set! $l (fetch))

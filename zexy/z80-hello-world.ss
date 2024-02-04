@@ -3,6 +3,8 @@
 (lets
   ($z80 (make-z80))
   ($mem (make-bytevector #x10000))
+  ($rd (partial bytevector-u8-ref $mem))
+  ($wr (partial bytevector-u8-set! $mem))
   ($in (lambda ($addr) 0))
   ($out
     (lambda ($addr $byte)
@@ -34,5 +36,5 @@
 
       (halt))
 
-    (z80-run $z80 $mem $in $out))
+    (z80-run $z80 $rd $wr $in $out))
   )
