@@ -8,6 +8,8 @@
 
     next-run
 
+    next-mmu next-mmu!
+
     next-bank
     next-rd next-wr
     next-in next-out
@@ -22,15 +24,21 @@
 
   (define-record next () (
     ((immutable z80) (make-z80))
-    ((immutable mmus) (make-bytevector 8))
+    ((immutable mmus) (make-bytevector 8 0))
     ((immutable banks) (build-immutable-vector #x100 make-bank))
     ((mutable char-stack) (stack))))
 
   (define (make-bank $index)
-    (make-bytevector #x2000))
+    (make-bytevector #x2000 0))
 
   (define (next-bank $next $index)
     (vector-ref (next-banks $next) $index))
+
+  (define (next-mmu $next $slot)
+    (bytevector-u8-ref (next-mmus $next) $slot))
+
+  (define (next-mmu! $next $slot $bank)
+    (bytevector-u8-set! (next-mmus $next) $slot $bank))
 
   (define (next-rd $next $addr)
     (bytevector-u8-ref
