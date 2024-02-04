@@ -3,6 +3,7 @@
 (test
   (boolean)
   (binder)
+  (case)
   (check)
   (compiler)
   (current)
