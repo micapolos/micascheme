@@ -34,6 +34,9 @@
       (unsigned-16 iy)))
 
   (define (z80-run $z80 $mem $in $out)
+    (define-syntax-rule (define-macro $body ...)
+      (define-syntax-rule $body ...))
+
     (define $a (z80-a $z80))
     (define $f (z80-f $z80))
     (define $b (z80-b $z80))
@@ -63,6 +66,11 @@
 
     (define $halt? #f)
 
+    (define-macro (fetch-op)
+      (begin
+        (set! $op (mem-ref $mem $pc))
+        (set! $pc (fx+ $pc 1))))
+
     (do ()
       ($halt?
         (set-z80-a! $z80 $a)
@@ -88,7 +96,7 @@
         (set-z80-ix! $z80 $ix)
         (set-z80-iy! $z80 $iy))
 
-      (fetch-op $op $mem $pc)
+      (fetch-op)
 
       (case $op
         ((#x00) (nop))
@@ -181,7 +189,7 @@
         ((#x7f) (ld-r-r $a $a))
 
         ((#xed)
-          (fetch-op $op $mem $pc)
+          (fetch-op)
 
           (case $op
             ((#x41) (out-c-r $out $b $c $b))
