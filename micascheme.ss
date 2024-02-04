@@ -35,7 +35,8 @@
     (system)
     (test)
     (throw)
-    (variable))
+    (variable)
+    (vector))
 
   (export
     cons
@@ -73,5 +74,6 @@
       (system)
       (test)
       (throw)
-      (variable)))
+      (variable)
+      (vector)))
 )

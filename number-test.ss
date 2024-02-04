@@ -12,3 +12,12 @@
 
 (check (one? 1))
 (check (not (one? 0)))
+
+(check
+  (equal?
+    (iterate-indexed
+      (lambda ($list $index)
+        (cons (* $index 10) $list))
+      (list 'end)
+      5)
+    (list 40 30 20 10 0 'end)))

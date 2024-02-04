@@ -49,6 +49,7 @@
   (typed)
   (value)
   (variable)
+  (vector)
   (writer)
   (writing)
   (z80)

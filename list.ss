@@ -21,6 +21,7 @@
     indexed-find
     intercalate
     null
+    build-list
 
     flatten)
 
@@ -202,4 +203,12 @@
 
   (define (intercalate $list $item)
     (reverse (push-intercalated (stack) $item $list)))
+
+  (define (build-list $size $proc)
+    (reverse
+      (iterate-indexed
+        (lambda ($list $index)
+          (cons ($proc $index) $list))
+        (list)
+        $size)))
 )
