@@ -21,7 +21,9 @@
       (ld a #\l) (out (c) a)
       (ld a #\o) (out (c) a)
       (ld a #\,) (out (c) a)
+
       (ld a #\space) (out (c) a)
+
       (ld a #\w) (out (c) a)
       (ld a #\o) (out (c) a)
       (ld a #\r) (out (c) a)
