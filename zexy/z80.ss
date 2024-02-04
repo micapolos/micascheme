@@ -104,7 +104,8 @@
 
     (define-macro (ld-rr-nm $h $l)
       (fetch $m $n)
-      (rr-set-nm! $h $l))
+      (set! $h $n)
+      (set! $l $m))
 
     (define-macro (ld-sp-nm)
       (fetch $m $n)

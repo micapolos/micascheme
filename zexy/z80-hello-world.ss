@@ -34,6 +34,5 @@
 
       (halt))
 
-    (time
-      (z80-run $z80 $mem $in $out)))
+    (z80-run $z80 $mem $in $out))
   )
