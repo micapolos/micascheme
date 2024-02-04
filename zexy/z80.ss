@@ -90,13 +90,19 @@
 
       (case $op
         ((#x00) (nop))
-
+        ((#x01) (ld-rr-nm $b $c $n $m $mem $pc))
         ((#x06) (ld-r-n $b $n $mem $pc))
         ((#x0e) (ld-r-n $c $n $mem $pc))
+
+        ((#x11) (ld-rr-nm $d $e $n $m $mem $pc))
         ((#x16) (ld-r-n $d $n $mem $pc))
         ((#x1e) (ld-r-n $e $n $mem $pc))
+
+        ((#x21) (ld-rr-nm $h $l $n $m $mem $pc))
         ((#x26) (ld-r-n $h $n $mem $pc))
         ((#x2e) (ld-r-n $l $n $mem $pc))
+
+        ((#x31) (ld-sp-nm $sp $n $m $mem $pc))
         ((#x36) (ld-ihl-n $h $l $n $mem $pc))
         ((#x3e) (ld-r-n $a $n $mem $pc))
 
@@ -204,6 +210,11 @@
       (set! $m (mem-ref $mem $pc))
       (set! $pc (fxand (fx+ $pc 1) #xffff))))
 
+  (define-syntax-rule (fetch-nm $n $m $mem $pc)
+    (begin
+      (fetch-m $m $mem $pc)
+      (fetch-n $n $mem $pc)))
+
   (define-syntax-rule (nop)
     (void))
 
@@ -227,6 +238,17 @@
       (fetch-n $n $mem $pc)
       (mem-set! $mem (nm $h $l) $n)))
 
+  (define-syntax-rule (ld-rr-nm $h $l $n $m $mem $pc)
+    (begin
+      (fetch-nm $n $m $mem $pc)
+      (rr-set-nm! $h $l $n $m)))
+
+  (define-syntax-rule (ld-sp-nm $sp $n $m $mem $pc)
+    (begin
+      (fetch-n $m $mem $pc)
+      (fetch-m $n $mem $pc)
+      (set! $sp (nm $n $m))))
+
   (define-syntax-rule (out-c-r $out $b $c $r)
     ($out (nm $b $c) $r))
 
@@ -238,4 +260,9 @@
 
   (define-syntax-rule (mem-set! $mem $addr $value)
     (bytevector-u8-set! $mem $addr $value))
+
+  (define-syntax-rule (rr-set-nm! $h $l $n $m)
+    (begin
+      (set! $h $n)
+      (set! $l $m)))
 )

@@ -12,8 +12,7 @@
 
   (run
     (assemble $mem
-      (ld b #x11)
-      (ld c #x3b)
+      (ld bc #x113b)
 
       (ld a #\H) (out (c) a)
       (ld a #\e) (out (c) a)
@@ -35,5 +34,6 @@
 
       (halt))
 
-    (z80-run $z80 $mem $in $out))
+    (time
+      (z80-run $z80 $mem $in $out)))
   )
