@@ -4,6 +4,7 @@
     next-z80
     next-mmus
     next-banks
+    next-string
 
     next-run
 
@@ -22,7 +23,8 @@
   (define-record next () (
     ((immutable z80) (make-z80))
     ((immutable mmus) (make-bytevector 8))
-    ((immutable banks) (build-immutable-vector #x100 make-bank))))
+    ((immutable banks) (build-immutable-vector #x100 make-bank))
+    ((mutable char-stack) (stack))))
 
   (define (make-bank $index)
     (make-bytevector #x2000))
@@ -55,7 +57,9 @@
   (define (next-out $next $addr $u8)
     (case $addr
       ; I2C SDA line
-      ((#x113B) (display (integer->char $u8)))
+      ((#x113B)
+        (set-next-char-stack! $next
+          (push (next-char-stack $next) (integer->char $u8))))
       (else (void))))
 
   (define (next-print-char $next $char)
@@ -74,4 +78,7 @@
       (partial next-wr $next)
       (partial next-in $next)
       (partial next-out $next)))
+
+  (define (next-string $next)
+    (list->string (reverse (next-char-stack $next))))
 )
