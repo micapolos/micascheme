@@ -50,8 +50,9 @@
     (define-macro (pc! v) (set-z80-a! z80 v))
     (define-macro (sp! v) (set-z80-sp! z80 v))
 
-    (define-macro (rr h l) (fxior (fxsll (h) 8) (l)))
+    (define-macro (rr h l) (nm (h) (l)))
 
+    (define-macro (nm h l) (fxior (fxsll h 8) h))
     (define-macro (lsb nm) (fxand nm #xff))
     (define-macro (msb nm) (fxsrl nm 8))
 
