@@ -4,13 +4,24 @@
     empty-asm
     asm-bytevector
     asm-op
-    asm-ops)
+    asm-ops
+    assemble)
   (import
     (micascheme)
     (zexy math)
     (zexy env))
 
   (data (asm stack org env imports))
+
+  (define-syntax-rule (assemble $mem $op ...)
+    (lets
+      ($vec
+        (asm-bytevector
+          (asm-ops
+            (empty-asm)
+            (list (syntax $op) ...))))
+      (run
+        (bytevector-copy! $vec 0 $mem 0 (bytevector-length $vec)))))
 
   (define (empty-asm)
     (asm (stack) 0 (empty-env) (stack)))
