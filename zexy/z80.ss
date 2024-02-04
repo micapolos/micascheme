@@ -80,17 +80,20 @@
     (define-macro (mem! $addr $value)
       (bytevector-u8-set! $mem $addr $value))
 
-    (define-macro (fetch $lhs ...)
-      (begin
-        (set! $lhs (mem $pc))
-        (set! $pc (fx+ $pc 1))) ...)
+    (define-macro (fetch)
+      (let ()
+        (define $value (mem $pc))
+        (set! $pc (fxand (fx+ $pc 1) #xffff))
+        $value))
+
+    (define-macro (fetch-nm)
+      (fxior (fetch) (fxsll (fetch) 8)))
 
     (define-macro (ld-r-r $lhs $rhs)
       (set! $lhs $rhs))
 
     (define-macro (ld-r-n $r)
-      (fetch $n)
-      (set! $r $n))
+      (set! $r (fetch)))
 
     (define-macro (ld-r-ihl $r)
       (set! $r (mem (rr $h $l))))
@@ -99,17 +102,14 @@
       (mem! (rr $h $l) $r))
 
     (define-macro (ld-ihl-n)
-      (fetch $n)
-      (mem! (rr $h $l) $n))
+      (mem! (rr $h $l) (fetch)))
 
     (define-macro (ld-rr-nm $h $l)
-      (fetch $m $n)
-      (set! $h $n)
-      (set! $l $m))
+      (set! $l (fetch))
+      (set! $h (fetch)))
 
     (define-macro (ld-sp-nm)
-      (fetch $m $n)
-      (set! $sp (rr $n $m)))
+      (set! $sp (fetch-nm)))
 
     (define-macro (out-c-r $r)
       ($out (rr $b $c) $r))
@@ -139,9 +139,7 @@
         (set-z80-ix! $z80 $ix)
         (set-z80-iy! $z80 $iy))
 
-      (fetch $op)
-
-      (case $op
+      (case (fetch)
         ((#x00) (void))
         ((#x01) (ld-rr-nm $b $c))
         ((#x06) (ld-r-n $b))
@@ -232,9 +230,7 @@
         ((#x7f) (ld-r-r $a $a))
 
         ((#xed)
-          (fetch $op)
-
-          (case $op
+          (case (fetch)
             ((#x41) (out-c-r $b))
             ((#x49) (out-c-r $c))
             ((#x51) (out-c-r $d))
