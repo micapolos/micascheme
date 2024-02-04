@@ -1,8 +1,7 @@
 (library (zexy z80)
   (export
     z80 z80? make-z80
-    z80-run
-    mem-ref mem-set!)
+    z80-run)
   (import
     (except (micascheme) define)
     (only (scheme) define)
@@ -34,8 +33,9 @@
       (unsigned-16 iy)))
 
   (define (z80-run $z80 $mem $in $out)
-    (define-syntax-rule (define-macro $body ...)
-      (define-syntax-rule $body ...))
+    (define-syntax-rule (define-macro $params $body ...)
+      (define-syntax-rule $params
+        (begin $body ...)))
 
     (define $a (z80-a $z80))
     (define $f (z80-f $z80))
@@ -66,10 +66,52 @@
 
     (define $halt? #f)
 
-    (define-macro (fetch-op)
+    (define-macro (rr $h $l)
+      (fxior (fxsll $h 8) $l))
+
+    (define-macro (rr-set-nm! $h $l)
       (begin
-        (set! $op (mem-ref $mem $pc))
-        (set! $pc (fx+ $pc 1))))
+        (set! $h $n)
+        (set! $l $m)))
+
+    (define-macro (mem $addr)
+      (bytevector-u8-ref $mem $addr))
+
+    (define-macro (mem! $addr $value)
+      (bytevector-u8-set! $mem $addr $value))
+
+    (define-macro (fetch $lhs ...)
+      (begin
+        (set! $lhs (mem $pc))
+        (set! $pc (fx+ $pc 1))) ...)
+
+    (define-macro (ld-r-r $lhs $rhs)
+      (set! $lhs $rhs))
+
+    (define-macro (ld-r-n $r)
+      (fetch $n)
+      (set! $r $n))
+
+    (define-macro (ld-r-ihl $r)
+      (set! $r (mem (rr $h $l))))
+
+    (define-macro (ld-ihl-r $r)
+      (mem! (rr $h $l) $r))
+
+    (define-macro (ld-ihl-n)
+      (fetch $n)
+      (mem! (rr $h $l) $n))
+
+    (define-macro (ld-rr-nm $h $l)
+      (fetch $m $n)
+      (rr-set-nm! $h $l))
+
+    (define-macro (ld-sp-nm)
+      (fetch $m $n)
+      (set! $sp (rr $n $m)))
+
+    (define-macro (out-c-r $r)
+      ($out (rr $b $c) $r))
 
     (do ()
       ($halt?
@@ -96,25 +138,25 @@
         (set-z80-ix! $z80 $ix)
         (set-z80-iy! $z80 $iy))
 
-      (fetch-op)
+      (fetch $op)
 
       (case $op
-        ((#x00) (nop))
-        ((#x01) (ld-rr-nm $b $c $n $m $mem $pc))
-        ((#x06) (ld-r-n $b $n $mem $pc))
-        ((#x0e) (ld-r-n $c $n $mem $pc))
+        ((#x00) (void))
+        ((#x01) (ld-rr-nm $b $c))
+        ((#x06) (ld-r-n $b))
+        ((#x0e) (ld-r-n $c))
 
-        ((#x11) (ld-rr-nm $d $e $n $m $mem $pc))
-        ((#x16) (ld-r-n $d $n $mem $pc))
-        ((#x1e) (ld-r-n $e $n $mem $pc))
+        ((#x11) (ld-rr-nm $d $e))
+        ((#x16) (ld-r-n $d))
+        ((#x1e) (ld-r-n $e))
 
-        ((#x21) (ld-rr-nm $h $l $n $m $mem $pc))
-        ((#x26) (ld-r-n $h $n $mem $pc))
-        ((#x2e) (ld-r-n $l $n $mem $pc))
+        ((#x21) (ld-rr-nm $h $l))
+        ((#x26) (ld-r-n $h))
+        ((#x2e) (ld-r-n $l))
 
-        ((#x31) (ld-sp-nm $sp $n $m $mem $pc))
-        ((#x36) (ld-ihl-n $h $l $n $mem $pc))
-        ((#x3e) (ld-r-n $a $n $mem $pc))
+        ((#x31) (ld-sp-nm))
+        ((#x36) (ld-ihl-n))
+        ((#x3e) (ld-r-n $a))
 
         ((#x40) (ld-r-r $b $b))
         ((#x41) (ld-r-r $b $c))
@@ -122,7 +164,7 @@
         ((#x43) (ld-r-r $b $e))
         ((#x44) (ld-r-r $b $h))
         ((#x45) (ld-r-r $b $l))
-        ((#x46) (ld-r-ihl $b $mem $h $l))
+        ((#x46) (ld-r-ihl $b))
         ((#x47) (ld-r-r $b $a))
 
         ((#x48) (ld-r-r $c $b))
@@ -131,7 +173,7 @@
         ((#x4b) (ld-r-r $c $e))
         ((#x4c) (ld-r-r $c $h))
         ((#x4d) (ld-r-r $c $l))
-        ((#x4e) (ld-r-ihl $c $mem $h $l))
+        ((#x4e) (ld-r-ihl $c))
         ((#x4f) (ld-r-r $c $a))
 
         ((#x50) (ld-r-r $d $b))
@@ -140,7 +182,7 @@
         ((#x53) (ld-r-r $d $e))
         ((#x54) (ld-r-r $d $h))
         ((#x55) (ld-r-r $d $l))
-        ((#x56) (ld-r-ihl $d $mem $h $l))
+        ((#x56) (ld-r-ihl $d))
         ((#x57) (ld-r-r $d $a))
 
         ((#x58) (ld-r-r $e $b))
@@ -149,7 +191,7 @@
         ((#x5b) (ld-r-r $e $e))
         ((#x5c) (ld-r-r $e $h))
         ((#x5d) (ld-r-r $e $l))
-        ((#x5e) (ld-r-ihl $e $mem $h $l))
+        ((#x5e) (ld-r-ihl $e))
         ((#x5f) (ld-r-r $e $a))
 
         ((#x60) (ld-r-r $h $b))
@@ -158,7 +200,7 @@
         ((#x63) (ld-r-r $h $e))
         ((#x64) (ld-r-r $h $h))
         ((#x65) (ld-r-r $h $l))
-        ((#x66) (ld-r-ihl $h $mem $h $l))
+        ((#x66) (ld-r-ihl $h))
         ((#x67) (ld-r-r $h $a))
 
         ((#x68) (ld-r-r $l $b))
@@ -167,17 +209,17 @@
         ((#x6b) (ld-r-r $l $e))
         ((#x6c) (ld-r-r $l $h))
         ((#x6d) (ld-r-r $l $l))
-        ((#x6e) (ld-r-ihl $l $mem $h $l))
+        ((#x6e) (ld-r-ihl $l))
         ((#x6f) (ld-r-r $l $a))
 
-        ((#x70) (ld-ihl-r $mem $h $l $b))
-        ((#x71) (ld-ihl-r $mem $h $l $c))
-        ((#x72) (ld-ihl-r $mem $h $l $d))
-        ((#x73) (ld-ihl-r $mem $h $l $e))
-        ((#x74) (ld-ihl-r $mem $h $l $h))
-        ((#x75) (ld-ihl-r $mem $h $l $l))
+        ((#x70) (ld-ihl-r $b))
+        ((#x71) (ld-ihl-r $c))
+        ((#x72) (ld-ihl-r $d))
+        ((#x73) (ld-ihl-r $e))
+        ((#x74) (ld-ihl-r $h))
+        ((#x75) (ld-ihl-r $l))
         ((#x76) (set! $halt? #t))
-        ((#x77) (ld-ihl-r $mem $h $l $a))
+        ((#x77) (ld-ihl-r $a))
 
         ((#x78) (ld-r-r $a $b))
         ((#x79) (ld-r-r $a $c))
@@ -185,94 +227,23 @@
         ((#x7b) (ld-r-r $a $e))
         ((#x7c) (ld-r-r $a $h))
         ((#x7d) (ld-r-r $a $l))
-        ((#x7e) (ld-r-ihl $a $mem $h $l))
+        ((#x7e) (ld-r-ihl $a))
         ((#x7f) (ld-r-r $a $a))
 
         ((#xed)
-          (fetch-op)
+          (fetch $op)
 
           (case $op
-            ((#x41) (out-c-r $out $b $c $b))
-            ((#x49) (out-c-r $out $b $c $c))
-            ((#x51) (out-c-r $out $b $c $d))
-            ((#x59) (out-c-r $out $b $c $e))
-            ((#x61) (out-c-r $out $b $c $h))
-            ((#x69) (out-c-r $out $b $c $l))
-            ((#x71) (out-c-r $out $b $c 0))
-            ((#x79) (out-c-r $out $b $c $a))
+            ((#x41) (out-c-r $b))
+            ((#x49) (out-c-r $c))
+            ((#x51) (out-c-r $d))
+            ((#x59) (out-c-r $e))
+            ((#x61) (out-c-r $h))
+            ((#x69) (out-c-r $l))
+            ((#x71) (out-c-r 0))
+            ((#x79) (out-c-r $a))
             (else (throw illegal-ed-op $op))))
 
         (else (throw illegal-op $op))
       )))
-
-  (define-syntax-rule (fetch-op $op $mem $pc)
-    (begin
-      (set! $op (mem-ref $mem $pc))
-      (set! $pc (fx+ $pc 1))))
-
-  (define-syntax-rule (fetch-n $n $mem $pc)
-    (begin
-      (set! $n (mem-ref $mem $pc))
-      (set! $pc (fxand (fx+ $pc 1) #xffff))))
-
-  (define-syntax-rule (fetch-m $m $mem $pc)
-    (begin
-      (set! $m (mem-ref $mem $pc))
-      (set! $pc (fxand (fx+ $pc 1) #xffff))))
-
-  (define-syntax-rule (fetch-nm $n $m $mem $pc)
-    (begin
-      (fetch-m $m $mem $pc)
-      (fetch-n $n $mem $pc)))
-
-  (define-syntax-rule (nop)
-    (void))
-
-  (define-syntax-rule (ld-r-r $r1 $r2)
-    (begin
-      (set! $r1 $r2)))
-
-  (define-syntax-rule (ld-r-n $r $n $mem $pc)
-    (begin
-      (fetch-n $n $mem $pc)
-      (set! $r $n)))
-
-  (define-syntax-rule (ld-r-ihl $r $mem $h $l)
-    (set! $r (mem-ref $mem (nm $h $l))))
-
-  (define-syntax-rule (ld-ihl-r $mem $h $l $r)
-    (mem-set! $mem (nm $h $l) $r))
-
-  (define-syntax-rule (ld-ihl-n $h $l $n $mem $pc)
-    (begin
-      (fetch-n $n $mem $pc)
-      (mem-set! $mem (nm $h $l) $n)))
-
-  (define-syntax-rule (ld-rr-nm $h $l $n $m $mem $pc)
-    (begin
-      (fetch-nm $n $m $mem $pc)
-      (rr-set-nm! $h $l $n $m)))
-
-  (define-syntax-rule (ld-sp-nm $sp $n $m $mem $pc)
-    (begin
-      (fetch-n $m $mem $pc)
-      (fetch-m $n $mem $pc)
-      (set! $sp (nm $n $m))))
-
-  (define-syntax-rule (out-c-r $out $b $c $r)
-    ($out (nm $b $c) $r))
-
-  (define-syntax-rule (nm $n $m)
-    (fxior (fxsll $n 8) $m))
-
-  (define-syntax-rule (mem-ref $mem $addr)
-    (bytevector-u8-ref $mem $addr))
-
-  (define-syntax-rule (mem-set! $mem $addr $value)
-    (bytevector-u8-set! $mem $addr $value))
-
-  (define-syntax-rule (rr-set-nm! $h $l $n $m)
-    (begin
-      (set! $h $n)
-      (set! $l $m)))
 )
