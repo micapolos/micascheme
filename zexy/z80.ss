@@ -47,44 +47,49 @@
     (define-macro (h! v) (set-z80-h! z80 v))
     (define-macro (l! v) (set-z80-l! z80 v))
 
-    (define-macro (pc! v) (set-z80-a! z80 v))
+    (define-macro (pc! v) (set-z80-pc! z80 v))
     (define-macro (sp! v) (set-z80-sp! z80 v))
+
+    (define-macro (fx-nm fx) (fxand fx #xffff))
+    (define-macro (fx-n fx) (fxand fx #xff))
 
     (define-macro (nm lsb msb) (fxior (fxsll msb 8) lsb))
     (define-macro (lsb nm) (fxand nm #xff))
     (define-macro (msb nm) (fxsrl nm 8))
 
-    (define-macro (rr h l) (nm (h) (l)))
+    (define-macro (rr rh rl) (nm (rl) (rh)))
 
     (define-macro (bc) (rr b c))
     (define-macro (de) (rr d e))
     (define-macro (hl) (rr h l))
 
-    (define-macro (rr! h! l! v)
-      (h! (msb v))
-      (l! (lsb v)))
+    (define-macro (rr! rh! rl! expr)
+      (let ((v expr))
+        (rh! (msb v))
+        (rl! (lsb v))))
 
     (define-macro (bc! v) (rr! b! c! v))
     (define-macro (de! v) (rr! d! e! v))
     (define-macro (hl! v) (rr! h! l! v))
 
-    (define-macro (nm!! nm) (fxand nm #xffff))
-    (define-macro (inc-nm nm) (nm!! (fx+ nm 1)))
-    (define-macro (dec-nm nm) (nm!! (fx- nm 1)))
+    (define-macro (inc-nm nm) (fx-nm (fx+ nm 1)))
+    (define-macro (dec-nm nm) (fx-nm (fx- nm 1)))
 
     (define halt? #f)
 
     (define-macro (fetch)
-      (let ()
-        (define $value (mem (pc)))
+      (let ((n (mem (pc))))
         (pc! (inc-nm (pc)))
-        $value))
+        n))
 
     (define-macro (fetch-nm)
-      (nm (fetch) (fetch)))
+      (lets
+        (lsb (fetch))
+        (msb (fetch))
+        (nm lsb msb)))
 
     (do ()
-      (#t (void))
+      (halt? (void))
 
       (case1 (fetch)
         (#x00 (void))

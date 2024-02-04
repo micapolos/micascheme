@@ -1,19 +1,19 @@
 (import (check) (micascheme) (zexy z80) (zexy asm))
 
 (lets
-  ($z80 (make-z80))
-  ($mem (make-bytevector #x10000))
-  ($rd (partial bytevector-u8-ref $mem))
-  ($wr (partial bytevector-u8-set! $mem))
-  ($in (lambda ($addr) 0))
-  ($out
+  (z80 (make-z80))
+  (vec (make-bytevector #x10000))
+  (mem (partial bytevector-u8-ref vec))
+  (mem! (partial bytevector-u8-set! vec))
+  (io (lambda ($addr) 0))
+  (io!
     (lambda ($addr $byte)
-      (case $addr
-        ((#x113B) (display (integer->char $byte)))
-        (else (void)))))
+      (case1 $addr
+        (#x113b (display (integer->char $byte)))
+        ((else _) (void)))))
 
   (run
-    (assemble $mem
+    (assemble vec
       (ld bc #x113b)
 
       (ld a #\H) (out (c) a)
@@ -36,5 +36,7 @@
 
       (halt))
 
-    (z80-run $z80 $rd $wr $in $out))
+    (z80-run z80 mem mem! io io!)
   )
+)
+
