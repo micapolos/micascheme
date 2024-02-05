@@ -1,6 +1,7 @@
 (library (zexy math)
   (export
     band bxor bor shl shr msb lsb inc-nm nm+
+    n-hex nm-hex
     n$ nm$)
   (import (micascheme))
 
@@ -14,19 +15,20 @@
   (define (inc-nm $nm) (band (add1 $nm) #xffff))
   (define (nm+ $nm $nm2) (band (+ $nm $nm2) #xffff))
 
-  (define (n$ n)
+  (define (n-hex n)
     (string
-      #\$
       (fx-hex-char (fxsrl n 4))
       (fx-hex-char n)))
 
-  (define (nm$ nm)
+  (define (nm-hex nm)
     (string
-      #\$
       (fx-hex-char (fxsrl nm 12))
       (fx-hex-char (fxsrl nm 8))
       (fx-hex-char (fxsrl nm 4))
       (fx-hex-char nm)))
+
+  (define (n$ n) (string-append "$" (n-hex n)))
+  (define (nm$ nm) (string-append "$" (nm-hex nm)))
 
   (define (fx-hex-char fx)
     (case1 (fxand fx #xf)
