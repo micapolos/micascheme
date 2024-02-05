@@ -1,0 +1,23 @@
+(import (zexy z80-syntax) (check))
+
+(check (equal? (r-op #'b) #b000))
+(check (equal? (r-op #'c) #b001))
+(check (equal? (r-op #'d) #b010))
+(check (equal? (r-op #'e) #b011))
+(check (equal? (r-op #'h) #b100))
+(check (equal? (r-op #'l) #b101))
+(check (equal? (r-op #'(hl)) #b110))
+(check (equal? (r-op #'a) #b111))
+(check (equal? (r-op #'f) #f))
+
+(check (equal? (rr-af-op #'bc) #b00))
+(check (equal? (rr-af-op #'de) #b01))
+(check (equal? (rr-af-op #'hl) #b10))
+(check (equal? (rr-af-op #'af) #b11))
+(check (equal? (rr-af-op #'sp) #f))
+
+(check (equal? (rr-sp-op #'bc) #b00))
+(check (equal? (rr-sp-op #'de) #b01))
+(check (equal? (rr-sp-op #'hl) #b10))
+(check (equal? (rr-sp-op #'sp) #b11))
+(check (equal? (rr-sp-op #'af) #f))
