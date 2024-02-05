@@ -6,7 +6,14 @@
 (check (syntax-null? #'()))
 (check (not (syntax-null? #'(1))))
 
-(check
-  (equal?
-    (syntax-inline (datum->syntax #'+ 'string?))
-    string?))
+(define (predicate-syntax s)
+  (datum->syntax #'+
+    (string->symbol
+      (string-append
+        (symbol->string s)
+        "?"))))
+
+(check (equal? (syntax-inline #'string?) string?))
+(check (equal? (syntax-inline ((lambda () #'string?))) string?))
+(check (equal? (syntax-inline (datum->syntax #'+ 'string?)) string?))
+(check (equal? (syntax-inline (predicate-syntax 'string)) string?))
