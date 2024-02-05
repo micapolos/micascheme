@@ -3,8 +3,7 @@
     syntax-null?
     define-syntax-rule
     define-syntax-case
-    define-aux-keyword
-    syntax-inline)
+    define-aux-keyword)
   (import (scheme))
 
   (define (syntax-null? $syntax)
@@ -38,9 +37,4 @@
   (define-syntax-rule (define-aux-keyword aux)
     (define-syntax-rule aux
       (syntax-error (quote aux) "misplaced aux keyword")))
-
-  (define-syntax-rule (syntax-inline body)
-    (let-syntax
-      ((inline (lambda (_) body)))
-      (inline)))
 )

@@ -12,8 +12,3 @@
       (string-append
         (symbol->string s)
         "?"))))
-
-(check (equal? (syntax-inline #'string?) string?))
-(check (equal? (syntax-inline ((lambda () #'string?))) string?))
-(check (equal? (syntax-inline (datum->syntax #'+ 'string?)) string?))
-(check (equal? (syntax-inline (predicate-syntax 'string)) string?))
