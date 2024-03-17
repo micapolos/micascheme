@@ -1,18 +1,5 @@
 (import (check) (micascheme) (labs stacky))
 
-(stacky
-  (displayln "Begin...")
-  #\newline
-  #\!
-  #\i
-  #\G
-  inc
-  out
-  out
-  out
-  out
-  (displayln "The end!!!"))
-
 (define-syntax assemble
   (lambda ($syntax)
     (syntax-case $syntax ()
