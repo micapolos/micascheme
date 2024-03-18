@@ -14,10 +14,8 @@
               #,@(map
                 (lambda ($asm)
                   (syntax-case $asm (db dw)
-                    ((db $expr)
-                      #`(list 'db $expr))
-                    ((dw $expr)
-                      #`(list 'dw $expr))))
+                    ((db $expr) #`(list 'db $expr))
+                    ((dw $expr) #`(list 'dw $expr))))
                 (assemble #'$op)))
             (list (quote $data) ...)))))))
 
