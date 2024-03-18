@@ -1,6 +1,7 @@
 (import (micascheme))
 
 (test
+  (zexy assembler)
   (zexy env)
   (zexy asm)
   (zexy z80)

@@ -3,11 +3,22 @@
     syntax-null?
     define-syntax-rule
     define-syntax-case
-    define-aux-keyword)
+    define-aux-keyword
+    expand-begin-syntaxes)
   (import (scheme))
 
   (define (syntax-null? $syntax)
     (null? (syntax->datum $syntax)))
+
+  (define (expand-begin-syntaxes $syntaxes)
+    (apply append
+      (map
+        (lambda ($syntax)
+          (syntax-case $syntax (begin)
+            ((begin $syntax ...)
+              (syntax->list #'($syntax ...)))
+            ($other (list #'other))))
+        $syntaxes)))
 
   (define-syntax define-syntax-rule
     (syntax-rules ()
