@@ -32,14 +32,14 @@
           (asm (db #b01110110)))
 
         ((ld $r (hl)) (r? #'$r)
-          (asm (db (bitwise-ior #b01000110 (bitwise-arithmetic-shift-left (r? #'$r) 3)))))
+          (asm (db (bitwise-233 #b01 (r? #'$r) #b110))))
         ((ld (hl) $r) (r? #'$r)
-          (asm (db (bitwise-ior #b01110000 (r? #'$r)))))
+          (asm (db (bitwise-233 #b01 #b110 (r? #'$r)))))
         ((ld $r1 $r2) (and (r? #'$r1) (r? #'$r2))
-          (asm (db (bitwise-ior #b01000000 (bitwise-arithmetic-shift-left (r? #'$r1) 3) (r? #'$r2)))))
+          (asm (db (bitwise-233 #b01 (r? #'$r1) (r? #'$r2)))))
         ((ld (hl) $r)
           (asm
-            (db (bitwise-ior #b00110110))
+            (db #b00110110)
             (db #'$r)))
 
         ((ld a (bc)) (asm (db #x0a)))
@@ -57,7 +57,7 @@
 
         ((ld $r $n) (r? #'$r)
           (asm
-            (db (bitwise-ior #b00000110 (bitwise-arithmetic-shift-left (r? #'$r) 3)))
+            (db (bitwise-233 #b00 (r? #'$r) #b110))
             (db #'$n)))
 
         ($other #f))
@@ -73,4 +73,10 @@
       (l #b101)
       (a #b111)
       (_ #f)))
+
+  (define (bitwise-233 $a $b $c)
+    (bitwise-ior
+      (bitwise-arithmetic-shift-left $a 6)
+      (bitwise-arithmetic-shift-left $b 3)
+      $c))
 )
