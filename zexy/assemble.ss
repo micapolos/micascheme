@@ -31,15 +31,15 @@
         ((halt)
           (asm (db #b01110110)))
 
-        ((ld $r (hl)) (fxr #'$r)
-          (asm (db (fxior #b01000110 (fxsll (fxr #'$r) 3)))))
-        ((ld (hl) $r) (fxr #'$r)
-          (asm (db (fxior #b01110000 (fxr #'$r)))))
-        ((ld $r1 $r2) (and (fxr #'$r1) (fxr #'$r2))
-          (asm (db (fxior #b01000000 (fxsll (fxr #'$r1) 3) (fxr #'$r2)))))
+        ((ld $r (hl)) (r? #'$r)
+          (asm (db (bitwise-ior #b01000110 (bitwise-arithmetic-shift-left (r? #'$r) 3)))))
+        ((ld (hl) $r) (r? #'$r)
+          (asm (db (bitwise-ior #b01110000 (r? #'$r)))))
+        ((ld $r1 $r2) (and (r? #'$r1) (r? #'$r2))
+          (asm (db (bitwise-ior #b01000000 (bitwise-arithmetic-shift-left (r? #'$r1) 3) (r? #'$r2)))))
         ((ld (hl) $r)
           (asm
-            (db (fxior #b00110110))
+            (db (bitwise-ior #b00110110))
             (db #'$r)))
 
         ((ld a (bc)) (asm (db #x0a)))
@@ -55,15 +55,15 @@
         ((ld i a) (asm (db #xed) (db #x47)))
         ((ld r a) (asm (db #xed) (db #x4f)))
 
-        ((ld $r $n) (fxr #'$r)
+        ((ld $r $n) (r? #'$r)
           (asm
-            (db (fxior #b00000110 (fxsll (fxr #'$r) 3)))
+            (db (bitwise-ior #b00000110 (bitwise-arithmetic-shift-left (r? #'$r) 3)))
             (db #'$n)))
 
         ($other #f))
       (list $op)))
 
-  (define (fxr $syntax)
+  (define (r? $syntax)
     (syntax-case $syntax (b c d e h l a)
       (b #b000)
       (c #b001)
