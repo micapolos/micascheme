@@ -1,6 +1,7 @@
 (library (procedure)
   (export
     run
+    repeat
     identity
     once-proc
     checking-once
@@ -19,6 +20,12 @@
         (let () (void)))
       ((_ $item ...)
         (let () $item ...))))
+
+  (define-syntax-rule (repeat $count $body ...)
+    (do
+      (($i $count (- $i 1)))
+      ((zero? $i) (void))
+      $body ...))
 
   (define-syntax-rule (once-proc $proc)
     (let ()

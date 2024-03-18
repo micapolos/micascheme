@@ -1,7 +1,7 @@
 (import
   (check)
   (zexy link)
-  (only (zexy ops) label org db dw))
+  (only (zexy ops) label org db dw ds align))
 
 (define-syntax-case (check-links ($in ...) ($out ...))
   #`(check
@@ -14,7 +14,8 @@
               (lambda ($op)
                 (syntax-case $op (db dw)
                   ((db $expr) #`(list 'db $expr))
-                  ((dw $expr) #`(list 'dw $expr))))
+                  ((dw $expr) #`(list 'dw $expr))
+                  ((ds $expr) #`(list 'ds $expr))))
               $ops))))
       (list (quote $out) ...))))
 
@@ -35,6 +36,10 @@
 (check-links
   ((dw (+ #x1200 #x0034)))
   ((dw #x1234)))
+
+(check-links
+  ((ds 3))
+  ((ds 3)))
 
 (check-links
   (
@@ -63,3 +68,35 @@
   (
     (db #x12)
     (dw #x2001)))
+
+(check-links
+  (
+    (align 4)
+    (db #x11))
+  (
+    (db #x11)))
+
+(check-links
+  (
+    (db #x11)
+    (align 4)
+    (db #x55))
+  (
+    (db #x11)
+    (ds 3)
+    (db #x55)))
+
+(check-links
+  (
+    (db #x11)
+    (db #x22)
+    (db #x33)
+    (db #x44)
+    (align 4)
+    (db #x55))
+  (
+    (db #x11)
+    (db #x22)
+    (db #x33)
+    (db #x44)
+    (db #x55)))

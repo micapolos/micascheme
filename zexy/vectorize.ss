@@ -3,7 +3,7 @@
     vectorize)
   (import
     (micascheme)
-    (only (zexy ops) db dw))
+    (only (zexy ops) db dw ds))
 
   (define (vectorize $ops)
     #`(lets
@@ -19,7 +19,9 @@
                   ($value $expr)
                   (run
                     (put-u8 $port (fxand $value #xff))
-                    (put-u8 $port (fxsrl $value 8)))))))
+                    (put-u8 $port (fxsrl $value 8)))))
+              ((ds $expr)
+                #`(repeat $expr (put-u8 $port 0)))))
           $ops)
         ($close))))
 )

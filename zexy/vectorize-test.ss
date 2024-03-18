@@ -18,3 +18,6 @@
 (check-vectorizes (dw #x1234) (#x34 #x12))
 (check-vectorizes (dw (+ #x1200 #x0034)) (#x34 #x12))
 (check-vectorizes (dw #x1234) (dw #x5678) (#x34 #x12 #x78 #x56))
+
+(check-vectorizes (ds 3) (0 0 0))
+(check-vectorizes (ds (+ 1 2)) (0 0 0))
