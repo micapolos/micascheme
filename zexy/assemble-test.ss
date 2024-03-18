@@ -1,6 +1,6 @@
 (import
   (check)
-  (zexy assembler)
+  (zexy assemble)
   (zexy ops)
   (syntax))
 

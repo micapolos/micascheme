@@ -1,4 +1,4 @@
-(library (zexy assembler)
+(library (zexy assemble)
   (export
     assemble)
   (import

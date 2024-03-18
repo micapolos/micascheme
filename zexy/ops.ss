@@ -26,7 +26,10 @@
     call ret reti retn rst
     cpd cpdr cpi cpir ldd lddr ldi ldir
     in ind indr ini inir
-    out outi otir outd otdr)
+    out outi otir outd otdr
+
+    ; linker
+    align label)
 
   (import
     (only (micascheme)
@@ -65,5 +68,8 @@
     call ret reti retn rst
     cpd cpdr cpi cpir ldd lddr ldi ldir
     in ind indr ini inir
-    out outi otir outd otdr)
+    out outi otir outd otdr
+
+    ; linker
+    align label)
 )
