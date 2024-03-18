@@ -29,7 +29,7 @@
     out outi otir outd otdr
 
     ; linker
-    align label)
+    align org label)
 
   (import
     (only (micascheme)
@@ -71,5 +71,5 @@
     out outi otir outd otdr
 
     ; linker
-    align label)
+    align org label)
 )
