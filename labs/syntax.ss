@@ -6,5 +6,6 @@
     (syntax-case $syntax (begin)
       ((begin $body ...)
         (syntax->list #'($body ...)))
-      ($other (list #'$other))))
+      ($other
+        (list #'$other))))
 )
