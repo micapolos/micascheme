@@ -1,9 +1,13 @@
 (library (labs syntax)
   (export
+    syntax-cons
     syntax-flatten
     flat-map-syntax
     flat-map-syntax-list)
   (import (micascheme))
+
+  (define (syntax-cons $car $cdr)
+    #`(#,$car . #,$cdr))
 
   (define (syntax-flatten $syntax)
     (syntax-case $syntax (begin)
