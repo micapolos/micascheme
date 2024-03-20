@@ -22,6 +22,7 @@
     intercalate
     null
     build-list
+    ensure-list
 
     flatten)
 
@@ -211,4 +212,9 @@
           (cons ($proc $index) $list))
         (list)
         $size)))
+
+  (define (ensure-list $obj)
+    (switch $obj
+      ((list? $list) $list)
+      ((else $other) (list $other))))
 )

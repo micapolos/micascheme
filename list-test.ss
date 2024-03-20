@@ -166,3 +166,12 @@
   (equal?
     (build-list 5 add1)
     (list 1 2 3 4 5)))
+
+; === ensure-list ===
+
+(check (equal? (ensure-list 1) (list 1)))
+(check (equal? (ensure-list (cons 1 2)) (list (cons 1 2))))
+
+(check (equal? (ensure-list (list)) (list)))
+(check (equal? (ensure-list (list 1)) (list 1)))
+(check (equal? (ensure-list (list 1 2 3)) (list 1 2 3)))
