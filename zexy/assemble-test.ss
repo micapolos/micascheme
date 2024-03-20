@@ -6,18 +6,19 @@
 
 (define-syntax check-assembles
   (lambda ($syntax)
-    (syntax-case $syntax ()
-      ((_ $op $data ...)
-        #`(check
-          (equal?
-            (list
-              #,@(map
-                (lambda ($asm)
-                  (syntax-case $asm (db dw)
-                    ((db $expr) #`(list 'db $expr))
-                    ((dw $expr) #`(list 'dw $expr))))
-                (assemble #'$op)))
-            (list (quote $data) ...)))))))
+    (lambda ($lookup)
+      (syntax-case $syntax ()
+        ((_ $op $data ...)
+          #`(check
+            (equal?
+              (list
+                #,@(map
+                  (lambda ($asm)
+                    (syntax-case $asm (db dw)
+                      ((db $expr) #`(list 'db $expr))
+                      ((dw $expr) #`(list 'dw $expr))))
+                  (assemble (lambda ($id) #f) #'$op)))
+              (list (quote $data) ...))))))))
 
 (define n12 #x12)
 (define nm1234 #x1234)
@@ -118,3 +119,19 @@
 (check-assembles (ld a r) (db #xed) (db #x5f))
 (check-assembles (ld i a) (db #xed) (db #x47))
 (check-assembles (ld r a) (db #xed) (db #x4f))
+
+(check-assembles (inc b) (db #b00000100))
+(check-assembles (inc c) (db #b00001100))
+(check-assembles (inc d) (db #b00010100))
+(check-assembles (inc e) (db #b00011100))
+(check-assembles (inc h) (db #b00100100))
+(check-assembles (inc l) (db #b00101100))
+(check-assembles (inc a) (db #b00111100))
+
+(check-assembles (dec b) (db #b00000101))
+(check-assembles (dec c) (db #b00001101))
+(check-assembles (dec d) (db #b00010101))
+(check-assembles (dec e) (db #b00011101))
+(check-assembles (dec h) (db #b00100101))
+(check-assembles (dec l) (db #b00101101))
+(check-assembles (dec a) (db #b00111101))

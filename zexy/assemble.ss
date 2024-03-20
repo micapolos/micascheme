@@ -3,14 +3,15 @@
     assemble)
   (import
     (micascheme)
+    (labs syntax)
     (rename (zexy ops)
       (and %and)
       (or %or)
       (push %push)
       (pop %pop)))
 
-  (define (assemble $op)
-    (syntax-case $op (nop ret ld halt a i r bc de hl)
+  (define (assemble $lookup $op)
+    (syntax-case $op (nop ret ld halt a i r bc de hl inc dec)
       ((nop) (list (db-8 #x00)))
       ((ret) (list (db-8 #xc9)))
       ((halt) (list (db-8 #b01110110)))
@@ -42,9 +43,24 @@
       ((ld i a) (list (db-8 #xed) (db-8 #x47)))
       ((ld r a) (list (db-8 #xed) (db-8 #x4f)))
 
+      ((inc $r)
+        (r3 #'$r)
+        (list (db-233 #b00 (r3 #'$r) #b100)))
+
+      ((dec $r)
+        (r3 #'$r)
+        (list (db-233 #b00 (r3 #'$r) #b101)))
+
       ((ld $r $n)
         (r3 #'$r)
         (list (db-233 #b00 (r3 #'$r) #b110) #'(db $n)))
+
+      (($id $body ...)
+        (and (identifier? #'$id) ($lookup #'$id))
+        (flatten
+          (map
+            (partial assemble $lookup)
+            (syntax-flatten (($lookup #'$id) $op)))))
 
       ($other (list #'$other))))
 
