@@ -1,4 +1,4 @@
-(import (check) (asm base))
+(import (check) (asm asm) (micascheme))
 
 (check
   (equal?
@@ -7,6 +7,5 @@
       (db 10)
       (db 20)
       (label foo)
-      (dw foo)
-      (dw (org)))
-    (bytevector 10 20)))
+      (dw foo))
+    (bytevector 10 20 #x02 #x20)))

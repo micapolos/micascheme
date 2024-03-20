@@ -54,6 +54,7 @@
   (writer)
   (writing)
   (z80)
+  (asm all)
   (leo all)
   (scheme all)
   (tico all)
