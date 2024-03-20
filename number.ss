@@ -5,7 +5,8 @@
     iterate
     iterate-indexed
     nonnegative-integer?
-    one?)
+    one?
+    bitwise-align)
   (import (scheme))
 
   (define pi (* (asin 1) 2))
@@ -37,4 +38,10 @@
 
   (define (one? $number)
     (= $number 1))
+
+  (define (bitwise-align $value $alignment)
+    (let (($mask (- $alignment 1)))
+      (bitwise-and
+        (+ $value $mask)
+        (bitwise-not $mask))))
 )

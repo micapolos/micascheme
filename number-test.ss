@@ -21,3 +21,18 @@
       (list 'end)
       5)
     (list 40 30 20 10 0 'end)))
+
+(check (equal? (bitwise-align #x1234 1) #x1234))
+(check (equal? (bitwise-align #x1235 1) #x1235))
+
+(check (equal? (bitwise-align #x1234 2) #x1234))
+(check (equal? (bitwise-align #x1235 2) #x1236))
+(check (equal? (bitwise-align #x1236 2) #x1236))
+(check (equal? (bitwise-align #x1237 2) #x1238))
+
+(check (equal? (bitwise-align #x1234 4) #x1234))
+(check (equal? (bitwise-align #x1235 4) #x1238))
+(check (equal? (bitwise-align #x1236 4) #x1238))
+(check (equal? (bitwise-align #x1237 4) #x1238))
+(check (equal? (bitwise-align #x1238 4) #x1238))
+(check (equal? (bitwise-align #x1239 4) #x123c))

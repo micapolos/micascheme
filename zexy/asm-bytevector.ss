@@ -30,7 +30,7 @@
       (lambda ($lookup)
         (syntax-case $syntax ()
           ((_ $op ...)
-            (link
+            (link $lookup
               (flatten
                 (map
                   (partial assemble (lambda ($id) ($lookup $id #'asm)))
