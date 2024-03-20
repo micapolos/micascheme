@@ -20,9 +20,7 @@
                   (set! $entries (push $entries #`($name #,$pc))))
                 ((align $expr) (size? (datum $expr))
                   (lets
-                    ($align (datum $expr))
-                    ($mask (- $align 1))
-                    ($new-pc (bitwise-and (+ $pc $mask) (bitwise-not $mask)))
+                    ($new-pc (bitwise-align $pc (datum $expr)))
                     ($slack (- $new-pc $pc))
                     (run
                       (if (not (zero? $slack))
