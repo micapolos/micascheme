@@ -9,8 +9,9 @@
       (ret)
       (label here)
       (dw (+ here 1)))
-    #vu8(
-      #x7f
-      #x00
-      #xc9
-      #x04 #x20)))
+    (bytevector
+      #x7f      ; (ld a a)
+      #x00      ; (nop)
+      #xc9      ; (ret)
+      #x04 #x20 ; #x2004
+      )))
