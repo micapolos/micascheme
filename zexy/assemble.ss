@@ -31,12 +31,12 @@
         ((halt)
           (asm (db #b01110110)))
 
-        ((ld $r (hl)) (r? #'$r)
-          (asm (db (bitwise-233 #b01 (r? #'$r) #b110))))
-        ((ld (hl) $r) (r? #'$r)
-          (asm (db (bitwise-233 #b01 #b110 (r? #'$r)))))
-        ((ld $r1 $r2) (and (r? #'$r1) (r? #'$r2))
-          (asm (db (bitwise-233 #b01 (r? #'$r1) (r? #'$r2)))))
+        ((ld $r (hl)) (r3 #'$r)
+          (asm (db (bitwise-233 #b01 (r3 #'$r) #b110))))
+        ((ld (hl) $r) (r3 #'$r)
+          (asm (db (bitwise-233 #b01 #b110 (r3 #'$r)))))
+        ((ld $r1 $r2) (and (r3 #'$r1) (r3 #'$r2))
+          (asm (db (bitwise-233 #b01 (r3 #'$r1) (r3 #'$r2)))))
         ((ld (hl) $r)
           (asm
             (db #b00110110)
@@ -55,15 +55,15 @@
         ((ld i a) (asm (db #xed) (db #x47)))
         ((ld r a) (asm (db #xed) (db #x4f)))
 
-        ((ld $r $n) (r? #'$r)
+        ((ld $r $n) (r3 #'$r)
           (asm
-            (db (bitwise-233 #b00 (r? #'$r) #b110))
+            (db (bitwise-233 #b00 (r3 #'$r) #b110))
             (db #'$n)))
 
         ($other #f))
       (list $op)))
 
-  (define (r? $syntax)
+  (define (r3 $syntax)
     (syntax-case $syntax (b c d e h l a)
       (b #b000)
       (c #b001)
