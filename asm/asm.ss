@@ -1,8 +1,26 @@
 (library (asm asm)
   (export
+    define-asm-syntax
+    define-asm-syntax-rule
+    asm-emit
     asm-bytevector
-    label align org db dw ds)
-  (import (micascheme))
+    label align org db dw ds eq)
+  (import
+    (micascheme)
+    (labs syntax))
+
+  (data (asm syntax-list))
+
+  (define-aux-keyword asm-syntax)
+
+  (define-syntax-rule (define-asm-syntax $name $transformer)
+    (define-property $name asm-syntax $transformer))
+
+  (define-syntax-rule (define-asm-syntax-rule ($name $param ...) $body)
+    (define-asm-syntax $name
+      (lambda ($syntax)
+        (syntax-case $syntax ()
+          ((_ $param ...) #`$body)))))
 
   (define-aux-keyword label)
   (define-aux-keyword align)
@@ -10,12 +28,13 @@
   (define-aux-keyword db)
   (define-aux-keyword dw)
   (define-aux-keyword ds)
+  (define-aux-keyword eq)
 
-  (define-syntax asm-bytevector
+  (define-syntax asm-emit
     (lambda ($syntax)
       (lambda ($lookup)
         (syntax-case $syntax ()
-          (($asm $op ...)
+          (($asm $proc $op ...)
             (with-implicit ($asm emit)
               (let ()
                 (define $let-entries (stack))
@@ -28,41 +47,59 @@
                 (define (size? $datum)
                   (and (integer? $datum) (nonnegative? $datum)))
                 (for-each
-                  (lambda ($op)
-                    (syntax-case $op (label align org db dw ds)
-                      ((db $expr)
-                        (run
-                          (push-statement! #`(emit $expr))
-                          (set! $pc (+ $pc 1))))
-                      ((dw $expr)
-                        (run
-                          (push-statement!
-                            #`(let (($value $expr))
-                              (emit (fxand $value #xff))
-                              (emit (fxsrl $value 8))))
-                          (set! $pc (+ $pc 2))))
-                      ((ds $expr) (size? (datum $expr))
-                        (run
-                          (push-statement! #`(repeat $expr (emit 0)))
-                          (set! $pc (+ $pc (datum $expr)))))
-                      ((label $name) (identifier? #'$name)
-                        (push-let-entry! #`($name #,$pc)))
-                      ((align $expr) (size? (datum $expr))
-                        (lets
-                          ($new-pc (bitwise-align $pc (datum $expr)))
-                          ($slack (- $new-pc $pc))
+                  (rec $rec
+                    (lambda ($op)
+                      (syntax-case $op (eq label align org db dw ds)
+                        ((eq $name $expr)
+                          (identifier? #'$name)
+                          (push-let-entry! #'($name $expr)))
+                        ((db $expr ...)
+                          (for-each
+                            (lambda ($expr)
+                              (push-statement! #`(emit #,$expr))
+                              (set! $pc (+ $pc 1)))
+                            (syntax->list #'($expr ...))))
+                        ((dw $expr ...)
+                          (for-each
+                            (lambda ($expr)
+                              (push-statement!
+                                #`(let (($value #,$expr))
+                                  (emit (fxand $value #xff))
+                                  (emit (fxsrl $value 8))))
+                              (set! $pc (+ $pc 2)))
+                            (syntax->list #'($expr ...))))
+                        ((ds $expr) (size? (datum $expr))
                           (run
-                            (if (not (zero? $slack))
-                              (run
-                                (push-statement! #`(repeat #,$slack (emit 0)))
-                                (set! $pc $new-pc))))))
-                      ((org $expr) (size? (datum $expr))
-                        (set! $pc (datum $expr)))))
+                            (push-statement! #`(repeat $expr (emit 0)))
+                            (set! $pc (+ $pc (datum $expr)))))
+                        ((label $name) (identifier? #'$name)
+                          (push-let-entry! #`($name #,$pc)))
+                        ((align $expr) (size? (datum $expr))
+                          (lets
+                            ($new-pc (bitwise-align $pc (datum $expr)))
+                            ($slack (- $new-pc $pc))
+                            (run
+                              (if (not (zero? $slack))
+                                (run
+                                  (push-statement! #`(repeat #,$slack (emit 0)))
+                                  (set! $pc $new-pc))))))
+                        ((org $expr) (size? (datum $expr))
+                          (set! $pc (datum $expr)))
+                        (($id $body ...)
+                          (and (identifier? #'$id) ($lookup #'$id #'asm-syntax))
+                          (for-each $rec
+                            (syntax-flatten
+                              (($lookup #'$id #'asm-syntax) $op)))))))
                   (syntax->list #'($op ...)))
                 #`(lets
-                  ((values $port $close) (open-bytevector-output-port))
-                  (emit (lambda ($u8) (put-u8 $port $u8)))
-                  (let (#,@(reverse $let-entries))
-                    #,@(reverse $statements)
-                    ($close))))))))))
+                  (emit $proc)
+                  #,@(reverse $let-entries)
+                  (run
+                    #,@(reverse $statements))))))))))
+
+  (define-syntax-rule (asm-bytevector $op ...)
+    (lets
+      ((values $port $close) (open-bytevector-output-port))
+      (run (asm-emit (lambda ($u8) (put-u8 $port $u8)) $op ...))
+      ($close)))
 )
