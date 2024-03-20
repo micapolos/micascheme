@@ -44,7 +44,8 @@
         ((ld i a) (list (db-8 #xed) (db-8 #x47)))
         ((ld r a) (list (db-8 #xed) (db-8 #x4f)))
 
-        ((ld $r $n) (r3 #'$r)
+        ((ld $r $n)
+          (r3 #'$r)
           (list
             (db-233 #b00 (r3 #'$r) #b110)
             #'(db $n)))
