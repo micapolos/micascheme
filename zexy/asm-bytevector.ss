@@ -1,8 +1,8 @@
-(library (zexy z80-bytevector)
+(library (zexy asm-bytevector)
   (export
-    define-z80-syntax
-    define-z80-syntax-rule
-    z80-bytevector)
+    define-asm-syntax
+    define-asm-syntax-rule
+    asm-bytevector)
 
   (import
     (except (micascheme) and or pop push)
@@ -14,18 +14,18 @@
   (export
     (import (zexy ops)))
 
-  (define-aux-keyword z80)
+  (define-aux-keyword asm)
 
-  (define-syntax-rule (define-z80-syntax $name $transformer)
-    (define-property $name z80 $transformer))
+  (define-syntax-rule (define-asm-syntax $name $transformer)
+    (define-property $name asm $transformer))
 
-  (define-syntax-rule (define-z80-syntax-rule ($name $param ...) $body)
-    (define-z80-syntax $name
+  (define-syntax-rule (define-asm-syntax-rule ($name $param ...) $body)
+    (define-asm-syntax $name
       (lambda ($syntax)
         (syntax-case $syntax ()
           ((_ $param ...) #`$body)))))
 
-  (define-syntax z80-bytevector
+  (define-syntax asm-bytevector
     (lambda ($syntax)
       (lambda ($lookup)
         (syntax-case $syntax ()
@@ -33,7 +33,7 @@
             (link
               (flatten
                 (map
-                  (partial assemble (lambda ($id) ($lookup $id #'z80)))
+                  (partial assemble (lambda ($id) ($lookup $id #'asm)))
                   (syntax->list #'($op ...))))
               vectorize))))))
 )
