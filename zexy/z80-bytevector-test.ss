@@ -8,10 +8,10 @@
       (nop)
       (ret)
       (label here)
-      (dw (+ here 1)))
+      (dw (+ here #x10)))
     (bytevector
       #x7f      ; (ld a a)
       #x00      ; (nop)
       #xc9      ; (ret)
-      #x04 #x20 ; (org #x2000) + offset 4
+      #x13 #x20 ; (org #x2000) + (offset 3) + #x10
       )))
