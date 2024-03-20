@@ -13,5 +13,5 @@
       #x7f      ; (ld a a)
       #x00      ; (nop)
       #xc9      ; (ret)
-      #x04 #x20 ; #x2004
+      #x04 #x20 ; (org #x2000) + offset 4
       )))
