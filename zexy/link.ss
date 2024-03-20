@@ -39,8 +39,8 @@
                 (set! $linked (push $linked $op))
                 (set! $pc (+ $pc (datum $expr)))))))
         $ops)
-      #`(lets
-        #,@(reverse $entries)
+      #`(let
+        (#,@(reverse $entries))
         #,($cont (reverse $linked)))))
 
   (define (size? $datum)
