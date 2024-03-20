@@ -60,7 +60,7 @@
       (_ #f)))
 
   (define (db-8 $value)
-    #`(db #,$value))
+    #`(db #,(datum->syntax #'db-8 $value)))
 
   (define (db-233 $a $b $c)
     (db-8
