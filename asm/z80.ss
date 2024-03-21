@@ -3,7 +3,7 @@
   (import
     (micascheme)
     (labs syntax)
-    (asm core))
+    (asm base))
 
   (define (emit-dw $emit $u16)
     (run

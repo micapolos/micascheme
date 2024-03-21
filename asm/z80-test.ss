@@ -1,4 +1,4 @@
-(import (check) (micascheme) (asm core) (asm z80))
+(import (check) (micascheme) (asm base) (asm z80))
 
 (define-syntax-rule (check-assembles? $asm $bytevector)
   (check (equal? (asm-bytevector $asm) $bytevector)))
