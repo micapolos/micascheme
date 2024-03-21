@@ -1,13 +1,28 @@
 (library (asm core)
   (export
+    define-asm-core-syntax
+    define-asm-core-syntax-rule
     define-asm-syntax
     define-asm-syntax-rule
     asm
     asm-bytevector
-    label align ds eq)
+    label align eq)
   (import
     (micascheme)
     (labs syntax))
+
+  (define-aux-keyword asm-core-syntax)
+
+  (define-syntax-rule (define-asm-core-syntax $name $transformer)
+    (begin
+      (define-aux-keyword $name)
+      (define-property $name asm-core-syntax $transformer)))
+
+  (define-syntax-rule (define-asm-core-syntax-rule ($name $param ...) $body)
+    (define-asm-core-syntax $name
+      (lambda ($syntax $emit $org)
+        (syntax-case $syntax ()
+          ((_ $param ...) #`$body)))))
 
   (define-aux-keyword asm-syntax)
 
@@ -18,7 +33,7 @@
 
   (define-syntax-rule (define-asm-syntax-rule ($name $param ...) $body)
     (define-asm-syntax $name
-      (lambda ($syntax $emit $org)
+      (lambda ($syntax)
         (syntax-case $syntax ()
           ((_ $param ...) #`$body)))))
 
@@ -50,12 +65,6 @@
                         ((eq $name $expr)
                           (identifier? #'$name)
                           (push-define! #'(define $name $expr)))
-                        ((ds $expr) (size? (datum $expr))
-                          (lets
-                            ($size (datum $expr))
-                            (run
-                              (push-statement! #`(repeat #,$size ($emit 0)))
-                              ($org (+ ($org) $size)))))
                         ((label $name) (identifier? #'$name)
                           (push-define! #`(define $name #,($org))))
                         ((align $expr) (size? (datum $expr))
@@ -67,10 +76,15 @@
                               (push-statement! #`(repeat #,$slack ($emit 0)))
                               ($org $new-pc))))
                         (($id $body ...)
-                          (and (identifier? #'$id) ($lookup #'$id #'asm-syntax))
+                          (and (identifier? #'$id) ($lookup #'$id #'asm-core-syntax))
                           (for-each push-statement!
                             (syntax-flatten
-                              (($lookup #'$id #'asm-syntax) $op #'$emit $org)))))))
+                              (($lookup #'$id #'asm-core-syntax) $op #'$emit $org))))
+                        (($id $body ...)
+                          (and (identifier? #'$id) ($lookup #'$id #'asm-syntax))
+                          (for-each $rec
+                            (syntax-flatten
+                              (($lookup #'$id #'asm-syntax) $op)))))))
                   (syntax->list #'($op ...)))
                 #`(lambda ($emit)
                   (run

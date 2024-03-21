@@ -1,7 +1,8 @@
 (library (asm z80)
-  (export org db dw)
+  (export org db dw dz ds)
   (import
     (micascheme)
+    (labs syntax)
     (asm core))
 
   (define (emit-dw $emit $u16)
@@ -9,7 +10,7 @@
       ($emit (fxand $u16 #xff))
       ($emit (fxsrl $u16 8))))
 
-  (define-asm-syntax org
+  (define-asm-core-syntax org
     (lambda ($syntax $emit $org)
       (syntax-case $syntax ()
         ((_ $value)
@@ -18,20 +19,55 @@
             ($org (datum $value))
             #`(begin))))))
 
-  (define-asm-syntax db
+  (define-asm-core-syntax db
     (lambda ($syntax $emit $org)
       (syntax-case $syntax ()
         ((_ $expr ...)
-          (run
-            ($org (+ ($org) (length (syntax->list #'($expr ...)))))
-            #`(begin
-              (#,$emit $expr) ...))))))
+          #`(begin
+            #,@(flatten
+              (map syntax-flatten
+                (map
+                  (lambda ($expr)
+                    (syntax-case $expr ()
+                      ($string (string? (datum $string))
+                        (lets
+                          ($bytevector (string->utf8 (datum $string)))
+                          ($size (bytevector-length $bytevector))
+                          (run
+                            ($org (+ ($org) $size))
+                            #`(begin
+                              #,@(map
+                                (lambda ($u8) #`(#,$emit #,$u8))
+                                (bytevector->u8-list $bytevector))))))
+                      ($expr
+                        (run
+                          ($org (add1 ($org)))
+                          #`(switch $expr
+                            ((char? $char) (#,$emit (char->integer $char)))
+                            ((else $other) (#,$emit $other)))))))
+                  (syntax->list #'($expr ...))))))))))
 
-  (define-asm-syntax dw
+  (define-asm-core-syntax dw
     (lambda ($syntax $emit $org)
       (syntax-case $syntax ()
         ((_ $expr ...)
           (run
             ($org (+ ($org) (* 2 (length (syntax->list #'($expr ...))))))
             #`(begin (emit-dw #,$emit $expr) ...))))))
+
+  (define-asm-core-syntax ds
+    (lambda ($syntax $emit $org)
+      (syntax-case $syntax ()
+        ((_ $size)
+          (and (integer? (datum $size)) (nonnegative? (datum $size)))
+          #`(begin
+            #,@(map
+              (lambda ($index)
+                ($org (add1 ($org)))
+                #`(#,$emit 0))
+              (indices (datum $size))))))))
+
+  (define-asm-syntax-rule (dz $expr ...)
+    (db $expr ... 0))
+
 )

@@ -12,6 +12,18 @@
   (bytevector #x12))
 
 (check-assembles?
+  (asm (db #\f))
+  (bytevector (char->integer #\f)))
+
+(check-assembles?
+  (asm (db (integer->char 100)))
+  (bytevector 100))
+
+(check-assembles?
+  (asm (db "fo"))
+  (bytevector (char->integer #\f) (char->integer #\o)))
+
+(check-assembles?
   (asm (db #x12 #x34))
   (bytevector #x12 #x34))
 
@@ -30,3 +42,11 @@
 (check-assembles?
   (asm (org #x1234))
   (bytevector))
+
+(check-assembles?
+  (asm (dz #x12))
+  (bytevector #x12 0))
+
+(check-assembles?
+  (asm (ds 3))
+  (bytevector 0 0 0))
