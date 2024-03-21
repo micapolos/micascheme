@@ -35,10 +35,6 @@
                 (define $label-entries (stack))
                 (define $eq-entries (stack))
                 (define $statements (stack))
-                (define (push-statement! $statement)
-                  (set! $statements (push $statements $statement)))
-                (define (size? $datum)
-                  (and (integer? $datum) (nonnegative? $datum)))
                 (define $org (make-parameter 0))
                 (for-each
                   (rec $rec
@@ -51,7 +47,9 @@
                           (set! $label-entries (push $label-entries #`($name #,($org)))))
                         (($id $body ...)
                           (and (identifier? #'$id) ($lookup #'$id #'asm-core-syntax))
-                          (for-each push-statement!
+                          (for-each
+                            (lambda ($statement)
+                              (set! $statements (push $statements $statement)))
                             (syntax-flatten
                               (($lookup #'$id #'asm-core-syntax) $op #'$emit-u8 $org))))
                         (($id $body ...)
