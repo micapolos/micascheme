@@ -48,10 +48,9 @@
           (($asm $op ...)
             (with-implicit ($asm $emit)
               (let ()
-                (define $defines (stack))
+                (define $label-entries (stack))
+                (define $eq-entries (stack))
                 (define $statements (stack))
-                (define (push-define! $define)
-                  (set! $defines (push $defines $define)))
                 (define (push-statement! $statement)
                   (set! $statements (push $statements $statement)))
                 (define (size? $datum)
@@ -63,9 +62,9 @@
                       (syntax-case $op (eq label)
                         ((eq $name $expr)
                           (identifier? #'$name)
-                          (push-define! #'(define $name $expr)))
+                          (set! $eq-entries (push $eq-entries #'($name $expr))))
                         ((label $name) (identifier? #'$name)
-                          (push-define! #`(define $name #,($org))))
+                          (set! $label-entries (push $label-entries #`($name #,($org)))))
                         (($id $body ...)
                           (and (identifier? #'$id) ($lookup #'$id #'asm-core-syntax))
                           (for-each push-statement!
@@ -78,9 +77,11 @@
                               (($lookup #'$id #'asm-syntax) $op)))))))
                   (syntax->list #'($op ...)))
                 #`(lambda ($emit)
-                  (run
-                    #,@(reverse $defines)
-                    #,@(reverse $statements))))))))))
+                  (let
+                    (#,@(reverse $label-entries))
+                    (let* (#,@(reverse $eq-entries))
+                      #,@(reverse $statements)
+                      (void)))))))))))
 
   (define (asm-bytevector $asm)
     (lets
