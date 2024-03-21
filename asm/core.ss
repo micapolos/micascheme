@@ -30,7 +30,7 @@
       (lambda ($lookup)
         (syntax-case $syntax ()
           (($asm $op ...)
-            (with-implicit ($asm $emit)
+            (with-implicit ($asm $emit-u8)
               (let ()
                 (define $label-entries (stack))
                 (define $eq-entries (stack))
@@ -53,14 +53,14 @@
                           (and (identifier? #'$id) ($lookup #'$id #'asm-core-syntax))
                           (for-each push-statement!
                             (syntax-flatten
-                              (($lookup #'$id #'asm-core-syntax) $op #'$emit $org))))
+                              (($lookup #'$id #'asm-core-syntax) $op #'$emit-u8 $org))))
                         (($id $body ...)
                           (and (identifier? #'$id) ($lookup #'$id #'asm-syntax))
                           (for-each $rec
                             (syntax-flatten
                               (($lookup #'$id #'asm-syntax) $op)))))))
                   (syntax->list #'($op ...)))
-                #`(lambda ($emit)
+                #`(lambda ($emit-u8)
                   (let
                     (#,@(reverse $label-entries))
                     (let* (#,@(reverse $eq-entries))

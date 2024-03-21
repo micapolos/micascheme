@@ -5,13 +5,13 @@
     (labs syntax)
     (asm base))
 
-  (define (emit-dw $emit $u16)
+  (define (emit-u16 $emit-u8 $u16)
     (run
-      ($emit (fxand $u16 #xff))
-      ($emit (fxsrl $u16 8))))
+      ($emit-u8 (fxand $u16 #xff))
+      ($emit-u8 (fxsrl $u16 8))))
 
   (define-asm-core-syntax org
-    (lambda ($syntax $emit $org)
+    (lambda ($syntax $emit-u8 $org)
       (syntax-case $syntax ()
         ((_ $value)
           (and (integer? (datum $value)) (nonnegative? (datum $value)))
@@ -20,7 +20,7 @@
             #`(begin))))))
 
   (define-asm-core-syntax db
-    (lambda ($syntax $emit $org)
+    (lambda ($syntax $emit-u8 $org)
       (syntax-case $syntax ()
         ((_ $expr ...)
           #`(begin
@@ -37,26 +37,26 @@
                             ($org (+ ($org) $size))
                             #`(begin
                               #,@(map
-                                (lambda ($u8) #`(#,$emit #,$u8))
+                                (lambda ($u8) #`(#,$emit-u8 #,$u8))
                                 (bytevector->u8-list $bytevector))))))
                       ($expr
                         (run
                           ($org (add1 ($org)))
                           #`(switch $expr
-                            ((char? $char) (#,$emit (char->integer $char)))
-                            ((else $other) (#,$emit $other)))))))
+                            ((char? $char) (#,$emit-u8 (char->integer $char)))
+                            ((else $other) (#,$emit-u8 $other)))))))
                   (syntax->list #'($expr ...))))))))))
 
   (define-asm-core-syntax dw
-    (lambda ($syntax $emit $org)
+    (lambda ($syntax $emit-u8 $org)
       (syntax-case $syntax ()
         ((_ $expr ...)
           (run
             ($org (+ ($org) (* 2 (length (syntax->list #'($expr ...))))))
-            #`(begin (emit-dw #,$emit $expr) ...))))))
+            #`(begin (emit-u16 #,$emit-u8 $expr) ...))))))
 
   (define-asm-core-syntax ds
-    (lambda ($syntax $emit $org)
+    (lambda ($syntax $emit-u8 $org)
       (syntax-case $syntax ()
         ((_ $size)
           (and (integer? (datum $size)) (nonnegative? (datum $size)))
@@ -64,14 +64,14 @@
             #,@(map
               (lambda ($index)
                 ($org (add1 ($org)))
-                #`(#,$emit 0))
+                #`(#,$emit-u8 0))
               (indices (datum $size))))))))
 
   (define-asm-syntax-rule (dz $expr ...)
     (db $expr ... 0))
 
   (define-asm-core-syntax align
-    (lambda ($syntax $emit $org)
+    (lambda ($syntax $emit-u8 $org)
       (syntax-case $syntax ()
         ((_ $expr)
           (and (integer? (datum $expr)) (nonnegative? (datum $expr)))
@@ -81,5 +81,5 @@
             ($slack (- $new-pc $pc))
             (run
               ($org $new-pc)
-              #`(repeat #,$slack (#,$emit 0))))))))
+              #`(repeat #,$slack (#,$emit-u8 0))))))))
 )

@@ -14,7 +14,7 @@
 
   (define-syntax-rule (define-asm-core-syntax-rule ($name $param ...) $body)
     (define-asm-core-syntax $name
-      (lambda ($syntax $emit $org)
+      (lambda ($syntax $emit-u8 $org)
         (syntax-case $syntax ()
           ((_ $param ...) #`$body)))))
 
@@ -28,7 +28,7 @@
   (define (asm-bytevector $asm)
     (lets
       ((values $port $close) (open-bytevector-output-port))
-      ($emit (lambda ($u8) (put-u8 $port $u8)))
-      (run ($asm $emit))
+      ($emit-u8 (lambda ($u8) (put-u8 $port $u8)))
+      (run ($asm $emit-u8))
       ($close)))
 )
