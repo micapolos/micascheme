@@ -1,4 +1,5 @@
 (import (micascheme))
 
 (test
-  (asm asm))
+  (asm core)
+  (asm z80))
