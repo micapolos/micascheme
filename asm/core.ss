@@ -6,7 +6,7 @@
     define-asm-syntax-rule
     asm
     asm-bytevector
-    label align eq)
+    label eq)
   (import
     (micascheme)
     (labs syntax))
@@ -38,7 +38,6 @@
           ((_ $param ...) #`$body)))))
 
   (define-aux-keyword label)
-  (define-aux-keyword align)
   (define-aux-keyword ds)
   (define-aux-keyword eq)
 
@@ -61,20 +60,12 @@
                 (for-each
                   (rec $rec
                     (lambda ($op)
-                      (syntax-case $op (eq label align db dw ds)
+                      (syntax-case $op (eq label)
                         ((eq $name $expr)
                           (identifier? #'$name)
                           (push-define! #'(define $name $expr)))
                         ((label $name) (identifier? #'$name)
                           (push-define! #`(define $name #,($org))))
-                        ((align $expr) (size? (datum $expr))
-                          (lets
-                            ($pc ($org))
-                            ($new-pc (bitwise-align $pc (datum $expr)))
-                            ($slack (- $new-pc $pc))
-                            (run
-                              (push-statement! #`(repeat #,$slack ($emit 0)))
-                              ($org $new-pc))))
                         (($id $body ...)
                           (and (identifier? #'$id) ($lookup #'$id #'asm-core-syntax))
                           (for-each push-statement!

@@ -1,5 +1,5 @@
 (library (asm z80)
-  (export org db dw dz ds)
+  (export org db dw dz ds align)
   (import
     (micascheme)
     (labs syntax)
@@ -70,4 +70,16 @@
   (define-asm-syntax-rule (dz $expr ...)
     (db $expr ... 0))
 
+  (define-asm-core-syntax align
+    (lambda ($syntax $emit $org)
+      (syntax-case $syntax ()
+        ((_ $expr)
+          (and (integer? (datum $expr)) (nonnegative? (datum $expr)))
+          (lets
+            ($pc ($org))
+            ($new-pc (bitwise-align $pc (datum $expr)))
+            ($slack (- $new-pc $pc))
+            (run
+              ($org $new-pc)
+              #`(repeat #,$slack (#,$emit 0))))))))
 )

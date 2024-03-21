@@ -50,3 +50,38 @@
 (check-assembles?
   (asm (ds 3))
   (bytevector 0 0 0))
+
+(check-assembles?
+  (asm
+    (align 4)
+    (db #xff))
+  (bytevector #xff))
+
+(check-assembles?
+  (asm
+    (db #x12)
+    (align 4)
+    (db #xff))
+  (bytevector #x12 0 0 0 #xff))
+
+(check-assembles?
+  (asm
+    (db #x12 #x34)
+    (align 4)
+    (db #xff))
+  (bytevector #x12 #x34 0 0 #xff))
+
+(check-assembles?
+  (asm
+    (db #x12 #x34 #x56)
+    (align 4)
+    (db #xff))
+  (bytevector #x12 #x34 #x56 0 #xff))
+
+(check-assembles?
+  (asm
+    (db #x12 #x34 #x56 #x78)
+    (align 4)
+    (db #xff))
+  (bytevector #x12 #x34 #x56 #x78 #xff))
+
