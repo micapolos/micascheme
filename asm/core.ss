@@ -9,21 +9,19 @@
     (labs syntax))
 
   (define-aux-keyword asm-core-syntax)
+  (define-aux-keyword asm-syntax)
+  (define-aux-keyword label)
+  (define-aux-keyword eq)
 
   (define-syntax-rule (define-asm-core-syntax $name $transformer)
     (begin
       (define-aux-keyword $name)
       (define-property $name asm-core-syntax $transformer)))
 
-  (define-aux-keyword asm-syntax)
-
   (define-syntax-rule (define-asm-syntax $name $transformer)
     (begin
       (define-aux-keyword $name)
       (define-property $name asm-syntax $transformer)))
-
-  (define-aux-keyword label)
-  (define-aux-keyword eq)
 
   (define-syntax asm
     (lambda ($syntax)
