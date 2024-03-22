@@ -85,13 +85,5 @@
     (db #xff))
   (bytevector #x12 #x34 #x56 #x78 #xff))
 
-(check (equal? (r? b) #t))
-(check (equal? (r? (hl)) #t))
-(check (equal? (r? (+ ix 2)) #t))
-(check (equal? (r? dupa) #f))
-
-(check (equal? (values->list (r b)) (list #f #b000 #f)))
-(check (equal? (values->list (r h)) (list #f #b100 #f)))
-(check (equal? (values->list (r ixh)) (list #xdd #b100 #f)))
-(check (equal? (values->list (r (hl))) (list #f #b110 #f)))
-(check (equal? (values->list (r (+ ix 2))) (list #xdd #b110 2)))
+(check-assembles? (asm (ld a #x12)) (bytevector #b00111110 #x12))
+(check-assembles? (asm (ld b c))    (bytevector #b01000001))

@@ -5,7 +5,7 @@
     asm-bytevector)
 
   (import
-    (except (micascheme) and or pop push)
+    (except (micascheme) and or xor pop push)
     (zexy assemble)
     (zexy link)
     (zexy vectorize)

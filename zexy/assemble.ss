@@ -7,6 +7,7 @@
     (rename (zexy ops)
       (and %and)
       (or %or)
+      (xor %xor)
       (push %push)
       (pop %pop)))
 

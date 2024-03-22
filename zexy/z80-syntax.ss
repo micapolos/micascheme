@@ -26,7 +26,7 @@
     stack-op
     rot-op)
   (import
-    (except (zexy base) and or push pop))
+    (except (zexy base) and or xor push pop))
 
   (define-syntax-rule (define-keywords keyword ...)
     (begin
