@@ -65,6 +65,10 @@
       (($op $a $b) (string-append $a " " $op " " $b)))
     "foo * bar"))
 
+(check (equal? (syntax->datum ((match (a 10) (b 20)) #'a)) 10))
+(check (equal? (syntax->datum ((match (a 10) (b 20)) #'b)) 20))
+(check (equal? (syntax->datum ((match (a 10) (b 20)) #'c)) #f))
+
 (define-aux-keywords r b hl)
 
 (define-syntax-matcher r
@@ -73,16 +77,8 @@
       ((_ $code)
         (and (identifier? #'$code))
         (syntax-case $syntax (b hl)
-          (b
-            (lambda ($key)
-              (and
-                (free-identifier=? $key #'$code)
-                #'#b000)))
-          ((hl)
-            (lambda ($key)
-              (and
-                (free-identifier=? $key #'$code)
-                #'#b110))))))))
+          (b (match ($code #b000)))
+          ((hl) (match ($code #b110))))))))
 
 (define-macro ld
   ((_ (r $r1) (r $r2))

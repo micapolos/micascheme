@@ -2,7 +2,8 @@
   (export
     define-literal?
     define-syntax-matcher
-    syntax-match)
+    syntax-match
+    match)
   (import (micascheme))
 
   (define-aux-keyword syntax-literal?)
@@ -22,6 +23,21 @@
       (or
         ($match-b $key)
         ($match-a $key))))
+
+  (define-syntax match
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $entry ...)
+          (fold-left
+            (lambda ($match $entry)
+              (syntax-case $entry ()
+                (($id $value)
+                  #`(lambda ($key)
+                    (or
+                      (and (free-identifier=? $key #'$id) #'$value)
+                      (#,$match $key))))))
+            #`(lambda ($key) #f)
+            (syntax->list #'($entry ...)))))))
 
   (define-syntax-rule (define-literal? $name)
     (define-property $name syntax-literal? #t))
