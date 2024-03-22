@@ -82,4 +82,12 @@
             (run
               ($org $new-pc)
               #`(repeat #,$slack (#,$emit-u8 0))))))))
+
+  (define-syntax-rule (define-registers $reg ...)
+    (begin (define-aux-keyword $reg) ...))
+
+  (define-registers a b c d e h l hl ix iy ixh ixl iyh iyl)
+
+  (define-syntax-rule (db-233 $a $b $c)
+    (db (fxior (fxsll $a 6) (fxsll $b 3) $c)))
 )

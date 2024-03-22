@@ -4,7 +4,9 @@
     define-syntax-rule
     define-syntax-case
     define-aux-keyword
-    expand-begin-syntaxes)
+    define-aux-keywords
+    expand-begin-syntaxes
+    define-property-api)
   (import (scheme))
 
   (define (syntax-null? $syntax)
@@ -48,4 +50,32 @@
   (define-syntax-rule (define-aux-keyword aux)
     (define-syntax-rule aux
       (syntax-error (quote aux) "misplaced aux keyword")))
+
+  (define-syntax-rule (define-aux-keywords aux ...)
+    (begin (define-aux-keyword aux) ...))
+
+  (define-syntax define-property-api
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $name) (identifier? #'$name)
+          (let
+            (($define-identifier
+              (datum->syntax #'$name
+                (string->symbol
+                  (string-append "define-" (symbol->string (datum $name)))))))
+
+            #`(begin
+              (define-syntax-rule (#,$define-identifier $name $value)
+                (begin
+                  (define-aux-keyword $name)
+                  (define-property $name define-property-api (syntax $value))))
+
+              (define-syntax $name
+                (lambda ($syntax)
+                  (lambda ($lookup)
+                    (syntax-case $syntax ()
+                      ((_ $id) (and (identifier? #'$id))
+                        (or
+                          ($lookup #'$id #'define-property-api)
+                          #'#f))))))))))))
 )

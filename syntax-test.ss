@@ -12,3 +12,10 @@
       (string-append
         (symbol->string s)
         "?"))))
+
+(define-property-api matcher)
+(define-matcher x "matcher-x")
+(define-matcher y "matcher-y")
+(check (equal? (matcher x) "matcher-x"))
+(check (equal? (matcher y) "matcher-y"))
+(check (equal? (matcher z) #f))
