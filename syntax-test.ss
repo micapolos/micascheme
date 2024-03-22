@@ -19,3 +19,13 @@
 (check (equal? (matcher x) "matcher-x"))
 (check (equal? (matcher y) "matcher-y"))
 ;(check (equal? (matcher z) #f)) => syntax error
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-map-identifiers #`(+ (+ "foo" "bar") "zoo" other)
+        (lambda ($identifier)
+          (cond
+            ((bound-identifier=? $identifier #'+) #'string-append)
+            (else $identifier)))))
+    `(string-append (string-append "foo" "bar") "zoo" other)))

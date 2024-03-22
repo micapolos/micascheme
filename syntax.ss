@@ -6,7 +6,8 @@
     define-aux-keyword
     define-aux-keywords
     expand-begin-syntaxes
-    define-namespace)
+    define-namespace
+    syntax-map-identifiers)
   (import (scheme))
 
   (define (syntax-null? $syntax)
@@ -79,4 +80,16 @@
                           (identifier? #'$id)
                           ($lookup #'$id #'define-namespace))
                         ($lookup #'$id #'define-namespace))))))))))))
+
+  (define (syntax-map-identifiers $syntax $fn)
+    (syntax-case $syntax ()
+      (($head . $tail)
+        #`(
+          #,(syntax-map-identifiers #'$head $fn)
+          .
+          #,(syntax-map-identifiers #'$tail $fn)))
+      ($other
+        (if (identifier? #'$other)
+          ($fn #'$other)
+          #'$other))))
 )
