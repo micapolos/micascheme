@@ -83,9 +83,10 @@
   (define (syntax-match-1 $lookup $syntax $pattern $body)
     (opt-lets
       ($match (syntax-match-pattern-top-level $lookup $syntax $pattern))
-      (syntax-map-identifiers $body
+      (syntax-map-identifiers
         (lambda ($key)
-          (or ($match $key) $key)))))
+          (or ($match $key) $key))
+        $body)))
 
   (define (syntax-match $lookup $syntax $entries)
     (fold-left

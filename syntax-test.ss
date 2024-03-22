@@ -23,9 +23,10 @@
 (check
   (equal?
     (syntax->datum
-      (syntax-map-identifiers #`(+ (+ "foo" "bar") "zoo" other)
+      (syntax-map-identifiers
         (lambda ($identifier)
           (cond
             ((bound-identifier=? $identifier #'+) #'string-append)
-            (else $identifier)))))
+            (else $identifier)))
+        #`(+ (+ "foo" "bar") "zoo" other)))
     `(string-append (string-append "foo" "bar") "zoo" other)))

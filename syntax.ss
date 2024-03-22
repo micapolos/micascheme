@@ -81,13 +81,13 @@
                           ($lookup #'$id #'define-namespace))
                         ($lookup #'$id #'define-namespace))))))))))))
 
-  (define (syntax-map-identifiers $syntax $fn)
+  (define (syntax-map-identifiers $fn $syntax)
     (syntax-case $syntax ()
       (($head . $tail)
         #`(
-          #,(syntax-map-identifiers #'$head $fn)
+          #,(syntax-map-identifiers $fn #'$head)
           .
-          #,(syntax-map-identifiers #'$tail $fn)))
+          #,(syntax-map-identifiers $fn #'$tail)))
       ($other
         (if (identifier? #'$other)
           ($fn #'$other)
