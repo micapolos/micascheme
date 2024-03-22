@@ -175,3 +175,8 @@
 (check (equal? (ensure-list (list)) (list)))
 (check (equal? (ensure-list (list 1)) (list 1)))
 (check (equal? (ensure-list (list 1 2 3)) (list 1 2 3)))
+
+; === values->list ===
+
+(check (equal? (values->list (values)) (list)))
+(check (equal? (values->list (values 1 2 3)) (list 1 2 3)))

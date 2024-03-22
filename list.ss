@@ -24,7 +24,8 @@
     build-list
     ensure-list
 
-    flatten)
+    flatten
+    values->list)
 
   (import
     (scheme)
@@ -217,4 +218,7 @@
     (switch $obj
       ((list? $list) $list)
       ((else $other) (list $other))))
+
+  (define-syntax-rule (values->list $expr)
+    (call-with-values (lambda () $expr) list))
 )

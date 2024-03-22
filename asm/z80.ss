@@ -1,5 +1,8 @@
 (library (asm z80)
-  (export org db dw dz ds align)
+  (export
+    org db dw dz ds align r r?
+    a b c d e h l hl ix iy ixh ixl iyh iyl
+    r r?)
   (import
     (micascheme)
     (labs syntax)
@@ -90,4 +93,39 @@
 
   (define-syntax-rule (db-233 $a $b $c)
     (db (fxior (fxsll $a 6) (fxsll $b 3) $c)))
+
+  (define-syntax r?
+    (syntax-rules (+ a b c d e h l hl ix iy ixh ixl iyh iyl)
+      ((_ b) #t)
+      ((_ c) #t)
+      ((_ d) #t)
+      ((_ e) #t)
+      ((_ h) #t)
+      ((_ ixh) #t)
+      ((_ iyh) #t)
+      ((_ l) #t)
+      ((_ ixl) #t)
+      ((_ iyl) #t)
+      ((_ (hl)) #t)
+      ((_ (+ ix $d)) #t)
+      ((_ (+ iy $d)) #t)
+      ((_ a) #t)
+      ((_ $) #f)))
+
+  (define-syntax r
+    (syntax-rules (+ a b c d e h l hl ix iy ixh ixl iyh iyl)
+      ((_ b) (values #f #b000 #f))
+      ((_ c) (values #f #b001 #f))
+      ((_ d) (values #f #b010 #f))
+      ((_ e) (values #f #b011 #f))
+      ((_ h) (values #f #b100 #f))
+      ((_ ixh) (values #xdd #b100 #f))
+      ((_ iyh) (values #xfd #b100 #f))
+      ((_ l) (values #f #b101 #f))
+      ((_ ixl) (values #xdd #b101 #f))
+      ((_ iyl) (values #xfd #b101 #f))
+      ((_ (hl)) (values #f #b110 #f))
+      ((_ (+ ix $d)) (values #xdd #b110 $d))
+      ((_ (+ iy $d)) (values #xfd #b110 $d))
+      ((_ a) (values #f #b111 #f))))
 )
