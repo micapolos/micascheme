@@ -13,9 +13,9 @@
         (symbol->string s)
         "?"))))
 
-(define-property-api matcher)
+(define-namespace matcher)
 (define-matcher x "matcher-x")
 (define-matcher y "matcher-y")
 (check (equal? (matcher x) "matcher-x"))
 (check (equal? (matcher y) "matcher-y"))
-(check (equal? (matcher z) #f))
+;(check (equal? (matcher z) #f)) => syntax error

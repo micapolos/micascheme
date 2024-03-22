@@ -4,5 +4,5 @@
     syntax-matcher)
   (import (micascheme))
 
-  (define-property-api syntax-matcher)
+  (define-namespace syntax-matcher)
 )

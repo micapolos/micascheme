@@ -42,6 +42,7 @@
   (switch)
   (symbolizer)
   (syntax)
+  (syntax-matcher)
   (term)
   (throw)
   (tico)

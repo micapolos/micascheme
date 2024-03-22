@@ -6,7 +6,7 @@
     define-aux-keyword
     define-aux-keywords
     expand-begin-syntaxes
-    define-property-api)
+    define-namespace)
   (import (scheme))
 
   (define (syntax-null? $syntax)
@@ -54,7 +54,7 @@
   (define-syntax-rule (define-aux-keywords aux ...)
     (begin (define-aux-keyword aux) ...))
 
-  (define-syntax define-property-api
+  (define-syntax define-namespace
     (lambda ($syntax)
       (syntax-case $syntax ()
         ((_ $name) (identifier? #'$name)
@@ -68,14 +68,15 @@
               (define-syntax-rule (#,$define-identifier $name $value)
                 (begin
                   (define-aux-keyword $name)
-                  (define-property $name define-property-api (syntax $value))))
+                  (define-property $name define-namespace (syntax $value))))
 
               (define-syntax $name
                 (lambda ($syntax)
                   (lambda ($lookup)
                     (syntax-case $syntax ()
-                      ((_ $id) (and (identifier? #'$id))
-                        (or
-                          ($lookup #'$id #'define-property-api)
-                          #'#f))))))))))))
+                      ((_ $id)
+                        (and
+                          (identifier? #'$id)
+                          ($lookup #'$id #'define-namespace))
+                        ($lookup #'$id #'define-namespace))))))))))))
 )
