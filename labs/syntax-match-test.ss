@@ -81,10 +81,17 @@
           ((hl) (match ($code #b110))))))))
 
 (define-macro ld
-  ((_ (r $r1) (r $r2))
-    (list #b01 $r1 $r2)))
+  ((ld (r $r1) (r $r2))
+    (list #b01 $r1 $r2))
+  ((ld (r $r) $n)
+    (list #b01 $r #b110 $n)))
 
 (check
   (equal?
     (ld b (hl))
     (list #b01 #b000 #b110)))
+
+; (check
+;   (equal?
+;     (ld (hl) 12)
+;     (list #b01 #b110 #b110 12)))
