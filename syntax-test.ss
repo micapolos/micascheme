@@ -20,48 +20,50 @@
 (check (equal? (matcher y) "matcher-y"))
 ;(check (equal? (matcher z) #f)) => syntax error
 
-(define-syntax check-maps?
-  (lambda ($syntax)
-    (syntax-case $syntax ()
-      ((_ $syntax $expected)
-        #`(check
-          (equal?
-            (syntax->datum
-              (syntax-map-identifiers
-                (lambda ($id)
-                  (or
-                    (and (free-identifier=? $id #'+) #'string-append)
-                    $id))
-                #'$syntax))
-            '$expected))))))
+; === syntax-map-identifiers ===
 
-(check-maps? + string-append)
-(check-maps? - -)
+(let ()
+  (define-aux-keyword original)
+  (define-aux-keyword mapped)
 
-(check-maps? #'+ #'+)
-(check-maps? #'#,+ #'#,+)
+  (define-syntax check-maps?
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $syntax $expected)
+          #`(check
+            (equal?
+              (syntax->datum
+                (syntax-map-identifiers
+                  (lambda ($id)
+                    (or
+                      (and (free-identifier=? $id #'original) #'mapped)
+                      $id))
+                  #'$syntax))
+              '$expected))))))
 
-(check-maps? #`+ #`+)
-(check-maps? #`#,+ #`#,string-append)
+  (check-maps? original mapped)
+  (check-maps? other other)
 
-(check-maps? #`#,#'+ #`#,#'+)
-(check-maps? #`#'#,+ #`#'#,string-append)
-(check-maps? #'#`#,+ #'#`#,+)
+  (check-maps? #'original #'original)
+  (check-maps? #'#,original #'#,original)
 
-(check-maps? #`#`#,+ #`#`#,+)
-(check-maps? #`#`#,#,+ #`#`#,#,string-append)
+  (check-maps? #`original #`original)
+  (check-maps? #`#,original #`#,mapped)
 
-(check-maps? #`#,@(+ +) #`#,@(string-append string-append))
-(check-maps? #`#`#,@(+ +) #`#`#,@(+ +))
-(check-maps? #`#`#,@#,@(+ +) #`#`#,@#,@(string-append string-append))
+  (check-maps? #`#,#'original #`#,#'original)
+  (check-maps? #`#'#,original #`#'#,mapped)
+  (check-maps? #'#`#,original #'#`#,original)
 
-(check
-  (equal?
-    (syntax->datum
-      (syntax-map-identifiers
-        (lambda ($identifier)
-          (cond
-            ((free-identifier=? $identifier #'+) #'string-append)
-            (else $identifier)))
-        #`(+ (+ "foo" "bar") "zoo" other)))
-    `(string-append (string-append "foo" "bar") "zoo" other)))
+  (check-maps? #`#`#,original #`#`#,original)
+  (check-maps? #`#`#,#,original #`#`#,#,mapped)
+
+  (check-maps? #`#,@(original original) #`#,@(mapped mapped))
+  (check-maps? #`#`#,@(original original) #`#`#,@(original original))
+  (check-maps? #`#`#,@#,@(original original) #`#`#,@#,@(mapped mapped))
+
+  (check-maps? #,#'original #,#'mapped)
+  (check-maps? #,#`original #,#`mapped)
+
+  (check-maps? #,#,#'original #,#,#'original)
+  (check-maps? #,#,#'#'original #,#,#'#'mapped)
+)

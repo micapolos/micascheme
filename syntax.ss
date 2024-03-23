@@ -7,8 +7,7 @@
     define-aux-keywords
     expand-begin-syntaxes
     define-namespace
-    syntax-map-identifiers
-    depth-syntax-map-identifiers)
+    syntax-map-identifiers)
   (import (scheme))
 
   (define (syntax-null? $syntax)
@@ -87,9 +86,22 @@
 
   (define (depth-syntax-map-identifiers $fn $depth $syntax)
     (syntax-case $syntax (syntax quasisyntax)
-      ((syntax $body ...)
-        (zero? $depth)
-        $syntax)
+      (($syntax $body ...)
+        (and
+          (identifier? #'$syntax)
+          (free-identifier=? #'$syntax #'syntax)
+          (zero? $depth))
+        #`($syntax $body ...))
+      (($syntax $body ...)
+        (and
+          (identifier? #'$syntax)
+          (free-identifier=? #'$syntax #'syntax)
+          (< $depth 0))
+        #`($syntax
+          #,@(map
+            (lambda ($body)
+              (depth-syntax-map-identifiers $fn (add1 $depth) $body))
+            (syntax->list #'($body ...)))))
       (($quasisyntax $body ...)
         (and
           (identifier? #'$quasisyntax)
