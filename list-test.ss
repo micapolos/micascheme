@@ -180,3 +180,81 @@
 
 (check (equal? (values->list (values)) (list)))
 (check (equal? (values->list (values 1 2 3)) (list 1 2 3)))
+
+; === assp-update ===
+
+(check
+  (equal?
+    (assp-update
+      (partial eq? 'foo)
+      add1
+      '(
+        (foo . 10)
+        (bar . 20)))
+    '(
+      (foo . 11)
+      (bar . 20))))
+
+(check
+  (equal?
+    (assp-update
+      (partial eq? 'bar)
+      add1
+      '(
+        (foo . 10)
+        (bar . 20)))
+    '(
+      (foo . 10)
+      (bar . 21))))
+
+(check
+  (equal?
+    (assp-update
+      (partial eq? 'goo)
+      add1
+      '(
+        (foo . 10)
+        (bar . 20)))
+    #f))
+
+; === assp-update-new ===
+
+(check
+  (equal?
+    (assp-update-new
+      (partial eq? 'foo)
+      add1
+      (lambda () '(foo . 30))
+      '(
+        (foo . 10)
+        (bar . 20)))
+    '(
+      (foo . 11)
+      (bar . 20))))
+
+(check
+  (equal?
+    (assp-update-new
+      (partial eq? 'bar)
+      add1
+      (lambda () '(bar . 30))
+      '(
+        (foo . 10)
+        (bar . 20)))
+    '(
+      (foo . 10)
+      (bar . 21))))
+
+(check
+  (equal?
+    (assp-update-new
+      (partial eq? 'goo)
+      add1
+      (lambda () '(goo . 30))
+      '(
+        (foo . 10)
+        (bar . 20)))
+    '(
+      (goo . 31)
+      (foo . 10)
+      (bar . 20))))

@@ -25,7 +25,10 @@
     ensure-list
 
     flatten
-    values->list)
+    values->list
+
+    assp-update
+    assp-update-new)
 
   (import
     (scheme)
@@ -221,4 +224,36 @@
 
   (define-syntax-rule (values->list $expr)
     (call-with-values (lambda () $expr) list))
+
+  (define (assp-update $pred $update $list)
+    (cond
+      ((null? $list) #f)
+      (else
+        (lets
+          ($entry (car $list))
+          ($list (cdr $list))
+          ($key (car $entry))
+          ($value (cdr $entry))
+          (cond
+            (($pred $key)
+              (cons
+                (cons $key ($update $value))
+                $list))
+            (else
+              (lets
+                ($list (assp-update $pred $update $list))
+                (and $list (cons $entry $list)))))))))
+
+  (define (assp-update-new $pred $update $new $list)
+    (lets
+      ($list-update (assp-update $pred $update $list))
+      (or
+        $list-update
+        (cons
+          (lets
+            ($entry ($new))
+            ($key (car $entry))
+            ($value (cdr $entry))
+            (cons $key ($update $value)))
+          $list))))
 )
