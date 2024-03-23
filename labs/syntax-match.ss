@@ -111,15 +111,17 @@
       ($match (syntax-pattern-match $lookup $syntax $pattern))
       (syntax-match-apply $match $body)))
 
-  (define (syntax-match $lookup $syntax $entries)
-    (fold-left
-      (lambda ($acc $entry)
-        (or $acc
-          (syntax-case $entry ()
-            (($pattern $body)
-              (syntax-match-1 $lookup $syntax #'$pattern #'$body)))))
-      #f
-      $entries))
+  (define (syntax-match $lookup $syntax $clauses)
+    (or
+      (fold-left
+        (lambda ($acc $clause)
+          (or $acc
+            (syntax-case $clause ()
+              (($pattern $body)
+                (syntax-match-1 $lookup $syntax #'$pattern #'$body)))))
+        #f
+        $clauses)
+      (syntax-error $syntax)))
 
   (define (syntax-match-apply $match $syntax)
     (depth-syntax-match-apply $match 0 $syntax))

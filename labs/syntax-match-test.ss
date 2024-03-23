@@ -59,9 +59,7 @@
     (lambda ($lookup)
       (syntax-case $syntax ()
         ((_ $syntax $entry ...)
-          (or
-            (syntax-match $lookup #'$syntax (syntax->list #'($entry ...)))
-            (syntax-error #'$syntax)))))))
+          (syntax-match $lookup #'$syntax (syntax->list #'($entry ...))))))))
 
 (check
   (equal?
