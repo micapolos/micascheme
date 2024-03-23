@@ -1,5 +1,57 @@
 (import (check) (labs syntax-match) (micascheme))
 
+; === syntax-match-apply ===
+
+(let ()
+  (define-aux-keyword original)
+  (define-aux-keyword mapped)
+
+  (define-syntax-rule (check-maps? $syntax $expected)
+    (check
+      (equal?
+        (syntax->datum
+          (syntax-match-apply
+            (lambda ($id)
+              (if (free-identifier=? $id #'original) #'mapped $id))
+            #'$syntax))
+        '$expected)))
+
+  (check-maps? original mapped)
+  (check-maps? other other)
+
+  (check-maps? #'original #'original)
+  (check-maps? #'#,original #'#,original)
+
+  (check-maps? #`original #`original)
+  (check-maps? #`#,original #`#,mapped)
+
+  (check-maps? #`#,#'original #`#,#'original)
+  (check-maps? #`#'#,original #`#'#,mapped)
+  (check-maps? #'#`#,original #'#`#,original)
+
+  (check-maps? #`#`#,original #`#`#,original)
+  (check-maps? #`#`#,#,original #`#`#,#,mapped)
+
+  (check-maps? #`#,@(original original) #`#,@(mapped mapped))
+  (check-maps? #`#`#,@(original original) #`#`#,@(original original))
+  (check-maps? #`#`#,@#,@(original original) #`#`#,@#,@(mapped mapped))
+
+  (check-maps? #,#'original #,#'mapped)
+  (check-maps? #,#`original #,#`mapped)
+
+  (check-maps? #,#,#'original #,#,#'original)
+  (check-maps? #,#,#'#'original #,#,#'#'mapped)
+
+  (check-maps? (original original) (mapped mapped))
+  (check-maps? (original other) (mapped other))
+
+  (check-maps? (original syntax original) (mapped syntax mapped))
+  (check-maps? (original quasisyntax original) (mapped quasisyntax mapped))
+  (check-maps? (original unsyntax original) (mapped unsyntax mapped))
+  (check-maps? (original unsyntax-splicing original) (mapped unsyntax-splicing mapped))
+)
+
+
 (define-literal? +)
 (define-literal? -)
 

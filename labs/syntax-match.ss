@@ -83,10 +83,7 @@
   (define (syntax-match-1 $lookup $syntax $pattern $body)
     (opt-lets
       ($match (syntax-match-pattern-top-level $lookup $syntax $pattern))
-      (syntax-map-identifiers
-        (lambda ($key)
-          (or ($match $key) $key))
-        $body)))
+      (syntax-match-apply $match $body)))
 
   (define (syntax-match $lookup $syntax $entries)
     (fold-left
@@ -97,4 +94,71 @@
               (syntax-match-1 $lookup $syntax #'$pattern #'$body)))))
       #f
       $entries))
+
+  (define (syntax-match-apply $match $syntax)
+    (depth-syntax-match-apply $match 0 $syntax))
+
+  (define (depth-syntax-match-apply $match $depth $syntax)
+    (syntax-case $syntax ()
+      (($syntax $body ...)
+        (and
+          (identifier? #'$syntax)
+          (free-identifier=? #'$syntax #'syntax)
+          (zero? $depth))
+        #`($syntax $body ...))
+      (($syntax $body ...)
+        (and
+          (identifier? #'$syntax)
+          (free-identifier=? #'$syntax #'syntax)
+          (< $depth 0))
+        #`($syntax
+          #,@(map
+            (lambda ($body)
+              (depth-syntax-match-apply $match (add1 $depth) $body))
+            (syntax->list #'($body ...)))))
+      (($quasisyntax $body ...)
+        (and
+          (identifier? #'$quasisyntax)
+          (free-identifier=? #'$quasisyntax #'quasisyntax))
+        #`(
+          $quasisyntax
+          #,@(map
+            (lambda ($body)
+              (depth-syntax-match-apply $match (add1 $depth) $body))
+            (syntax->list #'($body ...)))))
+      (($unsyntax $body ...)
+        (and
+          (identifier? #'$unsyntax)
+          (free-identifier=? #'$unsyntax #'unsyntax))
+        #`(
+          $unsyntax
+          #,@(map
+            (lambda ($body)
+              (depth-syntax-match-apply $match (sub1 $depth) $body))
+            (syntax->list #'($body ...)))))
+      (($unsyntax-splicing $body ...)
+        (and
+          (identifier? #'$unsyntax-splicing)
+          (free-identifier=? #'$unsyntax-splicing #'unsyntax-splicing))
+        #`(
+          $unsyntax-splicing
+          #,@(map
+            (lambda ($body)
+              (depth-syntax-match-apply $match (sub1 $depth) $body))
+            (syntax->list #'($body ...)))))
+      (($head . $tail)
+        (depth-inner-syntax-match-apply $match $depth $syntax))
+      ($id
+        (and (zero? $depth) (identifier? #'$id))
+        (or ($match #'$id) #'$id))
+      ($other #'$other)))
+
+  (define (depth-inner-syntax-match-apply $match $depth $syntax)
+    (syntax-case $syntax ()
+      (() $syntax)
+      (($head . $tail)
+        #`(
+          #,(depth-syntax-match-apply $match $depth #'$head)
+          .
+          #,(depth-inner-syntax-match-apply $match $depth #'$tail)))))
 )
