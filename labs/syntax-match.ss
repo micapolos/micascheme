@@ -5,7 +5,8 @@
     define-literal?
     define-syntax-matcher
     syntax-match
-    syntax-match-apply)
+    syntax-match-apply
+    syntax-rule-id)
   (import (micascheme))
 
   (define-aux-keyword syntax-literal?)
@@ -31,6 +32,11 @@
 
   (define (match-ref $match $id)
     ($match $id))
+
+  (define (syntax-rule-id $rule)
+    (syntax-case $rule ()
+      (($id . _) (identifier? #'$id) #'$id)
+      ((($id . _) . _) (identifier? #'$id) #'$id)))
 
   (define-syntax match
     (lambda ($syntax)

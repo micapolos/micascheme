@@ -146,3 +146,48 @@
 ;   (equal?
 ;     (ld (hl) 12)
 ;     (list #b01 #b110 #b110 12)))
+
+(let ()
+  (define-syntax define-macros
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $rule ...)
+          (lets
+            ($groups
+              (fold-left
+                (lambda ($groups $rule)
+                  (assid-update-new
+                    (syntax-rule-id $rule)
+                    (partial cons $rule)
+                    (lambda () (list $rule))
+                    $groups))
+                (list)
+                (syntax->list #'($rule ...))))
+            #`(begin
+              #,@(map
+                (lambda ($group)
+                  #`(define-macro
+                    #,(car $group)
+                    #,@(reverse (cdr $group))))
+                (reverse $groups))))))))
+
+  (define-syntax-matcher string
+    (lambda ($lookup $syntax $pattern)
+      (syntax-case $pattern ()
+        ((_ $string)
+          (and (identifier? #'$string))
+          (and
+            (string? (syntax->datum $syntax))
+            (match-put null-match #'$string $syntax))))))
+
+  (define-macros
+    ((plus (string a) (string b)) (string-append a b))
+    ((plus a b) (+ a b))
+    ((minus a b) (- a b))
+    ((minus a) (- a)))
+
+  (check (equal? (plus 3 2) 5))
+  (check (equal? (plus "foo" "bar") "foobar"))
+  (check (equal? (minus 3 2) 1))
+  (check (equal? (minus 3) -3))
+)
