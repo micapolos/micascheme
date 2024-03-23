@@ -7,7 +7,8 @@
     define-aux-keywords
     expand-begin-syntaxes
     define-namespace
-    syntax-map-identifiers)
+    syntax-map-identifiers
+    depth-syntax-map-identifiers)
   (import (scheme))
 
   (define (syntax-null? $syntax)
@@ -82,14 +83,54 @@
                         ($lookup #'$id #'define-namespace))))))))))))
 
   (define (syntax-map-identifiers $fn $syntax)
-    (syntax-case $syntax ()
-      (($head . $tail)
+    (depth-syntax-map-identifiers $fn 0 $syntax))
+
+  (define (depth-syntax-map-identifiers $fn $depth $syntax)
+    (syntax-case $syntax (syntax quasisyntax)
+      ((syntax $body ...) (zero? $depth) $syntax)
+      (($quasisyntax $body ...)
+        (and
+          (identifier? #'$quasisyntax)
+          (free-identifier=? #'$quasisyntax #'quasisyntax))
         #`(
-          #,(syntax-map-identifiers $fn #'$head)
-          .
-          #,(syntax-map-identifiers $fn #'$tail)))
+          $quasisyntax
+          #,@(map
+            (lambda ($body)
+              (depth-syntax-map-identifiers $fn (add1 $depth) $body))
+            (syntax->list #'($body ...)))))
+      (($unsyntax $body ...)
+        (and
+          (identifier? #'$unsyntax)
+          (free-identifier=? #'$unsyntax #'unsyntax))
+        #`(
+          $unsyntax
+          #,@(map
+            (lambda ($body)
+              (depth-syntax-map-identifiers $fn (sub1 $depth) $body))
+            (syntax->list #'($body ...)))))
+      (($unsyntax-splicing $body ...)
+        (and
+          (identifier? #'$unsyntax-splicing)
+          (free-identifier=? #'$unsyntax-splicing #'unsyntax-splicing))
+        #`(
+          $unsyntax-splicing
+          #,@(map
+            (lambda ($body)
+              (depth-syntax-map-identifiers $fn (sub1 $depth) $body))
+            (syntax->list #'($body ...)))))
+      (($head . $tail)
+        (depth-inner-syntax-map-identifiers $fn $depth $syntax))
       ($other
-        (if (identifier? #'$other)
+        (if (and (zero? $depth) (identifier? #'$other))
           ($fn #'$other)
           #'$other))))
+
+  (define (depth-inner-syntax-map-identifiers $fn $depth $syntax)
+    (syntax-case $syntax ()
+      (() $syntax)
+      (($head . $tail)
+        #`(
+          #,(depth-syntax-map-identifiers $fn $depth #'$head)
+          .
+          #,(depth-inner-syntax-map-identifiers $fn $depth #'$tail)))))
 )

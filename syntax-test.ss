@@ -20,13 +20,35 @@
 (check (equal? (matcher y) "matcher-y"))
 ;(check (equal? (matcher z) #f)) => syntax error
 
+(define-syntax check-maps?
+  (lambda ($syntax)
+    (syntax-case $syntax ()
+      ((_ $syntax $expected)
+        #`(check
+          (equal?
+            #,(syntax-map-identifiers
+              (lambda ($id)
+                (or
+                  (and (free-identifier=? $id #'+) #'string-append)
+                  $id))
+              #'$syntax)
+            $expected))))))
+
+(check-maps? + string-append)
+(check-maps? - -)
+(check-maps? (syntax->datum #'+) '+)
+(check-maps? (syntax->datum #`+) '+)
+(check-maps? (syntax->datum #`#`#,+) '#`#,+)
+(check-maps? #`#,+ string-append)
+(check-maps? (syntax->datum #`#`#,#,+) `#`#,,string-append)
+
 (check
   (equal?
     (syntax->datum
       (syntax-map-identifiers
         (lambda ($identifier)
           (cond
-            ((bound-identifier=? $identifier #'+) #'string-append)
+            ((free-identifier=? $identifier #'+) #'string-append)
             (else $identifier)))
         #`(+ (+ "foo" "bar") "zoo" other)))
     `(string-append (string-append "foo" "bar") "zoo" other)))
