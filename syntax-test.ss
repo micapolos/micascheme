@@ -26,21 +26,34 @@
       ((_ $syntax $expected)
         #`(check
           (equal?
-            #,(syntax-map-identifiers
-              (lambda ($id)
-                (or
-                  (and (free-identifier=? $id #'+) #'string-append)
-                  $id))
-              #'$syntax)
-            $expected))))))
+            (syntax->datum
+              (syntax-map-identifiers
+                (lambda ($id)
+                  (or
+                    (and (free-identifier=? $id #'+) #'string-append)
+                    $id))
+                #'$syntax))
+            '$expected))))))
 
 (check-maps? + string-append)
 (check-maps? - -)
-(check-maps? (syntax->datum #'+) '+)
-(check-maps? (syntax->datum #`+) '+)
-(check-maps? (syntax->datum #`#`#,+) '#`#,+)
-(check-maps? #`#,+ string-append)
-(check-maps? (syntax->datum #`#`#,#,+) `#`#,,string-append)
+
+(check-maps? #'+ #'+)
+(check-maps? #'#,+ #'#,+)
+
+(check-maps? #`+ #`+)
+(check-maps? #`#,+ #`#,string-append)
+
+(check-maps? #`#,#'+ #`#,#'+)
+(check-maps? #`#'#,+ #`#'#,string-append)
+(check-maps? #'#`#,+ #'#`#,+)
+
+(check-maps? #`#`#,+ #`#`#,+)
+(check-maps? #`#`#,#,+ #`#`#,#,string-append)
+
+(check-maps? #`#,@(+ +) #`#,@(string-append string-append))
+(check-maps? #`#`#,@(+ +) #`#`#,@(+ +))
+(check-maps? #`#`#,@#,@(+ +) #`#`#,@#,@(string-append string-append))
 
 (check
   (equal?
