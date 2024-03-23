@@ -66,4 +66,12 @@
 
   (check-maps? #,#,#'original #,#,#'original)
   (check-maps? #,#,#'#'original #,#,#'#'mapped)
+
+  (check-maps? (original original) (mapped mapped))
+  (check-maps? (original other) (mapped other))
+
+  (check-maps? (original syntax original) (mapped syntax mapped))
+  (check-maps? (original quasisyntax original) (mapped quasisyntax mapped))
+  (check-maps? (original unsyntax original) (mapped unsyntax mapped))
+  (check-maps? (original unsyntax-splicing original) (mapped unsyntax-splicing mapped))
 )
