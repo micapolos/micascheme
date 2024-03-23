@@ -40,18 +40,7 @@
   (define-syntax-rule (define-syntax-matcher $name $matcher)
     (define-property $name syntax-matcher $matcher))
 
-  (define (syntax-match-pattern-top-level $lookup $syntax $pattern)
-    (syntax-case $pattern ()
-      (($id $param ...)
-        (and (identifier? #'$id))
-        (lets
-          ($matcher ($lookup #'$id #'syntax-matcher))
-          (if $matcher
-            ($matcher $lookup $syntax $pattern)
-            (syntax-match-pattern $lookup $syntax $pattern))))
-      ($other (syntax-match-pattern $lookup $syntax $pattern))))
-
-  (define (syntax-match-pattern $lookup $syntax $pattern)
+  (define (syntax-pattern-match $lookup $syntax $pattern)
     (syntax-case $pattern ()
       ($id
         (identifier? #'$id)
@@ -62,6 +51,18 @@
             null-match)
           (lambda ($key)
             (and (bound-identifier=? $key #'$id) $syntax))))
+      (($id $param ...)
+        (and (identifier? #'$id))
+        (lets
+          ($matcher ($lookup #'$id #'syntax-matcher))
+          (if $matcher
+            ($matcher $lookup $syntax $pattern)
+            (syntax-pattern-inner-match $lookup $syntax $pattern))))
+      ($other
+        (syntax-pattern-inner-match $lookup $syntax $pattern))))
+
+  (define (syntax-pattern-inner-match $lookup $syntax $pattern)
+    (syntax-case $pattern ()
       (()
         (syntax-case $syntax ()
           (() null-match)
@@ -70,14 +71,15 @@
         (syntax-case $syntax ()
           (($head . $tail)
             (opt-lets
-              ($head-match (syntax-match-pattern-top-level $lookup #'$head #'$pattern-head))
-              ($tail-match (syntax-match-pattern $lookup #'$tail #'$pattern-tail))
+              ($head-match (syntax-pattern-match $lookup #'$head #'$pattern-head))
+              ($tail-match (syntax-pattern-inner-match $lookup #'$tail #'$pattern-tail))
               (match-append $head-match $tail-match)))
-          (_ #f)))))
+          (_ #f)))
+      ($other #'$other)))
 
   (define (syntax-match-1 $lookup $syntax $pattern $body)
     (opt-lets
-      (match-ref $match (syntax-match-pattern-top-level $lookup $syntax $pattern))
+      (match-ref $match (syntax-pattern-match $lookup $syntax $pattern))
       (syntax-match-apply $match $body)))
 
   (define (syntax-match $lookup $syntax $entries)
