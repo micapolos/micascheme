@@ -90,3 +90,30 @@
 (check (equal? (syntax->datum (match-ref (match (a #'10) (b #'20)) #'a)) 10))
 (check (equal? (syntax->datum (match-ref (match (a #'10) (b #'20)) #'b)) 20))
 (check (equal? (syntax->datum (match-ref (match (a #'10) (b #'20)) #'c)) #f))
+
+(check (equal? (syntax->datum (match-ref (combined-match (a b) #'10 #'20) #'a)) 10))
+(check (equal? (syntax->datum (match-ref (combined-match (a b) #'10 #'20) #'b)) 20))
+(check (equal? (syntax->datum (match-ref (combined-match (a b) #'10 #'20) #'c)) #f))
+
+(check
+  (procedure?
+    (pattern-rules
+      ((r $code)
+        (b #b000)
+        (c #b001)
+        (d #b010)
+        (e #b011)
+        (h #b100)
+        (l #b101)
+        (a #b111))
+      ((r $prefix $code)
+        (ixh #xdd #b100)
+        (ixl #xdd #b101)
+        (iyh #xfd #b100)
+        (iyl #xfd #b101))
+      ((r $prefix $code $offset)
+        ((+ ix $d) #xdd #b110 $d)
+        ((- ix $d) #xdd #b110 $d)
+        ((+ ix $d) #xdd #b110 $d)
+        ((- iy $d) #xfd #b110 $d)))))
+
