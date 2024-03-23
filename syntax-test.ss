@@ -26,20 +26,15 @@
   (define-aux-keyword original)
   (define-aux-keyword mapped)
 
-  (define-syntax check-maps?
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $syntax $expected)
-          #`(check
-            (equal?
-              (syntax->datum
-                (syntax-map-identifiers
-                  (lambda ($id)
-                    (or
-                      (and (free-identifier=? $id #'original) #'mapped)
-                      $id))
-                  #'$syntax))
-              '$expected))))))
+  (define-syntax-rule (check-maps? $syntax $expected)
+    (check
+      (equal?
+        (syntax->datum
+          (syntax-map-identifiers
+            (lambda ($id)
+              (if (free-identifier=? $id #'original) #'mapped $id))
+            #'$syntax))
+        '$expected)))
 
   (check-maps? original mapped)
   (check-maps? other other)
