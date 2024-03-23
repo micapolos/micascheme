@@ -87,7 +87,9 @@
 
   (define (depth-syntax-map-identifiers $fn $depth $syntax)
     (syntax-case $syntax (syntax quasisyntax)
-      ((syntax $body ...) (zero? $depth) $syntax)
+      ((syntax $body ...)
+        (zero? $depth)
+        $syntax)
       (($quasisyntax $body ...)
         (and
           (identifier? #'$quasisyntax)
@@ -120,10 +122,10 @@
             (syntax->list #'($body ...)))))
       (($head . $tail)
         (depth-inner-syntax-map-identifiers $fn $depth $syntax))
-      ($other
-        (if (and (zero? $depth) (identifier? #'$other))
-          ($fn #'$other)
-          #'$other))))
+      ($id
+        (and (zero? $depth) (identifier? #'$id))
+        ($fn #'$id))
+      ($other #'$other)))
 
   (define (depth-inner-syntax-map-identifiers $fn $depth $syntax)
     (syntax-case $syntax ()
