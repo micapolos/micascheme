@@ -26,7 +26,7 @@
 )
 
 (let ()
-  ; TODO: Define custom syntax for match-matcher.
+  ; TODO: Define custom syntax for macro-matcher
   (define-macro-matcher string
     (lambda ($lookup $syntax $pattern)
       (syntax-case $pattern ()
