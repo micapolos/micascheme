@@ -129,7 +129,8 @@
         (and (identifier? #'$code))
         (syntax-case $syntax (b hl)
           (b (match ($code #b000)))
-          ((hl) (match ($code #b110))))))))
+          ((hl) (match ($code #b110)))
+          (_ #f))))))
 
 (define-macro ld
   ((ld (r $r1) (r $r2))
@@ -142,10 +143,10 @@
     (ld b (hl))
     (list #b01 #b000 #b110)))
 
-; (check
-;   (equal?
-;     (ld (hl) 12)
-;     (list #b01 #b110 #b110 12)))
+(check
+  (equal?
+    (ld (hl) 12)
+    (list #b01 #b110 #b110 12)))
 
 (let ()
   (define-syntax define-macros
