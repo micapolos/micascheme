@@ -35,7 +35,9 @@
 
     assid
     assid-update
-    assid-update-new)
+    assid-update-new
+
+    group-by)
 
   (import
     (scheme)
@@ -281,4 +283,26 @@
       $update
       (lambda () (pair $id ($new)))
       $list))
+
+  ; === group-by ===
+
+  (define (group-by $key-proc $eq-proc $list)
+    (reverse
+      (map
+        (lambda ($group)
+          (lets
+            ((pair $key $list) $group)
+            (pair $key (reverse $list))))
+        (fold-left
+          (lambda ($groups $item)
+            (lets
+              ($key ($key-proc $item))
+              (assp-update-new
+                (partial $eq-proc $key)         ; pred
+                (partial pair $item)            ; update
+                (lambda () (pair $key (list)))  ; new
+                $groups)))
+          (list)
+          $list))))
+
 )

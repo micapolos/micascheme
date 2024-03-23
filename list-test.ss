@@ -321,3 +321,21 @@
       (goo . 31)
       (foo . 10)
       (bar . 20))))
+
+; === group-by ===
+
+(check
+  (equal?
+    (group-by car eq?
+      `(
+        (foo . 10)
+        (bar . 20)
+        (foo . 30)))
+    `(
+      (foo .
+        (
+          (foo . 10)
+          (foo . 30)))
+      (bar .
+        (
+          (bar . 20))))))
