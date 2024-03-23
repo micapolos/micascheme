@@ -155,22 +155,17 @@
         ((_ $rule ...)
           (lets
             ($groups
-              (fold-left
-                (lambda ($groups $rule)
-                  (assid-update-new
-                    (syntax-rule-id $rule)
-                    (partial cons $rule)
-                    (lambda () (list $rule))
-                    $groups))
-                (list)
+              (group-by
+                syntax-rule-id
+                free-identifier=?
                 (syntax->list #'($rule ...))))
             #`(begin
               #,@(map
                 (lambda ($group)
                   #`(define-macro
                     #,(car $group)
-                    #,@(reverse (cdr $group))))
-                (reverse $groups))))))))
+                    #,@(cdr $group)))
+                $groups)))))))
 
   (define-syntax-matcher string
     (lambda ($lookup $syntax $pattern)
