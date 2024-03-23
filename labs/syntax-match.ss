@@ -24,19 +24,14 @@
         ($match-b $key)
         ($match-a $key))))
 
+  (define (match-ref $match $id)
+    ($match $id))
+
   (define-syntax match
     (lambda ($syntax)
       (syntax-case $syntax ()
         ((_ $entry ...)
-          (fold-left
-            (lambda ($match $entry)
-              (syntax-case $entry ()
-                (($id $value)
-                  #`(lambda ($key)
-                    (or
-                      (and (free-identifier=? $key #'$id) #'$value)
-                      (#,$match $key))))))
-            #`(lambda ($key) #f)
+          (fold-left match-put null-match
             (syntax->list #'($entry ...)))))))
 
   (define-syntax-rule (define-literal? $name)
@@ -82,7 +77,7 @@
 
   (define (syntax-match-1 $lookup $syntax $pattern $body)
     (opt-lets
-      ($match (syntax-match-pattern-top-level $lookup $syntax $pattern))
+      (match-ref $match (syntax-match-pattern-top-level $lookup $syntax $pattern))
       (syntax-match-apply $match $body)))
 
   (define (syntax-match $lookup $syntax $entries)
@@ -150,7 +145,7 @@
         (depth-inner-syntax-match-apply $match $depth $syntax))
       ($id
         (and (zero? $depth) (identifier? #'$id))
-        (or ($match #'$id) #'$id))
+        (or (match-ref $match #'$id) #'$id))
       ($other #'$other)))
 
   (define (depth-inner-syntax-match-apply $match $depth $syntax)
