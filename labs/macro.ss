@@ -5,7 +5,8 @@
     define-macro-literal?
     define-macro-matcher
     define-macro
-    define-macros)
+    define-macros
+    pattern-rules)
 
   (import
     (micascheme)
@@ -61,4 +62,42 @@
                     #,(car $group)
                     #,@(cdr $group)))
                 $groups)))))))
+
+  ; Example:
+  ;
+  ; (pattern-rules
+  ;   ((id1 param1)
+  ;     (pat1 arg1)
+  ;     (pat2 arg1)))
+  ;   ((id2 param1 param2)
+  ;     (pat1 arg1 arg2)
+  ;     (pat2 arg1 arg2)
+  ;     (pat3 arg1 arg2)))
+  (define-syntax pattern-rules
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $rule ...)
+          #`(lambda ($lookup $syntax $pattern)
+            (syntax-case $pattern ()
+              #,@(map
+                (lambda ($rule)
+                  (syntax-case $rule ()
+                    (($decl $body ...)
+                      (syntax-case #'$decl ()
+                        (($id $param ...)
+                          #`($decl
+                            (syntax-case $syntax ()
+                              #,@(map
+                                (lambda ($body)
+                                  (syntax-case $body ()
+                                    (($key $arg ...)
+                                      #`($key
+                                        (match
+                                          #,@(map
+                                            (lambda ($param $arg)
+                                              #`(#'#,$param #'#,$arg))
+                                            (syntax->list #'($param ...))
+                                            (syntax->list #'($arg ...))))))))
+                                (syntax->list #'($body ...))))))))))
+                (syntax->list #'($rule ...)))))))))
 )

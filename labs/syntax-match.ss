@@ -9,8 +9,7 @@
     define-syntax-matcher
     syntax-match
     syntax-match-apply
-    syntax-rule-id
-    pattern-rules)
+    syntax-rule-id)
   (import (micascheme))
 
   (define-aux-keyword syntax-literal?)
@@ -69,60 +68,6 @@
       ($key (combined-match ($param ...) ($arg ...)))
       ...
       (_ #f)))
-
-  (define-syntax pattern-rules
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $rule ...)
-          #`(lambda ($lookup $syntax $pattern)
-            (syntax-case $pattern ()
-              #,@(map
-                (lambda ($rule)
-                  (syntax-case $rule ()
-                    (($decl $body ...)
-                      (syntax-case #'$decl ()
-                        (($id $param ...)
-                          #`($decl
-                            (syntax-case $syntax ()
-                              #,@(map
-                                (lambda ($body)
-                                  (syntax-case $body ()
-                                    (($key $arg ...)
-                                      #`($key
-                                        (match
-                                          #,@(map
-                                            (lambda ($param $arg)
-                                              #`(#'#,$param #'#,$arg))
-                                            (syntax->list #'($param ...))
-                                            (syntax->list #'($arg ...))))))))
-                                (syntax->list #'($body ...))))))))))
-                (syntax->list #'($rule ...)))))))))
-
-      ; ((_ (($id $param ...) ($key $arg ...) ...) ...)
-      ;   (lambda ($lookup $syntax $pattern)
-      ;     (syntax-case $pattern ()
-      ;       (($id $param ...)
-      ;         (syntax-case $syntax ()
-      ;           ($key (combined-match ($param ...) ($arg ...)))
-      ;           ...
-      ;           (_ #f)))
-      ;       ...)))))
-
-    ; (lambda ($syntax1)
-    ;   (syntax-case $syntax1 ()
-    ;     ((_ (($id $param ...) ($pattern $body ...) ...))
-    ;       (lets
-    ;         ($... (datum->syntax #'pattern-rules '...))
-    ;         #`(lambda ($lookup $syntax $pattern)
-    ;           (syntax-case $pattern ()
-    ;             #,@
-    ;             (($id $param #,$...)
-    ;               (for-all identifier? #'($id $param #,$...))
-    ;               (opt-lets
-    ;                 ($match (syntax-match $lookup $syntax (list #'$rule ...)))
-    ;                 (map
-    ;                   (partial match-ref $match)
-    ;                   (list #'$param #,$...)))))))))))
 
   (define (syntax-pattern-match $lookup $syntax $pattern)
     (syntax-case $pattern ()

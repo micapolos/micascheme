@@ -88,3 +88,25 @@
   (check (equal? (minus 3) -3))
 )
 
+; Just check that it parses correctly.
+(check
+  (procedure?
+    (pattern-rules
+      ((r $code)
+        (b #b000)
+        (c #b001)
+        (d #b010)
+        (e #b011)
+        (h #b100)
+        (l #b101)
+        (a #b111))
+      ((r $prefix $code)
+        (ixh #xdd #b100)
+        (ixl #xdd #b101)
+        (iyh #xfd #b100)
+        (iyl #xfd #b101))
+      ((r $prefix $code $offset)
+        ((+ ix $d) #xdd #b110 $d)
+        ((- ix $d) #xdd #b110 $d)
+        ((+ ix $d) #xdd #b110 $d)
+        ((- iy $d) #xfd #b110 $d)))))
