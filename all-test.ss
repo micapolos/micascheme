@@ -58,6 +58,7 @@
   (asm all)
   (leo all)
   (scheme all)
+  (labs all)
   (tico all)
   (zexy all)
 )

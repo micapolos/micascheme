@@ -1,9 +1,11 @@
 (library (labs syntax-match)
   (export
+    null-match match-put match-append match-ref match
+
     define-literal?
     define-syntax-matcher
     syntax-match
-    match)
+    syntax-match-apply)
   (import (micascheme))
 
   (define-aux-keyword syntax-literal?)
@@ -18,6 +20,9 @@
         (and (free-identifier=? $key $id) $value)
         ($match $key))))
 
+  (define (match-put-pair $match $pair)
+    (match-put $match (car $pair) (cdr $pair)))
+
   (define (match-append $match-a $match-b)
     (lambda ($key)
       (or
@@ -31,8 +36,14 @@
     (lambda ($syntax)
       (syntax-case $syntax ()
         ((_ $entry ...)
-          (fold-left match-put null-match
-            (syntax->list #'($entry ...)))))))
+          #`(fold-left match-put-pair null-match
+            (list
+              #,@(map
+                (lambda ($entry)
+                  (syntax-case $entry ()
+                    (($id $value)
+                      #`(cons #'$id #'$value))))
+                (syntax->list #'($entry ...)))))))))
 
   (define-syntax-rule (define-literal? $name)
     (define-property $name syntax-literal? #t))
@@ -79,7 +90,7 @@
 
   (define (syntax-match-1 $lookup $syntax $pattern $body)
     (opt-lets
-      (match-ref $match (syntax-pattern-match $lookup $syntax $pattern))
+      ($match (syntax-pattern-match $lookup $syntax $pattern))
       (syntax-match-apply $match $body)))
 
   (define (syntax-match $lookup $syntax $entries)
