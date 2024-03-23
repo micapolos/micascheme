@@ -85,7 +85,7 @@
     (depth-syntax-map-identifiers $fn 0 $syntax))
 
   (define (depth-syntax-map-identifiers $fn $depth $syntax)
-    (syntax-case $syntax (syntax quasisyntax)
+    (syntax-case $syntax ()
       (($syntax $body ...)
         (and
           (identifier? #'$syntax)
