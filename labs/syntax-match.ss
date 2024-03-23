@@ -2,6 +2,9 @@
   (export
     null-match match-put match-append match-ref match combined-match
 
+    syntax-literal?
+    syntax-matcher
+
     define-literal?
     define-syntax-matcher
     syntax-match

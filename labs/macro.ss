@@ -1,5 +1,6 @@
 (library (labs macro)
   (export
+    macro-case
     macro-rules
     define-macro-literal?
     define-macro-matcher
@@ -26,6 +27,15 @@
                 (syntax-match $lookup $syntax
                   (list #'$entry ...))
                 (syntax-error $syntax))))))))
+
+  (define-syntax macro-case
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $lookup $syntax $entry ...)
+          #`(or
+            (syntax-match $lookup $syntax
+              (list #'$entry ...))
+            (syntax-error $syntax))))))
 
   (define-syntax define-macro
     (lambda ($syntax)

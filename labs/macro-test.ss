@@ -1,5 +1,45 @@
 (import (check) (labs macro) (labs syntax-match))
 
+(lets
+  ($lookup
+    (lambda ($key $id)
+      (cond
+        ((free-identifier=? $id #'syntax-literal?)
+          (or
+            (free-identifier=? $key #'+)
+            (free-identifier=? $key #'-)))
+        ((free-identifier=? $id #'syntax-matcher)
+          #f))))
+  (run
+    (check
+      (equal?
+        (syntax->datum
+          (macro-case $lookup #'(+ "foo" "bar")
+            ((+ a b) (a plus b))
+            ((- a b) (a minus b))
+            ((op a b) (a op b))))
+        '("foo" plus "bar")))
+
+    (check
+      (equal?
+        (syntax->datum
+          (macro-case $lookup #'(- "foo" "bar")
+            ((+ a b) (a plus b))
+            ((- a b) (a minus b))
+            ((op a b) (a op b))))
+        '("foo" minus "bar")))
+
+    (check
+      (equal?
+        (syntax->datum
+          (macro-case $lookup #'(* "foo" "bar")
+            ((+ a b) (a plus b))
+            ((- a b) (a minus b))
+            ((op a b) (a op b))))
+        '("foo" * "bar")))
+  )
+)
+
 (let ()
   (define-macro-literal? +)
   (define-macro-literal? -)
