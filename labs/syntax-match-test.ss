@@ -87,6 +87,6 @@
       (($op $a $b) (string-append $a " " $op " " $b)))
     "foo * bar"))
 
-(check (equal? (syntax->datum (match-ref (match (a 10) (b 20)) #'a)) 10))
-(check (equal? (syntax->datum (match-ref (match (a 10) (b 20)) #'b)) 20))
-(check (equal? (syntax->datum (match-ref (match (a 10) (b 20)) #'c)) #f))
+(check (equal? (syntax->datum (match-ref (match (a #'10) (b #'20)) #'a)) 10))
+(check (equal? (syntax->datum (match-ref (match (a #'10) (b #'20)) #'b)) 20))
+(check (equal? (syntax->datum (match-ref (match (a #'10) (b #'20)) #'c)) #f))

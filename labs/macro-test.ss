@@ -34,7 +34,7 @@
           (and (identifier? #'$string))
           (and
             (string? (syntax->datum $syntax))
-            (match-put null-match #'$string $syntax))))))
+            (match ($string $syntax)))))))
 
   (define-macros
     ((plus (string a) (string b)) (string-append a b))

@@ -48,7 +48,7 @@
                 (lambda ($entry)
                   (syntax-case $entry ()
                     (($id $value)
-                      #`(cons #'$id #'$value))))
+                      #`(cons #'$id $value))))
                 (syntax->list #'($entry ...)))))))))
 
   (define-syntax-rule (define-literal? $name)
