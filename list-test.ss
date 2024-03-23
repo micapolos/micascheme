@@ -258,3 +258,66 @@
       (goo . 31)
       (foo . 10)
       (bar . 20))))
+
+; === assoc-update ===
+
+(check
+  (equal?
+    (assoc-update 'foo add1
+      '(
+        (foo . 10)
+        (bar . 20)))
+    '(
+      (foo . 11)
+      (bar . 20))))
+
+(check
+  (equal?
+    (assoc-update 'bar add1
+      '(
+        (foo . 10)
+        (bar . 20)))
+    '(
+      (foo . 10)
+      (bar . 21))))
+
+(check
+  (equal?
+    (assoc-update 'goo add1
+      '(
+        (foo . 10)
+        (bar . 20)))
+    #f))
+
+; === assoc-update-new ===
+
+(check
+  (equal?
+    (assoc-update-new 'foo add1 (lambda () 30)
+      '(
+        (foo . 10)
+        (bar . 20)))
+    '(
+      (foo . 11)
+      (bar . 20))))
+
+(check
+  (equal?
+    (assoc-update-new 'bar add1 (lambda () 30)
+      '(
+        (foo . 10)
+        (bar . 20)))
+    '(
+      (foo . 10)
+      (bar . 21))))
+
+(check
+  (equal?
+    (assoc-update-new 'goo add1 (lambda () 30)
+      '(
+        (foo . 10)
+        (bar . 20)))
+    '(
+      (goo . 31)
+      (foo . 10)
+      (bar . 20))))

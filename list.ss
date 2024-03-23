@@ -28,7 +28,14 @@
     values->list
 
     assp-update
-    assp-update-new)
+    assp-update-new
+
+    assoc-update
+    assoc-update-new
+
+    assid
+    assid-update
+    assid-update-new)
 
   (import
     (scheme)
@@ -256,4 +263,27 @@
             ($value (cdr $entry))
             (cons $key ($update $value)))
           $list))))
+
+  (define (assoc-update $key $update $list)
+    (assp-update (partial equal? $key) $update $list))
+
+  (define (assoc-update-new $key $update $new $list)
+    (assp-update-new
+      (partial equal? $key)
+      $update
+      (lambda () (cons $key ($new)))
+      $list))
+
+  (define (assid $id $list)
+    (assp (partial free-identifier=? $id) $list))
+
+  (define (assid-update $id $update $list)
+    (assp-update (partial free-identifier=? $id) $update $list))
+
+  (define (assid-update-new $id $update $new $list)
+    (assp-update-new
+      (partial free-identifier=? $id)
+      $update
+      (lambda () (cons $id ($new)))
+      $list))
 )
