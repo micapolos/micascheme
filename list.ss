@@ -52,7 +52,8 @@
     (switch)
     (stack)
     (generate)
-    (number))
+    (number)
+    (pair))
 
   (define bindable-list list)
 
@@ -232,37 +233,31 @@
   (define-syntax-rule (values->list $expr)
     (call-with-values (lambda () $expr) list))
 
+  ; === ass lists ===
+
   (define (assp-update $pred $update $list)
     (cond
       ((null? $list) #f)
       (else
         (lets
-          ($entry (car $list))
-          ($list (cdr $list))
-          ($key (car $entry))
-          ($value (cdr $entry))
+          ((pair $entry $list) $list)
+          ((pair $key $value) $entry)
           (cond
             (($pred $key)
-              (cons
-                (cons $key ($update $value))
-                $list))
+              (pair (pair $key ($update $value)) $list))
             (else
-              (lets
+              (opt-lets
                 ($list (assp-update $pred $update $list))
-                (and $list (cons $entry $list)))))))))
+                (pair $entry $list))))))))
 
   (define (assp-update-new $pred $update $new $list)
-    (lets
-      ($list-update (assp-update $pred $update $list))
-      (or
-        $list-update
-        (cons
-          (lets
-            ($entry ($new))
-            ($key (car $entry))
-            ($value (cdr $entry))
-            (cons $key ($update $value)))
-          $list))))
+    (or
+      (assp-update $pred $update $list)
+      (pair
+        (lets
+          ((pair $key $value) ($new))
+          (pair $key ($update $value)))
+        $list)))
 
   (define (assoc-update $key $update $list)
     (assp-update (partial equal? $key) $update $list))
@@ -271,7 +266,7 @@
     (assp-update-new
       (partial equal? $key)
       $update
-      (lambda () (cons $key ($new)))
+      (lambda () (pair $key ($new)))
       $list))
 
   (define (assid $id $list)
@@ -284,6 +279,6 @@
     (assp-update-new
       (partial free-identifier=? $id)
       $update
-      (lambda () (cons $id ($new)))
+      (lambda () (pair $id ($new)))
       $list))
 )
