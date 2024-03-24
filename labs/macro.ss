@@ -21,8 +21,7 @@
   (define-syntax-rule (macro-rules $entry ...)
     (lambda ($syntax)
       (lambda ($lookup)
-        (syntax-match $lookup $syntax
-          (list #'$entry ...)))))
+        (macro-case $lookup $syntax $entry ...))))
 
   (define-syntax-rule (macro-case $lookup $syntax $entry ...)
     (syntax-match $lookup $syntax
