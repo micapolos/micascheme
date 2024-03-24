@@ -190,8 +190,4 @@
           #,(depth-syntax-match-apply $match $depth #'$head)
           .
           #,(depth-inner-syntax-match-apply $match $depth #'$tail)))))
-
-  ; (define (syntax-match-apply $match $body)
-  ;   #`(syntax-case #'(#,@(reverse (map cdr $match))) ()
-  ;     ((#,@(reverse (map car $match))) #'#,$body)))
 )
