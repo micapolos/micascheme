@@ -24,13 +24,13 @@
         ((_ $entry ...)
           #`(lambda ($syntax)
             (lambda ($lookup)
-              (syntax-clauses-apply $lookup $syntax (list #'$entry ...))))))))
+              (syntax-match $lookup $syntax (list #'$entry ...))))))))
 
   (define-syntax macro-case
     (lambda ($syntax)
       (syntax-case $syntax ()
         ((_ $lookup $syntax $entry ...)
-          #`(syntax-clauses-apply $lookup $syntax (list #'$entry ...))))))
+          #`(syntax-match $lookup $syntax (list #'$entry ...))))))
 
   (define-syntax define-macro
     (lambda ($syntax)

@@ -160,7 +160,7 @@
   (define (syntax-pattern-body-apply $lookup $syntax $pattern $body)
     (opt-lets
       ($match (syntax-pattern-match $lookup $syntax $pattern))
-      (syntax-match-apply $match $body)))
+      (match-apply-syntax $match $body)))
 
   (define (syntax-clause-apply $lookup $syntax $clause)
     (syntax-case $clause ()
@@ -245,6 +245,6 @@
           #,(depth-inner-syntax-match-apply $match $depth #'$tail)))))
 
   (define (match-apply-syntax $match $body)
-    #`(syntax-case #'(#,@(map cdr $match)) ()
-      ((#,@(map car $match)) #'#,$body)))
+    #`(syntax-case #'(#,@(reverse (map cdr $match))) ()
+      ((#,@(reverse(map car $match))) #'#,$body)))
 )

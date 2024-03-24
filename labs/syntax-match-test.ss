@@ -26,17 +26,18 @@
         (syntax->datum
           (syntax-clause-apply
             $lookup
-            #'(+ "foo" "bar")
-            #'((+ a b) (string-append a b))))
-        `(string-append "foo" "bar")))
+            #'(+ a b)
+            #'((+ $a $b) body)))
+        `(syntax-case #'(a b) ()
+          (($a $b) #'body))))
 
     (check
       (equal?
         (syntax->datum
           (syntax-clause-apply
             $lookup
-            #'(- "foo" "bar")
-            #'((+ a b) (string-append a b))))
+            #'(- a b)
+            #'((+ $a $b) body)))
         #f))))
 
 ; === syntax-clauses-apply ===
@@ -51,10 +52,10 @@
           (free-identifier=? $key #'-)))))
   ($clauses
     (list
-      #'((+ a b) (string-append a b))
-      #'((- a b) (string-prepend a b))
-      #'((op a b) (a op b))
-      #'(x (dupa x))))
+      #'((+ $a $b) body1)
+      #'((- $a $b) body2)
+      #'(($op $a $b) body3)
+      #'($other body4)))
 
   (run
     (check
@@ -62,36 +63,40 @@
         (syntax->datum
           (syntax-clauses-apply
             $lookup
-            #'(+ "foo" "bar")
+            #'(+ a b)
             $clauses))
-        `(string-append "foo" "bar")))
+        `(syntax-case #'(a b) ()
+          (($a $b) #'body1))))
 
     (check
       (equal?
         (syntax->datum
           (syntax-clauses-apply
             $lookup
-            #'(- "foo" "bar")
+            #'(- a b)
             $clauses))
-        `(string-prepend "foo" "bar")))
+        `(syntax-case #'(a b) ()
+          (($a $b) #'body2))))
 
     (check
       (equal?
         (syntax->datum
           (syntax-clauses-apply
             $lookup
-            #'(* "foo" "bar")
+            #'(* a b)
             $clauses))
-        `("foo" * "bar")))
+        `(syntax-case #'(* a b) ()
+          (($op $a $b) #'body3))))
 
     (check
       (equal?
         (syntax->datum
           (syntax-clauses-apply
             $lookup
-            #'("foo" "bar")
+            #'other
             $clauses))
-        `(dupa ("foo" "bar"))))))
+        `(syntax-case #'(other) ()
+          (($other) #'body4))))))
 
 ; === syntax-match-apply ===
 
@@ -191,7 +196,7 @@
   (equal?
     (syntax->datum
       (match-apply-syntax
-        (match (param-1 #'arg-1) (param-2 #'arg-2))
+        (match ($a #'a) ($b #'b))
         #'body))
-    '(syntax-case #'(arg-2 arg-1) ()
-      ((param-2 param-1) #'body))))
+    '(syntax-case #'(a b) ()
+      (($a $b) #'body))))
