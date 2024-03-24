@@ -186,3 +186,12 @@
 (check (equal? (syntax->datum (match-ref (combined-match (a b) #'10 #'20) #'a)) 10))
 (check (equal? (syntax->datum (match-ref (combined-match (a b) #'10 #'20) #'b)) 20))
 (check (equal? (syntax->datum (match-ref (combined-match (a b) #'10 #'20) #'c)) #f))
+
+(check
+  (equal?
+    (syntax->datum
+      (match-apply-syntax
+        (match (param-1 #'arg-1) (param-2 #'arg-2))
+        #'body))
+    '(syntax-case #'(arg-2 arg-1) ()
+      ((param-2 param-1) #'body))))

@@ -24,7 +24,9 @@
     define-syntax-matcher
     syntax-match
     syntax-match-apply
-    syntax-rule-id)
+    syntax-rule-id
+
+    match-apply-syntax)
   (import (micascheme))
 
   (define-aux-keyword syntax-literal?)
@@ -241,4 +243,8 @@
           #,(depth-syntax-match-apply $match $depth #'$head)
           .
           #,(depth-inner-syntax-match-apply $match $depth #'$tail)))))
+
+  (define (match-apply-syntax $match $body)
+    #`(syntax-case #'(#,@(map cdr $match)) ()
+      ((#,@(map car $match)) #'#,$body)))
 )
