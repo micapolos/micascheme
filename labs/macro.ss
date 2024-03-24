@@ -18,26 +18,17 @@
   (define-syntax-rule (define-macro-matcher $id $entry ...)
     (define-syntax-matcher $id $entry ...))
 
-  (define-syntax macro-rules
+  (define-syntax-rule (macro-rules $entry ...)
     (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $entry ...)
-          #`(lambda ($syntax)
-            (lambda ($lookup)
-              (syntax-match $lookup $syntax (list #'$entry ...))))))))
+      (lambda ($lookup)
+        (syntax-match $lookup $syntax (list #'$entry ...)))))
 
-  (define-syntax macro-case
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $lookup $syntax $entry ...)
-          #`(syntax-match $lookup $syntax (list #'$entry ...))))))
+  (define-syntax-rule (macro-case $lookup $syntax $entry ...)
+    (syntax-match $lookup $syntax (list #'$entry ...)))
 
-  (define-syntax define-macro
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $name $entry ...)
-          #`(define-syntax $name
-            (macro-rules $entry ...))))))
+  (define-syntax-rule (define-macro $name $entry ...)
+    (define-syntax $name
+      (macro-rules $entry ...)))
 
   (define-syntax define-macros
     (lambda ($syntax)
