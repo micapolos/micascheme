@@ -6,7 +6,8 @@
     define-aux-keyword
     define-aux-keywords
     expand-begin-syntaxes
-    define-namespace)
+    define-namespace
+    define-lookup-syntax)
   (import (scheme))
 
   (define (syntax-null? $syntax)
@@ -70,13 +71,24 @@
                   (define-aux-keyword $name)
                   (define-property $name define-namespace (syntax $value))))
 
-              (define-syntax $name
-                (lambda ($syntax)
-                  (lambda ($lookup)
-                    (syntax-case $syntax ()
-                      ((_ $id)
-                        (and
-                          (identifier? #'$id)
-                          ($lookup #'$id #'define-namespace))
-                        ($lookup #'$id #'define-namespace))))))))))))
+              (define-lookup-syntax ($name $syntax $lookup)
+                (syntax-case $syntax ()
+                  ((_ $id)
+                    (and
+                      (identifier? #'$id)
+                      ($lookup #'$id #'define-namespace))
+                    ($lookup #'$id #'define-namespace))))))))))
+
+  (define-syntax define-lookup-syntax
+    (syntax-rules ()
+      ((_ $name $body)
+        (identifier? #'$name)
+        (define-syntax $name $body))
+      ((_ ($name $syntax) $body)
+        (and (identifier? #'$name) (identifier? #'$syntax))
+        (define-syntax ($name $syntax) $body))
+      ((_ ($name $syntax $lookup) $body)
+        (and (identifier? #'$name) (identifier? #'$syntax) (identifier? #'$lookup))
+        (define-syntax ($name $syntax)
+          (lambda ($lookup) $body)))))
 )

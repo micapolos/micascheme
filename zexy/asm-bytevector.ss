@@ -25,15 +25,13 @@
         (syntax-case $syntax ()
           ((_ $param ...) #`$body)))))
 
-  (define-syntax asm-bytevector
-    (lambda ($syntax)
-      (lambda ($lookup)
-        (syntax-case $syntax ()
-          ((_ $op ...)
-            (link $lookup
-              (flatten
-                (map
-                  (partial assemble (lambda ($id) ($lookup $id #'asm)))
-                  (syntax->list #'($op ...))))
-              vectorize))))))
+  (define-syntax (asm-bytevector $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ $op ...)
+        (link $lookup
+          (flatten
+            (map
+              (partial assemble (lambda ($id) ($lookup $id #'asm)))
+              (syntax->list #'($op ...))))
+          vectorize))))
 )

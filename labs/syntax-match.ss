@@ -49,18 +49,17 @@
   (define (match-ref $match $id)
     (opt-lift cdr (assid $id $match)))
 
-  (define-syntax match
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $entry ...)
-          #`(fold-left match-put-pair null-match
-            (list
-              #,@(map
-                (lambda ($entry)
-                  (syntax-case $entry ()
-                    (($id $value)
-                      #`(cons #'$id $value))))
-                (syntax->list #'($entry ...)))))))))
+  (define-syntax (match $syntax)
+    (syntax-case $syntax ()
+      ((_ $entry ...)
+        #`(fold-left match-put-pair null-match
+          (list
+            #,@(map
+              (lambda ($entry)
+                (syntax-case $entry ()
+                  (($id $value)
+                    #`(cons #'$id $value))))
+              (syntax->list #'($entry ...))))))))
 
   ; === different approach ===
 

@@ -11,23 +11,19 @@
   (define-syntax-rule (define-proof $name $proof)
     (define-property $name proof $proof))
 
-  (define-syntax proof
-    (lambda ($syntax)
-      (lambda ($lookup)
-        (syntax-case $syntax ()
-          ((_ $item)
-            (lets
-              ($value ($lookup #'$item #'proof))
-              #`'#,(datum->syntax #'* $value)))))))
+  (define-syntax (proof $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ $item)
+        (lets
+          ($value ($lookup #'$item #'proof))
+          #`'#,(datum->syntax #'* $value)))))
 
-  (define-syntax proven
-    (lambda ($syntax)
-      (lambda ($lookup)
-        (syntax-case $syntax ()
-          ((_ $expr)
-            (let ()
-              (syntax->proof
-                (lambda ($identifier) ($lookup $identifier #'proof))
-                #'$expr)
-              #'$expr))))))
+  (define-syntax (proven $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ $expr)
+        (let ()
+          (syntax->proof
+            (lambda ($identifier) ($lookup $identifier #'proof))
+            #'$expr)
+          #'$expr))))
 )

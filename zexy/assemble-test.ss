@@ -4,21 +4,19 @@
   (zexy ops)
   (syntax))
 
-(define-syntax check-assembles
-  (lambda ($syntax)
-    (lambda ($lookup)
-      (syntax-case $syntax ()
-        ((_ $op $data ...)
-          #`(check
-            (equal?
-              (list
-                #,@(map
-                  (lambda ($asm)
-                    (syntax-case $asm (db dw)
-                      ((db $expr) #`(list 'db $expr))
-                      ((dw $expr) #`(list 'dw $expr))))
-                  (assemble (lambda ($id) #f) #'$op)))
-              (list (quote $data) ...))))))))
+(define-lookup-syntax (check-assembles $syntax $lookup)
+  (syntax-case $syntax ()
+    ((_ $op $data ...)
+      #`(check
+        (equal?
+          (list
+            #,@(map
+              (lambda ($asm)
+                (syntax-case $asm (db dw)
+                  ((db $expr) #`(list 'db $expr))
+                  ((dw $expr) #`(list 'dw $expr))))
+              (assemble (lambda ($id) #f) #'$op)))
+          (list (quote $data) ...))))))
 
 (define n12 #x12)
 (define nm1234 #x1234)

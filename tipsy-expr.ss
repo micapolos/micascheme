@@ -116,7 +116,7 @@
 
   (define-aux-keyword typeof)
 
-  (define (syntax-expr $lookup $syntax)
+  (define (syntax-expr $syntax $lookup)
     (syntax-case $syntax (define if lambda typeof of)
       ((of $value $type)
         (expr #'$type #'$value))

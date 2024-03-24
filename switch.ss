@@ -7,35 +7,33 @@
     (procedure)
     (throw))
 
-  (define-syntax switch
-    (lambda ($syntax)
-      (lambda ($lookup)
-        (syntax-case $syntax (else)
-          ((_ expr ((pred var) body) ... ((else else-var) else-body))
-            #`(let ((tmp expr))
-              (cond
-                #,@(map
-                  (lambda ($pred $decl $body)
-                    #`(
-                      (#,$pred tmp)
-                      #,(transform-binder $lookup $decl #'tmp $body)))
-                  (syntax->list #'(pred ...))
-                  (syntax->list #'(var ...))
-                  (syntax->list #'(body ...)))
-                (else
-                  (let ((else-tmp tmp))
-                    #,(transform-binder $lookup #'else-var #'else-tmp #'else-body))))))
-          ((_ expr ((pred var) body) ...)
-            #`(let ((tmp expr))
-              (cond
-                #,@(map
-                  (lambda ($pred $decl $body)
-                    #`(
-                      (#,$pred tmp)
-                      #,(transform-binder $lookup $decl #'tmp $body)))
-                  (syntax->list #'(pred ...))
-                  (syntax->list #'(var ...))
-                  (syntax->list #'(body ...))))))))))
+  (define-lookup-syntax (switch $syntax $lookup)
+    (syntax-case $syntax (else)
+      ((_ expr ((pred var) body) ... ((else else-var) else-body))
+        #`(let ((tmp expr))
+          (cond
+            #,@(map
+              (lambda ($pred $decl $body)
+                #`(
+                  (#,$pred tmp)
+                  #,(transform-binder $lookup $decl #'tmp $body)))
+              (syntax->list #'(pred ...))
+              (syntax->list #'(var ...))
+              (syntax->list #'(body ...)))
+            (else
+              (let ((else-tmp tmp))
+                #,(transform-binder $lookup #'else-var #'else-tmp #'else-body))))))
+      ((_ expr ((pred var) body) ...)
+        #`(let ((tmp expr))
+          (cond
+            #,@(map
+              (lambda ($pred $decl $body)
+                #`(
+                  (#,$pred tmp)
+                  #,(transform-binder $lookup $decl #'tmp $body)))
+              (syntax->list #'(pred ...))
+              (syntax->list #'(var ...))
+              (syntax->list #'(body ...))))))))
 
   (define-syntax-rule (switch-opt $expr (($pred $var) $body) ...)
     (switch $expr

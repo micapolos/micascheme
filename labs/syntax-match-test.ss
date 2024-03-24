@@ -153,12 +153,10 @@
 (define-literal? +)
 (define-literal? -)
 
-(define-syntax syntax-match!
-  (lambda ($syntax)
-    (lambda ($lookup)
-      (syntax-case $syntax ()
-        ((_ $syntax $entry ...)
-          (syntax-match $lookup #'$syntax (syntax->list #'($entry ...))))))))
+(define-syntax (syntax-match! $syntax $lookup)
+  (syntax-case $syntax ()
+    ((_ $syntax $entry ...)
+      (syntax-match $lookup #'$syntax (syntax->list #'($entry ...))))))
 
 (check
   (equal?

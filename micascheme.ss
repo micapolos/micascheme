@@ -6,7 +6,8 @@
       define
       list
       set-car!
-      set-cdr!)
+      set-cdr!
+      define-syntax)
     (binder)
     (boolean)
     (case)
@@ -32,7 +33,7 @@
     (read)
     (stack)
     (switch)
-    (syntax)
+    (rename (syntax) (define-lookup-syntax define-syntax))
     (system)
     (test)
     (throw)
@@ -46,7 +47,8 @@
         define
         list
         set-car!
-        set-cdr!)
+        set-cdr!
+        define-syntax)
       (binder)
       (boolean)
       (case)
@@ -72,7 +74,7 @@
       (read)
       (stack)
       (switch)
-      (syntax)
+      (rename (syntax) (define-lookup-syntax define-syntax))
       (system)
       (test)
       (throw)

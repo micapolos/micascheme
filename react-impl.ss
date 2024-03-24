@@ -9,9 +9,9 @@
 
   (define-aux-keyword react)
 
-  (define (react-syntax $lookup $syntax)
+  (define (react-syntax $syntax $lookup)
     (lets
-      ($statements (build $lookup $syntax))
+      ($statements (build $syntax $lookup))
       #`(begin
         (sdl-set-main-ready!)
         (run-sdl SDL-INIT-VIDEO SDL-INIT-EVENTS SDL-INIT-AUDIO
@@ -136,7 +136,7 @@
 
                         (sdl-pause-audio-device $audio-device #t))))))))))))
 
-  (define (build $lookup $syntax)
+  (define (build $syntax $lookup)
     (reverse
       (fold-left
         (partial statements+syntax $lookup)
@@ -193,7 +193,7 @@
       ($other
         (syntax-error $syntax))))
 
-  (define (built-audio-expression $lookup $syntax)
+  (define (built-audio-expression $syntax $lookup)
     (lets
       ($context (empty-context))
       ($context (context-bind $context #`sample-rate (pure-sequential #`$sample-freq)))
@@ -212,7 +212,7 @@
           (map sampler (deps-updaters $deps)))
         (sequential-value $sequential))))
 
-  (define (built-main-expression $lookup $syntax)
+  (define (built-main-expression $syntax $lookup)
     (lets
       ($context (empty-context))
       ($context (context-bind $context #`sample-rate (pure-sequential #`$sample-freq)))
