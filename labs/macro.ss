@@ -18,14 +18,14 @@
   (define-syntax-rule (define-macro-matcher $id $entry ...)
     (define-syntax-matcher $id $entry ...))
 
+  (define-syntax-rule (macro-case $lookup $syntax $entry ...)
+    (syntax-match $lookup $syntax
+      (list #'$entry ...)))
+
   (define-syntax-rule (macro-rules $entry ...)
     (lambda ($syntax)
       (lambda ($lookup)
         (macro-case $lookup $syntax $entry ...))))
-
-  (define-syntax-rule (macro-case $lookup $syntax $entry ...)
-    (syntax-match $lookup $syntax
-      (list #'$entry ...)))
 
   (define-syntax-rule (define-macro $name $entry ...)
     (define-syntax $name
