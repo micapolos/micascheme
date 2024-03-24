@@ -6,14 +6,16 @@
   (define-aux-keyword original)
   (define-aux-keyword mapped)
 
-  (define-syntax-rule (check-maps? $syntax $expected)
-    (check
-      (equal?
-        (syntax->datum
-          (syntax-match-apply
-            (id-match #'original #'mapped)
-            #'$syntax))
-        '$expected)))
+  (define-syntax check-maps?
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ $syntax $expected)
+          #`(check
+            (equal?
+              '#,(syntax-match-apply
+                (id-match #'original #'mapped)
+                #'$syntax)
+              '$expected))))))
 
   (check-maps? original mapped)
   (check-maps? other other)
