@@ -8,6 +8,15 @@
     match
     combined-match
 
+    null-syntax-match
+    syntax-match-put
+    syntax-match-append
+    syntax-match-apply-2
+    id-syntax-match
+
+    syntax-clause-apply
+    syntax-clauses-apply
+
     syntax-literal?
     syntax-matcher
 
@@ -38,11 +47,6 @@
   (define (match-ref $match $id)
     (opt-lift cdr (assid $id $match)))
 
-  (define (syntax-rule-id $rule)
-    (syntax-case $rule ()
-      (($id . _) (identifier? #'$id) #'$id)
-      ((($id . _) . _) (identifier? #'$id) #'$id)))
-
   (define-syntax match
     (lambda ($syntax)
       (syntax-case $syntax ()
@@ -55,6 +59,33 @@
                     (($id $value)
                       #`(cons #'$id $value))))
                 (syntax->list #'($entry ...)))))))))
+
+  ; === different approach ===
+
+  (define (null-syntax-match)
+    (lambda ($body) $body))
+
+  (define (syntax-match-put $match $id $syntax)
+    (lambda ($body)
+      #`(syntax-case #'#,$syntax ()
+        (#,$id #,($match $body)))))
+
+  (define (syntax-match-append $match $other)
+    (lambda ($body)
+      ($other ($match $body))))
+
+  (define (syntax-match-apply-2 $match $body)
+    ($match $body))
+
+  (define (id-syntax-match $id $syntax)
+    (syntax-match-put (null-syntax-match) $id $syntax))
+
+  ; ==========================
+
+  (define (syntax-rule-id $rule)
+    (syntax-case $rule ()
+      (($id . _) (identifier? #'$id) #'$id)
+      ((($id . _) . _) (identifier? #'$id) #'$id)))
 
   (define-syntax-rule (define-literal? $name)
     (define-property $name syntax-literal? #t))
@@ -123,6 +154,26 @@
         #f
         $clauses)
       (syntax-error $syntax)))
+
+  (define (syntax-pattern-body-apply $lookup $syntax $pattern $body)
+    (opt-lets
+      ($match (syntax-pattern-match $lookup $syntax $pattern))
+      (syntax-match-apply $match $body)))
+
+  (define (syntax-clause-apply $lookup $syntax $clause)
+    (syntax-case $clause ()
+      (($pattern $body)
+        (syntax-pattern-body-apply $lookup $syntax #'$pattern #'$body))))
+
+  (define (syntax-clauses-apply $lookup $syntax $clauses)
+    (or
+      (fold-left
+        (lambda ($acc $clause)
+          (or $acc (syntax-clause-apply $lookup $syntax $clause)))
+        #f
+        $clauses)
+      (syntax-error $syntax)))
+
 
   (define (syntax-match-apply $match $syntax)
     (depth-syntax-match-apply $match 0 $syntax))

@@ -1,5 +1,98 @@
 (import (check) (labs syntax-match) (micascheme))
 
+; === syntax-match ===
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-match-apply-2
+        (id-syntax-match #'foo #'(+ 1 2))
+        #'(* foo 3)))
+    '(syntax-case #'(+ 1 2) ()
+      (foo (* foo 3)))))
+
+; === syntax-clause-apply ===
+
+(lets
+  ($lookup
+    (lambda ($key $id)
+      (and
+        (free-identifier=? $id #'syntax-literal?)
+        (free-identifier=? $key #'+))))
+
+  (run
+    (check
+      (equal?
+        (syntax->datum
+          (syntax-clause-apply
+            $lookup
+            #'(+ "foo" "bar")
+            #'((+ a b) (string-append a b))))
+        `(string-append "foo" "bar")))
+
+    (check
+      (equal?
+        (syntax->datum
+          (syntax-clause-apply
+            $lookup
+            #'(- "foo" "bar")
+            #'((+ a b) (string-append a b))))
+        #f))))
+
+; === syntax-clauses-apply ===
+
+(lets
+  ($lookup
+    (lambda ($key $id)
+      (and
+        (free-identifier=? $id #'syntax-literal?)
+        (or
+          (free-identifier=? $key #'+)
+          (free-identifier=? $key #'-)))))
+  ($clauses
+    (list
+      #'((+ a b) (string-append a b))
+      #'((- a b) (string-prepend a b))
+      #'((op a b) (a op b))
+      #'(x (dupa x))))
+
+  (run
+    (check
+      (equal?
+        (syntax->datum
+          (syntax-clauses-apply
+            $lookup
+            #'(+ "foo" "bar")
+            $clauses))
+        `(string-append "foo" "bar")))
+
+    (check
+      (equal?
+        (syntax->datum
+          (syntax-clauses-apply
+            $lookup
+            #'(- "foo" "bar")
+            $clauses))
+        `(string-prepend "foo" "bar")))
+
+    (check
+      (equal?
+        (syntax->datum
+          (syntax-clauses-apply
+            $lookup
+            #'(* "foo" "bar")
+            $clauses))
+        `("foo" * "bar")))
+
+    (check
+      (equal?
+        (syntax->datum
+          (syntax-clauses-apply
+            $lookup
+            #'("foo" "bar")
+            $clauses))
+        `(dupa ("foo" "bar"))))))
+
 ; === syntax-match-apply ===
 
 (let ()
