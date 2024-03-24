@@ -34,39 +34,35 @@
       ((pair? $pair) (datums-select $name (cdr $pair)))
       ((else _) (throw not-record $datum))))
 
-  (define-syntax make
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $name $field ...) (identifier? #`$name)
-          #`(list (quote $name) $field ...)))))
+  (define-syntax (make $syntax)
+    (syntax-case $syntax ()
+      ((_ $name $field ...) (identifier? #`$name)
+        #`(list (quote $name) $field ...))))
 
-  (define-syntax get
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $name $target) (identifier? #`$name)
-          #`(datum-get (quote $name) $target)))))
+  (define-syntax (get $syntax)
+    (syntax-case $syntax ()
+      ((_ $name $target) (identifier? #`$name)
+        #`(datum-get (quote $name) $target))))
 
-  (define-syntax is?
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $name $target) (identifier? #`$name)
-          #`(datum-is? (quote $name) $target)))))
+  (define-syntax (is? $syntax)
+    (syntax-case $syntax ()
+      ((_ $name $target) (identifier? #`$name)
+        #`(datum-is? (quote $name) $target))))
 
-  (define-syntax when
-    (lambda ($syntax) 
-      (syntax-case $syntax (is? else)
-        ((_ expr ((is? name var) body ...) ... ((else else-var) else-body ...))
-          (let ((tmp (car (generate-temporaries `(tmp)))))
-            #`(let ((#,tmp expr))
-              (cond
-                ((is? (quote name) #,tmp)
-                  (let ((var #,tmp)) body ...)) ...
-                (else 
-                  (let ((else-var #,tmp)) else-body ...))))))
-        ((_ expr ((is? name var) body ...) ...)
-          (let ((tmp (car (generate-temporaries `(tmp)))))
-            #`(let ((#,tmp expr))
-              (cond
-                ((is? (quote name)  #,tmp)
-                  (let ((var #,tmp)) body ...)) ...)))))))
+  (define-syntax (when $syntax)
+    (syntax-case $syntax (is? else)
+      ((_ expr ((is? name var) body ...) ... ((else else-var) else-body ...))
+        (let ((tmp (car (generate-temporaries `(tmp)))))
+          #`(let ((#,tmp expr))
+            (cond
+              ((is? (quote name) #,tmp)
+                (let ((var #,tmp)) body ...)) ...
+              (else
+                (let ((else-var #,tmp)) else-body ...))))))
+      ((_ expr ((is? name var) body ...) ...)
+        (let ((tmp (car (generate-temporaries `(tmp)))))
+          #`(let ((#,tmp expr))
+            (cond
+              ((is? (quote name)  #,tmp)
+                (let ((var #,tmp)) body ...)) ...))))))
 )

@@ -45,9 +45,8 @@
           (with-implicit ($id untyped)
             #`(begin
               (define untyped #,(expr-value $expr))
-              (define-syntax $id
-                (lambda ($syntax)
-                  #`(syntax-error #'#,$syntax "misplaced tipsy")))
+              (define-syntax ($id $syntax)
+                #`(syntax-error #'#,$syntax "misplaced tipsy"))
               (define-expr $id
                 (expr
                   #'#,(expr-type $expr)

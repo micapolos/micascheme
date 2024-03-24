@@ -1,13 +1,12 @@
 (import (check) (zexy vectorize) (zexy ops))
 
-(define-syntax check-vectorizes
-  (lambda ($syntax)
-    (syntax-case $syntax ()
-      ((_ $op ... ($byte ...))
-        #`(check
-          (equal?
-            #,(vectorize (syntax->list #'($op ...)))
-            (bytevector $byte ...)))))))
+(define-syntax (check-vectorizes $syntax)
+  (syntax-case $syntax ()
+    ((_ $op ... ($byte ...))
+      #`(check
+        (equal?
+          #,(vectorize (syntax->list #'($op ...)))
+          (bytevector $byte ...))))))
 
 (check-vectorizes ())
 

@@ -16,16 +16,15 @@
   (define (list->path $list)
     (fold-right path #f $list))
 
-  (define-syntax path!
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $name)
-          (identifier? #'$name)
-          #'(path (quote $name) #f))
-        ((_ $name $name* ...)
-          (identifier? #'$name)
-          #'(path (quote $name)
-            (path! $name* ...))))))
+  (define-syntax (path! $syntax)
+    (syntax-case $syntax ()
+      ((_ $name)
+        (identifier? #'$name)
+        #'(path (quote $name) #f))
+      ((_ $name $name* ...)
+        (identifier? #'$name)
+        #'(path (quote $name)
+          (path! $name* ...)))))
 
   (define (path-filename $path)
     (string-append

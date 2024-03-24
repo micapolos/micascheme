@@ -36,36 +36,30 @@
   (data (list-type item-type))
   (data (type-type))
 
-  (define-syntax Boolean
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        (_ #`(boolean-type)))))
+  (define-syntax (Boolean $syntax)
+    (syntax-case $syntax ()
+      (_ #`(boolean-type))))
 
-  (define-syntax Number
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        (_ #`(number-type)))))
+  (define-syntax (Number $syntax)
+    (syntax-case $syntax ()
+      (_ #`(number-type))))
 
-  (define-syntax String
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        (_ #`(string-type)))))
+  (define-syntax (String $syntax)
+    (syntax-case $syntax ()
+      (_ #`(string-type))))
 
-  (define-syntax Lambda
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ ($param ...) $result)
-          #`(lambda-type (list $param ...) $result)))))
+  (define-syntax (Lambda $syntax)
+    (syntax-case $syntax ()
+      ((_ ($param ...) $result)
+        #`(lambda-type (list $param ...) $result))))
 
-  (define-syntax Type
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        (_ #`(type-type)))))
+  (define-syntax (Type $syntax)
+    (syntax-case $syntax ()
+      (_ #`(type-type))))
 
-  (define-syntax List
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $item) #`(list-type $item)))))
+  (define-syntax (List $syntax)
+    (syntax-case $syntax ()
+      ((_ $item) #`(list-type $item))))
 
   (enum
     (type

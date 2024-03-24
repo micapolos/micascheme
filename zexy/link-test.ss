@@ -3,24 +3,23 @@
   (zexy link)
   (only (zexy ops) label org db dw ds align))
 
-(define-syntax check-links
-  (lambda ($syntax)
-    (syntax-case $syntax ()
-      ((_ ($in ...) ($out ...))
-        #`(check
-          (equal?
-            #,(link
-              (syntax->list #'($in ...))
-              (lambda ($ops)
-                #`(list
-                  #,@(map
-                    (lambda ($op)
-                      (syntax-case $op (db dw)
-                        ((db $expr) #`(list 'db $expr))
-                        ((dw $expr) #`(list 'dw $expr))
-                        ((ds $expr) #`(list 'ds $expr))))
-                    $ops))))
-            (list (quote $out) ...)))))))
+(define-syntax (check-links $syntax)
+  (syntax-case $syntax ()
+    ((_ ($in ...) ($out ...))
+      #`(check
+        (equal?
+          #,(link
+            (syntax->list #'($in ...))
+            (lambda ($ops)
+              #`(list
+                #,@(map
+                  (lambda ($op)
+                    (syntax-case $op (db dw)
+                      ((db $expr) #`(list 'db $expr))
+                      ((dw $expr) #`(list 'dw $expr))
+                      ((ds $expr) #`(list 'ds $expr))))
+                  $ops))))
+          (list (quote $out) ...))))))
 
 (check-links () ())
 

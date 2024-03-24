@@ -30,10 +30,9 @@
           (syntax-rules ()
             ((_ param ...) body))))
       ((_ name body)
-        (define-syntax name
-          (lambda ($syntax)
-            (syntax-case $syntax ()
-              (_ #`body)))))))
+        (define-syntax (name $syntax)
+          (syntax-case $syntax ()
+            (_ #`body))))))
 
   (define-syntax define-syntax-case
     (syntax-rules ()
@@ -55,29 +54,28 @@
   (define-syntax-rule (define-aux-keywords aux ...)
     (begin (define-aux-keyword aux) ...))
 
-  (define-syntax define-namespace
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $name) (identifier? #'$name)
-          (let
-            (($define-identifier
-              (datum->syntax #'$name
-                (string->symbol
-                  (string-append "define-" (symbol->string (datum $name)))))))
+  (define-syntax (define-namespace $syntax)
+    (syntax-case $syntax ()
+      ((_ $name) (identifier? #'$name)
+        (let
+          (($define-identifier
+            (datum->syntax #'$name
+              (string->symbol
+                (string-append "define-" (symbol->string (datum $name)))))))
 
-            #`(begin
-              (define-syntax-rule (#,$define-identifier $name $value)
-                (begin
-                  (define-aux-keyword $name)
-                  (define-property $name define-namespace (syntax $value))))
+          #`(begin
+            (define-syntax-rule (#,$define-identifier $name $value)
+              (begin
+                (define-aux-keyword $name)
+                (define-property $name define-namespace (syntax $value))))
 
-              (define-lookup-syntax ($name $syntax $lookup)
-                (syntax-case $syntax ()
-                  ((_ $id)
-                    (and
-                      (identifier? #'$id)
-                      ($lookup #'$id #'define-namespace))
-                    ($lookup #'$id #'define-namespace))))))))))
+            (define-lookup-syntax ($name $syntax $lookup)
+              (syntax-case $syntax ()
+                ((_ $id)
+                  (and
+                    (identifier? #'$id)
+                    ($lookup #'$id #'define-namespace))
+                  ($lookup #'$id #'define-namespace)))))))))
 
   (define-syntax define-lookup-syntax
     (syntax-rules ()

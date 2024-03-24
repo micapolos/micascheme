@@ -112,29 +112,28 @@
   (define (filter-opts $opts)
     (filter identity $opts))
 
-  (define-syntax opt-lift
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $fn $spec ...)
-          (lets
-            ($opt-arg-pairs
+  (define-syntax (opt-lift $syntax)
+    (syntax-case $syntax ()
+      ((_ $fn $spec ...)
+        (lets
+          ($opt-arg-pairs
+            (map
+              (lambda ($spec)
+                (syntax-case $spec (opt)
+                  ((opt $arg) (cons #t #`$arg))
+                  ($arg (cons #f #`$arg))))
+              (syntax->list #`($spec ...))))
+          ($opts (map car $opt-arg-pairs))
+          ($args (map cdr $opt-arg-pairs))
+          ($tmps (generate-temporaries $args))
+          ($opt-tmps
+            (filter (lambda (x) x)
               (map
-                (lambda ($spec)
-                  (syntax-case $spec (opt)
-                    ((opt $arg) (cons #t #`$arg))
-                    ($arg (cons #f #`$arg))))
-                (syntax->list #`($spec ...))))
-            ($opts (map car $opt-arg-pairs))
-            ($args (map cdr $opt-arg-pairs))
-            ($tmps (generate-temporaries $args))
-            ($opt-tmps
-              (filter (lambda (x) x)
-                (map
-                  (lambda ($opt $tmp) (and (not $opt) $tmp))
-                  $opts $tmps)))
-            #`(lets
-              #,@(map (lambda ($tmp $arg) #`(#,$tmp #,$arg)) $tmps $args)
-              (and #,@$opt-tmps ($fn #,@$tmps))))))))
+                (lambda ($opt $tmp) (and (not $opt) $tmp))
+                $opts $tmps)))
+          #`(lets
+            #,@(map (lambda ($tmp $arg) #`(#,$tmp #,$arg)) $tmps $args)
+            (and #,@$opt-tmps ($fn #,@$tmps)))))))
 
   (define (list-indexed $list)
     (map-indexed (lambda ($index $value) (indexed $value $index)) $list))
@@ -162,11 +161,10 @@
       ((equal? (caar $list) $obj) (cons $index (cdar $list)))
       (else (associ (cdr $list) (+ $index 1) $obj))))
 
-  (define-syntax null
-    (lambda ($syntax)
-      (cond
-        ((identifier? $syntax) (syntax '()))
-        (else (syntax-error $syntax)))))
+  (define-syntax (null $syntax)
+    (cond
+      ((identifier? $syntax) (syntax '()))
+      (else (syntax-error $syntax))))
 
   ; --------------------------------------
 

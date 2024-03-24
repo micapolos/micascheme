@@ -287,13 +287,12 @@
                   $thunks)
                 (parser-push $else $char))))))))
 
-  (define-syntax oneof-parser
-    (lambda ($syntax)
-      (syntax-case $syntax (else)
-        ((_ $parser ... (else $else))
-          #`(make-oneof-parser (list $parser ...) $else))
-        ((_ $parser ...)
-          #`(oneof-parser $parser ... (else #f))))))
+  (define-syntax (oneof-parser $syntax)
+    (syntax-case $syntax (else)
+      ((_ $parser ... (else $else))
+        #`(make-oneof-parser (list $parser ...) $else))
+      ((_ $parser ...)
+        #`(oneof-parser $parser ... (else #f)))))
 
   ; ----------------------------------------------------------
 

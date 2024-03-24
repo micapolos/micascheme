@@ -3,14 +3,13 @@
   (import (micascheme) (sequential-syntax))
   (export (import (only (sequential-syntax) sequence)))
 
-  (define-syntax sequential-top-level
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $item ...)
-          (lambda ($lookup)
-            (syntax-list-transform
-              (lookup-context
-                (lambda ($id)
-                  ($lookup $id #`sequential)))
-              (syntax->list #`($item ...))))))))
+  (define-syntax (sequential-top-level $syntax)
+    (syntax-case $syntax ()
+      ((_ $item ...)
+        (lambda ($lookup)
+          (syntax-list-transform
+            (lookup-context
+              (lambda ($id)
+                ($lookup $id #`sequential)))
+            (syntax->list #`($item ...)))))))
 )

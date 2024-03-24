@@ -59,43 +59,41 @@
           (lambda ($args)
             (apply $fn $args))))))
 
-  (define-syntax monad-lets
-    (lambda ($syntax)
-      (syntax-case $syntax (pure)
-        ((_ $monad (pure $result))
-          #`(monad-pure $monad $result))
-        ((_ $monad $result)
-          #`$result)
-        ((_ $monad ($var (pure $body)) $decl ... $result)
-          #`(monad-bind $monad (monad-pure $monad $body)
-            (lambda ($var)
-              (monad-lets $monad $decl ... $result))))
-        ((_ $monad ($var $body) $decl ... $result)
-          #`(monad-bind $monad $body
-            (lambda ($var)
-              (monad-lets $monad $decl ... $result)))))))
+  (define-syntax (monad-lets $syntax)
+    (syntax-case $syntax (pure)
+      ((_ $monad (pure $result))
+        #`(monad-pure $monad $result))
+      ((_ $monad $result)
+        #`$result)
+      ((_ $monad ($var (pure $body)) $decl ... $result)
+        #`(monad-bind $monad (monad-pure $monad $body)
+          (lambda ($var)
+            (monad-lets $monad $decl ... $result))))
+      ((_ $monad ($var $body) $decl ... $result)
+        #`(monad-bind $monad $body
+          (lambda ($var)
+            (monad-lets $monad $decl ... $result))))))
 
-  (define-syntax define-monad
-    (lambda ($syntax)
-      (syntax-case $syntax (pure bind)
-        ((_ $name
-          ((pure $pure-var) $pure-body)
-          ((bind $bind-var $bind-fn) $bind-body))
-          (and
-            (identifier? #'$name)
-            (identifier? #'$pure-var)
-            (identifier? #'$bind-var)
-            (identifier? #'$bind-fn))
-          (lets
-            ($pure-name #'$name)
-            ($bind-name (build-identifier ($string #'$name) (string-append $string "-bind")))
-            ($lets-name (build-identifier ($string #'$name) (string-append $string "-lets")))
-            ($... (datum->syntax #'+ '...))
-            #`(begin
-              (define (#,$pure-name $pure-var) $pure-body)
-              (define (#,$bind-name $bind-var $bind-fn) $bind-body)
-              (define-binder $name
-                (lambda ($bind-var $bind-fn) $bind-body))))))))
+  (define-syntax (define-monad $syntax)
+    (syntax-case $syntax (pure bind)
+      ((_ $name
+        ((pure $pure-var) $pure-body)
+        ((bind $bind-var $bind-fn) $bind-body))
+        (and
+          (identifier? #'$name)
+          (identifier? #'$pure-var)
+          (identifier? #'$bind-var)
+          (identifier? #'$bind-fn))
+        (lets
+          ($pure-name #'$name)
+          ($bind-name (build-identifier ($string #'$name) (string-append $string "-bind")))
+          ($lets-name (build-identifier ($string #'$name) (string-append $string "-lets")))
+          ($... (datum->syntax #'+ '...))
+          #`(begin
+            (define (#,$pure-name $pure-var) $pure-body)
+            (define (#,$bind-name $bind-var $bind-fn) $bind-body)
+            (define-binder $name
+              (lambda ($bind-var $bind-fn) $bind-body)))))))
 
   ; monad-stack
 
@@ -144,15 +142,14 @@
       ((_ $monad $other) 
         $other)))
 
-  (define-syntax define-monadic
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ ($id $param ...) $body)
-          (lets
-            ($monad (generate-temporary #`monad))
-            #`(define $id
-              (lambda (#,$monad $param ...) 
-                (monadic #,$monad $body))))))))
+  (define-syntax (define-monadic $syntax)
+    (syntax-case $syntax ()
+      ((_ ($id $param ...) $body)
+        (lets
+          ($monad (generate-temporary #`monad))
+          #`(define $id
+            (lambda (#,$monad $param ...)
+              (monadic #,$monad $body)))))))
 
   ; monad-stack
 
