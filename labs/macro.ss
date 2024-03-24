@@ -31,23 +31,22 @@
     (define-syntax $name
       (macro-rules $entry ...)))
 
-  (define-syntax define-macros
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ $rule ...)
-          (lets
-            ($groups
-              (group-by
-                syntax-rule-id
-                free-identifier=?
-                (syntax->list #'($rule ...))))
-            #`(begin
-              #,@(map
-                (lambda ($group)
-                  #`(define-macro
-                    #,(car $group)
-                    #,@(cdr $group)))
-                $groups)))))))
+  (define-syntax (define-macros $syntax)
+    (syntax-case $syntax ()
+      ((_ $rule ...)
+        (lets
+          ($groups
+            (group-by
+              syntax-rule-id
+              free-identifier=?
+              (syntax->list #'($rule ...))))
+          #`(begin
+            #,@(map
+              (lambda ($group)
+                #`(define-macro
+                  #,(car $group)
+                  #,@(cdr $group)))
+              $groups))))))
 
   ; Example:
   ;

@@ -1,11 +1,10 @@
 (import (check) (micascheme) (labs stacky))
 
-(define-syntax assemble
-  (lambda ($syntax)
-    (syntax-case $syntax ()
-      ((_ $op ...)
-        (transform-assemble
-          (syntax->list #'($op ...)))))))
+(define-syntax (assemble $syntax)
+  (syntax-case $syntax ()
+    ((_ $op ...)
+      (transform-assemble
+        (syntax->list #'($op ...))))))
 
 (check
   (equal?
