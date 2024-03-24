@@ -11,8 +11,7 @@
       (equal?
         (syntax->datum
           (syntax-match-apply
-            (lambda ($id)
-              (if (free-identifier=? $id #'original) #'mapped $id))
+            (id-match #'original #'mapped)
             #'$syntax))
         '$expected)))
 

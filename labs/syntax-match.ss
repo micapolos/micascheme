@@ -1,6 +1,12 @@
 (library (labs syntax-match)
   (export
-    null-match match-put match-append match-ref match combined-match
+    null-match
+    id-match
+    match-put
+    match-append
+    match-ref
+    match
+    combined-match
 
     syntax-literal?
     syntax-matcher
@@ -15,26 +21,22 @@
   (define-aux-keyword syntax-literal?)
   (define-aux-keyword syntax-matcher)
 
-  (define null-match
-    (lambda ($key) #f))
+  (define null-match (list))
+
+  (define (id-match $id $value)
+    (match-put null-match $id $value))
 
   (define (match-put $match $id $value)
-    (lambda ($key)
-      (or
-        (and (free-identifier=? $key $id) $value)
-        ($match $key))))
+    (cons (cons $id $value) $match))
 
   (define (match-put-pair $match $pair)
     (match-put $match (car $pair) (cdr $pair)))
 
   (define (match-append $match-a $match-b)
-    (lambda ($key)
-      (or
-        ($match-b $key)
-        ($match-a $key))))
+    (append $match-b $match-a))
 
   (define (match-ref $match $id)
-    ($match $id))
+    (opt-lift cdr (assid $id $match)))
 
   (define (syntax-rule-id $rule)
     (syntax-case $rule ()
@@ -78,8 +80,7 @@
             (identifier? $syntax)
             (free-identifier=? $pattern $syntax)
             null-match)
-          (lambda ($key)
-            (and (bound-identifier=? $key #'$id) $syntax))))
+          (id-match #'$id $syntax)))
       (($id $param ...)
         (and (identifier? #'$id))
         (lets
