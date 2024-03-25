@@ -178,7 +178,6 @@
         $clauses)
       (syntax-error $syntax)))
 
-
   (define (syntax-match-apply $match $syntax)
     (depth-syntax-match-apply $match 0 $syntax))
 
