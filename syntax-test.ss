@@ -20,9 +20,10 @@
 (check (equal? (matcher y) "matcher-y"))
 ;(check (equal? (matcher z) #f)) => syntax error
 
-(check (free-identifier=? (syntax-pattern-id #'+) #'+))
-(check (free-identifier=? (syntax-pattern-id #'(+ a b)) #'+))
+(check (free-identifier=? (syntax-pattern-id? #'+) #'+))
+(check (free-identifier=? (syntax-pattern-id? #'(+ a b)) #'+))
+(check (false? (syntax-pattern-id? #'(10 a b))))
 
-(check (free-identifier=? (syntax-rule-id #'(+ body)) #'+))
-(check (free-identifier=? (syntax-rule-id #'((+ a b) body)) #'+))
-(check (free-identifier=? (syntax-rule-id #'((+ a b) fender body)) #'+))
+(check (free-identifier=? (syntax-rule-id? #'(+ body)) #'+))
+(check (free-identifier=? (syntax-rule-id? #'((+ a b) body)) #'+))
+(check (false? (syntax-rule-id? #'((10 a b) fender body))))
