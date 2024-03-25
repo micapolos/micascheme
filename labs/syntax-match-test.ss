@@ -1,5 +1,51 @@
 (import (check) (labs syntax-match) (micascheme))
 
+; === parse-pattern ===
+
+(let ()
+  (define ($lookup $key $id)
+    (and
+      (free-identifier=? $id #'pattern-matcher)
+      (free-identifier=? $key #'matcher)
+      (lambda ($syntax)
+        (syntax-case $syntax ()
+          ($id
+            (identifier? #'$id)
+            #'matched)
+          (($id $a $b)
+            (identifier? #'$id)
+            #'(matched $a $b))))))
+
+  (check
+    (equal?
+      (syntax->datum (parse-pattern $lookup #'$foo))
+      '($foo . ())))
+
+  (check
+    (equal?
+      (with-generate-temporary-seed $tmp
+        (syntax->datum
+          (parse-pattern $lookup
+            #'matcher)))
+      '($tmp-0 . (($tmp-0 . matched)))))
+
+  (check
+    (equal?
+      (with-generate-temporary-seed $tmp
+        (syntax->datum
+          (parse-pattern $lookup
+            #'(matcher $a $b))))
+      '($tmp-0 . (($tmp-0 . (matched $a $b))))))
+
+  (check
+    (equal?
+      (with-generate-temporary-seed $tmp
+        (syntax->datum
+          (parse-pattern $lookup
+            #'(foo $bar matcher (matcher $a $b)))))
+      '((foo $bar $tmp-0 $tmp-1) . (($tmp-0 . matched) ($tmp-1 . (matched $a $b))))))
+)
+
 ; === syntax-match ===
 
 (check

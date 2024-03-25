@@ -14,6 +14,9 @@
     syntax-match-apply-2
     id-syntax-match
 
+    pattern-matcher
+    parse-pattern
+
     syntax-clause-apply
     syntax-clauses-apply
 
@@ -96,6 +99,35 @@
       ($key (combined-match ($param ...) ($arg ...)))
       ...
       (_ #f)))
+
+  ; ==========================
+
+  (define-aux-keyword pattern-matcher)
+
+  (define (parse-pattern $lookup $pattern)
+    (or
+      (opt-lets
+        ($id (syntax-selector $pattern))
+        ($matcher ($lookup $id #'pattern-matcher))
+        ($matched ($matcher $pattern))
+        (lets
+          ($tmp (generate-temporary))
+          (cons $tmp (list (cons $tmp $matched)))))
+      (parse-default-pattern $lookup $pattern)))
+
+  (define (parse-default-pattern $lookup $pattern)
+    (syntax-case $pattern ()
+      (($head . $tail)
+        (lets
+          ((pair $head-pattern $head-matchers) (parse-pattern $lookup #'$head))
+          ((pair $tail-pattern $tail-matchers) (parse-default-pattern $lookup #'$tail))
+          (cons
+            #`(#,$head-pattern . #,$tail-pattern)
+            (append $head-matchers $tail-matchers))))
+      ($other
+        (cons #'$other (list)))))
+
+  ; ==========================
 
   (define (syntax-pattern-match $lookup $syntax $pattern)
     (syntax-case $pattern ()
