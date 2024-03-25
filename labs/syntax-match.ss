@@ -24,7 +24,6 @@
     define-syntax-matcher
     syntax-match
     syntax-match-apply
-    syntax-rule-id
 
     match-apply-syntax)
   (import (micascheme))
@@ -82,11 +81,6 @@
     (syntax-match-put (null-syntax-match) $id $syntax))
 
   ; ==========================
-
-  (define (syntax-rule-id $rule)
-    (syntax-case $rule ()
-      (($id . _) (identifier? #'$id) #'$id)
-      ((($id . _) . _) (identifier? #'$id) #'$id)))
 
   (define-syntax-rule (define-literal? $name)
     (define-property $name syntax-literal? #t))

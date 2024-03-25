@@ -7,7 +7,9 @@
     define-aux-keywords
     expand-begin-syntaxes
     define-namespace
-    define-lookup-syntax)
+    define-lookup-syntax
+    syntax-pattern-id
+    syntax-rule-id)
   (import (scheme))
 
   (define (syntax-null? $syntax)
@@ -89,4 +91,14 @@
         (and (identifier? #'$name) (identifier? #'$syntax) (identifier? #'$lookup))
         (define-syntax ($name $syntax)
           (lambda ($lookup) $body)))))
+
+  (define (syntax-pattern-id $pattern)
+    (syntax-case $pattern ()
+      ($id (identifier? #'$id) #'$id)
+      (($id $arg ...) (identifier? #'$id) #'$id)))
+
+  (define (syntax-rule-id $rule)
+    (syntax-case $rule ()
+      (($pattern $body ...)
+        (syntax-pattern-id #'$pattern))))
 )
