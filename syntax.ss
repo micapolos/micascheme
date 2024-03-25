@@ -8,9 +8,8 @@
     expand-begin-syntaxes
     define-namespace
     define-lookup-syntax
-    syntax-pattern-id?
+    syntax-selector
     syntax-pattern-id
-    syntax-rule-id?
     syntax-rule-id)
   (import (scheme))
 
@@ -94,24 +93,19 @@
         (define-syntax ($name $syntax)
           (lambda ($lookup) $body)))))
 
-  (define (syntax-pattern-id? $pattern)
-    (syntax-case $pattern ()
+  (define (syntax-selector $syntax)
+    (syntax-case $syntax ()
       ($id (identifier? #'$id) #'$id)
       (($id $arg ...) (identifier? #'$id) #'$id)
       (_ #f)))
 
-  (define (syntax-rule-id? $rule)
-    (syntax-case $rule ()
-      (($pattern $body ...) (syntax-pattern-id? #'$pattern))
-      (_ #f)))
-
   (define (syntax-pattern-id $pattern)
     (or
-      (syntax-pattern-id? $pattern)
+      (syntax-selector $pattern)
       (syntax-error $pattern "pattern syntax error")))
 
   (define (syntax-rule-id $rule)
-    (or
-      (syntax-rule-id? $rule)
-      (syntax-error $rule "rule syntax error")))
+    (syntax-case $rule ()
+      (($pattern $rest ...)
+        (syntax-pattern-id #'$pattern))))
 )
