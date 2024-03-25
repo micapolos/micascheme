@@ -13,7 +13,10 @@
             (identifier? #'$id)
             #'matched)
           (($id $a $b)
-            (identifier? #'$id)
+            (and
+              (identifier? #'$id)
+              (identifier? #'$a)
+              (identifier? #'$b))
             #'(matched $a $b))))))
 
   (check
@@ -27,7 +30,9 @@
         (syntax->datum
           (parse-pattern $lookup
             #'matcher)))
-      '($tmp-0 . (($tmp-0 . matched)))))
+      '($tmp-0 .
+        (
+          ($tmp-0 . matched)))))
 
   (check
     (equal?
@@ -35,15 +40,22 @@
         (syntax->datum
           (parse-pattern $lookup
             #'(matcher $a $b))))
-      '($tmp-0 . (($tmp-0 . (matched $a $b))))))
+      '($tmp-0 .
+        (
+          ($tmp-0 . (matched $a $b))))))
 
   (check
     (equal?
       (with-generate-temporary-seed $tmp
         (syntax->datum
           (parse-pattern $lookup
-            #'(foo $bar matcher (matcher $a $b)))))
-      '((foo $bar $tmp-0 $tmp-1) . (($tmp-0 . matched) ($tmp-1 . (matched $a $b))))))
+            #'(foo $bar matcher (matcher $a $b) (matcher $c $d)))))
+      '(
+        (foo $bar $tmp-0 $tmp-1 $tmp-2) .
+        (
+          ($tmp-0 . matched)
+          ($tmp-1 . (matched $a $b))
+          ($tmp-2 . (matched $c $d))))))
 )
 
 ; === syntax-match ===
