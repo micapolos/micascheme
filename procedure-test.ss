@@ -62,3 +62,9 @@
   (set-box! $box 11)
   (run) ; empty run
   (check (equal? (unbox $box) 11)))
+
+; === run-void ===
+
+(check (equal? (run-void) (void)))
+(check (equal? (run-void (define foo "foo")) (void)))
+(check (equal? (run-void (define foo "foo") "foo") (void)))

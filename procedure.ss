@@ -1,6 +1,7 @@
 (library (procedure)
   (export
     run
+    run-void
     repeat
     identity
     once-proc
@@ -20,6 +21,12 @@
         (let () (void)))
       ((_ $item ...)
         (let () $item ...))))
+
+  ; TODO: Replace run-void with run.
+  (define-syntax run-void
+    (syntax-rules ()
+      ((_ $item ...)
+        (let () $item ... (void)))))
 
   (define-syntax-rule (repeat $count $body ...)
     (do

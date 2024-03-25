@@ -7,7 +7,7 @@
     (procedure))
 
   (define-lookup-syntax (lets $syntax $lookup)
-    (syntax-case $syntax (values rec)
+    (syntax-case $syntax (values rec run)
       ((_ ((values $id ...) $expr) $decls ... $result)
         #'(call-with-values
           (lambda () $expr)
