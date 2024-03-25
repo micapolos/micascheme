@@ -100,20 +100,27 @@
   (define (syntax-pattern-match $lookup $syntax $pattern)
     (syntax-case $pattern ()
       ($id
-        (identifier? #'$id)
-        (if ($lookup #'$id #'syntax-literal?)
-          (and
-            (identifier? $syntax)
-            (free-identifier=? $pattern $syntax)
-            null-match)
-          (id-match #'$id $syntax)))
-      (($id $param ...)
-        (and (identifier? #'$id))
-        (lets
+        (and
+          (identifier? #'$id)
+          ($lookup #'$id #'syntax-literal?))
+        (and
+          (identifier? $syntax)
+          (free-identifier=? $pattern $syntax)
+          null-match))
+      ($id
+        (and
+          (identifier? #'$id)
+          ($lookup #'$id #'syntax-matcher))
+        (opt-lets
           ($matcher ($lookup #'$id #'syntax-matcher))
-          (if $matcher
-            ($matcher $lookup $syntax $pattern)
-            (syntax-pattern-inner-match $lookup $syntax $pattern))))
+          ($matcher $lookup $syntax $pattern)))
+      (($id $param ...)
+        (and
+          (identifier? #'$id)
+          ($lookup #'$id #'syntax-matcher))
+        (opt-lets
+          ($matcher ($lookup #'$id #'syntax-matcher))
+          ($matcher $lookup $syntax $pattern)))
       ($other
         (syntax-pattern-inner-match $lookup $syntax $pattern))))
 
