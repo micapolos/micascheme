@@ -135,32 +135,6 @@
               (match-append $head-match $tail-match)))
           (_ #f)))))
 
-  (define (syntax-pattern-match-2 $lookup $syntax $pattern)
-    (or
-      (opt-lets
-        ($id (syntax-selector $pattern))
-        ($matcher ($lookup $id #'syntax-matcher))
-        ($matcher $lookup $syntax $pattern))
-      (syntax-pattern-inner-match-2 $lookup $syntax $pattern)))
-
-  (define (syntax-pattern-inner-match-2 $lookup $syntax $pattern)
-    (syntax-case $pattern ()
-      (()
-        (syntax-case $syntax ()
-          (() null-match)
-          (_ #f)))
-      ($id
-        (identifier? #'$id)
-        (id-match #'$id $syntax))
-      (($pattern-head . $pattern-tail)
-        (syntax-case $syntax ()
-          (($head . $tail)
-            (opt-lets
-              ($head-match (syntax-pattern-match-2 $lookup #'$head #'$pattern-head))
-              ($tail-match (syntax-pattern-inner-match-2 $lookup #'$tail #'$pattern-tail))
-              (match-append $head-match $tail-match)))
-          (_ #f)))))
-
   (define (syntax-match-1 $lookup $syntax $pattern $body)
     (opt-lets
       ($match (syntax-pattern-match $lookup $syntax $pattern))
