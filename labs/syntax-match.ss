@@ -15,6 +15,7 @@
     id-syntax-match
 
     pattern-matcher
+    define-pattern-matcher
     parse-pattern
 
     syntax-clause-apply
@@ -103,6 +104,19 @@
   ; ==========================
 
   (define-aux-keyword pattern-matcher)
+
+  (define-syntax define-pattern-matcher
+    (syntax-rules ()
+      ((_ $name $pattern-matcher)
+        (identifier? #'$name)
+        (begin
+          (define-aux-keyword $name)
+          (define-property $name pattern-matcher $pattern-matcher)))
+      ((_ ($name $syntax) $body)
+        (and (identifier? #'$name) (identifier? #'$syntax))
+        (define-pattern-matcher $name
+          (lambda ($syntax)
+            $body)))))
 
   (define (parse-pattern $lookup $pattern)
     (or
