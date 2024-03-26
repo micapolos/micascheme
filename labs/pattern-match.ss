@@ -4,7 +4,8 @@
     syntax-matcher
 
     parse-pattern
-    parse-pattern-match)
+    parse-pattern-clause
+    parse-pattern-clauses)
   (import (micascheme))
 
   (define-aux-keyword syntax-matcher)
@@ -64,12 +65,20 @@
       ($other
         (syntax-error #'$other "invalid pattern"))))
 
-  (define (parse-pattern-match $lookup $syntax $pattern $body)
-    (lets
-      ((values $params $args-proc)
-        (parse-pattern $lookup $pattern))
-      #`(opt-lets
-        ($args (#,$args-proc #,$syntax))
-        (syntax-case #`(#,@$args) ()
-          ((#,@$params) #,$body)))))
+  (define (parse-pattern-clause $lookup $syntax $clause)
+    (syntax-case $clause ()
+      (($pattern $body)
+        (lets
+          ((values $params $args-proc)
+            (parse-pattern $lookup #'$pattern))
+          #`(opt-lets
+              ($args (#,$args-proc #,$syntax))
+              (syntax-case #`(#,@$args) ()
+                ((#,@$params) $body)))))))
+
+  (define (parse-pattern-clauses $lookup $syntax $clauses)
+    #`(or
+      #,@(map
+        (partial parse-pattern-clause $lookup $syntax)
+        $clauses)))
 )

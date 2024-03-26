@@ -31,13 +31,9 @@
 
   (define-syntax (macro-case-opt $syntax $lookup)
     (syntax-case $syntax ()
-      ((_ $syntax $clause ...)
-        #`(or
-          #,@(map
-            (lambda ($clause)
-              (syntax-case $clause ()
-                (($pattern $body)
-                  (parse-pattern-match $lookup #'$syntax #'$pattern #'$body))))
+      ((_ $expr $clause ...)
+        #`(lets ($syntax $expr)
+          #,(parse-pattern-clauses $lookup #'$syntax
             (syntax->list #'($clause ...)))))))
 
   (define-rule-syntax (macro-case $syntax $clause ...)

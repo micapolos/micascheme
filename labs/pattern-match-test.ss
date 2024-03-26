@@ -6,7 +6,7 @@
   (define-syntax (pattern-match $syntax $lookup)
     (syntax-case $syntax ()
       ((_ $syntax $pattern $body)
-        (parse-pattern-match $lookup #'$syntax #'$pattern #'$body))))
+        (parse-pattern-clause $lookup #'$syntax #'($pattern $body)))))
 
   (define-aux-keyword literal)
 
