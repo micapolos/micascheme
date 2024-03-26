@@ -1,36 +1,33 @@
 (library (labs macro)
   (export
+    define-pattern-literal?
+    define-pattern-matcher
     macro-case
     macro-rules
-    define-macro-literal?
-    define-macro-matcher
     define-macro
-    define-macros
-    pattern-rules
-    define-pattern-literal?
-    macro-case-2
-    macro-rules-2
-    define-macro-2
-    define-macros-2)
+    define-macros)
 
   (import
     (micascheme)
     (labs syntax-match))
 
-  (define-rule-syntax (define-macro-literal? $id)
-    (define-literal? $id))
-
   (define-rule-syntax (define-pattern-literal? $id)
     (define-property $id pattern-literal? #t))
 
-  (define-rule-syntax (define-macro-matcher $id $entry ...)
-    (define-syntax-matcher $id $entry ...))
+  (define-syntax define-pattern-matcher
+    (syntax-rules ()
+      ((_ $name $pattern-matcher)
+        (identifier? #'$name)
+        (begin
+          (define-aux-keyword $name)
+          (define-property $name pattern-matcher $pattern-matcher)))
+      ((_ ($name $syntax) $body)
+        (identifiers? #'($name $syntax))
+        (define-pattern-matcher $name
+          (lambda ($syntax)
+            $body)))))
 
-  (define-rule-syntax (macro-case $lookup $syntax $entry ...)
-    (syntax-match $lookup $syntax
-      (list #'$entry ...)))
-
-  (define-syntax (macro-case-2 $syntax $lookup)
+  (define-syntax (macro-case $syntax $lookup)
     (syntax-case $syntax ()
       ((_ $syntax $clause ...)
         #`(or
@@ -42,24 +39,15 @@
             (syntax->list #'($clause ...)))
           (syntax-error #'$syntax)))))
 
-  (define-syntax (macro-rules-2 $syntax $lookup)
+  (define-syntax (macro-rules $syntax $lookup)
     (syntax-case $syntax ()
       ((_ ($pattern $body)...)
         #`(lambda ($syntax)
-          (macro-case-2 $syntax ($pattern #'$body) ...)))))
-
-  (define-rule-syntax (macro-rules $entry ...)
-    (lambda ($syntax)
-      (lambda ($lookup)
-        (macro-case $lookup $syntax $entry ...))))
+          (macro-case $syntax ($pattern #'$body) ...)))))
 
   (define-rule-syntax (define-macro $name $entry ...)
     (define-syntax $name
       (macro-rules $entry ...)))
-
-  (define-rule-syntax (define-macro-2 $name $entry ...)
-    (define-syntax $name
-      (macro-rules-2 $entry ...)))
 
   (define-syntax (define-macros $syntax)
     (syntax-case $syntax ()
@@ -77,58 +65,4 @@
                   #,(car $group)
                   #,@(cdr $group)))
               $groups))))))
-
-  (define-syntax (define-macros-2 $syntax)
-    (syntax-case $syntax ()
-      ((_ $rule ...)
-        (lets
-          ($groups
-            (group-by
-              syntax-rule-id
-              free-identifier=?
-              (syntax->list #'($rule ...))))
-          #`(begin
-            #,@(map
-              (lambda ($group)
-                #`(define-macro-2
-                  #,(car $group)
-                  #,@(cdr $group)))
-              $groups))))))
-
-  ; Example:
-  ;
-  ; (pattern-rules
-  ;   ((id1 param1)
-  ;     (pat1 arg1)
-  ;     (pat2 arg1)))
-  ;   ((id2 param1 param2)
-  ;     (pat1 arg1 arg2)
-  ;     (pat2 arg1 arg2)
-  ;     (pat3 arg1 arg2)))
-  (define-syntax (pattern-rules $syntax)
-    (syntax-case $syntax ()
-      ((_ $rule ...)
-        #`(lambda ($lookup $syntax $pattern)
-          (syntax-case $pattern ()
-            #,@(map
-              (lambda ($rule)
-                (syntax-case $rule ()
-                  (($decl $body ...)
-                    (syntax-case #'$decl ()
-                      (($id $param ...)
-                        #`($decl
-                          (syntax-case $syntax ()
-                            #,@(map
-                              (lambda ($body)
-                                (syntax-case $body ()
-                                  (($key $arg ...)
-                                    #`($key
-                                      (match
-                                        #,@(map
-                                          (lambda ($param $arg)
-                                            #`(#'#,$param #'#,$arg))
-                                          (syntax->list #'($param ...))
-                                          (syntax->list #'($arg ...))))))))
-                              (syntax->list #'($body ...))))))))))
-              (syntax->list #'($rule ...))))))))
 )

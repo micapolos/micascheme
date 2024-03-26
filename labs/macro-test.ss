@@ -7,7 +7,7 @@
   (check
     (equal?
       (syntax->datum
-        (macro-case-2 #'(+ "foo" "bar")
+        (macro-case #'(+ "foo" "bar")
           ((+ a b) #'(a plus b))
           ((- a b) #'(a minus b))
           ((op a b) #'(a op b))))
@@ -16,7 +16,7 @@
   (check
     (equal?
       (syntax->datum
-        (macro-case-2 #'(- "foo" "bar")
+        (macro-case #'(- "foo" "bar")
           ((+ a b) #'(a plus b))
           ((- a b) #'(a minus b))
           ((op a b) #'(a op b))))
@@ -25,7 +25,7 @@
   (check
     (equal?
       (syntax->datum
-        (macro-case-2 #'(* "foo" "bar")
+        (macro-case #'(* "foo" "bar")
           ((+ a b) #'(a plus b))
           ((- a b) #'(a minus b))
           ((op a b) #'(a op b))))
@@ -33,7 +33,7 @@
 )
 
 (run-void
-  (define-macro-2 join
+  (define-macro join
     ((_ a b) (string-append a b))
     ((_ a b c) (string-append a b c)))
 
@@ -42,7 +42,7 @@
 )
 
 (run-void
-  (define-macros-2
+  (define-macros
     ((join a b) (string-append a b))
     ((join a b c) (string-append a b c))
     ((dot-separate a b) (string-append a "." b)))
