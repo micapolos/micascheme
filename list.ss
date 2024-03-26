@@ -41,7 +41,6 @@
 
   (import
     (scheme)
-    (syntax)
     (binder)
     (boolean)
     (check)
@@ -94,7 +93,10 @@
         (let ((val expr)) 
           (and val (opt-lets decl ... body))))))
 
-  (define-aux-keyword opt)
+  (define-syntax opt
+    (syntax-rules ()
+      ((_ $name) (identifier? #'$name)
+        (syntax-error $name "misplaced aux keyword"))))
 
   (define (fold-while $pred $fn $initial $list)
     (cond
@@ -230,8 +232,10 @@
       ((list? $list) $list)
       ((else $other) (list $other))))
 
-  (define-syntax-rule (values->list $expr)
-    (call-with-values (lambda () $expr) list))
+  (define-syntax values->list
+    (syntax-rules ()
+      ((_ $expr)
+        (call-with-values (lambda () $expr) list))))
 
   ; === ass lists ===
 
