@@ -14,9 +14,11 @@
     syntax-match-apply-2
     id-syntax-match
 
+    pattern-literal?
     pattern-matcher
     define-pattern-matcher
     parse-pattern
+    parse-pattern-match
 
     syntax-clause-apply
     syntax-clauses-apply
@@ -104,6 +106,9 @@
   ; ==========================
 
   (define-aux-keyword pattern-matcher)
+  (define-aux-keyword pattern-literal?)
+
+  (define $... (datum->syntax #'$... '...))
 
   (define-syntax define-pattern-matcher
     (syntax-rules ()
@@ -119,27 +124,67 @@
             $body)))))
 
   (define (parse-pattern $lookup $pattern)
-    (or
-      (opt-lets
-        ($id (syntax-selector $pattern))
-        ($matcher ($lookup $id #'pattern-matcher))
-        ($matched ($matcher $pattern))
-        (lets
-          ($tmp (generate-temporary))
-          (cons $tmp (list (cons $tmp $matched)))))
-      (parse-default-pattern $lookup $pattern)))
+    (syntax-case $pattern ()
+      ($id
+        (and
+          (identifier? #'$id)
+          ($lookup #'$id #'pattern-literal?))
+        (values
+          (list)
+          #`(lambda ($syntax)
+            (and
+              (identifier? $syntax)
+              (free-identifier=? $syntax #'$id)
+              (list)))))
+      (($id . $tail)
+        (and
+          (identifier? #'$id)
+          ($lookup #'$id #'pattern-matcher))
+        (app
+          ($lookup #'$id #'pattern-matcher)
+          $pattern))
+      ($other
+        (parse-default-pattern $lookup #'$other))))
 
   (define (parse-default-pattern $lookup $pattern)
     (syntax-case $pattern ()
+      (()
+        (values
+          (list)
+          #`(lambda ($syntax)
+            (syntax-case $syntax ()
+              (() (list))
+              (_ #f)))))
       (($head . $tail)
         (lets
-          ((pair $head-pattern $head-matchers) (parse-pattern $lookup #'$head))
-          ((pair $tail-pattern $tail-matchers) (parse-default-pattern $lookup #'$tail))
-          (cons
-            #`(#,$head-pattern . #,$tail-pattern)
-            (append $head-matchers $tail-matchers))))
+          ((values $head-params $head-proc) (parse-pattern $lookup #'$head))
+          ((values $tail-params $tail-proc) (parse-default-pattern $lookup #'$tail))
+          (values
+            (append $head-params $tail-params)
+            #`(lambda ($syntax)
+              (syntax-case $syntax ()
+                (($head . $tail)
+                  (opt-lets
+                    ($head-args (#,$head-proc #'$head))
+                    ($tail-args (#,$tail-proc #'$tail))
+                    (append $head-args $tail-args)))
+                (_ #f))))))
+      ($id
+        (identifier? #'$id)
+        (values
+          (list #'$id)
+          #'(lambda ($syntax) (list $syntax))))
       ($other
-        (cons #'$other (list)))))
+        (syntax-error #'$other "invalid pattern"))))
+
+  (define (parse-pattern-match $lookup $syntax $pattern $body)
+    (lets
+      ((values $params $args-proc)
+        (parse-pattern $lookup $pattern))
+      #`(opt-lets
+        ($args (#,$args-proc #,$syntax))
+        (syntax-case #`(#,@$args) ()
+          ((#,@$params) #,$body)))))
 
   ; ==========================
 

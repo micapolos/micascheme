@@ -1,61 +1,101 @@
 (import (check) (labs syntax-match) (micascheme))
 
-; === parse-pattern ===
+; === pattern-match ===
 
-(let ()
-  (define ($lookup $key $id)
-    (and
-      (free-identifier=? $id #'pattern-matcher)
-      (free-identifier=? $key #'matcher)
-      (lambda ($syntax)
-        (syntax-case $syntax ()
-          ($id
-            (identifier? #'$id)
-            #'matched)
-          (($id $a $b)
-            (and
-              (identifier? #'$id)
-              (identifier? #'$a)
-              (identifier? #'$b))
-            #'(matched $a $b))))))
+(run-void
+  (define-syntax (pattern-match $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ $syntax $pattern $body)
+        (parse-pattern-match $lookup #'$syntax #'$pattern #'$body))))
 
-  (check
-    (equal?
-      (syntax->datum (parse-pattern $lookup #'$foo))
-      '($foo . ())))
+  (define-aux-keyword literal)
 
-  (check
-    (equal?
-      (with-generate-temporary-seed $tmp
-        (syntax->datum
-          (parse-pattern $lookup
-            #'matcher)))
-      '($tmp-0 .
-        (
-          ($tmp-0 . matched)))))
+  (define-property literal pattern-literal? #t)
+
+  (define-aux-keyword matcher)
+  (define-aux-keyword match)
+
+  (define-property matcher pattern-matcher
+    (lambda ($pattern)
+      (syntax-case $pattern ()
+        ((_ $param1 $param2)
+          (and
+            (identifier? #'$param1)
+            (identifier? #'$param2))
+          (values
+            (list #'$param1 #'$param2)
+            #`(lambda ($syntax)
+              (syntax-case $syntax (match)
+                ((match $arg1 $arg2) (list #'$arg1 #'$arg2))
+                (_ #f))))))))
+
+  ; === open ===
 
   (check
     (equal?
-      (with-generate-temporary-seed $tmp
-        (syntax->datum
-          (parse-pattern $lookup
-            #'(matcher $a $b))))
-      '($tmp-0 .
-        (
-          ($tmp-0 . (matched $a $b))))))
+      (syntax->datum
+        (pattern-match
+          #'("foo" "bar")
+          ($a $b)
+          #'(string-append $a $b)))
+      '(string-append "foo" "bar")))
+
+  (check
+    (false?
+      (pattern-match
+        #'"foo"
+        ($a $b)
+        #'(string-append $a $b))))
+
+  ; === literal ===
 
   (check
     (equal?
-      (with-generate-temporary-seed $tmp
-        (syntax->datum
-          (parse-pattern $lookup
-            #'(foo $bar matcher (matcher $a $b) (matcher $c $d)))))
-      '(
-        (foo $bar $tmp-0 $tmp-1 $tmp-2) .
-        (
-          ($tmp-0 . matched)
-          ($tmp-1 . (matched $a $b))
-          ($tmp-2 . (matched $c $d))))))
+      (syntax->datum
+        (pattern-match #'literal literal #'matched))
+      'matched))
+
+  (check
+    (equal?
+      (syntax->datum
+        (pattern-match
+          #'(literal "foo" "bar")
+          (literal $a $b)
+          #'(string-append $a $b)))
+      '(string-append "foo" "bar")))
+
+  (check
+    (false?
+      (pattern-match #'not-literal literal #'matched)))
+
+  (check
+    (false?
+      (pattern-match #'not-literal literal #'matched)))
+
+  ; === matcher ===
+
+  (check
+    (equal?
+      (syntax->datum
+        (pattern-match
+          #'(match "foo" "bar")
+          (matcher $a $b)
+          #'(string-append $a $b)))
+      '(string-append "foo" "bar")))
+
+  (check
+    (false?
+      (pattern-match
+        #'(match "foo")
+        (matcher $a $b)
+        #'(string-append $a $b))))
+
+  (check
+    (false?
+      (pattern-match
+        #'(mismatch "foo" "bar")
+        (matcher $a $b)
+        #'(string-append $a $b))))
 )
 
 ; === syntax-match ===
