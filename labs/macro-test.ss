@@ -110,3 +110,34 @@
         ((- ix $d) #xdd #b110 $d)
         ((+ ix $d) #xdd #b110 $d)
         ((- iy $d) #xfd #b110 $d)))))
+
+(check
+  (equal?
+    (syntax->datum
+      (macro-case-2 #'("foo" "bar")
+        (($x $y) #'(match $x $y))
+        (($x) #'(match $x))))
+    '(match "foo" "bar")))
+
+(check
+  (equal?
+    (syntax->datum
+      (macro-case-2 #'("foo")
+        (($x $y) #'(match $x $y))
+        (($x) #'(match $x))))
+    '(match "foo")))
+
+(define-macro-2 dupa
+  ((_ $x $y) (string-append $x $y))
+  ((_ $x) (string-append $x "!")))
+
+(check (equal? (dupa "foo") "foo!"))
+(check (equal? (dupa "foo" "bar") "foobar"))
+
+(define-macros-2
+  ((dupa-2 $x $y) (string-append $x $y))
+  ((dupa-1 $x) (string-append $x "!")))
+
+(check (equal? (dupa-1 "foo") "foo!"))
+(check (equal? (dupa-2 "foo" "bar") "foobar"))
+
