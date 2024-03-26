@@ -1,8 +1,8 @@
-(import (check) (labs macro) (labs syntax-match) (micascheme))
+(import (check) (labs macro) (micascheme))
 
 (run-void
-  (define-pattern-literal? +)
-  (define-pattern-literal? -)
+  (define-literal? +)
+  (define-literal? -)
 
   (check
     (equal?
