@@ -24,15 +24,14 @@
 
 (define-syntax (asm $syntax)
   (define (r $syntax)
-    (syntax-case $syntax (b c d e h l a)
+    (syntax-case-opt $syntax (b c d e h l a)
       (b (lambda ($fn) ($fn #'#b000)))
       (c (lambda ($fn) ($fn #'#b001)))
       (d (lambda ($fn) ($fn #'#b010)))
       (e (lambda ($fn) ($fn #'#b011)))
       (h (lambda ($fn) ($fn #'#b100)))
       (l (lambda ($fn) ($fn #'#b101)))
-      (a (lambda ($fn) ($fn #'#b111)))
-      (_ #f))
+      (a (lambda ($fn) ($fn #'#b111))))
 
     (syntax-case $syntax (ld)
       ((_ (ld a b))

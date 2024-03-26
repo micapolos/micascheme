@@ -66,15 +66,14 @@
       ($other (list #'$other))))
 
   (define (r3 $syntax)
-    (syntax-case $syntax (b c d e h l a)
+    (syntax-case-opt $syntax (b c d e h l a)
       (b #b000)
       (c #b001)
       (d #b010)
       (e #b011)
       (h #b100)
       (l #b101)
-      (a #b111)
-      (_ #f)))
+      (a #b111)))
 
   (define (db-8 $value)
     #`(db #,(datum->syntax #'db-8 $value)))

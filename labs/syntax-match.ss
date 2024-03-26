@@ -98,10 +98,8 @@
     (match ($param $arg) ...))
 
   (define-syntax-rule (key-syntax-case $syntax ($param ...) ($key $arg ...) ...)
-    (syntax-case $syntax ()
-      ($key (combined-match ($param ...) ($arg ...)))
-      ...
-      (_ #f)))
+    (syntax-case-opt $syntax ()
+      ($key (combined-match ($param ...) ($arg ...))) ...))
 
   ; ==========================
 
@@ -152,9 +150,8 @@
         (values
           (list)
           #`(lambda ($syntax)
-            (syntax-case $syntax ()
-              (() (list))
-              (_ #f)))))
+            (syntax-case-opt $syntax ()
+              (() (list))))))
       (($head . $tail)
         (lets
           ((values $head-params $head-proc) (parse-pattern $lookup #'$head))
@@ -162,13 +159,12 @@
           (values
             (append $head-params $tail-params)
             #`(lambda ($syntax)
-              (syntax-case $syntax ()
+              (syntax-case-opt $syntax ()
                 (($head . $tail)
                   (opt-lets
                     ($head-args (#,$head-proc #'$head))
                     ($tail-args (#,$tail-proc #'$tail))
-                    (append $head-args $tail-args)))
-                (_ #f))))))
+                    (append $head-args $tail-args))))))))
       ($id
         (identifier? #'$id)
         (values
@@ -218,20 +214,18 @@
   (define (syntax-pattern-inner-match $lookup $syntax $pattern)
     (syntax-case $pattern ()
       (()
-        (syntax-case $syntax ()
-          (() null-match)
-          (_ #f)))
+        (syntax-case-opt $syntax ()
+          (() null-match)))
       ($id
         (identifier? #'$id)
         (id-match #'$id $syntax))
       (($pattern-head . $pattern-tail)
-        (syntax-case $syntax ()
+        (syntax-case-opt $syntax ()
           (($head . $tail)
             (opt-lets
               ($head-match (syntax-pattern-match $lookup #'$head #'$pattern-head))
               ($tail-match (syntax-pattern-inner-match $lookup #'$tail #'$pattern-tail))
-              (match-append $head-match $tail-match)))
-          (_ #f)))))
+              (match-append $head-match $tail-match)))))))
 
   (define (syntax-match-1 $lookup $syntax $pattern $body)
     (opt-lets

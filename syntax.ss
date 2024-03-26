@@ -95,10 +95,9 @@
           (lambda ($lookup) $body)))))
 
   (define (syntax-selector $syntax)
-    (syntax-case $syntax ()
+    (syntax-case-opt $syntax ()
       ($id (identifier? #'$id) #'$id)
-      (($id $arg ...) (identifier? #'$id) #'$id)
-      (_ #f)))
+      (($id $arg ...) (identifier? #'$id) #'$id)))
 
   (define (syntax-pattern-id $pattern)
     (or

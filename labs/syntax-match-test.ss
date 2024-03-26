@@ -25,9 +25,8 @@
           (values
             (list #'$param1 #'$param2)
             #`(lambda ($syntax)
-              (syntax-case $syntax (match)
-                ((match $arg1 $arg2) (list #'$arg1 #'$arg2))
-                (_ #f))))))))
+              (syntax-case-opt $syntax (match)
+                ((match $arg1 $arg2) (list #'$arg1 #'$arg2)))))))))
 
   ; === open ===
 

@@ -94,7 +94,7 @@
   (define-registers a b c d e h l hl ix iy ixh ixl iyh iyl)
 
   (meta define (r? $syntax)
-    (syntax-case $syntax (+ - a b c d e h l hl ix iy ixh ixl iyh iyl)
+    (syntax-case-opt $syntax (+ - a b c d e h l hl ix iy ixh ixl iyh iyl)
       (b #t)
       (c #t)
       (d #t)
@@ -110,8 +110,7 @@
       ((- ix $d) #t)
       ((+ iy $d) #t)
       ((- iy $d) #t)
-      (a #t)
-      (_ #f)))
+      (a #t)))
 
   (define-syntax r-prefix
     (syntax-rules (+ - a b c d e h l hl ix iy ixh ixl iyh iyl)
