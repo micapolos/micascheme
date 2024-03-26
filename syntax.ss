@@ -2,7 +2,7 @@
   (export
     syntax-null?
     define-rule-syntax
-    define-syntax-case
+    define-case-syntax
     define-aux-keyword
     define-aux-keywords
     expand-begin-syntaxes
@@ -38,12 +38,12 @@
           (syntax-case $syntax ()
             (_ #`body))))))
 
-  (define-syntax define-syntax-case
+  (define-syntax define-case-syntax
     (syntax-rules ()
       ((_ ($name $param ...) $body)
-        (define-syntax-case ($name $param ...) () $body))
+        (define-case-syntax ($name $param ...) () $body))
       ((_ ($name $param ...) $keywords $body)
-        (define-syntax-case $name $keywords
+        (define-case-syntax $name $keywords
           ((_ $param ...) $body)))
       ((_ $name $keywords $case ...)
         (define-syntax $name

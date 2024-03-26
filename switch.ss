@@ -47,7 +47,7 @@
         (throw non-exclusive
           (quote (switch $expr $pred ...))))))
 
-  (define-syntax-case (index-switch expr branch ... default)
+  (define-case-syntax (index-switch expr branch ... default)
     (let
       (($branches (syntax->list #`(branch ...))))
       #`(case expr

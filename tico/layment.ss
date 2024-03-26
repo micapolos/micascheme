@@ -52,7 +52,7 @@
   (define (empty-layment)
     (layment (empty-layout) #f))
 
-  (define-syntax-case (make-layment $layout $body)
+  (define-case-syntax (make-layment $layout $body)
     (lets
       ($var (generate-temporary))
       #`(lets
