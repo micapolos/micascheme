@@ -160,10 +160,10 @@
             (append $head-params $tail-params)
             #`(lambda ($syntax)
               (syntax-case-opt $syntax ()
-                (($head . $tail)
+                (($syntax-head . $syntax-tail)
                   (opt-lets
-                    ($head-args (#,$head-proc #'$head))
-                    ($tail-args (#,$tail-proc #'$tail))
+                    ($head-args (#,$head-proc #'$syntax-head))
+                    ($tail-args (#,$tail-proc #'$syntax-tail))
                     (append $head-args $tail-args))))))))
       ($id
         (identifier? #'$id)
