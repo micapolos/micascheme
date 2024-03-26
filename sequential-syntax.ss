@@ -100,7 +100,7 @@
               (syntax-sequential $context
                 #`$body)))))
       ((define ($id $param ...) $body)
-        (for-all identifier? (syntax->list #`($id $param ...)))
+        (identifiers? #`($id $param ...))
         #`(begin
           (define-aux-keyword $id)
           (define-property $id sequential

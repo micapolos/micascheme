@@ -116,9 +116,7 @@
   (define-syntax (enum $syntax)
     (syntax-case $syntax ()
       ((_ ($name $item ...))
-        (and
-          (identifier? #`$name)
-          (for-all identifier? (syntax->list #`($item ...))))
+        (identifiers? #`($name $item ...))
         (lets
           ($name #'$name)
           ($name-string (symbol->string (syntax->datum $name)))
