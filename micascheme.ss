@@ -34,6 +34,7 @@
     (stack)
     (switch)
     (rename (syntax) (define-lookup-syntax define-syntax))
+    (syntaxes)
     (system)
     (test)
     (throw)

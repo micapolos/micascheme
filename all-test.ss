@@ -42,6 +42,7 @@
   (switch)
   (symbolizer)
   (syntax)
+  (syntaxes)
   (syntax-matcher)
   (term)
   (throw)
