@@ -30,3 +30,5 @@
 
 (check (free-identifier=? (syntax-rule-id #'(+ body)) #'+))
 (check (free-identifier=? (syntax-rule-id #'((+ a b) body)) #'+))
+
+(check (false? (syntax-case-opt #'foo ())))

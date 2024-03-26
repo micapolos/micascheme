@@ -10,7 +10,8 @@
     define-lookup-syntax
     syntax-selector
     syntax-pattern-id
-    syntax-rule-id)
+    syntax-rule-id
+    syntax-case-opt)
   (import (scheme))
 
   (define (syntax-null? $syntax)
@@ -108,4 +109,10 @@
     (syntax-case $rule ()
       (($pattern $rest ...)
         (syntax-pattern-id #'$pattern))))
+
+  (define-syntax (syntax-case-opt $syntax)
+    (syntax-case $syntax ()
+      ((_ $expr ($literal ...) $clause ...)
+        #`(syntax-case $expr ($literal ...)
+          $clause ... (_ #f)))))
 )
