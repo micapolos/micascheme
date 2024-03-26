@@ -21,7 +21,7 @@
     (define-literal? $id))
 
   (define-rule-syntax (define-pattern-literal? $id)
-    (define-property $id pattern-literal? $id))
+    (define-property $id pattern-literal? #t))
 
   (define-rule-syntax (define-macro-matcher $id $entry ...)
     (define-syntax-matcher $id $entry ...))
