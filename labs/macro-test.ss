@@ -71,7 +71,7 @@
     (lambda ($lookup $syntax $pattern)
       (syntax-case $pattern ()
         ((_ $string)
-          (and (identifier? #'$string))
+          (identifier? #'$string)
           (and
             (string? (syntax->datum $syntax))
             (match ($string $syntax)))))))

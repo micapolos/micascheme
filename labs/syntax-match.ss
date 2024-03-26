@@ -116,7 +116,7 @@
           (define-aux-keyword $name)
           (define-property $name pattern-matcher $pattern-matcher)))
       ((_ ($name $syntax) $body)
-        (and (identifier? #'$name) (identifier? #'$syntax))
+        (identifiers? #'($name $syntax))
         (define-pattern-matcher $name
           (lambda ($syntax)
             $body)))))
