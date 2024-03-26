@@ -1,4 +1,4 @@
-(import (check) (labs macro) (labs syntax-match))
+(import (check) (labs macro) (labs syntax-match) (micascheme))
 
 (run-void
   (define $lookup
