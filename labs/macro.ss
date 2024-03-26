@@ -2,6 +2,8 @@
   (export
     define-syntax-literal?
     define-syntax-matcher
+    macro-case-opt
+    macro-rules-opt
     macro-case
     macro-rules
     define-macro
@@ -27,7 +29,7 @@
           (lambda ($syntax)
             $body)))))
 
-  (define-syntax (macro-case $syntax $lookup)
+  (define-syntax (macro-case-opt $syntax $lookup)
     (syntax-case $syntax ()
       ((_ $syntax $clause ...)
         #`(or
@@ -36,8 +38,18 @@
               (syntax-case $clause ()
                 (($pattern $body)
                   (parse-pattern-match $lookup #'$syntax #'$pattern #'$body))))
-            (syntax->list #'($clause ...)))
-          (syntax-error #'$syntax)))))
+            (syntax->list #'($clause ...)))))))
+
+  (define-rule-syntax (macro-case $syntax $clause ...)
+    (macro-case-opt $syntax
+      $clause ...
+      (_ (syntax-error #'$syntax))))
+
+  (define-syntax (macro-rules-opt $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ ($pattern $body)...)
+        #`(lambda ($syntax)
+          (macro-case-opt $syntax ($pattern #'$body) ...)))))
 
   (define-syntax (macro-rules $syntax $lookup)
     (syntax-case $syntax ()

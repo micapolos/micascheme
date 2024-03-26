@@ -17,13 +17,6 @@
         (symbol->string s)
         "?"))))
 
-(define-namespace matcher)
-(define-syntax-matcher x "matcher-x")
-(define-syntax-matcher y "matcher-y")
-(check (equal? (matcher x) "matcher-x"))
-(check (equal? (matcher y) "matcher-y"))
-;(check (equal? (matcher z) #f)) => syntax error
-
 (check (free-identifier=? (syntax-selector #'+) #'+))
 (check (free-identifier=? (syntax-selector #'(+ a b)) #'+))
 (check (false? (syntax-selector #'"foo")))

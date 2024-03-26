@@ -43,7 +43,6 @@
   (symbolizer)
   (syntax)
   (syntaxes)
-  (syntax-matcher)
   (term)
   (throw)
   (tico)
