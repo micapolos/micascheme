@@ -1,5 +1,6 @@
 (library (syntax)
   (export
+    identifiers?
     syntax-null?
     define-rule-syntax
     define-case-syntax
@@ -13,6 +14,9 @@
     syntax-rule-id
     syntax-case-opt)
   (import (scheme))
+
+  (define (identifiers? $syntax)
+    (for-all identifier? (syntax->list $syntax)))
 
   (define (syntax-null? $syntax)
     (null? (syntax->datum $syntax)))

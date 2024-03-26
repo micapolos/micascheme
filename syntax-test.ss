@@ -1,5 +1,9 @@
 (import (check) (syntax) (procedure))
 
+(check (equal? (identifiers? #'()) #t))
+(check (equal? (identifiers? #'(foo bar)) #t))
+(check (equal? (identifiers? #'(foo 123)) #f))
+
 (define-aux-keyword foo)
 (check (raises? (lambda () foo)))
 
