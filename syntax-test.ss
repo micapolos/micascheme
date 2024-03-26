@@ -18,8 +18,8 @@
         "?"))))
 
 (define-namespace matcher)
-(define-matcher x "matcher-x")
-(define-matcher y "matcher-y")
+(define-syntax-matcher x "matcher-x")
+(define-syntax-matcher y "matcher-y")
 (check (equal? (matcher x) "matcher-x"))
 (check (equal? (matcher y) "matcher-y"))
 ;(check (equal? (matcher z) #f)) => syntax error

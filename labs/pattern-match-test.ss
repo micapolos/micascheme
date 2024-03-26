@@ -1,4 +1,4 @@
-(import (check) (labs syntax-match) (micascheme))
+(import (check) (labs pattern-match) (micascheme))
 
 ; === pattern-match ===
 
@@ -10,12 +10,12 @@
 
   (define-aux-keyword literal)
 
-  (define-property literal pattern-literal? #t)
+  (define-property literal syntax-literal? #t)
 
   (define-aux-keyword matcher)
   (define-aux-keyword match)
 
-  (define-property matcher pattern-matcher
+  (define-property matcher syntax-matcher
     (lambda ($pattern)
       (syntax-case $pattern ()
         ((_ $param1 $param2)

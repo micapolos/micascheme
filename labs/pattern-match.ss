@@ -1,14 +1,14 @@
-(library (labs syntax-match)
+(library (labs pattern-match)
   (export
-    pattern-literal?
-    pattern-matcher
+    syntax-literal?
+    syntax-matcher
 
     parse-pattern
     parse-pattern-match)
   (import (micascheme))
 
-  (define-aux-keyword pattern-matcher)
-  (define-aux-keyword pattern-literal?)
+  (define-aux-keyword syntax-matcher)
+  (define-aux-keyword syntax-literal?)
 
   (define $... (datum->syntax #'$... '...))
 
@@ -17,7 +17,7 @@
       ($id
         (and
           (identifier? #'$id)
-          ($lookup #'$id #'pattern-literal?))
+          ($lookup #'$id #'syntax-literal?))
         (values
           (list)
           #`(lambda ($syntax)
@@ -28,9 +28,9 @@
       (($id . $tail)
         (and
           (identifier? #'$id)
-          ($lookup #'$id #'pattern-matcher))
+          ($lookup #'$id #'syntax-matcher))
         (app
-          ($lookup #'$id #'pattern-matcher)
+          ($lookup #'$id #'syntax-matcher)
           $pattern))
       ($other
         (parse-default-pattern $lookup #'$other))))

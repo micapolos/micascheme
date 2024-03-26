@@ -1,7 +1,7 @@
 (library (labs macro)
   (export
-    define-literal?
-    define-matcher
+    define-syntax-literal?
+    define-syntax-matcher
     macro-case
     macro-rules
     define-macro
@@ -9,21 +9,21 @@
 
   (import
     (micascheme)
-    (labs syntax-match))
+    (labs pattern-match))
 
-  (define-rule-syntax (define-literal? $id)
-    (define-property $id pattern-literal? #t))
+  (define-rule-syntax (define-syntax-literal? $id)
+    (define-property $id syntax-literal? #t))
 
-  (define-syntax define-matcher
+  (define-syntax define-syntax-matcher
     (syntax-rules ()
-      ((_ $name $pattern-matcher)
+      ((_ $name $syntax-matcher)
         (identifier? #'$name)
         (begin
           (define-aux-keyword $name)
-          (define-property $name pattern-matcher $pattern-matcher)))
+          (define-property $name syntax-matcher $syntax-matcher)))
       ((_ ($name $syntax) $body)
         (identifiers? #'($name $syntax))
-        (define-pattern-matcher $name
+        (define-syntax-matcher $name
           (lambda ($syntax)
             $body)))))
 

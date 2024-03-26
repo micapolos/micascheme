@@ -3,5 +3,5 @@
 (test
   (labs stacky)
   (labs syntax)
-  (labs syntax-match)
+  (labs pattern-match)
   (labs macro))
