@@ -7,6 +7,7 @@
     define-macro
     define-macros
     pattern-rules
+    define-pattern-literal?
     macro-case-2
     macro-rules-2
     define-macro-2
@@ -18,6 +19,9 @@
 
   (define-rule-syntax (define-macro-literal? $id)
     (define-literal? $id))
+
+  (define-rule-syntax (define-pattern-literal? $id)
+    (define-property $id pattern-literal? $id))
 
   (define-rule-syntax (define-macro-matcher $id $entry ...)
     (define-syntax-matcher $id $entry ...))
