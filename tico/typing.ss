@@ -79,17 +79,17 @@
 
   (data (typing type layment))
 
-  (define-syntax-rule (test-typing $name)
+  (define-rule-syntax (test-typing $name)
     (type-datum->typing
       (test-type $name)
       (test-datum $name)))
 
-  (define-syntax-rule (test-static-typing $name)
+  (define-rule-syntax (test-static-typing $name)
     (type-datum->typing
       (static-test-type $name)
       (test-datum $name)))
 
-  (define-syntax-rule (test-parameter-typing $name)
+  (define-rule-syntax (test-parameter-typing $name)
     (typing
       (test-type $name)
       (test-parameter-layment $name)))

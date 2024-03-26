@@ -15,7 +15,7 @@
 
 ; === term->datum ===
 
-(define-syntax-rule (check-datum $term $datum)
+(define-rule-syntax (check-datum $term $datum)
   (check (equal? (term->datum $term) (quote $datum))))
 
 (check-datum (native `string-append) string-append)
@@ -64,7 +64,7 @@
 
 ; === term-eval ===
 
-(define-syntax-rule (check-eval $term $value)
+(define-rule-syntax (check-eval $term $value)
   (check (equal? (term-eval $term (environment `(micascheme))) $value)))
 
 (check-eval (application! (native `string-append) "Hello, " "world!") "Hello, world!")

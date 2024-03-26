@@ -230,7 +230,7 @@
       ((list? $list) $list)
       ((else $other) (list $other))))
 
-  (define-syntax-rule (values->list $expr)
+  (define-rule-syntax (values->list $expr)
     (call-with-values (lambda () $expr) list))
 
   ; === ass lists ===

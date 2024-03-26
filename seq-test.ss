@@ -1,6 +1,6 @@
 (import (list) (seq))
 
-(define-syntax-rule (check-seq= $lhs $rhs)
+(define-rule-syntax (check-seq= $lhs $rhs)
   (check (equal? (seq->list $lhs) (seq->list $rhs))))
 
 (check-seq= (seq) (seq))

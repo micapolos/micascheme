@@ -165,7 +165,7 @@
               (record-predicate #,$record-name))
             (define #,$name-body
               (record-accessor #,$record-name 0))
-            (define-syntax-rule (#,$name-switch #,$name-tmp #,$case-tmp #,$dots)
+            (define-rule-syntax (#,$name-switch #,$name-tmp #,$case-tmp #,$dots)
               (switch (#,$name-body #,$name-tmp)
                 #,$case-tmp #,$dots)))))))
 

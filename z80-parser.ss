@@ -160,7 +160,7 @@
           (context-address-labels $context)))
       (bytevector->immutable-bytevector $bytevector)))
 
-  (define-syntax-rule (context+bytes $context $byte ...)
+  (define-rule-syntax (context+bytes $context $byte ...)
     (fold-left context+byte $context (list $byte ...)))
 
   (define (syntax->bytevector $syntax)

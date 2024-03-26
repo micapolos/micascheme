@@ -29,13 +29,13 @@
   (data (any-number))
   (data (anything))
 
-  (define-syntax-rule (struct! $name $value ...)
+  (define-rule-syntax (struct! $name $value ...)
     (struct (quote $name) (list $value ...)))
 
-  (define-syntax-rule (enum! $name $value ...)
+  (define-rule-syntax (enum! $name $value ...)
     (enum (quote $name) (list $value ...)))
 
-  (define-syntax-rule (arrow! ($param ...) $result ...)
+  (define-rule-syntax (arrow! ($param ...) $result ...)
     (arrow (list $param ...) (list $result ...)))
 
   (define anything! (anything))

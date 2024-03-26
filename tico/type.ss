@@ -70,10 +70,10 @@
   (data (recursion items))
   (data (var index))
 
-  (define-syntax-rule (static-test-type $name)
+  (define-rule-syntax (static-test-type $name)
     (struct (quote $name) (list)))
 
-  (define-syntax-rule (test-type $name)
+  (define-rule-syntax (test-type $name)
     (struct (quote $name) (list (unchecked-type))))
 
   (define (boolean-type)

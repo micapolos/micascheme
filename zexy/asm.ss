@@ -13,7 +13,7 @@
 
   (data (asm stack org env imports))
 
-  (define-syntax-rule (assemble $mem $op ...)
+  (define-rule-syntax (assemble $mem $op ...)
     (lets
       ($vec
         (asm-bytevector
@@ -142,7 +142,7 @@
       (asm-with-stack (push (asm-stack $asm) #`(dw #,$u16)))
       (asm-with-org (nm+ (asm-org $asm) 2))))
 
-  (define-syntax-rule (asm... $asm $u8 ...)
+  (define-rule-syntax (asm... $asm $u8 ...)
     (fold-left asm-u8 $asm (list $u8 ...)))
 
   (define (asm+label $asm $label)
@@ -826,6 +826,6 @@
       ((srl) #b111)
       (else #f)))
 
-  (define-syntax-rule (== $syntax $datum)
+  (define-rule-syntax (== $syntax $datum)
     (equal? (syntax->datum $syntax) '$datum))
 )

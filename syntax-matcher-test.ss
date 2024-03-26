@@ -2,7 +2,7 @@
 
 (define-aux-keywords b c d e h ixh iyh l ixl iyl hl ix iy a)
 
-(define-syntax-rule (match $expr ...)
+(define-rule-syntax (match $expr ...)
   (lambda ($fn)
     ($fn $expr ...)))
 
@@ -25,7 +25,7 @@
       (a         (match #f   #b111 #f))
       (_         #f))))
 
-(define-syntax-rule (check-matches? $syntax $result)
+(define-rule-syntax (check-matches? $syntax $result)
   (check
     (equal?
       (lets

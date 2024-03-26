@@ -27,10 +27,10 @@
               ($lookup $identifier #'expr))
             #'$expr)))))
 
-  (define-syntax-rule (define-expr $identifier $expr)
+  (define-rule-syntax (define-expr $identifier $expr)
     (define-property $identifier expr $expr))
 
-  (define-syntax-rule (define-type $identifier $type)
+  (define-rule-syntax (define-type $identifier $type)
     (define-expr $identifier (expr #'$type #'$identifier)))
 
   (define-syntax (define-tipsy $lookup $syntax)

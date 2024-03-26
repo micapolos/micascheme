@@ -88,7 +88,7 @@
               ($org $new-pc)
               #`(repeat #,$slack (#,$emit-u8 0))))))))
 
-  (define-syntax-rule (define-registers $reg ...)
+  (define-rule-syntax (define-registers $reg ...)
     (begin (define-aux-keyword $reg) ...))
 
   (define-registers a b c d e h l hl ix iy ixh ixl iyh iyl)

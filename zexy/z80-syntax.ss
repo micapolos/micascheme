@@ -28,9 +28,9 @@
   (import
     (except (zexy base) and or xor push pop))
 
-  (define-syntax-rule (define-keywords keyword ...)
+  (define-rule-syntax (define-keywords keyword ...)
     (begin
-      (define-syntax-rule keyword
+      (define-rule-syntax keyword
         (syntax-error 'keyword
           (string-append "misplaced asm keyword"))) ...))
 

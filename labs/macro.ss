@@ -16,13 +16,13 @@
     (micascheme)
     (labs syntax-match))
 
-  (define-syntax-rule (define-macro-literal? $id)
+  (define-rule-syntax (define-macro-literal? $id)
     (define-literal? $id))
 
-  (define-syntax-rule (define-macro-matcher $id $entry ...)
+  (define-rule-syntax (define-macro-matcher $id $entry ...)
     (define-syntax-matcher $id $entry ...))
 
-  (define-syntax-rule (macro-case $lookup $syntax $entry ...)
+  (define-rule-syntax (macro-case $lookup $syntax $entry ...)
     (syntax-match $lookup $syntax
       (list #'$entry ...)))
 
@@ -44,16 +44,16 @@
         #`(lambda ($syntax)
           (macro-case-2 $syntax ($pattern #'$body) ...)))))
 
-  (define-syntax-rule (macro-rules $entry ...)
+  (define-rule-syntax (macro-rules $entry ...)
     (lambda ($syntax)
       (lambda ($lookup)
         (macro-case $lookup $syntax $entry ...))))
 
-  (define-syntax-rule (define-macro $name $entry ...)
+  (define-rule-syntax (define-macro $name $entry ...)
     (define-syntax $name
       (macro-rules $entry ...)))
 
-  (define-syntax-rule (define-macro-2 $name $entry ...)
+  (define-rule-syntax (define-macro-2 $name $entry ...)
     (define-syntax $name
       (macro-rules-2 $entry ...)))
 

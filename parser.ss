@@ -57,7 +57,7 @@
 
   ; ----------------------------------------------------------
 
-  (define-syntax-rule (parser-thunk-do ($thunk $parser) $body)
+  (define-rule-syntax (parser-thunk-do ($thunk $parser) $body)
     (opt-lets ($thunk $parser) $body))
 
   (define (parser-push $parser $char)
@@ -130,7 +130,7 @@
 
   ; ----------------------------------------------------------
 
-  (define-syntax-rule (char-parser-bind $char $body)
+  (define-rule-syntax (char-parser-bind $char $body)
     (thunk #f (lambda ($char) $body)))
 
   (define (exact-char-parser $exact-char)

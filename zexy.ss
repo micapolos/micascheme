@@ -4,7 +4,7 @@
     (micascheme)
     (zexy asm))
 
-  (define-syntax-rule (compile-zexy $filename $arg ...)
+  (define-rule-syntax (compile-zexy $filename $arg ...)
     (lets
       ($port (open-file-output-port $filename (file-options no-fail) (buffer-mode none) #f))
       (run

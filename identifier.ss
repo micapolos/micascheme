@@ -6,12 +6,12 @@
     (scheme)
     (syntax))
 
-  (define-syntax-rule (identifier-named? $syntax $name)
+  (define-rule-syntax (identifier-named? $syntax $name)
     (and
       (identifier? $syntax)
       (symbol=? (syntax->datum $syntax) (quote $name))))
 
-  (define-syntax-rule (build-identifier ($var $id) $body)
+  (define-rule-syntax (build-identifier ($var $id) $body)
     (datum->syntax $id
       (string->symbol
         (let

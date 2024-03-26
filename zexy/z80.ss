@@ -22,8 +22,8 @@
       (unsigned-16 sp)))
 
   (define (z80-run z80 mem mem! io io!)
-    (define-syntax-rule (define-macro $params $body ...)
-      (define-syntax-rule $params
+    (define-rule-syntax (define-macro $params $body ...)
+      (define-rule-syntax $params
         (begin $body ...)))
 
     (define-macro (a) (z80-a z80))

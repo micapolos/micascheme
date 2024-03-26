@@ -28,13 +28,13 @@
       ((_ $item ...)
         (let () $item ... (void)))))
 
-  (define-syntax-rule (repeat $count $body ...)
+  (define-rule-syntax (repeat $count $body ...)
     (do
       (($i $count (- $i 1)))
       ((zero? $i) (void))
       $body ...))
 
-  (define-syntax-rule (once-proc $proc)
+  (define-rule-syntax (once-proc $proc)
     (let ()
       (define $applied? #f)
       (lambda ()
@@ -42,7 +42,7 @@
         (set! $applied? #t)
         ($proc))))
 
-  (define-syntax-rule (checking-once $body)
+  (define-rule-syntax (checking-once $body)
     (let ()
       (define $applied? #f)
       (lambda ()
@@ -50,7 +50,7 @@
         (set! $applied? #t)
         $body)))
 
-  (define-syntax-rule (app $fn $arg ...)
+  (define-rule-syntax (app $fn $arg ...)
     ($fn $arg ...))
 
   (define-syntax (values-app $syntax)

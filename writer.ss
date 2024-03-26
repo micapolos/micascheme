@@ -17,7 +17,7 @@
   (define (writer-write-string $writer $string)
     (fold-left writer-write-char $writer (string->list $string)))
 
-  (define-syntax-rule (do-writer-string $writer $body)
+  (define-rule-syntax (do-writer-string $writer $body)
     (list->string (reverse (writer-value (lets ($writer (chars-writer)) $body)))))
 
   (define chars-writer

@@ -53,11 +53,11 @@
                 "-"
                 (number->string (cdr $seed-opt)))))))))
 
-  (define-syntax-rule (with-generate-temporary-seed $prefix $body ...)
+  (define-rule-syntax (with-generate-temporary-seed $prefix $body ...)
     (parameterize ((generate-temporary-seed-opt (cons (quote $prefix) 0)))
       $body ...))
 
-  (define-syntax-rule (with-tmps $body ...)
+  (define-rule-syntax (with-tmps $body ...)
     (with-generate-temporary-seed $tmp $body ...))
 
 

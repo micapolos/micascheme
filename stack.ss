@@ -16,6 +16,6 @@
   (define (top $stack) (car $stack))
   (define (pop $stack) (cdr $stack))
 
-  (define-syntax-rule (push... $stack $arg ...)
+  (define-rule-syntax (push... $stack $arg ...)
     (push-all $stack (stack $arg ...)))
 )

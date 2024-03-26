@@ -19,7 +19,7 @@
 
   (define $audio-mutex (make-mutex))
 
-  (define-syntax-rule (run-sdl $flag $flags ... ($body ...))
+  (define-rule-syntax (run-sdl $flag $flags ... ($body ...))
     (case (sdl-init $flag $flags ...)
       ((0)
         (dynamic-wind
@@ -28,7 +28,7 @@
           (lambda () (sdl-quit))))
       (else (sdl-error))))
 
-  (define-syntax-rule (run-sdl-window $title $x $y $w $h $flag ... ($window $body ...))
+  (define-rule-syntax (run-sdl-window $title $x $y $w $h $flag ... ($window $body ...))
     (switch (sdl-create-window $title $x $y $w $h $flag ...)
       ((zero? _) (sdl-error))
       ((else $window)
@@ -37,7 +37,7 @@
           (lambda () $body ...)
           (lambda () (sdl-destroy-window $window))))))
 
-  (define-syntax-rule (run-sdl-renderer $window $index $flag ... ($renderer $body ...))
+  (define-rule-syntax (run-sdl-renderer $window $index $flag ... ($renderer $body ...))
     (switch (sdl-create-renderer $window $index $flag ...)
       ((zero? _) (sdl-error))
       ((else $renderer)
@@ -46,7 +46,7 @@
           (lambda () $body ...)
           (lambda () (sdl-destroy-renderer $renderer))))))
 
-  (define-syntax-rule
+  (define-rule-syntax
     (run-sdl-audio-device
       $freq $format $channels $samples
       ($bytevector $callback ...)
@@ -104,23 +104,23 @@
           (foreign-free $desired-audio-spec-address)
           (unlock-object $callable)))))
 
-  (define-syntax-rule (run-sdl-event-loop $body ...)
+  (define-rule-syntax (run-sdl-event-loop $body ...)
     (do
       (($event (sdl-poll-event) (sdl-poll-event)))
       ((sdl-event-quit?) (void))
       $body ...))
 
-  (define-syntax-rule (sdl-pause-audio-device $audio-device $pause?)
+  (define-rule-syntax (sdl-pause-audio-device $audio-device $pause?)
     (SDL_PauseAudioDevice $audio-device (if $pause? 1 0)))
 
-  (define-syntax-rule (sdl-queue-audio $audio-device $bytevector)
+  (define-rule-syntax (sdl-queue-audio $audio-device $bytevector)
     (SDL_QueueAudio $audio-device $bytevector (bytevector-length $bytevector)))
 
-  (define-syntax-rule (sdl-queued-audio-size $audio-device)
+  (define-rule-syntax (sdl-queued-audio-size $audio-device)
     (SDL_GetQueuedAudioSize $audio-device))
 
   ; TODO: SDL_LockAudioDevice dead-locks. Fix it!!!
-  (define-syntax-rule (run-sdl-locked-audio-device $audio-device ($body ...))
+  (define-rule-syntax (run-sdl-locked-audio-device $audio-device ($body ...))
     (with-mutex $audio-mutex $body ...))
     ; (dynamic-wind
     ;   (lambda ()

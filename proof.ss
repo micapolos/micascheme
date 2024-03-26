@@ -11,10 +11,10 @@
   (data (values-proof items))
   (data (pair-of? car cdr))
 
-  (define-syntax-rule (lambda? ($param ...) $result)
+  (define-rule-syntax (lambda? ($param ...) $result)
     (lambda-proof (list $param ...) $result))
 
-  (define-syntax-rule (values? $item ...)
+  (define-rule-syntax (values? $item ...)
     (values-proof (list $item ...)))
 
   (define syntax->proof

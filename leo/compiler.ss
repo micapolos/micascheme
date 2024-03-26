@@ -21,7 +21,7 @@
   (define (compiler+types $compiler $types)
     (fold-left compiler+type $compiler $types))
 
-  (define-syntax-rule (compiler! $type ...)
+  (define-rule-syntax (compiler! $type ...)
     (compiler (stack $type ...) 0))
 
   (define (compile $compiler $value)

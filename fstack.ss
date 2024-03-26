@@ -13,7 +13,7 @@
   (define fstack-top-parameter
     (make-thread-parameter #f))
 
-  (define-syntax-rule (frun $size $body ...)
+  (define-rule-syntax (frun $size $body ...)
     (lets
       ($address (foreign-alloc $size))
       (parameterize
@@ -24,19 +24,19 @@
           (lambda () $body ...)
           (lambda () (foreign-free $address))))))
 
-  (define-syntax-rule (fblock $body ...)
+  (define-rule-syntax (fblock $body ...)
     (parameterize ((fstack-address-parameter (fstack-address-parameter)))
       $body ...))
 
-  (define-syntax-rule (flambda ($param ...) $body ...)
+  (define-rule-syntax (flambda ($param ...) $body ...)
     (lambda ($param ...)
       (fblock $body ...)))
 
-  (define-syntax-rule (fdefine ($name $param ...) $body ...)
+  (define-rule-syntax (fdefine ($name $param ...) $body ...)
     (define $name
       (flambda ($param ...) $body ...)))
 
-  (define-syntax-rule (flocal $ftype $var)
+  (define-rule-syntax (flocal $ftype $var)
     (define $var
       (let (($pointer (make-ftype-pointer $ftype (fstack-address-parameter))))
         (fstack-address-parameter (+ (fstack-address-parameter) (ftype-sizeof $ftype)))

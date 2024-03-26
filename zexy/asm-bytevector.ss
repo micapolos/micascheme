@@ -16,10 +16,10 @@
 
   (define-aux-keyword asm)
 
-  (define-syntax-rule (define-asm-syntax $name $transformer)
+  (define-rule-syntax (define-asm-syntax $name $transformer)
     (define-property $name asm $transformer))
 
-  (define-syntax-rule (define-asm-syntax-rule ($name $param ...) $body)
+  (define-rule-syntax (define-asm-syntax-rule ($name $param ...) $body)
     (define-asm-syntax $name
       (lambda ($syntax)
         (syntax-case $syntax ()

@@ -39,12 +39,12 @@
 
   (data (layment layout compilation))
 
-  (define-syntax-rule (test-layment $name)
+  (define-rule-syntax (test-layment $name)
     (make-layment
       (simple-layout)
       (test-compilation $name)))
 
-  (define-syntax-rule (test-parameter-layment $name)
+  (define-rule-syntax (test-parameter-layment $name)
     (make-layment
       (simple-layout)
       (test-parameter-compilation $name)))

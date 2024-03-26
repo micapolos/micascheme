@@ -8,7 +8,7 @@
     (proof))
 
   ; TODO: Make sure not already proven
-  (define-syntax-rule (define-proof $name $proof)
+  (define-rule-syntax (define-proof $name $proof)
     (define-property $name proof $proof))
 
   (define-syntax (proof $syntax $lookup)

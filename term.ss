@@ -72,7 +72,7 @@
 
   ; --------------------------------------------------
 
-  (define-syntax-rule (global! library identifier)
+  (define-rule-syntax (global! library identifier)
     (global (quote library) (quote identifier)))
   
   ; --------------------------------------------------
@@ -215,22 +215,22 @@
   (define type! (universe 0))
   (define term! (term-type))
 
-  (define-syntax-rule (application! fn arg ...)
+  (define-rule-syntax (application! fn arg ...)
     (application fn (list arg ...)))
 
-  (define-syntax-rule (use! arg ... body)
+  (define-rule-syntax (use! arg ... body)
     (use (list arg ...) body))
 
-  (define-syntax-rule (function-type! (name arg ...) result)
+  (define-rule-syntax (function-type! (name arg ...) result)
     (function-type (quote name) (list arg ...) result))
 
-  (define-syntax-rule (tuple-type! (name arg ...))
+  (define-rule-syntax (tuple-type! (name arg ...))
     (tuple-type (quote name) (list arg ...)))
 
-  (define-syntax-rule (choice-type! arg ...)
+  (define-rule-syntax (choice-type! arg ...)
     (choice-type (list arg ...)))
 
-  (define-syntax-rule (branch! index case ...)
+  (define-rule-syntax (branch! index case ...)
     (branch index (list case ...)))
 
   ; -----------------------------------------------

@@ -14,7 +14,7 @@
 
   (data (env stack))
 
-  (define-syntax-rule (env... ($label $value) ...)
+  (define-rule-syntax (env... ($label $value) ...)
     (env (stack (cons (quote $label) $value) ...)))
 
   (define (empty-env)

@@ -1,6 +1,6 @@
 (import (check) (zexy asm))
 
-(define-syntax-rule (check-op $syntax ($op ...))
+(define-rule-syntax (check-op $syntax ($op ...))
   (check
     (equal?
       (asm-bytevector
@@ -353,7 +353,7 @@
 
 ; ---------------------------------------------------
 
-(define-syntax-rule (check-ops $syntax ... ($u8s ...))
+(define-rule-syntax (check-ops $syntax ... ($u8s ...))
   (check
     (equal?
       (asm-bytevector

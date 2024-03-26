@@ -11,7 +11,7 @@
     (monad)
     (syntax))
 
-  (define-syntax-rule (unsafe-current $body ...)
+  (define-rule-syntax (unsafe-current $body ...)
     (lambda () $body ...))
 
   (define (unsafe-current-get $current)

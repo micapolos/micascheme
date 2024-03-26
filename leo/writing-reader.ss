@@ -54,7 +54,7 @@
                   (char-writing #\newline)))
               (reverse $writings)))))))
 
-  (define-syntax-rule (script-string $item ...)
+  (define-rule-syntax (script-string $item ...)
     (writing-string
       (reader-eval (writing-reader) $item ...)))
 )

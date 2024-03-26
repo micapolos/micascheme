@@ -15,7 +15,7 @@
 
   (data (entry parameters constants))
 
-  (define-syntax-rule (test-entry $name ...)
+  (define-rule-syntax (test-entry $name ...)
     (entry
       (list (test-parameter-typing $name) ...)
       (list (test-typing $name) ...)))

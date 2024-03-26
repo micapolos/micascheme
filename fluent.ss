@@ -4,7 +4,7 @@
     (scheme)
     (syntax))
 
-  (define-syntax-rule (fluent $expr ($op $arg ...) ...)
+  (define-rule-syntax (fluent $expr ($op $arg ...) ...)
     (let*
       (
         ($var $expr)

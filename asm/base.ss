@@ -12,14 +12,14 @@
   (export
     (import (asm core)))
 
-  (define-syntax-rule (define-asm-core-syntax-rule ($name $param ...) $body)
+  (define-rule-syntax (define-asm-core-syntax-rule ($name $param ...) $body)
     (define-asm-core-syntax $name
       (lambda ($syntax $emit-u8 $org)
         (syntax-case $syntax ()
           ((_ $param ...) #`$body)))))
 
 
-  (define-syntax-rule (define-asm-syntax-rule ($name $param ...) $body)
+  (define-rule-syntax (define-asm-syntax-rule ($name $param ...) $body)
     (define-asm-syntax $name
       (lambda ($syntax)
         (syntax-case $syntax ()

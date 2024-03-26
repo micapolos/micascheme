@@ -5,7 +5,7 @@
   (typed)
   (compiler))
 
-(define-syntax-rule (check-compile lhs rhs)
+(define-rule-syntax (check-compile lhs rhs)
   (check (equal? (compile! lhs) rhs)))
 
 ; === literals ===

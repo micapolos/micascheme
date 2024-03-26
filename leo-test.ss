@@ -4,7 +4,7 @@
   (term)
   (compiler))
 
-(define-syntax-rule (check-leo $leo $value)
+(define-rule-syntax (check-leo $leo $value)
   (check (equal? (leo $leo) $value)))
 
 ; === natives

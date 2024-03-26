@@ -29,10 +29,10 @@
   (data (scope frames))
   (data (compiler scope parent-opt))
 
-  (define-syntax-rule (frame! type ...)
+  (define-rule-syntax (frame! type ...)
     (frame (list type ...)))
 
-  (define-syntax-rule (scope! frame ...)
+  (define-rule-syntax (scope! frame ...)
     (scope (list frame ...)))
 
   ; ----------------------------------------------------------------

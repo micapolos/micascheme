@@ -8,7 +8,7 @@
 
 (define-aux-keywords ld b c d e h l hl a)
 
-(define-syntax-rule (matcher-lets ($matcher-expr $param ...) $body)
+(define-rule-syntax (matcher-lets ($matcher-expr $param ...) $body)
   (opt-lets
     ($matcher $matcher-expr)
     ($matcher

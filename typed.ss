@@ -60,7 +60,7 @@
           (else (list->vector $values)))
         (tuple-type $name $types))))
 
-  (define-syntax-rule (typed-tuple! ($name $typed ...))
+  (define-rule-syntax (typed-tuple! ($name $typed ...))
     (typed-tuple (quote $name) (list $typed ...)))
 
   (define (typed-tuple-ref $typed-tuple $index)
@@ -95,7 +95,7 @@
       ((_ (not type)) (option-not type))
       ((_ typed) (option-the typed))))
 
-  (define-syntax-rule (typed-choice! option ...)
+  (define-rule-syntax (typed-choice! option ...)
     (typed-choice (list (typed-option! option) ...)))
 
   (define (typed-function $name $params $body)
@@ -103,7 +103,7 @@
       (function (length $params) (typed-value $body))
       (function-type $name $params (typed-type $body))))
 
-  (define-syntax-rule (typed-function! (name param ...) body)
+  (define-rule-syntax (typed-function! (name param ...) body)
     (typed-function (quote name) (list param ...) body))
 
   (define (typed-application $fn $args)
@@ -111,7 +111,7 @@
       (application (typed-value $fn) (map typed-value $args))
       (function-type-result (typed-type $fn))))
 
-  (define-syntax-rule (typed-application! fn arg ...)
+  (define-rule-syntax (typed-application! fn arg ...)
     (typed-application fn (list arg ...)))
 
   ; ---------------------------------------------------------

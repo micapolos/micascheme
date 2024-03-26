@@ -52,14 +52,14 @@
 
   (data (compilation arity datum evaluation))
 
-  (define-syntax-rule (test-compilation $name)
+  (define-rule-syntax (test-compilation $name)
     (datum->compilation (test-datum $name)))
 
-  (define-syntax-rule (test-parameter-compilation $name)
+  (define-rule-syntax (test-parameter-compilation $name)
     (parameter-compilation
       (test-parameter-datum $name)))
 
-  (define-syntax-rule (test-stack-compilation $name ...)
+  (define-rule-syntax (test-stack-compilation $name ...)
     (stack-compilation
       (test-compilation $name) ...))
 

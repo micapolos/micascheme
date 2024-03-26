@@ -35,12 +35,12 @@
               (syntax->list #'(var ...))
               (syntax->list #'(body ...))))))))
 
-  (define-syntax-rule (switch-opt $expr (($pred $var) $body) ...)
+  (define-rule-syntax (switch-opt $expr (($pred $var) $body) ...)
     (switch $expr
       (($pred $var) $body) ...
       ((else _) #f)))
 
-  (define-syntax-rule (switch-exclusive $expr (($pred $var) $body) ...)
+  (define-rule-syntax (switch-exclusive $expr (($pred $var) $body) ...)
     (switch $expr
       (($pred $var) $body) ...
       ((else _)

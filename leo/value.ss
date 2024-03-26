@@ -44,22 +44,22 @@
   (define string! (any-string))
   (define number! (any-number))
 
-  (define-syntax-rule (named! $name $value)
+  (define-rule-syntax (named! $name $value)
     (named (quote $name) $value))
 
-  (define-syntax-rule (tuple! $item ...)
+  (define-rule-syntax (tuple! $item ...)
     (tuple (list $item ...)))
 
-  (define-syntax-rule (choice! $item ...)
+  (define-rule-syntax (choice! $item ...)
     (choice (list $item ...)))
 
-  (define-syntax-rule (choice-switch! $choice $case ...)
+  (define-rule-syntax (choice-switch! $choice $case ...)
     (choice-switch $choice (list $case ...)))
 
-  (define-syntax-rule (function! ($param ...) $body)
+  (define-rule-syntax (function! ($param ...) $body)
     (function (list $param ...) $body))
 
-  (define-syntax-rule (application! $fn $arg ...)
+  (define-rule-syntax (application! $fn $arg ...)
     (application $fn (list $arg ...)))
 
   (define (typed-values $typed)

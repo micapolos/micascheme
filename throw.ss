@@ -4,7 +4,7 @@
     (scheme)
     (syntax))
 
-  (define-syntax-rule (throw name item ...)
+  (define-rule-syntax (throw name item ...)
     (error #f (format "~s" (list (quote name) item ...))))
 
   (define-syntax or-throw
@@ -17,7 +17,7 @@
         (or $other
           (throw or-throw $other)))))
 
-  (define-syntax-rule (ensure $pred $expr)
+  (define-rule-syntax (ensure $pred $expr)
     (let
       (($tmp $expr))
       (cond

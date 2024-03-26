@@ -11,7 +11,7 @@
 
   (define-aux-keyword binder)
 
-  (define-syntax-rule (define-binder $name $binder)
+  (define-rule-syntax (define-binder $name $binder)
     (define-property $name binder (syntax $binder)))
 
   (define (transform-binder $lookup $pattern $expr $body)

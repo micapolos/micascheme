@@ -4,7 +4,7 @@
   (term)
   (typed))
 
-(define-syntax-rule (check-decompile $typed $expected)
+(define-rule-syntax (check-decompile $typed $expected)
   (check (equal? (decompile $typed) $expected)))
 
 (check-decompile (typed! #f) #f)

@@ -1,7 +1,7 @@
 (library (syntax)
   (export
     syntax-null?
-    define-syntax-rule
+    define-rule-syntax
     define-syntax-case
     define-aux-keyword
     define-aux-keywords
@@ -27,7 +27,7 @@
             ($other (list #'other))))
         $syntaxes)))
 
-  (define-syntax define-syntax-rule
+  (define-syntax define-rule-syntax
     (syntax-rules ()
       ((_ (name param ...) body)
         (define-syntax name
@@ -51,11 +51,11 @@
             (syntax-case $tmp $keywords
               $case ...))))))
 
-  (define-syntax-rule (define-aux-keyword aux)
-    (define-syntax-rule aux
+  (define-rule-syntax (define-aux-keyword aux)
+    (define-rule-syntax aux
       (syntax-error (quote aux) "misplaced aux keyword")))
 
-  (define-syntax-rule (define-aux-keywords aux ...)
+  (define-rule-syntax (define-aux-keywords aux ...)
     (begin (define-aux-keyword aux) ...))
 
   (define-syntax (define-namespace $syntax)
@@ -68,7 +68,7 @@
                 (string-append "define-" (symbol->string (datum $name)))))))
 
           #`(begin
-            (define-syntax-rule (#,$define-identifier $name $value)
+            (define-rule-syntax (#,$define-identifier $name $value)
               (begin
                 (define-aux-keyword $name)
                 (define-property $name define-namespace (syntax $value))))

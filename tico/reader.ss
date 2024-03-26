@@ -331,19 +331,19 @@
       (lambda ()
         ($end #f))))
 
-  (define-syntax-rule (bindings-read-typings $bindings $body ...)
+  (define-rule-syntax (bindings-read-typings $bindings $body ...)
     (reader-eval
       (typings-reader $bindings)
       $body ...))
 
-  (define-syntax-rule (bindings-read-typing $bindings $body ...)
+  (define-rule-syntax (bindings-read-typing $bindings $body ...)
     (reader-eval
       (typing-reader $bindings)
       $body ...))
 
-  (define-syntax-rule (read-typings $body ...)
+  (define-rule-syntax (read-typings $body ...)
     (bindings-read-typings (stack) $body ...))
 
-  (define-syntax-rule (read-typing $body ...)
+  (define-rule-syntax (read-typing $body ...)
     (bindings-read-typing (stack) $body ...))
 )

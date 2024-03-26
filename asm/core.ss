@@ -13,12 +13,12 @@
   (define-aux-keyword label)
   (define-aux-keyword eq)
 
-  (define-syntax-rule (define-asm-core-syntax $name $transformer)
+  (define-rule-syntax (define-asm-core-syntax $name $transformer)
     (begin
       (define-aux-keyword $name)
       (define-property $name asm-core-syntax $transformer)))
 
-  (define-syntax-rule (define-asm-syntax $name $transformer)
+  (define-rule-syntax (define-asm-syntax $name $transformer)
     (begin
       (define-aux-keyword $name)
       (define-property $name asm-syntax $transformer)))

@@ -39,7 +39,7 @@
       ((else $other)
         (reader-append $reader $other))))
 
-  (define-syntax-rule (reader-eval $reader $item ...)
+  (define-rule-syntax (reader-eval $reader $item ...)
     (reader-end (reader-read-list $reader (list (quote $item) ...))))
 
   (define (reader-map $fn $reader)
@@ -57,7 +57,7 @@
           ((else $other)
             ($fn $other))))))
 
-  (define-syntax-rule (define-reader ($name $arg ... $end) $body)
+  (define-rule-syntax (define-reader ($name $arg ... $end) $body)
     (define $name
       (case-lambda
         (($arg ...) ($name $arg ... identity))

@@ -30,7 +30,7 @@
   (define boolean! (boolean-type))
   (define number! (number-type))
   (define string! (string-type))
-  (define-syntax-rule (tuple! $item ...)
+  (define-rule-syntax (tuple! $item ...)
     (tuple (list $item ...)))
 
   (define (evaluate-list $values)

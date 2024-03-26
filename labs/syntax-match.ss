@@ -88,16 +88,16 @@
 
   ; ==========================
 
-  (define-syntax-rule (define-literal? $name)
+  (define-rule-syntax (define-literal? $name)
     (define-property $name syntax-literal? #t))
 
-  (define-syntax-rule (define-syntax-matcher $name $matcher)
+  (define-rule-syntax (define-syntax-matcher $name $matcher)
     (define-property $name syntax-matcher $matcher))
 
-  (define-syntax-rule (combined-match ($param ...) $arg ...)
+  (define-rule-syntax (combined-match ($param ...) $arg ...)
     (match ($param $arg) ...))
 
-  (define-syntax-rule (key-syntax-case $syntax ($param ...) ($key $arg ...) ...)
+  (define-rule-syntax (key-syntax-case $syntax ($param ...) ($key $arg ...) ...)
     (syntax-case-opt $syntax ()
       ($key (combined-match ($param ...) ($arg ...))) ...))
 

@@ -41,10 +41,10 @@
     (tico tuple)
     (evaluator))
 
-  (define-syntax-rule (test-datum $name)
+  (define-rule-syntax (test-datum $name)
     (quote (quote $name)))
 
-  (define-syntax-rule (test-parameter-datum $name)
+  (define-rule-syntax (test-parameter-datum $name)
     (quote $name))
 
   (define (literal->datum $literal)
