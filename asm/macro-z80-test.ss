@@ -1,0 +1,43 @@
+(import
+  (micascheme)
+  (check)
+  (labs macro)
+  (asm macro-z80))
+
+(define (db $u8)
+  (writeln `(db ,$u8)))
+
+(define (dw $u16)
+  (writeln `(dw ,$u16)))
+
+(define (db-233 $a $b $c)
+  (db (fxior (fxsrl $a 6) (fxsrl $b 3) $c)))
+
+(define-macros
+  ((ld (r $r1) (r $r2))
+    (db-233 #b01 $r1 $r2))
+  ((ld (hl) (r $r))
+    (db-233 #b01 #b110 $r))
+  ((ld (r $r) (hl))
+    (db-233 #b01 $r #b110))
+  ((ld (r $r) $n)
+    (db-233 #b00 $r #b110)
+    (db $n))
+  ((ld a (bc))
+    (db #x0a))
+  ((ld a (de))
+    (db #x1a))
+  ((ld a ($nm))
+    (db #x3a)
+    (dw $nm))
+  ((ret)
+    (db #xc9)))
+
+(ld a c)
+(ld a d)
+(ld d 12)
+(ld (hl) h)
+;(ld a (bc))
+;(ld a (de))
+;(ld a (#x1234))
+(ret)

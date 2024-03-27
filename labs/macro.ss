@@ -20,9 +20,7 @@
     (syntax-rules ()
       ((_ $name $syntax-matcher)
         (identifier? #'$name)
-        (begin
-          (define-aux-keyword $name)
-          (define-property $name syntax-matcher $syntax-matcher)))
+        (define-property $name syntax-matcher $syntax-matcher))
       ((_ ($name $syntax) $body)
         (identifiers? #'($name $syntax))
         (define-syntax-matcher $name
@@ -43,15 +41,15 @@
 
   (define-syntax (macro-rules-opt $syntax $lookup)
     (syntax-case $syntax ()
-      ((_ ($pattern $body)...)
+      ((_ ($pattern $body ...) ...)
         #`(lambda ($syntax)
-          (macro-case-opt $syntax ($pattern #'$body) ...)))))
+          (macro-case-opt $syntax ($pattern #'(begin $body ...)) ...)))))
 
   (define-syntax (macro-rules $syntax $lookup)
     (syntax-case $syntax ()
-      ((_ ($pattern $body)...)
+      ((_ ($pattern $body ...) ...)
         #`(lambda ($syntax)
-          (macro-case $syntax ($pattern #'$body) ...)))))
+          (macro-case $syntax ($pattern #'(begin $body ...)) ...)))))
 
   (define-rule-syntax (define-macro $name $entry ...)
     (define-syntax $name
