@@ -13,7 +13,7 @@
     syntax-pattern-id
     syntax-rule-id
     syntax-case-opt
-    inline)
+    syntax-inline)
   (import (scheme))
 
   (define (identifiers? $syntax)
@@ -120,7 +120,7 @@
         #`(syntax-case $expr ($literal ...)
           $clause ... (_ #f)))))
 
-  (define-syntax (inline $syntax)
+  (define-syntax (syntax-inline $syntax)
     (syntax-case $syntax ()
       ((_ $expr)
         #'(let-syntax

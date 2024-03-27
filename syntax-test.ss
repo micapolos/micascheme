@@ -32,5 +32,5 @@
 
 (check
   (equal?
-    (inline #`(string-append "foo" "bar"))
+    (syntax-inline #`(string-append "foo" "bar"))
     "foobar"))
