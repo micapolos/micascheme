@@ -135,6 +135,7 @@
     (((alu $a) a (+ iy $d)) (db #xfd) (db-233 #b10 $a #b110) (db $d))
     (((alu $a) a $n)        (db #xc6) (db $n))
 
+    ; 8-bit inc/dec
     (((incr $i) (r $r))     (db-233 #b00 $r $i))
     (((incr $i) (p $p))     (db #xdd) (db-233 #b00 $r $i))
     (((incr $i) (q $q))     (db #xfd) (db-233 #b00 $r $i))
