@@ -1,41 +1,48 @@
 (library (asm macro-z80)
   (export
+    db db-233 dw
+
     b c d e h l a
     ixh ixl iyh iyl
     bc de hl af
     ix iy
     pc sp
-    i r)
+    i r
+    p q)
   (import
     (micascheme)
     (labs macro))
 
-  (define-rule-syntax (define-registers $r ...)
+  (define (db $u8)
+    (writeln `(db ,$u8)))
+
+  (define (db-233 $a $b $c)
+    (db (fxior (fxsll $a 6) (fxsll $b 3) $c)))
+
+  (define (dw $u16)
+    (run-void
+      (db (fxand $u16 #xff))
+      (db (fxsrl $u16 8))))
+
+  (define-rule-syntax (define-literals $r ...)
     (begin
       (define-aux-keyword $r) ...
       (define-syntax-literal? $r) ...))
 
-  (define-registers b c d e h l a)
-  (define-registers ixh ixl iyh iyl)
+  (define-literals b c d e h l a)
+  (define-literals ixh ixl iyh iyl)
 
-  (define-registers bc de hl af)
-  (define-registers ix iy)
+  (define-literals bc de hl af)
+  (define-literals ix iy)
 
-  (define-registers pc sp)
-  (define-registers i r)
+  (define-literals pc sp)
+  (define-literals i r)
 
-  (define-syntax-matcher (r $pattern)
-    (syntax-case $pattern ()
-      ((r $code)
-        (values
-          (list #'$code)
-          #`(lambda ($syntax)
-            (macro-case-opt $syntax
-              (b (list #'#b000))
-              (c (list #'#b001))
-              (d (list #'#b010))
-              (e (list #'#b011))
-              (h (list #'#b100))
-              (l (list #'#b101))
-              (a (list #'#b111))))))))
+  (define-literals nz z nc po pe m)
+
+  (define-syntax-literal? +)
+  (define-syntax-literal? -)
+
+  (define-aux-keywords p q)
+
 )

@@ -7,7 +7,11 @@
     macro-case
     macro-rules
     define-macro
-    define-macros)
+    define-macros
+
+    rules-matcher
+    define-rules-matcher
+    define-matchers)
 
   (import
     (micascheme)
@@ -69,6 +73,48 @@
               (lambda ($group)
                 #`(define-macro
                   #,(car $group)
+                  #,@(cdr $group)))
+              $groups))))))
+
+  (define-syntax (rules-matcher $syntax)
+    (syntax-case $syntax ()
+      ((_ $pattern-rule ...)
+        #`(lambda ($pattern)
+          (syntax-case $pattern ()
+            #,@(map
+              (lambda ($pattern-rule)
+                (syntax-case $pattern-rule ()
+                  ((($id $param ...) $matcher-rule ...)
+                    #`(($id $param ...)
+                      (values
+                        (list #'$param ...)
+                        #'(lambda ($stx)
+                          (macro-case-opt $stx
+                            #,@(map
+                              (lambda ($matcher-rule)
+                                (syntax-case $matcher-rule ()
+                                  (($pattern $arg ...)
+                                    #`($pattern (list #'$arg ...)))))
+                              (syntax->list #'($matcher-rule ...))))))))))
+              (syntax->list #'($pattern-rule ...))))))))
+
+  (define-rule-syntax (define-rules-matcher $name $rule ...)
+    (define-syntax-matcher $name
+      (rules-matcher $rule ...)))
+
+  (define-syntax (define-matchers $syntax)
+    (syntax-case $syntax ()
+      ((_ $rule ...)
+        (lets
+          ($groups
+            (group-by
+              syntax-rule-id
+              free-identifier=?
+              (syntax->list #'($rule ...))))
+          #`(begin
+            #,@(map
+              (lambda ($group)
+                #`(define-rules-matcher #,(car $group)
                   #,@(cdr $group)))
               $groups))))))
 )
