@@ -110,7 +110,7 @@
   ((e $e)
     ($e (- $e 2))))
 
-(define parse-z80-op
+(define assemble-instruction
   (macro-rules
     ; general purpose
     ((daa)                  (db #x27))
@@ -230,14 +230,15 @@
     ((jr (c2 $c) (e $e))    (db-323 #b001 $c #b000) (db $e))
     ((djnz (e $e))          (db #x10) (db $e))))
 
-(define-syntax (z80 $syntax)
+(define-syntax (asm $syntax)
   (syntax-case $syntax ()
     ((_ $op ...)
       #`(begin
-        #,@(map parse-z80-op (syntax->list #'($op ...)))))))
+        #,@(map assemble-instruction
+          (syntax->list #'($op ...)))))))
 
 ; assemble some Z80 instructions
-(z80
+(asm
   (ld a i)
   (ld a r)
   (ld r a)
