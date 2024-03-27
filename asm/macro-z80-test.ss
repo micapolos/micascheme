@@ -51,6 +51,11 @@
     (pe  #b101)
     (p   #b110)
     (m   #b111))
+  ((c2 $c)
+    (nz  #b000)
+    (z   #b001)
+    (nc  #b010)
+    (c   #b011))
   ((rr $code)
     (bc   #b00)
     (de   #b01)
@@ -79,7 +84,9 @@
     (#x20 #b100)
     (#x28 #b101)
     (#x30 #b110)
-    (#x38 #b111)))
+    (#x38 #b111))
+  ((e $e)
+    ($e (- $e 2))))
 
 (define-macros
   ; general purpose
@@ -172,7 +179,17 @@
   ((ret (c $c))           (db-233 #b11 $c #b000))
   ((reti)                 (db #xed) (db #x4d))
   ((retn)                 (db #xed) (db #x45))
-  ((rst (proc $r))        (db-233 #b11 $r #b111)))
+  ((rst (proc $r))        (db-233 #b11 $r #b111))
+
+  ; jump
+  ((jp (hl))              (db #xe9))
+  ((jp (ix))              (db #xdd) (db #xe9))
+  ((jp (iy))              (db #xfd) (db #xe9))
+  ((jp $nm)               (db #xc3) (dw $nm))
+  ((jp (c $c) $nm)        (db-233 #b11 $c #b101))
+  ((jr (e $e))            (db #x18) (db $e))
+  ((jr (c2 $c) (e $e))    (db-323 #b001 $c #b000) (db $e))
+  ((djnz (e $e))          (db #x10) (db $e)))
 
 ; assemble some Z80 instructions
 (ld a i)
@@ -211,3 +228,6 @@
 
 (add hl de)
 (add ix ix)
+
+(jp nz #x1234)
+(djnz -3)

@@ -15,6 +15,9 @@
   (define (db-224 $a $b $c)
     (db (fxior (fxsll $a 6) (fxsll $b 4) $c)))
 
+  (define (db-323 $a $b $c)
+    (db (fxior (fxsll $a 5) (fxsll $b 3) $c)))
+
   (define (dw $u16)
     (run-void
       (db (fxand $u16 #xff))
