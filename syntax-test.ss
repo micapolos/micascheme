@@ -1,4 +1,4 @@
-(import (check) (syntax) (procedure))
+(import (check) (syntax) (procedure) (boolean))
 
 (check (equal? (identifiers? #'()) #t))
 (check (equal? (identifiers? #'(foo bar)) #t))
@@ -29,3 +29,8 @@
 (check (free-identifier=? (syntax-rule-id #'((+ a b) body)) #'+))
 
 (check (false? (syntax-case-opt #'foo ())))
+
+(check
+  (equal?
+    (inline #`(string-append "foo" "bar"))
+    "foobar"))

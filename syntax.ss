@@ -12,7 +12,8 @@
     syntax-selector
     syntax-pattern-id
     syntax-rule-id
-    syntax-case-opt)
+    syntax-case-opt
+    inline)
   (import (scheme))
 
   (define (identifiers? $syntax)
@@ -118,4 +119,11 @@
       ((_ $expr ($literal ...) $clause ...)
         #`(syntax-case $expr ($literal ...)
           $clause ... (_ #f)))))
+
+  (define-syntax (inline $syntax)
+    (syntax-case $syntax ()
+      ((_ $expr)
+        #'(let-syntax
+          ((inlined (lambda (_) $expr)))
+          inlined))))
 )
