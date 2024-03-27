@@ -3,6 +3,20 @@
   (labs macro)
   (asm macro-z80))
 
+(define-literals
+  ; 8-bit registers
+  b c d e h l a
+  ixh ixl iyh iyl
+  i r
+
+  ; 16-bit registers
+  pc sp
+  bc de hl af
+  ix iy
+
+  ; flags
+  nz z nc po pe m)
+
 (define-matchers
   ((r $code)
     (b   #b000)
