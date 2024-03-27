@@ -4,7 +4,8 @@
     ixh ixl iyh iyl
     bc de hl af
     ix iy
-    r)
+    pc sp
+    i r)
   (import
     (micascheme)
     (labs macro))
@@ -20,7 +21,8 @@
   (define-registers bc de hl af)
   (define-registers ix iy)
 
-  (define-aux-keywords r)
+  (define-registers pc sp)
+  (define-registers i r)
 
   (define-syntax-matcher (r $pattern)
     (syntax-case $pattern ()
