@@ -11,7 +11,7 @@
 
   ; 16-bit registers
   pc sp
-  bc de hl af
+  bc de hl af af2
   ix iy
 
   ; flags
@@ -50,7 +50,30 @@
     (po  #b100)
     (pe  #b101)
     (p   #b110)
-    (m   #b111)))
+    (m   #b111))
+  ((rr $code)
+    (bc   #b00)
+    (de   #b01)
+    (hl   #b10))
+  ((rr-sp $code)
+    (bc   #b00)
+    (de   #b01)
+    (hl   #b10)
+    (sp   #b11))
+  ((rr-af $code)
+    (bc   #b00)
+    (de   #b01)
+    (hl   #b10)
+    (af   #b11))
+  ((proc $c)
+    (#x00 #b000)
+    (#x08 #b001)
+    (#x10 #b010)
+    (#x18 #b011)
+    (#x20 #b100)
+    (#x28 #b101)
+    (#x30 #b110)
+    (#x38 #b111)))
 
 (define-macros
   ; general purpose
@@ -63,6 +86,9 @@
   ((halt)                 (db #x76))
   ((di)                   (db #xf3))
   ((ei)                   (db #xfb))
+  ((im 0)                 (db #xed) (db #x46))
+  ((im 1)                 (db #xed) (db #x56))
+  ((im 2)                 (db #xed) (db #x5e))
 
   ; 8-bit load
   ((ld a i)               (db #xed) (db #x57))
@@ -71,10 +97,8 @@
   ((ld r a)               (db #xed) (db #x4f))
   ((ld a (bc))            (db #x0a))
   ((ld a (de))            (db #x1a))
-  ((ld a ($nm))           (db #x3a) (dw $nm))
   ((ld (bc) a)            (db #x02))
   ((ld (de) a)            (db #x12))
-  ((ld ($nm) a)           (db #x32) (dw $nm))
   ((ld (r $r1) (r $r2))   (db-233 #b01 $r1 $r2))
   ((ld (p $p1) (p $p2))   (db #xdd) (db-233 #b01 $p1 $p2))
   ((ld (q $q1) (q $q2))   (db #xfd) (db-233 #b01 $q1 $q2))
@@ -84,9 +108,43 @@
   ((ld (r $r) (hl))       (db-233 #b01 $r #b110))
   ((ld (r $r) (+ ix $d))  (db #xdd) (db-233 #b01 #b110 $r) (db $d))
   ((ld (r $r) (+ iy $d))  (db #xfd) (db-233 #b01 #b110 $r) (db $d))
+  ((ld a ($nm))           (db #x3a) (dw $nm))
+  ((ld ($nm) a)           (db #x32) (dw $nm))
   ((ld (r $r) $n)         (db-233 #b00 $r #b110) (db $n))
   ((ld (p $p) $n)         (db #xdd) (db-233 #b00 $p #b110))
   ((ld (q $q) $n)         (db #xfd) (db-233 #b00 $p #b110))
+
+  ; 16-bit load
+  ((ld sp hl)             (db #xf9))
+  ((ld sp ix)             (db #xdd) (db #xf9))
+  ((ld sp iy)             (db #xfd) (db #xf9))
+  ((ld hl ($nm))          (db #x2a) (dw $nm))
+  ((ld (rr-sp $rr) ($nm)) (db #xed) (db224 #b01 $rr #b1011))
+  ((ld ix ($nm))          (db #xdd) (db #x2a) (dw $nm))
+  ((ld iy ($nm))          (db #xfd) (db #x2a) (dw $nm))
+  ((ld ($nm) hl)          (db #x22) (dw $nm))
+  ((ld ($nm) (rr-sp $rr)) (db #xed) (db224 #b01 $rr #b0011))
+  ((ld ($nm) ix)          (db #xdd) (db #x22) (dw $nm))
+  ((ld ($nm) iy)          (db #xfd) (db #x22) (dw $nm))
+  ((ld (rr-sp $rr) $nm)   (db-244 #b00 $rr #b0011) (dw $nm))
+  ((ld ix $nm)            (db #xdd) (db-244 #b00 $rr #b0011) (dw $nm))
+  ((ld iy $nm)            (db #xfd) (db-244 #b00 $rr #b0011) (dw $nm))
+
+  ; stack
+  ((pop (rr-af $rr))      (db-224 #b11 $rr #b0001))
+  ((pop ix)               (db #xdd) (db #xe1))
+  ((pop iy)               (db #xfd) (db #xe1))
+  ((push (rr-af $rr))     (db-224 #b11 $rr #b0101))
+  ((push ix)              (db #xdd) (db #xe5))
+  ((push iy)              (db #xfd) (db #xe5))
+
+  ; exchange
+  ((ex af af2)            (db #x08))
+  ((ex de hl)             (db #xeb))
+  ((ex (sp) hl)           (db #xe3))
+  ((ex (sp) ix)           (db #xdd) (db #xe3))
+  ((ex (sp) iy)           (db #xfd) (db #xe3))
+  ((exx)                  (db #xd9))
 
   ; call
   ((call $nm)             (db #xcd) (dw $nm))
@@ -94,7 +152,8 @@
   ((ret)                  (db #xc9))
   ((ret (c $c))           (db-233 #b11 $c #b000))
   ((reti)                 (db #xed) (db #x4d))
-  ((retn)                 (db #xed) (db #x45)))
+  ((retn)                 (db #xed) (db #x45))
+  ((rst (proc $r))        (db-233 #b11 $r #b111)))
 
 ; assemble some Z80 instructions
 (ld a i)
@@ -118,3 +177,15 @@
 
 (call #x1213)
 (ret)
+(rst #x18)
+(rst #x38)
+(im 0)
+(im 1)
+(im 2)
+(push bc)
+(pop ix)
+
+(ex af af2)
+(exx)
+(ex de hl)
+(ex (sp) ix)

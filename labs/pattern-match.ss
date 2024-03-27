@@ -63,7 +63,13 @@
           (list #'$id)
           #'(lambda ($syntax) (list $syntax))))
       ($other
-        (syntax-error #'$other "invalid pattern"))))
+        (with-implicit (parse-default-pattern $tmp)
+          (values
+            (list)
+            #`(lambda ($syntax)
+              (and
+                (equal? (syntax->datum $syntax) '$other)
+                (list))))))))
 
   (define (parse-pattern-clause $lookup $syntax $clause)
     (syntax-case $clause ()

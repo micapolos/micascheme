@@ -1,7 +1,7 @@
 (library (asm macro-z80)
   (export
     define-literals
-    db db-233 dw)
+    db db-233 db-224 dw)
   (import
     (micascheme)
     (labs macro))
@@ -11,6 +11,9 @@
 
   (define (db-233 $a $b $c)
     (db (fxior (fxsll $a 6) (fxsll $b 3) $c)))
+
+  (define (db-224 $a $b $c)
+    (db (fxior (fxsll $a 6) (fxsll $b 4) $c)))
 
   (define (dw $u16)
     (run-void

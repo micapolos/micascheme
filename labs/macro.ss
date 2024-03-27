@@ -41,7 +41,7 @@
   (define-rule-syntax (macro-case $syntax $clause ...)
     (macro-case-opt $syntax
       $clause ...
-      (_ (syntax-error #'$syntax))))
+      (_ (syntax-error $syntax))))
 
   (define-syntax (macro-rules-opt $syntax $lookup)
     (syntax-case $syntax ()
