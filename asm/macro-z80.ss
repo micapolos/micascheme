@@ -1,7 +1,7 @@
 (library (asm macro-z80)
   (export
     define-literals
-    db db-233 db-224 dw)
+    db db-233 db-224 db-323 dw)
   (import
     (micascheme)
     (labs macro))
