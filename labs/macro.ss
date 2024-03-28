@@ -13,8 +13,11 @@
     define-macros
 
     rules-matcher
+    rules-matcher-2
     define-rules-matcher
-    define-matchers)
+    define-rules-matcher-2
+    define-matchers
+    define-matchers-2)
 
   (import
     (micascheme)
@@ -160,9 +163,42 @@
                               (syntax->list #'($matcher-rule ...))))))))))
               (syntax->list #'($pattern-rule ...))))))))
 
+  (define-syntax (rules-matcher-2 $syntax)
+    (syntax-case $syntax ()
+      ((_ $pattern-rule ...)
+        #`(lambda ($pattern)
+          (syntax-case $pattern ()
+            #,@(map
+              (lambda ($pattern-rule)
+                (syntax-case $pattern-rule ()
+                  ((($id $param ...) $matcher-rule ...)
+                    #`(($id $param ...)
+                      (lambda ($body)
+                        #'(lambda ($stx)
+                          (macro-case-opt $stx
+                            #,@(map
+                              (lambda ($matcher-rule)
+                                (syntax-case $matcher-rule ()
+                                  (($pattern $arg ...)
+                                    #`($pattern
+                                      (with-syntax
+                                        (
+                                          #,@(map
+                                            (lambda ($param $arg)
+                                              #`(#,$param #,$arg))
+                                            (syntax->list #'($param ...))
+                                            (syntax->list #'($arg ...))))
+                                        $body)))))
+                              (syntax->list #'($matcher-rule ...))))))))))
+              (syntax->list #'($pattern-rule ...))))))))
+
   (define-rule-syntax (define-rules-matcher $name $rule ...)
     (define-syntax-matcher $name
       (rules-matcher $rule ...)))
+
+  (define-rule-syntax (define-rules-matcher-2 $name $rule ...)
+    (define-syntax-matcher $name
+      (rules-matcher-2 $rule ...)))
 
   (define-syntax (define-matchers $syntax)
     (syntax-case $syntax ()
@@ -177,6 +213,22 @@
             #,@(map
               (lambda ($group)
                 #`(define-rules-matcher #,(car $group)
+                  #,@(cdr $group)))
+              $groups))))))
+
+  (define-syntax (define-matchers-2 $syntax)
+    (syntax-case $syntax ()
+      ((_ $rule ...)
+        (lets
+          ($groups
+            (group-by
+              syntax-rule-id
+              free-identifier=?
+              (syntax->list #'($rule ...))))
+          #`(begin
+            #,@(map
+              (lambda ($group)
+                #`(define-rules-matcher-2 #,(car $group)
                   #,@(cdr $group)))
               $groups))))))
 )
