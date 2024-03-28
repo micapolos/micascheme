@@ -2,6 +2,7 @@
   (export
     define-syntax-literal?
     define-syntax-matcher
+    define-syntax-matcher-2
     macro-case-opt
     macro-case-opt-2
     macro-case
@@ -30,6 +31,17 @@
       ((_ ($name $syntax) $body)
         (identifiers? #'($name $syntax))
         (define-syntax-matcher $name
+          (lambda ($syntax)
+            $body)))))
+
+  (define-syntax define-syntax-matcher-2
+    (syntax-rules ()
+      ((_ $name $syntax-matcher)
+        (identifier? #'$name)
+        (define-property $name syntax-matcher-2 $syntax-matcher))
+      ((_ ($name $syntax) $body)
+        (identifiers? #'($name $syntax))
+        (define-syntax-matcher-2 $name
           (lambda ($syntax)
             $body)))))
 
