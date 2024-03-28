@@ -82,16 +82,35 @@
               (with-syntax (($string $syntax))
                 #,$body)))))))
 
+  (define-syntax-matcher-2 (number $pattern)
+    (syntax-case $pattern ()
+      ((_ $number)
+        (lambda ($body)
+          #`(lambda ($syntax)
+            (and
+              (number? (syntax->datum $syntax))
+              (with-syntax (($number $syntax))
+                #,$body)))))))
+
   (check
     (equal?
       (syntax->datum
         (macro-case-opt-2 #'"foo"
-          ((string $string) #`(string-append $string "!"))))
+          ((string $string) #`(string-append $string "!"))
+          ((number $number) #`(+ $number 1))))
       '(string-append "foo" "!")))
 
   (check
+    (equal?
+      (syntax->datum
+        (macro-case-opt-2 #'123
+          ((string $string) #`(string-append $string "!"))
+          ((number $number) #`(+ $number 1))))
+      '(+ 123 1)))
+
+  (check
     (false?
-      (macro-case-opt-2 #'123
+      (macro-case-opt-2 #'#\space
         ((string $string) #`(string-append $string "!")))))
 )
 
