@@ -3,7 +3,7 @@
   (import (micascheme))
 
   (define (parse-js $syntax)
-    (syntax-case $syntax (set! if begin lambda let letrec)
+    (syntax-case $syntax (set! if begin lambda let letrec $primitive + - *)
       ($id
         (identifier? #'$id)
         (symbol->string (syntax->datum #'$id)))
@@ -38,9 +38,10 @@
       ((lambda ($x ...) $body1 ... $body2)
         (string-append
           "(("
-          (intercalate
-            (map parse-js (syntax->list #'($x ...)))
-            ", ")
+          (apply string-append
+            (intercalate
+              (map parse-js (syntax->list #'($x ...)))
+              ", "))
           ") => "
           (parse-js #`(begin $body1 ... $body2))
           ")"))
@@ -61,28 +62,38 @@
           (apply string-append
             (map
               (lambda ($js) (string-append $js "; "))
-              (map
-                (lambda ($body)
-                  (string-append (parse-js $body) "; "))
-                (syntax->list #'($body1 ...)))))
+              (map parse-js (syntax->list #'($body1 ...)))))
           (parse-js #'$body2)
           " }"))
-      ((letrec (($x $e) ...) $body1 ... $body2)
+      ((letrec* (($x $e) ...) $body1 ... $body2)
         (parse-js #`(let (($x $e) ...) $body1 ... $body2)))
-      ((+ $e ...)
+      ((($primitive _ +) $e ...)
         (apply string-append
           (intercalate
             (map parse-js (syntax->list #'($e ...)))
             " + ")))
+      ((($primitive _ -) $e ...)
+        (apply string-append
+          (intercalate
+            (map parse-js (syntax->list #'($e ...)))
+            " - ")))
+      ((($primitive _ *) $e ...)
+        (apply string-append
+          (intercalate
+            (map parse-js (syntax->list #'($e ...)))
+            " * ")))
+      ((($primitive _ <) $e ...)
+        (apply string-append
+          (intercalate
+            (map parse-js (syntax->list #'($e ...)))
+            " < ")))
       (($e0 $e1 ...)
         (string-append
           (parse-js #'$e0)
-          "("
           (apply string-append
             (intercalate
               (map parse-js (syntax->list #'($e1 ...)))
-              ", "))
-          ")"))
+              ", "))))
       ($other
         (format "~s" (datum $other)))))
 )
