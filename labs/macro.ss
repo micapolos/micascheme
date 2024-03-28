@@ -3,8 +3,10 @@
     define-syntax-literal?
     define-syntax-matcher
     macro-case-opt
-    macro-rules-opt
+    macro-case-opt-2
     macro-case
+    macro-case-2
+    macro-rules-opt
     macro-rules
     define-macro
     define-macros
@@ -38,8 +40,19 @@
           #,(parse-pattern-clauses $lookup #'$syntax
             (syntax->list #'($clause ...)))))))
 
+  (define-syntax (macro-case-opt-2 $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ $expr $clause ...)
+        (parse-pattern-clauses-2 $lookup #'$expr
+          (syntax->list #'($clause ...))))))
+
   (define-rule-syntax (macro-case $syntax $clause ...)
     (macro-case-opt $syntax
+      $clause ...
+      (_ (syntax-error $syntax))))
+
+  (define-rule-syntax (macro-case-2 $syntax $clause ...)
+    (macro-case-opt-2 $syntax
       $clause ...
       (_ (syntax-error $syntax))))
 
@@ -47,17 +60,37 @@
     (syntax-case $syntax ()
       ((_ ($pattern $body ...) ...)
         #`(lambda ($syntax)
-          (macro-case-opt $syntax ($pattern #'(begin $body ...)) ...)))))
+          (macro-case-opt $syntax
+            ($pattern #'(begin $body ...)) ...)))))
+
+  (define-syntax (macro-rules-opt-2 $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ ($pattern $body ...) ...)
+        #`(lambda ($syntax)
+          (macro-case-opt-2 $syntax
+            ($pattern #'(begin $body ...)) ...)))))
 
   (define-syntax (macro-rules $syntax $lookup)
     (syntax-case $syntax ()
       ((_ ($pattern $body ...) ...)
         #`(lambda ($syntax)
-          (macro-case $syntax ($pattern #'(begin $body ...)) ...)))))
+          (macro-case $syntax
+            ($pattern #'(begin $body ...)) ...)))))
+
+  (define-syntax (macro-rules-2 $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ ($pattern $body ...) ...)
+        #`(lambda ($syntax)
+          (macro-case-2 $syntax
+            ($pattern #'(begin $body ...)) ...)))))
 
   (define-rule-syntax (define-macro $name $entry ...)
     (define-syntax $name
       (macro-rules $entry ...)))
+
+  (define-rule-syntax (define-macro-2 $name $entry ...)
+    (define-syntax $name
+      (macro-rules-2 $entry ...)))
 
   (define-syntax (define-macros $syntax)
     (syntax-case $syntax ()
@@ -72,6 +105,23 @@
             #,@(map
               (lambda ($group)
                 #`(define-macro
+                  #,(car $group)
+                  #,@(cdr $group)))
+              $groups))))))
+
+  (define-syntax (define-macros-2 $syntax)
+    (syntax-case $syntax ()
+      ((_ $rule ...)
+        (lets
+          ($groups
+            (group-by
+              syntax-rule-id
+              free-identifier=?
+              (syntax->list #'($rule ...))))
+          #`(begin
+            #,@(map
+              (lambda ($group)
+                #`(define-macro-2
                   #,(car $group)
                   #,@(cdr $group)))
               $groups))))))

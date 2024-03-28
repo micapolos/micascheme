@@ -33,6 +33,45 @@
 )
 
 (run-void
+  (define-syntax-literal? +)
+  (define-syntax-literal? -)
+
+  (check
+    (equal?
+      (syntax->datum
+        (macro-case-opt-2 #'(+ "foo" "bar")
+          ((+ a b) #'(a plus b))
+          ((- a b) #'(a minus b))
+          ((op a b) #'(a op b))))
+      '("foo" plus "bar")))
+
+  (check
+    (equal?
+      (syntax->datum
+        (macro-case-opt-2 #'(- "foo" "bar")
+          ((+ a b) #'(a plus b))
+          ((- a b) #'(a minus b))
+          ((op a b) #'(a op b))))
+      '("foo" minus "bar")))
+
+  (check
+    (equal?
+      (syntax->datum
+        (macro-case-opt-2 #'(* "foo" "bar")
+          ((+ a b) #'(a plus b))
+          ((- a b) #'(a minus b))
+          ((op a b) #'(a op b))))
+      '("foo" * "bar")))
+
+  (check
+    (false?
+      (macro-case-opt-2 #'"foo"
+        ((+ a b) #'(a plus b))
+        ((- a b) #'(a minus b))
+        ((op a b) #'(a op b)))))
+)
+
+(run-void
   (define-macro join
     ((_ a b) (string-append a b))
     ((_ a b c) (string-append a b c)))
