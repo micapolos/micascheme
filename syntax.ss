@@ -13,7 +13,8 @@
     syntax-pattern-id
     syntax-rule-id
     syntax-case-opt
-    syntax-inline)
+    syntax-inline
+    ellipsis)
   (import (scheme))
 
   (define (identifiers? $syntax)
@@ -126,4 +127,6 @@
         #'(let-syntax
           ((inlined (lambda (_) $expr)))
           inlined))))
+
+  (define ellipsis (datum->syntax #'ellipsis '...))
 )
