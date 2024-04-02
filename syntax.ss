@@ -128,5 +128,5 @@
           ((inlined (lambda (_) $expr)))
           inlined))))
 
-  (define ellipsis (datum->syntax #'... '...))
+  (define ellipsis (datum->syntax #'ellipsis '...))
 )
