@@ -36,6 +36,17 @@
   (define-syntax-literal? +)
   (define-syntax-literal? -)
 
+  (define-syntax-matcher-2 string
+    (lambda ($pattern)
+      (syntax-case $pattern (string)
+        ((string $string)
+          (identifier? #'$string)
+          (lambda ($body)
+            #`(lambda ($syntax)
+              (and
+                (string? (syntax->datum $syntax))
+                (with-syntax (($string $syntax)) #,$body))))))))
+
   (check
     (equal?
       (syntax->datum
@@ -69,6 +80,37 @@
         ((+ a b) #'(a plus b))
         ((- a b) #'(a minus b))
         ((op a b) #'(a op b)))))
+
+  (check
+    (equal?
+      (macro-case-opt-2 #'"foo"
+        ((string $string) (string-append (datum $string) "!")))
+      "foo!"))
+
+  (check
+    (false?
+      (macro-case-opt-2 #'123
+        ((string $string)
+          (string-append (datum $string) "!")))))
+
+  (check
+    (equal?
+      (macro-case-opt-2 #'(+ "foo" "bar")
+        ((+ (string $string1) (string $string2))
+          (string-append (datum $string1) (datum $string2))))
+      "foobar"))
+
+  (check
+    (false?
+      (macro-case-opt-2 #'(+ "foo" 10)
+        ((+ (string $string1) (string $string2))
+          (string-append (datum $string1) (datum $string2))))))
+
+  (check
+    (false?
+      (macro-case-opt-2 #'(+ 10 "foo")
+        ((+ (string $string1) (string $string2))
+          (string-append (datum $string1) (datum $string2))))))
 )
 
 (run-void

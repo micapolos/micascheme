@@ -136,16 +136,17 @@
       '(lambda ($syntax)
         (syntax-case-opt $syntax ()
           (($syntax-head . $syntax-tail)
-            (app
-              (app
-                (lambda ($syntax)
-                  (syntax-case-opt $syntax ()
-                    (()
-                      (lambda ($syntax)
-                        (with-syntax (($x $syntax))
-                          (match $x))))))
-                #'$syntax-tail)
-              #'$syntax-head))))))
+            (opt-lets
+              ($result
+                (app
+                  (lambda ($syntax)
+                    (syntax-case-opt $syntax ()
+                      (()
+                        (lambda ($syntax)
+                          (with-syntax (($x $syntax))
+                            (match $x))))))
+                  (syntax $syntax-tail)))
+              (app $result (syntax $syntax-head))))))))
 
   (check
     (equal?
@@ -156,25 +157,28 @@
       '(lambda ($syntax)
         (syntax-case-opt $syntax ()
           (($syntax-head . $syntax-tail)
-            (app
-              (app
-                (lambda ($syntax)
-                  (syntax-case-opt $syntax ()
-                    (($syntax-head . $syntax-tail)
-                      (app
-                        (app
-                          (lambda ($syntax)
-                            (syntax-case-opt $syntax ()
-                              (()
-                                (lambda ($syntax)
-                                  (with-syntax (($y $syntax))
+            (opt-lets
+              ($result
+                (app
+                  (lambda ($syntax)
+                    (syntax-case-opt $syntax ()
+                      (($syntax-head . $syntax-tail)
+                        (opt-lets
+                          ($result
+                            (app
+                              (lambda ($syntax)
+                                (syntax-case-opt $syntax ()
+                                  (()
                                     (lambda ($syntax)
-                                      (with-syntax (($x $syntax))
-                                        (match $x $y))))))))
-                          #'$syntax-tail)
-                        #'$syntax-head))))
-                #'$syntax-tail)
-              #'$syntax-head))))))
+                                      (with-syntax (($y $syntax))
+                                        (lambda ($syntax)
+                                          (with-syntax (($x $syntax))
+                                            (match $x $y))))))))
+                              (syntax $syntax-tail)))
+                          (app $result
+                            (syntax $syntax-head))))))
+                  (syntax $syntax-tail)))
+              (app $result (syntax $syntax-head))))))))
 )
 
 (run-void

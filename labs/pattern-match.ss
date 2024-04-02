@@ -135,9 +135,9 @@
               #`(lambda ($syntax)
                 (syntax-case-opt $syntax ()
                   (($syntax-head . $syntax-tail)
-                    (app
-                      (app #,$body #'$syntax-tail)
-                      #'$syntax-head))))))))
+                    (opt-lets
+                      ($result (app #,$body #'$syntax-tail))
+                      (app $result #'$syntax-head)))))))))
       ($id
         (identifier? #'$id)
         (lambda ($body)
