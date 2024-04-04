@@ -1,6 +1,6 @@
 (library (labs slick-keywords)
-  (export the doing is)
-  (import (except (micascheme) is))
+  (export the)
+  (import (micascheme))
 
-  (define-aux-keywords the doing is)
+  (define-aux-keywords the)
 )
