@@ -2,10 +2,7 @@
   (export slick)
   (import
     (scheme)
-    (labs slick-syntax)
-    (labs slick-keywords))
-  (export
-    (import (labs slick-keywords)))
+    (labs slick-syntax))
 
   (define-syntax (slick $syntax)
     (syntax-case $syntax ()

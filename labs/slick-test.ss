@@ -29,8 +29,8 @@
 (check
   (equal?
     (slick
-      (the "foo" (string-append "bar"))
-      (the "!")
+      (values "foo" (string-append "bar"))
+      (values "!")
       (string-append))
     "foobar!"))
 

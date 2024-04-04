@@ -1,8 +1,7 @@
 (library (labs slick-syntax)
   (export slick-syntax slick-values)
   (import
-    (micascheme)
-    (labs slick-keywords))
+    (micascheme))
 
   (define (slick-syntax $syntax)
     (lets
@@ -18,8 +17,8 @@
           (syntax->list #'($item ...))))))
 
   (define (push-slick $values $syntax)
-    (syntax-case $syntax (the)
-      ((the $body ...)
+    (syntax-case $syntax (values)
+      ((values $body ...)
         (push-all $values
           (slick-values #'($body ...))))
       (($id $body ...)
