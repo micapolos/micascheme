@@ -29,12 +29,29 @@
 (check
   (equal?
     (slick
-      (values "foo" (string-append "bar"))
-      (values "!")
+      (values "foo" "bar" (string-append))
+      (then "!" "!" "!" (string-append))
       (string-append))
-    "foobar!"))
+    "foobar!!!"))
 
 (check
   (equal?
-    (call-with-values (lambda () (slick 10 20 30)) list)
+    (call-with-values (lambda () (slick 10 20 30 (values))) list)
     (list 10 20 30)))
+
+(check
+  (equal?
+    (slick
+      ($a $b)
+      (lambda (string-append $a $b))
+      (app "foo" "bar"))
+    "foobar"))
+
+(check
+  (equal?
+    (let ()
+      (slick
+        (plusik $a $b)
+        (define (string-append $a $b))
+        (then "foo" "bar" (plusik))))
+    "foobar"))

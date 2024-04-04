@@ -1,12 +1,14 @@
 (library (labs slick-syntax)
-  (export slick-syntax slick-values)
+  (export slick-syntax slick-values then)
   (import
     (micascheme))
+
+  (define-aux-keyword then)
 
   (define (slick-syntax $syntax)
     (lets
       ($values (slick-values $syntax))
-      #`(values #,@(reverse $values))))
+      #`(begin #,@(reverse $values))))
 
   (define (slick-values $syntax)
     (syntax-case $syntax ()
@@ -17,8 +19,8 @@
           (syntax->list #'($item ...))))))
 
   (define (push-slick $values $syntax)
-    (syntax-case $syntax (values)
-      ((values $body ...)
+    (syntax-case $syntax (then)
+      ((then $body ...)
         (push-all $values
           (slick-values #'($body ...))))
       (($id $body ...)
