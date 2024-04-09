@@ -1,4 +1,4 @@
-(import (check) (case))
+(import (scheme) (check) (case))
 
 (check (equal? (case1 1 (1 "one") (2 "two")) "one"))
 (check (equal? (case1 2 (1 "one") (2 "two")) "two"))

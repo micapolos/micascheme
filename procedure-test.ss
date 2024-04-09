@@ -1,4 +1,4 @@
-(import (check) (procedure))
+(import (scheme) (check) (procedure))
 
 ; === once-proc ===
 

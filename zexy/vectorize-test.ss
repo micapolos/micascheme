@@ -1,4 +1,4 @@
-(import (check) (zexy vectorize) (zexy ops))
+(import (except (scheme) and or) (check) (zexy vectorize) (zexy ops))
 
 (define-syntax (check-vectorizes $syntax)
   (syntax-case $syntax ()

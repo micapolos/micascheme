@@ -1,4 +1,4 @@
-(import (check) (number))
+(import (scheme) (check) (number))
 
 (check (nonnegative-integer? 0))
 (check (nonnegative-integer? 1))

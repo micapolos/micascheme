@@ -2,19 +2,14 @@
   (export test)
   (import (scheme) (list))
 
-  (define-syntax (test $syntax)
-    (syntax-case $syntax ()
+  (define-syntax test
+    (syntax-rules ()
       ((_ $spec ...)
-        #`(begin
-          #,@(map
-            (lambda ($spec)
-              #`(let ()
-                (load
-                  #,(string-append
-                    (apply string-append
-                      (intercalate
-                        (map symbol->string (syntax->datum $spec))
-                        "/"))
-                    "-test.ss"))))
-              (syntax->list #'($spec ...)))))))
+        (begin
+          (let ()
+            (load-program
+              (string-append
+                (apply string-append (intercalate (map symbol->string '$spec) "/"))
+                "-test.ss")))
+          ...))))
 )

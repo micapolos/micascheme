@@ -1,4 +1,4 @@
-(import (check) (variable) (current) (lets))
+(import (scheme) (check) (variable) (current) (lets))
 
 (let ()
   (define $value 0)

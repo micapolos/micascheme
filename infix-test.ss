@@ -1,4 +1,4 @@
-(import (check) (infix))
+(import (scheme) (check) (infix))
 
 (check (equal? (infix "a") "a"))
 

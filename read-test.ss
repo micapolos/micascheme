@@ -1,4 +1,4 @@
-(import (check) (read))
+(import (scheme) (check) (read))
 
 (check
   (equal?

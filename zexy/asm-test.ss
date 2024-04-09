@@ -1,4 +1,4 @@
-(import (check) (zexy asm))
+(import (micascheme) (check) (zexy asm))
 
 (define-rule-syntax (check-op $syntax ($op ...))
   (check

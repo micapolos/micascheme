@@ -1,4 +1,4 @@
-(import (micascheme) (leo2))
+(import (except (micascheme) enum) (leo2))
 
 (define static-type-a (struct! a))
 (define static-type-b (struct! b))

@@ -178,7 +178,7 @@
         (string-type))
       (struct 'foo (list (any-type))))
     (indexed
-      (struct' foo (list (string-type)))
+      (struct 'foo (list (string-type)))
       2)))
 
 ; --- type-application

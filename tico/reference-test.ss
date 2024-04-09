@@ -1,4 +1,4 @@
-(import (micascheme) (tico reference))
+(import (micascheme) (tico reference) (tico index) (tico arity))
 
 (lets
   ($reference

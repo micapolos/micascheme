@@ -1,4 +1,4 @@
-(import (check) (function) (binder) (procedure))
+(import (scheme) (check) (function) (binder) (procedure))
 
 (run
   (function (plus a b) (string-append a b))

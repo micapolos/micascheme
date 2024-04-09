@@ -1,4 +1,4 @@
-(import (list) (seq))
+(import (scheme) (check) (syntax) (list) (seq) (indexed))
 
 (define-rule-syntax (check-seq= $lhs $rhs)
   (check (equal? (seq->list $lhs) (seq->list $rhs))))

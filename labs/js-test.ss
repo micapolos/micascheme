@@ -1,4 +1,4 @@
-(import (check) (labs js))
+(import (scheme) (check) (labs js))
 
 (define-syntax (js $syntax)
   (syntax-case $syntax ()

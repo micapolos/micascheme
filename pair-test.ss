@@ -1,4 +1,4 @@
-(import (check) (pair))
+(import (scheme) (check) (pair))
 
 ; === null-or-pair? ===
 

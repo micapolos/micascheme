@@ -1,4 +1,4 @@
-(import (check) (proof))
+(import (scheme) (check) (proof))
 
 (check (equal? (syntax->proof #'#f) boolean?))
 (check (equal? (syntax->proof #'128) number?))

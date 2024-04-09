@@ -1,4 +1,4 @@
-(import (check) (syntaxes) (procedure))
+(import (scheme) (check) (syntaxes) (procedure))
 
 (run-void
   (define-rules-syntax (+)

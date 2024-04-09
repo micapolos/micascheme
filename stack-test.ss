@@ -1,4 +1,4 @@
-(import (check) (stack))
+(import (scheme) (check) (stack))
 
 (check (equal? (stack) (list)))
 (check (equal? (stack 1 2 3) (list 3 2 1)))

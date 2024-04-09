@@ -1,4 +1,4 @@
-(import (check) (switch))
+(import (scheme) (check) (switch) (procedure) (binder) (syntax))
 
 ; === switch
 
@@ -34,6 +34,9 @@
     (void)))
 
 (run
+  (define-aux-keyword number-with-one)
+  (define-aux-keyword string-with-excl)
+
   (define-binder number-with-one
     (lambda ($number $fn)
       ($fn $number 1)))

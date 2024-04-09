@@ -1,4 +1,4 @@
-(import (micascheme) (tico term))
+(import (micascheme) (tico term) (tico index))
 
 (check
   (equal?

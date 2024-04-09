@@ -1,4 +1,4 @@
-(import (check) (random) (lets))
+(import (scheme) (check) (random) (lets) (current))
 
 (lets
   ($randoms-pair

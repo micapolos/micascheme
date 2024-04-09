@@ -1,4 +1,4 @@
-(import (check) (failure) (lets))
+(import (scheme) (check) (failure) (lets) (procedure))
 
 (lets
   ($failure (failure "foo"))

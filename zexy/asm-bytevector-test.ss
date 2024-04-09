@@ -1,10 +1,14 @@
-(import (check) (zexy asm-bytevector))
+(import
+  (except (micascheme) and or xor push pop)
+  (check)
+  (zexy asm-bytevector))
 
 ; simple asm macro
 (define-asm-syntax-rule (daa)
   (db #x27))
 
 ; parameterized asm macro
+(define-aux-keywords inc-dec)
 (define-asm-syntax-rule (inc-dec $r)
   (begin
     (inc $r)

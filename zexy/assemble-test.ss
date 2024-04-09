@@ -1,4 +1,5 @@
 (import
+  (except (scheme) and or)
   (check)
   (zexy assemble)
   (zexy ops)

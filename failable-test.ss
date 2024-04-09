@@ -1,4 +1,4 @@
-(import (check) (failure) (failable) (lets))
+(import (scheme) (check) (failure) (failable) (lets) (procedure))
 
 (check
   (equal?

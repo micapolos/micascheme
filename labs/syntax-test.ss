@@ -1,4 +1,4 @@
-(import (check) (labs syntax))
+(import (scheme) (check) (labs syntax))
 
 ; syntax-flatten
 (check

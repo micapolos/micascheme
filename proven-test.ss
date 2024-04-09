@@ -1,4 +1,4 @@
-(import (check) (proof) (proven))
+(import (scheme) (check) (proof) (proven))
 
 (define-proof string-length
   (lambda? (string?) number?))

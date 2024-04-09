@@ -1,4 +1,5 @@
 (import
+  (scheme)
   (check)
   (zexy link)
   (only (zexy ops) label org db dw ds align))

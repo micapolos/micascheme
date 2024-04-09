@@ -1,4 +1,4 @@
-(import (check) (syntax) (procedure) (boolean))
+(import (scheme) (check) (syntax) (procedure) (boolean))
 
 (check (equal? (identifiers? #'()) #t))
 (check (equal? (identifiers? #'(foo bar)) #t))

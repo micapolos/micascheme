@@ -1,4 +1,4 @@
-(import (check) (lets))
+(import (scheme) (check) (lets) (binder) (list))
 
 (check (equal? (lets 1) 1))
 

@@ -1,4 +1,4 @@
-(import (check) (identifier))
+(import (scheme) (check) (identifier))
 
 (check (equal? (identifier-named? #`foo foo) #t))
 (check (equal? (identifier-named? #`foo bar) #f))

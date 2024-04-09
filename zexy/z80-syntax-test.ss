@@ -1,4 +1,7 @@
-(import (zexy z80-syntax) (check))
+(import
+  (except (micascheme) and or xor push pop)
+  (zexy z80-syntax)
+  (check))
 
 (check (equal? (r-op #'b) #b000))
 (check (equal? (r-op #'c) #b001))

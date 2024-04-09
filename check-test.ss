@@ -1,4 +1,4 @@
-(import (check))
+(import (scheme) (check) (throw))
 
 ; === raises? ===
 

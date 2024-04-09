@@ -1,4 +1,4 @@
-(import (check) (boolean))
+(import (scheme) (check) (boolean))
 
 ; === false? ===
 

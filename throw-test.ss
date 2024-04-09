@@ -1,4 +1,4 @@
-(import (check) (throw) (list))
+(import (scheme) (check) (throw) (list))
 
 ; === or-throw ===
 
