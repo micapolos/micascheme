@@ -7,8 +7,8 @@
     block-update-typings
     block+entry
     block-typing
-    block-with-typing
-    block-with-typings
+    block-updating-typing
+    block-updating-typings
     block+entry
     block+typing
     block+typings
@@ -59,12 +59,12 @@
       (lambda ($block-typings)
         (push-list $block-typings $typings))))
 
-  (define (block-with-typing $block $typing)
+  (define (block-updating-typing $block $typing)
     (block-update-typings $block
       (lambda (_)
         (stack $typing))))
 
-  (define (block-with-typings $block $typings)
+  (define (block-updating-typings $block $typings)
     (block-update-typings $block
       (lambda (_)
         $typings)))

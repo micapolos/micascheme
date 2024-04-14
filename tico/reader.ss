@@ -99,7 +99,7 @@
                 (lambda ($as-typing)
                   (push-block-reader
                     $bindings
-                    (block-with-typing $block
+                    (block-updating-typing $block
                       (typing-as $typing $as-typing))
                     $end)))))
           ((assert)
@@ -181,7 +181,7 @@
                 (lambda ($body-typing)
                   (push-block-reader
                     $bindings
-                    (block-with-typing $block
+                    (block-updating-typing $block
                       (typings-do
                         (bindings-stack-typing $bindings)
                         $parameter-typings
@@ -195,7 +195,7 @@
                 (lambda ($arg-block)
                   (push-block-reader
                     $bindings
-                    (block-with-typing $block
+                    (block-updating-typing $block
                       (block-let
                         (bindings-stack-typing $bindings)
                         $arg-block
@@ -212,7 +212,7 @@
                 (lambda ($doing-typing)
                   (push-block-reader
                     $bindings
-                    (block-with-typing $block
+                    (block-updating-typing $block
                       (scope-typing-abstraction
                         (bindings-stack-typing $bindings)
                         $param-typings
@@ -223,7 +223,7 @@
               (lambda ($result-typing)
                 (push-block-reader
                   $bindings
-                  (block-with-typing $block
+                  (block-updating-typing $block
                     (typing-promising
                       (reverse (block-typings $block))
                       (list $result-typing)))
@@ -235,7 +235,7 @@
                 (lambda ($offering-typing)
                   (push-block-reader
                     $bindings
-                    (block-with-typing $block
+                    (block-updating-typing $block
                       (typing-offering
                         $typing
                         $offering-typing))
@@ -247,7 +247,7 @@
                 (lambda ($being-typing)
                   (push-block-reader
                     $bindings
-                    (block-with-typing $block
+                    (block-updating-typing $block
                       (typing-being
                         $typing
                         $being-typing))
@@ -272,7 +272,7 @@
               (lambda ($symbol-block)
                 (push-block-reader
                   $bindings
-                  (block-with-typings $block
+                  (block-updating-typings $block
                     (bindings-resolve $bindings
                       (push
                         (block-typings $block)

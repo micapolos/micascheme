@@ -9,6 +9,9 @@
 (check (equal? (point-x (point 1 2)) 1))
 (check (equal? (point-y (point 1 2)) 2))
 
+(check (equal? (point-with-x (point 1 2) 3) (point 3 2)))
+(check (equal? (point-with-y (point 1 2) 3) (point 1 3)))
+
 (check (= (equal-hash (point 1 2)) (equal-hash (point 1 2))))
 (check (not (= (equal-hash (point 1 2)) (equal-hash (point 1 3)))))
 
@@ -39,6 +42,10 @@
 (check (equal? (vpoint-y (vpoint 1 2 3 4)) 2))
 (check (equal? (vpoint-v (vpoint 1 2)) (list)))
 (check (equal? (vpoint-v (vpoint 1 2 3 4)) (list 3 4)))
+
+(check (equal? (vpoint-with-x (vpoint 1 2 3 4) 5) (vpoint 5 2 3 4)))
+(check (equal? (vpoint-with-y (vpoint 1 2 3 4) 5) (vpoint 1 5 3 4)))
+(check (equal? (vpoint-with-v (vpoint 1 2 3 4) (list 5 6)) (vpoint 1 2 5 6)))
 
 (check (= (equal-hash (vpoint 1 2 3 4)) (equal-hash (vpoint 1 2 3 4))))
 (check (not (= (equal-hash (vpoint 1 2 3 4)) (equal-hash (vpoint 1 2 3 5)))))

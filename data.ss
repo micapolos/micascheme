@@ -23,6 +23,7 @@
             (tmp (car (generate-temporaries '(tmp))))
             (record-name (build-identifier ($string #`name) (string-append "%" $string)))
             (make-name (build-identifier ($string #`name) (string-append "make-" $string)))
+            (make-all-name (if list-field-opt make-name #'name))
             (rtd-name (build-identifier ($string #`name) (string-append $string "-rtd")))
             (prefix-name (string-append name-string "-"))
             (predicate-name (build-identifier ($string #`name) (string-append $string "?")))
@@ -40,6 +41,20 @@
               (if list-accessor-opt
                 (append accessors (list list-accessor-opt))
                 accessors))
+            (setters
+              (map
+                (lambda ($field)
+                  (build-identifier ($string $field)
+                    (string-append name-string "-with-" $string)))
+                fields))
+            (list-setter-opt
+              (and list-field-opt
+                (build-identifier ($string list-field-opt)
+                  (string-append name-string "-with-" $string))))
+            (all-setters
+              (if list-setter-opt
+                (append setters (list list-setter-opt))
+                setters))
             #`(begin
               (define #,rtd-name
                 (let ((#,tmp
@@ -111,7 +126,20 @@
                   #`(define #,(build-identifier (s f) (string-append prefix-name s))
                     (record-accessor #,rtd-name #,index)))
                 (iota (length all-fields))
-                all-fields)))))))
+                all-fields)
+              #,@(map
+                (lambda ($setter-index $setter)
+                  #`(define (#,$setter $record $value)
+                    (#,make-all-name
+                      #,@(map
+                        (lambda ($accessor-index $accessor)
+                          (cond
+                            ((= $setter-index $accessor-index) #'$value)
+                            (else #`(#,$accessor $record))))
+                        (iota (length all-accessors))
+                        all-accessors))))
+                (iota (length all-setters))
+                all-setters)))))))
 
   (define-syntax (enum $syntax)
     (syntax-case $syntax ()
