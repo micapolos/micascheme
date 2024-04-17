@@ -62,3 +62,17 @@
       ((opt b) #f)
       (string-append a b))
     #f))
+
+(check
+  (equal?
+    (lets
+      (lambda (+ $a $b) (string-append $a $b))
+      (+ "foo" "bar"))
+    "foobar"))
+
+(check
+  (equal?
+    (lets
+      (lambda (+ $a $b . $cs) (apply string-append (cons* $a $b $cs)))
+      (+ "foo" "bar" "goo" "zar"))
+    "foobargoozar"))
