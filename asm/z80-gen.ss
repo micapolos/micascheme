@@ -35,4 +35,11 @@
       #`(ld
         #,(vector-ref reg-8-vector $rrr)
         #,(vector-ref reg-8-vector $ppp))))
+
+  (define (op-01-rrr-ppp $rrr $ppp)
+    (if (and (= $rrr #b110) (= $ppp #b110))
+      #`(nop)
+      #`(ld
+        #,(vector-ref reg-8-vector $rrr)
+        #,(vector-ref reg-8-vector $ppp))))
 )
