@@ -37,7 +37,9 @@
     assid-update
     assid-update-new
 
-    group-by)
+    group-by
+    product
+    map-product)
 
   (import
     (scheme)
@@ -302,4 +304,21 @@
                 $groups)))
           (list)
           $list))))
+
+  (define (product $list . $lists)
+    (flatten
+      (map
+        (lambda ($item)
+          (map
+            (partial cons $item)
+            (switch $lists
+              ((null? _) (list '()))
+              ((else (pair $list $lists))
+                (apply product $list $lists)))))
+        $list)))
+
+  (define (map-product $fn $list . $lists)
+    (map
+      (partial apply $fn)
+      (apply product $list $lists)))
 )

@@ -339,3 +339,42 @@
       (bar .
         (
           (bar . 20))))))
+
+; === product ===
+
+(check
+  (equal?
+    (product
+      (list)
+      (list "a" "b")
+      (list 1 2 3))
+    (list)))
+
+(check
+  (equal?
+    (product
+      (list `foo)
+      (list "a" "b")
+      (list 1 2 3))
+    (list
+      (list `foo "a" 1)
+      (list `foo "a" 2)
+      (list `foo "a" 3)
+      (list `foo "b" 1)
+      (list `foo "b" 2)
+      (list `foo "b" 3))))
+
+(check
+  (equal?
+    (map-product
+      list
+      (list `foo)
+      (list "a" "b")
+      (list 1 2 3))
+    (list
+      (list `foo "a" 1)
+      (list `foo "a" 2)
+      (list `foo "a" 3)
+      (list `foo "b" 1)
+      (list `foo "b" 2)
+      (list `foo "b" 3))))
