@@ -1,4 +1,4 @@
-(import (micascheme) (masm compiler))
+(import (micascheme) (masm compiler) (u8))
 
 (define-op (const $u8)
   (op ($bytevector $sp)
@@ -11,7 +11,7 @@
       ($rhs (bytevector-u8-ref $bytevector $sp))
       (run (set! $sp (add1 $sp)))
       ($lhs (bytevector-u8-ref $bytevector $sp))
-      (bytevector-u8-set! $bytevector $sp (fxand (+ $lhs $rhs) #xff)))))
+      (bytevector-u8-set! $bytevector $sp (u8+ $lhs $rhs)))))
 
 (define-op (sub)
   (op ($bytevector $sp)
@@ -19,7 +19,7 @@
       ($rhs (bytevector-u8-ref $bytevector $sp))
       (run (set! $sp (add1 $sp)))
       ($lhs (bytevector-u8-ref $bytevector $sp))
-      (bytevector-u8-set! $bytevector $sp (fxand (- $lhs $rhs) #xff)))))
+      (bytevector-u8-set! $bytevector $sp (u8- $lhs $rhs)))))
 
 (define-rule-syntax (check-masm ($in ...) $op ... ($out ...))
   (let ()

@@ -49,6 +49,7 @@
   (tico-2)
   (type)
   (typed)
+  (u8)
   (value)
   (variable)
   (vector)
