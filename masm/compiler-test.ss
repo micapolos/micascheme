@@ -21,15 +21,18 @@
       ($lhs (bytevector-u8-ref $bytevector $sp))
       (bytevector-u8-set! $bytevector $sp (fxand (- $lhs $rhs) #xff)))))
 
-(lets
-  ($run
-    (masm
-      (const #x30)
-      (const #x20)
-      (const #x01)
-      (add)
-      (sub)))
-  ($bytevector (make-bytevector #x3))
-  (run-void
-    ($run $bytevector)
-    (check (equal? $bytevector #vu8(#x01 #x21 #x0f)))))
+(define-rule-syntax (check-masm ($in ...) $op ... ($out ...))
+  (let ()
+    (define $bytevector-in (bytevector $in ...))
+    (define $bytevector-out (bytevector $out ...))
+    (app (masm $op ...) $bytevector-in)
+    (check (equal? $bytevector-in $bytevector-out))))
+
+(check-masm
+  (#x00 #x00 #x00)
+  (const #x30)
+  (const #x20)
+  (const #x01)
+  (add)
+  (sub)
+  (#x01 #x21 #x0f))
