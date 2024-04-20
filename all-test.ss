@@ -56,6 +56,7 @@
   (writing)
   (z80)
   (asm all)
+  (cvm all)
   (leo all)
   (scheme all)
   (labs all)
