@@ -1,8 +1,8 @@
-(library (cvm compiler)
+(library (masm compiler)
   (export
     op
     define-op
-    compile-cvm)
+    masm)
   (import (micascheme))
 
   (define-rule-syntax (op ($param ...) $body ...)
@@ -22,7 +22,7 @@
           (define-aux-keyword $id)
           (define-property $id op $op)))))
 
-  (define-syntax (compile-cvm $syntax $lookup)
+  (define-syntax (masm $syntax $lookup)
     (syntax-case $syntax ()
       ((_ $op ...)
         #`(lambda ($bytevector)

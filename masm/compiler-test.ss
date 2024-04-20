@@ -1,4 +1,4 @@
-(import (micascheme) (cvm compiler))
+(import (micascheme) (masm compiler))
 
 (define-op (const $u8)
   (op ($bytevector $sp)
@@ -23,7 +23,7 @@
 
 (lets
   ($run
-    (compile-cvm
+    (masm
       (const #x30)
       (const #x20)
       (const #x01)
