@@ -2,22 +2,24 @@
   (export
     program? program program-exprs program-instrs
     program+op
-    ops->instrs)
+    compile-ops)
   (import
     (micascheme)
     (masm model))
 
   (data (program exprs instrs))
 
-  (define (ops->instrs $ops)
-    (reverse
-      (program-instrs
-        (fold-left
-          program+op
-          (program (stack) (stack))
-          $ops))))
+  (define (compile-ops $mem $locals . $ops)
+    `(lambda (,$mem)
+      ,@(reverse
+        (program-instrs
+          (fold-left
+            (partial program+op $mem $locals)
+            (program (stack) (stack))
+            $ops)))
+      (void)))
 
-  (define (program+op $program $op)
+  (define (program+op $mem $locals $program $op)
     (switch-exclusive $op
       ((const-op? $const-op)
         (program
@@ -39,7 +41,9 @@
             (program-instrs $program))))
       ((get-op? $get-op)
         (program
-          (push (program-exprs $program) (get-op-id $get-op))
+          (push
+            (program-exprs $program)
+            (vector-ref $locals (get-op-idx $get-op)))
           (program-instrs $program)))
       ((set-op? $set-op)
         (lets
@@ -48,12 +52,12 @@
             $exprs
             (push
               (program-instrs $program)
-              `(set! ,(set-op-id $set-op) ,$expr)))))
+              `(set! ,(vector-ref $locals (set-op-idx $set-op)) ,$expr)))))
       ((load-op? $load-op)
         (lets
           ((pair $addr $exprs) (program-exprs $program))
           (program
-            (push $exprs `(bytevector-u8-ref $mem ,$addr))
+            (push $exprs `(bytevector-u8-ref ,$mem ,$addr))
             (program-instrs $program))))
       ((store-op? $store-op)
         (lets
@@ -64,7 +68,7 @@
             $exprs
             (push
               (program-instrs $program)
-              `(bytevector-u8-set! $mem ,$addr ,$value)))))
+              `(bytevector-u8-set! ,$mem ,$addr ,$value)))))
       ((out-op? $out-op)
         (lets
           ((pair $expr $exprs) (program-exprs $program))
