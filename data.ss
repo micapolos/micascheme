@@ -193,7 +193,13 @@
               (record-accessor #,$record-name 0))
             (define-rule-syntax (#,$name-switch #,$name-tmp #,$case-tmp #,$dots)
               (switch (#,$name-body #,$name-tmp)
-                #,$case-tmp #,$dots)))))))
+                #,$case-tmp #,$dots)))))
+      ((_ ($name ($data-name . $data-body) ...))
+        (identifier? #'$name)
+        #'(begin
+          (enum ($name $data-name ...))
+          (data ($data-name . $data-body))
+          ...))))
 
   (define (record-pretty-writer rtd name)
     (lambda (record port wr)

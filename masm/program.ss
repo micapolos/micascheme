@@ -25,19 +25,30 @@
         (program
           (push
             (program-exprs $program)
-            (const-u8 $const))
+            (const-value $const))
           (program-instrs $program)))
       ((inc? $inc)
         (program
           (lets
             ((pair $expr $exprs) (program-exprs $program))
-            (push $exprs `(add1 ,$expr)))
+            (push $exprs
+              `(
+                ,(type-switch (inc-type $inc)
+                  ((u8? _) 'u8+1)
+                  ((u16? _) 'u16+1))
+                ,$expr)))
           (program-instrs $program)))
       ((add? $add)
         (lets
           ((pair $rhs (pair $lhs $exprs)) (program-exprs $program))
           (program
-            (push $exprs `(+ ,$lhs ,$rhs))
+            (push $exprs
+              `(
+                ,(type-switch (add-type $add)
+                  ((u8? _) 'u8+)
+                  ((u16? _) 'u16+))
+                ,$lhs
+                ,$rhs))
             (program-instrs $program))))
       ((get? $get)
         (program
@@ -57,7 +68,13 @@
         (lets
           ((pair $addr $exprs) (program-exprs $program))
           (program
-            (push $exprs `(bytevector-u8-ref ,$mem ,$addr))
+            (push $exprs
+              `(
+                ,(type-switch (load-type $load)
+                  ((u8? _) 'bytevector-u8-ref)
+                  ((u16? _) 'bytevector-u16-ref))
+                ,$mem
+                ,$addr))
             (program-instrs $program))))
       ((store? $store)
         (lets
@@ -68,7 +85,13 @@
             $exprs
             (push
               (program-instrs $program)
-              `(bytevector-u8-set! ,$mem ,$addr ,$value)))))
+              `(
+                ,(type-switch (store-type $store)
+                    ((u8? _) 'bytevector-u8-set!)
+                    ((u16? _) 'bytevector-u16-set!))
+                ,$mem
+                ,$addr
+                ,$value)))))
       ((out? $out)
         (lets
           ((pair $expr $exprs) (program-exprs $program))
