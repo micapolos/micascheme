@@ -2,14 +2,14 @@
   (export
     program? program program-exprs program-instrs
     program+op
-    compile-ops)
+    compiles)
   (import
-    (micascheme)
+    (except (micascheme) load)
     (masm model))
 
   (data (program exprs instrs))
 
-  (define (compile-ops $mem $locals . $ops)
+  (define (compiles $mem $locals . $ops)
     `(lambda (,$mem)
       ,@(reverse
         (program-instrs
@@ -20,46 +20,46 @@
       (void)))
 
   (define (program+op $mem $locals $program $op)
-    (switch-exclusive $op
-      ((const-op? $const-op)
+    (op-switch $op
+      ((const? $const)
         (program
           (push
             (program-exprs $program)
-            (const-op-u8 $const-op))
+            (const-u8 $const))
           (program-instrs $program)))
-      ((inc-op? $inc-op)
+      ((inc? $inc)
         (program
           (lets
             ((pair $expr $exprs) (program-exprs $program))
             (push $exprs `(add1 ,$expr)))
           (program-instrs $program)))
-      ((add-op? $add-op)
+      ((add? $add)
         (lets
           ((pair $rhs (pair $lhs $exprs)) (program-exprs $program))
           (program
             (push $exprs `(+ ,$lhs ,$rhs))
             (program-instrs $program))))
-      ((get-op? $get-op)
+      ((get? $get)
         (program
           (push
             (program-exprs $program)
-            (vector-ref $locals (get-op-idx $get-op)))
+            (vector-ref $locals (get-idx $get)))
           (program-instrs $program)))
-      ((set-op? $set-op)
+      ((set? $set)
         (lets
           ((pair $expr $exprs) (program-exprs $program))
           (program
             $exprs
             (push
               (program-instrs $program)
-              `(set! ,(vector-ref $locals (set-op-idx $set-op)) ,$expr)))))
-      ((load-op? $load-op)
+              `(set! ,(vector-ref $locals (set-idx $set)) ,$expr)))))
+      ((load? $load)
         (lets
           ((pair $addr $exprs) (program-exprs $program))
           (program
             (push $exprs `(bytevector-u8-ref ,$mem ,$addr))
             (program-instrs $program))))
-      ((store-op? $store-op)
+      ((store? $store)
         (lets
           ($exprs (program-exprs $program))
           ((pair $value $exprs) $exprs)
@@ -69,7 +69,7 @@
             (push
               (program-instrs $program)
               `(bytevector-u8-set! ,$mem ,$addr ,$value)))))
-      ((out-op? $out-op)
+      ((out? $out)
         (lets
           ((pair $expr $exprs) (program-exprs $program))
           (program

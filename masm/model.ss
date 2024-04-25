@@ -1,21 +1,35 @@
 (library (masm model)
   (export
-    const-op? const-op const-op-u8
-    inc-op? inc-op
-    add-op? add-op
-    get-op? get-op get-op-idx
-    set-op? set-op set-op-idx
-    load-op? load-op
-    store-op? store-op
-    out-op? out-op)
-  (import (micascheme))
+    u8? u8
+    u16? u16
 
-  (data (const-op u8))
-  (data (inc-op))
-  (data (add-op))
-  (data (get-op idx))
-  (data (set-op idx))
-  (data (load-op))
-  (data (store-op))
-  (data (out-op))
+    type? type type-switch
+
+    const? const const-u8
+    inc? inc
+    add? add
+    get? get get-idx
+    set? set set-idx
+    load? load
+    store? store
+    out? out
+
+    op? op op-switch)
+  (import (except (micascheme) load))
+
+  (data (u8))
+  (data (u16))
+
+  (enum (type u8 u16))
+
+  (data (const u8))
+  (data (inc))
+  (data (add))
+  (data (get idx))
+  (data (set idx))
+  (data (load))
+  (data (store))
+  (data (out))
+
+  (enum (op const inc add get set load store out))
 )
