@@ -1,35 +1,49 @@
 (library (masm model)
   (export
-    u8? u8
-    u16? u16
+    i8? i8
+    i16? i16
+    int? int int-switch
 
+    arrow? arrow arrow-ins arrow-outs
     type? type type-switch
 
-    const? const const-type const-value
-    inc? inc inc-type
-    add? add add-type
-    get? get get-type get-idx
-    set? set set-type set-idx
-    load? load load-type
-    store? store store-type
-    out? out out-type
+    const? const const-int const-value
+    inc? inc inc-int
+    add? add add-int
+    get? get get-int get-idx
+    set? set set-int set-idx
+    load? load load-int
+    store? store store-int
+    call? call call-idx
+    out? out out-int
 
-    op? op op-switch)
-  (import (except (micascheme) load))
+    op? op op-switch
 
-  (data (u8))
-  (data (u16))
+    func? func func-arrow func-locals func-ops
 
-  (enum (type u8 u16))
+    module? module module-funcs)
+  (import (except (micascheme) load module))
 
-  (data (const type value))
-  (data (inc type))
-  (data (add type))
-  (data (get type idx))
-  (data (set type idx))
-  (data (load type))
-  (data (store type))
-  (data (out type))
+  (data (i8))
+  (data (i16))
+  (enum (int i8 i16))
 
-  (enum (op const inc add get set load store out))
+  (data (arrow ins outs))
+  (enum (type int arrow))
+
+  (data (const int value))
+  (data (inc int))
+  (data (add int))
+  (data (get int idx))
+  (data (set int idx))
+  (data (load int))
+  (data (store int))
+  (data (call idx))
+  (data (out int))
+
+  (enum (op const inc add get set load store call out))
+
+  (data (func arrow locals ops))
+
+  (data (module funcs))
 )

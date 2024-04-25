@@ -1,23 +1,39 @@
 (import
-  (except (micascheme) load)
+  (except (micascheme) load module)
   (masm model)
   (masm program))
 
 (check
   (equal?
-    (compiles '$mem (vector '$a '$b)
-      (op (const (type (u8)) 10))
-      (op (get (type (u8)) 0))
-      (op (get (type (u8)) 1))
-      (op (add (type (u8))))
-      (op (out (type (u8))))
-      (op (inc (type (u8))))
-      (op (set (type (u8)) 0))
-      (op (const (type (u16)) #x1000))
-      (op (const (type (u8)) 10))
-      (op (store (type (u8)))))
-    '(lambda ($mem)
-      (displayln (u8+ $a $b))
-      (set! $a (u8+1 10))
-      (bytevector-u8-set! $mem 4096 10)
-      (void))))
+    (compile-ops '$mem (list '$a '$b) (stack)
+      (list
+        (op (const (int (i8)) 10))
+        (op (get (int (i8)) 0))
+        (op (get (int (i8)) 1))
+        (op (add (int (i8))))
+        (op (out (int (i8))))
+        (op (inc (int (i8))))
+        (op (set (int (i8)) 0))
+        (op (const (int (i16)) #x1000))
+        (op (const (int (i8)) 10))
+        (op (store (int (i8))))))
+    '(
+      (displayln (i8+ $a $b))
+      (set! $a (i8+1 10))
+      (mem-i8-set! $mem 4096 10))))
+
+(check
+  (equal?
+    (compile-func
+      '$mem
+      (func
+        (arrow
+          (list
+            (type (int (i8)))
+            (type (int (i8))))
+          (list (type (int (i8)))))
+        (list)
+        (list
+          (op (add (int (i8)))))))
+    '(lambda ($i8-0 $i8-1)
+      (values (i8+ $i8-0 $i8-1)))))

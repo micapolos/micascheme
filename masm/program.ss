@@ -2,22 +2,49 @@
   (export
     program? program program-exprs program-instrs
     program+op
-    compiles)
+    compile-func
+    compile-ops)
   (import
-    (except (micascheme) load)
+    (except (micascheme) load module)
     (masm model))
 
   (data (program exprs instrs))
 
-  (define (compiles $mem $locals . $ops)
-    `(lambda (,$mem)
-      ,@(reverse
-        (program-instrs
-          (fold-left
-            (partial program+op $mem $locals)
-            (program (stack) (stack))
-            $ops)))
-      (void)))
+  (define (compile-ops $mem $locals $exprs $ops)
+    (reverse
+      (program-instrs
+        (fold-left
+          (partial program+op $mem $locals)
+          (program $exprs (stack))
+          $ops))))
+
+  (define (sym $index $type)
+    (string->symbol
+      (string-append
+        "$"
+        (type-switch $type
+          ((int? $int)
+            (int-switch $int
+              ((i8? _) "i8")
+              ((i16? _) "i16")))
+          ((arrow? $arrow)
+            "func"))
+        "-"
+        (number->string $index))))
+
+  (define (compile-func $mem $func)
+    (lets
+      ($arrow (func-arrow $func))
+      ($locals (map-indexed sym (append (arrow-ins $arrow) (func-locals $func))))
+      ($params (map-indexed sym (arrow-ins $arrow)))
+      ($program
+        (fold-left
+          (partial program+op $mem $locals)
+          (program (reverse $params) (stack))
+          (func-ops $func)))
+      `(lambda (,@$params)
+        ,@(reverse (program-instrs $program))
+        (values ,@(reverse (program-exprs $program))))))
 
   (define (program+op $mem $locals $program $op)
     (op-switch $op
@@ -33,9 +60,9 @@
             ((pair $expr $exprs) (program-exprs $program))
             (push $exprs
               `(
-                ,(type-switch (inc-type $inc)
-                  ((u8? _) 'u8+1)
-                  ((u16? _) 'u16+1))
+                ,(int-switch (inc-int $inc)
+                  ((i8? _) 'i8+1)
+                  ((i16? _) 'i16+1))
                 ,$expr)))
           (program-instrs $program)))
       ((add? $add)
@@ -44,9 +71,9 @@
           (program
             (push $exprs
               `(
-                ,(type-switch (add-type $add)
-                  ((u8? _) 'u8+)
-                  ((u16? _) 'u16+))
+                ,(int-switch (add-int $add)
+                  ((i8? _) 'i8+)
+                  ((i16? _) 'i16+))
                 ,$lhs
                 ,$rhs))
             (program-instrs $program))))
@@ -54,7 +81,7 @@
         (program
           (push
             (program-exprs $program)
-            (vector-ref $locals (get-idx $get)))
+            (list-ref $locals (get-idx $get)))
           (program-instrs $program)))
       ((set? $set)
         (lets
@@ -63,16 +90,16 @@
             $exprs
             (push
               (program-instrs $program)
-              `(set! ,(vector-ref $locals (set-idx $set)) ,$expr)))))
+              `(set! ,(list-ref $locals (set-idx $set)) ,$expr)))))
       ((load? $load)
         (lets
           ((pair $addr $exprs) (program-exprs $program))
           (program
             (push $exprs
               `(
-                ,(type-switch (load-type $load)
-                  ((u8? _) 'bytevector-u8-ref)
-                  ((u16? _) 'bytevector-u16-ref))
+                ,(int-switch (load-int $load)
+                  ((i8? _) 'mem-i8-ref)
+                  ((i16? _) 'mem-i16-ref))
                 ,$mem
                 ,$addr))
             (program-instrs $program))))
@@ -86,9 +113,9 @@
             (push
               (program-instrs $program)
               `(
-                ,(type-switch (store-type $store)
-                    ((u8? _) 'bytevector-u8-set!)
-                    ((u16? _) 'bytevector-u16-set!))
+                ,(int-switch (store-int $store)
+                    ((i8? _) 'mem-i8-set!)
+                    ((i16? _) 'mem-i16-set!))
                 ,$mem
                 ,$addr
                 ,$value)))))
