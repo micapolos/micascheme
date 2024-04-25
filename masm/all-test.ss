@@ -1,4 +1,4 @@
 (import (micascheme))
 
 (test
-  (masm compiler))
+  (masm program))
