@@ -5,7 +5,7 @@
     compile-func
     compile-ops)
   (import
-    (except (micascheme) load module)
+    (except (micascheme) module)
     (masm model))
 
   (data (program exprs instrs))
@@ -89,33 +89,33 @@
                 ,$lhs
                 ,$rhs))
             (program-instrs $program))))
-      ((get? $get)
+      ((local-get? $local-get)
         (program
           (push
             (program-exprs $program)
-            (list-ref $locals (get-idx $get)))
+            (list-ref $locals (local-get-idx $local-get)))
           (program-instrs $program)))
-      ((set? $set)
+      ((local-set? $local-set)
         (lets
           ((pair $expr $exprs) (program-exprs $program))
           (program
             $exprs
             (push
               (program-instrs $program)
-              `(set! ,(list-ref $locals (set-idx $set)) ,$expr)))))
-      ((load? $load)
+              `(set! ,(list-ref $locals (local-set-idx $local-set)) ,$expr)))))
+      ((mem-get? $mem-get)
         (lets
           ((pair $addr $exprs) (program-exprs $program))
           (program
             (push $exprs
               `(
-                ,(int-switch (load-int $load)
+                ,(int-switch (mem-get-int $mem-get)
                   ((i8? _) 'mem-i8-ref)
                   ((i16? _) 'mem-i16-ref))
                 ,$mem
                 ,$addr))
             (program-instrs $program))))
-      ((store? $store)
+      ((mem-set? $mem-set)
         (lets
           ($exprs (program-exprs $program))
           ((pair $value $exprs) $exprs)
@@ -125,7 +125,7 @@
             (push
               (program-instrs $program)
               `(
-                ,(int-switch (store-int $store)
+                ,(int-switch (mem-set-int $mem-set)
                     ((i8? _) 'mem-i8-set!)
                     ((i16? _) 'mem-i16-set!))
                 ,$mem

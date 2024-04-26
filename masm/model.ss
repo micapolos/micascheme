@@ -10,10 +10,10 @@
     const? const const-int const-value
     inc? inc inc-int
     add? add add-int
-    get? get get-type get-idx
-    set? set set-type set-idx
-    load? load load-int
-    store? store store-int
+    local-get? local-get local-get-type local-get-idx
+    local-set? local-set local-set-type local-set-idx
+    mem-get? mem-get mem-get-int
+    mem-set? mem-set mem-set-int
     call? call call-idx
     out? out out-int
 
@@ -22,7 +22,7 @@
     func? func func-arrow func-locals func-ops
 
     module? module module-funcs)
-  (import (except (micascheme) load module))
+  (import (except (micascheme) module))
 
   (data (i8))
   (data (i16))
@@ -34,14 +34,14 @@
   (data (const int value))
   (data (inc int))
   (data (add int))
-  (data (get type idx))
-  (data (set type idx))
-  (data (load int))
-  (data (store int))
+  (data (local-get type idx))
+  (data (local-set type idx))
+  (data (mem-get int))
+  (data (mem-set int))
   (data (call idx))
   (data (out int))
 
-  (enum (op const inc add get set load store call out))
+  (enum (op const inc add local-get local-set mem-get mem-set call out))
 
   (data (func arrow locals ops))
 
