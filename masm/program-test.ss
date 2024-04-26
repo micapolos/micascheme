@@ -1,5 +1,5 @@
 (import
-  (except (micascheme) load module)
+  (except (micascheme) module)
   (masm model)
   (masm program))
 
@@ -8,17 +8,18 @@
     (compile-ops '$mem (list '$a '$b) (stack)
       (list
         (op (const (int (i8)) 10))
+        (op (const (int (i16)) 8912))
         (op (local-get (type (int (i8))) 0))
         (op (local-get (type (int (i8))) 1))
         (op (add (int (i8))))
-        (op (out (int (i8))))
+        (op (io-set))
         (op (inc (int (i8))))
         (op (local-set (type (int (i8))) 0))
-        (op (const (int (i16)) #x1000))
+        (op (const (int (i16)) 4096))
         (op (const (int (i8)) 10))
         (op (mem-set (int (i8))))))
     '(
-      (displayln (i8+ $a $b))
+      (io-set 8912 (i8+ $a $b))
       (set! $a (i8+1 10))
       (mem-i8-set! $mem 4096 10))))
 
@@ -38,10 +39,11 @@
           (op (add (int (i8))))
           (op (local-set (type (int (i8))) 0))
           (op (local-get (type (int (i8))) 0))
+          (op (const (int (i16)) 8912))
           (op (local-get (type (int (i8))) 0))
-          (op (out (int i8))))))
+          (op (io-set)))))
     '(lambda ($i8-0 $i8-1)
       (define $i8-2)
       (set! $i8-2 (i8+ $i8-0 $i8-1))
-      (displayln $i8-2)
+      (io-set 8912 $i8-2)
       (values $i8-2))))

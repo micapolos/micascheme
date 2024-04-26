@@ -15,7 +15,8 @@
     mem-get? mem-get mem-get-int
     mem-set? mem-set mem-set-int
     call? call call-idx
-    out? out out-int
+    io-get? io-get
+    io-set? io-set
 
     op? op op-switch
 
@@ -39,9 +40,10 @@
   (data (mem-get int))
   (data (mem-set int))
   (data (call idx))
-  (data (out int))
+  (data (io-get))
+  (data (io-set))
 
-  (enum (op const inc add local-get local-set mem-get mem-set call out))
+  (enum (op const inc add local-get local-set mem-get mem-set io-get io-set call))
 
   (data (func arrow locals ops))
 

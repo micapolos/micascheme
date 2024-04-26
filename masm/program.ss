@@ -131,12 +131,20 @@
                 ,$mem
                 ,$addr
                 ,$value)))))
-      ((out? $out)
+      ((io-get? $io-get)
         (lets
-          ((pair $expr $exprs) (program-exprs $program))
+          ((pair $addr $exprs) (program-exprs $program))
+          (program
+            (push $exprs `(io-get ,$addr))
+            (program-instrs $program))))
+      ((io-set? $io-set)
+        (lets
+          ($exprs (program-exprs $program))
+          ((pair $value $exprs) $exprs)
+          ((pair $port $exprs) $exprs)
           (program
             $exprs
             (push
               (program-instrs $program)
-              `(displayln ,$expr)))))))
+              `(io-set ,$port ,$value)))))))
 )
