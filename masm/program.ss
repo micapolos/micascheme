@@ -11,11 +11,11 @@
 
   (data (program exprs instrs))
 
-  (define (compile-ops $locals $exprs $ops)
+  (define (compile-ops $funcs $locals $exprs $ops)
     (reverse
       (program-instrs
         (fold-left
-          (partial program+op $locals)
+          (partial program+op $funcs $locals)
           (program $exprs (stack))
           $ops))))
 
@@ -32,13 +32,13 @@
               (string-append "$f" (number->string $index))))
           (indices (length $funcs))))
       ($lambdas
-        (map compile-func $funcs))
+        (map compile-func $syms $funcs))
       (map
         (lambda ($sym $lambda)
           `(define ,$sym ,$lambda))
         $syms $lambdas)))
 
-  (define (compile-func $func)
+  (define (compile-func $syms $func)
     (lets
       ($arrow (func-arrow $func))
       ($ins (arrow-ins $arrow))
@@ -56,7 +56,7 @@
       ($params (map-indexed sym $ins))
       ($program
         (fold-left
-          (partial program+op $locals)
+          (partial program+op $syms $locals)
           (program (reverse $params) (stack))
           (func-ops $func)))
       `(lambda (,@$params)
@@ -64,7 +64,7 @@
         ,@(reverse (program-instrs $program))
         (values ,@(reverse (program-exprs $program))))))
 
-  (define (program+op $locals $program $op)
+  (define (program+op $func-syms $locals $program $op)
     (op-switch $op
       ((const? $const)
         (program
