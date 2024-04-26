@@ -69,6 +69,20 @@
 
   (define (program+op $sym-arrows $locals $program $op)
     (op-switch $op
+      ((drop? $drop)
+        (program
+          (cdr (program-exprs $program))
+          (program-instrs $program)))
+      ((select? $select)
+        (lets
+          ($exprs (program-exprs $program))
+          ((pair $cond $exprs) $exprs)
+          ((pair $false $exprs) $exprs)
+          ((pair $true $exprs) $exprs)
+          (program
+            (push $exprs
+              `(if (zero? ,$cond) ,$true ,$false))
+            (program-instrs $program))))
       ((const? $const)
         (program
           (push
@@ -173,5 +187,18 @@
               (program
                 (push $exprs $expr)
                 (program-instrs $program)))
-            (else (throw many-outs)))))))
+            (else (throw many-outs)))))
+      ((nop? $nop)
+        $program)
+      ((trap? $trap)
+        (program
+          (program-exprs $program)
+          (push
+            (program-instrs $program)
+            '(trap))))
+      ((block? $block)
+        (fold-left
+          (partial program+op $sym-arrows $locals)
+          $program
+          (block-ops $block)))))
 )
