@@ -9,6 +9,7 @@
     app
     values-app
     partial
+    values-apply
     todo TODO)
   (import
     (scheme)
@@ -84,4 +85,7 @@
       (else (syntax-error $syntax))))
 
   (define identity (lambda (x) x))
+
+  (define-rule-syntax (values-apply $expr $proc)
+    (call-with-values (lambda () $expr) $proc))
 )

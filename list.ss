@@ -24,6 +24,9 @@
     build-list
     ensure-list
 
+    acc-split
+    split
+
     flatten
     values->list
 
@@ -102,6 +105,20 @@
     (cond
       ((or (null? $list) (not ($pred $initial))) $initial)
       (else (fold-while $pred $fn ($fn $initial (car $list)) (cdr $list)))))
+
+  (define (acc-split $acc $list $n)
+    (cond
+      ((null? $list) (values $acc $list))
+      ((= $n 0) (values $acc $list))
+      (else
+        (lets
+          ((pair $item $list) $list)
+          (acc-split (cons $item $acc) $list (sub1 $n))))))
+
+  (define (split $list $n)
+    (lets
+      ((values $acc $list) (acc-split (list) $list $n))
+      (values (reverse $acc) $list)))
 
   (define indices iota)
 

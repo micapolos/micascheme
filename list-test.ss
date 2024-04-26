@@ -378,3 +378,11 @@
       (list `foo "b" 1)
       (list `foo "b" 2)
       (list `foo "b" 3))))
+
+; === split ===
+
+(check (equal? (values-apply (split (list 1 2 3) 0) cons) (cons (list) (list 1 2 3))))
+(check (equal? (values-apply (split (list 1 2 3) 1) cons) (cons (list 1) (list 2 3))))
+(check (equal? (values-apply (split (list 1 2 3) 2) cons) (cons (list 1 2) (list 3))))
+(check (equal? (values-apply (split (list 1 2 3) 3) cons) (cons (list 1 2 3) (list))))
+(check (equal? (values-apply (split (list 1 2 3) 4) cons) (cons (list 1 2 3) (list))))

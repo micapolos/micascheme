@@ -68,3 +68,7 @@
 (check (equal? (run-void) (void)))
 (check (equal? (run-void (define foo "foo")) (void)))
 (check (equal? (run-void (define foo "foo") "foo") (void)))
+
+; === values-apply ===
+
+(check (equal? (values-apply (values 1 2 3) vector) (vector 1 2 3)))
