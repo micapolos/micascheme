@@ -35,14 +35,26 @@
   (define (compile-func $mem $func)
     (lets
       ($arrow (func-arrow $func))
-      ($locals (map-indexed sym (append (arrow-ins $arrow) (func-locals $func))))
-      ($params (map-indexed sym (arrow-ins $arrow)))
+      ($ins (arrow-ins $arrow))
+      ($outs (arrow-outs $arrow))
+      ($param-count (length $ins))
+      ($locals (map-indexed
+        (lambda ($index $type)
+          (sym (+ $index $param-count) $type))
+        (func-locals $func)))
+      ($defines
+        (map
+          (lambda ($local)
+            `(define ,$local))
+          $locals))
+      ($params (map-indexed sym $ins))
       ($program
         (fold-left
           (partial program+op $mem $locals)
           (program (reverse $params) (stack))
           (func-ops $func)))
       `(lambda (,@$params)
+        ,@$defines
         ,@(reverse (program-instrs $program))
         (values ,@(reverse (program-exprs $program))))))
 
