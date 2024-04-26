@@ -20,17 +20,7 @@
 
   (define (sym $index $type)
     (string->symbol
-      (string-append
-        "$"
-        (type-switch $type
-          ((int? $int)
-            (int-switch $int
-              ((i8? _) "i8")
-              ((i16? _) "i16")))
-          ((arrow? $arrow)
-            "func"))
-        "-"
-        (number->string $index))))
+      (string-append "$" (number->string $index))))
 
   (define (compile-func $mem $func)
     (lets
