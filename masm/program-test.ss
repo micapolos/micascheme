@@ -5,7 +5,7 @@
 
 (check
   (equal?
-    (compile-ops '$mem (list '$a '$b) (stack)
+    (compile-ops (list '$a '$b) (stack)
       (list
         (op (const (int (i8)) 10))
         (op (const (int (i16)) 8912))
@@ -26,7 +26,6 @@
 (check
   (equal?
     (compile-func
-      '$mem
       (func
         (arrow
           (list

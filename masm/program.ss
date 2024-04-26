@@ -10,11 +10,11 @@
 
   (data (program exprs instrs))
 
-  (define (compile-ops $mem $locals $exprs $ops)
+  (define (compile-ops $locals $exprs $ops)
     (reverse
       (program-instrs
         (fold-left
-          (partial program+op $mem $locals)
+          (partial program+op $locals)
           (program $exprs (stack))
           $ops))))
 
@@ -22,7 +22,7 @@
     (string->symbol
       (string-append "$" (number->string $index))))
 
-  (define (compile-func $mem $func)
+  (define (compile-func $func)
     (lets
       ($arrow (func-arrow $func))
       ($ins (arrow-ins $arrow))
@@ -40,7 +40,7 @@
       ($params (map-indexed sym $ins))
       ($program
         (fold-left
-          (partial program+op $mem $locals)
+          (partial program+op $locals)
           (program (reverse $params) (stack))
           (func-ops $func)))
       `(lambda (,@$params)
@@ -48,7 +48,7 @@
         ,@(reverse (program-instrs $program))
         (values ,@(reverse (program-exprs $program))))))
 
-  (define (program+op $mem $locals $program $op)
+  (define (program+op $locals $program $op)
     (op-switch $op
       ((const? $const)
         (program
@@ -102,7 +102,7 @@
                 ,(int-switch (mem-get-int $mem-get)
                   ((i8? _) 'mem-i8-ref)
                   ((i16? _) 'mem-i16-ref))
-                ,$mem
+                $mem
                 ,$addr))
             (program-instrs $program))))
       ((mem-set? $mem-set)
@@ -118,7 +118,7 @@
                 ,(int-switch (mem-set-int $mem-set)
                     ((i8? _) 'mem-i8-set!)
                     ((i16? _) 'mem-i16-set!))
-                ,$mem
+                $mem
                 ,$addr
                 ,$value)))))
       ((io-get? $io-get)
