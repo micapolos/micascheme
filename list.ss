@@ -108,7 +108,6 @@
 
   (define (acc-split $acc $list $n)
     (cond
-      ((null? $list) (values $acc $list))
       ((= $n 0) (values $acc $list))
       (else
         (lets
