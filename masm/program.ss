@@ -2,6 +2,7 @@
   (export
     program? program program-exprs program-instrs
     program+op
+    compile-module
     compile-func
     compile-ops)
   (import
@@ -21,6 +22,21 @@
   (define (sym $index $type)
     (string->symbol
       (string-append "$" (number->string $index))))
+
+  (define (compile-module (module $funcs))
+    (lets
+      ($syms
+        (map
+          (lambda ($index)
+            (string->symbol
+              (string-append "$f" (number->string $index))))
+          (indices (length $funcs))))
+      ($lambdas
+        (map compile-func $funcs))
+      (map
+        (lambda ($sym $lambda)
+          `(define ,$sym ,$lambda))
+        $syms $lambdas)))
 
   (define (compile-func $func)
     (lets

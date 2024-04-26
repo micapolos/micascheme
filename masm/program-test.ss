@@ -46,3 +46,24 @@
       (set! $2 (i8+ $0 $1))
       (io-set 8912 $2)
       (values $2))))
+
+(check
+  (equal?
+    (compile-module
+      (module
+        (list
+          (func
+            (arrow
+              (list (type (int (i8))))
+              (list (type (int (i8)))))
+            (list)
+            (list))
+          (func
+            (arrow
+              (list (type (int (i8))) (type (int (i8))))
+              (list (type (int (i8)))))
+            (list)
+            (list (op (add (int (i8)))))))))
+    '(
+      (define $f0 (lambda ($0) (values $0)))
+      (define $f1 (lambda ($0 $1) (values (i8+ $0 $1)))))))
