@@ -10,8 +10,8 @@
     const? const const-int const-value
     inc? inc inc-int
     add? add add-int
-    get? get get-int get-idx
-    set? set set-int set-idx
+    get? get get-type get-idx
+    set? set set-type set-idx
     load? load load-int
     store? store store-int
     call? call call-idx
@@ -34,8 +34,8 @@
   (data (const int value))
   (data (inc int))
   (data (add int))
-  (data (get int idx))
-  (data (set int idx))
+  (data (get type idx))
+  (data (set type idx))
   (data (load int))
   (data (store int))
   (data (call idx))
