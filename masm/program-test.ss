@@ -50,6 +50,41 @@
 
 (check
   (equal?
+    (compile-func
+      (list
+        (cons 'add
+          (arrow
+            (list
+              (type (int (i8)))
+              (type (int (i8))))
+            (list
+              (type (int (i8))))))
+        (cons 'inc
+          (arrow
+            (list (type (int (i8))))
+            (list (type (int (i8))))))
+        (cons 'show
+          (arrow
+            (list (type (int (i8))))
+            (list))))
+      (func
+        (arrow
+          (list
+            (type (int (i8)))
+            (type (int (i8))))
+          (list
+            (type (int (i8)))))
+        (list)
+        (list
+          (op (call 0))
+          (op (call 1))
+          (op (call 2)))))
+    '(lambda ($0 $1)
+      (show (inc (add $0 $1)))
+      (values))))
+
+(check
+  (equal?
     (compile-module
       (module
         (list

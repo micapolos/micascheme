@@ -25,20 +25,23 @@
 
   (define (compile-module (module $funcs))
     (lets
-      ($syms
-        (map
-          (lambda ($index)
-            (string->symbol
-              (string-append "$f" (number->string $index))))
-          (indices (length $funcs))))
+      ($sym-arrows
+        (map-indexed
+          (lambda ($index $func)
+            (cons
+              (string->symbol
+                (string-append "$f" (number->string $index)))
+              (func-arrow $func)))
+          $funcs))
       ($lambdas
-        (map compile-func $syms $funcs))
+        (map compile-func $sym-arrows $funcs))
       (map
         (lambda ($sym $lambda)
           `(define ,$sym ,$lambda))
-        $syms $lambdas)))
+        (map car $sym-arrows)
+        $lambdas)))
 
-  (define (compile-func $syms $func)
+  (define (compile-func $sym-arrows $func)
     (lets
       ($arrow (func-arrow $func))
       ($ins (arrow-ins $arrow))
@@ -54,17 +57,17 @@
             `(define ,$local))
           $locals))
       ($params (map-indexed sym $ins))
-      ($program
+      ((program $exprs $instrs)
         (fold-left
-          (partial program+op $syms $locals)
+          (partial program+op $sym-arrows $locals)
           (program (reverse $params) (stack))
           (func-ops $func)))
       `(lambda (,@$params)
         ,@$defines
-        ,@(reverse (program-instrs $program))
-        (values ,@(reverse (program-exprs $program))))))
+        ,@(reverse $instrs)
+        (values ,@(reverse $exprs)))))
 
-  (define (program+op $func-syms $locals $program $op)
+  (define (program+op $sym-arrows $locals $program $op)
     (op-switch $op
       ((const? $const)
         (program
@@ -152,5 +155,23 @@
             $exprs
             (push
               (program-instrs $program)
-              `(io-set ,$port ,$value)))))))
+              `(io-set ,$port ,$value)))))
+      ((call? (call $idx))
+        (lets
+          ((pair $sym $arrow) (list-ref $sym-arrows $idx))
+          ((values $args $exprs)
+            (split
+              (program-exprs $program)
+              (length (arrow-ins $arrow))))
+          ($expr `(,$sym ,@(reverse $args)))
+          (case (length (arrow-outs $arrow))
+            ((0)
+              (program
+                $exprs
+                (push (program-instrs $program) $expr)))
+            ((1)
+              (program
+                (push $exprs $expr)
+                (program-instrs $program)))
+            (else (throw many-outs)))))))
 )
