@@ -73,9 +73,16 @@
 
 (check (equal? (values-apply (values 1 2 3) vector) (vector 1 2 3)))
 
+; === dot-app ===
+
+(check (equal? (dot-app 123) 123))
+(check (equal? (dot-app number->string 123) "123"))
+(check (equal? (dot-app string-length number->string 123) 3))
+(check (equal? (dot-app number->string string-length number->string 123) "3"))
+
 ; === dot ===
 
-(check (equal? ((dot) 123) 123))
-(check (equal? ((dot number->string) 123) "123"))
-(check (equal? ((dot string-length number->string) 123) 3))
-(check (equal? ((dot number->string string-length number->string) 123) "3"))
+(check (equal? (app (dot) 123) 123))
+(check (equal? (app (dot number->string) 123) "123"))
+(check (equal? (app (dot string-length number->string) 123) 3))
+(check (equal? (app (dot number->string string-length number->string) 123) "3"))
