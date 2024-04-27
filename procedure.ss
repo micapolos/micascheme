@@ -10,7 +10,8 @@
     values-app
     partial
     values-apply
-    todo TODO)
+    todo TODO
+    dot)
   (import
     (scheme)
     (syntax)
@@ -88,4 +89,12 @@
 
   (define-rule-syntax (values-apply $expr $proc)
     (call-with-values (lambda () $expr) $proc))
+
+  (define (dot . $fns)
+    (fold-left
+      (lambda ($acc $fn)
+        (lambda ($x)
+          ($acc ($fn $x))))
+      identity
+      $fns))
 )
