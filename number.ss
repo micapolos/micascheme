@@ -4,6 +4,7 @@
     fract
     iterate
     iterate-indexed
+    positive-integer?
     nonnegative-integer?
     one?
     bitwise-align)
@@ -17,6 +18,9 @@
 
   (define (nonnegative-integer? $obj)
     (and (integer? $obj) (nonnegative? $obj)))
+
+  (define (positive-integer? $obj)
+    (and (integer? $obj) (positive? $obj)))
 
   (define (iterate $proc $item $count)
     (cond

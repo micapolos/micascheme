@@ -45,7 +45,7 @@
       (($pred $var) $body) ...
       ((else _)
         (throw non-exclusive
-          (quote (switch $expr $pred ...))))))
+          (quasiquote (switch (unquote $expr) $pred ...))))))
 
   (define-case-syntax (index-switch expr branch ... default)
     (let

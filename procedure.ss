@@ -3,6 +3,7 @@
     run
     run-void
     repeat
+    repeat-indexed
     identity
     once-proc
     checking-once
@@ -35,6 +36,12 @@
     (do
       (($i $count (- $i 1)))
       ((zero? $i) (void))
+      $body ...))
+
+  (define-rule-syntax (repeat-indexed $count $index $body ...)
+    (do
+      (($index 0 (add1 $index)))
+      ((= $index $count) (void))
       $body ...))
 
   (define-rule-syntax (once-proc $proc)
