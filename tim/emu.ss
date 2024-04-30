@@ -23,6 +23,8 @@
       (define $i 0)
       (define $r 0)
 
+      (define $indexing-offset 0)
+
       (define $regs (make-bytevector 16 0))
       (define $mem (make-bytevector #x10000))
 
@@ -52,9 +54,31 @@
       (define-r8 c 1)
       (define-r8 d 2)
       (define-r8 e 3)
-      (define-r8 h 4)
-      (define-r8 l 5)
       (define-r8 a 7)
+
+      (define-rules-syntax ()
+        ((h)
+          (case $indexing-offset
+            ((0) (reg #b100))
+            ((1) $ixh)
+            (else $iyh)))
+        ((h $u8)
+          (case $indexing-offset
+            ((0) (reg #b100 $u8))
+            ((1) (set! $ixh $u8))
+            (else (set! $iyh $u8)))))
+
+      (define-rules-syntax ()
+        ((l)
+          (case $indexing-offset
+            ((0) (reg #b101))
+            ((1) $ixl)
+            (else $iyl)))
+        ((l $u8)
+          (case $indexing-offset
+            ((0) (reg #b101 $u8))
+            ((1) (set! $ixl $u8))
+            (else (set! $iyl $u8)))))
 
       (define-r16 bc 0)
       (define-r16 de 2)
@@ -77,6 +101,10 @@
         ((r 5 $u8) (l $u8))
         ((r 6 $u8) (mem (hl) $u8))
         ((r 7 $u8) (a $u8)))
+
+      (define-rules-syntaxes ()
+        ((dd) (set! $indexing-offset 1))
+        ((fd) (set! $indexing-offset 2)))
 
       (define-rules-syntax ()
         ((mem $addr) (bytevector-u8-ref $mem $addr))
@@ -135,6 +163,9 @@
 
       (define $ops
         (build-ops op
+          (op #xdd (dd))
+          (op #xfd (fd))
+
           ; (ld r r)
           (with-r l $l
             (with-r r $r
@@ -184,4 +215,5 @@
         (do
           (($i 35000000 (fx-/wraparound $i 1)))
           ((fx= $i 0) (a))
+          (set! $indexing-offset 0)
           (app (vector-ref $ops (fetch-8))))))))
