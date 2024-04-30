@@ -2,7 +2,7 @@
 
 (parameterize ((optimize-level 3))
   (displayln
-    (let ()
+    (run
       (define $pc 0)
       (define $sp 0)
 
@@ -91,7 +91,7 @@
         ((mem $addr $u8) (bytevector-u8-set! $mem $addr $u8)))
 
       (define-rule-syntax (fetch-8)
-        (let ()
+        (run
           (define $u8 (mem $pc))
           (set! $pc (u16+ $pc 1))
           $u8))
@@ -105,7 +105,7 @@
       (define-rule-syntax (for-each-r $r $body ...)
         (repeat-indexed 8 $r
           (if (not (fx= $r #b110))
-            (let () $body ...))))
+            (run $body ...))))
 
       (define-syntax (with-r $syntax)
         (syntax-case $syntax ()
@@ -127,7 +127,7 @@
         (fxior (fxsll $a 6) (fxsll $b 3) $c))
 
       (define-rule-syntax (build-ops $op-id $bodys ...)
-        (let ()
+        (run
           (define $vec (make-vector 256 (lambda () (void))))
 
           (define-rule-syntax ($op-id $idx $body)
