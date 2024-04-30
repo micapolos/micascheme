@@ -12,77 +12,57 @@
       (define $c 0)
       (define $d 0)
       (define $e 0)
-      (define $h 0)
-      (define $l 0)
 
-      (define $ixh 0)
-      (define $ixl 0)
-      (define $iyh 0)
-      (define $iyl 0)
+      (define $h (make-bytevector 3 0))
+      (define $l (make-bytevector 3 0))
+      (define $hl-offset 0)
 
       (define $i 0)
       (define $r 0)
 
-      (define $indexing-offset 0)
-
-      (define $regs (make-bytevector 16 0))
       (define $mem (make-bytevector #x10000))
 
       (define-rule-syntax (native-endianness) 'big)
 
-      (define-rules-syntax ()
-        ((reg $idx) (bytevector-u8-ref $regs $idx))
-        ((reg $idx $u8) (bytevector-u8-set! $regs $idx $u8)))
-
-      (define-rule-syntax (define-r8 $id $idx)
+      (define-rule-syntax (define-r8 $id $var)
         (define-rules-syntax ()
-          (($id) (bytevector-u8-ref $regs $idx))
-          (($id $u8) (bytevector-u8-set! $regs $idx $u8))))
+          (($id) $var)
+          (($id $u8) (set! $var $u8))))
 
-      (define-rule-syntax (define-r16 $id $idx)
+      (define-r8 b $b)
+      (define-r8 c $c)
+      (define-r8 d $d)
+      (define-r8 e $e)
+      (define-r8 a $a)
+      (define-r8 f $f)
+
+      (define-rule-syntax (define-indexed-r8 $id $var)
         (define-rules-syntax ()
-          (($id) (bytevector-u16-ref $regs $idx (native-endianness)))
-          (($id $u16) (bytevector-u16-set! $regs $idx $u16 (native-endianness)))))
+          (($id) (bytevector-u8-ref $var $hl-offset))
+          (($id $u8) (bytevector-u8-set! $var $hl-offset $u8))))
+
+      (define-indexed-r8 h $h)
+      (define-indexed-r8 l $l)
+
+      (define-rule-syntax (define-r16 $id $h $l)
+        (define-rules-syntax ()
+          (($id) (fxior (fxsll ($h) 8) ($l)))
+          (($id $u16)
+            (lets
+              ($val $u16)
+              ($h (fxsrl $val 8))
+              ($l (fxand $val #xff))))))
+
+      (define-r16 bc b c)
+      (define-r16 de d e)
+      (define-r16 hl h l)
+      (define-r16 af a f)
 
       (define-rule-syntax (u8+ $a $b)
         (fxand (fx+/wraparound $a $b) #xff))
 
       (define-rule-syntax (u16+ $a $b)
         (fxand (fx+/wraparound $a $b) #xffff))
-
-      (define-r8 b 0)
-      (define-r8 c 1)
-      (define-r8 d 2)
-      (define-r8 e 3)
-      (define-r8 a 7)
-
-      (define-rules-syntax ()
-        ((h)
-          (case $indexing-offset
-            ((0) (reg #b100))
-            ((1) $ixh)
-            (else $iyh)))
-        ((h $u8)
-          (case $indexing-offset
-            ((0) (reg #b100 $u8))
-            ((1) (set! $ixh $u8))
-            (else (set! $iyh $u8)))))
-
-      (define-rules-syntax ()
-        ((l)
-          (case $indexing-offset
-            ((0) (reg #b101))
-            ((1) $ixl)
-            (else $iyl)))
-        ((l $u8)
-          (case $indexing-offset
-            ((0) (reg #b101 $u8))
-            ((1) (set! $ixl $u8))
-            (else (set! $iyl $u8)))))
-
-      (define-r16 bc 0)
-      (define-r16 de 2)
-      (define-r16 hl 4)
 
       (define-rules-syntax ()
         ((r 0) (b))
@@ -103,8 +83,8 @@
         ((r 7 $u8) (a $u8)))
 
       (define-rules-syntaxes ()
-        ((dd) (set! $indexing-offset 1))
-        ((fd) (set! $indexing-offset 2)))
+        ((dd) (set! $hl-offset 1))
+        ((fd) (set! $hl-offset 2)))
 
       (define-rules-syntax ()
         ((mem $addr) (bytevector-u8-ref $mem $addr))
@@ -215,5 +195,5 @@
         (do
           (($i 35000000 (fx-/wraparound $i 1)))
           ((fx= $i 0) (a))
-          (set! $indexing-offset 0)
+          (set! $hl-offset 0)
           (app (vector-ref $ops (fetch-8))))))))
