@@ -1,7 +1,7 @@
-(import (syntax) (syntaxes) (lets) (procedure))
+(import (syntax) (system) (syntaxes) (lets) (procedure) (list))
 
 (parameterize ((optimize-level 3))
-  (display
+  (displayln
     (let ()
       (define $pc 0)
       (define $sp 0)
@@ -29,8 +29,8 @@
       (define-rule-syntax (native-endianness) 'big)
 
       (define-rules-syntax ()
-        ((r $idx) (bytevector-u8-ref $regs $idx))
-        ((r $idx $u8) (bytevector-u8-set! $regs $idx $u8)))
+        ((reg $idx) (bytevector-u8-ref $regs $idx))
+        ((reg $idx $u8) (bytevector-u8-set! $regs $idx $u8)))
 
       (define-rule-syntax (define-r8 $id $idx)
         (define-rules-syntax ()
@@ -61,6 +61,24 @@
       (define-r16 hl 4)
 
       (define-rules-syntax ()
+        ((r 0) (b))
+        ((r 1) (c))
+        ((r 2) (d))
+        ((r 3) (e))
+        ((r 4) (h))
+        ((r 5) (l))
+        ((r 6) (mem (hl)))
+        ((r 7) (a))
+        ((r 0 $u8) (b $u8))
+        ((r 1 $u8) (c $u8))
+        ((r 2 $u8) (d $u8))
+        ((r 3 $u8) (e $u8))
+        ((r 4 $u8) (h $u8))
+        ((r 5 $u8) (l $u8))
+        ((r 6 $u8) (mem (hl) $u8))
+        ((r 7 $u8) (a $u8)))
+
+      (define-rules-syntax ()
         ((mem $addr) (bytevector-u8-ref $mem $addr))
         ((mem $addr $u8) (bytevector-u8-set! $mem $addr $u8)))
 
@@ -80,6 +98,22 @@
         (repeat-indexed 8 $r
           (if (not (fx= $r #b110))
             (let () $body ...))))
+
+      (define-syntax (with-r $syntax)
+        (syntax-case $syntax ()
+          ((_ $id $idx $body ...)
+            #`(begin
+              #,@(build-list 8
+                (lambda ($index)
+                  #`(let-syntax
+                    (($id
+                      (lambda ($syntax)
+                        (syntax-case $syntax ()
+                          ((_) #`(r #,#,$index))
+                          ((_ $expr) #`(r #,#,$index $expr))))))
+                    (let
+                      (($idx #,$index))
+                      $body ...))))))))
 
       (define (r-ihl? $r) (fx= $r #b110))
 
@@ -102,29 +136,20 @@
       (define $ops
         (build-ops op
           ; (ld r r)
-          (for-each-r $l
-            (for-each-r $r
+          (with-r l $l
+            (with-r r $r
               (op
                 (u8-233 #b01 $l $r)
-                (r $l (r $r)))))
-
-          ; (ld (hl) r)
-          (for-each-r $r
-            (op
-              (u8-233 #b01 $r #b110)
-              (mem (hl) (r $r))))
-
-          ; (ld r (hl))
-          (for-each-r $r
-            (op
-              (u8-233 #b01 #b110 $r)
-              (r $r (mem (hl)))))
+                (l (r)))))
 
           ; (ld r n)
-          (for-each-r $r
+          (with-r r $r
             (op
               (u8-233 #b00 $r #b110)
-              (r $r (fetch-8))))
+              (r (fetch-8))))
+
+          ; halt
+          (op #b01110110 (void))
 
           ; (ld (hl) n)
           (op #b00110110 (mem (hl) (fetch-8)))
@@ -159,5 +184,4 @@
         (do
           (($i 35000000 (fx-/wraparound $i 1)))
           ((fx= $i 0) (a))
-          (app (vector-ref $ops (fetch-8)))))))
-  (newline))
+          (app (vector-ref $ops (fetch-8))))))))
