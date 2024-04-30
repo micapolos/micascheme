@@ -123,12 +123,8 @@
                       (($idx #,$index))
                       $body ...))))))))
 
-      (define (r-ihl? $r) (fx= $r #b110))
-
       (define (u8-233 $a $b $c)
         (fxior (fxsll $a 6) (fxsll $b 3) $c))
-
-      (define-aux-keyword op)
 
       (define-rule-syntax (build-ops $op-id $bodys ...)
         (let ()
