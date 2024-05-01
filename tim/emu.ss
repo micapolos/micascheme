@@ -3,6 +3,27 @@
 (parameterize ((optimize-level 3))
   (displayln
     (run
+      (define-rule-syntax (u8+ $a $b)
+        (fxand (fx+/wraparound $a $b) #xff))
+
+      (define-rule-syntax (u16+ $a $b)
+        (fxand (fx+/wraparound $a $b) #xffff))
+
+      (define-rule-syntax (u8-233 $a $b $c)
+        (fxior (fxsll $a 6) (fxsll $b 3) $c))
+
+      (define-rule-syntax (u16-h $u16) (fxsrl $u16 8))
+      (define-rule-syntax (u16-l $u16) (fxand #xff))
+
+      (define-rule-syntax (u16-88 $h $l)
+        (fxior (fxsll $h 8) $l))
+
+      (define $mem (make-bytevector #x10000))
+
+      (define-rules-syntax ()
+        ((mem $addr) (bytevector-u8-ref $mem $addr))
+        ((mem $addr $u8) (bytevector-u8-set! $mem $addr $u8)))
+
       (define $pc 0)
       (define $sp 0)
 
@@ -19,10 +40,6 @@
 
       (define $i 0)
       (define $r 0)
-
-      (define $mem (make-bytevector #x10000))
-
-      (define-rule-syntax (native-endianness) 'big)
 
       (define-rule-syntax (define-r8 $id $var)
         (define-rules-syntax ()
@@ -46,23 +63,18 @@
 
       (define-rule-syntax (define-r16 $id $h $l)
         (define-rules-syntax ()
-          (($id) (fxior (fxsll ($h) 8) ($l)))
+          (($id)
+            (u16-88 ($h) ($l)))
           (($id $u16)
             (lets
               ($val $u16)
-              ($h (fxsrl $val 8))
-              ($l (fxand $val #xff))))))
+              ($h (u16-h $val))
+              ($l (u16-l $val))))))
 
       (define-r16 bc b c)
       (define-r16 de d e)
       (define-r16 hl h l)
       (define-r16 af a f)
-
-      (define-rule-syntax (u8+ $a $b)
-        (fxand (fx+/wraparound $a $b) #xff))
-
-      (define-rule-syntax (u16+ $a $b)
-        (fxand (fx+/wraparound $a $b) #xffff))
 
       (define-rules-syntax ()
         ((r 0) (b))
@@ -86,10 +98,6 @@
         ((dd) (set! $hl-offset 1))
         ((fd) (set! $hl-offset 2)))
 
-      (define-rules-syntax ()
-        ((mem $addr) (bytevector-u8-ref $mem $addr))
-        ((mem $addr $u8) (bytevector-u8-set! $mem $addr $u8)))
-
       (define-rule-syntax (fetch-8)
         (run
           (define $u8 (mem $pc))
@@ -100,12 +108,7 @@
         (lets
           ($l (fetch-8))
           ($h (fetch-8))
-          (fxior (fxsrl $h 8) $l)))
-
-      (define-rule-syntax (for-each-r $r $body ...)
-        (repeat-indexed 8 $r
-          (if (not (fx= $r #b110))
-            (run $body ...))))
+          (u16-88 $h $l)))
 
       (define-syntax (with-r $syntax)
         (syntax-case $syntax ()
@@ -122,9 +125,6 @@
                     (let
                       (($idx #,$index))
                       $body ...))))))))
-
-      (define (u8-233 $a $b $c)
-        (fxior (fxsll $a 6) (fxsll $b 3) $c))
 
       (define-rule-syntax (build-ops $op-id $bodys ...)
         (run
@@ -190,6 +190,6 @@
       (time
         (do
           (($i 35000000 (fx-/wraparound $i 1)))
-          ((fx= $i 0) (a))
+          ((fxzero? $i) (a))
           (set! $hl-offset 0)
           (app (vector-ref $ops (fetch-8))))))))
