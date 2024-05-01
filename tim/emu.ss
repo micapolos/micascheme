@@ -3,20 +3,27 @@
 (parameterize ((optimize-level 3))
   (displayln
     (run
-      (define-rule-syntax (u8+ $a $b)
-        (fxand (fx+/wraparound $a $b) #xff))
+      (define-rule-syntax (fx->u8 $fx) (fxand $fx #xff))
+      (define-rule-syntax (fx->u16 $fx) (fxand $fx #xffff))
 
-      (define-rule-syntax (u16+ $a $b)
-        (fxand (fx+/wraparound $a $b) #xffff))
+      (define-rule-syntax (u8+ $a $b) (fx->u8 (fx+/wraparound $a $b)))
+      (define-rule-syntax (u8- $a $b) (fx->u8 (fx-/wraparound $a $b)))
 
-      (define-rule-syntax (u8-233 $a $b $c)
-        (fxior (fxsll $a 6) (fxsll $b 3) $c))
+      (define-rule-syntax (u8+1 $x) (u8+ $x 1))
+      (define-rule-syntax (u8-1 $x) (u8- $x 1))
+
+      (define-rule-syntax (u16+ $a $b) (fx->u16 (fx+/wraparound $a $b)))
+      (define-rule-syntax (u16- $a $b) (fx->u16 (fx-/wraparound $a $b)))
+
+      (define-rule-syntax (u16+1 $x) (u16+ $x 1))
+      (define-rule-syntax (u16-1 $x) (u16- $x 1))
+
+      (define-rule-syntax (u8-233 $a $b $c) (fxior (fxsll $a 6) (fxsll $b 3) $c))
 
       (define-rule-syntax (u16-h $u16) (fxsrl $u16 8))
       (define-rule-syntax (u16-l $u16) (fxand #xff))
 
-      (define-rule-syntax (u16-88 $h $l)
-        (fxior (fxsll $h 8) $l))
+      (define-rule-syntax (u16-88 $h $l) (fxior (fxsll $h 8) $l))
 
       (define $mem (make-bytevector #x10000))
 
@@ -101,7 +108,7 @@
       (define-rule-syntax (fetch-8)
         (run
           (define $u8 (mem $pc))
-          (set! $pc (u16+ $pc 1))
+          (set! $pc (u16+1 $pc))
           $u8))
 
       (define-rule-syntax (fetch-16)
