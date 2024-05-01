@@ -1,13 +1,9 @@
-(import (syntax) (system) (syntaxes) (lets) (procedure) (list) (emu u))
+(import (syntax) (system) (syntaxes) (lets) (procedure) (list) (emu u) (emu mem))
 
 (parameterize ((optimize-level 3))
   (displayln
     (run
-      (define $mem (make-bytevector #x10000))
-
-      (define-rules-syntax ()
-        ((mem $addr) (bytevector-u8-ref $mem $addr))
-        ((mem $addr $u8) (bytevector-u8-set! $mem $addr $u8)))
+      (define-mem mem #x10000)
 
       (define $pc 0)
       (define $sp 0)
@@ -169,7 +165,7 @@
       (do
         (($i 0 (add1 $i)))
         ((= $i #x10000) (void))
-        (bytevector-u8-set! $mem $i (random #x100)))
+        (mem $i (random #x100)))
 
       ; Run and measure.
       (time
