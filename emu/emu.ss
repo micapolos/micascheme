@@ -42,22 +42,6 @@
         ((r 6 $u8) (mem (hl) $u8))
         ((r 7 $u8) (a $u8)))
 
-      (define-rules-syntaxes ()
-        ((dd) (hl-offset 1))
-        ((fd) (hl-offset 2)))
-
-      (define-rule-syntax (fetch-8)
-        (run
-          (define $u8 (mem (pc)))
-          (pc (u16+1 (pc)))
-          $u8))
-
-      (define-rule-syntax (fetch-16)
-        (lets
-          ($l (fetch-8))
-          ($h (fetch-8))
-          (u16-88 $h $l)))
-
       (define-syntax (with-r $syntax)
         (syntax-case $syntax ()
           ((_ $id $idx $body ...)
@@ -73,6 +57,22 @@
                     (let
                       (($idx #,$index))
                       $body ...))))))))
+
+      (define-rules-syntaxes ()
+        ((dd) (hl-offset 1))
+        ((fd) (hl-offset 2)))
+
+      (define-rule-syntax (fetch-8)
+        (run
+          (define $u8 (mem (pc)))
+          (pc (u16+1 (pc)))
+          $u8))
+
+      (define-rule-syntax (fetch-16)
+        (lets
+          ($l (fetch-8))
+          ($h (fetch-8))
+          (u16-88 $h $l)))
 
       (define-rule-syntax (build-ops $op-id $bodys ...)
         (run
