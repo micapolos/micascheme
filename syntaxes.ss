@@ -13,8 +13,9 @@
   (define-aux-keyword literals)
 
   (define-syntax (define-rules-syntaxes $syntax)
-    (syntax-case $syntax (literals ellipsis)
-      ((_ (ellipsis $ellipsis) (literals $literal ...) $rule ...)
+    (syntax-case $syntax (literals)
+      ((_ $ellipsis (literals $literal ...) $rule ...)
+        (identifier? #'$ellipsis)
         #`(begin
           #,@(map
             (lambda ($rules-group)
@@ -28,15 +29,17 @@
               free-identifier=?
               (syntax->list #'($rule ...))))))
       ((_ (literals $literal ...) $rule ...)
-        #`(define-rules-syntaxes (ellipsis #,ellipsis) (literals $literal ...) $rule ...))
-      ((_ (ellipsis $ellipsis) $rule ...)
-        #`(define-rules-syntaxes (ellipsis $ellipsis) (literals) $rule ...))
+        #`(define-rules-syntaxes #,ellipsis (literals $literal ...) $rule ...))
+      ((_ $ellipsis $rule ...)
+        (identifier? #'$ellipsis)
+        #`(define-rules-syntaxes $ellipsis (literals) $rule ...))
       ((_ $rule ...)
         #`(define-rules-syntaxes (literals) $rule ...))))
 
   (define-syntax (define-rules-syntax $syntax)
-    (syntax-case $syntax (ellipsis literals)
-      ((_ (ellipsis $ellipsis) (literals $literal ...) $rule ...)
+    (syntax-case $syntax (literals)
+      ((_ $ellipsis (literals $literal ...) $rule ...)
+        (identifier? #'$ellipsis)
         (lets
           ((pair $name $rules)
             (or
@@ -50,9 +53,10 @@
             (with-ellipsis $ellipsis
               (syntax-rules ($literal ...) #,@$rules)))))
       ((_ (literals $literal ...) $rule ...)
-        #`(define-rules-syntax (ellipsis #,ellipsis) (literals $literal ...) $rule ...))
-      ((_ (ellipsis $ellipsis) $rule ...)
-        #`(define-rules-syntax (ellipsis $ellipsis) (literals) $rule ...))
+        #`(define-rules-syntax #,ellipsis (literals $literal ...) $rule ...))
+      ((_ $ellipsis $rule ...)
+        (identifier? #'$ellipsis)
+        #`(define-rules-syntax $ellipsis (literals) $rule ...))
       ((_ $rule ...)
         #`(define-rules-syntax (literals) $rule ...))))
 )

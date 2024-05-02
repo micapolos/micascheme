@@ -39,9 +39,9 @@
   (with-ellipsis ___
     (define-syntax foo
       (syntax-rules ()
-        ((_ $id ___) (list $id ___))))
+        ((_ $id ___ $last) (list $id ___ $last))))
     (define-syntax bar
       (syntax-rules ()
-        ((_ $id ___) (list $id ___)))))
-  (check (equal? (foo 1 2 3) (list 1 2 3)))
-  (check (equal? (bar 1 2 3) (list 1 2 3))))
+        ((_ $id ___ $last) (list $id ___ $last)))))
+  (check (equal? (foo 1 2 3 4 5) (list 1 2 3 4 5)))
+  (check (equal? (bar 1 2 3 4 5) (list 1 2 3 4 5))))
