@@ -1,38 +1,23 @@
-(import (syntax) (system) (syntaxes) (lets) (procedure) (list) (emu u) (emu mem))
+(import (syntax) (system) (syntaxes) (lets) (procedure) (list) (emu u) (emu reg) (emu mem))
 
 (parameterize ((optimize-level 3))
   (displayln
     (run
       (define-mem mem #x10000)
 
-      (define $pc 0)
-      (define $sp 0)
-
-      (define $a 0)
-      (define $f 0)
-      (define $b 0)
-      (define $c 0)
-      (define $d 0)
-      (define $e 0)
+      (define-r16 pc)
+      (define-r16 sp)
 
       (define $h (make-bytevector 3 0))
       (define $l (make-bytevector 3 0))
       (define $hl-offset 0)
 
-      (define $i 0)
-      (define $r 0)
-
-      (define-rule-syntax (define-r8 $id $var)
-        (define-rules-syntax ()
-          (($id) $var)
-          (($id $u8) (set! $var $u8))))
-
-      (define-r8 b $b)
-      (define-r8 c $c)
-      (define-r8 d $d)
-      (define-r8 e $e)
-      (define-r8 a $a)
-      (define-r8 f $f)
+      (define-r8 b)
+      (define-r8 c)
+      (define-r8 d)
+      (define-r8 e)
+      (define-r8 a)
+      (define-r8 f)
 
       (define-rule-syntax (define-indexed-r8 $id $var)
         (define-rules-syntax ()
@@ -41,16 +26,6 @@
 
       (define-indexed-r8 h $h)
       (define-indexed-r8 l $l)
-
-      (define-rule-syntax (define-r16 $id $h $l)
-        (define-rules-syntax ()
-          (($id)
-            (u16-88 ($h) ($l)))
-          (($id $u16)
-            (lets
-              ($val $u16)
-              ($h (u16-h $val))
-              ($l (u16-l $val))))))
 
       (define-r16 bc b c)
       (define-r16 de d e)
@@ -81,8 +56,8 @@
 
       (define-rule-syntax (fetch-8)
         (run
-          (define $u8 (mem $pc))
-          (set! $pc (u16+1 $pc))
+          (define $u8 (mem (pc)))
+          (pc (u16+1 (pc)))
           $u8))
 
       (define-rule-syntax (fetch-16)
