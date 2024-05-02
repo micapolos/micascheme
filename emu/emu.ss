@@ -1,13 +1,5 @@
 (import
   (scheme)
-  (syntax)
-  (system)
-  (syntaxes)
-  (lets)
-  (procedure)
-  (list)
-  (emu u)
-  (emu reg)
   (emu mem)
   (emu z80))
 
