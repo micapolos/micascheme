@@ -1,4 +1,4 @@
-(library (emu u)
+(library (emu math)
   (export
     fx->u8 fx->u16
     u8+ u8- u8+1 u8-1

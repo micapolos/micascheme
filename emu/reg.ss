@@ -10,7 +10,7 @@
     (lets)
     (syntax)
     (syntaxes)
-    (emu u)
+    (emu math)
     (emu mem))
 
   (define-rules-syntaxes

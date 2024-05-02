@@ -7,7 +7,7 @@
     (lets)
     (procedure)
     (list)
-    (emu u)
+    (emu math)
     (emu reg)
     (emu mem))
 
