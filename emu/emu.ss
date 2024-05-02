@@ -1,4 +1,14 @@
-(import (syntax) (system) (syntaxes) (lets) (procedure) (list) (emu u) (emu reg) (emu mem))
+(import
+  (scheme)
+  (syntax)
+  (system)
+  (syntaxes)
+  (lets)
+  (procedure)
+  (list)
+  (emu u)
+  (emu reg)
+  (emu mem))
 
 (parameterize ((optimize-level 3))
   (displayln
