@@ -34,3 +34,14 @@
   (equal?
     (syntax-inline #`(string-append "foo" "bar"))
     "foobar"))
+
+(run-void
+  (with-ellipsis ___
+    (define-syntax foo
+      (syntax-rules ()
+        ((_ $id ___) (list $id ___))))
+    (define-syntax bar
+      (syntax-rules ()
+        ((_ $id ___) (list $id ___)))))
+  (check (equal? (foo 1 2 3) (list 1 2 3)))
+  (check (equal? (bar 1 2 3) (list 1 2 3))))

@@ -14,7 +14,8 @@
     syntax-rule-id
     syntax-case-opt
     syntax-inline
-    ellipsis)
+    ellipsis
+    with-ellipsis)
   (import (scheme))
 
   (define (identifiers? $syntax)
@@ -129,4 +130,21 @@
           inlined))))
 
   (define ellipsis (datum->syntax #'ellipsis '...))
+
+  (define-syntax (with-ellipsis $syntax)
+    (syntax-case $syntax ()
+      ((_ $ellipsis-id $body ...)
+        (identifier? #'$ellipsis-id)
+        (let ()
+          (define ellipsis (datum->syntax #'ellipsis '...))
+          (define (replace $stx)
+            (syntax-case $stx ()
+              ($id (identifier? #'$id)
+                (if (free-identifier=? #'$id #'$ellipsis-id) ellipsis #'$id))
+              (($x ...)
+                #`(
+                  #,@(map replace (syntax->list #'($x ...)))))
+              ($other #'$other)))
+          #`(begin
+            #,@(map replace #'($body ...)))))))
 )
