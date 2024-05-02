@@ -5,32 +5,24 @@
     (run
       (define-mem mem #x10000)
 
-      (define-r16 pc)
-      (define-r16 sp)
+      (define-reg-16 pc)
+      (define-reg-16 sp)
 
-      (define $h (make-bytevector 3 0))
-      (define $l (make-bytevector 3 0))
-      (define $hl-offset 0)
+      (define-idx hl-offset 3)
+      (define-mux-8 h hl-offset)
+      (define-mux-8 l hl-offset)
 
-      (define-r8 b)
-      (define-r8 c)
-      (define-r8 d)
-      (define-r8 e)
-      (define-r8 a)
-      (define-r8 f)
+      (define-reg-8 b)
+      (define-reg-8 c)
+      (define-reg-8 d)
+      (define-reg-8 e)
+      (define-reg-8 a)
+      (define-reg-8 f)
 
-      (define-rule-syntax (define-indexed-r8 $id $var)
-        (define-rules-syntax ()
-          (($id) (bytevector-u8-ref $var $hl-offset))
-          (($id $u8) (bytevector-u8-set! $var $hl-offset $u8))))
-
-      (define-indexed-r8 h $h)
-      (define-indexed-r8 l $l)
-
-      (define-r16 bc b c)
-      (define-r16 de d e)
-      (define-r16 hl h l)
-      (define-r16 af a f)
+      (define-reg-16 bc b c)
+      (define-reg-16 de d e)
+      (define-reg-16 hl h l)
+      (define-reg-16 af a f)
 
       (define-rules-syntax ()
         ((r 0) (b))
@@ -51,8 +43,8 @@
         ((r 7 $u8) (a $u8)))
 
       (define-rules-syntaxes ()
-        ((dd) (set! $hl-offset 1))
-        ((fd) (set! $hl-offset 2)))
+        ((dd) (hl-offset 1))
+        ((fd) (hl-offset 2)))
 
       (define-rule-syntax (fetch-8)
         (run
@@ -147,5 +139,5 @@
         (do
           (($i 35000000 (fx-/wraparound $i 1)))
           ((fxzero? $i) (a))
-          (set! $hl-offset 0)
+          (hl-offset 0)
           (app (vector-ref $ops (fetch-8))))))))

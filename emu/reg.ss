@@ -1,35 +1,53 @@
 (library (emu reg)
   (export
-    define-reg
-    define-r8
-    define-r16)
+    define-idx
+    idx-size
+    define-reg-8
+    define-reg-16
+    define-mux-8)
   (import
     (scheme)
+    (lets)
     (syntax)
     (syntaxes)
-    (emu u))
+    (emu u)
+    (emu mem))
 
-  (define-rule-syntax (define-reg $reg)
+  (define-rule-syntax (define-idx $idx $size)
     (begin
       (define $var 0)
       (define-rules-syntax ()
-        (($reg) $var)
-        (($reg $expr) (set! $var $expr)))))
+        (($idx) $var)
+        (($idx $expr) (set! $var $expr)))
+      (define-property $idx idx-size $size)))
 
-  (define-rule-syntax (define-r8 $r8)
-    (define-reg $r8))
+  (define-lookup-syntax (idx-size $syntax $lookup)
+    (syntax-case $syntax ()
+      (($id $idx)
+        (lets
+          ($size ($lookup #'$idx #'idx-size))
+          (run (unless $size (syntax-error #'$idx "not idx:")))
+          (datum->syntax #'$id $size)))))
+
+  (define-rule-syntax (define-reg-8 $r8)
+    (define-idx $r8 #x100))
 
   (define-rules-syntax ()
-    ((define-r16 $r16)
-      (define-reg $r16))
-    ((define-r16 $r16 $r8-h $r8-l)
+    ((define-reg-16 $reg-16)
+      (define-idx $reg-16 #x10000))
+    ((define-reg-16 $reg-16 $reg-8h $reg-8l)
       (begin
-        (define-r8 $r8h)
-        (define-r8 $r8l)
         (define-rules-syntax ()
-          (($r16) (u16-88 ($r8-h) ($r8-l)))
-          (($r16 $u16)
+          (($reg-16) (u16-88 ($reg-8h) ($reg-8l)))
+          (($reg-16 $u16)
             (let (($u16-id $u16))
-              ($r8-h (u16-h $u16-id))
-              ($r8-l (u16-l $u16-id))))))))
+              ($reg-8h (u16-h $u16-id))
+              ($reg-8l (u16-l $u16-id))))))))
+
+  (define-rule-syntax (define-mux-8 $mux-8 $idx)
+    (begin
+      (define-mem mem (idx-size $idx))
+      (define-rules-syntax ()
+        (($mux-8) (mem ($idx)))
+        (($mux-8 $expr) (mem ($idx) $expr)))))
 )
