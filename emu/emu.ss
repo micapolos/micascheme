@@ -34,7 +34,7 @@
       (define-reg-16 hl h l)
       (define-reg-16 af a f)
 
-      (define-rules-syntax ()
+      (define-rules-syntax
         ((r 0) (b))
         ((r 1) (c))
         ((r 2) (d))
@@ -68,7 +68,7 @@
                       (($idx #,$index))
                       $body ...))))))))
 
-      (define-rules-syntaxes ()
+      (define-rules-syntaxes
         ((dd) (hl-offset 1))
         ((fd) (hl-offset 2)))
 

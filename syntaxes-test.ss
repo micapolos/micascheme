@@ -1,7 +1,7 @@
 (import (scheme) (check) (syntaxes) (procedure))
 
 (run-void
-  (define-rules-syntax (+)
+  (define-rules-syntax (literals +)
     ((foo $a) (string-append "foo" $a))
     ((foo $a $b) (string-append $a $b))
     ((foo $a + $b) (string-append $a "+" $b))
@@ -14,7 +14,7 @@
 )
 
 (run-void
-  (define-rules-syntaxes (+)
+  (define-rules-syntaxes (literals +)
     ((foo $a) (string-append "foo" $a))
     ((foo $a $b) (string-append $a $b))
     ((foo $a + $b) (string-append $a "+" $b))

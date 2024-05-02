@@ -18,7 +18,7 @@
   (define mem (make-bytevector size))
   (define sp-box (box size))
 
-  (define-rules-syntax ()
+  (define-rules-syntax
     ((sp) (unbox sp-box))
     ((sp $sp) (set-box! sp-box $sp)))
 
@@ -28,16 +28,16 @@
   (define-rule-syntax (offset $offset)
     (sp (fx+/wraparound (sp) $offset)))
 
-  (define-rules-syntaxes ()
+  (define-rules-syntaxes
     ((grow) (grow 1))
     ((grow-16) (grow 2))
     ((grow $offset) (offset (fx-/wraparound 0 $offset))))
 
-  (define-rules-syntaxes ()
+  (define-rules-syntaxes
     ((top) (bytevector-u8-ref mem (sp)))
     ((top $u8) (bytevector-u8-set! mem (sp) $u8)))
 
-  (define-rules-syntaxes ()
+  (define-rules-syntaxes
     ((top-16)
       (lets
         ($sp (sp))
@@ -74,12 +74,12 @@
       (run (offset 2))
       $u16))
 
-  (define-rules-syntaxes ()
+  (define-rules-syntaxes
     ((drop) (drop 1))
     ((drop-16) (drop 2))
     ((drop $offset) (offset $offset)))
 
-  (define-rules-syntax ()
+  (define-rules-syntax
     ((out)
       (displayln (pop)))
     ((out $label)
@@ -88,7 +88,7 @@
         (display ": ")
         (out))))
 
-  (define-rules-syntax ()
+  (define-rules-syntax
     ((out-16)
       (displayln (pop-16)))
     ((out-16 $label)
@@ -97,7 +97,7 @@
         (display ": ")
         (out-16))))
 
-  (define-rules-syntax ()
+  (define-rules-syntax
     ((dup) (dup 0))
     ((dup $offset)
       (lets

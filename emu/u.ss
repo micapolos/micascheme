@@ -7,7 +7,7 @@
     u16-h u16-l)
   (import (scheme) (syntaxes))
 
-  (define-rules-syntaxes ()
+  (define-rules-syntaxes
     ((fx->u8 $fx) (fxand $fx #xff))
     ((fx->u16 $fx) (fxand $fx #xffff))
     ((u8+ $a $b) (fx->u8 (fx+/wraparound $a $b)))
