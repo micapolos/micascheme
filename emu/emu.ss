@@ -1,7 +1,8 @@
 (import
   (scheme)
   (emu mem)
-  (emu z80))
+  (emu z80)
+  (emu run))
 
 (define-mem mem #x10000)
 (define-z80 mem z80-step z80-dump)
@@ -11,10 +12,6 @@
   ((= $i #x10000) (void))
   (mem $i (random #x100)))
 
-(time
-  (do
-    (($i 35000000 (fx-/wraparound $i 1)))
-    ((fxzero? $i) (void))
-    (z80-step)))
+(time (run z80-step 35000000))
 
 (z80-dump)
