@@ -12,9 +12,9 @@
     (emu mem))
 
   (define-rules-syntax
-    ((define-z80 mem step)
-      (define-z80 mem step dump))
-    ((define-z80 mem step dump)
+    ((define-z80 mem io step)
+      (define-z80 mem io step dump))
+    ((define-z80 mem io step dump)
       (begin
         (define-reg-16 pc)
         (define-reg-16 sp)
@@ -136,7 +136,21 @@
             (op #b00010010 (mem (de) (a)))
 
             ; (ld (nn) a)
-            (op #b00110010 (mem (fetch-16) (a)))))
+            (op #b00110010 (mem (fetch-16) (a)))
+
+            ; (out (n) a)
+            (op #b11010001
+              (lets
+                ($h (fetch-8))
+                ($a (a))
+                (io (u16-88 $h $a) $a)))
+
+            ; (in a (n))
+            (op #b11011011
+              (lets
+                ($h (fetch-8))
+                (a (io (u16-88 $h (a))))))
+        ))
 
         (define-rule-syntax (step)
           (begin

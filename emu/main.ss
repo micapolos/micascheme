@@ -2,10 +2,15 @@
   (scheme)
   (emu mem)
   (emu z80)
-  (emu run))
+  (emu run)
+  (emu math)
+  (emu io)
+  (syntaxes)
+  (system))
 
 (define-mem mem #x10000)
-(define-z80 mem z80-step z80-dump)
+
+(define-z80 mem null-io z80-step z80-dump)
 
 (do
   (($i 0 (add1 $i)))
