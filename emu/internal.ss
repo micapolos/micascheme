@@ -2,10 +2,6 @@
   (export define-internal)
   (import (scheme) (syntax) (lets) (identifier))
 
-  ; (in (define-internal mem-bytevector))
-  ; (out
-  ;   (define-mem-bytevector mem (make-bytevector #x10000 0))
-  ;   (mem-bytevector mem))
   (define-syntax (define-internal stx)
     (syntax-case stx ()
       ((_ id)
