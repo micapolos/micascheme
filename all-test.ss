@@ -23,6 +23,7 @@
   (leo2)
   (lets)
   (list)
+  (list-syntax)
   (micascheme)
   (mico-c)
   (monad)
