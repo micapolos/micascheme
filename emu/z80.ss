@@ -9,7 +9,8 @@
     (list)
     (emu math)
     (emu reg)
-    (emu mem))
+    (emu mem)
+    (emu dispatch))
 
   (define-rules-syntax
     ((define-z80 mem io step)
@@ -84,81 +85,68 @@
             ($h (fetch-8))
             (run (u16-88 $h $l))))
 
-        (define-rules-syntax
-          ((build-ops $op-id $body (... ...))
-            (run
-              (define $vec (make-vector 256 (lambda () (void))))
+        (define-dispatch dispatch op
+          (op #xdd (dd))
+          (op #xfd (fd))
 
-              (define-rule-syntax ($op-id $idx $expr)
-                (vector-set! $vec $idx (lambda () $expr)))
-
-              $body (... ...)
-
-              (vector->immutable-vector $vec))))
-
-        (define $ops
-          (build-ops op
-            (op #xdd (dd))
-            (op #xfd (fd))
-
-            ; (ld r r)
-            (with-r l $l
-              (with-r r $r
-                (op
-                  (u8-233 #b01 $l $r)
-                  (l (r)))))
-
-            ; (ld r n)
+          ; (ld r r)
+          (with-r l $l
             (with-r r $r
               (op
-                (u8-233 #b00 $r #b110)
-                (r (fetch-8))))
+                (u8-233 #b01 $l $r)
+                (l (r)))))
 
-            ; halt
-            (op #b01110110 (pc (u16-1 (pc))))
+          ; (ld r n)
+          (with-r r $r
+            (op
+              (u8-233 #b00 $r #b110)
+              (r (fetch-8))))
 
-            ; (ld (hl) n)
-            (op #b00110110 (mem (hl) (fetch-8)))
+          ; halt
+          (op #b01110110 (pc (u16-1 (pc))))
 
-            ; (ld a (bc))
-            (op #b00001010 (a (mem (bc))))
+          ; (ld (hl) n)
+          (op #b00110110 (mem (hl) (fetch-8)))
 
-            ; (ld a (de))
-            (op #b00011010 (a (mem (de))))
+          ; (ld a (bc))
+          (op #b00001010 (a (mem (bc))))
 
-            ; (ld a (nn))
-            (op #b00111010 (a (mem (fetch-16))))
+          ; (ld a (de))
+          (op #b00011010 (a (mem (de))))
 
-            ; (ld (bc) a)
-            (op #b00000010 (mem (bc) (a)))
+          ; (ld a (nn))
+          (op #b00111010 (a (mem (fetch-16))))
 
-            ; (ld (de) a)
-            (op #b00010010 (mem (de) (a)))
+          ; (ld (bc) a)
+          (op #b00000010 (mem (bc) (a)))
 
-            ; (ld (nn) a)
-            (op #b00110010 (mem (fetch-16) (a)))
+          ; (ld (de) a)
+          (op #b00010010 (mem (de) (a)))
 
-            ; (out (n) a)
-            (op #b11010011
-              (lets
-                ($h (fetch-8))
-                ($a (a))
-                (io (u16-88 $h $a) $a)))
+          ; (ld (nn) a)
+          (op #b00110010 (mem (fetch-16) (a)))
 
-            ; (in a (n))
-            (op #b11011011
-              (lets
-                ($h (fetch-8))
-                (a (io (u16-88 $h (a))))))
+          ; (out (n) a)
+          (op #b11010011
+            (lets
+              ($h (fetch-8))
+              ($a (a))
+              (io (u16-88 $h $a) $a)))
 
-            ; (jp nm)
-            (op #b11000011 (pc (fetch-16)))
-        ))
+          ; (in a (n))
+          (op #b11011011
+            (lets
+              ($h (fetch-8))
+              (a (io (u16-88 $h (a))))))
+
+          ; (jp nm)
+          (op #b11000011 (pc (fetch-16)))
+        )
 
         (define-rule-syntax (step)
           (begin
             (hl-offset 0)
-            (app (vector-ref $ops (fetch-8)))))
+            (dispatch (fetch-8))))
 
         (define (dump)
           (pretty-print
