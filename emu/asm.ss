@@ -20,5 +20,5 @@
     ((ld a (nm)) (begin (db #b00111010) (dw nm)))
     ((ld a n) (begin (db #b00111110) (db n)))
     ((out (n) a) (begin (db #b11010011) (db n)))
-    ((jp nm) (begin (db #x11000011) (dw nm))))
+    ((jp nm) (begin (db #b11000011) (dw nm))))
 )

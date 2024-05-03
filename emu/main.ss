@@ -24,7 +24,7 @@
 (jp 0)
 
 ; Define Z80
-(define-z80 mem char-io z80-step z80-dump)
+(define-z80 mem null-io z80-step z80-dump)
 
 ; Run Z80 and measure time
 (time (run z80-step 35000000))
