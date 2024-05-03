@@ -23,7 +23,7 @@
 (out (#x34) a)
 (halt)
 
-; Define Z80
+; Define Z80 with char I/O.
 (define-z80 mem char-io z80-step z80-dump)
 
 ; Run Z80 and measure time
