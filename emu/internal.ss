@@ -4,7 +4,7 @@
 
   ; (in (define-internal mem-bytevector))
   ; (out
-  ;   (define-mem-bytevector mem bytevector)
+  ;   (define-mem-bytevector mem (make-bytevector #x10000 0))
   ;   (mem-bytevector mem))
   (define-syntax (define-internal stx)
     (syntax-case stx ()
