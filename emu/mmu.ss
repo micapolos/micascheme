@@ -3,9 +3,7 @@
   (import (scheme) (syntax) (syntaxes) (lets) (emu unit))
 
   (define-unit (mmu-8 bank-bits slot-bits)
-    (bank-bits bank-bits)
     (bank-mask (fx1- (fxsll 1 bank-bits)))
-    (slot-bits slot-bits)
     (slots-bytevector (make-bytevector (fxsll 1 slot-bits) 0)))
 
   (define-rules-syntaxes

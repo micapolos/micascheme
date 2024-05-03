@@ -10,12 +10,13 @@
           ($id #'id)
           ($params (syntax->list #'(param ...)))
           ($fields (syntax->list #'(field ...)))
+          ($ids (append $params $fields))
           ($inits (syntax->list #'(init ...)))
           ($internal-ids
             (map
               (lambda ($field)
                 (identifier-append $tmp $id #'- $field))
-              $fields))
+              $ids))
           ($internal-defs
             (map
               (lambda ($internal-id)
@@ -33,7 +34,7 @@
               (lambda ($define-id $field-init)
                 #`(#,$define-id #,$id #,$field-init))
               $internal-define-ids
-              $inits))
+              (append $params $inits)))
           #`(begin
             #,@$internal-defs
             (define-rules-syntaxes
