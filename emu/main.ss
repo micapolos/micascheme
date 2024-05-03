@@ -3,8 +3,9 @@
 ; 64Kb memory
 (define-mem mem #x10000)
 
-; Assembly
+; Assemble into memory
 (asm mem)
+(org 0)
 (ld a #\H)
 (out (#x34) a)
 (ld a #\i)
