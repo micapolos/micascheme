@@ -139,7 +139,7 @@
             (op #b00110010 (mem (fetch-16) (a)))
 
             ; (out (n) a)
-            (op #b11010001
+            (op #b11010011
               (lets
                 ($h (fetch-8))
                 ($a (a))
@@ -150,6 +150,9 @@
               (lets
                 ($h (fetch-8))
                 (a (io (u16-88 $h (a))))))
+
+            ; (jp nm)
+            (op #b11000011 (pc (fetch-16)))
         ))
 
         (define-rule-syntax (step)

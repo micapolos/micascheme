@@ -21,7 +21,7 @@
     ((u16+1 $x) (u16+ $x 1))
     ((u16-1 $x) (u16- $x 1))
     ((u16-h $u16) (fxsrl $u16 8))
-    ((u16-l $u16) (fxand #xff))
+    ((u16-l $u16) (fxand $u16 #xff))
     ((u8-233 $a $b $c) (fxior (fxsll $a 6) (fxsll $b 3) $c))
     ((u16-88 $h $l) (fxior (fxsll $h 8) $l)))
 )

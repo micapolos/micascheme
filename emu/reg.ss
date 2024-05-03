@@ -16,10 +16,10 @@
   (define-rules-syntaxes
     ((define-idx $idx $size)
       (begin
-        (define $var 0)
+        (define $box (box 0))
         (define-rules-syntax
-          (($idx) $var)
-          (($idx $expr) (set! $var $expr)))
+          (($idx) (unbox $box))
+          (($idx $expr) (set-box! $box $expr)))
         (define-property $idx idx-size $size)))
 
     ((define-reg-8 $reg-8)
@@ -36,7 +36,7 @@
             ($reg-8h (u16-h $u16-id))
             ($reg-8l (u16-l $u16-id))))))
 
-    ((define-mux-8 $mux-8 $idx)
+    ((define-mux-8 $mux-8 $idx $arg ...)
       (begin
         (define-mem mem (idx-size $idx))
         (define-rules-syntax
