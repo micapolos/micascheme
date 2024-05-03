@@ -4,17 +4,18 @@
 
   (define-syntax (define-unit $syntax)
     (syntax-case $syntax ()
-      (($ (id param ...) (field-id field-init) ...)
+      (($ (id param ...) (field init) ...)
         (lets
           ($tmp #'$)
           ($id #'id)
-          ($field-ids (syntax->list #'(field-id ...)))
-          ($field-inits (syntax->list #'(field-init ...)))
+          ($params (syntax->list #'(param ...)))
+          ($fields (syntax->list #'(field ...)))
+          ($inits (syntax->list #'(init ...)))
           ($internal-ids
             (map
-              (lambda ($field-id)
-                (identifier-append $tmp $id #'- $field-id))
-              $field-ids))
+              (lambda ($field)
+                (identifier-append $tmp $id #'- $field))
+              $fields))
           ($internal-defs
             (map
               (lambda ($internal-id)
@@ -32,7 +33,7 @@
               (lambda ($define-id $field-init)
                 #`(#,$define-id #,$id #,$field-init))
               $internal-define-ids
-              $field-inits))
+              $inits))
           #`(begin
             #,@$internal-defs
             (define-rules-syntaxes
