@@ -3,5 +3,6 @@
 (check
   (equal?
     (syntax->datum
-      (replace-identifiers #'___ ellipsis #'($x ___ $y (___ ()))))
-    '($x ... $y (... ()))))
+      (replace-identifiers #'___ ellipsis
+        #'($x ___ $y (___ ()) . ($w ___ . ()))))
+    '($x ... $y (... ()) . ($w ... . ()))))
