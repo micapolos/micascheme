@@ -4,13 +4,11 @@
 
   (define-rule-syntax (dispatch-vector $op $body ...)
     (let ()
-      (define $vector (make-vector 256 (lambda () (void))))
-
+      (define $vector
+        (make-vector 256 (lambda () (void))))
       (define-rule-syntax ($op $idx $expr)
         (vector-set! $vector $idx (lambda () $expr)))
-
       $body ...
-
       (vector->immutable-vector $vector)))
 
   (define-rule-syntax (define-dispatch $id $op $body ...)
