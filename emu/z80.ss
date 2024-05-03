@@ -85,14 +85,14 @@
             (u16-88 $h $l)))
 
         (define-rules-syntax
-          ((build-ops $op-id $bodys ___)
+          ((build-ops $op-id $body ___)
             (run
               (define $vec (make-vector 256 (lambda () (void))))
 
-              (define-rule-syntax ($op-id $idx $body)
-                (vector-set! $vec $idx (lambda () $body)))
+              (define-rule-syntax ($op-id $idx $expr)
+                (vector-set! $vec $idx (lambda () $expr)))
 
-              $bodys ___
+              $body ___
 
               (vector->immutable-vector $vec))))
 
