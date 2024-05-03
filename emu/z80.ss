@@ -88,6 +88,8 @@
         (define-dispatch dispatch op
           (op #xdd (dd))
           (op #xfd (fd))
+          (op #xcb (dispatch-cb (fetch-8)))
+          (op #xed (dispatch-ed (fetch-8)))
 
           ; (ld r r)
           (with-r l $l
@@ -142,6 +144,9 @@
           ; (jp nm)
           (op #b11000011 (pc (fetch-16)))
         )
+
+        (define-dispatch dispatch-cb op)
+        (define-dispatch dispatch-ed op)
 
         (define-rule-syntax (step)
           (begin
