@@ -12,8 +12,10 @@
         (lets
           (define-id (identifier-append #'id #'define- #'id))
           #`(begin
-            (define-rule-syntax (#,define-id key value)
-              (define-property key id #'value))
+            (define-rule-syntax (#,define-id key expr)
+              (begin
+                (define $internal expr)
+                (define-property key id #'$internal)))
             (define-lookup-syntax (id stx lookup)
               (syntax-case stx ()
                 ((_ key)
