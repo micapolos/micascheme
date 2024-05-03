@@ -73,16 +73,16 @@
           ((fd) (hl-offset 2)))
 
         (define-rule-syntax (fetch-8)
-          (run
-            (define $u8 (mem (pc)))
-            (pc (u16+1 (pc)))
+          (lets
+            ($u8 (mem (pc)))
+            (run (pc (u16+1 (pc))))
             $u8))
 
         (define-rule-syntax (fetch-16)
           (lets
             ($l (fetch-8))
             ($h (fetch-8))
-            (u16-88 $h $l)))
+            (run (u16-88 $h $l))))
 
         (define-rules-syntax
           ((build-ops $op-id $body (... ...))
