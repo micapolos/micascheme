@@ -61,10 +61,9 @@
                   (lambda ($index)
                     #`(let-syntax
                       (($id
-                        (lambda ($syntax)
-                          (syntax-case $syntax ()
-                            ((_) #`(r #,#,$index))
-                            ((_ $expr) #`(r #,#,$index $expr))))))
+                        (syntax-rules ()
+                          ((_) (r #,$index))
+                          ((_ $expr) (r #,$index $expr)))))
                       (let
                         (($idx #,$index))
                         $body))))))))

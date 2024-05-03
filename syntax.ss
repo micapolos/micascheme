@@ -14,6 +14,7 @@
     syntax-rule-id
     syntax-case-opt
     syntax-inline
+    inline-indexed
     ellipsis
     with-ellipsis)
   (import (scheme))
@@ -147,4 +148,15 @@
               ($other #'$other)))
           #`(begin
             #,@(map replace #'($body ...)))))))
+
+  (define-syntax (inline-indexed $syntax)
+    (syntax-case $syntax ()
+      ((_ ($id $count) $body ...)
+        #`(begin
+          #,@(map
+            (lambda ($index)
+              #`(let-syntax
+                (($id (lambda ($syntax) #'#,$index)))
+                $body ...))
+            (iota (datum $count)))))))
 )

@@ -45,3 +45,8 @@
         ((_ $id ___ $last) (list $id ___ $last)))))
   (check (equal? (foo 1 2 3 4 5) (list 1 2 3 4 5)))
   (check (equal? (bar 1 2 3 4 5) (list 1 2 3 4 5))))
+
+(check
+  (equal?
+    (expand `(inline-indexed ($i 4) (foobar $i)))
+    `(begin (foobar 0) (foobar 1) (foobar 2) (foobar 3))))
