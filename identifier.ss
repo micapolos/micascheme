@@ -1,10 +1,12 @@
 (library (identifier)
   (export
     identifier-named?
-    build-identifier)
+    build-identifier
+    identifier-append)
   (import
     (scheme)
-    (syntax))
+    (syntax)
+    (symbol))
 
   (define-rule-syntax (identifier-named? $syntax $name)
     (and
@@ -17,4 +19,8 @@
         (let
           (($var (symbol->string (syntax->datum $id))))
           $body))))
+
+  (define (identifier-append $tpl . $ids)
+    (datum->syntax $tpl
+      (apply symbol-append (map syntax->datum $ids))))
 )
