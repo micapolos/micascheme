@@ -4,7 +4,5 @@
 
   (define-rule-syntax (define-z80-rom (id size) body ...)
     (define-rom (id size write)
-      (asm write)
-      (org 0)
-      body ...))
+      (asm write body ...)))
 )

@@ -3,18 +3,17 @@
 ; 64Kb memory
 (define-mem z80-mem #x10000)
 
-; Assemble into memory
-(asm z80-mem)
-(org 0)
-(ld a #\H)
-(out (#x34) a)
-(ld a #\i)
-(out (#x34) a)
-(ld a #\!)
-(out (#x34) a)
-(ld a #\newline)
-(out (#x34) a)
-(halt)
+; Assemble
+(asm z80-mem
+  (ld a #\H)
+  (out (#x34) a)
+  (ld a #\i)
+  (out (#x34) a)
+  (ld a #\!)
+  (out (#x34) a)
+  (ld a #\newline)
+  (out (#x34) a)
+  (halt))
 
 ; Z80 with char I/O
 (define-z80 z80-mem char-io z80-step z80-dump)
