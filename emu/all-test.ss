@@ -1,6 +1,7 @@
 (import (test))
 
 (test
+  (emu unit)
   (emu rom)
   (emu mem)
   (emu mmu)

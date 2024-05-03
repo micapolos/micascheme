@@ -7,15 +7,14 @@
   (define-internal slot-bits)
   (define-internal slots-bytevector)
 
-  (define-rule-syntax (define-mmu-8 id bank-bits slot-bits)
-    (begin
-      (define-aux-keyword id)
-      (define-bank-bits id bank-bits)
-      (define-bank-mask id (fx1- (fxsll 1 bank-bits)))
-      (define-slot-bits id slot-bits)
-      (define-slots-bytevector id (make-bytevector (fxsll 1 slot-bits) 0))))
-
   (define-rules-syntaxes
+    ((define-mmu-8 id bank-bits slot-bits)
+      (begin
+        (define-aux-keyword id)
+        (define-bank-bits id bank-bits)
+        (define-bank-mask id (fx1- (fxsll 1 bank-bits)))
+        (define-slot-bits id slot-bits)
+        (define-slots-bytevector id (make-bytevector (fxsll 1 slot-bits) 0))))
     ((mmu-8-bank id slot)
       (bytevector-u8-ref (slots-bytevector id) slot))
     ((mmu-8-bank id slot bank)
