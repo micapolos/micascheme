@@ -14,34 +14,34 @@
     (emu mem))
 
   (define-rules-syntaxes
-    ((define-idx $idx $size)
+    ((define-idx $id $size)
       (begin
         (define $box (box 0))
         (define-rules-syntax
-          (($idx) (unbox $box))
-          (($idx $expr) (set-box! $box $expr)))
-        (define-property $idx idx-size $size)))
+          (($id) (unbox $box))
+          (($id $expr) (set-box! $box $expr)))
+        (define-property $id idx-size $size)))
 
-    ((define-reg-8 $reg-8)
-      (define-idx $reg-8 #x100))
+    ((define-reg-8 $id)
+      (define-idx $id #x100))
 
-    ((define-reg-16 $reg-16)
-      (define-idx $reg-16 #x10000))
+    ((define-reg-16 $id)
+      (define-idx $id #x10000))
 
-    ((define-reg-16 $reg-16 $reg-8h $reg-8l)
+    ((define-reg-16 $id $id-h $id-l)
       (define-rules-syntax
-        (($reg-16) (u16-88 ($reg-8h) ($reg-8l)))
-        (($reg-16 $u16)
-          (let (($u16-id $u16))
-            ($reg-8h (u16-h $u16-id))
-            ($reg-8l (u16-l $u16-id))))))
+        (($id) (u16-88 ($id-h) ($id-l)))
+        (($id $u16)
+          (let (($var $u16))
+            ($id-h (u16-h $var))
+            ($id-l (u16-l $var))))))
 
-    ((define-mux-8 $mux-8 $idx $arg ...)
+    ((define-mux-8 $id $idx $arg ...)
       (begin
         (define-mem mem (idx-size $idx))
         (define-rules-syntax
-          (($mux-8) (mem ($idx)))
-          (($mux-8 $expr) (mem ($idx) $expr))))))
+          (($id) (mem ($idx)))
+          (($id $expr) (mem ($idx) $expr))))))
 
   (define-lookup-syntax (idx-size $syntax $lookup)
     (syntax-case $syntax ()
