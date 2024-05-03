@@ -38,6 +38,7 @@
     (system)
     (test)
     (throw)
+    (transformer)
     (variable)
     (vector))
 
@@ -80,6 +81,7 @@
       (system)
       (test)
       (throw)
+      (transformer)
       (variable)
       (vector)))
 )

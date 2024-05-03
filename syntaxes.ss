@@ -1,16 +1,28 @@
 (library (syntaxes)
   (export
+    with-ellipsis
     define-rules-syntax
     define-rules-syntaxes
     literals)
   (import
     (scheme)
     (syntax)
+    (transformer)
+    (procedure)
     (list)
     (lets)
     (pair))
 
   (define-aux-keyword literals)
+
+  (define-syntax (with-ellipsis $syntax)
+    (syntax-case $syntax ()
+      ((_ $ellipsis $body ...)
+        (identifier? #'$ellipsis)
+        #`(begin
+          #,@(map
+            (partial replace-identifiers #'$ellipsis ellipsis)
+            (syntax->list #'($body ...)))))))
 
   (define-syntax (define-rules-syntaxes $syntax)
     (syntax-case $syntax (literals)
