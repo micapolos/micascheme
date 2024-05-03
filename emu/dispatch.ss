@@ -11,13 +11,13 @@
       (define-dispatch-vector $id
         (immutable-vector (lambda () $item) ...))))
 
-  (define-rule-syntax (define-dispatch-8 $id $op $body ...)
+  (define-rule-syntax (define-dispatch-8 ($id $set) $body ...)
     (begin
       (define $immutable-vector
         (run
           (define $vector
             (make-vector 256 (lambda () (void))))
-          (define-rule-syntax ($op $idx $expr)
+          (define-rule-syntax ($set $idx $expr)
             (vector-set! $vector $idx (lambda () $expr)))
           $body ...
           (vector->immutable-vector $vector)))
