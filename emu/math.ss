@@ -10,6 +10,20 @@
   (define-rules-syntaxes
     ((fx->u8 $fx) (fxand $fx #xff))
     ((fx->u16 $fx) (fxand $fx #xffff))
+
+    ((u8? $expr)
+      (lets ($var $expr)
+        (and
+          (fixnum? $var)
+          (fxzero? (fxand (fxnot #xff) $var)))))
+
+    ((u16? $expr)
+      (lets ($var $expr)
+        (and
+          (fixnum? $var)
+          (fxzero? (fxand (fxnot #xffff) $var)))))
+
+    ((u8 $expr) (u8? (datum $expr)) $expr)
     ((u8 $expr)
       (switch $expr
         ((fixnum? $int) (fx->u8 $int))
@@ -20,6 +34,8 @@
     ((u8- $a $b) (fx->u8 (fx-/wraparound $a $b)))
     ((u8+1 $x) (u8+ $x 1))
     ((u8-1 $x) (u8- $x 1))
+
+    ((u16 $expr) (u16? (datum $expr)) $expr)
     ((u16 $expr)
       (switch $expr
         ((fixnum? $int) (fx->u16 $int))
