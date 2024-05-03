@@ -1,15 +1,18 @@
 (library (emu dispatch)
   (export define-dispatch define-dispatch-8)
-  (import (scheme) (syntax) (procedure) (emu internal))
+  (import (scheme) (syntax) (syntaxes) (procedure) (emu internal))
 
   (define-internal dispatch-vector)
 
-  (define-rule-syntax (define-dispatch $id $item ...)
-    (begin
-      (define-rule-syntax ($id $index)
-        (app (vector-ref (dispatch-vector $id) $index)))
-      (define-dispatch-vector $id
-        (immutable-vector (lambda () $item) ...))))
+  (define-rules-syntaxes
+    ((define-dispatch $id $item ...)
+      (begin
+        (define-rule-syntax ($id $index)
+          (dispatch $id $index))
+        (define-dispatch-vector $id
+          (immutable-vector (lambda () $item) ...))))
+    ((dispatch $id $index)
+      (app (vector-ref (dispatch-vector $id) $index))))
 
   (define-rule-syntax (define-dispatch-8 ($id $set) $body ...)
     (begin
