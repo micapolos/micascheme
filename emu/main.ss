@@ -1,12 +1,4 @@
-(import
-  (scheme)
-  (emu mem)
-  (emu io)
-  (emu z80)
-  (emu run)
-  (emu asm)
-  (syntaxes)
-  (system))
+(import (scheme) (emu mem) (emu io) (emu z80) (emu run) (emu asm))
 
 ; 64Kb memory
 (define-mem mem #x10000)
