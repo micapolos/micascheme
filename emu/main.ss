@@ -11,7 +11,7 @@
 ; 64Kb memory
 (define-mem mem #x10000)
 
-; Assemble something into memory
+; Assembly
 (asm mem)
 (ld a #\H)
 (out (#x34) a)
@@ -23,11 +23,11 @@
 (out (#x34) a)
 (halt)
 
-; Define Z80 with char I/O.
+; Z80 with char I/O
 (define-z80 mem char-io z80-step z80-dump)
 
-; Run Z80 and measure time
+; Run and measure time
 (time (run z80-step 35000000))
 
-; Dump Z80 state
+; Dump
 (z80-dump)
