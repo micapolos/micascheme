@@ -22,5 +22,5 @@
 ; Run and measure time
 (time (run z80-step 35000000))
 
-; Dump
+; Dump registers
 (z80-dump)
