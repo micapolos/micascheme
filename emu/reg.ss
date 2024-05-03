@@ -11,7 +11,10 @@
     (syntax)
     (syntaxes)
     (emu math)
-    (emu mem))
+    (emu mem)
+    (emu internal))
+
+  (define-internal idx-size)
 
   (define-rules-syntaxes
     ((define-idx $id $size)
@@ -20,7 +23,7 @@
         (define-rules-syntax
           (($id) (unbox $box))
           (($id $expr) (set-box! $box $expr)))
-        (define-property $id idx-size $size)))
+        (define-idx-size $id $size)))
 
     ((define-reg-8 $id)
       (define-idx $id #x100))
@@ -42,12 +45,4 @@
         (define-rules-syntax
           (($id) (mem ($idx)))
           (($id $expr) (mem ($idx) $expr))))))
-
-  (define-lookup-syntax (idx-size $syntax $lookup)
-    (syntax-case $syntax ()
-      (($id $idx)
-        (lets
-          ($size ($lookup #'$idx #'idx-size))
-          (run (unless $size (syntax-error #'$idx "not idx:")))
-          (datum->syntax #'$id $size)))))
 )

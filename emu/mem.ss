@@ -11,7 +11,7 @@
           ((id addr) (mem-read id addr))
           ((id addr u8) (mem-write id addr u8)))
         (define $bytevector (make-bytevector size 0))
-        (mem-bytevector id $bytevector)))
+        (define-mem-bytevector id $bytevector)))
     ((mem-read id addr)
       (bytevector-u8-ref (mem-bytevector id) addr))
     ((mem-write id addr u8)
