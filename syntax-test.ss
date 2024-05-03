@@ -46,6 +46,18 @@
   (check (equal? (foo 1 2 3 4 5) (list 1 2 3 4 5)))
   (check (equal? (bar 1 2 3 4 5) (list 1 2 3 4 5))))
 
+(run-void
+  (define-syntax outer
+    (syntax-rules ()
+      ((_ $id)
+        (with-ellipsis ___
+          (define-syntax $id
+            (syntax-rules ()
+              (($id $x ___)
+                (list $x ___))))))))
+  (outer inner)
+  (check (equal? (inner 1 2 3) (list 1 2 3))))
+
 (check
   (equal?
     (expand `(inline-indexed ($i 4) (foobar $i)))

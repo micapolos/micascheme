@@ -53,20 +53,21 @@
           ((r 6 $u8) (mem (hl) $u8))
           ((r 7 $u8) (a $u8)))
 
-        (define-syntax (with-r $syntax)
-          (syntax-case $syntax ()
-            ((_ $id $idx $body)
-              #`(begin
-                #,@(build-list 8
-                  (lambda ($index)
-                    #`(let-syntax
-                      (($id
-                        (syntax-rules ()
-                          ((_) (r #,$index))
-                          ((_ $expr) (r #,$index $expr)))))
-                      (let
-                        (($idx #,$index))
-                        $body))))))))
+        (with-ellipsis ___
+          (define-syntax (with-r $syntax)
+            (syntax-case $syntax ()
+              ((_ $id $idx $body ___)
+                #`(begin
+                  #,@(build-list 8
+                    (lambda ($index)
+                      #`(let-syntax
+                        (($id
+                          (syntax-rules ()
+                            ((_) (r #,$index))
+                            ((_ $expr) (r #,$index $expr)))))
+                        (let
+                          (($idx #,$index))
+                          $body ___)))))))))
 
         (define-rules-syntaxes
           ((dd) (hl-offset 1))
@@ -84,59 +85,59 @@
             ($h (fetch-8))
             (u16-88 $h $l)))
 
-        (define-rule-syntax (build-ops $op-id $bodys)
-          (run
-            (define $vec (make-vector 256 (lambda () (void))))
+        (with-ellipsis ___
+          (define-rule-syntax (build-ops $op-id $bodys ___)
+            (run
+              (define $vec (make-vector 256 (lambda () (void))))
 
-            (define-rule-syntax ($op-id $idx $body)
-              (vector-set! $vec $idx (lambda () $body)))
+              (define-rule-syntax ($op-id $idx $body)
+                (vector-set! $vec $idx (lambda () $body)))
 
-            $bodys
+              $bodys ___
 
-            (vector->immutable-vector $vec)))
+              (vector->immutable-vector $vec))))
 
         (define $ops
           (build-ops op
-            (begin
-              (op #xdd (dd))
-              (op #xfd (fd))
+            (op #xdd (dd))
+            (op #xfd (fd))
 
-              ; (ld r r)
-              (with-r l $l
-                (with-r r $r
-                  (op
-                    (u8-233 #b01 $l $r)
-                    (l (r)))))
-
-              ; (ld r n)
+            ; (ld r r)
+            (with-r l $l
               (with-r r $r
                 (op
-                  (u8-233 #b00 $r #b110)
-                  (r (fetch-8))))
+                  (u8-233 #b01 $l $r)
+                  (l (r)))))
 
-              ; halt
-              (op #b01110110 (void))
+            ; (ld r n)
+            (with-r r $r
+              (op
+                (u8-233 #b00 $r #b110)
+                (r (fetch-8))))
 
-              ; (ld (hl) n)
-              (op #b00110110 (mem (hl) (fetch-8)))
+            ; halt
+            (op #b01110110 (void))
 
-              ; (ld a (bc))
-              (op #b00001010 (a (mem (bc))))
+            ; (ld (hl) n)
+            (op #b00110110 (mem (hl) (fetch-8)))
 
-              ; (ld a (de))
-              (op #b00011010 (a (mem (de))))
+            ; (ld a (bc))
+            (op #b00001010 (a (mem (bc))))
 
-              ; (ld a (nn))
-              (op #b00111010 (a (mem (fetch-16))))
+            ; (ld a (de))
+            (op #b00011010 (a (mem (de))))
 
-              ; (ld (bc) a)
-              (op #b00000010 (mem (bc) (a)))
+            ; (ld a (nn))
+            (op #b00111010 (a (mem (fetch-16))))
 
-              ; (ld (de) a)
-              (op #b00010010 (mem (de) (a)))
+            ; (ld (bc) a)
+            (op #b00000010 (mem (bc) (a)))
 
-              ; (ld (nn) a)
-              (op #b00110010 (mem (fetch-16) (a))))))
+            ; (ld (de) a)
+            (op #b00010010 (mem (de) (a)))
+
+            ; (ld (nn) a)
+            (op #b00110010 (mem (fetch-16) (a)))))
 
         (define-rule-syntax (step)
           (begin
