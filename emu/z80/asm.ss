@@ -1,4 +1,4 @@
-(library (emu asm)
+(library (emu z80 asm)
   (export
     org
     asm db dw nop ld jp out halt

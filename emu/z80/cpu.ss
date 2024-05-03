@@ -1,4 +1,4 @@
-(library (emu z80)
+(library (emu z80 cpu)
   (export define-z80)
   (import
     (scheme)
