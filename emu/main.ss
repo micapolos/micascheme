@@ -1,10 +1,10 @@
 (import (scheme) (emu mem) (emu io) (emu z80 cpu) (emu z80 asm) (emu run))
 
 ; 64Kb memory
-(define-mem mem #x10000)
+(define-mem z80-mem #x10000)
 
 ; Assemble into memory
-(asm mem)
+(asm z80-mem)
 (org 0)
 (ld a #\H)
 (out (#x34) a)
@@ -17,7 +17,7 @@
 (halt)
 
 ; Z80 with char I/O
-(define-z80 mem char-io z80-step z80-dump)
+(define-z80 z80-mem char-io z80-step z80-dump)
 
 ; Run and measure time
 (time (run z80-step 35000000))
