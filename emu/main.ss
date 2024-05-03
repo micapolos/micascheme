@@ -11,20 +11,20 @@
 ; 64Kb memory
 (define-mem mem #x10000)
 
-; Assemble into memory
+; Assemble something into memory
 (asm mem)
-(org 0)
-(nop)
-(nop)
-(ld a (char->integer #\a))
-(out (#x12) a)
-(ld b a)
-(ld c a)
-(ld (#x1000) a)
-(jp 0)
+(ld a #\H)
+(out (#x34) a)
+(ld a #\i)
+(out (#x34) a)
+(ld a #\!)
+(out (#x34) a)
+(ld a #\newline)
+(out (#x34) a)
+(halt)
 
 ; Define Z80
-(define-z80 mem null-io z80-step z80-dump)
+(define-z80 mem char-io z80-step z80-dump)
 
 ; Run Z80 and measure time
 (time (run z80-step 35000000))

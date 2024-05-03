@@ -1,15 +1,20 @@
 (library (emu math)
   (export
     fx->u8 fx->u16
-    u8= u8+ u8- u8+1 u8-1
+    u8 u8= u8+ u8- u8+1 u8-1
     u16= u16+ u16- u16+1 u16-1
     u8-233 u16-88
     u16-h u16-l)
-  (import (scheme) (syntaxes))
+  (import (scheme) (syntaxes) (lets) (switch) (throw))
 
   (define-rules-syntaxes
     ((fx->u8 $fx) (fxand $fx #xff))
     ((fx->u16 $fx) (fxand $fx #xffff))
+    ((u8 $expr)
+      (switch $expr
+        ((integer? $int) (fx->u8 $int))
+        ((char? $char) (fx->u8 (char->integer $char)))
+        ((else $other) (throw not-u8 $other))))
     ((u8= $a $b) (fx= $a $b))
     ((u8+ $a $b) (fx->u8 (fx+/wraparound $a $b)))
     ((u8- $a $b) (fx->u8 (fx-/wraparound $a $b)))

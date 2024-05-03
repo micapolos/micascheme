@@ -115,7 +115,7 @@
                 (r (fetch-8))))
 
             ; halt
-            (op #b01110110 (void))
+            (op #b01110110 (pc (u16-1 (pc))))
 
             ; (ld (hl) n)
             (op #b00110110 (mem (hl) (fetch-8)))
