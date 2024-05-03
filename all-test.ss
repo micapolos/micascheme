@@ -56,6 +56,7 @@
   (writer)
   (writing)
   (z80)
+  (emu all)
   (asm all)
   (masm all)
   (leo all)
