@@ -85,7 +85,7 @@
             ($h (fetch-8))
             (run (u16-88 $h $l))))
 
-        (define-dispatch dispatch op
+        (define-dispatch-8 dispatch op
           (op #xdd (dd))
           (op #xfd (fd))
           (op #xcb (dispatch-cb (fetch-8)))
@@ -145,8 +145,8 @@
           (op #b11000011 (pc (fetch-16)))
         )
 
-        (define-dispatch dispatch-cb op)
-        (define-dispatch dispatch-ed op)
+        (define-dispatch-8 dispatch-cb op)
+        (define-dispatch-8 dispatch-ed op)
 
         (define-rule-syntax (step)
           (begin

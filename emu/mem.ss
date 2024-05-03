@@ -11,8 +11,10 @@
           ((id addr) (mem-read id addr))
           ((id addr u8) (mem-write id addr u8)))
         (define-mem-bytevector id (make-bytevector size 0))))
+
     ((mem-read id addr)
       (bytevector-u8-ref (mem-bytevector id) addr))
+
     ((mem-write id addr u8)
       (bytevector-u8-set! (mem-bytevector id) addr u8)))
 )
