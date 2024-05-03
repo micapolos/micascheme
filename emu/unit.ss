@@ -1,6 +1,6 @@
 (library (emu unit)
   (export define-unit fields)
-  (import (scheme) (syntax) (syntaxes) (identifier) (lets) (emu internal))
+  (import (scheme) (syntax) (syntaxes) (identifier) (lets) (list-syntax) (emu internal))
 
   (define-syntax (define-unit $syntax)
     (syntax-case $syntax ()
@@ -13,28 +13,24 @@
           ($ids (append $params $fields))
           ($inits (syntax->list #'(init ...)))
           ($internal-ids
-            (map
-              (lambda ($field)
-                (identifier-append $tmp $id #'- $field))
-              $ids))
+            (map-with
+              ($field-id $ids)
+              (identifier-append $tmp $id #'- $field-id)))
           ($internal-defs
-            (map
-              (lambda ($internal-id)
-                #`(define-internal #,$internal-id))
-              $internal-ids))
+            (map-with
+              ($internal-id $internal-ids)
+              #`(define-internal #,$internal-id)))
           ($internal-define-ids
-            (map
-              (lambda ($internal-id)
-                (identifier-append $tmp #'define- $internal-id))
-              $internal-ids))
+            (map-with
+              ($internal-id $internal-ids)
+              (identifier-append $tmp #'define- $internal-id)))
           ($define-id
             (identifier-append $tmp #'define- $id))
           ($internal-initializers
-            (map
-              (lambda ($define-id $field-init)
-                #`(#,$define-id #,$id #,$field-init))
-              $internal-define-ids
-              (append $params $inits)))
+            (map-with
+              ($define-id $internal-define-ids)
+              ($field-init (append $params $inits))
+              #`(#,$define-id #,$id #,$field-init)))
           #`(begin
             #,@$internal-defs
             (define-rules-syntaxes
