@@ -1,29 +1,6 @@
 (import (scheme) (check) (syntaxes) (procedure))
 
 (run-void
-  (with-ellipsis ___
-    (define-syntax foo
-      (syntax-rules ()
-        ((_ $id ___ $last) (list $id ___ $last))))
-    (define-syntax bar
-      (syntax-rules ()
-        ((_ $id ___ $last) (list $id ___ $last)))))
-  (check (equal? (foo 1 2 3 4 5) (list 1 2 3 4 5)))
-  (check (equal? (bar 1 2 3 4 5) (list 1 2 3 4 5))))
-
-(run-void
-  (define-syntax outer
-    (syntax-rules ()
-      ((_ $id)
-        (with-ellipsis ___
-          (define-syntax $id
-            (syntax-rules ()
-              (($id $x ___)
-                (list $x ___))))))))
-  (outer inner)
-  (check (equal? (inner 1 2 3) (list 1 2 3))))
-
-(run-void
   (define-rules-syntax
     ((foo $a) (string-append "foo" $a))
     ((foo $a $b) (string-append $a $b)))

@@ -15,7 +15,7 @@
     ((define-z80 mem step)
       (define-z80 mem step dump))
     ((define-z80 mem step dump)
-      (with-ellipsis ___
+      (begin
         (define-reg-16 pc)
         (define-reg-16 sp)
 
@@ -55,7 +55,7 @@
 
         (define-syntax (with-r $syntax)
           (syntax-case $syntax ()
-            ((_ $id $idx $body ___)
+            ((_ $id $idx $body (... ...))
               #`(begin
                 #,@(build-list 8
                   (lambda ($index)
@@ -66,7 +66,7 @@
                           ((_ $expr) (r #,$index $expr)))))
                       (let
                         (($idx #,$index))
-                        $body ___))))))))
+                        $body (... ...)))))))))
 
         (define-rules-syntaxes
           ((dd) (hl-offset 1))
@@ -85,14 +85,14 @@
             (u16-88 $h $l)))
 
         (define-rules-syntax
-          ((build-ops $op-id $body ___)
+          ((build-ops $op-id $body (... ...))
             (run
               (define $vec (make-vector 256 (lambda () (void))))
 
               (define-rule-syntax ($op-id $idx $expr)
                 (vector-set! $vec $idx (lambda () $expr)))
 
-              $body ___
+              $body (... ...)
 
               (vector->immutable-vector $vec))))
 

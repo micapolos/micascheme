@@ -47,7 +47,6 @@
   (throw)
   (tico)
   (tico-2)
-  (transformer)
   (type)
   (typed)
   (u8)
