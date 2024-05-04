@@ -48,6 +48,7 @@
   (throw)
   (tico)
   (tico-2)
+  (to-syntax)
   (type)
   (typed)
   (u8)
