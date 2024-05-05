@@ -16,8 +16,9 @@
     syntax-inline
     inline-indexed
     ellipsis
+    fenders implicit
     syntax-rule->clause)
-  (import (scheme))
+  (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
     (for-all identifier? (syntax->list $syntax)))
@@ -156,9 +157,18 @@
             (iota (datum $count)))))))
 
   (define (syntax-rule->clause $rule)
-    (syntax-case $rule ()
+    (syntax-case $rule (fenders implicit)
+      ((pattern (fenders $fender ...) (implicit $implicit ...) body ...)
+        #`(pattern
+          (and $fender ...)
+          (with-implicit (#,(syntax-pattern-id #'pattern) $implicit ...) #'(begin body ...))))
+      ((pattern (implicit $implicit ...) body ...)
+        (syntax-rule->clause
+          #`(pattern (fenders) (implicit $implicit ...) body ...)))
       ((pattern fender body)
-        #`(pattern fender #'body))
+        (syntax-rule->clause
+          #`(pattern (fenders fender) (implicit) body)))
       ((pattern body)
-        #`(pattern #'body))))
+        (syntax-rule->clause
+          #`(pattern #t body)))))
 )

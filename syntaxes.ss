@@ -9,7 +9,9 @@
     (procedure)
     (list)
     (lets)
-    (pair))
+    (pair)
+    (syntax-keywords))
+  (export (import (syntax-keywords)))
 
   (define-aux-keyword literals)
 
