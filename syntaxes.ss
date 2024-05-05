@@ -22,7 +22,9 @@
               (lets
                 ((pair $name $rules) $rules-group)
                 #`(define-syntax #,$name
-                  (syntax-rules (literals $literal ...) #,@$rules))))
+                  (lambda ($syntax)
+                    (syntax-case $syntax ($literal ...)
+                      #,@(map syntax-rule->clause $rules))))))
             (group-by
               syntax-rule-id
               free-identifier=?
@@ -43,7 +45,9 @@
                   (syntax->list #'($rule ...))))
               (syntax-error $syntax "multiple ids")))
           #`(define-syntax #,$name
-            (syntax-rules ($literal ...) #,@$rules))))
+            (lambda ($syntax)
+              (syntax-case $syntax ($literal ...)
+                #,@(map syntax-rule->clause $rules))))))
       ((_ $rule ...)
         #`(define-rules-syntax (literals) $rule ...))))
 )

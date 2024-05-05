@@ -15,7 +15,8 @@
     syntax-case-opt
     syntax-inline
     inline-indexed
-    ellipsis)
+    ellipsis
+    syntax-rule->clause)
   (import (scheme))
 
   (define (identifiers? $syntax)
@@ -153,4 +154,11 @@
                 (($id (lambda ($syntax) #'#,$index)))
                 $body ...))
             (iota (datum $count)))))))
+
+  (define (syntax-rule->clause $rule)
+    (syntax-case $rule ()
+      ((pattern fender body)
+        #`(pattern fender #'body))
+      ((pattern body)
+        #`(pattern #'body))))
 )
