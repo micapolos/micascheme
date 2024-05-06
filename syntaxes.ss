@@ -1,5 +1,6 @@
 (library (syntaxes)
   (export
+    define-case-syntaxes
     define-rules-syntax
     define-rules-syntaxes
     literals)
@@ -14,6 +15,25 @@
   (export (import (syntax-keywords)))
 
   (define-aux-keyword literals)
+
+  (define-syntax (define-case-syntaxes $syntax)
+    (syntax-case $syntax (literals)
+      ((_ (literals $literal ...) $clause ...)
+        #`(begin
+          #,@(map
+            (lambda ($clauses-group)
+              (lets
+                ((pair $name $clauses) $clauses-group)
+                #`(define-syntax #,$name
+                  (lambda ($syntax)
+                    (syntax-case $syntax ($literal ...)
+                      #,@$clauses)))))
+            (group-by
+              syntax-clause-id
+              free-identifier=?
+              (syntax->list #'($clause ...))))))
+      ((_ $clause ...)
+        #`(define-case-syntaxes (literals) $clause ...))))
 
   (define-syntax (define-rules-syntaxes $syntax)
     (syntax-case $syntax (literals)

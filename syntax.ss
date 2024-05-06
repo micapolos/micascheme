@@ -12,6 +12,7 @@
     syntax-selector
     syntax-pattern-id
     syntax-rule-id
+    syntax-clause-id
     syntax-case-opt
     syntax-inline
     inline-indexed
@@ -113,10 +114,13 @@
       (syntax-selector $pattern)
       (syntax-error $pattern "pattern syntax error")))
 
-  (define (syntax-rule-id $rule)
+  (define (syntax-clause-or-rule-id $rule)
     (syntax-case $rule ()
-      (($pattern $rest ...)
+      (($pattern . $rest)
         (syntax-pattern-id #'$pattern))))
+
+  (define syntax-rule-id syntax-clause-or-rule-id)
+  (define syntax-clause-id syntax-clause-or-rule-id)
 
   (define-syntax (syntax-case-opt $syntax)
     (syntax-case $syntax ()
