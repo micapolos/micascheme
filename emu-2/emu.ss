@@ -5,10 +5,11 @@
   (define-rules-syntax
     ((emu unit body ...)
       (implicit step)
-      (define (step cycles) (displayln `(step ,cycles)))
-      (pretty-print `(creating unit))
-      (pretty-print `(starting))
-      body ...
-      (pretty-print `(ending))
-      (pretty-print `(done))))
+      (begin
+        (define (step cycles) (displayln `(step ,cycles)))
+        (pretty-print `(creating unit))
+        (pretty-print `(starting))
+        body ...
+        (pretty-print `(ending))
+        (pretty-print `(done)))))
 )

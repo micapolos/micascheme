@@ -158,13 +158,13 @@
 
   (define (syntax-rule->clause $rule)
     (syntax-case $rule (fenders implicit)
-      ((pattern (fenders $fender ...) (implicit $implicit ...) body ...)
+      ((pattern (fenders $fender ...) (implicit $implicit ...) body)
         #`(pattern
           (and $fender ...)
-          (with-implicit (#,(syntax-pattern-id #'pattern) $implicit ...) #'(begin body ...))))
-      ((pattern (implicit $implicit ...) body ...)
+          (with-implicit (#,(syntax-pattern-id #'pattern) $implicit ...) #'body)))
+      ((pattern (implicit $implicit ...) body)
         (syntax-rule->clause
-          #`(pattern (fenders) (implicit $implicit ...) body ...)))
+          #`(pattern (fenders) (implicit $implicit ...) body)))
       ((pattern fender body)
         (syntax-rule->clause
           #`(pattern (fenders fender) (implicit) body)))
