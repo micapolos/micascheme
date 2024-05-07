@@ -1,12 +1,14 @@
 (import (micascheme) (llvm api))
 
-(llvm-with-module (mod "foo")
+(llvm-with-module
+  (foo-module "foo")
   (lets
-    (fn
-      (llvm-add-function mod "sum"
+    (sum-function
+      (llvm-add-function foo-module "sum"
         (llvm-function-type
           (llvm-int32-type)
           (vector (llvm-int32-type) (llvm-int32-type)))))
-    (block (llvm-append-basic-block fn "entry"))
-    (llvm-dump-module mod))
+    (entry-block
+      (llvm-append-basic-block sum-function "entry"))
+    (llvm-dump-module foo-module))
 )
