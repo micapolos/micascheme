@@ -16,7 +16,10 @@
     llvm-get-param
 
     llvm-verify-module
-    llvm-with-execution-engine-for-module)
+    llvm-with-execution-engine-for-module
+
+    llvm-link-in-mcjit
+    llvm-link-in-interpreter)
   (import
     (scheme)
     (data)
@@ -28,7 +31,7 @@
     (llvm foreign)
     (dynamic-wind)
     (foreign)
-    (binder))
+    (throw))
 
   (define-rule-syntax (with-vector-ftype-pointer-and-count (id length ftype vector) body)
     (lets
@@ -89,14 +92,27 @@
   (define-rule-syntax (llvm-verify-module mod)
     (LLVMVerifyModule mod 0 0))
 
+  (define-rule-syntax (llvm-link-in-mcjit)
+    (LLVMLinkInMCJIT))
+
+  (define-rule-syntax (llvm-link-in-interpreter)
+    (LLVMLinkInInterpreter))
+
   (define-rule-syntax (llvm-with-execution-engine-for-module (engine mod) body)
     (with-foreign-alloc
       (engine-ptr (ftype-sizeof uptr))
       (error-ptr (ftype-sizeof uptr))
       (with-dynamic-wind
         (engine
-          (let ((ok? (LLVMCreateExecutionEngineForModule engine-ptr mod error-ptr)))
-            (and ok? (ftype-ref uptr () engine-ptr 0))))
-        (and engine body)
-        (and engine (LLVMDisposeExecutionEngine engine)))))
+          (lets
+            (ok?
+              (LLVMCreateExecutionEngineForModule
+                (make-ftype-pointer LLVMExecutionEngineRef engine-ptr)
+                mod
+                error-ptr))
+            (if ok?
+              (ftype-ref uptr () engine-ptr 0)
+              (throw create-execution-engine-error))))
+        body
+        (LLVMDisposeExecutionEngine engine))))
 )

@@ -28,7 +28,12 @@
 
     LLVMVerifyModule
     LLVMCreateExecutionEngineForModule
-    LLVMDisposeExecutionEngine)
+    LLVMDisposeExecutionEngine
+
+    LLVMLinkInMCJIT
+    LLVMLinkInInterpreter
+    ;LLVMInitializeNativeTarget
+  )
   (import (scheme) (syntax))
 
   (define llvm
@@ -70,4 +75,8 @@
 
   (define-llvm (LLVMCreateExecutionEngineForModule (* LLVMExecutionEngineRef) LLVMModuleRef uptr) boolean)
   (define-llvm (LLVMDisposeExecutionEngine LLVMExecutionEngineRef) void)
+
+  (define-llvm (LLVMLinkInMCJIT) void)
+  (define-llvm (LLVMLinkInInterpreter) void)
+  ;(define-llvm (LLVMInitializeNativeTarget) boolean)
 )

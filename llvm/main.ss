@@ -23,5 +23,8 @@
             (run
               (llvm-build-ret builder tmp-value)))))
       (llvm-dump-module foo-module)
-      (llvm-verify-module foo-module)))
+      (llvm-verify-module foo-module)
+      (llvm-link-in-mcjit)
+      (llvm-with-execution-engine-for-module (engine foo-module)
+        (displayln engine))))
 )
