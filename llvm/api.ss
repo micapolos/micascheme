@@ -30,7 +30,7 @@
     (foreign)
     (binder))
 
-  (define-rule-syntax (with-vector-ftype-pointer-and-count (id length ftype vector) body ...)
+  (define-rule-syntax (with-vector-ftype-pointer-and-count (id length ftype vector) body)
     (lets
       (vector-var vector)
       (length (vector-length vector-var))
@@ -38,12 +38,12 @@
         (let ((id (make-ftype-pointer ftype ptr)))
           (repeat-indexed length index
             (ftype-set! ftype () id index (vector-ref vector-var index)))
-          body ...))))
+          body))))
 
-  (define-rule-syntax (llvm-with-module (id name) body ...)
+  (define-rule-syntax (llvm-with-module (id name) body)
     (with-dynamic-wind
       (id (LLVMModuleCreateWithName name))
-      (begin body ...)
+      body
       (LLVMDisposeModule id)))
 
   (define-rule-syntax (llvm-dump-module mod)
@@ -68,10 +68,10 @@
   (define-rule-syntax (llvm-dump-type type)
     (LLVMDumpType type))
 
-  (define-rule-syntax (llvm-with-builder id body ...)
+  (define-rule-syntax (llvm-with-builder id body)
     (with-dynamic-wind
       (id (LLVMCreateBuilder))
-      (begin body ...)
+      body
       (LLVMDisposeBuilder id)))
 
   (define-rule-syntax (llvm-position-builder-at-end builder block)
@@ -89,7 +89,7 @@
   (define-rule-syntax (llvm-verify-module mod)
     (LLVMVerifyModule mod 0 0))
 
-  (define-rule-syntax (llvm-with-execution-engine-for-module (engine mod) body ...)
+  (define-rule-syntax (llvm-with-execution-engine-for-module (engine mod) body)
     (with-foreign-alloc
       (engine-ptr (ftype-sizeof uptr))
       (error-ptr (ftype-sizeof uptr))
@@ -97,7 +97,6 @@
         (engine
           (let ((ok? (LLVMCreateExecutionEngineForModule engine-ptr mod error-ptr)))
             (and ok? (ftype-ref uptr () engine-ptr 0))))
-        (and engine
-          (let () body ...))
+        (and engine body)
         (and engine (LLVMDisposeExecutionEngine engine)))))
 )
