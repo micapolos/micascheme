@@ -90,14 +90,14 @@
     (LLVMVerifyModule mod 0 0))
 
   (define-rule-syntax (llvm-with-execution-engine-for-module (engine mod) body ...)
-    (with-foreign-alloc (engine-ptr (ftype-sizeof uptr))
-      (with-foreign-alloc (error-ptr (ftype-sizeof uptr))
-        (with-dynamic-wind
-          (engine
-            (let ((ok? (LLVMCreateExecutionEngineForModule engine-ptr mod error-ptr)))
-              (and ok? (ftype-ref uptr () engine-ptr 0))))
-          (and engine
-            (let () body ...))
-          (and engine (LLVMDisposeExecutionEngine engine))))))
-
+    (with-foreign-alloc
+      (engine-ptr (ftype-sizeof uptr))
+      (error-ptr (ftype-sizeof uptr))
+      (with-dynamic-wind
+        (engine
+          (let ((ok? (LLVMCreateExecutionEngineForModule engine-ptr mod error-ptr)))
+            (and ok? (ftype-ref uptr () engine-ptr 0))))
+        (and engine
+          (let () body ...))
+        (and engine (LLVMDisposeExecutionEngine engine)))))
 )
