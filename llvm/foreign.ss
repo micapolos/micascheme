@@ -4,6 +4,7 @@
     LLVMTypeRef
     LLVMValueRef
     LLVMBasicBlockRef
+    LLVMBuilderRef
 
     LLVMModuleCreateWithName
     LLVMDisposeModule
@@ -13,7 +14,18 @@
 
     LLVMInt32Type
     LLVMFunctionType
-    LLVMDumpType)
+    LLVMDumpType
+
+    LLVMCreateBuilder
+    LLVMPositionBuilderAtEnd
+    LLVMDisposeBuilder
+
+    LLVMBuildAdd
+    LLVMBuildRet
+
+    LLVMGetParam
+
+    LLVMVerifyModule)
   (import (scheme) (syntax))
 
   (define llvm
@@ -23,6 +35,7 @@
   (define-ftype LLVMTypeRef uptr)
   (define-ftype LLVMValueRef uptr)
   (define-ftype LLVMBasicBlockRef uptr)
+  (define-ftype LLVMBuilderRef uptr)
 
   (define-case-syntax (define-llvm (name param ...) result)
     #`(define name
@@ -40,4 +53,14 @@
   (define-llvm (LLVMInt32Type) LLVMTypeRef)
   (define-llvm (LLVMFunctionType LLVMTypeRef (* LLVMTypeRef) unsigned boolean) LLVMTypeRef)
   (define-llvm (LLVMDumpType LLVMTypeRef) void)
+
+  (define-llvm (LLVMCreateBuilder) LLVMBuilderRef)
+  (define-llvm (LLVMPositionBuilderAtEnd LLVMBuilderRef LLVMBasicBlockRef) void)
+  (define-llvm (LLVMDisposeBuilder LLVMBuilderRef) void)
+  (define-llvm (LLVMBuildAdd LLVMBuilderRef LLVMValueRef LLVMValueRef string) LLVMValueRef)
+  (define-llvm (LLVMBuildRet LLVMBuilderRef LLVMValueRef) LLVMValueRef)
+
+  (define-llvm (LLVMGetParam LLVMValueRef unsigned) LLVMValueRef)
+
+  (define-llvm (LLVMVerifyModule LLVMModuleRef unsigned uptr) boolean)
 )

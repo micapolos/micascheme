@@ -6,7 +6,16 @@
     llvm-int32-type
     llvm-function-type
     llvm-add-function
-    llvm-append-basic-block)
+    llvm-append-basic-block
+
+    llvm-with-builder
+    llvm-position-builder-at-end
+    llvm-build-add
+    llvm-build-ret
+
+    llvm-get-param
+
+    llvm-verify-module)
   (import
     (scheme)
     (data)
@@ -68,4 +77,26 @@
 
   (define-rule-syntax (llvm-dump-type type)
     (LLVMDumpType type))
+
+  (define-rule-syntax (llvm-with-builder id body ...)
+    (with-rtti
+      (id
+        (LLVMCreateBuilder)
+        (LLVMDisposeBuilder id))
+      body ...))
+
+  (define-rule-syntax (llvm-position-builder-at-end builder block)
+    (LLVMPositionBuilderAtEnd builder block))
+
+  (define-rule-syntax (llvm-build-add builder lhs rhs name)
+    (LLVMBuildAdd builder lhs rhs name))
+
+  (define-rule-syntax (llvm-build-ret builder value)
+    (LLVMBuildRet builder value))
+
+  (define-rule-syntax (llvm-get-param fn index)
+    (LLVMGetParam fn index))
+
+  (define-rule-syntax (llvm-verify-module mod)
+    (LLVMVerifyModule mod 0 0))
 )

@@ -10,5 +10,17 @@
           (vector (llvm-int32-type) (llvm-int32-type)))))
     (entry-block
       (llvm-append-basic-block sum-function "entry"))
-    (llvm-dump-module foo-module))
+    (run
+      (llvm-with-builder builder
+        (llvm-position-builder-at-end builder entry-block)
+        (lets
+          (tmp-value
+            (llvm-build-add builder
+            (llvm-get-param sum-function 0)
+            (llvm-get-param sum-function 1)
+            "tmp"))
+          (run
+            (llvm-build-ret builder tmp-value))))
+      (llvm-dump-module foo-module)
+      (llvm-verify-module foo-module)))
 )
