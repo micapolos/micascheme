@@ -26,31 +26,9 @@
     (lets)
     (procedure)
     (llvm foreign)
+    (dynamic-wind)
+    (foreign)
     (binder))
-
-  (define (foreign-alloc-0 size)
-    (if (zero? size) 0 (foreign-alloc size)))
-
-  (define (foreign-free-0 ptr)
-    (if (zero? ptr) (void) (foreign-free ptr)))
-
-  (define-rule-syntax (with-rtti (id create dispose) body ...)
-    (let ()
-      (define id)
-      (dynamic-wind
-        (lambda () (set! id create))
-        (lambda () body ...)
-        (lambda () dispose))))
-
-  (define-rule-syntax (with-foreign-alloc (id size) body ...)
-    (with-rtti
-      (id (foreign-alloc size) (foreign-free id))
-      body ...))
-
-  (define-rule-syntax (with-foreign-alloc-0 (id size) body ...)
-    (with-rtti
-      (id (foreign-alloc-0 size) (foreign-free-0 id))
-      body ...))
 
   (define-rule-syntax (with-vector-ftype-pointer-and-count (id length ftype vector) body ...)
     (lets
@@ -63,11 +41,10 @@
           body ...))))
 
   (define-rule-syntax (llvm-with-module (id name) body ...)
-    (with-rtti
-      (id
-        (LLVMModuleCreateWithName name)
-        (LLVMDisposeModule id))
-      body ...))
+    (with-dynamic-wind
+      (id (LLVMModuleCreateWithName name))
+      (begin body ...)
+      (LLVMDisposeModule id)))
 
   (define-rule-syntax (llvm-dump-module mod)
     (LLVMDumpModule mod))
@@ -92,11 +69,10 @@
     (LLVMDumpType type))
 
   (define-rule-syntax (llvm-with-builder id body ...)
-    (with-rtti
-      (id
-        (LLVMCreateBuilder)
-        (LLVMDisposeBuilder id))
-      body ...))
+    (with-dynamic-wind
+      (id (LLVMCreateBuilder))
+      (begin body ...)
+      (LLVMDisposeBuilder id)))
 
   (define-rule-syntax (llvm-position-builder-at-end builder block)
     (LLVMPositionBuilderAtEnd builder block))
@@ -116,11 +92,12 @@
   (define-rule-syntax (llvm-with-execution-engine-for-module (engine mod) body ...)
     (with-foreign-alloc (engine-ptr (ftype-sizeof uptr))
       (with-foreign-alloc (error-ptr (ftype-sizeof uptr))
-        (with-rtti
+        (with-dynamic-wind
           (engine
             (let ((ok? (LLVMCreateExecutionEngineForModule engine-ptr mod error-ptr)))
-              (and ok? (ftype-ref uptr () engine-ptr 0)))
-            (and engine (LLVMDisposeExecutionEngine engine)))
+              (and ok? (ftype-ref uptr () engine-ptr 0))))
           (and engine
-            (let () body ...))))))
+            (let () body ...))
+          (and engine (LLVMDisposeExecutionEngine engine))))))
+
 )
