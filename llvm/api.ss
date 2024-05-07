@@ -7,7 +7,16 @@
     llvm-function-type
     llvm-add-function
     llvm-append-basic-block)
-  (import (scheme) (data) (syntax) (syntaxes) (system) (lets) (procedure) (llvm foreign))
+  (import
+    (scheme)
+    (data)
+    (syntax)
+    (syntaxes)
+    (system)
+    (lets)
+    (procedure)
+    (llvm foreign)
+    (binder))
 
   (define-rule-syntax (with-rtti (id create dispose) body ...)
     (let ()
