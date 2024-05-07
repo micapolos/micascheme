@@ -5,6 +5,7 @@
     LLVMValueRef
     LLVMBasicBlockRef
     LLVMBuilderRef
+    LLVMExecutionEngineRef
 
     LLVMModuleCreateWithName
     LLVMDisposeModule
@@ -25,7 +26,9 @@
 
     LLVMGetParam
 
-    LLVMVerifyModule)
+    LLVMVerifyModule
+    LLVMCreateExecutionEngineForModule
+    LLVMDisposeExecutionEngine)
   (import (scheme) (syntax))
 
   (define llvm
@@ -36,6 +39,7 @@
   (define-ftype LLVMValueRef uptr)
   (define-ftype LLVMBasicBlockRef uptr)
   (define-ftype LLVMBuilderRef uptr)
+  (define-ftype LLVMExecutionEngineRef uptr)
 
   (define-case-syntax (define-llvm (name param ...) result)
     #`(define name
@@ -63,4 +67,7 @@
   (define-llvm (LLVMGetParam LLVMValueRef unsigned) LLVMValueRef)
 
   (define-llvm (LLVMVerifyModule LLVMModuleRef unsigned uptr) boolean)
+
+  (define-llvm (LLVMCreateExecutionEngineForModule (* LLVMExecutionEngineRef) LLVMModuleRef uptr) boolean)
+  (define-llvm (LLVMDisposeExecutionEngine LLVMExecutionEngineRef) void)
 )

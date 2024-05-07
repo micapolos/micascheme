@@ -15,7 +15,8 @@
 
     llvm-get-param
 
-    llvm-verify-module)
+    llvm-verify-module
+    llvm-with-execution-engine-for-module)
   (import
     (scheme)
     (data)
@@ -27,6 +28,12 @@
     (llvm foreign)
     (binder))
 
+  (define (foreign-alloc-0 size)
+    (if (zero? size) 0 (foreign-alloc size)))
+
+  (define (foreign-free-0 ptr)
+    (if (zero? ptr) (void) (foreign-free ptr)))
+
   (define-rule-syntax (with-rtti (id create dispose) body ...)
     (let ()
       (define id)
@@ -35,15 +42,21 @@
         (lambda () body ...)
         (lambda () dispose))))
 
+  (define-rule-syntax (with-foreign-alloc (id size) body ...)
+    (with-rtti
+      (id (foreign-alloc size) (foreign-free id))
+      body ...))
+
+  (define-rule-syntax (with-foreign-alloc-0 (id size) body ...)
+    (with-rtti
+      (id (foreign-alloc-0 size) (foreign-free-0 id))
+      body ...))
+
   (define-rule-syntax (with-vector-ftype-pointer-and-count (id length ftype vector) body ...)
     (lets
       (vector-var vector)
       (length (vector-length vector-var))
-      (alloc? (not (zero? length)))
-      (with-rtti
-        (ptr
-          (if alloc? (foreign-alloc (* (ftype-sizeof ftype) length)) 0)
-          (if alloc? (foreign-free ptr)))
+      (with-foreign-alloc-0 (ptr (* (ftype-sizeof ftype) length))
         (let ((id (make-ftype-pointer ftype ptr)))
           (repeat-indexed length index
             (ftype-set! ftype () id index (vector-ref vector-var index)))
@@ -99,4 +112,15 @@
 
   (define-rule-syntax (llvm-verify-module mod)
     (LLVMVerifyModule mod 0 0))
+
+  (define-rule-syntax (llvm-with-execution-engine-for-module (engine mod) body ...)
+    (with-foreign-alloc (engine-ptr (ftype-sizeof uptr))
+      (with-foreign-alloc (error-ptr (ftype-sizeof uptr))
+        (with-rtti
+          (engine
+            (let ((ok? (LLVMCreateExecutionEngineForModule engine-ptr mod error-ptr)))
+              (and ok? (ftype-ref uptr () engine-ptr 0)))
+            (and engine (LLVMDisposeExecutionEngine engine)))
+          (and engine
+            (let () body ...))))))
 )
