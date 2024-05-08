@@ -1,6 +1,7 @@
 (library (inline)
   (export
     inline
+    inline-datum
     inline-bytevector
     inline-vector)
   (import (scheme) (syntax) (syntaxes) (procedure))
@@ -15,6 +16,12 @@
         (apply environment
           (map syntax->datum
             (syntax->list #'(import-spec ...)))))))
+
+  (define-rules-syntax (literals import)
+    ((inline-datum (import import-spec ...) $expr)
+      (inline (import (scheme) import-spec ...)
+        (datum->syntax (car (generate-temporaries '(tmp)))
+          $expr))))
 
   (define-rules-syntax (literals import)
     ((inline-bytevector (import import-spec ...) $expr)

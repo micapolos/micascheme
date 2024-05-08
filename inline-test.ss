@@ -20,6 +20,17 @@
       #`(bytevector (u8+ 1 2) 10))
     (bytevector 3 10)))
 
+; === inline-datum
+
+(check
+  (equal?
+    (expand
+      '(inline-datum
+        (import (scheme) (emu math))
+        (map (lambda (x) (u8+1 x)) '(1 2 3)))
+      (environment '(scheme) '(inline)))
+    '(2 3 4)))
+
 ; === inline-bytevector
 
 (check
