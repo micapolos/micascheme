@@ -20,7 +20,8 @@
     fenders implicit
     syntax-rule->clause
     syntax->datum/annotation
-    bytevector->syntax)
+    bytevector->syntax
+    vector->syntax)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -188,4 +189,8 @@
       #,@(map
         (lambda ($u8) (datum->syntax #'bytevector->syntax $u8))
         (bytevector->u8-list $bytevector))))
+
+  (define (vector->syntax $vector)
+    #`(($primitive 3 vector)
+      #,@(vector->list $vector)))
 )

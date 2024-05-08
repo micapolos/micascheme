@@ -1,13 +1,9 @@
 (library (inline)
   (export
     inline
-    inline-bytevector)
+    inline-bytevector
+    inline-vector)
   (import (scheme) (syntax) (syntaxes) (procedure))
-
-  (define-rules-syntax (literals import)
-    ((inline-bytevector (import import-spec ...) $expr)
-      (inline (import (syntax) import-spec ...)
-        (bytevector->syntax $expr))))
 
   (define-case-syntaxes (literals import)
     ((inline $syntax)
@@ -19,4 +15,14 @@
         (apply environment
           (map syntax->datum
             (syntax->list #'(import-spec ...)))))))
+
+  (define-rules-syntax (literals import)
+    ((inline-bytevector (import import-spec ...) $expr)
+      (inline (import (syntax) import-spec ...)
+        (bytevector->syntax $expr))))
+
+  (define-rules-syntax (literals import)
+    ((inline-vector (import import-spec ...) $expr)
+      (inline (import (syntax) import-spec ...)
+        (vector->syntax $expr))))
 )

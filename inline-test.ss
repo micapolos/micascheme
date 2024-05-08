@@ -39,3 +39,23 @@
       (environment '(scheme) '(inline)))
     `(($primitive 3 bytevector) 10 0 20 30)))
 
+; === inline-vector
+
+(check
+  (equal?
+    (expand
+      '(inline-vector
+        (import (scheme))
+        (let ()
+          (define $vector (make-vector 4 #`(lambda () "null")))
+          (vector-set! $vector 0 #`(lambda () "0"))
+          (vector-set! $vector 2 #`(lambda () "2"))
+          (vector-set! $vector 3 #`(#,(vector-ref $vector 0) #,(vector-ref $vector 2)))
+          $vector))
+      (environment '(scheme) '(inline)))
+    '(($primitive 3 vector)
+      (lambda () "0")
+      (lambda () "null")
+      (lambda () "2")
+      ((lambda () "0") (lambda () "2")))))
+
