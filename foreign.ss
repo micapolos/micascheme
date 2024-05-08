@@ -45,7 +45,7 @@
 
   (define-rule-syntax (with-object->reference-address (id obj) body ...)
     (with-locked-object (locked-obj obj)
-      (let ((id (object->reference-address locked-obj)) body ...))))
+      (let ((id (object->reference-address locked-obj))) body ...)))
 
   (define-rule-syntax (with-vector-ftype-pointer-and-count (id length ftype vector) body)
     (lets
