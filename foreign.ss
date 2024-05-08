@@ -9,6 +9,7 @@
     with-locked-object
     with-object->reference-address
     with-vector-ftype-pointer-and-count
+    with-ftype-alloc
 
     foreign-string-length
     foreign-string)
@@ -20,40 +21,31 @@
   (define (foreign-free-0 ptr)
     (if (zero? ptr) (void) (foreign-free ptr)))
 
-  (define-rules-syntax
-    ((with-foreign-alloc body) body)
-    ((with-foreign-alloc (id size) next ... body)
-      (with-dynamic-wind
-        (id (foreign-alloc size))
-        (with-foreign-alloc next ... body)
-        (foreign-free id))))
+  (define-rule-syntax (with-foreign-alloc (id size) body ...)
+    (with-dynamic-wind
+      (id (foreign-alloc size))
+      body ...
+      (foreign-free id)))
 
-  (define-rules-syntax
-    ((with-foreign-alloc-0 body) body)
-    ((with-foreign-alloc-0 (id size) next ... body)
-      (with-dynamic-wind
-        (id (foreign-alloc-0 size))
-        (with-foreign-alloc-0 next ... body)
-        (foreign-free-0 id))))
+  (define-rule-syntax (with-foreign-alloc-0 (id size) body ...)
+    (with-dynamic-wind
+      (id (foreign-alloc-0 size))
+      body ...
+      (foreign-free-0 id)))
 
-  (define-rules-syntax
-    ((with-locked-object body) body)
-    ((with-locked-object (id obj) next ... body)
-      (with-dynamic-wind
-        (id
-          (lets
-            (var obj)
-            (lock-object var)
-            var))
-        (with-locked-object next ... body)
-        (unlock-object id))))
+  (define-rule-syntax (with-locked-object (id obj) body ...)
+    (with-dynamic-wind
+      (id
+        (lets
+          (var obj)
+          (lock-object var)
+          var))
+      body ...
+      (unlock-object id)))
 
-  (define-rules-syntax
-    ((with-object->reference-address body) body)
-    ((with-object->reference-address (id obj) next ... body)
-      (with-locked-object (locked-obj obj)
-        (lets (id (object->reference-address locked-obj))
-          (with-object->reference-address next ... body)))))
+  (define-rule-syntax (with-object->reference-address (id obj) body ...)
+    (with-locked-object (locked-obj obj)
+      (let ((id (object->reference-address locked-obj)) body ...))))
 
   (define-rule-syntax (with-vector-ftype-pointer-and-count (id length ftype vector) body)
     (lets
@@ -64,6 +56,14 @@
           (repeat-indexed length index
             (ftype-set! ftype () id index (vector-ref vector-var index)))
           body))))
+
+  (define-rules-syntax
+    ((with-ftype-alloc (id ftype) body ...)
+      (with-ftype-alloc (id ftype 1) body ...))
+    ((with-ftype-alloc (id ftype size) body ...)
+      (with-foreign-alloc (ptr (* (ftype-sizeof ftype) size))
+        (lets (id (make-ftype-pointer ftype ptr))
+          body ...))))
 
   (define (foreign-string-length address)
     (let loop ((offset 0))

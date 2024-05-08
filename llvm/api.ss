@@ -36,10 +36,10 @@
     (foreign)
     (throw))
 
-  (define-rule-syntax (llvm-with-module (id name) body)
+  (define-rule-syntax (llvm-with-module (id name) body ...)
     (with-dynamic-wind
       (id (LLVMModuleCreateWithName name))
-      body
+      (begin body ...)
       (LLVMDisposeModule id)))
 
   (define-rule-syntax (llvm-dump-module mod)
@@ -64,10 +64,10 @@
   (define-rule-syntax (llvm-dump-type type)
     (LLVMDumpType type))
 
-  (define-rule-syntax (llvm-with-builder id body)
+  (define-rule-syntax (llvm-with-builder id body ...)
     (with-dynamic-wind
       (id (LLVMCreateBuilder))
-      body
+      (begin body ...)
       (LLVMDisposeBuilder id)))
 
   (define-rule-syntax (llvm-position-builder-at-end builder block)
@@ -92,11 +92,8 @@
     (LLVMLinkInInterpreter))
 
   (define-rule-syntax (llvm-with-execution-engine-for-module (engine mod) body)
-    (with-foreign-alloc
-      (engine-addr (ftype-sizeof uptr))
-      (error-addr (ftype-sizeof uptr))
-      (lets
-        (engine-ptr (make-ftype-pointer LLVMExecutionEngineRef engine-addr))
+    (with-ftype-alloc (engine-ptr LLVMExecutionEngineRef)
+      (with-foreign-alloc (error-addr (ftype-sizeof uptr))
         (with-dynamic-wind
           (engine
             (lets
