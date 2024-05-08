@@ -1,5 +1,6 @@
 (library (emu math)
   (export
+    u8? u16?
     fx->u8 fx->u16
     u8 u8= u8+ u8- u8+1 u8-1
     u16 u16= u16+ u16- u16+1 u16-1
