@@ -18,7 +18,9 @@
     inline-indexed
     ellipsis
     fenders implicit
-    syntax-rule->clause)
+    syntax-rule->clause
+    syntax->datum/annotation
+    bytevector->syntax)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -175,4 +177,15 @@
       ((pattern body)
         (syntax-rule->clause
           #`(pattern #t body)))))
+
+  (define (syntax->datum/annotation $syntax)
+    (or
+      (syntax->annotation $syntax)
+      (syntax->datum $syntax)))
+
+  (define (bytevector->syntax $bytevector)
+    #`(($primitive 3 bytevector)
+      #,@(map
+        (lambda ($u8) (datum->syntax #'bytevector->syntax $u8))
+        (bytevector->u8-list $bytevector))))
 )
