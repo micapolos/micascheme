@@ -6,6 +6,7 @@
     (micascheme)
     (minic keyword)
     (minic type)
+    (minic type-syntax)
     (prefix (emu math) emu-))
 
   (data (env syntax->expr-proc))
