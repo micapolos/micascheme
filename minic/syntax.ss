@@ -5,33 +5,61 @@
   (import
     (micascheme)
     (minic keyword)
+    (minic type)
     (prefix (emu math) emu-))
 
+  (data (env syntax->expr-proc))
   (data (expr type value))
 
+  (define (env-syntax->expr $env $syntax)
+    (app (env-syntax->expr-proc $env) $syntax))
+
   (define (parse $syntax)
-    (expr-value (syntax->expr $syntax)))
+    (expr-value
+      (syntax->expr
+        (env (lambda (_) #f))
+        $syntax)))
 
-  (define (syntax->expr $syntax)
-    (syntax-case $syntax (u8 u8+ u8+1)
-      ((u8 value)
-        (emu-u8? (datum value))
-        (expr #'u8 #'value))
-      ((u8+1 rhs)
-        (expr #'u8
-          #`(emu-u8+1
-            #,(syntax->u8-value #'rhs))))
-      ((u8+ lhs rhs)
-        (expr #'u8
-          #`(emu-u8+
-            #,(syntax->u8-value #'lhs)
-            #,(syntax->u8-value #'rhs))))))
+  (define (syntax->expr $env $syntax)
+    (or
+      (env-syntax->expr $env $syntax)
+      (syntax-case $syntax (u8 u8+ u8+1 u16 u16+1 u16+)
+        ((u8 value)
+          (cond
+            ((emu-u8? (datum value)) (expr (int-type 8) #'value))
+            (else (syntax-error #'value (format "not ~s:" (type->datum (int-type 8)))))))
+        ((u8+1 rhs)
+          (expr (int-type 8)
+            #`(emu-u8+1
+              #,(syntax-type->value $env #'rhs (int-type 8)))))
+        ((u8+ lhs rhs)
+          (expr (int-type 8)
+            #`(emu-u8+
+              #,(syntax-type->value $env #'lhs (int-type 8))
+              #,(syntax-type->value $env #'rhs (int-type 8)))))
+        ((u16 value)
+          (cond
+            ((emu-u16? (datum value)) (expr (int-type 16) #'value))
+            (else (syntax-error #'value (format "not ~s:" (type->datum (int-type 16)))))))
+        ((u16+1 rhs)
+          (expr (int-type 16)
+            #`(emu-u16+1
+              #,(syntax-type->value $env #'rhs (int-type 16)))))
+        ((u16+ lhs rhs)
+          (expr (int-type 16)
+            #`(emu-u16+
+              #,(syntax-type->value $env #'lhs (int-type 16))
+              #,(syntax-type->value $env #'rhs (int-type 16))))))))
 
-  (define (syntax->u8-value $syntax)
-    (expr->u8-value (syntax->expr $syntax)))
-
-  (define (expr->u8-value (expr $type $value))
-    (if (and (identifier? $type) (free-identifier=? $type #'u8))
-      $value
-      (syntax-error $value "not u8")))
+  (define (syntax-type->value $env $syntax $type)
+    (lets
+      ($expr (syntax->expr $env $syntax))
+      ($expr-type (expr-type $expr))
+      (run
+        (unless (equal? $expr-type $type)
+          (syntax-error $syntax
+            (format "expected ~s, actual ~s:"
+              (type->datum $type)
+              (type->datum $expr-type)))))
+      (expr-value $expr)))
 )
