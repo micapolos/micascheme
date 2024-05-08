@@ -23,7 +23,15 @@
   (define (syntax->expr $env $syntax)
     (or
       (env-syntax->expr $env $syntax)
-      (syntax-case $syntax (u8 u8+ u8+1 u16 u16+1 u16+)
+      (syntax-case $syntax (type u8 u8+ u8+1 u16 u16+1 u16+)
+        ((type $x)
+          (expr
+            (type-type)
+            (type->syntax (expr-type (syntax->expr $env #'$x)))))
+        (u8+
+          (expr
+            (function-type (list (int-type 8) (int-type 8)) (int-type 8))
+            #'(lambda (x y) (u8+ x y))))
         ((u8 value)
           (cond
             ((emu-u8? (datum value)) (expr (int-type 8) #'value))
