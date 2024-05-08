@@ -15,9 +15,9 @@
         (lets
           (tmp-value
             (llvm-build-add builder
-            (llvm-get-param sum-function 0)
-            (llvm-get-param sum-function 1)
-            "tmp"))
+              (llvm-get-param sum-function 0)
+              (llvm-get-param sum-function 1)
+              "tmp"))
           (run
             (llvm-build-ret builder tmp-value))))
         (llvm-dump-module foo-module)
