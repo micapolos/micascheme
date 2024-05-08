@@ -12,6 +12,7 @@
   (failable)
   (failure)
   (fluent)
+  (foreign)
   (from)
   (fstack)
   (function)

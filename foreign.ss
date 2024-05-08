@@ -6,6 +6,10 @@
     with-foreign-alloc
     with-foreign-alloc-0
 
+    with-locked-object
+    with-object->reference-address
+
+    foreign-string-length
     foreign-string)
   (import (scheme) (syntaxes) (dynamic-wind) (lets))
 
@@ -31,17 +35,44 @@
         (with-foreign-alloc-0 next ... body)
         (foreign-free-0 id))))
 
+  (define-rules-syntax
+    ((with-locked-object body) body)
+    ((with-locked-object (id obj) next ... body)
+      (with-dynamic-wind
+        (id
+          (lets
+            (var obj)
+            (lock-object var)
+            var))
+        (with-locked-object next ... body)
+        (unlock-object id))))
+
+  (define-rules-syntax
+    ((with-object->reference-address body) body)
+    ((with-object->reference-address (id obj) next ... body)
+      (with-locked-object (locked-obj obj)
+        (lets (id (object->reference-address locked-obj))
+          (with-object->reference-address next ... body)))))
+
+  (define (foreign-string-length address)
+    (let loop ((offset 0))
+      (lets
+        (u8 (foreign-ref 'unsigned-8 address offset))
+        (if (zero? u8)
+          offset
+          (loop (add1 offset))))))
+
   (define (foreign-string $address)
     (lets
       ((values $port $close) (open-bytevector-output-port))
       ($bytevector
         (let $loop (($offset 0))
           (lets
-            ($char (char->integer (foreign-ref 'char $address $offset)))
+            ($u8 (foreign-ref 'unsigned-8 $address $offset))
             (cond
-              ((zero? $char) ($close))
+              ((zero? $u8) ($close))
               (else
-                (put-u8 $port $char)
+                (put-u8 $port $u8)
                 ($loop (add1 $offset)))))))
       (utf8->string $bytevector)))
 )
