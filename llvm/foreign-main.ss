@@ -19,7 +19,6 @@
   (run (LLVMDisposeBuilder $builder))
   (run (LLVMDumpModule $module))
   (run (LLVMVerifyModule $module 0 0))
-  (run (LLVMLinkInMCJIT))
   ($engine-addr (foreign-alloc (ftype-sizeof LLVMExecutionEngineRef)))
   ($engine-ptr (make-ftype-pointer LLVMExecutionEngineRef $engine-addr))
   ($error-addr (foreign-alloc (ftype-sizeof uptr)))
