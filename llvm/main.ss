@@ -25,7 +25,12 @@
       (llvm-dump-module foo-module)
       (llvm-verify-module foo-module)
       (llvm-link-in-mcjit)
-      ; (llvm-with-execution-engine-for-module (engine foo-module)
-      ;   (displayln engine))
-      ))
-)
+      (llvm-with-execution-engine-for-module (engine foo-module)
+        (displayln
+          (format "10 + 20 = ~a"
+            (llvm-generic-value-to-int
+              (llvm-run-function engine sum-function
+                (vector
+                  (llvm-create-generic-value-of-int (llvm-int32-type) 10 #f)
+                  (llvm-create-generic-value-of-int (llvm-int32-type) 20 #f)))
+              #f)))))))

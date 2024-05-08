@@ -8,10 +8,11 @@
 
     with-locked-object
     with-object->reference-address
+    with-vector-ftype-pointer-and-count
 
     foreign-string-length
     foreign-string)
-  (import (scheme) (syntaxes) (dynamic-wind) (lets))
+  (import (scheme) (syntax) (syntaxes) (dynamic-wind) (lets) (procedure))
 
   (define (foreign-alloc-0 size)
     (if (zero? size) 0 (foreign-alloc size)))
@@ -53,6 +54,16 @@
       (with-locked-object (locked-obj obj)
         (lets (id (object->reference-address locked-obj))
           (with-object->reference-address next ... body)))))
+
+  (define-rule-syntax (with-vector-ftype-pointer-and-count (id length ftype vector) body)
+    (lets
+      (vector-var vector)
+      (length (vector-length vector-var))
+      (with-foreign-alloc-0 (ptr (* (ftype-sizeof ftype) length))
+        (let ((id (make-ftype-pointer ftype ptr)))
+          (repeat-indexed length index
+            (ftype-set! ftype () id index (vector-ref vector-var index)))
+          body))))
 
   (define (foreign-string-length address)
     (let loop ((offset 0))

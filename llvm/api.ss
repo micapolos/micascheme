@@ -17,6 +17,9 @@
 
     llvm-verify-module
     llvm-with-execution-engine-for-module
+    llvm-create-generic-value-of-int
+    llvm-generic-value-to-int
+    llvm-run-function
 
     llvm-link-in-mcjit
     llvm-link-in-interpreter)
@@ -32,16 +35,6 @@
     (dynamic-wind)
     (foreign)
     (throw))
-
-  (define-rule-syntax (with-vector-ftype-pointer-and-count (id length ftype vector) body)
-    (lets
-      (vector-var vector)
-      (length (vector-length vector-var))
-      (with-foreign-alloc-0 (ptr (* (ftype-sizeof ftype) length))
-        (let ((id (make-ftype-pointer ftype ptr)))
-          (repeat-indexed length index
-            (ftype-set! ftype () id index (vector-ref vector-var index)))
-          body))))
 
   (define-rule-syntax (llvm-with-module (id name) body)
     (with-dynamic-wind
@@ -100,20 +93,34 @@
 
   (define-rule-syntax (llvm-with-execution-engine-for-module (engine mod) body)
     (with-foreign-alloc
-      (engine-ptr (ftype-sizeof uptr))
-      (error-ptr (ftype-sizeof uptr))
-      (with-dynamic-wind
-        (engine
-          (lets
-            (ok?
-              (LLVMCreateExecutionEngineForModule
-                (make-ftype-pointer LLVMExecutionEngineRef engine-ptr)
-                mod
-                error-ptr))
-            (if ok?
-              (make-ftype-pointer LLVMExecutionEngineRef engine-ptr)
-              (throw create-execution-engine-error
-                (foreign-string (foreign-ref 'uptr error-ptr 0))))))
-        body
-        (LLVMDisposeExecutionEngine engine))))
+      (engine-addr (ftype-sizeof uptr))
+      (error-addr (ftype-sizeof uptr))
+      (lets
+        (engine-ptr (make-ftype-pointer LLVMExecutionEngineRef engine-addr))
+        (with-dynamic-wind
+          (engine
+            (lets
+              (error?
+                (LLVMCreateExecutionEngineForModule
+                  engine-ptr
+                  mod
+                  error-addr))
+              (if (not error?)
+                (ftype-ref LLVMExecutionEngineRef () engine-ptr 0)
+                (let ()
+                  ; TODO: Dispose error-ptr message
+                  (throw create-execution-engine-error)))))
+          body
+          (void) ;(LLVMDisposeExecutionEngine engine) - why dispose crashes?
+          ))))
+
+  (define-rule-syntax (llvm-create-generic-value-of-int type integer signed?)
+    (LLVMCreateGenericValueOfInt type integer signed?))
+
+  (define-rule-syntax (llvm-generic-value-to-int generic-value signed?)
+    (LLVMGenericValueToInt generic-value signed?))
+
+  (define-rule-syntax (llvm-run-function engine fn args)
+    (with-vector-ftype-pointer-and-count (args-ptr arg-count LLVMGenericValueRef args)
+      (LLVMRunFunction engine fn arg-count args-ptr)))
 )

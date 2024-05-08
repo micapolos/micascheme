@@ -6,6 +6,7 @@
     LLVMBasicBlockRef
     LLVMBuilderRef
     LLVMExecutionEngineRef
+    LLVMGenericValueRef
 
     LLVMModuleCreateWithName
     LLVMDisposeModule
@@ -30,6 +31,10 @@
     LLVMCreateExecutionEngineForModule
     LLVMDisposeExecutionEngine
 
+    LLVMCreateGenericValueOfInt
+    LLVMGenericValueToInt
+    LLVMRunFunction
+
     LLVMLinkInMCJIT
     LLVMLinkInInterpreter
     ;LLVMInitializeNativeTarget
@@ -45,6 +50,7 @@
   (define-ftype LLVMBasicBlockRef uptr)
   (define-ftype LLVMBuilderRef uptr)
   (define-ftype LLVMExecutionEngineRef uptr)
+  (define-ftype LLVMGenericValueRef uptr)
 
   (define-case-syntax (define-llvm (name param ...) result)
     #`(define name
@@ -75,6 +81,10 @@
 
   (define-llvm (LLVMCreateExecutionEngineForModule (* LLVMExecutionEngineRef) LLVMModuleRef uptr) boolean)
   (define-llvm (LLVMDisposeExecutionEngine LLVMExecutionEngineRef) void)
+
+  (define-llvm (LLVMCreateGenericValueOfInt LLVMTypeRef unsigned-long-long boolean) LLVMGenericValueRef)
+  (define-llvm (LLVMGenericValueToInt LLVMGenericValueRef boolean) unsigned-long-long)
+  (define-llvm (LLVMRunFunction LLVMExecutionEngineRef LLVMValueRef unsigned (* LLVMGenericValueRef)) LLVMGenericValueRef)
 
   (define-llvm (LLVMLinkInMCJIT) void)
   (define-llvm (LLVMLinkInInterpreter) void)
