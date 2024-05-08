@@ -24,16 +24,18 @@
   ($engine-ptr (make-ftype-pointer LLVMExecutionEngineRef $engine-addr))
   ($error-addr (foreign-alloc (ftype-sizeof uptr)))
   ($error? (LLVMCreateExecutionEngineForModule $engine-ptr $module $error-addr))
-  ($engine (if $error? (throw 'dupa) (ftype-ref LLVMExecutionEngineRef () $engine-ptr 0)))
-  (run
-    (displayln
-      (format "10 + 20 = ~a"
-        (llvm-generic-value-to-int
-          (llvm-run-function $engine $sum-function
-            (vector
-              (llvm-create-generic-value-of-int (llvm-int32-type) 10 #f)
-              (llvm-create-generic-value-of-int (llvm-int32-type) 20 #f)))
-          #f))))
-  ;(run (LLVMDisposeExecutionEngine $engine))
+  ($engine (if $error? (throw dupa) (ftype-ref LLVMExecutionEngineRef () $engine-ptr 0)))
+  (run (foreign-free $error-addr))
+  (run (foreign-free $engine-addr))
+  ($lhs-arg (LLVMCreateGenericValueOfInt (LLVMInt32Type) 10 #f))
+  ($rhs-arg (LLVMCreateGenericValueOfInt (LLVMInt32Type) 20 #f))
+  ($args-addr (foreign-alloc (* 2 (ftype-sizeof LLVMGenericValueRef))))
+  ($args-ptr (make-ftype-pointer LLVMGenericValueRef $args-addr))
+  (run (ftype-set! LLVMGenericValueRef () $args-ptr 0 $lhs-arg))
+  (run (ftype-set! LLVMGenericValueRef () $args-ptr 1 $rhs-arg))
+  ($result (LLVMRunFunction $engine $sum-function 2 $args-ptr))
+  (run (foreign-free $args-addr))
+  (run (displayln (format "10 + 20 = ~a" (LLVMGenericValueToInt $result #f))))
   (run (LLVMDisposeModule $module))
+  ;(run (LLVMDisposeExecutionEngine $engine))
   (void))
