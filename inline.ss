@@ -7,9 +7,6 @@
   (import (scheme) (syntax) (syntaxes) (procedure))
 
   (define-case-syntaxes (literals import)
-    ((inline $syntax)
-      (eval
-        (syntax->datum/annotation #'$syntax)))
     ((inline (import import-spec ...) $syntax)
       (eval
         (syntax->datum/annotation #'$syntax)

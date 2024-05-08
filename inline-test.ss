@@ -4,21 +4,12 @@
 
 (check
   (equal?
-    (inline #`(bytevector (+ 1 2) 10))
-    (bytevector 3 10)))
-
-(check
-  (equal?
-    (inline (import (scheme))
-      #`(bytevector (+ 1 2) 10))
-    (bytevector 3 10)))
-
-(check
-  (equal?
-    (inline
-      (import (scheme) (emu math))
-      #`(bytevector (u8+ 1 2) 10))
-    (bytevector 3 10)))
+    (expand
+      `(inline
+        (import (scheme) (emu math))
+        #`(($primitive 3 bytevector) #,(u8+ 1 2) 10))
+      (environment '(scheme) '(inline)))
+    `(($primitive 3 bytevector) 3 10)))
 
 ; === inline-datum
 
