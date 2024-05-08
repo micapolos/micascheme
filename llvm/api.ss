@@ -111,8 +111,9 @@
                 mod
                 error-ptr))
             (if ok?
-              (ftype-ref uptr () engine-ptr 0)
-              (throw create-execution-engine-error))))
+              (make-ftype-pointer LLVMExecutionEngineRef engine-ptr)
+              (throw create-execution-engine-error
+                (foreign-string (foreign-ref 'uptr error-ptr 0))))))
         body
         (LLVMDisposeExecutionEngine engine))))
 )

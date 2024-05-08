@@ -4,8 +4,10 @@
     foreign-free-0
 
     with-foreign-alloc
-    with-foreign-alloc-0)
-  (import (scheme) (syntaxes) (dynamic-wind))
+    with-foreign-alloc-0
+
+    foreign-string)
+  (import (scheme) (syntaxes) (dynamic-wind) (lets))
 
   (define (foreign-alloc-0 size)
     (if (zero? size) 0 (foreign-alloc size)))
@@ -28,4 +30,18 @@
         (id (foreign-alloc-0 size))
         (with-foreign-alloc-0 next ... body)
         (foreign-free-0 id))))
+
+  (define (foreign-string $address)
+    (lets
+      ((values $port $close) (open-bytevector-output-port))
+      ($bytevector
+        (let $loop (($offset 0))
+          (lets
+            ($char (char->integer (foreign-ref 'char $address $offset)))
+            (cond
+              ((zero? $char) ($close))
+              (else
+                (put-u8 $port $char)
+                ($loop (add1 $offset)))))))
+      (utf8->string $bytevector)))
 )
