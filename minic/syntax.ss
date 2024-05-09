@@ -8,7 +8,8 @@
     (minic keyword)
     (minic type)
     (minic type-syntax)
-    (prefix (emu math) emu-))
+    (prefix (emu math) emu-)
+    (prefix (minic runtime) runtime-))
 
   (data (env syntax->expr-proc syntax-type->value-proc))
   (data (expr type value))
@@ -35,11 +36,28 @@
   (define (syntax->expr $env $syntax)
     (or
       (env-syntax->expr $env $syntax)
-      (syntax-case $syntax (type u8 u8+ u8+1 u16 u16+1 u16+)
+      (syntax-case $syntax (type i u8 u8+ u8+1 u16 u16+1 u16+)
         ((type $x)
           (expr
             (type-type)
             (type->syntax (expr-type (syntax->expr $env #'$x)))))
+        ((i bits value)
+          (lets
+            (bits-datum (datum bits))
+            (bits
+              (if (and (integer? bits-datum) (>= bits-datum 0) (<= bits-datum (fixnum-width)))
+                bits-datum
+                (syntax-error $syntax "bits outside of range")))
+            (mask (fx-/wraparound (fxsll 1 bits) 1))
+            (value-datum (datum value))
+            (fixnum
+              (if (fixnum? value-datum)
+                value-datum
+                (syntax-error $syntax "not fixnum")))
+            (valid? (fxzero? (fxand fixnum (fxnot mask))))
+            (if valid?
+              (expr (int-type bits) #'value)
+              (syntax-error $syntax "valie outside of range"))))
         (($fn $arg ...)
           (expr-apply
             $env

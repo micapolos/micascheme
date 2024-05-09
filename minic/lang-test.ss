@@ -1,5 +1,8 @@
 (import (micascheme) (minic lang) (minic type))
 
+(check (equal? (minic (type (i 8 #x80))) (int-type 8)))
+(check (equal? (minic (i 8 #x80)) #x80))
+
 (check (equal? (minic (type u8)) (function-type (list (int-type 8)) (int-type 8))))
 (check (equal? (minic (type u8+1)) (function-type (list (int-type 8)) (int-type 8))))
 (check (equal? (minic (type u8+)) (function-type (list (int-type 8) (int-type 8)) (int-type 8))))
