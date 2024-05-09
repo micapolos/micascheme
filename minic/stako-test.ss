@@ -119,14 +119,15 @@
 ; loop
 (check
   (equal?
-    (run-stako 100
-      (alloc 3)
-      (in 0 1)
-      (const 2 1000)
-      (loop 1
-        (inc 2)
-        (inc 2)
-        (dec 1))
-      (out 0 2)
-      (free 3))
-    1200))
+    (time
+      (run-stako 35000000
+        (alloc 3)
+        (in 0 1)
+        (const 2 0)
+        (loop 1
+          (inc 2)
+          (inc 2)
+          (dec 1))
+        (out 0 2)
+        (free 3)))
+    70000000))
