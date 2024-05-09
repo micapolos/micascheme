@@ -33,6 +33,12 @@
                   #'emu-u16+))
               (else #f))))
         ; syntax-type->value
-        (lambda ($syntax $type) #f))
+        (lambda ($syntax $type)
+          (cond
+            ((equal? $type (int-type 8))
+              (and (emu-u8? (syntax->datum $syntax)) $syntax))
+            ((equal? $type (int-type 16))
+              (and (emu-u16? (syntax->datum $syntax)) $syntax))
+            (else #f))))
       #'body))
 )

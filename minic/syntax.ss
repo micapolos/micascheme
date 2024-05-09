@@ -22,14 +22,14 @@
   (define (parse $env $syntax)
     (expr-value (syntax->expr $env $syntax)))
 
-  (define (expr-apply $fn-syntax $fn-expr $arg-syntaxes $arg-exprs)
+  (define (expr-apply $env $fn-syntax $fn-expr $arg-syntaxes $arg-exprs)
     (lets
       ($fn-type (expr-type $fn-expr))
       (run (unless (function-type? $fn-type) (syntax-error $fn-syntax "not a function")))
       ($arg-types (map expr-type $arg-exprs))
       ($param-types (function-type-param-types $fn-type))
       ($result-type (function-type-result-type $fn-type))
-      ($values (map syntax-expr-type->value $arg-syntaxes $arg-exprs $param-types))
+      ($values (map (partial env-syntax-expr-type->value $env) $arg-syntaxes $arg-exprs $param-types))
       (expr $result-type #`(#,(expr-value $fn-expr) #,@$values))))
 
   (define (syntax->expr $env $syntax)
@@ -40,16 +40,9 @@
           (expr
             (type-type)
             (type->syntax (expr-type (syntax->expr $env #'$x)))))
-        ((u8 value)
-          (cond
-            ((emu-u8? (datum value)) (expr (int-type 8) #'value))
-            (else (syntax-error #'value (format "not ~s:" (type->datum (int-type 8)))))))
-        ((u16 value)
-          (cond
-            ((emu-u16? (datum value)) (expr (int-type 16) #'value))
-            (else (syntax-error #'value (format "not ~s:" (type->datum (int-type 16)))))))
         (($fn $arg ...)
           (expr-apply
+            $env
             #'$fn
             (syntax->expr $env #'$fn)
             (syntax->list #'($arg ...))
@@ -59,6 +52,15 @@
 
   (define (syntax-type->value $env $syntax $type)
     (syntax-expr-type->value $syntax (syntax->expr $env $syntax) $type))
+
+  (define (env-syntax-expr-type->value $env $syntax $expr $type)
+    (lets
+      ($expr-type (expr-type $expr))
+      (or
+        (switch-opt $expr-type
+          ((syntax-type? _)
+            (env-syntax-type->value $env $syntax $type)))
+        (syntax-expr-type->value $syntax $expr $type))))
 
   (define (syntax-expr-type->value $syntax $expr $type)
     (lets
