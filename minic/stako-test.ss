@@ -1,6 +1,7 @@
 (import (micascheme) (minic stako))
 
 (check (equal? (stako 0 (bytevector 10 20)) (bytevector 10 20)))
+(check (equal? (stako 100 (bytevector 10 20)) (bytevector 10 20)))
 
 ; alloc / free
 (check (equal? (stako 2 (bytevector 30) (alloc 2) (const-8 0 10) (const-8 1 20)) (bytevector 10 20 30)))
