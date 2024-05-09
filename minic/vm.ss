@@ -1,6 +1,6 @@
-(library (minic stako)
+(library (minic vm)
   (export
-    stako
+    vm
     alloc free
     const ld inc dec add sub
     in out
@@ -17,7 +17,7 @@
     in out
     block switch loop)
 
-  (define-syntax (stako $syntax)
+  (define-syntax (vm $syntax)
     (syntax-case $syntax ()
       (($id ($stack-size $io) $op* ...)
         (let ()

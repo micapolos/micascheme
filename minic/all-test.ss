@@ -4,4 +4,4 @@
   (minic type)
   (minic lang)
   (minic runtime)
-  (minic stako))
+  (minic vm))

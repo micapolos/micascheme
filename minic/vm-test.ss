@@ -1,21 +1,21 @@
-(import (except (micascheme) switch) (minic stako) (syntax) (syntaxes))
+(import (except (micascheme) switch) (minic vm) (syntax) (syntaxes))
 
-(define-rule-syntax (run-stako $in $op ...)
+(define-rule-syntax (run-vm $in $op ...)
   (let ()
     (define $val $in)
     (define-rules-syntaxes
       ((io $addr) $val)
       ((io $addr $fx) (set! $val $fx)))
-    (stako (1024 io) $op ...)
+    (vm (1024 io) $op ...)
     $val))
 
 ; empty
-(check (equal? (run-stako 0) 0))
+(check (equal? (run-vm 0) 0))
 
 ; out
 (check
   (equal?
-    (run-stako 0
+    (run-vm 0
       (alloc 2)
       (const 1 100)
       (out 1 0)
@@ -25,7 +25,7 @@
 ; inc
 (check
   (equal?
-    (run-stako 100
+    (run-vm 100
       (alloc 2)
       (in 1 0)
       (inc 1)
@@ -36,7 +36,7 @@
 ; dec
 (check
   (equal?
-    (run-stako 100
+    (run-vm 100
       (alloc 2)
       (in 1 0)
       (dec 1)
@@ -47,7 +47,7 @@
 ; add
 (check
   (equal?
-    (run-stako 100
+    (run-vm 100
       (alloc 3)
       (in 1 0)
       (const 2 10)
@@ -59,7 +59,7 @@
 ; sub
 (check
   (equal?
-    (run-stako 100
+    (run-vm 100
       (alloc 3)
       (in 1 0)
       (const 2 10)
@@ -71,7 +71,7 @@
 ; block
 (check
   (equal?
-    (run-stako 0
+    (run-vm 0
       (block
         (alloc 2)
         (const 1 10)
@@ -82,7 +82,7 @@
 ; switch
 (check
   (equal?
-    (run-stako 0
+    (run-vm 0
       (alloc 2)
       (in 1 0)
       (switch 1
@@ -94,7 +94,7 @@
 
 (check
   (equal?
-    (run-stako 1
+    (run-vm 1
       (alloc 2)
       (in 1 0)
       (switch 1
@@ -106,7 +106,7 @@
 
 (check
   (equal?
-    (run-stako 2
+    (run-vm 2
       (alloc 2)
       (in 1 0)
       (switch 1
@@ -119,7 +119,7 @@
 ; loop
 (check
   (equal?
-    (run-stako 35000000
+    (run-vm 35000000
       (alloc 3)
       (in 1 0)
       (const 2 0)
