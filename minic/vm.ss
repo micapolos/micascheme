@@ -1,25 +1,15 @@
 (library (minic vm)
-  (export
-    vm
-    alloc free
-    const ld inc dec add sub
-    in out
-    block switch loop)
+  (export vm)
   (import
     (scheme)
     (syntax)
     (syntaxes)
+    (minic vm-keywords)
     (only (switch) index-switch))
-
-  (define-aux-keywords
-    alloc free
-    const ld inc dec add sub
-    in out
-    block switch loop)
 
   (define-syntax (vm $syntax)
     (syntax-case $syntax ()
-      (($id ($stack-size $io) $op* ...)
+      (($id ($fxvector $sp $io) $op* ...)
         (let ()
           (define (op-syntax $op)
             (syntax-case $op
@@ -64,8 +54,6 @@
                       #,@(map op-syntax (syntax->list #'($op ...)))
                       (loop)))))))
           #`(let ()
-            (define $fxvector (make-fxvector $stack-size))
-            (define $sp (fxvector-length $fxvector))
             (define-rules-syntaxes
               ((fast+ $a $b)
                 (($primitive 3 fx+/wraparound) $a $b))

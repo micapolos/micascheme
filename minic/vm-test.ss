@@ -1,13 +1,15 @@
-(import (except (micascheme) switch) (minic vm) (syntax) (syntaxes))
+(import (except (micascheme) switch) (minic vm) (minic vm-keywords) (syntax) (syntaxes))
 
 (define-rule-syntax (run-vm $in $op ...)
   (let ()
-    (define $val $in)
+    (define $fxvector (make-fxvector 1024))
+    (define $sp (fxvector-length $fxvector))
+    (define $value $in)
     (define-rules-syntaxes
-      ((io $addr) $val)
-      ((io $addr $fx) (set! $val $fx)))
-    (vm (1024 io) $op ...)
-    $val))
+      ((io $addr) $value)
+      ((io $addr $fx) (set! $value $fx)))
+    (vm ($fxvector $sp io) $op ...)
+    $value))
 
 ; empty
 (check (equal? (run-vm 0) 0))
