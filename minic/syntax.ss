@@ -1,6 +1,7 @@
 (library (minic syntax)
   (export
     parse
+    env? env env-syntax->expr-proc
     expr? expr expr-type expr-value)
   (import
     (micascheme)
@@ -15,11 +16,18 @@
   (define (env-syntax->expr $env $syntax)
     (app (env-syntax->expr-proc $env) $syntax))
 
-  (define (parse $syntax)
-    (expr-value
-      (syntax->expr
-        (env (lambda (_) #f))
-        $syntax)))
+  (define (parse $env $syntax)
+    (expr-value (syntax->expr $env $syntax)))
+
+  (define (expr-apply $fn-expr $arg-exprs)
+    (lets
+      ($fn-type (expr-type $fn-expr))
+      (run (unless (function-type? $fn-type) (syntax-error (expr-value $fn-expr) "not a function")))
+      ($arg-types (map expr-type $arg-exprs))
+      ($param-types (function-type-param-types $fn-type))
+      ($result-type (function-type-result-type $fn-type))
+      ($values (map expr-type->value $arg-exprs $param-types))
+      (expr $result-type #`(#,(expr-value $fn-expr) #,@$values))))
 
   (define (syntax->expr $env $syntax)
     (or
@@ -29,45 +37,29 @@
           (expr
             (type-type)
             (type->syntax (expr-type (syntax->expr $env #'$x)))))
-        (u8+
-          (expr
-            (function-type (list (int-type 8) (int-type 8)) (int-type 8))
-            #'(lambda (x y) (u8+ x y))))
         ((u8 value)
           (cond
             ((emu-u8? (datum value)) (expr (int-type 8) #'value))
             (else (syntax-error #'value (format "not ~s:" (type->datum (int-type 8)))))))
-        ((u8+1 rhs)
-          (expr (int-type 8)
-            #`(emu-u8+1
-              #,(syntax-type->value $env #'rhs (int-type 8)))))
-        ((u8+ lhs rhs)
-          (expr (int-type 8)
-            #`(emu-u8+
-              #,(syntax-type->value $env #'lhs (int-type 8))
-              #,(syntax-type->value $env #'rhs (int-type 8)))))
         ((u16 value)
           (cond
             ((emu-u16? (datum value)) (expr (int-type 16) #'value))
             (else (syntax-error #'value (format "not ~s:" (type->datum (int-type 16)))))))
-        ((u16+1 rhs)
-          (expr (int-type 16)
-            #`(emu-u16+1
-              #,(syntax-type->value $env #'rhs (int-type 16)))))
-        ((u16+ lhs rhs)
-          (expr (int-type 16)
-            #`(emu-u16+
-              #,(syntax-type->value $env #'lhs (int-type 16))
-              #,(syntax-type->value $env #'rhs (int-type 16))))))))
+        (($fn $arg ...)
+          (expr-apply
+            (syntax->expr $env #'$fn)
+            (map (partial syntax->expr $env) (syntax->list #'($arg ...))))))))
 
   (define (syntax-type->value $env $syntax $type)
+    (expr-type->value (syntax->expr $env $syntax) $type))
+
+  (define (expr-type->value $expr $type)
     (lets
-      ($expr (syntax->expr $env $syntax))
       ($expr-type (expr-type $expr))
       (run
         (unless (equal? $expr-type $type)
-          (syntax-error $syntax
-            (format "expected ~s, actual ~s:"
+          (syntax-error (expr-value $expr)
+            (format "expected ~s, actual ~s, value"
               (type->datum $type)
               (type->datum $expr-type)))))
       (expr-value $expr)))
