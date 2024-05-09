@@ -11,6 +11,7 @@
   (define-case-syntax (minic body)
     (parse
       (env
+        ; syntax->expr
         (lambda ($syntax)
           (and (identifier? $syntax)
             (cond
@@ -30,6 +31,8 @@
                 (expr
                   (function-type (list (int-type 16) (int-type 16)) (int-type 16))
                   #'emu-u16+))
-              (else #f)))))
+              (else #f))))
+        ; syntax-type->value
+        (lambda ($syntax $type) #f))
       #'body))
 )

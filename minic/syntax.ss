@@ -1,7 +1,7 @@
 (library (minic syntax)
   (export
     parse
-    env? env env-syntax->expr-proc
+    env? env env-syntax->expr-proc env-syntax-type->value-proc
     expr? expr expr-type expr-value)
   (import
     (micascheme)
@@ -10,11 +10,14 @@
     (minic type-syntax)
     (prefix (emu math) emu-))
 
-  (data (env syntax->expr-proc))
+  (data (env syntax->expr-proc syntax-type->value-proc))
   (data (expr type value))
 
   (define (env-syntax->expr $env $syntax)
     (app (env-syntax->expr-proc $env) $syntax))
+
+  (define (env-syntax-type->value $env $syntax $type)
+    (app (env-syntax-type->value-proc $env) $syntax $type))
 
   (define (parse $env $syntax)
     (expr-value (syntax->expr $env $syntax)))
@@ -50,7 +53,9 @@
             #'$fn
             (syntax->expr $env #'$fn)
             (syntax->list #'($arg ...))
-            (map (partial syntax->expr $env) (syntax->list #'($arg ...))))))))
+            (map (partial syntax->expr $env) (syntax->list #'($arg ...)))))
+        ($other
+          (expr (syntax-type) #'#'$other)))))
 
   (define (syntax-type->value $env $syntax $type)
     (syntax-expr-type->value $syntax (syntax->expr $env $syntax) $type))

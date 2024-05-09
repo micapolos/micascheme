@@ -10,3 +10,6 @@
 (check (equal? (minic (u16 #x80)) #x80))
 (check (equal? (minic (u16+1 (u16 #x80))) #x81))
 (check (equal? (minic (u16+ (u16 #x80) (u16 #x90))) #x110))
+
+(check (equal? (minic (type "foo")) (syntax-type)))
+(check (equal? (syntax->datum (minic "foo")) "foo"))

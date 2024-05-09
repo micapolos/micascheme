@@ -6,6 +6,8 @@
     (switch $type
       ((type-type? _)
         #`(type-type))
+      ((syntax-type? _)
+        #`(syntax-type))
       ((int-type? (int-type $bits))
         #`(int-type #,$bits))
       ((function-type? (function-type $param-types $result-type))
