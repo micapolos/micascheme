@@ -3,6 +3,7 @@
 (let ()
   (define regs (make-fxvector 256))
   (define sp (fxvector-length regs))
+
   (define-rules-syntaxes
     ((io addr) 0)
     ((io addr value)
