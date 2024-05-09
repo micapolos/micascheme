@@ -47,9 +47,9 @@
                 #`(imem $lhs (fast- (imem $lhs) (imem $rhs))))
 
               ((in $lhs $rhs)
-                #`(imem $rhs ($io (imem $lhs))))
+                #`(imem $lhs ($io (imem $rhs))))
               ((out $lhs $rhs)
-                #`($io (imem $lhs) (imem $rhs)))
+                #`($io (imem $rhs) (imem $lhs)))
 
               ((block $op ...)
                 #`(begin #,@(map op-syntax (syntax->list #'($op ...)))))
