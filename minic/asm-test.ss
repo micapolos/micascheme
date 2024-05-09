@@ -12,6 +12,9 @@
 ; empty
 (check (equal? (test-asm 0) 0))
 
+; nop
+(check (equal? (test-asm 0 (nop)) 0))
+
 ; out
 (check
   (equal?

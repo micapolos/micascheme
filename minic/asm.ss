@@ -1,7 +1,8 @@
 (library (minic asm)
   (export
     asm
-    local block switch loop
+    local
+    nop block switch loop
     const ld inc dec add sub
     in out)
   (import
@@ -12,7 +13,8 @@
     (only (switch) index-switch))
 
   (define-aux-keywords
-    local block switch loop
+    local
+    nop block switch loop
     const ld inc dec add sub
     in out)
 
@@ -36,6 +38,9 @@
                   (set! $sp (prim- $sp $size))
                   #,@(op-syntax-list #'($op ...))
                   (set! $sp (prim+ $sp $size))))
+
+              ((nop)
+                #`(void))
               ((block $op ...)
                 #`(begin #,@(op-syntax-list #'($op ...))))
               ((switch $lhs $op ...)
