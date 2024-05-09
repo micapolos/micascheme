@@ -2,51 +2,13 @@
   (export minic)
   (import
     (micascheme)
-    (minic keyword)
-    (minic syntax)
-    (minic type)
+    (minic runtime)
+    (minic syntax-type)
     (prefix (emu math) emu-))
-  (export (import (minic keyword)))
+  (export (import (minic runtime)))
 
   (define-case-syntax (minic body)
-    (parse
-      (env
-        ; syntax->expr
-        (lambda ($syntax)
-          (and (identifier? $syntax)
-            (cond
-              ((free-identifier=? $syntax #'u8)
-                (expr
-                  (function-type (list (int-type 8)) (int-type 8))
-                  #'emu-u8))
-              ((free-identifier=? $syntax #'u8+1)
-                (expr
-                  (function-type (list (int-type 8)) (int-type 8))
-                  #'emu-u8+1))
-              ((free-identifier=? $syntax #'u8+)
-                (expr
-                  (function-type (list (int-type 8) (int-type 8)) (int-type 8))
-                  #'emu-u8+))
-              ((free-identifier=? $syntax #'u16)
-                (expr
-                  (function-type (list (int-type 16)) (int-type 16))
-                  #'emu-u16))
-              ((free-identifier=? $syntax #'u16+1)
-                (expr
-                  (function-type (list (int-type 16)) (int-type 16))
-                  #'emu-u16+1))
-              ((free-identifier=? $syntax #'u16+)
-                (expr
-                  (function-type (list (int-type 16) (int-type 16)) (int-type 16))
-                  #'emu-u16+))
-              (else #f))))
-        ; syntax-type->value
-        (lambda ($syntax $type)
-          (cond
-            ((equal? $type (int-type 8))
-              (and (emu-u8? (syntax->datum $syntax)) $syntax))
-            ((equal? $type (int-type 16))
-              (and (emu-u16? (syntax->datum $syntax)) $syntax))
-            (else #f))))
+    (run
+      (syntax->type #'body)
       #'body))
 )

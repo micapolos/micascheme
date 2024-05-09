@@ -1,24 +1,15 @@
-(import (micascheme) (minic lang) (minic type))
+(import (micascheme) (minic lang))
 
-(check (equal? (minic (type (i 8 #x80))) (int-type 8)))
-(check (equal? (minic (i 8 #x80)) #x80))
+(check (equal? (minic (int 7 const #x7f)) #x7f))
 
-(check (equal? (minic (type u8)) (function-type (list (int-type 8)) (int-type 8))))
-(check (equal? (minic (type u8+1)) (function-type (list (int-type 8)) (int-type 8))))
-(check (equal? (minic (type u8+)) (function-type (list (int-type 8) (int-type 8)) (int-type 8))))
+(check (equal? (minic (int 7 inc (int 7 const #x70))) #x71))
+(check (equal? (minic (int 7 inc (int 7 const #x7f))) #x00))
 
-(check (equal? (minic (type u16)) (function-type (list (int-type 16)) (int-type 16))))
-(check (equal? (minic (type u16+1)) (function-type (list (int-type 16)) (int-type 16))))
-(check (equal? (minic (type u16+)) (function-type (list (int-type 16) (int-type 16)) (int-type 16))))
+(check (equal? (minic (int 7 dec (int 7 const #x70))) #x6f))
+(check (equal? (minic (int 7 dec (int 7 const #x00))) #x7f))
 
-(check (equal? (minic (type 123)) (syntax-type)))
+(check (equal? (minic (int 7 add (int 7 const #x70) (int 7 const #x0f))) #x7f))
+(check (equal? (minic (int 7 add (int 7 const #x70) (int 7 const #x2f))) #x1f))
 
-(check (equal? (minic (u8 #x80)) #x80))
-(check (equal? (minic (u8+1 #x80)) #x81))
-(check (equal? (minic (u8+ #x80 #x90)) #x10))
-
-(check (equal? (minic (u16 #x8010)) #x8010))
-(check (equal? (minic (u16+1 #x80)) #x81))
-(check (equal? (minic (u16+ #x80 #x90)) #x110))
-
-(check (equal? (syntax->datum (minic 123)) 123))
+(check (equal? (minic (int 7 sub (int 7 const #x10) (int 7 const #x0f))) #x01))
+(check (equal? (minic (int 7 sub (int 7 const #x10) (int 7 const #x2f))) #x61))
