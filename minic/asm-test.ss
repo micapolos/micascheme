@@ -119,16 +119,17 @@
     20))
 
 ; loop
-(check
-  (equal?
-    (test-asm 35000000
-      (alloc 3)
-      (in 1 0)
-      (const 2 0)
-      (loop 1
-        (inc 2)
-        (inc 2)
-        (dec 1))
-      (out 2 0)
-      (free 3))
-    70000000))
+(time
+  (check
+    (equal?
+      (test-asm 35000000
+        (alloc 3)
+        (in 1 0)
+        (const 2 0)
+        (loop 1
+          (inc 2)
+          (inc 2)
+          (dec 1))
+        (out 2 0)
+        (free 3))
+      70000000)))
