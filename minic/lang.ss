@@ -15,6 +15,10 @@
         (lambda ($syntax)
           (and (identifier? $syntax)
             (cond
+              ((free-identifier=? $syntax #'u8)
+                (expr
+                  (function-type (list (int-type 8)) (int-type 8))
+                  #'emu-u8))
               ((free-identifier=? $syntax #'u8+1)
                 (expr
                   (function-type (list (int-type 8)) (int-type 8))
@@ -23,6 +27,10 @@
                 (expr
                   (function-type (list (int-type 8) (int-type 8)) (int-type 8))
                   #'emu-u8+))
+              ((free-identifier=? $syntax #'u16)
+                (expr
+                  (function-type (list (int-type 16)) (int-type 16))
+                  #'emu-u16))
               ((free-identifier=? $syntax #'u16+1)
                 (expr
                   (function-type (list (int-type 16)) (int-type 16))
