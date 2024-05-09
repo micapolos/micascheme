@@ -62,6 +62,7 @@
   (emu all)
   (asm all)
   (masm all)
+  (minic all)
   (leo all)
   (scheme all)
   (labs all)

@@ -13,5 +13,7 @@
       ((function-type? (function-type $param-types $result-type))
         #`(function-type
           (list #,@(map type->syntax $param-types))
-          #,(type->syntax $result-type)))))
+          #,(type->syntax $result-type)))
+      ((ref-type? (ref-type $type))
+        #`(ref-type #,(type->syntax $type)))))
 )
