@@ -1,15 +1,16 @@
-(import (scheme) (syntaxes) (minic asm))
+(import (scheme) (syntaxes) (minic asm) (minic prim))
 
 (let ()
   (define regs (make-fxvector 256))
   (define sp (fxvector-length regs))
 
-  (define-rules-syntaxes
-    ((io addr) 0)
-    ((io addr value)
-      (case addr
-        ((0) (pretty-print value))
-        ((1) (write-char (integer->char value))))))
+  (define io
+    (case-lambda
+      ((addr) 0)
+      ((addr value)
+        (if (prim-zero? addr)
+          (pretty-print value)
+          (write-char (integer->char value))))))
 
   (time
     (asm (regs sp io)
