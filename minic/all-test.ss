@@ -4,4 +4,4 @@
   (minic type)
   (minic lang)
   (minic runtime)
-  (minic vm))
+  (minic asm))

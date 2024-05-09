@@ -1,13 +1,23 @@
-(library (minic vm)
-  (export vm)
+(library (minic asm)
+  (export
+    asm
+    alloc free
+    const ld inc dec add sub
+    in out
+    block switch loop)
   (import
     (scheme)
     (syntax)
     (syntaxes)
-    (minic vm-keywords)
     (only (switch) index-switch))
 
-  (define-syntax (vm $syntax)
+  (define-aux-keywords
+    alloc free
+    const ld inc dec add sub
+    in out
+    block switch loop)
+
+  (define-syntax (asm $syntax)
     (syntax-case $syntax ()
       (($id ($fxvector $sp $io) $op* ...)
         (let ()
