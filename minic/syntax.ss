@@ -62,7 +62,7 @@
             (or
               (env-syntax-type->value $env $syntax $type)
               (syntax-error $syntax
-                (format "not: ~s, value:" (type->datum $type))))))
+                (format "expected type: ~s, value:" (type->datum $type))))))
         (syntax-expr-type->value $syntax $expr $type))))
 
   (define (syntax-expr-type->value $syntax $expr $type)
