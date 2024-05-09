@@ -4,7 +4,7 @@
     alloc free
     const ld inc dec add sub
     in out
-    switch loop block)
+    block switch loop)
   (import
     (scheme)
     (syntax)
@@ -15,7 +15,7 @@
     alloc free
     const ld inc dec add sub
     in out
-    switch loop block)
+    block switch loop)
 
   (define-syntax (stako $syntax)
     (syntax-case $syntax ()
@@ -27,7 +27,7 @@
                 alloc free
                 const ld inc dec add sub
                 in out
-                switch loop block)
+                block switch loop)
               ((alloc $size)
                 #`(set! $sp (- $sp $size)))
               ((free $size)
@@ -51,6 +51,8 @@
               ((out $lhs $rhs)
                 #`($io (imem $lhs) (imem $rhs)))
 
+              ((block $op ...)
+                #`(begin #,@(map op-syntax (syntax->list #'($op ...)))))
               ((switch $lhs $op ...)
                 #`(index-switch (imem $lhs)
                   #,@(map op-syntax (syntax->list #'($op ...)))))
@@ -60,10 +62,7 @@
                     ((fxzero? (imem $cond)) (void))
                     (else
                       #,@(map op-syntax (syntax->list #'($op ...)))
-                      (loop)))))
-
-              ((block $op ...)
-                #`(begin #,@(map op-syntax (syntax->list #'($op ...)))))))
+                      (loop)))))))
           #`(let ()
             (define $fxvector (make-fxvector $stack-size))
             (define $sp (fxvector-length $fxvector))
