@@ -39,7 +39,7 @@
               ((block $op ...)
                 #`(begin #,@(op-syntax-list #'($op ...))))
               ((switch $lhs $op ...)
-                #`(index-switch (reg $lhs)
+                #`(prim-switch (reg $lhs)
                   #,@(op-syntax-list #'($op ...))))
               ((loop $cond $op ...)
                 #`(let loop ()
