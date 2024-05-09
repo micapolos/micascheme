@@ -28,6 +28,7 @@
                 const ld inc dec add sub
                 in out
                 block switch loop)
+
               ((alloc $size)
                 #`(set! $sp (fast- $sp $size)))
               ((free $size)
@@ -59,7 +60,7 @@
               ((loop $cond $op ...)
                 #`(let loop ()
                   (cond
-                    ((($primitive 3 fxzero?) (reg $cond)) (void))
+                    ((fast-zero? (reg $cond)) (void))
                     (else
                       #,@(map op-syntax (syntax->list #'($op ...)))
                       (loop)))))))
