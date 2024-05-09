@@ -4,12 +4,10 @@
 
   (define (type->syntax $type)
     (switch $type
-      ((type-type? _)
-        #`(type-type))
-      ((syntax-type? _)
-        #`(syntax-type))
       ((int-type? (int-type $bits))
         #`(int-type #,$bits))
+      ((array-type? (array-type $element-type $index-bits))
+        #`(array-type #,(type->syntax $element-type) #,$index-bits))
       ((function-type? (function-type $param-types $result-type))
         #`(function-type
           (list #,@(map type->syntax $param-types))
