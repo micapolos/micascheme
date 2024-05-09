@@ -3,4 +3,5 @@
 (test
   (minic type)
   (minic lang)
-  (minic runtime))
+  (minic runtime)
+  (minic stako))
