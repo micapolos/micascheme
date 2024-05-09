@@ -28,7 +28,9 @@
         ; Loop
         (const 3 350000000) ; counter down
         (const 4 0) ; counter up
-        (loop 3 (dec 3) (inc 4))
+        (loop 3
+          (dec 3)
+          (inc 4))
 
         ; Print end value
         (const 2 (char->integer #\E)) (out 2 1)

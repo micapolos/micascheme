@@ -3,8 +3,9 @@
     prim-zero?
     prim+ prim+1
     prim- prim-1
-    prim-ref prim-set!)
-  (import (scheme) (syntaxes))
+    prim-ref prim-set!
+    prim-switch)
+  (import (scheme) (syntaxes) (switch))
 
   (define-rules-syntaxes
     ((prim-zero? $a) (($primitive 3 fxzero?) $a))
