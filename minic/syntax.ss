@@ -59,7 +59,10 @@
       (or
         (switch-opt $expr-type
           ((syntax-type? _)
-            (env-syntax-type->value $env $syntax $type)))
+            (or
+              (env-syntax-type->value $env $syntax $type)
+              (syntax-error $syntax
+                (format "not: ~s, value:" (type->datum $type))))))
         (syntax-expr-type->value $syntax $expr $type))))
 
   (define (syntax-expr-type->value $syntax $expr $type)
