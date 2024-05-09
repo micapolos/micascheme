@@ -14,6 +14,11 @@
 
 (check
   (equal?
+    (expand '(int 7 extend 'a) env)
+    ''a))
+
+(check
+  (equal?
     (expand '(int 7 add 'a 'b) env)
     '(($primitive 3 fxand) #x7f (($primitive 3 fx+/wraparound) 'a 'b))))
 
@@ -33,6 +38,7 @@
     '(($primitive 3 fxand) #x7f (($primitive 3 fx-/wraparound) 'a 1))))
 
 (check (equal? (int 7 const #x43) #x43))
+(check (equal? (int 7 extend #x43) #x43))
 (check (equal? (int 7 clamp #x143) #x43))
 (check (equal? (int 7 add #x40 #x50) #x10))
 (check (equal? (int 7 sub #x40 #x50) #x70))
