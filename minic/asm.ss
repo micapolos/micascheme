@@ -1,10 +1,9 @@
 (library (minic asm)
   (export
     asm
-    alloc free
+    local block switch loop
     const ld inc dec add sub
-    in out
-    block switch loop)
+    in out)
   (import
     (scheme)
     (syntax)
@@ -13,27 +12,40 @@
     (only (switch) index-switch))
 
   (define-aux-keywords
-    alloc free
+    local block switch loop
     const ld inc dec add sub
-    in out
-    block switch loop)
+    in out)
 
   (define-syntax (asm $syntax)
     (syntax-case $syntax ()
       (($id ($size $io) $op* ...)
         (let ()
+          (define (op-syntax-list $syntax)
+            (map op-syntax (syntax->list $syntax)))
+
           (define (op-syntax $op)
             (syntax-case $op
               ( ; literals
-                alloc free
+                local
                 const ld inc dec add sub
                 in out
                 block switch loop)
 
-              ((alloc $size)
-                #`(set! $sp (prim- $sp $size)))
-              ((free $size)
-                #`(set! $sp (prim+ $sp $size)))
+              ((local $size $op ...)
+                #`(begin
+                  (set! $sp (prim- $sp $size))
+                  #,@(op-syntax-list #'($op ...))
+                  (set! $sp (prim+ $sp $size))))
+              ((block $op ...)
+                #`(begin #,@(op-syntax-list #'($op ...))))
+              ((switch $lhs $op ...)
+                #`(index-switch (reg $lhs)
+                  #,@(op-syntax-list #'($op ...))))
+              ((loop $cond $op ...)
+                #`(let loop ()
+                  (cond
+                    ((prim-zero? (reg $cond)) (void))
+                    (else #,@(op-syntax-list #'($op ...)) (loop)))))
 
               ((const $offset $fx)
                 #`(reg $offset $fx))
@@ -51,20 +63,7 @@
               ((in $lhs $rhs)
                 #`(reg $lhs ($io (reg $rhs))))
               ((out $lhs $rhs)
-                #`($io (reg $rhs) (reg $lhs)))
-
-              ((block $op ...)
-                #`(begin #,@(map op-syntax (syntax->list #'($op ...)))))
-              ((switch $lhs $op ...)
-                #`(index-switch (reg $lhs)
-                  #,@(map op-syntax (syntax->list #'($op ...)))))
-              ((loop $cond $op ...)
-                #`(let loop ()
-                  (cond
-                    ((prim-zero? (reg $cond)) (void))
-                    (else
-                      #,@(map op-syntax (syntax->list #'($op ...)))
-                      (loop)))))))
+                #`($io (reg $rhs) (reg $lhs)))))
           #`(let ()
             (define $regs (make-fxvector $size))
             (define $sp (fxvector-length $regs))
