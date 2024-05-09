@@ -2,13 +2,11 @@
 
 (define-rule-syntax (test-asm $in $op ...)
   (let ()
-    (define $fxvector (make-fxvector 1024))
-    (define $sp (fxvector-length $fxvector))
     (define $value $in)
     (define-rules-syntaxes
       ((io $addr) $value)
       ((io $addr $fx) (set! $value $fx)))
-    (asm ($fxvector $sp io) $op ...)
+    (asm (256 io) $op ...)
     $value))
 
 ; empty
@@ -119,17 +117,16 @@
     20))
 
 ; loop
-(time
-  (check
-    (equal?
-      (test-asm 35000000
-        (alloc 3)
-        (in 1 0)
-        (const 2 0)
-        (loop 1
-          (inc 2)
-          (inc 2)
-          (dec 1))
-        (out 2 0)
-        (free 3))
-      70000000)))
+(check
+  (equal?
+    (test-asm 35000000
+      (alloc 3)
+      (in 1 0)
+      (const 2 0)
+      (loop 1
+        (inc 2)
+        (inc 2)
+        (dec 1))
+      (out 2 0)
+      (free 3))
+    70000000))

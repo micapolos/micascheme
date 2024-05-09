@@ -20,7 +20,7 @@
 
   (define-syntax (asm $syntax)
     (syntax-case $syntax ()
-      (($id ($reg-fxvector $sp $io) $op* ...)
+      (($id ($size $io) $op* ...)
         (let ()
           (define (op-syntax $op)
             (syntax-case $op
@@ -66,13 +66,15 @@
                       #,@(map op-syntax (syntax->list #'($op ...)))
                       (loop)))))))
           #`(let ()
+            (define $regs (make-fxvector $size))
+            (define $sp (fxvector-length $regs))
             (define-rules-syntaxes
               ((reg-addr $offset)
                 (prim+ $sp $offset))
               ((reg $offset)
-                (prim-ref $reg-fxvector (reg-addr $offset)))
+                (prim-ref $regs (reg-addr $offset)))
               ((reg $offset $fx)
-                (prim-set! $reg-fxvector (reg-addr $offset) $fx)))
+                (prim-set! $regs (reg-addr $offset) $fx)))
             #,@(map op-syntax (syntax->list #'($op* ...)))
             (void))))))
 )

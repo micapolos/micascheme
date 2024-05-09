@@ -1,9 +1,6 @@
 (import (scheme) (syntaxes) (minic asm) (minic prim))
 
 (let ()
-  (define regs (make-fxvector 256))
-  (define sp (fxvector-length regs))
-
   (define io
     (case-lambda
       ((addr) 0)
@@ -13,7 +10,7 @@
           (write-char (integer->char value))))))
 
   (time
-    (asm (regs sp io)
+    (asm (256 io)
       (alloc 5)
 
       (const 0 0) ; pretty-print port
