@@ -1,6 +1,6 @@
 (import (except (micascheme) switch) (minic asm) (syntax) (syntaxes))
 
-(define-rule-syntax (run-asm $in $op ...)
+(define-rule-syntax (test-asm $in $op ...)
   (let ()
     (define $fxvector (make-fxvector 1024))
     (define $sp (fxvector-length $fxvector))
@@ -12,12 +12,12 @@
     $value))
 
 ; empty
-(check (equal? (run-asm 0) 0))
+(check (equal? (test-asm 0) 0))
 
 ; out
 (check
   (equal?
-    (run-asm 0
+    (test-asm 0
       (alloc 2)
       (const 1 100)
       (out 1 0)
@@ -27,7 +27,7 @@
 ; inc
 (check
   (equal?
-    (run-asm 100
+    (test-asm 100
       (alloc 2)
       (in 1 0)
       (inc 1)
@@ -38,7 +38,7 @@
 ; dec
 (check
   (equal?
-    (run-asm 100
+    (test-asm 100
       (alloc 2)
       (in 1 0)
       (dec 1)
@@ -49,7 +49,7 @@
 ; add
 (check
   (equal?
-    (run-asm 100
+    (test-asm 100
       (alloc 3)
       (in 1 0)
       (const 2 10)
@@ -61,7 +61,7 @@
 ; sub
 (check
   (equal?
-    (run-asm 100
+    (test-asm 100
       (alloc 3)
       (in 1 0)
       (const 2 10)
@@ -73,7 +73,7 @@
 ; block
 (check
   (equal?
-    (run-asm 0
+    (test-asm 0
       (block
         (alloc 2)
         (const 1 10)
@@ -84,7 +84,7 @@
 ; switch
 (check
   (equal?
-    (run-asm 0
+    (test-asm 0
       (alloc 2)
       (in 1 0)
       (switch 1
@@ -96,7 +96,7 @@
 
 (check
   (equal?
-    (run-asm 1
+    (test-asm 1
       (alloc 2)
       (in 1 0)
       (switch 1
@@ -108,7 +108,7 @@
 
 (check
   (equal?
-    (run-asm 2
+    (test-asm 2
       (alloc 2)
       (in 1 0)
       (switch 1
@@ -121,7 +121,7 @@
 ; loop
 (check
   (equal?
-    (run-asm 35000000
+    (test-asm 35000000
       (alloc 3)
       (in 1 0)
       (const 2 0)
