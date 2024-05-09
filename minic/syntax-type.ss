@@ -17,7 +17,7 @@
         (int-type (syntax->bits #'bits)))))
 
   (define (syntax->type $syntax)
-    (syntax-case $syntax (int const add sub inc dec)
+    (syntax-case $syntax (int const extend clamp add sub inc dec)
       ((int bits const value)
         (lets
           ($bits (syntax->bits #'bits))
@@ -35,6 +35,16 @@
         (lets
           ($type (type-syntax->type #'(int bits)))
           (run (syntax-type-check #'rhs $type))
+          $type))
+      ((int bits extend rhs)
+        (lets
+          ($type (type-syntax->type #'(int bits)))
+          (run (syntax-int-type-check #'rhs))
+          $type))
+      ((int bits clamp rhs)
+        (lets
+          ($type (type-syntax->type #'(int bits)))
+          (run (syntax-int-type-check #'rhs))
           $type))
       ((int bits dec rhs)
         (lets
@@ -62,4 +72,12 @@
           (format "expected type: ~a, actual type: ~a, syntax:"
             (type->datum $expected-type)
             (type->datum $type))))))
+
+  (define (syntax-int-type-check $syntax)
+    (switch (syntax->type $syntax)
+      ((int-type? $int-type) (void))
+      ((else $other)
+        (syntax-error $syntax
+          (format "expected type: (int n), actual type: ~a, syntax:"
+            (type->datum $other))))))
 )
