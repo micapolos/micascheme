@@ -3,7 +3,7 @@
     stako
     alloc free
     const-8 inc-8 dec-8 add-8 sub-8
-    block switch-8)
+    block switch-8 loop-8)
   (import
     (except (micascheme) push pop)
     (minic runtime))
@@ -11,14 +11,14 @@
   (define-aux-keywords
     alloc free
     const-8 inc-8 dec-8 add-8 sub-8
-    block switch-8)
+    block switch-8 loop-8)
 
   (define-syntax (stako $syntax)
     (syntax-case $syntax ()
       (($id $extra-size-expr $in-expr $op* ...)
         (let ()
           (define (op-syntax $op)
-            (syntax-case $op (alloc free const-8 inc-8 dec-8 add-8 sub-8 block switch-8)
+            (syntax-case $op (alloc free const-8 inc-8 dec-8 add-8 sub-8 block switch-8 loop-8)
               ((alloc $size)
                 #`(set! $sp (- $sp $size)))
               ((free $size)
@@ -37,7 +37,14 @@
                 #`(begin #,@(map op-syntax (syntax->list #'($op ...)))))
               ((switch-8 $lhs $op ...)
                 #`(index-switch (imem $lhs)
-                  #,@(map op-syntax (syntax->list #'($op ...)))))))
+                  #,@(map op-syntax (syntax->list #'($op ...)))))
+              ((loop-8 $cond $op ...)
+                #`(let loop ()
+                  (cond
+                    ((zero? (imem $cond)) (void))
+                    (else
+                      #,@(map op-syntax (syntax->list #'($op ...)))
+                      (loop)))))))
           #`(let ()
             (define $in $in-expr)
             (define $in-size (bytevector-length $in))

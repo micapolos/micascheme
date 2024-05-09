@@ -21,3 +21,13 @@
 (check (equal? (stako 0 (bytevector 1) (switch-8 0 (const-8 0 10) (const-8 0 20) (const-8 0 30))) (bytevector 20)))
 (check (equal? (stako 0 (bytevector 2) (switch-8 0 (const-8 0 10) (const-8 0 20) (const-8 0 30))) (bytevector 30)))
 (check (equal? (stako 0 (bytevector 3) (switch-8 0 (const-8 0 10) (const-8 0 20) (const-8 0 30))) (bytevector 30)))
+
+; loop-8
+(check
+  (equal?
+    (stako 0 (bytevector 0 100)
+      (loop-8 1
+        (inc-8 0)
+        (inc-8 0)
+        (dec-8 1)))
+    (bytevector 200 0)))
