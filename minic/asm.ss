@@ -20,8 +20,8 @@
     (syntax-case $syntax ()
       (($id ($size $io) $op* ...)
         (let ()
-          (define (op-syntax-list $syntax)
-            (map op-syntax (syntax->list $syntax)))
+          (define (op-syntax-list $op)
+            (map op-syntax (syntax->list $op)))
 
           (define (op-syntax $op)
             (syntax-case $op
