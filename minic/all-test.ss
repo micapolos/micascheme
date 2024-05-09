@@ -2,4 +2,5 @@
 
 (test
   (minic type)
-  (minic lang))
+  (minic lang)
+  (minic runtime))
