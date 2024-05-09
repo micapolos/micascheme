@@ -64,6 +64,7 @@
                 #`(reg $lhs ($io (reg $rhs))))
               ((out $lhs $rhs)
                 #`($io (reg $rhs) (reg $lhs)))))
+
           #`(let ()
             (define $regs (make-fxvector $size))
             (define $sp (fxvector-length $regs))
