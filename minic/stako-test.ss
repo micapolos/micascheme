@@ -7,6 +7,10 @@
 (check (equal? (stako 2 (bytevector 30) (alloc 2) (const-8 0 10) (const-8 1 20)) (bytevector 10 20 30)))
 (check (equal? (stako 0 (bytevector 10 20 30) (free 2)) (bytevector 30)))
 
+; load-8
+(check (equal? (stako 0 (bytevector 10 20) (load-8 0 1)) (bytevector 20 20)))
+(check (equal? (stako 0 (bytevector 10 20) (load-8 1 0)) (bytevector 10 10)))
+
 ; math-8
 (check (equal? (stako 0 (bytevector 20 30) (inc-8 1)) (bytevector 20 31)))
 (check (equal? (stako 0 (bytevector 20 30) (dec-8 1)) (bytevector 20 29)))

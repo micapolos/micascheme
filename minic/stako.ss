@@ -2,8 +2,8 @@
   (export
     stako
     alloc free
-    const-8 inc-8 dec-8 add-8 sub-8 switch-8 loop-8
-    const-16 inc-16 dec-16 add-16 sub-16 switch-16 loop-16
+    const-8 load-8 inc-8 dec-8 add-8 sub-8 switch-8 loop-8
+    const-16 load-16 inc-16 dec-16 add-16 sub-16 switch-16 loop-16
     block)
   (import
     (except (micascheme) push pop)
@@ -11,8 +11,8 @@
 
   (define-aux-keywords
     alloc free
-    const-8 inc-8 dec-8 add-8 sub-8 switch-8 loop-8
-    const-16 inc-16 dec-16 add-16 sub-16 switch-16 loop-16
+    const-8 load-8 inc-8 dec-8 add-8 sub-8 switch-8 loop-8
+    const-16 load-16 inc-16 dec-16 add-16 sub-16 switch-16 loop-16
     block)
 
   (define-syntax (stako $syntax)
@@ -23,8 +23,8 @@
             (syntax-case $op
               (; keywords
                 alloc free
-                const-8 inc-8 dec-8 add-8 sub-8 switch-8 loop-8
-                const-16 inc-16 dec-16 add-16 sub-16 switch-16 loop-16
+                const-8 load-8 inc-8 dec-8 add-8 sub-8 switch-8 loop-8
+                const-16 load-16 inc-16 dec-16 add-16 sub-16 switch-16 loop-16
                 block)
               ((alloc $size)
                 #`(set! $sp (- $sp $size)))
@@ -33,6 +33,8 @@
 
               ((const-8 $offset $u8)
                 #`(imem-8 $offset $u8))
+              ((load-8 $lhs $rhs)
+                #`(imem-8 $lhs (imem-8 $rhs)))
               ((inc-8 $rhs)
                 #`(imem-8 $rhs (int 8 inc (imem-8 $rhs))))
               ((dec-8 $rhs)
@@ -54,6 +56,8 @@
 
               ((const-16 $offset $u16)
                 #`(imem-16 $offset $u16))
+              ((load-16 $lhs $rhs)
+                #`(imem-16 $lhs (imem-16 $rhs)))
               ((inc-16 $rhs)
                 #`(imem-16 $rhs (int 16 inc (imem-16 $rhs))))
               ((dec-16 $rhs)
