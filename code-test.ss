@@ -22,5 +22,14 @@
 
 (check
   (equal?
-    (code-string (code (code) (code "foo") #\b "ar" 10))
-    "foobar10"))
+    (code-string
+      (code
+        (code)
+        (code #\f "oo")
+        #\b
+        "ar"
+        12
+        (char-code #\3)
+        (string-code (string-append "4" "5"))
+        (code 6 7 8)))
+    "foobar12345678"))
