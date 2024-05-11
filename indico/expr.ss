@@ -54,12 +54,12 @@
           (values #,@$results)))))
 
   (define (syntax->expr $locals $syntax)
-    (syntax-case $syntax (native get block function call)
+    (syntax-case $syntax (native variable block function call)
       ((native body ...)
         (expr
           (value-type (length (datum (body ...))))
           #'(values body ...)))
-      ((get index)
+      ((variable index)
         (expr
           (value-type 1)
           (list-ref $locals (datum index))))

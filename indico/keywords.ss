@@ -1,6 +1,6 @@
 (library (indico keywords)
-  (export native get block function call)
+  (export native variable block function call)
   (import (scheme) (syntax))
 
-  (define-aux-keywords native get block function call)
+  (define-aux-keywords native variable block function call)
 )

@@ -17,7 +17,7 @@
     (indico (native "foo" "bar"))
     (list "foo" "bar")))
 
-; === block / get
+; === block / variable
 
 (check
   (equal?
@@ -26,27 +26,27 @@
 
 (check
   (equal?
-    (indico (block ((native "foo")) (get 0)))
+    (indico (block ((native "foo")) (variable 0)))
     (list "foo")))
 
 (check
   (equal?
-    (indico (block ((native "foo") (native "bar")) (get 1)))
+    (indico (block ((native "foo") (native "bar")) (variable 1)))
     (list "foo")))
 
 (check
   (equal?
-    (indico (block ((native "foo") (native "bar")) (get 0)))
+    (indico (block ((native "foo") (native "bar")) (variable 0)))
     (list "bar")))
 
 (check
   (equal?
-    (indico (block ((native "foo") (native "bar")) (get 1) (get 0)))
+    (indico (block ((native "foo") (native "bar")) (variable 1) (variable 0)))
     (list "foo" "bar")))
 
 (check
   (equal?
-    (indico (block ((native "foo" "bar") (native "goo")) (get 2) (get 1) (get 0)))
+    (indico (block ((native "foo" "bar") (native "goo")) (variable 2) (variable 1) (variable 0)))
     (list "foo" "bar" "goo")))
 
 ; === function
@@ -68,21 +68,21 @@
 (check
   (equal?
     (map-with
-      ($function (indico (function 1 (get 0))))
+      ($function (indico (function 1 (variable 0))))
       ($function "foo"))
     (list "foo")))
 
 (check
   (equal?
     (map-with
-      ($function (indico (function 2 (get 1))))
+      ($function (indico (function 2 (variable 1))))
       ($function "foo" "bar"))
     (list "foo")))
 
 (check
   (equal?
     (map-with
-      ($function (indico (function 2 (get 0))))
+      ($function (indico (function 2 (variable 0))))
       ($function "foo" "bar"))
     (list "bar")))
 
@@ -110,25 +110,25 @@
 
 (check
   (equal?
-    (indico (call (function 1 (get 0)) (native "foo")))
+    (indico (call (function 1 (variable 0)) (native "foo")))
     (list "foo")))
 
 (check
   (equal?
-    (indico (call (function 2 (get 1)) (native "foo") (native "bar")))
+    (indico (call (function 2 (variable 1)) (native "foo") (native "bar")))
     (list "foo")))
 
 (check
   (equal?
-    (indico (call (function 2 (get 0)) (native "foo") (native "bar")))
+    (indico (call (function 2 (variable 0)) (native "foo") (native "bar")))
     (list "bar")))
 
 (check
   (equal?
-    (indico (call (function 2 (get 1)) (native "foo" "bar")))
+    (indico (call (function 2 (variable 1)) (native "foo" "bar")))
     (list "foo")))
 
 (check
   (equal?
-    (indico (call (function 2 (get 0)) (native "foo" "bar")))
+    (indico (call (function 2 (variable 0)) (native "foo" "bar")))
     (list "bar")))
