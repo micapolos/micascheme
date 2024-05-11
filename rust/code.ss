@@ -1,5 +1,12 @@
 (library (rust code)
-  (export dot-code parens-code comma-separated-code invocation-code call-code)
+  (export
+    dot-code
+    parens-code
+    comma-separated-code
+    invocation-code
+    call-code
+    let-code
+    declaration-code)
   (import (scheme) (code) (list))
 
   (define (dot-code $lhs $rhs)
@@ -18,4 +25,10 @@
     (code-append
       (dot-code $target (string-code $name))
       (apply invocation-code $args)))
+
+  (define (let-code $var $expr)
+    (code "let " $var " = " $expr))
+
+  (define (declaration-code $body)
+    (code $body ";"))
 )
