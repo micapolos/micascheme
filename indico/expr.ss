@@ -4,7 +4,8 @@
     function-type? function-type function-type-out-arity
     expr? expr expr-type expr-syntax
     type-arity expr-arity
-    syntax->expr)
+    syntax->expr
+    list-syntax->expr)
   (import
     (scheme)
     (syntax)
@@ -30,12 +31,12 @@
   (define (expr-arity $expr)
     (type-arity (expr-type $expr)))
 
-  (define (body-syntax->expr $locals $syntax)
+  (define (list-syntax->expr $native $locals $syntax)
     (lets
       ($bodies
         (syntax->list $syntax))
       ($body-exprs
-        (map (partial syntax->expr $locals) $bodies))
+        (map (partial syntax->expr $native $locals) $bodies))
       ($body-syntaxes
         (map expr-syntax $body-exprs))
       ($body-tmpss
@@ -53,56 +54,33 @@
               #`((#,@$body-tmps) #,$body-syntax)))
           (values #,@$results)))))
 
-  (define (syntax->expr $locals $syntax)
-    (syntax-case $syntax (native variable block function call)
-      ((native body ...)
-        (expr
-          (value-type (length (datum (body ...))))
-          #'(values body ...)))
+  (define (syntax->expr $native $locals $syntax)
+    (syntax-case $syntax (variable function call)
       ((variable index)
         (expr
           (value-type 1)
           (list-ref $locals (datum index))))
-      ((block (arg ...) body ...)
-        (lets
-          ($args
-            (syntax->list #'(arg ...)))
-          ($arg-exprs
-            (map (partial syntax->expr $locals) $args))
-          ($arg-syntaxes
-            (map expr-syntax $arg-exprs))
-          ($arg-tmpss
-            (map-with ($arg-expr $arg-exprs)
-              (generate-temporaries (indices (expr-arity $arg-expr)))))
-          ($locals
-            (push-list $locals (flatten $arg-tmpss)))
-          ($body-expr
-            (body-syntax->expr $locals #'(body ...)))
-          (expr
-            (value-type (expr-arity $body-expr))
-            #`(let-values
-              (
-                #,@(map-with
-                  ($arg-syntax $arg-syntaxes)
-                  ($arg-tmps $arg-tmpss)
-                  #`((#,@$arg-tmps) #,$arg-syntax)))
-              #,(expr-syntax $body-expr)))))
       ((function arity body ...)
         (lets
           ($tmps
             (generate-temporaries (indices (datum arity))))
           ($body-expr
-            (body-syntax->expr (push-list $locals $tmps) #'(body ...)))
+            (list-syntax->expr $native (push-list $locals $tmps) #'(body ...)))
           (expr
             (function-type (expr-arity $body-expr))
             #`(lambda (#,@$tmps) #,(expr-syntax $body-expr)))))
       ((call fn arg ...)
         (lets
-          ($fn-expr (syntax->expr $locals #'fn))
-          ($args-expr (body-syntax->expr $locals #'(arg ...)))
+          ($fn-expr (syntax->expr $native $locals #'fn))
+          ($args-expr (list-syntax->expr $native $locals #'(arg ...)))
           (expr
             (value-type (function-type-out-arity (expr-type $fn-expr)))
             #`(call-with-values
               (lambda () #,(expr-syntax $args-expr))
-              #,(expr-syntax $fn-expr)))))))
+              #,(expr-syntax $fn-expr)))))
+      ($other
+        ($native
+          (partial list-syntax->expr $native)
+          $locals
+          #'$other))))
 )
