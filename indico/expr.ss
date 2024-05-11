@@ -25,16 +25,28 @@
         (expr 1 (list-ref $locals (datum index))))
       ((block (arg ...) body ...)
         (lets
-          ($args (syntax->list #'(arg ...)))
-          ($arg-exprs (map (partial syntax->expr $locals) $args))
-          ($arg-syntaxes (map expr-syntax $arg-exprs))
-          ($arg-tmpss (map-with ($arg-expr $arg-exprs) (generate-temporaries (indices (expr-arity $arg-expr)))))
-          ($locals (push-list $locals (flatten $arg-tmpss)))
-          ($bodies (syntax->list #'(body ...)))
-          ($body-exprs (map (partial syntax->expr $locals) $bodies))
-          ($body-syntaxes (map expr-syntax $body-exprs))
-          ($body-tmpss (map-with ($body-expr $body-exprs) (generate-temporaries (indices (expr-arity $body-expr)))))
-          ($results (flatten $body-tmpss))
+          ($args
+            (syntax->list #'(arg ...)))
+          ($arg-exprs
+            (map (partial syntax->expr $locals) $args))
+          ($arg-syntaxes
+            (map expr-syntax $arg-exprs))
+          ($arg-tmpss
+            (map-with ($arg-expr $arg-exprs)
+              (generate-temporaries (indices (expr-arity $arg-expr)))))
+          ($locals
+            (push-list $locals (flatten $arg-tmpss)))
+          ($bodies
+            (syntax->list #'(body ...)))
+          ($body-exprs
+            (map (partial syntax->expr $locals) $bodies))
+          ($body-syntaxes
+            (map expr-syntax $body-exprs))
+          ($body-tmpss
+            (map-with ($body-expr $body-exprs)
+              (generate-temporaries (indices (expr-arity $body-expr)))))
+          ($results
+            (flatten $body-tmpss))
           (expr
             (length $results)
             #`(let-values
