@@ -63,6 +63,7 @@
   (z80)
   (emu all)
   (asm all)
+  (indico all)
   (masm all)
   (minic all)
   (leo all)

@@ -1,11 +1,17 @@
-(library (rust indexed)
+(library (indico expr)
   (export
     expr? expr expr-arity expr-syntax
-    native get block
     syntax->expr)
-  (import (scheme) (syntax) (data) (lets) (list) (procedure) (stack) (list-syntax))
-
-  (define-aux-keywords native get block)
+  (import
+    (scheme)
+    (syntax)
+    (data)
+    (lets)
+    (list)
+    (procedure)
+    (stack)
+    (list-syntax)
+    (indico keywords))
 
   (data (expr arity syntax))
 
