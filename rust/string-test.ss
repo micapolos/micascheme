@@ -38,14 +38,14 @@
       "let v1 = 20;"
       "let v2 = v1;")))
 
-; (check
-;   (equal?
-;     (rust-block-string
-;       #`(
-;         (let (u8 10))
-;         (let (u8 20))
-;         (in (let (get 1)))))
-;     (lines-string
-;       "let v0 = 10;"
-;       "let v1 = 20;"
-;       "let v2 = v0;")))
+(check
+  (equal?
+    (rust-block-string
+      #`(
+        (let (u8 10))
+        (let (u8 20))
+        (in (let (get 1)))))
+    (lines-string
+      "let v0 = 10;"
+      "let v1 = 20;"
+      "let v2 = v0;")))

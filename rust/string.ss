@@ -65,7 +65,7 @@
           ($expr-code (rust-expr-code $locals #'$expr))
           (block
             (push $decls (declaration-code (let-code $var-code $expr-code)))
-            (push $locals $var-code)
+            (push $exports $var-code)
             (add1 $next-var-index))))
       ((in $body ...)
         (lets
