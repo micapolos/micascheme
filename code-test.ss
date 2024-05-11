@@ -14,6 +14,10 @@
 ; string-code
 (check (equal? (code-string (string-code "foo\nbar\n")) "foo\nbar\n"))
 
+; number-code
+(check (equal? (code-string (number-code 10)) "10"))
+(check (equal? (code-string (number-code 3.14)) "3.14"))
+
 ; code-append
 (check
   (equal?

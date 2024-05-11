@@ -6,6 +6,7 @@
     empty-code
     char-code
     string-code
+    number-code
     code-indent)
   (import (scheme) (lets) (procedure) (syntaxes) (switch))
 
@@ -18,7 +19,7 @@
       (switch (datum $item)
         ((char? $char) #`(char-code $item))
         ((string? $string) #`(string-code $item))
-        ((number? $number) #`(string-code (number->string $item)))
+        ((number? $number) #`(number-code $item))
         ((else _) #`$item)))
     ((code $item $item* ...)
       #`(code-append (code $item) (code $item* ...))))
@@ -60,6 +61,9 @@
     (apply code-append
       (map char-code
         (string->list $string))))
+
+  (define (number-code $number)
+    (string-code (number->string $number)))
 
   (define (code-indent $code)
     (lambda ($line-start? $indent $port)
