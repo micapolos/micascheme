@@ -1,6 +1,5 @@
 (import (scheme) (check) (code))
 
-
 (check (equal? (code-string (char-code #\newline)) "\n"))
 (check (equal? (code-string (char-code #\a)) "a"))
 (check (equal? (code-string (code-indent (char-code #\newline))) "\n"))
