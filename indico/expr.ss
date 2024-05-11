@@ -39,7 +39,7 @@
           (values #,@$results)))))
 
   (define (syntax->expr $locals $syntax)
-    (syntax-case $syntax (native get block)
+    (syntax-case $syntax (native get block function call)
       ((native body ...)
         (expr
           (length (datum (body ...)))
@@ -77,5 +77,6 @@
           ($body-expr
             (body-syntax->expr (push-list $locals $tmps) #'(body ...)))
           (expr 1
-            #`(lambda (#,@$tmps) #,(expr-syntax $body-expr)))))))
+            #`(lambda (#,@$tmps) #,(expr-syntax $body-expr)))))
+      ((call fn arg ...) TODO)))
 )
