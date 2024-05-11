@@ -9,11 +9,23 @@
     (lets)
     (list)
     (procedure)
+    (switch)
     (stack)
     (list-syntax)
     (indico keywords))
 
-  (data (expr arity syntax))
+  (data (value-type arity))
+  (data (function-type in-arity out-arity))
+
+  (data (expr type syntax))
+
+  (define (type-arity $type)
+    (switch-exclusive $type
+      ((value-type? (value-type $arity)) $arity)
+      ((function-type? _) 1)))
+
+  (define (expr-arity $expr)
+    (type-arity (expr-type $expr)))
 
   (define (body-syntax->expr $locals $syntax)
     (lets
@@ -29,7 +41,7 @@
       ($results
         (flatten $body-tmpss))
       (expr
-        (length $results)
+        (value-type (length $results))
         #`(let-values
           (
             #,@(map-with
@@ -42,10 +54,12 @@
     (syntax-case $syntax (native get block function call)
       ((native body ...)
         (expr
-          (length (datum (body ...)))
+          (value-type (length (datum (body ...))))
           #'(values body ...)))
       ((get index)
-        (expr 1 (list-ref $locals (datum index))))
+        (expr
+          (value-type 1)
+          (list-ref $locals (datum index))))
       ((block (arg ...) body ...)
         (lets
           ($args
@@ -62,7 +76,7 @@
           ($body-expr
             (body-syntax->expr $locals #'(body ...)))
           (expr
-            (expr-arity $body-expr)
+            (value-type (expr-arity $body-expr))
             #`(let-values
               (
                 #,@(map-with
@@ -76,7 +90,7 @@
             (generate-temporaries (indices (datum arity))))
           ($body-expr
             (body-syntax->expr (push-list $locals $tmps) #'(body ...)))
-          (expr 1
-            #`(lambda (#,@$tmps) #,(expr-syntax $body-expr)))))
-      ((call fn arg ...) TODO)))
+          (expr
+            (function-type (datum arity) (expr-arity $body-expr))
+            #`(lambda (#,@$tmps) #,(expr-syntax $body-expr)))))))
 )
