@@ -1,23 +1,23 @@
 (library (rust string)
   (export
     rust-expr-string
-    rust-body-string
-    mut get set
+    rust-block-string
+    in get
     u8 u8+ u8+1 u8- u8-1)
   (import (micascheme) (code) (rust code))
   (export (import (micascheme)) let)
 
   (define-aux-keywords
-    mut get set
+    in get
     u8 u8+ u8+1 u8- u8-1)
 
-  (data (body decls locals))
+  (data (block decls exports next-var-index))
 
-  (define (rust-body-string $syntax)
+  (define (rust-block-string $syntax)
     (code-string
       (apply code-append
         (map-with
-          ($decl (reverse (body-decls (rust-body (stack) $syntax))))
+          ($decl (reverse (block-decls (rust-block (stack) 0 $syntax))))
           (code $decl "\n")))))
 
   (define (rust-expr-string $syntax)
@@ -48,21 +48,34 @@
           (rust-expr-code $locals #'$lhs)
           "wrapping_dec"))))
 
-  (define (var-code $locals)
-    (code "v" (number-code (length $locals))))
+  (define (var-code $index)
+    (code "v" (number-code $index)))
 
-  (define (rust-body $locals $syntax)
+  (define (rust-block $locals $next-var-index $syntax)
     (fold-left
-      rust-body-push
-      (body (stack) $locals)
+      (partial rust-block-push $locals)
+      (block (stack) (stack) $next-var-index)
       (syntax->list $syntax)))
 
-  (define (rust-body-push (body $decls $locals) $syntax)
-    (syntax-case $syntax (let mut)
+  (define (rust-block-push $locals (block $decls $exports $next-var-index) $syntax)
+    (syntax-case $syntax (let in)
       ((let $expr)
         (lets
-          ($var-code (var-code $locals))
-          (body
-            (push $decls (declaration-code (let-code $var-code (rust-expr-code $locals #'$expr))))
-            (push $locals $var-code))))))
+          ($var-code (var-code $next-var-index))
+          ($expr-code (rust-expr-code $locals #'$expr))
+          (block
+            (push $decls (declaration-code (let-code $var-code $expr-code)))
+            (push $locals $var-code)
+            (add1 $next-var-index))))
+      ((in $body ...)
+        (lets
+          ($in-block
+            (rust-block
+              (push-all $locals $exports)
+              $next-var-index
+              #'($body ...)))
+          (block
+            (push-all $decls (block-decls $in-block))
+            (block-exports $in-block)
+            (block-next-var-index $in-block))))))
 )
