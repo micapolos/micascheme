@@ -1,4 +1,4 @@
 (import (micascheme))
 
 (test
-  (code))
+  (rust string))
