@@ -15,15 +15,15 @@
 
 (check
   (equal?
-    (rust-block-string #`((let (rust "a"))))
+    (rust-block-string #`((val (rust "a"))))
     (lines-string "let v0 = a;")))
 
 (check
   (equal?
     (rust-block-string
       #`(
-        (let (rust "a"))
-        (let (rust "b"))))
+        (val (rust "a"))
+        (val (rust "b"))))
     (lines-string
       "let v0 = a;"
       "let v1 = b;")))
@@ -33,9 +33,9 @@
   (equal?
     (rust-block-string
       #`(
-        (let (rust "a"))
-        (let (rust "b"))
-        (in (let (get 0)))))
+        (val (rust "a"))
+        (val (rust "b"))
+        (in (val (get 0)))))
     (lines-string
       "let v0 = a;"
       "let v1 = b;"
@@ -45,11 +45,11 @@
   (equal?
     (rust-block-string
       #`(
-        (let (rust "a"))
-        (let (rust "b"))
+        (val (rust "a"))
+        (val (rust "b"))
         (in
-          (let (get 1))
-          (let (get 0)))))
+          (val (get 1))
+          (val (get 0)))))
     (lines-string
       "let v0 = a;"
       "let v1 = b;"
@@ -60,10 +60,10 @@
   (equal?
     (rust-block-string
       #`(
-        (let (rust "a"))
-        (let (rust "b"))
-        (in (let (get 1)))
-        (in (let (get 0)))))
+        (val (rust "a"))
+        (val (rust "b"))
+        (in (val (get 1)))
+        (in (val (get 0)))))
     (lines-string
       "let v0 = a;"
       "let v1 = b;"
@@ -75,11 +75,11 @@
   (equal?
     (rust-block-string
       #`(
-        (let (rust "a"))
-        (let (rust "b"))
+        (val (rust "a"))
+        (val (rust "b"))
         (then
-          (let (get 0))
-          (let (get 1)))))
+          (val (get 0))
+          (val (get 1)))))
     (lines-string
       "let v0 = a;"
       "let v1 = b;"
@@ -90,16 +90,16 @@
   (equal?
     (rust-block-string
       #`(
-        (let (rust "a"))
-        (let (rust "b"))
+        (val (rust "a"))
+        (val (rust "b"))
         (then
-          (let (get 0))
-          (let (get 1)))
+          (val (get 0))
+          (val (get 1)))
         (then
-          (let (get 0))
-          (let (get 1))
-          (let (get 2))
-          (let (get 3)))))
+          (val (get 0))
+          (val (get 1))
+          (val (get 2))
+          (val (get 3)))))
     (lines-string
       "let v0 = a;"
       "let v1 = b;"

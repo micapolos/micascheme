@@ -3,14 +3,13 @@
     rust-expr-string
     rust-block-string
     rust
-    in get then
+    val in get then
     u8 u8+ u8+1 u8- u8-1)
   (import (micascheme) (code) (rust code))
-  (export (import (micascheme)) let)
 
   (define-aux-keywords
     rust
-    in get then
+    val in get then
     u8 u8+ u8+1 u8- u8-1)
 
   (data (block decls exports next-var-index))
@@ -62,8 +61,8 @@
       (syntax->list $syntax)))
 
   (define (rust-block-push $locals (block $decls $exports $next-var-index) $syntax)
-    (syntax-case $syntax (let in then)
-      ((let $expr)
+    (syntax-case $syntax (val in then)
+      ((val $expr)
         (lets
           ($var-code (var-code $next-var-index))
           ($expr-code (rust-expr-code $locals #'$expr))
