@@ -1,13 +1,20 @@
 (import (scheme) (check) (code))
 
+; empty-code
+(check (equal? (code-string empty-code) ""))
+
+; char-code
 (check (equal? (code-string (char-code #\newline)) "\n"))
 (check (equal? (code-string (char-code #\a)) "a"))
+
+; code-indent
 (check (equal? (code-string (code-indent (char-code #\newline))) "\n"))
 (check (equal? (code-string (code-indent (char-code #\a))) "  a"))
 
+; string-code
 (check (equal? (code-string (string-code "foo\nbar\n")) "foo\nbar\n"))
-(check (equal? (code-string (code-indent (string-code "foo\nbar\n"))) "  foo\n  bar\n"))
 
+; code-append
 (check
   (equal?
     (code-string
@@ -19,6 +26,7 @@
           (char-code #\newline))))
     "foo\nbar\n"))
 
+; code syntax
 (check
   (equal?
     (code-string

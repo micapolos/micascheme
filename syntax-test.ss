@@ -32,5 +32,7 @@
 
 (check
   (equal?
-    (expand `(inline-indexed ($i 4) (foobar $i)))
-    `(begin (foobar 0) (foobar 1) (foobar 2) (foobar 3))))
+    (expand
+      `(inline-indexed ($i 4) $i)
+      (environment '(scheme) '(syntax)))
+    `(begin 0 1 2 3)))

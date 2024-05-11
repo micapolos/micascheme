@@ -5,6 +5,7 @@
   (binder)
   (case)
   (check)
+  (code)
   (compiler)
   (current)
   (decompiler)

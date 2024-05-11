@@ -3,6 +3,7 @@
     code
     code-string
     code-append
+    empty-code
     char-code
     string-code
     code-indent)
@@ -35,6 +36,10 @@
           ($code $line-start? $indent $port))
         $line-start?
         $code*)))
+
+  (define empty-code
+    (lambda ($line-start? $indent $port)
+      $line-start?))
 
   (define (char-code $char)
     (case $char
