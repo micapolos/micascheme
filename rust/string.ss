@@ -2,13 +2,15 @@
   (export
     rust-expr-string
     rust-block-string
-    in get
+    rust
+    in get then
     u8 u8+ u8+1 u8- u8-1)
   (import (micascheme) (code) (rust code))
   (export (import (micascheme)) let)
 
   (define-aux-keywords
-    in get
+    rust
+    in get then
     u8 u8+ u8+1 u8- u8-1)
 
   (data (block decls exports next-var-index))
@@ -24,11 +26,13 @@
     (code-string (rust-expr-code (stack) $syntax)))
 
   (define (rust-expr-code $locals $syntax)
-    (syntax-case $syntax (get u8 u8+ u8+1 u8- u8-1)
+    (syntax-case $syntax (rust get u8 u8+ u8+1 u8- u8-1)
+      ((rust $string)
+        (string-code (datum $string)))
       ((get $index)
         (list-ref $locals (datum $index)))
       ((u8 $number)
-        (number-code (datum $number)))
+        (parens-code (code (number-code (datum $number)) " as u8")))
       ((u8+ $lhs $rhs)
         (call-code
           (rust-expr-code $locals #'$lhs)
@@ -58,7 +62,7 @@
       (syntax->list $syntax)))
 
   (define (rust-block-push $locals (block $decls $exports $next-var-index) $syntax)
-    (syntax-case $syntax (let in)
+    (syntax-case $syntax (let in then)
       ((let $expr)
         (lets
           ($var-code (var-code $next-var-index))
@@ -69,13 +73,24 @@
             (add1 $next-var-index))))
       ((in $body ...)
         (lets
-          ($in-block
+          ((block $in-decls $in-exports $in-next-var-index)
             (rust-block
               (push-all $locals $exports)
               $next-var-index
               #'($body ...)))
           (block
-            (push-all $decls (block-decls $in-block))
-            (block-exports $in-block)
-            (block-next-var-index $in-block))))))
+            (push-all $decls $in-decls)
+            $in-exports
+            $in-next-var-index)))
+      ((then $body ...)
+        (lets
+          ((block $then-decls $then-exports $then-next-var-index)
+            (rust-block
+              (push-all $locals $exports)
+              $next-var-index
+              #'($body ...)))
+          (block
+            (push-all $decls $then-decls)
+            (push-all $exports $then-exports)
+            $then-next-var-index)))))
 )
