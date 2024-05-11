@@ -1,6 +1,9 @@
 (library (indico expr)
   (export
-    expr? expr expr-arity expr-syntax
+    value-type? value-type value-type-arity
+    function-type? function-type function-type-in-arity function-type-out-arity
+    expr? expr expr-type expr-syntax
+    type-arity expr-arity
     syntax->expr)
   (import
     (scheme)
