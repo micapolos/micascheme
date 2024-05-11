@@ -1,7 +1,7 @@
 (library (indico expr)
   (export
     value-type? value-type value-type-arity
-    function-type? function-type function-type-in-arity function-type-out-arity
+    function-type? function-type function-type-out-arity
     expr? expr expr-type expr-syntax
     type-arity expr-arity
     syntax->expr)
@@ -18,7 +18,7 @@
     (indico keywords))
 
   (data (value-type arity))
-  (data (function-type in-arity out-arity))
+  (data (function-type out-arity))
 
   (data (expr type syntax))
 
@@ -94,6 +94,15 @@
           ($body-expr
             (body-syntax->expr (push-list $locals $tmps) #'(body ...)))
           (expr
-            (function-type (datum arity) (expr-arity $body-expr))
-            #`(lambda (#,@$tmps) #,(expr-syntax $body-expr)))))))
+            (function-type (expr-arity $body-expr))
+            #`(lambda (#,@$tmps) #,(expr-syntax $body-expr)))))
+      ((call fn arg ...)
+        (lets
+          ($fn-expr (syntax->expr $locals #'fn))
+          ($args-expr (body-syntax->expr $locals #'(arg ...)))
+          (expr
+            (value-type (function-type-out-arity (expr-type $fn-expr)))
+            #`(call-with-values
+              (lambda () #,(expr-syntax $args-expr))
+              #,(expr-syntax $fn-expr)))))))
 )
