@@ -60,6 +60,7 @@
         (expr
           (value-type 1)
           (list-ref $locals (datum index))))
+      ; block is redundant, should we remove it?
       ((block (arg ...) body ...)
         (lets
           ($args
