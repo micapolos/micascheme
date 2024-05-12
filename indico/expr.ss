@@ -58,7 +58,7 @@
     (expr-arity (list-syntax->expr $default $locals $syntax)))
 
   (define (syntax->expr $default $locals $syntax)
-    (syntax-case $syntax (variable block function call)
+    (syntax-case $syntax (variable block recursive function call)
       ((variable index)
         (expr
           (value-type 1)
@@ -79,7 +79,21 @@
             (list-syntax->expr $default (push-list $locals $tmps) #'(body ...)))
           (expr
             (function-type (expr-arity $body-expr))
-            #`(lambda (#,@$tmps) #,(expr-syntax $body-expr)))))
+            #`(lambda (#,@$tmps)
+              #,(expr-syntax $body-expr)))))
+      ((recursive (function arity body ...))
+        (lets
+          ($rec-tmp
+            (car (generate-temporaries `(rec))))
+          ($tmps
+            (generate-temporaries (indices (datum arity))))
+          ($body-expr
+            (list-syntax->expr $default (push-list (push $locals $rec-tmp) $tmps) #'(body ...)))
+          (expr
+            (function-type (expr-arity $body-expr))
+            #`(rec #,$rec-tmp
+              (lambda (#,@$tmps)
+                #,(expr-syntax $body-expr))))))
       ((call fn arg ...)
         (lets
           ($fn-expr (syntax->expr $default $locals #'fn))
