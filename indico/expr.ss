@@ -54,37 +54,23 @@
               #`((#,@$body-tmps) #,$body-syntax)))
           (values #,@$results)))))
 
+  (define (list-syntax->arity $default $locals $syntax)
+    (expr-arity (list-syntax->expr $default $locals $syntax)))
+
   (define (syntax->expr $default $locals $syntax)
     (syntax-case $syntax (variable block function call)
       ((variable index)
         (expr
           (value-type 1)
           (list-ref $locals (datum index))))
-      ; block is redundant, should we remove it?
+      ; block is derived, should we remove it?
       ((block (arg ...) body ...)
-        (lets
-          ($args
-            (syntax->list #'(arg ...)))
-          ($arg-exprs
-            (map (partial syntax->expr $default $locals) $args))
-          ($arg-syntaxes
-            (map expr-syntax $arg-exprs))
-          ($arg-tmpss
-            (map-with ($arg-expr $arg-exprs)
-              (generate-temporaries (indices (expr-arity $arg-expr)))))
-          ($locals
-            (push-list $locals (flatten $arg-tmpss)))
-          ($body-expr
-            (list-syntax->expr $default $locals #'(body ...)))
-          (expr
-            (value-type (expr-arity $body-expr))
-            #`(let-values
-              (
-                #,@(map-with
-                  ($arg-syntax $arg-syntaxes)
-                  ($arg-tmps $arg-tmpss)
-                  #`((#,@$arg-tmps) #,$arg-syntax)))
-              #,(expr-syntax $body-expr)))))
+        (syntax->expr $default $locals
+          #`(call
+            (function
+              #,(list-syntax->arity $default $locals #'(arg ...))
+              body ...)
+            arg ...)))
       ((function arity body ...)
         (lets
           ($tmps
