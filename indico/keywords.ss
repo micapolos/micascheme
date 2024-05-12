@@ -1,6 +1,6 @@
 (library (indico keywords)
-  (export variable function call)
+  (export variable block function call)
   (import (scheme) (syntax))
 
-  (define-aux-keywords variable function call)
+  (define-aux-keywords variable block function call)
 )

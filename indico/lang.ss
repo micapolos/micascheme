@@ -1,5 +1,5 @@
 (library (indico lang)
-  (export indico native block)
+  (export indico native)
   (import
     (scheme)
     (syntax)
@@ -10,7 +10,7 @@
 
   (export (import (indico keywords)))
 
-  (define-aux-keywords native block)
+  (define-aux-keywords native)
 
   (define-case-syntax (indico body ...)
     #`(values->list
@@ -21,15 +21,7 @@
               ((native body ...)
                 (expr
                   (value-type (length (datum (body ...))))
-                  #'(values body ...)))
-              ((block (arg ...) body ...)
-                ($recurse $locals
-                  #`(
-                    (call
-                      (function
-                        #,(expr-arity ($recurse $locals #'(arg ...)))
-                        body ...)
-                      arg ...))))))
+                  #'(values body ...)))))
           (stack)
           #'(body ...)))))
 )
