@@ -22,6 +22,6 @@
                 (expr
                   (value-type (length (datum (body ...))))
                   #'(values body ...)))))
-          (stack)
+          (stack) ; locals
           #'(body ...)))))
 )

@@ -84,7 +84,6 @@
                   ($arg-tmps $arg-tmpss)
                   #`((#,@$arg-tmps) #,$arg-syntax)))
               #,(expr-syntax $body-expr)))))
-      ; Remove this: functions are not expressions.
       ((function arity body ...)
         (lets
           ($tmps
@@ -108,4 +107,5 @@
           (partial list-syntax->expr $default)
           $locals
           #'$other))))
+
 )
