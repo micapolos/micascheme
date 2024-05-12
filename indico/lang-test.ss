@@ -126,6 +126,14 @@
 ; === recursive function
 
 (lets
-  ($procedure (indico (recursive (function 0 (variable 0)))))
-  (check (equal? $procedure ($procedure))))
+  ($procedure (indico (recursive (function 2 (variable 2)))))
+  (check (equal? ($procedure "foo" "bar") $procedure)))
+
+(lets
+  ($procedure (indico (recursive (function 2 (variable 1)))))
+  (check (equal? ($procedure "foo" "bar") "foo")))
+
+(lets
+  ($procedure (indico (recursive (function 2 (variable 0)))))
+  (check (equal? ($procedure "foo" "bar") "bar")))
 
