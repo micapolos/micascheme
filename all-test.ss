@@ -24,6 +24,7 @@
   (leo)
   (leo-syntax)
   (leo2)
+  (let)
   (lets)
   (list)
   (list-syntax)
