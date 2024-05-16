@@ -18,14 +18,15 @@
     (if (> $audio-sample 127) (set! $audio-sample (- $audio-sample 256)))))
 
 (define (render $renderer)
-  ;(displayln (format "Render: ~s" (unsafe-current-get current-seconds)))
-  (if $flash?
-    (sdl-set-render-draw-color! $renderer 255 255 255 255)
-    (sdl-set-render-draw-color! $renderer 0 0 0 255))
-  (sdl-render-clear $renderer)
-  (sdl-set-render-draw-color! $renderer 255 0 0 255)
-  (sdl-render-fill-rect $renderer (make-sdl-rect 0 0 $mouse-x $mouse-y))
-  (sdl-render-present $renderer))
+  (let ()
+    ;(displayln (format "Render: ~s" (unsafe-current-get current-seconds)))
+    (if $flash?
+      (sdl-set-render-draw-color! $renderer 255 255 255 255)
+      (sdl-set-render-draw-color! $renderer 0 0 0 255))
+    (sdl-render-clear $renderer)
+    (sdl-set-render-draw-color! $renderer 255 0 0 255)
+    (sdl-render-fill-rect $renderer (make-sdl-rect 0 0 $mouse-x $mouse-y))
+    (sdl-render-present $renderer)))
 
 (run-sdl
   SDL-INIT-VIDEO
