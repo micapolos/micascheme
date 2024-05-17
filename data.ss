@@ -106,10 +106,8 @@
               (define-binder name
                 (lambda ($record $fn)
                   ($fn
-                    #,@(map
-                      (lambda (accessor)
-                        #`(#,accessor $record))
-                      all-accessors))))
+                    #,@(map-with (accessor all-accessors)
+                      #`(#,accessor $record)))))
               #,@(map-with
                 (index (iota (length all-fields)))
                 (field all-fields)
