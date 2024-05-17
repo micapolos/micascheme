@@ -17,10 +17,10 @@
             (fields (syntax->list #'(field ...)))
             (list-field-opt
               (and
-                (not (null? (syntax->datum #'list-field)))
+                (not (null? (datum list-field)))
                 #'list-field))
             (all-fields (append fields (or (and list-field-opt (list list-field-opt)) '())))
-            (name-string (symbol->string (syntax->datum #`name)))
+            (name-string (symbol->string (datum name)))
             (tmp (car (generate-temporaries '(tmp))))
             (record-name (identifier-append #'id #'% #'name))
             (make-name (identifier-append #'id #'make #'- #'name))
