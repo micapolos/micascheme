@@ -4,6 +4,7 @@
     (scheme)
     (syntax)
     (binder)
+    (list-syntax)
     (procedure)
     (throw))
 
@@ -12,28 +13,22 @@
       ((_ expr ((pred var) body) ... ((else else-var) else-body))
         #`(let ((tmp expr))
           (cond
-            #,@(map
-              (lambda ($pred $decl $body)
-                #`(
-                  (#,$pred tmp)
-                  #,(transform-binder $lookup $decl #'tmp $body)))
-              (syntax->list #'(pred ...))
-              (syntax->list #'(var ...))
-              (syntax->list #'(body ...)))
+            #,@(map-with
+              ($pred (syntax->list #'(pred ...)))
+              ($decl (syntax->list #'(var ...)))
+              ($body (syntax->list #'(body ...)))
+              #`((#,$pred tmp) #,(transform-binder $lookup $decl #'tmp $body)))
             (else
               (let ((else-tmp tmp))
                 #,(transform-binder $lookup #'else-var #'else-tmp #'else-body))))))
       ((_ expr ((pred var) body) ...)
         #`(let ((tmp expr))
           (cond
-            #,@(map
-              (lambda ($pred $decl $body)
-                #`(
-                  (#,$pred tmp)
-                  #,(transform-binder $lookup $decl #'tmp $body)))
-              (syntax->list #'(pred ...))
-              (syntax->list #'(var ...))
-              (syntax->list #'(body ...))))))))
+            #,@(map-with
+              ($pred (syntax->list #'(pred ...)))
+              ($decl (syntax->list #'(var ...)))
+              ($body (syntax->list #'(body ...)))
+              #`((#,$pred tmp) #,(transform-binder $lookup $decl #'tmp $body))))))))
 
   (define-rule-syntax (switch-opt $expr (($pred $var) $body) ...)
     (switch $expr
