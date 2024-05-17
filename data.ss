@@ -3,6 +3,7 @@
   (import
     (scheme)
     (syntax)
+    (list-syntax)
     (binder)
     (identifier)
     (lets)
@@ -11,7 +12,7 @@
   (define-syntax data
     (lambda (stx)
       (syntax-case stx ()
-        ((_ (name field ... . list-field))
+        ((id (name field ... . list-field))
           (lets
             (fields (syntax->list #'(field ...)))
             (list-field-opt
@@ -21,36 +22,28 @@
             (all-fields (append fields (or (and list-field-opt (list list-field-opt)) '())))
             (name-string (symbol->string (syntax->datum #`name)))
             (tmp (car (generate-temporaries '(tmp))))
-            (record-name (build-identifier ($string #`name) (string-append "%" $string)))
-            (make-name (build-identifier ($string #`name) (string-append "make-" $string)))
+            (record-name (identifier-append #'id #'% #'name))
+            (make-name (identifier-append #'id #'make #'- #'name))
             (make-all-name (if list-field-opt make-name #'name))
-            (rtd-name (build-identifier ($string #`name) (string-append $string "-rtd")))
+            (rtd-name (identifier-append #'id #'name #'- #'rtd))
             (prefix-name (string-append name-string "-"))
-            (predicate-name (build-identifier ($string #`name) (string-append $string "?")))
+            (predicate-name (identifier-append #'id #'name #'?))
             (accessors
-              (map
-                (lambda ($field)
-                  (build-identifier ($string $field)
-                    (string-append name-string "-" $string)))
-                fields))
+              (map-with (field fields)
+                (identifier-append #'id #'name #'- field)))
             (list-accessor-opt
               (and list-field-opt
-                (build-identifier ($string list-field-opt)
-                  (string-append name-string "-" $string))))
+                (identifier-append #'id #'name #'- list-field-opt)))
             (all-accessors
               (if list-accessor-opt
                 (append accessors (list list-accessor-opt))
                 accessors))
             (setters
-              (map
-                (lambda ($field)
-                  (build-identifier ($string $field)
-                    (string-append name-string "-with-" $string)))
-                fields))
+              (map-with (field fields)
+                (identifier-append #'id #'name #'- #'with #'- field)))
             (list-setter-opt
               (and list-field-opt
-                (build-identifier ($string list-field-opt)
-                  (string-append name-string "-with-" $string))))
+                (identifier-append #'id #'name #'- #'with #'- list-field-opt)))
             (all-setters
               (if list-setter-opt
                 (append setters (list list-setter-opt))
@@ -86,22 +79,18 @@
                     #,tmp
                     (lambda (a b eq)
                       (and
-                      #,@(map
-                        (lambda (field)
-                          (lets
-                            (fld (build-identifier (s field) (string-append name-string "-" s)))
-                            #`(eq (#,fld a) (#,fld b))))
-                        all-fields))))
+                      #,@(map-with (field all-fields)
+                        (lets
+                          (fld (identifier-append #'id #'name #'- field))
+                          #`(eq (#,fld a) (#,fld b)))))))
                   (record-type-hash-procedure
                     #,tmp
                     (lambda (a hash)
                       (+
-                      #,@(map
-                        (lambda (field)
-                          (lets
-                            (fld (build-identifier (s field) (string-append name-string "-" s)))
-                            #`(hash (#,fld a))))
-                        all-fields))))
+                      #,@(map-with (field all-fields)
+                        (lets
+                          (fld (identifier-append #'id #'name #'- field))
+                          #`(hash (#,fld a)))))))
                   #,tmp))
               #,(if list-field-opt
                 #`(begin
@@ -121,25 +110,22 @@
                       (lambda (accessor)
                         #`(#,accessor $record))
                       all-accessors))))
-              #,@(map
-                (lambda (index f)
-                  #`(define #,(build-identifier (s f) (string-append prefix-name s))
-                    (record-accessor #,rtd-name #,index)))
-                (iota (length all-fields))
-                all-fields)
-              #,@(map
-                (lambda ($setter-index $setter)
-                  #`(define (#,$setter $record $value)
-                    (#,make-all-name
-                      #,@(map
-                        (lambda ($accessor-index $accessor)
-                          (cond
-                            ((= $setter-index $accessor-index) #'$value)
-                            (else #`(#,$accessor $record))))
-                        (iota (length all-accessors))
-                        all-accessors))))
-                (iota (length all-setters))
-                all-setters)))))))
+              #,@(map-with
+                (index (iota (length all-fields)))
+                (field all-fields)
+                #`(define #,(identifier-append #'id #'name #'- field)
+                  (record-accessor #,rtd-name #,index)))
+              #,@(map-with
+                ($setter-index (iota (length all-setters)))
+                ($setter all-setters)
+                #`(define (#,$setter $record $value)
+                  (#,make-all-name
+                    #,@(map-with
+                      ($accessor-index (iota (length all-accessors)))
+                      ($accessor all-accessors)
+                      (cond
+                        ((= $setter-index $accessor-index) #'$value)
+                        (else #`(#,$accessor $record)))))))))))))
 
   (define-syntax (enum $syntax)
     (syntax-case $syntax ()

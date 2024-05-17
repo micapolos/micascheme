@@ -2,7 +2,7 @@
 
 (define $audio-buffer-size 64)
 (define $audio-sample 0)
-(define $audio-high? #f)
+(define $audio-high? #t)
 
 (define $tick? #f)
 
@@ -30,7 +30,7 @@
           ()
           (#f (void))
           (set! $tick? (not $tick?))
-          (run-sdl-locked-audio-device $audio-device
-            ((set! $audio-high? $tick?)))
+          ; (run-sdl-locked-audio-device $audio-device
+          ;   ((set! $audio-high? $tick?)))
           (void))
         (sdl-pause-audio-device $audio-device #t)))))

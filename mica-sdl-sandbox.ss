@@ -4,7 +4,7 @@
 (define $mouse-x 0)
 (define $mouse-y 0)
 
-(define $audio-buffer-size 64)
+(define $audio-buffer-size 512)
 (define $audio-sample 0)
 (define $audio-flash? #f)
 
