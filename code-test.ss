@@ -44,3 +44,23 @@
         (string-code (string-append "4" "5"))
         (code 6 7 8)))
     "foobar12345678"))
+
+(check (equal? (code-string (separated-code ":")) ""))
+(check (equal? (code-string (separated-code ":" (code "a"))) "a"))
+(check (equal? (code-string (separated-code ":" (code "a") (code "b") (code "c"))) "a:b:c"))
+
+(check (equal? (code-string (space-separated-code (code "a") (code "b") (code "c"))) "a b c"))
+(check (equal? (code-string (newline-separated-code (code "a") (code "b") (code "c"))) "a\nb\nc"))
+(check (equal? (code-string (emptyline-separated-code (code "a") (code "b") (code "c"))) "a\n\nb\n\nc"))
+
+(check (equal? (code-string (suffixed-code ":")) ""))
+(check (equal? (code-string (suffixed-code ":" (code "a"))) "a:"))
+(check (equal? (code-string (suffixed-code ":" (code "a") (code "b") (code "c"))) "a:b:c:"))
+
+(check (equal? (code-string (colon-ended-code (code "a") (code "b") (code "c"))) "a;b;c;"))
+(check (equal? (code-string (newline-ended-code (code "a") (code "b") (code "c"))) "a\nb\nc\n"))
+
+(check (equal? (code-string (code-in-round-brackets (code "a") (code "b") (code "c"))) "(abc)"))
+(check (equal? (code-string (code-in-square-brackets (code "a") (code "b") (code "c"))) "[abc]"))
+(check (equal? (code-string (code-in-angle-brackets (code "a") (code "b") (code "c"))) "<abc>"))
+(check (equal? (code-string (code-in-curly-brackets (code "a") (code "b") (code "c"))) "{abc}"))
