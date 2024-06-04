@@ -15,6 +15,11 @@
     ((define-put-syntax ($id $port $syntax) $body ...)
       (define-put-syntax $id
         (lambda ($port $syntax) $body ...)))
+    ((define-put-syntax ($id $port $syntax $lookup) $body ...)
+      (define-put-syntax $id
+        (lambda ($port $syntax)
+          (lambda ($lookup)
+            $body ...))))
     ((define-put ($id $arg ...) $body ...)
       (define-put-syntax ($id $port $syntax)
         (syntax-case $syntax ()
@@ -29,7 +34,10 @@
             (syntax-case $syntax (put)
               (($op $arg ...)
                 ($lookup #'$op #'put)
-                (($lookup #'$op #'put) #'$port $syntax))))
+                (let (($transformer (($lookup #'$op #'put) #'$port $syntax)))
+                  (if (procedure? $transformer)
+                    ($transformer $lookup)
+                    $transformer)))))
           #`(let ()
             (define $port $port-expr)
             #,@(map parse-op (syntax->list #'($op ...)))

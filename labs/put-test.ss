@@ -6,28 +6,30 @@
       ((_ $expr)
         #`(put-u8 $port $expr)))))
 
-(define-put-syntax (u16 $port $syntax)
-  (syntax-case $syntax ()
-    ((_ $expr)
-      #`(let (($u16 $expr))
-        (put-u8 $port (fxand $u16 #xff))
-        (put-u8 $port (fxsrl $u16 8))))))
+(define-put-syntax u16
+  (lambda ($port $syntax)
+    (lambda ($lookup)
+      (syntax-case $syntax ()
+        ((_ $expr)
+          #`(let (($u16 $expr))
+            (put-u8 $port (fxand $u16 #xff))
+            (put-u8 $port (fxsrl $u16 8))))))))
 
 (define-put-syntax (utf8 $port $syntax)
   (syntax-case $syntax ()
     ((_ $expr)
       #`(put-bytevector $port (string->utf8 $expr)))))
 
-(define-put (c-string $expr)
-  (utf8 $expr)
-  (u8 0))
-
-(define-put-syntax (file $port $syntax)
+(define-put-syntax (file $port $syntax $lookup)
   (syntax-case $syntax ()
     ((_ $path)
       #`(call-with-port (open-file-input-port $path)
         (lambda ($input)
           (put-bytevector $port (get-bytevector-all $input)))))))
+
+(define-put (c-string $expr)
+  (utf8 $expr)
+  (u8 0))
 
 (check (equal? (bytevector!) (bytevector)))
 (check (equal? (bytevector! (u8 #x10) (u8 #x20)) (bytevector #x10 #x20)))
