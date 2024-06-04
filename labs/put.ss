@@ -19,7 +19,9 @@
       (define-put-syntax $id
         (lambda ($port $syntax)
           (lambda ($lookup)
-            $body ...))))
+            $body ...)))))
+
+  (define-rules-syntaxes
     ((define-put ($id $arg ...) $body ...)
       (define-put-syntax ($id $port $syntax)
         (syntax-case $syntax ()
