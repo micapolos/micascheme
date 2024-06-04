@@ -3,7 +3,8 @@
     define-put-syntax
     define-put
     put
-    bytevector!)
+    bytevector!
+    u8 u16-le u16-be utf8 c-string file)
   (import (scheme) (syntax) (syntaxes) (lets))
 
   (define-rules-syntaxes
@@ -49,4 +50,41 @@
     (call-with-bytevector-output-port
       (lambda ($port)
         (put $port $op ...))))
+
+  ; --- library ---
+
+  (define-put-syntax (u8 $port $syntax)
+    (syntax-case $syntax ()
+      ((_ $expr)
+        #`(put-u8 $port $expr))))
+
+  (define-put-syntax (u16-le $port $syntax)
+    (syntax-case $syntax ()
+      ((_ $expr)
+        #`(let (($u16 $expr))
+          (put-u8 $port (fxand $u16 #xff))
+          (put-u8 $port (fxsrl $u16 8))))))
+
+  (define-put-syntax (u16-be $port $syntax)
+    (syntax-case $syntax ()
+      ((_ $expr)
+        #`(let (($u16 $expr))
+          (put-u8 $port (fxsrl $u16 8))
+          (put-u8 $port (fxand $u16 #xff))))))
+
+  (define-put-syntax (utf8 $port $syntax)
+    (syntax-case $syntax ()
+      ((_ $expr)
+        #`(put-bytevector $port (string->utf8 $expr)))))
+
+  (define-put (c-string $expr)
+    (utf8 $expr)
+    (u8 0))
+
+  (define-put-syntax (file $port $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ $path)
+        #`(call-with-port (open-file-input-port $path)
+          (lambda ($input)
+            (put-bytevector $port (get-bytevector-all $input)))))))
 )
