@@ -22,17 +22,16 @@
   (utf8 $expr)
   (u8 0))
 
-(check
-  (equal?
-    (bytevector!
-      (u8 #x10)
-      (u8 #x20)
-      (u16 #x1234)
-      (utf8 "foo")
-      (c-string "foo"))
-    (bytevector
-      #x10
-      #x20
-      #x34 #x12
-      (char->integer #\f) (char->integer #\o) (char->integer #\o)
-      (char->integer #\f) (char->integer #\o) (char->integer #\o) 0)))
+(define-put-syntax (file $port $syntax)
+  (syntax-case $syntax ()
+    ((_ $path)
+      #`(call-with-port (open-file-input-port $path)
+        (lambda ($input)
+          (put-bytevector $port (get-bytevector-all $input)))))))
+
+(check (equal? (bytevector!) (bytevector)))
+(check (equal? (bytevector! (u8 #x10) (u8 #x20)) (bytevector #x10 #x20)))
+(check (equal? (bytevector! (u16 #x1234)) (bytevector #x34 #x12)))
+(check (equal? (bytevector! (utf8 "foo")) (string->utf8 "foo")))
+(check (equal? (bytevector! (c-string "foo")) (string->utf8 "foo\x0;")))
+(check (equal? (bytevector! (file "labs/put-foo.txt")) (string->utf8 "foo\n")))
