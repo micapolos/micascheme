@@ -70,7 +70,6 @@
   (leo all)
   (scheme all)
   (labs all)
-  (rust all)
   (tico all)
   (zexy all)
 )
