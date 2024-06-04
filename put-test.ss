@@ -1,4 +1,4 @@
-(import (scheme) (check) (labs put))
+(import (scheme) (check) (put))
 
 (define-put-syntax u8
   (lambda ($port $syntax)
@@ -36,4 +36,4 @@
 (check (equal? (bytevector! (u16 #x1234)) (bytevector #x34 #x12)))
 (check (equal? (bytevector! (utf8 "foo")) (string->utf8 "foo")))
 (check (equal? (bytevector! (c-string "foo")) (string->utf8 "foo\x0;")))
-(check (equal? (bytevector! (file "labs/put-foo.txt")) (string->utf8 "foo\n")))
+(check (equal? (bytevector! (file "put-foo.txt")) (string->utf8 "foo\n")))

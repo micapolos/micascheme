@@ -38,6 +38,7 @@
   (procedure)
   (proof)
   (proven)
+  (put)
   (random)
   (read)
   (seq)

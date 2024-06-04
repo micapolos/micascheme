@@ -1,4 +1,4 @@
-(library (labs put)
+(library (put)
   (export
     define-put-syntax
     define-put
