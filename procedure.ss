@@ -38,7 +38,7 @@
       ((zero? $i) (void))
       $body ...))
 
-  (define-rule-syntax (repeat-indexed $count $index $body ...)
+  (define-rule-syntax (repeat-indexed ($index $count) $body ...)
     (do
       (($index 0 (add1 $index)))
       ((= $index $count) (void))

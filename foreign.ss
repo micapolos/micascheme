@@ -53,7 +53,7 @@
       (length (vector-length vector-var))
       (with-foreign-alloc-0 (ptr (* (ftype-sizeof ftype) length))
         (let ((id (make-ftype-pointer ftype ptr)))
-          (repeat-indexed length index
+          (repeat-indexed (index length)
             (ftype-set! ftype () id index (vector-ref vector-var index)))
           body))))
 
