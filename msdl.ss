@@ -10,7 +10,7 @@
         (case $machine-type
           ((i3nt ti3nt a6nt ta6nt) "SDL2.dll")
           ((i3le ti3le a6le ta6le) "libSDL2.so")
-          ((i3osx ti3osx a6osx tarm64osx) "libSDL2.dylib")
+          ((i3osx ti3osx a6osx ta6osx arm64osx tarm64osx) "libSDL2.dylib")
           (else (error 'SDL "unsupported machine type" $machine-type))))))
 
   (define SDL_SetMainReady (foreign-procedure "SDL_SetMainReady" () void))
