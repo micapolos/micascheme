@@ -55,16 +55,17 @@
                 (sdl-pause-audio-device $audio-device #f)
                 (run-sdl-event-loop
                   (cond
+                    ((sdl-event-none?)
+                      (run-sdl-locked-audio-device $audio-device
+                        (
+                          (set! $audio-flash? $flash?)))
+                      (render $renderer))
                     ((sdl-event-mouse-motion?)
                       (set! $mouse-x (sdl-event-mouse-motion-x))
                       (set! $mouse-y (sdl-event-mouse-motion-y)))
                     ((sdl-event-key-down? SDLK-SPACE)
                       (set! $flash? #t))
                     ((sdl-event-key-up? SDLK-SPACE)
-                      (set! $flash? #f))
-                    ((sdl-event-none?)
-                      (run-sdl-locked-audio-device $audio-device
-                        (
-                          (set! $audio-flash? $flash?)))
-                      (render $renderer))))
+                      (set! $flash? #f))))
+
                 (sdl-pause-audio-device $audio-device #t)))))))))

@@ -32,12 +32,12 @@
           ($renderer
             (run-sdl-event-loop
               (cond
+                ((sdl-event-none?)
+                  (render $renderer))
                 ((sdl-event-mouse-motion?)
                   (set! $mouse-x (sdl-event-mouse-motion-x))
                   (set! $mouse-y (sdl-event-mouse-motion-y)))
                 ((sdl-event-key-down? SDLK-SPACE)
                   (set! $flash? #t))
                 ((sdl-event-key-up? SDLK-SPACE)
-                  (set! $flash? #f))
-                ((sdl-event-none?)
-                  (render $renderer))))))))))
+                  (set! $flash? #f))))))))))
