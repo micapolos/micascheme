@@ -93,8 +93,13 @@
             (define (#,$pure-name $pure-var) $pure-body)
             (define (#,$bind-name $bind-var $bind-fn) $bind-body)
             ; TODO: Refactor to define-bind
-            (define-binder $name
-              (lambda ($bind-var $bind-fn) $bind-body)))))))
+            (define-bind $name
+              (syntax-rules ()
+                ((_ ($name . $params) $body)
+                  (
+                    (lambda ($bind-var $bind-fn) $bind-body)
+                    $name
+                    (lambda $params $body))))))))))
 
   ; monad-stack
 
