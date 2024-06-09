@@ -1,4 +1,4 @@
-(import (scheme) (check) (switch) (procedure) (binder) (syntax))
+(import (scheme) (check) (switch) (procedure) (binder) (syntax) (lets))
 
 ; === switch
 
@@ -37,13 +37,21 @@
   (define-aux-keyword number-with-one)
   (define-aux-keyword string-with-excl)
 
-  (define-binder number-with-one
-    (lambda ($number $fn)
-      ($fn $number 1)))
+  (define-bind number-with-one
+    (syntax-rules ()
+      ((_ ($var $number $one) $body)
+        (lets
+          ($number $var)
+          ($one 1)
+          $body))))
 
-  (define-binder string-with-excl
-    (lambda ($string $fn)
-      ($fn $string "!")))
+  (define-bind string-with-excl
+    (syntax-rules ()
+      ((_ ($var $string $excl) $body)
+        (lets
+          ($string $var)
+          ($excl "!")
+          $body))))
 
   (check
     (equal?

@@ -13,6 +13,7 @@
     (failure)
     (monad)
     (switch)
+    (lets)
     (syntax))
 
   (define-monad failable
@@ -29,11 +30,15 @@
 
   (define-aux-keyword failable-failure)
 
-  (define-binder failable-failure
-    (lambda ($failable $fn)
-      (switch $failable
-        ((failure? $failure) ($fn (failure-value $failure)))
-        ((else $success) $success))))
+  (define-bind failable-failure
+    (syntax-rules ()
+      ((_ ($failable $value) $body)
+        (switch $failable
+          ((failure? $failure)
+            (lets
+              ($value (failure-value $failure))
+              $body))
+          ((else $success) $success)))))
 
   (define (failable-recover $failable $fn)
     (switch $failable

@@ -64,9 +64,10 @@
 
   (define bindable-list list)
 
-  (define-binder bindable-list
-    (lambda ($list $fn)
-      (apply $fn $list)))
+  (define-bind bindable-list
+    (syntax-rules ()
+      ((_ ($list . $values) $body)
+        (apply (lambda $values $body) $list))))
 
   (define (flatten $lists) (apply append $lists))
 

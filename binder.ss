@@ -1,6 +1,7 @@
 (library (binder)
   (export
     define-binder
+    define-bind
     transform-binder
     transform-binder-params)
   (import
@@ -10,9 +11,13 @@
     (syntax))
 
   (define-aux-keyword binder)
+  (define-aux-keyword bind)
 
   (define-rule-syntax (define-binder $name $binder)
     (define-property $name binder (syntax $binder)))
+
+  (define-rule-syntax (define-bind $name $bind)
+    (define-property $name bind $bind))
 
   (define (transform-binder $lookup $pattern $expr $body)
     (syntax-case $pattern ()
@@ -20,13 +25,17 @@
         (identifier? #'$name)
         #`(let (($name #,$expr)) #,$body))
       (($name . $params)
-        (identifier? #'$name)
-        (let (($binder ($lookup #'$name #'binder)))
-          (or
-            (and $binder
-              #`(#,$binder #,$expr
-                #,(transform-binder-params $lookup #'$params $body)))
-            (syntax-error #'$name "undefined binder"))))))
+        (and (identifier? #'$name) ($lookup #'$name #'binder))
+          #`(
+            #,($lookup #'$name #'binder)
+            #,$expr
+            #,(transform-binder-params $lookup #'$params $body)))
+      (($name . $params)
+        (and (identifier? #'$id) ($lookup #'$name #'bind))
+        #`(let (($id #,$expr))
+          #,(
+            ($lookup #'$name #'bind)
+            #`(bind ($id . $params) #,$body))))))
 
   (define (binding $decl)
     (cond

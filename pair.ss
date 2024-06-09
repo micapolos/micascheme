@@ -4,6 +4,7 @@
     pair)
   (import
     (scheme)
+    (lets)
     (binder))
 
   (define (null-or-pair? $obj)
@@ -11,7 +12,11 @@
 
   (define pair cons)
 
-  (define-binder pair
-    (lambda ($pair $fn)
-      ($fn (car $pair) (cdr $pair))))
+  (define-bind pair
+    (syntax-rules ()
+      ((_ ($pair $car $cdr) $body)
+        (lets
+          ($car (car $pair))
+          ($cdr (cdr $pair))
+          $body))))
 )

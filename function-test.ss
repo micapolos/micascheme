@@ -1,13 +1,17 @@
-(import (scheme) (check) (function) (binder) (procedure))
+(import (scheme) (check) (function) (binder) (procedure) (lets))
 
 (run
   (function (plus a b) (string-append a b))
   (check (equal? (plus "foo" "bar") "foobar")))
 
 (run
-  (define-binder cons
-    (lambda ($pair $fn)
-      ($fn (car $pair) (cdr $pair))))
+  (define-bind cons
+    (syntax-rules ()
+      ((_ ($id $car $cdr) $body)
+        (lets
+          ($car (car $id))
+          ($cdr (cdr $id))
+          $body))))
 
   (run
     (function (plus (cons a b) (cons c d))

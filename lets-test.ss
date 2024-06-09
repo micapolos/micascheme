@@ -1,4 +1,4 @@
-(import (scheme) (check) (lets) (binder) (list))
+(import (scheme) (check) (lets) (binder) (list) (syntax))
 
 (check (equal? (lets 1) 1))
 
@@ -35,9 +35,11 @@
 
 ; --- binder
 
-(define-binder opt
-  (lambda ($opt $fn)
-    (and $opt ($fn $opt))))
+(define-bind opt
+  (syntax-rules ()
+    ((_ ($opt $value) $body)
+      (lets ($value $opt)
+        (and $value $body)))))
 
 (check
   (equal?
@@ -76,3 +78,18 @@
       (lambda (+ $a $b . $cs) (apply string-append (cons* $a $b $cs)))
       (+ "foo" "bar" "goo" "zar"))
     "foobargoozar"))
+
+(define-bind cons
+  (syntax-rules ()
+    ((_ ($cons $car $cdr) $body ...)
+      (lets
+        ($car (car $cons))
+        ($cdr (cdr $cons))
+        $body ...))))
+
+(check
+  (equal?
+    (lets
+      ((cons $a $b) (cons "a" "b"))
+      (string-append $a $b))
+    "ab"))
