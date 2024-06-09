@@ -1,7 +1,11 @@
-(import (syntax) (check) (binder))
+(import (scheme) (syntax) (check) (binder) (lets))
 
 (define-aux-keyword number-and-string)
 
-(define-binder number-and-string
-  (lambda ($number $fn)
-    ($fn $number (number->string $number))))
+(define-bind number-and-string
+  (syntax-rules ()
+    ((_ ($var $number $string) $body)
+      (lets
+        ($number $var)
+        ($string (number->string $var))
+        $body))))

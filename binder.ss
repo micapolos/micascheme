@@ -1,6 +1,6 @@
 (library (binder)
   (export
-    define-binder
+    define-binder  ; TODO: Replace all usages with define-bind and remove
     define-bind
     transform-binder
     transform-binder-params)
@@ -13,6 +13,7 @@
   (define-aux-keyword binder)
   (define-aux-keyword bind)
 
+  ; TODO: Replace all usages with define-bind and remove
   (define-rule-syntax (define-binder $name $binder)
     (define-property $name binder (syntax $binder)))
 

@@ -92,6 +92,7 @@
           #`(begin
             (define (#,$pure-name $pure-var) $pure-body)
             (define (#,$bind-name $bind-var $bind-fn) $bind-body)
+            ; TODO: Refactor to define-bind
             (define-binder $name
               (lambda ($bind-var $bind-fn) $bind-body)))))))
 

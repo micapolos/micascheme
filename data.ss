@@ -103,6 +103,7 @@
                     (record-constructor #,rtd-name))))
               (define #,predicate-name
                 (record-predicate #,rtd-name))
+              ; TODO: Refactor to define-bind
               (define-binder name
                 (lambda ($record $fn)
                   ($fn
