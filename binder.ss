@@ -10,12 +10,14 @@
     (identifier)
     (syntax))
 
-  (define-aux-keyword binder)
   (define-aux-keyword bind)
 
   ; TODO: Replace all usages with define-bind and remove
   (define-rule-syntax (define-binder $name $binder)
-    (define-property $name binder (syntax $binder)))
+    (define-bind $name
+      (syntax-rules ()
+        ((_ ($name . $params) $body)
+          ($binder $name (lambda $params $body))))))
 
   (define-rule-syntax (define-bind $name $bind)
     (define-property $name bind $bind))
@@ -25,12 +27,6 @@
       ($name
         (identifier? #'$name)
         #`(let (($name #,$expr)) #,$body))
-      (($name . $params)
-        (and (identifier? #'$name) ($lookup #'$name #'binder))
-          #`(
-            #,($lookup #'$name #'binder)
-            #,$expr
-            #,(transform-binder-params $lookup #'$params $body)))
       (($name . $params)
         (and (identifier? #'$id) ($lookup #'$name #'bind))
         #`(let (($id #,$expr))
