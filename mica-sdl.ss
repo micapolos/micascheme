@@ -4,6 +4,7 @@
     run-sdl-window
     run-sdl-renderer
     run-sdl-rgb-surface-with-format
+    run-sdl-texture
     run-sdl-texture-from-surface
     run-sdl-event-loop
     run-sdl-audio-device
@@ -58,6 +59,15 @@
           (lambda () #f)
           (lambda () $body ...)
           (lambda () (sdl-free-surface $surface))))))
+
+  (define-rule-syntax (run-sdl-texture ($texture $renderer $format $access $width $height) $body ...)
+    (switch (sdl-create-texture $renderer $format $access $width $height)
+      ((zero? _) (sdl-error))
+      ((else $texture)
+        (dynamic-wind
+          (lambda () #f)
+          (lambda () $body ...)
+          (lambda () (sdl-destroy-texture $texture))))))
 
   (define-rule-syntax (run-sdl-texture-from-surface ($texture $renderer $surface) $body ...)
     (switch (sdl-create-texture-from-surface $renderer $surface)
