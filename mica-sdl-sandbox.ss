@@ -28,44 +28,24 @@
     (sdl-render-fill-rect $renderer (make-sdl-rect 0 0 $mouse-x $mouse-y))
     (sdl-render-present $renderer)))
 
-(run-sdl
-  SDL-INIT-VIDEO
-  SDL-INIT-EVENTS
-  SDL-INIT-AUDIO
-  (
-    (run-sdl-window
-      "Test"
-      SDL-WINDOWPOS-CENTERED
-      SDL-WINDOWPOS-CENTERED
-      640 480
-      ($window
-        (run-sdl-audio-device
-          22050
-          AUDIO-S8
-          1
-          $audio-buffer-size
-          ($bytevector (render-audio $bytevector))
-          ($audio-device
-            (run-sdl-renderer
-              $window
-              -1
-              SDL-RENDERER-ACCELERATED
-              SDL-RENDERER-PRESENT-VSYNC
-              ($renderer
-                (sdl-pause-audio-device $audio-device #f)
-                (run-sdl-event-loop
-                  (cond
-                    ((sdl-event-none?)
-                      (run-sdl-locked-audio-device $audio-device
-                        (
-                          (set! $audio-flash? $flash?)))
-                      (render $renderer))
-                    ((sdl-event-mouse-motion?)
-                      (set! $mouse-x (sdl-event-mouse-motion-x))
-                      (set! $mouse-y (sdl-event-mouse-motion-y)))
-                    ((sdl-event-key-down? SDLK-SPACE)
-                      (set! $flash? #t))
-                    ((sdl-event-key-up? SDLK-SPACE)
-                      (set! $flash? #f))))
+(run-sdl (SDL-INIT-VIDEO SDL-INIT-EVENTS SDL-INIT-AUDIO)
+  (run-sdl-window ($window "Test" SDL-WINDOWPOS-CENTERED SDL-WINDOWPOS-CENTERED 640 480)
+    (run-sdl-audio-device ($audio-device 22050 AUDIO-S8 1 $audio-buffer-size ($bytevector (render-audio $bytevector)))
+      (run-sdl-renderer ($renderer $window -1 SDL-RENDERER-ACCELERATED SDL-RENDERER-PRESENT-VSYNC)
+        (sdl-pause-audio-device $audio-device #f)
+        (run-sdl-event-loop
+          (cond
+            ((sdl-event-none?)
+              (run-sdl-locked-audio-device $audio-device
+                (
+                  (set! $audio-flash? $flash?)))
+              (render $renderer))
+            ((sdl-event-mouse-motion?)
+              (set! $mouse-x (sdl-event-mouse-motion-x))
+              (set! $mouse-y (sdl-event-mouse-motion-y)))
+            ((sdl-event-key-down? SDLK-SPACE)
+              (set! $flash? #t))
+            ((sdl-event-key-up? SDLK-SPACE)
+              (set! $flash? #f))))
 
-                (sdl-pause-audio-device $audio-device #t)))))))))
+        (sdl-pause-audio-device $audio-device #t)))))

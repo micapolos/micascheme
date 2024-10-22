@@ -20,7 +20,7 @@
 
   (define $audio-mutex (make-mutex))
 
-  (define-rule-syntax (run-sdl $flag $flags ... ($body ...))
+  (define-rule-syntax (run-sdl ($flag $flags ...) $body ...)
     (case (sdl-init $flag $flags ...)
       ((0)
         (dynamic-wind
@@ -29,7 +29,7 @@
           (lambda () (sdl-quit))))
       (else (sdl-error))))
 
-  (define-rule-syntax (run-sdl-window $title $x $y $w $h $flag ... ($window $body ...))
+  (define-rule-syntax (run-sdl-window ($window $title $x $y $w $h $flag ...) $body ...)
     (switch (sdl-create-window $title $x $y $w $h $flag ...)
       ((zero? _) (sdl-error))
       ((else $window)
@@ -38,7 +38,7 @@
           (lambda () $body ...)
           (lambda () (sdl-destroy-window $window))))))
 
-  (define-rule-syntax (run-sdl-renderer $window $index $flag ... ($renderer $body ...))
+  (define-rule-syntax (run-sdl-renderer ($renderer $window $index $flag ...) $body ...)
     (switch (sdl-create-renderer $window $index $flag ...)
       ((zero? _) (sdl-error))
       ((else $renderer)
@@ -58,9 +58,8 @@
 
   (define-rule-syntax
     (run-sdl-audio-device
-      $freq $format $channels $samples
-      ($bytevector $callback ...)
-      ($audio-device $body ...))
+      ($audio-device $freq $format $channels $samples ($bytevector $callback ...))
+      $body ...)
     (begin
       (define $callable
         (foreign-callable __collect_safe

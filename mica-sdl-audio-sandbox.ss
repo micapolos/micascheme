@@ -15,22 +15,14 @@
     (set! $audio-sample (+ $audio-sample (if $audio-high? 2 1)))
     (if (> $audio-sample 127) (set! $audio-sample (- $audio-sample 256)))))
 
-(run-sdl
-  SDL-INIT-AUDIO
-  (
-    (run-sdl-audio-device
-      22050
-      AUDIO-S8
-      1
-      $audio-buffer-size
-      ($bytevector (render-audio $bytevector))
-      ($audio-device
-        (sdl-pause-audio-device $audio-device #f)
-        (do
-          ()
-          (#f (void))
-          (set! $tick? (not $tick?))
-          ; (run-sdl-locked-audio-device $audio-device
-          ;   ((set! $audio-high? $tick?)))
-          (void))
-        (sdl-pause-audio-device $audio-device #t)))))
+(run-sdl (SDL-INIT-AUDIO)
+  (run-sdl-audio-device ($audio-device 22050 AUDIO-S8 1 $audio-buffer-size ($bytevector (render-audio $bytevector)))
+    (sdl-pause-audio-device $audio-device #f)
+    (do
+      ()
+      (#f (void))
+      (set! $tick? (not $tick?))
+      ; (run-sdl-locked-audio-device $audio-device
+      ;   ((set! $audio-high? $tick?)))
+      (void))
+    (sdl-pause-audio-device $audio-device #t)))
