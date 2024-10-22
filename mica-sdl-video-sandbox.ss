@@ -3,26 +3,31 @@
 (define $flash? #f)
 (define $mouse-x 0)
 (define $mouse-y 0)
+(define width (+ 48 256 48))
+(define height (+ 48 192 48))
+(define window-scale 2)
+(define window-width (* window-scale width))
+(define window-height (* window-scale height))
 
 (define (render $renderer $texture $pixels)
   (let ()
     (if $flash?
       (sdl-set-render-draw-color! $renderer 255 255 255 255)
       (sdl-set-render-draw-color! $renderer 0 0 0 255))
-    (sdl-update-texture $texture #f (object->reference-address $pixels) (* 640 4))
+    (do
+      (($index 0 (+ $index 1)))
+      ((= $index (bytevector-length $pixels)) (void))
+      (bytevector-u8-set! $pixels $index (fxand $index #xff)))
+    (sdl-update-texture $texture #f (object->reference-address $pixels) (* width 4))
     (sdl-render-copy $renderer $texture #f #f)
     (sdl-render-fill-rect $renderer (make-sdl-rect 0 0 $mouse-x $mouse-y))
     (sdl-render-present $renderer)))
 
 (run-sdl (SDL-INIT-VIDEO SDL-INIT-EVENTS)
-  (run-sdl-window ($window "Test" SDL-WINDOWPOS-CENTERED SDL-WINDOWPOS-CENTERED 640 480)
+  (run-sdl-window ($window "Test" SDL-WINDOWPOS-CENTERED SDL-WINDOWPOS-CENTERED window-width window-height)
     (run-sdl-renderer ($renderer $window -1 SDL-RENDERER-ACCELERATED SDL-RENDERER-PRESENT-VSYNC)
-      (run-sdl-texture ($texture $renderer SDL-PIXELFORMAT-BGRA8888 SDL-TEXTUREACCESS-STREAMING 640 480)
-        (define $pixels (make-immobile-bytevector (* 640 480 4)))
-        (do
-          (($index 0 (+ $index 1)))
-          ((= $index (bytevector-length $pixels)) (void))
-          (bytevector-u8-set! $pixels $index (random #xff)))
+      (run-sdl-texture ($texture $renderer SDL-PIXELFORMAT-BGRA8888 SDL-TEXTUREACCESS-STREAMING width height)
+        (define $pixels (make-immobile-bytevector (* width height 4)))
         (run-sdl-event-loop
           (cond
             ((sdl-event-none?)
