@@ -8,6 +8,8 @@
     run-sdl-event-loop
     run-sdl-audio-device
     run-sdl-locked-audio-device
+    sdl-surface-pixels
+    sdl-surface-pitch
     sdl-pause-audio-device
     sdl-queued-audio-size
     sdl-queue-audio)
@@ -65,6 +67,12 @@
           (lambda () #f)
           (lambda () $body ...)
           (lambda () (sdl-destroy-texture $texture))))))
+
+  (define-rule-syntax (sdl-surface-pixels $surface)
+    (ftype-ref SDL_Surface (pixels) $surface))
+
+  (define-rule-syntax (sdl-surface-pitch $surface)
+    (ftype-ref SDL_Surface (pitch) $surface))
 
   (define-rule-syntax
     (run-sdl-audio-device

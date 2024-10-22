@@ -12,6 +12,9 @@
     (sdl-render-clear $renderer)
     (sdl-set-render-draw-color! $renderer 255 0 0 255)
     (sdl-render-fill-rect $renderer (make-sdl-rect 0 0 $mouse-x $mouse-y))
+    (foreign-set! 'integer-32 (sdl-surface-pixels $surface) (* 4 (random (* 640 480))) #xffffffff)
+    (sdl-update-texture $texture #f (sdl-surface-pixels $surface) (sdl-surface-pitch $surface))
+    (sdl-render-copy $renderer $texture #f #f)
     (sdl-render-present $renderer)))
 
 (run-sdl (SDL-INIT-VIDEO SDL-INIT-EVENTS)
