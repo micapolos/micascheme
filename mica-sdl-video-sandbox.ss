@@ -24,20 +24,21 @@
       SDL-WINDOWPOS-CENTERED
       640 480
       ($window
-        (run-sdl-renderer
-          $window
-          -1
-          SDL-RENDERER-ACCELERATED
-          SDL-RENDERER-PRESENT-VSYNC
-          ($renderer
-            (run-sdl-event-loop
-              (cond
-                ((sdl-event-none?)
-                  (render $renderer))
-                ((sdl-event-mouse-motion?)
-                  (set! $mouse-x (sdl-event-mouse-motion-x))
-                  (set! $mouse-y (sdl-event-mouse-motion-y)))
-                ((sdl-event-key-down? SDLK-SPACE)
-                  (set! $flash? #t))
-                ((sdl-event-key-up? SDLK-SPACE)
-                  (set! $flash? #f))))))))))
+        (run-sdl-rgb-surface-with-format ($surface 0 320 256 32 SDL-PIXELFORMAT-BGRA8888)
+          (run-sdl-renderer
+            $window
+            -1
+            SDL-RENDERER-ACCELERATED
+            SDL-RENDERER-PRESENT-VSYNC
+            ($renderer
+              (run-sdl-event-loop
+                (cond
+                  ((sdl-event-none?)
+                    (render $renderer))
+                  ((sdl-event-mouse-motion?)
+                    (set! $mouse-x (sdl-event-mouse-motion-x))
+                    (set! $mouse-y (sdl-event-mouse-motion-y)))
+                  ((sdl-event-key-down? SDLK-SPACE)
+                    (set! $flash? #t))
+                  ((sdl-event-key-up? SDLK-SPACE)
+                    (set! $flash? #f)))))))))))

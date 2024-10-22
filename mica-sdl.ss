@@ -3,6 +3,7 @@
     run-sdl
     run-sdl-window
     run-sdl-renderer
+    run-sdl-rgb-surface-with-format
     run-sdl-event-loop
     run-sdl-audio-device
     run-sdl-locked-audio-device
@@ -45,6 +46,15 @@
           (lambda () #f)
           (lambda () $body ...)
           (lambda () (sdl-destroy-renderer $renderer))))))
+
+  (define-rule-syntax (run-sdl-rgb-surface-with-format ($surface $flags $width $height $bits-per-pixel $pixel-format) $body ...)
+    (switch (sdl-create-rgb-surface-with-format $flags $width $height $bits-per-pixel $pixel-format)
+      ((ftype-pointer-null? _) (sdl-error))
+      ((else $surface)
+        (dynamic-wind
+          (lambda () #f)
+          (lambda () $body ...)
+          (lambda () (sdl-free-surface $surface))))))
 
   (define-rule-syntax
     (run-sdl-audio-device
