@@ -23,7 +23,8 @@
 
   (define (compiler-body-syntax->expr $compiler $body $syntax)
     (syntax-case $syntax ()
-      (id (identifier? #'id))
+      (id (identifier? #'id)
+        )
       (_ (syntax-error $syntax "invalid expression"))))
 
   (define (compiler-body+syntax $compiler $body $syntax)

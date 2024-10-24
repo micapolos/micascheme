@@ -1,7 +1,7 @@
 (library (micac c-code)
   (export
-    c-body c-body? c-body-code c-body-size
-    c-body-append
+    c-block c-block? c-block-code c-block-size
+    c-block-append
 
     type->c-code
 
@@ -12,10 +12,10 @@
     instr->c-code)
   (import (micascheme) (micac ast) (code))
 
-  (data (c-body code size))
+  (data (c-block code size))
 
-  (define (empty-c-body)
-    (c-body empty-code 0))
+  (define (empty-c-block)
+    (c-block empty-code 0))
 
   (define (type->c-code $type)
     (type-switch $type
@@ -23,10 +23,10 @@
       ((u16? _) (code "uint16_t"))
       ((u32? _) (code "uint32_t"))))
 
-  (define (c-body-append . $c-bodies)
-    (c-body
-      (apply code-append (map c-body-code $c-bodies))
-      (apply + (map c-body-size $c-bodies))))
+  (define (c-block-append . $c-bodies)
+    (c-block
+      (apply code-append (map c-block-code $c-bodies))
+      (apply + (map c-block-size $c-bodies))))
 
   (define (type->size $type)
     (type-switch $type
@@ -50,35 +50,35 @@
         (number->string
           (variable-index $variable)))))
 
-  (define (c-body+instr $c-body $instr)
+  (define (c-block+instr $c-block $instr)
     (instr-switch $instr
       ((alloc? $alloc)
-        (c-body
+        (c-block
           (code
-            (c-body-code $c-body)
+            (c-block-code $c-block)
             (space-separated-code
               (type->c-code (alloc-type $alloc))
-              (variable->c-code (variable (c-body-size $c-body))))
+              (variable->c-code (variable (c-block-size $c-block))))
             ";\n")
-          (+ (c-body-size $c-body) 1)))
+          (+ (c-block-size $c-block) 1)))
       ((ld? $ld)
-        (c-body+op2 $c-body (ld-variable $ld) "=" (ld-value $ld)))
+        (c-block+op2 $c-block (ld-variable $ld) "=" (ld-value $ld)))
       ((add? $add)
-        (c-body+op2 $c-body (add-variable $add) "+=" (add-value $add)))
+        (c-block+op2 $c-block (add-variable $add) "+=" (add-value $add)))
       ((block? $block)
-        (fold-left c-body+instr $c-body (block-instrs $block)))))
+        (fold-left c-block+instr $c-block (block-instrs $block)))))
 
-  (define (c-body+op2 $c-body $variable $op $value)
-    (c-body-append $c-body
-      (c-body
+  (define (c-block+op2 $c-block $variable $op $value)
+    (c-block-append $c-block
+      (c-block
         (code
           (space-separated-code
             (variable->c-code $variable)
-            $op
+            (string-code $op)
             (value->c-code $value))
           ";\n")
         0)))
 
   (define (instr->c-code $instr)
-    (c-body-code (c-body+instr (empty-c-body) $instr)))
+    (c-block-code (c-block+instr (empty-c-block) $instr)))
 )
