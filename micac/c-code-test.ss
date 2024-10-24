@@ -21,10 +21,12 @@
               (type (u16)))
             (list
               (instr (ld (type (u8)) (variable 1) (value (const 128))))
-              (instr (add (type (u8)) (variable 2) (value (variable 1)))))))))
+              (instr (add (type (u8)) (variable 2) (value (variable 1))))
+              (instr (alloc (list (type (u32))) (list))))))))
     (lines-string
       "uint8_t v0;"
       "uint8_t v1;"
       "uint16_t v2;"
       "v1 = 128;"
-      "v0 += v1;")))
+      "v0 += v1;"
+      "uint32_t v3;")))
