@@ -9,8 +9,7 @@
     variable variable? variable-index
     value value? value-switch
 
-    alloc alloc? alloc-type
-    block block? block-instrs
+    alloc alloc? alloc-types alloc-instrs
     ld ld? ld-size ld-variable ld-value
     add add? add-size add-variable add-value
     instr instr? instr-switch)
@@ -25,9 +24,8 @@
   (data (variable index))
   (enum (value const variable))
 
-  (data (alloc type))
+  (data (alloc types instrs))
   (data (ld size variable value))
   (data (add size variable value))
-  (data (block instrs))
-  (enum (instr alloc ld block))
+  (enum (instr alloc ld add block))
 )
