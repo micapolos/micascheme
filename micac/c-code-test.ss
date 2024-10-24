@@ -1,61 +1,41 @@
 (import (micascheme) (code) (micac ast) (micac c-code))
 
-(check
-  (equal?
-    (code-string (type->c-code (type (bool))))
-    "bool"))
+(check (equal? (code-string (type->c-code (type (u8)))) "uint8_t"))
+(check (equal? (code-string (type->c-code (type (u16)))) "uint16_t"))
+(check (equal? (code-string (type->c-code (type (u32)))) "uint32_t"))
+
+(check (equal? (code-string (const->c-code (const 128))) "128"))
+(check (equal? (code-string (variable->c-code (variable 128))) "_128"))
+(check (equal? (code-string (value->c-code (value (variable 128)))) "_128"))
 
 (check
   (equal?
-    (code-string (type->c-code (type (u8))))
-    "uint8_t"))
+    (code-string (instr->c-code (instr (alloc (type (u8))))))
+    (lines-string "uint8_t _0;")))
 
 (check
   (equal?
-    (code-string (type->c-code (type (u16))))
-    "uint16_t"))
+    (code-string (instr->c-code (instr (ld (type (u8)) (variable 3) (value (const 128))))))
+    (lines-string "_3 = 128;")))
 
 (check
   (equal?
-    (code-string (type->c-code (type (u32))))
-    "uint32_t"))
-
-(check
-  (equal?
-    (code-string
-      (type->c-code
-        (type
-          (struct
-            (stack
-              (type (u8))
-              (type (u16)))))))
-    (lines-string0
-      "struct {"
-      "  uint8_t _0;"
-      "  uint16_t _1;"
-      "}")))
+    (code-string (instr->c-code (instr (add (type (u8)) (variable 3) (value (const 128))))))
+    (lines-string "_3 += 128;")))
 
 (check
   (equal?
     (code-string
-      (statement->c-code
-        (statement
-          (return
-            (expr
-              (type (u8))
-              (term (const 128)))))))
-    "return 128;"))
-
-(check
-  (equal?
-    (code-string
-      (statement->c-code
-        (statement
+      (instr->c-code
+        (instr
           (block
-            (stack (type (u8)) (type (u16)))
-            (stack)))))
-    (lines-string0
-      "{"
-      "  uint8_t _0;"
-      "  uint16_t _1;"
-      "}")))
+            (list
+              (instr (alloc (type (u8))))
+              (instr (alloc (type (u8))))
+              (instr (ld (type (u8)) (variable 0) (value (const 128))))
+              (instr (add (type (u8)) (variable 1) (value (variable 0)))))))))
+    (lines-string
+      "uint8_t _0;"
+      "uint8_t _1;"
+      "_0 = 128;"
+      "_1 += _0;")))

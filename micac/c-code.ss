@@ -1,94 +1,84 @@
 (library (micac c-code)
   (export
+    c-body c-body? c-body-code c-body-size
+    c-body-append
+
     type->c-code
-    term->c-code
-    expr->c-code
-    statement->c-code)
+
+    const->c-code
+    variable->c-code
+    value->c-code
+
+    instr->c-code)
   (import (micascheme) (micac ast) (code))
 
   (data (c-body code size))
 
-  (define (c-body+code $c-body $code)
-    (c-body-with-code $c-body
-      (code (c-body-code $c-body) $code)))
-
-  (define (block-code $code)
-    (code-in-curly-brackets
-      (code-indent
-        (code "\n" $code))))
+  (define (empty-c-body)
+    (c-body empty-code 0))
 
   (define (type->c-code $type)
     (type-switch $type
-      ((bool? _) (code "bool"))
       ((u8? _) (code "uint8_t"))
       ((u16? _) (code "uint16_t"))
-      ((u32? _) (code "uint32_t"))
-      ((struct? $struct)
-        (space-separated-code
-          "struct"
-          (block-code
-            (c-body-code
-              (types->c-body (struct-types $struct))))))))
+      ((u32? _) (code "uint32_t"))))
 
-  (define (types->c-body $types)
-    (fold-left
-      c-body+type
-      (c-body (code) 0)
-      (reverse $types)))
-
-  (define (c-body+type $c-body $type)
+  (define (c-body-append . $c-bodies)
     (c-body
-      (code
-        (c-body-code $c-body)
-        (space-separated-code
-          (type->c-code $type)
-          (string-code (string-append "_" (number->string (c-body-size $c-body)))))
-        ";\n")
-      (+ (c-body-size $c-body) 1)))
+      (apply code-append (map c-body-code $c-bodies))
+      (apply + (map c-body-size $c-bodies))))
 
-  (define (c-body+statement $c-body $statement)
-    (statement-switch $statement
-      ((block? $block)
-        (c-body+block $c-body $block))
-      ((return? $return)
-        (c-body+code $c-body
-          (code
-            (space-separated-code "return"
-              (expr->c-code (return-expr $return)))
-            ";")))))
+  (define (type->size $type)
+    (type-switch $type
+      ((u8? _) 1)
+      ((u16? _) 2)
+      ((u32? _) 4)))
 
-  (define (term->c-code $term)
-    (term-switch $term
-      ((const? $const) (const->c-code $const))))
+  (define (value->c-code $value)
+    (value-switch $value
+      ((const? $const) (const->c-code $const))
+      ((variable? $variable) (variable->c-code $variable))))
 
   (define (const->c-code $const)
-    (string-code (number->string (const-value $const))))
+    (string-code
+      (number->string
+        (const-value $const))))
 
-  (define (expr->c-code $expr)
-    (term->c-code (expr-term $expr)))
+  (define (variable->c-code $variable)
+    (string-code
+      (string-append "_"
+        (number->string
+          (variable-index $variable)))))
 
-  (define (c-body+block $c-body $block)
-    (lets
-      ($types-c-body
-        (fold-left
-          c-body+type
-          (c-body (code) (c-body-size $c-body))
-          (reverse (block-types $block))))
-      ($statements-c-body
-        (fold-left
-          c-body+statement
-          (c-body (code) (c-body-size $types-c-body))
-          (reverse (block-statements $block))))
-      (c-body
-        (block-code
+  (define (c-body+instr $c-body $instr)
+    (instr-switch $instr
+      ((alloc? $alloc)
+        (c-body
           (code
-            (c-body-code $types-c-body)
-            (c-body-code $statements-c-body)))
-        (c-body-size $statements-c-body))))
+            (c-body-code $c-body)
+            (space-separated-code
+              (type->c-code (alloc-type $alloc))
+              (variable->c-code (variable (c-body-size $c-body))))
+            ";\n")
+          (+ (c-body-size $c-body) 1)))
+      ((ld? $ld)
+        (c-body+op2 $c-body (ld-variable $ld) "=" (ld-value $ld)))
+      ((add? $add)
+        (c-body+op2 $c-body (add-variable $add) "+=" (add-value $add)))
+      ((block? $block)
+        (fold-left c-body+instr $c-body (block-instrs $block)))))
 
-  (define (statement->c-code $statement)
-    (c-body-code
-      (c-body+statement
-        (c-body (code) 0)
-        $statement)))
+  (define (c-body+op2 $c-body $variable $op $value)
+    (c-body-append $c-body
+      (c-body
+        (code
+          (space-separated-code
+            (variable->c-code $variable)
+            $op
+            (value->c-code $value))
+          ";\n")
+        0)))
+
+  (define (instr->c-code $instr)
+    (c-body-code (c-body+instr (empty-c-body) $instr)))
 )

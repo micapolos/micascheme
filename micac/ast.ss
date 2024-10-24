@@ -1,37 +1,33 @@
 (library (micac ast)
   (export
-    bool bool?
     u8 u8?
     u16 u16?
     u32 u32?
-    struct struct? struct-types
-
     type type? type-switch
 
     const const? const-value
-    term term? term-switch
+    variable variable? variable-index
+    value value? value-switch
 
-    expr expr? expr-type expr-term
-
-    block block? block-types block-statements
-    return return? return-expr
-
-    statement statement? statement-switch)
+    alloc alloc? alloc-type
+    block block? block-instrs
+    ld ld? ld-size ld-variable ld-value
+    add add? add-size add-variable add-value
+    instr instr? instr-switch)
   (import (micascheme))
 
-  (data (bool))
   (data (u8))
   (data (u16))
   (data (u32))
-  (data (struct types))
-  (enum (type bool u8 u16 u32 struct))
+  (enum (type u8 u16 u32))
 
   (data (const value))
-  (enum (term const))
+  (data (variable index))
+  (enum (value const variable))
 
-  (data (expr type term))
-
-  (data (block types statements))
-  (data (return expr))
-  (enum (statement block return))
+  (data (alloc type))
+  (data (ld size variable value))
+  (data (add size variable value))
+  (data (block instrs))
+  (enum (instr alloc ld block))
 )
