@@ -1,0 +1,61 @@
+(import (micascheme) (micac syntax) (micac syntax-c) (check))
+
+(check
+  (equal?
+    (syntax-c #`(var u8 x))
+    (lines-string "uint8_t x;")))
+
+(check
+  (equal?
+    (syntax-c #`(var u16 y))
+    (lines-string "uint16_t y;")))
+
+(check
+  (equal?
+    (syntax-c #`(var u32 z))
+    (lines-string "uint32_t z;")))
+
+(check
+  (equal?
+    (syntax-c #`(begin))
+    (lines-string)))
+
+(check
+  (equal?
+    (syntax-c
+      #`(begin
+        (var u8 x)
+        (set x 10)))
+    (lines-string
+      "uint8_t x;"
+      "x = 10;")))
+
+(check
+  (equal?
+    (syntax-c
+      #`(begin
+        (var u8 x)
+        (add x 10)))
+    (lines-string
+      "uint8_t x;"
+      "x += 10;")))
+
+(check
+  (equal?
+    (syntax-c
+      #`(begin
+        (var u8 x)
+        (set x 10)
+        (add x 20)
+        (sub x 30)
+        (and x 40)
+        (or x 50)
+        (xor x 60)))
+    (lines-string
+      "uint8_t x;"
+      "x = 10;"
+      "x += 20;"
+      "x -= 30;"
+      "x &= 40;"
+      "x |= 50;"
+      "x ^= 60;")))
