@@ -34,6 +34,7 @@
   (monad-syntax)
   ;(msdl)
   (number)
+  (option)
   (pair)
   (parser)
   (procedure)
