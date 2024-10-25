@@ -35,7 +35,9 @@
   (check (procedure? (bind option)))
   (check (equal? ((bind option) fx1+ 123) 124))
   (check (equal? (bind option fx1+ 123) 124))
-  (check (equal? (bind option fx1+ #f) #f)))
+  (check (equal? (bind option fx1+ #f) #f))
+  (check (equal? (bind (option fx 123) (fx1+ fx)) 124))
+  (check (equal? (bind (option fx #f) (fx1+ fx)) #f)))
 
 ; === fmap ===
 
@@ -44,9 +46,20 @@
   (define (io-run $io) ($io))
   (define-pure (io $value) (io $value))
   (define-bind (io $fn $io) ($fn (io-run $io)))
-  (check (equal? (io-run (io 123)) 123))
-  (check (equal? (io-run (pure io 123)) 123))
-  (check (equal? (io-run (bind io (lambda ($value) (io (fx1+ $value))) (io 123))) 124))
+
   (check (procedure? (fmap io)))
   (check (equal? (io-run ((fmap io) fx1+ (io 123))) 124))
-  (check (equal? (io-run (fmap io fx1+ (io 123))) 124)))
+  (check (equal? (io-run (fmap io fx1+ (io 123))) 124))
+  (check (equal? (io-run (fmap (io fx (io 123)) (fx1+ fx))) 124)))
+
+; === flat-map ===
+
+(let ()
+  (define-rule-syntax (io body) (lambda () body))
+  (define (io-run $io) ($io))
+  (define-pure (io $value) (io $value))
+  (define-bind (io $fn $io) ($fn (io-run $io)))
+
+  (check (procedure? (flat-map io)))
+  (check (equal? (io-run ((flat-map io) (list (io 1) (io 2)))) (list 1 2)))
+  (check (equal? (io-run (flat-map io (list (io 1) (io 2)))) (list 1 2))))
