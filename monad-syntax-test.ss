@@ -10,8 +10,7 @@
       (syntax-case $syntax ()
         ((_ body ...) #`(let () body ...)))))
 
-  (check (equal? (pure option 123) 123))
-  (check (equal? (pure option 123 125) 125)))
+  (check (equal? (pure option 123) 123)))
 
 ; === define-pure ===
 
@@ -45,4 +44,12 @@
   (check (equal? (bind option (x 128) (+ x 1)) 129))
   (check (equal? (bind option (x 128) #f) #f))
   (check (equal? (bind option (x #f) (+ x 1)) #f))
-  (check (equal? (bind option (x #f) #f) #f)))
+  (check (equal? (bind option (x #f) #f) #f))
+
+  (check
+    (equal?
+      (binds option
+        (x 10)
+        (y (+ x x))
+        (* x y))
+      200)))

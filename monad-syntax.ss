@@ -6,8 +6,9 @@
 
     define-bind-syntax
     define-bind
-    bind)
-  (import (scheme) (syntax))
+    bind
+    binds)
+  (import (scheme) (syntax) (syntaxes))
 
   (define-syntax (define-pure-syntax $syntax)
     (syntax-case $syntax ()
@@ -16,26 +17,25 @@
 
   (define-syntax (define-pure $syntax)
     (syntax-case $syntax ()
-      ((_ (id value) body ...)
+      ((_ (id value) body)
         #`(define-pure id
-          (lambda (value)
-            body ...)))
+          (lambda (value) body)))
       ((_ id fn)
         #`(begin
           (define id fn)
           (define-pure-syntax id
             (lambda ($syntax)
               (syntax-case $syntax ()
-                ((_ body (... ...))
-                  #`(id (let () body (... ...)))))))))))
+                ((_ body)
+                  #`(id body )))))))))
 
   (define-lookup-syntax (pure $syntax $lookup)
     (syntax-case $syntax ()
-      ((pure id body ...)
+      ((pure id body)
         (let ()
           (define $fn ($lookup #'id #'pure))
           (unless $fn (syntax-error $syntax "pure undefined"))
-          ($fn #'(pure body ...))))))
+          ($fn #'(pure body))))))
 
   (define-syntax (define-bind-syntax $syntax)
     (syntax-case $syntax ()
@@ -44,20 +44,26 @@
 
   (define-syntax (define-bind $syntax)
     (syntax-case $syntax ()
-      ((_ (id value fn) body ...)
+      ((_ (id value fn) body)
         #`(begin
-          (define (bind-fn value fn) body ...)
+          (define (bind-fn value fn) body)
           (define-bind-syntax id
             (lambda ($syntax)
               (syntax-case $syntax ()
-                ((_ (var expr) body2 (... ...))
-                  #`(bind-fn expr (lambda (var) body2 (... ...)))))))))))
+                ((_ (var expr) body2)
+                  #`(bind-fn expr (lambda (var) body2))))))))))
 
   (define-lookup-syntax (bind $syntax $lookup)
     (syntax-case $syntax ()
-      ((bind id (val expr) body ...)
+      ((bind id (val expr) body)
         (let ()
           (define $fn ($lookup #'id #'bind))
           (unless $fn (syntax-error $syntax "bind undefined"))
-          ($fn #'(bind (val expr) body ...))))))
+          ($fn #'(bind (val expr) body))))))
+
+  (define-rules-syntax
+    ((binds id body) body)
+    ((binds id (var expr) rest ...)
+      (bind id (var expr)
+        (binds id rest ...))))
 )
