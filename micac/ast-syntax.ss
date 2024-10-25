@@ -2,8 +2,41 @@
   (export )
   (import (micac ast))
 
-  (data (generated syntaxes size))
+  (data (scope offsets))
   (data (context bytevector-identifier))
+
+  (define scoped cons)
+  (define scope car)
+  (define scoped cons)
+
+  (define (context-instr->scoped-syntaxes $context $instr)
+    (define (instr->scoped-syntaxes $instr)
+      ()
+      )
+
+
+  (define (variable-syntax $variable)
+    (lambda ($context)
+      (lambda ($scope)
+        #`(
+          #,(identifier-append #'+ #'bytevector- (type-identifier $type) #'-native-ref)
+          (context-bytevector-identifier $context)
+          (datum->syntax #'+ (list-ref (scope-offsets $scope) (variable-index $variable)))))))
+
+  (define (const-syntax $const)
+    (datum->syntax #'+ (const-value $value)))
+
+  (define (value-syntax $value)
+    (value-switch $value
+      ((const? $const) (lambda ($context) (lambda ($scope) (const-syntax $const))))
+      ((variable? $variable) (variable-syntax $variable))))
+
+  (define (ld-syntax $ld)
+    ()
+
+  (define (instr-syntax $instr)
+    (instr-switch $instr
+      ((ld? $ld))
 
   (define (type-size $type)
     (type-switch $type

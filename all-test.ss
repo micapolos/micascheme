@@ -31,6 +31,7 @@
   (micascheme)
   (mico-c)
   (monad)
+  (monad-syntax)
   ;(msdl)
   (number)
   (pair)
