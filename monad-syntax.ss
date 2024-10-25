@@ -10,33 +10,37 @@
   (import (scheme) (syntax) (syntaxes))
 
   (define-rules-syntax
-    ((define-pure (id var) body)
-      (define-pure id
-        (lambda (var) body)))
-    ((define-pure id fn)
+    ((define-pure id value)
+      (identifier? #'id)
       (begin
-        (define var fn)
-        (define-property id pure #'var))))
+        (define var value)
+        (define-property id pure #'var)))
+    ((define-pure (id value) body)
+      (and (identifier? #'id) (identifier? #'value))
+      (define-pure id
+        (lambda (value) body))))
 
   (define-lookup-syntax (pure $syntax $lookup)
     (syntax-case $syntax ()
       ((pure id)
+        (identifier? #'id)
         (or
           ($lookup #'id #'pure)
           (syntax-error $syntax "undefined")))
-      ((pure id value)
+      ((pure (id value))
+        (identifier? #'id)
         #`((pure id) value))))
 
   (define-rules-syntax
-    ((define-bind (id fn value) body)
-      (and (identifier? #'id) (identifier? #'fn) (identifier? #'value))
-      (define-bind id
-        (lambda (fn value) body)))
     ((define-bind id fn)
       (identifier? #'id)
       (begin
         (define var fn)
-        (define-property id bind #'var))))
+        (define-property id bind #'var)))
+    ((define-bind (id fn monad) body)
+      (and (identifier? #'id) (identifier? #'fn) (identifier? #'monad))
+      (define-bind id
+        (lambda (fn monad) body))))
 
   (define-lookup-syntax (bind $syntax $lookup)
     (syntax-case $syntax ()
@@ -67,7 +71,7 @@
       (identifier? #'id)
       (lambda (fn monad)
         (bind (id value monad)
-          (pure id (fn value)))))
+          (pure (id (fn value))))))
     ((fmap id fn monad)
       (identifier? #'id)
       ((fmap id) fn monad))
@@ -80,7 +84,7 @@
       (lambda (value-monad values-monad)
         (bind (id value value-monad)
           (bind (id values values-monad)
-            (pure id (cons value values)))))
-      (pure id (list))
+            (pure (id (cons value values))))))
+      (pure (id (list)))
       monads))
 )
