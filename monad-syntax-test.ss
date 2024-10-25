@@ -48,7 +48,7 @@
 
   (check
     (equal?
-      (binds option
+      (bind option
         (x 10)
         (y (+ x x))
         (* x y))

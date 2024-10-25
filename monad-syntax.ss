@@ -6,8 +6,7 @@
 
     define-bind-syntax
     define-bind
-    bind
-    binds)
+    bind)
   (import (scheme) (syntax) (syntaxes))
 
   (define-syntax (define-pure-syntax $syntax)
@@ -53,17 +52,17 @@
                 ((_ (var expr) body2)
                   #`(bind-fn expr (lambda (var) body2))))))))))
 
-  (define-lookup-syntax (bind $syntax $lookup)
+  (define-lookup-syntax (bind0 $syntax $lookup)
     (syntax-case $syntax ()
-      ((bind id (val expr) body)
+      ((_ id (val expr) body)
         (let ()
           (define $fn ($lookup #'id #'bind))
           (unless $fn (syntax-error $syntax "bind undefined"))
           ($fn #'(bind (val expr) body))))))
 
   (define-rules-syntax
-    ((binds id body) body)
-    ((binds id (var expr) rest ...)
-      (bind id (var expr)
-        (binds id rest ...))))
+    ((bind id body) body)
+    ((bind id (var expr) rest ...)
+      (bind0 id (var expr)
+        (bind id rest ...))))
 )
