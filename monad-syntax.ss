@@ -4,7 +4,7 @@
     pure
     define-bind
     bind
-    ;monad-define
+    monad-define
     fmap
     flat-map)
   (import (scheme) (syntax) (syntaxes))
@@ -45,55 +45,42 @@
         (or
           ($lookup #'id #'bind)
           (syntax-error $syntax "undefined")))
-      ((bind id fn value)
+      ((bind id fn monad)
         (identifier? #'id)
-        #`((bind id) fn value))
-      ((bind (id var value) body)
-        (and (identifier? #'id) (identifier? #'var))
-        #`(bind id (lambda (var) body) value))))
+        #`((bind id) fn monad))
+      ((bind (id value monad) body)
+        (and (identifier? #'id) (identifier? #'value))
+        #`(bind id (lambda (value) body) monad))))
 
-  ; (define-rule-syntax (monad-define id (name arg ...) body)
-  ;   (define-rules-syntax
-  ;     ((name id)
-  ;       (identifier? #'id)
-  ;       (lambda (arg ...) body))
-  ;     ((name id arg ...)
-  ;       (identifier? #'id)
-  ;       ((name id) arg ...))
-  ;     ((name (id var value) body)
-  ;       (identifier? #'id)
-  ;       (name id (lambda (var) body) value))))
-
-  ; (monad-define id (fmap2 fn monad)
-  ;   (bind (id value monad)
-  ;     (pure id (fn value))))
+  (define-rules-syntax
+    ((monad-define (name id arg ...) body)
+      (define-rules-syntax
+        ((name id)
+          (identifier? #'id)
+          (lambda (arg ...) body))
+        ((name id arg ...)
+          (identifier? #'id)
+          ((name id) arg ...)))))
 
   (define-rules-syntax
     ((fmap id)
       (identifier? #'id)
-      (lambda (fn value)
-        (bind id
-          (lambda (x) (pure id (fn x)))
-          value)))
-    ((fmap id fn value)
+      (lambda (fn monad)
+        (bind (id value monad)
+          (pure id (fn value)))))
+    ((fmap id fn monad)
       (identifier? #'id)
-      ((fmap id) fn value))
-    ((fmap (id var value) body)
-      (and (identifier? #'id) (identifier? #'var))
-      (fmap id (lambda (var) body) value)))
+      ((fmap id) fn monad))
+    ((fmap (id value monad) body)
+      (and (identifier? #'id) (identifier? #'value))
+      (fmap id (lambda (value) body) monad)))
 
-  (define-rules-syntax
-    ((flat-map id)
-      (identifier? #'id)
-      (lambda (monads)
-        (fold-right
-          (lambda (value-monad values-monad)
-            (bind (id value value-monad)
-              (bind (id values values-monad)
-                (pure id (cons value values)))))
-          (pure id (list))
-          monads)))
-    ((flat-map id monads)
-      (identifier? #'id)
-      ((flat-map id) monads)))
+  (monad-define (flat-map id monads)
+    (fold-right
+      (lambda (value-monad values-monad)
+        (bind (id value value-monad)
+          (bind (id values values-monad)
+            (pure id (cons value values)))))
+      (pure id (list))
+      monads))
 )
