@@ -1,8 +1,8 @@
 (library (monad-syntax)
   (export
     define-pure
-    pure
     define-bind
+    pure
     bind
     monad-define
     fmap
@@ -20,17 +20,6 @@
       (define-pure id
         (lambda (value) body))))
 
-  (define-lookup-syntax (pure $syntax $lookup)
-    (syntax-case $syntax ()
-      ((pure id)
-        (identifier? #'id)
-        (or
-          ($lookup #'id #'pure)
-          (syntax-error $syntax "undefined")))
-      ((pure (id value))
-        (identifier? #'id)
-        #`((pure id) value))))
-
   (define-rules-syntax
     ((define-bind id fn)
       (identifier? #'id)
@@ -41,6 +30,17 @@
       (and (identifier? #'id) (identifier? #'fn) (identifier? #'monad))
       (define-bind id
         (lambda (fn monad) body))))
+
+  (define-lookup-syntax (pure $syntax $lookup)
+    (syntax-case $syntax ()
+      ((pure id)
+        (identifier? #'id)
+        (or
+          ($lookup #'id #'pure)
+          (syntax-error $syntax "undefined")))
+      ((pure (id value))
+        (identifier? #'id)
+        #`((pure id) value))))
 
   (define-lookup-syntax (bind $syntax $lookup)
     (syntax-case $syntax ()
