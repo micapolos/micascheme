@@ -4,6 +4,7 @@
     pure
     define-bind
     bind
+    ;monad-define
     fmap
     flat-map)
   (import (scheme) (syntax) (syntaxes))
@@ -50,6 +51,22 @@
       ((bind (id var value) body)
         (and (identifier? #'id) (identifier? #'var))
         #`(bind id (lambda (var) body) value))))
+
+  ; (define-rule-syntax (monad-define id (name arg ...) body)
+  ;   (define-rules-syntax
+  ;     ((name id)
+  ;       (identifier? #'id)
+  ;       (lambda (arg ...) body))
+  ;     ((name id arg ...)
+  ;       (identifier? #'id)
+  ;       ((name id) arg ...))
+  ;     ((name (id var value) body)
+  ;       (identifier? #'id)
+  ;       (name id (lambda (var) body) value))))
+
+  ; (monad-define id (fmap2 fn monad)
+  ;   (bind (id value monad)
+  ;     (pure id (fn value))))
 
   (define-rules-syntax
     ((fmap id)

@@ -46,6 +46,10 @@
         (define-syntax name
           (syntax-rules ()
             ((_ param ...) body))))
+      ((_ (name param ...) fender body)
+        (define-syntax name
+          (syntax-rules ()
+            ((_ param ...) fender body))))
       ((_ name body)
         (define-syntax (name $syntax)
           (syntax-case $syntax ()
