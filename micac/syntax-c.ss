@@ -11,11 +11,26 @@
   (define empty-block
     (block empty-code (stack)))
 
+  (define (size->code $size)
+    (lets
+      ($datum (syntax->datum $size))
+      (or
+        (and
+          (integer? $datum)
+          (nonnegative? $datum)
+          (number-code $datum))
+        (syntax-error $size "invalid size"))))
+
   (define (type->code $type)
-    (syntax-case $type (u8 u16 u32)
+    (syntax-case $type (u8 u16 u32 *)
       (u8 (code "uint8_t"))
       (u16 (code "uint16_t"))
       (u32 (code "uint32_t"))
+      ((* type) (code (type->code #'type) "*"))
+      ((* type size)
+        (code
+          (type->code #'type)
+          (code-in-square-brackets (size->code #'size))))
       (_ (syntax-error $type "unknown type"))))
 
   (define (block-append . $blocks)

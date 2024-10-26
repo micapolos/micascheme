@@ -22,6 +22,26 @@
 
 (check
   (equal?
+    (syntax-c #`(var (* u32) x))
+    (lines-string "uint32_t* x;")))
+
+(check
+  (equal?
+    (syntax-c #`(var (* (* u32)) x))
+    (lines-string "uint32_t** x;")))
+
+(check
+  (equal?
+    (syntax-c #`(var (* u32 24) x))
+    (lines-string "uint32_t[24] x;")))
+
+(check
+  (equal?
+    (syntax-c #`(var (* (* u32 24) 32) x))
+    (lines-string "uint32_t[24][32] x;")))
+
+(check
+  (equal?
     (syntax-c #`(begin))
     (lines-string
       "{"
