@@ -2,6 +2,11 @@
 
 (check
   (equal?
+    (syntax-c)
+    (lines-string)))
+
+(check
+  (equal?
     (syntax-c #`(var u8 x))
     (lines-string "uint8_t x;")))
 
@@ -18,7 +23,9 @@
 (check
   (equal?
     (syntax-c #`(begin))
-    (lines-string)))
+    (lines-string
+      "{"
+      "}")))
 
 (check
   (equal?
@@ -27,15 +34,16 @@
         (var u8 x)
         (set x 10)))
     (lines-string
-      "uint8_t x;"
-      "x = 10;")))
+      "{"
+      "  uint8_t x;"
+      "  x = 10;"
+      "}")))
 
 (check
   (equal?
     (syntax-c
-      #`(begin
-        (var u8 x)
-        (add x 10)))
+      #`(var u8 x)
+      #`(add x 10))
     (lines-string
       "uint8_t x;"
       "x += 10;")))
@@ -43,14 +51,13 @@
 (check
   (equal?
     (syntax-c
-      #`(begin
-        (var u8 x)
-        (set x 10)
-        (add x 20)
-        (sub x 30)
-        (and x 40)
-        (or x 50)
-        (xor x 60)))
+      #`(var u8 x)
+      #`(set x 10)
+      #`(add x 20)
+      #`(sub x 30)
+      #`(and x 40)
+      #`(or x 50)
+      #`(xor x 60))
     (lines-string
       "uint8_t x;"
       "x = 10;"

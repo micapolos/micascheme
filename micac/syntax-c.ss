@@ -23,6 +23,9 @@
       (apply code-append (map block-code $blocks))
       (apply append (map block-identifiers $blocks))))
 
+  (define (block-begin $block)
+    (block empty-code (block-identifiers $block)))
+
   (define (identifier->code $identifier)
     (string-code (symbol->string (syntax->datum $identifier))))
 
@@ -51,10 +54,26 @@
       (const
         (literal->code #'const))))
 
+  (define (block+instrs $block $syntaxes)
+    (fold-left block+instr $block $syntaxes))
+
   (define (block+instr $block $syntax)
     (syntax-case $syntax (begin var set add sub and or xor)
       ((begin instr ...)
-        (fold-left block+instr $block (syntax->list #'(instr ...))))
+        (lets
+          ($begin-block
+            (block+instrs
+              (block-begin $block)
+              (syntax->list #'(instr ...))))
+          (block
+            (code
+              (block-code $block)
+              (code-in-curly-brackets
+                (code-indent
+                  (code "\n"
+                    (block-code $begin-block))))
+              "\n")
+            (block-identifiers $block))))
       ((var type id)
         (block
           (code-append
@@ -89,6 +108,8 @@
           ";\n")
         (block-identifiers $block))))
 
-  (define (syntax-c $syntax)
-    (code-string (block-code (block+instr empty-block $syntax))))
+  (define (syntax-c . $syntaxes)
+    (code-string
+      (block-code
+        (block+instrs empty-block $syntaxes))))
 )

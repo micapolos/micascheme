@@ -5,5 +5,5 @@
 
   (define-case-syntax (micac-c instr ...)
     (datum->syntax #'+
-      (syntax-c #`(begin instr ...))))
+      (syntaxes-c (syntax->list #'(instr ...)))))
 )
