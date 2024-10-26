@@ -66,3 +66,30 @@
       "x &= 40;"
       "x |= 50;"
       "x ^= 60;")))
+
+(check
+  (equal?
+    (syntax-c
+      #`(var u8 x)
+      #`(if x (set x 10)))
+    (lines-string
+      "uint8_t x;"
+      "if (x) {"
+      "  x = 10;"
+      "}")))
+
+(check
+  (equal?
+    (syntax-c
+      #`(var u8 x)
+      #`(if x
+        (set x 10)
+        (set x 20)))
+    (lines-string
+      "uint8_t x;"
+      "if (x) {"
+      "  x = 10;"
+      "}"
+      "else {"
+      "  x = 20;"
+      "}")))

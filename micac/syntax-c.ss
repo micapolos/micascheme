@@ -57,8 +57,13 @@
   (define (block+instrs $block $syntaxes)
     (fold-left block+instr $block $syntaxes))
 
+  (define (instr->begin $instr)
+    (syntax-case $instr (begin)
+      ((begin body ...) $instr)
+      (other #'(begin other))))
+
   (define (block+instr $block $syntax)
-    (syntax-case $syntax (begin var set add sub and or xor)
+    (syntax-case $syntax (begin var if switch set add sub and or xor)
       ((begin instr ...)
         (lets
           ($begin-block
@@ -84,6 +89,35 @@
                 (identifier->code #'id))
               ";\n"))
           (push (block-identifiers $block) #'id)))
+      ((if variable then-instr)
+        (block
+          (code-append
+            (block-code $block)
+            (code
+              (space-separated-code
+                "if"
+                (code-in-round-brackets
+                  (variable->code
+                    (block-identifiers $block)
+                    #'variable))
+                (block-code (block+instr (block-begin $block) (instr->begin #'then-instr))))))
+          (block-identifiers $block)))
+      ((if variable then-instr else-instr)
+        (block
+          (code-append
+            (block-code $block)
+            (code
+              (space-separated-code
+                "if"
+                (code-in-round-brackets
+                  (variable->code
+                    (block-identifiers $block)
+                    #'variable))
+                (block-code (block+instr (block-begin $block) (instr->begin #'then-instr))))
+              (space-separated-code
+                "else"
+                (block-code (block+instr (block-begin $block) (instr->begin #'else-instr))))))
+          (block-identifiers $block)))
       ((set variable value)
         (block+op2 $block #'variable "=" #'value))
       ((add variable value)
