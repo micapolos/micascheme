@@ -62,8 +62,18 @@
       ((begin body ...) $instr)
       (other #'(begin other))))
 
+  (define (op->string $op)
+    (syntax-case $op (set add sub and or xor)
+      (set "=")
+      (add "+=")
+      (sub "-=")
+      (and "&=")
+      (or "|=")
+      (xor "^=")
+      (_ (syntax-error $op "invalid op"))))
+
   (define (block+instr $block $syntax)
-    (syntax-case $syntax (begin var if switch set add sub and or xor)
+    (syntax-case $syntax (begin var if switch)
       ((begin instr ...)
         (lets
           ($begin-block
@@ -118,18 +128,8 @@
                 "else"
                 (block-code (block+instr (block-begin $block) (instr->begin #'else-instr))))))
           (block-identifiers $block)))
-      ((set variable value)
-        (block+op2 $block #'variable "=" #'value))
-      ((add variable value)
-        (block+op2 $block #'variable "+=" #'value))
-      ((sub variable value)
-        (block+op2 $block #'variable "-=" #'value))
-      ((and variable value)
-        (block+op2 $block #'variable "&=" #'value))
-      ((or variable value)
-        (block+op2 $block #'variable "|=" #'value))
-      ((xor variable value)
-        (block+op2 $block #'variable "^=" #'value))))
+      ((op variable value)
+        (block+op2 $block #'variable (op->string #'op) #'value))))
 
   (define (block+op2 $block $variable $op $value)
     (block-append $block
