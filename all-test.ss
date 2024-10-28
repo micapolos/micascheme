@@ -69,6 +69,7 @@
   (asm all)
   (indico all)
   (masm all)
+  (micac all)
   (minic all)
   (leo all)
   (scheme all)

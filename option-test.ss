@@ -3,7 +3,7 @@
 (check (equal? (option 123) 123))
 (check (raises? (lambda () (option #f))))
 
-(check (equal? (pure option 123) 123))
+(check (equal? (pure (option 123)) 123))
 
 (check (equal? (bind (option $value 123) (fx1+ $value)) 124))
 (check (equal? (bind (option $value #f) (fx1+ $value)) #f))
