@@ -33,8 +33,13 @@
                     (pair #f (list))
                     (syntax->list #'(arg ...))))
                 (cond
-                  ((not $acc) #`#,($fn))
-                  ((null? $exprs) #`#,$acc)
-                  (else #`(op #,$acc #,@$exprs)))))
+                  ((not $acc)
+                    (cond
+                      ((null? $exprs) #`#,($fn))
+                      (else #`(op #,@$exprs))))
+                  (else
+                    (cond
+                      ((null? $exprs) #`#,$acc)
+                      (else #`(op #,$acc #,@$exprs)))))))
               $expr)))))
 )
