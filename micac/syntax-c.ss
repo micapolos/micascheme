@@ -88,7 +88,7 @@
       (_ (syntax-error $op "invalid op"))))
 
   (define (block+instr $block $syntax)
-    (syntax-case $syntax (begin var if switch)
+    (syntax-case $syntax (begin var if switch while)
       ((begin instr ...)
         (lets
           ($begin-block
@@ -142,6 +142,22 @@
               (space-separated-code
                 "else"
                 (block-code (block+instr (block-begin $block) (instr->begin #'else-instr))))))
+          (block-identifiers $block)))
+      ((while variable instr ...)
+        (block
+          (code-append
+            (block-code $block)
+            (code
+              (space-separated-code
+                "while"
+                (code-in-round-brackets
+                  (variable->code
+                    (block-identifiers $block)
+                    #'variable))
+                (block-code
+                  (block+instr
+                    (block-begin $block)
+                    #'(begin instr ...))))))
           (block-identifiers $block)))
       ((op variable value)
         (block+op2 $block #'variable (op->string #'op) #'value))))

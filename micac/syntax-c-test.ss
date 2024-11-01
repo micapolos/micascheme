@@ -113,3 +113,17 @@
       "else {"
       "  x = 20;"
       "}")))
+
+(check
+  (equal?
+    (syntax-c
+      #`(var u8 x)
+      #`(while x
+          (add x 1)
+          (add x 2)))
+    (lines-string
+      "uint8_t x;"
+      "while (x) {"
+      "  x += 1;"
+      "  x += 2;"
+      "}")))
