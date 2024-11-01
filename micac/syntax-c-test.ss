@@ -127,3 +127,9 @@
       "  x += 1;"
       "  x += 2;"
       "}")))
+
+(check
+  (equal?
+    (syntax-c #`(print 10))
+    (lines-string
+      "printf(\"%i\n\", 10);")))
