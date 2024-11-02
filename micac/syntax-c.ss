@@ -40,6 +40,13 @@
   (define (variable->code $variable)
     (identifier->code $variable))
 
+  (define (lhs->code $lookup $syntax)
+    (syntax-case $syntax ()
+      (id (identifier? #'id)
+        (variable->code #'id))
+      (other
+        (ref->code $lookup #'other))))
+
   (define (value->code $value)
     (syntax-case $value ()
       (id
@@ -112,10 +119,10 @@
               (variable->code #'variable))
             (code+instr $lookup empty-code
               #'(begin instr ...)))))
-      ((op2 variable expr)
+      ((op2 lhs expr)
         (op2->string-opt #'op2)
         (code+op2 $lookup $code
-          #'variable (op2->string-opt #'op2) #'expr))
+          #'lhs (op2->string-opt #'op2) #'expr))
       ((id arg ...)
         (and (identifier? #'id) ($lookup #'id #'micac))
         (code+instrs $lookup $code
@@ -134,10 +141,10 @@
                 (code ", "))))
           ";\n"))))
 
-  (define (code+op2 $lookup $code $variable $op $expr)
+  (define (code+op2 $lookup $code $lhs $op $expr)
     (code $code
       (space-separated-code
-        (variable->code $variable)
+        (lhs->code $lookup $lhs)
         (string-code $op)
         (syntax->expr-code $lookup $expr))
       ";\n"))
@@ -177,19 +184,7 @@
       ((not a)
         (op1->expr-code $lookup "!" #'a))
       ((ref var x ...)
-        (fold-left
-          (lambda ($code $x)
-            (syntax-case $x (*)
-              (*
-                (code-in-round-brackets (code "*" $code)))
-              (id (identifier? #'id)
-                (code $code "." (identifier->code #'id)))
-              (expr
-                (code $code
-                  (code-in-square-brackets
-                    (syntax->expr-code $lookup #'expr))))))
-          (variable->code #'var)
-          (syntax->list #'(x ...))))
+        (ref->code $lookup #'(var x ...)))
       ((id arg ...)
         (and (identifier? #'id) ($lookup #'id #'micac))
         (syntax->expr-code $lookup
@@ -207,6 +202,23 @@
                 (code ", "))))))
       (other
         (value->code #'other))))
+
+  (define (ref->code $lookup $syntax)
+    (syntax-case $syntax (*)
+      ((var x ...)
+        (fold-left
+          (lambda ($code $x)
+            (syntax-case $x (*)
+              (*
+                (code-in-round-brackets (code "*" $code)))
+              (id (identifier? #'id)
+                (code $code "." (identifier->code #'id)))
+              (expr
+                (code $code
+                  (code-in-square-brackets
+                    (syntax->expr-code $lookup #'expr))))))
+          (variable->code #'var)
+          (syntax->list #'(x ...))))))
 
   (define (op1->expr-code $lookup $op $rhs)
     (code-in-round-brackets
