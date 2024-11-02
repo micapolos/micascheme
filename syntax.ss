@@ -6,6 +6,7 @@
     define-case-syntax
     define-aux-keyword
     define-aux-keywords
+    begin-syntaxes
     expand-begin-syntaxes
     define-namespace
     define-lookup-syntax
@@ -29,6 +30,12 @@
 
   (define (syntax-null? $syntax)
     (null? (syntax->datum $syntax)))
+
+  (define (begin-syntaxes $syntax)
+    (syntax-case $syntax (begin)
+      ((begin $syntax ...)
+        (syntax->list #'($syntax ...)))
+      ($other (list #'other))))
 
   (define (expand-begin-syntaxes $syntaxes)
     (apply append

@@ -123,7 +123,12 @@
           ";\n"))
       ((op variable expr)
         (code+op2 $lookup $code
-          #'variable (op->string #'op) #'expr))))
+          #'variable (op->string #'op) #'expr))
+      ((id arg ...)
+        (and (identifier? #'id) ($lookup #'id #'micac))
+        (code+instrs $lookup $code
+          (begin-syntaxes
+            (($lookup #'id #'micac) $syntax))))))
 
   (define (code+op2 $lookup $code $variable $op $expr)
     (code $code
@@ -145,6 +150,10 @@
         (op2->expr-code $lookup #'a "|" #'b))
       ((xor a b)
         (op2->expr-code $lookup #'a "^" #'b))
+      ((id arg ...)
+        (and (identifier? #'id) ($lookup #'id #'micac))
+        (syntax->expr-code $lookup
+          (($lookup #'id #'micac) $syntax)))
       (other
         (value->code #'other))))
 
