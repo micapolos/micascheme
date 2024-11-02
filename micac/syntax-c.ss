@@ -14,7 +14,7 @@
         (< (expr-priority $expr) $priority)
         (and
           (= (expr-priority $expr) $priority)
-          (eq? (expr-left-to-right? $expr) (not $right?))))
+          (boolean=? (expr-left-to-right? $expr) (not $right?))))
       (expr-code $expr)
       (code-in-round-brackets (expr-code $expr))))
 
