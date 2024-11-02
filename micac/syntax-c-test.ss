@@ -54,6 +54,11 @@
 
 (check
   (equal?
+    (syntax-c $lookup #`(var u8 x y))
+    (lines-string "uint8_t x = y;")))
+
+(check
+  (equal?
     (syntax-c $lookup #`(begin))
     (lines-string
       "{"
@@ -220,6 +225,15 @@
     (lines-string
       "uint8_t x;"
       "x += (((x + 10) - 20) & 255);")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(defer (SDL_Quit))
+      #`(SDL_Init))
+    (lines-string
+      "SDL_Init();"
+      "SDL_Quit();")))
 
 (check
   (equal?

@@ -59,8 +59,16 @@
         (literal->code #'const))))
 
   (define (code+instrs $lookup $code $syntax)
-    (fold-left (partial code+instr $lookup) $code
-      (syntax->list $syntax)))
+    (syntax-case $syntax (defer)
+      (() $code)
+      (((defer deferred ...) body ...)
+        (code+instrs $lookup
+          (code+instrs $lookup $code #'(body ...))
+          #'(deferred ...)))
+      ((other body ...)
+        (code+instrs $lookup
+          (code+instr $lookup $code #'other)
+          #'(body ...)))))
 
   (define (instr->begin $instr)
     (syntax-case $instr (begin)
@@ -93,6 +101,14 @@
           (space-separated-code
             (type->code #'type)
             (identifier->code #'id))
+          ";\n"))
+      ((var type id expr)
+        (code $code
+          (space-separated-code
+            (type->code #'type)
+            (identifier->code #'id)
+            "="
+            (syntax->expr-code $lookup #'expr))
           ";\n"))
       ((if expr then-instr)
         (code $code
