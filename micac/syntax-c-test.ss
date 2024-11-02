@@ -106,6 +106,15 @@
 (check
   (equal?
     (syntax-c $lookup
+      #`(set x (- a))
+      #`(set x (inv a)))
+    (lines-string
+      "x = (-a);"
+      "x = (~a);")))
+
+(check
+  (equal?
+    (syntax-c $lookup
       #`(set x (+ a b))
       #`(set x (- a b))
       #`(set x (and a b))

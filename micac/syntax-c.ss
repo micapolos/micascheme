@@ -56,7 +56,7 @@
       ((begin body ...) $instr)
       (other #'(begin other))))
 
-  (define (op->string-opt $op)
+  (define (op2->string-opt $op)
     (syntax-case $op (set add sub and or xor shl shr)
       (set "=")
       (add "+=")
@@ -112,10 +112,10 @@
               (variable->code #'variable))
             (code+instr $lookup empty-code
               #'(begin instr ...)))))
-      ((op variable expr)
-        (op->string-opt #'op)
+      ((op2 variable expr)
+        (op2->string-opt #'op2)
         (code+op2 $lookup $code
-          #'variable (op->string-opt #'op) #'expr))
+          #'variable (op2->string-opt #'op2) #'expr))
       ((id arg ...)
         (and (identifier? #'id) ($lookup #'id #'micac))
         (code+instrs $lookup $code
@@ -143,9 +143,11 @@
       ";\n"))
 
   (define (syntax->expr-code $lookup $syntax)
-    (syntax-case $syntax (+ - and or xor shl shr)
+    (syntax-case $syntax (+ - and or xor shl shr neg inv)
       ((+ a b)
         (op2->expr-code $lookup #'a "+" #'b))
+      ((- a)
+        (op1->expr-code $lookup "-" #'a))
       ((- a b)
         (op2->expr-code $lookup #'a "-" #'b))
       ((and a b)
@@ -158,6 +160,8 @@
         (op2->expr-code $lookup #'a "<<" #'b))
       ((shr a b)
         (op2->expr-code $lookup #'a ">>" #'b))
+      ((inv a)
+        (op1->expr-code $lookup "~" #'a))
       ((id arg ...)
         (and (identifier? #'id) ($lookup #'id #'micac))
         (syntax->expr-code $lookup
@@ -175,6 +179,12 @@
                 (code ", "))))))
       (other
         (value->code #'other))))
+
+  (define (op1->expr-code $lookup $op $rhs)
+    (code-in-round-brackets
+      (code
+        (string-code $op)
+        (syntax->expr-code $lookup $rhs))))
 
   (define (op2->expr-code $lookup $lhs $op $rhs)
     (code-in-round-brackets
