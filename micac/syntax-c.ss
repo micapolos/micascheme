@@ -6,13 +6,6 @@
     (code)
     (micac syntax))
 
-  (data (block code identifiers))
-
-  (data (expr priority code))
-
-  (define empty-block
-    (block empty-code (stack)))
-
   (define (size->code $size)
     (lets
       ($datum (syntax->datum $size))
@@ -35,44 +28,27 @@
           (code-in-square-brackets (size->code #'size))))
       (_ (syntax-error $type "unknown type"))))
 
-  (define (block-append . $blocks)
-    (block
-      (apply code-append (map block-code $blocks))
-      (apply append (map block-identifiers $blocks))))
-
-  (define (block-begin $block)
-    (block empty-code (block-identifiers $block)))
-
   (define (identifier->code $identifier)
     (string-code (symbol->string (syntax->datum $identifier))))
-
-  (define (bound-identifier $identifiers $identifier)
-    (or
-      (find (partial free-identifier=? $identifier) $identifiers)
-      (syntax-error $identifier "unbound variable")))
 
   (define (literal->code $literal)
     (switch (syntax->datum $literal)
       ((fixnum? $fixnum) (string-code (number->string $fixnum)))
       ((else $other) (syntax-error $literal "not literal"))))
 
-  (define (variable->code $identifiers $variable)
-    (or
-      (and
-        (find (partial free-identifier=? $variable) $identifiers)
-        (identifier->code $variable))
-      (syntax-error $variable "unbound variable")))
+  (define (variable->code $variable)
+    (identifier->code $variable))
 
-  (define (value->code $identifiers $value)
+  (define (value->code $value)
     (syntax-case $value ()
       (id
         (identifier? #'id)
-        (variable->code $identifiers #'id))
+        (variable->code #'id))
       (const
         (literal->code #'const))))
 
-  (define (block+instrs $block $syntaxes)
-    (fold-left block+instr $block $syntaxes))
+  (define (code+instrs $lookup $code $syntaxes)
+    (fold-left (partial code+instr $lookup) $code $syntaxes))
 
   (define (instr->begin $instr)
     (syntax-case $instr (begin)
@@ -89,132 +65,96 @@
       (xor "^=")
       (_ (syntax-error $op "invalid op"))))
 
-  (define (block+instr $block $syntax)
+  (define (code+instr $lookup $code $syntax)
     (syntax-case $syntax (begin var if switch while print)
       ((begin instr ...)
-        (lets
-          ($begin-block
-            (block+instrs
-              (block-begin $block)
-              (syntax->list #'(instr ...))))
-          (block
-            (code
-              (block-code $block)
-              (code-in-curly-brackets
-                (code-indent
-                  (code "\n"
-                    (block-code $begin-block))))
-              "\n")
-            (block-identifiers $block))))
+        (code $code
+          (code-in-curly-brackets
+            (code-indent
+              (code "\n"
+                (code+instrs $lookup empty-code
+                  (syntax->list #'(instr ...))))))
+          "\n"))
       ((var type id)
-        (block
-          (code-append
-            (block-code $block)
-            (code
-              (space-separated-code
-                (type->code #'type)
-                (identifier->code #'id))
-              ";\n"))
-          (push (block-identifiers $block) #'id)))
-      ((if variable then-instr)
-        (block
-          (code-append
-            (block-code $block)
-            (code
-              (space-separated-code
-                "if"
-                (code-in-round-brackets
-                  (variable->code
-                    (block-identifiers $block)
-                    #'variable))
-                (block-code (block+instr (block-begin $block) (instr->begin #'then-instr))))))
-          (block-identifiers $block)))
-      ((if variable then-instr else-instr)
-        (block
-          (code-append
-            (block-code $block)
-            (code
-              (space-separated-code
-                "if"
-                (code-in-round-brackets
-                  (variable->code
-                    (block-identifiers $block)
-                    #'variable))
-                (block-code (block+instr (block-begin $block) (instr->begin #'then-instr))))
-              (space-separated-code
-                "else"
-                (block-code (block+instr (block-begin $block) (instr->begin #'else-instr))))))
-          (block-identifiers $block)))
-      ((while variable instr ...)
-        (block
-          (code-append
-            (block-code $block)
-            (code
-              (space-separated-code
-                "while"
-                (code-in-round-brackets
-                  (variable->code
-                    (block-identifiers $block)
-                    #'variable))
-                (block-code
-                  (block+instr
-                    (block-begin $block)
-                    #'(begin instr ...))))))
-          (block-identifiers $block)))
-      ((print label expr)
-        (block
-          (code-append
-            (block-code $block)
-            (code
-              "printf"
-              (code-in-round-brackets
-                (code
-                  "\""
-                  (string-code (symbol->string (datum label)))
-                  ": %i\\n"
-                  "\""
-                  ", "
-                  (syntax->expr-code (block-identifiers $block) #'expr)))
-              ";\n"))
-          (block-identifiers $block)))
-      ((op variable expr)
-        (block+op2 $block #'variable (op->string #'op) #'expr))))
-
-  (define (block+op2 $block $variable $op $expr)
-    (block-append $block
-      (block
-        (code
+        (code $code
           (space-separated-code
-            (variable->code (block-identifiers $block) $variable)
-            (string-code $op)
-            (syntax->expr-code (block-identifiers $block) $expr))
-          ";\n")
-        (block-identifiers $block))))
+            (type->code #'type)
+            (identifier->code #'id))
+          ";\n"))
+      ((if variable then-instr)
+        (code $code
+          (space-separated-code
+            "if"
+            (code-in-round-brackets
+              (variable->code #'variable))
+            (code+instr $lookup empty-code
+              (instr->begin #'then-instr)))))
+      ((if variable then-instr else-instr)
+        (code $code
+          (space-separated-code
+            "if"
+            (code-in-round-brackets
+              (variable->code #'variable))
+            (code+instr $lookup empty-code
+              (instr->begin #'then-instr)))
+          (space-separated-code
+            "else"
+            (code+instr $lookup empty-code
+              (instr->begin #'else-instr)))))
+      ((while variable instr ...)
+        (code $code
+          (space-separated-code
+            "while"
+            (code-in-round-brackets
+              (variable->code #'variable))
+            (code+instr $lookup empty-code
+              #'(begin instr ...)))))
+      ((print label expr)
+        (code $code
+          "printf"
+          (code-in-round-brackets
+            (code
+              "\""
+              (string-code (symbol->string (datum label)))
+              ": %i\\n"
+              "\""
+              ", "
+              (syntax->expr-code $lookup #'expr)))
+          ";\n"))
+      ((op variable expr)
+        (code+op2 $lookup $code
+          #'variable (op->string #'op) #'expr))))
 
-  (define (syntax->expr-code $identifiers $syntax)
+  (define (code+op2 $lookup $code $variable $op $expr)
+    (code $code
+      (space-separated-code
+        (variable->code $variable)
+        (string-code $op)
+        (syntax->expr-code $lookup $expr))
+      ";\n"))
+
+  (define (syntax->expr-code $lookup $syntax)
     (syntax-case $syntax (+ - and or xor)
       ((+ a b)
-        (op2->expr-code $identifiers #'a "+" #'b))
+        (op2->expr-code $lookup #'a "+" #'b))
       ((- a b)
-        (op2->expr-code $identifiers #'a "-" #'b))
+        (op2->expr-code $lookup #'a "-" #'b))
       ((and a b)
-        (op2->expr-code $identifiers #'a "&" #'b))
+        (op2->expr-code $lookup #'a "&" #'b))
       ((or a b)
-        (op2->expr-code $identifiers #'a "|" #'b))
+        (op2->expr-code $lookup #'a "|" #'b))
       ((xor a b)
-        (op2->expr-code $identifiers #'a "^" #'b))
+        (op2->expr-code $lookup #'a "^" #'b))
       (other
-        (value->code $identifiers #'other))))
+        (value->code #'other))))
 
-  (define (op2->expr-code $identifiers $lhs $op $rhs)
+  (define (op2->expr-code $lookup $lhs $op $rhs)
     (code-in-round-brackets
       (space-separated-code
-        (syntax->expr-code $identifiers $lhs)
+        (syntax->expr-code $lookup $lhs)
         (string-code $op)
-        (syntax->expr-code $identifiers $rhs))))
+        (syntax->expr-code $lookup $rhs))))
 
-  (define (syntax-c . $syntaxes)
-    (code-string
-      (block-code
-        (block+instrs empty-block $syntaxes))))
+  (define (syntax-c $lookup . $syntaxes)
+    (code-string (code+instrs $lookup empty-code $syntaxes)))
 )

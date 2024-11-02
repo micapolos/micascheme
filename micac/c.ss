@@ -3,7 +3,10 @@
   (import (micascheme) (micac syntax-c) (micac syntax) (syntax))
   (export (import (micac syntax)))
 
-  (define-case-syntax (micac-c instr ...)
-    (datum->syntax #'+
-      (apply syntax-c (syntax->list #'(instr ...)))))
+  (define-syntax (micac-c $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ instr ...)
+        (datum->syntax #'+
+          (apply syntax-c $lookup
+            (syntax->list #'(instr ...)))))))
 )

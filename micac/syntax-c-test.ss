@@ -1,55 +1,57 @@
 (import (micascheme) (micac syntax) (micac syntax-c) (check))
 
+(define $lookup (lambda (a b) #f))
+
 (check
   (equal?
-    (syntax-c)
+    (syntax-c $lookup)
     (lines-string)))
 
 (check
   (equal?
-    (syntax-c #`(var u8 x))
+    (syntax-c $lookup #`(var u8 x))
     (lines-string "uint8_t x;")))
 
 (check
   (equal?
-    (syntax-c #`(var u16 y))
+    (syntax-c $lookup #`(var u16 y))
     (lines-string "uint16_t y;")))
 
 (check
   (equal?
-    (syntax-c #`(var u32 z))
+    (syntax-c $lookup #`(var u32 z))
     (lines-string "uint32_t z;")))
 
 (check
   (equal?
-    (syntax-c #`(var (* u32) x))
+    (syntax-c $lookup #`(var (* u32) x))
     (lines-string "uint32_t* x;")))
 
 (check
   (equal?
-    (syntax-c #`(var (* (* u32)) x))
+    (syntax-c $lookup #`(var (* (* u32)) x))
     (lines-string "uint32_t** x;")))
 
 (check
   (equal?
-    (syntax-c #`(var (* u32 24) x))
+    (syntax-c $lookup #`(var (* u32 24) x))
     (lines-string "uint32_t[24] x;")))
 
 (check
   (equal?
-    (syntax-c #`(var (* (* u32 24) 32) x))
+    (syntax-c $lookup #`(var (* (* u32 24) 32) x))
     (lines-string "uint32_t[24][32] x;")))
 
 (check
   (equal?
-    (syntax-c #`(begin))
+    (syntax-c $lookup #`(begin))
     (lines-string
       "{"
       "}")))
 
 (check
   (equal?
-    (syntax-c
+    (syntax-c $lookup
       #`(begin
         (var u8 x)
         (set x 10)))
@@ -61,7 +63,7 @@
 
 (check
   (equal?
-    (syntax-c
+    (syntax-c $lookup
       #`(var u8 x)
       #`(add x 10))
     (lines-string
@@ -70,7 +72,7 @@
 
 (check
   (equal?
-    (syntax-c
+    (syntax-c $lookup
       #`(var u8 x)
       #`(set x 10)
       #`(add x 20)
@@ -89,7 +91,7 @@
 
 (check
   (equal?
-    (syntax-c
+    (syntax-c $lookup
       #`(var u8 x)
       #`(if x (set x 10)))
     (lines-string
@@ -100,7 +102,7 @@
 
 (check
   (equal?
-    (syntax-c
+    (syntax-c $lookup
       #`(var u8 x)
       #`(if x
         (set x 10)
@@ -116,7 +118,7 @@
 
 (check
   (equal?
-    (syntax-c
+    (syntax-c $lookup
       #`(var u8 x)
       #`(while x
           (add x 1)
@@ -130,7 +132,7 @@
 
 (check
   (equal?
-    (syntax-c
+    (syntax-c $lookup
       #`(var u8 x)
       #`(add x (and (- (+ x 10) 20) #xff)))
     (lines-string
@@ -139,6 +141,6 @@
 
 (check
   (equal?
-    (syntax-c #`(print test 10))
+    (syntax-c $lookup #`(print test 10))
     (lines-string
       "printf(\"test: %i\\n\", 10);")))
