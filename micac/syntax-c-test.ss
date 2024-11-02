@@ -107,10 +107,12 @@
   (equal?
     (syntax-c $lookup
       #`(set x (- a))
-      #`(set x (inv a)))
+      #`(set x (inv a))
+      #`(set x (not a)))
     (lines-string
       "x = (-a);"
-      "x = (~a);")))
+      "x = (~a);"
+      "x = (!a);")))
 
 (check
   (equal?
@@ -130,6 +132,23 @@
       "x = (a ^ b);"
       "x = (a << b);"
       "x = (a >> b);")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(set x (= a b))
+      #`(set x (!= a b))
+      #`(set x (> a b))
+      #`(set x (>= a b))
+      #`(set x (< a b))
+      #`(set x (<= a b)))
+    (lines-string
+      "x = (a == b);"
+      "x = (a != b);"
+      "x = (a > b);"
+      "x = (a >= b);"
+      "x = (a < b);"
+      "x = (a <= b);")))
 
 (check
   (equal?
