@@ -144,3 +144,8 @@
     (syntax-c $lookup #`(print test 10))
     (lines-string
       "printf(\"test: %i\\n\", 10);")))
+
+(check
+  (equal?
+    (syntax-c $lookup #`(SDL_CopyTexture texture (SDL_Rect 0 0 20 30)))
+    (lines-string "SDL_CopyTexture(texture, SDL_Rect(0, 0, 20, 30));")))
