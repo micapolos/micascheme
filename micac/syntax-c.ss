@@ -59,12 +59,23 @@
         (literal->code #'const))))
 
   (define (code+instrs $lookup $code $syntax)
-    (syntax-case $syntax (defer)
+    (syntax-case $syntax (defer break-if)
       (() $code)
       (((defer deferred ...) body ...)
-        (code+instrs $lookup
-          (code+instrs $lookup $code #'(body ...))
-          #'(deferred ...)))
+        (code+instrs $lookup $code
+          #'(body ... deferred ...)))
+      (((break-if expr break-body ...) body ...)
+        (code+instr $lookup $code
+          #`(if expr
+            (begin break-body ...)
+            (begin body ...))))
+      (((id arg ...) body ...)
+        (and (identifier? #'id) ($lookup #'id #'micac))
+        (code+instrs $lookup $code
+          #`(
+            #,@(begin-syntaxes
+              (($lookup #'id #'micac) #`(id arg ...)))
+            body ...)))
       ((other body ...)
         (code+instrs $lookup
           (code+instr $lookup $code #'other)

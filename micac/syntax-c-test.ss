@@ -237,6 +237,21 @@
 
 (check
   (equal?
+    (syntax-c $lookup
+      #`(break-if expr (init))
+      #`(defer (destroy))
+      #`(update))
+    (lines-string
+      "if (expr) {"
+      "  init();"
+      "}"
+      "else {"
+      "  update();"
+      "  destroy();"
+      "}")))
+
+(check
+  (equal?
     (syntax-c $lookup #`(macro 10 (macro 20 30)))
     (lines-string "macroed(10, macroed(20, 30));")))
 

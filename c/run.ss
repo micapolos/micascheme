@@ -5,6 +5,7 @@
   (define (c-run $string)
     (let ()
       (define $value 0)
+      (displayln $string)
       (call-with-output-file "/tmp/main.c"
         (lambda ($port)
           (put-string $port $string))

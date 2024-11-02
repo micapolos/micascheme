@@ -15,24 +15,17 @@
 (micac-macro (print-sdl-error)
   (printf "SDL could not initialize! SDL Error: %s\\n" (SDL_GetError)))
 
-(micac-macro (with-sdl body ...)
-  (if (!= (SDL_Init SDL_INIT_VIDEO) 0)
-    (print-sdl-error)
-    (begin
-      body ...
-      (SDL_Quit))))
+(micac-macro (sdl-init)
+  (break-if (!= (SDL_Init SDL_INIT_VIDEO) 0) (print-sdl-error))
+  (defer (SDL_Quit)))
 
-(micac-macro (with-sdl-window (window title width height) body ...)
-  (begin
-    (var (* SDL_Window) window)
-    (set window (SDL_CreateWindow title SDL_WINDOWPOS_UNDEFINED SDL_WINDOWPOS_UNDEFINED width height 0))
-    (if (not window)
-      (print-sdl-error)
-      (begin
-        body ...
-        (SDL_DestroyWindow window)))))
+(micac-macro (create-sdl-window window title width height)
+  (var (* SDL_Window) window)
+  (set window (SDL_CreateWindow title SDL_WINDOWPOS_UNDEFINED SDL_WINDOWPOS_UNDEFINED width height 0))
+  (break-if (not window) (print-sdl-error))
+  (defer (SDL_DestroyWindow window)))
 
-(micac-macro (with-sdl-event-loop body ...)
+(micac-macro (sdl-event-loop body ...)
   (var u8 running)
   (var SDL_Event event)
   (set running 1)
@@ -43,9 +36,9 @@
         (begin body ...)))))
 
 (micac-run
-  (with-sdl
-    (printf "Initialized...\\n")
-    (with-sdl-window ($window "My window" 640 480)
-      (printf "Window created %p\\n" $window)
-      (with-sdl-event-loop
-        (printf "Game loop\\n")))))
+  (sdl-init)
+  (printf "Initialized...\\n")
+  (create-sdl-window $window "My window" 640 480)
+  (printf "Window created %p\\n" $window)
+  (sdl-event-loop
+    (printf "Game loop\\n")))
