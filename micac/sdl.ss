@@ -54,7 +54,7 @@
 
   (micac-macro (sdl-create-renderer renderer window)
     (var SDL_Renderer (* renderer)
-      (SDL_CreateRenderer window -1 (or SDL_RENDERER_ACCELERATED SDL_RENDERER_PRESENTVSYNC)))
+      (SDL_CreateRenderer window -1 (bitwise-ior SDL_RENDERER_ACCELERATED SDL_RENDERER_PRESENTVSYNC)))
     (break-if (not renderer)
       (print-sdl-error "Could not create renderer."))
     (defer (SDL_DestroyRenderer renderer)))
