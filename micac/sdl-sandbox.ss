@@ -27,21 +27,20 @@
   (defer (SDL_Quit)))
 
 (micac-macro (create-sdl-window window title width height)
-  (var (* SDL_Window) window)
-  (set window (SDL_CreateWindow title SDL_WINDOWPOS_UNDEFINED SDL_WINDOWPOS_UNDEFINED width height 0))
+  (var (* SDL_Window) window
+    (SDL_CreateWindow title SDL_WINDOWPOS_UNDEFINED SDL_WINDOWPOS_UNDEFINED width height 0))
   (break-if (not window) (print-sdl-error))
   (defer (SDL_DestroyWindow window)))
 
 (micac-macro (create-sdl-renderer renderer window)
-  (var (* SDL_Renderer) renderer)
-  (set renderer (SDL_CreateRenderer window -1 (or SDL_RENDERER_ACCELERATED SDL_RENDERER_PRESENTVSYNC)))
+  (var (* SDL_Renderer) renderer
+    (SDL_CreateRenderer window -1 (or SDL_RENDERER_ACCELERATED SDL_RENDERER_PRESENTVSYNC)))
   (break-if (not renderer) (print-sdl-error))
   (defer (SDL_DestroyRenderer renderer)))
 
 (micac-macro (sdl-event-loop body ...)
-  (var u8 running)
+  (var u8 running 1)
   (var SDL_Event event)
-  (set running 1)
   (while running
     (while (SDL_PollEvent (&ref event))
       (if (= (ref event type) SDL_QUIT)
