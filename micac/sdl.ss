@@ -75,12 +75,12 @@
       (print-sdl-error "Could not render copy.")))
 
   (micac-macro (sdl-event-loop body ...)
-    (var u8 running 1)
+    (var bool running true)
     (var SDL_Event event)
     (while running
       (while (SDL_PollEvent (&ref event))
         (if (= (ref event type) SDL_QUIT)
-          (set running 0)))
+          (set running false)))
       (begin body ...)))
 
   (micac-macro (sdl-set-render-draw-color renderer red green blue alpha)

@@ -50,10 +50,7 @@
         (syntax-error $size "invalid size"))))
 
   (define (type->code $type)
-    (syntax-case $type (u8 u16 u32 *)
-      (u8 (code "uint8_t"))
-      (u16 (code "uint16_t"))
-      (u32 (code "uint32_t"))
+    (syntax-case $type ()
       (id (identifier? #'id)
         (identifier->code #'id))
       (_

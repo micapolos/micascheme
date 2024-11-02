@@ -5,13 +5,13 @@
   (sdl-create-window window "My window" 704 576)
   (sdl-create-renderer renderer window)
   (sdl-create-texture texture renderer SDL_PIXELFORMAT_BGRA8888 SDL_TEXTUREACCESS_STREAMING 352 288)
-  (var u8 scroll 0)
-  (var u8 (* pixels 405504))
+  (var int scroll 0)
+  (var uint8_t (* pixels 405504))
   (sdl-event-loop
     (begin
-      (var u8 value scroll)
-      (var u32 count 405504)
-      (var u8 (* pixel) pixels)
+      (var int count 405504)
+      (var uint8_t (* pixel) pixels)
+      (var uint8_t value scroll)
       (while count
         (set (pixel *) value)
         (sub count 1)

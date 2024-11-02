@@ -19,43 +19,33 @@
 
 (check
   (equal?
-    (syntax-c $lookup #`(var u8 x))
-    (lines-string "uint8_t x;")))
+    (syntax-c $lookup #`(var int x))
+    (lines-string "int x;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var u16 y))
-    (lines-string "uint16_t y;")))
+    (syntax-c $lookup #`(var uint8_t (* x)))
+    (lines-string "uint8_t *x;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var u32 z))
-    (lines-string "uint32_t z;")))
+    (syntax-c $lookup #`(var uint8_t (* (* x))))
+    (lines-string "uint8_t **x;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var u32 (* x)))
-    (lines-string "uint32_t *x;")))
+    (syntax-c $lookup #`(var uint8_t (* x 24)))
+    (lines-string "uint8_t x[24];")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var u32 (* (* x))))
-    (lines-string "uint32_t **x;")))
+    (syntax-c $lookup #`(var uint8_t (* (* x 24) 32)))
+    (lines-string "uint8_t x[24][32];")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var u32 (* x 24)))
-    (lines-string "uint32_t x[24];")))
-
-(check
-  (equal?
-    (syntax-c $lookup #`(var u32 (* (* x 24) 32)))
-    (lines-string "uint32_t x[24][32];")))
-
-(check
-  (equal?
-    (syntax-c $lookup #`(var u8 x y))
-    (lines-string "uint8_t x = y;")))
+    (syntax-c $lookup #`(var int x y))
+    (lines-string "int x = y;")))
 
 (check
   (equal?
@@ -73,27 +63,26 @@
   (equal?
     (syntax-c $lookup
       #`(begin
-        (var u8 x)
+        (var int x)
         (set x 10)))
     (lines-string
       "{"
-      "  uint8_t x;"
+      "  int x;"
       "  x = 10;"
       "}")))
 
 (check
   (equal?
     (syntax-c $lookup
-      #`(var u8 x)
+      #`(var int x)
       #`(add x 10))
     (lines-string
-      "uint8_t x;"
+      "int x;"
       "x += 10;")))
 
 (check
   (equal?
     (syntax-c $lookup
-      #`(var u8 x)
       #`(set x 10)
       #`(add x 20)
       #`(sub x 30)
@@ -103,7 +92,6 @@
       #`(shl x 3)
       #`(shr x 3))
     (lines-string
-      "uint8_t x;"
       "x = 10;"
       "x += 20;"
       "x -= 30;"
@@ -183,10 +171,8 @@
 (check
   (equal?
     (syntax-c $lookup
-      #`(var u8 x)
       #`(if x (set x 10)))
     (lines-string
-      "uint8_t x;"
       "if (x) {"
       "  x = 10;"
       "}")))
@@ -215,12 +201,10 @@
 (check
   (equal?
     (syntax-c $lookup
-      #`(var u8 x)
       #`(if x
         (set x 10)
         (set x 20)))
     (lines-string
-      "uint8_t x;"
       "if (x) {"
       "  x = 10;"
       "}"
@@ -231,12 +215,10 @@
 (check
   (equal?
     (syntax-c $lookup
-      #`(var u8 x)
       #`(while x
           (add x 1)
           (add x 2)))
     (lines-string
-      "uint8_t x;"
       "while (x) {"
       "  x += 1;"
       "  x += 2;"
@@ -245,10 +227,8 @@
 (check
   (equal?
     (syntax-c $lookup
-      #`(var u8 x)
       #`(add x (and (- (+ x 10) 20) #xff)))
     (lines-string
-      "uint8_t x;"
       "x += x + 10 - 20 & 255;")))
 
 (check

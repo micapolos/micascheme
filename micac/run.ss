@@ -10,6 +10,7 @@
         (lines-string
           "#include <stdlib.h>"
           "#include <stdio.h>"
+          "#include <stdbool.h>"
           "#include <SDL2/SDL.h>"
           (string-append "int main() " $string)))
       ($libs (list "sdl2"))

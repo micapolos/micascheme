@@ -23,10 +23,10 @@
 (check
   (equal?
     (micac-c
-      (var u8 x)
+      (var int x)
       (set x 10))
     (lines-string
-      "uint8_t x;"
+      "int x;"
       "x = 10;")))
 
 (check
@@ -50,4 +50,4 @@
     (micac-c
       (set x (sum 10 20 30)))
     (lines-string
-      "x = ((10 + 20) + 30);")))
+      "x = 10 + 20 + 30;")))
