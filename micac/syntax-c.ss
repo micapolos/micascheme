@@ -150,7 +150,7 @@
       ";\n"))
 
   (define (syntax->expr-code $lookup $syntax)
-    (syntax-case $syntax (= != > >= < <= + - and or xor shl shr neg not inv ref)
+    (syntax-case $syntax (= != > >= < <= + - and or xor shl shr neg not inv ref &ref)
       ((= a b)
         (op2->expr-code $lookup #'a "==" #'b))
       ((!= a b)
@@ -185,6 +185,8 @@
         (op1->expr-code $lookup "!" #'a))
       ((ref var x ...)
         (ref->code $lookup #'(var x ...)))
+      ((&ref var x ...)
+        (code "&" (ref->code $lookup #'(var x ...))))
       ((id arg ...)
         (and (identifier? #'id) ($lookup #'id #'micac))
         (syntax->expr-code $lookup
