@@ -66,6 +66,11 @@
 
 (check
   (equal?
+    (syntax-c $lookup #`(set x 10))
+    (lines-string "x = 10;")))
+
+(check
+  (equal?
     (syntax-c $lookup
       #`(begin
         (var u8 x)
@@ -115,9 +120,9 @@
       #`(set x (inv a))
       #`(set x (not a)))
     (lines-string
-      "x = (-a);"
-      "x = (~a);"
-      "x = (!a);")))
+      "x = -a;"
+      "x = ~a;"
+      "x = !a;")))
 
 (check
   (equal?
@@ -130,13 +135,13 @@
       #`(set x (shl a b))
       #`(set x (shr a b)))
     (lines-string
-      "x = (a + b);"
-      "x = (a - b);"
-      "x = (a & b);"
-      "x = (a | b);"
-      "x = (a ^ b);"
-      "x = (a << b);"
-      "x = (a >> b);")))
+      "x = a + b;"
+      "x = a - b;"
+      "x = a & b;"
+      "x = a | b;"
+      "x = a ^ b;"
+      "x = a << b;"
+      "x = a >> b;")))
 
 (check
   (equal?
@@ -148,12 +153,32 @@
       #`(set x (< a b))
       #`(set x (<= a b)))
     (lines-string
-      "x = (a == b);"
-      "x = (a != b);"
-      "x = (a > b);"
-      "x = (a >= b);"
-      "x = (a < b);"
-      "x = (a <= b);")))
+      "x = a == b;"
+      "x = a != b;"
+      "x = a > b;"
+      "x = a >= b;"
+      "x = a < b;"
+      "x = a <= b;")))
+
+(check
+  (equal?
+    (syntax-c $lookup #`(set x (+ (+ a b) c)))
+    (lines-string "x = a + b + c;")))
+
+(check
+  (equal?
+    (syntax-c $lookup #`(set x (+ a (+ b c))))
+    (lines-string "x = a + (b + c);")))
+
+(check
+  (equal?
+    (syntax-c $lookup #`(set x (* (+ a b) c)))
+    (lines-string "x = (a + b) * c;")))
+
+(check
+  (equal?
+    (syntax-c $lookup #`(set x (+ a (* b c))))
+    (lines-string "x = a + b * c;")))
 
 (check
   (equal?
@@ -169,23 +194,23 @@
 (check (equal? (syntax-c $lookup #`(set x (ref y))) (lines-string "x = y;")))
 (check (equal? (syntax-c $lookup #`(set x (ref y z))) (lines-string "x = y.z;")))
 (check (equal? (syntax-c $lookup #`(set x (ref y 10))) (lines-string "x = y[10];")))
-(check (equal? (syntax-c $lookup #`(set x (ref y (+ a b)))) (lines-string "x = y[(a + b)];")))
-(check (equal? (syntax-c $lookup #`(set x (ref y *))) (lines-string "x = (*y);")))
-(check (equal? (syntax-c $lookup #`(set x (ref y a b 10 *))) (lines-string "x = (*y.a.b[10]);")))
+(check (equal? (syntax-c $lookup #`(set x (ref y (+ a b)))) (lines-string "x = y[a + b];")))
+(check (equal? (syntax-c $lookup #`(set x (ref y *))) (lines-string "x = *y;")))
+(check (equal? (syntax-c $lookup #`(set x (ref y a b 10 *))) (lines-string "x = *y.a.b[10];")))
 
 (check (equal? (syntax-c $lookup #`(set x (&ref y))) (lines-string "x = &y;")))
 (check (equal? (syntax-c $lookup #`(set x (&ref y z))) (lines-string "x = &y.z;")))
 (check (equal? (syntax-c $lookup #`(set x (&ref y 10))) (lines-string "x = &y[10];")))
-(check (equal? (syntax-c $lookup #`(set x (&ref y (+ a b)))) (lines-string "x = &y[(a + b)];")))
-(check (equal? (syntax-c $lookup #`(set x (&ref y *))) (lines-string "x = &(*y);")))
-(check (equal? (syntax-c $lookup #`(set x (&ref y a b 10 *))) (lines-string "x = &(*y.a.b[10]);")))
+(check (equal? (syntax-c $lookup #`(set x (&ref y (+ a b)))) (lines-string "x = &y[a + b];")))
+(check (equal? (syntax-c $lookup #`(set x (&ref y *))) (lines-string "x = &*y;")))
+(check (equal? (syntax-c $lookup #`(set x (&ref y a b 10 *))) (lines-string "x = &*y.a.b[10];")))
 
 (check (equal? (syntax-c $lookup #`(set (x) z)) (lines-string "x = z;")))
 (check (equal? (syntax-c $lookup #`(set (x y) z)) (lines-string "x.y = z;")))
 (check (equal? (syntax-c $lookup #`(set (x 10) z)) (lines-string "x[10] = z;")))
-(check (equal? (syntax-c $lookup #`(set (x (+ a b)) z)) (lines-string "x[(a + b)] = z;")))
-(check (equal? (syntax-c $lookup #`(set (x *) z)) (lines-string "(*x) = z;")))
-(check (equal? (syntax-c $lookup #`(set (x y a b 10 *) z)) (lines-string "(*x.y.a.b[10]) = z;")))
+(check (equal? (syntax-c $lookup #`(set (x (+ a b)) z)) (lines-string "x[a + b] = z;")))
+(check (equal? (syntax-c $lookup #`(set (x *) z)) (lines-string "*x = z;")))
+(check (equal? (syntax-c $lookup #`(set (x y a b 10 *) z)) (lines-string "*x.y.a.b[10] = z;")))
 
 (check
   (equal?
@@ -224,7 +249,7 @@
       #`(add x (and (- (+ x 10) 20) #xff)))
     (lines-string
       "uint8_t x;"
-      "x += (((x + 10) - 20) & 255);")))
+      "x += x + 10 - 20 & 255;")))
 
 (check
   (equal?
@@ -252,11 +277,6 @@
 
 (check
   (equal?
-    (syntax-c $lookup #`(macro 10 (macro 20 30)))
-    (lines-string "macroed(10, macroed(20, 30));")))
-
-(check
-  (equal?
     (syntax-c $lookup #`(printf "%i\\n" 10))
     (lines-string "printf(\"%i\\n\", 10);")))
 
@@ -264,3 +284,8 @@
   (equal?
     (syntax-c $lookup #`(SDL_CopyTexture texture (SDL_Rect 0 0 20 30)))
     (lines-string "SDL_CopyTexture(texture, SDL_Rect(0, 0, 20, 30));")))
+
+(check
+  (equal?
+    (syntax-c $lookup #`(macro 10 (macro 20 30)))
+    (lines-string "macroed(10, macroed(20, 30));")))
