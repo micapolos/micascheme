@@ -17,13 +17,13 @@
   (sdl-event-loop
     (begin
       (var int count pixels-size)
-      (var uint8_t (* pixel) pixels)
+      (var uint8_t (* pixel-ref) pixels)
       (var uint8_t value scroll)
       (while count
-        (set (pixel *) value)
+        (set (pixel-ref *) value)
         (sub count 1)
         (add value 1)
-        (add pixel 1)))
+        (add pixel-ref 1)))
     (add scroll 8)
     (sdl-update-texture texture 0 (&ref pixels) pixels-pitch)
     (sdl-render-copy renderer texture 0 0)
