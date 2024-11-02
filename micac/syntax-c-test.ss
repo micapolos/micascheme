@@ -223,6 +223,19 @@
 (check
   (equal?
     (syntax-c $lookup
+      #`(set x (bitwise-xor))
+      #`(set x (bitwise-xor a))
+      #`(set x (bitwise-xor a b))
+      #`(set x (bitwise-xor a b c)))
+    (lines-string
+      "x = 0;"
+      "x = a;"
+      "x = a ^ b;"
+      "x = a ^ b ^ c;")))
+
+(check
+  (equal?
+    (syntax-c $lookup
       #`(set x (= a b))
       #`(set x (!= a b))
       #`(set x (> a b))
