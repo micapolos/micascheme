@@ -13,18 +13,26 @@
             (apply string-append
               (map-with ($lib $libs) (string-append " -l" $lib))))
           ($gcc-command
-            (format "gcc /tmp/main.c -o /tmp/main~a -Wno-parentheses-equality"
+            (format "gcc /tmp/main.c -o /tmp/main~a"
               $libs-string))
           (run
-            (displayln $string)
+            (display $string)
+            (echo "code-gen /tmp/main.c")
             (call-with-output-file "/tmp/main.c"
               (lambda ($port)
                 (put-string $port $string))
               `(replace))
-            (displayln $gcc-command)
-            (system $gcc-command)
-            (system "rm /tmp/main.c")
-            (set! $value (system "/tmp/main"))
-            (system "rm /tmp/main")
+            (echo-system $gcc-command)
+            (echo-system "rm /tmp/main.c")
+            (set! $value (echo-system "/tmp/main"))
+            (echo-system "rm /tmp/main")
             $value)))))
+
+  (define (echo $string)
+    (displayln (string-append "% " $string)))
+
+  (define (echo-system $string)
+    (run
+      (echo $string)
+      (system $string)))
 )
