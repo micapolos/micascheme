@@ -31,12 +31,12 @@
         (string-code $op)
         (expr-operand-code $expr $priority #t))))
 
-  (define (paren-expr $priority $left-to-right? $lhs $lparen $body $rparen)
+  (define (paren-expr $priority $left-to-right? $lhs $lparen $inner $rparen)
     (expr $priority $left-to-right?
       (code
         (expr-operand-code $lhs $priority #f)
         (string-code $lparen)
-        (expr-code $body)
+        (expr-code $inner)
         (string-code $rparen))))
 
   (define (size->code $size)
