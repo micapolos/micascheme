@@ -56,17 +56,17 @@
       (_
         (syntax-error $type "unknown type"))))
 
-  (define (declarator->code $syntax)
+  (define (declarator->code $lookup $syntax)
     (syntax-case $syntax (*)
       (id (identifier? #'id)
         (type->code #'id))
       ((* decl)
-        (code "*" (declarator->code #'decl)))
+        (code "*" (declarator->code $lookup #'decl)))
       ((* decl expr)
         (code
-          (declarator->code #'decl)
+          (declarator->code $lookup #'decl)
           (code-in-square-brackets
-            (number-code (datum expr)))))))
+            (expr-code (syntax->expr $lookup #'expr)))))))
 
   (define (identifier->code $identifier)
     (string-code (symbol->string (syntax->datum $identifier))))
@@ -140,7 +140,7 @@
       (_ #f)))
 
   (define (code+instr $lookup $code $syntax)
-    (syntax-case $syntax (begin var if switch while)
+    (syntax-case $syntax (begin var const if switch while)
       ((begin instr ...)
         (code $code
           (code-in-curly-brackets
@@ -152,13 +152,22 @@
         (code $code
           (space-separated-code
             (type->code #'type)
-            (declarator->code #'id))
+            (declarator->code $lookup #'id))
           ";\n"))
       ((var type id expr)
         (code $code
           (space-separated-code
             (type->code #'type)
-            (declarator->code #'id)
+            (declarator->code $lookup #'id)
+            "="
+            (expr-code (syntax->expr $lookup #'expr)))
+          ";\n"))
+      ((const type id expr)
+        (code $code
+          (space-separated-code
+            "const"
+            (type->code #'type)
+            (declarator->code $lookup #'id)
             "="
             (expr-code (syntax->expr $lookup #'expr)))
           ";\n"))

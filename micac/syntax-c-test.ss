@@ -19,6 +19,11 @@
 
 (check
   (equal?
+    (syntax-c $lookup #`(const int x 10))
+    (lines-string "const int x = 10;")))
+
+(check
+  (equal?
     (syntax-c $lookup #`(var int x))
     (lines-string "int x;")))
 
