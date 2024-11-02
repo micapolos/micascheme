@@ -57,13 +57,15 @@
       (other #'(begin other))))
 
   (define (op->string-opt $op)
-    (syntax-case $op (set add sub and or xor)
+    (syntax-case $op (set add sub and or xor shl shr)
       (set "=")
       (add "+=")
       (sub "-=")
       (and "&=")
       (or "|=")
       (xor "^=")
+      (shl "<<=")
+      (shr ">>=")
       (_ #f)))
 
   (define (code+instr $lookup $code $syntax)
@@ -141,7 +143,7 @@
       ";\n"))
 
   (define (syntax->expr-code $lookup $syntax)
-    (syntax-case $syntax (+ - and or xor)
+    (syntax-case $syntax (+ - and or xor shl shr)
       ((+ a b)
         (op2->expr-code $lookup #'a "+" #'b))
       ((- a b)
@@ -152,6 +154,10 @@
         (op2->expr-code $lookup #'a "|" #'b))
       ((xor a b)
         (op2->expr-code $lookup #'a "^" #'b))
+      ((shl a b)
+        (op2->expr-code $lookup #'a "<<" #'b))
+      ((shr a b)
+        (op2->expr-code $lookup #'a ">>" #'b))
       ((id arg ...)
         (and (identifier? #'id) ($lookup #'id #'micac))
         (syntax->expr-code $lookup

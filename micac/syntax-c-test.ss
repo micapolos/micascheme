@@ -89,7 +89,9 @@
       #`(sub x 30)
       #`(and x 40)
       #`(or x 50)
-      #`(xor x 60))
+      #`(xor x 60)
+      #`(shl x 3)
+      #`(shr x 3))
     (lines-string
       "uint8_t x;"
       "x = 10;"
@@ -97,7 +99,28 @@
       "x -= 30;"
       "x &= 40;"
       "x |= 50;"
-      "x ^= 60;")))
+      "x ^= 60;"
+      "x <<= 3;"
+      "x >>= 3;")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(set x (+ a b))
+      #`(set x (- a b))
+      #`(set x (and a b))
+      #`(set x (or a b))
+      #`(set x (xor a b))
+      #`(set x (shl a b))
+      #`(set x (shr a b)))
+    (lines-string
+      "x = (a + b);"
+      "x = (a - b);"
+      "x = (a & b);"
+      "x = (a | b);"
+      "x = (a ^ b);"
+      "x = (a << b);"
+      "x = (a >> b);")))
 
 (check
   (equal?
