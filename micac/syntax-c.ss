@@ -62,8 +62,9 @@
     (syntax-case $syntax (defer break-if)
       (() $code)
       (((defer deferred ...) body ...)
-        (code+instrs $lookup $code
-          #'(body ... deferred ...)))
+        (code+instrs $lookup
+          (code+instrs $lookup $code #'(body ...))
+          #'(deferred ...)))
       (((break-if expr break-body ...) body ...)
         (code+instr $lookup $code
           #`(if expr
