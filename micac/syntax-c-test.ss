@@ -1,6 +1,16 @@
 (import (micascheme) (micac syntax) (micac syntax-c) (check))
 
-(define $lookup (lambda (a b) #f))
+(define-aux-keyword macro)
+
+(define $lookup
+  (lambda ($id $key)
+    (and
+      (free-identifier=? $id #'macro)
+      (free-identifier=? $key #'micac)
+      (lambda ($syntax)
+        (syntax-case $syntax ()
+          ((_ arg ...)
+            #`(macroed arg ...)))))))
 
 (check
   (equal?
@@ -138,6 +148,11 @@
     (lines-string
       "uint8_t x;"
       "x += (((x + 10) - 20) & 255);")))
+
+(check
+  (equal?
+    (syntax-c $lookup #`(macro 10 (macro 20 30)))
+    (lines-string "macroed(10, macroed(20, 30));")))
 
 (check
   (equal?

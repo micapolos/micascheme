@@ -35,7 +35,7 @@
     (syntax-case $syntax (begin)
       ((begin $syntax ...)
         (syntax->list #'($syntax ...)))
-      ($other (list #'other))))
+      ($other (list #'$other))))
 
   (define (expand-begin-syntaxes $syntaxes)
     (apply append
@@ -44,7 +44,7 @@
           (syntax-case $syntax (begin)
             ((begin $syntax ...)
               (syntax->list #'($syntax ...)))
-            ($other (list #'other))))
+            ($other (list #'$other))))
         $syntaxes)))
 
   (define-syntax define-rule-syntax
