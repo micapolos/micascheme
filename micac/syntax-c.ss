@@ -58,8 +58,9 @@
       (const
         (literal->code #'const))))
 
-  (define (code+instrs $lookup $code $syntaxes)
-    (fold-left (partial code+instr $lookup) $code $syntaxes))
+  (define (code+instrs $lookup $code $syntax)
+    (fold-left (partial code+instr $lookup) $code
+      (syntax->list $syntax)))
 
   (define (instr->begin $instr)
     (syntax-case $instr (begin)
@@ -85,8 +86,7 @@
           (code-in-curly-brackets
             (code-indent
               (code "\n"
-                (code+instrs $lookup empty-code
-                  (syntax->list #'(instr ...))))))
+                (code+instrs $lookup empty-code #'(instr ...)))))
           "\n"))
       ((var type id)
         (code $code
@@ -129,8 +129,9 @@
       ((id arg ...)
         (and (identifier? #'id) ($lookup #'id #'micac))
         (code+instrs $lookup $code
-          (begin-syntaxes
-            (($lookup #'id #'micac) $syntax))))
+          #`(
+            #,@(begin-syntaxes
+              (($lookup #'id #'micac) $syntax)))))
       ((id arg ...)
         (identifier? #'id)
         (code $code
@@ -239,5 +240,7 @@
         (syntax->expr-code $lookup $rhs))))
 
   (define (syntax-c $lookup . $syntaxes)
-    (code-string (code+instrs $lookup empty-code $syntaxes)))
+    (code-string
+      (code+instrs $lookup empty-code
+        #`(#,@$syntaxes))))
 )
