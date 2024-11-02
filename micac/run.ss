@@ -12,5 +12,6 @@
           "#include <stdio.h>"
           "#include <SDL2/SDL.h>"
           (string-append "int main() " $string)))
-      (c-run $string (list "sdl2"))))
+      ($libs (list "sdl2"))
+      (c-run $string $libs)))
 )
