@@ -117,9 +117,9 @@
     (syntax-c $lookup
       #`(set x (+ a b))
       #`(set x (- a b))
-      #`(set x (and a b))
-      #`(set x (or a b))
-      #`(set x (xor a b))
+      #`(set x (bitwise-and a b))
+      #`(set x (bitwise-ior a b))
+      #`(set x (bitwise-xor a b))
       #`(set x (shl a b))
       #`(set x (shr a b)))
     (lines-string
@@ -130,6 +130,95 @@
       "x = a ^ b;"
       "x = a << b;"
       "x = a >> b;")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(set x (+))
+      #`(set x (+ a))
+      #`(set x (+ a b))
+      #`(set x (+ a b c)))
+    (lines-string
+      "x = 0;"
+      "x = a;"
+      "x = a + b;"
+      "x = a + b + c;")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(set x (- a))
+      #`(set x (- a b))
+      #`(set x (- a b c)))
+    (lines-string
+      "x = -a;"
+      "x = a - b;"
+      "x = a - b - c;")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(set x (*))
+      #`(set x (* a))
+      #`(set x (* a b))
+      #`(set x (* a b c)))
+    (lines-string
+      "x = 1;"
+      "x = a;"
+      "x = a * b;"
+      "x = a * b * c;")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(set x (and))
+      #`(set x (and a))
+      #`(set x (and a b))
+      #`(set x (and a b c)))
+    (lines-string
+      "x = true;"
+      "x = a;"
+      "x = a && b;"
+      "x = a && b && c;")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(set x (or))
+      #`(set x (or a))
+      #`(set x (or a b))
+      #`(set x (or a b c)))
+    (lines-string
+      "x = false;"
+      "x = a;"
+      "x = a || b;"
+      "x = a || b || c;")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(set x (bitwise-and))
+      #`(set x (bitwise-and a))
+      #`(set x (bitwise-and a b))
+      #`(set x (bitwise-and a b c)))
+    (lines-string
+      "x = -1;"
+      "x = a;"
+      "x = a & b;"
+      "x = a & b & c;")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(set x (bitwise-ior))
+      #`(set x (bitwise-ior a))
+      #`(set x (bitwise-ior a b))
+      #`(set x (bitwise-ior a b c)))
+    (lines-string
+      "x = 0;"
+      "x = a;"
+      "x = a | b;"
+      "x = a | b | c;")))
 
 (check
   (equal?
@@ -227,7 +316,7 @@
 (check
   (equal?
     (syntax-c $lookup
-      #`(add x (and (- (+ x 10) 20) #xff)))
+      #`(add x (bitwise-and (- (+ x 10) 20) #xff)))
     (lines-string
       "x += x + 10 - 20 & 255;")))
 
