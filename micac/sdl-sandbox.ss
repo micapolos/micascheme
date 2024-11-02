@@ -1,11 +1,11 @@
 (import (micascheme) (micac run) (micac sdl))
 
 (micac-run
-  (sdl-init)
   (const int width 352)
   (const int height 288)
   (const int scale 2)
   (const int bpp 4)
+  (sdl-init)
   (sdl-create-window window "My window" (* width scale) (* height scale))
   (sdl-create-renderer renderer window)
   (sdl-create-texture texture renderer SDL_PIXELFORMAT_BGRA8888 SDL_TEXTUREACCESS_STREAMING width height)
