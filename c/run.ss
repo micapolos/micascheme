@@ -9,5 +9,7 @@
           (put-string $port $string))
         `(replace))
       (system "gcc /tmp/main.c -o /tmp/main")
-      (system "/tmp/main")))
+      (system "rm /tmp/main.c")
+      (system "/tmp/main")
+      (system "rm /tmp/main")))
 )
