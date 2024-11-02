@@ -9,7 +9,7 @@
         (lambda ($port)
           (put-string $port $string))
         `(replace))
-      (system "gcc /tmp/main.c -o /tmp/main")
+      (system "gcc /tmp/main.c -o /tmp/main -lsdl2 -Wno-parentheses-equality")
       (system "rm /tmp/main.c")
       (set! $value (system "/tmp/main"))
       (system "rm /tmp/main")

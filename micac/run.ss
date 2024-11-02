@@ -1,7 +1,7 @@
 (library (micac run)
   (export micac-run)
   (import (micascheme) (c run) (micac c) (micac syntax))
-  (export (import (micac syntax)))
+  (export (import (micac syntax) (micac c)))
 
   (define-rule-syntax (micac-run instr ...)
     (lets
@@ -10,6 +10,7 @@
         (lines-string
           "#include <stdlib.h>"
           "#include <stdio.h>"
+          "#include <SDL2/SDL.h>"
           (string-append "int main() " $string)))
       (c-run $string)))
 )

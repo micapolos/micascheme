@@ -26,7 +26,10 @@
         (code
           (type->code #'type)
           (code-in-square-brackets (size->code #'size))))
-      (_ (syntax-error $type "unknown type"))))
+      (id (identifier? #'id)
+        (identifier->code #'id))
+      (_
+        (syntax-error $type "unknown type"))))
 
   (define (identifier->code $identifier)
     (string-code (symbol->string (syntax->datum $identifier))))
@@ -91,32 +94,32 @@
             (type->code #'type)
             (identifier->code #'id))
           ";\n"))
-      ((if variable then-instr)
+      ((if expr then-instr)
         (code $code
           (space-separated-code
             "if"
             (code-in-round-brackets
-              (variable->code #'variable))
+              (syntax->expr-code $lookup #'expr))
             (code+instr $lookup empty-code
               (instr->begin #'then-instr)))))
-      ((if variable then-instr else-instr)
+      ((if expr then-instr else-instr)
         (code $code
           (space-separated-code
             "if"
             (code-in-round-brackets
-              (variable->code #'variable))
+              (syntax->expr-code $lookup #'expr))
             (code+instr $lookup empty-code
               (instr->begin #'then-instr)))
           (space-separated-code
             "else"
             (code+instr $lookup empty-code
               (instr->begin #'else-instr)))))
-      ((while variable instr ...)
+      ((while expr instr ...)
         (code $code
           (space-separated-code
             "while"
             (code-in-round-brackets
-              (variable->code #'variable))
+              (syntax->expr-code $lookup #'expr))
             (code+instr $lookup empty-code
               #'(begin instr ...)))))
       ((op2 lhs expr)
