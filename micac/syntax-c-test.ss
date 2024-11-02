@@ -141,9 +141,8 @@
 
 (check
   (equal?
-    (syntax-c $lookup #`(print test 10))
-    (lines-string
-      "printf(\"test: %i\\n\", 10);")))
+    (syntax-c $lookup #`(printf "%i\\n" 10))
+    (lines-string "printf(\"%i\\n\", 10);")))
 
 (check
   (equal?

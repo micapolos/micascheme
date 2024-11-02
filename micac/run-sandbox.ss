@@ -3,10 +3,10 @@
 (micac-run
   (var u8 x)
   (set x 2)
-  (print first-value x)
+  (printf "First value: %i\\n" x)
   (add x 3)
-  (print second-value x)
+  (printf "Second value: %i\\n" x)
   (while x
-    (print loop x)
+    (printf "Loop: %i\\n" x)
     (sub x 1))
-  (print the-end (+ x 100)))
+  (printf "Done: %i\\n" (+ x 100)))

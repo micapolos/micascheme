@@ -3,8 +3,8 @@
     micac
     u8 u16 u32
     var set add sub
-    while print)
+    while)
   (import (micascheme))
 
-  (define-aux-keywords micac u8 u16 u32 var set add sub while print)
+  (define-aux-keywords micac u8 u16 u32 var set add sub while)
 )

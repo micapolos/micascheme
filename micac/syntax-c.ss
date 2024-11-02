@@ -33,7 +33,8 @@
 
   (define (literal->code $literal)
     (switch (syntax->datum $literal)
-      ((fixnum? $fixnum) (string-code (number->string $fixnum)))
+      ((number? $fixnum) (string-code (number->string $fixnum)))
+      ((string? $string) (code "\"" (string-code $string) "\""))
       ((else $other) (syntax-error $literal "not literal"))))
 
   (define (variable->code $variable)
@@ -66,7 +67,7 @@
       (_ #f)))
 
   (define (code+instr $lookup $code $syntax)
-    (syntax-case $syntax (begin var if switch while print)
+    (syntax-case $syntax (begin var if switch while)
       ((begin instr ...)
         (code $code
           (code-in-curly-brackets
@@ -109,18 +110,6 @@
               (variable->code #'variable))
             (code+instr $lookup empty-code
               #'(begin instr ...)))))
-      ((print label expr)
-        (code $code
-          "printf"
-          (code-in-round-brackets
-            (code
-              "\""
-              (string-code (symbol->string (datum label)))
-              ": %i\\n"
-              "\""
-              ", "
-              (syntax->expr-code $lookup #'expr)))
-          ";\n"))
       ((op variable expr)
         (op->string-opt #'op)
         (code+op2 $lookup $code
