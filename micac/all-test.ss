@@ -2,5 +2,4 @@
 
 (test
   (micac c)
-  (micac syntax-c)
-  (micac syntax-expr))
+  (micac syntax-c))

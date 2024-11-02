@@ -4,12 +4,14 @@
 
   (define (c-run $string)
     (let ()
+      (define $value 0)
       (call-with-output-file "/tmp/main.c"
         (lambda ($port)
           (put-string $port $string))
         `(replace))
       (system "gcc /tmp/main.c -o /tmp/main")
       (system "rm /tmp/main.c")
-      (system "/tmp/main")
-      (system "rm /tmp/main")))
+      (set! $value (system "/tmp/main"))
+      (system "rm /tmp/main")
+      $value))
 )

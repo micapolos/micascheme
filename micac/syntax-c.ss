@@ -161,7 +161,7 @@
                     (block-begin $block)
                     #'(begin instr ...))))))
           (block-identifiers $block)))
-      ((print label value)
+      ((print label expr)
         (block
           (code-append
             (block-code $block)
@@ -174,7 +174,7 @@
                   ": %i\\n"
                   "\""
                   ", "
-                  (value->code (block-identifiers $block) #'value)))
+                  (syntax->expr-code (block-identifiers $block) #'expr)))
               ";\n"))
           (block-identifiers $block)))
       ((op variable expr)
