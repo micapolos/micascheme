@@ -159,7 +159,7 @@
                     (block-begin $block)
                     #'(begin instr ...))))))
           (block-identifiers $block)))
-      ((print value)
+      ((print label value)
         (block
           (code-append
             (block-code $block)
@@ -167,7 +167,11 @@
               "printf"
               (code-in-round-brackets
                 (code
-                  "\"%i\n\", "
+                  "\""
+                  (string-code (symbol->string (datum label)))
+                  ": %i\\n"
+                  "\""
+                  ", "
                   (value->code (block-identifiers $block) #'value)))
               ";\n"))
           (block-identifiers $block)))

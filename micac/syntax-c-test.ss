@@ -130,6 +130,6 @@
 
 (check
   (equal?
-    (syntax-c #`(print 10))
+    (syntax-c #`(print test 10))
     (lines-string
-      "printf(\"%i\n\", 10);")))
+      "printf(\"test: %i\\n\", 10);")))
