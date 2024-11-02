@@ -69,7 +69,16 @@
             (expr-code (syntax->expr $lookup #'expr)))))))
 
   (define (identifier->code $identifier)
-    (string-code (symbol->string (syntax->datum $identifier))))
+    (string-code
+      (list->string
+        (map-with
+          ($char
+            (string->list
+              (symbol->string
+                (syntax->datum $identifier))))
+          (case $char
+            ((#\-) #\_)
+            (else $char))))))
 
   (define (literal->expr $literal)
     (switch (syntax->datum $literal)

@@ -29,6 +29,11 @@
 
 (check
   (equal?
+    (syntax-c $lookup #`(var int some-variable))
+    (lines-string "int some_variable;")))
+
+(check
+  (equal?
     (syntax-c $lookup #`(var uint8_t (* x)))
     (lines-string "uint8_t *x;")))
 

@@ -3,17 +3,20 @@
 (micac-run
   (const int width 352)
   (const int height 288)
-  (const int scale 2)
-  (const int bpp 4)
+  (const int window-scale 2)
+  (const int pixel-count (* width height))
+  (const int bits-per-pixel 4)
+  (const int pixels-size (* pixel-count bits-per-pixel))
+  (const int pixels-pitch (* width bits-per-pixel))
   (sdl-init)
-  (sdl-create-window window "My window" (* width scale) (* height scale))
+  (sdl-create-window window "My window" (* width window-scale) (* height window-scale))
   (sdl-create-renderer renderer window)
   (sdl-create-texture texture renderer SDL_PIXELFORMAT_BGRA8888 SDL_TEXTUREACCESS_STREAMING width height)
   (var int scroll 0)
-  (var uint8_t (* pixels (* width height bpp)))
+  (var uint8_t (* pixels pixels-size))
   (sdl-event-loop
     (begin
-      (var int count (* width height bpp))
+      (var int count pixels-size)
       (var uint8_t (* pixel) pixels)
       (var uint8_t value scroll)
       (while count
@@ -22,6 +25,6 @@
         (add value 1)
         (add pixel 1)))
     (add scroll 8)
-    (sdl-update-texture texture 0 (&ref pixels) (* width bpp))
+    (sdl-update-texture texture 0 (&ref pixels) pixels-pitch)
     (sdl-render-copy renderer texture 0 0)
     (sdl-render-present renderer)))
