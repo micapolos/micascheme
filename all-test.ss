@@ -76,4 +76,5 @@
   (labs all)
   (tico all)
   (zexy all)
+  (c all)
 )

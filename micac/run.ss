@@ -1,6 +1,6 @@
 (library (micac run)
   (export micac-run)
-  (import (micascheme) (micac c-run) (micac c) (micac syntax))
+  (import (micascheme) (c run) (micac c) (micac syntax))
   (export (import (micac syntax)))
 
   (define-rule-syntax (micac-run instr ...)

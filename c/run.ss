@@ -1,4 +1,4 @@
-(library (micac c-run)
+(library (c run)
   (export c-run)
   (import (micascheme))
 
