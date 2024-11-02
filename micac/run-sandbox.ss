@@ -2,7 +2,10 @@
 
 (micac-run
   (var u8 x)
-  (add x 2)
+  (set x 2)
   (print first-value x)
   (add x 3)
-  (print second-value x))
+  (print second-value x)
+  (while x
+    (print loop x)
+    (sub x 1)))
