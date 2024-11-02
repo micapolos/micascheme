@@ -34,23 +34,23 @@
 
 (check
   (equal?
-    (syntax-c $lookup #`(var (* u32) x))
-    (lines-string "uint32_t* x;")))
+    (syntax-c $lookup #`(var u32 (* x)))
+    (lines-string "uint32_t *x;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var (* (* u32)) x))
-    (lines-string "uint32_t** x;")))
+    (syntax-c $lookup #`(var u32 (* (* x))))
+    (lines-string "uint32_t **x;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var (* u32 24) x))
-    (lines-string "uint32_t[24] x;")))
+    (syntax-c $lookup #`(var u32 (* x 24)))
+    (lines-string "uint32_t x[24];")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var (* (* u32 24) 32) x))
-    (lines-string "uint32_t[24][32] x;")))
+    (syntax-c $lookup #`(var u32 (* (* x 24) 32)))
+    (lines-string "uint32_t x[24][32];")))
 
 (check
   (equal?

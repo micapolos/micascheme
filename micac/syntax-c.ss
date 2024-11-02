@@ -21,15 +21,22 @@
       (u8 (code "uint8_t"))
       (u16 (code "uint16_t"))
       (u32 (code "uint32_t"))
-      ((* type) (code (type->code #'type) "*"))
-      ((* type size)
-        (code
-          (type->code #'type)
-          (code-in-square-brackets (size->code #'size))))
       (id (identifier? #'id)
         (identifier->code #'id))
       (_
         (syntax-error $type "unknown type"))))
+
+  (define (declarator->code $syntax)
+    (syntax-case $syntax (*)
+      (id (identifier? #'id)
+        (type->code #'id))
+      ((* decl)
+        (code "*" (declarator->code #'decl)))
+      ((* decl expr)
+        (code
+          (declarator->code #'decl)
+          (code-in-square-brackets
+            (number-code (datum expr)))))))
 
   (define (identifier->code $identifier)
     (string-code (symbol->string (syntax->datum $identifier))))
@@ -112,13 +119,13 @@
         (code $code
           (space-separated-code
             (type->code #'type)
-            (identifier->code #'id))
+            (declarator->code #'id))
           ";\n"))
       ((var type id expr)
         (code $code
           (space-separated-code
             (type->code #'type)
-            (identifier->code #'id)
+            (declarator->code #'id)
             "="
             (syntax->expr-code $lookup #'expr))
           ";\n"))
