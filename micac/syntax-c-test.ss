@@ -130,6 +130,15 @@
 
 (check
   (equal?
+    (syntax-c
+      #`(var u8 x)
+      #`(add x (and (- (+ x 10) 20) #xff)))
+    (lines-string
+      "uint8_t x;"
+      "x += (((x + 10) - 20) & 255);")))
+
+(check
+  (equal?
     (syntax-c #`(print test 10))
     (lines-string
       "printf(\"test: %i\\n\", 10);")))

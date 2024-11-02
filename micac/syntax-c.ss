@@ -8,6 +8,8 @@
 
   (data (block code identifiers))
 
+  (data (expr priority code))
+
   (define empty-block
     (block empty-code (stack)))
 
@@ -175,19 +177,47 @@
                   (value->code (block-identifiers $block) #'value)))
               ";\n"))
           (block-identifiers $block)))
-      ((op variable value)
-        (block+op2 $block #'variable (op->string #'op) #'value))))
+      ((op variable expr)
+        (block+op2 $block #'variable (op->string #'op) #'expr))))
 
-  (define (block+op2 $block $variable $op $value)
+  (define (block+op2 $block $variable $op $expr)
     (block-append $block
       (block
         (code
           (space-separated-code
             (variable->code (block-identifiers $block) $variable)
             (string-code $op)
-            (value->code (block-identifiers $block) $value))
+            (syntax->expr-code (block-identifiers $block) $expr))
           ";\n")
         (block-identifiers $block))))
+
+  (define (syntax->expr-code $identifiers $syntax)
+    (syntax-case $syntax (u8 u16 u32 + - and or xor)
+      ((u8 number)
+        (number-code (datum number)))
+      ((u16 number)
+        (number-code (datum number)))
+      ((u32 number)
+        (number-code (datum number)))
+      ((+ a b)
+        (op2->expr-code $identifiers #'a "+" #'b))
+      ((- a b)
+        (op2->expr-code $identifiers #'a "-" #'b))
+      ((and a b)
+        (op2->expr-code $identifiers #'a "&" #'b))
+      ((or a b)
+        (op2->expr-code $identifiers #'a "|" #'b))
+      ((xor a b)
+        (op2->expr-code $identifiers #'a "^" #'b))
+      (other
+        (value->code $identifiers #'other))))
+
+  (define (op2->expr-code $identifiers $lhs $op $rhs)
+    (code-in-round-brackets
+      (space-separated-code
+        (syntax->expr-code $identifiers $lhs)
+        (string-code $op)
+        (syntax->expr-code $identifiers $rhs))))
 
   (define (syntax-c . $syntaxes)
     (code-string
