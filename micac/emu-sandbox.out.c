@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 
 int main() {
-  const int hz = 352 * 288 * 4 * 60;
+  const int hz = 352 * 288 * 60;
   const int frame_cycles = hz / 60;
   const int width = 352;
   const int height = 288;
@@ -37,10 +37,14 @@ int main() {
             printf("Could not allocate memory\n");
           }
           else {
+            const int bar_size = 3365;
             uint8_t *pixel_ref = pixels;
-            int pixel_counter = pixels_size;
-            int frame_counter = 0;
-            uint8_t pixel;
+            int pixel_counter = pixel_count;
+            int bar_counter = bar_size;
+            uint8_t alpha = 255;
+            uint8_t red = 255;
+            uint8_t green = 255;
+            uint8_t blue = 0;
             bool running = true;
             SDL_Event event;
             while (running) {
@@ -53,15 +57,25 @@ int main() {
                 {
                   int counter = frame_cycles;
                   while (counter) {
-                    *pixel_ref = pixel;
+                    *pixel_ref = alpha;
                     pixel_ref += 1;
-                    pixel += 1;
+                    *pixel_ref = red;
+                    pixel_ref += 1;
+                    *pixel_ref = green;
+                    pixel_ref += 1;
+                    *pixel_ref = blue;
+                    pixel_ref += 1;
+                    bar_counter -= 1;
+                    if (bar_counter == 0) {
+                      bar_counter = bar_size;
+                      red = ~red;
+                      green = ~green;
+                      blue = ~blue;
+                    }
                     pixel_counter -= 1;
                     if (pixel_counter == 0) {
                       pixel_ref = pixels;
-                      pixel_counter = pixels_size;
-                      frame_counter += 1;
-                      pixel = frame_counter << 3;
+                      pixel_counter = pixel_count;
                     }
                     counter -= 1;
                   }
