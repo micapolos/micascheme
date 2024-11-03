@@ -22,7 +22,9 @@
       ((* bit n)
         (size->uint-type #'n))
       ((* type n)
-        #`(* #,(transform-type #'type) #,(size->number #'n)))))
+        #`(*
+          #,(transform-type #'type)
+          #,(size->number #'n)))))
 
   (define (size->uint-type $size)
     (lets
