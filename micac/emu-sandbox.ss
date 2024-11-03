@@ -14,10 +14,10 @@
       (var int frame-counter 0)
       (var uint8_t pixel))
     (update
-      (set (pixel-ref *) pixel)
-      (add pixel-ref 1)
-      (add pixel 1)
-      (sub pixel-counter 1)
+      (set* pixel-ref pixel)
+      (inc pixel-ref)
+      (inc pixel)
+      (dec pixel-counter)
       (if (= pixel-counter 0)
         (begin
           (set pixel-ref pixels)
