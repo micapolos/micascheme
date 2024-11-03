@@ -22,8 +22,8 @@
       (var uint8_t value (* frame-counter 8))
       (repeat-times pixels-size
         (set (pixel-ref *) value)
-        (add value 1)
-        (add pixel-ref 1)))
+        (add pixel-ref 1)
+        (add value 1)))
     (add frame-counter 1)
     (sdl-update-texture texture 0 pixels pixels-pitch)
     (sdl-render-copy renderer texture 0 0)
