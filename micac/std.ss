@@ -1,5 +1,5 @@
 (library (micac std)
-  (export create-array)
+  (export sizeof create-array)
   (import (micascheme) (micac c))
 
   (micac-externs malloc free sizeof)
