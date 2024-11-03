@@ -16,9 +16,14 @@
         body ...
         (sub counter 1))))
 
-  (micac-macro (inc id) (add id 1))
-  (micac-macro (dec id) (sub id 1))
-  (micac-macro (set* id expr) (set (id *) expr))
+  (micac-macro (inc id)
+    (add id 1))
+
+  (micac-macro (dec id)
+    (sub id 1))
+
+  (micac-macro (set* id expr)
+    (set (id *) expr))
 
   (micac-macro (on expr body ...)
     (if expr (begin body ...)))
