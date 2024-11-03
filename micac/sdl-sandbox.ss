@@ -15,7 +15,7 @@
   (sdl-create-texture texture renderer SDL_PIXELFORMAT_BGRA8888 SDL_TEXTUREACCESS_STREAMING width height)
 
   (var int scroll 0)
-  (create-array uint8_t pixels pixels-size)
+  (alloc uint8_t pixels pixels-size)
 
   (sdl-event-loop
     (begin
