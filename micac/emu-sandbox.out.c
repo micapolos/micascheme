@@ -34,7 +34,7 @@ int main() {
         else {
           uint8_t *pixels = (uint8_t*)malloc(pixels_size * sizeof(uint8_t));
           if (pixels == 0) {
-            printf("malloc error\n");
+            printf("Could not allocate memory\n");
           }
           else {
             uint8_t *pixel_ref = pixels;
