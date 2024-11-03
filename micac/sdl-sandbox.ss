@@ -1,4 +1,8 @@
-(import (micascheme) (micac run) (micac std) (micac sdl))
+(import
+  (only (scheme) * begin)
+  (micac run)
+  (micac std)
+  (micac sdl))
 
 (micac-run
   (const int width 352)
