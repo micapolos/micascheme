@@ -192,6 +192,17 @@
 (check
   (equal?
     (syntax-c $lookup
+      #`(set x (/ a))
+      #`(set x (/ a b))
+      #`(set x (/ a b c)))
+    (lines-string
+      "x = 1 / a;"
+      "x = a / b;"
+      "x = a / b / c;")))
+
+(check
+  (equal?
+    (syntax-c $lookup
       #`(set x (and))
       #`(set x (and a))
       #`(set x (and a b))
