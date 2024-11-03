@@ -1,10 +1,10 @@
 (library (micac std)
-  (export sizeof allocate-array repeat-times)
+  (export sizeof array repeat-times)
   (import (micascheme) (micac c))
 
   (micac-externs malloc free sizeof)
 
-  (micac-macro (allocate-array id type size)
+  (micac-macro (array id type size)
     (var type (* id) (cast (* type) (malloc (* size (sizeof type)))))
     (break-if (= id 0) (printf "malloc error\\n"))
     (defer (free id)))
