@@ -19,14 +19,12 @@
     (syntax-case $type (bit *)
       (bit
         (transform-type #'(* bit 1)))
-      ((* bit n ns ...)
-        (fold-left
-          (lambda ($type $n)
-            #`(*
-              #,$type
-              #,(bitwise-arithmetic-shift-left 1 (size->number $n))))
-          (size->uint-type #'n)
-          (syntax->list #'(ns ...))))))
+      ((* bit n)
+        (size->uint-type #'n))
+      ((* type n)
+        #`(*
+          #,(transform-type #'type)
+          #,(size->number #'n)))))
 
   (define (size->uint-type $size)
     (lets
