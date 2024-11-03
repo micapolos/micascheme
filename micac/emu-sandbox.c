@@ -61,7 +61,7 @@ int main() {
                       pixel_ref = pixels;
                       pixel_counter = pixels_size;
                       frame_counter += 1;
-                      pixel = frame_counter * 8;
+                      pixel = frame_counter << 3;
                     }
                     counter -= 1;
                   }
