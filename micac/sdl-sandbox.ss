@@ -14,7 +14,7 @@
   (sdl-renderer renderer window)
   (sdl-texture texture renderer SDL_PIXELFORMAT_BGRA8888 SDL_TEXTUREACCESS_STREAMING width height)
 
-  (array pixels uint8_t pixels-size)
+  (alloc pixels uint8_t pixels-size)
   (var int frame-counter 0)
   (sdl-event-loop
     (begin
