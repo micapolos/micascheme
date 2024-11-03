@@ -1,5 +1,5 @@
 (library (micac std)
-  (export sizeof alloc repeat-times inc dec set*)
+  (export sizeof alloc repeat-times inc dec set* on)
   (import (micascheme) (micac c))
 
   (micac-externs malloc free sizeof)
@@ -19,4 +19,7 @@
   (micac-macro (inc id) (add id 1))
   (micac-macro (dec id) (sub id 1))
   (micac-macro (set* id expr) (set (id *) expr))
+
+  (micac-macro (on expr body ...)
+    (if expr (begin body ...)))
 )
