@@ -19,12 +19,15 @@
       (define-aux-keyword id)
       (define-micac-property id transformer)))
 
-  (define-rule-syntax (micac-macro (id arg ...) body ...)
-    (define-micac-syntax id
-      (lambda ($syntax)
-        (syntax-case $syntax ()
-          ((_ arg ...)
-            #'(begin body ...))))))
+  (define-rules-syntax (literals literals)
+    ((micac-macro (id arg ...) (literals literal ...) body ...)
+      (define-micac-syntax id
+        (lambda ($syntax)
+          (syntax-case $syntax (literal ...)
+            ((_ arg ...)
+              #'(begin body ...))))))
+    ((micac-macro (id arg ...) body ...)
+      (micac-macro (id arg ...) (literals) body ...)))
 
   (define-syntax (micac-c $syntax $lookup)
     (syntax-case $syntax ()
