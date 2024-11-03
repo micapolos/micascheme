@@ -1,6 +1,6 @@
 (library (micac emu)
   (export
-    emu video pixels pixels-size width height init update)
+    emu clock video pixels pixels-size width height init update)
   (import
     (micascheme)
     (micac syntax)
@@ -8,14 +8,17 @@
     (micac std)
     (micac sdl))
 
-  (micac-externs video pixels pixels-size width height init update)
+  (micac-externs clock video pixels pixels-size width height init update)
 
   (micac-macro
     (emu
+      (clock hz-expr)
       (video width-expr height-expr)
       (init init-body ...)
       (update update-body ...))
     (literals video init update)
+    (const int hz hz-expr)
+    (const int frame-cycles (/ hz 60))
     (const int width width-expr)
     (const int height height-expr)
     (const int window-scale 2)
@@ -32,7 +35,7 @@
     (alloc pixels uint8_t pixels-size)
     init-body ...
     (sdl-event-loop
-      update-body ...
+      (repeat-times frame-cycles update-body ...)
       (sdl-update-texture texture 0 pixels pixels-pitch)
       (sdl-render-copy renderer texture 0 0)
       (sdl-render-present renderer)))
