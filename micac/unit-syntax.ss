@@ -1,12 +1,12 @@
 (library (micac unit-syntax)
   (export
     bit
-    transform-type)
+    transform-uint-type)
   (import
     (micascheme)
     (micac syntax))
 
-  (define-aux-keywords bit)
+  (define-aux-keywords bit struct)
 
   (define (size->number $size)
     (lets
@@ -15,16 +15,15 @@
         (and (number? $datum) (positive? $datum) $datum)
         (syntax-error $size "invalid size"))))
 
-  (define (transform-type $type)
+  (define (scope-ref $scope $id)
+    (or
+      (assid $scope $id)
+      (syntax-error $id "unbound")))
+
+  (define (transform-uint-type $type)
     (syntax-case $type (bit *)
-      (bit
-        (transform-type #'(* bit 1)))
       ((* bit n)
-        (size->uint-type #'n))
-      ((* type n)
-        #`(*
-          #,(transform-type #'type)
-          #,(size->number #'n)))))
+        (size->uint-type #'n))))
 
   (define (size->uint-type $size)
     (lets
