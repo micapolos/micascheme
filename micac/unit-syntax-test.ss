@@ -13,4 +13,4 @@
 (check (equal? (syntax->datum (transform-type #'(* bit 64))) 'uint64_t))
 
 (check (equal? (syntax->datum (transform-type #'(* bit 8 16))) '(* uint8_t 65536)))
-(check (equal? (syntax->datum (transform-type #'(* bit 8 2 4))) '(* (* uint8_t 4) 16)))
+(check (equal? (syntax->datum (transform-type #'(* bit 8 2 16))) '(* (* uint8_t 4) 65536)))
