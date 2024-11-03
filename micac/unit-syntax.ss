@@ -32,5 +32,5 @@
         ((<= $size 16) #'uint16_t)
         ((<= $size 32) #'uint32_t)
         ((<= $size 64) #'uint64_t)
-        (else (syntax-error $size "size greater than 64")))))
+        (else (syntax-error $size "bit size greater than 64")))))
 )
