@@ -34,6 +34,11 @@
 
 (check
   (equal?
+    (syntax-c $lookup #`(var (* uint8_t) x))
+    (lines-string "uint8_t* x;")))
+
+(check
+  (equal?
     (syntax-c $lookup #`(var uint8_t (* x)))
     (lines-string "uint8_t *x;")))
 
@@ -121,6 +126,12 @@
       "x = -a;"
       "x = ~a;"
       "x = !a;")))
+
+(check
+  (equal?
+    (syntax-c $lookup #`(set pixels (cast (* uint8_t) ptr)))
+    (lines-string "pixels = (uint8_t*)ptr;")))
+
 
 (check
   (equal?

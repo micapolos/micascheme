@@ -50,9 +50,11 @@
         (syntax-error $size "invalid size"))))
 
   (define (type->code $type)
-    (syntax-case $type ()
+    (syntax-case $type (*)
       (id (identifier? #'id)
         (identifier->code #'id))
+      ((* type)
+        (code (type->code #'type) "*"))
       (_
         (syntax-error $type "unknown type"))))
 
@@ -245,7 +247,12 @@
       ";\n"))
 
   (define (syntax->expr $lookup $syntax)
-    (syntax-case $syntax (= != > >= < <= + - * and or bitwise-and bitwise-ior bitwise-xor shl shr neg not inv ref &ref)
+    (syntax-case $syntax (cast = != > >= < <= + - * and or bitwise-and bitwise-ior bitwise-xor shl shr neg not inv ref &ref)
+      ((cast type rhs)
+        (expr 2 #f
+          (code
+            (code-in-round-brackets (type->code #'type))
+            (expr-operand-code (syntax->expr $lookup #'rhs) 2 #t))))
       ((= a b)
         (op2->expr $lookup 7 #t #'a " == " #'b))
       ((!= a b)
