@@ -1,6 +1,8 @@
 (import (micascheme) (micac unit-syntax))
 
+; transform-type
 (check (equal? (syntax->datum (transform-type #'bit)) `uint8_t))
+
 (check (equal? (syntax->datum (transform-type #'(* bit 1))) `uint8_t))
 (check (equal? (syntax->datum (transform-type #'(* bit 8))) `uint8_t))
 (check (equal? (syntax->datum (transform-type #'(* bit 9))) `uint16_t))
@@ -9,3 +11,6 @@
 (check (equal? (syntax->datum (transform-type #'(* bit 32))) `uint32_t))
 (check (equal? (syntax->datum (transform-type #'(* bit 33))) `uint64_t))
 (check (equal? (syntax->datum (transform-type #'(* bit 64))) `uint64_t))
+
+(check (equal? (syntax->datum (transform-type #'(* (* bit 8) 256))) `(* uint8_t 256)))
+(check (equal? (syntax->datum (transform-type #'(* (* (* bit 8) 256) 192))) `(* (* uint8_t 256) 192)))

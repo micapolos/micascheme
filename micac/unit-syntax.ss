@@ -10,8 +10,12 @@
 
   (define (transform-type $type)
     (syntax-case $type (bit *)
-      (bit #'uint8_t)
-      ((* bit n) (size->uint-type #'n))))
+      (bit
+        #'uint8_t)
+      ((* bit n)
+        (size->uint-type #'n))
+      ((* type n)
+        #`(* #,(transform-type #'type) n))))
 
   (define (size->uint-type $size)
     (lets
