@@ -6,20 +6,41 @@
   (micac emu))
 
 (run-emu
-  (clock (* 352 288 4 60))
+  (clock (* 352 288 60))
   (video 352 288)
   (init
-    (var uint8_t (* pixel-ref) pixels)
-    (var int pixel-counter pixels-size)
-    (var int frame-counter 0)
-    (var uint8_t pixel))
+    (const int bar-size 3365)
+    (var uint8_t (* pixel-ref))
+    (var int pixel-counter 0)
+    (var int bar-counter 0)
+    (var uint8_t red #xff)
+    (var uint8_t green #xff)
+    (var uint8_t blue 0))
   (update
-    (set (pixel-ref *) pixel)
-    (inc pixel-ref)
-    (inc pixel)
-    (dec pixel-counter)
+    (on (= bar-counter 0)
+      (set bar-counter bar-size)
+      (set red (inv red))
+      (set green (inv green))
+      (set blue (inv blue)))
+    (dec bar-counter)
+
     (on (= pixel-counter 0)
       (set pixel-ref pixels)
-      (set pixel-counter pixels-size)
-      (inc frame-counter)
-      (set pixel (shl frame-counter 3)))))
+      (set pixel-counter pixel-count))
+    (dec pixel-counter)
+
+    ; alpha
+    (set (pixel-ref *) #xff)
+    (inc pixel-ref)
+
+    ; red
+    (set (pixel-ref *) red)
+    (inc pixel-ref)
+
+    ; green
+    (set (pixel-ref *) green)
+    (inc pixel-ref)
+
+    ; blue
+    (set (pixel-ref *) blue)
+    (inc pixel-ref)))

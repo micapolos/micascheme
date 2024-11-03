@@ -1,6 +1,6 @@
 (library (micac emu)
   (export
-    emu clock video pixels pixels-size width height init update
+    emu clock video pixels pixel-count pixels-size width height init update
     run-emu)
   (import
     (micascheme)
@@ -10,7 +10,7 @@
     (micac sdl)
     (micac run))
 
-  (micac-externs clock video pixels pixels-size width height init update)
+  (micac-externs clock video pixels pixel-count pixels-size width height init update)
 
   (micac-macro
     (emu
