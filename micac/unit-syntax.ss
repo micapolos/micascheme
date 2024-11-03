@@ -24,7 +24,7 @@
       ((* type n)
         #`(*
           #,(transform-type #'type)
-          #,(size->number #'n)))))
+          #,(bitwise-arithmetic-shift-left 1 (size->number #'n))))))
 
   (define (size->uint-type $size)
     (lets
