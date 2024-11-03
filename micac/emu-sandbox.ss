@@ -13,7 +13,7 @@
     (var int frame-counter 0)
     (var uint8_t pixel))
   (update
-    (set* pixel-ref pixel)
+    (set (pixel-ref *) pixel)
     (inc pixel-ref)
     (inc pixel)
     (dec pixel-counter)
