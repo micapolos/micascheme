@@ -18,12 +18,10 @@
   (var int frame-counter 0)
   (sdl-event-loop
     (begin
-      (var int count pixels-size)
       (var uint8_t (* pixel-ref) pixels)
       (var uint8_t value (* frame-counter 8))
-      (while count
+      (repeat-times pixels-size
         (set (pixel-ref *) value)
-        (sub count 1)
         (add value 1)
         (add pixel-ref 1)))
     (add frame-counter 1)
