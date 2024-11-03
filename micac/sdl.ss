@@ -1,9 +1,9 @@
 (library (micac sdl)
   (export
     sdl-init
-    sdl-create-window
-    sdl-create-renderer
-    sdl-create-texture
+    sdl-window
+    sdl-renderer
+    sdl-texture
     sdl-update-texture
     sdl-event-loop
     sdl-set-render-draw-color
@@ -45,21 +45,21 @@
       (print-sdl-error "Could not initialize."))
     (defer (SDL_Quit)))
 
-  (micac-macro (sdl-create-window window title width height)
+  (micac-macro (sdl-window window title width height)
     (var SDL_Window (* window)
       (SDL_CreateWindow title SDL_WINDOWPOS_UNDEFINED SDL_WINDOWPOS_UNDEFINED width height 0))
     (break-if (not window)
       (print-sdl-error "Could not create window."))
     (defer (SDL_DestroyWindow window)))
 
-  (micac-macro (sdl-create-renderer renderer window)
+  (micac-macro (sdl-renderer renderer window)
     (var SDL_Renderer (* renderer)
       (SDL_CreateRenderer window -1 (bitwise-ior SDL_RENDERER_ACCELERATED SDL_RENDERER_PRESENTVSYNC)))
     (break-if (not renderer)
       (print-sdl-error "Could not create renderer."))
     (defer (SDL_DestroyRenderer renderer)))
 
-  (micac-macro (sdl-create-texture texture renderer format access width height)
+  (micac-macro (sdl-texture texture renderer format access width height)
     (var SDL_Texture (* texture)
       (SDL_CreateTexture renderer format access width height))
     (break-if (not texture)

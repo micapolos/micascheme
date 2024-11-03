@@ -10,12 +10,12 @@
   (const int pixels-pitch (* width bits-per-pixel))
 
   (sdl-init)
-  (sdl-create-window window "My window" (* width window-scale) (* height window-scale))
-  (sdl-create-renderer renderer window)
-  (sdl-create-texture texture renderer SDL_PIXELFORMAT_BGRA8888 SDL_TEXTUREACCESS_STREAMING width height)
+  (sdl-window window "My window" (* width window-scale) (* height window-scale))
+  (sdl-renderer renderer window)
+  (sdl-texture texture renderer SDL_PIXELFORMAT_BGRA8888 SDL_TEXTUREACCESS_STREAMING width height)
 
   (var int scroll 0)
-  (alloc uint8_t pixels pixels-size)
+  (array uint8_t pixels pixels-size)
 
   (sdl-event-loop
     (begin
