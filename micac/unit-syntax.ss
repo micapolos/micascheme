@@ -18,13 +18,15 @@
   (define (transform-type $type)
     (syntax-case $type (bit *)
       (bit
-        #'uint8_t)
-      ((* bit n)
-        (size->uint-type #'n))
-      ((* type n)
-        #`(*
-          #,(transform-type #'type)
-          #,(bitwise-arithmetic-shift-left 1 (size->number #'n))))))
+        (transform-type #'(* bit 1)))
+      ((* bit n ns ...)
+        (fold-left
+          (lambda ($type $n)
+            #`(*
+              #,$type
+              #,(bitwise-arithmetic-shift-left 1 (size->number $n))))
+          (size->uint-type #'n)
+          (syntax->list #'(ns ...))))))
 
   (define (size->uint-type $size)
     (lets
