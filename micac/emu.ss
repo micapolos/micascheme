@@ -34,7 +34,7 @@
       (alloc pixels uint8_t pixels-size)
       init-body ...
       (sdl-event-loop
-        (repeat-times frame-cycles update-body ...)
+        (repeat frame-cycles update-body ...)
         (sdl-update-texture texture 0 pixels pixels-pitch)
         (sdl-render-copy renderer texture 0 0)
         (sdl-render-present renderer))))

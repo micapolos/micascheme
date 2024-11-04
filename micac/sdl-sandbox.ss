@@ -24,7 +24,7 @@
       (begin
         (var uint8_t (* pixel-ref) pixels)
         (var uint8_t value (* frame-counter 8))
-        (repeat-times pixels-size
+        (repeat pixels-size
           (set (pixel-ref *) value)
           (add pixel-ref 1)
           (add value 1)))

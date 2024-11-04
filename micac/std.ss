@@ -1,5 +1,5 @@
 (library (micac std)
-  (export sizeof alloc repeat-times inc dec on printf)
+  (export sizeof alloc repeat inc dec on printf)
   (import (micac))
 
   (micac
@@ -10,7 +10,7 @@
       (break-if (= id 0) (printf "Could not allocate memory\\n"))
       (defer (free id)))
 
-    (macro (repeat-times count body ...)
+    (macro (repeat count body ...)
       (begin
         (var int counter count)
         (while counter
