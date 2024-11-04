@@ -270,24 +270,29 @@
 
 (check (equal? (syntax-c $lookup #`(set x (ref y))) (lines-string "x = y;")))
 (check (equal? (syntax-c $lookup #`(set x (ref y z))) (lines-string "x = y.z;")))
-(check (equal? (syntax-c $lookup #`(set x (ref y 10))) (lines-string "x = y[10];")))
-(check (equal? (syntax-c $lookup #`(set x (ref y (+ a b)))) (lines-string "x = y[a + b];")))
+(check (equal? (syntax-c $lookup #`(set x (ref y (10)))) (lines-string "x = y[10];")))
+(check (equal? (syntax-c $lookup #`(set x (ref y ((+ a b))))) (lines-string "x = y[a + b];")))
 (check (equal? (syntax-c $lookup #`(set x (ref y *))) (lines-string "x = *y;")))
-(check (equal? (syntax-c $lookup #`(set x (ref y a b 10 *))) (lines-string "x = *y.a.b[10];")))
+(check (equal? (syntax-c $lookup #`(set x (ref y a b (10) *))) (lines-string "x = *y.a.b[10];")))
 
 (check (equal? (syntax-c $lookup #`(set x (&ref y))) (lines-string "x = &y;")))
 (check (equal? (syntax-c $lookup #`(set x (&ref y z))) (lines-string "x = &y.z;")))
-(check (equal? (syntax-c $lookup #`(set x (&ref y 10))) (lines-string "x = &y[10];")))
-(check (equal? (syntax-c $lookup #`(set x (&ref y (+ a b)))) (lines-string "x = &y[a + b];")))
+(check (equal? (syntax-c $lookup #`(set x (&ref y (10)))) (lines-string "x = &y[10];")))
+(check (equal? (syntax-c $lookup #`(set x (&ref y ((+ a b))))) (lines-string "x = &y[a + b];")))
 (check (equal? (syntax-c $lookup #`(set x (&ref y *))) (lines-string "x = &*y;")))
-(check (equal? (syntax-c $lookup #`(set x (&ref y a b 10 *))) (lines-string "x = &*y.a.b[10];")))
+(check (equal? (syntax-c $lookup #`(set x (&ref y a b (10) *))) (lines-string "x = &*y.a.b[10];")))
 
 (check (equal? (syntax-c $lookup #`(set (x) z)) (lines-string "x = z;")))
 (check (equal? (syntax-c $lookup #`(set (x y) z)) (lines-string "x.y = z;")))
-(check (equal? (syntax-c $lookup #`(set (x 10) z)) (lines-string "x[10] = z;")))
-(check (equal? (syntax-c $lookup #`(set (x (+ a b)) z)) (lines-string "x[a + b] = z;")))
+(check (equal? (syntax-c $lookup #`(set (x (10)) z)) (lines-string "x[10] = z;")))
+(check (equal? (syntax-c $lookup #`(set (x ((+ a b))) z)) (lines-string "x[a + b] = z;")))
 (check (equal? (syntax-c $lookup #`(set (x *) z)) (lines-string "*x = z;")))
-(check (equal? (syntax-c $lookup #`(set (x y a b 10 *) z)) (lines-string "*x.y.a.b[10] = z;")))
+(check (equal? (syntax-c $lookup #`(set (x y a b (10) *) z)) (lines-string "*x.y.a.b[10] = z;")))
+
+(check
+  (equal?
+    (syntax-c $lookup #`(set a (? x y z)))
+    (lines-string "a = x ? y : z;")))
 
 (check
   (equal?

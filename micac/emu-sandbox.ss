@@ -21,6 +21,9 @@
 
     (var int frame-counter 0)
 
+    (var int bits)
+    (var int attr)
+
     (var char (* filename) "/Users/micapolos/git/micascheme/micac/RoboCop.scr")
     (sdl-file-data data data-size filename)
     (printf "Loaded file: '%s', size: %zu\\n" filename data-size))
@@ -33,9 +36,47 @@
 
       (if screen?
         (then
-          (set red (- frame-counter h-counter))
-          (set green (- frame-counter v-counter))
-          (set blue (+ frame-counter (bitwise-arithmetic-shift-right (* h-counter v-counter) 6))))
+          (const int x (- h-counter border))
+          (const int y (- v-counter border))
+          (const bool read? (zero? (bitwise-and x #x07)))
+          (when read?
+            (const int h-addr (bitwise-and (>> x 3) #x1f))
+
+            (const int bits-addr
+              (bitwise-ior h-addr
+                (<<
+                  (bitwise-ior
+                    (bitwise-and y #xc0)
+                    (<< (bitwise-and y #x07) 3)
+                    (>> (bitwise-and y #x38) 3))
+                  5)))
+            (const int load-addr (<< frame-counter 2))
+            (const bool bits? (> (>> bits-addr 3) load-addr))
+            (set bits (? bits? #xff (ref data (bits-addr))))
+
+            (const int attr-addr (bitwise-ior #x1800 h-addr (<< (>> y 3) 5)))
+            (const bool attr? (> (>> attr-addr 3) load-addr))
+            (set attr (? attr? #x07 (ref data (attr-addr)))))
+
+          (const bool pixel-on? (not (zero? (bitwise-and bits #x80))))
+          (set bits (<< bits 1))
+
+          (const bool flash-on? (not (zero? (bitwise-and attr #x80))))
+          (const bool alternate-on? (not (zero? (bitwise-and frame-counter #x10))))
+          (const bool ink-on? (? (and flash-on? alternate-on?) (not pixel-on?) pixel-on?))
+          (const bool red? (not (zero? (bitwise-and attr (? ink-on? #x02 #x10)))))
+          (const bool green? (not (zero? (bitwise-and attr (? ink-on? #x04 #x10)))))
+          (const bool blue? (not (zero? (bitwise-and attr (? ink-on? #x01 #x08)))))
+          (const bool bright? (not (zero? (bitwise-and attr #x40))))
+          (const int color (? bright? #xFF #xBB))
+
+          (set red (? red? color 0))
+          (set green (? green? color 0))
+          (set blue (? blue? color 0)))
+
+          ; (set red (- frame-counter h-counter))
+          ; (set green (- frame-counter v-counter))
+          ; (set blue (+ frame-counter (bitwise-arithmetic-shift-right (* h-counter v-counter) 6))))
         (else
           (set red bg-red)
           (set green bg-green)

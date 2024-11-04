@@ -81,7 +81,7 @@
 
     (macro (sdl-rw-ops-data data size rw-ops)
       (var size_t size)
-      (var void (* data) (SDL_LoadFile_RW rw-ops (&ref size) 0))
+      (var uint8_t (* data) (SDL_LoadFile_RW rw-ops (&ref size) 0))
       (break-if (not data)
         (print-sdl-error "Could not open file."))
       (defer (free data)))

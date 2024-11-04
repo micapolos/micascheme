@@ -232,7 +232,7 @@
       (cast = > >= < <= + - * /
         and or bitwise-and bitwise-ior bitwise-xor
         bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
-        neg not inv ref &ref)
+        neg not inv ref &ref ?)
       ((cast type rhs)
         (expr 2 #f
           (code
@@ -330,6 +330,14 @@
         (ref->expr $lookup #'(var x ...)))
       ((&ref var x ...)
         (expr 2 #f (code "&" (expr-code (ref->expr $lookup #'(var x ...))))))
+      ((? cond true false)
+        (expr 13 #f
+          (code
+            (expr-operand-code (syntax->expr $lookup #'cond) 13 #f)
+            " ? "
+            (expr-code (syntax->expr $lookup #'true))
+            " : "
+            (expr-operand-code (syntax->expr $lookup #'false) 13 #t))))
       ((id arg ...)
         (and (identifier? #'id) ($lookup #'id #'micac-key))
         (syntax->expr $lookup
@@ -361,7 +369,7 @@
                 (prefix-expr 2 #f "*" $expr))
               (id (identifier? #'id)
                 (binary-expr 1 #t $expr "." (variable->expr #'id)))
-              (expr
+              ((expr)
                 (parenthesized-expr 1 #t $expr "[" (syntax->expr $lookup #'expr) "]"))))
           (variable->expr #'var)
           (syntax->list #'(x ...))))))
