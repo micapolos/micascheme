@@ -1,6 +1,6 @@
 (library (micac emu)
   (export
-    emu clock video
+    emu video
     width height h-counter v-counter
     red green blue
     init update
@@ -14,20 +14,16 @@
 
   (micac
     (externs
-      clock
       video width height h-counter v-counter
       red green blue
       init update)
 
     (macro
       (emu
-        (clock hz-expr)
         (video width-expr height-expr h-blank-expr v-blank-expr cycles-per-pixel-expr)
         (init init-body ...)
         (update update-body ...))
       (literals video init update)
-      (const int hz hz-expr)
-      (const int frame-cycles (/ hz 60))
       (const int width width-expr)
       (const int height height-expr)
       (const int h-blank h-blank-expr)
@@ -35,6 +31,7 @@
       (const int h-size (+ width h-blank))
       (const int v-size (+ height v-blank))
       (const int cycles-per-pixel cycles-per-pixel-expr)
+      (const int frame-cycles (* h-size v-size cycles-per-pixel))
       (const int window-scale 2)
 
       (var int h-counter 0)

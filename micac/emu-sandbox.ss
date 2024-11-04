@@ -5,7 +5,6 @@
   (micac sdl))
 
 (run-emu
-  (clock (* 448 312 60 4)) ; h-count v-count fps cycles-per-pixel
   (video 352 288 96 24 4) ; width height h-blank v-blank cycles-per-pixel
   (init
     (const bool ula? #t)
