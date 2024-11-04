@@ -49,7 +49,7 @@
               (symbol->string
                 (syntax->datum $identifier))))
           (case $char
-            ((#\-) #\_)
+            ((#\- #\?) #\_)
             (else $char))))))
 
   (define (literal->expr $literal)
@@ -58,6 +58,8 @@
         (expr 0 #t (string-code (number->string $fixnum))))
       ((string? $string)
         (expr 0 #t (code "\"" (string-code $string) "\"")))
+      ((boolean? $boolean)
+        (expr 0 #t (string-code (if $boolean "true" "false"))))
       ((else $other)
         (syntax-error $literal "not literal"))))
 
