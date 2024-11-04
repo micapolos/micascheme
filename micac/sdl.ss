@@ -9,7 +9,8 @@
     sdl-set-render-draw-color
     sdl-render-clear
     sdl-render-copy
-    sdl-render-present)
+    sdl-render-present
+    sdl-file-data)
   (import (micac) (micac std))
 
   (micac
@@ -30,6 +31,10 @@
       SDL_RenderPresent
       SDL_RenderCopy
       SDL_PollEvent
+      SDL_RWFromFile
+      SDL_RWclose
+      SDL_LoadFile_RW
+      free
       SDL_INIT_VIDEO
       SDL_QUIT
       SDL_WINDOWPOS_UNDEFINED
@@ -66,6 +71,24 @@
       (break-if (not texture)
         (print-sdl-error "Could not create texture."))
       (defer (SDL_DestroyTexture texture)))
+
+    (macro (sdl-rw-ops rw-ops filename)
+      (var SDL_RWops (* rw-ops)
+        (SDL_RWFromFile filename "rb"))
+      (break-if (not rw-ops)
+        (print-sdl-error "Could not open file."))
+      (defer (SDL_RWclose rw-ops)))
+
+    (macro (sdl-rw-ops-data data size rw-ops)
+      (var size_t size)
+      (var void (* data) (SDL_LoadFile_RW rw-ops (&ref size) 0))
+      (break-if (not data)
+        (print-sdl-error "Could not open file."))
+      (defer (free data)))
+
+    (macro (sdl-file-data data size filename)
+      (sdl-rw-ops rw-ops filename)
+      (sdl-rw-ops-data data size rw-ops))
 
     (macro (sdl-update-texture texture rect pixels pitch)
       (break-if (not (= (SDL_UpdateTexture texture rect pixels pitch) 0))

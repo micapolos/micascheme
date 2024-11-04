@@ -1,7 +1,8 @@
 (import
   (micac)
   (micac std)
-  (micac emu))
+  (micac emu)
+  (micac sdl))
 
 (run-emu
   (clock (* 448 312 60 4)) ; h-count v-count fps cycles-per-pixel
@@ -18,7 +19,11 @@
     (var uint8_t bg-green #xff)
     (var uint8_t bg-blue 0)
 
-    (var int frame-counter 0))
+    (var int frame-counter 0)
+
+    (var char (* filename) "/Users/micapolos/git/micascheme/micac/RoboCop.scr")
+    (sdl-file-data data data-size filename)
+    (printf "Loaded file: '%s', size: %zu\\n" filename data-size))
   (update
     (when (zero? pixel-cycle-counter)
       (const bool screen?
