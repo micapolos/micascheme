@@ -6,7 +6,8 @@
     set-and set-or
     set-bitwise-and set-bitwise-ior set-bitwise-xor
     set-bitwise-arithmetic-shift-left set-bitwise-arithmetic-shift-right
-    ref &ref add sub shl shr while defer break-if cast)
+    ref &ref
+    while defer break-if cast)
   (import (micascheme))
 
   (define-aux-keywords
@@ -16,5 +17,6 @@
     set-and set-or
     set-bitwise-and set-bitwise-ior set-bitwise-xor
     set-bitwise-arithmetic-shift-left set-bitwise-arithmetic-shift-right
-    ref &ref add sub shl shr while defer break-if cast)
+    ref &ref
+    while defer break-if cast)
 )
