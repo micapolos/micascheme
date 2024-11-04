@@ -23,8 +23,8 @@
     (when (zero? pixel-cycle-counter)
       (const bool screen?
         (and
-          (> h-counter border) (<= h-counter (+ border h-screen))
-          (> v-counter border) (<= v-counter (+ border v-screen))))
+          (in-range? h-counter border (+ border h-screen))
+          (in-range? v-counter border (+ border v-screen))))
 
       (if screen?
         (then

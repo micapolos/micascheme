@@ -1,5 +1,5 @@
 (library (micac std)
-  (export sizeof alloc repeat inc dec printf zero?)
+  (export sizeof alloc repeat inc dec printf zero? in-range?)
   (import (micac))
 
   (micac
@@ -20,4 +20,7 @@
           body ...
           (dec counter))))
 
-    (macro (zero? x) (= x 0))))
+    (macro (zero? x) (= x 0))
+
+    (macro (in-range? x min max)
+      (and (>= x min) (< x max)))))
