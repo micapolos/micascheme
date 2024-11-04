@@ -1,10 +1,12 @@
 (library (micac emu)
   (export
-    emu clock video pixels pixel-count pixels-size width height init update)
+    emu clock video pixels pixel-count pixels-size width height init update
+    run-emu)
   (import
     (micac)
     (micac std)
-    (micac sdl))
+    (micac sdl)
+    (syntax))
 
   (micac
     (externs clock video pixels pixel-count pixels-size width height init update)
@@ -38,4 +40,7 @@
         (sdl-update-texture texture 0 pixels pixels-pitch)
         (sdl-render-copy renderer texture 0 0)
         (sdl-render-present renderer))))
+
+  (define-rule-syntax (run-emu body ...)
+    (micac (run (emu body ...))))
 )
