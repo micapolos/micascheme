@@ -30,7 +30,9 @@
     (var bool h-screen? #t)
     (var bool v-screen? #t)
     (var bool h-pixel? #t)
-    (var bool v-pixel? #t))
+    (var bool v-pixel? #t)
+
+    (var int frame-counter 0))
 
   (update
     (begin
@@ -41,9 +43,9 @@
       (const bool screen? (and h-screen? v-screen?))
       (if screen?
         (begin
-          (set red #xc0)
-          (set green #xc0)
-          (set blue #xc0))
+          (set red (- frame-counter h-counter))
+          (set green (- frame-counter v-counter))
+          (set blue (+ frame-counter (* h-counter v-counter))))
         (begin
           (set red bg-red)
           (set green bg-green)
@@ -74,7 +76,8 @@
       (set h-counter 0)
       (inc v-counter)
       (when (= v-counter v-size)
-        (set v-counter 0)))
+        (set v-counter 0)
+        (inc frame-counter)))
 
     (begin
       (const bool h-screen-start? (= h-counter 0))
