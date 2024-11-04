@@ -76,12 +76,12 @@
         (print-sdl-error "Could not render copy.")))
 
     (macro (sdl-event-loop body ...)
-      (var bool running true)
+      (var bool running #t)
       (var SDL_Event event)
       (while running
         (while (SDL_PollEvent (&ref event))
           (when (= (ref event type) SDL_QUIT)
-            (set running false)))
+            (set running #f)))
         (begin body ...)))
 
     (macro (sdl-set-render-draw-color renderer red green blue alpha)
