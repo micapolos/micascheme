@@ -31,13 +31,13 @@
         (inc pixel-ref)
 
         (dec bar-counter)
-        (on (= bar-counter 0)
+        (when (= bar-counter 0)
           (set bar-counter bar-size)
           (set red (inv red))
           (set green (inv green))
           (set blue (inv blue)))
 
         (dec pixel-counter)
-        (on (= pixel-counter 0)
+        (when (= pixel-counter 0)
           (set pixel-ref pixels)
           (set pixel-counter pixel-count))))))
