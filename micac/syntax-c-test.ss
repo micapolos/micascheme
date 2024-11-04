@@ -6,7 +6,7 @@
   (lambda ($id $key)
     (and
       (free-identifier=? $id #'macro)
-      (free-identifier=? $key #'micac)
+      (free-identifier=? $key #'micac-key)
       (lambda ($syntax)
         (syntax-case $syntax ()
           ((_ arg ...)

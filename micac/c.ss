@@ -9,7 +9,7 @@
   (export (import (micac syntax)))
 
   (define-rule-syntax (define-micac-property id transformer)
-    (define-property id micac transformer))
+    (define-property id micac-key transformer))
 
   (define-rule-syntax (micac-externs id ...)
     (define-aux-keywords id ...))

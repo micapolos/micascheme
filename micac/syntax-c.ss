@@ -1,12 +1,14 @@
 (library (micac syntax-c)
   (export
-    syntax-c)
+    syntax-c micac-key)
   (import
     (micascheme)
     (code)
     (micac syntax))
 
   (data (expr priority left-to-right? code))
+
+  (define-aux-keyword micac-key)
 
   (define (expr-operand-code $expr $priority $right?)
     (if
@@ -122,11 +124,11 @@
             (begin break-body ...)
             (begin body ...))))
       (((id arg ...) body ...)
-        (and (identifier? #'id) ($lookup #'id #'micac))
+        (and (identifier? #'id) ($lookup #'id #'micac-key))
         (code+instrs $lookup $code
           #`(
             #,@(begin-syntaxes
-              (($lookup #'id #'micac) #`(id arg ...)))
+              (($lookup #'id #'micac-key) #`(id arg ...)))
             body ...)))
       ((other body ...)
         (code+instrs $lookup
@@ -215,11 +217,11 @@
         (code+op2 $lookup $code
           #'lhs (op2->string-opt #'op2) #'expr))
       ((id arg ...)
-        (and (identifier? #'id) ($lookup #'id #'micac))
+        (and (identifier? #'id) ($lookup #'id #'micac-key))
         (code+instrs $lookup $code
           #`(
             #,@(begin-syntaxes
-              (($lookup #'id #'micac) $syntax)))))
+              (($lookup #'id #'micac-key) $syntax)))))
       ((id arg ...)
         (identifier? #'id)
         (code $code
@@ -346,9 +348,9 @@
       ((&ref var x ...)
         (expr 2 #f (code "&" (expr-code (ref->expr $lookup #'(var x ...))))))
       ((id arg ...)
-        (and (identifier? #'id) ($lookup #'id #'micac))
+        (and (identifier? #'id) ($lookup #'id #'micac-key))
         (syntax->expr $lookup
-          (($lookup #'id #'micac) $syntax)))
+          (($lookup #'id #'micac-key) $syntax)))
       ((id arg ...)
         (identifier? #'id)
         (paren-expr 1 #t
@@ -390,12 +392,6 @@
       (syntax->expr $lookup $lhs)
       $op
       (syntax->expr $lookup $rhs)))
-
-  (define (paren->expr $lookup $priority $left-to-right? $lparen $expr $rparen)
-    (paren-expr $priority $left-to-right?
-      $lparen
-      (syntax->expr $lookup $expr)
-      $rparen))
 
   (define (syntax-c $lookup . $syntaxes)
     (code-string
