@@ -25,9 +25,7 @@
     (var int bits)
     (var int attr)
 
-    (var char (* filename) "/Users/micapolos/git/micascheme/micac/RoboCop.scr")
-    (sdl-file-data data data-size filename)
-    (printf "Loaded file: '%s', size: %zu\\n" filename data-size))
+    (sdl-file-data data data-size "/Users/micapolos/git/micascheme/micac/RoboCop.scr"))
   (update
     (when (zero? pixel-cycle-counter)
       (const bool screen?
