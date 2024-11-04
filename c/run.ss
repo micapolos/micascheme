@@ -16,7 +16,7 @@
             (format "gcc /tmp/main.c -O3 -o /tmp/main~a"
               $libs-string))
           (run
-            (display $string)
+            ;(display $string)
             (echo "code-gen /tmp/main.c")
             (call-with-output-file "/tmp/main.c"
               (lambda ($port)
@@ -29,7 +29,8 @@
             $value)))))
 
   (define (echo $string)
-    (displayln (string-append "% " $string)))
+    (void))
+    ;(displayln (string-append "% " $string)))
 
   (define (echo-system $string)
     (run

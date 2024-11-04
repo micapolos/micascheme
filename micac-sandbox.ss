@@ -1,5 +1,4 @@
-(import
-  (micac lang))
+(import (micac))
 
 (micac
   (externs printf)
@@ -9,4 +8,4 @@
   (run
     (var int x 10)
     (add x (plusik 20 30))
-    (printf "Hello\\n")))
+    (printf "Hello, %i worlds!\\n" x)))

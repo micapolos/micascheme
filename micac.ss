@@ -1,4 +1,4 @@
-(library (micac lang)
+(library (micac)
   (export micac run externs macro)
   (import
     (scheme)

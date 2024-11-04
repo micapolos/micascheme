@@ -28,6 +28,7 @@
   (lets)
   (list)
   (list-syntax)
+  (micac)
   (micascheme)
   (mico-c)
   (monad)
