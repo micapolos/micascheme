@@ -7,7 +7,7 @@
         #`(begin
           #,@(map-with
             ($x (syntax->list #'(xs ...)))
-            #`(add var #,$x)))))))
+            #`(set+ var #,$x)))))))
 
 (define-micac-syntax sum
   (lambda ($syntax)

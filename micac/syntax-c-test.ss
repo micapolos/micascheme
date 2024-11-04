@@ -69,52 +69,18 @@
       "{"
       "}")))
 
-(check
-  (equal?
-    (syntax-c $lookup #`(set x 10))
-    (lines-string "x = 10;")))
-
-(check
-  (equal?
-    (syntax-c $lookup
-      #`(begin
-        (var int x)
-        (set x 10)))
-    (lines-string
-      "{"
-      "  int x;"
-      "  x = 10;"
-      "}")))
-
-(check
-  (equal?
-    (syntax-c $lookup
-      #`(var int x)
-      #`(add x 10))
-    (lines-string
-      "int x;"
-      "x += 10;")))
-
-(check
-  (equal?
-    (syntax-c $lookup
-      #`(set x 10)
-      #`(add x 20)
-      #`(sub x 30)
-      #`(and x 40)
-      #`(or x 50)
-      #`(xor x 60)
-      #`(shl x 3)
-      #`(shr x 3))
-    (lines-string
-      "x = 10;"
-      "x += 20;"
-      "x -= 30;"
-      "x &= 40;"
-      "x |= 50;"
-      "x ^= 60;"
-      "x <<= 3;"
-      "x >>= 3;")))
+(check (equal? (syntax-c $lookup #`(set x 10)) (lines-string "x = 10;")))
+(check (equal? (syntax-c $lookup #`(set+ x 10)) (lines-string "x += 10;")))
+(check (equal? (syntax-c $lookup #`(set- x 10)) (lines-string "x -= 10;")))
+(check (equal? (syntax-c $lookup #`(set* x 10)) (lines-string "x *= 10;")))
+(check (equal? (syntax-c $lookup #`(set/ x 10)) (lines-string "x /= 10;")))
+(check (equal? (syntax-c $lookup #`(set-and x 10)) (lines-string "x &&= 10;")))
+(check (equal? (syntax-c $lookup #`(set-or x 10)) (lines-string "x ||= 10;")))
+(check (equal? (syntax-c $lookup #`(set-bitwise-and x 10)) (lines-string "x &= 10;")))
+(check (equal? (syntax-c $lookup #`(set-bitwise-ior x 10)) (lines-string "x |= 10;")))
+(check (equal? (syntax-c $lookup #`(set-bitwise-xor x 10)) (lines-string "x ^= 10;")))
+(check (equal? (syntax-c $lookup #`(set-bitwise-arithmetic-shift-left x 10)) (lines-string "x <<= 10;")))
+(check (equal? (syntax-c $lookup #`(set-bitwise-arithmetic-shift-right x 10)) (lines-string "x >>= 10;")))
 
 (check
   (equal?
@@ -350,8 +316,8 @@
   (equal?
     (syntax-c $lookup
       #`(while x
-          (add x 1)
-          (add x 2)))
+          (set+ x 1)
+          (set+ x 2)))
     (lines-string
       "while (x) {"
       "  x += 1;"
@@ -361,7 +327,7 @@
 (check
   (equal?
     (syntax-c $lookup
-      #`(add x (bitwise-and (- (+ x 10) 20) #xff)))
+      #`(set+ x (bitwise-and (- (+ x 10) 20) #xff)))
     (lines-string
       "x += x + 10 - 20 & 255;")))
 

@@ -141,15 +141,24 @@
       (other #'(begin other))))
 
   (define (op2->string-opt $op)
-    (syntax-case $op (set add sub and or xor shl shr)
+    (syntax-case $op
+      (set
+        set+ set- set* set/
+        set-and set-or
+        set-bitwise-and set-bitwise-ior set-bitwise-xor
+        set-bitwise-arithmetic-shift-left set-bitwise-arithmetic-shift-right)
       (set "=")
-      (add "+=")
-      (sub "-=")
-      (and "&=")
-      (or "|=")
-      (xor "^=")
-      (shl "<<=")
-      (shr ">>=")
+      (set+ "+=")
+      (set- "-=")
+      (set* "*=")
+      (set/ "/=")
+      (set-and "&&=")
+      (set-or "||=")
+      (set-bitwise-and "&=")
+      (set-bitwise-ior "|=")
+      (set-bitwise-xor "^=")
+      (set-bitwise-arithmetic-shift-left "<<=")
+      (set-bitwise-arithmetic-shift-right ">>=")
       (_ #f)))
 
   (define (code+instr $lookup $code $syntax)
