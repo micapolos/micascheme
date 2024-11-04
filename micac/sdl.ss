@@ -80,7 +80,7 @@
       (var SDL_Event event)
       (while running
         (while (SDL_PollEvent (&ref event))
-          (if (= (ref event type) SDL_QUIT)
+          (when (= (ref event type) SDL_QUIT)
             (set running false)))
         (begin body ...)))
 

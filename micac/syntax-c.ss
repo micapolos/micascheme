@@ -91,8 +91,8 @@
       (((break-if expr break-body ...) body ...)
         (code+instr $lookup $code
           #`(if expr
-            (begin break-body ...)
-            (begin body ...))))
+            (then break-body ...)
+            (else body ...))))
       (((id arg ...) body ...)
         (and (identifier? #'id) ($lookup #'id #'micac-key))
         (code+instrs $lookup $code
@@ -132,7 +132,7 @@
       (_ #f)))
 
   (define (code+instr $lookup $code $syntax)
-    (syntax-case $syntax (begin var const if while)
+    (syntax-case $syntax (begin var const if when while then else)
       ((begin instr ...)
         (code $code
           (code-in-curly-brackets
@@ -163,26 +163,26 @@
             "="
             (expr-code (syntax->expr $lookup #'expr)))
           ";\n"))
-      ((if expr then-instr)
+      ((if expr (then then-body ...) (else else-body ...))
         (code $code
           (space-separated-code
             "if"
             (code-in-round-brackets
               (expr-code (syntax->expr $lookup #'expr)))
             (code+instr $lookup empty-code
-              (instr->begin #'then-instr)))))
-      ((if expr then-instr else-instr)
-        (code $code
-          (space-separated-code
-            "if"
-            (code-in-round-brackets
-              (expr-code (syntax->expr $lookup #'expr)))
-            (code+instr $lookup empty-code
-              (instr->begin #'then-instr)))
+              (instr->begin #'(begin then-body ...))))
           (space-separated-code
             "else"
             (code+instr $lookup empty-code
-              (instr->begin #'else-instr)))))
+              (instr->begin #'(begin else-body ...))))))
+      ((when expr body ...)
+        (code $code
+          (space-separated-code
+            "if"
+            (code-in-round-brackets
+              (expr-code (syntax->expr $lookup #'expr)))
+            (code+instr $lookup empty-code
+              (instr->begin #'(begin body ...))))))
       ((while expr instr ...)
         (code $code
           (space-separated-code

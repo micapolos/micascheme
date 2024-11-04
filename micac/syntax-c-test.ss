@@ -268,15 +268,6 @@
     (syntax-c $lookup #`(set x (+ a (* b c))))
     (lines-string "x = a + b * c;")))
 
-(check
-  (equal?
-    (syntax-c $lookup
-      #`(if x (set x 10)))
-    (lines-string
-      "if (x) {"
-      "  x = 10;"
-      "}")))
-
 (check (equal? (syntax-c $lookup #`(set x (ref y))) (lines-string "x = y;")))
 (check (equal? (syntax-c $lookup #`(set x (ref y z))) (lines-string "x = y.z;")))
 (check (equal? (syntax-c $lookup #`(set x (ref y 10))) (lines-string "x = y[10];")))
@@ -302,14 +293,20 @@
   (equal?
     (syntax-c $lookup
       #`(if x
-        (set x 10)
-        (set x 20)))
+        (then
+          (set x 10)
+          (set x 20))
+        (else
+          (set x 30)
+          (set x 40))))
     (lines-string
       "if (x) {"
       "  x = 10;"
+      "  x = 20;"
       "}"
       "else {"
-      "  x = 20;"
+      "  x = 30;"
+      "  x = 40;"
       "}")))
 
 (check

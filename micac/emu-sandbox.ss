@@ -20,28 +20,27 @@
 
     (var int frame-counter 0))
   (update
-    (begin
-      (when (zero? pixel-cycle-counter)
-        (const bool screen?
-          (and
-            (> h-counter border) (<= h-counter (+ border h-screen))
-            (> v-counter border) (<= v-counter (+ border v-screen))))
-        (if screen?
-          (begin
-            (set red (- frame-counter h-counter))
-            (set green (- frame-counter v-counter))
-            (set blue (+ frame-counter (bitwise-arithmetic-shift-right (* h-counter v-counter) 6))))
-          (begin
-            (set red bg-red)
-            (set green bg-green)
-            (set blue bg-blue)))
+    (when (zero? pixel-cycle-counter)
+      (const bool screen?
+        (and
+          (> h-counter border) (<= h-counter (+ border h-screen))
+          (> v-counter border) (<= v-counter (+ border v-screen))))
+      (if screen?
+        (then
+          (set red (- frame-counter h-counter))
+          (set green (- frame-counter v-counter))
+          (set blue (+ frame-counter (bitwise-arithmetic-shift-right (* h-counter v-counter) 6))))
+        (else
+          (set red bg-red)
+          (set green bg-green)
+          (set blue bg-blue)))
 
-        (inc bar-counter)
-        (when (= bar-counter bar-size)
-          (set bar-counter 0)
-          (set bg-red (inv bg-red))
-          (set bg-green (inv bg-green))
-          (set bg-blue (inv bg-blue)))
+      (inc bar-counter)
+      (when (= bar-counter bar-size)
+        (set bar-counter 0)
+        (set bg-red (inv bg-red))
+        (set bg-green (inv bg-green))
+        (set bg-blue (inv bg-blue)))
 
-        (when (and (= h-counter 0) (= v-counter 0))
-          (inc frame-counter))))))
+      (when (and (= h-counter 0) (= v-counter 0))
+        (inc frame-counter)))))

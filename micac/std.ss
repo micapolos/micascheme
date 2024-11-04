@@ -1,5 +1,5 @@
 (library (micac std)
-  (export sizeof alloc repeat inc dec when printf zero?)
+  (export sizeof alloc repeat inc dec printf zero?)
   (import (micac))
 
   (micac
@@ -19,8 +19,5 @@
         (while counter
           body ...
           (dec counter))))
-
-    (macro (when expr body ...)
-      (if expr (begin body ...)))
 
     (macro (zero? x) (= x 0))))
