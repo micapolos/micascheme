@@ -7,7 +7,7 @@
 
     (macro (alloc id type size)
       (var type (* id) (cast (* type) (malloc (* size (sizeof type)))))
-      (break-if (= id 0) (printf "Could not allocate memory\\n"))
+      (break-if (= id 0) (printf "Could not allocate memory.\\n"))
       (defer (free id)))
 
     (macro (repeat count body ...)
