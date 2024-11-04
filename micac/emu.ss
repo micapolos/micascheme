@@ -1,6 +1,9 @@
 (library (micac emu)
   (export
-    emu clock video pixels pixel-count pixels-size width height init update
+    emu clock video
+    width height h-counter v-counter
+    red green blue
+    init update
     run-emu)
   (import
     (micac)
@@ -10,12 +13,16 @@
     (identifier))
 
   (micac
-    (externs clock video pixels pixel-count pixels-size width height init update)
+    (externs
+      clock
+      video width height h-counter v-counter
+      red green blue
+      init update)
 
     (macro
       (emu
         (clock hz-expr)
-        (video width-expr height-expr)
+        (video width-expr height-expr h-blank-expr v-blank-expr cycles-per-pixel-expr)
         (init init-body ...)
         (update update-body ...))
       (literals video init update)
@@ -23,21 +30,69 @@
       (const int frame-cycles (/ hz 60))
       (const int width width-expr)
       (const int height height-expr)
+      (const int h-blank h-blank-expr)
+      (const int v-blank v-blank-expr)
+      (const int h-size (+ width h-blank))
+      (const int v-size (+ height v-blank))
+      (const int cycles-per-pixel cycles-per-pixel-expr)
       (const int window-scale 2)
-      (const int pixel-count (* width height))
-      (const int bits-per-pixel 4)
-      (const int pixels-size (* pixel-count bits-per-pixel))
-      (const int pixels-pitch (* width bits-per-pixel))
+
+      (var int h-counter 0)
+      (var int v-counter 0)
+      (var int pixel-cycle-counter 0)
+
+      (var uint8_t red #x00)
+      (var uint8_t green #x00)
+      (var uint8_t blue #x00)
 
       (sdl-init)
       (sdl-window window "Emu" (* width window-scale) (* height window-scale))
       (sdl-renderer renderer window)
       (sdl-texture texture renderer SDL_PIXELFORMAT_BGRA8888 SDL_TEXTUREACCESS_STREAMING width height)
 
+      (const int pixel-count (* width height))
+      (const int bits-per-pixel 4)
+      (const int pixels-size (* pixel-count bits-per-pixel))
+      (const int pixels-pitch (* width bits-per-pixel))
       (alloc pixels uint8_t pixels-size)
+      (var uint8_t (* pixel-ref) pixels)
+
       init-body ...
       (sdl-event-loop
-        (repeat frame-cycles update-body ...)
+        (repeat frame-cycles
+          update-body ...
+
+          (when (zero? pixel-cycle-counter)
+            (const bool h-video? (< h-counter width))
+            (const bool v-video? (< v-counter height))
+            (const bool video? (and h-video? v-video?))
+
+            (when video?
+              (set (pixel-ref *) #xff) ; alpha
+              (inc pixel-ref)
+
+              (set (pixel-ref *) red)
+              (inc pixel-ref)
+
+              (set (pixel-ref *) green)
+              (inc pixel-ref)
+
+              (set (pixel-ref *) blue)
+              (inc pixel-ref)))
+
+          (inc pixel-cycle-counter)
+          (when (= pixel-cycle-counter cycles-per-pixel)
+            (set pixel-cycle-counter 0)
+
+            (inc h-counter)
+            (when (= h-counter h-size)
+              (set h-counter 0)
+
+              (inc v-counter)
+              (when (= v-counter v-size)
+                (set v-counter 0)
+                (set pixel-ref pixels)))))
+
         (sdl-update-texture texture 0 pixels pixels-pitch)
         (sdl-render-copy renderer texture 0 0)
         (sdl-render-present renderer))))
