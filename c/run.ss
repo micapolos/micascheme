@@ -13,7 +13,7 @@
             (apply string-append
               (map-with ($lib $libs) (string-append " -l" $lib))))
           ($gcc-command
-            (format "gcc /tmp/main.c -o /tmp/main~a"
+            (format "gcc /tmp/main.c -O3 -o /tmp/main~a"
               $libs-string))
           (run
             (display $string)
