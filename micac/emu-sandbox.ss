@@ -42,5 +42,5 @@
         (set bg-green (inv bg-green))
         (set bg-blue (inv bg-blue)))
 
-      (when (and (= h-counter 0) (= v-counter 0))
-        (inc frame-counter)))))
+      (const bool frame-start? (and (= h-counter 0) (= v-counter 0)))
+      (when frame-start? (inc frame-counter)))))
