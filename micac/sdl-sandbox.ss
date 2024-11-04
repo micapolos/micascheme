@@ -1,5 +1,5 @@
 (import
-  (micac lang)
+  (micac)
   (micac std)
   (micac sdl))
 

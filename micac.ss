@@ -3,6 +3,7 @@
   (import
     (scheme)
     (syntax)
+    (list-syntax)
     (syntaxes)
     (micac syntax)
     (micac c)
@@ -16,16 +17,20 @@
 
   (define-aux-keywords run externs macro)
 
-  (define-rules-syntax (literals run externs macro)
-    ((micac) (begin))
-    ((micac (run body ...))
-      (micac-run body ...))
-    ((micac (externs body ...))
-      (micac-externs body ...))
-    ((micac (macro body ...))
-      (micac-macro body ...))
-    ((micac x xs ...)
-      (begin
-        (micac x)
-        (micac xs ...))))
+  (define-syntax micac
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ item ...)
+          #`(begin
+            #,@(map
+              (lambda ($item)
+                (syntax-case $item (run externs macro)
+                  ((run body ...)
+                    #`(micac-run body ...))
+                  ((externs body ...)
+                    #`(micac-externs body ...))
+                  ((macro body ...)
+                    #`(micac-macro body ...))))
+              (syntax->list #'(item ...))))))))
+
 )
