@@ -13,3 +13,55 @@
   (free-identifier=?
     (identifier-append #'+ #'string #'- #'append)
     #'string-append))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-case #'(inc x) ()
+        ((inc x)
+          (datum? inc)
+          #`(+ x 1))
+        ((dec x)
+          (datum? dec)
+          #`(- x 1))
+        ((other x)
+          #`(* x 1))))
+    `(+ x 1)))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-case #'(dec x) ()
+        ((inc x)
+          (datum? inc)
+          #`(+ x 1))
+        ((dec x)
+          (datum? dec)
+          #`(- x 1))
+        ((other x)
+          #`(* x 1))))
+    `(- x 1)))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-case #'(boo x) ()
+        ((inc x)
+          (datum? inc)
+          #`(+ x 1))
+        ((dec x)
+          (datum? dec)
+          #`(- x 1))
+        ((other x)
+          #`(* x 1))))
+    `(* x 1)))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-case #'(print something new x) ()
+        ((print something new b)
+          (and
+            (keywords print something new)
+            #`(displayln x)))))
+    `(displayln x)))

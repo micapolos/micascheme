@@ -6,7 +6,8 @@
     (micac)
     (micac std)
     (micac sdl)
-    (syntax))
+    (syntax)
+    (identifier))
 
   (micac
     (externs clock video pixels pixel-count pixels-size width height init update)

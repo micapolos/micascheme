@@ -2,7 +2,9 @@
   (export
     identifier-named?
     build-identifier
-    identifier-append)
+    identifier-append
+    datum?
+    keywords)
   (import
     (scheme)
     (syntax)
@@ -23,4 +25,16 @@
   (define (identifier-append $tpl . $ids)
     (datum->syntax $tpl
       (apply symbol-append (map syntax->datum $ids))))
+
+  (define-rule-syntax (datum? x ...)
+    (equal?
+      (syntax->datum #'(x ...))
+      '(x ...)))
+
+  (define-rule-syntax (keywords id ...)
+    (and
+      (or
+        (datum? id)
+        (syntax-error #'id
+          (format "expected ~a instead of" 'id))) ...))
 )
