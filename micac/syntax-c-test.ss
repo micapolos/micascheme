@@ -141,8 +141,8 @@
       #`(set x (bitwise-and a b))
       #`(set x (bitwise-ior a b))
       #`(set x (bitwise-xor a b))
-      #`(set x (shl a b))
-      #`(set x (shr a b)))
+      #`(set x (bitwise-arithmetic-shift-left a b))
+      #`(set x (bitwise-arithmetic-shift-right a b)))
     (lines-string
       "x = a + b;"
       "x = a - b;"
