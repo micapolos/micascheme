@@ -153,7 +153,7 @@
       (_ #f)))
 
   (define (code+instr $lookup $code $syntax)
-    (syntax-case $syntax (begin var const if switch while)
+    (syntax-case $syntax (begin var const if while)
       ((begin instr ...)
         (code $code
           (code-in-curly-brackets

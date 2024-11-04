@@ -20,6 +20,11 @@
       (define-micac-property id transformer)))
 
   (define-rules-syntax (literals literals)
+    ((micac-macro (id arg ...) (literals literal ...) body)
+      (define-micac-syntax id
+        (lambda ($syntax)
+          (syntax-case $syntax (literal ...)
+            ((_ arg ...) #'body)))))
     ((micac-macro (id arg ...) (literals literal ...) body ...)
       (define-micac-syntax id
         (lambda ($syntax)

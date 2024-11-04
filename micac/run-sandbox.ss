@@ -1,7 +1,7 @@
 (import (micascheme) (micac run))
 
 (micac-run
-  (var u8 x)
+  (var int x)
   (set x 2)
   (printf "First value: %i\\n" x)
   (add x 3)
