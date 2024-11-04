@@ -45,7 +45,7 @@
         (begin
           (set red (- frame-counter h-counter))
           (set green (- frame-counter v-counter))
-          (set blue (+ frame-counter (* h-counter v-counter))))
+          (set blue (+ frame-counter (bitwise-arithmetic-shift-right (* h-counter v-counter) 4))))
         (begin
           (set red bg-red)
           (set green bg-green)

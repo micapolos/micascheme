@@ -15,7 +15,8 @@
     begin if
     not
     ...
-    and or bitwise-and bitwise-ior bitwise-xor)))
+    and or bitwise-and bitwise-ior bitwise-xor
+    bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right)))
 
   (define-aux-keywords run externs macro)
 
