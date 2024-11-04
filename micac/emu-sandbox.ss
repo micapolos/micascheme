@@ -25,6 +25,7 @@
         (and
           (> h-counter border) (<= h-counter (+ border h-screen))
           (> v-counter border) (<= v-counter (+ border v-screen))))
+
       (if screen?
         (then
           (set red (- frame-counter h-counter))
@@ -36,11 +37,14 @@
           (set blue bg-blue)))
 
       (inc bar-counter)
+
       (when (= bar-counter bar-size)
         (set bar-counter 0)
         (set bg-red (inv bg-red))
         (set bg-green (inv bg-green))
         (set bg-blue (inv bg-blue)))
 
-      (const bool frame-start? (and (= h-counter 0) (= v-counter 0)))
+      (const bool frame-start?
+        (and (= h-counter 0) (= v-counter 0)))
+
       (when frame-start? (inc frame-counter)))))
