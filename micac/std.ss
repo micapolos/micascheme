@@ -1,27 +1,28 @@
 (library (micac std)
-  (export sizeof alloc repeat-times inc dec on)
-  (import (micascheme) (micac c))
+  (export sizeof alloc repeat-times inc dec on printf)
+  (import (micac))
 
-  (micac-externs malloc free sizeof)
+  (micac
+    (externs malloc free sizeof printf)
 
-  (micac-macro (alloc id type size)
-    (var type (* id) (cast (* type) (malloc (* size (sizeof type)))))
-    (break-if (= id 0) (printf "Could not allocate memory\\n"))
-    (defer (free id)))
+    (macro (alloc id type size)
+      (var type (* id) (cast (* type) (malloc (* size (sizeof type)))))
+      (break-if (= id 0) (printf "Could not allocate memory\\n"))
+      (defer (free id)))
 
-  (micac-macro (repeat-times count body ...)
-    (begin
-      (var int counter count)
-      (while counter
-        body ...
-        (sub counter 1))))
+    (macro (repeat-times count body ...)
+      (begin
+        (var int counter count)
+        (while counter
+          body ...
+          (sub counter 1))))
 
-  (micac-macro (inc id)
-    (add id 1))
+    (macro (inc id)
+      (add id 1))
 
-  (micac-macro (dec id)
-    (sub id 1))
+    (macro (dec id)
+      (sub id 1))
 
-  (micac-macro (on expr body ...)
-    (if expr (begin body ...)))
+    (macro (on expr body ...)
+      (if expr (begin body ...))))
 )

@@ -9,10 +9,12 @@
     (micac c)
     (micac run))
   (export (import (micac syntax)))
+  (export (import (only (syntaxes) literals)))
   (export (import (only (scheme)
     = < <= > >= + - * /
     begin if
     not
+    ...
     and or bitwise-and bitwise-ior bitwise-xor)))
 
   (define-aux-keywords run externs macro)
