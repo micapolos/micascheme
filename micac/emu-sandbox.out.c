@@ -85,9 +85,9 @@ int main() {
                       bar_counter += 1;
                       if (bar_counter == bar_size) {
                         bar_counter = 0;
-                        bg_red ^= -1;
-                        bg_green ^= -1;
-                        bg_blue ^= -1;
+                        bg_red = ~bg_red;
+                        bg_green = ~bg_green;
+                        bg_blue = ~bg_blue;
                       }
                       if (h_counter == 0 && v_counter == 0) {
                         frame_counter += 1;

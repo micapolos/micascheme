@@ -39,9 +39,9 @@
         (inc bar-counter)
         (when (= bar-counter bar-size)
           (set bar-counter 0)
-          (set-bitwise-xor bg-red -1)
-          (set-bitwise-xor bg-green -1)
-          (set-bitwise-xor bg-blue -1))
+          (set bg-red (inv bg-red))
+          (set bg-green (inv bg-green))
+          (set bg-blue (inv bg-blue)))
 
         (when (and (= h-counter 0) (= v-counter 0))
           (inc frame-counter))))))
