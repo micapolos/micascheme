@@ -8,6 +8,8 @@
   (clock (* 448 312 60 4)) ; h-count v-count fps cycles-per-pixel
   (video 352 288 96 24 4) ; width height h-blank v-blank cycles-per-pixel
   (init
+    (const bool ula? #t)
+
     (const int border 48)
     (const int h-screen 256)
     (const int v-screen 192)
@@ -50,7 +52,8 @@
                     (<< (bitwise-and y #x07) 3)
                     (>> (bitwise-and y #x38) 3))
                   5)))
-            (const int load-addr (<< frame-counter 2))
+
+            (const int load-addr (<< frame-counter 1))
             (const bool bits? (> (>> bits-addr 3) load-addr))
             (set bits (? bits? #xff (ref data (bits-addr))))
 
@@ -70,13 +73,15 @@
           (const bool bright? (not (zero? (bitwise-and attr #x40))))
           (const int color (? bright? #xFF #xBB))
 
-          (set red (? red? color 0))
-          (set green (? green? color 0))
-          (set blue (? blue? color 0)))
-
-          ; (set red (- frame-counter h-counter))
-          ; (set green (- frame-counter v-counter))
-          ; (set blue (+ frame-counter (bitwise-arithmetic-shift-right (* h-counter v-counter) 6))))
+          (if ula?
+            (then
+              (set red (? red? color 0))
+              (set green (? green? color 0))
+              (set blue (? blue? color 0)))
+            (else
+              (set red (- frame-counter h-counter))
+              (set green (- frame-counter v-counter))
+              (set blue (+ frame-counter (bitwise-arithmetic-shift-right (* h-counter v-counter) 6))))))
         (else
           (set red bg-red)
           (set green bg-green)
