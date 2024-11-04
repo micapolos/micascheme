@@ -269,7 +269,7 @@
   (equal?
     (syntax-c $lookup
       #`(set x (= a b))
-      #`(set x (!= a b))
+      #`(set x (not (= a b)))
       #`(set x (> a b))
       #`(set x (>= a b))
       #`(set x (< a b))

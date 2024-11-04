@@ -249,7 +249,7 @@
       ";\n"))
 
   (define (syntax->expr $lookup $syntax)
-    (syntax-case $syntax (cast = != > >= < <= + - * / and or bitwise-and bitwise-ior bitwise-xor shl shr neg not inv ref &ref)
+    (syntax-case $syntax (cast = > >= < <= + - * / and or bitwise-and bitwise-ior bitwise-xor shl shr neg not inv ref &ref)
       ((cast type rhs)
         (expr 2 #f
           (code
@@ -257,7 +257,7 @@
             (expr-operand-code (syntax->expr $lookup #'rhs) 2 #t))))
       ((= a b)
         (op2->expr $lookup 7 #t #'a " == " #'b))
-      ((!= a b)
+      ((not (= a b))
         (op2->expr $lookup 7 #t #'a " != " #'b))
       ((> a b)
         (op2->expr $lookup 6 #t #'a " > " #'b))
