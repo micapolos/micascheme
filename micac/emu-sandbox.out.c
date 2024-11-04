@@ -4,15 +4,22 @@
 #include <SDL2/SDL.h>
 
 int main() {
-  const int hz = 448 * 312 * 60;
+  const int hz = 448 * 312 * 60 * 4;
   const int frame_cycles = hz / 60;
   const int width = 352;
   const int height = 288;
+  const int h_blank = 96;
+  const int v_blank = 24;
+  const int h_size = width + h_blank;
+  const int v_size = height + v_blank;
+  const int cycles_per_pixel = 4;
   const int window_scale = 2;
-  const int pixel_count = width * height;
-  const int bits_per_pixel = 4;
-  const int pixels_size = pixel_count * bits_per_pixel;
-  const int pixels_pitch = width * bits_per_pixel;
+  int h_counter = 0;
+  int v_counter = 0;
+  int pixel_cycle_counter = 0;
+  uint8_t red = 0;
+  uint8_t green = 0;
+  uint8_t blue = 0;
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     printf("%s SDL Error: %s\n", "Could not initialize.", SDL_GetError());
   }
@@ -32,30 +39,25 @@ int main() {
           printf("%s SDL Error: %s\n", "Could not create texture.", SDL_GetError());
         }
         else {
+          const int pixel_count = width * height;
+          const int bits_per_pixel = 4;
+          const int pixels_size = pixel_count * bits_per_pixel;
+          const int pixels_pitch = width * bits_per_pixel;
           uint8_t *pixels = (uint8_t*)malloc(pixels_size * sizeof(uint8_t));
           if (pixels == 0) {
             printf("Could not allocate memory.\n");
           }
           else {
+            uint8_t *pixel_ref = pixels;
             const int border = 48;
             const int h_screen = 256;
-            const int h_blank = 96;
             const int v_screen = 192;
-            const int v_blank = 24;
-            const int h_size = border + h_screen + border + h_blank;
-            const int v_size = border + v_screen + border + v_blank;
-            uint8_t *pixel_ref = pixels;
             const int bar_size = 4630;
-            int bar_counter = bar_size;
+            int bar_counter = 0;
             uint8_t bg_red = 255;
             uint8_t bg_green = 255;
             uint8_t bg_blue = 0;
-            int v_counter = 0;
-            int h_counter = 0;
-            bool h_screen_ = true;
-            bool v_screen_ = true;
-            bool h_pixel_ = true;
-            bool v_pixel_ = true;
+            int frame_counter = 0;
             bool running = true;
             SDL_Event event;
             while (running) {
@@ -68,21 +70,35 @@ int main() {
                 int counter = frame_cycles;
                 while (counter) {
                   {
-                    uint8_t red;
-                    uint8_t green;
-                    uint8_t blue;
-                    const bool screen_ = h_screen_ && v_screen_;
-                    if (screen_) {
-                      red = 192;
-                      green = 192;
-                      blue = 192;
+                    if (pixel_cycle_counter == 0) {
+                      const bool screen_ = h_counter > border && h_counter <= border + h_screen && v_counter > border && v_counter <= border + v_screen;
+                      if (screen_) {
+                        red = frame_counter - h_counter;
+                        green = frame_counter - v_counter;
+                        blue = frame_counter + (h_counter * v_counter >> 6);
+                      }
+                      else {
+                        red = bg_red;
+                        green = bg_green;
+                        blue = bg_blue;
+                      }
+                      bar_counter += 1;
+                      if (bar_counter == bar_size) {
+                        bar_counter = 0;
+                        bg_red ^= -1;
+                        bg_green ^= -1;
+                        bg_blue ^= -1;
+                      }
+                      if (h_counter == 0 && v_counter == 0) {
+                        frame_counter += 1;
+                      }
                     }
-                    else {
-                      red = bg_red;
-                      green = bg_green;
-                      blue = bg_blue;
-                    }
-                    if (h_pixel_ && v_pixel_) {
+                  }
+                  if (pixel_cycle_counter == 0) {
+                    const bool h_video_ = h_counter < width;
+                    const bool v_video_ = v_counter < height;
+                    const bool video_ = h_video_ && v_video_;
+                    if (video_) {
                       *pixel_ref = 255;
                       pixel_ref += 1;
                       *pixel_ref = red;
@@ -93,50 +109,17 @@ int main() {
                       pixel_ref += 1;
                     }
                   }
-                  bar_counter -= 1;
-                  if (bar_counter == 0) {
-                    bar_counter = bar_size;
-                    bg_red = ~bg_red;
-                    bg_green = ~bg_green;
-                    bg_blue = ~bg_blue;
-                  }
-                  h_counter += 1;
-                  if (h_counter == h_size) {
-                    h_counter = 0;
-                    v_counter += 1;
-                    if (v_counter == v_size) {
-                      v_counter = 0;
-                    }
-                  }
-                  {
-                    const bool h_screen_start_ = h_counter == 0;
-                    const bool h_screen_end_ = h_counter == h_screen;
-                    const bool v_screen_start_ = v_counter == 0;
-                    const bool v_screen_end_ = v_counter == v_screen;
-                    const bool h_pixel_start_ = h_counter == h_screen + border + h_blank;
-                    const bool h_pixel_end_ = h_counter == h_screen + border;
-                    const bool v_pixel_start_ = v_counter == v_screen + border + v_blank;
-                    const bool v_pixel_end_ = v_counter == v_screen + border;
-                    const bool h_screen_flip_ = h_screen_start_ || h_screen_end_;
-                    const bool v_screen_flip_ = h_screen_start_ && (v_screen_start_ || v_screen_end_);
-                    const bool h_pixel_flip_ = h_pixel_start_ || h_pixel_end_;
-                    const bool v_pixel_flip_ = h_pixel_start_ && (v_pixel_start_ || v_pixel_end_);
-                    if (h_screen_flip_) {
-                      h_screen_ = !h_screen_;
-                    }
-                    if (v_screen_flip_) {
-                      v_screen_ = !v_screen_;
-                    }
-                    if (h_pixel_flip_) {
-                      h_pixel_ = !h_pixel_;
-                    }
-                    if (v_pixel_flip_) {
-                      v_pixel_ = !v_pixel_;
-                    }
-                    const bool screen_start_ = h_screen_start_ && v_screen_start_;
-                    const bool pixel_start_ = h_pixel_start_ && v_pixel_start_;
-                    if (pixel_start_) {
-                      pixel_ref = pixels;
+                  pixel_cycle_counter += 1;
+                  if (pixel_cycle_counter == cycles_per_pixel) {
+                    pixel_cycle_counter = 0;
+                    h_counter += 1;
+                    if (h_counter == h_size) {
+                      h_counter = 0;
+                      v_counter += 1;
+                      if (v_counter == v_size) {
+                        v_counter = 0;
+                        pixel_ref = pixels;
+                      }
                     }
                   }
                   counter -= 1;
