@@ -4,42 +4,10 @@
   (import
     (micascheme)
     (code)
+    (micac expr)
     (micac syntax))
 
-  (data (expr priority left-to-right? code))
-
   (define-aux-keyword micac-key)
-
-  (define (expr-operand-code $expr $priority $right?)
-    (if
-      (or
-        (< (expr-priority $expr) $priority)
-        (and
-          (= (expr-priority $expr) $priority)
-          (boolean=? (expr-left-to-right? $expr) (not $right?))))
-      (expr-code $expr)
-      (code-in-round-brackets (expr-code $expr))))
-
-  (define (binary-expr $priority $left-to-right? $lhs $op $rhs)
-    (expr $priority $left-to-right?
-      (code
-        (expr-operand-code $lhs $priority #f)
-        (string-code $op)
-        (expr-operand-code $rhs $priority #t))))
-
-  (define (prefix-expr $priority $left-to-right? $op $expr)
-    (expr $priority $left-to-right?
-      (code
-        (string-code $op)
-        (expr-operand-code $expr $priority #t))))
-
-  (define (paren-expr $priority $left-to-right? $lhs $lparen $inner $rparen)
-    (expr $priority $left-to-right?
-      (code
-        (expr-operand-code $lhs $priority #f)
-        (string-code $lparen)
-        (expr-code $inner)
-        (string-code $rparen))))
 
   (define (size->code $size)
     (lets
@@ -235,7 +203,7 @@
         (identifier? #'id)
         (code $code
           (expr-code
-            (paren-expr 1 #t
+            (parenthesized-expr 1 #t
               (variable->expr #'id)
               "("
               (expr 0 #t
@@ -366,7 +334,7 @@
           (($lookup #'id #'micac-key) $syntax)))
       ((id arg ...)
         (identifier? #'id)
-        (paren-expr 1 #t
+        (parenthesized-expr 1 #t
           (variable->expr #'id)
           "("
           (expr 0 #t
@@ -392,7 +360,7 @@
               (id (identifier? #'id)
                 (binary-expr 1 #t $expr "." (variable->expr #'id)))
               (expr
-                (paren-expr 1 #t $expr "[" (syntax->expr $lookup #'expr) "]"))))
+                (parenthesized-expr 1 #t $expr "[" (syntax->expr $lookup #'expr) "]"))))
           (variable->expr #'var)
           (syntax->list #'(x ...))))))
 
