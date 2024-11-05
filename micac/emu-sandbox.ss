@@ -22,8 +22,8 @@
 
     (var int frame-counter 0)
 
-    (var int bits)
-    (var int attr)
+    (var uint8_t bits)
+    (var uint8_t attr)
 
     (sdl-file-data data data-size "/Users/micapolos/git/micascheme/micac/scr/BladeRunner.scr"))
   (update
@@ -68,7 +68,7 @@
           (const bool green? (not (zero? (bitwise-and attr (? ink-on? #x04 #x20)))))
           (const bool blue? (not (zero? (bitwise-and attr (? ink-on? #x01 #x08)))))
           (const bool bright? (not (zero? (bitwise-and attr #x40))))
-          (const int color (? bright? #xFF #xBB))
+          (const uint8_t color (? bright? #xFF #xBB))
 
           (if ula?
             (then
