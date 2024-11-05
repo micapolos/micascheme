@@ -25,7 +25,7 @@
     (var int bits)
     (var int attr)
 
-    (sdl-file-data data data-size "/Users/micapolos/git/micascheme/micac/RoboCop.scr"))
+    (sdl-file-data data data-size "/Users/micapolos/git/micascheme/micac/scr/BladeRunner.scr"))
   (update
     (when (zero? pixel-cycle-counter)
       (const bool screen?
@@ -65,7 +65,7 @@
           (const bool alternate-on? (not (zero? (bitwise-and frame-counter #x10))))
           (const bool ink-on? (? (and flash-on? alternate-on?) (not pixel-on?) pixel-on?))
           (const bool red? (not (zero? (bitwise-and attr (? ink-on? #x02 #x10)))))
-          (const bool green? (not (zero? (bitwise-and attr (? ink-on? #x04 #x10)))))
+          (const bool green? (not (zero? (bitwise-and attr (? ink-on? #x04 #x20)))))
           (const bool blue? (not (zero? (bitwise-and attr (? ink-on? #x01 #x08)))))
           (const bool bright? (not (zero? (bitwise-and attr #x40))))
           (const int color (? bright? #xFF #xBB))
