@@ -25,7 +25,7 @@
     (var uint8_t bits)
     (var uint8_t attr)
 
-    (sdl-file-data data data-size "/Users/micapolos/git/micascheme/micac/scr/BladeRunner.scr"))
+    (sdl-file-data data data-size "/Users/micapolos/git/micascheme/micac/scr/Cobra.scr"))
   (update
     (when (zero? pixel-cycle-counter)
       (const bool screen?
