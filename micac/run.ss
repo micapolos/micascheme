@@ -11,8 +11,8 @@
           "#include <stdlib.h>"
           "#include <stdio.h>"
           "#include <stdbool.h>"
-          "#include <SDL2/SDL.h>"
+          "#include <SDL.h>"
           ""
           (string-append "int main() " $string)))
-      (c-run $string "-lSDL2")))
+      (c-run $string "`sdl2-config --cflags --libs`")))
 )
