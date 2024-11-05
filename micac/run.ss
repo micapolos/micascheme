@@ -15,7 +15,11 @@
         (string-append "int main() " $string))))
 
   (define-rule-syntax (micac-run instr ...)
-    (c-run
-      (micac-string instr ...)
-      "`sdl2-config --cflags --libs`"))
+    (lets
+      ($string (micac-string instr ...))
+      (run
+        (call-with-output-file "micac/emu-sandbox.out.c"
+          (lambda ($port) (put-string $port $string))
+          `(replace))
+        (c-run $string  "`sdl2-config --cflags --libs`"))))
 )
