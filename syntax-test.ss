@@ -36,3 +36,33 @@
       `(inline-indexed ($i 4) $i)
       (environment '(scheme) '(syntax)))
     `(begin 0 1 2 3)))
+
+; --- syntax=?
+
+(check (syntax=? #`10 #`10))
+(check (not (syntax=? #`10 #`20)))
+
+(check (syntax=? #`foo #`foo))
+(check (not (syntax=? #`foo #`bar)))
+
+(check (syntax=? #`"foo" #`"foo"))
+(check (not (syntax=? #`"foo" #`"bar")))
+
+(check (syntax=? #`() #`()))
+(check (syntax=? #`(+) #`(+)))
+(check (syntax=? #`(+ -) #`(+ -)))
+(check (syntax=? #`(+ - *) #`(+ - *)))
+(check (syntax=? #`(+ - . *) #`(+ - . *)))
+
+(check (not (syntax=? #`() #`(+))))
+(check (not (syntax=? #`(+) #`(-))))
+(check (not (syntax=? #`(+) #`(+ -))))
+(check (not (syntax=? #`(+ -) #`(+))))
+(check (not (syntax=? #`(+ . -) #`(+ . *))))
+
+; --- replace-identifiers
+
+(check
+  (syntax=?
+    (syntax-replace #'+ #'- #'(+ 10 (+ 20 (* 30 40))))
+    #'(- 10 (- 20 (* 30 40)))))

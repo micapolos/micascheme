@@ -22,7 +22,9 @@
     syntax-rule->clause
     syntax->datum/annotation
     bytevector->syntax
-    vector->syntax)
+    vector->syntax
+    syntax=?
+    syntax-replace)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -151,17 +153,41 @@
 
   (define ellipsis (datum->syntax #'ellipsis '...))
 
-  (define (replace-identifiers $old $new $syntax)
+  (define (syntax-replace $from-id $to-id $syntax)
     (syntax-case $syntax ()
-      ($id (identifier? #'$id)
-        (if (free-identifier=? #'$id $old) $new #'$id))
-      (($x ...)
+      (x
+        (and
+          (identifier? #'x)
+          (free-identifier=? #'x $from-id))
+        $to-id)
+      ((x . y)
         #`(
-          #,@(map
-            (lambda ($syntax)
-              (replace-identifiers $old $new $syntax))
-            (syntax->list #'($x ...)))))
-      ($other #'$other)))
+          #,(syntax-replace $from-id $to-id #'x)
+          .
+          #,(syntax-replace $from-id $to-id #'y)))
+      (x #'x)))
+
+  (define (syntax=? a b)
+    (syntax-case a ()
+      (()
+        (syntax-case b ()
+          (() #t)
+          (_ #f)))
+      ((a . as)
+        (syntax-case b ()
+          ((b . bs)
+            (and
+              (syntax=? #'a #'b)
+              (syntax=? #'as #'bs)))
+          (_ #f)))
+      (a (identifier? #'a)
+        (syntax-case b ()
+          (b (identifier? #'b)
+            (free-identifier=? #'a #'b))))
+      (_
+        (equal?
+          (syntax->datum a)
+          (syntax->datum b)))))
 
   (define-syntax (inline-indexed $syntax)
     (syntax-case $syntax ()
