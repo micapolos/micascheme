@@ -60,7 +60,7 @@ int main() {
             int frame_counter = 0;
             uint8_t bits;
             uint8_t attr;
-            SDL_RWops *rw_ops = SDL_RWFromFile("/Users/micapolos/git/micascheme/micac/scr/Cobra.scr", "rb");
+            SDL_RWops *rw_ops = SDL_RWFromFile("/Users/micapolos/git/micascheme/micac/scr/Spellbound.scr", "rb");
             if (!rw_ops) {
               printf("%s SDL Error: %s\n", "Could not open file.", SDL_GetError());
             }
