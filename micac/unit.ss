@@ -32,6 +32,12 @@
         ((<= $bits 64) #`uint64_t)
         (else (syntax-error $size "64 <")))))
 
+  (define (size->pot-value $size)
+    (datum->syntax #'+ (bitwise-arithmetic-shift-left 1 (size->value $size))))
+
+  (define (size->mask $size)
+    (datum->syntax #'+ (- (size->pot-value $size) 1)))
+
   (define (transform-decl $decl)
     (syntax-case $decl (bit)
       ((id bit)
@@ -101,15 +107,23 @@
             #,@(syntaxes-if (not $phase?) $updates))))))
 
   (define (phase-core+component $phase? $core $component)
-    (syntax-case $component (buffer register memory)
-      ((buffer id type expr)
+    (syntax-case $component (wire buffer register memory neg)
+      ((wire id size expr)
         (phase-core+inits-updates $phase? $core
-          (list #`(var type id))
+          (list)
+          (list (const #,(size->uint-type #'size) id expr))))
+      ((buffer id size expr)
+        (phase-core+inits-updates $phase? $core
+          (list #`(var #,(size->uint-type #'size) id))
           (list #`(set id expr))))
-      ((register id type write? expr)
+      ((register id size write? expr)
         (phase-core+inits-updates $phase? $core
-          (list #`(var type id))
+          (list #`(var #,(size->uint-type #'size) id))
           (list #`(when write? (set id expr)))))
+      ((memory id addr-size data-size write? addr data)
+        (phase-core+inits-updates $phase? $core
+          (list #`(var #,(size->uint-type #'data-size) (* id #,(size->pot-value #'addr-size))))
+          (list #`(when write? (set (id (addr)) data)))))
       ((neg component ...)
         (fold-left
           (partial phase-core+component (not $phase?))
