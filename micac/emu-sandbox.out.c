@@ -60,7 +60,7 @@ int main() {
             int frame_counter = 0;
             uint8_t bits;
             uint8_t attr;
-            SDL_RWops *rw_ops = SDL_RWFromFile("/Users/micapolos/git/micascheme/micac/scr/Spellbound.scr", "rb");
+            SDL_RWops *rw_ops = SDL_RWFromFile("/Users/micapolos/git/micascheme/micac/scr/Robocop.scr", "rb");
             if (!rw_ops) {
               printf("%s SDL Error: %s\n", "Could not open file.", SDL_GetError());
             }
@@ -73,6 +73,9 @@ int main() {
               else {
                 bool running = true;
                 SDL_Event event;
+                int sdl_mouse_x = 0;
+                int sdl_mouse_y = 0;
+                bool sdl_mouse_pressed_ = false;
                 while (running) {
                   while (SDL_PollEvent(&event)) {
                     if (event.type == SDL_QUIT) {
@@ -80,6 +83,9 @@ int main() {
                     }
                   }
                   {
+                    uint32_t sdl_mouse_state;
+                    sdl_mouse_state = SDL_GetMouseState(&sdl_mouse_x, &sdl_mouse_y);
+                    sdl_mouse_pressed_ = !((sdl_mouse_state & 1) == 0);
                     int counter = frame_cycles;
                     while (counter) {
                       if (pixel_cycle_counter == 0) {

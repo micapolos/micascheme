@@ -25,7 +25,7 @@
     (var uint8_t bits)
     (var uint8_t attr)
 
-    (sdl-file-data data data-size "/Users/micapolos/git/micascheme/micac/scr/Spellbound.scr"))
+    (sdl-file-data data data-size "/Users/micapolos/git/micascheme/micac/scr/Robocop.scr"))
   (update
     (when (zero? pixel-cycle-counter)
       (const bool screen?

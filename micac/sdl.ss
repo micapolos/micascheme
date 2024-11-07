@@ -10,8 +10,13 @@
     sdl-render-clear
     sdl-render-copy
     sdl-render-present
-    sdl-file-data)
-  (import (micac) (micac std))
+    sdl-file-data
+    sdl-mouse-x
+    sdl-mouse-y
+    sdl-mouse-pressed?)
+  (import (micac) (micac std) (syntax))
+
+  (define-aux-keywords sdl-mouse-x sdl-mouse-y sdl-mouse-pressed?)
 
   (micac
     (externs
@@ -34,6 +39,7 @@
       SDL_RWFromFile
       SDL_RWclose
       SDL_LoadFile_RW
+      SDL_GetMouseState
       free
       SDL_INIT_VIDEO
       SDL_QUIT
@@ -101,11 +107,18 @@
     (macro (sdl-event-loop body ...)
       (var bool running #t)
       (var SDL_Event event)
+      (var int sdl-mouse-x 0)
+      (var int sdl-mouse-y 0)
+      (var bool sdl-mouse-pressed? #f)
       (while running
         (while (SDL_PollEvent (&ref event))
           (when (= (ref event type) SDL_QUIT)
             (set running #f)))
-        (begin body ...)))
+        (begin
+          (var uint32_t sdl-mouse-state)
+          (set sdl-mouse-state (SDL_GetMouseState (&ref sdl-mouse-x) (&ref sdl-mouse-y)))
+          (set sdl-mouse-pressed? (not (zero? (bitwise-and sdl-mouse-state #b1))))
+          body ...)))
 
     (macro (sdl-set-render-draw-color renderer red green blue alpha)
       (SDL_SetRenderDrawColor renderer red green blue alpha))
