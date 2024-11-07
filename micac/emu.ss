@@ -67,10 +67,12 @@
       init-body ...
       (sdl-event-loop
         (begin
-          (const uint32_t sdl-mouse-state
-            (sdl-get-mouse-state mouse-x mouse-y))
-          (set mouse-pressed?
-            (not (zero? (bitwise-and sdl-mouse-state #b1)))))
+          (var int sdl-mouse-x)
+          (var int sdl-mouse-y)
+          (const uint32_t sdl-mouse-state (sdl-get-mouse-state sdl-mouse-x sdl-mouse-y))
+          (set mouse-x (/ sdl-mouse-x window-scale))
+          (set mouse-y (/ sdl-mouse-y window-scale))
+          (set mouse-pressed? (not (zero? (bitwise-and sdl-mouse-state #b1)))))
 
         (repeat frame-cycles
           update-body ...

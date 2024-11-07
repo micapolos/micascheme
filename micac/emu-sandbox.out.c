@@ -86,7 +86,11 @@ int main() {
                   }
                   {
                     {
-                      const uint32_t sdl_mouse_state = SDL_GetMouseState(&mouse_x, &mouse_y);
+                      int sdl_mouse_x;
+                      int sdl_mouse_y;
+                      const uint32_t sdl_mouse_state = SDL_GetMouseState(&sdl_mouse_x, &sdl_mouse_y);
+                      mouse_x = sdl_mouse_x / window_scale;
+                      mouse_y = sdl_mouse_y / window_scale;
                       mouse_pressed_ = !((sdl_mouse_state & 1) == 0);
                     }
                     int counter = frame_cycles;
@@ -117,9 +121,7 @@ int main() {
                           const bool blue_ = !((attr & (ink_on_ ? 1 : 8)) == 0);
                           const bool bright_ = !((attr & 64) == 0);
                           const uint8_t color = bright_ ? 255 : 187;
-                          const int h_mouse = mouse_x >> 1;
-                          const int v_mouse = mouse_y >> 1;
-                          const bool ula_ = h_counter >= h_mouse && v_counter >= v_mouse || h_counter < h_mouse && v_counter < v_mouse;
+                          const bool ula_ = h_counter >= mouse_x && v_counter >= mouse_y || h_counter < mouse_x && v_counter < mouse_y;
                           if (ula_ ^ mouse_pressed_) {
                             red = red_ ? color : 0;
                             green = green_ ? color : 0;

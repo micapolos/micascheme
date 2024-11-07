@@ -68,12 +68,10 @@
           (const bool bright? (not (zero? (bitwise-and attr #x40))))
           (const uint8_t color (? bright? #xFF #xBB))
 
-          (const int h-mouse (>> mouse-x 1))
-          (const int v-mouse (>> mouse-y 1))
           (const bool ula?
             (or
-              (and (>= h-counter h-mouse) (>= v-counter v-mouse))
-              (and (< h-counter h-mouse) (< v-counter v-mouse))))
+              (and (>= h-counter mouse-x) (>= v-counter mouse-y))
+              (and (< h-counter mouse-x) (< v-counter mouse-y))))
           (if (xor ula? mouse-pressed?)
             (then
               (set red (? red? color 0))
