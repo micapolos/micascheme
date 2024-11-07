@@ -11,12 +11,8 @@
     sdl-render-copy
     sdl-render-present
     sdl-file-data
-    sdl-mouse-x
-    sdl-mouse-y
-    sdl-mouse-pressed?)
-  (import (micac) (micac std) (syntax))
-
-  (define-aux-keywords sdl-mouse-x sdl-mouse-y sdl-mouse-pressed?)
+    sdl-get-mouse-state)
+  (import (micac) (micac std))
 
   (micac
     (externs
@@ -104,6 +100,9 @@
       (break-if (not (= (SDL_RenderCopy renderer texture src-rect dst-rect) 0))
         (print-sdl-error "Could not render copy.")))
 
+    (macro (sdl-get-mouse-state x y)
+      (SDL_GetMouseState (&ref x) (&ref y)))
+
     (macro (sdl-event-loop body ...)
       (var bool running #t)
       (var SDL_Event event)
@@ -114,11 +113,7 @@
         (while (SDL_PollEvent (&ref event))
           (when (= (ref event type) SDL_QUIT)
             (set running #f)))
-        (begin
-          (var uint32_t sdl-mouse-state)
-          (set sdl-mouse-state (SDL_GetMouseState (&ref sdl-mouse-x) (&ref sdl-mouse-y)))
-          (set sdl-mouse-pressed? (not (zero? (bitwise-and sdl-mouse-state #b1))))
-          body ...)))
+        (begin body ...)))
 
     (macro (sdl-set-render-draw-color renderer red green blue alpha)
       (SDL_SetRenderDrawColor renderer red green blue alpha))

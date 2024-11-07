@@ -2,8 +2,10 @@
   (export
     emu video
     width height h-counter v-counter
+    mouse-x mouse-y mouse-pressed?
     red green blue
     init update
+    file-data
     run-emu)
   (import
     (micac)
@@ -15,8 +17,12 @@
   (micac
     (externs
       video width height h-counter v-counter
+      mouse-x mouse-y mouse-pressed?
       red green blue
       init update)
+
+    (macro (file-data data data-size filename)
+      (sdl-file-data data data-size filename))
 
     (macro
       (emu
@@ -54,8 +60,18 @@
       (alloc pixels uint8_t pixels-size)
       (var uint8_t (* pixel-ref) pixels)
 
+      (var int mouse-x 0)
+      (var int mouse-y 0)
+      (var bool mouse-pressed? #f)
+
       init-body ...
       (sdl-event-loop
+        (begin
+          (const uint32_t sdl-mouse-state
+            (sdl-get-mouse-state mouse-x mouse-y))
+          (set mouse-pressed?
+            (not (zero? (bitwise-and sdl-mouse-state #b1)))))
+
         (repeat frame-cycles
           update-body ...
 

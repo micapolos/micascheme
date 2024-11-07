@@ -23,7 +23,7 @@
     (var uint8_t bits)
     (var uint8_t attr)
 
-    (sdl-file-data data data-size "/Users/micapolos/git/micascheme/micac/scr/Robocop.scr"))
+    (file-data data data-size "/Users/micapolos/git/micascheme/micac/scr/Robocop.scr"))
   (update
     (when (zero? pixel-cycle-counter)
       (const bool screen?
@@ -68,13 +68,13 @@
           (const bool bright? (not (zero? (bitwise-and attr #x40))))
           (const uint8_t color (? bright? #xFF #xBB))
 
-          (const int h-mouse (>> sdl-mouse-x 1))
-          (const int v-mouse (>> sdl-mouse-y 1))
+          (const int h-mouse (>> mouse-x 1))
+          (const int v-mouse (>> mouse-y 1))
           (const bool ula?
             (or
               (and (>= h-counter h-mouse) (>= v-counter v-mouse))
               (and (< h-counter h-mouse) (< v-counter v-mouse))))
-          (if (xor ula? sdl-mouse-pressed?)
+          (if (xor ula? mouse-pressed?)
             (then
               (set red (? red? color 0))
               (set green (? green? color 0))
