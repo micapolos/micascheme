@@ -3,12 +3,15 @@
     bit
     size->value
     size->uint-type
-    transform-decl)
+    transform-decl
+    core->unit
+    core+)
   (import
     (micascheme)
     (micac syntax))
 
   (define-aux-keywords bit)
+  (define-aux-keywords core init update pos-edge neg-edge)
 
   (define (size->value $size)
     (switch (syntax->datum $size)
@@ -53,37 +56,66 @@
           (update
             pos-edge-body ...
             neg-edge-body ...)))))
+
+  (define (core->unit $core)
+    (syntax-case $core (core init pos-edge neg-edge)
+      (
+        (core
+          (init init-body ...)
+          (pos-edge pos-body ...)
+          (neg-edge neg-body ...))
+        #`(unit
+          (init init-body ...)
+          (update pos-body ... neg-body ...)))))
+
+  (define (core+ $a $b)
+    (syntax-case $a (core init pos-edge neg-edge)
+      (
+        (core
+          (init init-body-a ...)
+          (pos-edge pos-body-a ...)
+          (neg-edge neg-body-a ...))
+        (syntax-case $b ()
+          (
+            (core
+              (init init-body-b ...)
+              (pos-edge pos-body-b ...)
+              (neg-edge neg-body-b ...))
+            #`(core
+              (init init-body-a ... init-body-b ...)
+              (pos-edge pos-body-a ... pos-body-b ...)
+              (neg-edge pos-body-a ... pos-body-b ...)))))))
+
+  (define (phase-core+inits-updates $phase? $core $inits $updates)
+    (syntax-case $core (core init pos-edge neg-edge)
+      (
+        (core
+          (init init-body ...)
+          (pos-edge pos-body ...)
+          (neg-edge neg-body ...))
+        #`(core
+          (init init-body ... #,@$inits)
+          (pos-edge pos-body ...
+            #,@(syntaxes-if $phase? $updates))
+          (neg-edge neg-body ...
+            #,@(syntaxes-if (not $phase?) $updates))))))
+
+  (define (phase-core+component $phase? $core $component)
+    (syntax-case $component (buffer register memory)
+      ((buffer id type expr)
+        (phase-core+inits-updates $phase? $core
+          (list #`(var type id))
+          (list #`(set id expr))))
+      ((register id type write? expr)
+        (phase-core+inits-updates $phase? $core
+          (list #`(var type id))
+          (list #`(when write? (set id expr)))))
+      ((neg component ...)
+        (fold-left
+          (partial phase-core+component (not $phase?))
+          $core
+          (syntax->list #'(component ...))))))
+
+  (define (syntaxes-if $cond? $syntaxes)
+    (if $cond? $syntaxes (list)))
 )
-
-; ; interface
-; (mem
-;   (address-size (param size))
-;   (data-size (param size))
-;   (address-in (input (pos-edge (* wire address-size))))
-;   (data-in (input (pos-edge (* wire data-size))))
-;   (write (input (pos-edge wire)))
-;   (address-out (input (pos-edge (* wire address-size))))
-;   (data-out (output (neg-edge (* wire data-size)))))
-
-; ; native
-; (mem
-;   (address-size (param size))
-;   (data-size (param size))
-;   (address-in (input (pos-edge (* wire address-size))))
-;   (data-in (in (pos-edge (* wire data-size))))
-;   (write (in (pos-edge wire)))
-;   (address-out (in (pos-edge (* wire address-size))))
-;   (init (alloc mem (uint data-size) (bits-size address-size)))
-;   (pos-edge (when write (set (mem (address-in)) data-in)))
-;   (neg-edge (set data-out (mem (address-in))))
-;   (data-out ((* wire data-size) data-out-var)))
-
-; ; instance
-; (mem-16
-;   (mem
-;     (address-in "0000100010001010")
-;     (data-in "01001001")
-;     (write "1")))
-
-; ; usage
-; (mem-16 data-out)
