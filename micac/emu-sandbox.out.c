@@ -13,8 +13,8 @@ int main() {
   const int cycles_per_pixel = 4;
   const int frame_cycles = h_size * v_size * cycles_per_pixel;
   const int window_scale = 2;
-  int h_counter = 0;
-  int v_counter = 0;
+  int video_x = 0;
+  int video_y = 0;
   int pixel_cycle_counter = 0;
   uint8_t red = 0;
   uint8_t green = 0;
@@ -52,8 +52,8 @@ int main() {
             int mouse_y = 0;
             bool mouse_pressed_ = false;
             const int border = 48;
-            const int h_screen = 256;
-            const int v_screen = 192;
+            const int ula_width = 256;
+            const int ula_height = 192;
             const int bar_size = 4630;
             int bar_counter = 0;
             uint8_t bg_red = 255;
@@ -96,18 +96,18 @@ int main() {
                     int counter = frame_cycles;
                     while (counter) {
                       if (pixel_cycle_counter == 0) {
-                        const bool screen_ = h_counter >= border && h_counter < border + h_screen && (v_counter >= border && v_counter < border + v_screen);
+                        const bool screen_ = video_x >= border && video_x < border + ula_width && (video_y >= border && video_y < border + ula_height);
                         if (screen_) {
-                          const int x = h_counter - border;
-                          const int y = v_counter - border;
-                          const bool read_ = (x & 7) == 0;
+                          const int ula_x = video_x - border;
+                          const int ula_y = video_y - border;
+                          const bool read_ = (ula_x & 7) == 0;
                           if (read_) {
-                            const int h_addr = x >> 3 & 31;
-                            const int bits_addr = h_addr | (y & 192 | (y & 7) << 3 | (y & 56) >> 3) << 5;
+                            const int addr_x = ula_x >> 3 & 31;
+                            const int bits_addr = addr_x | (ula_y & 192 | (ula_y & 7) << 3 | (ula_y & 56) >> 3) << 5;
                             const int load_addr = frame_counter << 1;
                             const bool bits_ = bits_addr >> 3 > load_addr;
                             bits = bits_ ? 255 : scr[bits_addr];
-                            const int attr_addr = 6144 | h_addr | y >> 3 << 5;
+                            const int attr_addr = 6144 | addr_x | ula_y >> 3 << 5;
                             const bool attr_ = attr_addr >> 3 > load_addr;
                             attr = attr_ ? 7 : scr[attr_addr];
                           }
@@ -121,16 +121,16 @@ int main() {
                           const bool blue_ = !((attr & (ink_on_ ? 1 : 8)) == 0);
                           const bool bright_ = !((attr & 64) == 0);
                           const uint8_t color = bright_ ? 255 : 187;
-                          const bool ula_ = h_counter >= mouse_x && v_counter >= mouse_y || h_counter < mouse_x && v_counter < mouse_y;
+                          const bool ula_ = video_x >= mouse_x && video_y >= mouse_y || video_x < mouse_x && video_y < mouse_y;
                           if (ula_ ^ mouse_pressed_) {
                             red = red_ ? color : 0;
                             green = green_ ? color : 0;
                             blue = blue_ ? color : 0;
                           }
                           else {
-                            red = frame_counter - h_counter;
-                            green = frame_counter - v_counter;
-                            blue = frame_counter + (h_counter * v_counter >> 6);
+                            red = frame_counter - video_x;
+                            green = frame_counter - video_y;
+                            blue = frame_counter + (video_x * video_y >> 6);
                           }
                         }
                         else {
@@ -145,14 +145,14 @@ int main() {
                           bg_green = ~bg_green;
                           bg_blue = ~bg_blue;
                         }
-                        const bool frame_start_ = h_counter == 0 && v_counter == 0;
+                        const bool frame_start_ = video_x == 0 && video_y == 0;
                         if (frame_start_) {
                           frame_counter += 1;
                         }
                       }
                       if (pixel_cycle_counter == 0) {
-                        const bool h_video_ = h_counter < width;
-                        const bool v_video_ = v_counter < height;
+                        const bool h_video_ = video_x < width;
+                        const bool v_video_ = video_y < height;
                         const bool video_ = h_video_ && v_video_;
                         if (video_) {
                           *pixel_ref = 255;
@@ -168,12 +168,12 @@ int main() {
                       pixel_cycle_counter += 1;
                       if (pixel_cycle_counter == cycles_per_pixel) {
                         pixel_cycle_counter = 0;
-                        h_counter += 1;
-                        if (h_counter == h_size) {
-                          h_counter = 0;
-                          v_counter += 1;
-                          if (v_counter == v_size) {
-                            v_counter = 0;
+                        video_x += 1;
+                        if (video_x == h_size) {
+                          video_x = 0;
+                          video_y += 1;
+                          if (video_y == v_size) {
+                            video_y = 0;
                             pixel_ref = pixels;
                           }
                         }

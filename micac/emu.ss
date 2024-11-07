@@ -1,7 +1,7 @@
 (library (micac emu)
   (export
     emu video
-    width height h-counter v-counter
+    width height video-x video-y
     mouse-x mouse-y mouse-pressed?
     red green blue
     init update
@@ -16,7 +16,7 @@
 
   (micac
     (externs
-      video width height h-counter v-counter
+      video width height video-x video-y
       mouse-x mouse-y mouse-pressed?
       red green blue
       init update)
@@ -40,8 +40,8 @@
       (const int frame-cycles (* h-size v-size cycles-per-pixel))
       (const int window-scale 2)
 
-      (var int h-counter 0)
-      (var int v-counter 0)
+      (var int video-x 0)
+      (var int video-y 0)
       (var int pixel-cycle-counter 0)
 
       (var uint8_t red #x00)
@@ -78,8 +78,8 @@
           update-body ...
 
           (when (zero? pixel-cycle-counter)
-            (const bool h-video? (< h-counter width))
-            (const bool v-video? (< v-counter height))
+            (const bool h-video? (< video-x width))
+            (const bool v-video? (< video-y height))
             (const bool video? (and h-video? v-video?))
 
             (when video?
@@ -99,13 +99,13 @@
           (when (= pixel-cycle-counter cycles-per-pixel)
             (set pixel-cycle-counter 0)
 
-            (inc h-counter)
-            (when (= h-counter h-size)
-              (set h-counter 0)
+            (inc video-x)
+            (when (= video-x h-size)
+              (set video-x 0)
 
-              (inc v-counter)
-              (when (= v-counter v-size)
-                (set v-counter 0)
+              (inc video-y)
+              (when (= video-y v-size)
+                (set video-y 0)
                 (set pixel-ref pixels)))))
 
         (sdl-update-texture texture 0 pixels pixels-pitch)

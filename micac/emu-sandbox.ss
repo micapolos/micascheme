@@ -8,8 +8,8 @@
   (video 352 288 96 24 4) ; width height h-blank v-blank cycles-per-pixel
   (init
     (const int border 48)
-    (const int h-screen 256)
-    (const int v-screen 192)
+    (const int ula-width 256)
+    (const int ula-height 192)
 
     (const int bar-size 4630)
     (var int bar-counter 0)
@@ -28,31 +28,31 @@
     (when (zero? pixel-cycle-counter)
       (const bool screen?
         (and
-          (in-range? h-counter border (+ border h-screen))
-          (in-range? v-counter border (+ border v-screen))))
+          (in-range? video-x border (+ border ula-width))
+          (in-range? video-y border (+ border ula-height))))
 
       (if screen?
         (then
-          (const int x (- h-counter border))
-          (const int y (- v-counter border))
-          (const bool read? (zero? (bitwise-and x #x07)))
+          (const int ula-x (- video-x border))
+          (const int ula-y (- video-y border))
+          (const bool read? (zero? (bitwise-and ula-x #x07)))
           (when read?
-            (const int h-addr (bitwise-and (>> x 3) #x1f))
+            (const int addr-x (bitwise-and (>> ula-x 3) #x1f))
 
             (const int bits-addr
-              (bitwise-ior h-addr
+              (bitwise-ior addr-x
                 (<<
                   (bitwise-ior
-                    (bitwise-and y #xc0)
-                    (<< (bitwise-and y #x07) 3)
-                    (>> (bitwise-and y #x38) 3))
+                    (bitwise-and ula-y #xc0)
+                    (<< (bitwise-and ula-y #x07) 3)
+                    (>> (bitwise-and ula-y #x38) 3))
                   5)))
 
             (const int load-addr (<< frame-counter 1))
             (const bool bits? (> (>> bits-addr 3) load-addr))
             (set bits (? bits? #xff (ref scr (bits-addr))))
 
-            (const int attr-addr (bitwise-ior #x1800 h-addr (<< (>> y 3) 5)))
+            (const int attr-addr (bitwise-ior #x1800 addr-x (<< (>> ula-y 3) 5)))
             (const bool attr? (> (>> attr-addr 3) load-addr))
             (set attr (? attr? #x07 (ref scr (attr-addr)))))
 
@@ -70,17 +70,17 @@
 
           (const bool ula?
             (or
-              (and (>= h-counter mouse-x) (>= v-counter mouse-y))
-              (and (< h-counter mouse-x) (< v-counter mouse-y))))
+              (and (>= video-x mouse-x) (>= video-y mouse-y))
+              (and (< video-x mouse-x) (< video-y mouse-y))))
           (if (xor ula? mouse-pressed?)
             (then
               (set red (? red? color 0))
               (set green (? green? color 0))
               (set blue (? blue? color 0)))
             (else
-              (set red (- frame-counter h-counter))
-              (set green (- frame-counter v-counter))
-              (set blue (+ frame-counter (bitwise-arithmetic-shift-right (* h-counter v-counter) 6))))))
+              (set red (- frame-counter video-x))
+              (set green (- frame-counter video-y))
+              (set blue (+ frame-counter (bitwise-arithmetic-shift-right (* video-x video-y) 6))))))
         (else
           (set red bg-red)
           (set green bg-green)
@@ -95,6 +95,6 @@
         (set bg-blue (inv bg-blue)))
 
       (const bool frame-start?
-        (and (= h-counter 0) (= v-counter 0)))
+        (and (= video-x 0) (= video-y 0)))
 
       (when frame-start? (inc frame-counter)))))
