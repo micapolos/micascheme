@@ -7,8 +7,6 @@
 (run-emu
   (video 352 288 96 24 4) ; width height h-blank v-blank cycles-per-pixel
   (init
-    (const bool ula? #t)
-
     (const int border 48)
     (const int h-screen 256)
     (const int v-screen 192)
@@ -70,7 +68,13 @@
           (const bool bright? (not (zero? (bitwise-and attr #x40))))
           (const uint8_t color (? bright? #xFF #xBB))
 
-          (if ula?
+          (const int h-mouse (>> sdl-mouse-x 1))
+          (const int v-mouse (>> sdl-mouse-y 1))
+          (const bool ula?
+            (or
+              (and (>= h-counter h-mouse) (>= v-counter v-mouse))
+              (and (< h-counter h-mouse) (< v-counter v-mouse))))
+          (if (xor ula? sdl-mouse-pressed?)
             (then
               (set red (? red? color 0))
               (set green (? green? color 0))

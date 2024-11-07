@@ -48,7 +48,6 @@ int main() {
           }
           else {
             uint8_t *pixel_ref = pixels;
-            const bool ula_ = true;
             const int border = 48;
             const int h_screen = 256;
             const int v_screen = 192;
@@ -114,7 +113,10 @@ int main() {
                           const bool blue_ = !((attr & (ink_on_ ? 1 : 8)) == 0);
                           const bool bright_ = !((attr & 64) == 0);
                           const uint8_t color = bright_ ? 255 : 187;
-                          if (ula_) {
+                          const int h_mouse = sdl_mouse_x >> 1;
+                          const int v_mouse = sdl_mouse_y >> 1;
+                          const bool ula_ = h_counter >= h_mouse && v_counter >= v_mouse || h_counter < h_mouse && v_counter < v_mouse;
+                          if (ula_ ^ sdl_mouse_pressed_) {
                             red = red_ ? color : 0;
                             green = green_ ? color : 0;
                             blue = blue_ ? color : 0;

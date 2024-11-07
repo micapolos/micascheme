@@ -1,5 +1,5 @@
 (library (micac std)
-  (export sizeof alloc repeat inc dec printf zero? in-range? << >>)
+  (export sizeof alloc repeat inc dec printf zero? in-range? << >> xor)
   (import (micac))
 
   (micac
@@ -26,4 +26,7 @@
     (macro (<< x n) (bitwise-arithmetic-shift-left x n))
 
     (macro (in-range? x min max)
-      (and (>= x min) (< x max)))))
+      (and (>= x min) (< x max)))
+
+    (macro (xor xs ...) (bitwise-xor xs ...))
+))
