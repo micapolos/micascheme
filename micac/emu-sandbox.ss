@@ -80,7 +80,7 @@
             (else
               (set red (- frame-counter video-x))
               (set green (- frame-counter video-y))
-              (set blue (+ frame-counter (bitwise-arithmetic-shift-right (* video-x video-y) 6))))))
+              (set blue (+ frame-counter (>> (* video-x video-y) 6))))))
         (else
           (set red background-red)
           (set green background-green)
