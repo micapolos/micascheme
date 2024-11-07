@@ -56,9 +56,9 @@ int main() {
             const int ula_height = 192;
             const int bar_size = 4630;
             int bar_counter = 0;
-            uint8_t bg_red = 255;
-            uint8_t bg_green = 255;
-            uint8_t bg_blue = 0;
+            uint8_t background_red = 255;
+            uint8_t background_green = 255;
+            uint8_t background_blue = 0;
             int frame_counter = 0;
             uint8_t bits;
             uint8_t attr;
@@ -134,16 +134,16 @@ int main() {
                           }
                         }
                         else {
-                          red = bg_red;
-                          green = bg_green;
-                          blue = bg_blue;
+                          red = background_red;
+                          green = background_green;
+                          blue = background_blue;
                         }
                         bar_counter += 1;
                         if (bar_counter == bar_size) {
                           bar_counter = 0;
-                          bg_red = ~bg_red;
-                          bg_green = ~bg_green;
-                          bg_blue = ~bg_blue;
+                          background_red = ~background_red;
+                          background_green = ~background_green;
+                          background_blue = ~background_blue;
                         }
                         const bool frame_start_ = video_x == 0 && video_y == 0;
                         if (frame_start_) {

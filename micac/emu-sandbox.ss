@@ -14,9 +14,9 @@
     (const int bar-size 4630)
     (var int bar-counter 0)
 
-    (var uint8_t bg-red #xff)
-    (var uint8_t bg-green #xff)
-    (var uint8_t bg-blue 0)
+    (var uint8_t background-red #xff)
+    (var uint8_t background-green #xff)
+    (var uint8_t background-blue 0)
 
     (var int frame-counter 0)
 
@@ -82,17 +82,17 @@
               (set green (- frame-counter video-y))
               (set blue (+ frame-counter (bitwise-arithmetic-shift-right (* video-x video-y) 6))))))
         (else
-          (set red bg-red)
-          (set green bg-green)
-          (set blue bg-blue)))
+          (set red background-red)
+          (set green background-green)
+          (set blue background-blue)))
 
       (inc bar-counter)
 
       (when (= bar-counter bar-size)
         (set bar-counter 0)
-        (set bg-red (inv bg-red))
-        (set bg-green (inv bg-green))
-        (set bg-blue (inv bg-blue)))
+        (set background-red (inv background-red))
+        (set background-green (inv background-green))
+        (set background-blue (inv background-blue)))
 
       (const bool frame-start?
         (and (= video-x 0) (= video-y 0)))
