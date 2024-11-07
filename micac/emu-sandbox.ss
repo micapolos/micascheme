@@ -23,7 +23,7 @@
     (var uint8_t bits)
     (var uint8_t attr)
 
-    (file-data data data-size "/Users/micapolos/git/micascheme/micac/scr/Robocop.scr"))
+    (file scr scr-size "/Users/micapolos/git/micascheme/micac/scr/Robocop.scr"))
   (update
     (when (zero? pixel-cycle-counter)
       (const bool screen?
@@ -50,11 +50,11 @@
 
             (const int load-addr (<< frame-counter 1))
             (const bool bits? (> (>> bits-addr 3) load-addr))
-            (set bits (? bits? #xff (ref data (bits-addr))))
+            (set bits (? bits? #xff (ref scr (bits-addr))))
 
             (const int attr-addr (bitwise-ior #x1800 h-addr (<< (>> y 3) 5)))
             (const bool attr? (> (>> attr-addr 3) load-addr))
-            (set attr (? attr? #x07 (ref data (attr-addr)))))
+            (set attr (? attr? #x07 (ref scr (attr-addr)))))
 
           (const bool pixel-on? (not (zero? (bitwise-and bits #x80))))
           (set bits (<< bits 1))

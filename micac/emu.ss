@@ -5,7 +5,7 @@
     mouse-x mouse-y mouse-pressed?
     red green blue
     init update
-    file-data
+    file
     run-emu)
   (import
     (micac)
@@ -21,7 +21,7 @@
       red green blue
       init update)
 
-    (macro (file-data data data-size filename)
+    (macro (file data data-size filename)
       (sdl-file-data data data-size filename))
 
     (macro

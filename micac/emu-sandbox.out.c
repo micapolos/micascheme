@@ -67,9 +67,9 @@ int main() {
               printf("%s SDL Error: %s\n", "Could not open file.", SDL_GetError());
             }
             else {
-              size_t data_size;
-              uint8_t *data = SDL_LoadFile_RW(rw_ops, &data_size, 0);
-              if (!data) {
+              size_t scr_size;
+              uint8_t *scr = SDL_LoadFile_RW(rw_ops, &scr_size, 0);
+              if (!scr) {
                 printf("%s SDL Error: %s\n", "Could not open file.", SDL_GetError());
               }
               else {
@@ -102,10 +102,10 @@ int main() {
                             const int bits_addr = h_addr | (y & 192 | (y & 7) << 3 | (y & 56) >> 3) << 5;
                             const int load_addr = frame_counter << 1;
                             const bool bits_ = bits_addr >> 3 > load_addr;
-                            bits = bits_ ? 255 : data[bits_addr];
+                            bits = bits_ ? 255 : scr[bits_addr];
                             const int attr_addr = 6144 | h_addr | y >> 3 << 5;
                             const bool attr_ = attr_addr >> 3 > load_addr;
-                            attr = attr_ ? 7 : data[attr_addr];
+                            attr = attr_ ? 7 : scr[attr_addr];
                           }
                           const bool pixel_on_ = !((bits & 128) == 0);
                           bits = bits << 1;
@@ -191,7 +191,7 @@ int main() {
                     }
                   }
                 }
-                free(data);
+                free(scr);
               }
               SDL_RWclose(rw_ops);
             }
