@@ -23,7 +23,7 @@
     (var uint8_t bits)
     (var uint8_t attr)
 
-    (file scr scr-size "/Users/micapolos/git/micascheme/micac/scr/Robocop.scr"))
+    (file scr scr-size "/Users/micapolos/git/micascheme/micac/scr/Cobra.scr"))
   (update
     (when (zero? pixel-cycle-counter)
       (const bool screen?
