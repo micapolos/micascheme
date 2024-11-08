@@ -24,7 +24,8 @@
     bytevector->syntax
     vector->syntax
     syntax=?
-    syntax-replace)
+    syntax-replace
+    transform)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -230,4 +231,14 @@
   (define (vector->syntax $vector)
     #`(($primitive 3 vector)
       #,@(vector->list $vector)))
+
+  (define transform
+    (case-lambda
+      (($transformer $syntax $lookup)
+        (let (($result ($transformer $syntax)))
+          (if (procedure? $result)
+            ($result $lookup)
+            $result)))
+      (($transformer $syntax)
+        (transform $transformer $syntax (lambda _ #f)))))
 )

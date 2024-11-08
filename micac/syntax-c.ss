@@ -98,7 +98,10 @@
         (code+instrs $lookup $code
           #`(
             #,@(begin-syntaxes
-              (($lookup #'id #'micac-key) #`(id arg ...)))
+              (transform
+                ($lookup #'id #'micac-key)
+                #`(id arg ...)
+                $lookup))
             body ...)))
       ((other body ...)
         (code+instrs $lookup
@@ -200,7 +203,10 @@
         (code+instrs $lookup $code
           #`(
             #,@(begin-syntaxes
-              (($lookup #'id #'micac-key) $syntax)))))
+              (transform
+                ($lookup #'id #'micac-key)
+                $syntax
+                $lookup)))))
       ((id arg ...)
         (identifier? #'id)
         (code $code
@@ -341,7 +347,10 @@
       ((id arg ...)
         (and (identifier? #'id) ($lookup #'id #'micac-key))
         (syntax->expr $lookup
-          (($lookup #'id #'micac-key) $syntax)))
+          (transform
+            ($lookup #'id #'micac-key)
+            $syntax
+            $lookup)))
       ((id arg ...)
         (identifier? #'id)
         (parenthesized-expr 1 #t
