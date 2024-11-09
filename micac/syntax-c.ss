@@ -134,19 +134,16 @@
   (define (compiled-code+instr $compiled $syntax)
     (syntax-case $syntax (macro begin var const if when while then else)
       ((macro (id param ...) body ...)
-        (compiled
-          (env+
-            (compiled-env $compiled)
-            (identifier id)
-            (lambda ($syntax)
-              (lambda ($lookup)
-                (syntax-case $syntax ()
-                  ((_ arg ...)
-                    (syntax-subst
-                      #'(param ...)
-                      #'(arg ...)
-                      #'(begin body ...)))))))
-          (compiled-value $compiled)))
+        (compiled+ $compiled
+          (identifier id)
+          (lambda ($syntax)
+            (lambda ($lookup)
+              (syntax-case $syntax ()
+                ((_ arg ...)
+                  (syntax-subst
+                    #'(param ...)
+                    #'(arg ...)
+                    #'(begin body ...))))))))
       ((begin instr ...)
         (compiled-map
           ($code $compiled)

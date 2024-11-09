@@ -1,6 +1,7 @@
 (library (micac compiled)
   (export
     compiled compiled? compiled-env compiled-value
+    compiled+
     compiled-ref
     compiled-transform
     pure-compiled
@@ -11,6 +12,11 @@
     (micac env))
 
   (data (compiled env value))
+
+  (define (compiled+ $compiled $id $transformer)
+    (compiled
+      (env+ (compiled-env $compiled) $id $transformer)
+      (compiled-value $compiled)))
 
   (define (compiled-ref $compiled $id)
     (env-ref (compiled-env $compiled) $id))
