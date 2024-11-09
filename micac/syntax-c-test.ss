@@ -377,3 +377,14 @@
       #`(macro (zero s) (set s 0))
       #`(zero y))
     (lines-string "y = 0;")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(macro (zero v) (set v 0))
+      #`(macro (one v) (set v 1))
+      #`(zero x)
+      #`(one y))
+    (lines-string
+    "x = 0;"
+    "y = 1;")))

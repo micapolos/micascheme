@@ -47,15 +47,14 @@
     (compiled (compiled-scope compiled-expr) value))
 
   (define-rules-syntax
-    ((compiled-map body) (pure-compiled body))
-    ((compiled-map (value compiled-expr) decl ... body)
-      (compiled-map decl ...
-        (compiled-value
-          (lets
-            ($compiled compiled-expr)
-            (value (compiled-value $compiled))
-            ($body-value body)
-            (compiled (compiled-scope $compiled) $body-value))))))
+    ((compiled-map (value compiled-expr) body)
+      (lets
+        ($compiled compiled-expr)
+        (value (compiled-value $compiled))
+        (compiled (compiled-scope $compiled) body)))
+    ((compiled-map decl decls ... body)
+      (compiled-map decls ...
+        (compiled-value (compiled-map decl body)))))
 
   (define (size->code $size)
     (lets
