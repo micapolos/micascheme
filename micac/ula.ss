@@ -1,24 +1,25 @@
-(library (micac ula-screen)
-  (export ula-screen ula-screen-update)
+(library (micac ula)
+  (export ula)
   (import
     (micac)
     (micac std))
 
   (micac
-    (macro (ula-screen on? red green blue)
+    (macro (ula video-x video-y mem screen? red green blue update)
+      (const int ula-width 256)
+      (const int ula-height 192)
       (const int border 48)
-      (var bool on? #f)
+      (var bool screen? #f)
       (var uint8_t red 0)
       (var uint8_t green 0)
-      (var uint8_t blue 0))
-    (macro (ula-screen-update video-x video-y scr on? red green blue)
-      (set on?
-        (and
-          (in-range? video-x border (+ border ula-width))
-          (in-range? video-y border (+ border ula-height))))
+      (var uint8_t blue 0)
+      (macro (update)
+        (set screen?
+          (and
+            (in-range? video-x border (+ border ula-width))
+            (in-range? video-y border (+ border ula-height))))
 
-      (if on?
-        (then
+        (when screen?
           (const int ula-x (- video-x border))
           (const int ula-y (- video-y border))
           (const bool read? (zero? (bitwise-and ula-x #x07)))

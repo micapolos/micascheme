@@ -4,7 +4,7 @@
     width height video-x video-y
     mouse-x mouse-y mouse-pressed?
     red green blue
-    init update
+    update
     file
     run-emu)
   (import
@@ -19,7 +19,7 @@
       video width height video-x video-y
       mouse-x mouse-y mouse-pressed?
       red green blue
-      init update)
+      update)
 
     (macro (file data data-size filename)
       (sdl-file-data data data-size filename))
@@ -27,7 +27,7 @@
     (macro
       (emu
         (video width-expr height-expr h-blank-expr v-blank-expr cycles-per-pixel-expr)
-        (init init-body ...)
+        body ...
         (update update-body ...))
       (literals video init update)
       (const int width width-expr)
@@ -64,7 +64,7 @@
       (var int mouse-y 0)
       (var bool mouse-pressed? #f)
 
-      init-body ...
+      body ...
       (sdl-event-loop
         (begin
           (var int sdl-mouse-x)
