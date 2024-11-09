@@ -25,7 +25,8 @@
     vector->syntax
     syntax=?
     syntax-replace
-    transform)
+    transform
+    syntaxes)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -241,4 +242,7 @@
             $result)))
       (($transformer $syntax)
         (transform $transformer $syntax (lambda _ #f)))))
+
+  (define-rule-syntax (syntaxes xs ...)
+    (syntax->list #'(xs ...)))
 )

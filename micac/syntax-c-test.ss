@@ -371,3 +371,10 @@
   (equal?
     (syntax-c $lookup #`(foo 10 (foo 20 30)))
     (lines-string "fooed(10, fooed(20, 30));")))
+
+; (check
+;   (equal?
+;     (syntax-c $lookup
+;       #`(macro (zero s) (set s 0))
+;       #`(zero y))
+;     (lines-string "y = 0;")))

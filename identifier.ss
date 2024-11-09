@@ -4,7 +4,8 @@
     build-identifier
     identifier-append
     datum?
-    keywords)
+    keywords
+    identifier)
   (import
     (scheme)
     (syntax)
@@ -37,4 +38,9 @@
         (datum? id)
         (syntax-error #'id
           (format "expected ~a instead of" 'id))) ...))
+
+  (define-rule-syntax (identifier id)
+    (if (identifier? #'id)
+      #'id
+      (syntax-error #'id "not identifier")))
 )

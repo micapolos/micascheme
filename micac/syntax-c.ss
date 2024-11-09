@@ -9,10 +9,42 @@
 
   (define-aux-keyword micac-key)
 
+  (define scope list)
+
+  (define (scope+ $scope $id $transformer)
+    (push $scope (cons $id $transformer)))
+
+  (define (scope-ref $scope $id)
+    (lets
+      ($ass (assid $id $scope))
+      (and $ass (cdr $ass))))
+
   (data (compiled scope value))
 
+  (define (lookup-scope-ref $lookup $scope $id)
+    (or
+      (scope-ref $scope $id)
+      ($lookup $id #'micac-key)))
+
+  (define (compiled-ref $lookup $compiled $id)
+    (lookup-scope-ref $lookup (compiled-scope $compiled) $id))
+
+  (define (lookup-scope-transform $lookup $scope $id $syntax)
+    (lets
+      ($transformer (lookup-scope-ref $lookup $scope $id))
+      (if $transformer
+        (transform $transformer $syntax $lookup)
+        (syntax-error $id "no macro"))))
+
+  (define (compiled-transform $lookup $compiled $id $syntax)
+    (lets
+      ($transformer (compiled-ref $lookup $compiled $id))
+      (if $transformer
+        (transform $transformer $syntax $lookup)
+        (syntax-error $id "no macro"))))
+
   (define-rule-syntax (pure-compiled value)
-    (compiled (list) value))
+    (compiled (scope) value))
 
   (define-rule-syntax (compiled-with compiled-expr value)
     (compiled (compiled-scope compiled-expr) value))
@@ -113,14 +145,11 @@
             (then break-body ...)
             (else body ...))))
       (((id arg ...) body ...)
-        (and (identifier? #'id) ($lookup #'id #'micac-key))
+        (and (identifier? #'id) (compiled-ref $lookup $compiled #'id))
         (compiled-code+instrs $lookup $compiled
           #`(
             #,@(begin-syntaxes
-              (transform
-                ($lookup #'id #'micac-key)
-                #`(id arg ...)
-                $lookup))
+              (compiled-transform $lookup $compiled #'id #'(id arg ...)))
             body ...)))
       ((other body ...)
         (compiled-code+instrs $lookup
@@ -154,7 +183,20 @@
       (_ #f)))
 
   (define (compiled-code+instr $lookup $compiled $syntax)
-    (syntax-case $syntax (begin var const if when while then else)
+    (syntax-case $syntax (macro begin var const if when while then else)
+      ((macro (id param ...) body ...)
+        (compiled
+          (scope+
+            (compiled-scope $compiled)
+            (identifier id)
+            (lambda ($syntax)
+              (fold-left
+                (lambda ($acc $old $new)
+                  (syntax-replace $old $new $acc))
+                #`(begin body ...)
+                (syntaxes param ...)
+                (syntaxes body ...))))
+          (compiled-value $compiled)))
       ((begin instr ...)
         (compiled-map
           ($code $compiled)
@@ -241,14 +283,11 @@
           (code+op2 $lookup $code
             #'lhs (op2->string-opt #'op2) #'expr)))
       ((id arg ...)
-        (and (identifier? #'id) ($lookup #'id #'micac-key))
+        (and (identifier? #'id) (compiled-ref $lookup $compiled #'id))
         (compiled-code+instrs $lookup $compiled
           #`(
             #,@(begin-syntaxes
-              (transform
-                ($lookup #'id #'micac-key)
-                $syntax
-                $lookup)))))
+              (compiled-transform $lookup $compiled #'id $syntax)))))
       ((id arg ...)
         (identifier? #'id)
         (compiled-map
@@ -264,7 +303,7 @@
                       (map expr-code
                         (map
                           (partial syntax->expr $lookup)
-                          (syntax->list #`(arg ...))))
+                          (syntaxes arg ...)))
                       (code ", "))))
                 ")"))
             ";\n")))))
@@ -406,7 +445,7 @@
                 (map expr-code
                   (map
                     (partial syntax->expr $lookup)
-                    (syntax->list #`(arg ...))))
+                    (syntaxes arg ...)))
                 (code ", "))))
           ")"))
       (other
@@ -425,7 +464,7 @@
               ((expr)
                 (parenthesized-expr 1 #t $expr "[" (syntax->expr $lookup #'expr) "]"))))
           (variable->expr #'var)
-          (syntax->list #'(x ...))))))
+          (syntaxes x ...)))))
 
   (define (op1->expr $lookup $priority $left-to-right? $op $rhs)
     (prefix-expr $priority $left-to-right? $op
