@@ -132,133 +132,129 @@
       (_ #f)))
 
   (define (compiled-code+instr $compiled $syntax)
-    (syntax-case $syntax (macro begin var const if when while then else)
-      ((macro (id param ...) body ...)
-        (compiled+ $compiled
-          (identifier id)
-          (lambda ($syntax)
-            (lambda ($lookup)
-              (syntax-case $syntax ()
-                ((_ arg ...)
-                  (syntax-subst
-                    #'(param ...)
-                    #'(arg ...)
-                    #'(begin body ...))))))))
-      ((begin instr ...)
-        (compiled-map
-          ($code $compiled)
-          (code $code
-            (code-in-curly-brackets
-              (code-indent
-                (code "\n"
-                  (compiled-value
-                    (compiled-code+instrs
-                      (compiled-with $compiled empty-code)
-                      #'(instr ...))))))
-            "\n")))
-      ((var type id)
-        (compiled-map
-          ($code $compiled)
-          (code $code
-            (space-separated-code
-              (type->code #'type)
-              (declarator->code (compiled-env $compiled) #'id))
-            ";\n")))
-      ((var type id expr)
-        (compiled-map
-          ($code $compiled)
-          (code $code
-            (space-separated-code
-              (type->code #'type)
-              (declarator->code (compiled-env $compiled) #'id)
-              "="
-              (expr-code (syntax->expr (compiled-env $compiled) #'expr)))
-            ";\n")))
-      ((const type id expr)
-        (compiled-map
-          ($code $compiled)
-          (code $code
-            (space-separated-code
-              "const"
-              (type->code #'type)
-              (declarator->code (compiled-env $compiled) #'id)
-              "="
-              (expr-code (syntax->expr (compiled-env $compiled) #'expr)))
-            ";\n")))
-      ((if expr (then then-body ...) (else else-body ...))
-        (compiled-map
-          ($code $compiled)
-          ($then-code
-            (compiled-code+instr (compiled-with $compiled empty-code)
-              (instr->begin #'(begin then-body ...))))
-          ($else-code
-            (compiled-code+instr (compiled-with $compiled empty-code)
-              (instr->begin #'(begin else-body ...))))
-          (code $code
-            (space-separated-code
-              "if"
-              (code-in-round-brackets
-                (expr-code (syntax->expr (compiled-env $compiled) #'expr)))
-              $then-code)
-            (space-separated-code
-              "else"
-              $else-code))))
-      ((when expr body ...)
-        (compiled-map
-          ($code $compiled)
-          ($when-code
-            (compiled-code+instr
-              (compiled-with $compiled empty-code)
-              (instr->begin #'(begin body ...))))
-          (code $code
-            (space-separated-code
-              "if"
-              (code-in-round-brackets
-                (expr-code (syntax->expr (compiled-env $compiled) #'expr)))
-              $when-code))))
-      ((while expr instr ...)
-        (compiled-map
-          ($code $compiled)
-          ($while-code
-            (compiled-code+instr (compiled-with $compiled empty-code)
-              #'(begin instr ...)))
-          (code $code
-            (space-separated-code
-              "while"
-              (code-in-round-brackets
-                (expr-code (syntax->expr (compiled-env $compiled) #'expr)))
-              $while-code))))
-      ((op2 lhs expr)
-        (op2->string-opt #'op2)
-        (compiled-map
-          ($code $compiled)
-          (code+op2 (compiled-env $compiled) $code
-            #'lhs (op2->string-opt #'op2) #'expr)))
-      ((id arg ...)
-        (lets
-          ($transformer (compiled-ref $compiled (identifier id)))
-          (if $transformer
-            (compiled-code+instrs $compiled
-              #`(
-                #,@(begin-syntaxes
-                  (compiled-transform $compiled #'id $syntax))))
-            (compiled-map
-              ($code $compiled)
-              (code $code
-                (expr-code
-                  (parenthesized-expr 1 #t
-                    (variable->expr #'id)
-                    "("
-                    (expr 0 #t
-                      (apply code-append
-                        (intercalate
-                          (map expr-code
-                            (map
-                              (partial syntax->expr (compiled-env $compiled))
-                              (syntaxes arg ...)))
-                          (code ", "))))
-                    ")"))
-                ";\n")))))))
+    (lets
+      ((compiled $env $code) $compiled)
+      (syntax-case $syntax (macro begin var const if when while then else)
+        ((macro (id param ...) body ...)
+          (compiled+ $compiled
+            (identifier id)
+            (lambda ($syntax)
+              (lambda ($lookup)
+                (syntax-case $syntax ()
+                  ((_ arg ...)
+                    (syntax-subst
+                      #'(param ...)
+                      #'(arg ...)
+                      #'(begin body ...))))))))
+        ((begin instr ...)
+          (compiled-with $compiled
+            (code $code
+              (code-in-curly-brackets
+                (code-indent
+                  (code "\n"
+                    (compiled-value
+                      (compiled-code+instrs
+                        (compiled-with $compiled empty-code)
+                        #'(instr ...))))))
+              "\n")))
+        ((var type id)
+          (compiled-with $compiled
+            (code $code
+              (space-separated-code
+                (type->code #'type)
+                (declarator->code $env #'id))
+              ";\n")))
+        ((var type id expr)
+          (compiled-with $compiled
+            (code $code
+              (space-separated-code
+                (type->code #'type)
+                (declarator->code $env #'id)
+                "="
+                (expr-code (syntax->expr $env #'expr)))
+              ";\n")))
+        ((const type id expr)
+          (compiled-with $compiled
+            (code $code
+              (space-separated-code
+                "const"
+                (type->code #'type)
+                (declarator->code $env #'id)
+                "="
+                (expr-code (syntax->expr $env #'expr)))
+              ";\n")))
+        ((if expr (then then-body ...) (else else-body ...))
+          (compiled-map
+            ($code $compiled)
+            ($then-code
+              (compiled-code+instr (compiled-with $compiled empty-code)
+                (instr->begin #'(begin then-body ...))))
+            ($else-code
+              (compiled-code+instr (compiled-with $compiled empty-code)
+                (instr->begin #'(begin else-body ...))))
+            (code $code
+              (space-separated-code
+                "if"
+                (code-in-round-brackets
+                  (expr-code (syntax->expr $env #'expr)))
+                $then-code)
+              (space-separated-code
+                "else"
+                $else-code))))
+        ((when expr body ...)
+          (compiled-map
+            ($code $compiled)
+            ($when-code
+              (compiled-code+instr
+                (compiled-with $compiled empty-code)
+                (instr->begin #'(begin body ...))))
+            (code $code
+              (space-separated-code
+                "if"
+                (code-in-round-brackets
+                  (expr-code (syntax->expr $env #'expr)))
+                $when-code))))
+        ((while expr instr ...)
+          (compiled-map
+            ($code $compiled)
+            ($while-code
+              (compiled-code+instr (compiled-with $compiled empty-code)
+                #'(begin instr ...)))
+            (code $code
+              (space-separated-code
+                "while"
+                (code-in-round-brackets
+                  (expr-code (syntax->expr $env #'expr)))
+                $while-code))))
+        ((op2 lhs expr)
+          (op2->string-opt #'op2)
+          (compiled-with $compiled
+            (code+op2 $env $code
+              #'lhs (op2->string-opt #'op2) #'expr)))
+        ((id arg ...)
+          (lets
+            ($transformer (compiled-ref $compiled (identifier id)))
+            (if $transformer
+              (compiled-code+instrs $compiled
+                #`(
+                  #,@(begin-syntaxes
+                    (compiled-transform $compiled #'id $syntax))))
+              (compiled-with $compiled
+                (code $code
+                  (expr-code
+                    (parenthesized-expr 1 #t
+                      (variable->expr #'id)
+                      "("
+                      (expr 0 #t
+                        (apply code-append
+                          (intercalate
+                            (map expr-code
+                              (map
+                                (partial syntax->expr $env)
+                                (syntaxes arg ...)))
+                            (code ", "))))
+                      ")"))
+                  ";\n"))))))))
 
   (define (code+op2 $env $code $lhs $op $expr)
     (code $code
