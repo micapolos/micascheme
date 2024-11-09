@@ -3,10 +3,9 @@
 (define-aux-keyword foo)
 
 (define $lookup
-  (lambda ($id $key)
+  (lambda ($id)
     (and
       (free-identifier=? $id #'foo)
-      (free-identifier=? $key #'micac-key)
       (lambda ($syntax)
         (syntax-case $syntax ()
           ((_ arg ...)

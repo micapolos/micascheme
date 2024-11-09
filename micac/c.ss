@@ -3,21 +3,15 @@
     micac-c
     define-micac-syntax
     micac-externs
-    micac-macro
-    define-micac-property)
+    micac-macro)
   (import (micascheme) (micac syntax-c) (micac syntax) (syntax))
   (export (import (micac syntax)))
-
-  (define-rule-syntax (define-micac-property id transformer)
-    (define-property id micac-key transformer))
 
   (define-rule-syntax (micac-externs id ...)
     (define-aux-keywords id ...))
 
   (define-rule-syntax (define-micac-syntax id transformer)
-    (begin
-      (define-aux-keyword id)
-      (define-micac-property id transformer)))
+    (define-syntax id (make-compile-time-value transformer)))
 
   (define-rules-syntax (literals literals)
     ((micac-macro (id arg ...) (literals literal ...) body)

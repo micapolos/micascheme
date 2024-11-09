@@ -1,13 +1,10 @@
 (library (micac syntax-c)
-  (export
-    syntax-c micac-key)
+  (export syntax-c)
   (import
     (micascheme)
     (code)
     (micac expr)
     (micac syntax))
-
-  (define-aux-keyword micac-key)
 
   (define scope list)
 
@@ -24,7 +21,7 @@
   (define (lookup-scope-ref $lookup $scope $id)
     (or
       (scope-ref $scope $id)
-      ($lookup $id #'micac-key)))
+      ($lookup $id)))
 
   (define (compiled-ref $lookup $compiled $id)
     (lookup-scope-ref $lookup (compiled-scope $compiled) $id))
@@ -438,10 +435,10 @@
             " : "
             (expr-operand-code (syntax->expr $lookup #'false) 13 #t))))
       ((id arg ...)
-        (and (identifier? #'id) ($lookup #'id #'micac-key))
+        (and (identifier? #'id) ($lookup #'id))
         (syntax->expr $lookup
           (transform
-            ($lookup #'id #'micac-key)
+            ($lookup #'id)
             $syntax
             $lookup)))
       ((id arg ...)
