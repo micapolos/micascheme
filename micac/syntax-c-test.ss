@@ -388,3 +388,17 @@
     (lines-string
     "x = 0;"
     "y = 1;")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(macro (zero v) (set v 0))
+      #`(begin
+        (macro (zero v) (set v 1))
+        (zero x))
+      #`(zero y))
+    (lines-string
+    "{"
+    "  x = 1;"
+    "}"
+    "y = 0;")))

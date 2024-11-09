@@ -199,9 +199,14 @@
       ((begin instr ...)
         (compiled-map
           ($code $compiled)
-          ($begin-code (compiled-code+instrs $lookup (compiled-with $compiled empty-code) #'(instr ...)))
           (code $code
-            (code-in-curly-brackets (code-indent (code "\n" $begin-code)))
+            (code-in-curly-brackets
+              (code-indent
+                (code "\n"
+                  (compiled-value
+                    (compiled-code+instrs $lookup
+                      (compiled-with $compiled empty-code)
+                      #'(instr ...))))))
             "\n")))
       ((var type id)
         (compiled-map
