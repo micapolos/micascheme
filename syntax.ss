@@ -26,7 +26,8 @@
     syntax=?
     syntax-replace
     transform
-    syntaxes)
+    syntaxes
+    syntax-subst)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -245,4 +246,15 @@
 
   (define-rule-syntax (syntaxes xs ...)
     (syntax->list #'(xs ...)))
+
+  (define (syntax-subst $from $to $syntax)
+    (syntax-case #`(#,$from #,$to) ()
+      ((() ())
+        $syntax)
+      ((x y)
+        (identifier? #'x)
+        (syntax-replace #'x #'y $syntax))
+      (((a . b) (c . d))
+        (syntax-subst #'b #'d
+          (syntax-subst #'a #'c $syntax)))))
 )

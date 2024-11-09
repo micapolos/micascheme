@@ -60,9 +60,16 @@
 (check (not (syntax=? #`(+ -) #`(+))))
 (check (not (syntax=? #`(+ . -) #`(+ . *))))
 
-; --- replace-identifiers
-
 (check
   (syntax=?
     (syntax-replace #'+ #'- #'(+ 10 (+ 20 (* 30 40))))
     #'(- 10 (- 20 (* 30 40)))))
+
+(check
+  (syntax=?
+    (syntax-subst
+      #'(a (b c))
+      #'(10 (20 30))
+      #'(+ a b c))
+    #'(+ 10 20 30)))
+

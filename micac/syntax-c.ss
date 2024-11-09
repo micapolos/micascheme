@@ -190,19 +190,10 @@
               (lambda ($lookup)
                 (syntax-case $syntax ()
                   ((_ arg ...)
-                    (lets
-                      ($params (syntaxes param ...))
-                      ($args (syntaxes arg ...))
-                      ($param-count (length $params))
-                      ($arg-count (length $args))
-                      (if (not (= $param-count $arg-count))
-                        (syntax-error $syntax (format "expected ~a arguments in" $param-count))
-                        (fold-left
-                          (lambda ($acc $old $new)
-                            (syntax-replace $old $new $acc))
-                          #`(begin body ...)
-                          $params
-                          $args))))))))
+                    (syntax-subst
+                      #'(param ...)
+                      #'(arg ...)
+                      #'(begin body ...)))))))
           (compiled-value $compiled)))
       ((begin instr ...)
         (compiled-map
