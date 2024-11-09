@@ -47,6 +47,8 @@
     (compiled (compiled-scope compiled-expr) value))
 
   (define-rules-syntax
+    ((compiled-map body)
+      (pure-compiled body))
     ((compiled-map (value compiled-expr) body)
       (lets
         ($compiled compiled-expr)
