@@ -429,6 +429,6 @@
     (code-string
       (compiled-value
         (compiled-code+instrs
-          (compiled (env $lookup (scope)) empty-code)
+          (compiled (lookup-env $lookup) empty-code)
           #`(#,@$syntaxes)))))
 )
