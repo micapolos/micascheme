@@ -9,6 +9,25 @@
 
   (define-aux-keyword micac-key)
 
+  (data (compiled scope value))
+
+  (define-rule-syntax (pure-compiled value)
+    (compiled (list) value))
+
+  (define-rule-syntax (compiled-with compiled-expr value)
+    (compiled (compiled-scope compiled-expr) value))
+
+  (define-rules-syntax
+    ((compiled-map body) (pure-compiled body))
+    ((compiled-map (value compiled-expr) decl ... body)
+      (compiled-map decl ...
+        (compiled-value
+          (lets
+            ($compiled compiled-expr)
+            (value (compiled-value $compiled))
+            ($body-value body)
+            (compiled (compiled-scope $compiled) $body-value))))))
+
   (define (size->code $size)
     (lets
       ($datum (syntax->datum $size))
@@ -81,21 +100,21 @@
       (const
         (literal->expr #'const))))
 
-  (define (code+instrs $lookup $code $syntax)
+  (define (compiled-code+instrs $lookup $compiled $syntax)
     (syntax-case $syntax (defer break-if)
-      (() $code)
+      (() $compiled)
       (((defer deferred ...) body ...)
-        (code+instrs $lookup
-          (code+instrs $lookup $code #'(body ...))
+        (compiled-code+instrs $lookup
+          (compiled-code+instrs $lookup $compiled #'(body ...))
           #'(deferred ...)))
       (((break-if expr break-body ...) body ...)
-        (code+instr $lookup $code
+        (compiled-code+instr $lookup $compiled
           #`(if expr
             (then break-body ...)
             (else body ...))))
       (((id arg ...) body ...)
         (and (identifier? #'id) ($lookup #'id #'micac-key))
-        (code+instrs $lookup $code
+        (compiled-code+instrs $lookup $compiled
           #`(
             #,@(begin-syntaxes
               (transform
@@ -104,8 +123,8 @@
                 $lookup))
             body ...)))
       ((other body ...)
-        (code+instrs $lookup
-          (code+instr $lookup $code #'other)
+        (compiled-code+instrs $lookup
+          (compiled-code+instr $lookup $compiled #'other)
           #'(body ...)))))
 
   (define (instr->begin $instr)
@@ -134,73 +153,96 @@
       (set-bitwise-arithmetic-shift-right ">>=")
       (_ #f)))
 
-  (define (code+instr $lookup $code $syntax)
+  (define (compiled-code+instr $lookup $compiled $syntax)
     (syntax-case $syntax (begin var const if when while then else)
       ((begin instr ...)
-        (code $code
-          (code-in-curly-brackets
-            (code-indent
-              (code "\n"
-                (code+instrs $lookup empty-code #'(instr ...)))))
-          "\n"))
+        (compiled-map
+          ($code $compiled)
+          ($begin-code (compiled-code+instrs $lookup (compiled-with $compiled empty-code) #'(instr ...)))
+          (code $code
+            (code-in-curly-brackets (code-indent (code "\n" $begin-code)))
+            "\n")))
       ((var type id)
-        (code $code
-          (space-separated-code
-            (type->code #'type)
-            (declarator->code $lookup #'id))
-          ";\n"))
+        (compiled-map
+          ($code $compiled)
+          (code $code
+            (space-separated-code
+              (type->code #'type)
+              (declarator->code $lookup #'id))
+            ";\n")))
       ((var type id expr)
-        (code $code
-          (space-separated-code
-            (type->code #'type)
-            (declarator->code $lookup #'id)
-            "="
-            (expr-code (syntax->expr $lookup #'expr)))
-          ";\n"))
+        (compiled-map
+          ($code $compiled)
+          (code $code
+            (space-separated-code
+              (type->code #'type)
+              (declarator->code $lookup #'id)
+              "="
+              (expr-code (syntax->expr $lookup #'expr)))
+            ";\n")))
       ((const type id expr)
-        (code $code
-          (space-separated-code
-            "const"
-            (type->code #'type)
-            (declarator->code $lookup #'id)
-            "="
-            (expr-code (syntax->expr $lookup #'expr)))
-          ";\n"))
+        (compiled-map
+          ($code $compiled)
+          (code $code
+            (space-separated-code
+              "const"
+              (type->code #'type)
+              (declarator->code $lookup #'id)
+              "="
+              (expr-code (syntax->expr $lookup #'expr)))
+            ";\n")))
       ((if expr (then then-body ...) (else else-body ...))
-        (code $code
-          (space-separated-code
-            "if"
-            (code-in-round-brackets
-              (expr-code (syntax->expr $lookup #'expr)))
-            (code+instr $lookup empty-code
+        (compiled-map
+          ($code $compiled)
+          ($then-code
+            (compiled-code+instr $lookup (compiled-with $compiled empty-code)
               (instr->begin #'(begin then-body ...))))
-          (space-separated-code
-            "else"
-            (code+instr $lookup empty-code
-              (instr->begin #'(begin else-body ...))))))
+          ($else-code
+            (compiled-code+instr $lookup (compiled-with $compiled empty-code)
+              (instr->begin #'(begin else-body ...))))
+          (code $code
+            (space-separated-code
+              "if"
+              (code-in-round-brackets
+                (expr-code (syntax->expr $lookup #'expr)))
+              $then-code)
+            (space-separated-code
+              "else"
+              $else-code))))
       ((when expr body ...)
-        (code $code
-          (space-separated-code
-            "if"
-            (code-in-round-brackets
-              (expr-code (syntax->expr $lookup #'expr)))
-            (code+instr $lookup empty-code
-              (instr->begin #'(begin body ...))))))
+        (compiled-map
+          ($code $compiled)
+          ($when-code
+            (compiled-code+instr $lookup
+              (compiled-with $compiled empty-code)
+              (instr->begin #'(begin body ...))))
+          (code $code
+            (space-separated-code
+              "if"
+              (code-in-round-brackets
+                (expr-code (syntax->expr $lookup #'expr)))
+              $when-code))))
       ((while expr instr ...)
-        (code $code
-          (space-separated-code
-            "while"
-            (code-in-round-brackets
-              (expr-code (syntax->expr $lookup #'expr)))
-            (code+instr $lookup empty-code
-              #'(begin instr ...)))))
+        (compiled-map
+          ($code $compiled)
+          ($while-code
+            (compiled-code+instr $lookup (compiled-with $compiled empty-code)
+              #'(begin instr ...)))
+          (code $code
+            (space-separated-code
+              "while"
+              (code-in-round-brackets
+                (expr-code (syntax->expr $lookup #'expr)))
+              $while-code))))
       ((op2 lhs expr)
         (op2->string-opt #'op2)
-        (code+op2 $lookup $code
-          #'lhs (op2->string-opt #'op2) #'expr))
+        (compiled-map
+          ($code $compiled)
+          (code+op2 $lookup $code
+            #'lhs (op2->string-opt #'op2) #'expr)))
       ((id arg ...)
         (and (identifier? #'id) ($lookup #'id #'micac-key))
-        (code+instrs $lookup $code
+        (compiled-code+instrs $lookup $compiled
           #`(
             #,@(begin-syntaxes
               (transform
@@ -209,21 +251,23 @@
                 $lookup)))))
       ((id arg ...)
         (identifier? #'id)
-        (code $code
-          (expr-code
-            (parenthesized-expr 1 #t
-              (variable->expr #'id)
-              "("
-              (expr 0 #t
-                (apply code-append
-                  (intercalate
-                    (map expr-code
-                      (map
-                        (partial syntax->expr $lookup)
-                        (syntax->list #`(arg ...))))
-                    (code ", "))))
-              ")"))
-          ";\n"))))
+        (compiled-map
+          ($code $compiled)
+          (code $code
+            (expr-code
+              (parenthesized-expr 1 #t
+                (variable->expr #'id)
+                "("
+                (expr 0 #t
+                  (apply code-append
+                    (intercalate
+                      (map expr-code
+                        (map
+                          (partial syntax->expr $lookup)
+                          (syntax->list #`(arg ...))))
+                      (code ", "))))
+                ")"))
+            ";\n")))))
 
   (define (code+op2 $lookup $code $lhs $op $expr)
     (code $code
@@ -395,6 +439,7 @@
 
   (define (syntax-c $lookup . $syntaxes)
     (code-string
-      (code+instrs $lookup empty-code
-        #`(#,@$syntaxes))))
+      (compiled-value
+        (compiled-code+instrs $lookup (pure-compiled empty-code)
+          #`(#,@$syntaxes)))))
 )
