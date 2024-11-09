@@ -4,6 +4,8 @@
   (micac emu)
   (micac sdl)
   (micac ula)
+  (micac plasma)
+  (micac background)
   (c run))
 
 (c-run-echo? #t)
@@ -11,53 +13,39 @@
 (run-emu
   (video 352 288 96 24 4) ; width height h-blank v-blank cycles-per-pixel
 
-  (const int bar-size 4630)
-  (var int bar-counter 0)
-
-  (var uint8_t background-red #xff)
-  (var uint8_t background-green #xff)
-  (var uint8_t background-blue 0)
-
   (var int frame-counter 0)
-
-  (var uint8_t bits)
-  (var uint8_t attr)
 
   (file scr scr-size "/Users/micapolos/git/micascheme/micac/scr/Cobra.scr")
 
-  (ula video-x video-y scr screen? ula-red ula-green ula-blue ula-update)
+  (background 4630 background-red background-green background-blue background-update)
+  (ula video-x video-y scr ula-screen? ula-red ula-green ula-blue ula-update)
+  (plasma video-x video-y frame-counter plasma-red plasma-green plasma-blue plasma-update)
 
   (update
     (when (zero? pixel-cycle-counter)
+      (background-update)
       (ula-update)
+      (plasma-update)
 
-      (if screen?
+      (if ula-screen?
         (then
-          (const bool ula?
+          (const bool plasma?
             (or
               (and (>= video-x mouse-x) (>= video-y mouse-y))
               (and (< video-x mouse-x) (< video-y mouse-y))))
-          (if (xor ula? mouse-pressed?)
+          (if (xor plasma? mouse-pressed?)
             (then
               (set red ula-red)
               (set green ula-green)
               (set blue ula-blue))
             (else
-              (set red (- frame-counter video-x))
-              (set green (- frame-counter video-y))
-              (set blue (+ frame-counter (>> (* video-x video-y) 6))))))
+              (set red plasma-red)
+              (set green plasma-green)
+              (set blue plasma-blue))))
         (else
           (set red background-red)
           (set green background-green)
           (set blue background-blue)))
-
-      (inc bar-counter)
-
-      (when (= bar-counter bar-size)
-        (set bar-counter 0)
-        (set background-red (inv background-red))
-        (set background-green (inv background-green))
-        (set background-blue (inv background-blue)))
 
       (const bool frame-start?
         (and (= video-x 0) (= video-y 0)))

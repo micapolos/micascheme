@@ -51,14 +51,7 @@ int main() {
             int mouse_x = 0;
             int mouse_y = 0;
             bool mouse_pressed_ = false;
-            const int bar_size = 4630;
-            int bar_counter = 0;
-            uint8_t background_red = 255;
-            uint8_t background_green = 255;
-            uint8_t background_blue = 0;
             int frame_counter = 0;
-            uint8_t bits;
-            uint8_t attr;
             SDL_RWops *rw_ops = SDL_RWFromFile("/Users/micapolos/git/micascheme/micac/scr/Cobra.scr", "rb");
             if (!rw_ops) {
               printf("%s SDL Error: %s\n", "Could not open file.", SDL_GetError());
@@ -70,13 +63,22 @@ int main() {
                 printf("%s SDL Error: %s\n", "Could not open file.", SDL_GetError());
               }
               else {
+                int bar_counter = 0;
+                uint8_t background_red = 255;
+                uint8_t background_green = 255;
+                uint8_t background_blue = 0;
                 const int ula_width = 256;
                 const int ula_height = 192;
                 const int border = 48;
-                bool screen_ = false;
+                uint8_t bits;
+                uint8_t attr;
+                bool ula_screen_ = false;
                 uint8_t ula_red = 0;
                 uint8_t ula_green = 0;
                 uint8_t ula_blue = 0;
+                uint8_t plasma_red;
+                uint8_t plasma_green;
+                uint8_t plasma_blue;
                 bool running = true;
                 SDL_Event event;
                 int sdl_mouse_x = 0;
@@ -100,8 +102,15 @@ int main() {
                     int counter = frame_cycles;
                     while (counter) {
                       if (pixel_cycle_counter == 0) {
-                        screen_ = video_x >= border && video_x < border + ula_width && (video_y >= border && video_y < border + ula_height);
-                        if (screen_) {
+                        bar_counter += 1;
+                        if (bar_counter == 4630) {
+                          bar_counter = 0;
+                          background_red = ~background_red;
+                          background_green = ~background_green;
+                          background_blue = ~background_blue;
+                        }
+                        ula_screen_ = video_x >= border && video_x < border + ula_width && (video_y >= border && video_y < border + ula_height);
+                        if (ula_screen_) {
                           const int ula_x = video_x - border;
                           const int ula_y = video_y - border;
                           const bool read_ = (ula_x & 7) == 0;
@@ -129,30 +138,26 @@ int main() {
                           ula_green = green_ ? color : 0;
                           ula_blue = blue_ ? color : 0;
                         }
-                        if (screen_) {
-                          const bool ula_ = video_x >= mouse_x && video_y >= mouse_y || video_x < mouse_x && video_y < mouse_y;
-                          if (ula_ ^ mouse_pressed_) {
+                        plasma_red = frame_counter - video_x;
+                        plasma_green = frame_counter - video_y;
+                        plasma_blue = frame_counter + (video_x * video_y >> 6);
+                        if (ula_screen_) {
+                          const bool plasma_ = video_x >= mouse_x && video_y >= mouse_y || video_x < mouse_x && video_y < mouse_y;
+                          if (plasma_ ^ mouse_pressed_) {
                             red = ula_red;
                             green = ula_green;
                             blue = ula_blue;
                           }
                           else {
-                            red = frame_counter - video_x;
-                            green = frame_counter - video_y;
-                            blue = frame_counter + (video_x * video_y >> 6);
+                            red = plasma_red;
+                            green = plasma_green;
+                            blue = plasma_blue;
                           }
                         }
                         else {
                           red = background_red;
                           green = background_green;
                           blue = background_blue;
-                        }
-                        bar_counter += 1;
-                        if (bar_counter == bar_size) {
-                          bar_counter = 0;
-                          background_red = ~background_red;
-                          background_green = ~background_green;
-                          background_blue = ~background_blue;
                         }
                         const bool frame_start_ = video_x == 0 && video_y == 0;
                         if (frame_start_) {

@@ -10,6 +10,9 @@
       (const int ula-height 192)
       (const int border 48)
 
+      (var uint8_t bits)
+      (var uint8_t attr)
+
       (var bool screen? #f)
       (var uint8_t red 0)
       (var uint8_t green 0)

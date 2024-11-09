@@ -1,0 +1,17 @@
+(library (micac background)
+  (export background)
+  (import (micac) (micac std))
+
+  (micac
+    (macro (background size red green blue update)
+      (var int bar-counter 0)
+      (var uint8_t red #xff)
+      (var uint8_t green #xff)
+      (var uint8_t blue 0)
+      (macro (update)
+        (inc bar-counter)
+        (when (= bar-counter size)
+          (set bar-counter 0)
+          (set red (inv red))
+          (set green (inv green))
+          (set blue (inv blue)))))))
