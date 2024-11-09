@@ -1,14 +1,19 @@
 (library (micac env)
   (export
-    env env? env-lookup env-scope)
+    env env? env-lookup env-scope
+    empty-env env+ env-ref env-transform)
   (import
     (micascheme)
     (micac scope))
 
   (data (env lookup scope))
 
+  (define empty-env (env (lambda _ #f) (scope)))
+
   (define (env+ $env $id $transformer)
-    (env (env-lookup $env) $id $transformer))
+    (env
+      (env-lookup $env)
+      (scope+ (env-scope $env) $id $transformer)))
 
   (define (env-ref $env $id)
     (or

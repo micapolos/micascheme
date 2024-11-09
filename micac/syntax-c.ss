@@ -28,17 +28,17 @@
       (_
         (syntax-error $type "unknown type"))))
 
-  (define (declarator->code $lookup $syntax)
+  (define (declarator->code $env $syntax)
     (syntax-case $syntax (*)
       (id (identifier? #'id)
         (type->code #'id))
       ((* decl)
-        (code "*" (declarator->code $lookup #'decl)))
+        (code "*" (declarator->code $env #'decl)))
       ((* decl expr)
         (code
-          (declarator->code $lookup #'decl)
+          (declarator->code $env #'decl)
           (code-in-square-brackets
-            (expr-code (syntax->expr $lookup #'expr)))))))
+            (expr-code (syntax->expr $env #'expr)))))))
 
   (define (identifier->code $identifier)
     (string-code
@@ -66,12 +66,12 @@
   (define (variable->expr $variable)
     (expr 0 #t (identifier->code $variable)))
 
-  (define (lhs->expr $lookup $syntax)
+  (define (lhs->expr $env $syntax)
     (syntax-case $syntax ()
       (id (identifier? #'id)
         (variable->expr #'id))
       (other
-        (ref->expr $lookup #'other))))
+        (ref->expr $env #'other))))
 
   (define (value->expr $value)
     (syntax-case $value ()
@@ -81,28 +81,28 @@
       (const
         (literal->expr #'const))))
 
-  (define (compiled-code+instrs $lookup $compiled $syntax)
+  (define (compiled-code+instrs $compiled $syntax)
     (syntax-case $syntax (defer break-if)
       (() $compiled)
       (((defer deferred ...) body ...)
-        (compiled-code+instrs $lookup
-          (compiled-code+instrs $lookup $compiled #'(body ...))
+        (compiled-code+instrs
+          (compiled-code+instrs $compiled #'(body ...))
           #'(deferred ...)))
       (((break-if expr break-body ...) body ...)
-        (compiled-code+instr $lookup $compiled
+        (compiled-code+instr $compiled
           #`(if expr
             (then break-body ...)
             (else body ...))))
       (((id arg ...) body ...)
-        (and (identifier? #'id) (compiled-ref $lookup $compiled #'id))
-        (compiled-code+instrs $lookup $compiled
+        (and (identifier? #'id) (compiled-ref $compiled #'id))
+        (compiled-code+instrs $compiled
           #`(
             #,@(begin-syntaxes
-              (compiled-transform $lookup $compiled #'id #'(id arg ...)))
+              (compiled-transform $compiled #'id #'(id arg ...)))
             body ...)))
       ((other body ...)
-        (compiled-code+instrs $lookup
-          (compiled-code+instr $lookup $compiled #'other)
+        (compiled-code+instrs
+          (compiled-code+instr $compiled #'other)
           #'(body ...)))))
 
   (define (instr->begin $instr)
@@ -131,12 +131,12 @@
       (set-bitwise-arithmetic-shift-right ">>=")
       (_ #f)))
 
-  (define (compiled-code+instr $lookup $compiled $syntax)
+  (define (compiled-code+instr $compiled $syntax)
     (syntax-case $syntax (macro begin var const if when while then else)
       ((macro (id param ...) body ...)
         (compiled
-          (scope+
-            (compiled-scope $compiled)
+          (env+
+            (compiled-env $compiled)
             (identifier id)
             (lambda ($syntax)
               (lambda ($lookup)
@@ -155,7 +155,7 @@
               (code-indent
                 (code "\n"
                   (compiled-value
-                    (compiled-code+instrs $lookup
+                    (compiled-code+instrs
                       (compiled-with $compiled empty-code)
                       #'(instr ...))))))
             "\n")))
@@ -165,7 +165,7 @@
           (code $code
             (space-separated-code
               (type->code #'type)
-              (declarator->code $lookup #'id))
+              (declarator->code (compiled-env $compiled) #'id))
             ";\n")))
       ((var type id expr)
         (compiled-map
@@ -173,9 +173,9 @@
           (code $code
             (space-separated-code
               (type->code #'type)
-              (declarator->code $lookup #'id)
+              (declarator->code (compiled-env $compiled) #'id)
               "="
-              (expr-code (syntax->expr $lookup #'expr)))
+              (expr-code (syntax->expr (compiled-env $compiled) #'expr)))
             ";\n")))
       ((const type id expr)
         (compiled-map
@@ -184,24 +184,24 @@
             (space-separated-code
               "const"
               (type->code #'type)
-              (declarator->code $lookup #'id)
+              (declarator->code (compiled-env $compiled) #'id)
               "="
-              (expr-code (syntax->expr $lookup #'expr)))
+              (expr-code (syntax->expr (compiled-env $compiled) #'expr)))
             ";\n")))
       ((if expr (then then-body ...) (else else-body ...))
         (compiled-map
           ($code $compiled)
           ($then-code
-            (compiled-code+instr $lookup (compiled-with $compiled empty-code)
+            (compiled-code+instr (compiled-with $compiled empty-code)
               (instr->begin #'(begin then-body ...))))
           ($else-code
-            (compiled-code+instr $lookup (compiled-with $compiled empty-code)
+            (compiled-code+instr (compiled-with $compiled empty-code)
               (instr->begin #'(begin else-body ...))))
           (code $code
             (space-separated-code
               "if"
               (code-in-round-brackets
-                (expr-code (syntax->expr $lookup #'expr)))
+                (expr-code (syntax->expr (compiled-env $compiled) #'expr)))
               $then-code)
             (space-separated-code
               "else"
@@ -210,41 +210,41 @@
         (compiled-map
           ($code $compiled)
           ($when-code
-            (compiled-code+instr $lookup
+            (compiled-code+instr
               (compiled-with $compiled empty-code)
               (instr->begin #'(begin body ...))))
           (code $code
             (space-separated-code
               "if"
               (code-in-round-brackets
-                (expr-code (syntax->expr $lookup #'expr)))
+                (expr-code (syntax->expr (compiled-env $compiled) #'expr)))
               $when-code))))
       ((while expr instr ...)
         (compiled-map
           ($code $compiled)
           ($while-code
-            (compiled-code+instr $lookup (compiled-with $compiled empty-code)
+            (compiled-code+instr (compiled-with $compiled empty-code)
               #'(begin instr ...)))
           (code $code
             (space-separated-code
               "while"
               (code-in-round-brackets
-                (expr-code (syntax->expr $lookup #'expr)))
+                (expr-code (syntax->expr (compiled-env $compiled) #'expr)))
               $while-code))))
       ((op2 lhs expr)
         (op2->string-opt #'op2)
         (compiled-map
           ($code $compiled)
-          (code+op2 $lookup $code
+          (code+op2 (compiled-env $compiled) $code
             #'lhs (op2->string-opt #'op2) #'expr)))
       ((id arg ...)
         (lets
-          ($transformer (compiled-ref $lookup $compiled (identifier id)))
+          ($transformer (compiled-ref $compiled (identifier id)))
           (if $transformer
-            (compiled-code+instrs $lookup $compiled
+            (compiled-code+instrs $compiled
               #`(
                 #,@(begin-syntaxes
-                  (compiled-transform $lookup $compiled #'id $syntax))))
+                  (compiled-transform $compiled #'id $syntax))))
             (compiled-map
               ($code $compiled)
               (code $code
@@ -257,21 +257,21 @@
                         (intercalate
                           (map expr-code
                             (map
-                              (partial syntax->expr $lookup)
+                              (partial syntax->expr (compiled-env $compiled))
                               (syntaxes arg ...)))
                           (code ", "))))
                     ")"))
                 ";\n")))))))
 
-  (define (code+op2 $lookup $code $lhs $op $expr)
+  (define (code+op2 $env $code $lhs $op $expr)
     (code $code
       (space-separated-code
-        (expr-code (lhs->expr $lookup $lhs))
+        (expr-code (lhs->expr $env $lhs))
         (string-code $op)
-        (expr-code (syntax->expr $lookup $expr)))
+        (expr-code (syntax->expr $env $expr)))
       ";\n"))
 
-  (define (syntax->expr $lookup $syntax)
+  (define (syntax->expr $env $syntax)
     (syntax-case $syntax
       (cast = > >= < <= + - * /
         and or bitwise-and bitwise-ior bitwise-xor
@@ -281,116 +281,113 @@
         (expr 2 #f
           (code
             (code-in-round-brackets (type->code #'type))
-            (expr-operand-code (syntax->expr $lookup #'rhs) 2 #t))))
+            (expr-operand-code (syntax->expr $env #'rhs) 2 #t))))
       ((= a b)
-        (op2->expr $lookup 7 #t #'a " == " #'b))
+        (op2->expr $env 7 #t #'a " == " #'b))
       ((not (= a b))
-        (op2->expr $lookup 7 #t #'a " != " #'b))
+        (op2->expr $env 7 #t #'a " != " #'b))
       ((> a b)
-        (op2->expr $lookup 6 #t #'a " > " #'b))
+        (op2->expr $env 6 #t #'a " > " #'b))
       ((>= a b)
-        (op2->expr $lookup 6 #t #'a " >= " #'b))
+        (op2->expr $env 6 #t #'a " >= " #'b))
       ((< a b)
-        (op2->expr $lookup 6 #t #'a " < " #'b))
+        (op2->expr $env 6 #t #'a " < " #'b))
       ((<= a b)
-        (op2->expr $lookup 6 #t #'a " <= " #'b))
+        (op2->expr $env 6 #t #'a " <= " #'b))
       ((+)
-        (syntax->expr $lookup #'0))
+        (syntax->expr $env #'0))
       ((+ a)
-        (syntax->expr $lookup #'a))
+        (syntax->expr $env #'a))
       ((+ a b)
-        (op2->expr $lookup 4 #t #'a " + " #'b))
+        (op2->expr $env 4 #t #'a " + " #'b))
       ((+ a b cs ...)
-        (syntax->expr $lookup #`(+ (+ a b) cs ...)))
+        (syntax->expr $env #`(+ (+ a b) cs ...)))
       ((- a)
-        (op1->expr $lookup 2 #f "-" #'a))
+        (op1->expr $env 2 #f "-" #'a))
       ((- a b)
-        (op2->expr $lookup 4 #t #'a " - " #'b))
+        (op2->expr $env 4 #t #'a " - " #'b))
       ((- a b cs ...)
-        (syntax->expr $lookup #`(- (- a b) cs ...)))
+        (syntax->expr $env #`(- (- a b) cs ...)))
       ((*)
-        (syntax->expr $lookup #'1))
+        (syntax->expr $env #'1))
       ((* a)
-        (syntax->expr $lookup #'a))
+        (syntax->expr $env #'a))
       ((* a b)
-        (op2->expr $lookup 3 #t #'a " * " #'b))
+        (op2->expr $env 3 #t #'a " * " #'b))
       ((* a b cs ...)
-        (syntax->expr $lookup #`(* (* a b) cs ...)))
+        (syntax->expr $env #`(* (* a b) cs ...)))
       ((/ a)
-        (syntax->expr $lookup #`(/ 1 a)))
+        (syntax->expr $env #`(/ 1 a)))
       ((/ a b)
-        (op2->expr $lookup 3 #t #'a " / " #'b))
+        (op2->expr $env 3 #t #'a " / " #'b))
       ((/ a b cs ...)
-        (syntax->expr $lookup #`(/ (/ a b) cs ...)))
+        (syntax->expr $env #`(/ (/ a b) cs ...)))
       ((and)
-        (syntax->expr $lookup #'true))
+        (syntax->expr $env #'true))
       ((and a)
-        (syntax->expr $lookup #'a))
+        (syntax->expr $env #'a))
       ((and a b)
-        (op2->expr $lookup 11 #t #'a " && " #'b))
+        (op2->expr $env 11 #t #'a " && " #'b))
       ((and a b cs ...)
-        (syntax->expr $lookup #`(and (and a b) cs ...)))
+        (syntax->expr $env #`(and (and a b) cs ...)))
       ((or)
-        (syntax->expr $lookup #'false))
+        (syntax->expr $env #'false))
       ((or a)
-        (syntax->expr $lookup #'a))
+        (syntax->expr $env #'a))
       ((or a b)
-        (op2->expr $lookup 12 #t #'a " || " #'b))
+        (op2->expr $env 12 #t #'a " || " #'b))
       ((or a b cs ...)
-        (syntax->expr $lookup #`(or (or a b) cs ...)))
+        (syntax->expr $env #`(or (or a b) cs ...)))
       ((bitwise-and)
-        (syntax->expr $lookup #'-1))
+        (syntax->expr $env #'-1))
       ((bitwise-and a)
-        (syntax->expr $lookup #'a))
+        (syntax->expr $env #'a))
       ((bitwise-and a b)
-        (op2->expr $lookup 8 #t #'a " & " #'b))
+        (op2->expr $env 8 #t #'a " & " #'b))
       ((bitwise-and a b cs ...)
-        (syntax->expr $lookup #`(bitwise-and (bitwise-and a b) cs ...)))
+        (syntax->expr $env #`(bitwise-and (bitwise-and a b) cs ...)))
       ((bitwise-ior)
-        (syntax->expr $lookup #'0))
+        (syntax->expr $env #'0))
       ((bitwise-ior a)
-        (syntax->expr $lookup #'a))
+        (syntax->expr $env #'a))
       ((bitwise-ior a b)
-        (op2->expr $lookup 10 #t #'a " | " #'b))
+        (op2->expr $env 10 #t #'a " | " #'b))
       ((bitwise-ior a b cs ...)
-        (syntax->expr $lookup #`(bitwise-ior (bitwise-ior a b) cs ...)))
+        (syntax->expr $env #`(bitwise-ior (bitwise-ior a b) cs ...)))
       ((bitwise-xor)
-        (syntax->expr $lookup #'0))
+        (syntax->expr $env #'0))
       ((bitwise-xor a)
-        (syntax->expr $lookup #'a))
+        (syntax->expr $env #'a))
       ((bitwise-xor a b)
-        (op2->expr $lookup 9 #t #'a " ^ " #'b))
+        (op2->expr $env 9 #t #'a " ^ " #'b))
       ((bitwise-xor a b cs ...)
-        (syntax->expr $lookup #`(bitwise-xor (bitwise-xor a b) cs ...)))
+        (syntax->expr $env #`(bitwise-xor (bitwise-xor a b) cs ...)))
       ((bitwise-arithmetic-shift-left a b)
-        (op2->expr $lookup 5 #t #'a " << " #'b))
+        (op2->expr $env 5 #t #'a " << " #'b))
       ((bitwise-arithmetic-shift-right a b)
-        (op2->expr $lookup 5 #t #'a " >> " #'b))
+        (op2->expr $env 5 #t #'a " >> " #'b))
       ((inv a)
-        (op1->expr $lookup 2 #f "~" #'a))
+        (op1->expr $env 2 #f "~" #'a))
       ((not a)
-        (op1->expr $lookup 2 #f "!" #'a))
+        (op1->expr $env 2 #f "!" #'a))
       ((ref var x ...)
-        (ref->expr $lookup #'(var x ...)))
+        (ref->expr $env #'(var x ...)))
       ((&ref var x ...)
-        (expr 2 #f (code "&" (expr-code (ref->expr $lookup #'(var x ...))))))
+        (expr 2 #f (code "&" (expr-code (ref->expr $env #'(var x ...))))))
       ((? cond true false)
         (expr 13 #f
           (code
-            (expr-operand-code (syntax->expr $lookup #'cond) 13 #f)
+            (expr-operand-code (syntax->expr $env #'cond) 13 #f)
             " ? "
-            (expr-code (syntax->expr $lookup #'true))
+            (expr-code (syntax->expr $env #'true))
             " : "
-            (expr-operand-code (syntax->expr $lookup #'false) 13 #t))))
+            (expr-operand-code (syntax->expr $env #'false) 13 #t))))
       ((id arg ...)
         (lets
-          ($transformer ($lookup (identifier id)))
+          ($transformer (env-ref $env (identifier id)))
           (if $transformer
-            (syntax->expr $lookup
-              (transform
-                ($lookup #'id)
-                $syntax
-                $lookup))
+            (syntax->expr $env
+              (env-transform $env (identifier id) $syntax))
             (parenthesized-expr 1 #t
               (variable->expr #'id)
               "("
@@ -399,14 +396,14 @@
                   (intercalate
                     (map expr-code
                       (map
-                        (partial syntax->expr $lookup)
+                        (partial syntax->expr $env)
                         (syntaxes arg ...)))
                     (code ", "))))
               ")"))))
       (other
         (value->expr #'other))))
 
-  (define (ref->expr $lookup $syntax)
+  (define (ref->expr $env $syntax)
     (syntax-case $syntax (*)
       ((var x ...)
         (fold-left
@@ -417,23 +414,24 @@
               (id (identifier? #'id)
                 (binary-expr 1 #t $expr "." (variable->expr #'id)))
               ((expr)
-                (parenthesized-expr 1 #t $expr "[" (syntax->expr $lookup #'expr) "]"))))
+                (parenthesized-expr 1 #t $expr "[" (syntax->expr $env #'expr) "]"))))
           (variable->expr #'var)
           (syntaxes x ...)))))
 
-  (define (op1->expr $lookup $priority $left-to-right? $op $rhs)
+  (define (op1->expr $env $priority $left-to-right? $op $rhs)
     (prefix-expr $priority $left-to-right? $op
-      (syntax->expr $lookup $rhs)))
+      (syntax->expr $env $rhs)))
 
-  (define (op2->expr $lookup $priority $left-to-right? $lhs $op $rhs)
+  (define (op2->expr $env $priority $left-to-right? $lhs $op $rhs)
     (binary-expr $priority $left-to-right?
-      (syntax->expr $lookup $lhs)
+      (syntax->expr $env $lhs)
       $op
-      (syntax->expr $lookup $rhs)))
+      (syntax->expr $env $rhs)))
 
   (define (syntax-c $lookup . $syntaxes)
     (code-string
       (compiled-value
-        (compiled-code+instrs $lookup (pure-compiled empty-code)
+        (compiled-code+instrs
+          (compiled (env $lookup (scope)) empty-code)
           #`(#,@$syntaxes)))))
 )

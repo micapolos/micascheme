@@ -1,6 +1,6 @@
 (library (micac compiled)
   (export
-    compiled compiled? compiled-scope compiled-value
+    compiled compiled? compiled-env compiled-value
     compiled-ref
     compiled-transform
     pure-compiled
@@ -8,37 +8,21 @@
     compiled-map)
   (import
     (micascheme)
-    (micac scope))
+    (micac env))
 
-  (data (compiled scope value))
+  (data (compiled env value))
 
-  (define (lookup-scope-ref $lookup $scope $id)
-    (or
-      (scope-ref $scope $id)
-      ($lookup $id)))
+  (define (compiled-ref $compiled $id)
+    (env-ref (compiled-env $compiled) $id))
 
-  (define (compiled-ref $lookup $compiled $id)
-    (lookup-scope-ref $lookup (compiled-scope $compiled) $id))
-
-  (define (lookup-scope-transform $lookup $scope $id $syntax)
-    (lets
-      ($transformer (lookup-scope-ref $lookup $scope $id))
-      (if $transformer
-        (transform $transformer $syntax $lookup)
-        (syntax-error $id "no macro"))))
-
-  (define (compiled-transform $lookup $compiled $id $syntax)
-    (lets
-      ($transformer (compiled-ref $lookup $compiled $id))
-      (if $transformer
-        (transform $transformer $syntax $lookup)
-        (syntax-error $id "no macro"))))
+  (define (compiled-transform $compiled $id $syntax)
+    (env-transform (compiled-env $compiled) $id $syntax))
 
   (define-rule-syntax (pure-compiled value)
-    (compiled (scope) value))
+    (compiled empty-env value))
 
   (define-rule-syntax (compiled-with compiled-expr value)
-    (compiled (compiled-scope compiled-expr) value))
+    (compiled (compiled-env compiled-expr) value))
 
   (define-rules-syntax
     ((compiled-map body)
@@ -47,9 +31,8 @@
       (lets
         ($compiled compiled-expr)
         (value (compiled-value $compiled))
-        (compiled (compiled-scope $compiled) body)))
+        (compiled (compiled-env $compiled) body)))
     ((compiled-map decl decls ... body)
       (compiled-map decls ...
         (compiled-value (compiled-map decl body)))))
-
 )

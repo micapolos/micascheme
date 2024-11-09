@@ -97,7 +97,6 @@
     (syntax-c $lookup #`(set pixels (cast (* uint8_t) ptr)))
     (lines-string "pixels = (uint8_t*)ptr;")))
 
-
 (check
   (equal?
     (syntax-c $lookup
@@ -370,6 +369,12 @@
   (equal?
     (syntax-c $lookup #`(foo 10 (foo 20 30)))
     (lines-string "fooed(10, fooed(20, 30));")))
+
+(check
+  (equal?
+    (syntax-c $lookup
+      #`(macro (zero s) (set s 0)))
+    ""))
 
 (check
   (equal?
