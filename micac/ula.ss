@@ -9,10 +9,12 @@
       (const int ula-width 256)
       (const int ula-height 192)
       (const int border 48)
+
       (var bool screen? #f)
       (var uint8_t red 0)
       (var uint8_t green 0)
       (var uint8_t blue 0)
+
       (macro (update)
         (set screen?
           (and
