@@ -19,7 +19,7 @@
     bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
     when else)))
 
-  (define-aux-keywords run externs macro)
+  (define-aux-keywords run externs)
 
   (define-syntax micac
     (lambda ($syntax)

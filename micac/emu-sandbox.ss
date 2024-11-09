@@ -2,7 +2,10 @@
   (micac)
   (micac std)
   (micac emu)
-  (micac sdl))
+  (micac sdl)
+  (c run))
+
+(c-run-echo? #t)
 
 (run-emu
   (video 352 288 96 24 4) ; width height h-blank v-blank cycles-per-pixel

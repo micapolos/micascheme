@@ -1,8 +1,8 @@
 (library (c run)
-  (export c-run)
+  (export c-run c-run-echo?)
   (import (micascheme))
 
-  (define echo? #t)
+  (define c-run-echo? (make-parameter #f))
 
   (define (c-run $string . $gcc-flags)
     (lets
@@ -17,7 +17,7 @@
           (optimize-level)
           $gcc-flags-string))
       (run
-        (if echo? (display $string))
+        (if (c-run-echo?) (display $string))
         (echo "code-gen /tmp/main.c")
         (call-with-output-file "/tmp/main.c"
           (lambda ($port)
@@ -30,7 +30,7 @@
         $value)))
 
   (define (echo $string)
-    (if echo? (displayln (string-append "% " $string))))
+    (if (c-run-echo?) (displayln (string-append "% " $string))))
 
   (define (echo-system $string)
     (run
