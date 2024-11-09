@@ -287,30 +287,30 @@
           (code+op2 $lookup $code
             #'lhs (op2->string-opt #'op2) #'expr)))
       ((id arg ...)
-        (and (identifier? #'id) (compiled-ref $lookup $compiled #'id))
-        (compiled-code+instrs $lookup $compiled
-          #`(
-            #,@(begin-syntaxes
-              (compiled-transform $lookup $compiled #'id $syntax)))))
-      ((id arg ...)
-        (identifier? #'id)
-        (compiled-map
-          ($code $compiled)
-          (code $code
-            (expr-code
-              (parenthesized-expr 1 #t
-                (variable->expr #'id)
-                "("
-                (expr 0 #t
-                  (apply code-append
-                    (intercalate
-                      (map expr-code
-                        (map
-                          (partial syntax->expr $lookup)
-                          (syntaxes arg ...)))
-                      (code ", "))))
-                ")"))
-            ";\n")))))
+        (lets
+          ($transformer (compiled-ref $lookup $compiled (identifier id)))
+          (if $transformer
+            (compiled-code+instrs $lookup $compiled
+              #`(
+                #,@(begin-syntaxes
+                  (compiled-transform $lookup $compiled #'id $syntax))))
+            (compiled-map
+              ($code $compiled)
+              (code $code
+                (expr-code
+                  (parenthesized-expr 1 #t
+                    (variable->expr #'id)
+                    "("
+                    (expr 0 #t
+                      (apply code-append
+                        (intercalate
+                          (map expr-code
+                            (map
+                              (partial syntax->expr $lookup)
+                              (syntaxes arg ...)))
+                          (code ", "))))
+                    ")"))
+                ";\n")))))))
 
   (define (code+op2 $lookup $code $lhs $op $expr)
     (code $code
@@ -432,26 +432,26 @@
             " : "
             (expr-operand-code (syntax->expr $lookup #'false) 13 #t))))
       ((id arg ...)
-        (and (identifier? #'id) ($lookup #'id))
-        (syntax->expr $lookup
-          (transform
-            ($lookup #'id)
-            $syntax
-            $lookup)))
-      ((id arg ...)
-        (identifier? #'id)
-        (parenthesized-expr 1 #t
-          (variable->expr #'id)
-          "("
-          (expr 0 #t
-            (apply code-append
-              (intercalate
-                (map expr-code
-                  (map
-                    (partial syntax->expr $lookup)
-                    (syntaxes arg ...)))
-                (code ", "))))
-          ")"))
+        (lets
+          ($transformer ($lookup (identifier id)))
+          (if $transformer
+            (syntax->expr $lookup
+              (transform
+                ($lookup #'id)
+                $syntax
+                $lookup))
+            (parenthesized-expr 1 #t
+              (variable->expr #'id)
+              "("
+              (expr 0 #t
+                (apply code-append
+                  (intercalate
+                    (map expr-code
+                      (map
+                        (partial syntax->expr $lookup)
+                        (syntaxes arg ...)))
+                    (code ", "))))
+              ")"))))
       (other
         (value->expr #'other))))
 
