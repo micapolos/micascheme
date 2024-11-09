@@ -2,7 +2,7 @@
   (export
     env env? env-lookup env-scope
     lookup-env empty-env
-    env+ env-ref env-transform)
+    env-alloc env+ env-ref env-transform)
   (import
     (micascheme)
     (micac scope))
@@ -13,6 +13,12 @@
     (env $lookup (scope)))
 
   (define empty-env (lookup-env (lambda _ #f)))
+
+  (define (env-alloc $env $id)
+    (env
+      (env-lookup $env)
+      (scope-alloc (env-scope $env) $id)))
+
 
   (define (env+ $env $id $transformer)
     (env
