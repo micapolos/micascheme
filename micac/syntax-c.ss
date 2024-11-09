@@ -421,10 +421,10 @@
       $op
       (syntax->expr $env $rhs)))
 
-  (define (syntax-c $lookup . $syntaxes)
+  (define (syntax-c $env . $syntaxes)
     (code-string
       (compiled-value
         (compiled-code+instrs
-          (compiled (lookup-env $lookup) empty-code)
+          (compiled $env empty-code)
           #`(#,@$syntaxes)))))
 )

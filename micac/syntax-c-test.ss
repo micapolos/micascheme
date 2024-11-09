@@ -1,89 +1,90 @@
-(import (micascheme) (micac syntax) (micac syntax-c) (check))
+(import (micascheme) (micac syntax) (micac syntax-c) (micac env) (check))
 
 (define-aux-keyword foo)
 
-(define $lookup
-  (lambda ($id)
-    (and
-      (free-identifier=? $id #'foo)
-      (lambda ($syntax)
-        (syntax-case $syntax ()
-          ((_ arg ...)
-            #`(fooed arg ...)))))))
+(define $env
+  (lookup-env
+    (lambda ($id)
+      (and
+        (free-identifier=? $id #'foo)
+        (lambda ($syntax)
+          (syntax-case $syntax ()
+            ((_ arg ...)
+              #`(fooed arg ...))))))))
 
 (check
   (equal?
-    (syntax-c $lookup)
+    (syntax-c $env)
     (lines-string)))
 
 (check
   (equal?
-    (syntax-c $lookup #`(const int x 10))
+    (syntax-c $env #`(const int x 10))
     (lines-string "const int x = 10;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var int x))
+    (syntax-c $env #`(var int x))
     (lines-string "int x;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var int some-variable))
+    (syntax-c $env #`(var int some-variable))
     (lines-string "int some_variable;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var (* uint8_t) x))
+    (syntax-c $env #`(var (* uint8_t) x))
     (lines-string "uint8_t* x;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var uint8_t (* x)))
+    (syntax-c $env #`(var uint8_t (* x)))
     (lines-string "uint8_t *x;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var uint8_t (* (* x))))
+    (syntax-c $env #`(var uint8_t (* (* x))))
     (lines-string "uint8_t **x;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var uint8_t (* x 24)))
+    (syntax-c $env #`(var uint8_t (* x 24)))
     (lines-string "uint8_t x[24];")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var uint8_t (* (* x 24) 32)))
+    (syntax-c $env #`(var uint8_t (* (* x 24) 32)))
     (lines-string "uint8_t x[24][32];")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(var int x y))
+    (syntax-c $env #`(var int x y))
     (lines-string "int x = y;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(begin))
+    (syntax-c $env #`(begin))
     (lines-string
       "{"
       "}")))
 
-(check (equal? (syntax-c $lookup #`(set x 10)) (lines-string "x = 10;")))
-(check (equal? (syntax-c $lookup #`(set+ x 10)) (lines-string "x += 10;")))
-(check (equal? (syntax-c $lookup #`(set- x 10)) (lines-string "x -= 10;")))
-(check (equal? (syntax-c $lookup #`(set* x 10)) (lines-string "x *= 10;")))
-(check (equal? (syntax-c $lookup #`(set/ x 10)) (lines-string "x /= 10;")))
-(check (equal? (syntax-c $lookup #`(set-and x 10)) (lines-string "x &&= 10;")))
-(check (equal? (syntax-c $lookup #`(set-or x 10)) (lines-string "x ||= 10;")))
-(check (equal? (syntax-c $lookup #`(set-bitwise-and x 10)) (lines-string "x &= 10;")))
-(check (equal? (syntax-c $lookup #`(set-bitwise-ior x 10)) (lines-string "x |= 10;")))
-(check (equal? (syntax-c $lookup #`(set-bitwise-xor x 10)) (lines-string "x ^= 10;")))
-(check (equal? (syntax-c $lookup #`(set-bitwise-arithmetic-shift-left x 10)) (lines-string "x <<= 10;")))
-(check (equal? (syntax-c $lookup #`(set-bitwise-arithmetic-shift-right x 10)) (lines-string "x >>= 10;")))
+(check (equal? (syntax-c $env #`(set x 10)) (lines-string "x = 10;")))
+(check (equal? (syntax-c $env #`(set+ x 10)) (lines-string "x += 10;")))
+(check (equal? (syntax-c $env #`(set- x 10)) (lines-string "x -= 10;")))
+(check (equal? (syntax-c $env #`(set* x 10)) (lines-string "x *= 10;")))
+(check (equal? (syntax-c $env #`(set/ x 10)) (lines-string "x /= 10;")))
+(check (equal? (syntax-c $env #`(set-and x 10)) (lines-string "x &&= 10;")))
+(check (equal? (syntax-c $env #`(set-or x 10)) (lines-string "x ||= 10;")))
+(check (equal? (syntax-c $env #`(set-bitwise-and x 10)) (lines-string "x &= 10;")))
+(check (equal? (syntax-c $env #`(set-bitwise-ior x 10)) (lines-string "x |= 10;")))
+(check (equal? (syntax-c $env #`(set-bitwise-xor x 10)) (lines-string "x ^= 10;")))
+(check (equal? (syntax-c $env #`(set-bitwise-arithmetic-shift-left x 10)) (lines-string "x <<= 10;")))
+(check (equal? (syntax-c $env #`(set-bitwise-arithmetic-shift-right x 10)) (lines-string "x >>= 10;")))
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set x (- a))
       #`(set x (inv a))
       #`(set x (not a)))
@@ -94,12 +95,12 @@
 
 (check
   (equal?
-    (syntax-c $lookup #`(set pixels (cast (* uint8_t) ptr)))
+    (syntax-c $env #`(set pixels (cast (* uint8_t) ptr)))
     (lines-string "pixels = (uint8_t*)ptr;")))
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set x (+ a b))
       #`(set x (- a b))
       #`(set x (bitwise-and a b))
@@ -118,7 +119,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set x (+))
       #`(set x (+ a))
       #`(set x (+ a b))
@@ -131,7 +132,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set x (- a))
       #`(set x (- a b))
       #`(set x (- a b c)))
@@ -142,7 +143,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set x (*))
       #`(set x (* a))
       #`(set x (* a b))
@@ -155,7 +156,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set x (/ a))
       #`(set x (/ a b))
       #`(set x (/ a b c)))
@@ -166,7 +167,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set x (and))
       #`(set x (and a))
       #`(set x (and a b))
@@ -179,7 +180,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set x (or))
       #`(set x (or a))
       #`(set x (or a b))
@@ -192,7 +193,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set x (bitwise-and))
       #`(set x (bitwise-and a))
       #`(set x (bitwise-and a b))
@@ -205,7 +206,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set x (bitwise-ior))
       #`(set x (bitwise-ior a))
       #`(set x (bitwise-ior a b))
@@ -218,7 +219,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set x (bitwise-xor))
       #`(set x (bitwise-xor a))
       #`(set x (bitwise-xor a b))
@@ -231,7 +232,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set x (= a b))
       #`(set x (not (= a b)))
       #`(set x (> a b))
@@ -248,53 +249,53 @@
 
 (check
   (equal?
-    (syntax-c $lookup #`(set x (+ (+ a b) c)))
+    (syntax-c $env #`(set x (+ (+ a b) c)))
     (lines-string "x = a + b + c;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(set x (+ a (+ b c))))
+    (syntax-c $env #`(set x (+ a (+ b c))))
     (lines-string "x = a + (b + c);")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(set x (* (+ a b) c)))
+    (syntax-c $env #`(set x (* (+ a b) c)))
     (lines-string "x = (a + b) * c;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(set x (+ a (* b c))))
+    (syntax-c $env #`(set x (+ a (* b c))))
     (lines-string "x = a + b * c;")))
 
-(check (equal? (syntax-c $lookup #`(set x (ref y))) (lines-string "x = y;")))
-(check (equal? (syntax-c $lookup #`(set x (ref y z))) (lines-string "x = y.z;")))
-(check (equal? (syntax-c $lookup #`(set x (ref y (10)))) (lines-string "x = y[10];")))
-(check (equal? (syntax-c $lookup #`(set x (ref y ((+ a b))))) (lines-string "x = y[a + b];")))
-(check (equal? (syntax-c $lookup #`(set x (ref y *))) (lines-string "x = *y;")))
-(check (equal? (syntax-c $lookup #`(set x (ref y a b (10) *))) (lines-string "x = *y.a.b[10];")))
+(check (equal? (syntax-c $env #`(set x (ref y))) (lines-string "x = y;")))
+(check (equal? (syntax-c $env #`(set x (ref y z))) (lines-string "x = y.z;")))
+(check (equal? (syntax-c $env #`(set x (ref y (10)))) (lines-string "x = y[10];")))
+(check (equal? (syntax-c $env #`(set x (ref y ((+ a b))))) (lines-string "x = y[a + b];")))
+(check (equal? (syntax-c $env #`(set x (ref y *))) (lines-string "x = *y;")))
+(check (equal? (syntax-c $env #`(set x (ref y a b (10) *))) (lines-string "x = *y.a.b[10];")))
 
-(check (equal? (syntax-c $lookup #`(set x (&ref y))) (lines-string "x = &y;")))
-(check (equal? (syntax-c $lookup #`(set x (&ref y z))) (lines-string "x = &y.z;")))
-(check (equal? (syntax-c $lookup #`(set x (&ref y (10)))) (lines-string "x = &y[10];")))
-(check (equal? (syntax-c $lookup #`(set x (&ref y ((+ a b))))) (lines-string "x = &y[a + b];")))
-(check (equal? (syntax-c $lookup #`(set x (&ref y *))) (lines-string "x = &*y;")))
-(check (equal? (syntax-c $lookup #`(set x (&ref y a b (10) *))) (lines-string "x = &*y.a.b[10];")))
+(check (equal? (syntax-c $env #`(set x (&ref y))) (lines-string "x = &y;")))
+(check (equal? (syntax-c $env #`(set x (&ref y z))) (lines-string "x = &y.z;")))
+(check (equal? (syntax-c $env #`(set x (&ref y (10)))) (lines-string "x = &y[10];")))
+(check (equal? (syntax-c $env #`(set x (&ref y ((+ a b))))) (lines-string "x = &y[a + b];")))
+(check (equal? (syntax-c $env #`(set x (&ref y *))) (lines-string "x = &*y;")))
+(check (equal? (syntax-c $env #`(set x (&ref y a b (10) *))) (lines-string "x = &*y.a.b[10];")))
 
-(check (equal? (syntax-c $lookup #`(set (x) z)) (lines-string "x = z;")))
-(check (equal? (syntax-c $lookup #`(set (x y) z)) (lines-string "x.y = z;")))
-(check (equal? (syntax-c $lookup #`(set (x (10)) z)) (lines-string "x[10] = z;")))
-(check (equal? (syntax-c $lookup #`(set (x ((+ a b))) z)) (lines-string "x[a + b] = z;")))
-(check (equal? (syntax-c $lookup #`(set (x *) z)) (lines-string "*x = z;")))
-(check (equal? (syntax-c $lookup #`(set (x y a b (10) *) z)) (lines-string "*x.y.a.b[10] = z;")))
+(check (equal? (syntax-c $env #`(set (x) z)) (lines-string "x = z;")))
+(check (equal? (syntax-c $env #`(set (x y) z)) (lines-string "x.y = z;")))
+(check (equal? (syntax-c $env #`(set (x (10)) z)) (lines-string "x[10] = z;")))
+(check (equal? (syntax-c $env #`(set (x ((+ a b))) z)) (lines-string "x[a + b] = z;")))
+(check (equal? (syntax-c $env #`(set (x *) z)) (lines-string "*x = z;")))
+(check (equal? (syntax-c $env #`(set (x y a b (10) *) z)) (lines-string "*x.y.a.b[10] = z;")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(set a (? x y z)))
+    (syntax-c $env #`(set a (? x y z)))
     (lines-string "a = x ? y : z;")))
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(if x
         (then
           (set x 10)
@@ -314,7 +315,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(while x
           (set+ x 1)
           (set+ x 2)))
@@ -326,14 +327,14 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(set+ x (bitwise-and (- (+ x 10) 20) #xff)))
     (lines-string
       "x += x + 10 - 20 & 255;")))
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(defer (SDL_Quit))
       #`(SDL_Init))
     (lines-string
@@ -342,7 +343,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(break-if expr (init))
       #`(defer (destroy))
       #`(update))
@@ -357,35 +358,35 @@
 
 (check
   (equal?
-    (syntax-c $lookup #`(printf "%i\\n" 10))
+    (syntax-c $env #`(printf "%i\\n" 10))
     (lines-string "printf(\"%i\\n\", 10);")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(SDL_CopyTexture texture (SDL_Rect 0 0 20 30)))
+    (syntax-c $env #`(SDL_CopyTexture texture (SDL_Rect 0 0 20 30)))
     (lines-string "SDL_CopyTexture(texture, SDL_Rect(0, 0, 20, 30));")))
 
 (check
   (equal?
-    (syntax-c $lookup #`(foo 10 (foo 20 30)))
+    (syntax-c $env #`(foo 10 (foo 20 30)))
     (lines-string "fooed(10, fooed(20, 30));")))
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(macro (zero s) (set s 0)))
     ""))
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(macro (zero s) (set s 0))
       #`(zero y))
     (lines-string "y = 0;")))
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(macro (zero v) (set v 0))
       #`(macro (one v) (set v 1))
       #`(zero x)
@@ -396,7 +397,7 @@
 
 (check
   (equal?
-    (syntax-c $lookup
+    (syntax-c $env
       #`(macro (zero v) (set v 0))
       #`(begin
         (macro (zero v) (set v 1))

@@ -4,7 +4,7 @@
     define-micac-syntax
     micac-externs
     micac-macro)
-  (import (micascheme) (micac syntax-c) (micac syntax) (syntax))
+  (import (micascheme) (micac syntax-c) (micac syntax) (micac env) (syntax))
   (export (import (micac syntax)))
 
   (define-rule-syntax (micac-externs id ...)
@@ -32,6 +32,6 @@
     (syntax-case $syntax ()
       ((_ instr ...)
         (datum->syntax #'+
-          (apply syntax-c $lookup
+          (apply syntax-c (lookup-env $lookup)
             (syntax->list #'(instr ...)))))))
 )
