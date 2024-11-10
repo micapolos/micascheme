@@ -32,8 +32,10 @@
 (check
   (equal?
     (micac-c
+      (var int x)
       (add-all x 10 20 30))
     (lines-string
+      "int x;"
       "x += 10;"
       "x += 20;"
       "x += 30;")))
@@ -41,13 +43,17 @@
 (check
   (equal?
     (micac-c
+      (var int x)
       (set x (sum)))
     (lines-string
+      "int x;"
       "x = 0;")))
 
 (check
   (equal?
     (micac-c
+      (var int x)
       (set x (sum 10 20 30)))
     (lines-string
+      "int x;"
       "x = 10 + 20 + 30;")))

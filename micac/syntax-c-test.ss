@@ -21,6 +21,7 @@
       (cons #`x (variable #`x))
       (cons #`y (variable #`y))
       (cons #`z (variable #`z))
+      (cons #`pixels (variable #`pixels))
       (cons #`alloc (variable #`alloc))
       (cons #`update (variable #`update))
       (cons #`free (variable #`free))
