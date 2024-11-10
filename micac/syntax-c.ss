@@ -77,7 +77,7 @@
   (define (identifier->expr $env $identifier)
     (switch (env-ref $env $identifier)
       ((variable? $variable)
-        (expr 0 #t (variable-code $variable)))
+        (variable->expr (variable-identifier $variable)))
       ((false? _)
         ; TODO: (syntax-error $identifier "not bound")
         (variable->expr  $identifier))

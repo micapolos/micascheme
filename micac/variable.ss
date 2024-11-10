@@ -1,7 +1,7 @@
 (library (micac variable)
   (export
-    variable variable? variable-code)
+    variable variable? variable-identifier)
   (import (micascheme))
 
-  (data (variable code))
+  (data (variable identifier))
 )
