@@ -10,7 +10,7 @@
   (import
     (micascheme)
     (micac scope)
-    (micac variable))
+    (micac expr))
 
   (data (env lookup scope))
 
@@ -39,7 +39,7 @@
     (or
       (scope-transformer (env-scope $env) $id)
       (switch (app (env-lookup $env) $id)
-        ((variable? _) #f)
+        ((expr? _) #f)
         ((else $other) $other))))
 
   (define (env-transform $env $transformer $syntax)

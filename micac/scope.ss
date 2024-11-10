@@ -10,7 +10,7 @@
     scope-with)
   (import
     (micascheme)
-    (micac variable))
+    (micac expr))
 
   (data (scope bindings gen?))
 
@@ -29,7 +29,7 @@
 
   (define (scope-alloc $scope $id)
     (scope+ $scope $id
-      (variable
+      (identifier->expr
         (if (scope-gen? $scope)
           (generate-temporary $id)
           $id))))
@@ -41,7 +41,7 @@
 
   (define (scope-transformer $scope $id)
     (switch (scope-ref $scope $id)
-      ((variable? _) #f)
+      ((expr? _) #f)
       ((false? _) #f)
       ((else $transformer) $transformer)))
 

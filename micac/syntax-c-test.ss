@@ -1,4 +1,4 @@
-(import (micascheme) (micac syntax) (micac syntax-c) (micac env) (check) (micac scope) (micac variable))
+(import (micascheme) (micac syntax) (micac syntax-c) (micac env) (check) (micac scope) (micac expr))
 
 (define-aux-keyword foo)
 
@@ -14,21 +14,21 @@
             (_
               (syntax-error $syntax "wtf"))))))
     (scope-with
-      (cons #`a (variable #`a))
-      (cons #`b (variable #`b))
-      (cons #`c (variable #`c))
-      (cons #`ptr (variable #`ptr))
-      (cons #`x (variable #`x))
-      (cons #`y (variable #`y))
-      (cons #`z (variable #`z))
-      (cons #`pixels (variable #`pixels))
-      (cons #`alloc (variable #`alloc))
-      (cons #`update (variable #`update))
-      (cons #`free (variable #`free))
-      (cons #`printf (variable #`printf))
-      (cons #`SDL_CopyTexture (variable #`SDL_CopyTexture))
-      (cons #`SDL_Rect (variable #`SDL_Rect))
-      (cons #`fooed (variable #`fooed)))))
+      (cons #`a (identifier->expr #`a))
+      (cons #`b (identifier->expr #`b))
+      (cons #`c (identifier->expr #`c))
+      (cons #`ptr (identifier->expr #`ptr))
+      (cons #`x (identifier->expr #`x))
+      (cons #`y (identifier->expr #`y))
+      (cons #`z (identifier->expr #`z))
+      (cons #`pixels (identifier->expr #`pixels))
+      (cons #`alloc (identifier->expr #`alloc))
+      (cons #`update (identifier->expr #`update))
+      (cons #`free (identifier->expr #`free))
+      (cons #`printf (identifier->expr #`printf))
+      (cons #`SDL_CopyTexture (identifier->expr #`SDL_CopyTexture))
+      (cons #`SDL_Rect (identifier->expr #`SDL_Rect))
+      (cons #`fooed (identifier->expr #`fooed)))))
 
 (check
   (equal?

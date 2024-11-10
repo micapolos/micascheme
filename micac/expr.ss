@@ -4,12 +4,17 @@
     expr-operand-code
     binary-expr
     prefix-expr
-    parenthesized-expr)
+    parenthesized-expr
+    identifier->expr)
   (import
     (micascheme)
-    (code))
+    (code)
+    (micac code))
 
   (data (expr priority left-to-right? code))
+
+  (define (identifier->expr $variable)
+    (expr 0 #t (identifier->code $variable)))
 
   (define (expr-operand-code $expr $priority $right?)
     (if

@@ -7,8 +7,7 @@
     (micac syntax)
     (micac scope)
     (micac compiled)
-    (micac env)
-    (micac variable))
+    (micac env))
 
   (define (size->code $size)
     (lets
@@ -35,7 +34,7 @@
         (lets
           ($env (env-alloc $env #'id))
           (compiled $env
-            (expr-code (identifier->expr $env #'id)))))
+            (expr-code (env-identifier->expr $env #'id)))))
       ((* decl)
         (compiled-map
           ($code (declarator->compiled-code $env #'decl))
@@ -82,22 +81,23 @@
 
   (define (variable-identifier->expr $env $identifier)
     (switch (env-ref $env $identifier)
-      ((variable? $variable)
-        (variable->expr (variable-identifier $variable)))
+      ((expr? $expr)
+        $expr)
       ((else _)
         (syntax-error $identifier "unboud identifier"))))
 
-  (define (identifier->expr $env $identifier)
+  (define (env-identifier->expr $env $identifier)
     (switch (env-ref $env $identifier)
-      ((variable? $variable)
-        (variable->expr (variable-identifier $variable)))
+      ((expr? $expr)
+        $expr)
       ((else $transformer)
-        (env-transform $env $transformer $identifier))))
+        (syntax->expr $env
+          (env-transform $env $transformer $identifier)))))
 
   (define (value->expr $env $value)
     (syntax-case $value ()
       (id (identifier? #'id)
-        (identifier->expr $env #'id))
+        (env-identifier->expr $env #'id))
       (other
         (literal->expr #'other))))
 
@@ -163,7 +163,7 @@
         ((extern id)
           (compiled+ $compiled
             (identifier id)
-            (variable (identifier id))))
+            (identifier->expr (identifier id))))
         ((macro (id param ...) body ...)
           (compiled+ $compiled
             (identifier id)
@@ -265,12 +265,12 @@
               #'lhs (op2->string-opt #'op2) #'expr)))
         ((id arg ...)
           (switch (compiled-ref $compiled (identifier id))
-            ((variable? $variable)
+            ((expr? $expr)
               (compiled-with $compiled
                 (code $code
                   (expr-code
                     (parenthesized-expr 1 #t
-                      (variable->expr #'id)
+                      $expr
                       "("
                       (expr 0 #t
                         (apply code-append
@@ -409,9 +409,9 @@
             (expr-operand-code (syntax->expr $env #'false) 13 #t))))
       ((id arg ...)
         (switch (env-ref $env (identifier id))
-          ((variable? $variable)
+          ((expr? $expr)
             (parenthesized-expr 1 #t
-              (variable->expr (variable-identifier $variable))
+              $expr
               "("
               (expr 0 #t
                 (apply code-append

@@ -4,12 +4,12 @@
     micac-define
     micac-externs
     micac-macro)
-  (import (micascheme) (micac syntax-c) (micac syntax) (micac env) (micac variable) (syntax))
+  (import (micascheme) (micac syntax-c) (micac syntax) (micac env) (micac expr) (syntax))
   (export (import (micac syntax)))
 
   (define-rule-syntax (micac-externs id ...)
     (begin
-      (micac-define id (variable #'id)) ...))
+      (micac-define id (identifier->expr #'id)) ...))
 
   (define-rule-syntax (micac-define id item)
     (define-syntax id (make-compile-time-value item)))
