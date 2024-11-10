@@ -32,7 +32,7 @@
   (define (declarator->code $env $syntax)
     (syntax-case $syntax (*)
       (id (identifier? #'id)
-        (type->code #'id))
+        (identifier->code #'id))
       ((* decl)
         (code "*" (declarator->code $env #'decl)))
       ((* decl expr)
