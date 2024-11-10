@@ -18,7 +18,7 @@
     (scope $bindings #f))
 
   (define (empty-scope)
-    (scope (list) #f))
+    (apply scope-with (list)))
 
   (define (scope+ $scope $id $item)
     (scope

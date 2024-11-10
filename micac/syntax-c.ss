@@ -32,9 +32,10 @@
   (define (declarator->compiled-code $env $syntax)
     (syntax-case $syntax (*)
       (id (identifier? #'id)
-        (compiled
-          (env-alloc $env #'id)
-          (identifier->code #'id)))
+        (lets
+          ($env (env-alloc $env #'id))
+          (compiled $env
+            (expr-code (identifier->expr $env #'id)))))
       ((* decl)
         (compiled-map
           ($code (declarator->compiled-code $env #'decl))
@@ -75,9 +76,16 @@
   (define (lhs->expr $env $syntax)
     (syntax-case $syntax ()
       (id (identifier? #'id)
-        (variable->expr #'id))
+        (variable-identifier->expr $env #'id))
       (other
         (ref->expr $env #'other))))
+
+  (define (variable-identifier->expr $env $identifier)
+    (switch (env-ref $env $identifier)
+      ((variable? $variable)
+        (variable->expr (variable-identifier $variable)))
+      ((else _)
+        (syntax-error $identifier "unboud identifier"))))
 
   (define (identifier->expr $env $identifier)
     (switch (env-ref $env $identifier)
@@ -432,7 +440,7 @@
                 (binary-expr 1 #t $expr "." (variable->expr #'id)))
               ((expr)
                 (parenthesized-expr 1 #t $expr "[" (syntax->expr $env #'expr) "]"))))
-          (variable->expr #'var)
+          (variable-identifier->expr $env #'var)
           (syntaxes x ...)))))
 
   (define (op1->expr $env $priority $left-to-right? $op $rhs)
