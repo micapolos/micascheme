@@ -8,7 +8,7 @@
     set-bitwise-arithmetic-shift-left set-bitwise-arithmetic-shift-right
     ref &ref
     while defer break-if cast then ?
-    macro)
+    macro extern)
   (import (micascheme))
 
   (define-aux-keywords
@@ -20,5 +20,5 @@
     set-bitwise-arithmetic-shift-left set-bitwise-arithmetic-shift-right
     ref &ref
     while defer break-if cast then ?
-    macro)
+    macro extern)
 )

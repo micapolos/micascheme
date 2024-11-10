@@ -7,7 +7,8 @@
     (micac syntax)
     (micac scope)
     (micac compiled)
-    (micac env))
+    (micac env)
+    (micac variable))
 
   (define (size->code $size)
     (lets
@@ -134,7 +135,10 @@
   (define (compiled-code+instr $compiled $syntax)
     (lets
       ((compiled $env $code) $compiled)
-      (syntax-case $syntax (macro begin var const if when while then else)
+      (syntax-case $syntax (extern macro begin var const if when while then else)
+        ((extern id)
+          (compiled+ $compiled
+            (variable (identifier->code (identifier id)))))
         ((macro (id param ...) body ...)
           (compiled+ $compiled
             (identifier id)

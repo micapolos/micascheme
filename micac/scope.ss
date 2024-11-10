@@ -1,11 +1,13 @@
 (library (micac scope)
   (export scope scope+ scope-ref scope-alloc scope-transform)
-  (import (micascheme))
+  (import
+    (micascheme)
+    (micac variable))
 
   (define scope list)
 
-  (define (scope+ $scope $id $transformer)
-    (push $scope (cons $id $transformer)))
+  (define (scope+ $scope $id $item)
+    (push $scope (cons $id $item)))
 
   (define (scope-alloc $scope $id)
     (lets
@@ -18,9 +20,11 @@
       (and $ass (cdr $ass))))
 
   (define (scope-transform $scope $id $syntax)
-    (lets
-      ($transformer (scope-ref $scope $id))
-      (if $transformer
-        (transform $transformer $id)
-        (syntax-error $id "not bound"))))
+    (switch (scope-ref $scope $id)
+      ((variable? $variable)
+        (syntax-error $id "not a macro"))
+      ((false? _)
+        (syntax-error $id "not bound"))
+      ((else $transformer)
+        (transform $transformer $id))))
 )

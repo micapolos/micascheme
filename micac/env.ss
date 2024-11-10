@@ -5,7 +5,8 @@
     env-alloc env+ env-ref env-transform)
   (import
     (micascheme)
-    (micac scope))
+    (micac scope)
+    (micac variable))
 
   (data (env lookup scope))
 
@@ -20,10 +21,10 @@
       (scope-alloc (env-scope $env) $id)))
 
 
-  (define (env+ $env $id $transformer)
+  (define (env+ $env $id $item)
     (env
       (env-lookup $env)
-      (scope+ (env-scope $env) $id $transformer)))
+      (scope+ (env-scope $env) $id $item)))
 
   (define (env-ref $env $id)
     (or
@@ -32,8 +33,10 @@
 
   (define (env-transform $env $id $syntax)
     (lets
-      ($transformer (env-ref $env $id))
-      (if $transformer
-        (transform $transformer $syntax (env-lookup $env))
-        (syntax-error $id "no macro"))))
+      ($item (env-ref $env $id))
+      (switch $item
+        ((variable? $variable)
+          (syntax-error $id "not a macro"))
+        ((else $transformer)
+          (transform $transformer $syntax (env-lookup $env))))))
 )

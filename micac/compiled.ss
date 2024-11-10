@@ -18,9 +18,9 @@
       (env-alloc (compiled-env $compiled) $id)
       (compiled-value $compiled)))
 
-  (define (compiled+ $compiled $id $transformer)
+  (define (compiled+ $compiled $id $item)
     (compiled
-      (env+ (compiled-env $compiled) $id $transformer)
+      (env+ (compiled-env $compiled) $id $item)
       (compiled-value $compiled)))
 
   (define (compiled-ref $compiled $id)
