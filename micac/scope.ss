@@ -28,11 +28,13 @@
       (scope-gen? $scope)))
 
   (define (scope-alloc $scope $id)
-    (scope+ $scope $id
-      (identifier->expr
-        (if (scope-gen? $scope)
-          (generate-temporary $id)
-          $id))))
+    (lets
+      ($expr
+        (identifier->expr
+          (if (scope-gen? $scope)
+            (generate-temporary $id)
+            $id)))
+      (cons (scope+ $scope $id $expr) $expr)))
 
   (define (scope-ref $scope $id)
     (lets

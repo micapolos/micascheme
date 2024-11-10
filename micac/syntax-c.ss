@@ -31,10 +31,9 @@
   (define (declarator->compiled-code $env $syntax)
     (syntax-case $syntax (*)
       (id (identifier? #'id)
-        (lets
-          ($env (env-alloc $env #'id))
-          (compiled $env
-            (expr-code (env-identifier->expr $env #'id)))))
+        (compiled-map
+          ($expr (compiled-alloc $env #'id))
+          (expr-code $expr)))
       ((* decl)
         (compiled-map
           ($code (declarator->compiled-code $env #'decl))
