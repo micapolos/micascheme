@@ -74,13 +74,22 @@
       (other
         (ref->expr $env #'other))))
 
-  (define (value->expr $value)
+  (define (identifier->expr $env $identifier)
+    (switch (env-ref $env $identifier)
+      ((variable? $variable)
+        (expr 0 #t (variable-code $variable)))
+      ((false? _)
+        ; TODO: (syntax-error $identifier "not bound")
+        (variable->expr  $identifier))
+      ((else $transformer)
+        (transform $transformer $identifier  $identifier))))
+
+  (define (value->expr $env $value)
     (syntax-case $value ()
-      (id
-        (identifier? #'id)
-        (variable->expr #'id))
-      (const
-        (literal->expr #'const))))
+      (id (identifier? #'id)
+        (identifier->expr $env #'id))
+      (other
+        (literal->expr #'other))))
 
   (define (compiled-code+instrs $compiled $syntax)
     (syntax-case $syntax (defer break-if)
@@ -398,7 +407,7 @@
                     (code ", "))))
               ")"))))
       (other
-        (value->expr #'other))))
+        (value->expr $env #'other))))
 
   (define (ref->expr $env $syntax)
     (syntax-case $syntax (*)
