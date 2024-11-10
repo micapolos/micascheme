@@ -1,7 +1,7 @@
 (library (micac c)
   (export
     micac-c
-    define-micac
+    micac-define
     micac-externs
     micac-macro)
   (import (micascheme) (micac syntax-c) (micac syntax) (micac env) (micac variable) (syntax))
@@ -9,19 +9,19 @@
 
   (define-rule-syntax (micac-externs id ...)
     (begin
-      (define-micac id (variable #'id)) ...))
+      (micac-define id (variable #'id)) ...))
 
-  (define-rule-syntax (define-micac id transformer)
-    (define-syntax id (make-compile-time-value transformer)))
+  (define-rule-syntax (micac-define id item)
+    (define-syntax id (make-compile-time-value item)))
 
   (define-rules-syntax (literals literals)
     ((micac-macro (id arg ...) (literals literal ...) body)
-      (define-micac id
+      (micac-define id
         (lambda ($syntax)
           (syntax-case $syntax (literal ...)
             ((_ arg ...) #'body)))))
     ((micac-macro (id arg ...) (literals literal ...) body ...)
-      (define-micac id
+      (micac-define id
         (lambda ($syntax)
           (syntax-case $syntax (literal ...)
             ((_ arg ...)
