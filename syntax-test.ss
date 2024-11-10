@@ -1,4 +1,4 @@
-(import (scheme) (check) (syntax) (procedure) (boolean))
+(import (scheme) (check) (syntax) (procedure) (boolean) (lets))
 
 (check (equal? (identifiers? #'()) #t))
 (check (equal? (identifiers? #'(foo bar)) #t))
@@ -78,3 +78,11 @@
 (check (syntax-contains? #'(x y) #'x))
 (check (syntax-contains? #'(y x) #'x))
 (check (not (syntax-contains? #'(x y) #'z)))
+
+(lets
+  ($scope (syntax-scope+ (list) #'(x y (z)) #'(x2 y2 (z2))))
+  (run
+    (check (free-identifier=? (syntax-scope-ref $scope #'x) #'x2))
+    (check (free-identifier=? (syntax-scope-ref $scope #'y) #'y2))
+    (check (free-identifier=? (syntax-scope-ref $scope #'z) #'z2))
+    (check (not (syntax-scope-ref $scope #'a)))))

@@ -28,7 +28,9 @@
     transform
     syntaxes
     syntax-subst
-    syntax-contains?)
+    syntax-contains?
+    syntax-scope+
+    syntax-scope-ref)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -269,4 +271,20 @@
         (or
           (syntax-contains? #'x $id)
           (syntax-contains? #'y $id)))))
+
+  (define (syntax-scope+ $scope $params $args)
+    (syntax-case #`(#,$params #,$args) ()
+      ((() ())
+        $scope)
+      ((param arg)
+        (identifier? #'param)
+        (cons (cons #'param #'arg) $scope))
+      (((params-1 . params-2) (args-1 . args-2))
+        (syntax-scope+
+          (syntax-scope+ $scope #'params-1 #'args-1)
+          #'params-2 #'args-2))))
+
+  (define (syntax-scope-ref $scope $id)
+    (let (($ass (assp (lambda ($item) (free-identifier=? $item $id)) $scope)))
+      (and $ass (cdr $ass))))
 )
