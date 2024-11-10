@@ -80,7 +80,7 @@
 (check (not (syntax-contains? #'(x y) #'z)))
 
 (lets
-  ($scope (syntax-scope+ (list) #'(x y (z x)) #'(x2 y2 (z2 x3))))
+  ($scope (syntax-scope #'(x y (z x)) #'(x2 y2 (z2 x3))))
   (run
     (check (free-identifier=? (syntax-scope-ref $scope #'x) #'x3))
     (check (free-identifier=? (syntax-scope-ref $scope #'y) #'y2))

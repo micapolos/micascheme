@@ -29,6 +29,7 @@
     syntaxes
     syntax-subst
     syntax-contains?
+    syntax-scope
     syntax-scope+
     syntax-scope-ref)
   (import (scheme) (syntax-keywords))
@@ -283,6 +284,9 @@
         (syntax-scope+
           (syntax-scope+ $scope #'params-1 #'args-1)
           #'params-2 #'args-2))))
+
+  (define (syntax-scope $params $args)
+    (syntax-scope+ (list) $params $args))
 
   (define (syntax-scope-ref $scope $id)
     (let (($ass (assp (lambda ($item) (free-identifier=? $item $id)) $scope)))
