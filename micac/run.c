@@ -6,16 +6,24 @@
 int main() {
   const int width = 352;
   const int height = 288;
+  const int h_blank = 96;
+  const int v_blank = 24;
+  const int h_size = width + h_blank;
+  const int v_size = height + v_blank;
+  const int cycles_per_pixel = 4;
+  const int frame_cycles = h_size * v_size * cycles_per_pixel;
   const int window_scale = 2;
-  const int pixel_count = width * height;
-  const int bits_per_pixel = 4;
-  const int pixels_size = pixel_count * bits_per_pixel;
-  const int pixels_pitch = width * bits_per_pixel;
+  int video_x = 0;
+  int video_y = 0;
+  int pixel_cycle_counter = 0;
+  uint8_t red = 0;
+  uint8_t green = 0;
+  uint8_t blue = 0;
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     printf("%s SDL Error: %s\n", "Could not initialize.", SDL_GetError());
   }
   else {
-    SDL_Window *window = SDL_CreateWindow("My window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width * window_scale, height * window_scale, 0);
+    SDL_Window *window = SDL_CreateWindow("Emu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width * window_scale, height * window_scale, 0);
     if (!window) {
       printf("%s SDL Error: %s\n", "Could not create window.", SDL_GetError());
     }
@@ -30,48 +38,178 @@ int main() {
           printf("%s SDL Error: %s\n", "Could not create texture.", SDL_GetError());
         }
         else {
+          const int pixel_count = width * height;
+          const int bits_per_pixel = 4;
+          const int pixels_size = pixel_count * bits_per_pixel;
+          const int pixels_pitch = width * bits_per_pixel;
           uint8_t *pixels = (uint8_t*)malloc(pixels_size * sizeof(uint8_t));
           if (pixels == 0) {
             printf("Could not allocate memory.\n");
           }
           else {
+            uint8_t *pixel_ref = pixels;
+            int mouse_x = 0;
+            int mouse_y = 0;
+            bool mouse_pressed_ = false;
             int frame_counter = 0;
-            bool running = true;
-            SDL_Event event;
-            int sdl_mouse_x = 0;
-            int sdl_mouse_y = 0;
-            bool sdl_mouse_pressed_ = false;
-            while (running) {
-              while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_QUIT) {
-                  running = false;
-                }
+            SDL_RWops *rw_ops = SDL_RWFromFile("/Users/micapolos/git/micascheme/micac/scr/Cobra.scr", "rb");
+            if (!rw_ops) {
+              printf("%s SDL Error: %s\n", "Could not open file.", SDL_GetError());
+            }
+            else {
+              size_t scr_size;
+              uint8_t *scr = SDL_LoadFile_RW(rw_ops, &scr_size, 0);
+              if (!scr) {
+                printf("%s SDL Error: %s\n", "Could not open file.", SDL_GetError());
               }
-              {
-                {
-                  uint8_t *pixel_ref = pixels;
-                  uint8_t value = frame_counter * 8;
-                  int counter = pixels_size;
-                  while (counter) {
-                    *pixel_ref = value;
-                    pixel_ref += 1;
-                    value += 1;
-                    counter -= 1;
+              else {
+                int bar_counter = 0;
+                uint8_t background_red = 255;
+                uint8_t background_green = 255;
+                uint8_t background_blue = 0;
+                const int ula_width = 256;
+                const int ula_height = 192;
+                const int border = 48;
+                uint8_t bits;
+                uint8_t attr;
+                bool ula_screen_ = false;
+                uint8_t ula_red = 0;
+                uint8_t ula_green = 0;
+                uint8_t ula_blue = 0;
+                uint8_t plasma_red;
+                uint8_t plasma_green;
+                uint8_t plasma_blue;
+                bool running = true;
+                SDL_Event event;
+                int sdl_mouse_x = 0;
+                int sdl_mouse_y = 0;
+                bool sdl_mouse_pressed_ = false;
+                while (running) {
+                  while (SDL_PollEvent(&event)) {
+                    if (event.type == SDL_QUIT) {
+                      running = false;
+                    }
+                  }
+                  {
+                    {
+                      int sdl_mouse_x;
+                      int sdl_mouse_y;
+                      const uint32_t sdl_mouse_state = SDL_GetMouseState(&sdl_mouse_x, &sdl_mouse_y);
+                      mouse_x = sdl_mouse_x / window_scale;
+                      mouse_y = sdl_mouse_y / window_scale;
+                      mouse_pressed_ = !((sdl_mouse_state & 1) == 0);
+                    }
+                    int counter = frame_cycles;
+                    while (counter) {
+                      if (pixel_cycle_counter == 0) {
+                        bar_counter += 1;
+                        if (bar_counter == 4630) {
+                          bar_counter = 0;
+                          background_red = ~background_red;
+                          background_green = ~background_green;
+                          background_blue = ~background_blue;
+                        }
+                        ula_screen_ = video_x >= border && video_x < border + ula_width && (video_y >= border && video_y < border + ula_height);
+                        if (ula_screen_) {
+                          const int ula_x = video_x - border;
+                          const int ula_y = video_y - border;
+                          const bool read_ = (ula_x & 7) == 0;
+                          if (read_) {
+                            const int addr_x = ula_x >> 3 & 31;
+                            const int bits_addr = addr_x | (ula_y & 192 | (ula_y & 7) << 3 | (ula_y & 56) >> 3) << 5;
+                            const int load_addr = frame_counter << 1;
+                            const bool bits_ = bits_addr >> 3 > load_addr;
+                            bits = bits_ ? 255 : scr[bits_addr];
+                            const int attr_addr = 6144 | addr_x | ula_y >> 3 << 5;
+                            const bool attr_ = attr_addr >> 3 > load_addr;
+                            attr = attr_ ? 7 : scr[attr_addr];
+                          }
+                          const bool pixel_on_ = !((bits & 128) == 0);
+                          bits = bits << 1;
+                          const bool flash_on_ = !((attr & 128) == 0);
+                          const bool alternate_on_ = !((frame_counter & 16) == 0);
+                          const bool ink_on_ = flash_on_ && alternate_on_ ? !pixel_on_ : pixel_on_;
+                          const bool red_ = !((attr & (ink_on_ ? 2 : 16)) == 0);
+                          const bool green_ = !((attr & (ink_on_ ? 4 : 32)) == 0);
+                          const bool blue_ = !((attr & (ink_on_ ? 1 : 8)) == 0);
+                          const bool bright_ = !((attr & 64) == 0);
+                          const uint8_t color = bright_ ? 255 : 187;
+                          ula_red = red_ ? color : 0;
+                          ula_green = green_ ? color : 0;
+                          ula_blue = blue_ ? color : 0;
+                        }
+                        plasma_red = frame_counter - video_x;
+                        plasma_green = frame_counter - video_y;
+                        plasma_blue = frame_counter + (video_x * video_y >> 6);
+                        if (ula_screen_) {
+                          const bool plasma_ = video_x >= mouse_x && video_y >= mouse_y || video_x < mouse_x && video_y < mouse_y;
+                          if (plasma_ ^ mouse_pressed_) {
+                            red = ula_red;
+                            green = ula_green;
+                            blue = ula_blue;
+                          }
+                          else {
+                            red = plasma_red;
+                            green = plasma_green;
+                            blue = plasma_blue;
+                          }
+                        }
+                        else {
+                          red = background_red;
+                          green = background_green;
+                          blue = background_blue;
+                        }
+                        const bool frame_start_ = video_x == 0 && video_y == 0;
+                        if (frame_start_) {
+                          frame_counter += 1;
+                        }
+                      }
+                      if (pixel_cycle_counter == 0) {
+                        const bool h_video_ = video_x < width;
+                        const bool v_video_ = video_y < height;
+                        const bool video_ = h_video_ && v_video_;
+                        if (video_) {
+                          *pixel_ref = 255;
+                          pixel_ref += 1;
+                          *pixel_ref = red;
+                          pixel_ref += 1;
+                          *pixel_ref = green;
+                          pixel_ref += 1;
+                          *pixel_ref = blue;
+                          pixel_ref += 1;
+                        }
+                      }
+                      pixel_cycle_counter += 1;
+                      if (pixel_cycle_counter == cycles_per_pixel) {
+                        pixel_cycle_counter = 0;
+                        video_x += 1;
+                        if (video_x == h_size) {
+                          video_x = 0;
+                          video_y += 1;
+                          if (video_y == v_size) {
+                            video_y = 0;
+                            pixel_ref = pixels;
+                          }
+                        }
+                      }
+                      counter -= 1;
+                    }
+                    if (SDL_UpdateTexture(texture, 0, pixels, pixels_pitch) != 0) {
+                      printf("%s SDL Error: %s\n", "Could not update texture.", SDL_GetError());
+                    }
+                    else {
+                      if (SDL_RenderCopy(renderer, texture, 0, 0) != 0) {
+                        printf("%s SDL Error: %s\n", "Could not render copy.", SDL_GetError());
+                      }
+                      else {
+                        SDL_RenderPresent(renderer);
+                      }
+                    }
                   }
                 }
-                frame_counter += 1;
-                if (SDL_UpdateTexture(texture, 0, pixels, pixels_pitch) != 0) {
-                  printf("%s SDL Error: %s\n", "Could not update texture.", SDL_GetError());
-                }
-                else {
-                  if (SDL_RenderCopy(renderer, texture, 0, 0) != 0) {
-                    printf("%s SDL Error: %s\n", "Could not render copy.", SDL_GetError());
-                  }
-                  else {
-                    SDL_RenderPresent(renderer);
-                  }
-                }
+                free(scr);
               }
+              SDL_RWclose(rw_ops);
             }
             free(pixels);
           }

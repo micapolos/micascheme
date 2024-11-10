@@ -29,17 +29,22 @@
       (_
         (syntax-error $type "unknown type"))))
 
-  (define (declarator->code $env $syntax)
+  (define (declarator->compiled-code $env $syntax)
     (syntax-case $syntax (*)
       (id (identifier? #'id)
-        (identifier->code #'id))
+        (compiled
+          (env+ $env #'id (variable #'id))
+          (identifier->code #'id)))
       ((* decl)
-        (code "*" (declarator->code $env #'decl)))
+        (compiled-map
+          ($code (declarator->compiled-code $env #'decl))
+          (code "*" $code)))
       ((* decl expr)
-        (code
-          (declarator->code $env #'decl)
-          (code-in-square-brackets
-            (expr-code (syntax->expr $env #'expr)))))))
+        (compiled-map
+          ($code (declarator->compiled-code $env #'decl))
+          (code $code
+            (code-in-square-brackets
+              (expr-code (syntax->expr $env #'expr))))))))
 
   (define (identifier->code $identifier)
     (string-code
@@ -174,28 +179,31 @@
                         #'(instr ...))))))
               "\n")))
         ((var type id)
-          (compiled-with $compiled
-            (code $code
-              (space-separated-code
-                (type->code #'type)
-                (declarator->code $env #'id))
-              ";\n")))
+          (compiled-map
+            ($declarator-code (declarator->compiled-code $env #'id))
+              (code $code
+                (space-separated-code
+                  (type->code #'type)
+                  $declarator-code)
+                ";\n")))
         ((var type id expr)
-          (compiled-with $compiled
+          (compiled-map
+            ($declarator-code (declarator->compiled-code $env #'id))
             (code $code
               (space-separated-code
                 (type->code #'type)
-                (declarator->code $env #'id)
+                $declarator-code
                 "="
                 (expr-code (syntax->expr $env #'expr)))
               ";\n")))
         ((const type id expr)
-          (compiled-with $compiled
+          (compiled-map
+            ($declarator-code (declarator->compiled-code $env #'id))
             (code $code
               (space-separated-code
                 "const"
                 (type->code #'type)
-                (declarator->code $env #'id)
+                $declarator-code
                 "="
                 (expr-code (syntax->expr $env #'expr)))
               ";\n")))
