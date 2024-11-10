@@ -27,7 +27,8 @@
     syntax-replace
     transform
     syntaxes
-    syntax-subst)
+    syntax-subst
+    syntax-contains?)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -257,4 +258,15 @@
       (((a . b) (c . d))
         (syntax-subst #'b #'d
           (syntax-subst #'a #'c $syntax)))))
+
+  (define (syntax-contains? $syntax $id)
+    (syntax-case $syntax ()
+      (()
+        #f)
+      (x (identifier? #'x)
+        (free-identifier=? #'x $id))
+      ((x . y)
+        (or
+          (syntax-contains? #'x $id)
+          (syntax-contains? #'y $id)))))
 )
