@@ -11,7 +11,36 @@
     sdl-render-copy
     sdl-render-present
     sdl-file-data
-    sdl-get-mouse-state)
+    sdl-get-mouse-state
+
+    SDL_GetError
+    SDL_Init
+    SDL_Quit
+    SDL_Window
+    SDL_CreateWindow
+    SDL_DestroyWindow
+    SDL_CreateRenderer
+    SDL_DestroyRenderer
+    SDL_CreateTexture
+    SDL_UpdateTexture
+    SDL_DestroyTexture
+    SDL_SetRenderDrawColor
+    SDL_RenderClear
+    SDL_RenderPresent
+    SDL_RenderCopy
+    SDL_PollEvent
+    SDL_RWFromFile
+    SDL_RWclose
+    SDL_LoadFile_RW
+    SDL_GetMouseState
+    free
+    SDL_INIT_VIDEO
+    SDL_QUIT
+    SDL_WINDOWPOS_UNDEFINED
+    SDL_RENDERER_ACCELERATED
+    SDL_RENDERER_PRESENTVSYNC
+    SDL_PIXELFORMAT_BGRA8888
+    SDL_TEXTUREACCESS_STREAMING)
   (import (micac) (micac std))
 
   (micac

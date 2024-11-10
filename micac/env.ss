@@ -32,7 +32,9 @@
   (define (env-transformer $env $id)
     (or
       (scope-transformer (env-scope $env) $id)
-      (app (env-lookup $env) $id)))
+      (switch (app (env-lookup $env) $id)
+        ((variable? _) #f)
+        ((else $other) $other))))
 
   (define (env-transform $env $transformer $syntax)
     (transform $transformer $syntax (env-lookup $env)))

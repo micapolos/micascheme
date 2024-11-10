@@ -1,9 +1,14 @@
 (library (micac std)
-  (export sizeof alloc repeat inc dec printf zero? in-range? << >> xor)
+  (export
+    bool int uint8_t uint16_t uint32_t uint64_t
+    sizeof alloc repeat
+    inc dec printf zero? in-range? << >> xor)
   (import (micac))
 
   (micac
-    (externs malloc free sizeof printf)
+    (externs
+      bool int uint8_t uint16_t uint32_t uint64_t
+      malloc free sizeof printf)
 
     (macro (alloc id type size)
       (var type (* id) (cast (* type) (malloc (* size (sizeof type)))))

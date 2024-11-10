@@ -24,7 +24,6 @@
       ((false? _) #f)
       ((else $transformer) $transformer)))
 
-  ; TODO: Make it a syntax-error
   (define (scope-unbound $id)
-    (variable $id))
+    (syntax-error $id "unbound identifier"))
 )

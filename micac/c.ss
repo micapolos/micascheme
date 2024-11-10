@@ -4,11 +4,12 @@
     define-micac-syntax
     micac-externs
     micac-macro)
-  (import (micascheme) (micac syntax-c) (micac syntax) (micac env) (syntax))
+  (import (micascheme) (micac syntax-c) (micac syntax) (micac env) (micac variable) (syntax))
   (export (import (micac syntax)))
 
   (define-rule-syntax (micac-externs id ...)
-    (define-aux-keywords id ...))
+    (begin
+      (define-micac-syntax id (variable #'id)) ...))
 
   (define-rule-syntax (define-micac-syntax id transformer)
     (define-syntax id (make-compile-time-value transformer)))
