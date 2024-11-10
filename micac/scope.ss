@@ -1,21 +1,42 @@
 (library (micac scope)
   (export
-    scope scope+
+    scope scope? scope-bindings scope-gen?
+    empty-scope
+    scope+
+    scope-alloc
     scope-ref
     scope-transformer
-    scope-unbound)
+    scope-unbound
+    scope-with)
   (import
     (micascheme)
     (micac variable))
 
-  (define scope list)
+  (data (scope bindings gen?))
+
+  (define (scope-with . $bindings)
+    (scope $bindings #f))
+
+  (define (empty-scope)
+    (scope (list) #f))
 
   (define (scope+ $scope $id $item)
-    (push $scope (cons $id $item)))
+    (scope
+      (push
+        (scope-bindings $scope)
+        (cons $id $item))
+      (scope-gen? $scope)))
+
+  (define (scope-alloc $scope $id)
+    (scope+ $scope $id
+      (variable
+        (if (scope-gen? $scope)
+          (generate-temporary $id)
+          $id))))
 
   (define (scope-ref $scope $id)
     (lets
-      ($ass (assid $id $scope))
+      ($ass (assid $id (scope-bindings $scope)))
       (and $ass (cdr $ass))))
 
   (define (scope-transformer $scope $id)

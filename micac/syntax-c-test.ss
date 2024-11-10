@@ -13,7 +13,7 @@
               #`(fooed arg ...))
             (_
               (syntax-error $syntax "wtf"))))))
-    (scope
+    (scope-with
       (cons #`a (variable #`a))
       (cons #`b (variable #`b))
       (cons #`c (variable #`c))

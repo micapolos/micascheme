@@ -3,6 +3,7 @@
     env env? env-lookup env-scope
     lookup-env empty-env
     env+
+    env-alloc
     env-ref
     env-transformer
     env-transform)
@@ -14,7 +15,7 @@
   (data (env lookup scope))
 
   (define (lookup-env $lookup)
-    (env $lookup (scope)))
+    (env $lookup (empty-scope)))
 
   (define empty-env (lookup-env (lambda _ #f)))
 
@@ -22,6 +23,11 @@
     (env
       (env-lookup $env)
       (scope+ (env-scope $env) $id $item)))
+
+  (define (env-alloc $env $id)
+    (env
+      (env-lookup $env)
+      (scope-alloc (env-scope $env) $id)))
 
   (define (env-ref $env $id)
     (or
