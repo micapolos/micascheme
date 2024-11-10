@@ -78,11 +78,8 @@
     (switch (env-ref $env $identifier)
       ((variable? $variable)
         (variable->expr (variable-identifier $variable)))
-      ((false? _)
-        ; TODO: (syntax-error $identifier "not bound")
-        (variable->expr  $identifier))
       ((else $transformer)
-        (transform $transformer $identifier  $identifier))))
+        (env-transform $env $transformer $identifier))))
 
   (define (value->expr $env $value)
     (syntax-case $value ()
@@ -103,13 +100,18 @@
           #`(if expr
             (then break-body ...)
             (else body ...))))
-      (((id arg ...) body ...)
-        (and (identifier? #'id) (compiled-ref $compiled #'id))
-        (compiled-code+instrs $compiled
-          #`(
-            #,@(begin-syntaxes
-              (compiled-transform $compiled #'id #'(id arg ...)))
-            body ...)))
+      (((id arg ...) body ...) (identifier? #'id)
+        (switch (compiled-ref $compiled #'id)
+          ((variable? $variable)
+            (compiled-code+instrs
+              (compiled-code+instr $compiled #'(id arg ...))
+              #'(body ...)))
+          ((else $transformer)
+            (compiled-code+instrs $compiled
+              #`(
+                #,@(begin-syntaxes
+                  (compiled-transform $compiled $transformer #'(id arg ...)))
+                body ...)))))
       ((other body ...)
         (compiled-code+instrs
           (compiled-code+instr $compiled #'other)
@@ -245,13 +247,8 @@
             (code+op2 $env $code
               #'lhs (op2->string-opt #'op2) #'expr)))
         ((id arg ...)
-          (lets
-            ($transformer (compiled-ref $compiled (identifier id)))
-            (if $transformer
-              (compiled-code+instrs $compiled
-                #`(
-                  #,@(begin-syntaxes
-                    (compiled-transform $compiled #'id $syntax))))
+          (switch (compiled-ref $compiled (identifier id))
+            ((variable? $variable)
               (compiled-with $compiled
                 (code $code
                   (expr-code
@@ -267,7 +264,12 @@
                                 (syntaxes arg ...)))
                             (code ", "))))
                       ")"))
-                  ";\n"))))))))
+                  ";\n")))
+            ((else $transformer)
+              (compiled-code+instrs $compiled
+                #`(
+                  #,@(begin-syntaxes
+                    (compiled-transform $compiled $transformer $syntax))))))))))
 
   (define (code+op2 $env $code $lhs $op $expr)
     (code $code
@@ -389,13 +391,10 @@
             " : "
             (expr-operand-code (syntax->expr $env #'false) 13 #t))))
       ((id arg ...)
-        (lets
-          ($transformer (env-ref $env (identifier id)))
-          (if $transformer
-            (syntax->expr $env
-              (env-transform $env (identifier id) $syntax))
+        (switch (env-ref $env (identifier id))
+          ((variable? $variable)
             (parenthesized-expr 1 #t
-              (variable->expr #'id)
+              (variable->expr (variable-identifier $variable))
               "("
               (expr 0 #t
                 (apply code-append
@@ -405,7 +404,10 @@
                         (partial syntax->expr $env)
                         (syntaxes arg ...)))
                     (code ", "))))
-              ")"))))
+              ")"))
+          ((else $transformer)
+            (syntax->expr $env
+              (env-transform $env $transformer $syntax)))))
       (other
         (value->expr $env #'other))))
 

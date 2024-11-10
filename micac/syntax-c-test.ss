@@ -10,7 +10,9 @@
         (lambda ($syntax)
           (syntax-case $syntax ()
             ((_ arg ...)
-              #`(fooed arg ...))))))))
+              #`(fooed arg ...))
+            (_
+              (syntax-error $syntax "wtf"))))))))
 
 (check
   (equal?

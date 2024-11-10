@@ -20,8 +20,8 @@
   (define (compiled-ref $compiled $id)
     (env-ref (compiled-env $compiled) $id))
 
-  (define (compiled-transform $compiled $id $syntax)
-    (env-transform (compiled-env $compiled) $id $syntax))
+  (define (compiled-transform $compiled $transformer $syntax)
+    (env-transform (compiled-env $compiled) $transformer $syntax))
 
   (define-rule-syntax (compiled-with compiled-expr value)
     (compiled (compiled-env compiled-expr) value))

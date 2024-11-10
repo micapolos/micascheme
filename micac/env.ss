@@ -23,14 +23,10 @@
   (define (env-ref $env $id)
     (or
       (scope-ref (env-scope $env) $id)
-      (app (env-lookup $env) $id)))
+      (app (env-lookup $env) $id)
+      ; TODO: Make it a syntax-error
+      (variable $id)))
 
-  (define (env-transform $env $id $syntax)
-    (lets
-      ($item (env-ref $env $id))
-      (switch $item
-        ((variable? $variable)
-          (syntax-error $id "not a macro"))
-        ((else $transformer)
-          (transform $transformer $syntax (env-lookup $env))))))
+  (define (env-transform $env $transformer $syntax)
+    (transform $transformer $syntax (env-lookup $env)))
 )
