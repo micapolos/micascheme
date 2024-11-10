@@ -1,6 +1,7 @@
 (import (micascheme) (micac run))
 
 (micac-run
+  (extern printf)
   (var int x)
   (set x 2)
   (printf "First value: %i\\n" x)

@@ -101,8 +101,8 @@
             (then break-body ...)
             (else body ...))))
       (((id arg ...) body ...) (identifier? #'id)
-        (switch (compiled-ref $compiled #'id)
-          ((variable? $variable)
+        (switch (compiled-transformer $compiled #'id)
+          ((false? _)
             (compiled-code+instrs
               (compiled-code+instr $compiled #'(id arg ...))
               #'(body ...)))
@@ -149,7 +149,8 @@
       (syntax-case $syntax (extern macro begin var const if when while then else)
         ((extern id)
           (compiled+ $compiled
-            (variable (identifier->code (identifier id)))))
+            (identifier id)
+            (variable (identifier id))))
         ((macro (id param ...) body ...)
           (compiled+ $compiled
             (identifier id)
@@ -331,7 +332,7 @@
       ((/ a b cs ...)
         (syntax->expr $env #`(/ (/ a b) cs ...)))
       ((and)
-        (syntax->expr $env #'true))
+        (syntax->expr $env #'#t))
       ((and a)
         (syntax->expr $env #'a))
       ((and a b)
@@ -339,7 +340,7 @@
       ((and a b cs ...)
         (syntax->expr $env #`(and (and a b) cs ...)))
       ((or)
-        (syntax->expr $env #'false))
+        (syntax->expr $env #'#f))
       ((or a)
         (syntax->expr $env #'a))
       ((or a b)

@@ -1,9 +1,9 @@
-(import (micascheme) (micac syntax) (micac syntax-c) (micac env) (check))
+(import (micascheme) (micac syntax) (micac syntax-c) (micac env) (check) (micac scope) (micac variable))
 
 (define-aux-keyword foo)
 
 (define $env
-  (lookup-env
+  (env
     (lambda ($id)
       (and
         (free-identifier=? $id #'foo)
@@ -12,7 +12,22 @@
             ((_ arg ...)
               #`(fooed arg ...))
             (_
-              (syntax-error $syntax "wtf"))))))))
+              (syntax-error $syntax "wtf"))))))
+    (scope
+      (cons #`a (variable #`a))
+      (cons #`b (variable #`b))
+      (cons #`c (variable #`c))
+      (cons #`ptr (variable #`ptr))
+      (cons #`x (variable #`x))
+      (cons #`y (variable #`y))
+      (cons #`z (variable #`z))
+      (cons #`alloc (variable #`alloc))
+      (cons #`update (variable #`update))
+      (cons #`free (variable #`free))
+      (cons #`printf (variable #`printf))
+      (cons #`SDL_CopyTexture (variable #`SDL_CopyTexture))
+      (cons #`SDL_Rect (variable #`SDL_Rect))
+      (cons #`fooed (variable #`fooed)))))
 
 (check
   (equal?
@@ -337,25 +352,25 @@
 (check
   (equal?
     (syntax-c $env
-      #`(defer (SDL_Quit))
-      #`(SDL_Init))
+      #`(defer (free))
+      #`(alloc))
     (lines-string
-      "SDL_Init();"
-      "SDL_Quit();")))
+      "alloc();"
+      "free();")))
 
 (check
   (equal?
     (syntax-c $env
-      #`(break-if expr (init))
-      #`(defer (destroy))
+      #`(break-if x (alloc))
+      #`(defer (free))
       #`(update))
     (lines-string
-      "if (expr) {"
-      "  init();"
+      "if (x) {"
+      "  alloc();"
       "}"
       "else {"
       "  update();"
-      "  destroy();"
+      "  free();"
       "}")))
 
 (check
@@ -365,8 +380,8 @@
 
 (check
   (equal?
-    (syntax-c $env #`(SDL_CopyTexture texture (SDL_Rect 0 0 20 30)))
-    (lines-string "SDL_CopyTexture(texture, SDL_Rect(0, 0, 20, 30));")))
+    (syntax-c $env #`(SDL_CopyTexture x (SDL_Rect 0 0 20 30)))
+    (lines-string "SDL_CopyTexture(x, SDL_Rect(0, 0, 20, 30));")))
 
 (check
   (equal?

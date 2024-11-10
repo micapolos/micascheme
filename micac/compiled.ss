@@ -3,6 +3,7 @@
     compiled compiled? compiled-env compiled-value
     compiled+
     compiled-ref
+    compiled-transformer
     compiled-transform
     compiled-with
     compiled-map)
@@ -19,6 +20,9 @@
 
   (define (compiled-ref $compiled $id)
     (env-ref (compiled-env $compiled) $id))
+
+  (define (compiled-transformer $compiled $id)
+    (env-transformer (compiled-env $compiled) $id))
 
   (define (compiled-transform $compiled $transformer $syntax)
     (env-transform (compiled-env $compiled) $transformer $syntax))

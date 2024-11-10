@@ -2,7 +2,10 @@
   (export
     env env? env-lookup env-scope
     lookup-env empty-env
-    env+ env-ref env-transform)
+    env+
+    env-ref
+    env-transformer
+    env-transform)
   (import
     (micascheme)
     (micac scope)
@@ -24,8 +27,12 @@
     (or
       (scope-ref (env-scope $env) $id)
       (app (env-lookup $env) $id)
-      ; TODO: Make it a syntax-error
-      (variable $id)))
+      (scope-unbound $id)))
+
+  (define (env-transformer $env $id)
+    (or
+      (scope-transformer (env-scope $env) $id)
+      (app (env-lookup $env) $id)))
 
   (define (env-transform $env $transformer $syntax)
     (transform $transformer $syntax (env-lookup $env)))
