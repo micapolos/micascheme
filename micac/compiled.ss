@@ -1,7 +1,6 @@
 (library (micac compiled)
   (export
     compiled compiled? compiled-env compiled-value
-    compiled-alloc
     compiled+
     compiled-ref
     compiled-transform
@@ -12,11 +11,6 @@
     (micac env))
 
   (data (compiled env value))
-
-  (define (compiled-alloc $compiled $id)
-    (compiled
-      (env-alloc (compiled-env $compiled) $id)
-      (compiled-value $compiled)))
 
   (define (compiled+ $compiled $id $item)
     (compiled
