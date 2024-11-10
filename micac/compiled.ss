@@ -2,7 +2,6 @@
   (export
     compiled compiled? compiled-env compiled-value
     compiled+
-    compiled-alloc
     compiled-ref
     compiled-transformer
     compiled-transform
@@ -17,11 +16,6 @@
   (define (compiled+ $compiled $id $item)
     (compiled
       (env+ (compiled-env $compiled) $id $item)
-      (compiled-value $compiled)))
-
-  (define (compiled-alloc $compiled $id)
-    (compiled
-      (env-alloc (compiled-env $compiled) $id)
       (compiled-value $compiled)))
 
   (define (compiled-ref $compiled $id)

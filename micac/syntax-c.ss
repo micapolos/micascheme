@@ -33,7 +33,7 @@
     (syntax-case $syntax (*)
       (id (identifier? #'id)
         (compiled
-          (env+ $env #'id (variable #'id))
+          (env-alloc $env #'id)
           (identifier->code #'id)))
       ((* decl)
         (compiled-map
