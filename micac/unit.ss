@@ -34,7 +34,7 @@
   (define (size->mask $size)
     (datum->syntax #'+ (- (size->pot-value $size) 1)))
 
-  (define-micac-syntax init
+  (define-micac init
     (lambda ($syntax)
       (lambda ($lookup)
         (syntax-case $syntax ()
@@ -45,7 +45,7 @@
                 (syntax-error $syntax "not unit"))
               $syntax))))))
 
-  (define-micac-syntax update
+  (define-micac update
     (lambda ($syntax)
       (lambda ($lookup)
         (syntax-case $syntax ()

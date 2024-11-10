@@ -1,6 +1,6 @@
 (import (micascheme) (micac c) (check))
 
-(define-micac-syntax add-all
+(define-micac add-all
   (lambda ($syntax)
     (syntax-case $syntax ()
       ((_ var xs ...)
@@ -9,7 +9,7 @@
             ($x (syntax->list #'(xs ...)))
             #`(set+ var #,$x)))))))
 
-(define-micac-syntax sum
+(define-micac sum
   (lambda ($syntax)
     (syntax-case $syntax ()
       ((_) #'0)
