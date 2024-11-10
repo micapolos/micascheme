@@ -1,21 +1,24 @@
 (library (micac scope)
   (export
-    scope scope? scope-bindings scope-gen?
+    scope scope? scope-bindings scope-size
     empty-scope
     scope+
     scope-alloc
     scope-ref
     scope-transformer
     scope-unbound
-    scope-with)
+    scope-with
+    pretty-expr?)
   (import
     (micascheme)
     (micac expr))
 
-  (data (scope bindings gen?))
+  (define pretty-expr? (make-parameter #f))
+
+  (data (scope bindings size))
 
   (define (scope-with . $bindings)
-    (scope $bindings #f))
+    (scope $bindings (length $bindings)))
 
   (define (empty-scope)
     (apply scope-with (list)))
@@ -25,15 +28,21 @@
       (push
         (scope-bindings $scope)
         (cons $id $item))
-      (scope-gen? $scope)))
+      (+ (scope-size $scope) 1)))
 
   (define (scope-alloc $scope $id)
     (lets
       ($expr
         (identifier->expr
-          (if (scope-gen? $scope)
-            (generate-temporary $id)
-            $id)))
+          (if (pretty-expr?)
+            $id
+            (datum->syntax $id
+              (string->symbol
+                (string-append
+                  "v"
+                  (number->string (scope-size $scope))
+                  "-"
+                  (symbol->string (syntax->datum $id))))))))
       (cons (scope+ $scope $id $expr) $expr)))
 
   (define (scope-ref $scope $id)

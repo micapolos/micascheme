@@ -1,5 +1,8 @@
 (import (micascheme) (micac syntax) (micac syntax-c) (micac env) (check) (micac scope) (micac expr))
 
+; for testing
+(pretty-expr? #t)
+
 (define-aux-keyword foo)
 
 (define $env

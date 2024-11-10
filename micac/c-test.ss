@@ -1,4 +1,6 @@
-(import (micascheme) (micac c) (check))
+(import (micascheme) (micac c) (check) (micac scope))
+
+(pretty-expr? #t)
 
 (micac-define add-all
   (lambda ($syntax)
@@ -26,8 +28,8 @@
       (var int x)
       (set x 10))
     (lines-string
-      "int x;"
-      "x = 10;")))
+      "int v0_x;"
+      "v0_x = 10;")))
 
 (check
   (equal?
@@ -35,10 +37,10 @@
       (var int x)
       (add-all x 10 20 30))
     (lines-string
-      "int x;"
-      "x += 10;"
-      "x += 20;"
-      "x += 30;")))
+      "int v0_x;"
+      "v0_x += 10;"
+      "v0_x += 20;"
+      "v0_x += 30;")))
 
 (check
   (equal?
@@ -46,8 +48,8 @@
       (var int x)
       (set x (sum)))
     (lines-string
-      "int x;"
-      "x = 0;")))
+      "int v0_x;"
+      "v0_x = 0;")))
 
 (check
   (equal?
@@ -55,5 +57,5 @@
       (var int x)
       (set x (sum 10 20 30)))
     (lines-string
-      "int x;"
-      "x = 10 + 20 + 30;")))
+      "int v0_x;"
+      "v0_x = 10 + 20 + 30;")))

@@ -4,220 +4,220 @@
 #include <SDL.h>
 
 int main() {
-  const int width = 352;
-  const int height = 288;
-  const int h_blank = 96;
-  const int v_blank = 24;
-  const int h_size = width + h_blank;
-  const int v_size = height + v_blank;
-  const int cycles_per_pixel = 4;
-  const int frame_cycles = h_size * v_size * cycles_per_pixel;
-  const int window_scale = 2;
-  int video_x = 0;
-  int video_y = 0;
-  int pixel_cycle_counter = 0;
-  uint8_t red = 0;
-  uint8_t green = 0;
-  uint8_t blue = 0;
+  const int v0_width = 352;
+  const int v1_height = 288;
+  const int v2_h_blank = 96;
+  const int v3_v_blank = 24;
+  const int v4_h_size = v0_width + v2_h_blank;
+  const int v5_v_size = v1_height + v3_v_blank;
+  const int v6_cycles_per_pixel = 4;
+  const int v7_frame_cycles = v4_h_size * v5_v_size * v6_cycles_per_pixel;
+  const int v8_window_scale = 2;
+  int v9_video_x = 0;
+  int v10_video_y = 0;
+  int v11_pixel_cycle_counter = 0;
+  uint8_t v12_red = 0;
+  uint8_t v13_green = 0;
+  uint8_t v14_blue = 0;
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     printf("%s SDL Error: %s\n", "Could not initialize.", SDL_GetError());
   }
   else {
-    SDL_Window *window = SDL_CreateWindow("Emu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width * window_scale, height * window_scale, 0);
-    if (!window) {
+    SDL_Window *v15_window = SDL_CreateWindow("Emu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, v0_width * v8_window_scale, v1_height * v8_window_scale, 0);
+    if (!v15_window) {
       printf("%s SDL Error: %s\n", "Could not create window.", SDL_GetError());
     }
     else {
-      SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-      if (!renderer) {
+      SDL_Renderer *v16_renderer = SDL_CreateRenderer(v15_window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+      if (!v16_renderer) {
         printf("%s SDL Error: %s\n", "Could not create renderer.", SDL_GetError());
       }
       else {
-        SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_STREAMING, width, height);
-        if (!texture) {
+        SDL_Texture *v17_texture = SDL_CreateTexture(v16_renderer, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_STREAMING, v0_width, v1_height);
+        if (!v17_texture) {
           printf("%s SDL Error: %s\n", "Could not create texture.", SDL_GetError());
         }
         else {
-          const int pixel_count = width * height;
-          const int bits_per_pixel = 4;
-          const int pixels_size = pixel_count * bits_per_pixel;
-          const int pixels_pitch = width * bits_per_pixel;
-          uint8_t *pixels = (uint8_t*)malloc(pixels_size * sizeof(uint8_t));
-          if (pixels == 0) {
+          const int v18_pixel_count = v0_width * v1_height;
+          const int v19_bits_per_pixel = 4;
+          const int v20_pixels_size = v18_pixel_count * v19_bits_per_pixel;
+          const int v21_pixels_pitch = v0_width * v19_bits_per_pixel;
+          uint8_t *v22_pixels = (uint8_t*)malloc(v20_pixels_size * sizeof(uint8_t));
+          if (v22_pixels == 0) {
             printf("Could not allocate memory.\n");
           }
           else {
-            uint8_t *pixel_ref = pixels;
-            int mouse_x = 0;
-            int mouse_y = 0;
-            bool mouse_pressed_ = false;
-            int frame_counter = 0;
-            SDL_RWops *rw_ops = SDL_RWFromFile("/Users/micapolos/git/micascheme/micac/scr/Cobra.scr", "rb");
-            if (!rw_ops) {
+            uint8_t *v23_pixel_ref = v22_pixels;
+            int v24_mouse_x = 0;
+            int v25_mouse_y = 0;
+            bool v26_mouse_pressed_ = false;
+            int v27_frame_counter = 0;
+            SDL_RWops *v28_rw_ops = SDL_RWFromFile("/Users/micapolos/git/micascheme/micac/scr/Cobra.scr", "rb");
+            if (!v28_rw_ops) {
               printf("%s SDL Error: %s\n", "Could not open file.", SDL_GetError());
             }
             else {
-              size_t scr_size;
-              uint8_t *scr = SDL_LoadFile_RW(rw_ops, &scr_size, 0);
-              if (!scr) {
+              size_t v29_scr_size;
+              uint8_t *v30_scr = SDL_LoadFile_RW(v28_rw_ops, &v29_scr_size, 0);
+              if (!v30_scr) {
                 printf("%s SDL Error: %s\n", "Could not open file.", SDL_GetError());
               }
               else {
-                int bar_counter = 0;
-                uint8_t background_red = 255;
-                uint8_t background_green = 255;
-                uint8_t background_blue = 0;
-                const int ula_width = 256;
-                const int ula_height = 192;
-                const int border = 48;
-                uint8_t bits;
-                uint8_t attr;
-                bool ula_screen_ = false;
-                uint8_t ula_red = 0;
-                uint8_t ula_green = 0;
-                uint8_t ula_blue = 0;
-                uint8_t plasma_red;
-                uint8_t plasma_green;
-                uint8_t plasma_blue;
-                bool running = true;
-                SDL_Event event;
-                int sdl_mouse_x = 0;
-                int sdl_mouse_y = 0;
-                bool sdl_mouse_pressed_ = false;
-                while (running) {
-                  while (SDL_PollEvent(&event)) {
-                    if (event.type == SDL_QUIT) {
-                      running = false;
+                int v31_bar_counter = 0;
+                uint8_t v32_background_red = 255;
+                uint8_t v33_background_green = 255;
+                uint8_t v34_background_blue = 0;
+                const int v36_ula_width = 256;
+                const int v37_ula_height = 192;
+                const int v38_border = 48;
+                uint8_t v39_bits;
+                uint8_t v40_attr;
+                bool v41_ula_screen_ = false;
+                uint8_t v42_ula_red = 0;
+                uint8_t v43_ula_green = 0;
+                uint8_t v44_ula_blue = 0;
+                uint8_t v46_plasma_red;
+                uint8_t v47_plasma_green;
+                uint8_t v48_plasma_blue;
+                bool v50_running = true;
+                SDL_Event v51_event;
+                int v52_sdl_mouse_x = 0;
+                int v53_sdl_mouse_y = 0;
+                bool v54_sdl_mouse_pressed_ = false;
+                while (v50_running) {
+                  while (SDL_PollEvent(&v51_event)) {
+                    if (v51_event.type == SDL_QUIT) {
+                      v50_running = false;
                     }
                   }
                   {
                     {
-                      int sdl_mouse_x;
-                      int sdl_mouse_y;
-                      const uint32_t sdl_mouse_state = SDL_GetMouseState(&sdl_mouse_x, &sdl_mouse_y);
-                      mouse_x = sdl_mouse_x / window_scale;
-                      mouse_y = sdl_mouse_y / window_scale;
-                      mouse_pressed_ = !((sdl_mouse_state & 1) == 0);
+                      int v55_sdl_mouse_x;
+                      int v56_sdl_mouse_y;
+                      const uint32_t v57_sdl_mouse_state = SDL_GetMouseState(&v55_sdl_mouse_x, &v56_sdl_mouse_y);
+                      v24_mouse_x = v55_sdl_mouse_x / v8_window_scale;
+                      v25_mouse_y = v56_sdl_mouse_y / v8_window_scale;
+                      v26_mouse_pressed_ = !((v57_sdl_mouse_state & 1) == 0);
                     }
-                    int counter = frame_cycles;
-                    while (counter) {
-                      if (pixel_cycle_counter == 0) {
-                        bar_counter += 1;
-                        if (bar_counter == 4630) {
-                          bar_counter = 0;
-                          background_red = ~background_red;
-                          background_green = ~background_green;
-                          background_blue = ~background_blue;
+                    int v55_counter = v7_frame_cycles;
+                    while (v55_counter) {
+                      if (v11_pixel_cycle_counter == 0) {
+                        v31_bar_counter += 1;
+                        if (v31_bar_counter == 4630) {
+                          v31_bar_counter = 0;
+                          v32_background_red = ~v32_background_red;
+                          v33_background_green = ~v33_background_green;
+                          v34_background_blue = ~v34_background_blue;
                         }
-                        ula_screen_ = video_x >= border && video_x < border + ula_width && (video_y >= border && video_y < border + ula_height);
-                        if (ula_screen_) {
-                          const int ula_x = video_x - border;
-                          const int ula_y = video_y - border;
-                          const bool read_ = (ula_x & 7) == 0;
-                          if (read_) {
-                            const int addr_x = ula_x >> 3 & 31;
-                            const int bits_addr = addr_x | (ula_y & 192 | (ula_y & 7) << 3 | (ula_y & 56) >> 3) << 5;
-                            const int load_addr = frame_counter << 1;
-                            const bool bits_ = bits_addr >> 3 > load_addr;
-                            bits = bits_ ? 255 : scr[bits_addr];
-                            const int attr_addr = 6144 | addr_x | ula_y >> 3 << 5;
-                            const bool attr_ = attr_addr >> 3 > load_addr;
-                            attr = attr_ ? 7 : scr[attr_addr];
+                        v41_ula_screen_ = v9_video_x >= v38_border && v9_video_x < v38_border + v36_ula_width && (v10_video_y >= v38_border && v10_video_y < v38_border + v37_ula_height);
+                        if (v41_ula_screen_) {
+                          const int v56_ula_x = v9_video_x - v38_border;
+                          const int v57_ula_y = v10_video_y - v38_border;
+                          const bool v58_read_ = (v56_ula_x & 7) == 0;
+                          if (v58_read_) {
+                            const int v59_addr_x = v56_ula_x >> 3 & 31;
+                            const int v60_bits_addr = v59_addr_x | (v57_ula_y & 192 | (v57_ula_y & 7) << 3 | (v57_ula_y & 56) >> 3) << 5;
+                            const int v61_load_addr = v27_frame_counter << 1;
+                            const bool v62_bits_ = v60_bits_addr >> 3 > v61_load_addr;
+                            v39_bits = v62_bits_ ? 255 : v30_scr[v60_bits_addr];
+                            const int v63_attr_addr = 6144 | v59_addr_x | v57_ula_y >> 3 << 5;
+                            const bool v64_attr_ = v63_attr_addr >> 3 > v61_load_addr;
+                            v40_attr = v64_attr_ ? 7 : v30_scr[v63_attr_addr];
                           }
-                          const bool pixel_on_ = !((bits & 128) == 0);
-                          bits = bits << 1;
-                          const bool flash_on_ = !((attr & 128) == 0);
-                          const bool alternate_on_ = !((frame_counter & 16) == 0);
-                          const bool ink_on_ = flash_on_ && alternate_on_ ? !pixel_on_ : pixel_on_;
-                          const bool red_ = !((attr & (ink_on_ ? 2 : 16)) == 0);
-                          const bool green_ = !((attr & (ink_on_ ? 4 : 32)) == 0);
-                          const bool blue_ = !((attr & (ink_on_ ? 1 : 8)) == 0);
-                          const bool bright_ = !((attr & 64) == 0);
-                          const uint8_t color = bright_ ? 255 : 187;
-                          ula_red = red_ ? color : 0;
-                          ula_green = green_ ? color : 0;
-                          ula_blue = blue_ ? color : 0;
+                          const bool v59_pixel_on_ = !((v39_bits & 128) == 0);
+                          v39_bits = v39_bits << 1;
+                          const bool v60_flash_on_ = !((v40_attr & 128) == 0);
+                          const bool v61_alternate_on_ = !((v27_frame_counter & 16) == 0);
+                          const bool v62_ink_on_ = v60_flash_on_ && v61_alternate_on_ ? !v59_pixel_on_ : v59_pixel_on_;
+                          const bool v63_red_ = !((v40_attr & (v62_ink_on_ ? 2 : 16)) == 0);
+                          const bool v64_green_ = !((v40_attr & (v62_ink_on_ ? 4 : 32)) == 0);
+                          const bool v65_blue_ = !((v40_attr & (v62_ink_on_ ? 1 : 8)) == 0);
+                          const bool v66_bright_ = !((v40_attr & 64) == 0);
+                          const uint8_t v67_color = v66_bright_ ? 255 : 187;
+                          v42_ula_red = v63_red_ ? v67_color : 0;
+                          v43_ula_green = v64_green_ ? v67_color : 0;
+                          v44_ula_blue = v65_blue_ ? v67_color : 0;
                         }
-                        plasma_red = frame_counter - video_x;
-                        plasma_green = frame_counter - video_y;
-                        plasma_blue = frame_counter + (video_x * video_y >> 6);
-                        if (ula_screen_) {
-                          const bool plasma_ = video_x >= mouse_x && video_y >= mouse_y || video_x < mouse_x && video_y < mouse_y;
-                          if (plasma_ ^ mouse_pressed_) {
-                            red = ula_red;
-                            green = ula_green;
-                            blue = ula_blue;
+                        v46_plasma_red = v27_frame_counter - v9_video_x;
+                        v47_plasma_green = v27_frame_counter - v10_video_y;
+                        v48_plasma_blue = v27_frame_counter + (v9_video_x * v10_video_y >> 6);
+                        if (v41_ula_screen_) {
+                          const bool v56_plasma_ = v9_video_x >= v24_mouse_x && v10_video_y >= v25_mouse_y || v9_video_x < v24_mouse_x && v10_video_y < v25_mouse_y;
+                          if (v56_plasma_ ^ v26_mouse_pressed_) {
+                            v12_red = v42_ula_red;
+                            v13_green = v43_ula_green;
+                            v14_blue = v44_ula_blue;
                           }
                           else {
-                            red = plasma_red;
-                            green = plasma_green;
-                            blue = plasma_blue;
+                            v12_red = v46_plasma_red;
+                            v13_green = v47_plasma_green;
+                            v14_blue = v48_plasma_blue;
                           }
                         }
                         else {
-                          red = background_red;
-                          green = background_green;
-                          blue = background_blue;
+                          v12_red = v32_background_red;
+                          v13_green = v33_background_green;
+                          v14_blue = v34_background_blue;
                         }
-                        const bool frame_start_ = video_x == 0 && video_y == 0;
-                        if (frame_start_) {
-                          frame_counter += 1;
-                        }
-                      }
-                      if (pixel_cycle_counter == 0) {
-                        const bool h_video_ = video_x < width;
-                        const bool v_video_ = video_y < height;
-                        const bool video_ = h_video_ && v_video_;
-                        if (video_) {
-                          *pixel_ref = 255;
-                          pixel_ref += 1;
-                          *pixel_ref = red;
-                          pixel_ref += 1;
-                          *pixel_ref = green;
-                          pixel_ref += 1;
-                          *pixel_ref = blue;
-                          pixel_ref += 1;
+                        const bool v56_frame_start_ = v9_video_x == 0 && v10_video_y == 0;
+                        if (v56_frame_start_) {
+                          v27_frame_counter += 1;
                         }
                       }
-                      pixel_cycle_counter += 1;
-                      if (pixel_cycle_counter == cycles_per_pixel) {
-                        pixel_cycle_counter = 0;
-                        video_x += 1;
-                        if (video_x == h_size) {
-                          video_x = 0;
-                          video_y += 1;
-                          if (video_y == v_size) {
-                            video_y = 0;
-                            pixel_ref = pixels;
+                      if (v11_pixel_cycle_counter == 0) {
+                        const bool v56_h_video_ = v9_video_x < v0_width;
+                        const bool v57_v_video_ = v10_video_y < v1_height;
+                        const bool v58_video_ = v56_h_video_ && v57_v_video_;
+                        if (v58_video_) {
+                          *v23_pixel_ref = 255;
+                          v23_pixel_ref += 1;
+                          *v23_pixel_ref = v12_red;
+                          v23_pixel_ref += 1;
+                          *v23_pixel_ref = v13_green;
+                          v23_pixel_ref += 1;
+                          *v23_pixel_ref = v14_blue;
+                          v23_pixel_ref += 1;
+                        }
+                      }
+                      v11_pixel_cycle_counter += 1;
+                      if (v11_pixel_cycle_counter == v6_cycles_per_pixel) {
+                        v11_pixel_cycle_counter = 0;
+                        v9_video_x += 1;
+                        if (v9_video_x == v4_h_size) {
+                          v9_video_x = 0;
+                          v10_video_y += 1;
+                          if (v10_video_y == v5_v_size) {
+                            v10_video_y = 0;
+                            v23_pixel_ref = v22_pixels;
                           }
                         }
                       }
-                      counter -= 1;
+                      v55_counter -= 1;
                     }
-                    if (SDL_UpdateTexture(texture, 0, pixels, pixels_pitch) != 0) {
+                    if (SDL_UpdateTexture(v17_texture, 0, v22_pixels, v21_pixels_pitch) != 0) {
                       printf("%s SDL Error: %s\n", "Could not update texture.", SDL_GetError());
                     }
                     else {
-                      if (SDL_RenderCopy(renderer, texture, 0, 0) != 0) {
+                      if (SDL_RenderCopy(v16_renderer, v17_texture, 0, 0) != 0) {
                         printf("%s SDL Error: %s\n", "Could not render copy.", SDL_GetError());
                       }
                       else {
-                        SDL_RenderPresent(renderer);
+                        SDL_RenderPresent(v16_renderer);
                       }
                     }
                   }
                 }
-                free(scr);
+                free(v30_scr);
               }
-              SDL_RWclose(rw_ops);
+              SDL_RWclose(v28_rw_ops);
             }
-            free(pixels);
+            free(v22_pixels);
           }
-          SDL_DestroyTexture(texture);
+          SDL_DestroyTexture(v17_texture);
         }
-        SDL_DestroyRenderer(renderer);
+        SDL_DestroyRenderer(v16_renderer);
       }
-      SDL_DestroyWindow(window);
+      SDL_DestroyWindow(v15_window);
     }
     SDL_Quit();
   }
