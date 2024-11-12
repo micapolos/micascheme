@@ -3,17 +3,19 @@
 ; for testing
 (pretty-expr? #t)
 
-(define-aux-keyword foo)
+(define-aux-keywords foo)
 
 (define $env
   (env
     (lambda ($id)
       (and
-        (free-identifier=? $id #'foo)
+        (or (free-identifier=? $id #'foo) (free-identifier=? $id #'zero?))
         (lambda ($syntax)
-          (syntax-case $syntax ()
-            ((_ arg ...)
+          (syntax-case $syntax (foo zero?)
+            ((foo arg ...)
               #`(fooed arg ...))
+            ((zero? expr)
+              #`(= expr 0))
             (_
               (syntax-error $syntax "wtf"))))))
     (scope-with
@@ -391,6 +393,17 @@
   (equal?
     (syntax-c $env #`(foo 10 (foo 20 30)))
     (lines-string "fooed(10, fooed(20, 30));")))
+
+(check
+  (equal?
+    (syntax-c $env #`(printf (zero? x)))
+    (lines-string "printf(x == 0);")))
+
+; todo: this should expand to x != 0
+(check
+  (equal?
+    (syntax-c $env #`(printf (not (zero? x))))
+    (lines-string "printf(!(x == 0));")))
 
 (check
   (equal?
