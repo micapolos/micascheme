@@ -403,7 +403,7 @@
 (check
   (equal?
     (syntax-c $env #`(printf (not (zero? x))))
-    (lines-string "printf(!(x == 0));")))
+    (lines-string "printf(x != 0);")))
 
 (check
   (equal?

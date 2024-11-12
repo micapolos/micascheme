@@ -43,7 +43,7 @@
           ($code (declarator->compiled-code $env #'decl))
           (code $code
             (code-in-square-brackets
-              (expr-code (syntax->expr $env #'expr))))))))
+              (expr-code (syntax->expand-expr $env #'expr))))))))
 
   (define (identifier->code $identifier)
     (string-code
@@ -90,7 +90,7 @@
       ((expr? $expr)
         $expr)
       ((else $transformer)
-        (syntax->expr $env
+        (syntax->expand-expr $env
           (env-transform $env $transformer $identifier)))))
 
   (define (value->expr $env $value)
@@ -201,7 +201,7 @@
                 (type->code #'type)
                 $declarator-code
                 "="
-                (expr-code (syntax->expr $env #'expr)))
+                (expr-code (syntax->expand-expr $env #'expr)))
               ";\n")))
         ((const type id expr)
           (compiled-map
@@ -212,7 +212,7 @@
                 (type->code #'type)
                 $declarator-code
                 "="
-                (expr-code (syntax->expr $env #'expr)))
+                (expr-code (syntax->expand-expr $env #'expr)))
               ";\n")))
         ((if expr (then then-body ...) (else else-body ...))
           (compiled-map
@@ -227,7 +227,7 @@
               (space-separated-code
                 "if"
                 (code-in-round-brackets
-                  (expr-code (syntax->expr $env #'expr)))
+                  (expr-code (syntax->expand-expr $env #'expr)))
                 $then-code)
               (space-separated-code
                 "else"
@@ -243,7 +243,7 @@
               (space-separated-code
                 "if"
                 (code-in-round-brackets
-                  (expr-code (syntax->expr $env #'expr)))
+                  (expr-code (syntax->expand-expr $env #'expr)))
                 $when-code))))
         ((while expr instr ...)
           (compiled-map
@@ -255,7 +255,7 @@
               (space-separated-code
                 "while"
                 (code-in-round-brackets
-                  (expr-code (syntax->expr $env #'expr)))
+                  (expr-code (syntax->expand-expr $env #'expr)))
                 $while-code))))
         ((op2 lhs expr)
           (op2->string-opt #'op2)
@@ -276,7 +276,7 @@
                           (intercalate
                             (map expr-code
                               (map
-                                (partial syntax->expr $env)
+                                (partial syntax->expand-expr $env)
                                 (syntaxes arg ...)))
                             (code ", "))))
                       ")"))
@@ -292,8 +292,11 @@
       (space-separated-code
         (expr-code (lhs->expr $env $lhs))
         (string-code $op)
-        (expr-code (syntax->expr $env $expr)))
+        (expr-code (syntax->expand-expr $env $expr)))
       ";\n"))
+
+  (define (syntax->expand-expr $env $syntax)
+    (syntax->expr $env (expand-expr $env $syntax)))
 
   (define (syntax->expr $env $syntax)
     (syntax-case $syntax
@@ -426,6 +429,35 @@
               (env-transform $env $transformer $syntax)))))
       (other
         (value->expr $env #'other))))
+
+  (define (expand-expr $env $expr)
+    (syntax-case $expr (cast ref &ref)
+      ((cast type rhs)
+        #`(cast type #,(expand-expr $env #'rhs)))
+      ((ref var x ...)
+        #`(ref
+          #,(expand-expr $env #'var)
+          #,@(map (partial expand-ref $env) (syntaxes x ...))))
+      ((&ref var x ...)
+        #`(&ref
+          #,(expand-expr $env #'var)
+          #,@(map (partial expand-ref $env) (syntaxes x ...))))
+      ((id arg ...)
+        (switch (env-transformer $env (identifier id))
+          ((false? _)
+            #`(
+              #,@(map
+                (partial expand-expr $env)
+                (syntaxes id arg ...))))
+          ((else $transformer)
+            (expand-expr $env
+              (env-transform $env $transformer $expr)))))
+      (other #'other)))
+
+  (define (expand-ref $env $ref)
+    (syntax-case $ref ()
+      ((expr) #`(#,(expand-expr $env #'expr)))
+      (other #'other)))
 
   (define (ref->expr $env $syntax)
     (syntax-case $syntax (*)
