@@ -425,8 +425,7 @@
                     (code ", "))))
               ")"))
           ((else $transformer)
-            (syntax->expr $env
-              (env-transform $env $transformer $syntax)))))
+            (syntax-error #'id "macro identifier"))))
       (other
         (value->expr $env #'other))))
 
