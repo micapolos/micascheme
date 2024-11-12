@@ -142,7 +142,7 @@
         (while (SDL_PollEvent (&ref event))
           (when (= (ref event type) SDL_QUIT)
             (set running #f)))
-        (begin body ...)))
+        body ...))
 
     (macro (sdl-set-render-draw-color renderer red green blue alpha)
       (SDL_SetRenderDrawColor renderer red green blue alpha))

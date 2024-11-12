@@ -330,10 +330,33 @@
       "if (x) {"
       "  x = 10;"
       "  x = 20;"
-      "}"
-      "else {"
+      "} else {"
       "  x = 30;"
       "  x = 40;"
+      "}")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(while x
+          (set x 10)
+          (set x 20)))
+    (lines-string
+      "while (x) {"
+      "  x = 10;"
+      "  x = 20;"
+      "}")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(when x
+          (set x 10)
+          (set x 20)))
+    (lines-string
+      "if (x) {"
+      "  x = 10;"
+      "  x = 20;"
       "}")))
 
 (check
@@ -373,8 +396,7 @@
     (lines-string
       "if (x) {"
       "  alloc();"
-      "}"
-      "else {"
+      "} else {"
       "  update();"
       "  free();"
       "}")))

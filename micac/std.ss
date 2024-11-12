@@ -19,11 +19,10 @@
     (macro (dec id) (set- id 1))
 
     (macro (repeat count body ...)
-      (begin
-        (var int counter count)
-        (while counter
-          body ...
-          (dec counter))))
+      (var int counter count)
+      (while counter
+        body ...
+        (dec counter)))
 
     (macro (zero? x) (= x 0))
 

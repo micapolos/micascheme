@@ -155,6 +155,15 @@
       (set-bitwise-arithmetic-shift-right ">>=")
       (_ #f)))
 
+  (define (block-code $env $syntaxes)
+    (code-in-curly-brackets
+      (code-indent
+        (code "\n"
+          (compiled-value
+            (compiled-code+instrs
+              (compiled $env empty-code)
+              $syntaxes))))))
+
   (define (compiled-code+instr $compiled $syntax)
     (lets
       ((compiled $env $code) $compiled)
@@ -177,13 +186,7 @@
         ((begin instr ...)
           (compiled-with $compiled
             (code $code
-              (code-in-curly-brackets
-                (code-indent
-                  (code "\n"
-                    (compiled-value
-                      (compiled-code+instrs
-                        (compiled-with $compiled empty-code)
-                        #'(instr ...))))))
+              (block-code $env (syntaxes instr ...))
               "\n")))
         ((var type id)
           (compiled-map
@@ -215,48 +218,35 @@
                 (expr-code (syntax->expand-expr $env #'expr)))
               ";\n")))
         ((if expr (then then-body ...) (else else-body ...))
-          (compiled-map
-            ($code $compiled)
-            ($then-code
-              (compiled-code+instr (compiled-with $compiled empty-code)
-                (instr->begin #'(begin then-body ...))))
-            ($else-code
-              (compiled-code+instr (compiled-with $compiled empty-code)
-                (instr->begin #'(begin else-body ...))))
+          (compiled-with $compiled
             (code $code
               (space-separated-code
                 "if"
                 (code-in-round-brackets
                   (expr-code (syntax->expand-expr $env #'expr)))
-                $then-code)
+                (block-code $env (syntaxes then-body ...))
               (space-separated-code
                 "else"
-                $else-code))))
+                (block-code $env (syntaxes else-body ...))))
+              "\n")))
         ((when expr body ...)
-          (compiled-map
-            ($code $compiled)
-            ($when-code
-              (compiled-code+instr
-                (compiled-with $compiled empty-code)
-                (instr->begin #'(begin body ...))))
+          (compiled-with $compiled
             (code $code
               (space-separated-code
                 "if"
                 (code-in-round-brackets
                   (expr-code (syntax->expand-expr $env #'expr)))
-                $when-code))))
-        ((while expr instr ...)
-          (compiled-map
-            ($code $compiled)
-            ($while-code
-              (compiled-code+instr (compiled-with $compiled empty-code)
-                #'(begin instr ...)))
+                (block-code $env (syntaxes body ...)))
+              "\n")))
+        ((while expr body ...)
+          (compiled-with $compiled
             (code $code
               (space-separated-code
                 "while"
                 (code-in-round-brackets
                   (expr-code (syntax->expand-expr $env #'expr)))
-                $while-code))))
+                (block-code $env (syntaxes body ...)))
+              "\n")))
         ((op2 lhs expr)
           (op2->string-opt #'op2)
           (compiled-with $compiled
