@@ -392,6 +392,7 @@
         #'0)
       ((+ a)
         (expand-expr $env #'a))
+      ; TODO: Fix other operators to look like this one
       ((+ a b)
         (lets
           ($a (expand-expr $env #'a))
