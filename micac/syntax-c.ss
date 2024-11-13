@@ -183,6 +183,12 @@
                       #'(param ...)
                       #'(arg ...)
                       #'(begin body ...))))))))
+        ((macro id expr)
+          (compiled+ $compiled
+            (identifier id)
+            (lambda ($syntax)
+              (lambda ($lookup)
+                #'expr))))
         ((begin instr ...)
           (compiled-with $compiled
             (code $code
@@ -386,8 +392,13 @@
         #'0)
       ((+ a)
         (expand-expr $env #'a))
-      ((+ a b) (and (number? (datum a)) (number? (datum b)))
-        (datum->syntax #'+ (+ (datum a) (datum b))))
+      ((+ a b)
+        (lets
+          ($a (expand-expr $env #'a))
+          ($b (expand-expr $env #'b))
+          (if (and (number? (syntax->datum $a)) (number? (syntax->datum $b)))
+            (datum->syntax #'+ (+ (syntax->datum $a) (syntax->datum $b)))
+            #`(+ #,$a #,$b))))
       ((+ a b c cs ...)
         (expand-expr $env #`(+ #,(expand-expr $env #'(+ a b)) c cs ...)))
       ((- a) (number? (datum a))

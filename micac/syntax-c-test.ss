@@ -577,6 +577,16 @@
 (check
   (equal?
     (syntax-c $env
+      #`(macro one 1)
+      #`(macro two 2)
+      #`(macro three 3)
+      #`(macro sum (+ one two three))
+      #`(set x sum))
+    (lines-string "x = 6;")))
+
+(check
+  (equal?
+    (syntax-c $env
       #`(macro (zero s) (set s 0))
       #`(zero y))
     (lines-string "y = 0;")))
