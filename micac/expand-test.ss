@@ -95,3 +95,15 @@
     (set x (goo zero)))
   (begin
     (set x (gar 0))))
+
+; macro shadowed by variable declaration
+(check-expand-instr
+  (begin
+    (macro ten 10)
+    (set x ten)
+    (var int ten)
+    (set x ten))
+  (begin
+    (set x 10)
+    (var int ten)
+    (set x ten)))
