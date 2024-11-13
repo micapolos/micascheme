@@ -7,7 +7,7 @@
     opt
     single? single force-single
     ordered-map
-    map-fluent
+    map-using
     bind-if
     opt-lets
     opt-lift
@@ -340,6 +340,6 @@
       (partial apply $fn)
       (apply product $list $lists)))
 
-  (define (map-fluent $list $fn)
+  (define (map-using $list $fn)
     (map $fn $list))
 )

@@ -7,7 +7,7 @@
       (syntax->datum)
       (symbol->string)
       (string->list)
-      (map-fluent identifier-char)
+      (map-using identifier-char)
       (list->string)
       (string-code)))
 
