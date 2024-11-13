@@ -6,9 +6,9 @@
 
   (micac
     (macro (ula video-x video-y mem screen? red green blue update)
-      (const int ula-width 256)
-      (const int ula-height 192)
-      (const int border 48)
+      (macro ula-width 256)
+      (macro ula-height 192)
+      (macro border 48)
 
       (var uint8_t bits)
       (var uint8_t attr)
