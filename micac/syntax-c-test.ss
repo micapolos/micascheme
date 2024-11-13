@@ -109,7 +109,7 @@
   (equal?
     (syntax-c $env
       #`(set x (- a))
-      #`(set x (inv a))
+      #`(set x (bitwise-not a))
       #`(set x (not a)))
     (lines-string
       "x = -a;"
@@ -139,6 +139,151 @@
       "x = a ^ b;"
       "x = a << b;"
       "x = a >> b;")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(set x (+))
+      #`(set x (+ 10))
+      #`(set x (+ 10 20))
+      #`(set x (+ 10 20 30)))
+    (lines-string
+      "x = 0;"
+      "x = 10;"
+      "x = 30;"
+      "x = 60;")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(set x (- 30))
+      #`(set x (- 30 20))
+      #`(set x (- 30 20 10)))
+    (lines-string
+      "x = -30;"
+      "x = 10;"
+      "x = 0;")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(set x (*))
+      #`(set x (* 10))
+      #`(set x (* 10 20))
+      #`(set x (* 10 20 30)))
+    (lines-string
+      "x = 1;"
+      "x = 10;"
+      "x = 200;"
+      "x = 6000;")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(set x (div 8 4)))
+    (lines-string "x = 2;")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(set x (and))
+      #`(set x (and #t))
+      #`(set x (and #f))
+      #`(set x (and #t #t))
+      #`(set x (and #t #f))
+      #`(set x (and #t #t #t))
+      #`(set x (and #t #f #t)))
+    (lines-string
+      "x = true;"
+      "x = true;"
+      "x = false;"
+      "x = true;"
+      "x = false;"
+      "x = true;"
+      "x = false;")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(set x (or))
+      #`(set x (or #f))
+      #`(set x (or #t))
+      #`(set x (or #f #f))
+      #`(set x (or #f #t))
+      #`(set x (or #f #f #f))
+      #`(set x (or #f #t #f)))
+    (lines-string
+      "x = false;"
+      "x = false;"
+      "x = true;"
+      "x = false;"
+      "x = true;"
+      "x = false;"
+      "x = true;")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(set x (not #f))
+      #`(set x (not #t)))
+    (lines-string
+      "x = true;"
+      "x = false;")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(set x (bitwise-and))
+      #`(set x (bitwise-and 15))
+      #`(set x (bitwise-and 15 5))
+      #`(set x (bitwise-and 15 5 1)))
+    (lines-string
+      "x = -1;"
+      "x = 15;"
+      "x = 5;"
+      "x = 1;")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(set x (bitwise-ior))
+      #`(set x (bitwise-ior 5))
+      #`(set x (bitwise-ior 4 1))
+      #`(set x (bitwise-ior 8 4 1)))
+    (lines-string
+      "x = 0;"
+      "x = 5;"
+      "x = 5;"
+      "x = 13;")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(set x (bitwise-xor))
+      #`(set x (bitwise-xor 15))
+      #`(set x (bitwise-xor 15 5))
+      #`(set x (bitwise-xor 15 5 1)))
+    (lines-string
+      "x = 0;"
+      "x = 15;"
+      "x = 10;"
+      "x = 11;")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(set x (bitwise-not 15)))
+    (lines-string
+      "x = -16;")))
+
+(check
+  (equal?
+    (syntax-c $env
+      #`(set x (bitwise-arithmetic-shift-left 5 1))
+      #`(set x (bitwise-arithmetic-shift-right 5 1)))
+    (lines-string
+      "x = 10;"
+      "x = 2;")))
 
 (check
   (equal?
@@ -180,13 +325,9 @@
 (check
   (equal?
     (syntax-c $env
-      #`(set x (/ a))
-      #`(set x (/ a b))
-      #`(set x (/ a b c)))
+      #`(set x (div a b)))
     (lines-string
-      "x = 1 / a;"
-      "x = a / b;"
-      "x = a / b / c;")))
+      "x = a / b;")))
 
 (check
   (equal?

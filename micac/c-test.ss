@@ -55,7 +55,7 @@
   (equal?
     (micac-c
       (var int x)
-      (set x (sum 10 20 30)))
+      (set x (sum x x x)))
     (lines-string
       "int v0_x;"
-      "v0_x = 10 + 20 + 30;")))
+      "v0_x = v0_x + v0_x + v0_x;")))

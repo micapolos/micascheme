@@ -11,11 +11,11 @@
   (export (import (micac syntax)))
   (export (import (only (syntaxes) literals)))
   (export (import (only (scheme)
-    = < <= > >= + - * /
+    = < <= > >= + - * div
     begin if
-    not
+    and or not
     ...
-    and or bitwise-and bitwise-ior bitwise-xor
+    bitwise-and bitwise-ior bitwise-xor bitwise-not
     bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
     when else)))
 
