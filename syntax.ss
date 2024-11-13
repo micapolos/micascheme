@@ -7,6 +7,7 @@
     define-aux-keyword
     define-aux-keywords
     begin-syntaxes
+    begin-syntax
     expand-begin-syntaxes
     define-namespace
     define-lookup-syntax
@@ -45,6 +46,12 @@
       ((begin $syntax ...)
         (syntax->list #'($syntax ...)))
       ($other (list #'$other))))
+
+  (define (begin-syntax $syntax)
+    (syntax-case $syntax (begin)
+      ((begin $syntax)
+        #'$syntax)
+      ($other #'$other)))
 
   (define (expand-begin-syntaxes $syntaxes)
     (apply append
