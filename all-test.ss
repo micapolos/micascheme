@@ -19,7 +19,6 @@
   (function)
   (identifier)
   (indexed)
-  (infix)
   (inline)
   (leo)
   (leo-syntax)
