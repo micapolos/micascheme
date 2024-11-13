@@ -3,14 +3,16 @@
   (import (micascheme) (code))
 
   (define (identifier->code $identifier)
-    (string-code
-      (list->string
-        (map-with
-          ($char
-            (string->list
-              (symbol->string
-                (syntax->datum $identifier))))
-          (case $char
-            ((#\- #\?) #\_)
-            (else $char))))))
+    (fluent $identifier
+      (syntax->datum)
+      (symbol->string)
+      (string->list)
+      (map-fluent identifier-char)
+      (list->string)
+      (string-code)))
+
+  (define (identifier-char $char)
+    (case $char
+      ((#\- #\?) #\_)
+      (else $char)))
 )
