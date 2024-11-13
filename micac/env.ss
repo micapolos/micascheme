@@ -6,7 +6,8 @@
     env-alloc
     env-ref
     env-transformer
-    env-transform)
+    env-transform
+    env->lookup)
   (import
     (micascheme)
     (micac scope)
@@ -45,4 +46,16 @@
 
   (define (env-transform $env $transformer $syntax)
     (transform $transformer $syntax (env-lookup $env)))
+
+  (define (env->lookup $env)
+    (lets
+      ($scope-lookup (scope->lookup (env-scope $env)))
+      ($env-lookup (env-lookup $env))
+      (lambda ($id)
+        (or
+          ($scope-lookup $id)
+          (switch ($env-lookup $id)
+            ((expr? _) #f)
+            ((false? _) #f)
+            ((else $other) $other))))))
 )

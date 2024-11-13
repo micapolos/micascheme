@@ -8,7 +8,8 @@
     scope-transformer
     scope-unbound
     scope-with
-    pretty-expr?)
+    pretty-expr?
+    scope->lookup)
   (import
     (micascheme)
     (micac expr))
@@ -58,4 +59,11 @@
 
   (define (scope-unbound $id)
     (syntax-error $id "unbound identifier"))
+
+  (define (scope->lookup $scope)
+    (lambda ($id)
+      (switch (scope-ref $scope $id)
+        ((expr? _) #f)
+        ((false? _) #f)
+        ((else $transformer) $transformer))))
 )
