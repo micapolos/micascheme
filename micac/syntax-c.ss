@@ -100,6 +100,7 @@
       (other
         (literal->expr #'other))))
 
+  ; TODO: Separate "expand" and "compile"
   (define (compiled-code+instrs $compiled $syntax)
     (syntax-case $syntax (defer break-if)
       (() $compiled)
@@ -164,6 +165,7 @@
               (compiled $env empty-code)
               $syntaxes))))))
 
+  ; TODO: Separate "expand" and "compile"
   (define (compiled-code+instr $compiled $syntax)
     (lets
       ((compiled $env $code) $compiled)
