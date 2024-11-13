@@ -399,11 +399,9 @@
       ((div arg ...)
         (expand-op2 $env $expr number? div))
       ((and arg ...)
-        (expand-op2-fold-default $env $expr #'#t boolean?
-          (lambda $args (andmap identity $args))))
+        (expand-op2-fold-default $env $expr #'#t boolean? and-proc))
       ((or arg ...)
-        (expand-op2-fold-default $env $expr #'#f boolean?
-          (lambda $args (ormap identity $args))))
+        (expand-op2-fold-default $env $expr #'#f boolean? or-proc))
       ((not arg ...)
         (expand-op1 $env $expr boolean? not))
       ((bitwise-and arg ...)

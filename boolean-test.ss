@@ -28,3 +28,9 @@
 (check (equal? (xor #t #f #t) #f))
 (check (equal? (xor #t #t #f) #f))
 (check (equal? (xor #t #t #t) #f))
+
+(check (equal? (apply and-proc (list #t #t #t)) #t))
+(check (equal? (apply and-proc (list #t #f #t)) #f))
+
+(check (equal? (apply or-proc (list #f #f #f)) #f))
+(check (equal? (apply or-proc (list #f #t #f)) #t))
