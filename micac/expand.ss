@@ -1,0 +1,116 @@
+(library (micac expand)
+  (export expand-expr)
+  (import (micascheme) (micac env) (micac syntax))
+
+  (define (expand-expr $env $expr)
+    (syntax-case $expr
+      (
+        cast + - * div
+        not and or
+        bitwise-not bitwise-and bitwise-ior bitwise-xor
+        bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
+        ref &ref)
+      ((cast type rhs)
+        #`(cast type #,(expand-expr $env #'rhs)))
+      ((+ arg ...)
+        (expand-op2-fold-default $env $expr #'0 number? +))
+      ((- arg ...)
+        (expand-op2-fold $env $expr number? -))
+      ((* arg ...)
+        (expand-op2-fold-default $env $expr #'1 number? *))
+      ((div arg ...)
+        (expand-op2 $env $expr number? div))
+      ((and arg ...)
+        (expand-op2-fold-default $env $expr #'#t boolean? and-proc))
+      ((or arg ...)
+        (expand-op2-fold-default $env $expr #'#f boolean? or-proc))
+      ((not arg ...)
+        (expand-op1 $env $expr boolean? not))
+      ((bitwise-and arg ...)
+        (expand-op2-fold-default $env $expr #'-1 integer? bitwise-and))
+      ((bitwise-ior arg ...)
+        (expand-op2-fold-default $env $expr #'0 integer? bitwise-ior))
+      ((bitwise-xor arg ...)
+        (expand-op2-fold-default $env $expr #'0 integer? bitwise-xor))
+      ((bitwise-not arg ...)
+        (expand-op1 $env $expr integer? bitwise-not))
+      ((bitwise-arithmetic-shift-left arg ...)
+        (expand-op2 $env $expr integer? bitwise-arithmetic-shift-left))
+      ((bitwise-arithmetic-shift-right arg ...)
+        (expand-op2 $env $expr integer? bitwise-arithmetic-shift-right))
+      ((ref var x ...)
+        #`(ref
+          #,(expand-expr $env #'var)
+          #,@(map (partial expand-ref $env) (syntaxes x ...))))
+      ((&ref var x ...)
+        #`(&ref
+          #,(expand-expr $env #'var)
+          #,@(map (partial expand-ref $env) (syntaxes x ...))))
+      ((id arg ...)
+        (switch (env-transformer $env (identifier id))
+          ((false? _)
+            #`(
+              #,@(map
+                (partial expand-expr $env)
+                (syntaxes id arg ...))))
+          ((else $transformer)
+            (expand-expr $env
+              (env-transform $env $transformer $expr)))))
+      (id (identifier? #'id)
+        (switch (env-transformer $env #'id)
+          ((false? _) #'id)
+          ((else $transformer)
+            (expand-expr $env
+              (env-transform $env $transformer $expr)))))
+      (other #'other)))
+
+  (define (expand-op1 $env $syntax $test? $proc)
+    (syntax-case $syntax ()
+      ((op a)
+        (lets
+          ($a (expand-expr $env #'a))
+          ($datum (syntax->datum $a))
+          (if ($test? $datum)
+            (datum->syntax #'op ($proc $datum))
+            #`(op #,$a))))))
+
+  (define (expand-op2 $env $syntax $test? $proc)
+    (syntax-case $syntax ()
+      ((op a b)
+        (lets
+          ($a (expand-expr $env #'a))
+          ($b (expand-expr $env #'b))
+          ($datum-a (syntax->datum $a))
+          ($datum-b (syntax->datum $b))
+          (if (and ($test? $datum-a) ($test? $datum-b))
+            (datum->syntax #'op ($proc $datum-a $datum-b))
+            #`(op #,$a #,$b))))))
+
+  (define (expand-op2-fold $env $syntax $test? $proc)
+    (syntax-case $syntax ()
+      ((op a)
+        (expand-op1 $env $syntax $test? $proc))
+      ((op a b)
+        (expand-op2 $env $syntax $test? $proc))
+      ((op a b c cs ...)
+        (expand-op2-fold $env
+          #`(op #,(expand-op2 $env #'(op a b) $test? $proc) c cs ...)
+          $test? $proc))))
+
+  (define (expand-op2-fold-default $env $syntax $default $test? $proc)
+    (syntax-case $syntax ()
+      ((op) $default)
+      ((op a)
+        (lets
+          ($a (expand-expr $env #'a))
+          ($datum (syntax->datum $a))
+          (if ($test? $datum)
+            (datum->syntax #'op ($proc $datum))
+            $a)))
+      (_ (expand-op2-fold $env $syntax $test? $proc))))
+
+  (define (expand-ref $env $ref)
+    (syntax-case $ref ()
+      ((expr) #`(#,(expand-expr $env #'expr)))
+      (other #'other)))
+)
