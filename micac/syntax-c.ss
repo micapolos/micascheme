@@ -49,10 +49,7 @@
     (string-code
       (list->string
         (map-with
-          ($char
-            (string->list
-              (symbol->string
-                (syntax->datum $identifier))))
+          ($char (fluent $identifier (syntax->datum) (symbol->string) (string->list)))
           (case $char
             ((#\- #\?) #\_)
             (else $char))))))

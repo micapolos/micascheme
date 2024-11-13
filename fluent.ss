@@ -2,11 +2,10 @@
   (export fluent)
   (import
     (scheme)
-    (syntax))
+    (syntaxes))
 
-  (define-rule-syntax (fluent $expr ($op $arg ...) ...)
-    (let*
-      (
-        ($var $expr)
-        ($var ($op $var $arg ...)) ...)
-      $var)))
+  (define-rules-syntax
+    ((fluent expr) expr)
+    ((fluent expr (fn arg ...) rest ...)
+      (let ((var expr))
+        (fluent (fn var arg ...) rest ...)))))
