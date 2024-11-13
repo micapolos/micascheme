@@ -472,6 +472,12 @@
           ((else $transformer)
             (expand-expr $env
               (env-transform $env $transformer $expr)))))
+      (id (identifier? #'id)
+        (switch (env-transformer $env #'id)
+          ((false? _) #'id)
+          ((else $transformer)
+            (expand-expr $env
+              (env-transform $env $transformer $expr)))))
       (other #'other)))
 
   (define (expand-ref $env $ref)
