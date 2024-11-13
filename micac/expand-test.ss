@@ -35,12 +35,41 @@
 (check-expand-expr (+ zero one two) 3)
 (check-expand-expr (foo zero one two) (bar 0 1 2))
 
+(check-expand-expr (cast int 0) (cast int 0))
+(check-expand-expr (cast int one) (cast int 1))
+(check-expand-expr (cast zero one) (cast zero 1))
+
+(check-expand-expr (+) 0)
+(check-expand-expr (+ one) 1)
+(check-expand-expr (+ one two) 3)
+(check-expand-expr (+ zero one two) 3)
+(check-expand-expr (+ one ten) (+ 1 ten))
+
+(check-expand-expr (- one) -1)
+(check-expand-expr (- one two) -1)
+(check-expand-expr (- zero one two) -3)
+(check-expand-expr (- one ten) (- 1 ten))
+
+(check-expand-expr (*) 1)
+(check-expand-expr (* two) 2)
+(check-expand-expr (* one two) 2)
+(check-expand-expr (* zero one two) 0)
+(check-expand-expr (* one ten) (* 1 ten))
+
 (check-expand-instr (bar 0) (bar 0))
 (check-expand-instr (foo 0) (bar 0))
 (check-expand-instr (foo zero) (bar 0))
 (check-expand-instr (var int x) (var int x))
 (check-expand-instr (var int x zero) (var int x 0))
 (check-expand-instr (const int x zero) (const int x 0))
+
+(check-expand-instr (var int (* x)) (var int (* x)))
+(check-expand-instr (var int (* zero)) (var int (* zero)))
+(check-expand-instr (var zero (* x)) (var zero (* x)))
+
+(check-expand-instr (var int (* x 10)) (var int (* x 10)))
+(check-expand-instr (var int (* x one)) (var int (* x 1)))
+(check-expand-instr (var int (* (* x one) two)) (var int (* (* x 1) 2)))
 
 (check-expand-instr (begin) (begin))
 
