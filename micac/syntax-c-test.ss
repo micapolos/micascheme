@@ -93,17 +93,17 @@
       "}")))
 
 (check (equal? (syntax-c $env #`(set x 10)) (lines-string "x = 10;")))
-(check (equal? (syntax-c $env #`(set+ x 10)) (lines-string "x += 10;")))
-(check (equal? (syntax-c $env #`(set- x 10)) (lines-string "x -= 10;")))
-(check (equal? (syntax-c $env #`(set* x 10)) (lines-string "x *= 10;")))
-(check (equal? (syntax-c $env #`(set/ x 10)) (lines-string "x /= 10;")))
-(check (equal? (syntax-c $env #`(set-and x 10)) (lines-string "x &&= 10;")))
-(check (equal? (syntax-c $env #`(set-or x 10)) (lines-string "x ||= 10;")))
-(check (equal? (syntax-c $env #`(set-bitwise-and x 10)) (lines-string "x &= 10;")))
-(check (equal? (syntax-c $env #`(set-bitwise-ior x 10)) (lines-string "x |= 10;")))
-(check (equal? (syntax-c $env #`(set-bitwise-xor x 10)) (lines-string "x ^= 10;")))
-(check (equal? (syntax-c $env #`(set-bitwise-arithmetic-shift-left x 10)) (lines-string "x <<= 10;")))
-(check (equal? (syntax-c $env #`(set-bitwise-arithmetic-shift-right x 10)) (lines-string "x >>= 10;")))
+(check (equal? (syntax-c $env #`(set x + 10)) (lines-string "x += 10;")))
+(check (equal? (syntax-c $env #`(set x - 10)) (lines-string "x -= 10;")))
+(check (equal? (syntax-c $env #`(set x * 10)) (lines-string "x *= 10;")))
+(check (equal? (syntax-c $env #`(set x div 10)) (lines-string "x /= 10;")))
+(check (equal? (syntax-c $env #`(set x and 10)) (lines-string "x &&= 10;")))
+(check (equal? (syntax-c $env #`(set x or 10)) (lines-string "x ||= 10;")))
+(check (equal? (syntax-c $env #`(set x bitwise-and 10)) (lines-string "x &= 10;")))
+(check (equal? (syntax-c $env #`(set x bitwise-ior 10)) (lines-string "x |= 10;")))
+(check (equal? (syntax-c $env #`(set x bitwise-xor 10)) (lines-string "x ^= 10;")))
+(check (equal? (syntax-c $env #`(set x bitwise-arithmetic-shift-left 10)) (lines-string "x <<= 10;")))
+(check (equal? (syntax-c $env #`(set x bitwise-arithmetic-shift-right 10)) (lines-string "x >>= 10;")))
 
 (check
   (equal?
@@ -504,8 +504,8 @@
   (equal?
     (syntax-c $env
       #`(while x
-          (set+ x 1)
-          (set+ x 2)))
+          (set x + 1)
+          (set x + 2)))
     (lines-string
       "while (x) {"
       "  x += 1;"
@@ -515,7 +515,7 @@
 (check
   (equal?
     (syntax-c $env
-      #`(set+ x (bitwise-and (- (+ x 10) 20) #xff)))
+      #`(set x + (bitwise-and (- (+ x 10) 20) #xff)))
     (lines-string
       "x += x + 10 - 20 & 255;")))
 

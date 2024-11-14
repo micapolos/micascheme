@@ -15,8 +15,8 @@
       (break-if (= id 0) (printf "Could not allocate memory.\\n"))
       (defer (free id)))
 
-    (macro (inc id) (set+ id 1))
-    (macro (dec id) (set- id 1))
+    (macro (inc id) (set id + 1))
+    (macro (dec id) (set id - 1))
 
     (macro (repeat count body ...)
       (var int counter count)

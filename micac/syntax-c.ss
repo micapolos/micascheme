@@ -133,27 +133,6 @@
       ((begin body ...) $instr)
       (other #'(begin other))))
 
-  (define (op2->string-opt $op)
-    (syntax-case $op
-      (set
-        set+ set- set* set/
-        set-and set-or
-        set-bitwise-and set-bitwise-ior set-bitwise-xor
-        set-bitwise-arithmetic-shift-left set-bitwise-arithmetic-shift-right)
-      (set "=")
-      (set+ "+=")
-      (set- "-=")
-      (set* "*=")
-      (set/ "/=")
-      (set-and "&&=")
-      (set-or "||=")
-      (set-bitwise-and "&=")
-      (set-bitwise-ior "|=")
-      (set-bitwise-xor "^=")
-      (set-bitwise-arithmetic-shift-left "<<=")
-      (set-bitwise-arithmetic-shift-right ">>=")
-      (_ #f)))
-
   (define (block-code $env $syntaxes)
     (code-in-curly-brackets
       (code-indent
@@ -167,7 +146,11 @@
   (define (compiled-code+instr $compiled $syntax)
     (lets
       ((compiled $env $code) $compiled)
-      (syntax-case $syntax (extern macro begin var const if when while then else)
+      (syntax-case $syntax
+        (
+          extern macro begin var const if when while then else set
+          + - * div and or bitwise-and bitwise-ior bitwise-xor
+          bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right)
         ((extern id)
           (compiled+ $compiled
             (identifier id)
@@ -253,11 +236,42 @@
                   (expr-code (syntax->expand-expr $env #'expr)))
                 (block-code $env (syntaxes body ...)))
               "\n")))
-        ((op2 lhs expr)
-          (op2->string-opt #'op2)
+        ((set lhs expr)
           (compiled-with $compiled
-            (code+op2 $env $code
-              #'lhs (op2->string-opt #'op2) #'expr)))
+            (code+op2 $env $code #'lhs "=" #'expr)))
+        ((set lhs + expr)
+          (compiled-with $compiled
+            (code+op2 $env $code #'lhs "+=" #'expr)))
+        ((set lhs - expr)
+          (compiled-with $compiled
+            (code+op2 $env $code #'lhs "-=" #'expr)))
+        ((set lhs * expr)
+          (compiled-with $compiled
+            (code+op2 $env $code #'lhs "*=" #'expr)))
+        ((set lhs div expr)
+          (compiled-with $compiled
+            (code+op2 $env $code #'lhs "/=" #'expr)))
+        ((set lhs and expr)
+          (compiled-with $compiled
+            (code+op2 $env $code #'lhs "&&=" #'expr)))
+        ((set lhs or expr)
+          (compiled-with $compiled
+            (code+op2 $env $code #'lhs "||=" #'expr)))
+        ((set lhs bitwise-and expr)
+          (compiled-with $compiled
+            (code+op2 $env $code #'lhs "&=" #'expr)))
+        ((set lhs bitwise-ior expr)
+          (compiled-with $compiled
+            (code+op2 $env $code #'lhs "|=" #'expr)))
+        ((set lhs bitwise-xor expr)
+          (compiled-with $compiled
+            (code+op2 $env $code #'lhs "^=" #'expr)))
+        ((set lhs bitwise-arithmetic-shift-left expr)
+          (compiled-with $compiled
+            (code+op2 $env $code #'lhs "<<=" #'expr)))
+        ((set lhs bitwise-arithmetic-shift-right expr)
+          (compiled-with $compiled
+            (code+op2 $env $code #'lhs ">>=" #'expr)))
         ((id arg ...)
           (switch (compiled-ref $compiled (identifier id))
             ((expr? $expr)
