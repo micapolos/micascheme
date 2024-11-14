@@ -1,6 +1,7 @@
 (library (micac expand)
   (export
     expand-expr
+    expand-lhs
     expand-instr
     expand-instrs)
   (import (micascheme) (micac env) (micac syntax) (micac compiled))
@@ -39,9 +40,9 @@
   (define (declarator->compiled-syntax $env $declarator)
     (syntax-case $declarator (*)
       (id (identifier? #'id)
-        (compiled
-          (env+ $env #'id #'id)
-          #'id))
+        (lets
+          ((pair $env $identifier) (env-gen $env #'id))
+          (compiled $env $identifier)))
       ((* decl)
         (compiled-map
           ($compiled-decl (declarator->compiled-syntax $env #'decl))
@@ -125,7 +126,7 @@
             ((identifier? $identifier)
               (compiled+syntax $compiled
                 #`(
-                  id
+                  #,$identifier
                   #,@(map
                     (partial expand-expr $env)
                     (syntaxes arg ...)))))
@@ -206,7 +207,8 @@
       ((id arg ...) (identifier? #'id)
         (switch (env-ref $env #'id)
           ((identifier? $identifier)
-            #`(id
+            #`(
+              #,$identifier
               #,@(map
                 (partial expand-expr $env)
                 (syntaxes arg ...))))
@@ -216,7 +218,8 @@
                 (env-transform $env $transformer $expr))))))
       (id (identifier? #'id)
         (switch (env-ref $env #'id)
-          ((identifier? $identifier) #'id)
+          ((identifier? $identifier)
+            $identifier)
           ((else $transformer)
             (expand-expr $env
               (begin-syntax
@@ -253,7 +256,7 @@
         (expand-op2 $env $syntax $test? $proc))
       ((op a b c cs ...)
         (expand-op2-fold $env
-          #`(op #,(expand-op2 $env #'(op a b) $test? $proc) c cs ...)
+          #`(op (op a b) c cs ...)
           $test? $proc))))
 
   (define (expand-op2-fold-default $env $syntax $default $test? $proc)
@@ -273,13 +276,24 @@
       ((expr accessor accessors ...)
         #`(
           #,(expand-expr $env #'expr)
-          #,@(map (partial expand-accessor $env) (syntaxes accessor accessors ...))))
+          #,@(map
+            (partial expand-accessor $env)
+            (syntaxes accessor accessors ...))))
+      ((id)
+        (expand-lhs $env #'id))
       (id (identifier? #'id)
-        #'id)))
+        (expand-identifier $env #'id))))
+
+  (define (expand-identifier $env $id)
+    (switch (env-ref $env $id)
+      ((identifier? $identifier)
+        $identifier)
+      ((else $transformer)
+        $id)))
 
   (define (expand-accessor $env $accessor)
     (syntax-case $accessor (*)
       ((expr) #`(#,(expand-expr $env #'expr)))
       (* #'*)
-      (other #'other)))
+      (field (identifier? #'field) #'field)))
 )

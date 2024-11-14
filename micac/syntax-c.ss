@@ -77,29 +77,14 @@
   (define (lhs->expr $env $syntax)
     (syntax-case $syntax ()
       (id (identifier? #'id)
-        (variable-identifier->expr $env #'id))
+        (identifier->expr #'id))
       (other
         (ref->expr $env #'other))))
 
-  (define (variable-identifier->expr $env $identifier)
-    (switch (env-ref $env $identifier)
-      ((identifier? $identifier)
-        (identifier->expr $identifier))
-      ((else _)
-        (syntax-error $identifier "unboud identifier"))))
-
-  (define (env-identifier->expr $env $identifier)
-    (switch (env-ref $env $identifier)
-      ((identifier? $identifier)
-        (identifier->expr $identifier))
-      ((else $transformer)
-        (syntax->expand-expr $env
-          (env-transform $env $transformer $identifier)))))
-
-  (define (value->expr $env $value)
+  (define (value->expr $value)
     (syntax-case $value ()
       (id (identifier? #'id)
-        (env-identifier->expr $env #'id))
+        (identifier->expr #'id))
       (other
         (literal->expr #'other))))
 
@@ -290,13 +275,15 @@
                     (compiled-transform $compiled $transformer $syntax))))))))))
 
   (define (compiled-code+op2 $compiled $lhs $op $expr)
-    (compiled+code $compiled
-      (newline-ended-code
-        (colon-ended-code
-          (space-separated-code
-            (expr-code (lhs->expr (compiled-env $compiled) $lhs))
-            (string-code $op)
-            (expr-code (syntax->expand-expr (compiled-env $compiled) $expr)))))))
+    (lets
+      ($env (compiled-env $compiled))
+      (compiled+code $compiled
+        (newline-ended-code
+          (colon-ended-code
+            (space-separated-code
+              (expr-code (lhs->expr $env (expand-lhs $env $lhs)))
+              (string-code $op)
+              (expr-code (syntax->expand-expr $env $expr))))))))
 
   (define (syntax->expand-expr $env $syntax)
     (syntax->expr $env (expand-expr $env $syntax)))
@@ -367,24 +354,20 @@
             " : "
             (expr-operand-code (syntax->expr $env #'false) 13 #t))))
       ((id arg ...)
-        (switch (env-ref $env (identifier id))
-          ((identifier? $identifier)
-            (parenthesized-expr 1 #t
-              (identifier->expr $identifier)
-              "("
-              (expr 0 #t
-                (apply code-append
-                  (intercalate
-                    (map expr-code
-                      (map
-                        (partial syntax->expr $env)
-                        (syntaxes arg ...)))
-                    (code ", "))))
-              ")"))
-          ((else $transformer)
-            (syntax-error #'id "macro identifier"))))
+        (parenthesized-expr 1 #t
+          (identifier->expr #'id)
+          "("
+          (expr 0 #t
+            (apply code-append
+              (intercalate
+                (map expr-code
+                  (map
+                    (partial syntax->expr $env)
+                    (syntaxes arg ...)))
+                (code ", "))))
+          ")"))
       (other
-        (value->expr $env #'other))))
+        (value->expr #'other))))
 
   (define (ref->expr $env $syntax)
     (syntax-case $syntax (*)
@@ -398,7 +381,7 @@
                 (binary-expr 1 #t $expr "." (variable->expr #'id)))
               ((expr)
                 (parenthesized-expr 1 #t $expr "[" (syntax->expr $env #'expr) "]"))))
-          (variable-identifier->expr $env #'var)
+          (identifier->expr #'var)
           (syntaxes x ...)))))
 
   (define (op1->expr $env $priority $left-to-right? $op $rhs)
