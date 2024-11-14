@@ -185,11 +185,11 @@
       ((ref var x ...)
         #`(ref
           #,(expand-expr $lookup #'var)
-          #,@(map (partial expand-ref $lookup) (syntaxes x ...))))
+          #,@(map (partial expand-accessor $lookup) (syntaxes x ...))))
       ((&ref var x ...)
         #`(&ref
           #,(expand-expr $lookup #'var)
-          #,@(map (partial expand-ref $lookup) (syntaxes x ...))))
+          #,@(map (partial expand-accessor $lookup) (syntaxes x ...))))
       ((id arg ...) (identifier? #'id)
         (switch ($lookup #'id)
           ((false? _)
@@ -255,7 +255,7 @@
             $a)))
       (_ (expand-op2-fold $lookup $syntax $test? $proc))))
 
-  (define (expand-ref $lookup $ref)
+  (define (expand-accessor $lookup $ref)
     (syntax-case $ref ()
       ((expr) #`(#,(expand-expr $lookup #'expr)))
       (other #'other)))
