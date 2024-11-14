@@ -78,7 +78,7 @@
   (define (expanded+instr $expanded $instr)
     (lets
       ((expanded $lookup $syntaxes) $expanded)
-      (syntax-case $instr (extern macro begin var const if when while then else)
+      (syntax-case $instr (extern macro begin var const if when while then else set)
         ((extern id)
           (expanded+binding $expanded (identifier id) #f))
         ((macro (id param ...) body ...)
@@ -131,6 +131,17 @@
             #`(while
               #,(expand-expr $lookup #'expr)
               #,@(expand-instrs $lookup #'(body ...)))))
+        ((set lhs expr)
+          (expanded+syntax $expanded
+            #`(set
+              #,(expand-lhs $lookup #'lhs)
+              #,(expand-expr $lookup #'expr))))
+        ((set lhs op expr)
+          (expanded+syntax $expanded
+            #`(set
+              #,(expand-lhs $lookup #'lhs)
+              op
+              #,(expand-expr $lookup #'expr))))
         ((id arg ...) (identifier? #'id)
           (switch ($lookup #'id)
             ((false? _)
@@ -255,8 +266,18 @@
             $a)))
       (_ (expand-op2-fold $lookup $syntax $test? $proc))))
 
-  (define (expand-accessor $lookup $ref)
-    (syntax-case $ref ()
+  (define (expand-lhs $lookup $lhs)
+    (syntax-case $lhs ()
+      ((expr accessor accessors ...)
+        #`(
+          #,(expand-expr $lookup #'expr)
+          #,@(map (partial expand-accessor $lookup) (syntaxes accessor accessors ...))))
+      (id (identifier? #'id)
+        #'id)))
+
+  (define (expand-accessor $lookup $accessor)
+    (syntax-case $accessor (*)
       ((expr) #`(#,(expand-expr $lookup #'expr)))
+      (* #'*)
       (other #'other)))
 )

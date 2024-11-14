@@ -90,10 +90,13 @@
   (while (bar 0) (bar 1) (bar 2)))
 
 (check-expand-instr (set x (foo zero)) (set x (bar 0)))
-(check-expand-instr (set+ x (foo zero)) (set+ x (bar 0)))
-(check-expand-instr (set- x (foo zero)) (set- x (bar 0)))
-(check-expand-instr (set* x (foo zero)) (set* x (bar 0)))
-(check-expand-instr (set/ x (foo zero)) (set/ x (bar 0)))
+(check-expand-instr (set x + (foo zero)) (set x + (bar 0)))
+(check-expand-instr (set x - (foo zero)) (set x - (bar 0)))
+(check-expand-instr (set x * (foo zero)) (set x * (bar 0)))
+(check-expand-instr (set x / (foo zero)) (set x / (bar 0)))
+
+(check-expand-instr (set (x a (zero) *) (foo one)) (set (x a (0) *) (bar 1)))
+(check-expand-instr (set x (ref x a (zero) *)) (set x (ref x a (0) *)))
 
 (check-expand-instr
   (begin
