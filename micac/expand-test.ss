@@ -1,7 +1,5 @@
 (import (micascheme) (micac expand) (micac syntax) (micac env) (micac scope))
 
-(pretty-identifier? #t)
-
 (define-aux-keywords zero one two)
 
 (define $env
