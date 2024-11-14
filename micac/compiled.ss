@@ -24,8 +24,8 @@
 
   (define (compiled-alloc $env $id)
     (lets
-      ((pair $env $expr) (env-alloc $env $id))
-      (compiled $env $expr)))
+      ((pair $env $identifier) (env-alloc $env $id))
+      (compiled $env $identifier)))
 
   (define (compiled-transformer $compiled $id)
     (env-transformer (compiled-env $compiled) $id))

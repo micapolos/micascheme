@@ -45,7 +45,7 @@
                 (symbol->string (syntax->datum $id)))))))
       (pair
         (scope+ $scope $id $identifier)
-        (identifier->expr $identifier))))
+        $identifier)))
 
   (define (scope-ref $scope $id)
     (lets

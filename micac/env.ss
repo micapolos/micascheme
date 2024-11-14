@@ -28,9 +28,11 @@
 
   (define (env-alloc $env $id)
     (lets
-      ((pair $scope $expr)
+      ((pair $scope $identifier)
         (scope-alloc (env-scope $env) $id))
-      (cons (env (env-lookup $env) $scope) $expr)))
+      (pair
+        (env (env-lookup $env) $scope)
+        $identifier)))
 
   (define (env-ref $env $id)
     (or
