@@ -8,13 +8,13 @@
     scope-transformer
     scope-unbound
     scope-with
-    pretty-expr?
+    $pretty-identifier?
     scope->lookup)
   (import
     (micascheme)
     (micac expr))
 
-  (define pretty-expr? (make-parameter #f))
+  (define $pretty-identifier? (make-parameter #f))
 
   (data (scope bindings size))
 
@@ -34,7 +34,7 @@
   (define (scope-alloc $scope $id)
     (lets
       ($identifier
-        (if (pretty-expr?)
+        (if ($pretty-identifier?)
           $id
           (datum->syntax $id
             (string->symbol

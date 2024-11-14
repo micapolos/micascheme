@@ -1,6 +1,6 @@
 (import (micascheme) (micac c) (check) (micac scope))
 
-(pretty-expr? #t)
+($pretty-identifier? #t)
 
 (micac-define add-all
   (lambda ($syntax)
