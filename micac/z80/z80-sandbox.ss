@@ -15,6 +15,6 @@
 
     (set clk? (not clk?))
 
-    (set red (? z80-m1? #xff 0))
+    (set red (if z80-m1? #xff 0))
     (set green (bitwise-and z80-address #xff))
 ))

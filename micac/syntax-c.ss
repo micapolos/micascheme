@@ -314,6 +314,7 @@
         not and or
         bitwise-and bitwise-ior bitwise-xor bitwise-not
         bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
+        if
         ref &ref ?)
       ((cast type rhs)
         (expr 2 #f
@@ -364,7 +365,7 @@
         (ref->expr $env #'(var x ...)))
       ((&ref var x ...)
         (expr 2 #f (code "&" (expr-code (ref->expr $env #'(var x ...))))))
-      ((? cond true false)
+      ((if cond true false)
         (expr 13 #f
           (code
             (expr-operand-code (syntax->expr $env #'cond) 13 #f)

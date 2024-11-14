@@ -50,9 +50,9 @@
           (else
             (set address read-write-address))))
       (macro (negedge)
-        (const uint8_t last-clock-cycle (? fetch-cycle? 3 2))
+        (const uint8_t last-clock-cycle (if fetch-cycle? 3 2))
         (const bool last-clock-cycle? (= clock-cycle last-clock-cycle))
-        (set clock-cycle-request (? last-clock-cycle? 0 (+ clock-cycle 1)))
+        (set clock-cycle-request (if last-clock-cycle? 0 (+ clock-cycle 1)))
         (set memory-request? (not last-clock-cycle?))
         (set m1-request?
           (and

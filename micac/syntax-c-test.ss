@@ -454,7 +454,7 @@
 
 (check
   (equal?
-    (syntax-c $env #`(set a (? x y z)))
+    (syntax-c $env #`(set a (if x y z)))
     (lines-string "a = x ? y : z;")))
 
 (check
