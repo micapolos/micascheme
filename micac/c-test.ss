@@ -1,6 +1,6 @@
 (import (micascheme) (micac c) (check) (micac scope))
 
-(pretty-identifier? #t)
+(parameterize ((pretty-identifier? #t))
 
 (micac-define add-all
   (lambda ($syntax)
@@ -59,3 +59,5 @@
     (lines-string
       "int v0_x;"
       "v0_x = v0_x + v0_x + v0_x;")))
+
+)

@@ -71,23 +71,23 @@
 (check-expand-instr (bar 0) (bar 0))
 (check-expand-instr (foo 0) (bar 0))
 (check-expand-instr (foo zero) (bar 0))
-(check-expand-instr (var int x) (var int x))
-(check-expand-instr (var int x zero) (var int x 0))
-(check-expand-instr (const int x zero) (const int x 0))
+(check-expand-instr (var int x) (var int v11-x))
+(check-expand-instr (var int x zero) (var int v11-x 0))
+(check-expand-instr (const int x zero) (const int v11-x 0))
 
-(check-expand-instr (var int (* x)) (var int (* x)))
-(check-expand-instr (var int (* zero)) (var int (* zero)))
-(check-expand-instr (var zero (* x)) (var zero (* x)))
+(check-expand-instr (var int (* x)) (var int (* v11-x)))
+(check-expand-instr (var int (* zero)) (var int (* v11-zero)))
+(check-expand-instr (var zero (* x)) (var zero (* v11-x)))
 
-(check-expand-instr (var int (* x 10)) (var int (* x 10)))
-(check-expand-instr (var int (* x one)) (var int (* x 1)))
-(check-expand-instr (var int (* (* x one) two)) (var int (* (* x 1) 2)))
+(check-expand-instr (var int (* x 10)) (var int (* v11-x 10)))
+(check-expand-instr (var int (* x one)) (var int (* v11-x 1)))
+(check-expand-instr (var int (* (* x one) two)) (var int (* (* v11-x 1) 2)))
 
 (check-expand-instr (begin) (begin))
 
 (check-expand-instr
   (begin (var int x zero) (var int y one))
-  (begin (var int x 0) (var int y 1)))
+  (begin (var int v11-x 0) (var int v12-y 1)))
 
 (check-expand-instr
   (if (foo zero) (then (foo one)) (else (foo two)))
@@ -149,5 +149,5 @@
     (set x ten))
   (begin
     (set x 10)
-    (var int ten)
-    (set x ten)))
+    (var int v12-ten)
+    (set x v12-ten)))

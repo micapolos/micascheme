@@ -1,7 +1,7 @@
 (import (micascheme) (micac syntax) (micac syntax-c) (micac env) (check) (micac scope) (micac expr))
 
 ; for testing
-(pretty-identifier? #t)
+(parameterize ((pretty-identifier? #t))
 
 (define-aux-keywords foo)
 
@@ -615,3 +615,5 @@
     "  x = 1;"
     "}"
     "y = 0;")))
+
+)
