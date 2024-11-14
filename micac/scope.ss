@@ -3,7 +3,7 @@
     scope scope? scope-bindings scope-size
     empty-scope
     scope+
-    scope-alloc
+    scope-gen
     scope-ref
     scope-transformer
     scope-unbound
@@ -31,7 +31,7 @@
         (cons $id $item))
       (+ (scope-size $scope) 1)))
 
-  (define (scope-alloc $scope $id)
+  (define (scope-gen $scope $id)
     (lets
       ($identifier
         (if ($pretty-identifier?)

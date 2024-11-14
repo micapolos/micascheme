@@ -3,7 +3,7 @@
     compiled compiled? compiled-env compiled-value
     compiled+
     compiled-ref
-    compiled-alloc
+    compiled-gen
     compiled-transformer
     compiled-transform
     compiled-with
@@ -22,9 +22,9 @@
   (define (compiled-ref $compiled $id)
     (env-ref (compiled-env $compiled) $id))
 
-  (define (compiled-alloc $env $id)
+  (define (compiled-gen $env $id)
     (lets
-      ((pair $env $identifier) (env-alloc $env $id))
+      ((pair $env $identifier) (env-gen $env $id))
       (compiled $env $identifier)))
 
   (define (compiled-transformer $compiled $id)

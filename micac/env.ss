@@ -3,7 +3,7 @@
     env env? env-lookup env-scope
     lookup-env empty-env
     env+
-    env-alloc
+    env-gen
     env-ref
     env-transformer
     env-transform
@@ -26,10 +26,10 @@
       (env-lookup $env)
       (scope+ (env-scope $env) $id $item)))
 
-  (define (env-alloc $env $id)
+  (define (env-gen $env $id)
     (lets
       ((pair $scope $identifier)
-        (scope-alloc (env-scope $env) $id))
+        (scope-gen (env-scope $env) $id))
       (pair
         (env (env-lookup $env) $scope)
         $identifier)))
