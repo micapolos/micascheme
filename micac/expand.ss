@@ -164,7 +164,7 @@
         not and or
         bitwise-not bitwise-and bitwise-ior bitwise-xor
         bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
-        ref &ref)
+        if ref &ref)
       ((cast type rhs)
         #`(cast type #,(expand-expr $lookup #'rhs)))
       ((+ arg ...)
@@ -201,6 +201,16 @@
         #`(&ref
           #,(expand-expr $lookup #'var)
           #,@(map (partial expand-accessor $lookup) (syntaxes x ...))))
+      ((if cond then els)
+        (lets
+          ($cond (expand-expr $lookup #'cond))
+          ($then (expand-expr $lookup #'then))
+          ($else (expand-expr $lookup #'els))
+          (switch (syntax->datum $cond)
+            ((boolean? $boolean)
+              (if $boolean $then $else))
+            ((else $other)
+              #`(if #,$cond #,$then #,$else)))))
       ((id arg ...) (identifier? #'id)
         (switch ($lookup #'id)
           ((false? _)

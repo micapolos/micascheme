@@ -57,6 +57,9 @@
 (check-expand-expr (* one ten) (* 1 ten))
 
 (check-expand-expr (if zero one two) (if 0 1 2))
+(check-expand-expr (if #t one two) 1)
+(check-expand-expr (if #f one two) 2)
+(check-expand-expr (if (and #t #f) one two) 2)
 
 (check-expand-instr (bar 0) (bar 0))
 (check-expand-instr (foo 0) (bar 0))
