@@ -10,6 +10,11 @@
     (micac env)
     (micac expand))
 
+  (define (compiled+code $compiled $code)
+    (compiled-map
+      ($compiled-code $compiled)
+      (code $compiled-code $code)))
+
   (define (size->code $size)
     (lets
       ($datum (syntax->datum $size))
@@ -173,42 +178,44 @@
               (lambda ($lookup)
                 #'expr))))
         ((begin instr ...)
-          (compiled-with $compiled
-            (code $code
-              (block-code $env (syntaxes instr ...))
-              "\n")))
+          (compiled+code $compiled
+            (newline-ended-code
+              (block-code $env (syntaxes instr ...)))))
         ((var type id)
           (compiled-map
             ($declarator-code (declarator->compiled-code $env #'id))
               (code $code
-                (space-separated-code
-                  (type->code #'type)
-                  $declarator-code)
-                ";\n")))
+                (newline-ended-code
+                  (colon-ended-code
+                    (space-separated-code
+                      (type->code #'type)
+                      $declarator-code))))))
         ((var type id expr)
           (compiled-map
             ($declarator-code (declarator->compiled-code $env #'id))
             (code $code
-              (space-separated-code
-                (type->code #'type)
-                $declarator-code
-                "="
-                (expr-code (syntax->expand-expr $env #'expr)))
-              ";\n")))
+              (newline-ended-code
+                (colon-ended-code
+                  (space-separated-code
+                    (type->code #'type)
+                    $declarator-code
+                    "="
+                    (expr-code (syntax->expand-expr $env #'expr))))))))
         ((const type id expr)
           (compiled-map
             ($declarator-code (declarator->compiled-code $env #'id))
             (code $code
-              (space-separated-code
-                "const"
-                (type->code #'type)
-                $declarator-code
-                "="
-                (expr-code (syntax->expand-expr $env #'expr)))
-              ";\n")))
+              (newline-ended-code
+                (colon-ended-code
+                  (space-separated-code
+                    "const"
+                    (type->code #'type)
+                    $declarator-code
+                    "="
+                    (expr-code (syntax->expand-expr $env #'expr))))))))
         ((if expr (then then-body ...) (else else-body ...))
-          (compiled-with $compiled
-            (code $code
+          (compiled+code $compiled
+            (newline-ended-code
               (space-separated-code
                 "if"
                 (code-in-round-brackets
@@ -216,26 +223,23 @@
                 (block-code $env (syntaxes then-body ...))
               (space-separated-code
                 "else"
-                (block-code $env (syntaxes else-body ...))))
-              "\n")))
+                (block-code $env (syntaxes else-body ...)))))))
         ((when expr body ...)
-          (compiled-with $compiled
-            (code $code
+          (compiled+code $compiled
+            (newline-ended-code
               (space-separated-code
                 "if"
                 (code-in-round-brackets
                   (expr-code (syntax->expand-expr $env #'expr)))
-                (block-code $env (syntaxes body ...)))
-              "\n")))
+                (block-code $env (syntaxes body ...))))))
         ((while expr body ...)
-          (compiled-with $compiled
-            (code $code
+          (compiled+code $compiled
+            (newline-ended-code
               (space-separated-code
                 "while"
                 (code-in-round-brackets
                   (expr-code (syntax->expand-expr $env #'expr)))
-                (block-code $env (syntaxes body ...)))
-              "\n")))
+                (block-code $env (syntaxes body ...))))))
         ((set lhs expr)
           (compiled-with $compiled
             (code+op2 $env $code #'lhs "=" #'expr)))
@@ -275,22 +279,22 @@
         ((id arg ...)
           (switch (compiled-ref $compiled (identifier id))
             ((identifier? $identifier)
-              (compiled-with $compiled
-                (code $code
-                  (expr-code
-                    (parenthesized-expr 1 #t
-                      (identifier->expr $identifier)
-                      "("
-                      (expr 0 #t
-                        (apply code-append
-                          (intercalate
-                            (map expr-code
-                              (map
-                                (partial syntax->expand-expr $env)
-                                (syntaxes arg ...)))
-                            (code ", "))))
-                      ")"))
-                  ";\n")))
+              (compiled+code $compiled
+                (newline-ended-code
+                  (colon-ended-code
+                    (expr-code
+                      (parenthesized-expr 1 #t
+                        (identifier->expr $identifier)
+                        "("
+                        (expr 0 #t
+                          (apply code-append
+                            (intercalate
+                              (map expr-code
+                                (map
+                                  (partial syntax->expand-expr $env)
+                                  (syntaxes arg ...)))
+                              (code ", "))))
+                        ")"))))))
             ((else $transformer)
               (compiled-code+instrs $compiled
                 #`(
@@ -299,11 +303,12 @@
 
   (define (code+op2 $env $code $lhs $op $expr)
     (code $code
-      (space-separated-code
-        (expr-code (lhs->expr $env $lhs))
-        (string-code $op)
-        (expr-code (syntax->expand-expr $env $expr)))
-      ";\n"))
+      (newline-ended-code
+        (colon-ended-code
+          (space-separated-code
+            (expr-code (lhs->expr $env $lhs))
+            (string-code $op)
+            (expr-code (syntax->expand-expr $env $expr)))))))
 
   (define (syntax->expand-expr $env $syntax)
     (syntax->expr $env (expand-expr (env->lookup $env) $syntax)))
