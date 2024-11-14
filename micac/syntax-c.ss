@@ -299,7 +299,7 @@
             (expr-code (syntax->expand-expr (compiled-env $compiled) $expr)))))))
 
   (define (syntax->expand-expr $env $syntax)
-    (syntax->expr $env (expand-expr (env->lookup $env) $syntax)))
+    (syntax->expr $env (expand-expr $env $syntax)))
 
   (define (syntax->expr $env $syntax)
     (syntax-case $syntax

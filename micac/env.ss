@@ -18,7 +18,8 @@
   (define (lookup-env $lookup)
     (env $lookup (empty-scope)))
 
-  (define empty-env (lookup-env (lambda _ #f)))
+  (define (empty-env)
+    (lookup-env (lambda _ #f)))
 
   (define (env+ $env $id $item)
     (env

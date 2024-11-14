@@ -1,33 +1,39 @@
-(import (micascheme) (micac expand) (micac syntax))
+(import (micascheme) (micac expand) (micac syntax) (micac env))
 
 (define-aux-keywords zero one two)
 
-(define (lookup $id)
-  (cond
-    ((free-identifier=? $id #'zero) (lambda _ #'0))
-    ((free-identifier=? $id #'one) (lambda _ #'1))
-    ((free-identifier=? $id #'two) (lambda _ #'2))
-    ((free-identifier=? $id #'foo)
+(define $env
+  (fluent (empty-env)
+    (env+ #'bar #'bar)
+    (env+ #'ten #'ten)
+    (env+ #'a #'a)
+    (env+ #'b #'b)
+    (env+ #'c #'c)
+    (env+ #'x #'x)
+    (env+ #'gar #'gar)
+    (env+ #'zero (lambda _ #'0))
+    (env+ #'one (lambda _ #'1))
+    (env+ #'two (lambda _ #'2))
+    (env+ #'foo
       (syntax-rules ()
-        ((_ xs ...) (bar xs ...))))
-    (else #f)))
+        ((_ xs ...) (bar xs ...))))))
 
 (define-rule-syntax (check-expand-expr in out)
   (check
     (equal?
-      (syntax->datum (expand-expr lookup #'in))
+      (syntax->datum (expand-expr $env #'in))
       'out)))
 
 (define-rule-syntax (check-expand-instr in out)
   (check
     (equal?
-      (syntax->datum (expand-instr lookup #'in))
+      (syntax->datum (expand-instr $env #'in))
       'out)))
 
 (define-rule-syntax (check-expand-instrs (in-body ...) (out-body ...))
   (check
     (equal?
-      (syntax->datum #`(#,@(expand-instrs lookup #'(in-body ...))))
+      (syntax->datum #`(#,@(expand-instrs $env #'(in-body ...))))
       '(out-body ...))))
 
 (check-expand-expr zero 0)

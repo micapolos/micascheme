@@ -3,88 +3,66 @@
     expand-expr
     expand-instr
     expand-instrs)
-  (import (micascheme) (micac env) (micac syntax))
+  (import (micascheme) (micac env) (micac syntax) (micac compiled))
 
-  (data (expanded lookup value))
-
-  (define (lookup+ $lookup $id $value)
-    (lambda ($lookup-id)
-      (if (free-identifier=? $lookup-id $id)
-        $value
-        ($lookup $lookup-id))))
-
-  (define (expanded+binding (expanded $lookup $expanded-value) $id $value)
-    (expanded
-      (lookup+ $lookup $id $value)
-      $expanded-value))
-
-  (define (expanded+syntax (expanded $lookup $syntaxes) $syntax)
-    (expanded
-      $lookup
+  (define (compiled+syntax $compiled $syntax)
+    (compiled-map
+      ($syntaxes $compiled)
       (push $syntaxes $syntax)))
 
-  (define-rules-syntax
-    ((expanded-map (value expanded-expr) body)
-      (lets
-        ((expanded $lookup value) expanded-expr)
-        (expanded $lookup body)))
-    ((expanded-map decl decls ... body)
-      (expanded-map decls ...
-        (expanded-value (expanded-map decl body)))))
-
-  (define (expand-instrs $lookup $syntax)
-    (fluent $lookup
-      (expanded (stack))
-      (expanded+instrs $syntax)
-      (expanded-value)
+  (define (expand-instrs $env $syntax)
+    (fluent $env
+      (compiled (stack))
+      (compiled+instrs $syntax)
+      (compiled-value)
       (reverse)))
 
-  (define (expand-instr $lookup $syntax)
-    (force-single (expand-instrs $lookup #`(#,$syntax))))
+  (define (expand-instr $env $syntax)
+    (force-single (expand-instrs $env #`(#,$syntax))))
 
-  (define (expanded+instrs $expanded $instrs)
+  (define (compiled+instrs $compiled $instrs)
     (syntax-case $instrs (defer break-if)
-      (() $expanded)
+      (() $compiled)
       (((defer deferred ...) body ...)
-        (expanded+instrs $expanded
+        (compiled+instrs $compiled
           #`(body ... deferred ...)))
       (((break-if expr break-body ...) body ...)
-        (expanded+instr $expanded
+        (compiled+instr $compiled
           #`(if expr
             (then break-body ...)
             (else body ...))))
       ((instr instrs ...)
-        (expanded+instrs
-          (expanded+instr $expanded #'instr)
+        (compiled+instrs
+          (compiled+instr $compiled #'instr)
           #'(instrs ...)))))
 
-  (define (declarator->expanded-syntax $lookup $declarator)
+  (define (declarator->compiled-syntax $env $declarator)
     (syntax-case $declarator (*)
       (id (identifier? #'id)
-        (expanded
-          (lookup+ $lookup #'id #f)
+        (compiled
+          (env+ $env #'id #'id)
           #'id))
       ((* decl)
-        (expanded-map
-          ($expanded-decl (declarator->expanded-syntax $lookup #'decl))
-          #`(* #,$expanded-decl)))
+        (compiled-map
+          ($compiled-decl (declarator->compiled-syntax $env #'decl))
+          #`(* #,$compiled-decl)))
       ((* decl expr)
         (lets
-          ($expr (expand-expr $lookup #'expr))
-          (expanded-map
-            ($expanded-decl (declarator->expanded-syntax $lookup #'decl))
-            #`(* #,$expanded-decl #,$expr))))))
+          ($expr (expand-expr $env #'expr))
+          (compiled-map
+            ($compiled-decl (declarator->compiled-syntax $env #'decl))
+            #`(* #,$compiled-decl #,$expr))))))
 
-  (define (expanded+instr $expanded $instr)
+  (define (compiled+instr $compiled $instr)
     (lets
-      ((expanded $lookup $syntaxes) $expanded)
+      ((compiled $env $syntaxes) $compiled)
       (syntax-case $instr (extern macro begin var const if when while then else set)
         ((extern id)
-          (expanded+binding $expanded (identifier id) #f))
+          (compiled+ $compiled (identifier id) #f))
         ((macro (id param ...) body ...)
-          (expanded+binding $expanded (identifier id)
+          (compiled+ $compiled (identifier id)
             (lambda ($syntax)
-              (lambda ($lookup)
+              (lambda ($env)
                 (syntax-case $syntax ()
                   ((_ arg ...)
                     (syntax-subst
@@ -92,202 +70,216 @@
                       #'(arg ...)
                       #'(begin body ...))))))))
         ((macro id expr)
-          (expanded+binding $expanded (identifier id)
+          (compiled+ $compiled (identifier id)
             (lambda ($syntax)
-              (lambda ($lookup)
+              (lambda ($env)
                 #'expr))))
         ((begin instr ...)
-          (expanded+syntax $expanded
+          (compiled+syntax $compiled
             #`(begin
-              #,@(expand-instrs $lookup #'(instr ...)))))
+              #,@(expand-instrs $env #'(instr ...)))))
         ((var type decl)
-          (expanded-map
-            ($decl (declarator->expanded-syntax $lookup #'decl))
+          (compiled-map
+            ($decl (declarator->compiled-syntax $env #'decl))
             (push $syntaxes
               #`(var type #,$decl))))
         ((var type decl expr)
-          (expanded-map
-            ($decl (declarator->expanded-syntax $lookup #'decl))
+          (compiled-map
+            ($decl (declarator->compiled-syntax $env #'decl))
             (push $syntaxes
-              #`(var type #,$decl #,(expand-expr $lookup #'expr)))))
+              #`(var type #,$decl #,(expand-expr $env #'expr)))))
         ((const type decl expr)
-          (expanded-map
-            ($decl (declarator->expanded-syntax $lookup #'decl))
+          (compiled-map
+            ($decl (declarator->compiled-syntax $env #'decl))
             (push $syntaxes
-              #`(const type #,$decl #,(expand-expr $lookup #'expr)))))
+              #`(const type #,$decl #,(expand-expr $env #'expr)))))
         ((if expr (then then-body ...) (else else-body ...))
-          (expanded+syntax $expanded
+          (compiled+syntax $compiled
             #`(if
-              #,(expand-expr $lookup #'expr)
-              (then #,@(expand-instrs $lookup #'(then-body ...)))
-              (else #,@(expand-instrs $lookup #'(else-body ...))))))
+              #,(expand-expr $env #'expr)
+              (then #,@(expand-instrs $env #'(then-body ...)))
+              (else #,@(expand-instrs $env #'(else-body ...))))))
         ((when expr body ...)
-          (expanded+syntax $expanded
+          (compiled+syntax $compiled
             #`(when
-              #,(expand-expr $lookup #'expr)
-              #,@(expand-instrs $lookup #'(body ...)))))
+              #,(expand-expr $env #'expr)
+              #,@(expand-instrs $env #'(body ...)))))
         ((while expr body ...)
-          (expanded+syntax $expanded
+          (compiled+syntax $compiled
             #`(while
-              #,(expand-expr $lookup #'expr)
-              #,@(expand-instrs $lookup #'(body ...)))))
+              #,(expand-expr $env #'expr)
+              #,@(expand-instrs $env #'(body ...)))))
         ((set lhs expr)
-          (expanded+syntax $expanded
+          (compiled+syntax $compiled
             #`(set
-              #,(expand-lhs $lookup #'lhs)
-              #,(expand-expr $lookup #'expr))))
+              #,(expand-lhs $env #'lhs)
+              #,(expand-expr $env #'expr))))
         ((set lhs op expr)
-          (expanded+syntax $expanded
+          (compiled+syntax $compiled
             #`(set
-              #,(expand-lhs $lookup #'lhs)
+              #,(expand-lhs $env #'lhs)
               op
-              #,(expand-expr $lookup #'expr))))
+              #,(expand-expr $env #'expr))))
         ((id arg ...) (identifier? #'id)
-          (switch ($lookup #'id)
-            ((false? _)
-              (expanded+syntax $expanded
-                #`(id
+          (switch (env-ref $env #'id)
+            ((identifier? $identifier)
+              (compiled+syntax $compiled
+                #`(
+                  id
                   #,@(map
-                    (partial expand-expr $lookup)
+                    (partial expand-expr $env)
                     (syntaxes arg ...)))))
             ((else $transformer)
               (fold-left
-                expanded+instr
-                $expanded
+                compiled+instr
+                $compiled
                 (begin-syntaxes
-                  (transform $transformer $instr $lookup)))))))))
+                  (env-transform $env $transformer $instr)))))))))
 
-  (define (expand-expr $lookup $expr)
+  (define (expand-expr $env $expr)
     (syntax-case $expr
       (
-        cast + - * div
+        cast
+        = not
+        < <= > >=
+        + - * div
         not and or
         bitwise-not bitwise-and bitwise-ior bitwise-xor
         bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
         if ref &ref)
       ((cast type rhs)
-        #`(cast type #,(expand-expr $lookup #'rhs)))
+        #`(cast type #,(expand-expr $env #'rhs)))
+      ((= arg ...)
+        (expand-op2 $env $expr boolean? =))
+      ((< arg ...)
+        (expand-op2 $env $expr number? <))
+      ((<= arg ...)
+        (expand-op2 $env $expr number? <=))
+      ((> arg ...)
+        (expand-op2 $env $expr number? >))
+      ((>= arg ...)
+        (expand-op2 $env $expr number? >=))
       ((+ arg ...)
-        (expand-op2-fold-default $lookup $expr #'0 number? +))
+        (expand-op2-fold-default $env $expr #'0 number? +))
       ((- arg ...)
-        (expand-op2-fold $lookup $expr number? -))
+        (expand-op2-fold $env $expr number? -))
       ((* arg ...)
-        (expand-op2-fold-default $lookup $expr #'1 number? *))
+        (expand-op2-fold-default $env $expr #'1 number? *))
       ((div arg ...)
-        (expand-op2 $lookup $expr number? div))
+        (expand-op2 $env $expr number? div))
       ((and arg ...)
-        (expand-op2-fold-default $lookup $expr #'#t boolean? and-proc))
+        (expand-op2-fold-default $env $expr #'#t boolean? and-proc))
       ((or arg ...)
-        (expand-op2-fold-default $lookup $expr #'#f boolean? or-proc))
+        (expand-op2-fold-default $env $expr #'#f boolean? or-proc))
       ((not arg ...)
-        (expand-op1 $lookup $expr boolean? not))
+        (expand-op1 $env $expr boolean? not))
       ((bitwise-and arg ...)
-        (expand-op2-fold-default $lookup $expr #'-1 integer? bitwise-and))
+        (expand-op2-fold-default $env $expr #'-1 integer? bitwise-and))
       ((bitwise-ior arg ...)
-        (expand-op2-fold-default $lookup $expr #'0 integer? bitwise-ior))
+        (expand-op2-fold-default $env $expr #'0 integer? bitwise-ior))
       ((bitwise-xor arg ...)
-        (expand-op2-fold-default $lookup $expr #'0 integer? bitwise-xor))
+        (expand-op2-fold-default $env $expr #'0 integer? bitwise-xor))
       ((bitwise-not arg ...)
-        (expand-op1 $lookup $expr integer? bitwise-not))
+        (expand-op1 $env $expr integer? bitwise-not))
       ((bitwise-arithmetic-shift-left arg ...)
-        (expand-op2 $lookup $expr integer? bitwise-arithmetic-shift-left))
+        (expand-op2 $env $expr integer? bitwise-arithmetic-shift-left))
       ((bitwise-arithmetic-shift-right arg ...)
-        (expand-op2 $lookup $expr integer? bitwise-arithmetic-shift-right))
+        (expand-op2 $env $expr integer? bitwise-arithmetic-shift-right))
       ((ref var x ...)
         #`(ref
-          #,(expand-expr $lookup #'var)
-          #,@(map (partial expand-accessor $lookup) (syntaxes x ...))))
+          #,(expand-expr $env #'var)
+          #,@(map (partial expand-accessor $env) (syntaxes x ...))))
       ((&ref var x ...)
         #`(&ref
-          #,(expand-expr $lookup #'var)
-          #,@(map (partial expand-accessor $lookup) (syntaxes x ...))))
+          #,(expand-expr $env #'var)
+          #,@(map (partial expand-accessor $env) (syntaxes x ...))))
       ((if cond then els)
         (lets
-          ($cond (expand-expr $lookup #'cond))
-          ($then (expand-expr $lookup #'then))
-          ($else (expand-expr $lookup #'els))
+          ($cond (expand-expr $env #'cond))
+          ($then (expand-expr $env #'then))
+          ($else (expand-expr $env #'els))
           (switch (syntax->datum $cond)
             ((boolean? $boolean)
               (if $boolean $then $else))
             ((else $other)
               #`(if #,$cond #,$then #,$else)))))
       ((id arg ...) (identifier? #'id)
-        (switch ($lookup #'id)
-          ((false? _)
+        (switch (env-ref $env #'id)
+          ((identifier? $identifier)
             #`(id
               #,@(map
-                (partial expand-expr $lookup)
+                (partial expand-expr $env)
                 (syntaxes arg ...))))
           ((else $transformer)
-            (expand-expr $lookup
+            (expand-expr $env
               (begin-syntax
-                (transform $transformer $expr $lookup))))))
+                (env-transform $env $transformer $expr))))))
       (id (identifier? #'id)
-        (switch ($lookup #'id)
-          ((false? _) #'id)
+        (switch (env-ref $env #'id)
+          ((identifier? $identifier) #'id)
           ((else $transformer)
-            (expand-expr $lookup
+            (expand-expr $env
               (begin-syntax
-                (transform $transformer $expr $lookup))))))
+                (env-transform $env $transformer $expr))))))
       (other #'other)))
 
-  (define (expand-op1 $lookup $syntax $test? $proc)
+  (define (expand-op1 $env $syntax $test? $proc)
     (syntax-case $syntax ()
       ((op a)
         (lets
-          ($a (expand-expr $lookup #'a))
+          ($a (expand-expr $env #'a))
           ($datum (syntax->datum $a))
           (if ($test? $datum)
             (datum->syntax #'op ($proc $datum))
             #`(op #,$a))))))
 
-  (define (expand-op2 $lookup $syntax $test? $proc)
+  (define (expand-op2 $env $syntax $test? $proc)
     (syntax-case $syntax ()
       ((op a b)
         (lets
-          ($a (expand-expr $lookup #'a))
-          ($b (expand-expr $lookup #'b))
+          ($a (expand-expr $env #'a))
+          ($b (expand-expr $env #'b))
           ($datum-a (syntax->datum $a))
           ($datum-b (syntax->datum $b))
           (if (and ($test? $datum-a) ($test? $datum-b))
             (datum->syntax #'op ($proc $datum-a $datum-b))
             #`(op #,$a #,$b))))))
 
-  (define (expand-op2-fold $lookup $syntax $test? $proc)
+  (define (expand-op2-fold $env $syntax $test? $proc)
     (syntax-case $syntax ()
       ((op a)
-        (expand-op1 $lookup $syntax $test? $proc))
+        (expand-op1 $env $syntax $test? $proc))
       ((op a b)
-        (expand-op2 $lookup $syntax $test? $proc))
+        (expand-op2 $env $syntax $test? $proc))
       ((op a b c cs ...)
-        (expand-op2-fold $lookup
-          #`(op #,(expand-op2 $lookup #'(op a b) $test? $proc) c cs ...)
+        (expand-op2-fold $env
+          #`(op #,(expand-op2 $env #'(op a b) $test? $proc) c cs ...)
           $test? $proc))))
 
-  (define (expand-op2-fold-default $lookup $syntax $default $test? $proc)
+  (define (expand-op2-fold-default $env $syntax $default $test? $proc)
     (syntax-case $syntax ()
       ((op) $default)
       ((op a)
         (lets
-          ($a (expand-expr $lookup #'a))
+          ($a (expand-expr $env #'a))
           ($datum (syntax->datum $a))
           (if ($test? $datum)
             (datum->syntax #'op ($proc $datum))
             $a)))
-      (_ (expand-op2-fold $lookup $syntax $test? $proc))))
+      (_ (expand-op2-fold $env $syntax $test? $proc))))
 
-  (define (expand-lhs $lookup $lhs)
+  (define (expand-lhs $env $lhs)
     (syntax-case $lhs ()
       ((expr accessor accessors ...)
         #`(
-          #,(expand-expr $lookup #'expr)
-          #,@(map (partial expand-accessor $lookup) (syntaxes accessor accessors ...))))
+          #,(expand-expr $env #'expr)
+          #,@(map (partial expand-accessor $env) (syntaxes accessor accessors ...))))
       (id (identifier? #'id)
         #'id)))
 
-  (define (expand-accessor $lookup $accessor)
+  (define (expand-accessor $env $accessor)
     (syntax-case $accessor (*)
-      ((expr) #`(#,(expand-expr $lookup #'expr)))
+      ((expr) #`(#,(expand-expr $env #'expr)))
       (* #'*)
       (other #'other)))
 )
