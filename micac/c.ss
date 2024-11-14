@@ -9,7 +9,7 @@
 
   (define-rule-syntax (micac-externs id ...)
     (begin
-      (micac-define id (identifier->expr #'id)) ...))
+      (micac-define id #'id) ...))
 
   (define-rule-syntax (micac-define id item)
     (define-syntax id (make-compile-time-value item)))

@@ -33,18 +33,19 @@
 
   (define (scope-alloc $scope $id)
     (lets
-      ($expr
-        (identifier->expr
-          (if (pretty-expr?)
-            $id
-            (datum->syntax $id
-              (string->symbol
-                (string-append
-                  "v"
-                  (number->string (scope-size $scope))
-                  "-"
-                  (symbol->string (syntax->datum $id))))))))
-      (cons (scope+ $scope $id $expr) $expr)))
+      ($identifier
+        (if (pretty-expr?)
+          $id
+          (datum->syntax $id
+            (string->symbol
+              (string-append
+                "v"
+                (number->string (scope-size $scope))
+                "-"
+                (symbol->string (syntax->datum $id)))))))
+      (pair
+        (scope+ $scope $id $identifier)
+        (identifier->expr $identifier))))
 
   (define (scope-ref $scope $id)
     (lets
@@ -53,7 +54,7 @@
 
   (define (scope-transformer $scope $id)
     (switch (scope-ref $scope $id)
-      ((expr? _) #f)
+      ((identifier? _) #f)
       ((false? _) #f)
       ((else $transformer) $transformer)))
 
@@ -63,7 +64,7 @@
   (define (scope->lookup $scope)
     (lambda ($id)
       (switch (scope-ref $scope $id)
-        ((expr? _) #f)
+        ((identifier? _) #f)
         ((false? _) #f)
         ((else $transformer) $transformer))))
 )

@@ -78,15 +78,15 @@
 
   (define (variable-identifier->expr $env $identifier)
     (switch (env-ref $env $identifier)
-      ((expr? $expr)
-        $expr)
+      ((identifier? $identifier)
+        (identifier->expr $identifier))
       ((else _)
         (syntax-error $identifier "unboud identifier"))))
 
   (define (env-identifier->expr $env $identifier)
     (switch (env-ref $env $identifier)
-      ((expr? $expr)
-        $expr)
+      ((identifier? $identifier)
+        (identifier->expr $identifier))
       ((else $transformer)
         (syntax->expand-expr $env
           (env-transform $env $transformer $identifier)))))
@@ -154,7 +154,7 @@
         ((extern id)
           (compiled+ $compiled
             (identifier id)
-            (identifier->expr (identifier id))))
+            (identifier id)))
         ((macro (id param ...) body ...)
           (compiled+ $compiled
             (identifier id)
@@ -274,12 +274,12 @@
             (code+op2 $env $code #'lhs ">>=" #'expr)))
         ((id arg ...)
           (switch (compiled-ref $compiled (identifier id))
-            ((expr? $expr)
+            ((identifier? $identifier)
               (compiled-with $compiled
                 (code $code
                   (expr-code
                     (parenthesized-expr 1 #t
-                      $expr
+                      (identifier->expr $identifier)
                       "("
                       (expr 0 #t
                         (apply code-append
@@ -375,9 +375,9 @@
             (expr-operand-code (syntax->expr $env #'false) 13 #t))))
       ((id arg ...)
         (switch (env-ref $env (identifier id))
-          ((expr? $expr)
+          ((identifier? $identifier)
             (parenthesized-expr 1 #t
-              $expr
+              (identifier->expr $identifier)
               "("
               (expr 0 #t
                 (apply code-append

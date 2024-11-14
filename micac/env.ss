@@ -41,7 +41,7 @@
     (or
       (scope-transformer (env-scope $env) $id)
       (switch (app (env-lookup $env) $id)
-        ((expr? _) #f)
+        ((identifier? _) #f)
         ((else $other) $other))))
 
   (define (env-transform $env $transformer $syntax)
@@ -55,7 +55,7 @@
         (or
           ($scope-lookup $id)
           (switch ($env-lookup $id)
-            ((expr? _) #f)
+            ((identifier? _) #f)
             ((false? _) #f)
             ((else $other) $other))))))
 )
