@@ -1,6 +1,6 @@
 (library (micac scope)
   (export
-    scope scope? scope-bindings scope-size
+    scope scope? scope-lookup scope-size
     empty-scope
     scope+
     scope-gen
@@ -15,20 +15,24 @@
 
   (define pretty-identifier? (make-parameter #f))
 
-  (data (scope bindings size))
-
-  (define (scope-with . $bindings)
-    (scope $bindings (length $bindings)))
+  (data (scope lookup size))
 
   (define (empty-scope)
-    (apply scope-with (list)))
+    (scope (lambda (_) #f) 0))
+
+  (define (scope-ref $scope $id)
+    (app (scope-lookup $scope) $id))
 
   (define (scope+ $scope $id $item)
     (scope
-      (push
-        (scope-bindings $scope)
-        (cons $id $item))
+      (lambda ($lookup-id)
+        (if (free-identifier=? $lookup-id $id)
+          $item
+          (scope-ref $scope $lookup-id)))
       (+ (scope-size $scope) 1)))
+
+  (define (scope-with . $bindings)
+    (fold-left scope+ (empty-scope) $bindings))
 
   (define (scope-gen $scope $id)
     (lets
@@ -45,11 +49,6 @@
       (pair
         (scope+ $scope $id $identifier)
         $identifier)))
-
-  (define (scope-ref $scope $id)
-    (lets
-      ($ass (assid $id (scope-bindings $scope)))
-      (and $ass (cdr $ass))))
 
   (define (scope-transformer $scope $id)
     (switch (scope-ref $scope $id)
