@@ -5,7 +5,7 @@
 (define-syntax check-generates
   (syntax-rules (micac lines)
     ((_ (micac instr ...) string)
-      (check (equal? (core-syntax-c #'(instr ...)) string)))))
+      (check (equal? (syntax-c #'(instr ...)) string)))))
 
 (check-generates
   (micac)
