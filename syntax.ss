@@ -93,7 +93,7 @@
 
   (define-rule-syntax (define-aux-keyword aux)
     (define-rule-syntax aux
-      (syntax-error (quote aux) "misplaced aux keyword")))
+      (syntax-error #'aux "misplaced aux keyword")))
 
   (define-rule-syntax (define-aux-keywords aux ...)
     (begin (define-aux-keyword aux) ...))

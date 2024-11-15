@@ -1,5 +1,7 @@
 (library (micac syntax-c)
-  (export syntax-c)
+  (export
+    syntax-c
+    core-syntax-c)
   (import
     (micascheme)
     (code)
@@ -303,4 +305,10 @@
       (instrs-code
         (expand-instrs $env
           #`(#,@$syntaxes)))))
+
+  (define (core-syntax-c $syntax)
+    (syntax-case $syntax ()
+      ((body ...)
+        (code-string
+          (instrs-code (syntaxes body ...))))))
 )
