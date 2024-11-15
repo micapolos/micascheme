@@ -128,6 +128,13 @@
 
 (check-expand-instr
   (begin
+    (break-if (foo zero) (foo one))
+    (foo two))
+  (begin
+    (if (bar 0) (then (bar 1)) (else (bar 2)))))
+
+(check-expand-instr
+  (begin
     (macro ten 10)
     (set x ten))
   (begin
@@ -151,3 +158,21 @@
     (set x 10)
     (var int v12-ten)
     (set x v12-ten)))
+
+(check-expand-instr
+  (begin
+    (defer (foo zero))
+    (foo one))
+  (begin
+    (bar 1)
+    (bar 0)))
+
+(check-expand-instr
+  (begin
+    (break-if (foo zero) (foo one) (foo one))
+    (foo two)
+    (foo two))
+  (begin
+    (if (bar 0)
+      (then (bar 1) (bar 1))
+      (else (bar 2) (bar 2)))))

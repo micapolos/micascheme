@@ -5,15 +5,8 @@
     (code)
     (micac expr)
     (micac syntax)
-    (micac scope)
-    (micac compiled)
     (micac env)
     (micac expand))
-
-  (define (compiled+code $compiled $code)
-    (compiled-map
-      ($compiled-code $compiled)
-      (code $compiled-code $code)))
 
   (define (size->code $size)
     (lets
@@ -34,22 +27,17 @@
       (_
         (syntax-error $type "unknown type"))))
 
-  (define (declarator->compiled-code $env $syntax)
+  (define (declarator->code $syntax)
     (syntax-case $syntax (*)
       (id (identifier? #'id)
-        (compiled-map
-          ($identifier (compiled-gen $env #'id))
-          (identifier->code $identifier)))
+        (identifier->code #'id))
       ((* decl)
-        (compiled-map
-          ($code (declarator->compiled-code $env #'decl))
-          (code "*" $code)))
+        (code "*" (declarator->code #'decl)))
       ((* decl expr)
-        (compiled-map
-          ($code (declarator->compiled-code $env #'decl))
-          (code $code
-            (code-in-square-brackets
-              (expr-code (syntax->expand-expr $env #'expr))))))))
+        (code
+          (declarator->code #'decl)
+          (code-in-square-brackets
+            (expr-code (syntax->expr #'expr)))))))
 
   (define (identifier->code $identifier)
     (string-code
@@ -74,12 +62,12 @@
   (define (variable->expr $variable)
     (expr 0 #t (identifier->code $variable)))
 
-  (define (lhs->expr $env $syntax)
+  (define (lhs->expr $syntax)
     (syntax-case $syntax ()
       (id (identifier? #'id)
         (identifier->expr #'id))
       (other
-        (ref->expr $env #'other))))
+        (ref->expr #'other))))
 
   (define (value->expr $value)
     (syntax-case $value ()
@@ -88,207 +76,124 @@
       (other
         (literal->expr #'other))))
 
-  ; TODO: Separate "expand" and "compile"
-  (define (compiled-code+instrs $compiled $syntax)
-    (syntax-case $syntax (defer break-if)
-      (() $compiled)
-      (((defer deferred ...) body ...)
-        (compiled-code+instrs
-          (compiled-code+instrs $compiled #'(body ...))
-          #'(deferred ...)))
-      (((break-if expr break-body ...) body ...)
-        (compiled-code+instr $compiled
-          #`(if expr
-            (then break-body ...)
-            (else body ...))))
-      (((id arg ...) body ...) (identifier? #'id)
-        (switch (compiled-transformer $compiled #'id)
-          ((false? _)
-            (compiled-code+instrs
-              (compiled-code+instr $compiled #'(id arg ...))
-              #'(body ...)))
-          ((else $transformer)
-            (compiled-code+instrs $compiled
-              #`(
-                #,@(begin-syntaxes
-                  (compiled-transform $compiled $transformer #'(id arg ...)))
-                body ...)))))
-      ((other body ...)
-        (compiled-code+instrs
-          (compiled-code+instr $compiled #'other)
-          #'(body ...)))))
+  (define (instrs-code $instrs)
+    (apply code-append
+      (map instr-code $instrs)))
 
   (define (instr->begin $instr)
     (syntax-case $instr (begin)
       ((begin body ...) $instr)
       (other #'(begin other))))
 
-  (define (block-code $env $syntaxes)
+  (define (block-code $instrs)
     (code-in-curly-brackets
       (code-indent
         (code "\n"
-          (compiled-value
-            (compiled-code+instrs
-              (compiled $env empty-code)
-              $syntaxes))))))
+          (instrs-code $instrs)))))
 
-  ; TODO: Separate "expand" and "compile"
-  (define (compiled-code+instr $compiled $syntax)
-    (lets
-      ((compiled $env $code) $compiled)
-      (syntax-case $syntax
-        (
-          extern macro begin var const if when while then else set
-          + - * div and or bitwise-and bitwise-ior bitwise-xor
-          bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right)
-        ((extern id)
-          (compiled+ $compiled
-            (identifier id)
-            (identifier id)))
-        ((macro (id param ...) body ...)
-          (compiled+ $compiled
-            (identifier id)
-            (lambda ($syntax)
-              (lambda ($lookup)
-                (syntax-case $syntax ()
-                  ((_ arg ...)
-                    (syntax-subst
-                      #'(param ...)
-                      #'(arg ...)
-                      #'(begin body ...))))))))
-        ((macro id expr)
-          (compiled+ $compiled
-            (identifier id)
-            (lambda ($syntax)
-              (lambda ($lookup)
-                #'expr))))
-        ((begin instr ...)
-          (compiled+code $compiled
-            (newline-ended-code
-              (block-code $env (syntaxes instr ...)))))
-        ((var type id)
-          (compiled-map
-            ($declarator-code (declarator->compiled-code $env #'id))
-              (code $code
-                (newline-ended-code
-                  (colon-ended-code
-                    (space-separated-code
-                      (type->code #'type)
-                      $declarator-code))))))
-        ((var type id expr)
-          (compiled-map
-            ($declarator-code (declarator->compiled-code $env #'id))
-            (code $code
-              (newline-ended-code
-                (colon-ended-code
-                  (space-separated-code
-                    (type->code #'type)
-                    $declarator-code
-                    "="
-                    (expr-code (syntax->expand-expr $env #'expr))))))))
-        ((const type id expr)
-          (compiled-map
-            ($declarator-code (declarator->compiled-code $env #'id))
-            (code $code
-              (newline-ended-code
-                (colon-ended-code
-                  (space-separated-code
-                    "const"
-                    (type->code #'type)
-                    $declarator-code
-                    "="
-                    (expr-code (syntax->expand-expr $env #'expr))))))))
-        ((if expr (then then-body ...) (else else-body ...))
-          (compiled+code $compiled
-            (newline-ended-code
-              (space-separated-code
-                "if"
-                (code-in-round-brackets
-                  (expr-code (syntax->expand-expr $env #'expr)))
-                (block-code $env (syntaxes then-body ...))
-              (space-separated-code
-                "else"
-                (block-code $env (syntaxes else-body ...)))))))
-        ((when expr body ...)
-          (compiled+code $compiled
-            (newline-ended-code
-              (space-separated-code
-                "if"
-                (code-in-round-brackets
-                  (expr-code (syntax->expand-expr $env #'expr)))
-                (block-code $env (syntaxes body ...))))))
-        ((while expr body ...)
-          (compiled+code $compiled
-            (newline-ended-code
-              (space-separated-code
-                "while"
-                (code-in-round-brackets
-                  (expr-code (syntax->expand-expr $env #'expr)))
-                (block-code $env (syntaxes body ...))))))
-        ((set lhs expr)
-          (compiled-code+op2 $compiled #'lhs "=" #'expr))
-        ((set lhs + expr)
-          (compiled-code+op2 $compiled #'lhs "+=" #'expr))
-        ((set lhs - expr)
-          (compiled-code+op2 $compiled #'lhs "-=" #'expr))
-        ((set lhs * expr)
-          (compiled-code+op2 $compiled #'lhs "*=" #'expr))
-        ((set lhs div expr)
-          (compiled-code+op2 $compiled #'lhs "/=" #'expr))
-        ((set lhs and expr)
-          (compiled-code+op2 $compiled #'lhs "&&=" #'expr))
-        ((set lhs or expr)
-          (compiled-code+op2 $compiled #'lhs "||=" #'expr))
-        ((set lhs bitwise-and expr)
-          (compiled-code+op2 $compiled #'lhs "&=" #'expr))
-        ((set lhs bitwise-ior expr)
-          (compiled-code+op2 $compiled #'lhs "|=" #'expr))
-        ((set lhs bitwise-xor expr)
-          (compiled-code+op2 $compiled #'lhs "^=" #'expr))
-        ((set lhs bitwise-arithmetic-shift-left expr)
-          (compiled-code+op2 $compiled #'lhs "<<=" #'expr))
-        ((set lhs bitwise-arithmetic-shift-right expr)
-          (compiled-code+op2 $compiled #'lhs ">>=" #'expr))
-        ((id arg ...)
-          (switch (compiled-ref $compiled (identifier id))
-            ((identifier? $identifier)
-              (compiled+code $compiled
-                (newline-ended-code
-                  (colon-ended-code
-                    (expr-code
-                      (parenthesized-expr 1 #t
-                        (identifier->expr $identifier)
-                        "("
-                        (expr 0 #t
-                          (apply code-append
-                            (intercalate
-                              (map expr-code
-                                (map
-                                  (partial syntax->expand-expr $env)
-                                  (syntaxes arg ...)))
-                              (code ", "))))
-                        ")"))))))
-            ((else $transformer)
-              (compiled-code+instrs $compiled
-                #`(
-                  #,@(begin-syntaxes
-                    (compiled-transform $compiled $transformer $syntax))))))))))
-
-  (define (compiled-code+op2 $compiled $lhs $op $expr)
-    (lets
-      ($env (compiled-env $compiled))
-      (compiled+code $compiled
+  (define (instr-code $instr)
+    (syntax-case $instr
+      (
+        begin var const if when while then else set
+        + - * div and or bitwise-and bitwise-ior bitwise-xor
+        bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right)
+      ((begin instr ...)
+        (newline-ended-code (block-code (syntaxes instr ...))))
+      ((var type decl)
         (newline-ended-code
           (colon-ended-code
             (space-separated-code
-              (expr-code (lhs->expr $env (expand-lhs $env $lhs)))
-              (string-code $op)
-              (expr-code (syntax->expand-expr $env $expr))))))))
+              (type->code #'type)
+              (declarator->code #'decl)))))
+      ((var type decl expr)
+        (newline-ended-code
+          (colon-ended-code
+            (space-separated-code
+              (type->code #'type)
+              (declarator->code #'decl)
+              "="
+              (expr-code (syntax->expr #'expr))))))
+      ((const type decl expr)
+        (newline-ended-code
+          (colon-ended-code
+            (space-separated-code
+              "const"
+              (type->code #'type)
+              (declarator->code #'decl)
+              "="
+              (expr-code (syntax->expr #'expr))))))
+      ((if expr (then then-body ...) (else else-body ...))
+        (newline-ended-code
+          (space-separated-code
+            "if"
+            (code-in-round-brackets
+              (expr-code (syntax->expr #'expr)))
+            (block-code (syntaxes then-body ...))
+          (space-separated-code
+            "else"
+            (block-code (syntaxes else-body ...))))))
+      ((when expr body ...)
+        (newline-ended-code
+          (space-separated-code
+            "if"
+            (code-in-round-brackets
+              (expr-code (syntax->expr #'expr)))
+            (block-code (syntaxes body ...)))))
+      ((while expr body ...)
+        (newline-ended-code
+          (space-separated-code
+            "while"
+            (code-in-round-brackets
+              (expr-code (syntax->expr #'expr)))
+            (block-code (syntaxes body ...)))))
+      ((set lhs expr)
+        (op2-code #'lhs "=" #'expr))
+      ((set lhs + expr)
+        (op2-code #'lhs "+=" #'expr))
+      ((set lhs - expr)
+        (op2-code #'lhs "-=" #'expr))
+      ((set lhs * expr)
+        (op2-code #'lhs "*=" #'expr))
+      ((set lhs div expr)
+        (op2-code #'lhs "/=" #'expr))
+      ((set lhs and expr)
+        (op2-code #'lhs "&&=" #'expr))
+      ((set lhs or expr)
+        (op2-code #'lhs "||=" #'expr))
+      ((set lhs bitwise-and expr)
+        (op2-code #'lhs "&=" #'expr))
+      ((set lhs bitwise-ior expr)
+        (op2-code #'lhs "|=" #'expr))
+      ((set lhs bitwise-xor expr)
+        (op2-code #'lhs "^=" #'expr))
+      ((set lhs bitwise-arithmetic-shift-left expr)
+        (op2-code #'lhs "<<=" #'expr))
+      ((set lhs bitwise-arithmetic-shift-right expr)
+        (op2-code #'lhs ">>=" #'expr))
+      ((id arg ...)
+        (newline-ended-code
+          (colon-ended-code
+            (expr-code
+              (parenthesized-expr 1 #t
+                (identifier->expr #'id)
+                "("
+                (expr 0 #t
+                  (apply code-append
+                    (intercalate
+                      (map expr-code
+                        (map syntax->expr (syntaxes arg ...)))
+                      (code ", "))))
+                ")")))))))
 
-  (define (syntax->expand-expr $env $syntax)
-    (syntax->expr $env (expand-expr $env $syntax)))
+  (define (op2-code $lhs $op $expr)
+    (newline-ended-code
+      (colon-ended-code
+        (space-separated-code
+          (expr-code (lhs->expr $lhs))
+          (string-code $op)
+          (expr-code (syntax->expr $expr))))))
 
-  (define (syntax->expr $env $syntax)
+  (define (syntax->expr $syntax)
     (syntax-case $syntax
       (cast = > >= < <= + - * div
         not and or
@@ -300,59 +205,59 @@
         (expr 2 #f
           (code
             (code-in-round-brackets (type->code #'type))
-            (expr-operand-code (syntax->expr $env #'rhs) 2 #t))))
+            (expr-operand-code (syntax->expr #'rhs) 2 #t))))
       ((= a b)
-        (op2->expr $env 7 #t #'a " == " #'b))
+        (op2->expr 7 #t #'a " == " #'b))
       ((not (= a b))
-        (op2->expr $env 7 #t #'a " != " #'b))
+        (op2->expr 7 #t #'a " != " #'b))
       ((> a b)
-        (op2->expr $env 6 #t #'a " > " #'b))
+        (op2->expr 6 #t #'a " > " #'b))
       ((>= a b)
-        (op2->expr $env 6 #t #'a " >= " #'b))
+        (op2->expr 6 #t #'a " >= " #'b))
       ((< a b)
-        (op2->expr $env 6 #t #'a " < " #'b))
+        (op2->expr 6 #t #'a " < " #'b))
       ((<= a b)
-        (op2->expr $env 6 #t #'a " <= " #'b))
+        (op2->expr 6 #t #'a " <= " #'b))
       ((+ a b)
-        (op2->expr $env 4 #t #'a " + " #'b))
+        (op2->expr 4 #t #'a " + " #'b))
       ((- a)
-        (op1->expr $env 2 #f "-" #'a))
+        (op1->expr 2 #f "-" #'a))
       ((- a b)
-        (op2->expr $env 4 #t #'a " - " #'b))
+        (op2->expr 4 #t #'a " - " #'b))
       ((* a b)
-        (op2->expr $env 3 #t #'a " * " #'b))
+        (op2->expr 3 #t #'a " * " #'b))
       ((div a b)
-        (op2->expr $env 3 #t #'a " / " #'b))
+        (op2->expr 3 #t #'a " / " #'b))
       ((not a)
-        (op1->expr $env 2 #f "!" #'a))
+        (op1->expr 2 #f "!" #'a))
       ((and a b)
-        (op2->expr $env 11 #t #'a " && " #'b))
+        (op2->expr 11 #t #'a " && " #'b))
       ((or a b)
-        (op2->expr $env 12 #t #'a " || " #'b))
+        (op2->expr 12 #t #'a " || " #'b))
       ((bitwise-not a)
-        (op1->expr $env 2 #f "~" #'a))
+        (op1->expr 2 #f "~" #'a))
       ((bitwise-and a b)
-        (op2->expr $env 8 #t #'a " & " #'b))
+        (op2->expr 8 #t #'a " & " #'b))
       ((bitwise-ior a b)
-        (op2->expr $env 10 #t #'a " | " #'b))
+        (op2->expr 10 #t #'a " | " #'b))
       ((bitwise-xor a b)
-        (op2->expr $env 9 #t #'a " ^ " #'b))
+        (op2->expr 9 #t #'a " ^ " #'b))
       ((bitwise-arithmetic-shift-left a b)
-        (op2->expr $env 5 #t #'a " << " #'b))
+        (op2->expr 5 #t #'a " << " #'b))
       ((bitwise-arithmetic-shift-right a b)
-        (op2->expr $env 5 #t #'a " >> " #'b))
+        (op2->expr 5 #t #'a " >> " #'b))
       ((ref var x ...)
-        (ref->expr $env #'(var x ...)))
+        (ref->expr #'(var x ...)))
       ((&ref var x ...)
-        (expr 2 #f (code "&" (expr-code (ref->expr $env #'(var x ...))))))
+        (expr 2 #f (code "&" (expr-code (ref->expr #'(var x ...))))))
       ((if cond true false)
         (expr 13 #f
           (code
-            (expr-operand-code (syntax->expr $env #'cond) 13 #f)
+            (expr-operand-code (syntax->expr #'cond) 13 #f)
             " ? "
-            (expr-code (syntax->expr $env #'true))
+            (expr-code (syntax->expr #'true))
             " : "
-            (expr-operand-code (syntax->expr $env #'false) 13 #t))))
+            (expr-operand-code (syntax->expr #'false) 13 #t))))
       ((id arg ...)
         (parenthesized-expr 1 #t
           (identifier->expr #'id)
@@ -361,15 +266,14 @@
             (apply code-append
               (intercalate
                 (map expr-code
-                  (map
-                    (partial syntax->expr $env)
+                  (map syntax->expr
                     (syntaxes arg ...)))
                 (code ", "))))
           ")"))
       (other
         (value->expr #'other))))
 
-  (define (ref->expr $env $syntax)
+  (define (ref->expr $syntax)
     (syntax-case $syntax (*)
       ((var x ...)
         (fold-left
@@ -380,24 +284,23 @@
               (id (identifier? #'id)
                 (binary-expr 1 #t $expr "." (variable->expr #'id)))
               ((expr)
-                (parenthesized-expr 1 #t $expr "[" (syntax->expr $env #'expr) "]"))))
+                (parenthesized-expr 1 #t $expr "[" (syntax->expr #'expr) "]"))))
           (identifier->expr #'var)
           (syntaxes x ...)))))
 
-  (define (op1->expr $env $priority $left-to-right? $op $rhs)
+  (define (op1->expr $priority $left-to-right? $op $rhs)
     (prefix-expr $priority $left-to-right? $op
-      (syntax->expr $env $rhs)))
+      (syntax->expr $rhs)))
 
-  (define (op2->expr $env $priority $left-to-right? $lhs $op $rhs)
+  (define (op2->expr $priority $left-to-right? $lhs $op $rhs)
     (binary-expr $priority $left-to-right?
-      (syntax->expr $env $lhs)
+      (syntax->expr $lhs)
       $op
-      (syntax->expr $env $rhs)))
+      (syntax->expr $rhs)))
 
   (define (syntax-c $env . $syntaxes)
     (code-string
-      (compiled-value
-        (compiled-code+instrs
-          (compiled $env empty-code)
+      (instrs-code
+        (expand-instrs $env
           #`(#,@$syntaxes)))))
 )

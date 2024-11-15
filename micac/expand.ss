@@ -32,6 +32,18 @@
           #`(if expr
             (then break-body ...)
             (else body ...))))
+      (((id arg ...) body ...) (identifier? #'id)
+        (switch (compiled-transformer $compiled #'id)
+          ((false? _)
+            (compiled+instrs
+              (compiled+instr $compiled #'(id arg ...))
+              #'(body ...)))
+          ((else $transformer)
+            (compiled+instrs $compiled
+              #`(
+                #,@(begin-syntaxes
+                  (compiled-transform $compiled $transformer #'(id arg ...)))
+              body ...)))))
       ((instr instrs ...)
         (compiled+instrs
           (compiled+instr $compiled #'instr)
@@ -131,11 +143,10 @@
                     (partial expand-expr $env)
                     (syntaxes arg ...)))))
             ((else $transformer)
-              (fold-left
-                compiled+instr
-                $compiled
-                (begin-syntaxes
-                  (env-transform $env $transformer $instr)))))))))
+              (compiled+instrs $compiled
+                #`(
+                  #,@(begin-syntaxes
+                    (env-transform $env $transformer $instr))))))))))
 
   (define (expand-expr $env $expr)
     (syntax-case $expr
