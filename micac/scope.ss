@@ -10,12 +10,12 @@
     scope-transform
     scope-unbound
     scope-with
-    pretty-identifier?)
+    scope-unique-gen?)
   (import
     (micascheme)
     (micac expr))
 
-  (define pretty-identifier? (make-parameter #f))
+  (define scope-unique-gen? (make-parameter #f))
 
   (data (scope lookup size))
 
@@ -42,7 +42,7 @@
   (define (scope-gen $scope $id)
     (lets
       ($identifier
-        (if (pretty-identifier?)
+        (if (scope-unique-gen?)
           $id
           (datum->syntax $id
             (string->symbol

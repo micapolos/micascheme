@@ -1,6 +1,6 @@
 (import (micascheme) (micac c) (check) (micac scope))
 
-(parameterize ((pretty-identifier? #t))
+(parameterize ((scope-unique-gen? #t))
 
 (micac-define add-all
   (lambda ($syntax)
