@@ -176,3 +176,11 @@
     (if (bar 0)
       (then (bar 1) (bar 1))
       (else (bar 2) (bar 2)))))
+
+(check-expand-instr
+  (begin (defer (a)) (b))
+  (begin (b) (a)))
+
+(check-expand-instr
+  (begin (break-if x (a)) (defer (b)) (c))
+  (begin (if x (then (a)) (else (c) (b)))))
