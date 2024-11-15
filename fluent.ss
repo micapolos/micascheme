@@ -4,8 +4,12 @@
     (scheme)
     (syntaxes))
 
-  (define-rules-syntax
-    ((fluent expr) expr)
+  (define-rules-syntax (literals with)
+    ((fluent expr)
+      expr)
+    ((fluent expr (with with-var with-expr) rest ...)
+      (let ((with-var expr))
+        (fluent with-expr rest ...)))
     ((fluent expr (fn arg ...) rest ...)
       (let ((var expr))
         (fluent (fn var arg ...) rest ...)))))
