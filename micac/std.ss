@@ -2,7 +2,7 @@
   (export
     bool int uint8_t uint16_t uint32_t uint64_t
     sizeof alloc repeat
-    inc dec printf zero? in-range? << >> xor)
+    inc dec printf zero? not-zero? in-range? << >> xor)
   (import (micac))
 
   (micac
@@ -25,6 +25,7 @@
         (dec counter)))
 
     (macro (zero? x) (= x 0))
+    (macro (not-zero? x) (!= x 0))
 
     (macro (>> x n) (bitwise-arithmetic-shift-right x n))
     (macro (<< x n) (bitwise-arithmetic-shift-left x n))
