@@ -1,39 +1,39 @@
-(import (micascheme) (micac expand) (micac syntax) (micac env) (micac scope))
+(import (micascheme) (micac expand) (micac syntax) (micac scope))
 
 (define-aux-keywords zero one two)
 
-(define $env
-  (fluent (empty-env)
-    (env+ #'bar #'bar)
-    (env+ #'ten #'ten)
-    (env+ #'a #'a)
-    (env+ #'b #'b)
-    (env+ #'c #'c)
-    (env+ #'x #'x)
-    (env+ #'gar #'gar)
-    (env+ #'zero (lambda _ #'0))
-    (env+ #'one (lambda _ #'1))
-    (env+ #'two (lambda _ #'2))
-    (env+ #'foo
+(define $scope
+  (fluent (empty-scope)
+    (scope+ #'bar #'bar)
+    (scope+ #'ten #'ten)
+    (scope+ #'a #'a)
+    (scope+ #'b #'b)
+    (scope+ #'c #'c)
+    (scope+ #'x #'x)
+    (scope+ #'gar #'gar)
+    (scope+ #'zero (lambda _ #'0))
+    (scope+ #'one (lambda _ #'1))
+    (scope+ #'two (lambda _ #'2))
+    (scope+ #'foo
       (syntax-rules ()
         ((_ xs ...) (bar xs ...))))))
 
 (define-rule-syntax (check-expr in out)
   (check
     (equal?
-      (syntax->datum (expand-expr $env #'in))
+      (syntax->datum (expand-expr $scope #'in))
       'out)))
 
 (define-rule-syntax (check-instr in out)
   (check
     (equal?
-      (syntax->datum (expand-instr $env #'in))
+      (syntax->datum (expand-instr $scope #'in))
       'out)))
 
 (define-rule-syntax (check-instrs (in-body ...) (out-body ...))
   (check
     (equal?
-      (syntax->datum #`(#,@(expand-instrs $env #'(in-body ...))))
+      (syntax->datum #`(#,@(expand-instrs $scope #'(in-body ...))))
       '(out-body ...))))
 
 (check-expr zero 0)

@@ -5,7 +5,6 @@
     (code)
     (micac expr)
     (micac syntax)
-    (micac env)
     (micac expand))
 
   (define (size->code $size)

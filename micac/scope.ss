@@ -2,10 +2,12 @@
   (export
     scope scope? scope-lookup scope-size
     empty-scope
+    lookup-scope
     scope+
     scope-gen
     scope-ref
     scope-transformer
+    scope-transform
     scope-unbound
     scope-with
     pretty-identifier?)
@@ -16,6 +18,9 @@
   (define pretty-identifier? (make-parameter #f))
 
   (data (scope lookup size))
+
+  (define (lookup-scope $lookup)
+    (scope $lookup 0))
 
   (define (empty-scope)
     (scope (lambda (_) #f) 0))
@@ -55,6 +60,10 @@
       ((identifier? _) #f)
       ((false? _) #f)
       ((else $transformer) $transformer)))
+
+  (define (scope-transform $scope $transformer $syntax)
+    (transform $transformer $syntax (scope-lookup $scope)))
+
 
   (define (scope-unbound $id)
     (syntax-error $id "unbound identifier"))

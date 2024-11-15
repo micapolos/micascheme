@@ -4,7 +4,7 @@
     micac-define
     micac-externs
     micac-macro)
-  (import (micascheme) (micac syntax-c) (micac syntax) (micac env) (micac expr) (micac expand) (syntax))
+  (import (micascheme) (micac syntax-c) (micac syntax) (micac scope) (micac expr) (micac expand) (syntax))
   (export (import (micac syntax)))
 
   (define-rule-syntax (micac-externs id ...)
@@ -36,6 +36,6 @@
           (syntax-c
             #`(
               #,@(expand-instrs
-                (lookup-env $lookup)
+                (lookup-scope $lookup)
                 #'(instr ...))))))))
 )
