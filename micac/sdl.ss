@@ -78,7 +78,7 @@
       (printf "%s SDL Error: %s\\n" message (SDL_GetError)))
 
     (macro (sdl-init)
-      (break-if (not (= (SDL_Init SDL_INIT_VIDEO) 0))
+      (break-if (!= (SDL_Init SDL_INIT_VIDEO) 0)
         (print-sdl-error "Could not initialize."))
       (defer (SDL_Quit)))
 
@@ -122,11 +122,11 @@
       (sdl-rw-ops-data data size rw-ops))
 
     (macro (sdl-update-texture texture rect pixels pitch)
-      (break-if (not (= (SDL_UpdateTexture texture rect pixels pitch) 0))
+      (break-if (!= (SDL_UpdateTexture texture rect pixels pitch) 0)
         (print-sdl-error "Could not update texture.")))
 
     (macro (sdl-render-copy renderer texture src-rect dst-rect)
-      (break-if (not (= (SDL_RenderCopy renderer texture src-rect dst-rect) 0))
+      (break-if (!= (SDL_RenderCopy renderer texture src-rect dst-rect) 0)
         (print-sdl-error "Could not render copy.")))
 
     (macro (sdl-get-mouse-state x y)

@@ -5,7 +5,7 @@
     ref &ref
     while defer break-if cast then
     macro extern)
-  (import (micascheme))
+  (import (syntax))
 
   (define-aux-keywords
     const var

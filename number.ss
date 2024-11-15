@@ -7,7 +7,8 @@
     positive-integer?
     nonnegative-integer?
     one?
-    bitwise-align)
+    bitwise-align
+    !=)
   (import (scheme))
 
   (define pi (* (asin 1) 2))
@@ -48,4 +49,7 @@
       (bitwise-and
         (+ $value $mask)
         (bitwise-not $mask))))
+
+  (define (!= a b)
+    (not (= a b)))
 )

@@ -152,7 +152,7 @@
     (syntax-case $expr
       (
         cast
-        = not
+        = != not
         < <= > >=
         + - * div
         not and or
@@ -163,6 +163,8 @@
         #`(cast type #,(expand-expr $env #'rhs)))
       ((= arg ...)
         (expand-op2 $env $expr boolean? =))
+      ((!= arg ...)
+        (expand-op2 $env $expr boolean? !=))
       ((< arg ...)
         (expand-op2 $env $expr number? <))
       ((<= arg ...)

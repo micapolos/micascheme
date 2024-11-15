@@ -72,7 +72,7 @@ int main() {
                   const uint32_t v57_sdl_mouse_state = SDL_GetMouseState(&v55_sdl_mouse_x, &v56_sdl_mouse_y);
                   v24_mouse_x = v55_sdl_mouse_x / 2;
                   v25_mouse_y = v56_sdl_mouse_y / 2;
-                  v26_mouse_pressed_ = (v57_sdl_mouse_state & 1) != 0;
+                  v26_mouse_pressed_ = !((v57_sdl_mouse_state & 1) == 0);
                   int v58_counter = 559104;
                   while (v58_counter) {
                     if (v11_pixel_cycle_counter == 0) {
@@ -98,15 +98,15 @@ int main() {
                           const bool v67_attr_ = v66_attr_addr >> 3 > v64_load_addr;
                           v40_attr = v67_attr_ ? 7 : v30_scr[v66_attr_addr];
                         }
-                        const bool v62_pixel_on_ = (v39_bits & 128) != 0;
+                        const bool v62_pixel_on_ = !((v39_bits & 128) == 0);
                         v39_bits = v39_bits << 1;
-                        const bool v63_flash_on_ = (v40_attr & 128) != 0;
-                        const bool v64_alternate_on_ = (v27_frame_counter & 16) != 0;
+                        const bool v63_flash_on_ = !((v40_attr & 128) == 0);
+                        const bool v64_alternate_on_ = !((v27_frame_counter & 16) == 0);
                         const bool v65_ink_on_ = v63_flash_on_ && v64_alternate_on_ ? !v62_pixel_on_ : v62_pixel_on_;
-                        const bool v66_red_ = (v40_attr & (v65_ink_on_ ? 2 : 16)) != 0;
-                        const bool v67_green_ = (v40_attr & (v65_ink_on_ ? 4 : 32)) != 0;
-                        const bool v68_blue_ = (v40_attr & (v65_ink_on_ ? 1 : 8)) != 0;
-                        const bool v69_bright_ = (v40_attr & 64) != 0;
+                        const bool v66_red_ = !((v40_attr & (v65_ink_on_ ? 2 : 16)) == 0);
+                        const bool v67_green_ = !((v40_attr & (v65_ink_on_ ? 4 : 32)) == 0);
+                        const bool v68_blue_ = !((v40_attr & (v65_ink_on_ ? 1 : 8)) == 0);
+                        const bool v69_bright_ = !((v40_attr & 64) == 0);
                         const uint8_t v70_color = v69_bright_ ? 255 : 187;
                         v42_ula_red = v66_red_ ? v70_color : 0;
                         v43_ula_green = v67_green_ ? v70_color : 0;

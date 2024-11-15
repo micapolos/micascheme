@@ -18,6 +18,7 @@
     bitwise-and bitwise-ior bitwise-xor bitwise-not
     bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
     when else)))
+  (export (import (only (number) !=)))
 
   (define-aux-keywords run externs)
 
