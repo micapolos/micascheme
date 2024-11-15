@@ -2,104 +2,104 @@
 
 (define-aux-keywords micac lines)
 
-(define-syntax check-generates
+(define-syntax check-c-string
   (syntax-rules (micac lines)
     ((_ (micac instr ...) string)
       (check (equal? (syntax-c #'(instr ...)) string)))))
 
-(check-generates
+(check-c-string
   (micac)
   (lines-string))
 
-(check-generates
+(check-c-string
   (micac (const int x 10))
   (lines-string "const int x = 10;"))
 
-(check-generates
+(check-c-string
   (micac (var int x))
   (lines-string "int x;"))
 
-(check-generates
+(check-c-string
   (micac (var int some-variable))
   (lines-string "int some_variable;"))
 
-(check-generates
+(check-c-string
   (micac (var (* uint8_t) x))
   (lines-string "uint8_t* x;"))
 
-(check-generates
+(check-c-string
   (micac (var uint8_t (* x)))
   (lines-string "uint8_t *x;"))
 
-(check-generates
+(check-c-string
   (micac (var uint8_t (* (* x))))
   (lines-string "uint8_t **x;"))
 
-(check-generates
+(check-c-string
   (micac (var uint8_t (* x 24)))
   (lines-string "uint8_t x[24];"))
 
-(check-generates
+(check-c-string
   (micac (var uint8_t (* (* x 24) 32)))
   (lines-string "uint8_t x[24][32];"))
 
-(check-generates
+(check-c-string
   (micac (var int x y))
   (lines-string "int x = y;"))
 
-(check-generates
+(check-c-string
   (micac (begin))
   (lines-string "{" "}"))
 
-(check-generates
+(check-c-string
   (micac (set x 10))
   (lines-string "x = 10;"))
 
-(check-generates
+(check-c-string
   (micac (set x + 10))
   (lines-string "x += 10;"))
 
-(check-generates
+(check-c-string
   (micac (set x - 10))
   (lines-string "x -= 10;"))
 
-(check-generates
+(check-c-string
   (micac (set x * 10))
   (lines-string "x *= 10;"))
 
-(check-generates
+(check-c-string
   (micac (set x div 10))
   (lines-string "x /= 10;"))
 
-(check-generates
+(check-c-string
   (micac (set x and 10))
   (lines-string "x &&= 10;"))
 
-(check-generates
+(check-c-string
   (micac (set x or 10))
   (lines-string "x ||= 10;"))
 
-(check-generates
+(check-c-string
   (micac (set x bitwise-and 10))
   (lines-string "x &= 10;"))
 
-(check-generates
+(check-c-string
   (micac (set x bitwise-ior 10))
   (lines-string "x |= 10;"))
 
-(check-generates
+(check-c-string
   (micac (set x bitwise-xor 10))
   (lines-string "x ^= 10;"))
 
-(check-generates
+(check-c-string
   (micac (set x bitwise-arithmetic-shift-left 10))
   (lines-string "x <<= 10;"))
 
-(check-generates
+(check-c-string
   (micac (set x bitwise-arithmetic-shift-right 10))
   (lines-string "x >>= 10;"))
 
-(check-generates
+(check-c-string
   (micac
     (set x (- a))
     (set x (bitwise-not a))
@@ -109,11 +109,11 @@
     "x = ~a;"
     "x = !a;"))
 
-(check-generates
+(check-c-string
   (micac (set pixels (cast (* uint8_t) ptr)))
   (lines-string "pixels = (uint8_t*)ptr;"))
 
-(check-generates
+(check-c-string
   (micac
     (set x (+ a b))
     (set x (- a b))
@@ -141,7 +141,7 @@
     "x = a << b;"
     "x = a >> b;"))
 
-(check-generates
+(check-c-string
   (micac
     (set x (= a b))
     (set x (not (= a b)))
@@ -157,48 +157,48 @@
     "x = a < b;"
     "x = a <= b;"))
 
-(check-generates
+(check-c-string
   (micac (set x (+ (+ a b) c)))
   (lines-string "x = a + b + c;"))
 
-(check-generates
+(check-c-string
   (micac (set x (+ a (+ b c))))
   (lines-string "x = a + (b + c);"))
 
-(check-generates
+(check-c-string
   (micac (set x (* (+ a b) c)))
   (lines-string "x = (a + b) * c;"))
 
-(check-generates
+(check-c-string
   (micac (set x (+ a (* b c))))
   (lines-string "x = a + b * c;"))
 
-(check-generates (micac (set x (ref y))) (lines-string "x = y;"))
-(check-generates (micac (set x (ref y z))) (lines-string "x = y.z;"))
-(check-generates (micac (set x (ref y (10)))) (lines-string "x = y[10];"))
-(check-generates (micac (set x (ref y ((+ a b))))) (lines-string "x = y[a + b];"))
-(check-generates (micac (set x (ref y *))) (lines-string "x = *y;"))
-(check-generates (micac (set x (ref y a b (10) *))) (lines-string "x = *y.a.b[10];"))
+(check-c-string (micac (set x (ref y))) (lines-string "x = y;"))
+(check-c-string (micac (set x (ref y z))) (lines-string "x = y.z;"))
+(check-c-string (micac (set x (ref y (10)))) (lines-string "x = y[10];"))
+(check-c-string (micac (set x (ref y ((+ a b))))) (lines-string "x = y[a + b];"))
+(check-c-string (micac (set x (ref y *))) (lines-string "x = *y;"))
+(check-c-string (micac (set x (ref y a b (10) *))) (lines-string "x = *y.a.b[10];"))
 
-(check-generates (micac (set x (&ref y))) (lines-string "x = &y;"))
-(check-generates (micac (set x (&ref y z))) (lines-string "x = &y.z;"))
-(check-generates (micac (set x (&ref y (10)))) (lines-string "x = &y[10];"))
-(check-generates (micac (set x (&ref y ((+ a b))))) (lines-string "x = &y[a + b];"))
-(check-generates (micac (set x (&ref y *))) (lines-string "x = &*y;"))
-(check-generates (micac (set x (&ref y a b (10) *))) (lines-string "x = &*y.a.b[10];"))
+(check-c-string (micac (set x (&ref y))) (lines-string "x = &y;"))
+(check-c-string (micac (set x (&ref y z))) (lines-string "x = &y.z;"))
+(check-c-string (micac (set x (&ref y (10)))) (lines-string "x = &y[10];"))
+(check-c-string (micac (set x (&ref y ((+ a b))))) (lines-string "x = &y[a + b];"))
+(check-c-string (micac (set x (&ref y *))) (lines-string "x = &*y;"))
+(check-c-string (micac (set x (&ref y a b (10) *))) (lines-string "x = &*y.a.b[10];"))
 
-(check-generates (micac (set (x) z)) (lines-string "x = z;"))
-(check-generates (micac (set (x y) z)) (lines-string "x.y = z;"))
-(check-generates (micac (set (x (10)) z)) (lines-string "x[10] = z;"))
-(check-generates (micac (set (x ((+ a b))) z)) (lines-string "x[a + b] = z;"))
-(check-generates (micac (set (x *) z)) (lines-string "*x = z;"))
-(check-generates (micac (set (x y a b (10) *) z)) (lines-string "*x.y.a.b[10] = z;"))
+(check-c-string (micac (set (x) z)) (lines-string "x = z;"))
+(check-c-string (micac (set (x y) z)) (lines-string "x.y = z;"))
+(check-c-string (micac (set (x (10)) z)) (lines-string "x[10] = z;"))
+(check-c-string (micac (set (x ((+ a b))) z)) (lines-string "x[a + b] = z;"))
+(check-c-string (micac (set (x *) z)) (lines-string "*x = z;"))
+(check-c-string (micac (set (x y a b (10) *) z)) (lines-string "*x.y.a.b[10] = z;"))
 
-(check-generates
+(check-c-string
   (micac (set a (if x y z)))
   (lines-string "a = x ? y : z;"))
 
-(check-generates
+(check-c-string
   (micac
     (if x
       (then
@@ -216,7 +216,7 @@
     "  x = 40;"
     "}"))
 
-(check-generates
+(check-c-string
   (micac
     (while x
       (set x 10)
@@ -227,7 +227,7 @@
     "  x = 20;"
     "}"))
 
-(check-generates
+(check-c-string
   (micac
     (when x
       (set x 10)
@@ -238,14 +238,14 @@
     "  x = 20;"
     "}"))
 
-(check-generates
+(check-c-string
   (micac (set x + (bitwise-and (- (+ x 10) 20) #xff)))
   (lines-string "x += x + 10 - 20 & 255;"))
 
-(check-generates
+(check-c-string
   (micac (printf "%i\\n" 10))
   (lines-string "printf(\"%i\\n\", 10);"))
 
-(check-generates
+(check-c-string
   (micac (SDL_CopyTexture x (SDL_Rect 0 0 20 30)))
   (lines-string "SDL_CopyTexture(x, SDL_Rect(0, 0, 20, 30));"))
