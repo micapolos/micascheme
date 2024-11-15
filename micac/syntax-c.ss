@@ -195,7 +195,7 @@
 
   (define (syntax->expr $syntax)
     (syntax-case $syntax
-      (cast = != > >= < <= + - * div
+      (cast = > >= < <= + - * div
         not and or
         bitwise-and bitwise-ior bitwise-xor bitwise-not
         bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
@@ -206,10 +206,10 @@
           (code
             (code-in-round-brackets (type->code #'type))
             (expr-operand-code (syntax->expr #'rhs) 2 #t))))
+      ((not (= a b))
+        (op2->expr 7 #t #'a " != " #'b))
       ((= a b)
         (op2->expr 7 #t #'a " == " #'b))
-      ((!= a b)
-        (op2->expr 7 #t #'a " != " #'b))
       ((> a b)
         (op2->expr 6 #t #'a " > " #'b))
       ((>= a b)

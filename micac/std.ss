@@ -1,7 +1,7 @@
 (library (micac std)
   (export
     bool int uint8_t uint16_t uint32_t uint64_t
-    sizeof alloc repeat
+    sizeof alloc repeat !=
     inc dec printf zero? not-zero? in-range? << >> xor)
   (import (micac))
 
@@ -17,6 +17,8 @@
 
     (macro (inc id) (set id + 1))
     (macro (dec id) (set id - 1))
+
+    (macro (!= a b) (not (= a b)))
 
     (macro (repeat count body ...)
       (var int counter count)
