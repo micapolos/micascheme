@@ -4,76 +4,76 @@
     expand-lhs
     expand-instr
     expand-instrs)
-  (import (micascheme) (micac env) (micac syntax) (micac compiled))
+  (import (micascheme) (micac env) (micac syntax) (micac expanded))
 
-  (define (compiled+syntax $compiled $syntax)
-    (compiled-map
-      ($syntaxes $compiled)
+  (define (expanded+syntax $expanded $syntax)
+    (expanded-map
+      ($syntaxes $expanded)
       (push $syntaxes $syntax)))
 
   (define (expand-instrs $env $syntax)
     (fluent $env
-      (compiled (stack))
-      (compiled+instrs $syntax)
-      (compiled-value)
+      (expanded (stack))
+      (expanded+instrs $syntax)
+      (expanded-value)
       (reverse)))
 
   (define (expand-instr $env $syntax)
     (force-single (expand-instrs $env #`(#,$syntax))))
 
-  (define (compiled+instrs $compiled $instrs)
+  (define (expanded+instrs $expanded $instrs)
     (syntax-case $instrs (defer break-if)
-      (() $compiled)
+      (() $expanded)
       (((defer deferred ...) body ...)
-        (compiled+instrs $compiled
+        (expanded+instrs $expanded
           #`(body ... deferred ...)))
       (((break-if expr break-body ...) body ...)
-        (compiled+instr $compiled
+        (expanded+instr $expanded
           #`(if expr
             (then break-body ...)
             (else body ...))))
       (((id arg ...) body ...) (identifier? #'id)
-        (switch (compiled-transformer $compiled #'id)
+        (switch (expanded-transformer $expanded #'id)
           ((false? _)
-            (compiled+instrs
-              (compiled+instr $compiled #'(id arg ...))
+            (expanded+instrs
+              (expanded+instr $expanded #'(id arg ...))
               #'(body ...)))
           ((else $transformer)
-            (compiled+instrs $compiled
+            (expanded+instrs $expanded
               #`(
                 #,@(begin-syntaxes
-                  (compiled-transform $compiled $transformer #'(id arg ...)))
+                  (expanded-transform $expanded $transformer #'(id arg ...)))
               body ...)))))
       ((instr instrs ...)
-        (compiled+instrs
-          (compiled+instr $compiled #'instr)
+        (expanded+instrs
+          (expanded+instr $expanded #'instr)
           #'(instrs ...)))))
 
-  (define (declarator->compiled-syntax $env $declarator)
+  (define (declarator->expanded-syntax $env $declarator)
     (syntax-case $declarator (*)
       (id (identifier? #'id)
         (lets
           ((pair $env $identifier) (env-gen $env #'id))
-          (compiled $env $identifier)))
+          (expanded $env $identifier)))
       ((* decl)
-        (compiled-map
-          ($compiled-decl (declarator->compiled-syntax $env #'decl))
-          #`(* #,$compiled-decl)))
+        (expanded-map
+          ($expanded-decl (declarator->expanded-syntax $env #'decl))
+          #`(* #,$expanded-decl)))
       ((* decl expr)
         (lets
           ($expr (expand-expr $env #'expr))
-          (compiled-map
-            ($compiled-decl (declarator->compiled-syntax $env #'decl))
-            #`(* #,$compiled-decl #,$expr))))))
+          (expanded-map
+            ($expanded-decl (declarator->expanded-syntax $env #'decl))
+            #`(* #,$expanded-decl #,$expr))))))
 
-  (define (compiled+instr $compiled $instr)
+  (define (expanded+instr $expanded $instr)
     (lets
-      ((compiled $env $syntaxes) $compiled)
+      ((expanded $env $syntaxes) $expanded)
       (syntax-case $instr (extern macro begin var const if when while then else set)
         ((extern id)
-          (compiled+ $compiled (identifier id) #f))
+          (expanded+ $expanded (identifier id) #f))
         ((macro (id param ...) body ...)
-          (compiled+ $compiled (identifier id)
+          (expanded+ $expanded (identifier id)
             (lambda ($syntax)
               (lambda ($env)
                 (syntax-case $syntax ()
@@ -83,52 +83,52 @@
                       #'(arg ...)
                       #'(begin body ...))))))))
         ((macro id expr)
-          (compiled+ $compiled (identifier id)
+          (expanded+ $expanded (identifier id)
             (lambda ($syntax)
               (lambda ($env)
                 #'expr))))
         ((begin instr ...)
-          (compiled+syntax $compiled
+          (expanded+syntax $expanded
             #`(begin
               #,@(expand-instrs $env #'(instr ...)))))
         ((var type decl)
-          (compiled-map
-            ($decl (declarator->compiled-syntax $env #'decl))
+          (expanded-map
+            ($decl (declarator->expanded-syntax $env #'decl))
             (push $syntaxes
               #`(var type #,$decl))))
         ((var type decl expr)
-          (compiled-map
-            ($decl (declarator->compiled-syntax $env #'decl))
+          (expanded-map
+            ($decl (declarator->expanded-syntax $env #'decl))
             (push $syntaxes
               #`(var type #,$decl #,(expand-expr $env #'expr)))))
         ((const type decl expr)
-          (compiled-map
-            ($decl (declarator->compiled-syntax $env #'decl))
+          (expanded-map
+            ($decl (declarator->expanded-syntax $env #'decl))
             (push $syntaxes
               #`(const type #,$decl #,(expand-expr $env #'expr)))))
         ((if expr (then then-body ...) (else else-body ...))
-          (compiled+syntax $compiled
+          (expanded+syntax $expanded
             #`(if
               #,(expand-expr $env #'expr)
               (then #,@(expand-instrs $env #'(then-body ...)))
               (else #,@(expand-instrs $env #'(else-body ...))))))
         ((when expr body ...)
-          (compiled+syntax $compiled
+          (expanded+syntax $expanded
             #`(when
               #,(expand-expr $env #'expr)
               #,@(expand-instrs $env #'(body ...)))))
         ((while expr body ...)
-          (compiled+syntax $compiled
+          (expanded+syntax $expanded
             #`(while
               #,(expand-expr $env #'expr)
               #,@(expand-instrs $env #'(body ...)))))
         ((set lhs expr)
-          (compiled+syntax $compiled
+          (expanded+syntax $expanded
             #`(set
               #,(expand-lhs $env #'lhs)
               #,(expand-expr $env #'expr))))
         ((set lhs op expr)
-          (compiled+syntax $compiled
+          (expanded+syntax $expanded
             #`(set
               #,(expand-lhs $env #'lhs)
               op
@@ -136,14 +136,14 @@
         ((id arg ...) (identifier? #'id)
           (switch (env-ref $env #'id)
             ((identifier? $identifier)
-              (compiled+syntax $compiled
+              (expanded+syntax $expanded
                 #`(
                   #,$identifier
                   #,@(map
                     (partial expand-expr $env)
                     (syntaxes arg ...)))))
             ((else $transformer)
-              (compiled+instrs $compiled
+              (expanded+instrs $expanded
                 #`(
                   #,@(begin-syntaxes
                     (env-transform $env $transformer $instr))))))))))
