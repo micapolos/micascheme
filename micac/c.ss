@@ -35,7 +35,6 @@
         (datum->syntax #'+
           (syntax-c
             #`(
-              #,@(expand-instrs
-                (lookup-scope $lookup)
+              #,@(expand-instrs $lookup
                 #'(instr ...))))))))
 )

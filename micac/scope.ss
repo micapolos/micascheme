@@ -1,8 +1,6 @@
 (library (micac scope)
   (export
-    scope scope? scope-lookup scope-size
     empty-scope
-    lookup-scope
     scope+
     scope-gen
     scope-ref
@@ -11,30 +9,22 @@
     scope-unbound
     scope-with
     scope-unique-gen?)
-  (import
-    (micascheme)
-    (micac expr))
+  (import (micascheme))
 
-  (define scope-unique-gen? (make-parameter #f))
-
-  (data (scope lookup size))
-
-  (define (lookup-scope $lookup)
-    (scope $lookup 0))
+  (define scope-unique-gen?
+    (make-parameter #f))
 
   (define (empty-scope)
-    (scope (lambda (_) #f) 0))
+    (lambda (_) #f))
 
   (define (scope-ref $scope $id)
-    (app (scope-lookup $scope) $id))
+    ($scope $id))
 
   (define (scope+ $scope $id $item)
-    (scope
-      (lambda ($lookup-id)
-        (if (free-identifier=? $lookup-id $id)
-          $item
-          (scope-ref $scope $lookup-id)))
-      (+ (scope-size $scope) 1)))
+    (lambda ($lookup-id)
+      (if (free-identifier=? $lookup-id $id)
+        $item
+        (scope-ref $scope $lookup-id))))
 
   (define (scope-with . $bindings)
     (fold-left scope+ (empty-scope) $bindings))
@@ -44,7 +34,12 @@
       ($identifier
         (if (scope-unique-gen?)
           $id
-          (parameterize ((gensym-prefix (fluent $id (syntax->datum) (symbol->string) (string-append "_"))))
+          (parameterize
+            ((gensym-prefix
+              (fluent $id
+                (syntax->datum)
+                (symbol->string)
+                (string-append "_"))))
             (fluent (list $id)
               (generate-temporaries)
               (car)
@@ -63,8 +58,7 @@
       ((else $transformer) $transformer)))
 
   (define (scope-transform $scope $transformer $syntax)
-    (transform $transformer $syntax (scope-lookup $scope)))
-
+    (transform $transformer $syntax $scope))
 
   (define (scope-unbound $id)
     (syntax-error $id "unbound identifier"))
