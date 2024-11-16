@@ -2,8 +2,7 @@
   (export
     define-case-syntaxes
     define-rules-syntax
-    define-rules-syntaxes
-    literals)
+    define-rules-syntaxes)
   (import
     (scheme)
     (syntax)
@@ -13,8 +12,6 @@
     (pair)
     (syntax-keywords))
   (export (import (syntax-keywords)))
-
-  (define-aux-keyword literals)
 
   (define-syntax (define-case-syntaxes $syntax)
     (syntax-case $syntax (literals)

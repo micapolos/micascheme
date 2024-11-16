@@ -64,19 +64,19 @@
         $syntaxes)))
 
   (define-syntax define-rule-syntax
-    (syntax-rules ()
-      ((_ (name param ...) body)
+    (syntax-rules (literals)
+      ((_ (literals literal ...) (name param ...) body ...)
+        (identifier? #'name)
         (define-syntax name
-          (syntax-rules ()
-            ((_ param ...) body))))
-      ((_ (name param ...) fender body)
-        (define-syntax name
-          (syntax-rules ()
-            ((_ param ...) fender body))))
+          (syntax-rules (literal ...)
+            ((_ param ...) body ...))))
       ((_ name body)
+        (identifier? #'name)
         (define-syntax (name $syntax)
           (syntax-case $syntax ()
-            (_ #`body))))))
+            (_ #'body))))
+      ((_ body ...)
+        (define-rule-syntax (literals) body ...))))
 
   (define-syntax define-case-syntax
     (syntax-rules ()
