@@ -7,12 +7,12 @@
       ((_ $id) (identifier? #'$id)
         #`(define-syntax ($id $syntax)
           (syntax-case $syntax ()
-            ((_ $op #,ellipsis)
+            ((_ $op (... ...))
               #`(begin
                 #,@(map
                   (lambda ($op)
                     (#,(z80-gen) $op))
-                  (syntax->list #'($op #,ellipsis))))))))))
+                  (syntax->list #'($op (... ...)))))))))))
 
   (define-z80-op z80-op)
 )

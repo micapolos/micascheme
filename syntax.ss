@@ -17,7 +17,6 @@
     syntax-case-opt
     syntax-inline
     inline-indexed
-    ellipsis
     fenders implicit
     syntax-rule->clause
     syntax->datum/annotation
@@ -141,8 +140,6 @@
         #'(let-syntax
           ((inlined (lambda (_) $expr)))
           inlined))))
-
-  (define ellipsis (datum->syntax #'ellipsis '...))
 
   (define (syntax-replace $from-id $to-id $syntax)
     (syntax-case $syntax ()
