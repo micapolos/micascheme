@@ -65,18 +65,19 @@
 
   (define-syntax define-rule-syntax
     (syntax-rules (literals)
-      ((_ (literals literal ...) (name param ...) body ...)
+      ((_ (literal ...) (name param ...) body rest ...)
         (identifier? #'name)
         (define-syntax name
           (syntax-rules (literal ...)
-            ((_ param ...) body ...))))
-      ((_ name body)
+            ((_ param ...) body rest ...))))
+      ((_ name expr)
         (identifier? #'name)
         (define-syntax (name $syntax)
           (syntax-case $syntax ()
-            (_ #'body))))
+            (_ #'expr))))
       ((_ body ...)
-        (define-rule-syntax (literals) body ...))))
+        (define-rule-syntax ()
+          body ...))))
 
   (define-syntax define-case-syntax
     (syntax-rules ()
