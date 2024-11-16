@@ -8,4 +8,5 @@
   (micac syntax-c)
   (micac scope)
   (micac expand)
+  (micac run)
   (micac lib all))

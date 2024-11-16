@@ -87,7 +87,8 @@
       (
         begin var const if when while then else set
         + - * div and or bitwise-and bitwise-ior bitwise-xor
-        bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right)
+        bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
+        return)
       ((begin instr ...)
         (newline-ended-code (block-code (syntaxes instr ...))))
       ((var type decl)
@@ -161,6 +162,12 @@
         (op2-code #'lhs "<<=" #'expr))
       ((set lhs bitwise-arithmetic-shift-right expr)
         (op2-code #'lhs ">>=" #'expr))
+      ((return expr)
+        (newline-ended-code
+          (colon-ended-code
+            (space-separated-code
+              "return"
+              (expr-code (syntax->expr #'expr))))))
       ((id arg ...)
         (newline-ended-code
           (colon-ended-code

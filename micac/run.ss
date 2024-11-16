@@ -21,5 +21,5 @@
         (call-with-output-file "micac/run.c"
           (lambda ($port) (put-string $port $string))
           `(replace))
-        (c-run $string  "`sdl2-config --cflags --libs`"))))
+        (c-run $string "`sdl2-config --cflags --libs`"))))
 )

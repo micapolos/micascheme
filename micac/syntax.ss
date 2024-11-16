@@ -4,7 +4,7 @@
     set
     ref &ref
     while defer break-if cast then
-    macro extern)
+    macro extern return)
   (import (syntax))
 
   (define-aux-keywords
@@ -12,5 +12,5 @@
     set
     ref &ref
     while defer break-if cast then
-    macro extern)
+    macro extern return)
 )
