@@ -5,13 +5,13 @@
 
 (micac
   (run
-    (const int width 352)
-    (const int height 288)
-    (const int window-scale 2)
-    (const int pixel-count (* width height))
-    (const int bits-per-pixel 4)
-    (const int pixels-size (* pixel-count bits-per-pixel))
-    (const int pixels-pitch (* width bits-per-pixel))
+    (macro width 352)
+    (macro height 288)
+    (macro window-scale 2)
+    (macro pixel-count (* width height))
+    (macro bits-per-pixel 4)
+    (macro pixels-size (* pixel-count bits-per-pixel))
+    (macro pixels-pitch (* width bits-per-pixel))
 
     (sdl-init)
     (sdl-window window "My window" (* width window-scale) (* height window-scale))
