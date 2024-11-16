@@ -1,11 +1,11 @@
 (import
   (micac)
-  (micac std)
-  (micac emu)
-  (micac sdl)
-  (micac ula)
-  (micac plasma)
-  (micac background)
+  (micac lib std)
+  (micac lib emu)
+  (micac lib sdl)
+  (micac zx-spectrum background)
+  (micac zx-spectrum ula)
+  (micac misc plasma)
   (c run))
 
 (c-run-echo? #t)

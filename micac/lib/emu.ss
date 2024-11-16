@@ -1,4 +1,4 @@
-(library (micac emu)
+(library (micac lib emu)
   (export
     emu video
     width height video-x video-y
@@ -9,8 +9,8 @@
     run-emu)
   (import
     (micac)
-    (micac std)
-    (micac sdl)
+    (micac lib std)
+    (micac lib sdl)
     (syntax)
     (identifier))
 

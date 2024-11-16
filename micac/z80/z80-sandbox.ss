@@ -1,7 +1,7 @@
 (import
   (micac)
-  (micac emu)
-  (micac std)
+  (micac lib emu)
+  (micac lib std)
   (micac z80 z80))
 
 (run-emu

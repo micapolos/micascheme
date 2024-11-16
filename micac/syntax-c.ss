@@ -4,6 +4,7 @@
     (micascheme)
     (code)
     (micac expr)
+    (micac code)
     (micac syntax)
     (micac expand))
 
@@ -37,15 +38,6 @@
           (declarator->code #'decl)
           (code-in-square-brackets
             (expr-code (syntax->expr #'expr)))))))
-
-  (define (identifier->code $identifier)
-    (string-code
-      (list->string
-        (map-with
-          ($char (fluent $identifier (syntax->datum) (symbol->string) (string->list)))
-          (case $char
-            ((#\- #\?) #\_)
-            (else $char))))))
 
   (define (literal->expr $literal)
     (switch (syntax->datum $literal)

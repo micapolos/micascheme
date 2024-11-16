@@ -1,7 +1,7 @@
 (import
   (micac)
-  (micac std)
-  (micac sdl))
+  (micac lib std)
+  (micac lib sdl))
 
 (micac
   (run

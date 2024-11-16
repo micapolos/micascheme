@@ -1,4 +1,4 @@
-(library (micac sdl)
+(library (micac lib sdl)
   (export
     sdl-init
     sdl-window
@@ -41,7 +41,7 @@
     SDL_RENDERER_PRESENTVSYNC
     SDL_PIXELFORMAT_BGRA8888
     SDL_TEXTUREACCESS_STREAMING)
-  (import (micac) (micac std))
+  (import (micac) (micac lib std))
 
   (micac
     (externs

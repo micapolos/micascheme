@@ -1,8 +1,8 @@
-(library (micac ula)
+(library (micac zx-spectrum ula)
   (export ula)
   (import
     (micac)
-    (micac std))
+    (micac lib std))
 
   (micac
     (macro (ula video-x video-y mem screen? red green blue update)

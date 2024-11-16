@@ -1,4 +1,4 @@
-(library (micac std)
+(library (micac lib std)
   (export
     bool int uint8_t uint16_t uint32_t uint64_t
     sizeof alloc repeat !=

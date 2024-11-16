@@ -2,7 +2,7 @@
   (export z80)
   (import
     (micac)
-    (micac std))
+    (micac lib std))
 
   (micac
     (macro

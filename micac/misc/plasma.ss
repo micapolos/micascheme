@@ -1,8 +1,8 @@
-(library (micac plasma)
+(library (micac misc plasma)
   (export plasma)
   (import
     (micac)
-    (micac std))
+    (micac lib std))
 
   (micac
     (macro (plasma video-x video-y counter red green blue update)

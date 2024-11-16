@@ -1,6 +1,6 @@
-(library (micac background)
+(library (micac zx-spectrum background)
   (export background)
-  (import (micac) (micac std))
+  (import (micac) (micac lib std))
 
   (micac
     (macro (background size red green blue update)
