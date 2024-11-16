@@ -6,8 +6,8 @@
     define-case-syntax
     define-aux-keyword
     define-aux-keywords
-    begin-syntaxes
-    begin-syntax
+    unbegin-syntaxes
+    unbegin-syntax
     expand-begin-syntaxes
     define-lookup-syntax
     syntax-selector
@@ -40,13 +40,13 @@
   (define (syntax-null? $syntax)
     (null? (syntax->datum $syntax)))
 
-  (define (begin-syntaxes $syntax)
+  (define (unbegin-syntaxes $syntax)
     (syntax-case $syntax (begin)
       ((begin $syntax ...)
         (syntax->list #'($syntax ...)))
       ($other (list #'$other))))
 
-  (define (begin-syntax $syntax)
+  (define (unbegin-syntax $syntax)
     (syntax-case $syntax (begin)
       ((begin $syntax)
         #'$syntax)

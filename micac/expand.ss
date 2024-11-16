@@ -41,7 +41,7 @@
           ((else $transformer)
             (scoped+instrs $scoped
               #`(
-                #,@(begin-syntaxes
+                #,@(unbegin-syntaxes
                   (scoped-transform $scoped $transformer #'(id arg ...)))
               body ...)))))
       ((instr instrs ...)
@@ -145,7 +145,7 @@
             ((else $transformer)
               (scoped+instrs $scoped
                 #`(
-                  #,@(begin-syntaxes
+                  #,@(unbegin-syntaxes
                     (scope-transform $scope $transformer $instr))))))))))
 
   (define (expand-expr $scope $expr)
@@ -225,7 +225,7 @@
                 (syntaxes arg ...))))
           ((else $transformer)
             (expand-expr $scope
-              (begin-syntax
+              (unbegin-syntax
                 (scope-transform $scope $transformer $expr))))))
       (id (identifier? #'id)
         (switch (scope-ref $scope #'id)
@@ -233,7 +233,7 @@
             $identifier)
           ((else $transformer)
             (expand-expr $scope
-              (begin-syntax
+              (unbegin-syntax
                 (scope-transform $scope $transformer $expr))))))
       (other #'other)))
 
