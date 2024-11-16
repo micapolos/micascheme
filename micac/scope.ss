@@ -8,11 +8,11 @@
     scope-transform
     scope-unbound
     scope-with
-    scope-pretty-gen?)
+    scope-gen?)
   (import (micascheme))
 
-  (define scope-pretty-gen?
-    (make-parameter #f))
+  (define scope-gen?
+    (make-parameter #t))
 
   (define (empty-scope)
     (lambda (_) #f))
@@ -32,9 +32,9 @@
   (define (scope-gen $scope $id)
     (lets
       ($identifier
-        (if (scope-pretty-gen?)
-          $id
-          (generate-identifier $id)))
+        (if (scope-gen?)
+          (generate-identifier $id)
+          $id))
       (pair
         (scope+ $scope $id $identifier)
         $identifier)))
