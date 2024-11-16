@@ -67,9 +67,15 @@
       (other
         (literal->expr #'other))))
 
-  (define (instrs-code $instrs)
-    (apply code-append
-      (map instr-code $instrs)))
+  (define (instrs-code $top-level? $instrs)
+    (syntax-case $instrs ()
+      (() (code ""))
+      ((instr ... last)
+        (code
+          (apply code-append
+            (map (partial instr-code #f)
+              (syntax->list #'(instr ...))))
+          (instr-code #t #'last)))))
 
   (define (instr->begin $instr)
     (syntax-case $instr (begin)
@@ -80,9 +86,9 @@
     (code-in-curly-brackets
       (code-indent
         (code "\n"
-          (instrs-code $instrs)))))
+          (instrs-code #f $instrs)))))
 
-  (define (instr-code $instr)
+  (define (instr-code $allow-return? $instr)
     (syntax-case $instr
       (
         begin var const if when while then else set
@@ -120,24 +126,24 @@
             "if"
             (code-in-round-brackets
               (expr-code (syntax->expr #'expr)))
-            (block-code (syntaxes then-body ...))
+            (block-code #'(then-body ...))
           (space-separated-code
             "else"
-            (block-code (syntaxes else-body ...))))))
+            (block-code #'(else-body ...))))))
       ((when expr body ...)
         (newline-ended-code
           (space-separated-code
             "if"
             (code-in-round-brackets
               (expr-code (syntax->expr #'expr)))
-            (block-code (syntaxes body ...)))))
+            (block-code #'(body ...)))))
       ((while expr body ...)
         (newline-ended-code
           (space-separated-code
             "while"
             (code-in-round-brackets
               (expr-code (syntax->expr #'expr)))
-            (block-code (syntaxes body ...)))))
+            (block-code #'(body ...)))))
       ((set lhs expr)
         (op2-code #'lhs "=" #'expr))
       ((set lhs + expr)
@@ -163,11 +169,13 @@
       ((set lhs bitwise-arithmetic-shift-right expr)
         (op2-code #'lhs ">>=" #'expr))
       ((return expr)
-        (newline-ended-code
-          (colon-ended-code
-            (space-separated-code
-              "return"
-              (expr-code (syntax->expr #'expr))))))
+        (if $allow-return?
+          (newline-ended-code
+            (colon-ended-code
+              (space-separated-code
+                "return"
+                (expr-code (syntax->expr #'expr)))))
+          (syntax-error #'return "not allowed")))
       ((id arg ...)
         (newline-ended-code
           (colon-ended-code
@@ -300,5 +308,5 @@
     (syntax-case $syntax ()
       ((body ...)
         (code-string
-          (instrs-code (syntaxes body ...))))))
+          (instrs-code #t #'(body ...))))))
 )

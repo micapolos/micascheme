@@ -1,3 +1,3 @@
-(import (micac) (only (micascheme) check equal?))
+(import (micac))
 
 (check (equal? (micac (run (return 128))) 128))

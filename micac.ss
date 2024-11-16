@@ -18,6 +18,7 @@
     bitwise-and bitwise-ior bitwise-xor bitwise-not
     bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
     when else)))
+  (export (import (only (micascheme) check equal?)))
 
   (define-aux-keywords run externs)
 
@@ -36,5 +37,4 @@
                   ((macro body ...)
                     #`(micac-macro body ...))))
               (syntax->list #'(item ...))))))))
-
 )
