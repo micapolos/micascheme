@@ -7,7 +7,6 @@
     scope-transformer
     scope-transform
     scope-unbound
-    scope-with
     scope-gen?)
   (import (micascheme))
 
@@ -25,9 +24,6 @@
       (if (free-identifier=? $lookup-id $id)
         $item
         (scope-ref $scope $lookup-id))))
-
-  (define (scope-with . $bindings)
-    (fold-left scope+ (empty-scope) $bindings))
 
   (define (scope-gen $scope $id)
     (lets
