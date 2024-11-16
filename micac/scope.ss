@@ -44,13 +44,14 @@
       ($identifier
         (if (scope-unique-gen?)
           $id
-          (datum->syntax $id
-            (string->symbol
-              (string-append
-                "v"
-                (number->string (scope-size $scope))
-                "-"
-                (symbol->string (syntax->datum $id)))))))
+          (parameterize ((gensym-prefix (fluent $id (syntax->datum) (symbol->string) (string-append "_"))))
+            (fluent (list $id)
+              (generate-temporaries)
+              (car)
+              (syntax->datum)
+              (symbol->string)
+              (string->symbol)
+              (with $it (datum->syntax $id $it))))))
       (pair
         (scope+ $scope $id $identifier)
         $identifier)))

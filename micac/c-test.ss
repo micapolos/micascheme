@@ -1,6 +1,6 @@
 (import (micascheme) (micac c) (check) (micac scope))
 
-(parameterize ((scope-unique-gen? #t))
+(micac-externs x)
 
 (micac-define add-all
   (lambda ($syntax)
@@ -25,39 +25,29 @@
 (check
   (equal?
     (micac-c
-      (var int x)
       (set x 10))
     (lines-string
-      "int v0_x;"
-      "v0_x = 10;")))
+      "x = 10;")))
 
 (check
   (equal?
     (micac-c
-      (var int x)
       (add-all x 10 20 30))
     (lines-string
-      "int v0_x;"
-      "v0_x += 10;"
-      "v0_x += 20;"
-      "v0_x += 30;")))
+      "x += 10;"
+      "x += 20;"
+      "x += 30;")))
 
 (check
   (equal?
     (micac-c
-      (var int x)
       (set x (sum)))
     (lines-string
-      "int v0_x;"
-      "v0_x = 0;")))
+      "x = 0;")))
 
 (check
   (equal?
     (micac-c
-      (var int x)
       (set x (sum x x x)))
     (lines-string
-      "int v0_x;"
-      "v0_x = v0_x + v0_x + v0_x;")))
-
-)
+      "x = x + x + x;")))

@@ -1,5 +1,7 @@
 (import (micascheme) (micac expand) (micac syntax) (micac scope))
 
+(parameterize ((scope-unique-gen? #t))
+
 (define-aux-keywords zero one two)
 
 (define $scope
@@ -71,23 +73,23 @@
 (check-instr (bar 0) (bar 0))
 (check-instr (foo 0) (bar 0))
 (check-instr (foo zero) (bar 0))
-(check-instr (var int x) (var int v11-x))
-(check-instr (var int x zero) (var int v11-x 0))
-(check-instr (const int x zero) (const int v11-x 0))
+(check-instr (var int x) (var int x))
+(check-instr (var int x zero) (var int x 0))
+(check-instr (const int x zero) (const int x 0))
 
-(check-instr (var int (* x)) (var int (* v11-x)))
-(check-instr (var int (* zero)) (var int (* v11-zero)))
-(check-instr (var zero (* x)) (var zero (* v11-x)))
+(check-instr (var int (* x)) (var int (* x)))
+(check-instr (var int (* zero)) (var int (* zero)))
+(check-instr (var zero (* x)) (var zero (* x)))
 
-(check-instr (var int (* x 10)) (var int (* v11-x 10)))
-(check-instr (var int (* x one)) (var int (* v11-x 1)))
-(check-instr (var int (* (* x one) two)) (var int (* (* v11-x 1) 2)))
+(check-instr (var int (* x 10)) (var int (* x 10)))
+(check-instr (var int (* x one)) (var int (* x 1)))
+(check-instr (var int (* (* x one) two)) (var int (* (* x 1) 2)))
 
 (check-instr (begin) (begin))
 
 (check-instr
   (begin (var int x zero) (var int y one))
-  (begin (var int v11-x 0) (var int v12-y 1)))
+  (begin (var int x 0) (var int y 1)))
 
 (check-instr
   (if (foo zero) (then (foo one)) (else (foo two)))
@@ -156,8 +158,8 @@
     (set x ten))
   (begin
     (set x 10)
-    (var int v12-ten)
-    (set x v12-ten)))
+    (var int ten)
+    (set x ten)))
 
 (check-instr
   (begin
@@ -184,3 +186,5 @@
 (check-instr
   (begin (break-if x (a)) (defer (b)) (c))
   (begin (if x (then (a)) (else (c) (b)))))
+
+)
