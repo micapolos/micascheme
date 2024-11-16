@@ -7,4 +7,5 @@
   (micac c)
   (micac syntax-c)
   (micac scope)
-  (micac expand))
+  (micac expand)
+  (micac lib all))
