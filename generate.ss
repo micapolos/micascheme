@@ -3,7 +3,8 @@
     generate-symbol generate-symbols
     generate-temporary
     with-generate-temporary-seed
-    with-tmps)
+    with-tmps
+    generate-identifier)
   (import
     (scheme)
     (identifier)
@@ -11,7 +12,8 @@
     (stack)
     (check)
     (lets)
-    (syntax))
+    (syntax)
+    (fluent))
 
   (define (generate-symbol)
     (syntax->datum (generate-temporary)))
@@ -60,5 +62,17 @@
   (define-rule-syntax (with-tmps $body ...)
     (with-generate-temporary-seed $tmp $body ...))
 
-
+  (define (generate-identifier $id)
+    (parameterize
+      ((gensym-prefix
+        (fluent $id
+          (syntax->datum)
+          (symbol->string)
+          (string-append "_"))))
+      (fluent
+        (generate-temporary)
+        (syntax->datum)
+        (symbol->string)
+        (string->symbol)
+        (with $it (datum->syntax $id $it)))))
 )

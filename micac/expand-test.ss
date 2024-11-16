@@ -1,6 +1,6 @@
 (import (micascheme) (micac expand) (micac syntax) (micac scope))
 
-(parameterize ((scope-unique-gen? #t))
+(parameterize ((scope-pretty-gen? #t))
 
 (define-aux-keywords zero one two)
 

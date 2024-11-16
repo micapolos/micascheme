@@ -8,10 +8,10 @@
     scope-transform
     scope-unbound
     scope-with
-    scope-unique-gen?)
+    scope-pretty-gen?)
   (import (micascheme))
 
-  (define scope-unique-gen?
+  (define scope-pretty-gen?
     (make-parameter #f))
 
   (define (empty-scope)
@@ -32,21 +32,9 @@
   (define (scope-gen $scope $id)
     (lets
       ($identifier
-        (if (scope-unique-gen?)
+        (if (scope-pretty-gen?)
           $id
-          (parameterize
-            ((gensym-prefix
-              (fluent $id
-                (syntax->datum)
-                (symbol->string)
-                (string-append "_"))))
-            (fluent (list $id)
-              (generate-temporaries)
-              (car)
-              (syntax->datum)
-              (symbol->string)
-              (string->symbol)
-              (with $it (datum->syntax $id $it))))))
+          (generate-identifier $id)))
       (pair
         (scope+ $scope $id $identifier)
         $identifier)))
