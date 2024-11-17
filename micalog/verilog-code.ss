@@ -75,7 +75,7 @@
         (expr->code $value))))
 
   (define (expr->code $value)
-    (syntax-case $value (%+ %and %or %not %get)
+    (syntax-case $value (%+ %and %or %not %get %join)
       (id (identifier? #'id)
         (name->code #'id))
       (integer (integer? (datum integer))
@@ -91,7 +91,13 @@
       ((%get expr selector)
         (code
           (expr->code #'expr)
-          (selector->code #'selector)))))
+          (selector->code #'selector)))
+      ((%join expr ...)
+        (code-in-curly-brackets
+          (apply code-append
+            (intercalate
+              (map expr->code (syntaxes expr ...))
+              (code ", ")))))))
 
   (define (op1->code $op $rhs)
     (code
