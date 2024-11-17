@@ -9,7 +9,7 @@
   (define (expr->verilog $expr)
     (syntax-case $expr ()
       (expr
-        (syntax-case (expr-term #'expr) (%+ %- %append)
+        (syntax-case (expr-term #'expr) (%+ %- %append %and %or %not)
           (id (identifier? #'id)
             #'id)
           (integer (integer? (datum integer))
@@ -25,5 +25,16 @@
           ((%append lhs rhs)
             #`(%%append
               #,(expr->verilog #'lhs)
+              #,(expr->verilog #'rhs)))
+          ((%and lhs rhs)
+            #`(%%and
+              #,(expr->verilog #'lhs)
+              #,(expr->verilog #'rhs)))
+          ((%or lhs rhs)
+            #`(%%or
+              #,(expr->verilog #'lhs)
+              #,(expr->verilog #'rhs)))
+          ((%not rhs)
+            #`(%%inv
               #,(expr->verilog #'rhs)))))))
 )

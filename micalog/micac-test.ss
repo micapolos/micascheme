@@ -26,3 +26,14 @@
   (_ _ (%append (_ _ a) (_ 4 b)))
   (%%bitwise-ior (%%bitwise-arithmetic-shift-left a 4) b))
 
+(check-expr
+  (_ _ (%and (_ _ a) (_ _ b)))
+  (%%bitwise-and a b))
+
+(check-expr
+  (_ _ (%or (_ _ a) (_ _ b)))
+  (%%bitwise-ior a b))
+
+(check-expr
+  (_ _ (%not (_ _ a)))
+  (%%bitwise-not a))

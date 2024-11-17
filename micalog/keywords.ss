@@ -1,7 +1,10 @@
 (library (micalog keywords)
-  (export + - append)
+  (export
+    + - append
+    and or not)
   (import (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
-    + - append)
+    + - append
+    and or not)
 )
