@@ -73,6 +73,7 @@
   (leo all)
   (masm all)
   (micac all)
+  (micalog all)
   (minic all)
   (scheme all)
   (tico all)
