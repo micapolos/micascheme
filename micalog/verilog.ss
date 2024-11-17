@@ -1,10 +1,10 @@
 (library (micalog verilog)
   (export
     program->code
-    item->code
+    declaration->code
     size->code
-    identifier->code
-    value->code
+    name->code
+    expr->code
     edge->code
     event->code
     check-verilog)
@@ -16,102 +16,67 @@
 
   (define (program->code $program)
     (syntax-case $program (%circuit)
-      ((%circuit item ...)
+      ((%circuit declaration ...)
         (apply code-append
           (intercalate
-            (map item->code (syntaxes item ...))
+            (map declaration->code (syntaxes declaration ...))
             (code "\n"))))))
 
-  (define (item->code $item)
-    (syntax-case $item (%register %size %initial %on %set %if %wire)
-      (
-        (%register name
-          (%size size)
-          (%initial initial-value)
-          (%on event)
-          (%if if-value)
-          (%set set-value))
+  (define (declaration->code $item)
+    (syntax-case $item ()
+      ((name type expr)
+        (reg?-name-type-expr->code #f #'name #'type #'expr))
+      ((name type expr action)
         (code
-          (newline-ended-code
-            (colon-ended-code
-              (code
-                (space-separated-code
-                  "reg"
-                  (and (datum size) (size->code #'size))
-                  (identifier->code #'name)
-                  (and
-                    (datum initial-value)
-                    (space-separated-code
-                      "="
-                      (value->code #'initial-value)))))))
-          (newline-ended-code
-            (newline-separated-code
-              (space-separated-code
-                "always"
-                (code
-                  "@"
-                  (code-in-round-brackets (event->code #'event)))
-                "begin")
-              (code-indent
-                (if (datum if-value)
-                  (newline-separated-code
-                    (space-separated-code
-                      "if"
-                      (code-in-round-brackets (value->code #'if-value))
-                      "begin")
-                    (code-indent
-                      (set->code #`(%set name set-value)))
-                    "end")
-                  (set->code #`(%set name set-value))))
-              "end"))))
-      (
-        (%wire name
-          (%size size)
-          value)
-        (code
-          (newline-ended-code
-            (colon-ended-code
-              (space-separated-code
-                "wire"
-                (and (datum size) (size->code #'size))
-                (identifier->code #'name)
-                "="
-                (value->code #'value))))))))
+          (reg?-name-type-expr->code #t #'name #'type #'expr)
+          (name-action->code #'name #'action)))))
 
-  (define (identifier->code $identifier)
-    (fluent $identifier
+  (define (reg?-name-type-expr->code $reg? $name $type $expr)
+    (lets
+      ((values $vector-code $array-code)
+        (type->vector-array-code $type))
+      (newline-ended-code
+        (colon-ended-code
+          (space-separated-code
+            (string-code (if $reg? "reg" "wire"))
+            $vector-code
+            (name->code $name)
+            $array-code
+            "="
+            (expr->code $expr))))))
+
+  (define (name->code $name)
+    (fluent $name
       (syntax->datum)
       (symbol->string)
       (string->list)
-      (map-using identifier-char)
+      (map-using name-char)
       (list->string)
       (string-code)))
 
-  (define (set->code $set)
-    (syntax-case $set (%set)
-      ((%set id value)
-        (colon-ended-code
-          (space-separated-code
-            (identifier->code (identifier id))
-            "<="
-            (value->code #'value))))))
-
-  (define (identifier-char $char)
+  (define (name-char $char)
     (case $char
       ((#\- #\?) #\_)
       (else $char)))
 
-  (define (value->code $value)
+  (define (name-set->code $name $value)
+    (colon-ended-code
+      (space-separated-code
+        (name->code $name)
+        "<="
+        (expr->code $value))))
+
+  (define (expr->code $value)
     (syntax-case $value (%+)
       (id (identifier? #'id)
-        (identifier->code #'id))
-      (number (number? (datum number))
-        (number-code (datum number)))
+        (name->code #'id))
+      (integer (integer? (datum integer))
+        (number-code (datum integer)))
       ((%+ lhs rhs)
         (space-separated-code
-          (value->code #'lhs)
+          (expr->code #'lhs)
           "+"
-          (value->code #'rhs)))))
+          (expr->code #'rhs)))))
 
   (define (size->number $size)
     (switch (syntax->datum $size)
@@ -131,12 +96,57 @@
       ((edge value)
         (space-separated-code
           (edge->code #'edge)
-          (value->code #'value)))))
+          (expr->code #'value)))))
 
   (define (edge->code $edge)
     (syntax-case $edge (%positive-edge %negative-edge)
       (%positive-edge (code "posedge"))
       (%negative-edge (code "negedge"))))
+
+  (define (name-action->code $name $action)
+    (syntax-case $action (%on)
+      ((%on event body)
+        (newline-ended-code
+          (newline-separated-code
+            (space-separated-code
+              "always"
+              (code "@"
+                (code-in-round-brackets
+                  (event->code #'event)))
+              "begin")
+            (code-indent
+              (mutate->code $name #'body))
+            "end")))))
+
+  (define (mutate->code $name $syntax)
+    (syntax-case $syntax (%if)
+      ((%if body ...)
+        (name-if->code $name $syntax))
+      (other
+        (name-set->code $name $syntax))))
+
+  (define (name-if->code $name $if)
+    (syntax-case $if (%if)
+      ((%if cond expr)
+        (newline-separated-code
+          (space-separated-code
+            "if"
+            (code-in-round-brackets (expr->code #'cond))
+            "begin")
+          (code-indent
+            (name-set->code $name #'expr))
+          "end"))))
+
+  (define (type->vector-array-code $type)
+    (syntax-case $type (%bit %vector)
+      (%bit
+        (values #f #f))
+      ((%vector type size)
+        (lets
+          ((values $vector $array) (type->vector-array-code #'type))
+          (if $vector
+            (values $vector (code $array (size->code #'size)))
+            (values (size->code #'size) #f))))))
 
   (define-case-syntax (check-verilog (id body) string)
     #`(check
