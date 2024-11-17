@@ -91,9 +91,10 @@
       ((body ...)
         (code
           (newline-ended-code "begin")
-          (code-indent
-            (list->code
-              (map statement->code (syntaxes body ...))))
+          (fluent (syntaxes body ...)
+            (map-using statement->code)
+            (list->code)
+            (code-indent))
           "end"))))
 
   (define (cond-clause->code $clause)
@@ -184,16 +185,13 @@
     (switch $exprs
       ((null? _) $default)
       ((else $exprs)
-        (list->code
-          (intercalate
-            (map expr->code $exprs)
-            (string-code $op))))))
+        (ops->code $op $exprs))))
 
   (define (ops->code $op $exprs)
-    (list->code
-      (intercalate
-        (map expr->code $exprs)
-        (string-code $op))))
+    (fluent $exprs
+      (map-using expr->code)
+      (intercalate (string-code $op))
+      (list->code)))
 
   (define (size->number $size)
     (switch (syntax->datum $size)
@@ -204,7 +202,7 @@
 
   (define (size->code $size)
     (code-in-square-brackets
-      (number-code (- (size->number $size) 1))
+      (fluent $size (size->number) (- 1) (number-code))
       ":"
       (number-code 0)))
 
