@@ -10,9 +10,9 @@
 
     (wire (3 : 0) counter-4 (ref counter-8 (3 : 0)))
 
-    (always (positive-edge clock)
+    (always (posedge clock)
       (set! half-clock (inv half-clock)))
 
-    (always (positive-edge half-clock)
+    (always (posedge half-clock)
       (if write?
         (set! counter-8 (+ counter-8 1))))))

@@ -2,7 +2,7 @@
   (export
     circuit wire reg
     bit
-    positive-edge negative-edge always
+    posedge negedge always
     if :
     + vector and or inv set! ref append)
   (import
@@ -11,7 +11,7 @@
   (define-aux-keywords
     circuit wire reg
     bit
-    positive-edge negative-edge always
+    posedge negedge always
     if :
     + vector and or inv set! ref append)
 )

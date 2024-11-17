@@ -50,11 +50,11 @@
     "  y <= 20;"
     "end"))
 
-(check-verilog (edge positive-edge) "posedge")
-(check-verilog (edge negative-edge) "negedge")
+(check-verilog (edge posedge) "posedge")
+(check-verilog (edge negedge) "negedge")
 
-(check-verilog (event (positive-edge clock)) "posedge clock")
-(check-verilog (event (negative-edge clock)) "negedge clock")
+(check-verilog (event (posedge clock)) "posedge clock")
+(check-verilog (event (negedge clock)) "negedge clock")
 
 (check-verilog (size 8) "[7:0]")
 
@@ -100,7 +100,7 @@
 
 (check-verilog
   (declaration
-    (always (positive-edge clock)
+    (always (posedge clock)
       (set! x 10)
       (set! y 20)))
   (lines
@@ -114,7 +114,7 @@
     (circuit
       (reg (7 : 0) counter 128)
       (wire (7 : 0) counter-next (+ counter 1))
-      (always (negative-edge clock)
+      (always (negedge clock)
         (set! counter counter-next))))
   (lines
     "reg [7:0] counter = 128;"

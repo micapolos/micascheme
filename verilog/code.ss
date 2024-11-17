@@ -188,9 +188,9 @@
           (expr->code #'value)))))
 
   (define (edge->code $edge)
-    (syntax-case $edge (%positive-edge %negative-edge)
-      (%positive-edge (code "posedge"))
-      (%negative-edge (code "negedge"))))
+    (syntax-case $edge (%posedge %negedge)
+      (%posedge (code "posedge"))
+      (%negedge (code "negedge"))))
 
   (define (type->vector-array-code $type)
     (syntax-case $type (%bit %vector)
