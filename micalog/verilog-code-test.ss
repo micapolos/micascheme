@@ -13,6 +13,9 @@
 (check-verilog (expr (or a b)) "a | b")
 (check-verilog (expr (not a)) "~a")
 
+(check-verilog (expr (get a (12))) "a[12]")
+(check-verilog (expr (get a (3 0))) "a[3:0]")
+
 (check-verilog (edge positive-edge) "posedge")
 (check-verilog (edge negative-edge) "negedge")
 

@@ -8,4 +8,4 @@ always @(posedge half_clock) begin
     counter_8 <= counter + 1;
   end
 end
-wire [3:0] counter_4 = counter_8 & 15;
+wire [3:0] counter_4 = counter_8[3:0];

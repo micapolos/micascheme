@@ -75,7 +75,7 @@
         (expr->code $value))))
 
   (define (expr->code $value)
-    (syntax-case $value (%+ %and %or %not)
+    (syntax-case $value (%+ %and %or %not %get)
       (id (identifier? #'id)
         (name->code #'id))
       (integer (integer? (datum integer))
@@ -87,7 +87,11 @@
       ((%or lhs rhs)
         (op2->code #'lhs "|" #'rhs))
       ((%not rhs)
-        (op1->code "~" #'rhs))))
+        (op1->code "~" #'rhs))
+      ((%get expr selector)
+        (code
+          (expr->code #'expr)
+          (selector->code #'selector)))))
 
   (define (op1->code $op $rhs)
     (code
@@ -169,6 +173,24 @@
           (if $vector
             (values $vector (code $array (size->code #'size)))
             (values (size->code #'size) #f))))))
+
+  (define (selector->code $selector)
+    (code-in-square-brackets
+      (syntax-case $selector ()
+        ((from to)
+          (code
+            (index->code #'from)
+            ":"
+            (index->code #'to)))
+        ((index)
+          (index->code #'index)))))
+
+  (define (index->code $index)
+    (switch (syntax->datum $index)
+      ((nonnegative-integer? $integer)
+        (number-code $integer))
+      ((else _)
+        (syntax-error $index "invalid index"))))
 
   (define-case-syntax (check-verilog (id body) string)
     #`(check
