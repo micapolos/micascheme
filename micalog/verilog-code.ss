@@ -75,7 +75,7 @@
         (expr->code $value))))
 
   (define (expr->code $value)
-    (syntax-case $value (%+)
+    (syntax-case $value (%+ %bitwise-and)
       (id (identifier? #'id)
         (name->code #'id))
       (integer (integer? (datum integer))
@@ -84,6 +84,11 @@
         (space-separated-code
           (expr->code #'lhs)
           "+"
+          (expr->code #'rhs)))
+      ((%bitwise-and lhs rhs)
+        (space-separated-code
+          (expr->code #'lhs)
+          "&"
           (expr->code #'rhs)))))
 
   (define (size->number $size)
