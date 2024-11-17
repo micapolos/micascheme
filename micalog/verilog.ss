@@ -2,6 +2,7 @@
   (export
     program->code
     declaration->code
+    declarations->code
     size->code
     name->code
     expr->code
@@ -17,10 +18,11 @@
   (define (program->code $program)
     (syntax-case $program (%circuit)
       ((%circuit declaration ...)
-        (apply code-append
-          (intercalate
-            (map declaration->code (syntaxes declaration ...))
-            (code "\n"))))))
+        (declarations->code (syntaxes declaration ...)))))
+
+  (define (declarations->code $declarations)
+    (apply code-append
+      (map declaration->code $declarations)))
 
   (define (declaration->code $item)
     (syntax-case $item (%initial %on)
