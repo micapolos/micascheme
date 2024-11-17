@@ -83,16 +83,7 @@
               "<="
               (expr->code #'rhs)))))
       ((%when cond statement ...)
-        (code
-          (newline-ended-code
-            (space-separated-code
-              "if"
-              (code-in-round-brackets (expr->code #'cond))
-              "begin"))
-          (code-indent
-            (list->code
-              (map statement->code (syntaxes statement ...))))
-          (newline-ended-code "end")))
+        (statement->code #'(%cond (cond statement ...))))
       ((%cond clause clause* ... (%else else-body ...))
         (newline-ended-code
           (list->code
