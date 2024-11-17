@@ -10,4 +10,4 @@
     (on (positive-edge half-clock)
       (if write? (+ counter 1))))
   (counter-4 (vector bit 4)
-    (get counter-8 (3 0))))
+    (ref counter-8 (3 0))))

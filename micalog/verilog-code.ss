@@ -75,39 +75,47 @@
         (expr->code $value))))
 
   (define (expr->code $value)
-    (syntax-case $value (%+ %and %or %not %get %join)
+    (syntax-case $value (%+ %and %or %not %ref %append)
       (id (identifier? #'id)
         (name->code #'id))
       (integer (integer? (datum integer))
         (number-code (datum integer)))
-      ((%+ lhs rhs)
-        (op2->code #'lhs "+" #'rhs))
-      ((%and lhs rhs)
-        (op2->code #'lhs "&" #'rhs))
-      ((%or lhs rhs)
-        (op2->code #'lhs "|" #'rhs))
+      ((%+ expr ...)
+        (ops-default->code " + " (code 0) (syntaxes expr ...)))
+      ((%and expr ...)
+        (ops-default->code " & " (code "~0") (syntaxes expr ...)))
+      ((%or expr ...)
+        (ops-default->code " | " (code 0) (syntaxes expr ...)))
       ((%not rhs)
-        (op1->code "~" #'rhs))
-      ((%get expr selector)
+        (op->code "~" #'rhs))
+      ((%ref expr selector ...)
         (code
           (expr->code #'expr)
-          (selector->code #'selector)))
-      ((%join lhs rhs)
+          (apply code-append
+            (map selector->code (syntaxes selector ...)))))
+      ((%append expr ...)
         (code-in-curly-brackets
-          (expr->code #'lhs)
-          ", "
-          (expr->code #'rhs)))))
+          (ops->code ", " (syntaxes expr ...))))))
 
-  (define (op1->code $op $rhs)
+  (define (op->code $op $rhs)
     (code
       (string-code $op)
       (expr->code $rhs)))
 
-  (define (op2->code $lhs $op $rhs)
-    (space-separated-code
-      (expr->code $lhs)
-      (string-code $op)
-      (expr->code $rhs)))
+  (define (ops-default->code $op $default $exprs)
+    (switch $exprs
+      ((null? _) $default)
+      ((else $exprs)
+        (apply code-append
+          (intercalate
+            (map expr->code $exprs)
+            (string-code $op))))))
+
+  (define (ops->code $op $exprs)
+    (apply code-append
+      (intercalate
+        (map expr->code $exprs)
+        (string-code $op))))
 
   (define (size->number $size)
     (switch (syntax->datum $size)

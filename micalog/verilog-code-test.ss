@@ -8,15 +8,32 @@
 
 (check-verilog (expr 128) "128")
 (check-verilog (expr clock) "clock")
+
+(check-verilog (expr (+)) "0")
+(check-verilog (expr (+ a)) "a")
 (check-verilog (expr (+ a b)) "a + b")
+(check-verilog (expr (+ a b c)) "a + b + c")
+
+(check-verilog (expr (and)) "~0")
+(check-verilog (expr (and a)) "a")
 (check-verilog (expr (and a b)) "a & b")
+(check-verilog (expr (and a b c)) "a & b & c")
+
+(check-verilog (expr (or)) "0")
+(check-verilog (expr (or a)) "a")
 (check-verilog (expr (or a b)) "a | b")
+(check-verilog (expr (or a b c)) "a | b | c")
+
 (check-verilog (expr (not a)) "~a")
 
-(check-verilog (expr (get a (12))) "a[12]")
-(check-verilog (expr (get a (3 0))) "a[3:0]")
+(check-verilog (expr (ref a)) "a")
+(check-verilog (expr (ref a (12))) "a[12]")
+(check-verilog (expr (ref a (12) (13))) "a[12][13]")
+(check-verilog (expr (ref a (3 0))) "a[3:0]")
 
-(check-verilog (expr (join a b)) "{a, b}")
+(check-verilog (expr (append)) "{}")
+(check-verilog (expr (append a)) "{a}")
+(check-verilog (expr (append a b)) "{a, b}")
 
 (check-verilog (edge positive-edge) "posedge")
 (check-verilog (edge negative-edge) "negedge")
