@@ -70,6 +70,7 @@
   (indico all)
   (masm all)
   (micac all)
+  (micalog verilog)
   (minic all)
   (leo all)
   (scheme all)

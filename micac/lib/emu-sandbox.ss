@@ -6,9 +6,11 @@
   (micac zx-spectrum background)
   (micac zx-spectrum ula)
   (micac misc plasma)
+  (micac run)
   (c run))
 
 (c-run-echo? #t)
+(micac-run-echo? #t)
 
 (run-emu
   (video 352 288 96 24 4) ; width height h-blank v-blank cycles-per-pixel

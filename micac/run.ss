@@ -1,7 +1,9 @@
 (library (micac run)
-  (export micac-run micac-string)
+  (export micac-run micac-string micac-run-echo?)
   (import (micascheme) (c run) (micac c) (micac syntax))
   (export (import (micac syntax) (micac c)))
+
+  (define micac-run-echo? (make-parameter #f))
 
   (define-rule-syntax (micac-string instr ...)
     (lets
@@ -18,8 +20,9 @@
     (lets
       ($string (micac-string instr ...))
       (run
-        (call-with-output-file "micac/run.c"
-          (lambda ($port) (put-string $port $string))
-          `(replace))
+        (when (micac-run-echo?)
+          (call-with-output-file "micac/run.c"
+            (lambda ($port) (put-string $port $string))
+            `(replace)))
         (c-run $string "`sdl2-config --cflags --libs`"))))
 )
