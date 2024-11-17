@@ -1,9 +1,11 @@
 (library (verilog keywords)
   (export
     wire reg
-    posedge negedge always
+    always
+    * posedge negedge
     cond else range
-    + - * and or inv
+    + -
+    and or inv
     assign set! ref
     append)
   (import
@@ -11,9 +13,11 @@
 
   (define-aux-keywords
     wire reg
-    posedge negedge always
+    always
+    * posedge negedge
     cond else range
-    + - * and or inv
+    + -
+    and or inv
     assign set! ref
     append)
 )
