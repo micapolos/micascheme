@@ -30,7 +30,7 @@
       (map declaration->code $declarations)))
 
   (define (declaration->code $item)
-    (syntax-case $item (%always)
+    (syntax-case $item (%always %assign)
       ((%always event statement ...)
         (code
           (newline-ended-code
@@ -44,21 +44,31 @@
             (list->code
               (map statement->code (syntaxes statement ...))))
           (newline-ended-code "end")))
+      ((%assign lhs rhs)
+        (newline-ended-code
+          (colon-ended-code
+            (space-separated-code
+              "assign"
+              (lhs->code #'lhs)
+              "="
+              (expr->code #'rhs)))))
       ((kind name array ...)
         (for-all range->code? (syntaxes array ...))
-        (declaration-components->code #'kind #f #'name (syntaxes array ...) #f))
+        (declaration-components->code #'kind #f #'name (syntaxes array ...)))
       ((kind vector name array ...)
         (for-all range->code? (syntaxes vector array ...))
-        (declaration-components->code #'kind #'vector #'name (syntaxes array ...) #f))
-      ((kind name array ... expr)
-        (for-all range->code? (syntaxes array ...))
-        (declaration-components->code #'kind #f #'name (syntaxes array ...) #'expr))
-      ((kind vector name array ... expr)
-        (for-all range->code? (syntaxes vector array ...))
-        (declaration-components->code #'kind #'vector #'name (syntaxes array ...) #'expr))))
+        (declaration-components->code #'kind #'vector #'name (syntaxes array ...)))))
 
   (define (statement->code $statement)
-    (syntax-case $statement (%set! %if)
+    (syntax-case $statement (%assign %set! %when %cond %else)
+      ((%assign lhs rhs)
+        (newline-ended-code
+          (colon-ended-code
+            (space-separated-code
+              "assign"
+              (lhs->code #'lhs)
+              "="
+              (expr->code #'rhs)))))
       ((%set! lhs rhs)
         (newline-ended-code
           (colon-ended-code
@@ -66,7 +76,7 @@
               (lhs->code #'lhs)
               "<="
               (expr->code #'rhs)))))
-      ((%if cond statement ...)
+      ((%when cond statement ...)
         (code
           (newline-ended-code
             (space-separated-code
@@ -76,22 +86,56 @@
           (code-indent
             (list->code
               (map statement->code (syntaxes statement ...))))
-          (newline-ended-code "end")))))
+          (newline-ended-code "end")))
+      ((%cond clause clause* ... (%else else-body ...))
+        (newline-ended-code
+          (list->code
+            (intercalate
+              (append
+                (list (cond-clause->code (syntax clause)))
+                (map cond-clause->code (syntaxes clause* ...))
+                (list (block->code (syntaxes else-body ...))))
+              (code " else ")))))
+      ((%cond clause clause* ...)
+        (newline-ended-code
+          (list->code
+            (intercalate
+              (cons
+                (cond-clause->code (syntax clause))
+                (map cond-clause->code (syntaxes clause* ...)))
+              (code " else ")))))))
+
+  (define (block->code $block)
+    (syntax-case $block ()
+      ((body ...)
+        (code
+          (newline-ended-code "begin")
+          (code-indent
+            (list->code
+              (map statement->code (syntaxes body ...))))
+          "end"))))
+
+  (define (cond-clause->code $clause)
+    (syntax-case $clause ()
+      ((cond body ...)
+        (space-separated-code
+          "if"
+          (code-in-round-brackets (expr->code #'cond))
+          (block->code #'(body ...))))))
 
   (define (declaration-kind->code $kind)
     (syntax-case $kind (%wire %reg)
       (%wire (code "wire"))
       (%reg (code "reg"))))
 
-  (define (declaration-components->code $kind $vector $name $arrays $expr)
+  (define (declaration-components->code $kind $vector $name $arrays)
     (newline-ended-code
       (colon-ended-code
         (space-separated-code
           (declaration-kind->code $kind)
           (and $vector (range-declaration->code $vector))
           (name->code $name)
-          (list->code (map range-declaration->code $arrays))
-          (and $expr (space-separated-code "=" (expr->code $expr)))))))
+          (list->code (map range-declaration->code $arrays))))))
 
   (define (name->code $name)
     (fluent $name
@@ -106,13 +150,6 @@
     (case $char
       ((#\- #\?) #\_)
       (else $char)))
-
-  (define (name-set->code $name $value)
-    (colon-ended-code
-      (space-separated-code
-        (name->code $name)
-        "<="
-        (expr->code $value))))
 
   (define (expr->code $value)
     (syntax-case $value (%+ %and %or %inv %ref %append)
@@ -185,7 +222,9 @@
       (number-code 0)))
 
   (define (event->code $event)
-    (syntax-case $event ()
+    (syntax-case $event (%*)
+      (%*
+        (code "*"))
       ((edge value)
         (space-separated-code
           (edge->code #'edge)
