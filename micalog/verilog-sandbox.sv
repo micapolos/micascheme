@@ -1,4 +1,4 @@
-reg half_clock;
+reg half_clock = 0;
 always @(posedge clock) begin
   half_clock <= ~half_clock;
 end
