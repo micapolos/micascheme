@@ -36,6 +36,8 @@
 (check-verilog (expr (ref a (12) (13))) "a[12][13]")
 (check-verilog (expr (ref a (3 to 0))) "a[3:0]")
 
+(check-verilog (expr (if a b c)) "a ? b : c")
+
 (check-verilog (expr (append)) "{}")
 (check-verilog (expr (append a)) "{a}")
 (check-verilog (expr (append a b)) "{a, b}")

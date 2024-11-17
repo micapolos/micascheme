@@ -137,7 +137,7 @@
       (else $char)))
 
   (define (expr->code $value)
-    (syntax-case $value (%+ %- %and %or %inv %ref %append)
+    (syntax-case $value (%+ %- %and %or %inv %ref %if %append)
       (id (identifier? #'id)
         (name->code #'id))
       (integer (nonnegative-integer? (datum integer))
@@ -162,6 +162,13 @@
         (code
           (expr->code #'expr)
           (list->code (map selector->code (syntaxes selector ...)))))
+      ((%if cond true false)
+        (space-separated-code
+          (expr->code #'cond)
+          "?"
+          (expr->code #'true)
+          ":"
+          (expr->code #'false)))
       ((%append expr ...)
         (code-in-curly-brackets
           (ops->code ", " (syntaxes expr ...))))))

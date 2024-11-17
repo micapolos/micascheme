@@ -3,7 +3,7 @@
     wire reg
     always
     * posedge negedge
-    cond else to
+    if cond else to
     + -
     and or inv
     assign set! ref
@@ -14,7 +14,7 @@
     wire reg
     always
     * posedge negedge
-    cond else to
+    if cond else to
     + -
     and or inv
     assign set! ref
