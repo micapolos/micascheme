@@ -1,4 +1,4 @@
-(library (micalog verilog-code)
+(library (verilog code)
   (export
     program->code
     declaration->code
@@ -13,8 +13,12 @@
   (import
     (micascheme)
     (code)
-    (prefix (micalog keywords) %))
-  (export (import (rename (only (micascheme) lines-string) (lines-string lines))))
+    (prefix (verilog keywords) %))
+  (export
+    (import
+      (rename
+        (only (micascheme) lines-string)
+        (lines-string lines))))
 
   (define (program->code $program)
     (syntax-case $program (%circuit)

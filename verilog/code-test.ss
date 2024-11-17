@@ -1,6 +1,6 @@
 (import
-  (micalog keywords)
-  (micalog verilog-code)
+  (verilog keywords)
+  (verilog code)
   (code))
 
 (check-verilog (name clock) "clock")

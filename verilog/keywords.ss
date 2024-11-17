@@ -1,4 +1,4 @@
-(library (micalog keywords)
+(library (verilog keywords)
   (export
     circuit wire reg
     bit
