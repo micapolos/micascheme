@@ -23,10 +23,10 @@
             (code "\n"))))))
 
   (define (item->code $item)
-    (syntax-case $item (%register %bit-count %initial %on %set %if %wire)
+    (syntax-case $item (%register %size %initial %on %set %if %wire)
       (
         (%register name
-          (%bit-count size)
+          (%size size)
           (%initial initial-value)
           (%on event)
           (%if if-value)
@@ -66,7 +66,7 @@
               "end"))))
       (
         (%wire name
-          (%bit-count size)
+          (%size size)
           value)
         (code
           (newline-ended-code

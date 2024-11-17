@@ -21,7 +21,7 @@
 (check-verilog
   (item
     (register counter
-      (bit-count #f)
+      (size #f)
       (initial #f)
       (on (positive-edge clock))
       (if #f)
@@ -35,7 +35,7 @@
 (check-verilog
   (item
     (register counter
-      (bit-count 8)
+      (size 8)
       (initial 128)
       (on (positive-edge clock))
       (if enabled)
@@ -51,7 +51,7 @@
 (check-verilog
   (item
     (wire next-value
-      (bit-count #f)
+      (size #f)
       (+ value 1)))
   (lines
     "wire next_value = value + 1;"))
@@ -59,7 +59,7 @@
 (check-verilog
   (item
     (wire next-value
-      (bit-count 8)
+      (size 8)
       (+ value 1)))
   (lines
     "wire [7:0] next_value = value + 1;"))
@@ -68,16 +68,16 @@
   (program
     (circuit
       (register counter
-        (bit-count 8)
+        (size 8)
         (initial 128)
         (on (positive-edge clock))
         (if #f)
         (set next-counter))
       (wire next-value
-        (bit-count 8)
+        (size 8)
         (+ counter 1))
       (register next-counter
-        (bit-count 8)
+        (size 8)
         (initial #f)
         (on (negative-edge clock))
         (if #f)
