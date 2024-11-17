@@ -23,7 +23,7 @@
   (lines "wire foo;"))
 
 (check-verilog
-  (declaration (foo (vector bit 8)))
+  (declaration (foo (* bit 8)))
   (lines "wire [7:0] foo;"))
 
 (check-verilog
@@ -31,21 +31,21 @@
   (lines "wire foo = x;"))
 
 (check-verilog
-  (declaration (foo (vector bit 8) x))
+  (declaration (foo (* bit 8) x))
   (lines "wire [7:0] foo = x;"))
 
 (check-verilog
-  (declaration (foo (vector (vector bit 8) 4) x))
+  (declaration (foo (* (* bit 8) 4) x))
   (lines "wire [7:0] foo [3:0] = x;"))
 
 (check-verilog
-  (declaration (foo (vector (vector (vector bit 8) 4) 3) x))
+  (declaration (foo (* (* (* bit 8) 4) 3) x))
   (lines "wire [7:0] foo [3:0][2:0] = x;"))
 
 (check-verilog
   (declaration
     (foo
-      (vector bit 8)
+      (* bit 8)
       (on (positive-edge clock) y)))
   (lines
     "reg [7:0] foo;"
@@ -56,7 +56,7 @@
 (check-verilog
   (declaration
     (foo
-      (vector bit 8)
+      (* bit 8)
       (initial x)
       (on (positive-edge clock) y)))
   (lines
@@ -69,14 +69,14 @@
   (program
     (circuit
       (counter
-        (vector bit 8)
+        (* bit 8)
         (initial 128)
         (on (positive-edge clock) next-counter))
       (next-value
-        (vector bit 8)
+        (* bit 8)
         (+ counter 1))
       (next-counter
-        (vector bit 8)
+        (* bit 8)
         (on (negative-edge clock) next-value))))
   (lines
     "reg [7:0] counter = 128;"
