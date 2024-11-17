@@ -1,6 +1,6 @@
 (import
-  (micascheme)
-  (only (verilog string) verilog-string wire bit))
+  (only (micascheme) check equal? lines-string)
+  (verilog string))
 
 (check
   (equal?
