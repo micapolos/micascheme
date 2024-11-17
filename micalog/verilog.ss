@@ -51,7 +51,20 @@
                     (identifier->code #'name)
                     "<="
                     (value->code #'write-value))))
-              "end"))))))
+              "end"))))
+      (
+        (wire name
+          (bit-count size)
+          value)
+        (code
+          (newline-ended-code
+            (colon-ended-code
+              (space-separated-code
+                "wire"
+                (size->code #'size)
+                (identifier->code #'name)
+                "="
+                (value->code #'value))))))))
 
   (define (identifier->code $identifier)
     (fluent $identifier
