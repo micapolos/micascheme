@@ -1,7 +1,7 @@
 (import (scheme) (check) (code))
 
 ; empty-code
-(check (equal? (code-string empty-code) ""))
+(check (equal? (code-string (empty-code)) ""))
 
 ; char-code
 (check (equal? (code-string (char-code #\newline)) "\n"))

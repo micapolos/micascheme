@@ -25,11 +25,10 @@
     code-in-curly-brackets)
   (import (scheme) (lets) (list) (list-syntax) (procedure) (syntaxes) (switch))
 
-  ; (typeof code) => (lambda ($line-start? $indent $port) $line-start?)
+  ; (typeof code) => (lambda ($line-start? $indent $port) $line-start?) or #f if empty
 
   (define-case-syntaxes
-    ((code)
-      #`(lambda ($line-start? $indent $port) $line-start?))
+    ((code) #`(empty-code))
     ((code $item)
       (switch (datum $item)
         ((char? $char) #`(char-code $item))
@@ -53,7 +52,7 @@
         $line-start?
         $code*)))
 
-  (define empty-code
+  (define (empty-code)
     (lambda ($line-start? $indent $port)
       $line-start?))
 
