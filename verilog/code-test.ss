@@ -6,7 +6,7 @@
 (check-verilog (name clock) "clock")
 (check-verilog (name item-counter) "item_counter")
 
-(check-verilog (expr 128) "128")
+(check-verilog (expr #b10010) "'b10010")
 (check-verilog (expr clock) "clock")
 
 (check-verilog (expr (+)) "0")
@@ -42,12 +42,12 @@
 (check-verilog
   (statement
     (if x
-      (set! x 10)
-      (set! y 20)))
+      (set! x z)
+      (set! y z)))
   (lines
     "if (x) begin"
-    "  x <= 10;"
-    "  y <= 20;"
+    "  x <= z;"
+    "  y <= z;"
     "end"))
 
 (check-verilog (edge posedge) "posedge")
@@ -71,12 +71,12 @@
   (lines "wire [3:0] foo [4:0];"))
 
 (check-verilog
-  (declaration (wire foo 0))
-  (lines "wire foo = 0;"))
+  (declaration (wire foo x))
+  (lines "wire foo = x;"))
 
 (check-verilog
-  (declaration (wire (range 3 0) foo 0))
-  (lines "wire [3:0] foo = 0;"))
+  (declaration (wire (range 3 0) foo x))
+  (lines "wire [3:0] foo = x;"))
 
 (check-verilog
   (declaration (reg foo))
@@ -91,33 +91,33 @@
   (lines "reg [3:0] foo [4:0];"))
 
 (check-verilog
-  (declaration (reg foo 0))
-  (lines "reg foo = 0;"))
+  (declaration (reg foo x))
+  (lines "reg foo = x;"))
 
 (check-verilog
-  (declaration (reg (range 3 0) foo 0))
-  (lines "reg [3:0] foo = 0;"))
+  (declaration (reg (range 3 0) foo x))
+  (lines "reg [3:0] foo = x;"))
 
 (check-verilog
   (declaration
     (always (posedge clock)
-      (set! x 10)
-      (set! y 20)))
+      (set! x z)
+      (set! y z)))
   (lines
     "always @(posedge clock) begin"
-    "  x <= 10;"
-    "  y <= 20;"
+    "  x <= z;"
+    "  y <= z;"
     "end"))
 
 (check-verilog
   (program
     (circuit
-      (reg (range 7 0) counter 128)
+      (reg (range 7 0) counter 0)
       (wire (range 7 0) counter-next (+ counter 1))
       (always (negedge clock)
         (set! counter counter-next))))
   (lines
-    "reg [7:0] counter = 128;"
+    "reg [7:0] counter = 0;"
     "wire [7:0] counter_next = counter + 1;"
     "always @(negedge clock) begin"
     "  counter <= counter_next;"
