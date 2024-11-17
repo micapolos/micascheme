@@ -16,13 +16,17 @@
           (integer (integer? (datum integer))
             #'integer)
           ((%+ lhs rhs)
-            #`(%%+
-              #,(expr->micac #'lhs)
-              #,(expr->micac #'rhs)))
+            (micac-mask
+              #`(%%+
+                #,(expr->micac #'lhs)
+                #,(expr->micac #'rhs))
+              (expr-size #'expr)))
           ((%- lhs rhs)
-            #`(%%-
-              #,(expr->micac #'lhs)
-              #,(expr->micac #'rhs)))
+            (micac-mask
+              #`(%%-
+                #,(expr->micac #'lhs)
+                #,(expr->micac #'rhs))
+              (expr-size #'expr)))
           ((%append lhs rhs)
             #`(%%bitwise-ior
               (%%bitwise-arithmetic-shift-left
@@ -38,6 +42,14 @@
               #,(expr->micac #'lhs)
               #,(expr->micac #'rhs)))
           ((%not rhs)
-            #`(%%bitwise-not
-              #,(expr->micac #'rhs)))))))
+            (micac-mask
+              #`(%%bitwise-not
+                #,(expr->micac #'rhs))
+              (expr-size #'expr)))))))
+
+  (define (micac-mask $micac $size)
+    #`(%%bitwise-and
+      #,$micac
+      #,(datum->syntax #'%%bitwise-and
+        (- (bitwise-arithmetic-shift-left 1 $size) 1))))
 )

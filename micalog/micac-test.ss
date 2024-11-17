@@ -15,12 +15,12 @@
 (check-expr (_ _ 128) 128)
 
 (check-expr
-  (_ _ (%+ (_ _ a) (_ _ b)))
-  (%%+ a b))
+  (_ 6 (%+ (_ _ a) (_ _ b)))
+  (%%bitwise-and (%%+ a b) #x3f))
 
 (check-expr
-  (_ _ (%- (_ _ a) (_ _ b)))
-  (%%- a b))
+  (_ 6 (%- (_ _ a) (_ _ b)))
+  (%%bitwise-and (%%- a b) #x3f))
 
 (check-expr
   (_ _ (%append (_ _ a) (_ 4 b)))
@@ -35,5 +35,5 @@
   (%%bitwise-ior a b))
 
 (check-expr
-  (_ _ (%not (_ _ a)))
-  (%%bitwise-not a))
+  (_ 6 (%not (_ _ a)))
+  (%%bitwise-and (%%bitwise-not a) #x3f))
