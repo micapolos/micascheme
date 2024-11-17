@@ -23,9 +23,11 @@
     code-in-square-brackets
     code-in-angle-brackets
     code-in-curly-brackets)
-  (import (scheme) (lets) (list) (list-syntax) (procedure) (syntaxes) (switch))
+  (import (scheme) (lets) (list) (list-syntax) (procedure) (syntaxes) (switch) (fluent))
 
   ; (typeof code) => (lambda ($line-start? $indent $port) $line-start?) or #f if empty
+
+  (define (empty-code) #f)
 
   (define-case-syntaxes
     ((code) #`(empty-code))
@@ -41,20 +43,20 @@
   (define (code-string $code)
     (lets
       ($port (open-output-string))
-      (run ($code #t 0 $port))
+      (run (when $code ($code #t 0 $port)))
       (get-output-string $port)))
 
-  (define (code-append . $code*)
-    (lambda ($line-start? $indent $port)
-      (fold-left
-        (lambda ($line-start? $code)
-          ($code $line-start? $indent $port))
-        $line-start?
-        $code*)))
-
-  (define (empty-code)
-    (lambda ($line-start? $indent $port)
-      $line-start?))
+  (define (code-append . $codes)
+    (and
+      (exists identity $codes)
+      (lambda ($line-start? $indent $port)
+        (fold-left
+          (lambda ($line-start? $code)
+            (if $code
+              ($code $line-start? $indent $port)
+              $line-start?))
+          $line-start?
+          $codes))))
 
   (define (char-code $char)
     (case $char
@@ -85,10 +87,10 @@
 
   (define-case-syntaxes
     ((separated-code $separator $code ...)
-      #`(code
-        #,@(intercalate
-          (syntax->list #'($code ...))
-          #'$separator)))
+      #`(fluent (list (code $code) ...)
+        (filter-using identity)
+        (intercalate (code $separator))
+        (with $it (apply code-append $it))))
     ((suffixed-code $suffix $code ...)
       #`(code
         #,@(map-with

@@ -8,6 +8,7 @@
     single? single force-single
     ordered-map
     map-using
+    filter-using
     bind-if
     opt-lets
     opt-lift
@@ -342,4 +343,7 @@
 
   (define (map-using $list $fn)
     (map $fn $list))
+
+  (define (filter-using $list $fn)
+    (filter $fn $list))
 )

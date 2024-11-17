@@ -37,11 +37,13 @@
               (code
                 (space-separated-code
                   "reg"
-                  (size->code #'size)
-                  (identifier->code #'name))
-                (if (datum initial-value)
-                  (code " = " (value->code #'initial-value))
-                  (code "")))))
+                  (and (datum size) (size->code #'size))
+                  (identifier->code #'name)
+                  (and
+                    (datum initial-value)
+                    (space-separated-code
+                      "="
+                      (value->code #'initial-value)))))))
           (newline-ended-code
             (newline-separated-code
               (space-separated-code
@@ -71,7 +73,7 @@
             (colon-ended-code
               (space-separated-code
                 "wire"
-                (size->code #'size)
+                (and (datum size) (size->code #'size))
                 (identifier->code #'name)
                 "="
                 (value->code #'value))))))))

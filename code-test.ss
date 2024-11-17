@@ -49,6 +49,8 @@
 (check (equal? (code-string (separated-code ":" (code "a"))) "a"))
 (check (equal? (code-string (separated-code ":" (code "a") (code "b") (code "c"))) "a:b:c"))
 
+(check (equal? (code-string (separated-code ":" (code "a") #f (code "c"))) "a:c"))
+
 (check (equal? (code-string (space-separated-code (code "a") (code "b") (code "c"))) "a b c"))
 (check (equal? (code-string (newline-separated-code (code "a") (code "b") (code "c"))) "a\nb\nc"))
 (check (equal? (code-string (emptyline-separated-code (code "a") (code "b") (code "c"))) "a\n\nb\n\nc"))

@@ -21,13 +21,13 @@
 (check-verilog
   (item
     (register counter
-      (bit-count 8)
+      (bit-count #f)
       (initial #f)
       (on (positive-edge clock))
       (if #f)
       (set (+ counter 1))))
   (lines
-    "reg [7:0] counter;"
+    "reg counter;"
     "always @(posedge clock) begin"
     "  counter <= counter + 1;"
     "end"))
@@ -47,6 +47,14 @@
     "    counter <= counter + 1;"
     "  end"
     "end"))
+
+(check-verilog
+  (item
+    (wire next-value
+      (bit-count #f)
+      (+ value 1)))
+  (lines
+    "wire next_value = value + 1;"))
 
 (check-verilog
   (item
