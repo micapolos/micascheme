@@ -21,8 +21,7 @@
         (lines-string lines))))
 
   (define (declarations->code $declarations)
-    (apply code-append
-      (map declaration->code $declarations)))
+    (list->code (map declaration->code $declarations)))
 
   (define (declaration->code $item)
     (syntax-case $item (%always %assign)
@@ -161,8 +160,7 @@
       ((%ref expr selector ...)
         (code
           (expr->code #'expr)
-          (apply code-append
-            (map selector->code (syntaxes selector ...)))))
+          (list->code (map selector->code (syntaxes selector ...)))))
       ((%append expr ...)
         (code-in-curly-brackets
           (ops->code ", " (syntaxes expr ...))))))
@@ -186,13 +184,13 @@
     (switch $exprs
       ((null? _) $default)
       ((else $exprs)
-        (apply code-append
+        (list->code
           (intercalate
             (map expr->code $exprs)
             (string-code $op))))))
 
   (define (ops->code $op $exprs)
-    (apply code-append
+    (list->code
       (intercalate
         (map expr->code $exprs)
         (string-code $op))))
