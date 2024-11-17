@@ -57,6 +57,7 @@
     "always @(posedge clock) begin"
     "  counter <= next_counter;"
     "end"
+    ""
     "reg [7:0] next_counter = 0;"
     "always @(negedge clock) begin"
     "  next_counter <= counter + 1;"

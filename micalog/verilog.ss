@@ -16,7 +16,9 @@
     (syntax-case $program (circuit)
       ((circuit item ...)
         (apply code-append
-          (map item->code (syntaxes item ...))))))
+          (intercalate
+            (map item->code (syntaxes item ...))
+            (code "\n"))))))
 
   (define (item->code $item)
     (syntax-case $item (register bit-count init on write)
