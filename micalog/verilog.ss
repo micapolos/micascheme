@@ -1,5 +1,6 @@
 (library (micalog verilog)
   (export
+    program->code
     item->code
     size->code
     identifier->code
@@ -10,6 +11,12 @@
     (except (micascheme) write)
     (code)
     (micalog keywords))
+
+  (define (program->code $program)
+    (syntax-case $program (circuit)
+      ((circuit item ...)
+        (apply code-append
+          (map item->code (syntaxes item ...))))))
 
   (define (item->code $item)
     (syntax-case $item (register bit-count init on write)
