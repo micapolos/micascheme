@@ -8,8 +8,7 @@
     and or inv
     assign set! ref
     append)
-  (import
-    (only (micascheme) define-aux-keywords))
+  (import (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
     wire reg
