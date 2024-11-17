@@ -1,6 +1,6 @@
 reg half_clock;
 always @(posedge clock) begin
-  half_clock <= ~clock;
+  half_clock <= ~half_clock;
 end
 reg [7:0] counter = 0;
 always @(posedge half_clock) begin
