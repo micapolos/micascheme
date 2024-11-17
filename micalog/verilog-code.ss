@@ -92,12 +92,11 @@
         (code
           (expr->code #'expr)
           (selector->code #'selector)))
-      ((%join expr ...)
+      ((%join lhs rhs)
         (code-in-curly-brackets
-          (apply code-append
-            (intercalate
-              (map expr->code (syntaxes expr ...))
-              (code ", ")))))))
+          (expr->code #'lhs)
+          ", "
+          (expr->code #'rhs)))))
 
   (define (op1->code $op $rhs)
     (code
