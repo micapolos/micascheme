@@ -21,11 +21,11 @@
             (code "\n"))))))
 
   (define (item->code $item)
-    (syntax-case $item (register bit-count init on write)
+    (syntax-case $item (register bit-count initial on write)
       (
         (register name
           (bit-count size)
-          (init init-value)
+          (initial initial-value)
           (on event)
           (write write-value))
         (code
@@ -36,7 +36,7 @@
                 (size->code #'size)
                 (identifier->code #'name)
                 "="
-                (value->code #'init-value))))
+                (value->code #'initial-value))))
           (newline-ended-code
             (newline-separated-code
               (space-separated-code

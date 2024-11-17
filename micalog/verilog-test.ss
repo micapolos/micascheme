@@ -30,7 +30,7 @@
   (item
     (register counter
       (bit-count 8)
-      (init 128)
+      (initial 128)
       (on (positive-edge clock))
       (write (+ counter 1))))
   (lines-string
@@ -44,12 +44,12 @@
     (circuit
       (register counter
         (bit-count 8)
-        (init 128)
+        (initial 128)
         (on (positive-edge clock))
         (write next-counter))
       (register next-counter
         (bit-count 8)
-        (init 0)
+        (initial 0)
         (on (negative-edge clock))
         (write (+ counter 1)))))
   (lines-string
