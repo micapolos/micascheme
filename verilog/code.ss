@@ -54,10 +54,16 @@
               (expr->code #'rhs)))))
       ((kind name array ...)
         (for-all range->code? (syntaxes array ...))
-        (declaration-components->code #'kind #f #'name (syntaxes array ...)))
+        (declaration-components->code #'kind #f #'name (syntaxes array ...) #f))
       ((kind vector name array ...)
         (for-all range->code? (syntaxes vector array ...))
-        (declaration-components->code #'kind #'vector #'name (syntaxes array ...)))))
+        (declaration-components->code #'kind #'vector #'name (syntaxes array ...) #f))
+      ((kind name array ... expr)
+        (for-all range->code? (syntaxes array ...))
+        (declaration-components->code #'kind #f #'name (syntaxes array ...) #'expr))
+      ((kind vector name array ... expr)
+        (for-all range->code? (syntaxes vector array ...))
+        (declaration-components->code #'kind #'vector #'name (syntaxes array ...) #'expr))))
 
   (define (statement->code $statement)
     (syntax-case $statement (%assign %set! %when %cond %else)
@@ -128,14 +134,15 @@
       (%wire (code "wire"))
       (%reg (code "reg"))))
 
-  (define (declaration-components->code $kind $vector $name $arrays)
+  (define (declaration-components->code $kind $vector $name $arrays $expr)
     (newline-ended-code
       (colon-ended-code
         (space-separated-code
           (declaration-kind->code $kind)
           (and $vector (range-declaration->code $vector))
           (name->code $name)
-          (list->code (map range-declaration->code $arrays))))))
+          (list->code (map range-declaration->code $arrays))
+          (and $expr (space-separated-code "=" (expr->code $expr)))))))
 
   (define (name->code $name)
     (fluent $name
