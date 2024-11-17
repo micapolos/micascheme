@@ -3,8 +3,8 @@
     circuit wire reg
     bit
     initial
-    on positive-edge negative-edge
-    if when
+    on positive-edge negative-edge always
+    if
     + vector and or inv set! ref append)
   (import
     (only (micascheme) define-aux-keywords))
@@ -13,7 +13,7 @@
     circuit wire reg
     bit
     initial
-    on positive-edge negative-edge
-    if when
+    on positive-edge negative-edge always
+    if
     + vector and or inv set! ref append)
 )

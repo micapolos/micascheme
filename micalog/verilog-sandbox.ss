@@ -1,13 +1,11 @@
 (import (micalog verilog))
 
 (verilog
-  (half-clock bit
-    (initial 0)
-    (on (positive-edge clock)
-      (inv half-clock)))
-  (counter-8 (vector bit 8)
-    (initial 0)
-    (on (positive-edge half-clock)
-      (if write? (+ counter 1))))
-  (counter-4 (vector bit 4)
-    (ref counter-8 (3 0))))
+  (reg half-clock bit 0)
+  (always (positive-edge clock)
+    (set! half-clock (inv half-clock)))
+  (reg counter-8 (vector bit 8) 0)
+  (always (positive-edge half-clock)
+    (if write?
+      (set! counter-8 (+ counter-8 1))))
+  (wire counter-4 (vector bit 4) (ref counter-8 (3 0))))

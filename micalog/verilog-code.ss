@@ -26,8 +26,8 @@
       (map declaration->code $declarations)))
 
   (define (declaration->code $item)
-    (syntax-case $item (%initial %on)
-      ((%on event statement ...)
+    (syntax-case $item (%initial %always %wire %reg)
+      ((%always event statement ...)
         (code
           (newline-ended-code
             (space-separated-code
@@ -40,22 +40,17 @@
             (list->code
               (map statement->code (syntaxes statement ...))))
           (newline-ended-code "end")))
-      ((name type (%initial expr) (%on action ...))
-        (code
-          (reg?-name-type-expr->code #t #'name #'type #'expr)
-          (name-action->code #'name #'(%on action ...))))
-      ((name type (%on action ...))
-        (code
-          (reg?-name-type-expr->code #t #'name #'type #f)
-          (name-action->code #'name #'(%on action ...))))
-      ((name type expr)
+      ((%wire name type)
+        (reg?-name-type-expr->code #f #'name #'type #f))
+      ((%wire name type expr)
         (reg?-name-type-expr->code #f #'name #'type #'expr))
-      ((name type)
-        (code
-          (reg?-name-type-expr->code #F #'name #'type #f)))))
+      ((%reg name type)
+        (reg?-name-type-expr->code #t #'name #'type #f))
+      ((%reg name type expr)
+        (reg?-name-type-expr->code #t #'name #'type #'expr))))
 
   (define (statement->code $statement)
-    (syntax-case $statement (%set! %when)
+    (syntax-case $statement (%set! %if)
       ((%set! lhs rhs)
         (newline-ended-code
           (colon-ended-code
@@ -63,7 +58,7 @@
               (lhs->code #'lhs)
               "<="
               (expr->code #'rhs)))))
-      ((%when cond statement ...)
+      ((%if cond statement ...)
         (code
           (newline-ended-code
             (space-separated-code
@@ -186,40 +181,6 @@
     (syntax-case $edge (%positive-edge %negative-edge)
       (%positive-edge (code "posedge"))
       (%negative-edge (code "negedge"))))
-
-  (define (name-action->code $name $action)
-    (syntax-case $action (%on)
-      ((%on event body)
-        (newline-ended-code
-          (newline-separated-code
-            (space-separated-code
-              "always"
-              (code "@"
-                (code-in-round-brackets
-                  (event->code #'event)))
-              "begin")
-            (code-indent
-              (mutate->code $name #'body))
-            "end")))))
-
-  (define (mutate->code $name $syntax)
-    (syntax-case $syntax (%if)
-      ((%if body ...)
-        (name-if->code $name $syntax))
-      (other
-        (name-set->code $name $syntax))))
-
-  (define (name-if->code $name $if)
-    (syntax-case $if (%if)
-      ((%if cond expr)
-        (newline-separated-code
-          (space-separated-code
-            "if"
-            (code-in-round-brackets (expr->code #'cond))
-            "begin")
-          (code-indent
-            (name-set->code $name #'expr))
-          "end"))))
 
   (define (type->vector-array-code $type)
     (syntax-case $type (%bit %vector)
