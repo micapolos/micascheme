@@ -6,38 +6,42 @@
     identifier->code
     value->code
     edge->code
-    event->code)
+    event->code
+    check-verilog)
   (import
-    (except (micascheme) write when)
+    (micascheme)
     (code)
-    (micalog keywords))
+    (prefix (micalog keywords) %))
+  (export (import (rename (only (micascheme) lines-string) (lines-string lines))))
 
   (define (program->code $program)
-    (syntax-case $program (circuit)
-      ((circuit item ...)
+    (syntax-case $program (%circuit)
+      ((%circuit item ...)
         (apply code-append
           (intercalate
             (map item->code (syntaxes item ...))
             (code "\n"))))))
 
   (define (item->code $item)
-    (syntax-case $item (register bit-count initial on write when)
+    (syntax-case $item (%register %bit-count %initial %on %set %if %wire)
       (
-        (register name
-          (bit-count size)
-          (initial initial-value)
-          (on event)
-          (when when-value)
-          (write write-value))
+        (%register name
+          (%bit-count size)
+          (%initial initial-value)
+          (%on event)
+          (%if if-value)
+          (%set set-value))
         (code
           (newline-ended-code
             (colon-ended-code
-              (space-separated-code
-                "reg"
-                (size->code #'size)
-                (identifier->code #'name)
-                "="
-                (value->code #'initial-value))))
+              (code
+                (space-separated-code
+                  "reg"
+                  (size->code #'size)
+                  (identifier->code #'name))
+                (if (datum initial-value)
+                  (code " = " (value->code #'initial-value))
+                  (code "")))))
           (newline-ended-code
             (newline-separated-code
               (space-separated-code
@@ -50,19 +54,19 @@
                 (newline-separated-code
                   (space-separated-code
                     "if"
-                    (code-in-round-brackets (value->code #'when-value))
+                    (code-in-round-brackets (value->code #'if-value))
                     "begin")
                   (code-indent
                     (colon-ended-code
                       (space-separated-code
                         (identifier->code #'name)
                         "<="
-                        (value->code #'write-value))))
+                        (value->code #'set-value))))
                   "end"))
               "end"))))
       (
-        (wire name
-          (bit-count size)
+        (%wire name
+          (%bit-count size)
           value)
         (code
           (newline-ended-code
@@ -89,12 +93,12 @@
       (else $char)))
 
   (define (value->code $value)
-    (syntax-case $value (+)
+    (syntax-case $value (%+)
       (id (identifier? #'id)
         (identifier->code #'id))
       (number (number? (datum number))
         (number-code (datum number)))
-      ((+ lhs rhs)
+      ((%+ lhs rhs)
         (space-separated-code
           (value->code #'lhs)
           "+"
@@ -121,7 +125,14 @@
           (value->code #'value)))))
 
   (define (edge->code $edge)
-    (syntax-case $edge (positive-edge negative-edge)
-      (positive-edge (code "posedge"))
-      (negative-edge (code "negedge"))))
+    (syntax-case $edge (%positive-edge %negative-edge)
+      (%positive-edge (code "posedge"))
+      (%negative-edge (code "negedge"))))
+
+  (define-case-syntax (check-verilog (id body) string)
+    #`(check
+      (equal?
+        (code-string
+          (#,(identifier-append #'id #'id #'->code) #'body))
+        string)))
 )

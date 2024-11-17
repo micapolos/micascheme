@@ -1,15 +1,15 @@
 (library (micalog keywords)
   (export
     circuit
-    register bit-count initial on write when
+    register bit-count initial on set if +
     wire
     positive-edge negative-edge)
   (import
-    (except (micascheme) write when))
+    (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
     circuit
-    register bit-count initial on write when
+    register bit-count initial on set if +
     wire
     positive-edge negative-edge)
 )

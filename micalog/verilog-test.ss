@@ -1,15 +1,7 @@
 (import
-  (except (micascheme) write when)
   (micalog keywords)
   (micalog verilog)
   (code))
-
-(define-case-syntax (check-verilog (id body) string)
-  #`(check
-    (equal?
-      (code-string
-        (#,(identifier-append #'id #'id #'->code) #'body))
-      string)))
 
 (check-verilog (identifier clock) "clock")
 (check-verilog (identifier item-counter) "item_counter")
@@ -32,9 +24,9 @@
       (bit-count 8)
       (initial 128)
       (on (positive-edge clock))
-      (when enabled)
-      (write (+ counter 1))))
-  (lines-string
+      (if enabled)
+      (set (+ counter 1))))
+  (lines
     "reg [7:0] counter = 128;"
     "always @(posedge clock) begin"
     "  if (enabled) begin"
@@ -47,7 +39,7 @@
     (wire next-value
       (bit-count 8)
       (+ value 1)))
-  (lines-string
+  (lines
     "wire [7:0] next_value = value + 1;"))
 
 (check-verilog
@@ -57,8 +49,8 @@
         (bit-count 8)
         (initial 128)
         (on (positive-edge clock))
-        (when enabled)
-        (write next-counter))
+        (if enabled)
+        (set next-counter))
       (wire next-value
         (bit-count 8)
         (+ counter 1))
@@ -66,9 +58,9 @@
         (bit-count 8)
         (initial 0)
         (on (negative-edge clock))
-        (when enabled)
-        (write next-value))))
-  (lines-string
+        (if enabled)
+        (set next-value))))
+  (lines
     "reg [7:0] counter = 128;"
     "always @(posedge clock) begin"
     "  if (enabled) begin"
