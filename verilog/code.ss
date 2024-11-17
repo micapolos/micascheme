@@ -1,6 +1,5 @@
 (library (verilog code)
   (export
-    program->code
     declaration->code
     declarations->code
     statement->code
@@ -9,7 +8,8 @@
     expr->code
     edge->code
     event->code
-    check-verilog)
+    check-verilog
+    check-verilog*)
   (import
     (micascheme)
     (code)
@@ -19,11 +19,6 @@
       (rename
         (only (micascheme) lines-string)
         (lines-string lines))))
-
-  (define (program->code $program)
-    (syntax-case $program (%circuit)
-      ((%circuit declaration ...)
-        (declarations->code (syntaxes declaration ...)))))
 
   (define (declarations->code $declarations)
     (apply code-append
@@ -276,5 +271,12 @@
       (equal?
         (code-string
           (#,(identifier-append #'id #'id #'->code) #'body))
+        string)))
+
+  (define-case-syntax (check-verilog* (id body ...) string)
+    #`(check
+      (equal?
+        (code-string
+          (#,(identifier-append #'id #'id #'->code) (list #'body ...)))
         string)))
 )

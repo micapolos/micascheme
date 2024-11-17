@@ -134,15 +134,14 @@
     "  y <= z;"
     "end"))
 
-(check-verilog
-  (program
-    (circuit
-      (reg (range 7 0) counter)
-      (wire (range 7 0) counter-next)
-      (always *
-        (assign counter-next (+ counter 1)))
-      (always (negedge clock)
-        (set! counter counter-next))))
+(check-verilog*
+  (declarations
+    (reg (range 7 0) counter)
+    (wire (range 7 0) counter-next)
+    (always *
+      (assign counter-next (+ counter 1)))
+    (always (negedge clock)
+      (set! counter counter-next)))
   (lines
     "reg [7:0] counter;"
     "wire [7:0] counter_next;"

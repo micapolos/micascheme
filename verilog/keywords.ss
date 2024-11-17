@@ -1,6 +1,6 @@
 (library (verilog keywords)
   (export
-    circuit wire reg
+    wire reg
     posedge negedge always
     cond else range
     + - * and or inv
@@ -10,7 +10,7 @@
     (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
-    circuit wire reg
+    wire reg
     posedge negedge always
     cond else range
     + - * and or inv
