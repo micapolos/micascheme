@@ -142,7 +142,9 @@
           (and $vector (range-declaration->code $vector))
           (name->code $name)
           (list->code (map range-declaration->code $arrays))
-          (and $expr (space-separated-code "=" (expr->code $expr)))))))
+          (if (and (free-identifier=? $kind #'%wire) $expr)
+            (syntax-error $expr "not valid for wire")
+            (and $expr (space-separated-code "=" (expr->code $expr))))))))
 
   (define (name->code $name)
     (fluent $name
