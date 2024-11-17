@@ -27,7 +27,8 @@
     transform
     syntaxes
     syntax-subst
-    syntax-contains?)
+    syntax-contains?
+    syntax-case?)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -250,4 +251,7 @@
         (or
           (syntax-contains? #'x $id)
           (syntax-contains? #'y $id)))))
+
+  (define-rule-syntax (syntax-case? expr keywords case ...)
+    (syntax-case expr keywords case ... (_ #f)))
 )

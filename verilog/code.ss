@@ -45,16 +45,16 @@
               (map statement->code (syntaxes statement ...))))
           (newline-ended-code "end")))
       ((kind name array ...)
-        (for-all range? (syntaxes array ...))
+        (for-all range->code? (syntaxes array ...))
         (declaration-components->code #'kind #f #'name (syntaxes array ...) #f))
       ((kind vector name array ...)
-        (for-all range? (syntaxes vector array ...))
+        (for-all range->code? (syntaxes vector array ...))
         (declaration-components->code #'kind #'vector #'name (syntaxes array ...) #f))
       ((kind name array ... expr)
-        (for-all range? (syntaxes array ...))
+        (for-all range->code? (syntaxes array ...))
         (declaration-components->code #'kind #f #'name (syntaxes array ...) #'expr))
       ((kind vector name array ... expr)
-        (for-all range? (syntaxes vector array ...))
+        (for-all range->code? (syntaxes vector array ...))
         (declaration-components->code #'kind #'vector #'name (syntaxes array ...) #'expr))))
 
   (define (statement->code $statement)
@@ -211,18 +211,18 @@
         ((index)
           (index->code #'index)))))
 
-  (define (range? $range)
-    (syntax-case $range (%:)
-      ((_ %: _) #t)
-      (_ #f)))
-
-  (define (range->code $range)
-    (syntax-case $range (%:)
+  (define (range->code? $range)
+    (syntax-case? $range (%:)
       ((from %: to)
         (code
           (index->code #'from)
           ":"
           (index->code #'to)))))
+
+  (define (range->code $range)
+    (or
+      (range->code? $range)
+      (syntax-error $range "invalid range")))
 
   (define (range-declaration->code $range-declaration)
     (code-in-square-brackets (range->code $range-declaration)))
