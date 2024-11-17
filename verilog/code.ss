@@ -30,7 +30,7 @@
       (map declaration->code $declarations)))
 
   (define (declaration->code $item)
-    (syntax-case $item (%always %:)
+    (syntax-case $item (%always)
       ((%always event statement ...)
         (code
           (newline-ended-code
