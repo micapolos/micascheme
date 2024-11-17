@@ -1,7 +1,9 @@
 reg half_clock = 0;
 reg [7:0] counter_8 = 'b11111111;
 wire [3:0] counter_4;
-assign counter_4 = counter_8[3:0];
+always @(*) begin
+  assign counter_4 = counter_8[3:0];
+end
 always @(posedge clock) begin
   half_clock <= ~half_clock;
 end

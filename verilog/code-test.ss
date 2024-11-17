@@ -45,6 +45,10 @@
   (lines "x <= y;"))
 
 (check-verilog
+  (statement (assign x y))
+  (lines "assign x = y;"))
+
+(check-verilog
   (statement
     (cond
       (reset (set! x 0))
@@ -74,14 +78,11 @@
 (check-verilog (edge posedge) "posedge")
 (check-verilog (edge negedge) "negedge")
 
+(check-verilog (event *) "*")
 (check-verilog (event (negedge clock)) "negedge clock")
 (check-verilog (event (negedge clock)) "negedge clock")
 
 (check-verilog (size 8) "[7:0]")
-
-(check-verilog
-  (declaration (assign x y))
-  (lines "assign x = y;"))
 
 (check-verilog
   (declaration (wire foo))
@@ -113,6 +114,17 @@
 
 (check-verilog
   (declaration
+    (always *
+      (assign x z)
+      (assign y z)))
+  (lines
+    "always @(*) begin"
+    "  assign x = z;"
+    "  assign y = z;"
+    "end"))
+
+(check-verilog
+  (declaration
     (always (posedge clock)
       (set! x z)
       (set! y z)))
@@ -127,13 +139,16 @@
     (circuit
       (reg (range 7 0) counter)
       (wire (range 7 0) counter-next)
-      (assign counter-next (+ counter 1))
+      (always *
+        (assign counter-next (+ counter 1)))
       (always (negedge clock)
         (set! counter counter-next))))
   (lines
     "reg [7:0] counter;"
     "wire [7:0] counter_next;"
-    "assign counter_next = counter + 1;"
+    "always @(*) begin"
+    "  assign counter_next = counter + 1;"
+    "end"
     "always @(negedge clock) begin"
     "  counter <= counter_next;"
     "end"))
