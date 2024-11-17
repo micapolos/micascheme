@@ -12,6 +12,8 @@
         (syntax-case (expr-term #'expr) (%+ %- %append)
           (id (identifier? #'id)
             #'id)
+          (integer (integer? (datum integer))
+            #'integer)
           ((%+ lhs rhs)
             #`(%%+
               #,(expr->verilog #'lhs)

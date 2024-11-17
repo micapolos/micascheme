@@ -12,6 +12,8 @@
 
 (check-expr (_ _ x) x)
 
+(check-expr (_ _ 128) 128)
+
 (check-expr
   (_ _ (%+ (_ _ a) (_ _ b)))
   (%%+ a b))
