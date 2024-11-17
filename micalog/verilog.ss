@@ -8,7 +8,7 @@
     edge->code
     event->code)
   (import
-    (except (micascheme) write)
+    (except (micascheme) write when)
     (code)
     (micalog keywords))
 
@@ -21,12 +21,13 @@
             (code "\n"))))))
 
   (define (item->code $item)
-    (syntax-case $item (register bit-count initial on write)
+    (syntax-case $item (register bit-count initial on write when)
       (
         (register name
           (bit-count size)
           (initial initial-value)
           (on event)
+          (when when-value)
           (write write-value))
         (code
           (newline-ended-code
@@ -46,11 +47,18 @@
                   (code-in-round-brackets (event->code #'event)))
                 "begin")
               (code-indent
-                (colon-ended-code
+                (newline-separated-code
                   (space-separated-code
-                    (identifier->code #'name)
-                    "<="
-                    (value->code #'write-value))))
+                    "if"
+                    (code-in-round-brackets (value->code #'when-value))
+                    "begin")
+                  (code-indent
+                    (colon-ended-code
+                      (space-separated-code
+                        (identifier->code #'name)
+                        "<="
+                        (value->code #'write-value))))
+                  "end"))
               "end"))))
       (
         (wire name

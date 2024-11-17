@@ -1,5 +1,5 @@
 (import
-  (except (micascheme) write)
+  (except (micascheme) write when)
   (micalog keywords)
   (micalog verilog)
   (code))
@@ -32,11 +32,14 @@
       (bit-count 8)
       (initial 128)
       (on (positive-edge clock))
+      (when enabled)
       (write (+ counter 1))))
   (lines-string
     "reg [7:0] counter = 128;"
     "always @(posedge clock) begin"
-    "  counter <= counter + 1;"
+    "  if (enabled) begin"
+    "    counter <= counter + 1;"
+    "  end"
     "end"))
 
 (check-verilog
@@ -54,6 +57,7 @@
         (bit-count 8)
         (initial 128)
         (on (positive-edge clock))
+        (when enabled)
         (write next-counter))
       (wire next-value
         (bit-count 8)
@@ -62,16 +66,21 @@
         (bit-count 8)
         (initial 0)
         (on (negative-edge clock))
+        (when enabled)
         (write next-value))))
   (lines-string
     "reg [7:0] counter = 128;"
     "always @(posedge clock) begin"
-    "  counter <= next_counter;"
+    "  if (enabled) begin"
+    "    counter <= next_counter;"
+    "  end"
     "end"
     ""
     "wire [7:0] next_value = counter + 1;"
     ""
     "reg [7:0] next_counter = 0;"
     "always @(negedge clock) begin"
-    "  next_counter <= next_value;"
+    "  if (enabled) begin"
+    "    next_counter <= next_value;"
+    "  end"
     "end"))
