@@ -240,8 +240,8 @@
           (index->code #'index)))))
 
   (define (range->code? $range)
-    (syntax-case? $range (%range)
-      ((%range from to)
+    (syntax-case? $range (%to)
+      ((from %to to)
         (code
           (index->code #'from)
           ":"
