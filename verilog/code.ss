@@ -30,7 +30,7 @@
       (map declaration->code $declarations)))
 
   (define (declaration->code $item)
-    (syntax-case $item (%initial %always %wire %reg)
+    (syntax-case $item (%always %:)
       ((%always event statement ...)
         (code
           (newline-ended-code
@@ -44,14 +44,14 @@
             (list->code
               (map statement->code (syntaxes statement ...))))
           (newline-ended-code "end")))
-      ((%wire name type)
-        (reg?-name-type-expr->code #f #'name #'type #f))
-      ((%wire name type expr)
-        (reg?-name-type-expr->code #f #'name #'type #'expr))
-      ((%reg name type)
-        (reg?-name-type-expr->code #t #'name #'type #f))
-      ((%reg name type expr)
-        (reg?-name-type-expr->code #t #'name #'type #'expr))))
+      ((kind name (a1 %: a2) ...)
+        (declaration-components->code #'kind #f #'name (syntaxes (a1 %: a2) ...) #f))
+      ((kind (v1 %: v2) name (a1 %: a2) ...)
+        (declaration-components->code #'kind #'(v1 %: v2) #'name (syntaxes (a1 %: a2) ...) #f))
+      ((kind name (a1 %: a2) ... expr)
+        (declaration-components->code #'kind #f #'name (syntaxes (a1 %: a2) ...) #'expr))
+      ((kind (v1 %: v2) name (a1 %: a2) ... expr)
+        (declaration-components->code #'kind #'(v1 %: v2) #'name (syntaxes (a1 %: a2) ...) #'expr))))
 
   (define (statement->code $statement)
     (syntax-case $statement (%set! %if)
@@ -74,18 +74,20 @@
               (map statement->code (syntaxes statement ...))))
           (newline-ended-code "end")))))
 
-  (define (reg?-name-type-expr->code $reg? $name $type $expr)
-    (lets
-      ((values $vector-code $array-code)
-        (type->vector-array-code $type))
-      (newline-ended-code
-        (colon-ended-code
-          (space-separated-code
-            (string-code (if $reg? "reg" "wire"))
-            $vector-code
-            (name->code $name)
-            $array-code
-            (and $expr (space-separated-code "=" (expr->code $expr))))))))
+  (define (declaration-kind->code $kind)
+    (syntax-case $kind (%wire %reg)
+      (%wire (code "wire"))
+      (%reg (code "reg"))))
+
+  (define (declaration-components->code $kind $vector $name $arrays $expr)
+    (newline-ended-code
+      (colon-ended-code
+        (space-separated-code
+          (declaration-kind->code $kind)
+          (and $vector (range-declaration->code $vector))
+          (name->code $name)
+          (list->code (map range-declaration->code $arrays))
+          (and $expr (space-separated-code "=" (expr->code $expr)))))))
 
   (define (name->code $name)
     (fluent $name
@@ -199,14 +201,22 @@
 
   (define (selector->code $selector)
     (code-in-square-brackets
-      (syntax-case $selector ()
-        ((from to)
-          (code
-            (index->code #'from)
-            ":"
-            (index->code #'to)))
+      (syntax-case $selector (%:)
+        ((from %: to)
+          (range->code $selector))
         ((index)
           (index->code #'index)))))
+
+  (define (range->code $range)
+    (syntax-case $range (%:)
+      ((from %: to)
+        (code
+          (index->code #'from)
+          ":"
+          (index->code #'to)))))
+
+  (define (range-declaration->code $range-declaration)
+    (code-in-square-brackets (range->code $range-declaration)))
 
   (define (index->code $index)
     (switch (syntax->datum $index)

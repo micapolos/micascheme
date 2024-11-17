@@ -4,5 +4,5 @@
 
 (check
   (equal?
-    (verilog-string (wire x bit 0))
-    (lines-string "wire x = 0;")))
+    (verilog-string (wire x))
+    (lines-string "wire x;")))

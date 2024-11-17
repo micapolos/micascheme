@@ -4,12 +4,11 @@
 
 (display
   (verilog-string
-    (reg half-clock bit 0)
+    (reg half-clock 0)
 
-    (reg counter-8 (vector bit 8) 0)
+    (reg (7 : 0) counter-8 0)
 
-    (wire counter-4 (vector bit 4)
-      (ref counter-8 (3 0)))
+    (wire (3 : 0) counter-4 (ref counter-8 (3 : 0)))
 
     (always (positive-edge clock)
       (set! half-clock (inv half-clock)))

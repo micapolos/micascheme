@@ -29,7 +29,7 @@
 (check-verilog (expr (ref a)) "a")
 (check-verilog (expr (ref a (12))) "a[12]")
 (check-verilog (expr (ref a (12) (13))) "a[12][13]")
-(check-verilog (expr (ref a (3 0))) "a[3:0]")
+(check-verilog (expr (ref a (3 : 0))) "a[3:0]")
 
 (check-verilog (expr (append)) "{}")
 (check-verilog (expr (append a)) "{a}")
@@ -59,52 +59,44 @@
 (check-verilog (size 8) "[7:0]")
 
 (check-verilog
-  (declaration (wire foo bit))
+  (declaration (wire foo))
   (lines "wire foo;"))
 
 (check-verilog
-  (declaration (wire foo (vector bit 8)))
-  (lines "wire [7:0] foo;"))
+  (declaration (wire (3 : 0) foo))
+  (lines "wire [3:0] foo;"))
 
 (check-verilog
-  (declaration (wire foo bit x))
-  (lines "wire foo = x;"))
+  (declaration (wire (3 : 0) foo (4 : 0)))
+  (lines "wire [3:0] foo [4:0];"))
 
 (check-verilog
-  (declaration (wire foo (vector bit 8) x))
-  (lines "wire [7:0] foo = x;"))
+  (declaration (wire foo 0))
+  (lines "wire foo = 0;"))
 
 (check-verilog
-  (declaration (wire foo (vector (vector bit 8) 4) x))
-  (lines "wire [7:0] foo [3:0] = x;"))
+  (declaration (wire (3 : 0) foo 0))
+  (lines "wire [3:0] foo = 0;"))
 
 (check-verilog
-  (declaration (wire foo (vector (vector (vector bit 8) 4) 3) x))
-  (lines "wire [7:0] foo [3:0][2:0] = x;"))
-
-(check-verilog
-  (declaration (reg foo bit))
+  (declaration (reg foo))
   (lines "reg foo;"))
 
 (check-verilog
-  (declaration (reg foo (vector bit 8)))
-  (lines "reg [7:0] foo;"))
+  (declaration (reg (3 : 0) foo))
+  (lines "reg [3:0] foo;"))
 
 (check-verilog
-  (declaration (reg foo bit x))
-  (lines "reg foo = x;"))
+  (declaration (reg (3 : 0) foo (4 : 0)))
+  (lines "reg [3:0] foo [4:0];"))
 
 (check-verilog
-  (declaration (reg foo (vector bit 8) x))
-  (lines "reg [7:0] foo = x;"))
+  (declaration (reg foo 0))
+  (lines "reg foo = 0;"))
 
 (check-verilog
-  (declaration (reg foo (vector (vector bit 8) 4) x))
-  (lines "reg [7:0] foo [3:0] = x;"))
-
-(check-verilog
-  (declaration (reg foo (vector (vector (vector bit 8) 4) 3) x))
-  (lines "reg [7:0] foo [3:0][2:0] = x;"))
+  (declaration (reg (3 : 0) foo 0))
+  (lines "reg [3:0] foo = 0;"))
 
 (check-verilog
   (declaration
@@ -120,8 +112,8 @@
 (check-verilog
   (program
     (circuit
-      (reg counter (vector bit 8) 128)
-      (wire counter-next (vector bit 8) (+ counter 1))
+      (reg (7 : 0) counter 128)
+      (wire (7 : 0) counter-next (+ counter 1))
       (always (negative-edge clock)
         (set! counter counter-next))))
   (lines
