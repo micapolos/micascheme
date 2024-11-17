@@ -75,7 +75,7 @@
         (expr->code $value))))
 
   (define (expr->code $value)
-    (syntax-case $value (%+ %and %or %not %ref %append)
+    (syntax-case $value (%+ %and %or %inv %ref %append)
       (id (identifier? #'id)
         (name->code #'id))
       (integer (integer? (datum integer))
@@ -86,7 +86,7 @@
         (ops-default->code " & " (code "~0") (syntaxes expr ...)))
       ((%or expr ...)
         (ops-default->code " | " (code 0) (syntaxes expr ...)))
-      ((%not rhs)
+      ((%inv rhs)
         (op->code "~" #'rhs))
       ((%ref expr selector ...)
         (code

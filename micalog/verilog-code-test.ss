@@ -24,7 +24,7 @@
 (check-verilog (expr (or a b)) "a | b")
 (check-verilog (expr (or a b c)) "a | b | c")
 
-(check-verilog (expr (not a)) "~a")
+(check-verilog (expr (inv a)) "~a")
 
 (check-verilog (expr (ref a)) "a")
 (check-verilog (expr (ref a (12))) "a[12]")

@@ -5,7 +5,7 @@
     initial
     on positive-edge negative-edge
     if
-    + vector and or not ref append)
+    + vector and or inv ref append)
   (import
     (only (micascheme) define-aux-keywords))
 
@@ -15,5 +15,5 @@
     initial
     on positive-edge negative-edge
     if
-    + vector and or not ref append)
+    + vector and or inv ref append)
 )
