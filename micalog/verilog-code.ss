@@ -146,10 +146,10 @@
           "end"))))
 
   (define (type->vector-array-code $type)
-    (syntax-case $type (%bit %*)
+    (syntax-case $type (%bit %vector)
       (%bit
         (values #f #f))
-      ((%* type size)
+      ((%vector type size)
         (lets
           ((values $vector $array) (type->vector-array-code #'type))
           (if $vector
