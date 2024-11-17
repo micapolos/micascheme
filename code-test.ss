@@ -8,6 +8,7 @@
 (check (equal? (code-string (char-code #\a)) "a"))
 
 ; code-indent
+(check (equal? (code-string (code-indent #f)) ""))
 (check (equal? (code-string (code-indent (char-code #\newline))) "\n"))
 (check (equal? (code-string (code-indent (char-code #\a))) "  a"))
 
@@ -24,6 +25,18 @@
   (equal?
     (code-string
       (apply code-append
+        (list
+          (string-code "foo")
+          (char-code #\newline)
+          (string-code "bar")
+          (char-code #\newline))))
+    "foo\nbar\n"))
+
+; list->code
+(check
+  (equal?
+    (code-string
+      (list->code
         (list
           (string-code "foo")
           (char-code #\newline)

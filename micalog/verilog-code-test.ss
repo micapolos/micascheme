@@ -35,6 +35,21 @@
 (check-verilog (expr (append a)) "{a}")
 (check-verilog (expr (append a b)) "{a, b}")
 
+(check-verilog
+  (statement (set! x y))
+  (lines "x <= y;"))
+
+(check-verilog
+  (statement
+    (when x
+      (set! x 10)
+      (set! y 20)))
+  (lines
+    "if (x) begin"
+    "  x <= 10;"
+    "  y <= 20;"
+    "end"))
+
 (check-verilog (edge positive-edge) "posedge")
 (check-verilog (edge negative-edge) "negedge")
 
@@ -88,6 +103,24 @@
     "reg [7:0] foo = x;"
     "always @(posedge clock) begin"
     "  foo <= y;"
+    "end"))
+
+(check-verilog
+  (declaration
+    (on (positive-edge clock)))
+  (lines
+    "always @(posedge clock) begin"
+    "end"))
+
+(check-verilog
+  (declaration
+    (on (positive-edge clock)
+      (set! x 10)
+      (set! y 20)))
+  (lines
+    "always @(posedge clock) begin"
+    "  x <= 10;"
+    "  y <= 20;"
     "end"))
 
 (check-verilog

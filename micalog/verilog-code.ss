@@ -3,6 +3,7 @@
     program->code
     declaration->code
     declarations->code
+    statement->code
     size->code
     name->code
     expr->code
@@ -26,6 +27,19 @@
 
   (define (declaration->code $item)
     (syntax-case $item (%initial %on)
+      ((%on event statement ...)
+        (code
+          (newline-ended-code
+            (space-separated-code
+              "always"
+              (code "@"
+                (code-in-round-brackets
+                  (event->code #'event)))
+              "begin"))
+          (code-indent
+            (list->code
+              (map statement->code (syntaxes statement ...))))
+          (newline-ended-code "end")))
       ((name type (%initial expr) (%on action ...))
         (code
           (reg?-name-type-expr->code #t #'name #'type #'expr)
@@ -39,6 +53,27 @@
       ((name type)
         (code
           (reg?-name-type-expr->code #F #'name #'type #f)))))
+
+  (define (statement->code $statement)
+    (syntax-case $statement (%set! %when)
+      ((%set! lhs rhs)
+        (newline-ended-code
+          (colon-ended-code
+            (space-separated-code
+              (lhs->code #'lhs)
+              "<="
+              (expr->code #'rhs)))))
+      ((%when cond statement ...)
+        (code
+          (newline-ended-code
+            (space-separated-code
+              "if"
+              (code-in-round-brackets (expr->code #'cond))
+              "begin"))
+          (code-indent
+            (list->code
+              (map statement->code (syntaxes statement ...))))
+          (newline-ended-code "end")))))
 
   (define (reg?-name-type-expr->code $reg? $name $type $expr)
     (lets
@@ -96,6 +131,16 @@
       ((%append expr ...)
         (code-in-curly-brackets
           (ops->code ", " (syntaxes expr ...))))))
+
+  (define (lhs->code $lhs)
+    (syntax-case $lhs ()
+      (id (identifier? #'id)
+        (name->code #'id))
+      ((id selector ...)
+        (identifier? #'id)
+        (code
+          (name->code #'id)
+          (list->code (map selector->code (syntaxes selector ...)))))))
 
   (define (op->code $op $rhs)
     (code

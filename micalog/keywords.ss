@@ -1,19 +1,19 @@
 (library (micalog keywords)
   (export
-    circuit
+    circuit wire reg
     bit
     initial
     on positive-edge negative-edge
-    if
-    + vector and or inv ref append)
+    if when
+    + vector and or inv set! ref append)
   (import
     (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
-    circuit
+    circuit wire reg
     bit
     initial
     on positive-edge negative-edge
-    if
-    + vector and or inv ref append)
+    if when
+    + vector and or inv set! ref append)
 )

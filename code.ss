@@ -8,6 +8,7 @@
     string-code
     number-code
     code-indent
+    list->code
 
     separated-code
     space-separated-code
@@ -46,7 +47,7 @@
       (run (when $code ($code #t 0 $port)))
       (get-output-string $port)))
 
-  (define (code-append . $codes)
+  (define (list->code $codes)
     (and
       (exists identity $codes)
       (lambda ($line-start? $indent $port)
@@ -57,6 +58,9 @@
               $line-start?))
           $line-start?
           $codes))))
+
+  (define (code-append . $codes)
+    (list->code $codes))
 
   (define (char-code $char)
     (case $char
@@ -82,8 +86,9 @@
     (string-code (number->string $number)))
 
   (define (code-indent $code)
-    (lambda ($line-start? $indent $port)
-      ($code $line-start? (add1 $indent) $port)))
+    (and $code
+      (lambda ($line-start? $indent $port)
+        ($code $line-start? (add1 $indent) $port))))
 
   (define-case-syntaxes
     ((separated-code $separator $code ...)
