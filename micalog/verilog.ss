@@ -23,13 +23,20 @@
             (code "\n"))))))
 
   (define (declaration->code $item)
-    (syntax-case $item ()
-      ((name type expr)
-        (reg?-name-type-expr->code #f #'name #'type #'expr))
-      ((name type expr action)
+    (syntax-case $item (%initial %on)
+      ((name type (%initial expr) (%on action ...))
         (code
           (reg?-name-type-expr->code #t #'name #'type #'expr)
-          (name-action->code #'name #'action)))))
+          (name-action->code #'name #'(%on action ...))))
+      ((name type (%on action ...))
+        (code
+          (reg?-name-type-expr->code #t #'name #'type #f)
+          (name-action->code #'name #'(%on action ...))))
+      ((name type expr)
+        (reg?-name-type-expr->code #f #'name #'type #'expr))
+      ((name type)
+        (code
+          (reg?-name-type-expr->code #F #'name #'type #f)))))
 
   (define (reg?-name-type-expr->code $reg? $name $type $expr)
     (lets
@@ -42,8 +49,7 @@
             $vector-code
             (name->code $name)
             $array-code
-            "="
-            (expr->code $expr))))))
+            (and $expr (space-separated-code "=" (expr->code $expr))))))))
 
   (define (name->code $name)
     (fluent $name

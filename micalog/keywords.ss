@@ -2,6 +2,7 @@
   (export
     circuit
     bit vector
+    initial
     on positive-edge negative-edge
     if
     +)
@@ -11,6 +12,7 @@
   (define-aux-keywords
     circuit
     bit vector
+    initial
     on positive-edge negative-edge
     if
     +)

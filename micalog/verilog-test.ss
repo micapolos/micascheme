@@ -19,6 +19,10 @@
 (check-verilog (size 8) "[7:0]")
 
 (check-verilog
+  (declaration (foo bit))
+  (lines "wire foo;"))
+
+(check-verilog
   (declaration (foo bit x))
   (lines "wire foo = x;"))
 
@@ -32,7 +36,18 @@
 
 (check-verilog
   (declaration
-    (foo bit x
+    (foo bit
+      (on (positive-edge clock) y)))
+  (lines
+    "reg foo;"
+    "always @(posedge clock) begin"
+    "  foo <= y;"
+    "end"))
+
+(check-verilog
+  (declaration
+    (foo bit
+      (initial x)
       (on (positive-edge clock) y)))
   (lines
     "reg foo = x;"
@@ -41,27 +56,18 @@
     "end"))
 
 (check-verilog
-  (declaration
-    (foo bit x
-      (on (positive-edge clock)
-        (if write y))))
-  (lines
-    "reg foo = x;"
-    "always @(posedge clock) begin"
-    "  if (write) begin"
-    "    foo <= y;"
-    "  end"
-    "end"))
-
-(check-verilog
   (program
     (circuit
-      (counter (vector bit 8) 128
+      (counter
+        (vector bit 8)
+        (initial 128)
         (on (positive-edge clock) next-counter))
-      (next-value (vector bit 8) (+ counter 1))
-      (next-counter (vector bit 8) 0
-        (on (negative-edge clock)
-          next-value))))
+      (next-value
+        (vector bit 8)
+        (+ counter 1))
+      (next-counter
+        (vector bit 8)
+        (on (negative-edge clock) next-value))))
   (lines
     "reg [7:0] counter = 128;"
     "always @(posedge clock) begin"
@@ -70,7 +76,7 @@
     ""
     "wire [7:0] next_value = counter + 1;"
     ""
-    "reg [7:0] next_counter = 0;"
+    "reg [7:0] next_counter;"
     "always @(negedge clock) begin"
     "  next_counter <= next_value;"
     "end"))
