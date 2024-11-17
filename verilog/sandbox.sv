@@ -10,5 +10,7 @@ always @(posedge half_clock) begin
     counter_8 <= 0;
   end else if (increment_) begin
     counter_8 <= counter_8 + 1;
+  end else begin
+    counter_8 <= counter_8 - 1;
   end
 end

@@ -15,6 +15,10 @@
 (check-verilog (expr (+ a b)) "a + b")
 (check-verilog (expr (+ a b c)) "a + b + c")
 
+(check-verilog (expr (- a)) "-a")
+(check-verilog (expr (- a b)) "a - b")
+(check-verilog (expr (- a b c)) "a - b - c")
+
 (check-verilog (expr (and)) "~0")
 (check-verilog (expr (and a)) "a")
 (check-verilog (expr (and a b)) "a & b")

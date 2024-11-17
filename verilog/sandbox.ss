@@ -13,4 +13,5 @@
     (always (posedge half-clock)
       (cond
         (reset? (set! counter-8 0))
-        (increment? (set! counter-8 (+ counter-8 1)))))))
+        (increment? (set! counter-8 (+ counter-8 1)))
+        (else (set! counter-8 (- counter-8 1)))))))

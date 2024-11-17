@@ -3,7 +3,7 @@
     circuit wire reg
     posedge negedge always
     when cond else range
-    + * and or inv
+    + - * and or inv
     assign set! ref
     append)
   (import
@@ -13,7 +13,7 @@
     circuit wire reg
     posedge negedge always
     when cond else range
-    + * and or inv
+    + - * and or inv
     assign set! ref
     append)
 )
