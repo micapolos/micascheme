@@ -6,9 +6,9 @@
   (verilog-string
     (reg half-clock 0)
 
-    (reg (7 : 0) counter-8 0)
+    (reg (range 7 0) counter-8 0)
 
-    (wire (3 : 0) counter-4 (ref counter-8 (3 : 0)))
+    (wire (range 3 0) counter-4 (ref counter-8 (range 3 0)))
 
     (always (posedge clock)
       (set! half-clock (inv half-clock)))

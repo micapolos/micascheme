@@ -29,7 +29,7 @@
 (check-verilog (expr (ref a)) "a")
 (check-verilog (expr (ref a (12))) "a[12]")
 (check-verilog (expr (ref a (12) (13))) "a[12][13]")
-(check-verilog (expr (ref a (3 : 0))) "a[3:0]")
+(check-verilog (expr (ref a (range 3 0))) "a[3:0]")
 
 (check-verilog (expr (append)) "{}")
 (check-verilog (expr (append a)) "{a}")
@@ -63,11 +63,11 @@
   (lines "wire foo;"))
 
 (check-verilog
-  (declaration (wire (3 : 0) foo))
+  (declaration (wire (range 3 0) foo))
   (lines "wire [3:0] foo;"))
 
 (check-verilog
-  (declaration (wire (3 : 0) foo (4 : 0)))
+  (declaration (wire (range 3 0) foo (range 4 0)))
   (lines "wire [3:0] foo [4:0];"))
 
 (check-verilog
@@ -75,7 +75,7 @@
   (lines "wire foo = 0;"))
 
 (check-verilog
-  (declaration (wire (3 : 0) foo 0))
+  (declaration (wire (range 3 0) foo 0))
   (lines "wire [3:0] foo = 0;"))
 
 (check-verilog
@@ -83,11 +83,11 @@
   (lines "reg foo;"))
 
 (check-verilog
-  (declaration (reg (3 : 0) foo))
+  (declaration (reg (range 3 0) foo))
   (lines "reg [3:0] foo;"))
 
 (check-verilog
-  (declaration (reg (3 : 0) foo (4 : 0)))
+  (declaration (reg (range 3 0) foo (range 4 0)))
   (lines "reg [3:0] foo [4:0];"))
 
 (check-verilog
@@ -95,7 +95,7 @@
   (lines "reg foo = 0;"))
 
 (check-verilog
-  (declaration (reg (3 : 0) foo 0))
+  (declaration (reg (range 3 0) foo 0))
   (lines "reg [3:0] foo = 0;"))
 
 (check-verilog
@@ -112,8 +112,8 @@
 (check-verilog
   (program
     (circuit
-      (reg (7 : 0) counter 128)
-      (wire (7 : 0) counter-next (+ counter 1))
+      (reg (range 7 0) counter 128)
+      (wire (range 7 0) counter-next (+ counter 1))
       (always (negedge clock)
         (set! counter counter-next))))
   (lines

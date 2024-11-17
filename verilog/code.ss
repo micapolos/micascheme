@@ -205,15 +205,15 @@
 
   (define (selector->code $selector)
     (code-in-square-brackets
-      (syntax-case $selector (%:)
-        ((from %: to)
-          (range->code $selector))
+      (syntax-case $selector ()
+        (range (range->code? #'range)
+          (range->code #'range))
         ((index)
           (index->code #'index)))))
 
   (define (range->code? $range)
-    (syntax-case? $range (%:)
-      ((from %: to)
+    (syntax-case? $range (%range)
+      ((%range from to)
         (code
           (index->code #'from)
           ":"
