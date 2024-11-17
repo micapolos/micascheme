@@ -1,4 +1,4 @@
-(import (micalog syntax))
+(import (micalog verilog))
 
 (verilog
   (counter

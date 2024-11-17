@@ -2,4 +2,4 @@
 
 (test
   (micalog keywords)
-  (micalog verilog))
+  (micalog verilog-code))
