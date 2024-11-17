@@ -75,21 +75,30 @@
         (expr->code $value))))
 
   (define (expr->code $value)
-    (syntax-case $value (%+ %bitwise-and)
+    (syntax-case $value (%+ %and %or %not)
       (id (identifier? #'id)
         (name->code #'id))
       (integer (integer? (datum integer))
         (number-code (datum integer)))
       ((%+ lhs rhs)
-        (space-separated-code
-          (expr->code #'lhs)
-          "+"
-          (expr->code #'rhs)))
-      ((%bitwise-and lhs rhs)
-        (space-separated-code
-          (expr->code #'lhs)
-          "&"
-          (expr->code #'rhs)))))
+        (op2->code #'lhs "+" #'rhs))
+      ((%and lhs rhs)
+        (op2->code #'lhs "&" #'rhs))
+      ((%or lhs rhs)
+        (op2->code #'lhs "|" #'rhs))
+      ((%not rhs)
+        (op1->code "~" #'rhs))))
+
+  (define (op1->code $op $rhs)
+    (code
+      (string-code $op)
+      (expr->code $rhs)))
+
+  (define (op2->code $lhs $op $rhs)
+    (space-separated-code
+      (expr->code $lhs)
+      (string-code $op)
+      (expr->code $rhs)))
 
   (define (size->number $size)
     (switch (syntax->datum $size)

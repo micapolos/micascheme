@@ -5,7 +5,7 @@
     initial
     on positive-edge negative-edge
     if
-    + vector bitwise-and)
+    + vector and or not)
   (import
     (only (micascheme) define-aux-keywords))
 
@@ -15,5 +15,5 @@
     initial
     on positive-edge negative-edge
     if
-    + vector bitwise-and)
+    + vector and or not)
 )

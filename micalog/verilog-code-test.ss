@@ -9,6 +9,9 @@
 (check-verilog (expr 128) "128")
 (check-verilog (expr clock) "clock")
 (check-verilog (expr (+ a b)) "a + b")
+(check-verilog (expr (and a b)) "a & b")
+(check-verilog (expr (or a b)) "a | b")
+(check-verilog (expr (not a)) "~a")
 
 (check-verilog (edge positive-edge) "posedge")
 (check-verilog (edge negative-edge) "negedge")
