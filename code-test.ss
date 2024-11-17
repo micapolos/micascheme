@@ -12,6 +12,7 @@
 (check (equal? (code-string (code-indent (char-code #\a))) "  a"))
 
 ; string-code
+(check (equal? (code-string (string-code "")) ""))
 (check (equal? (code-string (string-code "foo\nbar\n")) "foo\nbar\n"))
 
 ; number-code
@@ -50,6 +51,8 @@
 (check (equal? (code-string (separated-code ":" (code "a") (code "b") (code "c"))) "a:b:c"))
 
 (check (equal? (code-string (separated-code ":" (code "a") #f (code "c"))) "a:c"))
+(check (equal? (code-string (separated-code ":" (code "a") (empty-code) (code "c"))) "a:c"))
+(check (equal? (code-string (separated-code ":" (code "a") (string-code "") (code "c"))) "a:c"))
 
 (check (equal? (code-string (space-separated-code (code "a") (code "b") (code "c"))) "a b c"))
 (check (equal? (code-string (newline-separated-code (code "a") (code "b") (code "c"))) "a\nb\nc"))
