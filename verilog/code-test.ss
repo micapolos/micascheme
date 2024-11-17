@@ -41,10 +41,6 @@
 (check-verilog (expr (append a b)) "{a, b}")
 
 (check-verilog
-  (statement (assign x y))
-  (lines "assign x = y;"))
-
-(check-verilog
   (statement (set! x y))
   (lines "x <= y;"))
 
@@ -78,11 +74,14 @@
 (check-verilog (edge posedge) "posedge")
 (check-verilog (edge negedge) "negedge")
 
-(check-verilog (event *) "*")
 (check-verilog (event (negedge clock)) "negedge clock")
 (check-verilog (event (negedge clock)) "negedge clock")
 
 (check-verilog (size 8) "[7:0]")
+
+(check-verilog
+  (declaration (assign x y))
+  (lines "assign x = y;"))
 
 (check-verilog
   (declaration (wire foo))
@@ -111,17 +110,6 @@
 (check-verilog
   (declaration (reg (range 3 0) foo (range 4 0)))
   (lines "reg [3:0] foo [4:0];"))
-
-(check-verilog
-  (declaration
-    (always *
-      (assign x z)
-      (assign y z)))
-  (lines
-    "always @(*) begin"
-    "  assign x = z;"
-    "  assign y = z;"
-    "end"))
 
 (check-verilog
   (declaration

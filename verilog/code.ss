@@ -66,15 +66,7 @@
         (declaration-components->code #'kind #'vector #'name (syntaxes array ...) #'expr))))
 
   (define (statement->code $statement)
-    (syntax-case $statement (%assign %set! %cond %else)
-      ((%assign lhs rhs)
-        (newline-ended-code
-          (colon-ended-code
-            (space-separated-code
-              "assign"
-              (lhs->code #'lhs)
-              "="
-              (expr->code #'rhs)))))
+    (syntax-case $statement (%set! %cond %else)
       ((%set! lhs rhs)
         (newline-ended-code
           (colon-ended-code
@@ -224,9 +216,7 @@
       (number-code 0)))
 
   (define (event->code $event)
-    (syntax-case $event (%*)
-      (%*
-        (code "*"))
+    (syntax-case $event ()
       ((edge value)
         (space-separated-code
           (edge->code #'edge)
