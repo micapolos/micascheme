@@ -50,17 +50,6 @@
 
 (check-verilog
   (statement
-    (when x
-      (set! x z)
-      (set! y z)))
-  (lines
-    "if (x) begin"
-    "  x <= z;"
-    "  y <= z;"
-    "end"))
-
-(check-verilog
-  (statement
     (cond
       (reset (set! x 0))
       (write (set! x data))))

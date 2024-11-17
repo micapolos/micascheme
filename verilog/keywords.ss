@@ -2,7 +2,7 @@
   (export
     circuit wire reg
     posedge negedge always
-    when cond else range
+    cond else range
     + - * and or inv
     assign set! ref
     append)
@@ -12,7 +12,7 @@
   (define-aux-keywords
     circuit wire reg
     posedge negedge always
-    when cond else range
+    cond else range
     + - * and or inv
     assign set! ref
     append)

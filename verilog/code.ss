@@ -66,7 +66,7 @@
         (declaration-components->code #'kind #'vector #'name (syntaxes array ...) #'expr))))
 
   (define (statement->code $statement)
-    (syntax-case $statement (%assign %set! %when %cond %else)
+    (syntax-case $statement (%assign %set! %cond %else)
       ((%assign lhs rhs)
         (newline-ended-code
           (colon-ended-code
@@ -82,8 +82,6 @@
               (lhs->code #'lhs)
               "<="
               (expr->code #'rhs)))))
-      ((%when cond statement ...)
-        (statement->code #'(%cond (cond statement ...))))
       ((%cond clause clause* ... (%else else-body ...))
         (newline-ended-code
           (list->code
