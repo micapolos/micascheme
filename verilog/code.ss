@@ -9,7 +9,7 @@
     edge->code
     event->code
     check-verilog
-    check-verilog*)
+    check-verilogs)
   (import
     (micascheme)
     (code)
@@ -273,7 +273,7 @@
           (#,(identifier-append #'id #'id #'->code) #'body))
         string)))
 
-  (define-case-syntax (check-verilog* (id body ...) string)
+  (define-case-syntax (check-verilogs (id body ...) string)
     #`(check
       (equal?
         (code-string

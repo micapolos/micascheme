@@ -134,7 +134,7 @@
     "  y <= z;"
     "end"))
 
-(check-verilog*
+(check-verilogs
   (declarations
     (reg (range 7 0) counter)
     (wire (range 7 0) counter-next)
