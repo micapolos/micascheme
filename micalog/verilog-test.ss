@@ -22,6 +22,20 @@
   (item
     (register counter
       (bit-count 8)
+      (initial #f)
+      (on (positive-edge clock))
+      (if #f)
+      (set (+ counter 1))))
+  (lines
+    "reg [7:0] counter;"
+    "always @(posedge clock) begin"
+    "  counter <= counter + 1;"
+    "end"))
+
+(check-verilog
+  (item
+    (register counter
+      (bit-count 8)
       (initial 128)
       (on (positive-edge clock))
       (if enabled)
@@ -49,30 +63,26 @@
         (bit-count 8)
         (initial 128)
         (on (positive-edge clock))
-        (if enabled)
+        (if #f)
         (set next-counter))
       (wire next-value
         (bit-count 8)
         (+ counter 1))
       (register next-counter
         (bit-count 8)
-        (initial 0)
+        (initial #f)
         (on (negative-edge clock))
-        (if enabled)
+        (if #f)
         (set next-value))))
   (lines
     "reg [7:0] counter = 128;"
     "always @(posedge clock) begin"
-    "  if (enabled) begin"
-    "    counter <= next_counter;"
-    "  end"
+    "  counter <= next_counter;"
     "end"
     ""
     "wire [7:0] next_value = counter + 1;"
     ""
-    "reg [7:0] next_counter = 0;"
+    "reg [7:0] next_counter;"
     "always @(negedge clock) begin"
-    "  if (enabled) begin"
-    "    next_counter <= next_value;"
-    "  end"
+    "  next_counter <= next_value;"
     "end"))

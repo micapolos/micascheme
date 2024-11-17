@@ -51,18 +51,16 @@
                   (code-in-round-brackets (event->code #'event)))
                 "begin")
               (code-indent
-                (newline-separated-code
-                  (space-separated-code
-                    "if"
-                    (code-in-round-brackets (value->code #'if-value))
-                    "begin")
-                  (code-indent
-                    (colon-ended-code
-                      (space-separated-code
-                        (identifier->code #'name)
-                        "<="
-                        (value->code #'set-value))))
-                  "end"))
+                (if (datum if-value)
+                  (newline-separated-code
+                    (space-separated-code
+                      "if"
+                      (code-in-round-brackets (value->code #'if-value))
+                      "begin")
+                    (code-indent
+                      (set->code #`(%set name set-value)))
+                    "end")
+                  (set->code #`(%set name set-value))))
               "end"))))
       (
         (%wire name
@@ -86,6 +84,15 @@
       (map-using identifier-char)
       (list->string)
       (string-code)))
+
+  (define (set->code $set)
+    (syntax-case $set (%set)
+      ((%set id value)
+        (colon-ended-code
+          (space-separated-code
+            (identifier->code (identifier id))
+            "<="
+            (value->code #'value))))))
 
   (define (identifier-char $char)
     (case $char
