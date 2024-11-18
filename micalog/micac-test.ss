@@ -72,13 +72,13 @@
 (check-micac (size 64) %%uint64_t)
 
 (check-micac
-  (instr (%val foo (%expr 9 12)))
+  (instr (%define foo (%expr 9 12)))
   (%%unit
     (%%init)
     (%%update (%%const %%uint16_t foo 12))))
 
 (check-micac
-  (instr (%val foo (%expr (%reg 9) 12)))
+  (instr (%define foo (%expr (%reg 9) 12)))
   (%%unit
     (%%init (%%var %%uint16_t foo 12))
     (%%update)))
@@ -94,11 +94,11 @@
     (instr
       (%on (%expr _ clock)
         (%posedge
-          (%val pos-reg (%expr (%reg 8) 10))
-          (%val pos-val (%expr 8 10)))
+          (%define pos-reg (%expr (%reg 8) 10))
+          (%define pos-val (%expr 8 10)))
         (%negedge
-          (%val neg-reg (%expr (%reg 8) 10))
-          (%val neg-val (%expr 8 10)))))
+          (%define neg-reg (%expr (%reg 8) 10))
+          (%define neg-val (%expr 8 10)))))
     (%%unit
       (%%init
         (%%var %%uint8_t previous-clock 0)

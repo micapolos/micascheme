@@ -1,5 +1,6 @@
 (library (micalog keywords)
   (export
+    define on cond else
     expr
     append slice
     + -
@@ -8,6 +9,7 @@
   (import (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
+    define on cond else
     expr
     append slice
     + -

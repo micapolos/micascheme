@@ -8,9 +8,9 @@
   (process
     (on (expr 1 clock)
       (posedge
-        (val half-clock (expr (reg 1) (reg)))
-        (val counter (expr (reg 8) (reg)))
-        (val counter+16 (expr 8
+        (define half-clock (expr (reg 1) (reg)))
+        (define counter (expr (reg 8) (reg)))
+        (define counter+16 (expr 8
           (+
             (expr 8 (reg-ref (expr (reg 8) counter)))
             (expr 8 16))))

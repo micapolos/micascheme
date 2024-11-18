@@ -89,8 +89,8 @@
       (%%update #,@(reverse $updates))))
 
   (define (block+instr $block $instr)
-    (syntax-case $instr (%val %set %on %posedge %negedge)
-      ((%val id expr)
+    (syntax-case $instr (%define %set %on %posedge %negedge)
+      ((%define id expr)
         (syntax-case (expr-type #'expr) (%reg)
           ((%reg size)
             (block+init $block
