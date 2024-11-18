@@ -10,31 +10,31 @@
       (syntax->datum (expr->verilog #'micalog))
       'verilog)))
 
-(check-expr (_ _ x) x)
+(check-expr (_ x) x)
 
-(check-expr (_ _ 128) 128)
+(check-expr (_ 128) 128)
 
 (check-expr
-  (_ _ (%+ (_ _ a) (_ _ b)))
+  (_ (%+ (_ a) (_ b)))
   (%%+ a b))
 
 (check-expr
-  (_ _ (%- (_ _ a) (_ _ b)))
+  (_ (%- (_ a) (_ b)))
   (%%- a b))
 
 (check-expr
-  (_ _ (%append (_ _ a) (_ 4 b)))
+  (_ (%append (_ a) (_ b)))
   (%%append a b))
 
 (check-expr
-  (_ _ (%and (_ _ a) (_ _ b)))
+  (_ (%and (_ a) (_ b)))
   (%%and a b))
 
 (check-expr
-  (_ _ (%or (_ _ a) (_ _ b)))
+  (_ (%or (_ a) (_ b)))
   (%%or a b))
 
 (check-expr
-  (_ _ (%not (_ _ a)))
+  (_ (%not (_ a)))
   (%%inv a))
 

@@ -8,8 +8,8 @@
 
   (define (expr->verilog $expr)
     (syntax-case $expr ()
-      (expr
-        (syntax-case (expr-term #'expr) (%+ %- %append %and %or %not)
+      ((type term)
+        (syntax-case #'term (%+ %- %append %and %or %not)
           (id (identifier? #'id)
             #'id)
           (integer (integer? (datum integer))
