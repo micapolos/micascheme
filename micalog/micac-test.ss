@@ -4,48 +4,87 @@
   (prefix (micalog keywords) %)
   (prefix (micac syntax) %%))
 
-(define-rule-syntax (check-expr micalog micac)
-  (check
+(define-case-syntax (check-micac (kind micalog) micac)
+  #`(check
     (equal?
-      (syntax->datum (expr->micac #'micalog))
+      (syntax->datum
+        (
+          #,(identifier-append #'kind #'kind #'->micac)
+          #'micalog))
       'micac)))
 
-(check-expr
-  (%expr _ x)
+(define-case-syntax (check-micacs (kind micalog ...) micac)
+  #`(check
+    (equal?
+      (syntax->datum
+        (
+          #,(identifier-append #'kind #'kind #'->micacs)
+          #'(micalog ...)))
+      'micac)))
+
+(check-micac
+  (expr (%expr _ x))
   x)
 
-(check-expr
-  (%expr _ 128)
+(check-micac
+  (expr (%expr _ 128))
   128)
 
-(check-expr
-  (%expr 6 (%+ (%expr _ a) (%expr _ b)))
+(check-micac
+  (expr (%expr 6 (%+ (%expr _ a) (%expr _ b))))
   (%%bitwise-and (%%+ a b) #x3f))
 
-(check-expr
-  (%expr 6 (%- (%expr _ a) (%expr _ b)))
+(check-micac
+  (expr (%expr 6 (%- (%expr _ a) (%expr _ b))))
   (%%bitwise-and (%%- a b) #x3f))
 
-(check-expr
-  (%expr _ (%append (%expr _ a) (%expr 4 b)))
+(check-micac
+  (expr (%expr _ (%append (%expr _ a) (%expr 4 b))))
   (%%bitwise-ior (%%bitwise-arithmetic-shift-left a 4) b))
 
-(check-expr
-  (%expr _ (%slice (%expr _ a) 3 6))
+(check-micac
+  (expr (%expr _ (%slice (%expr _ a) 3 6)))
   (%%bitwise-and (%%bitwise-arithmetic-shift-right a 3) #x3f))
 
-(check-expr
-  (%expr _ (%and (%expr _ a) (%expr _ b)))
+(check-micac
+  (expr (%expr _ (%and (%expr _ a) (%expr _ b))))
   (%%bitwise-and a b))
 
-(check-expr
-  (%expr _ (%or (%expr _ a) (%expr _ b)))
+(check-micac
+  (expr (%expr _ (%or (%expr _ a) (%expr _ b))))
   (%%bitwise-ior a b))
 
-(check-expr
-  (%expr 6 (%not (%expr _ a)))
+(check-micac
+  (expr (%expr 6 (%not (%expr _ a))))
   (%%bitwise-and (%%bitwise-not a) #x3f))
 
-(check-expr
-  (%expr _ (%reg-ref (%expr _ a)))
+(check-micac
+  (expr (%expr _ (%reg-ref (%expr _ a))))
   a)
+
+(check-micac (size 1) %%uint8_t)
+(check-micac (size 8) %%uint8_t)
+(check-micac (size 9) %%uint16_t)
+(check-micac (size 16) %%uint16_t)
+(check-micac (size 17) %%uint32_t)
+(check-micac (size 32) %%uint32_t)
+(check-micac (size 33) %%uint64_t)
+(check-micac (size 64) %%uint64_t)
+
+(check-micac
+  (instr (%val foo (%expr 9 12)))
+  (%%unit
+    (%%init)
+    (%%update (%%const %%uint16_t foo 12))))
+
+(check-micac
+  (instr (%val foo (%expr (%reg 9) 12)))
+  (%%unit
+    (%%init (%%var %%uint16_t foo 12))
+    (%%update)))
+
+(check-micac
+  (instr (%set! (%expr _ x) (%expr _ y)))
+  (%%unit
+    (%%init)
+    (%%update (%%set x y))))
