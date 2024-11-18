@@ -386,3 +386,8 @@
 (check (equal? (values-apply (split (list 1 2 3) 2) cons) (cons (list 1 2) (list 3))))
 (check (equal? (values-apply (split (list 1 2 3) 3) cons) (cons (list 1 2 3) (list))))
 (check (raises? (lambda () (split (list 1 2 3) 4))))
+
+; === opt->list ===
+
+(check (equal? (opt->list #f) (list)))
+(check (equal? (opt->list 123) (list 123)))

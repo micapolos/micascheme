@@ -17,7 +17,7 @@
   (define (expr->micac $expr)
     (syntax-case $expr (%expr)
       ((%expr type term)
-        (syntax-case #'term (%+ %- %append %slice %and %or %not %reg-ref)
+        (syntax-case #'term (%append %slice %+ %- %and %or %not %reg-ref)
           (id (identifier? #'id)
             #'id)
           (integer (integer? (datum integer))
@@ -58,6 +58,11 @@
           ((%reg-ref rhs)
             (expr->micac #'rhs))))))
 
+  (define (reg->micac? $reg)
+    (syntax-case $reg (%reg)
+      ((%reg) #f)
+      ((%reg expr) (expr->micac #'expr))))
+
   (define (instr->micac $instr)
     (fluent
       (empty-block)
@@ -97,7 +102,7 @@
               #`(%%var
                 #,(size->micac #'size)
                 #,(id->micac #'id)
-                #,(expr->micac #'expr))))
+                #,@(opt->list (reg->micac? (expr-value #'expr))))))
           (size
             (block+update $block
               #`(%%const

@@ -5,6 +5,7 @@
     list-get-overflow list-get-overflow? list-get-overflow-index
 
     opt
+    opt->list
     single? single force-single
     ordered-map
     map-using
@@ -346,4 +347,7 @@
 
   (define (filter-using $list $fn)
     (filter $fn $list))
+
+  (define (opt->list $opt)
+    (if $opt (list $opt) (list)))
 )
