@@ -78,3 +78,66 @@
 (check (syntax-contains? #'(x y) #'x))
 (check (syntax-contains? #'(y x) #'x))
 (check (not (syntax-contains? #'(x y) #'z)))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-properties-values
+        #'((prop1 value1) (prop2 value2) (prop1 value3))
+        #'prop1))
+    '(value1 value3)))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-properties-values
+        #'((prop1 value1) (prop2 value2) (prop1 value3))
+        #'prop2))
+    '(value2)))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-properties-values
+        #'((prop1 value1) (prop2 value2) (prop1 value3))
+        #'prop3))
+    '()))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-properties-value?
+        #'((prop1 value1) (prop2 value2))
+        #'prop1))
+    'value1))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-properties-value?
+        #'((prop1 value1) (prop2 value2))
+        #'prop2))
+    'value2))
+
+(check
+  (equal?
+    (syntax-properties-value?
+      #'((prop1 value1) (prop2 value2))
+      #'prop3)
+    #f))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-properties-value
+        #'((prop1 value1) (prop2 value2))
+        #'prop1))
+    'value1))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-properties-value
+        #'((prop1 value1) (prop2 value2))
+        #'prop2))
+    'value2))
