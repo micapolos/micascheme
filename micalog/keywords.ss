@@ -1,10 +1,16 @@
 (library (micalog keywords)
   (export
-    + - append
-    and or not)
+    expr
+    append slice
+    + -
+    and or not
+    reg reg-ref)
   (import (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
-    + - append
-    and or not)
+    expr
+    append slice
+    + -
+    and or not
+    reg reg-ref)
 )

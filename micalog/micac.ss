@@ -8,29 +8,34 @@
     (prefix (micac syntax) %%))
 
   (define (expr->micac $expr)
-    (syntax-case $expr ()
-      ((type term)
-        (syntax-case #'term (%+ %- %append %and %or %not)
+    (syntax-case $expr (%expr)
+      ((%expr type term)
+        (syntax-case #'term (%+ %- %append %slice %and %or %not %reg-ref)
           (id (identifier? #'id)
             #'id)
           (integer (integer? (datum integer))
             #'integer)
+          ((%append lhs rhs)
+            #`(%%bitwise-ior
+              (%%bitwise-arithmetic-shift-left
+                #,(expr->micac #'lhs)
+                #,(type-size (expr-type #'rhs)))
+              #,(expr->micac #'rhs)))
+          ((%slice lhs shift size)
+            (size-micac-mask (datum size)
+              #`(%%bitwise-arithmetic-shift-right
+                #,(expr->micac #'lhs)
+                shift)))
           ((%+ lhs rhs)
-            (micac-mask #'type
+            (type-micac-mask #'type
               #`(%%+
                 #,(expr->micac #'lhs)
                 #,(expr->micac #'rhs))))
           ((%- lhs rhs)
-            (micac-mask #'type
+            (type-micac-mask #'type
               #`(%%-
                 #,(expr->micac #'lhs)
                 #,(expr->micac #'rhs))))
-          ((%append lhs (rhs-type rhs-term))
-            #`(%%bitwise-ior
-              (%%bitwise-arithmetic-shift-left
-                #,(expr->micac #'lhs)
-                #,(syntax->datum #'rhs-type))
-              #,(expr->micac #'(rhs-type rhs-term))))
           ((%and lhs rhs)
             #`(%%bitwise-and
               #,(expr->micac #'lhs)
@@ -40,13 +45,18 @@
               #,(expr->micac #'lhs)
               #,(expr->micac #'rhs)))
           ((%not rhs)
-            (micac-mask #'type
+            (type-micac-mask #'type
               #`(%%bitwise-not
-                #,(expr->micac #'rhs))))))))
+                #,(expr->micac #'rhs))))
+          ((%reg-ref rhs)
+            (expr->micac #'rhs))))))
 
-  (define (micac-mask $type $micac)
+  (define (size-micac-mask $size $micac)
     #`(%%bitwise-and
       #,$micac
-      #,(datum->syntax #'%%bitwise-and
-        (- (bitwise-arithmetic-shift-left 1 (syntax->datum $type)) 1))))
+      #,(datum->syntax #'+
+        (- (bitwise-arithmetic-shift-left 1 (syntax->datum $size)) 1))))
+
+  (define (type-micac-mask $type $micac)
+    (size-micac-mask (type-size $type) $micac))
 )

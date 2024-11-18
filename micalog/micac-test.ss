@@ -10,30 +10,42 @@
       (syntax->datum (expr->micac #'micalog))
       'micac)))
 
-(check-expr (_ x) x)
-
-(check-expr (_ 128) 128)
+(check-expr
+  (%expr _ x)
+  x)
 
 (check-expr
-  (6 (%+ (_ a) (_ b)))
+  (%expr _ 128)
+  128)
+
+(check-expr
+  (%expr 6 (%+ (%expr _ a) (%expr _ b)))
   (%%bitwise-and (%%+ a b) #x3f))
 
 (check-expr
-  (6 (%- (_ a) (_ b)))
+  (%expr 6 (%- (%expr _ a) (%expr _ b)))
   (%%bitwise-and (%%- a b) #x3f))
 
 (check-expr
-  (_ (%append (_ a) (4 b)))
+  (%expr _ (%append (%expr _ a) (%expr 4 b)))
   (%%bitwise-ior (%%bitwise-arithmetic-shift-left a 4) b))
 
 (check-expr
-  (_ (%and (_ a) (_ b)))
+  (%expr _ (%slice (%expr _ a) 3 6))
+  (%%bitwise-and (%%bitwise-arithmetic-shift-right a 3) #x3f))
+
+(check-expr
+  (%expr _ (%and (%expr _ a) (%expr _ b)))
   (%%bitwise-and a b))
 
 (check-expr
-  (_ (%or (_ a) (_ b)))
+  (%expr _ (%or (%expr _ a) (%expr _ b)))
   (%%bitwise-ior a b))
 
 (check-expr
-  (6 (%not (_ a)))
+  (%expr 6 (%not (%expr _ a)))
   (%%bitwise-and (%%bitwise-not a) #x3f))
+
+(check-expr
+  (%expr _ (%reg-ref (%expr _ a)))
+  a)

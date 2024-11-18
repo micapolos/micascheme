@@ -7,23 +7,30 @@
     (prefix (verilog keywords) %%))
 
   (define (expr->verilog $expr)
-    (syntax-case $expr ()
-      ((type term)
-        (syntax-case #'term (%+ %- %append %and %or %not)
+    (syntax-case $expr (%expr)
+      ((%expr type value)
+        (syntax-case #'value (%append %slice %+ %- %and %or %not %reg-ref)
           (id (identifier? #'id)
             #'id)
           (integer (integer? (datum integer))
             #'integer)
+          ((%append lhs rhs)
+            #`(%%append
+              #,(expr->verilog #'lhs)
+              #,(expr->verilog #'rhs)))
+          ((%slice lhs shift cut)
+            #`(%%ref
+              #,(expr->verilog #'lhs)
+              (
+                #,(datum->syntax #'+ (+ (datum shift) (datum cut) -1))
+                %%to
+                shift)))
           ((%+ lhs rhs)
             #`(%%+
               #,(expr->verilog #'lhs)
               #,(expr->verilog #'rhs)))
           ((%- lhs rhs)
             #`(%%-
-              #,(expr->verilog #'lhs)
-              #,(expr->verilog #'rhs)))
-          ((%append lhs rhs)
-            #`(%%append
               #,(expr->verilog #'lhs)
               #,(expr->verilog #'rhs)))
           ((%and lhs rhs)
@@ -36,5 +43,7 @@
               #,(expr->verilog #'rhs)))
           ((%not rhs)
             #`(%%inv
-              #,(expr->verilog #'rhs)))))))
+              #,(expr->verilog #'rhs)))
+          ((%reg-ref rhs)
+            (expr->verilog #'rhs))))))
 )

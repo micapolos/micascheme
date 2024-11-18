@@ -2,4 +2,5 @@
 
 (test
   (micalog micac)
-  (micalog verilog))
+  (micalog verilog)
+  (micalog model))
