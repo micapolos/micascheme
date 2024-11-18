@@ -88,3 +88,28 @@
   (%%unit
     (%%init)
     (%%update (%%set x y))))
+
+(parameterize ((generates-identifier? #f))
+  (check-micac
+    (instr
+      (%on (%expr _ clock)
+        (%posedge
+          (%val pos-reg (%expr (%reg 8) 10))
+          (%val pos-val (%expr 8 10)))
+        (%negedge
+          (%val neg-reg (%expr (%reg 8) 10))
+          (%val neg-val (%expr 8 10)))))
+    (%%unit
+      (%%init
+        (%%var %%uint8_t previous-clock 0)
+        (%%var %%uint8_t pos-reg 10)
+        (%%var %%uint8_t neg-reg 10))
+      (%%update
+        (%%when
+          (%%not (%%= previous-clock id))
+          (%%set previous-clock id)
+          (%%if (not (zero? id))
+            (%%then
+              (%%const %%uint8_t pos-val 10))
+            (%%else
+              (%%const %%uint8_t neg-val 10))))))))

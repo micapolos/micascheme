@@ -4,6 +4,7 @@
     generate-temporary
     with-generate-temporary-seed
     with-tmps
+    generates-identifier?
     generate-identifier)
   (import
     (scheme)
@@ -62,17 +63,22 @@
   (define-rule-syntax (with-tmps $body ...)
     (with-generate-temporary-seed $tmp $body ...))
 
+  (define generates-identifier?
+    (make-thread-parameter #t))
+
   (define (generate-identifier $id)
-    (parameterize
-      ((gensym-prefix
-        (fluent $id
+    (if (generates-identifier?)
+      (parameterize
+        ((gensym-prefix
+          (fluent $id
+            (syntax->datum)
+            (symbol->string)
+            (string-append "_"))))
+        (fluent
+          (generate-temporary)
           (syntax->datum)
           (symbol->string)
-          (string-append "_"))))
-      (fluent
-        (generate-temporary)
-        (syntax->datum)
-        (symbol->string)
-        (string->symbol)
-        (with $it (datum->syntax $id $it)))))
+          (string->symbol)
+          (with $it (datum->syntax $id $it))))
+      $id))
 )

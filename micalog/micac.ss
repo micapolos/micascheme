@@ -64,11 +64,13 @@
       (block+instr $instr)
       (block->micac)))
 
-  (define (instrs->micac $instrs)
+  (define (instrs->block $instrs)
     (fluent
       (empty-block)
-      (with $block (fold-left block+instr $block (syntax->list $instrs)))
-      (block->micac)))
+      (with $block (fold-left block+instr $block (syntax->list $instrs)))))
+
+  (define (instrs->micac $instrs)
+    (block->micac (instrs->block $instrs)))
 
   (define (empty-block)
     (block (stack) (stack)))
@@ -107,23 +109,36 @@
           #`(%%set
             #,(expr->micac #'lhs)
             #,(expr->micac #'rhs))))
-      ((%on (%expr 1 id)
+      ((%on expr
         (%posedge pos-instr ...)
         (%negedge neg-instr ...))
         (lets
-          ($previous-id (generate-identifier (identifier id)))
-          (fluent $block
-            (block+init
-              #`(%%var
-                #,(size->micac #'1)
-                #,$previous-id
-                0))
-            (block+update
+          ($previous-id
+            (generate-identifier
+              (identifier-append #'%on #'previous- (value-id (expr-value #'expr)))))
+          ($pos-block (instrs->block #'(pos-instr ...)))
+          ($neg-block (instrs->block #'(neg-instr ...)))
+          (block
+            (append
+              (block-inits $neg-block)
+              (block-inits $pos-block)
+              (list
+                #`(%%var
+                  #,(size->micac #'1)
+                  #,$previous-id
+                  0))
+              (block-inits $block))
+            (push
+              (block-updates $block)
               #`(%%when (%%not (%%= #,$previous-id id))
                 (%%set #,$previous-id id)
                 (%%if (not (zero? id))
-                  (%%then pos-instr ...)
-                  (%%else neg-instr ...)))))))))
+                  (%%then
+                    #,@(reverse
+                      (block-updates $pos-block)))
+                  (%%else
+                    #,@(reverse
+                      (block-updates $neg-block)))))))))))
 
   (define (size->micac $size)
     (syntax-case $size ()
@@ -136,6 +151,11 @@
             ((<= $number 32) #'%%uint32_t)
             ((<= $number 64) #'%%uint64_t)
             (else (syntax-error $size)))))))
+
+  (define (value-id $value)
+    (syntax-case $value ()
+      (id (identifier? #'id) #'id)
+      (_ #'value)))
 
   (define (id->micac $id) $id)
 
