@@ -82,7 +82,7 @@
 (check
   (equal?
     (syntax->datum
-      (syntax-properties-values
+      (syntax-properties-ref*
         #'((prop1 value1) (prop2 value2) (prop1 value3))
         #'prop1))
     '(value1 value3)))
@@ -90,7 +90,7 @@
 (check
   (equal?
     (syntax->datum
-      (syntax-properties-values
+      (syntax-properties-ref*
         #'((prop1 value1) (prop2 value2) (prop1 value3))
         #'prop2))
     '(value2)))
@@ -98,7 +98,7 @@
 (check
   (equal?
     (syntax->datum
-      (syntax-properties-values
+      (syntax-properties-ref*
         #'((prop1 value1) (prop2 value2) (prop1 value3))
         #'prop3))
     '()))
@@ -106,7 +106,7 @@
 (check
   (equal?
     (syntax->datum
-      (syntax-properties-value?
+      (syntax-properties-ref?
         #'((prop1 value1) (prop2 value2))
         #'prop1))
     'value1))
@@ -114,14 +114,14 @@
 (check
   (equal?
     (syntax->datum
-      (syntax-properties-value?
+      (syntax-properties-ref?
         #'((prop1 value1) (prop2 value2))
         #'prop2))
     'value2))
 
 (check
   (equal?
-    (syntax-properties-value?
+    (syntax-properties-ref?
       #'((prop1 value1) (prop2 value2))
       #'prop3)
     #f))
@@ -129,7 +129,7 @@
 (check
   (equal?
     (syntax->datum
-      (syntax-properties-value
+      (syntax-properties-ref
         #'((prop1 value1) (prop2 value2))
         #'prop1))
     'value1))
@@ -137,7 +137,17 @@
 (check
   (equal?
     (syntax->datum
-      (syntax-properties-value
+      (syntax-properties-ref
         #'((prop1 value1) (prop2 value2))
         #'prop2))
     'value2))
+
+(check
+  (equal?
+    (syntax->datum
+      (syntax-properties-add
+        #'((prop1 value1) (prop2 value2))
+        #'prop3
+        #'value3))
+    '((prop3 value3) (prop1 value1) (prop2 value2))))
+

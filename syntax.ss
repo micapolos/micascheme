@@ -29,9 +29,10 @@
     syntax-subst
     syntax-contains?
     syntax-case?
-    syntax-properties-values
-    syntax-properties-value?
-    syntax-properties-value)
+    syntax-properties-ref*
+    syntax-properties-ref?
+    syntax-properties-ref
+    syntax-properties-add)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -258,33 +259,37 @@
   (define-rule-syntax (syntax-case? expr keywords case ...)
     (syntax-case expr keywords case ... (_ #f)))
 
-  (define (syntax-properties-values $syntax $id)
+  (define (syntax-properties-ref* $syntax $id)
     (syntax-case $syntax ()
       ((property ...)
         (filter
           (lambda (x) x)
           (map
-            (lambda ($property) (syntax-property-value? $property $id))
+            (lambda ($property) (syntax-property-ref? $property $id))
             (syntaxes property ...))))
-      (_ (syntax-error $syntax "not a property list"))))
+      (_
+        (syntax-error $syntax "not a property list"))))
 
-  (define (syntax-properties-value? $syntax $id)
-    (let (($values (syntax-properties-values $syntax $id)))
+  (define (syntax-properties-ref? $syntax $id)
+    (let (($values (syntax-properties-ref* $syntax $id)))
       (cond
         ((null? $values) #f)
         ((null? (cdr $values)) (car $values))
         (else (syntax-error $syntax (format "duplicate property ~a in" (syntax->datum $id)))))))
 
-  (define (syntax-properties-value $syntax $id)
+  (define (syntax-properties-ref $syntax $id)
     (or
-      (syntax-properties-value? $syntax $id)
+      (syntax-properties-ref? $syntax $id)
       (syntax-error $syntax (format "no property ~a in" (syntax->datum $id)))))
 
-  (define (syntax-property-value? $syntax $id)
+  (define (syntax-property-ref? $syntax $id)
     (syntax-case $syntax ()
       ((id value)
         (identifier? #'id)
         (and (free-identifier=? #'id $id) #'value))
       (_
         (syntax-error $syntax "invalid property"))))
+
+  (define (syntax-properties-add $syntax $id $value)
+    #`((#,$id #,$value) . #,$syntax))
 )
