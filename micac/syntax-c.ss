@@ -137,6 +137,7 @@
             (code-in-round-brackets
               (expr-code (syntax->expr #'expr)))
             (block-code #'(body ...)))))
+      ; TODO: Move "cond" to expanded, and expand to "if"
       ((cond clause clause* ... (else else-instr ...))
         (newline-ended-code
           (list->code
@@ -145,6 +146,7 @@
                 (map clause-code (syntaxes clause clause* ...))
                 (list (block-code (syntaxes else-instr ...))))
               (code " else ")))))
+      ; TODO: Move "cond" to expanded, and expand to "when"
       ((cond clause clause* ...)
         (newline-ended-code
           (list->code
