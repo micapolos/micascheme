@@ -287,7 +287,8 @@
     (syntax-case $syntax ()
       ((id value)
         (identifier? #'id)
-        (and (free-identifier=? #'id $id) #'value))))
+        (and (free-identifier=? #'id $id) #'value))
+      (_ #f)))
 
   (define (syntax-properties-add $syntax $id $value)
     #`((#,$id #,$value) . #,$syntax))
