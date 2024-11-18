@@ -58,7 +58,7 @@
           ((%reg-ref rhs)
             (expr->micac #'rhs))))))
 
-  (define (reg->micac? $reg)
+  (define (reg-value->micac? $reg)
     (syntax-case $reg (%reg)
       ((%reg) #f)
       ((%reg expr) (expr->micac #'expr))))
@@ -102,7 +102,7 @@
               #`(%%var
                 #,(size->micac #'size)
                 #,(id->micac #'id)
-                #,@(opt->list (reg->micac? (expr-value #'expr))))))
+                #,@(opt->list (reg-value->micac? (expr-value #'expr))))))
           (size
             (block+update $block
               #`(%%const
