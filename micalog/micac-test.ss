@@ -105,8 +105,7 @@
         (%%var %%uint8_t pos-reg 10)
         (%%var %%uint8_t neg-reg 10))
       (%%update
-        (%%when
-          (%%not (%%= previous-clock id))
+        (%%when (%%not (%%= previous-clock id))
           (%%set previous-clock id)
           (%%if (not (zero? id))
             (%%then

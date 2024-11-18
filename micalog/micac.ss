@@ -128,8 +128,7 @@
                   #,$previous-id
                   0))
               (block-inits $block))
-            (push
-              (block-updates $block)
+            (cons
               #`(%%when (%%not (%%= #,$previous-id id))
                 (%%set #,$previous-id id)
                 (%%if (not (zero? id))
@@ -138,7 +137,8 @@
                       (block-updates $pos-block)))
                   (%%else
                     #,@(reverse
-                      (block-updates $neg-block)))))))))))
+                      (block-updates $neg-block)))))
+                (block-updates $block)))))))
 
   (define (size->micac $size)
     (syntax-case $size ()
