@@ -22,7 +22,7 @@
             #`(%%ref
               #,(expr->verilog #'lhs)
               (
-                #,(datum->syntax #'+ (+ (datum shift) (datum cut) -1))
+                #,(literal->syntax (+ (datum shift) (datum cut) -1))
                 %%to
                 shift)))
           ((%+ lhs rhs)

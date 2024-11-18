@@ -1,13 +1,13 @@
 (micalog
-  (val clock (: 1 native))
-  (val reset? (: 1 native))
-  (val mouse-x (: 16 native))
-  (val mouse-y (: 16 native))
-  (val mouse-pressed? (: 1 native))
+  (val clock (: 1 ?))
+  (val reset? (: 1 ?))
+  (val mouse-x (: 16 ?))
+  (val mouse-y (: 16 ?))
+  (val mouse-pressed? (: 1 ?))
   (on (: 1 clock)
     (posedge
-      (val half-clock (: (reg 1) (reg ?)))
-      (val counter (: (reg 8) (reg ?)))
+      (val half-clock (: (reg 1) (reg)))
+      (val counter (: (reg 8) (reg)))
       (val counter+16 (: 8
         (+
           (: 8 (reg-ref (: (reg 8) counter)))

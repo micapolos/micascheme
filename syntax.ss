@@ -35,7 +35,11 @@
     syntax-properties-add
     syntax-properties-update
     syntax-properties-set
-    syntax-properties-delete)
+    syntax-properties-delete
+    syntax-cons
+    list->syntax
+    syntax-append
+    literal->syntax)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -261,6 +265,18 @@
 
   (define-rule-syntax (syntax-case? expr keywords case ...)
     (syntax-case expr keywords case ... (_ #f)))
+
+  (define (syntax-cons $a $b)
+    #`(#,$a . #,$b))
+
+  (define (list->syntax $list)
+    #`(#,@$list))
+
+  (define (syntax-append . $list)
+    (list->syntax $list))
+
+  (define (literal->syntax $literal)
+    (datum->syntax #'literal->syntax $literal))
 
   (define (syntax-properties-ref* $syntax $id)
     (syntax-case $syntax ()

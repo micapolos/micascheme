@@ -54,7 +54,7 @@
   (define (size-micac-mask $size $micac)
     #`(%%bitwise-and
       #,$micac
-      #,(datum->syntax #'+
+      #,(literal->syntax
         (- (bitwise-arithmetic-shift-left 1 (syntax->datum $size)) 1))))
 
   (define (type-micac-mask $type $micac)
