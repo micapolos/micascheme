@@ -91,7 +91,7 @@
   (define (instr-code $allow-return? $instr)
     (syntax-case $instr
       (
-        begin var const if when while then else set
+        begin var const if when cond while then else set
         + - * div and or bitwise-and bitwise-ior bitwise-xor
         bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
         return)
@@ -137,6 +137,20 @@
             (code-in-round-brackets
               (expr-code (syntax->expr #'expr)))
             (block-code #'(body ...)))))
+      ((cond clause clause* ... (else else-instr ...))
+        (newline-ended-code
+          (list->code
+            (intercalate
+              (append
+                (map clause-code (syntaxes clause clause* ...))
+                (list (block-code (syntaxes else-instr ...))))
+              (code " else ")))))
+      ((cond clause clause* ...)
+        (newline-ended-code
+          (list->code
+            (intercalate
+              (map clause-code (syntaxes clause clause* ...))
+              (code " else ")))))
       ((while expr body ...)
         (newline-ended-code
           (space-separated-code
@@ -190,6 +204,15 @@
                         (map syntax->expr (syntaxes arg ...)))
                       (code ", "))))
                 ")")))))))
+
+  (define (clause-code $clause)
+    (syntax-case $clause ()
+      ((expr instr ...)
+        (space-separated-code
+          "if"
+          (code-in-round-brackets
+            (expr-code (syntax->expr #'expr)))
+          (block-code #'(instr ...))))))
 
   (define (op2-code $lhs $op $expr)
     (newline-ended-code

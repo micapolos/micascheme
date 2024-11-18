@@ -239,6 +239,66 @@
     "}"))
 
 (check-c-string
+  (micac
+    (cond
+      (x
+        (set x 10)
+        (set y 20))))
+  (lines-string
+    "if (x) {"
+    "  x = 10;"
+    "  y = 20;"
+    "}"))
+
+(check-c-string
+  (micac
+    (cond
+      (x
+        (set x 10)
+        (set y 20))
+      (y
+        (set x 30)
+        (set y 40))
+      (z
+        (set x 50)
+        (set y 60))))
+  (lines-string
+    "if (x) {"
+    "  x = 10;"
+    "  y = 20;"
+    "} else if (y) {"
+    "  x = 30;"
+    "  y = 40;"
+    "} else if (z) {"
+    "  x = 50;"
+    "  y = 60;"
+    "}"))
+
+(check-c-string
+  (micac
+    (cond
+      (x
+        (set x 10)
+        (set y 20))
+      (y
+        (set x 30)
+        (set y 40))
+      (else
+        (set x 50)
+        (set y 60))))
+  (lines-string
+    "if (x) {"
+    "  x = 10;"
+    "  y = 20;"
+    "} else if (y) {"
+    "  x = 30;"
+    "  y = 40;"
+    "} else {"
+    "  x = 50;"
+    "  y = 60;"
+    "}"))
+
+(check-c-string
   (micac (set x + (bitwise-and (- (+ x 10) 20) #xff)))
   (lines-string "x += x + 10 - 20 & 255;"))
 

@@ -99,6 +99,24 @@
     (when (bar 0) (bar 1) (bar 2)))
 
   (check-instr
+    (cond
+      ((foo zero) (foo one) (foo two))
+      ((foo one) (foo two) (foo zero)))
+    (cond
+      ((bar 0) (bar 1) (bar 2))
+      ((bar 1) (bar 2) (bar 0))))
+
+  (check-instr
+    (cond
+      ((foo zero) (foo one) (foo two))
+      ((foo one) (foo two) (foo zero))
+      (else (foo two) (foo one)))
+    (cond
+      ((bar 0) (bar 1) (bar 2))
+      ((bar 1) (bar 2) (bar 0))
+      (else (bar 2) (bar 1))))
+
+  (check-instr
     (while (foo zero) (foo one) (foo two))
     (while (bar 0) (bar 1) (bar 2)))
 

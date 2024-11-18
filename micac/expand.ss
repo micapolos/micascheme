@@ -69,7 +69,7 @@
   (define (scoped+instr $scoped $instr)
     (lets
       ((scoped $scope $syntaxes) $scoped)
-      (syntax-case $instr (extern macro begin var const if when while then else set return)
+      (syntax-case $instr (extern macro begin var const if when cond while then else set return)
         ((extern id)
           (scoped+ $scoped (identifier id) #f))
         ((macro (id param ...) body ...)
@@ -117,6 +117,15 @@
             #`(when
               #,(expand-expr $scope #'expr)
               #,@(expand-instrs $scope #'(body ...)))))
+        ((cond clause clause* ... (else else-body ...))
+          (scoped+syntax $scoped
+            #`(cond
+              #,@(map (partial expand-clause $scope) (syntaxes clause clause* ...))
+              (else #,@(expand-instrs $scope #'(else-body ...))))))
+        ((cond clause clause* ...)
+          (scoped+syntax $scoped
+            #`(cond
+              #,@(map (partial expand-clause $scope) (syntaxes clause clause* ...)))))
         ((while expr body ...)
           (scoped+syntax $scoped
             #`(while
@@ -150,6 +159,13 @@
                 #`(
                   #,@(unbegin-syntaxes
                     (scope-transform $scope $transformer $instr))))))))))
+
+  (define (expand-clause $scope $clause)
+    (syntax-case $clause ()
+      ((expr body ...)
+        #`(
+          #,(expand-expr $scope #'expr)
+          #,@(expand-instrs $scope #'(body ...))))))
 
   (define (expand-expr $scope $expr)
     (syntax-case $expr
