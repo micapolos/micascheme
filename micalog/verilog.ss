@@ -7,7 +7,7 @@
     module->verilog
     expr->verilog
     register-declaration->verilog
-    register-body->verilog
+    register-update->verilog
     parameter->verilog
     declaration->verilogs
     kind->verilog?
@@ -66,7 +66,7 @@
       ((%register type init (on event update))
         (list
           (register-declaration->verilog #`(#,$name type init))
-          (register-body->verilog #`(#,$name (on event update)))))
+          (register-update->verilog #`(#,$name (on event update)))))
       (expr
         (non-false-list
           (wire->verilog-declaration? $kind $type $name)
@@ -80,7 +80,7 @@
           #,(name->verilog #'name)
           #,@(opt->list (init->verilog? #'init))))))
 
-  (define (register-body->verilog $body)
+  (define (register-update->verilog $body)
     (syntax-case $body (%on)
       ((name (%on event update))
         #`(%%always

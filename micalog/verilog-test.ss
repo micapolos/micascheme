@@ -24,12 +24,6 @@
 (check-verilog (event (%posedge foo)) (%%posedge foo))
 (check-verilog (event (%negedge 123)) (%%negedge 123))
 
-(check-verilog (parameter (%input 1 foo)) (%%input foo))
-(check-verilog (parameter (%input 16 foo)) (%%input (15 %%to 0) foo))
-
-(check-verilog (parameter (%output 1 foo value)) (%%output foo))
-(check-verilog (parameter (%output 16 foo value)) (%%output (15 %%to 0) foo))
-
 (check-verilog (expr 10) 10)
 (check-verilog (expr foo) foo)
 (check-verilog (expr (%append 0)) (%%append))
@@ -55,10 +49,22 @@
 (check-verilog (expr (%sub 16 a b)) (%%- a b))
 (check-verilog (expr (%neg 16 a)) (%%- a))
 
-(check-verilog (register-declaration (foo 16 (%init))) (%%reg (15 %%to 0) foo))
-(check-verilog (register-declaration (foo 16 (%init 12))) (%%reg (15 %%to 0) foo 12))
+(check-verilog
+  (register-declaration (foo 16 (%init)))
+  (%%reg (15 %%to 0) foo))
+(check-verilog
+  (register-declaration (foo 16 (%init 12)))
+  (%%reg (15 %%to 0) foo 12))
 
-(check-verilog (register-body (foo (%on (%posedge clock) bar))) (%%always (%%posedge clock) (%%set! foo bar)))
+(check-verilog
+  (register-update (foo (%on (%posedge clock) bar)))
+  (%%always (%%posedge clock) (%%set! foo bar)))
+
+(check-verilog (parameter (%input 1 foo)) (%%input foo))
+(check-verilog (parameter (%input 16 foo)) (%%input (15 %%to 0) foo))
+
+(check-verilog (parameter (%output 1 foo value)) (%%output foo))
+(check-verilog (parameter (%output 16 foo value)) (%%output (15 %%to 0) foo))
 
 (check-verilog
   (module
