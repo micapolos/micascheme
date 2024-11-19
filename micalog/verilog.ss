@@ -31,20 +31,25 @@
           ($internals (filter (partial item-kind-of? #'%internal) $items))
           #`(module
             (micalog #,@(map parameter->verilog (append $inputs $outputs)))
-            #,@(flatten (map declaration->verilogs $internals)))))))
+            #,@(flatten (map declaration->verilogs (append $outputs $internals))))))))
 
   (define (parameter->verilog $parameter)
-    (syntax-case $parameter ()
-      ((kind type name)
+    (syntax-case $parameter (%input %output)
+      ((%input type name)
         #`(
-          #,@(opt->list (kind->verilog? #'kind))
+          %%input
+          #,@(opt->list (type->verilog? #'type))
+          #,(name->verilog #'name)))
+      ((%output type name _)
+        #`(
+          %%output
           #,@(opt->list (type->verilog? #'type))
           #,(name->verilog #'name)))))
 
   (define (declaration->verilogs $declaration)
     (syntax-case $declaration (%internal)
-      ((%interal type name body)
-        (body->verilogs #'type #'name #'body))))
+      ((kind type name body)
+        (body->verilogs #'kind #'type #'name #'body))))
 
   (define (kind->verilog? $kind)
     (syntax-case $kind (%input %output %internal)
@@ -59,7 +64,7 @@
           (not (= (datum number) 1))
           #`(#,(- (datum number) 1) %%to 0)))))
 
-  (define (body->verilogs $type $name $value)
+  (define (body->verilogs $kind $type $name $value)
     (syntax-case $value (%register %+)
       ((%register type init domain edge update)
         (list
@@ -75,25 +80,31 @@
               #,(name->verilog $name)
               #,(value->verilog #'update)))))
       ((%+ type a b)
-        (list
-          #`(%%wire
-            #,@(opt->list (type->verilog? $type))
-            #,(name->verilog $name))
-          #`(%%always %%*
-            (%%assign
-              #,(name->verilog $name)
-              (%%+
-                #,(value->verilog #'a)
-                #,(value->verilog #'b))))))
+        (filter-opts
+          (list
+            (and
+              (free-identifier=? $kind #'%internal)
+              #`(%%wire
+                #,@(opt->list (type->verilog? $type))
+                #,(name->verilog $name)))
+            #`(%%always %%*
+              (%%assign
+                #,(name->verilog $name)
+                (%%+
+                  #,(value->verilog #'a)
+                  #,(value->verilog #'b)))))))
       (value
-        (list
-          #`(%%wire
-            #,@(opt->list (type->verilog? $type))
-            #,(name->verilog $name))
-          #`(%%always %%*
-            (%%assign
-              #,(name->verilog $name)
-              #,(value->verilog #'value)))))))
+        (filter-opts
+          (list
+            (and
+              (free-identifier=? $kind #'%internal)
+              #`(%%wire
+                #,@(opt->list (type->verilog? $type))
+                #,(name->verilog $name)))
+            #`(%%always %%*
+              (%%assign
+                #,(name->verilog $name)
+                #,(value->verilog #'value))))))))
 
   (define (edge->verilog $edge)
     (syntax-case $edge ()

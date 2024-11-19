@@ -24,20 +24,30 @@
 (check-verilog (parameter (%input 1 foo)) (%%input foo))
 (check-verilog (parameter (%input 16 foo)) (%%input (15 %%to 0) foo))
 
-(check-verilog (parameter (%output 1 foo)) (%%output foo))
-(check-verilog (parameter (%output 16 foo)) (%%output (15 %%to 0) foo))
+(check-verilog (parameter (%output 1 foo value)) (%%output foo))
+(check-verilog (parameter (%output 16 foo value)) (%%output (15 %%to 0) foo))
 
 (check-verilog
   (module
     (%module
       (%input 8 in1)
-      (%input 8 in2)
-      (%output 8 out)))
+      (%input 8 in2)))
   (module
     (micalog
       (%%input (7 %%to 0) in1)
-      (%%input (7 %%to 0) in2)
-      (%%output (7 %%to 0) out))))
+      (%%input (7 %%to 0) in2))))
+
+(check-verilog
+  (module
+    (%module
+      (%output 8 out-1 value-1)
+      (%output 8 out-2 value-2)))
+  (module
+    (micalog
+      (%%output (7 %%to 0) out-1)
+      (%%output (7 %%to 0) out-2))
+    (%%always %%* (%%assign out-1 value-1))
+    (%%always %%* (%%assign out-2 value-2))))
 
 (check-verilog
   (module
