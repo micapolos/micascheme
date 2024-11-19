@@ -7,8 +7,8 @@
     register
     expr
     append slice
-    + -
-    and or not
+    + - add sub
+    and or not inv
     reg reg-ref)
   (import (only (micascheme) define-aux-keywords))
 
@@ -20,7 +20,7 @@
     register
     expr
     append slice
-    + -
-    and or not
+    + - add sub
+    and or not inv
     reg reg-ref)
 )

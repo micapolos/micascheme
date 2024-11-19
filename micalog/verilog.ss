@@ -98,7 +98,7 @@
       #,(expr->verilog $expr)))
 
   (define (expr->verilog $expr)
-    (syntax-case $expr (%append %slice %+ %- %not)
+    (syntax-case $expr (%append %slice %not %and %or %add %sub)
       ((%append type a b)
         #`(%%append
           #,(value->verilog #'a)
@@ -113,17 +113,25 @@
               #,(literal->syntax (+ $shift $mask -1))
               %%to
               #,(literal->syntax $shift)))))
-      ((%+ type a b)
-        #`(%%+
-          #,(value->verilog #'a)
-          #,(value->verilog #'b)))
-      ((%- type a b)
-        #`(%%-
-          #,(value->verilog #'a)
-          #,(value->verilog #'b)))
       ((%not type a)
         #`(%%inv
           #,(value->verilog #'a)))
+      ((%and type a b)
+        #`(%%and
+          #,(value->verilog #'a)
+          #,(value->verilog #'b)))
+      ((%or type a b)
+        #`(%%or
+          #,(value->verilog #'a)
+          #,(value->verilog #'b)))
+      ((%add type a b)
+        #`(%%+
+          #,(value->verilog #'a)
+          #,(value->verilog #'b)))
+      ((%sub type a b)
+        #`(%%-
+          #,(value->verilog #'a)
+          #,(value->verilog #'b)))
       (value
         (value->verilog #'value))))
 

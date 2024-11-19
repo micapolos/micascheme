@@ -15,8 +15,8 @@
       (internal 1 next-half-clock (not 16 previous-half-clock))
       (internal 16 counter (register 16 0 half-clock posedge next-counter))
       (internal 16 previous-counter (register 16 0 half-clock negedge counter))
-      (internal 16 inc-counter (+ 16 previous-counter 1))
-      (internal 16 dec-counter (- 16 previous-counter 1))
+      (internal 16 inc-counter (add 16 previous-counter 1))
+      (internal 16 dec-counter (sub 16 previous-counter 1))
       (internal 16 next-counter
         (cond 16
           (reset? mouse-x)
