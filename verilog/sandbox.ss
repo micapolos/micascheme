@@ -14,7 +14,7 @@
       (reg half-clock 0)
       (reg (7 to 0) counter #xff)
       (always (posedge clock)
-        (set! half-clock (inv half-clock)))
+        (set! half-clock (not half-clock)))
       (always (posedge half-clock)
         (cond
           (reset? (set! counter (ref mouse-x (7 to 0))))
