@@ -40,6 +40,7 @@
 (check-verilog (expr (append)) "{}")
 (check-verilog (expr (append a)) "{a}")
 (check-verilog (expr (append a b)) "{a, b}")
+(check-verilog (expr (append a b c)) "{a, b, c}")
 
 (check-verilog
   (statement (set! x y))
