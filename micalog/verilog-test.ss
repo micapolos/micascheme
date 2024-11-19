@@ -18,8 +18,8 @@
 (check-verilog (value foo) foo)
 (check-verilog (value 128) 128)
 
-(check-verilog (edge 0) %%negedge)
-(check-verilog (edge 1) %%posedge)
+(check-verilog (edge %edge-01) %%posedge)
+(check-verilog (edge %edge-10) %%negedge)
 
 (check-verilog (parameter (%input 1 foo)) (%%input foo))
 (check-verilog (parameter (%input 16 foo)) (%%input (15 %%to 0) foo))
@@ -61,7 +61,7 @@
 (check-verilog
   (module
     (%module
-      (%internal 8 foo (%register 16 15 clock 1 bar))))
+      (%internal 8 foo (%register 16 15 clock %edge-01 bar))))
   (module
     (micalog)
     (%%reg (7 %%to 0) foo 15)

@@ -105,9 +105,9 @@
           #,(value->verilog #'value)))))
 
   (define (edge->verilog $edge)
-    (syntax-case $edge ()
-      (0 #'%%negedge)
-      (1 #'%%posedge)))
+    (syntax-case $edge (%edge-01 %edge-10)
+      (%edge-01 #'%%posedge)
+      (%edge-10 #'%%negedge)))
 
   (define (value->verilog $value)
     (syntax-case $value ()

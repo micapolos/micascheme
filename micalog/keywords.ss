@@ -3,6 +3,7 @@
     micalog
     module input output internal
     define on cond else
+    edge-01 edge-10
     register
     expr
     append slice
@@ -15,6 +16,7 @@
     micalog
     module input output internal
     define on cond else
+    edge-01 edge-10
     register
     expr
     append slice
