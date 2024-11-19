@@ -5,6 +5,8 @@
     value->verilog
     module->verilog
     expr->verilog
+    register-declaration->verilog
+    register-body->verilog
     parameter->verilog
     declaration->verilogs
     kind->verilog?
@@ -62,20 +64,20 @@
     (syntax-case $value (%register)
       ((%register type init (on (edge domain) update))
         (list
-          (reg->verilog-declaration $type $name #'init)
-          (reg->verilog-body $name #'domain #'edge #'update)))
+          (register-declaration->verilog $type $name #'init)
+          (register-body->verilog $name #'domain #'edge #'update)))
       (expr
         (non-false-list
           (wire->verilog-declaration? $kind $type $name)
           (assign->verilog $name #'expr)))))
 
-  (define (reg->verilog-declaration $type $name $init)
+  (define (register-declaration->verilog $type $name $init)
     #`(%%reg
       #,@(opt->list (type->verilog? $type))
       #,(name->verilog $name)
       #,@(opt->list (init->verilog? $init))))
 
-  (define (reg->verilog-body $name $domain $edge $update)
+  (define (register-body->verilog $name $domain $edge $update)
     #`(%%always
       (
         #,(edge->verilog $edge)
