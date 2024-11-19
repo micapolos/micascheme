@@ -16,19 +16,13 @@
     (prefix (micalog keywords) %)
     (prefix (verilog keywords) %%))
 
-  (define (item-kind-of? $kind $item)
-    (syntax-case $item ()
-      ((kind body ...)
-        (free-identifier=? #'kind $kind))))
-
   (define (module->verilog $module)
     (syntax-case $module (%module)
       ((%module declaration ...)
         (lets
-          ($items (syntaxes declaration ...))
-          ($inputs (filter (partial item-kind-of? #'%input) $items))
-          ($outputs (filter (partial item-kind-of? #'%output) $items))
-          ($internals (filter (partial item-kind-of? #'%internal) $items))
+          ($inputs (declaration-syntaxes %input declaration ...))
+          ($outputs (declaration-syntaxes %output declaration ...))
+          ($internals (declaration-syntaxes %internal declaration ...))
           #`(module
             (micalog #,@(map parameter->verilog (append $inputs $outputs)))
             #,@(flatten (map declaration->verilogs (append $outputs $internals))))))))
