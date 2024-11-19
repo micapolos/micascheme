@@ -61,7 +61,7 @@
 
   (define (body->verilogs $type $name $value)
     (syntax-case $value (%register %+)
-      ((%register type domain edge init update)
+      ((%register type init domain edge update)
         (list
           #`(%%reg
             #,@(opt->list (type->verilog? $type))

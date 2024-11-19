@@ -4,5 +4,10 @@
 
 (check
   (equal?
-    (verilog-string (wire x))
-    (lines-string "wire x;")))
+    (verilog-string (module (foo (input x) (output y))))
+    (lines-string
+      "module foo ("
+      "  input x,"
+      "  output y"
+      ");"
+      "endmodule")))

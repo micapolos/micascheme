@@ -3,9 +3,9 @@
   (import (micascheme) (code) (verilog code))
   (export (import (verilog keywords)))
 
-  (define-rule-syntax (verilog-string declaration ...)
+  (define-rule-syntax (verilog-string module)
     (fluent
-      (syntaxes declaration ...)
-      (declarations->code)
+      #'module
+      (module->code)
       (code-string)))
 )

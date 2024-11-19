@@ -1,5 +1,6 @@
 (library (micalog keywords)
   (export
+    micalog
     module input output internal
     define on cond else
     register
@@ -11,6 +12,7 @@
   (import (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
+    micalog
     module input output internal
     define on cond else
     register
