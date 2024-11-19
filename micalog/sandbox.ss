@@ -1,46 +1,17 @@
 (micalog
-  (regs
-    (clock (expr 1 ?))
-    (reset? (expr 1 ?))
-    (mouse-x (expr 16 ?))
-    (mouse-y (expr 16 ?))
-    (mouse-pressed? (expr 1 ?))
-  (process
-    (on (expr 1 clock)
-      (posedge
-        (define half-clock (expr (reg 1) (reg)))
-        (define counter (expr (reg 8) (reg)))
-        (define counter+16 (expr 8
-          (+
-            (expr 8 (reg-ref (expr (reg 8) counter)))
-            (expr 8 16))))
-        (on-edge (expr 1 half-clock)
-          (positive
-            (set!
-              (expr (reg 8) counter)
-              (expr 8
-                (reg-ref (expr (reg 8) next-counter)))))
-          (negative
-            (cond
-              ((expr 1 reset?)
-                (set!
-                  (expr (reg 8 next-counter))
-                  (expr 8 (slice (expr 16 mouse-x) 0 8))))
-              ((expr 1 mouse-pressed?)
-                (set!
-                  (expr (reg 8) next-counter)
-                  (expr 8
-                    (+
-                      (expr 8 counter)
-                      (expr 8 1)))))
-              (else
-                (set!
-                  (expr (reg 8) next-counter)
-                  (expr 8
-                    (-
-                      (expr 8 counter)
-                      (expr 8 1)))))))))
-      (negedge
-        (reg (1 next-half-clock) (1 0))
-        (reg (8 next-counter) (1 0))
-        (set! (1 next-half-clock) (1 (not (1 half-clock))))))))
+ (input clock 1)
+ (input reset? 1)
+ (input mouse-pressed? 1)
+ (input mouse-x 16)
+ (internal half-clock (register 1 0 posedge clock inv-half-clock))
+ (internal previous-half-clock (register 1 0 negedge clock half-clock))
+ (internal next-half-clock (inv 16 previous-half-clock))
+ (output counter (register 16 0 posedge half-clock next-counter))
+ (internal previous-counter (register 16 0 negedge half-clock counter))
+ (internal inc-counter (inc 16 previous-counter))
+ (internal dec-counter (dec 16 previous-counter))
+ (internal next-counter
+   (cond 16
+     (reset? mouse-x)
+     (mouse-pressed? inc-counter)
+     (else dec-counter))))
