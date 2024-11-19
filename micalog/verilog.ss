@@ -8,8 +8,7 @@
     parameter->verilog
     declaration->verilogs
     kind->verilog?
-    type->verilog?
-    value->verilog)
+    type->verilog?)
 
   (import
     (micascheme)
@@ -74,7 +73,7 @@
     #`(%%reg
       #,@(opt->list (type->verilog? $type))
       #,(name->verilog $name)
-      #,(value->verilog $init)))
+      #,@(opt->list (init->verilog? $init))))
 
   (define (reg->verilog-body $name $domain $edge $update)
     #`(%%always
@@ -169,6 +168,11 @@
         #'integer)
       (name
         (name->verilog #'name))))
+
+  (define (init->verilog? $init)
+    (syntax-case $init (%init)
+      ((%init) #f)
+      ((%init value) (value->verilog #'value))))
 
   (define (name->verilog $name)
     (syntax-case $name ()

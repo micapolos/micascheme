@@ -6,6 +6,7 @@
     edge-01 edge-10
     register
     expr
+    init
     = != < <= > >=
     append slice
     + - add sub neg
@@ -20,6 +21,7 @@
     edge-01 edge-10
     register
     expr
+    init
     = != < <= > >=
     append slice
     + - add sub neg
