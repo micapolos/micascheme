@@ -2,6 +2,7 @@
   (export
     name->verilog
     edge->verilog
+    event->verilog
     value->verilog
     module->verilog
     expr->verilog
@@ -62,10 +63,10 @@
 
   (define (body->verilogs $kind $type $name $value)
     (syntax-case $value (%register)
-      ((%register type init (on (edge domain) update))
+      ((%register type init (on event update))
         (list
           (register-declaration->verilog #`(#,$name type init))
-          (register-body->verilog #`(#,$name (on (edge domain) update)))))
+          (register-body->verilog #`(#,$name (on event update)))))
       (expr
         (non-false-list
           (wire->verilog-declaration? $kind $type $name)
@@ -81,11 +82,9 @@
 
   (define (register-body->verilog $body)
     (syntax-case $body (%on)
-      ((name (%on (edge domain) update))
+      ((name (%on event update))
         #`(%%always
-          (
-            #,(edge->verilog #'edge)
-            #,(value->verilog #'domain))
+          #,(event->verilog #'event)
           (%%set!
             #,(name->verilog #'name)
             #,(value->verilog #'update))))))
@@ -167,6 +166,13 @@
     (syntax-case $edge (%posedge %negedge)
       (%posedge #'%%posedge)
       (%negedge #'%%negedge)))
+
+  (define (event->verilog $event)
+    (syntax-case $event ()
+      ((edge value)
+        #`(
+          #,(edge->verilog #'edge)
+          #,(value->verilog #'value)))))
 
   (define (value->verilog $value)
     (syntax-case $value ()
