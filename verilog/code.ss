@@ -37,7 +37,7 @@
                     (list->separated-code (code ",\n")
                       (map parameter->code (syntaxes parameter ...))))))
               ";\n"))
-          (declarations->code (syntaxes declaration ...))
+          (indented-code (declarations->code (syntaxes declaration ...)))
           (newline-ended-code "endmodule")))))
 
   (define (parameter->code $parameter)

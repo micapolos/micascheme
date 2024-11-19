@@ -174,8 +174,8 @@
     "  output out_1,"
     "  output out_2"
     ");"
-    "always @(*) begin"
-    "  assign out_1 = in;"
-    "  assign out_2 = in;"
-    "end"
+    "  always @(*) begin"
+    "    assign out_1 = in;"
+    "    assign out_2 = in;"
+    "  end"
     "endmodule"))
