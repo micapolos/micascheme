@@ -3,6 +3,14 @@
   (verilog code)
   (code))
 
+(check-verilog (io input) "input")
+(check-verilog (io output) "output")
+
+(check-verilog (parameter (input foo)) "input foo")
+(check-verilog (parameter (input (7 to 0) foo)) "input [7:0] foo")
+(check-verilog (parameter (output bar)) "output bar")
+(check-verilog (parameter (output (7 to 0) bar)) "output [7:0] bar")
+
 (check-verilog (name clock) "clock")
 (check-verilog (name item-counter) "item_counter")
 (check-verilog (name reset?) "reset_")
@@ -153,3 +161,21 @@
     "always @(negedge clock) begin"
     "  counter <= counter_next;"
     "end"))
+
+(check-verilog
+  (module
+    (module (foo (input in) (output out-1) (output out-2))
+      (always *
+        (assign out-1 in)
+        (assign out-2 in))))
+  (lines
+    "module foo ("
+    "  input in,"
+    "  output out_1,"
+    "  output out_2"
+    ");"
+    "always @(*) begin"
+    "  assign out_1 = in;"
+    "  assign out_2 = in;"
+    "end"
+    "endmodule"))

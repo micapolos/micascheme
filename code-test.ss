@@ -77,8 +77,12 @@
 
 (check (equal? (code-string (colon-ended-code (code "a") (code "b") (code "c"))) "a;b;c;"))
 (check (equal? (code-string (newline-ended-code (code "a") (code "b") (code "c"))) "a\nb\nc\n"))
+(check (equal? (code-string (indented-code "\na" "b" "\nc")) "\n  ab\n  c"))
 
 (check (equal? (code-string (code-in-round-brackets (code "a") (code "b") (code "c"))) "(abc)"))
 (check (equal? (code-string (code-in-square-brackets (code "a") (code "b") (code "c"))) "[abc]"))
 (check (equal? (code-string (code-in-angle-brackets (code "a") (code "b") (code "c"))) "<abc>"))
 (check (equal? (code-string (code-in-curly-brackets (code "a") (code "b") (code "c"))) "{abc}"))
+(check (equal? (code-string (code-in-newlines (code "a") (code "b") (code "c"))) "\nabc\n"))
+
+(check (equal? (code-string (list->separated-code (code " ") (list (code "a") (code "b") (code "c")))) "a b c"))

@@ -9,6 +9,7 @@
     number-code
     code-indent
     list->code
+    list->separated-code
 
     separated-code
     space-separated-code
@@ -19,12 +20,14 @@
     suffixed-code
     colon-ended-code
     newline-ended-code
+    indented-code
 
     code-in-round-brackets
     code-in-square-brackets
     code-in-angle-brackets
-    code-in-curly-brackets)
-  (import (scheme) (lets) (list) (list-syntax) (procedure) (syntaxes) (switch) (fluent))
+    code-in-curly-brackets
+    code-in-newlines)
+  (import (scheme) (lets) (list) (list-syntax) (procedure) (syntaxes) (syntax) (switch) (fluent))
 
   ; (typeof code) => (lambda ($line-start? $indent $port) $line-start?) or #f if empty
 
@@ -58,6 +61,9 @@
               $line-start?))
           $line-start?
           $codes))))
+
+  (define (list->separated-code $separator $codes)
+    (list->code (intercalate $codes $separator)))
 
   (define (code-append . $codes)
     (list->code $codes))
@@ -101,6 +107,8 @@
         #,@(map-with
           ($code (syntax->list #'($code ...)))
           #`(code #,$code $suffix))))
+    ((indented-code $code ...)
+      #`(code-indent (code $code ...)))
     ((space-separated-code $code ...)
       #`(separated-code " " $code ...))
     ((comma-separated-code $code ...)
@@ -122,5 +130,7 @@
     ((code-in-angle-brackets $code ...)
       #`(code "<" $code ... ">"))
     ((code-in-curly-brackets $code ...)
-      #`(code "{" $code ... "}")))
+      #`(code "{" $code ... "}"))
+    ((code-in-newlines $code ...)
+      #`(code "\n" $code ... "\n")))
 )

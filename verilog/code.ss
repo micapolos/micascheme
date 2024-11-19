@@ -1,5 +1,8 @@
 (library (verilog code)
   (export
+    module->code
+    io->code
+    parameter->code
     declaration->code
     declarations->code
     statement->code
@@ -19,6 +22,40 @@
       (rename
         (only (micascheme) lines-string)
         (lines-string lines))))
+
+  (define (module->code $module)
+    (syntax-case $module (%module)
+      ((%module (name parameter ...) declaration ...)
+        (code
+          (space-separated-code
+            "module"
+            (name->code (identifier name))
+            (code
+              (code-in-round-brackets
+                (code-in-newlines
+                  (indented-code
+                    (list->separated-code (code ",\n")
+                      (map parameter->code (syntaxes parameter ...))))))
+              ";\n"))
+          (declarations->code (syntaxes declaration ...))
+          (newline-ended-code "endmodule")))))
+
+  (define (parameter->code $parameter)
+    (syntax-case $parameter (%input %output)
+      ((io name)
+        (space-separated-code
+          (io->code #'io)
+          (name->code #'name)))
+      ((io vector name)
+        (space-separated-code
+          (io->code #'io)
+          (range-declaration->code #'vector)
+          (name->code #'name)))))
+
+  (define (io->code $io)
+    (syntax-case $io (%input %output)
+      (%input (code "input"))
+      (%output (code "output"))))
 
   (define (declarations->code $declarations)
     (list->code (map declaration->code $declarations)))

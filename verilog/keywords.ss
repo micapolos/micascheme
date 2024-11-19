@@ -1,5 +1,6 @@
 (library (verilog keywords)
   (export
+    module input output
     wire reg
     always
     * posedge negedge
@@ -11,6 +12,7 @@
   (import (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
+    module input output
     wire reg
     always
     * posedge negedge

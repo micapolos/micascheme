@@ -4,48 +4,55 @@
   (prefix (micalog keywords) %)
   (prefix (verilog keywords) %%))
 
-(define-rule-syntax (check-expr micalog verilog)
-  (check
+(define-case-syntax (check-verilog (name micalog) verilog)
+  #`(check
     (equal?
-      (syntax->datum (expr->verilog #'micalog))
+      (syntax->datum
+        (
+          #,(identifier-append #'name #'name #'->verilog)
+          #'micalog))
       'verilog)))
 
-(check-expr
-  (%expr _ x)
-  x)
+(check-verilog (name foo) foo)
 
-(check-expr
-  (%expr _ 128)
-  128)
+(check-verilog (value foo) foo)
+(check-verilog (value 128) 128)
 
-(check-expr
-  (%expr 6 (%+ (%expr _ a) (%expr _ b)))
-  (%%+ a b))
+(check-verilog (edge 0) %%negedge)
+(check-verilog (edge 1) %%posedge)
 
-(check-expr
-  (%expr 6 (%- (%expr _ a) (%expr _ b)))
-  (%%- a b))
+(check-verilog (parameter (%input 1 foo)) (%%input foo))
+(check-verilog (parameter (%input 16 foo)) (%%input (15 %%to 0) foo))
 
-(check-expr
-  (%expr _ (%append (%expr _ a) (%expr 4 b)))
-  (%%append a b))
+(check-verilog (parameter (%output 1 foo)) (%%output foo))
+(check-verilog (parameter (%output 16 foo)) (%%output (15 %%to 0) foo))
 
-(check-expr
-  (%expr _ (%slice (%expr _ a) 3 6))
-  (%%ref a (8 %%to 3)))
+(check-verilog
+  (module
+    (%module
+      (%input 8 in1)
+      (%input 8 in2)
+      (%output 8 out)))
+  (module
+    (micalog
+      (%%input (7 %%to 0) in1)
+      (%%input (7 %%to 0) in2)
+      (%%output (7 %%to 0) out))))
 
-(check-expr
-  (%expr _ (%and (%expr _ a) (%expr _ b)))
-  (%%and a b))
+(check-verilog
+  (module
+    (%module
+      (%internal 8 bar 12)))
+  (module
+    (micalog)
+    (%%wire (7 %%to 0) bar)
+    (%%always %%* (%%assign bar 12))))
 
-(check-expr
-  (%expr _ (%or (%expr _ a) (%expr _ b)))
-  (%%or a b))
-
-(check-expr
-  (%expr 6 (%not (%expr _ a)))
-  (%%inv a))
-
-(check-expr
-  (%expr _ (%reg-ref (%expr _ a)))
-  a)
+(check-verilog
+  (module
+    (%module
+      (%internal 8 foo (%register 16 clock 1 15 bar))))
+  (module
+    (micalog)
+    (%%reg (7 %%to 0) foo 15)
+    (%%always (%%posedge clock) (%%set! foo bar))))
