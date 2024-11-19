@@ -64,10 +64,10 @@
         (list
           (reg->verilog-declaration $type $name #'init)
           (reg->verilog-body $name #'domain #'edge #'update)))
-      (wire
+      (expr
         (non-false-list
           (wire->verilog-declaration? $kind $type $name)
-          (wire->verilog-body $kind $name #'wire)))))
+          (assign->verilog $name #'expr)))))
 
   (define (reg->verilog-declaration $type $name $init)
     #`(%%reg
@@ -91,18 +91,19 @@
         #,@(opt->list (type->verilog? $type))
         #,(name->verilog $name))))
 
-  (define (wire->verilog-body $kind $name $wire)
-    (syntax-case $wire (%+)
+  (define (assign->verilog $name $expr)
+    #`(%%assign
+      #,(name->verilog $name)
+      #,(expr->verilog $expr)))
+
+  (define (expr->verilog $expr)
+    (syntax-case $expr (%+)
       ((%+ type a b)
-        #`(%%assign
-          #,(name->verilog $name)
-          (%%+
-            #,(value->verilog #'a)
-            #,(value->verilog #'b))))
+        #`(%%+
+          #,(value->verilog #'a)
+          #,(value->verilog #'b)))
       (value
-        #`(%%assign
-          #,(name->verilog $name)
-          #,(value->verilog #'value)))))
+        (value->verilog #'value))))
 
   (define (edge->verilog $edge)
     (syntax-case $edge (%posedge %negedge)
