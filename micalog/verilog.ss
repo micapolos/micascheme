@@ -64,27 +64,31 @@
     (syntax-case $value (%register)
       ((%register type init (on (edge domain) update))
         (list
-          (register-declaration->verilog $type $name #'init)
-          (register-body->verilog $name #'domain #'edge #'update)))
+          (register-declaration->verilog #`(#,$name type init))
+          (register-body->verilog #`(#,$name (on (edge domain) update)))))
       (expr
         (non-false-list
           (wire->verilog-declaration? $kind $type $name)
           (assign->verilog $name #'expr)))))
 
-  (define (register-declaration->verilog $type $name $init)
-    #`(%%reg
-      #,@(opt->list (type->verilog? $type))
-      #,(name->verilog $name)
-      #,@(opt->list (init->verilog? $init))))
+  (define (register-declaration->verilog $declaration)
+    (syntax-case $declaration ()
+      ((name type init)
+        #`(%%reg
+          #,@(opt->list (type->verilog? #'type))
+          #,(name->verilog #'name)
+          #,@(opt->list (init->verilog? #'init))))))
 
-  (define (register-body->verilog $name $domain $edge $update)
-    #`(%%always
-      (
-        #,(edge->verilog $edge)
-        #,(value->verilog $domain))
-      (%%set!
-        #,(name->verilog $name)
-        #,(value->verilog $update))))
+  (define (register-body->verilog $body)
+    (syntax-case $body (%on)
+      ((name (%on (edge domain) update))
+        #`(%%always
+          (
+            #,(edge->verilog #'edge)
+            #,(value->verilog #'domain))
+          (%%set!
+            #,(name->verilog #'name)
+            #,(value->verilog #'update))))))
 
   (define (wire->verilog-declaration? $kind $type $name)
     (and

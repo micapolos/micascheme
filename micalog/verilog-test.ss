@@ -52,6 +52,11 @@
 (check-verilog (expr (%sub 16 a b)) (%%- a b))
 (check-verilog (expr (%neg 16 a)) (%%- a))
 
+(check-verilog (register-declaration (foo 16 (%init))) (%%reg (15 %%to 0) foo))
+(check-verilog (register-declaration (foo 16 (%init 12))) (%%reg (15 %%to 0) foo 12))
+
+(check-verilog (register-body (foo (%on (%posedge clock) bar))) (%%always (%%posedge clock) (%%set! foo bar)))
+
 (check-verilog
   (module
     (%module
@@ -86,7 +91,7 @@
 (check-verilog
   (module
     (%module
-      (%internal 8 foo (%register 16 (%init) (%on (%posedge clock) bar)))))
+      (%internal 8 foo (%register 8 (%init) (%on (%posedge clock) bar)))))
   (module
     (micalog)
     (%%reg (7 %%to 0) foo)
@@ -95,7 +100,7 @@
 (check-verilog
   (module
     (%module
-      (%internal 8 foo (%register 16 (%init 15) (%on (%posedge clock) bar)))))
+      (%internal 8 foo (%register 8 (%init 15) (%on (%posedge clock) bar)))))
   (module
     (micalog)
     (%%reg (7 %%to 0) foo 15)
