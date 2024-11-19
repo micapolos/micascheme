@@ -27,6 +27,12 @@
 (check-verilog (parameter (%output 1 foo value)) (%%output foo))
 (check-verilog (parameter (%output 16 foo value)) (%%output (15 %%to 0) foo))
 
+(check-verilog (expr 10) 10)
+(check-verilog (expr foo) foo)
+(check-verilog (expr (%+ 16 a b)) (%%+ a b))
+(check-verilog (expr (%- 16 a b)) (%%- a b))
+(check-verilog (expr (%not 16 a)) (%%inv a))
+
 (check-verilog
   (module
     (%module

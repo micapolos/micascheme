@@ -4,6 +4,7 @@
     edge->verilog
     value->verilog
     module->verilog
+    expr->verilog
     parameter->verilog
     declaration->verilogs
     kind->verilog?
@@ -97,11 +98,18 @@
       #,(expr->verilog $expr)))
 
   (define (expr->verilog $expr)
-    (syntax-case $expr (%+)
+    (syntax-case $expr (%+ %- %not)
       ((%+ type a b)
         #`(%%+
           #,(value->verilog #'a)
           #,(value->verilog #'b)))
+      ((%- type a b)
+        #`(%%-
+          #,(value->verilog #'a)
+          #,(value->verilog #'b)))
+      ((%not type a)
+        #`(%%inv
+          #,(value->verilog #'a)))
       (value
         (value->verilog #'value))))
 
