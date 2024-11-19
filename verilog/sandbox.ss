@@ -20,5 +20,4 @@
           (reset? (set! counter (ref mouse-x (7 to 0))))
           (mouse-pressed? (set! counter (+ counter 1)))
           (else (set! counter (- counter 1)))))
-      (always *
-        (assign value counter)))))
+      (assign value counter))))

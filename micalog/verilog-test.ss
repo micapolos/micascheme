@@ -46,8 +46,8 @@
     (micalog
       (%%output (7 %%to 0) out-1)
       (%%output (7 %%to 0) out-2))
-    (%%always %%* (%%assign out-1 value-1))
-    (%%always %%* (%%assign out-2 value-2))))
+    (%%assign out-1 value-1)
+    (%%assign out-2 value-2)))
 
 (check-verilog
   (module
@@ -56,7 +56,7 @@
   (module
     (micalog)
     (%%wire (7 %%to 0) bar)
-    (%%always %%* (%%assign bar 12))))
+    (%%assign bar 12)))
 
 (check-verilog
   (module

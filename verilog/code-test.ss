@@ -144,6 +144,10 @@
     "  y <= z;"
     "end"))
 
+(check-verilog
+  (declaration (assign a b))
+  (lines "assign a = b;"))
+
 (check-verilogs
   (declarations
     (reg (7 to 0) counter)

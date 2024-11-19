@@ -94,17 +94,15 @@
   (define (wire->verilog-body $kind $name $wire)
     (syntax-case $wire (%+)
       ((%+ type a b)
-        #`(%%always %%*
-          (%%assign
-            #,(name->verilog $name)
-            (%%+
-              #,(value->verilog #'a)
-              #,(value->verilog #'b)))))
+        #`(%%assign
+          #,(name->verilog $name)
+          (%%+
+            #,(value->verilog #'a)
+            #,(value->verilog #'b))))
       (value
-        #`(%%always %%*
-          (%%assign
-            #,(name->verilog $name)
-            #,(value->verilog #'value))))))
+        #`(%%assign
+          #,(name->verilog $name)
+          #,(value->verilog #'value)))))
 
   (define (edge->verilog $edge)
     (syntax-case $edge ()

@@ -19,7 +19,5 @@ module funny_counter (
       counter <= counter - 1;
     end
   end
-  always @(*) begin
-    assign value = counter;
-  end
+  assign value = counter;
 endmodule

@@ -75,6 +75,14 @@
             (list->code
               (map statement->code (syntaxes statement ...))))
           (newline-ended-code "end")))
+      ((%assign lhs rhs)
+        (newline-ended-code
+          (colon-ended-code
+            (space-separated-code
+              "assign"
+              (lhs->code #'lhs)
+              "="
+              (expr->code #'rhs)))))
       ((kind name array ...)
         (for-all range->code? (syntaxes array ...))
         (declaration-components->code #'kind #f #'name (syntaxes array ...) #f))
