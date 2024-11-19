@@ -68,37 +68,49 @@
     (syntax-case $value (%register)
       ((%register type init domain edge update)
         (list
-          #`(%%reg
-            #,@(opt->list (type->verilog? $type))
-            #,(name->verilog $name)
-            #,(value->verilog #'init))
-          #`(%%always
-            (
-              #,(edge->verilog #'edge)
-              #,(value->verilog #'domain))
-            (%%set!
-              #,(name->verilog $name)
-              #,(value->verilog #'update)))))
+          (reg->verilog-declaration $type $name #'init)
+          (reg->verilog-body $name #'domain #'edge #'update)))
       (wire
-        (filter-opts
-          (list
-            (and (free-identifier=? $kind #'%internal)
-              #`(%%wire
-                #,@(opt->list (type->verilog? $type))
-                #,(name->verilog $name)))
-            (syntax-case #'wire (%+)
-              ((%+ type a b)
-                #`(%%always %%*
-                  (%%assign
-                    #,(name->verilog $name)
-                    (%%+
-                      #,(value->verilog #'a)
-                      #,(value->verilog #'b)))))
-              (value
-                #`(%%always %%*
-                  (%%assign
-                    #,(name->verilog $name)
-                    #,(value->verilog #'value))))))))))
+        (non-false-list
+          (wire->verilog-declaration? $kind $type $name)
+          (wire->verilog-body $kind $name #'wire)))))
+
+  (define (reg->verilog-declaration $type $name $init)
+    #`(%%reg
+      #,@(opt->list (type->verilog? $type))
+      #,(name->verilog $name)
+      #,(value->verilog $init)))
+
+  (define (reg->verilog-body $name $domain $edge $update)
+    #`(%%always
+      (
+        #,(edge->verilog $edge)
+        #,(value->verilog $domain))
+      (%%set!
+        #,(name->verilog $name)
+        #,(value->verilog $update))))
+
+  (define (wire->verilog-declaration? $kind $type $name)
+    (and
+      (free-identifier=? $kind #'%internal)
+      #`(%%wire
+        #,@(opt->list (type->verilog? $type))
+        #,(name->verilog $name))))
+
+  (define (wire->verilog-body $kind $name $wire)
+    (syntax-case $wire (%+)
+      ((%+ type a b)
+        #`(%%always %%*
+          (%%assign
+            #,(name->verilog $name)
+            (%%+
+              #,(value->verilog #'a)
+              #,(value->verilog #'b)))))
+      (value
+        #`(%%always %%*
+          (%%assign
+            #,(name->verilog $name)
+            #,(value->verilog #'value))))))
 
   (define (edge->verilog $edge)
     (syntax-case $edge ()

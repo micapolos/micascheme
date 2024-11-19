@@ -6,6 +6,7 @@
 
     opt
     opt->list
+    non-false-list
     single? single force-single
     ordered-map
     map-using
@@ -350,4 +351,7 @@
 
   (define (opt->list $opt)
     (if $opt (list $opt) (list)))
+
+  (define (non-false-list . $item)
+    (filter-opts $item))
 )

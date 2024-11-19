@@ -391,3 +391,7 @@
 
 (check (equal? (opt->list #f) (list)))
 (check (equal? (opt->list 123) (list 123)))
+
+; === not-false-list ===
+
+(check (equal? (non-false-list 1 #f 2) (list 1 2)))
