@@ -9,6 +9,7 @@
     not
     and or xor
     nand nor xnor
+    < <= > >= = !=
     assign set! ref
     append)
   (import (only (micascheme) define-aux-keywords))
@@ -23,6 +24,7 @@
     not
     and or xor
     nand nor xnor
+    < <= > >= = !=
     assign set! ref
     append)
 )
