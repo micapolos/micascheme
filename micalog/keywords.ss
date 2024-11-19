@@ -8,7 +8,7 @@
     expr
     = != < <= > >=
     append slice
-    + - add sub
+    + - add sub neg
     and or xor nand nor xnor not inv
     reg reg-ref)
   (import (only (micascheme) define-aux-keywords))
@@ -22,7 +22,7 @@
     expr
     = != < <= > >=
     append slice
-    + - add sub
+    + - add sub neg
     and or xor nand nor xnor not inv
     reg reg-ref)
 )

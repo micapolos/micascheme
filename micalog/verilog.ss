@@ -98,7 +98,7 @@
       #,(expr->verilog $expr)))
 
   (define (expr->verilog $expr)
-    (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %not %and %or %xor %nand %nor %xnor %add %sub)
+    (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %not %and %or %xor %nand %nor %xnor %add %sub %neg)
       ((%append type a b)
         #`(%%append
           #,(value->verilog #'a)
@@ -143,6 +143,8 @@
         (op2->verilog #'%%+ #'a #'b))
       ((%sub type a b)
         (op2->verilog #'%%- #'a #'b))
+      ((%neg type a)
+        (op->verilog #'%%- #'a))
       (value
         (value->verilog #'value))))
 
