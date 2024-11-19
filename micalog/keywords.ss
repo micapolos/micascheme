@@ -6,9 +6,10 @@
     edge-01 edge-10
     register
     expr
+    = != < <= > >=
     append slice
     + - add sub
-    and or not inv
+    and or xor nand nor xnor not inv
     reg reg-ref)
   (import (only (micascheme) define-aux-keywords))
 
@@ -19,8 +20,9 @@
     edge-01 edge-10
     register
     expr
+    = != < <= > >=
     append slice
     + - add sub
-    and or not inv
+    and or xor nand nor xnor not inv
     reg reg-ref)
 )

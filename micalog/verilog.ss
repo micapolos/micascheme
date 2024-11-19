@@ -98,7 +98,7 @@
       #,(expr->verilog $expr)))
 
   (define (expr->verilog $expr)
-    (syntax-case $expr (%append %slice %not %and %or %add %sub)
+    (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %not %and %or %xor %nand %nor %xnor %add %sub)
       ((%append type a b)
         #`(%%append
           #,(value->verilog #'a)
@@ -113,27 +113,49 @@
               #,(literal->syntax (+ $shift $mask -1))
               %%to
               #,(literal->syntax $shift)))))
+      ((%= type a b)
+        (op2->verilog #'%%= #'a #'b))
+      ((%!= type a b)
+        (op2->verilog #'%%!= #'a #'b))
+      ((%< type a b)
+        (op2->verilog #'%%< #'a #'b))
+      ((%<= type a b)
+        (op2->verilog #'%%<= #'a #'b))
+      ((%> type a b)
+        (op2->verilog #'%%> #'a #'b))
+      ((%>= type a b)
+        (op2->verilog #'%%>= #'a #'b))
       ((%not type a)
-        #`(%%inv
-          #,(value->verilog #'a)))
+        (op->verilog #'%%inv #'a))
       ((%and type a b)
-        #`(%%and
-          #,(value->verilog #'a)
-          #,(value->verilog #'b)))
+        (op2->verilog #'%%and #'a #'b))
       ((%or type a b)
-        #`(%%or
-          #,(value->verilog #'a)
-          #,(value->verilog #'b)))
+        (op2->verilog #'%%or #'a #'b))
+      ((%xor type a b)
+        (op2->verilog #'%%xor #'a #'b))
+      ((%nand type a b)
+        (op2->verilog #'%%nand #'a #'b))
+      ((%nor type a b)
+        (op2->verilog #'%%nor #'a #'b))
+      ((%xnor type a b)
+        (op2->verilog #'%%xnor #'a #'b))
       ((%add type a b)
-        #`(%%+
-          #,(value->verilog #'a)
-          #,(value->verilog #'b)))
+        (op2->verilog #'%%+ #'a #'b))
       ((%sub type a b)
-        #`(%%-
-          #,(value->verilog #'a)
-          #,(value->verilog #'b)))
+        (op2->verilog #'%%- #'a #'b))
       (value
         (value->verilog #'value))))
+
+  (define (op->verilog $op $rhs)
+    #`(
+      #,$op
+      #,(value->verilog $rhs)))
+
+  (define (op2->verilog $op $lhs $rhs)
+    #`(
+      #,$op
+      #,(value->verilog $lhs)
+      #,(value->verilog $rhs)))
 
   (define (edge->verilog $edge)
     (syntax-case $edge (%posedge %negedge)

@@ -31,9 +31,22 @@
 (check-verilog (expr foo) foo)
 (check-verilog (expr (%append 16 a b)) (%%append a b))
 (check-verilog (expr (%slice 3 a 5)) (%%ref a (7 %%to 5)))
+
+(check-verilog (expr (%= 16 a b)) (%%= a b))
+(check-verilog (expr (%!= 16 a b)) (%%!= a b))
+(check-verilog (expr (%< 16 a b)) (%%< a b))
+(check-verilog (expr (%<= 16 a b)) (%%<= a b))
+(check-verilog (expr (%> 16 a b)) (%%> a b))
+(check-verilog (expr (%>= 16 a b)) (%%>= a b))
+
 (check-verilog (expr (%not 16 a)) (%%inv a))
 (check-verilog (expr (%and 16 a b)) (%%and a b))
 (check-verilog (expr (%or 16 a b)) (%%or a b))
+(check-verilog (expr (%xor 16 a b)) (%%xor a b))
+(check-verilog (expr (%nand 16 a b)) (%%nand a b))
+(check-verilog (expr (%nor 16 a b)) (%%nor a b))
+(check-verilog (expr (%xnor 16 a b)) (%%xnor a b))
+
 (check-verilog (expr (%add 16 a b)) (%%+ a b))
 (check-verilog (expr (%sub 16 a b)) (%%- a b))
 
