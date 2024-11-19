@@ -4,7 +4,6 @@
     expr-type
     expr-value
     reg-type
-    declaration-kind-of?
     declaration-syntaxes)
   (import
     (micascheme)
