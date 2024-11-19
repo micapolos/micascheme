@@ -65,7 +65,7 @@
           #`(#,(- (datum number) 1) %%to 0)))))
 
   (define (body->verilogs $kind $type $name $value)
-    (syntax-case $value (%register %+)
+    (syntax-case $value (%register)
       ((%register type init domain edge update)
         (list
           #`(%%reg
@@ -79,32 +79,26 @@
             (%%set!
               #,(name->verilog $name)
               #,(value->verilog #'update)))))
-      ((%+ type a b)
+      (wire
         (filter-opts
           (list
-            (and
-              (free-identifier=? $kind #'%internal)
+            (and (free-identifier=? $kind #'%internal)
               #`(%%wire
                 #,@(opt->list (type->verilog? $type))
                 #,(name->verilog $name)))
-            #`(%%always %%*
-              (%%assign
-                #,(name->verilog $name)
-                (%%+
-                  #,(value->verilog #'a)
-                  #,(value->verilog #'b)))))))
-      (value
-        (filter-opts
-          (list
-            (and
-              (free-identifier=? $kind #'%internal)
-              #`(%%wire
-                #,@(opt->list (type->verilog? $type))
-                #,(name->verilog $name)))
-            #`(%%always %%*
-              (%%assign
-                #,(name->verilog $name)
-                #,(value->verilog #'value))))))))
+            (syntax-case #'wire (%+)
+              ((%+ type a b)
+                #`(%%always %%*
+                  (%%assign
+                    #,(name->verilog $name)
+                    (%%+
+                      #,(value->verilog #'a)
+                      #,(value->verilog #'b)))))
+              (value
+                #`(%%always %%*
+                  (%%assign
+                    #,(name->verilog $name)
+                    #,(value->verilog #'value))))))))))
 
   (define (edge->verilog $edge)
     (syntax-case $edge ()
