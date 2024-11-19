@@ -29,6 +29,8 @@
 
 (check-verilog (expr 10) 10)
 (check-verilog (expr foo) foo)
+(check-verilog (expr (%append 16 a b)) (%%append a b))
+(check-verilog (expr (%slice 3 a 2)) (%%ref a (4 %%to 2)))
 (check-verilog (expr (%+ 16 a b)) (%%+ a b))
 (check-verilog (expr (%- 16 a b)) (%%- a b))
 (check-verilog (expr (%not 16 a)) (%%inv a))
