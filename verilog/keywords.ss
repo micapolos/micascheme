@@ -6,7 +6,9 @@
     * posedge negedge
     if cond else to
     + -
-    and or inv
+    not
+    and or xor
+    nand nor xnor
     assign set! ref
     append)
   (import (only (micascheme) define-aux-keywords))
@@ -18,7 +20,9 @@
     * posedge negedge
     if cond else to
     + -
-    and or inv
+    not
+    and or xor
+    nand nor xnor
     assign set! ref
     append)
 )

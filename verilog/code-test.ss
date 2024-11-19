@@ -27,6 +27,8 @@
 (check-verilog (expr (- a b)) "a - b")
 (check-verilog (expr (- a b c)) "a - b - c")
 
+(check-verilog (expr (not a)) "~a")
+
 (check-verilog (expr (and)) "~0")
 (check-verilog (expr (and a)) "a")
 (check-verilog (expr (and a b)) "a & b")
@@ -37,7 +39,25 @@
 (check-verilog (expr (or a b)) "a | b")
 (check-verilog (expr (or a b c)) "a | b | c")
 
-(check-verilog (expr (inv a)) "~a")
+(check-verilog (expr (xor)) "0")
+(check-verilog (expr (xor a)) "a")
+(check-verilog (expr (xor a b)) "a ^ b")
+(check-verilog (expr (xor a b c)) "a ^ b ^ c")
+
+(check-verilog (expr (nand)) "0")
+(check-verilog (expr (nand a)) "a")
+(check-verilog (expr (nand a b)) "a ~& b")
+(check-verilog (expr (nand a b c)) "a ~& b ~& c")
+
+(check-verilog (expr (nor)) "~0")
+(check-verilog (expr (nor a)) "a")
+(check-verilog (expr (nor a b)) "a ~| b")
+(check-verilog (expr (nor a b c)) "a ~| b ~| c")
+
+(check-verilog (expr (xnor)) "~0")
+(check-verilog (expr (xnor a)) "a")
+(check-verilog (expr (xnor a b)) "a ^~ b")
+(check-verilog (expr (xnor a b c)) "a ^~ b ^~ c")
 
 (check-verilog (expr (ref a)) "a")
 (check-verilog (expr (ref a (12))) "a[12]")
