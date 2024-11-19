@@ -86,7 +86,7 @@
 (check-verilog
   (module
     (%module
-      (%internal 8 foo (%register 16 15 clock %posedge bar))))
+      (%internal 8 foo (%register 16 15 (%posedge clock) bar))))
   (module
     (micalog)
     (%%reg (7 %%to 0) foo 15)
