@@ -62,17 +62,17 @@
           #,(name->verilog #'name)))))
 
   (define (declaration->verilog-instrs $init-names $top-level? $declaration)
-    (syntax-case $declaration (%on %else)
+    (syntax-case $declaration (%on)
       ((name (%on (edge body ...)))
         (opt->list
           (and $top-level?
             (process->verilog $init-names #'name #'(edge body ...)))))
-      ((name (%on (edge body ...) (%else else ...)))
+      ((name (%on (edge body ...) (other-edge other-body ...)))
         (non-false-list
           (and $top-level?
             (process->verilog $init-names #'name #'(edge body ...)))
           (and $top-level?
-            (process->verilog $init-names #'name #`(#,(else-edge #'edge) else ...)))))
+            (process->verilog $init-names #'name #`(#,(else-edge #'edge #'other-edge) other-body ...)))))
       (instr
         (instr->verilogs $init-names #'instr))))
 
@@ -222,20 +222,21 @@
         #'name)))
 
   (define (declaration->init-names $declaration)
-    (syntax-case $declaration (%on %else)
+    (syntax-case $declaration (%on)
       ((name (%on (edge body ...)))
         (process->init-names #'(edge body ...)))
-      ((name (%on (edge body ...) (%else else ...)))
+      ((name (%on (edge body ...) (other-edge other-body ...)))
         (append
           (process->init-names #`(edge body ...))
-          (process->init-names #`(#,(else-edge #'edge) else ...))))
+          (process->init-names #`(#,(else-edge #'edge #'other-edge) other-body ...))))
       (_
         (list))))
 
-  (define (else-edge $edge)
-    (syntax-case $edge (%posedge %negedge)
-      (%posedge #'%negedge)
-      (%negedge #'%posedge)))
+  (define (else-edge $edge $other-edge)
+    (syntax-case #`(#,$edge #,$other-edge) (%posedge %negedge)
+      ((%posedge %negedge) #'%negedge)
+      ((%negedge %posedge) #'%posedge)
+      ((_ other) (syntax-error #'other))))
 
   (define (process->init-names $process)
     (syntax-case $process (%init %update)
@@ -249,13 +250,13 @@
       ((name type expr) #'name)))
 
   (define (declaration->verilog-declarations $init-names $declaration)
-    (syntax-case $declaration (%on %else)
+    (syntax-case $declaration (%on)
       ((name (%on (edge body ...)))
         (process->verilog-declarations $init-names #'(edge body ...)))
-      ((name (%on (edge body ...) (%else else ...)))
+      ((name (%on (edge body ...) (other-edge other-body ...)))
         (append
           (process->verilog-declarations $init-names #`(edge body ...))
-          (process->verilog-declarations $init-names #`(#,(else-edge #'edge) else ...))))
+          (process->verilog-declarations $init-names #`(#,(else-edge #'edge #'other-edge) other-body ...))))
       ((name type expr)
         (if (name-init? $init-names #'name)
           (list)

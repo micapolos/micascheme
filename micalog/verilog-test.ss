@@ -76,7 +76,7 @@
             (pos-init-2 1 0))
           (%update
             (pos-update 1 0)))
-        (%else
+        (%negedge
           (%init
             (neg-init-1 1 0)
             (neg-init-2 1 0))
@@ -101,7 +101,7 @@
             (pos-init-2 1 2))
           (%update
             (pos-update 1 3)))
-        (%else
+        (%negedge
           (%init
             (neg-init-1 1 4)
             (neg-init-2 1 5))
@@ -138,7 +138,7 @@
           (%update
             (pos-1 1 3)
             (pos-1 1 4)))
-        (%else
+        (%negedge
           (%init
             (neg-1 1 5)
             (neg-2 1 6))
