@@ -8,10 +8,9 @@
     123))
 
 (check
-  (raises?
-    (lambda ()
-      (let (($fn (once-proc (lambda () 123))))
-        ($fn) ($fn)))))
+  (raises
+    (let (($fn (once-proc (lambda () 123))))
+      ($fn) ($fn))))
 
 ; === checking-once ===
 
@@ -21,11 +20,10 @@
     123))
 
 (check
-  (raises?
-    (lambda ()
-      (let (($fn (checking-once 123)))
-      ($fn)
-      ($fn)))))
+  (raises
+    (let (($fn (checking-once 123)))
+    ($fn)
+    ($fn))))
 
 ; === app ===
 
@@ -51,8 +49,8 @@
 
 ; === todo ===
 
-(check (raises? (lambda () (todo))))
-(check (raises? (lambda () TODO)))
+(check (raises (todo)))
+(check (raises TODO))
 
 ; === run ===
 

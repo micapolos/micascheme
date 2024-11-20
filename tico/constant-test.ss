@@ -86,11 +86,10 @@
     (constant "foobargar")))
 
 (check
-  (raises?
-    (lambda ()
-      (constant-application
-        (constant)
-        (list)))))
+  (raises
+    (constant-application
+      (constant)
+      (list))))
 
 ; --- constant-abstraction
 

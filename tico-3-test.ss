@@ -13,10 +13,9 @@
     (transformer (top-level-syntax 'cond env))))
 
 (check
-  (raises?
-    (lambda ()
-      (scope-value
-        (scope env (stack)) 'foo))))
+  (raises
+    (scope-value
+      (scope env (stack)) 'foo)))
 
 (check
   (equal?
@@ -92,10 +91,9 @@
       '(string-append "foo" "bar"))))
 
 (check
-  (raises?
-    (lambda ()
-      (syntax->thunk
-        #'(native unbound)))))
+  (raises
+    (syntax->thunk
+      #'(native unbound))))
 
 ; --- identifier
 
@@ -283,13 +281,12 @@
     (thunk (constant 55) 55)))
 
 (check
-  (raises?
-    (lambda ()
-      (syntax->thunk
-        #'(
-          (lambda ($x $y)
-            (compile-time (string-append $x $y)))
-          "goo" "gar")))))
+  (raises
+    (syntax->thunk
+      #'(
+        (lambda ($x $y)
+          (compile-time (string-append $x $y)))
+        "goo" "gar"))))
 
 ; --- testing
 
@@ -315,19 +312,16 @@
         (string-append $x $y)))))
 
 (check
-  (raises?
-    (lambda ()
-      (syntax->thunk #'(testing (= 1 2) "foo")))))
+  (raises
+    (syntax->thunk #'(testing (= 1 2) "foo"))))
 
 (check
-  (raises?
-    (lambda ()
-      (syntax->thunk #'(lambda (x) (testing (= 1 2) "foo"))))))
+  (raises
+    (syntax->thunk #'(lambda (x) (testing (= 1 2) "foo")))))
 
 (check
-  (raises?
-    (lambda ()
-      (syntax->thunk #'(lambda (x) (testing (= x 1) "foo"))))))
+  (raises
+    (syntax->thunk #'(lambda (x) (testing (= x 1) "foo")))))
 
 ; --- transformers
 
@@ -340,9 +334,8 @@
 
 ; non-procedure-transformer
 (check
-  (raises?
-    (lambda ()
-      (syntax->thunk #'syntax-case))))
+  (raises
+    (syntax->thunk #'syntax-case)))
 
 (check
   (equal?

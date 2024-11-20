@@ -303,13 +303,12 @@
     (literal->typing 123)))
 
 (check
-  (raises?
-    (lambda ()
-      (typing-constant-access
-        (typing-constant
-          (type->typing (struct 'foo (list)))
-          (literal->typing 123))
-        (typing-struct 'bar (list))))))
+  (raises
+    (typing-constant-access
+      (typing-constant
+        (type->typing (struct 'foo (list)))
+        (literal->typing 123))
+      (typing-struct 'bar (list)))))
 
 (check
   (equal?
@@ -343,21 +342,18 @@
 
 ; not boolean
 (check
-  (raises?
-    (lambda ()
-      (typing-assert (type-datum->typing (string-type) "foo")))))
+  (raises
+    (typing-assert (type-datum->typing (string-type) "foo"))))
 
 ; not true
 (check
-  (raises?
-    (lambda ()
-      (typing-assert (type-datum->typing (boolean-type) '(= 1 2))))))
+  (raises
+    (typing-assert (type-datum->typing (boolean-type) '(= 1 2)))))
 
 ; non value
 (check
-  (raises?
-    (lambda ()
-      (typing-assert (variable-typing (boolean-type) 'foo 1)))))
+  (raises
+    (typing-assert (variable-typing (boolean-type) 'foo 1))))
 
 ; --- typings-resolve-get
 

@@ -5,9 +5,8 @@
 (check (equal? (syntax->proof #'"foo") string?))
 
 (check
-  (raises?
-    (lambda ()
-      (syntax->proof #'string-length))))
+  (raises
+    (syntax->proof #'string-length)))
 
 (check
   (equal?

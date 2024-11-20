@@ -193,12 +193,11 @@
     (read-typings 10 20)))
 
 (check
-  (raises?
-    (lambda ()
-      (read-typings 10 20
-        (assert
-          (native "(= 1 2)")
-          (as boolean))))))
+  (raises
+    (read-typings 10 20
+      (assert
+        (native "(= 1 2)")
+        (as boolean)))))
 
 (check
   (equal?

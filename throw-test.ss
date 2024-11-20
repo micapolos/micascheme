@@ -8,9 +8,8 @@
     "foo"))
 
 (check
-  (raises?
-    (lambda ()
-      (or-throw #f))))
+  (raises
+    (or-throw #f)))
 
 (check
   (equal?
@@ -18,7 +17,6 @@
     1))
 
 (check
-  (raises?
-    (lambda ()
-      (or-throw (single (list))))))
+  (raises
+    (or-throw (single (list)))))
 

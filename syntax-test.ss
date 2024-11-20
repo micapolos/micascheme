@@ -5,7 +5,7 @@
 (check (equal? (identifiers? #'(foo 123)) #f))
 
 (define-aux-keyword foo)
-(check (raises? (lambda () foo)))
+(check (raises foo))
 
 (check (syntax-null? #'()))
 (check (not (syntax-null? #'(1))))

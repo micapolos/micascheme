@@ -107,11 +107,10 @@
     "3"))
 
 (check
-  (raises?
-    (lambda ()
-      (switch-exclusive #\a
-        ((string? $string) (string-append $string "!"))
-        ((number? $number) (number->string $number))))))
+  (raises
+    (switch-exclusive #\a
+      ((string? $string) (string-append $string "!"))
+      ((number? $number) (number->string $number)))))
 
 ; === index-switch
 

@@ -1,7 +1,7 @@
 (import (scheme) (option) (check) (monad-syntax))
 
 (check (equal? (option 123) 123))
-(check (raises? (lambda () (option #f))))
+(check (raises (option #f)))
 
 (check (equal? (pure (option 123)) 123))
 

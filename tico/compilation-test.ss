@@ -23,14 +23,12 @@
     3))
 
 (check
-  (raises?
-    (lambda ()
-      (compilation-value (variable-compilation 'foo 1)))))
+  (raises
+    (compilation-value (variable-compilation 'foo 1))))
 
 (check
-  (raises?
-    (lambda ()
-      (compilation-value (parameter-compilation 'foo)))))
+  (raises
+    (compilation-value (parameter-compilation 'foo))))
 
 (check
   (equal?
