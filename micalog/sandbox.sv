@@ -26,6 +26,7 @@ module clock_counter (
   end
   assign counter = { clock_3, clock_2, clock_1, clock };
 endmodule
+
 module clock_counter_with_scopes (
   input clock,
   output [3:0] counter

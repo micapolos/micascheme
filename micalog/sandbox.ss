@@ -33,6 +33,8 @@
       (output 4 counter)
       (assign 4 counter (append 4 clock-3 clock-2 clock-1 clock)))))
 
+(newline)
+
 (display
   (verilog-string
     (module clock-counter-with-scopes
