@@ -227,7 +227,9 @@
           (expr->code #'false)))
       ((%append expr ...)
         (code-in-curly-brackets
-          (ops->code ", " (syntaxes expr ...))))))
+          (lets
+            ($exprs (ops->code ", " (syntaxes expr ...)))
+            (and $exprs (code " " $exprs " ")))))))
 
   (define (lhs->code $lhs)
     (syntax-case $lhs ()
