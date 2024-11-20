@@ -60,6 +60,9 @@
 (check-verilog (declaration (%register 1 foo)) (%%reg foo))
 (check-verilog (declaration (%register 8 foo)) (%%reg (7 %%to 0) foo))
 
+(check-verilog (declaration (%assign 1 foo bar)) (%%assign foo bar))
+(check-verilog (declaration (%assign 8 foo bar)) (%%assign foo bar))
+
 (check-verilog
   (declaration
     (%on clock
@@ -71,16 +74,8 @@
     (%%set! goo gar)))
 
 (check-verilog
-  (declaration-instrs
-    (%on clock
-      (%posedge
-        (%init
-          (%register 1 pos-1)
-          (%register 1 pos-2))
-        (%update
-          (%set 1 pos-1 3)
-          (%set 1 pos-1 4)))))
-  ())
+  (instr (%set 1 foo bar))
+  (%%set! foo bar))
 
 (check-verilog
   (module
