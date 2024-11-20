@@ -65,7 +65,9 @@
             (append
               $declarations
               $opposite-declarations
-              (list #`(%on name #,$process #,$opposite-process)))
+              (list
+                #`(%on name #,$process)
+                #`(%on name #,$opposite-process)))
             (list))))
       ((%set body ...)
         (pair (list) (list $item)))))

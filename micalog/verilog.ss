@@ -62,12 +62,7 @@
     (syntax-case $on (%on)
       ((%on name process)
         (list
-          (process->verilog #'name #'process)))
-      ((%on name process other-process)
-        (opposite-processes? #'process #'other-process)
-        (list
-          (process->verilog #'name #'process)
-          (process->verilog #'name #'other-process)))))
+          (process->verilog #'name #'process)))))
 
   (define (process->verilog $name $process)
     (syntax-case $process ()

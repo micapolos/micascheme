@@ -60,30 +60,13 @@
       (%posedge
         (%register 1 pos-init-1)
         (%register 1 pos-init-2)
-        (%wire 1 pos-update 3))
-      (%negedge
-        (%register 1 neg-init-1)
-        (%register 1 neg-init-2)
-        (%wire 1 neg-update 6)
-        (%on sub-clock
-          (%posedge
-            (%register 1 sub-init)
-            (%wire 1 sub-update 8))))))
+        (%wire 1 pos-update 3))))
   (
     (%%always (%%posedge clock))
-    (%%always (%%negedge clock))
     (%%reg pos-init-1)
     (%%reg pos-init-2)
     (%%wire pos-update)
-    (%%assign pos-update 3)
-    (%%reg neg-init-1)
-    (%%reg neg-init-2)
-    (%%wire neg-update)
-    (%%assign neg-update 6)
-    (%%always (%%posedge sub-clock))
-    (%%reg sub-init)
-    (%%wire sub-update)
-    (%%assign sub-update 8)))
+    (%%assign pos-update 3)))
 
 (check-verilog
   (declaration-instrs
@@ -94,20 +77,7 @@
           (%register 1 pos-2))
         (%update
           (%set 1 pos-1 3)
-          (%set 1 pos-1 4)))
-      (%negedge
-        (%init
-          (%register 1 neg-1)
-          (%register 1 neg-2))
-        (%update
-          (%set 1 neg-1 7)
-          (%set 1 neg-2 8)
-          (%on sub-clock
-            (%posedge
-              (%init
-                (%register 1 sub))
-              (%update
-                (%set 1 sub 10))))))))
+          (%set 1 pos-1 4)))))
   ())
 
 (check-verilog

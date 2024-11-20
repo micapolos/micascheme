@@ -58,7 +58,8 @@
     (%register 2 reg-2)
     (%on clock
       (%posedge
-        (%set 1 reg-1 val-1))
+        (%set 1 reg-1 val-1)))
+    (%on clock
       (%negedge
         (%set 2 reg-2 val-2)))))
 
