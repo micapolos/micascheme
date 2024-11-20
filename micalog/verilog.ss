@@ -63,27 +63,28 @@
 
   (define (declaration->verilog-instrs $init-names $top-level? $declaration)
     (syntax-case $declaration (%on)
-      ((name (%on (edge body ...)))
-        (opt->list
-          (and $top-level?
-            (process->verilog $init-names #'name #'(edge body ...)))))
-      ((name (%on (edge body ...) (other-edge other-body ...)))
-        (non-false-list
-          (and $top-level?
-            (process->verilog $init-names #'name #'(edge body ...)))
-          (and $top-level?
-            (process->verilog $init-names #'name #`(#,(else-edge #'edge #'other-edge) other-body ...)))))
+      ((name (%on body ...))
+        (on->verilogs $init-names #'name $top-level? #'(%on body ...)))
       (instr
         (instr->verilogs $init-names #'instr))))
 
-  (define (instr->verilogs $init-names $instr)
-    (syntax-case $instr ()
-      ((name type expr)
+  (define (on->verilogs $init-names $name $top-level? $on)
+    (syntax-case $on (%on)
+      ((%on (edge body ...))
         (opt->list
-          (and (name-init? $init-names #'name)
-            #`(%%set!
-              #,(name->verilog #'name)
-              #,(expr->verilog #'expr)))))))
+          (and $top-level?
+            (process->verilog $init-names $name
+              #'(edge body ...)))))
+      ((%on (edge body ...) (other-edge other-body ...))
+        (non-false-list
+          (and $top-level?
+            (process->verilog $init-names $name
+              #'(edge body ...)))
+          (and $top-level?
+            (process->verilog $init-names $name
+              #`(
+                #,(else-edge #'edge #'other-edge)
+                other-body ...)))))))
 
   (define (process->verilog $init-names $name $process)
     (syntax-case $process (%init %update)
@@ -100,6 +101,15 @@
         (map
           (partial declaration->verilog-instrs $init-names #f)
           $instrs))))
+
+  (define (instr->verilogs $init-names $instr)
+    (syntax-case $instr ()
+      ((name type expr)
+        (opt->list
+          (and (name-init? $init-names #'name)
+            #`(%%set!
+              #,(name->verilog #'name)
+              #,(expr->verilog #'expr)))))))
 
   (define (type->verilog? $type)
     (syntax-case $type ()
