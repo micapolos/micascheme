@@ -51,20 +51,16 @@
 
 (check-verilog (expr (%if 16 foo? a b)) (%%if foo? a b))
 
-(check-verilog
-  (register-declaration (foo 16 (%init)))
-  (%%reg (15 %%to 0) foo))
-(check-verilog
-  (register-declaration (foo 16 (%init 12)))
-  (%%reg (15 %%to 0) foo 12))
-
 (check-verilog (input (foo 1)) (%%input foo))
 (check-verilog (input (foo 16)) (%%input (15 %%to 0) foo))
 
 (check-verilog (output (foo 1 value)) (%%output foo))
 (check-verilog (output (foo 16 value)) (%%output (15 %%to 0) foo))
 
+(check-verilog (init (foo 1)) (%%reg foo))
 (check-verilog (init (foo 1 value)) (%%reg foo value))
+(check-verilog (init (foo 8)) (%%reg (7 %%to 0) foo))
+(check-verilog (init (foo 8 value)) (%%reg (7 %%to 0) foo value))
 
 (check-verilog
   (init-names

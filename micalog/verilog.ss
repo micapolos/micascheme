@@ -6,7 +6,6 @@
     value->verilog
     module->verilog
     expr->verilog
-    register-declaration->verilog
     input->verilog
     output->verilog
     declaration->init-names
@@ -113,14 +112,6 @@
         (and
           (not (= (datum number) 1))
           #`(#,(- (datum number) 1) %%to 0)))))
-
-  (define (register-declaration->verilog $declaration)
-    (syntax-case $declaration ()
-      ((name type init)
-        #`(%%reg
-          #,@(opt->list (type->verilog? #'type))
-          #,(name->verilog #'name)
-          #,@(opt->list (init->verilog? #'init))))))
 
   (define (wire->verilog $name $type)
     #`(%%wire
@@ -283,6 +274,10 @@
 
   (define (init->verilog $init)
     (syntax-case $init ()
+      ((name type)
+        #`(%%reg
+          #,@(opt->list (type->verilog? #'type))
+          #,(name->verilog #'name)))
       ((name type expr)
         #`(%%reg
           #,@(opt->list (type->verilog? #'type))
