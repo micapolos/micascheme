@@ -1,11 +1,11 @@
 (library (micalog keywords)
   (export
     module input output internal
+    process init update
     define on cond else
     posedge negedge
     register
     expr
-    init
     = != < <= > >=
     if
     append slice
@@ -16,11 +16,11 @@
 
   (define-aux-keywords
     module input output internal
+    process init update
     define on cond else
     posedge negedge
     register
     expr
-    init
     = != < <= > >=
     if
     append slice
