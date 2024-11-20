@@ -22,9 +22,9 @@
         (list #'%register))
       ((%wire body ...)
         (list #'%wire))
-      ((name (%on process))
+      ((%on name process)
         (process-declarations #'process))
-      ((name (%on process opposite-process))
+      ((%on name process opposite-process)
         (append
           (process-declarations #'process)
           (process-declarations #'opposite-process)))
