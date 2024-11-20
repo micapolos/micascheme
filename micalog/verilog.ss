@@ -9,8 +9,7 @@
     input->verilog
     output->verilog
     declaration-instrs->verilog
-    declaration-declarations->verilog
-    init->verilog)
+    declaration-declarations->verilog)
 
   (import
     (micascheme)
@@ -19,23 +18,19 @@
     (prefix (verilog keywords) %%))
 
   (define (module->verilog $module)
-    (syntax-case $module (%module %input %internal %output)
+    (syntax-case (flatten-module $module) (%module %input %internal %output)
       ((%module name body ...)
         #`(%%module
           (
             #,(name->verilog #'name)
-            #,@(map input->verilog (declaration-syntaxes %input body ...))
-            #,@(map output->verilog (declaration-syntaxes %output body ...)))
+            #,@(map input->verilog (declaration-syntaxes-of %input body ...))
+            #,@(map output->verilog (declaration-syntaxes-of %output body ...)))
           #,@(flatten
-            (map
-              declaration->verilog-declarations
-              (syntaxes body ...)))
+            (map declaration->verilog-declarations
+              (declaration-syntaxes body ...)))
           #,@(flatten
-            (map
-              (partial declaration->verilog-instrs #t)
-              (syntaxes body ...)))
-          #,@(map output-assign->verilog
-            (declaration-syntaxes %output body ...))))))
+            (map declaration->verilog-instrs
+              (declaration-syntaxes body ...)))))))
 
   (define (input->verilog $input)
     (syntax-case $input (%input)
@@ -46,37 +41,40 @@
 
   (define (output->verilog $output)
     (syntax-case $output (%output)
+      ((%output type name)
+        #`(%%output
+          #,@(opt->list (type->verilog? #'type))
+          #,(name->verilog #'name)))
       ((%output type name expr)
         #`(%%output
           #,@(opt->list (type->verilog? #'type))
           #,(name->verilog #'name)))))
 
-  (define (declaration->verilog-instrs $top-level? $declaration)
-    (syntax-case $declaration (%on)
-      ((%on body ...)
-        (on->verilogs $top-level? #'(%on body ...)))
-      (instr
-        (instr->verilogs #'instr))))
+  (define (declaration->verilog-instrs $declaration)
+    (syntax-case $declaration (%set)
+      ((%set type name expr)
+        (list
+          #`(%%set!
+            #,(name->verilog #'name)
+            #,(expr->verilog #'expr))))
+      (_ (list))))
 
-  (define (on->verilogs $top-level? $on)
+  (define (on->verilogs $on)
     (syntax-case $on (%on)
       ((%on name process)
-        (opt->list
-          (and $top-level?
-            (process->verilog #'name #'process))))
+        (list
+          (process->verilog #'name #'process)))
       ((%on name process other-process)
         (opposite-processes? #'process #'other-process)
-        (non-false-list
-          (and $top-level?
-            (process->verilog #'name #'process))
-          (and $top-level?
-            (process->verilog #'name #'other-process))))))
+        (list
+          (process->verilog #'name #'process)
+          (process->verilog #'name #'other-process)))))
 
   (define (process->verilog $name $process)
-    (syntax-case $process (%init %update)
-      ((edge (%init init ...) (%update update ...))
+    (syntax-case $process ()
+      ((edge body ...)
         (always->verilog $name #'edge
-          (syntaxes update ...)))))
+          (syntaxes body ...)))))
 
   (define (always->verilog $name $edge $instrs)
     #`(%%always
@@ -84,19 +82,8 @@
         #,(edge->verilog $edge)
         #,(name->verilog $name))
       #,@(flatten
-        (map
-          (partial declaration->verilog-instrs #f)
+        (map declaration->verilog-instrs
           $instrs))))
-
-  (define (instr->verilogs $instr)
-    (syntax-case $instr (%set)
-      ((%set type name expr)
-        (list
-          #`(%%set!
-            #,(name->verilog #'name)
-            #,(expr->verilog #'expr))))
-      (_ ; TODO: Detect assign here
-        (list))))
 
   (define (type->verilog? $type)
     (syntax-case $type ()
@@ -206,50 +193,31 @@
         #'name)))
 
   (define (declaration->verilog-declarations $declaration)
-    (syntax-case $declaration (%on %wire)
-      ((%on name process)
-        (process->verilog-declarations #'process))
-      ((%on name process other-process)
-        (opposite-processes? #'process #'other-process)
-        (append
-          (process->verilog-declarations #`process)
-          (process->verilog-declarations #`other-process)))
+    (syntax-case $declaration (%wire %register %output %on)
+      ((%output type name expr)
+        (list
+          (assign->verilog #'name #'expr)))
+      ((%wire type name)
+        (list
+          (wire->verilog #'name #'type)))
       ((%wire type name expr)
         (list
           (wire->verilog #'name #'type)
           (assign->verilog #'name #'expr)))
-      (_
-        ; TODO: Implement assign and wire
-        (list))))
-
-  (define (output-assign->verilog $output)
-    (syntax-case $output (%output)
-      ((%output type name expr)
-        (assign->verilog #'name #'expr))))
-
-  (define (process->verilog-declarations $process)
-    (syntax-case $process (%init %update)
-      ((edge (%init init ...) (%update update ...))
-        (append
-          (map init->verilog (syntaxes init ...))
-          (flatten
-            (map
-              (partial declaration->verilog-declarations)
-              (syntaxes update ...)))))))
-
-  (define (init->verilog $init)
-    (syntax-case $init (%register)
       ((%register type name)
-        #`(%%reg
-          #,@(opt->list (type->verilog? #'type))
-          #,(name->verilog #'name)))))
+        (list
+          #`(%%reg
+            #,@(opt->list (type->verilog? #'type))
+            #,(name->verilog #'name))))
+      ((%on body ...)
+        (on->verilogs $declaration))
+      (_ (list))))
 
   (define (declaration-declarations->verilog $declaration)
-    #`(#,@(declaration->verilog-declarations $declaration)))
+    #`(#,@(flatten (map declaration->verilog-declarations (flatten-declaration $declaration)))))
 
   (define (declaration-instrs->verilog $declaration)
     (list->syntax
       (declaration->verilog-instrs
-        #t
         $declaration)))
 )

@@ -7,12 +7,76 @@
     opposite-edges?
     process-edge
     opposite-processes?
+    flatten-declaration
     flatten-declarations
     declaration-kind-of?
-    declaration-syntaxes)
+    declaration-syntaxes
+    declaration-syntaxes-of
+    items->declarations-instrs
+    flatten-module
+    check-flattens)
   (import
     (micascheme)
     (prefix (micalog keywords) %))
+
+  (define-rule-syntax (check-flattens in out)
+    (check (equal? (syntax->datum (flatten-module #'in)) 'out)))
+
+  (define (flatten-module $module)
+    (syntax-case $module (%module)
+      ((%module name item ...)
+        #`(%module name
+          #,@(flatten-items
+            (syntaxes item ...))))))
+
+  (define (flatten-items $items)
+    (lets
+      ((pair $declarations $instrs) (items->declarations-instrs $items))
+      (append $declarations $instrs)))
+
+  (define (items->declarations-instrs $items)
+    (lets
+      ($pairs (map item->declarations-instrs $items))
+      (pair
+        (flatten (map car $pairs))
+        (flatten (map cdr $pairs)))))
+
+  (define (item->declarations-instrs $item)
+    (syntax-case $item (%input %output %register %wire %on %set %assign)
+      ((%input body ...)
+        (pair (list $item) (list)))
+      ((%output body ...)
+        (pair (list $item) (list)))
+      ((%register body ...)
+        (pair (list $item) (list)))
+      ((%wire body ...)
+        (pair (list $item) (list)))
+      ((%on name process)
+        (lets
+          ((pair $declarations $process) (process->declarations-process #'process))
+          (pair
+            (append $declarations (list #`(%on name #,$process)))
+            (list))))
+      ((%on name process opposite-process)
+        (lets
+          ((pair $declarations $process) (process->declarations-process #'process))
+          ((pair $opposite-declarations $opposite-process) (process->declarations-process #'opposite-process))
+          (pair
+            (append
+              $declarations
+              $opposite-declarations
+              (list #`(%on name #,$process #,$opposite-process)))
+            (list))))
+      ((%set body ...)
+        (pair (list) (list $item)))))
+
+  (define (process->declarations-process $item)
+    (syntax-case $item ()
+      ((edge item ...)
+        (lets
+          ((pair $declarations $instrs)
+            (items->declarations-instrs (syntaxes item ...)))
+          (pair $declarations #`(edge #,@$instrs))))))
 
   (define (flatten-declarations $declarations)
     (flatten (map flatten-declaration $declarations)))
@@ -28,18 +92,20 @@
       ((%wire body ...)
         (list $declaration))
       ((%on name process)
-        (process-declarations #'process))
+        (cons $declaration
+          (process-declarations #'process)))
       ((%on name process opposite-process)
-        (append
-          (process-declarations #'process)
-          (process-declarations #'opposite-process)))
+        (cons $declaration
+          (append
+            (process-declarations #'process)
+            (process-declarations #'opposite-process))))
       (_ (list))))
 
   (define (process-declarations $process)
     (syntax-case $process ()
-      ((edge declaration ...)
+      ((edge body ...)
         (flatten-declarations
-          (syntaxes declaration ...)))))
+          (syntaxes body ...)))))
 
   (define (declaration-kind-of? $kind $declaration)
     (syntax-case $declaration ()
@@ -47,10 +113,13 @@
         (free-identifier=? #'kind $kind))
       (_ #f)))
 
-  (define-rule-syntax (declaration-syntaxes kind declaration ...)
+  (define-rule-syntax (declaration-syntaxes declaration ...)
+    (syntaxes declaration ...))
+
+  (define-rule-syntax (declaration-syntaxes-of kind declaration ...)
     (filter
       (partial declaration-kind-of? #'kind)
-      (flatten-declarations (syntaxes declaration ...))))
+      (syntaxes declaration ...)))
 
   (define (opposite-edges? $edge $other-edge)
     (syntax-case #`(#,$edge #,$other-edge) (%posedge %negedge)

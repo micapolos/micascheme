@@ -57,31 +57,24 @@
 (check-verilog (output (%output 1 foo value)) (%%output foo))
 (check-verilog (output (%output 16 foo value)) (%%output (15 %%to 0) foo))
 
-(check-verilog (init (%register 1 foo)) (%%reg foo))
-(check-verilog (init (%register 8 foo)) (%%reg (7 %%to 0) foo))
-
 (check-verilog
   (declaration-declarations
     (%on clock
       (%posedge
-        (%init
-          (%register 1 pos-init-1)
-          (%register 1 pos-init-2))
-        (%update
-          (%wire 1 pos-update 3)))
+        (%register 1 pos-init-1)
+        (%register 1 pos-init-2)
+        (%wire 1 pos-update 3))
       (%negedge
-        (%init
-          (%register 1 neg-init-1)
-          (%register 1 neg-init-2))
-        (%update
-          (%wire 1 neg-update 6)
-          (%on sub-clock
-            (%posedge
-              (%init
-                (%register 1 sub-init))
-              (%update
-                (%wire 1 sub-update 8))))))))
+        (%register 1 neg-init-1)
+        (%register 1 neg-init-2)
+        (%wire 1 neg-update 6)
+        (%on sub-clock
+          (%posedge
+            (%register 1 sub-init)
+            (%wire 1 sub-update 8))))))
   (
+    (%%always (%%posedge clock))
+    (%%always (%%negedge clock))
     (%%reg pos-init-1)
     (%%reg pos-init-2)
     (%%wire pos-update)
@@ -90,6 +83,7 @@
     (%%reg neg-init-2)
     (%%wire neg-update)
     (%%assign neg-update 6)
+    (%%always (%%posedge sub-clock))
     (%%reg sub-init)
     (%%wire sub-update)
     (%%assign sub-update 8)))
@@ -117,13 +111,7 @@
                 (%register 1 sub))
               (%update
                 (%set 1 sub 10))))))))
-  (
-    (%%always (%%posedge clock)
-      (%%set! pos-1 3)
-      (%%set! pos-1 4))
-    (%%always (%%negedge clock)
-      (%%set! neg-1 7)
-      (%%set! neg-2 8))))
+  ())
 
 (check-verilog
   (module
@@ -158,14 +146,12 @@
     (%module my-mod
       (%on clock
         (%posedge
-          (%init
-            (%register 16 init-1)
-            (%register 16 init-2))
-          (%update
-            (%wire 16 update-1 3)
-            (%wire 16 update-2 4)
-            (%set 16 init-1 5)
-            (%set 16 init-2 6))))))
+          (%register 16 init-1)
+          (%register 16 init-2)
+          (%wire 16 update-1 3)
+          (%wire 16 update-2 4)
+          (%set 16 init-1 5)
+          (%set 16 init-2 6)))))
   (%%module (my-mod)
     (%%reg (15 %%to 0) init-1)
     (%%reg (15 %%to 0) init-2)

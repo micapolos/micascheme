@@ -18,16 +18,34 @@
       (input 1 clock)
       (on clock
         (posedge
-          (init (register 1 clock-1))
-          (update (set 1 clock-1 (not 1 clock-1)))))
+          (register 1 clock-1)
+          (set 1 clock-1 (not 1 clock-1))))
       (on clock-1
         (posedge
-          (init (register 1 clock-2))
-          (update (set 1 clock-2 (not 1 clock-2)))))
+          (register 1 clock-2)
+          (set 1 clock-2 (not 1 clock-2))))
       (on clock-2
         (posedge
-          (init (register 1 clock-3))
-          (update (set 1 clock-3 (not 1 clock-3)))))
+          (register 1 clock-3)
+          (set 1 clock-3 (not 1 clock-3))))
+      (output 4 counter (append 4 clock-3 clock-2 clock-1 clock)))))
+
+(display
+  (verilog-string
+    (module clock-counter-2
+      (input 1 clock)
+      (on clock
+        (posedge
+          (register 1 clock-1)
+          (set 1 clock-1 (not 1 clock-1))
+          (on clock-1
+            (posedge
+              (register 1 clock-2)
+              (set 1 clock-2 (not 1 clock-2))
+              (on clock-2
+                (posedge
+                  (register 1 clock-3)
+                  (set 1 clock-3 (not 1 clock-3))))))))
       (output 4 counter (append 4 clock-3 clock-2 clock-1 clock)))))
 
 (newline)
@@ -39,15 +57,13 @@
       (input 1 reset?)
       (input 1 mouse-pressed?)
       (input 16 mouse-x)
+      (output 16 counter)
       (on clock
         (posedge
-          (init
-            (register 1 half-clock)
-            (register 16 counter))
-          (update
-            (set 1 half-clock (not 1 half-clock))
-            (wire 16 inc-counter (add 16 counter 1))
-            (wire 16 dec-counter (sub 16 counter 1))
-            (wire 16 updated-counter (if 16 mouse-pressed? inc-counter dec-counter))
-            (set 16 counter (if 16 reset? mouse-x updated-counter)))))
-      (output 16 out counter))))
+          (register 1 half-clock)
+          (register 16 counter)
+          (set 1 half-clock (not 1 half-clock))
+          (wire 16 inc-counter (add 16 counter 1))
+          (wire 16 dec-counter (sub 16 counter 1))
+          (wire 16 updated-counter (if 16 mouse-pressed? inc-counter dec-counter))
+          (set 16 counter (if 16 reset? mouse-x updated-counter)))))))
