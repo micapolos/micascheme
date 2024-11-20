@@ -42,7 +42,7 @@
           #,(name->verilog #'name)))))
 
   (define (declaration->verilog? $declaration)
-    (syntax-case $declaration (%wire %register %on %assign)
+    (syntax-case $declaration (%wire %register %assign %on)
       ((%wire type name)
         #`(%%wire
           #,@(opt->list (type->verilog? #'type))
@@ -52,9 +52,11 @@
           #,@(opt->list (type->verilog? #'type))
           #,(name->verilog #'name)))
       ((%assign type name expr)
-        (assign->verilog #'name #'expr))
-      ((%on body ...)
-        (on->verilog $declaration))
+        #`(%%assign
+          #,(name->verilog #'name)
+          #,(expr->verilog #'expr)))
+      ((%on name process)
+        (process->verilog #'name #'process))
       (_ #f)))
 
   (define (instr->verilog? $declaration)
@@ -64,11 +66,6 @@
           #,(name->verilog #'name)
           #,(expr->verilog #'expr)))
       (_ #f)))
-
-  (define (on->verilog $on)
-    (syntax-case $on (%on)
-      ((%on name process)
-        (process->verilog #'name #'process))))
 
   (define (process->verilog $name $process)
     (syntax-case $process ()
@@ -87,11 +84,6 @@
         (and
           (not (= (datum number) 1))
           #`(#,(- (datum number) 1) %%to 0)))))
-
-  (define (assign->verilog $name $expr)
-    #`(%%assign
-      #,(name->verilog $name)
-      #,(expr->verilog $expr)))
 
   (define (expr->verilog $expr)
     (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %if %not %and %or %xor %nand %nor %xnor %add %sub %neg)
