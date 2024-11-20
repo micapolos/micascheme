@@ -20,4 +20,6 @@
 (check (raises (opposite-edges? #'%posedge #'%posedge)))
 
 (check (opposite-processes? #'(%posedge _ _) #'(%negedge _ _)))
+(check (opposite-processes? #'(%negedge _ _) #'(%posedge _ _)))
 (check (raises (opposite-processes? #'(%posedge _ _) #'(%posedge _ _))))
+(check (raises (opposite-processes? #'(%negedge _ _) #'(%negedge _ _))))
