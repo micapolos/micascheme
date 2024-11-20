@@ -2,11 +2,23 @@
   (export
     checking?
     check
+    raises
+    works
     raises?
     works?)
   (import (scheme))
 
   (define checking? (make-thread-parameter #f))
+
+  (define-syntax raises
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        (_ (syntax-error $syntax)))))
+
+  (define-syntax works
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        (_ (syntax-error $syntax)))))
 
   (define (raises? $proc)
     (call/cc
@@ -30,7 +42,11 @@
 
   (define-syntax check
     (lambda (stx)
-      (syntax-case stx (not)
+      (syntax-case stx (not raises works)
+        ((_ (raises body ...))
+          #`(check (raises? (lambda () body ...))))
+        ((_ (works body ...))
+          #`(check (works? (lambda () body ...))))
         ((_ (not (pred arg ...)))
           (let*
             (

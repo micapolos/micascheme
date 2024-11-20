@@ -222,22 +222,20 @@
     (boolean-type)))
 
 (check
-  (raises?
-    (lambda ()
-      (type-application
-        (arrow
-          (list (string-type) (number-type))
-          (list (boolean-type)))
-        (list (string-type))))))
+  (raises
+    (type-application
+      (arrow
+        (list (string-type) (number-type))
+        (list (boolean-type)))
+      (list (string-type)))))
 
 (check
-  (raises?
-    (lambda ()
-      (type-application
-        (arrow
-          (list (string-type) (number-type))
-          (list (boolean-type)))
-        (list (string-type) (any-type))))))
+  (raises
+    (type-application
+      (arrow
+        (list (string-type) (number-type))
+        (list (boolean-type)))
+      (list (string-type) (any-type)))))
 
 ; --- type-struct
 
