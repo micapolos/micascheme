@@ -1,9 +1,19 @@
-module sandbox (
+module and_gate (
+  input in_1,
+  input in_2,
+  output out_and,
+  output out_nand
+);
+  assign out_and = in_1 & in_2;
+  assign out_nand = ~out_and;
+endmodule
+
+module funny_counter (
   input clock,
   input reset_,
   input mouse_pressed_,
   input [15:0] mouse_x,
-  output [15:0] value
+  output [15:0] out
 );
   reg half_clock = 0;
   reg [15:0] counter = 0;
@@ -17,5 +27,5 @@ module sandbox (
     half_clock <= ~half_clock;
     counter <= reset_ ? mouse_x : updated_counter;
   end
-  assign value = counter;
+  assign out = counter;
 endmodule

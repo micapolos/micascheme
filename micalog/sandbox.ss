@@ -1,10 +1,23 @@
 (import
   (micalog verilog-string)
-  (only (micascheme) display))
+  (only (micascheme) display newline))
 
 (display
   (verilog-string
-    (module sandbox
+    (module and-gate
+      (input
+        (in-1 1)
+        (in-2 1))
+      (internal)
+      (output
+        (out-and 1 (and 1 in-1 in-2))
+        (out-nand 1 (not 1 out-and))))))
+
+(newline)
+
+(display
+  (verilog-string
+    (module funny-counter
       (input
         (clock 1)
         (reset? 1)
@@ -24,4 +37,4 @@
                 (updated-counter 16 (if 16 mouse-pressed? inc-counter dec-counter))
                 (counter 16 (if 16 reset? mouse-x updated-counter)))))))
       (output
-        (value 16 counter)))))
+        (out 16 counter)))))
