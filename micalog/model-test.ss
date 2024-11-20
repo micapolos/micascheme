@@ -15,3 +15,9 @@
 
 (check (opposite-edges? #'%posedge #'%negedge))
 (check (opposite-edges? #'%negedge #'%posedge))
+
+(check (raises? (lambda () (opposite-edges? #'%negedge #'%negedge))))
+(check (raises? (lambda () (opposite-edges? #'%posedge #'%posedge))))
+
+(check (opposite-processes? #'(%posedge _ _) #'(%negedge _ _)))
+(check (raises? (lambda () (opposite-processes? #'(%posedge _ _) #'(%posedge _ _)))))
