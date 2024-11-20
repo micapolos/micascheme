@@ -2,7 +2,6 @@
   (export
     name->verilog
     edge->verilog
-    event->verilog
     value->verilog
     module->verilog
     expr->verilog
@@ -173,13 +172,6 @@
       (%posedge #'%%posedge)
       (%negedge #'%%negedge)))
 
-  (define (event->verilog $event)
-    (syntax-case $event ()
-      ((edge value)
-        #`(
-          #,(edge->verilog #'edge)
-          #,(value->verilog #'value)))))
-
   (define (value->verilog $value)
     (syntax-case $value ()
       (integer (integer? (datum integer))
@@ -211,10 +203,13 @@
             #,(name->verilog #'name))))
       ((%on body ...)
         (on->verilogs $declaration))
-      (_ (list))))
+      (_
+        (list))))
 
   (define (declaration-declarations->verilog $declaration)
-    #`(#,@(flatten (map declaration->verilog-declarations (flatten-declaration $declaration)))))
+    #`(#,@(flatten
+      (map declaration->verilog-declarations
+        (flatten-declaration $declaration)))))
 
   (define (declaration-instrs->verilog $declaration)
     (list->syntax

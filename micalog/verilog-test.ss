@@ -21,9 +21,6 @@
 (check-verilog (edge %posedge) %%posedge)
 (check-verilog (edge %negedge) %%negedge)
 
-(check-verilog (event (%posedge foo)) (%%posedge foo))
-(check-verilog (event (%negedge 123)) (%%negedge 123))
-
 (check-verilog (expr 10) 10)
 (check-verilog (expr foo) foo)
 (check-verilog (expr (%append 0)) (%%append))
