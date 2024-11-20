@@ -49,6 +49,8 @@
 (check-verilog (expr (%sub 16 a b)) (%%- a b))
 (check-verilog (expr (%neg 16 a)) (%%- a))
 
+(check-verilog (expr (%if 16 foo? a b)) (%%if foo? a b))
+
 (check-verilog
   (register-declaration (foo 16 (%init)))
   (%%reg (15 %%to 0) foo))

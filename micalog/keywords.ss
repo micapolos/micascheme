@@ -8,6 +8,7 @@
     expr
     init
     = != < <= > >=
+    if
     append slice
     + - add sub neg
     and or xor nand nor xnor not inv
@@ -23,6 +24,7 @@
     expr
     init
     = != < <= > >=
+    if
     append slice
     + - add sub neg
     and or xor nand nor xnor not inv
