@@ -7,7 +7,6 @@
     module->verilog
     expr->verilog
     register-declaration->verilog
-    register-update->verilog
     input->verilog
     output->verilog
     declaration->init-names
@@ -43,7 +42,8 @@
             #,@(flatten
               (map
                 (partial declaration->verilog-instrs $init-names #t)
-                (syntaxes internal ... output ...))))))))
+                (syntaxes internal ...)))
+            #,@(map output-assign->verilog (syntaxes output ...)))))))
 
   (define (input->verilog $input)
     (syntax-case $input ()
@@ -70,15 +70,17 @@
             (syntaxes process ...))
           (list)))
       (instr
-        (list (instr->verilog $init-names #'instr)))))
+        (instr->verilogs $init-names #'instr))))
 
-  (define (instr->verilog $init-names $instr)
+  (define (instr->verilogs $init-names $instr)
     (syntax-case $instr ()
       ((name type expr)
-        #`(
-          #,(if (name-init? $init-names #'name) #'%%set! #'%%assign)
-          #,(name->verilog #'name)
-          #,(expr->verilog #'expr)))))
+        (opt->list
+          (and
+            (name-init? $init-names #'name)
+            #`(%%set!
+              #,(name->verilog #'name)
+              #,(expr->verilog #'expr)))))))
 
   (define (process->verilog $init-names $expr $process)
     (syntax-case $process (%init %update)
@@ -107,21 +109,10 @@
           #,(name->verilog #'name)
           #,@(opt->list (init->verilog? #'init))))))
 
-  (define (register-update->verilog $body)
-    (syntax-case $body (%on)
-      ((name (%on event update))
-        #`(%%always
-          #,(event->verilog #'event)
-          (%%set!
-            #,(name->verilog #'name)
-            #,(value->verilog #'update))))))
-
-  (define (wire->verilog-declaration? $kind $type $name)
-    (and
-      (free-identifier=? $kind #'%internal)
-      #`(%%wire
-        #,@(opt->list (type->verilog? $type))
-        #,(name->verilog $name))))
+  (define (wire->verilog $name $type)
+    #`(%%wire
+      #,@(opt->list (type->verilog? $type))
+      #,(name->verilog $name)))
 
   (define (assign->verilog $name $expr)
     #`(%%assign
@@ -252,9 +243,13 @@
         (if (name-init? $init-names #'name)
           (list)
           (list
-            #`(%%wire
-              #,@(opt->list (type->verilog? #'type))
-              #,(name->verilog #'name)))))))
+            (wire->verilog #'name #'type)
+            (assign->verilog #'name #'expr))))))
+
+  (define (output-assign->verilog $output)
+    (syntax-case $output ()
+      ((name type expr)
+        (assign->verilog #'name #'expr))))
 
   (define (process->verilog-declarations $init-names $process)
     (syntax-case $process (%init %update)
