@@ -10,7 +10,6 @@
     register-update->verilog
     parameter->verilog
     declaration->verilogs
-    kind->verilog?
     type->verilog?)
 
   (import
@@ -55,12 +54,6 @@
     (syntax-case $declaration (%internal)
       ((kind name type body)
         (body->verilogs #'kind #'name #'type #'body))))
-
-  (define (kind->verilog? $kind)
-    (syntax-case $kind (%input %output %internal)
-      (%input #'%%input)
-      (%output #'%%output)
-      (%internal #f)))
 
   (define (type->verilog? $type)
     (syntax-case $type ()

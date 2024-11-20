@@ -3,21 +3,10 @@
     type-size
     expr-type
     expr-value
-    reg-type
-    declaration-syntaxes)
+    reg-type)
   (import
     (micascheme)
     (prefix (micalog keywords) %))
-
-  (define (declaration-kind-of? $kind $item)
-    (syntax-case $item ()
-      ((kind body ...)
-        (free-identifier=? #'kind $kind))))
-
-  (define-rule-syntax (declaration-syntaxes kind declaration ...)
-    (filter
-      (partial declaration-kind-of? #'kind)
-      (syntaxes declaration ...)))
 
   (define (type-size $type)
     (syntax-case $type ()
