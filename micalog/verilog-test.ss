@@ -61,31 +61,6 @@
 (check-verilog (init (%register 8 foo)) (%%reg (7 %%to 0) foo))
 
 (check-verilog
-  (init-names
-    (clock
-      (%on
-        (%posedge
-          (%init
-            (%register 1 pos-init-1)
-            (%register 1 pos-init-2))
-          (%update
-            (pos-update 1 0)))
-        (%negedge
-          (%init
-            (%register 1 neg-init-1)
-            (%register 1 neg-init-2))
-          (%update
-            (neg-update 1 0)
-            (sub-clock
-              (%on
-                (%posedge
-                  (%init
-                    (%register 1 sub-init))
-                  (%update
-                    (sub-update 1 0))))))))))
-  (pos-init-1 pos-init-2 neg-init-1 neg-init-2 sub-init))
-
-(check-verilog
   (declaration-declarations
     (clock
       (%on
