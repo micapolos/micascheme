@@ -276,14 +276,14 @@
         $declaration)))
 
   (define (declaration-instrs->verilog $declaration)
-    #`(
-      #,@(declaration->verilog-instrs
+    (list->syntax
+      (declaration->verilog-instrs
         (declaration->init-names $declaration)
         #t
         $declaration)))
 
   (define (init-names->verilog $declaration)
-    (declaration->init-names $declaration))
+    (list->syntax (declaration->init-names $declaration)))
 
   (define (name-init? $init-names $name)
     (find (partial free-identifier=? $name) $init-names))
