@@ -97,13 +97,15 @@
           $instrs))))
 
   (define (instr->verilogs $init-names $instr)
-    (syntax-case $instr ()
-      ((name type expr)
+    (syntax-case $instr (%set)
+      ((%set type name expr)
         (opt->list
           (and (name-init? $init-names #'name)
             #`(%%set!
               #,(name->verilog #'name)
-              #,(expr->verilog #'expr)))))))
+              #,(expr->verilog #'expr)))))
+      (_ ; TODO: Detect assign here
+        (list))))
 
   (define (type->verilog? $type)
     (syntax-case $type ()
@@ -236,7 +238,7 @@
       ((%register type name) #'name)))
 
   (define (declaration->verilog-declarations $init-names $declaration)
-    (syntax-case $declaration (%on)
+    (syntax-case $declaration (%on %wire)
       ((name (%on process))
         (process->verilog-declarations $init-names #'process))
       ((name (%on process other-process))
@@ -244,12 +246,13 @@
         (append
           (process->verilog-declarations $init-names #`process)
           (process->verilog-declarations $init-names #`other-process)))
-      ((name type expr)
-        (if (name-init? $init-names #'name)
-          (list)
-          (list
-            (wire->verilog #'name #'type)
-            (assign->verilog #'name #'expr))))))
+      ((%wire type name expr)
+        (list
+          (wire->verilog #'name #'type)
+          (assign->verilog #'name #'expr)))
+      (_
+        ; TODO: Implement assign and wire
+        (list))))
 
   (define (output-assign->verilog $output)
     (syntax-case $output ()

@@ -25,17 +25,17 @@
           (on
             (posedge
               (init (register 1 clock-1))
-              (update (clock-1 1 (not 1 clock-1))))))
+              (update (set 1 clock-1 (not 1 clock-1))))))
         (clock-1
           (on
             (posedge
               (init (register 1 clock-2))
-              (update (clock-2 1 (not 1 clock-2))))))
+              (update (set 1 clock-2 (not 1 clock-2))))))
         (clock-2
           (on
             (posedge
               (init (register 1 clock-3))
-              (update (clock-3 1 (not 1 clock-3)))))))
+              (update (set 1 clock-3 (not 1 clock-3)))))))
       (output
         (counter 4 (append 4 clock-3 clock-2 clock-1 clock))))))
 
@@ -57,10 +57,10 @@
                 (register 1 half-clock)
                 (register 16 counter))
               (update
-                (half-clock 1 (not 1 half-clock))
-                (inc-counter 16 (add 16 counter 1))
-                (dec-counter 16 (sub 16 counter 1))
-                (updated-counter 16 (if 16 mouse-pressed? inc-counter dec-counter))
-                (counter 16 (if 16 reset? mouse-x updated-counter)))))))
+                (set 1 half-clock (not 1 half-clock))
+                (wire 16 inc-counter (add 16 counter 1))
+                (wire 16 dec-counter (sub 16 counter 1))
+                (wire 16 updated-counter (if 16 mouse-pressed? inc-counter dec-counter))
+                (set 16 counter (if 16 reset? mouse-x updated-counter)))))))
       (output
         (out 16 counter)))))
