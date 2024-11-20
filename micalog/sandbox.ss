@@ -32,7 +32,7 @@
 
 (display
   (verilog-string
-    (module clock-counter-2
+    (module clock-counter-with-scopes
       (input 1 clock)
       (on clock
         (posedge
