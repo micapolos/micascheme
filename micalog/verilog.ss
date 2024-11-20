@@ -20,38 +20,34 @@
 
   (define (module->verilog $module)
     (syntax-case $module (%module %input %internal %output)
-      ((%module name
-        (%input input ...)
-        (%internal internal ...)
-        (%output output ...))
+      ((%module name body ...)
         #`(%%module
           (
             #,(name->verilog #'name)
-            #,@(map input->verilog (syntaxes input ...))
-            #,@(map output->verilog (syntaxes output ...)))
+            #,@(map input->verilog (declaration-syntaxes %input body ...))
+            #,@(map output->verilog (declaration-syntaxes %output body ...)))
           #,@(flatten
             (map
               declaration->verilog-declarations
-              (syntaxes internal ...)))
+              (syntaxes body ...)))
           #,@(flatten
             (map
               (partial declaration->verilog-instrs #t)
-              (syntaxes internal ...)))
-          #,@(map output-assign->verilog (syntaxes output ...))))))
+              (syntaxes body ...)))
+          #,@(map output-assign->verilog
+            (declaration-syntaxes %output body ...))))))
 
   (define (input->verilog $input)
-    (syntax-case $input ()
-      ((name type)
-        #`(
-          %%input
+    (syntax-case $input (%input)
+      ((%input type name)
+        #`(%%input
           #,@(opt->list (type->verilog? #'type))
           #,(name->verilog #'name)))))
 
-  (define (output->verilog $parameter)
-    (syntax-case $parameter ()
-      ((name type expr)
-        #`(
-          %%output
+  (define (output->verilog $output)
+    (syntax-case $output (%output)
+      ((%output type name expr)
+        #`(%%output
           #,@(opt->list (type->verilog? #'type))
           #,(name->verilog #'name)))))
 
@@ -227,8 +223,8 @@
         (list))))
 
   (define (output-assign->verilog $output)
-    (syntax-case $output ()
-      ((name type expr)
+    (syntax-case $output (%output)
+      ((%output type name expr)
         (assign->verilog #'name #'expr))))
 
   (define (process->verilog-declarations $process)

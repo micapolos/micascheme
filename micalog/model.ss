@@ -6,7 +6,10 @@
     reg-type
     opposite-edges?
     process-edge
-    opposite-processes?)
+    opposite-processes?
+    flatten-declarations
+    declaration-kind-of?
+    declaration-syntaxes)
   (import
     (micascheme)
     (prefix (micalog keywords) %))
@@ -15,13 +18,15 @@
     (flatten (map flatten-declaration $declarations)))
 
   (define (flatten-declaration $declaration)
-    (syntax-case $declaration (%input %register %wire %on)
+    (syntax-case $declaration (%input %output %register %wire %on)
       ((%input body ...)
-        (list #'%input))
+        (list $declaration))
+      ((%output body ...)
+        (list $declaration))
       ((%register body ...)
-        (list #'%register))
+        (list $declaration))
       ((%wire body ...)
-        (list #'%wire))
+        (list $declaration))
       ((%on name process)
         (process-declarations #'process))
       ((%on name process opposite-process)
@@ -33,7 +38,19 @@
   (define (process-declarations $process)
     (syntax-case $process ()
       ((edge declaration ...)
-        (flatten-declarations (syntaxes declaration ...)))))
+        (flatten-declarations
+          (syntaxes declaration ...)))))
+
+  (define (declaration-kind-of? $kind $declaration)
+    (syntax-case $declaration ()
+      ((kind body ...)
+        (free-identifier=? #'kind $kind))
+      (_ #f)))
+
+  (define-rule-syntax (declaration-syntaxes kind declaration ...)
+    (filter
+      (partial declaration-kind-of? #'kind)
+      (flatten-declarations (syntaxes declaration ...))))
 
   (define (opposite-edges? $edge $other-edge)
     (syntax-case #`(#,$edge #,$other-edge) (%posedge %negedge)
