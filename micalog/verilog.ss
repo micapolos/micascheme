@@ -55,9 +55,16 @@
         #`(%%assign
           #,(name->verilog #'name)
           #,(expr->verilog #'expr)))
-      ((%on name process)
-        (process->verilog #'name #'process))
+      ((%on name (edge body ...))
+        #`(%%always
+          (#,(edge->verilog #'edge) #,(name->verilog #'name))
+          #,@(filter-opts (map instr->verilog? (syntaxes body ...)))))
       (_ #f)))
+
+  (define (declaration->verilog $declaration)
+    (or
+      (declaration->verilog? $declaration)
+      (syntax-error $declaration)))
 
   (define (instr->verilog? $declaration)
     (syntax-case $declaration (%set)
@@ -67,12 +74,10 @@
           #,(expr->verilog #'expr)))
       (_ #f)))
 
-  (define (process->verilog $name $process)
-    (syntax-case $process ()
-      ((edge body ...)
-        #`(%%always
-          (#,(edge->verilog #'edge) #,(name->verilog $name))
-          #,@(filter-opts (map instr->verilog? (syntaxes body ...)))))))
+  (define (instr->verilog $instr)
+    (or
+      (instr->verilog? $instr)
+      (syntax-error $instr)))
 
   (define (type->verilog? $type)
     (syntax-case $type ()
@@ -163,14 +168,4 @@
     (syntax-case $name ()
       (name (identifier? #'name)
         #'name)))
-
-  (define (declaration->verilog $declaration)
-    (or
-      (declaration->verilog? $declaration)
-      (syntax-error $declaration)))
-
-  (define (instr->verilog $instr)
-    (or
-      (instr->verilog? $instr)
-      (syntax-error $instr)))
 )
