@@ -10,7 +10,6 @@
     flatten-declaration
     flatten-declarations
     declaration-kind-of?
-    declaration-syntaxes
     declaration-syntaxes-of
     items->declarations-instrs
     flatten-module
@@ -118,9 +117,6 @@
       ((kind body ...)
         (free-identifier=? #'kind $kind))
       (_ #f)))
-
-  (define-rule-syntax (declaration-syntaxes declaration ...)
-    (syntaxes declaration ...))
 
   (define-rule-syntax (declaration-syntaxes-of kind declaration ...)
     (filter

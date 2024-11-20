@@ -17,19 +17,15 @@
     (prefix (verilog keywords) %%))
 
   (define (module->verilog $module)
-    (syntax-case (flatten-module $module) (%module %input %internal %output)
+    (syntax-case $module (%module %input %internal %output)
       ((%module name body ...)
         #`(%%module
           (
             #,(name->verilog #'name)
             #,@(map input->verilog (declaration-syntaxes-of %input body ...))
             #,@(map output->verilog (declaration-syntaxes-of %output body ...)))
-          #,@(flatten
-            (map declaration->verilog-declarations
-              (declaration-syntaxes body ...)))
-          #,@(flatten
-            (map declaration->verilog-instrs
-              (declaration-syntaxes body ...)))))))
+          #,@(filter-opts (map declaration->verilog-declaration? (syntaxes body ...)))
+          #,@(filter-opts (map declaration->verilog-instr? (syntaxes body ...)))))))
 
   (define (input->verilog $input)
     (syntax-case $input (%input)
@@ -45,20 +41,18 @@
           #,@(opt->list (type->verilog? #'type))
           #,(name->verilog #'name)))))
 
-  (define (declaration->verilog-instrs $declaration)
+  (define (declaration->verilog-instr? $declaration)
     (syntax-case $declaration (%set)
       ((%set type name expr)
-        (list
-          #`(%%set!
-            #,(name->verilog #'name)
-            #,(expr->verilog #'expr))))
-      (_ (list))))
+        #`(%%set!
+          #,(name->verilog #'name)
+          #,(expr->verilog #'expr)))
+      (_ #f)))
 
-  (define (on->verilogs $on)
+  (define (on->verilog $on)
     (syntax-case $on (%on)
       ((%on name process)
-        (list
-          (process->verilog #'name #'process)))))
+        (process->verilog #'name #'process))))
 
   (define (process->verilog $name $process)
     (syntax-case $process ()
@@ -68,12 +62,8 @@
 
   (define (always->verilog $name $edge $instrs)
     #`(%%always
-      (
-        #,(edge->verilog $edge)
-        #,(name->verilog $name))
-      #,@(flatten
-        (map declaration->verilog-instrs
-          $instrs))))
+      (#,(edge->verilog $edge) #,(name->verilog $name))
+      #,@(filter-opts (map declaration->verilog-instr? $instrs))))
 
   (define (type->verilog? $type)
     (syntax-case $type ()
@@ -175,34 +165,25 @@
       (name (identifier? #'name)
         #'name)))
 
-  (define (declaration->verilog-declarations $declaration)
+  (define (declaration->verilog-declaration? $declaration)
     (syntax-case $declaration (%wire %register %output %on %assign)
       ((%output type name expr)
-        (list
-          (assign->verilog #'name #'expr)))
+        (assign->verilog #'name #'expr))
       ((%wire type name)
-        (list
-          (wire->verilog #'name #'type)))
+        (wire->verilog #'name #'type))
       ((%register type name)
-        (list
-          #`(%%reg
-            #,@(opt->list (type->verilog? #'type))
-            #,(name->verilog #'name))))
+        #`(%%reg
+          #,@(opt->list (type->verilog? #'type))
+          #,(name->verilog #'name)))
       ((%assign type name expr)
-        (list
-          (assign->verilog #'name #'expr)))
+        (assign->verilog #'name #'expr))
       ((%on body ...)
-        (on->verilogs $declaration))
-      (_
-        (list))))
+        (on->verilog $declaration))
+      (_ #f)))
 
   (define (declaration-declarations->verilog $declaration)
-    #`(#,@(flatten
-      (map declaration->verilog-declarations
-        (flatten-declaration $declaration)))))
+    #`(#,@(opt->list (declaration->verilog-declaration? $declaration))))
 
   (define (declaration-instrs->verilog $declaration)
-    (list->syntax
-      (declaration->verilog-instrs
-        $declaration)))
+    #`(#,@(opt->list (declaration->verilog-instr? $declaration))))
 )

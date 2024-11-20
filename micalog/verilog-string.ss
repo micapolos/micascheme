@@ -9,11 +9,13 @@
     (rename
       (only (micalog verilog) module->verilog)
       (module->verilog micalog-module->verilog))
+    (only (micalog model) flatten-module)
     (micalog keywords))
   (export (import (micalog keywords)))
 
   (define-case-syntax (verilog-string body)
     (fluent #'body
+      (flatten-module)
       (micalog-module->verilog)
       (verilog-module->code)
       (code-string)

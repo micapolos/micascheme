@@ -60,11 +60,7 @@
         (%wire 1 pos-update)
         (%assign 1 pos-update 3))))
   (
-    (%%always (%%posedge clock))
-    (%%reg pos-init-1)
-    (%%reg pos-init-2)
-    (%%wire pos-update)
-    (%%assign pos-update 3)))
+    (%%always (%%posedge clock))))
 
 (check-verilog
   (declaration-instrs
@@ -101,14 +97,14 @@
 (check-verilog
   (module
     (%module my-mod
+      (%register 16 init-1)
+      (%register 16 init-2)
+      (%wire 16 update-1)
+      (%assign 16 update-1 3)
+      (%wire 16 update-2)
+      (%assign 16 update-2 4)
       (%on clock
         (%posedge
-          (%register 16 init-1)
-          (%register 16 init-2)
-          (%wire 16 update-1)
-          (%assign 16 update-1 3)
-          (%wire 16 update-2)
-          (%assign 16 update-2 4)
           (%set 16 init-1 5)
           (%set 16 init-2 6)))))
   (%%module (my-mod)
