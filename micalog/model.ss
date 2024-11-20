@@ -3,10 +3,28 @@
     type-size
     expr-type
     expr-value
-    reg-type)
+    reg-type
+    opposite-edges?
+    process-edge
+    opposite-processes?)
   (import
     (micascheme)
     (prefix (micalog keywords) %))
+
+  (define (opposite-edges? $edge $other-edge)
+    (syntax-case #`(#,$edge #,$other-edge) (%posedge %negedge)
+      ((%posedge %negedge) #t)
+      ((%negedge %posedge) #t)
+      ((_ other) (syntax-error $other-edge "non opposite"))))
+
+  (define (process-edge $process)
+    (syntax-case $process ()
+      ((edge body ...) #'edge)))
+
+  (define (opposite-processes? $process $other-process)
+    (opposite-edges?
+      (process-edge $process)
+      (process-edge $other-process)))
 
   (define (type-size $type)
     (syntax-case $type ()
