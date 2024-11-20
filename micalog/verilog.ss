@@ -72,11 +72,6 @@
           (not (= (datum number) 1))
           #`(#,(- (datum number) 1) %%to 0)))))
 
-  (define (wire->verilog $name $type)
-    #`(%%wire
-      #,@(opt->list (type->verilog? $type))
-      #,(name->verilog $name)))
-
   (define (assign->verilog $name $expr)
     #`(%%assign
       #,(name->verilog $name)
@@ -166,11 +161,11 @@
         #'name)))
 
   (define (declaration->verilog-declaration? $declaration)
-    (syntax-case $declaration (%wire %register %output %on %assign)
-      ((%output type name expr)
-        (assign->verilog #'name #'expr))
+    (syntax-case $declaration (%wire %register %on %assign)
       ((%wire type name)
-        (wire->verilog #'name #'type))
+        #`(%%wire
+          #,@(opt->list (type->verilog? #'type))
+          #,(name->verilog #'name)))
       ((%register type name)
         #`(%%reg
           #,@(opt->list (type->verilog? #'type))
