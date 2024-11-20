@@ -1,10 +1,9 @@
 (import
   (micalog verilog-string)
-  (only (micascheme) display)
-  (micalog keywords))
+  (only (micascheme) display))
 
 (display
-  (micalog->verilog-string
+  (verilog-string
     (module sandbox
       (input
         (clock 1)
