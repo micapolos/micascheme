@@ -17,6 +17,28 @@
 
 (display
   (verilog-string
+    (module clock-counter
+      (input
+        (clock 1))
+      (internal
+        (clock
+          (on
+            (posedge
+              (init (clock-1 1 0))
+              (update
+                (clock-1 1 (not 1 clock-1))
+                (clock-1
+                  (on
+                    (posedge
+                      (init (clock-2 1 0))
+                      (update (clock2 1 (not 1 clock-2)))))))))))
+      (output
+        (counter 3 (append clock-2 clock-1 clock))))))
+
+(newline)
+
+(display
+  (verilog-string
     (module funny-counter
       (input
         (clock 1)
