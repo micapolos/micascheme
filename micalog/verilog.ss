@@ -80,8 +80,7 @@
     (syntax-case $instr ()
       ((name type expr)
         (opt->list
-          (and
-            (name-init? $init-names #'name)
+          (and (name-init? $init-names #'name)
             #`(%%set!
               #,(name->verilog #'name)
               #,(expr->verilog #'expr)))))))
