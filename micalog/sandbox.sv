@@ -1,3 +1,4 @@
+micapolos@MacBook-Misia micascheme % scheme --script micalog/sandbox.ss
 module and_gate (
   input in_1,
   input in_2,
@@ -8,7 +9,7 @@ module and_gate (
   assign out_nand = ~out_and;
 endmodule
 
-module clock_counter (
+module counter_4 (
   input clock,
   output [3:0] counter
 );
@@ -27,7 +28,7 @@ module clock_counter (
   assign counter = { clock_3, clock_2, clock_1, clock };
 endmodule
 
-module clock_counter_with_scopes (
+module alternative_counter_4 (
   input clock,
   output [3:0] counter
 );
@@ -46,7 +47,7 @@ module clock_counter_with_scopes (
   assign counter = { clock_3, clock_2, clock_1, clock };
 endmodule
 
-module funny_counter (
+module funny_module (
   input clock,
   input reset_,
   input mouse_pressed_,
@@ -66,3 +67,4 @@ module funny_counter (
     counter <= reset_ ? mouse_x : updated_counter;
   end
 endmodule
+micapolos@MacBook-Misia micascheme %

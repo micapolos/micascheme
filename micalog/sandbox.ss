@@ -16,7 +16,7 @@
 
 (display
   (verilog-string
-    (module clock-counter
+    (module counter-4
       (input 1 clock)
       (on clock
         (posedge
@@ -37,7 +37,7 @@
 
 (display
   (verilog-string
-    (module clock-counter-with-scopes
+    (module alternative-counter-4
       (input 1 clock)
       (on clock
         (posedge
@@ -58,7 +58,7 @@
 
 (display
   (verilog-string
-    (module funny-counter
+    (module funny-module
       (input 1 clock)
       (input 1 reset?)
       (input 1 mouse-pressed?)
