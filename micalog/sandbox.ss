@@ -19,7 +19,6 @@
                 (counter 16 0))
               (update
                 (half-clock 1 (not 1 half-clock))
-                (half-clock (on (posedge (init) (update)))) ; TODO: missing!!!
                 (inc-counter 16 (add 16 counter 1))
                 (dec-counter 16 (sub 16 counter 1))
                 (updated-counter 16 (if 16 mouse-pressed? inc-counter dec-counter))
