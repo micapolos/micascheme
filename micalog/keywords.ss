@@ -4,7 +4,7 @@
     process init update
     define on cond else
     posedge negedge
-    register
+    register wire
     expr
     = != < <= > >=
     if
@@ -19,7 +19,7 @@
     process init update
     define on cond else
     posedge negedge
-    register
+    register wire
     expr
     = != < <= > >=
     if

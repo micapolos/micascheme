@@ -57,8 +57,8 @@
 (check-verilog (output (foo 1 value)) (%%output foo))
 (check-verilog (output (foo 16 value)) (%%output (15 %%to 0) foo))
 
-(check-verilog (init (foo 1)) (%%reg foo))
-(check-verilog (init (foo 8)) (%%reg (7 %%to 0) foo))
+(check-verilog (init (%register foo 1)) (%%reg foo))
+(check-verilog (init (%register foo 8)) (%%reg (7 %%to 0) foo))
 
 (check-verilog
   (init-names
@@ -66,21 +66,21 @@
       (%on
         (%posedge
           (%init
-            (pos-init-1 1)
-            (pos-init-2 1))
+            (%register pos-init-1 1)
+            (%register pos-init-2 1))
           (%update
             (pos-update 1 0)))
         (%negedge
           (%init
-            (neg-init-1 1)
-            (neg-init-2 1))
+            (%register neg-init-1 1)
+            (%register neg-init-2 1))
           (%update
             (neg-update 1 0)
             (sub-clock
               (%on
                 (%posedge
                   (%init
-                    (sub-init 1))
+                    (%register sub-init 1))
                   (%update
                     (sub-update 1 0))))))))))
   (pos-init-1 pos-init-2 neg-init-1 neg-init-2 sub-init))
@@ -91,21 +91,21 @@
       (%on
         (%posedge
           (%init
-            (pos-init-1 1)
-            (pos-init-2 1))
+            (%register pos-init-1 1)
+            (%register pos-init-2 1))
           (%update
             (pos-update 1 3)))
         (%negedge
           (%init
-            (neg-init-1 1)
-            (neg-init-2 1))
+            (%register neg-init-1 1)
+            (%register neg-init-2 1))
           (%update
             (neg-update 1 6)
             (sub-clock
               (%on
                 (%posedge
                   (%init
-                    (sub-init 1))
+                    (%register sub-init 1))
                   (%update
                     (sub-update 1 8))))))))))
   (
@@ -127,15 +127,15 @@
       (%on
         (%posedge
           (%init
-            (pos-1 1)
-            (pos-2 1))
+            (%register pos-1 1)
+            (%register pos-2 1))
           (%update
             (pos-1 1 3)
             (pos-1 1 4)))
         (%negedge
           (%init
-            (neg-1 1)
-            (neg-2 1))
+            (%register neg-1 1)
+            (%register neg-2 1))
           (%update
             (neg-1 1 7)
             (neg-2 1 8)
@@ -143,7 +143,7 @@
               (%on
                 (%posedge
                   (%init
-                    (sub 1))
+                    (%register sub 1))
                   (%update
                     (sub 1 10))))))))))
   (
@@ -198,8 +198,8 @@
           (%on
             (%posedge
               (%init
-                (init-1 16)
-                (init-2 16))
+                (%register init-1 16)
+                (%register init-2 16))
               (%update
                 (update-1 16 3)
                 (update-2 16 4)

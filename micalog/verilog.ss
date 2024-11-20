@@ -232,8 +232,8 @@
           (flatten (map declaration->init-names (syntaxes update ...)))))))
 
   (define (init->name $init)
-    (syntax-case $init ()
-      ((name type) #'name)))
+    (syntax-case $init (%register)
+      ((%register name type) #'name)))
 
   (define (declaration->verilog-declarations $init-names $declaration)
     (syntax-case $declaration (%on)
@@ -267,8 +267,8 @@
               (syntaxes update ...)))))))
 
   (define (init->verilog $init)
-    (syntax-case $init ()
-      ((name type)
+    (syntax-case $init (%register)
+      ((%register name type)
         #`(%%reg
           #,@(opt->list (type->verilog? #'type))
           #,(name->verilog #'name)))))
