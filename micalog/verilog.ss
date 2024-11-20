@@ -34,12 +34,12 @@
 
   (define (parameter->verilog $parameter)
     (syntax-case $parameter (%input %output)
-      ((%input type name)
+      ((%input name type)
         #`(
           %%input
           #,@(opt->list (type->verilog? #'type))
           #,(name->verilog #'name)))
-      ((%output type name _)
+      ((%output name type _)
         #`(
           %%output
           #,@(opt->list (type->verilog? #'type))
@@ -47,8 +47,8 @@
 
   (define (declaration->verilogs $declaration)
     (syntax-case $declaration (%internal)
-      ((kind type name body)
-        (body->verilogs #'kind #'type #'name #'body))))
+      ((kind name type body)
+        (body->verilogs #'kind #'name #'type #'body))))
 
   (define (kind->verilog? $kind)
     (syntax-case $kind (%input %output %internal)
@@ -63,7 +63,7 @@
           (not (= (datum number) 1))
           #`(#,(- (datum number) 1) %%to 0)))))
 
-  (define (body->verilogs $kind $type $name $value)
+  (define (body->verilogs $kind $name $type $value)
     (syntax-case $value (%register)
       ((%register type init (on event update))
         (list

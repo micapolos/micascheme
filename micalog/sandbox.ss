@@ -6,44 +6,44 @@
 (display
   (micalog->verilog-string
     (module sandbox
-      (input 1 clock)
-      (input 1 reset?)
-      (input 1 mouse-pressed?)
-      (input 16 mouse-x)
+      (input clock 1)
+      (input reset? 1)
+      (input mouse-pressed? 1)
+      (input mouse-x 16)
 
-      (internal 1 half-clock
+      (internal half-clock 1
         (register 1
           (init 0)
           (on (posedge clock) inv-half-clock)))
 
-      (internal 1 previous-half-clock
+      (internal previous-half-clock 1
         (register 1
           (init 0)
           (on (negedge clock) half-clock)))
 
-      (internal 1 next-half-clock
+      (internal next-half-clock 1
         (not 16 previous-half-clock))
 
-      (internal 16 counter
+      (internal counter 16
         (register 16
           (init)
           (on (posedge half-clock) next-counter)))
 
-      (internal 16 previous-counter
+      (internal previous-counter 16
         (register 16
           (init)
           (on (negedge half-clock) counter)))
 
-      (internal 16 inc-counter
+      (internal inc-counter 16
         (add 16 previous-counter 1))
 
-      (internal 16 dec-counter
+      (internal dec-counter 16
         (sub 16 previous-counter 1))
 
-      (internal 16 updated-counter
+      (internal updated-counter 16
         (if 16 mouse-pressed? inc-counter dec-counter))
 
-      (internal 16 next-counter
+      (internal next-counter 16
         (if 16 reset? mouse-x updated-counter))
 
-      (output 16 value counter))))
+      (output value 16 counter))))
