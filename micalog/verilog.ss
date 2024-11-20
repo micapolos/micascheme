@@ -85,14 +85,17 @@
   (define (process->verilog $init-names $name $process)
     (syntax-case $process (%init %update)
       ((edge (%init init ...) (%update update ...))
-        #`(%%always
-          (
-            #,(edge->verilog #'edge)
-            #,(name->verilog $name))
-          #,@(flatten
-            (map
-              (partial declaration->verilog-instrs $init-names #f)
-              (syntaxes update ...)))))))
+        (always->verilog $init-names $name #'edge (syntaxes update ...)))))
+
+  (define (always->verilog $init-names $name $edge $instrs)
+    #`(%%always
+      (
+        #,(edge->verilog $edge)
+        #,(name->verilog $name))
+      #,@(flatten
+        (map
+          (partial declaration->verilog-instrs $init-names #f)
+          $instrs))))
 
   (define (type->verilog? $type)
     (syntax-case $type ()
