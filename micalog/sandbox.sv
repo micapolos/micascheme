@@ -1,4 +1,4 @@
-module micalog (
+module sandbox (
   input clock,
   input reset_,
   input mouse_pressed_,

@@ -5,7 +5,7 @@
 
 (display
   (micalog->verilog-string
-    (module
+    (module sandbox
       (input 1 clock)
       (input 1 reset?)
       (input 1 mouse-pressed?)

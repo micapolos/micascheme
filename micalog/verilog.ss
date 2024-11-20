@@ -21,13 +21,15 @@
 
   (define (module->verilog $module)
     (syntax-case $module (%module)
-      ((%module declaration ...)
+      ((%module name declaration ...)
         (lets
           ($inputs (declaration-syntaxes %input declaration ...))
           ($outputs (declaration-syntaxes %output declaration ...))
           ($internals (declaration-syntaxes %internal declaration ...))
           #`(%%module
-            (micalog #,@(map parameter->verilog (append $inputs $outputs)))
+            (
+              #,(name->verilog #'name)
+              #,@(map parameter->verilog (append $inputs $outputs)))
             #,@(flatten (map declaration->verilogs (append $outputs $internals))))))))
 
   (define (parameter->verilog $parameter)

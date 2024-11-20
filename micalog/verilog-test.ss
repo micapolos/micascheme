@@ -37,7 +37,7 @@
 (check-verilog (expr (%> 16 a b)) (%%> a b))
 (check-verilog (expr (%>= 16 a b)) (%%>= a b))
 
-(check-verilog (expr (%not 16 a)) (%%inv a))
+(check-verilog (expr (%not 16 a)) (%%not a))
 (check-verilog (expr (%and 16 a b)) (%%and a b))
 (check-verilog (expr (%or 16 a b)) (%%or a b))
 (check-verilog (expr (%xor 16 a b)) (%%xor a b))
@@ -70,21 +70,21 @@
 
 (check-verilog
   (module
-    (%module
+    (%module my-mod
       (%input 8 in1)
       (%input 8 in2)))
-  (module
-    (micalog
+  (%%module
+    (my-mod
       (%%input (7 %%to 0) in1)
       (%%input (7 %%to 0) in2))))
 
 (check-verilog
   (module
-    (%module
+    (%module my-mod
       (%output 8 out-1 value-1)
       (%output 8 out-2 value-2)))
-  (module
-    (micalog
+  (%%module
+    (my-mod
       (%%output (7 %%to 0) out-1)
       (%%output (7 %%to 0) out-2))
     (%%assign out-1 value-1)
@@ -92,27 +92,27 @@
 
 (check-verilog
   (module
-    (%module
+    (%module my-mod
       (%internal 8 bar 12)))
-  (module
-    (micalog)
+  (%%module
+    (my-mod)
     (%%wire (7 %%to 0) bar)
     (%%assign bar 12)))
 
 (check-verilog
   (module
-    (%module
+    (%module my-mod
       (%internal 8 foo (%register 8 (%init) (%on (%posedge clock) bar)))))
-  (module
-    (micalog)
+  (%%module
+    (my-mod)
     (%%reg (7 %%to 0) foo)
     (%%always (%%posedge clock) (%%set! foo bar))))
 
 (check-verilog
   (module
-    (%module
+    (%module my-mod
       (%internal 8 foo (%register 8 (%init 15) (%on (%posedge clock) bar)))))
-  (module
-    (micalog)
+  (%%module
+    (my-mod)
     (%%reg (7 %%to 0) foo 15)
     (%%always (%%posedge clock) (%%set! foo bar))))
