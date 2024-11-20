@@ -37,9 +37,11 @@
         (%set 1 foo bar))))
   (%module mod
     (%input 1 in)
-    (%output 1 out var)
+    (%output 1 out)
+    (%assign 1 out var)
     (%register 1 foo)
-    (%wire 1 var gar)
+    (%wire 1 var)
+    (%assign 1 var gar)
     (%on clock
       (%posedge
         (%set 1 foo bar)))))

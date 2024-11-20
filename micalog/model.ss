@@ -44,14 +44,32 @@
     (syntax-case $item (%input %output %register %wire %on %set %assign)
       ((%input body ...)
         (pair (list $item) (list)))
-      ((%output body ...)
-        (pair (list $item) (list)))
+      ((%output type name)
+        (pair
+          (list #`(%output type name))
+          (list)))
+      ((%output type name expr)
+        (pair
+          (list
+            #`(%output type name)
+            #`(%assign type name expr))
+          (list)))
       ((%register body ...)
         (pair (list $item) (list)))
-      ((%wire body ...)
-        (pair (list $item) (list)))
-      ((%assign body ...)
-        (pair (list $item) (list)))
+      ((%wire type name)
+        (pair
+          (list #`(%wire type name))
+          (list)))
+      ((%wire type name expr)
+        (pair
+          (list
+            #`(%wire type name)
+            #`(%assign type name expr))
+          (list)))
+      ((%assign type name expr)
+        (pair
+          (list #`(%assign type name expr))
+          (list)))
       ((%on name process)
         (lets
           ((pair $declarations $process) (process->declarations-process #'process))

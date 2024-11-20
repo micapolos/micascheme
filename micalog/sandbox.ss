@@ -7,10 +7,8 @@
     (module and-gate
       (input 1 in-1)
       (input 1 in-2)
-      (output 1 out-and)
-      (assign 1 out-and (and 1 in-1 in-2))
-      (output 1 out-nand)
-      (assign 1 out-nand (not 1 out-and)))))
+      (output 1 out-and (and 1 in-1 in-2))
+      (output 1 out-nand (not 1 out-and)))))
 
 (newline)
 
@@ -30,8 +28,7 @@
         (posedge
           (register 1 clock-3)
           (set 1 clock-3 (not 1 clock-3))))
-      (output 4 counter)
-      (assign 4 counter (append 4 clock-3 clock-2 clock-1 clock)))))
+      (output 4 counter (append 4 clock-3 clock-2 clock-1 clock)))))
 
 (newline)
 
@@ -51,8 +48,7 @@
                 (posedge
                   (register 1 clock-3)
                   (set 1 clock-3 (not 1 clock-3))))))))
-      (output 4 counter)
-      (assign 4 counter (append 4 clock-3 clock-2 clock-1 clock)))))
+      (output 4 counter (append 4 clock-3 clock-2 clock-1 clock)))))
 
 (newline)
 
@@ -69,10 +65,7 @@
           (register 1 half-clock)
           (register 16 counter)
           (set 1 half-clock (not 1 half-clock))
-          (wire 16 inc-counter)
-          (assign 16 inc-counter (add 16 counter 1))
-          (wire 16 dec-counter)
-          (assign 16 dec-counter (sub 16 counter 1))
-          (wire 16 updated-counter)
-          (assign 16 updated-counter (if 16 mouse-pressed? inc-counter dec-counter))
+          (wire 16 inc-counter (add 16 counter 1))
+          (wire 16 dec-counter (sub 16 counter 1))
+          (wire 16 updated-counter (if 16 mouse-pressed? inc-counter dec-counter))
           (set 16 counter (if 16 reset? mouse-x updated-counter)))))))
