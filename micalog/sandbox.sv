@@ -1,4 +1,3 @@
-micapolos@MacBook-Misia micascheme % scheme --script micalog/sandbox.ss
 module and_gate (
   input in_1,
   input in_2,
@@ -67,4 +66,3 @@ module funny_module (
     counter <= reset_ ? mouse_x : updated_counter;
   end
 endmodule
-micapolos@MacBook-Misia micascheme %
