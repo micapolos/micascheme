@@ -70,13 +70,9 @@
   (define (process->verilog $name $process)
     (syntax-case $process ()
       ((edge body ...)
-        (always->verilog $name #'edge
-          (syntaxes body ...)))))
-
-  (define (always->verilog $name $edge $instrs)
-    #`(%%always
-      (#,(edge->verilog $edge) #,(name->verilog $name))
-      #,@(filter-opts (map instr->verilog? $instrs))))
+        #`(%%always
+          (#,(edge->verilog #'edge) #,(name->verilog $name))
+          #,@(filter-opts (map instr->verilog? (syntaxes body ...)))))))
 
   (define (type->verilog? $type)
     (syntax-case $type ()
