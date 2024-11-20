@@ -13,18 +13,36 @@ module clock_counter (
   output [3:0] counter
 );
   reg clock_1;
-  reg clock_2;
-  reg clock_3;
   always @(posedge clock) begin
     clock_1 <= ~clock_1;
+  end
+  reg clock_2;
+  always @(posedge clock_1) begin
+    clock_2 <= ~clock_2;
+  end
+  reg clock_3;
+  always @(posedge clock_2) begin
+    clock_3 <= ~clock_3;
+  end
+  assign counter = { clock_3, clock_2, clock_1, clock };
+endmodule
+module clock_counter_with_scopes (
+  input clock,
+  output [3:0] counter
+);
+  reg clock_1;
+  reg clock_2;
+  reg clock_3;
+  always @(posedge clock_2) begin
+    clock_3 <= ~clock_3;
   end
   always @(posedge clock_1) begin
     clock_2 <= ~clock_2;
   end
-  always @(posedge clock_2) begin
-    clock_3 <= ~clock_3;
+  always @(posedge clock) begin
+    clock_1 <= ~clock_1;
   end
-  assign counter = {clock_3, clock_2, clock_1, clock};
+  assign counter = { clock_3, clock_2, clock_1, clock };
 endmodule
 
 module funny_counter (
@@ -32,7 +50,7 @@ module funny_counter (
   input reset_,
   input mouse_pressed_,
   input [15:0] mouse_x,
-  output [15:0] out
+  output [15:0] counter
 );
   reg half_clock;
   reg [15:0] counter;
@@ -46,5 +64,4 @@ module funny_counter (
     half_clock <= ~half_clock;
     counter <= reset_ ? mouse_x : updated_counter;
   end
-  assign out = counter;
 endmodule
