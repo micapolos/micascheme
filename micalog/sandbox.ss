@@ -24,17 +24,17 @@
         (clock
           (on
             (posedge
-              (init (register clock-1 1))
+              (init (register 1 clock-1))
               (update (clock-1 1 (not 1 clock-1))))))
         (clock-1
           (on
             (posedge
-              (init (register clock-2 1))
+              (init (register 1 clock-2))
               (update (clock-2 1 (not 1 clock-2))))))
         (clock-2
           (on
             (posedge
-              (init (register clock-3 1))
+              (init (register 1 clock-3))
               (update (clock-3 1 (not 1 clock-3)))))))
       (output
         (counter 4 (append 4 clock-3 clock-2 clock-1 clock))))))
@@ -54,8 +54,8 @@
           (on
             (posedge
               (init
-                (register half-clock 1)
-                (register counter 16))
+                (register 1 half-clock)
+                (register 16 counter))
               (update
                 (half-clock 1 (not 1 half-clock))
                 (inc-counter 16 (add 16 counter 1))

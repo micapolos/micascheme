@@ -233,7 +233,7 @@
 
   (define (init->name $init)
     (syntax-case $init (%register)
-      ((%register name type) #'name)))
+      ((%register type name) #'name)))
 
   (define (declaration->verilog-declarations $init-names $declaration)
     (syntax-case $declaration (%on)
@@ -268,7 +268,7 @@
 
   (define (init->verilog $init)
     (syntax-case $init (%register)
-      ((%register name type)
+      ((%register type name)
         #`(%%reg
           #,@(opt->list (type->verilog? #'type))
           #,(name->verilog #'name)))))
