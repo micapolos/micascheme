@@ -40,10 +40,10 @@
       (internal 16 dec-counter
         (sub 16 previous-counter 1))
 
+      (internal 16 updated-counter
+        (if 16 mouse-pressed? inc-counter dec-counter))
+
       (internal 16 next-counter
-        (cond 16
-          (reset? mouse-x)
-          (mouse-pressed? inc-counter)
-          (else dec-counter)))
+        (if 16 reset? mouse-x updated-counter))
 
       (output 16 value counter))))

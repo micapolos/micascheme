@@ -26,7 +26,7 @@
           ($inputs (declaration-syntaxes %input declaration ...))
           ($outputs (declaration-syntaxes %output declaration ...))
           ($internals (declaration-syntaxes %internal declaration ...))
-          #`(module
+          #`(%%module
             (micalog #,@(map parameter->verilog (append $inputs $outputs)))
             #,@(flatten (map declaration->verilogs (append $outputs $internals))))))))
 
@@ -129,7 +129,7 @@
       ((%>= type a b)
         (op2->verilog #'%%>= #'a #'b))
       ((%not type a)
-        (op->verilog #'%%inv #'a))
+        (op->verilog #'%%not #'a))
       ((%and type a b)
         (op2->verilog #'%%and #'a #'b))
       ((%or type a b)

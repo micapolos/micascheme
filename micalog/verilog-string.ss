@@ -3,7 +3,6 @@
   (import
     (only (micascheme) define-case-syntax literal->syntax syntax)
     (only (code) code-string)
-    (only (micalog keywords) micalog)
     (only (verilog code) module->code)
     (only (micalog verilog) module->verilog))
 
