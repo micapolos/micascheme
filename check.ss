@@ -3,9 +3,7 @@
     checking?
     check
     raises
-    works
-    raises?
-    works?)
+    works)
   (import (scheme))
 
   (define checking? (make-thread-parameter #f))
