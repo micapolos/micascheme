@@ -51,16 +51,14 @@
 (check-verilog (input (%input 1 foo)) (%%input foo))
 (check-verilog (input (%input 16 foo)) (%%input (15 %%to 0) foo))
 
-(check-verilog (output (%output 1 foo value)) (%%output foo))
-(check-verilog (output (%output 16 foo value)) (%%output (15 %%to 0) foo))
-
 (check-verilog
   (declaration-declarations
     (%on clock
       (%posedge
         (%register 1 pos-init-1)
         (%register 1 pos-init-2)
-        (%wire 1 pos-update 3))))
+        (%wire 1 pos-update)
+        (%assign 1 pos-update 3))))
   (
     (%%always (%%posedge clock))
     (%%reg pos-init-1)
@@ -93,7 +91,8 @@
 (check-verilog
   (module
     (%module my-mod
-      (%wire 8 bar 12)))
+      (%wire 8 bar)
+      (%assign 8 bar 12)))
   (%%module
     (my-mod)
     (%%wire (7 %%to 0) bar)
@@ -102,21 +101,14 @@
 (check-verilog
   (module
     (%module my-mod
-      (%wire 8 foo 0)))
-  (%%module
-    (my-mod)
-    (%%wire (7 %%to 0) foo)
-    (%%assign foo 0)))
-
-(check-verilog
-  (module
-    (%module my-mod
       (%on clock
         (%posedge
           (%register 16 init-1)
           (%register 16 init-2)
-          (%wire 16 update-1 3)
-          (%wire 16 update-2 4)
+          (%wire 16 update-1)
+          (%assign 16 update-1 3)
+          (%wire 16 update-2)
+          (%assign 16 update-2 4)
           (%set 16 init-1 5)
           (%set 16 init-2 6)))))
   (%%module (my-mod)
@@ -133,8 +125,10 @@
 (check-verilog
   (module
     (%module my-mod
-      (%output 8 out-1 value-1)
-      (%output 8 out-2 value-2)))
+      (%output 8 out-1)
+      (%assign 8 out-1 value-1)
+      (%output 8 out-2)
+      (%assign 8 out-2 value-2)))
   (%%module
     (my-mod
       (%%output (7 %%to 0) out-1)

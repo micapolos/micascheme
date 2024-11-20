@@ -51,6 +51,8 @@
         (pair (list $item) (list)))
       ((%wire body ...)
         (pair (list $item) (list)))
+      ((%assign body ...)
+        (pair (list $item) (list)))
       ((%on name process)
         (lets
           ((pair $declarations $process) (process->declarations-process #'process))
@@ -84,7 +86,7 @@
     (flatten (map flatten-declaration $declarations)))
 
   (define (flatten-declaration $declaration)
-    (syntax-case $declaration (%input %output %register %wire %on)
+    (syntax-case $declaration (%input %output %register %wire %assign %on)
       ((%input body ...)
         (list $declaration))
       ((%output body ...)
@@ -92,6 +94,8 @@
       ((%register body ...)
         (list $declaration))
       ((%wire body ...)
+        (list $declaration))
+      ((%assign body ...)
         (list $declaration))
       ((%on name process)
         (cons $declaration

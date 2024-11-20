@@ -43,10 +43,6 @@
       ((%output type name)
         #`(%%output
           #,@(opt->list (type->verilog? #'type))
-          #,(name->verilog #'name)))
-      ((%output type name expr)
-        #`(%%output
-          #,@(opt->list (type->verilog? #'type))
           #,(name->verilog #'name)))))
 
   (define (declaration->verilog-instrs $declaration)
@@ -180,22 +176,21 @@
         #'name)))
 
   (define (declaration->verilog-declarations $declaration)
-    (syntax-case $declaration (%wire %register %output %on)
+    (syntax-case $declaration (%wire %register %output %on %assign)
       ((%output type name expr)
         (list
           (assign->verilog #'name #'expr)))
       ((%wire type name)
         (list
           (wire->verilog #'name #'type)))
-      ((%wire type name expr)
-        (list
-          (wire->verilog #'name #'type)
-          (assign->verilog #'name #'expr)))
       ((%register type name)
         (list
           #`(%%reg
             #,@(opt->list (type->verilog? #'type))
             #,(name->verilog #'name))))
+      ((%assign type name expr)
+        (list
+          (assign->verilog #'name #'expr)))
       ((%on body ...)
         (on->verilogs $declaration))
       (_
