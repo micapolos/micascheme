@@ -57,24 +57,24 @@
 
   (define (declaration->verilog-instrs $top-level? $declaration)
     (syntax-case $declaration (%on)
-      ((name (%on body ...))
-        (on->verilogs #'name $top-level? #'(%on body ...)))
+      ((%on body ...)
+        (on->verilogs $top-level? #'(%on body ...)))
       (instr
         (instr->verilogs #'instr))))
 
-  (define (on->verilogs $name $top-level? $on)
+  (define (on->verilogs $top-level? $on)
     (syntax-case $on (%on)
-      ((%on process)
+      ((%on name process)
         (opt->list
           (and $top-level?
-            (process->verilog $name #'process))))
-      ((%on process other-process)
+            (process->verilog #'name #'process))))
+      ((%on name process other-process)
         (opposite-processes? #'process #'other-process)
         (non-false-list
           (and $top-level?
-            (process->verilog $name #'process))
+            (process->verilog #'name #'process))
           (and $top-level?
-            (process->verilog $name #'other-process))))))
+            (process->verilog #'name #'other-process))))))
 
   (define (process->verilog $name $process)
     (syntax-case $process (%init %update)
@@ -211,9 +211,9 @@
 
   (define (declaration->verilog-declarations $declaration)
     (syntax-case $declaration (%on %wire)
-      ((name (%on process))
+      ((%on name process)
         (process->verilog-declarations #'process))
-      ((name (%on process other-process))
+      ((%on name process other-process)
         (opposite-processes? #'process #'other-process)
         (append
           (process->verilog-declarations #`process)

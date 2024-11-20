@@ -21,21 +21,18 @@
       (input
         (clock 1))
       (internal
-        (clock
-          (on
-            (posedge
-              (init (register 1 clock-1))
-              (update (set 1 clock-1 (not 1 clock-1))))))
-        (clock-1
-          (on
-            (posedge
-              (init (register 1 clock-2))
-              (update (set 1 clock-2 (not 1 clock-2))))))
-        (clock-2
-          (on
-            (posedge
-              (init (register 1 clock-3))
-              (update (set 1 clock-3 (not 1 clock-3)))))))
+        (on clock
+          (posedge
+            (init (register 1 clock-1))
+            (update (set 1 clock-1 (not 1 clock-1)))))
+        (on clock-1
+          (posedge
+            (init (register 1 clock-2))
+            (update (set 1 clock-2 (not 1 clock-2)))))
+        (on clock-2
+          (posedge
+            (init (register 1 clock-3))
+            (update (set 1 clock-3 (not 1 clock-3))))))
       (output
         (counter 4 (append 4 clock-3 clock-2 clock-1 clock))))))
 
@@ -50,17 +47,16 @@
         (mouse-pressed? 1)
         (mouse-x 16))
       (internal
-        (clock
-          (on
-            (posedge
-              (init
-                (register 1 half-clock)
-                (register 16 counter))
-              (update
-                (set 1 half-clock (not 1 half-clock))
-                (wire 16 inc-counter (add 16 counter 1))
-                (wire 16 dec-counter (sub 16 counter 1))
-                (wire 16 updated-counter (if 16 mouse-pressed? inc-counter dec-counter))
-                (set 16 counter (if 16 reset? mouse-x updated-counter)))))))
+        (on clock
+          (posedge
+            (init
+              (register 1 half-clock)
+              (register 16 counter))
+            (update
+              (set 1 half-clock (not 1 half-clock))
+              (wire 16 inc-counter (add 16 counter 1))
+              (wire 16 dec-counter (sub 16 counter 1))
+              (wire 16 updated-counter (if 16 mouse-pressed? inc-counter dec-counter))
+              (set 16 counter (if 16 reset? mouse-x updated-counter))))))
       (output
         (out 16 counter)))))

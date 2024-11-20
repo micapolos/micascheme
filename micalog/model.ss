@@ -11,6 +11,30 @@
     (micascheme)
     (prefix (micalog keywords) %))
 
+  (define (flatten-declarations $declarations)
+    (flatten (map flatten-declaration $declarations)))
+
+  (define (flatten-declaration $declaration)
+    (syntax-case $declaration (%input %register %wire %on)
+      ((%input body ...)
+        (list #'%input))
+      ((%register body ...)
+        (list #'%register))
+      ((%wire body ...)
+        (list #'%wire))
+      ((name (%on process))
+        (process-declarations #'process))
+      ((name (%on process opposite-process))
+        (append
+          (process-declarations #'process)
+          (process-declarations #'opposite-process)))
+      (_ (list))))
+
+  (define (process-declarations $process)
+    (syntax-case $process ()
+      ((edge declaration ...)
+        (flatten-declarations (syntaxes declaration ...)))))
+
   (define (opposite-edges? $edge $other-edge)
     (syntax-case #`(#,$edge #,$other-edge) (%posedge %negedge)
       ((%posedge %negedge) #t)

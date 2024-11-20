@@ -62,27 +62,25 @@
 
 (check-verilog
   (declaration-declarations
-    (clock
-      (%on
-        (%posedge
-          (%init
-            (%register 1 pos-init-1)
-            (%register 1 pos-init-2))
-          (%update
-            (%wire 1 pos-update 3)))
-        (%negedge
-          (%init
-            (%register 1 neg-init-1)
-            (%register 1 neg-init-2))
-          (%update
-            (%wire 1 neg-update 6)
-            (sub-clock
-              (%on
-                (%posedge
-                  (%init
-                    (%register 1 sub-init))
-                  (%update
-                    (%wire 1 sub-update 8))))))))))
+    (%on clock
+      (%posedge
+        (%init
+          (%register 1 pos-init-1)
+          (%register 1 pos-init-2))
+        (%update
+          (%wire 1 pos-update 3)))
+      (%negedge
+        (%init
+          (%register 1 neg-init-1)
+          (%register 1 neg-init-2))
+        (%update
+          (%wire 1 neg-update 6)
+          (%on sub-clock
+            (%posedge
+              (%init
+                (%register 1 sub-init))
+              (%update
+                (%wire 1 sub-update 8))))))))
   (
     (%%reg pos-init-1)
     (%%reg pos-init-2)
@@ -98,29 +96,27 @@
 
 (check-verilog
   (declaration-instrs
-    (clock
-      (%on
-        (%posedge
-          (%init
-            (%register 1 pos-1)
-            (%register 1 pos-2))
-          (%update
-            (%set 1 pos-1 3)
-            (%set 1 pos-1 4)))
-        (%negedge
-          (%init
-            (%register 1 neg-1)
-            (%register 1 neg-2))
-          (%update
-            (%set 1 neg-1 7)
-            (%set 1 neg-2 8)
-            (sub-clock
-              (%on
-                (%posedge
-                  (%init
-                    (%register 1 sub))
-                  (%update
-                    (%set 1 sub 10))))))))))
+    (%on clock
+      (%posedge
+        (%init
+          (%register 1 pos-1)
+          (%register 1 pos-2))
+        (%update
+          (%set 1 pos-1 3)
+          (%set 1 pos-1 4)))
+      (%negedge
+        (%init
+          (%register 1 neg-1)
+          (%register 1 neg-2))
+        (%update
+          (%set 1 neg-1 7)
+          (%set 1 neg-2 8)
+          (%on sub-clock
+            (%posedge
+              (%init
+                (%register 1 sub))
+              (%update
+                (%set 1 sub 10))))))))
   (
     (%%always (%%posedge clock)
       (%%set! pos-1 3)
@@ -169,17 +165,16 @@
     (%module my-mod
       (%input)
       (%internal
-        (clock
-          (%on
-            (%posedge
-              (%init
-                (%register 16 init-1)
-                (%register 16 init-2))
-              (%update
-                (%wire 16 update-1 3)
-                (%wire 16 update-2 4)
-                (%set 16 init-1 5)
-                (%set 16 init-2 6))))))
+        (%on clock
+          (%posedge
+            (%init
+              (%register 16 init-1)
+              (%register 16 init-2))
+            (%update
+              (%wire 16 update-1 3)
+              (%wire 16 update-2 4)
+              (%set 16 init-1 5)
+              (%set 16 init-2 6)))))
       (%output)))
   (%%module (my-mod)
     (%%reg (15 %%to 0) init-1)
