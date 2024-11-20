@@ -68,48 +68,52 @@
 
 (check-verilog
   (init-names
-    (%on clock
-      (%posedge
-        (%init
-          (pos-init-1 1 0)
-          (pos-init-2 1 0))
-        (%update
-          (pos-update 1 0)))
-      (%negedge
-        (%init
-          (neg-init-1 1 0)
-          (neg-init-2 1 0))
-        (%update
-          (neg-update 1 0)
-          (%on sub-clock
-            (%posedge
-              (%init
-                (sub-init 1 0))
-              (%update
-                (sub-update 1 0))))))))
+    (clock
+      (%on
+        (%posedge
+          (%init
+            (pos-init-1 1 0)
+            (pos-init-2 1 0))
+          (%update
+            (pos-update 1 0)))
+        (%negedge
+          (%init
+            (neg-init-1 1 0)
+            (neg-init-2 1 0))
+          (%update
+            (neg-update 1 0)
+            (sub-clock
+              (%on
+                (%posedge
+                  (%init
+                    (sub-init 1 0))
+                  (%update
+                    (sub-update 1 0))))))))))
   (pos-init-1 pos-init-2 neg-init-1 neg-init-2 sub-init))
 
 (check-verilog
   (declaration-declarations
-    (%on clock
-      (%posedge
-        (%init
-          (pos-init-1 1 1)
-          (pos-init-2 1 2))
-        (%update
-          (pos-update 1 3)))
-      (%negedge
-        (%init
-          (neg-init-1 1 4)
-          (neg-init-2 1 5))
-        (%update
-          (neg-update 1 6)
-          (%on sub-clock
-            (%posedge
-              (%init
-                (sub-init 1 7))
-              (%update
-                (sub-update 1 8))))))))
+    (clock
+      (%on
+        (%posedge
+          (%init
+            (pos-init-1 1 1)
+            (pos-init-2 1 2))
+          (%update
+            (pos-update 1 3)))
+        (%negedge
+          (%init
+            (neg-init-1 1 4)
+            (neg-init-2 1 5))
+          (%update
+            (neg-update 1 6)
+            (sub-clock
+              (%on
+                (%posedge
+                  (%init
+                    (sub-init 1 7))
+                  (%update
+                    (sub-update 1 8))))))))))
   (
     (%%reg pos-init-1 1)
     (%%reg pos-init-2 2)
@@ -125,27 +129,29 @@
 
 (check-verilog
   (declaration-instrs
-    (%on clock
-      (%posedge
-        (%init
-          (pos-1 1 1)
-          (pos-2 1 2))
-        (%update
-          (pos-1 1 3)
-          (pos-1 1 4)))
-      (%negedge
-        (%init
-          (neg-1 1 5)
-          (neg-2 1 6))
-        (%update
-          (neg-1 1 7)
-          (neg-2 1 8)
-          (%on sub-clock
-            (%posedge
-              (%init
-                (sub 1 9))
-              (%update
-                (sub 1 10))))))))
+    (clock
+      (%on
+        (%posedge
+          (%init
+            (pos-1 1 1)
+            (pos-2 1 2))
+          (%update
+            (pos-1 1 3)
+            (pos-1 1 4)))
+        (%negedge
+          (%init
+            (neg-1 1 5)
+            (neg-2 1 6))
+          (%update
+            (neg-1 1 7)
+            (neg-2 1 8)
+            (sub-clock
+              (%on
+                (%posedge
+                  (%init
+                    (sub 1 9))
+                  (%update
+                    (sub 1 10))))))))))
   (
     (%%always (%%posedge clock)
       (%%set! pos-1 3)
@@ -194,16 +200,17 @@
     (%module my-mod
       (%input)
       (%internal
-        (%on clock
-          (%posedge
-            (%init
-              (init-1 16 1)
-              (init-2 16 2))
-            (%update
-              (update-1 16 3)
-              (update-2 16 4)
-              (init-1 16 5)
-              (init-2 16 6)))))
+        (clock
+          (%on
+            (%posedge
+              (%init
+                (init-1 16 1)
+                (init-2 16 2))
+              (%update
+                (update-1 16 3)
+                (update-2 16 4)
+                (init-1 16 5)
+                (init-2 16 6))))))
       (%output)))
   (%%module (my-mod)
     (%%reg (15 %%to 0) init-1 1)
