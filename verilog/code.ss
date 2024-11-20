@@ -85,16 +85,10 @@
               (expr->code #'rhs)))))
       ((kind name array ...)
         (for-all range->code? (syntaxes array ...))
-        (declaration-components->code #'kind #f #'name (syntaxes array ...) #f))
+        (declaration-components->code #'kind #f #'name (syntaxes array ...)))
       ((kind vector name array ...)
         (for-all range->code? (syntaxes vector array ...))
-        (declaration-components->code #'kind #'vector #'name (syntaxes array ...) #f))
-      ((kind name array ... expr)
-        (for-all range->code? (syntaxes array ...))
-        (declaration-components->code #'kind #f #'name (syntaxes array ...) #'expr))
-      ((kind vector name array ... expr)
-        (for-all range->code? (syntaxes vector array ...))
-        (declaration-components->code #'kind #'vector #'name (syntaxes array ...) #'expr))))
+        (declaration-components->code #'kind #'vector #'name (syntaxes array ...)))))
 
   (define (statement->code $statement)
     (syntax-case $statement (%set! %assign %cond %else)
@@ -155,17 +149,14 @@
       (%wire (code "wire"))
       (%reg (code "reg"))))
 
-  (define (declaration-components->code $kind $vector $name $arrays $expr)
+  (define (declaration-components->code $kind $vector $name $arrays)
     (newline-ended-code
       (colon-ended-code
         (space-separated-code
           (declaration-kind->code $kind)
           (and $vector (range-declaration->code $vector))
           (name->code $name)
-          (list->code (map range-declaration->code $arrays))
-          (if (and (free-identifier=? $kind #'%wire) $expr)
-            (syntax-error $expr "not valid for wire")
-            (and $expr (space-separated-code "=" (expr->code $expr))))))))
+          (list->code (map range-declaration->code $arrays))))))
 
   (define (name->code $name)
     (fluent $name

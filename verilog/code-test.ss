@@ -111,10 +111,6 @@
   (lines "reg foo;"))
 
 (check-verilog
-  (declaration (reg foo x))
-  (lines "reg foo = x;"))
-
-(check-verilog
   (declaration (reg (3 to 0) foo))
   (lines "reg [3:0] foo;"))
 

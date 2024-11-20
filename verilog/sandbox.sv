@@ -5,8 +5,8 @@ module funny_counter (
   input [15:0] mouse_x,
   output [8:0] value
 );
-  reg half_clock = 0;
-  reg [7:0] counter = 'b11111111;
+  reg half_clock;
+  reg [7:0] counter;
   always @(posedge clock) begin
     half_clock <= ~half_clock;
   end

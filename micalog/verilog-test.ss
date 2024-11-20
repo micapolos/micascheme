@@ -58,9 +58,7 @@
 (check-verilog (output (foo 16 value)) (%%output (15 %%to 0) foo))
 
 (check-verilog (init (foo 1)) (%%reg foo))
-(check-verilog (init (foo 1 value)) (%%reg foo value))
 (check-verilog (init (foo 8)) (%%reg (7 %%to 0) foo))
-(check-verilog (init (foo 8 value)) (%%reg (7 %%to 0) foo value))
 
 (check-verilog
   (init-names
@@ -68,21 +66,21 @@
       (%on
         (%posedge
           (%init
-            (pos-init-1 1 0)
-            (pos-init-2 1 0))
+            (pos-init-1 1)
+            (pos-init-2 1))
           (%update
             (pos-update 1 0)))
         (%negedge
           (%init
-            (neg-init-1 1 0)
-            (neg-init-2 1 0))
+            (neg-init-1 1)
+            (neg-init-2 1))
           (%update
             (neg-update 1 0)
             (sub-clock
               (%on
                 (%posedge
                   (%init
-                    (sub-init 1 0))
+                    (sub-init 1))
                   (%update
                     (sub-update 1 0))))))))))
   (pos-init-1 pos-init-2 neg-init-1 neg-init-2 sub-init))
@@ -93,33 +91,33 @@
       (%on
         (%posedge
           (%init
-            (pos-init-1 1 1)
-            (pos-init-2 1 2))
+            (pos-init-1 1)
+            (pos-init-2 1))
           (%update
             (pos-update 1 3)))
         (%negedge
           (%init
-            (neg-init-1 1 4)
-            (neg-init-2 1 5))
+            (neg-init-1 1)
+            (neg-init-2 1))
           (%update
             (neg-update 1 6)
             (sub-clock
               (%on
                 (%posedge
                   (%init
-                    (sub-init 1 7))
+                    (sub-init 1))
                   (%update
                     (sub-update 1 8))))))))))
   (
-    (%%reg pos-init-1 1)
-    (%%reg pos-init-2 2)
+    (%%reg pos-init-1)
+    (%%reg pos-init-2)
     (%%wire pos-update)
     (%%assign pos-update 3)
-    (%%reg neg-init-1 4)
-    (%%reg neg-init-2 5)
+    (%%reg neg-init-1)
+    (%%reg neg-init-2)
     (%%wire neg-update)
     (%%assign neg-update 6)
-    (%%reg sub-init 7)
+    (%%reg sub-init)
     (%%wire sub-update)
     (%%assign sub-update 8)))
 
@@ -129,15 +127,15 @@
       (%on
         (%posedge
           (%init
-            (pos-1 1 1)
-            (pos-2 1 2))
+            (pos-1 1)
+            (pos-2 1))
           (%update
             (pos-1 1 3)
             (pos-1 1 4)))
         (%negedge
           (%init
-            (neg-1 1 5)
-            (neg-2 1 6))
+            (neg-1 1)
+            (neg-2 1))
           (%update
             (neg-1 1 7)
             (neg-2 1 8)
@@ -145,7 +143,7 @@
               (%on
                 (%posedge
                   (%init
-                    (sub 1 9))
+                    (sub 1))
                   (%update
                     (sub 1 10))))))))))
   (
@@ -200,8 +198,8 @@
           (%on
             (%posedge
               (%init
-                (init-1 16 1)
-                (init-2 16 2))
+                (init-1 16)
+                (init-2 16))
               (%update
                 (update-1 16 3)
                 (update-2 16 4)
@@ -209,8 +207,8 @@
                 (init-2 16 6))))))
       (%output)))
   (%%module (my-mod)
-    (%%reg (15 %%to 0) init-1 1)
-    (%%reg (15 %%to 0) init-2 2)
+    (%%reg (15 %%to 0) init-1)
+    (%%reg (15 %%to 0) init-2)
     (%%wire (15 %%to 0) update-1)
     (%%assign update-1 3)
     (%%wire (15 %%to 0) update-2)

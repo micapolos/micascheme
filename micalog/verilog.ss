@@ -12,8 +12,7 @@
     declaration-instrs->verilog
     declaration-declarations->verilog
     init-names->verilog
-    init->verilog
-    type->verilog?)
+    init->verilog)
 
   (import
     (micascheme)
@@ -208,11 +207,6 @@
       (name
         (name->verilog #'name))))
 
-  (define (init->verilog? $init)
-    (syntax-case $init (%init)
-      ((%init) #f)
-      ((%init value) (value->verilog #'value))))
-
   (define (name->verilog $name)
     (syntax-case $name ()
       (name (identifier? #'name)
@@ -239,7 +233,7 @@
 
   (define (init->name $init)
     (syntax-case $init ()
-      ((name type expr) #'name)))
+      ((name type) #'name)))
 
   (define (declaration->verilog-declarations $init-names $declaration)
     (syntax-case $declaration (%on)
@@ -277,12 +271,7 @@
       ((name type)
         #`(%%reg
           #,@(opt->list (type->verilog? #'type))
-          #,(name->verilog #'name)))
-      ((name type expr)
-        #`(%%reg
-          #,@(opt->list (type->verilog? #'type))
-          #,(name->verilog #'name)
-          #,(expr->verilog #'expr)))))
+          #,(name->verilog #'name)))))
 
   (define (declaration-declarations->verilog $declaration)
     #`(
