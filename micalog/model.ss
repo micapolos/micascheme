@@ -7,28 +7,26 @@
     opposite-edges?
     process-edge
     opposite-processes?
-    flatten-declaration
-    flatten-declarations
     declaration-kind-of?
     declaration-syntaxes-of
     items->declarations-instrs
-    flatten-module
+    expand-module
     check-flattens)
   (import
     (micascheme)
     (prefix (micalog keywords) %))
 
   (define-rule-syntax (check-flattens in out)
-    (check (equal? (syntax->datum (flatten-module #'in)) 'out)))
+    (check (equal? (syntax->datum (expand-module #'in)) 'out)))
 
-  (define (flatten-module $module)
+  (define (expand-module $module)
     (syntax-case $module (%module)
       ((%module name item ...)
         #`(%module name
-          #,@(flatten-items
+          #,@(expand-items
             (syntaxes item ...))))))
 
-  (define (flatten-items $items)
+  (define (expand-items $items)
     (lets
       ((pair $declarations $instrs) (items->declarations-instrs $items))
       (append $declarations $instrs)))
@@ -98,37 +96,6 @@
           ((pair $declarations $instrs)
             (items->declarations-instrs (syntaxes item ...)))
           (pair $declarations #`(edge #,@$instrs))))))
-
-  (define (flatten-declarations $declarations)
-    (flatten (map flatten-declaration $declarations)))
-
-  (define (flatten-declaration $declaration)
-    (syntax-case $declaration (%input %output %register %wire %assign %on)
-      ((%input body ...)
-        (list $declaration))
-      ((%output body ...)
-        (list $declaration))
-      ((%register body ...)
-        (list $declaration))
-      ((%wire body ...)
-        (list $declaration))
-      ((%assign body ...)
-        (list $declaration))
-      ((%on name process)
-        (cons $declaration
-          (process-declarations #'process)))
-      ((%on name process opposite-process)
-        (cons $declaration
-          (append
-            (process-declarations #'process)
-            (process-declarations #'opposite-process))))
-      (_ (list))))
-
-  (define (process-declarations $process)
-    (syntax-case $process ()
-      ((edge body ...)
-        (flatten-declarations
-          (syntaxes body ...)))))
 
   (define (declaration-kind-of? $kind $declaration)
     (syntax-case $declaration ()
