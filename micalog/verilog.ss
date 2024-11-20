@@ -20,17 +20,23 @@
     (prefix (verilog keywords) %%))
 
   (define (module->verilog $module)
-    (syntax-case $module (%module)
-      ((%module name declaration ...)
-        (lets
-          ($inputs (declaration-syntaxes %input declaration ...))
-          ($outputs (declaration-syntaxes %output declaration ...))
-          ($internals (declaration-syntaxes %internal declaration ...))
-          #`(%%module
-            (
-              #,(name->verilog #'name)
-              #,@(map parameter->verilog (append $inputs $outputs)))
-            #,@(flatten (map declaration->verilogs (append $outputs $internals))))))))
+    (syntax-case $module (%module %input %internal %output)
+      ((%module name
+        (%input input ...)
+        (%internal internal ...)
+        (%output output ...))
+        #`(%%module
+          (
+            #,(name->verilog #'name)
+            #,@(map parameter->verilog
+              (syntaxes
+                (%input . input) ...
+                (%output . output) ...)))
+          #,@(flatten
+            (map declaration->verilogs
+              (syntaxes
+                (%output . output) ...
+                (%internal . internal) ...)))))))
 
   (define (parameter->verilog $parameter)
     (syntax-case $parameter (%input %output)

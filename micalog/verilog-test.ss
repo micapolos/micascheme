@@ -71,8 +71,11 @@
 (check-verilog
   (module
     (%module my-mod
-      (%input in1 8)
-      (%input in2 8)))
+      (%input
+        (in1 8)
+        (in2 8))
+      (%internal)
+      (%output)))
   (%%module
     (my-mod
       (%%input (7 %%to 0) in1)
@@ -81,8 +84,11 @@
 (check-verilog
   (module
     (%module my-mod
-      (%output out-1 8 value-1)
-      (%output out-2 8 value-2)))
+      (%input)
+      (%internal)
+      (%output
+        (out-1 8 value-1)
+        (out-2 8 value-2))))
   (%%module
     (my-mod
       (%%output (7 %%to 0) out-1)
@@ -93,7 +99,9 @@
 (check-verilog
   (module
     (%module my-mod
-      (%internal bar 8 12)))
+      (%input)
+      (%internal (bar 8 12))
+      (%output)))
   (%%module
     (my-mod)
     (%%wire (7 %%to 0) bar)
@@ -102,7 +110,9 @@
 (check-verilog
   (module
     (%module my-mod
-      (%internal foo 8 (%register 8 (%init) (%on (%posedge clock) bar)))))
+      (%input)
+      (%internal (foo 8 (%register 8 (%init) (%on (%posedge clock) bar))))
+      (%output)))
   (%%module
     (my-mod)
     (%%reg (7 %%to 0) foo)
@@ -111,7 +121,9 @@
 (check-verilog
   (module
     (%module my-mod
-      (%internal foo 8 (%register 8 (%init 15) (%on (%posedge clock) bar)))))
+      (%input)
+      (%internal (foo 8 (%register 8 (%init 15) (%on (%posedge clock) bar))))
+      (%output)))
   (%%module
     (my-mod)
     (%%reg (7 %%to 0) foo 15)
