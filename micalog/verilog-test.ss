@@ -51,16 +51,24 @@
 (check-verilog (input (%input 1 foo)) (%%input foo))
 (check-verilog (input (%input 16 foo)) (%%input (15 %%to 0) foo))
 
+(check-verilog (output (%output 1 foo)) (%%output foo))
+(check-verilog (output (%output 16 foo)) (%%output (15 %%to 0) foo))
+
+(check-verilog (declaration (%wire 1 foo)) (%%wire foo))
+(check-verilog (declaration (%wire 8 foo)) (%%wire (7 %%to 0) foo))
+
+(check-verilog (declaration (%register 1 foo)) (%%reg foo))
+(check-verilog (declaration (%register 8 foo)) (%%reg (7 %%to 0) foo))
+
 (check-verilog
-  (declaration-declarations
+  (declaration
     (%on clock
       (%posedge
-        (%register 1 pos-init-1)
-        (%register 1 pos-init-2)
-        (%wire 1 pos-update)
-        (%assign 1 pos-update 3))))
-  (
-    (%%always (%%posedge clock))))
+        (%set 1 foo bar)
+        (%set 2 goo gar))))
+  (%%always (%%posedge clock)
+    (%%set! foo bar)
+    (%%set! goo gar)))
 
 (check-verilog
   (declaration-instrs

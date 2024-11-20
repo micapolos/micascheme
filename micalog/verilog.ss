@@ -8,7 +8,7 @@
     input->verilog
     output->verilog
     declaration-instrs->verilog
-    declaration-declarations->verilog)
+    declaration->verilog)
 
   (import
     (micascheme)
@@ -181,8 +181,10 @@
         (on->verilog $declaration))
       (_ #f)))
 
-  (define (declaration-declarations->verilog $declaration)
-    #`(#,@(opt->list (declaration->verilog-declaration? $declaration))))
+  (define (declaration->verilog $declaration)
+    (or
+      (declaration->verilog-declaration? $declaration)
+      (syntax-error $declaration)))
 
   (define (declaration-instrs->verilog $declaration)
     #`(#,@(opt->list (declaration->verilog-instr? $declaration))))
