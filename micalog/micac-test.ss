@@ -57,6 +57,8 @@
 
 (check-micac (expr (%not 6 a)) (%%bitwise-and (%%bitwise-not a) #x3f))
 
+(check-micac (expr (%if 6 a b c)) (%%if (%%= a 1) b c))
+
 (check-micac (size 1) %%uint8_t)
 (check-micac (size 8) %%uint8_t)
 (check-micac (size 9) %%uint16_t)

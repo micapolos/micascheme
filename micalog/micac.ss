@@ -23,7 +23,7 @@
         #'integer)))
 
   (define (expr->micac $expr)
-    (syntax-case $expr (%= %!= %< %<= %> %>= %append %slice %add %sub %neg %and %or %xor %nand %nor %xnor %not)
+    (syntax-case $expr (%= %!= %< %<= %> %>= %append %slice %add %sub %neg %and %or %xor %nand %nor %xnor %not %if)
       ((%= type lhs rhs)
         (boolean->number
           #`(%%=
@@ -102,8 +102,11 @@
         (type-micac-mask #'type
           #`(%%bitwise-not
             #,(value->micac #'rhs))))
-      ((%reg-ref rhs)
-        (expr->micac #'rhs))
+      ((%if type cond true false)
+        #`(%%if
+          (%= #,(value->micac #'cond) 1)
+          #,(value->micac #'true)
+          #,(value->micac #'false)))
       (other
         (value->micac #'other))))
 
