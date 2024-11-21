@@ -36,6 +36,13 @@
   (expr (%slice 6 a 2))
   (%%bitwise-and (%%bitwise-arithmetic-shift-right a 2) #x3f))
 
+(check-micac (expr (%= 6 a b)) (%%if (%%= a b) 1 0))
+(check-micac (expr (%!= 6 a b)) (%%if (%%not (%%= a b)) 1 0))
+(check-micac (expr (%< 6 a b)) (%%if (%%< a b) 1 0))
+(check-micac (expr (%<= 6 a b)) (%%if (%%<= a b) 1 0))
+(check-micac (expr (%> 6 a b)) (%%if (%%> a b) 1 0))
+(check-micac (expr (%>= 6 a b)) (%%if (%%>= a b) 1 0))
+
 (check-micac (expr (%add 6 a b)) (%%bitwise-and (%%+ a b) #x3f))
 (check-micac (expr (%sub 6 a b)) (%%bitwise-and (%%- a b) #x3f))
 (check-micac (expr (%neg 6 a)) (%%bitwise-and (%%- a) #x3f))
@@ -43,6 +50,11 @@
 (check-micac (expr (%and 6 a b)) (%%bitwise-and a b))
 (check-micac (expr (%or 6 a b)) (%%bitwise-ior a b))
 (check-micac (expr (%xor 6 a b)) (%%bitwise-xor a b))
+
+(check-micac (expr (%nand 6 a b)) (%%bitwise-not (%%bitwise-and a b)))
+(check-micac (expr (%nor 6 a b)) (%%bitwise-not (%%bitwise-ior a b)))
+(check-micac (expr (%nxor 6 a b)) (%%bitwise-not (%%bitwise-xor a b)))
+
 (check-micac (expr (%not 6 a)) (%%bitwise-and (%%bitwise-not a) #x3f))
 
 (check-micac (size 1) %%uint8_t)
