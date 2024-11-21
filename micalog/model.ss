@@ -11,7 +11,9 @@
     declaration-syntaxes-of
     items->declarations-instrs
     expand-module
-    check-flattens)
+    check-flattens
+    declaration-name
+    declaration-type)
   (import
     (micascheme)
     (prefix (micalog keywords) %))
@@ -143,4 +145,12 @@
   (define (expr-value $expr)
     (syntax-case $expr (%expr)
       ((%expr _ value) #'value)))
+
+  (define (declaration-name $declaration)
+    (syntax-case $declaration ()
+      ((kind type name) #'name)))
+
+  (define (declaration-type $declaration)
+    (syntax-case $declaration ()
+      ((kind type name) #'type)))
 )

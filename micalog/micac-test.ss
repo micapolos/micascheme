@@ -53,7 +53,7 @@
 
 (check-micac (expr (%nand 6 a b)) (%%bitwise-not (%%bitwise-and a b)))
 (check-micac (expr (%nor 6 a b)) (%%bitwise-not (%%bitwise-ior a b)))
-(check-micac (expr (%nxor 6 a b)) (%%bitwise-not (%%bitwise-xor a b)))
+(check-micac (expr (%xnor 6 a b)) (%%bitwise-not (%%bitwise-xor a b)))
 
 (check-micac (expr (%not 6 a)) (%%bitwise-and (%%bitwise-not a) #x3f))
 
@@ -67,56 +67,3 @@
 (check-micac (size 32) %%uint32_t)
 (check-micac (size 33) %%uint64_t)
 (check-micac (size 64) %%uint64_t)
-
-(check-micac (declaration (%input 8 foo)) (%%extern foo))
-(check-micac (declaration (%output 8 foo)) (%%var uint8_t foo))
-(check-micac (declaration (%wire 8 foo)) (%%var uint8_t foo))
-(check-micac (declaration (%reg 8 foo)) (%%var uint8_t foo))
-
-(check-micac
-  (instr (%define foo (%expr 9 12)))
-  (%%unit
-    (%%init)
-    (%%update (%%const %%uint16_t foo 12))))
-
-(check-micac
-  (instr (%define foo (%expr (%reg 9) (%reg (%expr 9 128)))))
-  (%%unit
-    (%%init (%%var %%uint16_t foo 128))
-    (%%update)))
-
-(check-micac
-  (instr (%define foo (%expr (%reg 9) (%reg))))
-  (%%unit
-    (%%init (%%var %%uint16_t foo))
-    (%%update)))
-
-(check-micac
-  (instr (%set! (%expr _ x) (%expr _ y)))
-  (%%unit
-    (%%init)
-    (%%update (%%set x y))))
-
-(parameterize ((generates-identifier? #f))
-  (check-micac
-    (instr
-      (%on (%expr _ clock)
-        (%posedge
-          (%define pos-reg (%expr (%reg 8) (%reg (%expr 8 10))))
-          (%define pos-val (%expr 8 10)))
-        (%negedge
-          (%define neg-reg (%expr (%reg 8) (%reg (%expr 8 10))))
-          (%define neg-val (%expr 8 10)))))
-    (%%unit
-      (%%init
-        (%%var %%uint8_t previous-clock 0)
-        (%%var %%uint8_t pos-reg 10)
-        (%%var %%uint8_t neg-reg 10))
-      (%%update
-        (%%when (%%not (%%= previous-clock id))
-          (%%set previous-clock id)
-          (%%if (not (zero? id))
-            (%%then
-              (%%const %%uint8_t pos-val 10))
-            (%%else
-              (%%const %%uint8_t neg-val 10))))))))

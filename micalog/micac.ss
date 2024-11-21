@@ -16,6 +16,74 @@
   (define-aux-keywords %%unit %%init %%update)
   (data (block inits updates))
 
+  (define (module->micac $module)
+    (syntax-case $module (%module)
+      ((%module name statement ...)
+        #`(
+          ; externs
+          #,@(filter-opts (map statement-extern->micac? (syntaxes statement ...)))
+          ; global registers
+          #,@(map register->micac
+            (flatten
+              (map (partial global?-statement-registers #t)
+                (syntaxes statement ...))))
+          ; local declarations
+          #,@(filter-opts (map statement-local->micac? (syntaxes statement ...)))))))
+
+  (define (statement-extern->micac? $statement)
+    (syntax-case $statement (%input)
+      ((%input type name)
+        #`(%%extern #,(id->micac #'name)))
+      (_ #f)))
+
+  (define (register->micac $statement)
+    (syntax-case $statement (%register)
+      ((%register type name)
+        #`(%%var
+          #,(type->micac #'type)
+          #,(id->micac #'name)))))
+
+  (define (statement-local->micac? $statement)
+    (syntax-case $statement (%wire %output %assign %on)
+      ((%wire type name)
+        #`(%%var
+          #,(type->micac #'type)
+          #,(id->micac #'name)))
+      ((%output type name)
+        #`(%%var
+          #,(type->micac #'type)
+          #,(id->micac #'name)))
+      ((%assign type name expr)
+        #`(%%set
+          #,(id->micac #'name)
+          #,(expr->micac #'expr)))
+      ; ((%on name process)
+      ;   )
+      ; ((%on name process opposite-process)
+      ;   )
+      (_
+        #f)))
+
+  ; (define (on-wrap->micac $name $body)
+  ;   (lets
+  ;     ($tmp (generate-identifier $name))
+
+  ;     ($types (map declaration-type $registers))
+  ;     ($names (map declaration-name $registers))
+
+  ; (define (process-wrap->micac $process $body)
+  ;   (lets
+  ;     ($registers (global?-on-registers #f $on))
+  ;     ($types (map declaration-type $registers))
+  ;     ($names (map declaration-name $registers))
+  ;     ($temporaries (map generate-identifier $names))
+  ;     #`(%%begin
+  ;       #,@(map-with ($name $names) ($temporary $temporaries) ($type $types)
+  ;         #`(%%const
+  ;           #,(type->micac $type)
+  ;           #,(id->micac $temporary)
+  ;           #,(id->micac $name)))
+
   (define (value->micac $value)
     (syntax-case $value ()
       (id (identifier? #'id)
@@ -94,18 +162,18 @@
           #,(value->micac #'lhs)
           #,(value->micac #'rhs)))
       ((%nand type lhs rhs)
-        (expr->micac #`(%not type (%and type lhs rhs))))
+        #`(%%bitwise-not #,(expr->micac #`(%and type lhs rhs))))
       ((%nor type lhs rhs)
-        (expr->micac #`(%not type (%or type lhs rhs))))
+        #`(%%bitwise-not #,(expr->micac #`(%or type lhs rhs))))
       ((%xnor type lhs rhs)
-        (expr->micac #`(%not type (%xor type lhs rhs))))
+        #`(%%bitwise-not #,(expr->micac #`(%xor type lhs rhs))))
       ((%not type rhs)
         (type-micac-mask #'type
           #`(%%bitwise-not
             #,(value->micac #'rhs))))
       ((%if type cond true false)
         #`(%%if
-          (%= #,(value->micac #'cond) 1)
+          (%%= #,(value->micac #'cond) 1)
           #,(value->micac #'true)
           #,(value->micac #'false)))
       (other
@@ -250,4 +318,34 @@
 
   (define (type-micac-mask $type $micac)
     (size-micac-mask (type-size $type) $micac))
+
+  (define (global?-statement-registers $global? $statement)
+    (syntax-case $statement (%register %on)
+      ((%register body ...)
+        (list $statement))
+      ((%on body ...)
+        (if $global?
+          (global?-on-registers $global? $statement)
+          (list)))
+      (_
+        (list))))
+
+  (define (global?-on-registers $global? $on)
+    (syntax-case $on (%on)
+      ((%on name process)
+        (global?-process-registers $global? #'process))
+      ((%on name process)
+        (global?-process-registers $global? #'process))
+          ((%on name process opposite-process)
+            (append
+              (global?-process-registers $global? #'process)
+              (global?-process-registers $global? #'opposite-process)))))
+
+  (define (global?-process-registers $global? $process)
+    (syntax-case $process ()
+      ((edge statement ...)
+        (flatten
+          (map
+            (partial global?-statement-registers $global?)
+            (syntaxes statement ...))))))
 )
