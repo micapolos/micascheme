@@ -70,14 +70,17 @@
           (list)))
       ((%on name process)
         (lets
-          ((pair $declarations $process) (process->declarations-process #'process))
+          ((pair $declarations $process)
+            (process->declarations-process #'process))
           (pair
             (append $declarations (list #`(%on name #,$process)))
             (list))))
       ((%on name process opposite-process)
         (lets
-          ((pair $declarations $process) (process->declarations-process #'process))
-          ((pair $opposite-declarations $opposite-process) (process->declarations-process #'opposite-process))
+          ((pair $declarations $process)
+            (process->declarations-process #'process))
+          ((pair $opposite-declarations $opposite-process)
+            (process->declarations-process #'opposite-process))
           (pair
             (append
               $declarations
