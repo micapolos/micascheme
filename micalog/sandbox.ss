@@ -28,12 +28,10 @@
         (posedge
           (register 1 clock-3)
           (set 1 clock-3 (not 1 clock-3))))
-      (output 4 counter
-        (append 4
-          (1 clock-3)
-          (1 clock-2)
-          (1 clock-1)
-          (1 clock))))))
+      (wire 2 clock-32 (append 1 clock-3 1 clock-2))
+      (wire 2 clock-10 (append 1 clock-1 1 clock-0))
+      (wire 4 clock-3210 (append 2 clock-32 2 clock-10))
+      (output 4 counter clock-3210))))
 
 (newline)
 
@@ -53,12 +51,10 @@
                 (posedge
                   (register 1 clock-3)
                   (set 1 clock-3 (not 1 clock-3))))))))
-      (output 4 counter
-        (append 4
-          (1 clock-3)
-          (1 clock-2)
-          (1 clock-1)
-          (1 clock))))))
+      (wire 2 clock-32 (append 1 clock-3 1 clock-2))
+      (wire 2 clock-10 (append 1 clock-1 1 clock-0))
+      (wire 4 clock-3210 (append 2 clock-32 2 clock-10))
+      (output 4 counter clock-3210))))
 
 (newline)
 

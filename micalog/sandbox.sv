@@ -24,7 +24,13 @@ module counter_4 (
   always @(posedge clock_2) begin
     clock_3 <= ~clock_3;
   end
-  assign counter = { clock_3, clock_2, clock_1, clock };
+  wire [1:0] clock_32;
+  assign clock_32 = { clock_3, clock_2 };
+  wire [1:0] clock_10;
+  assign clock_10 = { clock_1, clock_0 };
+  wire [3:0] clock_3210;
+  assign clock_3210 = { clock_32, clock_10 };
+  assign counter = clock_3210;
 endmodule
 
 module alternative_counter_4 (
@@ -43,7 +49,13 @@ module alternative_counter_4 (
   always @(posedge clock) begin
     clock_1 <= ~clock_1;
   end
-  assign counter = { clock_3, clock_2, clock_1, clock };
+  wire [1:0] clock_32;
+  assign clock_32 = { clock_3, clock_2 };
+  wire [1:0] clock_10;
+  assign clock_10 = { clock_1, clock_0 };
+  wire [3:0] clock_3210;
+  assign clock_3210 = { clock_32, clock_10 };
+  assign counter = clock_3210;
 endmodule
 
 module funny_module (
