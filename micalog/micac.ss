@@ -19,7 +19,7 @@
       ((%expr type term)
         (syntax-case #'term (%append %slice %+ %- %and %or %not %reg-ref)
           (id (identifier? #'id)
-            #'id)
+            (id->micac #'id))
           (integer (integer? (datum integer))
             #'integer)
           ((%append lhs rhs)

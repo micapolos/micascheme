@@ -28,7 +28,12 @@
         (posedge
           (register 1 clock-3)
           (set 1 clock-3 (not 1 clock-3))))
-      (output 4 counter (append 4 clock-3 clock-2 clock-1 clock)))))
+      (output 4 counter
+        (append 4
+          (1 clock-3)
+          (1 clock-2)
+          (1 clock-1)
+          (1 clock))))))
 
 (newline)
 
@@ -48,7 +53,12 @@
                 (posedge
                   (register 1 clock-3)
                   (set 1 clock-3 (not 1 clock-3))))))))
-      (output 4 counter (append 4 clock-3 clock-2 clock-1 clock)))))
+      (output 4 counter
+        (append 4
+          (1 clock-3)
+          (1 clock-2)
+          (1 clock-1)
+          (1 clock))))))
 
 (newline)
 
