@@ -22,45 +22,28 @@
           #'(micalog ...)))
       'micac)))
 
-(check-micac
-  (expr (%expr _ x))
-  x)
+(check-micac (value foo) foo)
+(check-micac (value 123) 123)
+
+(check-micac (expr foo) foo)
+(check-micac (expr 123) 123)
 
 (check-micac
-  (expr (%expr _ 128))
-  128)
-
-(check-micac
-  (expr (%expr 6 (%+ (%expr _ a) (%expr _ b))))
-  (%%bitwise-and (%%+ a b) #x3f))
-
-(check-micac
-  (expr (%expr 6 (%- (%expr _ a) (%expr _ b))))
-  (%%bitwise-and (%%- a b) #x3f))
-
-(check-micac
-  (expr (%expr _ (%append (%expr _ a) (%expr 4 b))))
+  (expr (%append 2 a 4 b))
   (%%bitwise-ior (%%bitwise-arithmetic-shift-left a 4) b))
 
 (check-micac
-  (expr (%expr _ (%slice (%expr _ a) 3 6)))
-  (%%bitwise-and (%%bitwise-arithmetic-shift-right a 3) #x3f))
+  (expr (%slice 6 a 2))
+  (%%bitwise-and (%%bitwise-arithmetic-shift-right a 2) #x3f))
 
-(check-micac
-  (expr (%expr _ (%and (%expr _ a) (%expr _ b))))
-  (%%bitwise-and a b))
+(check-micac (expr (%add 6 a b)) (%%bitwise-and (%%+ a b) #x3f))
+(check-micac (expr (%sub 6 a b)) (%%bitwise-and (%%- a b) #x3f))
+(check-micac (expr (%neg 6 a)) (%%bitwise-and (%%- a) #x3f))
 
-(check-micac
-  (expr (%expr _ (%or (%expr _ a) (%expr _ b))))
-  (%%bitwise-ior a b))
-
-(check-micac
-  (expr (%expr 6 (%not (%expr _ a))))
-  (%%bitwise-and (%%bitwise-not a) #x3f))
-
-(check-micac
-  (expr (%expr _ (%reg-ref (%expr _ a))))
-  a)
+(check-micac (expr (%and 6 a b)) (%%bitwise-and a b))
+(check-micac (expr (%or 6 a b)) (%%bitwise-ior a b))
+(check-micac (expr (%xor 6 a b)) (%%bitwise-xor a b))
+(check-micac (expr (%not 6 a)) (%%bitwise-and (%%bitwise-not a) #x3f))
 
 (check-micac (size 1) %%uint8_t)
 (check-micac (size 8) %%uint8_t)

@@ -1,5 +1,6 @@
 (library (micalog micac)
   (export
+    value->micac
     expr->micac
     instr->micac
     instrs->micac
@@ -14,49 +15,60 @@
   (define-aux-keywords %%unit %%init %%update)
   (data (block inits updates))
 
+  (define (value->micac $value)
+    (syntax-case $value ()
+      (id (identifier? #'id)
+        (id->micac #'id))
+      (integer (integer? (datum integer))
+        #'integer)))
+
   (define (expr->micac $expr)
-    (syntax-case $expr (%expr)
-      ((%expr type term)
-        (syntax-case #'term (%append %slice %+ %- %and %or %not %reg-ref)
-          (id (identifier? #'id)
-            (id->micac #'id))
-          (integer (integer? (datum integer))
-            #'integer)
-          ((%append lhs rhs)
-            #`(%%bitwise-ior
-              (%%bitwise-arithmetic-shift-left
-                #,(expr->micac #'lhs)
-                #,(type-size (expr-type #'rhs)))
-              #,(expr->micac #'rhs)))
-          ((%slice lhs shift size)
-            (size-micac-mask (datum size)
-              #`(%%bitwise-arithmetic-shift-right
-                #,(expr->micac #'lhs)
-                shift)))
-          ((%+ lhs rhs)
-            (type-micac-mask #'type
-              #`(%%+
-                #,(expr->micac #'lhs)
-                #,(expr->micac #'rhs))))
-          ((%- lhs rhs)
-            (type-micac-mask #'type
-              #`(%%-
-                #,(expr->micac #'lhs)
-                #,(expr->micac #'rhs))))
-          ((%and lhs rhs)
-            #`(%%bitwise-and
-              #,(expr->micac #'lhs)
-              #,(expr->micac #'rhs)))
-          ((%or lhs rhs)
-            #`(%%bitwise-ior
-              #,(expr->micac #'lhs)
-              #,(expr->micac #'rhs)))
-          ((%not rhs)
-            (type-micac-mask #'type
-              #`(%%bitwise-not
-                #,(expr->micac #'rhs))))
-          ((%reg-ref rhs)
-            (expr->micac #'rhs))))))
+    (syntax-case $expr (%append %slice %add %sub %neg %and %or %xor %not)
+      ((%append lhs-type lhs rhs-type rhs)
+        #`(%%bitwise-ior
+          (%%bitwise-arithmetic-shift-left
+            #,(value->micac #'lhs)
+            #,(type-size #'rhs-type))
+          #,(value->micac #'rhs)))
+      ((%slice type rhs shift)
+        (type-micac-mask #'type
+          #`(%%bitwise-arithmetic-shift-right
+            #,(value->micac #'rhs)
+            shift)))
+      ((%add type lhs rhs)
+        (type-micac-mask #'type
+          #`(%%+
+            #,(value->micac #'lhs)
+            #,(value->micac #'rhs))))
+      ((%sub type lhs rhs)
+        (type-micac-mask #'type
+          #`(%%-
+            #,(value->micac #'lhs)
+            #,(value->micac #'rhs))))
+      ((%neg type rhs)
+        (type-micac-mask #'type
+          #`(%%-
+            #,(value->micac #'rhs))))
+      ((%and type lhs rhs)
+        #`(%%bitwise-and
+          #,(value->micac #'lhs)
+          #,(value->micac #'rhs)))
+      ((%or type lhs rhs)
+        #`(%%bitwise-ior
+          #,(value->micac #'lhs)
+          #,(value->micac #'rhs)))
+      ((%xor type lhs rhs)
+        #`(%%bitwise-xor
+          #,(value->micac #'lhs)
+          #,(value->micac #'rhs)))
+      ((%not type rhs)
+        (type-micac-mask #'type
+          #`(%%bitwise-not
+            #,(value->micac #'rhs))))
+      ((%reg-ref rhs)
+        (expr->micac #'rhs))
+      (other
+        (value->micac #'other))))
 
   (define (reg-value->micac? $reg)
     (syntax-case $reg (%reg)
