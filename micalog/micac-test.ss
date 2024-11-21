@@ -68,6 +68,11 @@
 (check-micac (size 33) %%uint64_t)
 (check-micac (size 64) %%uint64_t)
 
+(check-micac (declaration (%input 8 foo)) (%%extern foo))
+(check-micac (declaration (%output 8 foo)) (%%var uint8_t foo))
+(check-micac (declaration (%wire 8 foo)) (%%var uint8_t foo))
+(check-micac (declaration (%reg 8 foo)) (%%var uint8_t foo))
+
 (check-micac
   (instr (%define foo (%expr 9 12)))
   (%%unit

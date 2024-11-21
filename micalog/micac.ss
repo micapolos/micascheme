@@ -5,6 +5,7 @@
     instr->micac
     instrs->micac
     size->micac
+    declaration->micac
     %%unit %%init %%update)
   (import
     (micascheme)
@@ -118,6 +119,25 @@
       ((%reg) #f)
       ((%reg expr) (expr->micac #'expr))))
 
+  (define (declaration->micac $declaration)
+    (syntax-case $declaration (%reg)
+      ((%input type name)
+        #`(%%extern name))
+      ((%output type name)
+        #`(%%var
+          #,(type->micac #'type)
+          #,(id->micac #'id)))
+      ((%reg type name)
+        #`(%%var
+          #,(type->micac #'type)
+          #,(id->micac #'id)))
+      ((%wire type name)
+        #`(%%var
+          #,(type->micac #'type)
+          #,(id->micac #'id)))
+      ((%on name (edge instr ...))
+        #`TODO)))
+
   (define (instr->micac $instr)
     (fluent
       (empty-block)
@@ -199,6 +219,9 @@
                     #,@(reverse
                       (block-updates $neg-block)))))
                 (block-updates $block)))))))
+
+  (define (type->micac $type)
+    (size->micac $type))
 
   (define (size->micac $size)
     (syntax-case $size ()
