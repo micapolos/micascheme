@@ -40,9 +40,9 @@
 (check-typed (expr (%nor bin-1101 hex-a)) (%nor 4 #b1101 #xa))
 (check-typed (expr (%xnor bin-1101 hex-a)) (%xnor 4 #b1101 #xa))
 
-(check-typed (expr (%neg bin-1101)) (%neg 4 #b1101))
-(check-typed (expr (%add bin-1101 hex-a)) (%add 4 #b1101 #xa))
-(check-typed (expr (%sub bin-1101 hex-a)) (%sub 4 #b1101 #xa))
+(check-typed (expr (%- bin-1101)) (%- 4 #b1101))
+(check-typed (expr (%+ bin-1101 hex-a)) (%+ 4 #b1101 #xa))
+(check-typed (expr (%- bin-1101 hex-a)) (%- 4 #b1101 #xa))
 
 (check-typed (scope-expr $scope foo-4) (4 foo))
 (check-typed (scope-expr $scope (%= foo-4 bar-4)) (%= 4 foo bar))

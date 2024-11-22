@@ -10,7 +10,7 @@
     = != < <= > >=
     if
     append slice
-    + - add sub neg
+    + -
     and or xor nand nor xnor not inv
     reg reg-ref)
   (import (only (micascheme) define-aux-keywords))
@@ -26,7 +26,7 @@
     = != < <= > >=
     if
     append slice
-    + - add sub neg
+    + -
     and or xor nand nor xnor not inv
     reg reg-ref)
 )

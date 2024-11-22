@@ -41,9 +41,9 @@
 (check-verilog (expr (%nor 16 a b)) (%%nor a b))
 (check-verilog (expr (%xnor 16 a b)) (%%xnor a b))
 
-(check-verilog (expr (%add 16 a b)) (%%+ a b))
-(check-verilog (expr (%sub 16 a b)) (%%- a b))
-(check-verilog (expr (%neg 16 a)) (%%- a))
+(check-verilog (expr (%+ 16 a b)) (%%+ a b))
+(check-verilog (expr (%- 16 a b)) (%%- a b))
+(check-verilog (expr (%- 16 a)) (%%- a))
 
 (check-verilog (expr (%if 16 foo? a b)) (%%if foo? a b))
 

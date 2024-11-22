@@ -67,9 +67,9 @@
         ((%nand a b) (scope-op2->typed $scope $expr))
         ((%nor a b) (scope-op2->typed $scope $expr))
         ((%xnor a b) (scope-op2->typed $scope $expr))
-        ((%neg a) (scope-op1->typed $scope $expr))
-        ((%add a b) (scope-op2->typed $scope $expr))
-        ((%sub a b) (scope-op2->typed $scope $expr)))))
+        ((%- a) (scope-op1->typed $scope $expr))
+        ((%+ a b) (scope-op2->typed $scope $expr))
+        ((%- a b) (scope-op2->typed $scope $expr)))))
 
   (define expr->typed
     (partial scope-expr->typed (empty-scope)))
