@@ -60,26 +60,26 @@
   (define (scope-expr->typed $scope $expr)
     (or
       (literal->typed? $expr)
-      (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %not %and %or %xor %nand %not %xnor %+ %- %if)
+      (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %not %and %or %xor %nand %nor %xnor %+ %- %if)
         (id (identifier? #'id) (scope-id->typed $scope #'id))
-        ((%append a b) (scope-append->typed $scope $expr))
-        ((%= a b) (scope-op2->typed $scope $expr))
-        ((%!= a b) (scope-op2->typed $scope $expr))
-        ((%< a b) (scope-op2->typed $scope $expr))
-        ((%<= a b) (scope-op2->typed $scope $expr))
-        ((%> a b) (scope-op2->typed $scope $expr))
-        ((%>= a b) (scope-op2->typed $scope $expr))
-        ((%not a) (scope-op1->typed $scope $expr))
-        ((%and a b) (scope-op2->typed $scope $expr))
-        ((%or a b) (scope-op2->typed $scope $expr))
-        ((%xor a b) (scope-op2->typed $scope $expr))
-        ((%nand a b) (scope-op2->typed $scope $expr))
-        ((%nor a b) (scope-op2->typed $scope $expr))
-        ((%xnor a b) (scope-op2->typed $scope $expr))
-        ((%- a) (scope-op1->typed $scope $expr))
-        ((%+ a b) (scope-op2->typed $scope $expr))
-        ((%- a b) (scope-op2->typed $scope $expr))
-        ((%if a b c) (scope-if->typed $scope $expr)))))
+        ((%append x ...) (scope-append->typed $scope $expr))
+        ((%slice x ...) (scope-slice->typed $scope $expr))
+        ((%= x ...) (scope-op2->typed $scope $expr))
+        ((%!= x ...) (scope-op2->typed $scope $expr))
+        ((%< x ...) (scope-op2->typed $scope $expr))
+        ((%<= x ...) (scope-op2->typed $scope $expr))
+        ((%> x ...) (scope-op2->typed $scope $expr))
+        ((%>= x ...) (scope-op2->typed $scope $expr))
+        ((%not x ...) (scope-op1->typed $scope $expr))
+        ((%and x ...) (scope-op2->typed $scope $expr))
+        ((%or x ...) (scope-op2->typed $scope $expr))
+        ((%xor x ...) (scope-op2->typed $scope $expr))
+        ((%nand x ...) (scope-op2->typed $scope $expr))
+        ((%nor x ...) (scope-op2->typed $scope $expr))
+        ((%xnor x ...) (scope-op2->typed $scope $expr))
+        ((%+ x ...) (scope-op2->typed $scope $expr))
+        ((%- x ...) (scope-op1/2->typed $scope $expr))
+        ((%if x ...) (scope-if->typed $scope $expr)))))
 
   (define expr->typed
     (partial scope-expr->typed (empty-scope)))
@@ -110,6 +110,11 @@
               (format "type mismatch ~a, expected ~a in"
                 (syntax->datum #`(op #,$type-a #,$type-b))
                 (syntax->datum #`(op #,$type-a #,$type-a)))))))))
+
+  (define (scope-op1/2->typed $scope $expr)
+    (syntax-case $expr ()
+      ((_ _) (scope-op1->typed $scope $expr))
+      ((_ _ _) (scope-op2->typed $scope $expr))))
 
   (define (scope-if->typed $scope $if)
     (syntax-case $if (%if)
@@ -146,6 +151,28 @@
             #,(typed-value $typed-a)
             #,(typed-value $typed-b))))))
 
+  (define (scope-slice->typed $scope $slice)
+    (syntax-case $slice (%slice)
+      ((%slice a shift size)
+        (lets
+          ($typed-a (scope-expr->typed $scope #'a))
+          ($type-a (typed-type $typed-a))
+          ($a-size (type-size $type-a))
+          ($shift (shift-number #'shift))
+          ($size (type-size #'size))
+          (if
+            (>= $a-size (+ $shift $size))
+            #`(%slice
+              size
+              #,(typed-value $typed-a)
+              shift)
+            (syntax-error $slice
+              (format "type mismatch ~a, expected ~a in"
+                (syntax->datum #`(%slice #,$type-a shift size))
+                (syntax->datum #`(>= #,$type-a (+ shift size))))))))
+      ((%slice a size)
+        (scope-slice->typed $scope #'(%slice a 0 size)))))
+
   (define (typed $type $value)
     #`(#,$type #,$value))
 
@@ -161,6 +188,11 @@
     (syntax-case $type ()
       (size (positive-integer? (datum size)) (datum size))
       (_ (syntax-error $type "illegal type"))))
+
+  (define (shift-number $shift)
+    (syntax-case $shift ()
+      (size (nonnegative-integer? (datum size)) (datum size))
+      (_ (syntax-error $shift "illegal shift"))))
 
   (define (size->type $size)
     (literal->syntax $size))

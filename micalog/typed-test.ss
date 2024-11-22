@@ -35,6 +35,14 @@
 
 (check-typed (expr (%append bin-10 hex-af)) (%append 10 #b10 #xaf))
 
+(check-typed (expr (%slice bin-11001010 6)) (%slice 6 #b11001010 0))
+(check-typed (expr (%slice bin-11001010 8)) (%slice 8 #b11001010 0))
+(check-typed (expr (%slice bin-11001010 2 4)) (%slice 4 #b11001010 2))
+(check-typed (raises (expr (%slice bin-11001010 0))))
+(check-typed (raises (expr (%slice bin-11001010 2 0))))
+(check-typed (raises (expr (%slice bin-11001010 9))))
+(check-typed (raises (expr (%slice bin-11001010 4 5))))
+
 (check-typed (expr (%= bin-1101 hex-a)) (%= 4 #b1101 #xa))
 (check-typed (expr (%!= bin-1101 hex-a)) (%!= 4 #b1101 #xa))
 (check-typed (expr (%< bin-1101 hex-a)) (%< 4 #b1101 #xa))
