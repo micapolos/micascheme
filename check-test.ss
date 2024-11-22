@@ -17,4 +17,4 @@
     ((bar x) #`(foo x))))
 
 (check-foo (bar (bar 10)) (foo 10))
-(check-foo (raises (non-bar 10)))
+(check-foo (raises (bar (non-bar 10))))

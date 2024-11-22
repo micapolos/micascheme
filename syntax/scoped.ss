@@ -1,4 +1,4 @@
-(library (micac scoped)
+(library (syntax scoped)
   (export
     scoped scoped? scoped-scope scoped-value
     scoped+
