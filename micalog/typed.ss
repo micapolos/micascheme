@@ -25,17 +25,23 @@
               ($data-length (string-length $data))
               (case $prefix
                 (("bin-")
-                  #`(
-                    #,(literal->syntax $data-length)
-                    #,(literal->syntax (string->number $data 2))))
+                  (opt-lets
+                    ($number (string->number $data 2))
+                    #`(
+                      #,(literal->syntax $data-length)
+                      #,(literal->syntax $number))))
                 (("hex-")
-                  #`(
-                    #,(literal->syntax (* $data-length 4))
-                    #,(literal->syntax (string->number $data 16))))
+                  (opt-lets
+                    ($number (string->number $data 16))
+                    #`(
+                      #,(literal->syntax (* $data-length 4))
+                      #,(literal->syntax $number))))
                 (("oct-")
-                  #`(
-                    #,(literal->syntax (* $data-length 3))
-                    #,(literal->syntax (string->number $data 8))))
+                  (opt-lets
+                    ($number (string->number $data 8))
+                    #`(
+                      #,(literal->syntax (* $data-length 3))
+                      #,(literal->syntax $number))))
                 (else #f))))))
       (else #f)))
 
@@ -52,7 +58,7 @@
   (define (scope-expr->typed $scope $expr)
     (or
       (literal->typed? $expr)
-      (syntax-case $expr (%= %!= %< %<= %> %>= let)
+      (syntax-case $expr (%= %!= %< %<= %> %>= %not %and %or %xor %nand %not %xnor %+ %- %if)
         (id (identifier? #'id) (scope-id->typed $scope #'id))
         ((%= a b) (scope-op2->typed $scope $expr))
         ((%!= a b) (scope-op2->typed $scope $expr))
@@ -69,7 +75,8 @@
         ((%xnor a b) (scope-op2->typed $scope $expr))
         ((%- a) (scope-op1->typed $scope $expr))
         ((%+ a b) (scope-op2->typed $scope $expr))
-        ((%- a b) (scope-op2->typed $scope $expr)))))
+        ((%- a b) (scope-op2->typed $scope $expr))
+        ((%if a b c) (scope-if->typed $scope $expr)))))
 
   (define expr->typed
     (partial scope-expr->typed (empty-scope)))
@@ -89,12 +96,39 @@
         (lets
           ($typed-a (scope-expr->typed $scope #'a))
           ($typed-b (scope-expr->typed $scope #'b))
-          (if (type=? (typed-type $typed-a) (typed-type $typed-b))
+          ($type-a (typed-type $typed-a))
+          ($type-b (typed-type $typed-b))
+          (if (type=? $type-a $type-b)
             #`(op
-              #,(typed-type $typed-a)
+              #,$type-a
               #,(typed-value $typed-a)
               #,(typed-value $typed-b))
-            (syntax-error $expr "invalid types"))))))
+            (syntax-error $expr
+              (format "type mismatch ~a in"
+                (syntax->datum
+                  #`(op #,$type-a #,$type-b)))))))))
+
+  (define (scope-if->typed $scope $if)
+    (syntax-case $if (%if)
+      ((%if a b c)
+        (lets
+          ($typed-a (scope-expr->typed $scope #'a))
+          ($typed-b (scope-expr->typed $scope #'b))
+          ($typed-c (scope-expr->typed $scope #'c))
+          ($type-a (typed-type $typed-a))
+          ($type-b (typed-type $typed-b))
+          ($type-c (typed-type $typed-c))
+          (if
+            (and (type=? $type-a #`1) (type=? $type-b $type-c))
+            #`(%if
+              #,$type-b
+              #,(typed-value $typed-a)
+              #,(typed-value $typed-b)
+              #,(typed-value $typed-c))
+            (syntax-error $if
+              (format "type mismatch ~a in"
+                (syntax->datum
+                  #`(op #,$type-a #,$type-b #,$type-c)))))))))
 
   (define (typed $type $value)
     #`(#,$type #,$value))

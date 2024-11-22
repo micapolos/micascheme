@@ -3,4 +3,5 @@
 (test
   (micalog micac)
   (micalog verilog)
-  (micalog model))
+  (micalog model)
+  (micalog typed))

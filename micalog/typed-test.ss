@@ -4,11 +4,17 @@
   (micac scope)
   (prefix (micalog keywords) %))
 
-(define-case-syntax (check-typed (name arg ... input) expected)
-  #`(check
-    (equal?
-      (syntax->datum (#,(identifier-append #'name #'name #'->typed) arg ... #'input))
-      'expected)))
+(define-syntax (check-typed $syntax)
+  (syntax-case $syntax (raises)
+    ((_ (raises (name arg ... input)))
+      #`(check
+        (raises
+          (#,(identifier-append #'name #'name #'->typed) arg ... #'input))))
+    ((_ (name arg ... input) expected)
+      #`(check
+        (equal?
+          (syntax->datum (#,(identifier-append #'name #'name #'->typed) arg ... #'input))
+          'expected)))))
 
 (define $scope
   (scope-with
@@ -23,6 +29,17 @@
 (check-typed (literal hex-af) (8 #xaf))
 (check-typed (literal oct-34) (6 #o34))
 
+(check-typed (raises (literal 2)))
+(check-typed (raises (literal bin)))
+(check-typed (raises (literal bin-)))
+(check-typed (raises (literal bin-12)))
+(check-typed (raises (literal hex)))
+(check-typed (raises (literal hex-)))
+(check-typed (raises (literal hex-3g)))
+(check-typed (raises (literal oct)))
+(check-typed (raises (literal oct-)))
+(check-typed (raises (literal oct-08)))
+
 (check-typed (expr bin-101) (3 #b101))
 
 (check-typed (expr (%= bin-1101 hex-a)) (%= 4 #b1101 #xa))
@@ -31,6 +48,8 @@
 (check-typed (expr (%<= bin-1101 hex-a)) (%<= 4 #b1101 #xa))
 (check-typed (expr (%> bin-1101 hex-a)) (%> 4 #b1101 #xa))
 (check-typed (expr (%>= bin-1101 hex-a)) (%>= 4 #b1101 #xa))
+
+(check-typed (raises (expr (%= bin-1101 hex-af))))
 
 (check-typed (expr (%not bin-1101)) (%not 4 #b1101))
 (check-typed (expr (%and bin-1101 hex-a)) (%and 4 #b1101 #xa))
@@ -43,6 +62,8 @@
 (check-typed (expr (%- bin-1101)) (%- 4 #b1101))
 (check-typed (expr (%+ bin-1101 hex-a)) (%+ 4 #b1101 #xa))
 (check-typed (expr (%- bin-1101 hex-a)) (%- 4 #b1101 #xa))
+
+(check-typed (expr (%if bin-1 bin-1101 hex-a)) (%if 4 #b1 #b1101 #xa))
 
 (check-typed (scope-expr $scope foo-4) (4 foo))
 (check-typed (scope-expr $scope (%= foo-4 bar-4)) (%= 4 foo bar))
