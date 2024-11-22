@@ -1,6 +1,8 @@
 (library (expression)
   (export
     expression expression? expression-priority expression-left-to-right? expression-value
+    expression-operand-value
+    value-expression
     unary-expression
     binary-expression)
   (import (micascheme))

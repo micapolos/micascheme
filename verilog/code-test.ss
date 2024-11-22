@@ -50,6 +50,10 @@
 (check-verilog (expr (append a b)) "{ a, b }")
 (check-verilog (expr (append a b c)) "{ a, b, c }")
 
+(check-verilog (expr (- (- a b) (- c d))) "a - b - (c - d)")
+(check-verilog (expr (or (and a b) (and c d))) "a & b | c & d")
+(check-verilog (expr (and (or a b) (or c d))) "(a | b) & (c | d)")
+
 (check-verilog
   (statement (set! x y))
   (lines "x <= y;"))

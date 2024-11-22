@@ -16,6 +16,7 @@
   (import
     (micascheme)
     (code)
+    (expression)
     (prefix (verilog keywords) %))
   (export
     (import
@@ -173,63 +174,73 @@
       (else $char)))
 
   (define (expr->code $value)
+    (expression-value (expr->code-expression $value)))
+
+  (define (expr->code-expression $value)
     (syntax-case $value (%= %!= %< %<= %> %>= %+ %- %not %and %or %xor %nand %nor %xnor %ref %if %append)
       (id (identifier? #'id)
-        (name->code #'id))
+        (value-expression (name->code #'id)))
       (integer (nonnegative-integer? (datum integer))
-        (case (datum integer)
-          ((0 1) (number-code (datum integer)))
-          (else (string-code (string-append "'b" (number->string (datum integer) 2))))))
+        (value-expression
+          (case (datum integer)
+            ((0 1) (number-code (datum integer)))
+            (else (string-code (string-append "'b" (number->string (datum integer) 2)))))))
       (integer (integer? (datum integer))
-        (number-code (datum integer) 2))
+        (value-expression (number-code (datum integer) 2)))
       ((%= lhs rhs)
-        (op2->code "==" #'lhs #'rhs))
+        (op2->code-expression 9 #t "==" #'lhs #'rhs))
       ((%!= lhs rhs)
-        (op2->code "!=" #'lhs #'rhs))
+        (op2->code-expression 9 #t "!=" #'lhs #'rhs))
       ((%< lhs rhs)
-        (op2->code "<" #'lhs #'rhs))
+        (op2->code-expression 8 #t "<" #'lhs #'rhs))
       ((%<= lhs rhs)
-        (op2->code "<=" #'lhs #'rhs))
+        (op2->code-expression 8 #t "<=" #'lhs #'rhs))
       ((%> lhs rhs)
-        (op2->code ">" #'lhs #'rhs))
+        (op2->code-expression 8 #t ">" #'lhs #'rhs))
       ((%>= lhs rhs)
-        (op2->code ">=" #'lhs #'rhs))
+        (op2->code-expression 8 #t ">=" #'lhs #'rhs))
       ((%+ lhs rhs)
-        (op2->code "+" #'lhs #'rhs))
+        (op2->code-expression 6 #t "+" #'lhs #'rhs))
       ((%- expr)
-        (op->code "-" #'expr))
+        (op->code-expression 2 #f "-" #'expr))
       ((%- lhs rhs)
-        (op2->code "-" #'lhs #'rhs))
+        (op2->code-expression 6 #t "-" #'lhs #'rhs))
       ((%not rhs)
-        (op->code "~" #'rhs))
+        (op->code-expression 3 #f "~" #'rhs))
       ((%and lhs rhs)
-        (op2->code "&" #'lhs #'rhs))
+        (op2->code-expression 10 #t "&" #'lhs #'rhs))
       ((%or lhs rhs)
-        (op2->code "|" #'lhs #'rhs))
+        (op2->code-expression 12 #t "|" #'lhs #'rhs))
       ((%xor lhs rhs)
-        (op2->code "^" #'lhs #'rhs))
+        (op2->code-expression 11 #t "^" #'lhs #'rhs))
       ((%nand lhs rhs)
-        (op2->code "~&" #'lhs #'rhs))
+        (op2->code-expression 10 #t "~&" #'lhs #'rhs))
       ((%nor lhs rhs)
-        (op2->code "~|" #'lhs #'rhs))
+        (op2->code-expression 12 #t "~|" #'lhs #'rhs))
       ((%xnor lhs rhs)
-        (op2->code "^~" #'lhs #'rhs))
+        (op2->code-expression 11 #t "^~" #'lhs #'rhs))
       ((%ref expr selector ...)
-        (code
-          (expr->code #'expr)
-          (list->code (map selector->code (syntaxes selector ...)))))
+        (value-expression
+          (code
+            (expr->code #'expr)
+            (list->code (map selector->code (syntaxes selector ...))))))
       ((%if cond true false)
-        (space-separated-code
-          (expr->code #'cond)
-          "?"
-          (expr->code #'true)
-          ":"
-          (expr->code #'false)))
+        (expression 13 #f
+          (space-separated-code
+            (expression-operand-value parenthesize 13 #f (expr->code-expression #'cond))
+            "?"
+            (expr->code #'true)
+            ":"
+            (expression-operand-value parenthesize 13 #t (expr->code-expression #'false)))))
       ((%append expr ...)
-        (code-in-curly-brackets
-          (lets
-            ($exprs (ops->code ", " (syntaxes expr ...)))
-            (and $exprs (code " " $exprs " ")))))))
+        (value-expression
+          (code-in-curly-brackets
+            (lets
+              ($exprs (ops->code ", " (syntaxes expr ...)))
+              (and $exprs (code " " $exprs " "))))))))
+
+  (define (parenthesize $code)
+    (code-in-round-brackets $code))
 
   (define (lhs->code $lhs)
     (syntax-case $lhs ()
@@ -241,16 +252,22 @@
           (name->code #'id)
           (list->code (map selector->code (syntaxes selector ...)))))))
 
-  (define (op->code $op $rhs)
-    (code
-      (string-code $op)
-      (expr->code $rhs)))
+  (define (op->code-expression $priority $left-to-right? $op $rhs)
+    (unary-expression
+      (partial op1-code $op)
+      parenthesize
+      $priority
+      $left-to-right?
+      (expr->code-expression $rhs)))
 
-  (define (op2->code $op $lhs $rhs)
-    (code
-      (expr->code $lhs)
-      (string-code (string-append " " $op " "))
-      (expr->code $rhs)))
+  (define (op2->code-expression $priority $left-to-right? $op $lhs $rhs)
+    (binary-expression
+      (partial op2-code (string-append " " $op " "))
+      parenthesize
+      $priority
+      $left-to-right?
+      (expr->code-expression $lhs)
+      (expr->code-expression $rhs)))
 
   (define (ops->code $op $exprs)
     (fluent $exprs
