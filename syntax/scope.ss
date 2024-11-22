@@ -4,6 +4,7 @@
     scope+
     scope-gen
     scope-ref
+    scope-item
     scope-transformer
     scope-transform
     scope-unbound
@@ -19,6 +20,11 @@
 
   (define (scope-ref $scope $id)
     ($scope $id))
+
+  (define (scope-item $scope $id)
+    (or
+      (scope-ref $scope $id)
+      (scope-unbound $id)))
 
   (define (scope+ $scope $id $item)
     (lambda ($lookup-id)

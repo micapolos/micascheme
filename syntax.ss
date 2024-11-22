@@ -39,7 +39,8 @@
     syntax-cons
     list->syntax
     syntax-append
-    literal->syntax)
+    literal->syntax
+    syntax-single)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -328,4 +329,8 @@
 
   (define (syntax-properties-delete $syntax $id)
     (syntax-properties-update $syntax $id (lambda (_) #f)))
+
+  (define (syntax-single $syntax)
+    (syntax-case $syntax ()
+      ((item) #'item)))
 )

@@ -187,3 +187,6 @@
         (lambda (_) #f)))
     '((prop1 value1) (prop2 value2))))
 
+(check (syntax=? (syntax-single #`(foo)) #'foo))
+(check (raises (syntax-single #`123)))
+(check (raises (syntax-single #`(foo bar))))

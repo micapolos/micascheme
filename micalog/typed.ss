@@ -2,10 +2,13 @@
   (export
     literal->typed
     expr->typed
-    scope-expr->typed)
+    scope-expr->typed
+    scope-instrs->typed
+    scope-instr->typed)
   (import
     (micascheme)
     (syntax scope)
+    (syntax scoped)
     (prefix (micalog keywords) %))
 
   (define (literal->typed? $literal)
@@ -186,6 +189,41 @@
               (format "type mismatch ~a, expected ~a in"
                 (syntax->datum #`(%slice #,$type-a size))
                 (syntax->datum #`(>= #,$type-a size)))))))))
+
+  (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
+    (syntax-case $instr (%wire %set)
+      ((%wire id expr)
+        (lets
+          ($typed (scope-expr->typed $scope #'expr))
+          ($type (typed-type $typed))
+          (scoped
+            (scope+ $scope #'id (typed-type $typed))
+            (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))
+      ((%set id expr)
+        (lets
+          ($id-type (scope-item $scope #'id))
+          ($typed (scope-expr->typed $scope #'expr))
+          ($type (typed-type $typed))
+          (if (type=? $id-type $type)
+            (scoped $scope
+              (push $syntaxes #`(%set #,$type id #,(typed-value $typed))))
+            (syntax-error $instr
+              (format "type mismatch ~a, expected ~a in"
+                (syntax->datum #`(%set #,$id-type #,$type))
+                (syntax->datum #`(%set #,$id-type #,$id-type)))))))))
+
+  (define (scope-instrs->typed $scope $instrs)
+    (fluent
+      (fold-left
+        scoped-syntaxes+instr
+        (scoped $scope (stack))
+        (syntax->list $instrs))
+      (scoped-value)
+      (reverse)
+      (list->syntax)))
+
+  (define (scope-instr->typed $scope $instr)
+    (syntax-single (scope-instrs->typed $scope #`(#,$instr))))
 
   (define (typed $type $value)
     #`(#,$type #,$value))
