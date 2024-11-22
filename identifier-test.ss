@@ -1,4 +1,4 @@
-(import (scheme) (check) (identifier) (symbol))
+(import (scheme) (check) (identifier) (symbol) (syntax))
 
 (check (equal? (identifier-named? #`foo foo) #t))
 (check (equal? (identifier-named? #`foo bar) #f))
@@ -65,3 +65,5 @@
             (keywords print something new)
             #`(displayln x)))))
     `(displayln x)))
+
+(check (syntax=? (identifier id) #'id))
