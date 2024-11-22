@@ -4,7 +4,8 @@
     expression-operand-value
     value-expression
     unary-expression
-    binary-expression)
+    binary-expression
+    ternary-expression)
   (import (micascheme))
 
   (data (expression priority left-to-right? value))
@@ -31,5 +32,12 @@
     (expression $priority $left-to-right?
       ($make
         (expression-operand-value $promote $priority #f $lhs)
+        (expression-operand-value $promote $priority #t $rhs))))
+
+  (define (ternary-expression $make $promote $priority $left-to-right? $lhs $mid $rhs)
+    (expression $priority $left-to-right?
+      ($make
+        (expression-operand-value $promote $priority #f $lhs)
+        (expression-value $mid)
         (expression-operand-value $promote $priority #t $rhs))))
 )

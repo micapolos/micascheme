@@ -59,10 +59,29 @@
         ((%< a b) (scope-op2->typed $scope $expr))
         ((%<= a b) (scope-op2->typed $scope $expr))
         ((%> a b) (scope-op2->typed $scope $expr))
-        ((%>= a b) (scope-op2->typed $scope $expr)))))
+        ((%>= a b) (scope-op2->typed $scope $expr))
+        ((%not a) (scope-op1->typed $scope $expr))
+        ((%and a b) (scope-op2->typed $scope $expr))
+        ((%or a b) (scope-op2->typed $scope $expr))
+        ((%xor a b) (scope-op2->typed $scope $expr))
+        ((%nand a b) (scope-op2->typed $scope $expr))
+        ((%nor a b) (scope-op2->typed $scope $expr))
+        ((%xnor a b) (scope-op2->typed $scope $expr))
+        ((%neg a) (scope-op1->typed $scope $expr))
+        ((%add a b) (scope-op2->typed $scope $expr))
+        ((%sub a b) (scope-op2->typed $scope $expr)))))
 
   (define expr->typed
     (partial scope-expr->typed (empty-scope)))
+
+  (define (scope-op1->typed $scope $expr)
+    (syntax-case $expr ()
+      ((op a)
+        (lets
+          ($typed-a (scope-expr->typed $scope #'a))
+          #`(op
+            #,(typed-type $typed-a)
+            #,(typed-value $typed-a))))))
 
   (define (scope-op2->typed $scope $expr)
     (syntax-case $expr ()
