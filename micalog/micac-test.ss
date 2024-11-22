@@ -4,7 +4,7 @@
   (prefix (micalog keywords) %)
   (prefix (micac syntax) %%))
 
-(define-check-> micac)
+(define-check-datum-> micac)
 
 (check-micac (value foo) foo)
 (check-micac (value 123) 123)

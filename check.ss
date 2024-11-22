@@ -4,7 +4,8 @@
     check
     raises
     works
-    define-check->)
+    define-check->
+    define-check-datum->)
   (import (scheme) (identifier))
 
   (define checking? (make-thread-parameter #f))
@@ -84,6 +85,21 @@
                       (list (quote pred) #,@tmps)))))))))))
 
   (define-syntax (define-check-> $syntax)
+    (syntax-case $syntax ()
+      ((_ id)
+        #`(define-syntax (#,(identifier-append #'id #'check- #'id) $syntax)
+          (syntax-case $syntax (raises)
+            ((_ (raises (name arg (... ...) input)))
+              #`(check
+                (raises
+                  (#,(identifier-append #'name #'name #'-> #'id) arg (... ...) input))))
+            ((_ (name arg (... ...) input) expected)
+              #`(check
+                (equal?
+                  (#,(identifier-append #'name #'name #'-> #'id) arg (... ...) input)
+                  expected))))))))
+
+  (define-syntax (define-check-datum-> $syntax)
     (syntax-case $syntax ()
       ((_ id)
         #`(define-syntax (#,(identifier-append #'id #'check- #'id) $syntax)

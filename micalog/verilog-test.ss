@@ -4,7 +4,7 @@
   (prefix (micalog keywords) %)
   (prefix (verilog keywords) %%))
 
-(define-check-> verilog)
+(define-check-datum-> verilog)
 
 (check-verilog (name foo) foo)
 

@@ -4,7 +4,7 @@
   (syntax scope)
   (prefix (micalog keywords) %))
 
-(define-check-> typed)
+(define-check-datum-> typed)
 
 (define $scope
   (scope-with
