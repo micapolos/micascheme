@@ -96,71 +96,71 @@
       ((%= type lhs rhs)
         (boolean->number
           #`(%%=
-            #,(value->micac #'lhs)
-            #,(value->micac #'rhs))))
+            #,(expr->micac #'lhs)
+            #,(expr->micac #'rhs))))
       ((%!= type lhs rhs)
         (boolean->number
           #`(%%not
             (%%=
-              #,(value->micac #'lhs)
-              #,(value->micac #'rhs)))))
+              #,(expr->micac #'lhs)
+              #,(expr->micac #'rhs)))))
       ((%< type lhs rhs)
         (boolean->number
           #`(%%<
-            #,(value->micac #'lhs)
-            #,(value->micac #'rhs))))
+            #,(expr->micac #'lhs)
+            #,(expr->micac #'rhs))))
       ((%<= type lhs rhs)
         (boolean->number
           #`(%%<=
-            #,(value->micac #'lhs)
-            #,(value->micac #'rhs))))
+            #,(expr->micac #'lhs)
+            #,(expr->micac #'rhs))))
       ((%> type lhs rhs)
         (boolean->number
           #`(%%>
-            #,(value->micac #'lhs)
-            #,(value->micac #'rhs))))
+            #,(expr->micac #'lhs)
+            #,(expr->micac #'rhs))))
       ((%>= type lhs rhs)
         (boolean->number
           #`(%%>=
-            #,(value->micac #'lhs)
-            #,(value->micac #'rhs))))
+            #,(expr->micac #'lhs)
+            #,(expr->micac #'rhs))))
       ((%append lhs-type lhs rhs-type rhs)
         #`(%%bitwise-ior
           (%%bitwise-arithmetic-shift-left
-            #,(value->micac #'lhs)
+            #,(expr->micac #'lhs)
             #,(type-size #'rhs-type))
-          #,(value->micac #'rhs)))
+          #,(expr->micac #'rhs)))
       ((%slice type rhs shift)
         (type-micac-mask #'type
           #`(%%bitwise-arithmetic-shift-right
-            #,(value->micac #'rhs)
+            #,(expr->micac #'rhs)
             shift)))
       ((%add type lhs rhs)
         (type-micac-mask #'type
           #`(%%+
-            #,(value->micac #'lhs)
-            #,(value->micac #'rhs))))
+            #,(expr->micac #'lhs)
+            #,(expr->micac #'rhs))))
       ((%sub type lhs rhs)
         (type-micac-mask #'type
           #`(%%-
-            #,(value->micac #'lhs)
-            #,(value->micac #'rhs))))
+            #,(expr->micac #'lhs)
+            #,(expr->micac #'rhs))))
       ((%neg type rhs)
         (type-micac-mask #'type
           #`(%%-
-            #,(value->micac #'rhs))))
+            #,(expr->micac #'rhs))))
       ((%and type lhs rhs)
         #`(%%bitwise-and
-          #,(value->micac #'lhs)
-          #,(value->micac #'rhs)))
+          #,(expr->micac #'lhs)
+          #,(expr->micac #'rhs)))
       ((%or type lhs rhs)
         #`(%%bitwise-ior
-          #,(value->micac #'lhs)
-          #,(value->micac #'rhs)))
+          #,(expr->micac #'lhs)
+          #,(expr->micac #'rhs)))
       ((%xor type lhs rhs)
         #`(%%bitwise-xor
-          #,(value->micac #'lhs)
-          #,(value->micac #'rhs)))
+          #,(expr->micac #'lhs)
+          #,(expr->micac #'rhs)))
       ((%nand type lhs rhs)
         #`(%%bitwise-not #,(expr->micac #`(%and type lhs rhs))))
       ((%nor type lhs rhs)
@@ -170,12 +170,12 @@
       ((%not type rhs)
         (type-micac-mask #'type
           #`(%%bitwise-not
-            #,(value->micac #'rhs))))
+            #,(expr->micac #'rhs))))
       ((%if type cond true false)
         #`(%%if
-          (%%= #,(value->micac #'cond) 1)
-          #,(value->micac #'true)
-          #,(value->micac #'false)))
+          (%%= #,(expr->micac #'cond) 1)
+          #,(expr->micac #'true)
+          #,(expr->micac #'false)))
       (other
         (value->micac #'other))))
 
