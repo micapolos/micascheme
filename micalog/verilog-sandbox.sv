@@ -13,6 +13,22 @@ module counter_4 (
   input clock_0,
   output [3:0] counter
 );
+  always @(posedge clock_0) begin
+    clock_1 <= ~clock_1;
+  end
+  always @(posedge clock_1) begin
+    clock_2 <= ~clock_2;
+  end
+  always @(posedge clock_2) begin
+    clock_3 <= ~clock_3;
+  end
+  assign counter = { clock_3, clock_2, clock_1, clock_0 };
+endmodule
+
+module cascading_counter_4 (
+  input clock_0,
+  output [3:0] counter
+);
   always @(posedge clock_2) begin
     clock_3 <= ~clock_3;
   end
