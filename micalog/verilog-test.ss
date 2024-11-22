@@ -47,6 +47,10 @@
 
 (check-verilog (expr (%if 16 foo? a b)) (%%if foo? a b))
 
+(check-verilog
+  (expr (%if 16 (%not 1 foo?) (%and 16 a b) (%or 16 c (%not 16 d))))
+  (%%if (%%not foo?) (%%and a b) (%%or c (%%not d))))
+
 (check-verilog (input (%input 1 foo)) (%%input foo))
 (check-verilog (input (%input 16 foo)) (%%input (15 %%to 0) foo))
 

@@ -90,14 +90,14 @@
     (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %if %not %and %or %xor %nand %nor %xnor %add %sub %neg)
       ((%append lhs-type lhs-value rhs-type rhs-value)
         #`(%%append
-          #,(value->verilog #'lhs-value)
-          #,(value->verilog #'rhs-value)))
+          #,(expr->verilog #'lhs-value)
+          #,(expr->verilog #'rhs-value)))
       ((%slice type a shift)
         (lets
           ($shift (datum shift))
           ($mask (datum type))
           #`(%%ref
-            #,(value->verilog #'a)
+            #,(expr->verilog #'a)
             (
               #,(literal->syntax (+ $shift $mask -1))
               %%to
@@ -145,13 +145,13 @@
   (define (op->verilog $op $rhs)
     #`(
       #,$op
-      #,(value->verilog $rhs)))
+      #,(expr->verilog $rhs)))
 
   (define (op2->verilog $op $lhs $rhs)
     #`(
       #,$op
-      #,(value->verilog $lhs)
-      #,(value->verilog $rhs)))
+      #,(expr->verilog $lhs)
+      #,(expr->verilog $rhs)))
 
   (define (edge->verilog $edge)
     (syntax-case $edge (%posedge %negedge)
