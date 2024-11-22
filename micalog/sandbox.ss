@@ -13,8 +13,7 @@
     (module and-gate
       (input in-1 8)
       (input in-2 8)
-      (output out-and (and in-1 in-2))
-      (output out-nand (not out-and)))))
+      (output out-and (and in-1 in-2)))))
 
 (newline)
 
