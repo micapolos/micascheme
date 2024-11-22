@@ -8,11 +8,13 @@
 
 (define $scope
   (scope-with
-    (foo-1 1)
-    (foo-4 4)
-    (bar-4 4)
-    (foo-8 8)
-    (bar-8 8)))
+    (foo-1 (%wire 1))
+    (foo-4 (%wire 4))
+    (bar-4 (%wire 4))
+    (foo-8 (%wire 8))
+    (bar-8 (%wire 8))
+    (reg-foo-4 (%register 4))
+    (reg-bar-8 (%register 8))))
 
 (check-typed (literal 0) (1 0))
 (check-typed (literal 1) (1 1))
@@ -70,11 +72,12 @@
 (check-typed (scope-expr $scope (%= foo-4 bar-4)) (%= 4 foo-4 bar-4))
 (check-typed (scope-expr $scope (%if foo-1 foo-8 bar-8)) (%if 8 foo-1 foo-8 bar-8))
 
-(check-typed (scope-instr $scope (%set foo-4 bar-4)) (%set 4 foo-4 bar-4))
+(check-typed (scope-instr $scope (%set reg-foo-4 bar-4)) (%set 4 reg-foo-4 bar-4))
+(check-typed (raises (scope-instr $scope (%set foo-4 bar-4))))
 (check-typed (raises (scope-instr $scope (%set foo-4 bar-8))))
 
 (check-typed (scope-instr $scope (%wire foo-4 bar-4)) (%wire 4 foo-4 bar-4))
 
 (check-typed
-  (scope-instrs $scope ((%wire goo-4 bin-1010) (%set foo-4 goo-4)))
-  ((%wire 4 goo-4 #b1010) (%set 4 foo-4 goo-4)))
+  (scope-instrs $scope ((%wire goo-4 bin-1010) (%set reg-foo-4 goo-4)))
+  ((%wire 4 goo-4 #b1010) (%set 4 reg-foo-4 goo-4)))

@@ -11,6 +11,17 @@
     (syntax scoped)
     (prefix (micalog keywords) %))
 
+  (define (binding-kind $binding)
+    (syntax-case $binding ()
+      ((kind type) #'kind)))
+
+  (define (binding-type $binding)
+    (syntax-case $binding ()
+      ((kind type) #'type)))
+
+  (define (binding $kind $type)
+    #`(#,$kind #,$type))
+
   (define (literal->typed? $literal)
     (syntax-case $literal ()
       (0 #`(1 0))
@@ -54,7 +65,7 @@
       (syntax-error $literal "invalid literal")))
 
   (define (scope-id->typed $scope $id)
-    #`(#,(scope-item $scope $id) #,$id))
+    #`(#,(binding-type (scope-item $scope $id)) #,$id))
 
   (define (scope-expr->typed $scope $expr)
     (or
@@ -193,20 +204,22 @@
           ($typed (scope-expr->typed $scope #'expr))
           ($type (typed-type $typed))
           (scoped
-            (scope+ $scope #'id (typed-type $typed))
+            (scope+ $scope #'id (binding #'%wire (typed-type $typed)))
             (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))
       ((%set id expr)
         (lets
-          ($id-type (scope-item $scope #'id))
+          ($id-binding (scope-item $scope #'id))
+          ($id-kind (binding-kind $id-binding))
+          ($id-type (binding-type $id-binding))
           ($typed (scope-expr->typed $scope #'expr))
           ($type (typed-type $typed))
-          (if (type=? $id-type $type)
+          (if (and (syntax=? $id-kind #'%register) (type=? $id-type $type))
             (scoped $scope
               (push $syntaxes #`(%set #,$type id #,(typed-value $typed))))
             (syntax-error $instr
               (format "type mismatch ~a, expected ~a in"
-                (syntax->datum #`(%set #,$id-type #,$type))
-                (syntax->datum #`(%set #,$id-type #,$id-type)))))))))
+                (syntax->datum #`(%set #,$id-binding #,$type))
+                (syntax->datum #`(%set (%register #,$id-type) #,$id-type)))))))))
 
   (define (scope-instrs->typed $scope $instrs)
     (fluent
