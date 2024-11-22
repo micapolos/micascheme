@@ -4,15 +4,11 @@
   (micac scope)
   (prefix (micalog keywords) %))
 
-(define-case-syntax (check-typed (name arg ... in) out)
+(define-case-syntax (check-typed (name arg ... input) expected)
   #`(check
     (equal?
-      (syntax->datum
-        (
-          #,(identifier-append #'name #'name #'->typed)
-          arg ...
-          #'in))
-      'out)))
+      (syntax->datum (#,(identifier-append #'name #'name #'->typed) arg ... #'input))
+      'expected)))
 
 (define $scope
   (scope-with
@@ -37,3 +33,4 @@
 (check-typed (expr (%>= bin-1101 hex-a)) (%>= 4 #b1101 #xa))
 
 (check-typed (scope-expr $scope foo-4) (4 foo))
+(check-typed (scope-expr $scope (%= foo-4 bar-4)) (%= 4 foo bar))
