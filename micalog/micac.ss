@@ -350,7 +350,7 @@
     (syntax-case $on (%on)
       ((%on name process)
         (global?-process-registers $global? #'process))
-      ((%on name process)
+      ((%on name process opposite-process)
         (global?-process-registers $global? #'process))
           ((%on name process opposite-process)
             (append

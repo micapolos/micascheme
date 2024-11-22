@@ -239,6 +239,12 @@
           (scoped
             (scope+ $scope (identifier id) (binding #'%wire $type))
             (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))
+      ((%register id type)
+        (lets
+          ($type (type->syntax #'type))
+          (scoped $scope
+            (push $syntaxes
+              #`(%register #,$type #,(identifier id))))))
       ((%set id expr)
         (lets
           ($id-binding (scope-item $scope (identifier id)))
@@ -281,9 +287,7 @@
               (#,(edge->syntax #'edge)
                 #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...))))
               (#,(edge->syntax #'other-edge)
-                #,@(syntax->list (scope-instrs->typed-syntax $scope #'(other-body ...))))))))
-      ((%register xs ...)
-        (scoped $scope $syntaxes))))
+                #,@(syntax->list (scope-instrs->typed-syntax $scope #'(other-body ...))))))))))
 
   (define (scoped-syntaxes+instrs $scoped $instrs)
     (fold-left scoped-syntaxes+instr $scoped (syntax->list $instrs)))

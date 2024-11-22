@@ -13,6 +13,9 @@ module counter_4 (
   input clock_0,
   output [3:0] counter
 );
+  reg clock_1;
+  reg clock_2;
+  reg clock_3;
   always @(posedge clock_0) begin
     clock_1 <= ~clock_1;
   end
@@ -29,6 +32,9 @@ module cascading_counter_4 (
   input clock_0,
   output [3:0] counter
 );
+  reg clock_1;
+  reg clock_2;
+  reg clock_3;
   always @(posedge clock_2) begin
     clock_3 <= ~clock_3;
   end
@@ -48,6 +54,7 @@ module funny_module (
   input [15:0] mouse_x,
   output [15:0] out
 );
+  reg [15:0] counter;
   wire [15:0] inc_counter;
   assign inc_counter = counter + 1;
   wire [15:0] dec_counter;
