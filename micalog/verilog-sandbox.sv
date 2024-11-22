@@ -12,7 +12,7 @@ endmodule
 module oscillating_registers (
   input clock,
   input reset_,
-  input [1:0] initial,
+  input [1:0] _initial,
   output [1:0] out
 );
   reg [1:0] reg_1;
@@ -22,8 +22,8 @@ module oscillating_registers (
       reg_1 <= reg_2;
       reg_2 <= reg_1;
     end else begin
-      reg_1 <= initial;
-      reg_1 <= ~initial;
+      reg_1 <= _initial;
+      reg_1 <= ~_initial;
     end
   end
   assign out = reg_1;

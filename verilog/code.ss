@@ -161,6 +161,17 @@
           (name->code $name)
           (list->code (map range-declaration->code $arrays))))))
 
+  (define reserved-identifier-strings
+    (list
+      "module" "endmodule"
+      "input" "output" "inout"
+      "wire" "reg" "integer" "real" "time"
+      "always" "initial" "forever" "#" "posedge" "negedge"
+      "if" "else" "case" "casex" "casez" "default"
+      "for" "while" "repeat"
+      "task" "endtask" "function" "endfunction"
+      "+" "-" "*" "/" "%" "&" "|" "^" "~" "!" "&&" "||" "==" "!=" "<" ">" "<=" ">=" "<<" ">>"))
+
   (define (name->code $name)
     (fluent $name
       (syntax->datum)
@@ -168,6 +179,10 @@
       (string->list)
       (map-using name-char)
       (list->string)
+      (with $string
+        (if (member $string reserved-identifier-strings)
+          (string-append "_" $string)
+          $string))
       (string-code)))
 
   (define (name-char $char)

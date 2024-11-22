@@ -14,6 +14,8 @@
 (check-verilog (name clock) "clock")
 (check-verilog (name item-counter) "item_counter")
 (check-verilog (name reset?) "reset_")
+(check-verilog (name wire) "_wire")
+(check-verilog (name initial) "_initial")
 
 (check-verilog (expr #b10010) "'b10010")
 (check-verilog (expr clock) "clock")
@@ -86,7 +88,7 @@
     "end else if (write) begin"
     "  x <= data;"
     "end else begin"
-    "  x <= default;"
+    "  x <= _default;"
     "end"))
 
 (check-verilog (edge posedge) "posedge")
