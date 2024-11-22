@@ -52,7 +52,9 @@
 
   (define (scope-id->typed $scope $id)
     (or
-      (scope-ref $scope $id)
+      (opt-lets
+        ($type (scope-ref $scope $id))
+        #`(#,$type #,$id))
       (syntax-error $id "not bound")))
 
   (define (scope-expr->typed $scope $expr)

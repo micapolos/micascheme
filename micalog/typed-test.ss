@@ -18,10 +18,10 @@
 
 (define $scope
   (scope-with
-    (foo-4 (4 foo))
-    (bar-4 (4 bar))
-    (foo-8 (8 foo))
-    (bar-8 (8 bar))))
+    (foo-4 4)
+    (bar-4 4)
+    (foo-8 8)
+    (bar-8 8)))
 
 (check-typed (literal 0) (1 0))
 (check-typed (literal 1) (1 1))
@@ -65,5 +65,5 @@
 
 (check-typed (expr (%if bin-1 bin-1101 hex-a)) (%if 4 #b1 #b1101 #xa))
 
-(check-typed (scope-expr $scope foo-4) (4 foo))
-(check-typed (scope-expr $scope (%= foo-4 bar-4)) (%= 4 foo bar))
+(check-typed (scope-expr $scope foo-4) (4 foo-4))
+(check-typed (scope-expr $scope (%= foo-4 bar-4)) (%= 4 foo-4 bar-4))
