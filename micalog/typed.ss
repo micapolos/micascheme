@@ -171,7 +171,21 @@
                 (syntax->datum #`(%slice #,$type-a shift size))
                 (syntax->datum #`(>= #,$type-a (+ shift size))))))))
       ((%slice a size)
-        (scope-slice->typed $scope #'(%slice a 0 size)))))
+        (lets
+          ($typed-a (scope-expr->typed $scope #'a))
+          ($type-a (typed-type $typed-a))
+          ($a-size (type-size $type-a))
+          ($size (type-size #'size))
+          (if
+            (>= $a-size $size)
+            #`(%slice
+              size
+              #,(typed-value $typed-a)
+              0)
+            (syntax-error $slice
+              (format "type mismatch ~a, expected ~a in"
+                (syntax->datum #`(%slice #,$type-a size))
+                (syntax->datum #`(>= #,$type-a size)))))))))
 
   (define (typed $type $value)
     #`(#,$type #,$value))
