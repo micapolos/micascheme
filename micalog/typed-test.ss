@@ -18,6 +18,7 @@
 
 (define $scope
   (scope-with
+    (foo-1 1)
     (foo-4 4)
     (bar-4 4)
     (foo-8 8)
@@ -67,3 +68,4 @@
 
 (check-typed (scope-expr $scope foo-4) (4 foo-4))
 (check-typed (scope-expr $scope (%= foo-4 bar-4)) (%= 4 foo-4 bar-4))
+(check-typed (scope-expr $scope (%if foo-1 foo-8 bar-8)) (%if 8 foo-1 foo-8 bar-8))
