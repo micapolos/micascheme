@@ -2,7 +2,7 @@
   (export syntax-c)
   (import
     (micascheme)
-    (except (code) op2-code)
+    (code)
     (micac expr)
     (micac code)
     (micac syntax)

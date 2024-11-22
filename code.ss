@@ -11,8 +11,9 @@
     list->code
     list->separated-code
 
-    op1-code
-    op2-code
+    infix-code
+    prefix-code
+    postfix-code
 
     separated-code
     space-separated-code
@@ -99,10 +100,13 @@
       (lambda ($line-start? $indent $port)
         ($code $line-start? (add1 $indent) $port))))
 
-  (define (op1-code $op $rhs)
+  (define (prefix-code $op $rhs)
     (code (string-code $op) $rhs))
 
-  (define (op2-code $op $lhs $rhs)
+  (define (postfix-code $op $rhs)
+    (code $rhs (string $op)))
+
+  (define (infix-code $op $lhs $rhs)
     (code $lhs (string-code $op) $rhs))
 
   (define-case-syntaxes

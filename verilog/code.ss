@@ -188,37 +188,37 @@
       (integer (integer? (datum integer))
         (value-expression (number-code (datum integer) 2)))
       ((%= lhs rhs)
-        (op2->code-expression 9 #t "==" #'lhs #'rhs))
+        (infix->code-expression 9 #t "==" #'lhs #'rhs))
       ((%!= lhs rhs)
-        (op2->code-expression 9 #t "!=" #'lhs #'rhs))
+        (infix->code-expression 9 #t "!=" #'lhs #'rhs))
       ((%< lhs rhs)
-        (op2->code-expression 8 #t "<" #'lhs #'rhs))
+        (infix->code-expression 8 #t "<" #'lhs #'rhs))
       ((%<= lhs rhs)
-        (op2->code-expression 8 #t "<=" #'lhs #'rhs))
+        (infix->code-expression 8 #t "<=" #'lhs #'rhs))
       ((%> lhs rhs)
-        (op2->code-expression 8 #t ">" #'lhs #'rhs))
+        (infix->code-expression 8 #t ">" #'lhs #'rhs))
       ((%>= lhs rhs)
-        (op2->code-expression 8 #t ">=" #'lhs #'rhs))
+        (infix->code-expression 8 #t ">=" #'lhs #'rhs))
       ((%+ lhs rhs)
-        (op2->code-expression 6 #t "+" #'lhs #'rhs))
+        (infix->code-expression 6 #t "+" #'lhs #'rhs))
       ((%- expr)
         (op->code-expression 2 #f "-" #'expr))
       ((%- lhs rhs)
-        (op2->code-expression 6 #t "-" #'lhs #'rhs))
+        (infix->code-expression 6 #t "-" #'lhs #'rhs))
       ((%not rhs)
         (op->code-expression 3 #f "~" #'rhs))
       ((%and lhs rhs)
-        (op2->code-expression 10 #t "&" #'lhs #'rhs))
+        (infix->code-expression 10 #t "&" #'lhs #'rhs))
       ((%or lhs rhs)
-        (op2->code-expression 12 #t "|" #'lhs #'rhs))
+        (infix->code-expression 12 #t "|" #'lhs #'rhs))
       ((%xor lhs rhs)
-        (op2->code-expression 11 #t "^" #'lhs #'rhs))
+        (infix->code-expression 11 #t "^" #'lhs #'rhs))
       ((%nand lhs rhs)
-        (op2->code-expression 10 #t "~&" #'lhs #'rhs))
+        (infix->code-expression 10 #t "~&" #'lhs #'rhs))
       ((%nor lhs rhs)
-        (op2->code-expression 12 #t "~|" #'lhs #'rhs))
+        (infix->code-expression 12 #t "~|" #'lhs #'rhs))
       ((%xnor lhs rhs)
-        (op2->code-expression 11 #t "^~" #'lhs #'rhs))
+        (infix->code-expression 11 #t "^~" #'lhs #'rhs))
       ((%ref expr selector ...)
         (value-expression
           (code
@@ -254,15 +254,15 @@
 
   (define (op->code-expression $priority $left-to-right? $op $rhs)
     (unary-expression
-      (partial op1-code $op)
+      (partial prefix-code $op)
       parenthesize
       $priority
       $left-to-right?
       (expr->code-expression $rhs)))
 
-  (define (op2->code-expression $priority $left-to-right? $op $lhs $rhs)
+  (define (infix->code-expression $priority $left-to-right? $op $lhs $rhs)
     (binary-expression
-      (partial op2-code (string-append " " $op " "))
+      (partial infix-code (string-append " " $op " "))
       parenthesize
       $priority
       $left-to-right?
