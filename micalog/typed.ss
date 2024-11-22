@@ -5,7 +5,7 @@
     scope-expr->typed)
   (import
     (micascheme)
-    (micac scope)
+    (syntax scope)
     (prefix (micalog keywords) %))
 
   (define (literal->typed? $literal)

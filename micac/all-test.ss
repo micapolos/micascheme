@@ -6,7 +6,7 @@
   (micac syntax)
   (micac c)
   (micac syntax-c)
-  (micac scope)
+  (syntax scope)
   (micac expand)
   (micac run)
   (micac lib all))

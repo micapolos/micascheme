@@ -10,7 +10,7 @@
     scoped-map)
   (import
     (micascheme)
-    (micac scope))
+    (syntax scope))
 
   (data (scoped scope value))
 

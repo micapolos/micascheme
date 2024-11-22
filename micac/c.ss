@@ -4,7 +4,7 @@
     micac-define
     micac-externs
     micac-macro)
-  (import (micascheme) (micac syntax-c) (micac syntax) (micac scope) (micac expr) (micac expand) (syntax))
+  (import (micascheme) (micac syntax-c) (micac syntax) (syntax scope) (micac expr) (micac expand) (syntax))
   (export (import (micac syntax)))
 
   (define-rule-syntax (micac-externs id ...)

@@ -1,4 +1,4 @@
-(library (micac scope)
+(library (syntax scope)
   (export
     empty-scope
     scope+

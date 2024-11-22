@@ -1,4 +1,4 @@
-(import (micascheme) (micac expand) (micac syntax) (micac scope))
+(import (micascheme) (micac expand) (micac syntax) (syntax scope))
 
 (parameterize ((scope-gen? #f))
   (define-aux-keywords zero one two)

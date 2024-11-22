@@ -1,7 +1,7 @@
 (import
   (micascheme)
   (micalog typed)
-  (micac scope)
+  (syntax scope)
   (prefix (micalog keywords) %))
 
 (define-check-> typed)

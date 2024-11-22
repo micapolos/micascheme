@@ -76,6 +76,7 @@
   (micalog all)
   (minic all)
   (scheme all)
+  (syntax all)
   (tico all)
   (verilog all)
   (zexy all)
