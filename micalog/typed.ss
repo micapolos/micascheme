@@ -67,6 +67,17 @@
   (define (scope-id->typed $scope $id)
     #`(#,(binding-type (scope-item $scope $id)) #,$id))
 
+  (define (scope-expr-type->typed $scope $expr $expected-type)
+    (lets
+      ($typed (scope-expr->typed $scope $expr))
+      ($type (typed-type $typed))
+      (if (type=? $type $expected-type)
+        (typed-value $typed)
+        (syntax-error $expr
+          (format "type mismatch ~a, expected ~a in"
+            (syntax->datum $type)
+            (syntax->datum $expected-type))))))
+
   (define (scope-expr->typed $scope $expr)
     (or
       (literal->typed? $expr)
@@ -198,7 +209,7 @@
                 (syntax->datum #`(>= #,$type-a size)))))))))
 
   (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
-    (syntax-case $instr (%wire %set)
+    (syntax-case $instr (%wire %set %when %if %on)
       ((%wire id expr)
         (lets
           ($typed (scope-expr->typed $scope #'expr))
