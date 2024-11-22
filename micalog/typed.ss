@@ -53,14 +53,13 @@
     (or
       (literal->typed? $expr)
       (syntax-case $expr (%= %!= %< %<= %> %>= let)
+        (id (identifier? #'id) (scope-id->typed $scope #'id))
         ((%= a b) (scope-op2->typed $scope $expr))
         ((%!= a b) (scope-op2->typed $scope $expr))
         ((%< a b) (scope-op2->typed $scope $expr))
         ((%<= a b) (scope-op2->typed $scope $expr))
         ((%> a b) (scope-op2->typed $scope $expr))
-        ((%>= a b) (scope-op2->typed $scope $expr))
-        (id (identifier? #'id)
-          (scope-id->typed $scope #'id)))))
+        ((%>= a b) (scope-op2->typed $scope $expr)))))
 
   (define expr->typed
     (partial scope-expr->typed (empty-scope)))
