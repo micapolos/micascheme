@@ -1,6 +1,4 @@
-module empty (
-
-);
+module empty ();
 endmodule
 
 module and_gate (

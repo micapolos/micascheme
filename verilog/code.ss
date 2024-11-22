@@ -33,10 +33,12 @@
             (name->code (identifier name))
             (code
               (code-in-round-brackets
-                (code-in-newlines
-                  (indented-code
-                    (list->separated-code (code ",\n")
-                      (map parameter->code (syntaxes parameter ...))))))
+                (if (null? (syntaxes parameter ...))
+                  (code "")
+                  (code-in-newlines
+                    (indented-code
+                      (list->separated-code (code ",\n")
+                        (map parameter->code (syntaxes parameter ...)))))))
               ";\n"))
           (indented-code (declarations->code (syntaxes declaration ...)))
           (newline-ended-code "endmodule")))))

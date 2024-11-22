@@ -167,6 +167,12 @@
     "end"))
 
 (check-verilog
+  (module (module (foo)))
+  (lines
+    "module foo ();"
+    "endmodule"))
+
+(check-verilog
   (module
     (module (foo (input in) (output out-1) (output out-2))
       (always *
