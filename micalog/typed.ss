@@ -106,9 +106,9 @@
               #,(typed-value $typed-a)
               #,(typed-value $typed-b))
             (syntax-error $expr
-              (format "type mismatch ~a in"
-                (syntax->datum
-                  #`(op #,$type-a #,$type-b)))))))))
+              (format "type mismatch ~a, expected ~a in"
+                (syntax->datum #`(op #,$type-a #,$type-b))
+                (syntax->datum #`(op #,$type-a #,$type-a)))))))))
 
   (define (scope-if->typed $scope $if)
     (syntax-case $if (%if)
@@ -128,9 +128,9 @@
               #,(typed-value $typed-b)
               #,(typed-value $typed-c))
             (syntax-error $if
-              (format "type mismatch ~a in"
-                (syntax->datum
-                  #`(%if #,$type-a #,$type-b #,$type-c)))))))))
+              (format "type mismatch ~a, expected ~a in"
+                (syntax->datum #`(%if #,$type-a #,$type-b #,$type-c))
+                (syntax->datum #`(%if 1 #,$type-b #,$type-b)))))))))
 
   (define (typed $type $value)
     #`(#,$type #,$value))
