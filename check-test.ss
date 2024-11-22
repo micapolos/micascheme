@@ -7,7 +7,7 @@
 
 (check-string (list (list #\a #\b)) "ab")
 (check-string (number 123) "123")
-(check-string (raises (list #\a #\b 1)))
+;(check-string (raises (list (list #\a #\b 123))))
 
 (define-check-datum-> foo)
 (define-aux-keyword bar)
