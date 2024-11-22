@@ -242,9 +242,9 @@
       ((%register id type)
         (lets
           ($type (type->syntax #'type))
-          (scoped $scope
-            (push $syntaxes
-              #`(%register #,$type #,(identifier id))))))
+          (scoped
+            (scope+ $scope (identifier id) (binding #'%register $type))
+            (push $syntaxes #`(%register #,$type #,(identifier id))))))
       ((%set id expr)
         (lets
           ($id-binding (scope-item $scope (identifier id)))
@@ -292,21 +292,9 @@
   (define (scoped-syntaxes+instrs $scoped $instrs)
     (fold-left scoped-syntaxes+instr $scoped (syntax->list $instrs)))
 
-  (define (scope+init $scope $init)
-    (syntax-case $init (%register)
-      ((%register id type)
-        (scope+ $scope
-          (identifier id)
-          (binding #'%register (type->syntax #'type))))
-      (_
-        $scope)))
-
-  (define (scope+inits $scope $inits)
-    (fold-left scope+init $scope (syntax->list $inits)))
-
   (define (scope-instrs->typed-syntax $scope $instrs)
     (fluent
-      (scoped (scope+inits $scope $instrs) (stack))
+      (scoped $scope (stack))
       (scoped-syntaxes+instrs (syntax->list $instrs))
       (scoped-value)
       (reverse)
