@@ -27,37 +27,29 @@
       (0 #`(1 0))
       (1 #`(1 1))
       (id (identifier? #'id)
-        (lets
-          ($string (symbol->string (datum id)))
-          ($length (string-length $string))
-          ($prefix-template "xxx-")
-          ($prefix-length (string-length $prefix-template))
-          (and (> $length $prefix-length)
-            (lets
-              ($prefix (substring $string 0 $prefix-length))
-              ($data (substring $string $prefix-length $length))
-              ($data-length (string-length $data))
-              (case $prefix
-                (("bin-")
-                  (opt-lets
-                    ($number (string->number $data 2))
-                    #`(
-                      #,(literal->syntax $data-length)
-                      #,(literal->syntax $number))))
-                (("hex-")
-                  (opt-lets
-                    ($number (string->number $data 16))
-                    #`(
-                      #,(literal->syntax (* $data-length 4))
-                      #,(literal->syntax $number))))
-                (("oct-")
-                  (opt-lets
-                    ($number (string->number $data 8))
-                    #`(
-                      #,(literal->syntax (* $data-length 3))
-                      #,(literal->syntax $number))))
-                (else #f))))))
+        (or
+          (prefix-size-id->typed? "bin-" 1 #'id)
+          (prefix-size-id->typed? "oct-" 3 #'id)
+          (prefix-size-id->typed? "hex-" 4 #'id)))
       (else #f)))
+
+  (define (prefix-size-id->typed? $prefix $size $id)
+    (lets
+      ($string (symbol->string (syntax->datum $id)))
+      ($length (string-length $string))
+      ($prefix-length (string-length $prefix))
+      ($radix (bitwise-arithmetic-shift-left 1 $size))
+      (and (> $length $prefix-length)
+        (lets
+          ($string-prefix (substring $string 0 $prefix-length))
+          ($data (substring $string $prefix-length $length))
+          ($data-length (string-length $data))
+          (and (string=? $string-prefix $prefix)
+            (opt-lets
+              ($number (string->number $data $radix))
+              #`(
+                #,(literal->syntax (* $data-length $size))
+                #,(literal->syntax $number))))))))
 
   (define (literal->typed $literal)
     (or
