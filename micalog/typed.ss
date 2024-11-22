@@ -54,11 +54,7 @@
       (syntax-error $literal "invalid literal")))
 
   (define (scope-id->typed $scope $id)
-    (or
-      (opt-lets
-        ($type (scope-ref $scope $id))
-        #`(#,$type #,$id))
-      (syntax-error $id "not bound")))
+    #`(#,(scope-item $scope $id) #,$id))
 
   (define (scope-expr->typed $scope $expr)
     (or
