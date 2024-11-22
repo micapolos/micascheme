@@ -128,7 +128,7 @@
             (syntax-error $if
               (format "type mismatch ~a in"
                 (syntax->datum
-                  #`(op #,$type-a #,$type-b #,$type-c)))))))))
+                  #`(%if #,$type-a #,$type-b #,$type-c)))))))))
 
   (define (typed $type $value)
     #`(#,$type #,$value))
