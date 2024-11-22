@@ -216,8 +216,8 @@
   (define (scoped-syntaxes+instrs $scoped $instrs)
     (fold-left scoped-syntaxes+instr $scoped (syntax->list $instrs)))
 
-  (define (scope+instr $scope $instr)
-    (syntax-case $instr (%register)
+  (define (scope+init $scope $init)
+    (syntax-case $init (%register)
       ((%register id type)
         (scope+ $scope
           (identifier id)
@@ -225,12 +225,12 @@
       (_
         $scope)))
 
-  (define (scope+instrs $scope $instrs)
-    (fold-left scope+instr $scope (syntax->list $instrs)))
+  (define (scope+inits $scope $inits)
+    (fold-left scope+init $scope (syntax->list $inits)))
 
   (define (scope-instrs->typed-syntax $scope $instrs)
     (fluent
-      (scoped (scope+instrs $scope $instrs) (stack))
+      (scoped (scope+inits $scope $instrs) (stack))
       (scoped-syntaxes+instrs (syntax->list $instrs))
       (scoped-value)
       (reverse)
