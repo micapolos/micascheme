@@ -33,6 +33,8 @@
 
 (check-typed (expr bin-101) (3 #b101))
 
+(check-typed (expr (%append bin-10 hex-af)) (%append 10 #b10 #xaf))
+
 (check-typed (expr (%= bin-1101 hex-a)) (%= 4 #b1101 #xa))
 (check-typed (expr (%!= bin-1101 hex-a)) (%!= 4 #b1101 #xa))
 (check-typed (expr (%< bin-1101 hex-a)) (%< 4 #b1101 #xa))

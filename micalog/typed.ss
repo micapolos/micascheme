@@ -60,8 +60,9 @@
   (define (scope-expr->typed $scope $expr)
     (or
       (literal->typed? $expr)
-      (syntax-case $expr (%= %!= %< %<= %> %>= %not %and %or %xor %nand %not %xnor %+ %- %if)
+      (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %not %and %or %xor %nand %not %xnor %+ %- %if)
         (id (identifier? #'id) (scope-id->typed $scope #'id))
+        ((%append a b) (scope-append->typed $scope $expr))
         ((%= a b) (scope-op2->typed $scope $expr))
         ((%!= a b) (scope-op2->typed $scope $expr))
         ((%< a b) (scope-op2->typed $scope $expr))
@@ -132,6 +133,19 @@
                 (syntax->datum #`(%if #,$type-a #,$type-b #,$type-c))
                 (syntax->datum #`(%if 1 #,$type-b #,$type-b)))))))))
 
+  (define (scope-append->typed $scope $append)
+    (syntax-case $append (%append)
+      ((%append a b)
+        (lets
+          ($typed-a (scope-expr->typed $scope #'a))
+          ($typed-b (scope-expr->typed $scope #'b))
+          ($type-a (typed-type $typed-a))
+          ($type-b (typed-type $typed-b))
+          #`(%append
+            #,(size->type (+ (type-size $type-a) (type-size $type-b)))
+            #,(typed-value $typed-a)
+            #,(typed-value $typed-b))))))
+
   (define (typed $type $value)
     #`(#,$type #,$value))
 
@@ -142,6 +156,14 @@
   (define (typed-value $typed)
     (syntax-case $typed ()
       ((type value) #'value)))
+
+  (define (type-size $type)
+    (syntax-case $type ()
+      (size (positive-integer? (datum size)) (datum size))
+      (_ (syntax-error $type "illegal type"))))
+
+  (define (size->type $size)
+    (literal->syntax $size))
 
   (define type=? syntax=?)
 )
