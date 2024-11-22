@@ -177,8 +177,9 @@
           ($type (size->type (+ (type-size $type-a) (type-size $type-b))))
           (typed $type
             #`(%append
-              #,$type
+              #,$type-a
               #,(typed-value $typed-a)
+              #,$type-b
               #,(typed-value $typed-b)))))))
 
   (define (scope-slice->typed $scope $slice)

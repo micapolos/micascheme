@@ -20,22 +20,24 @@
 
 (display
   (verilog-string
-    (module alternative-counter-4
-      (input clock 1)
-      (on clock
+    (module counter-4
+      (input clock-0 1)
+      (register clock-1 1)
+      (register clock-2 1)
+      (register clock-3 1)
+      (on clock-0
         (posedge
-          (register clock-1 1)
           (set clock-1 (not clock-1))
           (on clock-1
             (posedge
-              (register clock-2 1)
               (set clock-2 (not clock-2))
               (on clock-2
                 (posedge
-                  (register clock-3 1)
                   (set clock-3 (not clock-3))))))))
-      ; TODO: How to access register from sub-process?
-      (output counter hex-0))))
+      (output counter
+        (append
+          (append clock-3 clock-2)
+          (append clock-1 clock-0))))))
 
 (newline)
 
@@ -46,14 +48,11 @@
       (input reset? 1)
       (input mouse-pressed? 1)
       (input mouse-x 16)
+      (register counter 16)
       (on clock
         (posedge
-          (register half-clock 1)
-          (register counter 16)
-          (set half-clock (not half-clock))
           (wire inc-counter (+ counter hex-0001))
           (wire dec-counter (- counter hex-0001))
           (wire updated-counter (if mouse-pressed? inc-counter dec-counter))
           (set counter (if reset? mouse-x updated-counter))))
-      ; TODO: How to access register from sub-process?
-      (output counter hex-0000))))
+      (output out counter))))
