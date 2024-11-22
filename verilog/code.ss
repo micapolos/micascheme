@@ -237,9 +237,9 @@
       ((%append expr ...)
         (value-expression
           (code-in-curly-brackets
-            (lets
+            (opt-lets
               ($exprs (ops->code ", " (syntaxes expr ...)))
-              (and $exprs (code " " $exprs " "))))))))
+              (code " " $exprs " ")))))))
 
   (define (parenthesize $code)
     (code-in-round-brackets $code))
