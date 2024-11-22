@@ -77,7 +77,9 @@
 (check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-4))))
 (check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-8))))
 
+(check-typed-syntax (scope-instr $scope (%input foo-4 4)) (%input 4 foo-4))
 (check-typed-syntax (scope-instr $scope (%wire foo-4 bar-4)) (%wire 4 foo-4 bar-4))
+(check-typed-syntax (scope-instr $scope (%output foo-4 bar-4)) (%output 4 foo-4 bar-4))
 
 (check-typed-syntax
   (scope-instrs $scope ((%wire goo-4 bin-1010) (%set reg-foo-4 goo-4)))

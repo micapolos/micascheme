@@ -189,7 +189,18 @@
                 (syntax->datum #`(>= size)))))))))
 
   (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
-    (syntax-case $instr (%wire %register %set %when %if %on)
+    (syntax-case $instr (%input %output %wire %register %set %when %if %on)
+      ((%input id type)
+        (scoped
+          (scope+ $scope (identifier id) (binding #'%wire #'type))
+          (push $syntaxes #`(%input type id))))
+      ((%output id expr)
+        (lets
+          ($typed (scope-expr->typed $scope #'expr))
+          ($type (typed-type $typed))
+          (scoped
+            (scope+ $scope (identifier id) (binding #'%wire (typed-type $typed)))
+            (push $syntaxes #`(%output #,$type id #,(typed-value $typed))))))
       ((%wire id expr)
         (lets
           ($typed (scope-expr->typed $scope #'expr))
