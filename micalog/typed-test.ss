@@ -42,7 +42,7 @@
 
 (check-typed (expr bin-101) (3 #b101))
 
-(check-typed (expr (%append bin-10 hex-af)) (10 (%append 2 #b10 8 #xaf)))
+(check-typed (expr (%append bin-10 hex-af)) (10 (%append (2 #b10) (8 #xaf))))
 
 (check-typed (expr (%slice bin-11001010 6)) (6 (%slice 6 #b11001010 0)))
 (check-typed (expr (%slice bin-11001010 8)) (8 (%slice 8 #b11001010 0)))
@@ -190,7 +190,7 @@
     (%input 8 in-2)
     (%output 9 out
       (%append
-        8 (%and 8 in-1 in-2)
-        1 clock))))
+        (8 (%and 8 in-1 in-2))
+        (1 clock)))))
 
 

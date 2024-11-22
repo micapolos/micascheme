@@ -124,12 +124,19 @@
           #`(%%>=
             #,(expr->micac #'lhs)
             #,(expr->micac #'rhs))))
-      ((%append lhs-type lhs rhs-type rhs)
+      ((%append (lhs-type lhs))
+        (expr->micac #'lhs))
+      ((%append (lhs-type lhs) (rhs-type rhs))
         #`(%%bitwise-ior
           (%%bitwise-arithmetic-shift-left
             #,(expr->micac #'lhs)
             #,(type-size #'rhs-type))
           #,(expr->micac #'rhs)))
+      ((%append (lhs-type lhs-expr) rhs ...)
+        (fold-left
+          micac-append
+          (expr->micac #'lhs-expr)
+          (syntaxes rhs ...)))
       ((%slice type rhs shift)
         (type-micac-mask #'type
           #`(%%bitwise-arithmetic-shift-right
@@ -178,6 +185,15 @@
           #,(expr->micac #'false)))
       (other
         (value->micac #'other))))
+
+  (define (micac-append $lhs-micac $rhs)
+    (syntax-case $rhs ()
+      ((type expr)
+        #`(%%bitwise-ior
+          (%%bitwise-arithmetic-shift-left
+            #,$lhs-micac
+            #,(type-size #'type))
+          #,(expr->micac #'expr)))))
 
   (define (boolean->number $boolean?)
     #`(%%if #,$boolean? 1 0))

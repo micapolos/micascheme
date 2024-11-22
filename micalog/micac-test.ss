@@ -13,8 +13,22 @@
 (check-micac (expr 123) 123)
 
 (check-micac
-  (expr (%append 2 a 4 b))
+  (expr (%append (2 a)))
+  a)
+
+(check-micac
+  (expr (%append (2 a) (4 b)))
   (%%bitwise-ior (%%bitwise-arithmetic-shift-left a 4) b))
+
+(check-micac
+  (expr (%append (2 a) (4 b) (5 c)))
+  (%%bitwise-ior
+    (%%bitwise-arithmetic-shift-left
+      (%%bitwise-ior
+        (%%bitwise-arithmetic-shift-left a 4)
+        b)
+      5)
+    c))
 
 (check-micac
   (expr (%slice 6 a 2))

@@ -168,19 +168,16 @@
 
   (define (scope-append->typed $scope $append)
     (syntax-case $append (%append)
-      ((%append a b)
+      ((%append expr ...)
         (lets
-          ($typed-a (scope-expr->typed $scope #'a))
-          ($typed-b (scope-expr->typed $scope #'b))
-          ($type-a (typed-type $typed-a))
-          ($type-b (typed-type $typed-b))
-          ($type (size->type (+ (type-size $type-a) (type-size $type-b))))
+          ($typeds (map (partial scope-expr->typed $scope) (syntaxes expr ...)))
+          ($types (map typed-type $typeds))
+          ($values (map typed-value $typeds))
+          ($sizes (map type-size $types))
+          ($type (size->type (fold-left + 0 $sizes)))
           (typed $type
             #`(%append
-              #,$type-a
-              #,(typed-value $typed-a)
-              #,$type-b
-              #,(typed-value $typed-b)))))))
+              #,@(map typed $types $values)))))))
 
   (define (scope-slice->typed $scope $slice)
     (syntax-case $slice (%slice)

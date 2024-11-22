@@ -88,10 +88,9 @@
 
   (define (expr->verilog $expr)
     (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %if %not %and %or %xor %nand %nor %xnor %+ %-)
-      ((%append lhs-type lhs-value rhs-type rhs-value)
+      ((%append (type expr) ...)
         #`(%%append
-          #,(expr->verilog #'lhs-value)
-          #,(expr->verilog #'rhs-value)))
+          #,@(map expr->verilog (syntaxes expr ...))))
       ((%slice type a shift)
         (lets
           ($shift (datum shift))

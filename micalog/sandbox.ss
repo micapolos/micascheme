@@ -34,9 +34,7 @@
                 (posedge
                   (set clock-3 (not clock-3))))))))
       (output counter
-        (append
-          (append clock-3 clock-2)
-          (append clock-1 clock-0))))))
+        (append clock-3 clock-2 clock-1 clock-0)))))
 
 (newline)
 
