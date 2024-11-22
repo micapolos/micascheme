@@ -4,17 +4,7 @@
   (micac scope)
   (prefix (micalog keywords) %))
 
-(define-syntax (check-typed $syntax)
-  (syntax-case $syntax (raises)
-    ((_ (raises (name arg ... input)))
-      #`(check
-        (raises
-          (#,(identifier-append #'name #'name #'->typed) arg ... #'input))))
-    ((_ (name arg ... input) expected)
-      #`(check
-        (equal?
-          (syntax->datum (#,(identifier-append #'name #'name #'->typed) arg ... #'input))
-          'expected)))))
+(define-check-> typed)
 
 (define $scope
   (scope-with

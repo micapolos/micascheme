@@ -4,23 +4,7 @@
   (prefix (micalog keywords) %)
   (prefix (micac syntax) %%))
 
-(define-case-syntax (check-micac (kind micalog) micac)
-  #`(check
-    (equal?
-      (syntax->datum
-        (
-          #,(identifier-append #'kind #'kind #'->micac)
-          #'micalog))
-      'micac)))
-
-(define-case-syntax (check-micacs (kind micalog ...) micac)
-  #`(check
-    (equal?
-      (syntax->datum
-        (
-          #,(identifier-append #'kind #'kind #'->micacs)
-          #'(micalog ...)))
-      'micac)))
+(define-check-> micac)
 
 (check-micac (value foo) foo)
 (check-micac (value 123) 123)

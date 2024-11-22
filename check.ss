@@ -3,8 +3,9 @@
     checking?
     check
     raises
-    works)
-  (import (scheme))
+    works
+    define-check->)
+  (import (scheme) (identifier))
 
   (define checking? (make-thread-parameter #f))
 
@@ -81,4 +82,19 @@
                       #,ann-string
                       (quote (pred arg ...))
                       (list (quote pred) #,@tmps)))))))))))
+
+  (define-syntax (define-check-> $syntax)
+    (syntax-case $syntax ()
+      ((_ id)
+        #`(define-syntax (#,(identifier-append #'id #'check- #'id) $syntax)
+          (syntax-case $syntax (raises)
+            ((_ (raises (name arg (... ...) input)))
+              #`(check
+                (raises
+                  (#,(identifier-append #'name #'name #'-> #'id) arg (... ...) #'input))))
+            ((_ (name arg (... ...) input) expected)
+              #`(check
+                (equal?
+                  (syntax->datum (#,(identifier-append #'name #'name #'-> #'id) arg (... ...) #'input))
+                  'expected))))))))
 )

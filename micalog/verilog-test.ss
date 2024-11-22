@@ -4,14 +4,7 @@
   (prefix (micalog keywords) %)
   (prefix (verilog keywords) %%))
 
-(define-case-syntax (check-verilog (name micalog) verilog)
-  #`(check
-    (equal?
-      (syntax->datum
-        (
-          #,(identifier-append #'name #'name #'->verilog)
-          #'micalog))
-      'verilog)))
+(define-check-> verilog)
 
 (check-verilog (name foo) foo)
 
