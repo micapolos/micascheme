@@ -45,11 +45,13 @@
           ($data (substring $string $prefix-length $length))
           ($data-length (string-length $data))
           (and (string=? $string-prefix $prefix)
-            (opt-lets
+            (lets
               ($number (string->number $data $radix))
-              #`(
-                #,(literal->syntax (* $data-length $size))
-                #,(literal->syntax $number))))))))
+              (if $number
+                #`(
+                  #,(literal->syntax (* $data-length $size))
+                  #,(literal->syntax $number))
+                (syntax-error $id "illegal digits"))))))))
 
   (define (literal->typed $literal)
     (or
