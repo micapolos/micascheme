@@ -10,11 +10,13 @@
       (only (micalog verilog) module->verilog)
       (module->verilog micalog-module->verilog))
     (only (micalog model) expand-module)
+    (only (micalog typed) module->typed-syntax)
     (micalog keywords))
   (export (import (micalog keywords)))
 
   (define-case-syntax (verilog-string body)
     (fluent #'body
+      (module->typed-syntax)
       (expand-module)
       (micalog-module->verilog)
       (verilog-module->code)
