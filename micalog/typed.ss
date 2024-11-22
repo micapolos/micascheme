@@ -173,10 +173,10 @@
               size
               #,(typed-value $typed-a)
               shift)
-            (syntax-error $slice
+            (syntax-error #'a
               (format "type mismatch ~a, expected ~a in"
-                (syntax->datum #`(%slice #,$type-a shift size))
-                (syntax->datum #`(>= #,$type-a (+ shift size))))))))
+                (syntax->datum $type-a)
+                (syntax->datum #`(>= (+ shift size))))))))
       ((%slice a size)
         (lets
           ($typed-a (scope-expr->typed $scope #'a))
@@ -189,10 +189,10 @@
               size
               #,(typed-value $typed-a)
               0)
-            (syntax-error $slice
+            (syntax-error #'a
               (format "type mismatch ~a, expected ~a in"
-                (syntax->datum #`(%slice #,$type-a size))
-                (syntax->datum #`(>= #,$type-a size)))))))))
+                (syntax->datum $type-a)
+                (syntax->datum #`(>= size)))))))))
 
   (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
     (syntax-case $instr (%wire %set %when %if %on)
