@@ -67,12 +67,12 @@
   (define (scope-id->typed $scope $id)
     #`(#,(binding-type (scope-item $scope $id)) #,$id))
 
-  (define (scope-expr-type->typed $scope $expr $expected-type)
+  (define (scope-type-expr->typed $scope $expected-type $expr)
     (lets
       ($typed (scope-expr->typed $scope $expr))
       ($type (typed-type $typed))
       (if (type=? $type $expected-type)
-        (typed-value $typed)
+        $typed
         (syntax-error $expr
           (format "type mismatch ~a, expected ~a in"
             (syntax->datum $type)
@@ -119,18 +119,12 @@
       ((op a b)
         (lets
           ($typed-a (scope-expr->typed $scope #'a))
-          ($typed-b (scope-expr->typed $scope #'b))
           ($type-a (typed-type $typed-a))
-          ($type-b (typed-type $typed-b))
-          (if (type=? $type-a $type-b)
-            #`(op
-              #,$type-a
-              #,(typed-value $typed-a)
-              #,(typed-value $typed-b))
-            (syntax-error $expr
-              (format "type mismatch ~a, expected ~a in"
-                (syntax->datum #`(op #,$type-a #,$type-b))
-                (syntax->datum #`(op #,$type-a #,$type-a)))))))))
+          ($typed-b (scope-type-expr->typed $scope $type-a #'b))
+          #`(op
+            #,$type-a
+            #,(typed-value $typed-a)
+            #,(typed-value $typed-b))))))
 
   (define (scope-op1/2->typed $scope $expr)
     (syntax-case $expr ()
@@ -141,23 +135,15 @@
     (syntax-case $if (%if)
       ((%if a b c)
         (lets
-          ($typed-a (scope-expr->typed $scope #'a))
+          ($typed-a (scope-type-expr->typed $scope #'1 #'a))
           ($typed-b (scope-expr->typed $scope #'b))
-          ($typed-c (scope-expr->typed $scope #'c))
-          ($type-a (typed-type $typed-a))
           ($type-b (typed-type $typed-b))
-          ($type-c (typed-type $typed-c))
-          (if
-            (and (type=? $type-a #`1) (type=? $type-b $type-c))
-            #`(%if
-              #,$type-b
-              #,(typed-value $typed-a)
-              #,(typed-value $typed-b)
-              #,(typed-value $typed-c))
-            (syntax-error $if
-              (format "type mismatch ~a, expected ~a in"
-                (syntax->datum #`(%if #,$type-a #,$type-b #,$type-c))
-                (syntax->datum #`(%if 1 #,$type-b #,$type-b)))))))))
+          ($typed-c (scope-type-expr->typed $scope $type-b #'c))
+          #`(%if
+            #,$type-b
+            #,(typed-value $typed-a)
+            #,(typed-value $typed-b)
+            #,(typed-value $typed-c))))))
 
   (define (scope-append->typed $scope $append)
     (syntax-case $append (%append)
@@ -222,14 +208,13 @@
           ($id-binding (scope-item $scope #'id))
           ($id-kind (binding-kind $id-binding))
           ($id-type (binding-type $id-binding))
-          ($typed (scope-expr->typed $scope #'expr))
-          ($type (typed-type $typed))
-          (if (and (syntax=? $id-kind #'%register) (type=? $id-type $type))
+          ($typed (scope-type-expr->typed $scope $id-type #'expr))
+          (if (syntax=? $id-kind #'%register)
             (scoped $scope
-              (push $syntaxes #`(%set #,$type id #,(typed-value $typed))))
+              (push $syntaxes #`(%set #,$id-type id #,(typed-value $typed))))
             (syntax-error $instr
               (format "type mismatch ~a, expected ~a in"
-                (syntax->datum #`(%set #,$id-binding #,$type))
+                (syntax->datum #`(%set #,$id-binding #,$id-type))
                 (syntax->datum #`(%set (%register #,$id-type) #,$id-type)))))))))
 
   (define (scope-instrs->typed $scope $instrs)
