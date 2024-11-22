@@ -104,3 +104,12 @@
   (scope-instrs $scope ((%register reg-4 4) (%wire goo-4 foo-4) (%set reg-4 goo-4)))
   ((%wire 4 goo-4 foo-4) (%set 4 reg-4 goo-4)))
 
+(check-typed-syntax (raises (scope-instr $scope (%when foo-4))))
+
+(check-typed-syntax
+  (scope-instr $scope (%when foo-1))
+  (%when foo-1))
+
+(check-typed-syntax
+  (scope-instr $scope (%when foo-1 (%set reg-foo-4 foo-4) (%set reg-bar-8 bar-8)))
+  (%when foo-1 (%set 4 reg-foo-4 foo-4) (%set 8 reg-bar-8 bar-8)))

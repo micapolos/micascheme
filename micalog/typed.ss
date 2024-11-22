@@ -227,6 +227,12 @@
               (format "type mismatch ~a, expected ~a in"
                 (syntax->datum #`(%set #,$id-binding #,$id-type))
                 (syntax->datum #`(%set (%register #,$id-type) #,$id-type)))))))
+      ((%when cond body ...)
+        (scoped $scope
+          (push $syntaxes
+            #`(%when
+              #,(typed-value (scope-type-expr->typed $scope #'1 #'cond))
+              #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...)))))))
       ((%register xs ...)
         (scoped $scope $syntaxes))))
 
