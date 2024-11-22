@@ -22,7 +22,7 @@ module counter_4 (
   always @(posedge clock_0) begin
     clock_1 <= ~clock_1;
   end
-  assign counter = { { clock_3, clock_2 }, { clock_1, clock_0 } };
+  assign counter = { clock_3, clock_2, clock_1, clock_0 };
 endmodule
 
 module funny_module (
