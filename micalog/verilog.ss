@@ -67,11 +67,21 @@
       (syntax-error $declaration)))
 
   (define (instr->verilog? $declaration)
-    (syntax-case $declaration (%set)
+    (syntax-case $declaration (%set %when %if %then %else)
       ((%set type name expr)
         #`(%%set!
           #,(name->verilog #'name)
           #,(expr->verilog #'expr)))
+      ((%when cond body ...)
+        #`(%%cond
+          (#,(expr->verilog #'cond)
+            #,@(filter-opts (map instr->verilog? (syntaxes body ...))))))
+      ((%if cond (%then then ...) (%else els ...))
+        #`(%%cond
+          (#,(expr->verilog #'cond)
+            #,@(filter-opts (map instr->verilog? (syntaxes then ...))))
+          (%%else
+            #,@(filter-opts (map instr->verilog? (syntaxes els ...))))))
       (_ #f)))
 
   (define (instr->verilog $instr)

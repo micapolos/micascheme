@@ -19,6 +19,27 @@
 
 (display
   (verilog-string
+    (module oscillating-registers
+      (input clock 1)
+      (input reset? 1)
+      (input initial 2)
+      (register reg-1 2)
+      (register reg-2 2)
+      (on clock
+        (posedge
+          (if reset?
+            (then
+              (set reg-1 reg-2)
+              (set reg-2 reg-1))
+            (else
+              (set reg-1 initial)
+              (set reg-1 (not initial))))))
+      (output out reg-1))))
+
+(newline)
+
+(display
+  (verilog-string
     (module counter-4
       (input clock-0 1)
       (register clock-1 1)

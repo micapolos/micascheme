@@ -41,7 +41,7 @@
         (flatten (map cdr $pairs)))))
 
   (define (item->declarations-instrs $item)
-    (syntax-case $item (%input %output %register %wire %on %set %assign)
+    (syntax-case $item (%input %output %register %wire %on %set %assign %when %if %then %else)
       ((%input body ...)
         (pair (list $item) (list)))
       ((%output type name)
@@ -91,6 +91,21 @@
                 #`(%on name #,$process)
                 #`(%on name #,$opposite-process)))
             (list))))
+      ((%when cond body ...)
+        (lets
+          ((pair $declarations $instrs)
+            (items->declarations-instrs (syntaxes body ...)))
+          (pair $declarations
+            (list #`(%when cond #,@$instrs)))))
+      ((%if cond (%then then ...) (%else els ...))
+        (lets
+          ((pair $then-declarations $then-instrs)
+            (items->declarations-instrs (syntaxes then ...)))
+          ((pair $else-declarations $else-instrs)
+            (items->declarations-instrs (syntaxes els ...)))
+          (pair
+            (append $then-declarations $else-declarations)
+            (list #`(%if cond (%then #,@$then-instrs) (%else #,@$else-instrs))))))
       ((%set body ...)
         (pair (list) (list $item)))))
 

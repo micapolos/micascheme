@@ -77,6 +77,33 @@
   (%%set! foo bar))
 
 (check-verilog
+  (instr
+    (%when clock
+      (%set 1 foo bar)
+      (%set 2 goo gar)))
+  (%%cond
+    (clock
+      (%%set! foo bar)
+      (%%set! goo gar))))
+
+(check-verilog
+  (instr
+    (%if clock
+      (%then
+        (%set 1 foo bar)
+        (%set 2 goo gar))
+      (%else
+        (%set 1 zoo zar)
+        (%set 2 moo mar))))
+  (%%cond
+    (clock
+      (%%set! foo bar)
+      (%%set! goo gar))
+    (%%else
+      (%%set! zoo zar)
+      (%%set! moo mar))))
+
+(check-verilog
   (module
     (%module my-mod
       (%input 8 in1)

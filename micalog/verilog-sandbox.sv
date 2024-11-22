@@ -9,6 +9,26 @@ module and_gate (
   assign out_and = in_1 & in_2;
 endmodule
 
+module oscillating_registers (
+  input clock,
+  input reset_,
+  input [1:0] initial,
+  output [1:0] out
+);
+  reg [1:0] reg_1;
+  reg [1:0] reg_2;
+  always @(posedge clock) begin
+    if (reset_) begin
+      reg_1 <= reg_2;
+      reg_2 <= reg_1;
+    end else begin
+      reg_1 <= initial;
+      reg_1 <= ~initial;
+    end
+  end
+  assign out = reg_1;
+endmodule
+
 module counter_4 (
   input clock_0,
   output [3:0] counter
