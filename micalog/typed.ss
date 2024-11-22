@@ -2,6 +2,7 @@
   (export
     literal->typed
     expr->typed
+    type->syntax
     scope-expr->typed
     scope-instr->typed-syntax
     scope-instrs->typed-syntax)
@@ -21,6 +22,9 @@
 
   (define (binding $kind $type)
     #`(#,$kind #,$type))
+
+  (define (type->syntax $type)
+    (literal->syntax (type-size $type)))
 
   (define (literal->typed? $literal)
     (syntax-case $literal ()
@@ -191,22 +195,24 @@
   (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
     (syntax-case $instr (%input %output %wire %register %set %when %if %on)
       ((%input id type)
-        (scoped
-          (scope+ $scope (identifier id) (binding #'%wire #'type))
-          (push $syntaxes #`(%input type id))))
+        (lets
+          ($type (type->syntax #'type))
+          (scoped
+            (scope+ $scope (identifier id) (binding #'%wire $type))
+            (push $syntaxes #`(%input #,$type id)))))
       ((%output id expr)
         (lets
           ($typed (scope-expr->typed $scope #'expr))
           ($type (typed-type $typed))
           (scoped
-            (scope+ $scope (identifier id) (binding #'%wire (typed-type $typed)))
+            (scope+ $scope (identifier id) (binding #'%wire $type))
             (push $syntaxes #`(%output #,$type id #,(typed-value $typed))))))
       ((%wire id expr)
         (lets
           ($typed (scope-expr->typed $scope #'expr))
           ($type (typed-type $typed))
           (scoped
-            (scope+ $scope (identifier id) (binding #'%wire (typed-type $typed)))
+            (scope+ $scope (identifier id) (binding #'%wire $type))
             (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))
       ((%set id expr)
         (lets
@@ -232,7 +238,7 @@
       ((%register id type)
         (scope+ $scope
           (identifier id)
-          (binding #'%register #'type)))
+          (binding #'%register (type->syntax #'type))))
       (_
         $scope)))
 

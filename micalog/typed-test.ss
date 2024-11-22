@@ -6,6 +6,7 @@
 
 (define-check-datum-> typed)
 (define-check-datum-> typed-syntax)
+(define-check-datum-> syntax)
 
 (define $scope
   (scope-with
@@ -16,6 +17,11 @@
     (bar-8 (%wire 8))
     (reg-foo-4 (%register 4))
     (reg-bar-8 (%register 8))))
+
+(check-syntax (type 1) 1)
+(check-syntax (type 8) 8)
+(check-syntax (raises (type 0)))
+(check-syntax (raises (type foo)))
 
 (check-typed (literal 0) (1 0))
 (check-typed (literal 1) (1 1))
@@ -74,8 +80,10 @@
 (check-typed (scope-expr $scope (%if foo-1 foo-8 bar-8)) (%if 8 foo-1 foo-8 bar-8))
 
 (check-typed-syntax (scope-instr $scope (%input foo-4 4)) (%input 4 foo-4))
-(check-typed-syntax (scope-instr $scope (%wire foo-4 bar-4)) (%wire 4 foo-4 bar-4))
-(check-typed-syntax (scope-instr $scope (%output foo-4 bar-4)) (%output 4 foo-4 bar-4))
+(check-typed-syntax (raises (scope-instr $scope (%input foo-4 foo))))
+
+(check-typed-syntax (scope-instr $scope (%wire wire-4 foo-4)) (%wire 4 wire-4 foo-4))
+(check-typed-syntax (scope-instr $scope (%output out-4 foo-4)) (%output 4 out-4 foo-4))
 
 (check-typed-syntax (scope-instr $scope (%set reg-foo-4 bar-4)) (%set 4 reg-foo-4 bar-4))
 (check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-4))))
