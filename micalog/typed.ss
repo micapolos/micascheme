@@ -3,8 +3,8 @@
     literal->typed
     expr->typed
     scope-expr->typed
-    scope-instrs->typed
-    scope-instr->typed)
+    scope-instr->typed-syntax
+    scope-instrs->typed-syntax)
   (import
     (micascheme)
     (syntax scope)
@@ -189,17 +189,17 @@
                 (syntax->datum #`(>= size)))))))))
 
   (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
-    (syntax-case $instr (%wire %set %when %if %on)
+    (syntax-case $instr (%wire %register %set %when %if %on)
       ((%wire id expr)
         (lets
           ($typed (scope-expr->typed $scope #'expr))
           ($type (typed-type $typed))
           (scoped
-            (scope+ $scope #'id (binding #'%wire (typed-type $typed)))
+            (scope+ $scope (identifier id) (binding #'%wire (typed-type $typed)))
             (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))
       ((%set id expr)
         (lets
-          ($id-binding (scope-item $scope #'id))
+          ($id-binding (scope-item $scope (identifier id)))
           ($id-kind (binding-kind $id-binding))
           ($id-type (binding-type $id-binding))
           ($typed (scope-type-expr->typed $scope $id-type #'expr))
@@ -209,20 +209,35 @@
             (syntax-error $instr
               (format "type mismatch ~a, expected ~a in"
                 (syntax->datum #`(%set #,$id-binding #,$id-type))
-                (syntax->datum #`(%set (%register #,$id-type) #,$id-type)))))))))
+                (syntax->datum #`(%set (%register #,$id-type) #,$id-type)))))))
+      ((%register xs ...)
+        (scoped $scope $syntaxes))))
 
-  (define (scope-instrs->typed $scope $instrs)
+  (define (scoped-syntaxes+instrs $scoped $instrs)
+    (fold-left scoped-syntaxes+instr $scoped (syntax->list $instrs)))
+
+  (define (scope+instr $scope $instr)
+    (syntax-case $instr (%register)
+      ((%register id type)
+        (scope+ $scope
+          (identifier id)
+          (binding #'%register #'type)))
+      (_
+        $scope)))
+
+  (define (scope+instrs $scope $instrs)
+    (fold-left scope+instr $scope (syntax->list $instrs)))
+
+  (define (scope-instrs->typed-syntax $scope $instrs)
     (fluent
-      (fold-left
-        scoped-syntaxes+instr
-        (scoped $scope (stack))
-        (syntax->list $instrs))
+      (scoped (scope+instrs $scope $instrs) (stack))
+      (scoped-syntaxes+instrs (syntax->list $instrs))
       (scoped-value)
       (reverse)
       (list->syntax)))
 
-  (define (scope-instr->typed $scope $instr)
-    (syntax-single (scope-instrs->typed $scope #`(#,$instr))))
+  (define (scope-instr->typed-syntax $scope $instr)
+    (syntax-single (scope-instrs->typed-syntax $scope #`(#,$instr))))
 
   (define (typed $type $value)
     #`(#,$type #,$value))

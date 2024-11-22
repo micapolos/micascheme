@@ -5,6 +5,7 @@
   (prefix (micalog keywords) %))
 
 (define-check-datum-> typed)
+(define-check-datum-> typed-syntax)
 
 (define $scope
   (scope-with
@@ -72,12 +73,24 @@
 (check-typed (scope-expr $scope (%= foo-4 bar-4)) (%= 4 foo-4 bar-4))
 (check-typed (scope-expr $scope (%if foo-1 foo-8 bar-8)) (%if 8 foo-1 foo-8 bar-8))
 
-(check-typed (scope-instr $scope (%set reg-foo-4 bar-4)) (%set 4 reg-foo-4 bar-4))
-(check-typed (raises (scope-instr $scope (%set foo-4 bar-4))))
-(check-typed (raises (scope-instr $scope (%set foo-4 bar-8))))
+(check-typed-syntax (scope-instr $scope (%set reg-foo-4 bar-4)) (%set 4 reg-foo-4 bar-4))
+(check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-4))))
+(check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-8))))
 
-(check-typed (scope-instr $scope (%wire foo-4 bar-4)) (%wire 4 foo-4 bar-4))
+(check-typed-syntax (scope-instr $scope (%wire foo-4 bar-4)) (%wire 4 foo-4 bar-4))
 
-(check-typed
+(check-typed-syntax
   (scope-instrs $scope ((%wire goo-4 bin-1010) (%set reg-foo-4 goo-4)))
   ((%wire 4 goo-4 #b1010) (%set 4 reg-foo-4 goo-4)))
+
+(check-typed-syntax
+  (raises (scope-instrs $scope ((%set reg-4 foo-4)))))
+
+(check-typed-syntax
+  (scope-instrs $scope ((%register reg-4 4) (%set reg-4 foo-4)))
+  ((%set 4 reg-4 foo-4)))
+
+(check-typed-syntax
+  (scope-instrs $scope ((%register reg-4 4) (%wire goo-4 foo-4) (%set reg-4 goo-4)))
+  ((%wire 4 goo-4 foo-4) (%set 4 reg-4 goo-4)))
+
