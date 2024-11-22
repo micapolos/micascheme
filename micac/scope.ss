@@ -7,7 +7,8 @@
     scope-transformer
     scope-transform
     scope-unbound
-    scope-gen?)
+    scope-gen?
+    scope-with)
   (import (micascheme))
 
   (define scope-gen?
@@ -46,4 +47,8 @@
 
   (define (scope-unbound $id)
     (syntax-error $id "unbound identifier"))
+
+  (define-rule-syntax (scope-with (id item) ...)
+    (fluent (empty-scope)
+      (scope+ #'id #'item) ...))
 )

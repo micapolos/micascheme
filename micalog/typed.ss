@@ -1,7 +1,8 @@
 (library (micalog typed)
   (export
     literal->typed
-    expr->typed)
+    expr->typed
+    scope-expr->typed)
   (import
     (micascheme)
     (micac scope)
@@ -12,47 +13,54 @@
       (0 #`(1 0))
       (1 #`(1 1))
       (id (identifier? #'id)
-        (or
-          (lets
-            ($string (symbol->string (datum id)))
-            ($length (string-length $string))
-            ($prefix-template "xxx-")
-            ($prefix-length (string-length $prefix-template))
-            (and (> $length $prefix-length)
-              (lets
-                ($prefix (substring $string 0 $prefix-length))
-                ($data (substring $string $prefix-length $length))
-                ($data-length (string-length $data))
-                (case $prefix
-                  (("bin-")
-                    #`(
-                      #,(literal->syntax $data-length)
-                      #,(literal->syntax (string->number $data 2))))
-                  (("hex-")
-                    #`(
-                      #,(literal->syntax (* $data-length 4))
-                      #,(literal->syntax (string->number $data 16))))
-                  (("oct-")
-                    #`(
-                      #,(literal->syntax (* $data-length 3))
-                      #,(literal->syntax (string->number $data 8))))
-                  (else #f)))))
-            (syntax-error $literal "invalid literal")))))
+        (lets
+          ($string (symbol->string (datum id)))
+          ($length (string-length $string))
+          ($prefix-template "xxx-")
+          ($prefix-length (string-length $prefix-template))
+          (and (> $length $prefix-length)
+            (lets
+              ($prefix (substring $string 0 $prefix-length))
+              ($data (substring $string $prefix-length $length))
+              ($data-length (string-length $data))
+              (case $prefix
+                (("bin-")
+                  #`(
+                    #,(literal->syntax $data-length)
+                    #,(literal->syntax (string->number $data 2))))
+                (("hex-")
+                  #`(
+                    #,(literal->syntax (* $data-length 4))
+                    #,(literal->syntax (string->number $data 16))))
+                (("oct-")
+                  #`(
+                    #,(literal->syntax (* $data-length 3))
+                    #,(literal->syntax (string->number $data 8))))
+                (else #f))))))
+      (else #f)))
 
   (define (literal->typed $literal)
     (or
       (literal->typed? $literal)
-      (syntax-error $literal)))
+      (syntax-error $literal "invalid literal")))
+
+  (define (scope-id->typed $scope $id)
+    (or
+      (scope-ref $scope $id)
+      (syntax-error $id "not bound")))
 
   (define (scope-expr->typed $scope $expr)
-    (syntax-case $expr ()
-      ((%= a b) (scope-op2->typed $scope $expr))
-      ((%!= a b) (scope-op2->typed $scope $expr))
-      ((%< a b) (scope-op2->typed $scope $expr))
-      ((%<= a b) (scope-op2->typed $scope $expr))
-      ((%> a b) (scope-op2->typed $scope $expr))
-      ((%>= a b) (scope-op2->typed $scope $expr))
-      (literal (literal->typed #'literal))))
+    (or
+      (literal->typed? $expr)
+      (syntax-case $expr (%= %!= %< %<= %> %>= let)
+        ((%= a b) (scope-op2->typed $scope $expr))
+        ((%!= a b) (scope-op2->typed $scope $expr))
+        ((%< a b) (scope-op2->typed $scope $expr))
+        ((%<= a b) (scope-op2->typed $scope $expr))
+        ((%> a b) (scope-op2->typed $scope $expr))
+        ((%>= a b) (scope-op2->typed $scope $expr))
+        (id (identifier? #'id)
+          (scope-id->typed $scope #'id)))))
 
   (define expr->typed
     (partial scope-expr->typed (empty-scope)))

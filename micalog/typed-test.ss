@@ -1,13 +1,25 @@
 (import
   (micascheme)
   (micalog typed)
+  (micac scope)
   (prefix (micalog keywords) %))
 
-(define-case-syntax (check-typed (name in) out)
+(define-case-syntax (check-typed (name arg ... in) out)
   #`(check
     (equal?
-      (syntax->datum (#,(identifier-append #'name #'name #'->typed) #'in))
+      (syntax->datum
+        (
+          #,(identifier-append #'name #'name #'->typed)
+          arg ...
+          #'in))
       'out)))
+
+(define $scope
+  (scope-with
+    (foo-4 (4 foo))
+    (bar-4 (4 bar))
+    (foo-8 (8 foo))
+    (bar-8 (8 bar))))
 
 (check-typed (literal 0) (1 0))
 (check-typed (literal 1) (1 1))
@@ -23,3 +35,5 @@
 (check-typed (expr (%<= bin-1101 hex-a)) (%<= 4 #b1101 #xa))
 (check-typed (expr (%> bin-1101 hex-a)) (%> 4 #b1101 #xa))
 (check-typed (expr (%>= bin-1101 hex-a)) (%>= 4 #b1101 #xa))
+
+(check-typed (scope-expr $scope foo-4) (4 foo))
