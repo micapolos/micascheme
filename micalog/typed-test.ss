@@ -113,3 +113,13 @@
 (check-typed-syntax
   (scope-instr $scope (%when foo-1 (%set reg-foo-4 foo-4) (%set reg-bar-8 bar-8)))
   (%when foo-1 (%set 4 reg-foo-4 foo-4) (%set 8 reg-bar-8 bar-8)))
+
+(check-typed-syntax (raises (scope-instr $scope (%if foo-4 (%then) (%else)))))
+
+(check-typed-syntax
+  (scope-instr $scope (%if foo-1 (%then) (%else)))
+  (%if foo-1 (%then) (%else)))
+
+(check-typed-syntax
+  (scope-instr $scope (%if foo-1 (%then (%set reg-foo-4 foo-4)) (%else (%set reg-bar-8 bar-8))))
+  (%if foo-1 (%then (%set 4 reg-foo-4 foo-4)) (%else (%set 8 reg-bar-8 bar-8))))

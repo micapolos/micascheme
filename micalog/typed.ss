@@ -193,7 +193,7 @@
                 (syntax->datum #`(>= size)))))))))
 
   (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
-    (syntax-case $instr (%input %output %wire %register %set %when %if %on)
+    (syntax-case $instr (%input %output %wire %register %set %when %if %then %else %on)
       ((%input id type)
         (lets
           ($type (type->syntax #'type))
@@ -233,6 +233,13 @@
             #`(%when
               #,(typed-value (scope-type-expr->typed $scope #'1 #'cond))
               #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...)))))))
+      ((%if cond (%then then ...) (%else els ...))
+        (scoped $scope
+          (push $syntaxes
+            #`(%if
+              #,(typed-value (scope-type-expr->typed $scope #'1 #'cond))
+              (%then #,@(syntax->list (scope-instrs->typed-syntax $scope #'(then ...))))
+              (%else #,@(syntax->list (scope-instrs->typed-syntax $scope #'(els ...))))))))
       ((%register xs ...)
         (scoped $scope $syntaxes))))
 

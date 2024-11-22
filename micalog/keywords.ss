@@ -2,13 +2,13 @@
   (export
     module input output internal
     process init update
-    define on cond else
+    define on cond
     posedge negedge
     register set
     wire assign
     expr
     = != < <= > >=
-    if
+    if then else
     append slice
     + -
     and or xor nand nor xnor not inv
@@ -18,13 +18,13 @@
   (define-aux-keywords
     module input output internal
     process init update
-    define on cond else
+    define on cond
     posedge negedge
     register set
     wire assign
     expr
     = != < <= > >=
-    if
+    if then else
     append slice
     + -
     and or xor nand nor xnor not inv
