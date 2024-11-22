@@ -10,6 +10,7 @@
     (micascheme)
     (syntax scope)
     (syntax scoped)
+    (only (micalog model) opposite-edges?)
     (prefix (micalog keywords) %))
 
   (define (binding-kind $binding)
@@ -25,6 +26,11 @@
 
   (define (type->syntax $type)
     (literal->syntax (type-size $type)))
+
+  (define (edge->syntax $edge)
+    (syntax-case $edge (%posedge %negedge)
+      (%posedge #'%posedge)
+      (%negedge #'%negedge)))
 
   (define (literal->typed? $literal)
     (syntax-case $literal ()
@@ -240,6 +246,23 @@
               #,(typed-value (scope-type-expr->typed $scope #'1 #'cond))
               (%then #,@(syntax->list (scope-instrs->typed-syntax $scope #'(then ...))))
               (%else #,@(syntax->list (scope-instrs->typed-syntax $scope #'(els ...))))))))
+      ((%on clock (edge body ...))
+        (scoped $scope
+          (push $syntaxes
+            #`(%on
+              #,(typed-value (scope-type-expr->typed $scope #'1 #'clock))
+              (#,(edge->syntax #'edge)
+                #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...))))))))
+      ((%on clock (edge body ...) (other-edge other-body ...))
+        (opposite-edges? #'edge #'other-edge)
+        (scoped $scope
+          (push $syntaxes
+            #`(%on
+              #,(typed-value (scope-type-expr->typed $scope #'1 #'clock))
+              (#,(edge->syntax #'edge)
+                #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...))))
+              (#,(edge->syntax #'other-edge)
+                #,@(syntax->list (scope-instrs->typed-syntax $scope #'(other-body ...))))))))
       ((%register xs ...)
         (scoped $scope $syntaxes))))
 
