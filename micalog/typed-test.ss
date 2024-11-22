@@ -42,42 +42,42 @@
 
 (check-typed (expr bin-101) (3 #b101))
 
-(check-typed (expr (%append bin-10 hex-af)) (%append 10 #b10 #xaf))
+(check-typed (expr (%append bin-10 hex-af)) (10 (%append 10 #b10 #xaf)))
 
-(check-typed (expr (%slice bin-11001010 6)) (%slice 6 #b11001010 0))
-(check-typed (expr (%slice bin-11001010 8)) (%slice 8 #b11001010 0))
-(check-typed (expr (%slice bin-11001010 2 4)) (%slice 4 #b11001010 2))
+(check-typed (expr (%slice bin-11001010 6)) (6 (%slice 6 #b11001010 0)))
+(check-typed (expr (%slice bin-11001010 8)) (8 (%slice 8 #b11001010 0)))
+(check-typed (expr (%slice bin-11001010 2 4)) (4 (%slice 4 #b11001010 2)))
 (check-typed (raises (expr (%slice bin-11001010 0))))
 (check-typed (raises (expr (%slice bin-11001010 2 0))))
 (check-typed (raises (expr (%slice bin-11001010 9))))
 (check-typed (raises (expr (%slice bin-11001010 4 5))))
 
-(check-typed (expr (%= bin-1101 hex-a)) (%= 4 #b1101 #xa))
-(check-typed (expr (%!= bin-1101 hex-a)) (%!= 4 #b1101 #xa))
-(check-typed (expr (%< bin-1101 hex-a)) (%< 4 #b1101 #xa))
-(check-typed (expr (%<= bin-1101 hex-a)) (%<= 4 #b1101 #xa))
-(check-typed (expr (%> bin-1101 hex-a)) (%> 4 #b1101 #xa))
-(check-typed (expr (%>= bin-1101 hex-a)) (%>= 4 #b1101 #xa))
+(check-typed (expr (%= bin-1101 hex-a)) (1 (%= 4 #b1101 #xa)))
+(check-typed (expr (%!= bin-1101 hex-a)) (1 (%!= 4 #b1101 #xa)))
+(check-typed (expr (%< bin-1101 hex-a)) (1 (%< 4 #b1101 #xa)))
+(check-typed (expr (%<= bin-1101 hex-a)) (1 (%<= 4 #b1101 #xa)))
+(check-typed (expr (%> bin-1101 hex-a)) (1 (%> 4 #b1101 #xa)))
+(check-typed (expr (%>= bin-1101 hex-a)) (1 (%>= 4 #b1101 #xa)))
 
 (check-typed (raises (expr (%= bin-1101 hex-af))))
 
-(check-typed (expr (%not bin-1101)) (%not 4 #b1101))
-(check-typed (expr (%and bin-1101 hex-a)) (%and 4 #b1101 #xa))
-(check-typed (expr (%or bin-1101 hex-a)) (%or 4 #b1101 #xa))
-(check-typed (expr (%xor bin-1101 hex-a)) (%xor 4 #b1101 #xa))
-(check-typed (expr (%nand bin-1101 hex-a)) (%nand 4 #b1101 #xa))
-(check-typed (expr (%nor bin-1101 hex-a)) (%nor 4 #b1101 #xa))
-(check-typed (expr (%xnor bin-1101 hex-a)) (%xnor 4 #b1101 #xa))
+(check-typed (expr (%not bin-1101)) (4 (%not 4 #b1101)))
+(check-typed (expr (%and bin-1101 hex-a)) (4 (%and 4 #b1101 #xa)))
+(check-typed (expr (%or bin-1101 hex-a)) (4 (%or 4 #b1101 #xa)))
+(check-typed (expr (%xor bin-1101 hex-a)) (4 (%xor 4 #b1101 #xa)))
+(check-typed (expr (%nand bin-1101 hex-a)) (4 (%nand 4 #b1101 #xa)))
+(check-typed (expr (%nor bin-1101 hex-a)) (4 (%nor 4 #b1101 #xa)))
+(check-typed (expr (%xnor bin-1101 hex-a)) (4 (%xnor 4 #b1101 #xa)))
 
-(check-typed (expr (%- bin-1101)) (%- 4 #b1101))
-(check-typed (expr (%+ bin-1101 hex-a)) (%+ 4 #b1101 #xa))
-(check-typed (expr (%- bin-1101 hex-a)) (%- 4 #b1101 #xa))
+(check-typed (expr (%- bin-1101)) (4 (%- 4 #b1101)))
+(check-typed (expr (%+ bin-1101 hex-a)) (4 (%+ 4 #b1101 #xa)))
+(check-typed (expr (%- bin-1101 hex-a)) (4 (%- 4 #b1101 #xa)))
 
-(check-typed (expr (%if bin-1 bin-1101 hex-a)) (%if 4 #b1 #b1101 #xa))
+(check-typed (expr (%if bin-1 bin-1101 hex-a)) (4 (%if 4 #b1 #b1101 #xa)))
 
 (check-typed (scope-expr $scope foo-4) (4 foo-4))
-(check-typed (scope-expr $scope (%= foo-4 bar-4)) (%= 4 foo-4 bar-4))
-(check-typed (scope-expr $scope (%if foo-1 foo-8 bar-8)) (%if 8 foo-1 foo-8 bar-8))
+(check-typed (scope-expr $scope (%= foo-4 bar-4)) (1 (%= 4 foo-4 bar-4)))
+(check-typed (scope-expr $scope (%if foo-1 foo-8 bar-8)) (8 (%if 8 foo-1 foo-8 bar-8)))
 
 (check-typed-syntax (scope-instr $scope (%input foo-4 4)) (%input 4 foo-4))
 (check-typed-syntax (raises (scope-instr $scope (%input foo-4 foo))))
@@ -160,3 +160,37 @@
       (%set 4 reg-foo-4 foo-4))
     (%negedge
       (%set 8 reg-bar-8 foo-8))))
+
+(check-typed-syntax
+  (module (%module empty))
+  (%module empty))
+
+(check-typed-syntax
+  (module
+    (%module bypass-8
+      (%input in 8)
+      (%output out in)))
+  (%module bypass-8
+    (%input 8 in)
+    (%output 8 out in)))
+
+(check-typed-syntax
+  (module
+    (%module and-gate
+      (%input clock 1)
+      (%input in-1 8)
+      (%input in-2 8)
+      (%output out
+        (%append
+          (%and in-1 in-2)
+          clock))))
+  (%module and-gate
+    (%input 1 clock)
+    (%input 8 in-1)
+    (%input 8 in-2)
+    (%output 9 out
+      (%append 9
+        (%and 8 in-1 in-2)
+        clock))))
+
+

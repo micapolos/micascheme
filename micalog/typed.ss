@@ -5,7 +5,8 @@
     type->syntax
     scope-expr->typed
     scope-instr->typed-syntax
-    scope-instrs->typed-syntax)
+    scope-instrs->typed-syntax
+    module->typed-syntax)
   (import
     (micascheme)
     (syntax scope)
@@ -89,12 +90,12 @@
         (id (identifier? #'id) (scope-id->typed $scope #'id))
         ((%append x ...) (scope-append->typed $scope $expr))
         ((%slice x ...) (scope-slice->typed $scope $expr))
-        ((%= x ...) (scope-op2->typed $scope $expr))
-        ((%!= x ...) (scope-op2->typed $scope $expr))
-        ((%< x ...) (scope-op2->typed $scope $expr))
-        ((%<= x ...) (scope-op2->typed $scope $expr))
-        ((%> x ...) (scope-op2->typed $scope $expr))
-        ((%>= x ...) (scope-op2->typed $scope $expr))
+        ((%= x ...) (scope-type-op2->typed $scope #'1 $expr))
+        ((%!= x ...) (scope-type-op2->typed $scope #'1 $expr))
+        ((%< x ...) (scope-type-op2->typed $scope #'1 $expr))
+        ((%<= x ...) (scope-type-op2->typed $scope #'1 $expr))
+        ((%> x ...) (scope-type-op2->typed $scope #'1 $expr))
+        ((%>= x ...) (scope-type-op2->typed $scope #'1 $expr))
         ((%not x ...) (scope-op1->typed $scope $expr))
         ((%and x ...) (scope-op2->typed $scope $expr))
         ((%or x ...) (scope-op2->typed $scope $expr))
@@ -114,9 +115,23 @@
       ((op a)
         (lets
           ($typed-a (scope-expr->typed $scope #'a))
-          #`(op
-            #,(typed-type $typed-a)
-            #,(typed-value $typed-a))))))
+          ($type-a (typed-type $typed-a))
+          (typed $type-a
+            #`(op #,$type-a
+              #,(typed-value $typed-a)))))))
+
+  (define (scope-type-op2->typed $scope $type $expr)
+    (syntax-case $expr ()
+      ((op a b)
+        (lets
+          ($typed-a (scope-expr->typed $scope #'a))
+          ($type-a (typed-type $typed-a))
+          ($typed-b (scope-type-expr->typed $scope $type-a #'b))
+          (typed $type
+            #`(op
+              #,$type-a
+              #,(typed-value $typed-a)
+              #,(typed-value $typed-b)))))))
 
   (define (scope-op2->typed $scope $expr)
     (syntax-case $expr ()
@@ -125,10 +140,11 @@
           ($typed-a (scope-expr->typed $scope #'a))
           ($type-a (typed-type $typed-a))
           ($typed-b (scope-type-expr->typed $scope $type-a #'b))
-          #`(op
-            #,$type-a
-            #,(typed-value $typed-a)
-            #,(typed-value $typed-b))))))
+          (typed $type-a
+            #`(op
+              #,$type-a
+              #,(typed-value $typed-a)
+              #,(typed-value $typed-b)))))))
 
   (define (scope-op1/2->typed $scope $expr)
     (syntax-case $expr ()
@@ -143,11 +159,12 @@
           ($typed-b (scope-expr->typed $scope #'b))
           ($type-b (typed-type $typed-b))
           ($typed-c (scope-type-expr->typed $scope $type-b #'c))
-          #`(%if
-            #,$type-b
-            #,(typed-value $typed-a)
-            #,(typed-value $typed-b)
-            #,(typed-value $typed-c))))))
+          (typed $type-b
+            #`(%if
+              #,$type-b
+              #,(typed-value $typed-a)
+              #,(typed-value $typed-b)
+              #,(typed-value $typed-c)))))))
 
   (define (scope-append->typed $scope $append)
     (syntax-case $append (%append)
@@ -157,10 +174,12 @@
           ($typed-b (scope-expr->typed $scope #'b))
           ($type-a (typed-type $typed-a))
           ($type-b (typed-type $typed-b))
-          #`(%append
-            #,(size->type (+ (type-size $type-a) (type-size $type-b)))
-            #,(typed-value $typed-a)
-            #,(typed-value $typed-b))))))
+          ($type (size->type (+ (type-size $type-a) (type-size $type-b))))
+          (typed $type
+            #`(%append
+              #,$type
+              #,(typed-value $typed-a)
+              #,(typed-value $typed-b)))))))
 
   (define (scope-slice->typed $scope $slice)
     (syntax-case $slice (%slice)
@@ -173,10 +192,11 @@
           ($size (type-size #'size))
           (if
             (>= $a-size (+ $shift $size))
-            #`(%slice
-              size
-              #,(typed-value $typed-a)
-              shift)
+            (typed #'size
+              #`(%slice
+                size
+                #,(typed-value $typed-a)
+                shift))
             (syntax-error #'a
               (format "type mismatch ~a, expected ~a in"
                 (syntax->datum $type-a)
@@ -189,10 +209,11 @@
           ($size (type-size #'size))
           (if
             (>= $a-size $size)
-            #`(%slice
-              size
-              #,(typed-value $typed-a)
-              0)
+            (typed #'size
+              #`(%slice
+                size
+                #,(typed-value $typed-a)
+                0))
             (syntax-error #'a
               (format "type mismatch ~a, expected ~a in"
                 (syntax->datum $type-a)
@@ -288,6 +309,15 @@
       (scoped-value)
       (reverse)
       (list->syntax)))
+
+  (define (module->typed-syntax $module)
+    (syntax-case $module ()
+      ((%module name body ...)
+        #`(%module #,(identifier name)
+          #,@(syntax->list
+            (scope-instrs->typed-syntax
+              (empty-scope)
+              #'(body ...)))))))
 
   (define (scope-instr->typed-syntax $scope $instr)
     (syntax-single (scope-instrs->typed-syntax $scope #`(#,$instr))))
