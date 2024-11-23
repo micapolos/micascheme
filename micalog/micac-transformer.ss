@@ -14,6 +14,11 @@
     (prefix (micac) %%)
     (prefix (micac lib emu) %%))
 
+  ; Requirements:
+  ; - fully typed
+  ; - registers, inputs and outputs at the top-level
+  ; - explicit capture registers to access previous values
+  ; - on statement with explicit "from" and "to" values
   (define (module->micac $module)
     (syntax-case $module (%module)
       ((%module name statement ...)
@@ -35,38 +40,44 @@
   (define (input-param->micac $input)
     (syntax-case $input (%input)
       ((%input type name)
-        (id->micac #'name))))
+        (name->micac #'name))))
 
   (define (register->micac $statement)
     (syntax-case $statement (%register)
       ((%register type name)
         #`(%%var
           #,(type->micac #'type)
-          #,(id->micac #'name)))))
+          #,(name->micac #'name)))))
 
   (define (instruction->micac $statement)
-    (syntax-case $statement (%output %wire %set %on)
+    (syntax-case $statement (%capture %output %wire %set %on)
+      ((%capture type name expr)
+        #`(%%const
+          #,(type->micac #'type)
+          #,(name->micac #'name)
+          #,(expr->micac #'name)))
       ((%output type name)
         #`(%%var
           #,(type->micac #'type)
-          #,(id->micac #'name)))
-      ((%wire type name)
-        #`(%%var
+          #,(name->micac #'name)))
+      ((%wire type name expr)
+        #`(%%const
           #,(type->micac #'type)
-          #,(id->micac #'name)))
+          #,(name->micac #'name)
+          #,(expr->micac #'expr)))
       ((%set type name expr)
         #`(%%set
-          #,(id->micac #'name)
+          #,(name->micac #'name)
           #,(expr->micac #'expr)))
-      ((%on (capture-id id) (edge statement ...))
-        #`(%%when (%%not (%%= #,(id->micac #'capture-id) #,(id->micac #'id)))
-          (%%set #,(id->micac #'capture-id) #,(id->micac #'id))
-          (%%when (%%= #,(id->micac #'id) #,(edge->micac #'edge))
+      ((%on (capture-name name) (edge statement ...))
+        #`(%%when (%%not (%%= #,(name->micac #'capture-name) #,(name->micac #'name)))
+          (%%set #,(name->micac #'capture-name) #,(name->micac #'name))
+          (%%when (%%= #,(name->micac #'name) #,(edge->micac #'edge))
             #,@(map instruction->micac (syntaxes statement ...)))))
-      ((%on (capture-id id) (edge statement ...) (%else else-statement ...))
-        #`(%%when (%%not (%%= #,(id->micac #'capture-id) #,(id->micac #'id)))
-          (%%set #,(id->micac #'capture-id) #,(id->micac #'id))
-          (%%if (%%= #,(id->micac #'id) #,(edge->micac #'edge))
+      ((%on (capture-name name) (edge statement ...) (%else else-statement ...))
+        #`(%%when (%%not (%%= #,(name->micac #'capture-id) #,(name->micac #'name)))
+          (%%set #,(name->micac #'capture-name) #,(name->micac #'name))
+          (%%if (%%= #,(name->micac #'name) #,(edge->micac #'edge))
             (%%then #,@(map instruction->micac (syntaxes statement ...)))
             (%%else #,@(map instruction->micac (syntaxes else-statement ...))))))))
 
@@ -78,7 +89,7 @@
   (define (value->micac $value)
     (syntax-case $value ()
       (id (identifier? #'id)
-        (id->micac #'id))
+        (name->micac #'id))
       (integer (integer? (datum integer))
         #'integer)))
 
@@ -209,7 +220,7 @@
             ((<= $number 64) #'%%uint64_t)
             (else (syntax-error $size)))))))
 
-  (define (id->micac $id) $id)
+  (define (name->micac $id) $id)
 
   (define (size-micac-mask $size $micac)
     #`(%%bitwise-and
