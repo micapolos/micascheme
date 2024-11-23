@@ -37,3 +37,8 @@
   (equal?
     (syntax->datum (domain+ #'((clock-1 %posedge) (clock-2 %negedge)) #'((clock-1 %posedge))))
     '((clock-1 %posedge))))
+
+(check
+  (equal?
+    (syntax->datum (domain+ #'((clock-1 %posedge) (clock-2 %negedge)) #'((clock-1 %posedge) (clock-2 %negedge))))
+    '((clock-1 %posedge) (clock-2 %negedge))))
