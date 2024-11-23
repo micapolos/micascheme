@@ -41,7 +41,7 @@
         (flatten (map cdr $pairs)))))
 
   (define (item->declarations-instrs $item)
-    (syntax-case $item (%input %output %register %wire %on %set %assign %when %if %then %else)
+    (syntax-case $item (%input %output %register %wire %on %set %assign %cond %else)
       ((%input body ...)
         (pair (list $item) (list)))
       ((%output type name)
@@ -91,23 +91,39 @@
                 #`(%on name #,$process)
                 #`(%on name #,$opposite-process)))
             (list))))
-      ((%when cond body ...)
+      ((%cond clause ... (%else body ...))
+        (lets
+          ($clause-pairs
+            (map clause->declarations-clause (syntaxes clause ...)))
+          ((pair $else-declarations $else-instrs)
+            (items->declarations-instrs (syntaxes body ...)))
+          (pair
+            (append
+              (flatten (map car $clause-pairs))
+              $else-declarations)
+            (list
+              #`(%cond
+                #,@(map cdr $clause-pairs)
+                (%else #,@$else-instrs))))))
+      ((%cond clause-1 clause ...)
+        (lets
+          ($clause-pairs
+            (map clause->declarations-clause (syntaxes clause-1 clause ...)))
+          (pair
+            (flatten (map car $clause-pairs))
+            (list #`(%cond #,@(map cdr $clause-pairs))))))
+      ((%set body ...)
+        (pair (list) (list $item)))))
+
+  (define (clause->declarations-clause $clause)
+    (syntax-case $clause ()
+      ((cond body ...)
         (lets
           ((pair $declarations $instrs)
             (items->declarations-instrs (syntaxes body ...)))
-          (pair $declarations
-            (list #`(%when cond #,@$instrs)))))
-      ((%if cond (%then then ...) (%else els ...))
-        (lets
-          ((pair $then-declarations $then-instrs)
-            (items->declarations-instrs (syntaxes then ...)))
-          ((pair $else-declarations $else-instrs)
-            (items->declarations-instrs (syntaxes els ...)))
           (pair
-            (append $then-declarations $else-declarations)
-            (list #`(%if cond (%then #,@$then-instrs) (%else #,@$else-instrs))))))
-      ((%set body ...)
-        (pair (list) (list $item)))))
+            $declarations
+            #`(cond #,@$instrs))))))
 
   (define (process->declarations-process $item)
     (syntax-case $item ()

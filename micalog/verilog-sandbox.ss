@@ -16,8 +16,8 @@
     (register reg-2 2)
     (on clock
       (posedge
-        (if reset?
-          (then
+        (cond
+          (reset?
             (set reg-1 initial)
             (set reg-2 (not initial)))
           (else
@@ -56,8 +56,8 @@
     (register counter 16)
     (on clock
       (posedge
-        (wire inc-counter (+ counter hex-0001))
-        (wire dec-counter (- counter hex-0001))
-        (wire updated-counter (if mouse-pressed? inc-counter dec-counter))
-        (set counter (if reset? mouse-x updated-counter))))
+        (cond
+          (reset? (set counter mouse-x))
+          (mouse-pressed? (set counter (+ counter hex-0001)))
+          (else (set counter (- counter hex-0001))))))
     (output out counter)))

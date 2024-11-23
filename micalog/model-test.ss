@@ -87,26 +87,27 @@
 
 (check-flattens
   (%module mod
-    (%when clock
-      (%register 1 reg-1)
-      (%set 1 reg-1 val-1)))
+    (%cond
+      (clock
+        (%register 1 reg-1)
+        (%set 1 reg-1 val-1))))
   (%module mod
     (%register 1 reg-1)
-    (%when clock (%set 1 reg-1 val-1))))
+    (%cond (clock (%set 1 reg-1 val-1)))))
 
 (check-flattens
   (%module mod
-    (%if clock
-      (%then
+    (%cond
+      (clock
         (%register 1 reg-1)
         (%set 1 reg-1 val-1))
       (%else
         (%register 2 reg-2)
         (%set 1 reg-2 val-2))))
-   (%module mod
+  (%module mod
     (%register 1 reg-1)
     (%register 2 reg-2)
-    (%if clock
-      (%then (%set 1 reg-1 val-1))
+    (%cond
+      (clock (%set 1 reg-1 val-1))
       (%else (%set 1 reg-2 val-2)))))
 

@@ -21,7 +21,7 @@ module oscillating_registers (
     if (reset_) begin
       reg_1 <= _initial;
       reg_2 <= ~_initial;
-    end else begin
+    end else if (%else) begin
       reg_1 <= reg_2;
       reg_2 <= reg_1;
     end
@@ -75,14 +75,14 @@ module funny_module (
   output [15:0] out
 );
   reg [15:0] counter;
-  wire [15:0] inc_counter;
-  assign inc_counter = counter + 1;
-  wire [15:0] dec_counter;
-  assign dec_counter = counter - 1;
-  wire [15:0] updated_counter;
-  assign updated_counter = mouse_pressed_ ? inc_counter : dec_counter;
   always @(posedge clock) begin
-    counter <= reset_ ? mouse_x : updated_counter;
+    if (reset_) begin
+      counter <= mouse_x;
+    end else if (mouse_pressed_) begin
+      counter <= counter + 1;
+    end else if (%else) begin
+      counter <= counter - 1;
+    end
   end
   assign out = counter;
 endmodule

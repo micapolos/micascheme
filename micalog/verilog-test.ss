@@ -78,9 +78,10 @@
 
 (check-verilog
   (instr
-    (%when clock
-      (%set 1 foo bar)
-      (%set 2 goo gar)))
+    (%cond
+      (clock
+        (%set 1 foo bar)
+        (%set 2 goo gar))))
   (%%cond
     (clock
       (%%set! foo bar)

@@ -218,7 +218,7 @@
                 (syntax->datum #`(>= size)))))))))
 
   (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
-    (syntax-case $instr (%input %output %wire %register %set %when %if %then %else %on)
+    (syntax-case $instr (%input %output %wire %register %set %cond %else %on)
       ((%input id type)
         (lets
           ($type (type->syntax #'type))
@@ -258,19 +258,17 @@
               (format "type mismatch ~a, expected ~a in"
                 (syntax->datum #`(%set #,$id-binding #,$id-type))
                 (syntax->datum #`(%set (%register #,$id-type) #,$id-type)))))))
-      ((%when cond body ...)
+      ((%cond clause ... (%else els ...))
         (scoped $scope
           (push $syntaxes
-            #`(%when
-              #,(typed-value (scope-type-expr->typed $scope #'1 #'cond))
-              #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...)))))))
-      ((%if cond (%then then ...) (%else els ...))
-        (scoped $scope
-          (push $syntaxes
-            #`(%if
-              #,(typed-value (scope-type-expr->typed $scope #'1 #'cond))
-              (%then #,@(syntax->list (scope-instrs->typed-syntax $scope #'(then ...))))
+            #`(%cond
+              #,@(map (partial scope-clause->typed-syntax $scope) (syntaxes clause ...))
               (%else #,@(syntax->list (scope-instrs->typed-syntax $scope #'(els ...))))))))
+      ((%cond clause clause* ...)
+        (scoped $scope
+          (push $syntaxes
+            #`(%cond
+              #,@(map (partial scope-clause->typed-syntax $scope) (syntaxes clause clause* ...))))))
       ((%on clock (edge body ...))
         (scoped $scope
           (push $syntaxes
@@ -288,6 +286,13 @@
                 #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...))))
               (#,(edge->syntax #'other-edge)
                 #,@(syntax->list (scope-instrs->typed-syntax $scope #'(other-body ...))))))))))
+
+  (define (scope-clause->typed-syntax $scope $clause)
+    (syntax-case $clause ()
+      ((cond body ...)
+        #`(
+          #,(typed-value (scope-type-expr->typed $scope #'1 #'cond))
+          #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...)))))))
 
   (define (scoped-syntaxes+instrs $scoped $instrs)
     (fold-left scoped-syntaxes+instr $scoped (syntax->list $instrs)))
