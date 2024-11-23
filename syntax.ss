@@ -27,7 +27,6 @@
     transform
     syntaxes
     syntax-subst
-    syntax-contains?
     syntax-case?
     syntax-cons
     syntax-car
@@ -254,17 +253,6 @@
       (((a . b) (c . d))
         (syntax-subst #'b #'d
           (syntax-subst #'a #'c $syntax)))))
-
-  (define (syntax-contains? $syntax $id)
-    (syntax-case $syntax ()
-      (()
-        #f)
-      (x (identifier? #'x)
-        (free-identifier=? #'x $id))
-      ((x . y)
-        (or
-          (syntax-contains? #'x $id)
-          (syntax-contains? #'y $id)))))
 
   (define-rule-syntax (syntax-case? expr keywords case ...)
     (syntax-case expr keywords case ... (_ #f)))

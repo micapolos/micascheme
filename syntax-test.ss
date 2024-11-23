@@ -73,12 +73,6 @@
       #'(+ a b c))
     #'(+ 10 20 30)))
 
-(check (not (syntax-contains? #'() #'x)))
-(check (syntax-contains? #'x #'x))
-(check (syntax-contains? #'(x y) #'x))
-(check (syntax-contains? #'(y x) #'x))
-(check (not (syntax-contains? #'(x y) #'z)))
-
 ; === null? cons car cdr ===
 
 (check (syntax-null? #'()))
