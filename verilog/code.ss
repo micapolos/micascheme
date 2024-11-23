@@ -161,7 +161,7 @@
           (name->code $name)
           (list->code (map range-declaration->code $arrays))))))
 
-  (define reserved-identifier-strings
+  (define reserved-strings
     (list
       "module" "endmodule"
       "input" "output" "inout"
@@ -180,7 +180,7 @@
       (map-using name-char)
       (list->string)
       (with $string
-        (if (member $string reserved-identifier-strings)
+        (if (member $string reserved-strings)
           (string-append "_" $string)
           $string))
       (string-code)))
