@@ -23,3 +23,17 @@
 (check (opposite-processes? #'(%negedge _ _) #'(%posedge _ _)))
 (check (raises (opposite-processes? #'(%posedge _ _) #'(%posedge _ _))))
 (check (raises (opposite-processes? #'(%negedge _ _) #'(%negedge _ _))))
+
+; === edge ===
+
+(check (syntax=? (edge-identifier #'%posedge) #'%posedge))
+(check (syntax=? (edge-identifier #'%negedge) #'%negedge))
+(check (raises (edge-identifier #'foo)))
+
+(check (edge=? #'%posedge #'%posedge))
+(check (not (edge=? #'%posedge #'%negedge)))
+
+(check (syntax=? (edge+? #'%posedge #'%posedge) #'%posedge))
+(check (syntax=? (edge+? #'%negedge #'%negedge) #'%negedge))
+(check (not (edge+? #'%posedge #'%negedge)))
+(check (not (edge+? #'%negedge #'%posedge)))

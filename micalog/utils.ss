@@ -10,7 +10,10 @@
     declaration-kind-of?
     declaration-syntaxes-of
     declaration-name
-    declaration-type)
+    declaration-type
+    edge-identifier
+    edge=?
+    edge+?)
   (import
     (micascheme)
     (prefix (micalog keywords) %))
@@ -66,4 +69,20 @@
   (define (declaration-type $declaration)
     (syntax-case $declaration ()
       ((kind type name) #'type)))
+
+  (define (edge-identifier $edge)
+    (syntax-case $edge (%posedge %negedge)
+      (%posedge #'%posedge)
+      (%negedge #'%negedge)
+      (_ (syntax-error $edge "invalid edge"))))
+
+  (define (edge=? $edge-a $edge-b)
+    (free-identifier=?
+      (edge-identifier $edge-a)
+      (edge-identifier $edge-b)))
+
+  (define (edge+? $edge-a $edge-b)
+    (and
+      (edge=? $edge-a $edge-b)
+      $edge-a))
 )
