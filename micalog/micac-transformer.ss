@@ -12,7 +12,8 @@
     (micalog utils)
     (prefix (micalog keywords) %)
     (prefix (micac) %%)
-    (prefix (micac lib emu) %%))
+    (prefix (micac lib emu) %%)
+    (prefix (micac lib std) %%))
 
   ; Requirements:
   ; - module with explicit previous-clock and clock names
@@ -23,7 +24,7 @@
   ; - "on" statement with explicit previous value
   (define (module->micac $module)
     (syntax-case $module (%module)
-      ((%module (name previous-clock clock) statement ...)
+      ((%module (previous-clock clock) statement ...)
         (lets
           ($inputs (declaration-syntaxes-of %input statement ...))
           ($registers (declaration-syntaxes-of %register statement ...))
@@ -34,7 +35,8 @@
                   (not (declaration-kind-of? #'%input $statement))
                   (not (declaration-kind-of? #'%register $statement))))
               (syntaxes statement ...)))
-          #`(%%macro (name #,@(map input-param->micac $inputs))
+          #`(%%run-emu
+            (%%video 352 288 96 24 4)
             (%%var uint8_t previous-clock 0)
             (%%var uint8_t clock 1)
             #,@(map register->micac $registers)
@@ -56,7 +58,7 @@
           #,(name->micac #'name)))))
 
   (define (instruction->micac $statement)
-    (syntax-case $statement (%capture %output %wire %set %on %else)
+    (syntax-case $statement (%capture %output %wire %set %on %cond %else)
       ((%capture type name expr)
         #`(%%const
           #,(type->micac #'type)
@@ -75,6 +77,13 @@
         #`(%%set
           #,(name->micac #'name)
           #,(expr->micac #'expr)))
+      ((%cond clause ... (%else els ...))
+        #`(%%cond
+          #,@(map clause->micac (syntaxes clause ...))
+          (%%else #,@(map instruction->micac (syntaxes els ...)))))
+      ((%cond clause-1 clause ...)
+        #`(%%cond
+          #,@(map clause->micac (syntaxes clause-1 clause ...))))
       ((%on (previous-name name) (edge statement ...))
         #`(%%when (%%not (%%= #,(name->micac #'previous-name) #,(name->micac #'name)))
           (%%when (%%= #,(name->micac #'name) #,(edge->micac #'edge))
@@ -84,6 +93,13 @@
           (%%if (%%= #,(name->micac #'name) #,(edge->micac #'edge))
             (%%then #,@(map instruction->micac (syntaxes statement ...)))
             (%%else #,@(map instruction->micac (syntaxes else-statement ...))))))))
+
+  (define (clause->micac $clause)
+    (syntax-case $clause ()
+      ((cond instruction ...)
+        #`(
+          #,(expr->micac #'cond)
+          #,@(map instruction->micac (syntaxes instruction ...))))))
 
   (define (edge->micac $edge)
     (syntax-case $edge (%posedge %negedge)
@@ -213,11 +229,11 @@
         (lets
           ($number (datum number))
           (cond
-            ((= $number 1) #'%%bool)
-            ((<= $number 8) #'%%uint8_t)
-            ((<= $number 16) #'%%uint16_t)
-            ((<= $number 32) #'%%uint32_t)
-            ((<= $number 64) #'%%uint64_t)
+            ((= $number 1) #'bool)
+            ((<= $number 8) #'uint8_t)
+            ((<= $number 16) #'uint16_t)
+            ((<= $number 32) #'uint32_t)
+            ((<= $number 64) #'uint64_t)
             (else (syntax-error $size)))))))
 
   (define (name->micac $id) $id)

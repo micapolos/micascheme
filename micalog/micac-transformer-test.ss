@@ -3,21 +3,22 @@
   (micalog micac-transformer)
   (prefix (micalog keywords) %)
   (prefix (micac) %%)
+  (prefix (micac lib emu) %%)
   (prefix (micac lib emu) %%))
 
 (define-check-datum-> micac)
 
 ; === types ===
 
-(check-micac (type 1) %%bool)
-(check-micac (type 2) %%uint8_t)
-(check-micac (type 8) %%uint8_t)
-(check-micac (type 9) %%uint16_t)
-(check-micac (type 16) %%uint16_t)
-(check-micac (type 17) %%uint32_t)
-(check-micac (type 32) %%uint32_t)
-(check-micac (type 33) %%uint64_t)
-(check-micac (type 64) %%uint64_t)
+(check-micac (type 1) bool)
+(check-micac (type 2) uint8_t)
+(check-micac (type 8) uint8_t)
+(check-micac (type 9) uint16_t)
+(check-micac (type 16) uint16_t)
+(check-micac (type 17) uint32_t)
+(check-micac (type 32) uint32_t)
+(check-micac (type 33) uint64_t)
+(check-micac (type 64) uint64_t)
 
 ; === values ===
 
@@ -103,7 +104,7 @@
 
 (check-micac
   (register (%register 8 foo))
-  (%%var %%uint8_t foo))
+  (%%var uint8_t foo))
 
 ; === input params ===
 
@@ -115,11 +116,11 @@
 
 (check-micac
   (instruction (%capture 8 foo bar))
-  (%%const %%uint8_t foo bar))
+  (%%const uint8_t foo bar))
 
 (check-micac
   (instruction (%wire 8 foo bar))
-  (%%const %%uint8_t foo bar))
+  (%%const uint8_t foo bar))
 
 (check-micac
   (raises
@@ -192,12 +193,31 @@
         (%%set zoo zar)
         (%%set moo mar)))))
 
+(check-micac
+  (instruction
+    (%cond
+      (foo (%set 8 foo bar))
+      (%else (%set 8 zoo zar))))
+  (%%cond
+    (foo (%%set foo bar))
+    (%%else (%%set zoo zar))))
+
+(check-micac
+  (instruction
+    (%cond
+      (foo (%set 8 foo bar))
+      (bar (%set 8 zoo zar))))
+  (%%cond
+    (foo (%%set foo bar))
+    (bar (%%set zoo zar))))
+
 ; === module ===
 
 (check-micac
   (module
-    (%module (empty prev-clock clock)))
-  (%%macro (empty)
+    (%module (prev-clock clock)))
+  (%%run-emu
+    (%%video 352 288 96 24 4)
     (%%var uint8_t prev-clock 0)
     (%%var uint8_t clock 1)
     (%%update
@@ -206,20 +226,21 @@
 
 (check-micac
   (module
-    (%module (counter prev-clock clock)
+    (%module (prev-clock clock)
       (%register 16 counter)
       (%on (prev-clock clock)
         (%posedge
           (%capture 16 previous-counter counter)
           (%set 16 counter (%+ 16 previous-counter 1))))))
-  (%%macro (counter)
+  (%%run-emu
+    (%%video 352 288 96 24 4)
     (%%var uint8_t prev-clock 0)
     (%%var uint8_t clock 1)
-    (%%var %%uint16_t counter)
+    (%%var uint16_t counter)
     (%%update
       (%%set prev-clock clock)
       (%%set clock (%%xor clock 1))
       (%%when (%%not (%%= prev-clock clock))
         (%%when (%%= clock 1)
-          (%%const %%uint16_t previous-counter counter)
+          (%%const uint16_t previous-counter counter)
           (%%set counter (%%+ previous-counter 1)))))))
