@@ -61,7 +61,7 @@
         #`(%%const
           #,(type->micac #'type)
           #,(name->micac #'name)
-          #,(expr->micac #'name)))
+          #,(expr->micac #'expr)))
       ((%output type name)
         #`(%%var
           #,(type->micac #'type)

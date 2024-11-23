@@ -95,6 +95,10 @@
 ; === instructions ===
 
 (check-micac
+  (instruction (%capture 8 foo bar))
+  (%%const %%uint8_t foo bar))
+
+(check-micac
   (instruction (%wire 8 foo bar))
   (%%const %%uint8_t foo bar))
 
