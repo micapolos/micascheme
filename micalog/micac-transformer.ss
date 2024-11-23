@@ -228,6 +228,7 @@
 
   (define (size-needs-mask? $size)
     (syntax-case $size ()
+      (1 #f)
       (8 #f)
       (16 #f)
       (32 #f)
