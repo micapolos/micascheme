@@ -11,7 +11,7 @@
     (micascheme)
     (syntax scope)
     (syntax scoped)
-    (only (micalog model) opposite-edges?)
+    (only (micalog utils) opposite-edges?)
     (prefix (micalog keywords) %))
 
   (define (binding-kind $binding)

@@ -3,6 +3,6 @@
 (test
   (micalog micac-transformer)
   (micalog verilog-transformer)
-  (micalog model)
+  (micalog utils)
   (micalog flatten)
   (micalog typed))
