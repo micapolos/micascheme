@@ -41,6 +41,10 @@
     syntax-cdr
     syntax-ref?
     syntax-ref
+    syntax-set
+    syntax-update
+    syntax-remove
+    syntax-add
     list->syntax
     syntax-append
     literal->syntax
@@ -282,6 +286,9 @@
     (syntax-case $syntax ()
       ((_ . b) #'b)))
 
+  (define (syntax-add $syntax $id $value)
+    (syntax-cons #`(#,$id . #,$value) $syntax))
+
   (define (syntax-ref? $syntax $id)
     (syntax-case $syntax ()
       (() #f)
@@ -295,6 +302,31 @@
       (syntax-ref? $syntax $id)
       (syntax-error $syntax
         (format "~a not found in" (syntax->datum $id)))))
+
+  (define (syntax-update $syntax $id $fn)
+    (syntax-case $syntax ()
+      (() #`())
+      (((id . value) . tail)
+        (if (free-identifier=? #'id $id)
+          #`((id . #,($fn #'value)) . #,(syntax-update #'tail $id $fn))
+          #`((id . value) . #,(syntax-update #'tail $id $fn))))))
+
+  (define (syntax-set $syntax $id $value)
+    (syntax-case $syntax ()
+      (()
+        #`((#,$id . #,$value)))
+      (((id . value) . tail)
+        (if (free-identifier=? #'id $id)
+          #`((id . #,$value) . #,(syntax-remove #'tail $id))
+          #`((id . value) . #,(syntax-set #'tail $id $value))))))
+
+  (define (syntax-remove $syntax $id)
+    (syntax-case $syntax ()
+      (() #`())
+      (((id . value) . tail)
+        (if (free-identifier=? #'id $id)
+          (syntax-remove #'tail $id)
+          #`((id . value) . #,(syntax-remove #'tail $id))))))
 
   (define (list->syntax $list)
     #`(#,@$list))

@@ -208,3 +208,29 @@
 (check (syntax=? (syntax-ref #`((a . b) (c . d)) #'a) #'b))
 (check (syntax=? (syntax-ref #`((a . b) (c . d)) #'c) #'d))
 (check (raises (syntax-ref #`((a . b) (c . d)) #'e)))
+
+(check (syntax=? (syntax-add #'() #'a #'b) #`((a . b))))
+(check (syntax=? (syntax-add #'((a . b)) #'c #'d) #'((c . d) (a . b))))
+
+(check (syntax=? (syntax-remove #'() #'a) #'()))
+(check (syntax=? (syntax-remove #'((a . b)) #'a) #'()))
+(check (syntax=? (syntax-remove #'((a . b) (c . d)) #'a) #'((c . d))))
+(check (syntax=? (syntax-remove #'((a . b) (c . d) (a . f)) #'a) #'((c . d))))
+
+(check (syntax=? (syntax-set #'() #'a #'b) #'((a . b))))
+(check (syntax=? (syntax-set #'((a . d)) #'a #'b) #'((a . b))))
+(check (syntax=? (syntax-set #'((c . d)) #'a #'b) #'((c . d) (a . b))))
+(check (syntax=? (syntax-set #'((c . d) (a . f)) #'a #'b) #'((c . d) (a . b))))
+(check (syntax=? (syntax-set #'((a . b) (c . d) (a . f)) #'a #'g) #'((a . g) (c . d))))
+
+(check (syntax=? (syntax-remove #'() #'a) #'()))
+(check (syntax=? (syntax-remove #'((a . b)) #'a) #'()))
+(check (syntax=? (syntax-remove #'((a . b) (c . d)) #'a) #'((c . d))))
+(check (syntax=? (syntax-remove #'((c . d) (a . b)) #'a) #'((c . d))))
+(check (syntax=? (syntax-remove #'((c . d) (a . b) (a . f)) #'a) #'((c . d))))
+
+(define (update-fn $a) #`(updated #,$a))
+(check (syntax=? (syntax-update #'() #'a update-fn) #'()))
+(check (syntax=? (syntax-update #'((a . b)) #'a update-fn) #'((a . (updated b)))))
+(check (syntax=? (syntax-update #'((a . b) (c . d)) #'a update-fn) #'((a . (updated b)) (c . d))))
+(check (syntax=? (syntax-update #'((a . b) (c . d) (a . g)) #'a update-fn) #'((a . (updated b)) (c . d) (a . (updated g)))))
