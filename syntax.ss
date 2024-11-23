@@ -39,6 +39,8 @@
     syntax-cons
     syntax-car
     syntax-cdr
+    syntax-ref?
+    syntax-ref
     list->syntax
     syntax-append
     literal->syntax
@@ -279,6 +281,20 @@
   (define (syntax-cdr $syntax)
     (syntax-case $syntax ()
       ((_ . b) #'b)))
+
+  (define (syntax-ref? $syntax $id)
+    (syntax-case $syntax ()
+      (() #f)
+      (((id . value) . tail)
+        (if (free-identifier=? #'id $id)
+          #'value
+          (syntax-ref? #'tail $id)))))
+
+  (define (syntax-ref $syntax $id)
+    (or
+      (syntax-ref? $syntax $id)
+      (syntax-error $syntax
+        (format "~a not found in" (syntax->datum $id)))))
 
   (define (list->syntax $list)
     #`(#,@$list))

@@ -200,3 +200,11 @@
 (check (syntax=? (syntax-cons #'a #'b) #'(a . b)))
 (check (syntax=? (syntax-car #'(a . b)) #'a))
 (check (syntax=? (syntax-cdr #'(a . b)) #'b))
+
+(check (syntax=? (syntax-ref? #`((a . b) (c . d)) #'a) #'b))
+(check (syntax=? (syntax-ref? #`((a . b) (c . d)) #'c) #'d))
+(check (not (syntax-ref? #`((a . b) (c . d)) #'e)))
+
+(check (syntax=? (syntax-ref #`((a . b) (c . d)) #'a) #'b))
+(check (syntax=? (syntax-ref #`((a . b) (c . d)) #'c) #'d))
+(check (raises (syntax-ref #`((a . b) (c . d)) #'e)))
