@@ -1,11 +1,11 @@
 (library (micalog micac-transformer)
   (export
+    type->micac
     module->micac
     input-param->micac
     register->micac
     instruction->micac
     expr->micac
-    size->micac
     value->micac)
   (import
     (micascheme)
@@ -15,13 +15,14 @@
     (prefix (micac lib emu) %%))
 
   ; Requirements:
+  ; - module with explicit previous-clock and clock names
   ; - fully typed
-  ; - registers and inputs at the top-level
-  ; - explicit capture to implement access to previous values
-  ; - "on" statement with explicit capture
+  ; - all inputs and registers declared at the top-level
+  ; - explicit captures to capture previous register values
+  ; - "on" statement with explicit previous value
   (define (module->micac $module)
     (syntax-case $module (%module)
-      ((%module name statement ...)
+      ((%module (name previous-clock clock) statement ...)
         (lets
           ($inputs (declaration-syntaxes-of %input statement ...))
           ($registers (declaration-syntaxes-of %register statement ...))
@@ -33,8 +34,12 @@
                   (not (declaration-kind-of? #'%register $statement))))
               (syntaxes statement ...)))
           #`(%%macro (name #,@(map input-param->micac $inputs))
+            (%%var uint8_t previous-clock 0)
+            (%%var uint8_t clock 1)
             #,@(map register->micac $registers)
             (%%update
+              (%%set previous-clock clock)
+              (%%set clock (%%xor clock 1))
               #,@(map instruction->micac $instructions)))))))
 
   (define (input-param->micac $input)
@@ -69,14 +74,12 @@
         #`(%%set
           #,(name->micac #'name)
           #,(expr->micac #'expr)))
-      ((%on (capture-name name) (edge statement ...))
-        #`(%%when (%%not (%%= #,(name->micac #'capture-name) #,(name->micac #'name)))
-          (%%set #,(name->micac #'capture-name) #,(name->micac #'name))
+      ((%on (previous-name name) (edge statement ...))
+        #`(%%when (%%not (%%= #,(name->micac #'previous-name) #,(name->micac #'name)))
           (%%when (%%= #,(name->micac #'name) #,(edge->micac #'edge))
             #,@(map instruction->micac (syntaxes statement ...)))))
-      ((%on (capture-name name) (edge statement ...) (%else else-statement ...))
-        #`(%%when (%%not (%%= #,(name->micac #'capture-id) #,(name->micac #'name)))
-          (%%set #,(name->micac #'capture-name) #,(name->micac #'name))
+      ((%on (previous-name name) (edge statement ...) (%else else-statement ...))
+        #`(%%when (%%not (%%= #,(name->micac #'previous-id) #,(name->micac #'name)))
           (%%if (%%= #,(name->micac #'name) #,(edge->micac #'edge))
             (%%then #,@(map instruction->micac (syntaxes statement ...)))
             (%%else #,@(map instruction->micac (syntaxes else-statement ...))))))))
@@ -205,10 +208,7 @@
       ((%reg) #f)
       ((%reg expr) (expr->micac #'expr))))
 
-  (define (type->micac $type)
-    (size->micac $type))
-
-  (define (size->micac $size)
+  (define (type->micac $size)
     (syntax-case $size ()
       (number (positive-integer? (datum number))
         (lets

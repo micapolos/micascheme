@@ -7,6 +7,15 @@
 
 (define-check-datum-> micac)
 
+(check-micac (type 1) %%uint8_t)
+(check-micac (type 8) %%uint8_t)
+(check-micac (type 9) %%uint16_t)
+(check-micac (type 16) %%uint16_t)
+(check-micac (type 17) %%uint32_t)
+(check-micac (type 32) %%uint32_t)
+(check-micac (type 33) %%uint64_t)
+(check-micac (type 64) %%uint64_t)
+
 (check-micac (value foo) foo)
 (check-micac (value 123) 123)
 
@@ -65,11 +74,4 @@
     (%%bitwise-and (%%bitwise-not b) 63)
     (%%bitwise-and c d)))
 
-(check-micac (size 1) %%uint8_t)
-(check-micac (size 8) %%uint8_t)
-(check-micac (size 9) %%uint16_t)
-(check-micac (size 16) %%uint16_t)
-(check-micac (size 17) %%uint32_t)
-(check-micac (size 32) %%uint32_t)
-(check-micac (size 33) %%uint64_t)
-(check-micac (size 64) %%uint64_t)
+
