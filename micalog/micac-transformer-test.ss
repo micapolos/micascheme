@@ -1,6 +1,6 @@
 (import
   (micascheme)
-  (micalog micac)
+  (micalog micac-transformer)
   (prefix (micalog keywords) %)
   (prefix (micac syntax) %%))
 

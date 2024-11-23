@@ -7,7 +7,7 @@
       (only (verilog code) module->code)
       (module->code verilog-module->code))
     (rename
-      (only (micalog to-verilog) module->verilog)
+      (only (micalog verilog-transformer) module->verilog)
       (module->verilog micalog-module->verilog))
     (only (micalog flatten) flatten-module)
     (only (micalog typed) module->typed-syntax)

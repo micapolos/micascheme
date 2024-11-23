@@ -1,6 +1,6 @@
 (import
   (micascheme)
-  (micalog to-verilog)
+  (micalog verilog-transformer)
   (prefix (micalog keywords) %)
   (prefix (verilog keywords) %%))
 

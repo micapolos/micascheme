@@ -1,8 +1,8 @@
 (import (micascheme))
 
 (test
-  (micalog micac)
-  (micalog to-verilog)
+  (micalog micac-transformer)
+  (micalog verilog-transformer)
   (micalog model)
   (micalog flatten)
   (micalog typed))
