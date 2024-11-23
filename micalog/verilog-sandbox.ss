@@ -58,6 +58,6 @@
       (posedge
         (cond
           (reset? (set counter mouse-x))
-          (mouse-pressed? (set counter (+ counter hex-0001)))
-          (else (set counter (- counter hex-0001))))))
+          (mouse-pressed? (set counter (+ counter 1)))
+          (else (set counter (- counter 1))))))
     (output out counter)))

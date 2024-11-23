@@ -34,15 +34,28 @@
       (%negedge #'%negedge)))
 
   (define (literal->typed? $literal)
-    (syntax-case $literal ()
+    (syntax-case $literal (%int)
       (0 #`(1 0))
       (1 #`(1 1))
+      ((%int type number)
+        #`(
+          #,(type->syntax #'type)
+          #,(if (integer? (datum number))
+            #'number
+            (syntax-error #'number "invalid int"))))
       (id (identifier? #'id)
         (or
           (prefix-size-id->typed? "bin-" 1 #'id)
           (prefix-size-id->typed? "oct-" 3 #'id)
           (prefix-size-id->typed? "hex-" 4 #'id)))
       (else #f)))
+
+  (define (type-literal->typed? $type $literal)
+    (syntax-case $literal ()
+      (integer (integer? (datum integer))
+        #`(#,$type integer))
+      (_
+        #f)))
 
   (define (prefix-size-id->typed? $prefix $size $id)
     (lets
@@ -73,15 +86,17 @@
     #`(#,(binding-type (scope-item $scope $id)) #,$id))
 
   (define (scope-type-expr->typed $scope $expected-type $expr)
-    (lets
-      ($typed (scope-expr->typed $scope $expr))
-      ($type (typed-type $typed))
-      (if (type=? $type $expected-type)
-        $typed
-        (syntax-error $expr
-          (format "type mismatch ~a, expected ~a in"
-            (syntax->datum $type)
-            (syntax->datum $expected-type))))))
+    (or
+      (type-literal->typed? $expected-type $expr)
+      (lets
+        ($typed (scope-expr->typed $scope $expr))
+        ($type (typed-type $typed))
+        (if (type=? $type $expected-type)
+          $typed
+          (syntax-error $expr
+            (format "type mismatch ~a, expected ~a in"
+              (syntax->datum $type)
+              (syntax->datum $expected-type)))))))
 
   (define (scope-expr->typed $scope $expr)
     (or

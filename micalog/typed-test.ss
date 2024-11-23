@@ -26,6 +26,9 @@
 
 (check-typed (literal 0) (1 0))
 (check-typed (literal 1) (1 1))
+
+(check-typed (literal (%int 8 12)) (8 12))
+
 (check-typed (literal bin-10101100) (8 #b10101100))
 (check-typed (literal hex-af) (8 #xaf))
 (check-typed (literal oct-34) (6 #o34))
@@ -73,6 +76,8 @@
 (check-typed (expr (%- bin-1101)) (4 (%- 4 #b1101)))
 (check-typed (expr (%+ bin-1101 hex-a)) (4 (%+ 4 #b1101 #xa)))
 (check-typed (expr (%- bin-1101 hex-a)) (4 (%- 4 #b1101 #xa)))
+
+(check-typed (expr (%+ bin-1101 1)) (4 (%+ 4 #b1101 1)))
 
 (check-typed (expr (%if bin-1 bin-1101 hex-a)) (4 (%if 4 #b1 #b1101 #xa)))
 

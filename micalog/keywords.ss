@@ -6,7 +6,7 @@
     posedge negedge
     register set
     wire assign
-    expr
+    expr int
     = != < <= > >=
     if then else
     append slice
@@ -22,7 +22,7 @@
     posedge negedge
     register set
     wire assign
-    expr
+    expr int
     = != < <= > >=
     if then else
     append slice
