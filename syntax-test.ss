@@ -76,7 +76,7 @@
 ; === syntax-datum=? ===
 
 (check (syntax-datum=? #'(a b) #'(a b)))
-(check (syntax-datum=? #'(a b) #'(a c)))
+(check (not (syntax-datum=? #'(a b) #'(a c))))
 
 ; === null? cons car cdr ===
 
@@ -133,3 +133,13 @@
 (check (not (syntax-false? #'#t)))
 (check (not (syntax-false? #'())))
 (check (not (syntax-false? #'a)))
+
+(check (syntax=? (syntax-and #'#f #'#f) #'#f))
+(check (syntax=? (syntax-and #'foo #'#f) #'#f))
+(check (syntax=? (syntax-and #'#f #'bar) #'#f))
+(check (syntax=? (syntax-and #'foo #'bar) #'bar))
+
+(check (syntax=? (syntax-or #'#f #'#f) #'#f))
+(check (syntax=? (syntax-or #'foo #'#f) #'foo))
+(check (syntax=? (syntax-or #'#f #'bar) #'bar))
+(check (syntax=? (syntax-or #'foo #'bar) #'foo))

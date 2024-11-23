@@ -41,6 +41,8 @@
     syntax-remove
     syntax-add
     syntax-false?
+    syntax-and
+    syntax-or
     list->syntax
     syntax-append
     literal->syntax
@@ -345,4 +347,10 @@
   (define (syntax-single $syntax)
     (syntax-case $syntax ()
       ((item) #'item)))
+
+  (define (syntax-and $a $b)
+    (if (syntax-false? $a) $a $b))
+
+  (define (syntax-or $a $b)
+    (if (syntax-false? $a) $b $a))
 )
