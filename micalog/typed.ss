@@ -38,9 +38,11 @@
       (0 #`(1 0))
       (1 #`(1 1))
       ((%int type integer)
-        (type-literal->typed?
-          (type->syntax #'type)
-          #'integer))
+        (or
+          (type-literal->typed?
+            (type->syntax #'type)
+            #'integer)
+          (syntax-error #'integer "invalid int")))
       (id (identifier? #'id)
         (or
           (prefix-size-id->typed? "bin-" 1 #'id)
