@@ -73,6 +73,11 @@
       #'(+ a b c))
     #'(+ 10 20 30)))
 
+; === syntax-datum=? ===
+
+(check (syntax-datum=? #'(a b) #'(a b)))
+(check (syntax-datum=? #'(a b) #'(a c)))
+
 ; === null? cons car cdr ===
 
 (check (syntax=? (null-syntax) #'()))

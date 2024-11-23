@@ -1,0 +1,11 @@
+(library (micalog domain)
+  (export edges+edge)
+  (import (micascheme) (prefix (micalog keywords) %))
+
+  (define (edges+edge $edges $edge)
+    (syntax-case $edges ()
+      ((pos? neg?)
+        (syntax-case $edge (%posedge %negedge)
+          (%posedge #'(#t neg?))
+          (%negedge #'(pos? #t))))))
+)

@@ -24,6 +24,7 @@
     bytevector->syntax
     vector->syntax
     syntax=?
+    syntax-datum=?
     syntax-replace
     transform
     syntaxes
@@ -191,6 +192,11 @@
         (equal?
           (syntax->datum a)
           (syntax->datum b)))))
+
+  (define (syntax-datum=? $a $b)
+    (equal?
+      (syntax->datum $a)
+      (syntax->datum $b)))
 
   (define-syntax (inline-indexed $syntax)
     (syntax-case $syntax ()
