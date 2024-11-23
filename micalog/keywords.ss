@@ -1,14 +1,12 @@
 (library (micalog keywords)
   (export
-    module input output internal
-    process init update
-    define on cond
-    posedge negedge
+    module input output
+    on posedge negedge
+    cond else
     register set
     wire assign
     expr int
     = != < <= > >=
-    if then else
     append slice
     + -
     and or xor nand nor xnor not inv
@@ -16,15 +14,13 @@
   (import (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
-    module input output internal
-    process init update
-    define on cond
-    posedge negedge
+    module input output
+    on posedge negedge
+    cond else
     register set
     wire assign
     expr int
     = != < <= > >=
-    if then else
     append slice
     + -
     and or xor nand nor xnor not inv
