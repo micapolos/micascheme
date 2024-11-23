@@ -16,9 +16,9 @@
 
   ; Requirements:
   ; - fully typed
-  ; - registers, inputs and outputs at the top-level
-  ; - explicit capture registers to access previous values
-  ; - on statement with explicit "from" and "to" values
+  ; - registers and inputs at the top-level
+  ; - explicit capture to implement access to previous values
+  ; - "on" statement with explicit capture
   (define (module->micac $module)
     (syntax-case $module (%module)
       ((%module name statement ...)
