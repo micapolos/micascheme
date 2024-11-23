@@ -1,4 +1,4 @@
-(library (micalog verilog-string)
+(library (micalog verilog-syntax)
   (export verilog-string display-verilog)
   (import
     (only (micascheme) display define-rule-syntax string-append apply intercalate with map-using syntaxes ... fluent define-case-syntax literal->syntax syntax export ...)
