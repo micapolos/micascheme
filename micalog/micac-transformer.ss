@@ -157,15 +157,18 @@
           #`(%%-
             #,(expr->micac #'rhs))))
       ((%and type lhs rhs)
-        #`(%%bitwise-and
+        #`(
+          #,(if (type-boolean? #'type) #'%%and #'%%bitwise-and)
           #,(expr->micac #'lhs)
           #,(expr->micac #'rhs)))
       ((%or type lhs rhs)
-        #`(%%bitwise-ior
+        #`(
+          #,(if (type-boolean? #'type) #'%%or #'%%bitwise-ior)
           #,(expr->micac #'lhs)
           #,(expr->micac #'rhs)))
       ((%xor type lhs rhs)
-        #`(%%bitwise-xor
+        #`(
+          %%bitwise-xor
           #,(expr->micac #'lhs)
           #,(expr->micac #'rhs)))
       ((%nand type lhs rhs)
@@ -176,11 +179,12 @@
         (expr->micac #`(%not type (%xor type lhs rhs))))
       ((%not type rhs)
         (type-micac-mask #'type
-          #`(%%bitwise-not
+          #`(
+            #,(if (type-boolean? #'type) #'%%not #'%%bitwise-not)
             #,(expr->micac #'rhs))))
       ((%if type cond true false)
         #`(%%if
-          (%%= #,(expr->micac #'cond) 1)
+          #,(expr->micac #'cond)
           #,(expr->micac #'true)
           #,(expr->micac #'false)))
       (other

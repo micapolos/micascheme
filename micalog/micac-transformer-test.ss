@@ -81,12 +81,12 @@
 (check-micac (expr (%not 6 a)) (%%bitwise-and (%%bitwise-not a) #x3f))
 (check-micac (expr (%not 8 a)) (%%bitwise-not a))
 
-(check-micac (expr (%if 6 a b c)) (%%if (%%= a 1) b c))
+(check-micac (expr (%if 6 a b c)) (%%if a b c))
 
 (check-micac
   (expr (%if 6 (%not 1 a) (%not 6 b) (%and 6 c d)))
   (%%if
-    (%%= (%%bitwise-and (%%bitwise-not a) 1) 1)
+    (%%not a)
     (%%bitwise-and (%%bitwise-not b) 63)
     (%%bitwise-and c d)))
 
