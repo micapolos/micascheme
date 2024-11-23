@@ -9,7 +9,8 @@
 
 ; === types ===
 
-(check-micac (type 1) %%uint8_t)
+(check-micac (type 1) %%bool)
+(check-micac (type 2) %%uint8_t)
 (check-micac (type 8) %%uint8_t)
 (check-micac (type 9) %%uint16_t)
 (check-micac (type 16) %%uint16_t)
@@ -50,12 +51,12 @@
   (expr (%slice 6 a 2))
   (%%bitwise-and (%%bitwise-arithmetic-shift-right a 2) #x3f))
 
-(check-micac (expr (%= 6 a b)) (%%if (%%= a b) 1 0))
-(check-micac (expr (%!= 6 a b)) (%%if (%%not (%%= a b)) 1 0))
-(check-micac (expr (%< 6 a b)) (%%if (%%< a b) 1 0))
-(check-micac (expr (%<= 6 a b)) (%%if (%%<= a b) 1 0))
-(check-micac (expr (%> 6 a b)) (%%if (%%> a b) 1 0))
-(check-micac (expr (%>= 6 a b)) (%%if (%%>= a b) 1 0))
+(check-micac (expr (%= 6 a b)) (%%= a b))
+(check-micac (expr (%!= 6 a b)) (%%not (%%= a b)))
+(check-micac (expr (%< 6 a b)) (%%< a b))
+(check-micac (expr (%<= 6 a b)) (%%<= a b))
+(check-micac (expr (%> 6 a b)) (%%> a b))
+(check-micac (expr (%>= 6 a b)) (%%>= a b))
 
 (check-micac (expr (%+ 6 a b)) (%%bitwise-and (%%+ a b) #x3f))
 (check-micac (expr (%- 6 a b)) (%%bitwise-and (%%- a b) #x3f))

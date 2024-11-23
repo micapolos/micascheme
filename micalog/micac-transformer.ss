@@ -23,7 +23,6 @@
   ; - "on" statement with explicit previous value
   ; TODO:
   ; - translate 1-bit type to bool
-  ; - don't mask if the type fits exactly
   (define (module->micac $module)
     (syntax-case $module (%module)
       ((%module (name previous-clock clock) statement ...)
@@ -103,36 +102,30 @@
   (define (expr->micac $expr)
     (syntax-case $expr (%= %!= %< %<= %> %>= %append %slice %+ %- %and %or %xor %nand %nor %xnor %not %if)
       ((%= type lhs rhs)
-        (boolean->number
-          #`(%%=
-            #,(expr->micac #'lhs)
-            #,(expr->micac #'rhs))))
+        #`(%%=
+          #,(expr->micac #'lhs)
+          #,(expr->micac #'rhs)))
       ((%!= type lhs rhs)
-        (boolean->number
-          #`(%%not
-            (%%=
-              #,(expr->micac #'lhs)
-              #,(expr->micac #'rhs)))))
+        #`(%%not
+          (%%=
+            #,(expr->micac #'lhs)
+            #,(expr->micac #'rhs))))
       ((%< type lhs rhs)
-        (boolean->number
-          #`(%%<
-            #,(expr->micac #'lhs)
-            #,(expr->micac #'rhs))))
+        #`(%%<
+          #,(expr->micac #'lhs)
+          #,(expr->micac #'rhs)))
       ((%<= type lhs rhs)
-        (boolean->number
-          #`(%%<=
-            #,(expr->micac #'lhs)
-            #,(expr->micac #'rhs))))
+        #`(%%<=
+          #,(expr->micac #'lhs)
+          #,(expr->micac #'rhs)))
       ((%> type lhs rhs)
-        (boolean->number
-          #`(%%>
-            #,(expr->micac #'lhs)
-            #,(expr->micac #'rhs))))
+        #`(%%>
+          #,(expr->micac #'lhs)
+          #,(expr->micac #'rhs)))
       ((%>= type lhs rhs)
-        (boolean->number
-          #`(%%>=
-            #,(expr->micac #'lhs)
-            #,(expr->micac #'rhs))))
+        #`(%%>=
+          #,(expr->micac #'lhs)
+          #,(expr->micac #'rhs)))
       ((%append (lhs-type lhs))
         (expr->micac #'lhs))
       ((%append (lhs-type lhs) (rhs-type rhs))
@@ -218,6 +211,7 @@
         (lets
           ($number (datum number))
           (cond
+            ((= $number 1) #'%%bool)
             ((<= $number 8) #'%%uint8_t)
             ((<= $number 16) #'%%uint16_t)
             ((<= $number 32) #'%%uint32_t)
@@ -242,6 +236,10 @@
       (64 #f)
       (_ #t)))
 
+  (define (type-boolean? $type)
+    (syntax-case $type ()
+      (1 #t)
+      (_ #f)))
 
   (define (type-micac-mask $type $micac)
     (size-micac-mask (type-size $type) $micac))
