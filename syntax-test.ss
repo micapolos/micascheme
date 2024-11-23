@@ -75,6 +75,8 @@
 
 ; === null? cons car cdr ===
 
+(check (syntax=? (null-syntax) #'()))
+
 (check (syntax-null? #'()))
 (check (not (syntax-null? #'a)))
 (check (not (syntax-null? #'(a))))
@@ -83,15 +85,15 @@
 (check (syntax=? (syntax-car #'(a . b)) #'a))
 (check (syntax=? (syntax-cdr #'(a . b)) #'b))
 
-(check (syntax=? (syntax-ref? #`((a . b) (c . d)) #'a) #'b))
-(check (syntax=? (syntax-ref? #`((a . b) (c . d)) #'c) #'d))
-(check (not (syntax-ref? #`((a . b) (c . d)) #'e)))
+(check (syntax=? (syntax-ref? #'((a . b) (c . d)) #'a) #'b))
+(check (syntax=? (syntax-ref? #'((a . b) (c . d)) #'c) #'d))
+(check (not (syntax-ref? #'((a . b) (c . d)) #'e)))
 
-(check (syntax=? (syntax-ref #`((a . b) (c . d)) #'a) #'b))
-(check (syntax=? (syntax-ref #`((a . b) (c . d)) #'c) #'d))
-(check (raises (syntax-ref #`((a . b) (c . d)) #'e)))
+(check (syntax=? (syntax-ref #'((a . b) (c . d)) #'a) #'b))
+(check (syntax=? (syntax-ref #'((a . b) (c . d)) #'c) #'d))
+(check (raises (syntax-ref #'((a . b) (c . d)) #'e)))
 
-(check (syntax=? (syntax-add #'() #'a #'b) #`((a . b))))
+(check (syntax=? (syntax-add #'() #'a #'b) #'((a . b))))
 (check (syntax=? (syntax-add #'((a . b)) #'c #'d) #'((c . d) (a . b))))
 
 (check (syntax=? (syntax-remove #'() #'a) #'()))
@@ -117,7 +119,7 @@
 (check (syntax=? (syntax-update #'((a . b) (c . d)) #'a update-fn) #'((a . (updated b)) (c . d))))
 (check (syntax=? (syntax-update #'((a . b) (c . d) (a . g)) #'a update-fn) #'((a . (updated b)) (c . d) (a . (updated g)))))
 
-(check (syntax-false? #`#f))
-(check (not (syntax-false? #`#t)))
-(check (not (syntax-false? #`())))
-(check (not (syntax-false? #`a)))
+(check (syntax-false? #'#f))
+(check (not (syntax-false? #'#t)))
+(check (not (syntax-false? #'())))
+(check (not (syntax-false? #'a)))

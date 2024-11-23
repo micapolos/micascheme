@@ -1,6 +1,7 @@
 (library (syntax)
   (export
     identifiers?
+    null-syntax
     syntax-null?
     define-rule-syntax
     define-case-syntax
@@ -46,6 +47,8 @@
 
   (define (identifiers? $syntax)
     (for-all identifier? (syntax->list $syntax)))
+
+  (define (null-syntax) #'())
 
   (define (syntax-null? $syntax)
     (null? (syntax->datum $syntax)))
