@@ -1,40 +1,41 @@
 (library (micalog micac-transformer)
   (export
-    value->micac
+    module->micac
+    input-param->micac
+    register->micac
+    instruction->micac
     expr->micac
-    instr->micac
-    instrs->micac
     size->micac
-    declaration->micac
-    %%unit %%init %%update)
+    value->micac)
   (import
     (micascheme)
     (micalog utils)
     (prefix (micalog keywords) %)
-    (prefix (micac syntax) %%))
-
-  (define-aux-keywords %%unit %%init %%update)
-  (data (block inits updates))
+    (prefix (micac) %%)
+    (prefix (micac lib emu) %%))
 
   (define (module->micac $module)
     (syntax-case $module (%module)
       ((%module name statement ...)
-        #`(
-          ; externs
-          #,@(filter-opts (map statement-extern->micac? (syntaxes statement ...)))
-          ; global registers
-          #,@(map register->micac
-            (flatten
-              (map (partial global?-statement-registers #t)
-                (syntaxes statement ...))))
-          ; local declarations
-          #,@(filter-opts (map statement-local->micac? (syntaxes statement ...)))))))
+        (lets
+          ($inputs (declaration-syntaxes-of %input statement ...))
+          ($registers (declaration-syntaxes-of %register statement ...))
+          ($instructions
+            (filter
+              (lambda ($statement)
+                (and
+                  (not (declaration-kind-of? #'%input $statement))
+                  (not (declaration-kind-of? #'%register $statement))))
+              (syntaxes statement ...)))
+          #`(%%macro (name #,@(map input-param->micac $inputs))
+            #,@(map register->micac $registers)
+            (%%update
+              #,@(map instruction->micac $instructions)))))))
 
-  (define (statement-extern->micac? $statement)
-    (syntax-case $statement (%input)
+  (define (input-param->micac $input)
+    (syntax-case $input (%input)
       ((%input type name)
-        #`(%%extern #,(id->micac #'name)))
-      (_ #f)))
+        (id->micac #'name))))
 
   (define (register->micac $statement)
     (syntax-case $statement (%register)
@@ -43,46 +44,36 @@
           #,(type->micac #'type)
           #,(id->micac #'name)))))
 
-  (define (statement-local->micac? $statement)
-    (syntax-case $statement (%wire %output %assign %on)
-      ((%wire type name)
-        #`(%%var
-          #,(type->micac #'type)
-          #,(id->micac #'name)))
+  (define (instruction->micac $statement)
+    (syntax-case $statement (%output %wire %set %on)
       ((%output type name)
         #`(%%var
           #,(type->micac #'type)
           #,(id->micac #'name)))
-      ((%assign type name expr)
+      ((%wire type name)
+        #`(%%var
+          #,(type->micac #'type)
+          #,(id->micac #'name)))
+      ((%set type name expr)
         #`(%%set
           #,(id->micac #'name)
           #,(expr->micac #'expr)))
-      ; ((%on name process)
-      ;   )
-      ; ((%on name process opposite-process)
-      ;   )
-      (_
-        #f)))
+      ((%on (capture-id id) (edge statement ...))
+        #`(%%when (%%not (%%= #,(id->micac #'capture-id) #,(id->micac #'id)))
+          (%%set #,(id->micac #'capture-id) #,(id->micac #'id))
+          (%%when (%%= #,(id->micac #'id) #,(edge->micac #'edge))
+            #,@(map instruction->micac (syntaxes statement ...)))))
+      ((%on (capture-id id) (edge statement ...) (%else else-statement ...))
+        #`(%%when (%%not (%%= #,(id->micac #'capture-id) #,(id->micac #'id)))
+          (%%set #,(id->micac #'capture-id) #,(id->micac #'id))
+          (%%if (%%= #,(id->micac #'id) #,(edge->micac #'edge))
+            (%%then #,@(map instruction->micac (syntaxes statement ...)))
+            (%%else #,@(map instruction->micac (syntaxes else-statement ...))))))))
 
-  ; (define (on-wrap->micac $name $body)
-  ;   (lets
-  ;     ($tmp (generate-identifier $name))
-
-  ;     ($types (map declaration-type $registers))
-  ;     ($names (map declaration-name $registers))
-
-  ; (define (process-wrap->micac $process $body)
-  ;   (lets
-  ;     ($registers (global?-on-registers #f $on))
-  ;     ($types (map declaration-type $registers))
-  ;     ($names (map declaration-name $registers))
-  ;     ($temporaries (map generate-identifier $names))
-  ;     #`(%%begin
-  ;       #,@(map-with ($name $names) ($temporary $temporaries) ($type $types)
-  ;         #`(%%const
-  ;           #,(type->micac $type)
-  ;           #,(id->micac $temporary)
-  ;           #,(id->micac $name)))
+  (define (edge->micac $edge)
+    (syntax-case $edge (%posedge %negedge)
+      (%posedge #'1)
+      (%negedge #'0)))
 
   (define (value->micac $value)
     (syntax-case $value ()
@@ -203,107 +194,6 @@
       ((%reg) #f)
       ((%reg expr) (expr->micac #'expr))))
 
-  (define (declaration->micac $declaration)
-    (syntax-case $declaration (%reg)
-      ((%input type name)
-        #`(%%extern name))
-      ((%output type name)
-        #`(%%var
-          #,(type->micac #'type)
-          #,(id->micac #'id)))
-      ((%reg type name)
-        #`(%%var
-          #,(type->micac #'type)
-          #,(id->micac #'id)))
-      ((%wire type name)
-        #`(%%var
-          #,(type->micac #'type)
-          #,(id->micac #'id)))
-      ((%on name (edge instr ...))
-        #`TODO)))
-
-  (define (instr->micac $instr)
-    (fluent
-      (empty-block)
-      (block+instr $instr)
-      (block->micac)))
-
-  (define (instrs->block $instrs)
-    (fluent
-      (empty-block)
-      (with $block (fold-left block+instr $block (syntax->list $instrs)))))
-
-  (define (instrs->micac $instrs)
-    (block->micac (instrs->block $instrs)))
-
-  (define (empty-block)
-    (block (stack) (stack)))
-
-  (define (block+init $block $init)
-    (block-with-inits $block
-      (push (block-inits $block) $init)))
-
-  (define (block+update $block $update)
-    (block-with-updates $block
-      (push (block-updates $block) $update)))
-
-  (define (block->micac (block $inits $updates))
-    #`(%%unit
-      (%%init #,@(reverse $inits))
-      (%%update #,@(reverse $updates))))
-
-  (define (block+instr $block $instr)
-    (syntax-case $instr (%define %set %on %posedge %negedge)
-      ((%define id expr)
-        (syntax-case (expr-type #'expr) (%reg)
-          ((%reg size)
-            (block+init $block
-              #`(%%var
-                #,(size->micac #'size)
-                #,(id->micac #'id)
-                #,@(opt->list (reg-value->micac? (expr-value #'expr))))))
-          (size
-            (block+update $block
-              #`(%%const
-                #,(size->micac #'size)
-                #,(id->micac #'id)
-                #,(expr->micac #'expr))))))
-      ((%set! lhs rhs)
-        (block+update $block
-          #`(%%set
-            #,(expr->micac #'lhs)
-            #,(expr->micac #'rhs))))
-      ((%on expr
-        (%posedge pos-instr ...)
-        (%negedge neg-instr ...))
-        (lets
-          ($previous-id
-            (generate-identifier
-              (identifier-append #'%on #'previous- (value-id (expr-value #'expr)))))
-          ($pos-block (instrs->block #'(pos-instr ...)))
-          ($neg-block (instrs->block #'(neg-instr ...)))
-          (block
-            (append
-              (block-inits $neg-block)
-              (block-inits $pos-block)
-              (list
-                #`(%%var
-                  #,(size->micac #'1)
-                  #,$previous-id
-                  0))
-              (block-inits $block))
-            (cons
-              #`(%%when (%%not (%%= #,$previous-id id))
-                (%%set #,$previous-id id)
-                (%%if (not (zero? id))
-                  (%%then
-                    #,@(reverse
-                      (block-updates $pos-block)))
-                  (%%else
-                    #,@(reverse
-                      (block-updates $neg-block)))))
-                (block-updates $block)))))))
-
   (define (type->micac $type)
     (size->micac $type))
 
@@ -319,11 +209,6 @@
             ((<= $number 64) #'%%uint64_t)
             (else (syntax-error $size)))))))
 
-  (define (value-id $value)
-    (syntax-case $value ()
-      (id (identifier? #'id) #'id)
-      (_ #'value)))
-
   (define (id->micac $id) $id)
 
   (define (size-micac-mask $size $micac)
@@ -334,34 +219,4 @@
 
   (define (type-micac-mask $type $micac)
     (size-micac-mask (type-size $type) $micac))
-
-  (define (global?-statement-registers $global? $statement)
-    (syntax-case $statement (%register %on)
-      ((%register body ...)
-        (list $statement))
-      ((%on body ...)
-        (if $global?
-          (global?-on-registers $global? $statement)
-          (list)))
-      (_
-        (list))))
-
-  (define (global?-on-registers $global? $on)
-    (syntax-case $on (%on)
-      ((%on name process)
-        (global?-process-registers $global? #'process))
-      ((%on name process opposite-process)
-        (global?-process-registers $global? #'process))
-          ((%on name process opposite-process)
-            (append
-              (global?-process-registers $global? #'process)
-              (global?-process-registers $global? #'opposite-process)))))
-
-  (define (global?-process-registers $global? $process)
-    (syntax-case $process ()
-      ((edge statement ...)
-        (flatten
-          (map
-            (partial global?-statement-registers $global?)
-            (syntaxes statement ...))))))
 )

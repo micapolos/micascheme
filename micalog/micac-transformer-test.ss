@@ -2,7 +2,8 @@
   (micascheme)
   (micalog micac-transformer)
   (prefix (micalog keywords) %)
-  (prefix (micac syntax) %%))
+  (prefix (micac) %%)
+  (prefix (micac lib emu) %%))
 
 (define-check-datum-> micac)
 

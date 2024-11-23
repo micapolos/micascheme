@@ -4,6 +4,7 @@
     on posedge negedge
     cond else
     register set
+    capture
     wire assign
     int
     = != < <= > >=
@@ -18,6 +19,7 @@
     on posedge negedge
     cond else
     register set
+    capture
     wire assign
     int
     = != < <= > >=
