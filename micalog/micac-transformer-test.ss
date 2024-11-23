@@ -7,6 +7,8 @@
 
 (define-check-datum-> micac)
 
+; === types ===
+
 (check-micac (type 1) %%uint8_t)
 (check-micac (type 8) %%uint8_t)
 (check-micac (type 9) %%uint16_t)
@@ -16,8 +18,12 @@
 (check-micac (type 33) %%uint64_t)
 (check-micac (type 64) %%uint64_t)
 
+; === values ===
+
 (check-micac (value foo) foo)
 (check-micac (value 123) 123)
+
+; === expressions ===
 
 (check-micac (expr foo) foo)
 (check-micac (expr 123) 123)
@@ -73,5 +79,94 @@
     (%%= (%%bitwise-and (%%bitwise-not a) 1) 1)
     (%%bitwise-and (%%bitwise-not b) 63)
     (%%bitwise-and c d)))
+
+; === registers ===
+
+(check-micac
+  (register (%register 8 foo))
+  (%%var %%uint8_t foo))
+
+; === input params ===
+
+(check-micac
+  (input-param (%input 8 foo))
+  foo)
+
+; === instructions ===
+
+(check-micac
+  (instruction (%wire 8 foo bar))
+  (%%const %%uint8_t foo bar))
+
+(check-micac
+  (raises
+    (instruction (%output 8 foo bar))))
+
+(check-micac
+  (instruction (%set 8 foo bar))
+  (%%set foo bar))
+
+(check-micac
+  (instruction
+    (%on (prev next)
+      (%posedge)))
+  (%%when (%%not (%%= prev next))
+    (%%when (%%= next 1))))
+
+(check-micac
+  (instruction
+    (%on (prev next)
+      (%negedge)))
+  (%%when (%%not (%%= prev next))
+    (%%when (%%= next 0))))
+
+(check-micac
+  (instruction
+    (%on (prev next)
+      (%posedge)
+      (%else)))
+  (%%when (%%not (%%= prev next))
+    (%%if (%%= next 1)
+      (%%then)
+      (%%else))))
+
+(check-micac
+  (instruction
+    (%on (prev next)
+      (%negedge)
+      (%else)))
+  (%%when (%%not (%%= prev next))
+    (%%if (%%= next 0)
+      (%%then)
+      (%%else))))
+
+(check-micac
+  (instruction
+    (%on (prev next)
+      (%posedge
+        (%set 8 foo bar)
+        (%set 8 goo gar))))
+  (%%when (%%not (%%= prev next))
+    (%%when (%%= next 1)
+      (%%set foo bar)
+      (%%set goo gar))))
+
+(check-micac
+  (instruction
+    (%on (prev next)
+      (%negedge
+        (%set 8 foo bar)
+        (%set 8 goo gar))
+      (%else
+        (%set 16 zoo zar)
+        (%set 16 moo mar))))
+  (%%when (%%not (%%= prev next))
+    (%%if (%%= next 0)
+      (%%then
+        (%%set foo bar)
+        (%%set goo gar))
+      (%%else
+        (%%set zoo zar)
+        (%%set moo mar)))))
 
 

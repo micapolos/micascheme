@@ -18,6 +18,7 @@
   ; - module with explicit previous-clock and clock names
   ; - fully typed
   ; - all inputs and registers declared at the top-level
+  ; - no outputs
   ; - explicit captures to capture previous register values
   ; - "on" statement with explicit previous value
   (define (module->micac $module)
@@ -55,7 +56,7 @@
           #,(name->micac #'name)))))
 
   (define (instruction->micac $statement)
-    (syntax-case $statement (%capture %output %wire %set %on)
+    (syntax-case $statement (%capture %output %wire %set %on %else)
       ((%capture type name expr)
         #`(%%const
           #,(type->micac #'type)
@@ -79,7 +80,7 @@
           (%%when (%%= #,(name->micac #'name) #,(edge->micac #'edge))
             #,@(map instruction->micac (syntaxes statement ...)))))
       ((%on (previous-name name) (edge statement ...) (%else else-statement ...))
-        #`(%%when (%%not (%%= #,(name->micac #'previous-id) #,(name->micac #'name)))
+        #`(%%when (%%not (%%= #,(name->micac #'previous-name) #,(name->micac #'name)))
           (%%if (%%= #,(name->micac #'name) #,(edge->micac #'edge))
             (%%then #,@(map instruction->micac (syntaxes statement ...)))
             (%%else #,@(map instruction->micac (syntaxes else-statement ...))))))))
