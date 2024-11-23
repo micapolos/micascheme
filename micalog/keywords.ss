@@ -5,7 +5,7 @@
     cond else
     register set
     wire assign
-    expr int
+    int
     = != < <= > >=
     append slice
     + -
@@ -19,7 +19,7 @@
     cond else
     register set
     wire assign
-    expr int
+    int
     = != < <= > >=
     append slice
     + -
