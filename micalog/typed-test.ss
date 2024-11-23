@@ -85,7 +85,8 @@
 (check-typed (scope-expr $scope (%= foo-4 bar-4)) (1 (%= 4 foo-4 bar-4)))
 (check-typed (scope-expr $scope (%if foo-1 foo-8 bar-8)) (8 (%if 8 foo-1 foo-8 bar-8)))
 
-(check-typed-syntax (scope-instr $scope (%input foo-4 4)) (%input 4 foo-4))
+(check-typed-syntax (scope-instr $scope (%input foo-1)) (%input 1 foo-1))
+(check-typed-syntax (scope-instr $scope (%input 4 foo-4)) (%input 4 foo-4))
 (check-typed-syntax (raises (scope-instr $scope (%input foo-4 foo))))
 
 (check-typed-syntax (scope-instr $scope (%wire wire-4 foo-4)) (%wire 4 wire-4 foo-4))
@@ -103,11 +104,15 @@
   (raises (scope-instrs $scope ((%set reg-4 foo-4)))))
 
 (check-typed-syntax
-  (scope-instrs $scope ((%register reg-4 4) (%set reg-4 foo-4)))
+  (scope-instrs $scope ((%register reg-1) (%set reg-1 foo-1)))
+  ((%register 1 reg-1) (%set 1 reg-1 foo-1)))
+
+(check-typed-syntax
+  (scope-instrs $scope ((%register 4 reg-4) (%set reg-4 foo-4)))
   ((%register 4 reg-4) (%set 4 reg-4 foo-4)))
 
 (check-typed-syntax
-  (scope-instrs $scope ((%register reg-4 4) (%wire goo-4 foo-4) (%set reg-4 goo-4)))
+  (scope-instrs $scope ((%register 4 reg-4) (%wire goo-4 foo-4) (%set reg-4 goo-4)))
   ((%register 4 reg-4) (%wire 4 goo-4 foo-4) (%set 4 reg-4 goo-4)))
 
 (check-typed-syntax (raises (scope-instr $scope (%cond (foo-4)))))
@@ -187,7 +192,7 @@
 (check-typed-syntax
   (module
     (%module bypass-8
-      (%input in 8)
+      (%input 8 in)
       (%output out in)))
   (%module bypass-8
     (%input 8 in)
@@ -196,9 +201,9 @@
 (check-typed-syntax
   (module
     (%module and-gate
-      (%input clock 1)
-      (%input in-1 8)
-      (%input in-2 8)
+      (%input 1 clock)
+      (%input 8 in-1)
+      (%input 8 in-2)
       (%output out
         (%append
           (%and in-1 in-2)

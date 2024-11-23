@@ -237,7 +237,11 @@
 
   (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
     (syntax-case $instr (%input %output %wire %register %set %cond %else %on)
-      ((%input id type)
+      ((%input id)
+        (scoped
+          (scope+ $scope (identifier id) (binding #'%wire #'1))
+          (push $syntaxes #`(%input 1 id))))
+      ((%input type id)
         (lets
           ($type (type->syntax #'type))
           (scoped
@@ -257,7 +261,11 @@
           (scoped
             (scope+ $scope (identifier id) (binding #'%wire $type))
             (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))
-      ((%register id type)
+      ((%register id)
+        (scoped
+          (scope+ $scope (identifier id) (binding #'%register #'1))
+          (push $syntaxes #`(%register 1 #,(identifier id)))))
+      ((%register type id)
         (lets
           ($type (type->syntax #'type))
           (scoped
