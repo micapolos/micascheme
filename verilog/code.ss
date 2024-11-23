@@ -170,7 +170,11 @@
       "if" "else" "case" "casex" "casez" "default"
       "for" "while" "repeat"
       "task" "endtask" "function" "endfunction"
-      "+" "-" "*" "/" "%" "&" "|" "^" "~" "!" "&&" "||" "==" "!=" "<" ">" "<=" ">=" "<<" ">>"))
+      "+" "-" "*" "/" "%"
+      "&" "|" "^" "~&" "~|" "^~" "~"
+      "!" "&&" "||"
+      "==" "!="
+      "<" ">" "<=" ">=" "<<" ">>"))
 
   (define (name->code $name)
     (fluent $name
