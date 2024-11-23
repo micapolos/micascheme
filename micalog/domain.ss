@@ -27,6 +27,8 @@
         (syntax-case $domain-b ()
           (((id-b . edges-b) . tail-b)
             (if (free-identifier=? (identifier id-a) (identifier id-b))
-              #`((id-a . #,(edges+ #'edges-a #'edges-b)))
+              #`(
+                (id-a . #,(edges+ #'edges-a #'edges-b)) .
+                #,(domain+ #'tail-a #'tail-b))
               #`TODO))))))
 )

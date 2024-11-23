@@ -1,6 +1,6 @@
 (import
   (micascheme)
-  (micalog typed)
+  (micalog type)
   (syntax scope)
   (prefix (micalog keywords) %))
 

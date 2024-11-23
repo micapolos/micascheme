@@ -5,4 +5,5 @@
   (micalog verilog-transformer)
   (micalog utils)
   (micalog flatten)
-  (micalog typed))
+  (micalog type)
+  (micalog domain))

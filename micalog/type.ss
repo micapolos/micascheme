@@ -1,4 +1,4 @@
-(library (micalog typed)
+(library (micalog type)
   (export
     literal->typed
     expr->typed
