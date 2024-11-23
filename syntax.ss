@@ -187,9 +187,9 @@
               (syntax=? #'as #'bs)))
           (_ #f)))
       (a (identifier? #'a)
-        (syntax-case b ()
-          (b (identifier? #'b)
-            (free-identifier=? #'a #'b))))
+        (and
+          (identifier? b)
+          (free-identifier=? #'a b)))
       (_
         (equal?
           (syntax->datum a)
@@ -307,10 +307,15 @@
 
   (define (syntax-update $syntax $id $fn)
     (syntax-case $syntax ()
-      (() #`())
+      (()
+        (let (($updated ($fn #f)))
+          (if $updated #`((#,$id . #,$updated)) #'())))
       (((id . value) . tail)
         (if (free-identifier=? #'id $id)
-          #`((id . #,($fn #'value)) . #,(syntax-update #'tail $id $fn))
+          (let (($updated ($fn #'value)))
+            (if $updated
+              #`((id . #,$updated) . tail)
+              (syntax-update #'tail $id $fn)))
           #`((id . value) . #,(syntax-update #'tail $id $fn))))))
 
   (define (syntax-set $syntax $id $value)

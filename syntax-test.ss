@@ -123,11 +123,24 @@
 (check (syntax=? (syntax-remove #'((c . d) (a . b)) #'a) #'((c . d))))
 (check (syntax=? (syntax-remove #'((c . d) (a . b) (a . f)) #'a) #'((c . d))))
 
-(define (update-fn $a) #`(updated #,$a))
+(define (update-fn $a) (if $a #`(updated #,$a) #f))
 (check (syntax=? (syntax-update #'() #'a update-fn) #'()))
 (check (syntax=? (syntax-update #'((a . b)) #'a update-fn) #'((a . (updated b)))))
 (check (syntax=? (syntax-update #'((a . b) (c . d)) #'a update-fn) #'((a . (updated b)) (c . d))))
-(check (syntax=? (syntax-update #'((a . b) (c . d) (a . g)) #'a update-fn) #'((a . (updated b)) (c . d) (a . (updated g)))))
+(check (syntax=? (syntax-update #'((a . b) (c . d) (a . g)) #'a update-fn) #'((a . (updated b)) (c . d) (a . g))))
+
+(define (remove-fn $a) #f)
+(check (syntax=? (syntax-update #'() #'a remove-fn) #'()))
+(check (syntax=? (syntax-update #'((a . b)) #'a remove-fn) #'()))
+(check (syntax=? (syntax-update #'((a . b) (c . d)) #'a remove-fn) #'((c . d))))
+(check (syntax=? (syntax-update #'((a . b) (c . d) (a . g)) #'a remove-fn) #'((c . d))))
+
+(define (update-or-new-fn $a) (if $a #`(updated #,$a) #'new))
+(check (syntax=? (syntax-update #'() #'a update-or-new-fn) #'((a . new))))
+(check (syntax=? (syntax-update #'((a . b)) #'a update-or-new-fn) #'((a . (updated b)))))
+(check (syntax=? (syntax-update #'((a . b) (c . d)) #'a update-or-new-fn) #'((a . (updated b)) (c . d))))
+(check (syntax=? (syntax-update #'((a . b) (c . d) (a . g)) #'a update-or-new-fn) #'((a . (updated b)) (c . d) (a . g))))
+(check (syntax=? (syntax-update #'((a . b)) #'e update-or-new-fn) #'((a . b) (e . new))))
 
 (check (syntax-false? #'#f))
 (check (not (syntax-false? #'#t)))
