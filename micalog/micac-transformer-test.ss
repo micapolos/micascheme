@@ -173,4 +173,34 @@
         (%%set zoo zar)
         (%%set moo mar)))))
 
+; === module ===
 
+(check-micac
+  (module
+    (%module (empty prev-clock clock)))
+  (%%macro (empty)
+    (%%var uint8_t prev-clock 0)
+    (%%var uint8_t clock 1)
+    (%%update
+      (%%set prev-clock clock)
+      (%%set clock (%%xor clock 1)))))
+
+(check-micac
+  (module
+    (%module (counter prev-clock clock)
+      (%register 16 counter)
+      (%on (prev-clock clock)
+        (%posedge
+          (%capture 16 previous-counter counter)
+          (%set 16 counter (%+ 16 previous-counter 1))))))
+  (%%macro (counter)
+    (%%var uint8_t prev-clock 0)
+    (%%var uint8_t clock 1)
+    (%%var %%uint16_t counter)
+    (%%update
+      (%%set prev-clock clock)
+      (%%set clock (%%xor clock 1))
+      (%%when (%%not (%%= prev-clock clock))
+        (%%when (%%= clock 1)
+          (%%const %%uint16_t previous-counter counter)
+          (%%set counter (%%bitwise-and (%%+ previous-counter 1) 65535)))))))
