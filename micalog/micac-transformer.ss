@@ -21,8 +21,6 @@
   ; - no outputs
   ; - explicit captures to capture previous register values
   ; - "on" statement with explicit previous value
-  ; TODO:
-  ; - translate 1-bit type to bool
   (define (module->micac $module)
     (syntax-case $module (%module)
       ((%module (name previous-clock clock) statement ...)
