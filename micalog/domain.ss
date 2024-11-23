@@ -23,12 +23,15 @@
 
   (define (domain+ $domain-a $domain-b)
     (syntax-case $domain-a ()
+      (() $domain-b)
       (((id-a . edges-a) . tail-a)
         (syntax-case $domain-b ()
+          (() $domain-a)
           (((id-b . edges-b) . tail-b)
             (if (free-identifier=? (identifier id-a) (identifier id-b))
               #`(
                 (id-a . #,(edges+ #'edges-a #'edges-b)) .
                 #,(domain+ #'tail-a #'tail-b))
-              #`TODO))))))
+              (syntax-error #'id-b
+                (format "illegal domain, expected ~a in" (datum id-a)))))))))
 )
