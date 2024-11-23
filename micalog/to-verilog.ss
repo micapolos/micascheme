@@ -75,16 +75,10 @@
       ((%cond clause ... (%else body ...))
         #`(%%cond
           #,@(map clause->verilog (syntaxes clause ...))
-          (%else #,@(filter-opts (map instr->verilog? (syntaxes body ...))))))
+          (%%else #,@(filter-opts (map instr->verilog? (syntaxes body ...))))))
       ((%cond clause-1 clause ...)
         #`(%%cond
           #,@(map clause->verilog (syntaxes clause-1 clause ...))))
-      ((%if cond (%then then ...) (%else els ...))
-        #`(%%cond
-          (#,(expr->verilog #'cond)
-            #,@(filter-opts (map instr->verilog? (syntaxes then ...))))
-          (%%else
-            #,@(filter-opts (map instr->verilog? (syntaxes els ...))))))
       (_ #f)))
 
   (define (clause->verilog $clause)

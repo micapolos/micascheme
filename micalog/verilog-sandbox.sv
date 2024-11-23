@@ -21,7 +21,7 @@ module oscillating_registers (
     if (reset_) begin
       reg_1 <= _initial;
       reg_2 <= ~_initial;
-    end else if (%else) begin
+    end else begin
       reg_1 <= reg_2;
       reg_2 <= reg_1;
     end
@@ -80,7 +80,7 @@ module funny_module (
       counter <= mouse_x;
     end else if (mouse_pressed_) begin
       counter <= counter + 1;
-    end else if (%else) begin
+    end else begin
       counter <= counter - 1;
     end
   end
