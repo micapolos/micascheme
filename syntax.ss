@@ -45,6 +45,7 @@
     syntax-update
     syntax-remove
     syntax-add
+    syntax-false?
     list->syntax
     syntax-append
     literal->syntax
@@ -327,6 +328,11 @@
         (if (free-identifier=? #'id $id)
           (syntax-remove #'tail $id)
           #`((id . value) . #,(syntax-remove #'tail $id))))))
+
+  (define (syntax-false? $syntax)
+    (syntax-case $syntax ()
+      (#f #t)
+      (_ #f)))
 
   (define (list->syntax $list)
     #`(#,@$list))

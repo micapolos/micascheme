@@ -234,3 +234,8 @@
 (check (syntax=? (syntax-update #'((a . b)) #'a update-fn) #'((a . (updated b)))))
 (check (syntax=? (syntax-update #'((a . b) (c . d)) #'a update-fn) #'((a . (updated b)) (c . d))))
 (check (syntax=? (syntax-update #'((a . b) (c . d) (a . g)) #'a update-fn) #'((a . (updated b)) (c . d) (a . (updated g)))))
+
+(check (syntax-false? #`#f))
+(check (not (syntax-false? #`#t)))
+(check (not (syntax-false? #`())))
+(check (not (syntax-false? #`a)))
