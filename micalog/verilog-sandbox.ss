@@ -1,4 +1,4 @@
-(import (micalog verilog-syntax))
+(import (micalog verilog))
 
 (display-verilog
   (module empty)

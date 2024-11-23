@@ -1,191 +1,30 @@
 (library (micalog verilog)
-  (export
-    name->verilog
-    edge->verilog
-    value->verilog
-    module->verilog
-    expr->verilog
-    input->verilog
-    output->verilog
-    instr->verilog
-    declaration->verilog)
-
+  (export verilog-string display-verilog)
   (import
-    (micascheme)
-    (micalog model)
-    (prefix (micalog keywords) %)
-    (prefix (verilog keywords) %%))
+    (only (micascheme) display define-rule-syntax string-append apply intercalate with map-using syntaxes ... fluent define-case-syntax literal->syntax syntax export ...)
+    (only (code) code-string)
+    (rename
+      (only (verilog code) module->code)
+      (module->code verilog-module->code))
+    (rename
+      (only (micalog to-verilog) module->verilog)
+      (module->verilog micalog-module->verilog))
+    (only (micalog model) expand-module)
+    (only (micalog typed) module->typed-syntax)
+    (micalog keywords))
+  (export (import (micalog keywords)))
 
-  (define (module->verilog $module)
-    (syntax-case $module (%module %input %internal %output)
-      ((%module name body ...)
-        #`(%%module
-          (
-            #,(name->verilog #'name)
-            #,@(map input->verilog (declaration-syntaxes-of %input body ...))
-            #,@(map output->verilog (declaration-syntaxes-of %output body ...)))
-          #,@(filter-opts (map declaration->verilog? (syntaxes body ...)))
-          #,@(filter-opts (map instr->verilog? (syntaxes body ...)))))))
+  (define-case-syntax (verilog-string module ...)
+    (fluent (syntaxes module ...)
+      (map-using module->typed-syntax)
+      (map-using expand-module)
+      (map-using micalog-module->verilog)
+      (map-using verilog-module->code)
+      (map-using code-string)
+      (intercalate "\n")
+      (with $it (apply string-append $it))
+      (literal->syntax)))
 
-  (define (input->verilog $input)
-    (syntax-case $input (%input)
-      ((%input type name)
-        #`(%%input
-          #,@(opt->list (type->verilog? #'type))
-          #,(name->verilog #'name)))))
-
-  (define (output->verilog $output)
-    (syntax-case $output (%output)
-      ((%output type name)
-        #`(%%output
-          #,@(opt->list (type->verilog? #'type))
-          #,(name->verilog #'name)))))
-
-  (define (declaration->verilog? $declaration)
-    (syntax-case $declaration (%wire %register %assign %on)
-      ((%wire type name)
-        #`(%%wire
-          #,@(opt->list (type->verilog? #'type))
-          #,(name->verilog #'name)))
-      ((%register type name)
-        #`(%%reg
-          #,@(opt->list (type->verilog? #'type))
-          #,(name->verilog #'name)))
-      ((%assign type name expr)
-        #`(%%assign
-          #,(name->verilog #'name)
-          #,(expr->verilog #'expr)))
-      ((%on name (edge body ...))
-        #`(%%always
-          (#,(edge->verilog #'edge) #,(name->verilog #'name))
-          #,@(filter-opts (map instr->verilog? (syntaxes body ...)))))
-      (_ #f)))
-
-  (define (declaration->verilog $declaration)
-    (or
-      (declaration->verilog? $declaration)
-      (syntax-error $declaration)))
-
-  (define (instr->verilog? $declaration)
-    (syntax-case $declaration (%set %cond %else)
-      ((%set type name expr)
-        #`(%%set!
-          #,(name->verilog #'name)
-          #,(expr->verilog #'expr)))
-      ((%cond clause ... (%else body ...))
-        #`(%%cond
-          #,@(map clause->verilog (syntaxes clause ...))
-          (%else #,@(filter-opts (map instr->verilog? (syntaxes body ...))))))
-      ((%cond clause-1 clause ...)
-        #`(%%cond
-          #,@(map clause->verilog (syntaxes clause-1 clause ...))))
-      ((%if cond (%then then ...) (%else els ...))
-        #`(%%cond
-          (#,(expr->verilog #'cond)
-            #,@(filter-opts (map instr->verilog? (syntaxes then ...))))
-          (%%else
-            #,@(filter-opts (map instr->verilog? (syntaxes els ...))))))
-      (_ #f)))
-
-  (define (clause->verilog $clause)
-    (syntax-case $clause ()
-      ((cond body ...)
-        #`(
-          #,(expr->verilog #'cond)
-          #,@(filter-opts (map instr->verilog? (syntaxes body ...)))))))
-
-  (define (instr->verilog $instr)
-    (or
-      (instr->verilog? $instr)
-      (syntax-error $instr)))
-
-  (define (type->verilog? $type)
-    (syntax-case $type ()
-      (number (positive-integer? (datum number))
-        (and
-          (not (= (datum number) 1))
-          #`(#,(- (datum number) 1) %%to 0)))))
-
-  (define (expr->verilog $expr)
-    (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %if %not %and %or %xor %nand %nor %xnor %+ %-)
-      ((%append (type expr) ...)
-        #`(%%append
-          #,@(map expr->verilog (syntaxes expr ...))))
-      ((%slice type a shift)
-        (lets
-          ($shift (datum shift))
-          ($mask (datum type))
-          #`(%%ref
-            #,(expr->verilog #'a)
-            (
-              #,(literal->syntax (+ $shift $mask -1))
-              %%to
-              #,(literal->syntax $shift)))))
-      ((%= type a b)
-        (op2->verilog #'%%= #'a #'b))
-      ((%!= type a b)
-        (op2->verilog #'%%!= #'a #'b))
-      ((%< type a b)
-        (op2->verilog #'%%< #'a #'b))
-      ((%<= type a b)
-        (op2->verilog #'%%<= #'a #'b))
-      ((%> type a b)
-        (op2->verilog #'%%> #'a #'b))
-      ((%>= type a b)
-        (op2->verilog #'%%>= #'a #'b))
-      ((%not type a)
-        (op->verilog #'%%not #'a))
-      ((%and type a b)
-        (op2->verilog #'%%and #'a #'b))
-      ((%or type a b)
-        (op2->verilog #'%%or #'a #'b))
-      ((%xor type a b)
-        (op2->verilog #'%%xor #'a #'b))
-      ((%nand type a b)
-        (op2->verilog #'%%nand #'a #'b))
-      ((%nor type a b)
-        (op2->verilog #'%%nor #'a #'b))
-      ((%xnor type a b)
-        (op2->verilog #'%%xnor #'a #'b))
-      ((%+ type a b)
-        (op2->verilog #'%%+ #'a #'b))
-      ((%- type a b)
-        (op2->verilog #'%%- #'a #'b))
-      ((%- type a)
-        (op->verilog #'%%- #'a))
-      ((%if type cond true false)
-        #`(%%if
-          #,(expr->verilog #'cond)
-          #,(expr->verilog #'true)
-          #,(expr->verilog #'false)))
-      (value
-        (value->verilog #'value))))
-
-  (define (op->verilog $op $rhs)
-    #`(
-      #,$op
-      #,(expr->verilog $rhs)))
-
-  (define (op2->verilog $op $lhs $rhs)
-    #`(
-      #,$op
-      #,(expr->verilog $lhs)
-      #,(expr->verilog $rhs)))
-
-  (define (edge->verilog $edge)
-    (syntax-case $edge (%posedge %negedge)
-      (%posedge #'%%posedge)
-      (%negedge #'%%negedge)))
-
-  (define (value->verilog $value)
-    (syntax-case $value ()
-      (integer (integer? (datum integer))
-        #'integer)
-      (name
-        (name->verilog #'name))))
-
-  (define (name->verilog $name)
-    (syntax-case $name ()
-      (name (identifier? #'name)
-        #'name)))
+  (define-rule-syntax (display-verilog module ...)
+    (display (verilog-string module ...)))
 )

@@ -2,6 +2,6 @@
 
 (test
   (micalog micac)
-  (micalog verilog)
+  (micalog to-verilog)
   (micalog model)
   (micalog typed))
