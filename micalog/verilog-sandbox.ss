@@ -18,11 +18,11 @@
       (posedge
         (if reset?
           (then
-            (set reg-1 reg-2)
-            (set reg-2 reg-1))
-          (else
             (set reg-1 initial)
-            (set reg-1 (not initial))))))
+            (set reg-2 (not initial)))
+          (else
+            (set reg-1 reg-2)
+            (set reg-2 reg-1)))))
     (output out reg-1))
 
   (module counter-4

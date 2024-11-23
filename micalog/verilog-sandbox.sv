@@ -19,11 +19,11 @@ module oscillating_registers (
   reg [1:0] reg_2;
   always @(posedge clock) begin
     if (reset_) begin
+      reg_1 <= _initial;
+      reg_2 <= ~_initial;
+    end else begin
       reg_1 <= reg_2;
       reg_2 <= reg_1;
-    end else begin
-      reg_1 <= _initial;
-      reg_1 <= ~_initial;
     end
   end
   assign out = reg_1;
