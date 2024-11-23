@@ -1,7 +1,9 @@
 (library (fluent)
-  (export fluent)
+  (export fluent with)
   (import
-    (scheme))
+    (scheme) (syntax))
+
+  (define-aux-keyword with)
 
   (define-syntax fluent
     (syntax-rules (with values)

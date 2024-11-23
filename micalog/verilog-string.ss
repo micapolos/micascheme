@@ -1,7 +1,7 @@
 (library (micalog verilog-string)
-  (export verilog-string)
+  (export verilog-string display-verilog)
   (import
-    (only (micascheme) fluent define-case-syntax literal->syntax syntax export ...)
+    (only (micascheme) display define-rule-syntax string-append apply intercalate with map-using syntaxes ... fluent define-case-syntax literal->syntax syntax export ...)
     (only (code) code-string)
     (rename
       (only (verilog code) module->code)
@@ -14,12 +14,17 @@
     (micalog keywords))
   (export (import (micalog keywords)))
 
-  (define-case-syntax (verilog-string body)
-    (fluent #'body
-      (module->typed-syntax)
-      (expand-module)
-      (micalog-module->verilog)
-      (verilog-module->code)
-      (code-string)
+  (define-case-syntax (verilog-string module ...)
+    (fluent (syntaxes module ...)
+      (map-using module->typed-syntax)
+      (map-using expand-module)
+      (map-using micalog-module->verilog)
+      (map-using verilog-module->code)
+      (map-using code-string)
+      (intercalate "\n")
+      (with $it (apply string-append $it))
       (literal->syntax)))
+
+  (define-rule-syntax (display-verilog module ...)
+    (display (verilog-string module ...)))
 )
