@@ -178,11 +178,11 @@
           #,(expr->micac #'lhs)
           #,(expr->micac #'rhs)))
       ((%nand type lhs rhs)
-        #`(%%bitwise-not #,(expr->micac #`(%and type lhs rhs))))
+        (expr->micac #`(%not type (%and type lhs rhs))))
       ((%nor type lhs rhs)
-        #`(%%bitwise-not #,(expr->micac #`(%or type lhs rhs))))
+        (expr->micac #`(%not type (%or type lhs rhs))))
       ((%xnor type lhs rhs)
-        #`(%%bitwise-not #,(expr->micac #`(%xor type lhs rhs))))
+        (expr->micac #`(%not type (%xor type lhs rhs))))
       ((%not type rhs)
         (type-micac-mask #'type
           #`(%%bitwise-not
@@ -227,10 +227,21 @@
   (define (name->micac $id) $id)
 
   (define (size-micac-mask $size $micac)
-    #`(%%bitwise-and
-      #,$micac
-      #,(literal->syntax
-        (- (bitwise-arithmetic-shift-left 1 (syntax->datum $size)) 1))))
+    (if (size-needs-mask? $size)
+      #`(%%bitwise-and
+        #,$micac
+        #,(literal->syntax
+          (- (bitwise-arithmetic-shift-left 1 (syntax->datum $size)) 1)))
+      $micac))
+
+  (define (size-needs-mask? $size)
+    (syntax-case $size ()
+      (8 #f)
+      (16 #f)
+      (32 #f)
+      (64 #f)
+      (_ #t)))
+
 
   (define (type-micac-mask $type $micac)
     (size-micac-mask (type-size $type) $micac))

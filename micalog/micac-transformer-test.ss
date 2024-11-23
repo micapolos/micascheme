@@ -61,15 +61,24 @@
 (check-micac (expr (%- 6 a b)) (%%bitwise-and (%%- a b) #x3f))
 (check-micac (expr (%- 6 a)) (%%bitwise-and (%%- a) #x3f))
 
+(check-micac (expr (%+ 8 a b)) (%%+ a b))
+(check-micac (expr (%- 8 a b)) (%%- a b))
+(check-micac (expr (%- 8 a)) (%%- a))
+
 (check-micac (expr (%and 6 a b)) (%%bitwise-and a b))
 (check-micac (expr (%or 6 a b)) (%%bitwise-ior a b))
 (check-micac (expr (%xor 6 a b)) (%%bitwise-xor a b))
 
-(check-micac (expr (%nand 6 a b)) (%%bitwise-not (%%bitwise-and a b)))
-(check-micac (expr (%nor 6 a b)) (%%bitwise-not (%%bitwise-ior a b)))
-(check-micac (expr (%xnor 6 a b)) (%%bitwise-not (%%bitwise-xor a b)))
+(check-micac (expr (%nand 6 a b)) (%%bitwise-and (%%bitwise-not (%%bitwise-and a b)) #x3f))
+(check-micac (expr (%nor 6 a b)) (%%bitwise-and (%%bitwise-not (%%bitwise-ior a b)) #x3f))
+(check-micac (expr (%xnor 6 a b)) (%%bitwise-and (%%bitwise-not (%%bitwise-xor a b)) #x3f))
+
+(check-micac (expr (%nand 8 a b)) (%%bitwise-not (%%bitwise-and a b)))
+(check-micac (expr (%nor 8 a b)) (%%bitwise-not (%%bitwise-ior a b)))
+(check-micac (expr (%xnor 8 a b)) (%%bitwise-not (%%bitwise-xor a b)))
 
 (check-micac (expr (%not 6 a)) (%%bitwise-and (%%bitwise-not a) #x3f))
+(check-micac (expr (%not 8 a)) (%%bitwise-not a))
 
 (check-micac (expr (%if 6 a b c)) (%%if (%%= a 1) b c))
 
@@ -203,4 +212,4 @@
       (%%when (%%not (%%= prev-clock clock))
         (%%when (%%= clock 1)
           (%%const %%uint16_t previous-counter counter)
-          (%%set counter (%%bitwise-and (%%+ previous-counter 1) 65535)))))))
+          (%%set counter (%%+ previous-counter 1)))))))
