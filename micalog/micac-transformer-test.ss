@@ -66,9 +66,17 @@
 (check-micac (expr (%- 8 a b)) (%%- a b))
 (check-micac (expr (%- 8 a)) (%%- a))
 
+(check-micac (expr (%and 1 a b)) (%%and a b))
+(check-micac (expr (%or 1 a b)) (%%or a b))
+(check-micac (expr (%xor 1 a b)) (%%bitwise-xor a b))
+
 (check-micac (expr (%and 6 a b)) (%%bitwise-and a b))
 (check-micac (expr (%or 6 a b)) (%%bitwise-ior a b))
 (check-micac (expr (%xor 6 a b)) (%%bitwise-xor a b))
+
+(check-micac (expr (%nand 1 a b)) (%%not (%%and a b)))
+(check-micac (expr (%nor 1 a b)) (%%not (%%or a b)))
+(check-micac (expr (%xnor 1 a b)) (%%not (%%bitwise-xor a b)))
 
 (check-micac (expr (%nand 6 a b)) (%%bitwise-and (%%bitwise-not (%%bitwise-and a b)) #x3f))
 (check-micac (expr (%nor 6 a b)) (%%bitwise-and (%%bitwise-not (%%bitwise-ior a b)) #x3f))
@@ -78,6 +86,7 @@
 (check-micac (expr (%nor 8 a b)) (%%bitwise-not (%%bitwise-ior a b)))
 (check-micac (expr (%xnor 8 a b)) (%%bitwise-not (%%bitwise-xor a b)))
 
+(check-micac (expr (%not 1 a)) (%%not a))
 (check-micac (expr (%not 6 a)) (%%bitwise-and (%%bitwise-not a) #x3f))
 (check-micac (expr (%not 8 a)) (%%bitwise-not a))
 
