@@ -29,13 +29,6 @@
     syntax-subst
     syntax-contains?
     syntax-case?
-    syntax-properties-ref*
-    syntax-properties-ref?
-    syntax-properties-ref
-    syntax-properties-add
-    syntax-properties-update
-    syntax-properties-set
-    syntax-properties-delete
     syntax-cons
     syntax-car
     syntax-cdr
@@ -342,57 +335,6 @@
 
   (define (literal->syntax $literal)
     (datum->syntax #'literal->syntax $literal))
-
-  (define (syntax-properties-ref* $syntax $id)
-    (syntax-case $syntax ()
-      ((property ...)
-        (filter
-          (lambda (x) x)
-          (map
-            (lambda ($property) (syntax-property-ref? $property $id))
-            (syntaxes property ...))))))
-
-  (define (syntax-properties-ref? $syntax $id)
-    (syntax-case $syntax ()
-      (() #f)
-      ((property . tail)
-        (let (($value (syntax-property-ref? #'property $id)))
-          (or $value (syntax-properties-ref? #'tail $id))))))
-
-  (define (syntax-properties-ref $syntax $id)
-    (or
-      (syntax-properties-ref? $syntax $id)
-      (syntax-error $syntax (format "no property ~a in" (syntax->datum $id)))))
-
-  (define (syntax-property-ref? $syntax $id)
-    (syntax-case $syntax ()
-      ((id value)
-        (identifier? #'id)
-        (and (free-identifier=? #'id $id) #'value))
-      (_ #f)))
-
-  (define (syntax-properties-add $syntax $id $value)
-    #`((#,$id #,$value) . #,$syntax))
-
-  (define (syntax-properties-update $syntax $id $proc)
-    (syntax-case $syntax ()
-      (()
-        (let (($value ($proc #f)))
-          (if $value #`((#,$id #,$value)) $syntax)))
-      ((property . tail)
-        (let (($value (syntax-property-ref? #'property $id)))
-          (if $value
-            (let (($updated-value ($proc $value)))
-              (if $updated-value
-                #`((#,$id #,$updated-value) . tail)
-                #'tail))
-            #`(property . #,(syntax-properties-update #'tail $id $proc)))))))
-
-  (define (syntax-properties-set $syntax $id $value)
-    (syntax-properties-update $syntax $id (lambda (_) $value)))
-
-  (define (syntax-properties-delete $syntax $id)
-    (syntax-properties-update $syntax $id (lambda (_) #f)))
 
   (define (syntax-single $syntax)
     (syntax-case $syntax ()
