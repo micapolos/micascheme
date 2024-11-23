@@ -34,4 +34,7 @@
                 #,(domain+ #'tail-a #'tail-b))
               (syntax-error #'id-b
                 (format "illegal domain, expected ~a in" (datum id-a)))))))))
+
+  (define (env+id-domain $env $id $domain)
+    (syntax-update $env $id ))
 )

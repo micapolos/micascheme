@@ -109,19 +109,13 @@
 (check (syntax=? (syntax-remove #'() #'a) #'()))
 (check (syntax=? (syntax-remove #'((a . b)) #'a) #'()))
 (check (syntax=? (syntax-remove #'((a . b) (c . d)) #'a) #'((c . d))))
-(check (syntax=? (syntax-remove #'((a . b) (c . d) (a . f)) #'a) #'((c . d))))
+(check (syntax=? (syntax-remove #'((a . b) (c . d) (a . f)) #'a) #'((c . d) (a . f))))
 
 (check (syntax=? (syntax-set #'() #'a #'b) #'((a . b))))
 (check (syntax=? (syntax-set #'((a . d)) #'a #'b) #'((a . b))))
 (check (syntax=? (syntax-set #'((c . d)) #'a #'b) #'((c . d) (a . b))))
 (check (syntax=? (syntax-set #'((c . d) (a . f)) #'a #'b) #'((c . d) (a . b))))
-(check (syntax=? (syntax-set #'((a . b) (c . d) (a . f)) #'a #'g) #'((a . g) (c . d))))
-
-(check (syntax=? (syntax-remove #'() #'a) #'()))
-(check (syntax=? (syntax-remove #'((a . b)) #'a) #'()))
-(check (syntax=? (syntax-remove #'((a . b) (c . d)) #'a) #'((c . d))))
-(check (syntax=? (syntax-remove #'((c . d) (a . b)) #'a) #'((c . d))))
-(check (syntax=? (syntax-remove #'((c . d) (a . b) (a . f)) #'a) #'((c . d))))
+(check (syntax=? (syntax-set #'((a . b) (c . d) (a . f)) #'a #'g) #'((a . g) (c . d) (a . f))))
 
 (define (update-fn $a) (if $a #`(updated #,$a) #f))
 (check (syntax=? (syntax-update #'() #'a update-fn) #'()))
@@ -133,7 +127,7 @@
 (check (syntax=? (syntax-update #'() #'a remove-fn) #'()))
 (check (syntax=? (syntax-update #'((a . b)) #'a remove-fn) #'()))
 (check (syntax=? (syntax-update #'((a . b) (c . d)) #'a remove-fn) #'((c . d))))
-(check (syntax=? (syntax-update #'((a . b) (c . d) (a . g)) #'a remove-fn) #'((c . d))))
+(check (syntax=? (syntax-update #'((a . b) (c . d) (a . g)) #'a remove-fn) #'((c . d) (a . g))))
 
 (define (update-or-new-fn $a) (if $a #`(updated #,$a) #'new))
 (check (syntax=? (syntax-update #'() #'a update-or-new-fn) #'((a . new))))

@@ -315,25 +315,16 @@
           (let (($updated ($fn #'value)))
             (if $updated
               #`((id . #,$updated) . tail)
-              (syntax-update #'tail $id $fn)))
+              #'tail))
           #`((id . value) . #,(syntax-update #'tail $id $fn))))))
 
   (define (syntax-set $syntax $id $value)
-    (syntax-case $syntax ()
-      (()
-        #`((#,$id . #,$value)))
-      (((id . value) . tail)
-        (if (free-identifier=? #'id $id)
-          #`((id . #,$value) . #,(syntax-remove #'tail $id))
-          #`((id . value) . #,(syntax-set #'tail $id $value))))))
+    (syntax-update $syntax $id
+      (lambda (_) $value)))
 
   (define (syntax-remove $syntax $id)
-    (syntax-case $syntax ()
-      (() #`())
-      (((id . value) . tail)
-        (if (free-identifier=? #'id $id)
-          (syntax-remove #'tail $id)
-          #`((id . value) . #,(syntax-remove #'tail $id))))))
+    (syntax-update $syntax $id
+      (lambda (_) #f)))
 
   (define (syntax-false? $syntax)
     (syntax-case $syntax ()
