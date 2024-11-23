@@ -190,3 +190,13 @@
 (check (syntax=? (syntax-single #`(foo)) #'foo))
 (check (raises (syntax-single #`123)))
 (check (raises (syntax-single #`(foo bar))))
+
+; === null? cons car cdr ===
+
+(check (syntax-null? #'()))
+(check (not (syntax-null? #'a)))
+(check (not (syntax-null? #'(a))))
+
+(check (syntax=? (syntax-cons #'a #'b) #'(a . b)))
+(check (syntax=? (syntax-car #'(a . b)) #'a))
+(check (syntax=? (syntax-cdr #'(a . b)) #'b))

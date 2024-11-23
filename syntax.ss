@@ -37,6 +37,8 @@
     syntax-properties-set
     syntax-properties-delete
     syntax-cons
+    syntax-car
+    syntax-cdr
     list->syntax
     syntax-append
     literal->syntax
@@ -269,6 +271,14 @@
 
   (define (syntax-cons $a $b)
     #`(#,$a . #,$b))
+
+  (define (syntax-car $syntax)
+    (syntax-case $syntax ()
+      ((a . _) #'a)))
+
+  (define (syntax-cdr $syntax)
+    (syntax-case $syntax ()
+      ((_ . b) #'b)))
 
   (define (list->syntax $list)
     #`(#,@$list))
