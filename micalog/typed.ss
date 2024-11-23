@@ -37,12 +37,10 @@
     (syntax-case $literal (%int)
       (0 #`(1 0))
       (1 #`(1 1))
-      ((%int type number)
-        #`(
-          #,(type->syntax #'type)
-          #,(if (integer? (datum number))
-            #'number
-            (syntax-error #'number "invalid int"))))
+      ((%int type integer)
+        (type-literal->typed?
+          (type->syntax #'type)
+          #'integer))
       (id (identifier? #'id)
         (or
           (prefix-size-id->typed? "bin-" 1 #'id)
