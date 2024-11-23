@@ -9,7 +9,7 @@
     (rename
       (only (micalog to-verilog) module->verilog)
       (module->verilog micalog-module->verilog))
-    (only (micalog model) expand-module)
+    (only (micalog flatten) flatten-module)
     (only (micalog typed) module->typed-syntax)
     (micalog keywords))
   (export (import (micalog keywords)))
@@ -17,7 +17,7 @@
   (define-case-syntax (verilog-string module ...)
     (fluent (syntaxes module ...)
       (map-using module->typed-syntax)
-      (map-using expand-module)
+      (map-using flatten-module)
       (map-using micalog-module->verilog)
       (map-using verilog-module->code)
       (map-using code-string)
