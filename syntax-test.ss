@@ -93,6 +93,11 @@
 (check (syntax=? (syntax-ref #'((a . b) (c . d)) #'c) #'d))
 (check (raises (syntax-ref #'((a . b) (c . d)) #'e)))
 
+(check (syntax=? (syntax-ref* #'((a . b) (c . d)) #'a) #'(b)))
+(check (syntax=? (syntax-ref* #'((a . b) (c . d)) #'c) #'(d)))
+(check (syntax=? (syntax-ref* #'((a . b) (c . d)) #'e) #'()))
+(check (raises (syntax-ref* #'((a . b) (c . d) (a . f)) #'(b f))))
+
 (check (syntax=? (syntax-add #'() #'a #'b) #'((a . b))))
 (check (syntax=? (syntax-add #'((a . b)) #'c #'d) #'((c . d) (a . b))))
 

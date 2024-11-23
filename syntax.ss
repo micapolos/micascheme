@@ -34,6 +34,7 @@
     syntax-cdr
     syntax-ref?
     syntax-ref
+    syntax-ref*
     syntax-set
     syntax-update
     syntax-remove
@@ -273,6 +274,14 @@
 
   (define (syntax-add $syntax $id $value)
     (syntax-cons #`(#,$id . #,$value) $syntax))
+
+  (define (syntax-ref* $syntax $id)
+    (syntax-case $syntax ()
+      (() #'())
+      (((id . value) . tail)
+        (if (free-identifier=? #'id $id)
+          #`(value . #,(syntax-ref* #'tail $id))
+          (syntax-ref* #'tail $id)))))
 
   (define (syntax-ref? $syntax $id)
     (syntax-case $syntax ()
