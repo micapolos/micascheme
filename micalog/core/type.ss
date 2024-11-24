@@ -285,7 +285,7 @@
   (define (gen?-scoped-syntaxes+instr $gen? $scoped $instr)
     (lets
       ((scoped $scope $syntaxes) $scoped)
-      (syntax-case $instr (%input %output %wire %register %set %cond %else %on %macro)
+      (syntax-case $instr (%input %output %wire %register %set %cond %else %on %macro %repeat)
         ((%input id)
           (gen?-scoped-syntaxes+instr $gen? $scoped #`(%input 1 id)))
         ((%input type id)
@@ -358,6 +358,16 @@
                   #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(body ...))))
                 (#,(edge->syntax #'other-edge)
                   #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(other-body ...))))))))
+        ((%repeat (index count) body ...)
+          (fold-left
+            (lambda ($scoped $index)
+              (gen?-scoped-syntaxes+instrs #t $scoped
+                (syntax-subst
+                  #'index
+                  (literal->syntax $index)
+                  (syntaxes body ...))))
+            $scoped
+            (indices (count-number #'count))))
         ((%macro (name param ...) body ...)
           (scoped-map
             ($name (gen-scoped-name $gen? $scope (identifier name)
@@ -435,6 +445,11 @@
     (syntax-case $shift ()
       (size (nonnegative-integer? (datum size)) (datum size))
       (_ (syntax-error $shift "illegal shift"))))
+
+  (define (count-number $count)
+    (syntax-case $count ()
+      (count (nonnegative-integer? (datum count)) (datum count))
+      (_ (syntax-error $count "illegal count"))))
 
   (define (size->type $size)
     (literal->syntax $size))

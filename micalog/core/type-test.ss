@@ -275,3 +275,13 @@
   (
     (%register 8 local_0)
     (%set 8 local_0 (%+ 8 foo-8 foo-8))))
+
+; === repeat ===
+
+(check-typed-syntax
+  (scope-instrs $scope
+    ((%repeat (i 3) (%set reg-foo-4 i))))
+  (
+    (%set 4 reg-foo-4 0)
+    (%set 4 reg-foo-4 1)
+    (%set 4 reg-foo-4 2)))
