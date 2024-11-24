@@ -231,9 +231,13 @@
 (check-typed-syntax
   (scope-instrs $scope
     (
-      (%macro (local-input) (%input 8 local))
-      (local-input)))
-  ((%input 8 local_0)))
+      (%macro (local-register param)
+        (%register 8 local)
+        (%set local param))
+      (local-register foo-8)))
+  (
+    (%register 8 local_0)
+    (%set 8 local_0 foo-8)))
 
 (check-typed-syntax
   (scope-instrs $scope
