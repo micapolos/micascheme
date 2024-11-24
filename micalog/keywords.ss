@@ -11,6 +11,8 @@
     append slice
     + -
     if
+    inc dec
+    set+ set-
     and or xor nand nor xnor not inv
     reg reg-ref)
   (import (only (micascheme) define-aux-keywords))
@@ -27,6 +29,8 @@
     append slice
     + -
     if
+    inc dec
+    set+ set-
     and or xor nand nor xnor not inv
     reg reg-ref)
 )

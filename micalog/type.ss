@@ -236,7 +236,7 @@
                 `(>= ,$size))))))))
 
   (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
-    (syntax-case $instr (%input %output %wire %register %set %cond %else %on)
+    (syntax-case $instr (%input %output %wire %register %set %cond %else %on %inc %dec %add %sub)
       ((%input id)
         (scoped
           (scope+undefined $scope (identifier id) (binding #'%wire #'1))
@@ -311,7 +311,27 @@
               (#,(edge->syntax #'edge)
                 #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...))))
               (#,(edge->syntax #'other-edge)
-                #,@(syntax->list (scope-instrs->typed-syntax $scope #'(other-body ...))))))))))
+                #,@(syntax->list (scope-instrs->typed-syntax $scope #'(other-body ...))))))))
+      (macro
+        (scoped-syntaxes+macro (scoped $scope $syntaxes) #'macro))))
+
+  (define (scoped-syntaxes+macro $scoped $macro)
+    (syntax-case $macro (%inc dec %set+ %set- %set-not)
+      ((%inc name)
+        (scoped-syntaxes+instr $scoped
+          #`(%set name (%+ name 1))))
+      ((%dec name)
+        (scoped-syntaxes+instr $scoped
+          #`(%set name (%- name 1))))
+      ((%set+ name expr)
+        (scoped-syntaxes+instr $scoped
+          #`(%set name (%+ name expr))))
+      ((%set- name expr)
+        (scoped-syntaxes+instr $scoped
+          #`(%set name (%- name expr))))
+      ((%set-not name)
+        (scoped-syntaxes+instr $scoped
+          #`(%set name (%not name))))))
 
   (define (scope-clause->typed-syntax $scope $clause)
     (syntax-case $clause ()

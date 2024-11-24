@@ -16,9 +16,9 @@
     (register 8 bar-blue)
     (on clock
       (posedge
-        (set red-counter (+ red-counter 1))
-        (set green-counter (+ green-counter 1))
-        (set blue-counter (+ blue-counter 1))
+        (inc red-counter)
+        (inc green-counter)
+        (inc blue-counter)
         (cond
           ((> red-counter 19940)
             (set red-counter 0)
