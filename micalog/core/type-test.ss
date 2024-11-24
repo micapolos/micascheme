@@ -285,3 +285,14 @@
     (%set 4 reg-foo-4 0)
     (%set 4 reg-foo-4 1)
     (%set 4 reg-foo-4 2)))
+
+; TODO: Not working, same variable is re-declared
+; (check-typed-syntax
+;   (scope-instrs $scope
+;     ((%repeat (i 3)
+;       (%register 4 reg)
+;       (%set reg i))))
+;   (
+;     (%set 4 reg-foo-4 0)
+;     (%set 4 reg-foo-4 1)
+;     (%set 4 reg-foo-4 2)))
