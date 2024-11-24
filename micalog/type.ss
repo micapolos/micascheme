@@ -6,6 +6,7 @@
     scope-expr->typed
     scope-instr->typed-syntax
     scope-instrs->typed-syntax
+    scope-module->typed-syntax
     module->typed-syntax)
   (import
     (micascheme)
@@ -390,12 +391,15 @@
       (list->syntax)))
 
   (define (module->typed-syntax $module)
+    (scope-module->typed-syntax (empty-scope) $module))
+
+  (define (scope-module->typed-syntax $scope $module)
     (syntax-case $module ()
       ((%module name body ...)
         #`(%module #,(identifier name)
           #,@(syntax->list
             (scope-instrs->typed-syntax
-              (empty-scope)
+              $scope
               #'(body ...)))))))
 
   (define (scope-instr->typed-syntax $scope $instr)

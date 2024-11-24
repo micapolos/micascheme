@@ -8,4 +8,5 @@
   (micalog type)
   (micalog inits-updates)
   (micalog on-old-new)
-  (micalog domain))
+  (micalog domain)
+  (micalog syntax))
