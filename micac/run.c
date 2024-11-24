@@ -34,9 +34,9 @@ int main() {
             int mouse_y_16 = 0;
             bool mouse_pressed__17 = false;
             bool clock_18 = 0;
-            uint16_t red_counter_19;
-            uint16_t green_counter_20;
-            uint16_t blue_counter_21;
+            uint64_t red_counter_19;
+            uint64_t green_counter_20;
+            uint64_t blue_counter_21;
             uint8_t bar_red_22;
             uint8_t bar_green_23;
             uint8_t bar_blue_24;
@@ -63,28 +63,28 @@ int main() {
                 clock_18 = clock_18 ^ 1;
                 if (old_clock_3_25 != clock_18) {
                   if (clock_18 == 1) {
-                    red_counter_19 = red_counter_19 - 1;
-                    green_counter_20 = green_counter_20 - 1;
-                    blue_counter_21 = blue_counter_21 - 1;
-                    if (red_counter_19 == 0) {
-                      red_counter_19 = 19940;
+                    red_counter_19 = red_counter_19 + 1;
+                    green_counter_20 = green_counter_20 + 1;
+                    blue_counter_21 = blue_counter_21 + 1;
+                    if (red_counter_19 > 19940) {
+                      red_counter_19 = 0;
                       bar_red_22 = ~bar_red_22;
                     }
-                    if (green_counter_20 == 0) {
-                      green_counter_20 = 19920;
+                    if (green_counter_20 > 19920) {
+                      green_counter_20 = 0;
                       bar_green_23 = ~bar_green_23;
                     }
-                    if (blue_counter_21 == 0) {
-                      blue_counter_21 = 19900;
+                    if (blue_counter_21 > 19900) {
+                      blue_counter_21 = 0;
                       bar_blue_24 = ~bar_blue_24;
                     }
                   }
                 }
                 old_clock_3_25 = clock_18;
-                const bool screen__35 = video_x_4 >= 48 && video_x_4 < 304 && (video_y_5 >= 48 && video_x_4 < 240);
-                uint8_t red_36 = bar_red_22;
-                uint8_t green_37 = bar_green_23;
-                uint8_t blue_38 = bar_blue_24;
+                const bool screen__35 = video_x_4 >= 48 && video_x_4 < 304 && (video_y_5 >= 48 && video_y_5 < 240);
+                uint8_t red_36 = screen__35 ? 221 : bar_red_22;
+                uint8_t green_37 = screen__35 ? 221 : bar_green_23;
+                uint8_t blue_38 = screen__35 ? 221 : bar_blue_24;
                 if (pixel_cycle_counter_6 == 0) {
                   const bool h_video__39 = video_x_4 < 352;
                   const bool v_video__40 = video_y_5 < 288;
