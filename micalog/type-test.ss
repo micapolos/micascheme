@@ -17,6 +17,7 @@
     (foo-8 (%wire 8))
     (bar-8 (%wire 8))
     (reg-foo-4 (%register 4))
+    (reg-bar-4 (%register 4))
     (reg-bar-8 (%register 8))))
 
 (check-syntax (type 1) 1)
@@ -219,4 +220,28 @@
         (8 (%and 8 in-1 in-2))
         (1 clock)))))
 
+; === macros (instructions) ===
 
+(check-typed-syntax
+  (scope-instrs $scope ((%macro (set-zero name) (%set name 0))))
+  ())
+
+(check-typed-syntax
+  (scope-instrs $scope
+    (
+      (%macro (set-zero name) (%set name 0))
+      (set-zero reg-foo-4)))
+  ((%set 4 reg-foo-4 0)))
+
+(check-typed-syntax
+  (scope-instrs $scope
+    (
+      (%macro (exchange a b)
+        (%set a b)
+        (%set b a))
+      (exchange reg-foo-4 reg-bar-4)))
+  (
+    (%set 4 reg-foo-4 reg-bar-4)
+    (%set 4 reg-bar-4 reg-foo-4)))
+
+; === macros (expressions) ===

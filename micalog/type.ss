@@ -83,10 +83,21 @@
       (syntax-error $literal "invalid literal")))
 
   (define (scope-id->binding $scope $id)
-    (scope-item $scope $id))
+    (switch (scope-item $scope $id)
+      ((procedure? _)
+        (syntax-error $id "macro"))
+      ((else $binding)
+        $binding)))
 
   (define (scope-id->typed $scope $id)
     #`(#,(binding-type (scope-id->binding $scope $id)) #,$id))
+
+  (define (scope-id->transformer? $scope $id)
+    (switch (scope-ref $scope $id)
+      ((procedure? $transformer)
+        $transformer)
+      ((else _)
+        #f)))
 
   (define (scope-type-expr->typed $scope $expected-type $expr)
     (or
@@ -315,8 +326,25 @@
                 #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...))))
               (#,(edge->syntax #'other-edge)
                 #,@(syntax->list (scope-instrs->typed-syntax $scope #'(other-body ...))))))))
-      (macro
-        (scoped-syntaxes+macro (scoped $scope $syntaxes) #'macro))))
+      ((%macro (name param ...) body ...)
+        (scoped
+          (scope+ $scope (identifier name)
+            (lambda ($syntax)
+              (syntax-case $syntax ()
+                ((_ arg ...)
+                  (syntax-subst
+                    #'(param ...)
+                    #'(arg ...)
+                    #'(begin body ...))))))
+          $syntaxes))
+      ((id arg ...)
+        (and (identifier? #'id) (scope-id->transformer? $scope #'id))
+        (scoped-syntaxes+instrs (scoped $scope $syntaxes)
+          (list->syntax
+            (unbegin-syntaxes
+              (transform (scope-id->transformer? $scope #'id) $instr $scope)))))
+      (other
+        (scoped-syntaxes+macro (scoped $scope $syntaxes) #'other))))
 
   (define (scoped-syntaxes+macro $scoped $macro)
     (syntax-case $macro (%inc dec %set+ %set- %set-not)
