@@ -2,5 +2,5 @@
 
 (test
   (micalog core all)
-  (micalog micac all)
+  (micalog emu all)
   (micalog verilog all))

@@ -1,6 +1,6 @@
 (import
   (micascheme)
-  (micalog micac transformer)
+  (micalog emu transformer)
   (prefix (micalog keywords) %)
   (prefix (micac) %%)
   (prefix (micac lib emu) %%)

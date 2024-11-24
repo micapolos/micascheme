@@ -1,4 +1,4 @@
-(import (micalog micac))
+(import (micalog emu))
 
 (micalog-emu
   (module colour-bars

@@ -1,6 +1,6 @@
 (import
   (micascheme)
-  (micalog micac on-old-new)
+  (micalog emu on-old-new)
   (prefix (micalog keywords) %))
 
 (define-check-datum-> on-old-new-syntax)

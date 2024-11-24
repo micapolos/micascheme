@@ -1,4 +1,4 @@
-(library (micalog micac inits-updates)
+(library (micalog emu inits-updates)
   (export
     module->inits-updates-syntax
     statement->inits-updates-syntax
