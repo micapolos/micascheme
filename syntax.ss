@@ -9,6 +9,7 @@
     define-aux-keywords
     unbegin-syntaxes
     unbegin-syntax
+    syntaxes->syntax
     expand-begin-syntaxes
     define-lookup-syntax
     syntax-selector
@@ -61,13 +62,19 @@
     (syntax-case $syntax (begin)
       ((begin $syntax ...)
         (syntax->list #'($syntax ...)))
-      ($other (list #'$other))))
+      ($other
+        (list #'$other))))
 
   (define (unbegin-syntax $syntax)
     (syntax-case $syntax (begin)
       ((begin $syntax)
         #'$syntax)
       ($other #'$other)))
+
+  (define (syntaxes->syntax $syntaxes)
+    (case (length $syntaxes)
+      ((1) (car $syntaxes))
+      (else #`(begin #,@$syntaxes))))
 
   (define (expand-begin-syntaxes $syntaxes)
     (apply append

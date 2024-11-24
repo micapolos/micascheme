@@ -150,3 +150,7 @@
 (check (syntax=? (syntax-or #'foo #'#f) #'foo))
 (check (syntax=? (syntax-or #'#f #'bar) #'bar))
 (check (syntax=? (syntax-or #'foo #'bar) #'foo))
+
+(check-datum=? (syntaxes->syntax (list)) #`(begin))
+(check-datum=? (syntaxes->syntax (list #'foo)) #`foo)
+(check-datum=? (syntaxes->syntax (list #'foo #'bar)) #`(begin foo bar))

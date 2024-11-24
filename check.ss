@@ -57,7 +57,7 @@
               (ann (syntax->annotation stx))
               (source (annotation-source ann))
               (ann-string (syntax->location-string stx)))
-            #`(parameterize ((checking? #t))
+            #`(parameterize ((checking? #t) (gensym-count 0))
               (let (#,@let-cases)
                 (or
                   (not (pred #,@tmps))
@@ -75,7 +75,7 @@
               (ann (syntax->annotation stx))
               (source (annotation-source ann))
               (ann-string (syntax->location-string stx)))
-            #`(parameterize ((checking? #t))
+            #`(parameterize ((checking? #t) (gensym-count 0))
               (let (#,@let-cases)
                 (or
                   (pred #,@tmps)
