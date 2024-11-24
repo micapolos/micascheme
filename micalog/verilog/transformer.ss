@@ -12,7 +12,7 @@
 
   (import
     (micascheme)
-    (micalog utils)
+    (micalog core utils)
     (prefix (micalog keywords) %)
     (prefix (verilog keywords) %%))
 

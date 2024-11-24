@@ -3,6 +3,6 @@
 (test
   (micalog micac all)
   (micalog verilog all)
-  (micalog utils)
-  (micalog type)
-  (micalog domain))
+  (micalog core utils)
+  (micalog core type)
+  (micalog core domain))

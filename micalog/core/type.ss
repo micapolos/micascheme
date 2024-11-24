@@ -1,4 +1,4 @@
-(library (micalog type)
+(library (micalog core type)
   (export
     literal->typed
     expr->typed
@@ -12,7 +12,7 @@
     (micascheme)
     (syntax scope)
     (syntax scoped)
-    (only (micalog utils) opposite-edges?)
+    (only (micalog core utils) opposite-edges?)
     (prefix (micalog keywords) %))
 
   (define (binding-kind $binding)

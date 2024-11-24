@@ -4,7 +4,7 @@
     flatten-module)
   (import
     (micascheme)
-    (micalog utils)
+    (micalog core utils)
     (prefix (micalog keywords) %))
 
   (define-rule-syntax (check-flattens in out)

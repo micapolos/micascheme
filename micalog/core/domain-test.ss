@@ -1,5 +1,5 @@
 (import
   (micascheme)
-  (micalog domain)
-  (micalog utils)
+  (micalog core domain)
+  (micalog core utils)
   (prefix (micalog keywords) %))

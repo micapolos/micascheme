@@ -1,6 +1,6 @@
 (import
   (micascheme)
-  (micalog utils)
+  (micalog core utils)
   (prefix (micalog keywords) %))
 
 (check (syntax=? (type-size #'6) #'6))

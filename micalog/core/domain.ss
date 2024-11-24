@@ -1,11 +1,11 @@
-(library (micalog domain)
+(library (micalog core domain)
   (export
     edges+
     event+?
     domain+)
   (import
     (micascheme)
-    (micalog utils)
+    (micalog core utils)
     (syntax scope)
     (prefix (micalog keywords) %))
 

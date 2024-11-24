@@ -1,4 +1,4 @@
-(library (micalog utils)
+(library (micalog core utils)
   (export
     type-size
     expr-type

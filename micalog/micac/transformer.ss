@@ -9,7 +9,7 @@
     value->micac)
   (import
     (micascheme)
-    (micalog utils)
+    (micalog core utils)
     (prefix (micalog keywords) %)
     (prefix (micac) %%)
     (prefix (micac lib emu) %%)

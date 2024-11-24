@@ -3,7 +3,7 @@
   (import
     (only (micascheme) newline parameterize define fluent define-syntax syntax-case unsyntax unsyntax-splicing pretty-print quote list quasisyntax push lambda list->syntax display define-rule-syntax string-append apply intercalate with map-using syntaxes ... fluent define-case-syntax literal->syntax syntax export ...)
     (only (micalog micac transformer) module->micac)
-    (only (micalog type) module->typed-syntax)
+    (only (micalog core type) module->typed-syntax)
     (only (micac syntax-c) syntax-c)
     (only (micac expand) expand-instrs)
     (micalog micac on-old-new)
