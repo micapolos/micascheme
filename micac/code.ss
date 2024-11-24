@@ -13,6 +13,6 @@
 
   (define (identifier-char $char)
     (case $char
-      ((#\- #\?) #\_)
+      ((#\- #\? #\%) #\_)
       (else $char)))
 )

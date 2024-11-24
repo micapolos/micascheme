@@ -235,7 +235,7 @@
             ((else $other)
               #`(if #,$cond #,$then #,$else)))))
       ((id arg ...) (identifier? #'id)
-        (switch (scope-ref $scope #'id)
+        (switch (scope-item $scope #'id)
           ((identifier? $identifier)
             #`(
               #,$identifier
@@ -247,7 +247,7 @@
               (unbegin-syntax
                 (scope-transform $scope $transformer $expr))))))
       (id (identifier? #'id)
-        (switch (scope-ref $scope #'id)
+        (switch (scope-item $scope #'id)
           ((identifier? $identifier)
             $identifier)
           ((else $transformer)

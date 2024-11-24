@@ -2,7 +2,6 @@
   (export
     type->micac
     module->micac
-    input-param->micac
     register->micac
     instruction->micac
     expr->micac
@@ -11,6 +10,7 @@
     (micascheme)
     (micalog core utils)
     (prefix (micalog keywords) %)
+    (prefix (micalog emu keywords) %)
     (prefix (micac) %%)
     (prefix (micac lib emu) %%)
     (prefix (micac lib std) %%))
@@ -25,7 +25,7 @@
     (syntax-case $module (%module)
       ((%module name statement ...)
         (lets
-          ($inputs (declaration-syntaxes-of %input statement ...))
+          ($statements (syntaxes statement ...))
           ($registers (declaration-syntaxes-of %register statement ...))
           ($instructions
             (filter
@@ -34,18 +34,34 @@
                   (not (declaration-kind-of? #'%input $statement))
                   (not (declaration-kind-of? #'%register $statement))))
               (syntaxes statement ...)))
+          ($video-x-input? (kind-name-find-statement #'%input #'9 #'%video-x $statements))
+          ($video-y-input? (kind-name-find-statement #'%input #'9 #'%video-y $statements))
+          ($video-red-output? (kind-name-find-statement #'%output #'8 #'%video-red $statements))
+          ($video-green-output? (kind-name-find-statement #'%output #'8 #'%video-green $statements))
+          ($video-blue-output? (kind-name-find-statement #'%output #'8 #'%video-blue $statements))
+          ($mouse-x-input? (kind-name-find-statement #'%input #'9 #'%mouse-x $statements))
+          ($mouse-y-input? (kind-name-find-statement #'%input #'9 #'%mouse-y $statements))
+          ($mouse-pressed?-input? (kind-name-find-statement #'%input #'1 #'%mouse-pressed? $statements))
           #`(%%run-emu
             (%%video 352 288 96 24 4)
             (%%var bool clock 0)
+            #,@(opt->list (and $video-x-input? #`(%%var int %video-x)))
+            #,@(opt->list (and $video-y-input? #`(%%var int %video-y)))
+            #,@(opt->list (and $mouse-x-input? #`(%%var int %mouse-x)))
+            #,@(opt->list (and $mouse-y-input? #`(%%var int %mouse-y)))
+            #,@(opt->list (and $mouse-pressed?-input? #`(%%var bool %mouse-pressed?)))
             #,@(map register->micac $registers)
             (%%update
               (%%set clock (%%xor clock 1))
-              #,@(map instruction->micac $instructions)))))))
-
-  (define (input-param->micac $input)
-    (syntax-case $input (%input)
-      ((%input type name)
-        (name->micac #'name))))
+              #,@(opt->list (and $video-x-input? #`(%%set %video-x %%video-x)))
+              #,@(opt->list (and $video-y-input? #`(%%set %video-y %%video-y)))
+              #,@(opt->list (and $mouse-x-input? #`(%%set %mouse-x %%mouse-x)))
+              #,@(opt->list (and $mouse-y-input? #`(%%set %mouse-y %%mouse-y)))
+              #,@(opt->list (and $mouse-pressed?-input? #`(%%set %mouse-pressed? %%mouse-pressed?)))
+              #,@(map instruction->micac $instructions)
+              #,@(opt->list (and $video-red-output? #`(%%set %%red %video-red)))
+              #,@(opt->list (and $video-green-output? #`(%%set %%green %video-green)))
+              #,@(opt->list (and $video-blue-output? #`(%%set %%blue %video-blue)))))))))
 
   (define (register->micac $statement)
     (syntax-case $statement (%register)
@@ -255,4 +271,16 @@
 
   (define (type-micac-mask $type $micac)
     (size-micac-mask (type-size $type) $micac))
+
+  (define (kind-name-find-statement $kind $type $name $statements)
+    (find
+      (lambda ($statement)
+        (syntax-case $statement ()
+          ((kind type name body ...)
+            (and
+              (free-identifier=? #'kind $kind)
+              (syntax=? #'type $type)
+              (free-identifier=? #'name $name)
+              $statement))))
+       $statements))
 )

@@ -8,24 +8,23 @@
     (micac expand)
     (micalog emu on-old-new)
     (micalog emu inits-updates)
-    (micac lib emu)
     (micalog verilog)
-    (micalog keywords)
-    (only (micac) var)
     (only (micac run) micac-run-echo?)
     (only (c run) c-run-echo?))
   (%export (import (micalog keywords)))
-  (%export (import (only (micac lib emu) red green blue video-x video-y mouse-x mouse-y mouse-pressed?)))
+  (%export (import (micalog emu keywords)))
 
-  (%define-case-syntax (micalog-emu micalog)
-    (%quasisyntax
-      (%parameterize ((c-run-echo? #t) (micac-run-echo? #t))
-        (display-micalog-verilog micalog)
-        (%newline)
-        (%unsyntax
-          (%fluent (%syntax micalog)
-            (module->typed-syntax)
-            (module->on-old-new-syntax)
-            (module->inits-updates-syntax)
-            (module->micac))))))
+  (%define-syntax (micalog-emu $syntax $lookup)
+    (%syntax-case $syntax ()
+      ((_ module)
+        (%quasisyntax
+          (%parameterize ((c-run-echo? #t) (micac-run-echo? #t))
+            (display-micalog-verilog module)
+            (%newline)
+            (%unsyntax
+              (%fluent $lookup
+                (scope-module->typed-syntax (%syntax module))
+                (module->on-old-new-syntax)
+                (module->inits-updates-syntax)
+                (module->micac))))))))
 )

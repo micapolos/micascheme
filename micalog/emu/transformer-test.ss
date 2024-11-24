@@ -106,12 +106,6 @@
   (register (%register 8 foo))
   (%%var uint8_t foo))
 
-; === input params ===
-
-(check-micac
-  (input-param (%input 8 foo))
-  foo)
-
 ; === instructions ===
 
 (check-micac

@@ -21,14 +21,18 @@
 
   (define (binding-kind $binding)
     (syntax-case $binding ()
-      ((kind type) #'kind)))
+      ((kind type name) #'kind)))
 
   (define (binding-type $binding)
     (syntax-case $binding ()
-      ((kind type) #'type)))
+      ((kind type name) #'type)))
 
-  (define (binding $kind $type)
-    #`(#,$kind #,$type))
+  (define (binding-name $binding)
+    (syntax-case $binding ()
+      ((kind type name) #'name)))
+
+  (define (binding $kind $type $name)
+    #`(#,$kind #,$type #,$name))
 
   (define (type->syntax $type)
     (literal->syntax (type-size $type)))
@@ -95,7 +99,11 @@
         $binding)))
 
   (define (scope-id->typed $scope $id)
-    #`(#,(binding-type (scope-id->binding $scope $id)) #,$id))
+    (lets
+      ($binding (scope-id->binding $scope $id))
+      #`(
+        #,(binding-type $binding)
+        #,(binding-name $binding))))
 
   (define (scope-id->transformer? $scope $id)
     (switch (scope-ref $scope $id)
@@ -265,47 +273,48 @@
     (syntax-case $instr (%input %output %wire %register %set %cond %else %on %inc %dec %add %sub %macro)
       ((%input id)
         (scoped
-          (scope+undefined $scope (identifier id) (binding #'%wire #'1))
+          (scope+undefined $scope (identifier id) (binding #'%wire #'1 #'id))
           (push $syntaxes #`(%input 1 id))))
       ((%input type id)
         (lets
           ($type (type->syntax #'type))
           (scoped
-            (scope+undefined $scope (identifier id) (binding #'%wire $type))
+            (scope+undefined $scope (identifier id) (binding #'%wire $type #'id))
             (push $syntaxes #`(%input #,$type id)))))
       ((%output id expr)
         (lets
           ($typed (scope-expr->typed $scope #'expr))
           ($type (typed-type $typed))
           (scoped
-            (scope+undefined $scope (identifier id) (binding #'%wire $type))
+            (scope+undefined $scope (identifier id) (binding #'%wire $type #'id))
             (push $syntaxes #`(%output #,$type id #,(typed-value $typed))))))
       ((%wire id expr)
         (lets
           ($typed (scope-expr->typed $scope #'expr))
           ($type (typed-type $typed))
           (scoped
-            (scope+undefined $scope (identifier id) (binding #'%wire $type))
+            (scope+undefined $scope (identifier id) (binding #'%wire $type #'id))
             (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))
       ((%register id)
         (scoped
-          (scope+undefined $scope (identifier id) (binding #'%register #'1))
+          (scope+undefined $scope (identifier id) (binding #'%register #'1 #'id))
           (push $syntaxes #`(%register 1 #,(identifier id)))))
       ((%register type id)
         (lets
           ($type (type->syntax #'type))
           (scoped
-            (scope+undefined $scope (identifier id) (binding #'%register $type))
+            (scope+undefined $scope (identifier id) (binding #'%register $type #'id))
             (push $syntaxes #`(%register #,$type #,(identifier id))))))
       ((%set id expr)
         (lets
           ($id-binding (scope-id->binding $scope (identifier id)))
           ($id-kind (binding-kind $id-binding))
           ($id-type (binding-type $id-binding))
+          ($id-name (binding-name $id-binding))
           ($typed (scope-type-expr->typed $scope $id-type #'expr))
           (if (syntax=? $id-kind #'%register)
             (scoped $scope
-              (push $syntaxes #`(%set #,$id-type id #,(typed-value $typed))))
+              (push $syntaxes #`(%set #,$id-type #,$id-name #,(typed-value $typed))))
             (syntax-error $instr
               (format "type mismatch ~a, expected ~a in"
                 (syntax->datum #`(%set #,$id-binding #,$id-type))
@@ -354,27 +363,7 @@
         (scoped-syntaxes+instrs (scoped $scope $syntaxes)
           (list->syntax
             (unbegin-syntaxes
-              (transform (scope-id->transformer? $scope #'id) $instr $scope)))))
-      (other
-        (scoped-syntaxes+macro (scoped $scope $syntaxes) #'other))))
-
-  (define (scoped-syntaxes+macro $scoped $macro)
-    (syntax-case $macro (%inc dec %set+ %set- %set-not)
-      ((%inc name)
-        (scoped-syntaxes+instr $scoped
-          #`(%set name (%+ name 1))))
-      ((%dec name)
-        (scoped-syntaxes+instr $scoped
-          #`(%set name (%- name 1))))
-      ((%set+ name expr)
-        (scoped-syntaxes+instr $scoped
-          #`(%set name (%+ name expr))))
-      ((%set- name expr)
-        (scoped-syntaxes+instr $scoped
-          #`(%set name (%- name expr))))
-      ((%set-not name)
-        (scoped-syntaxes+instr $scoped
-          #`(%set name (%not name))))))
+              (transform (scope-id->transformer? $scope #'id) $instr $scope)))))))
 
   (define (scope-clause->typed-syntax $scope $clause)
     (syntax-case $clause ()

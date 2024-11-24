@@ -1,4 +1,4 @@
-(import (micalog verilog))
+(import (micalog verilog) (micalog std))
 
 (display-micalog-verilog
   (module empty)
@@ -30,9 +30,9 @@
     (register clock-1)
     (register clock-2)
     (register clock-3)
-    (on clock-0 (posedge (set clock-1 (not clock-1))))
-    (on clock-1 (posedge (set clock-2 (not clock-2))))
-    (on clock-2 (posedge (set clock-3 (not clock-3))))
+    (on clock-0 (posedge (set-not clock-1)))
+    (on clock-1 (posedge (set-not clock-2)))
+    (on clock-2 (posedge (set-not clock-3)))
     (output counter (append clock-3 clock-2 clock-1 clock-0)))
 
   (module cascading-counter-4
@@ -41,11 +41,11 @@
     (register clock-2)
     (register clock-3)
     (on clock-0
-      (posedge (set clock-1 (not clock-1))
+      (posedge (set-not clock-1)
         (on clock-1
-          (posedge (set clock-2 (not clock-2))
+          (posedge (set-not clock-2)
             (on clock-2
-              (posedge (set clock-3 (not clock-3))))))))
+              (posedge (set-not clock-3)))))))
     (output counter (append clock-3 clock-2 clock-1 clock-0)))
 
   (module funny-module
@@ -58,6 +58,6 @@
       (posedge
         (cond
           (reset? (set counter mouse-x))
-          (mouse-pressed? (set counter (+ counter 1)))
-          (else (set counter (- counter 1))))))
+          (mouse-pressed? (inc counter))
+          (else (dec counter)))))
     (output out counter)))

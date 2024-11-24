@@ -1,4 +1,4 @@
-(import (micalog emu))
+(import (micalog emu) (micalog std))
 
 (micalog-emu
   (module colour-bars
@@ -39,6 +39,6 @@
           (and (>= video-y 48) (< video-y 240)))))
     (wire black? (xor (> video-x mouse-x) (> video-y mouse-y)))
     (wire background (if black? hex-00 hex-dd))
-    (output red (if bar? bar-red background))
-    (output green (if bar? bar-green background))
-    (output blue (if bar? bar-blue background))))
+    (output video-red (if bar? bar-red background))
+    (output video-green (if bar? bar-green background))
+    (output video-blue (if bar? bar-blue background))))

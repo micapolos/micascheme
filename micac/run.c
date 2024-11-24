@@ -34,71 +34,84 @@ int main() {
             int mouse_y_16 = 0;
             bool mouse_pressed__17 = false;
             bool clock_18 = 0;
-            uint64_t red_counter_19;
-            uint64_t green_counter_20;
-            uint64_t blue_counter_21;
-            uint8_t bar_red_22;
-            uint8_t bar_green_23;
-            uint8_t bar_blue_24;
-            bool old_clock_3_25;
-            bool running_26 = true;
-            SDL_Event event_27;
-            int sdl_mouse_x_28 = 0;
-            int sdl_mouse_y_29 = 0;
-            bool sdl_mouse_pressed__30 = false;
-            while (running_26) {
-              while (SDL_PollEvent(&event_27)) {
-                if (event_27.type == SDL_QUIT) {
-                  running_26 = false;
+            int _video_x_19;
+            int _video_y_20;
+            int _mouse_x_21;
+            int _mouse_y_22;
+            bool _mouse_pressed__23;
+            uint64_t red_counter_24;
+            uint64_t green_counter_25;
+            uint64_t blue_counter_26;
+            uint8_t bar_red_27;
+            uint8_t bar_green_28;
+            uint8_t bar_blue_29;
+            bool old_clock_3_30;
+            bool running_31 = true;
+            SDL_Event event_32;
+            int sdl_mouse_x_33 = 0;
+            int sdl_mouse_y_34 = 0;
+            bool sdl_mouse_pressed__35 = false;
+            while (running_31) {
+              while (SDL_PollEvent(&event_32)) {
+                if (event_32.type == SDL_QUIT) {
+                  running_31 = false;
                 }
               }
-              int sdl_mouse_x_31;
-              int sdl_mouse_y_32;
-              const uint32_t sdl_mouse_state_33 = SDL_GetMouseState(&sdl_mouse_x_31, &sdl_mouse_y_32);
-              mouse_x_15 = sdl_mouse_x_31 / 2;
-              mouse_y_16 = sdl_mouse_y_32 / 2;
-              mouse_pressed__17 = (sdl_mouse_state_33 & 1) != 0;
-              int counter_34 = 559104;
-              while (counter_34) {
+              int sdl_mouse_x_36;
+              int sdl_mouse_y_37;
+              const uint32_t sdl_mouse_state_38 = SDL_GetMouseState(&sdl_mouse_x_36, &sdl_mouse_y_37);
+              mouse_x_15 = sdl_mouse_x_36 / 2;
+              mouse_y_16 = sdl_mouse_y_37 / 2;
+              mouse_pressed__17 = (sdl_mouse_state_38 & 1) != 0;
+              int counter_39 = 559104;
+              while (counter_39) {
                 clock_18 = clock_18 ^ 1;
-                if (old_clock_3_25 != clock_18) {
+                _video_x_19 = video_x_4;
+                _video_y_20 = video_y_5;
+                _mouse_x_21 = mouse_x_15;
+                _mouse_y_22 = mouse_y_16;
+                _mouse_pressed__23 = mouse_pressed__17;
+                if (old_clock_3_30 != clock_18) {
                   if (clock_18 == 1) {
-                    red_counter_19 = red_counter_19 + 1;
-                    green_counter_20 = green_counter_20 + 1;
-                    blue_counter_21 = blue_counter_21 + 1;
-                    if (red_counter_19 > 19940) {
-                      red_counter_19 = 0;
-                      bar_red_22 = ~bar_red_22;
+                    red_counter_24 = red_counter_24 + 1;
+                    green_counter_25 = green_counter_25 + 1;
+                    blue_counter_26 = blue_counter_26 + 1;
+                    if (red_counter_24 > 19940) {
+                      red_counter_24 = 0;
+                      bar_red_27 = ~bar_red_27;
                     }
-                    if (green_counter_20 > 19920) {
-                      green_counter_20 = 0;
-                      bar_green_23 = ~bar_green_23;
+                    if (green_counter_25 > 19920) {
+                      green_counter_25 = 0;
+                      bar_green_28 = ~bar_green_28;
                     }
-                    if (blue_counter_21 > 19900) {
-                      blue_counter_21 = 0;
-                      bar_blue_24 = ~bar_blue_24;
+                    if (blue_counter_26 > 19900) {
+                      blue_counter_26 = 0;
+                      bar_blue_29 = ~bar_blue_29;
                     }
                   }
                 }
-                old_clock_3_25 = clock_18;
-                const bool bar__35 = !mouse_pressed__17 ^ (video_x_4 >= 48 && video_x_4 < 304 && (video_y_5 >= 48 && video_y_5 < 240));
-                const bool black__36 = video_x_4 > mouse_x_15 ^ video_y_5 > mouse_y_16;
-                const uint8_t background_37 = black__36 ? 0 : 221;
-                uint8_t red_38 = bar__35 ? bar_red_22 : background_37;
-                uint8_t green_39 = bar__35 ? bar_green_23 : background_37;
-                uint8_t blue_40 = bar__35 ? bar_blue_24 : background_37;
+                old_clock_3_30 = clock_18;
+                const bool bar__40 = !_mouse_pressed__23 ^ (_video_x_19 >= 48 && _video_x_19 < 304 && (_video_y_20 >= 48 && _video_y_20 < 240));
+                const bool black__41 = _video_x_19 > _mouse_x_21 ^ _video_y_20 > _mouse_y_22;
+                const uint8_t background_42 = black__41 ? 0 : 221;
+                uint8_t video_red_43 = bar__40 ? bar_red_27 : background_42;
+                uint8_t video_green_44 = bar__40 ? bar_green_28 : background_42;
+                uint8_t video_blue_45 = bar__40 ? bar_blue_29 : background_42;
+                red_7 = video_red_43;
+                green_8 = video_green_44;
+                blue_9 = video_blue_45;
                 if (pixel_cycle_counter_6 == 0) {
-                  const bool h_video__41 = video_x_4 < 352;
-                  const bool v_video__42 = video_y_5 < 288;
-                  const bool video__43 = h_video__41 && v_video__42;
-                  if (video__43) {
+                  const bool h_video__46 = video_x_4 < 352;
+                  const bool v_video__47 = video_y_5 < 288;
+                  const bool video__48 = h_video__46 && v_video__47;
+                  if (video__48) {
                     *pixel_ref_14 = 255;
                     pixel_ref_14 += 1;
-                    *pixel_ref_14 = red_38;
+                    *pixel_ref_14 = red_7;
                     pixel_ref_14 += 1;
-                    *pixel_ref_14 = green_39;
+                    *pixel_ref_14 = green_8;
                     pixel_ref_14 += 1;
-                    *pixel_ref_14 = blue_40;
+                    *pixel_ref_14 = blue_9;
                     pixel_ref_14 += 1;
                   }
                 }
@@ -115,7 +128,7 @@ int main() {
                     }
                   }
                 }
-                counter_34 -= 1;
+                counter_39 -= 1;
               }
               if (SDL_UpdateTexture(texture_12, 0, pixels_13, 1408) != 0) {
                 printf("%s SDL Error: %s\n", "Could not update texture.", SDL_GetError());
