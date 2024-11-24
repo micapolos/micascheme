@@ -349,7 +349,7 @@
                 #,@(syntax->list (scope-instrs->typed-syntax $scope #'(other-body ...))))))))
       ((%macro (name param ...) body ...)
         (scoped
-          (scope+ $scope (identifier name)
+          (scope+undefined $scope (identifier name)
             (lambda ($syntax)
               (syntax-case $syntax ()
                 ((_ arg ...)
