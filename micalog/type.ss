@@ -216,7 +216,7 @@
             (syntax-error #'a
               (format "type mismatch ~a, expected ~a in"
                 (syntax->datum $type-a)
-                (syntax->datum #`(>= (+ shift size))))))))
+                `(>= ,(+ $shift $size)))))))
       ((%slice a size)
         (lets
           ($typed-a (scope-expr->typed $scope #'a))
@@ -233,7 +233,7 @@
             (syntax-error #'a
               (format "type mismatch ~a, expected ~a in"
                 (syntax->datum $type-a)
-                (syntax->datum #`(>= size)))))))))
+                `(>= ,$size))))))))
 
   (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
     (syntax-case $instr (%input %output %wire %register %set %cond %else %on)
