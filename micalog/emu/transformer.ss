@@ -279,8 +279,11 @@
           ((kind type name body ...)
             (and
               (free-identifier=? #'kind $kind)
-              (syntax=? #'type $type)
               (free-identifier=? #'name $name)
+              (or
+                (syntax=? #'type $type)
+                (syntax-error $statement
+                  (format "invalid type, expected ~a in" (syntax->datum $type))))
               $statement))))
        $statements))
 )
