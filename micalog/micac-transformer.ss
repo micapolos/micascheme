@@ -55,12 +55,7 @@
           #,(name->micac #'name)))))
 
   (define (instruction->micac $statement)
-    (syntax-case $statement (%capture %output %wire %set %on %cond %else)
-      ((%capture type name expr)
-        #`(%%const
-          #,(type->micac #'type)
-          #,(name->micac #'name)
-          #,(expr->micac #'expr)))
+    (syntax-case $statement (%output %wire %set %on %cond %else)
       ((%output type name expr)
         #`(%%var
           #,(type->micac #'type)

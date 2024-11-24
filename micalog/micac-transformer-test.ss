@@ -115,10 +115,6 @@
 ; === instructions ===
 
 (check-micac
-  (instruction (%capture 8 foo bar))
-  (%%const uint8_t foo bar))
-
-(check-micac
   (instruction (%wire 8 foo bar))
   (%%const uint8_t foo bar))
 
@@ -228,7 +224,7 @@
       (%register 16 counter)
       (%on (prev-clock clock)
         (%posedge
-          (%capture 16 previous-counter counter)
+          (%wire 16 previous-counter counter)
           (%set 16 counter (%+ 16 previous-counter 1))))))
   (%%run-emu
     (%%video 352 288 96 24 4)
