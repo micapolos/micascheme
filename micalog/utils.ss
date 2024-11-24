@@ -13,7 +13,10 @@
     declaration-type
     edge-identifier
     edge=?
-    edge+?)
+    edge+?
+    edges+
+    event+?
+    domain+)
   (import
     (micascheme)
     (prefix (micalog keywords) %))
@@ -85,4 +88,33 @@
     (and
       (edge=? $edge-a $edge-b)
       $edge-a))
+
+  (define (edges+ $edges-a $edges-b)
+    (syntax-case #`(#,$edges-a #,$edges-b) (%posedge %negedge %edge)
+      ((%posedge %posedge) #'%posedge)
+      ((%negedge %negedge) #'%negedge)
+      ((_ _) #'%edge)))
+
+  (define (event+? $event-a $event-b)
+    (syntax-case #`(#,$event-a #,$event-b) ()
+      (((edges-a signal-a) (edges-b signal-b))
+        (and
+          (free-identifier=? #'signal-a #'signal-b)
+          #`(#,(edges+ #'edges-a #'edges-b) signal-a)))))
+
+  (define event=? syntax=?)
+
+  (define (domain+ $domain-a $domain-b)
+    (syntax-case #`(#,$domain-a #,$domain-b) ()
+      ((() _) #'())
+      ((_ ()) #'())
+      (((event-a . events-a) (event-b . events-b))
+        (lets
+          ($event? (event+? #'event-a #'event-b))
+          (if $event?
+            #`(#,$event?
+              #,@(if (event=? $event? #'event-a)
+                (domain+ #'events-a #'events-b)
+                (list)))
+            #'())))))
 )
