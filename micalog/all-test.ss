@@ -1,8 +1,6 @@
 (import (micascheme))
 
 (test
+  (micalog core all)
   (micalog micac all)
-  (micalog verilog all)
-  (micalog core utils)
-  (micalog core type)
-  (micalog core domain))
+  (micalog verilog all))
