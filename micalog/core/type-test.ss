@@ -286,7 +286,9 @@
     (%set 4 reg-foo-4 1)
     (%set 4 reg-foo-4 2)))
 
-; TODO: Not working, same variable is re-declared
+; TODO: Not working, same variable is re-declared.
+; Replace $gen? with a list of parameters, which will be preserved.
+; Everything else will be generated.
 ; (check-typed-syntax
 ;   (scope-instrs $scope
 ;     ((%repeat (i 3)
