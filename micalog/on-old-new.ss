@@ -33,10 +33,10 @@
           ($old-name (generate-identifier (identifier-append #'name #'old- #'name)))
           #`(begin
             (%register 1 #,$old-name)
-            (%set 1 #,$old-name name)
             (%on (#,$old-name name)
               #,@(map clause->on-old-new-syntax
-                (syntaxes clause ...))))))
+                (syntaxes clause ...)))
+            (%set 1 #,$old-name name))))
       (other #'other)))
 
   (define (clause->on-old-new-syntax $clause)

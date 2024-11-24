@@ -218,10 +218,8 @@
     (%module (prev-clock clock)))
   (%%run-emu
     (%%video 352 288 96 24 4)
-    (%%var uint8_t prev-clock 0)
-    (%%var uint8_t clock 1)
+    (%%var bool clock 0)
     (%%update
-      (%%set prev-clock clock)
       (%%set clock (%%xor clock 1)))))
 
 (check-micac
@@ -234,11 +232,9 @@
           (%set 16 counter (%+ 16 previous-counter 1))))))
   (%%run-emu
     (%%video 352 288 96 24 4)
-    (%%var uint8_t prev-clock 0)
-    (%%var uint8_t clock 1)
+    (%%var bool clock 0)
     (%%var uint16_t counter)
     (%%update
-      (%%set prev-clock clock)
       (%%set clock (%%xor clock 1))
       (%%when (%%not (%%= prev-clock clock))
         (%%when (%%= clock 1)

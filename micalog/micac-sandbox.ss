@@ -7,24 +7,28 @@
 (micac-run-echo? #t)
 
 (micalog-emu
-  (module (previous-clock clock)
+  (module colour-bars
+    (input 1 clock)
     (register 16 red-counter)
     (register 16 green-counter)
     (register 16 blue-counter)
-    (on (previous-clock clock)
+    (register 8 red)
+    (register 8 green)
+    (register 8 blue)
+    (on clock
       (posedge
-        (set 16 red-counter (- 16 red-counter 1))
-        (set 16 green-counter (- 16 green-counter 1))
-        (set 16 blue-counter (- 16 blue-counter 1))
+        (set red-counter (- red-counter 1))
+        (set green-counter (- green-counter 1))
+        (set blue-counter (- blue-counter 1))
         (cond
-          ((= 16 red-counter 0)
-            (set 16 red-counter 19940)
-            (set 8 red (not 8 red))))
+          ((= red-counter 0)
+            (set red-counter 19940)
+            (set red (not red))))
         (cond
-          ((= 16 green-counter 0)
-            (set 16 green-counter 19920)
-            (set 8 green (not 8 green))))
+          ((= green-counter 0)
+            (set green-counter 19920)
+            (set green (not green))))
         (cond
-          ((= 16 blue-counter 0)
-            (set 16 blue-counter 19900)
-            (set 8 blue (not 8 blue))))))))
+          ((= blue-counter 0)
+            (set blue-counter 19900)
+            (set blue (not blue))))))))

@@ -12,10 +12,10 @@
       (%else c d)))
   (begin
     (%register 1 old-clock_0)
-    (%set 1 old-clock_0 clock)
     (%on (old-clock_0 clock)
       (%posedge a b)
-      (%else c d))))
+      (%else c d))
+    (%set 1 old-clock_0 clock)))
 
 (check-on-old-new-syntax
   (statement
@@ -24,16 +24,16 @@
       (negedge (%on other-clock))))
   (begin
     (%register 1 old-clock_0)
-    (%set 1 old-clock_0 clock)
     (%on (old-clock_0 clock)
       (posedge
         (%register 1 old-other-clock_1)
-        (%set 1 old-other-clock_1 other-clock)
-        (%on (old-other-clock_1 other-clock)))
+        (%on (old-other-clock_1 other-clock))
+        (%set 1 old-other-clock_1 other-clock))
       (negedge
         (%register 1 old-other-clock_2)
-        (%set 1 old-other-clock_2 other-clock)
-        (%on (old-other-clock_2 other-clock))))))
+        (%on (old-other-clock_2 other-clock))
+        (%set 1 old-other-clock_2 other-clock)))
+    (%set 1 old-clock_0 clock)))
 
 (check-on-old-new-syntax
   (statement
@@ -44,8 +44,8 @@
     (a b c)
     (d
       (%register 1 old-clock_0)
-      (%set 1 old-clock_0 clock)
-      (%on (old-clock_0 clock)))))
+      (%on (old-clock_0 clock))
+      (%set 1 old-clock_0 clock))))
 
 (check-on-old-new-syntax
   (module
@@ -55,7 +55,7 @@
         (%else c d))))
   (%module foo
     (%register 1 old-clock_0)
-    (%set 1 old-clock_0 clock)
     (%on (old-clock_0 clock)
       (%posedge a b)
-      (%else c d))))
+      (%else c d))
+    (%set 1 old-clock_0 clock)))

@@ -1,7 +1,7 @@
 (library (micalog micac)
   (export micalog-emu)
   (import
-    (only (micascheme) define-syntax syntax-case unsyntax unsyntax-splicing pretty-print quote list quasisyntax push lambda list->syntax display define-rule-syntax string-append apply intercalate with map-using syntaxes ... fluent define-case-syntax literal->syntax syntax export ...)
+    (only (micascheme) define fluent define-syntax syntax-case unsyntax unsyntax-splicing pretty-print quote list quasisyntax push lambda list->syntax display define-rule-syntax string-append apply intercalate with map-using syntaxes ... fluent define-case-syntax literal->syntax syntax export ...)
     (only (micalog micac-transformer) module->micac)
     (only (micalog type) module->typed-syntax)
     (only (micac syntax-c) syntax-c)
@@ -14,6 +14,10 @@
   (export (import (micalog keywords)))
   (export (import (only (micac lib emu) red green blue)))
 
-  (define-case-syntax (micalog-emu module)
-    (module->micac #'module))
+  (define-case-syntax (micalog-emu micalog)
+    (fluent #'micalog
+      (module->typed-syntax)
+      (module->on-old-new-syntax)
+      (module->inits-updates-syntax)
+      (module->micac)))
 )

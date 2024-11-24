@@ -24,7 +24,7 @@
   ; - "on" statement with explicit previous value
   (define (module->micac $module)
     (syntax-case $module (%module)
-      ((%module (previous-clock clock) statement ...)
+      ((%module name statement ...)
         (lets
           ($inputs (declaration-syntaxes-of %input statement ...))
           ($registers (declaration-syntaxes-of %register statement ...))
@@ -37,11 +37,9 @@
               (syntaxes statement ...)))
           #`(%%run-emu
             (%%video 352 288 96 24 4)
-            (%%var uint8_t previous-clock 0)
-            (%%var uint8_t clock 1)
+            (%%var bool clock 0)
             #,@(map register->micac $registers)
             (%%update
-              (%%set previous-clock clock)
               (%%set clock (%%xor clock 1))
               #,@(map instruction->micac $instructions)))))))
 
