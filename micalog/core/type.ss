@@ -269,101 +269,103 @@
                 (syntax->datum $type-a)
                 `(>= ,$size))))))))
 
-  (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
-    (syntax-case $instr (%input %output %wire %register %set %cond %else %on %macro)
-      ((%input id)
-        (scoped
-          (scope+undefined $scope (identifier id) (binding #'%wire #'1 #'id))
-          (push $syntaxes #`(%input 1 id))))
-      ((%input type id)
-        (lets
-          ($type (type->syntax #'type))
+  (define (scoped-syntaxes+instr $scoped $instr)
+    (lets
+      ((scoped $scope $syntaxes) $scoped)
+      (syntax-case $instr (%input %output %wire %register %set %cond %else %on %macro)
+        ((%input id)
           (scoped
-            (scope+undefined $scope (identifier id) (binding #'%wire $type #'id))
-            (push $syntaxes #`(%input #,$type id)))))
-      ((%output id expr)
-        (lets
-          ($typed (scope-expr->typed $scope #'expr))
-          ($type (typed-type $typed))
+            (scope+undefined $scope (identifier id) (binding #'%wire #'1 #'id))
+            (push $syntaxes #`(%input 1 id))))
+        ((%input type id)
+          (lets
+            ($type (type->syntax #'type))
+            (scoped
+              (scope+undefined $scope (identifier id) (binding #'%wire $type #'id))
+              (push $syntaxes #`(%input #,$type id)))))
+        ((%output id expr)
+          (lets
+            ($typed (scope-expr->typed $scope #'expr))
+            ($type (typed-type $typed))
+            (scoped
+              (scope+undefined $scope (identifier id) (binding #'%wire $type #'id))
+              (push $syntaxes #`(%output #,$type id #,(typed-value $typed))))))
+        ((%wire id expr)
+          (lets
+            ($typed (scope-expr->typed $scope #'expr))
+            ($type (typed-type $typed))
+            (scoped
+              (scope+undefined $scope (identifier id) (binding #'%wire $type #'id))
+              (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))
+        ((%register id)
           (scoped
-            (scope+undefined $scope (identifier id) (binding #'%wire $type #'id))
-            (push $syntaxes #`(%output #,$type id #,(typed-value $typed))))))
-      ((%wire id expr)
-        (lets
-          ($typed (scope-expr->typed $scope #'expr))
-          ($type (typed-type $typed))
+            (scope+undefined $scope (identifier id) (binding #'%register #'1 #'id))
+            (push $syntaxes #`(%register 1 #,(identifier id)))))
+        ((%register type id)
+          (lets
+            ($type (type->syntax #'type))
+            (scoped
+              (scope+undefined $scope (identifier id) (binding #'%register $type #'id))
+              (push $syntaxes #`(%register #,$type #,(identifier id))))))
+        ((%set id expr)
+          (lets
+            ($id-binding (scope-id->binding $scope (identifier id)))
+            ($id-kind (binding-kind $id-binding))
+            ($id-type (binding-type $id-binding))
+            ($id-name (binding-name $id-binding))
+            ($typed (scope-type-expr->typed $scope $id-type #'expr))
+            (if (syntax=? $id-kind #'%register)
+              (scoped $scope
+                (push $syntaxes #`(%set #,$id-type #,$id-name #,(typed-value $typed))))
+              (syntax-error $instr
+                (format "type mismatch ~a, expected ~a in"
+                  (syntax->datum #`(%set #,$id-binding #,$id-type))
+                  (syntax->datum #`(%set (%register #,$id-type) #,$id-type)))))))
+        ((%cond clause ... (%else els ...))
+          (scoped $scope
+            (push $syntaxes
+              #`(%cond
+                #,@(map (partial scope-clause->typed-syntax $scope) (syntaxes clause ...))
+                (%else #,@(syntax->list (scope-instrs->typed-syntax $scope #'(els ...))))))))
+        ((%cond clause clause* ...)
+          (scoped $scope
+            (push $syntaxes
+              #`(%cond
+                #,@(map (partial scope-clause->typed-syntax $scope) (syntaxes clause clause* ...))))))
+        ((%on clock (edge body ...))
+          (scoped $scope
+            (push $syntaxes
+              #`(%on
+                #,(typed-value (scope-type-expr->typed $scope #'1 #'clock))
+                (#,(edge->syntax #'edge)
+                  #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...))))))))
+        ((%on clock (edge body ...) (other-edge other-body ...))
+          (opposite-edges? #'edge #'other-edge)
+          (scoped $scope
+            (push $syntaxes
+              #`(%on
+                #,(typed-value (scope-type-expr->typed $scope #'1 #'clock))
+                (#,(edge->syntax #'edge)
+                  #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...))))
+                (#,(edge->syntax #'other-edge)
+                  #,@(syntax->list (scope-instrs->typed-syntax $scope #'(other-body ...))))))))
+        ((%macro (name param ...) body ...)
           (scoped
-            (scope+undefined $scope (identifier id) (binding #'%wire $type #'id))
-            (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))
-      ((%register id)
-        (scoped
-          (scope+undefined $scope (identifier id) (binding #'%register #'1 #'id))
-          (push $syntaxes #`(%register 1 #,(identifier id)))))
-      ((%register type id)
-        (lets
-          ($type (type->syntax #'type))
-          (scoped
-            (scope+undefined $scope (identifier id) (binding #'%register $type #'id))
-            (push $syntaxes #`(%register #,$type #,(identifier id))))))
-      ((%set id expr)
-        (lets
-          ($id-binding (scope-id->binding $scope (identifier id)))
-          ($id-kind (binding-kind $id-binding))
-          ($id-type (binding-type $id-binding))
-          ($id-name (binding-name $id-binding))
-          ($typed (scope-type-expr->typed $scope $id-type #'expr))
-          (if (syntax=? $id-kind #'%register)
-            (scoped $scope
-              (push $syntaxes #`(%set #,$id-type #,$id-name #,(typed-value $typed))))
-            (syntax-error $instr
-              (format "type mismatch ~a, expected ~a in"
-                (syntax->datum #`(%set #,$id-binding #,$id-type))
-                (syntax->datum #`(%set (%register #,$id-type) #,$id-type)))))))
-      ((%cond clause ... (%else els ...))
-        (scoped $scope
-          (push $syntaxes
-            #`(%cond
-              #,@(map (partial scope-clause->typed-syntax $scope) (syntaxes clause ...))
-              (%else #,@(syntax->list (scope-instrs->typed-syntax $scope #'(els ...))))))))
-      ((%cond clause clause* ...)
-        (scoped $scope
-          (push $syntaxes
-            #`(%cond
-              #,@(map (partial scope-clause->typed-syntax $scope) (syntaxes clause clause* ...))))))
-      ((%on clock (edge body ...))
-        (scoped $scope
-          (push $syntaxes
-            #`(%on
-              #,(typed-value (scope-type-expr->typed $scope #'1 #'clock))
-              (#,(edge->syntax #'edge)
-                #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...))))))))
-      ((%on clock (edge body ...) (other-edge other-body ...))
-        (opposite-edges? #'edge #'other-edge)
-        (scoped $scope
-          (push $syntaxes
-            #`(%on
-              #,(typed-value (scope-type-expr->typed $scope #'1 #'clock))
-              (#,(edge->syntax #'edge)
-                #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...))))
-              (#,(edge->syntax #'other-edge)
-                #,@(syntax->list (scope-instrs->typed-syntax $scope #'(other-body ...))))))))
-      ((%macro (name param ...) body ...)
-        (scoped
-          (scope+undefined $scope (identifier name)
-            (lambda ($syntax)
-              (syntax-case $syntax ()
-                ((_ arg ...)
-                  (syntax-subst
-                    #'(param ...)
-                    #'(arg ...)
-                    #'(begin body ...))))))
-          $syntaxes))
-      ((id arg ...)
-        (and (identifier? #'id) (scope-id->transformer? $scope #'id))
-        (scoped-syntaxes+instrs (scoped $scope $syntaxes)
-          (list->syntax
-            (unbegin-syntaxes
-              (transform (scope-id->transformer? $scope #'id) $instr $scope)))))))
+            (scope+undefined $scope (identifier name)
+              (lambda ($syntax)
+                (syntax-case $syntax ()
+                  ((_ arg ...)
+                    (syntax-subst
+                      #'(param ...)
+                      #'(arg ...)
+                      #'(begin body ...))))))
+            $syntaxes))
+        ((id arg ...)
+          (and (identifier? #'id) (scope-id->transformer? $scope #'id))
+          (scoped-syntaxes+instrs $scoped
+            (list->syntax
+              (unbegin-syntaxes
+                (transform (scope-id->transformer? $scope #'id) $instr $scope))))))))
 
   (define (scope-clause->typed-syntax $scope $clause)
     (syntax-case $clause ()
