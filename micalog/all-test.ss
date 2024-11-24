@@ -6,4 +6,5 @@
   (micalog utils)
   (micalog flatten)
   (micalog type)
+  (micalog inits-updates)
   (micalog domain))
