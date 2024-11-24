@@ -5,5 +5,4 @@
   (micalog verilog all)
   (micalog utils)
   (micalog type)
-  (micalog domain)
-  (micalog syntax))
+  (micalog domain))
