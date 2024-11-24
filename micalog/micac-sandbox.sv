@@ -32,9 +32,13 @@ module colour_bars (
       bar_blue <= ~bar_blue;
     end
   end
-  wire screen_;
-  assign screen_ = video_x >= 'b110000 & video_x < 'b100110000 & (video_y >= 'b110000 & video_y < 'b11110000);
-  assign red = screen_ ? 'b11011101 : bar_red;
-  assign green = screen_ ? 'b11011101 : bar_green;
-  assign blue = screen_ ? 'b11011101 : bar_blue;
+  wire bar_;
+  assign bar_ = ~mouse_pressed_ ^ video_x >= 'b110000 & video_x < 'b100110000 & (video_y >= 'b110000 & video_y < 'b11110000);
+  wire black_;
+  assign black_ = video_x > mouse_x ^ video_y > mouse_y;
+  wire [7:0] background;
+  assign background = black_ ? 0 : 'b11011101;
+  assign red = bar_ ? bar_red : background;
+  assign green = bar_ ? bar_green : background;
+  assign blue = bar_ ? bar_blue : background;
 endmodule
