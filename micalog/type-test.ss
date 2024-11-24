@@ -220,7 +220,7 @@
         (8 (%and 8 in-1 in-2))
         (1 clock)))))
 
-; === macros (instructions) ===
+; === macros ===
 
 (check-typed-syntax
   (scope-instrs $scope ((%macro (set-zero name) (%set name 0))))
@@ -244,4 +244,10 @@
     (%set 4 reg-foo-4 reg-bar-4)
     (%set 4 reg-bar-4 reg-foo-4)))
 
-; === macros (expressions) ===
+(check-typed-syntax
+  (scope-instrs $scope
+    (
+      (%macro (double a) (%+ a a))
+      (%set reg-foo-4 (double foo-4))))
+  ((%set 4 reg-foo-4 (%+ 4 foo-4 foo-4))))
+

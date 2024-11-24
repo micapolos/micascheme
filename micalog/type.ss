@@ -137,7 +137,14 @@
         ((%xnor x ...) (scope-op2->typed $scope $expr))
         ((%+ x ...) (scope-op2->typed $scope $expr))
         ((%- x ...) (scope-op1/2->typed $scope $expr))
-        ((%if x ...) (scope-if->typed $scope $expr)))))
+        ((%if x ...) (scope-if->typed $scope $expr))
+        ((id arg ...)
+          (and (identifier? #'id) (scope-id->transformer? $scope #'id))
+          (fluent
+            (scope-id->transformer? $scope #'id)
+            (transform $expr $scope)
+            (unbegin-syntax)
+            (with $expr (scope-expr->typed $scope $expr)))))))
 
   (define expr->typed
     (partial scope-expr->typed (empty-scope)))
