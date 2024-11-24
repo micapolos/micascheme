@@ -262,7 +262,7 @@
                 `(>= ,$size))))))))
 
   (define (scoped-syntaxes+instr (scoped $scope $syntaxes) $instr)
-    (syntax-case $instr (%input %output %wire %register %set %cond %else %on %inc %dec %add %sub)
+    (syntax-case $instr (%input %output %wire %register %set %cond %else %on %inc %dec %add %sub %macro)
       ((%input id)
         (scoped
           (scope+undefined $scope (identifier id) (binding #'%wire #'1))
