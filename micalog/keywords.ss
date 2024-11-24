@@ -13,8 +13,7 @@
     if
     inc dec
     set+ set-
-    and or xor nand nor xnor not inv
-    reg reg-ref)
+    and or xor nand nor xnor not)
   (import (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
@@ -31,6 +30,5 @@
     if
     inc dec
     set+ set-
-    and or xor nand nor xnor not inv
-    reg reg-ref)
+    and or xor nand nor xnor not)
 )
