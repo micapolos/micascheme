@@ -20,7 +20,7 @@
   (%define-case-syntax (micalog-emu micalog)
     (%quasisyntax
       (%parameterize ((c-run-echo? #t) (micac-run-echo? #t))
-        (display-verilog micalog)
+        (display-micalog-verilog micalog)
         (%newline)
         (%unsyntax
           (%fluent (%syntax micalog)

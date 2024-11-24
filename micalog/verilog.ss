@@ -1,5 +1,5 @@
 (library (micalog verilog)
-  (export verilog-string display-verilog)
+  (export verilog-string display-micalog-verilog)
   (import
     (prefix (micascheme) %)
     (code)
@@ -22,6 +22,6 @@
       (%with $it (%apply %string-append $it))
       (%literal->syntax)))
 
-  (%define-rule-syntax (display-verilog module %...)
+  (%define-rule-syntax (display-micalog-verilog module %...)
     (%display (verilog-string module %...)))
 )

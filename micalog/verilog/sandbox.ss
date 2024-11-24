@@ -1,6 +1,6 @@
 (import (micalog verilog))
 
-(display-verilog
+(display-micalog-verilog
   (module empty)
 
   (module and-gate
