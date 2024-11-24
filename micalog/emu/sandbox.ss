@@ -22,15 +22,15 @@
         (cond
           ((> red-counter 19940)
             (set red-counter 0)
-            (set bar-red (not bar-red))))
+            (set-not bar-red)))
         (cond
           ((> green-counter 19920)
             (set green-counter 0)
-            (set bar-green (not bar-green))))
+            (set-not bar-green)))
         (cond
           ((> blue-counter 19900)
             (set blue-counter 0)
-            (set bar-blue (not bar-blue))))))
+            (set-not bar-blue)))))
     (wire bar?
       (xor
         (not mouse-pressed?)
