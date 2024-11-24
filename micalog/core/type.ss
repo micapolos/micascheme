@@ -269,44 +269,48 @@
                 (syntax->datum $type-a)
                 `(>= ,$size))))))))
 
+  (define (gen-scoped-binding-name $scope $kind $type $name)
+    (gen-scoped-name $scope $name (binding $kind $type $name)))
+
+  (define (gen-scoped-name $scope $name $item)
+    (lets
+      ($scope (scope+undefined $scope $name $item))
+      (scoped $scope $name)))
+
   (define (scoped-syntaxes+instr $scoped $instr)
     (lets
       ((scoped $scope $syntaxes) $scoped)
       (syntax-case $instr (%input %output %wire %register %set %cond %else %on %macro)
         ((%input id)
-          (scoped
-            (scope+undefined $scope (identifier id) (binding #'%wire #'1 #'id))
-            (push $syntaxes #`(%input 1 id))))
+          (scoped-syntaxes+instr $scoped #`(%input 1 id)))
         ((%input type id)
           (lets
             ($type (type->syntax #'type))
-            (scoped
-              (scope+undefined $scope (identifier id) (binding #'%wire $type #'id))
-              (push $syntaxes #`(%input #,$type id)))))
+            (scoped-map
+              ($name (gen-scoped-binding-name $scope #'%wire $type (identifier id)))
+              (push $syntaxes #`(%input #,$type #,$name)))))
         ((%output id expr)
           (lets
             ($typed (scope-expr->typed $scope #'expr))
             ($type (typed-type $typed))
-            (scoped
-              (scope+undefined $scope (identifier id) (binding #'%wire $type #'id))
+            (scoped-map
+              ($name (gen-scoped-binding-name $scope #'%wire $type (identifier id)))
               (push $syntaxes #`(%output #,$type id #,(typed-value $typed))))))
         ((%wire id expr)
           (lets
             ($typed (scope-expr->typed $scope #'expr))
             ($type (typed-type $typed))
-            (scoped
-              (scope+undefined $scope (identifier id) (binding #'%wire $type #'id))
+            (scoped-map
+              ($name (gen-scoped-binding-name $scope #'%wire $type (identifier id)))
               (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))
         ((%register id)
-          (scoped
-            (scope+undefined $scope (identifier id) (binding #'%register #'1 #'id))
-            (push $syntaxes #`(%register 1 #,(identifier id)))))
+          (scoped-syntaxes+instr $scoped #`(%register 1 id)))
         ((%register type id)
           (lets
             ($type (type->syntax #'type))
-            (scoped
-              (scope+undefined $scope (identifier id) (binding #'%register $type #'id))
-              (push $syntaxes #`(%register #,$type #,(identifier id))))))
+            (scoped-map
+              ($name (gen-scoped-binding-name $scope #'%register $type (identifier id)))
+              (push $syntaxes #`(%register #,$type #,$name)))))
         ((%set id expr)
           (lets
             ($id-binding (scope-id->binding $scope (identifier id)))
@@ -350,15 +354,15 @@
                 (#,(edge->syntax #'other-edge)
                   #,@(syntax->list (scope-instrs->typed-syntax $scope #'(other-body ...))))))))
         ((%macro (name param ...) body ...)
-          (scoped
-            (scope+undefined $scope (identifier name)
+          (scoped-map
+            ($name (gen-scoped-name $scope (identifier name)
               (lambda ($syntax)
                 (syntax-case $syntax ()
                   ((_ arg ...)
                     (syntax-subst
                       #'(param ...)
                       #'(arg ...)
-                      #'(begin body ...))))))
+                      #'(begin body ...)))))))
             $syntaxes))
         ((id arg ...)
           (and (identifier? #'id) (scope-id->transformer? $scope #'id))
