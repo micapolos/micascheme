@@ -1,4 +1,4 @@
-(library (micalog verilog-transformer)
+(library (micalog verilog transformer)
   (export
     name->verilog
     edge->verilog

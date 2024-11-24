@@ -1,12 +1,12 @@
 (import (micascheme))
 
 (test
-  (micalog micac-transformer)
-  (micalog verilog-transformer)
+  (micalog micac all)
+  (micalog verilog all)
   (micalog utils)
   (micalog flatten)
   (micalog type)
-  (micalog inits-updates)
-  (micalog on-old-new)
+  (micalog micac inits-updates)
+  (micalog micac on-old-new)
   (micalog domain)
   (micalog syntax))

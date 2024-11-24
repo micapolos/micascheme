@@ -1,4 +1,4 @@
-(library (micalog micac-transformer)
+(library (micalog micac transformer)
   (export
     type->micac
     module->micac

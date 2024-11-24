@@ -1,4 +1,4 @@
-(library (micalog on-old-new)
+(library (micalog micac on-old-new)
   (export
     module->on-old-new-syntax
     statement->on-old-new-syntax
