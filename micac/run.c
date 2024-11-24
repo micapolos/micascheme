@@ -65,15 +65,15 @@ int main() {
                     green_counter_20 = green_counter_20 - 1;
                     blue_counter_21 = blue_counter_21 - 1;
                     if (red_counter_19 == 0) {
-                      red_counter_19 = 9960;
+                      red_counter_19 = 19940;
                       red_6 = ~red_6;
                     }
                     if (green_counter_20 == 0) {
-                      green_counter_20 = 9980;
+                      green_counter_20 = 19920;
                       green_7 = ~green_7;
                     }
                     if (blue_counter_21 == 0) {
-                      blue_counter_21 = 9940;
+                      blue_counter_21 = 19900;
                       blue_8 = ~blue_8;
                     }
                   }

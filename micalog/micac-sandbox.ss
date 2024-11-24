@@ -18,13 +18,13 @@
         (set 16 blue-counter (- 16 blue-counter 1))
         (cond
           ((= 16 red-counter 0)
-            (set 16 red-counter 9960)
+            (set 16 red-counter 19940)
             (set 8 red (not 8 red))))
         (cond
           ((= 16 green-counter 0)
-            (set 16 green-counter 9980)
+            (set 16 green-counter 19920)
             (set 8 green (not 8 green))))
         (cond
           ((= 16 blue-counter 0)
-            (set 16 blue-counter 9940)
+            (set 16 blue-counter 19900)
             (set 8 blue (not 8 blue))))))))
