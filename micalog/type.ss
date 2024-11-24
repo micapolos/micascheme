@@ -82,8 +82,11 @@
       (literal->typed? $literal)
       (syntax-error $literal "invalid literal")))
 
+  (define (scope-id->binding $scope $id)
+    (scope-item $scope $id))
+
   (define (scope-id->typed $scope $id)
-    #`(#,(binding-type (scope-item $scope $id)) #,$id))
+    #`(#,(binding-type (scope-id->binding $scope $id)) #,$id))
 
   (define (scope-type-expr->typed $scope $expected-type $expr)
     (or
@@ -273,7 +276,7 @@
             (push $syntaxes #`(%register #,$type #,(identifier id))))))
       ((%set id expr)
         (lets
-          ($id-binding (scope-item $scope (identifier id)))
+          ($id-binding (scope-id->binding $scope (identifier id)))
           ($id-kind (binding-kind $id-binding))
           ($id-type (binding-type $id-binding))
           ($typed (scope-type-expr->typed $scope $id-type #'expr))
