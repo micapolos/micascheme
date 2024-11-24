@@ -239,37 +239,37 @@
     (syntax-case $instr (%input %output %wire %register %set %cond %else %on)
       ((%input id)
         (scoped
-          (scope+ $scope (identifier id) (binding #'%wire #'1))
+          (scope+undefined $scope (identifier id) (binding #'%wire #'1))
           (push $syntaxes #`(%input 1 id))))
       ((%input type id)
         (lets
           ($type (type->syntax #'type))
           (scoped
-            (scope+ $scope (identifier id) (binding #'%wire $type))
+            (scope+undefined $scope (identifier id) (binding #'%wire $type))
             (push $syntaxes #`(%input #,$type id)))))
       ((%output id expr)
         (lets
           ($typed (scope-expr->typed $scope #'expr))
           ($type (typed-type $typed))
           (scoped
-            (scope+ $scope (identifier id) (binding #'%wire $type))
+            (scope+undefined $scope (identifier id) (binding #'%wire $type))
             (push $syntaxes #`(%output #,$type id #,(typed-value $typed))))))
       ((%wire id expr)
         (lets
           ($typed (scope-expr->typed $scope #'expr))
           ($type (typed-type $typed))
           (scoped
-            (scope+ $scope (identifier id) (binding #'%wire $type))
+            (scope+undefined $scope (identifier id) (binding #'%wire $type))
             (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))
       ((%register id)
         (scoped
-          (scope+ $scope (identifier id) (binding #'%register #'1))
+          (scope+undefined $scope (identifier id) (binding #'%register #'1))
           (push $syntaxes #`(%register 1 #,(identifier id)))))
       ((%register type id)
         (lets
           ($type (type->syntax #'type))
           (scoped
-            (scope+ $scope (identifier id) (binding #'%register $type))
+            (scope+undefined $scope (identifier id) (binding #'%register $type))
             (push $syntaxes #`(%register #,$type #,(identifier id))))))
       ((%set id expr)
         (lets
