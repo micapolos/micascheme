@@ -264,3 +264,14 @@
       (%set reg-foo-4 (double foo-4))))
   ((%set 4 reg-foo-4 (%+ 4 foo-4 foo-4))))
 
+(check-typed-syntax
+  (scope-instrs $scope
+    (
+      (%macro (double expr) (%+ expr expr))
+      (%macro (local-register param)
+        (%register 8 local)
+        (%set local (double param)))
+      (local-register foo-8)))
+  (
+    (%register 8 local_0)
+    (%set 8 local_0 (%+ 8 foo-8 foo-8))))
