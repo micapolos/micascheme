@@ -58,7 +58,7 @@
     (transform $transformer $syntax $scope))
 
   (define (scope-unbound $id)
-    (syntax-error $id "unbound identifier"))
+    (syntax-error $id "undefined"))
 
   (define-rule-syntax (scope-with (id item) ...)
     (fluent (empty-scope)
