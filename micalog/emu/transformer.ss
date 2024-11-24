@@ -283,7 +283,9 @@
               (or
                 (syntax=? #'type $type)
                 (syntax-error $statement
-                  (format "invalid type, expected ~a in" (syntax->datum $type))))
+                  (format "invalid type ~a, expected ~a in"
+                    (syntax->datum #'type)
+                    (syntax->datum $type))))
               $statement))))
        $statements))
 )
