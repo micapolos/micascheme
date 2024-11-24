@@ -18,3 +18,6 @@
 
 (check-foo (bar (bar 10)) (foo 10))
 (check-foo (raises (bar (non-bar 10))))
+
+(check-datum=? #`(foo bar) #`(foo bar))
+(check (raises (check-datum=? #`(foo bar) #`(foo gar))))

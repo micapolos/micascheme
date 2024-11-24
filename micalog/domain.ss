@@ -1,64 +1,71 @@
 (library (micalog domain)
   (export
-    empty-domain
-    domain+
-    env-domain+register)
+    edges+
+    event+?
+    domain+)
   (import
     (micascheme)
     (micalog utils)
+    (syntax scope)
     (prefix (micalog keywords) %))
 
-  (define (empty-domain) #'())
+  (define (edges+ $edges-a $edges-b)
+    (syntax-case #`(#,$edges-a #,$edges-b) (%posedge %negedge %edge)
+      ((%posedge %posedge) #'%posedge)
+      ((%negedge %negedge) #'%negedge)
+      ((_ _) #'%edge)))
 
-  (define domain=? syntax=?)
+  (define (event+? $event-a $event-b)
+    (syntax-case #`(#,$event-a #,$event-b) ()
+      (((edges-a signal-a) (edges-b signal-b))
+        (and
+          (free-identifier=? #'signal-a #'signal-b)
+          #`(#,(edges+ #'edges-a #'edges-b) signal-a)))))
+
+  (define event=? syntax=?)
 
   (define (domain+ $domain-a $domain-b)
-    (syntax-case $domain-a ()
-      (() (empty-domain))
-      (((id-a edge-a) . tail-a)
-        (syntax-case $domain-b ()
-          (() (empty-domain))
-          (((id-b edge-b) . tail-b)
-            (if (free-identifier=? (identifier id-a) (identifier id-b))
-              (lets
-                ($edge? (edge+? #'edge-a #'edge-b))
-                (if $edge?
-                  #`((id-a #,$edge?) . #,(domain+ #'tail-a #'tail-b))
-                  (empty-domain)))
-              (empty-domain)))))))
-
-  (define (env+id-domain $env $id $domain)
-    (syntax-set $env $id $domain))
-
-  (define (env-id->domain $env $id)
-    (syntax-ref $env $id))
-
-  (define (env-domain+register $env $domain $register)
-    (syntax-case $register (%register)
-      ((%register type name)
-        (syntax-set $env (identifier name) $domain))))
-
-  (define (env-domain+set $env $domain $set)
-    (syntax-case $set (%set)
-      ((%set type name expr)
+    (syntax-case #`(#,$domain-a #,$domain-b) ()
+      ((() _) #'())
+      ((_ ()) #'())
+      (((event-a . events-a) (event-b . events-b))
         (lets
-          ($register-domain (env-id->domain $env (identifier name)))
-          (if (domain=? $register-domain $domain)
-            TODO
-            (syntax-error #'name
-              (format
-                "illegal domain ~a, expected ~a in register"
-                $register-domain
-                $domain)))))))
+          ($event? (event+? #'event-a #'event-b))
+          (if $event?
+            #`(#,$event?
+              #,@(if (event=? $event? #'event-a)
+                (domain+ #'events-a #'events-b)
+                (list)))
+            #'())))))
 
-  (define (env-id-domain-ref $env $id $domain)
-    (lets
-      ($env-domain (env-id->domain $env $id))
-      (if (domain=? $env-domain $domain)
-        $domain
-        (syntax-error $id
-          (format
-            "illegal domain ~a, expected ~a in"
-            $env-domain
-            $domain)))))
+  (define (timed-domain $timed)
+    (syntax-case $timed ()
+      ((domain xs ...) #'domain)))
+
+  (define (literal->timed $literal)
+    (syntax-case $literal ()
+      ((type value)
+        #`(%async type value))))
+
+  (define (scope-name->timed $scope $name)
+    (syntax-case $name ()
+      ((type name)
+        #'(
+          #,(scope-ref $scope (identifier name))
+          type name))))
+
+  (define (scope-expr->timed $scope $type $expr)
+    (syntax-case $expr ()
+      ((type value)
+        (syntax-case #'value ()
+          ((%and a b)
+            (lets
+              ($timed-a (scope-expr->timed $scope #'a))
+              ($timed-b (scope-expr->timed $scope #'b))
+              ($domain (domain+ (timed-domain $timed-a) (timed-domain $timed-b)))
+              #`(#,$domain type value)))
+          (name (identifier? #'name)
+            #`(#,(scope-ref $scope #'name) type name))
+          (literal
+            #`(%async type literal))))))
 )

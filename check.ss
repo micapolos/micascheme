@@ -5,7 +5,8 @@
     raises
     works
     define-check->
-    define-check-datum->)
+    define-check-datum->
+    check-datum=?)
   (import (scheme) (identifier))
 
   (define checking? (make-thread-parameter #f))
@@ -113,4 +114,12 @@
                 (equal?
                   (syntax->datum (#,(identifier-append #'name #'name #'-> #'id) arg (... ...) #'input))
                   'expected))))))))
+
+  (define-syntax check-datum=?
+    (syntax-rules ()
+      ((_ a b)
+        (check
+          (equal?
+            (syntax->datum a)
+            (syntax->datum b))))))
 )

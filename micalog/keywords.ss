@@ -1,7 +1,7 @@
 (library (micalog keywords)
   (export
     module input output
-    on posedge negedge
+    on posedge negedge edge
     cond else
     register set
     capture
@@ -16,7 +16,7 @@
 
   (define-aux-keywords
     module input output
-    on posedge negedge
+    on posedge negedge edge
     cond else
     register set
     capture
