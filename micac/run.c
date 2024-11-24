@@ -35,37 +35,46 @@ int main() {
             bool mouse_pressed__16 = false;
             uint8_t previous_clock_17 = 0;
             uint8_t clock_18 = 1;
-            uint16_t bar_counter_19;
-            uint8_t color_20;
-            bool running_21 = true;
-            SDL_Event event_22;
-            int sdl_mouse_x_23 = 0;
-            int sdl_mouse_y_24 = 0;
-            bool sdl_mouse_pressed__25 = false;
-            while (running_21) {
-              while (SDL_PollEvent(&event_22)) {
-                if (event_22.type == SDL_QUIT) {
-                  running_21 = false;
+            uint16_t red_counter_19;
+            uint16_t green_counter_20;
+            uint16_t blue_counter_21;
+            bool running_22 = true;
+            SDL_Event event_23;
+            int sdl_mouse_x_24 = 0;
+            int sdl_mouse_y_25 = 0;
+            bool sdl_mouse_pressed__26 = false;
+            while (running_22) {
+              while (SDL_PollEvent(&event_23)) {
+                if (event_23.type == SDL_QUIT) {
+                  running_22 = false;
                 }
               }
-              int sdl_mouse_x_26;
-              int sdl_mouse_y_27;
-              const uint32_t sdl_mouse_state_28 = SDL_GetMouseState(&sdl_mouse_x_26, &sdl_mouse_y_27);
-              mouse_x_14 = sdl_mouse_x_26 / 2;
-              mouse_y_15 = sdl_mouse_y_27 / 2;
-              mouse_pressed__16 = (sdl_mouse_state_28 & 1) != 0;
-              int counter_29 = 559104;
-              while (counter_29) {
+              int sdl_mouse_x_27;
+              int sdl_mouse_y_28;
+              const uint32_t sdl_mouse_state_29 = SDL_GetMouseState(&sdl_mouse_x_27, &sdl_mouse_y_28);
+              mouse_x_14 = sdl_mouse_x_27 / 2;
+              mouse_y_15 = sdl_mouse_y_28 / 2;
+              mouse_pressed__16 = (sdl_mouse_state_29 & 1) != 0;
+              int counter_30 = 559104;
+              while (counter_30) {
                 previous_clock_17 = clock_18;
                 clock_18 = clock_18 ^ 1;
                 if (previous_clock_17 != clock_18) {
                   if (clock_18 == 1) {
-                    bar_counter_19 = bar_counter_19 - 1;
-                    const bool bar_counter_zero__30 = bar_counter_19 == 0;
-                    if (bar_counter_zero__30) {
-                      bar_counter_19 = 9950;
-                      color_20 = ~color_20;
-                      red_6 = color_20;
+                    red_counter_19 = red_counter_19 - 1;
+                    green_counter_20 = green_counter_20 - 1;
+                    blue_counter_21 = blue_counter_21 - 1;
+                    if (red_counter_19 == 0) {
+                      red_counter_19 = 9960;
+                      red_6 = ~red_6;
+                    }
+                    if (green_counter_20 == 0) {
+                      green_counter_20 = 9980;
+                      green_7 = ~green_7;
+                    }
+                    if (blue_counter_21 == 0) {
+                      blue_counter_21 = 9940;
+                      blue_8 = ~blue_8;
                     }
                   }
                 }
@@ -97,7 +106,7 @@ int main() {
                     }
                   }
                 }
-                counter_29 -= 1;
+                counter_30 -= 1;
               }
               if (SDL_UpdateTexture(texture_11, 0, pixels_12, 1408) != 0) {
                 printf("%s SDL Error: %s\n", "Could not update texture.", SDL_GetError());

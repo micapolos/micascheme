@@ -8,14 +8,23 @@
 
 (micalog-emu
   (module (previous-clock clock)
-    (register 16 bar-counter)
-    (register 8 color)
+    (register 16 red-counter)
+    (register 16 green-counter)
+    (register 16 blue-counter)
     (on (previous-clock clock)
       (posedge
-        (set 16 bar-counter (- 16 bar-counter 1))
-        (wire 1 bar-counter-zero? (= 16 bar-counter 0))
+        (set 16 red-counter (- 16 red-counter 1))
+        (set 16 green-counter (- 16 green-counter 1))
+        (set 16 blue-counter (- 16 blue-counter 1))
         (cond
-          (bar-counter-zero?
-            (set 16 bar-counter 9950)
-            (set 8 color (not 8 color))
-            (set 8 red color)))))))
+          ((= 16 red-counter 0)
+            (set 16 red-counter 9960)
+            (set 8 red (not 8 red))))
+        (cond
+          ((= 16 green-counter 0)
+            (set 16 green-counter 9980)
+            (set 8 green (not 8 green))))
+        (cond
+          ((= 16 blue-counter 0)
+            (set 16 blue-counter 9940)
+            (set 8 blue (not 8 blue))))))))
