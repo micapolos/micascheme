@@ -12,7 +12,7 @@
     (only (micac) var)
     (micalog keywords))
   (export (import (micalog keywords)))
-  (export (import (only (micac lib emu) red green blue)))
+  (export (import (only (micac lib emu) red green blue video-x video-y mouse-x mouse-y mouse-pressed?)))
 
   (define-case-syntax (micalog-emu micalog)
     (fluent #'micalog

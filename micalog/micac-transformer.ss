@@ -18,8 +18,7 @@
   ; Requirements:
   ; - module with explicit previous-clock and clock names
   ; - fully typed
-  ; - all inputs and registers declared at the top-level
-  ; - no outputs
+  ; - inputs and registers declared at the top-level
   ; - explicit captures to capture previous register values
   ; - "on" statement with explicit previous value
   (define (module->micac $module)
@@ -62,10 +61,11 @@
           #,(type->micac #'type)
           #,(name->micac #'name)
           #,(expr->micac #'expr)))
-      ((%output type name)
+      ((%output type name expr)
         #`(%%var
           #,(type->micac #'type)
-          #,(name->micac #'name)))
+          #,(name->micac #'name)
+          #,(expr->micac #'expr)))
       ((%wire type name expr)
         #`(%%const
           #,(type->micac #'type)

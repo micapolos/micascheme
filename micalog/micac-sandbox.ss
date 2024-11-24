@@ -9,12 +9,17 @@
 (micalog-emu
   (module colour-bars
     (input 1 clock)
+    (input 9 video-x)
+    (input 9 video-y)
+    (input 9 mouse-x)
+    (input 9 mouse-y)
+    (input 1 mouse-pressed?)
     (register 16 red-counter)
     (register 16 green-counter)
     (register 16 blue-counter)
-    (register 8 red)
-    (register 8 green)
-    (register 8 blue)
+    (register 8 bar-red)
+    (register 8 bar-green)
+    (register 8 bar-blue)
     (on clock
       (posedge
         (set red-counter (- red-counter 1))
@@ -23,12 +28,19 @@
         (cond
           ((= red-counter 0)
             (set red-counter 19940)
-            (set red (not red))))
+            (set bar-red (not bar-red))))
         (cond
           ((= green-counter 0)
             (set green-counter 19920)
-            (set green (not green))))
+            (set bar-green (not bar-green))))
         (cond
           ((= blue-counter 0)
             (set blue-counter 19900)
-            (set blue (not blue))))))))
+            (set bar-blue (not bar-blue))))))
+    (wire screen?
+      (and
+        (and (>= video-x 48) (< video-x 304))
+        (and (>= video-y 48) (< video-x 240))))
+    (output red bar-red)
+    (output green bar-green)
+    (output blue bar-blue)))

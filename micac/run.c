@@ -37,9 +37,9 @@ int main() {
             uint16_t red_counter_19;
             uint16_t green_counter_20;
             uint16_t blue_counter_21;
-            uint8_t red_22;
-            uint8_t green_23;
-            uint8_t blue_24;
+            uint8_t bar_red_22;
+            uint8_t bar_green_23;
+            uint8_t bar_blue_24;
             bool old_clock_3_25;
             bool running_26 = true;
             SDL_Event event_27;
@@ -68,31 +68,35 @@ int main() {
                     blue_counter_21 = blue_counter_21 - 1;
                     if (red_counter_19 == 0) {
                       red_counter_19 = 19940;
-                      red_22 = ~red_22;
+                      bar_red_22 = ~bar_red_22;
                     }
                     if (green_counter_20 == 0) {
                       green_counter_20 = 19920;
-                      green_23 = ~green_23;
+                      bar_green_23 = ~bar_green_23;
                     }
                     if (blue_counter_21 == 0) {
                       blue_counter_21 = 19900;
-                      blue_24 = ~blue_24;
+                      bar_blue_24 = ~bar_blue_24;
                     }
                   }
                 }
                 old_clock_3_25 = clock_18;
+                const bool screen__35 = video_x_4 >= 48 && video_x_4 < 304 && (video_y_5 >= 48 && video_x_4 < 240);
+                uint8_t red_36 = bar_red_22;
+                uint8_t green_37 = bar_green_23;
+                uint8_t blue_38 = bar_blue_24;
                 if (pixel_cycle_counter_6 == 0) {
-                  const bool h_video__35 = video_x_4 < 352;
-                  const bool v_video__36 = video_y_5 < 288;
-                  const bool video__37 = h_video__35 && v_video__36;
-                  if (video__37) {
+                  const bool h_video__39 = video_x_4 < 352;
+                  const bool v_video__40 = video_y_5 < 288;
+                  const bool video__41 = h_video__39 && v_video__40;
+                  if (video__41) {
                     *pixel_ref_14 = 255;
                     pixel_ref_14 += 1;
-                    *pixel_ref_14 = red_22;
+                    *pixel_ref_14 = red_36;
                     pixel_ref_14 += 1;
-                    *pixel_ref_14 = green_23;
+                    *pixel_ref_14 = green_37;
                     pixel_ref_14 += 1;
-                    *pixel_ref_14 = blue_24;
+                    *pixel_ref_14 = blue_38;
                     pixel_ref_14 += 1;
                   }
                 }

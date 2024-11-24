@@ -123,8 +123,8 @@
   (%%const uint8_t foo bar))
 
 (check-micac
-  (raises
-    (instruction (%output 8 foo bar))))
+  (instruction (%output 8 foo bar))
+  (%%var uint8_t foo bar))
 
 (check-micac
   (instruction (%set 8 foo bar))
