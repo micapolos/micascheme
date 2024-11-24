@@ -8,6 +8,8 @@
     expr->typed
     type->syntax
     scope-expr->typed
+    gen?-scope-instr->typed-syntax
+    gen?-scope-instrs->typed-syntax
     scope-instr->typed-syntax
     scope-instrs->typed-syntax
     scope-module->typed-syntax
@@ -269,48 +271,51 @@
                 (syntax->datum $type-a)
                 `(>= ,$size))))))))
 
-  (define (gen-scoped-binding-name $scope $gen? $kind $type $name)
-    (gen-scoped-name $scope $gen? $name (binding $kind $type $name)))
+  (define (gen-scoped-binding-name $gen? $scope $kind $type $name)
+    (lets
+      ($gen-name (if $gen? (generate-identifier $name) $name))
+      ($scope (scope+undefined $scope $name (binding $kind $type $gen-name)))
+      (scoped $scope $gen-name)))
 
-  (define (gen-scoped-name $scope $gen? $name $item)
+  (define (gen-scoped-name $gen? $scope $name $item)
     (lets
       ($gen-name (if $gen? (generate-identifier $name) $name))
       ($scope (scope+undefined $scope $name $item))
-      (scoped $scope $name)))
+      (scoped $scope $gen-name)))
 
-  (define (scoped-syntaxes+instr $scoped $instr)
+  (define (gen?-scoped-syntaxes+instr $gen? $scoped $instr)
     (lets
       ((scoped $scope $syntaxes) $scoped)
       (syntax-case $instr (%input %output %wire %register %set %cond %else %on %macro)
         ((%input id)
-          (scoped-syntaxes+instr $scoped #`(%input 1 id)))
+          (gen?-scoped-syntaxes+instr $gen? $scoped #`(%input 1 id)))
         ((%input type id)
           (lets
             ($type (type->syntax #'type))
             (scoped-map
-              ($name (gen-scoped-binding-name $scope #f #'%wire $type (identifier id)))
+              ($name (gen-scoped-binding-name $gen? $scope #'%wire $type (identifier id)))
               (push $syntaxes #`(%input #,$type #,$name)))))
         ((%output id expr)
           (lets
             ($typed (scope-expr->typed $scope #'expr))
             ($type (typed-type $typed))
             (scoped-map
-              ($name (gen-scoped-binding-name $scope #f #'%wire $type (identifier id)))
+              ($name (gen-scoped-binding-name $gen? $scope #'%wire $type (identifier id)))
               (push $syntaxes #`(%output #,$type id #,(typed-value $typed))))))
         ((%wire id expr)
           (lets
             ($typed (scope-expr->typed $scope #'expr))
             ($type (typed-type $typed))
             (scoped-map
-              ($name (gen-scoped-binding-name $scope #f #'%wire $type (identifier id)))
+              ($name (gen-scoped-binding-name $gen? $scope #'%wire $type (identifier id)))
               (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))
         ((%register id)
-          (scoped-syntaxes+instr $scoped #`(%register 1 id)))
+          (gen?-scoped-syntaxes+instr $gen? $scoped #`(%register 1 id)))
         ((%register type id)
           (lets
             ($type (type->syntax #'type))
             (scoped-map
-              ($name (gen-scoped-binding-name $scope #f #'%register $type (identifier id)))
+              ($name (gen-scoped-binding-name $gen? $scope #'%register $type (identifier id)))
               (push $syntaxes #`(%register #,$type #,$name)))))
         ((%set id expr)
           (lets
@@ -330,20 +335,20 @@
           (scoped $scope
             (push $syntaxes
               #`(%cond
-                #,@(map (partial scope-clause->typed-syntax $scope) (syntaxes clause ...))
-                (%else #,@(syntax->list (scope-instrs->typed-syntax $scope #'(els ...))))))))
+                #,@(map (partial gen?-scope-clause->typed-syntax $gen? $scope) (syntaxes clause ...))
+                (%else #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(els ...))))))))
         ((%cond clause clause* ...)
           (scoped $scope
             (push $syntaxes
               #`(%cond
-                #,@(map (partial scope-clause->typed-syntax $scope) (syntaxes clause clause* ...))))))
+                #,@(map (partial gen?-scope-clause->typed-syntax $gen? $scope) (syntaxes clause clause* ...))))))
         ((%on clock (edge body ...))
           (scoped $scope
             (push $syntaxes
               #`(%on
                 #,(typed-value (scope-type-expr->typed $scope #'1 #'clock))
                 (#,(edge->syntax #'edge)
-                  #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...))))))))
+                  #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(body ...))))))))
         ((%on clock (edge body ...) (other-edge other-body ...))
           (opposite-edges? #'edge #'other-edge)
           (scoped $scope
@@ -351,12 +356,12 @@
               #`(%on
                 #,(typed-value (scope-type-expr->typed $scope #'1 #'clock))
                 (#,(edge->syntax #'edge)
-                  #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...))))
+                  #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(body ...))))
                 (#,(edge->syntax #'other-edge)
-                  #,@(syntax->list (scope-instrs->typed-syntax $scope #'(other-body ...))))))))
+                  #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(other-body ...))))))))
         ((%macro (name param ...) body ...)
           (scoped-map
-            ($name (gen-scoped-name $scope #f (identifier name)
+            ($name (gen-scoped-name $gen? $scope (identifier name)
               (lambda ($syntax)
                 (syntax-case $syntax ()
                   ((_ arg ...)
@@ -367,28 +372,30 @@
             $syntaxes))
         ((id arg ...)
           (and (identifier? #'id) (scope-id->transformer? $scope #'id))
-          (scoped-syntaxes+instrs $scoped
+          (gen?-scoped-syntaxes+instrs #t $scoped
             (list->syntax
               (unbegin-syntaxes
                 (transform (scope-id->transformer? $scope #'id) $instr $scope))))))))
 
-  (define (scope-clause->typed-syntax $scope $clause)
+  (define (gen?-scope-clause->typed-syntax $gen? $scope $clause)
     (syntax-case $clause ()
       ((cond body ...)
         #`(
           #,(typed-value (scope-type-expr->typed $scope #'1 #'cond))
-          #,@(syntax->list (scope-instrs->typed-syntax $scope #'(body ...)))))))
+          #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(body ...)))))))
 
-  (define (scoped-syntaxes+instrs $scoped $instrs)
-    (fold-left scoped-syntaxes+instr $scoped (syntax->list $instrs)))
+  (define (gen?-scoped-syntaxes+instrs $gen? $scoped $instrs)
+    (fold-left (partial gen?-scoped-syntaxes+instr $gen?) $scoped (syntax->list $instrs)))
 
-  (define (scope-instrs->typed-syntax $scope $instrs)
-    (fluent
-      (scoped $scope (stack))
-      (scoped-syntaxes+instrs (syntax->list $instrs))
+  (define (gen?-scope-instrs->typed-syntax $gen? $scope $instrs)
+    (fluent $gen?
+      (gen?-scoped-syntaxes+instrs (scoped $scope (stack)) (syntax->list $instrs))
       (scoped-value)
       (reverse)
       (list->syntax)))
+
+  (define (scope-instrs->typed-syntax $scope $instrs)
+    (gen?-scope-instrs->typed-syntax #f $scope $instrs))
 
   (define (module->typed-syntax $module)
     (scope-module->typed-syntax (empty-scope) $module))
@@ -398,12 +405,16 @@
       ((%module name body ...)
         #`(%module #,(identifier name)
           #,@(syntax->list
-            (scope-instrs->typed-syntax
+            (gen?-scope-instrs->typed-syntax
+              #f
               $scope
               #'(body ...)))))))
 
+  (define (gen?-scope-instr->typed-syntax $gen? $scope $instr)
+    (syntax-single (gen?-scope-instrs->typed-syntax $gen? $scope #`(#,$instr))))
+
   (define (scope-instr->typed-syntax $scope $instr)
-    (syntax-single (scope-instrs->typed-syntax $scope #`(#,$instr))))
+    (gen?-scope-instr->typed-syntax #f $scope $instr))
 
   (define (typed $type $value)
     #`(#,$type #,$value))

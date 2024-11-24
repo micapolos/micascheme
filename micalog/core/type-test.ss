@@ -231,6 +231,13 @@
 (check-typed-syntax
   (scope-instrs $scope
     (
+      (%macro (local-input) (%input 8 local))
+      (local-input)))
+  ((%input 8 local_0)))
+
+(check-typed-syntax
+  (scope-instrs $scope
+    (
       (%macro (set-zero name) (%set name 0))
       (set-zero reg-foo-4)))
   ((%set 4 reg-foo-4 0)))
