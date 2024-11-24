@@ -81,22 +81,24 @@ int main() {
                   }
                 }
                 old_clock_3_25 = clock_18;
-                const bool screen__35 = video_x_4 >= 48 && video_x_4 < 304 && (video_y_5 >= 48 && video_y_5 < 240);
-                uint8_t red_36 = screen__35 ? 221 : bar_red_22;
-                uint8_t green_37 = screen__35 ? 221 : bar_green_23;
-                uint8_t blue_38 = screen__35 ? 221 : bar_blue_24;
+                const bool bar__35 = !mouse_pressed__17 ^ (video_x_4 >= 48 && video_x_4 < 304 && (video_y_5 >= 48 && video_y_5 < 240));
+                const bool black__36 = video_x_4 > mouse_x_15 ^ video_y_5 > mouse_y_16;
+                const uint8_t background_37 = black__36 ? 0 : 221;
+                uint8_t red_38 = bar__35 ? bar_red_22 : background_37;
+                uint8_t green_39 = bar__35 ? bar_green_23 : background_37;
+                uint8_t blue_40 = bar__35 ? bar_blue_24 : background_37;
                 if (pixel_cycle_counter_6 == 0) {
-                  const bool h_video__39 = video_x_4 < 352;
-                  const bool v_video__40 = video_y_5 < 288;
-                  const bool video__41 = h_video__39 && v_video__40;
-                  if (video__41) {
+                  const bool h_video__41 = video_x_4 < 352;
+                  const bool v_video__42 = video_y_5 < 288;
+                  const bool video__43 = h_video__41 && v_video__42;
+                  if (video__43) {
                     *pixel_ref_14 = 255;
                     pixel_ref_14 += 1;
-                    *pixel_ref_14 = red_36;
+                    *pixel_ref_14 = red_38;
                     pixel_ref_14 += 1;
-                    *pixel_ref_14 = green_37;
+                    *pixel_ref_14 = green_39;
                     pixel_ref_14 += 1;
-                    *pixel_ref_14 = blue_38;
+                    *pixel_ref_14 = blue_40;
                     pixel_ref_14 += 1;
                   }
                 }

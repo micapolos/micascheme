@@ -31,10 +31,14 @@
           ((> blue-counter 19900)
             (set blue-counter 0)
             (set bar-blue (not bar-blue))))))
-    (wire screen?
-      (and
-        (and (>= video-x 48) (< video-x 304))
-        (and (>= video-y 48) (< video-y 240))))
-    (output red (if screen? hex-dd bar-red))
-    (output green (if screen? hex-dd bar-green))
-    (output blue (if screen? hex-dd bar-blue))))
+    (wire bar?
+      (xor
+        (not mouse-pressed?)
+        (and
+          (and (>= video-x 48) (< video-x 304))
+          (and (>= video-y 48) (< video-y 240)))))
+    (wire black? (xor (> video-x mouse-x) (> video-y mouse-y)))
+    (wire background (if black? hex-00 hex-dd))
+    (output red (if bar? bar-red background))
+    (output green (if bar? bar-green background))
+    (output blue (if bar? bar-blue background))))
