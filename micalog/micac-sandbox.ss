@@ -1,10 +1,4 @@
-(import
-  (micalog micac)
-  (only (micac run) micac-run-echo?)
-  (only (c run) c-run-echo?))
-
-(c-run-echo? #t)
-(micac-run-echo? #t)
+(import (micalog micac))
 
 (micalog-emu
   (module colour-bars
