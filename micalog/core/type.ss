@@ -1,3 +1,7 @@
+; TODO:
+; - check that register is assigned within single domain
+; - disallow redefining keywords
+; - generate unique names in macros
 (library (micalog core type)
   (export
     literal->typed
