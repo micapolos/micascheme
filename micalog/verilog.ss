@@ -9,7 +9,7 @@
     (rename
       (only (micalog verilog transformer) module->verilog)
       (module->verilog micalog-module->verilog))
-    (only (micalog flatten) flatten-module)
+    (only (micalog verilog flatten) flatten-module)
     (only (micalog type) module->typed-syntax)
     (micalog keywords))
   (export (import (micalog keywords)))

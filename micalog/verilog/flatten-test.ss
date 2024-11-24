@@ -1,6 +1,6 @@
 (import
   (micascheme)
-  (micalog flatten)
+  (micalog verilog flatten)
   (prefix (micalog keywords) %))
 
 (check-flattens (%module mod) (%module mod))

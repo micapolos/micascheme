@@ -1,3 +1,5 @@
 (import (micascheme))
 
-(test (micalog verilog transformer))
+(test
+  (micalog verilog transformer)
+  (micalog verilog flatten))

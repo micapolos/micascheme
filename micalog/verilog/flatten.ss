@@ -1,4 +1,4 @@
-(library (micalog flatten)
+(library (micalog verilog flatten)
   (export
     check-flattens
     flatten-module)
