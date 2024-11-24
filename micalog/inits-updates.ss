@@ -30,13 +30,13 @@
           (pair
             $inits
             (list #`(%cond #,@$clauses)))))
-      ((%on event process ...)
+      ((%on name process ...)
         (lets
           ($process-pairs
             (map clause->inits-clause (syntaxes process ...)))
           ($inits (apply append (map car $process-pairs)))
           ($processes (map cdr $process-pairs))
-          (pair $inits (list #`(%on event #,@$processes)))))
+          (pair $inits (list #`(%on name #,@$processes)))))
       (other
         (pair (list) (list #'other)))))
 
