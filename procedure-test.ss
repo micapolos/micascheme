@@ -84,3 +84,7 @@
 (check (equal? (app (dot number->string) 123) "123"))
 (check (equal? (app (dot string-length number->string) 123) 3))
 (check (equal? (app (dot number->string string-length number->string) 123) "3"))
+
+; === ignore ===
+
+(check (equal? (ignore 10 20) 20))

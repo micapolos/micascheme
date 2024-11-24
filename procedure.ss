@@ -13,7 +13,8 @@
     values-apply
     todo TODO
     dot
-    dot-app)
+    dot-app
+    ignore)
   (import
     (scheme)
     (syntax)
@@ -106,4 +107,6 @@
 
   (define-rule-syntax (dot $fn ...)
     (lambda ($x) (dot-app $fn ... $x)))
+
+  (define (ignore $in $out) $out)
 )

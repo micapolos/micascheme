@@ -1,6 +1,6 @@
-(import (micalog micac))
+(import (micalog verify))
 
-(micalog-emu
+(micalog-verify
   (module colour-bars
     (input clock)
     (input 9 video-x)
