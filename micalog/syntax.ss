@@ -9,8 +9,9 @@
   (%define-syntax (micalog-syntax $syntax $lookup)
     (%syntax-case $syntax ()
       ((_ mod)
-        (%quasisyntax
-          (%syntax
-            (%unsyntax
-              (scope-module->typed-syntax $lookup (%syntax mod))))))))
+        (%fluent $lookup
+          (scope-module->typed-syntax (%syntax mod))
+          (%unsyntax)
+          (%syntax)
+          (%quasisyntax)))))
 )
