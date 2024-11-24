@@ -1,10 +1,19 @@
 (library (micalog inits-updates)
   (export
+    module->inits-updates-syntax
     statement->inits-updates-syntax
     statements->inits-updates-syntax)
   (import
     (micascheme)
     (prefix (micalog keywords) %))
+
+  (define (module->inits-updates-syntax $module)
+    (syntax-case $module (%module)
+      ((%module name statement ...)
+        #`(%module name
+          #,@(unbegin-syntaxes
+            (statements->inits-updates-syntax
+              (syntaxes statement ...)))))))
 
   (define (statement->inits-updates-syntax $statement)
     (inits-updates->syntax (statement->inits-updates $statement)))

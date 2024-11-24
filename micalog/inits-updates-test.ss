@@ -84,3 +84,14 @@
       (%posedge (%wire 8 wire-8))
       (%else (%wire 8 else-wire-8)))))
 
+(check-inits-updates-syntax
+  (module
+    (%module mod
+      (%on clock
+        (%posedge
+          (%register 8 reg-8)
+          foo bar))))
+  (%module mod
+    (%register 8 reg-8)
+    (%on clock
+      (%posedge foo bar))))

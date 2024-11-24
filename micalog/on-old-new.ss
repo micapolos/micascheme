@@ -1,10 +1,19 @@
 (library (micalog on-old-new)
   (export
+    module->on-old-new-syntax
     statement->on-old-new-syntax
     statements->on-old-new-syntax)
   (import
     (micascheme)
     (prefix (micalog keywords) %))
+
+  (define (module->on-old-new-syntax $module)
+    (syntax-case $module (%module)
+      ((%module name statement ...)
+        #`(%module name
+          #,@(unbegin-syntaxes
+            (statements->on-old-new-syntax
+              (syntaxes statement ...)))))))
 
   (define (statements->on-old-new-syntax $statements)
     (fluent $statements

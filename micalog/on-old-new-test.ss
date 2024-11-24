@@ -47,4 +47,15 @@
       (%set 1 old-clock_0 clock)
       (%on (old-clock_0 clock)))))
 
-
+(check-on-old-new-syntax
+  (module
+    (%module foo
+      (%on clock
+        (%posedge a b)
+        (%else c d))))
+  (%module foo
+    (%register 1 old-clock_0)
+    (%set 1 old-clock_0 clock)
+    (%on (old-clock_0 clock)
+      (%posedge a b)
+      (%else c d))))

@@ -6,6 +6,8 @@
     (only (micalog type) module->typed-syntax)
     (only (micac syntax-c) syntax-c)
     (only (micac expand) expand-instrs)
+    (micalog on-old-new)
+    (micalog inits-updates)
     (micac lib emu)
     (only (micac) var)
     (micalog keywords))
