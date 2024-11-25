@@ -146,9 +146,9 @@
         ((%nand x ...) (scope-op2->typed $scope $expr))
         ((%nor x ...) (scope-op2->typed $scope $expr))
         ((%xnor x ...) (scope-op2->typed $scope $expr))
-        ((%+ x ...) (scope-+->typed $scope $expr))
-        ((%* x ...) (scope-*->typed $scope $expr))
-        ((%- x ...) (scope-op1/2->typed $scope $expr)) ; FIXIT
+        ((%+ x ...) (scope-additive2->typed $scope $expr))
+        ((%* x ...) (scope-multiplicative2->typed $scope $expr))
+        ((%- x ...) (scope-additive1/2->typed $scope $expr))
         ((%if x ...) (scope-if->typed $scope $expr))
         ((id arg ...)
           (and (identifier? #'id) (scope-id->transformer? $scope #'id))
@@ -169,6 +169,19 @@
           ($type-a (typed-type $typed-a))
           (typed $type-a
             #`(op #,$type-a
+              #,(typed-value $typed-a)))))))
+
+  (define (scope-additive1->typed $scope $expr)
+    (syntax-case $expr ()
+      ((op a)
+        (lets
+          ($typed-a (scope-expr->typed $scope #'a))
+          ($type-a (typed-type $typed-a))
+          ($size-a (type-size $type-a))
+          ($size (+ $size-a 1))
+          ($type (size->type $size))
+          (typed $type
+            #`(op #,$type
               #,(typed-value $typed-a)))))))
 
   (define (scope-type-op2->typed $scope $type $expr)
@@ -199,7 +212,7 @@
               #,(typed-value $typed-a)
               #,(typed-value $typed-b)))))))
 
-  (define (scope-+->typed $scope $expr)
+  (define (scope-additive2->typed $scope $expr)
     (syntax-case $expr ()
       ((op a b)
         (lets
@@ -214,7 +227,7 @@
               #,(typed-value $typed-a)
               #,(typed-value $typed-b)))))))
 
-  (define (scope-*->typed $scope $expr)
+  (define (scope-multiplicative2->typed $scope $expr)
     (syntax-case $expr ()
       ((op a b)
         (lets
@@ -229,10 +242,10 @@
               #,(typed-value $typed-a)
               #,(typed-value $typed-b)))))))
 
-  (define (scope-op1/2->typed $scope $expr)
+  (define (scope-additive1/2->typed $scope $expr)
     (syntax-case $expr ()
-      ((_ _) (scope-op1->typed $scope $expr))
-      ((_ _ _) (scope-op2->typed $scope $expr))))
+      ((_ _) (scope-additive1->typed $scope $expr))
+      ((_ _ _) (scope-additive2->typed $scope $expr))))
 
   (define (scope-if->typed $scope $if)
     (syntax-case $if (%if)

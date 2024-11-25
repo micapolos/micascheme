@@ -75,10 +75,10 @@
 (check-typed (expr (%nor bin-1101 hex-a)) (4 (%nor 4 #b1101 #xa)))
 (check-typed (expr (%xnor bin-1101 hex-a)) (4 (%xnor 4 #b1101 #xa)))
 
-(check-typed (expr (%- bin-1101)) (4 (%- 4 #b1101)))
+(check-typed (expr (%- bin-1101)) (5 (%- 5 #b1101)))
 
 (check-typed (expr (%+ bin-1101 hex-a)) (5 (%+ 5 #b1101 #xa)))
-(check-typed (expr (%- bin-1101 hex-a)) (4 (%- 4 #b1101 #xa))) ; FIXIT
+(check-typed (expr (%- bin-1101 hex-a)) (5 (%- 5 #b1101 #xa)))
 (check-typed (expr (%* bin-1101 hex-a)) (8 (%* 8 #b1101 #xa)))
 
 (check-typed (expr (%+ bin-1101 1)) (4 (%+ 4 #b1101 1)))
