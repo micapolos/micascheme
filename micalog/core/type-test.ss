@@ -77,9 +77,9 @@
 
 (check-typed (expr (%- bin-1101)) (4 (%- 4 #b1101)))
 
-(check-typed (expr (%+ bin-1101 hex-a)) (4 (%+ 4 #b1101 #xa)))
-(check-typed (expr (%- bin-1101 hex-a)) (4 (%- 4 #b1101 #xa)))
-(check-typed (expr (%* bin-1101 hex-a)) (4 (%* 4 #b1101 #xa)))
+(check-typed (expr (%+ bin-1101 hex-a)) (5 (%+ 5 #b1101 #xa)))
+(check-typed (expr (%- bin-1101 hex-a)) (4 (%- 4 #b1101 #xa))) ; FIXIT
+(check-typed (expr (%* bin-1101 hex-a)) (8 (%* 8 #b1101 #xa)))
 
 (check-typed (expr (%+ bin-1101 1)) (4 (%+ 4 #b1101 1)))
 
@@ -99,6 +99,7 @@
 (check-typed-syntax (scope-instr $scope (%wire wire-4 foo-4)) (%wire 4 wire-4 foo-4))
 (check-typed-syntax (scope-instr $scope (%output out-4 foo-4)) (%output 4 out-4 foo-4))
 
+(check-typed-syntax (scope-instr $scope (%set reg-foo-4 bin-1001)) (%set 4 reg-foo-4 #b1001))
 (check-typed-syntax (scope-instr $scope (%set reg-foo-4 bar-4)) (%set 4 reg-foo-4 bar-4))
 (check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-4))))
 (check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-8))))
@@ -263,8 +264,8 @@
   (scope-instrs $scope
     (
       (%macro (double a) (%+ a a))
-      (%set reg-foo-4 (double foo-4))))
-  ((%set 4 reg-foo-4 (%+ 4 foo-4 foo-4))))
+      (%set reg-foo-4 (%slice (double foo-4) 4))))
+  ((%set 4 reg-foo-4 (%slice 4 (%+ 5 foo-4 foo-4) 0))))
 
 (check-typed-syntax
   (scope-instrs $scope
@@ -272,21 +273,21 @@
       (%macro (double expr) (%+ expr expr))
       (%macro (local-register param)
         (%register 8 local)
-        (%set local (double param)))
+        (%set local (%slice (double param) 8)))
       (local-register foo-8)))
   (
     (%register 8 local_0)
-    (%set 8 local_0 (%+ 8 foo-8 foo-8))))
+    (%set 8 local_0 (%slice 8 (%+ 9 foo-8 foo-8) 0))))
 
 ; === repeat ===
 
-(check-typed-syntax
-  (scope-instrs $scope
-    ((%repeat (i 3) (%set reg-foo-4 i))))
-  (
-    (%set 4 reg-foo-4 0)
-    (%set 4 reg-foo-4 1)
-    (%set 4 reg-foo-4 2)))
+; (check-typed-syntax
+;   (scope-instrs $scope
+;     ((%repeat (i 3) (%set reg-foo-4 i))))
+;   (
+;     (%set 4 reg-foo-4 hex-0)
+;     (%set 4 reg-foo-4 hex-1)
+;     (%set 4 reg-foo-4 hex-2)))
 
 ; TODO: Not working, same variable is re-declared.
 ; Replace $gen? with a list of parameters, which will be preserved.

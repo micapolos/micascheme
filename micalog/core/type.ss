@@ -149,9 +149,9 @@
         ((%nand x ...) (scope-op2->typed $scope $expr))
         ((%nor x ...) (scope-op2->typed $scope $expr))
         ((%xnor x ...) (scope-op2->typed $scope $expr))
-        ((%+ x ...) (scope-op2->typed $scope $expr))
-        ((%* x ...) (scope-op2->typed $scope $expr))
-        ((%- x ...) (scope-op1/2->typed $scope $expr))
+        ((%+ x ...) (scope-+->typed $scope $expr))
+        ((%* x ...) (scope-*->typed $scope $expr))
+        ((%- x ...) (scope-op1/2->typed $scope $expr)) ; FIXIT
         ((%if x ...) (scope-if->typed $scope $expr))
         ((id arg ...)
           (and (identifier? #'id) (scope-id->transformer? $scope #'id))
@@ -192,11 +192,43 @@
       ((op a b)
         (lets
           ($typed-a (scope-expr->typed $scope #'a))
-          ($type-a (typed-type $typed-a))
-          ($typed-b (scope-type-expr->typed $scope $type-a #'b))
-          (typed $type-a
-            #`(op
-              #,$type-a
+          ($typed-b (scope-expr->typed $scope #'b))
+          ($size-a (type-size (typed-type $typed-a)))
+          ($size-b (type-size (typed-type $typed-b)))
+          ($size (max $size-a $size-b))
+          ($type (size->type $size))
+          (typed $type
+            #`(op #,$type
+              #,(typed-value $typed-a)
+              #,(typed-value $typed-b)))))))
+
+  (define (scope-+->typed $scope $expr)
+    (syntax-case $expr ()
+      ((op a b)
+        (lets
+          ($typed-a (scope-expr->typed $scope #'a))
+          ($typed-b (scope-expr->typed $scope #'b))
+          ($size-a (type-size (typed-type $typed-a)))
+          ($size-b (type-size (typed-type $typed-b)))
+          ($size (if (= $size-a $size-b) (+ $size-a 1) (max $size-a $size-b)))
+          ($type (size->type $size))
+          (typed $type
+            #`(op #,$type
+              #,(typed-value $typed-a)
+              #,(typed-value $typed-b)))))))
+
+  (define (scope-*->typed $scope $expr)
+    (syntax-case $expr ()
+      ((op a b)
+        (lets
+          ($typed-a (scope-expr->typed $scope #'a))
+          ($typed-b (scope-expr->typed $scope #'b))
+          ($size-a (type-size (typed-type $typed-a)))
+          ($size-b (type-size (typed-type $typed-b)))
+          ($size (+ $size-a $size-b))
+          ($type (size->type $size))
+          (typed $type
+            #`(op #,$type
               #,(typed-value $typed-a)
               #,(typed-value $typed-b)))))))
 
@@ -321,16 +353,22 @@
           (lets
             ($id-binding (scope-id->binding $scope (identifier id)))
             ($id-kind (binding-kind $id-binding))
-            ($id-type (binding-type $id-binding))
-            ($id-name (binding-name $id-binding))
-            ($typed (scope-type-expr->typed $scope $id-type #'expr))
-            (if (syntax=? $id-kind #'%register)
-              (scoped $scope
-                (push $syntaxes #`(%set #,$id-type #,$id-name #,(typed-value $typed))))
-              (syntax-error $instr
-                (format "type mismatch ~a, expected ~a in"
-                  (syntax->datum #`(%set #,$id-binding #,$id-type))
-                  (syntax->datum #`(%set (%register #,$id-type) #,$id-type)))))))
+            (cond
+              ((not (syntax=? $id-kind #'%register))
+                (syntax-error #'id "not register"))
+              (else
+                (lets
+                  ($id-type (binding-type $id-binding))
+                  ($id-size (type-size $id-type))
+                  ($id-name (binding-name $id-binding))
+                  ($typed (scope-expr->typed $scope #'expr))
+                  ($type (typed-type $typed))
+                  ($size (type-size $type))
+                  (if (<= $size $id-size)
+                    (scoped $scope
+                      (push $syntaxes #`(%set #,$id-type #,$id-name #,(typed-value $typed))))
+                    (syntax-error #'expr
+                      (format "invalid type ~a, expected <= ~a in" $size $id-size))))))))
         ((%cond clause ... (%else els ...))
           (scoped $scope
             (push $syntaxes

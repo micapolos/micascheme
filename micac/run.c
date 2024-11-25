@@ -98,28 +98,23 @@ int main() {
                 const bool screen__41 = _video_x_19 >= 48 && _video_x_19 < 304 && (_video_y_20 >= 48 && _video_y_20 < 240);
                 const bool plasma__42 = _video_x_19 > _mouse_x_21 ^ _video_y_20 < _mouse_y_22;
                 const bool bar__43 = screen__41 ^ _mouse_pressed__23;
-                const uint8_t counter_8_44 = frame_counter_27 >> 0;
-                const uint8_t video_x_8_45 = _video_x_19 >> 0;
-                const uint8_t video_y_8_46 = _video_y_20 >> 0;
-                const uint32_t video_x_18_47 = 0 | _video_x_19;
-                const uint32_t video_y_18_48 = 0 | _video_y_20;
-                const uint8_t plasma_red_49 = counter_8_44 - video_x_8_45;
-                const uint8_t plasma_green_50 = counter_8_44 - video_y_8_46;
-                const uint8_t plasma_blue_51 = counter_8_44 + ((video_x_18_47 * video_y_18_48 & 262143) >> 6);
-                const uint8_t screen_red_52 = plasma__42 ? plasma_red_49 : 221;
-                const uint8_t screen_green_53 = plasma__42 ? plasma_green_50 : 221;
-                const uint8_t screen_blue_54 = plasma__42 ? plasma_blue_51 : 221;
-                uint8_t video_red_55 = bar__43 ? screen_red_52 : bar_red_28;
-                uint8_t video_green_56 = bar__43 ? screen_green_53 : bar_green_29;
-                uint8_t video_blue_57 = bar__43 ? screen_blue_54 : bar_blue_30;
-                red_7 = video_red_55;
-                green_8 = video_green_56;
-                blue_9 = video_blue_57;
+                const uint8_t plasma_red_44 = frame_counter_27 - _video_x_19 >> 0;
+                const uint8_t plasma_green_45 = frame_counter_27 - _video_y_20 >> 0;
+                const uint8_t plasma_blue_46 = (frame_counter_27 + (_video_x_19 * _video_y_20 & 262143) & 262143) >> 6;
+                const uint8_t screen_red_47 = plasma__42 ? plasma_red_44 : 221;
+                const uint8_t screen_green_48 = plasma__42 ? plasma_green_45 : 221;
+                const uint8_t screen_blue_49 = plasma__42 ? plasma_blue_46 : 221;
+                uint8_t video_red_50 = bar__43 ? screen_red_47 : bar_red_28;
+                uint8_t video_green_51 = bar__43 ? screen_green_48 : bar_green_29;
+                uint8_t video_blue_52 = bar__43 ? screen_blue_49 : bar_blue_30;
+                red_7 = video_red_50;
+                green_8 = video_green_51;
+                blue_9 = video_blue_52;
                 if (pixel_cycle_counter_6 == 0) {
-                  const bool h_video__58 = video_x_4 < 352;
-                  const bool v_video__59 = video_y_5 < 288;
-                  const bool video__60 = h_video__58 && v_video__59;
-                  if (video__60) {
+                  const bool h_video__53 = video_x_4 < 352;
+                  const bool v_video__54 = video_y_5 < 288;
+                  const bool video__55 = h_video__53 && v_video__54;
+                  if (video__55) {
                     *pixel_ref_14 = 255;
                     pixel_ref_14 += 1;
                     *pixel_ref_14 = red_7;
