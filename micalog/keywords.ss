@@ -9,7 +9,7 @@
     int
     = != < <= > >=
     append slice
-    + -
+    + - *
     if
     and or xor nand nor xnor not)
   (import (only (micascheme) define-aux-keywords))
@@ -24,7 +24,7 @@
     int
     = != < <= > >=
     append slice
-    + -
+    + - *
     if
     and or xor nand nor xnor not)
 )

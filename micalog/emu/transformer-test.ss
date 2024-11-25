@@ -61,6 +61,7 @@
 
 (check-micac (expr (%+ 6 a b)) (%%bitwise-and (%%+ a b) #x3f))
 (check-micac (expr (%- 6 a b)) (%%bitwise-and (%%- a b) #x3f))
+(check-micac (expr (%* 6 a b)) (%%bitwise-and (%%* a b) #x3f))
 (check-micac (expr (%- 6 a)) (%%bitwise-and (%%- a) #x3f))
 
 (check-micac (expr (%+ 8 a b)) (%%+ a b))

@@ -123,7 +123,7 @@
         #'integer)))
 
   (define (expr->micac $expr)
-    (syntax-case $expr (%= %!= %< %<= %> %>= %append %slice %+ %- %and %or %xor %nand %nor %xnor %not %if)
+    (syntax-case $expr (%= %!= %< %<= %> %>= %append %slice %+ %- %* %and %or %xor %nand %nor %xnor %not %if)
       ((%= type lhs rhs)
         #`(%%=
           #,(expr->micac #'lhs)
@@ -180,6 +180,11 @@
       ((%- type rhs)
         (type-micac-mask #'type
           #`(%%-
+            #,(expr->micac #'rhs))))
+      ((%* type lhs rhs)
+        (type-micac-mask #'type
+          #`(%%*
+            #,(expr->micac #'lhs)
             #,(expr->micac #'rhs))))
       ((%and type lhs rhs)
         #`(

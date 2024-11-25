@@ -198,7 +198,7 @@
     (expression-value (expr->code-expression $value)))
 
   (define (expr->code-expression $value)
-    (syntax-case $value (%= %!= %< %<= %> %>= %+ %- %not %and %or %xor %nand %nor %xnor %ref %if %append)
+    (syntax-case $value (%= %!= %< %<= %> %>= %+ %- %* %not %and %or %xor %nand %nor %xnor %ref %if %append)
       (id (identifier? #'id)
         (value-expression (name->code #'id)))
       (integer (nonnegative-integer? (datum integer))

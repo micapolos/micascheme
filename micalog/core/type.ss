@@ -132,7 +132,7 @@
   (define (scope-expr->typed $scope $expr)
     (or
       (literal->typed? $expr)
-      (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %not %and %or %xor %nand %nor %xnor %+ %- %if)
+      (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %not %and %or %xor %nand %nor %xnor %+ %- %* %if)
         (id (identifier? #'id) (scope-id->typed $scope #'id))
         ((%append x ...) (scope-append->typed $scope $expr))
         ((%slice x ...) (scope-slice->typed $scope $expr))
@@ -150,6 +150,7 @@
         ((%nor x ...) (scope-op2->typed $scope $expr))
         ((%xnor x ...) (scope-op2->typed $scope $expr))
         ((%+ x ...) (scope-op2->typed $scope $expr))
+        ((%* x ...) (scope-op2->typed $scope $expr))
         ((%- x ...) (scope-op1/2->typed $scope $expr))
         ((%if x ...) (scope-if->typed $scope $expr))
         ((id arg ...)

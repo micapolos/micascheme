@@ -39,6 +39,7 @@
 
 (check-verilog (expr (%+ 16 a b)) (%%+ a b))
 (check-verilog (expr (%- 16 a b)) (%%- a b))
+(check-verilog (expr (%* 16 a b)) (%%* a b))
 (check-verilog (expr (%- 16 a)) (%%- a))
 
 (check-verilog (expr (%if 16 foo? a b)) (%%if foo? a b))
