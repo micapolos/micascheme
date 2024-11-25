@@ -1,6 +1,7 @@
 ; TODO:
 ; - check that register is assigned within single domain
 ; - disallow redefining keywords
+; - drop / take instead of slice
 (library (micalog core type)
   (export
     literal->typed
