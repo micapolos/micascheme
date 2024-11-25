@@ -30,7 +30,7 @@
         (flatten (map cdr $pairs)))))
 
   (define (item->declarations-instrs $item)
-    (syntax-case $item (%input %output %register %wire %on %set %assign %cond %else)
+    (syntax-case $item (%input %output %register %wire %on %set %log %assign %cond %else)
       ((%input body ...)
         (pair (list $item) (list)))
       ((%output type name)
@@ -101,6 +101,8 @@
           (pair
             (flatten (map car $clause-pairs))
             (list #`(%cond #,@(map cdr $clause-pairs))))))
+      ((%log body ...)
+        (pair (list) (list $item)))
       ((%set body ...)
         (pair (list) (list $item)))))
 

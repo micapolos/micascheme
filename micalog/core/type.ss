@@ -190,11 +190,13 @@
       ((op a b)
         (lets
           ($typed-a (scope-expr->typed $scope #'a))
-          ($type-a (typed-type $typed-a))
-          ($typed-b (scope-type-expr->typed $scope $type-a #'b))
+          ($typed-b (scope-expr->typed $scope #'b))
+          ($size-a (type-size (typed-type $typed-a)))
+          ($size-b (type-size (typed-type $typed-b)))
+          ($size (max $size-a $size-b))
           (typed $type
             #`(op
-              #,$type-a
+              #,(size->type $size)
               #,(typed-value $typed-a)
               #,(typed-value $typed-b)))))))
 
@@ -221,7 +223,7 @@
           ($typed-b (scope-expr->typed $scope #'b))
           ($size-a (type-size (typed-type $typed-a)))
           ($size-b (type-size (typed-type $typed-b)))
-          ($size (if (= $size-a $size-b) (+ $size-a 1) (max $size-a $size-b)))
+          ($size (+ (max $size-a $size-b) 1))
           ($type (size->type $size))
           (typed $type
             #`(op #,$type
@@ -329,7 +331,7 @@
   (define (gen?-scoped-syntaxes+instr $gen? $scoped $instr)
     (lets
       ((scoped $scope $syntaxes) $scoped)
-      (syntax-case $instr (%input %output %wire %register %set %cond %else %on %macro %repeat)
+      (syntax-case $instr (%input %output %wire %register %set %set-slice %cond %else %on %macro %repeat %log)
         ((%input id)
           (gen?-scoped-syntaxes+instr $gen? $scoped #`(%input 1 id)))
         ((%input type id)
@@ -380,6 +382,12 @@
                       (push $syntaxes #`(%set #,$id-type #,$id-name #,(typed-value $typed))))
                     (syntax-error #'expr
                       (format "invalid type ~a, expected <= ~a in" $size $id-size))))))))
+        ((%set-slice id expr)
+          (lets
+            ($id-binding (scope-id->binding $scope (identifier id)))
+            ($id-type (binding-type $id-binding))
+            (gen?-scoped-syntaxes+instr $gen? $scoped
+              #`(%set id (%slice expr #,$id-type)))))
         ((%cond clause ... (%else els ...))
           (scoped $scope
             (push $syntaxes
@@ -418,6 +426,11 @@
                   (syntaxes body ...))))
             $scoped
             (indices (count-number #'count))))
+        ((%log label expr)
+          (scoped $scope
+            (push $syntaxes
+              #`(%log label
+                #,(typed-value (scope-expr->typed $scope #'expr))))))
         ((%macro (name param ...) body ...)
           (scoped-map
             ($name (gen-scoped-name $gen? $scope (identifier name)

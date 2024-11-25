@@ -4,14 +4,15 @@
     macro repeat
     on posedge negedge edge
     cond else
-    register set
+    register set set-slice
     wire assign
     int
     = != < <= > >=
     append slice
     + - *
     if
-    and or xor nand nor xnor not)
+    and or xor nand nor xnor not
+    log)
   (import (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
@@ -19,12 +20,13 @@
     macro repeat
     on posedge negedge edge
     cond else
-    register set
+    register set set-slice
     wire assign
     int
     = != < <= > >=
     append slice
     + - *
     if
-    and or xor nand nor xnor not)
+    and or xor nand nor xnor not
+    log)
 )

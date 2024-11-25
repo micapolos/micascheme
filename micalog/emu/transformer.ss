@@ -71,7 +71,7 @@
           #,(name->micac #'name)))))
 
   (define (instruction->micac $statement)
-    (syntax-case $statement (%output %wire %set %on %cond %else)
+    (syntax-case $statement (%output %wire %set %log %on %cond %else)
       ((%output type name expr)
         #`(%%var
           #,(type->micac #'type)
@@ -85,6 +85,11 @@
       ((%set type name expr)
         #`(%%set
           #,(name->micac #'name)
+          #,(expr->micac #'expr)))
+      ((%log label expr)
+        #`(%%printf
+          "%s: %u\\n"
+          #,(format "~a" (symbol->string (syntax->datum (identifier label))))
           #,(expr->micac #'expr)))
       ((%cond clause ... (%else els ...))
         #`(%%cond

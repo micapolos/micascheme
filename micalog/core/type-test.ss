@@ -65,7 +65,7 @@
 (check-typed (expr (%> bin-1101 hex-a)) (1 (%> 4 #b1101 #xa)))
 (check-typed (expr (%>= bin-1101 hex-a)) (1 (%>= 4 #b1101 #xa)))
 
-(check-typed (raises (expr (%= bin-1101 hex-af))))
+(check-typed (expr (%= bin-1101 hex-af)) (1 (%= 8 #b1101 #xaf)))
 
 (check-typed (expr (%not bin-1101)) (4 (%not 4 #b1101)))
 (check-typed (expr (%and bin-1101 hex-a)) (4 (%and 4 #b1101 #xa)))
@@ -81,7 +81,7 @@
 (check-typed (expr (%- bin-1101 hex-a)) (5 (%- 5 #b1101 #xa)))
 (check-typed (expr (%* bin-1101 hex-a)) (8 (%* 8 #b1101 #xa)))
 
-(check-typed (expr (%+ bin-1101 1)) (4 (%+ 4 #b1101 1)))
+(check-typed (expr (%+ bin-1101 1)) (5 (%+ 5 #b1101 1)))
 
 (check-typed (expr (%if bin-1 bin-1101 hex-a)) (4 (%if 4 #b1 #b1101 #xa)))
 
@@ -102,7 +102,9 @@
 (check-typed-syntax (scope-instr $scope (%set reg-foo-4 bin-1001)) (%set 4 reg-foo-4 #b1001))
 (check-typed-syntax (scope-instr $scope (%set reg-foo-4 bar-4)) (%set 4 reg-foo-4 bar-4))
 (check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-4))))
-(check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-8))))
+(check-typed-syntax (raises (scope-instr $scope (%set reg-foo-4 bar-8))))
+
+(check-typed-syntax (scope-instr $scope (%set-slice reg-foo-4 bar-8)) (%set 4 reg-foo-4 (%slice 4 bar-8 0)))
 
 (check-typed-syntax
   (scope-instrs $scope ((%wire goo-4 bin-1010) (%set reg-foo-4 goo-4)))
@@ -192,6 +194,10 @@
       (%set 4 reg-foo-4 foo-4))
     (%negedge
       (%set 8 reg-bar-8 foo-8))))
+
+(check-typed-syntax
+  (scope-instr $scope (%log foo foo-4))
+  (%log foo foo-4))
 
 (check-typed-syntax
   (module (%module empty))

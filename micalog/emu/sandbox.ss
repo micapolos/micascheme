@@ -8,9 +8,9 @@
     (input 9 mouse-x)
     (input 9 mouse-y)
     (input mouse-pressed?)
-    (register 64 red-counter)
-    (register 64 green-counter)
-    (register 64 blue-counter)
+    (register 32 red-counter)
+    (register 32 green-counter)
+    (register 32 blue-counter)
     (register 16 frame-counter)
     (register 8 bar-red)
     (register 8 bar-green)
@@ -34,7 +34,8 @@
             (set-not bar-blue)))
         (cond
           ((and (= video-x 0) (= video-y 0))
-            (inc frame-counter)))))
+            (inc frame-counter)
+            (log frame-counter frame-counter)))))
     (wire screen?
       (and
         (and (>= video-x 48) (< video-x 304))

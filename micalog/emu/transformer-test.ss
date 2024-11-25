@@ -122,6 +122,14 @@
   (%%set foo bar))
 
 (check-micac
+  (instruction (%set 8 foo bar))
+  (%%set foo bar))
+
+(check-micac
+  (instruction (%log foo (%+ 16 1 2)))
+  (printf "%s: %li\\n" "foo" (%%+ 1 2)))
+
+(check-micac
   (instruction
     (%on (prev next)
       (%posedge)))
