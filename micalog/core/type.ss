@@ -427,10 +427,13 @@
             $scoped
             (indices (count-number #'count))))
         ((%log label expr)
-          (scoped $scope
-            (push $syntaxes
-              #`(%log label
-                #,(typed-value (scope-expr->typed $scope #'expr))))))
+          (lets
+            ($typed (scope-expr->typed $scope #'expr))
+            (scoped $scope
+              (push $syntaxes
+                #`(%log label
+                  #,(typed-type $typed)
+                  #,(typed-value $typed))))))
         ((%macro (name param ...) body ...)
           (scoped-map
             ($name (gen-scoped-name $gen? $scope (identifier name)

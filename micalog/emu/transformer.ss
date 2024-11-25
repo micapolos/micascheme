@@ -86,7 +86,7 @@
         #`(%%set
           #,(name->micac #'name)
           #,(expr->micac #'expr)))
-      ((%log label expr)
+      ((%log label type expr)
         #`(%%printf
           "%s: %u\\n"
           #,(format "~a" (symbol->string (syntax->datum (identifier label))))

@@ -72,7 +72,7 @@
         #`(%%set!
           #,(name->verilog #'name)
           #,(expr->verilog #'expr)))
-      ((%log label expr)
+      ((%log label type expr)
         ; TODO: Use $display
         #f)
       ((%cond clause ... (%else body ...))

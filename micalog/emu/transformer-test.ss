@@ -127,7 +127,7 @@
 
 (check-micac
   (instruction (%log foo (%+ 16 1 2)))
-  (printf "%s: %li\\n" "foo" (%%+ 1 2)))
+  (%%printf "%s: %u\\n" "foo" (%%+ 1 2)))
 
 (check-micac
   (instruction

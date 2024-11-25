@@ -11,7 +11,7 @@
     (register 32 red-counter)
     (register 32 green-counter)
     (register 32 blue-counter)
-    (register 16 frame-counter)
+    (register 32 frame-counter)
     (register 8 bar-red)
     (register 8 bar-green)
     (register 8 bar-blue)
@@ -35,7 +35,7 @@
         (cond
           ((and (= video-x 0) (= video-y 0))
             (inc frame-counter)
-            (log frame-counter frame-counter)))))
+            (log frame frame-counter)))))
     (wire screen?
       (and
         (and (>= video-x 48) (< video-x 304))

@@ -197,7 +197,7 @@
 
 (check-typed-syntax
   (scope-instr $scope (%log foo foo-4))
-  (%log foo foo-4))
+  (%log foo 4 foo-4))
 
 (check-typed-syntax
   (module (%module empty))
