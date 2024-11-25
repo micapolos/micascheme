@@ -289,6 +289,7 @@
 ; TODO: Not working, same variable is re-declared.
 ; Replace $gen? with a list of parameters, which will be preserved.
 ; Everything else will be generated.
+; Or... add %param to the scope.
 ; (check-typed-syntax
 ;   (scope-instrs $scope
 ;     ((%repeat (i 3)
