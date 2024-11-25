@@ -28,6 +28,7 @@
 
 (check-typed (literal 0) (1 0))
 (check-typed (literal 1) (1 1))
+(check-typed (literal #b10011) (5 #b10011))
 
 (check-typed (literal (%int 8 12)) (8 12))
 
@@ -35,7 +36,6 @@
 (check-typed (literal hex-af) (8 #xaf))
 (check-typed (literal oct-34) (6 #o34))
 
-(check-typed (raises (literal 2)))
 (check-typed (raises (literal bin)))
 (check-typed (raises (literal bin-)))
 (check-typed (raises (literal bin-12)))

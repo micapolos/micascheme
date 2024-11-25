@@ -45,8 +45,10 @@
 
   (define (literal->typed? $literal)
     (syntax-case $literal (%int)
-      (0 #`(1 0))
-      (1 #`(1 1))
+      (integer (nonnegative-integer? (datum integer))
+        #`(
+          #,(literal->syntax (string-length (number->string (datum integer) 2)))
+          integer))
       ((%int type integer)
         (or
           (type-literal->typed?
@@ -114,11 +116,6 @@
         #f)))
 
   (define (scope-type-expr->typed $scope $expected-type $expr)
-    (or
-      (type-literal->typed? $expected-type $expr)
-      (scope-type-expr-default->typed $scope $expected-type $expr)))
-
-  (define (scope-type-expr-default->typed $scope $expected-type $expr)
     (lets
       ($typed (scope-expr->typed $scope $expr))
       ($type (typed-type $typed))
