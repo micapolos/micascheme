@@ -30,6 +30,7 @@
 (check-verilog (expr (+ a b)) "a + b")
 (check-verilog (expr (- a)) "-a")
 (check-verilog (expr (- a b)) "a - b")
+(check-verilog (expr (* a b)) "a * b")
 
 (check-verilog (expr (not a)) "~a")
 

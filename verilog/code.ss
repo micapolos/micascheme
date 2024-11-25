@@ -226,6 +226,8 @@
         (op->code-expression 2 #f "-" #'expr))
       ((%- lhs rhs)
         (infix->code-expression 6 #t "-" #'lhs #'rhs))
+      ((%* lhs rhs)
+        (infix->code-expression 5 #t "*" #'lhs #'rhs))
       ((%not rhs)
         (op->code-expression 3 #f "~" #'rhs))
       ((%and lhs rhs)
