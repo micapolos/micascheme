@@ -102,6 +102,28 @@
       ((else $binding)
         $binding)))
 
+  (define (kinds-contains? $kinds $kind)
+    (find (partial free-identifier=? $kind) $kinds))
+
+  (define-rule-syntax (kinds kind ...)
+    (list #'kind ...))
+
+  (define (scope-id-kinds->binding $scope $id $kinds)
+    (switch (scope-item $scope $id)
+      ((procedure? _)
+        (syntax-error $id "macro"))
+      ((else $binding)
+        (lets
+          ($kind (binding-kind $binding))
+          (if (kinds-contains? $kinds $kind)
+            $binding
+            (syntax-error $id
+              (format "illegal kind ~a, expected ~a in"
+                (syntax->datum $kind)
+                (if (single? $kinds)
+                  (syntax->datum (car $kinds))
+                  `(one-of ,@(map syntax->datum $kinds))))))))))
+
   (define (scope-id->typed $scope $id)
     (lets
       ($binding (scope-id->binding $scope $id))
@@ -365,27 +387,22 @@
               (push $syntaxes #`(%register #,$type #,$name)))))
         ((%set id expr)
           (lets
-            ($id-binding (scope-id->binding $scope (identifier id)))
+            ($id-binding (scope-id-kinds->binding $scope (identifier id) (kinds %register)))
             ($id-kind (binding-kind $id-binding))
-            (cond
-              ((not (syntax=? $id-kind #'%register))
-                (syntax-error #'id "not register"))
-              (else
-                (lets
-                  ($id-type (binding-type $id-binding))
-                  ($id-size (type-size $id-type))
-                  ($id-name (binding-name $id-binding))
-                  ($typed (scope-expr->typed $scope #'expr))
-                  ($type (typed-type $typed))
-                  ($size (type-size $type))
-                  (if (<= $size $id-size)
-                    (scoped $scope
-                      (push $syntaxes #`(%set #,$id-type #,$id-name #,(typed-value $typed))))
-                    (syntax-error #'expr
-                      (format "invalid type ~a, expected <= ~a in" $size $id-size))))))))
+            ($id-type (binding-type $id-binding))
+            ($id-size (type-size $id-type))
+            ($id-name (binding-name $id-binding))
+            ($typed (scope-expr->typed $scope #'expr))
+            ($type (typed-type $typed))
+            ($size (type-size $type))
+            (if (<= $size $id-size)
+              (scoped $scope
+                (push $syntaxes #`(%set #,$id-type #,$id-name #,(typed-value $typed))))
+              (syntax-error #'expr
+                (format "invalid type ~a, expected <= ~a in" $size $id-size)))))
         ((%set-take id expr)
           (lets
-            ($id-binding (scope-id->binding $scope (identifier id)))
+            ($id-binding (scope-id-kinds->binding $scope (identifier id) (kinds %register)))
             ($id-type (binding-type $id-binding))
             (gen?-scoped-syntaxes+instr $gen? $scoped
               #`(%set id (%take expr #,$id-type)))))
