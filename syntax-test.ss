@@ -77,13 +77,19 @@
   (raises
     (syntax-replace... #'abc (list #'a #'b #'c) #'(abc))))
 
-(check
-  (syntax=?
-    (syntax-subst
-      #'(a (b c))
-      #'(10 (20 30))
-      #'(+ a b c))
-    #'(+ 10 20 30)))
+(check-datum=?
+  (syntax-subst
+    #'(a (b c))
+    #'(10 (20 30))
+    #'(+ a b c))
+  '(+ 10 20 30))
+
+(check-datum=?
+  (syntax-subst
+    #'((a b) c (... ...))
+    #'((10 20) c1 c2 c3)
+    #'(+ a b c (... ...)))
+  '(+ 10 20 c1 c2 c3))
 
 ; === syntax-datum=? ===
 

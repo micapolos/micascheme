@@ -291,6 +291,9 @@
       ((x y)
         (identifier? #'x)
         (syntax-replace #'x #'y $syntax))
+      (((x ellipses) y)
+        (and (identifier? #'x) (identifier? #'ellipses) (free-identifier=? #'ellipses #'(... ...)))
+        (syntax-replace... #'x (syntax->list #'y) $syntax))
       (((a . b) (c . d))
         (syntax-subst #'b #'d
           (syntax-subst #'a #'c $syntax)))))
