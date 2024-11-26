@@ -1,6 +1,6 @@
 (library (micalog std)
   (export inc dec set+ set- set-not)
-  (import (micalog))
+  (import (micalog) (only (micascheme) ...))
 
   (micalog
     (macro (inc name) (set-take name (+ name 1)))

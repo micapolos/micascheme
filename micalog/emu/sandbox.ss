@@ -24,21 +24,17 @@
       (inc red-counter)
       (inc green-counter)
       (inc blue-counter)
-      (cond
-        ((> red-counter 9980)
-          (set red-counter 0)
-          (set-not bar-red)))
-      (cond
-        ((> green-counter 9960)
-          (set green-counter 0)
-          (set-not bar-green)))
-      (cond
-        ((> blue-counter 9950)
-          (set blue-counter 0)
-          (set-not bar-blue)))
-      (cond
-        ((and (= video-x 0) (= video-y 0))
-          (inc frame-counter))))
+      (when (> red-counter 9980)
+        (set red-counter 0)
+        (set-not bar-red))
+      (when (> green-counter 9960)
+        (set green-counter 0)
+        (set-not bar-green))
+      (when (> blue-counter 9950)
+        (set blue-counter 0)
+        (set-not bar-blue))
+      (when (and (= video-x 0) (= video-y 0))
+        (inc frame-counter)))
 
     (wire screen?
       (and
