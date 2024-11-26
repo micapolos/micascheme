@@ -15,27 +15,29 @@
     (register 8 bar-red)
     (register 8 bar-green)
     (register 8 bar-blue)
+    (register 1 half-clock)
     (on clock
+      (posedge (set-not half-clock)))
+    (on half-clock
       (posedge
         (inc red-counter)
         (inc green-counter)
         (inc blue-counter)
         (cond
-          ((> red-counter 19940)
+          ((> red-counter 9980)
             (set red-counter 0)
             (set-not bar-red)))
         (cond
-          ((> green-counter 19920)
+          ((> green-counter 9960)
             (set green-counter 0)
             (set-not bar-green)))
         (cond
-          ((> blue-counter 19900)
+          ((> blue-counter 9950)
             (set blue-counter 0)
             (set-not bar-blue)))
         (cond
           ((and (= video-x 0) (= video-y 0))
-            (inc frame-counter)
-            (log frame frame-counter)))))
+            (inc frame-counter)))))
     (wire screen?
       (and
         (and (>= video-x 48) (< video-x 304))
@@ -50,7 +52,7 @@
 
     (wire plasma-red (slice (- frame-counter video-x) 8))
     (wire plasma-green (slice (- frame-counter video-y) 8))
-    (wire plasma-blue (slice (+ frame-counter (* video-x video-y)) 6 8))
+    (wire plasma-blue (slice (+ frame-counter (slice (* video-x video-y) 6 8)) 8))
 
     (wire screen-red (if plasma? plasma-red hex-dd))
     (wire screen-green (if plasma? plasma-green hex-dd))
