@@ -27,6 +27,7 @@
     syntax=?
     syntax-datum=?
     syntax-replace
+    syntax-replace...
     transform
     syntaxes
     syntax-subst
@@ -166,19 +167,40 @@
           ((inlined (lambda (_) $expr)))
           inlined))))
 
-  (define (syntax-replace $from-id $to-id $syntax)
+  (define (syntax-replace $from-id $to $syntax)
     (syntax-case $syntax ()
       (x
         (and
           (identifier? #'x)
           (free-identifier=? #'x $from-id))
-        $to-id)
+        $to)
       ((x . y)
         #`(
-          #,(syntax-replace $from-id $to-id #'x)
+          #,(syntax-replace $from-id $to #'x)
           .
-          #,(syntax-replace $from-id $to-id #'y)))
+          #,(syntax-replace $from-id $to #'y)))
       (x #'x)))
+
+  (define (syntax-replace... $from-id $tos $syntax)
+    (syntax-case $syntax ()
+      ((x ellipses . y)
+        (and
+          (identifier? #'x)
+          (identifier? #'ellipses)
+          (free-identifier=? #'x $from-id)
+          (free-identifier=? #'ellipses #'(... ...)))
+        #`(#,@$tos . #,(syntax-replace... $from-id $tos #'y)))
+      ((x . y)
+        (and
+          (identifier? #'x)
+          (free-identifier=? #'x $from-id))
+        (syntax-error #'x "missing ellipses"))
+      ((x . y)
+        #`(
+          #,(syntax-replace... $from-id $tos #'x)
+          .
+          #,(syntax-replace... $from-id $tos #'y)))
+      (other #'other)))
 
   (define (syntax=? a b)
     (syntax-case a ()

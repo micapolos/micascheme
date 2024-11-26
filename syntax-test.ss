@@ -65,6 +65,18 @@
     (syntax-replace #'+ #'- #'(+ 10 (+ 20 (* 30 40))))
     #'(- 10 (- 20 (* 30 40)))))
 
+(check-datum=?
+  (syntax-replace... #'abc (list #'a #'b #'c) #'(foo abc (... ...) goo))
+  '(foo a b c goo))
+
+(check-datum=?
+  (syntax-replace... #'abc (list #'a #'b #'c) #'(foo abc (... ...) goo abc (... ...) bar))
+  '(foo a b c goo a b c bar))
+
+(check
+  (raises
+    (syntax-replace... #'abc (list #'a #'b #'c) #'(abc))))
+
 (check
   (syntax=?
     (syntax-subst
