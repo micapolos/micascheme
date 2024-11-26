@@ -1,7 +1,7 @@
 (library (micac lib std)
   (export
     bool int uint8_t uint16_t uint32_t uint64_t
-    sizeof alloc repeat !=
+    sizeof alloc repeat for-each !=
     inc dec printf zero? not-zero? in-range? << >> xor)
   (import (micac))
 
@@ -21,10 +21,13 @@
     (macro (!= a b) (not (= a b)))
 
     (macro (repeat count body ...)
-      (var int counter count)
-      (while counter
+      (for-each (index count) body ...))
+
+    (macro (for-each (index count) body ...)
+      (var int index 0)
+      (while (!= counter count)
         body ...
-        (dec counter)))
+        (inc index)))
 
     (macro (zero? x) (= x 0))
     (macro (not-zero? x) (!= x 0))
