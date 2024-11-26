@@ -15,7 +15,7 @@
     (%lines-string
       "module foo ("
       "  input [3:0] in,"
-      "  output [3:0] out"
+      "  output [4:0] out"
       ");"
       "  assign out = in + in;"
       "endmodule")))

@@ -25,7 +25,7 @@
 
     (macro (for-each (index count) body ...)
       (var int index 0)
-      (while (!= counter count)
+      (while (!= index count)
         body ...
         (inc index)))
 

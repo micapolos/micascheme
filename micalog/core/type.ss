@@ -399,23 +399,13 @@
             (push $syntaxes
               #`(%cond
                 #,@(map (partial gen?-scope-clause->typed-syntax $gen? $scope) (syntaxes clause clause* ...))))))
-        ((%on clock (edge body ...))
+        ((%on (edge name) body ...)
           (scoped $scope
             (push $syntaxes
               #`(%on
-                #,(typed-value (scope-type-expr->typed $scope #'1 #'clock))
+                #,(typed-value (scope-type-expr->typed $scope #'1 #'name))
                 (#,(edge->syntax #'edge)
                   #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(body ...))))))))
-        ((%on clock (edge body ...) (other-edge other-body ...))
-          (opposite-edges? #'edge #'other-edge)
-          (scoped $scope
-            (push $syntaxes
-              #`(%on
-                #,(typed-value (scope-type-expr->typed $scope #'1 #'clock))
-                (#,(edge->syntax #'edge)
-                  #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(body ...))))
-                (#,(edge->syntax #'other-edge)
-                  #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(other-body ...))))))))
         ((%repeat (index count) body ...)
           (fold-left
             (lambda ($scoped $index)

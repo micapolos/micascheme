@@ -176,25 +176,11 @@
 
 (check-typed-syntax
   (scope-instr $scope
-    (%on foo-1
-      (%posedge
-        (%set reg-foo-4 foo-4))))
+    (%on (%posedge foo-1)
+      (%set reg-foo-4 foo-4)))
   (%on foo-1
     (%posedge
       (%set 4 reg-foo-4 foo-4))))
-
-(check-typed-syntax
-  (scope-instr $scope
-    (%on foo-1
-      (%posedge
-        (%set reg-foo-4 foo-4))
-      (%negedge
-        (%set reg-bar-8 foo-8))))
-  (%on foo-1
-    (%posedge
-      (%set 4 reg-foo-4 foo-4))
-    (%negedge
-      (%set 8 reg-bar-8 foo-8))))
 
 (check-typed-syntax
   (scope-instr $scope (%log foo foo-4))

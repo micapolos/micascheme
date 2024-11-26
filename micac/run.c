@@ -66,8 +66,8 @@ int main() {
               mouse_x_16 = sdl_mouse_x_40 / 2;
               mouse_y_17 = sdl_mouse_y_41 / 2;
               mouse_pressed__18 = (sdl_mouse_state_42 & 1) != 0;
-              int counter_43 = 559104;
-              while (counter_43) {
+              int index_43 = 0;
+              while (index_43 != 559104) {
                 clock_19 = clock_19 ^ 1;
                 _video_x_20 = video_x_5;
                 _video_y_21 = video_y_6;
@@ -146,7 +146,7 @@ int main() {
                     }
                   }
                 }
-                counter_43 -= 1;
+                index_43 += 1;
               }
               if (SDL_UpdateTexture(texture_13, 0, pixels_14, 1408) != 0) {
                 printf("%s SDL Error: %s\n", "Could not update texture.", SDL_GetError());

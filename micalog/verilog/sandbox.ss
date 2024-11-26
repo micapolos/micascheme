@@ -14,15 +14,14 @@
     (input 8 initial)
     (register 8 reg-1)
     (register 8 reg-2)
-    (on clock
-      (posedge
-        (cond
-          (reset?
-            (set reg-1 initial)
-            (set reg-2 (not initial)))
-          (else
-            (set reg-1 reg-2)
-            (set reg-2 reg-1)))))
+    (on (posedge clock)
+      (cond
+        (reset?
+          (set reg-1 initial)
+          (set reg-2 (not initial)))
+        (else
+          (set reg-1 reg-2)
+          (set reg-2 reg-1))))
     (output out reg-1))
 
   (module counter-4
@@ -30,9 +29,9 @@
     (register clock-1)
     (register clock-2)
     (register clock-3)
-    (on clock-0 (posedge (set-not clock-1)))
-    (on clock-1 (posedge (set-not clock-2)))
-    (on clock-2 (posedge (set-not clock-3)))
+    (on (posedge clock-0) (set-not clock-1))
+    (on (posedge clock-1) (set-not clock-2))
+    (on (posedge clock-2) (set-not clock-3))
     (output counter (append clock-3 clock-2 clock-1 clock-0)))
 
   (module cascading-counter-4
@@ -40,12 +39,12 @@
     (register clock-1)
     (register clock-2)
     (register clock-3)
-    (on clock-0
-      (posedge (set-not clock-1)
-        (on clock-1
-          (posedge (set-not clock-2)
-            (on clock-2
-              (posedge (set-not clock-3)))))))
+    (on (posedge clock-0)
+      (set-not clock-1)
+      (on (posedge clock-1)
+        (set-not clock-2)
+        (on (posedge clock-2)
+          (set-not clock-3))))
     (output counter (append clock-3 clock-2 clock-1 clock-0)))
 
   (module funny-module
@@ -54,10 +53,9 @@
     (input mouse-pressed?)
     (input 16 mouse-x)
     (register 16 counter)
-    (on clock
-      (posedge
-        (cond
-          (reset? (set counter mouse-x))
-          (mouse-pressed? (inc counter))
-          (else (dec counter)))))
+    (on (posedge clock)
+      (cond
+        (reset? (set counter mouse-x))
+        (mouse-pressed? (inc counter))
+        (else (dec counter))))
     (output out counter)))
