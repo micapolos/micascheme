@@ -108,7 +108,7 @@
 (check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-4))))
 (check-typed-syntax (raises (scope-instr $scope (%set reg-foo-4 bar-8))))
 
-(check-typed-syntax (scope-instr $scope (%set-slice reg-foo-4 bar-8)) (%set 4 reg-foo-4 (%slice 4 bar-8 0)))
+(check-typed-syntax (scope-instr $scope (%set-drop reg-foo-4 bar-8)) (%set 4 reg-foo-4 (%slice 4 bar-8 0)))
 
 (check-typed-syntax
   (scope-instrs $scope ((%wire goo-4 bin-1010) (%set reg-foo-4 goo-4)))

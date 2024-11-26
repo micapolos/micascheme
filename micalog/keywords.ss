@@ -4,7 +4,7 @@
     macro repeat
     on posedge negedge edge
     cond else
-    register set set-slice
+    register set set-drop
     wire assign
     take drop
     int
@@ -21,7 +21,7 @@
     macro repeat
     on posedge negedge edge
     cond else
-    register set set-slice
+    register set set-drop
     wire assign
     take drop
     int

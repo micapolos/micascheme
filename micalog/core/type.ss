@@ -371,7 +371,7 @@
   (define (gen?-scoped-syntaxes+instr $gen? $scoped $instr)
     (lets
       ((scoped $scope $syntaxes) $scoped)
-      (syntax-case $instr (%input %output %wire %register %set %set-slice %cond %else %on %macro %repeat %log)
+      (syntax-case $instr (%input %output %wire %register %set %set-drop %cond %else %on %macro %repeat %log)
         ((%input id)
           (gen?-scoped-syntaxes+instr $gen? $scoped #`(%input 1 id)))
         ((%input type id)
@@ -422,7 +422,7 @@
                       (push $syntaxes #`(%set #,$id-type #,$id-name #,(typed-value $typed))))
                     (syntax-error #'expr
                       (format "invalid type ~a, expected <= ~a in" $size $id-size))))))))
-        ((%set-slice id expr)
+        ((%set-drop id expr)
           (lets
             ($id-binding (scope-id->binding $scope (identifier id)))
             ($id-type (binding-type $id-binding))
