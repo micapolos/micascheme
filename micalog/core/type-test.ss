@@ -50,17 +50,14 @@
 
 (check-typed (expr (%append bin-10 hex-af)) (10 (%append (2 #b10) (8 #xaf))))
 
-(check-typed (expr (%take bin-11001010 6)) (6 (%slice 6 #b11001010 0)))
+(check-typed (expr (%take bin-11001010 6)) (6 (%take 6 #b11001010 6)))
+(check-typed (expr (%take bin-11001010 8)) (8 (%take 8 #b11001010 8)))
+(check-typed (raises (expr (%take bin-11001010 0))))
+(check-typed (raises (expr (%take bin-11001010 9))))
 
-(check-typed (expr (%drop bin-11001010 6)) (2 (%slice 2 #b11001010 6)))
-
-(check-typed (expr (%slice bin-11001010 6)) (6 (%slice 6 #b11001010 0)))
-(check-typed (expr (%slice bin-11001010 8)) (8 (%slice 8 #b11001010 0)))
-(check-typed (expr (%slice bin-11001010 2 4)) (4 (%slice 4 #b11001010 2)))
-(check-typed (raises (expr (%slice bin-11001010 0))))
-(check-typed (raises (expr (%slice bin-11001010 2 0))))
-(check-typed (raises (expr (%slice bin-11001010 9))))
-(check-typed (raises (expr (%slice bin-11001010 4 5))))
+(check-typed (expr (%drop bin-11001010 6)) (2 (%drop 2 #b11001010 6)))
+(check-typed (expr (%drop bin-11001010 2)) (6 (%drop 6 #b11001010 2)))
+(check-typed (raises (expr (%drop bin-11001010 8))))
 
 (check-typed (expr (%= bin-1101 hex-a)) (1 (%= 4 #b1101 #xa)))
 (check-typed (expr (%!= bin-1101 hex-a)) (1 (%!= 4 #b1101 #xa)))
@@ -108,7 +105,7 @@
 (check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-4))))
 (check-typed-syntax (raises (scope-instr $scope (%set reg-foo-4 bar-8))))
 
-(check-typed-syntax (scope-instr $scope (%set-drop reg-foo-4 bar-8)) (%set 4 reg-foo-4 (%slice 4 bar-8 0)))
+(check-typed-syntax (scope-instr $scope (%set-take reg-foo-4 bar-8)) (%set 4 reg-foo-4 (%take 4 bar-8 4)))
 
 (check-typed-syntax
   (scope-instrs $scope ((%wire goo-4 bin-1010) (%set reg-foo-4 goo-4)))
@@ -274,8 +271,8 @@
   (scope-instrs $scope
     (
       (%macro (double a) (%+ a a))
-      (%set reg-foo-4 (%slice (double foo-4) 4))))
-  ((%set 4 reg-foo-4 (%slice 4 (%+ 5 foo-4 foo-4) 0))))
+      (%set reg-foo-4 (%take (double foo-4) 4))))
+  ((%set 4 reg-foo-4 (%take 4 (%+ 5 foo-4 foo-4) 4))))
 
 (check-typed-syntax
   (scope-instrs $scope
@@ -283,11 +280,11 @@
       (%macro (double expr) (%+ expr expr))
       (%macro (local-register param)
         (%register 8 local)
-        (%set local (%slice (double param) 8)))
+        (%set local (%take (double param) 8)))
       (local-register foo-8)))
   (
     (%register 8 local_0)
-    (%set 8 local_0 (%slice 8 (%+ 9 foo-8 foo-8) 0))))
+    (%set 8 local_0 (%take 8 (%+ 9 foo-8 foo-8) 8))))
 
 ; === repeat ===
 

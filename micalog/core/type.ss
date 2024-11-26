@@ -1,7 +1,6 @@
 ; TODO:
 ; - check that register is assigned within single domain
 ; - disallow redefining keywords
-; - drop / take instead of slice
 (library (micalog core type)
   (export
     literal->typed
@@ -130,12 +129,11 @@
   (define (scope-expr->typed $scope $expr)
     (or
       (literal->typed? $expr)
-      (syntax-case $expr (%append %slice %take %drop %= %!= %< %<= %> %>= %not %and %or %xor %nand %nor %xnor %+ %- %* %if)
+      (syntax-case $expr (%append %take %drop %= %!= %< %<= %> %>= %not %and %or %xor %nand %nor %xnor %+ %- %* %if)
         (id (identifier? #'id) (scope-id->typed $scope #'id))
         ((%append x ...) (scope-append->typed $scope $expr))
         ((%take x ...) (scope-take->typed $scope $expr))
         ((%drop x ...) (scope-drop->typed $scope $expr))
-        ((%slice x ...) (scope-slice->typed $scope $expr))
         ((%= x ...) (scope-type-op2->typed $scope #'1 $expr))
         ((%!= x ...) (scope-type-op2->typed $scope #'1 $expr))
         ((%< x ...) (scope-type-op2->typed $scope #'1 $expr))
@@ -291,10 +289,10 @@
           (if
             (>= $a-size $size)
             (typed #'size
-              #`(%slice
+              #`(%take
                 size
                 #,(typed-value $typed-a)
-                0))
+                size))
             (syntax-error #'a
               (format "type mismatch ~a, expected ~a in"
                 (syntax->datum $type-a)
@@ -312,49 +310,11 @@
           ($type (size->type $size))
           (if (> $size 0)
             (typed $type
-              #`(%slice
+              #`(%drop
                 #,$type
                 #,(typed-value $typed-a)
                 drop))
             (syntax-error #'a "invalid drop")))))) ; TODO: better message
-
-  (define (scope-slice->typed $scope $slice)
-    (syntax-case $slice (%slice)
-      ((%slice a shift size)
-        (lets
-          ($typed-a (scope-expr->typed $scope #'a))
-          ($type-a (typed-type $typed-a))
-          ($a-size (type-size $type-a))
-          ($shift (shift-number #'shift))
-          ($size (type-size #'size))
-          (if
-            (>= $a-size (+ $shift $size))
-            (typed #'size
-              #`(%slice
-                size
-                #,(typed-value $typed-a)
-                shift))
-            (syntax-error #'a
-              (format "type mismatch ~a, expected ~a in"
-                (syntax->datum $type-a)
-                `(>= ,(+ $shift $size)))))))
-      ((%slice a size)
-        (lets
-          ($typed-a (scope-expr->typed $scope #'a))
-          ($type-a (typed-type $typed-a))
-          ($a-size (type-size $type-a))
-          ($size (type-size #'size))
-          (if
-            (>= $a-size $size)
-            (typed #'size
-              #`(%slice
-                size
-                #,(typed-value $typed-a)
-                0))
-            (syntax-error #'a
-              (format "type mismatch ~a, expected ~a in"
-                (syntax->datum $type-a)
-                `(>= ,$size))))))))
 
   (define (gen-scoped-binding-name $gen? $scope $kind $type $name)
     (lets
@@ -371,7 +331,7 @@
   (define (gen?-scoped-syntaxes+instr $gen? $scoped $instr)
     (lets
       ((scoped $scope $syntaxes) $scoped)
-      (syntax-case $instr (%input %output %wire %register %set %set-drop %cond %else %on %macro %repeat %log)
+      (syntax-case $instr (%input %output %wire %register %set %set-take %cond %else %on %macro %repeat %log)
         ((%input id)
           (gen?-scoped-syntaxes+instr $gen? $scoped #`(%input 1 id)))
         ((%input type id)
@@ -422,12 +382,12 @@
                       (push $syntaxes #`(%set #,$id-type #,$id-name #,(typed-value $typed))))
                     (syntax-error #'expr
                       (format "invalid type ~a, expected <= ~a in" $size $id-size))))))))
-        ((%set-drop id expr)
+        ((%set-take id expr)
           (lets
             ($id-binding (scope-id->binding $scope (identifier id)))
             ($id-type (binding-type $id-binding))
             (gen?-scoped-syntaxes+instr $gen? $scoped
-              #`(%set id (%slice expr #,$id-type)))))
+              #`(%set id (%take expr #,$id-type)))))
         ((%cond clause ... (%else els ...))
           (scoped $scope
             (push $syntaxes

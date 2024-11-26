@@ -104,20 +104,29 @@
           #`(#,(- (datum number) 1) %%to 0)))))
 
   (define (expr->verilog $expr)
-    (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %if %not %and %or %xor %nand %nor %xnor %+ %- %*)
+    (syntax-case $expr (%append %take %drop %= %!= %< %<= %> %>= %if %not %and %or %xor %nand %nor %xnor %+ %- %*)
       ((%append (type expr) ...)
         #`(%%append
           #,@(map expr->verilog (syntaxes expr ...))))
-      ((%slice type a shift)
+      ((%take type a size)
         (lets
-          ($shift (datum shift))
+          ($size (datum size))
+          #`(%%ref
+            #,(expr->verilog #'a)
+            (
+              #,(literal->syntax (+ $size -1))
+              %%to
+              0))))
+      ((%drop type a drop)
+        (lets
+          ($drop (datum drop))
           ($mask (datum type))
           #`(%%ref
             #,(expr->verilog #'a)
             (
-              #,(literal->syntax (+ $shift $mask -1))
+              #,(literal->syntax (+ $drop $mask -1))
               %%to
-              #,(literal->syntax $shift)))))
+              #,(literal->syntax $drop)))))
       ((%= type a b)
         (op2->verilog #'%%= #'a #'b))
       ((%!= type a b)

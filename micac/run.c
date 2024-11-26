@@ -82,9 +82,9 @@ int main() {
                 old_clock_3_33 = clock_19;
                 if (old_half_clock_4_34 != half_clock_32) {
                   if (half_clock_32 == 1) {
-                    red_counter_25 = red_counter_25 + 1 >> 0;
-                    green_counter_26 = green_counter_26 + 1 >> 0;
-                    blue_counter_27 = blue_counter_27 + 1 >> 0;
+                    red_counter_25 = red_counter_25 + 1;
+                    green_counter_26 = green_counter_26 + 1;
+                    blue_counter_27 = blue_counter_27 + 1;
                     if (red_counter_25 > 9980) {
                       red_counter_25 = 0;
                       bar_red_29 = ~bar_red_29;
@@ -98,7 +98,7 @@ int main() {
                       bar_blue_31 = ~bar_blue_31;
                     }
                     if (_video_x_20 == 0 && _video_y_21 == 0) {
-                      frame_counter_28 = frame_counter_28 + 1 >> 0;
+                      frame_counter_28 = frame_counter_28 + 1;
                     }
                   }
                 }
@@ -106,9 +106,9 @@ int main() {
                 const bool screen__44 = _video_x_20 >= 48 && _video_x_20 < 304 && (_video_y_21 >= 48 && _video_y_21 < 240);
                 const bool plasma__45 = _video_x_20 > _mouse_x_22 ^ _video_y_21 < _mouse_y_23;
                 const bool bar__46 = screen__44 ^ _mouse_pressed__24;
-                const uint8_t plasma_red_47 = frame_counter_28 - _video_x_20 >> 0;
-                const uint8_t plasma_green_48 = frame_counter_28 - _video_y_21 >> 0;
-                const uint8_t plasma_blue_49 = frame_counter_28 + (_video_x_20 * _video_y_21 >> 6 & 4095) >> 0;
+                const uint8_t plasma_red_47 = frame_counter_28 - _video_x_20;
+                const uint8_t plasma_green_48 = frame_counter_28 - _video_y_21;
+                const uint8_t plasma_blue_49 = frame_counter_28 + (_video_x_20 * _video_y_21 >> 6);
                 const uint8_t screen_red_50 = plasma__45 ? plasma_red_47 : 221;
                 const uint8_t screen_green_51 = plasma__45 ? plasma_green_48 : 221;
                 const uint8_t screen_blue_52 = plasma__45 ? plasma_blue_49 : 221;

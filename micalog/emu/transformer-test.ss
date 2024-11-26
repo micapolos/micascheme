@@ -49,8 +49,12 @@
     c))
 
 (check-micac
-  (expr (%slice 6 a 2))
-  (%%bitwise-and (%%bitwise-arithmetic-shift-right a 2) #x3f))
+  (expr (%take 6 a 6))
+  (%%bitwise-and a #x3f))
+
+(check-micac
+  (expr (%drop 6 a 2))
+  (%%bitwise-arithmetic-shift-right a 2))
 
 (check-micac (expr (%= 6 a b)) (%%= a b))
 (check-micac (expr (%!= 6 a b)) (%%not (%%= a b)))
