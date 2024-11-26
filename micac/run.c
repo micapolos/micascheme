@@ -108,7 +108,7 @@ int main() {
                 const bool bar__46 = screen__44 ^ _mouse_pressed__24;
                 const uint8_t plasma_red_47 = frame_counter_28 - _video_x_20 >> 0;
                 const uint8_t plasma_green_48 = frame_counter_28 - _video_y_21 >> 0;
-                const uint8_t plasma_blue_49 = frame_counter_28 + (_video_x_20 * _video_y_21 >> 6) >> 0;
+                const uint8_t plasma_blue_49 = frame_counter_28 + (_video_x_20 * _video_y_21 >> 6 & 4095) >> 0;
                 const uint8_t screen_red_50 = plasma__45 ? plasma_red_47 : 221;
                 const uint8_t screen_green_51 = plasma__45 ? plasma_green_48 : 221;
                 const uint8_t screen_blue_52 = plasma__45 ? plasma_blue_49 : 221;

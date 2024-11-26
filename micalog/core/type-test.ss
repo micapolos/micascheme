@@ -50,6 +50,10 @@
 
 (check-typed (expr (%append bin-10 hex-af)) (10 (%append (2 #b10) (8 #xaf))))
 
+(check-typed (expr (%take bin-11001010 6)) (6 (%slice 6 #b11001010 0)))
+
+(check-typed (expr (%drop bin-11001010 6)) (2 (%slice 2 #b11001010 6)))
+
 (check-typed (expr (%slice bin-11001010 6)) (6 (%slice 6 #b11001010 0)))
 (check-typed (expr (%slice bin-11001010 8)) (8 (%slice 8 #b11001010 0)))
 (check-typed (expr (%slice bin-11001010 2 4)) (4 (%slice 4 #b11001010 2)))

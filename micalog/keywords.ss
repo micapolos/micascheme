@@ -6,6 +6,7 @@
     cond else
     register set set-slice
     wire assign
+    take drop
     int
     = != < <= > >=
     append slice
@@ -22,6 +23,7 @@
     cond else
     register set set-slice
     wire assign
+    take drop
     int
     = != < <= > >=
     append slice

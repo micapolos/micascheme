@@ -130,9 +130,11 @@
   (define (scope-expr->typed $scope $expr)
     (or
       (literal->typed? $expr)
-      (syntax-case $expr (%append %slice %= %!= %< %<= %> %>= %not %and %or %xor %nand %nor %xnor %+ %- %* %if)
+      (syntax-case $expr (%append %slice %take %drop %= %!= %< %<= %> %>= %not %and %or %xor %nand %nor %xnor %+ %- %* %if)
         (id (identifier? #'id) (scope-id->typed $scope #'id))
         ((%append x ...) (scope-append->typed $scope $expr))
+        ((%take x ...) (scope-take->typed $scope $expr))
+        ((%drop x ...) (scope-drop->typed $scope $expr))
         ((%slice x ...) (scope-slice->typed $scope $expr))
         ((%= x ...) (scope-type-op2->typed $scope #'1 $expr))
         ((%!= x ...) (scope-type-op2->typed $scope #'1 $expr))
@@ -277,6 +279,44 @@
           (typed $type
             #`(%append
               #,@(map typed $types $values)))))))
+
+  (define (scope-take->typed $scope $take)
+    (syntax-case $take (%take)
+      ((%take a size)
+        (lets
+          ($typed-a (scope-expr->typed $scope #'a))
+          ($type-a (typed-type $typed-a))
+          ($a-size (type-size $type-a))
+          ($size (type-size #'size))
+          (if
+            (>= $a-size $size)
+            (typed #'size
+              #`(%slice
+                size
+                #,(typed-value $typed-a)
+                0))
+            (syntax-error #'a
+              (format "type mismatch ~a, expected ~a in"
+                (syntax->datum $type-a)
+                `(>= ,$size))))))))
+
+  (define (scope-drop->typed $scope $drop)
+    (syntax-case $drop (%drop)
+      ((%drop a drop)
+        (lets
+          ($typed-a (scope-expr->typed $scope #'a))
+          ($type-a (typed-type $typed-a))
+          ($a-size (type-size $type-a))
+          ($drop (nonnegative-number #'drop))
+          ($size (- $a-size $drop))
+          ($type (size->type $size))
+          (if (> $size 0)
+            (typed $type
+              #`(%slice
+                #,$type
+                #,(typed-value $typed-a)
+                drop))
+            (syntax-error #'a "invalid drop")))))) ; TODO: better message
 
   (define (scope-slice->typed $scope $slice)
     (syntax-case $slice (%slice)
@@ -506,6 +546,11 @@
     (syntax-case $type ()
       (size (positive-integer? (datum size)) (datum size))
       (_ (syntax-error $type "illegal type"))))
+
+  (define (nonnegative-number $syntax)
+    (syntax-case $syntax ()
+      (size (nonnegative-integer? (datum size)) (datum size))
+      (_ (syntax-error $syntax "illegal nonnegative number"))))
 
   (define (shift-number $shift)
     (syntax-case $shift ()

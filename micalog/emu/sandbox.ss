@@ -52,7 +52,7 @@
 
     (wire plasma-red (slice (- frame-counter video-x) 8))
     (wire plasma-green (slice (- frame-counter video-y) 8))
-    (wire plasma-blue (slice (+ frame-counter (slice (* video-x video-y) 6 8)) 8))
+    (wire plasma-blue (take (+ frame-counter (drop (* video-x video-y) 6)) 8))
 
     (wire screen-red (if plasma? plasma-red hex-dd))
     (wire screen-green (if plasma? plasma-green hex-dd))

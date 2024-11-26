@@ -59,10 +59,10 @@
 (check-micac (expr (%> 6 a b)) (%%> a b))
 (check-micac (expr (%>= 6 a b)) (%%>= a b))
 
-(check-micac (expr (%+ 6 a b)) (%%bitwise-and (%%+ a b) #x3f))
-(check-micac (expr (%- 6 a b)) (%%bitwise-and (%%- a b) #x3f))
-(check-micac (expr (%* 6 a b)) (%%bitwise-and (%%* a b) #x3f))
-(check-micac (expr (%- 6 a)) (%%bitwise-and (%%- a) #x3f))
+(check-micac (expr (%+ 6 a b)) (%%+ a b))
+(check-micac (expr (%- 6 a b)) (%%- a b))
+(check-micac (expr (%* 6 a b)) (%%* a b))
+(check-micac (expr (%- 6 a)) (%%- a))
 
 (check-micac (expr (%+ 8 a b)) (%%+ a b))
 (check-micac (expr (%- 8 a b)) (%%- a b))
@@ -126,7 +126,7 @@
   (%%set foo bar))
 
 (check-micac
-  (instruction (%log foo (%+ 16 1 2)))
+  (instruction (%log foo 16 (%+ 16 1 2)))
   (%%printf "%s: %u\\n" "foo" (%%+ 1 2)))
 
 (check-micac
