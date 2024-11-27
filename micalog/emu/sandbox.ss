@@ -19,6 +19,14 @@
     (register 8 bar-blue)
     (register 1 half-clock)
 
+    (register 8 red)
+    (register 8 green)
+    (register 8 blue)
+
+    (output video-red red)
+    (output video-green green)
+    (output video-blue blue)
+
     (on (posedge clock)
       (set-not half-clock))
 
@@ -31,7 +39,10 @@
           (set bar-blue 0)
           (set red-counter 0)
           (set green-counter 0)
-          (set blue-counter 0))
+          (set blue-counter 0)
+          (set red 0)
+          (set green 0)
+          (set blue 0))
         (else
           (inc red-counter)
           (inc green-counter)
@@ -46,26 +57,26 @@
             (set blue-counter 0)
             (set-not bar-blue))
           (when (and (= video-x 0) (= video-y 0))
-            (inc frame-counter)))))
+            (inc frame-counter))
 
-    (wire screen?
-      (and
-        (and (>= video-x 48) (< video-x 304))
-        (and (>= video-y 48) (< video-y 240))))
+          (wire screen?
+            (and
+              (and (>= video-x 48) (< video-x 304))
+              (and (>= video-y 48) (< video-y 240))))
 
-    (wire plasma?
-      (xor
-        (> video-x mouse-x)
-        (< video-y mouse-y)))
+          (wire plasma?
+            (xor
+              (> video-x mouse-x)
+              (< video-y mouse-y)))
 
-    (wire plasma-red (take (- frame-counter video-x) 8))
-    (wire plasma-green (take (- frame-counter video-y) 8))
-    (wire plasma-blue (take (+ frame-counter (drop (* video-x video-y) 6)) 8))
+          (wire plasma-red (take (- frame-counter video-x) 8))
+          (wire plasma-green (take (- frame-counter video-y) 8))
+          (wire plasma-blue (take (+ frame-counter (drop (* video-x video-y) 6)) 8))
 
-    (wire screen-red (if plasma? plasma-red hex-dd))
-    (wire screen-green (if plasma? plasma-green hex-dd))
-    (wire screen-blue (if plasma? plasma-blue hex-dd))
+          (wire screen-red (if plasma? plasma-red hex-dd))
+          (wire screen-green (if plasma? plasma-green hex-dd))
+          (wire screen-blue (if plasma? plasma-blue hex-dd))
 
-    (output video-red (if screen? screen-red bar-red))
-    (output video-green (if screen? screen-green bar-green))
-    (output video-blue (if screen? screen-blue bar-blue))))
+          (set red (if screen? screen-red bar-red))
+          (set green (if screen? screen-green bar-green))
+          (set blue (if screen? screen-blue bar-blue)))))))
