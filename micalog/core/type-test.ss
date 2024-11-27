@@ -169,18 +169,15 @@
     (bar-1 (%set 4 reg-foo-4 bar-4))
     (%else (%set 8 reg-bar-8 bar-8))))
 
-(check-typed-syntax (raises (scope-instr $scope (%on foo-4 (%posedge)))))
-(check-typed-syntax (raises (scope-instr $scope (%on foo-4 (%posedge) (%negedge)))))
-(check-typed-syntax (raises (scope-instr $scope (%on foo-1 (%posedge) (%posedge)))))
-(check-typed-syntax (raises (scope-instr $scope (%on foo-1 (%negedge) (%negedge)))))
+(check-typed-syntax (raises (scope-instr $scope (%on (%posedge foo-4)))))
+(check-typed-syntax (raises (scope-instr $scope (%on (invalid-edge foo-1)))))
 
 (check-typed-syntax
   (scope-instr $scope
     (%on (%posedge foo-1)
       (%set reg-foo-4 foo-4)))
-  (%on foo-1
-    (%posedge
-      (%set 4 reg-foo-4 foo-4))))
+  (%on (%posedge foo-1)
+    (%set 4 reg-foo-4 foo-4)))
 
 (check-typed-syntax
   (scope-instr $scope (%log foo foo-4))

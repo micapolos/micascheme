@@ -28,14 +28,15 @@
         #`(%cond
           #,@(map clause->on-old-new-syntax
             (syntaxes clause ...))))
-      ((%on name clause ...)
+      ((%on (edge name) body ...)
         (lets
           ($old-name (generate-identifier (identifier-append #'name #'old- #'name)))
           #`(begin
             (%register 1 #,$old-name)
-            (%on (#,$old-name name)
-              #,@(map clause->on-old-new-syntax
-                (syntaxes clause ...)))
+            (%on (edge #,$old-name name)
+              #,@(unbegin-syntaxes
+                (statements->on-old-new-syntax
+                  (syntaxes body ...))))
             (%set 1 #,$old-name name))))
       (other #'other)))
 

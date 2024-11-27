@@ -6,56 +6,29 @@
 (define-check-datum-> on-old-new-syntax)
 
 (check-on-old-new-syntax
-  (statement
-    (%on clock
-      (%posedge a b)
-      (%else c d)))
+  (statement (%on (%posedge clock) a b))
   (begin
     (%register 1 old-clock_0)
-    (%on (old-clock_0 clock)
-      (%posedge a b)
-      (%else c d))
-    (%set 1 old-clock_0 clock)))
-
-(check-on-old-new-syntax
-  (statement
-    (%on clock
-      (posedge (%on other-clock))
-      (negedge (%on other-clock))))
-  (begin
-    (%register 1 old-clock_0)
-    (%on (old-clock_0 clock)
-      (posedge
-        (%register 1 old-other-clock_1)
-        (%on (old-other-clock_1 other-clock))
-        (%set 1 old-other-clock_1 other-clock))
-      (negedge
-        (%register 1 old-other-clock_2)
-        (%on (old-other-clock_2 other-clock))
-        (%set 1 old-other-clock_2 other-clock)))
+    (%on (%posedge old-clock_0 clock) a b)
     (%set 1 old-clock_0 clock)))
 
 (check-on-old-new-syntax
   (statement
     (%cond
       (a b c)
-      (d (%on clock))))
+      (d (%on (%posedge clock)))))
   (%cond
     (a b c)
     (d
       (%register 1 old-clock_0)
-      (%on (old-clock_0 clock))
+      (%on (%posedge old-clock_0 clock))
       (%set 1 old-clock_0 clock))))
 
 (check-on-old-new-syntax
   (module
     (%module foo
-      (%on clock
-        (%posedge a b)
-        (%else c d))))
+      (%on (%posedge clock) a b)))
   (%module foo
     (%register 1 old-clock_0)
-    (%on (old-clock_0 clock)
-      (%posedge a b)
-      (%else c d))
+    (%on (%posedge old-clock_0 clock) a b)
     (%set 1 old-clock_0 clock)))

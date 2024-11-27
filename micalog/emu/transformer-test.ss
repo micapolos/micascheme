@@ -134,67 +134,24 @@
   (%%printf "%s: %u\\n" "foo" (%%+ 1 2)))
 
 (check-micac
-  (instruction
-    (%on (prev next)
-      (%posedge)))
+  (instruction (%on (%posedge prev next)))
   (%%when (%%not (%%= prev next))
     (%%when (%%= next 1))))
 
 (check-micac
-  (instruction
-    (%on (prev next)
-      (%negedge)))
+  (instruction (%on (%negedge prev next)))
   (%%when (%%not (%%= prev next))
     (%%when (%%= next 0))))
 
 (check-micac
   (instruction
-    (%on (prev next)
-      (%posedge)
-      (%else)))
-  (%%when (%%not (%%= prev next))
-    (%%if (%%= next 1)
-      (%%then)
-      (%%else))))
-
-(check-micac
-  (instruction
-    (%on (prev next)
-      (%negedge)
-      (%else)))
-  (%%when (%%not (%%= prev next))
-    (%%if (%%= next 0)
-      (%%then)
-      (%%else))))
-
-(check-micac
-  (instruction
-    (%on (prev next)
-      (%posedge
-        (%set 8 foo bar)
-        (%set 8 goo gar))))
+    (%on (%posedge prev next)
+      (%set 8 foo bar)
+      (%set 8 goo gar)))
   (%%when (%%not (%%= prev next))
     (%%when (%%= next 1)
       (%%set foo bar)
       (%%set goo gar))))
-
-(check-micac
-  (instruction
-    (%on (prev next)
-      (%negedge
-        (%set 8 foo bar)
-        (%set 8 goo gar))
-      (%else
-        (%set 16 zoo zar)
-        (%set 16 moo mar))))
-  (%%when (%%not (%%= prev next))
-    (%%if (%%= next 0)
-      (%%then
-        (%%set foo bar)
-        (%%set goo gar))
-      (%%else
-        (%%set zoo zar)
-        (%%set moo mar)))))
 
 (check-micac
   (instruction
@@ -229,10 +186,9 @@
   (module
     (%module (prev-clock clock)
       (%register 16 counter)
-      (%on (prev-clock clock)
-        (%posedge
-          (%wire 16 previous-counter counter)
-          (%set 16 counter (%+ 16 previous-counter 1))))))
+      (%on (%posedge prev-clock clock)
+        (%wire 16 previous-counter counter)
+        (%set 16 counter (%+ 16 previous-counter 1)))))
   (%%run-emu
     (%%video 352 288 96 24 4)
     (%%var bool clock 0)

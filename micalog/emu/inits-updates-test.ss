@@ -59,39 +59,20 @@
 
 (check-inits-updates-syntax
   (statement
-    (%on clock
-      (%posedge
-        (%register 8 reg-8)
-        (%wire 8 wire-8))))
-   (begin
-     (%register 8 reg-8)
-     (%on clock
-      (%posedge (%wire 8 wire-8)))))
-
-(check-inits-updates-syntax
-  (statement
-    (%on clock
-      (%posedge
-        (%register 8 reg-8)
-        (%wire 8 wire-8))
-      (%else
-        (%register 8 else-reg-8)
-        (%wire 8 else-wire-8))))
-   (begin
-     (%register 8 reg-8)
-     (%register 8 else-reg-8)
-     (%on clock
-      (%posedge (%wire 8 wire-8))
-      (%else (%wire 8 else-wire-8)))))
+    (%on (%posedge clock)
+      (%register 8 reg-8)
+      (%wire 8 wire-8)))
+  (begin
+    (%register 8 reg-8)
+    (%on (%posedge clock)
+      (%wire 8 wire-8))))
 
 (check-inits-updates-syntax
   (module
     (%module mod
-      (%on clock
-        (%posedge
-          (%register 8 reg-8)
-          foo bar))))
+      (%on (%posedge clock)
+        (%register 8 reg-8)
+        foo bar)))
   (%module mod
     (%register 8 reg-8)
-    (%on clock
-      (%posedge foo bar))))
+    (%on (%posedge clock) foo bar)))

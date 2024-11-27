@@ -59,26 +59,12 @@
         (pair
           (list #`(%assign type name expr))
           (list)))
-      ((%on name process)
+      ((%on event body ...)
         (lets
-          ((pair $declarations $process)
-            (process->declarations-process #'process))
+          ((pair $declarations $instrs)
+            (items->declarations-instrs (syntaxes body ...)))
           (pair
-            (append $declarations (list #`(%on name #,$process)))
-            (list))))
-      ((%on name process opposite-process)
-        (lets
-          ((pair $declarations $process)
-            (process->declarations-process #'process))
-          ((pair $opposite-declarations $opposite-process)
-            (process->declarations-process #'opposite-process))
-          (pair
-            (append
-              $declarations
-              $opposite-declarations
-              (list
-                #`(%on name #,$process)
-                #`(%on name #,$opposite-process)))
+            (append $declarations (list #`(%on event #,@$instrs)))
             (list))))
       ((%cond clause ... (%else body ...))
         (lets
@@ -115,14 +101,4 @@
           (pair
             $declarations
             #`(cond #,@$instrs))))))
-
-  (define (process->declarations-process $item)
-    (syntax-case $item ()
-      ((edge item ...)
-        (lets
-          ((pair $declarations $instrs)
-            (items->declarations-instrs (syntaxes item ...)))
-          (pair $declarations #`(edge #,@$instrs))))))
-
-
 )

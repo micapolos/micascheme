@@ -67,10 +67,9 @@
 
 (check-verilog
   (declaration
-    (%on clock
-      (%posedge
-        (%set 1 foo bar)
-        (%set 2 goo gar))))
+    (%on (%posedge clock)
+      (%set 1 foo bar)
+      (%set 2 goo gar)))
   (%%always (%%posedge clock)
     (%%set! foo bar)
     (%%set! goo gar)))
@@ -119,10 +118,9 @@
       (%assign 16 update-1 3)
       (%wire 16 update-2)
       (%assign 16 update-2 4)
-      (%on clock
-        (%posedge
-          (%set 16 init-1 5)
-          (%set 16 init-2 6)))))
+      (%on (%posedge clock)
+        (%set 16 init-1 5)
+        (%set 16 init-2 6))))
   (%%module (my-mod)
     (%%reg (15 %%to 0) init-1)
     (%%reg (15 %%to 0) init-2)

@@ -98,15 +98,10 @@
       ((%cond clause-1 clause ...)
         #`(%%cond
           #,@(map clause->micac (syntaxes clause-1 clause ...))))
-      ((%on (previous-name name) (edge statement ...))
+      ((%on (edge previous-name name) statement ...)
         #`(%%when (%%not (%%= #,(name->micac #'previous-name) #,(name->micac #'name)))
           (%%when (%%= #,(name->micac #'name) #,(edge->micac #'edge))
-            #,@(map instruction->micac (syntaxes statement ...)))))
-      ((%on (previous-name name) (edge statement ...) (%else else-statement ...))
-        #`(%%when (%%not (%%= #,(name->micac #'previous-name) #,(name->micac #'name)))
-          (%%if (%%= #,(name->micac #'name) #,(edge->micac #'edge))
-            (%%then #,@(map instruction->micac (syntaxes statement ...)))
-            (%%else #,@(map instruction->micac (syntaxes else-statement ...))))))))
+            #,@(map instruction->micac (syntaxes statement ...)))))))
 
   (define (clause->micac $clause)
     (syntax-case $clause ()

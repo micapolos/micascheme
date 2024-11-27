@@ -55,7 +55,7 @@
         #`(%%assign
           #,(name->verilog #'name)
           #,(expr->verilog #'expr)))
-      ((%on name (edge body ...))
+      ((%on (edge name) body ...)
         #`(%%always
           (#,(edge->verilog #'edge) #,(name->verilog #'name))
           #,@(filter-opts (map instr->verilog? (syntaxes body ...)))))

@@ -420,9 +420,10 @@
           (scoped $scope
             (push $syntaxes
               #`(%on
-                #,(typed-value (scope-type-expr->typed $scope #'1 #'name))
-                (#,(edge->syntax #'edge)
-                  #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(body ...))))))))
+                (
+                  #,(edge->syntax #'edge)
+                  #,(typed-value (scope-type-expr->typed $scope #'1 #'name)))
+                #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(body ...)))))))
         ((%repeat (index count) body ...)
           (fold-left
             (lambda ($scoped $index)
