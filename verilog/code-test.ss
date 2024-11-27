@@ -19,6 +19,7 @@
 
 (check-verilog (expr #b10010) "'b10010")
 (check-verilog (expr clock) "clock")
+(check-verilog (expr "foo") "\"foo\"")
 
 (check-verilog (expr (= a b)) "a == b")
 (check-verilog (expr (!= a b)) "a != b")
@@ -93,7 +94,7 @@
     "end"))
 
 (check-verilog
-  (statement (display result (+ foo bar)))
+  (statement (display "result: %d" (+ foo bar)))
   (lines "$display(\"result: %d\", foo + bar);"))
 
 (check-verilog (edge posedge) "posedge")

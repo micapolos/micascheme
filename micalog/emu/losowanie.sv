@@ -15,7 +15,7 @@ module losowanie (
       if (mouse_pressed_ & ~done_) begin
         result <= counter;
         done_ <= 1;
-        $display("wynik: %d", result + 1);
+        $display("wynik %d", result + 1);
       end
     end
   end

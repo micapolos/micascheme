@@ -94,7 +94,7 @@
         (declaration-components->code #'kind #'vector #'name (syntaxes array ...)))))
 
   (define (statement->code $statement)
-    (syntax-case $statement (%set! %assign %cond %else)
+    (syntax-case $statement (%set! %assign %cond %else %display)
       ((%set! lhs rhs)
         (newline-ended-code
           (colon-ended-code
@@ -127,18 +127,13 @@
                 (cond-clause->code (syntax clause))
                 (map cond-clause->code (syntaxes clause* ...)))
               (code " else ")))))
-      ((%display label expr)
+      ((%display expr ...)
         (newline-ended-code
           (colon-ended-code
             (code
               (code "$display")
               (code-in-round-brackets
-                (comma-separated-code
-                  (string-code
-                    (format "~s"
-                      (format "~a: %d"
-                        (symbol->string (syntax->datum (identifier label))))))
-                  (expr->code #'expr)))))))))
+                (ops->code ", " (syntaxes expr ...)))))))))
 
   (define (block->code $block)
     (syntax-case $block ()
@@ -220,6 +215,8 @@
             (else (string-code (string-append "'b" (number->string (datum integer) 2)))))))
       (integer (integer? (datum integer))
         (value-expression (number-code (datum integer) 2)))
+      (string (string? (datum string))
+        (value-expression (string-code (format "~s" (datum string)))))
       ((%= lhs rhs)
         (infix->code-expression 9 #t "==" #'lhs #'rhs))
       ((%!= lhs rhs)

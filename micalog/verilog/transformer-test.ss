@@ -91,7 +91,7 @@
 
 (check-verilog
   (instr (%log result 2 (%+ 2 foo bar)))
-  (%%display result (%%+ foo bar)))
+  (%%display "result %d" (%%+ foo bar)))
 
 (check-verilog
   (module
