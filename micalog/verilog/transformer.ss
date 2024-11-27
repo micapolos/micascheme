@@ -67,14 +67,13 @@
       (syntax-error $declaration)))
 
   (define (instr->verilog? $declaration)
-    (syntax-case $declaration (%set %log %cond %else)
+    (syntax-case $declaration (%set %log %cond %else %log)
       ((%set type name expr)
         #`(%%set!
           #,(name->verilog #'name)
           #,(expr->verilog #'expr)))
       ((%log label type expr)
-        ; TODO: Use $display
-        #f)
+        #`(%%display label #,(expr->verilog #'expr)))
       ((%cond clause ... (%else body ...))
         #`(%%cond
           #,@(map clause->verilog (syntaxes clause ...))

@@ -92,6 +92,10 @@
     "  x <= _default;"
     "end"))
 
+(check-verilog
+  (statement (display result (+ foo bar)))
+  (lines "$display(\"result: %d\", foo + bar);"))
+
 (check-verilog (edge posedge) "posedge")
 (check-verilog (edge negedge) "negedge")
 

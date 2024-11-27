@@ -126,7 +126,19 @@
               (cons
                 (cond-clause->code (syntax clause))
                 (map cond-clause->code (syntaxes clause* ...)))
-              (code " else ")))))))
+              (code " else ")))))
+      ((%display label expr)
+        (newline-ended-code
+          (colon-ended-code
+            (code
+              (code "$display")
+              (code-in-round-brackets
+                (comma-separated-code
+                  (string-code
+                    (format "~s"
+                      (format "~a: %d"
+                        (symbol->string (syntax->datum (identifier label))))))
+                  (expr->code #'expr)))))))))
 
   (define (block->code $block)
     (syntax-case $block ()

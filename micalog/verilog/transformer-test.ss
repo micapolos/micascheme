@@ -90,6 +90,10 @@
       (%%set! goo gar))))
 
 (check-verilog
+  (instr (%log result 2 (%+ 2 foo bar)))
+  (%%display result (%%+ foo bar)))
+
+(check-verilog
   (module
     (%module my-mod
       (%input 8 in1)

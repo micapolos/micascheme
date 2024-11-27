@@ -11,7 +11,8 @@
     nand nor xnor
     < <= > >= = !=
     assign set! ref
-    append)
+    append
+    display)
   (import (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
@@ -26,5 +27,6 @@
     nand nor xnor
     < <= > >= = !=
     assign set! ref
-    append)
+    append
+    display)
 )
