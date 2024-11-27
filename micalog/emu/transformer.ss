@@ -47,7 +47,7 @@
             (%%video 352 288 96 24 4)
             (%%var bool clock 0)
             #,@(opt->list (and $reset?-input? #`(%%var int reset-counter 32)))
-            #,@(opt->list (and $reset?-input? #`(%%var bool %reset? #t)))
+            #,@(opt->list (and $reset?-input? #`(%%var bool %reset? 1)))
             #,@(opt->list (and $video-x-input? #`(%%var int %video-x)))
             #,@(opt->list (and $video-y-input? #`(%%var int %video-y)))
             #,@(opt->list (and $mouse-x-input? #`(%%var int %mouse-x)))
@@ -59,7 +59,7 @@
               #,@(opt->list
                 (and $reset?-input?
                   #`(%%if (%%= reset-counter 0)
-                    (%%then (%%set %reset? #f))
+                    (%%then (%%set %reset? 0))
                     (%%else (%%set reset-counter (%%- reset-counter 1))))))
               #,@(opt->list (and $video-x-input? #`(%%set %video-x %%video-x)))
               #,@(opt->list (and $video-y-input? #`(%%set %video-y %%video-y)))

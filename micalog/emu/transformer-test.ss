@@ -219,7 +219,7 @@
     (%%video 352 288 96 24 4)
     (%%var bool clock 0)
     (%%var int reset-counter 32)
-    (%%var bool %reset? #t)
+    (%%var bool %reset? 1)
     (%%var int %video-x)
     (%%var int %video-y)
     (%%var int %mouse-x)
@@ -228,7 +228,7 @@
     (%%update
       (%%set clock (%%xor clock 1))
       (%%if (%%= reset-counter 0)
-        (%%then (%%set %reset? #f))
+        (%%then (%%set %reset? 0))
         (%%else (%%set reset-counter (%%- reset-counter 1))))
       (%%set %video-x %%video-x)
       (%%set %video-y %%video-y)

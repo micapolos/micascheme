@@ -35,7 +35,7 @@ int main() {
             bool mouse_pressed__18 = false;
             bool clock_19 = 0;
             int reset_counter_20 = 32;
-            bool _reset__21 = true;
+            bool _reset__21 = 1;
             int _video_x_22;
             int _video_y_23;
             int _mouse_x_24;
@@ -72,7 +72,7 @@ int main() {
               while (index_45 != 559104) {
                 clock_19 = clock_19 ^ 1;
                 if (reset_counter_20 == 0) {
-                  _reset__21 = false;
+                  _reset__21 = 0;
                 } else {
                   reset_counter_20 = reset_counter_20 - 1;
                 }
