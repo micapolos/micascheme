@@ -2,6 +2,7 @@
   (micascheme)
   (micalog emu transformer)
   (prefix (micalog keywords) %)
+  (prefix (micalog emu keywords) %)
   (prefix (micac) %%)
   (prefix (micac lib emu) %%)
   (prefix (micac lib emu) %%))
@@ -199,3 +200,18 @@
         (%%when (%%= clock 1)
           (%%const uint16_t previous-counter counter)
           (%%set counter (%%+ previous-counter 1)))))))
+
+(check-micac
+  (module
+    (%module (prev-clock clock)
+      (%input 1 %reset?)))
+  (%%run-emu
+    (%%video 352 288 96 24 4)
+    (%%var bool clock 0)
+    (%%var uint8_t reset-counter 32)
+    (%%var bool reset? #t)
+    (%%update
+      (%%set clock (%%xor clock 1))
+      (%%if (%%= reset-counter 0)
+        (%%then (%%set reset-counter (%%- reset-counter 1)))
+        (%%else (%%set %reset? #f))))))

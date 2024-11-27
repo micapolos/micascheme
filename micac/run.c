@@ -34,95 +34,105 @@ int main() {
             int mouse_y_17 = 0;
             bool mouse_pressed__18 = false;
             bool clock_19 = 0;
-            int _video_x_20;
-            int _video_y_21;
-            int _mouse_x_22;
-            int _mouse_y_23;
-            bool _mouse_pressed__24;
-            uint32_t red_counter_25;
-            uint32_t green_counter_26;
-            uint32_t blue_counter_27;
-            uint32_t frame_counter_28;
-            uint8_t bar_red_29;
-            uint8_t bar_green_30;
-            uint8_t bar_blue_31;
-            bool half_clock_32;
-            bool old_clock_3_33;
-            bool old_half_clock_4_34;
-            bool running_35 = true;
-            SDL_Event event_36;
-            int sdl_mouse_x_37 = 0;
-            int sdl_mouse_y_38 = 0;
-            bool sdl_mouse_pressed__39 = false;
-            while (running_35) {
-              while (SDL_PollEvent(&event_36)) {
-                if (event_36.type == SDL_QUIT) {
-                  running_35 = false;
+            int reset_counter_20 = 32;
+            bool _reset__21 = true;
+            int _video_x_22;
+            int _video_y_23;
+            int _mouse_x_24;
+            int _mouse_y_25;
+            bool _mouse_pressed__26;
+            uint32_t red_counter_27;
+            uint32_t green_counter_28;
+            uint32_t blue_counter_29;
+            uint32_t frame_counter_30;
+            uint8_t bar_red_31;
+            uint8_t bar_green_32;
+            uint8_t bar_blue_33;
+            bool half_clock_34;
+            bool old_clock_4_35;
+            bool old_half_clock_3_36;
+            bool running_37 = true;
+            SDL_Event event_38;
+            int sdl_mouse_x_39 = 0;
+            int sdl_mouse_y_40 = 0;
+            bool sdl_mouse_pressed__41 = false;
+            while (running_37) {
+              while (SDL_PollEvent(&event_38)) {
+                if (event_38.type == SDL_QUIT) {
+                  running_37 = false;
                 }
               }
-              int sdl_mouse_x_40;
-              int sdl_mouse_y_41;
-              const uint32_t sdl_mouse_state_42 = SDL_GetMouseState(&sdl_mouse_x_40, &sdl_mouse_y_41);
-              mouse_x_16 = sdl_mouse_x_40 / 2;
-              mouse_y_17 = sdl_mouse_y_41 / 2;
-              mouse_pressed__18 = (sdl_mouse_state_42 & 1) != 0;
-              int index_43 = 0;
-              while (index_43 != 559104) {
+              int sdl_mouse_x_42;
+              int sdl_mouse_y_43;
+              const uint32_t sdl_mouse_state_44 = SDL_GetMouseState(&sdl_mouse_x_42, &sdl_mouse_y_43);
+              mouse_x_16 = sdl_mouse_x_42 / 2;
+              mouse_y_17 = sdl_mouse_y_43 / 2;
+              mouse_pressed__18 = (sdl_mouse_state_44 & 1) != 0;
+              int index_45 = 0;
+              while (index_45 != 559104) {
                 clock_19 = clock_19 ^ 1;
-                _video_x_20 = video_x_5;
-                _video_y_21 = video_y_6;
-                _mouse_x_22 = mouse_x_16;
-                _mouse_y_23 = mouse_y_17;
-                _mouse_pressed__24 = mouse_pressed__18;
-                if (old_clock_3_33 != clock_19) {
+                if (reset_counter_20 == 0) {
+                  _reset__21 = false;
+                } else {
+                  reset_counter_20 = reset_counter_20 - 1;
+                }
+                _video_x_22 = video_x_5;
+                _video_y_23 = video_y_6;
+                _mouse_x_24 = mouse_x_16;
+                _mouse_y_25 = mouse_y_17;
+                _mouse_pressed__26 = mouse_pressed__18;
+                if (old_clock_4_35 != clock_19) {
                   if (clock_19 == 1) {
-                    half_clock_32 = !half_clock_32;
+                    half_clock_34 = !half_clock_34;
                   }
                 }
-                old_clock_3_33 = clock_19;
-                if (old_half_clock_4_34 != half_clock_32) {
-                  if (half_clock_32 == 1) {
-                    red_counter_25 = red_counter_25 + 1;
-                    green_counter_26 = green_counter_26 + 1;
-                    blue_counter_27 = blue_counter_27 + 1;
-                    if (red_counter_25 > 9980) {
-                      red_counter_25 = 0;
-                      bar_red_29 = ~bar_red_29;
+                old_clock_4_35 = clock_19;
+                if (old_half_clock_3_36 != half_clock_34) {
+                  if (half_clock_34 == 1) {
+                    red_counter_27 = red_counter_27 + 1;
+                    green_counter_28 = green_counter_28 + 1;
+                    blue_counter_29 = blue_counter_29 + 1;
+                    if (red_counter_27 > 9980) {
+                      red_counter_27 = 0;
+                      bar_red_31 = ~bar_red_31;
                     }
-                    if (green_counter_26 > 9960) {
-                      green_counter_26 = 0;
-                      bar_green_30 = ~bar_green_30;
+                    if (green_counter_28 > 9960) {
+                      green_counter_28 = 0;
+                      bar_green_32 = ~bar_green_32;
                     }
-                    if (blue_counter_27 > 9950) {
-                      blue_counter_27 = 0;
-                      bar_blue_31 = ~bar_blue_31;
+                    if (blue_counter_29 > 9950) {
+                      blue_counter_29 = 0;
+                      bar_blue_33 = ~bar_blue_33;
                     }
-                    if (_video_x_20 == 0 && _video_y_21 == 0) {
-                      frame_counter_28 = frame_counter_28 + 1;
+                    if (_reset__21) {
+                      frame_counter_30 = 100;
+                    } else if (_video_x_22 == 0 && _video_y_23 == 0) {
+                      frame_counter_30 = frame_counter_30 + 1;
+                      printf("%s: %u\n", "frame", frame_counter_30);
                     }
                   }
                 }
-                old_half_clock_4_34 = half_clock_32;
-                const bool screen__44 = _video_x_20 >= 48 && _video_x_20 < 304 && (_video_y_21 >= 48 && _video_y_21 < 240);
-                const bool plasma__45 = _video_x_20 > _mouse_x_22 ^ _video_y_21 < _mouse_y_23;
-                const bool bar__46 = screen__44 ^ _mouse_pressed__24;
-                const uint8_t plasma_red_47 = frame_counter_28 - _video_x_20;
-                const uint8_t plasma_green_48 = frame_counter_28 - _video_y_21;
-                const uint8_t plasma_blue_49 = frame_counter_28 + (_video_x_20 * _video_y_21 >> 6);
-                const uint8_t screen_red_50 = plasma__45 ? plasma_red_47 : 221;
-                const uint8_t screen_green_51 = plasma__45 ? plasma_green_48 : 221;
-                const uint8_t screen_blue_52 = plasma__45 ? plasma_blue_49 : 221;
-                uint8_t video_red_53 = bar__46 ? screen_red_50 : bar_red_29;
-                uint8_t video_green_54 = bar__46 ? screen_green_51 : bar_green_30;
-                uint8_t video_blue_55 = bar__46 ? screen_blue_52 : bar_blue_31;
-                red_8 = video_red_53;
-                green_9 = video_green_54;
-                blue_10 = video_blue_55;
+                old_half_clock_3_36 = half_clock_34;
+                const bool screen__46 = _video_x_22 >= 48 && _video_x_22 < 304 && (_video_y_23 >= 48 && _video_y_23 < 240);
+                const bool plasma__47 = _video_x_22 > _mouse_x_24 ^ _video_y_23 < _mouse_y_25;
+                const bool bar__48 = screen__46 ^ _mouse_pressed__26;
+                const uint8_t plasma_red_49 = frame_counter_30 - _video_x_22;
+                const uint8_t plasma_green_50 = frame_counter_30 - _video_y_23;
+                const uint8_t plasma_blue_51 = frame_counter_30 + (_video_x_22 * _video_y_23 >> 6);
+                const uint8_t screen_red_52 = plasma__47 ? plasma_red_49 : 221;
+                const uint8_t screen_green_53 = plasma__47 ? plasma_green_50 : 221;
+                const uint8_t screen_blue_54 = plasma__47 ? plasma_blue_51 : 221;
+                uint8_t video_red_55 = bar__48 ? screen_red_52 : bar_red_31;
+                uint8_t video_green_56 = bar__48 ? screen_green_53 : bar_green_32;
+                uint8_t video_blue_57 = bar__48 ? screen_blue_54 : bar_blue_33;
+                red_8 = video_red_55;
+                green_9 = video_green_56;
+                blue_10 = video_blue_57;
                 if (pixel_cycle_counter_7 == 0) {
-                  const bool h_video__56 = video_x_5 < 352;
-                  const bool v_video__57 = video_y_6 < 288;
-                  const bool video__58 = h_video__56 && v_video__57;
-                  if (video__58) {
+                  const bool h_video__58 = video_x_5 < 352;
+                  const bool v_video__59 = video_y_6 < 288;
+                  const bool video__60 = h_video__58 && v_video__59;
+                  if (video__60) {
                     *pixel_ref_15 = 255;
                     pixel_ref_15 += 1;
                     *pixel_ref_15 = red_8;
@@ -146,7 +156,7 @@ int main() {
                     }
                   }
                 }
-                index_43 += 1;
+                index_45 += 1;
               }
               if (SDL_UpdateTexture(texture_13, 0, pixels_14, 1408) != 0) {
                 printf("%s SDL Error: %s\n", "Could not update texture.", SDL_GetError());

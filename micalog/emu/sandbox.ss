@@ -2,6 +2,7 @@
 
 (micalog-emu
   (module colour-bars
+    (input reset?)
     (input clock)
     (input 9 video-x)
     (input 9 video-y)
@@ -33,8 +34,11 @@
       (when (> blue-counter 9950)
         (set blue-counter 0)
         (set-not bar-blue))
-      (when (and (= video-x 0) (= video-y 0))
-        (inc frame-counter)))
+      (cond
+        (reset?
+          (set frame-counter 0))
+        ((and (= video-x 0) (= video-y 0))
+          (inc frame-counter))))
 
     (wire screen?
       (and

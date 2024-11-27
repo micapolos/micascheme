@@ -34,6 +34,7 @@
                   (not (declaration-kind-of? #'%input $statement))
                   (not (declaration-kind-of? #'%register $statement))))
               (syntaxes statement ...)))
+          ($reset?-input? (kind-name-find-statement #'%input #'1 #'%reset? $statements))
           ($video-x-input? (kind-name-find-statement #'%input #'9 #'%video-x $statements))
           ($video-y-input? (kind-name-find-statement #'%input #'9 #'%video-y $statements))
           ($video-red-output? (kind-name-find-statement #'%output #'8 #'%video-red $statements))
@@ -45,6 +46,8 @@
           #`(%%run-emu
             (%%video 352 288 96 24 4)
             (%%var bool clock 0)
+            #,@(opt->list (and $reset?-input? #`(%%var int reset-counter 32)))
+            #,@(opt->list (and $reset?-input? #`(%%var bool %reset? #t)))
             #,@(opt->list (and $video-x-input? #`(%%var int %video-x)))
             #,@(opt->list (and $video-y-input? #`(%%var int %video-y)))
             #,@(opt->list (and $mouse-x-input? #`(%%var int %mouse-x)))
@@ -53,6 +56,11 @@
             #,@(map register->micac $registers)
             (%%update
               (%%set clock (%%xor clock 1))
+              #,@(opt->list
+                (and $reset?-input?
+                  #`(%%if (%%= reset-counter 0)
+                    (%%then (%%set %reset? #f))
+                    (%%else (%%set reset-counter (%%- reset-counter 1))))))
               #,@(opt->list (and $video-x-input? #`(%%set %video-x %%video-x)))
               #,@(opt->list (and $video-y-input? #`(%%set %video-y %%video-y)))
               #,@(opt->list (and $mouse-x-input? #`(%%set %mouse-x %%mouse-x)))
