@@ -44,7 +44,7 @@
           #`(%%run-emu
             (%%video 352 288 96 24 4)
             (%%var bool clock 0)
-            #,@(opt->list (and $reset?-input? #`(%%var int reset-counter 20000000)))  ; some cycles of reset?
+            #,@(opt->list (and $reset?-input? #`(%%var int reset-counter 32)))
             #,@(opt->list (and $reset?-input? #`(%%var bool %reset? 1)))
             #,@(opt->list (and $video-x-input? #`(%%var int %video-x)))
             #,@(opt->list (and $video-y-input? #`(%%var int %video-y)))
