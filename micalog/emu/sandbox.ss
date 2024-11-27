@@ -9,6 +9,7 @@
     (input 9 mouse-x)
     (input 9 mouse-y)
     (input mouse-pressed?)
+
     (register 32 red-counter)
     (register 32 green-counter)
     (register 32 blue-counter)
@@ -25,20 +26,24 @@
       (inc red-counter)
       (inc green-counter)
       (inc blue-counter)
-      (when (> red-counter 9980)
-        (set red-counter 0)
-        (set-not bar-red))
-      (when (> green-counter 9960)
-        (set green-counter 0)
-        (set-not bar-green))
-      (when (> blue-counter 9950)
-        (set blue-counter 0)
-        (set-not bar-blue))
       (cond
-        (reset?
-          (set frame-counter 0))
-        ((and (= video-x 0) (= video-y 0))
-          (inc frame-counter))))
+        ((or reset? mouse-pressed?)
+          (set frame-counter 0)
+          (set red-counter 0)
+          (set green-counter 0)
+          (set blue-counter 0))
+        (else
+          (when (> red-counter 9980)
+            (set red-counter 0)
+            (set-not bar-red))
+          (when (> green-counter 9960)
+            (set green-counter 0)
+            (set-not bar-green))
+          (when (> blue-counter 9950)
+            (set blue-counter 0)
+            (set-not bar-blue))
+          (when (and (= video-x 0) (= video-y 0))
+            (inc frame-counter)))))
 
     (wire screen?
       (and
@@ -50,8 +55,6 @@
         (> video-x mouse-x)
         (< video-y mouse-y)))
 
-    (wire bar? (xor screen? mouse-pressed?))
-
     (wire plasma-red (take (- frame-counter video-x) 8))
     (wire plasma-green (take (- frame-counter video-y) 8))
     (wire plasma-blue (take (+ frame-counter (drop (* video-x video-y) 6)) 8))
@@ -60,6 +63,6 @@
     (wire screen-green (if plasma? plasma-green hex-dd))
     (wire screen-blue (if plasma? plasma-blue hex-dd))
 
-    (output video-red (if bar? screen-red bar-red))
-    (output video-green (if bar? screen-green bar-green))
-    (output video-blue (if bar? screen-blue bar-blue))))
+    (output video-red (if screen? screen-red bar-red))
+    (output video-green (if screen? screen-green bar-green))
+    (output video-blue (if screen? screen-blue bar-blue))))

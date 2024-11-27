@@ -92,46 +92,50 @@ int main() {
                     red_counter_27 = red_counter_27 + 1;
                     green_counter_28 = green_counter_28 + 1;
                     blue_counter_29 = blue_counter_29 + 1;
-                    if (red_counter_27 > 9980) {
-                      red_counter_27 = 0;
-                      bar_red_31 = ~bar_red_31;
-                    }
-                    if (green_counter_28 > 9960) {
-                      green_counter_28 = 0;
-                      bar_green_32 = ~bar_green_32;
-                    }
-                    if (blue_counter_29 > 9950) {
-                      blue_counter_29 = 0;
-                      bar_blue_33 = ~bar_blue_33;
-                    }
-                    if (_reset__21) {
+                    if (_reset__21 || _mouse_pressed__26) {
                       frame_counter_30 = 0;
-                    } else if (_video_x_22 == 0 && _video_y_23 == 0) {
-                      frame_counter_30 = frame_counter_30 + 1;
+                      red_counter_27 = 0;
+                      green_counter_28 = 0;
+                      blue_counter_29 = 0;
+                    } else {
+                      if (red_counter_27 > 9980) {
+                        red_counter_27 = 0;
+                        bar_red_31 = ~bar_red_31;
+                      }
+                      if (green_counter_28 > 9960) {
+                        green_counter_28 = 0;
+                        bar_green_32 = ~bar_green_32;
+                      }
+                      if (blue_counter_29 > 9950) {
+                        blue_counter_29 = 0;
+                        bar_blue_33 = ~bar_blue_33;
+                      }
+                      if (_video_x_22 == 0 && _video_y_23 == 0) {
+                        frame_counter_30 = frame_counter_30 + 1;
+                      }
                     }
                   }
                 }
                 old_half_clock_3_36 = half_clock_34;
                 const bool screen__46 = _video_x_22 >= 48 && _video_x_22 < 304 && (_video_y_23 >= 48 && _video_y_23 < 240);
                 const bool plasma__47 = _video_x_22 > _mouse_x_24 ^ _video_y_23 < _mouse_y_25;
-                const bool bar__48 = screen__46 ^ _mouse_pressed__26;
-                const uint8_t plasma_red_49 = frame_counter_30 - _video_x_22;
-                const uint8_t plasma_green_50 = frame_counter_30 - _video_y_23;
-                const uint8_t plasma_blue_51 = frame_counter_30 + (_video_x_22 * _video_y_23 >> 6);
-                const uint8_t screen_red_52 = plasma__47 ? plasma_red_49 : 221;
-                const uint8_t screen_green_53 = plasma__47 ? plasma_green_50 : 221;
-                const uint8_t screen_blue_54 = plasma__47 ? plasma_blue_51 : 221;
-                uint8_t video_red_55 = bar__48 ? screen_red_52 : bar_red_31;
-                uint8_t video_green_56 = bar__48 ? screen_green_53 : bar_green_32;
-                uint8_t video_blue_57 = bar__48 ? screen_blue_54 : bar_blue_33;
-                red_8 = video_red_55;
-                green_9 = video_green_56;
-                blue_10 = video_blue_57;
+                const uint8_t plasma_red_48 = frame_counter_30 - _video_x_22;
+                const uint8_t plasma_green_49 = frame_counter_30 - _video_y_23;
+                const uint8_t plasma_blue_50 = frame_counter_30 + (_video_x_22 * _video_y_23 >> 6);
+                const uint8_t screen_red_51 = plasma__47 ? plasma_red_48 : 221;
+                const uint8_t screen_green_52 = plasma__47 ? plasma_green_49 : 221;
+                const uint8_t screen_blue_53 = plasma__47 ? plasma_blue_50 : 221;
+                uint8_t video_red_54 = screen__46 ? screen_red_51 : bar_red_31;
+                uint8_t video_green_55 = screen__46 ? screen_green_52 : bar_green_32;
+                uint8_t video_blue_56 = screen__46 ? screen_blue_53 : bar_blue_33;
+                red_8 = video_red_54;
+                green_9 = video_green_55;
+                blue_10 = video_blue_56;
                 if (pixel_cycle_counter_7 == 0) {
-                  const bool h_video__58 = video_x_5 < 352;
-                  const bool v_video__59 = video_y_6 < 288;
-                  const bool video__60 = h_video__58 && v_video__59;
-                  if (video__60) {
+                  const bool h_video__57 = video_x_5 < 352;
+                  const bool v_video__58 = video_y_6 < 288;
+                  const bool video__59 = h_video__57 && v_video__58;
+                  if (video__59) {
                     *pixel_ref_15 = 255;
                     pixel_ref_15 += 1;
                     *pixel_ref_15 = red_8;
