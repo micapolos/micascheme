@@ -18,8 +18,6 @@
   ; Requirements:
   ; - module with explicit previous-clock and clock names
   ; - fully typed
-  ; - inputs and registers declared at the top-level
-  ; - explicit captures to capture previous register values
   ; - "on" statement with explicit previous value
   (define (module->micac $module)
     (syntax-case $module (%module)
