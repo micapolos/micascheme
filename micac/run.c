@@ -105,10 +105,9 @@ int main() {
                       bar_blue_33 = ~bar_blue_33;
                     }
                     if (_reset__21) {
-                      frame_counter_30 = 100;
+                      frame_counter_30 = 0;
                     } else if (_video_x_22 == 0 && _video_y_23 == 0) {
                       frame_counter_30 = frame_counter_30 + 1;
-                      printf("%s: %u\n", "frame", frame_counter_30);
                     }
                   }
                 }
