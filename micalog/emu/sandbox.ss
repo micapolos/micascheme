@@ -23,16 +23,19 @@
       (set-not half-clock))
 
     (on (posedge half-clock)
-      (inc red-counter)
-      (inc green-counter)
-      (inc blue-counter)
       (cond
         ((or reset? mouse-pressed?)
           (set frame-counter 0)
+          (set bar-red 0)
+          (set bar-green 0)
+          (set bar-blue 0)
           (set red-counter 0)
           (set green-counter 0)
           (set blue-counter 0))
         (else
+          (inc red-counter)
+          (inc green-counter)
+          (inc blue-counter)
           (when (> red-counter 9980)
             (set red-counter 0)
             (set-not bar-red))

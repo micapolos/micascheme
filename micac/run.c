@@ -89,15 +89,18 @@ int main() {
                 old_clock_4_35 = clock_19;
                 if (old_half_clock_3_36 != half_clock_34) {
                   if (half_clock_34 == 1) {
-                    red_counter_27 = red_counter_27 + 1;
-                    green_counter_28 = green_counter_28 + 1;
-                    blue_counter_29 = blue_counter_29 + 1;
                     if (_reset__21 || _mouse_pressed__26) {
                       frame_counter_30 = 0;
+                      bar_red_31 = 0;
+                      bar_green_32 = 0;
+                      bar_blue_33 = 0;
                       red_counter_27 = 0;
                       green_counter_28 = 0;
                       blue_counter_29 = 0;
                     } else {
+                      red_counter_27 = red_counter_27 + 1;
+                      green_counter_28 = green_counter_28 + 1;
+                      blue_counter_29 = blue_counter_29 + 1;
                       if (red_counter_27 > 9980) {
                         red_counter_27 = 0;
                         bar_red_31 = ~bar_red_31;
