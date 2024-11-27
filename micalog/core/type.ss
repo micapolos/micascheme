@@ -1,7 +1,6 @@
 ; TODO:
 ; - check that register is assigned within single domain
 ; - disallow redefining keywords
-; - support ... in macros
 (library (micalog core type)
   (export
     literal->typed
@@ -354,7 +353,7 @@
   (define (gen?-scoped-syntaxes+instr $gen? $scoped $instr)
     (lets
       ((scoped $scope $syntaxes) $scoped)
-      (syntax-case $instr (%input %output %wire %register %set %set-take %cond %else %when %on %macro %repeat %log)
+      (syntax-case $instr (%input %output %wire %register %set %set-take %cond %else %on %macro %repeat %log)
         ((%input id)
           (gen?-scoped-syntaxes+instr $gen? $scoped #`(%input 1 id)))
         ((%input type id)
@@ -417,10 +416,6 @@
             (push $syntaxes
               #`(%cond
                 #,@(map (partial gen?-scope-clause->typed-syntax $gen? $scope) (syntaxes clause clause* ...))))))
-        ; Move to (micalog std) once ... is supported
-        ((%when cond body ...)
-          (gen?-scoped-syntaxes+instr $gen? $scoped
-            #`(%cond (cond body ...))))
         ((%on (edge name) body ...)
           (scoped $scope
             (push $syntaxes

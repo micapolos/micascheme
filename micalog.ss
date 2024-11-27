@@ -4,6 +4,7 @@
     (micascheme)
     (prefix (micalog keywords) %))
   (export (import (micalog keywords)))
+  (export (import (only (micascheme) ...)))
 
   (define-syntax (micalog $syntax $lookup)
     (syntax-case $syntax ()

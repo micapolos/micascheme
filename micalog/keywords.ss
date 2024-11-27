@@ -3,7 +3,7 @@
     module input output
     macro repeat
     on posedge negedge edge
-    cond else when
+    cond else
     register set set-take
     wire assign
     int
@@ -19,7 +19,7 @@
     module input output
     macro repeat
     on posedge negedge edge
-    cond else when
+    cond else
     register set set-take
     wire assign
     int

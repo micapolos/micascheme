@@ -272,6 +272,20 @@
     (%register 8 local_0)
     (%set 8 local_0 (%take 8 (%+ 9 foo-8 foo-8) 8))))
 
+(check-typed-syntax
+  (scope-instrs $scope
+    (
+      (%macro (whenek cond body (... ...))
+        (%cond (cond body (... ...))))
+      (whenek foo-1
+        (%set reg-foo-4 foo-4)
+        (%set reg-bar-4 bar-4))))
+  (
+    (%cond
+      (foo-1
+        (%set 4 reg-foo-4 foo-4)
+        (%set 4 reg-bar-4 bar-4)))))
+
 ; === repeat ===
 
 ; (check-typed-syntax
