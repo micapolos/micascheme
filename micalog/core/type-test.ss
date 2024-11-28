@@ -92,6 +92,14 @@
 (check-typed (scope-expr $scope (%= foo-4 bar-4)) (1 (%= 4 foo-4 bar-4)))
 (check-typed (scope-expr $scope (%if foo-1 foo-8 bar-8)) (8 (%if 8 foo-1 foo-8 bar-8)))
 
+; raise on re-declaration
+(check-typed-syntax (raises (scope-instr $scope (%input %input))))
+(check-typed-syntax (raises (scope-instr $scope (%input %wire))))
+(check-typed-syntax (raises (scope-instr $scope (%input %+))))
+(check-typed-syntax (raises (scope-instr $scope (%input %macro))))
+;(check-typed-syntax (raises (scope-instr $scope (%input %int))))
+;(check-typed-syntax (raises (scope-instr $scope (%input %bin-000))))
+
 (check-typed-syntax (raises (scope-instr $scope (%input foo-1))))
 
 (check-typed-syntax (scope-instr $scope (%input moo-1)) (%input 1 moo-1))
