@@ -60,7 +60,7 @@
       (scope+instr log)
       (scope+instr macro)))
 
-  (define (scope+checked $scope $id $item)
+  (define (scope+id-item $scope $id $item)
     (if (radix->typed? $id)
       (syntax-error $id "can not redefine literal")
       (scope+undefined $scope $id $item)))
@@ -68,21 +68,21 @@
   (define-syntax (scope+literal $syntax)
     (syntax-case $syntax ()
       ((_ scope id)
-        #`(scope+checked scope
+        #`(scope+id-item scope
           #'#,(identifier-append #'id #'% #'id)
           (literal-typer #,(identifier-append #'id #'id #'->typed))))))
 
   (define-syntax (scope+expr $syntax)
     (syntax-case $syntax ()
       ((_ scope id fn)
-        #`(scope+checked scope
+        #`(scope+id-item scope
           #'#,(identifier-append #'id #'% #'id)
           (expr-typer #,(identifier-append #'id #'scope- #'fn #'->typed))))
       ((_ scope id)
         #`(scope+expr scope id id))))
 
   (define-case-syntax (scope+instr scope id)
-    #`(scope+checked scope
+    #`(scope+id-item scope
       #'#,(identifier-append #'id #'% #'id)
       (instr-typer #,(identifier-append #'id #'gen?-scoped-syntaxes+ #'id))))
 
@@ -420,13 +420,13 @@
   (define (gen-scoped-binding-name $gen? $scope $kind $type $name)
     (lets
       ($gen-name (if $gen? (generate-identifier $name) $name))
-      ($scope (scope+checked $scope $name (binding $kind $type $gen-name)))
+      ($scope (scope+id-item $scope $name (binding $kind $type $gen-name)))
       (scoped $scope $gen-name)))
 
   (define (gen-scoped-name $gen? $scope $name $item)
     (lets
       ($gen-name (if $gen? (generate-identifier $name) $name))
-      ($scope (scope+checked $scope $name $item))
+      ($scope (scope+id-item $scope $name $item))
       (scoped $scope $gen-name)))
 
   (define (gen?-scoped-syntaxes+input $gen? (scoped $scope $syntaxes) $input)
