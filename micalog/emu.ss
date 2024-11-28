@@ -23,7 +23,7 @@
             (%newline)
             (%unsyntax
               (%fluent $lookup
-                (scope+std)
+                (scope+core)
                 (scope-module->typed-syntax (%syntax module))
                 (module->on-old-new-syntax)
                 (module->inits-updates-syntax)

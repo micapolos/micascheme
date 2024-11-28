@@ -10,7 +10,7 @@
 
 (define $scope
   (fluent (empty-scope)
-    (scope+std)
+    (scope+core)
     (scope+undefined #'foo-1 #'(%wire 1 foo-1))
     (scope+undefined #'bar-1 #'(%wire 1 bar-1))
     (scope+undefined #'foo-4 #'(%wire 4 foo-4))

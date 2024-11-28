@@ -12,7 +12,7 @@
     scope-instrs->typed-syntax
     scope-module->typed-syntax
     module->typed-syntax
-    scope+std)
+    scope+core)
   (import
     (micascheme)
     (syntax scope)
@@ -23,7 +23,7 @@
   (data (expr-typer fn))
   (data (instr-typer fn))
 
-  (define (scope+std $scope)
+  (define (scope+core $scope)
     (fluent $scope
       (scope+expr append)
       (scope+expr take)
@@ -229,7 +229,7 @@
         (scope-id->typed $scope (identifier id)))))
 
   (define (expr->typed $expr)
-    (scope-expr->typed (scope+std (empty-scope)) $expr))
+    (scope-expr->typed (scope+core (empty-scope)) $expr))
 
   (define (scope-op1->typed $scope $expr)
     (syntax-case $expr ()
@@ -578,7 +578,7 @@
     (gen?-scope-instrs->typed-syntax #f $scope $instrs))
 
   (define (module->typed-syntax $module)
-    (scope-module->typed-syntax (scope+std (empty-scope)) $module))
+    (scope-module->typed-syntax (scope+core (empty-scope)) $module))
 
   (define (scope-module->typed-syntax $scope $module)
     (syntax-case $module ()
