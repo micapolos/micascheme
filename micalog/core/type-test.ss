@@ -31,7 +31,7 @@
 (check-typed (literal 1) (1 1))
 (check-typed (literal #b10011) (5 #b10011))
 
-(check-typed (literal (%int 8 12)) (8 12))
+(check-typed (int (%int 8 12)) (8 12))
 
 (check-typed (literal bin-10101100) (8 #b10101100))
 (check-typed (literal hex-af) (8 #xaf))
@@ -47,7 +47,9 @@
 (check-typed (raises (literal oct-)))
 (check-typed (raises (literal oct-08)))
 
+(check-typed (expr 0) (1 0))
 (check-typed (expr bin-101) (3 #b101))
+(check-typed (expr (%int 8 12)) (8 12))
 
 (check-typed (expr (%append bin-10 hex-af)) (10 (%append (2 #b10) (8 #xaf))))
 
@@ -97,8 +99,8 @@
 (check-typed-syntax (raises (scope-instr $scope (%input %wire))))
 (check-typed-syntax (raises (scope-instr $scope (%input %+))))
 (check-typed-syntax (raises (scope-instr $scope (%input %macro))))
-;(check-typed-syntax (raises (scope-instr $scope (%input %int))))
-;(check-typed-syntax (raises (scope-instr $scope (%input %bin-000))))
+(check-typed-syntax (raises (scope-instr $scope (%input %int))))
+(check-typed-syntax (raises (scope-instr $scope (%input bin-000))))
 
 (check-typed-syntax (raises (scope-instr $scope (%input foo-1))))
 

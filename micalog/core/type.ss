@@ -3,6 +3,7 @@
 (library (micalog core type)
   (export
     literal->typed
+    int->typed
     expr->typed
     type->syntax
     scope-expr->typed
@@ -20,11 +21,13 @@
     (only (micalog core utils) opposite-edges?)
     (prefix (micalog keywords) %))
 
+  (data (literal-typer fn))
   (data (expr-typer fn))
   (data (instr-typer fn))
 
   (define (scope+core $scope)
     (fluent $scope
+      (scope+literal int)
       (scope+expr append)
       (scope+expr take)
       (scope+expr drop)
@@ -57,17 +60,29 @@
       (scope+instr log)
       (scope+instr macro)))
 
+  (define (scope+checked $scope $id $item)
+    (if (radix->typed? $id)
+      (syntax-error $id "can not redefine literal")
+      (scope+undefined $scope $id $item)))
+
+  (define-syntax (scope+literal $syntax)
+    (syntax-case $syntax ()
+      ((_ scope id)
+        #`(scope+checked scope
+          #'#,(identifier-append #'id #'% #'id)
+          (literal-typer #,(identifier-append #'id #'id #'->typed))))))
+
   (define-syntax (scope+expr $syntax)
     (syntax-case $syntax ()
       ((_ scope id fn)
-        #`(scope+undefined scope
+        #`(scope+checked scope
           #'#,(identifier-append #'id #'% #'id)
           (expr-typer #,(identifier-append #'id #'scope- #'fn #'->typed))))
       ((_ scope id)
         #`(scope+expr scope id id))))
 
   (define-case-syntax (scope+instr scope id)
-    #`(scope+undefined scope
+    #`(scope+checked scope
       #'#,(identifier-append #'id #'% #'id)
       (instr-typer #,(identifier-append #'id #'gen?-scoped-syntaxes+ #'id))))
 
@@ -95,23 +110,31 @@
       (%negedge #'%negedge)))
 
   (define (literal->typed? $literal)
-    (syntax-case $literal (%int)
+    (syntax-case $literal ()
       (integer (nonnegative-integer? (datum integer))
         #`(
           #,(literal->syntax (string-length (number->string (datum integer) 2)))
           integer))
-      ((%int type integer)
-        (or
-          (type-literal->typed?
-            (type->syntax #'type)
-            #'integer)
-          (syntax-error #'integer "invalid int")))
+      (radix
+        (radix->typed? #'radix))))
+
+  (define (radix->typed? $radix)
+    (syntax-case $radix ()
       (id (identifier? #'id)
         (or
           (prefix-size-id->typed? "bin-" 1 #'id)
           (prefix-size-id->typed? "oct-" 3 #'id)
           (prefix-size-id->typed? "hex-" 4 #'id)))
       (else #f)))
+
+  (define (int->typed $int)
+    (syntax-case $int ()
+      ((%int type integer)
+        (or
+          (type-literal->typed?
+            (type->syntax #'type)
+            #'integer)
+          (syntax-error #'integer "invalid int")))))
 
   (define (type-literal->typed? $type $literal)
     (syntax-case $literal ()
@@ -149,10 +172,12 @@
     (switch (scope-item $scope $id)
       ((procedure? _)
         (syntax-error $id "macro"))
+      ((literal-typer? _)
+        (syntax-error $id "literal"))
       ((expr-typer? _)
         (syntax-error $id "expression"))
-      ((expr-typer? _)
-        (syntax-error $id "expression"))
+      ((instr-typer? _)
+        (syntax-error $id "instruction"))
       ((else $binding)
         $binding)))
 
@@ -166,6 +191,8 @@
     (switch (scope-item $scope $id)
       ((procedure? _)
         (syntax-error $id "macro"))
+      ((literal-typer? _)
+        (syntax-error $id "literal"))
       ((expr-typer? _)
         (syntax-error $id "expression"))
       ((instr-typer? _)
@@ -216,6 +243,8 @@
     (syntax-case $expr ()
       ((id arg ...)
         (switch (scope-item $scope (identifier id))
+          ((literal-typer? $literal-typer)
+            (app (literal-typer-fn $literal-typer) $expr))
           ((expr-typer? $expr-typer)
             (app (expr-typer-fn $expr-typer) $scope $expr))
           ((procedure? $procedure)
@@ -391,13 +420,13 @@
   (define (gen-scoped-binding-name $gen? $scope $kind $type $name)
     (lets
       ($gen-name (if $gen? (generate-identifier $name) $name))
-      ($scope (scope+undefined $scope $name (binding $kind $type $gen-name)))
+      ($scope (scope+checked $scope $name (binding $kind $type $gen-name)))
       (scoped $scope $gen-name)))
 
   (define (gen-scoped-name $gen? $scope $name $item)
     (lets
       ($gen-name (if $gen? (generate-identifier $name) $name))
-      ($scope (scope+undefined $scope $name $item))
+      ($scope (scope+checked $scope $name $item))
       (scoped $scope $gen-name)))
 
   (define (gen?-scoped-syntaxes+input $gen? (scoped $scope $syntaxes) $input)
