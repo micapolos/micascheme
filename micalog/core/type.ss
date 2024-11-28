@@ -162,20 +162,23 @@
   (define (scope-expr->typed $scope $expr)
     (or
       (literal->typed? $expr)
-      (syntax-case $expr (%append %take %drop %= %!= %< %<= %> %>= %not %and %or %xor %nand %nor %xnor %+ %- %* %if)
-        ((id arg ...)
-          (switch (scope-item $scope (identifier id))
-            ((expr-typer? $expr-typer)
-              (app (expr-typer-fn $expr-typer) $scope $expr))
-            ((procedure? $procedure)
-              (fluent $procedure
-                (transform $expr $scope)
-                (unbegin-syntax)
-                (with $expr (scope-expr->typed $scope $expr))))
-            ((else $other)
-              (syntax-error #'id "not expression"))))
-        (id
-          (scope-id->typed $scope (identifier id))))))
+      (scope-default-expr->typed $scope $expr)))
+
+  (define (scope-default-expr->typed $scope $expr)
+    (syntax-case $expr ()
+      ((id arg ...)
+        (switch (scope-item $scope (identifier id))
+          ((expr-typer? $expr-typer)
+            (app (expr-typer-fn $expr-typer) $scope $expr))
+          ((procedure? $procedure)
+            (fluent $procedure
+              (transform $expr $scope)
+              (unbegin-syntax)
+              (with $expr (scope-expr->typed $scope $expr))))
+          ((else $other)
+            (syntax-error #'id "not expression"))))
+      (id
+        (scope-id->typed $scope (identifier id)))))
 
   (define-syntax (scope+expr $syntax)
     (syntax-case $syntax ()
