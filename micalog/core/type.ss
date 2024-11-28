@@ -122,9 +122,9 @@
     (syntax-case $radix ()
       (id (identifier? #'id)
         (or
-          (prefix-size-id->typed? "bin-" 1 #'id)
-          (prefix-size-id->typed? "oct-" 3 #'id)
-          (prefix-size-id->typed? "hex-" 4 #'id)))
+          (radix-size-id->typed? "bin" 1 #'id)
+          (radix-size-id->typed? "oct" 3 #'id)
+          (radix-size-id->typed? "hex" 4 #'id)))
       (else #f)))
 
   (define (int->typed $int)
@@ -143,8 +143,9 @@
       (_
         #f)))
 
-  (define (prefix-size-id->typed? $prefix $size $id)
+  (define (radix-size-id->typed? $radix-string $size $id)
     (lets
+      ($prefix (string-append $radix-string "-"))
       ($string (symbol->string (syntax->datum $id)))
       ($length (string-length $string))
       ($prefix-length (string-length $prefix))
@@ -157,11 +158,12 @@
           (and (string=? $string-prefix $prefix)
             (lets
               ($number (string->number $data $radix))
-              (if $number
+              (if (and $number (integer? $number))
                 #`(
                   #,(literal->syntax (* $data-length $size))
                   #,(literal->syntax $number))
-                (syntax-error $id "illegal digits"))))))))
+                (syntax-error $id
+                  (format "illegal ~a literal" $radix-string)))))))))
 
   (define (literal->typed $literal)
     (or
