@@ -3,7 +3,9 @@
     expand-expr
     expand-lhs
     expand-instr
-    expand-instrs)
+    expand-instrs
+    expand-top-level
+    expand-top-levels)
   (import (micascheme) (syntax scope) (micac keywords) (syntax scoped))
 
   (define (scoped+syntax $scoped $syntax)
@@ -20,6 +22,20 @@
 
   (define (expand-instr $scope $syntax)
     (force-single (expand-instrs $scope #`(#,$syntax))))
+
+  (define (expand-top-level $scope $syntax)
+    (syntax-case $syntax (import)
+      ((type (name param ...) body ...)
+        #`(type (name param ...)
+          #,@(expand-instrs $scope #'(body ...))))
+      (other
+        #'other)))
+
+  (define (expand-top-levels $scope $syntax)
+    (syntaxes->syntax
+      (map
+        (partial expand-top-level $scope)
+        (unbegin-syntaxes $syntax))))
 
   (define (scoped+instrs $scoped $instrs)
     (syntax-case $instrs (defer break-if)
