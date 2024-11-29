@@ -79,6 +79,6 @@
           (syntax->datum)
           (symbol->string)
           (string->symbol)
-          (with $it (datum->syntax $id $it))))
+          (let $it (datum->syntax $id $it))))
       $id))
 )

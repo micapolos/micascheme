@@ -1,17 +1,14 @@
 (library (fluent)
-  (export fluent with)
-  (import
-    (scheme) (syntax))
-
-  (define-aux-keyword with)
+  (export fluent)
+  (import (scheme) (syntax))
 
   (define-syntax fluent
-    (syntax-rules (with values)
+    (syntax-rules (let values)
       ((fluent expr)
         expr)
       ((fluent (values value ...) (fn arg ...) rest ...)
         (fluent (fn value ... arg ...) rest ...))
-      ((fluent expr (with with-var with-expr) rest ...)
+      ((fluent expr (let with-var with-expr) rest ...)
         (let ((with-var expr))
           (fluent with-expr rest ...)))
       ((fluent expr (fn arg ...) rest ...)

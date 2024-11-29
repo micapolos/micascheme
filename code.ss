@@ -111,7 +111,7 @@
       #`(fluent (list (code $code) ...)
         (filter-using identity)
         (intercalate (code $separator))
-        (with $it (apply code-append $it))))
+        (let $it (apply code-append $it))))
     ((suffixed-code $suffix $code ...)
       #`(code
         #,@(map-with

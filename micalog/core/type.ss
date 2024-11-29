@@ -257,7 +257,7 @@
             (fluent $procedure
               (transform $expr $scope)
               (unbegin-syntax)
-              (with $expr (scope-expr->typed $scope $expr))))
+              (let $expr (scope-expr->typed $scope $expr))))
           ((else $other)
             (syntax-error #'id "not expression"))))
       (id

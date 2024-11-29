@@ -21,7 +21,7 @@
           (%map-using module->code)
           (%map-using code-string)
           (%intercalate "\n")
-          (%with $it (%apply %string-append $it))
+          (%let $it (%apply %string-append $it))
           (%literal->syntax)))))
 
   (%define-rule-syntax (display-micalog-verilog module %...)

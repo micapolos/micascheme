@@ -190,7 +190,7 @@
       (string->list)
       (map-using name-char)
       (list->string)
-      (with $string
+      (let $string
         (if (member $string reserved-strings)
           (string-append "_" $string)
           $string))

@@ -19,7 +19,7 @@
     (fluent
       "foo"
       (string-append "bar")
-      (with $it (string-append "Hello, " $it))
+      (let $it (string-append "Hello, " $it))
       (string-append "!"))
     "Hello, foobar!"))
 
