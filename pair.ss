@@ -1,7 +1,9 @@
 (library (pair)
   (export
     null-or-pair?
-    pair)
+    pair
+    map-car
+    map-cdr)
   (import
     (scheme)
     (lets)
@@ -19,4 +21,10 @@
           ($car (car $pair))
           ($cdr (cdr $pair))
           $body))))
+
+  (define (map-car $proc $pair)
+    (cons ($proc (car $pair)) (cdr $pair)))
+
+  (define (map-cdr $proc $pair)
+    (cons (car $pair) ($proc (cdr $pair))))
 )

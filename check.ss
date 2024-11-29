@@ -6,7 +6,8 @@
     works
     define-check->
     define-check-datum->
-    check-datum=?)
+    check-datum=?
+    check-equal?)
   (import (scheme) (identifier))
 
   (define checking? (make-thread-parameter #f))
@@ -122,4 +123,9 @@
           (equal?
             (syntax->datum a)
             (syntax->datum b))))))
+
+  (define-syntax check-equal?
+    (syntax-rules ()
+      ((_ a b)
+        (check (equal? a b)))))
 )
