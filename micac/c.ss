@@ -1,6 +1,7 @@
 (library (micac c)
   (export
     micac-c
+    micac-statements-c
     micac-define
     micac-externs
     micac-macro)
@@ -31,8 +32,18 @@
 
   (define-syntax (micac-c $syntax $lookup)
     (syntax-case $syntax ()
+      ((_ top-level ...)
+        (literal->syntax
+          (apply string-append
+            (map top-level-c
+              (map
+                (partial expand-top-level $lookup)
+                (syntaxes top-level ...))))))))
+
+  (define-syntax (micac-statements-c $syntax $lookup)
+    (syntax-case $syntax ()
       ((_ instr ...)
-        (datum->syntax #'micac-c
+        (literal->syntax
           (syntax-c
             #`(
               #,@(expand-instrs $lookup

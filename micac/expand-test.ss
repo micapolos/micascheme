@@ -43,12 +43,6 @@
         (syntax->datum (expand-top-level $scope #'in))
         'out)))
 
-  (define-rule-syntax (check-top-levels (in ...) (out ...))
-    (check
-      (equal?
-        (syntax->datum (expand-top-levels $scope #'(in ...)))
-        '(out ...))))
-
   (check-expr zero 0)
   (check-expr one 1)
   (check-expr (+ zero one two) 3)
@@ -216,15 +210,15 @@
     (begin (break-if x (a)) (defer (b)) (c))
     (begin (if x (then (a)) (else (c) (b)))))
 
-  (check-top-levels
-    (begin
-      (import "foo")
-      (import bar))
-    (begin
-      (import "foo")
-      (import bar)))
+  (check-top-level
+    (import "foo")
+    (import "foo"))
 
-  (check-top-levels
+  (check-top-level
+    (import bar)
+    (import bar))
+
+  (check-top-level
     (int (inc (int x))
       (return (+ x one)))
     (int (inc (int x))

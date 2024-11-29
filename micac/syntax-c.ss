@@ -123,12 +123,6 @@
                     (map param->code (syntaxes param ...)))))
               (block-code (syntaxes body ...))))))))
 
-  (define (top-levels-code $top-levels)
-    (list->code
-      (intercalate
-        (map top-level-code $top-levels)
-        (code "\n"))))
-
   (define (instr-code $allow-return? $instr)
     (syntax-case $instr
       (

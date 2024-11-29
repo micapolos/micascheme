@@ -117,6 +117,8 @@
 (check-typed (expr (%- bin-1101 hex-a)) (5 (%- 5 #b1101 #xa)))
 (check-typed (expr (%* bin-1101 hex-a)) (8 (%* 8 #b1101 #xa)))
 
+(check-typed (expr (%wrap+ bin-1101 1)) (4 (%wrap+ 4 #b1101 1)))
+
 (check-typed (expr (%if bin-1 bin-1101 hex-a)) (4 (%if 4 #b1 #b1101 #xa)))
 
 (check-typed (scope-expr $scope foo-4) (4 foo-4))

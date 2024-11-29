@@ -1,197 +1,192 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <SDL.h>
-
+#import <stdlib.h>
+#import <stdio.h>
+#import <stdbool.h>
+#import <SDL.h>
 int main() {
-  int video_x_5 = 0;
-  int video_y_6 = 0;
-  int pixel_cycle_counter_7 = 0;
-  uint8_t red_8 = 0;
-  uint8_t green_9 = 0;
-  uint8_t blue_10 = 0;
+  int video_x_3 = 0;
+  int video_y_4 = 0;
+  int pixel_cycle_counter_5 = 0;
+  uint8_t red_6 = 0;
+  uint8_t green_7 = 0;
+  uint8_t blue_8 = 0;
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     printf("%s SDL Error: %s\n", "Could not initialize.", SDL_GetError());
   } else {
-    SDL_Window *window_11 = SDL_CreateWindow("Emu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 704, 576, 0);
-    if (!window_11) {
+    SDL_Window *window_9 = SDL_CreateWindow("Emu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 704, 576, 0);
+    if (!window_9) {
       printf("%s SDL Error: %s\n", "Could not create window.", SDL_GetError());
     } else {
-      SDL_Renderer *renderer_12 = SDL_CreateRenderer(window_11, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-      if (!renderer_12) {
+      SDL_Renderer *renderer_10 = SDL_CreateRenderer(window_9, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+      if (!renderer_10) {
         printf("%s SDL Error: %s\n", "Could not create renderer.", SDL_GetError());
       } else {
-        SDL_Texture *texture_13 = SDL_CreateTexture(renderer_12, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_STREAMING, 352, 288);
-        if (!texture_13) {
+        SDL_Texture *texture_11 = SDL_CreateTexture(renderer_10, SDL_PIXELFORMAT_BGRA8888, SDL_TEXTUREACCESS_STREAMING, 352, 288);
+        if (!texture_11) {
           printf("%s SDL Error: %s\n", "Could not create texture.", SDL_GetError());
         } else {
-          uint8_t *pixels_14 = (uint8_t*)malloc(405504 * sizeof(uint8_t));
-          if (pixels_14 == 0) {
+          uint8_t *pixels_12 = (uint8_t*)malloc(405504 * sizeof(uint8_t));
+          if (pixels_12 == 0) {
             printf("Could not allocate memory.\n");
           } else {
-            uint8_t *pixel_ref_15 = pixels_14;
-            int mouse_x_16 = 0;
-            int mouse_y_17 = 0;
-            bool mouse_pressed__18 = false;
-            bool clock_19 = 0;
-            int reset_counter_20 = 32;
-            bool _reset__21 = 1;
-            int _video_x_22;
-            int _video_y_23;
-            int _mouse_x_24;
-            int _mouse_y_25;
-            bool _mouse_pressed__26;
-            uint32_t red_counter_27;
-            uint32_t green_counter_28;
-            uint32_t blue_counter_29;
-            uint32_t frame_counter_30;
-            uint8_t bar_red_31;
-            uint8_t bar_green_32;
-            uint8_t bar_blue_33;
-            bool half_clock_34;
-            uint8_t red_35;
-            uint8_t green_36;
-            uint8_t blue_37;
-            bool old_clock_4_38;
-            bool old_half_clock_3_39;
-            bool running_40 = true;
-            SDL_Event event_41;
-            int sdl_mouse_x_42 = 0;
-            int sdl_mouse_y_43 = 0;
-            bool sdl_mouse_pressed__44 = false;
-            while (running_40) {
-              while (SDL_PollEvent(&event_41)) {
-                if (event_41.type == SDL_QUIT) {
-                  running_40 = false;
-                }
-              }
-              int sdl_mouse_x_45;
-              int sdl_mouse_y_46;
-              const uint32_t sdl_mouse_state_47 = SDL_GetMouseState(&sdl_mouse_x_45, &sdl_mouse_y_46);
-              mouse_x_16 = sdl_mouse_x_45 / 2;
-              mouse_y_17 = sdl_mouse_y_46 / 2;
-              mouse_pressed__18 = (sdl_mouse_state_47 & 1) != 0;
-              int index_48 = 0;
-              while (index_48 != 559104) {
-                clock_19 = clock_19 ^ 1;
-                if (reset_counter_20 == 0) {
-                  _reset__21 = 0;
-                } else {
-                  reset_counter_20 = reset_counter_20 - 1;
-                }
-                _video_x_22 = video_x_5;
-                _video_y_23 = video_y_6;
-                _mouse_x_24 = mouse_x_16;
-                _mouse_y_25 = mouse_y_17;
-                _mouse_pressed__26 = mouse_pressed__18;
-                uint8_t video_red_49 = red_35;
-                uint8_t video_green_50 = green_36;
-                uint8_t video_blue_51 = blue_37;
-                if (old_clock_4_38 != clock_19) {
-                  if (clock_19 == 1) {
-                    half_clock_34 = !half_clock_34 & 1;
-                  }
-                }
-                old_clock_4_38 = clock_19;
-                if (old_half_clock_3_39 != half_clock_34) {
-                  if (half_clock_34 == 1) {
-                    if (_reset__21 || _mouse_pressed__26) {
-                      frame_counter_30 = 0;
-                      bar_red_31 = 0;
-                      bar_green_32 = 0;
-                      bar_blue_33 = 0;
-                      red_counter_27 = 0;
-                      green_counter_28 = 0;
-                      blue_counter_29 = 0;
-                      red_35 = 0;
-                      green_36 = 0;
-                      blue_37 = 0;
-                    } else {
-                      red_counter_27 = red_counter_27 + 1 & 4294967295;
-                      green_counter_28 = green_counter_28 + 1 & 4294967295;
-                      blue_counter_29 = blue_counter_29 + 1 & 4294967295;
-                      if (red_counter_27 > 9980) {
-                        red_counter_27 = 0;
-                        bar_red_31 = ~bar_red_31 & 255;
-                      }
-                      if (green_counter_28 > 9960) {
-                        green_counter_28 = 0;
-                        bar_green_32 = ~bar_green_32 & 255;
-                      }
-                      if (blue_counter_29 > 9950) {
-                        blue_counter_29 = 0;
-                        bar_blue_33 = ~bar_blue_33 & 255;
-                      }
-                      if ((_video_x_22 | _video_y_23) == 0) {
-                        frame_counter_30 = frame_counter_30 + 1 & 4294967295;
-                      }
-                      const bool screen__52 = _video_x_22 >= 48 && _video_x_22 < 304 && (_video_y_23 >= 48 && _video_y_23 < 240);
-                      const bool plasma__53 = _video_x_22 >= _mouse_x_24 ^ _video_y_23 < _mouse_y_25;
-                      const uint8_t plasma_red_54 = frame_counter_30 - _video_x_22 & 4294967295 & 255;
-                      const uint8_t plasma_green_55 = frame_counter_30 - _video_y_23 & 4294967295 & 255;
-                      const uint8_t plasma_blue_56 = frame_counter_30 + (_video_x_22 * _video_y_23 >> 6) & 255;
-                      const uint8_t screen_red_57 = plasma__53 ? plasma_red_54 : 221;
-                      const uint8_t screen_green_58 = plasma__53 ? plasma_green_55 : 221;
-                      const uint8_t screen_blue_59 = plasma__53 ? plasma_blue_56 : 221;
-                      red_35 = screen__52 ? screen_red_57 : bar_red_31;
-                      green_36 = screen__52 ? screen_green_58 : bar_green_32;
-                      blue_37 = screen__52 ? screen_blue_59 : bar_blue_33;
-                    }
-                  }
-                }
-                old_half_clock_3_39 = half_clock_34;
-                red_8 = video_red_49;
-                green_9 = video_green_50;
-                blue_10 = video_blue_51;
-                if (pixel_cycle_counter_7 == 0) {
-                  const bool h_video__60 = video_x_5 < 352;
-                  const bool v_video__61 = video_y_6 < 288;
-                  const bool video__62 = h_video__60 && v_video__61;
-                  if (video__62) {
-                    *pixel_ref_15 = 255;
-                    pixel_ref_15 += 1;
-                    *pixel_ref_15 = red_8;
-                    pixel_ref_15 += 1;
-                    *pixel_ref_15 = green_9;
-                    pixel_ref_15 += 1;
-                    *pixel_ref_15 = blue_10;
-                    pixel_ref_15 += 1;
-                  }
-                }
-                pixel_cycle_counter_7 += 1;
-                if (pixel_cycle_counter_7 == 4) {
-                  pixel_cycle_counter_7 = 0;
-                  video_x_5 += 1;
-                  if (video_x_5 == 448) {
-                    video_x_5 = 0;
-                    video_y_6 += 1;
-                    if (video_y_6 == 312) {
-                      video_y_6 = 0;
-                      pixel_ref_15 = pixels_14;
-                    }
-                  }
-                }
-                index_48 += 1;
-              }
-              if (SDL_UpdateTexture(texture_13, 0, pixels_14, 1408) != 0) {
-                printf("%s SDL Error: %s\n", "Could not update texture.", SDL_GetError());
+            uint8_t *pixel_ref_13 = pixels_12;
+            int mouse_x_14 = 0;
+            int mouse_y_15 = 0;
+            bool mouse_pressed__16 = false;
+            int frame_counter_17 = 0;
+            SDL_RWops *rw_ops_18 = SDL_RWFromFile("/Users/micapolos/git/micascheme/micac/scr/Cobra.scr", "rb");
+            if (!rw_ops_18) {
+              printf("%s SDL Error: %s\n", "Could not open file.", SDL_GetError());
+            } else {
+              size_t scr_size_19;
+              uint8_t *scr_20 = SDL_LoadFile_RW(rw_ops_18, &scr_size_19, 0);
+              if (!scr_20) {
+                printf("%s SDL Error: %s\n", "Could not open file.", SDL_GetError());
               } else {
-                if (SDL_RenderCopy(renderer_12, texture_13, 0, 0) != 0) {
-                  printf("%s SDL Error: %s\n", "Could not render copy.", SDL_GetError());
-                } else {
-                  SDL_RenderPresent(renderer_12);
+                int bar_counter_21 = 0;
+                uint8_t background_red_22 = 255;
+                uint8_t background_green_23 = 255;
+                uint8_t background_blue_24 = 0;
+                uint8_t bits_25;
+                uint8_t attr_26;
+                bool ula_screen__27 = false;
+                uint8_t ula_red_28 = 0;
+                uint8_t ula_green_29 = 0;
+                uint8_t ula_blue_30 = 0;
+                uint8_t plasma_red_31;
+                uint8_t plasma_green_32;
+                uint8_t plasma_blue_33;
+                bool running_34 = true;
+                SDL_Event event_35;
+                int sdl_mouse_x_36 = 0;
+                int sdl_mouse_y_37 = 0;
+                bool sdl_mouse_pressed__38 = false;
+                while (running_34) {
+                  while (SDL_PollEvent(&event_35)) {
+                    if (event_35.type == SDL_QUIT) {
+                      running_34 = false;
+                    }
+                  }
+                  int sdl_mouse_x_39;
+                  int sdl_mouse_y_40;
+                  const uint32_t sdl_mouse_state_41 = SDL_GetMouseState(&sdl_mouse_x_39, &sdl_mouse_y_40);
+                  mouse_x_14 = sdl_mouse_x_39 / 2;
+                  mouse_y_15 = sdl_mouse_y_40 / 2;
+                  mouse_pressed__16 = (sdl_mouse_state_41 & 1) != 0;
+                  int index_42 = 0;
+                  while (index_42 != 559104) {
+                    if (pixel_cycle_counter_5 == 0) {
+                      bar_counter_21 += 1;
+                      if (bar_counter_21 == 4630) {
+                        bar_counter_21 = 0;
+                        background_red_22 = ~background_red_22;
+                        background_green_23 = ~background_green_23;
+                        background_blue_24 = ~background_blue_24;
+                      }
+                      ula_screen__27 = video_x_3 >= 48 && video_x_3 < 304 && (video_y_4 >= 48 && video_y_4 < 240);
+                      if (ula_screen__27) {
+                        const int ula_x_43 = video_x_3 - 48;
+                        const int ula_y_44 = video_y_4 - 48;
+                        const bool read__45 = (ula_x_43 & 7) == 0;
+                        if (read__45) {
+                          const int addr_x_46 = ula_x_43 >> 3 & 31;
+                          const int bits_addr_47 = addr_x_46 | (ula_y_44 & 192 | (ula_y_44 & 7) << 3 | (ula_y_44 & 56) >> 3) << 5;
+                          const int load_addr_48 = frame_counter_17 << 1;
+                          const bool bits__49 = bits_addr_47 >> 3 > load_addr_48;
+                          bits_25 = bits__49 ? 255 : scr_20[bits_addr_47];
+                          const int attr_addr_50 = 6144 | addr_x_46 | ula_y_44 >> 3 << 5;
+                          const bool attr__51 = attr_addr_50 >> 3 > load_addr_48;
+                          attr_26 = attr__51 ? 7 : scr_20[attr_addr_50];
+                        }
+                        const bool pixel_on__52 = (bits_25 & 128) != 0;
+                        bits_25 = bits_25 << 1;
+                        const bool flash_on__53 = (attr_26 & 128) != 0;
+                        const bool alternate_on__54 = (frame_counter_17 & 16) != 0;
+                        const bool ink_on__55 = flash_on__53 && alternate_on__54 ? !pixel_on__52 : pixel_on__52;
+                        const bool red__56 = (attr_26 & (ink_on__55 ? 2 : 16)) != 0;
+                        const bool green__57 = (attr_26 & (ink_on__55 ? 4 : 32)) != 0;
+                        const bool blue__58 = (attr_26 & (ink_on__55 ? 1 : 8)) != 0;
+                        const bool bright__59 = (attr_26 & 64) != 0;
+                        const uint8_t color_60 = bright__59 ? 255 : 187;
+                        ula_red_28 = red__56 ? color_60 : 0;
+                        ula_green_29 = green__57 ? color_60 : 0;
+                        ula_blue_30 = blue__58 ? color_60 : 0;
+                      }
+                      plasma_red_31 = frame_counter_17 - video_x_3;
+                      plasma_green_32 = frame_counter_17 - video_y_4;
+                      plasma_blue_33 = frame_counter_17 + (video_x_3 * video_y_4 >> 6);
+                      if (ula_screen__27) {
+                        const bool plasma__61 = video_x_3 >= mouse_x_14 && video_y_4 >= mouse_y_15 || video_x_3 < mouse_x_14 && video_y_4 < mouse_y_15;
+                        if (plasma__61 ^ mouse_pressed__16) {
+                          red_6 = ula_red_28;
+                          green_7 = ula_green_29;
+                          blue_8 = ula_blue_30;
+                        } else {
+                          red_6 = plasma_red_31;
+                          green_7 = plasma_green_32;
+                          blue_8 = plasma_blue_33;
+                        }
+                      } else {
+                        red_6 = background_red_22;
+                        green_7 = background_green_23;
+                        blue_8 = background_blue_24;
+                      }
+                      const bool frame_start__62 = video_x_3 == 0 && video_y_4 == 0;
+                      if (frame_start__62) {
+                        frame_counter_17 += 1;
+                      }
+                    }
+                    if (pixel_cycle_counter_5 == 0) {
+                      const bool h_video__63 = video_x_3 < 352;
+                      const bool v_video__64 = video_y_4 < 288;
+                      const bool video__65 = h_video__63 && v_video__64;
+                      if (video__65) {
+                        *pixel_ref_13 = 255;
+                        pixel_ref_13 += 1;
+                        *pixel_ref_13 = red_6;
+                        pixel_ref_13 += 1;
+                        *pixel_ref_13 = green_7;
+                        pixel_ref_13 += 1;
+                        *pixel_ref_13 = blue_8;
+                        pixel_ref_13 += 1;
+                      }
+                    }
+                    pixel_cycle_counter_5 += 1;
+                    if (pixel_cycle_counter_5 == 4) {
+                      pixel_cycle_counter_5 = 0;
+                      video_x_3 += 1;
+                      if (video_x_3 == 448) {
+                        video_x_3 = 0;
+                        video_y_4 += 1;
+                        if (video_y_4 == 312) {
+                          video_y_4 = 0;
+                          pixel_ref_13 = pixels_12;
+                        }
+                      }
+                    }
+                    index_42 += 1;
+                  }
+                  if (SDL_UpdateTexture(texture_11, 0, pixels_12, 1408) != 0) {
+                    printf("%s SDL Error: %s\n", "Could not update texture.", SDL_GetError());
+                  } else {
+                    if (SDL_RenderCopy(renderer_10, texture_11, 0, 0) != 0) {
+                      printf("%s SDL Error: %s\n", "Could not render copy.", SDL_GetError());
+                    } else {
+                      SDL_RenderPresent(renderer_10);
+                    }
+                  }
                 }
+                SDL_Quit();
+                SDL_DestroyWindow(window_9);
+                SDL_DestroyRenderer(renderer_10);
+                SDL_DestroyTexture(texture_11);
+                free(pixels_12);
+                SDL_RWclose(rw_ops_18);
+                free(scr_20);
               }
             }
-            SDL_Quit();
-            SDL_DestroyWindow(window_11);
-            SDL_DestroyRenderer(renderer_12);
-            SDL_DestroyTexture(texture_13);
-            free(pixels_14);
           }
         }
       }
     }
   }
 }
-

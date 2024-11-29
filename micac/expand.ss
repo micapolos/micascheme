@@ -4,14 +4,41 @@
     expand-lhs
     expand-instr
     expand-instrs
-    expand-top-level
-    expand-top-levels)
+    expand-top-level)
   (import (micascheme) (syntax scope) (micac keywords) (syntax scoped))
 
   (define (scoped+syntax $scoped $syntax)
     (scoped-map
       ($syntaxes $scoped)
       (push $syntaxes $syntax)))
+
+  (define (expand-top-level $scope $syntax)
+    (syntax-case $syntax (import)
+      ((type (name param ...) body ...)
+        (lets
+          ($scoped-params
+            (fold-left
+              scoped-syntaxes+param
+              (scoped $scope (stack))
+              (syntaxes param ...)))
+          #`(type (name #,@(reverse (scoped-value $scoped-params)))
+            #,@(expand-instrs
+              (scoped-scope $scoped-params)
+              #'(body ...)))))
+      ((import x ...)
+        $syntax)))
+
+  (define (scoped-syntaxes+param $scoped $param)
+    (parameterize ((scope-gen? #f))
+      (syntax-case $param ()
+        ((type declarator)
+          (lets
+            ($scoped-declarator (declarator->scoped-syntax (scoped-scope $scoped) #'declarator))
+            (scoped
+              (scoped-scope $scoped-declarator)
+              (push
+                (scoped-value $scoped)
+                #`(type #,(scoped-value $scoped-declarator)))))))))
 
   (define (expand-instrs $scope $syntax)
     (fluent $scope
@@ -22,20 +49,6 @@
 
   (define (expand-instr $scope $syntax)
     (force-single (expand-instrs $scope #`(#,$syntax))))
-
-  (define (expand-top-level $scope $syntax)
-    (syntax-case $syntax (import)
-      ((type (name param ...) body ...)
-        #`(type (name param ...)
-          #,@(expand-instrs $scope #'(body ...))))
-      (other
-        #'other)))
-
-  (define (expand-top-levels $scope $syntax)
-    (syntaxes->syntax
-      (map
-        (partial expand-top-level $scope)
-        (unbegin-syntaxes $syntax))))
 
   (define (scoped+instrs $scoped $instrs)
     (syntax-case $instrs (defer break-if)

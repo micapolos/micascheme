@@ -228,15 +228,17 @@
         #f)))
 
   (define (scope-type-expr->typed $scope $expected-type $expr)
-    (lets
-      ($typed (scope-expr->typed $scope $expr))
-      ($type (typed-type $typed))
-      (if (type=? $type $expected-type)
-        $typed
-        (syntax-error $expr
-          (format "type mismatch ~a, expected ~a in"
-            (syntax->datum $type)
-            (syntax->datum $expected-type))))))
+    (if (integer? (syntax->datum $expr))
+      (typed $expected-type (syntax->datum $expr))
+      (lets
+        ($typed (scope-expr->typed $scope $expr))
+        ($type (typed-type $typed))
+        (if (type=? $type $expected-type)
+          $typed
+          (syntax-error $expr
+            (format "type mismatch ~a, expected ~a in"
+              (syntax->datum $type)
+              (syntax->datum $expected-type)))))))
 
   (define (scope-expr->typed $scope $expr)
     (or

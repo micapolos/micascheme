@@ -24,14 +24,14 @@
 
 (check
   (equal?
-    (micac-c
+    (micac-statements-c
       (set x 10))
     (lines-string
       "x = 10;")))
 
 (check
   (equal?
-    (micac-c
+    (micac-statements-c
       (add-all x 10 20 30))
     (lines-string
       "x += 10;"
@@ -40,14 +40,26 @@
 
 (check
   (equal?
-    (micac-c
+    (micac-statements-c
       (set x (sum)))
     (lines-string
       "x = 0;")))
 
 (check
   (equal?
-    (micac-c
+    (micac-statements-c
       (set x (sum x x x)))
     (lines-string
       "x = x + x + x;")))
+
+(check
+  (equal?
+    (micac-c
+      (import stdlib)
+      (int (add (int x) (int y))
+        (return (+ x y))))
+    (lines-string
+      "#import <stdlib>"
+      "int add(int x, int y) {"
+      "  return x + y;"
+      "}")))
