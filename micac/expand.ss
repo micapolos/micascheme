@@ -13,7 +13,7 @@
       (push $syntaxes $syntax)))
 
   (define (expand-top-level $scope $syntax)
-    (syntax-case $syntax (import)
+    (syntax-case $syntax (include)
       ((type (name param ...) body ...)
         (lets
           ($scoped-params
@@ -25,7 +25,7 @@
             #,@(expand-instrs
               (scoped-scope $scoped-params)
               #'(body ...)))))
-      ((import x ...)
+      ((include x ...)
         $syntax)))
 
   (define (scoped-syntaxes+param $scoped $param)

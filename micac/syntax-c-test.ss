@@ -316,12 +316,12 @@
   (lines-string "SDL_CopyTexture(x, SDL_Rect(0, 0, 20, 30));"))
 
 (check-top-level-c
-  (import "foo/bar.h")
-  (lines-string "#import \"foo/bar.h\""))
+  (include "foo/bar.h")
+  (lines-string "#include \"foo/bar.h\""))
 
 (check-top-level-c
-  (import foo/bar.h)
-  (lines-string "#import <foo/bar.h>"))
+  (include foo/bar.h)
+  (lines-string "#include <foo/bar.h>"))
 
 (check-top-level-c
   (int (add (int a) (int b))

@@ -11,7 +11,7 @@
   (export (import (micac keywords)))
   (export (import (only (syntaxes) literals)))
   (export (import (only (scheme)
-    import
+    include
     = < <= > >= + - * div
     begin if
     and or not

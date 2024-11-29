@@ -211,12 +211,12 @@
     (begin (if x (then (a)) (else (c) (b)))))
 
   (check-top-level
-    (import "foo")
-    (import "foo"))
+    (include "foo")
+    (include "foo"))
 
   (check-top-level
-    (import bar)
-    (import bar))
+    (include bar)
+    (include bar))
 
   (check-top-level
     (int (inc (int x))

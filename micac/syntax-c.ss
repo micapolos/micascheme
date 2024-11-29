@@ -96,21 +96,21 @@
           (instrs-code #f $instrs)))))
 
   (define (top-level-code $top-level)
-    (syntax-case $top-level (import)
-      ((import id)
+    (syntax-case $top-level (include)
+      ((include id)
         (switch (datum id)
           ((string? $string)
             (newline-ended-code
               (space-separated-code
-                (code "#import")
+                (code "#include")
                 (string-code (format "~s" $string)))))
           ((symbol? $symbol)
             (newline-ended-code
               (space-separated-code
-                (code "#import")
+                (code "#include")
                 (string-code (format "<~a>" $symbol)))))
           ((else $other)
-            (syntax-error #'id "invalid import"))))
+            (syntax-error #'id "invalid include"))))
       ((type (name param ...) body ...)
         (newline-ended-code
           (code

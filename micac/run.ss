@@ -7,10 +7,10 @@
 
   (define-rule-syntax (micac-string instr ...)
     (micac-c
-      (import stdlib.h)
-      (import stdio.h)
-      (import stdbool.h)
-      (import SDL.h)
+      (include stdlib.h)
+      (include stdio.h)
+      (include stdbool.h)
+      (include SDL.h)
       (int (main) instr ...)))
 
   (define-rule-syntax (micac-run instr ...)
