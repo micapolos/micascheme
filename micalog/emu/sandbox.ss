@@ -66,7 +66,7 @@
 
           (wire plasma?
             (xor
-              (> video-x mouse-x)
+              (>= video-x mouse-x)
               (< video-y mouse-y)))
 
           (wire plasma-red (take (wrap- frame-counter video-x) 8))

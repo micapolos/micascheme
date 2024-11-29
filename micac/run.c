@@ -126,7 +126,7 @@ int main() {
                         frame_counter_30 = frame_counter_30 + 1 & 4294967295;
                       }
                       const bool screen__52 = _video_x_22 >= 48 && _video_x_22 < 304 && (_video_y_23 >= 48 && _video_y_23 < 240);
-                      const bool plasma__53 = _video_x_22 > _mouse_x_24 ^ _video_y_23 < _mouse_y_25;
+                      const bool plasma__53 = _video_x_22 >= _mouse_x_24 ^ _video_y_23 < _mouse_y_25;
                       const uint8_t plasma_red_54 = frame_counter_30 - _video_x_22 & 4294967295 & 255;
                       const uint8_t plasma_green_55 = frame_counter_30 - _video_y_23 & 4294967295 & 255;
                       const uint8_t plasma_blue_56 = frame_counter_30 + (_video_x_22 * _video_y_23 >> 6) & 255;
