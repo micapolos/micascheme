@@ -55,11 +55,11 @@
 (check
   (equal?
     (micac-c
-      (import stdlib)
+      (include stdlib.h)
       (int (add (int x) (int y))
         (return (+ x y))))
     (lines-string
-      "#import <stdlib>"
+      "#include <stdlib.h>"
       "int add(int x, int y) {"
       "  return x + y;"
       "}")))
