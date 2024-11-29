@@ -1,5 +1,5 @@
 (library (micac syntax-c)
-  (export syntax-c)
+  (export syntax-c top-level-c)
   (import
     (micascheme)
     (code)
@@ -67,6 +67,13 @@
       (other
         (literal->expr #'other))))
 
+  (define (param->code $param)
+    (syntax-case $param ()
+      ((type declarator)
+        (space-separated-code
+          (type->code #'type)
+          (declarator->code #'declarator)))))
+
   (define (instrs-code $top-level? $instrs)
     (syntax-case $instrs ()
       (() (code ""))
@@ -87,6 +94,40 @@
       (code-indent
         (code "\n"
           (instrs-code #f $instrs)))))
+
+  (define (top-level-code $top-level)
+    (syntax-case $top-level (import)
+      ((import id)
+        (switch (datum id)
+          ((string? $string)
+            (newline-ended-code
+              (space-separated-code
+                (code "#import")
+                (string-code (format "~s" $string)))))
+          ((symbol? $symbol)
+            (newline-ended-code
+              (space-separated-code
+                (code "#import")
+                (string-code (format "<~a>" $symbol)))))
+          ((else $other)
+            (syntax-error #'id "invalid import"))))
+      ((type (name param ...) body ...)
+        (newline-ended-code
+          (code
+            (space-separated-code
+              (type->code #'type)
+              (code
+                (identifier->code #'name)
+                (code-in-round-brackets
+                  (list->separated-code (code ", ")
+                    (map param->code (syntaxes param ...)))))
+              (block-code (syntaxes body ...))))))))
+
+  (define (top-levels-code $top-levels)
+    (list->code
+      (intercalate
+        (map top-level-code $top-levels)
+        (code "\n"))))
 
   (define (instr-code $allow-return? $instr)
     (syntax-case $instr
@@ -334,4 +375,7 @@
       ((body ...)
         (code-string
           (instrs-code #t #'(body ...))))))
+
+  (define (top-level-c $top-level)
+    (code-string (top-level-code $top-level)))
 )

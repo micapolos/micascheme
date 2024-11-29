@@ -1,11 +1,16 @@
 (import (micascheme) (micac keywords) (micac syntax-c))
 
-(define-aux-keywords micac lines)
+(define-aux-keywords micac)
 
 (define-syntax check-c-string
-  (syntax-rules (micac lines)
+  (syntax-rules (micac)
     ((_ (micac instr ...) string)
       (check (equal? (syntax-c #'(instr ...)) string)))))
+
+(define-syntax check-top-level-c
+  (syntax-rules (micac)
+    ((_ top-level string)
+      (check (equal? (top-level-c #'top-level) string)))))
 
 (check-c-string
   (micac)
@@ -309,3 +314,19 @@
 (check-c-string
   (micac (SDL_CopyTexture x (SDL_Rect 0 0 20 30)))
   (lines-string "SDL_CopyTexture(x, SDL_Rect(0, 0, 20, 30));"))
+
+(check-top-level-c
+  (import "foo/bar.h")
+  (lines-string "#import \"foo/bar.h\""))
+
+(check-top-level-c
+  (import foo/bar.h)
+  (lines-string "#import <foo/bar.h>"))
+
+(check-top-level-c
+  (int (add (int a) (int b))
+    (return (+ a b)))
+  (lines-string
+    "int add(int a, int b) {"
+    "  return a + b;"
+    "}"))
