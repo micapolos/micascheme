@@ -1,4 +1,4 @@
-(library (micac syntax)
+(library (micac keywords)
   (export
     const var
     set

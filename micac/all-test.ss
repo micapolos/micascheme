@@ -3,7 +3,7 @@
 (test
   (micac expr)
   (micac expand)
-  (micac syntax)
+  (micac keywords)
   (micac c)
   (micac syntax-c)
   (syntax scope)

@@ -4,7 +4,7 @@
     expand-lhs
     expand-instr
     expand-instrs)
-  (import (micascheme) (syntax scope) (micac syntax) (syntax scoped))
+  (import (micascheme) (syntax scope) (micac keywords) (syntax scoped))
 
   (define (scoped+syntax $scoped $syntax)
     (scoped-map

@@ -1,4 +1,4 @@
-(import (micascheme) (micac syntax) (micac syntax-c))
+(import (micascheme) (micac keywords) (micac syntax-c))
 
 (define-aux-keywords micac lines)
 

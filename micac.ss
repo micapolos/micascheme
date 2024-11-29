@@ -5,10 +5,10 @@
     (syntax)
     (list-syntax)
     (syntaxes)
-    (micac syntax)
+    (micac keywords)
     (micac c)
     (micac run))
-  (export (import (micac syntax)))
+  (export (import (micac keywords)))
   (export (import (only (syntaxes) literals)))
   (export (import (only (scheme)
     = < <= > >= + - * div
