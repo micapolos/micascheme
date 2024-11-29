@@ -154,7 +154,7 @@
         (op2->verilog #'%%nor #'a #'b))
       ((%xnor type a b)
         (op2->verilog #'%%xnor #'a #'b))
-      ; Fix these to mask
+      ; TODO: Select bits from type
       ((%wrap+ type a b)
         (op2->verilog #'%%+ #'a #'b))
       ((%wrap- type a b)
