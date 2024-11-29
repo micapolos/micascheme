@@ -8,6 +8,10 @@
 
   (define-lookup-syntax (lets $syntax $lookup)
     (syntax-case $syntax (values lambda rec run)
+      ((_ (run body ...) $decls ... $result)
+        #'(let ()
+          body ...
+          (lets $decls ... $result)))
       ((_ ((values $id ...) $expr) $decls ... $result)
         #'(call-with-values
           (lambda () $expr)

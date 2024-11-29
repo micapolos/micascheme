@@ -1,4 +1,4 @@
-(import (scheme) (check) (lets) (binder) (list) (syntax))
+(import (scheme) (check) (lets) (binder) (list) (syntax) (procedure))
 
 (check (equal? (lets 1) 1))
 
@@ -93,3 +93,13 @@
       ((cons $a $b) (cons "a" "b"))
       (string-append $a $b))
     "ab"))
+
+(check
+  (equal?
+    (lets
+      ($string "a")
+      (run
+        (set! $string (string-append $string "b"))
+        (set! $string (string-append $string "c")))
+      $string)
+    "abc"))
