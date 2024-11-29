@@ -54,7 +54,7 @@
       (run (when $code ($code #t 0 $port)))
       (get-output-string $port)))
 
-  (define (list->code $codes)
+  (define-list->/append (code $codes)
     (and
       (exists identity $codes)
       (lambda ($line-start? $indent $port)
@@ -68,9 +68,6 @@
 
   (define (list->separated-code $separator $codes)
     (list->code (intercalate $codes $separator)))
-
-  (define (code-append . $codes)
-    (list->code $codes))
 
   (define (char-code $char)
     (case $char
