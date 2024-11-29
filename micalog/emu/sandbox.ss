@@ -61,8 +61,8 @@
 
           (wire screen?
             (and
-              (and (in-range< video-x 48 304))
-              (and (in-range< video-y 48 240))))
+              (in-range< video-x 48 304)
+              (in-range< video-y 48 240)))
 
           (wire plasma?
             (xor
