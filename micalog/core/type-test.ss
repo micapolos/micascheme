@@ -72,25 +72,50 @@
 (check-typed (expr (%= bin-1101 hex-af)) (1 (%= 8 #b1101 #xaf)))
 
 (check-typed (expr (%not bin-1101)) (4 (%not 4 #b1101)))
+
+(check-typed (raises (expr (%and))))
+(check-typed (expr (%and bin-1101)) (4 #b1101))
 (check-typed (expr (%and bin-1101 hex-a)) (4 (%and 4 #b1101 #xa)))
+(check-typed (expr (%and bin-1101 hex-a hex-f)) (4 (%and 4 (%and 4 #b1101 #xa) #xf)))
+
+(check-typed (raises (expr (%or))))
+(check-typed (expr (%or bin-1101)) (4 #b1101))
 (check-typed (expr (%or bin-1101 hex-a)) (4 (%or 4 #b1101 #xa)))
+(check-typed (expr (%or bin-1101 hex-a hex-f)) (4 (%or 4 (%or 4 #b1101 #xa) #xf)))
+
+(check-typed (raises (expr (%xor))))
+(check-typed (expr (%xor bin-1101)) (4 #b1101))
 (check-typed (expr (%xor bin-1101 hex-a)) (4 (%xor 4 #b1101 #xa)))
+(check-typed (expr (%xor bin-1101 hex-a hex-f)) (4 (%xor 4 (%xor 4 #b1101 #xa) #xf)))
+
+(check-typed (raises (expr (%nand))))
+(check-typed (expr (%nand bin-1101)) (4 #b1101))
 (check-typed (expr (%nand bin-1101 hex-a)) (4 (%nand 4 #b1101 #xa)))
+(check-typed (expr (%nand bin-1101 hex-a hex-f)) (4 (%nand 4 (%nand 4 #b1101 #xa) #xf)))
+
+(check-typed (raises (expr (%nor))))
+(check-typed (expr (%nor bin-1101)) (4 #b1101))
 (check-typed (expr (%nor bin-1101 hex-a)) (4 (%nor 4 #b1101 #xa)))
+(check-typed (expr (%nor bin-1101 hex-a hex-f)) (4 (%nor 4 (%nor 4 #b1101 #xa) #xf)))
+
+(check-typed (raises (expr (%xnor))))
+(check-typed (expr (%xnor bin-1101)) (4 #b1101))
 (check-typed (expr (%xnor bin-1101 hex-a)) (4 (%xnor 4 #b1101 #xa)))
+(check-typed (expr (%xnor bin-1101 hex-a hex-f)) (4 (%xnor 4 (%xnor 4 #b1101 #xa) #xf)))
 
-(check-typed (expr (%wrap- bin-1101)) (4 (%wrap- 4 #b1101)))
-(check-typed (expr (%- bin-1101)) (5 (%- 5 #b1101)))
-
+(check-typed (raises (expr (%wrap+))))
+(check-typed (expr (%wrap+ bin-1101)) (4 #b1101))
 (check-typed (expr (%wrap+ bin-1101 hex-a)) (4 (%wrap+ 4 #b1101 #xa)))
+(check-typed (expr (%wrap+ bin-1101 hex-a hex-f)) (4 (%wrap+ 4 (%wrap+ 4 #b1101 #xa) #xf)))
+
+(check-typed (raises (expr (%wrap-))))
+(check-typed (expr (%wrap- bin-1101)) (4 (%wrap- 4 #b1101)))
 (check-typed (expr (%wrap- bin-1101 hex-a)) (4 (%wrap- 4 #b1101 #xa)))
-(check-typed (expr (%wrap* bin-1101 hex-a)) (4 (%wrap* 4 #b1101 #xa)))
+(check-typed (expr (%wrap- bin-1101 hex-a hex-f)) (4 (%wrap- 4 (%wrap- 4 #b1101 #xa) #xf)))
 
 (check-typed (expr (%+ bin-1101 hex-a)) (5 (%+ 5 #b1101 #xa)))
 (check-typed (expr (%- bin-1101 hex-a)) (5 (%- 5 #b1101 #xa)))
 (check-typed (expr (%* bin-1101 hex-a)) (8 (%* 8 #b1101 #xa)))
-
-(check-typed (expr (%wrap+ bin-1101 1)) (4 (%wrap+ 4 #b1101 1)))
 
 (check-typed (expr (%if bin-1 bin-1101 hex-a)) (4 (%if 4 #b1 #b1101 #xa)))
 
