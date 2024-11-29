@@ -10,7 +10,9 @@
     single? single force-single
     ordered-map
     map-using
+    map-find
     filter-using
+    find-using
     bind-if
     opt-lets
     opt-lift
@@ -46,7 +48,9 @@
 
     group-by
     product
-    map-product)
+    map-product
+
+    define-list->/append)
 
   (import
     (scheme)
@@ -190,6 +194,14 @@
       (else (syntax-error $syntax))))
 
   ; --------------------------------------
+
+  (define (map-find $proc $list)
+    (switch $list
+      ((null? _) #f)
+      ((else $pair)
+        (or
+          ($proc (car $pair))
+          (map-find $proc (cdr $pair))))))
 
   (define (map-find-indexed $proc $list)
     (map-find-indexed+ $proc $list 0))
@@ -349,9 +361,21 @@
   (define (filter-using $list $fn)
     (filter $fn $list))
 
+  (define (find-using $list $fn)
+    (find $fn $list))
+
   (define (opt->list $opt)
     (if $opt (list $opt) (list)))
 
   (define (non-false-list . $item)
     (filter-opts $item))
+
+  (define-case-syntax (define-list->/append (id list) body ...)
+    (lets
+      ($list->id (identifier-append #'define-list->/append #'list-> #'id))
+      ($append-id (identifier-append #'define-list->/append #'id #'- #'append))
+      #`(begin
+        (define (#,$list->id list) body ...)
+        (define (#,$append-id . list) (#,$list->id list)))))
+
 )

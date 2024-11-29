@@ -109,7 +109,7 @@
         (define-case-syntax ($name $param ...) () $body))
       ((_ ($name $param ...) $keywords $body)
         (define-case-syntax $name $keywords
-          ((_ $param ...) $body)))
+          (($name $param ...) $body)))
       ((_ $name $keywords $case ...)
         (define-syntax $name
           (lambda ($tmp)

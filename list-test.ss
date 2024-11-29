@@ -1,4 +1,4 @@
-(import (scheme) (list) (check) (data) (lets) (stack) (indexed) (generate) (failure) (procedure))
+(import (scheme) (list) (check) (data) (lets) (stack) (indexed) (generate) (failure) (procedure) (boolean))
 
 ; === binder ===
 
@@ -67,6 +67,15 @@
 (check (equal? (associ (list (cons `a `foo) (cons `b `bar)) 100 `a) (cons 100 `foo)))
 (check (equal? (associ (list (cons `a `foo) (cons `b `bar)) 100 `b) (cons 101 `bar)))
 (check (equal? (associ (list (cons `a `foo) (cons `b `bar)) 100 `c) #f))
+
+; === map-find ===
+
+(lets
+  ($proc (lambda ($item) (and (odd? $item) (+ $item 100))))
+  (run
+    (check (equal? (map-find $proc (list 1 2 3)) 101))
+    (check (equal? (map-find $proc (list 2 3 4)) 103))
+    (check (false? (map-find $proc (list 2 4))))))
 
 ; === map-find-indexed ===
 
@@ -395,3 +404,11 @@
 ; === not-false-list ===
 
 (check (equal? (non-false-list 1 #f 2) (list 1 2)))
+
+; === define-list->/append
+
+(run
+  (define-list->/append (stack $list) (reverse $list))
+  (check-equal? (list->stack (list 1 2 3)) (list 3 2 1))
+  (check-equal? (stack-append 1 2 3) (list 3 2 1)))
+

@@ -10,7 +10,9 @@
     scope-transform
     scope-unbound
     scope-gen?
-    scope-with)
+    scope-with
+    list->scope
+    scope-append)
   (import (micascheme))
 
   (define scope-gen?
@@ -63,4 +65,10 @@
   (define-rule-syntax (scope-with (id item) ...)
     (fluent (empty-scope)
       (scope+ #'id #'item) ...))
+
+  (define-list->/append (scope $scopes)
+    (lambda ($id)
+      (map-find
+        (lambda ($scope) ($scope $id))
+        $scopes)))
 )
