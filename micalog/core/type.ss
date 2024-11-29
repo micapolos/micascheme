@@ -310,11 +310,8 @@
       ((op a b)
         (lets
           ($typed-a (scope-expr->typed $scope #'a))
-          ($typed-b (scope-expr->typed $scope #'b))
-          ($size-a (type-size (typed-type $typed-a)))
-          ($size-b (type-size (typed-type $typed-b)))
-          ($size (max $size-a $size-b))
-          ($type (size->type $size))
+          ($type (typed-type $typed-a))
+          ($typed-b (scope-type-expr->typed $scope $type #'b))
           (typed $type
             #`(op #,$type
               #,(typed-value $typed-a)
