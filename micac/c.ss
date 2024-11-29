@@ -32,7 +32,7 @@
   (define-syntax (micac-c $syntax $lookup)
     (syntax-case $syntax ()
       ((_ instr ...)
-        (datum->syntax #'+
+        (datum->syntax #'micac-c
           (syntax-c
             #`(
               #,@(expand-instrs $lookup
