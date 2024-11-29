@@ -44,6 +44,9 @@
       (scope+expr nand op2)
       (scope+expr nor op2)
       (scope+expr xnor op2)
+      (scope+expr wrap+ op2)
+      (scope+expr wrap- op1/2)
+      (scope+expr wrap* op2)
       (scope+expr + additive2)
       (scope+expr - additive1/2)
       (scope+expr * multiplicative2)
@@ -53,7 +56,6 @@
       (scope+instr wire)
       (scope+instr register)
       (scope+instr set)
-      (scope+instr set-take)
       (scope+instr cond)
       (scope+instr on)
       (scope+instr repeat)
@@ -318,6 +320,11 @@
               #,(typed-value $typed-a)
               #,(typed-value $typed-b)))))))
 
+  (define (scope-op1/2->typed $scope $expr)
+    (syntax-case $expr ()
+      ((_ _) (scope-op1->typed $scope $expr))
+      ((_ _ _) (scope-op2->typed $scope $expr))))
+
   (define (scope-additive2->typed $scope $expr)
     (syntax-case $expr ()
       ((op a b)
@@ -492,15 +499,6 @@
             (syntax-error #'expr
               (format "invalid type ~a, expected <= ~a in" $size $id-size)))))))
 
-  (define (gen?-scoped-syntaxes+set-take $gen? (scoped $scope $syntaxes) $set-take)
-    (syntax-case $set-take ()
-      ((%set-take id expr)
-        (lets
-          ($id-binding (scope-id-kinds->binding $scope (identifier id) (kinds %register)))
-          ($id-type (binding-type $id-binding))
-          (gen?-scoped-syntaxes+instr $gen? (scoped $scope $syntaxes)
-            #`(%set id (%take expr #,$id-type)))))))
-
   (define (gen?-scoped-syntaxes+cond $gen? (scoped $scope $syntaxes) $cond)
     (syntax-case $cond (%else)
       ((%cond clause ... (%else els ...))
@@ -573,7 +571,7 @@
   (define (gen?-scoped-syntaxes+instr $gen? $scoped $instr)
     (lets
       ((scoped $scope $syntaxes) $scoped)
-      (syntax-case $instr (%input %output %wire %register %set %set-take %cond %else %on %macro %repeat %log)
+      (syntax-case $instr ()
         ((id arg ...)
           (switch (scope-item $scope (identifier id))
             ((instr-typer? $instr-typer)

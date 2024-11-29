@@ -4,11 +4,12 @@
     macro repeat
     on posedge negedge edge
     cond else
-    register set set-take
+    register set
     wire assign
     int
     = != < <= > >=
     append take drop
+    wrap+ wrap- wrap*
     + - *
     if
     and or xor nand nor xnor not
@@ -20,11 +21,12 @@
     macro repeat
     on posedge negedge edge
     cond else
-    register set set-take
+    register set
     wire assign
     int
     = != < <= > >=
     append take drop
+    wrap+ wrap- wrap*
     + - *
     if
     and or xor nand nor xnor not

@@ -105,7 +105,7 @@
           #`(#,(- (datum number) 1) %%to 0)))))
 
   (define (expr->verilog $expr)
-    (syntax-case $expr (%append %take %drop %= %!= %< %<= %> %>= %if %not %and %or %xor %nand %nor %xnor %+ %- %*)
+    (syntax-case $expr (%append %take %drop %= %!= %< %<= %> %>= %if %not %and %or %xor %nand %nor %xnor %wrap+ %wrap- %wrap* %+ %- %*)
       ((%append (type expr) ...)
         #`(%%append
           #,@(map expr->verilog (syntaxes expr ...))))
@@ -154,6 +154,15 @@
         (op2->verilog #'%%nor #'a #'b))
       ((%xnor type a b)
         (op2->verilog #'%%xnor #'a #'b))
+      ; Fix these to mask
+      ((%wrap+ type a b)
+        (op2->verilog #'%%+ #'a #'b))
+      ((%wrap- type a b)
+        (op2->verilog #'%%- #'a #'b))
+      ((%wrap* type a b)
+        (op2->verilog #'%%* #'a #'b))
+      ((%wrap- type a)
+        (op->verilog #'%%- #'a))
       ((%+ type a b)
         (op2->verilog #'%%+ #'a #'b))
       ((%- type a b)

@@ -79,13 +79,18 @@
 (check-typed (expr (%nor bin-1101 hex-a)) (4 (%nor 4 #b1101 #xa)))
 (check-typed (expr (%xnor bin-1101 hex-a)) (4 (%xnor 4 #b1101 #xa)))
 
+(check-typed (expr (%wrap- bin-1101)) (4 (%wrap- 4 #b1101)))
 (check-typed (expr (%- bin-1101)) (5 (%- 5 #b1101)))
+
+(check-typed (expr (%wrap+ bin-1101 hex-a)) (4 (%wrap+ 4 #b1101 #xa)))
+(check-typed (expr (%wrap- bin-1101 hex-a)) (4 (%wrap- 4 #b1101 #xa)))
+(check-typed (expr (%wrap* bin-1101 hex-a)) (4 (%wrap* 4 #b1101 #xa)))
 
 (check-typed (expr (%+ bin-1101 hex-a)) (5 (%+ 5 #b1101 #xa)))
 (check-typed (expr (%- bin-1101 hex-a)) (5 (%- 5 #b1101 #xa)))
 (check-typed (expr (%* bin-1101 hex-a)) (8 (%* 8 #b1101 #xa)))
 
-(check-typed (expr (%+ bin-1101 1)) (5 (%+ 5 #b1101 1)))
+(check-typed (expr (%wrap+ bin-1101 1)) (4 (%wrap+ 4 #b1101 1)))
 
 (check-typed (expr (%if bin-1 bin-1101 hex-a)) (4 (%if 4 #b1 #b1101 #xa)))
 
@@ -97,7 +102,7 @@
 ; raise on re-declaration
 (check-typed-syntax (raises (scope-instr $scope (%input %input))))
 (check-typed-syntax (raises (scope-instr $scope (%input %wire))))
-(check-typed-syntax (raises (scope-instr $scope (%input %+))))
+(check-typed-syntax (raises (scope-instr $scope (%input %if))))
 (check-typed-syntax (raises (scope-instr $scope (%input %macro))))
 (check-typed-syntax (raises (scope-instr $scope (%input %int))))
 (check-typed-syntax (raises (scope-instr $scope (%input bin-000))))
@@ -115,8 +120,6 @@
 (check-typed-syntax (scope-instr $scope (%set reg-foo-4 bar-4)) (%set 4 reg-foo-4 bar-4))
 (check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-4))))
 (check-typed-syntax (raises (scope-instr $scope (%set reg-foo-4 bar-8))))
-
-(check-typed-syntax (scope-instr $scope (%set-take reg-foo-4 bar-8)) (%set 4 reg-foo-4 (%take 4 bar-8 4)))
 
 (check-typed-syntax
   (scope-instrs $scope ((%wire goo-4 bin-1010) (%set reg-foo-4 goo-4)))
@@ -264,21 +267,21 @@
 (check-typed-syntax
   (scope-instrs $scope
     (
-      (%macro (double a) (%+ a a))
-      (%set reg-foo-4 (%take (double foo-4) 4))))
-  ((%set 4 reg-foo-4 (%take 4 (%+ 5 foo-4 foo-4) 4))))
+      (%macro (double a) (%wrap+ a a))
+      (%set reg-foo-4 (double foo-4))))
+  ((%set 4 reg-foo-4 (%wrap+ 4 foo-4 foo-4))))
 
 (check-typed-syntax
   (scope-instrs $scope
     (
-      (%macro (double expr) (%+ expr expr))
+      (%macro (double expr) (%wrap+ expr expr))
       (%macro (local-register param)
         (%register 8 local)
-        (%set local (%take (double param) 8)))
+        (%set local (double param)))
       (local-register foo-8)))
   (
     (%register 8 local_0)
-    (%set 8 local_0 (%take 8 (%+ 9 foo-8 foo-8) 8))))
+    (%set 8 local_0 (%wrap+ 8 foo-8 foo-8))))
 
 (check-typed-syntax
   (scope-instrs $scope

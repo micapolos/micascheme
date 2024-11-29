@@ -69,8 +69,8 @@
               (> video-x mouse-x)
               (< video-y mouse-y)))
 
-          (wire plasma-red (take (- frame-counter video-x) 8))
-          (wire plasma-green (take (- frame-counter video-y) 8))
+          (wire plasma-red (take (wrap- frame-counter video-x) 8))
+          (wire plasma-green (take (wrap- frame-counter video-y) 8))
           (wire plasma-blue (take (+ frame-counter (drop (* video-x video-y) 6)) 8))
 
           (wire screen-red (if plasma? plasma-red hex-dd))

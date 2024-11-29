@@ -39,6 +39,11 @@
 (check-verilog (expr (%nor 16 a b)) (%%nor a b))
 (check-verilog (expr (%xnor 16 a b)) (%%xnor a b))
 
+(check-verilog (expr (%wrap+ 16 a b)) (%%+ a b))
+(check-verilog (expr (%wrap- 16 a b)) (%%- a b))
+(check-verilog (expr (%wrap* 16 a b)) (%%* a b))
+(check-verilog (expr (%wrap- 16 a)) (%%- a))
+
 (check-verilog (expr (%+ 16 a b)) (%%+ a b))
 (check-verilog (expr (%- 16 a b)) (%%- a b))
 (check-verilog (expr (%* 16 a b)) (%%* a b))
@@ -90,7 +95,7 @@
       (%%set! goo gar))))
 
 (check-verilog
-  (instr (%log result 2 (%+ 2 foo bar)))
+  (instr (%log result 2 (%wrap+ 2 foo bar)))
   (%%display "result %d" (%%+ foo bar)))
 
 (check-verilog

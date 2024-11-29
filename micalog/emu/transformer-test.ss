@@ -64,14 +64,15 @@
 (check-micac (expr (%> 6 a b)) (%%> a b))
 (check-micac (expr (%>= 6 a b)) (%%>= a b))
 
+(check-micac (expr (%wrap+ 6 a b)) (%%bitwise-and (%%+ a b) #x3f))
+(check-micac (expr (%wrap- 6 a b)) (%%bitwise-and (%%- a b) #x3f))
+(check-micac (expr (%wrap* 6 a b)) (%%bitwise-and (%%* a b) #x3f))
+(check-micac (expr (%wrap- 6 a)) (%%bitwise-and (%%- a) #x3f))
+
 (check-micac (expr (%+ 6 a b)) (%%+ a b))
 (check-micac (expr (%- 6 a b)) (%%- a b))
 (check-micac (expr (%* 6 a b)) (%%* a b))
 (check-micac (expr (%- 6 a)) (%%- a))
-
-(check-micac (expr (%+ 8 a b)) (%%+ a b))
-(check-micac (expr (%- 8 a b)) (%%- a b))
-(check-micac (expr (%- 8 a)) (%%- a))
 
 (check-micac (expr (%and 1 a b)) (%%and a b))
 (check-micac (expr (%or 1 a b)) (%%or a b))
@@ -81,29 +82,24 @@
 (check-micac (expr (%or 6 a b)) (%%bitwise-ior a b))
 (check-micac (expr (%xor 6 a b)) (%%bitwise-xor a b))
 
-(check-micac (expr (%nand 1 a b)) (%%not (%%and a b)))
-(check-micac (expr (%nor 1 a b)) (%%not (%%or a b)))
-(check-micac (expr (%xnor 1 a b)) (%%not (%%bitwise-xor a b)))
+(check-micac (expr (%nand 1 a b)) (%%bitwise-and (%%not (%%and a b)) 1))
+(check-micac (expr (%nor 1 a b)) (%%bitwise-and (%%not (%%or a b)) 1))
+(check-micac (expr (%xnor 1 a b)) (%%bitwise-and (%%not (%%bitwise-xor a b)) 1))
 
 (check-micac (expr (%nand 6 a b)) (%%bitwise-and (%%bitwise-not (%%bitwise-and a b)) #x3f))
 (check-micac (expr (%nor 6 a b)) (%%bitwise-and (%%bitwise-not (%%bitwise-ior a b)) #x3f))
 (check-micac (expr (%xnor 6 a b)) (%%bitwise-and (%%bitwise-not (%%bitwise-xor a b)) #x3f))
 
-(check-micac (expr (%nand 8 a b)) (%%bitwise-not (%%bitwise-and a b)))
-(check-micac (expr (%nor 8 a b)) (%%bitwise-not (%%bitwise-ior a b)))
-(check-micac (expr (%xnor 8 a b)) (%%bitwise-not (%%bitwise-xor a b)))
-
-(check-micac (expr (%not 1 a)) (%%not a))
+(check-micac (expr (%not 1 a)) (%%bitwise-and (%%not a) 1))
 (check-micac (expr (%not 6 a)) (%%bitwise-and (%%bitwise-not a) #x3f))
-(check-micac (expr (%not 8 a)) (%%bitwise-not a))
 
 (check-micac (expr (%if 6 a b c)) (%%if a b c))
 
 (check-micac
   (expr (%if 6 (%not 1 a) (%not 6 b) (%and 6 c d)))
   (%%if
-    (%%not a)
-    (%%bitwise-and (%%bitwise-not b) 63)
+    (%%bitwise-and (%%not a) 1)
+    (%%bitwise-and (%%bitwise-not b) #x3f)
     (%%bitwise-and c d)))
 
 ; === registers ===
@@ -131,8 +127,8 @@
   (%%set foo bar))
 
 (check-micac
-  (instruction (%log foo 16 (%+ 16 1 2)))
-  (%%printf "%s: %u\\n" "foo" (%%+ 1 2)))
+  (instruction (%log foo 16 (%wrap+ 16 1 2)))
+  (%%printf "%s: %u\\n" "foo" (%%bitwise-and (%%+ 1 2) #xffff)))
 
 (check-micac
   (instruction (%on (%posedge prev next)))
@@ -189,7 +185,7 @@
       (%register 16 counter)
       (%on (%posedge prev-clock clock)
         (%wire 16 previous-counter counter)
-        (%set 16 counter (%+ 16 previous-counter 1)))))
+        (%set 16 counter (%wrap+ 16 previous-counter 1)))))
   (%%run-emu
     (%%video 352 288 96 24 4)
     (%%var bool clock 0)
@@ -199,7 +195,7 @@
       (%%when (%%not (%%= prev-clock clock))
         (%%when (%%= clock 1)
           (%%const uint16_t previous-counter counter)
-          (%%set counter (%%+ previous-counter 1)))))))
+          (%%set counter (%%bitwise-and (%%+ previous-counter 1) #xffff)))))))
 
 (check-micac
   (module
@@ -235,7 +231,7 @@
       (%%set %mouse-x %%mouse-x)
       (%%set %mouse-y %%mouse-y)
       (%%set %mouse-pressed? %%mouse-pressed?)
-      (%%var bool inv-clock (%%not %clock))
+      (%%var bool inv-clock (%%bitwise-and (%%not %clock) 1))
       (%%var uint8_t %video-red 20)
       (%%var uint8_t %video-green 30)
       (%%var uint8_t %video-blue 40)

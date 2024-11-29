@@ -89,7 +89,7 @@ int main() {
                 uint8_t video_blue_51 = blue_37;
                 if (old_clock_4_38 != clock_19) {
                   if (clock_19 == 1) {
-                    half_clock_34 = !half_clock_34;
+                    half_clock_34 = !half_clock_34 & 1;
                   }
                 }
                 old_clock_4_38 = clock_19;
@@ -107,29 +107,29 @@ int main() {
                       green_36 = 0;
                       blue_37 = 0;
                     } else {
-                      red_counter_27 = red_counter_27 + 1;
-                      green_counter_28 = green_counter_28 + 1;
-                      blue_counter_29 = blue_counter_29 + 1;
+                      red_counter_27 = red_counter_27 + 1 & 4294967295;
+                      green_counter_28 = green_counter_28 + 1 & 4294967295;
+                      blue_counter_29 = blue_counter_29 + 1 & 4294967295;
                       if (red_counter_27 > 9980) {
                         red_counter_27 = 0;
-                        bar_red_31 = ~bar_red_31;
+                        bar_red_31 = ~bar_red_31 & 255;
                       }
                       if (green_counter_28 > 9960) {
                         green_counter_28 = 0;
-                        bar_green_32 = ~bar_green_32;
+                        bar_green_32 = ~bar_green_32 & 255;
                       }
                       if (blue_counter_29 > 9950) {
                         blue_counter_29 = 0;
-                        bar_blue_33 = ~bar_blue_33;
+                        bar_blue_33 = ~bar_blue_33 & 255;
                       }
                       if (_video_x_22 == 0 && _video_y_23 == 0) {
-                        frame_counter_30 = frame_counter_30 + 1;
+                        frame_counter_30 = frame_counter_30 + 1 & 4294967295;
                       }
                       const bool screen__52 = _video_x_22 >= 48 && _video_x_22 < 304 && (_video_y_23 >= 48 && _video_y_23 < 240);
                       const bool plasma__53 = _video_x_22 > _mouse_x_24 ^ _video_y_23 < _mouse_y_25;
-                      const uint8_t plasma_red_54 = frame_counter_30 - _video_x_22;
-                      const uint8_t plasma_green_55 = frame_counter_30 - _video_y_23;
-                      const uint8_t plasma_blue_56 = frame_counter_30 + (_video_x_22 * _video_y_23 >> 6);
+                      const uint8_t plasma_red_54 = frame_counter_30 - _video_x_22 & 4294967295 & 255;
+                      const uint8_t plasma_green_55 = frame_counter_30 - _video_y_23 & 4294967295 & 255;
+                      const uint8_t plasma_blue_56 = frame_counter_30 + (_video_x_22 * _video_y_23 >> 6) & 255;
                       const uint8_t screen_red_57 = plasma__53 ? plasma_red_54 : 221;
                       const uint8_t screen_green_58 = plasma__53 ? plasma_green_55 : 221;
                       const uint8_t screen_blue_59 = plasma__53 ? plasma_blue_56 : 221;
