@@ -122,7 +122,7 @@ int main() {
                         blue_counter_29 = 0;
                         bar_blue_33 = ~bar_blue_33 & 255;
                       }
-                      if (_video_x_22 == 0 && _video_y_23 == 0) {
+                      if ((_video_x_22 | _video_y_23) == 0) {
                         frame_counter_30 = frame_counter_30 + 1 & 4294967295;
                       }
                       const bool screen__52 = _video_x_22 >= 48 && _video_x_22 < 304 && (_video_y_23 >= 48 && _video_y_23 < 240);

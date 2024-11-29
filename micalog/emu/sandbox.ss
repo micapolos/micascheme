@@ -56,13 +56,13 @@
           (when (> blue-counter 9950)
             (set blue-counter 0)
             (set-not bar-blue))
-          (when (and (= video-x 0) (= video-y 0))
+          (when (zero? (or video-x video-y))
             (inc frame-counter))
 
           (wire screen?
             (and
-              (and (>= video-x 48) (< video-x 304))
-              (and (>= video-y 48) (< video-y 240))))
+              (and (in-range< video-x 48 304))
+              (and (in-range< video-y 48 240))))
 
           (wire plasma?
             (xor
