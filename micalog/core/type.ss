@@ -89,19 +89,18 @@
       (instr-typer #,(identifier-append #'id #'gen?-scoped-syntaxes+ #'id))))
 
   (define (binding-kind $binding)
-    (syntax-case $binding ()
-      ((kind type name) #'kind)))
+    (syntax-case (cdr $binding) ()
+      ((kind type) #'kind)))
 
   (define (binding-type $binding)
-    (syntax-case $binding ()
-      ((kind type name) #'type)))
+    (syntax-case (cdr $binding) ()
+      ((kind type) #'type)))
 
   (define (binding-name $binding)
-    (syntax-case $binding ()
-      ((kind type name) #'name)))
+    (car $binding))
 
   (define (binding $kind $type $name)
-    #`(#,$kind #,$type #,$name))
+    (pair $name #`(#,$kind #,$type)))
 
   (define (type->syntax $type)
     (literal->syntax (type-size $type)))
