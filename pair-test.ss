@@ -15,3 +15,13 @@
 (check-equal?
   (map-cdr (partial + 1) (cons 10 20))
   (cons 10 21))
+
+; === with-car / with-cdr ===
+
+(check-equal?
+  (with-car ($car (cons "foo" "bar")) (string-append $car "!"))
+  (cons "foo!" "bar"))
+
+(check-equal?
+  (with-cdr ($car (cons "foo" "bar")) (string-append $car "!"))
+  (cons "foo" "bar!"))
