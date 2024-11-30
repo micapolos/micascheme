@@ -5,7 +5,7 @@
     lookup-undefined-id
     lookup+undefined
     lookup-gen
-    lookup-value
+    lookup-ref
     lookup-transformer
     lookup-transform
     lookup-unbound
@@ -21,7 +21,7 @@
   (define (empty-lookup)
     (lambda (_) #f))
 
-  (define (lookup-value $lookup $id)
+  (define (lookup-ref $lookup $id)
     (or
       ($lookup $id)
       (lookup-unbound $id)))

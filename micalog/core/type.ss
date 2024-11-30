@@ -172,7 +172,7 @@
       (syntax-error $literal "invalid literal")))
 
   (define (scope-id->binding $lookup $id)
-    (switch (lookup-value $lookup $id)
+    (switch (lookup-ref $lookup $id)
       ((procedure? _)
         (syntax-error $id "macro"))
       ((literal-typer? _)
@@ -191,7 +191,7 @@
     (list #'kind ...))
 
   (define (scope-id-kinds->binding $lookup $id $kinds)
-    (switch (lookup-value $lookup $id)
+    (switch (lookup-ref $lookup $id)
       ((procedure? _)
         (syntax-error $id "macro"))
       ((literal-typer? _)
@@ -247,7 +247,7 @@
   (define (scope-default-expr->typed $lookup $expr)
     (syntax-case $expr ()
       ((id arg ...)
-        (switch (lookup-value $lookup (identifier id))
+        (switch (lookup-ref $lookup (identifier id))
           ((literal-typer? $literal-typer)
             (app (literal-typer-fn $literal-typer) $expr))
           ((expr-typer? $expr-typer)
@@ -587,7 +587,7 @@
       ((scoped $lookup $syntaxes) $scoped)
       (syntax-case $instr ()
         ((id arg ...)
-          (switch (lookup-value $lookup (identifier id))
+          (switch (lookup-ref $lookup (identifier id))
             ((instr-typer? $instr-typer)
               (fluent $instr-typer
                 (instr-typer-fn)

@@ -264,7 +264,7 @@
             ((else $other)
               #`(if #,$cond #,$then #,$else)))))
       ((id arg ...) (identifier? #'id)
-        (switch (lookup-value $lookup #'id)
+        (switch (lookup-ref $lookup #'id)
           ((identifier? $identifier)
             #`(
               #,$identifier
@@ -276,7 +276,7 @@
               (unbegin-syntax
                 (lookup-transform $lookup $transformer $expr))))))
       (id (identifier? #'id)
-        (switch (lookup-value $lookup #'id)
+        (switch (lookup-ref $lookup #'id)
           ((identifier? $identifier)
             $identifier)
           ((else $transformer)

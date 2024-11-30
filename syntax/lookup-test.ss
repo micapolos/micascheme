@@ -13,9 +13,9 @@
     (check-datum=? ($lookup #'one) #'1)
     (check (false? ($lookup #'two)))
 
-    (check-datum=? (lookup-value $lookup #'zero) #'0)
-    (check-datum=? (lookup-value $lookup #'one) #'1)
-    (check (raises (lookup-value $lookup #'two)))
+    (check-datum=? (lookup-ref $lookup #'zero) #'0)
+    (check-datum=? (lookup-ref $lookup #'one) #'1)
+    (check (raises (lookup-ref $lookup #'two)))
 
     (check (raises (lookup+undefined $lookup #'one 11)))))
 
