@@ -2,6 +2,7 @@
   (export
     empty-scope
     scope+
+    scope-undefined-id
     scope+undefined
     scope-gen
     scope-ref
@@ -35,10 +36,13 @@
         $item
         (scope-ref $scope $lookup-id))))
 
-  (define (scope+undefined $scope $id $item)
+  (define (scope-undefined-id $scope $id)
     (if (scope-ref $scope $id)
       (syntax-error $id "already defined")
-      (scope+ $scope $id $item)))
+      $id))
+
+  (define (scope+undefined $scope $id $item)
+    (scope+ $scope (scope-undefined-id $scope $id) $item))
 
   (define (scope-gen $scope $id)
     (lets

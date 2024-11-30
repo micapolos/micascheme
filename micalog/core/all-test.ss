@@ -2,6 +2,7 @@
 
 (test
   (micalog core scope)
+  (micalog core env)
   (micalog core utils)
   (micalog core type)
   (micalog core domain))
