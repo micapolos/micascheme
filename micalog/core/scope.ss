@@ -10,7 +10,7 @@
     scope-commit)
   (import
     (micascheme)
-    (prefix (syntax lookup) syntax-))
+    (syntax lookup))
 
   (data (scope renamed-id-lookup id-value-lookup))
 
@@ -26,43 +26,43 @@
       (id-value-lookup->scope)))
 
   (define (id-value-lookup->scope $id-value-lookup)
-    (scope (syntax-empty-lookup) $id-value-lookup))
+    (scope (empty-lookup) $id-value-lookup))
 
   (define (empty-scope)
-    (id-value-lookup->scope (syntax-empty-lookup)))
+    (id-value-lookup->scope (empty-lookup)))
 
   (define (scope+renamed (scope $renamed-id-lookup $id-value-lookup) $id $renamed-id)
     (scope
-      (syntax-lookup+undefined
+      (lookup+undefined
         $renamed-id-lookup
-        (syntax-lookup-undefined-id $id-value-lookup $id)
+        (lookup-undefined-id $id-value-lookup $id)
         $renamed-id)
       $id-value-lookup))
 
   (define (scope+ (scope $renamed-id-lookup $id-value-lookup) $id $value)
     (scope
       $renamed-id-lookup
-      (syntax-lookup+undefined
+      (lookup+undefined
         $id-value-lookup
-        (syntax-lookup-undefined-id $renamed-id-lookup $id)
+        (lookup-undefined-id $renamed-id-lookup $id)
         (pair $id $value))))
 
   (define (scope+gen (scope $renamed-id-lookup $id-value-lookup) $id $value)
     (lets
       ($renamed-id (generate-identifier $id))
       (scope
-        (syntax-lookup+undefined $renamed-id-lookup $id $renamed-id)
-        (syntax-lookup+undefined $id-value-lookup $renamed-id (pair $renamed-id $value)))))
+        (lookup+undefined $renamed-id-lookup $id $renamed-id)
+        (lookup+undefined $id-value-lookup $renamed-id (pair $renamed-id $value)))))
 
   (define (scope-ref? (scope $renamed-id-lookup $id-value-lookup) $id)
     (lets
-      ($renamed-id (or (syntax-lookup-ref $renamed-id-lookup $id) $id))
-      (syntax-lookup-ref $id-value-lookup $renamed-id)))
+      ($renamed-id (or (lookup-ref $renamed-id-lookup $id) $id))
+      (lookup-ref $id-value-lookup $renamed-id)))
 
   (define (scope-ref $scope $id)
     (or
       (scope-ref? $scope $id)
-      (syntax-error "undefined" $id)))
+      (error "undefined" $id)))
 
   (define (scope-commit $scope)
     (id-value-lookup->scope (partial scope-ref? $scope)))
