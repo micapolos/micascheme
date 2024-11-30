@@ -1,21 +1,21 @@
-(import (micascheme) (micac expand) (micac keywords) (syntax scope))
+(import (micascheme) (micac expand) (micac keywords) (syntax lookup))
 
-(parameterize ((scope-gen? #f))
+(parameterize ((lookup-gen? #f))
   (define-aux-keywords zero one two)
 
   (define $scope
-    (fluent (empty-scope)
-      (scope+ #'bar #'bar)
-      (scope+ #'ten #'ten)
-      (scope+ #'a #'a)
-      (scope+ #'b #'b)
-      (scope+ #'c #'c)
-      (scope+ #'x #'x)
-      (scope+ #'gar #'gar)
-      (scope+ #'zero (lambda _ #'0))
-      (scope+ #'one (lambda _ #'1))
-      (scope+ #'two (lambda _ #'2))
-      (scope+ #'foo
+    (fluent (empty-lookup)
+      (lookup+ #'bar #'bar)
+      (lookup+ #'ten #'ten)
+      (lookup+ #'a #'a)
+      (lookup+ #'b #'b)
+      (lookup+ #'c #'c)
+      (lookup+ #'x #'x)
+      (lookup+ #'gar #'gar)
+      (lookup+ #'zero (lambda _ #'0))
+      (lookup+ #'one (lambda _ #'1))
+      (lookup+ #'two (lambda _ #'2))
+      (lookup+ #'foo
         (syntax-rules ()
           ((_ xs ...) (bar xs ...))))))
 

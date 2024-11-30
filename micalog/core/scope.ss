@@ -10,7 +10,7 @@
     scope-commit)
   (import
     (micascheme)
-    (prefix (syntax scope) syntax-))
+    (prefix (syntax lookup) syntax-))
 
   (data (scope renamed-id-lookup id-value-lookup))
 
@@ -26,38 +26,38 @@
       (id-value-lookup->scope)))
 
   (define (id-value-lookup->scope $id-value-lookup)
-    (scope (syntax-empty-scope) $id-value-lookup))
+    (scope (syntax-empty-lookup) $id-value-lookup))
 
   (define (empty-scope)
-    (id-value-lookup->scope (syntax-empty-scope)))
+    (id-value-lookup->scope (syntax-empty-lookup)))
 
   (define (scope+renamed (scope $renamed-id-lookup $id-value-lookup) $id $renamed-id)
     (scope
-      (syntax-scope+undefined
+      (syntax-lookup+undefined
         $renamed-id-lookup
-        (syntax-scope-undefined-id $id-value-lookup $id)
+        (syntax-lookup-undefined-id $id-value-lookup $id)
         $renamed-id)
       $id-value-lookup))
 
   (define (scope+ (scope $renamed-id-lookup $id-value-lookup) $id $value)
     (scope
       $renamed-id-lookup
-      (syntax-scope+undefined
+      (syntax-lookup+undefined
         $id-value-lookup
-        (syntax-scope-undefined-id $renamed-id-lookup $id)
+        (syntax-lookup-undefined-id $renamed-id-lookup $id)
         (pair $id $value))))
 
   (define (scope+gen (scope $renamed-id-lookup $id-value-lookup) $id $value)
     (lets
       ($renamed-id (generate-identifier $id))
       (scope
-        (syntax-scope+undefined $renamed-id-lookup $id $renamed-id)
-        (syntax-scope+undefined $id-value-lookup $renamed-id (pair $renamed-id $value)))))
+        (syntax-lookup+undefined $renamed-id-lookup $id $renamed-id)
+        (syntax-lookup+undefined $id-value-lookup $renamed-id (pair $renamed-id $value)))))
 
   (define (scope-ref? (scope $renamed-id-lookup $id-value-lookup) $id)
     (lets
-      ($renamed-id (or (syntax-scope-ref $renamed-id-lookup $id) $id))
-      (syntax-scope-ref $id-value-lookup $renamed-id)))
+      ($renamed-id (or (syntax-lookup-ref $renamed-id-lookup $id) $id))
+      (syntax-lookup-ref $id-value-lookup $renamed-id)))
 
   (define (scope-ref $scope $id)
     (or

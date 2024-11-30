@@ -10,28 +10,28 @@
     scoped-map)
   (import
     (micascheme)
-    (syntax scope))
+    (syntax lookup))
 
   (data (scoped scope value))
 
   (define (scoped+ $scoped $id $item)
     (scoped
-      (scope+ (scoped-scope $scoped) $id $item)
+      (lookup+ (scoped-scope $scoped) $id $item)
       (scoped-value $scoped)))
 
   (define (scoped-ref $scoped $id)
-    (scope-ref (scoped-scope $scoped) $id))
+    (lookup-ref (scoped-scope $scoped) $id))
 
   (define (scoped-gen $scope $id)
     (lets
-      ((pair $scope $identifier) (scope-gen $scope $id))
+      ((pair $scope $identifier) (lookup-gen $scope $id))
       (scoped $scope $identifier)))
 
   (define (scoped-transformer $scoped $id)
-    (scope-transformer (scoped-scope $scoped) $id))
+    (lookup-transformer (scoped-scope $scoped) $id))
 
   (define (scoped-transform $scoped $transformer $syntax)
-    (scope-transform (scoped-scope $scoped) $transformer $syntax))
+    (lookup-transform (scoped-scope $scoped) $transformer $syntax))
 
   (define-rule-syntax (scoped-with scoped-expr value)
     (scoped (scoped-scope scoped-expr) value))

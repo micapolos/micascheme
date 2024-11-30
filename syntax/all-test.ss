@@ -1,4 +1,4 @@
 (import (micascheme))
 
 (test
-  (syntax scope))
+  (syntax lookup))

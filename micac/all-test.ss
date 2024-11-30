@@ -6,7 +6,7 @@
   (micac keywords)
   (micac c)
   (micac syntax-c)
-  (syntax scope)
+  (syntax lookup)
   (micac expand)
   (micac run)
   (micac lib all))

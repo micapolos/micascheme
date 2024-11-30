@@ -1,7 +1,7 @@
 (import
   (micascheme)
   (micalog core type)
-  (syntax scope)
+  (syntax lookup)
   (prefix (micalog keywords) %))
 
 (define-check-datum-> typed)
@@ -9,18 +9,18 @@
 (define-check-datum-> syntax)
 
 (define $scope
-  (fluent (empty-scope)
+  (fluent (empty-lookup)
     (scope+core)
-    (scope+undefined #'foo-1 (pair #'foo-1 #'(%wire 1)))
-    (scope+undefined #'bar-1 (pair #'bar-1 #'(%wire 1)))
-    (scope+undefined #'foo-4 (pair #'foo-4 #'(%wire 4)))
-    (scope+undefined #'bar-4 (pair #'bar-4 #'(%wire 4)))
-    (scope+undefined #'foo-8 (pair #'foo-8 #'(%wire 8)))
-    (scope+undefined #'bar-8 (pair #'bar-8 #'(%wire 8)))
-    (scope+undefined #'reg-foo-4 (pair #'reg-foo-4 #'(%register 4)))
-    (scope+undefined #'reg-bar-4 (pair #'reg-bar-4 #'(%register 4)))
-    (scope+undefined #'reg-bar-8 (pair #'reg-bar-8 #'(%register 8)))
-    (scope+undefined #'zoo-1 (pair #'renamed-zoo-1 #'(%wire 1)))))
+    (lookup+undefined #'foo-1 (pair #'foo-1 #'(%wire 1)))
+    (lookup+undefined #'bar-1 (pair #'bar-1 #'(%wire 1)))
+    (lookup+undefined #'foo-4 (pair #'foo-4 #'(%wire 4)))
+    (lookup+undefined #'bar-4 (pair #'bar-4 #'(%wire 4)))
+    (lookup+undefined #'foo-8 (pair #'foo-8 #'(%wire 8)))
+    (lookup+undefined #'bar-8 (pair #'bar-8 #'(%wire 8)))
+    (lookup+undefined #'reg-foo-4 (pair #'reg-foo-4 #'(%register 4)))
+    (lookup+undefined #'reg-bar-4 (pair #'reg-bar-4 #'(%register 4)))
+    (lookup+undefined #'reg-bar-8 (pair #'reg-bar-8 #'(%register 8)))
+    (lookup+undefined #'zoo-1 (pair #'renamed-zoo-1 #'(%wire 1)))))
 
 (check-syntax (type 1) 1)
 (check-syntax (type 8) 8)

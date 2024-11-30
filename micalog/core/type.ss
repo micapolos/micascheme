@@ -16,7 +16,7 @@
     scope+core)
   (import
     (micascheme)
-    (syntax scope)
+    (syntax lookup)
     (syntax scoped)
     (only (micalog core utils) opposite-edges?)
     (prefix (micalog keywords) %))
@@ -65,7 +65,7 @@
   (define (scope+id-item $scope $id $item)
     (if (radix->typed? $id)
       (syntax-error $id "can not redefine literal")
-      (scope+undefined $scope $id $item)))
+      (lookup+undefined $scope $id $item)))
 
   (define-syntax (scope+literal $syntax)
     (syntax-case $syntax ()
@@ -172,7 +172,7 @@
       (syntax-error $literal "invalid literal")))
 
   (define (scope-id->binding $scope $id)
-    (switch (scope-item $scope $id)
+    (switch (lookup-value $scope $id)
       ((procedure? _)
         (syntax-error $id "macro"))
       ((literal-typer? _)
@@ -191,7 +191,7 @@
     (list #'kind ...))
 
   (define (scope-id-kinds->binding $scope $id $kinds)
-    (switch (scope-item $scope $id)
+    (switch (lookup-value $scope $id)
       ((procedure? _)
         (syntax-error $id "macro"))
       ((literal-typer? _)
@@ -220,7 +220,7 @@
         #,(binding-name $binding))))
 
   (define (scope-id->transformer? $scope $id)
-    (switch (scope-ref $scope $id)
+    (switch (lookup-ref $scope $id)
       ((procedure? $transformer)
         $transformer)
       ((else _)
@@ -247,7 +247,7 @@
   (define (scope-default-expr->typed $scope $expr)
     (syntax-case $expr ()
       ((id arg ...)
-        (switch (scope-item $scope (identifier id))
+        (switch (lookup-value $scope (identifier id))
           ((literal-typer? $literal-typer)
             (app (literal-typer-fn $literal-typer) $expr))
           ((expr-typer? $expr-typer)
@@ -263,7 +263,7 @@
         (scope-id->typed $scope (identifier id)))))
 
   (define (expr->typed $expr)
-    (scope-expr->typed (scope+core (empty-scope)) $expr))
+    (scope-expr->typed (scope+core (empty-lookup)) $expr))
 
   (define (scope-op1->typed $scope $expr)
     (syntax-case $expr ()
@@ -587,7 +587,7 @@
       ((scoped $scope $syntaxes) $scoped)
       (syntax-case $instr ()
         ((id arg ...)
-          (switch (scope-item $scope (identifier id))
+          (switch (lookup-value $scope (identifier id))
             ((instr-typer? $instr-typer)
               (fluent $instr-typer
                 (instr-typer-fn)
@@ -621,7 +621,7 @@
     (gen?-scope-instrs->typed-syntax #f $scope $instrs))
 
   (define (module->typed-syntax $module)
-    (scope-module->typed-syntax (scope+core (empty-scope)) $module))
+    (scope-module->typed-syntax (scope+core (empty-lookup)) $module))
 
   (define (scope-module->typed-syntax $scope $module)
     (syntax-case $module ()

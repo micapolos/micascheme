@@ -5,7 +5,7 @@
     expand-instr
     expand-instrs
     expand-top-level)
-  (import (micascheme) (syntax scope) (micac keywords) (syntax scoped))
+  (import (micascheme) (syntax lookup) (micac keywords) (syntax scoped))
 
   (define (scoped+syntax $scoped $syntax)
     (scoped-map
@@ -29,7 +29,7 @@
         $syntax)))
 
   (define (scoped-syntaxes+param $scoped $param)
-    (parameterize ((scope-gen? #f))
+    (parameterize ((lookup-gen? #f))
       (syntax-case $param ()
         ((type declarator)
           (lets
@@ -82,7 +82,7 @@
     (syntax-case $declarator (*)
       (id (identifier? #'id)
         (lets
-          ((pair $scope $identifier) (scope-gen $scope #'id))
+          ((pair $scope $identifier) (lookup-gen $scope #'id))
           (scoped $scope $identifier)))
       ((* decl)
         (scoped-map
@@ -175,7 +175,7 @@
           (scoped+syntax $scoped
             #`(return #,(expand-expr $scope #'expr))))
         ((id arg ...) (identifier? #'id)
-          (switch (scope-ref $scope #'id)
+          (switch (lookup-ref $scope #'id)
             ((identifier? $identifier)
               (scoped+syntax $scoped
                 #`(
@@ -187,7 +187,7 @@
               (scoped+instrs $scoped
                 #`(
                   #,@(unbegin-syntaxes
-                    (scope-transform $scope $transformer $instr))))))))))
+                    (lookup-transform $scope $transformer $instr))))))))))
 
   (define (expand-clause $scope $clause)
     (syntax-case $clause ()
@@ -264,7 +264,7 @@
             ((else $other)
               #`(if #,$cond #,$then #,$else)))))
       ((id arg ...) (identifier? #'id)
-        (switch (scope-item $scope #'id)
+        (switch (lookup-value $scope #'id)
           ((identifier? $identifier)
             #`(
               #,$identifier
@@ -274,15 +274,15 @@
           ((else $transformer)
             (expand-expr $scope
               (unbegin-syntax
-                (scope-transform $scope $transformer $expr))))))
+                (lookup-transform $scope $transformer $expr))))))
       (id (identifier? #'id)
-        (switch (scope-item $scope #'id)
+        (switch (lookup-value $scope #'id)
           ((identifier? $identifier)
             $identifier)
           ((else $transformer)
             (expand-expr $scope
               (unbegin-syntax
-                (scope-transform $scope $transformer $expr))))))
+                (lookup-transform $scope $transformer $expr))))))
       (other #'other)))
 
   (define (expand-op1 $scope $syntax $test? $proc)
@@ -344,7 +344,7 @@
         (expand-identifier $scope #'id))))
 
   (define (expand-identifier $scope $id)
-    (switch (scope-ref $scope $id)
+    (switch (lookup-ref $scope $id)
       ((identifier? $identifier)
         $identifier)
       ((else $transformer)

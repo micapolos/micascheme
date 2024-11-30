@@ -6,7 +6,7 @@
   (import
     (micascheme)
     (micalog core utils)
-    (syntax scope)
+    (syntax lookup)
     (prefix (micalog keywords) %))
 
   (define (timed-domain $timed)
@@ -18,25 +18,25 @@
       ((type value)
         #`(%async type value))))
 
-  (define (scope-name->timed $scope $name)
+  (define (scope-name->timed $lookup $name)
     (syntax-case $name ()
       ((type name)
         #'(
-          #,(scope-ref $scope (identifier name))
+          #,(lookup-ref $lookup (identifier name))
           type name))))
 
-  ; (define (scope-expr->timed $scope $expr)
+  ; (define (scope-expr->timed $lookup $expr)
   ;   (syntax-case $expr ()
   ;     ((type value)
   ;       (syntax-case #'value ()
   ;         (name (identifier? #'name)
-  ;           #`(#,(scope-ref $scope #'name) type name))
+  ;           #`(#,(lookup-ref $lookup #'name) type name))
   ;         ((%and xs ...)
-  ;           (scope-type-op->timed $scope #'type #'value))
+  ;           (scope-type-op->timed $lookup #'type #'value))
   ;         (literal (integer? (datum literal))
   ;           #`(%async type literal))))))
 
-  ; (define (scope-type-op2->timed $scope $type $op2)
+  ; (define (scope-type-op2->timed $lookup $type $op2)
   ;   (syntax-case $op2 ()
   ;     ((op a b)
   ;       (lets
