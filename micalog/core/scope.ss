@@ -7,6 +7,7 @@
     scope+gen
     scope+renamed
     scope-ref
+    scope->lookup
     scope-commit)
   (import
     (micascheme)
@@ -63,6 +64,10 @@
     (or
       (scope-ref? $scope $id)
       (error "undefined" $id)))
+
+  (define (scope->lookup $scope)
+    (lambda ($id)
+      (scope-ref $scope $id)))
 
   (define (scope-commit $scope)
     (id-value-lookup->scope (partial scope-ref? $scope)))
