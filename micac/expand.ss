@@ -23,7 +23,7 @@
               (syntaxes param ...)))
           #`(type (name #,@(reverse (scoped-value $scoped-params)))
             #,@(expand-instrs
-              (scoped-scope $scoped-params)
+              (scoped-lookup $scoped-params)
               #'(body ...)))))
       ((include x ...)
         $syntax)))
@@ -33,9 +33,9 @@
       (syntax-case $param ()
         ((type declarator)
           (lets
-            ($scoped-declarator (declarator->scoped-syntax (scoped-scope $scoped) #'declarator))
+            ($scoped-declarator (declarator->scoped-syntax (scoped-lookup $scoped) #'declarator))
             (scoped
-              (scoped-scope $scoped-declarator)
+              (scoped-lookup $scoped-declarator)
               (push
                 (scoped-value $scoped)
                 #`(type #,(scoped-value $scoped-declarator)))))))))

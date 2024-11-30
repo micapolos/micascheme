@@ -1,6 +1,6 @@
 (library (syntax scoped)
   (export
-    scoped scoped? scoped-scope scoped-value
+    scoped scoped? scoped-lookup scoped-value
     scoped+
     scoped-ref
     scoped-gen
@@ -12,15 +12,15 @@
     (micascheme)
     (syntax lookup))
 
-  (data (scoped scope value))
+  (data (scoped lookup value))
 
   (define (scoped+ $scoped $id $item)
     (scoped
-      (lookup+ (scoped-scope $scoped) $id $item)
+      (lookup+ (scoped-lookup $scoped) $id $item)
       (scoped-value $scoped)))
 
   (define (scoped-ref $scoped $id)
-    ((scoped-scope $scoped) $id))
+    ((scoped-lookup $scoped) $id))
 
   (define (scoped-gen $scope $id)
     (lets
@@ -28,20 +28,20 @@
       (scoped $scope $identifier)))
 
   (define (scoped-transformer $scoped $id)
-    (lookup-transformer (scoped-scope $scoped) $id))
+    (lookup-transformer (scoped-lookup $scoped) $id))
 
   (define (scoped-transform $scoped $transformer $syntax)
-    (lookup-transform (scoped-scope $scoped) $transformer $syntax))
+    (lookup-transform (scoped-lookup $scoped) $transformer $syntax))
 
   (define-rule-syntax (scoped-with scoped-expr value)
-    (scoped (scoped-scope scoped-expr) value))
+    (scoped (scoped-lookup scoped-expr) value))
 
   (define-rules-syntax
     ((scoped-map (value scoped-expr) body)
       (lets
         ($scoped scoped-expr)
         (value (scoped-value $scoped))
-        (scoped (scoped-scope $scoped) body)))
+        (scoped (scoped-lookup $scoped) body)))
     ((scoped-map decl decls ... body)
       (scoped-map decls ...
         (scoped-value (scoped-map decl body)))))
