@@ -25,8 +25,8 @@
   (data (expr-typer fn))
   (data (instr-typer fn))
 
-  (define (scope+core $scope)
-    (fluent $scope
+  (define (scope+core $lookup)
+    (fluent $lookup
       (scope+literal int)
       (scope+expr append)
       (scope+expr take)
@@ -62,10 +62,10 @@
       (scope+instr log)
       (scope+instr macro)))
 
-  (define (scope+id-item $scope $id $item)
+  (define (scope+id-item $lookup $id $item)
     (if (radix->typed? $id)
       (syntax-error $id "can not redefine literal")
-      (lookup+undefined $scope $id $item)))
+      (lookup+undefined $lookup $id $item)))
 
   (define-syntax (scope+literal $syntax)
     (syntax-case $syntax ()
@@ -171,8 +171,8 @@
       (literal->typed? $literal)
       (syntax-error $literal "invalid literal")))
 
-  (define (scope-id->binding $scope $id)
-    (switch (lookup-value $scope $id)
+  (define (scope-id->binding $lookup $id)
+    (switch (lookup-value $lookup $id)
       ((procedure? _)
         (syntax-error $id "macro"))
       ((literal-typer? _)
@@ -190,8 +190,8 @@
   (define-rule-syntax (kinds kind ...)
     (list #'kind ...))
 
-  (define (scope-id-kinds->binding $scope $id $kinds)
-    (switch (lookup-value $scope $id)
+  (define (scope-id-kinds->binding $lookup $id $kinds)
+    (switch (lookup-value $lookup $id)
       ((procedure? _)
         (syntax-error $id "macro"))
       ((literal-typer? _)
@@ -212,25 +212,25 @@
                   (syntax->datum (car $kinds))
                   `(one-of ,@(map syntax->datum $kinds))))))))))
 
-  (define (scope-id->typed $scope $id)
+  (define (scope-id->typed $lookup $id)
     (lets
-      ($binding (scope-id->binding $scope $id))
+      ($binding (scope-id->binding $lookup $id))
       #`(
         #,(binding-type $binding)
         #,(binding-name $binding))))
 
-  (define (scope-id->transformer? $scope $id)
-    (switch (lookup-ref $scope $id)
+  (define (scope-id->transformer? $lookup $id)
+    (switch ($lookup $id)
       ((procedure? $transformer)
         $transformer)
       ((else _)
         #f)))
 
-  (define (scope-type-expr->typed $scope $expected-type $expr)
+  (define (scope-type-expr->typed $lookup $expected-type $expr)
     (if (integer? (syntax->datum $expr))
       (typed $expected-type (syntax->datum $expr))
       (lets
-        ($typed (scope-expr->typed $scope $expr))
+        ($typed (scope-expr->typed $lookup $expr))
         ($type (typed-type $typed))
         (if (type=? $type $expected-type)
           $typed
@@ -239,47 +239,47 @@
               (syntax->datum $type)
               (syntax->datum $expected-type)))))))
 
-  (define (scope-expr->typed $scope $expr)
+  (define (scope-expr->typed $lookup $expr)
     (or
       (literal->typed? $expr)
-      (scope-default-expr->typed $scope $expr)))
+      (scope-default-expr->typed $lookup $expr)))
 
-  (define (scope-default-expr->typed $scope $expr)
+  (define (scope-default-expr->typed $lookup $expr)
     (syntax-case $expr ()
       ((id arg ...)
-        (switch (lookup-value $scope (identifier id))
+        (switch (lookup-value $lookup (identifier id))
           ((literal-typer? $literal-typer)
             (app (literal-typer-fn $literal-typer) $expr))
           ((expr-typer? $expr-typer)
-            (app (expr-typer-fn $expr-typer) $scope $expr))
+            (app (expr-typer-fn $expr-typer) $lookup $expr))
           ((procedure? $procedure)
             (fluent $procedure
-              (transform $expr $scope)
+              (transform $expr $lookup)
               (unbegin-syntax)
-              (let $expr (scope-expr->typed $scope $expr))))
+              (let $expr (scope-expr->typed $lookup $expr))))
           ((else $other)
             (syntax-error #'id "not expression"))))
       (id
-        (scope-id->typed $scope (identifier id)))))
+        (scope-id->typed $lookup (identifier id)))))
 
   (define (expr->typed $expr)
     (scope-expr->typed (scope+core (empty-lookup)) $expr))
 
-  (define (scope-op1->typed $scope $expr)
+  (define (scope-op1->typed $lookup $expr)
     (syntax-case $expr ()
       ((op a)
         (lets
-          ($typed-a (scope-expr->typed $scope #'a))
+          ($typed-a (scope-expr->typed $lookup #'a))
           ($type-a (typed-type $typed-a))
           (typed $type-a
             #`(op #,$type-a
               #,(typed-value $typed-a)))))))
 
-  (define (scope-additive1->typed $scope $expr)
+  (define (scope-additive1->typed $lookup $expr)
     (syntax-case $expr ()
       ((op a)
         (lets
-          ($typed-a (scope-expr->typed $scope #'a))
+          ($typed-a (scope-expr->typed $lookup #'a))
           ($type-a (typed-type $typed-a))
           ($size-a (type-size $type-a))
           ($size (+ $size-a 1))
@@ -288,15 +288,15 @@
             #`(op #,$type
               #,(typed-value $typed-a)))))))
 
-  (define (scope-relational-op2->typed $scope $expr)
-    (type-scope-op2->typed #'1 $scope $expr))
+  (define (scope-relational-op2->typed $lookup $expr)
+    (type-scope-op2->typed #'1 $lookup $expr))
 
-  (define (type-scope-op2->typed $type $scope $expr)
+  (define (type-scope-op2->typed $type $lookup $expr)
     (syntax-case $expr ()
       ((op a b)
         (lets
-          ($typed-a (scope-expr->typed $scope #'a))
-          ($typed-b (scope-expr->typed $scope #'b))
+          ($typed-a (scope-expr->typed $lookup #'a))
+          ($typed-b (scope-expr->typed $lookup #'b))
           ($size-a (type-size (typed-type $typed-a)))
           ($size-b (type-size (typed-type $typed-b)))
           ($size (max $size-a $size-b))
@@ -306,45 +306,45 @@
               #,(typed-value $typed-a)
               #,(typed-value $typed-b)))))))
 
-  (define (scope-op2->typed $scope $expr)
+  (define (scope-op2->typed $lookup $expr)
     (syntax-case $expr ()
       ((op a b)
         (lets
-          ($typed-a (scope-expr->typed $scope #'a))
+          ($typed-a (scope-expr->typed $lookup #'a))
           ($type (typed-type $typed-a))
-          ($typed-b (scope-type-expr->typed $scope $type #'b))
+          ($typed-b (scope-type-expr->typed $lookup $type #'b))
           (typed $type
             #`(op #,$type
               #,(typed-value $typed-a)
               #,(typed-value $typed-b)))))))
 
-  (define (scope-op1/2->typed $scope $expr)
+  (define (scope-op1/2->typed $lookup $expr)
     (syntax-case $expr ()
-      ((_ _) (scope-op1->typed $scope $expr))
-      ((_ _ _) (scope-op2->typed $scope $expr))))
+      ((_ _) (scope-op1->typed $lookup $expr))
+      ((_ _ _) (scope-op2->typed $lookup $expr))))
 
-  (define (scope-fold-op2->typed $scope $op)
+  (define (scope-fold-op2->typed $lookup $op)
     (syntax-case $op ()
       ((op a)
-        (scope-expr->typed $scope #'a))
+        (scope-expr->typed $lookup #'a))
       ((op a b)
-        (scope-op2->typed $scope $op))
+        (scope-op2->typed $lookup $op))
       ((op a b c ...)
-        (scope-expr->typed $scope #'(op (op a b) c ...)))))
+        (scope-expr->typed $lookup #'(op (op a b) c ...)))))
 
-  (define (scope-fold-op1/2->typed $scope $op)
+  (define (scope-fold-op1/2->typed $lookup $op)
     (syntax-case $op ()
       ((op a)
-        (scope-op1->typed $scope $op))
+        (scope-op1->typed $lookup $op))
       ((op a b ...)
-        (scope-fold-op2->typed $scope $op))))
+        (scope-fold-op2->typed $lookup $op))))
 
-  (define (scope-additive2->typed $scope $expr)
+  (define (scope-additive2->typed $lookup $expr)
     (syntax-case $expr ()
       ((op a b)
         (lets
-          ($typed-a (scope-expr->typed $scope #'a))
-          ($typed-b (scope-expr->typed $scope #'b))
+          ($typed-a (scope-expr->typed $lookup #'a))
+          ($typed-b (scope-expr->typed $lookup #'b))
           ($size-a (type-size (typed-type $typed-a)))
           ($size-b (type-size (typed-type $typed-b)))
           ($size (+ (max $size-a $size-b) 1))
@@ -354,12 +354,12 @@
               #,(typed-value $typed-a)
               #,(typed-value $typed-b)))))))
 
-  (define (scope-multiplicative2->typed $scope $expr)
+  (define (scope-multiplicative2->typed $lookup $expr)
     (syntax-case $expr ()
       ((op a b)
         (lets
-          ($typed-a (scope-expr->typed $scope #'a))
-          ($typed-b (scope-expr->typed $scope #'b))
+          ($typed-a (scope-expr->typed $lookup #'a))
+          ($typed-b (scope-expr->typed $lookup #'b))
           ($size-a (type-size (typed-type $typed-a)))
           ($size-b (type-size (typed-type $typed-b)))
           ($size (+ $size-a $size-b))
@@ -369,19 +369,19 @@
               #,(typed-value $typed-a)
               #,(typed-value $typed-b)))))))
 
-  (define (scope-additive1/2->typed $scope $expr)
+  (define (scope-additive1/2->typed $lookup $expr)
     (syntax-case $expr ()
-      ((_ _) (scope-additive1->typed $scope $expr))
-      ((_ _ _) (scope-additive2->typed $scope $expr))))
+      ((_ _) (scope-additive1->typed $lookup $expr))
+      ((_ _ _) (scope-additive2->typed $lookup $expr))))
 
-  (define (scope-if->typed $scope $if)
+  (define (scope-if->typed $lookup $if)
     (syntax-case $if (%if)
       ((%if a b c)
         (lets
-          ($typed-a (scope-type-expr->typed $scope #'1 #'a))
-          ($typed-b (scope-expr->typed $scope #'b))
+          ($typed-a (scope-type-expr->typed $lookup #'1 #'a))
+          ($typed-b (scope-expr->typed $lookup #'b))
           ($type-b (typed-type $typed-b))
-          ($typed-c (scope-type-expr->typed $scope $type-b #'c))
+          ($typed-c (scope-type-expr->typed $lookup $type-b #'c))
           (typed $type-b
             #`(%if
               #,$type-b
@@ -389,11 +389,11 @@
               #,(typed-value $typed-b)
               #,(typed-value $typed-c)))))))
 
-  (define (scope-append->typed $scope $append)
+  (define (scope-append->typed $lookup $append)
     (syntax-case $append (%append)
       ((%append expr ...)
         (lets
-          ($typeds (map (partial scope-expr->typed $scope) (syntaxes expr ...)))
+          ($typeds (map (partial scope-expr->typed $lookup) (syntaxes expr ...)))
           ($types (map typed-type $typeds))
           ($values (map typed-value $typeds))
           ($sizes (map type-size $types))
@@ -402,11 +402,11 @@
             #`(%append
               #,@(map typed $types $values)))))))
 
-  (define (scope-take->typed $scope $take)
+  (define (scope-take->typed $lookup $take)
     (syntax-case $take (%take)
       ((%take a size)
         (lets
-          ($typed-a (scope-expr->typed $scope #'a))
+          ($typed-a (scope-expr->typed $lookup #'a))
           ($type-a (typed-type $typed-a))
           ($a-size (type-size $type-a))
           ($size (type-size #'size))
@@ -422,11 +422,11 @@
                 (syntax->datum $type-a)
                 `(>= ,$size))))))))
 
-  (define (scope-drop->typed $scope $drop)
+  (define (scope-drop->typed $lookup $drop)
     (syntax-case $drop (%drop)
       ((%drop a drop)
         (lets
-          ($typed-a (scope-expr->typed $scope #'a))
+          ($typed-a (scope-expr->typed $lookup #'a))
           ($type-a (typed-type $typed-a))
           ($a-size (type-size $type-a))
           ($drop (nonnegative-number #'drop))
@@ -440,109 +440,109 @@
                 drop))
             (syntax-error #'a "invalid drop")))))) ; TODO: better message
 
-  (define (gen-scoped-binding-name $gen? $scope $kind $type $name)
+  (define (gen-scoped-binding-name $gen? $lookup $kind $type $name)
     (lets
       ($gen-name (if $gen? (generate-identifier $name) $name))
-      ($scope (scope+id-item $scope $name (binding $kind $type $gen-name)))
-      (scoped $scope $gen-name)))
+      ($lookup (scope+id-item $lookup $name (binding $kind $type $gen-name)))
+      (scoped $lookup $gen-name)))
 
-  (define (gen-scoped-name $gen? $scope $name $item)
+  (define (gen-scoped-name $gen? $lookup $name $item)
     (lets
       ($gen-name (if $gen? (generate-identifier $name) $name))
-      ($scope (scope+id-item $scope $name $item))
-      (scoped $scope $gen-name)))
+      ($lookup (scope+id-item $lookup $name $item))
+      (scoped $lookup $gen-name)))
 
-  (define (gen?-scoped-syntaxes+input $gen? (scoped $scope $syntaxes) $input)
+  (define (gen?-scoped-syntaxes+input $gen? (scoped $lookup $syntaxes) $input)
     (syntax-case $input (%input)
       ((%input id)
-        (gen?-scoped-syntaxes+instr $gen? (scoped $scope $syntaxes) #`(%input 1 id)))
+        (gen?-scoped-syntaxes+instr $gen? (scoped $lookup $syntaxes) #`(%input 1 id)))
       ((%input type id)
         (lets
           ($type (type->syntax #'type))
           (scoped-map
-            ($name (gen-scoped-binding-name $gen? $scope #'%wire $type (identifier id)))
+            ($name (gen-scoped-binding-name $gen? $lookup #'%wire $type (identifier id)))
             (push $syntaxes
               #`(%input #,$type #,$name)))))))
 
-  (define (gen?-scoped-syntaxes+output $gen? (scoped $scope $syntaxes) $output)
+  (define (gen?-scoped-syntaxes+output $gen? (scoped $lookup $syntaxes) $output)
     (syntax-case $output ()
       ((%output id expr)
         (lets
-          ($typed (scope-expr->typed $scope #'expr))
+          ($typed (scope-expr->typed $lookup #'expr))
           ($type (typed-type $typed))
           (scoped-map
-            ($name (gen-scoped-binding-name $gen? $scope #'%wire $type (identifier id)))
+            ($name (gen-scoped-binding-name $gen? $lookup #'%wire $type (identifier id)))
             (push $syntaxes #`(%output #,$type id #,(typed-value $typed))))))))
 
-  (define (gen?-scoped-syntaxes+wire $gen? (scoped $scope $syntaxes) $wire)
+  (define (gen?-scoped-syntaxes+wire $gen? (scoped $lookup $syntaxes) $wire)
     (syntax-case $wire ()
       ((%wire id expr)
         (lets
-          ($typed (scope-expr->typed $scope #'expr))
+          ($typed (scope-expr->typed $lookup #'expr))
           ($type (typed-type $typed))
           (scoped-map
-            ($name (gen-scoped-binding-name $gen? $scope #'%wire $type (identifier id)))
+            ($name (gen-scoped-binding-name $gen? $lookup #'%wire $type (identifier id)))
             (push $syntaxes #`(%wire #,$type id #,(typed-value $typed))))))))
 
-  (define (gen?-scoped-syntaxes+register $gen? (scoped $scope $syntaxes) $register)
+  (define (gen?-scoped-syntaxes+register $gen? (scoped $lookup $syntaxes) $register)
     (syntax-case $register ()
       ((%register id)
-        (gen?-scoped-syntaxes+instr $gen? (scoped $scope $syntaxes) #`(%register 1 id)))
+        (gen?-scoped-syntaxes+instr $gen? (scoped $lookup $syntaxes) #`(%register 1 id)))
       ((%register type id)
         (lets
           ($type (type->syntax #'type))
           (scoped-map
-            ($name (gen-scoped-binding-name $gen? $scope #'%register $type (identifier id)))
+            ($name (gen-scoped-binding-name $gen? $lookup #'%register $type (identifier id)))
             (push $syntaxes #`(%register #,$type #,$name)))))))
 
-  (define (gen?-scoped-syntaxes+set $gen? (scoped $scope $syntaxes) $set)
+  (define (gen?-scoped-syntaxes+set $gen? (scoped $lookup $syntaxes) $set)
     (syntax-case $set ()
       ((%set id expr)
         (lets
-          ($id-binding (scope-id-kinds->binding $scope (identifier id) (kinds %register)))
+          ($id-binding (scope-id-kinds->binding $lookup (identifier id) (kinds %register)))
           ($id-kind (binding-kind $id-binding))
           ($id-type (binding-type $id-binding))
           ($id-size (type-size $id-type))
           ($id-name (binding-name $id-binding))
-          ($typed (scope-expr->typed $scope #'expr))
+          ($typed (scope-expr->typed $lookup #'expr))
           ($type (typed-type $typed))
           ($size (type-size $type))
           (if (<= $size $id-size)
-            (scoped $scope
+            (scoped $lookup
               (push $syntaxes #`(%set #,$id-type #,$id-name #,(typed-value $typed))))
             (syntax-error #'expr
               (format "invalid type ~a, expected <= ~a in" $size $id-size)))))))
 
-  (define (gen?-scoped-syntaxes+cond $gen? (scoped $scope $syntaxes) $cond)
+  (define (gen?-scoped-syntaxes+cond $gen? (scoped $lookup $syntaxes) $cond)
     (syntax-case $cond (%else)
       ((%cond clause ... (%else els ...))
-        (scoped $scope
+        (scoped $lookup
           (push $syntaxes
             #`(%cond
               #,@(map
-                (partial gen?-scope-clause->typed-syntax $gen? $scope)
+                (partial gen?-scope-clause->typed-syntax $gen? $lookup)
                 (syntaxes clause ...))
               (%else
                 #,@(syntax->list
-                  (gen?-scope-instrs->typed-syntax $gen? $scope #'(els ...))))))))
+                  (gen?-scope-instrs->typed-syntax $gen? $lookup #'(els ...))))))))
       ((%cond clause clause* ...)
-        (scoped $scope
+        (scoped $lookup
           (push $syntaxes
             #`(%cond
               #,@(map
-                (partial gen?-scope-clause->typed-syntax $gen? $scope)
+                (partial gen?-scope-clause->typed-syntax $gen? $lookup)
                 (syntaxes clause clause* ...))))))))
 
-  (define (gen?-scoped-syntaxes+on $gen? (scoped $scope $syntaxes) $on)
+  (define (gen?-scoped-syntaxes+on $gen? (scoped $lookup $syntaxes) $on)
     (syntax-case $on ()
       ((%on (edge name) body ...)
-        (scoped $scope
+        (scoped $lookup
           (push $syntaxes
             #`(%on
               (
                 #,(edge->syntax #'edge)
-                #,(typed-value (scope-type-expr->typed $scope #'1 #'name)))
-              #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(body ...)))))))))
+                #,(typed-value (scope-type-expr->typed $lookup #'1 #'name)))
+              #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $lookup #'(body ...)))))))))
 
   (define (gen?-scoped-syntaxes+repeat $gen? $scoped $repeat)
     (syntax-case $repeat ()
@@ -557,22 +557,22 @@
           $scoped
           (indices (count-number #'count))))))
 
-  (define (gen?-scoped-syntaxes+log $gen? (scoped $scope $syntaxes) $log)
+  (define (gen?-scoped-syntaxes+log $gen? (scoped $lookup $syntaxes) $log)
     (syntax-case $log ()
       ((%log label expr)
         (lets
-          ($typed (scope-expr->typed $scope #'expr))
-          (scoped $scope
+          ($typed (scope-expr->typed $lookup #'expr))
+          (scoped $lookup
             (push $syntaxes
               #`(%log label
                 #,(typed-type $typed)
                 #,(typed-value $typed))))))))
 
-  (define (gen?-scoped-syntaxes+macro $gen? (scoped $scope $syntaxes) $macro)
+  (define (gen?-scoped-syntaxes+macro $gen? (scoped $lookup $syntaxes) $macro)
     (syntax-case $macro ()
       ((%macro (name param ...) body ...)
         (scoped-map
-          ($name (gen-scoped-name $gen? $scope (identifier name)
+          ($name (gen-scoped-name $gen? $lookup (identifier name)
             (lambda ($syntax)
               (syntax-case $syntax ()
                 ((_ arg ...)
@@ -584,10 +584,10 @@
 
   (define (gen?-scoped-syntaxes+instr $gen? $scoped $instr)
     (lets
-      ((scoped $scope $syntaxes) $scoped)
+      ((scoped $lookup $syntaxes) $scoped)
       (syntax-case $instr ()
         ((id arg ...)
-          (switch (lookup-value $scope (identifier id))
+          (switch (lookup-value $lookup (identifier id))
             ((instr-typer? $instr-typer)
               (fluent $instr-typer
                 (instr-typer-fn)
@@ -596,48 +596,48 @@
               (gen?-scoped-syntaxes+instrs #t $scoped
                 (list->syntax
                   (unbegin-syntaxes
-                    (transform $transformer $instr $scope)))))
+                    (transform $transformer $instr $lookup)))))
             ((else $other)
               (syntax-error #'id "not statement")))))))
 
-  (define (gen?-scope-clause->typed-syntax $gen? $scope $clause)
+  (define (gen?-scope-clause->typed-syntax $gen? $lookup $clause)
     (syntax-case $clause ()
       ((cond body ...)
         #`(
-          #,(typed-value (scope-type-expr->typed $scope #'1 #'cond))
-          #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $scope #'(body ...)))))))
+          #,(typed-value (scope-type-expr->typed $lookup #'1 #'cond))
+          #,@(syntax->list (gen?-scope-instrs->typed-syntax $gen? $lookup #'(body ...)))))))
 
   (define (gen?-scoped-syntaxes+instrs $gen? $scoped $instrs)
     (fold-left (partial gen?-scoped-syntaxes+instr $gen?) $scoped (syntax->list $instrs)))
 
-  (define (gen?-scope-instrs->typed-syntax $gen? $scope $instrs)
+  (define (gen?-scope-instrs->typed-syntax $gen? $lookup $instrs)
     (fluent $gen?
-      (gen?-scoped-syntaxes+instrs (scoped $scope (stack)) (syntax->list $instrs))
+      (gen?-scoped-syntaxes+instrs (scoped $lookup (stack)) (syntax->list $instrs))
       (scoped-value)
       (reverse)
       (list->syntax)))
 
-  (define (scope-instrs->typed-syntax $scope $instrs)
-    (gen?-scope-instrs->typed-syntax #f $scope $instrs))
+  (define (scope-instrs->typed-syntax $lookup $instrs)
+    (gen?-scope-instrs->typed-syntax #f $lookup $instrs))
 
   (define (module->typed-syntax $module)
     (scope-module->typed-syntax (scope+core (empty-lookup)) $module))
 
-  (define (scope-module->typed-syntax $scope $module)
+  (define (scope-module->typed-syntax $lookup $module)
     (syntax-case $module ()
       ((%module name body ...)
         #`(%module #,(identifier name)
           #,@(syntax->list
             (gen?-scope-instrs->typed-syntax
               #f
-              $scope
+              $lookup
               #'(body ...)))))))
 
-  (define (gen?-scope-instr->typed-syntax $gen? $scope $instr)
-    (syntax-single (gen?-scope-instrs->typed-syntax $gen? $scope #`(#,$instr))))
+  (define (gen?-scope-instr->typed-syntax $gen? $lookup $instr)
+    (syntax-single (gen?-scope-instrs->typed-syntax $gen? $lookup #`(#,$instr))))
 
-  (define (scope-instr->typed-syntax $scope $instr)
-    (gen?-scope-instr->typed-syntax #f $scope $instr))
+  (define (scope-instr->typed-syntax $lookup $instr)
+    (gen?-scope-instr->typed-syntax #f $lookup $instr))
 
   (define (typed $type $value)
     #`(#,$type #,$value))

@@ -12,14 +12,14 @@
       ($syntaxes $scoped)
       (push $syntaxes $syntax)))
 
-  (define (expand-top-level $scope $syntax)
+  (define (expand-top-level $lookup $syntax)
     (syntax-case $syntax (include)
       ((type (name param ...) body ...)
         (lets
           ($scoped-params
             (fold-left
               scoped-syntaxes+param
-              (scoped $scope (stack))
+              (scoped $lookup (stack))
               (syntaxes param ...)))
           #`(type (name #,@(reverse (scoped-value $scoped-params)))
             #,@(expand-instrs
@@ -40,15 +40,15 @@
                 (scoped-value $scoped)
                 #`(type #,(scoped-value $scoped-declarator)))))))))
 
-  (define (expand-instrs $scope $syntax)
-    (fluent $scope
+  (define (expand-instrs $lookup $syntax)
+    (fluent $lookup
       (scoped (stack))
       (scoped+instrs $syntax)
       (scoped-value)
       (reverse)))
 
-  (define (expand-instr $scope $syntax)
-    (force-single (expand-instrs $scope #`(#,$syntax))))
+  (define (expand-instr $lookup $syntax)
+    (force-single (expand-instrs $lookup #`(#,$syntax))))
 
   (define (scoped+instrs $scoped $instrs)
     (syntax-case $instrs (defer break-if)
@@ -78,33 +78,33 @@
           (scoped+instr $scoped #'instr)
           #'(instrs ...)))))
 
-  (define (declarator->scoped-syntax $scope $declarator)
+  (define (declarator->scoped-syntax $lookup $declarator)
     (syntax-case $declarator (*)
       (id (identifier? #'id)
         (lets
-          ((pair $scope $identifier) (lookup-gen $scope #'id))
-          (scoped $scope $identifier)))
+          ((pair $lookup $identifier) (lookup-gen $lookup #'id))
+          (scoped $lookup $identifier)))
       ((* decl)
         (scoped-map
-          ($scoped-decl (declarator->scoped-syntax $scope #'decl))
+          ($scoped-decl (declarator->scoped-syntax $lookup #'decl))
           #`(* #,$scoped-decl)))
       ((* decl expr)
         (lets
-          ($expr (expand-expr $scope #'expr))
+          ($expr (expand-expr $lookup #'expr))
           (scoped-map
-            ($scoped-decl (declarator->scoped-syntax $scope #'decl))
+            ($scoped-decl (declarator->scoped-syntax $lookup #'decl))
             #`(* #,$scoped-decl #,$expr))))))
 
   (define (scoped+instr $scoped $instr)
     (lets
-      ((scoped $scope $syntaxes) $scoped)
+      ((scoped $lookup $syntaxes) $scoped)
       (syntax-case $instr (extern macro begin var const if when cond while then else set return)
         ((extern id)
           (scoped+ $scoped (identifier id) #f))
         ((macro (id param ...) body ...)
           (scoped+ $scoped (identifier id)
             (lambda ($syntax)
-              (lambda ($scope)
+              (lambda ($lookup)
                 (syntax-case $syntax ()
                   ((_ arg ...)
                     (syntax-subst
@@ -114,89 +114,89 @@
         ((macro id expr)
           (scoped+ $scoped (identifier id)
             (lambda ($syntax)
-              (lambda ($scope)
+              (lambda ($lookup)
                 #'expr))))
         ((begin instr ...)
           (scoped+syntax $scoped
             #`(begin
-              #,@(expand-instrs $scope #'(instr ...)))))
+              #,@(expand-instrs $lookup #'(instr ...)))))
         ((var type decl)
           (scoped-map
-            ($decl (declarator->scoped-syntax $scope #'decl))
+            ($decl (declarator->scoped-syntax $lookup #'decl))
             (push $syntaxes
               #`(var type #,$decl))))
         ((var type decl expr)
           (scoped-map
-            ($decl (declarator->scoped-syntax $scope #'decl))
+            ($decl (declarator->scoped-syntax $lookup #'decl))
             (push $syntaxes
-              #`(var type #,$decl #,(expand-expr $scope #'expr)))))
+              #`(var type #,$decl #,(expand-expr $lookup #'expr)))))
         ((const type decl expr)
           (scoped-map
-            ($decl (declarator->scoped-syntax $scope #'decl))
+            ($decl (declarator->scoped-syntax $lookup #'decl))
             (push $syntaxes
-              #`(const type #,$decl #,(expand-expr $scope #'expr)))))
+              #`(const type #,$decl #,(expand-expr $lookup #'expr)))))
         ((if expr (then then-body ...) (else else-body ...))
           (scoped+syntax $scoped
             #`(if
-              #,(expand-expr $scope #'expr)
-              (then #,@(expand-instrs $scope #'(then-body ...)))
-              (else #,@(expand-instrs $scope #'(else-body ...))))))
+              #,(expand-expr $lookup #'expr)
+              (then #,@(expand-instrs $lookup #'(then-body ...)))
+              (else #,@(expand-instrs $lookup #'(else-body ...))))))
         ((when expr body ...)
           (scoped+syntax $scoped
             #`(when
-              #,(expand-expr $scope #'expr)
-              #,@(expand-instrs $scope #'(body ...)))))
+              #,(expand-expr $lookup #'expr)
+              #,@(expand-instrs $lookup #'(body ...)))))
         ((cond clause clause* ... (else else-body ...))
           (scoped+syntax $scoped
             #`(cond
-              #,@(map (partial expand-clause $scope) (syntaxes clause clause* ...))
-              (else #,@(expand-instrs $scope #'(else-body ...))))))
+              #,@(map (partial expand-clause $lookup) (syntaxes clause clause* ...))
+              (else #,@(expand-instrs $lookup #'(else-body ...))))))
         ((cond clause clause* ...)
           (scoped+syntax $scoped
             #`(cond
-              #,@(map (partial expand-clause $scope) (syntaxes clause clause* ...)))))
+              #,@(map (partial expand-clause $lookup) (syntaxes clause clause* ...)))))
         ((while expr body ...)
           (scoped+syntax $scoped
             #`(while
-              #,(expand-expr $scope #'expr)
-              #,@(expand-instrs $scope #'(body ...)))))
+              #,(expand-expr $lookup #'expr)
+              #,@(expand-instrs $lookup #'(body ...)))))
         ((set lhs expr)
           (scoped+syntax $scoped
             #`(set
-              #,(expand-lhs $scope #'lhs)
-              #,(expand-expr $scope #'expr))))
+              #,(expand-lhs $lookup #'lhs)
+              #,(expand-expr $lookup #'expr))))
         ((set lhs op expr)
           (scoped+syntax $scoped
             #`(set
-              #,(expand-lhs $scope #'lhs)
+              #,(expand-lhs $lookup #'lhs)
               op
-              #,(expand-expr $scope #'expr))))
+              #,(expand-expr $lookup #'expr))))
         ((return expr)
           (scoped+syntax $scoped
-            #`(return #,(expand-expr $scope #'expr))))
+            #`(return #,(expand-expr $lookup #'expr))))
         ((id arg ...) (identifier? #'id)
-          (switch (lookup-ref $scope #'id)
+          (switch ($lookup #'id)
             ((identifier? $identifier)
               (scoped+syntax $scoped
                 #`(
                   #,$identifier
                   #,@(map
-                    (partial expand-expr $scope)
+                    (partial expand-expr $lookup)
                     (syntaxes arg ...)))))
             ((else $transformer)
               (scoped+instrs $scoped
                 #`(
                   #,@(unbegin-syntaxes
-                    (lookup-transform $scope $transformer $instr))))))))))
+                    (lookup-transform $lookup $transformer $instr))))))))))
 
-  (define (expand-clause $scope $clause)
+  (define (expand-clause $lookup $clause)
     (syntax-case $clause ()
       ((expr body ...)
         #`(
-          #,(expand-expr $scope #'expr)
-          #,@(expand-instrs $scope #'(body ...))))))
+          #,(expand-expr $lookup #'expr)
+          #,@(expand-instrs $lookup #'(body ...))))))
 
-  (define (expand-expr $scope $expr)
+  (define (expand-expr $lookup $expr)
     (syntax-case $expr
       (
         cast
@@ -208,151 +208,151 @@
         bitwise-arithmetic-shift-left bitwise-arithmetic-shift-right
         if ref &ref)
       ((cast type rhs)
-        #`(cast type #,(expand-expr $scope #'rhs)))
+        #`(cast type #,(expand-expr $lookup #'rhs)))
       ((= arg ...)
-        (expand-op2 $scope $expr boolean? =))
+        (expand-op2 $lookup $expr boolean? =))
       ((< arg ...)
-        (expand-op2 $scope $expr number? <))
+        (expand-op2 $lookup $expr number? <))
       ((<= arg ...)
-        (expand-op2 $scope $expr number? <=))
+        (expand-op2 $lookup $expr number? <=))
       ((> arg ...)
-        (expand-op2 $scope $expr number? >))
+        (expand-op2 $lookup $expr number? >))
       ((>= arg ...)
-        (expand-op2 $scope $expr number? >=))
+        (expand-op2 $lookup $expr number? >=))
       ((+ arg ...)
-        (expand-op2-fold-default $scope $expr #'0 number? +))
+        (expand-op2-fold-default $lookup $expr #'0 number? +))
       ((- arg ...)
-        (expand-op2-fold $scope $expr number? -))
+        (expand-op2-fold $lookup $expr number? -))
       ((* arg ...)
-        (expand-op2-fold-default $scope $expr #'1 number? *))
+        (expand-op2-fold-default $lookup $expr #'1 number? *))
       ((div arg ...)
-        (expand-op2 $scope $expr number? div))
+        (expand-op2 $lookup $expr number? div))
       ((and arg ...)
-        (expand-op2-fold-default $scope $expr #'#t boolean? and-proc))
+        (expand-op2-fold-default $lookup $expr #'#t boolean? and-proc))
       ((or arg ...)
-        (expand-op2-fold-default $scope $expr #'#f boolean? or-proc))
+        (expand-op2-fold-default $lookup $expr #'#f boolean? or-proc))
       ((not arg ...)
-        (expand-op1 $scope $expr boolean? not))
+        (expand-op1 $lookup $expr boolean? not))
       ((bitwise-and arg ...)
-        (expand-op2-fold-default $scope $expr #'-1 integer? bitwise-and))
+        (expand-op2-fold-default $lookup $expr #'-1 integer? bitwise-and))
       ((bitwise-ior arg ...)
-        (expand-op2-fold-default $scope $expr #'0 integer? bitwise-ior))
+        (expand-op2-fold-default $lookup $expr #'0 integer? bitwise-ior))
       ((bitwise-xor arg ...)
-        (expand-op2-fold-default $scope $expr #'0 integer? bitwise-xor))
+        (expand-op2-fold-default $lookup $expr #'0 integer? bitwise-xor))
       ((bitwise-not arg ...)
-        (expand-op1 $scope $expr integer? bitwise-not))
+        (expand-op1 $lookup $expr integer? bitwise-not))
       ((bitwise-arithmetic-shift-left arg ...)
-        (expand-op2 $scope $expr integer? bitwise-arithmetic-shift-left))
+        (expand-op2 $lookup $expr integer? bitwise-arithmetic-shift-left))
       ((bitwise-arithmetic-shift-right arg ...)
-        (expand-op2 $scope $expr integer? bitwise-arithmetic-shift-right))
+        (expand-op2 $lookup $expr integer? bitwise-arithmetic-shift-right))
       ((ref var x ...)
         #`(ref
-          #,(expand-expr $scope #'var)
-          #,@(map (partial expand-accessor $scope) (syntaxes x ...))))
+          #,(expand-expr $lookup #'var)
+          #,@(map (partial expand-accessor $lookup) (syntaxes x ...))))
       ((&ref var x ...)
         #`(&ref
-          #,(expand-expr $scope #'var)
-          #,@(map (partial expand-accessor $scope) (syntaxes x ...))))
+          #,(expand-expr $lookup #'var)
+          #,@(map (partial expand-accessor $lookup) (syntaxes x ...))))
       ((if cond then els)
         (lets
-          ($cond (expand-expr $scope #'cond))
-          ($then (expand-expr $scope #'then))
-          ($else (expand-expr $scope #'els))
+          ($cond (expand-expr $lookup #'cond))
+          ($then (expand-expr $lookup #'then))
+          ($else (expand-expr $lookup #'els))
           (switch (syntax->datum $cond)
             ((boolean? $boolean)
               (if $boolean $then $else))
             ((else $other)
               #`(if #,$cond #,$then #,$else)))))
       ((id arg ...) (identifier? #'id)
-        (switch (lookup-value $scope #'id)
+        (switch (lookup-value $lookup #'id)
           ((identifier? $identifier)
             #`(
               #,$identifier
               #,@(map
-                (partial expand-expr $scope)
+                (partial expand-expr $lookup)
                 (syntaxes arg ...))))
           ((else $transformer)
-            (expand-expr $scope
+            (expand-expr $lookup
               (unbegin-syntax
-                (lookup-transform $scope $transformer $expr))))))
+                (lookup-transform $lookup $transformer $expr))))))
       (id (identifier? #'id)
-        (switch (lookup-value $scope #'id)
+        (switch (lookup-value $lookup #'id)
           ((identifier? $identifier)
             $identifier)
           ((else $transformer)
-            (expand-expr $scope
+            (expand-expr $lookup
               (unbegin-syntax
-                (lookup-transform $scope $transformer $expr))))))
+                (lookup-transform $lookup $transformer $expr))))))
       (other #'other)))
 
-  (define (expand-op1 $scope $syntax $test? $proc)
+  (define (expand-op1 $lookup $syntax $test? $proc)
     (syntax-case $syntax ()
       ((op a)
         (lets
-          ($a (expand-expr $scope #'a))
+          ($a (expand-expr $lookup #'a))
           ($datum (syntax->datum $a))
           (if ($test? $datum)
             (datum->syntax #'op ($proc $datum))
             #`(op #,$a))))))
 
-  (define (expand-op2 $scope $syntax $test? $proc)
+  (define (expand-op2 $lookup $syntax $test? $proc)
     (syntax-case $syntax ()
       ((op a b)
         (lets
-          ($a (expand-expr $scope #'a))
-          ($b (expand-expr $scope #'b))
+          ($a (expand-expr $lookup #'a))
+          ($b (expand-expr $lookup #'b))
           ($datum-a (syntax->datum $a))
           ($datum-b (syntax->datum $b))
           (if (and ($test? $datum-a) ($test? $datum-b))
             (datum->syntax #'op ($proc $datum-a $datum-b))
             #`(op #,$a #,$b))))))
 
-  (define (expand-op2-fold $scope $syntax $test? $proc)
+  (define (expand-op2-fold $lookup $syntax $test? $proc)
     (syntax-case $syntax ()
       ((op a)
-        (expand-op1 $scope $syntax $test? $proc))
+        (expand-op1 $lookup $syntax $test? $proc))
       ((op a b)
-        (expand-op2 $scope $syntax $test? $proc))
+        (expand-op2 $lookup $syntax $test? $proc))
       ((op a b c cs ...)
-        (expand-op2-fold $scope
+        (expand-op2-fold $lookup
           #`(op (op a b) c cs ...)
           $test? $proc))))
 
-  (define (expand-op2-fold-default $scope $syntax $default $test? $proc)
+  (define (expand-op2-fold-default $lookup $syntax $default $test? $proc)
     (syntax-case $syntax ()
       ((op) $default)
       ((op a)
         (lets
-          ($a (expand-expr $scope #'a))
+          ($a (expand-expr $lookup #'a))
           ($datum (syntax->datum $a))
           (if ($test? $datum)
             (datum->syntax #'op ($proc $datum))
             $a)))
-      (_ (expand-op2-fold $scope $syntax $test? $proc))))
+      (_ (expand-op2-fold $lookup $syntax $test? $proc))))
 
-  (define (expand-lhs $scope $lhs)
+  (define (expand-lhs $lookup $lhs)
     (syntax-case $lhs ()
       ((expr accessor accessors ...)
         #`(
-          #,(expand-expr $scope #'expr)
+          #,(expand-expr $lookup #'expr)
           #,@(map
-            (partial expand-accessor $scope)
+            (partial expand-accessor $lookup)
             (syntaxes accessor accessors ...))))
       ((id)
-        (expand-lhs $scope #'id))
+        (expand-lhs $lookup #'id))
       (id (identifier? #'id)
-        (expand-identifier $scope #'id))))
+        (expand-identifier $lookup #'id))))
 
-  (define (expand-identifier $scope $id)
-    (switch (lookup-ref $scope $id)
+  (define (expand-identifier $lookup $id)
+    (switch ($lookup $id)
       ((identifier? $identifier)
         $identifier)
       ((else $transformer)
         $id)))
 
-  (define (expand-accessor $scope $accessor)
+  (define (expand-accessor $lookup $accessor)
     (syntax-case $accessor (*)
-      ((expr) #`(#,(expand-expr $scope #'expr)))
+      ((expr) #`(#,(expand-expr $lookup #'expr)))
       (* #'*)
       (field (identifier? #'field) #'field)))
 )

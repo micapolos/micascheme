@@ -56,8 +56,8 @@
 
   (define (scope-ref? (scope $renamed-id-lookup $id-value-lookup) $id)
     (lets
-      ($renamed-id (or (lookup-ref $renamed-id-lookup $id) $id))
-      (lookup-ref $id-value-lookup $renamed-id)))
+      ($renamed-id (or ($renamed-id-lookup $id) $id))
+      ($id-value-lookup $renamed-id)))
 
   (define (scope-ref $scope $id)
     (or

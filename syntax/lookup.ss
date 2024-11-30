@@ -5,7 +5,6 @@
     lookup-undefined-id
     lookup+undefined
     lookup-gen
-    lookup-ref
     lookup-value
     lookup-transformer
     lookup-transform
@@ -22,19 +21,16 @@
   (define (empty-lookup)
     (lambda (_) #f))
 
-  (define (lookup-ref $lookup $id)
-    ($lookup $id))
-
   (define (lookup-value $lookup $id)
     (or
-      (lookup-ref $lookup $id)
+      ($lookup $id)
       (lookup-unbound $id)))
 
   (define (lookup+ $lookup $id $item)
     (lambda ($lookup-id)
       (if (free-identifier=? $lookup-id $id)
         $item
-        (lookup-ref $lookup $lookup-id))))
+        ($lookup $lookup-id))))
 
   (define (lookup-undefined-id $lookup $id)
     (if ($lookup $id)
@@ -55,7 +51,7 @@
         $identifier)))
 
   (define (lookup-transformer $lookup $id)
-    (switch (lookup-ref $lookup $id)
+    (switch ($lookup $id)
       ((identifier? _) #f)
       ((false? _) #f)
       ((else $transformer) $transformer)))

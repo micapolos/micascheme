@@ -20,7 +20,7 @@
       (scoped-value $scoped)))
 
   (define (scoped-ref $scoped $id)
-    (lookup-ref (scoped-scope $scoped) $id))
+    ((scoped-scope $scoped) $id))
 
   (define (scoped-gen $scope $id)
     (lets

@@ -22,7 +22,7 @@
     (syntax-case $name ()
       ((type name)
         #'(
-          #,(lookup-ref $lookup (identifier name))
+          #,($lookup (identifier name))
           type name))))
 
   ; (define (scope-expr->timed $lookup $expr)
@@ -30,7 +30,7 @@
   ;     ((type value)
   ;       (syntax-case #'value ()
   ;         (name (identifier? #'name)
-  ;           #`(#,(lookup-ref $lookup #'name) type name))
+  ;           #`(#,($lookup #'name) type name))
   ;         ((%and xs ...)
   ;           (scope-type-op->timed $lookup #'type #'value))
   ;         (literal (integer? (datum literal))
