@@ -19,9 +19,13 @@
 ; === with-car / with-cdr ===
 
 (check-equal?
-  (with-car ($car (cons "foo" "bar")) (string-append $car "!"))
+  (with-car
+    ($car (cons "foo" "bar"))
+    (string-append $car "!"))
   (cons "foo!" "bar"))
 
 (check-equal?
-  (with-cdr ($car (cons "foo" "bar")) (string-append $car "!"))
+  (with-cdr
+    ($car (cons "foo" "bar"))
+    (string-append $car "!"))
   (cons "foo" "bar!"))
