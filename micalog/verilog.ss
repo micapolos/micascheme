@@ -15,7 +15,7 @@
       ((_ module %...)
         (%fluent
           (%syntaxes module %...)
-          (%map-using (%partial scope-module->typed-syntax (scope+core $lookup)))
+          (%map-using (%partial lookup-module->typed-syntax (lookup+core $lookup)))
           (%map-using flatten-module)
           (%map-using module->verilog)
           (%map-using module->code)

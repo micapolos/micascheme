@@ -8,9 +8,9 @@
 (define-check-datum-> typed-syntax)
 (define-check-datum-> syntax)
 
-(define $scope
+(define $lookup
   (fluent (empty-lookup)
-    (scope+core)
+    (lookup+core)
     (lookup+undefined #'foo-1 (pair #'foo-1 #'(%wire 1)))
     (lookup+undefined #'bar-1 (pair #'bar-1 #'(%wire 1)))
     (lookup+undefined #'foo-4 (pair #'foo-4 #'(%wire 4)))
@@ -121,60 +121,60 @@
 
 (check-typed (expr (%if bin-1 bin-1101 hex-a)) (4 (%if 4 #b1 #b1101 #xa)))
 
-(check-typed (scope-expr $scope foo-4) (4 foo-4))
-(check-typed (scope-expr $scope zoo-1) (1 renamed-zoo-1))
-(check-typed (scope-expr $scope (%= foo-4 bar-4)) (1 (%= 4 foo-4 bar-4)))
-(check-typed (scope-expr $scope (%if foo-1 foo-8 bar-8)) (8 (%if 8 foo-1 foo-8 bar-8)))
+(check-typed (lookup-expr $lookup foo-4) (4 foo-4))
+(check-typed (lookup-expr $lookup zoo-1) (1 renamed-zoo-1))
+(check-typed (lookup-expr $lookup (%= foo-4 bar-4)) (1 (%= 4 foo-4 bar-4)))
+(check-typed (lookup-expr $lookup (%if foo-1 foo-8 bar-8)) (8 (%if 8 foo-1 foo-8 bar-8)))
 
 ; raise on re-declaration
-(check-typed-syntax (raises (scope-instr $scope (%input %input))))
-(check-typed-syntax (raises (scope-instr $scope (%input %wire))))
-(check-typed-syntax (raises (scope-instr $scope (%input %if))))
-(check-typed-syntax (raises (scope-instr $scope (%input %macro))))
-(check-typed-syntax (raises (scope-instr $scope (%input %int))))
-(check-typed-syntax (raises (scope-instr $scope (%input bin-000))))
+(check-typed-syntax (raises (lookup-instr $lookup (%input %input))))
+(check-typed-syntax (raises (lookup-instr $lookup (%input %wire))))
+(check-typed-syntax (raises (lookup-instr $lookup (%input %if))))
+(check-typed-syntax (raises (lookup-instr $lookup (%input %macro))))
+(check-typed-syntax (raises (lookup-instr $lookup (%input %int))))
+(check-typed-syntax (raises (lookup-instr $lookup (%input bin-000))))
 
-(check-typed-syntax (raises (scope-instr $scope (%input foo-1))))
+(check-typed-syntax (raises (lookup-instr $lookup (%input foo-1))))
 
-(check-typed-syntax (scope-instr $scope (%input moo-1)) (%input 1 moo-1))
-(check-typed-syntax (scope-instr $scope (%input 4 moo-4)) (%input 4 moo-4))
-(check-typed-syntax (raises (scope-instr $scope (%input foo-4 foo))))
+(check-typed-syntax (lookup-instr $lookup (%input moo-1)) (%input 1 moo-1))
+(check-typed-syntax (lookup-instr $lookup (%input 4 moo-4)) (%input 4 moo-4))
+(check-typed-syntax (raises (lookup-instr $lookup (%input foo-4 foo))))
 
-(check-typed-syntax (scope-instr $scope (%wire wire-4 foo-4)) (%wire 4 wire-4 foo-4))
-(check-typed-syntax (scope-instr $scope (%output out-4 foo-4)) (%output 4 out-4 foo-4))
+(check-typed-syntax (lookup-instr $lookup (%wire wire-4 foo-4)) (%wire 4 wire-4 foo-4))
+(check-typed-syntax (lookup-instr $lookup (%output out-4 foo-4)) (%output 4 out-4 foo-4))
 
-(check-typed-syntax (scope-instr $scope (%set reg-foo-4 bin-1001)) (%set 4 reg-foo-4 #b1001))
-(check-typed-syntax (scope-instr $scope (%set reg-foo-4 bar-4)) (%set 4 reg-foo-4 bar-4))
-(check-typed-syntax (raises (scope-instr $scope (%set foo-4 bar-4))))
-(check-typed-syntax (raises (scope-instr $scope (%set reg-foo-4 bar-8))))
+(check-typed-syntax (lookup-instr $lookup (%set reg-foo-4 bin-1001)) (%set 4 reg-foo-4 #b1001))
+(check-typed-syntax (lookup-instr $lookup (%set reg-foo-4 bar-4)) (%set 4 reg-foo-4 bar-4))
+(check-typed-syntax (raises (lookup-instr $lookup (%set foo-4 bar-4))))
+(check-typed-syntax (raises (lookup-instr $lookup (%set reg-foo-4 bar-8))))
 
 (check-typed-syntax
-  (scope-instrs $scope ((%wire goo-4 bin-1010) (%set reg-foo-4 goo-4)))
+  (lookup-instrs $lookup ((%wire goo-4 bin-1010) (%set reg-foo-4 goo-4)))
   ((%wire 4 goo-4 #b1010) (%set 4 reg-foo-4 goo-4)))
 
 (check-typed-syntax
-  (raises (scope-instrs $scope ((%set reg-4 foo-4)))))
+  (raises (lookup-instrs $lookup ((%set reg-4 foo-4)))))
 
 (check-typed-syntax
-  (scope-instrs $scope ((%register reg-1) (%set reg-1 foo-1)))
+  (lookup-instrs $lookup ((%register reg-1) (%set reg-1 foo-1)))
   ((%register 1 reg-1) (%set 1 reg-1 foo-1)))
 
 (check-typed-syntax
-  (scope-instrs $scope ((%register 4 reg-4) (%set reg-4 foo-4)))
+  (lookup-instrs $lookup ((%register 4 reg-4) (%set reg-4 foo-4)))
   ((%register 4 reg-4) (%set 4 reg-4 foo-4)))
 
 (check-typed-syntax
-  (scope-instrs $scope ((%register 4 reg-4) (%wire goo-4 foo-4) (%set reg-4 goo-4)))
+  (lookup-instrs $lookup ((%register 4 reg-4) (%wire goo-4 foo-4) (%set reg-4 goo-4)))
   ((%register 4 reg-4) (%wire 4 goo-4 foo-4) (%set 4 reg-4 goo-4)))
 
-(check-typed-syntax (raises (scope-instr $scope (%cond (foo-4)))))
+(check-typed-syntax (raises (lookup-instr $lookup (%cond (foo-4)))))
 
 (check-typed-syntax
-  (scope-instr $scope (%cond (foo-1)))
+  (lookup-instr $lookup (%cond (foo-1)))
   (%cond (foo-1)))
 
 (check-typed-syntax
-  (scope-instr $scope
+  (lookup-instr $lookup
     (%cond
       (foo-1
         (%set reg-foo-4 foo-4)
@@ -184,14 +184,14 @@
       (%set 4 reg-foo-4 foo-4)
       (%set 8 reg-bar-8 bar-8))))
 
-(check-typed-syntax (raises (scope-instr $scope (%cond (foo-4) (%else)))))
+(check-typed-syntax (raises (lookup-instr $lookup (%cond (foo-4) (%else)))))
 
 (check-typed-syntax
-  (scope-instr $scope (%cond (foo-1) (%else)))
+  (lookup-instr $lookup (%cond (foo-1) (%else)))
   (%cond (foo-1) (%else)))
 
 (check-typed-syntax
-  (scope-instr $scope
+  (lookup-instr $lookup
     (%cond
       (foo-1 (%set reg-foo-4 foo-4))
       (%else (%set reg-bar-8 bar-8))))
@@ -200,7 +200,7 @@
     (%else (%set 8 reg-bar-8 bar-8))))
 
 (check-typed-syntax
-  (scope-instr $scope
+  (lookup-instr $lookup
     (%cond
       (foo-1 (%set reg-foo-4 foo-4))
       (bar-1 (%set reg-foo-4 bar-4))
@@ -210,18 +210,18 @@
     (bar-1 (%set 4 reg-foo-4 bar-4))
     (%else (%set 8 reg-bar-8 bar-8))))
 
-(check-typed-syntax (raises (scope-instr $scope (%on (%posedge foo-4)))))
-(check-typed-syntax (raises (scope-instr $scope (%on (invalid-edge foo-1)))))
+(check-typed-syntax (raises (lookup-instr $lookup (%on (%posedge foo-4)))))
+(check-typed-syntax (raises (lookup-instr $lookup (%on (invalid-edge foo-1)))))
 
 (check-typed-syntax
-  (scope-instr $scope
+  (lookup-instr $lookup
     (%on (%posedge foo-1)
       (%set reg-foo-4 foo-4)))
   (%on (%posedge foo-1)
     (%set 4 reg-foo-4 foo-4)))
 
 (check-typed-syntax
-  (scope-instr $scope (%log foo foo-4))
+  (lookup-instr $lookup (%log foo foo-4))
   (%log foo 4 foo-4))
 
 (check-typed-syntax
@@ -259,11 +259,11 @@
 ; === macros ===
 
 (check-typed-syntax
-  (scope-instrs $scope ((%macro (set-zero name) (%set name 0))))
+  (lookup-instrs $lookup ((%macro (set-zero name) (%set name 0))))
   ())
 
 (check-typed-syntax
-  (scope-instrs $scope
+  (lookup-instrs $lookup
     (
       (%macro (local-register param)
         (%register 8 local)
@@ -274,14 +274,14 @@
     (%set 8 local_0 foo-8)))
 
 (check-typed-syntax
-  (scope-instrs $scope
+  (lookup-instrs $lookup
     (
       (%macro (set-zero name) (%set name 0))
       (set-zero reg-foo-4)))
   ((%set 4 reg-foo-4 0)))
 
 (check-typed-syntax
-  (scope-instrs $scope
+  (lookup-instrs $lookup
     (
       (%macro (exchange a b)
         (%set a b)
@@ -292,14 +292,14 @@
     (%set 4 reg-bar-4 reg-foo-4)))
 
 (check-typed-syntax
-  (scope-instrs $scope
+  (lookup-instrs $lookup
     (
       (%macro (double a) (%wrap+ a a))
       (%set reg-foo-4 (double foo-4))))
   ((%set 4 reg-foo-4 (%wrap+ 4 foo-4 foo-4))))
 
 (check-typed-syntax
-  (scope-instrs $scope
+  (lookup-instrs $lookup
     (
       (%macro (double expr) (%wrap+ expr expr))
       (%macro (local-register param)
@@ -311,7 +311,7 @@
     (%set 8 local_0 (%wrap+ 8 foo-8 foo-8))))
 
 (check-typed-syntax
-  (scope-instrs $scope
+  (lookup-instrs $lookup
     (
       (%macro (whenek cond body (... ...))
         (%cond (cond body (... ...))))
@@ -327,7 +327,7 @@
 ; === repeat ===
 
 ; (check-typed-syntax
-;   (scope-instrs $scope
+;   (lookup-instrs $lookup
 ;     ((%repeat (i 3) (%set reg-foo-4 i))))
 ;   (
 ;     (%set 4 reg-foo-4 hex-0)
@@ -337,9 +337,9 @@
 ; TODO: Not working, same variable is re-declared.
 ; Replace $gen? with a list of parameters, which will be preserved.
 ; Everything else will be generated.
-; Or... add %param to the scope.
+; Or... add %param to the lookup.
 ; (check-typed-syntax
-;   (scope-instrs $scope
+;   (lookup-instrs $lookup
 ;     ((%repeat (i 3)
 ;       (%register 4 reg)
 ;       (%set reg i))))
