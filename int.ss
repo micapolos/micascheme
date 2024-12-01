@@ -18,7 +18,7 @@
         ((negative? $width)
           (syntax-error #'width "negative width"))
         ((> $width (fixnum-width))
-          (syntax-error #'width (format "maximum ~a exceeded in width" (fixnum-width))))
+          (syntax-error #'width (format "greater than ~a width" (fixnum-width))))
         (else
           (literal->syntax (- (bitwise-arithmetic-shift-left 1 $width) 1))))))
 
