@@ -36,7 +36,7 @@
           #`(eval
             '(lets
               #,@(opt->list (and $clock-input? #`(clock 0)))
-              #,@(opt->list (and $reset?-input? #`(reset-counter 32)))
+              #,@(opt->list (and $reset?-input? #`(reset-counter 64))) ; 32 clock cycles of reset
               #,@(opt->list (and $reset?-input? #`(reset? 1)))
               #,@(map register->scheme $registers)
               (run
@@ -45,11 +45,11 @@
                     #,(if $exit?-output?
                       (syntax-case $exit?-output? ()
                         ((%output type name expr)
-                          #`(= #,(expr->scheme #'expr) 1)))
+                          #`(and (= reset? 0) (= #,(expr->scheme #'expr) 1))))
                       #`#f)
                     (void))
                   (lets
-                    #,@(opt->list (and $clock-input? #`(run (set! clock (xor clock 1)))))
+                    #,@(opt->list (and $clock-input? #`(run (set! clock (bitwise-xor clock 1)))))
                     #,@(opt->list
                       (and $reset?-input?
                         #`(run
@@ -86,8 +86,9 @@
             #,(expr->scheme #'expr))))
       ((%log label type expr)
         #`(run
-          (display
-            (format "~a: ~a\\n"
+          (displayln
+            (format "~a: ~a"
+              'label
               #,(expr->scheme #'expr)))))
       ((%cond clause ... (%else els ...))
         #`(run
@@ -108,7 +109,7 @@
     (syntax-case $clause ()
       ((cond instruction ...)
         #`(
-          #,(expr->scheme #'cond)
+          (= #,(expr->scheme #'cond) 1)
           #,(block->scheme #'(instruction ...))))))
 
   (define (edge->scheme $edge)
@@ -126,30 +127,36 @@
   (define (expr->scheme $expr)
     (syntax-case $expr (%= %!= %< %<= %> %>= %append %take %drop %wrap+ %wrap- %wrap* %+ %- %* %and %or %xor %nand %nor %xnor %not %if)
       ((%= type lhs rhs)
-        #`(=
-          #,(expr->scheme #'lhs)
-          #,(expr->scheme #'rhs)))
-      ((%!= type lhs rhs)
-        #`(not
-          (=
+        (boolean-scheme
+          #`(=
             #,(expr->scheme #'lhs)
             #,(expr->scheme #'rhs))))
+      ((%!= type lhs rhs)
+        (boolean-scheme
+          #`(not
+            (=
+              #,(expr->scheme #'lhs)
+              #,(expr->scheme #'rhs)))))
       ((%< type lhs rhs)
-        #`(<
-          #,(expr->scheme #'lhs)
-          #,(expr->scheme #'rhs)))
+        (boolean-scheme
+          #`(<
+            #,(expr->scheme #'lhs)
+            #,(expr->scheme #'rhs))))
       ((%<= type lhs rhs)
-        #`(<=
-          #,(expr->scheme #'lhs)
-          #,(expr->scheme #'rhs)))
+        (boolean-scheme
+          #`(<=
+            #,(expr->scheme #'lhs)
+            #,(expr->scheme #'rhs))))
       ((%> type lhs rhs)
-        #`(>
-          #,(expr->scheme #'lhs)
-          #,(expr->scheme #'rhs)))
+        (boolean-scheme
+          #`(>
+            #,(expr->scheme #'lhs)
+            #,(expr->scheme #'rhs))))
       ((%>= type lhs rhs)
-        #`(>=
-          #,(expr->scheme #'lhs)
-          #,(expr->scheme #'rhs)))
+        (boolean-scheme
+          #`(>=
+            #,(expr->scheme #'lhs)
+            #,(expr->scheme #'rhs))))
       ((%append (lhs-type lhs))
         (expr->scheme #'lhs))
       ((%append (lhs-type lhs) (rhs-type rhs))
@@ -205,18 +212,15 @@
           #,(expr->scheme #'lhs)
           #,(expr->scheme #'rhs)))
       ((%and type lhs rhs)
-        #`(
-          #,(if (type-boolean? #'type) #'and #'bitwise-and)
+        #`(bitwise-and
           #,(expr->scheme #'lhs)
           #,(expr->scheme #'rhs)))
       ((%or type lhs rhs)
-        #`(
-          #,(if (type-boolean? #'type) #'or #'bitwise-ior)
+        #`(bitwise-ior
           #,(expr->scheme #'lhs)
           #,(expr->scheme #'rhs)))
       ((%xor type lhs rhs)
-        #`(
-          bitwise-xor
+        #`(bitwise-xor
           #,(expr->scheme #'lhs)
           #,(expr->scheme #'rhs)))
       ((%nand type lhs rhs)
@@ -227,16 +231,18 @@
         (expr->scheme #`(%not type (%xor type lhs rhs))))
       ((%not type rhs)
         (type-scheme-mask #'type
-          #`(
-            #,(if (type-boolean? #'type) #'not #'bitwise-not)
+          #`(bitwise-not
             #,(expr->scheme #'rhs))))
       ((%if type cond true false)
         #`(if
-          #,(expr->scheme #'cond)
+          (= #,(expr->scheme #'cond) 1)
           #,(expr->scheme #'true)
           #,(expr->scheme #'false)))
       (other
         (value->scheme #'other))))
+
+  (define (boolean-scheme $scheme)
+    #`(if #,$scheme 1 0))
 
   (define (scheme-append $lhs-micac $rhs)
     (syntax-case $rhs ()
@@ -262,11 +268,6 @@
       #,$micac
       #,(literal->syntax
         (- (bitwise-arithmetic-shift-left 1 (syntax->datum $size)) 1))))
-
-  (define (type-boolean? $type)
-    (syntax-case $type ()
-      (1 #t)
-      (_ #f)))
 
   (define (type-scheme-mask $type $micac)
     (size-scheme-mask (type-size $type) $micac))
