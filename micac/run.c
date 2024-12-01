@@ -32,7 +32,7 @@ int main() {
             int mouse_x_16 = 0;
             int mouse_y_17 = 0;
             bool mouse_pressed__18 = false;
-            bool clock_19 = 0;
+            bool _clock_19 = 0;
             int reset_counter_20 = 32;
             bool _reset__21 = 1;
             int _video_x_22;
@@ -72,7 +72,7 @@ int main() {
               mouse_pressed__18 = (sdl_mouse_state_47 & 1) != 0;
               int index_48 = 0;
               while (index_48 != 559104) {
-                clock_19 = clock_19 ^ 1;
+                _clock_19 = _clock_19 ^ 1;
                 if (reset_counter_20 == 0) {
                   _reset__21 = 0;
                 } else {
@@ -86,12 +86,12 @@ int main() {
                 uint8_t video_red_49 = red_35;
                 uint8_t video_green_50 = green_36;
                 uint8_t video_blue_51 = blue_37;
-                if (old_clock_4_38 != clock_19) {
-                  if (clock_19 == 1) {
+                if (old_clock_4_38 != _clock_19) {
+                  if (_clock_19 == 1) {
                     half_clock_34 = !half_clock_34 & 1;
                   }
                 }
-                old_clock_4_38 = clock_19;
+                old_clock_4_38 = _clock_19;
                 if (old_half_clock_3_39 != half_clock_34) {
                   if (half_clock_34 == 1) {
                     if (_reset__21 || _mouse_pressed__26) {

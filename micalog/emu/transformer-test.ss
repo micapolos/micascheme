@@ -172,34 +172,14 @@
 
 (check-micac
   (module
-    (%module (prev-clock clock)))
+    (%module foo))
   (%%run-emu
     (%%video 352 288 96 24 4)
-    (%%var bool clock 0)
-    (%%update
-      (%%set clock (%%xor clock 1)))))
+    (%%update)))
 
 (check-micac
   (module
-    (%module (prev-clock clock)
-      (%register 16 counter)
-      (%on (%posedge prev-clock clock)
-        (%wire 16 previous-counter counter)
-        (%set 16 counter (%wrap+ 16 previous-counter 1)))))
-  (%%run-emu
-    (%%video 352 288 96 24 4)
-    (%%var bool clock 0)
-    (%%var uint16_t counter)
-    (%%update
-      (%%set clock (%%xor clock 1))
-      (%%when (%%not (%%= prev-clock clock))
-        (%%when (%%= clock 1)
-          (%%const uint16_t previous-counter counter)
-          (%%set counter (%%bitwise-and (%%+ previous-counter 1) #xffff)))))))
-
-(check-micac
-  (module
-    (%module (prev-clock clock)
+    (%module foo
       (%input 1 %reset?)
       (%input 1 %clock)
       (%input 9 %video-x)
@@ -213,7 +193,7 @@
       (%output 8 %video-blue 40)))
   (%%run-emu
     (%%video 352 288 96 24 4)
-    (%%var bool clock 0)
+    (%%var bool %clock 0)
     (%%var int reset-counter 32)
     (%%var bool %reset? 1)
     (%%var int %video-x)
@@ -222,7 +202,7 @@
     (%%var int %mouse-y)
     (%%var bool %mouse-pressed?)
     (%%update
-      (%%set clock (%%xor clock 1))
+      (%%set %clock (%%xor %clock 1))
       (%%if (%%= reset-counter 0)
         (%%then (%%set %reset? 0))
         (%%else (%%set reset-counter (%%- reset-counter 1))))
@@ -238,6 +218,19 @@
       (%%set %%red %video-red)
       (%%set %%green %video-green)
       (%%set %%blue %video-blue))))
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

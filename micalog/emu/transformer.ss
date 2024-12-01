@@ -16,7 +16,6 @@
     (prefix (micac lib std) %%))
 
   ; Requirements:
-  ; - module with explicit previous-clock and clock names
   ; - fully typed
   ; - "on" statement with explicit previous value
   (define (module->micac $module)
@@ -32,6 +31,7 @@
                   (not (declaration-kind-of? #'%input $statement))
                   (not (declaration-kind-of? #'%register $statement))))
               (syntaxes statement ...)))
+          ($clock-input? (kind-name-find-statement #'%input #'1 #'%clock $statements))
           ($reset?-input? (kind-name-find-statement #'%input #'1 #'%reset? $statements))
           ($video-x-input? (kind-name-find-statement #'%input #'9 #'%video-x $statements))
           ($video-y-input? (kind-name-find-statement #'%input #'9 #'%video-y $statements))
@@ -43,7 +43,7 @@
           ($mouse-pressed?-input? (kind-name-find-statement #'%input #'1 #'%mouse-pressed? $statements))
           #`(%%run-emu
             (%%video 352 288 96 24 4)
-            (%%var bool clock 0)
+            #,@(opt->list (and $clock-input? #`(%%var bool %clock 0)))
             #,@(opt->list (and $reset?-input? #`(%%var int reset-counter 32)))
             #,@(opt->list (and $reset?-input? #`(%%var bool %reset? 1)))
             #,@(opt->list (and $video-x-input? #`(%%var int %video-x)))
@@ -53,7 +53,7 @@
             #,@(opt->list (and $mouse-pressed?-input? #`(%%var bool %mouse-pressed?)))
             #,@(map register->micac $registers)
             (%%update
-              (%%set clock (%%xor clock 1))
+              #,@(opt->list (and $clock-input? #`(%%set %clock (%%xor %clock 1))))
               #,@(opt->list
                 (and $reset?-input?
                   #`(%%if (%%= reset-counter 0)
