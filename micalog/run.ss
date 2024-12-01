@@ -22,6 +22,6 @@
               (module->scheme)
               (%let $it
                 (%let ()
-                  (%pretty-print (%syntax->datum $it))
+                  ;(%pretty-print (%syntax->datum $it))
                   $it))))))))
 )
