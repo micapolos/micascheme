@@ -2,6 +2,7 @@
 
 (test
   (micalog core utils)
+  (micalog core inliner)
   (micalog core type)
   (micalog core domain)
   (micalog core inits-updates)

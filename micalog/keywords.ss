@@ -2,6 +2,7 @@
   (export
     module input output
     macro repeat
+    variable
     on posedge negedge edge
     cond else
     register set
@@ -19,6 +20,7 @@
   (define-aux-keywords
     module input output
     macro repeat
+    variable
     on posedge negedge edge
     cond else
     register set
