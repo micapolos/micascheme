@@ -90,78 +90,106 @@
 
 (check-scheme
   (register (%register 8 foo))
-  (define foo 0))
+  (foo 0))
 
 ; === instructions ===
 
 (check-scheme
   (instruction (%wire 8 foo bar))
-  (define foo bar))
+  (foo bar))
 
 (check-scheme
   (instruction (%output 8 foo bar))
-  (define foo bar))
+  (foo bar))
 
 (check-scheme
   (instruction (%set 8 foo bar))
-  (set! foo bar))
+  (run (set! foo bar)))
 
 (check-scheme
   (instruction (%set 8 foo bar))
-  (set! foo bar))
+  (run (set! foo bar)))
 
 (check-scheme
   (instruction (%log foo 16 (%wrap+ 16 1 2)))
-  (display (format "~a: ~a\\n" (bitwise-and (+ 1 2) 65535))))
+  (run (display (format "~a: ~a\\n" (bitwise-and (+ 1 2) 65535)))))
 
 (check-scheme
   (instruction (%on (%posedge prev next)))
-  (when (not (= prev next))
-    (when (= next 1))))
+  (run
+    (when (not (= prev next))
+      (when (= next 1)
+        (lets (void))))))
 
 (check-scheme
   (instruction (%on (%negedge prev next)))
-  (when (not (= prev next))
-    (when (= next 0))))
+  (run
+    (when (not (= prev next))
+      (when (= next 0)
+        (lets (void))))))
 
 (check-scheme
   (instruction
     (%on (%posedge prev next)
       (%set 8 foo bar)
       (%set 8 goo gar)))
-  (when (not (= prev next))
-    (when (= next 1)
-      (set! foo bar)
-      (set! goo gar))))
+  (run
+    (when (not (= prev next))
+      (when (= next 1)
+        (lets
+          (run (set! foo bar))
+          (run (set! goo gar))
+          (void))))))
 
 (check-scheme
   (instruction
     (%cond
       (foo (%set 8 foo bar))
       (%else (%set 8 zoo zar))))
-  (cond
-    (foo (set! foo bar))
-    (else (set! zoo zar))))
+  (run
+    (cond
+      (foo (lets (run (set! foo bar)) (void)))
+      (else (lets (run (set! zoo zar)) (void))))))
 
 (check-scheme
   (instruction
     (%cond
       (foo (%set 8 foo bar))
       (bar (%set 8 zoo zar))))
-  (cond
-    (foo (set! foo bar))
-    (bar (set! zoo zar))))
+  (run
+    (cond
+      (foo (lets (run (set! foo bar)) (void)))
+      (bar (lets (run (set! zoo zar)) (void))))))
+
+; === block ===
+
+(check-scheme
+  (block ())
+  (lets (void)))
+
+(check-scheme
+  (block
+    (
+      (%wire 4 foo bar)
+      (%set 4 goo gar)))
+  (lets
+    (foo bar)
+    (run (set! goo gar))
+    (void)))
 
 ; === module ===
 
 (check-scheme
   (module
     (%module (prev-clock clock)))
-  (let ()
-    (do
-      ((exit? 0 exit?))
-      ((= exit? 1) (void))
-      (let ()))))
+  (lets
+    (run
+      (do
+        ((exit? 0 exit?))
+        ((= exit? 1)
+          (void))
+        (lets (void))))
+    (void)))
 
 (check-scheme
   (module
@@ -170,15 +198,21 @@
       (%on (%posedge prev-clock clock)
         (%wire 16 previous-counter counter)
         (%set 16 counter (%wrap+ 16 previous-counter 1)))))
-   (let ()
-    (define counter 0)
-    (do
-      ((exit? 0 exit?))
-      ((= exit? 1) (void))
-      (let ()
-        (when (not (= prev-clock clock))
-          (when (= clock 1)
-            (define previous-counter counter)
-            (set! counter (bitwise-and (+ previous-counter 1) 65535))))))))
+  (lets
+    (counter 0)
+    (run
+      (do
+        ((exit? 0 exit?))
+        ((= exit? 1) (void))
+        (lets
+          (run
+            (when (not (= prev-clock clock))
+              (when (= clock 1)
+                (lets
+                  (previous-counter counter)
+                  (run (set! counter (bitwise-and (+ previous-counter 1) 65535)))
+                  (void)))))
+          (void))))
+    (void)))
 
 

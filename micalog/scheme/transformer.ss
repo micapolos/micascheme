@@ -3,6 +3,7 @@
     module->scheme
     register->scheme
     instruction->scheme
+    block->scheme
     expr->scheme
     value->scheme)
   (import
@@ -32,64 +33,78 @@
           ($clock-input? (kind-name-find-statement #'%input #'1 #'clock $statements))
           ($reset?-input? (kind-name-find-statement #'%input #'1 #'reset? $statements))
           ($exit?-output? (kind-name-find-statement #'%output #'1 #'exit? $statements))
-          #`(let ()
-            #,@(opt->list (and $clock-input? #`(define clock 0)))
-            #,@(opt->list (and $reset?-input? #`(define reset-counter 32)))
-            #,@(opt->list (and $reset?-input? #`(define reset? 1)))
+          #`(lets
+            #,@(opt->list (and $clock-input? #`(clock 0)))
+            #,@(opt->list (and $reset?-input? #`(reset-counter 32)))
+            #,@(opt->list (and $reset?-input? #`(reset? 1)))
             #,@(map register->scheme $registers)
-            (do
-              ((exit? 0 exit?))
-              ((= exit? 1) (void))
-              #,@(opt->list (and $clock-input? #`(set! clock (xor clock 1))))
-              #,@(opt->list
-                (and $reset?-input?
-                  #`(if (= reset-counter 0)
-                    (set! reset? 0)
-                    (set! reset-counter (- reset-counter 1)))))
-              (let ()
-                #,@(map instruction->scheme $instructions))))))))
+            (run
+              (do
+                ((exit? 0 exit?))
+                ((= exit? 1) (void))
+                (lets
+                  #,@(opt->list (and $clock-input? #`(run (set! clock (xor clock 1)))))
+                  #,@(opt->list
+                    (and $reset?-input?
+                      #`(run
+                        (if (= reset-counter 0)
+                          (set! reset? 0)
+                          (set! reset-counter (- reset-counter 1))))))
+                  #,@(map instruction->scheme $instructions)
+                  (void))))
+            (void))))))
 
   (define (register->scheme $statement)
     (syntax-case $statement (%register)
       ((%register type name)
-        #`(define #,(name->scheme #'name) 0))))
+        #`(#,(name->scheme #'name) 0))))
+
+  (define (block->scheme $block)
+    #`(lets
+      #,@(map instruction->scheme (syntax->list $block))
+      (void)))
 
   (define (instruction->scheme $statement)
     (syntax-case $statement (%output %wire %set %log %on %cond %else)
       ((%output type name expr)
-        #`(define
+        #`(
           #,(name->scheme #'name)
           #,(expr->scheme #'expr)))
       ((%wire type name expr)
-        #`(define
+        #`(
           #,(name->scheme #'name)
           #,(expr->scheme #'expr)))
       ((%set type name expr)
-        #`(set!
-          #,(name->scheme #'name)
-          #,(expr->scheme #'expr)))
-      ((%log label type expr)
-        #`(display
-          (format "~a: ~a\\n"
+        #`(run
+          (set!
+            #,(name->scheme #'name)
             #,(expr->scheme #'expr))))
+      ((%log label type expr)
+        #`(run
+          (display
+            (format "~a: ~a\\n"
+              #,(expr->scheme #'expr)))))
       ((%cond clause ... (%else els ...))
-        #`(cond
-          #,@(map clause->scheme (syntaxes clause ...))
-          (else #,@(map instruction->scheme (syntaxes els ...)))))
+        #`(run
+          (cond
+            #,@(map clause->scheme (syntaxes clause ...))
+            (else #,(block->scheme #'(els ...))))))
       ((%cond clause-1 clause ...)
-        #`(cond
-          #,@(map clause->scheme (syntaxes clause-1 clause ...))))
+        #`(run
+          (cond
+            #,@(map clause->scheme (syntaxes clause-1 clause ...)))))
       ((%on (edge previous-name name) statement ...)
-        #`(when (not (= #,(name->scheme #'previous-name) #,(name->scheme #'name)))
-          (when (= #,(name->scheme #'name) #,(edge->scheme #'edge))
-            #,@(map instruction->scheme (syntaxes statement ...)))))))
+        #`(run
+          (when (not (= #,(name->scheme #'previous-name) #,(name->scheme #'name)))
+            (when (= #,(name->scheme #'name) #,(edge->scheme #'edge))
+              #,(block->scheme #'(statement ...))))))))
 
   (define (clause->scheme $clause)
     (syntax-case $clause ()
       ((cond instruction ...)
         #`(
           #,(expr->scheme #'cond)
-          #,@(map instruction->scheme (syntaxes instruction ...))))))
+          #,(block->scheme #'(instruction ...))))))
 
   (define (edge->scheme $edge)
     (syntax-case $edge (%posedge %negedge)
