@@ -1,7 +1,8 @@
 (import
   (micascheme)
   (micalog scheme transformer)
-  (prefix (micalog keywords) %))
+  (prefix (micalog keywords) %)
+  (prefix (micalog scheme keywords) %))
 
 (define-check-datum-> scheme)
 
@@ -100,7 +101,7 @@
 
 (check-scheme
   (instruction (%output 8 foo bar))
-  (foo bar))
+  (run))
 
 (check-scheme
   (instruction (%set 8 foo bar))
@@ -180,39 +181,40 @@
 ; === module ===
 
 (check-scheme
-  (module
-    (%module (prev-clock clock)))
-  (lets
-    (run
-      (do
-        ((exit? 0 exit?))
-        ((= exit? 1)
-          (void))
-        (lets (void))))
-    (void)))
+  (module (%module foo))
+  (eval (quote (lets (run (do () (#f (void)) (lets (void)))) (void))) (environment (quote (micascheme)))))
 
 (check-scheme
   (module
-    (%module (prev-clock clock)
-      (%register 16 counter)
-      (%on (%posedge prev-clock clock)
-        (%wire 16 previous-counter counter)
-        (%set 16 counter (%wrap+ 16 previous-counter 1)))))
-  (lets
-    (counter 0)
-    (run
-      (do
-        ((exit? 0 exit?))
-        ((= exit? 1) (void))
-        (lets
-          (run
-            (when (not (= prev-clock clock))
-              (when (= clock 1)
-                (lets
-                  (previous-counter counter)
-                  (run (set! counter (bitwise-and (+ previous-counter 1) 65535)))
-                  (void)))))
-          (void))))
-    (void)))
+    (%module foo
+      (%input 1 %clock)
+      (%input 1 %reset?)
+      (%output 1 %exit? (%not 1 %reset?))))
+   (eval
+    (quote
+      (lets
+        (clock 0)
+        (reset-counter 32)
+        (reset? 1)
+        (run
+          (do ()
+            ((= (bitwise-and (not %reset?) 1) 1) (void))
+            (lets
+              (run (set! clock (xor clock 1)))
+              (run
+                (cond
+                  ((= reset-counter 0) (set! reset? 0))
+                  (else (set! reset-counter (- reset-counter 1)))))
+              (run)
+              (void))))
+        (void)))
+    (environment (quote (micascheme)))) )
+
+
+
+
+
+
+
 
 

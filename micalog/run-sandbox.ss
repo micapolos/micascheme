@@ -1,4 +1,6 @@
 (import (micalog run) (micalog std))
 
 (micalog-run
-  (module colour-bars))
+  (module sandbox
+    (input 1 reset?)
+    (output exit? reset?)))

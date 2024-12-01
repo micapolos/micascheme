@@ -33,26 +33,33 @@
           ($clock-input? (kind-name-find-statement #'%input #'1 #'clock $statements))
           ($reset?-input? (kind-name-find-statement #'%input #'1 #'reset? $statements))
           ($exit?-output? (kind-name-find-statement #'%output #'1 #'exit? $statements))
-          #`(lets
-            #,@(opt->list (and $clock-input? #`(clock 0)))
-            #,@(opt->list (and $reset?-input? #`(reset-counter 32)))
-            #,@(opt->list (and $reset?-input? #`(reset? 1)))
-            #,@(map register->scheme $registers)
-            (run
-              (do
-                ((exit? 0 exit?))
-                ((= exit? 1) (void))
-                (lets
-                  #,@(opt->list (and $clock-input? #`(run (set! clock (xor clock 1)))))
-                  #,@(opt->list
-                    (and $reset?-input?
-                      #`(run
-                        (if (= reset-counter 0)
-                          (set! reset? 0)
-                          (set! reset-counter (- reset-counter 1))))))
-                  #,@(map instruction->scheme $instructions)
-                  (void))))
-            (void))))))
+          #`(eval
+            '(lets
+              #,@(opt->list (and $clock-input? #`(clock 0)))
+              #,@(opt->list (and $reset?-input? #`(reset-counter 32)))
+              #,@(opt->list (and $reset?-input? #`(reset? 1)))
+              #,@(map register->scheme $registers)
+              (run
+                (do ()
+                  (
+                    #,(if $exit?-output?
+                      (syntax-case $exit?-output? ()
+                        ((%output type name expr)
+                          #`(= #,(expr->scheme #'expr) 1)))
+                      #`#f)
+                    (void))
+                  (lets
+                    #,@(opt->list (and $clock-input? #`(run (set! clock (xor clock 1)))))
+                    #,@(opt->list
+                      (and $reset?-input?
+                        #`(run
+                          (cond
+                            ((= reset-counter 0) (set! reset? 0))
+                            (else (set! reset-counter (- reset-counter 1)))))))
+                    #,@(map instruction->scheme $instructions)
+                    (void))))
+              (void))
+            (environment '(micascheme)))))))
 
   (define (register->scheme $statement)
     (syntax-case $statement (%register)
@@ -67,9 +74,7 @@
   (define (instruction->scheme $statement)
     (syntax-case $statement (%output %wire %set %log %on %cond %else)
       ((%output type name expr)
-        #`(
-          #,(name->scheme #'name)
-          #,(expr->scheme #'expr)))
+        #`(run))
       ((%wire type name expr)
         #`(
           #,(name->scheme #'name)
