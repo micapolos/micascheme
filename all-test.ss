@@ -20,6 +20,7 @@
   (identifier)
   (indexed)
   (inline)
+  (int)
   (leo)
   (leo-syntax)
   (leo2)

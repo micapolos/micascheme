@@ -8,8 +8,13 @@
     nonnegative-integer?
     one?
     bitwise-align
-    !=)
-  (import (scheme))
+    !=
+    integer-mask
+    integer-wraparound
+    integer+/wraparound
+    integer-/wraparound
+    integer*/wraparound)
+  (import (scheme) (syntax))
 
   (define pi (* (asin 1) 2))
   (define pi2 (* (asin 1) 4))
@@ -52,4 +57,19 @@
 
   (define (!= a b)
     (not (= a b)))
+
+  (define-rule-syntax (integer-mask size)
+    (syntax-inline (- (bitwise-arithmetic-shift-left 1 size) 1)))
+
+  (define-rule-syntax (integer-wraparound size i)
+    (bitwise-and i (integer-mask size)))
+
+  (define-rule-syntax (integer+/wraparound size a b)
+    (integer-wraparound size (+ a b)))
+
+  (define-rule-syntax (integer-/wraparound size a b)
+    (integer-wraparound size (- a b)))
+
+  (define-rule-syntax (integer*/wraparound size a b)
+    (integer-wraparound size (* a b)))
 )
