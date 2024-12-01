@@ -2,7 +2,7 @@
   (micascheme)
   (syntax lookup)
   (micalog core inliner)
-  (prefix (micalog keywords) %))
+  (prefix (micalog core keywords) %))
 
 ; (displayln
 ;   (fluent (empty-lookup)

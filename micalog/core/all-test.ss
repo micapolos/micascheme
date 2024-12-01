@@ -1,6 +1,7 @@
 (import (micascheme))
 
 (test
+  (micalog core keywords)
   (micalog core utils)
   (micalog core inliner)
   (micalog core type)

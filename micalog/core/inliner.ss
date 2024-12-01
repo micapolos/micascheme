@@ -5,7 +5,7 @@
   (import
     (micascheme)
     (syntax lookup)
-    (prefix (micalog keywords) %))
+    (prefix (micalog core keywords) %))
 
   (data (expr inliner))
 
