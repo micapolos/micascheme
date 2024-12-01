@@ -4,8 +4,8 @@
     (prefix (micascheme) %)
     (micalog scheme transformer)
     (micalog core type)
-    (micalog emu on-old-new)
-    (micalog emu inits-updates))
+    (micalog core on-old-new)
+    (micalog core inits-updates))
   (%export (import (micalog keywords)))
   (%export (import (micalog scheme keywords)))
 

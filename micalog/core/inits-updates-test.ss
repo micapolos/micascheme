@@ -1,6 +1,6 @@
 (import
   (micascheme)
-  (micalog emu inits-updates)
+  (micalog core inits-updates)
   (prefix (micalog keywords) %))
 
 (define-check-datum-> inits-updates-syntax)

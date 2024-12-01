@@ -1,4 +1,4 @@
-(library (micalog emu on-old-new)
+(library (micalog core on-old-new)
   (export
     module->on-old-new-syntax
     statement->on-old-new-syntax
