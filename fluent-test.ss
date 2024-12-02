@@ -6,12 +6,18 @@
   (procedure))
 
 (check-equal?
-  (fluent)
-  (void))
+  (values->list (fluent))
+  (list))
 
 (check-equal?
   (fluent "a")
   "a")
+
+(check-equal?
+  (fluent
+    "a"
+    (string-append "b"))
+  "ab")
 
 (check-equal?
   (fluent
@@ -63,7 +69,7 @@
     "ac")
   (check-equal? $consumed (list "a" "b")))
 
-(let ()
+ (let ()
   (define $consumed (list))
   (define (consume . $values)
     (set! $consumed (append $values $consumed)))

@@ -69,16 +69,7 @@
   (define (generate-identifier $id)
     (if (generates-identifier?)
       (parameterize
-        ((gensym-prefix
-          (fluent $id
-            (syntax->datum)
-            (symbol->string)
-            (string-append "_"))))
-        (fluent
-          (generate-temporary)
-          (syntax->datum)
-          (symbol->string)
-          (string->symbol)
-          (let $it (datum->syntax $id $it))))
+        ((gensym-prefix (string-append (symbol->string (syntax->datum $id)) "_")))
+        (datum->syntax $id (string->symbol (symbol->string (syntax->datum (generate-temporary))))))
       $id))
 )
