@@ -10,23 +10,22 @@
   (void))
 
 (check-equal?
-  (fluent "foo")
-  "foo")
+  (fluent "a")
+  "a")
 
 (check-equal?
   (fluent
-    "foo"
-    (string-append "bar")
+    "a"
+    (string-append "b")
     (string-length))
-  6)
+  2)
 
 (check-equal?
   (fluent
-    "foo"
-    (string-append "bar")
-    (let $it (string-append "Hello, " $it))
-    (string-append "!"))
-  "Hello, foobar!")
+    "c"
+    (let $it (string-append "a" "b" $it))
+    (string-append "d"))
+  "abcd")
 
 (check-equal?
   (fluent
@@ -58,11 +57,11 @@
     (set! $consumed (append $values $consumed)))
   (check-equal?
     (fluent
-      "foo"
-      (also (consume "bar"))
-      (string-append "goo"))
-    "foogoo")
-  (check-equal? $consumed (list "foo" "bar")))
+      "a"
+      (also (consume "b"))
+      (string-append "c"))
+    "ac")
+  (check-equal? $consumed (list "a" "b")))
 
 (let ()
   (define $consumed (list))
@@ -72,6 +71,6 @@
     (fluent
       (3 (values "a" "b" "c"))
       (also (consume "d"))
-      (string-append "d"))
-    "abcd")
+      (string-append "e"))
+    "abce")
   (check-equal? $consumed (list "a" "b" "c" "d")))
