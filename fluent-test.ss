@@ -3,7 +3,8 @@
   (check)
   (fluent)
   (list)
-  (procedure))
+  (procedure)
+  (syntax))
 
 (check-equal?
   (fluent "a")
@@ -76,3 +77,12 @@
       (string-append "e"))
     "abce")
   (check-equal? $consumed (list "a" "b" "c" "d")))
+
+(define-rule-syntax (check-syntax-error body)
+  (check (raises (expand 'body (environment '(scheme) '(fluent))))))
+
+(check-syntax-error (fluent))
+(check-syntax-error (fluent "a" "b"))
+(check-syntax-error (fluent "a" (let (x y) (string-append x y))))
+(check-syntax-error (fluent (values "a" "b") (let x (string-append x))))
+(check-syntax-error (fluent (values "a" "b") (let (x y z) (string-append x y z))))
