@@ -6,10 +6,6 @@
   (procedure))
 
 (check-equal?
-  (values->list (fluent))
-  (list))
-
-(check-equal?
   (fluent "a")
   "a")
 

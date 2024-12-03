@@ -5,14 +5,25 @@
   (define-aux-keyword also)
 
   (define-syntax (fluent $syntax)
+    (define (arity-syntax $syntax)
+      (syntax-case $syntax (values)
+        ((arity expr)
+          (and (integer? (datum arity)) (nonnegative? (datum arity)))
+          $syntax)
+        ((values x ...)
+          #`(
+            #,(literal->syntax (length (syntaxes x ...)))
+            #,$syntax))
+        (_
+          #`(1 #,$syntax))))
+
     (define (fluent+ $fluent $syntax)
       (let
         (
           ($arity (car $fluent))
           ($syntax-proc (cdr $fluent)))
-        (syntax-case $syntax (values)
+        (syntax-case (arity-syntax $syntax) ()
           ((arity expr)
-            (and (integer? (datum arity)) (nonnegative? (datum arity)))
             (syntax-case #'expr (let also)
               ((let (var ...) expr)
                 (for-all identifier? (syntaxes var ...))
@@ -41,30 +52,18 @@
                   (lambda ($body)
                     (let (($tmps (generate-temporaries (iota $arity))))
                       #`(let-values (((#,@$tmps) #,($syntax-proc $body)))
-                        (fn #,@$tmps x ...))))))
-              (other
-                (case $arity
-                  ((0)
-                    (cons
-                      (datum arity)
-                      (lambda ($body)
-                        #`(let () #,($syntax-proc $body) other))))
-                  (else
-                    (syntax-error #'other))))))
-          ((values x ...)
-            (fluent+ $fluent
-              #`(
-                #,(literal->syntax (length (syntaxes x ...)))
-                #,$syntax)))
-          (other
-            (fluent+ $fluent #`(1 other))))))
+                        (fn #,@$tmps x ...)))))))))))
 
     (syntax-case $syntax ()
-      ((fluent x ...)
+      ((fluent x xs ...)
         (
           (cdr
             (fold-left
               fluent+
-              (cons 0 (lambda ($body) $body))
-              (syntaxes x ...)))
-          #'(values))))))
+              (syntax-case (arity-syntax #'x) ()
+                ((arity expr)
+                  (cons
+                    (datum arity)
+                    (lambda ($body) #'expr))))
+              (syntaxes xs ...)))
+          #'(void))))))
