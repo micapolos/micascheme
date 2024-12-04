@@ -25,6 +25,27 @@
 
 (check-equal?
   (fluent
+    "a"
+    (with "b")
+    (string-append "c"))
+  "abc")
+
+(check-equal?
+  (fluent
+    "a"
+    (with "b" "c")
+    (string-append "d"))
+  "abcd")
+
+(check-equal?
+  (fluent
+    "a"
+    (with (values "b" "c"))
+    (string-append "d"))
+  "abcd")
+
+(check-equal?
+  (fluent
     "c"
     (let $it (string-append "a" "b" $it))
     (string-append "d"))

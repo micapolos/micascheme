@@ -1,8 +1,8 @@
 (library (fluent)
-  (export fluent also)
+  (export fluent also with)
   (import (scheme) (syntax) (procedure))
 
-  (define-aux-keyword also)
+  (define-aux-keywords also with)
 
   (define-syntax (fluent $syntax)
     (define (arity-syntax $syntax)
@@ -24,7 +24,7 @@
           ($syntax-proc (cdr $fluent)))
         (syntax-case (arity-syntax $syntax) ()
           ((arity expr)
-            (syntax-case #'expr (let also)
+            (syntax-case #'expr (let also with)
               ((let (var ...) expr)
                 (for-all identifier? (syntaxes var ...))
                 (let (($vars (syntaxes var ...)))
@@ -46,6 +46,22 @@
                       #`(let-values (((#,@$tmps) #,($syntax-proc $body)))
                         (fn #,@$tmps x ...)
                         (values #,@$tmps))))))
+              ((with x ...)
+                (let*
+                  (
+                    ($tmps (generate-temporaries (iota $arity)))
+                    ($x-arity-syntaxes (map (dot syntax->list arity-syntax) (syntaxes x ...)))
+                    ($x-arities (map (dot syntax->datum car) $x-arity-syntaxes))
+                    ($x-syntaxes (map cdr $x-arity-syntaxes))
+                    ($x-tmps (map (dot generate-temporaries iota) $x-arities)))
+                  (cons
+                    (apply + $arity $x-arities)
+                    (lambda ($body)
+                      #`(let-values
+                        (
+                          ((#,@$tmps) #,($syntax-proc $body))
+                          #,@(map syntax-cons (map list->syntax $x-tmps) $x-syntaxes))
+                        (values #,@$tmps #,@(apply append $x-tmps)))))))
               ((fn x ...)
                 (cons
                   (datum arity)
