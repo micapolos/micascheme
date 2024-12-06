@@ -85,3 +85,13 @@
 (check-asm (op (ld l foo))    (asm (db #b00101110) (db foo)))
 (check-asm (op (ld (hl) foo)) (asm (db #b00110110) (db foo)))
 (check-asm (op (ld a foo))    (asm (db #b00111110) (db foo)))
+
+(check-asm (op (ld ixh ixh))  (asm (db #xdd) (db #b01100100)))
+(check-asm (op (ld ixh ixl))  (asm (db #xdd) (db #b01100101)))
+(check-asm (op (ld ixl ixh))  (asm (db #xdd) (db #b01101100)))
+(check-asm (op (ld ixl ixl))  (asm (db #xdd) (db #b01101101)))
+
+(check-asm (op (ld iyh iyh))  (asm (db #xfd) (db #b01100100)))
+(check-asm (op (ld iyh iyl))  (asm (db #xfd) (db #b01100101)))
+(check-asm (op (ld iyl iyh))  (asm (db #xfd) (db #b01101100)))
+(check-asm (op (ld iyl iyl))  (asm (db #xfd) (db #b01101101)))
