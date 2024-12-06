@@ -88,7 +88,7 @@
         $syntaxes)))
 
   (define-syntax define-rule-syntax
-    (syntax-rules (literals)
+    (syntax-rules ()
       ((_ (literal ...) (name param ...) body rest ...)
         (identifier? #'name)
         (define-syntax name
