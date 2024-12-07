@@ -1,8 +1,12 @@
 (library (z80 keywords)
   (export
-    db dw
+    db dw +
 
     nop ld halt
+
+    add adc sub sbc
+    and or xor cp
+    inc dec
 
     pc sp
     a f b c d e h l
@@ -14,9 +18,13 @@
   (import (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
-    db dw
+    db dw +
 
     nop ld halt
+
+    add adc sub sbc
+    and or xor cp
+    inc dec
 
     pc sp
     a f b c d e h l
