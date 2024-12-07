@@ -6,7 +6,7 @@
 (%define-rule-syntax (check-asm (op out %...) %...)
   (%begin
     (%check-datum=?
-      (%list->syntax (op->asm (%syntax op)))
+      (%list->syntax (op->asm? (%syntax op)))
       (%syntax (out %...))) %...))
 
 (check-asm

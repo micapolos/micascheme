@@ -1,6 +1,6 @@
 (library (z80 asm)
   (export
-    op->asm)
+    op->asm?)
   (import
     (rename (micascheme)
       (and %and)
@@ -10,11 +10,11 @@
       (+ %+))
     (z80 keywords))
 
-  (define-rule-syntax (asm-syntax-case stx literals (pattern fender body ... ) ...)
-    (syntax-case stx literals (pattern fender (filter-opts (list body ...))) ...))
+  (define-rule-syntax (asm-syntax-case? stx literals (pattern fender body ... ) ...)
+    (syntax-case? stx literals (pattern fender (filter-opts (list body ...))) ...))
 
-  (define (op->asm $op)
-    (asm-syntax-case $op (a nop ld)
+  (define (op->asm? $op)
+    (asm-syntax-case? $op (a nop ld hl)
       ((add a r) (%and (add-3? add) (rx-3? r))
         (db-prefix? r)
         (db-233 #b10 (add-3? add) (rx-3? r))
