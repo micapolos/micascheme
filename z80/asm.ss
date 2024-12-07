@@ -11,7 +11,7 @@
     (z80 keywords))
 
   (define-rule-syntax (asm-syntax-case stx literals (pattern fender body ... ) ...)
-    (syntax-case stx literals (pattern fender (list->asm body ...)) ...))
+    (syntax-case stx literals (pattern fender (filter-opts (list body ...))) ...))
 
   (define (op->asm $op)
     (asm-syntax-case $op (a nop ld)
@@ -130,7 +130,4 @@
 
   (define-rule-syntax (db-n n)
     #'(db n))
-
-  (define (list->asm . $ops)
-    #`(asm #,@(filter-opts $ops)))
 )

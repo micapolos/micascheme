@@ -6,8 +6,8 @@
 (%define-rule-syntax (check-asm (op out %...) %...)
   (%begin
     (%check-datum=?
-      (op->asm (%syntax op))
-      (%syntax (asm out %...))) %...))
+      (%list->syntax (op->asm (%syntax op)))
+      (%syntax (out %...))) %...))
 
 (check-asm
   ((add a b)          (db #b10000000))

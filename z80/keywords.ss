@@ -12,9 +12,7 @@
     a f b c d e h l
     af bc de hl
     ixh ixl iyh iyl
-    ix iy
-
-    asm)
+    ix iy)
   (import (only (micascheme) define-aux-keywords))
 
   (define-aux-keywords
@@ -30,7 +28,5 @@
     a f b c d e h l
     af bc de hl
     ixh ixl iyh iyl
-    ix iy
-
-    asm)
+    ix iy)
 )
