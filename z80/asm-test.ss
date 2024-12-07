@@ -1,7 +1,10 @@
 (import
-  (only (micascheme) define-check-datum->)
+  (only (micascheme) define-check-datum-> define-rule-syntax ... check-datum=? begin syntax quote)
   (z80 asm)
   (z80 keywords))
+
+; (define-rule-syntax (check-asm2 (op out ...) ...)
+;   (begin (check-datum=? (op->asm #'op) #'(asm out ...)) ...))
 
 (define-check-datum-> asm)
 
