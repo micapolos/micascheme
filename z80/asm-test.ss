@@ -7,7 +7,8 @@
   (%begin
     (%check-datum=?
       (%list->syntax (op->asm? (%syntax op)))
-      (%syntax (out %...))) %...))
+      (%syntax (out %...)))
+    %...))
 
 (check-asm
   ((add a b)          (db #b10000000))
