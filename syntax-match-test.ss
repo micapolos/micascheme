@@ -36,25 +36,31 @@
           (switch-opt (syntax->datum $syntax)
             ((string? $string)
               (lambda ()
-                (lets (s $string) body))))))))
+                (lets
+                  (s $string)
+                  body))))))))
 
   (check-equal? (pattern-match #'"foo" (str s) (string-append s "!")) "foo!")
   (check (raises (pattern-match #'123 (str s) (string-append s "!")))))
 
+(let ()
+  (define-pattern-matcher nums
+    (syntax-rules ()
+      ((_ (_ n-1 n n+1) body)
+        (lambda ($syntax)
+          (switch-opt (syntax->datum $syntax)
+            ((number? $number)
+              (lambda ()
+                (lets
+                  (n-1 (- $number 1))
+                  (n $number)
+                  (n+1 (+ $number 1))
+                  body))))))))
+
+  (check-equal? (pattern-match #'10 (nums $n-1 $n $n+1) (list $n-1 $n $n+1)) (list 9 10 11))
+  (check (raises (pattern-match #'"foo" (nums $n-1 $n $n+1) (list $n-1 $n $n+1)))))
+
 ; === syntax-match ===
-
-(define-syntax-match-clause string-match
-  (lambda ($syntax)
-    (syntax-case $syntax ()
-      (((_ s) body)
-        #`(s
-          (string? (datum s))
-          (let ((s (datum s))) body))))))
-
-(define-syntax-match-clause (number-match n) body
-  (n
-    (number? (datum n))
-    (let ((n (datum n))) body)))
 
 (check
   (raises
@@ -117,6 +123,19 @@
   (syntax-match #'(+ 1 2)
     ((#'x #'y #'z) (list (syntax->datum x) (syntax->datum y) (syntax->datum z))))
   '(+ 1 2))
+
+(define-syntax-match-clause string-match
+  (lambda ($syntax)
+    (syntax-case $syntax ()
+      (((_ s) body)
+        #`(s
+          (string? (datum s))
+          (let ((s (datum s))) body))))))
+
+(define-syntax-match-clause (number-match n) body
+  (n
+    (number? (datum n))
+    (let ((n (datum n))) body)))
 
 (check-equal?
   (syntax-match #'"foo"
