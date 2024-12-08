@@ -19,6 +19,7 @@
         (define-syntax (id $syntax) (syntax-error $syntax "misplaced syntax-match-matcher"))
         (define-property id syntax-match-clause proc))))
 
+  ; TODO: Add support for ...
   (define-syntax (syntax-match $syntax)
     (lambda ($lookup)
       (define (transform-clause $syntax)
