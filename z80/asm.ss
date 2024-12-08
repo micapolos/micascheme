@@ -59,7 +59,7 @@
       (a #b111)))
 
   (define-rule-syntax (rx-3? r)
-    (syntax-case? #'r (+ b c d e h l a hl ix ixh ixl iy iyh iyl)
+    (syntax-match? #'r
       (b        #b000)
       (c        #b001)
       (d        #b010)
@@ -71,50 +71,50 @@
       (ixl      #b101)
       (iyl      #b101)
       ((hl)     #b110)
-      ((+ ix d) #b110)
-      ((+ iy d) #b110)
+      ((+ ix _) #b110)
+      ((+ iy _) #b110)
       (a        #b111)))
 
   (define-rule-syntax (db-prefix? x)
-    (syntax-case? #'x (+ ix ixh ixl ix iyh iyl)
+    (syntax-match? #'x
       (ixh      (db-8 #xdd))
       (ixl      (db-8 #xdd))
-      ((+ ix d) (db-8 #xdd))
+      ((+ ix _) (db-8 #xdd))
       (iyh      (db-8 #xfd))
       (iyl      (db-8 #xfd))
-      ((+ iy d) (db-8 #xfd))))
+      ((+ iy _) (db-8 #xfd))))
 
   (define-rule-syntax (db-offset? x)
-    (syntax-case? #'x (+ ix ixh ixl ix iyh iyl)
-      ((+ ix d) (db-8 (datum d)))
-      ((+ iy d) (db-8 (datum d)))))
+    (syntax-match? #'x
+      ((+ ix #'d) #'(db d))
+      ((+ iy #'d) #'(db d))))
 
   (define-rule-syntax (add-3? x)
-    (syntax-case? #'x (add adc sub sbc)
+    (syntax-match? #'x
       (add #b000)
       (adc #b001)
       (sub #b010)
       (sbc #b011)))
 
   (define-rule-syntax (and-3? x)
-    (syntax-case? #'x (and or xor cp)
+    (syntax-match? #'x
       (and #b100)
       (or  #b101)
       (xor #b110)
       (cp  #b111)))
 
   (define-rule-syntax (inc-3? x)
-    (syntax-case? #'x (inc dec)
+    (syntax-match? #'x
       (inc #b100)
       (dec #b101)))
 
   (define-rule-syntax (p-3? p)
-    (syntax-case? #'p (ixh ixl)
+    (syntax-match? #'p
       (ixh #b100)
       (ixl #b101)))
 
   (define-rule-syntax (q-3? q)
-    (syntax-case? #'q (iyh iyl)
+    (syntax-match? #'q
       (iyh #b100)
       (iyl #b101)))
 
