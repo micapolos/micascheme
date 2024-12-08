@@ -2,6 +2,44 @@
 
 (define-aux-keywords foo bar)
 
+; === pattern-match ===
+
+(check-equal? (pattern-match #'(_ 1 2) _ "ok") "ok")
+
+(check-equal? (pattern-match #'(+ 1 2) #'x (syntax->datum x)) '(+ 1 2))
+
+(check-equal? (pattern-match #'() () "ok") "ok")
+(check-equal? (pattern-match #'128 128 "ok") "ok")
+(check-equal? (pattern-match #'"foo" "foo" "ok") "ok")
+(check-equal? (pattern-match #'#\a #\a "ok") "ok")
+(check-equal? (pattern-match #'#t #t "ok") "ok")
+(check-equal? (pattern-match #'#f #f "ok") "ok")
+
+(check (raises (pattern-match #'() 123 "ok")))
+(check (raises (pattern-match #'123 () "ok")))
+
+(check-equal? (pattern-match #'foo foo "ok") "ok")
+(check (raises (pattern-match #'bar foo "ok")))
+
+(check-equal? (pattern-match #'(foo bar) (foo bar) "ok") "ok")
+(check (raises (pattern-match #'(foo foo) (foo bar) "ok")))
+(check (raises (pattern-match #'(bar bar) (foo bar) "ok")))
+
+(let ()
+  (define-pattern-matcher str
+    (syntax-rules ()
+      ((_ (_ s) body)
+        (lambda ($syntax)
+          (switch-opt (syntax->datum $syntax)
+            ((string? $string)
+              (lambda ()
+                (lets (s $string) body))))))))
+
+  (check-equal? (pattern-match #'"foo" (str s) (string-append s "!")) "foo!")
+  (check (raises (pattern-match #'123 (str s) (string-append s "!")))))
+
+; === syntax-match ===
+
 (define-syntax-match-clause string-match
   (lambda ($syntax)
     (syntax-case $syntax ()
@@ -14,8 +52,6 @@
   (n
     (number? (datum n))
     (let ((n (datum n))) body)))
-
-; === syntax-match ===
 
 (check
   (raises
@@ -121,39 +157,3 @@
   (syntax-match #'10
     ((numbers-match a b c) (list a b c)))
   (list 9 10 11))
-
-; === pattern-match? ===
-
-(check-equal? (pattern-match #'(_ 1 2) _ "ok") "ok")
-
-(check-equal? (pattern-match #'(+ 1 2) #'x (syntax->datum x)) '(+ 1 2))
-
-(check-equal? (pattern-match #'() () "ok") "ok")
-(check-equal? (pattern-match #'128 128 "ok") "ok")
-(check-equal? (pattern-match #'"foo" "foo" "ok") "ok")
-(check-equal? (pattern-match #'#\a #\a "ok") "ok")
-(check-equal? (pattern-match #'#t #t "ok") "ok")
-(check-equal? (pattern-match #'#f #f "ok") "ok")
-
-(check (raises (pattern-match #'() 123 "ok")))
-(check (raises (pattern-match #'123 () "ok")))
-
-(check-equal? (pattern-match #'foo foo "ok") "ok")
-(check (raises (pattern-match #'bar foo "ok")))
-
-(check-equal? (pattern-match #'(foo bar) (foo bar) "ok") "ok")
-(check (raises (pattern-match #'(foo foo) (foo bar) "ok")))
-(check (raises (pattern-match #'(bar bar) (foo bar) "ok")))
-
-(let ()
-  (define-pattern-matcher str
-    (syntax-rules ()
-      ((_ (_ s) body)
-        (lambda ($syntax)
-          (switch-opt (syntax->datum $syntax)
-            ((string? $string)
-              (lambda ()
-                (lets (s $string) body))))))))
-
-  (check-equal? (pattern-match #'"foo" (str s) (string-append s "!")) "foo!")
-  (check (raises (pattern-match #'123 (str s) (string-append s "!")))))
