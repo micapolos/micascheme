@@ -1,4 +1,4 @@
-(import (scheme) (lets) (check) (syntax) (generate) (syntax-match))
+(import (scheme) (lets) (check) (syntax) (switch) (generate) (syntax-match))
 
 (define-aux-keywords foo bar)
 
@@ -121,3 +121,39 @@
   (syntax-match #'10
     ((numbers-match a b c) (list a b c)))
   (list 9 10 11))
+
+; === pattern-match? ===
+
+(check-equal? (pattern-match #'(_ 1 2) _ "ok") "ok")
+
+(check-equal? (pattern-match #'(+ 1 2) #'x (syntax->datum x)) '(+ 1 2))
+
+(check-equal? (pattern-match #'() () "ok") "ok")
+(check-equal? (pattern-match #'128 128 "ok") "ok")
+(check-equal? (pattern-match #'"foo" "foo" "ok") "ok")
+(check-equal? (pattern-match #'#\a #\a "ok") "ok")
+(check-equal? (pattern-match #'#t #t "ok") "ok")
+(check-equal? (pattern-match #'#f #f "ok") "ok")
+
+(check (raises (pattern-match #'() 123 "ok")))
+(check (raises (pattern-match #'123 () "ok")))
+
+(check-equal? (pattern-match #'foo foo "ok") "ok")
+(check (raises (pattern-match #'bar foo "ok")))
+
+(check-equal? (pattern-match #'(foo bar) (foo bar) "ok") "ok")
+(check (raises (pattern-match #'(foo foo) (foo bar) "ok")))
+(check (raises (pattern-match #'(bar bar) (foo bar) "ok")))
+
+(let ()
+  (define-pattern-match-proc?-syntax str
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ expr (_ s) body)
+          #'(switch-opt (syntax->datum expr)
+            ((string? $string)
+              (lambda ()
+                (lets (s $string) body))))))))
+
+  (check-equal? (pattern-match #'"foo" (str s) (string-append s "!")) "foo!")
+  (check (raises (pattern-match #'123 (str s) (string-append s "!")))))
