@@ -2,7 +2,7 @@
 
 (define-aux-keywords foo bar)
 
-(define-syntax-match string-match
+(define-syntax-match-clause string-match
   (lambda ($syntax)
     (syntax-case $syntax ()
       (((_ s) body)
@@ -10,7 +10,7 @@
           (string? (datum s))
           (let ((s (datum s))) body))))))
 
-(define-syntax-match (number-match n) body
+(define-syntax-match-clause (number-match n) body
   (n
     (number? (datum n))
     (let ((n (datum n))) body)))

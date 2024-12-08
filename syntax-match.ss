@@ -1,17 +1,23 @@
 (library (syntax-match)
-  (export define-syntax-match syntax-match syntax-match?)
+  (export
+    syntax-match-clause
+    define-syntax-match-clause
+    syntax-match
+    syntax-match?)
   (import (scheme) (syntax) (syntaxes) (generate) (lets))
 
+  (define-aux-keyword syntax-match-clause)
+
   (define-rules-syntax
-    ((define-syntax-match (id param ...) in body)
-      (define-syntax-match id
+    ((define-syntax-match-clause (id param ...) in body)
+      (define-syntax-match-clause id
         (lambda ($syntax)
           (syntax-case $syntax ()
             (((id param ...) in) #'body)))))
-    ((define-syntax-match id proc)
+    ((define-syntax-match-clause id proc)
       (begin
-        (define-syntax (id $syntax) (syntax-error $syntax "misplaced syntax-match"))
-        (define-property id syntax-match proc))))
+        (define-syntax (id $syntax) (syntax-error $syntax "misplaced syntax-match-matcher"))
+        (define-property id syntax-match-clause proc))))
 
   (define-syntax (syntax-match $syntax)
     (lambda ($lookup)
@@ -22,11 +28,11 @@
           (((syntax x) fender body)
             #`(x fender body))
           (((id . args) fender body)
-            (and (identifier? #'id) ($lookup #'id #'syntax-match))
-            (($lookup #'id #'syntax-match) #`((id . args) body)))
+            (and (identifier? #'id) ($lookup #'id #'syntax-match-clause))
+            (($lookup #'id #'syntax-match-clause) #`((id . args) body)))
           ((id fender body)
-            (and (identifier? #'id) ($lookup #'id #'syntax-match))
-            (($lookup #'id #'syntax-match) #`((id . args) body)))
+            (and (identifier? #'id) ($lookup #'id #'syntax-match-clause))
+            (($lookup #'id #'syntax-match-clause) #`((id . args) body)))
           (((id . args) fender body)
             (syntax-case (transform-clause #`(id body)) ()
               ((id-pattern id-fender id-body)
