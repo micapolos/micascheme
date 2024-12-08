@@ -25,6 +25,9 @@
 (check (raises (pattern-match #'(foo foo) (foo bar) "ok")))
 (check (raises (pattern-match #'(bar bar) (foo bar) "ok")))
 
+(check-equal? (pattern-match? #'() () "ok") "ok")
+(check-equal? (pattern-match? #'() 123 "ok") #f)
+
 (let ()
   (define-pattern-matcher str
     (syntax-rules ()
