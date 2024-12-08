@@ -1,4 +1,4 @@
-(import (scheme) (check) (syntax) (generate) (syntax-match))
+(import (scheme) (lets) (check) (syntax) (generate) (syntax-match))
 
 (define-aux-keywords foo bar)
 
@@ -95,4 +95,18 @@
     ((string-match s) (string-append s "!")))
   #f)
 
+; === multi match ===
 
+(define-syntax-match-clause (numbers-match n-1 n n+1) body
+  (n
+    (number? (datum n))
+    (lets
+      (n (datum n))
+      (n+1 (+ n 1))
+      (n-1 (- n 1))
+      body)))
+
+(check-equal?
+  (syntax-match #'10
+    ((numbers-match a b c) (list a b c)))
+  (list 9 10 11))
