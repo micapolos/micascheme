@@ -1,6 +1,5 @@
 (library (z80 asm)
-  (export
-    op->asm?)
+  (export op->asm?)
   (import
     (rename (micascheme)
       (and %and)

@@ -64,6 +64,12 @@
   #f)
 
 (check-equal?
+  (syntax-match #'(foo bar bar)
+    ((foo _ _) "ok")
+    (_ #f))
+  "ok")
+
+(check-equal?
   (syntax-match #'(+ 1 2)
     (#'x (syntax->datum x)))
   '(+ 1 2))
