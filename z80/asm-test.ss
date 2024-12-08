@@ -10,6 +10,12 @@
       (%syntax (out %...)))
     %...))
 
+; (%check-equal?
+;   (%syntax-match (%syntax (ld (hl) (+ iy foo)))
+;     ((ld (r a-prefix? a-r3 a-offset?) (r b-prefix? b-r3 b-offset?))
+;       (%list a-prefix? a-r3 (%syntax->datum a-offset?) b-prefix? b-r3 (%syntax->datum b-offset?))))
+;   (%list ))
+
 (check-asm
   ((add a b)          (db #b10000000))
   ((add a c)          (db #b10000001))
