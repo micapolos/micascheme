@@ -146,11 +146,11 @@
 (check (raises (pattern-match #'(bar bar) (foo bar) "ok")))
 
 (let ()
-  (define-pattern-match-proc?-syntax str
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((_ expr (_ s) body)
-          #'(switch-opt (syntax->datum expr)
+  (define-pattern-matcher str
+    (syntax-rules ()
+      ((_ (_ s) body)
+        (lambda ($syntax)
+          (switch-opt (syntax->datum $syntax)
             ((string? $string)
               (lambda ()
                 (lets (s $string) body))))))))
