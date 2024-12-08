@@ -27,7 +27,9 @@
           ((matcher body)
             (transform-clause #`(matcher #t body)))
           (((syntax x) fender body)
-            #`(x fender body))
+            (lets
+              ($tmp (generate-identifier #'syntax))
+              #`(#,$tmp fender (let ((x #'#,$tmp)) body))))
           (((id . args) fender body)
             (and (identifier? #'id) ($lookup #'id #'syntax-match-clause))
             (($lookup #'id #'syntax-match-clause) #`((id . args) body)))

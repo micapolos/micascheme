@@ -65,7 +65,12 @@
 
 (check-equal?
   (syntax-match #'(+ 1 2)
-    (#'x (datum x)))
+    (#'x (syntax->datum x)))
+  '(+ 1 2))
+
+(check-equal?
+  (syntax-match #'(+ 1 2)
+    ((#'x #'y #'z) (list (syntax->datum x) (syntax->datum y) (syntax->datum z))))
   '(+ 1 2))
 
 (check-equal?
