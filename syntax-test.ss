@@ -172,3 +172,6 @@
 (check-datum=? (syntaxes->syntax (list)) #`(begin))
 (check-datum=? (syntaxes->syntax (list #'foo)) #`foo)
 (check-datum=? (syntaxes->syntax (list #'foo #'bar)) #`(begin foo bar))
+
+(define-property string syntax "string-syntax")
+(check-equal? (get-property string syntax) "string-syntax")

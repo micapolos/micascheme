@@ -53,6 +53,7 @@
   (switch)
   (symbolizer)
   (syntax)
+  (syntax-match)
   (syntaxes)
   (term)
   (throw)
