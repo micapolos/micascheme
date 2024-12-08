@@ -8,7 +8,7 @@
     define-syntax-match-clause
     syntax-match
     syntax-match?)
-  (import (scheme) (syntax) (syntaxes) (procedure) (list) (generate) (lets))
+  (import (scheme) (syntax) (syntaxes) (fluent) (procedure) (list) (generate) (lets))
 
   (define-aux-keyword syntax-match-clause)
 
@@ -80,6 +80,7 @@
             (and (identifier? #'id) ($lookup #'id #'pattern-matcher))
             (($lookup #'id #'pattern-matcher) $syntax))
           ((syntax x)
+            (identifier? #'x)
             #'(lambda ($syntax)
               (lambda ()
                 (lets (x $syntax) body))))

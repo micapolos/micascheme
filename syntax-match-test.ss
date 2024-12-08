@@ -25,6 +25,15 @@
 (check (raises (pattern-match #'(foo foo) (foo bar) "ok")))
 (check (raises (pattern-match #'(bar bar) (foo bar) "ok")))
 
+(check-equal? (pattern-match #'((+ 1 2)) (#'x) (syntax->datum x)) '(+ 1 2))
+
+; (check-equal?
+;   (pattern-match
+;     #'((+ 1 2) (* 3 4))
+;     (#'x #'y)
+;     (list (syntax->datum x) (syntax->datum y)))
+;   '(+ 1 2))
+
 (check-equal? (pattern-match? #'() () "ok") "ok")
 (check-equal? (pattern-match? #'() 123 "ok") #f)
 
