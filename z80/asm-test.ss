@@ -6,17 +6,15 @@
 (%define-rule-syntax (check-r (id prefix? r3 offset?) %...)
   (%begin
     (%check-equal?
-      (%pattern-match? (%syntax id) (r $prefix? $r3 $offset?)
-        (%match
-          (%list
-            (%opt-lift %syntax->datum $prefix?)
-            $r3
-            (%opt-lift %syntax->datum $offset?))))
-      (%match
+      (%pattern-ref-match-ref? (%syntax id) (r $prefix? $r3 $offset?)
         (%list
-          (%or (%datum prefix?) (%quote prefix?))
-          r3
-          (%or (%datum offset?) (%quote offset?)))))
+          (%opt-lift %syntax->datum $prefix?)
+          $r3
+          (%opt-lift %syntax->datum $offset?)))
+      (%list
+        (%or (%datum prefix?) (%quote prefix?))
+        r3
+        (%or (%datum offset?) (%quote offset?))))
     %...))
 
 (check-r

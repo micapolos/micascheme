@@ -1,18 +1,26 @@
 (library (syntax-match)
   (export
-    match match? match-ref match?-ref?
+    match match? match-ref
+    match?-ref? ref?->match
     define-pattern-match?
     pattern-match?
+    pattern-ref-match-ref?
     syntax-match?
     syntax-match
     syntax-match-ref
-    syntax-match-ref?)
+    syntax-match-ref?
+    syntax-ref?-match-ref?
+    syntax-ref-match-ref
+    syntax-ref-match-ref?)
   (import (scheme) (syntax) (syntaxes) (fluent) (procedure) (list) (generate) (lets) (data))
 
   (data (match ref))
 
   (define (match?-ref? $match?)
     (and $match? (match-ref $match?)))
+
+  (define (ref?->match $ref?)
+    (and $ref? (match $ref?)))
 
   (define-rule-syntax (define-pattern-match? id expr)
     (begin
@@ -48,6 +56,9 @@
             #'(syntax-case? expr ()
               (other body)))))))
 
+  (define-rule-syntax (pattern-ref-match-ref? expr pattern body)
+    (match?-ref? (pattern-match? expr pattern (match body))))
+
   (define-rule-syntax (syntax-match? expr (pattern body) ...)
     (lets ($expr expr)
       (or (pattern-match? $expr pattern body) ...)))
@@ -62,4 +73,13 @@
 
   (define-rule-syntax (syntax-match-ref? expr clause ...)
     (match?-ref? (syntax-match? expr clause ...)))
+
+  (define-rule-syntax (syntax-ref?-match-ref? expr (pattern body) ...)
+    (syntax-match-ref? expr (pattern (ref?->match? body)) ...))
+
+  (define-rule-syntax (syntax-ref-match-ref expr (pattern body) ...)
+    (syntax-match-ref expr (pattern (match body)) ...))
+
+  (define-rule-syntax (syntax-ref-match-ref? expr (pattern body) ...)
+    (syntax-match-ref? expr (pattern (match body)) ...))
 )

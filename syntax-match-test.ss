@@ -181,3 +181,27 @@
   (false?
     (syntax-match-ref? #'123
       ((str s) (match (string-append s "!"))))))
+
+; === syntax-ref-match-ref ===
+
+(check-equal?
+  (syntax-ref-match-ref #'"foo"
+    ((str s) (string-append s "!")))
+  "foo!")
+
+(check
+  (raises
+    (syntax-ref-match-ref #'123
+      ((str s) (string-append s "!")))))
+
+; === syntax-ref-match-ref? ===
+
+(check-equal?
+  (syntax-ref-match-ref? #'"foo"
+    ((str s) (string-append s "!")))
+  "foo!")
+
+(check
+  (false?
+    (syntax-ref-match-ref? #'123
+      ((str s) (string-append s "!")))))

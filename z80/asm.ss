@@ -11,8 +11,8 @@
     (z80 keywords))
 
   (define-rule-syntax (asm-syntax-match-ref? expr (pattern fender item ...) ...)
-    (syntax-match-ref? expr
-      (pattern (%and fender (match (non-false-list item ...)))) ...))
+    (syntax-ref-match-ref? expr
+      (pattern (%and fender (non-false-list item ...))) ...))
 
   (define-rule-syntax (define-asm-pattern-match? (id param ...) (pattern arg ...) ...)
     (define-pattern-match? id
@@ -20,8 +20,8 @@
         ((_ expr (_ param ...) body)
           (opt-lets
             ($list
-              (syntax-match-ref? expr
-                (pattern (match (list arg ...))) ...))
+              (syntax-ref-match-ref? expr
+                (pattern (list arg ...)) ...))
             (let-values (((param ...) (apply values $list)))
               body))))))
 
