@@ -33,6 +33,8 @@
   ((add a (+ ix d))   (db #xdd) (db #b10000110) (db d))
   ((add a (+ iy d))   (db #xfd) (db #b10000110) (db d))
 
+  ((add a n)          (db #b11000110) (db n))
+
   ((adc a b)          (db #b10001000))
   ((adc a c)          (db #b10001001))
   ((adc a d)          (db #b10001010))
@@ -48,6 +50,8 @@
   ((adc a iyl)        (db #xfd) (db #b10001101))
   ((adc a (+ ix d))   (db #xdd) (db #b10001110) (db d))
   ((adc a (+ iy d))   (db #xfd) (db #b10001110) (db d))
+
+  ((adc a n)          (db #b11001110) (db n))
 
   ((sub a b)          (db #b10010000))
   ((sub a c)          (db #b10010001))
@@ -65,6 +69,8 @@
   ((sub a (+ ix d))   (db #xdd) (db #b10010110) (db d))
   ((sub a (+ iy d))   (db #xfd) (db #b10010110) (db d))
 
+  ((sub a n)          (db #b11010110) (db n))
+
   ((sbc a b)          (db #b10011000))
   ((sbc a c)          (db #b10011001))
   ((sbc a d)          (db #b10011010))
@@ -80,6 +86,8 @@
   ((sbc a iyl)        (db #xfd) (db #b10011101))
   ((sbc a (+ ix d))   (db #xdd) (db #b10011110) (db d))
   ((sbc a (+ iy d))   (db #xfd) (db #b10011110) (db d))
+
+  ((sbc a n)          (db #b11011110) (db n))
 
   ((and b)            (db #b10100000))
   ((and c)            (db #b10100001))
@@ -97,6 +105,8 @@
   ((and (+ ix d))     (db #xdd) (db #b10100110) (db d))
   ((and (+ iy d))     (db #xfd) (db #b10100110) (db d))
 
+  ((and n)            (db #b11100110) (db n))
+
   ((or b)             (db #b10101000))
   ((or c)             (db #b10101001))
   ((or d)             (db #b10101010))
@@ -112,6 +122,8 @@
   ((or iyl)           (db #xfd) (db #b10101101))
   ((or (+ ix d))      (db #xdd) (db #b10101110) (db d))
   ((or (+ iy d))      (db #xfd) (db #b10101110) (db d))
+
+  ((or n)             (db #b11101110) (db n))
 
   ((xor b)            (db #b10110000))
   ((xor c)            (db #b10110001))
@@ -129,6 +141,8 @@
   ((xor (+ ix d))     (db #xdd) (db #b10110110) (db d))
   ((xor (+ iy d))     (db #xfd) (db #b10110110) (db d))
 
+  ((xor n)            (db #b11110110) (db n))
+
   ((cp b)             (db #b10111000))
   ((cp c)             (db #b10111001))
   ((cp d)             (db #b10111010))
@@ -144,6 +158,8 @@
   ((cp iyl)           (db #xfd) (db #b10111101))
   ((cp (+ ix d))      (db #xdd) (db #b10111110) (db d))
   ((cp (+ iy d))      (db #xfd) (db #b10111110) (db d))
+
+  ((cp n)             (db #b11111110) (db n))
 
   ((inc b)            (db #b00000100))
   ((inc c)            (db #b00001100))
