@@ -13,32 +13,49 @@
   (define-rule-syntax (asm-syntax-case? stx literals (pattern fender body ... ) ...)
     (syntax-case? stx literals (pattern fender (filter-opts (list body ...))) ...))
 
-  (define-syntax-match-clause r
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        (((_ prefix? r3 offset?) body)
-          (with-syntax ((tmp (generate-identifier #'r)))
-            (with-syntax
-              ((match?
-                #`(syntax-match? #'tmp
-                  (b           (list #f #b000 #f))
-                  (c           (list #f #b001 #f))
-                  (d           (list #f #b010 #f))
-                  (e           (list #f #b011 #f))
-                  (h           (list #f #b100 #f))
-                  (l           (list #f #b101 #f))
-                  ((hl)        (list #f #b110 #f))
-                  (a           (list #f #b111 #f))
-                  (ixh         (list #xdd #b100 #f))
-                  (ixl         (list #xdd #b101 #f))
-                  (iyh         (list #xfd #b100 #f))
-                  (iyl         (list #xfd #b101 #f))
-                  ((+ ix #'d)  (list #xdd #b110 d))
-                  ((+ iy #'d)  (list #xfd #b110 d)))))
-                #`(tmp match?
-                  (let-values
-                    (((prefix? r3 offset?) (apply values match?)))
-                    body))))))))
+  (define-rule-syntax (define-asm-pattern-matcher (id param ...) (pattern arg ...) ...)
+    (define-pattern-matcher id
+      (syntax-rules ()
+        ((_ expr (_ param ...) body)
+          (opt-lets
+            ($list
+              (syntax-match? expr
+                (pattern (list arg ...)) ...))
+            (lambda ()
+              (let-values (((param ...) (apply values $list)))
+                body)))))))
+
+  (define-asm-pattern-matcher (r prefix? r3 offset?)
+    (b           #f #b000 #f)
+    (c           #f #b001 #f)
+    (d           #f #b010 #f)
+    (e           #f #b011 #f)
+    (h           #f #b100 #f)
+    (l           #f #b101 #f)
+    ((hl)        #f #b110 #f)
+    (a           #f #b111 #f)
+    (ixh         (db-8 #xdd) #b100 #f)
+    (ixl         (db-8 #xdd) #b101 #f)
+    (iyh         (db-8 #xfd) #b100 #f)
+    (iyl         (db-8 #xfd) #b101 #f)
+    ((+ ix #'d)  (db-8 #xdd) #b110 #`(db #,d))
+    ((+ iy #'d)  (db-8 #xfd) #b110 #`(db #,d)))
+
+  (define-asm-pattern-matcher (arith x)
+    (add #b000)
+    (adc #b001)
+    (sub #b010)
+    (sbc #b011))
+
+  (define-asm-pattern-matcher (logic x)
+    (and #b100)
+    (or  #b101)
+    (xor #b110)
+    (cp  #b111))
+
+  (define-asm-pattern-matcher (incr x)
+    (inc #b100)
+    (dec #b101))
 
   (define (op->asm? $op)
     (asm-syntax-case? $op (a nop ld hl)
