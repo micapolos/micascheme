@@ -10,9 +10,9 @@
       (+ %+))
     (z80 keywords))
 
-  (define-rule-syntax (asm-syntax-match? expr (pattern fender item ...) ...)
-    (syntax-match? expr
-      (pattern (%and fender (non-false-list item ...))) ...))
+  (define-rule-syntax (asm-syntax-match-ref? expr (pattern fender item ...) ...)
+    (syntax-match-ref? expr
+      (pattern (%and fender (match (non-false-list item ...)))) ...))
 
   (define-rule-syntax (define-asm-pattern-match? (id param ...) (pattern arg ...) ...)
     (define-pattern-match? id
@@ -20,8 +20,8 @@
         ((_ expr (_ param ...) body)
           (opt-lets
             ($list
-              (syntax-match? expr
-                (pattern (list arg ...)) ...))
+              (syntax-match-ref? expr
+                (pattern (match (list arg ...))) ...))
             (let-values (((param ...) (apply values $list)))
               body))))))
 
@@ -44,7 +44,8 @@
   (define-pattern-match? n
     (syntax-rules ()
       ((_ expr (_ n) body)
-        (lets (n #'(db n)) body))))
+        (lets (n #'(db n))
+          body))))
 
   (define-asm-pattern-match? (math math)
     (add #b000)
@@ -73,7 +74,7 @@
     #`(db #,$a))
 
   (define (op->asm? $op)
-    (asm-syntax-match? $op
+    (asm-syntax-match-ref? $op
       (((math m) a (r prefix? r offset?)) #t
         prefix?
         (db-233 #b10 m r)

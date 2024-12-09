@@ -3,12 +3,44 @@
   (z80 asm)
   (z80 keywords))
 
-(%define-rule-syntax (check-asm (op out %...) %...)
+(%define-rule-syntax (check-r (id prefix? r3 offset?) %...)
   (%begin
-    (%check-datum=?
-      (%list->syntax (op->asm? (%syntax op)))
-      (%syntax (out %...)))
+    (%check-equal?
+      (%pattern-match? (%syntax id) (r $prefix? $r3 $offset?)
+        (%match
+          (%list
+            (%opt-lift %syntax->datum $prefix?)
+            $r3
+            (%opt-lift %syntax->datum $offset?))))
+      (%match
+        (%list
+          (%or (%datum prefix?) (%quote prefix?))
+          r3
+          (%or (%datum offset?) (%quote offset?)))))
     %...))
+
+(check-r
+  (b           #f #b000 #f)
+  (c           #f #b001 #f)
+  (d           #f #b010 #f)
+  (e           #f #b011 #f)
+  (h           #f #b100 #f)
+  (l           #f #b101 #f)
+  ((hl)        #f #b110 #f)
+  (a           #f #b111 #f)
+  (ixh         (db #xdd) #b100 #f)
+  (ixl         (db #xdd) #b101 #f)
+  ((+ ix n)    (db #xdd) #b110 (db n))
+  (iyh         (db #xfd) #b100 #f)
+  (iyl         (db #xfd) #b101 #f)
+  ((+ iy n)    (db #xfd) #b110 (db n)))
+
+(%define-rule-syntax (check-asm (op out %...) %...)
+   (%begin
+     (%check-datum=?
+       (%list->syntax (op->asm? (%syntax op)))
+       (%syntax (out %...)))
+     %...))
 
 (check-asm
   ((add a b)          (db #b10000000))
@@ -333,3 +365,4 @@
   ((ld iyh iyl)       (db #xfd) (db #b01100101))
   ((ld iyl iyh)       (db #xfd) (db #b01101100))
   ((ld iyl iyl)       (db #xfd) (db #b01101101)))
+
