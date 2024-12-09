@@ -1,71 +1,59 @@
 (library (syntax-match)
   (export
-    define-pattern-matcher
-    pattern-matcher
+    define-pattern-match?-syntax
     pattern-match?
     pattern-match
-    syntax-match
-    syntax-match?)
+    syntax-match?
+    syntax-match)
   (import (scheme) (syntax) (syntaxes) (fluent) (procedure) (list) (generate) (lets))
 
-  (define-rule-syntax (define-pattern-matcher id expr)
+  (define-rule-syntax (define-pattern-match?-syntax id expr)
     (begin
       (define-syntax (id $syntax) (syntax-error $syntax "misplaced"))
-      (define-property id pattern-matcher expr)))
+      (define-property id pattern-match? expr)))
 
-  (define-lookup-syntax (pattern-matcher $syntax $lookup)
+  (define-lookup-syntax (pattern-match? $syntax $lookup)
     (syntax-case $syntax ()
       ((_ expr pattern body)
         (syntax-case #'pattern (syntax)
           (id
-            (and (identifier? #'id) ($lookup #'id #'pattern-matcher))
-            (($lookup #'id #'pattern-matcher) $syntax))
+            (and (identifier? #'id) ($lookup #'id #'pattern-match?))
+            (($lookup #'id #'pattern-match?) $syntax))
           ((id . args)
-            (and (identifier? #'id) ($lookup #'id #'pattern-matcher))
-            (($lookup #'id #'pattern-matcher) $syntax))
+            (and (identifier? #'id) ($lookup #'id #'pattern-match?))
+            (($lookup #'id #'pattern-match?) $syntax))
           ((syntax x)
             (identifier? #'x)
-            #'(lambda ()
-              (lets (x expr) body)))
+            #'(lets (x expr) body))
           ((pattern-1 . pattern-2)
             #'(syntax-case? expr ()
               ((expr-1 . expr-2)
-                (opt-lets
-                  ($proc
-                    (pattern-matcher #'expr-1 pattern-1
-                      (pattern-matcher #'expr-2 pattern-2 body)))
-                  ($proc)))))
+                (pattern-match? #'expr-1 pattern-1
+                  (pattern-match? #'expr-2 pattern-2
+                    body)))))
           (underscore
             (syntax=? #'underscore #'_)
-            #'(lambda () body))
+            #'body)
           (id
             (identifier? #'id)
             #'(syntax-case? expr (id)
-              (id (lambda () body))))
+              (id body)))
           (other
             #'(syntax-case? expr ()
-              (other (lambda () body))))))))
-
-  (define-rule-syntax (pattern-match? expr pattern body)
-    (lets
-      ($proc? (pattern-matcher expr pattern body))
-      (and $proc? ($proc?))))
+              (other body)))))))
 
   (define-rule-syntax (pattern-match expr pattern body)
-    (lets
-      ($proc? (pattern-matcher expr pattern body))
-      (if $proc? ($proc?) (syntax-error expr))))
+    (lets ($expr expr)
+      (or
+        (pattern-match? $expr pattern body)
+        (syntax-error $expr))))
 
-  (define-rule-syntax (syntax-match expr (pattern body) ...)
-    (lets
-      ($expr expr)
-      (app
-        (or
-          (pattern-matcher $expr pattern body) ...
-          (syntax-error $expr)))))
+  (define-rule-syntax (syntax-match? expr (pattern body) ...)
+    (lets ($expr expr)
+      (or (pattern-match? $expr pattern body) ...)))
 
-  (define-rule-syntax (syntax-match? expr clause ...)
-    (syntax-match expr
+  (define-rule-syntax (syntax-match expr clause ...)
+    (syntax-match? expr
       clause ...
-      (_ #f)))
+      (#'other (syntax-error other))))
 )

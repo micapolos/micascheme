@@ -83,4 +83,5 @@
   (tico all)
   (verilog all)
   (zexy all)
+  (z80 all)
 )
