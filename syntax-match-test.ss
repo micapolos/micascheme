@@ -27,12 +27,12 @@
 
 (check-equal? (pattern-match #'((+ 1 2)) (#'x) (syntax->datum x)) '(+ 1 2))
 
-; (check-equal?
-;   (pattern-match
-;     #'((+ 1 2) (* 3 4))
-;     (#'x #'y)
-;     (list (syntax->datum x) (syntax->datum y)))
-;   '(+ 1 2))
+(check-equal?
+  (pattern-match
+    #'((+ 1 2) (* 3 4))
+    (#'x #'y)
+    (list (syntax->datum x) (syntax->datum y)))
+  '((+ 1 2) (* 3 4)))
 
 (check-equal? (pattern-match? #'() () "ok") "ok")
 (check-equal? (pattern-match? #'() 123 "ok") #f)
@@ -40,14 +40,13 @@
 (let ()
   (define-pattern-matcher str
     (syntax-rules ()
-      ((_ (_ s) body)
-        (lambda ($syntax)
-          (switch-opt (syntax->datum $syntax)
-            ((string? $string)
-              (lambda ()
-                (lets
-                  (s $string)
-                  body))))))))
+      ((_ expr (_ s) body)
+        (switch-opt (syntax->datum expr)
+          ((string? $string)
+            (lambda ()
+              (lets
+                (s $string)
+                body)))))))
 
   (check-equal? (pattern-match #'"foo" (str s) (string-append s "!")) "foo!")
   (check (raises (pattern-match #'123 (str s) (string-append s "!")))))
@@ -55,16 +54,15 @@
 (let ()
   (define-pattern-matcher nums
     (syntax-rules ()
-      ((_ (_ n-1 n n+1) body)
-        (lambda ($syntax)
-          (switch-opt (syntax->datum $syntax)
-            ((number? $number)
-              (lambda ()
-                (lets
-                  (n-1 (- $number 1))
-                  (n $number)
-                  (n+1 (+ $number 1))
-                  body))))))))
+      ((_ expr (_ n-1 n n+1) body)
+        (switch-opt (syntax->datum expr)
+          ((number? $number)
+            (lambda ()
+              (lets
+                (n-1 (- $number 1))
+                (n $number)
+                (n+1 (+ $number 1))
+                body)))))))
 
   (check-equal? (pattern-match #'10 (nums $n-1 $n $n+1) (list $n-1 $n $n+1)) (list 9 10 11))
   (check (raises (pattern-match #'"foo" (nums $n-1 $n $n+1) (list $n-1 $n $n+1)))))

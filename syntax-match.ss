@@ -71,7 +71,7 @@
 
   (define-lookup-syntax (pattern-matcher $syntax $lookup)
     (syntax-case $syntax ()
-      ((_ pattern body)
+      ((_ expr pattern body)
         (syntax-case #'pattern (syntax)
           (id
             (and (identifier? #'id) ($lookup #'id #'pattern-matcher))
@@ -81,39 +81,35 @@
             (($lookup #'id #'pattern-matcher) $syntax))
           ((syntax x)
             (identifier? #'x)
-            #'(lambda ($syntax)
-              (lambda ()
-                (lets (x $syntax) body))))
+            #'(lambda ()
+              (lets (x expr) body)))
           ((pattern-1 . pattern-2)
-            #'(lambda ($syntax)
-              (syntax-case? $syntax ()
-                ((expr-1 . expr-2)
-                  (opt-lets
-                    ($proc-1 ((pattern-matcher pattern-1 body) #'expr-1))
-                    ($proc-2 ((pattern-matcher pattern-2 ($proc-1)) #'expr-2))
-                    $proc-2)))))
+            #'(syntax-case? expr ()
+              ((expr-1 . expr-2)
+                (opt-lets
+                  ($proc
+                    (pattern-matcher #'expr-1 pattern-1
+                      (pattern-matcher #'expr-2 pattern-2 body)))
+                  ($proc)))))
           (underscore
             (syntax=? #'underscore #'_)
-            #'(lambda ($syntax)
-              (lambda () body)))
+            #'(lambda () body))
           (id
             (identifier? #'id)
-            #'(lambda ($syntax)
-              (syntax-case? $syntax (id)
-                (id (lambda () body)))))
+            #'(syntax-case? expr (id)
+              (id (lambda () body))))
           (other
-            #'(lambda ($syntax)
-              (syntax-case? $syntax ()
-                (other (lambda () body)))))))))
+            #'(syntax-case? expr ()
+              (other (lambda () body))))))))
 
   (define-rule-syntax (pattern-match? expr pattern body)
     (lets
-      ($proc? ((pattern-matcher pattern body) expr))
+      ($proc? (pattern-matcher expr pattern body))
       (and $proc? ($proc?))))
 
   (define-rule-syntax (pattern-match expr pattern body)
     (lets
-      ($proc? ((pattern-matcher pattern body) expr))
+      ($proc? (pattern-matcher expr pattern body))
       (if $proc? ($proc?) (syntax-error expr))))
 
   (define-rule-syntax (syntax-match? clause ...)
