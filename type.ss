@@ -8,7 +8,7 @@
     choice-type-index-of)
 
   (import
-    (except (micascheme) pair)
+    (except (micascheme) pair match match? match-ref)
     (term))
 
   ; ---------------------------------------------------------

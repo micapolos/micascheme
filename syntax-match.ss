@@ -1,13 +1,16 @@
 (library (syntax-match)
   (export
-    define-pattern-match?-syntax
+    match match? match-ref
+    define-pattern-match?
     pattern-match?
     pattern-match
     syntax-match?
     syntax-match)
-  (import (scheme) (syntax) (syntaxes) (fluent) (procedure) (list) (generate) (lets))
+  (import (scheme) (syntax) (syntaxes) (fluent) (procedure) (list) (generate) (lets) (data))
 
-  (define-rule-syntax (define-pattern-match?-syntax id expr)
+  (data (match ref))
+
+  (define-rule-syntax (define-pattern-match? id expr)
     (begin
       (define-syntax (id $syntax) (syntax-error $syntax "misplaced"))
       (define-property id pattern-match? expr)))

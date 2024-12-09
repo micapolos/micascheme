@@ -2,7 +2,7 @@
 
 (define-aux-keywords foo bar)
 
-(define-pattern-match?-syntax str
+(define-pattern-match? str
   (syntax-rules ()
     ((_ expr (_ s) body)
       (switch-opt (syntax->datum expr)
@@ -11,7 +11,7 @@
             (s $string)
             body))))))
 
-(define-pattern-match?-syntax nums
+(define-pattern-match? nums
   (syntax-rules ()
     ((_ expr (_ n-1 n n+1) body)
       (switch-opt (syntax->datum expr)

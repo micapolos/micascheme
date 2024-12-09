@@ -14,8 +14,8 @@
     (syntax-match? expr
       (pattern (%and fender (non-false-list item ...))) ...))
 
-  (define-rule-syntax (define-asm-pattern-match?-syntax (id param ...) (pattern arg ...) ...)
-    (define-pattern-match?-syntax id
+  (define-rule-syntax (define-asm-pattern-match? (id param ...) (pattern arg ...) ...)
+    (define-pattern-match? id
       (syntax-rules ()
         ((_ expr (_ param ...) body)
           (opt-lets
@@ -25,7 +25,7 @@
             (let-values (((param ...) (apply values $list)))
               body))))))
 
-  (define-asm-pattern-match?-syntax (r prefix? r offset?)
+  (define-asm-pattern-match? (r prefix? r offset?)
     (b           #f #b000 #f)
     (c           #f #b001 #f)
     (d           #f #b010 #f)
@@ -41,24 +41,24 @@
     ((+ ix #'d)  (db-8 #xdd) #b110 #`(db #,d))
     ((+ iy #'d)  (db-8 #xfd) #b110 #`(db #,d)))
 
-  (define-pattern-match?-syntax n
+  (define-pattern-match? n
     (syntax-rules ()
       ((_ expr (_ n) body)
         (lets (n #'(db n)) body))))
 
-  (define-asm-pattern-match?-syntax (math math)
+  (define-asm-pattern-match? (math math)
     (add #b000)
     (adc #b001)
     (sub #b010)
     (sbc #b011))
 
-  (define-asm-pattern-match?-syntax (logic logic)
+  (define-asm-pattern-match? (logic logic)
     (and #b100)
     (or  #b101)
     (xor #b110)
     (cp  #b111))
 
-  (define-asm-pattern-match?-syntax (incr incr)
+  (define-asm-pattern-match? (incr incr)
     (inc #b100)
     (dec #b101))
 
