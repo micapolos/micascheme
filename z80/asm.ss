@@ -1,6 +1,6 @@
 (library (z80 asm)
   (export
-    op->asm? r)
+    op->asm? reg)
   (import
     (rename (micascheme)
       (and %and)
@@ -24,7 +24,7 @@
           body))))
 
   (define-asm-pattern-match?
-    (r           prefix?      r3     offset? )
+    (reg           prefix?      r3     offset? )
     (b           #f           #b000  #f      )
     (c           #f           #b001  #f      )
     (d           #f           #b010  #f      )
@@ -90,21 +90,21 @@
 
   (define (op->asm? $op)
     (asm-syntax-match? $op
-      (((math m) a (r prefix? r offset?)) #t
+      (((math m) a (reg prefix? r offset?)) #t
         prefix?
         (db-233 #b10 m r)
         offset?)
       (((math m) a (n n)) #t
         (db-233 #b11 m #b110)
         n)
-      (((logic l) (r prefix? r offset?)) #t
+      (((logic l) (reg prefix? r offset?)) #t
         prefix?
         (db-233 #b10 l r)
         offset?)
       (((logic l) (n n)) #t
         (db-233 #b11 l #b110)
         n)
-      (((incr i) (r prefix? r offset?)) #t
+      (((incr i) (reg prefix? r offset?)) #t
         prefix?
         (db-233 #b00 r i)
         offset?)
@@ -120,7 +120,19 @@
         (db-8 #b00000010))
       ((ld (de) a) #t
         (db-8 #b00010010))
-      ((ld (r prefix-1? r-1 offset-1?) (r prefix-2? r-2 offset-2?))
+      ((ld a i) #t
+        (db-8 #xed)
+        (db-8 #x57))
+      ((ld a r) #t
+        (db-8 #xed)
+        (db-8 #x5f))
+      ((ld i a) #t
+        (db-8 #xed)
+        (db-8 #x47))
+      ((ld r a) #t
+        (db-8 #xed)
+        (db-8 #x4f))
+      ((ld (reg prefix-1? r-1 offset-1?) (reg prefix-2? r-2 offset-2?))
         (%and
           (%not (%and (= r-1 #b110) (= r-2 #b110)))
           (%or (%not prefix-1?) (%not prefix-2?) (syntax=? prefix-1? prefix-2?)))
@@ -133,7 +145,7 @@
       ((ld ((nm nm)) a) #t
         (db-8 #b00110010)
         nm)
-      ((ld (r prefix? r offset?) (n n)) #t
+      ((ld (reg prefix? r offset?) (n n)) #t
         prefix?
         (db-233 #b00 r #b110)
         offset?

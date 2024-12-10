@@ -3,10 +3,10 @@
   (z80 asm)
   (z80 keywords))
 
-(%define-rule-syntax (check-r (id prefix? r3 offset?) %...)
+(%define-rule-syntax (check-reg (id prefix? r3 offset?) %...)
   (%begin
     (%check-equal?
-      (%pattern-match? (%syntax id) (r $prefix? $r3 $offset?)
+      (%pattern-match? (%syntax id) (reg $prefix? $r3 $offset?)
         (%list
           (%opt-lift %syntax->datum $prefix?)
           $r3
@@ -17,7 +17,7 @@
         (%or (%datum offset?) (%quote offset?))))
     %...))
 
-(check-r
+(check-reg
   (b           #f         #b000  #f    )
   (c           #f         #b001  #f    )
   (d           #f         #b010  #f    )
