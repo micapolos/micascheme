@@ -28,10 +28,10 @@
   (a           #f #b111 #f)
   (ixh         (db #xdd) #b100 #f)
   (ixl         (db #xdd) #b101 #f)
-  ((+ ix n)    (db #xdd) #b110 (db n))
+  ((+ ix d)    (db #xdd) #b110 (db d))
   (iyh         (db #xfd) #b100 #f)
   (iyl         (db #xfd) #b101 #f)
-  ((+ iy n)    (db #xfd) #b110 (db n)))
+  ((+ iy d)    (db #xfd) #b110 (db d)))
 
 (%define-rule-syntax (check-asm (op out %...) %...)
    (%begin
