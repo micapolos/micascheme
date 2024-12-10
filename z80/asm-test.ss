@@ -19,7 +19,7 @@
         (%or (%datum n?) (%quote n?))))
     %...))
 
-(check-r     ; prefix     r3    offset?  n?
+(check-r
   (b           #f         #b000  #f      #f)
   (c           #f         #b001  #f      #f)
   (d           #f         #b010  #f      #f)
