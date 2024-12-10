@@ -372,4 +372,9 @@
   ((ld (bc) a)        (db #b00000010))
   ((ld (de) a)        (db #b00010010))
   ((ld (nm) a)        (db #b00110010) (dw nm))
+
+  ((ld a i)           (db #xed) (db #x57))
+  ((ld a r)           (db #xed) (db #x5f))
+  ((ld i a)           (db #xed) (db #x47))
+  ((ld r a)           (db #xed) (db #x4f))
 )
