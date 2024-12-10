@@ -104,8 +104,8 @@
         (db-8 #b01110110))
       ((ld (r prefix-1? r-1 offset-1? n-1?) (r prefix-2? r-2 offset-2? n-2?))
         (%and
-          (%not (%and (%not n-2?) (= r-1 #b110) (= r-2 #b110)))
           (%not n-1?)
+          (%not (%and (%not n-2?) (= r-1 #b110) (= r-2 #b110)))
           (%or (%not prefix-1?) (%not prefix-2?) (syntax=? prefix-1? prefix-2?)))
         (%or prefix-1? prefix-2?)
         (db-1133 0 (if n-2? 0 1) r-1 r-2)
