@@ -6,10 +6,16 @@
     syntax-match)
   (import (scheme) (syntax) (syntaxes) (fluent) (procedure) (list) (generate) (lets) (data))
 
-  (define-rule-syntax (define-pattern-match? id expr)
-    (begin
-      (define-syntax (id $syntax) (syntax-error $syntax "misplaced"))
-      (define-property id pattern-match? expr)))
+  (define-rules-syntax
+    ((define-pattern-match? id expr)
+      (begin
+        (define-syntax (id $syntax) (syntax-error $syntax "misplaced"))
+        (define-property id pattern-match? expr)))
+    ((define-pattern-match? (id param ...) (expr body) match)
+      (define-pattern-match? id
+        (syntax-rules ()
+          ((_ expr (_ param ...) body)
+            match)))))
 
   (define-lookup-syntax (pattern-match? $syntax $lookup)
     (syntax-case $syntax ()

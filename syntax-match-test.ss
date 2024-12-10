@@ -11,16 +11,14 @@
             (s $string)
             body))))))
 
-(define-pattern-match? nums
-  (syntax-rules ()
-    ((_ expr (_ n-1 n n+1) body)
-      (switch-opt (syntax->datum expr)
-        ((number? $number)
-          (lets
-            (n-1 (- $number 1))
-            (n $number)
-            (n+1 (+ $number 1))
-            body))))))
+(define-pattern-match? (nums n-1 n n+1) (expr body)
+  (switch-opt (syntax->datum expr)
+    ((number? $number)
+      (lets
+        (n-1 (- $number 1))
+        (n $number)
+        (n+1 (+ $number 1))
+        body))))
 
 ; === pattern-match? ===
 

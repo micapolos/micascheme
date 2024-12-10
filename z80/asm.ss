@@ -15,15 +15,13 @@
       (pattern (%and fender (non-false-list item ...))) ...))
 
   (define-rule-syntax (define-asm-pattern-match? (id param ...) (pattern arg ...) ...)
-    (define-pattern-match? id
-      (syntax-rules ()
-        ((_ expr (_ param ...) body)
-          (opt-lets
-            ($list
-              (syntax-match? expr
-                (pattern (list arg ...)) ...))
-            (let-values (((param ...) (apply values $list)))
-              body))))))
+    (define-pattern-match? (id param ...) (expr body)
+      (opt-lets
+        ($list
+          (syntax-match? expr
+            (pattern (list arg ...)) ...))
+        (let-values (((param ...) (apply values $list)))
+          body))))
 
   (define-asm-pattern-match? (r prefix? r offset?)
     (b           #f #b000 #f)
@@ -41,11 +39,9 @@
     ((+ ix #'d)  (db-8 #xdd) #b110 #`(db #,d))
     ((+ iy #'d)  (db-8 #xfd) #b110 #`(db #,d)))
 
-  (define-pattern-match? n
-    (syntax-rules ()
-      ((_ expr (_ n) body)
-        (lets (n #'(db n))
-          body))))
+  (define-pattern-match? (n id) (expr body)
+    (lets (id #'(db id))
+      body))
 
   (define-asm-pattern-match? (math math)
     (add #b000)
