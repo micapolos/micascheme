@@ -24,7 +24,7 @@
           body))))
 
   (define-asm-pattern-match?
-    (reg           prefix?      r3     offset? )
+    (reg         prefix?      r3     offset? )
     (b           #f           #b000  #f      )
     (c           #f           #b001  #f      )
     (d           #f           #b010  #f      )
