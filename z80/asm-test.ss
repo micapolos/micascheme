@@ -3,38 +3,35 @@
   (z80 asm)
   (z80 keywords))
 
-(%define-rule-syntax (check-r (id prefix? r3 offset? n?) %...)
+(%define-rule-syntax (check-r (id prefix? r3 offset?) %...)
   (%begin
     (%check-equal?
-      (%pattern-match? (%syntax id) (r $prefix? $r3 $offset? $n?)
+      (%pattern-match? (%syntax id) (r $prefix? $r3 $offset?)
         (%list
           (%opt-lift %syntax->datum $prefix?)
           $r3
-          (%opt-lift %syntax->datum $offset?)
-          (%opt-lift %syntax->datum $n?)))
+          (%opt-lift %syntax->datum $offset?)))
       (%list
         (%or (%datum prefix?) (%quote prefix?))
         r3
-        (%or (%datum offset?) (%quote offset?))
-        (%or (%datum n?) (%quote n?))))
+        (%or (%datum offset?) (%quote offset?))))
     %...))
 
 (check-r
-  (b           #f         #b000  #f      #f)
-  (c           #f         #b001  #f      #f)
-  (d           #f         #b010  #f      #f)
-  (e           #f         #b011  #f      #f)
-  (h           #f         #b100  #f      #f)
-  (l           #f         #b101  #f      #f)
-  ((hl)        #f         #b110  #f      #f)
-  (a           #f         #b111  #f      #f)
-  (ixh         (db #xdd)  #b100  #f      #f)
-  (ixl         (db #xdd)  #b101  #f      #f)
-  ((+ ix d)    (db #xdd)  #b110  (db d)  #f)
-  (iyh         (db #xfd)  #b100  #f      #f)
-  (iyl         (db #xfd)  #b101  #f      #f)
-  ((+ iy d)    (db #xfd)  #b110  (db d)  #f)
-  (n           #f         #b110  #f      (db n)))
+  (b           #f         #b000  #f    )
+  (c           #f         #b001  #f    )
+  (d           #f         #b010  #f    )
+  (e           #f         #b011  #f    )
+  (h           #f         #b100  #f    )
+  (l           #f         #b101  #f    )
+  ((hl)        #f         #b110  #f    )
+  (a           #f         #b111  #f    )
+  (ixh         (db #xdd)  #b100  #f    )
+  (ixl         (db #xdd)  #b101  #f    )
+  ((+ ix d)    (db #xdd)  #b110  (db d))
+  (iyh         (db #xfd)  #b100  #f    )
+  (iyl         (db #xfd)  #b101  #f    )
+  ((+ iy d)    (db #xfd)  #b110  (db d)))
 
 ; =====================================================================
 
@@ -367,4 +364,12 @@
   ((ld iyh iyh)       (db #xfd) (db #b01100100))
   ((ld iyh iyl)       (db #xfd) (db #b01100101))
   ((ld iyl iyh)       (db #xfd) (db #b01101100))
-  ((ld iyl iyl)       (db #xfd) (db #b01101101)))
+  ((ld iyl iyl)       (db #xfd) (db #b01101101))
+
+  ((ld a (bc))        (db #b00001010))
+  ((ld a (de))        (db #b00011010))
+  ((ld a (nm))        (db #b00111010) (dw nm))
+  ((ld (bc) a)        (db #b00000010))
+  ((ld (de) a)        (db #b00010010))
+  ((ld (nm) a)        (db #b00110010) (dw nm))
+)

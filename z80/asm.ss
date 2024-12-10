@@ -24,25 +24,28 @@
           body))))
 
   (define-asm-pattern-match?
-    (r           prefix?      r3     offset?     n?)
-    (b           #f           #b000  #f          #f)
-    (c           #f           #b001  #f          #f)
-    (d           #f           #b010  #f          #f)
-    (e           #f           #b011  #f          #f)
-    (h           #f           #b100  #f          #f)
-    (l           #f           #b101  #f          #f)
-    ((hl)        #f           #b110  #f          #f)
-    (a           #f           #b111  #f          #f)
-    (ixh         (db-8 #xdd)  #b100  #f          #f)
-    (ixl         (db-8 #xdd)  #b101  #f          #f)
-    (iyh         (db-8 #xfd)  #b100  #f          #f)
-    (iyl         (db-8 #xfd)  #b101  #f          #f)
-    ((+ ix #'d)  (db-8 #xdd)  #b110  (db-n d)    #f)
-    ((+ iy #'d)  (db-8 #xfd)  #b110  (db-n d)    #f)
-    (#'n         #f           #b110  #f          (db-n n)))
+    (r           prefix?      r3     offset? )
+    (b           #f           #b000  #f      )
+    (c           #f           #b001  #f      )
+    (d           #f           #b010  #f      )
+    (e           #f           #b011  #f      )
+    (h           #f           #b100  #f      )
+    (l           #f           #b101  #f      )
+    ((hl)        #f           #b110  #f      )
+    (a           #f           #b111  #f      )
+    (ixh         (db-8 #xdd)  #b100  #f      )
+    (ixl         (db-8 #xdd)  #b101  #f      )
+    (iyh         (db-8 #xfd)  #b100  #f      )
+    (iyl         (db-8 #xfd)  #b101  #f      )
+    ((+ ix #'d)  (db-8 #xdd)  #b110  (db-n d))
+    ((+ iy #'d)  (db-8 #xfd)  #b110  (db-n d)))
 
   (define-pattern-match? (n id) (expr body)
     (lets (id #'(db id))
+      body))
+
+  (define-pattern-match? (nm id) (expr body)
+    (lets (id #'(dw id))
       body))
 
   (define-asm-pattern-match? (math math)
@@ -79,22 +82,29 @@
   (define (db-8 $a)
     #`(db #,$a))
 
+  (define (db-16 $a)
+    #`(dw #,$a))
+
   (define (db-n $n)
     #`(db #,$n))
 
   (define (op->asm? $op)
     (asm-syntax-match? $op
-      (((math m) a (r prefix? r offset? n?)) #t
+      (((math m) a (r prefix? r offset?)) #t
         prefix?
-        (db-1133 1 (if n? 1 0) m r)
-        offset?
-        n?)
-      (((logic l) (r prefix? r offset? n?)) #t
+        (db-233 #b10 m r)
+        offset?)
+      (((math m) a (n n)) #t
+        (db-233 #b11 m #b110)
+        n)
+      (((logic l) (r prefix? r offset?)) #t
         prefix?
-        (db-1133 1 (if n? 1 0) l r)
-        offset?
-        n?)
-      (((incr i) (r prefix? r offset? n?)) (%not n?)
+        (db-233 #b10 l r)
+        offset?)
+      (((logic l) (n n)) #t
+        (db-233 #b11 l #b110)
+        n)
+      (((incr i) (r prefix? r offset?)) #t
         prefix?
         (db-233 #b00 r i)
         offset?)
@@ -102,13 +112,30 @@
         (db-8 0))
       ((halt) #t
         (db-8 #b01110110))
-      ((ld (r prefix-1? r-1 offset-1? n-1?) (r prefix-2? r-2 offset-2? n-2?))
+      ((ld a (bc)) #t
+        (db-8 #b00001010))
+      ((ld a (de)) #t
+        (db-8 #b00011010))
+      ((ld (bc) a) #t
+        (db-8 #b00000010))
+      ((ld (de) a) #t
+        (db-8 #b00010010))
+      ((ld (r prefix-1? r-1 offset-1?) (r prefix-2? r-2 offset-2?))
         (%and
-          (%not n-1?)
-          (%not (%and (%not n-2?) (= r-1 #b110) (= r-2 #b110)))
+          (%not (%and (= r-1 #b110) (= r-2 #b110)))
           (%or (%not prefix-1?) (%not prefix-2?) (syntax=? prefix-1? prefix-2?)))
         (%or prefix-1? prefix-2?)
-        (db-1133 0 (if n-2? 0 1) r-1 r-2)
-        (%or offset-1? offset-2?)
-        n-2?)))
+        (db-233 #b01 r-1 r-2)
+        (%or offset-1? offset-2?))
+      ((ld a ((nm nm))) #t
+        (db-8 #b00111010)
+        nm)
+      ((ld ((nm nm)) a) #t
+        (db-8 #b00110010)
+        nm)
+      ((ld (r prefix? r offset?) (n n)) #t
+        prefix?
+        (db-233 #b00 r #b110)
+        offset?
+        n)))
 )
