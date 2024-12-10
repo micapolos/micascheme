@@ -36,6 +36,8 @@
   ((+ iy d)    (db #xfd)  #b110  (db d)  #f)
   (n           #f         #b110  #f      (db n)))
 
+; =====================================================================
+
 (%define-rule-syntax (check-asm (op out %...) %...)
    (%begin
      (%check-datum=?
