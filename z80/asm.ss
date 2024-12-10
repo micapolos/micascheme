@@ -90,6 +90,7 @@
 
   (define (op->asm? $op)
     (asm-syntax-match? $op
+      ; === 8-bit arithmetic and logical ===
       (((math m) a (reg prefix? r offset?)) #t
         prefix?
         (db-233 #b10 m r)
@@ -108,10 +109,12 @@
         prefix?
         (db-233 #b00 r i)
         offset?)
+      ; === General-Purpose Arithmetic and CPU Control ===
       ((nop) #t
         (db-8 0))
       ((halt) #t
         (db-8 #b01110110))
+      ; === 8-bit load ===
       ((ld a (bc)) #t
         (db-8 #b00001010))
       ((ld a (de)) #t
