@@ -46,30 +46,6 @@
 
 (check-equal?
   (fluent
-    (values "a" "b")
-    (string-append it "c" "d"))
-  "abcd")
-
-(check-equal?
-  (fluent
-    (values "a" "b")
-    (string-append "c" it "d"))
-  "cabd")
-
-(check-equal?
-  (fluent
-    (values "a" "b")
-    (string-append "c" "d" it))
-  "cdab")
-
-(check-equal?
-  (fluent
-    (values "a" "b")
-    (string-append it "c" it "d" it))
-  "abcabdab")
-
-(check-equal?
-  (fluent
     "c"
     (let $it (string-append "a" "b" $it))
     (string-append "d"))

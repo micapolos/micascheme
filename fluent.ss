@@ -1,8 +1,8 @@
 (library (fluent)
-  (export fluent also with it)
+  (export fluent also with)
   (import (scheme) (syntax) (procedure))
 
-  (define-aux-keywords also with it)
+  (define-aux-keywords also with)
 
   (define-syntax (fluent $syntax)
     (define (arity-syntax $syntax)
@@ -43,19 +43,9 @@
                   $arity
                   (lambda ($body)
                     (let
-                      (
-                        ($tmps (generate-temporaries (iota $arity)))
-                        ($has-it? (find (partial syntax=? #'it) (syntaxes x ...))))
+                      (($tmps (generate-temporaries (iota $arity))))
                       #`(let-values (((#,@$tmps) #,($syntax-proc $body)))
-                        (fn
-                          #,@(apply append
-                            (if $has-it? (list) $tmps)
-                            (map
-                              (lambda ($x)
-                                (syntax-case $x (it)
-                                  (it $tmps)
-                                  (other (list #'other))))
-                              (syntaxes x ...))))
+                        (fn #,@$tmps x ...)
                         (values #,@$tmps))))))
               ((with x ...)
                 (let*
@@ -78,19 +68,9 @@
                   (datum arity)
                   (lambda ($body)
                     (let
-                      (
-                        ($tmps (generate-temporaries (iota $arity)))
-                        ($has-it? (find (partial syntax=? #'it) (syntaxes x ...))))
+                      (($tmps (generate-temporaries (iota $arity))))
                       #`(let-values (((#,@$tmps) #,($syntax-proc $body)))
-                        (fn
-                          #,@(apply append
-                            (if $has-it? (list) $tmps)
-                            (map
-                              (lambda ($x)
-                                (syntax-case $x (it)
-                                  (it $tmps)
-                                  (other (list #'other))))
-                              (syntaxes x ...))))))))))))))
+                        (fn #,@$tmps x ...)))))))))))
 
     (syntax-case $syntax ()
       ((fluent x xs ...)
