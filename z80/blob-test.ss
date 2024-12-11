@@ -29,7 +29,3 @@
 (check-blob
   (list->blob (list (u8-blob 1) (u8-blob 2) (u8-blob 3)))
   1 2 3)
-
-(check-blob
-  (list->blob (list (u8-blob 1) (u8-blob 2) (u8-blob 3)))
-  1 2 3)
