@@ -7,9 +7,11 @@
       ((_ $spec ...)
         (begin
           (let ()
-            (load-program
-              (string-append
-                (apply string-append (intercalate (map symbol->string '$spec) "/"))
-                "-test.ss")))
+            (display (format "Testing ~a\n" '$spec))
+            (let (($start-time (current-time 'time-process)))
+              (load-program
+                (string-append
+                  (apply string-append (intercalate (map symbol->string '$spec) "/"))
+                  "-test.ss"))))
           ...))))
 )
