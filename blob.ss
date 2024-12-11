@@ -1,14 +1,18 @@
 (library (blob)
   (export
     blob blob? blob-put-proc blob-size
+    empty-blob
     u8-blob
     put-blob
     list->blob
     blob-append
     blob->bytevector)
-  (import (micascheme))
+  (import (scheme) (data) (lets) (procedure))
 
   (data (blob size put-proc))
+
+  (define (empty-blob)
+    (blob 0 (lambda ($port) (void))))
 
   (define (u8-blob $u8)
     (blob 1 (lambda ($port) (put-u8 $port $u8))))

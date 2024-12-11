@@ -1,4 +1,6 @@
-(import (micascheme) (z80 blob))
+(import (scheme) (check) (blob) (syntax) (lets) (procedure))
+
+(check (blob? (blob 0 (lambda ($port) (void)))))
 
 (check-equal?
   (blob->bytevector
@@ -17,6 +19,8 @@
     (run
       (check-equal? (blob-size $blob) $size)
       (check-equal? $bytevector (bytevector byte ...)))))
+
+(check-blob (empty-blob))
 
 (check-blob
   (u8-blob 123)
