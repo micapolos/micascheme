@@ -10,9 +10,13 @@
   (bytevector 1 2 3))
 
 (define-rule-syntax (check-blob blob byte ...)
-  (check-equal?
-    (blob->bytevector blob)
-    (bytevector byte ...)))
+  (lets
+    ($blob blob)
+    ($bytevector (blob->bytevector $blob))
+    ($size (bytevector-length $bytevector))
+    (run
+      (check-equal? (blob-size $blob) $size)
+      (check-equal? $bytevector (bytevector byte ...)))))
 
 (check-blob
   (u8-blob 123)
