@@ -2,6 +2,10 @@
 
 (check (blob? (blob 0 (lambda ($port) (void)))))
 
+(lets
+  ($put-proc (lambda ($port) (void)))
+  (check-equal? (blob-put-proc (blob 0 $put-proc)) $put-proc))
+
 (check-equal?
   (blob->bytevector
     (blob 3
