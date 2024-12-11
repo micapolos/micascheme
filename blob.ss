@@ -1,4 +1,4 @@
-(library (z80 blob)
+(library (blob)
   (export
     blob blob? blob-put-proc blob-size
     u8-blob

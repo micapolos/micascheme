@@ -9,6 +9,7 @@
       set-cdr!
       define-syntax)
     (binder)
+    (blob)
     (boolean)
     (case)
     (check)
@@ -55,6 +56,7 @@
         set-cdr!
         define-syntax)
       (binder)
+      (blob)
       (boolean)
       (case)
       (check)

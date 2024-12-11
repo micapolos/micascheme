@@ -3,6 +3,7 @@
 (test
   (boolean)
   (binder)
+  (blob)
   (case)
   (check)
   (code)
