@@ -1,7 +1,7 @@
 (import (micascheme))
 
 (test
-  (asm)
+  (assembler)
   (boolean)
   (binder)
   (blob)

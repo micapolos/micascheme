@@ -1,4 +1,4 @@
-(import (micascheme) (asm))
+(import (micascheme) (assembler))
 
 (check-datum=?
   (asm->syntax
