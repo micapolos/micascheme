@@ -70,7 +70,6 @@
   (writer)
   (writing)
   (z80)
-  (asm all)
   (c all)
   (emu all)
   (indico all)
