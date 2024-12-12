@@ -17,13 +17,15 @@
             #`(bytevector->blob (u16-bytevector expr (endianness little)))))
         (asm-with-org (+ (asm-org $asm) 2))))))
 
-(define-asm-syntax (zeros n)
-  ($asm
-    (fluent $asm
-      (asm-with-blobs
-        (push (asm-blobs $asm)
-          #`(bytevector->blob (make-bytevector n 0))))
-      (asm-with-org (+ (asm-org $asm) (datum n))))))
+(define-asm-syntax (zeros n) ($asm)
+  (fluent $asm
+    (asm-with-blobs (push (asm-blobs $asm) #`(bytevector->blob (make-bytevector n 0))))
+    (asm-with-org (+ (asm-org $asm) (datum n)))))
+
+(define-asm-syntax (eq id expr) ($asm)
+  (asm-with-values $asm
+    (push (asm-values $asm)
+      #`(id expr))))
 
 (check-equal?
   (asm-bytevector (db #x10))
@@ -36,3 +38,11 @@
 (check-equal?
   (asm-bytevector (zeros 5))
   (bytevector 0 0 0 0 0))
+
+(check-equal?
+  (asm-bytevector (db foo) (db #x10) foo (db foo) (zeros 3) (db (+ foo foo)))
+  (bytevector #x02 #x10 #x02 0 0 0 #x04))
+
+(check-equal?
+  (asm-bytevector (eq foo+3 (+ foo 3)) (zeros 5) foo (db foo+3))
+  (bytevector 0 0 0 0 0 8))

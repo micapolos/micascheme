@@ -10,7 +10,7 @@
       (for-all identifier? (syntaxes id $asm $syntax))
       (define-asm-syntax id
         (lambda ($asm $syntax) body)))
-    ((define-asm-syntax (id param ...) ($asm body))
+    ((define-asm-syntax (id param ...) ($asm) body)
       (for-all identifier? (syntaxes id param ...))
       (define-asm-syntax (id $asm $syntax)
         (syntax-case $syntax ()
@@ -29,7 +29,12 @@
                     (app
                       (or ($lookup #'id) (syntax-error #'id "undefined asm-syntax"))
                       $asm
-                      $item))))
+                      $item))
+                  (id
+                    (identifier? #'id)
+                    (asm-with-labels $asm
+                      (push (asm-labels $asm)
+                        #`(id #,(literal->syntax (asm-org $asm))))))))
               (empty-asm)
               (syntaxes item ...)))
           #`(lets
