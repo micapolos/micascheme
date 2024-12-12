@@ -6,6 +6,7 @@
     put-blob
     list->blob
     blob-append
+    bytevector->blob
     blob->bytevector)
   (import (scheme) (data) (lets) (procedure))
 
@@ -16,6 +17,12 @@
 
   (define (u8-blob $u8)
     (blob 1 (lambda ($port) (put-u8 $port $u8))))
+
+  (define (bytevector->blob $bytevector)
+    (blob
+      (bytevector-length $bytevector)
+      (lambda ($port)
+        (put-bytevector $port $bytevector))))
 
   (define (put-blob $port $blob)
     ((blob-put-proc $blob) $port))

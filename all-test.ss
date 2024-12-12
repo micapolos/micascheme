@@ -4,6 +4,7 @@
   (boolean)
   (binder)
   (blob)
+  (bytevector)
   (case)
   (check)
   (code)
