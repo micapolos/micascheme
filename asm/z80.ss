@@ -1,4 +1,4 @@
-(library (z80 asm)
+(library (asm z80)
   (export
     op->asm? reg)
   (import
@@ -8,7 +8,7 @@
       (xor %xor)
       (not %not)
       (+ %+))
-    (z80 keywords))
+    (asm z80-keywords))
 
   (define-rule-syntax (asm-syntax-match? expr (pattern fender item ...) ...)
     (syntax-match? expr

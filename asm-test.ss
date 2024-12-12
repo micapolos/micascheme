@@ -1,4 +1,4 @@
-(import (micascheme) (z80 asm-blob))
+(import (micascheme) (asm))
 
 (check-datum=?
   (asm->syntax

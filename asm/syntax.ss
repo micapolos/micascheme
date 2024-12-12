@@ -1,6 +1,6 @@
-(library (z80 asm-syntax)
+(library (asm syntax)
   (export define-asm-syntax asm-bytevector)
-  (import (micascheme) (z80 asm-blob))
+  (import (micascheme) (asm))
 
   (define-rules-syntax
     ((define-asm-syntax id proc)

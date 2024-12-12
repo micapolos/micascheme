@@ -1,4 +1,4 @@
-(import (micascheme) (z80 asm-blob) (z80 asm-syntax))
+(import (micascheme) (asm) (asm syntax))
 
 (define-asm-syntax db
   (lambda ($asm $db)

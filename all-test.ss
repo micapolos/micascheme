@@ -1,6 +1,7 @@
 (import (micascheme))
 
 (test
+  (asm)
   (boolean)
   (binder)
   (blob)
@@ -70,6 +71,7 @@
   (writer)
   (writing)
   (z80)
+  (asm all)
   (c all)
   (emu all)
   (indico all)
@@ -84,5 +86,4 @@
   (tico all)
   (verilog all)
   (zexy all)
-  (z80 all)
 )

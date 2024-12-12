@@ -1,7 +1,7 @@
 (import
   (prefix (micascheme) %)
-  (z80 asm)
-  (z80 keywords))
+  (asm z80)
+  (asm z80-keywords))
 
 (%define-rule-syntax (check-reg (id prefix? r3 offset?) %...)
   (%begin

@@ -1,4 +1,4 @@
-(library (z80 keywords)
+(library (asm z80-keywords)
   (export
     db dw +
 

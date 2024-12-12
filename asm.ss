@@ -1,4 +1,4 @@
-(library (z80 asm-blob)
+(library (asm)
   (export
     asm asm?
     asm-org asm-with-org
