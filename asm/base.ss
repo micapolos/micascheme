@@ -14,19 +14,7 @@
             (asm+syntax $asm
               #`(u8 #,(literal->syntax (char->integer $char)))))
           ((else $other)
-            (syntax-case $other (dw)
-              ((dw item ...)
-                (fold-left
-                  (lambda ($asm $item)
-                    (fluent $asm
-                      (asm+put
-                        (lambda ($port)
-                          #`(put-u16 #,$port #,$item (endianness little))))
-                      (asm+org 2)))
-                  $asm
-                  (syntaxes item ...)))
-              (other
-                (asm+syntax $asm #`(u8 other)))))))
+            (asm+syntax $asm #`(u8 #,$other)))))
       $asm
       (syntaxes item ...)))
 
