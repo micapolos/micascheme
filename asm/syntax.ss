@@ -1,10 +1,7 @@
 (library (asm syntax)
   (export
-    define-asm-syntax asm-bytevector
-    org eq db)
+    define-asm-syntax asm-bytevector)
   (import (micascheme) (asm))
-
-  (define-aux-keywords org eq db)
 
   (define-rules-syntax
     ((define-asm-syntax id proc)
@@ -27,23 +24,11 @@
           (fold-left
             (lambda ($asm $item)
               (syntax-case $item (eq org db)
-                (id
-                  (identifier? #'id)
-                  (asm+label $asm #'id))
-                ((org expr)
-                  (asm-with-org $asm (datum expr)))
-                ((eq id expr)
-                  (identifier? #'id)
-                  (asm+value $asm #'id #'expr))
-                ((db expr ...)
-                  (fluent $asm
-                    (asm+blob #'(u8-blob expr ...))
-                    (asm+org (length (syntaxes expr ...)))))
                 ((id arg ...)
-                  (identifier? #'id)
-                  (switch ($lookup #'id)
-                    ((procedure? $procedure) ($procedure $asm $item))
-                    ((else _) (syntax-error #'id "undefined asm-syntax"))))))
+                  (and (identifier? #'id) ($lookup #'id))
+                  (($lookup #'id) $asm $item))
+                (other
+                  (asm+syntax $asm #'other))))
             (empty-asm)
             (syntaxes item ...))))))
 )

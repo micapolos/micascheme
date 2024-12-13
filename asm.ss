@@ -1,5 +1,6 @@
 (library (asm)
   (export
+    org eq db
     asm asm?
     asm-org asm-with-org
     asm-labels asm-with-labels
@@ -10,10 +11,13 @@
     asm+label
     asm+value
     asm+blob
+    asm+syntax
     asm->syntax)
   (import (micascheme))
 
   (data (asm org labels values blobs))
+
+  (define-aux-keywords org eq db)
 
   (define (empty-asm)
     (asm 0 (stack) (stack) (stack)))
@@ -41,4 +45,19 @@
       #,@(reverse (asm-labels $asm))
       #,@(reverse (asm-values $asm))
       (blob->bytevector (blob-append #,@(reverse (asm-blobs $asm))))))
+
+  (define (asm+syntax $asm $syntax)
+    (syntax-case $syntax (eq org db)
+      (id
+        (identifier? #'id)
+        (asm+label $asm #'id))
+      ((org expr)
+        (asm-with-org $asm (datum expr)))
+      ((eq id expr)
+        (identifier? #'id)
+        (asm+value $asm #'id #'expr))
+      ((db expr ...)
+        (fluent $asm
+          (asm+blob #'(u8-blob expr ...))
+          (asm+org (length (syntaxes expr ...)))))))
 )
