@@ -1,6 +1,5 @@
 (library (asm syntax)
-  (export
-    define-asm-syntax asm-bytevector)
+  (export define-asm-syntax asm-bytevector)
   (import (micascheme) (asm))
 
   (define-rules-syntax
