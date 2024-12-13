@@ -5,27 +5,23 @@
     (syntax-case $db ()
       ((db expr)
         (fluent $asm
-          (asm-with-blobs (push (asm-blobs $asm) #`(u8-blob expr)))
+          (asm+blob #`(u8-blob expr))
           (asm+org 1))))))
 
 (define-asm-syntax (dw $asm $dw)
   (syntax-case $dw ()
     ((dw expr)
       (fluent $asm
-        (asm-with-blobs
-          (push (asm-blobs $asm)
-            #`(bytevector->blob (u16-bytevector expr (endianness little)))))
+        (asm+blob #`(bytevector->blob (u16-bytevector expr (endianness little))))
         (asm+org 2)))))
 
 (define-asm-syntax (zeros n) ($asm)
   (fluent $asm
-    (asm-with-blobs (push (asm-blobs $asm) #`(bytevector->blob (make-bytevector n 0))))
-    (asm-with-org (+ (asm-org $asm) (datum n)))))
+    (asm+blob #`(bytevector->blob (make-bytevector n 0)))
+    (asm+org (datum n))))
 
 (define-asm-syntax (eq id expr) ($asm)
-  (asm-with-values $asm
-    (push (asm-values $asm)
-      #`(id expr))))
+  (asm+value $asm #'id #'expr))
 
 (check-equal?
   (asm-bytevector (db #x10))

@@ -8,6 +8,8 @@
     empty-asm
     asm+org
     asm+label
+    asm+value
+    asm+blob
     asm->syntax)
   (import (micascheme))
 
@@ -24,6 +26,15 @@
   (define (asm+org $asm $offset)
     (asm-with-org $asm
       (+ (asm-org $asm) $offset)))
+
+  (define (asm+value $asm $id $value)
+    (asm-with-values $asm
+      (push (asm-values $asm)
+        (syntax-append $id $value))))
+
+  (define (asm+blob $asm $blob)
+    (asm-with-blobs $asm
+      (push (asm-blobs $asm) $blob)))
 
   (define (asm->syntax $asm)
     #`(lets
