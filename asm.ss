@@ -12,7 +12,7 @@
     asm+value
     asm+blob
     asm+syntax
-    asm->syntax)
+    asm->bytevector-syntax)
   (import (micascheme))
 
   (data (asm org labels values blobs))
@@ -40,7 +40,7 @@
     (asm-with-blobs $asm
       (push (asm-blobs $asm) $blob)))
 
-  (define (asm->syntax $asm)
+  (define (asm->bytevector-syntax $asm)
     #`(lets
       #,@(reverse (asm-labels $asm))
       #,@(reverse (asm-values $asm))

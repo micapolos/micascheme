@@ -1,7 +1,7 @@
 (import (micascheme) (asm))
 
 (check-datum=?
-  (asm->syntax
+  (asm->bytevector-syntax
     (asm 10
       (stack #`label-1 #`label-2)
       (stack #`value-1 #`value-2)

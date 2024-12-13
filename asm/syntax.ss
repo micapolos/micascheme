@@ -1,5 +1,7 @@
 (library (asm syntax)
-  (export define-asm-syntax asm-bytevector)
+  (export
+    define-asm-syntax
+    asm-bytevector)
   (import (micascheme) (asm))
 
   (define-rules-syntax
@@ -19,7 +21,7 @@
   (define-syntax (asm-bytevector $syntax $lookup)
     (syntax-case $syntax ()
       ((id item ...)
-        (asm->syntax
+        (asm->bytevector-syntax
           (fold-left
             (lambda ($asm $item)
               (syntax-case $item (eq org db)
