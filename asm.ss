@@ -5,17 +5,18 @@
     asm-org asm-with-org
     asm-labels asm-with-labels
     asm-values asm-with-values
-    asm-blobs asm-with-blobs
+    asm-puts asm-puts
     empty-asm
     asm+org
     asm+label
     asm+value
-    asm+blob-syntax
+    asm+put
+    asm+u8
     asm+syntax
     asm->bytevector-syntax)
   (import (micascheme))
 
-  (data (asm org labels values blobs))
+  (data (asm org labels values puts))
 
   (define-aux-keywords org eq u8)
 
@@ -36,18 +37,25 @@
       (push (asm-values $asm)
         (syntax-append $id $value))))
 
-  (define (asm+blob-syntax $asm $blob)
-    (asm-with-blobs $asm
-      (push (asm-blobs $asm) $blob)))
+  (define (asm+put $asm $put)
+    (asm-with-puts $asm
+      (push (asm-puts $asm) $put)))
 
-  (define (asm+blob $asm $blob)
-    (asm+blob-syntax $asm (blob->syntax $blob)))
+  (define (asm+u8 $asm $u8)
+    (fluent $asm
+      (asm+put (lambda ($port) #`(put-u8 #,$port #,$u8)))
+      (asm+org 1)))
 
   (define (asm->bytevector-syntax $asm)
     #`(lets
       #,@(reverse (asm-labels $asm))
       #,@(reverse (asm-values $asm))
-      (blob->bytevector (blob-append #,@(reverse (asm-blobs $asm))))))
+      ((values $port $close) (open-bytevector-output-port))
+      (run
+        #,@(map-with
+          ($put (reverse (asm-puts $asm)))
+          ($put #'$port)))
+      ($close)))
 
   (define (asm+syntax $asm $syntax)
     (syntax-case $syntax (eq org u8)
@@ -60,7 +68,5 @@
         (identifier? #'id)
         (asm+value $asm #'id #'expr))
       ((u8 expr ...)
-        (fluent $asm
-          (asm+blob-syntax #'(u8-blob expr ...))
-          (asm+org (length (syntaxes expr ...)))))))
+        (fold-left asm+u8 $asm (syntaxes expr ...)))))
 )

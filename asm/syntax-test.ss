@@ -30,10 +30,7 @@
   (define-asm-syntax db
     (lambda ($asm $db)
       (syntax-case $db ()
-        ((db expr)
-          (fluent $asm
-            (asm+blob-syntax #`(u8-blob expr))
-            (asm+org 1))))))
+        ((db expr) (asm+u8 $asm #`expr)))))
 
   (check-equal?
     (asm-bytevector (db #x10))
@@ -42,10 +39,7 @@
 (run
   (define-asm-syntax (db $asm $u8)
     (syntax-case $u8 ()
-      ((db expr)
-        (fluent $asm
-          (asm+blob-syntax #`(u8-blob expr))
-          (asm+org 1)))))
+      ((db expr) (asm+u8 $asm #`expr))))
 
   (check-equal?
     (asm-bytevector (db #x10))
@@ -53,9 +47,7 @@
 
 (run
   (define-asm-syntax (db expr) ($asm)
-    (fluent $asm
-      (asm+blob-syntax #`(u8-blob expr))
-      (asm+org 1)))
+     (asm+u8 $asm #`expr))
 
   (check-equal?
     (asm-bytevector (db #x10))

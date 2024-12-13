@@ -21,17 +21,12 @@
   (define-aux-keyword call)
   (define-aux-keyword ret)
 
-  (define (put-u16 $port $u16)
-    (run
-      (put-u8 $port (fxand $u16 #xff))
-      (put-u8 $port (fxand (fxsrl $u16 8) #xff))))
-
   (define (transform-put-op $port $op)
     (syntax-case $op (db dw)
       ((db $expr)
         #`(put-u8 #,$port $expr))
       ((dw $expr)
-        #`(put-u16 #,$port $expr))))
+        #`(put-u16 #,$port $expr (endianness little)))))
 
   (define (transform-vectorize $op-list)
     (with-implicit (transform-assemble $port)

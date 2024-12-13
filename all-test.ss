@@ -42,6 +42,7 @@
   (option)
   (pair)
   (parser)
+  (port)
   (procedure)
   (proof)
   (proven)
