@@ -1,5 +1,5 @@
 (library (asm base)
-  (export db)
+  (export db dw)
   (import (micascheme) (asm) (asm syntax))
 
   (define-asm-syntax (db item ...) ($asm)
@@ -13,9 +13,27 @@
           ((char? $char)
             (asm+syntax $asm
               #`(u8 #,(literal->syntax (char->integer $char)))))
-          ((else _)
-            (asm+syntax $asm
-              #`(u8 #,$item)))))
+          ((else $other)
+            (syntax-case $other (dw)
+              ((dw item ...)
+                (fold-left
+                  (lambda ($asm $item)
+                    (fluent $asm
+                      (asm+blob #`(bytevector->blob (u16-bytevector #,$item (endianness little))))
+                      (asm+org 2)))
+                  $asm
+                  (syntaxes item ...)))
+              (other
+                (asm+syntax $asm #`(u8 other)))))))
+      $asm
+      (syntaxes item ...)))
+
+  (define-asm-syntax (dw item ...) ($asm)
+    (fold-left
+      (lambda ($asm $item)
+        (fluent $asm
+          (asm+blob #`(bytevector->blob (u16-bytevector #,$item (endianness little))))
+          (asm+org 2)))
       $asm
       (syntaxes item ...)))
 )
