@@ -19,26 +19,21 @@
   (define-syntax (asm-bytevector $syntax $lookup)
     (syntax-case $syntax ()
       ((id item ...)
-        (lets
-          ($asm
-            (fold-left
-              (lambda ($asm $item)
-                (syntax-case $item ()
-                  ((id arg ...)
-                    (identifier? #'id)
-                    (app
-                      (or ($lookup #'id) (syntax-error #'id "undefined asm-syntax"))
-                      $asm
-                      $item))
-                  (id
-                    (identifier? #'id)
-                    (asm-with-labels $asm
-                      (push (asm-labels $asm)
-                        #`(id #,(literal->syntax (asm-org $asm))))))))
-              (empty-asm)
-              (syntaxes item ...)))
-          #`(lets
-            #,@(reverse (asm-labels $asm))
-            #,@(reverse (asm-values $asm))
-            (blob->bytevector (blob-append #,@(reverse (asm-blobs $asm)))))))))
+        (asm->syntax
+          (fold-left
+            (lambda ($asm $item)
+              (syntax-case $item ()
+                ((id arg ...)
+                  (identifier? #'id)
+                  (app
+                    (or ($lookup #'id) (syntax-error #'id "undefined asm-syntax"))
+                    $asm
+                    $item))
+                (id
+                  (identifier? #'id)
+                  (asm-with-labels $asm
+                    (push (asm-labels $asm)
+                      #`(id #,(literal->syntax (asm-org $asm))))))))
+            (empty-asm)
+            (syntaxes item ...))))))
 )
