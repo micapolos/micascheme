@@ -31,9 +31,7 @@
                     $item))
                 (id
                   (identifier? #'id)
-                  (asm-with-labels $asm
-                    (push (asm-labels $asm)
-                      #`(id #,(literal->syntax (asm-org $asm))))))))
+                  (asm+label $asm #'id))))
             (empty-asm)
             (syntaxes item ...))))))
 )
