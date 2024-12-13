@@ -15,8 +15,11 @@
   (define (empty-blob)
     (blob 0 (lambda ($port) (void))))
 
-  (define (u8-blob $u8)
-    (blob 1 (lambda ($port) (put-u8 $port $u8))))
+  (define (u8-blob . $u8s)
+    (blob
+      (length $u8s)
+      (lambda ($port)
+        (for-each (partial put-u8 $port) $u8s))))
 
   (define (bytevector->blob $bytevector)
     (blob

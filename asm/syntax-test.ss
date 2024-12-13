@@ -1,44 +1,55 @@
 (import (micascheme) (asm) (asm syntax))
 
-(define-asm-syntax db
-  (lambda ($asm $db)
-    (syntax-case $db ()
-      ((db expr)
+(check-equal?
+  (asm-bytevector (db #x10 #x20))
+  (bytevector #x10 #x20))
+
+(check-equal?
+  (asm-bytevector
+    (eq one 1)
+    (eq two (+ one one))
+    (db one two))
+  (bytevector 1 2))
+
+(check-equal?
+  (asm-bytevector
+    (db 10 20 label-1 label-2)
+    label-1
+    (db 30 40)
+    label-2)
+  (bytevector 10 20 4 6 30 40))
+
+(run
+  (define-asm-syntax u8
+    (lambda ($asm $db)
+      (syntax-case $db ()
+        ((u8 expr)
+          (fluent $asm
+            (asm+blob #`(u8-blob expr))
+            (asm+org 1))))))
+
+  (check-equal?
+    (asm-bytevector (u8 #x10))
+    (bytevector #x10)))
+
+(run
+  (define-asm-syntax (u8 $asm $u8)
+    (syntax-case $u8 ()
+      ((u8 expr)
         (fluent $asm
           (asm+blob #`(u8-blob expr))
-          (asm+org 1))))))
+          (asm+org 1)))))
 
-(define-asm-syntax (dw $asm $dw)
-  (syntax-case $dw ()
-    ((dw expr)
-      (fluent $asm
-        (asm+blob #`(bytevector->blob (u16-bytevector expr (endianness little))))
-        (asm+org 2)))))
+  (check-equal?
+    (asm-bytevector (db #x10))
+    (bytevector #x10)))
 
-(define-asm-syntax (zeros n) ($asm)
-  (fluent $asm
-    (asm+blob #`(bytevector->blob (make-bytevector n 0)))
-    (asm+org (datum n))))
+(run
+  (define-asm-syntax (u8 expr) ($asm)
+    (fluent $asm
+      (asm+blob #`(u8-blob expr))
+      (asm+org 1)))
 
-(define-asm-syntax (eq id expr) ($asm)
-  (asm+value $asm #'id #'expr))
-
-(check-equal?
-  (asm-bytevector (db #x10))
-  (bytevector #x10))
-
-(check-equal?
-  (asm-bytevector (dw #x1234))
-  (bytevector #x34 #x12))
-
-(check-equal?
-  (asm-bytevector (zeros 5))
-  (bytevector 0 0 0 0 0))
-
-(check-equal?
-  (asm-bytevector (db foo) (db #x10) foo (db foo) (zeros 3) (db (+ foo foo)))
-  (bytevector #x02 #x10 #x02 0 0 0 #x04))
-
-(check-equal?
-  (asm-bytevector (eq foo+3 (+ foo 3)) (zeros 5) foo (db foo+3))
-  (bytevector 0 0 0 0 0 8))
+  (check-equal?
+    (asm-bytevector (db #x10))
+    (bytevector #x10)))

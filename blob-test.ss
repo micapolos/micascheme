@@ -26,9 +26,9 @@
 
 (check-blob (empty-blob))
 
-(check-blob
-  (u8-blob 123)
-  123)
+(check-blob (u8-blob))
+(check-blob (u8-blob 123) 123)
+(check-blob (u8-blob 1 2 3 4) 1 2 3 4)
 
 (check-blob
   (blob-append (u8-blob 1) (u8-blob 2) (u8-blob 3))
