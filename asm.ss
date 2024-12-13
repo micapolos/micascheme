@@ -13,6 +13,7 @@
     asm+put
     asm+u8
     asm+syntax
+    asm->put-syntax
     asm->bytevector-syntax)
   (import (micascheme))
 
@@ -46,16 +47,19 @@
       (asm+put (lambda ($port) #`(put-u8 #,$port #,$u8)))
       (asm+org 1)))
 
-  (define (asm->bytevector-syntax $asm)
+  (define (asm->put-syntax $asm $port)
     #`(lets
       #,@(reverse (asm-labels $asm))
       #,@(reverse (asm-values $asm))
-      ((values $port $close) (open-bytevector-output-port))
       (run
         #,@(map-with
           ($put (reverse (asm-puts $asm)))
-          ($put #'$port)))
-      ($close)))
+          ($put #'$port)))))
+
+  (define (asm->bytevector-syntax $asm)
+    #`(call-with-bytevector-output-port
+      (lambda ($port)
+        #,(asm->put-syntax $asm #'$port))))
 
   (define (asm+syntax $asm $syntax)
     (syntax-case $syntax (eq org u8)
