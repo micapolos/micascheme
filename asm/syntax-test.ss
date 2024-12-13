@@ -19,6 +19,13 @@
     label-2)
   (bytevector 10 20 4 6 30 40))
 
+(check-equal?
+  (asm-bytevector
+    (org #x12)
+    here
+    (db here))
+  (bytevector #x12))
+
 (run
   (define-asm-syntax u8
     (lambda ($asm $db)

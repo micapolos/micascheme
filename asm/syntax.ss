@@ -31,7 +31,7 @@
                   (identifier? #'id)
                   (asm+label $asm #'id))
                 ((org expr)
-                  (asm-with-org $asm (datum org)))
+                  (asm-with-org $asm (datum expr)))
                 ((eq id expr)
                   (identifier? #'id)
                   (asm+value $asm #'id #'expr))
