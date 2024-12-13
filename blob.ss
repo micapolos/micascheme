@@ -7,8 +7,9 @@
     list->blob
     blob-append
     bytevector->blob
-    blob->bytevector)
-  (import (scheme) (data) (lets) (procedure))
+    blob->bytevector
+    blob->syntax)
+  (import (scheme) (data) (lets) (procedure) (fluent) (syntax))
 
   (data (blob size put-proc))
 
@@ -43,4 +44,10 @@
       ((values $port $close) (open-bytevector-output-port))
       (run (put-blob $port $blob))
       ($close)))
+
+  (define (blob->syntax $blob)
+    (fluent $blob
+      (blob->bytevector)
+      (bytevector->syntax)
+      (let $it #`(bytevector->blob #,$it))))
 )

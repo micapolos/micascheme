@@ -19,7 +19,7 @@
                 (fold-left
                   (lambda ($asm $item)
                     (fluent $asm
-                      (asm+blob #`(bytevector->blob (u16-bytevector #,$item (endianness little))))
+                      (asm+blob-syntax #`(bytevector->blob (u16-bytevector #,$item (endianness little))))
                       (asm+org 2)))
                   $asm
                   (syntaxes item ...)))
@@ -32,7 +32,7 @@
     (fold-left
       (lambda ($asm $item)
         (fluent $asm
-          (asm+blob #`(bytevector->blob (u16-bytevector #,$item (endianness little))))
+          (asm+blob-syntax #`(bytevector->blob (u16-bytevector #,$item (endianness little))))
           (asm+org 2)))
       $asm
       (syntaxes item ...)))

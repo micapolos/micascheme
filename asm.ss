@@ -10,7 +10,7 @@
     asm+org
     asm+label
     asm+value
-    asm+blob
+    asm+blob-syntax
     asm+syntax
     asm->bytevector-syntax)
   (import (micascheme))
@@ -36,9 +36,12 @@
       (push (asm-values $asm)
         (syntax-append $id $value))))
 
-  (define (asm+blob $asm $blob)
+  (define (asm+blob-syntax $asm $blob)
     (asm-with-blobs $asm
       (push (asm-blobs $asm) $blob)))
+
+  (define (asm+blob $asm $blob)
+    (asm+blob-syntax $asm (blob->syntax $blob)))
 
   (define (asm->bytevector-syntax $asm)
     #`(lets
@@ -58,6 +61,6 @@
         (asm+value $asm #'id #'expr))
       ((u8 expr ...)
         (fluent $asm
-          (asm+blob #'(u8-blob expr ...))
+          (asm+blob-syntax #'(u8-blob expr ...))
           (asm+org (length (syntaxes expr ...)))))))
 )

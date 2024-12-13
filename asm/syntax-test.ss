@@ -32,7 +32,7 @@
       (syntax-case $db ()
         ((db expr)
           (fluent $asm
-            (asm+blob #`(u8-blob expr))
+            (asm+blob-syntax #`(u8-blob expr))
             (asm+org 1))))))
 
   (check-equal?
@@ -44,7 +44,7 @@
     (syntax-case $u8 ()
       ((db expr)
         (fluent $asm
-          (asm+blob #`(u8-blob expr))
+          (asm+blob-syntax #`(u8-blob expr))
           (asm+org 1)))))
 
   (check-equal?
@@ -54,7 +54,7 @@
 (run
   (define-asm-syntax (db expr) ($asm)
     (fluent $asm
-      (asm+blob #`(u8-blob expr))
+      (asm+blob-syntax #`(u8-blob expr))
       (asm+org 1)))
 
   (check-equal?
