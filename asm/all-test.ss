@@ -2,4 +2,5 @@
 
 (test
   (asm z80)
-  (asm syntax))
+  (asm syntax)
+  (asm base))

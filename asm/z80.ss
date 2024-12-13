@@ -1,6 +1,5 @@
 (library (asm z80)
-  (export
-    op->asm? reg)
+  (export op->asm? reg)
   (import
     (rename (micascheme)
       (and %and)
@@ -9,7 +8,8 @@
       (not %not)
       (+ %+))
     (asm z80-keywords)
-    (asm syntax))
+    (asm syntax)
+    (asm))
 
   (define-rule-syntax (asm-syntax-match? expr (pattern fender item ...) ...)
     (syntax-match? expr
