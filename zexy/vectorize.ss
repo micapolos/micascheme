@@ -21,11 +21,9 @@
           #`(repeat $expr ($put-u8 0))))))
 
   (define (vectorize $ops)
-    #`(lets
-      ((values $port $close) (open-bytevector-output-port))
-      (run
+    #`(call-with-bytevector-output-port
+      (lambda ($port)
         (for-each
           (lambda ($fn) ($fn (lambda ($u8) (put-u8 $port $u8))))
-          (list #,@(flat-map-syntax-list vectorize-op $ops)))
-        ($close))))
+          (list #,@(flat-map-syntax-list vectorize-op $ops))))))
 )

@@ -40,10 +40,9 @@
     (list->blob $blobs))
 
   (define (blob->bytevector $blob)
-    (lets
-      ((values $port $close) (open-bytevector-output-port))
-      (run (put-blob $port $blob))
-      ($close)))
+    (call-with-bytevector-output-port
+      (lambda ($port)
+        (put-blob $port $blob))))
 
   (define (blob->syntax $blob)
     (fluent $blob

@@ -74,16 +74,15 @@
           (loop (add1 offset))))))
 
   (define (foreign-string $address)
-    (lets
-      ((values $port $close) (open-bytevector-output-port))
-      ($bytevector
-        (let $loop (($offset 0))
-          (lets
-            ($u8 (foreign-ref 'unsigned-8 $address $offset))
-            (cond
-              ((zero? $u8) ($close))
-              (else
-                (put-u8 $port $u8)
-                ($loop (add1 $offset)))))))
-      (utf8->string $bytevector)))
+    (utf8->string
+      (call-with-bytevector-output-port
+        (lambda ($port)
+          (let $loop (($offset 0))
+            (lets
+              ($u8 (foreign-ref 'unsigned-8 $address $offset))
+              (cond
+                ((zero? $u8) (void))
+                (else
+                  (put-u8 $port $u8)
+                  ($loop (add1 $offset))))))))))
 )
