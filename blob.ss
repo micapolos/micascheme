@@ -9,7 +9,7 @@
     bytevector->blob
     blob->bytevector
     blob->syntax)
-  (import (scheme) (data) (lets) (procedure) (fluent) (syntax))
+  (import (scheme) (data) (lets) (procedure) (fluent) (syntax) (port))
 
   (data (blob size put-proc))
 
@@ -40,9 +40,8 @@
     (list->blob $blobs))
 
   (define (blob->bytevector $blob)
-    (call-with-bytevector-output-port
-      (lambda ($port)
-        (put-blob $port $blob))))
+    (with-bytevector-output-port $port
+      (put-blob $port $blob)))
 
   (define (blob->syntax $blob)
     (fluent $blob

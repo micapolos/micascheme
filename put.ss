@@ -5,7 +5,7 @@
     put
     bytevector!
     u8 u16-le u16-be utf8 c-string file)
-  (import (scheme) (syntax) (syntaxes) (lets))
+  (import (scheme) (syntax) (syntaxes) (lets) (port))
 
   (define-rules-syntaxes
     ((define-put-syntax $id $expr)
@@ -47,9 +47,8 @@
             (void))))))
 
   (define-rule-syntax (bytevector! $op ...)
-    (call-with-bytevector-output-port
-      (lambda ($port)
-        (put $port $op ...))))
+    (with-bytevector-output-port $port
+      (put $port $op ...)))
 
   ; --- library ---
 

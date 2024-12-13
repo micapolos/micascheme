@@ -13,7 +13,7 @@
 
     foreign-string-length
     foreign-string)
-  (import (scheme) (syntax) (syntaxes) (dynamic-wind) (lets) (procedure))
+  (import (scheme) (syntax) (syntaxes) (dynamic-wind) (lets) (procedure) (port))
 
   (define (foreign-alloc-0 size)
     (if (zero? size) 0 (foreign-alloc size)))
@@ -75,14 +75,13 @@
 
   (define (foreign-string $address)
     (utf8->string
-      (call-with-bytevector-output-port
-        (lambda ($port)
-          (let $loop (($offset 0))
-            (lets
-              ($u8 (foreign-ref 'unsigned-8 $address $offset))
-              (cond
-                ((zero? $u8) (void))
-                (else
-                  (put-u8 $port $u8)
-                  ($loop (add1 $offset))))))))))
+      (with-bytevector-output-port $port
+        (let $loop (($offset 0))
+          (lets
+            ($u8 (foreign-ref 'unsigned-8 $address $offset))
+            (cond
+              ((zero? $u8) (void))
+              (else
+                (put-u8 $port $u8)
+                ($loop (add1 $offset)))))))))
 )
