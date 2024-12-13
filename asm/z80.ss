@@ -17,7 +17,7 @@
 
   (define-rule-syntax (define-asm-pattern-match? (id param ...) (pattern arg ...) ...)
     (define-pattern-match? (id param ...) (expr body)
-      (opt-lets
+      (lets?
         ($list
           (syntax-match? expr
             (pattern (list arg ...)) ...))

@@ -58,7 +58,7 @@
   ; ----------------------------------------------------------
 
   (define-rule-syntax (parser-thunk-do ($thunk $parser) $body)
-    (opt-lets ($thunk $parser) $body))
+    (lets? ($thunk $parser) $body))
 
   (define (parser-push $parser $char)
     (parser-thunk-do ($thunk $parser)
@@ -348,17 +348,17 @@
             ((#\space)
               (if (< $indent indent-size)
                 (make-indent-parser (+ $indent 1) $thunk)
-                (opt-lift make-indent-parser
+                (lift? make-indent-parser
                   (opt $indent)
                   (thunk-push $thunk $char))))
             ((#\newline)
               (and
                 (or (= $indent 0) (= $indent indent-size)) 0)
-                (opt-lift make-indent-parser 0 (thunk-push $thunk $char)))
+                (lift? make-indent-parser 0 (thunk-push $thunk $char)))
             (else
               (and
                 (= $indent indent-size)
-                (opt-lift make-indent-parser
+                (lift? make-indent-parser
                   (opt $indent)
                   (thunk-push $thunk $char)))))))))
 

@@ -183,14 +183,14 @@
       ($term (typed-value $typed))
       (switch $to-type
         ((choice-type? $to-choice-type)
-          (opt-lets
+          (lets?
             ($index (choice-type-index-of $to-choice-type $type))
             (typed (pair $index $term) $to-choice-type)))
         ((tuple-type? $to-tuple-type)
           (and 
             (tuple-type? $type)
             (symbol=? (tuple-type-name $type) (tuple-type-name $to-tuple-type))
-            (opt-lets
+            (lets?
               ($single-to-type (single (tuple-type-types $to-tuple-type)))
               ($single-type (single (tuple-type-types $type)))
               ($tuple-wrap (typed-wrap $single-type $single-to-type))

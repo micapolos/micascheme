@@ -58,7 +58,7 @@
             #`(lambda ($syntax)
               (syntax-case-opt $syntax ()
                 (($syntax-head . $syntax-tail)
-                  (opt-lets
+                  (lets?
                     ($head-args (#,$head-proc #'$syntax-head))
                     ($tail-args (#,$tail-proc #'$syntax-tail))
                     (append $head-args $tail-args))))))))
@@ -82,7 +82,7 @@
         (lets
           ((values $params $args-proc)
             (parse-pattern $lookup #'$pattern))
-          #`(opt-lets
+          #`(lets?
               ($args (#,$args-proc #,$syntax))
               (syntax-case #`(#,@$args) ()
                 ((#,@$params) $body)))))))
@@ -135,7 +135,7 @@
               #`(lambda ($syntax)
                 (syntax-case-opt $syntax ()
                   (($syntax-head . $syntax-tail)
-                    (opt-lets
+                    (lets?
                       ($result (app #,$body #'$syntax-tail))
                       (app $result #'$syntax-head)))))))))
       ($id

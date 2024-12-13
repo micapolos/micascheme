@@ -137,7 +137,7 @@
       '(lambda ($syntax)
         (syntax-case-opt $syntax ()
           (($syntax-head . $syntax-tail)
-            (opt-lets
+            (lets?
               ($result
                 (app
                   (lambda ($syntax)
@@ -158,13 +158,13 @@
       '(lambda ($syntax)
         (syntax-case-opt $syntax ()
           (($syntax-head . $syntax-tail)
-            (opt-lets
+            (lets?
               ($result
                 (app
                   (lambda ($syntax)
                     (syntax-case-opt $syntax ()
                       (($syntax-head . $syntax-tail)
-                        (opt-lets
+                        (lets?
                           ($result
                             (app
                               (lambda ($syntax)

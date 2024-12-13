@@ -82,20 +82,20 @@
     (and
       (= (string-length $string) 3)
       (char=? (string-ref $string 2) #\h)
-      (opt-lift byte
-        (opt-lift +
-          (opt-lift bitwise-arithmetic-shift-left (char->hex-number-opt (string-ref $string 0)) 4)
+      (lift? byte
+        (lift? +
+          (lift? bitwise-arithmetic-shift-left (char->hex-number-opt (string-ref $string 0)) 4)
           (char->hex-number-opt (string-ref $string 1))))))
 
   (define (string->hex-word-opt $string)
     (and
       (= (string-length $string) 5)
       (char=? (string-ref $string 4) #\h)
-      (opt-lift word
-        (opt-lift +
-          (opt-lift bitwise-arithmetic-shift-left (char->hex-number-opt (string-ref $string 0)) 12)
-          (opt-lift bitwise-arithmetic-shift-left (char->hex-number-opt (string-ref $string 1)) 8)
-          (opt-lift bitwise-arithmetic-shift-left (char->hex-number-opt (string-ref $string 2)) 4)
+      (lift? word
+        (lift? +
+          (lift? bitwise-arithmetic-shift-left (char->hex-number-opt (string-ref $string 0)) 12)
+          (lift? bitwise-arithmetic-shift-left (char->hex-number-opt (string-ref $string 1)) 8)
+          (lift? bitwise-arithmetic-shift-left (char->hex-number-opt (string-ref $string 2)) 4)
           (char->hex-number-opt (string-ref $string 3))))))
 
   (define (string->label-opt $string)

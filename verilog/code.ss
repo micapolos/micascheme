@@ -267,7 +267,7 @@
       ((%append expr ...)
         (value-expression
           (code-in-curly-brackets
-            (opt-lets
+            (lets?
               ($exprs (ops->code ", " (syntaxes expr ...)))
               (code " " $exprs " ")))))))
 

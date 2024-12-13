@@ -189,7 +189,7 @@
       ($layout-field (stack-layout-ref $struct-layout $index))
       (layment
         (layout-field-layout $layout-field)
-        (opt-lets
+        (lets?
           ($index (layout-field-index-opt $layout-field))
           (stack-compilation-ref
             (layment-compilation $stack-layment)

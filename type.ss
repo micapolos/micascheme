@@ -53,7 +53,7 @@
     (if (null? $lhs)
       (and (null? $rhs) $env)
       (and (not (null? $rhs))
-        (opt-lets ($env (match $env (car $lhs) (car $rhs)))
+        (lets? ($env (match $env (car $lhs) (car $rhs)))
           (list-match $env (cdr $lhs) (cdr $rhs))))))
   
   (define (match $env $lhs $rhs)
@@ -123,7 +123,7 @@
     (and
       (function-type? $rhs)
       (symbol=? (function-type-name $function-type) (function-type-name $rhs))
-      (opt-lets
+      (lets?
         ($env (list-match $env (function-type-params $function-type) (function-type-params $rhs)))
         (match $env (function-type-result $function-type) (function-type-result $rhs)))))
 
@@ -162,16 +162,16 @@
       ((else $other) #f)))
 
   (define (type-named? $type $symbol)
-    (opt-lets ($selector (type-selector $type))
+    (lets? ($selector (type-selector $type))
       (symbol=? $selector $symbol)))
 
   (define (type-selector-index $type $selector)
     (and (pair? $type)
-      (opt-lets
+      (lets?
         ($indexed
           (map-find-indexed 
             (lambda ($sub-type) 
-              (opt-lets ($sub-selector (type-selector $sub-type))
+              (lets? ($sub-selector (type-selector $sub-type))
                 (eq? $sub-selector $selector)))
             (cdr $type)))
         (indexed-index $indexed))))
@@ -179,7 +179,7 @@
   ; -------------------------------------------------
 
   (define (choice-type-index-of $choice-type $type)
-    (opt-lets
+    (lets?
       ($indexed (map-find-indexed (partial equal? $type) (choice-type-types $choice-type)))
       (indexed-index $indexed)))
 )

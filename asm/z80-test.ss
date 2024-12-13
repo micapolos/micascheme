@@ -8,9 +8,9 @@
     (%check-equal?
       (%pattern-match? (%syntax id) (reg $prefix? $r3 $offset?)
         (%list
-          (%opt-lift %syntax->datum $prefix?)
+          (%lift? %syntax->datum $prefix?)
           $r3
-          (%opt-lift %syntax->datum $offset?)))
+          (%lift? %syntax->datum $offset?)))
       (%list
         (%or (%datum prefix?) (%quote prefix?))
         r3

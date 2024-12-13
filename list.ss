@@ -14,8 +14,8 @@
     filter-using
     find-using
     bind-if
-    opt-lets
-    opt-lift
+    lets?
+    lift?
     indices
     fold-while
     find-index
@@ -101,12 +101,12 @@
   (define (bind-if $pred $obj $fn)
     (if ($pred $obj) ($fn $obj) $obj))
 
-  (define-syntax opt-lets
+  (define-syntax lets?
     (syntax-rules ()
       ((_ body) body)
       ((_ (val expr) decl ... body)
         (let ((val expr)) 
-          (and val (opt-lets decl ... body))))))
+          (and val (lets? decl ... body))))))
 
   (define-aux-keyword opt)
 
@@ -139,7 +139,7 @@
   (define (filter-opts $opts)
     (filter identity $opts))
 
-  (define-syntax (opt-lift $syntax)
+  (define-syntax (lift? $syntax)
     (syntax-case $syntax ()
       ((_ $fn $spec ...)
         (lets
@@ -216,7 +216,7 @@
           (map-find-indexed+ $proc (cdr $list) (+ $index 1))))))
 
   (define (find-index $proc $list)
-    (opt-lets ($indexed (map-find-indexed $proc $list))
+    (lets? ($indexed (map-find-indexed $proc $list))
       (indexed-index $indexed)))
 
   (define (indexed-find+ $proc $list $index)
@@ -281,7 +281,7 @@
             (($pred $key)
               (pair (pair $key ($update $value)) $list))
             (else
-              (opt-lets
+              (lets?
                 ($list (assp-update $pred $update $list))
                 (pair $entry $list))))))))
 
