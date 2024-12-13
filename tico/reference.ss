@@ -14,7 +14,7 @@
     (switch (reference-index-opt $reference)
       ((false? _) $reference)
       ((else $index)
-        (switch-opt (- (index-value $index) (arity-value $arity))
+        (switch? (- (index-value $index) (arity-value $arity))
           ((nonnegative-integer? $value)
             (reference
               (index $value)

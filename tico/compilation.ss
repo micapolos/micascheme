@@ -94,7 +94,7 @@
         $constant)))
 
   (define (compilation-binding-opt $compilation)
-    (switch-opt (compilation-evaluation $compilation)
+    (switch? (compilation-evaluation $compilation)
       ((constant? $constant)
         (cons
           (compilation-datum $compilation)
@@ -254,7 +254,7 @@
     (filter-opts
       (map
         (lambda ($datum $evaluation)
-          (switch-opt $evaluation
+          (switch? $evaluation
             ((constant? $constant)
               (cons $datum (constant-value $constant)))))
         (compilation-datum $stack-compilation)

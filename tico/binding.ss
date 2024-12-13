@@ -43,7 +43,7 @@
         TODO)))
 
   (define (bindings-match-from $bindings $pattern $index)
-    (switch-opt $bindings
+    (switch? $bindings
       ((pair? (pair $binding $bindings))
         (or
           (binding-match $binding $pattern $index)

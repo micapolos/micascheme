@@ -768,11 +768,11 @@
       ((else _) (syntax-error $syntax "invalid label"))))
 
   (define (str $syntax)
-    (switch-opt (syntax->datum $syntax)
+    (switch? (syntax->datum $syntax)
       ((string? $string) $string)))
 
   (define (chr $syntax)
-    (switch-opt (syntax->datum $syntax)
+    (switch? (syntax->datum $syntax)
       ((char? $char) (char->integer $char))))
 
   (define (p $syntax)

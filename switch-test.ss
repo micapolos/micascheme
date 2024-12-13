@@ -67,25 +67,25 @@
         ((else (number-with-one $n1 $n2)) (+ $n1 $n2)))
       129)))
 
-; === switch-opt
+; === switch?
 
 (check
   (equal?
-    (switch-opt (string-append "foo" "bar")
+    (switch? (string-append "foo" "bar")
       ((string? $string) (string-append $string "!"))
       ((number? $number) (number->string $number)))
     "foobar!"))
 
 (check
   (equal?
-    (switch-opt (+ 1 2)
+    (switch? (+ 1 2)
       ((string? $string) (string-append $string "!"))
       ((number? $number) (number->string $number)))
     "3"))
 
 (check
   (equal?
-    (switch-opt #\a
+    (switch? #\a
       ((string? $string) (string-append $string "!"))
       ((number? $number) (number->string $number)))
     #f))

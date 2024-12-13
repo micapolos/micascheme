@@ -291,7 +291,7 @@
       (lets
         ($target-typing (cadr $typings))
         ($selector-typing (car $typings))
-        (switch-opt (typing-type $selector-typing)
+        (switch? (typing-type $selector-typing)
           ((struct? $selector-struct)
             (and
               (symbol=? (struct-name $selector-struct) 'get)

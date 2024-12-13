@@ -101,7 +101,7 @@
       ((else $other) (throw literal->type $literal))))
 
   (define (type-application-opt $target $args)
-    (switch-opt $target
+    (switch? $target
       ((arrow? $arrow)
         (and
           (types-match?

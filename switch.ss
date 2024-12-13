@@ -1,5 +1,5 @@
 (library (switch)
-  (export switch switch-opt switch-exclusive index-switch)
+  (export switch switch? switch-exclusive index-switch)
   (import
     (scheme)
     (syntax)
@@ -30,7 +30,7 @@
               ($body (syntax->list #'(body ...)))
               #`((#,$pred tmp) #,(transform-binder $lookup $decl #'tmp $body))))))))
 
-  (define-rule-syntax (switch-opt $expr (($pred $var) $body) ...)
+  (define-rule-syntax (switch? $expr (($pred $var) $body) ...)
     (switch $expr
       (($pred $var) $body) ...
       ((else _) #f)))

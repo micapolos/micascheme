@@ -5,14 +5,14 @@
 (define-pattern-match? str
   (syntax-rules ()
     ((_ expr (_ s) body)
-      (switch-opt (syntax->datum expr)
+      (switch? (syntax->datum expr)
         ((string? $string)
           (lets
             (s $string)
             body))))))
 
 (define-pattern-match? (nums n-1 n n+1) (expr body)
-  (switch-opt (syntax->datum expr)
+  (switch? (syntax->datum expr)
     ((number? $number)
       (lets
         (n-1 (- $number 1))
