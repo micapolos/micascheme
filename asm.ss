@@ -57,9 +57,8 @@
           ($put #'$port)))))
 
   (define (asm->bytevector-syntax $asm)
-    #`(call-with-bytevector-output-port
-      (lambda ($port)
-        #,(asm->put-syntax $asm #'$port))))
+    #`(with-bytevector-output-port $port
+      #,(asm->put-syntax $asm #'$port)))
 
   (define (asm+syntax $asm $syntax)
     (syntax-case $syntax (eq org u8)
