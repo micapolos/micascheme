@@ -1,21 +1,21 @@
 (import (micascheme) (asm) (asm syntax))
 
 (check-equal?
-  (asm-bytevector (db #x10 #x20))
+  (asm-bytevector (u8 #x10 #x20))
   (bytevector #x10 #x20))
 
 (check-equal?
   (asm-bytevector
     (eq one 1)
     (eq two (+ one one))
-    (db one two))
+    (u8 one two))
   (bytevector 1 2))
 
 (check-equal?
   (asm-bytevector
-    (db 10 20 label-1 label-2)
+    (u8 10 20 label-1 label-2)
     label-1
-    (db 30 40)
+    (u8 30 40)
     label-2)
   (bytevector 10 20 4 6 30 40))
 
@@ -23,26 +23,26 @@
   (asm-bytevector
     (org #x12)
     here
-    (db here))
+    (u8 here))
   (bytevector #x12))
 
 (run
-  (define-asm-syntax u8
+  (define-asm-syntax db
     (lambda ($asm $db)
       (syntax-case $db ()
-        ((u8 expr)
+        ((db expr)
           (fluent $asm
             (asm+blob #`(u8-blob expr))
             (asm+org 1))))))
 
   (check-equal?
-    (asm-bytevector (u8 #x10))
+    (asm-bytevector (db #x10))
     (bytevector #x10)))
 
 (run
-  (define-asm-syntax (u8 $asm $u8)
+  (define-asm-syntax (db $asm $u8)
     (syntax-case $u8 ()
-      ((u8 expr)
+      ((db expr)
         (fluent $asm
           (asm+blob #`(u8-blob expr))
           (asm+org 1)))))
@@ -52,7 +52,7 @@
     (bytevector #x10)))
 
 (run
-  (define-asm-syntax (u8 expr) ($asm)
+  (define-asm-syntax (db expr) ($asm)
     (fluent $asm
       (asm+blob #`(u8-blob expr))
       (asm+org 1)))

@@ -8,7 +8,8 @@
       (xor %xor)
       (not %not)
       (+ %+))
-    (asm z80-keywords))
+    (asm z80-keywords)
+    (asm syntax))
 
   (define-rule-syntax (asm-syntax-match? expr (pattern fender item ...) ...)
     (syntax-match? expr

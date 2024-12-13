@@ -1,6 +1,6 @@
 (library (asm)
   (export
-    org eq db
+    org eq u8
     asm asm?
     asm-org asm-with-org
     asm-labels asm-with-labels
@@ -17,7 +17,7 @@
 
   (data (asm org labels values blobs))
 
-  (define-aux-keywords org eq db)
+  (define-aux-keywords org eq u8)
 
   (define (empty-asm)
     (asm 0 (stack) (stack) (stack)))
@@ -47,7 +47,7 @@
       (blob->bytevector (blob-append #,@(reverse (asm-blobs $asm))))))
 
   (define (asm+syntax $asm $syntax)
-    (syntax-case $syntax (eq org db)
+    (syntax-case $syntax (eq org u8)
       (id
         (identifier? #'id)
         (asm+label $asm #'id))
@@ -56,7 +56,7 @@
       ((eq id expr)
         (identifier? #'id)
         (asm+value $asm #'id #'expr))
-      ((db expr ...)
+      ((u8 expr ...)
         (fluent $asm
           (asm+blob #'(u8-blob expr ...))
           (asm+org (length (syntaxes expr ...)))))))
