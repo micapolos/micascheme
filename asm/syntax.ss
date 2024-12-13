@@ -1,6 +1,6 @@
 (library (asm syntax)
   (export define-asm-syntax asm-bytevector)
-  (import (micascheme) (assembler))
+  (import (micascheme) (asm))
 
   (define-rules-syntax
     ((define-asm-syntax id proc)

@@ -1,4 +1,4 @@
-(library (assembler)
+(library (asm)
   (export
     asm asm?
     asm-org asm-with-org

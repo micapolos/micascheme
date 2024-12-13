@@ -1,4 +1,4 @@
-(import (micascheme) (assembler) (asm syntax))
+(import (micascheme) (asm) (asm syntax))
 
 (define-asm-syntax db
   (lambda ($asm $db)
