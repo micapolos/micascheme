@@ -6,7 +6,7 @@
       ((db expr)
         (fluent $asm
           (asm-with-blobs (push (asm-blobs $asm) #`(u8-blob expr)))
-          (asm-with-org (+ (asm-org $asm) 1)))))))
+          (asm+org 1))))))
 
 (define-asm-syntax (dw $asm $dw)
   (syntax-case $dw ()
@@ -15,7 +15,7 @@
         (asm-with-blobs
           (push (asm-blobs $asm)
             #`(bytevector->blob (u16-bytevector expr (endianness little)))))
-        (asm-with-org (+ (asm-org $asm) 2))))))
+        (asm+org 2)))))
 
 (define-asm-syntax (zeros n) ($asm)
   (fluent $asm
