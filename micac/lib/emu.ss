@@ -3,7 +3,7 @@
     emu video
     width height video-x video-y
     mouse-x mouse-y mouse-pressed?
-    audio-left audio-right
+    audio-req? audio-left audio-right
     red green blue
     update
     file
@@ -19,7 +19,7 @@
     (externs
       video width height video-x video-y
       mouse-x mouse-y mouse-pressed?
-      audio-left audio-right
+      audio-req? audio-left audio-right
       red green blue
       update)
 
@@ -87,6 +87,7 @@
 
       (var int sample-cycle-counter 0)
 
+      (var bool audio-req? #f)
       (var uint8_t audio-left 128)
       (var uint8_t audio-right 128)
 
@@ -105,9 +106,9 @@
         (set mouse-y (div sdl-mouse-y window-scale))
         (set mouse-pressed? (not (zero? (bitwise-and sdl-mouse-state #b1))))
 
-        ;(printf "Queued audio size: %i\\n" (sdl-get-queued-audio-size audio-device))
-
         (repeat frame-cycles
+          (set audio-req? (= sample-cycle-counter 0))
+
           update-body ...
 
           (when (zero? pixel-cycle-counter)
@@ -128,9 +129,8 @@
               (set (pixel-ref *) blue)
               (inc pixel-ref)))
 
-          (inc pixel-cycle-counter)
-          (when (= pixel-cycle-counter cycles-per-pixel)
-            (set pixel-cycle-counter 0)
+          (when (zero? pixel-cycle-counter)
+            (set pixel-cycle-counter cycles-per-pixel)
 
             (inc video-x)
             (when (= video-x h-size)
@@ -140,19 +140,18 @@
               (when (= video-y v-size)
                 (set video-y 0)
                 (set pixel-ref pixels))))
+          (dec pixel-cycle-counter)
 
-          (inc sample-cycle-counter)
-          (when (>= sample-cycle-counter sample-cycles)
-            (set sample-cycle-counter - sample-cycles)
+          (when audio-req?
+            (set sample-cycle-counter + sample-cycles)
 
             (set (sample-buffer-ref *) audio-left)
             (inc sample-buffer-ref)
             (set (sample-buffer-ref *) audio-right)
             (inc sample-buffer-ref)
 
-            (inc sample-counter)
-            (when (= sample-counter audio-samples)
-              (set sample-counter 0)
+            (when (zero? sample-counter)
+              (set sample-counter audio-samples)
               (set sample-buffer-ref sample-buffer)
 
               (const int queued-audio-size (sdl-get-queued-audio-size audio-device))
@@ -165,7 +164,9 @@
                   (set queue-audio-count 0)
                   (printf "Audio queue overflow.\\n")))
               (repeat queue-audio-count
-                (sdl-queue-audio audio-device sample-buffer sample-buffer-size))))
+                (sdl-queue-audio audio-device sample-buffer sample-buffer-size)))
+            (dec sample-counter))
+          (set sample-cycle-counter - 1)
         )
 
         (sdl-update-texture texture 0 pixels pixels-pitch)
