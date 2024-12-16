@@ -2,7 +2,7 @@
   (export c-run c-run-echo?)
   (import (micascheme))
 
-  (define c-run-echo? (make-parameter #f))
+  (define c-run-echo? (make-parameter #t))
 
   (define (c-run $string . $gcc-flags)
     (lets

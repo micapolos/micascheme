@@ -12,6 +12,10 @@
     sdl-render-present
     sdl-file-data
     sdl-get-mouse-state
+    sdl-audio-device
+    sdl-pause-audio-device
+    sdl-queue-audio
+    sdl-get-queued-audio-size
 
     SDL_GetError
     SDL_Init
@@ -33,8 +37,17 @@
     SDL_RWclose
     SDL_LoadFile_RW
     SDL_GetMouseState
+    SDL_AudioSpec
+    SDL_OpenAudioDevice
+    SDL_CloseAudioDevice
+    SDL_PauseAudioDevice
+    SDL_QueueAudio
+    SDL_GetQueuedAudioSize
+    SDL_AudioDeviceID
     free
     SDL_INIT_VIDEO
+    SDL_INIT_AUDIO
+    AUDIO_U8
     SDL_QUIT
     SDL_WINDOWPOS_UNDEFINED
     SDL_RENDERER_ACCELERATED
@@ -65,8 +78,17 @@
       SDL_RWclose
       SDL_LoadFile_RW
       SDL_GetMouseState
+      SDL_AudioSpec
+      SDL_OpenAudioDevice
+      SDL_CloseAudioDevice
+      SDL_PauseAudioDevice
+      SDL_QueueAudio
+      SDL_GetQueuedAudioSize
+      SDL_AudioDeviceID
       free
       SDL_INIT_VIDEO
+      SDL_INIT_AUDIO
+      AUDIO_U8
       SDL_QUIT
       SDL_WINDOWPOS_UNDEFINED
       SDL_RENDERER_ACCELERATED
@@ -78,7 +100,7 @@
       (printf "%s SDL Error: %s\\n" message (SDL_GetError)))
 
     (macro (sdl-init)
-      (break-if (!= (SDL_Init SDL_INIT_VIDEO) 0)
+      (break-if (!= (SDL_Init (bitwise-ior SDL_INIT_VIDEO SDL_INIT_AUDIO)) 0)
         (print-sdl-error "Could not initialize."))
       (defer (SDL_Quit)))
 
@@ -131,6 +153,21 @@
 
     (macro (sdl-get-mouse-state x y)
       (SDL_GetMouseState (&ref x) (&ref y)))
+
+    (macro (sdl-audio-device audio-device spec)
+      (var SDL_AudioDeviceID audio-device (SDL_OpenAudioDevice 0 0 spec 0 0))
+      (break-if (= audio-device 0)
+        (print-sdl-error "Could not open audio device."))
+      (defer (SDL_CloseAudioDevice audio-device)))
+
+    (macro (sdl-pause-audio-device audio-device pause?)
+      (SDL_PauseAudioDevice audio-device pause?))
+
+    (macro (sdl-queue-audio audio-device data len)
+      (SDL_QueueAudio audio-device data len))
+
+    (macro (sdl-get-queued-audio-size audio-device)
+      (SDL_GetQueuedAudioSize audio-device))
 
     (macro (sdl-event-loop body ...)
       (var bool running #t)
