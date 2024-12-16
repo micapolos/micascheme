@@ -157,18 +157,19 @@ int main() {
                             green_47 = background_green_75;
                             blue_48 = background_blue_76;
                           }
-                          audio_left_64 = plasma_green_84;
-                          audio_right_65 = plasma_green_84;
-                          const bool frame_start__114 = video_x_43 == 0 && video_y_44 == 0;
-                          if (frame_start__114) {
+                          const uint8_t audio_114 = (plasma_green_84 >> 2) + 96;
+                          audio_left_64 = audio_114;
+                          audio_right_65 = audio_114;
+                          const bool frame_start__115 = video_x_43 == 0 && video_y_44 == 0;
+                          if (frame_start__115) {
                             frame_counter_69 += 1;
                           }
                         }
                         if (pixel_cycle_counter_45 == 0) {
-                          const bool h_video__115 = video_x_43 < 352;
-                          const bool v_video__116 = video_y_44 < 288;
-                          const bool video__117 = h_video__115 && v_video__116;
-                          if (video__117) {
+                          const bool h_video__116 = video_x_43 < 352;
+                          const bool v_video__117 = video_y_44 < 288;
+                          const bool video__118 = h_video__116 && v_video__117;
+                          if (video__118) {
                             *pixel_ref_53 = 255;
                             pixel_ref_53 += 1;
                             *pixel_ref_53 = red_46;

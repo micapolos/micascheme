@@ -49,8 +49,9 @@
           (set green background-green)
           (set blue background-blue)))
 
-      (set audio-left plasma-green)
-      (set audio-right plasma-green)
+      (const uint8_t audio (+ (>> plasma-green 2) 96))  ; 25% volume
+      (set audio-left audio)
+      (set audio-right audio)
 
       (const bool frame-start?
         (and (= video-x 0) (= video-y 0)))
