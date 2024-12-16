@@ -154,7 +154,18 @@
             (when (= sample-counter audio-samples)
               (set sample-counter 0)
               (set sample-buffer-ref sample-buffer)
-              (sdl-queue-audio audio-device sample-buffer sample-buffer-size)))
+
+              (const int queued-audio-size (sdl-get-queued-audio-size audio-device))
+              (var int queue-audio-count 1)
+              (cond
+                ((= queued-audio-size 0)
+                  (set queue-audio-count 2)
+                  (printf "Audio queue underflow.\\n"))
+                ((>= queued-audio-size (* 4 sample-buffer-size))
+                  (set queue-audio-count 0)
+                  (printf "Audio queue overflow.\\n")))
+              (repeat queue-audio-count
+                (sdl-queue-audio audio-device sample-buffer sample-buffer-size))))
         )
 
         (sdl-update-texture texture 0 pixels pixels-pitch)

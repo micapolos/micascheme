@@ -204,7 +204,20 @@ int main() {
                           if (sample_counter_60 == audio_samples_54) {
                             sample_counter_60 = 0;
                             sample_buffer_ref_59 = sample_buffer_58;
-                            SDL_QueueAudio(audio_device_56, sample_buffer_58, sample_buffer_size_57);
+                            const int queued_audio_size_119 = SDL_GetQueuedAudioSize(audio_device_56);
+                            int queue_audio_count_120 = 1;
+                            if (queued_audio_size_119 == 0) {
+                              queue_audio_count_120 = 2;
+                              printf("Audio queue underflow.\n");
+                            } else if (queued_audio_size_119 >= 4 * sample_buffer_size_57) {
+                              queue_audio_count_120 = 0;
+                              printf("Audio queue overflow.\n");
+                            }
+                            int index_121 = 0;
+                            while (index_121 != queue_audio_count_120) {
+                              SDL_QueueAudio(audio_device_56, sample_buffer_58, sample_buffer_size_57);
+                              index_121 += 1;
+                            }
                           }
                         }
                         index_94 += 1;
