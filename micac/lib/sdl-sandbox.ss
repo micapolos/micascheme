@@ -23,7 +23,7 @@
 
       (set (audio-spec freq) 22050)
       (set (audio-spec format) AUDIO_U8)
-      (set (audio-spec channels) 1)
+      (set (audio-spec channels) 2)
       (set (audio-spec samples) 256)
       (set (audio-spec callback) 0)
       (sdl-audio-device audio-device (&ref audio-spec))
@@ -57,10 +57,12 @@
 
         (when (< (sdl-get-queued-audio-size audio-device) sample-count)
           (var uint8_t (* samples-ref) samples)
-          (for-each (i sample-count)
+          (for-each (i (>> sample-count 1))
             (set sample-1 + 257)
+            (set (samples-ref *) (bitwise-and (>> sample-1 8) #xff))
+            (inc samples-ref)
             (set sample-2 + 258)
-            (set (samples-ref *) (bitwise-and (>> (+ (>> sample-1 8) (>> sample-2 8)) 1) #xff))
+            (set (samples-ref *) (bitwise-and (>> sample-2 8) #xff))
             (inc samples-ref))
 
           (sdl-queue-audio audio-device samples sample-count))))))
