@@ -20,12 +20,12 @@
       (sdl-init)
 
       (var SDL_AudioSpec audio-spec)
-
       (set (audio-spec freq) 22050)
       (set (audio-spec format) AUDIO_U8)
       (set (audio-spec channels) 2)
       (set (audio-spec samples) 256)
       (set (audio-spec callback) 0)
+
       (sdl-audio-device audio-device (&ref audio-spec))
 
       (alloc samples uint8_t sample-count)
