@@ -49,6 +49,9 @@
           (set green background-green)
           (set blue background-blue)))
 
+      (set audio-left plasma-green)
+      (set audio-right plasma-green)
+
       (const bool frame-start?
         (and (= video-x 0) (= video-y 0)))
 

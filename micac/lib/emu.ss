@@ -3,6 +3,7 @@
     emu video
     width height video-x video-y
     mouse-x mouse-y mouse-pressed?
+    audio-left audio-right
     red green blue
     update
     file
@@ -18,6 +19,7 @@
     (externs
       video width height video-x video-y
       mouse-x mouse-y mouse-pressed?
+      audio-left audio-right
       red green blue
       update)
 
@@ -49,6 +51,7 @@
       (var uint8_t blue #x00)
 
       (sdl-init)
+
       (sdl-window window "Emu" (* width window-scale) (* height window-scale))
       (sdl-renderer renderer window)
       (sdl-texture texture renderer SDL_PIXELFORMAT_BGRA8888 SDL_TEXTUREACCESS_STREAMING width height)
@@ -59,6 +62,35 @@
       (macro pixels-pitch (* width bits-per-pixel))
       (alloc pixels uint8_t pixels-size)
       (var uint8_t (* pixel-ref) pixels)
+
+      (const int audio-samples 256)
+
+      (var SDL_AudioSpec audio-spec)
+      (set (audio-spec freq) 22050)
+      (set (audio-spec format) AUDIO_U8)
+      (set (audio-spec channels) 2)
+      (set (audio-spec samples) audio-samples)
+      (set (audio-spec callback) 0)
+
+      (sdl-audio-device audio-device (&ref audio-spec))
+
+      (const int sample-buffer-size (* 2 audio-samples))
+      (alloc sample-buffer uint8_t sample-buffer-size)
+      (var uint8_t (* sample-buffer-ref) sample-buffer)
+      (var int sample-counter 0)
+
+      (const float frame-samples (div (cast float 22050) 60))
+      (const float sample-cycles (div frame-cycles frame-samples))
+      (printf "Cycles per frame: %i\\n" frame-cycles)
+      (printf "Samples per frame: %f\\n" frame-samples)
+      (printf "Cycles per sample: %f\\n" sample-cycles)
+
+      (var int sample-cycle-counter 0)
+
+      (var uint8_t audio-left 128)
+      (var uint8_t audio-right 128)
+
+      (sdl-pause-audio-device audio-device #f)
 
       (var int mouse-x 0)
       (var int mouse-y 0)
@@ -72,6 +104,8 @@
         (set mouse-x (div sdl-mouse-x window-scale))
         (set mouse-y (div sdl-mouse-y window-scale))
         (set mouse-pressed? (not (zero? (bitwise-and sdl-mouse-state #b1))))
+
+        ;(printf "Queued audio size: %i\\n" (sdl-get-queued-audio-size audio-device))
 
         (repeat frame-cycles
           update-body ...
@@ -105,7 +139,23 @@
               (inc video-y)
               (when (= video-y v-size)
                 (set video-y 0)
-                (set pixel-ref pixels)))))
+                (set pixel-ref pixels))))
+
+          (inc sample-cycle-counter)
+          (when (>= sample-cycle-counter sample-cycles)
+            (set sample-cycle-counter - sample-cycles)
+
+            (set (sample-buffer-ref *) audio-left)
+            (inc sample-buffer-ref)
+            (set (sample-buffer-ref *) audio-right)
+            (inc sample-buffer-ref)
+
+            (inc sample-counter)
+            (when (= sample-counter audio-samples)
+              (set sample-counter 0)
+              (set sample-buffer-ref sample-buffer)
+              (sdl-queue-audio audio-device sample-buffer sample-buffer-size)))
+        )
 
         (sdl-update-texture texture 0 pixels pixels-pitch)
         (sdl-render-copy renderer texture 0 0)
