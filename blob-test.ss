@@ -42,6 +42,10 @@
   (bytevector->blob (bytevector 1 2 3))
   1 2 3)
 
+(check-blob
+  (utf8->blob "foo")
+  102 111 111)
+
 (check-datum=?
   (blob->syntax (u8-blob 1 2 3))
   '(bytevector->blob (($primitive 3 bytevector) 1 2 3)))

@@ -7,6 +7,7 @@
     list->blob
     blob-append
     bytevector->blob
+    utf8->blob
     blob->bytevector
     blob->syntax)
   (import (scheme) (data) (lets) (procedure) (fluent) (syntax) (port))
@@ -27,6 +28,9 @@
       (bytevector-length $bytevector)
       (lambda ($port)
         (put-bytevector $port $bytevector))))
+
+  (define (utf8->blob $string)
+    (bytevector->blob (string->utf8 $string)))
 
   (define (put-blob $port $blob)
     ((blob-put-proc $blob) $port))
