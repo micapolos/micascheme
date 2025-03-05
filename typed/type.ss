@@ -49,22 +49,29 @@
   (define-rule-syntax (any-lambda (param ...) result)
     (make-any-lambda (list param ...) result))
 
-  (define (type-apply $lhs . $args)
-    (switch $lhs
+  (define (type-apply $target . $args)
+    (switch $target
       ((any-lambda? $any-lambda)
         (lets
           ($params (any-lambda-params $any-lambda))
           (run
             (when
               (not (= (length $params) (length $args)))
-              (throw invalid-arg-count `(actual ,(length $args)) `(expected ,(length $params))))
+              (throw invalid-arg-count
+                `(actual ,(length $args))
+                `(expected ,(length $params))))
             (for-each
               (lambda ($index $param $arg)
                 (when
                   (not (equal? $param $arg))
-                  (throw invalid-arg `(actual ,$arg) `(expected ,$param) `(index ,$index))))
+                  (throw invalid-arg
+                    `(actual ,$arg)
+                    `(expected ,$param)
+                    `(index ,$index))))
               (iota (length $params)) $params $args))
           (any-lambda-result $any-lambda)))
       ((else $other)
-        (throw invalid-target `(actual ,$lhs) `(expected any-lambda)))))
+        (throw invalid-target
+          `(actual ,$target)
+          `(expected any-lambda)))))
 )
