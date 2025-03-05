@@ -12,6 +12,19 @@
   (define-syntax data
     (lambda (stx)
       (syntax-case stx ()
+        ((id name)
+          (identifier? #'name)
+          (lets
+            (name-string (symbol->string (datum name)))
+            (name-syntax (datum->syntax #'id name-string))
+            (constructor-identifier #'name)
+            (predicate-identifier (identifier-append #'id #'name #'?))
+            #`(define-values (#,constructor-identifier #,predicate-identifier)
+              (lets
+                (rtd (make-record-type #,name-syntax '()))
+                (values
+                  ((record-constructor rtd))
+                  (record-predicate rtd))))))
         ((id (name field ... . list-field))
           (lets
             (fields (syntax->list #'(field ...)))

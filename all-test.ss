@@ -85,6 +85,7 @@
   (scheme all)
   (syntax all)
   (tico all)
+  (typed all)
   (verilog all)
   (zexy all)
 )

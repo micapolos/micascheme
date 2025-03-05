@@ -1,4 +1,4 @@
-(import (check) (data) (syntax))
+(import (scheme) (check) (data) (syntax))
 
 ; === data ===
 
@@ -63,6 +63,22 @@
 ;       ((vpoint x (vpoint y z . t1) . t2) (vpoint "a" (vpoint "b" "c" "d" "e") "f" "g"))
 ;       (string-append x y z (apply string-append t1) (apply string-append t2)))
 ;     "abcdefg"))
+
+; === data unit ===
+
+(data foo)
+(check (record? foo))
+(check (equal? foo foo))
+(check (foo? foo))
+
+(data bar)
+(check (record? bar))
+(check (equal? bar bar))
+(check (bar? bar))
+
+(check (not (equal? foo bar)))
+(check (not (foo? bar)))
+(check (not (bar? foo)))
 
 ; === enum ===
 
