@@ -36,11 +36,10 @@
 
 ; invalid-arg-count
 (check
-  (equal?
+  (raises
     (type-apply
       (any-lambda (any-string) any-fixnum)
-      any-string any-boolean)
-    any-fixnum))
+      any-string any-boolean)))
 
 ; invalid-arg
 (check
