@@ -20,8 +20,10 @@
             (constructor-identifier #'name)
             (predicate-identifier (identifier-append #'id #'name #'?))
             #`(define-values (#,constructor-identifier #,predicate-identifier)
-              (lets
-                (rtd (make-record-type #,name-syntax '()))
+              (let ((rtd (make-record-type #,name-syntax '())))
+                (record-writer rtd
+                  (lambda (record port wr)
+                    (display #,name-syntax port)))
                 (values
                   ((record-constructor rtd))
                   (record-predicate rtd))))))
