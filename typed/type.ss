@@ -50,7 +50,7 @@
   (define-rule-syntax (any-lambda (param ...) result)
     (make-any-lambda (list param ...) result))
 
-  (define (type-apply $target . $args)
+  (define (type-apply $target $args)
     (switch $target
       ((any-lambda? $any-lambda)
         (lets

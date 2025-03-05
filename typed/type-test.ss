@@ -31,7 +31,9 @@
 
 (check
   (equal?
-    (type-apply (any-lambda () any-fixnum))
+    (type-apply
+      (any-lambda () any-fixnum)
+      (list))
     any-fixnum))
 
 ; invalid-arg-count
@@ -39,14 +41,14 @@
   (raises
     (type-apply
       (any-lambda (any-string) any-fixnum)
-      any-string any-boolean)))
+      (list any-string any-boolean))))
 
 ; invalid-arg
 (check
   (raises
     (type-apply
       (any-lambda (any-fixnum any-boolean) any-fixnum)
-      any-fixnum any-string)))
+      (list any-fixnum any-string))))
 
 (check
   (equal?
