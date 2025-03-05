@@ -1,16 +1,24 @@
 (library (typed type)
   (export
-    string-t
-    fx-t
-    lambda-t make-lambda-t lambda-t? lambda-params lambda-result)
+    any-boolean
+    any-fixnum
+    any-flonum
+    any-char
+    any-string
+    any-lambda make-any-lambda any-lambda? any-lambda-params any-lambda-result
+
+    type-apply)
   (import (micascheme))
 
-  (data string-t)
-  (data fx-t)
+  (data any-boolean)
+  (data any-fixnum)
+  (data any-flonum)
+  (data any-char)
+  (data any-string)
 
-  (define-values (make-lambda-t lambda-t? lambda-params lambda-result)
+  (define-values (make-any-lambda any-lambda? any-lambda-params any-lambda-result)
     (lets
-      ($rtd (make-record-type "lambda-t" '((immutable params) (immutable result))))
+      ($rtd (make-record-type "any-lambda" '((immutable params) (immutable result))))
       ($constructor (record-constructor $rtd))
       ($predicate (record-predicate $rtd))
       ($params-accessor (record-accessor $rtd 0))
@@ -23,21 +31,40 @@
               ($eq ($result-accessor $arrow-t1) ($result-accessor $arrow-t2)))))
         ; TODO: Implement hash procedure
         (record-writer $rtd
-          (lambda ($lambda-t $port $wr)
+          (lambda ($any-lambda $port $wr)
             (define $first-param? #t)
-            (display "(lambda-t (" $port)
+            (display "(any-lambda (" $port)
             (for-each
               (lambda ($param)
                 (if $first-param?
                   (set! $first-param? #f)
                   (display " " $port))
                 ($wr $param $port))
-              ($params-accessor $lambda-t))
+              ($params-accessor $any-lambda))
             (display ") " $port)
-            ($wr ($result-accessor $lambda-t) $port)
+            ($wr ($result-accessor $any-lambda) $port)
             (display ")" $port))))
       (values $constructor $predicate $params-accessor $result-accessor)))
 
-  (define-rule-syntax (lambda-t (param ...) result)
-    (make-lambda-t (list param ...) result))
+  (define-rule-syntax (any-lambda (param ...) result)
+    (make-any-lambda (list param ...) result))
+
+  (define (type-apply $lhs . $args)
+    (switch $lhs
+      ((any-lambda? $any-lambda)
+        (lets
+          ($params (any-lambda-params $any-lambda))
+          (run
+            (when
+              (not (= (length $params) (length $args)))
+              (throw invalid-arg-count))
+            (for-each
+              (lambda ($param $arg)
+                (when
+                  (not (equal? $param $arg))
+                  (throw invalid-arg)))
+              $params $args))
+          (any-lambda-result $any-lambda)))
+      ((else $other)
+        (throw not-any-lambda))))
 )

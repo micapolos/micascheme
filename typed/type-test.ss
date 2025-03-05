@@ -1,26 +1,50 @@
 (import (micascheme) (typed type))
 
-(check (equal? string-t string-t))
-(check (equal? fx-t fx-t))
-(check (not (equal? string-t fx-t)))
+(check (equal? any-boolean any-boolean))
+(check (equal? any-fixnum any-fixnum))
+(check (equal? any-flonum any-flonum))
+(check (equal? any-char any-char))
+(check (equal? any-string any-string))
+
+(check (not (equal? any-string any-fixnum)))
 
 (check
   (equal?
-    (lambda-t () fx-t)
-    (lambda-t () fx-t)))
+    (any-lambda () any-fixnum)
+    (any-lambda () any-fixnum)))
 (check
   (equal?
-    (lambda-t (string-t fx-t) fx-t)
-    (lambda-t (string-t fx-t) fx-t)))
+    (any-lambda (any-string any-fixnum) any-fixnum)
+    (any-lambda (any-string any-fixnum) any-fixnum)))
 
 (check
   (not
     (equal?
-      (lambda-t () fx-t)
-      (lambda-t () string-t))))
+      (any-lambda () any-fixnum)
+      (any-lambda () any-string))))
 
 (check
   (not
     (equal?
-      (lambda-t (fx-t string-t) fx-t)
-      (lambda-t (string-t fx-t) fx-t))))
+      (any-lambda (any-fixnum any-string) any-fixnum)
+      (any-lambda (any-string any-fixnum) any-fixnum))))
+
+(check
+  (equal?
+    (type-apply (any-lambda () any-fixnum))
+    any-fixnum))
+
+; invalid-arg-count
+(check
+  (equal?
+    (type-apply
+      (any-lambda (any-string) any-fixnum)
+      any-string any-boolean)
+    any-fixnum))
+
+; invalid-arg
+(check
+  (raises
+    (type-apply
+      (any-lambda (any-fixnum any-boolean) any-fixnum)
+      any-fixnum any-string)))
