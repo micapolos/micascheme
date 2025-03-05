@@ -47,3 +47,14 @@
     (type-apply
       (any-lambda (any-fixnum any-boolean) any-fixnum)
       any-fixnum any-string)))
+
+(check
+  (equal?
+    (any-list any-string)
+    (any-list any-string)))
+
+(check
+  (not
+    (equal?
+      (any-list any-string)
+      (any-list any-fixnum))))

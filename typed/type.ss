@@ -6,7 +6,7 @@
     any-char
     any-string
     any-lambda make-any-lambda any-lambda? any-lambda-params any-lambda-result
-
+    any-list any-list? any-list-component
     type-apply)
   (import (micascheme))
 
@@ -15,6 +15,7 @@
   (data any-flonum)
   (data any-char)
   (data any-string)
+  (data (any-list component))
 
   (define-values (make-any-lambda any-lambda? any-lambda-params any-lambda-result)
     (lets
