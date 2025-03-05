@@ -57,14 +57,14 @@
           (run
             (when
               (not (= (length $params) (length $args)))
-              (throw invalid-arg-count))
+              (throw invalid-arg-count `(actual ,(length $args)) `(expected ,(length $params))))
             (for-each
-              (lambda ($param $arg)
+              (lambda ($index $param $arg)
                 (when
                   (not (equal? $param $arg))
-                  (throw invalid-arg)))
-              $params $args))
+                  (throw invalid-arg `(actual ,$arg) `(expected ,$param) `(index ,$index))))
+              (iota (length $params)) $params $args))
           (any-lambda-result $any-lambda)))
       ((else $other)
-        (throw not-any-lambda))))
+        (throw invalid-target `(actual ,$lhs) `(expected any-lambda)))))
 )
