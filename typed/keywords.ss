@@ -1,6 +1,6 @@
 (library (typed keywords)
-  (export as assume)
+  (export a an : assume)
   (import (micascheme))
 
-  (define-aux-keywords as assume)
+  (define-aux-keywords a an : assume)
 )

@@ -1,5 +1,5 @@
 (library (typed lang)
-  (export tt as assume)
+  (export tt a an : assume)
   (import
     (micascheme)
     (typed typed)
