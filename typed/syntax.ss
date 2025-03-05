@@ -1,6 +1,7 @@
 (library (typed syntax)
   (export
-    syntax->typed)
+    syntax->typed
+    type->syntax)
   (import
     (micascheme)
     (syntax lookup)
@@ -80,7 +81,7 @@
                   #,(typed-value $typed-target)
                   #,@(map typed-value $typed-args))))
             ((else $type)
-              (syntax-error (typed-value $typed-target) "not lambda")))))))
+              (syntax-error (typed-value $typed-target) (format "not lambda, but ~s" $type))))))))
 
   (define (lookup+typed $type-lookup $typed)
     (lookup+ $type-lookup
@@ -94,4 +95,24 @@
         (typed ($type-eval #'type) #'identifier))
       (else
         (syntax-error $syntax "invalid parameter"))))
+
+  (define (type->syntax $type)
+    (switch-exclusive $type
+      ((any-boolean? $any-boolean)
+        #'any-boolean)
+      ((any-char? $any-char)
+        #'any-char)
+      ((any-string? $any-string)
+        #'any-string)
+      ((any-fixnum? $any-fixnum)
+        #'any-fixnum)
+      ((any-flonum? $any-flonum)
+        #'any-flonum)
+      ((any-lambda? $any-lambda)
+        #`(any-lambda
+          (#,@(map type->syntax (any-lambda-params $any-lambda)))
+          #,(type->syntax (any-lambda-result $any-lambda))))
+      ((any-list? $any-list)
+        #`(any-list
+          #,(type->syntax (any-list-component $any-list))))))
 )

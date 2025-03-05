@@ -1,15 +1,17 @@
 (library (typed type)
   (export
-    any-boolean
-    any-fixnum
-    any-flonum
-    any-char
-    any-string
+    type
+    any-boolean any-boolean?
+    any-fixnum any-fixnum?
+    any-flonum any-flonum?
+    any-char any-char?
+    any-string any-string?
     any-lambda make-any-lambda any-lambda? any-lambda-params any-lambda-result
     any-list any-list? any-list-component
     type-apply)
   (import (micascheme))
 
+  (define-aux-keyword type)
   (data any-boolean)
   (data any-fixnum)
   (data any-flonum)
