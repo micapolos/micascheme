@@ -5,10 +5,23 @@
     (micascheme)
     (syntax lookup)
     (typed type)
-    (typed typed))
+    (typed typed)
+    (typed keywords))
 
   (define (syntax->typed $type-eval $type-lookup $syntax)
-    (syntax-case $syntax (lambda)
+    (syntax-case $syntax (assume as lambda)
+      ((assume type expr)
+        (typed ($type-eval #'type) #'expr))
+      ((as expr type)
+        (lets
+          ($typed-expr (syntax->typed $type-eval $type-lookup #'expr))
+          ($as-type ($type-eval #'type))
+          (if (equal? (typed-type $typed-expr) $as-type)
+            $typed-expr
+            (syntax-error #'expr
+              (format "invalid type: expected ~s, actual ~s in"
+                $as-type
+                (typed-type $typed-expr))))))
       (x
         (identifier? #'x)
         (switch ($type-lookup #'x)

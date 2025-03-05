@@ -1,9 +1,10 @@
 (library (typed lang)
-  (export tt)
+  (export tt as assume)
   (import
     (micascheme)
     (typed typed)
-    (typed syntax))
+    (typed syntax)
+    (typed keywords))
 
   (define-syntax (tt $syntax $lookup)
     (syntax-case $syntax ()
