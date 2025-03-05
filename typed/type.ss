@@ -1,54 +1,43 @@
 (library (typed type)
   (export
-    arrow arrow? arrow-params arrow-result
-    type=?
-    any-string
-    define-type)
+    string-t
+    fx-t
+    lambda-t make-lambda-t lambda-t? lambda-params lambda-result)
   (import (micascheme))
 
-  (define-syntax (define-type $syntax)
-    (syntax-case $syntax ()
-      ((_ id)
-        (identifier? #'id)
-        #`(define-values
-          (id #,(identifier-append #'id #'id #'?))
-          (lets
-            ($name #,(symbol->string (datum id)))
-            ($rtd (make-record-type $name `()))
-            (run
-              (record-writer $rtd
-                (lambda ($record $port $wr)
-                  (display $name $port))))
-            (values
-              ((record-constructor $rtd))
-              (record-predicate $rtd)))))))
+  (data string-t)
+  (data fx-t)
 
-  (data (arrow params result))
-
-  (define (type=? $type-a $type-b)
-    (switch $type-a
-      ((arrow? $arrow-a)
-        (switch? $type-b
-          ((arrow? $arrow-b)
+  (define-values (make-lambda-t lambda-t? lambda-params lambda-result)
+    (lets
+      ($rtd (make-record-type "lambda-t" '((immutable params) (immutable result))))
+      ($constructor (record-constructor $rtd))
+      ($predicate (record-predicate $rtd))
+      ($params-accessor (record-accessor $rtd 0))
+      ($result-accessor (record-accessor $rtd 1))
+      (run
+        (record-type-equal-procedure $rtd
+          (lambda ($arrow-t1 $arrow-t2 $eq)
             (and
-              (=
-                (length (arrow-params $arrow-a))
-                (length (arrow-params $arrow-b)))
-              (for-all type=?
-                (arrow-params $arrow-a)
-                (arrow-params $arrow-b))
-              (type=?
-                (arrow-result $arrow-a)
-                (arrow-result $arrow-b))))))
-      ((identifier? $identifier-a)
-        (switch? $type-b
-          ((identifier? $identifier-b)
-            (free-identifier=? $identifier-a $identifier-b))))
-      ((else $other-a)
-        (equal? $other-a $type-b))))
+              ($eq ($params-accessor $arrow-t1) ($params-accessor $arrow-t2))
+              ($eq ($result-accessor $arrow-t1) ($result-accessor $arrow-t2)))))
+        ; TODO: Implement hash procedure
+        (record-writer $rtd
+          (lambda ($lambda-t $port $wr)
+            (define $first-param? #t)
+            (display "(lambda-t (" $port)
+            (for-each
+              (lambda ($param)
+                (if $first-param?
+                  (set! $first-param? #f)
+                  (display " " $port))
+                ($wr $param $port))
+              ($params-accessor $lambda-t))
+            (display ") " $port)
+            ($wr ($result-accessor $lambda-t) $port)
+            (display ")" $port))))
+      (values $constructor $predicate $params-accessor $result-accessor)))
 
-  (define-syntax (any-string $syntax)
-    (syntax-case $syntax ()
-      (x (identifier? #'x)
-        #'#'any-string)))
+  (define-rule-syntax (lambda-t (param ...) result)
+    (make-lambda-t (list param ...) result))
 )

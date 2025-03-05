@@ -1,12 +1,26 @@
 (import (micascheme) (typed type))
 
-(check (type=? 'int 'int))
-(check (not (type=? 'int 'float)))
+(check (equal? string-t string-t))
+(check (equal? fx-t fx-t))
+(check (not (equal? string-t fx-t)))
 
-(check (type=? #'string? #'string?))
-(check (not (type=? #'string? #'fixnum?)))
+(check
+  (equal?
+    (lambda-t () fx-t)
+    (lambda-t () fx-t)))
+(check
+  (equal?
+    (lambda-t (string-t fx-t) fx-t)
+    (lambda-t (string-t fx-t) fx-t)))
 
-(check (type=? (arrow (list 'k1 'k2) 'v) (arrow (list 'k1 'k2) 'v)))
-(check (not (type=? (arrow (list 'k1) 'v) (arrow (list 'k1 'k2) 'v))))
-(check (not (type=? (arrow (list 'k1 'k1) 'v) (arrow (list 'k1 'k2) 'v))))
-(check (not (type=? (arrow (list 'k1 'k2) 'v) (arrow (list 'k1 'k2) 'v2))))
+(check
+  (not
+    (equal?
+      (lambda-t () fx-t)
+      (lambda-t () string-t))))
+
+(check
+  (not
+    (equal?
+      (lambda-t (fx-t string-t) fx-t)
+      (lambda-t (string-t fx-t) fx-t))))
