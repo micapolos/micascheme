@@ -1,6 +1,6 @@
 (library (typed lang)
   (export
-    a an : assume
+    : assume
     tt
     define-typed)
   (import

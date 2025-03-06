@@ -10,18 +10,12 @@
     (typed keywords))
 
   (define (syntax->typed $type-eval $type-lookup $syntax)
-    (syntax-case $syntax (type assume lambda)
+    (syntax-case $syntax (type assume : lambda)
       ((type t)
         (typed any-type (type->syntax ($type-eval #'t))))
       ((assume typ expr)
         (typed ($type-eval #'typ) #'expr))
-      ((x typ expr)
-        (and
-          (identifier? #'x)
-          (or
-            (free-identifier=? #'x #'a)
-            (free-identifier=? #'x #'an)
-            (free-identifier=? #'x #':)))
+      ((: typ expr)
         (lets
           ($typed-expr (syntax->typed $type-eval $type-lookup #'expr))
           ($as-type ($type-eval #'typ))
