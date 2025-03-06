@@ -5,7 +5,13 @@
 (check (equal? (tt 123) 123))
 (check (equal? (tt ((lambda () 123))) 123))
 (check (equal? (tt ((lambda ((any-fixnum fx)) fx) 123)) 123))
-(check (equal? (tt (type 123)) any-fixnum))
+
+(check (equal? (tt (typeof #f)) any-boolean))
+(check (equal? (tt (typeof 123)) any-fixnum))
+(check (equal? (tt (typeof 123.0)) any-flonum))
+(check (equal? (tt (typeof #\a)) any-char))
+(check (equal? (tt (typeof "foo")) any-string))
+(check (equal? (tt (typeof (type any-string))) any-type))
 
 (define-typed x 10)
 (check (equal? (tt x) 10))

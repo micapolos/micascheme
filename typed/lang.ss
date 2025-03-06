@@ -2,6 +2,7 @@
   (export
     : assume
     tt
+    typeof type
     define-typed)
   (import
     (micascheme)
