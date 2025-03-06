@@ -1,6 +1,5 @@
 (library (typed syntax)
   (export
-    define-type
     syntax->typed
     type->syntax)
   (import
@@ -9,23 +8,6 @@
     (typed type)
     (typed typed)
     (typed keywords))
-
-  (define-syntax (define-type $syntax)
-    (syntax-case $syntax ()
-      ((define-type id)
-        (identifier? #'id)
-        #`(begin
-          (define id (type #'id (list)))
-          (define-property id type any-type)))
-      ((define-type (id param ...))
-        (for-all identifier? (syntaxes id param ...))
-        #`(begin
-          (define (id param ...)
-            (type #'id (list param ...)))
-          (define-property id type
-            (any-lambda
-              (#,@(map (lambda ($param) #'any-type) (syntaxes param ...)))
-              any-type))))))
 
   (define (syntax->typed $type-eval $type-lookup $syntax)
     (syntax-case $syntax (typeof type assume : lambda)
@@ -119,16 +101,9 @@
   (define (type->syntax $type)
     (switch-exclusive $type
       ((type? $type)
-        (lets
-          ($identifier (type-identifier $type))
-          ($args (type-args $type))
-          (case (length $args)
-            ((0)
-              $identifier)
-            (else
-              #`(
-                #,$identifier
-                #,@(map type->syntax (type-args $type)))))))
+        #`(type
+          #,(type-id-string $type)
+          (list #,@(map type->syntax (type-args $type)))))
       ((any-type? $any-type)
         #'any-type)
       ((any-boolean? $any-boolean)

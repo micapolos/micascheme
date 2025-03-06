@@ -1,6 +1,7 @@
 (library (typed type)
   (export
-    type type? type-identifier type-args
+    type type? type-id-string type-args
+    define-type
     any-type any-type?
     any-boolean any-boolean?
     any-fixnum any-fixnum?
@@ -12,7 +13,26 @@
     type-apply)
   (import (micascheme))
 
-  (data (type identifier args))
+  (data (type id-string args))
+
+  (define-syntax (define-type $syntax)
+    (syntax-case $syntax ()
+      ((define-type id)
+        (identifier? #'id)
+        #`(begin
+          (define id (type #,(gensym->unique-string (gensym (symbol->string (datum id)))) (list)))
+          (define-property id type any-type)))
+      ((define-type (id param ...))
+        (for-all identifier? (syntaxes id param ...))
+        #`(begin
+          (define (id param ...)
+            (type
+              #,(gensym->unique-string (gensym (symbol->string (datum id))))
+              (list param ...)))
+          (define-property id type
+            (any-lambda
+              (#,@(map (lambda ($param) #'any-type) (syntaxes param ...)))
+              any-type))))))
 
   (data any-type)
   (data any-boolean)

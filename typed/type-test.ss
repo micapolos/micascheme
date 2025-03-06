@@ -1,5 +1,16 @@
 (import (micascheme) (typed type))
 
+(define-type str)
+(check (equal? str str))
+
+(define-type u8)
+(check (equal? u8 u8))
+(check (not (equal? u8 str)))
+
+(define-type (lst item))
+(check (equal? (lst str) (lst str)))
+(check (not (equal? (lst str) (lst u8))))
+
 (check (equal? any-boolean any-boolean))
 (check (equal? any-fixnum any-fixnum))
 (check (equal? any-flonum any-flonum))
