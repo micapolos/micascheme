@@ -5,6 +5,7 @@
 (check (equal? (tt 123) 123))
 (check (equal? (tt ((lambda () 123))) 123))
 (check (equal? (tt ((lambda ((any-fixnum fx)) fx) 123)) 123))
+(check (equal? (tt (type any-string)) any-string))
 
 (check (equal? (tt (typeof #f)) any-boolean))
 (check (equal? (tt (typeof 123)) any-fixnum))
