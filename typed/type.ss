@@ -1,6 +1,6 @@
 (library (typed type)
   (export
-    type
+    type type? type-identifier type-args
     any-type any-type?
     any-boolean any-boolean?
     any-fixnum any-fixnum?
@@ -12,7 +12,8 @@
     type-apply)
   (import (micascheme))
 
-  (define-aux-keyword type)
+  (data (type identifier args))
+
   (data any-type)
   (data any-boolean)
   (data any-fixnum)

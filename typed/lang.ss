@@ -3,6 +3,7 @@
     : assume
     tt
     typeof type
+    define-type
     define-typed)
   (import
     (micascheme)
