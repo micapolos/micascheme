@@ -1,5 +1,12 @@
 (import (micascheme) (typed lang) (typed type))
 
+(define-property any-boolean type any-type)
+(define-property any-char type any-type)
+(define-property any-fixnum type any-type)
+(define-property any-flonum type any-type)
+(define-property any-string type any-type)
+(define-property any-list type (any-lambda (any-type) any-type))
+
 (check (equal? (tt (assume 'type 'value)) 'value))
 (check (equal? (tt (: any-fixnum 123)) 123))
 (check (equal? (tt 123) 123))
@@ -12,7 +19,8 @@
 (check (equal? (tt (typeof 123.0)) any-flonum))
 (check (equal? (tt (typeof #\a)) any-char))
 (check (equal? (tt (typeof "foo")) any-string))
-(check (equal? (tt (typeof (type any-string))) any-type))
+(check (equal? (tt (typeof any-string)) any-type))
+(check (equal? (tt (typeof (any-list any-string))) any-type))
 
 (define-typed x 10)
 (check (equal? (tt x) 10))
