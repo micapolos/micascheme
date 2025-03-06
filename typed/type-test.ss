@@ -5,6 +5,7 @@
 (check (equal? any-flonum any-flonum))
 (check (equal? any-char any-char))
 (check (equal? any-string any-string))
+(check (equal? any-type any-type))
 
 (check (not (equal? any-string any-fixnum)))
 

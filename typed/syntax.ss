@@ -10,10 +10,12 @@
     (typed keywords))
 
   (define (syntax->typed $type-eval $type-lookup $syntax)
-    (syntax-case $syntax (assume lambda)
-      ((assume type expr)
-        (typed ($type-eval #'type) #'expr))
-      ((x type expr)
+    (syntax-case $syntax (type assume lambda)
+      ((type t)
+        (typed any-type (type->syntax ($type-eval #'t))))
+      ((assume typ expr)
+        (typed ($type-eval #'typ) #'expr))
+      ((x typ expr)
         (and
           (identifier? #'x)
           (or
@@ -22,7 +24,7 @@
             (free-identifier=? #'x #':)))
         (lets
           ($typed-expr (syntax->typed $type-eval $type-lookup #'expr))
-          ($as-type ($type-eval #'type))
+          ($as-type ($type-eval #'typ))
           (if (equal? (typed-type $typed-expr) $as-type)
             $typed-expr
             (syntax-error #'expr
@@ -98,6 +100,8 @@
 
   (define (type->syntax $type)
     (switch-exclusive $type
+      ((any-type? $any-type)
+        #'any-type)
       ((any-boolean? $any-boolean)
         #'any-boolean)
       ((any-char? $any-char)

@@ -1,6 +1,7 @@
 (library (typed type)
   (export
     type
+    any-type any-type?
     any-boolean any-boolean?
     any-fixnum any-fixnum?
     any-flonum any-flonum?
@@ -12,6 +13,7 @@
   (import (micascheme))
 
   (define-aux-keyword type)
+  (data any-type)
   (data any-boolean)
   (data any-fixnum)
   (data any-flonum)
