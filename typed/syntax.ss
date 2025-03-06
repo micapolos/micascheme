@@ -11,8 +11,11 @@
 
   (define (syntax->typed $type-eval $type-lookup $syntax)
     (syntax-case $syntax (type assume : lambda)
-      ((type t)
-        (typed any-type (type->syntax ($type-eval #'t))))
+      ((type expr)
+        (typed any-type
+          (type->syntax
+            (typed-type
+              (syntax->typed $type-eval $type-lookup #'expr)))))
       ((assume typ expr)
         (typed ($type-eval #'typ) #'expr))
       ((: typ expr)
