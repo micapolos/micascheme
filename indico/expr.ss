@@ -24,7 +24,7 @@
   (data (expr type syntax))
 
   (define (type-arity $type)
-    (switch-exclusive $type
+    (switch-exhaustive $type
       ((value-type? (value-type $arity)) $arity)
       ((function-type? _) 1)))
 

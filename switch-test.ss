@@ -90,25 +90,25 @@
       ((number? $number) (number->string $number)))
     #f))
 
-; === switch-exclusive
+; === switch-exhaustive
 
 (check
   (equal?
-    (switch-exclusive (string-append "foo" "bar")
+    (switch-exhaustive (string-append "foo" "bar")
       ((string? $string) (string-append $string "!"))
       ((number? $number) (number->string $number)))
     "foobar!"))
 
 (check
   (equal?
-    (switch-exclusive (+ 1 2)
+    (switch-exhaustive (+ 1 2)
       ((string? $string) (string-append $string "!"))
       ((number? $number) (number->string $number)))
     "3"))
 
 (check
   (raises
-    (switch-exclusive #\a
+    (switch-exhaustive #\a
       ((string? $string) (string-append $string "!"))
       ((number? $number) (number->string $number)))))
 

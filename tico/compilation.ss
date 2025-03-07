@@ -136,7 +136,7 @@
         (evaluation-parameters $arity $evaluation))))
 
   (define (compilation-variable $compilation $index)
-    (switch-exclusive (compilation-evaluation $compilation)
+    (switch-exhaustive (compilation-evaluation $compilation)
       ((constant? $constant)
         $compilation)
       ((variable? $variable)
@@ -219,7 +219,7 @@
     (compilation
       (arity 1)
       (datum-ref $arity (compilation-datum $target) $index)
-      (switch-exclusive (compilation-evaluation $target)
+      (switch-exhaustive (compilation-evaluation $target)
         ((constant? $constant)
           (constant-ref $arity $constant $index))
         ((variable? $variable)

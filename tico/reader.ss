@@ -166,7 +166,7 @@
                       (block-update-typings $block
                         (lambda ($block-typings)
                           (stack
-                            (switch-exclusive $typing-opt
+                            (switch-exhaustive $typing-opt
                               ((typing? $typing)
                                 (bindings-typing-get $bindings $typing $patterns))
                               ((false? _)

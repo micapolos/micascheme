@@ -96,7 +96,7 @@
       #,(datum->syntax #'fixnum-between->syntax (fixnum-between-max $fixnum-between))))
 
   (define (type->syntax $type)
-    (switch-exclusive $type
+    (switch-exhaustive $type
       ((any-type? $any-type)
         #'any-type)
       ((any-boolean? $any-boolean)

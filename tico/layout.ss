@@ -56,7 +56,7 @@
       ((else $other) #f))) ; (throw not-layout $other))))
 
   (define (layout-arity $layout)
-    (switch-exclusive $layout
+    (switch-exhaustive $layout
       ((empty-layout? _) (arity 0))
       ((native-layout? _) (arity 1))
       ((simple-layout? _) (arity 1))

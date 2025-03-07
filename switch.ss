@@ -1,5 +1,5 @@
 (library (switch)
-  (export switch switch? switch-exclusive index-switch)
+  (export switch switch? switch-exhaustive index-switch)
   (import
     (scheme)
     (syntax)
@@ -35,11 +35,11 @@
       (($pred $var) $body) ...
       ((else _) #f)))
 
-  (define-rule-syntax (switch-exclusive $expr (($pred $var) $body) ...)
+  (define-rule-syntax (switch-exhaustive $expr (($pred $var) $body) ...)
     (switch $expr
       (($pred $var) $body) ...
       ((else _)
-        (throw non-exclusive
+        (throw non-exhaustive
           (quasiquote (switch (unquote $expr) $pred ...))))))
 
   (define-case-syntax (index-switch expr branch ... default)

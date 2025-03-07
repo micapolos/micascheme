@@ -33,13 +33,13 @@
       (constant-struct $name $evaluations)))
 
   (define (evaluation-promote $evaluation $arity)
-    (switch-exclusive $evaluation
+    (switch-exhaustive $evaluation
       ((constant? $constant) #f)
       ((variable? $variable) (variable-promote $variable $arity))
       ((parameter? $parameter) $parameter)))
 
   (define (evaluation-parameter $evaluation)
-    (switch-exclusive $evaluation
+    (switch-exhaustive $evaluation
       ((constant? $constant) $constant)
       ((variable? _) (parameter))
       ((parameter? _) (parameter))))
@@ -47,7 +47,7 @@
   (define (evaluation-parameters $arity $evaluation)
     (lets
       ((arity $size) $arity)
-      (switch-exclusive $evaluation
+      (switch-exhaustive $evaluation
         ((constant? $constant)
           (constant-parameters $constant))
         ((variable? _)

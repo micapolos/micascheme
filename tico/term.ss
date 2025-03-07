@@ -22,7 +22,7 @@
   (data (values-term items))
 
   (define (term-constant-arity $term)
-    (switch-exclusive $term
+    (switch-exhaustive $term
       ((native-term? $native-term)
         (native-term-arity $native-term))
       ((application-term? $application-term)
