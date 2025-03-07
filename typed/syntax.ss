@@ -1,7 +1,6 @@
 (library (typed syntax)
   (export
-    syntax->typed
-    type->syntax)
+    syntax->typed)
   (import
     (micascheme)
     (syntax lookup)
@@ -97,30 +96,4 @@
         (typed ($type-eval #'type) #'identifier))
       (else
         (syntax-error $syntax "invalid parameter"))))
-
-  (define (type->syntax $type)
-    (switch-exclusive $type
-      ((type? $type)
-        #`(type
-          #,(type-id-string $type)
-          (list #,@(map type->syntax (type-args $type)))))
-      ((any-type? $any-type)
-        #'any-type)
-      ((any-boolean? $any-boolean)
-        #'any-boolean)
-      ((any-char? $any-char)
-        #'any-char)
-      ((any-string? $any-string)
-        #'any-string)
-      ((any-fixnum? $any-fixnum)
-        #'any-fixnum)
-      ((any-flonum? $any-flonum)
-        #'any-flonum)
-      ((any-lambda? $any-lambda)
-        #`(any-lambda
-          (#,@(map type->syntax (any-lambda-params $any-lambda)))
-          #,(type->syntax (any-lambda-result $any-lambda))))
-      ((any-list? $any-list)
-        #`(any-list
-          #,(type->syntax (any-list-component $any-list))))))
 )

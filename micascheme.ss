@@ -7,7 +7,8 @@
       list
       set-car!
       set-cdr!
-      define-syntax)
+      define-syntax
+      type-descriptor)
     (binder)
     (blob)
     (boolean)
@@ -56,7 +57,8 @@
         list
         set-car!
         set-cdr!
-        define-syntax)
+        define-syntax
+        type-descriptor)
       (binder)
       (blob)
       (boolean)

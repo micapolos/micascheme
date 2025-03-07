@@ -1,7 +1,5 @@
 (library (typed type)
   (export
-    type type? type-id-string type-args
-    define-type
     any-type any-type?
     any-boolean any-boolean?
     any-fixnum any-fixnum?
@@ -10,29 +8,9 @@
     any-string any-string?
     any-lambda make-any-lambda any-lambda? any-lambda-params any-lambda-result
     any-list any-list? any-list-component
-    type-apply)
+    type-apply
+    type->syntax)
   (import (micascheme))
-
-  (data (type id-string args))
-
-  (define-syntax (define-type $syntax)
-    (syntax-case $syntax ()
-      ((define-type id)
-        (identifier? #'id)
-        #`(begin
-          (define id (type #,(gensym->unique-string (gensym (symbol->string (datum id)))) (list)))
-          (define-property id type any-type)))
-      ((define-type (id param ...))
-        (for-all identifier? (syntaxes id param ...))
-        #`(begin
-          (define (id param ...)
-            (type
-              #,(gensym->unique-string (gensym (symbol->string (datum id))))
-              (list param ...)))
-          (define-property id type
-            (any-lambda
-              (#,@(map (lambda ($param) #'any-type) (syntaxes param ...)))
-              any-type))))))
 
   (data any-type)
   (data any-boolean)
@@ -100,4 +78,32 @@
         (throw invalid-target
           `(actual ,$target)
           `(expected any-lambda)))))
+
+  (define (any-lambda->syntax $any-lambda)
+    #`(any-lambda
+      (#,@(map type->syntax (any-lambda-params $any-lambda)))
+      #,(type->syntax (any-lambda-result $any-lambda))))
+
+  (define (any-list->syntax $any-list)
+    #`(any-list
+      #,(type->syntax (any-list-component $any-list))))
+
+  (define (type->syntax $type)
+    (switch-exclusive $type
+      ((any-type? $any-type)
+        #'any-type)
+      ((any-boolean? $any-boolean)
+        #'any-boolean)
+      ((any-char? $any-char)
+        #'any-char)
+      ((any-string? $any-string)
+        #'any-string)
+      ((any-fixnum? $any-fixnum)
+        #'any-fixnum)
+      ((any-flonum? $any-flonum)
+        #'any-flonum)
+      ((any-lambda? $any-lambda)
+        (any-lambda->syntax $any-lambda))
+      ((any-list? $any-list)
+        (any-list->syntax $any-list))))
 )
