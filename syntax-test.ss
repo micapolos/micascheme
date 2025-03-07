@@ -1,4 +1,4 @@
-(import (scheme) (check) (syntax) (procedure) (boolean) (lets))
+(import (scheme) (check) (syntax) (procedure) (boolean) (lets) (identifier))
 
 (check (equal? (identifiers? #'()) #t))
 (check (equal? (identifiers? #'(foo bar)) #t))
@@ -175,3 +175,11 @@
 
 (define-property string syntax "string-syntax")
 (check-equal? (get-property string syntax) "string-syntax")
+
+(check
+  (equal?
+    (syntax-inline
+      #`(
+        #,(identifier-append #'syntax-inline #'string #'- #'append)
+        "foo" "bar"))
+    "foobar"))
