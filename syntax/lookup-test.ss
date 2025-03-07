@@ -22,8 +22,8 @@
 (lets
   ($lookup (lookup-with (zero 0) (one 1)))
   (run
-    (check-datum=? ($lookup #'zero) #'0)
-    (check-datum=? ($lookup #'one) #'1)
+    (check (equal? ($lookup #'zero) 0))
+    (check (equal? ($lookup #'one) 1))
     (check (false? ($lookup #'two)))))
 
 (lets
@@ -32,4 +32,4 @@
       (lookup-with (zero 0) (one 11))
       (lookup-with (two 2) (one 1))))
   (run
-    (check-datum=? ($lookup #'zero) 0)))
+    (check (equal? ($lookup #'zero) 0))))

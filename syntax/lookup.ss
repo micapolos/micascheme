@@ -64,7 +64,7 @@
 
   (define-rule-syntax (lookup-with (id item) ...)
     (fluent (empty-lookup)
-      (lookup+ #'id #'item) ...))
+      (lookup+ #'id item) ...))
 
   (define-list->/append (lookup $lookups)
     (lambda ($id)
