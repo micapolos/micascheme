@@ -20,6 +20,8 @@
   (data any-string)
   (data (any-list component))
 
+  (data (fixnum-between min max))
+
   (define-values (make-any-lambda any-lambda? any-lambda-params any-lambda-result)
     (lets
       ($rtd (make-record-type "any-lambda" '((immutable params) (immutable result))))
@@ -88,6 +90,11 @@
     #`(any-list
       #,(type->syntax (any-list-component $any-list))))
 
+  (define (fixnum-between->syntax $fixnum-between)
+    #`(fixnum-between
+      #,(datum->syntax #'fixnum-between->syntax (fixnum-between-min $fixnum-between))
+      #,(datum->syntax #'fixnum-between->syntax (fixnum-between-max $fixnum-between))))
+
   (define (type->syntax $type)
     (switch-exclusive $type
       ((any-type? $any-type)
@@ -105,5 +112,7 @@
       ((any-lambda? $any-lambda)
         (any-lambda->syntax $any-lambda))
       ((any-list? $any-list)
-        (any-list->syntax $any-list))))
+        (any-list->syntax $any-list))
+      ((fixnum-between? $fixnum-between)
+        (fixnum-between->syntax $fixnum-between))))
 )
