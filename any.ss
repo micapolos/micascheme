@@ -10,6 +10,7 @@
     any-type any-type?
     any-list any-list? any-list-item
     any-fixnum-between any-fixnum-between? any-fixnum-between-min any-fixnum-between-max
+    any-integer-between any-integer-between? any-integer-between-min any-integer-between-max
     (rename
       (any-lambda make-any-lambda)
       (any-lambda-syntax any-lambda))
@@ -26,6 +27,7 @@
   (data any-type)
   (data (any-list item))
   (data (any-fixnum-between min max))
+  (data (any-integer-between min max))
 
   (data (any-lambda params result)
     ($rtd

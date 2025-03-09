@@ -9,6 +9,7 @@
 (check (any-integer? any-integer))
 (check (any-type? any-type))
 (check (any-lambda? (any-lambda (any-string any-boolean) any-flonum)))
+(check (any-integer-between? (any-integer-between 0 10)))
 
 (check (equal? any-boolean any-boolean))
 (check (equal? any-char any-char))
@@ -40,3 +41,8 @@
     (equal?
       (any-lambda (any-string any-string) any-string)
       (any-lambda (any-string any-char) any-string))))
+
+(check (equal? (any-integer-between 0 10) (any-integer-between 0 10)))
+(check (not (equal? (any-integer-between 0 10) (any-integer-between 1 10)))
+(check (not (equal? (any-integer-between 0 10) (any-integer-between 0 11)))
+(check (not (equal? (any-integer-between 0 10) any-integer)))
