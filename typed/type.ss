@@ -5,36 +5,6 @@
     type=?)
   (import (micascheme) (any))
 
-  ; (define-values (make-any-lambda any-lambda? any-lambda-params any-lambda-result)
-  ;   (lets
-  ;     ($rtd (make-record-type "any-lambda" '((immutable params) (immutable result))))
-  ;     ($constructor (record-constructor $rtd))
-  ;     ($predicate (record-predicate $rtd))
-  ;     ($params-accessor (record-accessor $rtd 0))
-  ;     ($result-accessor (record-accessor $rtd 1))
-  ;     (run
-  ;       (record-type-equal-procedure $rtd
-  ;         (lambda ($arrow-t1 $arrow-t2 $eq)
-  ;           (and
-  ;             ($eq ($params-accessor $arrow-t1) ($params-accessor $arrow-t2))
-  ;             ($eq ($result-accessor $arrow-t1) ($result-accessor $arrow-t2)))))
-  ;       ; TODO: Implement hash procedure
-  ;       (record-writer $rtd
-  ;         (lambda ($any-lambda $port $wr)
-  ;           (define $first-param? #t)
-  ;           (display "(any-lambda (" $port)
-  ;           (for-each
-  ;             (lambda ($param)
-  ;               (if $first-param?
-  ;                 (set! $first-param? #f)
-  ;                 (display " " $port))
-  ;               ($wr $param $port))
-  ;             ($params-accessor $any-lambda))
-  ;           (display ") " $port)
-  ;           ($wr ($result-accessor $any-lambda) $port)
-  ;           (display ")" $port))))
-  ;     (values $constructor $predicate $params-accessor $result-accessor)))
-
   (define (type-apply $target $args)
     (switch $target
       ((any-lambda? $any-lambda)

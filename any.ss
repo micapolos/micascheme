@@ -25,7 +25,23 @@
   (data (any-list item))
   (data (any-fixnum-between min max))
 
-  (data (any-lambda params result))
+  (data (any-lambda params result)
+    ($rtd
+      (record-writer $rtd
+        (lambda ($any-lambda $port $wr)
+          (define $first-param? #t)
+          (display "(any-lambda (" $port)
+          (for-each
+            (lambda ($param)
+              (if $first-param?
+                (set! $first-param? #f)
+                (display " " $port))
+              ($wr $param $port))
+            ((record-accessor $rtd 0) $any-lambda))
+          (display ") " $port)
+          ($wr ((record-accessor $rtd 1) $any-lambda) $port)
+          (display ")" $port)))))
+
   (define-rule-syntax (any-lambda-syntax (param ...) result)
     (any-lambda (list param ...) result))
 )

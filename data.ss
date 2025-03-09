@@ -14,6 +14,9 @@
       (syntax-case stx ()
         ((id name)
           (identifier? #'name)
+          #`(id name (rtd)))
+        ((id name (rtd rtd-body ...))
+          (for-all identifier? (syntaxes name rtd))
           (lets
             (name-string (symbol->string (datum name)))
             (name-syntax (datum->syntax #'id name-string))
@@ -24,10 +27,15 @@
                 (record-writer rtd
                   (lambda (record port wr)
                     (display #,name-syntax port)))
+                rtd-body ...
                 (values
                   ((record-constructor rtd))
                   (record-predicate rtd))))))
         ((id (name field ... . list-field))
+          (for-all identifier? (syntaxes name field ...))
+          #`(id (name field ... . list-field) (rtd)))
+        ((id (name field ... . list-field) (rtd rtd-body ...))
+          (for-all identifier? (syntaxes name field ... rtd))
           (lets
             (fields (syntax->list #'(field ...)))
             (list-field-opt
@@ -36,7 +44,7 @@
                 #'list-field))
             (all-fields (append fields (or (and list-field-opt (list list-field-opt)) '())))
             (name-string (symbol->string (datum name)))
-            (tmp (car (generate-temporaries '(tmp))))
+            (tmp #'rtd)
             (record-name (identifier-append #'id #'% #'name))
             (make-name (identifier-append #'id #'make #'- #'name))
             (make-all-name (if list-field-opt make-name #'name))
@@ -106,6 +114,7 @@
                         (lets
                           (fld (identifier-append #'id #'name #'- field))
                           #`(hash (#,fld a)))))))
+                  rtd-body ...
                   #,tmp))
               #,(if list-field-opt
                 #`(begin
