@@ -1,42 +1,41 @@
 (library (typed syntax)
   (export
-    syntax->typed)
+    syntax->eval
+    syntax->typed
+    syntax->type)
   (import
     (micascheme)
+    (any)
     (syntax lookup)
     (typed type)
     (typed typed)
     (typed keywords))
 
-  (define (syntax->typed $type-eval $type-lookup $syntax)
-    (syntax-case $syntax (typeof type assume : lambda)
-      ((typeof expr)
-        (typed any-type
-          (type->syntax
-            (typed-type
-              (syntax->typed $type-eval $type-lookup #'expr)))))
-      ((type x)
-        (typed any-type
-          (type->syntax ($type-eval #'x))))
-      ((assume typ expr)
-        (typed ($type-eval #'typ) #'expr))
-      ((: typ expr)
-        (lets
-          ($typed-expr (syntax->typed $type-eval $type-lookup #'expr))
-          ($as-type ($type-eval #'typ))
-          (if (equal? (typed-type $typed-expr) $as-type)
-            $typed-expr
-            (syntax-error #'expr
-              (format "invalid type: expected ~s, actual ~s in"
-                $as-type
-                (typed-type $typed-expr))))))
+  (data (constant value))
+  (data (dynamic value))
+
+  (define (syntax->type $lookup $syntax)
+    (lets
+      ($typed (syntax->typed $lookup $syntax))
+      (switch (typed-type $typed)
+        ((any-type? $any-type)
+          (switch-exhaustive (typed-value $typed)
+            ((constant? $constant)
+              (constant-value $constant))
+            ((dynamic? $dynamic)
+              (syntax-error $syntax "non constant type"))))
+        ((else $other)
+          (syntax-error $syntax "not a type")))))
+
+  (define (syntax->typed $lookup $syntax)
+    (syntax-case $syntax (assume type)
+      ((assume t expr)
+        (typed
+          (syntax->type $lookup #'t)
+          (dynamic #'expr)))
       (x
         (identifier? #'x)
-        (switch ($type-lookup #'x)
-          ((false? _)
-            (syntax-error #'x "not bound"))
-          ((else $type)
-            (typed $type #'x))))
+        (lookup-ref $lookup #'x))
       (x
         (boolean? (datum x))
         (typed any-boolean #'x))

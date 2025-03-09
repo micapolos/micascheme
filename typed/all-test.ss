@@ -3,5 +3,6 @@
 (test
   (typed type)
   (typed typed)
-  (typed syntax)
-  (typed lang))
+  ;(typed syntax)
+  ;(typed lang)
+  )

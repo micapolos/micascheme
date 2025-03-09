@@ -1,4 +1,4 @@
-(import (micascheme) (typed type))
+(import (micascheme) (any) (typed type))
 
 (check (equal? any-boolean any-boolean))
 (check (equal? any-fixnum any-fixnum))
