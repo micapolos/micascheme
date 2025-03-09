@@ -1,6 +1,7 @@
 (library (any)
   (export
     any-boolean any-boolean?
+    any-symbol any-symbol?
     any-char any-char?
     any-string any-string?
     any-fixnum any-fixnum?
@@ -16,6 +17,7 @@
   (import (scheme) (data) (syntax))
 
   (data any-boolean)
+  (data any-symbol)
   (data any-char)
   (data any-string)
   (data any-fixnum)

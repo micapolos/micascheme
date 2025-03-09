@@ -1,6 +1,7 @@
 (import (scheme) (check) (any))
 
 (check (any-boolean? any-boolean))
+(check (any-symbol? any-symbol))
 (check (any-char? any-char))
 (check (any-string? any-string))
 (check (any-fixnum? any-fixnum))
