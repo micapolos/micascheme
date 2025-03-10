@@ -1,9 +1,12 @@
 (library (typed type)
   (export
+    type? type type-value type-equal-proc type-syntax-proc
     type-apply
     type->syntax
     type=?)
   (import (micascheme) (any))
+
+  (data (type value equal-proc syntax-proc))
 
   (define (type-apply $target $args)
     (switch $target
@@ -47,6 +50,8 @@
 
   (define (type->syntax $type)
     (switch-exhaustive $type
+      ((type? $type)
+        ((type-syntax-proc $type) (type-value $type)))
       ((any-type? $any-type)
         #'any-type)
       ((any-boolean? $any-boolean)
@@ -67,5 +72,17 @@
         (any-fixnum-between->syntax $any-fixnum-between))))
 
   (define (type=? $type-a $type-b)
-    (equal? $type-a $type-b))
+    (switch $type-a
+      ((type? $type-a)
+        (switch? $type-b
+          ((type? $type-b)
+            (and
+              (eq?
+                (type-equal-proc $type-a)
+                (type-equal-proc $type-b))
+              ((type-equal-proc $type-a)
+                (type-value $type-a)
+                (type-value $type-b))))))
+      ((else $other)
+        (equal? $other $type-b))))
 )

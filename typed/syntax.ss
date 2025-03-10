@@ -7,9 +7,11 @@
     (micascheme)
     (any)
     (syntax lookup)
+    (evaluator)
     (typed type)
     (typed typed)
-    (typed keywords))
+    (typed keywords)
+    (typed compiler))
 
   (data (constant value))
   (data (dynamic value))
@@ -26,6 +28,32 @@
               (syntax-error $syntax "non constant type"))))
         ((else $other)
           (syntax-error $syntax "not a type")))))
+
+  (define (syntax->typed-value $lookup $expected-type $syntax)
+    (lets
+      ($typed (syntax->typed $lookup $syntax))
+      ($type (typed-type $typed))
+      (case
+        ((equal? $type $expected-type)
+          (typed-value $typed))
+        (else
+          (syntax-error $syntax
+            (format
+              "invalid type ~s, expected ~s in"
+              $type
+              $expected-type))))))
+
+  (define (syntax->typed-lambda $lookup $syntax)
+    (lets
+      ($typed (syntax->typed $lookup $syntax))
+      (switch (typed-type $typed)
+        ((any-lambda? $any-lambda)
+          (typed $any-lambda (typed-value $typed)))
+        ((else $type)
+          (syntax-error $syntax
+            (format
+              "invalid type ~s, expected any-lambda in"
+              $type))))))
 
   (define (syntax->typed $lookup $syntax)
     (syntax-case $syntax (assume type)
@@ -72,16 +100,26 @@
       ((target args ...)
         (lets
           ($typed-target (syntax->typed $type-eval $type-lookup #'target))
-          ($typed-args (map (partial syntax->typed $type-eval $type-lookup) (syntaxes args ...)))
-          (switch (typed-type $typed-target)
-            ((any-lambda? $any-lambda)
-              (typed
-                (type-apply $any-lambda (map typed-type $typed-args))
-                #`(
-                  #,(typed-value $typed-target)
-                  #,@(map typed-value $typed-args))))
-            ((else $type)
-              (syntax-error (typed-value $typed-target) (format "not lambda, but ~s" $type))))))))
+          ($typed-lambda (syntax->typed-lambda $typed-target))
+          ($any-lambda (typed-type $typed-lambda))
+          ($param-types (map typed-type $typed-args))
+          (run
+            (when
+              (not (= (length $param-types) (length $typed-args)))
+              (syntax-error $syntax
+                (format
+                  "invalid number of args, expected ~s in"
+                  (length $param-types)))))
+          ($typed-args
+            (map
+              (partial syntax->typed-value $lookup)
+              $param-types
+              (syntaxes args ...)))
+          (typed
+            (any-lambda-result $any-lambda)
+            #`(
+              #,(typed-value $typed-target)
+              #,@$typed-args))))))
 
   (define (lookup+typed $type-lookup $typed)
     (lookup+ $type-lookup

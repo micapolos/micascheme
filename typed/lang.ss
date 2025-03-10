@@ -2,6 +2,7 @@
   (export
     : assume
     tt
+    tt2
     typeof type
     define-typed)
   (import
@@ -9,7 +10,8 @@
     (typed type)
     (typed typed)
     (typed syntax)
-    (typed keywords))
+    (typed keywords)
+    (typed phased))
 
   (meta define (type-lookup $lookup)
     (lambda ($identifier)
@@ -43,4 +45,28 @@
           #`(begin
             (define id #,(typed-value $typed))
             (define-property id type #,(type->syntax (typed-type $typed))))))))
+
+  (define-syntax (tt2 $syntax $lookup)
+    (define (syntax->phased $lookup $syntax)
+      (syntax-case $syntax (assume)
+        (x
+          (identifier? #'x)
+          (lookup-ref $lookup #'x))))
+    (define (syntax->typed $lookup $expected-phase $syntax)
+      (lets
+        ((phased $phase $typed)
+          (syntax->phased $lookup $syntax))
+        (case
+          ((= $phased $expected-phase)
+            $typed)
+          (else )
+            (syntax-error $syntax
+              (format "invalid phase ~s, expected ~s in"
+                $phase
+                $expected-phase)))))
+    (lets
+      ($typed (syntax->typed $lookup 0 $syntax))
+      #`(typed
+        (type->syntax (typed-type $typed))
+        #,(typed-value $typed))))
 )
