@@ -1,6 +1,7 @@
 (library (any)
   (export
     any any? any-value
+    any-datum any-datum
     any-boolean any-boolean?
     any-symbol any-symbol?
     any-char any-char?
@@ -21,6 +22,7 @@
   (import (scheme) (data) (syntax))
 
   (data (any value))
+  (data any-datum)
   (data any-boolean)
   (data any-symbol)
   (data any-char)

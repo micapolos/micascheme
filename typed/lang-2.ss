@@ -1,5 +1,5 @@
 (library (typed lang-2)
-  (export tt)
+  (export tt assume)
   (import
     (micascheme)
     (syntax lookup)
@@ -14,7 +14,14 @@
       ((id x)
         (let ()
           (define (syntax->phased $lookup $syntax)
-            (syntax-case $syntax ()
+            (syntax-case $syntax (any-string assume)
+              ((assume t expr)
+                (phased 0
+                  (typed
+                    (typed-type (syntax->typed $lookup 1 #'t))
+                    #'expr)))
+              (any-string
+                (phased 0 (typed (any any-string) #'any-string)))
               (x
                 (identifier? #'x)
                 (lookup-ref $lookup #'x))

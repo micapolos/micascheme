@@ -1,6 +1,7 @@
 (import (scheme) (check) (any))
 
 (check (any? (any "foo")))
+(check (any-datum? any-datum))
 (check (any-boolean? any-boolean))
 (check (any-symbol? any-symbol))
 (check (any-char? any-char))
@@ -16,6 +17,7 @@
 (check (any-any-lambda? any-any-lambda))
 
 (check (equal? (any "foo") (any "foo")))
+(check (equal? any-datum any-datum))
 (check (equal? any-boolean any-boolean))
 (check (equal? any-char any-char))
 (check (equal? any-string any-string))
