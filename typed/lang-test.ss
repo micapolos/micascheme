@@ -1,4 +1,4 @@
-(import (micascheme) (typed lang) (typed type))
+(import (micascheme) (typed lang) (typed type) (typed phased) (typed typed))
 
 (check (equal? (tt any-boolean) any-boolean))
 (check (equal? (tt any-number) any-number))
@@ -10,3 +10,6 @@
 (check (equal? (tt "foo") "foo"))
 (check (syntax=? (tt #'(foo bar)) #'(foo bar)))
 
+(define-phased foo (phased 0 (typed any-string #'"foo")))
+
+(check (equal? (tt foo) "foo"))

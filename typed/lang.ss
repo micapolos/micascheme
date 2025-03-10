@@ -2,7 +2,8 @@
   (export
     tt
     any-boolean any-string any-number any-syntax any-lambda
-    syntax lambda)
+    syntax lambda
+    define-phased)
   (import
     (micascheme)
     (any)
@@ -17,10 +18,13 @@
       ((_ expr)
         (typed-value
           (syntax->typed
-            (lambda ($type-syntax)
-              (eval
-                (syntax->datum $type-syntax)
-                (environment '(micascheme) '(typed type))))
+            (lambda ($identifier)
+              ($lookup $identifier #'phased))
             0
             #'expr)))))
+
+  (define-rule-syntax (define-phased name expr)
+    (begin
+      (define-aux-keyword name)
+      (define-property name phased expr)))
 )
