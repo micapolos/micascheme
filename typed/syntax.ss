@@ -11,8 +11,8 @@
     (typed phased)
     (typed keywords))
 
-  (define (syntax->typed $lookup $phase $syntax)
-    (syntax-case $syntax (syntax any-boolean any-string any-number any-syntax any-lambda)
+  (define (syntax->typed $phase $lookup $syntax)
+    (syntax-case $syntax (any-boolean any-string any-number any-syntax any-lambda syntax lambda)
       (any-boolean
         (typed (any any-boolean)
           (if (zero? $phase) #'any-boolean any-boolean)))
@@ -25,6 +25,14 @@
       (any-syntax
         (typed (any any-syntax)
           (if (zero? $phase) #'any-syntax any-syntax)))
+      ((any-lambda (param ...) result)
+        (typed any-any-lambda
+          (lets
+            ($any-lambda
+              (make-any-lambda
+                (map (partial syntax->type $phase $lookup) (syntaxes param ...))
+                (syntax->type $phase $lookup #'result)))
+            (if (zero? $phase) (type->syntax $any-lambda) $any-lambda))))
       (x
         (and (identifier? #'x) ($lookup #'x))
         (lets
@@ -50,20 +58,27 @@
           (if (zero? $phase) #'x (datum x))))
       ((syntax x)
         (typed any-syntax
-          (if (zero? $phase) #'#'x #'x)))))
+          (if (zero? $phase) #'#'x #'x)))
+      ((lambda (param ...) body)
+        (lets
+          ($typed-params
+            (map
+              (partial param-syntax->typed $phase $lookup)
+              (syntaxes param ...)))
+          ($param-types (map typed-type $typed-params))
+          ($param-identifiers (map typed-value $typed-params))
+          ($typed-body
+            (syntax->typed $phase
+              (fold-left (partial lookup+typed $phase) $lookup $typed-params)
+              #'body))
+          (typed
+            (make-any-lambda $param-types (typed-type $typed-body))
+            #`(lambda
+              (#,@(map typed-value $typed-params))
+              #,(typed-value $typed-body)))))))
 
-  ; (define (syntax->type $lookup $syntax)
-  ;   (lets
-  ;     ($typed (syntax->typed $lookup $syntax))
-  ;     (switch (typed-type $typed)
-  ;       ((any-type? $any-type)
-  ;         (switch-exhaustive (typed-value $typed)
-  ;           ((constant? $constant)
-  ;             (constant-value $constant))
-  ;           ((dynamic? $dynamic)
-  ;             (syntax-error $syntax "non constant type"))))
-  ;       ((else $other)
-  ;         (syntax-error $syntax "not a type")))))
+  (define (syntax->type $phase $lookup $syntax)
+    (typed-value (syntax->typed (+ $phase 1) $lookup $syntax)))
 
   ; (define (syntax->typed-value $lookup $expected-type $syntax)
   ;   (lets
@@ -157,16 +172,23 @@
   ;             #,(typed-value $typed-target)
   ;             #,@$typed-args))))))
 
-  ; (define (lookup+typed $type-lookup $typed)
-  ;   (lookup+ $type-lookup
-  ;     (typed-value $typed)
-  ;     (typed-type $typed)))
+  (define (lookup+typed $phase $lookup $typed)
+    (lookup+ $lookup
+      (typed-value $typed)
+      (phased $phase
+        (typed
+          (typed-type $typed)
+          (if (zero? $phase)
+            (typed-value $typed)
+            (syntax->datum (typed-value $typed)))))))
 
-  ; (define (param-syntax->typed $type-eval $syntax)
-  ;   (syntax-case $syntax ()
-  ;     ((type identifier)
-  ;       (identifier? #'identifier)
-  ;       (typed ($type-eval #'type) #'identifier))
-  ;     (else
-  ;       (syntax-error $syntax "invalid parameter"))))
+  (define (param-syntax->typed $phase $lookup $syntax)
+    (syntax-case $syntax ()
+      ((type identifier)
+        (identifier? #'identifier)
+        (typed
+          (syntax->type $phase $lookup #'type)
+          #'identifier))
+      (else
+        (syntax-error $syntax "invalid parameter"))))
 )

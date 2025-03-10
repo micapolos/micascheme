@@ -17,10 +17,9 @@
     (syntax-case $syntax ()
       ((_ expr)
         (typed-value
-          (syntax->typed
+          (syntax->typed 0
             (lambda ($identifier)
               ($lookup $identifier #'phased))
-            0
             #'expr)))))
 
   (define-rule-syntax (define-phased name expr)
