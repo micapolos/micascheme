@@ -6,6 +6,8 @@
     any-symbol any-symbol?
     any-char any-char?
     any-string any-string?
+    any-number any-number?
+    any-syntax any-syntax?
     any-fixnum any-fixnum?
     any-flonum any-flonum?
     any-integer any-integer?
@@ -27,6 +29,8 @@
   (data any-symbol)
   (data any-char)
   (data any-string)
+  (data any-number)
+  (data any-syntax)
   (data any-fixnum)
   (data any-flonum)
   (data any-integer)
