@@ -1,5 +1,7 @@
 (import (micascheme) (typed lang) (typed type) (typed phased) (typed typed))
 
+(check (equal? (tt (assume any-string "foo")) "foo"))
+
 (check (equal? (tt any-boolean) any-boolean))
 (check (equal? (tt (typeof any-boolean)) (any any-boolean)))
 
@@ -52,3 +54,8 @@
 
 (check (equal? (tt (typeof same-string)) (any-lambda (any-string) any-string)))
 (check (equal? ((tt same-string) "foo") "foo"))
+
+(tt (define string+ (assume (any-lambda (any-string any-string) any-string) string-append)))
+
+(check (equal? (tt (typeof string+)) (any-lambda (any-string any-string) any-string)))
+(check (equal? (tt (string+ "foo" "bar")) "foobar"))

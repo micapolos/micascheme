@@ -12,7 +12,13 @@
     (typed keywords))
 
   (define (syntax->typed $phase $lookup $syntax)
-    (syntax-case $syntax (type typeof any-boolean any-string any-number any-syntax any-lambda syntax lambda)
+    (syntax-case $syntax (assume type typeof any-boolean any-string any-number any-syntax any-lambda syntax lambda)
+      ((assume t x)
+        (lets
+          ($type (syntax->type $phase $lookup #'t))
+          (typed $type
+            (if (zero? $phase) #'x
+              (syntax-error $syntax "must be phase 0")))))
       ((type x)
         (lets
           ($type (syntax->type $phase $lookup #'x))
@@ -87,36 +93,61 @@
               #`(lambda
                 (#,@(map typed-value $typed-params))
                 #,(typed-value $typed-body))
-              (todo)))))))
+              (todo)))))
+        ((target arg ...)
+          (lets
+            ($typed-lambda (syntax->typed-lambda $phase $lookup #'target))
+            ($any-lambda (typed-type $typed-lambda))
+            ($param-types (any-lambda-params $any-lambda))
+            ($args (syntaxes arg ...))
+            (run
+              (when
+                (not (= (length $param-types) (length $args)))
+                (syntax-error $syntax
+                  (format
+                    "invalid number of args, expected ~s in"
+                    (length $param-types)))))
+            ($arg-values
+              (map
+                (partial syntax->typed-value $phase $lookup)
+                $param-types
+                $args))
+            (typed
+              (any-lambda-result $any-lambda)
+              (if (zero? $phase)
+                #`(
+                  #,(typed-value $typed-lambda)
+                  #,@$arg-values)
+                (todo)))))))
 
   (define (syntax->type $phase $lookup $syntax)
     (typed-value (syntax->typed (+ $phase 1) $lookup $syntax)))
 
-  ; (define (syntax->typed-value $lookup $expected-type $syntax)
-  ;   (lets
-  ;     ($typed (syntax->typed $lookup $syntax))
-  ;     ($type (typed-type $typed))
-  ;     (case
-  ;       ((equal? $type $expected-type)
-  ;         (typed-value $typed))
-  ;       (else
-  ;         (syntax-error $syntax
-  ;           (format
-  ;             "invalid type ~s, expected ~s in"
-  ;             $type
-  ;             $expected-type))))))
+  (define (syntax->typed-value $phase $lookup $expected-type $syntax)
+    (lets
+      ($typed (syntax->typed $phase $lookup $syntax))
+      ($type (typed-type $typed))
+      (cond
+        ((type=? $type $expected-type)
+          (typed-value $typed))
+        (else
+          (syntax-error $syntax
+            (format
+              "invalid type ~s, expected ~s in"
+              $type
+              $expected-type))))))
 
-  ; (define (syntax->typed-lambda $lookup $syntax)
-  ;   (lets
-  ;     ($typed (syntax->typed $lookup $syntax))
-  ;     (switch (typed-type $typed)
-  ;       ((any-lambda? $any-lambda)
-  ;         (typed $any-lambda (typed-value $typed)))
-  ;       ((else $type)
-  ;         (syntax-error $syntax
-  ;           (format
-  ;             "invalid type ~s, expected any-lambda in"
-  ;             $type))))))
+  (define (syntax->typed-lambda $phase $lookup $syntax)
+    (lets
+      ($typed (syntax->typed $phase $lookup $syntax))
+      (switch (typed-type $typed)
+        ((any-lambda? $any-lambda)
+          (typed $any-lambda (typed-value $typed)))
+        ((else $type)
+          (syntax-error $syntax
+            (format
+              "invalid type ~s, expected any-lambda in"
+              $type))))))
 
   ; (define (syntax->typed $lookup $syntax)
   ;   (syntax-case $syntax (assume type)
