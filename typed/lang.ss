@@ -5,7 +5,7 @@
     any-boolean any-string any-number any-syntax any-lambda
     type typeof
     syntax lambda
-    define-phased define)
+    define)
   (import
     (micascheme)
     (any)
@@ -60,9 +60,4 @@
                         (lambda ($identifier)
                           ($lookup $identifier #'phased))
                         #'expr)))))))))))
-
-  (define-rule-syntax (define-phased name expr)
-    (begin
-      (define-aux-keyword name)
-      (define-property name phased expr)))
 )
