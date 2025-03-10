@@ -12,7 +12,17 @@
     (typed keywords))
 
   (define (syntax->typed $phase $lookup $syntax)
-    (syntax-case $syntax (any-boolean any-string any-number any-syntax any-lambda syntax lambda)
+    (syntax-case $syntax (type typeof any-boolean any-string any-number any-syntax any-lambda syntax lambda)
+      ((type x)
+        (lets
+          ($type (syntax->type $phase $lookup #'x))
+          (typed any-type
+            (if (zero? $phase) (type->syntax $type) $type))))
+      ((typeof x)
+        (lets
+          ($type (typed-type (syntax->typed $phase $lookup #'x)))
+          (typed any-type
+            (if (zero? $phase) (type->syntax $type) $type))))
       (any-boolean
         (typed (any any-boolean)
           (if (zero? $phase) #'any-boolean any-boolean)))
@@ -73,9 +83,11 @@
               #'body))
           (typed
             (make-any-lambda $param-types (typed-type $typed-body))
-            #`(lambda
-              (#,@(map typed-value $typed-params))
-              #,(typed-value $typed-body)))))))
+            (if (zero? $phase)
+              #`(lambda
+                (#,@(map typed-value $typed-params))
+                #,(typed-value $typed-body))
+              (todo)))))))
 
   (define (syntax->type $phase $lookup $syntax)
     (typed-value (syntax->typed (+ $phase 1) $lookup $syntax)))

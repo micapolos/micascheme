@@ -1,7 +1,9 @@
 (library (typed lang)
   (export
     tt
+    any any-any-lambda any-type
     any-boolean any-string any-number any-syntax any-lambda
+    type typeof
     syntax lambda
     define-phased)
   (import

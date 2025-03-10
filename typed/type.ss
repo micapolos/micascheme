@@ -50,6 +50,8 @@
 
   (define (type->syntax $type)
     (switch-exhaustive $type
+      ((any? $any)
+        #`(any #,(type->syntax (any-value $any))))
       ((type? $type)
         ((type-syntax-proc $type) (type-value $type)))
       ((any-type? $any-type)
@@ -70,6 +72,8 @@
         #'any-flonum)
       ((any-lambda? $any-lambda)
         (any-lambda->syntax $any-lambda))
+      ((any-any-lambda? $any-any-lambda)
+        #'any-any-lambda)
       ((any-list? $any-list)
         (any-list->syntax $any-list))
       ((any-fixnum-between? $any-fixnum-between)
