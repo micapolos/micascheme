@@ -34,11 +34,6 @@
 (check (syntax=? (tt #'(foo bar)) #'(foo bar)))
 (check (syntax=? (tt (typeof #'(foo bar))) any-syntax))
 
-(define-phased foo (phased 0 (typed any-string #'"foo")))
-
-(check (equal? (tt foo) "foo"))
-(check (equal? (tt (typeof foo)) any-string))
-
 (check (equal? ((tt (lambda () "foo"))) "foo"))
 (check (equal? (tt (typeof (lambda () "foo"))) (any-lambda () any-string)))
 
@@ -47,3 +42,13 @@
 
 (check (equal? (tt (typeof (typeof "foo"))) any-type))
 (check (equal? (tt (typeof (typeof (typeof "foo")))) any-type))
+
+(tt (define foo "foo"))
+
+(check (equal? (tt foo) "foo"))
+(check (equal? (tt (typeof foo)) any-string))
+
+(tt (define (same-string (any-string s)) s))
+
+(check (equal? (tt (typeof same-string)) (any-lambda (any-string) any-string)))
+(check (equal? ((tt same-string) "foo") "foo"))
