@@ -1,0 +1,23 @@
+(library (typed evaluate)
+  (export evaluate-syntax)
+  (import
+    (micascheme)
+    (evaluator)
+    (any)
+    (typed typed)
+    (typed type))
+
+  (define (evaluate-syntax $evaluator $syntax)
+    (syntax-case $syntax (string)
+      ((string x)
+        (switch (datum x)
+          ((string? $string)
+            (typed any-string $string))
+          ((else _)
+            (syntax-error #'x "not string"))))
+      (x
+        (identifier? #'x)
+        (if (evaluator-bound? $evaluator (datum x))
+          (evaluator-ref $evaluator (datum x))
+          (syntax-error #'x "not bound")))))
+)

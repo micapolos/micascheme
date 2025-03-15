@@ -4,4 +4,5 @@
   (typed type)
   (typed typed)
   (typed syntax)
-  (typed lang))
+  (typed lang)
+  (typed evaluate))

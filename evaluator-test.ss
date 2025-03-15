@@ -60,3 +60,22 @@
           (cons `+ (lambda (a b) (string-append a b)))))
       `(+ "Hello, " "world!"))
     "Hello, world!"))
+
+(lets
+  ($evaluator
+    (fluent
+      '(scheme)
+      (environment)
+      (empty-evaluator)
+      (evaluator+ 'a "foo")
+      (evaluator+ 'b "bar")))
+  (run
+    (check (evaluator-bound? $evaluator 'b))
+    (check (evaluator-bound? $evaluator 'a))
+    (check (evaluator-bound? $evaluator 'string))
+    (check (false? (evaluator-bound? $evaluator 'foo)))
+
+    (check (equal? (evaluator-ref $evaluator 'a) "foo"))
+    (check (equal? (evaluator-ref $evaluator 'b) "bar"))
+    (check (equal? (evaluator-ref $evaluator 'string) string))
+    (check (raises (evaluator-ref $evaluator 'foo)))))
