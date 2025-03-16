@@ -1,8 +1,6 @@
 (library (list)
   (export 
     bindable-list
-    list-get
-    list-get-overflow list-get-overflow? list-get-overflow-index
 
     opt
     opt->list
@@ -61,7 +59,6 @@
     (identifier)
     (indexed)
     (procedure)
-    (data)
     (lets)
     (throw)
     (switch)
@@ -228,15 +225,6 @@
 
   (define (indexed-find $proc $list)
     (indexed-find+ $proc $list 0))
-
-  (data (list-get-overflow index))
-
-  (define (list-get $list $index)
-    (if (null? $list)
-      (list-get-overflow $index)
-      (if (= $index 0)
-        (car $list)
-        (list-get (cdr $list) (- $index 1)))))
 
   (define (push-intercalated $stack $item $list)
     (cond

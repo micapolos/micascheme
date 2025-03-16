@@ -25,13 +25,6 @@
       (generate-symbols 3)
       (list `tmp-0 `tmp-1 `tmp-2))))
 
-; === list-safe-ref ===
-
-(check (equal? (list-get (list "a" "b") 0) "a"))
-(check (equal? (list-get (list "a" "b") 1) "b"))
-(check (equal? (list-get (list "a" "b") 2) (list-get-overflow 0)))
-(check (equal? (list-get (list "a" "b") 3) (list-get-overflow 1)))
-
 ; === bind-if ===
 
 (check (equal? (bind-if string? "foo" string-length) 3))

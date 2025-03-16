@@ -4,7 +4,7 @@
     pattern-match?
     syntax-match?
     syntax-match)
-  (import (scheme) (syntax) (syntaxes) (fluent) (procedure) (list) (generate) (lets) (data))
+  (import (scheme) (syntax) (syntaxes) (fluent) (procedure) (list) (generate) (lets))
 
   (define-rules-syntax
     ((define-pattern-match? id expr)
