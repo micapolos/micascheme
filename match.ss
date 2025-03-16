@@ -6,6 +6,10 @@
     define-predicate-matcher)
   (import (scheme) (syntax) (syntaxes) (throw) (identifier))
 
+  ; TODO: Make matcher recursive, so we can match not only on 1-level deep matchers.
+  ; TODO: Define matchers in (data), for predicate and constructor
+  ; TODO: Define core matchers and export in (micascheme)
+
   (define-lookup-syntax (matcher $syntax $lookup)
     (syntax-case $syntax ()
       ((_ expr spec body)
