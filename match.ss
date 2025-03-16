@@ -1,7 +1,9 @@
 (library (match)
   (export
     matcher
-    if-matches match)
+    if-matches
+    match
+    define-predicate-matcher)
   (import (scheme) (syntax) (syntaxes) (throw) (identifier))
 
   (define-lookup-syntax (matcher $syntax $lookup)
@@ -42,4 +44,14 @@
   (define-rule-syntax (match expr rule ...)
     (let ((val expr))
       (match-val val rule ...)))
+
+  (define-rule-syntax (define-predicate-matcher test?)
+    (define-property test? matcher
+      (lambda ($syntax)
+        (syntax-case $syntax ()
+          ((_ expr (_ x) body)
+            #`(let ((val expr))
+              (and (test? val)
+                (lambda ()
+                  (let ((x val)) body)))))))))
 )
