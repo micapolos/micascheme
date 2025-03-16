@@ -1,7 +1,5 @@
 (import (scheme) (check) (match) (syntax))
 
-(check (equal? (match "foo" (foo (string-append foo "!"))) "foo!"))
-
 (check (equal? (match #t (#t "true") ($other $other)) "true"))
 (check (equal? (match #f (#t "true") ($other $other)) #f))
 
@@ -13,6 +11,8 @@
 
 (check (equal? (match "foo" ("foo" "foo!") ($other $other)) "foo!"))
 (check (equal? (match "bar" ("foo" "foo!") ($other $other)) "bar"))
+
+(check (equal? (match "foo" (foo (string-append foo "!"))) "foo!"))
 
 (define-property string matcher
   (syntax-rules ()
