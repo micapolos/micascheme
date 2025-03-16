@@ -6,18 +6,26 @@
 
   (define-lookup-syntax (matcher $syntax $lookup)
     (syntax-case $syntax ()
-      ((_ expr id body)
-        (identifier? #'id)
-        #`(lambda ()
-          (let ((id expr)) body)))
-      ((_ expr (id . rest) body)
-        (identifier? #'id)
-        (let*
-          (($matcher
-            (or
-              ($lookup #'id #'matcher)
-              (syntax-error #'id "no matcher"))))
-          ($matcher $syntax)))))
+      ((_ expr spec body)
+        (syntax-case #'spec ()
+          (id
+            (identifier? #'id)
+            #`(let ((id expr))
+              (lambda () body)))
+          (x
+            (let (($x (datum x)))
+              (or (boolean? $x) (char? $x) (number? $x) (string? $x)))
+            #`(and (equal? expr x)
+              (lambda () body)))
+          ((id . rest)
+            (identifier? #'id)
+            (let*
+              (($matcher
+                (or
+                  ($lookup #'id #'matcher)
+                  (syntax-error #'id "no matcher"))))
+              ($matcher $syntax)))
+          (other (syntax-error #'other) "invalid matcher spec")))))
 
   (define-rule-syntax (if-matches expr spec match-body else-body)
     (let

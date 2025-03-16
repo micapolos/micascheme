@@ -2,6 +2,18 @@
 
 (check (equal? (match "foo" (foo (string-append foo "!"))) "foo!"))
 
+(check (equal? (match #t (#t "true") ($other $other)) "true"))
+(check (equal? (match #f (#t "true") ($other $other)) #f))
+
+(check (equal? (match #\a (#\a "a") ($other $other)) "a"))
+(check (equal? (match #\b (#\a "a") ($other $other)) #\b))
+
+(check (equal? (match 128 (128 "128") ($other $other)) "128"))
+(check (equal? (match 129 (128 "128") ($other $other)) 129))
+
+(check (equal? (match "foo" ("foo" "foo!") ($other $other)) "foo!"))
+(check (equal? (match "bar" ("foo" "foo!") ($other $other)) "bar"))
+
 (define-property string matcher
   (syntax-rules ()
     ((_ expr (_ s) body)
