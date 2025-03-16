@@ -1,5 +1,7 @@
 (import (scheme) (check) (match) (syntax))
 
+(check (equal? (match "foo" (foo (string-append foo "!"))) "foo!"))
+
 (define-property string matcher
   (syntax-rules ()
     ((_ expr (_ s) body)
@@ -48,5 +50,5 @@
     (match #\a
       ((string s) (string-append s "!"))
       ((number n) (+ n 1))
-      ((else x) (format "char ~a" x)))
+      (x (format "char ~a" x)))
     "char a"))
