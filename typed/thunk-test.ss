@@ -58,3 +58,24 @@
           (scope (foo "foo") (tmp_0 "bar"))
           '(string-append foo tmp_0)))))
 
+; combine-thunks
+
+(check
+  (equal?
+    (combine-thunks
+      (list
+        (thunk 3
+          (compiled
+            (scope (foo-1 "foo-1") (foo-2 "foo-2"))
+            '(string-append foo-1 foo-2)))
+        (thunk 5
+          (compiled
+            (scope (bar-1 "bar-1") (bar-2 "bar-2"))
+            '(string-append bar-1 bar-2))))
+      (lambda ($datums)
+        `(string-append ,@$datums)))
+    (thunk 5
+      (compiled
+        (scope (foo-1 "foo-1") (foo-2 "foo-2") (bar-1 "bar-1") (bar-2 "bar-2"))
+        '(string-append (string-append foo-1 foo-2) (string-append bar-1 bar-2))))))
+

@@ -2,7 +2,8 @@
   (export
     thunk thunk? thunk-max-index thunk-compiled
     thunk-promote
-    thunk-bind)
+    thunk-bind
+    combine-thunks)
   (import
     (micascheme)
     (typed compiled))
@@ -20,4 +21,9 @@
     (thunk
       (thunk-max-index $thunk)
       (compiled-bind (thunk-compiled $thunk) $value $datum-proc)))
+
+  (define (combine-thunks $thunks $datum-proc)
+    (thunk
+      (apply max (map thunk-max-index $thunks))
+      (combine-compiled-list (map thunk-compiled $thunks) $datum-proc)))
 )
