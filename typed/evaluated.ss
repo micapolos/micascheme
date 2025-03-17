@@ -4,11 +4,13 @@
     evaluated-max-index?
     evaluated-list-max-index?
     evaluated-compiled
-    combine-evaluated-list)
+    combine-evaluated-list
+    evaluated-bound)
   (import
     (micascheme)
     (typed thunk)
-    (typed compiled))
+    (typed compiled)
+    (typed hole))
 
   ;(enum (evaluated thunk value))
 
@@ -54,4 +56,9 @@
       (if $max-index?
         (thunk $max-index? $compiled)
         (compiled-value $environment $compiled))))
+
+  (define (evaluated-bound $evaluated)
+    (switch $evaluated
+      ((thunk? $thunk) hole)
+      ((else $value) $value)))
 )

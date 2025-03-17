@@ -99,21 +99,14 @@
                 (lets
                   ((pair $symbol $typed) $binding)
                   (scope+ $scope $symbol
-                    (typed
-                      (typed-type $typed)
-                      (switch (typed-value $typed)
-                        ((thunk? $thunk) hole)
-                        ((else $value) $value))))))
+                    (typed-map-value $typed evaluated-bound))))
               $scope
               $bindings))
           ($typed-body
             (evaluate-syntax $environment $scope #'body))
           (typed-map-value $typed-body
             (lambda ($evaluated)
-              (evaluated-promote
-                $environment
-                $evaluated
-                (length $bindings))))))
+              (evaluated-promote $environment $evaluated (length $bindings))))))
       ((lambda (param ...) body)
         (lets
           ($params (syntaxes param ...))
