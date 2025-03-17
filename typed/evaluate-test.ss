@@ -19,8 +19,32 @@
 
 (check
   (equal?
+    (evaluate-syntax env (scope) 'any-string)
+    (typed any-type any-string)))
+
+(check
+  (equal?
+    (evaluate-syntax env (scope) 'any-number)
+    (typed any-type any-number)))
+
+(check
+  (equal?
     (evaluate-syntax env (scope) "foo")
     (typed any-string "foo")))
+
+(check
+  (equal?
+    (evaluate-syntax env (scope) 123)
+    (typed any-number 123)))
+
+(check
+  (equal?
+    (evaluate-syntax env (scope) '(expect any-string "foo"))
+    (typed any-string "foo")))
+
+(check
+  (raises
+    (evaluate-syntax env (scope) '(expect any-number "foo"))))
 
 (check
   (equal?
@@ -31,6 +55,11 @@
   (equal?
     (datumize (evaluate-syntax env (scope (x (typed any-string hole))) 'x))
     (typed any-string (thunk 0 'x))))
+
+(check
+  (equal?
+    (evaluate-syntax env (scope) '(expect any-string "foo"))
+    (typed any-string "foo")))
 
 (check
   (equal?

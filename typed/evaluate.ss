@@ -60,7 +60,12 @@
         $type)))
 
   (define (evaluate-syntax $environment $scope $syntax)
-    (syntax-case $syntax (assume assume-type any-type any-string any-lambda lambda)
+    (syntax-case $syntax (assume assume-type any-type any-string any-number any-lambda lambda expect)
+      ((expect type expr)
+        (lets
+          ($type (evaluate-type $environment $scope #'type))
+          (typed $type
+            (evaluate-value $environment $scope $type #'expr))))
       ((assume type value)
         (typed
           (evaluate-type $environment $scope #'type)
@@ -73,6 +78,8 @@
         (typed any-type any-type))
       (any-string
         (typed any-type any-string))
+      (any-number
+        (typed any-type any-number))
       ((any-lambda (param ...) result)
         (typed any-type
           (make-any-lambda
@@ -81,6 +88,9 @@
       (x
         (string? (datum x))
         (typed any-string (datum x)))
+      (x
+        (number? (datum x))
+        (typed any-number (datum x)))
       ((lambda (param ...) body)
         (lets
           ($params (syntaxes param ...))
