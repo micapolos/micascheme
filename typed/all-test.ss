@@ -5,4 +5,5 @@
   (typed typed)
   (typed syntax)
   (typed lang)
+  (typed compiled)
   (typed evaluate))

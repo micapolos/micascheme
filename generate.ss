@@ -17,7 +17,7 @@
     (fluent))
 
   (define (generate-symbol)
-    (syntax->datum (generate-temporary)))
+    (syntax->datum (generate-identifier #'tmp)))
 
   (define (generate-symbols $count)
     (reverse

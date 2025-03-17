@@ -6,13 +6,14 @@
     compiled+value)
   (import
     (micascheme)
-    (evaluator))
+    (evaluator)
+    (generate))
 
   (data (compiled bindings datum))
 
   (define (value-compiled $value)
     (lets
-      ($symbol (gensym))
+      ($symbol (generate-symbol))
       (compiled
         (stack (cons $symbol $value))
         $symbol)))
