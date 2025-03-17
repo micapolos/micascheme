@@ -1,6 +1,6 @@
 (library (typed lang)
   (export
-    assume
+    assume assume-type
     tt
     any any-any-lambda any-type
     any-boolean any-string any-number any-syntax any-lambda

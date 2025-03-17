@@ -1,6 +1,6 @@
 (library (typed keywords)
-  (export typeof : assume)
+  (export typeof : assume assume-type)
   (import (micascheme))
 
-  (define-aux-keywords typeof : assume)
+  (define-aux-keywords typeof : assume assume-type)
 )
