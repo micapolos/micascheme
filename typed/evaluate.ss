@@ -110,7 +110,7 @@
               ((thunk? (thunk $max-index $datum-proc))
                 (lets
                   ($datum
-                    `(lambda (,(map typed-value $typed-params))
+                    `(lambda (,@(map typed-value $typed-params))
                       ,($datum-proc)))
                   (cond
                     ((< $max-index $params-length)
@@ -118,7 +118,7 @@
                     (else
                       (thunk
                         (- $max-index $params-length)
-                        `(lambda () ,$datum))))))
+                        (lambda () $datum))))))
               ((else $value)
                 (lets
                   ($tmp (gensym))

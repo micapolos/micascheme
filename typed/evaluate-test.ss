@@ -37,3 +37,21 @@
         '(lambda () "foo")))
     (typed (any-lambda () any-string) a-procedure)))
 
+(check
+  (equal?
+    (datumize
+      (evaluate-syntax
+        (scope (x (typed any-string "foo")))
+        '(lambda () x)))
+    (typed (any-lambda () any-string) a-procedure)))
+
+(check
+  (equal?
+    (datumize
+      (evaluate-syntax
+        (scope (x (typed any-string hole)))
+        '(lambda () x)))
+    (typed
+      (any-lambda () any-string)
+      (thunk 0 '(lambda () x)))))
+
