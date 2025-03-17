@@ -1,7 +1,5 @@
 (library (typed evaluate)
-  (export
-    hole hole?
-    evaluate-syntax)
+  (export evaluate-syntax)
   (import
     (micascheme)
     (evaluator)
@@ -12,9 +10,8 @@
     (typed compiled)
     (typed thunk)
     (typed evaluated)
-    (typed scope))
-
-  (data hole)
+    (typed scope)
+    (typed hole))
 
   (define (evaluate-identifier $scope $identifier)
     (lets
@@ -111,12 +108,12 @@
               $bindings))
           ($typed-body
             (evaluate-syntax $environment $scope #'body))
-          (typed
-            (typed-type $typed-body)
-            (evaluated-promote
-              $environment
-              (typed-value $typed-body)
-              (length $bindings)))))
+          (typed-map-value $typed-body
+            (lambda ($evaluated)
+              (evaluated-promote
+                $environment
+                $evaluated
+                (length $bindings))))))
       ((lambda (param ...) body)
         (lets
           ($params (syntaxes param ...))

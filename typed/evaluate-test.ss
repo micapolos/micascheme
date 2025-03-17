@@ -1,4 +1,4 @@
-(import (micascheme) (typed lang) (typed typed) (typed evaluate) (typed scope) (typed thunk) (typed compiled) (any))
+(import (micascheme) (typed lang) (typed typed) (typed evaluate) (typed scope) (typed thunk) (typed compiled) (typed hole) (any))
 
 (data a-procedure)
 
