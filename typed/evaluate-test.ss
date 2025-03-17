@@ -87,7 +87,6 @@
 (check
   (equal?
     (evaluate-syntax env
-      (scope
-        (+ (typed (any-lambda (any-string any-string) any-string) string-append)))
-      '(+ "foo" "bar"))
+      (scope (foo (typed any-string "foo")))
+      '((assume (any-lambda (any-string any-string) any-string) string-append) foo "bar"))
     (typed any-string "foobar")))
