@@ -1,5 +1,5 @@
 (library (typed evaluate)
-  (export evaluate-syntax)
+  (export evaluate-typed)
   (import
     (micascheme)
     (evaluator)
@@ -30,7 +30,7 @@
 
   (define (evaluate-value $environment $scope $type $syntax)
     (lets
-      ($typed (evaluate-syntax $environment $scope $syntax))
+      ($typed (evaluate-typed $environment $scope $syntax))
       (if (type=? (typed-type $typed) $type)
         (typed-value $typed)
         (syntax-error $syntax
@@ -40,7 +40,7 @@
 
   (define (evaluate-lambda $environment $scope $syntax)
     (lets
-      ($typed (evaluate-syntax $environment $scope $syntax))
+      ($typed (evaluate-typed $environment $scope $syntax))
       (switch (typed-type $typed)
         ((any-lambda? _)
           $typed)
@@ -55,7 +55,7 @@
       ((else $type)
         $type)))
 
-  (define (evaluate-syntax $environment $scope $syntax)
+  (define (evaluate-typed $environment $scope $syntax)
     (syntax-case $syntax (assume assume-type any-type any-string any-number any-lambda lambda expect let)
       ((expect type expr)
         (lets
@@ -103,7 +103,7 @@
               $scope
               $bindings))
           ($typed-body
-            (evaluate-syntax $environment $scope #'body))
+            (evaluate-typed $environment $scope #'body))
           (typed-map-value $typed-body
             (lambda ($evaluated)
               (evaluated-promote $environment $evaluated (length $bindings))))))
@@ -124,7 +124,7 @@
               $scope
               $typed-params))
           ($typed-body
-            (evaluate-syntax $environment $scope #'body))
+            (evaluate-typed $environment $scope #'body))
           (typed
             (make-any-lambda
               (map typed-type $typed-params)
@@ -201,7 +201,7 @@
       ((id expr)
         (cons
           (syntax->symbol #'id)
-          (evaluate-syntax $environment $scope #'expr)))
+          (evaluate-typed $environment $scope #'expr)))
       (other
         (syntax-error #'other "invalid binding"))))
 )
