@@ -28,9 +28,9 @@
           ((else $other)
             $other)))))
 
-  (define (evaluate-value $default $environment $scope $type $syntax)
+  (define (evaluate-value $default? $environment $scope $type $syntax)
     (lets
-      ($typed (evaluate-typed $default $environment $scope $syntax))
+      ($typed (evaluate-typed $default? $environment $scope $syntax))
       (if (type=? (typed-type $typed) $type)
         (typed-value $typed)
         (syntax-error $syntax
@@ -38,9 +38,9 @@
             (typed-type $typed)
             $type)))))
 
-  (define (evaluate-lambda $default $environment $scope $syntax)
+  (define (evaluate-lambda $default? $environment $scope $syntax)
     (lets
-      ($typed (evaluate-typed $default $environment $scope $syntax))
+      ($typed (evaluate-typed $default? $environment $scope $syntax))
       (switch (typed-type $typed)
         ((any-lambda? _)
           $typed)
@@ -48,28 +48,28 @@
           (syntax-error $syntax
             (format "invalid type ~s, expected any-lambda, in" $type))))))
 
-  (define (evaluate-type $default $environment $scope $syntax)
-    (switch (evaluate-value $default $environment $scope any-type $syntax)
+  (define (evaluate-type $default? $environment $scope $syntax)
+    (switch (evaluate-value $default? $environment $scope any-type $syntax)
       ((thunk? _)
         (syntax-error $syntax "type not constant"))
       ((else $type)
         $type)))
 
-  (define (evaluate-typed $default $environment $scope $syntax)
+  (define (evaluate-typed $default? $environment $scope $syntax)
     (or
-      ($default $environment $scope $syntax)
+      ($default? $environment $scope $syntax)
       (syntax-case $syntax (assume assume-type any-lambda lambda expect let)
         (x
           (symbol? (datum x))
           (evaluate-identifier $scope #'x))
         ((expect type expr)
           (lets
-            ($type (evaluate-type $default $environment $scope #'type))
+            ($type (evaluate-type $default? $environment $scope #'type))
             (typed $type
-              (evaluate-value $default $environment $scope $type #'expr))))
+              (evaluate-value $default? $environment $scope $type #'expr))))
         ((assume type value)
           (typed
-            (evaluate-type $default $environment $scope #'type)
+            (evaluate-type $default? $environment $scope #'type)
             (eval (datum value) $environment)))
         ((assume-type value)
           (typed
@@ -78,13 +78,13 @@
         ((any-lambda (param ...) result)
           (typed any-type
             (make-any-lambda
-              (map (partial evaluate-type $default $environment $scope) (syntaxes param ...))
-              (evaluate-type $default $environment $scope #'result))))
+              (map (partial evaluate-type $default? $environment $scope) (syntaxes param ...))
+              (evaluate-type $default? $environment $scope #'result))))
         ((let (binding ...) body)
           (lets
             ($bindings
               (map
-                (partial evaluate-binding $default $environment $scope)
+                (partial evaluate-binding $default? $environment $scope)
                 (syntaxes binding ...)))
             ($scope
               (fold-left
@@ -96,7 +96,7 @@
                 $scope
                 $bindings))
             ($typed-body
-              (evaluate-typed $default $environment $scope #'body))
+              (evaluate-typed $default? $environment $scope #'body))
             (typed-map-value $typed-body
               (lambda ($evaluated)
                 (evaluated-promote $environment $evaluated (length $bindings))))))
@@ -106,7 +106,7 @@
             ($params-length (length $params))
             ($typed-params
               (map
-                (partial evaluate-param $default $environment $scope)
+                (partial evaluate-param $default? $environment $scope)
                 $params))
             ($scope
               (fold-left
@@ -117,7 +117,7 @@
                 $scope
                 $typed-params))
             ($typed-body
-              (evaluate-typed $default $environment $scope #'body))
+              (evaluate-typed $default? $environment $scope #'body))
             (typed
               (make-any-lambda
                 (map typed-type $typed-params)
@@ -134,7 +134,7 @@
         ((fn params ...)
           (lets
             ($params (syntaxes params ...))
-            ($typed-lambda (evaluate-lambda $default $environment $scope #'fn))
+            ($typed-lambda (evaluate-lambda $default? $environment $scope #'fn))
             ($any-lambda (typed-type $typed-lambda))
             ($param-types (any-lambda-params $any-lambda))
             (run
@@ -145,7 +145,7 @@
                     (length $param-types)))))
             ($param-values
               (map
-                (partial evaluate-value $default $environment $scope)
+                (partial evaluate-value $default? $environment $scope)
                 $param-types
                 $params))
             (typed
@@ -162,21 +162,21 @@
         $datum
         (syntax-error $syntax "invalid identifier"))))
 
-  (define (evaluate-param $default $environment $scope $param)
+  (define (evaluate-param $default? $environment $scope $param)
     (syntax-case $param ()
       ((type id)
         (typed
-          (evaluate-type $default $environment $scope #'type)
+          (evaluate-type $default? $environment $scope #'type)
           (syntax->symbol #'id)))
       (other
         (syntax-error #'other "invalid param"))))
 
-  (define (evaluate-binding $default $environment $scope $binding)
+  (define (evaluate-binding $default? $environment $scope $binding)
     (syntax-case $binding ()
       ((id expr)
         (cons
           (syntax->symbol #'id)
-          (evaluate-typed $default $environment $scope #'expr)))
+          (evaluate-typed $default? $environment $scope #'expr)))
       (other
         (syntax-error #'other "invalid binding"))))
 )

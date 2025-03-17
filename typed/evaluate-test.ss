@@ -13,7 +13,7 @@
 
 (define $environment (environment '(scheme)))
 
-(define ($default $environment $scope $syntax)
+(define ($default? $environment $scope $syntax)
   (syntax-case $syntax (any-type any-boolean any-string any-number)
     (any-type
       (typed any-type any-type))
@@ -45,59 +45,59 @@
 
 (check
   (equal?
-    (evaluate-typed $default $environment (scope) 'any-string)
+    (evaluate-typed $default? $environment (scope) 'any-string)
     (typed any-type any-string)))
 
 (check
   (equal?
-    (evaluate-typed $default $environment (scope) 'any-number)
+    (evaluate-typed $default? $environment (scope) 'any-number)
     (typed any-type any-number)))
 
 (check
   (equal?
-    (evaluate-typed $default $environment (scope) "foo")
+    (evaluate-typed $default? $environment (scope) "foo")
     (typed any-string "foo")))
 
 (check
   (equal?
-    (evaluate-typed $default $environment (scope) 123)
+    (evaluate-typed $default? $environment (scope) 123)
     (typed any-number 123)))
 
 (check
   (equal?
-    (evaluate-typed $default $environment (scope) '(expect any-string "foo"))
+    (evaluate-typed $default? $environment (scope) '(expect any-string "foo"))
     (typed any-string "foo")))
 
 (check
   (raises
-    (evaluate-typed $default $environment (scope) '(expect any-number "foo"))))
+    (evaluate-typed $default? $environment (scope) '(expect any-number "foo"))))
 
 (check
   (equal?
-    (evaluate-typed $default $environment (scope (x (typed any-string "foo"))) 'x)
+    (evaluate-typed $default? $environment (scope (x (typed any-string "foo"))) 'x)
     (typed any-string "foo")))
 
 (check
   (equal?
-    (datumize (evaluate-typed $default $environment (scope (x (typed any-string hole))) 'x))
+    (datumize (evaluate-typed $default? $environment (scope (x (typed any-string hole))) 'x))
     (typed any-string (thunk 0 (compiled (scope) 'x)))))
 
 (check
   (equal?
-    (evaluate-typed $default $environment (scope) '(expect any-string "foo"))
+    (evaluate-typed $default? $environment (scope) '(expect any-string "foo"))
     (typed any-string "foo")))
 
 (check
   (equal?
     (datumize
-      (evaluate-typed $default $environment (scope)
+      (evaluate-typed $default? $environment (scope)
         '(lambda () "foo")))
     (typed (any-lambda () any-string) a-procedure)))
 
 (check
   (equal?
     (datumize
-      (evaluate-typed $default $environment
+      (evaluate-typed $default? $environment
         (scope (x (typed any-string "foo")))
         '(lambda () x)))
     (typed (any-lambda () any-string) a-procedure)))
@@ -105,7 +105,7 @@
 (check
   (equal?
     (datumize
-      (evaluate-typed $default $environment
+      (evaluate-typed $default? $environment
         (scope (x (typed any-string hole)))
         '(lambda () x)))
     (typed
@@ -116,14 +116,14 @@
 
 (check
   (equal?
-    (evaluate-typed $default $environment
+    (evaluate-typed $default? $environment
       (scope (foo (typed any-string "foo")))
       '((assume (any-lambda (any-string any-string) any-string) string-append) foo "bar"))
     (typed any-string "foobar")))
 
 (check
   (equal?
-    (evaluate-typed $default $environment
+    (evaluate-typed $default? $environment
       (scope (foo (typed any-string hole)))
       '((assume (any-lambda (any-string any-string) any-string) string-append) foo "bar"))
     (typed any-string
@@ -134,14 +134,14 @@
 
 (check
   (equal?
-    (evaluate-typed $default $environment
+    (evaluate-typed $default? $environment
       (scope)
       '(let ((foo "foo")) foo))
     (typed any-string "foo")))
 
 (check
   (equal?
-    (evaluate-typed $default $environment
+    (evaluate-typed $default? $environment
       (scope
         (foo (typed any-string hole))
         (bar (typed any-string hole))
