@@ -11,10 +11,11 @@
         '(string-append foo bar)))
     "foobar"))
 
-(check
-  (equal?
-    (value-compiled "foo")
-    (compiled (scope) "foo")))
+(check (equal? (value-compiled #t) (compiled (scope) #t)))
+(check (equal? (value-compiled #\a) (compiled (scope) #\a)))
+(check (equal? (value-compiled 123) (compiled (scope) 123)))
+(check (equal? (value-compiled "foo") (compiled (scope) "foo")))
+(check (equal? (value-compiled 'foo) (compiled (scope) 'foo)))
 
 (check
   (equal?

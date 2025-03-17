@@ -31,6 +31,7 @@
   (lets)
   (list)
   (list-syntax)
+  (literal)
   (match)
   (micac)
   (micalog)

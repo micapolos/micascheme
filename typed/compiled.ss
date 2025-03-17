@@ -11,14 +11,6 @@
 
   (data (compiled bindings datum))
 
-  (define (literal? $obj)
-    (or
-      (boolean? $obj)
-      (char? $obj)
-      (number? $obj)
-      (string? $obj)
-      (symbol? $obj)))
-
   (define (value-compiled $value)
     (if (literal? $value)
       (compiled (stack) $value)

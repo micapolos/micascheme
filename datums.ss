@@ -1,6 +1,5 @@
 (library (datums)
-  (export
-    make get is? when)
+  (export make get is? when)
   (import (micascheme))
 
   (define (datum-name $datum)

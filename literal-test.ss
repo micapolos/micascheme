@@ -1,0 +1,11 @@
+(import (scheme) (check) (literal))
+
+(check (literal? #t))
+(check (literal? #f))
+(check (literal? 123))
+(check (literal? #\a))
+(check (literal? "foo"))
+(check (literal? 'foo))
+(check (not (literal? (cons "foo" "bar"))))
+(check (not (literal? (void))))
+(check (not (literal? string-append)))
