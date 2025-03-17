@@ -63,7 +63,7 @@
         $type)))
 
   (define (evaluate-syntax $scope $syntax)
-    (syntax-case $syntax (assume assume-type lambda)
+    (syntax-case $syntax (assume assume-type any-type any-string any-lambda lambda)
       ((assume type value)
         (typed
           (evaluate-type $scope #'type)
@@ -72,9 +72,15 @@
         (typed
           any-type
           (datum->value (datum value))))
-      (x
-        (symbol? (datum x))
-        (evaluate-identifier $scope #'x))
+      (any-type
+        (typed any-type any-type))
+      (any-string
+        (typed any-type any-string))
+      ((any-lambda (param ...) result)
+        (typed any-type
+          (make-any-lambda
+            (map (partial evaluate-type $scope) (syntaxes param ...))
+            (evaluate-type $scope #'result))))
       (x
         (string? (datum x))
         (typed any-string (datum x)))
@@ -116,20 +122,30 @@
               ((else $value)
                 (lets
                   ($tmp (gensym))
-                  (thunk $params-length
-                    (lambda ()
-                      (
-                        (datum->value
-                          `(lambda (,$tmp)
-                            (lambda (,(map typed-value $typed-params))
-                              ,$tmp)))
-                        $value)))))))))))
+                  (
+                    (datum->value
+                      `(lambda (,$tmp)
+                        (lambda (,@(map typed-value $typed-params))
+                          ,$tmp)))
+                    $value)))))))
+      (x
+        (symbol? (datum x))
+        (evaluate-identifier $scope #'x))))
+
+  (define (syntax->symbol $syntax)
+    (lets
+      ($datum (syntax->datum $syntax))
+      (if (symbol? $datum)
+        $datum
+        (syntax-error $syntax "invalid identifier"))))
 
   (define (evaluate-param $scope $param)
     (syntax-case $param ()
       ((type id)
         (lets
-          ($symbol (identifier id))
+          ($symbol (syntax->symbol #'id))
           ($type (evaluate-type $scope #'type))
-          (scope+ $scope $symbol (typed $type $symbol))))))
+          (scope+ $scope $symbol (typed $type $symbol))))
+      (other
+        (syntax-error #'other "invalid param"))))
 )

@@ -1,5 +1,7 @@
 (import (micascheme) (typed lang) (typed typed) (typed evaluate) (any))
 
+(data a-procedure)
+
 (define (datumize $typed)
   (typed
     (typed-type $typed)
@@ -8,6 +10,8 @@
         (thunk
           (thunk-max-index $thunk)
           ((thunk-datum-proc $thunk))))
+      ((procedure? $procedure)
+        a-procedure)
       ((else $other)
         $other))))
 
@@ -25,3 +29,11 @@
   (equal?
     (datumize (evaluate-syntax (scope (x (typed any-string hole))) 'x))
     (typed any-string (thunk 0 'x))))
+
+(check
+  (equal?
+    (datumize
+      (evaluate-syntax (scope)
+        '(lambda () "foo")))
+    (typed (any-lambda () any-string) a-procedure)))
+
