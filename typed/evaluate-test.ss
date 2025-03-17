@@ -83,3 +83,11 @@
       (thunk 0
         (compiled (scope)
           '(lambda () x))))))
+
+(check
+  (equal?
+    (evaluate-syntax env
+      (scope
+        (string-append (typed (any-lambda (any-string any-string) any-string) string-append)))
+      '(string-append "foo" "bar"))
+    (typed any-string "foobar")))

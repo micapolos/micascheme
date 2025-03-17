@@ -36,7 +36,20 @@
       ($typed (evaluate-syntax $environment $scope $syntax))
       (if (type=? (typed-type $typed) $type)
         (typed-value $typed)
-        (syntax-error $syntax "invalid type"))))
+        (syntax-error $syntax
+          (format "invalid type ~s, expected ~s, in"
+            (typed-type $typed)
+            $type)))))
+
+  (define (evaluate-lambda $environment $scope $syntax)
+    (lets
+      ($typed (evaluate-syntax $environment $scope $syntax))
+      (switch (typed-type $typed)
+        ((any-lambda? _)
+          $typed)
+        ((else $type)
+          (syntax-error $syntax
+            (format "invalid type ~s, expected any-lambda, in" $type))))))
 
   (define (evaluate-type $environment $scope $syntax)
     (switch (evaluate-value $environment $scope any-type $syntax)
@@ -151,6 +164,29 @@
                           ,$tmp))
                       $environment)
                     $value)))))))
+      ((fn params ...)
+        (lets
+          ($params (syntaxes params ...))
+          ($typed-lambda (evaluate-lambda $environment $scope #'fn))
+          ($any-lambda (typed-type $typed-lambda))
+          ($param-types (any-lambda-params $any-lambda))
+          (run
+            (unless (= (length $params) (length $param-types))
+              (syntax-error $syntax
+                (format "invalid param count ~s, expected ~s, in"
+                  (length $params)
+                  (length $param-types)))))
+          ($param-values
+            (map
+              (partial evaluate-value $environment $scope)
+              $param-types
+              $params))
+          (typed
+            (any-lambda-result $any-lambda)
+            (combine-evaluated-list
+              $environment
+              (append (list (typed-value $typed-lambda)) $param-values)
+              (lambda ($datums) `(,@$datums))))))
       (x
         (symbol? (datum x))
         (evaluate-identifier $scope #'x))))
