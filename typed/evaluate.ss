@@ -2,7 +2,7 @@
   (export
     scope scope-ref
     hole hole?
-    thunk thunk? thunk-depth thunk-datum-proc
+    thunk thunk? thunk-max-index thunk-datum-proc
     evaluate-syntax)
   (import
     (micascheme)
@@ -12,7 +12,7 @@
     (typed typed)
     (typed type))
 
-  (data (thunk depth datum-proc))
+  (data (thunk max-index datum-proc))
   (data hole)
 
   (define-rule-syntax (scope (symbol value) ...)
@@ -43,8 +43,7 @@
       (typed $type
         (switch (typed-value $typed)
           ((hole? _)
-            (thunk
-              (+ $index 1)
+            (thunk $index
               (lambda () $symbol)))
           ((else $other)
             $other)))))
@@ -102,17 +101,17 @@
               (map typed-type $typed-params)
               (typed-type $typed-body))
             (switch (typed-value $typed-body)
-              ((thunk? (thunk $depth $datum-proc))
+              ((thunk? (thunk $max-index $datum-proc))
                 (lets
                   ($datum
                     `(lambda (,(map typed-value $typed-params))
                       ,($datum-proc)))
                   (cond
-                    ((<= $depth $params-length)
+                    ((< $max-index $params-length)
                       (datum->value $datum))
                     (else
                       (thunk
-                        (- $depth $params-length)
+                        (- $max-index $params-length)
                         `(lambda () ,$datum))))))
               ((else $value)
                 (lets

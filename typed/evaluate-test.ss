@@ -5,9 +5,11 @@
     (typed-type $typed)
     (switch (typed-value $typed)
       ((thunk? $thunk)
-        ((thunk-datum-proc $thunk)))
+        (thunk
+          (thunk-max-index $thunk)
+          ((thunk-datum-proc $thunk))))
       ((else $other)
-        (throw dupa)))))
+        $other))))
 
 (check
   (equal?
@@ -22,4 +24,4 @@
 (check
   (equal?
     (datumize (evaluate-syntax (scope (x (typed any-string hole))) 'x))
-    (typed any-string 'x)))
+    (typed any-string (thunk 0 'x))))
