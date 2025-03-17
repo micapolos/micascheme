@@ -2,7 +2,6 @@
   (export
     thunk thunk? thunk-max-index thunk-compiled
     thunk-promote
-    thunk-bind
     combine-thunks)
   (import
     (micascheme)
@@ -16,11 +15,6 @@
       (if (< $new-max-index 0)
         (compiled-value $environment $compiled)
         (thunk $new-max-index $compiled))))
-
-  (define (thunk-bind $thunk $value $datum-proc)
-    (thunk
-      (thunk-max-index $thunk)
-      (compiled-bind (thunk-compiled $thunk) $value $datum-proc)))
 
   (define (combine-thunks $thunks $datum-proc)
     (thunk

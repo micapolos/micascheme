@@ -2,7 +2,6 @@
   (export
     evaluated-max-index?
     evaluated-list-max-index?
-    evaluated-bind
     evaluated-compiled
     combine-evaluated-list)
   (import
@@ -29,14 +28,6 @@
             $evaluated-max-index?)))
       #f
       $evaluated-list))
-
-  (define (evaluated-bind $environment $evaluated $value $datum-proc)
-    (switch $evaluated
-      ((thunk? $thunk)
-        (thunk-bind $thunk $value $datum-proc))
-      ((else $other)
-        (compiled-value $environment
-          (compiled-bind (value-compiled $other) $value $datum-proc)))))
 
   (define (evaluated-compiled $evaluated)
     (switch $evaluated

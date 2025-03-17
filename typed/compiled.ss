@@ -3,7 +3,6 @@
     compiled compiled? compiled-bindings compiled-datum
     value-compiled
     compiled-value
-    compiled-bind
     combine-compiled-list)
   (import
     (micascheme)
@@ -25,15 +24,6 @@
         $environment
         (compiled-bindings $compiled))
       (compiled-datum $compiled)))
-
-  (define (compiled-bind $compiled $value $datum-proc)
-    (lets
-      ($symbol (generate-symbol))
-      (compiled
-        (push
-          (compiled-bindings $compiled)
-          (cons $symbol $value))
-        ($datum-proc (compiled-datum $compiled) $symbol))))
 
   (define (combine-compiled-list $compiled-list $combine-datums)
     (compiled
