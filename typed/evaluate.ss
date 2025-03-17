@@ -202,21 +202,21 @@
       (other
         (syntax-error #'other "invalid binding"))))
 
-  (define (value-max-index? $value)
-    (switch $value
+  (define (evaluated-max-index? $evaluated)
+    (switch $evaluated
       ((thunk? $thunk) (thunk-max-index $thunk))
       ((else _) #f)))
 
-  (define (values-max-index? $values)
+  (define (evaluated-list-max-index? $evaluated-list)
     (fold-left
-      (lambda ($max-index? $value)
+      (lambda ($max-index? $evaluated)
         (lets
-          ($value-max-index? (value-max-index? $value))
+          ($evaluated-max-index? (evaluated-max-index? $evaluated))
           (if $max-index?
-            (if $value-max-index?
-              (max $max-index? $value-max-index?)
+            (if $evaluated-max-index?
+              (max $max-index? $evaluated-max-index?)
               $max-index?)
-            $value-max-index?)))
+            $evaluated-max-index?)))
       #f
-      $values))
+      $evaluated-list))
 )
