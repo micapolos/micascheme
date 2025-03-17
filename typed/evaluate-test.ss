@@ -8,10 +8,6 @@
   (typed
     (typed-type $typed)
     (switch (typed-value $typed)
-      ((thunk? $thunk)
-        (thunk
-          (thunk-max-index $thunk)
-          ((thunk-datum-proc $thunk))))
       ((procedure? $procedure)
         a-procedure)
       ((else $other)
@@ -54,7 +50,7 @@
 (check
   (equal?
     (datumize (evaluate-syntax env (scope (x (typed any-string hole))) 'x))
-    (typed any-string (thunk 0 'x))))
+    (typed any-string (thunk 0 (compiled (scope) 'x)))))
 
 (check
   (equal?
@@ -84,4 +80,6 @@
         '(lambda () x)))
     (typed
       (any-lambda () any-string)
-      (thunk 0 '(lambda () x)))))
+      (thunk 0
+        (compiled (scope)
+          '(lambda () x))))))
