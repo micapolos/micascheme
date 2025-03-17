@@ -14,7 +14,12 @@
 (check
   (equal?
     (value-compiled "foo")
-    (compiled (scope (tmp_0 "foo")) 'tmp_0)))
+    (compiled (scope) "foo")))
+
+(check
+  (equal?
+    (value-compiled (cons "foo" "bar"))
+    (compiled (scope (tmp_0 (cons "foo" "bar"))) 'tmp_0)))
 
 (check
   (equal?

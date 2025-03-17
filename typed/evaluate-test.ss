@@ -99,7 +99,5 @@
     (typed any-string
       (thunk 0
         (compiled
-          (scope
-            (tmp_1 string-append)
-            (tmp_0 "bar"))
-          '(tmp_1 foo tmp_0))))))
+          (scope (tmp_0 string-append))
+          '(tmp_0 foo "bar"))))))

@@ -11,12 +11,22 @@
 
   (data (compiled bindings datum))
 
+  (define (literal? $obj)
+    (or
+      (boolean? $obj)
+      (char? $obj)
+      (number? $obj)
+      (string? $obj)
+      (symbol? $obj)))
+
   (define (value-compiled $value)
-    (lets
-      ($symbol (generate-symbol))
-      (compiled
-        (stack (cons $symbol $value))
-        $symbol)))
+    (if (literal? $value)
+      (compiled (stack) $value)
+      (lets
+        ($symbol (generate-symbol))
+        (compiled
+          (stack (cons $symbol $value))
+          $symbol))))
 
   (define (compiled-value $environment $compiled)
     (evaluate

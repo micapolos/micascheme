@@ -30,7 +30,12 @@
 (check
   (equal?
     (evaluated-compiled "foo")
-    (compiled (scope (tmp_0 "foo")) 'tmp_0)))
+    (compiled (scope) "foo")))
+
+(check
+  (equal?
+    (evaluated-compiled (cons "foo" "bar"))
+    (compiled (scope (tmp_0 (cons "foo" "bar"))) 'tmp_0)))
 
 (check
   (equal?
@@ -53,6 +58,7 @@
     (combine-evaluated-list
       (environment '(scheme))
       (list
+        string-append
         (thunk 3
           (compiled
             (scope (foo-1 "foo-1") (foo-2 "foo-2"))
@@ -63,10 +69,15 @@
             (scope (bar-1 "bar-1") (bar-2 "bar-2"))
             '(string-append bar-1 bar-2))))
       (lambda ($datums)
-        `(string-append ,@$datums)))
+        `(,@$datums)))
     (thunk 5
       (compiled
-        (scope (foo-1 "foo-1") (foo-2 "foo-2") (tmp_0 ", ") (bar-1 "bar-1") (bar-2 "bar-2"))
-        '(string-append (string-append foo-1 foo-2) tmp_0 (string-append bar-1 bar-2))))))
+        (scope
+          (tmp_0 string-append)
+          (foo-1 "foo-1")
+          (foo-2 "foo-2")
+          (bar-1 "bar-1")
+          (bar-2 "bar-2"))
+        '(tmp_0 (string-append foo-1 foo-2) ", " (string-append bar-1 bar-2))))))
 
 
