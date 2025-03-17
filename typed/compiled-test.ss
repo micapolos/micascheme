@@ -27,3 +27,18 @@
       (scope (foo "foo") (tmp_0 "bar"))
       '(let ((tmp_0 "bar")) (string-append foo tmp_0)))))
 
+(check
+  (equal?
+    (combine-compiled-list
+      (list
+        (compiled
+          (scope (foo-1 "foo-1") (foo-2 "foo-2"))
+          '(string-append foo-1 foo-2))
+        (compiled
+          (scope (bar-1 "bar-1") (bar-2 "bar-2"))
+          '(string-append bar-1 bar-2)))
+      (lambda ($datums)
+        `(string-append ,@$datums)))
+    (compiled
+      (scope (foo-1 "foo-1") (foo-2 "foo-2") (bar-1 "bar-1") (bar-2 "bar-2"))
+      '(string-append (string-append foo-1 foo-2) (string-append bar-1 bar-2)))))

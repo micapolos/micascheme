@@ -3,7 +3,8 @@
     compiled compiled? compiled-bindings compiled-datum
     value-compiled
     compiled-value
-    compiled-bind)
+    compiled-bind
+    combine-compiled-list)
   (import
     (micascheme)
     (evaluator)
@@ -33,4 +34,9 @@
           (compiled-bindings $compiled)
           (cons $symbol $value))
         ($datum-proc (compiled-datum $compiled) $symbol))))
+
+  (define (combine-compiled-list $compiled-list $combine-datums)
+    (compiled
+      (apply append (reverse (map compiled-bindings $compiled-list)))
+      ($combine-datums (map compiled-datum $compiled-list))))
 )
