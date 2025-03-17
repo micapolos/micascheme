@@ -3,7 +3,6 @@
     scope scope-ref
     hole hole?
     thunk thunk? thunk-max-index thunk-compiled
-    compiled compiled compiled-bindings compiled-datum
     evaluate-syntax)
   (import
     (micascheme)
@@ -11,19 +10,12 @@
     (any)
     (typed lang)
     (typed typed)
-    (typed type))
+    (typed type)
+    (typed compiled))
 
-  (data (compiled bindings datum))
   ;(enum (evaluated thunk value))
   (data (thunk max-index compiled))
   (data hole)
-
-  (define (compiled-value $environment $compiled)
-    (evaluate
-      (evaluator
-        $environment
-        (compiled-bindings $compiled))
-      (compiled-datum $compiled)))
 
   (define-rule-syntax (scope (symbol value) ...)
     (stack (cons 'symbol value) ...))
@@ -220,4 +212,23 @@
             $evaluated-max-index?)))
       #f
       $evaluated-list))
+
+  (define (thunk+value $thunk $symbol $value)
+    (thunk
+      (thunk-max-index $thunk)
+      (compiled+value (thunk-compiled $thunk) $symbol $value)))
+
+  (define (evaluated+value $evaluated $symbol $value)
+    (switch $evaluated
+      ((thunk? $thunk)
+        (thunk+value $thunk $symbol $value))
+      ((else $value)
+        $value)))
+
+  (define (thunk-promote $environment (thunk $max-index $compiled) $depth)
+    (lets
+      ($new-max-index (- $max-index $depth))
+      (if (< $new-max-index 0)
+        (compiled-value $environment $compiled)
+        (thunk $new-max-index $compiled))))
 )

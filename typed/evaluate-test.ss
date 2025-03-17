@@ -1,4 +1,4 @@
-(import (micascheme) (typed lang) (typed typed) (typed evaluate) (any))
+(import (micascheme) (typed lang) (typed typed) (typed evaluate) (typed compiled) (any))
 
 (data a-procedure)
 
