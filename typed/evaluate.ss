@@ -98,7 +98,7 @@
               (syntaxes binding ...)))
           ($scope
             (fold-left
-              (lambda ($binding)
+              (lambda ($scope $binding)
                 (lets
                   ((pair $symbol $typed) $binding)
                   (scope+ $scope $symbol
@@ -113,11 +113,10 @@
             (evaluate-syntax $environment $scope #'body))
           (typed
             (typed-type $typed-body)
-            (switch (typed-value $typed-body)
-              ((thunk? $thunk)
-                TODO)
-              ((else $value)
-                TODO)))))
+            (evaluated-promote
+              $environment
+              (typed-value $typed-body)
+              (length $bindings)))))
       ((lambda (param ...) body)
         (lets
           ($params (syntaxes param ...))

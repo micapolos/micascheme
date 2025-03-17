@@ -101,3 +101,24 @@
         (compiled
           (scope (tmp_0 string-append))
           '(tmp_0 foo "bar"))))))
+
+(check
+  (equal?
+    (evaluate-syntax env
+      (scope)
+      '(let ((foo "foo")) foo))
+    (typed any-string "foo")))
+
+(check
+  (equal?
+    (evaluate-syntax env
+      (scope
+        (foo (typed any-string hole))
+        (bar (typed any-string hole))
+        (string-append (typed (any-lambda (any-string any-string) any-string) string-append)))
+      '(let ((foo! (string-append foo "!"))) (string-append foo! bar)))
+    (typed any-string
+      (thunk 1
+        (compiled
+          (scope (tmp_1 string-append))
+          '(tmp_1 foo! bar))))))
