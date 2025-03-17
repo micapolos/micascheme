@@ -18,9 +18,6 @@
   (define-rule-syntax (scope (symbol value) ...)
     (stack (cons 'symbol value) ...))
 
-  (define (datum->value $datum)
-    (eval $datum (environment '(micascheme))))
-
   (define (scope+ $scope $symbol $value)
     (push $scope (cons $symbol $value)))
 
@@ -48,30 +45,30 @@
           ((else $other)
             $other)))))
 
-  (define (evaluate-value $scope $type $syntax)
+  (define (evaluate-value $environment $scope $type $syntax)
     (lets
-      ($typed (evaluate-syntax $scope $syntax))
+      ($typed (evaluate-syntax $environment $scope $syntax))
       (if (type=? (typed-type $typed) $type)
         (typed-value $typed)
         (syntax-error $syntax "invalid type"))))
 
-  (define (evaluate-type $scope $syntax)
-    (switch (evaluate-value $scope any-type $syntax)
+  (define (evaluate-type $environment $scope $syntax)
+    (switch (evaluate-value $environment $scope any-type $syntax)
       ((thunk? _)
         (syntax-error $syntax "type not constant"))
       ((else $type)
         $type)))
 
-  (define (evaluate-syntax $scope $syntax)
+  (define (evaluate-syntax $environment $scope $syntax)
     (syntax-case $syntax (assume assume-type any-type any-string any-lambda lambda)
       ((assume type value)
         (typed
-          (evaluate-type $scope #'type)
-          (datum->value (datum value))))
+          (evaluate-type $environment $scope #'type)
+          (eval (datum value) $environment)))
       ((assume-type value)
         (typed
           any-type
-          (datum->value (datum value))))
+          (eval (datum value) $environment)))
       (any-type
         (typed any-type any-type))
       (any-string
@@ -79,8 +76,8 @@
       ((any-lambda (param ...) result)
         (typed any-type
           (make-any-lambda
-            (map (partial evaluate-type $scope) (syntaxes param ...))
-            (evaluate-type $scope #'result))))
+            (map (partial evaluate-type $environment $scope) (syntaxes param ...))
+            (evaluate-type $environment $scope #'result))))
       (x
         (string? (datum x))
         (typed any-string (datum x)))
@@ -90,7 +87,7 @@
           ($params-length (length $params))
           ($typed-params
             (map
-              (partial evaluate-param $scope)
+              (partial evaluate-param $environment $scope)
               $params))
           ($scope
             (fold-left
@@ -101,7 +98,7 @@
               $scope
               $typed-params))
           ($typed-body
-            (evaluate-syntax $scope #'body))
+            (evaluate-syntax $environment $scope #'body))
           (typed
             (make-any-lambda
               (map typed-type $typed-params)
@@ -114,7 +111,7 @@
                       ,($datum-proc)))
                   (cond
                     ((< $max-index $params-length)
-                      (datum->value $datum))
+                      (eval $datum $environment))
                     (else
                       (thunk
                         (- $max-index $params-length)
@@ -123,10 +120,11 @@
                 (lets
                   ($tmp (gensym))
                   (
-                    (datum->value
+                    (eval
                       `(lambda (,$tmp)
                         (lambda (,@(map typed-value $typed-params))
-                          ,$tmp)))
+                          ,$tmp))
+                      $environment)
                     $value)))))))
       (x
         (symbol? (datum x))
@@ -139,12 +137,12 @@
         $datum
         (syntax-error $syntax "invalid identifier"))))
 
-  (define (evaluate-param $scope $param)
+  (define (evaluate-param $environment $scope $param)
     (syntax-case $param ()
       ((type id)
         (lets
           ($symbol (syntax->symbol #'id))
-          ($type (evaluate-type $scope #'type))
+          ($type (evaluate-type $environment $scope #'type))
           (scope+ $scope $symbol (typed $type $symbol))))
       (other
         (syntax-error #'other "invalid param"))))

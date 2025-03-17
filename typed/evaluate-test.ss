@@ -2,6 +2,8 @@
 
 (data a-procedure)
 
+(define env (environment '(scheme)))
+
 (define (datumize $typed)
   (typed
     (typed-type $typed)
@@ -17,30 +19,30 @@
 
 (check
   (equal?
-    (evaluate-syntax (scope) "foo")
+    (evaluate-syntax env (scope) "foo")
     (typed any-string "foo")))
 
 (check
   (equal?
-    (evaluate-syntax (scope (x (typed any-string "foo"))) 'x)
+    (evaluate-syntax env (scope (x (typed any-string "foo"))) 'x)
     (typed any-string "foo")))
 
 (check
   (equal?
-    (datumize (evaluate-syntax (scope (x (typed any-string hole))) 'x))
+    (datumize (evaluate-syntax env (scope (x (typed any-string hole))) 'x))
     (typed any-string (thunk 0 'x))))
 
 (check
   (equal?
     (datumize
-      (evaluate-syntax (scope)
+      (evaluate-syntax env (scope)
         '(lambda () "foo")))
     (typed (any-lambda () any-string) a-procedure)))
 
 (check
   (equal?
     (datumize
-      (evaluate-syntax
+      (evaluate-syntax env
         (scope (x (typed any-string "foo")))
         '(lambda () x)))
     (typed (any-lambda () any-string) a-procedure)))
@@ -48,10 +50,9 @@
 (check
   (equal?
     (datumize
-      (evaluate-syntax
+      (evaluate-syntax env
         (scope (x (typed any-string hole)))
         '(lambda () x)))
     (typed
       (any-lambda () any-string)
       (thunk 0 '(lambda () x)))))
-
