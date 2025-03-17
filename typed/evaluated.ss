@@ -2,7 +2,9 @@
   (export
     evaluated-max-index?
     evaluated-list-max-index?
-    evaluated-bind)
+    evaluated-bind
+    evaluated-compiled
+    combine-evaluated-list)
   (import
     (micascheme)
     (typed thunk)
@@ -35,4 +37,22 @@
       ((else $other)
         (compiled-value $environment
           (compiled-bind (value-compiled $other) $value $datum-proc)))))
+
+  (define (evaluated-compiled $evaluated)
+    (switch $evaluated
+      ((thunk? $thunk)
+        (thunk-compiled $thunk))
+      ((else $value)
+        (value-compiled $value))))
+
+  (define (combine-evaluated-list $environment $evaluated-list $datum-proc)
+    (lets
+      ($compiled
+        (combine-compiled-list
+          (map evaluated-compiled $evaluated-list)
+          $datum-proc))
+      ($max-index? (evaluated-list-max-index? $evaluated-list))
+      (if $max-index?
+        (thunk $max-index? $compiled)
+        (compiled-value $environment $compiled))))
 )
