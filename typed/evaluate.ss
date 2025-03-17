@@ -14,6 +14,7 @@
     (typed type))
 
   (data (compiled bindings datum))
+  ;(enum (evaluated thunk value))
   (data (thunk max-index compiled))
   (data hole)
 
