@@ -90,3 +90,16 @@
       (scope (foo (typed any-string "foo")))
       '((assume (any-lambda (any-string any-string) any-string) string-append) foo "bar"))
     (typed any-string "foobar")))
+
+(check
+  (equal?
+    (evaluate-syntax env
+      (scope (foo (typed any-string hole)))
+      '((assume (any-lambda (any-string any-string) any-string) string-append) foo "bar"))
+    (typed any-string
+      (thunk 0
+        (compiled
+          (scope
+            (tmp_1 string-append)
+            (tmp_0 "bar"))
+          '(tmp_1 foo tmp_0))))))
