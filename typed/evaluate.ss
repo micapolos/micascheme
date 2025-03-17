@@ -129,30 +129,15 @@
             (make-any-lambda
               (map typed-type $typed-params)
               (typed-type $typed-body))
-            (switch (typed-value $typed-body)
-              ((thunk? (thunk $max-index $compiled))
-                (lets
-                  ((compiled $bindings $datum) $compiled)
-                  ($datum
-                    `(lambda (,@(map typed-value $typed-params))
-                      ,$datum))
-                  (cond
-                    ((< $max-index $params-length)
-                      (eval $datum $environment))
-                    (else
-                      (thunk
-                        (- $max-index $params-length)
-                        (compiled $bindings $datum))))))
-              ((else $value)
-                (lets
-                  ($tmp (gensym))
-                  (
-                    (eval
-                      `(lambda (,$tmp)
-                        (lambda (,@(map typed-value $typed-params))
-                          ,$tmp))
-                      $environment)
-                    $value)))))))
+            (evaluated-promote
+              $environment
+              (combine-evaluated-list
+                $environment
+                (list (typed-value $typed-body))
+                (lambda ($datums)
+                  `(lambda (,@(map typed-value $typed-params))
+                    ,@$datums)))
+              $params-length))))
       ((fn params ...)
         (lets
           ($params (syntaxes params ...))
