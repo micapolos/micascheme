@@ -3,7 +3,6 @@
     compiled compiled? compiled-bindings compiled-datum
     value-compiled
     compiled-value
-    compiled+value
     compiled-bind)
   (import
     (micascheme)
@@ -24,13 +23,6 @@
       (evaluator
         $environment
         (compiled-bindings $compiled))
-      (compiled-datum $compiled)))
-
-  (define (compiled+value $compiled $symbol $value)
-    (compiled
-      (push
-        (compiled-bindings $compiled)
-        (cons $symbol $value))
       (compiled-datum $compiled)))
 
   (define (compiled-bind $compiled $value $datum-proc)

@@ -6,4 +6,5 @@
   (typed syntax)
   (typed lang)
   (typed compiled)
+  (typed thunk)
   (typed evaluate))
