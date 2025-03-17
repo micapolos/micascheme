@@ -1,5 +1,56 @@
 (import (micascheme) (typed evaluated) (typed thunk) (typed compiled) (typed scope))
 
+; evaluated-promote
+
+(check
+  (equal?
+    (evaluated-promote
+      (environment '(scheme))
+      "foo"
+      2)
+    "foo"))
+
+(check
+  (equal?
+    (evaluated-promote
+      (environment '(scheme))
+      (thunk 5
+        (compiled
+          (scope (foo "foo"))
+          '(string-append foo "bar")))
+      2)
+    (thunk 3
+      (compiled
+        (scope (foo "foo"))
+        '(string-append foo "bar")))))
+
+(check
+  (equal?
+    (evaluated-promote
+      (environment '(scheme))
+      (thunk 5
+        (compiled
+          (scope (foo "foo"))
+          '(string-append foo "bar")))
+      5)
+    (thunk 0
+      (compiled
+        (scope (foo "foo"))
+        '(string-append foo "bar")))))
+
+(check
+  (equal?
+    (evaluated-promote
+      (environment '(scheme))
+      (thunk 5
+        (compiled
+          (scope (foo "foo"))
+          '(string-append foo "bar")))
+      6)
+    "foobar"))
+
+; evaluated-max-index?
+
 (check
   (equal?
     (evaluated-max-index? 123)
@@ -79,5 +130,3 @@
           (bar-1 "bar-1")
           (bar-2 "bar-2"))
         '(tmp_0 (string-append foo-1 foo-2) ", " (string-append bar-1 bar-2))))))
-
-

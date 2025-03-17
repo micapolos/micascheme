@@ -1,5 +1,6 @@
 (library (typed evaluated)
   (export
+    evaluated-promote
     evaluated-max-index?
     evaluated-list-max-index?
     evaluated-compiled
@@ -10,6 +11,13 @@
     (typed compiled))
 
   ;(enum (evaluated thunk value))
+
+  (define (evaluated-promote $environment $evaluated $depth)
+    (switch $evaluated
+      ((thunk? $thunk)
+        (thunk-promote $environment $thunk $depth))
+      ((else $value)
+        $value)))
 
   (define (evaluated-max-index? $evaluated)
     (switch $evaluated
