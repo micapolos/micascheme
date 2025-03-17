@@ -8,4 +8,5 @@
   (typed scope)
   (typed compiled)
   (typed thunk)
+  (typed evaluated)
   (typed evaluate))
