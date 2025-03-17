@@ -5,6 +5,7 @@
   (typed typed)
   (typed syntax)
   (typed lang)
+  (typed scope)
   (typed compiled)
   (typed thunk)
   (typed evaluate))

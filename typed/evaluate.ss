@@ -1,6 +1,5 @@
 (library (typed evaluate)
   (export
-    scope scope-ref
     hole hole?
     evaluate-syntax)
   (import
@@ -11,24 +10,11 @@
     (typed typed)
     (typed type)
     (typed compiled)
-    (typed thunk))
+    (typed thunk)
+    (typed scope))
 
   ;(enum (evaluated thunk value))
   (data hole)
-
-  (define-rule-syntax (scope (symbol value) ...)
-    (stack (cons 'symbol value) ...))
-
-  (define (scope+ $scope $symbol $value)
-    (push $scope (cons $symbol $value)))
-
-  (define (scope-ref $scope $symbol)
-    (indexed-find
-      (lambda ($index $ass)
-        (and
-          (symbol=? (car $ass) $symbol)
-          (cons $index (cdr $ass))))
-      $scope))
 
   (define (evaluate-identifier $scope $identifier)
     (lets

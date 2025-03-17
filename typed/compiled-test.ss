@@ -1,4 +1,4 @@
-(import (micascheme) (typed compiled) (typed evaluate))
+(import (micascheme) (typed scope) (typed compiled))
 
 (check
   (equal?
