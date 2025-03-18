@@ -6,7 +6,12 @@
     evaluate-lambda
     evaluate-identifier
     evaluate-param
-    evaluate-binding)
+    evaluate-binding
+
+    any-environment any-environment?
+    any-scope any-scope
+    any-typed any-typed?
+    any-evaluate-typed-lambda)
   (import
     (micascheme)
     (evaluator)
@@ -19,6 +24,20 @@
     (typed evaluated)
     (typed scope)
     (typed hole))
+
+  (data any-environment)
+  (data any-scope)
+  (data any-typed)
+
+  (define any-evaluate-typed-lambda
+    (any-lambda
+      (
+        (any-lambda (any-environment any-scope any-syntax) any-typed)
+        any-environment
+        any-scope
+        any-syntax
+        (any-lambda () any-typed))
+      any-typed))
 
   (define (evaluate-identifier $scope $identifier)
     (lets
@@ -63,6 +82,31 @@
         $type)))
 
   (define (evaluate-typed $recurse $environment $scope $syntax)
+    (evaluate-typed-discard $recurse $environment $scope $syntax
+      (lambda ()
+        (evaluate-typed-expanded $recurse $environment $scope $syntax))))
+
+  (define (evaluate-typed-discard $recurse $environment $scope $syntax $discard)
+    (switch $scope
+      ((null? _)
+        ($discard))
+      ((pair? $pair)
+        (lets
+          ((pair $binding $scope) $pair)
+          ((pair $symbol $typed) $binding)
+          ((typed $type $bound) $typed)
+          (cond
+            (
+              (and
+                (type=? $type any-evaluate-typed-lambda)
+                (not (hole? $bound)))
+              ($bound $recurse $environment $scope $syntax
+                (lambda ()
+                  (evaluate-typed-discard $recurse $environment $scope $syntax $discard))))
+            (else
+              (evaluate-typed-discard $recurse $environment $scope $syntax $discard)))))))
+
+  (define (evaluate-typed-expanded $recurse $environment $scope $syntax)
     (syntax-case $syntax (assume assume-type any-lambda lambda expect let)
       (x
         (symbol? (datum x))

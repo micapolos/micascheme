@@ -10,6 +10,7 @@
   (any))
 
 (data a-procedure)
+(define-aux-keyword fixnum)
 
 (define $environment (environment '(scheme)))
 
@@ -158,3 +159,23 @@
         (compiled
           (scope (tmp_1 string-append))
           '(tmp_1 foo! bar))))))
+
+(check
+  (equal?
+    (test-evaluate-typed
+      $environment
+      (stack
+        (cons (gensym)
+          (typed
+            any-evaluate-typed-lambda
+            (lambda ($recurse $environment $scope $syntax $discard)
+              (syntax-case $syntax (fixnum)
+                ((fixnum x)
+                  (if (fixnum? (datum x))
+                    (typed any-fixnum (datum x))
+                    (syntax-error #'x "invalid fixnum")))
+                (other
+                  ($discard)))))))
+      '(fixnum 123))
+    (typed any-fixnum 123)))
+
