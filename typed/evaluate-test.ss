@@ -164,8 +164,8 @@
   (equal?
     (test-evaluate-typed
       $environment
-      (scope
-        (evaluate-typed
+      (stack
+        (cons evaluate-typed-gensym
           (typed
             any-evaluate-typed-lambda
             (lambda ($recurse $environment $scope $syntax $discard)

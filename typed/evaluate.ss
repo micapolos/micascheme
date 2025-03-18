@@ -11,7 +11,8 @@
     any-environment any-environment?
     any-scope any-scope
     any-typed any-typed?
-    any-evaluate-typed-lambda)
+    any-evaluate-typed-lambda
+    evaluate-typed-gensym)
   (import
     (micascheme)
     (evaluator)
@@ -38,6 +39,8 @@
         any-syntax
         (any-lambda () any-typed))
       any-typed))
+
+  (define evaluate-typed-gensym (gensym "evaluate-typed"))
 
   (define (evaluate-identifier $scope $identifier)
     (lets
@@ -98,7 +101,7 @@
           (cond
             (
               (and
-                (symbol=? $symbol 'evaluate-typed)
+                (symbol=? $symbol evaluate-typed-gensym)
                 (type=? $type any-evaluate-typed-lambda)
                 (not (hole? $bound)))
               ($bound $recurse $environment $scope $syntax
