@@ -98,6 +98,7 @@
           (cond
             (
               (and
+                (symbol=? $symbol 'evaluate-typed)
                 (type=? $type any-evaluate-typed-lambda)
                 (not (hole? $bound)))
               ($bound $recurse $environment $scope $syntax
