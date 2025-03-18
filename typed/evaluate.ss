@@ -1,5 +1,12 @@
 (library (typed evaluate)
-  (export evaluate-typed)
+  (export
+    evaluate-typed
+    evaluate-value
+    evaluate-type
+    evaluate-lambda
+    evaluate-identifier
+    evaluate-param
+    evaluate-binding)
   (import
     (micascheme)
     (evaluator)
