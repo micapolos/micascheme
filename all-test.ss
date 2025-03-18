@@ -2,6 +2,7 @@
 
 (test
   (asm)
+  (any)
   (boolean)
   (binder)
   (blob)

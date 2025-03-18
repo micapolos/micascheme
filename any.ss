@@ -1,7 +1,7 @@
 (library (any)
   (export
     any any? any-value
-    any-datum any-datum
+    any-datum any-datum?
     any-boolean any-boolean?
     any-symbol any-symbol?
     any-char any-char?
@@ -14,6 +14,8 @@
     any-type any-type?
     any-list any-list? any-list-item
     any-any-list any-any-list?
+    any-option any-option? any-option-item
+    any-any-option any-any-option?
     any-fixnum-between any-fixnum-between? any-fixnum-between-min any-fixnum-between-max
     any-integer-between any-integer-between? any-integer-between-min any-integer-between-max
     (rename
@@ -35,6 +37,7 @@
   (data any-flonum)
   (data any-integer)
   (data any-type)
+  (data (any-option item))
   (data (any-list item))
   (data (any-fixnum-between min max))
   (data (any-integer-between min max))
@@ -58,6 +61,7 @@
 
   (data any-any-list)
   (data any-any-lambda)
+  (data any-any-option)
 
   (define-rule-syntax (any-lambda-syntax (param ...) result)
     (any-lambda (list param ...) result))
