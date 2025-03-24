@@ -1,39 +1,54 @@
-(import (micascheme) (typed scope) (typed compiled))
+(import (micascheme) (typed scope) (typed compiled) (typed combo))
 
 (check
   (equal?
-    (compiled-value
+    (compiled-combo
       (environment '(scheme))
       (compiled
         (scope
-          (foo "foo")
-          (bar "bar"))
+          (foo (combo "foo" '(string #\f #\o #\o)))
+          (bar (combo "bar" '(string #\b #\a #\r))))
         '(string-append foo bar)))
-    "foobar"))
+    (combo
+      "foobar"
+      '(lets
+        (bar (string #\b #\a #\r))
+        (foo (string #\f #\o #\o))
+        (string-append foo bar)))))
 
-(check (equal? (value-compiled #t) (compiled (scope) #t)))
-(check (equal? (value-compiled #\a) (compiled (scope) #\a)))
-(check (equal? (value-compiled 123) (compiled (scope) 123)))
-(check (equal? (value-compiled "foo") (compiled (scope) "foo")))
-(check (equal? (value-compiled 'foo) (compiled (scope) 'foo)))
+(check (equal? (combo-compiled (combo #t 'bool)) (compiled (scope) 'bool)))
+(check (equal? (combo-compiled (combo #\a 'char)) (compiled (scope) 'char)))
+(check (equal? (combo-compiled (combo 123 'num)) (compiled (scope) 'num)))
+(check (equal? (combo-compiled (combo "foo" 'str)) (compiled (scope) 'str)))
+(check (equal? (combo-compiled (combo 'foo 'symb)) (compiled (scope) 'symb)))
 
 (check
   (equal?
-    (value-compiled (cons "foo" "bar"))
-    (compiled (scope (tmp_0 (cons "foo" "bar"))) 'tmp_0)))
+    (combo-compiled (combo (cons "foo" "bar") '(cons "foo" "bar")))
+    (compiled (scope) '(cons "foo" "bar"))))
 
 (check
   (equal?
     (combine-compiled-list
       (list
         (compiled
-          (scope (foo-1 "foo-1") (foo-2 "foo-2"))
+          (scope
+            (foo-1 (combo "foo-1" 'foo-1))
+            (foo-2 (combo "foo-2" 'foo-2)))
           '(string-append foo-1 foo-2))
         (compiled
-          (scope (bar-1 "bar-1") (bar-2 "bar-2"))
+          (scope
+            (bar-1 (combo "bar-1" 'bar-1))
+            (bar-2 (combo "bar-2" 'bar-2)))
           '(string-append bar-1 bar-2)))
       (lambda ($datums)
         `(string-append ,@$datums)))
     (compiled
-      (scope (foo-1 "foo-1") (foo-2 "foo-2") (bar-1 "bar-1") (bar-2 "bar-2"))
-      '(string-append (string-append foo-1 foo-2) (string-append bar-1 bar-2)))))
+      (scope
+        (foo-1 (combo "foo-1" 'foo-1))
+        (foo-2 (combo "foo-2" 'foo-2))
+        (bar-1 (combo "bar-1" 'bar-1))
+        (bar-2 (combo "bar-2" 'bar-2)))
+      '(string-append
+        (string-append foo-1 foo-2)
+        (string-append bar-1 bar-2)))))

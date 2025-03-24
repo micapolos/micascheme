@@ -13,7 +13,7 @@
     (lets
       ($new-max-index (- $max-index $depth))
       (if (< $new-max-index 0)
-        (compiled-value $environment $compiled)
+        (compiled-combo $environment $compiled)
         (thunk $new-max-index $compiled))))
 
   (define (combine-thunks $thunks $datum-proc)

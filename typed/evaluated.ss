@@ -10,21 +10,22 @@
     (micascheme)
     (typed thunk)
     (typed compiled)
-    (typed hole))
+    (typed hole)
+    (typed combo))
 
-  ;(enum (evaluated thunk value))
+  ;(enum (evaluated thunk combo))
 
   (define (evaluated-promote $environment $evaluated $depth)
-    (switch $evaluated
+    (switch-exhaustive $evaluated
       ((thunk? $thunk)
         (thunk-promote $environment $thunk $depth))
-      ((else $value)
-        $value)))
+      ((combo? $combo)
+        $combo)))
 
   (define (evaluated-max-index? $evaluated)
-    (switch $evaluated
+    (switch-exhaustive $evaluated
       ((thunk? $thunk) (thunk-max-index $thunk))
-      ((else _) #f)))
+      ((combo? $combo) #f)))
 
   (define (evaluated-list-max-index? $evaluated-list)
     (fold-left
@@ -40,11 +41,11 @@
       $evaluated-list))
 
   (define (evaluated-compiled $evaluated)
-    (switch $evaluated
+    (switch-exhaustive $evaluated
       ((thunk? $thunk)
         (thunk-compiled $thunk))
-      ((else $value)
-        (value-compiled $value))))
+      ((combo? $combo)
+        (combo-compiled $combo))))
 
   (define (combine-evaluated-list $environment $evaluated-list $datum-proc)
     (lets
@@ -55,10 +56,10 @@
       ($max-index? (evaluated-list-max-index? $evaluated-list))
       (if $max-index?
         (thunk $max-index? $compiled)
-        (compiled-value $environment $compiled))))
+        (compiled-combo $environment $compiled))))
 
   (define (evaluated-bound $evaluated)
     (switch $evaluated
       ((thunk? $thunk) hole)
-      ((else $value) $value)))
+      ((combo? $combo) $combo)))
 )

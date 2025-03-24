@@ -1,4 +1,4 @@
-(import (micascheme) (typed evaluated) (typed thunk) (typed compiled) (typed scope))
+(import (micascheme) (typed evaluated) (typed thunk) (typed compiled) (typed scope) (typed combo))
 
 ; evaluated-promote
 
@@ -6,9 +6,9 @@
   (equal?
     (evaluated-promote
       (environment '(scheme))
-      "foo"
+      (combo "foo" "foo")
       2)
-    "foo"))
+    (combo "foo" "foo")))
 
 (check
   (equal?
@@ -44,16 +44,20 @@
       (environment '(scheme))
       (thunk 5
         (compiled
-          (scope (foo "foo"))
+          (scope (foo (combo "foo" '(string #\f #\o #\o))))
           '(string-append foo "bar")))
       6)
-    "foobar"))
+    (combo
+      "foobar"
+      '(lets
+        (foo (string #\f #\o #\o))
+        (string-append foo "bar")))))
 
 ; evaluated-max-index?
 
 (check
   (equal?
-    (evaluated-max-index? 123)
+    (evaluated-max-index? (combo 123 'num))
     #f))
 
 (check
@@ -64,14 +68,14 @@
 
 (check
   (equal?
-    (evaluated-list-max-index? (list 123 124))
+    (evaluated-list-max-index? (list (combo 123 'num1) (combo 124 'num2)))
     #f))
 
 (check
   (equal?
     (evaluated-list-max-index?
       (list
-        123
+        (combo 123 'num1)
         (thunk 5 (compiled (scope) 'foo))
         (thunk 3 (compiled (scope) 'bar))))
     5))
@@ -80,13 +84,8 @@
 
 (check
   (equal?
-    (evaluated-compiled "foo")
-    (compiled (scope) "foo")))
-
-(check
-  (equal?
-    (evaluated-compiled (cons "foo" "bar"))
-    (compiled (scope (tmp_0 (cons "foo" "bar"))) 'tmp_0)))
+    (evaluated-compiled (combo "foo" '(string #\f #\o #\o)))
+    (compiled (scope) '(string #\f #\o #\o))))
 
 (check
   (equal?
@@ -98,35 +97,48 @@
 (check
   (equal?
     (combine-evaluated-list
-      (environment '(scheme))
-      (list "foo" "bar")
+      (environment '(micascheme))
+      (list
+        (combo "foo" '(string #\f #\o #\o))
+        (combo "bar" '(string #\b #\a #\r)))
       (lambda ($datums)
         `(string-append ,@$datums)))
-    "foobar"))
+    (combo
+      "foobar"
+      '(lets
+        (string-append
+          (string #\f #\o #\o)
+          (string #\b #\a #\r))))))
 
 (check
   (equal?
     (combine-evaluated-list
       (environment '(scheme))
       (list
-        string-append
+        (combo string-append 'string-append)
         (thunk 3
           (compiled
-            (scope (foo-1 "foo-1") (foo-2 "foo-2"))
+            (scope
+              (foo-1 (combo "1" '(string #\1)))
+              (foo-2 (combo "2" '(string #\2))))
             '(string-append foo-1 foo-2)))
-        ", "
+        (combo ", " '(string #\, #\space))
         (thunk 5
           (compiled
-            (scope (bar-1 "bar-1") (bar-2 "bar-2"))
-            '(string-append bar-1 bar-2))))
+            (scope
+              (foo-3 (combo "3" '(string #\3)))
+              (foo-4 (combo "4" '(string #\4))))
+            '(string-append foo-3 foo-4))))
       (lambda ($datums)
         `(,@$datums)))
     (thunk 5
       (compiled
         (scope
-          (tmp_0 string-append)
-          (foo-1 "foo-1")
-          (foo-2 "foo-2")
-          (bar-1 "bar-1")
-          (bar-2 "bar-2"))
-        '(tmp_0 (string-append foo-1 foo-2) ", " (string-append bar-1 bar-2))))))
+          (foo-1 (combo "1" '(string #\1)))
+          (foo-2 (combo "2" '(string #\2)))
+          (foo-3 (combo "3" '(string #\3)))
+          (foo-4 (combo "4" '(string #\4))))
+        '(string-append
+          (string-append foo-1 foo-2)
+          (string #\, #\space)
+          (string-append foo-3 foo-4))))))

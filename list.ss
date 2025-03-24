@@ -22,6 +22,7 @@
     filter-map filter-opts
     map-find-indexed
     map-indexed list-indexed
+    assmap-cdr
     indexed-find
     intercalate
     null
@@ -366,4 +367,9 @@
         (define (#,$list->id list) body ...)
         (define (#,$append-id . list) (#,$list->id list)))))
 
+  (define (assmap-cdr $fn $list)
+    (map
+      (lambda ($item)
+        (map-cdr $fn $item))
+      $list))
 )

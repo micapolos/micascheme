@@ -23,7 +23,8 @@
     (typed thunk)
     (typed evaluated)
     (typed scope)
-    (typed hole))
+    (typed hole)
+    (typed combo))
 
   (data any-environment)
   (data any-scope)
@@ -51,8 +52,8 @@
         (switch (typed-value $typed)
           ((hole? _)
             (thunk $index (compiled (stack) $symbol)))
-          ((else $other)
-            $other)))))
+          ((combo? $combo)
+            $combo)))))
 
   (define (evaluate-value $recurse $environment $scope $type $syntax)
     (lets
@@ -78,8 +79,8 @@
     (switch (evaluate-value $recurse $environment $scope any-type $syntax)
       ((thunk? _)
         (syntax-error $syntax "type not constant"))
-      ((else $type)
-        $type)))
+      ((combo? $combo)
+        (combo-value $combo))))
 
   (define (evaluate-typed $recurse $environment $scope $syntax)
     (evaluate-typed-discard $recurse $environment $scope $syntax
@@ -119,16 +120,22 @@
       ((assume type value)
         (typed
           (evaluate-type $recurse $environment $scope #'type)
-          (eval (datum value) $environment)))
+          (combo
+            (eval (datum value) $environment)
+            (datum value))))
       ((assume-type value)
         (typed
           any-type
-          (eval (datum value) $environment)))
+          (combo
+            (eval (datum value) $environment)
+            (datum value))))
       ((any-lambda (param ...) result)
         (typed any-type
-          (make-any-lambda
-            (map (partial evaluate-type $recurse $environment $scope) (syntaxes param ...))
-            (evaluate-type $recurse $environment $scope #'result))))
+          (combo
+            (make-any-lambda
+              (map (partial evaluate-type $recurse $environment $scope) (syntaxes param ...))
+              (evaluate-type $recurse $environment $scope #'result))
+            (syntax->datum $syntax))))
       ((let (binding ...) body)
         (lets
           ($bindings
