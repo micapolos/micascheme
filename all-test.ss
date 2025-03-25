@@ -90,6 +90,7 @@
   (syntax all)
   (tico all)
   (typed all)
+  (typed-scheme all)
   (verilog all)
   (zexy all)
 )
