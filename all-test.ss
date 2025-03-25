@@ -25,6 +25,7 @@
   (indexed)
   (inline)
   (int)
+  (io)
   (leo)
   (leo-syntax)
   (leo2)
