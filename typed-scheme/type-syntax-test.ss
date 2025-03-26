@@ -19,6 +19,10 @@
     boolean-type))
 
 (check
+  (raises
+    (syntax->type $lookup (stack) #'(a-boolean a-boolean))))
+
+(check
   (equal?
     (syntax->type $lookup (stack) #'a-string)
     string-type))
@@ -32,6 +36,14 @@
   (equal?
     (syntax->type $lookup (stack) #'(a-pair a-string a-boolean))
     (pair-type string-type boolean-type)))
+
+(check
+  (raises
+    (syntax->type $lookup (stack) #'a-pair)))
+
+(check
+  (raises
+    (syntax->type $lookup (stack) #'(a-pair a-string))))
 
 (check
   (equal?
