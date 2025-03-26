@@ -10,15 +10,17 @@
   (define-syntax (define-type $syntax)
     (syntax-case $syntax ()
       ((id name)
+        (identifier? #'name)
         (lets
-          ($name (datum->syntax #'id (symbol->string (syntax->datum (identifier name)))))
+          ($name (datum->syntax #'id (symbol->string (datum name))))
           #`(begin
             (define def (type-definition #f (gensym) #,$name 0))
             (define name (defined-type #f def (immutable-vector)))
             (define-property name type-definition? #t))))
       ((id (name param ...))
+        (for-all identifier? (syntaxes name param ...))
         (lets
-          ($name (datum->syntax #'id (symbol->string (syntax->datum (identifier name)))))
+          ($name (datum->syntax #'id (symbol->string (datum name))))
           ($arity (length (syntaxes param ...)))
           ($arity-syntax (datum->syntax #'id $arity))
           #`(begin
