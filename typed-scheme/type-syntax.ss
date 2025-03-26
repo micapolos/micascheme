@@ -46,21 +46,15 @@
           ($scope (fold-left scope+ $scope $params))
           (forall-type $arity ($recurse $lookup $scope #'type))))
       (id
-        (identifier? #'id)
-        (lets
-          ($index? (scope-ref $scope #'id))
-          (cond
-            ($index? (variable-type $index?))
-            (($lookup #'id) (defined-type #f ($lookup #'id) (immutable-vector)))
-            (else (syntax-error #'id "undefined")))))
+        (and (identifier? #'id) (scope-ref $scope #'id))
+        (variable-type (scope-ref $scope #'id)))
+      (id
+        (and (identifier? #'id) ($lookup #'id))
+        (defined-type #f ($lookup #'id) (immutable-vector)))
       ((id arg ...)
-        (identifier? #'id)
-        (switch ($lookup #'id)
-          ((type-definition? $type-definition)
-            (defined-type #f $type-definition
-              (syntaxes->types $recurse $lookup $scope (syntaxes arg ...))))
-          ((else $other)
-            (syntax-error #'id "undefined"))))
+        (and (identifier? #'id) ($lookup #'id))
+        (defined-type #f ($lookup #'id)
+          (syntaxes->types $recurse $lookup $scope (syntaxes arg ...))))
       (other
         (syntax-error #'other "invalid type"))))
 )
