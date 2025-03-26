@@ -61,7 +61,7 @@
           ($typed-body
             ($recurse $lookup $type-scope $scope #'body))
           (typed
-            (lambda-type
+            (lambda-type 0
               (list->immutable-vector $param-types)
               (typed-type $typed-body))
             #`(lambda (name ...)

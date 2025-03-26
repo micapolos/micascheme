@@ -15,6 +15,7 @@
 
     lambda-type
     lambda-type?
+    lambda-type-arity
     lambda-type-params
     lambda-type-result
 
@@ -48,7 +49,7 @@
   (data (type-definition parent? gensym name arity))
 
   (data (defined-type parent? definition arguments))
-  (data (lambda-type params result))
+  (data (lambda-type arity params result))
   (data (union-type items))
   (data (record-type parent? gensym items))
   (data (variable-type index))

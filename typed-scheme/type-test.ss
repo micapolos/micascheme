@@ -9,11 +9,11 @@
 
 (check
   (type-assignable-to?
-    (lambda-type (immutable-vector type-1) type-2)
-    (lambda-type (immutable-vector type-1) type-2)))
+    (lambda-type 0 (immutable-vector type-1) type-2)
+    (lambda-type 0 (immutable-vector type-1) type-2)))
 
 (check
   (not
     (type-assignable-to?
-      (lambda-type (immutable-vector type-1) type-2)
-      (lambda-type (immutable-vector type-2) type-1))))
+      (lambda-type 0 (immutable-vector type-1) type-2)
+      (lambda-type 0 (immutable-vector type-2) type-1))))

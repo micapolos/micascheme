@@ -21,5 +21,5 @@
   (equal?
     (syntax->expr-datum $lookup (stack) (stack) #'(lambda ((a-string s)) s))
     (typed
-      (lambda-type (immutable-vector string-type) string-type)
+      (lambda-type 0 (immutable-vector string-type) string-type)
       '(lambda (s) s))))

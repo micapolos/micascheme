@@ -32,8 +32,16 @@
 
   (define (core-syntax->type $recurse $lookup $scope $syntax)
     (syntax-case $syntax (a-lambda oneof forall)
+      ((a-lambda (forall type-param ...) (param ...) result)
+        (lets
+          ($type-params (syntaxes type-param ...))
+          ($arity (length $type-params))
+          ($scope (fold-left scope+ $scope $type-params))
+          (lambda-type $arity
+            (syntaxes->types $recurse $lookup $scope (syntaxes param ...))
+            ($recurse $lookup $scope #'result))))
       ((a-lambda (param ...) result)
-        (lambda-type
+        (lambda-type 0
           (syntaxes->types $recurse $lookup $scope (syntaxes param ...))
           ($recurse $lookup $scope #'result)))
       ((oneof item ...)
