@@ -41,7 +41,8 @@
     recursive-type?
     recursive-type-type
 
-    type?)
+    type?
+    type-assignable-to?)
   (import (micascheme))
 
   (data (type-definition parent? gensym name arity))
@@ -63,4 +64,8 @@
       (variable-type? $obj)
       (forall-type? $obj)
       (record-type? $obj)))
+
+  ; TODO: Implement properly
+  (define (type-assignable-to? $type $to-type)
+    (equal? $type $to-type))
 )
