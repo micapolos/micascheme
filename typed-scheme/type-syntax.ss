@@ -49,12 +49,25 @@
         (and (identifier? #'id) (scope-ref $scope #'id))
         (variable-type (scope-ref $scope #'id)))
       (id
-        (and (identifier? #'id) ($lookup #'id))
-        (defined-type #f ($lookup #'id) (immutable-vector)))
+        (and (identifier? #'id) (type-definition? ($lookup #'id)))
+        (lets
+          ($type-definition ($lookup #'id))
+          ($arity (type-definition-arity $type-definition))
+          (if (= (type-definition-arity $type-definition) 0)
+            (defined-type #f ($lookup #'id) (immutable-vector))
+            (syntax-error #'id
+              (format "expected ~s arguments in" $arity)))))
       ((id arg ...)
-        (and (identifier? #'id) ($lookup #'id))
-        (defined-type #f ($lookup #'id)
-          (syntaxes->types $recurse $lookup $scope (syntaxes arg ...))))
+        (and (identifier? #'id) (type-definition? ($lookup #'id)))
+        (lets
+          ($type-definition ($lookup #'id))
+          ($arity (type-definition-arity $type-definition))
+          ($args (syntaxes arg ...))
+          (if (= $arity (length $args))
+            (defined-type #f ($lookup #'id)
+              (syntaxes->types $recurse $lookup $scope (syntaxes arg ...)))
+            (syntax-error $syntax
+              (format "expected ~s arguments in" $arity)))))
       (other
         (syntax-error #'other "invalid type"))))
 )
