@@ -13,6 +13,10 @@
     defined-type-definition
     defined-type-arguments
 
+    native-type
+    native-type?
+    native-type-value
+
     lambda-type
     lambda-type?
     lambda-type-arity
@@ -48,6 +52,7 @@
 
   (data (type-definition parent? gensym name arity))
 
+  (data (native-type value))
   (data (defined-type parent? definition arguments))
   (data (lambda-type arity params result))
   (data (union-type items))
@@ -58,6 +63,7 @@
 
   (define (type? $obj)
     (or
+      (native-type? $obj)
       (defined-type? $obj)
       (lambda-type? $obj)
       (union-type? $obj)

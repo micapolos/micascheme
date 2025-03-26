@@ -13,49 +13,52 @@
     (a-number number-type-definition)
     (a-pair pair-type-definition)))
 
+(define (test-syntax->type $lookup $scope $syntax)
+  (syntax->type test-syntax->type $lookup $scope $syntax))
+
 (check
   (equal?
-    (syntax->type $lookup (stack) #'a-boolean)
+    (test-syntax->type $lookup (stack) #'a-boolean)
     boolean-type))
 
 (check
   (raises
-    (syntax->type $lookup (stack) #'(a-boolean a-boolean))))
+    (test-syntax->type $lookup (stack) #'(a-boolean a-boolean))))
 
 (check
   (equal?
-    (syntax->type $lookup (stack) #'a-string)
+    (test-syntax->type $lookup (stack) #'a-string)
     string-type))
 
 (check
   (equal?
-    (syntax->type $lookup (stack) #'a-number)
+    (test-syntax->type $lookup (stack) #'a-number)
     number-type))
 
 (check
   (equal?
-    (syntax->type $lookup (stack) #'(a-pair a-string a-boolean))
+    (test-syntax->type $lookup (stack) #'(a-pair a-string a-boolean))
     (pair-type string-type boolean-type)))
 
 (check
   (raises
-    (syntax->type $lookup (stack) #'a-pair)))
+    (test-syntax->type $lookup (stack) #'a-pair)))
 
 (check
   (raises
-    (syntax->type $lookup (stack) #'(a-pair a-string))))
+    (test-syntax->type $lookup (stack) #'(a-pair a-string))))
 
 (check
   (equal?
-    (syntax->type $lookup (stack) #'(a-lambda (a-string a-boolean) a-number))
+    (test-syntax->type $lookup (stack) #'(a-lambda (a-string a-boolean) a-number))
     (lambda-type 0 (immutable-vector string-type boolean-type) number-type)))
 
 (check
   (equal?
-    (syntax->type $lookup (stack) #'(oneof a-string a-boolean))
+    (test-syntax->type $lookup (stack) #'(oneof a-string a-boolean))
     (union-type (immutable-vector string-type boolean-type))))
 
 (check
   (equal?
-    (syntax->type $lookup (stack) #'(forall (a b) (a-pair a b)))
+    (test-syntax->type $lookup (stack) #'(forall (a b) (a-pair a b)))
     (forall-type 2 (pair-type (variable-type 1) (variable-type 0)))))

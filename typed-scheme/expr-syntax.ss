@@ -23,21 +23,7 @@
           (expr (cdr $binding) (variable-term $index))
           (scope-ref-from $scope $identifier (+ $index 1))))))
 
-  (define (syntax->expr $lookup $type-scope $scope $syntax)
-    (syntax-case $syntax ()
-      (n
-        (fixnum? (datum n))
-        (expr fixnum-type (native-term (datum n))))
-      (n
-        (integer? (datum n))
-        (expr integer-type (native-term (datum n))))
-      (n
-        (number? (datum n))
-        (expr number-type (native-term (datum n))))
-      (other
-        (core-syntax->expr syntax->type syntax->expr $lookup $type-scope $scope #'other))))
-
-  (define (core-syntax->expr $type-recurse $recurse $lookup $type-scope $scope $syntax)
+  (define (syntax->expr $type-recurse $recurse $lookup $type-scope $scope $syntax)
     (syntax-case $syntax (lambda)
       (x
         (and (identifier? #'x) (scope-ref $scope #'x))

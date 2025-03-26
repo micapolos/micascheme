@@ -22,15 +22,12 @@
           $index
           (scope-ref-from $scope $identifier (+ $index 1))))))
 
-  (define (syntax->type $lookup $scope $syntax)
-    (core-syntax->type syntax->type $lookup $scope $syntax))
-
   (define (syntaxes->types $recurse $lookup $scope $syntaxes)
     (vector->immutable-vector
       (list->vector
         (map (partial $recurse $lookup $scope) $syntaxes))))
 
-  (define (core-syntax->type $recurse $lookup $scope $syntax)
+  (define (syntax->type $recurse $lookup $scope $syntax)
     (syntax-case $syntax (a-lambda oneof forall)
       ((a-lambda (forall type-param ...) (param ...) result)
         (lets
