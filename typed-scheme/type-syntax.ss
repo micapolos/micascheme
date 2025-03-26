@@ -16,28 +16,24 @@
   (define (scope-ref-from $scope $identifier $index)
     (switch $scope
       ((null? _)
-        (syntax-error $identifier "not bound"))
+        #f)
       ((pair? (pair $head $scope))
         (if (free-identifier=? $identifier $head)
           $index
           (scope-ref-from $scope $identifier (+ $index 1))))))
 
-  (define (syntax->type $scope $syntax)
-    (syntax-case $syntax (a-boolean a-string a-number)
-      (a-boolean #'boolean-type)
-      (a-string #'string-type)
-      (a-number #'number-type)
-      (other (core-syntax->type syntax->type $scope #'other))))
+  (define (syntax->type $lookup $scope $syntax)
+    (core-syntax->type syntax->type $lookup $scope $syntax))
 
-  (define (core-syntax->type $recurse $scope $syntax)
+  (define (core-syntax->type $recurse $lookup $scope $syntax)
     (syntax-case $syntax (a-lambda oneof forall)
       ((a-lambda (param ...) result)
         #`(lambda-type
-          (immutable-vector #,@(map (partial $recurse $scope) (syntaxes param ...)))
-          #,($recurse $scope #'result)))
+          (immutable-vector #,@(map (partial $recurse $lookup $scope) (syntaxes param ...)))
+          #,($recurse $lookup $scope #'result)))
       ((oneof item ...)
         #`(union-type
-          (immutable-vector #,@(map (partial $recurse $scope) (syntaxes item ...)))))
+          (immutable-vector #,@(map (partial $recurse $lookup $scope) (syntaxes item ...)))))
       ((forall (param ...) type)
         (lets
           ($params (syntaxes param ...))
@@ -45,11 +41,24 @@
           ($scope (fold-left scope+ $scope $params))
           #`(forall-type
             #,(datum->syntax #'forall $arity)
-            #,($recurse $scope #'type))))
+            #,($recurse $lookup $scope #'type))))
       (id
         (identifier? #'id)
-        #`(variable-type
-          #,(datum->syntax #'id (scope-ref $scope #'id))))
+        (lets
+          ($index? (scope-ref $scope #'id))
+          (cond
+            ($index?
+              #`(variable-type
+                #,(datum->syntax #'id $index?)))
+            (($lookup #'id)
+              #'id)
+            (else (syntax-error #'id "undefined")))))
+      ((id arg ...)
+        (identifier? #'id)
+        (cond
+          (($lookup #'id)
+            #`(id #,@(map (partial $recurse $lookup $scope) (syntaxes arg ...))))
+          (else (syntax-error #'id "undefined"))))
       (other
         (syntax-error #'other "invalid type"))))
 )

@@ -1,25 +1,28 @@
 (import
   (micascheme)
   (typed-scheme lang)
-  (typed-scheme type)
-  (typed-scheme types))
+  (typed-scheme type))
 
-(check (equal? (type a-boolean) boolean-type))
-(check (equal? (type a-string) string-type))
-(check (equal? (type a-number) number-type))
+(define-type a-boolean)
+(define-type a-string)
+(define-type a-number)
+
+(check (equal? (type a-boolean) a-boolean))
+(check (equal? (type a-string) a-string))
+(check (equal? (type a-number) a-number))
 
 (check
   (equal?
     (type (a-lambda (a-boolean a-string) a-number))
     (lambda-type
-      (immutable-vector boolean-type string-type)
-      number-type)))
+      (immutable-vector a-boolean a-string)
+      a-number)))
 
 (check
   (equal?
     (type (oneof a-boolean a-string))
     (union-type
-      (immutable-vector boolean-type string-type))))
+      (immutable-vector a-boolean a-string))))
 
 (check
   (equal?
