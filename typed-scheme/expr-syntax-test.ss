@@ -3,6 +3,7 @@
   (syntax lookup)
   (typed-scheme type)
   (typed-scheme types)
+  (typed-scheme expr)
   (typed-scheme expr-syntax))
 
 (define $lookup
@@ -14,12 +15,12 @@
 
 (check
   (equal?
-    (syntax->expr-datum $lookup (stack) (stack) #'123.4)
-    (typed number-type 123.4)))
+    (syntax->expr $lookup (stack) (stack) #'123.4)
+    (expr number-type (native-term 123.4))))
 
 (check
   (equal?
-    (syntax->expr-datum $lookup (stack) (stack) #'(lambda ((a-string s)) s))
-    (typed
+    (syntax->expr $lookup (stack) (stack) #'(lambda ((a-string s)) s))
+    (expr
       (lambda-type 0 (immutable-vector string-type) string-type)
-      '(lambda (s) s))))
+      (lambda-term (variable-term 0)))))

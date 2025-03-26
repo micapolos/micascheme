@@ -1,45 +1,39 @@
 (library (typed-scheme expr-syntax)
-  (export
-    typed typed? typed-type typed-value
-    syntax->expr
-    syntax->expr-datum)
+  (export syntax->expr)
   (import
     (micascheme)
     (typed-scheme keywords)
     (typed-scheme type)
     (typed-scheme types)
+    (typed-scheme expr)
     (typed-scheme type-syntax))
-
-  (data (typed type value))
 
   (define (scope+ $scope $identifier $type)
     (push $scope (cons $identifier $type)))
 
   (define (scope-ref $scope $identifier)
+    (scope-ref-from $scope $identifier 0))
+
+  (define (scope-ref-from $scope $identifier $index)
     (switch $scope
       ((null? _)
         #f)
       ((pair? (pair $binding $scope))
         (if (free-identifier=? $identifier (car $binding))
-          (cdr $binding)
-          (scope-ref $scope $identifier)))))
-
-  (define (syntax->expr-datum $lookup $type-scope $scope $syntax)
-    (lets
-      ($typed (syntax->expr $lookup $type-scope $scope $syntax))
-      (typed-with-value $typed (syntax->datum (typed-value $typed)))))
+          (expr (cdr $binding) (variable-term $index))
+          (scope-ref-from $scope $identifier (+ $index 1))))))
 
   (define (syntax->expr $lookup $type-scope $scope $syntax)
     (syntax-case $syntax ()
       (n
         (fixnum? (datum n))
-        (typed fixnum-type #'n))
+        (expr fixnum-type (native-term (datum n))))
       (n
         (integer? (datum n))
-        (typed integer-type #'n))
+        (expr integer-type (native-term (datum n))))
       (n
         (number? (datum n))
-        (typed number-type #'n))
+        (expr number-type (native-term (datum n))))
       (other
         (core-syntax->expr syntax->type syntax->expr $lookup $type-scope $scope #'other))))
 
@@ -47,7 +41,7 @@
     (syntax-case $syntax (lambda)
       (x
         (and (identifier? #'x) (scope-ref $scope #'x))
-        (typed (scope-ref $scope #'x) #'x))
+        (scope-ref $scope #'x))
       ((lambda ((type name) ...) body)
         (for-all identifier? (syntaxes name ...))
         (lets
@@ -58,12 +52,11 @@
               (syntaxes type ...)))
           ($scope
             (fold-left scope+ $scope $param-names $param-types))
-          ($typed-body
+          ($body-expr
             ($recurse $lookup $type-scope $scope #'body))
-          (typed
+          (expr
             (lambda-type 0
               (list->immutable-vector $param-types)
-              (typed-type $typed-body))
-            #`(lambda (name ...)
-              #,(typed-value $typed-body)))))))
+              (expr-type $body-expr))
+            (lambda-term (expr-term $body-expr)))))))
 )
