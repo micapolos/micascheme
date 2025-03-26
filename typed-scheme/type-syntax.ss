@@ -66,7 +66,7 @@
           (if (= $arity (length $args))
             (defined-type #f ($lookup #'id)
               (syntaxes->types $recurse $lookup $scope (syntaxes arg ...)))
-            (syntax-error $syntax
+            (syntax-error #'id
               (format "expected ~s arguments in" $arity)))))
       (other
         (syntax-error #'other "invalid type"))))
