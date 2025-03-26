@@ -20,28 +20,28 @@
     (micascheme)
     (typed-scheme type))
 
-  (data null-type-definition
+  (define null-type-definition
     (type-definition #f (gensym) "null" 0))
 
-  (data boolean-type-definition
+  (define boolean-type-definition
     (type-definition #f (gensym) "boolean" 0))
 
-  (data string-type-definition
+  (define string-type-definition
     (type-definition #f (gensym) "string" 0))
 
-  (data number-type-definition
+  (define number-type-definition
     (type-definition #f (gensym) "number" 0))
 
-  (data integer-type-definition
+  (define integer-type-definition
     (type-definition number-type-definition (gensym) "integer" 0))
 
-  (data fixnum-type-definition
+  (define fixnum-type-definition
     (type-definition integer-type-definition (gensym) "fixnum" 0))
 
-  (data pair-type-definition
+  (define pair-type-definition
     (type-definition #f (gensym) "pair" 2))
 
-  (data list-type-definition
+  (define list-type-definition
     (type-definition #f (gensym) "list" 1))
 
   (define null-type
