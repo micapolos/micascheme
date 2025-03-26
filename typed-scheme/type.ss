@@ -35,6 +35,7 @@
     forall-type
     forall-type?
     forall-type-arity
+    forall-type-type
 
     recursive-type
     recursive-type?
@@ -50,7 +51,7 @@
   (data (union-type items))
   (data (record-type parent? gensym items))
   (data (variable-type index))
-  (data (forall-type arity))
+  (data (forall-type arity type))
   (data (recursive-type type))
 
   (define (type? $obj)
