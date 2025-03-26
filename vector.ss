@@ -1,7 +1,8 @@
 (library (vector)
   (export
     build-vector
-    build-immutable-vector)
+    build-immutable-vector
+    list->immutable-vector)
   (import (scheme))
 
   (define (build-vector $size $proc)
@@ -14,4 +15,7 @@
 
   (define (build-immutable-vector $size $proc)
     (vector->immutable-vector (build-vector $size $proc)))
+
+  (define (list->immutable-vector $list)
+    (vector->immutable-vector (list->vector $list)))
 )
