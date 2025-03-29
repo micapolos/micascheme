@@ -1,7 +1,8 @@
 (library (typed-scheme type-syntax)
   (export
     syntax->type
-    type->syntax)
+    type->syntax
+    type-definition->syntax)
   (import
     (micascheme)
     (syntax lookup)
@@ -113,7 +114,7 @@
       #,(if $parent?
         (type-definition->syntax $id $parent?)
         (datum->syntax $id #f))
-      #,(datum->syntax $id $gensym)
+      '#,(datum->syntax $id $gensym)
       #,(datum->syntax $id $name)
       #,(datum->syntax $id $arity)))
 )

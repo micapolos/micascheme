@@ -1,5 +1,8 @@
 (library (typed-scheme lang)
-  (export define-type type)
+  (export
+    define-type
+    get-type-definition
+    type)
   (import
     (micascheme)
     (typed-scheme type)
@@ -38,4 +41,10 @@
               (gensym)
               (symbol->string (datum name))
               (length (syntaxes param ...))))))))
+
+  (define-syntax (get-type-definition $syntax $lookup)
+    (syntax-case $syntax ()
+      ((id name)
+        (and (identifier? #'name) (type-definition? ($lookup #'name)))
+        (type-definition->syntax #'id ($lookup #'name)))))
 )

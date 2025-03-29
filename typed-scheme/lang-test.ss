@@ -14,8 +14,8 @@
     (type (oneof))
     (union-type (immutable-vector))))
 
-; (check
-;   (equal?
-;     (type a-null)
-;     (union-type (immutable-vector))))
+(check
+  (equal?
+    (type a-null)
+    (defined-type #f (get-type-definition a-null) (immutable-vector))))
 
