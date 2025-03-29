@@ -8,3 +8,14 @@
 (define-type a-string)
 (define-type a-number)
 (define-type (a-pair car cdr))
+
+(check
+  (equal?
+    (type (oneof))
+    (union-type (immutable-vector))))
+
+; (check
+;   (equal?
+;     (type a-null)
+;     (union-type (immutable-vector))))
+

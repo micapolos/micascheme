@@ -1,11 +1,22 @@
 (library (typed-scheme lang)
-  (export define-type)
+  (export define-type type)
   (import
     (micascheme)
     (typed-scheme type)
     (typed-scheme type-syntax)
     (typed-scheme keywords))
   (export (import (typed-scheme keywords)))
+
+  (define-syntax (type $syntax $lookup)
+    (let ()
+      (define (lang-syntax->type $lookup $scope $syntax)
+        (syntax->type lang-syntax->type $lookup $scope $syntax))
+      (syntax-case $syntax ()
+        ((id x)
+          (type->syntax
+            (lambda ($value) (syntax-error $syntax "native"))
+            #'id
+            (lang-syntax->type $lookup (stack) #'x))))))
 
   (define-syntax (define-type $syntax)
     (syntax-case $syntax ()
