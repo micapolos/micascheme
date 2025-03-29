@@ -1,10 +1,13 @@
 (library (let)
   (export let-values/optimize)
-  (import (scheme) (syntaxes))
+  (import (scheme))
 
-  (define-rules-syntax
-    ((let-values/optimize ((($var) $expr) ...) $body ...)
-      (let (($var $expr) ...) $body ...))
-    ((let-values/optimize ((($var ...) $expr) ...) $body ...)
-      (let-values ((($var ...) $expr) ...) $body ...)))
+  (define-syntax let-values/optimize
+    (syntax-rules ()
+      ((_ ((() $expr) ...) $body ...)
+        (let () $body ...))
+      ((_ ((($var) $expr) ...) $body ...)
+        (let (($var $expr) ...) $body ...))
+      ((_ ((($var ...) $expr) ...) $body ...)
+        (let-values ((($var ...) $expr) ...) $body ...))))
 )

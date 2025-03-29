@@ -1,6 +1,6 @@
 (library (fluent)
   (export fluent also with)
-  (import (scheme) (syntax) (procedure))
+  (import (scheme) (syntax) (procedure) (let))
 
   (define-aux-keywords also with)
 
@@ -44,7 +44,7 @@
                   (lambda ($body)
                     (let
                       (($tmps (generate-temporaries (iota $arity))))
-                      #`(let-values (((#,@$tmps) #,($syntax-proc $body)))
+                      #`(let-values/optimize (((#,@$tmps) #,($syntax-proc $body)))
                         (fn #,@$tmps x ...)
                         (values #,@$tmps))))))
               ((with x ...)
@@ -58,7 +58,7 @@
                   (cons
                     (apply + $arity $x-arities)
                     (lambda ($body)
-                      #`(let-values
+                      #`(let-values/optimize
                         (
                           ((#,@$tmps) #,($syntax-proc $body))
                           #,@(map syntax-cons (map list->syntax $x-tmps) $x-syntaxes))
@@ -69,7 +69,7 @@
                   (lambda ($body)
                     (let
                       (($tmps (generate-temporaries (iota $arity))))
-                      #`(let-values (((#,@$tmps) #,($syntax-proc $body)))
+                      #`(let-values/optimize (((#,@$tmps) #,($syntax-proc $body)))
                         (fn #,@$tmps x ...)))))))))))
 
     (syntax-case $syntax ()
