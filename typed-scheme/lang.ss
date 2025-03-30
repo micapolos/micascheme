@@ -2,7 +2,9 @@
   (export
     define-type
     get-type-definition
-    type)
+    type
+    assume-type
+    typeof)
   (import
     (micascheme)
     (typed-scheme type)
@@ -47,4 +49,20 @@
       ((id name)
         (and (identifier? #'name) (type-definition? ($lookup #'name)))
         (type-definition->syntax #'id ($lookup #'name)))))
+
+  (define-rule-syntax (assume-type id t)
+    (define-property id type t))
+
+  (define-syntax (typeof $syntax $lookup)
+    (syntax-case $syntax ()
+      ((typeof id)
+        (identifier? #'id)
+          (lets
+            ($type? ($lookup #'id #'type))
+            (if $type?
+              (type->syntax
+                (lambda ($value) (syntax-error $syntax "native"))
+                #'typeof
+                $type?)
+              (syntax-error #'id "unknown type"))))))
 )

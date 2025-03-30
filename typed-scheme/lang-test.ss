@@ -19,3 +19,5 @@
     (type a-null)
     (defined-type #f (get-type-definition a-null) (immutable-vector))))
 
+(assume-type string-append (union-type (immutable-vector)))
+(check (equal? (typeof string-append) (union-type (immutable-vector))))
