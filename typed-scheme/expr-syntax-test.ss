@@ -62,3 +62,16 @@
               (expr string-type (variable-term 0)))))))
     '(let ((v0 "foo") (v1 "bar")) v1)))
 
+(check
+  (equal?
+    (pretty-datum
+      (syntax->datum
+        (expr->syntax #'id identity (stack)
+          (expr
+            (lambda-type 0 (immutable-vector string-type string-type) string-type)
+            (lambda-term
+              (list string-type string-type)
+              (expr string-type (variable-term 0)))))))
+    '(lambda (v0 v1) v1)))
+
+

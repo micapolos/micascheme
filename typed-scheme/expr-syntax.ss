@@ -83,7 +83,7 @@
             #,(expr->syntax $id $native $scope $body-expr))))
       ((lambda-term? (lambda-term $param-types $body-expr))
         (lets
-          ($tmps (map generate-temporary $param-types))
+          ($tmps (map (partial scope-gensym $scope $id) (iota (length $param-types))))
           ($scope (fold-left push $scope $tmps))
           #`(lambda (#,@$tmps)
             #,(expr->syntax $id $native $scope $body-expr))))
