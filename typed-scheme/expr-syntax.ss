@@ -23,11 +23,28 @@
           (expr (cdr $binding) (variable-term $index))
           (scope-ref-from $scope $identifier (+ $index 1))))))
 
+  (define (syntax->term-of $recurse $lookup $type-scope $scope $type $syntax)
+    (lets
+      ($expr ($recurse $lookup $type-scope $scope $syntax))
+      (if (type-assignable-to? (expr-type $expr) $type)
+        (expr-term $expr)
+        (syntax-error $syntax "invalid type"))))
+
+  (define (syntax->lambda-expr $recurse $lookup $type-scope $scope $syntax)
+    (lets
+      ($expr ($recurse $lookup $type-scope $scope $syntax))
+      (if (lambda-type? (expr-type $expr))
+        $expr
+        (syntax-error $syntax "invalid type"))))
+
   (define (syntax->expr $type-recurse $recurse $lookup $type-scope $scope $syntax)
     (syntax-case $syntax (lambda let)
       (x
         (and (identifier? #'x) (scope-ref $scope #'x))
         (scope-ref $scope #'x))
+      (x
+        (and (identifier? #'x) ($lookup #'x))
+        (expr ($lookup #'x) (native-term #'x)))
       ((lambda ((type name) ...) body)
         (for-all identifier? (syntaxes name ...))
         (lets
@@ -57,7 +74,19 @@
           ($body-expr ($recurse $lookup $type-scope $scope #'body))
           (expr
             (expr-type $body-expr)
-            (bind-term $exprs $body-expr))))))
+            (bind-term $exprs $body-expr))))
+      ((fn arg ...)
+        (lets
+          ($lambda-expr (syntax->lambda-expr $recurse $lookup $type-scope $scope #'fn))
+          ($lambda-type (expr-type $lambda-expr))
+          ($arg-exprs
+            (map-with
+              ($type (lambda-type-params $lambda-type))
+              ($arg (syntaxes arg ...))
+              (syntax->term-of $recurse $lookup $type-scope $scope $type $arg)))
+          (expr
+            (lambda-type-result $lambda-type)
+            (application-term $lambda-expr $arg-exprs))))))
 
   (define (scope-gensym $scope $id $index)
     (datum->syntax $id

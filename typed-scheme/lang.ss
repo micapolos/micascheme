@@ -4,13 +4,29 @@
     get-type-definition
     type
     assume-type
-    typeof)
+    typeof
+    typed)
   (import
     (micascheme)
     (typed-scheme type)
     (typed-scheme type-syntax)
+    (typed-scheme expr-syntax)
     (typed-scheme keywords))
   (export (import (typed-scheme keywords)))
+
+  (define-syntax (typed $syntax $lookup)
+    (let ()
+      (define ($type-lookup $id)
+        ($lookup $id #'type))
+      (define (lang-syntax->type $lookup $scope $syntax)
+        (syntax->type lang-syntax->type $lookup $scope $syntax))
+      (define (lang-syntax->expr $type-lookup $type-scope $scope $syntax)
+        (syntax->expr lang-syntax->type lang-syntax->expr $type-lookup $type-scope $scope $syntax))
+      (syntax-case $syntax ()
+        ((typed x)
+          (fluent
+            (lang-syntax->expr $type-lookup (stack) (stack) #'x)
+            (let $expr (expr->syntax #'typed identity (stack) $expr)))))))
 
   (define-syntax (type $syntax $lookup)
     (let ()

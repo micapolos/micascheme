@@ -9,6 +9,13 @@
 (define-type a-number)
 (define-type (a-pair car cdr))
 
+(assume-type string-append (a-lambda (a-string a-string) a-string))
+
+(check
+  (equal?
+    (typed string-append)
+    string-append))
+
 (check
   (equal?
     (type (oneof))
