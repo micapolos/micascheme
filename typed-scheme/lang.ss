@@ -17,10 +17,10 @@
     (typed-scheme keywords))
   (export (import (typed-scheme keywords)))
 
-  (meta define (lang-syntax->type $lookup $scope $syntax)
-    (syntax->type lang-syntax->type $lookup $scope $syntax))
+  (meta define (lang-syntax->type $type-definition-lookup $scope $syntax)
+    (syntax->type lang-syntax->type $type-definition-lookup $scope $syntax))
 
-  (meta define (lang-syntax->expr $type-lookup $type-scope $scope $syntax)
+  (meta define (lang-syntax->expr $type-definition-lookup $type-lookup $type-scope $scope $syntax)
     (syntax-case $syntax ()
       (s
         (string? (datum s))
@@ -32,10 +32,16 @@
         (boolean? (datum b))
         (expr boolean-type (native-term #'b)))
       (other
-        (syntax->expr lang-syntax->type lang-syntax->expr $type-lookup $type-scope $scope #'other))))
+        (syntax->expr
+          lang-syntax->type
+          lang-syntax->expr
+          $type-definition-lookup
+          $type-lookup
+          $type-scope
+          $scope
+          #'other))))
 
-  (meta define (type-definition-lookup $lookup)
-    $lookup)
+  (meta define (type-definition-lookup $lookup) $lookup)
 
   (meta define (type-lookup $lookup)
     (lambda ($id)
@@ -46,6 +52,7 @@
       ((typed x)
         (fluent
           (lang-syntax->expr
+            (type-definition-lookup $lookup)
             (type-lookup $lookup)
             (stack)
             (stack)
@@ -57,7 +64,13 @@
       ((define-typed name value)
         (identifier? #'name)
         (lets
-          ($expr (lang-syntax->expr (type-lookup $lookup) (stack) (stack) #'value))
+          ($expr
+            (lang-syntax->expr
+              (type-definition-lookup $lookup)
+              (type-lookup $lookup)
+              (stack)
+              (stack)
+              #'value))
           #`(begin
             (define name
               #,(expr->syntax #'define-typed identity (stack) $expr))

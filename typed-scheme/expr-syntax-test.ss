@@ -7,32 +7,46 @@
   (typed-scheme type-syntax)
   (typed-scheme expr-syntax))
 
-(define $lookup
+(define $type-definition-lookup
   (lookup-with
     (a-boolean boolean-type-definition)
     (a-string string-type-definition)
     (a-number number-type-definition)
     (a-pair pair-type-definition)))
 
-(define (test-syntax->type $lookup $scope $syntax)
-  (syntax->type test-syntax->type $lookup $scope $syntax))
+(define $type-lookup
+  (lookup-with))
 
-(define (test-syntax->expr $lookup $type-scope $scope $syntax)
+(define (test-syntax->type $type-definition-lookup $scope $syntax)
+  (syntax->type
+    test-syntax->type
+    $type-definition-lookup
+    $scope
+    $syntax))
+
+(define (test-syntax->expr $type-definition-lookup $type-lookup $type-scope $scope $syntax)
   (syntax-case $syntax ()
     (n
       (string? (datum n))
       (expr string-type (native-term (datum n))))
     (other
-      (syntax->expr test-syntax->type test-syntax->expr $lookup $type-scope $scope #'other))))
+      (syntax->expr
+        test-syntax->type
+        test-syntax->expr
+        $type-definition-lookup
+        $type-lookup
+        $type-scope
+        $scope
+        #'other))))
 
 (check
   (equal?
-    (test-syntax->expr $lookup (stack) (stack) #'"foo")
+    (test-syntax->expr $type-definition-lookup $type-lookup (stack) (stack) #'"foo")
     (expr string-type (native-term "foo"))))
 
 (check
   (equal?
-    (test-syntax->expr $lookup (stack) (stack) #'(lambda ((a-string s)) s))
+    (test-syntax->expr $type-definition-lookup $type-lookup (stack) (stack) #'(lambda ((a-string s)) s))
     (expr
       (lambda-type 0 (immutable-vector string-type) string-type)
       (lambda-term

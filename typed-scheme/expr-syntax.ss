@@ -24,9 +24,9 @@
           (expr (cdr $binding) (variable-term $index))
           (scope-ref-from $scope $identifier (+ $index 1))))))
 
-  (define (syntax->expr-of $recurse $lookup $type-scope $scope $type $syntax)
+  (define (syntax->expr-of $recurse $type-definition-lookup $type-lookup $type-scope $scope $type $syntax)
     (lets
-      ($expr ($recurse $lookup $type-scope $scope $syntax))
+      ($expr ($recurse $type-definition-lookup $type-lookup $type-scope $scope $syntax))
       (if (type-assignable-to? (expr-type $expr) $type)
         $expr
         (syntax-error $syntax
@@ -34,33 +34,33 @@
             (type->datum (expr-type $expr))
             (type->datum $type))))))
 
-  (define (syntax->lambda-expr $recurse $lookup $type-scope $scope $syntax)
+  (define (syntax->lambda-expr $recurse $type-definition-lookup $type-lookup $type-scope $scope $syntax)
     (lets
-      ($expr ($recurse $lookup $type-scope $scope $syntax))
+      ($expr ($recurse $type-definition-lookup $type-lookup $type-scope $scope $syntax))
       (if (lambda-type? (expr-type $expr))
         $expr
         (syntax-error $syntax "invalid type"))))
 
-  (define (syntax->expr $type-recurse $recurse $lookup $type-scope $scope $syntax)
+  (define (syntax->expr $type-recurse $recurse $type-definition-lookup $type-lookup $type-scope $scope $syntax)
     (syntax-case $syntax (lambda let)
       (x
         (and (identifier? #'x) (scope-ref $scope #'x))
         (scope-ref $scope #'x))
       (x
-        (and (identifier? #'x) ($lookup #'x))
-        (expr ($lookup #'x) (native-term #'x)))
+        (and (identifier? #'x) ($type-lookup #'x))
+        (expr ($type-lookup #'x) (native-term #'x)))
       ((lambda ((type name) ...) body)
         (for-all identifier? (syntaxes name ...))
         (lets
           ($param-names (syntaxes name ...))
           ($param-types
             (map
-              (partial $type-recurse $lookup $type-scope)
+              (partial $type-recurse $type-definition-lookup $type-scope)
               (syntaxes type ...)))
           ($scope
             (fold-left scope+ $scope $param-names $param-types))
           ($body-expr
-            ($recurse $lookup $type-scope $scope #'body))
+            ($recurse $type-definition-lookup $type-lookup $type-scope $scope #'body))
           (expr
             (lambda-type 0
               (list->immutable-vector $param-types)
@@ -72,22 +72,22 @@
         (for-all identifier? (syntaxes name ...))
         (lets
           ($names (syntaxes name ...))
-          ($exprs (map ($recurse $lookup $type-scope $scope) (syntaxes exp ...)))
+          ($exprs (map ($recurse $type-definition-lookup $type-lookup $type-scope $scope) (syntaxes exp ...)))
           ($types (map expr-type $exprs))
           ($scope (fold-left scope+ $scope $names $types))
-          ($body-expr ($recurse $lookup $type-scope $scope #'body))
+          ($body-expr ($recurse $type-definition-lookup $type-lookup $type-scope $scope #'body))
           (expr
             (expr-type $body-expr)
             (bind-term $exprs $body-expr))))
       ((fn arg ...)
         (lets
-          ($lambda-expr (syntax->lambda-expr $recurse $lookup $type-scope $scope #'fn))
+          ($lambda-expr (syntax->lambda-expr $recurse $type-definition-lookup $type-lookup $type-scope $scope #'fn))
           ($lambda-type (expr-type $lambda-expr))
           ($arg-exprs
             (map-with
               ($type (vector->list (lambda-type-params $lambda-type)))
               ($arg (syntaxes arg ...))
-              (syntax->expr-of $recurse $lookup $type-scope $scope $type $arg)))
+              (syntax->expr-of $recurse $type-definition-lookup $type-lookup $type-scope $scope $type $arg)))
           (expr
             (lambda-type-result $lambda-type)
             (application-term $lambda-expr $arg-exprs))))))
