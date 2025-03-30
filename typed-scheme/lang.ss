@@ -3,7 +3,7 @@
     define-type
     assume-type
     typed
-    define-typed)
+    (rename (define-typed define)))
   (import
     (micascheme)
     (typed-scheme type)
@@ -121,5 +121,5 @@
               (stack)
               #'t))))
       ((assume-type (id param ...) result)
-        #'(assume-type id (a-lambda (param ...) result)))))
+        #'(assume-type id (any-lambda (param ...) result)))))
 )

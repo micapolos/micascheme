@@ -17,7 +17,7 @@
           ($args (vector->list $args))
           (if (null? $args) $name `(,$name ,@(map scope-type->datum $scope $args)))))
       ((lambda-type? (lambda-type $arity $params $result))
-        `(a-lambda
+        `(any-lambda
           ,@(map (partial scope-type->datum $scope) (vector->list $params))
           ,(scope-type->datum $scope $result)))
       ((union-type? (union-type $items))

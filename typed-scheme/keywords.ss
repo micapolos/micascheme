@@ -1,6 +1,6 @@
 (library (typed-scheme keywords)
-  (export assume expect a-lambda oneof forall)
+  (export assume expect any-lambda oneof forall)
   (import (micascheme))
 
-  (define-aux-keywords assume expect a-lambda oneof forall)
+  (define-aux-keywords assume expect any-lambda oneof forall)
 )

@@ -8,57 +8,57 @@
 
 (define $lookup
   (lookup-with
-    (a-boolean boolean-type-definition)
-    (a-string string-type-definition)
-    (a-number number-type-definition)
-    (a-pair pair-type-definition)))
+    (any-boolean boolean-type-definition)
+    (any-string string-type-definition)
+    (any-number number-type-definition)
+    (any-pair pair-type-definition)))
 
 (define (test-syntax->type $lookup $scope $syntax)
   (syntax->type test-syntax->type $lookup $scope $syntax))
 
 (check
   (equal?
-    (test-syntax->type $lookup (stack) #'a-boolean)
+    (test-syntax->type $lookup (stack) #'any-boolean)
     boolean-type))
 
 (check
   (raises
-    (test-syntax->type $lookup (stack) #'(a-boolean a-boolean))))
+    (test-syntax->type $lookup (stack) #'(any-boolean any-boolean))))
 
 (check
   (equal?
-    (test-syntax->type $lookup (stack) #'a-string)
+    (test-syntax->type $lookup (stack) #'any-string)
     string-type))
 
 (check
   (equal?
-    (test-syntax->type $lookup (stack) #'a-number)
+    (test-syntax->type $lookup (stack) #'any-number)
     number-type))
 
 (check
   (equal?
-    (test-syntax->type $lookup (stack) #'(a-pair a-string a-boolean))
+    (test-syntax->type $lookup (stack) #'(any-pair any-string any-boolean))
     (pair-type string-type boolean-type)))
 
 (check
   (raises
-    (test-syntax->type $lookup (stack) #'a-pair)))
+    (test-syntax->type $lookup (stack) #'any-pair)))
 
 (check
   (raises
-    (test-syntax->type $lookup (stack) #'(a-pair a-string))))
+    (test-syntax->type $lookup (stack) #'(any-pair any-string))))
 
 (check
   (equal?
-    (test-syntax->type $lookup (stack) #'(a-lambda (a-string a-boolean) a-number))
+    (test-syntax->type $lookup (stack) #'(any-lambda (any-string any-boolean) any-number))
     (lambda-type 0 (immutable-vector string-type boolean-type) number-type)))
 
 (check
   (equal?
-    (test-syntax->type $lookup (stack) #'(oneof a-string a-boolean))
+    (test-syntax->type $lookup (stack) #'(oneof any-string any-boolean))
     (union-type (immutable-vector string-type boolean-type))))
 
 (check
   (equal?
-    (test-syntax->type $lookup (stack) #'(forall (a b) (a-pair a b)))
+    (test-syntax->type $lookup (stack) #'(forall (a b) (any-pair a b)))
     (forall-type 2 (pair-type (variable-type 1) (variable-type 0)))))

@@ -22,28 +22,28 @@
     (typed-scheme type))
 
   (define null-type-definition
-    (type-definition #f (gensym) "a-null" 0))
+    (type-definition #f (gensym) "any-null" 0))
 
   (define boolean-type-definition
-    (type-definition #f (gensym) "a-boolean" 0))
+    (type-definition #f (gensym) "any-boolean" 0))
 
   (define string-type-definition
-    (type-definition #f (gensym) "a-string" 0))
+    (type-definition #f (gensym) "any-string" 0))
 
   (define number-type-definition
-    (type-definition #f (gensym) "a-number" 0))
+    (type-definition #f (gensym) "any-number" 0))
 
   (define integer-type-definition
-    (type-definition number-type-definition (gensym) "an-integer" 0))
+    (type-definition number-type-definition (gensym) "any-integer" 0))
 
   (define fixnum-type-definition
-    (type-definition integer-type-definition (gensym) "a-fixnum" 0))
+    (type-definition integer-type-definition (gensym) "any-fixnum" 0))
 
   (define pair-type-definition
-    (type-definition #f (gensym) "a-pair" 2))
+    (type-definition #f (gensym) "any-pair" 2))
 
   (define list-type-definition
-    (type-definition #f (gensym) "a-list" 1))
+    (type-definition #f (gensym) "any-list" 1))
 
   (define null-type
     (defined-type #f null-type-definition (immutable-vector)))
