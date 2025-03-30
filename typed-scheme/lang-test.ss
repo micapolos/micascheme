@@ -8,7 +8,7 @@
 (define-type a-boolean boolean-type-definition)
 (define-type a-string string-type-definition)
 (define-type a-number number-type-definition)
-(define-type (a-pair car cdr))
+(define-type a-pair pair-type-definition)
 
 (check (equal? (typed #t) #t))
 (check (equal? (typed #f) #f))
