@@ -1,5 +1,5 @@
 (import
-  (only (micascheme) check equal? string-append string=? string-length)
+  (only (micascheme) check equal? string-append string=? string-length null)
   (typed-scheme lang)
   (typed-scheme type)
   (typed-scheme types))
@@ -7,13 +7,16 @@
 (define-type any-null null-type-definition)
 (define-type any-boolean boolean-type-definition)
 (define-type any-string string-type-definition)
+(define-type any-char char-type-definition)
 (define-type any-number number-type-definition)
 (define-type any-pair pair-type-definition)
 
+(check (equal? (typed null) null))
 (check (equal? (typed #t) #t))
 (check (equal? (typed #f) #f))
-(check (equal? (typed 123) 123))
+(check (equal? (typed #\a) #\a))
 (check (equal? (typed "foo") "foo"))
+(check (equal? (typed 123) 123))
 
 (assume-type string-append (any-lambda (any-string any-string) any-string))
 (check (equal? (typed string-append) string-append))

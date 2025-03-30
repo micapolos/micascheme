@@ -2,6 +2,7 @@
   (export
     null-type-definition
     boolean-type-definition
+    char-type-definition
     string-type-definition
     number-type-definition
     integer-type-definition
@@ -11,6 +12,7 @@
 
     null-type
     boolean-type
+    char-type
     string-type
     number-type
     integer-type
@@ -26,6 +28,9 @@
 
   (define boolean-type-definition
     (type-definition #f (gensym) "any-boolean" 0))
+
+  (define char-type-definition
+    (type-definition #f (gensym) "any-char" 0))
 
   (define string-type-definition
     (type-definition #f (gensym) "any-string" 0))
@@ -50,6 +55,9 @@
 
   (define boolean-type
     (defined-type #f boolean-type-definition (immutable-vector)))
+
+  (define char-type
+    (defined-type #f char-type-definition (immutable-vector)))
 
   (define string-type
     (defined-type #f string-type-definition (immutable-vector)))

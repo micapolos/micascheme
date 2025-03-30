@@ -14,13 +14,18 @@
     (typed-scheme keywords))
   (export
     (import (typed-scheme keywords))
-    (import (only (scheme) lambda)))
+    (import (only (micascheme) lambda null)))
 
   (meta define (lang-syntax->type $type-definition-lookup $scope $syntax)
     (syntax->type lang-syntax->type $type-definition-lookup $scope $syntax))
 
   (meta define (lang-syntax->expr $type-definition-lookup $type-lookup $type-scope $scope $syntax)
-    (syntax-case $syntax ()
+    (syntax-case $syntax (null)
+      (null
+        (expr null-type (native-term #''())))
+      (c
+        (char? (datum c))
+        (expr char-type (native-term #'c)))
       (s
         (string? (datum s))
         (expr string-type (native-term #'s)))
