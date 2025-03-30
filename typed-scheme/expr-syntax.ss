@@ -69,6 +69,8 @@
     (switch (expr-term $expr)
       ((native-term? $native-term)
         ($native (native-term-value $native-term)))
+      ((variable-term? (variable-term $index))
+        (list-ref $scope $index))
       ((bind-term? (bind-term $bound-exprs $body-expr))
         (lets
           ($tmps (map (partial scope-gensym $scope $id) (iota (length $bound-exprs))))
@@ -87,6 +89,8 @@
           ($scope (fold-left push $scope $tmps))
           #`(lambda (#,@$tmps)
             #,(expr->syntax $id $native $scope $body-expr))))
-      ((variable-term? (variable-term $index))
-        (list-ref $scope $index))))
+      ((application-term? (application-term $lambda-expr $arg-exprs))
+        #`(
+          #,(expr->syntax $id $native $scope $lambda-expr)
+          #,@(map (partial expr->syntax $id $native $scope) $arg-exprs)))))
 )

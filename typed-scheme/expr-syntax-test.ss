@@ -90,4 +90,20 @@
               (expr string-type (variable-term 0)))))))
     '(lambda (v0 v1) v1)))
 
+(check
+  (equal?
+    (pretty-datum
+      (syntax->datum
+        (expr->syntax #'id identity (stack #'fn #'foo #'bar)
+          (expr (native-type 'result)
+            (application-term
+              (expr
+                (lambda-type 0
+                  (immutable-vector (native-type 'p1) (native-type 'p2))
+                  (native-type 'result))
+                (variable-term 2))
+              (list
+                (expr (native-type 'p1) (variable-term 1))
+                (expr (native-type 'p2) (variable-term 0))))))))
+    '(fn foo bar)))
 

@@ -5,19 +5,24 @@
     expr-type
     expr-term
 
-    lambda-term
-    lambda-term?
-    lambda-term-param-types
-    lambda-term-body-expr
+    native-term
+    native-term?
+    native-term-value
 
     bind-term
     bind-term?
     bind-term-bound-exprs
     bind-term-body-expr
 
-    native-term
-    native-term?
-    native-term-value
+    lambda-term
+    lambda-term?
+    lambda-term-param-types
+    lambda-term-body-expr
+
+    application-term
+    application-term?
+    application-term-lambda-expr
+    application-term-arg-exprs
 
     variable-term
     variable-term?
@@ -28,8 +33,9 @@
 
   (data (expr type term))
   (data (native-term value))
-  (data (lambda-term param-types body-expr))
   (data (bind-term bound-exprs body-expr))
+  (data (lambda-term param-types body-expr))
+  (data (application-term lambda-expr arg-exprs))
   (data (variable-term index))
 
   (define (term? $obj)
