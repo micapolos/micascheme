@@ -12,6 +12,7 @@
   (code)
   (compiler)
   (current)
+  (datum)
   (decompiler)
   (evaluator)
   (failable)

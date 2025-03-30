@@ -35,4 +35,30 @@
     (test-syntax->expr $lookup (stack) (stack) #'(lambda ((a-string s)) s))
     (expr
       (lambda-type 0 (immutable-vector string-type) string-type)
-      (lambda-term (variable-term 0)))))
+      (lambda-term
+        (immutable-vector string-type)
+        (expr string-type (variable-term 0))))))
+
+; === expr->syntax
+
+(check
+  (equal?
+    (pretty-datum
+      (syntax->datum
+        (expr->syntax #'id identity (stack)
+        (expr string-type (native-term #'"foo")))))
+    "foo"))
+
+(check
+  (equal?
+    (pretty-datum
+      (syntax->datum
+        (expr->syntax #'id identity (stack)
+          (expr string-type
+            (bind-term
+              (list
+                (expr string-type (native-term #'"foo"))
+                (expr string-type (native-term #'"bar")))
+              (expr string-type (variable-term 0)))))))
+    '(let ((v0 "foo") (v1 "bar")) v1)))
+
