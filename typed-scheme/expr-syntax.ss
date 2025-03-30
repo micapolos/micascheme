@@ -30,16 +30,18 @@
       (if (type-assignable-to? (expr-type $expr) $type)
         $expr
         (syntax-error $syntax
-          (format "invalid type ~s, expected ~s, in"
+          (format "invalid type ~s, expected ~s in"
             (type->datum (expr-type $expr))
             (type->datum $type))))))
 
   (define (syntax->lambda-expr $recurse $type-definition-lookup $type-lookup $type-scope $scope $syntax)
     (lets
       ($expr ($recurse $type-definition-lookup $type-lookup $type-scope $scope $syntax))
-      (if (lambda-type? (expr-type $expr))
-        $expr
-        (syntax-error $syntax "invalid type"))))
+      (switch (expr-type $expr)
+        ((lambda-type? $lambda-type) $expr)
+        ((else $type)
+          (syntax-error $syntax
+            (format "invalid type ~s, expected any-lambda in" $type))))))
 
   (define (syntax->expr $type-recurse $recurse $type-definition-lookup $type-lookup $type-scope $scope $syntax)
     (syntax-case $syntax (assume lambda let expect)
