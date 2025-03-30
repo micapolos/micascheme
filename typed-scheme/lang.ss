@@ -33,12 +33,19 @@
       (other
         (syntax->expr lang-syntax->type lang-syntax->expr $type-lookup $type-scope $scope #'other))))
 
+  (meta define (type-definition-lookup $lookup)
+    $lookup)
+
+  (meta define (type-lookup $lookup)
+    (lambda ($id)
+      ($lookup $id #'type)))
+
   (define-syntax (typed $syntax $lookup)
     (syntax-case $syntax ()
       ((typed x)
         (fluent
           (lang-syntax->expr
-            (lambda ($id) ($lookup $id #'type))
+            (type-lookup $lookup)
             (stack)
             (stack)
             #'x)
@@ -50,7 +57,7 @@
         (type->syntax
           (lambda ($value) (syntax-error $syntax "native"))
           #'id
-          (lang-syntax->type $lookup (stack) #'x)))))
+          (lang-syntax->type (type-definition-lookup $lookup) (stack) #'x)))))
 
   (define-syntax (define-type $syntax)
     (syntax-case $syntax ()
