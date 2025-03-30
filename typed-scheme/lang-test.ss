@@ -24,6 +24,15 @@
 (check (equal? (typed (string=? "foo" "bar")) #f))
 (check (equal? (typed (string-append "foo" "bar")) "foobar"))
 
+(define-typed foo "foo")
+(define-typed bar "bar")
+
+(check (equal? (typed foo) "foo"))
+(check (equal? (typed bar) "bar"))
+(check (equal? (typed (string-append foo bar)) "foobar"))
+
+;(define-typed string+ (lambda ((a-string a) (a-string b)) a))
+
 (check
   (equal?
     (type (oneof))

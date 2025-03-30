@@ -5,7 +5,8 @@
     type
     assume-type
     typeof
-    typed)
+    typed
+    define-typed)
   (import
     (micascheme)
     (typed-scheme type)
@@ -50,6 +51,24 @@
             (stack)
             #'x)
           (let $expr (expr->syntax #'typed identity (stack) $expr))))))
+
+  (define-syntax (define-typed $syntax $lookup)
+    (syntax-case $syntax ()
+      ((define-typed name value)
+        (identifier? #'name)
+        (lets
+          ($expr (lang-syntax->expr (type-lookup $lookup) (stack) (stack) #'value))
+          #`(begin
+            (define name
+              #,(expr->syntax #'define-typed identity (stack) $expr))
+            (define-property name type
+              #,(type->syntax
+                (lambda ($value) (syntax-error $syntax "native"))
+                #'define-typed
+                (expr-type $expr))))))
+      ((define-typed (name param ...) value)
+        #`(define-typed name
+          (lambda (param ...) value)))))
 
   (define-syntax (type $syntax $lookup)
     (syntax-case $syntax ()
