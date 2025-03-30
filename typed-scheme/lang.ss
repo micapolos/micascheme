@@ -1,10 +1,7 @@
 (library (typed-scheme lang)
   (export
     define-type
-    get-type-definition
-    type
     assume-type
-    typeof
     typed
     define-typed)
   (import
@@ -47,6 +44,9 @@
     (lambda ($id)
       ($lookup $id #'type)))
 
+  (define-syntax (type $syntax)
+    (syntax-error $syntax))
+
   (define-syntax (typed $syntax $lookup)
     (syntax-case $syntax ()
       ((typed x)
@@ -83,14 +83,6 @@
         #`(define-typed name
           (lambda (param ...) value)))))
 
-  (define-syntax (type $syntax $lookup)
-    (syntax-case $syntax ()
-      ((id x)
-        (type->syntax
-          (lambda ($value) (syntax-error $syntax "native"))
-          #'id
-          (lang-syntax->type (type-definition-lookup $lookup) (stack) #'x)))))
-
   (define-syntax (define-type $syntax)
     (syntax-case $syntax ()
       ((id name definition)
@@ -116,29 +108,18 @@
               (symbol->string (datum name))
               (length (syntaxes param ...))))))))
 
-  (define-syntax (get-type-definition $syntax $lookup)
+  (define-syntax (assume-type $syntax $lookup)
     (syntax-case $syntax ()
-      ((id name)
-        (and (identifier? #'name) (type-definition? ($lookup #'name)))
-        (type-definition->syntax #'id ($lookup #'name)))))
-
-  (define-rules-syntax
-    ((assume-type id t)
-      (identifier? #'id)
-      (define-property id type (type t)))
-    ((assume-type (id param ...) result)
-      (assume-type id (a-lambda (param ...) result))))
-
-  (define-syntax (typeof $syntax $lookup)
-    (syntax-case $syntax ()
-      ((typeof id)
+      ((assume-type id t)
         (identifier? #'id)
-          (lets
-            ($type? ($lookup #'id #'type))
-            (if $type?
-              (type->syntax
-                (lambda ($value) (syntax-error $syntax "native"))
-                #'typeof
-                $type?)
-              (syntax-error #'id "unknown type"))))))
+        #`(define-property id type
+          #,(type->syntax
+            (lambda ($value) (syntax-error #'id))
+            #'assume-type
+            (lang-syntax->type
+              (type-definition-lookup $lookup)
+              (stack)
+              #'t))))
+      ((assume-type (id param ...) result)
+        #'(assume-type id (a-lambda (param ...) result)))))
 )
