@@ -45,6 +45,10 @@
 
 (check (equal? (typed (expect a-string "foo")) "foo"))
 
+(define-typed string-len (assume (a-lambda (a-string) a-number) string-length))
+
+(check (equal? (typed (string-len "foo")) 3))
+
 (check
   (equal?
     (type (oneof))

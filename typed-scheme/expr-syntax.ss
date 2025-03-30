@@ -42,13 +42,17 @@
         (syntax-error $syntax "invalid type"))))
 
   (define (syntax->expr $type-recurse $recurse $type-definition-lookup $type-lookup $type-scope $scope $syntax)
-    (syntax-case $syntax (lambda let expect)
+    (syntax-case $syntax (assume lambda let expect)
       (x
         (and (identifier? #'x) (scope-ref $scope #'x))
         (scope-ref $scope #'x))
       (x
         (and (identifier? #'x) ($type-lookup #'x))
         (expr ($type-lookup #'x) (native-term #'x)))
+      ((assume type body)
+        (expr
+          ($type-recurse $type-definition-lookup $type-scope #'type)
+          (native-term #'body)))
       ((lambda ((type name) ...) body)
         (for-all identifier? (syntaxes name ...))
         (lets
