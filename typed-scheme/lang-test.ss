@@ -22,6 +22,7 @@
 (check (equal? (typed string=?) string=?))
 
 (check (equal? (typed (string=? "foo" "bar")) #f))
+(check (equal? (typed (string-append "foo" "bar")) "foobar"))
 
 (check
   (equal?

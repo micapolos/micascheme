@@ -30,7 +30,7 @@
       (if (type-assignable-to? (expr-type $expr) $type)
         $expr
         (syntax-error $syntax
-          (format "type ~s is not assignable to ~s in"
+          (format "invalid type ~s, expected ~s, in"
             (type->datum (expr-type $expr))
             (type->datum $type))))))
 
