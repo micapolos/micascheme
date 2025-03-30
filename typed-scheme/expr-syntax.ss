@@ -79,6 +79,15 @@
           (expr
             (expr-type $body-expr)
             (bind-term $exprs $body-expr))))
+      ((a type expr)
+        (syntax->expr-of
+          $recurse
+          $type-definition-lookup
+          $type-lookup
+          $type-scope
+          $scope
+          ($type-recurse $type-definition-lookup $type-scope #'type)
+          #'expr))
       ((fn arg ...)
         (lets
           ($lambda-expr (syntax->lambda-expr $recurse $type-definition-lookup $type-lookup $type-scope $scope #'fn))
@@ -90,16 +99,7 @@
               (syntax->expr-of $recurse $type-definition-lookup $type-lookup $type-scope $scope $type $arg)))
           (expr
             (lambda-type-result $lambda-type)
-            (application-term $lambda-expr $arg-exprs))))
-      ((a type expr)
-        (syntax->expr-of
-          $recurse
-          $type-definition-lookup
-          $type-lookup
-          $type-scope
-          $scope
-          ($type-recurse $type-definition-lookup $type-scope #'type)
-          #'expr))))
+            (application-term $lambda-expr $arg-exprs))))))
 
   (define (scope-gensym $scope $id $index)
     (datum->syntax $id
