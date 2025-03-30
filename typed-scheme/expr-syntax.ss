@@ -42,7 +42,7 @@
         (syntax-error $syntax "invalid type"))))
 
   (define (syntax->expr $type-recurse $recurse $type-definition-lookup $type-lookup $type-scope $scope $syntax)
-    (syntax-case $syntax (lambda let a)
+    (syntax-case $syntax (lambda let expect)
       (x
         (and (identifier? #'x) (scope-ref $scope #'x))
         (scope-ref $scope #'x))
@@ -79,7 +79,7 @@
           (expr
             (expr-type $body-expr)
             (bind-term $exprs $body-expr))))
-      ((a type expr)
+      ((expect type expr)
         (syntax->expr-of
           $recurse
           $type-definition-lookup

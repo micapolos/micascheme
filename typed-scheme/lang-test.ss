@@ -43,7 +43,7 @@
 
 (check (equal? (typed (string++ foo bar)) "foobar"))
 
-(check (equal? (typed (a a-string (string+ foo bar))) "foobar"))
+(check (equal? (typed (expect a-string "foo")) "foo"))
 
 (check
   (equal?
