@@ -91,7 +91,7 @@
           #,(type-definition->syntax $id $definition)
           (immutable-vector #,@(map (partial type->syntax $value->syntax $id) (vector->list $args)))))
       ((lambda-type? (lambda-type $arity $params $result))
-        #`(a-lambda
+        #`(lambda-type
           #,(datum->syntax $id $arity)
           (immutable-vector #,@(map (partial type->syntax $value->syntax $id) (vector->list $params)))
           #,(type->syntax $value->syntax $id $result)))

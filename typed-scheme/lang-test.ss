@@ -19,5 +19,17 @@
     (type a-null)
     (defined-type #f (get-type-definition a-null) (immutable-vector))))
 
-(assume-type string-append (union-type (immutable-vector)))
-(check (equal? (typeof string-append) (union-type (immutable-vector))))
+(check
+  (equal?
+    (type (a-lambda (a-string a-boolean) a-number))
+    (lambda-type 0
+      (immutable-vector
+        (defined-type #f (get-type-definition a-string) (immutable-vector))
+        (defined-type #f (get-type-definition a-boolean) (immutable-vector)))
+      (defined-type #f (get-type-definition a-number) (immutable-vector)))))
+
+(assume-type string-append (a-lambda (a-string a-string) a-string))
+(check
+  (equal?
+    (typeof string-append)
+    (type (a-lambda (a-string a-string) a-string))))

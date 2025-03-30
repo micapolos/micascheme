@@ -51,7 +51,7 @@
         (type-definition->syntax #'id ($lookup #'name)))))
 
   (define-rule-syntax (assume-type id t)
-    (define-property id type t))
+    (define-property id type (type t)))
 
   (define-syntax (typeof $syntax $lookup)
     (syntax-case $syntax ()
