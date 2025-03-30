@@ -6,6 +6,7 @@
     (rename (define-typed define)))
   (import
     (micascheme)
+    (syntax lookup)
     (typed-scheme type)
     (typed-scheme types)
     (typed-scheme type-syntax)
@@ -14,7 +15,7 @@
     (typed-scheme keywords))
   (export
     (import (typed-scheme keywords))
-    (import (only (micascheme) lambda null)))
+    (import (only (micascheme) lambda null if)))
 
   (meta define (lang-syntax->type $type-definition-lookup $scope $syntax)
     (syntax->type lang-syntax->type $type-definition-lookup $scope $syntax))
@@ -67,7 +68,30 @@
           (let $expr (expr->syntax #'typed identity (stack) $expr))))))
 
   (define-syntax (define-typed $syntax $lookup)
-    (syntax-case $syntax ()
+    (syntax-case $syntax (expect)
+      ((define-typed name (expect typ value))
+        (identifier? #'name)
+        (lets
+          ($type
+            (lang-syntax->type
+              (type-definition-lookup $lookup)
+              (stack)
+              #'typ))
+          ($expr
+            (lang-syntax->expr
+              (type-definition-lookup $lookup)
+              (lookup+ (type-lookup $lookup) #'name $type)
+              (stack)
+              (stack)
+              #'(expect typ value)))
+          #`(begin
+            (define name
+              #,(expr->syntax #'define-typed identity (stack) $expr))
+            (define-property name type
+              #,(type->syntax
+                (lambda ($value) (syntax-error $syntax "native"))
+                #'define-typed
+                $type)))))
       ((define-typed name value)
         (identifier? #'name)
         (lets
@@ -86,6 +110,11 @@
                 (lambda ($value) (syntax-error $syntax "native"))
                 #'define-typed
                 (expr-type $expr))))))
+      ((define-typed (name (type param) ...) (expect result-type value))
+        #`(define-typed name
+          (expect
+            (any-lambda (type ...) result-type)
+            (lambda ((type param) ...) value))))
       ((define-typed (name param ...) value)
         #`(define-typed name
           (lambda (param ...) value)))))

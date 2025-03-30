@@ -44,7 +44,7 @@
             (format "invalid type ~s, expected any-lambda in" $type))))))
 
   (define (syntax->expr $type-recurse $recurse $type-definition-lookup $type-lookup $type-scope $scope $syntax)
-    (syntax-case $syntax (assume lambda let expect)
+    (syntax-case $syntax (assume lambda let expect if)
       (x
         (and (identifier? #'x) (scope-ref $scope #'x))
         (scope-ref $scope #'x))
@@ -85,6 +85,36 @@
           (expr
             (expr-type $body-expr)
             (bind-term $exprs $body-expr))))
+      ((if condition consequent alternate)
+        (lets
+          ($condition-expr
+            (syntax->expr-of
+              $recurse
+              $type-definition-lookup
+              $type-lookup
+              $type-scope
+              $scope
+              boolean-type
+              #'condition))
+          ($consequent-expr
+            ($recurse
+              $type-definition-lookup
+              $type-lookup
+              $type-scope
+              $scope
+              #'consequent))
+          ($alternate-expr
+            (syntax->expr-of
+              $recurse
+              $type-definition-lookup
+              $type-lookup
+              $type-scope
+              $scope
+              (expr-type $consequent-expr)
+              #'alternate))
+          (expr
+            (expr-type $consequent-expr)
+            (if-term $condition-expr $consequent-expr $alternate-expr))))
       ((expect type expr)
         (syntax->expr-of
           $recurse
@@ -140,5 +170,10 @@
       ((application-term? (application-term $lambda-expr $arg-exprs))
         #`(
           #,(expr->syntax $id $native $scope $lambda-expr)
-          #,@(map (partial expr->syntax $id $native $scope) $arg-exprs)))))
+          #,@(map (partial expr->syntax $id $native $scope) $arg-exprs)))
+      ((if-term? (if-term $condition $consequent $alternate))
+        #`(if
+          #,(expr->syntax $id $native $scope $condition)
+          #,(expr->syntax $id $native $scope $consequent)
+          #,(expr->syntax $id $native $scope $alternate)))))
 )

@@ -1,5 +1,5 @@
 (import
-  (only (micascheme) check equal? string-append string=? string-length null)
+  (only (micascheme) check equal? string-append string=? string-length null = + - number->string zero?)
   (typed-scheme lang)
   (typed-scheme type)
   (typed-scheme types))
@@ -51,3 +51,21 @@
 (define string-len (assume (any-lambda (any-string) any-number) string-length))
 
 (check (equal? (typed (string-len "foo")) 3))
+
+(assume-type = (any-lambda (any-number any-number) any-boolean))
+(assume-type + (any-lambda (any-number any-number) any-number))
+(assume-type - (any-lambda (any-number any-number) any-number))
+(assume-type number->string (any-lambda (any-number) any-string))
+(assume-type zero? (any-lambda (any-number) any-boolean))
+
+; recursive declaration
+
+(define (string+numbers (any-string $string) (any-number $number))
+  (expect any-string
+    (if (zero? $number)
+      $string
+      (string+numbers
+        (string-append $string (number->string $number))
+        (- $number 1)))))
+
+(check (equal? (typed (string+numbers "" 5)) "54321"))

@@ -28,6 +28,12 @@
     variable-term?
     variable-term-index
 
+    if-term
+    if-term?
+    if-term-condition
+    if-term-consequent
+    if-term-alternate
+
     term?)
   (import (micascheme))
 
@@ -37,11 +43,13 @@
   (data (lambda-term param-types body-expr))
   (data (application-term lambda-expr arg-exprs))
   (data (variable-term index))
+  (data (if-term condition consequent alternate))
 
   (define (term? $obj)
     (or
       (native-term? $obj)
       (lambda-term? $obj)
       (bind-term? $obj)
-      (variable-term? $obj)))
+      (variable-term? $obj)
+      (if-term? $obj)))
 )

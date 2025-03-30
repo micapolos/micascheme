@@ -60,7 +60,7 @@
     (pretty-datum
       (syntax->datum
         (expr->syntax #'id identity (stack)
-        (expr string-type (native-term #'"foo")))))
+          (expr string-type (native-term #'"foo")))))
     "foo"))
 
 (check
@@ -68,7 +68,7 @@
     (pretty-datum
       (syntax->datum
         (expr->syntax #'id identity (stack #'v0 #'v1)
-        (expr string-type (variable-term 0)))))
+          (expr string-type (variable-term 0)))))
     'v1))
 
 (check
@@ -76,8 +76,21 @@
     (pretty-datum
       (syntax->datum
         (expr->syntax #'id identity (stack #'v0 #'v1)
-        (expr string-type (variable-term 1)))))
+          (expr string-type (variable-term 1)))))
     'v0))
+
+
+(check
+  (equal?
+    (pretty-datum
+      (syntax->datum
+        (expr->syntax #'id identity (stack #'v0 #'v1)
+          (expr string-type
+            (if-term
+              (expr boolean-type (native-term #'cond))
+              (expr string-type (native-term #'foo))
+              (expr string-type (native-term #'bar)))))))
+    '(if cond foo bar)))
 
 (check
   (equal?
