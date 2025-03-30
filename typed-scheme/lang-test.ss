@@ -1,5 +1,5 @@
 (import
-  (except (micascheme) define)
+  (only (micascheme) check equal? string-append string=? string-length)
   (typed-scheme lang)
   (typed-scheme type)
   (typed-scheme types))

@@ -12,7 +12,9 @@
     (typed-scheme expr-syntax)
     (typed-scheme expr)
     (typed-scheme keywords))
-  (export (import (typed-scheme keywords)))
+  (export
+    (import (typed-scheme keywords))
+    (import (only (scheme) lambda)))
 
   (meta define (lang-syntax->type $type-definition-lookup $scope $syntax)
     (syntax->type lang-syntax->type $type-definition-lookup $scope $syntax))
