@@ -9,12 +9,18 @@
 (define-type a-number)
 (define-type (a-pair car cdr))
 
-(assume-type string-append (a-lambda (a-string a-string) a-string))
+(check (equal? (typed #t) #t))
+(check (equal? (typed #f) #f))
+(check (equal? (typed 123) 123))
+(check (equal? (typed "foo") "foo"))
 
-(check
-  (equal?
-    (typed string-append)
-    string-append))
+(assume-type string-append (a-lambda (a-string a-string) a-string))
+(check (equal? (typed string-append) string-append))
+
+(assume-type (string=? a-string a-string) a-boolean)
+(check (equal? (typed string=?) string=?))
+
+;(check (equal? (typed (string=? "foo" "bar")) #f))
 
 (check
   (equal?

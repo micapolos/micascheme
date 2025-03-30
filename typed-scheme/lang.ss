@@ -9,35 +9,48 @@
   (import
     (micascheme)
     (typed-scheme type)
+    (typed-scheme types)
     (typed-scheme type-syntax)
     (typed-scheme expr-syntax)
+    (typed-scheme expr)
     (typed-scheme keywords))
   (export (import (typed-scheme keywords)))
 
+  (meta define (lang-syntax->type $lookup $scope $syntax)
+    (syntax->type lang-syntax->type $lookup $scope $syntax))
+
+  (meta define (lang-syntax->expr $type-lookup $type-scope $scope $syntax)
+    (syntax-case $syntax ()
+      (s
+        (string? (datum s))
+        (expr string-type (native-term #'s)))
+      (n
+        (number? (datum n))
+        (expr number-type (native-term #'n)))
+      (b
+        (boolean? (datum b))
+        (expr boolean-type (native-term #'b)))
+      (other
+        (syntax->expr lang-syntax->type lang-syntax->expr $type-lookup $type-scope $scope #'other))))
+
   (define-syntax (typed $syntax $lookup)
-    (let ()
-      (define ($type-lookup $id)
-        ($lookup $id #'type))
-      (define (lang-syntax->type $lookup $scope $syntax)
-        (syntax->type lang-syntax->type $lookup $scope $syntax))
-      (define (lang-syntax->expr $type-lookup $type-scope $scope $syntax)
-        (syntax->expr lang-syntax->type lang-syntax->expr $type-lookup $type-scope $scope $syntax))
-      (syntax-case $syntax ()
-        ((typed x)
-          (fluent
-            (lang-syntax->expr $type-lookup (stack) (stack) #'x)
-            (let $expr (expr->syntax #'typed identity (stack) $expr)))))))
+    (syntax-case $syntax ()
+      ((typed x)
+        (fluent
+          (lang-syntax->expr
+            (lambda ($id) ($lookup $id #'type))
+            (stack)
+            (stack)
+            #'x)
+          (let $expr (expr->syntax #'typed identity (stack) $expr))))))
 
   (define-syntax (type $syntax $lookup)
-    (let ()
-      (define (lang-syntax->type $lookup $scope $syntax)
-        (syntax->type lang-syntax->type $lookup $scope $syntax))
-      (syntax-case $syntax ()
-        ((id x)
-          (type->syntax
-            (lambda ($value) (syntax-error $syntax "native"))
-            #'id
-            (lang-syntax->type $lookup (stack) #'x))))))
+    (syntax-case $syntax ()
+      ((id x)
+        (type->syntax
+          (lambda ($value) (syntax-error $syntax "native"))
+          #'id
+          (lang-syntax->type $lookup (stack) #'x)))))
 
   (define-syntax (define-type $syntax)
     (syntax-case $syntax ()
@@ -66,8 +79,12 @@
         (and (identifier? #'name) (type-definition? ($lookup #'name)))
         (type-definition->syntax #'id ($lookup #'name)))))
 
-  (define-rule-syntax (assume-type id t)
-    (define-property id type (type t)))
+  (define-rules-syntax
+    ((assume-type id t)
+      (identifier? #'id)
+      (define-property id type (type t)))
+    ((assume-type (id param ...) result)
+      (assume-type id (a-lambda (param ...) result))))
 
   (define-syntax (typeof $syntax $lookup)
     (syntax-case $syntax ()
