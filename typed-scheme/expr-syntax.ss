@@ -6,6 +6,7 @@
     (typed-scheme type)
     (typed-scheme types)
     (typed-scheme expr)
+    (typed-scheme type-datum)
     (typed-scheme type-syntax))
 
   (define (scope+ $scope $identifier $type)
@@ -23,12 +24,15 @@
           (expr (cdr $binding) (variable-term $index))
           (scope-ref-from $scope $identifier (+ $index 1))))))
 
-  (define (syntax->term-of $recurse $lookup $type-scope $scope $type $syntax)
+  (define (syntax->expr-of $recurse $lookup $type-scope $scope $type $syntax)
     (lets
       ($expr ($recurse $lookup $type-scope $scope $syntax))
       (if (type-assignable-to? (expr-type $expr) $type)
-        (expr-term $expr)
-        (syntax-error $syntax "invalid type"))))
+        $expr
+        (syntax-error $syntax
+          (format "type ~s is not assignable to ~s in"
+            (type->datum (expr-type $expr))
+            (type->datum $type))))))
 
   (define (syntax->lambda-expr $recurse $lookup $type-scope $scope $syntax)
     (lets
@@ -81,9 +85,9 @@
           ($lambda-type (expr-type $lambda-expr))
           ($arg-exprs
             (map-with
-              ($type (lambda-type-params $lambda-type))
+              ($type (vector->list (lambda-type-params $lambda-type)))
               ($arg (syntaxes arg ...))
-              (syntax->term-of $recurse $lookup $type-scope $scope $type $arg)))
+              (syntax->expr-of $recurse $lookup $type-scope $scope $type $arg)))
           (expr
             (lambda-type-result $lambda-type)
             (application-term $lambda-expr $arg-exprs))))))

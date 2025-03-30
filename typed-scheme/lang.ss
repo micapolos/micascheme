@@ -54,6 +54,10 @@
 
   (define-syntax (define-type $syntax)
     (syntax-case $syntax ()
+      ((id name definition)
+        (identifier? #'name)
+        #`(define-syntax name
+          (make-compile-time-value definition)))
       ((id name)
         (identifier? #'name)
         #`(define-syntax name

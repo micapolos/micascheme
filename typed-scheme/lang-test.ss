@@ -1,12 +1,13 @@
 (import
   (micascheme)
   (typed-scheme lang)
-  (typed-scheme type))
+  (typed-scheme type)
+  (typed-scheme types))
 
-(define-type a-null)
-(define-type a-boolean)
-(define-type a-string)
-(define-type a-number)
+(define-type a-null null-type-definition)
+(define-type a-boolean boolean-type-definition)
+(define-type a-string string-type-definition)
+(define-type a-number number-type-definition)
 (define-type (a-pair car cdr))
 
 (check (equal? (typed #t) #t))
@@ -20,7 +21,7 @@
 (assume-type (string=? a-string a-string) a-boolean)
 (check (equal? (typed string=?) string=?))
 
-;(check (equal? (typed (string=? "foo" "bar")) #f))
+(check (equal? (typed (string=? "foo" "bar")) #f))
 
 (check
   (equal?

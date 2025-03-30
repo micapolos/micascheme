@@ -9,6 +9,7 @@
     pair-type-definition
     list-type-definition
 
+    null-type
     boolean-type
     string-type
     number-type
