@@ -53,6 +53,22 @@
   (equal?
     (pretty-datum
       (syntax->datum
+        (expr->syntax #'id identity (stack #'v0 #'v1)
+        (expr string-type (variable-term 0)))))
+    'v1))
+
+(check
+  (equal?
+    (pretty-datum
+      (syntax->datum
+        (expr->syntax #'id identity (stack #'v0 #'v1)
+        (expr string-type (variable-term 1)))))
+    'v0))
+
+(check
+  (equal?
+    (pretty-datum
+      (syntax->datum
         (expr->syntax #'id identity (stack)
           (expr string-type
             (bind-term
