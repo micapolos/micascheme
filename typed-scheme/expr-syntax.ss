@@ -42,7 +42,7 @@
         (syntax-error $syntax "invalid type"))))
 
   (define (syntax->expr $type-recurse $recurse $type-definition-lookup $type-lookup $type-scope $scope $syntax)
-    (syntax-case $syntax (lambda let)
+    (syntax-case $syntax (lambda let a)
       (x
         (and (identifier? #'x) (scope-ref $scope #'x))
         (scope-ref $scope #'x))
@@ -90,7 +90,16 @@
               (syntax->expr-of $recurse $type-definition-lookup $type-lookup $type-scope $scope $type $arg)))
           (expr
             (lambda-type-result $lambda-type)
-            (application-term $lambda-expr $arg-exprs))))))
+            (application-term $lambda-expr $arg-exprs))))
+      ((a type expr)
+        (syntax->expr-of
+          $recurse
+          $type-definition-lookup
+          $type-lookup
+          $type-scope
+          $scope
+          ($type-recurse $type-definition-lookup $type-scope #'type)
+          #'expr))))
 
   (define (scope-gensym $scope $id $index)
     (datum->syntax $id
