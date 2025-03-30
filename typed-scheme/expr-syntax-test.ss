@@ -46,12 +46,12 @@
 
 (check
   (equal?
-    (test-syntax->expr $type-definition-lookup $type-lookup (stack) (stack) #'(lambda ((a-string s)) s))
+    (test-syntax->expr $type-definition-lookup $type-lookup (stack) (stack) #'(lambda ((a-string s) (a-boolean b)) s))
     (expr
-      (lambda-type 0 (immutable-vector string-type) string-type)
+      (lambda-type 0 (immutable-vector string-type boolean-type) string-type)
       (lambda-term
-        (immutable-vector string-type)
-        (expr string-type (variable-term 0))))))
+        (immutable-vector string-type boolean-type)
+        (expr string-type (variable-term 1))))))
 
 ; === expr->syntax
 
@@ -100,7 +100,7 @@
           (expr
             (lambda-type 0 (immutable-vector string-type string-type) string-type)
             (lambda-term
-              (list string-type string-type)
+              (immutable-vector string-type string-type)
               (expr string-type (variable-term 0)))))))
     '(lambda (v0 v1) v1)))
 

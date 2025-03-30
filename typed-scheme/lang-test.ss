@@ -31,7 +31,17 @@
 (check (equal? (typed bar) "bar"))
 (check (equal? (typed (string-append foo bar)) "foobar"))
 
-;(define-typed string+ (lambda ((a-string a) (a-string b)) a))
+(define-typed string+
+  (lambda ((a-string a) (a-string b))
+    (string-append a b)))
+
+(check (equal? (typed (string+ foo bar)) "foobar"))
+
+(define-typed
+  (string++ (a-string a) (a-string b))
+    (string-append a b))
+
+(check (equal? (typed (string++ foo bar)) "foobar"))
 
 (check
   (equal?
