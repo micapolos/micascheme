@@ -74,8 +74,11 @@
       (forall-type? $obj)
       (record-type? $obj)))
 
-  ; TODO: Implement properly
   (define (type-assignable-to? $type $to-type)
+    (scope-type-assignable-to? (stack) $type $to-type))
+
+  ; TODO: Implement properly
+  (define (scope-type-assignable-to? $scope $type $to-type)
     (switch $type
       ((lambda-type? (lambda-type $arity $params $result))
         (switch? $to-type
@@ -83,19 +86,22 @@
             (and
               (= $arity $to-arity)
               (= (vector-length $params) (vector-length $to-params))
-              (for-all type-assignable-to? (vector->list $to-params) (vector->list $params))
-              (type-assignable-to? $result $to-result)))))
+              (for-all
+                (partial scope-type-assignable-to? $scope)
+                (vector->list $to-params)
+                (vector->list $params))
+              (scope-type-assignable-to? $scope $result $to-result)))))
       ((union-type? $union-type)
         (for-all
           (lambda ($type)
-            (type-assignable-to? $type $to-type))
+            (scope-type-assignable-to? $scope $type $to-type))
           (vector->list (union-type-items $union-type))))
       ((else $type)
         (switch $to-type
           ((union-type? $to-union-type)
             (exists
               (lambda ($to-type)
-                (type-assignable-to? $type $to-type))
+                (scope-type-assignable-to? $scope $type $to-type))
               (vector->list (union-type-items $to-union-type))))
           ((else $to-type)
             (equal? $type $to-type))))))
