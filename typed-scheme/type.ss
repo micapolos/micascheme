@@ -1,5 +1,13 @@
 (library (typed-scheme type)
   (export
+    variance?
+    in-variance
+    in-variance?
+    out-variance
+    out-variance?
+    inout-variance
+    inout-variance?
+
     type-definition
     type-definition?
     type-definition-parent?
@@ -54,6 +62,10 @@
     type+)
   (import (micascheme))
 
+  (data in-variance)
+  (data out-variance)
+  (data inout-variance)
+
   (data (type-definition parent? gensym name arity))
 
   (data (native-type value))
@@ -67,6 +79,12 @@
 
   (data hole)
   (data (recursion scope type))
+
+  (define (variance? $obj)
+    (or
+      (in-variance? $obj)
+      (out-variance? $obj)
+      (inout-variance? $obj)))
 
   (define (type? $obj)
     (or

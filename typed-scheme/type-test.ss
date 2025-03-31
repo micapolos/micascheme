@@ -16,6 +16,21 @@
 (define type-1-1 (defined-type type-1 type-definition-1-1 (immutable-vector)))
 (define type-1-2 (defined-type type-1 type-definition-1-2 (immutable-vector)))
 
+; === variance?
+
+(check (in-variance? in-variance))
+(check (out-variance? out-variance))
+(check (inout-variance? inout-variance))
+
+(check (not (in-variance? "foo")))
+(check (not (out-variance? "foo")))
+(check (not (inout-variance? "foo")))
+
+(check (variance? in-variance))
+(check (variance? out-variance))
+(check (variance? inout-variance))
+(check (not (variance? "foo")))
+
 ; === type-assignable-to?
 
 (check (type-assignable-to? (native-type 1) (native-type 1)))
