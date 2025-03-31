@@ -76,7 +76,29 @@
 
   ; TODO: Implement properly
   (define (type-assignable-to? $type $to-type)
-    (equal? $type $to-type))
+    (switch $type
+      ((lambda-type? (lambda-type $arity $params $result))
+        (switch? $to-type
+          ((lambda-type? (lambda-type $to-arity $to-params $to-result))
+            (and
+              (= $arity $to-arity)
+              (= (vector-length $params) (vector-length $to-params))
+              (for-all type-assignable-to? (vector->list $to-params) (vector->list $params))
+              (type-assignable-to? $result $to-result)))))
+      ((union-type? $union-type)
+        (for-all
+          (lambda ($type)
+            (type-assignable-to? $type $to-type))
+          (vector->list (union-type-items $union-type))))
+      ((else $type)
+        (switch $to-type
+          ((union-type? $to-union-type)
+            (exists
+              (lambda ($to-type)
+                (type-assignable-to? $type $to-type))
+              (vector->list (union-type-items $to-union-type))))
+          ((else $to-type)
+            (equal? $type $to-type))))))
 
   (define (type-list $type)
     (switch $type
