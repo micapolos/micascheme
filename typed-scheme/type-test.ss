@@ -30,6 +30,7 @@
 (check (type-assignable-to? type-1-1 type-1-1))
 (check (type-assignable-to? type-1-2 type-1-2))
 (check (not (type-assignable-to? type-1-1 type-1-2)))
+(check (not (type-assignable-to? type-1-2 type-1-1)))
 
 (check
   (type-assignable-to?
