@@ -64,6 +64,7 @@
   (data (recursive-type type))
 
   (data hole)
+  (data (recursion scope type))
 
   (define (type? $obj)
     (or
@@ -107,6 +108,13 @@
                 (fold-left push $scope (make-list $arity hole))
                 $type
                 $to-type)))))
+      ((recursive-type? (recursive-type $type))
+        (switch? $to-type
+          ((recursive-type? (recursive-type $to-type))
+            (scope-type-assignable-to?
+              (push $scope (recursion $scope $to-type))
+              $type
+              $to-type))))
       ((else $type)
         (switch $to-type
           ((union-type? $to-union-type)

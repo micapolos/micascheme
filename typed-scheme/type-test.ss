@@ -59,6 +59,10 @@
 (check (not (type-assignable-to? (forall-type 2 type-1) (forall-type 3 type-1))))
 ;(check (type-assignable-to? type-1 (forall-type 3 type-1)))
 
+;(check (type-assignable-to? type-1 (recursive-type type-1)))
+(check (type-assignable-to? (recursive-type type-1) (recursive-type type-1)))
+(check (not (type-assignable-to? (recursive-type type-1) (recursive-type type-2))))
+
 ; === type+
 
 (check
