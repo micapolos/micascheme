@@ -69,3 +69,5 @@
         (- $number 1)))))
 
 (check (equal? (typed (string+numbers "" 5)) "54321"))
+
+(assume-type equal? (forall (x) (any-lambda (x x) any-boolean)))
