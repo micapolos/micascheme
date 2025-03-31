@@ -103,6 +103,8 @@
           ((defined-type? (defined-type $parent? $definition $arguments))
             (cond
               ((type-definition-gensym=? $definition $to-definition)
+                ; TODO: Implement variance, so it's possible to declare "in" and "out".
+                ; In any-lambda, implicit variable is "in" for params and "out" for result.
                 (for-all (partial scope-type=? $scope)
                   (vector->list $arguments)
                   (vector->list $to-arguments)))
