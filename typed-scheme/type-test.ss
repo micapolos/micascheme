@@ -29,7 +29,24 @@
 (check
   (type-assignable-to?
     (union-type (immutable-vector type-1 type-2))
+    (union-type (immutable-vector type-1 type-2))))
+
+(check
+  (type-assignable-to?
+    (union-type (immutable-vector type-1 type-2))
     (union-type (immutable-vector type-1 type-2 type-3))))
+
+(check
+  (not
+    (type-assignable-to?
+      (union-type (immutable-vector type-1 type-2))
+      type-1)))
+
+(check
+  (not
+    (type-assignable-to?
+      (union-type (immutable-vector type-1 type-2))
+      type-2)))
 
 (check
   (not
