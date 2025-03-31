@@ -115,6 +115,17 @@
               (push $scope (recursion $scope $to-type))
               $type
               $to-type))))
+      ((variable-type? (variable-type $index))
+        (switch? $to-type
+          ((variable-type? (variable-type $to-index))
+            (and
+              (= $index $to-index)
+              (switch-exhaustive (list-ref $scope $index)
+                ((hole? _)
+                  (switch? (list-ref $scope $to-index)
+                    ((hole? _) #t)))
+                ((recursion? (recursion $scope $to-type))
+                  (scope-type-assignable-to? $scope $type $to-type)))))))
       ((else $type)
         (switch $to-type
           ((union-type? $to-union-type)
