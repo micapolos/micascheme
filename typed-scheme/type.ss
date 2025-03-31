@@ -80,9 +80,29 @@
   (define (type-assignable-to? $type $to-type)
     (scope-type-assignable-to? (stack) $type $to-type))
 
+  (define (scope-type=? $scope $type-a $type-b)
+    (and
+      (scope-type-assignable-to? $scope $type-a $type-b)
+      (scope-type-assignable-to? $scope $type-b $type-a)))
+
   ; TODO: Implement properly
   (define (scope-type-assignable-to? $scope $type $to-type)
     (switch $type
+      ((defined-type? (defined-type $parent? $definition $arguments))
+        (switch? $to-type
+          ((defined-type? (defined-type $to-parent? $to-definition $to-arguments))
+            (cond
+              ((type-definition-gensym=? $definition $to-definition)
+                (for-all (partial scope-type=? $scope)
+                  (vector->list $arguments)
+                  (vector->list $to-arguments)))
+              (else
+                (and $parent? (scope-type-assignable-to? $scope $parent? $to-type)))))
+          ((union-type? $to-union-type)
+            (exists
+              (lambda ($to-type)
+                (scope-type-assignable-to? $scope $type $to-type))
+              (vector->list (union-type-items $to-union-type))))))
       ((lambda-type? (lambda-type $arity $params $result))
         (switch? $to-type
           ((lambda-type? (lambda-type $to-arity $to-params $to-result))
@@ -162,4 +182,9 @@
           type-list+type
           (reverse (type-list $type-a))
           (type-list $type-b)))))
+
+  (define (type-definition-gensym=? $type-definition-a $type-definition-b)
+    (symbol=?
+      (type-definition-gensym $type-definition-a)
+      (type-definition-gensym $type-definition-b)))
 )
