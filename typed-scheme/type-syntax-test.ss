@@ -62,3 +62,8 @@
   (equal?
     (test-syntax->type $lookup (stack) #'(forall (a b) (any-pair a b)))
     (forall-type 2 (pair-type (variable-type 1) (variable-type 0)))))
+
+(check
+  (equal?
+    (test-syntax->type $lookup (stack) #'(forall (a b) (any-lambda (a) b)))
+    (forall-type 2 (lambda-type (immutable-vector (variable-type 1)) (variable-type 0)))))
