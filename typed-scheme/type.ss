@@ -93,25 +93,20 @@
 
   ; TODO: Implement properly
   (define (scope-type-assignable-to? $scope $type $to-type)
-    (switch $type
-      ((defined-type? (defined-type $parent? $definition $arguments))
-        (switch? $to-type
-          ((defined-type? (defined-type $to-parent? $to-definition $to-arguments))
+    (switch $to-type
+      ((defined-type? (defined-type $to-parent? $to-definition $to-arguments))
+        (switch? $type
+          ((defined-type? (defined-type $parent? $definition $arguments))
             (cond
               ((type-definition-gensym=? $definition $to-definition)
                 (for-all (partial scope-type=? $scope)
                   (vector->list $arguments)
                   (vector->list $to-arguments)))
               (else
-                (and $parent? (scope-type-assignable-to? $scope $parent? $to-type)))))
-          ((union-type? $to-union-type)
-            (exists
-              (lambda ($to-type)
-                (scope-type-assignable-to? $scope $type $to-type))
-              (vector->list (union-type-items $to-union-type))))))
-      ((lambda-type? (lambda-type $arity $params $result))
-        (switch? $to-type
-          ((lambda-type? (lambda-type $to-arity $to-params $to-result))
+                (and $parent? (scope-type-assignable-to? $scope $parent? $to-type)))))))
+      ((lambda-type? (lambda-type $to-arity $to-params $to-result))
+        (switch? $type
+          ((lambda-type? (lambda-type $arity $params $result))
             (and
               (= $arity $to-arity)
               (= (vector-length $params) (vector-length $to-params))
@@ -120,30 +115,33 @@
                 (vector->list $to-params)
                 (vector->list $params))
               (scope-type-assignable-to? $scope $result $to-result)))))
-      ((union-type? $union-type)
+      ((union-type? $to-union-type)
         (for-all
           (lambda ($type)
-            (scope-type-assignable-to? $scope $type $to-type))
-          (vector->list (union-type-items $union-type))))
-      ((forall-type? (forall-type $arity $type))
-        (switch? $to-type
-          ((forall-type? (forall-type $to-arity $to-type))
+            (exists
+              (lambda ($to-type)
+                (scope-type-assignable-to? $scope $type $to-type))
+              (vector->list (union-type-items $to-union-type))))
+          (type-list $type)))
+      ((forall-type? (forall-type $to-arity $to-type))
+        (switch? $type
+          ((forall-type? (forall-type $arity $type))
             (and
               (= $arity $to-arity)
               (scope-type-assignable-to?
                 (fold-left push $scope (make-list $arity hole))
                 $type
                 $to-type)))))
-      ((recursive-type? (recursive-type $type))
-        (switch? $to-type
-          ((recursive-type? (recursive-type $to-type))
+      ((recursive-type? (recursive-type $to-type))
+        (switch? $type
+          ((recursive-type? (recursive-type $type))
             (scope-type-assignable-to?
               (push $scope (recursion $scope $to-type))
               $type
               $to-type))))
-      ((variable-type? (variable-type $index))
-        (switch? $to-type
-          ((variable-type? (variable-type $to-index))
+      ((variable-type? (variable-type $to-index))
+        (switch? $type
+          ((variable-type? (variable-type $index))
             (and
               (= $index $to-index)
               (switch-exhaustive (list-ref $scope $index)
@@ -152,15 +150,8 @@
                     ((hole? _) #t)))
                 ((recursion? (recursion $scope $to-type))
                   (scope-type-assignable-to? $scope $type $to-type)))))))
-      ((else $type)
-        (switch $to-type
-          ((union-type? $to-union-type)
-            (exists
-              (lambda ($to-type)
-                (scope-type-assignable-to? $scope $type $to-type))
-              (vector->list (union-type-items $to-union-type))))
-          ((else $to-type)
-            (equal? $type $to-type))))))
+      ((else $to-type)
+        (todo))))
 
   (define (type-list $type)
     (switch $type

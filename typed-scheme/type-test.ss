@@ -45,6 +45,8 @@
 
 (check (type-assignable-to? type-1 (union-type (immutable-vector type-1 type-2))))
 (check (type-assignable-to? type-2 (union-type (immutable-vector type-1 type-2))))
+(check (type-assignable-to? type-1-1 (union-type (immutable-vector type-1 type-2))))
+(check (type-assignable-to? type-1-2 (union-type (immutable-vector type-1 type-2))))
 (check (not (type-assignable-to? type-3 (union-type (immutable-vector type-1 type-2)))))
 
 (check
