@@ -104,7 +104,7 @@
             (and
               (= $arity $to-arity)
               (scope-type-assignable-to?
-                (push $scope hole)
+                (fold-left push $scope (make-list $arity hole))
                 $type
                 $to-type)))))
       ((else $type)

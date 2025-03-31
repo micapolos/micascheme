@@ -54,6 +54,10 @@
       (union-type (immutable-vector type-1 type-2))
       (union-type (immutable-vector type-1 type-3)))))
 
+(check (type-assignable-to? (forall-type 3 type-1) (forall-type 3 type-1)))
+(check (not (type-assignable-to? (forall-type 3 type-1) (forall-type 3 type-2))))
+(check (not (type-assignable-to? (forall-type 2 type-1) (forall-type 3 type-1))))
+
 ; === type+
 
 (check
