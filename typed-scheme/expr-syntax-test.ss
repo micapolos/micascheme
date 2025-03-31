@@ -4,6 +4,7 @@
   (typed-scheme type)
   (typed-scheme types)
   (typed-scheme expr)
+  (typed-scheme keywords)
   (typed-scheme type-syntax)
   (typed-scheme expr-syntax))
 
@@ -27,6 +28,12 @@
 (define (test-syntax->expr $type-definition-lookup $type-lookup $type-scope $scope $syntax)
   (syntax-case $syntax ()
     (n
+      (boolean? (datum n))
+      (expr boolean-type (native-term (datum n))))
+    (n
+      (number? (datum n))
+      (expr number-type (native-term (datum n))))
+    (n
       (string? (datum n))
       (expr string-type (native-term (datum n))))
     (other
@@ -46,12 +53,34 @@
 
 (check
   (equal?
-    (test-syntax->expr $type-definition-lookup $type-lookup (stack) (stack) #'(lambda ((a-string s) (a-boolean b)) s))
+    (test-syntax->expr $type-definition-lookup $type-lookup (stack) (stack)
+      #'(lambda ((a-string s) (a-boolean b)) s))
     (expr
       (lambda-type 0 (immutable-vector string-type boolean-type) string-type)
       (lambda-term
         (immutable-vector string-type boolean-type)
         (expr string-type (variable-term 1))))))
+
+(check
+  (equal?
+    (test-syntax->expr $type-definition-lookup $type-lookup (stack) (stack)
+      #'(if #t "foo" "bar"))
+    (expr string-type
+      (if-term
+        (expr boolean-type (native-term #t))
+        (expr string-type (native-term "foo"))
+        (expr string-type (native-term "bar"))))))
+
+(check
+  (equal?
+    (test-syntax->expr $type-definition-lookup $type-lookup (stack) (stack)
+      #'(if #t "foo" 123))
+    (expr
+      (union-type (immutable-vector string-type number-type))
+      (if-term
+        (expr boolean-type (native-term #t))
+        (expr string-type (native-term "foo"))
+        (expr number-type (native-term 123))))))
 
 ; === expr->syntax
 
@@ -133,4 +162,3 @@
                 (expr (native-type 'p1) (variable-term 1))
                 (expr (native-type 'p2) (variable-term 0))))))))
     '(fn foo bar)))
-

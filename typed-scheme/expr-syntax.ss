@@ -104,16 +104,14 @@
               $scope
               #'consequent))
           ($alternate-expr
-            (syntax->expr-of
-              $recurse
+            ($recurse
               $type-definition-lookup
               $type-lookup
               $type-scope
               $scope
-              (expr-type $consequent-expr)
               #'alternate))
           (expr
-            (expr-type $consequent-expr)
+            (type+ (expr-type $consequent-expr) (expr-type $alternate-expr))
             (if-term $condition-expr $consequent-expr $alternate-expr))))
       ((expect type expr)
         (syntax->expr-of
