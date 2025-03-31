@@ -16,7 +16,7 @@
           ($name (string->symbol (type-definition-name $definition)))
           ($args (vector->list $args))
           (if (null? $args) $name `(,$name ,@(map scope-type->datum $scope $args)))))
-      ((lambda-type? (lambda-type $arity $params $result))
+      ((lambda-type? (lambda-type $params $result))
         `(any-lambda
           ,@(map (partial scope-type->datum $scope) (vector->list $params))
           ,(scope-type->datum $scope $result)))

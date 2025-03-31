@@ -68,7 +68,7 @@
           ($body-expr
             ($recurse $type-definition-lookup $type-lookup $type-scope $scope #'body))
           (expr
-            (lambda-type 0
+            (lambda-type
               (list->immutable-vector $param-types)
               (expr-type $body-expr))
             (lambda-term

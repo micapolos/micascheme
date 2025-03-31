@@ -32,16 +32,8 @@
 
   (define (syntax->type $recurse $lookup $scope $syntax)
     (syntax-case $syntax (any-lambda oneof forall)
-      ((any-lambda (forall type-param ...) (param ...) result)
-        (lets
-          ($type-params (syntaxes type-param ...))
-          ($arity (length $type-params))
-          ($scope (fold-left scope+ $scope $type-params))
-          (lambda-type $arity
-            (syntaxes->types $recurse $lookup $scope (syntaxes param ...))
-            ($recurse $lookup $scope #'result))))
       ((any-lambda (param ...) result)
-        (lambda-type 0
+        (lambda-type
           (syntaxes->types $recurse $lookup $scope (syntaxes param ...))
           ($recurse $lookup $scope #'result)))
       ((oneof item ...)
@@ -90,9 +82,8 @@
             (datum->syntax $id #f))
           #,(type-definition->syntax $id $definition)
           (immutable-vector #,@(map (partial type->syntax $value->syntax $id) (vector->list $args)))))
-      ((lambda-type? (lambda-type $arity $params $result))
+      ((lambda-type? (lambda-type $params $result))
         #`(lambda-type
-          #,(datum->syntax $id $arity)
           (immutable-vector #,@(map (partial type->syntax $value->syntax $id) (vector->list $params)))
           #,(type->syntax $value->syntax $id $result)))
       ((union-type? (union-type $items))

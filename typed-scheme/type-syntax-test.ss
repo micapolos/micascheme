@@ -51,7 +51,7 @@
 (check
   (equal?
     (test-syntax->type $lookup (stack) #'(any-lambda (any-string any-boolean) any-number))
-    (lambda-type 0 (immutable-vector string-type boolean-type) number-type)))
+    (lambda-type (immutable-vector string-type boolean-type) number-type)))
 
 (check
   (equal?

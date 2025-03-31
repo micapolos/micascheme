@@ -19,7 +19,6 @@
 
     lambda-type
     lambda-type?
-    lambda-type-arity
     lambda-type-params
     lambda-type-result
 
@@ -59,7 +58,7 @@
 
   (data (native-type value))
   (data (defined-type parent? definition arguments))
-  (data (lambda-type arity params result))
+  (data (lambda-type params result))
   (data (union-type items))
   (data (record-type parent? gensym items))
   (data (variable-type index))
@@ -109,11 +108,10 @@
                   (vector->list $to-arguments)))
               (else
                 (and $parent? (scope-type-assignable-to? $scope $parent? $to-type)))))))
-      ((lambda-type? (lambda-type $to-arity $to-params $to-result))
+      ((lambda-type? (lambda-type $to-params $to-result))
         (switch? $type
-          ((lambda-type? (lambda-type $arity $params $result))
+          ((lambda-type? (lambda-type $params $result))
             (and
-              (= $arity $to-arity)
               (= (vector-length $params) (vector-length $to-params))
               (for-all
                 (partial scope-type-assignable-to? $scope)

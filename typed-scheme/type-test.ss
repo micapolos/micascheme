@@ -37,14 +37,14 @@
 
 (check
   (type-assignable-to?
-    (lambda-type 0 (immutable-vector type-1) type-2)
-    (lambda-type 0 (immutable-vector type-1) type-2)))
+    (lambda-type (immutable-vector type-1) type-2)
+    (lambda-type (immutable-vector type-1) type-2)))
 
 (check
   (not
     (type-assignable-to?
-      (lambda-type 0 (immutable-vector type-1) type-2)
-      (lambda-type 0 (immutable-vector type-2) type-1))))
+      (lambda-type (immutable-vector type-1) type-2)
+      (lambda-type (immutable-vector type-2) type-1))))
 
 (check (type-assignable-to? type-1 (union-type (immutable-vector type-1 type-2))))
 (check (type-assignable-to? type-2 (union-type (immutable-vector type-1 type-2))))
