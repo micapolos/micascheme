@@ -94,6 +94,11 @@
   ; TODO: Implement properly
   (define (scope-type-assignable-to? $scope $type $to-type)
     (switch $to-type
+      ((native-type? (native-type $to-value))
+        (switch? $type
+          ((native-type? (native-type $value))
+            ; Introduce $value-assignable-to?
+            (equal? $value $to-value))))
       ((defined-type? (defined-type $to-parent? $to-definition $to-arguments))
         (switch? $type
           ((defined-type? (defined-type $parent? $definition $arguments))

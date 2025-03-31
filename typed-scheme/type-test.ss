@@ -18,6 +18,9 @@
 
 ; === type-assignable-to?
 
+(check (type-assignable-to? (native-type 1) (native-type 1)))
+(check (not (type-assignable-to? (native-type 1) (native-type 2))))
+
 (check (type-assignable-to? type-1 type-1))
 (check (not (type-assignable-to? type-1 type-2)))
 (check (not (type-assignable-to? type-2 type-1)))
