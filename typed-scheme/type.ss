@@ -46,8 +46,11 @@
     recursive-type?
     recursive-type-type
 
+    type-definition-gensym=?
+
     type?
     type-assignable-to?
+    type=?
 
     type+)
   (import (micascheme))
@@ -79,6 +82,9 @@
 
   (define (type-assignable-to? $type $to-type)
     (scope-type-assignable-to? (stack) $type $to-type))
+
+  (define (type=? $type-a $type-b)
+    (scope-type=? (stack) $type-a $type-b))
 
   (define (scope-type=? $scope $type-a $type-b)
     (and
