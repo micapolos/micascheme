@@ -63,6 +63,8 @@
   (data (forall-type arity type))
   (data (recursive-type type))
 
+  (data hole)
+
   (define (type? $obj)
     (or
       (native-type? $obj)
@@ -96,6 +98,15 @@
           (lambda ($type)
             (scope-type-assignable-to? $scope $type $to-type))
           (vector->list (union-type-items $union-type))))
+      ((forall-type? (forall-type $arity $type))
+        (switch? $to-type
+          ((forall-type? (forall-type $to-arity $to-type))
+            (and
+              (= $arity $to-arity)
+              (scope-type-assignable-to?
+                (push $scope hole)
+                $type
+                $to-type)))))
       ((else $type)
         (switch $to-type
           ((union-type? $to-union-type)
