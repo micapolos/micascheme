@@ -47,7 +47,9 @@
     recursive-type-type
 
     type?
-    type-assignable-to?)
+    type-assignable-to?
+
+    type+)
   (import (micascheme))
 
   (data (type-definition parent? gensym name arity))
@@ -75,4 +77,31 @@
   ; TODO: Implement properly
   (define (type-assignable-to? $type $to-type)
     (equal? $type $to-type))
+
+  (define (type-list $type)
+    (switch $type
+      ((union-type? $union-type)
+        (vector->list (union-type-items $union-type)))
+      ((else $other)
+        (list $other))))
+
+  (define (type-list->type $type-list)
+    (case (length $type-list)
+      ((1) (car $type-list))
+      (else (union-type (list->immutable-vector $type-list)))))
+
+  (define (type-list+type $type-list $type)
+    (cond
+      ((exists (partial type-assignable-to? $type) $type-list)
+        $type-list)
+      (else
+        (cons $type $type-list))))
+
+  (define (type+ $type-a $type-b)
+    (type-list->type
+      (reverse
+        (fold-left
+          type-list+type
+          (reverse (type-list $type-a))
+          (type-list $type-b)))))
 )

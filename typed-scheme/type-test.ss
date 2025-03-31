@@ -2,6 +2,8 @@
 
 (define type-1 (defined-type #f (type-definition #f (gensym) "type-1" 0) (immutable-vector)))
 (define type-2 (defined-type #f (type-definition #f (gensym) "type-2" 0) (immutable-vector)))
+(define type-3 (defined-type #f (type-definition #f (gensym) "type-3" 0) (immutable-vector)))
+(define type-4 (defined-type #f (type-definition #f (gensym) "type-4" 0) (immutable-vector)))
 
 (check (type-assignable-to? type-1 type-1))
 (check (not (type-assignable-to? type-1 type-2)))
@@ -17,3 +19,29 @@
     (type-assignable-to?
       (lambda-type 0 (immutable-vector type-1) type-2)
       (lambda-type 0 (immutable-vector type-2) type-1))))
+
+; === type+
+
+(check
+  (equal?
+    (type+ type-1 type-1)
+    type-1))
+
+(check
+  (equal?
+    (type+ type-1 type-2)
+    (union-type (immutable-vector type-1 type-2))))
+
+(check
+  (equal?
+    (type+
+      (union-type (immutable-vector type-1 type-2))
+      (union-type (immutable-vector type-2 type-3)))
+    (union-type (immutable-vector type-1 type-2 type-3))))
+
+(check
+  (equal?
+    (type+
+      (union-type (immutable-vector))
+      (union-type (immutable-vector)))
+    (union-type (immutable-vector))))
