@@ -61,9 +61,20 @@
 (check
   (equal?
     (test-syntax->type $lookup (stack) #'(forall (a b) (any-pair a b)))
-    (forall-type 2 (pair-type (variable-type 1) (variable-type 0)))))
+    (forall-type
+      (immutable-vector inout-variance inout-variance)
+      (pair-type (variable-type 1) (variable-type 0)))))
+
+(check
+  (equal?
+    (test-syntax->type $lookup (stack) #'(forall ((in a) (out b)) (any-pair a b)))
+    (forall-type
+      (immutable-vector in-variance out-variance)
+      (pair-type (variable-type 1) (variable-type 0)))))
 
 (check
   (equal?
     (test-syntax->type $lookup (stack) #'(forall (a b) (any-lambda (a) b)))
-    (forall-type 2 (lambda-type (immutable-vector (variable-type 1)) (variable-type 0)))))
+    (forall-type
+      (immutable-vector inout-variance inout-variance)
+      (lambda-type (immutable-vector (variable-type 1)) (variable-type 0)))))
