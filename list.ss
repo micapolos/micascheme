@@ -17,7 +17,8 @@
     indices
     fold-while
     find-index
-    list-set list-ref-opt list-drop
+    list-set list-ref? list-drop
+    list-update
     associ
     filter-map filter-opts
     map-find-indexed
@@ -164,12 +165,12 @@
   (define (list-indexed $list)
     (map-indexed (lambda ($index $value) (indexed $value $index)) $list))
 
-  (define (list-ref-opt $list $index)
+  (define (list-ref? $list $index)
     (and
       (pair? $list)
       (if (= $index 0)
         (car $list)
-        (list-ref-opt (cdr $list) (- $index 1)))))
+        (list-ref? (cdr $list) (- $index 1)))))
 
   (define (list-drop $list $count)
     (cond
@@ -177,9 +178,18 @@
       (else (and (pair? $list) (list-drop (cdr $list) (- $count 1))))))
 
   (define (list-set $list $index $obj)
-    (if (> $index 0)
-      (cons (car $list) (list-set (cdr $list) (- $index 1) $obj))
-      (cons $obj (cdr $list))))
+    (list-update $list $index (lambda (_) $obj)))
+
+  (define (list-update $list $index $proc)
+    (cond
+      ((zero? $index)
+        (cons
+          ($proc (car $list))
+          (cdr $list)))
+      (else
+        (cons
+          (car $list)
+          (list-update (cdr $list) (- $index 1) $proc)))))
 
   (define (associ $list $index $obj)
     (cond

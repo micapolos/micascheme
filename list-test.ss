@@ -131,11 +131,11 @@
 
 (check (equal? (map-indexed cons (list "a" "b" "c")) (list (cons 0 "a") (cons 1 "b") (cons 2 "c"))))
 
-; === list-ref-opt ===
+; === list-ref? ===
 
-(check (equal? (list-ref-opt (list "a" "b") 0) "a"))
-(check (equal? (list-ref-opt (list "a" "b") 1) "b"))
-(check (equal? (list-ref-opt (list "a" "b") 2) #f))
+(check (equal? (list-ref? (list "a" "b") 0) "a"))
+(check (equal? (list-ref? (list "a" "b") 1) "b"))
+(check (equal? (list-ref? (list "a" "b") 2) #f))
 
 ; === list-drop ===
 
