@@ -46,7 +46,7 @@
 
     forall-type
     forall-type?
-    forall-type-arity
+    forall-type-variances
     forall-type-type
 
     recursive-type
@@ -74,7 +74,7 @@
   (data (union-type items))
   (data (record-type parent? gensym items))
   (data (variable-type index))
-  (data (forall-type arity type))
+  (data (forall-type variances type))
   (data (recursive-type type))
 
   (data hole)
@@ -146,13 +146,13 @@
                 (scope-type-assignable-to? $scope $type $to-type))
               (vector->list (union-type-items $to-union-type))))
           (type-list $type)))
-      ((forall-type? (forall-type $to-arity $to-type))
+      ((forall-type? (forall-type $to-variances $to-type))
         (switch? $type
-          ((forall-type? (forall-type $arity $type))
+          ((forall-type? (forall-type $variances $type))
             (and
-              (= $arity $to-arity)
+              (equal? $variances $to-variances)
               (scope-type-assignable-to?
-                (fold-left push $scope (make-list $arity hole))
+                (fold-left push $scope (map-with ($variance (vector->list $variances)) hole))
                 $type
                 $to-type)))))
       ((recursive-type? (recursive-type $to-type))
