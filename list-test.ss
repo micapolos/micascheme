@@ -405,3 +405,29 @@
   (check-equal? (list->stack (list 1 2 3)) (list 3 2 1))
   (check-equal? (stack-append 1 2 3) (list 3 2 1)))
 
+; === fold-left? ===
+
+(lets
+  ($proc
+    (lambda ($string? $a $b)
+      (and $string? (not (zero? $b))
+        (string-append
+          (if (zero? (string-length $string?))
+            $string?
+            (string-append $string? ", "))
+          (number->string (div $a $b))))))
+  (run
+    (check
+      (equal?
+        (fold-left? $proc "" (list 10 6 12) (list 2 3 4))
+        "5, 2, 3")))
+  (run
+    (check
+      (equal?
+        (fold-left? $proc #f (list 10 6 12) (list 2 3 4))
+        #f))
+  (run
+    (check
+      (equal?
+        (fold-left? $proc "" (list 10 6 12) (list 2 0 4))
+        #f)))))

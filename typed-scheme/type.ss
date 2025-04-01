@@ -59,7 +59,9 @@
     type-assignable-to?
     type=?
 
-    type+)
+    type+
+
+    proc-scope-specialize?)
   (import (micascheme))
 
   (data in-variance)
@@ -175,6 +177,51 @@
                   (scope-type-assignable-to? $scope $type $to-type)))))))
       ((else $to-type)
         (todo))))
+
+  (define (proc-scope-specialize? $proc $scope $lhs-type $rhs-type)
+    (switch-exhaustive $lhs-type
+      ((native-type? (native-type $lhs-value))
+        (switch? $rhs-type
+          ((native-type? (native-type $rhs-value))
+            (lets?
+              ($value ($proc $scope $lhs-value $rhs-value))
+              (native-type $value)))))
+      ((defined-type? (defined-type $lhs-parent? $lhs-definition $lhs-arguments))
+        (switch? $rhs-type
+          ((defined-type (defined-type $rhs-parent? $rhs-definition $rhs-arguments))
+            (cond
+              ((type-definition-gensym=? $lhs-definition $rhs-definition)
+                (fold-left?
+                  (partial proc-scope-specialize? $proc)
+                  $scope
+                  (vector->list $lhs-arguments)
+                  (vector->list $rhs-arguments)))
+              (else
+                (and $rhs-parent?
+                  (proc-scope-specialize? $proc $scope $lhs-type $rhs-parent?)))))))
+      ((lambda-type? (lambda-type $lhs-params $lhs-result))
+        (switch? $rhs-type
+          ((lambda-type? (lambda-type $rhs-params $rhs-result))
+            (and
+              (= (vector-length $lhs-params) (vector-length $rhs-params))
+              (lets?
+                ($scope
+                  (fold-left?
+                    (partial proc-scope-specialize? $proc)
+                    (vector->list $rhs-params)
+                    (vector->list $lhs-params)))
+                (proc-scope-specialize? $proc $scope $lhs-result $rhs-result))))))))
+
+  (define (proc-scope-variance-specialize? $proc $scope $variance $lhs-type $rhs-type)
+    (switch-exhaustive $variance
+      ((out-variance? _)
+        (proc-scope-specialize? $proc $scope $lhs-type $rhs-type))
+      ((in-variance? _)
+        (proc-scope-specialize? $proc $scope $rhs-type $lhs-type))
+      ((inout-variance? _)
+        (lets?
+          ($scope (proc-scope-specialize? $proc $scope $lhs-type $rhs-type))
+          (proc-scope-specialize? $proc $scope $rhs-type $lhs-type)))))
 
   (define (type-list $type)
     (switch $type

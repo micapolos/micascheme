@@ -28,6 +28,7 @@
     null
     build-list
     ensure-list
+    fold-left?
 
     acc-split
     split
@@ -305,6 +306,15 @@
       $update
       (lambda () (pair $id ($new)))
       $list))
+
+  ; === fold-left? ===
+
+  (define (fold-left? $proc $initial? . $lists)
+    (apply fold-left
+      (lambda ($folded? . $items)
+        (and $folded? (apply $proc $folded? $items)))
+      $initial?
+      $lists))
 
   ; === group-by ===
 
