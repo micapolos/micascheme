@@ -2,8 +2,9 @@
   (export
     define-type
     assume-type
-    typed
-    (rename (define-typed define)))
+    (rename
+      (define-typed define)
+      (%expr expr)))
   (import
     (micascheme)
     (syntax lookup)
@@ -12,7 +13,8 @@
     (typed-scheme type-syntax)
     (typed-scheme expr-syntax)
     (typed-scheme expr)
-    (typed-scheme keywords))
+    (typed-scheme keywords)
+    (typed-scheme typed))
   (export
     (import (typed-scheme keywords))
     (import (only (micascheme) lambda null if)))
@@ -55,9 +57,9 @@
   (define-syntax (type $syntax)
     (syntax-error $syntax))
 
-  (define-syntax (typed $syntax $lookup)
+  (define-syntax (%expr $syntax $lookup)
     (syntax-case $syntax ()
-      ((typed x)
+      ((%expr x)
         (fluent
           (lang-syntax->expr
             (type-definition-lookup $lookup)
@@ -65,7 +67,13 @@
             (stack)
             (stack)
             #'x)
-          (let $expr (expr->syntax #'typed identity (stack) $expr))))))
+          (let $expr
+            #`(typed
+              #,(type->syntax
+                (lambda ($value) (syntax-error $syntax "native"))
+                #'%expr
+                (expr-type $expr))
+              #,(expr->syntax #'typed identity (stack) $expr)))))))
 
   (define-syntax (define-typed $syntax $lookup)
     (syntax-case $syntax (expect)
