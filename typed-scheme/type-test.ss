@@ -1,12 +1,12 @@
 (import (micascheme) (typed-scheme type))
 
-(define type-definition-1 (type-definition #f (gensym) "type-1" 0))
-(define type-definition-2 (type-definition #f (gensym) "type-2" 0))
-(define type-definition-3 (type-definition #f (gensym) "type-3" 0))
-(define type-definition-4 (type-definition #f (gensym) "type-4" 0))
+(define type-definition-1 (type-definition #f (gensym) "type-1" (immutable-vector)))
+(define type-definition-2 (type-definition #f (gensym) "type-2" (immutable-vector)))
+(define type-definition-3 (type-definition #f (gensym) "type-3" (immutable-vector)))
+(define type-definition-4 (type-definition #f (gensym) "type-4" (immutable-vector)))
 
-(define type-definition-1-1 (type-definition type-definition-1 (gensym) "type-1-1" 0))
-(define type-definition-1-2 (type-definition type-definition-1 (gensym) "type-1-2" 0))
+(define type-definition-1-1 (type-definition type-definition-1 (gensym) "type-1-1" (immutable-vector)))
+(define type-definition-1-2 (type-definition type-definition-1 (gensym) "type-1-2" (immutable-vector)))
 
 (define type-1 (defined-type #f type-definition-1 (immutable-vector)))
 (define type-2 (defined-type #f type-definition-2 (immutable-vector)))

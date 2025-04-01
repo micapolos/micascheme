@@ -24,31 +24,31 @@
     (typed-scheme type))
 
   (define null-type-definition
-    (type-definition #f (gensym) "any-null" 0))
+    (type-definition #f (gensym) "any-null" (immutable-vector)))
 
   (define boolean-type-definition
-    (type-definition #f (gensym) "any-boolean" 0))
+    (type-definition #f (gensym) "any-boolean" (immutable-vector)))
 
   (define char-type-definition
-    (type-definition #f (gensym) "any-char" 0))
+    (type-definition #f (gensym) "any-char" (immutable-vector)))
 
   (define string-type-definition
-    (type-definition #f (gensym) "any-string" 0))
+    (type-definition #f (gensym) "any-string" (immutable-vector)))
 
   (define number-type-definition
-    (type-definition #f (gensym) "any-number" 0))
+    (type-definition #f (gensym) "any-number" (immutable-vector)))
 
   (define integer-type-definition
-    (type-definition number-type-definition (gensym) "any-integer" 0))
+    (type-definition number-type-definition (gensym) "any-integer" (immutable-vector)))
 
   (define fixnum-type-definition
-    (type-definition integer-type-definition (gensym) "any-fixnum" 0))
+    (type-definition integer-type-definition (gensym) "any-fixnum" (immutable-vector)))
 
   (define pair-type-definition
-    (type-definition #f (gensym) "any-pair" 2))
+    (type-definition #f (gensym) "any-pair" (immutable-vector out-variance out-variance)))
 
   (define list-type-definition
-    (type-definition #f (gensym) "any-list" 1))
+    (type-definition #f (gensym) "any-list" (immutable-vector out-variance)))
 
   (define null-type
     (defined-type #f null-type-definition (immutable-vector)))

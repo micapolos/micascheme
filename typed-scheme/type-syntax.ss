@@ -52,8 +52,8 @@
         (and (identifier? #'id) (type-definition? ($lookup #'id)))
         (lets
           ($type-definition ($lookup #'id))
-          ($arity (type-definition-arity $type-definition))
-          (if (= (type-definition-arity $type-definition) 0)
+          ($arity (vector-length (type-definition-variances $type-definition)))
+          (if (= $arity 0)
             (defined-type #f ($lookup #'id) (immutable-vector))
             (syntax-error #'id
               (format "expected ~s arguments in" $arity)))))
@@ -61,7 +61,7 @@
         (and (identifier? #'id) (type-definition? ($lookup #'id)))
         (lets
           ($type-definition ($lookup #'id))
-          ($arity (type-definition-arity $type-definition))
+          ($arity (vector-length (type-definition-variances $type-definition)))
           ($args (syntaxes arg ...))
           (if (= $arity (length $args))
             (defined-type #f ($lookup #'id)
@@ -100,12 +100,19 @@
           #,(datum->syntax $id $arity)
           #,(type->syntax $value->syntax $id $type)))))
 
-  (define (type-definition->syntax $id (type-definition $parent? $gensym $name $arity))
+  (define (type-definition->syntax $id (type-definition $parent? $gensym $name $variances))
     #`(type-definition
       #,(if $parent?
         (type-definition->syntax $id $parent?)
         (datum->syntax $id #f))
       '#,(datum->syntax $id $gensym)
       #,(datum->syntax $id $name)
-      #,(datum->syntax $id $arity)))
+      (immutable-vector
+        #,@(map variance->syntax (vector->list $variances)))))
+
+  (define (variance->syntax $variance)
+    (switch-exhaustive $variance
+      ((in-variance? _) #'in-variance)
+      ((out-variance? _) #'out-variance)
+      ((inout-variance? _) #'inout-variance)))
 )

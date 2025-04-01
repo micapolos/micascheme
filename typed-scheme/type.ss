@@ -13,7 +13,7 @@
     type-definition-parent?
     type-definition-gensym
     type-definition-name
-    type-definition-arity
+    type-definition-variances
 
     defined-type
     defined-type?
@@ -66,7 +66,7 @@
   (data out-variance)
   (data inout-variance)
 
-  (data (type-definition parent? gensym name arity))
+  (data (type-definition parent? gensym name variances))
 
   (data (native-type value))
   (data (defined-type parent? definition arguments))
