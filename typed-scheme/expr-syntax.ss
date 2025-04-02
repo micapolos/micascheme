@@ -123,10 +123,18 @@
           ($lambda-expr (syntax->lambda-expr $recurse $type-definition-lookup $type-lookup $type-scope $scope #'fn))
           ($lambda-type (expr-type $lambda-expr))
           ($arg-exprs
-            (map-with
-              ($type (lambda-type-params $lambda-type))
-              ($arg (syntaxes arg ...))
-              (syntax->expr-of $recurse $type-definition-lookup $type-lookup $type-scope $scope $type $arg)))
+            (map*
+              (lambda ($type $arg)
+                (syntax->expr-of $recurse $type-definition-lookup $type-lookup $type-scope $scope $type $arg))
+              (lambda ($type* $varargs)
+                (switch $type*
+                  ((null? $null) $null)
+                  ((else $type)
+                    (map
+                      (partial syntax->expr-of $recurse $type-definition-lookup $type-lookup $type-scope $scope $type)
+                      $varargs))))
+              (lambda-type-params $lambda-type)
+              (syntaxes arg ...)))
           (expr
             (lambda-type-result $lambda-type)
             (application-term $lambda-expr $arg-exprs))))))
