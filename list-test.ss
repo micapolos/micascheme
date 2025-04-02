@@ -437,12 +437,12 @@
 (lets
   ($proc
     (lambda ($string $x . $xs)
-      (apply string-append $string (number->string $x) (map number->string $xs))))
+      (apply string-append $string " " (number->string $x) "-" (map number->string $xs))))
   ($proc*
     (lambda ($string $x . $xs)
-      (apply string-append $string $x $xs)))
+      (apply string-append $string " " $x $xs)))
   (run
     (check
       (equal?
-        (fold-left* $proc $proc* ":" (list* 1 2 3 "!") (list* 4 5 6 "?"))
-        ":142536!?"))))
+        (fold-left* $proc $proc* ">" (list* 1 2 3 "(") (list* 4 5 6 ")"))
+        "> 1-4 2-5 3-6 ()"))))
