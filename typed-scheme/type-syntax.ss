@@ -26,9 +26,7 @@
           (scope-ref-from $scope $identifier (+ $index 1))))))
 
   (define (syntaxes->types $recurse $lookup $scope $syntaxes)
-    (vector->immutable-vector
-      (list->vector
-        (map (partial $recurse $lookup $scope) $syntaxes))))
+    (map (partial $recurse $lookup $scope) $syntaxes))
 
   (define (syntax->type $recurse $lookup $scope $syntax)
     (syntax-case $syntax (any-lambda oneof forall)
@@ -42,7 +40,7 @@
       ((forall (param ...) type)
         (lets
           ($params (map syntax->variance-identifier (syntaxes param ...)))
-          ($variances (list->immutable-vector (map car $params)))
+          ($variances (map car $params))
           ($scope (fold-left scope+ $scope (map cdr $params)))
           (forall-type $variances ($recurse $lookup $scope #'type))))
       (id
@@ -52,16 +50,16 @@
         (and (identifier? #'id) (type-definition? ($lookup #'id)))
         (lets
           ($type-definition ($lookup #'id))
-          ($arity (vector-length (type-definition-variances $type-definition)))
+          ($arity (length (type-definition-variances $type-definition)))
           (if (= $arity 0)
-            (defined-type #f ($lookup #'id) (immutable-vector))
+            (defined-type #f ($lookup #'id) (list))
             (syntax-error #'id
               (format "expected ~s arguments in" $arity)))))
       ((id arg ...)
         (and (identifier? #'id) (type-definition? ($lookup #'id)))
         (lets
           ($type-definition ($lookup #'id))
-          ($arity (vector-length (type-definition-variances $type-definition)))
+          ($arity (length (type-definition-variances $type-definition)))
           ($args (syntaxes arg ...))
           (if (= $arity (length $args))
             (defined-type #f ($lookup #'id)
@@ -90,14 +88,14 @@
             (type->syntax $value->syntax $id $parent?)
             (datum->syntax $id #f))
           #,(type-definition->syntax $id $definition)
-          (immutable-vector #,@(map (partial type->syntax $value->syntax $id) (vector->list $args)))))
+          (list #,@(map (partial type->syntax $value->syntax $id) $args))))
       ((lambda-type? (lambda-type $params $result))
         #`(lambda-type
-          (immutable-vector #,@(map (partial type->syntax $value->syntax $id) (vector->list $params)))
+          (list #,@(map (partial type->syntax $value->syntax $id) $params))
           #,(type->syntax $value->syntax $id $result)))
       ((union-type? (union-type $items))
         #`(union-type
-          (immutable-vector #,@(map (partial type->syntax $value->syntax $id) (vector->list $items)))))
+          (list #,@(map (partial type->syntax $value->syntax $id) $items))))
       ((recursive-type? (recursive-type $type))
         #`(recursive-type
           #,(type->syntax $value->syntax $id $type)))
@@ -106,7 +104,7 @@
           #,(datum->syntax $id $index)))
       ((forall-type? (forall-type $variances $type))
         #`(forall-type
-          (immutable-vector #,@(map variance->syntax (vector->list $variances)))
+          (list #,@(map variance->syntax $variances))
           #,(type->syntax $value->syntax $id $type)))))
 
   (define (type-definition->syntax $id (type-definition $parent? $gensym $name $variances))
@@ -116,8 +114,8 @@
         (datum->syntax $id #f))
       '#,(datum->syntax $id $gensym)
       #,(datum->syntax $id $name)
-      (immutable-vector
-        #,@(map variance->syntax (vector->list $variances)))))
+      (list
+        #,@(map variance->syntax $variances))))
 
   (define (variance->syntax $variance)
     (switch-exhaustive $variance

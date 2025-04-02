@@ -68,12 +68,8 @@
           ($body-expr
             ($recurse $type-definition-lookup $type-lookup $type-scope $scope #'body))
           (expr
-            (lambda-type
-              (list->immutable-vector $param-types)
-              (expr-type $body-expr))
-            (lambda-term
-              (list->immutable-vector $param-types)
-              $body-expr))))
+            (lambda-type $param-types (expr-type $body-expr))
+            (lambda-term $param-types $body-expr))))
       ((let ((name exp) ...) body)
         (for-all identifier? (syntaxes name ...))
         (lets
@@ -128,7 +124,7 @@
           ($lambda-type (expr-type $lambda-expr))
           ($arg-exprs
             (map-with
-              ($type (vector->list (lambda-type-params $lambda-type)))
+              ($type (lambda-type-params $lambda-type))
               ($arg (syntaxes arg ...))
               (syntax->expr-of $recurse $type-definition-lookup $type-lookup $type-scope $scope $type $arg)))
           (expr
@@ -161,7 +157,7 @@
             #,(expr->syntax $id $native $scope $body-expr))))
       ((lambda-term? (lambda-term $param-types $body-expr))
         (lets
-          ($tmps (map (partial scope-gensym $scope $id) (iota (vector-length $param-types))))
+          ($tmps (map (partial scope-gensym $scope $id) (iota (length $param-types))))
           ($scope (fold-left push $scope $tmps))
           #`(lambda (#,@$tmps)
             #,(expr->syntax $id $native $scope $body-expr))))

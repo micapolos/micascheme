@@ -56,9 +56,9 @@
     (test-syntax->expr $type-definition-lookup $type-lookup (stack) (stack)
       #'(lambda ((a-string s) (a-boolean b)) s))
     (expr
-      (lambda-type (immutable-vector string-type boolean-type) string-type)
+      (lambda-type (list string-type boolean-type) string-type)
       (lambda-term
-        (immutable-vector string-type boolean-type)
+        (list string-type boolean-type)
         (expr string-type (variable-term 1))))))
 
 (check
@@ -76,7 +76,7 @@
     (test-syntax->expr $type-definition-lookup $type-lookup (stack) (stack)
       #'(if #t "foo" 123))
     (expr
-      (union-type (immutable-vector string-type number-type))
+      (union-type (list string-type number-type))
       (if-term
         (expr boolean-type (native-term #t))
         (expr string-type (native-term "foo"))
@@ -140,9 +140,9 @@
       (syntax->datum
         (expr->syntax #'id identity (stack)
           (expr
-            (lambda-type (immutable-vector string-type string-type) string-type)
+            (lambda-type (list string-type string-type) string-type)
             (lambda-term
-              (immutable-vector string-type string-type)
+              (list string-type string-type)
               (expr string-type (variable-term 0)))))))
     '(lambda (v0 v1) v1)))
 
@@ -155,7 +155,7 @@
             (application-term
               (expr
                 (lambda-type
-                  (immutable-vector (native-type 'p1) (native-type 'p2))
+                  (list (native-type 'p1) (native-type 'p2))
                   (native-type 'result))
                 (variable-term 2))
               (list

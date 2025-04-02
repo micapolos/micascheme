@@ -125,20 +125,15 @@
               ((type-definition-gensym=? $definition $to-definition)
                 ; TODO: Implement variance, so it's possible to declare "in" and "out".
                 ; In any-lambda, implicit variable is "in" for params and "out" for result.
-                (for-all (partial scope-type=? $scope)
-                  (vector->list $arguments)
-                  (vector->list $to-arguments)))
+                (for-all (partial scope-type=? $scope) $arguments) $to-arguments)
               (else
                 (and $parent? (scope-type-assignable-to? $scope $parent? $to-type)))))))
       ((lambda-type? (lambda-type $to-params $to-result))
         (switch? $type
           ((lambda-type? (lambda-type $params $result))
             (and
-              (= (vector-length $params) (vector-length $to-params))
-              (for-all
-                (partial scope-type-assignable-to? $scope)
-                (vector->list $to-params)
-                (vector->list $params))
+              (= (length $params) (length $to-params))
+              (for-all (partial scope-type-assignable-to? $scope) $to-params $params)
               (scope-type-assignable-to? $scope $result $to-result)))))
       ((union-type? $to-union-type)
         (for-all
@@ -146,7 +141,7 @@
             (exists
               (lambda ($to-type)
                 (scope-type-assignable-to? $scope $type $to-type))
-              (vector->list (union-type-items $to-union-type))))
+              (union-type-items $to-union-type)))
           (type-list $type)))
       ((forall-type? (forall-type $to-variances $to-type))
         (switch? $type
@@ -154,7 +149,7 @@
             (and
               (equal? $variances $to-variances)
               (scope-type-assignable-to?
-                (fold-left push $scope (map-with ($variance (vector->list $variances)) hole))
+                (fold-left push $scope (map-with ($variance $variances) hole))
                 $type
                 $to-type)))))
       ((recursive-type? (recursive-type $to-type))
@@ -194,8 +189,8 @@
                 (fold-left?
                   (partial proc-scope-specialize? $proc)
                   $scope
-                  (vector->list $lhs-arguments)
-                  (vector->list $rhs-arguments)))
+                  $lhs-arguments
+                  $rhs-arguments))
               (else
                 (and $rhs-parent?
                   (proc-scope-specialize? $proc $scope $lhs-type $rhs-parent?)))))))
@@ -203,13 +198,13 @@
         (switch? $rhs-type
           ((lambda-type? (lambda-type $rhs-params $rhs-result))
             (and
-              (= (vector-length $lhs-params) (vector-length $rhs-params))
+              (= (length $lhs-params) (length $rhs-params))
               (lets?
                 ($scope
                   (fold-left?
                     (partial proc-scope-specialize? $proc)
-                    (vector->list $rhs-params)
-                    (vector->list $lhs-params)))
+                    $rhs-params
+                    $lhs-params))
                 (proc-scope-specialize? $proc $scope $lhs-result $rhs-result))))))))
 
   (define (proc-scope-variance-specialize? $proc $scope $variance $lhs-type $rhs-type)
@@ -226,14 +221,14 @@
   (define (type-list $type)
     (switch $type
       ((union-type? $union-type)
-        (vector->list (union-type-items $union-type)))
+        (union-type-items $union-type))
       ((else $other)
         (list $other))))
 
   (define (type-list->type $type-list)
     (case (length $type-list)
       ((1) (car $type-list))
-      (else (union-type (list->immutable-vector $type-list)))))
+      (else (union-type $type-list))))
 
   (define (type-list+type $type-list $type)
     (cond

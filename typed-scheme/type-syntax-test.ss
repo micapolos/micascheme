@@ -51,30 +51,30 @@
 (check
   (equal?
     (test-syntax->type $lookup (stack) #'(any-lambda (any-string any-boolean) any-number))
-    (lambda-type (immutable-vector string-type boolean-type) number-type)))
+    (lambda-type (list string-type boolean-type) number-type)))
 
 (check
   (equal?
     (test-syntax->type $lookup (stack) #'(oneof any-string any-boolean))
-    (union-type (immutable-vector string-type boolean-type))))
+    (union-type (list string-type boolean-type))))
 
 (check
   (equal?
     (test-syntax->type $lookup (stack) #'(forall (a b) (any-pair a b)))
     (forall-type
-      (immutable-vector inout-variance inout-variance)
+      (list inout-variance inout-variance)
       (pair-type (variable-type 1) (variable-type 0)))))
 
 (check
   (equal?
     (test-syntax->type $lookup (stack) #'(forall ((in a) (out b)) (any-pair a b)))
     (forall-type
-      (immutable-vector in-variance out-variance)
+      (list in-variance out-variance)
       (pair-type (variable-type 1) (variable-type 0)))))
 
 (check
   (equal?
     (test-syntax->type $lookup (stack) #'(forall (a b) (any-lambda (a) b)))
     (forall-type
-      (immutable-vector inout-variance inout-variance)
-      (lambda-type (immutable-vector (variable-type 1)) (variable-type 0)))))
+      (list inout-variance inout-variance)
+      (lambda-type (list (variable-type 1)) (variable-type 0)))))

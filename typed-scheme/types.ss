@@ -24,55 +24,55 @@
     (typed-scheme type))
 
   (define null-type-definition
-    (type-definition #f (gensym) "any-null" (immutable-vector)))
+    (type-definition #f (gensym) "any-null" (list)))
 
   (define boolean-type-definition
-    (type-definition #f (gensym) "any-boolean" (immutable-vector)))
+    (type-definition #f (gensym) "any-boolean" (list)))
 
   (define char-type-definition
-    (type-definition #f (gensym) "any-char" (immutable-vector)))
+    (type-definition #f (gensym) "any-char" (list)))
 
   (define string-type-definition
-    (type-definition #f (gensym) "any-string" (immutable-vector)))
+    (type-definition #f (gensym) "any-string" (list)))
 
   (define number-type-definition
-    (type-definition #f (gensym) "any-number" (immutable-vector)))
+    (type-definition #f (gensym) "any-number" (list)))
 
   (define integer-type-definition
-    (type-definition number-type-definition (gensym) "any-integer" (immutable-vector)))
+    (type-definition number-type-definition (gensym) "any-integer" (list)))
 
   (define fixnum-type-definition
-    (type-definition integer-type-definition (gensym) "any-fixnum" (immutable-vector)))
+    (type-definition integer-type-definition (gensym) "any-fixnum" (list)))
 
   (define pair-type-definition
-    (type-definition #f (gensym) "any-pair" (immutable-vector out-variance out-variance)))
+    (type-definition #f (gensym) "any-pair" (list out-variance out-variance)))
 
   (define list-type-definition
-    (type-definition #f (gensym) "any-list" (immutable-vector out-variance)))
+    (type-definition #f (gensym) "any-list" (list out-variance)))
 
   (define null-type
-    (defined-type #f null-type-definition (immutable-vector)))
+    (defined-type #f null-type-definition (list)))
 
   (define boolean-type
-    (defined-type #f boolean-type-definition (immutable-vector)))
+    (defined-type #f boolean-type-definition (list)))
 
   (define char-type
-    (defined-type #f char-type-definition (immutable-vector)))
+    (defined-type #f char-type-definition (list)))
 
   (define string-type
-    (defined-type #f string-type-definition (immutable-vector)))
+    (defined-type #f string-type-definition (list)))
 
   (define number-type
-    (defined-type #f number-type-definition (immutable-vector)))
+    (defined-type #f number-type-definition (list)))
 
   (define integer-type
-    (defined-type number-type integer-type-definition (immutable-vector)))
+    (defined-type number-type integer-type-definition (list)))
 
   (define fixnum-type
-    (defined-type integer-type fixnum-type-definition (immutable-vector)))
+    (defined-type integer-type fixnum-type-definition (list)))
 
   (define (pair-type $first $second)
-    (defined-type #f pair-type-definition (immutable-vector $first $second)))
+    (defined-type #f pair-type-definition (list $first $second)))
 
   (define (list-type $item)
     (recursive-type

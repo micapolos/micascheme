@@ -1,5 +1,5 @@
 (import
-  (only (micascheme) check equal? string-append string=? string-length null = + - number->string zero? immutable-vector)
+  (only (micascheme) check equal? string-append string=? string-length null = + - number->string zero? list)
   (typed-scheme typed)
   (typed-scheme lang)
   (typed-scheme type)
@@ -24,7 +24,7 @@
   (equal?
     (expr string-append)
     (typed
-      (lambda-type (immutable-vector string-type string-type) string-type)
+      (lambda-type (list string-type string-type) string-type)
       string-append)))
 
 (assume-type (string=? any-string any-string) any-boolean)
@@ -32,7 +32,7 @@
   (equal?
     (expr string=?)
     (typed
-      (lambda-type (immutable-vector string-type string-type) boolean-type)
+      (lambda-type (list string-type string-type) boolean-type)
       string=?)))
 
 (check (equal? (expr (string=? "foo" "bar")) (typed boolean-type #f)))
