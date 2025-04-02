@@ -461,8 +461,12 @@
   (run
     (check
       (equal?
-        (map* $proc $proc* '() '(#\a #\b #\c))
-        '(#\a #\b #\c))))
+        (map* $proc $proc* '() '())
+        '())))
+  (run
+    (check
+      (raises
+        (map* $proc $proc* '() '(#\a)))))
   (run
     (check
       (equal?
@@ -473,6 +477,10 @@
       (equal?
         (map* $proc $proc* '(string number char) '("foo" 128 #\a))
         '((string . "foo") (number . 128) (char . #\a)))))
+  (run
+    (check
+      (raises
+        (map* $proc $proc* '(string number char) '("foo" 128 #\a #\b)))))
   (run
     (check
       (equal?

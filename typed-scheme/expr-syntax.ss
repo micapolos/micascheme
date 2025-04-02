@@ -126,13 +126,10 @@
             (map*
               (lambda ($type $arg)
                 (syntax->expr-of $recurse $type-definition-lookup $type-lookup $type-scope $scope $type $arg))
-              (lambda ($type* $varargs)
-                (switch $type*
-                  ((null? $null) $null)
-                  ((else $type)
-                    (map
-                      (partial syntax->expr-of $recurse $type-definition-lookup $type-lookup $type-scope $scope $type)
-                      $varargs))))
+              (lambda ($type $varargs)
+                (map
+                  (partial syntax->expr-of $recurse $type-definition-lookup $type-lookup $type-scope $scope $type)
+                  $varargs))
               (lambda-type-params $lambda-type)
               (syntaxes arg ...)))
           (expr

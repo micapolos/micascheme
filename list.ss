@@ -341,6 +341,9 @@
 
   (define (map* $proc $proc* $list . $lists)
     (cond
+      ((null? $list)
+        (assert (for-all null? $lists))
+        $list)
       ((pair? $list)
         (cons
           (apply $proc (car $list) (map car $lists))
