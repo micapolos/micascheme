@@ -446,3 +446,23 @@
       (equal?
         (fold-left* $proc $proc* ">" (list* 1 2 3 "(") (list* 4 5 6 ")"))
         "> 1-4 2-5 3-6 ()"))))
+
+; === map* ===
+
+(lets
+  ($proc
+    (lambda ($type $value)
+      (cons $type $value)))
+  ($proc*
+    (lambda ($type $values)
+      (map (partial cons $type) $values)))
+  (run
+    (check
+      (equal?
+        (map* $proc $proc* 'char '(#\a #\b #\c))
+        '((char . #\a) (char . #\b) (char . #\c)))))
+  (run
+    (check
+      (equal?
+        (map* $proc $proc* '(string number . char) '("foo" 128 #\a #\b #\c))
+        '((string . "foo") (number . 128) (char . #\a) (char . #\b) (char . #\c))))))

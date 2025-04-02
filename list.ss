@@ -31,6 +31,7 @@
     ensure-list
     fold-left?
     fold-left*
+    map*
 
     acc-split
     split
@@ -337,6 +338,15 @@
           (map cdr $lists)))
       (else
         (apply $proc* $initial $list $lists))))
+
+  (define (map* $proc $proc* $list . $lists)
+    (cond
+      ((pair? $list)
+        (cons
+          (apply $proc (car $list) (map car $lists))
+          (apply map* $proc $proc* (cdr $list) (map cdr $lists))))
+      (else
+        (apply $proc* $list $lists))))
 
   ; === group-by ===
 
