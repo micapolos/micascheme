@@ -30,6 +30,7 @@
     build-list
     ensure-list
     fold-left?
+    fold-left*
 
     acc-split
     split
@@ -319,12 +320,23 @@
 
   ; === fold-left? ===
 
-  (define (fold-left? $proc $initial? . $lists)
+  (define (fold-left? $proc $initial? $list . $lists)
     (apply fold-left
       (lambda ($folded? . $items)
         (and $folded? (apply $proc $folded? $items)))
       $initial?
+      $list
       $lists))
+
+  (define (fold-left* $proc $proc* $initial $list . $lists)
+    (cond
+      ((pair? $list)
+        (apply fold-left* $proc $proc*
+          (apply $proc $initial (car $list) (map car $lists))
+          (cdr $list)
+          (map cdr $lists)))
+      (else
+        (apply $proc* $initial $list $lists))))
 
   ; === group-by ===
 

@@ -431,3 +431,18 @@
       (equal?
         (fold-left? $proc "" (list 10 6 12) (list 2 0 4))
         #f)))))
+
+; === fold-left* ===
+
+(lets
+  ($proc
+    (lambda ($string $x . $xs)
+      (apply string-append $string (number->string $x) (map number->string $xs))))
+  ($proc*
+    (lambda ($string $x . $xs)
+      (apply string-append $string $x $xs)))
+  (run
+    (check
+      (equal?
+        (fold-left* $proc $proc* ":" (list* 1 2 3 "!") (list* 4 5 6 "?"))
+        ":142536!?"))))
