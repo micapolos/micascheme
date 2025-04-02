@@ -455,12 +455,24 @@
       (cons $type $value)))
   ($proc*
     (lambda ($type $values)
-      (map (partial cons $type) $values)))
+      (cond
+        ((null? $type) $values)
+        (else (map (partial cons $type) $values)))))
+  (run
+    (check
+      (equal?
+        (map* $proc $proc* '() '(#\a #\b #\c))
+        '(#\a #\b #\c))))
   (run
     (check
       (equal?
         (map* $proc $proc* 'char '(#\a #\b #\c))
         '((char . #\a) (char . #\b) (char . #\c)))))
+  (run
+    (check
+      (equal?
+        (map* $proc $proc* '(string number char) '("foo" 128 #\a))
+        '((string . "foo") (number . 128) (char . #\a)))))
   (run
     (check
       (equal?
