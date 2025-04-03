@@ -6,4 +6,5 @@
   (typed-scheme expr)
   (typed-scheme type-syntax)
   (typed-scheme expr-syntax)
+  (typed-scheme type-datum)
   (typed-scheme lang))
