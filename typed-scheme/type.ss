@@ -249,4 +249,34 @@
     (symbol=?
       (type-definition-gensym $type-definition-a)
       (type-definition-gensym $type-definition-b)))
+
+  (define (proc-scope-type-substitute $proc $scope $type)
+    (switch $type
+      ((variable-type? (variable-type $index))
+        (switch (list-ref? $scope $index)
+          ((false? _) (variable-type $index))
+          ((else $type) $type)))
+      ((native-type? (native-type $value))
+        (native-type ($proc $scope $value)))
+      ((defined-type? (defined-type $parent $definition $arguments))
+        (defined-type $parent $definition
+          (map (partial proc-scope-type-substitute $proc $scope) $arguments)))
+      ((lambda-type? (lambda-type $params $result))
+        (lambda-type
+          (map (partial proc-scope-type-substitute $proc $scope) $params)
+          (proc-scope-type-substitute $proc $scope $result)))
+      ((union-type? (union-type $items))
+        (union-type (partial proc-scope-type-substitute $proc $scope) $items))
+      ((forall-type (forall-type $variances $type))
+        (forall-type $variances
+          (proc-scope-type-substitute
+            $proc
+            (fold-left push $scope (map (lambda (_) #f) $variances))
+            $type)))
+      ((recursive-type? (recursive-type $type))
+        (recursive-type
+          (proc-scope-type-substitute
+            $proc
+            (push $scope #f)
+            $type)))))
 )
