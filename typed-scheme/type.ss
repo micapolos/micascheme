@@ -151,6 +151,7 @@
               (union-type-items $to-union-type)))
           (type-union-list $type)))
       ((intersection-type? $to-intersection-type)
+        ; TODO: Validate whether it makes sense
         (exists
           (lambda ($type)
             (for-all
