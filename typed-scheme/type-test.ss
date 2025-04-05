@@ -139,3 +139,52 @@
       (union-type (list))
       (union-type (list)))
     (union-type (list))))
+
+; --- type-substitute ---
+
+(define scope-type-substitute
+  (partial proc-scope-type-substitute
+    (lambda ($scope $value)
+      (box $value))))
+
+(check
+  (equal?
+    (scope-type-substitute
+      (stack type-1 #f type-2)
+      (variable-type 3))
+    (variable-type 3)))
+
+(check
+  (equal?
+    (scope-type-substitute
+      (stack type-1 #f type-2)
+      (variable-type 2))
+    type-1))
+
+(check
+  (equal?
+    (scope-type-substitute
+      (stack type-1 #f type-2)
+      (variable-type 1))
+    (variable-type 1)))
+
+(check
+  (equal?
+    (scope-type-substitute
+      (stack type-1 #f type-2)
+      (variable-type 0))
+    type-2))
+
+(define type-substitute (partial scope-type-substitute (stack)))
+
+(check
+  (equal?
+    (type-substitute (native-type 'foo))
+    (native-type (box 'foo))))
+
+(check
+  (equal?
+    (scope-type-substitute
+      (stack type-1 #f type-2)
+      (lambda-type (list (variable-type 0) (variable-type 1)) (variable-type 2)))
+    (lambda-type (list type-2 (variable-type 1)) type-1)))

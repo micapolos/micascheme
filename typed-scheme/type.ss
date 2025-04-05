@@ -61,7 +61,8 @@
 
     type+
 
-    proc-scope-specialize?)
+    proc-scope-specialize?
+    proc-scope-type-substitute)
   (import (micascheme))
 
   (data in-variance)
