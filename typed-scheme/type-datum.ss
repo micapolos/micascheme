@@ -1,5 +1,7 @@
 (library (typed-scheme type-datum)
-  (export type->datum)
+  (export
+    type->datum
+    scope-type->datum)
   (import
     (micascheme)
     (typed-scheme type))
@@ -29,6 +31,10 @@
         (todo))
       ((variable-type? (variable-type $index))
         (list-ref $scope $index))
-      ((forall-type? (forall-type $arity $type))
-        (todo))))
+      ((forall-type? (forall-type $variances $type))
+        (lets
+          ($gensyms (map (lambda (_) (gensym)) $variances))
+          ($scope (fold-left push $scope $gensyms))
+          `(forall (,@$gensyms)
+            (scope-type->datum $scope $type))))))
 )
