@@ -34,6 +34,10 @@
     union-type?
     union-type-items
 
+    intersection-type
+    intersection-type?
+    intersection-type-types
+
     record-type
     record-type?
     record-type-rtd
@@ -75,6 +79,7 @@
   (data (defined-type parent? definition arguments))
   (data (lambda-type params result))
   (data (union-type items))
+  (data (intersection-type types))
   (data (record-type parent? gensym items))
   (data (variable-type index))
   (data (forall-type variances type))
@@ -95,6 +100,7 @@
       (defined-type? $obj)
       (lambda-type? $obj)
       (union-type? $obj)
+      (intersection-type? $obj)
       (recursive-type? $obj)
       (variable-type? $obj)
       (forall-type? $obj)
@@ -143,7 +149,15 @@
               (lambda ($to-type)
                 (scope-type-assignable-to? $scope $type $to-type))
               (union-type-items $to-union-type)))
-          (type-list $type)))
+          (type-union-list $type)))
+      ((intersection-type? $to-intersection-type)
+        (exists
+          (lambda ($type)
+            (for-all
+              (lambda ($to-type)
+                (scope-type-assignable-to? $scope $type $to-type))
+              (intersection-type-types $to-intersection-type)))
+          (type-intersection-list $type)))
       ((forall-type? (forall-type $to-variances $to-type))
         (switch? $type
           ((forall-type? (forall-type $variances $type))
@@ -219,32 +233,35 @@
           ($scope (proc-scope-specialize? $proc $scope $lhs-type $rhs-type))
           (proc-scope-specialize? $proc $scope $rhs-type $lhs-type)))))
 
-  (define (type-list $type)
+  (define (type-union-list $type)
     (switch $type
-      ((union-type? $union-type)
-        (union-type-items $union-type))
-      ((else $other)
-        (list $other))))
+      ((union-type? (union-type $items)) $items)
+      ((else $other) (list $other))))
 
-  (define (type-list->type $type-list)
-    (case (length $type-list)
-      ((1) (car $type-list))
-      (else (union-type $type-list))))
+  (define (type-intersection-list $type)
+    (switch $type
+      ((intersection-type? (intersection-type $types)) $types)
+      ((else $other) (list $other))))
 
-  (define (type-list+type $type-list $type)
+  (define (type-union-list->type $type-union-list)
+    (case (length $type-union-list)
+      ((1) (car $type-union-list))
+      (else (union-type $type-union-list))))
+
+  (define (type-union-list+type $type-union-list $type)
     (cond
-      ((exists (partial type-assignable-to? $type) $type-list)
-        $type-list)
+      ((exists (partial type-assignable-to? $type) $type-union-list)
+        $type-union-list)
       (else
-        (cons $type $type-list))))
+        (cons $type $type-union-list))))
 
   (define (type+ $type-a $type-b)
-    (type-list->type
+    (type-union-list->type
       (reverse
         (fold-left
-          type-list+type
-          (reverse (type-list $type-a))
-          (type-list $type-b)))))
+          type-union-list+type
+          (reverse (type-union-list $type-a))
+          (type-union-list $type-b)))))
 
   (define (type-definition-gensym=? $type-definition-a $type-definition-b)
     (symbol=?
