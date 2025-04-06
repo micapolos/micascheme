@@ -4,6 +4,8 @@
     match-prim?
     match?
     match-case?
+    match
+    match-case
     define-predicate-match-prim?)
   (import (scheme) (syntax) (syntaxes))
 
@@ -79,9 +81,19 @@
     (let ((val expr))
       (match-prim-transitive? val spec body)))
 
+  (define-rule-syntax (match expr spec body)
+    (or
+      (match? expr spec body)
+      (syntax-error #'expr "no match for")))
+
   (define-rule-syntax (match-case? expr (spec body) ...)
     (let ((val expr))
       (or (match? val spec body) ...)))
+
+  (define-rule-syntax (match-case expr (spec body) ...)
+    (or
+      (match-case? expr (spec body) ...)
+      (syntax-error #'expr "no match for")))
 
   (define-rule-syntax (define-predicate-match-prim? test?)
     (define-property test? match-prim?
