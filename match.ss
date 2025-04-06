@@ -4,7 +4,7 @@
     if-matches
     match
     define-predicate-matcher)
-  (import (scheme) (syntax) (syntaxes) (identifier))
+  (import (scheme) (syntax) (syntaxes))
 
   ; TODO: Define matchers in (data), for predicate and constructor
   ; TODO: Define core matchers and export in (micascheme)
