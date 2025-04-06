@@ -17,6 +17,14 @@
 (define-predicate-matcher string?)
 (define-predicate-matcher number?)
 
+(define-property cons matcher
+  (lambda ($syntax)
+    (syntax-case $syntax ()
+      ((_ expr (_ a b) body)
+        #`(let ((tmp expr))
+          (let ((a (car tmp)) (b (cdr tmp)))
+            body))))))
+
 (check (equal? (if-matches "foo" (string? s) (string-append s "!") "error") "foo!"))
 (check (equal? (if-matches 123 (string? s) (string-append s "!") "error") "error"))
 
@@ -35,10 +43,11 @@
     124))
 
 (check
-  (raises
+  (equal?
     (match #\a
       ((string? s) (string-append s "!"))
-      ((number? n) (+ n 1)))))
+      ((number? n) (+ n 1)))
+    #f))
 
 (check
   (equal?
@@ -47,3 +56,13 @@
       ((number? n) (+ n 1))
       (x (format "char ~a" x)))
     "char a"))
+
+(check
+  (equal?
+    (matcher (cons 1 2) (cons a b) (cons b a))
+    (cons 2 1)))
+
+(check
+  (equal?
+    (matcher (list 1 2) (cons a (cons b c)) (cons b (cons a c)))
+    (list 2 1)))

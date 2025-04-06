@@ -4,9 +4,8 @@
     if-matches
     match
     define-predicate-matcher)
-  (import (scheme) (syntax) (syntaxes) (throw) (identifier))
+  (import (scheme) (syntax) (syntaxes) (identifier))
 
-  ; TODO: Make matcher recursive, so we can match not only on 1-level deep matchers.
   ; TODO: Define matchers in (data), for predicate and constructor
   ; TODO: Define core matchers and export in (micascheme)
 
@@ -23,14 +22,45 @@
               (or (boolean? $x) (char? $x) (number? $x) (string? $x)))
             #`(and (equal? expr x)
               (lambda () body)))
-          ((id . rest)
+          ((id arg ...)
             (identifier? #'id)
             (let*
               (($matcher
                 (or
                   ($lookup #'id #'matcher)
-                  (syntax-error #'id "no matcher"))))
-              ($matcher $syntax)))
+                  (syntax-error #'id "no matcher")))
+               ($args (syntaxes arg ...))
+               ($tmps?
+                (map
+                  (lambda ($arg)
+                    (and
+                      (not (identifier? $arg))
+                      (car (generate-temporaries $arg))))
+                  $args)))
+              #`(let
+                (#,@(filter
+                  (lambda ($id) $id)
+                  (map
+                    (lambda ($tmp? $arg)
+                      (and $tmp? #`(#,$tmp? #'$arg)))
+                    $tmps?
+                    $args)))
+                #,($matcher
+                  #`(matcher
+                    expr
+                    (id
+                      #,@(map
+                        (lambda ($tmp? $arg)
+                          (or $tmp? $arg))
+                        $tmps? $args))
+                    #,(fold-left
+                      (lambda ($body $tmp? $arg)
+                        (if (not $tmp?)
+                          $body
+                          #`(matcher #,$tmp? #,$arg #,$body)))
+                      #'body
+                      $tmps?
+                      $args))))))
           (other (syntax-error #'other) "invalid matcher spec")))))
 
   (define-rule-syntax (if-matches expr spec match-body else-body)
@@ -40,7 +70,7 @@
 
   (define-rules-syntax
     ((match-val val)
-      (throw mismatch))
+      #f)
     ((match-val val (spec match-body) rules ...)
       (if-matches val spec match-body
         (match-val val rules ...))))
