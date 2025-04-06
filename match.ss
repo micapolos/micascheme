@@ -24,7 +24,7 @@
   (define-rule-syntax (define-match-prim? name value)
     (define-property name match-prim? value))
 
-  (define-lookup-syntax (match? $syntax $lookup)
+  (define-lookup-syntax (match-prim-transitive? $syntax $lookup)
     (syntax-case $syntax ()
       ((_ expr spec body)
         (syntax-case #'spec ()
@@ -59,7 +59,7 @@
                     $tmps?
                     $args)))
                 #,($match-prim?
-                  #`(matcher
+                  #`(match-prim-transitive?
                     expr
                     (id
                       #,@(map
@@ -70,7 +70,7 @@
                       (lambda ($body $tmp? $arg)
                         (if (not $tmp?)
                           $body
-                          #`(match? #,$tmp? #,$arg #,$body)))
+                          #`(match-prim-transitive? #,$tmp? #,$arg #,$body)))
                       #'body
                       $tmps?
                       $args))))))
@@ -88,9 +88,13 @@
       (if-matches val spec match-body
         (match-val? val rules ...))))
 
-  (define-rule-syntax (match-case? expr rule ...)
+  (define-rule-syntax (match? expr spec body)
     (let ((val expr))
-      (match-val? val rule ...)))
+      (match-prim-transitive? val spec body)))
+
+  (define-rule-syntax (match-case? expr (spec body) ...)
+    (let ((val expr))
+      (or (match? val spec body) ...)))
 
   (define-rule-syntax (define-predicate-match-prim? test?)
     (define-property test? match-prim?
