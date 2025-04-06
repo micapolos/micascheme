@@ -119,75 +119,78 @@
 
   ; TODO: Implement properly
   (define (scope-type-assignable-to? $scope $type $to-type)
-    (switch $to-type
-      ((native-type? (native-type $to-value))
-        (switch? $type
-          ((native-type? (native-type $value))
-            ; Introduce $value-assignable-to?
-            (equal? $value $to-value))))
-      ((defined-type? (defined-type $to-parent? $to-definition $to-arguments))
-        (switch? $type
-          ((defined-type? (defined-type $parent? $definition $arguments))
-            (cond
-              ((type-definition-gensym=? $definition $to-definition)
-                ; TODO: Implement variance, so it's possible to declare "in" and "out".
-                ; In any-lambda, implicit variable is "in" for params and "out" for result.
-                (for-all (partial scope-type=? $scope) $arguments) $to-arguments)
-              (else
-                (and $parent? (scope-type-assignable-to? $scope $parent? $to-type)))))))
-      ((lambda-type? (lambda-type $to-params $to-result))
-        (switch? $type
-          ((lambda-type? (lambda-type $params $result))
-            (and
-              (= (length $params) (length $to-params))
-              (for-all (partial scope-type-assignable-to? $scope) $to-params $params)
-              (scope-type-assignable-to? $scope $result $to-result)))))
-      ((union-type? $to-union-type)
-        (for-all
-          (lambda ($type)
-            (exists
-              (lambda ($to-type)
-                (scope-type-assignable-to? $scope $type $to-type))
-              (union-type-items $to-union-type)))
-          (type-union-list $type)))
-      ((intersection-type? (intersection-type $to-types))
-        ; TODO: Validate whether it makes sense
-        (for-all
-          (lambda ($to-type)
-            (exists
+    (switch $type
+      ((intersection-type? (intersection-type $types))
+        (for-all-with
+          ($to-type (type-intersection-list $to-type))
+          (exists-with
+            ($type $types)
+            (scope-type-assignable-to? $scope $type $to-type))))
+      ((else $type)
+        (switch $to-type
+          ((native-type? (native-type $to-value))
+            (switch? $type
+              ((native-type? (native-type $value))
+                ; Introduce $value-assignable-to?
+                (equal? $value $to-value))))
+          ((defined-type? (defined-type $to-parent? $to-definition $to-arguments))
+            (switch? $type
+              ((defined-type? (defined-type $parent? $definition $arguments))
+                (cond
+                  ((type-definition-gensym=? $definition $to-definition)
+                    ; TODO: Implement variance, so it's possible to declare "in" and "out".
+                    ; In any-lambda, implicit variable is "in" for params and "out" for result.
+                    (for-all (partial scope-type=? $scope) $arguments) $to-arguments)
+                  (else
+                    (and $parent? (scope-type-assignable-to? $scope $parent? $to-type)))))))
+          ((lambda-type? (lambda-type $to-params $to-result))
+            (switch? $type
+              ((lambda-type? (lambda-type $params $result))
+                (and
+                  (= (length $params) (length $to-params))
+                  (for-all (partial scope-type-assignable-to? $scope) $to-params $params)
+                  (scope-type-assignable-to? $scope $result $to-result)))))
+          ((union-type? $to-union-type)
+            (for-all
               (lambda ($type)
-                (scope-type-assignable-to? $scope $type $to-type))
-              (intersection-type-types $type)))
-          $to-types))
-      ((forall-type? (forall-type $to-variances $to-type))
-        (switch? $type
-          ((forall-type? (forall-type $variances $type))
-            (and
-              (equal? $variances $to-variances)
-              (scope-type-assignable-to?
-                (fold-left push $scope (map-with ($variance $variances) hole))
-                $type
-                $to-type)))))
-      ((recursive-type? (recursive-type $to-type))
-        (switch? $type
-          ((recursive-type? (recursive-type $type))
-            (scope-type-assignable-to?
-              (push $scope (recursion $scope $to-type))
-              $type
-              $to-type))))
-      ((variable-type? (variable-type $to-index))
-        (switch? $type
-          ((variable-type? (variable-type $index))
-            (and
-              (= $index $to-index)
-              (switch-exhaustive (list-ref $scope $index)
-                ((hole? _)
-                  (switch? (list-ref $scope $to-index)
-                    ((hole? _) #t)))
-                ((recursion? (recursion $scope $to-type))
-                  (scope-type-assignable-to? $scope $type $to-type)))))))
-      ((else $to-type)
-        (todo))))
+                (exists
+                  (lambda ($to-type)
+                    (scope-type-assignable-to? $scope $type $to-type))
+                  (union-type-items $to-union-type)))
+              (type-union-list $type)))
+          ((intersection-type? (intersection-type $to-types))
+            (for-all-with
+              ($to-type $to-types)
+              (scope-type-assignable-to? $scope $type $to-type)))
+          ((forall-type? (forall-type $to-variances $to-type))
+            (switch? $type
+              ((forall-type? (forall-type $variances $type))
+                (and
+                  (equal? $variances $to-variances)
+                  (scope-type-assignable-to?
+                    (fold-left push $scope (map-with ($variance $variances) hole))
+                    $type
+                    $to-type)))))
+          ((recursive-type? (recursive-type $to-type))
+            (switch? $type
+              ((recursive-type? (recursive-type $type))
+                (scope-type-assignable-to?
+                  (push $scope (recursion $scope $to-type))
+                  $type
+                  $to-type))))
+          ((variable-type? (variable-type $to-index))
+            (switch? $type
+              ((variable-type? (variable-type $index))
+                (and
+                  (= $index $to-index)
+                  (switch-exhaustive (list-ref $scope $index)
+                    ((hole? _)
+                      (switch? (list-ref $scope $to-index)
+                        ((hole? _) #t)))
+                    ((recursion? (recursion $scope $to-type))
+                      (scope-type-assignable-to? $scope $type $to-type)))))))
+          ((else $to-type)
+            (todo))))))
 
   (define (proc-scope-specialize? $proc $scope $lhs-type $rhs-type)
     (switch-exhaustive $lhs-type

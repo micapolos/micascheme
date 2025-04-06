@@ -95,10 +95,37 @@
       (union-type (list type-1 type-2))
       (union-type (list type-1 type-3)))))
 
-; (check (type-assignable-to? (intersection-type (list type-1 type-2)) type-1))
-; (check (type-assignable-to? (intersection-type (list type-1 type-2)) type-2))
-; (check (type-assignable-to? (intersection-type (list type-1 type-2)) type-1-1))
-; (check (type-assignable-to? (intersection-type (list type-1 type-2)) type-1-2))
+(check (type-assignable-to? (intersection-type (list type-1 type-2)) type-1))
+(check (type-assignable-to? (intersection-type (list type-1 type-2)) type-2))
+(check (type-assignable-to? (intersection-type (list type-1-1 type-2)) type-1))
+(check (type-assignable-to? (intersection-type (list type-1-2 type-2)) type-1))
+
+(check
+  (type-assignable-to?
+    (intersection-type (list type-1 type-2))
+    (intersection-type (list type-1 type-2))))
+
+(check
+  (type-assignable-to?
+    (intersection-type (list type-1 type-2 type-3))
+    (intersection-type (list type-1 type-2))))
+
+(check
+  (not
+    (type-assignable-to?
+      (intersection-type (list type-1))
+      (intersection-type (list type-1 type-2)))))
+
+(check
+  (type-assignable-to?
+    type-1
+    (intersection-type (list type-1 type-1))))
+
+(check
+  (not
+    (type-assignable-to?
+      type-1
+      (intersection-type (list type-1 type-2)))))
 
 (check
   (type-assignable-to?
