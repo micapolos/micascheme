@@ -5,12 +5,8 @@
     match?
     match-case?
     match
-    match-case
-    define-predicate-match-prim?)
+    match-case)
   (import (scheme) (syntax))
-
-  ; TODO: Define matchers in (data), for predicate and constructor
-  ; TODO: Define core matchers and export in (micascheme)
 
   (define-lookup-syntax (match-prim? $syntax $lookup)
     (syntax-case $syntax ()
@@ -94,13 +90,4 @@
     (or
       (match-case? expr (spec body) ...)
       (syntax-error #'expr "no match for")))
-
-  (define-rule-syntax (define-predicate-match-prim? test?)
-    (define-property test? match-prim?
-      (lambda ($syntax)
-        (syntax-case $syntax ()
-          ((_ expr (_ x) body)
-            #`(let ((val expr))
-              (and (test? val)
-                (let ((x val)) body))))))))
 )
