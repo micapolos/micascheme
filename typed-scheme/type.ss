@@ -150,15 +150,15 @@
                 (scope-type-assignable-to? $scope $type $to-type))
               (union-type-items $to-union-type)))
           (type-union-list $type)))
-      ((intersection-type? $to-intersection-type)
+      ((intersection-type? (intersection-type $to-types))
         ; TODO: Validate whether it makes sense
-        (exists
-          (lambda ($type)
-            (for-all
-              (lambda ($to-type)
+        (for-all
+          (lambda ($to-type)
+            (exists
+              (lambda ($type)
                 (scope-type-assignable-to? $scope $type $to-type))
-              (intersection-type-types $to-intersection-type)))
-          (type-intersection-list $type)))
+              (intersection-type-types $type)))
+          $to-types))
       ((forall-type? (forall-type $to-variances $to-type))
         (switch? $type
           ((forall-type? (forall-type $variances $type))

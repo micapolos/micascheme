@@ -95,6 +95,11 @@
       (union-type (list type-1 type-2))
       (union-type (list type-1 type-3)))))
 
+; (check (type-assignable-to? (intersection-type (list type-1 type-2)) type-1))
+; (check (type-assignable-to? (intersection-type (list type-1 type-2)) type-2))
+; (check (type-assignable-to? (intersection-type (list type-1 type-2)) type-1-1))
+; (check (type-assignable-to? (intersection-type (list type-1 type-2)) type-1-2))
+
 (check
   (type-assignable-to?
     (forall-type (list in-variance) type-1)

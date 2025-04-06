@@ -1,4 +1,4 @@
-(import (scheme) (check) (list-syntax))
+(import (scheme) (check) (list-syntax) (boolean))
 
 (check
   (equal?
@@ -10,6 +10,12 @@
       "1: one"
       "2: two"
       "3: three")))
+
+(check (not-false? (for-all-with ($n1 (list 1 2 3)) ($n2 (list 1 2 3)) (= $n1 $n2))))
+(check (false? (for-all-with ($n1 (list 1 2 3)) ($n2 (list 1 2 4)) (= $n1 $n2))))
+
+(check (not-false? (exists-with ($n1 (list 1 2 3)) ($n2 (list 1 3 4)) (= $n1 $n2))))
+(check (false? (exists-with ($n1 (list 1 2 3)) ($n2 (list 2 3 4)) (= $n1 $n2))))
 
 (let ()
   (define $string "Hello")
