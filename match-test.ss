@@ -16,14 +16,31 @@
 
 (check (equal? (match? "foo" foo (string-append foo "!")) "foo!"))
 
-(define-predicate-match-prim? string?)
-(define-predicate-match-prim? number?)
+(define-property string match-prim?
+  (lambda ($syntax)
+    (syntax-case $syntax ()
+      ((_ val (_ s) body)
+        #`(and
+          (string? val)
+          (let ((s val))
+            body))))))
 
-(check (equal? (match? "foo" (string? $string) (string-append $string "!")) "foo!"))
-(check (equal? (match? 123 (string? $string) (string-append $string "!")) #f))
+(define-aux-keyword number)
 
-(check (equal? (match? "foo" (number? $number) (+ $number 1)) #f))
-(check (equal? (match? 123 (number? $number) (+  $number 1)) 124))
+(define-property number match-prim?
+  (lambda ($syntax)
+    (syntax-case $syntax ()
+      ((_ val (_ n) body)
+        #`(and
+          (number? val)
+          (let ((n val))
+            body))))))
+
+(check (equal? (match? "foo" (string $string) (string-append $string "!")) "foo!"))
+(check (equal? (match? 123 (string $string) (string-append $string "!")) #f))
+
+(check (equal? (match? "foo" (number $number) (+ $number 1)) #f))
+(check (equal? (match? 123 (number $number) (+  $number 1)) 124))
 
 (define-property cons match-prim?
   (lambda ($syntax)
@@ -51,37 +68,37 @@
 
 ; === match
 
-(check (equal? (match "foo" (string? $string) (string-append $string "!")) "foo!"))
-(check (raises (match 123 (string? $string) (string-append $string "!"))))
+(check (equal? (match "foo" (string $string) (string-append $string "!")) "foo!"))
+(check (raises (match 123 (string $string) (string-append $string "!"))))
 
 ; === match-case?
 
 (check
   (equal?
     (match-case? "foo"
-      ((string? s) (string-append s "!"))
-      ((number? n) (number->string n)))
+      ((string s) (string-append s "!"))
+      ((number n) (number->string n)))
     "foo!"))
 
 (check
   (equal?
     (match-case? 123
-      ((string? s) (string-append s "!"))
-      ((number? n) (+ n 1)))
+      ((string s) (string-append s "!"))
+      ((number n) (+ n 1)))
     124))
 
 (check
   (equal?
     (match-case? #\a
-      ((string? s) (string-append s "!"))
-      ((number? n) (+ n 1)))
+      ((string s) (string-append s "!"))
+      ((number n) (+ n 1)))
     #f))
 
 (check
   (equal?
     (match-case? #\a
-      ((string? s) (string-append s "!"))
-      ((number? n) (+ n 1))
+      ((string s) (string-append s "!"))
+      ((number n) (+ n 1))
       (x (format "char ~a" x)))
     "char a"))
 
@@ -90,12 +107,12 @@
 (check
   (equal?
     (match-case "foo"
-      ((string? s) (string-append s "!"))
-      ((number? n) (number->string n)))
+      ((string s) (string-append s "!"))
+      ((number n) (number->string n)))
     "foo!"))
 
 (check
   (raises
     (match-case #\a
-      ((string? s) (string-append s "!"))
-      ((number? n) (+ n 1)))))
+      ((string s) (string-append s "!"))
+      ((number n) (+ n 1)))))
