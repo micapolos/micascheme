@@ -29,8 +29,15 @@
   (lambda ($syntax)
     (syntax-case $syntax ()
       ((_ val (_ a b) body)
-        #`(let ((a (car val)) (b (cdr val)))
-            body)))))
+        #`(and
+          (pair? val)
+          (let ((a (car val)) (b (cdr val)))
+            body))))))
+
+(check
+  (equal?
+    (match? "foo" (cons a b) (cons b a))
+    #f))
 
 (check
   (equal?

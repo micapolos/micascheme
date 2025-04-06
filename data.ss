@@ -7,8 +7,7 @@
     (binder)
     (identifier)
     (lets)
-    (switch)
-    (match))
+    (switch))
 
   (define-syntax data
     (lambda (stx)
