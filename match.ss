@@ -1,13 +1,29 @@
 (library (match)
   (export
+    define-match-prim?
+    match-prim?
     matcher
     if-matches
-    match
+    match?
+    match-case?
     define-predicate-matcher)
   (import (scheme) (syntax) (syntaxes))
 
   ; TODO: Define matchers in (data), for predicate and constructor
   ; TODO: Define core matchers and export in (micascheme)
+
+  (define-lookup-syntax (match-prim? $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ val (id arg ...) body)
+        (for-all identifier? (syntaxes val id arg ...))
+        (
+          (or
+            ($lookup #'id #'match-prim?)
+            (syntax-error #'id "match-prim? undefined for"))
+          $syntax))))
+
+  (define-rule-syntax (define-match-prim? name value)
+    (define-property name match-prim? value))
 
   (define-lookup-syntax (matcher $syntax $lookup)
     (syntax-case $syntax ()
@@ -15,19 +31,17 @@
         (syntax-case #'spec ()
           (id
             (identifier? #'id)
-            #`(let ((id expr))
-              (lambda () body)))
+            #`(let ((id expr)) body))
           (x
             (let (($x (datum x)))
               (or (boolean? $x) (char? $x) (number? $x) (string? $x)))
-            #`(and (equal? expr x)
-              (lambda () body)))
+            #`(and (equal? expr x) body))
           ((id arg ...)
             (identifier? #'id)
             (let*
               (($matcher
                 (or
-                  ($lookup #'id #'matcher)
+                  ($lookup #'id #'match-prim?)
                   (syntax-error #'id "no matcher")))
                ($args (syntaxes arg ...))
                ($tmps?
@@ -64,28 +78,31 @@
           (other (syntax-error #'other) "invalid matcher spec")))))
 
   (define-rule-syntax (if-matches expr spec match-body else-body)
-    (let
-      (($cont? (matcher expr spec match-body)))
-      (if $cont? ($cont?) else-body)))
+    (or
+      (matcher expr spec match-body)
+      else-body))
 
   (define-rules-syntax
-    ((match-val val)
+    ((match-val? val)
       #f)
-    ((match-val val (spec match-body) rules ...)
+    ((match-val? val (spec match-body) rules ...)
       (if-matches val spec match-body
-        (match-val val rules ...))))
+        (match-val? val rules ...))))
 
-  (define-rule-syntax (match expr rule ...)
+  (define-rule-syntax (match-case? expr rule ...)
     (let ((val expr))
-      (match-val val rule ...)))
+      (match-val? val rule ...)))
+
+  (define-rule-syntax (match? expr spec body)
+    (let ((val expr))
+      (match-val? val (spec body))))
 
   (define-rule-syntax (define-predicate-matcher test?)
-    (define-property test? matcher
+    (define-property test? match-prim?
       (lambda ($syntax)
         (syntax-case $syntax ()
           ((_ expr (_ x) body)
             #`(let ((val expr))
               (and (test? val)
-                (lambda ()
-                  (let ((x val)) body)))))))))
+                (let ((x val)) body))))))))
 )
