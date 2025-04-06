@@ -2,7 +2,6 @@
   (export
     define-match-prim?
     match-prim?
-    if-matches
     match?
     match-case?
     define-predicate-match-prim?)
@@ -75,18 +74,6 @@
                       $tmps?
                       $args))))))
           (other (syntax-error #'other) "invalid matcher spec")))))
-
-  (define-rule-syntax (if-matches expr spec match-body else-body)
-    (or
-      (match? expr spec match-body)
-      else-body))
-
-  (define-rules-syntax
-    ((match-val? val)
-      #f)
-    ((match-val? val (spec match-body) rules ...)
-      (if-matches val spec match-body
-        (match-val? val rules ...))))
 
   (define-rule-syntax (match? expr spec body)
     (let ((val expr))

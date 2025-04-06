@@ -24,9 +24,6 @@
         #`(let ((a (car val)) (b (cdr val)))
             body)))))
 
-(check (equal? (if-matches "foo" (string? s) (string-append s "!") "error") "foo!"))
-(check (equal? (if-matches 123 (string? s) (string-append s "!") "error") "error"))
-
 (check
   (equal?
     (match-case? "foo"
