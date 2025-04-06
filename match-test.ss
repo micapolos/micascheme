@@ -58,10 +58,10 @@
 
 (check
   (equal?
-    (matcher (cons 1 2) (cons a b) (cons b a))
+    (match? (cons 1 2) (cons a b) (cons b a))
     (cons 2 1)))
 
 (check
   (equal?
-    (matcher (list 1 2) (cons a (cons b c)) (cons b (cons a c)))
+    (match? (list 1 2) (cons a (cons b c)) (cons b (cons a c)))
     (list 2 1)))
