@@ -6,7 +6,7 @@
     if-matches
     match?
     match-case?
-    define-predicate-matcher)
+    define-predicate-match-prim?)
   (import (scheme) (syntax) (syntaxes))
 
   ; TODO: Define matchers in (data), for predicate and constructor
@@ -19,7 +19,7 @@
         (
           (or
             ($lookup #'id #'match-prim?)
-            (syntax-error #'id "match-prim? undefined for"))
+            (syntax-error #'id "match-prim? not defined for"))
           $syntax))))
 
   (define-rule-syntax (define-match-prim? name value)
@@ -39,10 +39,10 @@
           ((id arg ...)
             (identifier? #'id)
             (let*
-              (($matcher
+              (($match-prim?
                 (or
                   ($lookup #'id #'match-prim?)
-                  (syntax-error #'id "no matcher")))
+                  (syntax-error #'id "match-prim? not defined for")))
                ($args (syntaxes arg ...))
                ($tmps?
                 (map
@@ -59,7 +59,7 @@
                       (and $tmp? #`(#,$tmp? #'$arg)))
                     $tmps?
                     $args)))
-                #,($matcher
+                #,($match-prim?
                   #`(matcher
                     expr
                     (id
@@ -97,7 +97,7 @@
     (let ((val expr))
       (match-val? val (spec body))))
 
-  (define-rule-syntax (define-predicate-matcher test?)
+  (define-rule-syntax (define-predicate-match-prim? test?)
     (define-property test? match-prim?
       (lambda ($syntax)
         (syntax-case $syntax ()

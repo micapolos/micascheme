@@ -14,8 +14,8 @@
 
 (check (equal? (match-case? "foo" (foo (string-append foo "!"))) "foo!"))
 
-(define-predicate-matcher string?)
-(define-predicate-matcher number?)
+(define-predicate-match-prim? string?)
+(define-predicate-match-prim? number?)
 
 (define-property cons match-prim?
   (lambda ($syntax)
