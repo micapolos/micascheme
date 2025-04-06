@@ -7,7 +7,7 @@
     match
     match-case
     define-predicate-match-prim?)
-  (import (scheme) (syntax) (syntaxes))
+  (import (scheme) (syntax))
 
   ; TODO: Define matchers in (data), for predicate and constructor
   ; TODO: Define core matchers and export in (micascheme)
@@ -15,7 +15,7 @@
   (define-lookup-syntax (match-prim? $syntax $lookup)
     (syntax-case $syntax ()
       ((_ val (id arg ...) body)
-        (for-all identifier? (syntaxes val id arg ...))
+        (for-all identifier? (syntax->list #'(val id arg ...)))
         (
           (or
             ($lookup #'id #'match-prim?)
@@ -43,7 +43,7 @@
                 (or
                   ($lookup #'id #'match-prim?)
                   (syntax-error #'id "match-prim? not defined for")))
-               ($args (syntaxes arg ...))
+               ($args (syntax->list #'(arg ...)))
                ($tmps?
                 (map
                   (lambda ($arg)
