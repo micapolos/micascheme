@@ -50,7 +50,7 @@
   ; ----------------------------------------------------------
 
   (data (parsed value))
-  (data (thunk parsed-opt push-fn))
+  (data (thunk parsed? push-fn))
 
   (define (thunk-push $thunk $char)
     ((thunk-push-fn $thunk) $char))
@@ -64,9 +64,9 @@
     (parser-thunk-do ($thunk $parser)
       (thunk-push $thunk $char)))
 
-  (define (parser-parsed-opt $parser)
+  (define (parser-parsed? $parser)
     (parser-thunk-do ($thunk $parser)
-      (thunk-parsed-opt $thunk)))
+      (thunk-parsed? $thunk)))
 
   (define (parser-bind-with $parser $fn-parser $fn)
     (cond
@@ -74,10 +74,10 @@
       (else
         (lets
           ($thunk $parser)
-          ($parsed-opt (thunk-parsed-opt $thunk))
-          ($fn-parser (or (and $parsed-opt ($fn (parsed-value $parsed-opt))) $fn-parser))
+          ($parsed? (thunk-parsed? $thunk))
+          ($fn-parser (or (and $parsed? ($fn (parsed-value $parsed?))) $fn-parser))
           (thunk
-            (parser-parsed-opt $fn-parser)
+            (parser-parsed? $fn-parser)
             (lambda ($char)
               (parser-bind-with
                 (thunk-push $thunk $char)
@@ -107,9 +107,9 @@
       (switch (read-char $port)
         ((eof-object? _)
           (lets
-            ($parsed-opt (thunk-parsed-opt $thunk))
-            (if $parsed-opt
-              (parsed-value $parsed-opt)
+            ($parsed? (thunk-parsed? $thunk))
+            (if $parsed?
+              (parsed-value $parsed?)
               (parse-error $line $column))))
         ((char? $char)
           (lets
@@ -159,7 +159,7 @@
   (define (parser-until-newline $parser)
     (parser-thunk-do ($thunk $parser)
       (thunk
-        (thunk-parsed-opt $thunk)
+        (thunk-parsed? $thunk)
         (lambda ($char)
           (case $char
             ((#\newline) #f)
@@ -274,9 +274,9 @@
         (else 
           (thunk
             (lets
-              ($values (map parsed-value (filter-opts (map thunk-parsed-opt $thunks))))
+              ($values (map parsed-value (filter-opts (map thunk-parsed? $thunks))))
               (case (length $values)
-                ((0) (parser-parsed-opt $else))
+                ((0) (parser-parsed? $else))
                 ((1) (parsed (car $values)))
                 (else #f)))
             (lambda ($char)
@@ -342,7 +342,7 @@
       (thunk
         (and
           (= $indent indent-size)
-          (thunk-parsed-opt $thunk))
+          (thunk-parsed? $thunk))
         (lambda ($char)
           (case $char
             ((#\space)
@@ -374,7 +374,7 @@
       (($parser $skip-newline?)
         (parser-thunk-do ($thunk $parser)
           (thunk
-            (thunk-parsed-opt $thunk)
+            (thunk-parsed? $thunk)
             (lambda ($char)
               (case $char
                 ((#\newline)
