@@ -27,6 +27,7 @@
   (inline)
   (int)
   (io)
+  (keyword)
   (leo)
   (leo-syntax)
   (leo2)
