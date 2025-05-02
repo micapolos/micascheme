@@ -17,6 +17,9 @@
   (define (make-empty-vm $size)
     (make-vm (make-bytevector $size 0) $size))
 
+  (define (vm-sp-set+! $vm $offset)
+    (vm-sp-set! (+ (vm-sp $vm) $offset)))
+
   (define (vm-u8-set! $vm $index $u8)
     (bytevector-u8-set! (vm-bytevector $vm) $index $u8))
 
