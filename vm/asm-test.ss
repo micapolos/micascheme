@@ -1,4 +1,4 @@
-(import (micascheme) (vm vm) (vm run))
+(import (micascheme) (vm vm) (vm asm))
 
 (define-syntax push-u8
   (make-compile-time-value
@@ -9,7 +9,7 @@
 
 (lets
   ($vm (make-empty-vm 4))
+  ($asm (asm (push-u8 13) (push-u8 12) (push-u8 11)))
   (run
-    (vm-run $vm (push-u8 13))
-    (vm-run $vm (push-u8 12) (push-u8 11))
+    ($asm $vm)
     (check (equal? $vm (make-vm (bytevector 0 11 12 13) 1)))))

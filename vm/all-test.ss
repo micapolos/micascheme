@@ -2,4 +2,4 @@
 
 (test
   (vm vm)
-  (vm run))
+  (vm asm))
