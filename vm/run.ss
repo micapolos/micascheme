@@ -1,0 +1,21 @@
+(library (vm run)
+  (export vm-run)
+  (import (micascheme))
+
+  (define-syntax (vm-run $syntax)
+    (lambda ($lookup)
+      (define (transform $vm $syntax)
+        (syntax-case $syntax ()
+          ((id arg ...)
+            (identifier? #'id)
+            (lets
+              ($fn ($lookup #'id))
+              (if $fn
+                ($fn $vm $syntax)
+                (syntax-error #'id "not a transformer"))))))
+      (syntax-case $syntax ()
+        ((id vm arg ...)
+          #`(let ((vm-var vm))
+            #,@(map (partial transform #'vm-var) #'(arg ...))
+            (void))))))
+)

@@ -1,4 +1,5 @@
 (import (micascheme))
 
 (test
-  (vm vm))
+  (vm vm)
+  (vm run))
