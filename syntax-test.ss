@@ -37,6 +37,15 @@
       (environment '(scheme) '(syntax)))
     `(begin 0 1 2 3)))
 
+; --- syntax?
+
+(check (syntax? #'foo))
+(check (syntax? #'123))
+(check (syntax? #'(a b)))
+(check (not (syntax? 'foo)))
+(check (not (syntax? 123)))
+(check (not (syntax? '(a b))))
+
 ; --- syntax=?
 
 (check (syntax=? #`10 #`10))

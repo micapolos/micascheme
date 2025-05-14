@@ -24,6 +24,7 @@
     syntax->datum/annotation
     bytevector->syntax
     vector->syntax
+    syntax?
     syntax=?
     syntax-datum=?
     syntax-replace
@@ -202,6 +203,8 @@
           .
           #,(syntax-replace... $from-id $tos #'y)))
       (other #'other)))
+
+  (define syntax? (record-predicate (record-rtd #`foo)))
 
   (define (syntax=? a b)
     (syntax-case a ()
