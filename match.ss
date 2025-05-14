@@ -8,15 +8,16 @@
     match-case)
   (import (scheme) (syntax))
 
+  (meta define (match-prim?-ref $lookup $id)
+    (or
+      ($lookup $id #'match-prim?)
+      (syntax-error $id "match-prim? not defined for")))
+
   (define-lookup-syntax (match-prim? $syntax $lookup)
     (syntax-case $syntax ()
       ((_ val (id arg ...) body)
         (for-all identifier? (syntax->list #'(val id arg ...)))
-        (
-          (or
-            ($lookup #'id #'match-prim?)
-            (syntax-error #'id "match-prim? not defined for"))
-          $syntax))))
+        ((match-prim?-ref $lookup #'id) $syntax))))
 
   (define-rule-syntax (define-match-prim? name value)
     (define-property name match-prim? value))
@@ -35,10 +36,7 @@
           ((id arg ...)
             (identifier? #'id)
             (let*
-              (($match-prim?
-                (or
-                  ($lookup #'id #'match-prim?)
-                  (syntax-error #'id "match-prim? not defined for")))
+              (($match-prim? (match-prim?-ref $lookup #'id))
                ($args (syntax->list #'(arg ...)))
                ($tmps?
                 (map
@@ -71,7 +69,11 @@
                       #'body
                       $tmps?
                       $args))))))
-          (other (syntax-error #'other) "invalid matcher spec")))))
+          (other
+            (syntax-error #'other "invalid match-prim? syntax"))))))
+
+  (define-rule-syntax (match-error expr)
+    (syntax-error #'expr "no match for"))
 
   (define-rule-syntax (match? expr spec body)
     (let ((val expr))
@@ -80,7 +82,7 @@
   (define-rule-syntax (match expr spec body)
     (or
       (match? expr spec body)
-      (syntax-error #'expr "no match for")))
+      (match-error expr)))
 
   (define-rule-syntax (match-case? expr (spec body) ...)
     (let ((val expr))
@@ -89,5 +91,5 @@
   (define-rule-syntax (match-case expr (spec body) ...)
     (or
       (match-case? expr (spec body) ...)
-      (syntax-error #'expr "no match for")))
+      (match-error expr)))
 )
