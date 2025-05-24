@@ -95,5 +95,6 @@
   (typed-scheme all)
   (verilog all)
   (vm all)
+  (zasm all)
   (zexy all)
 )
