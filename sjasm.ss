@@ -23,15 +23,16 @@
     (lets
       (run
         (asm
-          (savenex open "/tmp/main.nex" label stack)
+          (savenex open "/Users/micapolos/git/zexy/built/scheme-demo.nex" label stack)
           (savenex auto)
           (savenex close)
-          (cspectmap "/tmp/main.map"))
+          (cspectmap "/Users/micapolos/git/zexy/built/scheme-demo.map"))
         (display (emitted))
-        (displayln "======================================================================")
-        (save "/tmp/main.asm"))
-      ($sjasm-result (system "sjasmplus --zxnext=cspect --lst=/tmp/main.lst /tmp/main.asm"))
+        (displayln "========================================================================")
+        (save "/Users/micapolos/git/zexy/nex/scheme-demo.asm"))
+      ($sjasm-result
+        (system "sjasmplus --zxnext=cspect --lst=/Users/micapolos/git/zexy/built/scheme-demo.lst /Users/micapolos/git/zexy/nex/scheme-demo.asm"))
       (run
         (when (= $sjasm-result 0)
-          (system "cspect -map=/tmp/main.map /tmp/main.nex")))))
+          (system "cspect -map=/Users/micapolos/git/zexy/built/scheme-demo.map /Users/micapolos/git/zexy/built/scheme-demo.nex")))))
 )
