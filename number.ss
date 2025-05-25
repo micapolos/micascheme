@@ -59,7 +59,7 @@
     (not (= a b)))
 
   (define-rule-syntax (integer-mask size)
-    (syntax-inline (- (bitwise-arithmetic-shift-left 1 size) 1)))
+    (syntax-eval (- (bitwise-arithmetic-shift-left 1 size) 1)))
 
   (define-rule-syntax (integer-wraparound size i)
     (bitwise-and i (integer-mask size)))

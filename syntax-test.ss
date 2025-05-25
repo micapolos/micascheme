@@ -187,8 +187,8 @@
 
 (check
   (equal?
-    (syntax-inline
+    (syntax-eval
       #`(
-        #,(identifier-append #'syntax-inline #'string #'- #'append)
+        #,(identifier-append #'syntax-eval #'string #'- #'append)
         "foo" "bar"))
     "foobar"))

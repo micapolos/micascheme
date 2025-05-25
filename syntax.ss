@@ -17,7 +17,7 @@
     syntax-rule-id
     syntax-clause-id
     syntax-case-opt
-    syntax-inline
+    syntax-eval
     inline-indexed
     fenders implicit
     syntax-rule->clause
@@ -162,7 +162,7 @@
         #`(syntax-case $expr ($literal ...)
           $clause ... (_ #f)))))
 
-  (define-syntax (syntax-inline $syntax)
+  (define-syntax (syntax-eval $syntax)
     (syntax-case $syntax ()
       ((_ $expr)
         #'(let-syntax
