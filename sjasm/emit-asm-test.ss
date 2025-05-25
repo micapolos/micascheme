@@ -1,0 +1,10 @@
+(import (micascheme) (sjasm emit-asm))
+
+(emit 10)
+(emit 20)
+(check (equal? (flush) '(10 20)))
+(check (equal? (flush) '()))
+(emit 30)
+(emit 40)
+(check (equal? (flush) '(30 40)))
+(check (equal? (flush) '()))
