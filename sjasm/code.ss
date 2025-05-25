@@ -30,7 +30,7 @@
       (map instr-code $syntaxes)))
 
   (define (instr-code $syntax)
-    (syntax-case $syntax (savenex)
+    (syntax-case $syntax (savenex include)
       ((savenex op arg* ...)
         (space-separated-code
           (identifier-code #'savenex)
@@ -38,6 +38,10 @@
           (list->separated-code
             (code ", ")
             (map expr-code #'(arg* ...)))))
+      ((include path)
+        (space-separated-code
+          "include"
+          (string-code (datum path))))
       ((op arg ...)
         (space-separated-code
           (identifier-code #'op)

@@ -20,6 +20,7 @@
 (check-instr (ld (hl) #xff) "ld (hl), 255")
 (check-instr (ld ((+ ix 2)) sp) "ld (ix + 2), sp")
 (check-instr (savenex open "foo" 123) "savenex open \"foo\", 123")
+(check-instr (include "../foo.asm") "include ../foo.asm")
 
 (check-line foo "foo")
 (check-line (foo : nop) "foo nop")
