@@ -17,11 +17,11 @@
       (id
         (identifier? #'id)
         (identifier-code #'id))
-      ((id : instr ...)
+      ((id : x ...)
         (identifier? #'id)
         (space-separated-code
           (identifier-code #'id)
-          (indented-code (instrs-code #'(instr ...)))))
+          (instr-code #'(x ...))))
       (instr (indented-code (instr-code #'instr)))))
 
   (define (instrs-code $syntaxes)
@@ -53,6 +53,9 @@
       (id
         (number? (datum id))
         (number-code (datum id)))
+      (id
+        (char? (datum id))
+        (number-code (char->integer (datum id))))
       (id
         (string? (datum id))
         (string-code (format "~s" (datum id))))

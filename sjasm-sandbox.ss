@@ -1,0 +1,20 @@
+(import (sjasm))
+
+(asm
+  (device zxspectrumnext)
+  (org #x8000)
+Main
+  (nextreg #x50 #xff)
+  (nextreg #x51 #xff)
+  (ld a #\H)
+  (rst #x10)
+  (ld a #\e)
+  (rst #x10)
+  (ld a #\l)
+  (rst #x10)
+  (ld a #\l)
+  (rst #x10)
+  (ld a #\o)
+  (rst #x10)
+  (loop : jp loop))
+(cspect Main #xbfe0)

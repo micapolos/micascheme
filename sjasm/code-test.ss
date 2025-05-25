@@ -22,7 +22,6 @@
 (check-instr (savenex open "foo" 123) "savenex open \"foo\", 123")
 
 (check-line foo "foo")
-(check-line (foo :) "foo")
-(check-line (foo : (nop) (ret)) "foo nop" "  ret")
+(check-line (foo : nop) "foo nop")
 (check-line (nop) "  nop")
 (check-line (savenex open "foo" 123) "  savenex open \"foo\", 123")
