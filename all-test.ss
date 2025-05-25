@@ -10,6 +10,7 @@
   (case)
   (check)
   (code)
+  (core)
   (compiler)
   (current)
   (datum)

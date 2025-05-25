@@ -53,7 +53,9 @@
     product
     map-product
 
-    define-list->/append)
+    define-list->/append
+
+    ?list->list?)
 
   (import
     (scheme)
@@ -417,4 +419,7 @@
       (lambda ($item)
         (map-cdr $fn $item))
       $list))
+
+  (define (?list->list? $?list)
+    (and (for-all not-false? $?list) $?list))
 )

@@ -486,3 +486,10 @@
       (equal?
         (map* $proc $proc* '(string number . char) '("foo" 128 #\a #\b #\c))
         '((string . "foo") (number . 128) (char . #\a) (char . #\b) (char . #\c))))))
+
+; === ?list->list?
+
+(check (equal? (?list->list? '()) '()))
+(check (equal? (?list->list? '(1 2 3)) '(1 2 3)))
+(check (equal? (?list->list? '(1 #f 3)) #f))
+
