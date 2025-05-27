@@ -19,7 +19,7 @@
 
   (data (asm org labels values puts))
 
-  (define-aux-keywords org eq u8)
+  (define-keywords org eq u8)
 
   (define (empty-asm)
     (asm 0 (stack) (stack) (stack)))

@@ -34,12 +34,12 @@
   (import
     (only (micascheme)
       define-rule-syntax
-      define-aux-keyword
+      define-keyword
       begin ...))
 
   (define-rule-syntax (define-ops $op ...)
     (begin
-      (define-aux-keyword $op) ...))
+      (define-keyword $op) ...))
 
   (define-ops
     ; regs

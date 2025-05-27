@@ -3,7 +3,7 @@
 (run-void
   (define-syntax-literal? +)
   (define-syntax-literal? -)
-  (define-aux-keywords a op b)
+  (define-keywords a op b)
 
   (check
     (equal?
@@ -36,7 +36,7 @@
 (run-void
   (define-syntax-literal? +)
   (define-syntax-literal? -)
-  (define-aux-keywords a op b)
+  (define-keywords a op b)
 
   (define-syntax-matcher-2 string
     (lambda ($pattern)
@@ -116,7 +116,7 @@
 )
 
 (run-void
-  (define-aux-keyword number)
+  (define-keyword number)
 
   (define-syntax-matcher-2 (string $pattern)
     (syntax-case $pattern ()
@@ -161,7 +161,7 @@
 )
 
 (run-void
-  (define-aux-keywords a b c)
+  (define-keywords a b c)
 
   (define-macro join
     ((_ a b) (string-append a b))

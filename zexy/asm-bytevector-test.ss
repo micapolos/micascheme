@@ -8,7 +8,7 @@
   (db #x27))
 
 ; parameterized asm macro
-(define-aux-keywords inc-dec)
+(define-keywords inc-dec)
 (define-asm-syntax-rule (inc-dec $r)
   (begin
     (inc $r)

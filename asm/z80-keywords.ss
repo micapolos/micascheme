@@ -15,9 +15,9 @@
     ix iy
 
     i r)
-  (import (only (micascheme) define-aux-keywords))
+  (import (only (micascheme) define-keywords))
 
-  (define-aux-keywords
+  (define-keywords
     db dw +
 
     nop ld halt

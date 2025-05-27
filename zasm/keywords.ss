@@ -2,5 +2,5 @@
   (export org db dw eq)
   (import (micascheme))
 
-  (define-aux-keywords org db dw eq)
+  (define-keywords org db dw eq)
 )

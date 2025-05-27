@@ -123,7 +123,7 @@
         (empty-context)
         #`(define counter (sequence 0 n (+ n 1)))))
     `(begin
-      (define-aux-keyword counter)
+      (define-keyword counter)
       (define-property counter sequential
         (sequential
           (deps
@@ -138,7 +138,7 @@
         (empty-context)
         #`(define (osc dt) (sequence 0 t (+ t dt)))))
     `(begin
-      (define-aux-keyword osc)
+      (define-keyword osc)
       (define-property osc sequential
         (template
           (stack)

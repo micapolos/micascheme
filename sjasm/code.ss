@@ -21,7 +21,7 @@
         (identifier? #'id)
         (space-separated-code
           (identifier-code #'id)
-          (instr-code #'(x ...))))
+          (indented-code (instrs-code #'(x ...)))))
       (instr (indented-code (instr-code #'instr)))))
 
   (define (instrs-code $syntaxes)

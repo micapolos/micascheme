@@ -25,7 +25,7 @@
           (let ((s val))
             body))))))
 
-(define-aux-keyword number)
+(define-keyword number)
 
 (define-property number match-prim?
   (lambda ($syntax)

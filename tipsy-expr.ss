@@ -68,7 +68,7 @@
       lambda-type
       type-type))
 
-  (define-aux-keyword of)
+  (define-keyword of)
 
   (define (expr-apply $lhs $args)
     (expr
@@ -108,7 +108,7 @@
       #,(expr-type $expr)
       #,(expr-value $expr)))
 
-  (define-aux-keyword typeof)
+  (define-keyword typeof)
 
   (define (syntax-expr $syntax $lookup)
     (syntax-case $syntax (define if lambda typeof of)

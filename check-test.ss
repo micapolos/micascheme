@@ -10,7 +10,7 @@
 ;(check-string (raises (list (list #\a #\b 123))))
 
 (define-check-datum-> foo)
-(define-aux-keyword bar)
+(define-keyword bar)
 
 (define (bar->foo $bar)
   (syntax-case $bar (bar)

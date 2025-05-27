@@ -2,4 +2,4 @@
   (export : savenex)
   (import (micascheme))
 
-  (define-aux-keywords : savenex))
+  (define-keywords : savenex))

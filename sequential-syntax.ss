@@ -94,7 +94,7 @@
       ((define $id $body)
         (identifier? #`$id)
         #`(begin
-          (define-aux-keyword $id)
+          (define-keyword $id)
           (define-property $id sequential
             #,(sequential-syntax
               (syntax-sequential $context
@@ -102,7 +102,7 @@
       ((define ($id $param ...) $body)
         (identifiers? #`($id $param ...))
         #`(begin
-          (define-aux-keyword $id)
+          (define-keyword $id)
           (define-property $id sequential
             #,(sequential-syntax
               (template (stack) (syntax->list #`($param ...)) #`$body)))))
@@ -112,7 +112,7 @@
             (syntax-sequential $context #`$other)
             10)))))
 
-  (define-aux-keyword sequence)
+  (define-keyword sequence)
 
   (define (syntax-sequential $context $syntax)
     (syntax-case $syntax (sequence lets)

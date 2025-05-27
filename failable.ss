@@ -28,7 +28,7 @@
       ((failure? $failure) ($fn $failure))
       ((else $success) $success)))
 
-  (define-aux-keyword failable-failure)
+  (define-keyword failable-failure)
 
   (define-bind failable-failure
     (syntax-rules ()

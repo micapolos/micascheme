@@ -7,7 +7,7 @@
   (data (sampler syntax))
   (data (stream syntax))
 
-  (define-aux-keyword react)
+  (define-keyword react)
 
   (define (react-syntax $syntax $lookup)
     (lets

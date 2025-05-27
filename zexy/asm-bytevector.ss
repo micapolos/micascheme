@@ -14,7 +14,7 @@
   (export
     (import (zexy ops)))
 
-  (define-aux-keyword asm)
+  (define-keyword asm)
 
   (define-rule-syntax (define-asm-syntax $name $transformer)
     (define-property $name asm $transformer))

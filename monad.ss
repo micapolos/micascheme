@@ -132,8 +132,8 @@
 
   ; syntaxes
 
-  (define-aux-keyword pure)
-  (define-aux-keyword bind)
+  (define-keyword pure)
+  (define-keyword bind)
 
   (define-syntax monadic
     (syntax-rules (pure lets)

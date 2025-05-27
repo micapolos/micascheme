@@ -2,7 +2,7 @@
   (export fluent also with)
   (import (scheme) (syntax) (procedure) (let))
 
-  (define-aux-keywords also with)
+  (define-keywords also with)
 
   (define-syntax (fluent $syntax)
     (define (arity-syntax $syntax)

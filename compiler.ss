@@ -11,17 +11,17 @@
     (type)
     (typed))
 
-  (define-aux-keyword boolean)
-  (define-aux-keyword number)
-  (define-aux-keyword type)
-  (define-aux-keyword select)
-  (define-aux-keyword nth)
-  (define-aux-keyword first)
-  (define-aux-keyword second)
-  (define-aux-keyword tuple)
-  (define-aux-keyword get)
-  (define-aux-keyword choice)
-  (define-aux-keyword any)
+  (define-keyword boolean)
+  (define-keyword number)
+  (define-keyword type)
+  (define-keyword select)
+  (define-keyword nth)
+  (define-keyword first)
+  (define-keyword second)
+  (define-keyword tuple)
+  (define-keyword get)
+  (define-keyword choice)
+  (define-keyword any)
 
   ; ----------------------------------------------------------------
 

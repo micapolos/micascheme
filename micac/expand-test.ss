@@ -1,7 +1,7 @@
 (import (micascheme) (micac expand) (micac keywords) (syntax lookup))
 
 (parameterize ((lookup-gen? #f))
-  (define-aux-keywords zero one two)
+  (define-keywords zero one two)
 
   (define $scope
     (fluent (empty-lookup)

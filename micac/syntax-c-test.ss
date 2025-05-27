@@ -1,6 +1,6 @@
 (import (micascheme) (micac keywords) (micac syntax-c))
 
-(define-aux-keywords micac)
+(define-keywords micac)
 
 (define-syntax check-c-string
   (syntax-rules (micac)

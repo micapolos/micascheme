@@ -36,6 +36,6 @@
             (define-rules-syntaxes
               ((#,$define-id id param ...)
                 (begin
-                  (define-aux-keyword id)
+                  (define-keyword id)
                   #,@$internal-initializers))))))))
 )

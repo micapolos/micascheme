@@ -4,7 +4,7 @@
     in out)
   (import (micascheme))
 
-  (define-aux-keywords
+  (define-keywords
     assume expect any-lambda oneof forall
     in out)
 )

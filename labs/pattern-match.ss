@@ -12,9 +12,9 @@
     parse-pattern-2)
   (import (micascheme))
 
-  (define-aux-keyword syntax-matcher)
-  (define-aux-keyword syntax-matcher-2)
-  (define-aux-keyword syntax-literal?)
+  (define-keyword syntax-matcher)
+  (define-keyword syntax-matcher-2)
+  (define-keyword syntax-literal?)
 
   (define $... (datum->syntax #'$... '...))
 

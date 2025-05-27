@@ -7,7 +7,7 @@
 
   (define param (make-thread-parameter (lambda ($addr $u8) (throw no-asm))))
 
-  (define-aux-keywords a f b c d e h l)
+  (define-keywords a f b c d e h l)
   (define-reg-16 org)
   (define-rules-syntaxes (literals a f b c d e h l)
     ((asm write body ...)

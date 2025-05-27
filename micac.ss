@@ -21,7 +21,7 @@
     when cond else)))
   (export (import (only (micascheme) check equal?)))
 
-  (define-aux-keywords run externs)
+  (define-keywords run externs)
 
   (define-syntax micac
     (lambda ($syntax)

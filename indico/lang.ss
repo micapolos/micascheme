@@ -10,7 +10,7 @@
 
   (export (import (indico keywords)))
 
-  (define-aux-keywords native)
+  (define-keywords native)
 
   (define-case-syntax (indico body ...)
     (expr-syntax

@@ -23,6 +23,6 @@
 (check-instr (include "../foo.asm") "include ../foo.asm")
 
 (check-line foo "foo")
-(check-line (foo : nop) "foo nop")
+(check-line (foo : (nop) (ret)) "foo nop" "  ret")
 (check-line (nop) "  nop")
 (check-line (savenex open "foo" 123) "  savenex open \"foo\", 123")

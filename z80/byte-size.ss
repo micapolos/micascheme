@@ -1,0 +1,12 @@
+(library (z80 byte-size)
+  (export byte-size)
+  (import (micascheme) (z80 prim))
+
+  (define-rules-syntax (literals u8 u16 * vector)
+    ((byte-size u8) 1)
+    ((byte-size u16) 2)
+    ((byte-size (* size item))
+      (* size (byte-size item)))
+    ((byte-size (vector item ...))
+      (+ (byte-size item) ...)))
+)

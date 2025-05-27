@@ -8,13 +8,13 @@
       ((_ $syntax $pattern $body)
         (parse-pattern-clause $lookup #'$syntax #'($pattern $body)))))
 
-  (define-aux-keyword literal)
+  (define-keyword literal)
 
   (define-property literal syntax-literal? #t)
 
-  (define-aux-keyword matcher)
-  (define-aux-keyword match)
-  (define-aux-keywords $a $b)
+  (define-keyword matcher)
+  (define-keyword match)
+  (define-keywords $a $b)
 
   (define-property matcher syntax-matcher
     (lambda ($pattern)
@@ -183,7 +183,7 @@
 )
 
 (run-void
-  (define-aux-keyword literal)
+  (define-keyword literal)
 
   (define ($lookup $key $id)
     (and
@@ -204,7 +204,7 @@
 )
 
 (run-void
-  (define-aux-keyword matcher)
+  (define-keyword matcher)
 
   (define ($lookup $key $id)
     (and
@@ -226,7 +226,7 @@
 )
 
 (run-void
-  (define-aux-keyword matcher)
+  (define-keyword matcher)
 
   (define ($lookup $key $id)
     (and

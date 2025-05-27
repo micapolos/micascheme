@@ -14,9 +14,9 @@
     if
     and or xor nand nor xnor not
     log)
-  (import (only (micascheme) define-aux-keywords))
+  (import (only (micascheme) define-keywords))
 
-  (define-aux-keywords
+  (define-keywords
     module input output
     macro repeat
     on posedge negedge edge

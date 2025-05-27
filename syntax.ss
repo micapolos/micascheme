@@ -5,8 +5,8 @@
     syntax-null?
     define-rule-syntax
     define-case-syntax
-    define-aux-keyword
-    define-aux-keywords
+    define-keyword
+    define-keywords
     unbegin-syntaxes
     unbegin-syntax
     syntaxes->syntax
@@ -118,12 +118,12 @@
             (syntax-case $tmp $keywords
               $case ...))))))
 
-  (define-rule-syntax (define-aux-keyword aux)
+  (define-rule-syntax (define-keyword aux)
     (define-rule-syntax aux
       (syntax-error #'aux "misplaced aux keyword")))
 
-  (define-rule-syntax (define-aux-keywords aux ...)
-    (begin (define-aux-keyword aux) ...))
+  (define-rule-syntax (define-keywords aux ...)
+    (begin (define-keyword aux) ...))
 
   (define-syntax define-lookup-syntax
     (syntax-rules ()

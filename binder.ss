@@ -10,7 +10,7 @@
     (identifier)
     (syntax))
 
-  (define-aux-keyword bind)
+  (define-keyword bind)
 
   ; TODO: Replace all usages with define-bind and remove
   (define-rule-syntax (define-binder $name $binder)

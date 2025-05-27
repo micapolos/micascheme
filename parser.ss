@@ -44,8 +44,8 @@
 
   ; ----------------------------------------------------------
 
-  (define-aux-keyword selected)
-  (define-aux-keyword skip)
+  (define-keyword selected)
+  (define-keyword skip)
 
   ; ----------------------------------------------------------
 

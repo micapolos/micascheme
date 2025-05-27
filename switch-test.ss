@@ -34,8 +34,8 @@
     (void)))
 
 (run
-  (define-aux-keyword number-with-one)
-  (define-aux-keyword string-with-excl)
+  (define-keyword number-with-one)
+  (define-keyword string-with-excl)
 
   (define-bind number-with-one
     (syntax-rules ()

@@ -42,7 +42,7 @@
       (expr (%take x size)
         #`(%take #,(inline (expr x)) size))))
 
-  (define-aux-keyword exprs)
+  (define-keyword exprs)
 
   (define-case-syntax (lookup+defs lookup inline def ...)
     #`(fluent lookup

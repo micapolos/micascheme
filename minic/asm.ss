@@ -12,7 +12,7 @@
     (minic prim)
     (only (switch) index-switch))
 
-  (define-aux-keywords
+  (define-keywords
     local
     nop block switch loop
     const ld inc dec add sub

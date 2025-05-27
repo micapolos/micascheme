@@ -11,7 +11,7 @@
   (any))
 
 (data a-procedure)
-(define-aux-keyword fixnum)
+(define-keyword fixnum)
 
 (define $environment (environment '(scheme)))
 

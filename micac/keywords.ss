@@ -7,7 +7,7 @@
     macro extern return)
   (import (syntax))
 
-  (define-aux-keywords
+  (define-keywords
     const var
     set
     ref &ref

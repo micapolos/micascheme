@@ -11,7 +11,7 @@
     ((define-put-syntax $id $expr)
       (identifier? #'$id)
       (begin
-        (define-aux-keyword $id)
+        (define-keyword $id)
         (define-property $id put $expr)))
     ((define-put-syntax ($id $port $syntax) $body ...)
       (define-put-syntax $id

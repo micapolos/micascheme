@@ -4,7 +4,7 @@
 (check (equal? (identifiers? #'(foo bar)) #t))
 (check (equal? (identifiers? #'(foo 123)) #f))
 
-(define-aux-keyword foo)
+(define-keyword foo)
 (check (raises foo))
 
 (check (syntax-null? #'()))

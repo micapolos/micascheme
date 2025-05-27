@@ -1,6 +1,6 @@
 (import (scheme) (lets) (check) (syntax) (switch) (generate) (syntax-match) (boolean))
 
-(define-aux-keywords foo bar)
+(define-keywords foo bar)
 
 (define-pattern-match? str
   (syntax-rules ()

@@ -2,7 +2,7 @@
   (export int const extend clamp add sub inc dec)
   (import (micascheme) (syntaxes))
 
-  (define-aux-keywords const extend clamp add sub inc dec)
+  (define-keywords const extend clamp add sub inc dec)
 
   (define-syntax (int-mask $syntax)
     (syntax-case $syntax ()

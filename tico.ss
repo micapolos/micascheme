@@ -26,10 +26,10 @@
   (data (struct name items))
   (data (function-type params result))
 
-  (define-aux-keyword get)
-  (define-aux-keyword type)
-  (define-aux-keyword boolean)
-  (define-aux-keyword number)
+  (define-keyword get)
+  (define-keyword type)
+  (define-keyword boolean)
+  (define-keyword number)
 
   (define tico-environment
     (copy-environment (environment `(micascheme))))

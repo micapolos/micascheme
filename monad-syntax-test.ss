@@ -3,14 +3,14 @@
 ; === pure ===
 
 (let ()
-  (define-aux-keyword option)
+  (define-keyword option)
   (define-pure option (lambda ($value) $value))
   (check (procedure? (pure option)))
   (check (equal? ((pure option) 123) 123))
   (check (equal? (pure (option 123)) 123)))
 
 (let ()
-  (define-aux-keyword option)
+  (define-keyword option)
   (define-pure (option $value) $value)
   (check (procedure? (pure option)))
   (check (equal? ((pure option) 123) 123))
@@ -19,7 +19,7 @@
 ; == bind ===
 
 (let ()
-  (define-aux-keyword option)
+  (define-keyword option)
   (define-bind option
     (lambda ($fn $value)
       (and $value ($fn $value))))
@@ -29,7 +29,7 @@
   (check (equal? (bind option fx1+ #f) #f)))
 
 (let ()
-  (define-aux-keyword option)
+  (define-keyword option)
   (define-bind (option $fn $value)
     (and $value ($fn $value)))
   (check (procedure? (bind option)))

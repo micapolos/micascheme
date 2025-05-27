@@ -13,9 +13,9 @@
     assign set! ref
     append
     display)
-  (import (only (micascheme) define-aux-keywords))
+  (import (only (micascheme) define-keywords))
 
-  (define-aux-keywords
+  (define-keywords
     module input output
     wire reg
     always

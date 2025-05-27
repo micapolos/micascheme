@@ -3,7 +3,7 @@
   (import
     (micascheme))
 
-  (define-aux-keyword then)
+  (define-keyword then)
 
   (define (slick-syntax $syntax)
     (lets

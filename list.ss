@@ -112,7 +112,7 @@
         (let ((val expr)) 
           (and val (lets? decl ... body))))))
 
-  (define-aux-keyword opt)
+  (define-keyword opt)
 
   (define (fold-while $pred $fn $initial $list)
     (cond
