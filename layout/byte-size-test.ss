@@ -1,4 +1,4 @@
-(import (micascheme) (z80 prim) (z80 byte-size))
+(import (micascheme) (layout keywords) (layout byte-size))
 
 (check (equal? (byte-size u8) 1))
 (check (equal? (byte-size u16) 2))

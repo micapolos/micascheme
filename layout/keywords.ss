@@ -1,4 +1,4 @@
-(library (z80 prim)
+(library (layout keywords)
   (export u8 u16)
   (import (micascheme))
 
