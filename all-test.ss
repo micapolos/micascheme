@@ -1,7 +1,6 @@
 (import (micascheme))
 
 (test
-  (asm)
   (any)
   (boolean)
   (binder)

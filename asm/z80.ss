@@ -9,7 +9,7 @@
       (+ %+))
     (asm z80-keywords)
     (asm syntax)
-    (asm))
+    (asm asm))
 
   (define-rule-syntax (asm-syntax-match? expr (pattern fender item ...) ...)
     (syntax-match? expr

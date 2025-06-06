@@ -1,6 +1,6 @@
 (library (asm base)
   (export db dw)
-  (import (micascheme) (asm) (asm syntax))
+  (import (micascheme) (asm asm) (asm syntax))
 
   (define-asm-syntax (db item ...) ($asm)
     (fold-left

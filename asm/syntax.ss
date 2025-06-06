@@ -2,7 +2,7 @@
   (export
     define-asm-syntax
     asm-bytevector)
-  (import (micascheme) (asm))
+  (import (micascheme) (asm asm))
 
   (define-rules-syntax
     ((define-asm-syntax id proc)

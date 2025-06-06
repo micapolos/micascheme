@@ -1,4 +1,4 @@
-(import (micascheme) (asm) (asm syntax))
+(import (micascheme) (asm asm) (asm syntax))
 
 (check-equal?
   (asm-bytevector (u8 #x10 #x20))

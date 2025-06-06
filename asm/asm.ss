@@ -1,4 +1,4 @@
-(library (asm)
+(library (asm asm)
   (export
     org eq u8
     asm asm?
