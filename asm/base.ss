@@ -7,14 +7,12 @@
       (lambda ($asm $item)
         (switch (syntax->datum $item)
           ((string? $string)
-            (asm+syntax $asm
-              #`(u8
-                #,@(map literal->syntax (bytevector->u8-list (string->utf8 $string))))))
+            (fold-left asm+u8 $asm
+              (map literal->syntax (bytevector->u8-list (string->utf8 $string)))))
           ((char? $char)
-            (asm+syntax $asm
-              #`(u8 #,(literal->syntax (char->integer $char)))))
+            (asm+u8 $asm (literal->syntax (char->integer $char))))
           ((else $other)
-            (asm+syntax $asm #`(u8 #,$other)))))
+            (asm+u8 $asm $other))))
       $asm
       (syntaxes item ...)))
 

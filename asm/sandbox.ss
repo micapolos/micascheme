@@ -2,8 +2,7 @@
 
 (pretty-print
   (asm-bytevector
-    (eq foo 3)
+    (eq bar 3)
+    (eq foo bar)
     (u8 0)
-    bar
-    (u8 10)
-    (u8 (+ foo bars))))
+    (u8 10)))
