@@ -54,7 +54,7 @@
       (run
         #,@(map-with
           ($put (reverse (asm-puts $asm)))
-          ($put #'$port)))))
+          ($put $port)))))
 
   (define (asm->bytevector-syntax $asm)
     #`(with-bytevector-output-port $port

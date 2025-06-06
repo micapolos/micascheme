@@ -10,8 +10,10 @@
         #'(value-1 30)
         #'(value-2 (+ value-1 label-1)))
       (stack
-        (lambda ($port) #'(put-u8 $port 1))
-        (lambda ($port) #'(put-u8 $port 2))))
+        (lambda ($port-identifier)
+          #`(put-u8 #,$port-identifier 1))
+        (lambda ($port-identifier)
+          #`(put-u8 #,$port-identifier 2))))
     #'$port)
   `(lets
     (label-1 10)
