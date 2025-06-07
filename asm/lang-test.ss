@@ -15,11 +15,14 @@
 (define-property fragment-3 fragment
   (fragment
     (list #'fragment-2 #'fragment-1)
-    (u8-block 40 50 60)))
+    (u8-block 40 #'fragment-2 #'fragment-1)))
 
 (define-property main fragment
   (fragment
     (list #'fragment-3 #'fragment-1)
-    (u8-block #'fragment-3)))
+    (u8-block 50 #'fragment-1 #'fragment-3)))
 
-(displayln (call-with-bytevector-output-port (asm-put-proc 100 main)))
+(check
+  (equal?
+    (call-with-bytevector-output-port (asm-put-proc 100 main))
+    (bytevector 20 30 10 40 100 102 50 102 103)))

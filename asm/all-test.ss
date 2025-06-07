@@ -6,4 +6,5 @@
   (asm syntax)
   (asm base)
   (asm block)
-  (asm fragment))
+  (asm fragment)
+  (asm lang))
