@@ -4,4 +4,6 @@
   (asm asm)
   (asm z80)
   (asm syntax)
-  (asm base))
+  (asm base)
+  (asm block)
+  (asm fragment))
