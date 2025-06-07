@@ -39,4 +39,4 @@
     (call-with-bytevector-output-port
       (lambda ($port)
         ((asm-put-proc main) $port 100)))
-    (bytevector 20 30 10 40 100 102 50 102 103)))
+    (bytevector 50 108 103 40 106 108 20 30 10)))

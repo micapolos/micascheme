@@ -7,4 +7,5 @@
   (asm base)
   (asm block)
   (asm fragment)
-  (asm lang))
+  (asm lang)
+  (asm expression))
