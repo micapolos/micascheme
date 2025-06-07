@@ -28,17 +28,18 @@
     (main main)))
 
 (check-datum=?
-  (org-label->put-proc-syntax fragment-lookup 100 #'main)
-  '(lets
-    (fragment-2 100)
-    (fragment-1 102)
-    (fragment-3 103)
-    (main 106)
-    (lambda ($port)
-      (put-u8 $port 20)
-      (put-u8 $port 30)
-      (put-u8 $port 10)
-      (put-u8 $port 40)
-      (put-u8 $port 50)
-      (put-u8 $port 60)
-      (put-u8 $port 70))))
+  (org-label->put-proc-syntax fragment-lookup #'main)
+  '(lambda ($port $org)
+    (lets
+      (fragment-2 (+ $org 0))
+      (fragment-1 (+ $org 2))
+      (fragment-3 (+ $org 3))
+      (main (+ $org 6))
+      (run
+        (put-u8 $port 20)
+        (put-u8 $port 30)
+        (put-u8 $port 10)
+        (put-u8 $port 40)
+        (put-u8 $port 50)
+        (put-u8 $port 60)
+        (put-u8 $port 70)))))

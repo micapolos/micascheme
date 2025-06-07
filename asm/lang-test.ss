@@ -1,6 +1,11 @@
 (import (micascheme) (asm lang) (asm block) (asm fragment))
 
-(define-keywords fragment-1 fragment-2 fragment-3 main)
+(define-keywords empty fragment-1 fragment-2 fragment-3 main)
+
+(define-property empty fragment
+  (fragment
+    '()
+    (u8-block)))
 
 (define-property fragment-1 fragment
   (fragment
@@ -24,5 +29,14 @@
 
 (check
   (equal?
-    (call-with-bytevector-output-port (asm-put-proc 100 main))
+    (call-with-bytevector-output-port
+      (lambda ($port)
+        ((asm-put-proc empty) $port 100)))
+    (bytevector)))
+
+(check
+  (equal?
+    (call-with-bytevector-output-port
+      (lambda ($port)
+        ((asm-put-proc main) $port 100)))
     (bytevector 20 30 10 40 100 102 50 102 103)))

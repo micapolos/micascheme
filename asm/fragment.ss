@@ -13,8 +13,8 @@
       ($ass? (assid $id $labels))
       (and $ass? (cdr $ass?))))
 
-  (define (empty-program $org)
-    (program '() $org (empty-block)))
+  (define (empty-program)
+    (program '() 0 (empty-block)))
 
   (define (program+label $fragment-lookup $program $label)
     (lets
@@ -38,16 +38,20 @@
               (+ $org (block-size $fragment-block))
               (block-append $program-block $fragment-block)))))))
 
-  (define (org-label->put-proc-syntax $fragment-lookup $org $label)
+  (define (org-label->put-proc-syntax $fragment-lookup $label)
     (lets
       ((program $labels _ $block)
         (program+label
           $fragment-lookup
-          (empty-program $org)
+          (empty-program)
           $label))
-      #`(lets
-        #,@(map-with
-          ($label (reverse $labels))
-          #`(#,(car $label) #,(literal->syntax (cdr $label))))
-        #,(block->put-proc-syntax $block))))
+      #`(lambda ($port $org)
+        (lets
+          #,@(map-with
+            ($label (reverse $labels))
+            #`(
+              #,(car $label)
+              (+ $org #,(literal->syntax (cdr $label)))))
+          (run
+            #,@(block->put-syntaxes $block #'$port))))))
 )

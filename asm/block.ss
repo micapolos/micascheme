@@ -5,6 +5,7 @@
     empty-block
     block-append
     block->put-proc-syntax
+    block->put-syntaxes
     u8-block)
   (import (micascheme))
 
@@ -39,4 +40,7 @@
       #,@(lets
         ($syntaxes (reverse ((block-put-syntax-stack-proc $block) #'$port)))
         (if (null? $syntaxes) (list #'(void)) $syntaxes))))
+
+  (define (block->put-syntaxes $block $port-identifier)
+    (reverse ((block-put-syntax-stack-proc $block) $port-identifier)))
 )
