@@ -9,4 +9,5 @@
   (asm fragment)
   (asm program)
   (asm lang)
-  (asm expression))
+  (asm expression)
+  (asm frame))

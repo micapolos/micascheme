@@ -7,7 +7,7 @@
     fragment->syntax
     fragment->datum
     syntax->fragment)
-  (import (micascheme) (syntax lookup) (asm block) (asm expression))
+  (import (micascheme) (syntax lookup) (asm block) (asm expression) (asm parameters))
 
   (data (fragment parameters block))
 
@@ -16,18 +16,6 @@
 
   (define (empty-fragment)
     (fragment-with () (empty-block)))
-
-  (define (parameters-push $parameters $parameter)
-    (if (exists (partial free-identifier=? $parameter) $parameters)
-      $parameters
-      (push $parameters $parameter)))
-
-  (define (parameters-append . $parameters-list)
-    (fold-left
-      (lambda ($folded $parameters)
-        (fold-left parameters-push $folded $parameters))
-      (stack)
-      $parameters-list))
 
   (define (fragment-append . $fragments)
     (fragment

@@ -1,6 +1,7 @@
 (library (asm program)
   (export
     program program? program-labels program-block
+    program-with-labels program-with-block
     label->program
     fragment->program
     program+label
