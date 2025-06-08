@@ -23,7 +23,7 @@
         (block-with ($port 2)
           (put-u8 $port 30)
           (put-u8 $port 40)))))
-  '(fragment (bar foo gar)
+  '(fragment (foo bar gar)
     (blob 4
       (lambda ($port)
         (put-u8 $port 10)
