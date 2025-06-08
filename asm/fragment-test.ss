@@ -43,3 +43,15 @@
         (put-u8 $port 20)
         (put-u8 $port 30)
         (put-u8 $port 10)))))
+
+; === syntax-fragment ===
+
+(check
+  (equal?
+    (fragment->datum (syntax->fragment #`(db 10 foo 30)))
+    '(fragment (foo)
+      (block 3
+        (lambda ($port)
+          (put-u8 $port 10)
+          (put-u8 $port foo)
+          (put-u8 $port 30))))))

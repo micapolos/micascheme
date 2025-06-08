@@ -1,16 +1,19 @@
 (library (asm expression)
   (export
     expression expression? expression-parameters expression-syntax
+    expression->datum
     syntax->expression)
   (import (micascheme))
 
   (data (expression parameters syntax))
 
+  (define (expression->datum $expression)
+    `(expression
+      (,@(map syntax->datum (expression-parameters $expression)))
+      ,(syntax->datum (expression-syntax $expression))))
+
   (define (syntax->expression $locals $syntax)
     (syntax-case $syntax (+)
-      (literal
-        (literal? (datum literal))
-        (expression (stack) #'literal))
       (id
         (identifier? #'id)
         (cond
@@ -18,6 +21,9 @@
             (expression (stack) #'id))
           (else
             (expression (stack #'id) #'id))))
+      (literal
+        (literal? (datum literal))
+        (expression (stack) #'literal))
       ((+ arg ...)
         (lets
           ($expressions (map (partial syntax->expression $locals) #'(arg ...)))

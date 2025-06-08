@@ -1,1 +1,21 @@
 (import (micascheme) (asm expression))
+
+(check
+  (equal?
+    (expression->datum (expression (list #'a #'b) #'(+ a b)))
+    '(expression (a b) (+ a b))))
+
+(check
+  (equal?
+    (expression->datum (syntax->expression (list) #'123))
+    '(expression () 123)))
+
+(check
+  (equal?
+    (expression->datum (syntax->expression (list) #'foo))
+    '(expression (foo) foo)))
+
+(check
+  (equal?
+    (expression->datum (syntax->expression (list #'foo) #'foo))
+    '(expression () foo)))

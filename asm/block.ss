@@ -6,7 +6,8 @@
     block-append
     block->put-proc-syntax
     block->put-syntaxes
-    u8-block)
+    u8-block
+    block->datum)
   (import (micascheme))
 
   (data (block size put-syntax-stack-proc))
@@ -43,4 +44,9 @@
 
   (define (block->put-syntaxes $block $port-identifier)
     (reverse ((block-put-syntax-stack-proc $block) $port-identifier)))
+
+  (define (block->datum $block)
+    `(block
+      ,(block-size $block)
+      ,(syntax->datum (block->put-proc-syntax $block))))
 )
