@@ -1,6 +1,6 @@
 (library (cspect)
   (export cspect)
-  (import (scheme))
+  (import (scheme) (blob))
 
   (define (cspect $path)
     (system

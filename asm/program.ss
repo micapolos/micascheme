@@ -2,6 +2,7 @@
   (export
     program program? program-labels program-org program-block
     label->program
+    fragment->program
     program->syntax)
   (import (micascheme) (syntax lookup) (asm block) (asm fragment))
 
@@ -41,6 +42,12 @@
       $lookup
       (empty-program $org)
       $label))
+
+  (define (fragment->program $lookup $org $fragment)
+    (fold-left
+      (partial program+label $lookup)
+      (program (stack) $org (fragment-block $fragment))
+      (fragment-parameters $fragment)))
 
   (define (label->syntax $label)
     #`(
