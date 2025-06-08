@@ -1,13 +1,18 @@
 (library (asm lang)
-  (export asm-put-proc)
+  (export asm-blob asm-bytevector)
   (import (micascheme) (asm fragment))
 
-  (define-syntax (asm-put-proc $syntax $lookup)
+  (define-syntax (asm-blob $syntax $lookup)
     (syntax-case $syntax ()
-      ((_ label)
+      ((_ label org)
         (identifier? #'label)
-        (org-label->put-proc-syntax
-          (lambda ($identifier)
-            ($lookup $identifier #'fragment))
-          #'label))))
+        (program->syntax
+          (label->program
+            (lambda ($identifier)
+              ($lookup $identifier #'fragment))
+            (datum org)
+            #'label)))))
+
+  (define-rule-syntax (asm-bytevector label org)
+    (blob->bytevector (asm-blob label org)))
 )

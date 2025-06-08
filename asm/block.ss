@@ -4,8 +4,7 @@
     block-with
     empty-block
     block-append
-    block->put-proc-syntax
-    block->put-syntaxes
+    block->syntax
     u8-block
     block->datum)
   (import (micascheme))
@@ -36,17 +35,15 @@
         (lambda ($port)
           (stack #`(put-u8 #,$port #,u8) ...)))))
 
-  (define (block->put-proc-syntax $block)
-    #`(lambda ($port)
-      #,@(lets
-        ($syntaxes (reverse ((block-put-syntax-stack-proc $block) #'$port)))
-        (if (null? $syntaxes) (list #'(void)) $syntaxes))))
-
-  (define (block->put-syntaxes $block $port-identifier)
-    (reverse ((block-put-syntax-stack-proc $block) $port-identifier)))
+  (define (block->syntax $block)
+    #`(blob
+      #,(literal->syntax (block-size $block))
+      (lambda ($port)
+        #,@(lets
+          ($syntaxes (reverse ((block-put-syntax-stack-proc $block) #'$port)))
+          (if (null? $syntaxes) (list #'(void)) $syntaxes)))))
 
   (define (block->datum $block)
-    `(block
-      ,(block-size $block)
-      ,(syntax->datum (block->put-proc-syntax $block))))
+    (syntax->datum
+      (block->syntax $block)))
 )

@@ -29,14 +29,10 @@
 
 (check
   (equal?
-    (call-with-bytevector-output-port
-      (lambda ($port)
-        ((asm-put-proc empty) $port 100)))
+    (asm-bytevector empty 100)
     (bytevector)))
 
 (check
   (equal?
-    (call-with-bytevector-output-port
-      (lambda ($port)
-        ((asm-put-proc main) $port 100)))
+    (asm-bytevector main 100)
     (bytevector 50 108 103 40 106 108 20 30 10)))

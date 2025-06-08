@@ -2,7 +2,8 @@
   (export
     fragment fragment? fragment-parameters fragment-block
     program program? program-labels program-org program-block
-    org-label->put-proc-syntax
+    label->program
+    program->syntax
     fragment->datum
     syntax->fragment)
   (import (micascheme) (syntax lookup) (asm block) (asm expression))
@@ -20,8 +21,8 @@
       ($ass? (assid $id $labels))
       (and $ass? (cdr $ass?))))
 
-  (define (empty-program)
-    (program '() 0 (empty-block)))
+  (define (empty-program $org)
+    (program '() $org (empty-block)))
 
   (define (program+label $fragment-lookup $program $label)
     (lets
@@ -44,22 +45,24 @@
               $program
               (fragment-parameters $fragment)))))))
 
-  (define (org-label->put-proc-syntax $fragment-lookup $label)
+  (define (label->program $fragment-lookup $org $label)
+    (program+label
+      $fragment-lookup
+      (empty-program $org)
+      $label))
+
+  (define (label->syntax $label)
+    #`(
+      #,(car $label)
+      #,(literal->syntax (cdr $label))))
+
+  (define (program->syntax $program)
     (lets
-      ((program $labels _ $block)
-        (program+label
-          $fragment-lookup
-          (empty-program)
-          $label))
-      #`(lambda ($port $org)
-        (lets
-          #,@(map-with
-            ($label (reverse $labels))
-            #`(
-              #,(car $label)
-              (+ $org #,(literal->syntax (cdr $label)))))
-          (run
-            #,@(block->put-syntaxes $block #'$port))))))
+      ($labels (program-labels $program))
+      ($block (program-block $program))
+      #`(lets
+        #,@(map label->syntax (reverse $labels))
+        #,(block->syntax $block))))
 
   (define (syntax->fragment $syntax)
     (syntax-case $syntax (begin db dw call ret)

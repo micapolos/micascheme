@@ -1,5 +1,7 @@
 (import (micascheme) (asm fragment) (asm block) (syntax lookup))
 
+; === program->syntax ===
+
 (define fragment-1
   (fragment
     '()
@@ -28,14 +30,14 @@
     (main main)))
 
 (check-datum=?
-  (org-label->put-proc-syntax fragment-lookup #'main)
-  '(lambda ($port $org)
-    (lets
-      (main (+ $org 0))
-      (fragment-3 (+ $org 1))
-      (fragment-2 (+ $org 4))
-      (fragment-1 (+ $org 6))
-      (run
+  (program->syntax (label->program fragment-lookup #x2000 #'main))
+  '(lets
+    (main 8192)
+    (fragment-3 8193)
+    (fragment-2 8196)
+    (fragment-1 8198)
+    (blob 7
+      (lambda ($port)
         (put-u8 $port 70)
         (put-u8 $port 40)
         (put-u8 $port 50)
@@ -44,14 +46,15 @@
         (put-u8 $port 30)
         (put-u8 $port 10)))))
 
-; === syntax-fragment ===
+; === syntax->fragment ===
 
 (check
   (equal?
     (fragment->datum (syntax->fragment #`(db 10 foo 30)))
     '(fragment (foo)
-      (block 3
+      (blob 3
         (lambda ($port)
           (put-u8 $port 10)
           (put-u8 $port foo)
           (put-u8 $port 30))))))
+
