@@ -19,3 +19,8 @@
   (equal?
     (expression->datum (syntax->expression (list #'foo) #'foo))
     '(expression () foo)))
+
+(check
+  (equal?
+    (expression->datum (syntax->expression (list #'foo) #'(+ foo bar)))
+    '(expression (bar) (+ foo bar))))
