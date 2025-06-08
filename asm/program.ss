@@ -1,15 +1,15 @@
 (library (asm program)
   (export
-    program program? program-labels program-org program-block
+    program program? program-labels program-block
     label->program
     fragment->program
     program->syntax)
   (import (micascheme) (syntax lookup) (asm block) (asm fragment))
 
-  (data (program labels org block))
+  (data (program labels block))
 
   (define (empty-program)
-    (program '() 0 (empty-block)))
+    (program '() (empty-block)))
 
   (define (label-ref $labels $id)
     (lets
@@ -23,14 +23,13 @@
         ((label-ref $labels $label) $program)
         (else
           (lets
-            ($org (program-org $program))
             ($program-block (program-block $program))
+            ($program-size (block-size $program-block))
             ($fragment (lookup-ref $lookup $label))
             ($fragment-block (fragment-block $fragment))
             ($program
               (program
-                (push $labels (cons $label $org))
-                (+ $org (block-size $fragment-block))
+                (push $labels (cons $label $program-size))
                 (block-append $program-block $fragment-block)))
             (fold-left
               (partial program+label $lookup)
@@ -43,10 +42,10 @@
       (empty-program)
       $label))
 
-  (define (fragment->program $lookup $org $fragment)
+  (define (fragment->program $lookup $fragment)
     (fold-left
       (partial program+label $lookup)
-      (program (stack) $org (fragment-block $fragment))
+      (program (stack) (fragment-block $fragment))
       (fragment-parameters $fragment)))
 
   (define (label->syntax $org $label)

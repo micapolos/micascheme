@@ -50,7 +50,7 @@
               (lambda ($port)
                 (put-blob $port
                   (nex-blob
-                    #,(program->syntax
-                      (fragment->program $lookup #xc000 (main-fragment)))))))
+                    #,(program->syntax #xc000
+                      (fragment->program $lookup (main-fragment)))))))
             (cspect $path))))))
 )
