@@ -11,13 +11,13 @@
 
   (data (block size put-syntax-stack-proc))
 
-  (define-rule-syntax (block-with ($size $port-identifier) body ...)
+  (define-rule-syntax (block-with ($port-identifier $size) body ...)
     (block $size
       (lambda ($port-identifier)
         (stack #'body ...))))
 
   (define (empty-block)
-    (block-with (0 _)))
+    (block-with ($port 0)))
 
   (define (block-append . $blocks)
     (block

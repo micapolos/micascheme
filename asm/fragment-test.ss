@@ -3,7 +3,7 @@
 (check-datum=?
   (fragment->syntax
     (fragment-with (foo bar)
-      (block-with (2 $port)
+      (block-with ($port 2)
         (put-u8 $port 10)
         (put-u8 $port 20))))
   '(fragment (foo bar)
@@ -16,11 +16,11 @@
   (fragment->syntax
     (fragment-append
       (fragment-with (foo bar)
-        (block-with (2 $port)
+        (block-with ($port 2)
           (put-u8 $port 10)
           (put-u8 $port 20)))
       (fragment-with (bar gar)
-        (block-with (2 $port)
+        (block-with ($port 2)
           (put-u8 $port 30)
           (put-u8 $port 40)))))
   '(fragment (bar foo gar)

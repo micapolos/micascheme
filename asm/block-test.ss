@@ -14,7 +14,7 @@
 
 (check-datum=?
   (block->syntax
-    (block-with (2 $port)
+    (block-with ($port 2)
       (put-u8 $port 10)
       (put-u8 $port 20)))
   '(blob 2
@@ -25,10 +25,10 @@
 (check-datum=?
   (block->syntax
     (block-append
-      (block-with (2 $port)
+      (block-with ($port 2)
         (put-u8 $port 10)
         (put-u8 $port 20))
-      (block-with (2 $port)
+      (block-with ($port 2)
         (put-u8 $port 30)
         (put-u8 $port 40))))
   '(blob 4
