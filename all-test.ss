@@ -44,6 +44,7 @@
   (monad)
   (monad-syntax)
   ;(msdl)
+  (nex)
   (number)
   (option)
   (pair)
