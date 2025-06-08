@@ -35,15 +35,16 @@
     (switch (program+label? $program $label)
       ((false? _) $program)
       ((else $program)
-        (lets
-          ($fragment (lookup-ref $lookup $label))
-          (fold-left
-            (partial program+import $lookup)
-            (program-with-block $program
-              (block-append
-                (program-block $program)
-                (fragment-block $fragment)))
-            (fragment-parameters $fragment))))))
+        (program+fragment $lookup $program (lookup-ref $lookup $label)))))
+
+  (define (program+fragment $lookup $program $fragment)
+    (fold-left
+      (partial program+import $lookup)
+      (program-with-block $program
+        (block-append
+          (program-block $program)
+          (fragment-block $fragment)))
+      (fragment-parameters $fragment)))
 
   (define (label->program $lookup $label)
     (program+import
