@@ -5,6 +5,8 @@
     asm-bytevector)
   (import (micascheme) (asm fragment) (asm program) (asm expression) (asm block))
 
+  (define current-fragment (make-thread-parameter (empty-fragment)))
+
   (define-rule-syntax (define-asm label fragment)
     (define-syntax label (make-compile-time-value fragment)))
 

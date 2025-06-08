@@ -2,6 +2,7 @@
   (export
     fragment fragment? fragment-parameters fragment-block
     fragment-with
+    empty-fragment
     fragment-append
     fragment->syntax
     fragment->datum
@@ -12,6 +13,9 @@
 
   (define-rule-syntax (fragment-with (parameter ...) block)
     (fragment (stack #'parameter ...) block))
+
+  (define (empty-fragment)
+    (fragment-with () (empty-block)))
 
   (define (parameters-push $parameters $parameter)
     (if (exists (partial free-identifier=? $parameter) $parameters)
