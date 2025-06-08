@@ -1,6 +1,8 @@
 (library (asm frame)
   (export
-    frame frame? frame-parameters frame-program)
+    frame frame? frame-parameters frame-program
+    frame+fragment
+    frame+label)
   (import (micascheme) (asm program) (asm fragment) (asm parameters) (asm block))
 
   (data (frame parameters program))
@@ -16,4 +18,8 @@
           (block-append
             (program-block $program)
             (fragment-block $fragment))))))
+
+  (define (frame+label $frame $label)
+    (frame-with-program $frame
+      (program+label (frame-program $frame) $label)))
 )
