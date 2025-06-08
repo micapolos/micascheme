@@ -1,15 +1,37 @@
 (library (asm fragment)
   (export
     fragment fragment? fragment-parameters fragment-block
+    fragment-with
+    fragment-append
     fragment->datum
     syntax->fragment)
   (import (micascheme) (syntax lookup) (asm block) (asm expression))
 
   (data (fragment parameters block))
 
+  (define-rule-syntax (fragment-with (parameter ...) block)
+    (fragment (stack #'parameter ...) block))
+
+  (define (parameters-push $parameters $parameter)
+    (if (exists (partial free-identifier=? $parameter) $parameters)
+      $parameters
+      (push $parameters $parameter)))
+
+  (define (parameters-append . $parameters-list)
+    (fold-left
+      (lambda ($folded $parameters)
+        (fold-left parameters-push $folded $parameters))
+      (stack)
+      $parameters-list))
+
+  (define (fragment-append . $fragments)
+    (fragment
+      (apply parameters-append (map fragment-parameters $fragments))
+      (apply block-append (map fragment-block $fragments))))
+
   (define (fragment->datum $fragment)
     `(fragment
-      (,@(map syntax->datum (fragment-parameters $fragment)))
+      (,@(map syntax->datum (reverse (fragment-parameters $fragment))))
       ,(block->datum (fragment-block $fragment))))
 
   (define (syntax->fragment $syntax)
