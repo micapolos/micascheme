@@ -2,10 +2,23 @@
   (export
     expression expression? expression-parameters expression-syntax
     expression->datum
-    syntax->expression)
+    syntax->expression
+    u8? u16?)
   (import (micascheme))
 
   (data (expression parameters syntax))
+
+  (define (u8? $obj)
+    (and
+      (integer? $obj)
+      (>= $obj #x00)
+      (<= $obj #xff)))
+
+  (define (u16? $obj)
+    (and
+      (integer? $obj)
+      (>= $obj #x0000)
+      (<= $obj #xffff)))
 
   (define (expression->datum $expression)
     `(expression
