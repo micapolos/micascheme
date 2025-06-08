@@ -35,7 +35,8 @@
     (switch (program+label? $program $label)
       ((false? _) $program)
       ((else $program)
-        (program+fragment $lookup $program (lookup-ref $lookup $label)))))
+        (program+fragment $lookup $program
+          (lookup-ref $lookup $label)))))
 
   (define (program+fragment $lookup $program $fragment)
     (fold-left
