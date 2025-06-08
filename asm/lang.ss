@@ -3,7 +3,7 @@
     define-asm
     asm-blob
     asm-bytevector)
-  (import (micascheme) (asm fragment))
+  (import (micascheme) (asm fragment) (asm program))
 
   (define-rule-syntax (define-asm label fragment)
     (define-syntax label (make-compile-time-value fragment)))

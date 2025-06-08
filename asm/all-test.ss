@@ -7,5 +7,6 @@
   (asm base)
   (asm block)
   (asm fragment)
+  (asm program)
   (asm lang)
   (asm expression))
