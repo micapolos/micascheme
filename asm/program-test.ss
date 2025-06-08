@@ -30,7 +30,7 @@
     (main main)))
 
 (check-datum=?
-  (program->syntax (label->program lookup #x2000 #'main))
+  (program->syntax #x2000 (label->program lookup #'main))
   '(lets
     (main 8192)
     (fragment-3 8193)

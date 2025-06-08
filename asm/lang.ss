@@ -32,9 +32,9 @@
       ((_ label org)
         (identifier? #'label)
         (program->syntax
+          (datum org)
           (label->program
             $lookup
-            (datum org)
             #'label)))))
 
   (define-rule-syntax (asm-bytevector label org)

@@ -8,8 +8,8 @@
 
   (data (program labels org block))
 
-  (define (empty-program $org)
-    (program '() $org (empty-block)))
+  (define (empty-program)
+    (program '() 0 (empty-block)))
 
   (define (label-ref $labels $id)
     (lets
@@ -37,10 +37,10 @@
               $program
               (fragment-parameters $fragment)))))))
 
-  (define (label->program $lookup $org $label)
+  (define (label->program $lookup $label)
     (program+label
       $lookup
-      (empty-program $org)
+      (empty-program)
       $label))
 
   (define (fragment->program $lookup $org $fragment)
@@ -49,16 +49,16 @@
       (program (stack) $org (fragment-block $fragment))
       (fragment-parameters $fragment)))
 
-  (define (label->syntax $label)
+  (define (label->syntax $org $label)
     #`(
       #,(car $label)
-      #,(literal->syntax (cdr $label))))
+      #,(literal->syntax (+ $org (cdr $label)))))
 
-  (define (program->syntax $program)
+  (define (program->syntax $org $program)
     (lets
       ($labels (program-labels $program))
       ($block (program-block $program))
       #`(lets
-        #,@(map label->syntax (reverse $labels))
+        #,@(map (partial label->syntax $org) (reverse $labels))
         #,(block->syntax $block))))
 )
