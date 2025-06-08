@@ -3,6 +3,7 @@
     program program? program-labels program-block
     label->program
     fragment->program
+    program+label
     program->syntax)
   (import (micascheme) (syntax lookup) (asm block) (asm fragment))
 
@@ -16,11 +17,6 @@
       ($ass? (assid $id $labels))
       (and $ass? (cdr $ass?))))
 
-  (define (program+label $program $label)
-    (or
-      (program+label? $program $label)
-      (syntax-error $label "already defined")))
-
   (define (program+label? $program $label)
     (lets
       ($labels (program-labels $program))
@@ -29,6 +25,11 @@
           (push $labels
             (cons $label
               (block-size (program-block $program))))))))
+
+  (define (program+label $program $label)
+    (or
+      (program+label? $program $label)
+      (syntax-error $label "already defined")))
 
   (define (program+import $lookup $program $label)
     (switch (program+label? $program $label)
