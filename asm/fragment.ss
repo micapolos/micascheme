@@ -24,7 +24,7 @@
   (define (empty-program $org)
     (program '() $org (empty-block)))
 
-  (define (program+label $fragment-lookup $program $label)
+  (define (program+label $lookup $program $label)
     (lets
       ($labels (program-labels $program))
       (cond
@@ -33,7 +33,7 @@
           (lets
             ($org (program-org $program))
             ($program-block (program-block $program))
-            ($fragment (lookup-ref $fragment-lookup $label))
+            ($fragment (lookup-ref $lookup $label))
             ($fragment-block (fragment-block $fragment))
             ($program
               (program
@@ -41,13 +41,13 @@
                 (+ $org (block-size $fragment-block))
                 (block-append $program-block $fragment-block)))
             (fold-left
-              (partial program+label $fragment-lookup)
+              (partial program+label $lookup)
               $program
               (fragment-parameters $fragment)))))))
 
-  (define (label->program $fragment-lookup $org $label)
+  (define (label->program $lookup $org $label)
     (program+label
-      $fragment-lookup
+      $lookup
       (empty-program $org)
       $label))
 

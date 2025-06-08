@@ -22,7 +22,7 @@
     (list #'fragment-3 #'fragment-1)
     (u8-block 70)))
 
-(define fragment-lookup
+(define lookup
   (lookup-with
     (fragment-1 fragment-1)
     (fragment-2 fragment-2)
@@ -30,7 +30,7 @@
     (main main)))
 
 (check-datum=?
-  (program->syntax (label->program fragment-lookup #x2000 #'main))
+  (program->syntax (label->program lookup #x2000 #'main))
   '(lets
     (main 8192)
     (fragment-3 8193)

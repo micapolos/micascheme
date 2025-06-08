@@ -1,28 +1,26 @@
 (import (micascheme) (asm lang) (asm block) (asm fragment))
 
-(define-keywords empty fragment-1 fragment-2 fragment-3 main)
-
-(define-property empty fragment
+(define-asm empty
   (fragment
     '()
     (u8-block)))
 
-(define-property fragment-1 fragment
+(define-asm fragment-1
   (fragment
     '()
     (u8-block 10)))
 
-(define-property fragment-2 fragment
+(define-asm fragment-2
   (fragment
     '()
     (u8-block 20 30)))
 
-(define-property fragment-3 fragment
+(define-asm fragment-3
   (fragment
     (list #'fragment-2 #'fragment-1)
     (u8-block 40 #'fragment-2 #'fragment-1)))
 
-(define-property main fragment
+(define-asm main
   (fragment
     (list #'fragment-3 #'fragment-1)
     (u8-block 50 #'fragment-1 #'fragment-3)))
