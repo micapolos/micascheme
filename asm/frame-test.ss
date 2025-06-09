@@ -67,6 +67,19 @@
           (put-db $port 10)
           (put-db $port foo))))))
 
+(check-frame 100
+  (fluent (empty-frame)
+    (frame+syntax #'(label x))
+    (frame+syntax #'(db 10))
+    (frame+syntax #'(dw x)))
+  (lambda (x)  ; TODO: Should `x` be there?
+    (lets
+      (x 100)
+      (blob 3
+        (lambda ($port)
+          (put-db $port 10)
+          (put-dw $port x))))))
+
 (check
   (raises
     (fluent (empty-frame)
