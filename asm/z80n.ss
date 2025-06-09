@@ -9,7 +9,9 @@
     pc sp
     i r
 
-    di ld out jp loop halt
+    ld
+    di ei
+    out jp loop halt
 
     run)
   (import
@@ -192,10 +194,11 @@
     ((ld iyh n)        (db #xfd #b00101110 n))
     ((ld (+ iy d) n)   (db #xfd #b00110110 d n))
 
-    ;
     ((di) (db #xf3))
+    ((ei) (db #xfb))
+
     ((out (n) a) (db #xd3 n))
-    ((jp nn) (begin (db #xc3) (dw nn))))
+    ((jp nm) (begin (db #xc3) (dw nm))))
 
   (define-case-syntax (loop body ...)
     (lets
