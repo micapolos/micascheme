@@ -5,7 +5,7 @@
     asm-bytevector
     main-blob
     define-ops)
-  (import (micascheme) (asm fragment) (asm program) (asm expression) (asm block) (asm frame) (nex) (cspect))
+  (import (micascheme) (asm fragment) (asm program) (asm expression) (asm block) (asm frame))
 
   (meta define main-frame
     (make-thread-parameter (empty-frame)))
