@@ -234,6 +234,11 @@
     ((im 2)            (db #xed #x5e))
 
     ((out (n) a)       (db #xd3 n))
+
+    ; Jump
+    ((jp (hl))         (db #xe9))
+    ((jp (ix))         (db #xdd #xe9))
+    ((jp (iy))         (db #xfd #xe9))
     ((jp nm)           (begin (db #xc3) (dw nm))))
 
   (define-case-syntax (loop body ...)
