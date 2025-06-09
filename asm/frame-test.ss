@@ -53,3 +53,9 @@
         (lambda ($port)
           (put-db $port 10)
           (put-db $port foo))))))
+
+(check
+  (raises
+    (fluent (empty-frame)
+      (frame+syntax #'(label x))
+      (frame+syntax #'(label x)))))
