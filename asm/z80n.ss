@@ -13,7 +13,10 @@
 
     ld
     di ei
-    out jp loop halt
+    out jp halt
+    djnz nop
+
+    loop-jp loop-djnz
 
     run)
   (import
@@ -21,6 +24,7 @@
     (asm core)
     (nex)
     (cspect)
+    (asm expression)
     (rename (asm fragment) (db %db) (dw %dw))
     (rename (asm frame) (label %label)))
 
@@ -255,7 +259,23 @@
     ((jp m nm)         (begin (db #b11111010) (dw nm)))
     ((jp nm)           (begin (db #xc3) (dw nm))))
 
-  (define-case-syntax (loop body ...)
+  (define-case-syntax (djnz e)
+    (lets
+      ($tmp (generate-temporary #'loop))
+      #`(begin
+        (label #,$tmp)
+        (db #x10)
+        (db (u8 (- e #,$tmp 2))))))
+
+  (define-case-syntax (loop-djnz body ...)
+    (lets
+      ($tmp (generate-temporary #'loop-djnz))
+      #`(begin
+        (label #,$tmp)
+        body ...
+        (djnz #,$tmp))))
+
+  (define-case-syntax (loop-jp body ...)
     (lets
       ($tmp (generate-temporary #'loop))
       #`(begin

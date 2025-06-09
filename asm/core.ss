@@ -13,7 +13,11 @@
   (define-syntax (main-blob $syntax)
     (syntax-case $syntax ()
       ((_)
-        (frame->syntax #xc000 (main-frame)))))
+        (lets
+          ($syntax (frame->syntax #xc000 (main-frame)))
+          #`(lets
+            (run (pretty-print '#,$syntax))
+            #,$syntax)))))
 
   (define-rule-syntax (define-ops (op target) ...)
     (begin

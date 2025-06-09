@@ -7,6 +7,21 @@
 
 (check
   (equal?
+    (expression->datum (expression (list #'a #'b) #'(- a b)))
+    '(expression (a b) (- a b))))
+
+(check
+  (equal?
+    (expression->datum (expression (list #'a) #'(u8 a)))
+    '(expression (a) (u8 a))))
+
+(check
+  (equal?
+    (expression->datum (expression (list #'a) #'(u16 a)))
+    '(expression (a) (u16 a))))
+
+(check
+  (equal?
     (expression->datum (syntax->expression (list) #'123))
     '(expression () 123)))
 
