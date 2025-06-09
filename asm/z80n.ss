@@ -9,6 +9,8 @@
     pc sp
     i r
 
+    nz z nc po pe p m
+
     ld
     di ei
     out jp loop halt
@@ -35,7 +37,8 @@
     ix iy
     ixh ixl iyh iyl
     pc sp
-    i r)
+    i r
+    nz z nc po pe p m)
 
   (define-rules-syntaxes
     (literals
@@ -44,7 +47,8 @@
       ix iy
       ixh ixl iyh iyl
       pc sp
-      i r)
+      i r
+      nz z nc po pe p m)
     ; Load
     ((ld b b)          (db #b01000000))
     ((ld b c)          (db #b01000001))
@@ -239,6 +243,16 @@
     ((jp (hl))         (db #xe9))
     ((jp (ix))         (db #xdd #xe9))
     ((jp (iy))         (db #xfd #xe9))
+
+    ; Jump (argument)
+    ((jp nz nm)        (begin (db #b11000010) (dw nm)))
+    ((jp z nm)         (begin (db #b11001010) (dw nm)))
+    ((jp nc nm)        (begin (db #b11010010) (dw nm)))
+    ((jp c nm)         (begin (db #b11011010) (dw nm)))
+    ((jp po nm)        (begin (db #b11100010) (dw nm)))
+    ((jp pe nm)        (begin (db #b11101010) (dw nm)))
+    ((jp p nm)         (begin (db #b11110010) (dw nm)))
+    ((jp m nm)         (begin (db #b11111010) (dw nm)))
     ((jp nm)           (begin (db #xc3) (dw nm))))
 
   (define-case-syntax (loop body ...)
