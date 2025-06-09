@@ -8,7 +8,7 @@
       (%label label)
       (%db db)
       (%dw dw))
-    di ld out jp a)
+    di ld out jp a loop)
   (import (micascheme) (asm fragment) (asm program) (asm expression) (asm block) (asm frame) (nex) (cspect))
 
   (meta define main-frame
@@ -50,6 +50,14 @@
 
   (define-rule-syntax (asm-bytevector label org)
     (blob->bytevector (asm-blob label org)))
+
+  (define-case-syntax (loop body ...)
+    (lets
+      ($tmp (generate-temporary #'loop))
+      #`(begin
+        (%label #,$tmp)
+        body ...
+        (jp #,$tmp))))
 
   (define-syntax (start $syntax $lookup)
     (syntax-case $syntax ()

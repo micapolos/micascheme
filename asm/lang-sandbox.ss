@@ -1,10 +1,9 @@
 (import (asm lang))
 
-(label loop)
-(ld a #b00000010)
-(out (#xfe) a)
-(ld a #b00010101)
-(out (#xfe) a)
-(jp loop)
+(loop
+  (ld a #b00000010)
+  (out (#xfe) a)
+  (ld a #b00010101)
+  (out (#xfe) a))
 
 (start)
