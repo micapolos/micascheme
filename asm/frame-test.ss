@@ -1,4 +1,4 @@
-(import (micascheme) (asm frame) (asm parameters) (asm block) (asm program))
+(import (micascheme) (asm frame) (asm parameters) (asm block) (asm program) (asm fragment))
 
 (define-rule-syntax (check-frame org actual expected)
   (check-datum=?

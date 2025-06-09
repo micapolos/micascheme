@@ -6,8 +6,11 @@
     fragment-append
     fragment->syntax
     fragment->datum
-    syntax->fragment)
+    syntax->fragment
+    db dw)
   (import (micascheme) (syntax lookup) (asm block) (asm expression) (asm parameters))
+
+  (define-keywords db dw)
 
   (data (fragment parameters block))
 
@@ -49,7 +52,7 @@
         (put-u16 $port $u16 (endianness little)))))
 
   (define (syntax->fragment $syntax)
-    (syntax-case $syntax (db)
+    (syntax-case $syntax (db dw)
       ((db arg ...)
         (lets
           ($expressions (map (partial syntax->expression '()) #'(arg ...)))

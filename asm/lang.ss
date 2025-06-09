@@ -3,16 +3,17 @@
     define-asm
     asm-blob
     asm-bytevector
-    start
-    (rename
-      (%label label)
-      (%db db)
-      (%dw dw))
-    di ld out jp a loop)
+    main-blob
+    define-ops)
   (import (micascheme) (asm fragment) (asm program) (asm expression) (asm block) (asm frame) (nex) (cspect))
 
   (meta define main-frame
     (make-thread-parameter (empty-frame)))
+
+  (define-syntax (main-blob $syntax)
+    (syntax-case $syntax ()
+      ((_)
+        (frame->syntax #xc000 (main-frame)))))
 
   (define-rule-syntax (define-ops (op target) ...)
     (begin
@@ -22,18 +23,6 @@
             (run
               (main-frame (frame+syntax (main-frame) #'(target arg (... ...))))
               #`(void))))) ...))
-
-  (define-ops
-    (%label label)
-    (%db db)
-    (%dw dw))
-
-  (define-keywords a)
-
-  (define-rule-syntax (di) (%db #xf3))
-  (define-rule-syntax (ld a n) (%db #x3e n))
-  (define-rule-syntax (out (n) a) (%db #xd3 n))
-  (define-rule-syntax (jp nn) (begin (%db #xc3) (%dw nn)))
 
   (define-rule-syntax (define-asm label fragment)
     (define-syntax label (make-compile-time-value fragment)))
@@ -50,31 +39,4 @@
 
   (define-rule-syntax (asm-bytevector label org)
     (blob->bytevector (asm-blob label org)))
-
-  (define-case-syntax (loop body ...)
-    (lets
-      ($tmp (generate-temporary #'loop))
-      #`(begin
-        (%label #,$tmp)
-        body ...
-        (jp #,$tmp))))
-
-  (define-syntax (start $syntax $lookup)
-    (syntax-case $syntax ()
-      ((_)
-        #`(lets
-          ($path "/tmp/main.nex")
-          (run
-            (call-with-port (open-file-output-port $path (file-options no-fail))
-              (lambda ($port)
-                (put-blob $port
-                  (nex-blob
-                    #,(lets
-                      ($syntax (frame->syntax #xc000 (main-frame)))
-                      (run (pretty-print (syntax->datum $syntax)))
-                      #`(lets
-                        ($blob #,$syntax)
-                        (run (pretty-print (blob->bytevector $blob)))
-                        $blob))))))
-            (cspect $path))))))
 )
