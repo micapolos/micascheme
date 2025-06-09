@@ -45,6 +45,7 @@
       ixh ixl iyh iyl
       pc sp
       i r)
+    ; Load
     ((ld b b)          (db #b01000000))
     ((ld b c)          (db #b01000001))
     ((ld b d)          (db #b01000010))
@@ -176,6 +177,7 @@
     ((ld sp ix)        (db #xdd #xf9))
     ((ld sp iy)        (db #xdd #xf9))
 
+    ; Load (argument)
     ((ld b n)          (db #b00000110 n))
     ((ld c n)          (db #b00001110 n))
     ((ld d n)          (db #b00010110 n))
@@ -215,6 +217,9 @@
     ((ld (nm) iy)      (begin (db #xdd #b00100010) (dw nm)))
     ((ld (nm) sp)      (begin (db #xed #b01110011) (dw nm)))
 
+    ; Arithmetic and logic
+
+    ; General purpose
     ((daa)             (db #x27))
     ((cpl)             (db #x2f))
     ((ccf)             (db #x3f))
@@ -228,8 +233,8 @@
     ((im 1)            (db #xed #x56))
     ((im 2)            (db #xed #x5e))
 
-    ((out (n) a) (db #xd3 n))
-    ((jp nm) (begin (db #xc3) (dw nm))))
+    ((out (n) a)       (db #xd3 n))
+    ((jp nm)           (begin (db #xc3) (dw nm))))
 
   (define-case-syntax (loop body ...)
     (lets
