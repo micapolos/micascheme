@@ -71,14 +71,14 @@
   (fluent (empty-frame)
     (frame+syntax #'(label x))
     (frame+syntax #'(db 10))
-    (frame+syntax #'(dw x)))
-  (lambda (x)  ; TODO: Should `x` be there?
+    (frame+syntax #'(dw (+ x y))))
+  (lambda (y x)  ; TODO: Should `x` be there?
     (lets
       (x 100)
       (blob 3
         (lambda ($port)
           (put-db $port 10)
-          (put-dw $port x))))))
+          (put-dw $port (+ x y)))))))
 
 (check
   (raises
