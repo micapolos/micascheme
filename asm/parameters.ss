@@ -4,7 +4,8 @@
     empty-parameters
     parameters-push
     parameters-append
-    parameters->syntax)
+    parameters->syntax
+    parameters-remove)
   (import (micascheme))
 
   (define-rule-syntax (parameters-with parameter ...)
@@ -17,6 +18,9 @@
     (if (exists (partial free-identifier=? $parameter) $parameters)
       $parameters
       (push $parameters $parameter)))
+
+  (define (parameters-remove $parameters $parameter)
+    (remp (partial free-identifier=? $parameter) $parameters))
 
   (define (parameters-append . $parameters-list)
     (fold-left

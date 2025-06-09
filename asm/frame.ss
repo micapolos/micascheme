@@ -18,6 +18,7 @@
 
   (define (frame+fragment $frame $fragment)
     (frame
+      ; TODO: Don't add parameters which match labels
       (parameters-append
         (frame-parameters $frame)
         (fragment-parameters $fragment))
@@ -29,7 +30,8 @@
             (fragment-block $fragment))))))
 
   (define (frame+label $frame $label)
-    (frame-with-program $frame
+    (frame
+      (parameters-remove (frame-parameters $frame) $label)
       (program+label (frame-program $frame) $label)))
 
   (define (frame->syntax $org $frame)
