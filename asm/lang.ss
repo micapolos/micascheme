@@ -64,6 +64,9 @@
                     #,(lets
                       ($syntax (frame->syntax #xc000 (main-frame)))
                       (run (pretty-print (syntax->datum $syntax)))
-                      $syntax)))))
+                      #`(lets
+                        ($blob #,$syntax)
+                        (run (pretty-print (blob->bytevector $blob)))
+                        $blob))))))
             (cspect $path))))))
 )
