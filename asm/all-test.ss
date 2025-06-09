@@ -7,7 +7,7 @@
   (asm expression)
   (asm frame)
   (asm fragment)
-  (asm lang)
+  (asm core)
   (asm program)
   (asm parameters)
   (asm syntax)

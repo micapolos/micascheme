@@ -1,4 +1,4 @@
-(import (micascheme) (asm lang) (asm block) (asm fragment))
+(import (micascheme) (asm core) (asm block) (asm fragment))
 
 (define-asm empty
   (fragment

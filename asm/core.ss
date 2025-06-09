@@ -1,4 +1,4 @@
-(library (asm lang)
+(library (asm core)
   (export
     define-asm
     asm-blob

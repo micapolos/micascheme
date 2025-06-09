@@ -5,7 +5,7 @@
     run)
   (import
     (rename (micascheme) (run %run))
-    (asm lang)
+    (asm core)
     (nex)
     (cspect)
     (rename (asm fragment) (db %db) (dw %dw))
