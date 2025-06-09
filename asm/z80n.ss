@@ -44,8 +44,6 @@
       ix iy
       ixh ixl iyh iyl
       pc sp)
-    ((nop)             (db #x00))
-
     ((ld b b)          (db #b01000000))
     ((ld b c)          (db #b01000001))
     ((ld b d)          (db #b01000010))
@@ -106,7 +104,6 @@
     ((ld (hl) e)       (db #b01110011))
     ((ld (hl) h)       (db #b01110100))
     ((ld (hl) l)       (db #b01110101))
-    ((halt)            (db #b01110110))
     ((ld (hl) a)       (db #b01110111))
 
     ((ld a b)          (db #b01111000))
@@ -194,8 +191,18 @@
     ((ld iyh n)        (db #xfd #b00101110 n))
     ((ld (+ iy d) n)   (db #xfd #b00110110 d n))
 
-    ((di) (db #xf3))
-    ((ei) (db #xfb))
+    ((daa)             (db #x27))
+    ((cpl)             (db #x2f))
+    ((ccf)             (db #x3f))
+    ((scf)             (db #x37))
+    ((nop)             (db #x00))
+    ((halt)            (db #x76))
+    ((di)              (db #xf3))
+    ((ei)              (db #xfb))
+    ((neg)             (db #xed #x44))
+    ((im 0)            (db #xed #x46))
+    ((im 1)            (db #xed #x56))
+    ((im 2)            (db #xed #x5e))
 
     ((out (n) a) (db #xd3 n))
     ((jp nm) (begin (db #xc3) (dw nm))))
