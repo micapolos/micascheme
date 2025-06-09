@@ -3,29 +3,29 @@
     define-asm
     asm-blob
     asm-bytevector
-    start)
+    start
+    (rename
+      (%label label)
+      (%db db)
+      (%dw dw)))
   (import (micascheme) (asm fragment) (asm program) (asm expression) (asm block) (asm frame) (nex) (cspect))
 
-  ; TODO: Replace with empty fragment
   (meta define main-frame
-    (make-thread-parameter
-      (frame
-        (stack)
-        (program
-          (stack)
-          (u8-block
-            #xf3 ; DI
-            #x3e ; LD A, 0
-            #b00000010
-            #xd3 ; OUT ($fe), A
-            #xfe
-            #x3e ; LD A, $ff
-            #b00010101
-            #xd3 ; OUT ($fe), A
-            #xfe
-            #xc3 ; JMP $c001
-            #x01
-            #xc0)))))
+    (make-thread-parameter (empty-frame)))
+
+  (define-rule-syntax (define-ops (op target) ...)
+    (begin
+      (define-syntax (op $syntax $lookup)
+        (syntax-case $syntax ()
+          ((_ arg (... ...))
+            (run
+              (main-frame (frame+syntax (main-frame) #'(target arg (... ...))))
+              #`(void))))) ...))
+
+  (define-ops
+    (%label label)
+    (%db db)
+    (%dw dw))
 
   (define-rule-syntax (define-asm label fragment)
     (define-syntax label (make-compile-time-value fragment)))
@@ -53,6 +53,9 @@
               (lambda ($port)
                 (put-blob $port
                   (nex-blob
-                    #,(frame->syntax #xc000 (main-frame))))))
+                    #,(lets
+                      ($syntax (frame->syntax #xc000 (main-frame)))
+                      (run (pretty-print (syntax->datum $syntax)))
+                      $syntax)))))
             (cspect $path))))))
 )
