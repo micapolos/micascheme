@@ -7,7 +7,8 @@
     (rename
       (%label label)
       (%db db)
-      (%dw dw)))
+      (%dw dw))
+    di ld out jp a)
   (import (micascheme) (asm fragment) (asm program) (asm expression) (asm block) (asm frame) (nex) (cspect))
 
   (meta define main-frame
@@ -26,6 +27,13 @@
     (%label label)
     (%db db)
     (%dw dw))
+
+  (define-keywords a)
+
+  (define-rule-syntax (di) (%db #xf3))
+  (define-rule-syntax (ld a n) (%db #x3e n))
+  (define-rule-syntax (out (n) a) (%db #xd3 n))
+  (define-rule-syntax (jp nn) (begin (%db #xc3) (%dw nn)))
 
   (define-rule-syntax (define-asm label fragment)
     (define-syntax label (make-compile-time-value fragment)))
