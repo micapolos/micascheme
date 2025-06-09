@@ -45,6 +45,19 @@
   (fluent (empty-frame)
     (frame+syntax #'(label x))
     (frame+syntax #'(db 10))
+    (frame+syntax #'(label y)))
+  (lambda ()
+    (lets
+      (x 100)
+      (y 101)
+      (blob 1
+        (lambda ($port)
+          (put-db $port 10))))))
+
+(check-frame 100
+  (fluent (empty-frame)
+    (frame+syntax #'(label x))
+    (frame+syntax #'(db 10))
     (frame+syntax #'(db foo)))
   (lambda (foo)
     (lets
