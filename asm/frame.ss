@@ -18,7 +18,7 @@
 
   (define (frame+fragment $frame $fragment)
     (frame
-      ; TODO: Don't add parameters which match labels
+      ; TODO: Don't add parameters which matchlabels
       (parameters-append
         (frame-parameters $frame)
         (fragment-parameters $fragment))
@@ -35,9 +35,7 @@
       (program+label (frame-program $frame) $label)))
 
   (define (frame->syntax $org $frame)
-    #`(lambda
-      #,(parameters->syntax (frame-parameters $frame))
-      #,(program->syntax $org (frame-program $frame))))
+    (program->syntax $org (frame-program $frame)))
 
   (define (frame+syntax $frame $syntax)
     (syntax-case $syntax (label)

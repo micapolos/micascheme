@@ -4,25 +4,28 @@
     asm-blob
     asm-bytevector
     start)
-  (import (micascheme) (asm fragment) (asm program) (asm expression) (asm block) (nex) (cspect))
+  (import (micascheme) (asm fragment) (asm program) (asm expression) (asm block) (asm frame) (nex) (cspect))
 
   ; TODO: Replace with empty fragment
-  (meta define main-fragment
+  (meta define main-frame
     (make-thread-parameter
-      (fragment-with ()
-        (u8-block
-          #xf3 ; DI
-          #x3e ; LD A, 0
-          #b00000010
-          #xd3 ; OUT ($fe), A
-          #xfe
-          #x3e ; LD A, $ff
-          #b00010101
-          #xd3 ; OUT ($fe), A
-          #xfe
-          #xc3 ; JMP $c001
-          #x01
-          #xc0))))
+      (frame
+        (stack)
+        (program
+          (stack)
+          (u8-block
+            #xf3 ; DI
+            #x3e ; LD A, 0
+            #b00000010
+            #xd3 ; OUT ($fe), A
+            #xfe
+            #x3e ; LD A, $ff
+            #b00010101
+            #xd3 ; OUT ($fe), A
+            #xfe
+            #xc3 ; JMP $c001
+            #x01
+            #xc0)))))
 
   (define-rule-syntax (define-asm label fragment)
     (define-syntax label (make-compile-time-value fragment)))
@@ -50,7 +53,6 @@
               (lambda ($port)
                 (put-blob $port
                   (nex-blob
-                    #,(program->syntax #xc000
-                      (fragment->program $lookup (main-fragment)))))))
+                    #,(frame->syntax #xc000 (main-frame))))))
             (cspect $path))))))
 )
