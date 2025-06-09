@@ -43,7 +43,8 @@
       af bc de hl
       ix iy
       ixh ixl iyh iyl
-      pc sp)
+      pc sp
+      i r)
     ((ld b b)          (db #b01000000))
     ((ld b c)          (db #b01000001))
     ((ld b d)          (db #b01000010))
@@ -161,15 +162,6 @@
     ((ld l (+ iy d))   (db #xfd #b01101110 d))
     ((ld a (+ iy d))   (db #xfd #b01111110 d))
 
-    ((ld b n)          (db #b00000110 n))
-    ((ld c n)          (db #b00001110 n))
-    ((ld d n)          (db #b00010110 n))
-    ((ld e n)          (db #b00011110 n))
-    ((ld h n)          (db #b00100110 n))
-    ((ld l n)          (db #b00101110 n))
-    ((ld (hl) n)       (db #b00110110 n))
-    ((ld a n)          (db #b00111110 n))
-
     ((ld (bc) a)       (db #b00000010))
     ((ld (de) a)       (db #b00000110))
     ((ld a (bc))       (db #b00001010))
@@ -179,6 +171,19 @@
     ((ld r a)          (db #xed #b01001111))
     ((ld a i)          (db #xed #b01010111))
     ((ld a r)          (db #xed #b01011111))
+
+    ((ld sp hl)        (db #xf9))
+    ((ld sp ix)        (db #xdd #xf9))
+    ((ld sp iy)        (db #xdd #xf9))
+
+    ((ld b n)          (db #b00000110 n))
+    ((ld c n)          (db #b00001110 n))
+    ((ld d n)          (db #b00010110 n))
+    ((ld e n)          (db #b00011110 n))
+    ((ld h n)          (db #b00100110 n))
+    ((ld l n)          (db #b00101110 n))
+    ((ld (hl) n)       (db #b00110110 n))
+    ((ld a n)          (db #b00111110 n))
 
     ((ld (nm) a)       (begin (db #b00110010) (dw nm)))
     ((ld a (nm))       (begin (db #b00111010) (dw nm)))
@@ -190,6 +195,25 @@
     ((ld iyl n)        (db #xfd #b00100110 n))
     ((ld iyh n)        (db #xfd #b00101110 n))
     ((ld (+ iy d) n)   (db #xfd #b00110110 d n))
+
+    ((ld bc nm)        (begin (db #b00000001) (dw nm)))
+    ((ld de nm)        (begin (db #b00010001) (dw nm)))
+    ((ld hl nm)        (begin (db #b00100001) (dw nm)))
+    ((ld sp nm)        (begin (db #b00110001) (dw nm)))
+
+    ((ld bc (nm))      (begin (db #xed #b01001011) (dw nm)))
+    ((ld de (nm))      (begin (db #xed #b01011011) (dw nm)))
+    ((ld hl (nm))      (begin (db      #b00101010) (dw nm)))
+    ((ld ix (nm))      (begin (db #xdd #b00101010) (dw nm)))
+    ((ld iy (nm))      (begin (db #xdd #b00101010) (dw nm)))
+    ((ld sp (nm))      (begin (db #xed #b01111011) (dw nm)))
+
+    ((ld (nm) bc)      (begin (db #xed #b01000011) (dw nm)))
+    ((ld (nm) de)      (begin (db #xed #b01010011) (dw nm)))
+    ((ld (nm) hl)      (begin (db      #b00100010) (dw nm)))
+    ((ld (nm) ix)      (begin (db #xdd #b00100010) (dw nm)))
+    ((ld (nm) iy)      (begin (db #xdd #b00100010) (dw nm)))
+    ((ld (nm) sp)      (begin (db #xed #b01110011) (dw nm)))
 
     ((daa)             (db #x27))
     ((cpl)             (db #x2f))
