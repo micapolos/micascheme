@@ -6,10 +6,10 @@
   (ld a #b00000010)
   (out (#xfe) a)
   (ld b 0)
-  (loop-djnz (nop) (nop) (nop) (nop))
+  (loop-djnz (dup 4 (nop)))
   (ld a #b00000101)
   (out (#xfe) a)
   (ld b 0)
-  (loop-djnz (nop) (nop) (nop) (nop)))
+  (loop-djnz (dup 4 (nop))))
 
 (run)

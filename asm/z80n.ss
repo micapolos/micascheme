@@ -12,11 +12,14 @@
     nz z nc po pe p m
 
     ld
-    di ei
-    out jp halt
-    djnz nop
+    out
+    jp djnz
+
+    daa cpl ccf scf nop halt di ei im
 
     loop-jp loop-djnz
+
+    dup
 
     run)
   (import
@@ -263,9 +266,9 @@
     (lets
       ($tmp (generate-temporary #'loop))
       #`(begin
-        (label #,$tmp)
         (db #x10)
-        (db (u8 (- e #,$tmp 2))))))
+        (db (u8 (- e #,$tmp)))
+        (label #,$tmp))))
 
   (define-case-syntax (loop-djnz body ...)
     (lets
@@ -282,6 +285,12 @@
         (label #,$tmp)
         body ...
         (jp #,$tmp))))
+
+  (define-case-syntax (dup n body ...)
+    #`(begin
+      #,@(apply append
+        (map-with (_ (iota (datum n)))
+          #'(body ...)))))
 
   (define-syntax (run $syntax $lookup)
     (syntax-case $syntax ()
