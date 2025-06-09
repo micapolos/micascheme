@@ -43,6 +43,11 @@
           (put-bytevector $port (string->utf8 $string))
           (put-u8 $port 0)))))
 
+  (define (put-dw $port $dw)
+    (switch-exhaustive $dw
+      ((u16? $u16)
+        (put-u16 $port $u16 (endianness little)))))
+
   (define (syntax->fragment $syntax)
     (syntax-case $syntax (db)
       ((db arg ...)
@@ -54,5 +59,15 @@
               (length $expressions)
               (lambda ($port)
                 (map-with ($expression (reverse $expressions))
-                  #`(put-db $port #,(expression-syntax $expression))))))))))
+                  #`(put-db $port #,(expression-syntax $expression))))))))
+      ((dw arg ...)
+        (lets
+          ($expressions (map (partial syntax->expression '()) #'(arg ...)))
+          (fragment
+            (apply append (map expression-parameters $expressions))
+            (block
+              (* 2 (length $expressions))
+              (lambda ($port)
+                (map-with ($expression (reverse $expressions))
+                  #`(put-dw $port #,(expression-syntax $expression))))))))))
 )

@@ -42,3 +42,12 @@
           (put-db $port 30)
           (put-db $port "foo"))))))
 
+(check
+  (equal?
+    (fragment->datum (syntax->fragment #`(dw #x1234 #x2345)))
+    '(fragment ()
+      (blob 4
+        (lambda ($port)
+          (put-dw $port #x1234)
+          (put-dw $port #x2345))))))
+
