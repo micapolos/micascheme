@@ -1,6 +1,7 @@
 (library (blob)
   (export
     blob blob? blob-put-proc blob-size
+    blob-with
     empty-blob
     u8-blob
     put-blob
@@ -14,8 +15,13 @@
 
   (data (blob size put-proc))
 
+  (define-rule-syntax (blob-with ($port $size) body body* ...)
+    (blob $size
+      (lambda ($port)
+        body body* ...)))
+
   (define (empty-blob)
-    (blob 0 (lambda ($port) (void))))
+    (blob-with ($port 0) (void)))
 
   (define (u8-blob . $u8s)
     (blob

@@ -15,6 +15,14 @@
         (put-u8 $port 3))))
   (bytevector 1 2 3))
 
+(check-equal?
+  (blob->bytevector
+    (blob-with ($port 3)
+      (put-u8 $port 1)
+      (put-u8 $port 2)
+      (put-u8 $port 3)))
+  (bytevector 1 2 3))
+
 (define-rule-syntax (check-blob blob byte ...)
   (lets
     ($blob blob)

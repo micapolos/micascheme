@@ -8,6 +8,7 @@
   (asm frame)
   (asm fragment)
   (asm core)
+  (asm core-2)
   (asm program)
   (asm parameters)
   (asm syntax)
