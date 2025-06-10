@@ -52,6 +52,7 @@
   (port)
   (procedure)
   (proof)
+  (property)
   (proven)
   (put)
   (random)
