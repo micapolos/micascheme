@@ -1,15 +1,12 @@
 (import (asm z80n))
 
+(di)
+(ld a 0)
+(ld b 0)
 (loop-jp
-  (di)
-  (ld b 0)
-  (ld a #b00000010)
   (out (#xfe) a)
-  (ld b 0)
-  (loop-djnz (dup 4 (nop)))
-  (ld a #b00000101)
-  (out (#xfe) a)
-  (ld b 0)
-  (loop-djnz (dup 4 (nop))))
+  (loop-djnz (dup 5 (nop)))
+  (inc a)
+  (and #b111))
 
 (run)
