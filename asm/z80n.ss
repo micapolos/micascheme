@@ -16,6 +16,8 @@
     add adc sub sbc and xor or cp
     inc dec
 
+    pop push
+
     out
 
     jp djnz
@@ -29,7 +31,13 @@
 
     run)
   (import
-    (rename (micascheme) (run %run) (and %and) (or %or) (xor %xor))
+    (rename (micascheme)
+      (run %run)
+      (and %and)
+      (or %or)
+      (xor %xor)
+      (push %push)
+      (pop %pop))
     (asm core)
     (nex)
     (cspect)
@@ -435,6 +443,24 @@
     ((im 1)            (db #xed #x56))
     ((im 2)            (db #xed #x5e))
 
+    ; Stack
+    ((pop bc)          (db #b11000001))
+    ((pop de)          (db #b11010001))
+    ((pop hl)          (db #b11100001))
+    ((pop af)          (db #b11110001))
+
+    ((pop ix)          (db #xdd #b11100001))
+    ((pop iy)          (db #xfd #b11100001))
+
+    ((push bc)         (db #b11000101))
+    ((push de)         (db #b11010101))
+    ((push hl)         (db #b11100101))
+    ((push af)         (db #b11110101))
+
+    ((push ix)         (db #xdd #b11100101))
+    ((push iy)         (db #xfd #b11100101))
+
+    ; Output
     ((out (n) a)       (db #xd3 n))
 
     ; Jump
