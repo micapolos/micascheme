@@ -17,7 +17,9 @@
     inc dec
 
     out
+
     jp djnz
+    call ret reti retn rst
 
     daa cpl ccf scf nop halt di ei im
 
@@ -449,7 +451,43 @@
     ((jp pe nm)        (begin (db #b11101010) (dw nm)))
     ((jp p nm)         (begin (db #b11110010) (dw nm)))
     ((jp m nm)         (begin (db #b11111010) (dw nm)))
-    ((jp nm)           (begin (db #xc3) (dw nm))))
+    ((jp nm)           (begin (db #xc3) (dw nm)))
+
+    ; Call and return
+    ((call nm)         (begin (db #xcd) (dw nm)))
+
+    ((call nz nm)      (begin (db #b11000100) (dw nm)))
+    ((call z nm)       (begin (db #b11001100) (dw nm)))
+    ((call nc nm)      (begin (db #b11010100) (dw nm)))
+    ((call c nm)       (begin (db #b11011100) (dw nm)))
+    ((call po nm)      (begin (db #b11100100) (dw nm)))
+    ((call pe nm)      (begin (db #b11101100) (dw nm)))
+    ((call p nm)       (begin (db #b11110100) (dw nm)))
+    ((call m nm)       (begin (db #b11111100) (dw nm)))
+
+    ((ret)             (db #xc9))
+
+    ((ret nz)          (db #b11000000))
+    ((ret z)           (db #b11001000))
+    ((ret nc)          (db #b11010000))
+    ((ret c)           (db #b11011000))
+    ((ret po)          (db #b11100000))
+    ((ret pe)          (db #b11101000))
+    ((ret p)           (db #b11110000))
+    ((ret m)           (db #b11111000))
+
+    ((reti)            (db #xed #x4d))
+    ((retn)            (db #xed #x45))
+
+    ((rst #x00)        (db #b11000111))
+    ((rst #x08)        (db #b11001111))
+    ((rst #x10)        (db #b11010111))
+    ((rst #x18)        (db #b11011111))
+    ((rst #x20)        (db #b11100111))
+    ((rst #x28)        (db #b11101111))
+    ((rst #x30)        (db #b11110111))
+    ((rst #x38)        (db #b11111111))
+  )
 
   (define-case-syntax (djnz e)
     (lets
