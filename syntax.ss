@@ -18,6 +18,7 @@
     syntax-clause-id
     syntax-case-opt
     syntax-eval
+    quasisyntax-eval
     inline-indexed
     fenders implicit
     syntax-rule->clause
@@ -162,12 +163,13 @@
         #`(syntax-case $expr ($literal ...)
           $clause ... (_ #f)))))
 
-  (define-syntax (syntax-eval $syntax)
-    (syntax-case $syntax ()
-      ((_ $expr)
-        #'(let-syntax
-          ((inlined (lambda (_) $expr)))
-          inlined))))
+  (define-rule-syntax (syntax-eval body)
+    (let-syntax
+      ((inlined (lambda (_) body)))
+      inlined))
+
+  (define-rule-syntax (quasisyntax-eval body)
+    (syntax-eval #`body))
 
   (define (syntax-replace $from-id $to $syntax)
     (syntax-case $syntax ()

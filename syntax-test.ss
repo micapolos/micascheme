@@ -192,3 +192,11 @@
         #,(identifier-append #'syntax-eval #'string #'- #'append)
         "foo" "bar"))
     "foobar"))
+
+(check
+  (equal?
+    (quasisyntax-eval
+      (
+        #,(identifier-append #'syntax-eval #'string #'- #'append)
+        "foo" "bar"))
+    "foobar"))
