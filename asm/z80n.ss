@@ -63,6 +63,59 @@
     i r
     nz z nc po pe p m)
 
+  ; (define (db-233 a b c)
+  ;   (db (fxor (fxsll a 6) (fxsll b 3) c)))
+
+  (define r-syntaxes
+    (syntaxes
+      (b        (void)    #b000 (void))
+      (c        (void)    #b001 (void))
+      (d        (void)    #b010 (void))
+      (e        (void)    #b011 (void))
+      (h        (void)    #b100 (void))
+      (ixh      (db #xdd) #b100 (void))
+      (iyh      (db #xfd) #b100 (void))
+      (l        (void)    #b101 (void))
+      (ixl      (db #xdd) #b101 (void))
+      (iyl      (db #xfd) #b101 (void))
+      ((hl)     (void)    #b110 (void))
+      ((+ ix d) (db #xdd) #b110 (db d))
+      ((+ iy d) (db #xfd) #b110 (db d))
+      (a        (void)    #b111 (void))))
+
+  (define (rr-syntaxes $last)
+    (append
+      (syntaxes
+        (bc (void)    #b00)
+        (de (void)    #b01)
+        (hl (void)    #b10)
+        (ix (db #xdd) #b10))
+      (syntax-case $last (af sp)
+        (af (syntaxes (af (void) #b11)))
+        (sp (syntaxes (sp (void) #b11))))))
+
+  (define math-syntaxes
+    (syntaxes
+      (add #b000)
+      (adc #b001)
+      (sub #b010)
+      (sbc #b011)
+      (and #b100)
+      (xor #b101)
+      (or  #b110)
+      (cp  #b111)))
+
+  (define flag-syntaxes
+    (syntaxes
+      (nz #b000)
+      (z  #b001)
+      (nc #b010)
+      (c  #b011)
+      (po #b100)
+      (pe #b101)
+      (p  #b110)
+      (m  #b111)))
+
   (define-rules-syntaxes
     (literals
       a f b c d e h l +
