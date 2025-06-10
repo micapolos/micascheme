@@ -18,6 +18,8 @@
 
     pop push
 
+    ex exx
+
     out
 
     jp djnz
@@ -459,6 +461,14 @@
 
     ((push ix)         (db #xdd #b11100101))
     ((push iy)         (db #xfd #b11100101))
+
+    ; Exchange
+    ((ex af)           (db #x08))
+    ((ex de hl)        (db #xeb))
+    ((ex (sp) hl)      (db #xe3))
+    ((ex (sp) ix)      (db #xdd #xe3))
+    ((ex (sp) iy)      (db #xfd #xe3))
+    ((exx)             (db #xd9))
 
     ; Output
     ((out (n) a)       (db #xd3 n))
