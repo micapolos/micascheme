@@ -12,6 +12,10 @@
     nz z nc po pe p m
 
     ld
+
+    add adc sub sbc and xor or cp
+    inc dec
+
     out
     jp djnz
 
@@ -23,7 +27,7 @@
 
     run)
   (import
-    (rename (micascheme) (run %run))
+    (rename (micascheme) (run %run) (and %and) (or %or) (xor %xor))
     (asm core)
     (nex)
     (cspect)
@@ -229,6 +233,191 @@
     ((ld (nm) sp)      (begin (db #xed #b01110011) (dw nm)))
 
     ; Arithmetic and logic
+    ((add b)           (db #b10000000))
+    ((add c)           (db #b10000001))
+    ((add d)           (db #b10000010))
+    ((add e)           (db #b10000011))
+    ((add h)           (db #b10000100))
+    ((add l)           (db #b10000101))
+    ((add (hl))        (db #b10000110))
+    ((add a)           (db #b10000111))
+
+    ((add ixh)         (db #xdd #b10000100))
+    ((add ixl)         (db #xdd #b10000101))
+    ((add (+ ix d))     (db #xdd #b10000110 d))
+
+    ((add iyh)         (db #xfd #b10000100))
+    ((add iyl)         (db #xfd #b10000101))
+    ((add (+ iy d))    (db #xfd #b10000110 d))
+
+    ((add n)           (db #b11000110 n))
+
+    ((adc b)           (db #b10001000))
+    ((adc c)           (db #b10001001))
+    ((adc d)           (db #b10001010))
+    ((adc e)           (db #b10001011))
+    ((adc h)           (db #b10001100))
+    ((adc l)           (db #b10001101))
+    ((adc (hl))        (db #b10001110))
+    ((adc a)           (db #b10001111))
+
+    ((adc ixh)         (db #xdd #b10001100))
+    ((adc ixl)         (db #xdd #b10001101))
+    ((adc (+ ix d))    (db #xdd #b10001110 d))
+
+    ((adc iyh)         (db #xfd #b10001100))
+    ((adc iyl)         (db #xfd #b10001101))
+    ((adc (+ iy d))    (db #xfd #b10001110 d))
+
+    ((adc n)           (db #b11001110 n))
+
+    ((sub b)           (db #b10010000))
+    ((sub c)           (db #b10010001))
+    ((sub d)           (db #b10010010))
+    ((sub e)           (db #b10010011))
+    ((sub h)           (db #b10010100))
+    ((sub l)           (db #b10010101))
+    ((sub (hl))        (db #b10010110))
+    ((sub a)           (db #b10010111))
+
+    ((sub ixh)         (db #xdd #b10010100))
+    ((sub ixl)         (db #xdd #b10010101))
+    ((sub (+ ix d))    (db #xdd #b10010110 d))
+
+    ((sub iyh)         (db #xfd #b10010100))
+    ((sub iyl)         (db #xfd #b10010101))
+    ((sub (+ iy d))    (db #xfd #b10010110 d))
+
+    ((sub n)           (db #b11010110 n))
+
+    ((sbc b)           (db #b10011000))
+    ((sbc c)           (db #b10011001))
+    ((sbc d)           (db #b10011010))
+    ((sbc e)           (db #b10011011))
+    ((sbc h)           (db #b10011100))
+    ((sbc l)           (db #b10011101))
+    ((sbc (hl))        (db #b10011110))
+    ((sbc a)           (db #b10011111))
+
+    ((sbc ixh)         (db #xdd #b10011100))
+    ((sbc ixl)         (db #xdd #b10011101))
+    ((sbc (+ ix d))    (db #xdd #b10011110 d))
+
+    ((sbc iyh)         (db #xfd #b10011100))
+    ((sbc iyl)         (db #xfd #b10011101))
+    ((sbc (+ iy d))    (db #xfd #b10011110 d))
+
+    ((sbc n)           (db #b11011110 n))
+
+    ((and b)           (db #b10100000))
+    ((and c)           (db #b10100001))
+    ((and d)           (db #b10100010))
+    ((and e)           (db #b10100011))
+    ((and h)           (db #b10100100))
+    ((and l)           (db #b10100101))
+    ((and (hl))        (db #b10100110))
+    ((and a)           (db #b10100111))
+
+    ((and ixh)         (db #xdd #b10100100))
+    ((and ixl)         (db #xdd #b10100101))
+    ((and (+ ix d))    (db #xdd #b10100110 d))
+
+    ((and iyh)         (db #xfd #b10100100))
+    ((and iyl)         (db #xfd #b10100101))
+    ((and (+ iy d))    (db #xfd #b10100110 d))
+
+    ((and n)           (db #b11100110 n))
+
+    ((xor b)           (db #b10101000))
+    ((xor c)           (db #b10101001))
+    ((xor d)           (db #b10101010))
+    ((xor e)           (db #b10101011))
+    ((xor h)           (db #b10101100))
+    ((xor l)           (db #b10101101))
+    ((xor (hl))        (db #b10101110))
+    ((xor a)           (db #b10101111))
+
+    ((xor ixh)         (db #xdd #b10101100))
+    ((xor ixl)         (db #xdd #b10101101))
+    ((xor (+ ix d))    (db #xdd #b10101110 d))
+
+    ((xor iyh)         (db #xfd #b10101100))
+    ((xor iyl)         (db #xfd #b10101101))
+    ((xor (+ iy d))    (db #xfd #b10101110 d))
+
+    ((xor n)           (db #b11101110 n))
+
+    ((or b)            (db #b10110000))
+    ((or c)            (db #b10110001))
+    ((or d)            (db #b10110010))
+    ((or e)            (db #b10110011))
+    ((or h)            (db #b10110100))
+    ((or l)            (db #b10110101))
+    ((or (hl))         (db #b10110110))
+    ((or a)            (db #b10110111))
+
+    ((or ixh)          (db #xdd #b10110100))
+    ((or ixl)          (db #xdd #b10110101))
+    ((or (+ ix d))     (db #xdd #b10110110 d))
+
+    ((or iyh)          (db #xfd #b10110100))
+    ((or iyl)          (db #xfd #b10110101))
+    ((or (+ iy d))     (db #xfd #b10110110 d))
+
+    ((or n)            (db #b11110110 n))
+
+    ((cp b)            (db #b10111000))
+    ((cp c)            (db #b10111001))
+    ((cp d)            (db #b10111010))
+    ((cp e)            (db #b10111011))
+    ((cp h)            (db #b10111100))
+    ((cp l)            (db #b10111101))
+    ((cp (hl))         (db #b10111110))
+    ((cp a)            (db #b10111111))
+
+    ((cp ixh)          (db #xdd #b10111100))
+    ((cp ixl)          (db #xdd #b10111101))
+    ((cp (+ ix d))     (db #xdd #b10111110 d))
+
+    ((cp iyh)          (db #xfd #b10111100))
+    ((cp iyl)          (db #xfd #b10111101))
+    ((cp (+ iy d))     (db #xfd #b10111110 d))
+
+    ((cp n)            (db #b11111110 n))
+
+    ((inc b)           (db #b00000100))
+    ((inc c)           (db #b00001100))
+    ((inc d)           (db #b00010100))
+    ((inc e)           (db #b00011100))
+    ((inc h)           (db #b00100100))
+    ((inc l)           (db #b00101100))
+    ((inc (hl))        (db #b00110100))
+    ((inc a)           (db #b00111100))
+
+    ((inc ixh)         (db #xdd #b00100100))
+    ((inc ixl)         (db #xdd #b00101100))
+    ((inc (+ ix d))    (db #xdd #b00110100 d))
+
+    ((inc iyh)         (db #xfd #b00100100))
+    ((inc iyl)         (db #xfd #b00101100))
+    ((inc (+ iy d))    (db #xfd #b00110100 d))
+
+    ((dec b)           (db #b00000101))
+    ((dec c)           (db #b00001101))
+    ((dec d)           (db #b00010101))
+    ((dec e)           (db #b00011101))
+    ((dec h)           (db #b00100101))
+    ((dec l)           (db #b00101101))
+    ((dec (hl))        (db #b00110101))
+    ((dec a)           (db #b00111101))
+
+    ((dec ixh)         (db #xdd #b00100101))
+    ((dec ixl)         (db #xdd #b00101101))
+    ((dec (+ ix d))    (db #xdd #b00110101 d))
+
+    ((dec iyh)         (db #xfd #b00100101))
+    ((dec iyl)         (db #xfd #b00101101))
+    ((dec (+ iy d))    (db #xfd #b00110101 d))
 
     ; General purpose
     ((daa)             (db #x27))
