@@ -31,7 +31,12 @@
 
     dup
 
-    run)
+    run
+
+    r-syntaxes
+    rr-syntaxes
+    math-syntaxes
+    flag-syntaxes)
   (import
     (rename (micascheme)
       (run %run)
