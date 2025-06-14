@@ -80,3 +80,8 @@
   (equal?
     (typed scope '(cond (b1 i1) (b2 i2) (else i)))
     '(integer . (if b1 i1 (if b2 i2 i)))))
+
+(check
+  (equal?
+    (typed scope `(let ((x (macro ($scope $syntax) `(: integer 123)))) (x)))
+    '(integer . (let ((x #f)) 123))))

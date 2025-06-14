@@ -25,3 +25,11 @@
 (check (equal? (simplang (if #f "foo" "bar")) "bar"))
 
 (check (equal? (simplang (let ((x 10) (y 20)) (+ x y))) 30))
+
+(check
+  (equal?
+    (simplang
+      (let
+        ((x (macro ($scope $syntax) `(: integer 123))))
+        (x)))
+    123))
