@@ -4,7 +4,11 @@
   (append
     (list
       (cons 'b 'boolean)
+      (cons 'b1 'boolean)
+      (cons 'b2 'boolean)
       (cons 'i 'integer)
+      (cons 'i1 'integer)
+      (cons 'i2 'integer)
       (cons 'ch 'char)
       (cons 's 'string))
     core-scope))
@@ -66,3 +70,8 @@
 (check (raises (typed scope '(if 10 20 30))))
 (check (raises (typed scope '(if #t 10 "foo"))))
 (check (raises (typed scope '(if #t 10))))
+
+(check
+  (equal?
+    (typed scope '(cond (b1 i1) (b2 i2) (else i)))
+    '(integer . (if b1 i1 (if b2 i2 i)))))

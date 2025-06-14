@@ -15,6 +15,13 @@
                   (cons (car $typed-body)
                     `(let (,@(map list #'(var ...) (map cdr $typed-exprs)))
                       ,(cdr $typed-body)))))))))
+      (cons 'cond
+        (cons 'macro
+          (lambda ($scope $syntax)
+            (syntax-case $syntax (else)
+              ((_ (else body)) #'body)
+              ((_ (test body) x ...)
+                #'(if test body (cond x ...)))))))
       (cons 'if
         (cons 'core
           (lambda ($scope $syntax)
