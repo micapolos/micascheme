@@ -1,11 +1,13 @@
-(import (micascheme) (simplang expander))
+(import (micascheme) (simplang expander) (simplang core))
 
 (define scope
-  '(
-    (b . boolean)
-    (i . integer)
-    (ch . char)
-    (s . string)))
+  (append
+    (list
+      (cons 'b 'boolean)
+      (cons 'i 'integer)
+      (cons 'ch 'char)
+      (cons 's 'string))
+    core-scope))
 
 (check (equal? (typed scope #f) '(boolean . #f)))
 (check (equal? (typed scope #\a) '(char . #\a)))

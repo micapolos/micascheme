@@ -1,5 +1,5 @@
 (library (simplang expander)
-  (export typed)
+  (export typed expr-of)
   (import (except (micascheme) expand))
 
   (define (typed $scope $syntax)
@@ -8,53 +8,35 @@
       (x (integer? (datum x)) (cons 'integer #'x))
       (x (char? (datum x)) (cons 'char #'x))
       (x (string? (datum x)) (cons 'string #'x))
-      ((: type x) (symbol? (datum x)) (cons #'type #'x))
-      (x (symbol? #'x)
-        (switch (assv #'x $scope)
-          ((pair? (pair $symbol $type)) (cons $type #'x))
-          ((else _) (syntax-error $syntax "undefined"))))
-      ((if cond true false)
-        (lets
-          ((pair $type $true) (typed $scope #'true))
-          (cons $type
-            `(if
-              ,(expr-of $scope 'boolean #'cond)
-              ,$true
-              ,(expr-of $scope $type #'false)))))
-      ((let ((var expr) ...) body)
-        (lets
-          ($typed-exprs (map (partial typed $scope) #'(expr ...)))
-          ($typed-body (typed (append (map cons #'(var ...) (map car $typed-exprs)) $scope) #'body))
-          (cons (car $typed-body)
-            `(let (,@(map list #'(var ...) (map cdr $typed-exprs)))
-              ,(cdr $typed-body)))))
-      ((= a b)
-        (cons 'boolean
-          (lets
-            ((pair $type $a) (typed $scope #'a))
-            (case $type
-              ((boolean) `(boolean=? ,$a ,(expr-of $scope $type #'b)))
-              ((integer) `(= ,$a ,(expr-of $scope $type #'b)))
-              ((char) `(char=? ,$a ,(expr-of $scope $type #'b)))
-              ((string) `(string=? ,$a ,(expr-of $scope $type #'b)))))))
-      ((+ arg arg* ...)
-        (lets
-          ((pair $type $arg) (typed $scope #'arg))
-          ($arg* (map (partial expr-of $scope $type) #'(arg* ...)))
-          (case $type
-            ((integer) `(integer . (+ ,$arg ,@$arg*)))
-            ((string) `(string . (string-append ,$arg ,@$arg*)))
-            (else (syntax-error $syntax
-              (format "invalid argument type ~s, expected integer or string, in" $type))))))
-      ((- arg arg* ...)
-        `(integer . (- ,@(map (partial expr-of $scope 'integer) #'(arg arg* ...)))))
-      ((length arg)
-        `(integer . (string-length ,(expr-of $scope 'string #'arg))))
+      (x (symbol? (datum x))
+        (switch (assv (datum x) $scope)
+          ((pair? (pair _ $type)) (cons $type (datum x)))
+          ((else _) (syntax-error #'x "undefined"))))
+      (x
+        (or
+          (typed-syntax? $scope $syntax)
+          (typed-application $scope #'x)))))
+
+  (define (typed-syntax? $scope $syntax)
+    (syntax-case $syntax ()
+      ((x arg ...)
+        (symbol? (datum x))
+        (switch? (assv (datum x) $scope)
+          ((pair? (pair $id $type))
+            (switch? $type
+              ((pair? (pair $subtype $value))
+                (case $subtype
+                  ((core) ($value $scope $syntax))
+                  ((macro) (typed $scope ($value $scope $syntax)))
+                  (else #f)))))))))
+
+  (define (typed-application $scope $syntax)
+    (syntax-case $syntax ()
       ((fn arg ...)
         (lets
           ($typed-fn (typed $scope #'fn))
           ($typed-args (map (partial typed $scope) #'(arg ...)))
-          (syntax-case (car $typed-fn) (->)
+          (syntax-case (car $typed-fn) (-> core)
             ((-> (param ...) result)
               (cond
                 ((not (= (length #'(param ...)) (length #'(arg ...))))
