@@ -41,7 +41,7 @@
     (syntax-case $syntax ()
       ((x arg ...)
         (symbol? (datum x))
-        (switch (assv (datum x) $scope)
+        (switch? (assv (datum x) $scope)
           ((pair? (pair _ $type))
             (syntax-case? $type (core macro)
               ((core . proc) (#'proc $scope $syntax))
