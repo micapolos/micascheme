@@ -9,10 +9,19 @@
           (lambda ($scope $syntax)
             (syntax-case $syntax ()
               ((_ ((var expr) ...) body)
+                (for-all (dot symbol? syntax->datum) #'(var ...))
                 (lets
                   ($typed-exprs (map (partial typed $scope) #'(expr ...)))
-                  ($typed-body (typed (append (map cons #'(var ...) (map car $typed-exprs)) $scope) #'body))
-                  (cons (car $typed-body)
+                  ($typed-body
+                    (typed
+                      (append
+                        (map cons
+                          (map syntax->datum #'(var ...))
+                          (map car $typed-exprs))
+                        $scope)
+                      #'body))
+                  (cons
+                    (car $typed-body)
                     `(let (,@(map list #'(var ...) (map cdr $typed-exprs)))
                       ,(cdr $typed-body)))))))))
       (cons 'cond
