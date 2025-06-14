@@ -30,6 +30,8 @@
   (equal?
     (simplang
       (let
-        ((x (macro ($scope $syntax) `(: integer 123))))
-        (x)))
-    123))
+        ((exclamate (macro ($scope $syntax)
+          (syntax-case $syntax ()
+            ((_ s) `(+ ,#'s "!"))))))
+        (exclamate "Hello")))
+    "Hello!"))
