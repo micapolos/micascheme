@@ -2,36 +2,39 @@
   (export typed expr-of)
   (import (except (micascheme) expand))
 
-  (define (typed $scope $datum/annotation)
-    (lets
-      ((values $expression $stripped)
-        (datum/annotation->expression-stripped $datum/annotation))
-      (switch $stripped
-        ((boolean? $boolean) (cons 'boolean $datum/annotation))
-        ((integer? $integer) (cons 'integer $datum/annotation))
-        ((char? $char) (cons 'char $datum/annotation))
-        ((string? $string) (cons 'string $datum/annotation))
-        ((symbol? $symbol)
-          (switch (assv $symbol $scope)
-            ((pair? (pair _ $type)) (cons $type $datum/annotation))
-            ((else _) (syntax-error $datum/annotation "undefined"))))
-        ((pair? (pair $car $cdr))
-          (case $car
-            ((:)
-              (if (and (list? $cdr) (= 2 (length $cdr)))
-                (cons (cadr $expression) (caddr $expression))
-                (syntax-error $datum/annotation)))
-            (else
-              (or
-                (typed-syntax? $scope $datum/annotation)
-                (typed-application $scope $datum/annotation))))))))
+  (define (typed $scope $syntax)
+    (syntax-case $syntax (:)
+      ((: type x)
+        (symbol? (datum x))
+        (cons #'type #'x))
+      (x
+        (boolean? (datum x))
+        (cons 'boolean #'x))
+      (x
+        (integer? (datum x))
+        (cons 'integer #'x))
+      (x
+        (char? (datum x))
+        (cons 'char #'x))
+      (x
+        (string? (datum x))
+        (cons 'string #'x))
+      (x
+        (symbol? (datum x))
+        (switch (assv (datum x) $scope)
+          ((pair? (pair _ $type)) (cons $type (datum x)))
+          ((else _) (syntax-error #'x "undefined"))))
+      (x
+        (or
+          (typed-syntax? $scope $syntax)
+          (typed-application $scope #'x)))))
 
   (define (typed-syntax? $scope $syntax)
     (syntax-case $syntax ()
       ((x arg ...)
         (symbol? (datum x))
         (switch? (assv (datum x) $scope)
-          ((pair? (pair _ $type))
+          ((pair? (pair $id $type))
             (switch? $type
               ((pair? (pair $subtype $value))
                 (case $subtype
