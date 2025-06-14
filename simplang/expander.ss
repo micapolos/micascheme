@@ -49,7 +49,8 @@
       ((x arg ...)
         (symbol? (datum x))
         (syntax-case? (scope-ref $scope #'x) (macro)
-          ((macro . proc) (typed $scope (#'proc $scope $syntax)))))))
+          ((macro . proc)
+            (typed $scope (#'proc $scope $syntax)))))))
 
   (define (typed-application $scope $syntax)
     (syntax-case $syntax ()
