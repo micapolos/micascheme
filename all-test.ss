@@ -1,6 +1,7 @@
 (import (micascheme))
 
 (test
+  (annotation)
   (any)
   (boolean)
   (binder)

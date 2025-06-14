@@ -9,6 +9,7 @@
       set-cdr!
       define-syntax
       type-descriptor)
+    (annotation)
     (binder)
     (blob)
     (boolean)
@@ -63,6 +64,7 @@
         set-cdr!
         define-syntax
         type-descriptor)
+      (annotation)
       (binder)
       (blob)
       (boolean)
