@@ -29,9 +29,9 @@
         (cons 'string #'x))
       (x
         (symbol? (datum x))
-        (syntax-case (assv (datum x) $scope) ()
-          ((_ . type) (cons #'type (datum x)))
-          (other (syntax-error #'other "undefined"))))
+        (switch (assv (datum x) $scope)
+          ((pair? (pair _ $type)) (cons $type (datum x)))
+          ((else _) (syntax-error #'x "undefined"))))
       (x
         (or
           (typed-syntax? $scope $syntax)
