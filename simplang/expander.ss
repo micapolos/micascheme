@@ -41,9 +41,9 @@
     (syntax-case $syntax ()
       ((x arg ...)
         (symbol? (datum x))
-        (syntax-case? (assv (datum x) $scope) ()
-          ((_ . type)
-            (syntax-case? #'type (core macro)
+        (switch (assv (datum x) $scope)
+          ((pair? (pair _ $type))
+            (syntax-case? $type (core macro)
               ((core . proc) (#'proc $scope $syntax))
               ((macro . proc) (typed $scope (#'proc $scope $syntax)))))))))
 
