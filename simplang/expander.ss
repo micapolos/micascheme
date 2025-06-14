@@ -10,6 +10,13 @@
   ; - (-> (type ...) type)
   ; - (core transformer-proc)
 
+  (define (scope-ref $scope $id)
+    (lets
+      ($ass? (assv (datum/annotation-stripped $id) $scope))
+      (if $ass?
+        (cdr $ass?)
+        (syntax-error $id "not bound"))))
+
   (define (typed $scope $syntax)
     (syntax-case $syntax (:)
       ((: arg ...)
@@ -31,9 +38,7 @@
         (cons 'string #'x))
       (x
         (symbol? (datum x))
-        (switch (assv (datum x) $scope)
-          ((pair? (pair _ $type)) (cons $type (datum x)))
-          ((else _) (syntax-error #'x "undefined"))))
+        (cons (scope-ref $scope #'x) (datum x)))
       (x
         (or
           (typed-syntax? $scope $syntax)
@@ -43,10 +48,8 @@
     (syntax-case $syntax ()
       ((x arg ...)
         (symbol? (datum x))
-        (switch? (assv (datum x) $scope)
-          ((pair? (pair _ $type))
-            (syntax-case? $type (macro)
-              ((macro . proc) (typed $scope (#'proc $scope $syntax)))))))))
+        (syntax-case? (scope-ref $scope #'x) (macro)
+          ((macro . proc) (typed $scope (#'proc $scope $syntax)))))))
 
   (define (typed-application $scope $syntax)
     (syntax-case $syntax ()

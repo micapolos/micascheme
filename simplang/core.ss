@@ -30,7 +30,7 @@
             (syntax-case $syntax (else)
               ((_ (else body)) #'body)
               ((_ (test body) x ...)
-                #'(if test body (cond x ...)))))))
+                `(if ,#'test ,#'body (cond ,@#'(x ...))))))))
       (cons 'if
         (cons 'macro
           (lambda ($scope $syntax)
