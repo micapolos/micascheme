@@ -2,6 +2,14 @@
   (export typed expr-of)
   (import (except (micascheme) expand))
 
+  ; Types:
+  ; - boolean
+  ; - integer
+  ; - char
+  ; - string
+  ; - (-> (type ...) type)
+  ; - (core transformer-proc)
+
   (define (typed $scope $syntax)
     (syntax-case $syntax (:)
       ((: type x)
@@ -21,9 +29,9 @@
         (cons 'string #'x))
       (x
         (symbol? (datum x))
-        (switch (assv (datum x) $scope)
-          ((pair? (pair _ $type)) (cons $type (datum x)))
-          ((else _) (syntax-error #'x "undefined"))))
+        (syntax-case (assv (datum x) $scope) ()
+          ((_ . type) (cons #'type (datum x)))
+          (other (syntax-error #'other "undefined"))))
       (x
         (or
           (typed-syntax? $scope $syntax)
@@ -33,14 +41,11 @@
     (syntax-case $syntax ()
       ((x arg ...)
         (symbol? (datum x))
-        (switch? (assv (datum x) $scope)
-          ((pair? (pair $id $type))
-            (switch? $type
-              ((pair? (pair $subtype $value))
-                (case $subtype
-                  ((core) ($value $scope $syntax))
-                  ((macro) (typed $scope ($value $scope $syntax)))
-                  (else #f)))))))))
+        (syntax-case? (assv (datum x) $scope) ()
+          ((_ . type)
+            (syntax-case? #'type (core macro)
+              ((core . proc) (#'proc $scope $syntax))
+              ((macro . proc) (typed $scope (#'proc $scope $syntax)))))))))
 
   (define (typed-application $scope $syntax)
     (syntax-case $syntax ()
@@ -48,7 +53,7 @@
         (lets
           ($typed-fn (typed $scope #'fn))
           ($typed-args (map (partial typed $scope) #'(arg ...)))
-          (syntax-case (car $typed-fn) (-> core)
+          (syntax-case (car $typed-fn) (->)
             ((-> (param ...) result)
               (cond
                 ((not (= (length #'(param ...)) (length #'(arg ...))))
