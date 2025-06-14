@@ -12,8 +12,11 @@
 
   (define (typed $scope $syntax)
     (syntax-case $syntax (:)
-      ((: type x)
-        (cons (datum type) #'x))
+      ((: arg ...)
+        (syntax-case #'(arg ...) ()
+          ((type expr)
+            (cons (datum type) #'expr))
+          (else (syntax-error $syntax))))
       (x
         (boolean? (datum x))
         (cons 'boolean #'x))
