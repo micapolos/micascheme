@@ -34,13 +34,6 @@
                       ,(expr-of $scope 'boolean #'cond)
                       ,$true
                       ,(expr-of $scope $type #'false)))))))))
-      (cons ':
-        (cons 'core
-          (lambda ($scope $syntax)
-            (syntax-case $syntax ()
-                ((_ type x)
-                  (symbol? (datum x))
-                  (cons #'type #'x))))))
       (cons '=
         (cons 'core
           (lambda ($scope $syntax)

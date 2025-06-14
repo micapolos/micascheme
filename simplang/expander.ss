@@ -3,12 +3,24 @@
   (import (except (micascheme) expand))
 
   (define (typed $scope $syntax)
-    (syntax-case $syntax (if = let : + - length)
-      (x (boolean? (datum x)) (cons 'boolean #'x))
-      (x (integer? (datum x)) (cons 'integer #'x))
-      (x (char? (datum x)) (cons 'char #'x))
-      (x (string? (datum x)) (cons 'string #'x))
-      (x (symbol? (datum x))
+    (syntax-case $syntax (:)
+      ((: type x)
+        (symbol? (datum x))
+        (cons #'type #'x))
+      (x
+        (boolean? (datum x))
+        (cons 'boolean #'x))
+      (x
+        (integer? (datum x))
+        (cons 'integer #'x))
+      (x
+        (char? (datum x))
+        (cons 'char #'x))
+      (x
+        (string? (datum x))
+        (cons 'string #'x))
+      (x
+        (symbol? (datum x))
         (switch (assv (datum x) $scope)
           ((pair? (pair _ $type)) (cons $type (datum x)))
           ((else _) (syntax-error #'x "undefined"))))

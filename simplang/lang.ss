@@ -4,6 +4,6 @@
 
   (define-case-syntax (simplang expr)
     #`(eval
-      '#,(datum->syntax #'+ (cdr (typed core-scope (or (syntax->annotation #'expr) (syntax->datum #'expr)))))
+      '#,(datum->syntax #'+ (cdr (typed core-scope (syntax->datum/annotation #'expr))))
       (environment '(scheme))))
 )
