@@ -8,7 +8,7 @@
   ; - char
   ; - string
   ; - (-> (type ...) type)
-  ; - (core transformer-proc)
+  ; - (macro . transformer-proc)
 
   (define (scope-ref $scope $id)
     (lets
