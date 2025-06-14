@@ -3,7 +3,7 @@
   (import (except (micascheme) expand))
 
   (define (typed $scope $syntax)
-    (syntax-case $syntax (let : + - length)
+    (syntax-case $syntax (if = let : + - length)
       (x (boolean? #'x) (cons 'boolean #'x))
       (x (integer? #'x) (cons 'integer #'x))
       (x (char? #'x) (cons 'char #'x))
@@ -13,6 +13,14 @@
         (switch (assv #'x $scope)
           ((pair? (pair $symbol $type)) (cons $type #'x))
           ((else _) (syntax-error $syntax "undefined"))))
+      ((if cond true false)
+        (lets
+          ((pair $type $true) (typed $scope #'true))
+          (cons $type
+            `(if
+              ,(expr-of $scope 'boolean #'cond)
+              ,$true
+              ,(expr-of $scope $type #'false)))))
       ((let ((var expr) ...) body)
         (lets
           ($typed-exprs (map (partial typed $scope) #'(expr ...)))
@@ -20,6 +28,15 @@
           (cons (car $typed-body)
             `(let (,@(map list #'(var ...) (map cdr $typed-exprs)))
               ,(cdr $typed-body)))))
+      ((= a b)
+        (cons 'boolean
+          (lets
+            ((pair $type $a) (typed $scope #'a))
+            (case $type
+              ((boolean) `(boolean=? ,$a ,(expr-of $scope $type #'b)))
+              ((integer) `(= ,$a ,(expr-of $scope $type #'b)))
+              ((char) `(char=? ,$a ,(expr-of $scope $type #'b)))
+              ((string) `(string=? ,$a ,(expr-of $scope $type #'b)))))))
       ((+ arg arg* ...)
         (lets
           ((pair $type $arg) (typed $scope #'arg))

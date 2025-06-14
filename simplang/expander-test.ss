@@ -24,6 +24,15 @@
     (typed scope '(let ((x 10) (y 20)) x))
     '(integer . (let ((x 10) (y 20)) x))))
 
+(check (equal? (typed scope '(= #t #f)) '(boolean . (boolean=? #t #f))))
+(check (equal? (typed scope '(= 10 20)) '(boolean . (= 10 20))))
+(check (equal? (typed scope '(= #\a #\b)) '(boolean . (char=? #\a #\b))))
+(check (equal? (typed scope '(= "a" "b")) '(boolean . (string=? "a" "b"))))
+(check (raises (typed scope '(=))))
+(check (raises (typed scope '(= 10))))
+(check (raises (typed scope '(= 10 "foo"))))
+(check (raises (typed scope '(= 10 20 30))))
+
 (check (raises (typed scope '(+))))
 (check (raises (typed scope '(+ #\a))))
 (check (raises (typed scope '(+ #f))))
@@ -50,3 +59,8 @@
 
 (check (raises (typed scope '(length 1))))
 (check (equal? (typed scope '(length "foo")) '(integer . (string-length "foo"))))
+
+(check (equal? (typed scope '(if #t 10 20)) '(integer . (if #t 10 20))))
+(check (raises (typed scope '(if 10 20 30))))
+(check (raises (typed scope '(if #t 10 "foo"))))
+(check (raises (typed scope '(if #t 10))))
