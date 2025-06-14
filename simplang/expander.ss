@@ -1,15 +1,9 @@
 (library (simplang expander)
-  (export typed std-scope)
+  (export typed)
   (import (except (micascheme) expand))
 
-  (define std-scope
-    '(
-      (+ . (-> (integer integer) integer))
-      (string-append . (-> (string string) string))
-      (string-length . (-> (string) integer))))
-
   (define (typed $scope $syntax)
-    (syntax-case $syntax (let :)
+    (syntax-case $syntax (let : + - length)
       (x (boolean? #'x) (cons 'boolean #'x))
       (x (integer? #'x) (cons 'integer #'x))
       (x (char? #'x) (cons 'char #'x))
@@ -26,6 +20,21 @@
           (cons (car $typed-body)
             `(let (,@(map list #'(var ...) (map cdr $typed-exprs)))
               ,(cdr $typed-body)))))
+      ((+ arg arg* ...)
+        (lets
+          ($typed-arg (typed $scope #'arg))
+          ($type (car $typed-arg))
+          ($arg (cdr $typed-arg))
+          ($arg* (map (partial expr-of $scope $type) #'(arg* ...)))
+          (case $type
+            ((integer) `(integer . (+ ,$arg ,@$arg*)))
+            ((string) `(string . (string-append ,$arg ,@$arg*)))
+            (else (syntax-error $syntax
+              (format "invalid argument type ~s, expected integer or string, in" $type))))))
+      ((- arg arg* ...)
+        `(integer . (- ,@(map (partial expr-of $scope 'integer) #'(arg arg* ...)))))
+      ((length arg)
+        `(integer . (string-length ,(expr-of $scope 'string #'arg))))
       ((fn arg ...)
         (lets
           ($typed-fn (typed $scope #'fn))
@@ -53,4 +62,12 @@
             (other
               (syntax-error #'fn
                 (format "invalid type ~s, expected procedure, in" #'other))))))))
+
+  (define (expr-of $scope $type $syntax)
+    (lets
+      ($typed (typed $scope $syntax))
+      (if (equal? (car $typed) $type)
+        (cdr $typed)
+        (syntax-error $syntax
+          (format "invalid type ~s, expected ~s, in" (car $typed) $type)))))
 )

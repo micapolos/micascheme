@@ -3,6 +3,6 @@
 (parameterize
   ((current-expand
     (lambda ($syntax . $rest)
-      (apply sc-expand (cdr (typed std-scope $syntax)) $rest))))
-  (pretty-print (eval '(string-append "foo" "bar")))
-  (pretty-print (eval '(string-length (string-append "foo" "bar")))))
+      (apply sc-expand (cdr (typed '() $syntax)) $rest))))
+  (pretty-print (eval '(+ "foo" "bar")))
+  (pretty-print (eval '(length (+ "foo" "bar")))))
