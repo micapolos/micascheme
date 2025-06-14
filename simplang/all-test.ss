@@ -1,4 +1,5 @@
 (import (micascheme))
 
 (test
-  (simplang expander))
+  (simplang expander)
+  (simplang lang))
