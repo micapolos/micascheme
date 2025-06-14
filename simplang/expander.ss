@@ -13,8 +13,7 @@
   (define (typed $scope $syntax)
     (syntax-case $syntax (:)
       ((: type x)
-        (symbol? (datum x))
-        (cons #'type #'x))
+        (cons (datum type) #'x))
       (x
         (boolean? (datum x))
         (cons 'boolean #'x))
@@ -43,8 +42,7 @@
         (symbol? (datum x))
         (switch? (assv (datum x) $scope)
           ((pair? (pair _ $type))
-            (syntax-case? $type (core macro)
-              ((core . proc) (#'proc $scope $syntax))
+            (syntax-case? $type (macro)
               ((macro . proc) (typed $scope (#'proc $scope $syntax)))))))))
 
   (define (typed-application $scope $syntax)

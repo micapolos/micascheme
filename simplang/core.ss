@@ -5,7 +5,7 @@
   (define core-scope
     (list
       (cons 'let
-        (cons 'core
+        (cons 'macro
           (lambda ($scope $syntax)
             (syntax-case $syntax ()
               ((_ ((var expr) ...) body)
@@ -20,9 +20,9 @@
                           (map car $typed-exprs))
                         $scope)
                       #'body))
-                  (cons
-                    (car $typed-body)
-                    `(let (,@(map list #'(var ...) (map cdr $typed-exprs)))
+                  `(:
+                    ,(car $typed-body)
+                    (let (,@(map list #'(var ...) (map cdr $typed-exprs)))
                       ,(cdr $typed-body)))))))))
       (cons 'cond
         (cons 'macro
@@ -32,24 +32,26 @@
               ((_ (test body) x ...)
                 #'(if test body (cond x ...)))))))
       (cons 'if
-        (cons 'core
+        (cons 'macro
           (lambda ($scope $syntax)
             (syntax-case $syntax ()
               ((_ cond true false)
                 (lets
                   ((pair $type $true) (typed $scope #'true))
-                  (cons $type
-                    `(if
+                  `(:
+                    ,$type
+                    (if
                       ,(expr-of $scope 'boolean #'cond)
                       ,$true
                       ,(expr-of $scope $type #'false)))))))))
       (cons '=
-        (cons 'core
+        (cons 'macro
           (lambda ($scope $syntax)
             (syntax-case $syntax ()
               ((_ a b)
-                (cons 'boolean
-                  (lets
+                `(:
+                  boolean
+                  ,(lets
                     ((pair $type $a) (typed $scope #'a))
                     (case $type
                       ((boolean) `(boolean=? ,$a ,(expr-of $scope $type #'b)))
@@ -57,7 +59,7 @@
                       ((char) `(char=? ,$a ,(expr-of $scope $type #'b)))
                       ((string) `(string=? ,$a ,(expr-of $scope $type #'b)))))))))))
       (cons '+
-        (cons 'core
+        (cons 'macro
           (lambda ($scope $syntax)
             (syntax-case $syntax ()
               ((_ arg arg* ...)
@@ -65,20 +67,24 @@
                   ((pair $type $arg) (typed $scope #'arg))
                   ($arg* (map (partial expr-of $scope $type) #'(arg* ...)))
                   (case $type
-                    ((integer) `(integer . (+ ,$arg ,@$arg*)))
-                    ((string) `(string . (string-append ,$arg ,@$arg*)))
+                    ((integer) `(: integer (+ ,$arg ,@$arg*)))
+                    ((string) `(: string (string-append ,$arg ,@$arg*)))
                     (else (syntax-error $syntax
                       (format "invalid argument type ~s, expected integer or string, in" $type))))))))))
       (cons '-
-        (cons 'core
+        (cons 'macro
           (lambda ($scope $syntax)
             (syntax-case $syntax ()
               ((- arg arg* ...)
-                `(integer . (- ,@(map (partial expr-of $scope 'integer) #'(arg arg* ...)))))))))
+                `(: integer
+                  (-
+                    ,@(map
+                      (partial expr-of $scope 'integer)
+                      #'(arg arg* ...)))))))))
       (cons 'length
-        (cons 'core
+        (cons 'macro
           (lambda ($scope $syntax)
             (syntax-case $syntax ()
               ((_ arg)
-                `(integer . (string-length ,(expr-of $scope 'string #'arg))))))))))
+                `(: integer (string-length ,(expr-of $scope 'string #'arg))))))))))
 )
