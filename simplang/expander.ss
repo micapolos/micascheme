@@ -22,9 +22,7 @@
               ,(cdr $typed-body)))))
       ((+ arg arg* ...)
         (lets
-          ($typed-arg (typed $scope #'arg))
-          ($type (car $typed-arg))
-          ($arg (cdr $typed-arg))
+          ((pair $type $arg) (typed $scope #'arg))
           ($arg* (map (partial expr-of $scope $type) #'(arg* ...)))
           (case $type
             ((integer) `(integer . (+ ,$arg ,@$arg*)))

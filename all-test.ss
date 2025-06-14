@@ -91,6 +91,7 @@
   (micalog all)
   (minic all)
   (scheme all)
+  (simplang all)
   (sjasm all)
   (syntax all)
   (tico all)
