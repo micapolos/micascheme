@@ -1,5 +1,7 @@
 (import (micascheme) (simplang lang))
 
+(check (equal? (simplang (: string (string-append "foo" "bar"))) "foobar"))
+
 (check (equal? (simplang (= 1 1)) #t))
 (check (equal? (simplang (= 1 2)) #f))
 
