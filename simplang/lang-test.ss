@@ -30,8 +30,12 @@
   (equal?
     (simplang
       (let
-        ((exclamate (macro ($scope $syntax)
-          (syntax-case $syntax ()
-            ((_ s) `(+ ,#'s "!"))))))
-        (exclamate "Hello")))
-    "Hello!"))
+        (
+          (hello "Hello")
+          (exclamate
+            (macro ($scope $syntax)
+              (syntax-case $syntax ()
+                ((_ s) `(+ ,#'s "!")))))
+          (world "world"))
+        (exclamate (+ hello ", " world))))
+    "Hello, world!"))

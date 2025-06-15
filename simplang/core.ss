@@ -31,7 +31,13 @@
                       #'body))
                   `(:
                     ,(car $typed-body)
-                    (let (,@(map list #'(var ...) (map cdr $typed-exprs)))
+                    (let
+                      (
+                        ,@(filter-opts
+                          (map-with
+                            ($var #'(var ...))
+                            ($typed $typed-exprs)
+                            (and (not (macro? (car $typed))) (list $var (cdr $typed))))))
                       ,(cdr $typed-body)))))))))
       (cons 'cond
         (cons 'macro

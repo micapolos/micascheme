@@ -83,5 +83,16 @@
 
 (check
   (equal?
-    (typed scope `(let ((x (macro ($scope $syntax) `(: integer 123)))) (x)))
-    '(integer . (let ((x #f)) 123))))
+    (typed scope
+      `(let
+        (
+          (hello "Hello")
+          (exclamate
+            (macro ($scope $syntax)
+              (syntax-case $syntax ()
+                ((_ s) `(+ ,#'s "!")))))
+          (world "world"))
+        (exclamate (+ hello ", " world))))
+    '(string .
+      (let ((hello "Hello") (world "world"))
+        (string-append (string-append hello ", " world) "!")))))

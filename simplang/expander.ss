@@ -1,5 +1,5 @@
 (library (simplang expander)
-  (export typed expr-of)
+  (export typed expr-of macro?)
   (import (except (micascheme) expand))
 
   ; Types:
@@ -81,6 +81,10 @@
             (other
               (syntax-error #'fn
                 (format "invalid type ~s, expected procedure, in" #'other))))))))
+
+  (define (macro? $type)
+    (syntax-case? $type (macro)
+      ((macro . proc) #t)))
 
   (define (expr-of $scope $type $syntax)
     (lets
