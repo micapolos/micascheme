@@ -1,9 +1,5 @@
-(import (micascheme) (simplang expander) (simplang core))
+(import (micascheme) (simplang expand))
 
 (parameterize
-  ((current-expand
-    (lambda ($obj $env . $params)
-      (apply sc-expand
-        `(pretty-print ,(cdr (typed core-scope $obj)))
-        $env $params))))
+  ((current-expand simplang-expand))
   (load "simplang/demo.ss"))
