@@ -1,14 +1,6 @@
 (library (simplang expander)
   (export typed expr-of macro?)
-  (import (except (micascheme) expand))
-
-  ; Types:
-  ; - boolean
-  ; - integer
-  ; - char
-  ; - string
-  ; - (arrow (type ...) type)
-  ; - (macro . transformer-proc)
+  (import (except (micascheme) expand string))
 
   (define (scope-ref $scope $id)
     (lets
@@ -19,11 +11,8 @@
 
   (define (typed $scope $syntax)
     (syntax-case $syntax (typed)
-      ((typed arg ...)
-        (syntax-case #'(arg ...) ()
-          ((type expr)
-            (cons (datum type) #'expr))
-          (else (syntax-error $syntax))))
+      ((typed type expr)
+        (cons (datum type) #'expr))
       (x
         (boolean? (datum x))
         (cons 'boolean #'x))
