@@ -17,7 +17,7 @@
 (check (equal? (typed scope #\a) '(char . #\a)))
 (check (equal? (typed scope 123) '(integer . 123)))
 (check (equal? (typed scope "foo") '(string . "foo")))
-(check (equal? (typed scope '(: integer x)) '(integer . x)))
+(check (equal? (typed scope '(typed integer x)) '(integer . x)))
 
 (check (equal? (typed scope 'b) '(boolean . b)))
 (check (equal? (typed scope 'i) '(integer . i)))

@@ -7,7 +7,7 @@
   ; - integer
   ; - char
   ; - string
-  ; - (-> (type ...) type)
+  ; - (arrow (type ...) type)
   ; - (macro . transformer-proc)
 
   (define (scope-ref $scope $id)
@@ -18,8 +18,8 @@
         (syntax-error $id "not bound"))))
 
   (define (typed $scope $syntax)
-    (syntax-case $syntax (:)
-      ((: arg ...)
+    (syntax-case $syntax (typed)
+      ((typed arg ...)
         (syntax-case #'(arg ...) ()
           ((type expr)
             (cons (datum type) #'expr))
@@ -58,8 +58,8 @@
         (lets
           ($typed-fn (typed $scope #'fn))
           ($typed-args (map (partial typed $scope) #'(arg ...)))
-          (syntax-case (car $typed-fn) (->)
-            ((-> (param ...) result)
+          (syntax-case (car $typed-fn) (arrow)
+            ((arrow (param ...) result)
               (cond
                 ((not (= (length #'(param ...)) (length #'(arg ...))))
                   (syntax-error $syntax

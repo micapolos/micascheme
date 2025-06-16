@@ -9,7 +9,7 @@
           (lambda ($scope $syntax)
             (syntax-case $syntax ()
               ((_ ($scope $syntax) body)
-                `(: (macro .
+                `(typed (macro .
                   ,(eval
                     `(lambda (,#'$scope ,#'$syntax) ,#'body)
                     (environment '(micascheme) '(simplang expander)))) #f))))))
@@ -29,7 +29,7 @@
                           (map car $typed-exprs))
                         $scope)
                       #'body))
-                  `(:
+                  `(typed
                     ,(car $typed-body)
                     (let
                       (
@@ -53,7 +53,7 @@
               ((_ cond true false)
                 (lets
                   ((pair $type $true) (typed $scope #'true))
-                  `(:
+                  `(typed
                     ,$type
                     (if
                       ,(expr-of $scope 'boolean #'cond)
@@ -64,7 +64,7 @@
           (lambda ($scope $syntax)
             (syntax-case $syntax ()
               ((_ a b)
-                `(:
+                `(typed
                   boolean
                   ,(lets
                     ((pair $type $a) (typed $scope #'a))
@@ -82,8 +82,8 @@
                   ((pair $type $arg) (typed $scope #'arg))
                   ($arg* (map (partial expr-of $scope $type) #'(arg* ...)))
                   (case $type
-                    ((integer) `(: integer (+ ,$arg ,@$arg*)))
-                    ((string) `(: string (string-append ,$arg ,@$arg*)))
+                    ((integer) `(typed integer (+ ,$arg ,@$arg*)))
+                    ((string) `(typed string (string-append ,$arg ,@$arg*)))
                     (else (syntax-error $syntax
                       (format "invalid argument type ~s, expected integer or string, in" $type))))))))))
       (cons '-
@@ -91,7 +91,7 @@
           (lambda ($scope $syntax)
             (syntax-case $syntax ()
               ((- arg arg* ...)
-                `(: integer
+                `(typed integer
                   (-
                     ,@(map
                       (partial expr-of $scope 'integer)
@@ -101,5 +101,5 @@
           (lambda ($scope $syntax)
             (syntax-case $syntax ()
               ((_ arg)
-                `(: integer (string-length ,(expr-of $scope 'string #'arg))))))))))
+                `(typed integer (string-length ,(expr-of $scope 'string #'arg))))))))))
 )
