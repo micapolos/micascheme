@@ -2,11 +2,23 @@
   (export asm org emit flush)
   (import (micascheme))
 
-  (define put-procs-parameter (make-thread-parameter (stack)))
-  (define org-parameter (make-thread-parameter 0))
+  (define-record-type builder
+    (fields (mutable put-procs) (mutable org))
+    (protocol
+      (lambda (new)
+        (lambda ()
+          (new (stack) 0)))))
 
-  (define-rule-syntax (org value)
-    (org-parameter value))
+  (define current-builder (make-thread-parameter (make-builder)))
+
+  (define-rule-syntax (with-current-builder ($builder) body ...)
+    (lets
+      ($builder (current-builder))
+      (run-void body ...)))
+
+  (define (org $org)
+    (with-current-builder ($builder)
+      (builder-org-set! $builder $org)))
 
   (define-syntax (asm $syntax)
     (begin
@@ -19,7 +31,7 @@
             (identifier? #'x)
             (begin
               (push! $labels #'(x 0))
-              (push! $instructions #'(set! x (org-parameter)))))
+              (push! $instructions #'(set! x (builder-org (current-builder))))))
           (instruction
             (push! $instructions #'instruction))))
       (syntax-case $syntax ()
@@ -31,17 +43,16 @@
               #,@(reverse $instructions)))))))
 
   (define-rule-syntax (emit ($port $size) body ...)
-    (begin
-      (put-procs-parameter
-        (push (put-procs-parameter)
-          (lambda ($port) body ...)))
-      (org-parameter (+ (org-parameter) $size))))
+    (with-current-builder ($builder)
+      (builder-put-procs-set! $builder
+        (push (builder-put-procs $builder) (lambda ($port) body ...)))
+      (builder-org-set! $builder (+ (builder-org $builder) $size))))
 
   (define (flush $port)
-    (run
+    (with-current-builder ($builder)
       (for-each
         (lambda ($put-proc) ($put-proc $port))
-        (reverse (put-procs-parameter)))
-      (put-procs-parameter (stack))
-      (org-parameter 0)))
+        (reverse (builder-put-procs $builder)))
+      (builder-put-procs-set! $builder (stack))
+      (builder-org-set! $builder 0)))
 )
