@@ -1,10 +1,8 @@
 (library (simplang expander)
   (export
     typed expr-of macro?
-    type boolean integer char arrow macro)
+    macro case-macro)
   (import (except (micascheme) expand string))
-
-  (define-keywords type boolean integer char arrow macro)
 
   (define (scope-ref $scope $id)
     (lets
@@ -96,4 +94,18 @@
         (cdr $typed)
         (syntax-error $syntax
           (format "invalid type ~s, expected ~s, in" (car $typed) $type)))))
+
+  (define-rules-syntaxes
+    ((macro id proc)
+      (identifier? #'id)
+      (cons 'id
+        (cons 'macro
+          proc)))
+    ((macro (id scope stx) body)
+      (macro id
+        (lambda (scope stx) body)))
+    ((case-macro (id arg ...) body)
+      (macro (id scope stx)
+        (syntax-case stx ()
+          ((_ arg ...) body)))))
 )
