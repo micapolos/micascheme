@@ -95,7 +95,7 @@
         (syntax-error $syntax
           (format "invalid type ~s, expected ~s, in" (car $typed) $type)))))
 
-  (define-rules-syntaxes
+  (define-rules-syntax
     ((macro id proc)
       (identifier? #'id)
       (cons 'id
