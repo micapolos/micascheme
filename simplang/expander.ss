@@ -14,15 +14,18 @@
         (syntax-error $id "not bound"))))
 
   (define (typed $scope $syntax)
-    (syntax-case $syntax (typed type boolean integer char string arrow macro)
+    (syntax-case $syntax (typed type boolean integer char string arrow)
       ((typed typ expr) (cons (datum typ) #'expr))
-      (type (cons 'type #f))
-      (boolean (cons 'type #f))
-      (integer (cons 'type #f))
-      (char (cons 'type #f))
-      (string (cons 'type #f))
-      ((arrow (param ...) result) (cons 'type #f))
-      (macro (cons 'type #f))
+      (type (cons 'type 'type))
+      (boolean (cons 'type 'boolean))
+      (integer (cons 'type 'integer))
+      (char (cons 'type 'char))
+      (string (cons 'type 'string))
+      ((arrow (param ...) result)
+        (cons 'type
+          `(arrow
+            ,(map (partial expr-of $scope 'type) #'(param ...))
+            ,(expr-of $scope 'type #'result))))
       (x
         (boolean? (datum x))
         (cons 'boolean #'x))
