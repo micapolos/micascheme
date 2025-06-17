@@ -46,7 +46,6 @@
       ((fn arg ...)
         (lets
           ($typed-fn (typed $scope #'fn))
-          ($typed-args (map (partial typed $scope) #'(arg ...)))
           (syntax-case (car $typed-fn) (arrow)
             ((arrow (param ...) result)
               (cond
@@ -57,16 +56,10 @@
                       (length #'(arg ...))
                       (length #'(param ...)))))
                 (else
-                  (for-each
-                    (lambda ($param $arg $type)
-                      (unless (equal? $param $type)
-                        (syntax-error $arg
-                          (format "invalid argument type ~s, expected ~s, in" $type $param))))
-                    #'(param ...)
-                    #'(arg ...)
-                    (map car $typed-args))
                   (cons #'result
-                    `(,(cdr $typed-fn) ,@(map cdr $typed-args))))))
+                    `(
+                      ,(cdr $typed-fn)
+                      ,@map (partial expr-of $scope) #'(param ...) #'(arg ...))))))
             (other
               (syntax-error #'fn
                 (format "invalid type ~s, expected procedure, in" #'other))))))))
