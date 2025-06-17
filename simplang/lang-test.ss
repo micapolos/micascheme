@@ -28,6 +28,11 @@
 
 (check
   (equal?
+    (simplang ((lambda ((string a) (string b)) (+ a b)) "foo" "bar"))
+    "foobar"))
+
+(check
+  (equal?
     (simplang
       (let
         (

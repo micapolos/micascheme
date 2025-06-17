@@ -53,7 +53,7 @@
           (typed-application $scope #'x)))))
 
   (define (typed-syntax? $scope $syntax)
-    (syntax-case $syntax ()
+    (syntax-case? $syntax ()
       ((x arg ...)
         (symbol? (datum x))
         (syntax-case? (scope-ref $scope #'x) (macro)
@@ -78,7 +78,7 @@
                   (cons #'result
                     `(
                       ,(cdr $typed-fn)
-                      ,@map (partial expr-of $scope) #'(param ...) #'(arg ...))))))
+                      ,@(map (partial expr-of $scope) #'(param ...) #'(arg ...)))))))
             (other
               (syntax-error #'fn
                 (format "invalid type ~s, expected procedure, in" #'other))))))))

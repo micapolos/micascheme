@@ -41,6 +41,16 @@
     (typed scope '(let ((x 10) (y 20)) (+ x y)))
     '(integer . (let ((x 10) (y 20)) (+ x y)))))
 
+(check
+  (equal?
+    (typed scope '(lambda ((integer x) (integer y)) (+ x y)))
+    '((arrow (integer integer) integer) . (lambda (x y) (+ x y)))))
+
+(check
+  (equal?
+    (typed scope '((lambda ((integer x) (integer y)) (+ x y)) 1 2))
+    '(integer . ((lambda (x y) (+ x y)) 1 2))))
+
 (check (equal? (typed scope '(= #t #f)) '(boolean . (boolean=? #t #f))))
 (check (equal? (typed scope '(= 10 20)) '(boolean . (= 10 20))))
 (check (equal? (typed scope '(= #\a #\b)) '(boolean . (char=? #\a #\b))))

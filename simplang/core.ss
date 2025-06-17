@@ -4,6 +4,26 @@
 
   (define core-scope
     (list
+      (macro (lambda $scope $syntax)
+        (syntax-case $syntax ()
+          ((_ ((type var) ...) body)
+            (for-all (dot symbol? syntax->datum) #'(var ...))
+            (lets
+              ($vars (map syntax->datum #'(var ...)))
+              ($types (map syntax->datum #'(type ...)))
+              ($scope (append (map cons $vars $types) $scope))
+              ($typed-body (typed $scope #'body))
+              ($body-type (car $typed-body))
+              `(typed
+                (arrow (,@$types) ,$body-type)
+                (lambda
+                  (
+                    ,@(filter-opts
+                      (map-with
+                        ($var $vars)
+                        ($type $types)
+                        (and (not (macro? $type)) $var))))
+                  ,(cdr $typed-body)))))))
       (macro (let $scope $syntax)
         (syntax-case $syntax ()
           ((_ ((var expr) ...) body)
