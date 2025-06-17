@@ -4,15 +4,6 @@
 
   (define core-scope
     (list
-      (cons 'macro
-        (cons 'macro
-          (lambda ($scope $syntax)
-            (syntax-case $syntax ()
-              ((_ ($scope $syntax) body)
-                `(typed (macro .
-                  ,(eval
-                    `(lambda (,#'$scope ,#'$syntax) ,#'body)
-                    (environment '(micascheme) '(simplang expander)))) #f))))))
       (cons 'let
         (cons 'macro
           (lambda ($scope $syntax)

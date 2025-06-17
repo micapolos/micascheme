@@ -14,7 +14,7 @@
         (syntax-error $id "not bound"))))
 
   (define (typed $scope $syntax)
-    (syntax-case $syntax (typed type boolean integer char string arrow)
+    (syntax-case $syntax (typed type boolean integer char string arrow macro)
       ((typed typ expr) (cons (datum typ) #'expr))
       (type (cons 'type 'type))
       (boolean (cons 'type 'boolean))
@@ -26,6 +26,14 @@
           `(arrow
             ,(map (partial expr-of $scope 'type) #'(param ...))
             ,(expr-of $scope 'type #'result))))
+      ((macro (scope stx) body)
+        (and (symbol? (datum scope)) (symbol? (datum stx)))
+        (cons
+          `(macro .
+            ,(eval
+              `(lambda (,#'scope ,#'stx) ,#'body)
+              (environment '(micascheme) '(simplang expander))))
+          #f))
       (x
         (boolean? (datum x))
         (cons 'boolean #'x))
