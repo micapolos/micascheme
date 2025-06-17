@@ -1,7 +1,7 @@
 (library (simplang expander)
   (export
     typed expr-of macro?
-    macro case-macro)
+    macro)
   (import (except (micascheme) expand string))
 
   (define (scope-ref $scope $id)
@@ -103,9 +103,5 @@
           proc)))
     ((macro (id scope stx) body)
       (macro id
-        (lambda (scope stx) body)))
-    ((case-macro (id arg ...) body)
-      (macro (id scope stx)
-        (syntax-case stx ()
-          ((_ arg ...) body)))))
+        (lambda (scope stx) body))))
 )
