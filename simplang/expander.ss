@@ -1,6 +1,10 @@
 (library (simplang expander)
-  (export typed expr-of macro?)
+  (export
+    typed expr-of macro?
+    type boolean integer char arrow macro)
   (import (except (micascheme) expand string))
+
+  (define-keywords type boolean integer char arrow macro)
 
   (define (scope-ref $scope $id)
     (lets
@@ -10,9 +14,15 @@
         (syntax-error $id "not bound"))))
 
   (define (typed $scope $syntax)
-    (syntax-case $syntax (typed)
-      ((typed type expr)
-        (cons (datum type) #'expr))
+    (syntax-case $syntax (typed type boolean integer char string arrow macro)
+      ((typed typ expr) (cons (datum typ) #'expr))
+      (type (cons 'type #f))
+      (boolean (cons 'type #f))
+      (integer (cons 'type #f))
+      (char (cons 'type #f))
+      (string (cons 'type #f))
+      ((arrow (param ...) result) (cons 'type #f))
+      (macro (cons 'type #f))
       (x
         (boolean? (datum x))
         (cons 'boolean #'x))

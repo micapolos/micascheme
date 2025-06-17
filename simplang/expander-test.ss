@@ -19,6 +19,13 @@
 (check (equal? (typed scope "foo") '(string . "foo")))
 (check (equal? (typed scope '(typed integer x)) '(integer . x)))
 
+(check (equal? (typed scope 'boolean) '(type . #f)))
+(check (equal? (typed scope 'integer) '(type . #f)))
+(check (equal? (typed scope 'char) '(type . #f)))
+(check (equal? (typed scope 'string) '(type . #f)))
+(check (equal? (typed scope 'macro) '(type . #f)))
+(check (equal? (typed scope '(arrow (string integer) boolean)) '(type . #f)))
+
 (check (equal? (typed scope 'b) '(boolean . b)))
 (check (equal? (typed scope 'i) '(integer . i)))
 (check (equal? (typed scope 'ch) '(char . ch)))
