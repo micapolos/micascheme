@@ -51,6 +51,7 @@
     (system)
     (test)
     (throw)
+    (top-level)
     (variable)
     (vector))
 
@@ -106,6 +107,7 @@
       (system)
       (test)
       (throw)
+      (top-level)
       (variable)
       (vector)))
 )
