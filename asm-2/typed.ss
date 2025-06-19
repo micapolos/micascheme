@@ -1,14 +1,14 @@
 (library (asm-2 typed)
   (export
     void type boolean integer char string function macro
-    label equ db
+    label db
     typed typed-type typed-value
     syntax->typed
     define-typed
     type=? asm-bytevector)
   (import (micascheme) (syntax lookup) (asm-2 block))
 
-  (define-keywords typed type boolean integer char function macro asm-bytevector label equ db)
+  (define-keywords typed type boolean integer char function macro asm-bytevector label db)
 
   (define-rules-syntax (literals typed)
     ((define-typed id (typed type expr))
@@ -29,7 +29,7 @@
     (syntax-case $syntax
       (
         typed void type boolean integer char string function lambda macro
-        bytevector asm-bytevector label equ db)
+        bytevector asm-bytevector label db)
       ((typed typ expr)
         #`(typed #,(syntax->expr $lookup #'type #'typ) expr))
       (void #`(typed type void))
@@ -92,13 +92,6 @@
           (function (block) block)
           (lambda ($block)
             (block+label $block #'id))))
-      ((equ id expr)
-        (identifier? #'id)
-        #`(typed
-          (function (block) block)
-          (lambda ($block)
-            (block+equ $block #'id
-              #'#,(syntax->expr $lookup #'integer #'expr)))))
       ((db u8)
         #`(typed
           (function (block) block)

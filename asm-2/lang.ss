@@ -5,7 +5,7 @@
     (asm-2 typed))
   (export
     (import (only (micascheme) string lambda))
-    (import (only (asm-2 typed) void type boolean integer char function typed macro asm-bytevector label equ db)))
+    (import (only (asm-2 typed) void type boolean integer char function typed macro asm-bytevector label db)))
 
   (define-syntax (define $syntax $lookup)
     (syntax-case $syntax (typed)

@@ -115,15 +115,6 @@
           (lambda ($block) (block+label $block #'y)))))))
 
 (check-typed
-  (asm-bytevector (equ x (+ 1 2)))
-  (typed bytevector
-    (block-bytevector
-      (fold-left block-apply (empty-block)
-        (list
-          (lambda ($block)
-            (block+equ $block #'x #'(%+ 1 2))))))))
-
-(check-typed
   (asm-bytevector
     (db 1)
     (db 2)
