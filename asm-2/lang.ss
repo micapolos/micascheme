@@ -30,6 +30,7 @@
   (define-syntax (asm $syntax $lookup)
     (syntax-case $syntax ()
       ((_ expr)
-        (typed-value
-          (syntax->typed $lookup #'expr)))))
+        (syntax-case (syntax->typed $lookup #'expr) (typed)
+          ((typed type expr)
+            #``(typed type ,expr))))))
 )
