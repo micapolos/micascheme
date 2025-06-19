@@ -5,6 +5,11 @@
     (string-length %string-length))
   (asm-2 typed))
 
+(define-syntax (typed->datum $syntax $lookup)
+  (syntax-case $syntax ()
+    ((_ expr)
+      #`'#,(syntax->typed $lookup #'expr))))
+
 (define-syntax (check-typed $syntax $lookup)
   (syntax-case $syntax ()
     ((_ in out)
@@ -88,3 +93,11 @@
 (check-typed
   (string-append "a" "b" "c")
   (typed string (%string-append "a" "b" "c")))
+
+(lets
+  ($typed (typed->datum (macro string-append)))
+  (run
+    (check (equal? (car $typed) 'typed))
+    (check (equal? (caadr $typed) 'macro))
+    (check (procedure? (cadr (cadr $typed))))
+    (check (equal? (caddr $typed) #f))))

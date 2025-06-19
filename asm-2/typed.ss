@@ -1,13 +1,13 @@
 (library (asm-2 typed)
   (export
-    void type boolean integer char string function
+    void type boolean integer char string function macro
     typed typed-type typed-value
     syntax->typed
     define-typed
     type=?)
   (import (micascheme) (syntax lookup))
 
-  (define-keywords typed type boolean integer char function)
+  (define-keywords typed type boolean integer char function macro)
 
   (define-rules-syntax (literals typed)
     ((define-typed id (typed type expr))
@@ -25,7 +25,7 @@
         (make-compile-time-value type/proc))))
 
   (define (syntax->typed $lookup $syntax)
-    (syntax-case $syntax (void type boolean integer char string function lambda)
+    (syntax-case $syntax (void type boolean integer char string function lambda macro)
       (void #`(typed type void))
       (type #`(typed type type))
       (boolean #`(typed type boolean))
@@ -54,6 +54,13 @@
       (str
         (string? (datum str))
         #`(typed string str))
+      ((macro proc)
+        #`(typed
+          (macro
+            #,(eval
+              (syntax->datum/annotation #'proc)
+              (environment '(micascheme) '(asm-2 typed))))
+          #f))
       ((lambda ((typ id) ...) body)
         (for-all identifier? #'(id ...))
         (lets
