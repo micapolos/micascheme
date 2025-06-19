@@ -11,7 +11,7 @@
   (define (empty-scope) (empty-lookup))
 
   (define (syntax->typed $scope $syntax)
-    (syntax-case $syntax (void type boolean integer char string procedure lambda)
+    (syntax-case $syntax (void type boolean integer char string procedure lambda + string-append)
       (void #`(typed type void))
       (type #`(typed type type))
       (boolean #`(typed type boolean))
@@ -37,6 +37,10 @@
       (str
         (string? (datum str))
         #`(typed string str))
+      (+
+        #`(typed (procedure (integer integer) integer) +))
+      (string-append
+        #`(typed (procedure (string string) string) string-append))
       (s
         (symbol? (datum s))
         #`(typed #,(lookup-ref $scope #'s) s))

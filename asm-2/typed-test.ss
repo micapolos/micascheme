@@ -21,6 +21,9 @@
 (check-typed #\a (typed char #\a))
 (check-typed "foo" (typed string "foo"))
 
+(check-typed + (typed (procedure (integer integer) integer) +))
+(check-typed string-append (typed (procedure (string string) string) string-append))
+
 (check-typed
   (lambda () "foo")
   (typed
