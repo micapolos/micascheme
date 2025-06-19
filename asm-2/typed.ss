@@ -18,13 +18,13 @@
       (and (identifier? #'$lookup) (identifier? #'$syntax))
       (define-syntax id
         (lambda ($lookup $syntax) body)))
-    ((define-typed id proc)
+    ((define-typed id type/proc)
       (identifier? #'id)
       (define-syntax id
-        (make-compile-time-value proc))))
+        (make-compile-time-value type/proc))))
 
   (define (syntax->typed $lookup $syntax)
-    (syntax-case $syntax (void type boolean integer char string procedure lambda + string-append)
+    (syntax-case $syntax (void type boolean integer char string procedure lambda)
       (void #`(typed type void))
       (type #`(typed type type))
       (boolean #`(typed type boolean))
