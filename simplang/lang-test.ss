@@ -45,5 +45,11 @@
         (exclamate (+ hello ", " world))))
     "Hello, world!"))
 
+(check
+  (equal?
+    (simplang
+      (let* ((x 10) (y (+ x 20))) (+ x y)))
+    40))
+
 ;(check (equal? ((car (block-puts ((simplang (db 10)) (empty-block)))) core-scope) 10))
 

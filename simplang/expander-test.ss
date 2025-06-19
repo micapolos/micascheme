@@ -115,6 +115,15 @@
 
 (check
   (equal?
+    (typed scope
+      `(let* ((x 10) (y (+ x 20))) (+ x y)))
+    '(integer .
+      (let ((x 10))
+        (let ((y (+ x 20)))
+          (+ x y))))))
+
+(check
+  (equal?
     (typed scope '(db 10))
     `(block-proc .
       (lambda ($block)
