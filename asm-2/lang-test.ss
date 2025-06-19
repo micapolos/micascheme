@@ -1,8 +1,12 @@
 (import (asm-2 lang) (asm-2 std))
 
+(define zero 0)
+(define one 1)
 (define exclamate (lambda ((string s)) (string-append s "!")))
-(define increment (lambda ((integer i)) (+ i 1)))
+(define (increment (integer i)) (+ i one))
 
+(check-asm zero 0)
+(check-asm one 1)
 (check-asm (exclamate "foo") "foo!")
 (check-asm (increment 10) 11)
 
