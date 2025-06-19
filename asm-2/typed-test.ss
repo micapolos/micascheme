@@ -96,5 +96,5 @@
 
 (check
   (equal?
-    (typed->datum (macro string-append))
-    `(typed (macro ,%string-append) #f)))
+    (typed->datum (macro syntax->typed))
+    `(typed (macro ,syntax->typed) #f)))
