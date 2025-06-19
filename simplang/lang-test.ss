@@ -1,4 +1,4 @@
-(import (micascheme) (simplang lang))
+(import (micascheme) (simplang lang) (simplang block) (simplang core))
 
 (check (equal? (simplang (typed string (string-append "foo" "bar"))) "foobar"))
 
@@ -44,3 +44,6 @@
           (world "world"))
         (exclamate (+ hello ", " world))))
     "Hello, world!"))
+
+;(check (equal? ((car (block-puts ((simplang (db 10)) (empty-block)))) core-scope) 10))
+

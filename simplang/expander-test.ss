@@ -112,3 +112,14 @@
     '(string .
       (let ((hello "Hello") (world "world"))
         (string-append (string-append hello ", " world) "!")))))
+
+(check
+  (equal?
+    (typed scope '(db 10))
+    `(block-proc .
+      (lambda ($block)
+        (block+data $block 1
+          (lambda ($scope)
+            `(lambda ($port)
+              (put-u8 $port
+                ,(expr-of $scope 'integer '10)))))))))

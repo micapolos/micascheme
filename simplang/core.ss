@@ -99,5 +99,40 @@
         (syntax-case $syntax ()
           ((_ arg)
             `(typed integer
-              (string-length ,(expr-of $scope 'string #'arg))))))))
+              (string-length ,(expr-of $scope 'string #'arg))))))
+      (macro (label $scope $syntax)
+        (syntax-case $syntax ()
+          ((_ id)
+            `(typed block-proc
+              (lambda ($block)
+                (block+labels $block ',(datum id)))))))
+      (macro (equ $scope $syntax)
+        (syntax-case $syntax ()
+          ((_ id expr)
+            `(typed block-proc
+              (lambda ($block)
+                (block+equ $block
+                  ',(datum id)
+                  ',(datum expr)))))))
+      (macro (db $scope $syntax)
+        (syntax-case $syntax ()
+          ((_ expr)
+            `(typed block-proc
+              (lambda ($block)
+                (block+data $block 1
+                  (lambda ($scope)
+                    `(lambda ($port)
+                      (put-u8 $port
+                        ,(expr-of $scope 'integer ',(datum expr)))))))))))
+      (macro (dw $scope $syntax)
+        (syntax-case $syntax ()
+          ((_ expr)
+            `(typed block-proc
+              (lambda ($block)
+                (block+data $block 2
+                  (lambda ($scope)
+                    `(lambda ($port)
+                      (put-u16 $port
+                        ,(expr-of $scope 'integer ',(datum expr))
+                        (endianness little))))))))))))
 )
