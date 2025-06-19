@@ -81,11 +81,12 @@
             (lambda (#,@$ids) #,(typed-value $typed-body)))))
       ((asm-bytevector blk ...)
         #`(typed bytevector
-          (block-bytevector
-            (fold-left
-              block-apply
-              (empty-block)
-              (list #,@(map (partial syntax->expr $lookup #'(function (block) block)) #'(blk ...)))))))
+          (syntax-eval
+            (block-bytevector-syntax
+              (fold-left
+                block-apply
+                (empty-block)
+                (list #,@(map (partial syntax->expr $lookup #'(function (block) block)) #'(blk ...))))))))
       ((label id)
         (identifier? #'id)
         #`(typed
@@ -95,7 +96,8 @@
       ((db u8)
         #`(typed
           (function (block) block)
-          (lambda ($block) $block)))
+          (lambda ($block)
+            (block+u8 $block #'#,(syntax->expr $lookup #'integer #'u8)))))
       ((fn arg ...)
         (syntax-case (syntax->typed $lookup #'fn) (typed function)
           ((typed (function params result) fn-expr)

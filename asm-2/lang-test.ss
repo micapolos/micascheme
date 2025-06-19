@@ -46,9 +46,9 @@
 (check-asm (string-length "foo") 3)
 
 (check-asm
-  (asm-bytevector (db 0) (db 1))
-  (bytevector 1 2 3))
+  (asm-bytevector (label x) (label y))
+  (bytevector))
 
 (check-asm
-  (asm-bytevector (label x) (label y))
-  (bytevector 1 2 3))
+  (asm-bytevector (db 1) (db (+ 2 3)))
+  (bytevector 1 5))

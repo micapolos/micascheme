@@ -1,17 +1,20 @@
 (library (asm-2 block)
   (export
     block block?
-    block-size block-labels block-equs block-puts
-    block-with-size block-with-labels block-with-equs block-with-puts
+    block-size block-labels block-puts
+    block-with-size block-with-labels  block-with-puts
     empty-block
-    block-apply block-bytevector
-    block+label block+equ block+data)
+    block-apply block-bytevector-syntax
+    block+label block+data block+u8)
   (import (micascheme))
 
-  (data (block size labels equs puts))
+  (data (block size labels puts))
+
+  (define (u8? $obj)
+    (and (integer? $obj) (>= $obj #x00) (<= $obj #xff)))
 
   (define (empty-block)
-    (block 0 (stack) (stack) (stack)))
+    (block 0 (stack) (stack)))
 
   (define (block+label $block $label)
     (block-with-labels $block
@@ -19,58 +22,31 @@
         (block-labels $block)
         (cons $label (block-size $block)))))
 
-  (define (block+equ $block $id $expr)
-    (block-with-equs $block
-      (push
-        (block-equs $block)
-        (cons $id $expr))))
-
   (define (block+data $block $size $put)
     (block-with-puts
       (block-with-size $block (+ (block-size $block) $size))
       (push (block-puts $block) $put)))
 
+  (define (block+u8 $block $expr)
+    (block+data $block 1
+      #`(lambda ($port)
+        (switch #,$expr
+          ((u8? $u8) (put-u8 $port #,$expr))
+          ((else $other)
+            (syntax-error #'$expr
+              (format "expected u8, got ~s, in" $other)))))))
+
   (define (block-apply $block $fn)
     ($fn $block))
 
-  (define (block-bytevector $block)
-    (bytevector 1 2 3))
-
-  ; (define (block-expr $block $scope $org)
-  ;   (lets
-  ;     ($labels (reverse (block-labels $block)))
-  ;     ($equs (reverse (block-equs $block)))
-  ;     `(let
-  ;       ())
-  ;     ($scope
-  ;       (fold-left
-  ;         (lambda ($scope $label)
-  ;           (push $scope (cons (car $label) 'integer)))
-  ;         $scope
-  ;         $labels))
-  ;     ($scope-exprs
-  ;       (fold-left
-  ;         (lambda ($scope-exprs $equ)
-  ;           (lets
-  ;             ($scope (car $scope-exprs))
-  ;             ($exprs (cdr $scope-exprs))
-  ;             ($id (car $equ))
-  ;             ($datum (cdr $equ))
-  ;             ($typed (typed $scope $datum))
-  ;             ($type (car $typed))
-  ;             ($expr (cdr $typed))
-  ;             (cons
-  ;               (push $scope (cons $id $type))
-  ;               (push $exprs $expr))))
-  ;         (cons $scope (stack))
-  ;         $equs))
-  ;     ($scope (car $scope-exprs))
-  ;     ($exprs (reverse (cdr $scope-exprs)))
-  ;     `(lets
-  ;       ,@(map-with ($label $labels)
-  ;         `(,(car $label) ,(+ $org (cdr $label))))
-  ;       ,@(map-with
-  ;         ($equ $equs)
-  ;         ($expr $exprs)
-  ;         `(,(car $equ) ,$expr)))))
+  (define (block-bytevector-syntax $block)
+    #`(lets
+      #,@(map-with
+        ($label (reverse (block-labels $block)))
+        #`(#,(car $label) #,(cdr $label)))
+      (call-with-bytevector-output-port
+        (lambda ($port)
+          (for-each
+            (lambda ($put) ($put $port))
+            (list #,@(reverse (block-puts $block))))))))
 )

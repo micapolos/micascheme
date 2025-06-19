@@ -108,21 +108,22 @@
 (check-typed
   (asm-bytevector (label x) (label y))
   (typed bytevector
-    (block-bytevector
-      (fold-left block-apply (empty-block)
-        (list
-          (lambda ($block) (block+label $block #'x))
-          (lambda ($block) (block+label $block #'y)))))))
+    (syntax-eval
+      (block-bytevector-syntax
+        (fold-left block-apply (empty-block)
+          (list
+            (lambda ($block) (block+label $block (syntax x)))
+            (lambda ($block) (block+label $block (syntax y)))))))))
 
 (check-typed
   (asm-bytevector
     (db 1)
-    (db 2)
-    (db 3))
+    (db (+ 3 4)))
   (typed bytevector
-    (block-bytevector
-      (fold-left block-apply (empty-block)
-        (list
-          (lambda ($block) $block)
-          (lambda ($block) $block)
-          (lambda ($block) $block))))))
+    (syntax-eval
+      (block-bytevector-syntax
+        (fold-left block-apply (empty-block)
+          (list
+            (lambda ($block) (block+u8 $block (syntax 1)))
+            (lambda ($block) (block+u8 $block (syntax (%+ 3 4))))))))))
+
