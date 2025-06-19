@@ -3,7 +3,8 @@
     void type boolean integer char string procedure
     typed typed-type typed-value
     syntax->typed
-    define-typed)
+    define-typed
+    type=?)
   (import (micascheme) (syntax lookup))
 
   (define-keywords typed type boolean integer char procedure)

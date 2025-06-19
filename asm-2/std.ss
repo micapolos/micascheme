@@ -1,6 +1,13 @@
 (library (asm-2 std)
-  (export not = boolean=? char=? string=? + - << >> and or xor string-append string-length)
-  (import (asm-2 lang) (prefix (micascheme) %))
+  (export
+    not
+    = boolean=? char=? string=? type=?
+    + - << >> and or xor
+    string-append string-length)
+  (import
+    (asm-2 lang)
+    (prefix (only (asm-2 typed) type=?) %)
+    (prefix (micascheme) %))
 
   (define not (typed (procedure (boolean) boolean) %not))
 
@@ -8,6 +15,7 @@
   (define boolean=? (typed (procedure (boolean boolean) boolean) %boolean=?))
   (define char=? (typed (procedure (char char) boolean) %char=?))
   (define string=? (typed (procedure (string string) boolean) %string=?))
+  (define type=? (typed (procedure (type type) boolean) %type=?))
 
   (define + (typed (procedure integer integer) %+))
   (define - (typed (procedure (integer . integer) integer) %-))
