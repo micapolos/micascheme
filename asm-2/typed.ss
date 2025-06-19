@@ -41,9 +41,6 @@
         #`(typed (procedure (integer integer) integer) +))
       (string-append
         #`(typed (procedure (string string) string) string-append))
-      (s
-        (symbol? (datum s))
-        #`(typed #,(lookup-ref $scope #'s) s))
       ((lambda ((typ id) ...) body)
         (for-all identifier? #'(id ...))
         (lets
@@ -63,7 +60,10 @@
               ((arg-expr ...)
                 #`(typed result (fn-expr arg-expr ...)))))
           ((typed _ _)
-            (syntax-error #'fn "not an procedure"))))))
+            (syntax-error #'fn "not an procedure"))))
+      (s
+        (symbol? (datum s))
+        #`(typed #,(lookup-ref $scope #'s) s))))
 
 
   (define (syntax->expr $scope $type $syntax)
