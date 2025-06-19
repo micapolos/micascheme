@@ -94,10 +94,7 @@
   (string-append "a" "b" "c")
   (typed string (%string-append "a" "b" "c")))
 
-(lets
-  ($typed (typed->datum (macro string-append)))
-  (run
-    (check (equal? (car $typed) 'typed))
-    (check (equal? (caadr $typed) 'macro))
-    (check (procedure? (cadr (cadr $typed))))
-    (check (equal? (caddr $typed) #f))))
+(check
+  (equal?
+    (typed->datum (macro string-append))
+    `(typed (macro ,%string-append) #f)))
