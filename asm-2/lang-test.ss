@@ -5,6 +5,8 @@
 (define exclamate (lambda ((string s)) (string-append s "!")))
 (define (increment (integer i)) (+ i one))
 
+(check-asm (typed string "foo") "foo")
+
 (check-asm zero 0)
 (check-asm one 1)
 (check-asm (exclamate "foo") "foo!")
@@ -42,3 +44,11 @@
 (check-asm (string-append "foo" "bar" "!") "foobar!")
 
 (check-asm (string-length "foo") 3)
+
+(check-asm
+  (asm-bytevector (db 0) (db 1))
+  (bytevector 1 2 3))
+
+(check-asm
+  (asm-bytevector (label x) (label y))
+  (bytevector 1 2 3))

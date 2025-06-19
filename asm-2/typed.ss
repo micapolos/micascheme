@@ -1,13 +1,14 @@
 (library (asm-2 typed)
   (export
     void type boolean integer char string function macro
+    label equ db
     typed typed-type typed-value
     syntax->typed
     define-typed
-    type=?)
-  (import (micascheme) (syntax lookup))
+    type=? asm-bytevector)
+  (import (micascheme) (syntax lookup) (asm-2 block))
 
-  (define-keywords typed type boolean integer char function macro)
+  (define-keywords typed type boolean integer char function macro asm-bytevector label equ db)
 
   (define-rules-syntax (literals typed)
     ((define-typed id (typed type expr))
@@ -25,7 +26,12 @@
         (make-compile-time-value type/proc))))
 
   (define (syntax->typed $lookup $syntax)
-    (syntax-case $syntax (void type boolean integer char string function lambda macro)
+    (syntax-case $syntax
+      (
+        typed void type boolean integer char string function lambda macro
+        bytevector asm-bytevector label equ db)
+      ((typed typ expr)
+        #`(typed #,(syntax->expr $lookup #'type #'typ) expr))
       (void #`(typed type void))
       (type #`(typed type type))
       (boolean #`(typed type boolean))
@@ -59,7 +65,7 @@
           (macro
             #,(eval
               (syntax->datum/annotation #'proc)
-              (environment '(micascheme) '(asm-2 typed))))
+              (environment '(micascheme) '(asm-2 typed) '(asm-2 block))))
           #f))
       ((lambda ((typ id) ...) body)
         (for-all identifier? #'(id ...))
@@ -73,6 +79,30 @@
           #`(typed
             (function (#,@$types) #,(typed-type $typed-body))
             (lambda (#,@$ids) #,(typed-value $typed-body)))))
+      ((asm-bytevector blk ...)
+        #`(typed bytevector
+          (block-bytevector
+            (fold-left
+              block-apply
+              (empty-block)
+              (list #,@(map (partial syntax->expr $lookup #'(function (block) block)) #'(blk ...)))))))
+      ((label id)
+        (identifier? #'id)
+        #`(typed
+          (function (block) block)
+          (lambda ($block)
+            (block+label $block #'id))))
+      ((equ id expr)
+        (identifier? #'id)
+        #`(typed
+          (function (block) block)
+          (lambda ($block)
+            (block+equ $block #'id
+              #'#,(syntax->expr $lookup #'integer #'expr)))))
+      ((db u8)
+        #`(typed
+          (function (block) block)
+          (lambda ($block) $block)))
       ((fn arg ...)
         (syntax-case (syntax->typed $lookup #'fn) (typed function)
           ((typed (function params result) fn-expr)

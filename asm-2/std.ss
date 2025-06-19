@@ -3,7 +3,7 @@
     not
     = boolean=? char=? string=? type=?
     + - << >> and or xor
-    string-append string-length)
+    string-append string-length bytevector)
   (import
     (asm-2 lang)
     (prefix (only (asm-2 typed) type=?) %)
@@ -26,4 +26,6 @@
   (define xor (typed (function integer integer) %bitwise-xor))
   (define string-append (typed (function string string) %string-append))
   (define string-length (typed (function (string) integer) %string-length))
+
+  (define bytevector (typed (function integer bytevector) %bytevector))
 )

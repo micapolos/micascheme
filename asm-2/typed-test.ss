@@ -2,7 +2,8 @@
   (rename (micascheme)
     (+ %+)
     (string-append %string-append)
-    (string-length %string-length))
+    (string-length %string-length)
+    (bytevector %bytevector))
   (asm-2 typed))
 
 (define-syntax (typed->datum $syntax $lookup)
@@ -21,6 +22,7 @@
 (define-typed + (typed (function integer integer) %+))
 (define-typed string-append (typed (function string string) %string-append))
 (define-typed string-length (typed (function (string) integer) %string-length))
+(define-typed bytevector (typed (function integer bytevector) %bytevector))
 
 (check-typed type (typed type type))
 
@@ -94,7 +96,42 @@
   (string-append "a" "b" "c")
   (typed string (%string-append "a" "b" "c")))
 
+(check-typed
+  (bytevector 1 2 (+ 3 4))
+  (typed bytevector (%bytevector 1 2 (%+ 3 4))))
+
 (check
   (equal?
     (typed->datum (macro syntax->typed))
     `(typed (macro ,syntax->typed) #f)))
+
+(check-typed
+  (asm-bytevector (label x) (label y))
+  (typed bytevector
+    (block-bytevector
+      (fold-left block-apply (empty-block)
+        (list
+          (lambda ($block) (block+label $block #'x))
+          (lambda ($block) (block+label $block #'y)))))))
+
+(check-typed
+  (asm-bytevector (equ x (+ 1 2)))
+  (typed bytevector
+    (block-bytevector
+      (fold-left block-apply (empty-block)
+        (list
+          (lambda ($block)
+            (block+equ $block #'x #'(%+ 1 2))))))))
+
+(check-typed
+  (asm-bytevector
+    (db 1)
+    (db 2)
+    (db 3))
+  (typed bytevector
+    (block-bytevector
+      (fold-left block-apply (empty-block)
+        (list
+          (lambda ($block) $block)
+          (lambda ($block) $block)
+          (lambda ($block) $block))))))
