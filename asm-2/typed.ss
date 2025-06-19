@@ -1,13 +1,13 @@
 (library (asm-2 typed)
   (export
-    void type boolean integer char string procedure
+    void type boolean integer char string function
     typed typed-type typed-value
     syntax->typed
     define-typed
     type=?)
   (import (micascheme) (syntax lookup))
 
-  (define-keywords typed type boolean integer char procedure)
+  (define-keywords typed type boolean integer char function)
 
   (define-rules-syntax (literals typed)
     ((define-typed id (typed type expr))
@@ -25,16 +25,16 @@
         (make-compile-time-value type/proc))))
 
   (define (syntax->typed $lookup $syntax)
-    (syntax-case $syntax (void type boolean integer char string procedure lambda)
+    (syntax-case $syntax (void type boolean integer char string function lambda)
       (void #`(typed type void))
       (type #`(typed type type))
       (boolean #`(typed type boolean))
       (integer #`(typed type integer))
       (char #`(typed type char))
       (string #`(typed type string))
-      ((procedure params result)
+      ((function params result)
         #`(typed type
-          (procedure
+          (function
             #,(map*
               (partial syntax->expr $lookup #'type)
               (partial syntax->expr $lookup #'type)
@@ -64,11 +64,11 @@
               (fold-left lookup+undefined $lookup $ids $types)
               #'body))
           #`(typed
-            (procedure (#,@$types) #,(typed-type $typed-body))
+            (function (#,@$types) #,(typed-type $typed-body))
             (lambda (#,@$ids) #,(typed-value $typed-body)))))
       ((fn arg ...)
-        (syntax-case (syntax->typed $lookup #'fn) (typed procedure)
-          ((typed (procedure params result) fn-expr)
+        (syntax-case (syntax->typed $lookup #'fn) (typed function)
+          ((typed (function params result) fn-expr)
             (syntax-case
               (map*
                 (partial syntax->expr $lookup)
@@ -79,12 +79,12 @@
               ((arg-expr ...)
                 #`(typed result (fn-expr arg-expr ...)))))
           ((typed _ _)
-            (syntax-error #'fn "not an procedure"))))
+            (syntax-error #'fn "not an function"))))
       (id
         (identifier? #'id)
         (switch (lookup-ref $lookup #'id)
-          ((procedure? $procedure)
-            ($procedure $lookup #'id))
+          ((procedure? $function)
+            ($function $lookup #'id))
           ((else $type)
             #`(typed #,$type id))))))
 

@@ -13,9 +13,9 @@
           '#,(syntax->typed $lookup #'in)
           'out)))))
 
-(define-typed + (typed (procedure integer integer) %+))
-(define-typed string-append (typed (procedure string string) %string-append))
-(define-typed string-length (typed (procedure (string) integer) %string-length))
+(define-typed + (typed (function integer integer) %+))
+(define-typed string-append (typed (function string string) %string-append))
+(define-typed string-length (typed (function (string) integer) %string-length))
 
 (check-typed type (typed type type))
 
@@ -26,20 +26,20 @@
 (check-typed string (typed type string))
 
 (check-typed
-  (procedure () boolean)
-  (typed type (procedure () boolean)))
+  (function () boolean)
+  (typed type (function () boolean)))
 
 (check-typed
-  (procedure (integer string) boolean)
-  (typed type (procedure (integer string) boolean)))
+  (function (integer string) boolean)
+  (typed type (function (integer string) boolean)))
 
 (check-typed
-  (procedure integer boolean)
-  (typed type (procedure integer boolean)))
+  (function integer boolean)
+  (typed type (function integer boolean)))
 
 (check-typed
-  (procedure (integer char . string) boolean)
-  (typed type (procedure (integer char . string) boolean)))
+  (function (integer char . string) boolean)
+  (typed type (function (integer char . string) boolean)))
 
 (check-typed (void) (typed void (void)))
 (check-typed #f (typed boolean #f))
@@ -47,32 +47,32 @@
 (check-typed #\a (typed char #\a))
 (check-typed "foo" (typed string "foo"))
 
-(check-typed + (typed (procedure integer integer) %+))
-(check-typed string-append (typed (procedure string string) %string-append))
-(check-typed string-length (typed (procedure (string) integer) %string-length))
+(check-typed + (typed (function integer integer) %+))
+(check-typed string-append (typed (function string string) %string-append))
+(check-typed string-length (typed (function (string) integer) %string-length))
 
 (check-typed
   (lambda () "foo")
   (typed
-    (procedure () string)
+    (function () string)
     (lambda ()"foo")))
 
 (check-typed
   (lambda ((integer i) (string s)) i)
   (typed
-    (procedure (integer string) integer)
+    (function (integer string) integer)
     (lambda (i s) i)))
 
 (check-typed
   (lambda ((integer i) (string s)) s)
   (typed
-    (procedure (integer string) string)
+    (function (integer string) string)
     (lambda (i s) s)))
 
 (check-typed
   (lambda ((string s)) (string-length s))
   (typed
-    (procedure (string) integer)
+    (function (string) integer)
     (lambda (s) (%string-length s))))
 
 (check-typed
