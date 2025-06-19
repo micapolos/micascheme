@@ -6,9 +6,9 @@
     (define %define))
   (asm-2 lang))
 
-(define-typed + (typed (procedure integer integer) %+))
-(define-typed string-append (typed (procedure string string) %string-append))
-(define-typed string-length (typed (procedure (string) integer) %string-length))
+(define + (typed (procedure integer integer) %+))
+(define string-append (typed (procedure string string) %string-append))
+(define string-length (typed (procedure (string) integer) %string-length))
 
 (define exclamate (lambda ((string s)) (string-append s "!")))
 (define increment (lambda ((integer i)) (+ i 1)))

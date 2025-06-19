@@ -5,10 +5,12 @@
     (asm-2 typed))
   (export
     (import (only (micascheme) string lambda))
-    (import (only (asm-2 typed) void type boolean integer char procedure define-typed typed)))
+    (import (only (asm-2 typed) void type boolean integer char procedure typed)))
 
   (define-syntax (define $syntax $lookup)
-    (syntax-case $syntax ()
+    (syntax-case $syntax (typed)
+      ((_ id (typed type expr))
+        #`(define-typed id (typed type expr)))
       ((_ (id . params) body)
         #`(define id (lambda params body)))
       ((_ id expr)
