@@ -1,7 +1,21 @@
-(import (micascheme) (asm-2 typed))
+(import
+  (rename (micascheme)
+    (+ %+)
+    (string-append %string-append)
+    (string-length %string-length))
+  (asm-2 typed))
 
-(define-rule-syntax (check-typed in out)
-  (check-datum=? (syntax->typed (empty-scope) #'in) 'out))
+(define-syntax (check-typed $syntax $lookup)
+  (syntax-case $syntax ()
+    ((_ in out)
+      #`(check
+        (equal?
+          '#,(syntax->typed $lookup #'in)
+          'out)))))
+
+(define-typed + (typed (procedure integer integer) %+))
+(define-typed string-append (typed (procedure string string) %string-append))
+(define-typed string-length (typed (procedure (string) integer) %string-length))
 
 (check-typed type (typed type type))
 
@@ -12,8 +26,20 @@
 (check-typed string (typed type string))
 
 (check-typed
+  (procedure () boolean)
+  (typed type (procedure () boolean)))
+
+(check-typed
   (procedure (integer string) boolean)
   (typed type (procedure (integer string) boolean)))
+
+(check-typed
+  (procedure integer boolean)
+  (typed type (procedure integer boolean)))
+
+(check-typed
+  (procedure (integer char . string) boolean)
+  (typed type (procedure (integer char . string) boolean)))
 
 (check-typed (void) (typed void (void)))
 (check-typed #f (typed boolean #f))
@@ -21,8 +47,9 @@
 (check-typed #\a (typed char #\a))
 (check-typed "foo" (typed string "foo"))
 
-(check-typed + (typed (procedure (integer integer) integer) +))
-(check-typed string-append (typed (procedure (string string) string) string-append))
+(check-typed + (typed (procedure integer integer) %+))
+(check-typed string-append (typed (procedure string string) %string-append))
+(check-typed string-length (typed (procedure (string) integer) %string-length))
 
 (check-typed
   (lambda () "foo")
@@ -43,5 +70,21 @@
     (lambda (i s) s)))
 
 (check-typed
-  ((lambda ((integer i)) i) 123)
-  (typed integer ((lambda (i) i) 123)))
+  (lambda ((string s)) (string-length s))
+  (typed
+    (procedure (string) integer)
+    (lambda (s) (%string-length s))))
+
+(check-typed
+  ((lambda ((string s)) (string-length s)) "foo")
+  (typed
+    integer
+    ((lambda (s) (%string-length s)) "foo")))
+
+(check-typed
+  (string-append)
+  (typed string (%string-append)))
+
+(check-typed
+  (string-append "a" "b" "c")
+  (typed string (%string-append "a" "b" "c")))

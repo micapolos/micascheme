@@ -1,4 +1,4 @@
-(import (scheme) (check) (syntax) (procedure) (boolean) (lets) (identifier))
+(import (scheme) (check) (syntax) (procedure) (boolean) (lets) (identifier) (list))
 
 (check (equal? (identifiers? #'()) #t))
 (check (equal? (identifiers? #'(foo bar)) #t))
@@ -200,3 +200,8 @@
         #,(identifier-append #'syntax-eval #'string #'- #'append)
         "foo" "bar"))
     "foobar"))
+
+(check (equal? (map* syntax->datum syntax->datum (syntax->list* #'())) '()))
+(check (equal? (map* syntax->datum syntax->datum (syntax->list* #'(1 2 3))) '(1 2 3)))
+(check (equal? (map* syntax->datum syntax->datum (syntax->list* #'1)) 1))
+(check (equal? (map* syntax->datum syntax->datum (syntax->list* #'(1 2 3 . 4))) '(1 2 3 . 4)))

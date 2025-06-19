@@ -51,7 +51,8 @@
     syntax-append
     literal->syntax
     syntax-single
-    get-property)
+    get-property
+    syntax->list*)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -394,4 +395,9 @@
         (syntax-case $syntax ()
           ((_ id key)
             #`'#,(datum->syntax #'get-property ($lookup #'id #'key)))))))
+
+  (define (syntax->list* $syntax)
+    (syntax-case $syntax ()
+      ((x ... . y)
+        (append #'(x ...) (if (null? (datum y)) '() #'y)))))
 )

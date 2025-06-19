@@ -1,16 +1,29 @@
 (library (asm-2 typed)
   (export
     void type boolean integer char string procedure
-    typed
-    empty-scope
-    syntax->typed)
+    typed typed-type typed-value
+    syntax->typed
+    define-typed)
   (import (micascheme) (syntax lookup))
 
   (define-keywords typed type boolean integer char procedure)
 
-  (define (empty-scope) (empty-lookup))
+  (define-rules-syntax (literals typed)
+    ((define-typed id (typed type expr))
+      (define-typed id
+        (lambda ($lookup $syntax)
+          (syntax-case $syntax (id)
+            (id #'(typed type expr))))))
+    ((define-typed (id $lookup $syntax) body)
+      (and (identifier? #'$lookup) (identifier? #'$syntax))
+      (define-syntax id
+        (lambda ($lookup $syntax) body)))
+    ((define-typed id proc)
+      (identifier? #'id)
+      (define-syntax id
+        (make-compile-time-value proc))))
 
-  (define (syntax->typed $scope $syntax)
+  (define (syntax->typed $lookup $syntax)
     (syntax-case $syntax (void type boolean integer char string procedure lambda + string-append)
       (void #`(typed type void))
       (type #`(typed type type))
@@ -18,11 +31,14 @@
       (integer #`(typed type integer))
       (char #`(typed type char))
       (string #`(typed type string))
-      ((procedure (param ...) result)
+      ((procedure params result)
         #`(typed type
           (procedure
-            (#,@(map (partial syntax->expr $scope #'type) #'(param ...)))
-            #,(syntax->expr $scope #'type #'result))))
+            #,(map*
+              (partial syntax->expr $lookup #'type)
+              (partial syntax->expr $lookup #'type)
+              (syntax->list* #'params))
+            #,(syntax->expr $lookup #'type #'result))))
       ((void)
         #`(typed void (void)))
       (b
@@ -37,37 +53,42 @@
       (str
         (string? (datum str))
         #`(typed string str))
-      (+
-        #`(typed (procedure (integer integer) integer) +))
-      (string-append
-        #`(typed (procedure (string string) string) string-append))
       ((lambda ((typ id) ...) body)
         (for-all identifier? #'(id ...))
         (lets
-          ($types (map (partial syntax->expr $scope #'type) #'(typ ...)))
+          ($types (map (partial syntax->expr $lookup #'type) #'(typ ...)))
           ($ids #'(id ...))
           ($typed-body
             (syntax->typed
-              (fold-left lookup+undefined $scope $ids $types)
+              (fold-left lookup+undefined $lookup $ids $types)
               #'body))
           #`(typed
             (procedure (#,@$types) #,(typed-type $typed-body))
             (lambda (#,@$ids) #,(typed-value $typed-body)))))
       ((fn arg ...)
-        (syntax-case (syntax->typed $scope #'fn) (typed procedure)
-          ((typed (procedure (param ...) result) fn-expr)
-            (syntax-case (map (partial syntax->expr $scope) #'(param ...) #'(arg ...)) ()
+        (syntax-case (syntax->typed $lookup #'fn) (typed procedure)
+          ((typed (procedure params result) fn-expr)
+            (syntax-case
+              (map*
+                (partial syntax->expr $lookup)
+                (partial syntaxes->exprs $lookup)
+                (syntax->list* #'params)
+                #'(arg ...))
+              ()
               ((arg-expr ...)
                 #`(typed result (fn-expr arg-expr ...)))))
           ((typed _ _)
             (syntax-error #'fn "not an procedure"))))
-      (s
-        (symbol? (datum s))
-        #`(typed #,(lookup-ref $scope #'s) s))))
+      (id
+        (identifier? #'id)
+        (switch (lookup-ref $lookup #'id)
+          ((procedure? $procedure)
+            ($procedure $lookup #'id))
+          ((else $type)
+            #`(typed #,$type id))))))
 
-
-  (define (syntax->expr $scope $type $syntax)
-    (syntax-case (syntax->typed $scope $syntax) (typed)
+  (define (syntax->expr $lookup $type $syntax)
+    (syntax-case (syntax->typed $lookup $syntax) (typed)
       ((typed type expr)
         (cond
           ((type=? #'type $type) #'expr)
@@ -76,6 +97,9 @@
               (format "invalid type ~s, expected ~s, in"
                 (syntax->datum #'type)
                 (syntax->datum $type))))))))
+
+  (define (syntaxes->exprs $lookup $type $syntaxes)
+    (map (partial syntax->expr $lookup $type) $syntaxes))
 
   (define (type=? $type-a $type-b)
     (equal?
