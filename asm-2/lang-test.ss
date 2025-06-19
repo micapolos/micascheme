@@ -10,6 +10,21 @@
 (check-asm (exclamate "foo") "foo!")
 (check-asm (increment 10) 11)
 
+(check-asm (boolean=? #t #t) #t)
+(check-asm (boolean=? #t #f) #f)
+
+(check-asm (= 0 0) #t)
+(check-asm (= 0 1) #f)
+
+(check-asm (char=? #\a #\a) #t)
+(check-asm (char=? #\a #\b) #f)
+
+(check-asm (string=? "foo" "foo") #t)
+(check-asm (string=? "foo" "bar") #f)
+
+(check-asm (not #f) #t)
+(check-asm (not #t) #f)
+
 (check-asm (+) 0)
 (check-asm (+ 1 2 3) 6)
 
