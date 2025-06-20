@@ -46,7 +46,7 @@
             (id #'(typed type expr))))))
     ((define-typed (id $lookup $syntax) body)
       (and (identifier? #'$lookup) (identifier? #'$syntax))
-      (define-syntax id
+      (define-typed id
         (lambda ($lookup $syntax) body)))
     ((define-typed id type/proc)
       (identifier? #'id)
