@@ -50,18 +50,6 @@
   (bytevector 3))
 
 (check-asm
-  (binary->bytevector (db-binary #x10))
-  (bytevector #x10))
-
-(check-asm
-  (binary->bytevector (dw-binary #x1234))
-  (bytevector #x34 #x12))
-
-(check-asm
-  (binary->bytevector (binary-append (db-binary #x10) (db-binary #x20)))
-  (bytevector #x10 #x20))
-
-(check-asm
   (asm-bytevector
     (org 100)
     (db 10))

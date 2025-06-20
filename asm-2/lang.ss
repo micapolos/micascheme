@@ -4,7 +4,7 @@
     (rename (micascheme) (define %define))
     (asm-2 typed))
   (export
-    (import (only (micascheme) string lambda))
+    (import (only (micascheme) string lambda syntax))
     (import (only (asm-2 block) block))
     (import (only (asm-2 typed) void type boolean integer char function typed macro asm-bytevector label db dw binary)))
 

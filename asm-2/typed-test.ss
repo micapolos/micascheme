@@ -110,38 +110,45 @@
   (db (+ 1 2))
   (typed
     (function (block) block)
-    (db-block-function #'(+ 1 2))))
+    (db-block-function (+ 1 2))))
+
+(check-typed
+  (dw (+ 1 2))
+  (typed
+    (function (block) block)
+    (dw-block-function (+ 1 2))))
 
 (check-typed
   (label x)
   (typed
     (function (block) block)
-    (label-block-function #'x)))
+    (label-block-function x)))
 
 (check-typed
   (block (db 0) (label x) (db x))
   (typed
     (function (block) block)
     (block-function-append
-      (db-block-function #'0)
-      (label-block-function #'x)
-      (db-block-function #'x))))
+      (db-block-function 0)
+      (label-block-function x)
+      (db-block-function x))))
 
-; (check-typed
-;   (asm-bytevector
-;     (org 100)
-;     (label start)
-;     (db 10)
-;     (db (- end start))
-;     (label end))
-;   (typed bytevector
-;     (syntax-eval
-;       (block-binary-syntax
-;         (app
-;           (block-function-append
-;             (label-block-function (syntax start))
-;             (db-block-function (syntax 10))
-;             (db-block-function (syntax (- end start)))
-;             (label-block-function (syntax end)))
-;           (empty-block))
-;         100))))
+(check-typed
+  (asm-bytevector
+    (org 100)
+    (label start)
+    (db 10)
+    (db (- end start))
+    (label end))
+  (typed bytevector
+    (binary->bytevector
+      (syntax-eval
+        (block-binary-syntax
+          (app
+            (block-function-append
+              (label-block-function start)
+              (db-block-function 10)
+              (db-block-function (- end start))
+              (label-block-function end))
+            (empty-block))
+          100)))))

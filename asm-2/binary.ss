@@ -10,13 +10,15 @@
   (define (put-binary $port $binary)
     ($binary $port))
 
-  (define-rule-syntax (db-binary $db)
+  (define (db-binary $db $syntax)
     (lambda ($port)
-      (put-u8 $port (u8 $db))))
+      (put-u8 $port (u8 $db $syntax))))
 
-  (define-rule-syntax (dw-binary $dw)
+  (define (dw-binary $dw $syntax)
     (lambda ($port)
-      (put-u16 $port (u16 $dw) 'little)))
+      (put-u16 $port
+        (u16 $dw $syntax)
+        (endianness little))))
 
   (define (binary-append . $binaries)
     (lambda ($port)

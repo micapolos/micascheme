@@ -11,27 +11,25 @@
 
   (define-keywords typed type boolean integer char function macro asm-bytevector label db dw binary)
 
-  (define (db-block-function $expr)
+  (define-rule-syntax (db-block-function expr)
     (lambda ($block)
       (block+data $block 1
-        #`(db-binary #,$expr))))
+        #`(db-binary expr #'expr))))
 
-  (define (dw-block-function $expr)
+  (define-rule-syntax (dw-block-function expr)
     (lambda ($block)
       (block+data $block 2
-        #`(dw-binary #,$expr))))
+        #`(dw-binary expr #'expr))))
 
-  (define (label-block-function $label)
+  (define-rule-syntax (label-block-function label)
     (lambda ($block)
-      (block+label $block $label)))
+      (block+label $block #'label)))
 
-  (define (block-function-append . $block-functions)
+  (define-rule-syntax (block-function-append expr ...)
     (lambda ($block)
-      (fold-left
-        (lambda ($block $block-function)
-          ($block-function $block))
-        $block
-        $block-functions)))
+      (lets
+        ($block (expr $block)) ...
+        $block)))
 
   (define-rules-syntax (literals typed)
     ((define-typed id (typed type expr))
@@ -122,15 +120,15 @@
         (identifier? #'id)
         #`(typed
           (function (block) block)
-          (label-block-function #'id)))
+          (label-block-function id)))
       ((db expr)
         #`(typed
           (function (block) block)
-          (db-block-function #'expr)))
+          (db-block-function expr)))
       ((dw expr)
         #`(typed
           (function (block) block)
-          (dw-block-function #'expr)))
+          (dw-block-function expr)))
       ((fn arg ...)
         (syntax-case (syntax->typed $lookup #'fn) (typed function)
           ((typed (function params result) fn-expr)

@@ -18,31 +18,31 @@
   (define (u16? $obj)
     (and (integer? $obj) (>= $obj #x0000) (<= $obj #xffff)))
 
-  (define-rule-syntax (u2 expr)
-    (switch expr
+  (define (u2 $obj $syntax)
+    (switch $obj
       ((u2? $u2) $u2)
       ((else $other)
-        (syntax-error #'expr
+        (syntax-error $syntax
           (format "expected u2, got ~s, in" $other)))))
 
-  (define-rule-syntax (u3 expr)
-    (switch expr
+  (define (u3 $obj $syntax)
+    (switch $obj
       ((u3? $u3) $u3)
       ((else $other)
-        (syntax-error #'expr
+        (syntax-error $syntax
           (format "expected u3, got ~s, in" $other)))))
 
-  (define-rule-syntax (u8 expr)
-    (switch expr
+  (define (u8 $obj $syntax)
+    (switch $obj
       ((u8? $u8) $u8)
       ((else $other)
-        (syntax-error #'expr
+        (syntax-error $syntax
           (format "expected u8, got ~s, in" $other)))))
 
-  (define-rule-syntax (u16 expr)
-    (switch expr
+  (define (u16 $obj $syntax)
+    (switch $obj
       ((u16? $u16) $u16)
       ((else $other)
-        (syntax-error #'expr
+        (syntax-error $syntax
           (format "expected u16, got ~s, in" $other)))))
 )
