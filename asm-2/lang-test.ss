@@ -58,8 +58,11 @@
   (bytevector #x20 #x10))
 
 (check-asm
-  (binary->bytevector (binary-append (db-binary #x10) (db-binary #x20)))
-  (bytevector #x10 #x20))
+  (binary->bytevector
+    (binary-append
+      (db-binary #x10)
+      (dw-binary #x2030)))
+  (bytevector #x10 #x30 #x20))
 
 (check-asm
   (binary->bytevector
