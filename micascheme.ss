@@ -10,6 +10,7 @@
       define-syntax
       type-descriptor)
     (annotation)
+    (binary)
     (binder)
     (blob)
     (boolean)
@@ -66,6 +67,7 @@
         define-syntax
         type-descriptor)
       (annotation)
+      (binary)
       (binder)
       (blob)
       (boolean)

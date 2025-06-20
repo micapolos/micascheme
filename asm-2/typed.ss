@@ -15,7 +15,7 @@
     (asm-2 block)
     (asm-2 binary))
 
-  (define-keywords typed type boolean integer char function macro asm-binary label db dw binary assembly)
+  (define-keywords typed type boolean integer char function macro asm-binary label db dw assembly)
 
   (define-rule-syntax (db-block-function expr)
     (lambda ($block)

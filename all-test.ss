@@ -4,6 +4,7 @@
   (annotation)
   (any)
   (boolean)
+  (binary)
   (binder)
   (blob)
   (bytevector)
