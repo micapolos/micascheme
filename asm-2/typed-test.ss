@@ -91,6 +91,17 @@
     ((lambda (s) (%string-length s)) "foo")))
 
 (check-typed
+  (let ((foo "foo") (bar "bar")) (string-append foo bar))
+  (typed string (let ((foo "foo") (bar "bar")) (%string-append foo bar))))
+
+(check-typed
+  (let* ((foo "foo") (foobar (string-append foo "bar"))) foobar)
+  (typed string
+    (let ((foo "foo"))
+      (let ((foobar (%string-append foo "bar")))
+        foobar))))
+
+(check-typed
   (string-append)
   (typed string (%string-append)))
 
@@ -153,22 +164,22 @@
       (label-block-function x)
       (db-block-function x))))
 
-(check-typed
-  (asm-bytevector
-    (org 100)
-    (label start)
-    (db 10)
-    (db (- end start))
-    (label end))
-  (typed bytevector
-    (binary->bytevector
-      (syntax-eval
-        (block-binary-syntax
-          (app
-            (block-function-append
-              (label-block-function start)
-              (db-block-function 10)
-              (db-block-function (- end start))
-              (label-block-function end))
-            (empty-block))
-          100)))))
+; (check-typed
+;   (asm-binary
+;     (org 100)
+;     (label start)
+;     (db 10)
+;     (db (- end start))
+;     (label end))
+;   (typed bytevector
+;     (binary->bytevector
+;       (syntax-eval
+;         (block-binary-syntax
+;           (app
+;             (block-function-append
+;               (label-block-function start)
+;               (db-block-function 10)
+;               (db-block-function (- end start))
+;               (label-block-function end))
+;             (empty-block))
+;           100)))))

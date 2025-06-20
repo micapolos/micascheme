@@ -28,7 +28,7 @@
     ($fn $block))
 
   (define (block-binary-syntax $block $org)
-    #`(let*
+    #`(let
       (#,@(map-with
         ($label (reverse (block-labels $block)))
         #`(#,(car $label) #,(datum->syntax #'+ (+ $org (cdr $label))))))

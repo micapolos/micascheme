@@ -11,7 +11,7 @@
         #`(db-binary a)
         #`(db-binary b)))
     100)
-  '(let*
+  '(let
     ((a 110) (b 120))
     (binary-append
       (db-binary a)

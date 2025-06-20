@@ -6,33 +6,34 @@
     typed typed-type typed-value
     syntax->typed syntax->expr
     define-typed
-    type=? asm-bytevector)
+    type=? asm-binary
+    db-block-function dw-block-function label-block-function block-function-append)
   (import
     (micascheme)
     (syntax lookup)
     (asm-2 block)
     (asm-2 binary))
 
-  (define-keywords typed type boolean integer char function macro asm-bytevector label db dw binary)
+  (define-keywords typed type boolean integer char function macro asm-binary label db dw binary)
 
   (define-rule-syntax (db-block-function expr)
     (lambda ($block)
       (block+data $block 1
-        #`(db-binary expr #'expr))))
+        #'(db-binary expr))))
 
   (define-rule-syntax (dw-block-function expr)
     (lambda ($block)
       (block+data $block 2
-        #`(dw-binary expr #'expr))))
+        #'(dw-binary expr))))
 
   (define-rule-syntax (label-block-function label)
     (lambda ($block)
       (block+label $block #'label)))
 
-  (define-rule-syntax (block-function-append expr ...)
+  (define-rule-syntax (block-function-append fn ...)
     (lambda ($block)
       (lets
-        ($block (expr $block)) ...
+        ($block (app fn $block)) ...
         $block)))
 
   (define-rules-syntax (literals typed)
@@ -55,7 +56,7 @@
       (
         typed void type boolean integer char string function lambda macro
         db-binary dw-binary binary-append binary->bytevector
-        bytevector asm-bytevector block label db dw org)
+        bytevector asm-binary block label db dw org let let*)
       ((typed typ expr)
         #`(typed #,(syntax->expr $lookup #'type #'typ) expr))
       (void #`(typed type void))
@@ -105,6 +106,30 @@
           #`(typed
             (function (#,@$types) #,(typed-type $typed-body))
             (lambda (#,@$ids) #,(typed-value $typed-body)))))
+      ((let ((id expr) ...) body)
+        (for-all identifier? #'(id ...))
+        (lets
+          ($typeds (map (partial syntax->typed $lookup) #'(expr ...)))
+          ($ids #'(id ...))
+          ($types (map typed-type $typeds))
+          ($values (map typed-value $typeds))
+          ($typed-body
+            (syntax->typed
+              (fold-left lookup+undefined $lookup $ids $types)
+              #'body))
+          (syntax-case $typed-body (typed)
+            ((typed body-type body-expr)
+              #`(typed body-type
+                (let
+                  (
+                    #,@(map
+                      (lambda ($id $value) #`(#,$id #,$value))
+                      $ids $values))
+                  body-expr))))))
+      ((let* () body)
+        (syntax->typed $lookup #'body))
+      ((let* (entry entry* ...) body)
+        (syntax->typed $lookup #'(let (entry) (let* (entry* ...) body))))
       ((db-binary expr)
         #`(typed binary
           (db-binary #,(syntax->expr $lookup #'integer #'expr) #'expr)))
@@ -118,15 +143,16 @@
       ((binary->bytevector expr)
         #`(typed bytevector
           (binary->bytevector #,(syntax->expr $lookup #'binary #'expr))))
-      ((asm-bytevector (org $org) body ...)
-        #`(typed bytevector
-          (binary->bytevector
-            (syntax-eval
-              (block-binary-syntax
-                (app
-                  #,(syntax->expr $lookup #'(function (block) block) #'(block body ...))
-                  (empty-block))
-                $org)))))
+      ((asm-binary (org $org) body ...)
+        #`(typed binary
+          #,(syntax->expr $lookup #'binary
+            (block-binary-syntax
+              (app
+                (eval
+                  (syntax->datum/annotation (syntax->expr $lookup #'(function (block) block) #'(block body ...)))
+                  (environment '(micascheme) '(asm-2 block) '(asm-2 typed)))
+                (empty-block))
+              (datum $org)))))
       ((block b ...)
         #`(typed
           (function (block) block)
