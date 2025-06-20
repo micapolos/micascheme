@@ -1,14 +1,14 @@
 (library (asm-2 block)
   (export
     block block?
-    block-size block-labels block-puts
-    block-with-size block-with-labels block-with-puts
+    block-size block-labels block-binary-syntaxes
+    block-with-size block-with-labels block-with-binary-syntaxes
     empty-block
     block-apply block-binary-syntax
-    block+label block+data)
+    block+label block+binary-syntax)
   (import (micascheme) (asm-2 u) (asm-2 binary) (syntax lookup))
 
-  (data (block size labels puts))
+  (data (block size labels binary-syntaxes))
 
   (define (empty-block)
     (block 0 (stack) (stack)))
@@ -19,10 +19,10 @@
         (block-labels $block)
         (cons $label (block-size $block)))))
 
-  (define (block+data $block $size $put)
-    (block-with-puts
+  (define (block+binary-syntax $block $size $binary-syntax)
+    (block-with-binary-syntaxes
       (block-with-size $block (+ (block-size $block) $size))
-      (push (block-puts $block) $put)))
+      (push (block-binary-syntaxes $block) $binary-syntax)))
 
   (define (block-apply $block $fn)
     ($fn $block))
@@ -32,5 +32,5 @@
       (#,@(map-with
         ($label (reverse (block-labels $block)))
         #`(#,(car $label) #,(datum->syntax #'+ (+ $org (cdr $label))))))
-      (binary-append #,@(reverse (block-puts $block)))))
+      (binary-append #,@(reverse (block-binary-syntaxes $block)))))
 )

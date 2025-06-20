@@ -18,12 +18,12 @@
 
   (define-rule-syntax (db-block-function expr)
     (lambda ($block)
-      (block+data $block 1
+      (block+binary-syntax $block 1
         #'(db-binary expr))))
 
   (define-rule-syntax (dw-block-function expr)
     (lambda ($block)
-      (block+data $block 2
+      (block+binary-syntax $block 2
         #'(dw-binary expr))))
 
   (define-rule-syntax (label-block-function label)
