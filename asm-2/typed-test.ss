@@ -1,6 +1,7 @@
 (import
   (rename (micascheme)
     (+ %+)
+    (- %-)
     (string-append %string-append)
     (string-length %string-length)
     (bytevector %bytevector))
@@ -21,7 +22,15 @@
           '#,(syntax->typed $lookup #'in)
           'out)))))
 
+(define-syntax (check-assembly $syntax $lookup)
+  (syntax-case $syntax ()
+    ((_ expr)
+      #`(begin
+        #,(check (procedure? (syntax->expr $lookup #'assembly #'expr)))
+        (void)))))
+
 (define-typed + (typed (function integer integer) %+))
+(define-typed - (typed (function (integer . integer) integer) %-))
 (define-typed string-append (typed (function string string) %string-append))
 (define-typed string-length (typed (function (string) integer) %string-length))
 (define-typed bytevector (typed (function integer bytevector) %bytevector))
@@ -137,49 +146,20 @@
   (binary->bytevector (db-binary 1))
   (typed bytevector (binary->bytevector (db-binary 1 #'1))))
 
-(check-typed
-  (db (+ 1 2))
-  (typed
-    (function (block) block)
-    (db-block-function (+ 1 2))))
+(check-assembly (db (+ 1 2)))
+(check-assembly (dw (+ 1 2)))
+(check-assembly (label x))
+(check-assembly (block (db 0) (label x) (db x)))
 
 (check-typed
-  (dw (+ 1 2))
-  (typed
-    (function (block) block)
-    (dw-block-function (+ 1 2))))
-
-(check-typed
-  (label x)
-  (typed
-    (function (block) block)
-    (label-block-function x)))
-
-(check-typed
-  (block (db 0) (label x) (db x))
-  (typed
-    (function (block) block)
-    (block-function-append
-      (db-block-function 0)
-      (label-block-function x)
-      (db-block-function x))))
-
-; (check-typed
-;   (asm-binary
-;     (org 100)
-;     (label start)
-;     (db 10)
-;     (db (- end start))
-;     (label end))
-;   (typed bytevector
-;     (binary->bytevector
-;       (syntax-eval
-;         (block-binary-syntax
-;           (app
-;             (block-function-append
-;               (label-block-function start)
-;               (db-block-function 10)
-;               (db-block-function (- end start))
-;               (label-block-function end))
-;             (empty-block))
-;           100)))))
+  (asm-binary
+    (org 100)
+    (label start)
+    (db 10)
+    (db (- end start))
+    (label end))
+  (typed binary
+    (let ((start 100) (end 102))
+      (binary-append
+        (db-binary 10 #'10)
+        (db-binary (%- end start) #'(- end start))))))

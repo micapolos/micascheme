@@ -68,18 +68,21 @@
       (db 10)))
   (bytevector 10))
 
-; (check-asm
-;   (binary->bytevector
-;     (asm-binary
-;       (org 100)
-;       (db end)
-;       (label end)))
-;   (bytevector 101))
+(check-asm
+  (binary->bytevector
+    (asm-binary
+      (org 100)
+      (db end)
+      (label end)))
+  (bytevector 101))
 
-; (check-asm
-;   (binary->bytevector (asm-binary
-;     (org 100)
-;     (label begin)
-;     (db (- end begin))
-;     (label end)))
-;   (bytevector 1 5))
+(check-asm
+  (binary->bytevector
+    (asm-binary
+      (org 100)
+      (label begin)
+      (db begin)
+      (db (- end begin))
+      (db end)
+      (label end)))
+  (bytevector 100 3 103))

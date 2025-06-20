@@ -7,14 +7,14 @@
     syntax->typed syntax->expr
     define-typed
     type=? asm-binary
-    db-block-function dw-block-function label-block-function block-function-append)
+    db-block-function dw-block-function label-block-function block-function-append assembly)
   (import
     (micascheme)
     (syntax lookup)
     (asm-2 block)
     (asm-2 binary))
 
-  (define-keywords typed type boolean integer char function macro asm-binary label db dw binary)
+  (define-keywords typed type boolean integer char function macro asm-binary label db dw binary assembly)
 
   (define-rule-syntax (db-block-function expr)
     (lambda ($block)
@@ -30,11 +30,12 @@
     (lambda ($block)
       (block+label $block #'label)))
 
-  (define-rule-syntax (block-function-append fn ...)
+  (define (block-function-append . $fns)
     (lambda ($block)
-      (lets
-        ($block (app fn $block)) ...
-        $block)))
+      (fold-left
+        (lambda ($block $fn) ($fn $block))
+        $block
+        $fns)))
 
   (define-rules-syntax (literals typed)
     ((define-typed id (typed type expr))
@@ -147,32 +148,26 @@
         #`(typed binary
           #,(syntax->expr $lookup #'binary
             (block-binary-syntax
-              (app
-                (eval
-                  (syntax->datum/annotation (syntax->expr $lookup #'(function (block) block) #'(block body ...)))
-                  (environment '(micascheme) '(asm-2 block) '(asm-2 typed)))
-                (empty-block))
+              (app (syntax->expr $lookup #'assembly #'(block body ...)) (empty-block))
               (datum $org)))))
       ((block b ...)
         #`(typed
-          (function (block) block)
-          (block-function-append
-            #,@(map
-              (partial syntax->expr $lookup #'(function (block) block))
-              #'(b ...)))))
+          assembly
+          #,(apply block-function-append
+            (map (partial syntax->expr $lookup #'assembly) #'(b ...)))))
       ((label id)
         (identifier? #'id)
         #`(typed
-          (function (block) block)
-          (label-block-function id)))
+          assembly
+          #,(label-block-function id)))
       ((db expr)
         #`(typed
-          (function (block) block)
-          (db-block-function expr)))
+          assembly
+          #,(db-block-function expr)))
       ((dw expr)
         #`(typed
-          (function (block) block)
-          (dw-block-function expr)))
+          assembly
+          #,(dw-block-function expr)))
       ((fn arg ...)
         (syntax-case (syntax->typed $lookup #'fn) (typed function)
           ((typed (function params result) fn-expr)
