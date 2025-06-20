@@ -7,21 +7,28 @@
     binary->bytevector)
   (import (micascheme) (asm-2 u))
 
+  (define-rules-syntax
+    ((binary)
+      (lambda ($port) (void)))
+    ((binary ($port) body body* ...)
+      (identifier? #'$port)
+      (lambda ($port) body body* ...)))
+
   (define (put-binary $port $binary)
     ($binary $port))
 
   (define (db-binary $db $syntax)
-    (lambda ($port)
+    (binary ($port)
       (put-u8 $port (u8 $db $syntax))))
 
   (define (dw-binary $dw $syntax)
-    (lambda ($port)
+    (binary ($port)
       (put-u16 $port
         (u16 $dw $syntax)
         (endianness little))))
 
   (define (binary-append . $binaries)
-    (lambda ($port)
+    (binary ($port)
       (for-each
         (partial put-binary $port)
         $binaries)))
