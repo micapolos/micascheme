@@ -6,7 +6,7 @@
     empty-block
     block-apply block-binary-syntax
     block+label block+binary-syntax)
-  (import (micascheme) (asm-2 u) (asm-2 binary) (syntax lookup))
+  (import (micascheme) (asm-2 binary))
 
   (data (block size labels binary-syntaxes))
 
