@@ -7,7 +7,11 @@
     syntax->typed syntax->expr
     define-typed
     type=? asm-bytevector)
-  (import (micascheme) (syntax lookup) (asm-2 block) (asm-2 binary))
+  (import
+    (micascheme)
+    (syntax lookup)
+    (asm-2 block)
+    (asm-2 binary))
 
   (define-keywords typed type boolean integer char function macro asm-bytevector label db dw binary)
 
@@ -50,6 +54,7 @@
     (syntax-case $syntax
       (
         typed void type boolean integer char string function lambda macro
+        db-binary dw-binary binary-append binary->bytevector
         bytevector asm-bytevector block label db dw org)
       ((typed typ expr)
         #`(typed #,(syntax->expr $lookup #'type #'typ) expr))
@@ -100,6 +105,19 @@
           #`(typed
             (function (#,@$types) #,(typed-type $typed-body))
             (lambda (#,@$ids) #,(typed-value $typed-body)))))
+      ((db-binary expr)
+        #`(typed binary
+          (db-binary #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+      ((dw-binary expr)
+        #`(typed binary
+          (dw-binary #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+      ((binary-append expr ...)
+        #`(typed binary
+          (binary-append
+            #,@(map (partial syntax->expr $lookup #'binary) #'(expr ...)))))
+      ((binary->bytevector expr)
+        #`(typed bytevector
+          (binary->bytevector #,(syntax->expr $lookup #'binary #'expr))))
       ((asm-bytevector (org $org) body ...)
         #`(typed bytevector
           (binary->bytevector

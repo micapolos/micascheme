@@ -5,7 +5,8 @@
     (string-length %string-length)
     (bytevector %bytevector))
   (asm-2 typed)
-  (asm-2 block))
+  (asm-2 block)
+  (asm-2 binary))
 
 (define-syntax (typed->datum $syntax $lookup)
   (syntax-case $syntax ()
@@ -105,6 +106,25 @@
   (equal?
     (typed->datum (macro syntax->typed))
     `(typed (macro ,syntax->typed) #f)))
+
+(check-typed
+  (db-binary (+ 1 2))
+  (typed binary (db-binary (%+ 1 2) #'(+ 1 2))))
+
+(check-typed
+  (dw-binary (+ 1 2))
+  (typed binary (dw-binary (%+ 1 2) #'(+ 1 2))))
+
+(check-typed
+  (binary-append (db-binary 1) (dw-binary 2))
+  (typed binary
+    (binary-append
+      (db-binary 1 #'1)
+      (dw-binary 2 #'2))))
+
+(check-typed
+  (binary->bytevector (db-binary 1))
+  (typed bytevector (binary->bytevector (db-binary 1 #'1))))
 
 (check-typed
   (db (+ 1 2))
