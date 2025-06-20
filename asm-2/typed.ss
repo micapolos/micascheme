@@ -62,14 +62,18 @@
           (switch ($lookup $identifier)
             ((false? _)
               (syntax->typed-noexpand $lookup $syntax))
-            ((procedure? $procedure)
-              ($procedure $lookup $syntax))
-            ((else $type)
-              (if $pair?
-                (syntax->typed-noexpand $lookup $syntax)
-                #`(typed #,$type #,$identifier)))))
+            ((else $procedure)
+              ($procedure $lookup $syntax))))
         ((else _)
           (syntax->typed-noexpand $lookup $syntax)))))
+
+  (define (lookup+type $lookup $id $type)
+    (lookup+undefined $lookup $id
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          (id
+            (identifier? #'id)
+            #`(typed #,$type #,$id))))))
 
   (define (syntax->typed-noexpand $lookup $syntax)
     (syntax-case $syntax
@@ -122,7 +126,7 @@
           ($ids #'(id ...))
           ($typed-body
             (syntax->typed
-              (fold-left lookup+undefined $lookup $ids $types)
+              (fold-left lookup+type $lookup $ids $types)
               #'body))
           #`(typed
             (function (#,@$types) #,(typed-type $typed-body))
@@ -136,7 +140,7 @@
           ($values (map typed-value $typeds))
           ($typed-body
             (syntax->typed
-              (fold-left lookup+undefined $lookup $ids $types)
+              (fold-left lookup+type $lookup $ids $types)
               #'body))
           (syntax-case $typed-body (typed)
             ((typed body-type body-expr)
