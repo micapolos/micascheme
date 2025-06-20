@@ -2,16 +2,13 @@
   (export
     block block?
     block-size block-labels block-puts
-    block-with-size block-with-labels  block-with-puts
+    block-with-size block-with-labels block-with-puts
     empty-block
-    block-apply block-bytevector-syntax
-    block+label block+data block+u8)
-  (import (micascheme))
+    block-apply block-binary-syntax
+    block+label block+data)
+  (import (micascheme) (asm-2 u) (asm-2 binary) (syntax lookup))
 
   (data (block size labels puts))
-
-  (define (u8? $obj)
-    (and (integer? $obj) (>= $obj #x00) (<= $obj #xff)))
 
   (define (empty-block)
     (block 0 (stack) (stack)))
@@ -27,26 +24,13 @@
       (block-with-size $block (+ (block-size $block) $size))
       (push (block-puts $block) $put)))
 
-  (define (block+u8 $block $expr)
-    (block+data $block 1
-      #`(lambda ($port)
-        (switch #,$expr
-          ((u8? $u8) (put-u8 $port #,$expr))
-          ((else $other)
-            (syntax-error #'$expr
-              (format "expected u8, got ~s, in" $other)))))))
-
   (define (block-apply $block $fn)
     ($fn $block))
 
-  (define (block-bytevector-syntax $block)
-    #`(lets
-      #,@(map-with
+  (define (block-binary-syntax $block $org)
+    #`(let*
+      (#,@(map-with
         ($label (reverse (block-labels $block)))
-        #`(#,(car $label) #,(cdr $label)))
-      (call-with-bytevector-output-port
-        (lambda ($port)
-          (for-each
-            (lambda ($put) ($put $port))
-            (list #,@(reverse (block-puts $block))))))))
+        #`(#,(car $label) #,(datum->syntax #'+ (+ $org (cdr $label))))))
+      (binary-append #,@(reverse (block-puts $block)))))
 )

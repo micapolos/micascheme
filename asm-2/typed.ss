@@ -1,14 +1,37 @@
 (library (asm-2 typed)
   (export
     void type boolean integer char string function macro
-    label db
+    label db dw
+    binary
     typed typed-type typed-value
-    syntax->typed
+    syntax->typed syntax->expr
     define-typed
     type=? asm-bytevector)
-  (import (micascheme) (syntax lookup) (asm-2 block))
+  (import (micascheme) (syntax lookup) (asm-2 block) (asm-2 binary))
 
-  (define-keywords typed type boolean integer char function macro asm-bytevector label db)
+  (define-keywords typed type boolean integer char function macro asm-bytevector label db dw binary)
+
+  (define (db-block-function $expr)
+    (lambda ($block)
+      (block+data $block 1
+        #`(db-binary #,$expr))))
+
+  (define (dw-block-function $expr)
+    (lambda ($block)
+      (block+data $block 2
+        #`(dw-binary #,$expr))))
+
+  (define (label-block-function $label)
+    (lambda ($block)
+      (block+label $block $label)))
+
+  (define (block-function-append . $block-functions)
+    (lambda ($block)
+      (fold-left
+        (lambda ($block $block-function)
+          ($block-function $block))
+        $block
+        $block-functions)))
 
   (define-rules-syntax (literals typed)
     ((define-typed id (typed type expr))
@@ -29,7 +52,7 @@
     (syntax-case $syntax
       (
         typed void type boolean integer char string function lambda macro
-        bytevector asm-bytevector label db)
+        bytevector asm-bytevector block label db dw org)
       ((typed typ expr)
         #`(typed #,(syntax->expr $lookup #'type #'typ) expr))
       (void #`(typed type void))
@@ -79,25 +102,35 @@
           #`(typed
             (function (#,@$types) #,(typed-type $typed-body))
             (lambda (#,@$ids) #,(typed-value $typed-body)))))
-      ((asm-bytevector blk ...)
+      ((asm-bytevector (org $org) body ...)
         #`(typed bytevector
-          (syntax-eval
-            (block-bytevector-syntax
-              (fold-left
-                block-apply
-                (empty-block)
-                (list #,@(map (partial syntax->expr $lookup #'(function (block) block)) #'(blk ...))))))))
+          (binary->bytevector
+            (syntax-eval
+              (block-binary-syntax
+                (app
+                  #,(syntax->expr $lookup #'(function (block) block) #'(block body ...))
+                  (empty-block))
+                $org)))))
+      ((block b ...)
+        #`(typed
+          (function (block) block)
+          (block-function-append
+            #,@(map
+              (partial syntax->expr $lookup #'(function (block) block))
+              #'(b ...)))))
       ((label id)
         (identifier? #'id)
         #`(typed
           (function (block) block)
-          (lambda ($block)
-            (block+label $block #'id))))
-      ((db u8)
+          (label-block-function #'id)))
+      ((db expr)
         #`(typed
           (function (block) block)
-          (lambda ($block)
-            (block+u8 $block #'#,(syntax->expr $lookup #'integer #'u8)))))
+          (db-block-function #'expr)))
+      ((dw expr)
+        #`(typed
+          (function (block) block)
+          (dw-block-function #'expr)))
       ((fn arg ...)
         (syntax-case (syntax->typed $lookup #'fn) (typed function)
           ((typed (function params result) fn-expr)

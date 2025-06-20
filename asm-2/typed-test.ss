@@ -4,7 +4,8 @@
     (string-append %string-append)
     (string-length %string-length)
     (bytevector %bytevector))
-  (asm-2 typed))
+  (asm-2 typed)
+  (asm-2 block))
 
 (define-syntax (typed->datum $syntax $lookup)
   (syntax-case $syntax ()
@@ -106,24 +107,41 @@
     `(typed (macro ,syntax->typed) #f)))
 
 (check-typed
-  (asm-bytevector (label x) (label y))
-  (typed bytevector
-    (syntax-eval
-      (block-bytevector-syntax
-        (fold-left block-apply (empty-block)
-          (list
-            (lambda ($block) (block+label $block (syntax x)))
-            (lambda ($block) (block+label $block (syntax y)))))))))
+  (db (+ 1 2))
+  (typed
+    (function (block) block)
+    (db-block-function #'(+ 1 2))))
 
 (check-typed
-  (asm-bytevector
-    (db 1)
-    (db (+ 3 4)))
-  (typed bytevector
-    (syntax-eval
-      (block-bytevector-syntax
-        (fold-left block-apply (empty-block)
-          (list
-            (lambda ($block) (block+u8 $block (syntax 1)))
-            (lambda ($block) (block+u8 $block (syntax (%+ 3 4))))))))))
+  (label x)
+  (typed
+    (function (block) block)
+    (label-block-function #'x)))
 
+(check-typed
+  (block (db 0) (label x) (db x))
+  (typed
+    (function (block) block)
+    (block-function-append
+      (db-block-function #'0)
+      (label-block-function #'x)
+      (db-block-function #'x))))
+
+; (check-typed
+;   (asm-bytevector
+;     (org 100)
+;     (label start)
+;     (db 10)
+;     (db (- end start))
+;     (label end))
+;   (typed bytevector
+;     (syntax-eval
+;       (block-binary-syntax
+;         (app
+;           (block-function-append
+;             (label-block-function (syntax start))
+;             (db-block-function (syntax 10))
+;             (db-block-function (syntax (- end start)))
+;             (label-block-function (syntax end)))
+;           (empty-block))
+;         100))))
