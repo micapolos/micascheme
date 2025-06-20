@@ -1,6 +1,10 @@
 (library (asm-2 binary)
   (export
     put-binary
+    u8-binary
+    u16-binary
+    bytevector-binary
+    utf8-binary
     db-binary
     dw-binary
     binary-append
@@ -16,6 +20,22 @@
 
   (define (put-binary $port $binary)
     ($binary $port))
+
+  (define (u8-binary $u8)
+    (binary ($port)
+      (put-u8 $port $u8)))
+
+  (define (u16-binary $u16 $endianness)
+    (binary ($port)
+      (put-u16 $port $u16 $endianness)))
+
+  (define (bytevector-binary $bytevector)
+    (binary ($port)
+      (put-bytevector $port $bytevector)))
+
+  (define (utf8-binary $string)
+    (binary ($port)
+      (put-bytevector $port (string->utf8 $string))))
 
   (define (db-binary $db $syntax)
     (binary ($port)
