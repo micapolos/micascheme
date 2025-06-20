@@ -45,6 +45,11 @@
 
 (check-asm (string-length "foo") 3)
 
+(check-asm (u2 (+ 1 2)) 3)
+(check-asm (u3 (+ 1 2)) 3)
+(check-asm (u8 (+ 1 2)) 3)
+(check-asm (u16 (+ 1 2)) 3)
+
 (check-asm
   (bytevector (+ 1 2))
   (bytevector 3))

@@ -7,6 +7,7 @@
     (import (only (micascheme) string lambda syntax))
     (import (only (asm-2 block) block))
     (import (only (asm-2 binary) db-binary dw-binary binary-append binary->bytevector))
+    (import (only (asm-2 u) u2 u3 u8 u16))
     (import (only (asm-2 typed) void type boolean integer char function typed macro asm-binary label db dw binary assembly)))
 
   (define-syntax (define $syntax $lookup)

@@ -11,6 +11,7 @@
   (import
     (micascheme)
     (syntax lookup)
+    (asm-2 u)
     (asm-2 block)
     (asm-2 binary))
 
@@ -57,7 +58,8 @@
       (
         typed void type boolean integer char string function lambda macro
         db-binary dw-binary binary-append binary->bytevector
-        bytevector asm-binary block label db dw org let let*)
+        bytevector asm-binary block label db dw org let let*
+        u2 u3 u8 u16)
       ((typed typ expr)
         #`(typed #,(syntax->expr $lookup #'type #'typ) expr))
       (void #`(typed type void))
@@ -168,6 +170,14 @@
         #`(typed
           assembly
           #,(dw-block-function expr)))
+      ((u2 expr)
+        #`(typed integer (u2 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+      ((u3 expr)
+        #`(typed integer (u3 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+      ((u8 expr)
+        #`(typed integer (u8 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+      ((u16 expr)
+        #`(typed integer (u16 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
       ((fn arg ...)
         (syntax-case (syntax->typed $lookup #'fn) (typed function)
           ((typed (function params result) fn-expr)

@@ -7,6 +7,7 @@
     (bytevector %bytevector))
   (asm-2 typed)
   (asm-2 block)
+  (asm-2 u)
   (asm-2 binary))
 
 (define-syntax (typed->datum $syntax $lookup)
@@ -126,6 +127,11 @@
   (equal?
     (typed->datum (macro syntax->typed))
     `(typed (macro ,syntax->typed) #f)))
+
+(check-typed (u2 (+ 1 2)) (typed integer (u2 (%+ 1 2) #'(+ 1 2))))
+(check-typed (u3 (+ 1 2)) (typed integer (u3 (%+ 1 2) #'(+ 1 2))))
+(check-typed (u8 (+ 1 2)) (typed integer (u8 (%+ 1 2) #'(+ 1 2))))
+(check-typed (u16 (+ 1 2)) (typed integer (u16 (%+ 1 2) #'(+ 1 2))))
 
 (check-typed
   (db-binary (+ 1 2))
