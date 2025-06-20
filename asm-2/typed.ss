@@ -54,6 +54,24 @@
         (make-compile-time-value type/proc))))
 
   (define (syntax->typed $lookup $syntax)
+    (lets
+      ((values $identifier? $pair?)
+        (syntax->identifier?-pair? $syntax))
+      (switch $identifier?
+        ((identifier? $identifier)
+          (switch ($lookup $identifier)
+            ((false? _)
+              (syntax->typed-noexpand $lookup $syntax))
+            ((procedure? $procedure)
+              ($procedure $lookup $syntax))
+            ((else $type)
+              (if $pair?
+                (syntax->typed-noexpand $lookup $syntax)
+                #`(typed #,$type #,$identifier)))))
+        ((else _)
+          (syntax->typed-noexpand $lookup $syntax)))))
+
+  (define (syntax->typed-noexpand $lookup $syntax)
     (syntax-case $syntax
       (
         typed void type boolean integer char string function lambda macro
@@ -191,14 +209,16 @@
               ((arg-expr ...)
                 #`(typed result (fn-expr arg-expr ...)))))
           ((typed _ _)
-            (syntax-error #'fn "not an function"))))
+            (syntax-error #'fn "not an function"))))))
+
+  (define (syntax->identifier?-pair? $syntax)
+    (syntax-case $syntax ()
       (id
-        (identifier? #'id)
-        (switch (lookup-ref $lookup #'id)
-          ((procedure? $function)
-            ($function $lookup #'id))
-          ((else $type)
-            #`(typed #,$type id))))))
+        (values (and (identifier? #'id) #'id) #f))
+      ((id . rest)
+        (values (and (identifier? #'id) #'id) #t))
+      (_
+        (values #f #f))))
 
   (define (syntax->expr $lookup $type $syntax)
     (syntax-case (syntax->typed $lookup $syntax) (typed)
