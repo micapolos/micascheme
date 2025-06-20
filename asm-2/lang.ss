@@ -1,5 +1,7 @@
 (library (asm-2 lang)
-  (export asm check-asm define)
+  (export asm check-asm define
+    define-primitive
+    define-primitives)
   (import
     (rename (micascheme) (define %define))
     (asm-2 typed))
@@ -26,6 +28,16 @@
                   (syntax-case $syntax ()
                     (id (identifier? #'id)
                       #`(typed type untyped)))))))))))
+
+  (define-rules-syntax
+    ((define-primitive id type prim)
+      (define id (typed type ($primitive 3 prim))))
+    ((define-primitive id type)
+      (define-primitive id type id)))
+
+  (define-rule-syntax (define-primitives (args ...) ...)
+    (begin
+      (define-primitive args ...) ...))
 
   (define-rule-syntax (check-asm in out)
     (check (equal? (asm in) (asm out))))
