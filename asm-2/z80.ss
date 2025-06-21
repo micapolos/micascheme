@@ -1,6 +1,8 @@
 (library (asm-2 z80)
   (export ret jp)
-  (import (asm-2 lang) (only (micascheme) define-rule-syntax ...))
+  (import
+    (asm-2 lang)
+    (only (micascheme) define-rule-syntax ...))
 
   (define-rule-syntax (define-op (id arg ...) body ...)
     (define-macro (id arg ...) (block body ...)))
