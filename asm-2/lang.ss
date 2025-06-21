@@ -1,7 +1,11 @@
 (library (asm-2 lang)
-  (export asm check-asm define
+  (export
+    asm
+    check-asm
+    define
     define-primitive
-    define-primitives)
+    define-primitives
+    define-macro)
   (import
     (rename (micascheme) (define %define))
     (asm-2 typed))
@@ -10,6 +14,7 @@
     (import (only (asm-2 block) block))
     (import (only (asm-2 binary) db-binary dw-binary))
     (import (only (asm-2 u) u2 u3 u8 u16))
+    (import (asm-2 core))
     (import (only (asm-2 typed) void type boolean integer char function typed asm-binary label db dw binary assembly)))
 
   (define-syntax (define $syntax $lookup)
@@ -41,6 +46,12 @@
   (define-rule-syntax (define-primitives (args ...) ...)
     (begin
       (define-primitive args ...) ...))
+
+  (define-rule-syntax (define-macro (id arg ...) body)
+    (define-typed (id $lookup $syntax)
+      (syntax->typed $lookup
+        (syntax-case $syntax ()
+          ((id arg ...) #'body)))))
 
   (define-rule-syntax (check-asm in out)
     (check (equal? (asm in) (asm out))))
