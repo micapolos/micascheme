@@ -2,7 +2,7 @@
 
 (asm-run
   (di)
-  (loop-jp
+  (loop
     (ld b 0)
     (ld a #b00000010)
     (out (#xfe) a)

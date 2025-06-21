@@ -25,7 +25,7 @@
 
     daa cpl ccf scf nop halt di ei im
 
-    loop-djnz loop-jp)
+    loop-djnz loop)
 
   (import
     (asm lang)
@@ -513,7 +513,7 @@
         (label loop-djnz-m8d4qeb8qqhh3nfolwvr1kr50)
         body ...
         (djnz loop-djnz-m8d4qeb8qqhh3nfolwvr1kr50)))
-    ((loop-jp body ...)
+    ((loop body ...)
       (local
         (label loop-jp-m8d4qeb8qqhh3nfolwvr1kr50)
         body ...
