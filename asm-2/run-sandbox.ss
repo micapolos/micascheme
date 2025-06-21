@@ -1,6 +1,6 @@
 (import (asm-2 lang) (asm-2 z80) (asm-2 run))
 
-(run-asm
+(run
   (db 243)
   (db 6)
   (db 0)

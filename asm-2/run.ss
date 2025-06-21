@@ -1,11 +1,15 @@
 (library (asm-2 run)
-  (export run-asm)
-  (import (rename (micascheme) (let* %let*) (define %define)) (cspect) (nex) (asm-2 lang))
+  (export run)
+  (import
+    (rename (micascheme) (let* %let*) (define %define) (run %run))
+    (cspect)
+    (nex)
+    (asm-2 lang))
 
-  (define-rule-syntax (run-asm body ...)
+  (define-rule-syntax (run body ...)
     (lets
       ($path "/tmp/main.nex")
-      (run
+      (%run
         (call-with-port (open-file-output-port $path (file-options no-fail))
           (lambda ($port)
             (lets
