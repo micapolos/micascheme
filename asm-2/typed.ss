@@ -14,8 +14,7 @@
     (syntax lookup)
     (asm-2 u)
     (asm-2 block)
-    (asm-2 binary)
-    (asm-2 identifier))
+    (asm-2 binary))
 
   (data (typed type value))
 
@@ -62,7 +61,7 @@
         (make-compile-time-value type/proc))))
 
   (define (syntax->typed $lookup $syntax)
-    (switch (syntax->identifier? $syntax)
+    (switch (syntax-selector $syntax)
       ((identifier? $identifier)
         (switch ($lookup $identifier)
           ((false? _)

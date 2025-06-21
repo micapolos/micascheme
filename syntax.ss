@@ -141,7 +141,7 @@
           (lambda ($lookup) $body)))))
 
   (define (syntax-selector $syntax)
-    (syntax-case-opt $syntax ()
+    (syntax-case? $syntax ()
       ($id (identifier? #'$id) #'$id)
       (($id . _) (identifier? #'$id) #'$id)))
 
