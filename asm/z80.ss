@@ -27,7 +27,7 @@
 
   (import
     (asm lang)
-    (rename (only (asm std) - and) (and %and))
+    (asm std)
     (only (asm typed) define-typed syntax->typed)
     (only (micascheme) syntax quasisyntax unsyntax lets generate-temporary syntax-case))
 
@@ -509,6 +509,6 @@
           (syntax->typed $lookup
             #`(block
               (db #x10)
-              (db (%and (- e #,$tmp) #xff))
+              (db (iand (- e #,$tmp) #xff))
               (label #,$tmp)))))))
 )
