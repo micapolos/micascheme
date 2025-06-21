@@ -1,6 +1,6 @@
 (import (asm lang) (asm z80) (asm run) (asm asm) (asm asm-core))
 
-(run
+(asm-run
   (label loop)
   (di)
   (ld b 0)
