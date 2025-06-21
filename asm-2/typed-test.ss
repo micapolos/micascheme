@@ -10,17 +10,12 @@
   (asm-2 u)
   (asm-2 binary))
 
-(define-syntax (typed->datum $syntax $lookup)
-  (syntax-case $syntax ()
-    ((_ expr)
-      #`'#,(syntax->typed $lookup #'expr))))
-
 (define-syntax (check-typed $syntax $lookup)
   (syntax-case $syntax ()
     ((_ in out)
       #`(check
         (equal?
-          '#,(syntax->typed $lookup #'in)
+          '#,(datum->syntax #'+ (typed->datum (syntax->typed $lookup #'in)))
           'out)))))
 
 (define-syntax (check-assembly $syntax $lookup)
@@ -74,7 +69,7 @@
   (lambda () "foo")
   (typed
     (function () string)
-    (lambda ()"foo")))
+    (lambda () "foo")))
 
 (check-typed
   (lambda ((integer i) (string s)) i)
@@ -122,11 +117,6 @@
 (check-typed
   (bytevector 1 2 (+ 3 4))
   (typed bytevector (%bytevector 1 2 (%+ 3 4))))
-
-(check
-  (equal?
-    (typed->datum (macro syntax->typed))
-    `(typed (macro ,syntax->typed) #f)))
 
 (check-typed (u2 (+ 1 2)) (typed integer (u2 (%+ 1 2) #'(+ 1 2))))
 (check-typed (u3 (+ 1 2)) (typed integer (u3 (%+ 1 2) #'(+ 1 2))))

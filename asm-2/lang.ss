@@ -10,7 +10,7 @@
     (import (only (asm-2 block) block))
     (import (only (asm-2 binary) db-binary dw-binary))
     (import (only (asm-2 u) u2 u3 u8 u16))
-    (import (only (asm-2 typed) void type boolean integer char function typed macro asm-binary label db dw binary assembly)))
+    (import (only (asm-2 typed) void type boolean integer char function typed asm-binary label db dw binary assembly)))
 
   (define-syntax (define $syntax $lookup)
     (syntax-case $syntax (typed)
@@ -19,15 +19,15 @@
       ((_ (id . params) body)
         #`(define id (lambda params body)))
       ((_ id expr)
-        (syntax-case (syntax->typed $lookup #'expr) (typed)
-          ((typed type value)
-            #`(begin
-              (%define untyped value)
-              (define-typed id
-                (lambda ($lookup $syntax)
-                  (syntax-case $syntax ()
-                    (id (identifier? #'id)
-                      #`(typed type untyped)))))))))))
+        (lets
+          ((typed $type $value) (syntax->typed $lookup #'expr))
+          #`(begin
+            (%define untyped #,$value)
+            (define-typed id
+              (lambda ($lookup $syntax)
+                (syntax-case $syntax ()
+                  (id (identifier? #'id)
+                    (typed #'#,$type #'untyped))))))))))
 
   (define-rules-syntax
     ((define-primitive id type prim)
@@ -45,7 +45,5 @@
   (define-syntax (asm $syntax $lookup)
     (syntax-case $syntax ()
       ((_ expr)
-        (syntax-case (syntax->typed $lookup #'expr) (typed)
-          ((typed type expr)
-            #``(typed type ,expr))))))
+        (typed-value (syntax->typed $lookup #'expr)))))
 )

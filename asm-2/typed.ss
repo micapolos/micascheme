@@ -1,6 +1,7 @@
 (library (asm-2 typed)
   (export
-    void type boolean integer char string function macro
+    typed typed? typed-type typed-value typed->datum
+    void type boolean integer char string function
     label db dw
     binary
     typed typed-type typed-value
@@ -15,7 +16,9 @@
     (asm-2 block)
     (asm-2 binary))
 
-  (define-keywords typed type boolean integer char function macro asm-binary label db dw assembly)
+  (data (typed type value))
+
+  (define-keywords type boolean integer char function asm-binary label db dw assembly)
 
   (define-rule-syntax (db-block-function expr)
     (lambda ($block)
@@ -43,7 +46,7 @@
       (define-typed id
         (lambda ($lookup $syntax)
           (syntax-case $syntax (id)
-            (id #'(typed type expr))))))
+            (id (typed #'type #'expr))))))
     ((define-typed (id $lookup $syntax) body)
       (and (identifier? #'$lookup) (identifier? #'$syntax))
       (define-typed id
@@ -73,52 +76,45 @@
         (syntax-case $syntax ()
           (id
             (identifier? #'id)
-            #`(typed #,$type #,$id))))))
+            (typed $type $id))))))
 
   (define (syntax->typed-noexpand $lookup $syntax)
     (syntax-case $syntax
       (
-        typed void type boolean integer char string function lambda macro
+        typed void type boolean integer char string function lambda
         db-binary dw-binary binary-append binary->bytevector
         bytevector asm-binary block label db dw org let let*
         u2 u3 u8 u16)
       ((typed typ expr)
-        #`(typed #,(syntax->expr $lookup #'type #'typ) expr))
-      (void #`(typed type void))
-      (type #`(typed type type))
-      (boolean #`(typed type boolean))
-      (integer #`(typed type integer))
-      (char #`(typed type char))
-      (string #`(typed type string))
+        (typed (syntax->expr $lookup #'type #'typ) #'expr))
+      (void (typed #'type #'void))
+      (type (typed #'type #'type))
+      (boolean (typed #'type #'boolean))
+      (integer (typed #'type #'integer))
+      (char (typed #'type #'char))
+      (string (typed #'type #'string))
       ((function params result)
-        #`(typed type
-          (function
+        (typed #'type
+          #`(function
             #,(map*
               (partial syntax->expr $lookup #'type)
               (partial syntax->expr $lookup #'type)
               (syntax->list* #'params))
             #,(syntax->expr $lookup #'type #'result))))
       ((void)
-        #`(typed void (void)))
+        (typed #'void #'(void)))
       (b
         (boolean? (datum b))
-        #`(typed boolean b))
+        (typed #'boolean #'b))
       (i
         (integer? (datum i))
-        #`(typed integer i))
+        (typed #'integer #'i))
       (ch
         (char? (datum ch))
-        #`(typed char ch))
+        (typed #'char #'ch))
       (str
         (string? (datum str))
-        #`(typed string str))
-      ((macro proc)
-        #`(typed
-          (macro
-            #,(eval
-              (syntax->datum/annotation #'proc)
-              (environment '(micascheme) '(asm-2 typed) '(asm-2 block))))
-          #f))
+        (typed #'string #'str))
       ((lambda ((typ id) ...) body)
         (for-all identifier? #'(id ...))
         (lets
@@ -128,9 +124,9 @@
             (syntax->typed
               (fold-left lookup+type $lookup $ids $types)
               #'body))
-          #`(typed
-            (function (#,@$types) #,(typed-type $typed-body))
-            (lambda (#,@$ids) #,(typed-value $typed-body)))))
+          (typed
+            #`(function (#,@$types) #,(typed-type $typed-body))
+            #`(lambda (#,@$ids) #,(typed-value $typed-body)))))
       ((let ((id expr) ...) body)
         (for-all identifier? #'(id ...))
         (lets
@@ -142,78 +138,72 @@
             (syntax->typed
               (fold-left lookup+type $lookup $ids $types)
               #'body))
-          (syntax-case $typed-body (typed)
-            ((typed body-type body-expr)
-              #`(typed body-type
-                (let
-                  (
-                    #,@(map
-                      (lambda ($id $value) #`(#,$id #,$value))
-                      $ids $values))
-                  body-expr))))))
+          (typed
+            (typed-type $typed-body)
+            #`(let
+              (
+                #,@(map
+                  (lambda ($id $value) #`(#,$id #,$value))
+                  $ids $values))
+              #,(typed-value $typed-body)))))
       ((let* () body)
         (syntax->typed $lookup #'body))
       ((let* (entry entry* ...) body)
         (syntax->typed $lookup #'(let (entry) (let* (entry* ...) body))))
       ((db-binary expr)
-        #`(typed binary
-          (db-binary #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+        (typed #'binary
+          #`(db-binary #,(syntax->expr $lookup #'integer #'expr) #'expr)))
       ((dw-binary expr)
-        #`(typed binary
-          (dw-binary #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+        (typed #'binary
+          #`(dw-binary #,(syntax->expr $lookup #'integer #'expr) #'expr)))
       ((binary-append expr ...)
-        #`(typed binary
-          (binary-append
+        (typed #'binary
+          #`(binary-append
             #,@(map (partial syntax->expr $lookup #'binary) #'(expr ...)))))
       ((binary->bytevector expr)
-        #`(typed bytevector
-          (binary->bytevector #,(syntax->expr $lookup #'binary #'expr))))
+        (typed #'bytevector
+          #`(binary->bytevector #,(syntax->expr $lookup #'binary #'expr))))
       ((asm-binary (org $org) body ...)
-        #`(typed binary
-          #,(syntax->expr $lookup #'binary
+        (typed #'binary
+          (syntax->expr $lookup #'binary
             (block-binary-syntax
               (app (syntax->expr $lookup #'assembly #'(block body ...)) (empty-block))
               (datum $org)))))
       ((block b ...)
-        #`(typed
-          assembly
-          #,(apply block-function-append
+        (typed #'assembly
+          (apply block-function-append
             (map (partial syntax->expr $lookup #'assembly) #'(b ...)))))
       ((label id)
         (identifier? #'id)
-        #`(typed
-          assembly
-          #,(label-block-function id)))
+        (typed #'assembly (label-block-function id)))
       ((db expr)
-        #`(typed
-          assembly
-          #,(db-block-function expr)))
+        (typed #'assembly (db-block-function expr)))
       ((dw expr)
-        #`(typed
-          assembly
-          #,(dw-block-function expr)))
+        (typed #'assembly (dw-block-function expr)))
       ((u2 expr)
-        #`(typed integer (u2 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+        (typed #'integer #`(u2 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
       ((u3 expr)
-        #`(typed integer (u3 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+        (typed #'integer #`(u3 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
       ((u8 expr)
-        #`(typed integer (u8 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+        (typed #'integer #`(u8 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
       ((u16 expr)
-        #`(typed integer (u16 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+        (typed #'integer #`(u16 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
       ((fn arg ...)
-        (syntax-case (syntax->typed $lookup #'fn) (typed function)
-          ((typed (function params result) fn-expr)
-            (syntax-case
-              (map*
-                (partial syntax->expr $lookup)
-                (partial syntaxes->exprs $lookup)
-                (syntax->list* #'params)
-                #'(arg ...))
-              ()
-              ((arg-expr ...)
-                #`(typed result (fn-expr arg-expr ...)))))
-          ((typed _ _)
-            (syntax-error #'fn "not an function"))))))
+        (lets
+          ((typed $type $expr) (syntax->typed $lookup #'fn))
+          (syntax-case $type (function)
+            ((function params result)
+              (syntax-case
+                (map*
+                  (partial syntax->expr $lookup)
+                  (partial syntaxes->exprs $lookup)
+                  (syntax->list* #'params)
+                  #'(arg ...))
+                ()
+                ((arg-expr ...)
+                  (typed #'result #`(#,$expr arg-expr ...)))))
+            (_
+              (syntax-error #'fn "not an function")))))))
 
   (define (syntax->identifier?-pair? $syntax)
     (syntax-case $syntax ()
@@ -224,16 +214,16 @@
       (_
         (values #f #f))))
 
-  (define (syntax->expr $lookup $type $syntax)
-    (syntax-case (syntax->typed $lookup $syntax) (typed)
-      ((typed type expr)
-        (cond
-          ((type=? #'type $type) #'expr)
-          (else
-            (syntax-error $syntax
-              (format "invalid type ~s, expected ~s, in"
-                (syntax->datum #'type)
-                (syntax->datum $type))))))))
+  (define (syntax->expr $lookup $expected-type $syntax)
+    (lets
+      ((typed $type $expr) (syntax->typed $lookup $syntax))
+      (cond
+        ((type=? $type $expected-type) $expr)
+        (else
+          (syntax-error $syntax
+            (format "invalid type ~s, expected ~s, in"
+              (syntax->datum $type)
+              (syntax->datum $expected-type)))))))
 
   (define (syntaxes->exprs $lookup $type $syntaxes)
     (map (partial syntax->expr $lookup $type) $syntaxes))
@@ -243,11 +233,8 @@
       (syntax->datum $type-a)
       (syntax->datum $type-b)))
 
-  (define (typed-type $typed)
-    (syntax-case $typed (typed)
-      ((typed type value) #'type)))
-
-  (define (typed-value $typed)
-    (syntax-case $typed (typed)
-      ((typed type value) #'value)))
+  (define (typed->datum $typed)
+    `(typed
+      ,(syntax->datum (typed-type $typed))
+      ,(syntax->datum (typed-value $typed))))
 )
