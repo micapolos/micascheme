@@ -6,6 +6,7 @@
     syntaxes->asm
     asm-blob
     asm-bytevector
+    check-asm
     org)
   (import
     (micascheme)
@@ -79,4 +80,7 @@
 
   (define-rule-syntax (asm-bytevector asm ...)
     (blob->bytevector (asm-blob asm ...)))
+
+  (define-rule-syntax (check-asm in out)
+    (check (equal? (asm-bytevector in) (asm-bytevector out))))
 )

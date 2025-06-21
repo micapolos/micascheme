@@ -5,106 +5,69 @@
 (define exclamate (lambda ((s string)) (string-append s "!")))
 (define (increment (i integer)) (+ i one))
 
-(check-asm (typed string "foo") "foo")
+(check-typed (typed string "foo") "foo")
 
-(check-asm (let ((x 1) (y 2)) (+ x y)) 3)
-(check-asm (let* ((x 1) (y (+ x 1))) (+ x y)) 3)
+(check-typed (let ((x 1) (y 2)) (+ x y)) 3)
+(check-typed (let* ((x 1) (y (+ x 1))) (+ x y)) 3)
 
-(check-asm zero 0)
-(check-asm one 1)
-(check-asm (exclamate "foo") "foo!")
-(check-asm (increment 10) 11)
+(check-typed zero 0)
+(check-typed one 1)
+(check-typed (exclamate "foo") "foo!")
+(check-typed (increment 10) 11)
 
-(check-asm (boolean=? #t #t) #t)
-(check-asm (boolean=? #t #f) #f)
+(check-typed (boolean=? #t #t) #t)
+(check-typed (boolean=? #t #f) #f)
 
-(check-asm (= 0 0) #t)
-(check-asm (= 0 1) #f)
+(check-typed (= 0 0) #t)
+(check-typed (= 0 1) #f)
 
-(check-asm (char=? #\a #\a) #t)
-(check-asm (char=? #\a #\b) #f)
+(check-typed (char=? #\a #\a) #t)
+(check-typed (char=? #\a #\b) #f)
 
-(check-asm (string=? "foo" "foo") #t)
-(check-asm (string=? "foo" "bar") #f)
+(check-typed (string=? "foo" "foo") #t)
+(check-typed (string=? "foo" "bar") #f)
 
-(check-asm (not #f) #t)
-(check-asm (not #t) #f)
+(check-typed (not #f) #t)
+(check-typed (not #t) #f)
 
-(check-asm (+) 0)
-(check-asm (+ 1 2 3) 6)
+(check-typed (+) 0)
+(check-typed (+ 1 2 3) 6)
 
-(check-asm (- 1) -1)
-(check-asm (- 10 3 2) 5)
+(check-typed (- 1) -1)
+(check-typed (- 10 3 2) 5)
 
-(check-asm (>> #b11010000 2) #b00110100)
-(check-asm (<< #b00110100 2) #b11010000)
+(check-typed (>> #b11010000 2) #b00110100)
+(check-typed (<< #b00110100 2) #b11010000)
 
-(check-asm (iand #b10101010 #b11110000) #b10100000)
-(check-asm (ior #b10101010 #b11110000) #b11111010)
-(check-asm (ixor #b10101010 #b11110000) #b01011010)
+(check-typed (iand #b10101010 #b11110000) #b10100000)
+(check-typed (ior #b10101010 #b11110000) #b11111010)
+(check-typed (ixor #b10101010 #b11110000) #b01011010)
 
-(check-asm (string-append ) "")
-(check-asm (string-append "foo" "bar" "!") "foobar!")
+(check-typed (string-append ) "")
+(check-typed (string-append "foo" "bar" "!") "foobar!")
 
-(check-asm (string-length "foo") 3)
+(check-typed (string-length "foo") 3)
 
-(check-asm (u2 (+ 1 2)) 3)
-(check-asm (u3 (+ 1 2)) 3)
-(check-asm (u8 (+ 1 2)) 3)
-(check-asm (u16 (+ 1 2)) 3)
+(check-typed (u2 (+ 1 2)) 3)
+(check-typed (u3 (+ 1 2)) 3)
+(check-typed (u8 (+ 1 2)) 3)
+(check-typed (u16 (+ 1 2)) 3)
 
-(check-asm
+(check-typed
   (bytevector (+ 1 2))
   (bytevector 3))
 
-(check-asm
+(check-typed
   (binary->bytevector (db-binary #x10))
   (bytevector #x10))
 
-(check-asm
+(check-typed
   (binary->bytevector (dw-binary #x1020))
   (bytevector #x20 #x10))
 
-(check-asm
+(check-typed
   (binary->bytevector
     (binary-append
       (db-binary #x10)
       (dw-binary #x2030)))
   (bytevector #x10 #x30 #x20))
-
-(check-asm
-  (binary->bytevector
-    (asm-binary
-      (org 100)
-      (db 10)))
-  (bytevector 10))
-
-(check-asm
-  (binary->bytevector
-    (asm-binary
-      (org 100)
-      (db end)
-      (label end)))
-  (bytevector 101))
-
-(check-asm
-  (binary->bytevector
-    (asm-binary
-      (org 100)
-      (label begin)
-      (db begin)
-      (db (- end begin))
-      (db end)
-      (label end)))
-  (bytevector 100 3 103))
-
-(check-asm
-  (binary->bytevector
-    (asm-binary
-      (org 100)
-      (db x)
-      (label x)
-      (local
-        (db x)
-        (label x))))
-  (bytevector 101 102))

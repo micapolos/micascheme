@@ -27,7 +27,9 @@
 
   (import
     (asm lang)
-    (asm std))
+    (asm std)
+    (asm asm)
+    (asm asm-core))
 
   (define-keywords
     a f b c d e h l
@@ -38,7 +40,7 @@
     i r
     nz z nc po pe p m)
 
-  (define-asm
+  (define-asm-rules
     (keywords
       a f b c d e h l +
       af bc de hl

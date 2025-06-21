@@ -2,13 +2,11 @@
   (export
     typed typed? typed-type typed-value typed->datum
     void type boolean integer char string function
-    label db dw
     binary
     typed typed-type typed-value
     syntax->typed syntax->typed-noexpand syntax->expr
-    define-typed define-asm
-    type=? asm-binary
-    db-block-function dw-block-function label-block-function block-function-append assembly local)
+    define-typed
+    type=?)
   (import
     (micascheme)
     (syntax lookup)
@@ -18,34 +16,7 @@
 
   (data (typed type value))
 
-  (define-keywords type boolean integer char function asm-binary label db dw assembly local)
-
-  (define (db-block-function $exprs)
-    (lambda ($block)
-      (fold-left
-        (lambda ($block $expr)
-          (block+binary-syntax-proc $block 1 (lambda ($org) #`(db-binary #,$expr))))
-        $block
-        $exprs)))
-
-  (define (dw-block-function $exprs)
-    (lambda ($block)
-      (fold-left
-        (lambda ($block $expr)
-          (block+binary-syntax-proc $block 2 (lambda ($org) #`(dw-binary #,$expr))))
-        $block
-        $exprs)))
-
-  (define-rule-syntax (label-block-function label)
-    (lambda ($block)
-      (block+label $block #'label)))
-
-  (define (block-function-append . $fns)
-    (lambda ($block)
-      (fold-left
-        (lambda ($block $fn) ($fn $block))
-        $block
-        $fns)))
+  (define-keywords type boolean integer char function)
 
   (define-rules-syntax (literals typed)
     ((define-typed id (typed type expr))
@@ -90,7 +61,7 @@
       (
         typed void type boolean integer char string function lambda
         db-binary dw-binary binary-append binary->bytevector
-        bytevector asm-binary block label db dw org let local
+        bytevector let
         u2 u3 u8 u16 s8)
       ((typed typ expr)
         (typed (syntax->expr $lookup #'type #'typ) #'expr))
@@ -168,29 +139,6 @@
       ((binary->bytevector expr)
         (typed #'bytevector
           #`(binary->bytevector #,(syntax->expr $lookup #'binary #'expr))))
-      ((asm-binary (org $org) body ...)
-        (typed #'binary
-          (syntax->expr $lookup #'binary
-            (block-binary-syntax
-              (app (syntax->expr $lookup #'assembly #'(block body ...)) (empty-block))
-              (datum $org)))))
-      ((block b ...)
-        (typed #'assembly
-          (apply block-function-append
-            (map (partial syntax->expr $lookup #'assembly) #'(b ...)))))
-      ((local b ...)
-        (typed #'assembly
-          (lets
-            ($assembly (syntax->expr $lookup #'assembly #`(block b ...)))
-            (lambda ($block)
-              (block+local $block ($assembly (empty-block)))))))
-      ((label id)
-        (identifier? #'id)
-        (typed #'assembly (label-block-function id)))
-      ((db expr ...)
-        (typed #'assembly (db-block-function #'(expr ...))))
-      ((dw expr ...)
-        (typed #'assembly (dw-block-function #'(expr ...))))
       ((u2 expr)
         (typed #'integer #`(u2 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
       ((u3 expr)
@@ -241,21 +189,4 @@
     `(typed
       ,(syntax->datum (typed-type $typed))
       ,(syntax->datum (typed-value $typed))))
-
-  (define-syntax (define-asm $syntax)
-    (syntax-case $syntax (keywords)
-      ((_ (keywords keyword ...) clause ...)
-        #`(begin
-          #,@(map-with
-            ($group (group-by syntax-clause-id free-identifier=? #'(clause ...)))
-            (lets
-              ((pair $id $clauses) $group)
-              #`(define-typed (#,$id $lookup $syntax)
-                (syntax-case $syntax (keyword ...)
-                  #,@(map-with ($clause $clauses)
-                    (syntax-case $clause ()
-                      ((pattern body ...)
-                        #`(pattern (syntax->typed $lookup #'(block body ...))))))))))))
-      ((_ clause ...)
-        #`(define-asm (keywords) clause ...))))
 )

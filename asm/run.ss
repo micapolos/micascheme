@@ -4,7 +4,8 @@
     (rename (micascheme) (let* %let*) (define %define) (run %run))
     (cspect)
     (nex)
-    (asm lang))
+    (asm lang)
+    (asm asm))
 
   (define-rule-syntax (run body ...)
     (lets
@@ -13,12 +14,7 @@
         (call-with-port (open-file-output-port $path (file-options no-fail))
           (lambda ($port)
             (lets
-              ($bytevector
-                (asm
-                  (binary->bytevector
-                    (asm-binary
-                      (org #xc000)
-                      body ...))))
+              ($bytevector (asm-bytevector (org #xc000) body ...))
               (run (pretty-print $bytevector))
               (put-blob $port (nex-blob (bytevector->blob $bytevector))))))
         (cspect $path))))

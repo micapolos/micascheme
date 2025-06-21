@@ -1,4 +1,4 @@
-(import (asm lang) (asm z80) (asm run))
+(import (asm lang) (asm z80) (asm run) (asm asm) (asm asm-core))
 
 (run
   (label loop)

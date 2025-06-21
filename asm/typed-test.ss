@@ -20,23 +20,11 @@
           '#,(datum->syntax #'+ (typed->datum (syntax->typed $lookup #'in)))
           'out)))))
 
-(define-syntax (check-assembly $syntax $lookup)
-  (syntax-case $syntax ()
-    ((_ expr)
-      #`(begin
-        #,(check (procedure? (syntax->expr $lookup #'assembly #'expr)))
-        (void)))))
-
 (define-typed + (typed (function integer integer) %+))
 (define-typed - (typed (function (integer . integer) integer) %-))
 (define-typed string-append (typed (function string string) %string-append))
 (define-typed string-length (typed (function (string) integer) %string-length))
 (define-typed bytevector (typed (function integer bytevector) %bytevector))
-
-(define-asm (keywords a b)
-  ((ld a a) (db 10))
-  ((ld a n) (db 20 n))
-  ((ret) (db 255)))
 
 (check-typed type (typed type type))
 
@@ -157,54 +145,3 @@
 (check-typed
   (binary->bytevector (db-binary 1))
   (typed bytevector (binary->bytevector (db-binary 1 #'1))))
-
-(check-assembly (db 1))
-(check-assembly (db (+ 1 2)))
-(check-assembly (db 1 2 3))
-(check-assembly (dw (+ 1 2)))
-(check-assembly (label x))
-(check-assembly (block (db 0) (label x) (db x)))
-
-(check-typed
-  (asm-binary
-    (org 100)
-    (label start)
-    (db 10)
-    (db (- end start))
-    (label end))
-  (typed binary
-    (let ((start 100) (end 102))
-      (binary-append
-        (db-binary 10 #'10)
-        (db-binary (%- end start) #'(- end start))))))
-
-(check-typed
-  (asm-binary
-    (org 100)
-    (ld a a)
-    (ld a 100)
-    (ret))
-  (typed binary
-    (let ()
-      (binary-append
-        (db-binary 10 #'10)
-        (db-binary 20 #'20)
-        (db-binary 100 #'100)
-        (db-binary 255 #'255)))))
-
-(check-typed
-  (asm-binary
-    (org 100)
-    (db x)
-    (label x)
-    (local
-      (db x)
-      (label x)))
-  (typed binary
-    (let ((x 101))
-      (binary-append
-        (db-binary x #'x)
-        (let ((x 102))
-          (binary-append
-            (db-binary x #'x)))))))
-

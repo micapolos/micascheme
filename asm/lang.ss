@@ -1,7 +1,7 @@
 (library (asm lang)
   (export
     asm
-    check-asm
+    check-typed
     define
     define-primitive
     define-primitives
@@ -11,11 +11,10 @@
     (asm typed))
   (export
     (import (only (micascheme) string let lambda syntax binary-append binary->bytevector keywords define-keywords))
-    (import (only (asm block) block))
     (import (only (asm binary) db-binary dw-binary))
     (import (only (asm u) u2 u3 u8 u16 s8))
     (import (asm core))
-    (import (only (asm typed) void type boolean integer char function typed asm-binary label db dw binary assembly define-asm local)))
+    (import (only (asm typed) void type boolean integer char function typed binary)))
 
   (define-syntax (define $syntax $lookup)
     (syntax-case $syntax (typed)
@@ -53,7 +52,7 @@
         (syntax-case $syntax ()
           ((id arg ...) #'body)))))
 
-  (define-rule-syntax (check-asm in out)
+  (define-rule-syntax (check-typed in out)
     (check (equal? (asm in) (asm out))))
 
   (define-syntax (asm $syntax $lookup)
