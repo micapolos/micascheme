@@ -15,7 +15,7 @@
     (import (only (asm binary) db-binary dw-binary))
     (import (only (asm u) u2 u3 u8 u16))
     (import (asm core))
-    (import (only (asm typed) void type boolean integer char function typed asm-binary label db dw binary assembly define-asm local shadow)))
+    (import (only (asm typed) void type boolean integer char function typed asm-binary label db dw binary assembly define-asm local)))
 
   (define-syntax (define $syntax $lookup)
     (syntax-case $syntax (typed)

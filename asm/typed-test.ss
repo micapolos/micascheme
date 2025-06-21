@@ -103,18 +103,12 @@
     ((lambda (s) (%string-length s)) "foo")))
 
 (check-typed
-  ((lambda ((shadow s string)) (string-length s)) "foo")
-  (typed
-    integer
-    ((lambda (s) (%string-length s)) "foo")))
-
-(check-typed
   (let ((foo "foo") (bar "bar")) (string-append foo bar))
   (typed string (let ((foo "foo") (bar "bar")) (%string-append foo bar))))
 
 (check-typed
   (let ((foo "foo") (bar "bar"))
-    (let ((shadow foo "foo2"))
+    (let ((foo "foo2"))
       (string-append foo bar)))
   (typed string
     (let ((foo "foo") (bar "bar"))

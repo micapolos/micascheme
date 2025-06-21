@@ -8,7 +8,7 @@
     syntax->typed syntax->typed-noexpand syntax->expr
     define-typed define-asm
     type=? asm-binary
-    db-block-function dw-block-function label-block-function block-function-append assembly shadow local)
+    db-block-function dw-block-function label-block-function block-function-append assembly local)
   (import
     (micascheme)
     (syntax lookup)
@@ -18,7 +18,7 @@
 
   (data (typed type value))
 
-  (define-keywords type boolean integer char function asm-binary label db dw assembly shadow local)
+  (define-keywords type boolean integer char function asm-binary label db dw assembly local)
 
   (define (db-block-function $exprs)
     (lambda ($block)
@@ -77,8 +77,8 @@
       ((else _)
         (syntax->typed-noexpand $lookup $syntax))))
 
-  (define (lookup+type $lookup $shadow? $id $type)
-    ((if $shadow? lookup+ lookup+undefined) $lookup $id
+  (define (lookup+type $lookup $id $type)
+    (lookup+ $lookup $id
       (lambda ($lookup $syntax)
         (syntax-case $syntax ()
           (id
@@ -125,42 +125,36 @@
       (str
         (string? (datum str))
         (typed #'string #'str))
-      ((lambda (entry ...) body)
-        (syntax-case (map syntax+implicit-shadow #'(entry ...)) ()
-          (((shadow? id typ) ...)
-            (for-all identifier? #'(id ...))
-            (lets
-              ($shadow?s (map syntax->datum #'(shadow? ...)))
-              ($ids #'(id ...))
-              ($types (map (partial syntax->expr $lookup #'type) #'(typ ...)))
-              ($typed-body
-                (syntax->typed
-                  (fold-left lookup+type $lookup $shadow?s $ids $types)
-                  #'body))
-              (typed
-                #`(function (#,@$types) #,(typed-type $typed-body))
-                #`(lambda (#,@$ids) #,(typed-value $typed-body)))))))
-      ((let (entry ...) body)
-        (syntax-case (map syntax+implicit-shadow #'(entry ...)) ()
-          (((shadow? id expr) ...)
-            (lets
-              ($shadow?s (map syntax->datum #'(shadow? ...)))
-              ($ids #'(id ...))
-              ($typeds (map (partial syntax->typed $lookup) #'(expr ...)))
-              ($types (map typed-type $typeds))
-              ($values (map typed-value $typeds))
-              ($typed-body
-                (syntax->typed
-                  (fold-left lookup+type $lookup $shadow?s $ids $types)
-                  #'body))
-              (typed
-                (typed-type $typed-body)
-                #`(let
-                  (
-                    #,@(map
-                      (lambda ($id $value) #`(#,$id #,$value))
-                      $ids $values))
-                  #,(typed-value $typed-body)))))))
+      ((lambda ((id typ) ...) body)
+        (for-all identifier? #'(id ...))
+        (lets
+          ($ids #'(id ...))
+          ($types (map (partial syntax->expr $lookup #'type) #'(typ ...)))
+          ($typed-body
+            (syntax->typed
+              (fold-left lookup+type $lookup $ids $types)
+              #'body))
+          (typed
+            #`(function (#,@$types) #,(typed-type $typed-body))
+            #`(lambda (#,@$ids) #,(typed-value $typed-body)))))
+      ((let ((id expr) ...) body)
+        (lets
+          ($ids #'(id ...))
+          ($typeds (map (partial syntax->typed $lookup) #'(expr ...)))
+          ($types (map typed-type $typeds))
+          ($values (map typed-value $typeds))
+          ($typed-body
+            (syntax->typed
+              (fold-left lookup+type $lookup $ids $types)
+              #'body))
+          (typed
+            (typed-type $typed-body)
+            #`(let
+              (
+                #,@(map
+                  (lambda ($id $value) #`(#,$id #,$value))
+                  $ids $values))
+              #,(typed-value $typed-body)))))
       ((db-binary expr)
         (typed #'binary
           #`(db-binary #,(syntax->expr $lookup #'integer #'expr) #'expr)))
@@ -245,11 +239,6 @@
     `(typed
       ,(syntax->datum (typed-type $typed))
       ,(syntax->datum (typed-value $typed))))
-
-  (define (syntax+implicit-shadow $syntax)
-    (syntax-case $syntax (shadow)
-      ((shadow . rest) $syntax)
-      (other #`(shadow . other))))
 
   (define-syntax (define-asm $syntax)
     (syntax-case $syntax (keywords)
