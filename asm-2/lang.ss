@@ -26,8 +26,11 @@
             (define-typed id
               (lambda ($lookup $syntax)
                 (syntax-case $syntax ()
-                  (id (identifier? #'id)
-                    (typed #'#,$type #'untyped))))))))))
+                  (id
+                    (identifier? #'id)
+                    (typed #'#,$type #'untyped))
+                  (other
+                    (syntax->typed-noexpand $lookup #'other))))))))))
 
   (define-rules-syntax
     ((define-primitive id type prim)

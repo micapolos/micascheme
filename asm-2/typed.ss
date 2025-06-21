@@ -5,7 +5,7 @@
     label db dw
     binary
     typed typed-type typed-value
-    syntax->typed syntax->expr
+    syntax->typed syntax->typed-noexpand syntax->expr
     define-typed
     type=? asm-binary
     db-block-function dw-block-function label-block-function block-function-append assembly)
@@ -46,7 +46,11 @@
       (define-typed id
         (lambda ($lookup $syntax)
           (syntax-case $syntax (id)
-            (id (typed #'type #'expr))))))
+            (id
+              (identifier? #'id)
+              (typed #'type #'expr))
+            (other
+              (syntax->typed-noexpand $lookup #'other))))))
     ((define-typed (id $lookup $syntax) body)
       (and (identifier? #'$lookup) (identifier? #'$syntax))
       (define-typed id
@@ -57,18 +61,15 @@
         (make-compile-time-value type/proc))))
 
   (define (syntax->typed $lookup $syntax)
-    (lets
-      ((values $identifier? $pair?)
-        (syntax->identifier?-pair? $syntax))
-      (switch $identifier?
-        ((identifier? $identifier)
-          (switch ($lookup $identifier)
-            ((false? _)
-              (syntax->typed-noexpand $lookup $syntax))
-            ((else $procedure)
-              ($procedure $lookup $syntax))))
-        ((else _)
-          (syntax->typed-noexpand $lookup $syntax)))))
+    (switch (syntax->identifier? $syntax)
+      ((identifier? $identifier)
+        (switch ($lookup $identifier)
+          ((false? _)
+            (syntax->typed-noexpand $lookup $syntax))
+          ((else $procedure)
+            ($procedure $lookup $syntax))))
+      ((else _)
+        (syntax->typed-noexpand $lookup $syntax))))
 
   (define (lookup+type $lookup $id $type)
     (lookup+undefined $lookup $id
@@ -208,14 +209,10 @@
             (_
               (syntax-error #'fn "not an function")))))))
 
-  (define (syntax->identifier?-pair? $syntax)
-    (syntax-case $syntax ()
-      (id
-        (values (and (identifier? #'id) #'id) #f))
-      ((id . rest)
-        (values (and (identifier? #'id) #'id) #t))
-      (_
-        (values #f #f))))
+  (define (syntax->identifier? $syntax)
+    (syntax-case? $syntax ()
+      (id (identifier? #'id) #'id)
+      ((id . rest) (identifier? #'id) #'id)))
 
   (define (syntax->expr $lookup $expected-type $syntax)
     (lets
