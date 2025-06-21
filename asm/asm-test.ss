@@ -18,6 +18,12 @@
         (block+binary-syntax-proc $block 2
           (lambda ($org) #'(dw-binary expr)))))))
 
+(define-asm (label $lookup $syntax)
+  (syntax-case $syntax ()
+    ((_ x)
+      (lambda ($block)
+        (block+label $block #'x)))))
+
 (check
   (equal?
     (asm-bytevector)
@@ -37,3 +43,13 @@
   (equal?
     (asm-bytevector (db #x12) (db #x34))
     (bytevector #x12 #x34)))
+
+(check
+  (equal?
+    (asm-bytevector (label begin) (db begin) (db end) (label end))
+    (bytevector 0 2)))
+
+(check
+  (equal?
+    (asm-bytevector (org 100) (label begin) (db begin) (db end) (label end))
+    (bytevector 100 102)))

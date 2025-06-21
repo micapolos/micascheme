@@ -3,12 +3,15 @@
     define-asm
     syntax->asm
     asm-blob
-    asm-bytevector)
+    asm-bytevector
+    org)
   (import
     (micascheme)
     (asm block)
     (binary)
     (only (asm typed) syntax->expr))
+
+  (define-keywords org)
 
   (define-rules-syntax
     ((define-asm id asm)
@@ -31,8 +34,8 @@
         $lookup $syntax)))
 
   (define-syntax (asm-blob $syntax $lookup)
-    (syntax-case $syntax ()
-      ((_ asm ...)
+    (syntax-case $syntax (org)
+      ((_ (org $org) asm ...)
         (lets
           ($block
             (fold-left
@@ -49,7 +52,9 @@
                       ((syntax->asm $lookup $asm) $block))
                     (empty-block)
                     #'(asm ...))
-                  0))))))))
+                  (datum $org)))))))
+      ((_ asm ...)
+        #`(asm-blob (org 0) asm ...))))
 
   (define-rule-syntax (asm-bytevector asm ...)
     (blob->bytevector (asm-blob asm ...)))
