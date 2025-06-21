@@ -4,13 +4,13 @@
     define-asm-rules
     syntax->asm
     syntaxes->asm
-    asm-blob
+    asm-binary
     asm-bytevector
     check-asm
     org)
   (import
     (micascheme)
-    (only (asm block) block-binary-syntax empty-block block-size)
+    (only (asm block) block-binary-syntax empty-block)
     (binary)
     (only (asm typed) syntax->expr))
 
@@ -60,26 +60,20 @@
         $block
         (map (partial syntax->asm $lookup) $syntaxes))))
 
-  (define-syntax (asm-blob $syntax $lookup)
+  (define-syntax (asm-binary $syntax $lookup)
     (syntax-case $syntax (org)
       ((_ (org $org) asm ...)
-        (lets
-          ($block
+        (syntax->expr $lookup #'binary
+          (block-binary-syntax
             (fold-left
               (lambda ($block $asm) ((syntax->asm $lookup $asm) $block))
-              (empty-block)
-              #'(asm ...)))
-          #`(blob-with ($port #,(block-size $block))
-            (put-binary $port
-              #,(syntax->expr $lookup #'binary
-                (block-binary-syntax
-                  (app (syntaxes->asm $lookup #'(asm ...)) (empty-block))
-                  (datum $org)))))))
+              (empty-block (datum $org))
+              #'(asm ...)))))
       ((_ asm ...)
-        #`(asm-blob (org 0) asm ...))))
+        #`(asm-binary (org 0) asm ...))))
 
   (define-rule-syntax (asm-bytevector asm ...)
-    (blob->bytevector (asm-blob asm ...)))
+    (binary->bytevector (asm-binary asm ...)))
 
   (define-rule-syntax (check-asm in out)
     (check (equal? (asm-bytevector in) (asm-bytevector out))))

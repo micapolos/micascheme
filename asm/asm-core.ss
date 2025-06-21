@@ -3,7 +3,7 @@
   (import
     (micascheme)
     (asm asm)
-    (only (asm block) empty-block block+binary-syntax-proc block+label block+local)
+    (only (asm block) empty-block block+binary-syntax block+label block-bind)
     (only (asm binary) db-binary dw-binary)
     (only (binary) binary-append))
 
@@ -11,15 +11,15 @@
     (syntax-case $syntax ()
       ((_ expr ...)
         (lambda ($block)
-          (block+binary-syntax-proc $block 1
-            (lambda ($org) #'(binary-append (db-binary expr) ...)))))))
+          (block+binary-syntax $block 1
+            #'(binary-append (db-binary expr) ...))))))
 
   (define-asm (dw $lookup $syntax)
     (syntax-case $syntax ()
       ((_ expr ...)
         (lambda ($block)
-          (block+binary-syntax-proc $block 2
-            (lambda ($org) #'(binary-append (dw-binary expr) ...)))))))
+          (block+binary-syntax $block 2
+            #'(binary-append (dw-binary expr) ...))))))
 
   (define-asm (label $lookup $syntax)
     (syntax-case $syntax ()
@@ -40,5 +40,5 @@
         (lets
           ($asm (syntaxes->asm $lookup #'(asm ...)))
           (lambda ($block)
-            (block+local $block ($asm (empty-block))))))))
+            (block-bind $block (lambda ($block) ($asm $block))))))))
 )
