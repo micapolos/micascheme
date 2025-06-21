@@ -197,3 +197,20 @@
         (db-binary 20 #'20)
         (db-binary 100 #'100)
         (db-binary 255 #'255)))))
+
+(check-typed
+  (asm-binary
+    (org 100)
+    (db x)
+    (label x)
+    (local
+      (db x)
+      (label x)))
+  (typed binary
+    (let ((x 101))
+      (binary-append
+        (db-binary x #'x)
+        (let ((x 2)) ; TODO: Should be 102
+          (binary-append
+            (db-binary x #'x)))))))
+

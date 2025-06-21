@@ -8,7 +8,7 @@
     syntax->typed syntax->typed-noexpand syntax->expr
     define-typed define-asm
     type=? asm-binary
-    db-block-function dw-block-function label-block-function block-function-append assembly shadow)
+    db-block-function dw-block-function label-block-function block-function-append assembly shadow local)
   (import
     (micascheme)
     (syntax lookup)
@@ -18,7 +18,7 @@
 
   (data (typed type value))
 
-  (define-keywords type boolean integer char function asm-binary label db dw assembly shadow)
+  (define-keywords type boolean integer char function asm-binary label db dw assembly shadow local)
 
   (define (db-block-function $exprs)
     (lambda ($block)
@@ -90,7 +90,7 @@
       (
         typed void type boolean integer char string function lambda
         db-binary dw-binary binary-append binary->bytevector
-        bytevector asm-binary block label db dw org let
+        bytevector asm-binary block label db dw org let local
         u2 u3 u8 u16)
       ((typed typ expr)
         (typed (syntax->expr $lookup #'type #'typ) #'expr))
@@ -184,6 +184,12 @@
         (typed #'assembly
           (apply block-function-append
             (map (partial syntax->expr $lookup #'assembly) #'(b ...)))))
+      ((local b ...)
+        (typed #'assembly
+          (lets
+            ($assembly (syntax->expr $lookup #'assembly #`(block b ...)))
+            (lambda ($block)
+              (block+local $block ($assembly (empty-block)))))))
       ((label id)
         (identifier? #'id)
         (typed #'assembly (label-block-function id)))

@@ -97,3 +97,14 @@
       (db end)
       (label end)))
   (bytevector 100 3 103))
+
+(check-asm
+  (binary->bytevector
+    (asm-binary
+      (org 100)
+      (db x)
+      (label x)
+      (local
+        (db x)
+        (label x))))
+  (bytevector 101 2))  ; TODO: should be 101 102
