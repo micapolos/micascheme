@@ -11,7 +11,6 @@
     (micascheme)
     (syntax lookup)
     (asm u)
-    (asm block)
     (asm binary))
 
   (data (typed type value))
