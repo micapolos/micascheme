@@ -109,6 +109,9 @@
       (i
         (integer? (datum i))
         (typed #'integer #'i))
+      (i
+        (number? (datum i))
+        (syntax-error $syntax "non-integer number"))
       (ch
         (char? (datum ch))
         (typed #'char #'ch))
