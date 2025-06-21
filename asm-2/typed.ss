@@ -84,7 +84,7 @@
       (
         typed void type boolean integer char string function lambda
         db-binary dw-binary binary-append binary->bytevector
-        bytevector asm-binary block label db dw org let let*
+        bytevector asm-binary block label db dw org let
         u2 u3 u8 u16)
       ((typed typ expr)
         (typed (syntax->expr $lookup #'type #'typ) #'expr))
@@ -150,10 +150,6 @@
                   (lambda ($id $value) #`(#,$id #,$value))
                   $ids $values))
               #,(typed-value $typed-body)))))
-      ((let* () body)
-        (syntax->typed $lookup #'body))
-      ((let* (entry entry* ...) body)
-        (syntax->typed $lookup #'(let (entry) (let* (entry* ...) body))))
       ((db-binary expr)
         (typed #'binary
           #`(db-binary #,(syntax->expr $lookup #'integer #'expr) #'expr)))
