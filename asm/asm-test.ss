@@ -1,28 +1,7 @@
 (import
   (micascheme)
   (asm asm)
-  (asm block)
-  (asm binary))
-
-(define-asm (db $lookup $syntax)
-  (syntax-case $syntax ()
-    ((_ expr)
-      (lambda ($block)
-        (block+binary-syntax-proc $block 1
-          (lambda ($org) #'(db-binary expr)))))))
-
-(define-asm (dw $lookup $syntax)
-  (syntax-case $syntax ()
-    ((_ expr)
-      (lambda ($block)
-        (block+binary-syntax-proc $block 2
-          (lambda ($org) #'(dw-binary expr)))))))
-
-(define-asm (label $lookup $syntax)
-  (syntax-case $syntax ()
-    ((_ x)
-      (lambda ($block)
-        (block+label $block #'x)))))
+  (asm asm-core))
 
 (define-asm-rules
   ((ret) (db #xc9))
@@ -66,3 +45,20 @@
       (jp loop)
       (ret))
     (bytevector #xff #x20 0 #Xc9)))
+
+(check
+  (equal?
+    (asm-bytevector (block (db 0) (db 1)))
+    (bytevector 0 1)))
+
+(check
+  (equal?
+    (asm-bytevector
+      (org 100)
+      (db x)
+      (label x)
+      (local
+        (db x)
+        (label x))
+      (db x))
+    (bytevector 101 102 101)))

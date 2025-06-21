@@ -9,7 +9,7 @@
     org)
   (import
     (micascheme)
-    (asm block)
+    (only (asm block) block-binary-syntax empty-block block-size)
     (binary)
     (only (asm typed) syntax->expr))
 
