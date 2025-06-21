@@ -5,7 +5,7 @@
     block-with-size block-with-labels block-with-binary-syntaxes
     empty-block
     block-apply block-binary-syntax
-    block+label block+binary-syntax)
+    block+label block+binary-syntax block+local)
   (import (micascheme) (asm binary))
 
   (data (block size labels binary-syntaxes))
@@ -23,6 +23,12 @@
     (block-with-binary-syntaxes
       (block-with-size $block (+ (block-size $block) $size))
       (push (block-binary-syntaxes $block) $binary-syntax)))
+
+  (define (block+local $block $local-block)
+    (block+binary-syntax
+      $block
+      (block-size $local-block)
+      (block-binary-syntax $local-block (block-size $block))))
 
   (define (block-apply $block $fn)
     ($fn $block))
