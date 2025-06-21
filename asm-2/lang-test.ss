@@ -1,4 +1,4 @@
-(import (asm-2 lang) (asm-2 std))
+(import (asm-2 lang) (asm-2 core) (asm-2 std))
 
 (define zero 0)
 (define one 1)
@@ -6,6 +6,9 @@
 (define (increment (integer i)) (+ i one))
 
 (check-asm (typed string "foo") "foo")
+
+(check-asm (let ((x 1) (y 2)) (+ x y)) 3)
+(check-asm (let* ((x 1) (y (+ x 1))) (+ x y)) 3)
 
 (check-asm zero 0)
 (check-asm one 1)
