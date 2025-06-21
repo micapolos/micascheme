@@ -27,8 +27,7 @@
 
   (import
     (asm lang)
-    (asm std)
-    (only (micascheme) syntax quasisyntax unsyntax lets generate-temporary syntax-case))
+    (asm std))
 
   (define-keywords
     a f b c d e h l
