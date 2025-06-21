@@ -1,11 +1,11 @@
-(library (asm-2 std)
+(library (asm std)
   (export
     not
     = boolean=? char=? string=? type=?
     + - << >> and or xor
     string-append string-length
     bytevector)
-  (import (asm-2 lang))
+  (import (asm lang))
 
   (define-primitives
     (not            (function (boolean) boolean))

@@ -1,10 +1,10 @@
-(library (asm-2 run)
+(library (asm run)
   (export run)
   (import
     (rename (micascheme) (let* %let*) (define %define) (run %run))
     (cspect)
     (nex)
-    (asm-2 lang))
+    (asm lang))
 
   (define-rule-syntax (run body ...)
     (lets

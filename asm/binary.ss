@@ -1,8 +1,8 @@
-(library (asm-2 binary)
+(library (asm binary)
   (export
     db-binary
     dw-binary)
-  (import (micascheme) (asm-2 u))
+  (import (micascheme) (asm u))
 
   (define (db-binary $db $syntax)
     (binary ($port)

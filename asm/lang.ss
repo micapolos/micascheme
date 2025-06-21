@@ -1,4 +1,4 @@
-(library (asm-2 lang)
+(library (asm lang)
   (export
     asm
     check-asm
@@ -8,14 +8,14 @@
     define-macro)
   (import
     (rename (micascheme) (define %define))
-    (asm-2 typed))
+    (asm typed))
   (export
     (import (only (micascheme) string let lambda syntax binary-append binary->bytevector keywords define-keywords))
-    (import (only (asm-2 block) block))
-    (import (only (asm-2 binary) db-binary dw-binary))
-    (import (only (asm-2 u) u2 u3 u8 u16))
-    (import (asm-2 core))
-    (import (only (asm-2 typed) void type boolean integer char function typed asm-binary label db dw binary assembly define-asm)))
+    (import (only (asm block) block))
+    (import (only (asm binary) db-binary dw-binary))
+    (import (only (asm u) u2 u3 u8 u16))
+    (import (asm core))
+    (import (only (asm typed) void type boolean integer char function typed asm-binary label db dw binary assembly define-asm)))
 
   (define-syntax (define $syntax $lookup)
     (syntax-case $syntax (typed)

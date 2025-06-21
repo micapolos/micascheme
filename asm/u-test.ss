@@ -1,4 +1,4 @@
-(import (micascheme) (asm-2 u))
+(import (micascheme) (asm u))
 
 (check (u2? #b00))
 (check (u2? #b11))

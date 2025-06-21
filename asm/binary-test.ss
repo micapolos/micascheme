@@ -1,4 +1,4 @@
-(import (micascheme) (asm-2 binary))
+(import (micascheme) (asm binary))
 
 (check
   (equal?

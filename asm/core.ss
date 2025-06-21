@@ -1,46 +1,15 @@
 (library (asm core)
-  (export
-    define-asm
-    asm-blob
-    asm-bytevector
-    main-blob
-    define-ops)
-  (import (micascheme) (asm fragment) (asm program) (asm expression) (asm block) (asm frame))
+  (export let*)
+  (import
+    (asm typed)
+    (rename (micascheme)
+      (let* %let*)))
 
-  (meta define main-frame
-    (make-thread-parameter (empty-frame)))
-
-  (define-syntax (main-blob $syntax)
+  (define-typed (let* $lookup $syntax)
     (syntax-case $syntax ()
-      ((_)
-        (lets
-          ($syntax (frame->syntax #xc000 (main-frame)))
-          #`(lets
-            (run (pretty-print '#,$syntax))
-            #,$syntax)))))
-
-  (define-rule-syntax (define-ops (op target) ...)
-    (begin
-      (define-syntax (op $syntax $lookup)
-        (syntax-case $syntax ()
-          ((_ arg (... ...))
-            (run
-              (main-frame (frame+syntax (main-frame) #'(target arg (... ...))))
-              #`(void))))) ...))
-
-  (define-rule-syntax (define-asm label fragment)
-    (define-syntax label (make-compile-time-value fragment)))
-
-  (define-syntax (asm-blob $syntax $lookup)
-    (syntax-case $syntax ()
-      ((_ label org)
-        (identifier? #'label)
-        (program->syntax
-          (datum org)
-          (label->program
-            $lookup
-            #'label)))))
-
-  (define-rule-syntax (asm-bytevector label org)
-    (blob->bytevector (asm-blob label org)))
+      ((_ () body)
+        (syntax->typed $lookup #'body))
+      ((_ (entry entry* ...) body)
+        (syntax->typed $lookup
+          #'(let (entry) (let* (entry* ...) body))))))
 )

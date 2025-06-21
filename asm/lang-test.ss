@@ -1,4 +1,4 @@
-(import (asm-2 lang) (asm-2 std))
+(import (asm lang) (asm std))
 
 (define zero 0)
 (define one 1)

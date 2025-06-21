@@ -1,4 +1,4 @@
-(library (asm-2 typed)
+(library (asm typed)
   (export
     typed typed? typed-type typed-value typed->datum
     void type boolean integer char string function
@@ -12,9 +12,9 @@
   (import
     (micascheme)
     (syntax lookup)
-    (asm-2 u)
-    (asm-2 block)
-    (asm-2 binary))
+    (asm u)
+    (asm block)
+    (asm binary))
 
   (data (typed type value))
 

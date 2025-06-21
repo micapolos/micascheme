@@ -1,49 +1,36 @@
 (library (asm block)
   (export
-    block block? block-size block-put-syntax-stack-proc
-    block-with
+    block block?
+    block-size block-labels block-binary-syntaxes
+    block-with-size block-with-labels block-with-binary-syntaxes
     empty-block
-    block-append
-    block->syntax
-    u8-block
-    block->datum)
-  (import (micascheme))
+    block-apply block-binary-syntax
+    block+label block+binary-syntax)
+  (import (micascheme) (asm binary))
 
-  (data (block size put-syntax-stack-proc))
-
-  (define-rule-syntax (block-with ($port-identifier $size) body ...)
-    (block $size
-      (lambda ($port-identifier)
-        (stack #'body ...))))
+  (data (block size labels binary-syntaxes))
 
   (define (empty-block)
-    (block-with ($port 0)))
+    (block 0 (stack) (stack)))
 
-  (define (block-append . $blocks)
-    (block
-      (apply + (map block-size $blocks))
-      (lambda ($port-identifier)
-        (apply append
-          (map
-            (lambda ($put-syntax-stack-proc) ($put-syntax-stack-proc $port-identifier))
-            (map block-put-syntax-stack-proc (reverse $blocks)))))))
+  (define (block+label $block $label)
+    (block-with-labels $block
+      (push
+        (block-labels $block)
+        (cons $label (block-size $block)))))
 
-  (define-rule-syntax (u8-block u8 ...)
-    (lets
-      ($u8s (list #'u8 ...))
-      (block (length $u8s)
-        (lambda ($port)
-          (stack #`(put-u8 #,$port #,u8) ...)))))
+  (define (block+binary-syntax $block $size $binary-syntax)
+    (block-with-binary-syntaxes
+      (block-with-size $block (+ (block-size $block) $size))
+      (push (block-binary-syntaxes $block) $binary-syntax)))
 
-  (define (block->syntax $block)
-    #`(blob
-      #,(literal->syntax (block-size $block))
-      (lambda ($port)
-        #,@(lets
-          ($syntaxes (reverse ((block-put-syntax-stack-proc $block) #'$port)))
-          (if (null? $syntaxes) (list #'(void)) $syntaxes)))))
+  (define (block-apply $block $fn)
+    ($fn $block))
 
-  (define (block->datum $block)
-    (syntax->datum
-      (block->syntax $block)))
+  (define (block-binary-syntax $block $org)
+    #`(let
+      (#,@(map-with
+        ($label (reverse (block-labels $block)))
+        #`(#,(car $label) #,(datum->syntax #'+ (+ $org (cdr $label))))))
+      (binary-append #,@(reverse (block-binary-syntaxes $block)))))
 )
