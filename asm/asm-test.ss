@@ -24,7 +24,7 @@
       (lambda ($block)
         (block+label $block #'x)))))
 
-(define-ops
+(define-asm-rules
   ((ret) (db #xc9))
   ((jp nn) (db #xff) (dw nn)))
 

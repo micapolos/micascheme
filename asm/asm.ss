@@ -1,7 +1,7 @@
 (library (asm asm)
   (export
     define-asm
-    define-ops
+    define-asm-rules
     syntax->asm
     syntaxes->asm
     asm-blob
@@ -23,7 +23,7 @@
       (and (identifier? #'$lookup) (identifier? #'$syntax))
       (define-asm id (lambda ($lookup $syntax) body))))
 
-  (define-syntax (define-ops $syntax)
+  (define-syntax (define-asm-rules $syntax)
     (syntax-case $syntax (keywords)
       ((_ (keywords keyword ...) clause ...)
         #`(begin
@@ -38,7 +38,7 @@
                       ((pattern body ...)
                         #`(pattern (syntaxes->asm $lookup (list #'body ...))))))))))))
       ((_ clause ...)
-        #`(define-ops (keywords) clause ...))))
+        #`(define-asm-rules (keywords) clause ...))))
 
   (meta define (syntax->asm $lookup $syntax)
     (lets
