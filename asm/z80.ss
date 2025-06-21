@@ -28,7 +28,6 @@
   (import
     (asm lang)
     (asm std)
-    (only (asm typed) define-typed syntax->typed)
     (only (micascheme) syntax quasisyntax unsyntax lets generate-temporary syntax-case))
 
   (define-keywords
