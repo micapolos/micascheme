@@ -1,6 +1,7 @@
 (import (asm-2 lang) (asm-2 z80) (asm-2 run))
 
 (run
+  (label loop)
   (db 243)
   (db 6)
   (db 0)
@@ -28,6 +29,4 @@
   (db 0)
   (db 16)
   (db 250)
-  (db 195)
-  (db 0)
-  (db 192))
+  (jp loop))
