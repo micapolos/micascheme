@@ -24,7 +24,7 @@
     (lambda ($block)
       (fold-left
         (lambda ($block $expr)
-          (block+binary-syntax $block 1 #`(db-binary #,$expr)))
+          (block+binary-syntax-proc $block 1 (lambda ($org) #`(db-binary #,$expr))))
         $block
         $exprs)))
 
@@ -32,7 +32,7 @@
     (lambda ($block)
       (fold-left
         (lambda ($block $expr)
-          (block+binary-syntax $block 2 #`(dw-binary #,$expr)))
+          (block+binary-syntax-proc $block 2 (lambda ($org) #`(dw-binary #,$expr))))
         $block
         $exprs)))
 

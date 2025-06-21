@@ -210,7 +210,7 @@
     (let ((x 101))
       (binary-append
         (db-binary x #'x)
-        (let ((x 2)) ; TODO: Should be 102
+        (let ((x 102))
           (binary-append
             (db-binary x #'x)))))))
 

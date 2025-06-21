@@ -15,8 +15,8 @@
       (cons #'a 10)
       (cons #'b 20))
     (stack
-      #`(db-binary a)
-      #`(db-binary b)))
+      (lambda ($org) #`(db-binary a))
+      (lambda ($org) #`(db-binary b))))
   (let
     ((a 110) (b 120))
     (binary-append
@@ -26,17 +26,17 @@
 (check-block (org 100)
   (fluent (empty-block)
     (block+label #'pre)
-    (block+binary-syntax 2 #'(pre-op))
+    (block+binary-syntax-proc 2 (lambda ($org) #'(pre-op)))
     (block+local
       (fluent (empty-block)
         (block+label #'local)
-        (block+binary-syntax 3 #'(local-op))))
+        (block+binary-syntax-proc 3 (lambda ($org) #'(local-op)))))
     (block+label #'post)
-    (block+binary-syntax 2 #'(post-op))
+    (block+binary-syntax-proc 2 (lambda ($org) #'(post-op)))
     (block+label #'end))
   (let
     ((pre 100) (post 105) (end 107))
     (binary-append
       (pre-op)
-      (let ((local 2)) (binary-append (local-op)))
+      (let ((local 102)) (binary-append (local-op)))
       (post-op))))

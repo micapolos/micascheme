@@ -107,4 +107,4 @@
       (local
         (db x)
         (label x))))
-  (bytevector 101 2))  ; TODO: should be 101 102
+  (bytevector 101 102))
