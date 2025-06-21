@@ -31,3 +31,8 @@
 (check (equal? (u16 #x0000 #'x) #x0000))
 (check (equal? (u16 #xffff #'x) #xffff))
 (check (raises (u16 #x10000 #'x)))
+
+(check (s8? -128))
+(check (s8? 127))
+(check (not (s8? -129)))
+(check (not (s8? 128)))

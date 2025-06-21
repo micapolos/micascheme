@@ -91,7 +91,7 @@
         typed void type boolean integer char string function lambda
         db-binary dw-binary binary-append binary->bytevector
         bytevector asm-binary block label db dw org let local
-        u2 u3 u8 u16)
+        u2 u3 u8 u16 s8)
       ((typed typ expr)
         (typed (syntax->expr $lookup #'type #'typ) #'expr))
       (void (typed #'type #'void))
@@ -199,6 +199,8 @@
         (typed #'integer #`(u8 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
       ((u16 expr)
         (typed #'integer #`(u16 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+      ((s8 expr)
+        (typed #'integer #`(s8 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
       ((fn arg ...)
         (lets
           ((typed $type $expr) (syntax->typed $lookup #'fn))

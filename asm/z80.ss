@@ -454,7 +454,7 @@
     ((jp (hl))         (db #xe9))
     ((jp (ix))         (db #xdd #xe9))
     ((jp (iy))         (db #xfd #xe9))
-    ((djnz e)          (local (db #x10) (db (iand (- e _djnz) #xff)) (label _djnz)))
+    ((djnz nn)         (local (db #x10) (db (iand (s8 (- nn _djnz)) #xff)) (label _djnz)))
 
     ; Jump (argument)
     ((jp nz nm)        (db #b11000010) (dw nm))

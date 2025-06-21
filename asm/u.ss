@@ -3,7 +3,8 @@
     u2? u2
     u3? u3
     u8? u8
-    u16? u16)
+    u16? u16
+    s8? s8)
   (import (micascheme))
 
   (define (u2? $obj)
@@ -17,6 +18,9 @@
 
   (define (u16? $obj)
     (and (integer? $obj) (>= $obj #x0000) (<= $obj #xffff)))
+
+  (define (s8? $obj)
+    (and (integer? $obj) (>= $obj -128) (<= $obj 127)))
 
   (define (u2 $obj $syntax)
     (switch $obj
@@ -45,4 +49,11 @@
       ((else $other)
         (syntax-error $syntax
           (format "expected u16, got ~s, in" $other)))))
+
+  (define (s8 $obj $syntax)
+    (switch $obj
+      ((s8? $s8) $s8)
+      ((else $other)
+        (syntax-error $syntax
+          (format "expected s8, got ~s, in" $other)))))
 )

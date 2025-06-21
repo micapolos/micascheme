@@ -13,7 +13,7 @@
     (import (only (micascheme) string let lambda syntax binary-append binary->bytevector keywords define-keywords))
     (import (only (asm block) block))
     (import (only (asm binary) db-binary dw-binary))
-    (import (only (asm u) u2 u3 u8 u16))
+    (import (only (asm u) u2 u3 u8 u16 s8))
     (import (asm core))
     (import (only (asm typed) void type boolean integer char function typed asm-binary label db dw binary assembly define-asm local)))
 
