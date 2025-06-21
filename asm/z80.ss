@@ -454,6 +454,7 @@
     ((jp (hl))         (db #xe9))
     ((jp (ix))         (db #xdd #xe9))
     ((jp (iy))         (db #xfd #xe9))
+    ((djnz e)          (local (db #x10) (db (iand (- e _djnz) #xff)) (label _djnz)))
 
     ; Jump (argument)
     ((jp nz nm)        (db #b11000010) (dw nm))
@@ -500,15 +501,4 @@
     ((rst #x28)        (db #b11101111))
     ((rst #x30)        (db #b11110111))
     ((rst #x38)        (db #b11111111)))
-
-  (define-typed (djnz $lookup $syntax)
-    (syntax-case $syntax ()
-      ((_ e)
-        (lets
-          ($tmp (generate-temporary #'loop))
-          (syntax->typed $lookup
-            #`(block
-              (db #x10)
-              (db (iand (- e #,$tmp) #xff))
-              (label #,$tmp)))))))
 )
