@@ -2,6 +2,7 @@
   (export
     define-asm
     syntax->asm
+    asm-blob
     asm-bytevector)
   (import
     (micascheme)
@@ -29,16 +30,27 @@
           (syntax-error $identifier "undefined asm"))
         $lookup $syntax)))
 
-  (define-syntax (asm-bytevector $syntax $lookup)
+  (define-syntax (asm-blob $syntax $lookup)
     (syntax-case $syntax ()
       ((_ asm ...)
-        #`(binary->bytevector
-          #,(syntax->expr $lookup #'binary
-            (block-binary-syntax
-              (fold-left
-                (lambda ($block $asm)
-                  ((syntax->asm $lookup $asm) $block))
-                (empty-block)
-                #'(asm ...))
-              0))))))
+        (lets
+          ($block
+            (fold-left
+              (lambda ($block $asm)
+                ((syntax->asm $lookup $asm) $block))
+              (empty-block)
+              #'(asm ...)))
+          #`(blob-with ($port #,(block-size $block))
+            (put-binary $port
+              #,(syntax->expr $lookup #'binary
+                (block-binary-syntax
+                  (fold-left
+                    (lambda ($block $asm)
+                      ((syntax->asm $lookup $asm) $block))
+                    (empty-block)
+                    #'(asm ...))
+                  0))))))))
+
+  (define-rule-syntax (asm-bytevector asm ...)
+    (blob->bytevector (asm-blob asm ...)))
 )
