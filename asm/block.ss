@@ -8,10 +8,7 @@
     block+label block+binary-syntax-proc block+local)
   (import
     (micascheme)
-    (asm binary)
-    (rename
-      (only (asm std) +)
-      (+ %+)))
+    (asm binary))
 
   (data (block size labels binary-syntax-procs))
 
@@ -33,22 +30,20 @@
     (block+binary-syntax-proc
       $block
       (block-size $local-block)
-      (lambda ($org-syntax)
-        #`(let
-          (($org
-            (%+ #,$org-syntax #,(literal->syntax (block-size $block)))))
-          #,(block-binary-syntax $local-block #'$org)))))
+      (lambda ($org)
+        (block-binary-syntax $local-block
+          (+ (block-size $block) $org)))))
 
   (define (block-apply $block $fn)
     ($fn $block))
 
-  (define (block-binary-syntax $block $org-syntax)
+  (define (block-binary-syntax $block $org)
     #`(let
       (#,@(map-with
         ($label (reverse (block-labels $block)))
-        #`(#,(car $label) (%+ #,$org-syntax #,(literal->syntax (cdr $label))))))
+        #`(#,(car $label) #,(literal->syntax (+ $org (cdr $label))))))
       (binary-append
         #,@(map
-          (lambda ($binary-syntax-proc) ($binary-syntax-proc $org-syntax))
+          (lambda ($binary-syntax-proc) ($binary-syntax-proc $org))
           (reverse (block-binary-syntax-procs $block))))))
 )
