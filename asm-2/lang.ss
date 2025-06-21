@@ -10,12 +10,12 @@
     (rename (micascheme) (define %define))
     (asm-2 typed))
   (export
-    (import (only (micascheme) string let lambda syntax binary-append binary->bytevector))
+    (import (only (micascheme) string let lambda syntax binary-append binary->bytevector keywords))
     (import (only (asm-2 block) block))
     (import (only (asm-2 binary) db-binary dw-binary))
     (import (only (asm-2 u) u2 u3 u8 u16))
     (import (asm-2 core))
-    (import (only (asm-2 typed) void type boolean integer char function typed asm-binary label db dw binary assembly)))
+    (import (only (asm-2 typed) void type boolean integer char function typed asm-binary label db dw binary assembly define-asm)))
 
   (define-syntax (define $syntax $lookup)
     (syntax-case $syntax (typed)

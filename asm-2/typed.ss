@@ -6,7 +6,7 @@
     binary
     typed typed-type typed-value
     syntax->typed syntax->typed-noexpand syntax->expr
-    define-typed
+    define-typed define-asm
     type=? asm-binary
     db-block-function dw-block-function label-block-function block-function-append assembly)
   (import
@@ -14,7 +14,8 @@
     (syntax lookup)
     (asm-2 u)
     (asm-2 block)
-    (asm-2 binary))
+    (asm-2 binary)
+    (asm-2 identifier))
 
   (data (typed type value))
 
@@ -205,11 +206,6 @@
             (_
               (syntax-error #'fn "not an function")))))))
 
-  (define (syntax->identifier? $syntax)
-    (syntax-case? $syntax ()
-      (id (identifier? #'id) #'id)
-      ((id . rest) (identifier? #'id) #'id)))
-
   (define (syntax->expr $lookup $expected-type $syntax)
     (lets
       ((typed $type $expr) (syntax->typed $lookup $syntax))
@@ -233,4 +229,21 @@
     `(typed
       ,(syntax->datum (typed-type $typed))
       ,(syntax->datum (typed-value $typed))))
+
+  (define-syntax (define-asm $syntax)
+    (syntax-case $syntax (keywords)
+      ((_ (keywords keyword ...) clause ...)
+        #`(begin
+          #,@(map-with
+            ($group (group-by syntax-clause-id free-identifier=? #'(clause ...)))
+            (lets
+              ((pair $id $clauses) $group)
+              #`(define-typed (#,$id $lookup $syntax)
+                (syntax-case $syntax (keyword ...)
+                  #,@(map-with ($clause $clauses)
+                    (syntax-case $clause ()
+                      ((pattern body ...)
+                        #`(pattern (syntax->typed $lookup #'(block body ...))))))))))))
+      ((_ clause ...)
+        #`(define-asm (keywords) clause ...))))
 )

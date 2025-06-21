@@ -33,6 +33,11 @@
 (define-typed string-length (typed (function (string) integer) %string-length))
 (define-typed bytevector (typed (function integer bytevector) %bytevector))
 
+(define-asm (keywords a b)
+  ((ld a a) (db 10))
+  ((ld a n) (db 20) (db n))
+  ((ret) (db 255)))
+
 (check-typed type (typed type type))
 
 (check-typed void (typed type void))
@@ -161,3 +166,17 @@
       (binary-append
         (db-binary 10 #'10)
         (db-binary (%- end start) #'(- end start))))))
+
+(check-typed
+  (asm-binary
+    (org 100)
+    (ld a a)
+    (ld a 100)
+    (ret))
+  (typed binary
+    (let ()
+      (binary-append
+        (db-binary 10 #'10)
+        (db-binary 20 #'20)
+        (db-binary 100 #'100)
+        (db-binary 255 #'255)))))
