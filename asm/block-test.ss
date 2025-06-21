@@ -1,12 +1,10 @@
 (import (micascheme) (asm typed) (asm block) (syntax lookup))
 
 (define-rules-syntax (literals org)
-  ((check-block (org $org) block stx)
+  ((check-block (org $org-identifier) block stx)
     (check-datum=?
-      (block-binary-syntax block $org)
-      'stx))
-  ((check-block . args)
-    (check-block (org 0) . args)))
+      (block-binary-syntax block #'$org-identifier)
+      'stx)))
 
 (check-block (org 100)
   (block
@@ -15,13 +13,11 @@
       (cons #'a 10)
       (cons #'b 20))
     (stack
-      (lambda ($org) #`(db-binary a))
-      (lambda ($org) #`(db-binary b))))
+      (lambda ($org-identifier) #`(db-binary a))
+      (lambda ($org-identifier) #`(db-binary b))))
   (let
-    ((a 110) (b 120))
-    (binary-append
-      (db-binary a)
-      (db-binary b))))
+    ((a (%+ 100 10)) (b (%+ 100 20)))
+    (binary-append (db-binary a) (db-binary b))))
 
 (check-block (org 100)
   (fluent (empty-block)
@@ -35,8 +31,10 @@
     (block+binary-syntax-proc 2 (lambda ($org) #'(post-op)))
     (block+label #'end))
   (let
-    ((pre 100) (post 105) (end 107))
+    ((pre (%+ 100 0)) (post (%+ 100 5)) (end (%+ 100 7)))
     (binary-append
       (pre-op)
-      (let ((local 102)) (binary-append (local-op)))
+      (let (($org (%+ 100 2)))
+        (let ((local (%+ $org 0)))
+          (binary-append (local-op))))
       (post-op))))

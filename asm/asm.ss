@@ -62,7 +62,7 @@
 
   (define-syntax (asm-blob $syntax $lookup)
     (syntax-case $syntax (org)
-      ((_ (org $org) asm ...)
+      ((_ (org $org-syntax) asm ...)
         (lets
           ($block
             (fold-left
@@ -74,7 +74,7 @@
               #,(syntax->expr $lookup #'binary
                 (block-binary-syntax
                   (app (syntaxes->asm $lookup #'(asm ...)) (empty-block))
-                  (datum $org)))))))
+                  #'$org-syntax))))))
       ((_ asm ...)
         #`(asm-blob (org 0) asm ...))))
 
