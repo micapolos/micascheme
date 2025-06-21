@@ -1,7 +1,9 @@
 (library (asm asm)
   (export
     define-asm
+    define-ops
     syntax->asm
+    syntaxes->asm
     asm-blob
     asm-bytevector
     org)
@@ -21,6 +23,23 @@
       (and (identifier? #'$lookup) (identifier? #'$syntax))
       (define-asm id (lambda ($lookup $syntax) body))))
 
+  (define-syntax (define-ops $syntax)
+    (syntax-case $syntax (keywords)
+      ((_ (keywords keyword ...) clause ...)
+        #`(begin
+          #,@(map-with
+            ($group (group-by syntax-clause-id free-identifier=? #'(clause ...)))
+            (lets
+              ((pair $id $clauses) $group)
+              #`(define-asm (#,$id $lookup $syntax)
+                (syntax-case $syntax (keyword ...)
+                  #,@(map-with ($clause $clauses)
+                    (syntax-case $clause ()
+                      ((pattern body ...)
+                        #`(pattern (syntaxes->asm $lookup (list #'body ...))))))))))))
+      ((_ clause ...)
+        #`(define-ops (keywords) clause ...))))
+
   (meta define (syntax->asm $lookup $syntax)
     (lets
       ($identifier
@@ -33,25 +52,27 @@
           (syntax-error $identifier "undefined asm"))
         $lookup $syntax)))
 
+  (meta define (syntaxes->asm $lookup $syntaxes)
+    (lambda ($block)
+      (fold-left
+        (lambda ($block $asm) ($asm $block))
+        $block
+        (map (partial syntax->asm $lookup) $syntaxes))))
+
   (define-syntax (asm-blob $syntax $lookup)
     (syntax-case $syntax (org)
       ((_ (org $org) asm ...)
         (lets
           ($block
             (fold-left
-              (lambda ($block $asm)
-                ((syntax->asm $lookup $asm) $block))
+              (lambda ($block $asm) ((syntax->asm $lookup $asm) $block))
               (empty-block)
               #'(asm ...)))
           #`(blob-with ($port #,(block-size $block))
             (put-binary $port
               #,(syntax->expr $lookup #'binary
                 (block-binary-syntax
-                  (fold-left
-                    (lambda ($block $asm)
-                      ((syntax->asm $lookup $asm) $block))
-                    (empty-block)
-                    #'(asm ...))
+                  (app (syntaxes->asm $lookup #'(asm ...)) (empty-block))
                   (datum $org)))))))
       ((_ asm ...)
         #`(asm-blob (org 0) asm ...))))

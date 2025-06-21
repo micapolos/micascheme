@@ -24,6 +24,10 @@
       (lambda ($block)
         (block+label $block #'x)))))
 
+(define-ops
+  ((ret) (db #xc9))
+  ((jp nn) (db #xff) (dw nn)))
+
 (check
   (equal?
     (asm-bytevector)
@@ -53,3 +57,12 @@
   (equal?
     (asm-bytevector (org 100) (label begin) (db begin) (db end) (label end))
     (bytevector 100 102)))
+
+(check
+  (equal?
+    (asm-bytevector
+      (org #x20)
+      (label loop)
+      (jp loop)
+      (ret))
+    (bytevector #xff #x20 0 #Xc9)))
