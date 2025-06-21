@@ -35,7 +35,7 @@
 
 (define-asm (keywords a b)
   ((ld a a) (db 10))
-  ((ld a n) (db 20) (db n))
+  ((ld a n) (db 20 n))
   ((ret) (db 255)))
 
 (check-typed type (typed type type))
@@ -149,7 +149,9 @@
   (binary->bytevector (db-binary 1))
   (typed bytevector (binary->bytevector (db-binary 1 #'1))))
 
+(check-assembly (db 1))
 (check-assembly (db (+ 1 2)))
+(check-assembly (db 1 2 3))
 (check-assembly (dw (+ 1 2)))
 (check-assembly (label x))
 (check-assembly (block (db 0) (label x) (db x)))

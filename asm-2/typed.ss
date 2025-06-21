@@ -20,15 +20,21 @@
 
   (define-keywords type boolean integer char function asm-binary label db dw assembly)
 
-  (define-rule-syntax (db-block-function expr)
+  (define (db-block-function $exprs)
     (lambda ($block)
-      (block+binary-syntax $block 1
-        #'(db-binary expr))))
+      (fold-left
+        (lambda ($block $expr)
+          (block+binary-syntax $block 1 #`(db-binary #,$expr)))
+        $block
+        $exprs)))
 
-  (define-rule-syntax (dw-block-function expr)
+  (define (dw-block-function $exprs)
     (lambda ($block)
-      (block+binary-syntax $block 2
-        #'(dw-binary expr))))
+      (fold-left
+        (lambda ($block $expr)
+          (block+binary-syntax $block 2 #`(dw-binary #,$expr)))
+        $block
+        $exprs)))
 
   (define-rule-syntax (label-block-function label)
     (lambda ($block)
@@ -176,10 +182,10 @@
       ((label id)
         (identifier? #'id)
         (typed #'assembly (label-block-function id)))
-      ((db expr)
-        (typed #'assembly (db-block-function expr)))
-      ((dw expr)
-        (typed #'assembly (dw-block-function expr)))
+      ((db expr ...)
+        (typed #'assembly (db-block-function #'(expr ...))))
+      ((dw expr ...)
+        (typed #'assembly (dw-block-function #'(expr ...))))
       ((u2 expr)
         (typed #'integer #`(u2 #,(syntax->expr $lookup #'integer #'expr) #'expr)))
       ((u3 expr)
