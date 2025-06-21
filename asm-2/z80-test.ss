@@ -1,7 +1,7 @@
 (import
   (only (micascheme) define-rule-syntax ...)
   (asm-2 lang)
-  (asm-2 std)
+  (only (asm-2 std) bytevector)
   (asm-2 z80))
 
 (define-rule-syntax (check-op op u8 ...)
