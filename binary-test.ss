@@ -28,3 +28,7 @@
     (u8-binary #x10)
     (u16-binary #x3020 'little))
   (bytevector #x10 #x20 #x30))
+
+(check-binary
+  (fill-binary 4 12)
+  (bytevector 12 12 12 12))

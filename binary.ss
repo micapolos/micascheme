@@ -4,6 +4,8 @@
     put-binary
     binary-append
     binary->bytevector
+    fill-binary
+    zero-binary
     u8-binary
     u16-binary
     bytevector-binary
@@ -30,6 +32,14 @@
       (for-each
         (partial put-binary $port)
         $binaries)))
+
+  (define (fill-binary $size $u8)
+    (binary ($port)
+      (repeat $size
+        (put-u8 $port $u8))))
+
+  (define (zero-binary $size)
+    (fill-binary $size 0))
 
   (define (u8-binary $u8)
     (binary ($port)

@@ -4,8 +4,9 @@
     block-size block-labels block-binary-syntax-procs
     block-with-size block-with-labels block-with-binary-syntax-procs
     empty-block
-    block-apply block-binary-syntax
-    block+label block+binary-syntax-proc block+local)
+    block-binary-syntax
+    block+label block+binary-syntax-proc block+local
+    block+zeroes)
   (import
     (micascheme)
     (asm binary))
@@ -34,8 +35,14 @@
         (block-binary-syntax $local-block
           (+ (block-size $block) $org)))))
 
-  (define (block-apply $block $fn)
-    ($fn $block))
+  (define (block+zeroes $block $size)
+    (block+binary-syntax-proc $block $size
+      (lambda ($org)
+        #`(zero-binary #,(literal->syntax $size)))))
+
+  (define (block-align $block $alignment)
+    (block+zeroes $block
+      (bitwise-align (block-size $block) $alignment)))
 
   (define (block-binary-syntax $block $org)
     #`(let

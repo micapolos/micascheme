@@ -128,6 +128,10 @@
 (check-typed (u16 (+ 1 2)) (typed integer (u16 (%+ 1 2) #'(+ 1 2))))
 
 (check-typed
+  (zero-binary 123)
+  (typed binary (zero-binary 123)))
+
+(check-typed
   (db-binary (+ 1 2))
   (typed binary (db-binary (%+ 1 2) #'(+ 1 2))))
 
