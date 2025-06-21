@@ -143,7 +143,7 @@
   (define (syntax-selector $syntax)
     (syntax-case-opt $syntax ()
       ($id (identifier? #'$id) #'$id)
-      (($id $arg ...) (identifier? #'$id) #'$id)))
+      (($id . _) (identifier? #'$id) #'$id)))
 
   (define (syntax-pattern-id $pattern)
     (or
