@@ -10,7 +10,7 @@
     (rename (micascheme) (define %define))
     (asm typed))
   (export
-    (import (only (micascheme) string let lambda syntax binary-append binary->bytevector keywords define-keywords))
+    (import (only (micascheme) string let lambda syntax binary-append binary->bytevector keywords define-keywords ...))
     (import (only (asm binary) db-binary dw-binary))
     (import (only (asm u) u2 u3 u8 u16 s8))
     (import (asm core))

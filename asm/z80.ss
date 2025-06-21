@@ -23,7 +23,9 @@
     jp djnz
     call ret reti retn rst
 
-    daa cpl ccf scf nop halt di ei im)
+    daa cpl ccf scf nop halt di ei im
+
+    loop-djnz loop-jp)
 
   (import
     (asm lang)
@@ -504,4 +506,16 @@
     ((rst #x28)        (db #b11101111))
     ((rst #x30)        (db #b11110111))
     ((rst #x38)        (db #b11111111)))
+
+  (define-asm-rules
+    ((loop-djnz body ...)
+      (local
+        (label loop-djnz-m8d4qeb8qqhh3nfolwvr1kr50)
+        body ...
+        (djnz loop-djnz-m8d4qeb8qqhh3nfolwvr1kr50)))
+    ((loop-jp body ...)
+      (local
+        (label loop-jp-m8d4qeb8qqhh3nfolwvr1kr50)
+        body ...
+        (jp loop-jp-m8d4qeb8qqhh3nfolwvr1kr50))))
 )
