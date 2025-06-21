@@ -125,7 +125,7 @@
       (str
         (string? (datum str))
         (typed #'string #'str))
-      ((lambda ((typ id) ...) body)
+      ((lambda ((id typ) ...) body)
         (for-all identifier? #'(id ...))
         (lets
           ($types (map (partial syntax->expr $lookup #'type) #'(typ ...)))

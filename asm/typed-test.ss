@@ -79,25 +79,25 @@
     (lambda () "foo")))
 
 (check-typed
-  (lambda ((integer i) (string s)) i)
+  (lambda ((i integer) (s string)) i)
   (typed
     (function (integer string) integer)
     (lambda (i s) i)))
 
 (check-typed
-  (lambda ((integer i) (string s)) s)
+  (lambda ((i integer) (s string)) s)
   (typed
     (function (integer string) string)
     (lambda (i s) s)))
 
 (check-typed
-  (lambda ((string s)) (string-length s))
+  (lambda ((s string)) (string-length s))
   (typed
     (function (string) integer)
     (lambda (s) (%string-length s))))
 
 (check-typed
-  ((lambda ((string s)) (string-length s)) "foo")
+  ((lambda ((s string)) (string-length s)) "foo")
   (typed
     integer
     ((lambda (s) (%string-length s)) "foo")))

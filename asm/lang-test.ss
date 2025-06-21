@@ -2,8 +2,8 @@
 
 (define zero 0)
 (define one 1)
-(define exclamate (lambda ((string s)) (string-append s "!")))
-(define (increment (integer i)) (+ i one))
+(define exclamate (lambda ((s string)) (string-append s "!")))
+(define (increment (i integer)) (+ i one))
 
 (check-asm (typed string "foo") "foo")
 
