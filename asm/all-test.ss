@@ -7,4 +7,5 @@
   (asm typed)
   (asm std)
   (asm lang)
-  (asm z80))
+  (asm z80)
+  (asm asm))
