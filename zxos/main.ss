@@ -21,7 +21,13 @@
   (ld a #b00100111)
   (call mem-fill)
 
+  (mmu 0 #xff)
+  (mmu 1 #xff)
+
   (jp debug-bars)
+
+  (ld a 76)
+  (rst #x10)
 
   (import
     (mem fill)

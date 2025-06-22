@@ -10,7 +10,8 @@
       (asm z80)
       (asm run)
       (asm asm)
-      (asm asm-core)))
+      (asm asm-core)
+      (zxos mmu)))
 
   (define-rule-syntax (zxos body ...)
     (asm-run

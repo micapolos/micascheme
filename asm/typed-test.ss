@@ -122,10 +122,11 @@
   (bytevector 1 2 (+ 3 4))
   (typed bytevector (%bytevector 1 2 (%+ 3 4))))
 
-(check-typed (u2 (+ 1 2)) (typed integer (u2 (%+ 1 2) #'(+ 1 2))))
-(check-typed (u3 (+ 1 2)) (typed integer (u3 (%+ 1 2) #'(+ 1 2))))
-(check-typed (u8 (+ 1 2)) (typed integer (u8 (%+ 1 2) #'(+ 1 2))))
-(check-typed (u16 (+ 1 2)) (typed integer (u16 (%+ 1 2) #'(+ 1 2))))
+(check-typed (u2 (+ 1 2)) (typed integer (u2 (%+ 1 2) (+ 1 2))))
+(check-typed (u3 (+ 1 2)) (typed integer (u3 (%+ 1 2) (+ 1 2))))
+(check-typed (u8 (+ 1 2)) (typed integer (u8 (%+ 1 2) (+ 1 2))))
+(check-typed (u16 (+ 1 2)) (typed integer (u16 (%+ 1 2) (+ 1 2))))
+(check-typed (s8 (+ 1 2)) (typed integer (s8 (%+ 1 2) (+ 1 2))))
 
 (check-typed
   (zero-binary 123)
