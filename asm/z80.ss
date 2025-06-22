@@ -28,7 +28,8 @@
     cpd cpdr cpi cpir ldd lddr ldi ldir
     nextreg
 
-    loop-djnz loop proc data)
+    loop-djnz loop proc data
+    input output)
 
   (import
     (asm lang)
@@ -542,7 +543,9 @@
     ((nextreg n n2)     (db #xed #x91 n n2))
   )
 
-  (define-asm-rules
+  (define-keywords input output)
+
+  (define-asm-rules (keywords input output)
     ((loop-djnz body ...)
       (local
         (label __loop)
@@ -553,6 +556,15 @@
         (label __loop)
         body ...
         (jp __loop)))
+    ((proc id (input input-body ...) (output output-body ...) body ...)
+      (label id)
+      (local body ...))
+    ((proc id (input input-body ...) body ...)
+      (label id)
+      (local body ...))
+    ((proc id (output output-body ...) body ...)
+      (label id)
+      (local body ...))
     ((proc id body ...)
       (label id)
       (local body ...))
