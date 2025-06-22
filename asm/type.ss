@@ -2,6 +2,8 @@
   (export
     primitive-type primitive-type? primitive-type-gensym primitive-type-datum
     function-type function-type? function-type-parameter-types function-type-result-type
+    for-all-type for-all-type? for-all-type-arity for-all-type-referenced-type
+    variable-type variable-type? variable-type-index
     type->syntax
     type->datum
     type=?
@@ -12,6 +14,8 @@
 
   (data (primitive-type gensym datum))
   (data (function-type parameter-types result-type))
+  (data (for-all-type arity referenced-type))
+  (data (variable-type index))
 
   (define (type->syntax $type)
     (switch-exhaustive $type
