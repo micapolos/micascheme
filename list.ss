@@ -32,6 +32,8 @@
     fold-left?
     fold-left*
     map*
+    map**
+    for-all*
 
     acc-split
     split
@@ -350,6 +352,32 @@
         (cons
           (apply $proc (car $list) (map car $lists))
           (apply map* $proc $proc* (cdr $list) (map cdr $lists))))
+      (else
+        (apply $proc* $list $lists))))
+
+  ; works lists and improper lists
+  (define (for-all* $proc $list . $lists)
+    (cond
+      ((and (null? $list) (for-all null? $lists))
+        #t)
+      ((and (pair? $list) (for-all pair? $lists))
+        (and
+          (apply $proc (car $list) (map car $lists))
+          (apply for-all* $proc (cdr $list) (map cdr $lists))))
+      (else
+        (and
+          (not (null? $list))
+          (not (pair? $list))
+          (not (exists null? $lists))
+          (not (exists pair? $lists))
+          (apply $proc $list $lists)))))
+
+  (define (map** $proc $proc* $list . $lists)
+    (cond
+      ((pair? $list)
+        (cons
+          (apply $proc (car $list) (map car $lists))
+          (apply map** $proc $proc* (cdr $list) (map cdr $lists))))
       (else
         (apply $proc* $list $lists))))
 

@@ -493,3 +493,73 @@
 (check (equal? (?list->list? '(1 2 3)) '(1 2 3)))
 (check (equal? (?list->list? '(1 #f 3)) #f))
 
+; === for-all*
+
+(check
+  (for-all*
+    (lambda (a b c) (and a b c))
+    (list)
+    (list)
+    (list)))
+
+(check
+  (for-all*
+    (lambda (a b c) (and a b c))
+    (list #t #t #t)
+    (list #t #t #t)
+    (list #t #t #t)))
+
+(check
+  (for-all*
+    (lambda (a b c) (and a b c))
+    (list* #t)
+    (list* #t)
+    (list* #t)))
+
+(check
+  (for-all*
+    (lambda (a b c) (and a b c))
+    (list* #t #t #t)
+    (list* #t #t #t)
+    (list* #t #t #t)))
+
+(check
+  (not
+    (for-all*
+      (lambda (a b c) (and a b c))
+      (list* #t #t #t)
+      (list* #t #f #t)
+      (list* #t #t #t))))
+
+(check
+  (not
+    (for-all*
+      (lambda ($item . $items) (and $item (for-all identity $items)))
+      (list #t #t #t)
+      (list #t #t #t #t)
+      (list #t #t #t))))
+
+(check
+  (not
+    (for-all*
+      (lambda ($item . $items) (and $item (for-all identity $items)))
+      (list #t #t #t)
+      (list* #t #t #t)
+      (list #t #t #t))))
+
+(check
+  (not
+    (for-all*
+      (lambda ($item . $items) (and $item (for-all identity $items)))
+      (list* #t #t #t)
+      (list* #t #f #t)
+      (list* #t #t #t))))
+
+(check
+  (not
+    (for-all*
+      (lambda ($item . $items) (and $item (for-all identity $items)))
+      (list* #t #t #t)
+      (list* #t #f #f)
+      (list* #t #t #t))))
+
