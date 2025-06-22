@@ -24,21 +24,20 @@
   (mmu 0 #xff)
   (mmu 1 #xff)
 
-  (ld a (char->integer #\H))
+  (ld hl hi-string)
   (ld de #x4000)
-  (call ula-blit-char)
-
-  (ld a (char->integer #\i))
-  (ld de #x4001)
-  (call ula-blit-char)
-
-  (ld a (char->integer #\!))
-  (ld de #x4002)
-  (call ula-blit-char)
+  (call ula-blit-string)
 
   (jp debug-bars)
+
+  (data hi-string
+    (db
+      (char->integer #\H)
+      (char->integer #\i)
+      (char->integer #\!)
+      0))
 
   (import
     (mem fill)
     (debug bars)
-    (ula blit-char)))
+    (ula blit string)))

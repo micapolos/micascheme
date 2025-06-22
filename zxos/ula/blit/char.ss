@@ -1,5 +1,7 @@
 (proc ula-blit-char
-  (input (a char) (de dst))
+  (input
+    (a char)
+    (de dst))
   (sub #x20)
   (ld h 0)
   (ld l a)
