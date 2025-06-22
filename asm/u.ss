@@ -7,68 +7,35 @@
     s8? s8)
   (import (micascheme))
 
-  (define (u2? $obj)
-    (and (integer? $obj) (>= $obj #b00) (<= $obj #b11)))
+  (define-case-syntax (define-integer sign bits)
+    (lets
+      ($signed? (syntax-case #'sign (u s) (u #f) (s #t)))
+      ($bits (datum bits))
+      ($size (bitwise-arithmetic-shift-left 1 $bits))
+      ($min (if $signed? (- (bitwise-arithmetic-shift-right $size 1)) 0))
+      ($max (+ $min $size))
+      ($bits-id (literal->syntax (string->symbol (number->string $bits))))
+      ($id (identifier-append #'sign #'sign $bits-id))
+      ($id? (identifier-append #'sign $id #'?))
+      #`(begin
+        (define (#,$id? $obj)
+          (and
+            (integer? $obj)
+            (>= $obj #,(literal->syntax $min))
+            (< $obj #,(literal->syntax $max))))
+        (define-rules-syntax
+          ((#,$id obj)
+            (#,$id obj obj))
+          ((#,$id obj stx)
+            (switch obj
+              ((#,$id? $match) $match)
+              ((else $mismatch)
+                (syntax-error #'stx
+                  (format "~s is not ~s, in" $mismatch '#,$id)))))))))
 
-  (define (u3? $obj)
-    (and (integer? $obj) (>= $obj #b000) (<= $obj #b111)))
-
-  (define (u8? $obj)
-    (and (integer? $obj) (>= $obj #x00) (<= $obj #xff)))
-
-  (define (u16? $obj)
-    (and (integer? $obj) (>= $obj #x0000) (<= $obj #xffff)))
-
-  (define (s8? $obj)
-    (and (integer? $obj) (>= $obj -128) (<= $obj 127)))
-
-  (define-rules-syntax
-    ((u2 obj)
-      (u2 obj #'obj))
-    ((u2 obj stx)
-      (switch obj
-        ((u2? $u2) $u2)
-        ((else $other)
-          (syntax-error #'stx
-            (format "invalid value ~s, expected u2, in" $other))))))
-
-  (define-rules-syntax
-    ((u3 obj)
-      (u3 obj #'obj))
-    ((u3 obj stx)
-      (switch obj
-        ((u3? $u3) $u3)
-        ((else $other)
-          (syntax-error #'stx
-            (format "invalid value ~s, expected u3, in" $other))))))
-
-  (define-rules-syntax
-    ((u8 obj)
-      (u8 obj #'obj))
-    ((u8 obj stx)
-      (switch obj
-        ((u8? $u8) $u8)
-        ((else $other)
-          (syntax-error #'stx
-            (format "invalid value ~s, expected u8, in" $other))))))
-
-  (define-rules-syntax
-    ((u16 obj)
-      (u16 obj #'obj))
-    ((u16 obj stx)
-      (switch obj
-        ((u16? $u16) $u16)
-        ((else $other)
-          (syntax-error #'stx
-            (format "invalid value ~s, expected u16, in" $other))))))
-
-  (define-rules-syntax
-    ((s8 obj)
-      (s8 obj #'obj))
-    ((s8 obj stx)
-      (switch obj
-        ((s8? $s8) $s8)
-        ((else $other)
-          (syntax-error #'stx
-            (format "invalid value ~s, expected s8, in" $other))))))
+  (define-integer u 2)
+  (define-integer u 3)
+  (define-integer u 8)
+  (define-integer u 16)
+  (define-integer s 8)
 )
