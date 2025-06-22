@@ -1,4 +1,4 @@
-(proc bars
+(proc debug-bars
   (ld a #b010)
   (ld b 0)
   (loop

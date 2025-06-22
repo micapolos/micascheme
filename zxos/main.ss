@@ -21,9 +21,9 @@
   (ld a #b00100111)
   (call mem-fill)
 
-  (jp bars)
+  (jp debug-bars)
 
   (import
-    (zxos mem)
-    (zxos bars)))
+    (zxos mem fill)
+    (zxos debug bars)))
 
