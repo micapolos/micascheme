@@ -1,4 +1,4 @@
-(library (zxos lang)
+(library (zxos)
   (export zxos)
   (import
     (micascheme)

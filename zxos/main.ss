@@ -1,4 +1,4 @@
-(import (zxos lang))
+(import (zxos))
 
 (zxos
   (ld de #x4000)
