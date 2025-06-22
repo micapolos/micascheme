@@ -25,7 +25,7 @@
 
     daa cpl ccf scf nop halt di ei im
 
-    loop-djnz loop)
+    loop-djnz loop proc data)
 
   (import
     (asm lang)
@@ -510,12 +510,18 @@
   (define-asm-rules
     ((loop-djnz body ...)
       (local
-        (label loop-djnz-m8d4qeb8qqhh3nfolwvr1kr50)
+        (label __loop)
         body ...
-        (djnz loop-djnz-m8d4qeb8qqhh3nfolwvr1kr50)))
+        (djnz __loop)))
     ((loop body ...)
       (local
-        (label loop-jp-m8d4qeb8qqhh3nfolwvr1kr50)
+        (label __loop)
         body ...
-        (jp loop-jp-m8d4qeb8qqhh3nfolwvr1kr50))))
+        (jp __loop)))
+    ((proc id body ...)
+      (label id)
+      (local body ...))
+    ((data id body ...)
+      (label id)
+      (local body ...)))
 )

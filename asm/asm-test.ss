@@ -1,5 +1,5 @@
 (import
-  (micascheme)
+  (rename (micascheme) (include %include))
   (asm asm)
   (asm asm-core))
 

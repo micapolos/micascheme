@@ -309,7 +309,7 @@
         (asm-ops
           (asm-with-imports $asm
             (push (asm-imports $asm) $path))
-          (load-syntax-list $path)))))
+          (load-syntax-list #'+ $path)))))
 
   (define (asm-org1 $asm $arg)
     (asm-with-org $asm (env-eval (asm-env $asm) $arg)))
