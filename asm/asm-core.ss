@@ -1,7 +1,7 @@
 (library (asm asm-core)
-  (export label db dw block local import)
+  (export label db dw block local import reverse)
   (import
-    (rename (micascheme) (import %import))
+    (rename (micascheme) (import %import) (reverse %reverse))
     (asm asm)
     (only (asm block) empty-block block+binary-syntax block+label block-bind block+import)
     (only (asm binary) db-binary dw-binary)
@@ -41,6 +41,13 @@
           ($asm (syntaxes->asm $lookup #'(asm ...)))
           (lambda ($block)
             (block-bind $block (lambda ($block) ($asm $block))))))))
+
+  (define-asm (reverse $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ asm ...)
+        (lets
+          ($asm (syntaxes->asm $lookup (%reverse #'(asm ...))))
+          (lambda ($block) ($asm $block))))))
 
   (define-asm (import $lookup $syntax)
     (syntax-case $syntax ()

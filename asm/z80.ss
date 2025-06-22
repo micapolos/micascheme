@@ -29,7 +29,7 @@
     nextreg
 
     loop-djnz loop proc data
-    input output)
+    input output preserve)
 
   (import
     (asm lang)
@@ -570,5 +570,11 @@
       (local body ...))
     ((data id body ...)
       (label id)
-      (local body ...)))
+      (local body ...))
+    ((preserve (reg ...) body ...)
+      (block (preserve reg (block body ...)) ...))
+    ((preserve reg body ...)
+      (push reg)
+      (block body ...)
+      (pop reg)))
 )
