@@ -5,4 +5,4 @@
   (ld b 0)
   (ld a #b00000010)
   (loop (call step))
-  (include (asm sandbox-step)))
+  (import (asm sandbox-step)))

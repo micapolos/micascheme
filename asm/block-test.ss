@@ -13,7 +13,8 @@
       (cons #'b 120))
     (stack
       #`(db-binary a)
-      #`(db-binary b)))
+      #`(db-binary b))
+    (stack))
   (let
     ((a 110) (b 120))
     (binary-append (db-binary a) (db-binary b))))
