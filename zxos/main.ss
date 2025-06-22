@@ -31,11 +31,7 @@
   (jp debug-bars)
 
   (data hi-string
-    (db
-      (char->integer #\H)
-      (char->integer #\i)
-      (char->integer #\!)
-      0))
+    (db #\H #\i #\! 0))
 
   (import
     (mem fill)

@@ -130,7 +130,12 @@
           #`(zero-binary #,(syntax->expr $lookup #'integer #'expr))))
       ((db-binary expr)
         (typed #'binary
-          #`(db-binary #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+          (lets
+            ((typed $type $value) (syntax->typed $lookup #'expr))
+            (syntax-case $type (integer char)
+              (integer #`(db-binary #,$value #'expr))
+              (char #`(db-binary (char->integer #,$value) #'expr))
+              (_ (syntax-error $type "invalid db type"))))))
       ((dw-binary expr)
         (typed #'binary
           #`(dw-binary #,(syntax->expr $lookup #'integer #'expr) #'expr)))

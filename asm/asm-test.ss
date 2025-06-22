@@ -72,3 +72,8 @@
         (label x))
       (db x))
     (bytevector 101 102 101)))
+
+(check
+  (equal?
+    (asm-bytevector (db #\a))
+    (bytevector 97)))
