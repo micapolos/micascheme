@@ -25,6 +25,9 @@
 
     daa cpl ccf scf nop halt di ei im
 
+    cpd cpdr cpi cpir ldd lddr ldi ldir
+    nextreg
+
     loop-djnz loop proc data)
 
   (import
@@ -170,9 +173,9 @@
     ((ld a (+ iy d))   (db #xfd #b01111110 d))
 
     ((ld (bc) a)       (db #b00000010))
-    ((ld (de) a)       (db #b00000110))
+    ((ld (de) a)       (db #b00010010))
     ((ld a (bc))       (db #b00001010))
-    ((ld a (de))       (db #b00001110))
+    ((ld a (de))       (db #b00011010))
 
     ((ld i a)          (db #xed #b01000111))
     ((ld r a)          (db #xed #b01001111))
@@ -410,6 +413,22 @@
     ((dec iyl)         (db #xfd #b00101101))
     ((dec (+ iy d))    (db #xfd #b00110101 d))
 
+    ; 16-bit arithmetic
+
+    ((inc bc)          (db      #b00000011))
+    ((inc de)          (db      #b00010011))
+    ((inc hl)          (db      #b00100011))
+    ((inc ix)          (db #xdd #b00100011))
+    ((inc iy)          (db #xfd #b00100011))
+    ((inc sp)          (db      #b00110011))
+
+    ((dec bc)          (db      #b00001011))
+    ((dec de)          (db      #b00011011))
+    ((dec hl)          (db      #b00101011))
+    ((dec ix)          (db #xdd #b00101011))
+    ((dec iy)          (db #xfd #b00101011))
+    ((dec sp)          (db      #b00111011))
+
     ; General purpose
     ((daa)             (db #x27))
     ((cpl)             (db #x2f))
@@ -448,6 +467,17 @@
     ((ex (sp) ix)      (db #xdd #xe3))
     ((ex (sp) iy)      (db #xfd #xe3))
     ((exx)             (db #xd9))
+
+    ; Block / transfer
+
+    ((cpd)             (db #xed #xa9))
+    ((cpdr)            (db #xed #xb9))
+    ((cpi)             (db #xed #xa1))
+    ((cpir)            (db #xed #xb1))
+    ((ldd)             (db #xed #xa8))
+    ((lddr)            (db #xed #xb8))
+    ((ldi)             (db #xed #xa0))
+    ((ldir)            (db #xed #xb0))
 
     ; Output
     ((out (n) a)       (db #xd3 n))
@@ -505,7 +535,12 @@
     ((rst #x20)        (db #b11100111))
     ((rst #x28)        (db #b11101111))
     ((rst #x30)        (db #b11110111))
-    ((rst #x38)        (db #b11111111)))
+    ((rst #x38)        (db #b11111111))
+
+    ; Next
+    ((nextreg n a)     (db #xed #x92 n))
+    ((nextreg n n2)     (db #xed #x91 n n2))
+  )
 
   (define-asm-rules
     ((loop-djnz body ...)

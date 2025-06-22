@@ -44,17 +44,20 @@
 
   (define-asm (import $lookup $syntax)
     (syntax-case $syntax ()
-      ((id (path ...))
-        (for-all identifier? #'(path ...))
+      ((id (path ...) ...)
         (lambda ($block)
-          (block+import $block (syntax->datum #'(path ...))
-            (lambda ($block)
-              (lets
-                ($path
-                  (string-append
-                    (apply string-append
-                      (intercalate (map symbol->string (datum (path ...))) "/"))
-                    ".ss"))
-                ($syntaxes (load-syntax-list #'id $path))
-                (app (syntaxes->asm $lookup $syntaxes) $block))))))))
+          (fold-left
+            (lambda ($block $path)
+              (block+import $block (syntax->datum $path)
+                (lambda ($block)
+                  (lets
+                    ($path
+                      (string-append
+                        (apply string-append
+                          (intercalate (map symbol->string (syntax->datum $path)) "/"))
+                        ".ss"))
+                    ($syntaxes (load-syntax-list #'id $path))
+                    (app (syntaxes->asm $lookup $syntaxes) $block)))))
+            $block
+            #'((path ...) ...))))))
 )
