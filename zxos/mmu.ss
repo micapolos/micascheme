@@ -3,6 +3,6 @@
   (import (asm asm) (asm lang) (asm z80) (asm std))
 
   (define-asm-rules (keywords a)
-    ((mmu n a)   (nextreg (+ #x50 (u3 n)) a))
-    ((mmu n m)   (nextreg (+ #x50 (u3 n)) m)))
+    ((mmu slot a)   (nextreg (+ #x50 (u3 slot)) a))
+    ((mmu slot n)   (nextreg (+ #x50 (u3 slot)) n)))
 )
