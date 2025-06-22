@@ -8,7 +8,7 @@
 
   (ld de #x5800)
   (ld bc #x100)
-  (ld a #b01010111)
+  (ld a #b01111010)
   (call mem-fill)
 
   (ld de #x5900)
@@ -24,11 +24,21 @@
   (mmu 0 #xff)
   (mmu 1 #xff)
 
-  (jp debug-bars)
+  (ld a (char->integer #\H))
+  (ld de #x4000)
+  (call ula-blit-char)
 
-  (ld a 76)
-  (rst #x10)
+  (ld a (char->integer #\i))
+  (ld de #x4001)
+  (call ula-blit-char)
+
+  (ld a (char->integer #\!))
+  (ld de #x4002)
+  (call ula-blit-char)
+
+  (jp debug-bars)
 
   (import
     (mem fill)
-    (debug bars)))
+    (debug bars)
+    (ula blit-char)))

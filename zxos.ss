@@ -11,6 +11,7 @@
       (asm run)
       (asm asm)
       (asm asm-core)
+      (asm std)
       (zxos mmu)))
 
   (define-rule-syntax (zxos body ...)

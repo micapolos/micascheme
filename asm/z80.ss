@@ -28,6 +28,8 @@
     cpd cpdr cpi cpir ldd lddr ldi ldir
     nextreg
 
+    rcf
+
     loop-djnz loop proc data
     input output preserve)
 
@@ -415,6 +417,29 @@
     ((dec (+ iy d))    (db #xfd #b00110101 d))
 
     ; 16-bit arithmetic
+    ((add hl bc)       (db #b00001001))
+    ((add hl de)       (db #b00011001))
+    ((add hl hl)       (db #b00101001))
+    ((add hl sp)       (db #b00111001))
+
+    ((add ix bc)       (db #xdd #b00001001))
+    ((add ix de)       (db #xdd #b00011001))
+    ((add ix ix)       (db #xdd #b00101001))
+    ((add ix sp)       (db #xdd #b00111001))
+
+    ((add iy bc)       (db #xfd #b00001001))
+    ((add iy de)       (db #xfd #b00011001))
+    ((add iy iy)       (db #xfd #b00101001))
+    ((add iy sp)       (db #xfd #b00111001))
+
+    ; Next extension
+    ((add hl a)        (db #xed #b00110001))
+    ((add de a)        (db #xed #b00110010))
+    ((add bc a)        (db #xed #b00110011))
+
+    ((add hl nm)       (db #xed #b00110100) (dw nm))
+    ((add de nm)       (db #xed #b00110101) (dw nm))
+    ((add bc nm)       (db #xed #b00110110) (dw nm))
 
     ((inc bc)          (db      #b00000011))
     ((inc de)          (db      #b00010011))
@@ -540,11 +565,14 @@
 
     ; Next
     ((nextreg n a)     (db #xed #x92 n))
-    ((nextreg n n2)     (db #xed #x91 n n2))
+    ((nextreg n n2)    (db #xed #x91 n n2))
   )
 
-  (define-keywords input output)
+  ; Helpers
+  (define-asm-rules
+    ((rcf)             (or a)))
 
+  (define-keywords input output)
   (define-asm-rules (keywords input output)
     ((loop-djnz body ...)
       (local

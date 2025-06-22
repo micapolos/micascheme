@@ -3,7 +3,7 @@
     not
     = boolean=? char=? string=? type=?
     + - >> << iand ior ixor
-    string-append string-length
+    string-append string-length char->integer
     bytevector)
   (import (asm lang))
 
@@ -23,5 +23,6 @@
     (ixor           (function integer integer)               bitwise-xor)
     (string-append  (function string string))
     (string-length  (function (string) integer))
+    (char->integer  (function (char) integer))
     (bytevector     (function integer bytevector)))
 )
