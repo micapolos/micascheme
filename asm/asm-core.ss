@@ -1,9 +1,9 @@
 (library (asm asm-core)
-  (export label db dw block local import reverse)
+  (export label db dw block local import import-base reverse)
   (import
     (rename (micascheme) (import %import) (reverse %reverse))
     (asm asm)
-    (only (asm block) empty-block block+binary-syntax block+label block-bind block+import)
+    (only (asm block) empty-block block+binary-syntax block+label block-bind block+import block-import-base block-with-import-base)
     (only (asm binary) db-binary dw-binary)
     (only (binary) binary-append))
 
@@ -49,6 +49,13 @@
           ($asm (syntaxes->asm $lookup (%reverse #'(asm ...))))
           (lambda ($block) ($asm $block))))))
 
+  (define-asm (import-base $lookup $syntax)
+    (syntax-case $syntax ()
+      ((id (path ...))
+        (lambda ($block)
+          (block-with-import-base $block
+            #'(path ...))))))
+
   (define-asm (import $lookup $syntax)
     (syntax-case $syntax ()
       ((id (path ...) ...)
@@ -61,7 +68,12 @@
                     ($path
                       (string-append
                         (apply string-append
-                          (intercalate (map symbol->string (syntax->datum $path)) "/"))
+                          (intercalate
+                            (map symbol->string
+                              (append
+                                (syntax->datum (block-import-base $block))
+                                (syntax->datum $path)))
+                            "/"))
                         ".ss"))
                     ($syntaxes (load-syntax-list #'id $path))
                     (app (syntaxes->asm $lookup $syntaxes) $block)))))

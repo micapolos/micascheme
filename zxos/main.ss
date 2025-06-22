@@ -1,6 +1,6 @@
 (import (zxos lang))
 
-(asm-run
+(zxos
   (ld de #x4000)
   (ld bc #x1800)
   (ld a #b11001100)
@@ -24,6 +24,5 @@
   (jp debug-bars)
 
   (import
-    (zxos mem fill)
-    (zxos debug bars)))
-
+    (mem fill)
+    (debug bars)))

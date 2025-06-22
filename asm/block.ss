@@ -1,8 +1,8 @@
 (library (asm block)
   (export
     block block?
-    block-org block-labels block-binary-syntaxes
-    block-with-org block-with-labels block-with-binary-syntaxes
+    block-org block-labels block-binary-syntaxes block-import-base block-imports
+    block-with-org block-with-labels block-with-binary-syntaxes block-with-import-base block-with-imports
     empty-block
     block-binary-syntax
     block+label block+binary-syntax block-bind
@@ -12,10 +12,10 @@
     (micascheme)
     (asm binary))
 
-  (data (block org labels binary-syntaxes imports))
+  (data (block org labels binary-syntaxes import-base imports))
 
   (define (empty-block $org)
-    (block $org (stack) (stack) (stack)))
+    (block $org (stack) (stack) #'() (stack)))
 
   (define (block+label $block $label)
     (block-with-labels $block

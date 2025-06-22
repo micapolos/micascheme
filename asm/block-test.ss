@@ -14,6 +14,7 @@
     (stack
       #`(db-binary a)
       #`(db-binary b))
+    #'()
     (stack))
   (let
     ((a 110) (b 120))
