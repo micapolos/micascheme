@@ -5,6 +5,10 @@
 (define exclamate (lambda ((s string)) (string-append s "!")))
 (define (increment (i integer)) (+ i one))
 
+(define-rules
+  ((inc x) (+ x 1))
+  ((dec x) (- x 1)))
+
 (check-typed (typed string "foo") "foo")
 
 (check-typed (let ((x 1) (y 2)) (+ x y)) 3)
@@ -14,6 +18,9 @@
 (check-typed one 1)
 (check-typed (exclamate "foo") "foo!")
 (check-typed (increment 10) 11)
+
+(check-typed (inc 10) 11)
+(check-typed (dec 10) 9)
 
 (check-typed (boolean=? #t #t) #t)
 (check-typed (boolean=? #t #f) #f)

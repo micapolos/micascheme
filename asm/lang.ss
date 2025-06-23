@@ -5,7 +5,8 @@
     define
     define-primitive
     define-primitives
-    define-macro)
+    define-macro
+    define-rules)
   (import
     (rename (micascheme) (define %define))
     (asm typed))
@@ -59,4 +60,22 @@
     (syntax-case $syntax ()
       ((_ expr)
         (typed-value (syntax->typed $lookup #'expr)))))
+
+  (define-syntax (define-rules $syntax)
+    (syntax-case $syntax (keywords)
+      ((_ (keywords keyword ...) clause ...)
+        #`(begin
+          #,@(map-with
+            ($group (group-by syntax-clause-id free-identifier=? #'(clause ...)))
+            (lets
+              ((pair $id $clauses) $group)
+              #`(define-typed (#,$id $lookup $syntax)
+                (syntax-case $syntax (keyword ...)
+                  #,@(map-with ($clause $clauses)
+                    (syntax-case $clause ()
+                      ((pattern body)
+                        #`(pattern (syntax->typed $lookup #'body)))))))))))
+      ((_ clause ...)
+        #`(define-rules (keywords) clause ...))))
+
 )
