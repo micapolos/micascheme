@@ -77,5 +77,4 @@
                         #`(pattern (syntax->typed $lookup #'body)))))))))))
       ((_ clause ...)
         #`(define-rules (keywords) clause ...))))
-
 )
