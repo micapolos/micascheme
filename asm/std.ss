@@ -5,7 +5,7 @@
     + - >> << iand ior ixor
     string-append string-length
     string->utf8 char->integer
-    bytevector bytevector-length)
+    make-bytevector bytevector bytevector-length)
   (import (asm lang))
 
   (define-primitives
@@ -27,5 +27,6 @@
     (string->utf8        (function (string) bytevector))
     (char->integer       (function (char) integer))
     (bytevector-length   (function (bytevector) integer))
-    (bytevector          (function integer bytevector)))
+    (bytevector          (function integer bytevector))
+    (make-bytevector     (function (integer integer) bytevector)))
 )

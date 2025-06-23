@@ -39,4 +39,5 @@
   (import
     (mem fill)
     (debug bars)
+    (mem bank alloc)
     (ula blit string)))

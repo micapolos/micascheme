@@ -1,12 +1,12 @@
 (library (asm asm-core)
-  (export label db dw block local import import-base reverse zero-terminated)
+  (export label db dw ds block local import import-base reverse zero-terminated)
   (import
-    (rename (micascheme) (import %import) (reverse %reverse) (bytevector %bytevector))
+    (rename (micascheme) (import %import) (reverse %reverse) (bytevector %bytevector) (make-bytevector %make-bytevector))
     (asm asm)
     (only (asm block) empty-block block+binary-syntax block+label block-bind block+import block-import-base block-with-import-base)
     (only (asm binary) db-binary dw-binary)
     (only (binary) binary-append bytevector-binary)
-    (only (asm std) bytevector))
+    (only (asm std) bytevector make-bytevector))
 
   (define-asm (db $lookup $syntax)
     (syntax-case $syntax ()
@@ -21,6 +21,17 @@
         (lambda ($block)
           (block+binary-syntax $block (* 2 (length #'(expr ...) ))
             #'(binary-append (dw-binary expr) ...))))))
+
+  (define-asm (ds $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ size )
+        (syntax->asm $lookup #'(ds size 0)))
+      ((_ size value)
+        (and (integer? (datum size)) (integer? (datum value)))
+        (lambda ($block)
+          (block+binary-syntax $block (datum size)
+            #`(bytevector-binary
+              (make-bytevector size value)))))))
 
   (define-asm (zero-terminated $lookup $syntax)
     (syntax-case $syntax ()

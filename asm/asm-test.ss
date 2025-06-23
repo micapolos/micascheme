@@ -82,3 +82,13 @@
   (equal?
     (asm-bytevector (zero-terminated "foo"))
     (bytevector 102 111 111 0)))
+
+(check
+  (equal?
+    (asm-bytevector (ds 4))
+    (bytevector 0 0 0 0)))
+
+(check
+  (equal?
+    (asm-bytevector (ds 4 10))
+    (bytevector 10 10 10 10)))

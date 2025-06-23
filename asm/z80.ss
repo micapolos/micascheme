@@ -26,12 +26,17 @@
     daa cpl ccf scf nop halt di ei im
 
     cpd cpdr cpi cpir ldd lddr ldi ldir
+
+    rla rlca rra rrca
+
     nextreg
+
+    break exit
 
     rcf
 
     loop-djnz loop proc data
-    input output preserve)
+    input output preserve if then else)
 
   (import
     (asm lang)
@@ -495,7 +500,6 @@
     ((exx)             (db #xd9))
 
     ; Block / transfer
-
     ((cpd)             (db #xed #xa9))
     ((cpdr)            (db #xed #xb9))
     ((cpi)             (db #xed #xa1))
@@ -504,6 +508,12 @@
     ((lddr)            (db #xed #xb8))
     ((ldi)             (db #xed #xa0))
     ((ldir)            (db #xed #xb0))
+
+    ; Shift/rotate
+    ((rla)             (db #x17))
+    ((rlca)            (db #x07))
+    ((rra)             (db #x1f))
+    ((rrca)            (db #x0f))
 
     ; Output
     ((out (n) a)       (db #xd3 n))
@@ -566,14 +576,18 @@
     ; Next
     ((nextreg n a)     (db #xed #x92 n))
     ((nextreg n n2)    (db #xed #x91 n n2))
+
+    ; CSpect
+    ((break)           (db #xfd #x00))
+    ((exit)            (db #xdd #x00))
   )
 
   ; Helpers
   (define-asm-rules
     ((rcf)             (or a)))
 
-  (define-keywords input output)
-  (define-asm-rules (keywords input output)
+  (define-keywords input output then else)
+  (define-asm-rules (keywords input output then else)
     ((loop-djnz body ...)
       (local
         (label __loop)
@@ -602,5 +616,12 @@
     ((preserve (reg ...) body ...)
       (block (push reg) ...)
       (block body ...)
-      (reverse (pop reg) ...)))
+      (reverse (pop reg) ...))
+    ((if flag (then then-body ...) (else else-body ...))
+      (jp flag __then)
+      (block else-body ...)
+      (jp __end)
+      (label __then)
+      (block then-body ...)
+      (label __end)))
 )
