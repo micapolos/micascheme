@@ -38,3 +38,14 @@
       (pre-op)
       (let ((local 102)) (local-op))
       (post-op))))
+
+(check
+  (equal?
+    (block->map-string
+      (block-with-labels (empty-block 100)
+        (stack
+          (cons #'foo-bar #x1234)
+          (cons #'goo->zar/gar #x2345))))
+    (lines-string
+      "1234 foo-bar"
+      "2345 goo->zar/gar")))

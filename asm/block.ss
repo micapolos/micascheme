@@ -7,10 +7,12 @@
     block-binary-syntax
     block+label block+binary-syntax block-bind
     block+zeroes
-    block+import)
+    block+import
+    block->map-string)
   (import
     (micascheme)
-    (asm binary))
+    (asm binary)
+    (code))
 
   (data (block org labels binary-syntaxes import-base imports))
 
@@ -65,4 +67,14 @@
       #,(or
         (single (block-binary-syntaxes $block))
         #`(binary-append #,@(reverse (block-binary-syntaxes $block))))))
+
+  (define (block->map-string $block)
+    (code-string
+      (list->code
+        (map-with ($label (reverse (block-labels $block)))
+          (code
+            (string-code (format "~4,'0X" (cdr $label)))
+            #\space
+            (string-code (symbol->string (syntax->datum (car $label))))
+            #\newline)))))
 )
