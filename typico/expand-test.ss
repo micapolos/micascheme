@@ -45,3 +45,8 @@
   (equal?
     (expand-typed lookup 'inc)
     (typed (function-type (list integer-type) integer-type) 'local-inc)))
+
+(check
+  (equal?
+    (expand-typed lookup '(inc $integer))
+    (typed integer-type '(local-inc $local-integer))))
