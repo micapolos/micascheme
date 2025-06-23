@@ -1,6 +1,7 @@
 (import
   (asm lang)
   (asm z80)
+  (asm z80-blocks)
   (asm asm)
   (asm asm-core))
 

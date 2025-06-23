@@ -33,10 +33,7 @@
 
     break exit
 
-    rcf
-
-    loop-djnz loop proc data
-    input output preserve if then else)
+    rcf)
 
   (import
     (asm lang)
@@ -577,51 +574,12 @@
     ((nextreg n a)     (db #xed #x92 n))
     ((nextreg n n2)    (db #xed #x91 n n2))
 
+    ; Helpers
+    ((rcf)             (or a))
+
     ; CSpect
     ((break)           (db #xfd #x00))
     ((exit)            (db #xdd #x00))
   )
 
-  ; Helpers
-  (define-asm-rules
-    ((rcf)             (or a)))
-
-  (define-keywords input output then else)
-  (define-asm-rules (keywords input output then else)
-    ((loop-djnz body ...)
-      (local
-        (label __loop)
-        body ...
-        (djnz __loop)))
-    ((loop body ...)
-      (local
-        (label __loop)
-        body ...
-        (jp __loop)))
-    ((proc id (input input-body ...) (output output-body ...) body ...)
-      (label id)
-      (local body ...))
-    ((proc id (input input-body ...) body ...)
-      (label id)
-      (local body ...))
-    ((proc id (output output-body ...) body ...)
-      (label id)
-      (local body ...))
-    ((proc id body ...)
-      (label id)
-      (local body ...))
-    ((data id body ...)
-      (label id)
-      (local body ...))
-    ((preserve (reg ...) body ...)
-      (push reg) ...
-      body ...
-      (reverse (pop reg) ...))
-    ((if flag (then then-body ...) (else else-body ...))
-      (jp flag __then)
-      else-body ...
-      (jp __end)
-      (label __then)
-      then-body ...
-      (label __end)))
 )

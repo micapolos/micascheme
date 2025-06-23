@@ -8,6 +8,7 @@
     (import
       (asm lang)
       (asm z80)
+      (asm z80-blocks)
       (asm run)
       (asm asm)
       (asm asm-core)

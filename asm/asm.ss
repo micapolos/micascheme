@@ -1,6 +1,7 @@
 (library (asm asm)
   (export
     define-asm
+    define-asm-rule
     define-asm-rules
     syntax->asm
     syntaxes->asm
@@ -40,6 +41,17 @@
                         #`(pattern (syntaxes->asm $lookup (syntax->list #'(body ...)))))))))))))
       ((_ clause ...)
         #`(define-asm-rules (keywords) clause ...))))
+
+  (define-syntax (define-asm-rule $syntax)
+    (syntax-case $syntax (keywords)
+      ((_ (keywords keyword ...) (id param ...) body ...)
+        #`(define-asm (id $lookup $syntax)
+          (syntax-case $syntax (keyword ...)
+            ((id param ...)
+              (syntaxes->asm $lookup
+                (syntax->list #'(body ...)))))))
+      ((_ body ...)
+        #`(define-asm-rule (keywords) body ...))))
 
   (meta define (syntax->asm $lookup $syntax)
     (lets
