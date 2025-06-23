@@ -55,9 +55,7 @@
   (define-asm (block $lookup $syntax)
     (syntax-case $syntax ()
       ((_ asm ...)
-        (lets
-          ($asm (syntaxes->asm $lookup #'(asm ...)))
-          (lambda ($block) ($asm $block))))))
+        (syntaxes->asm $lookup #'(asm ...)))))
 
   (define-asm (local $lookup $syntax)
     (syntax-case $syntax ()
@@ -70,9 +68,7 @@
   (define-asm (reverse $lookup $syntax)
     (syntax-case $syntax ()
       ((_ asm ...)
-        (lets
-          ($asm (syntaxes->asm $lookup (%reverse #'(asm ...))))
-          (lambda ($block) ($asm $block))))))
+        (syntaxes->asm $lookup (%reverse #'(asm ...))))))
 
   (define-asm (import-base $lookup $syntax)
     (syntax-case $syntax ()
