@@ -100,6 +100,7 @@
   (tico all)
   (typed all)
   (typed-scheme all)
+  (typico all)
   (verilog all)
   (vm all)
   (zasm all)
