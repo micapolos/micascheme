@@ -59,7 +59,7 @@
     (syntax-case $syntax
       (
         typed void type boolean integer char string function lambda
-        db-binary dw-binary binary-append binary->bytevector zero-binary
+        db-binary dw-binary binary-append binary->bytevector zero-binary bytevector-binary
         bytevector let
         u2 u3 u8 u16 s8)
       ((typed typ expr)
@@ -139,6 +139,9 @@
       ((dw-binary expr)
         (typed #'binary
           #`(dw-binary #,(syntax->expr $lookup #'integer #'expr) #'expr)))
+      ((bytevector-binary expr)
+        (typed #'binary
+          #`(bytevector-binary #,(syntax->expr $lookup #'bytevector #'expr))))
       ((binary-append expr ...)
         (typed #'binary
           #`(binary-append

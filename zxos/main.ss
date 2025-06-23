@@ -24,14 +24,17 @@
   (mmu 0 #xff)
   (mmu 1 #xff)
 
-  (ld hl hi-string)
+  (ld hl string-1)
   (ld de #x4000)
+  (call ula-blit-string)
+  (ld hl string-2)
+  (ld de #x4800)
   (call ula-blit-string)
 
   (jp debug-bars)
 
-  (data hi-string
-    (db #\H #\i #\! 0))
+  (data string-1 (zero-terminated "Hi there!!!"))
+  (data string-2 (zero-terminated "This is ZX Spectrum Next."))
 
   (import
     (mem fill)

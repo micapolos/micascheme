@@ -77,3 +77,8 @@
   (equal?
     (asm-bytevector (db #\a))
     (bytevector 97)))
+
+(check
+  (equal?
+    (asm-bytevector (zero-terminated "foo"))
+    (bytevector 102 111 111 0)))
