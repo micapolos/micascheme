@@ -37,7 +37,7 @@
                   #,@(map-with ($clause $clauses)
                     (syntax-case $clause ()
                       ((pattern body ...)
-                        #`(pattern (syntaxes->asm $lookup (list #'body ...))))))))))))
+                        #`(pattern (syntaxes->asm $lookup (syntax->list #'(body ...)))))))))))))
       ((_ clause ...)
         #`(define-asm-rules (keywords) clause ...))))
 

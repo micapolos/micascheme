@@ -614,14 +614,14 @@
       (label id)
       (local body ...))
     ((preserve (reg ...) body ...)
-      (block (push reg) ...)
-      (block body ...)
+      (push reg) ...
+      body ...
       (reverse (pop reg) ...))
     ((if flag (then then-body ...) (else else-body ...))
       (jp flag __then)
-      (block else-body ...)
+      else-body ...
       (jp __end)
       (label __then)
-      (block then-body ...)
+      then-body ...
       (label __end)))
 )
