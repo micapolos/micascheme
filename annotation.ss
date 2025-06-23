@@ -2,8 +2,9 @@
   (export
     datum/annotation-expression-stripped
     datum/annotation-stripped
-    datum/annotation-expression)
-  (import (scheme) (switch))
+    datum/annotation-expression
+    datum/annotation)
+  (import (scheme) (switch) (syntax))
 
   (define (datum/annotation-expression-stripped $datum/annotation)
     (switch $datum/annotation
@@ -23,4 +24,7 @@
     (switch $datum/annotation
       ((annotation? $annotation) (annotation-expression $annotation))
       ((else $datum) $datum)))
+
+  (define-rule-syntax (datum/annotation obj)
+    (syntax->datum/annotation #'obj))
 )

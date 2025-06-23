@@ -34,9 +34,9 @@
   (define (default-expand-typed $lookup $datum/annotation)
     (switch (datum/annotation-expression $datum/annotation)
       ((boolean? _)
-        (typed boolean-type $datum/annotation))
+        (typed boolean-type (datum/annotation-stripped $datum/annotation)))
       ((number? _)
-        (typed integer-type $datum/annotation))
+        (typed integer-type (datum/annotation-stripped $datum/annotation)))
       ((pair? (pair $car $cdr))
         (lets
           ($typed-car (expand-typed $lookup $car))
@@ -48,22 +48,11 @@
                     (partial expand-typed $lookup)
                     (lambda (_) (syntax-error $cdr "not a proper list"))
                     (datum/annotation-expression $cdr)))
-                ($stripped
-                  `(
-                    ,(datum/annotation-stripped (typed-value $typed-car))
-                    ,@(map datum/annotation-stripped (map typed-value $typed-args))))
                 (typed
                   (function-type-result-type $function-type)
-                  (switch $datum/annotation
-                    ((annotation? $annotation)
-                      (make-annotation
-                        `(
-                          ,(datum/annotation-expression (typed-value $typed-car))
-                          ,@(map datum/annotation-expression (map typed-value $typed-args)))
-                        (annotation-source $annotation)
-                        $stripped
-                        (annotation-option-set $annotation)))
-                    ((else _) $stripped)))))
+                  `(
+                    ,(datum/annotation-stripped (typed-value $typed-car))
+                    ,@(map datum/annotation-stripped (map typed-value $typed-args))))))
             ((else $other-type)
               (syntax-error $car "not a function")))))))
 

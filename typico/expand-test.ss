@@ -24,7 +24,7 @@
           ((macro)
             (typed integer-type '(expanded macro)))
           (else
-            (typed integer-type `(expanded ,$datum/annotation))))))
+            (typed integer-type `(expanded ,(datum/annotation-stripped $datum/annotation)))))))
     (else
       (syntax-error $datum/annotation "unbound"))))
 
@@ -67,3 +67,16 @@
   (equal?
     (expand-typed lookup '(macro 123))
     (typed integer-type '(expanded (macro 123)))))
+
+; annotations
+
+(check
+  (equal?
+    (expand-typed lookup (datum/annotation #t))
+    (typed boolean-type #t)))
+
+(check
+  (equal?
+    (expand-typed lookup (datum/annotation (macro 123)))
+    (typed integer-type '(expanded (macro 123)))))
+
