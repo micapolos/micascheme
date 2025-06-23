@@ -1,5 +1,5 @@
 (library (asm asm-core)
-  (export label db dw ds block local import import-base reverse zero-terminated)
+  (export label db dw ds block local import import-base reverse string-c)
   (import
     (rename (micascheme) (import %import) (reverse %reverse) (bytevector %bytevector) (make-bytevector %make-bytevector))
     (asm asm)
@@ -33,18 +33,35 @@
             #`(bytevector-binary
               (make-bytevector size value)))))))
 
-  (define-asm (zero-terminated $lookup $syntax)
+  (define-asm (string-c $lookup $syntax)
     (syntax-case $syntax ()
       ((_ s)
         (string? (datum s))
-        (lambda ($block)
-          (lets
-            ($utf8 (string->utf8 (datum s)))
-            (block+binary-syntax $block (+ (bytevector-length $utf8) 1)
-              #`(bytevector-binary
-                (bytevector
-                  #,@(map literal->syntax (bytevector->u8-list $utf8))
-                  0))))))))
+        (lets
+          ($bytevector (string->utf8 (datum s)))
+          (cond
+            ((= (bytevector-length $bytevector) 0)
+              (syntax-error $syntax "empty string"))
+            (else
+              (lets
+                ($length (bytevector-length $bytevector))
+                ($last-index (- $length 1))
+                ($u8-list (bytevector->u8-list $bytevector))
+                (cond
+                  ((exists (lambda ($u8) (not (zero? (bitwise-and $u8 #x80)))) $u8-list)
+                    (syntax-error $syntax "non-ascii chars"))
+                  (else
+                    (lambda ($block)
+                      (block+binary-syntax $block $length
+                        #`(bytevector-binary
+                          (bytevector
+                            #,@(map-with
+                              ($index (iota $length))
+                              ($u7 $u8-list)
+                              (literal->syntax
+                                (if (= $index $last-index)
+                                  (bitwise-ior $u7 #x80)
+                                  $u7))))))))))))))))
 
   (define-asm (label $lookup $syntax)
     (syntax-case $syntax ()

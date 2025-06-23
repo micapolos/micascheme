@@ -1,7 +1,7 @@
 (import
   (ula blit char))
 
-(proc ula-blit-string
+(proc ula-blit-string-c
   (input
     (hl string-addr)
     (de screen-addr))
@@ -13,6 +13,6 @@
     (ld a (hl))
     (inc hl)
     (or a)
-    (ret z)
+    (ret m)
     (preserve (de hl) (call ula-blit-char))
     (inc e)))

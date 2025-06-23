@@ -14,6 +14,8 @@
     add adc sub sbc and xor or cp
     inc dec
 
+    bit
+
     pop push
 
     ex exx
@@ -456,6 +458,95 @@
     ((dec ix)          (db #xdd #b00101011))
     ((dec iy)          (db #xfd #b00101011))
     ((dec sp)          (db      #b00111011))
+
+    ; Bit
+    ((bit 0 b)         (db      #xcb   #b01000000))
+    ((bit 0 c)         (db      #xcb   #b01000001))
+    ((bit 0 d)         (db      #xcb   #b01000010))
+    ((bit 0 e)         (db      #xcb   #b01000011))
+    ((bit 0 h)         (db      #xcb   #b01000100))
+    ((bit 0 l)         (db      #xcb   #b01000101))
+    ((bit 0 (hl))      (db      #xcb   #b01000110))
+    ((bit 0 (+ ix d))  (db #xdd #xcb d #b01000110))
+    ((bit 0 (+ iy d))  (db #xfd #xcb d #b01000110))
+    ((bit 0 a)         (db      #xcb   #b01000111))
+
+    ((bit 1 b)         (db      #xcb   #b01001000))
+    ((bit 1 c)         (db      #xcb   #b01001001))
+    ((bit 1 d)         (db      #xcb   #b01001010))
+    ((bit 1 e)         (db      #xcb   #b01001011))
+    ((bit 1 h)         (db      #xcb   #b01001100))
+    ((bit 1 l)         (db      #xcb   #b01001101))
+    ((bit 1 (hl))      (db      #xcb   #b01001110))
+    ((bit 1 (+ ix d))  (db #xdd #xcb d #b01001110))
+    ((bit 1 (+ iy d))  (db #xfd #xcb d #b01001110))
+    ((bit 1 a)         (db      #xcb   #b01001111))
+
+    ((bit 2 b)         (db      #xcb   #b01010000))
+    ((bit 2 c)         (db      #xcb   #b01010001))
+    ((bit 2 d)         (db      #xcb   #b01010010))
+    ((bit 2 e)         (db      #xcb   #b01010011))
+    ((bit 2 h)         (db      #xcb   #b01010100))
+    ((bit 2 l)         (db      #xcb   #b01010101))
+    ((bit 2 (hl))      (db      #xcb   #b01010110))
+    ((bit 2 (+ ix d))  (db #xdd #xcb d #b01010110))
+    ((bit 2 (+ iy d))  (db #xfd #xcb d #b01010110))
+    ((bit 2 a)         (db      #xcb   #b01010111))
+
+    ((bit 3 b)         (db      #xcb   #b01011000))
+    ((bit 3 c)         (db      #xcb   #b01011001))
+    ((bit 3 d)         (db      #xcb   #b01011010))
+    ((bit 3 e)         (db      #xcb   #b01011011))
+    ((bit 3 h)         (db      #xcb   #b01011100))
+    ((bit 3 l)         (db      #xcb   #b01011101))
+    ((bit 3 (hl))      (db      #xcb   #b01011110))
+    ((bit 3 (+ ix d))  (db #xdd #xcb d #b01011110))
+    ((bit 3 (+ iy d))  (db #xfd #xcb d #b01011110))
+    ((bit 3 a)         (db      #xcb   #b01011111))
+
+    ((bit 4 b)         (db      #xcb   #b01100000))
+    ((bit 4 c)         (db      #xcb   #b01100001))
+    ((bit 4 d)         (db      #xcb   #b01100010))
+    ((bit 4 e)         (db      #xcb   #b01100011))
+    ((bit 4 h)         (db      #xcb   #b01100100))
+    ((bit 4 l)         (db      #xcb   #b01100101))
+    ((bit 4 (hl))      (db      #xcb   #b01100110))
+    ((bit 4 (+ ix d))  (db #xdd #xcb d #b01100110))
+    ((bit 4 (+ iy d))  (db #xfd #xcb d #b01100110))
+    ((bit 4 a)         (db      #xcb   #b01100111))
+
+    ((bit 5 b)         (db      #xcb   #b01101000))
+    ((bit 5 c)         (db      #xcb   #b01101001))
+    ((bit 5 d)         (db      #xcb   #b01101010))
+    ((bit 5 e)         (db      #xcb   #b01101011))
+    ((bit 5 h)         (db      #xcb   #b01101100))
+    ((bit 5 l)         (db      #xcb   #b01101101))
+    ((bit 5 (hl))      (db      #xcb   #b01101110))
+    ((bit 5 (+ ix d))  (db #xdd #xcb d #b01101110))
+    ((bit 5 (+ iy d))  (db #xfd #xcb d #b01101110))
+    ((bit 5 a)         (db      #xcb   #b01101111))
+
+    ((bit 6 b)         (db      #xcb   #b01110000))
+    ((bit 6 c)         (db      #xcb   #b01110001))
+    ((bit 6 d)         (db      #xcb   #b01110010))
+    ((bit 6 e)         (db      #xcb   #b01110011))
+    ((bit 6 h)         (db      #xcb   #b01110100))
+    ((bit 6 l)         (db      #xcb   #b01110101))
+    ((bit 6 (hl))      (db      #xcb   #b01110110))
+    ((bit 6 (+ ix d))  (db #xdd #xcb d #b01110110))
+    ((bit 6 (+ iy d))  (db #xfd #xcb d #b01110110))
+    ((bit 6 a)         (db      #xcb   #b01110111))
+
+    ((bit 7 b)         (db      #xcb   #b01111000))
+    ((bit 7 c)         (db      #xcb   #b01111001))
+    ((bit 7 d)         (db      #xcb   #b01111010))
+    ((bit 7 e)         (db      #xcb   #b01111011))
+    ((bit 7 h)         (db      #xcb   #b01111100))
+    ((bit 7 l)         (db      #xcb   #b01111101))
+    ((bit 7 (hl))      (db      #xcb   #b01111110))
+    ((bit 7 (+ ix d))  (db #xdd #xcb d #b01111110))
+    ((bit 7 (+ iy d))  (db #xfd #xcb d #b01111110))
+    ((bit 7 a)         (db      #xcb   #b01111111))
 
     ; General purpose
     ((daa)             (db #x27))

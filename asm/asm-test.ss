@@ -80,8 +80,8 @@
 
 (check
   (equal?
-    (asm-bytevector (zero-terminated "foo"))
-    (bytevector 102 111 111 0)))
+    (asm-bytevector (string-c "foo"))
+    (bytevector #x66 #x6f #xEf)))
 
 (check
   (equal?
