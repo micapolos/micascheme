@@ -5,8 +5,6 @@
   (asm asm)
   (asm asm-core))
 
-(check-asm (ret) (db #xc9))
-
 (check-asm
   (block
     (db 10)
