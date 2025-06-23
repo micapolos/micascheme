@@ -10,12 +10,16 @@
   (define-rule-syntax (asm-run body ...)
     (lets
       ($path "/tmp/main.nex")
+      ($map-path "/tmp/main.map")
+      ((values $binary $map-string) (asm-binary/map-string (org #xc000) body ...))
+      ($bytevector (binary->bytevector $binary))
+      (run (pretty-print $bytevector))
+      (run (display $map-string))
+      ($nex-blob (nex-blob (bytevector->blob $bytevector)))
       (run
         (call-with-port (open-file-output-port $path (file-options no-fail))
-          (lambda ($port)
-            (lets
-              ($bytevector (asm-bytevector (org #xc000) body ...))
-              (run (pretty-print $bytevector))
-              (put-blob $port (nex-blob (bytevector->blob $bytevector))))))
-        (cspect $path))))
+          (lambda ($port) (put-blob $port $nex-blob)))
+        (call-with-port (open-output-file $map-path 'replace)
+          (lambda ($port) (put-string $port $map-string)))
+        (cspect $path $map-path))))
 )

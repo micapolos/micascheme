@@ -47,5 +47,5 @@
           (cons #'foo-bar #x1234)
           (cons #'goo->zar/gar #x2345))))
     (lines-string
-      "1234 foo-bar"
-      "2345 goo->zar/gar")))
+      "00001234 00001234 00 foo-bar"
+      "00002345 00002345 00 goo->zar/gar")))

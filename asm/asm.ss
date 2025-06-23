@@ -6,12 +6,13 @@
     syntax->asm
     syntaxes->asm
     asm-binary
+    asm-binary/map-string
     asm-bytevector
     check-asm
     org)
   (import
     (micascheme)
-    (only (asm block) block-binary-syntax empty-block)
+    (only (asm block) block-binary-syntax empty-block block->map-string)
     (binary)
     (only (asm typed) syntax->expr))
 
@@ -72,17 +73,25 @@
         $block
         (map (partial syntax->asm $lookup) $syntaxes))))
 
-  (define-syntax (asm-binary $syntax $lookup)
+  (define-syntax (asm-binary/map-string $syntax $lookup)
     (syntax-case $syntax (org)
       ((_ (org $org) asm ...)
-        (syntax->expr $lookup #'binary
-          (block-binary-syntax
+        (lets
+          ($block
             (fold-left
               (lambda ($block $asm) ((syntax->asm $lookup $asm) $block))
               (empty-block (datum $org))
-              #'(asm ...)))))
+              #'(asm ...)))
+          #`(values
+            #,(syntax->expr $lookup #'binary (block-binary-syntax $block))
+            #,(literal->syntax (block->map-string $block)))))
       ((_ asm ...)
-        #`(asm-binary (org 0) asm ...))))
+        #`(asm-binary/map-string (org 0) asm ...))))
+
+  (define-rule-syntax (asm-binary body ...)
+    (lets
+      ((values $binary $map) (asm-binary/map-string body ...))
+      $binary))
 
   (define-rule-syntax (asm-bytevector asm ...)
     (binary->bytevector (asm-binary asm ...)))

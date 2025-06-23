@@ -73,7 +73,11 @@
       (list->code
         (map-with ($label (reverse (block-labels $block)))
           (code
-            (string-code (format "~4,'0X" (cdr $label)))
+            (string-code (format "~8,'0X" (cdr $label)))
+            #\space
+            (string-code (format "~8,'0X" (cdr $label)))
+            #\space
+            "00"
             #\space
             (string-code (symbol->string (syntax->datum (car $label))))
             #\newline)))))
