@@ -26,18 +26,18 @@
 
   (ld hl string-1)
   (ld de #x4000)
-  (call ula-blit-string-c)
+  (call ula-blit-string-m)
   (ld hl string-2)
   (ld de #x4800)
-  (call ula-blit-string-c)
+  (call ula-blit-string-m)
 
   (jp debug-bars)
 
-  (data string-1 (string-c "Hi there!!!"))
-  (data string-2 (string-c "This is ZX Spectrum Next."))
+  (data string-1 (string-m "Hi there!!!"))
+  (data string-2 (string-m "This is ZX Spectrum Next."))
 
   (import
     (mem fill)
     (debug bars)
     (mem bank alloc)
-    (ula blit string-c)))
+    (ula blit string-m)))

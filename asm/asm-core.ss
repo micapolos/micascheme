@@ -1,5 +1,5 @@
 (library (asm asm-core)
-  (export label db dw ds block local import import-base reverse string-c)
+  (export label db dw ds block local import import-base reverse string-z string-m)
   (import
     (rename (micascheme) (import %import) (reverse %reverse) (bytevector %bytevector) (make-bytevector %make-bytevector))
     (asm asm)
@@ -33,7 +33,7 @@
             #`(bytevector-binary
               (make-bytevector size value)))))))
 
-  (define-asm (string-c $lookup $syntax)
+  (define-asm (string-m $lookup $syntax)
     (syntax-case $syntax ()
       ((_ s)
         (string? (datum s))
@@ -62,6 +62,27 @@
                                 (if (= $index $last-index)
                                   (bitwise-ior $u7 #x80)
                                   $u7))))))))))))))))
+
+  (define-asm (string-z $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ s)
+        (string? (datum s))
+        (lets
+          ($bytevector (string->utf8 (datum s)))
+          (cond
+            ((= (bytevector-length $bytevector) 0)
+              (syntax-error $syntax "empty string"))
+            (else
+              (lets
+                ($length (bytevector-length $bytevector))
+                ($last-index (- $length 1))
+                ($u8-list (bytevector->u8-list $bytevector))
+                (lambda ($block)
+                  (block+binary-syntax $block $length
+                    #`(bytevector-binary
+                      (bytevector
+                        #,@(map literal->syntax $u8-list)
+                        #,(literal->syntax 0))))))))))))
 
   (define-asm (label $lookup $syntax)
     (syntax-case $syntax ()
