@@ -43,30 +43,6 @@
           (other
             (expand-typed/no-lookup $lookup #'other))))))
 
-  (define (lookup+integer+ $lookup)
-    (lookup+ $lookup 'integer+
-      (lambda ($lookup $syntax)
-        (syntax-case $syntax ()
-          (id
-            (identifier? #'id)
-            (typed
-              (function-type (list* integer-type) integer-type)
-              `($primitive 3 +)))
-          (other
-            (expand-typed/no-lookup $lookup #'other))))))
-
-  (define (lookup+string+ $lookup)
-    (lookup+ $lookup 'string+
-      (lambda ($lookup $syntax)
-        (syntax-case $syntax ()
-          (id
-            (identifier? #'id)
-            (typed
-              (function-type (list* string-type) string-type)
-              `($primitive 3 string-append)))
-          (other
-            (expand-typed/no-lookup $lookup #'other))))))
-
   (define (lookup++ $lookup)
     (lookup+ $lookup '+
       (lambda ($lookup $syntax)
