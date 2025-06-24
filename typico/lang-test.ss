@@ -12,6 +12,10 @@
 (check-equal? (+ "foo") "foo")
 (check-equal? (+ "f" "o" "o") "foo")
 
+(check-primitive integer+ +)
+(check-equal? (integer+) 0)
+(check-equal? (integer+ 1 2 3) 6)
+
 (check-raises +)
 (check-raises (+))
 (check-raises (+ #t))

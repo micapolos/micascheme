@@ -31,6 +31,18 @@
                     (map typed-value $typed-list)))
                   ,(typed-value $typed-body)))))))))
 
+  (define (lookup+integer+ $lookup)
+    (lookup+ $lookup 'integer+
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          (id
+            (identifier? #'id)
+            (typed
+              (function-type (list* integer-type) integer-type)
+              `($primitive 3 +)))
+          (other
+            (expand-typed/no-lookup $lookup #'other))))))
+
   (define (lookup++ $lookup)
     (lookup+ $lookup '+
       (lambda ($lookup $syntax)
@@ -80,6 +92,7 @@
   (define (core-lookup)
     (fluent (empty-lookup)
       (lookup+let)
+      (lookup+integer+)
       (lookup++)
       (lookup+and)))
 )
