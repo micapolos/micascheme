@@ -4,6 +4,7 @@
     check
     raises
     works
+    works?
     define-check->
     define-check-datum->
     check-datum=?
