@@ -2,4 +2,5 @@
 
 (test
   (typico type)
+  (typico typed)
   (typico expand))

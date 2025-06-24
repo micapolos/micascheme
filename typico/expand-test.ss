@@ -1,4 +1,4 @@
-(import (micascheme) (typico expand) (typico type))
+(import (micascheme) (typico expand) (typico type) (typico typed))
 
 (define (lookup $identifier)
   (syntax-case $identifier ($integer inc - macro)
