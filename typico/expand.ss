@@ -21,15 +21,9 @@
   (define integer-type (primitive-type (gensym) 'integer))
 
   (define (expand-typed $lookup $syntax)
-    (syntax-case $syntax ()
-      (id
-        (symbol? (datum id))
-        (($lookup #'id) $lookup #'id))
-      ((id . tail)
-        (symbol? (datum id))
-        (($lookup #'id) $lookup $syntax))
-      (other
-        (default-expand-typed $lookup #'other))))
+    (switch (syntax-selector $syntax)
+      ((false? _) (default-expand-typed $lookup $syntax))
+      ((else $id) (($lookup $id) $lookup $syntax))))
 
   (define (default-expand-typed $lookup $syntax)
     (syntax-case $syntax ()
