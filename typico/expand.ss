@@ -5,7 +5,7 @@
     expand-typed
     default-expand-typed
     typed-value-of)
-  (import (micascheme) (typico type) (typico typed) (typico core-types))
+  (import (micascheme) (typico type) (typico typed) (typico core-types) (typico literal-expand))
 
   (define (expand-typed $lookup $syntax)
     (switch (syntax-selector $syntax)
@@ -14,12 +14,6 @@
 
   (define (default-expand-typed $lookup $syntax)
     (syntax-case $syntax ()
-      (b
-        (boolean? (datum b))
-        (typed boolean-type (datum b)))
-      (i
-        (integer? (datum i))
-        (typed integer-type (datum i)))
       ((fn arg ...)
         (lets
           ($typed-fn (expand-typed $lookup #'fn))
@@ -37,7 +31,9 @@
                       $typed-args
                       #'(arg ...))))))
             ((else $other-type)
-              (syntax-error #'fn "not a function")))))))
+              (syntax-error #'fn "not a function")))))
+      (other
+        (literal-expand-typed #'other))))
 
   (define (typed-value-of $syntax $type $typed)
     (cond
