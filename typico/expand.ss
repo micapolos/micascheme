@@ -4,7 +4,9 @@
     integer-type
     expand-typed
     expand-typed/no-lookup
-    expand-value-of)
+    expand-value-of
+    type-error
+    types-error)
   (import
     (micascheme)
     (typico type)
@@ -100,11 +102,21 @@
         ((type=? $type (typed-type $typed))
           (typed-value $typed))
         (else
-          (type-error (typed-type $typed) $type $syntax)))))
+          (type-error $syntax (typed-type $typed) $type)))))
 
-  (define (type-error $actual-type $expected-type $syntax)
+  (define (type-error $syntax $actual-type $expected-type)
     (syntax-error $syntax
       (format "invalid type ~s, expected ~s, in"
         (type->datum $actual-type)
         (type->datum $expected-type))))
+
+  (define (types-error $syntax $actual-type $expected-types)
+    (syntax-error $syntax
+      (format "invalid type ~s, expected ~a, in"
+        (type->datum $actual-type)
+        (apply string-append
+          (intercalate
+            (map (partial format "~s")
+              (map type->datum $expected-types))
+            " or ")))))
 )

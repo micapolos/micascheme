@@ -64,11 +64,36 @@
                     `(($primitive 3 string-append)
                       ,(typed-value $typed-arg)
                       ,@(map (partial expand-value-of $lookup string-type) #'(arg* ...)))))
-                (else (syntax-error #'arg
-                  "invalid type")))))))))
+                (else
+                  (types-error #'arg $arg-type
+                    (list integer-type string-type))))))))))
+
+  (define (lookup+and $lookup)
+    (lookup+ $lookup 'and
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          ((_ arg arg* ...)
+            (lets
+              ($typed-arg (expand-typed $lookup #'arg))
+              ($arg-type (typed-type $typed-arg))
+              (cond
+                ((type=? $arg-type boolean-type)
+                  (typed boolean-type
+                    `(and
+                      ,(typed-value $typed-arg)
+                      ,@(map (partial expand-value-of $lookup boolean-type) #'(arg* ...)))))
+                ((type=? $arg-type integer-type)
+                  (typed integer-type
+                    `(($primitive 3 bitwise-and)
+                      ,(typed-value $typed-arg)
+                      ,@(map (partial expand-value-of $lookup integer-type) #'(arg* ...)))))
+                (else
+                  (types-error #'arg $arg-type
+                    (list boolean-type integer-type))))))))))
 
   (define (core-lookup)
     (fluent (empty-lookup)
       (lookup+let)
-      (lookup++)))
+      (lookup++)
+      (lookup+and)))
 )
