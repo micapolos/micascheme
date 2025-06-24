@@ -13,8 +13,10 @@
 
   (define (expand-typed $lookup $syntax)
     (switch (syntax-selector $syntax)
-      ((false? _) (expand-typed/no-lookup $lookup $syntax))
-      ((else $id) (($lookup $id) $lookup $syntax))))
+      ((false? _)
+        (expand-typed/no-lookup $lookup $syntax))
+      ((else $id)
+        (($lookup $id) $lookup $syntax))))
 
   (define (expand-typed/no-lookup $lookup $syntax)
     (or
