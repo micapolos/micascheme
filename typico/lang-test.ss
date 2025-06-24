@@ -15,6 +15,12 @@
 (check-primitive integer+ +)
 (check-equal? (integer+) 0)
 (check-equal? (integer+ 1 2 3) 6)
+(check-raises (integer+ #t))
+
+(check-primitive string+ string-append)
+(check-equal? (string+) "")
+(check-equal? (string+ "a" "b" "c") "abc")
+(check-raises (string+ #t))
 
 (check-raises +)
 (check-raises (+))

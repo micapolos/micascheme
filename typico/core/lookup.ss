@@ -31,6 +31,18 @@
                     (map typed-value $typed-list)))
                   ,(typed-value $typed-body)))))))))
 
+  (define-rule-syntax (lookup+primitive $lookup in type out)
+    (lookup+ $lookup 'in
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          (id
+            (identifier? #'id)
+            (typed
+              type
+              `($primitive 3 out)))
+          (other
+            (expand-typed/no-lookup $lookup #'other))))))
+
   (define (lookup+integer+ $lookup)
     (lookup+ $lookup 'integer+
       (lambda ($lookup $syntax)
@@ -40,6 +52,18 @@
             (typed
               (function-type (list* integer-type) integer-type)
               `($primitive 3 +)))
+          (other
+            (expand-typed/no-lookup $lookup #'other))))))
+
+  (define (lookup+string+ $lookup)
+    (lookup+ $lookup 'string+
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          (id
+            (identifier? #'id)
+            (typed
+              (function-type (list* string-type) string-type)
+              `($primitive 3 string-append)))
           (other
             (expand-typed/no-lookup $lookup #'other))))))
 
@@ -92,7 +116,8 @@
   (define (core-lookup)
     (fluent (empty-lookup)
       (lookup+let)
-      (lookup+integer+)
+      (lookup+primitive integer+ (function-type (list* integer-type) integer-type) +)
+      (lookup+primitive string+ (function-type (list* string-type) string-type) string-append)
       (lookup++)
       (lookup+and)))
 )
