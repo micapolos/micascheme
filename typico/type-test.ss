@@ -40,3 +40,8 @@
           (primitive-type (gensym) 'b))
         (primitive-type (gensym) 'result)))
     '(function (a b ...) result)))
+
+(check
+  (equal?
+    (type->datum (expander-type identity))
+    `(expander ,identity)))
