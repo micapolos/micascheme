@@ -16,7 +16,9 @@
       ((false? _)
         (expand-typed/no-lookup $lookup $syntax))
       ((else $id)
-        (($lookup $id) $lookup $syntax))))
+        (switch ($lookup (syntax->datum $id))
+          ((false? _) (syntax-error $id "undefined"))
+          ((else $proc) ($proc $lookup $syntax))))))
 
   (define (expand-typed/no-lookup $lookup $syntax)
     (or
