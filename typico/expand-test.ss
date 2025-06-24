@@ -6,7 +6,7 @@
       (lambda ($lookup $syntax)
         (syntax-case $syntax ($integer)
           ($integer (typed integer-type '$expanded-integer))
-          (other (default-expand-typed $lookup #'other)))))
+          (other (expand-typed/no-lookup $lookup #'other)))))
     (inc
       (lambda ($lookup $syntax)
         (syntax-case $syntax (inc)
@@ -15,7 +15,7 @@
               (function-type (list integer-type) integer-type)
               'expanded-inc))
           (other
-            (default-expand-typed $lookup #'other)))))
+            (expand-typed/no-lookup $lookup #'other)))))
     (-
       (lambda ($lookup $syntax)
         (syntax-case $syntax (-)
@@ -24,7 +24,7 @@
               (function-type (list* integer-type integer-type) integer-type)
               'expanded-))
           (other
-            (default-expand-typed $lookup #'other)))))
+            (expand-typed/no-lookup $lookup #'other)))))
     (macro
       (lambda ($lookup $syntax)
         (syntax-case $syntax (macro)

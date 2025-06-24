@@ -3,7 +3,7 @@
     boolean-type
     integer-type
     expand-typed
-    default-expand-typed
+    expand-typed/no-lookup
     typed-value-of)
   (import
     (micascheme)
@@ -13,10 +13,10 @@
 
   (define (expand-typed $lookup $syntax)
     (switch (syntax-selector $syntax)
-      ((false? _) (default-expand-typed $lookup $syntax))
+      ((false? _) (expand-typed/no-lookup $lookup $syntax))
       ((else $id) (($lookup $id) $lookup $syntax))))
 
-  (define (default-expand-typed $lookup $syntax)
+  (define (expand-typed/no-lookup $lookup $syntax)
     (or
       (expand-typed-literal? $syntax)
       (expand-typed-application? $lookup $syntax)
