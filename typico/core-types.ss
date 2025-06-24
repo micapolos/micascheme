@@ -1,6 +1,6 @@
 (library (typico core-types)
   (export
-    boolean-type integer-type char-type string-type
+    boolean-type integer-type number-type char-type string-type
     bytevector-type
     u2-type u3-type u7-type u8-type u16-type
     s8-type)
@@ -8,6 +8,7 @@
 
   (define boolean-type (primitive-type (gensym) 'boolean))
   (define integer-type (primitive-type (gensym) 'integer))
+  (define number-type (primitive-type (gensym) 'number))
   (define char-type (primitive-type (gensym) 'char))
   (define string-type (primitive-type (gensym) 'string))
   (define bytevector-type (primitive-type (gensym) 'bytevector))

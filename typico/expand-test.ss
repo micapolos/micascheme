@@ -44,6 +44,7 @@
 
 (check-typed #t (typed boolean #t))
 (check-typed 123 (typed integer 123))
+(check-typed 123.0 (typed number 123.0))
 (check-typed #\a (typed char #\a))
 (check-typed "foo" (typed string "foo"))
 

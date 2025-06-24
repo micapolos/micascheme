@@ -30,8 +30,11 @@
         (boolean? (datum b))
         (typed boolean-type (datum b)))
       (i
-        (integer? (datum i))
+        (and (integer? (datum i)) (exact? (datum i)))
         (typed integer-type (datum i)))
+      (n
+        (number? (datum n))
+        (typed number-type (datum n)))
       (ch
         (char? (datum ch))
         (typed char-type (datum ch)))
