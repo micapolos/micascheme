@@ -7,7 +7,9 @@
     integer-type
     expand-typed
     default-expand-typed
-    typed-value-of)
+    typed-value-of
+    type->datum
+    typed->datum)
   (import (micascheme))
 
   (data (typed type value))
@@ -79,4 +81,22 @@
             (syntax-error $syntax "illegal argument count"))))
       ((else $vararg-type)
         (map (partial typed-value-of $syntax $vararg-type) $typed-args))))
+
+  (define (type->datum $type)
+    (switch-exhaustive $type
+      ((primitive-type? $primitive-type)
+        (primitive-type-datum $primitive-type))
+      ((function-type? $function-type)
+        `(function
+          (
+          ,@(map*
+            type->datum
+            (lambda ($type) `(,(type->datum $type) ...))
+            (function-type-param-types $function-type)))
+          ,(type->datum (function-type-result-type $function-type))))))
+
+  (define (typed->datum $typed)
+    `(typed
+      ,(type->datum (typed-type $typed))
+      ,(typed-value $typed)))
 )

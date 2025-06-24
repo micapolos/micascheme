@@ -6,7 +6,7 @@
       (lambda ($lookup $syntax)
         (syntax-case $syntax ($integer)
           ($integer
-            (typed integer-type '$resolved-integer))
+            (typed integer-type '$expanded-integer))
           (other
             (default-expand-typed $lookup #'other)))))
     (inc
@@ -15,7 +15,7 @@
           (inc
             (typed
               (function-type (list integer-type) integer-type)
-              'resolved-inc))
+              'expanded-inc))
           (other
             (default-expand-typed $lookup #'other)))))
     (-
@@ -24,98 +24,46 @@
           (-
             (typed
               (function-type (list* integer-type integer-type) integer-type)
-              'resolved-))
+              'expanded-))
           (other
             (default-expand-typed $lookup #'other)))))
     (macro
       (lambda ($lookup $syntax)
         (syntax-case $syntax (macro)
           (macro
-            (typed integer-type '(expanded macro)))
+            (typed integer-type 'expanded-macro))
           (other
             (typed integer-type `(expanded ,(datum other)))))))
     (other
       (syntax-error #'other "unbound"))))
 
-(check
-  (equal?
-    (expand-typed lookup #'#t)
-    (typed boolean-type #t)))
+(define-rule-syntax (check-typed in out)
+  (check
+    (equal?
+      (typed->datum (expand-typed lookup #'in))
+      'out)))
 
-(check
-  (equal?
-    (expand-typed lookup #'123)
-    (typed integer-type 123)))
+(define-rule-syntax (check-type-error in)
+  (check (raises (expand-typed lookup #'in))))
 
-(check
-  (equal?
-    (expand-typed lookup #'123)
-    (typed integer-type 123)))
+(check-typed #t (typed boolean #t))
+(check-typed 123 (typed integer 123))
 
-(check
-  (equal?
-    (expand-typed lookup #'$integer)
-    (typed integer-type '$resolved-integer)))
+(check-typed $integer (typed integer $expanded-integer))
+(check-type-error ($integer))
 
-(check
-  (raises
-    (expand-typed lookup #'($integer))))
+(check-typed inc (typed (function (integer) integer) expanded-inc))
+(check-typed (inc $integer) (typed integer (expanded-inc $expanded-integer)))
 
-(check
-  (equal?
-    (expand-typed lookup #'inc)
-    (typed (function-type (list integer-type) integer-type) 'resolved-inc)))
+(check-type-error (inc))
+(check-type-error (inc $boolean))
+(check-type-error (inc $integer $integer))
 
-(check
-  (equal?
-    (expand-typed lookup #'(inc $integer))
-    (typed integer-type '(resolved-inc $resolved-integer))))
-
-(check
-  (raises
-    (expand-typed lookup #'(inc))))
-
-(check
-  (raises
-    (expand-typed lookup #'(inc $boolean))))
-
-(check
-  (raises
-    (expand-typed lookup #'(inc $integer $integer))))
-
-(check
-  (equal?
-    (expand-typed lookup #'-)
-    (typed (function-type (list* integer-type integer-type) integer-type) 'resolved-)))
-
-(check
-  (raises
-    (expand-typed lookup #'(-))))
-
-(check
-  (equal?
-    (expand-typed lookup #'(- $integer))
-    (typed integer-type '(resolved- $resolved-integer))))
-
-(check
-  (equal?
-    (expand-typed lookup #'(- $integer $integer))
-    (typed integer-type '(resolved- $resolved-integer $resolved-integer))))
-
-(check
-  (raises
-    (expand-typed lookup #'(- $boolean))))
-
-(check
-  (raises
-    (expand-typed lookup #'(- $boolean $integer))))
-
-(check
-  (equal?
-    (expand-typed lookup #'macro)
-    (typed integer-type '(expanded macro))))
-
-(check
-  (equal?
-    (expand-typed lookup #'(macro 123))
-    (typed integer-type '(expanded (macro 123)))))
+(check-typed - (typed (function (integer integer ...) integer) expanded-))
+(check-type-error (-))
+(check-typed (- $integer) (typed integer (expanded- $expanded-integer)))
+(check-typed (- $integer $integer) (typed integer (expanded- $expanded-integer $expanded-integer)))
+(check-type-error (- $boolean))
+(check-type-error (- $boolean $integer))
+(check-typed macro (typed integer expanded-macro))
+(check-typed (macro 123) (typed integer (expanded (macro 123))))
