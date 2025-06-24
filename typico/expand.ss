@@ -1,21 +1,15 @@
 (library (typico expand)
   (export
     typed typed? typed-type typed-value
-    primitive-type primitive-type?
-    function-type function-type? function-type-param-types function-type-result-type
     boolean-type
     integer-type
     expand-typed
     default-expand-typed
     typed-value-of
-    type->datum
     typed->datum)
-  (import (micascheme))
+  (import (micascheme) (typico type))
 
   (data (typed type value))
-
-  (data (primitive-type gensym datum))
-  (data (function-type param-types result-type))
 
   (define boolean-type (primitive-type (gensym) 'boolean))
   (define integer-type (primitive-type (gensym) 'integer))
@@ -75,19 +69,6 @@
             (syntax-error $syntax "illegal argument count"))))
       ((else $vararg-type)
         (map (partial typed-value-of $syntax $vararg-type) $typed-args))))
-
-  (define (type->datum $type)
-    (switch-exhaustive $type
-      ((primitive-type? $primitive-type)
-        (primitive-type-datum $primitive-type))
-      ((function-type? $function-type)
-        `(function
-          (
-          ,@(map*
-            type->datum
-            (lambda ($type) `(,(type->datum $type) ...))
-            (function-type-param-types $function-type)))
-          ,(type->datum (function-type-result-type $function-type))))))
 
   (define (typed->datum $typed)
     `(typed
