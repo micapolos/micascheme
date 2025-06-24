@@ -5,10 +5,7 @@
     expand-typed
     default-expand-typed
     typed-value-of)
-  (import (micascheme) (typico type) (typico typed))
-
-  (define boolean-type (primitive-type (gensym) 'boolean))
-  (define integer-type (primitive-type (gensym) 'integer))
+  (import (micascheme) (typico type) (typico typed) (typico core-types))
 
   (define (expand-typed $lookup $syntax)
     (switch (syntax-selector $syntax)
