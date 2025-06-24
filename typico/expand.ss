@@ -2,18 +2,18 @@
   (export
     typed typed? typed-type typed-value
     primitive-type primitive-type?
-    function-type function-type? function-type-param-types function-type-result-type
+    function-type function-type? function-type-param-types function-type-vararg-type? function-type-result-type
     boolean-type
     integer-type
     expand-typed
     default-expand-typed
-    type-assignable?)
+    typed-value-of)
   (import (micascheme))
 
   (data (typed type value))
 
   (data (primitive-type gensym datum))
-  (data (function-type param-types result-type))
+  (data (function-type param-types vararg-type? result-type))
 
   (define boolean-type (primitive-type (gensym) 'boolean))
   (define integer-type (primitive-type (gensym) 'integer))
@@ -48,6 +48,12 @@
                     (partial expand-typed $lookup)
                     (lambda (_) (syntax-error $cdr "not a proper list"))
                     (datum/annotation-expression $cdr)))
+                (run
+                  (when
+                    (<
+                      (length $typed-args)
+                      (length (function-type-param-types $function-type)))
+                    (syntax-error $datum/annotation "illegal argument count")))
                 (typed
                   (function-type-result-type $function-type)
                   `(
@@ -56,6 +62,10 @@
             ((else $other-type)
               (syntax-error $car "not a function")))))))
 
-  (define (type-assignable? $type $from-type)
-    (equal? $type $from-type))
+  (define (typed-value-of $typed $type $syntax)
+    (cond
+      ((equal? $type (typed-type $typed))
+        (typed-value $typed))
+      (else
+        (syntax-error $syntax "invalid type"))))
 )

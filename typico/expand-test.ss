@@ -14,7 +14,7 @@
         (case (datum/annotation-stripped $datum/annotation)
           ((inc)
             (typed
-              (function-type (list integer-type) integer-type)
+              (function-type (list integer-type) #f integer-type)
               'resolved-inc))
           (else
             (default-expand-typed $lookup $datum/annotation)))))
@@ -49,14 +49,22 @@
     (typed integer-type '$resolved-integer)))
 
 (check
+  (raises
+    (expand-typed lookup '($integer))))
+
+(check
   (equal?
     (expand-typed lookup 'inc)
-    (typed (function-type (list integer-type) integer-type) 'resolved-inc)))
+    (typed (function-type (list integer-type) #f integer-type) 'resolved-inc)))
 
 (check
   (equal?
     (expand-typed lookup '(inc $integer))
     (typed integer-type '(resolved-inc $resolved-integer))))
+
+(check
+  (raises
+    (expand-typed lookup '(inc))))
 
 (check
   (equal?
