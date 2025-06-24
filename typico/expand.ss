@@ -7,6 +7,7 @@
     integer-type
     expand-typed
     default-expand-typed
+    expand-typed-application
     typed-value-of
     type->datum
     typed->datum)
@@ -33,6 +34,11 @@
       (i
         (integer? (datum i))
         (typed integer-type (datum i)))
+      (other
+        (expand-typed-application $lookup #'other))))
+
+  (define (expand-typed-application $lookup $syntax)
+    (syntax-case $syntax ()
       ((fn arg ...)
         (lets
           ($typed-fn (expand-typed $lookup #'fn))
