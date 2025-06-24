@@ -4,7 +4,6 @@
     check
     raises
     works
-    works?
     define-check->
     define-check-datum->
     check-datum=?
@@ -48,8 +47,8 @@
       (syntax-case stx (not raises works)
         ((_ (raises body ...))
           #`(check (raises? (lambda () body ...))))
-        ((_ (works body ...))
-          #`(check (works? (lambda () body ...))))
+        ((_ (works body))
+          #`(check (works? body)))
         ((_ (not (pred arg ...)))
           (let*
             (
