@@ -24,5 +24,5 @@
     (check (equal? (typico in) ($primitive 3 out))))
 
   (define-case-syntax (check-raises in)
-    (check (raises (expand-typed (core-lookup) #'in))))
+    (check (raises (typico in))))
 )
