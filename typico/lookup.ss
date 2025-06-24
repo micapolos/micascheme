@@ -1,6 +1,11 @@
 (library (typico lookup)
-  (export empty-lookup lookup+ lookup+let core-lookup)
-  (import (micascheme) (typico typed) (typico expand))
+  (export
+    empty-lookup
+    lookup+
+    lookup+let
+    lookup++
+    core-lookup)
+  (import (micascheme) (typico typed) (typico expand) (typico type) (typico core-types))
 
   (define (empty-lookup)
     (lambda ($symbol) #f))
@@ -40,7 +45,30 @@
                     (map typed-value $typed-list)))
                   ,(typed-value $typed-body)))))))))
 
+  (define (lookup++ $lookup)
+    (lookup+ $lookup '+
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          ((_ arg arg* ...)
+            (lets
+              ($typed-arg (expand-typed $lookup #'arg))
+              ($arg-type (typed-type $typed-arg))
+              (cond
+                ((type=? $arg-type integer-type)
+                  (typed integer-type
+                    `(($primitive 3 +)
+                      ,(typed-value $typed-arg)
+                      ,@(map (partial expand-value-of $lookup integer-type) #'(arg* ...)))))
+                ((type=? $arg-type string-type)
+                  (typed string-type
+                    `(($primitive 3 string-append)
+                      ,(typed-value $typed-arg)
+                      ,@(map (partial expand-value-of $lookup string-type) #'(arg* ...)))))
+                (else (syntax-error #'arg
+                  "invalid type")))))))))
+
   (define (core-lookup)
     (fluent (empty-lookup)
-      (lookup+let)))
+      (lookup+let)
+      (lookup++)))
 )

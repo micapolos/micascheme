@@ -3,4 +3,5 @@
 (test
   (typico type)
   (typico typed)
-  (typico expand))
+  (typico expand)
+  (typico lang))

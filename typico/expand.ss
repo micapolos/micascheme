@@ -4,7 +4,7 @@
     integer-type
     expand-typed
     expand-typed/no-lookup
-    typed-value-of)
+    expand-value-of)
   (import
     (micascheme)
     (typico type)
@@ -81,7 +81,7 @@
 
   (define (typed-value-of $syntax $type $typed)
     (cond
-      ((equal? $type (typed-type $typed))
+      ((type=? $type (typed-type $typed))
         (typed-value $typed))
       (else
         (syntax-error $syntax "invalid type"))))
@@ -97,8 +97,14 @@
     (lets
       ($typed (expand-typed $lookup $syntax))
       (cond
-        ((equal? $type (typed-type $typed))
+        ((type=? $type (typed-type $typed))
           (typed-value $typed))
         (else
-          (syntax-error $syntax "invalid type")))))
+          (type-error (typed-type $typed) $type $syntax)))))
+
+  (define (type-error $actual-type $expected-type $syntax)
+    (syntax-error $syntax
+      (format "invalid type ~s, expected ~s, in"
+        (type->datum $actual-type)
+        (type->datum $expected-type))))
 )

@@ -3,7 +3,8 @@
     primitive-type primitive-type?
     function-type function-type? function-type-param-types function-type-result-type
     expander-type expander-type? expander-type-proc
-    type->datum)
+    type->datum
+    type=?)
   (import (micascheme))
 
   (data (primitive-type gensym datum))
@@ -24,4 +25,7 @@
           ,(type->datum (function-type-result-type $function-type))))
       ((expander-type? $expander-type)
         `(expander ,(expander-type-proc $expander-type)))))
+
+  (define (type=? $type-a $type-b)
+    (equal? $type-a $type-b))
 )
