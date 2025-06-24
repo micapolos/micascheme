@@ -1,6 +1,6 @@
-(library (typico core-lookup)
+(library (typico core lookup)
   (export core-lookup)
-  (import (micascheme) (typico typed) (typico expand) (typico type) (typico core-types) (typico lookup))
+  (import (micascheme) (typico typed) (typico expand) (typico type) (typico core types) (typico lookup))
 
   (define (lookup+let $lookup)
     (lookup+ $lookup 'let

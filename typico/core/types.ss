@@ -1,4 +1,4 @@
-(library (typico core-types)
+(library (typico core types)
   (export
     boolean-type integer-type number-type char-type string-type
     bytevector-type

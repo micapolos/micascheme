@@ -8,7 +8,7 @@
       quote check equal? raises)
     (typico typed)
     (typico expand)
-    (typico core-lookup))
+    (typico core lookup))
 
   (define-syntax (typico $syntax)
     (syntax-case $syntax ()

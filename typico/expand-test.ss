@@ -3,7 +3,7 @@
   (typico expand)
   (typico type)
   (typico typed)
-  (typico core-types))
+  (typico core types))
 
 (define (lookup $identifier)
   (syntax-case $identifier ($integer inc - macro)

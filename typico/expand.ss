@@ -10,7 +10,7 @@
   (import
     (micascheme)
     (typico type)
-    (typico core-types)
+    (typico core types)
     (typico typed))
 
   (define (expand-typed $lookup $syntax)
