@@ -2,7 +2,7 @@
   (export
     typed typed? typed-type typed-value
     primitive-type primitive-type?
-    function-type function-type? function-type-param-types function-type-vararg-type? function-type-result-type
+    function-type function-type? function-type-param-types function-type-result-type
     boolean-type
     integer-type
     expand-typed
@@ -13,7 +13,7 @@
   (data (typed type value))
 
   (data (primitive-type gensym datum))
-  (data (function-type param-types vararg-type? result-type))
+  (data (function-type param-types result-type))
 
   (define boolean-type (primitive-type (gensym) 'boolean))
   (define integer-type (primitive-type (gensym) 'integer))
@@ -48,24 +48,39 @@
                     (partial expand-typed $lookup)
                     (lambda (_) (syntax-error $cdr "not a proper list"))
                     (datum/annotation-expression $cdr)))
-                (run
-                  (when
-                    (<
-                      (length $typed-args)
-                      (length (function-type-param-types $function-type)))
-                    (syntax-error $datum/annotation "illegal argument count")))
                 (typed
                   (function-type-result-type $function-type)
                   `(
                     ,(datum/annotation-stripped (typed-value $typed-car))
-                    ,@(map datum/annotation-stripped (map typed-value $typed-args))))))
+                    ,@(typed-arg-values
+                      $datum/annotation
+                      (function-type-param-types $function-type)
+                      $typed-args
+                      (datum/annotation-expression $cdr))))))
             ((else $other-type)
               (syntax-error $car "not a function")))))))
 
-  (define (typed-value-of $typed $type $syntax)
+  (define (typed-value-of $datum/annotation $type $typed)
     (cond
       ((equal? $type (typed-type $typed))
         (typed-value $typed))
       (else
-        (syntax-error $syntax "invalid type"))))
+        (syntax-error $datum/annotation "invalid type"))))
+
+  (define (typed-arg-values $datum/annotation $param-types $typed-args $arg-datum/annotations)
+    (switch $param-types
+      ((null? _)
+        (cond
+          ((null? $typed-args) '())
+          (else (syntax-error $datum/annotation "illegal argument count"))))
+      ((pair? (pair $param-type $param-types))
+        (switch $typed-args
+          ((pair? (pair $typed-arg $typed-args))
+            (cons
+              (typed-value-of (car $arg-datum/annotations) $param-type $typed-arg)
+              (typed-arg-values $datum/annotation $param-types $typed-args (cdr $arg-datum/annotations))))
+          ((else _)
+            (syntax-error $datum/annotation "illegal argument count"))))
+      ((else $vararg-type)
+        (map (partial typed-value-of $datum/annotation $vararg-type) $typed-args))))
 )
