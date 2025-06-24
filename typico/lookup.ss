@@ -1,5 +1,5 @@
 (library (typico lookup)
-  (export empty-lookup lookup+ lookup+let)
+  (export empty-lookup lookup+ lookup+let core-lookup)
   (import (micascheme) (typico typed) (typico expand))
 
   (define (empty-lookup)
@@ -39,4 +39,8 @@
                     (map syntax->datum $ids)
                     (map typed-value $typed-list)))
                   ,(typed-value $typed-body)))))))))
+
+  (define (core-lookup)
+    (fluent (empty-lookup)
+      (lookup+let)))
 )
