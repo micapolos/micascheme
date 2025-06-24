@@ -10,5 +10,4 @@
     `(typed
       ,(type->datum (typed-type $typed))
       ,(typed-value $typed)))
-
 )

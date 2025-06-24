@@ -5,7 +5,11 @@
     expand-typed
     default-expand-typed
     typed-value-of)
-  (import (micascheme) (typico type) (typico typed) (typico core-types) (typico literal-expand))
+  (import
+    (micascheme)
+    (typico type)
+    (typico core-types)
+    (typico typed))
 
   (define (expand-typed $lookup $syntax)
     (switch (syntax-selector $syntax)
@@ -13,7 +17,28 @@
       ((else $id) (($lookup $id) $lookup $syntax))))
 
   (define (default-expand-typed $lookup $syntax)
-    (syntax-case $syntax ()
+    (or
+      (expand-typed-literal? $syntax)
+      (expand-typed-application? $lookup $syntax)
+      (syntax-error $syntax)))
+
+  (define (expand-typed-literal? $syntax)
+    (syntax-case? $syntax ()
+      (b
+        (boolean? (datum b))
+        (typed boolean-type (datum b)))
+      (i
+        (integer? (datum i))
+        (typed integer-type (datum i)))
+      (ch
+        (char? (datum ch))
+        (typed char-type (datum ch)))
+      (s
+        (string? (datum s))
+        (typed string-type (datum s)))))
+
+  (define (expand-typed-application? $lookup $syntax)
+    (syntax-case? $syntax ()
       ((fn arg ...)
         (lets
           ($typed-fn (expand-typed $lookup #'fn))
@@ -31,16 +56,7 @@
                       $typed-args
                       #'(arg ...))))))
             ((else $other-type)
-              (syntax-error #'fn "not a function")))))
-      (other
-        (literal-expand-typed #'other))))
-
-  (define (typed-value-of $syntax $type $typed)
-    (cond
-      ((equal? $type (typed-type $typed))
-        (typed-value $typed))
-      (else
-        (syntax-error $syntax "invalid type"))))
+              (syntax-error #'fn "not a function")))))))
 
   (define (typed-arg-values $syntax $param-types $typed-args $arg-syntaxes)
     (switch $param-types
@@ -58,4 +74,11 @@
             (syntax-error $syntax "illegal argument count"))))
       ((else $vararg-type)
         (map (partial typed-value-of $syntax $vararg-type) $typed-args))))
+
+  (define (typed-value-of $syntax $type $typed)
+    (cond
+      ((equal? $type (typed-type $typed))
+        (typed-value $typed))
+      (else
+        (syntax-error $syntax "invalid type"))))
 )

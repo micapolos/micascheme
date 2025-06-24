@@ -44,6 +44,8 @@
 
 (check-typed #t (typed boolean #t))
 (check-typed 123 (typed integer 123))
+(check-typed #\a (typed char #\a))
+(check-typed "foo" (typed string "foo"))
 
 (check-typed $integer (typed integer $expanded-integer))
 (check-type-error ($integer))
