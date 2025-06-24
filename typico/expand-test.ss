@@ -1,121 +1,121 @@
 (import (micascheme) (typico expand))
 
-(define (lookup $datum/annotation)
-  (case (datum/annotation-stripped $datum/annotation)
-    (($integer)
-      (lambda ($lookup $datum/annotation)
-        (case (datum/annotation-stripped $datum/annotation)
-          (($integer)
+(define (lookup $identifier)
+  (syntax-case $identifier ($integer inc - macro)
+    ($integer
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ($integer)
+          ($integer
             (typed integer-type '$resolved-integer))
-          (else
-            (default-expand-typed $lookup $datum/annotation)))))
-    ((inc)
-      (lambda ($lookup $datum/annotation)
-        (case (datum/annotation-stripped $datum/annotation)
-          ((inc)
+          (other
+            (default-expand-typed $lookup #'other)))))
+    (inc
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax (inc)
+          (inc
             (typed
               (function-type (list integer-type) integer-type)
               'resolved-inc))
-          (else
-            (default-expand-typed $lookup $datum/annotation)))))
-    ((-)
-      (lambda ($lookup $datum/annotation)
-        (case (datum/annotation-stripped $datum/annotation)
-          ((-)
+          (other
+            (default-expand-typed $lookup #'other)))))
+    (-
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax (-)
+          (-
             (typed
               (function-type (list* integer-type integer-type) integer-type)
               'resolved-))
-          (else
-            (default-expand-typed $lookup $datum/annotation)))))
-    ((macro)
-      (lambda ($lookup $datum/annotation)
-        (case (datum/annotation-stripped $datum/annotation)
-          ((macro)
+          (other
+            (default-expand-typed $lookup #'other)))))
+    (macro
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax (macro)
+          (macro
             (typed integer-type '(expanded macro)))
-          (else
-            (typed integer-type `(expanded ,(datum/annotation-stripped $datum/annotation)))))))
-    (else
-      (syntax-error $datum/annotation "unbound"))))
+          (other
+            (typed integer-type `(expanded ,(datum other)))))))
+    (other
+      (syntax-error #'other "unbound"))))
 
 (check
   (equal?
-    (expand-typed lookup (datum/annotation #t))
+    (expand-typed lookup #'#t)
     (typed boolean-type #t)))
 
 (check
   (equal?
-    (expand-typed lookup (datum/annotation 123))
+    (expand-typed lookup #'123)
     (typed integer-type 123)))
 
 (check
   (equal?
-    (expand-typed lookup (datum/annotation 123))
+    (expand-typed lookup #'123)
     (typed integer-type 123)))
 
 (check
   (equal?
-    (expand-typed lookup (datum/annotation $integer))
+    (expand-typed lookup #'$integer)
     (typed integer-type '$resolved-integer)))
 
 (check
   (raises
-    (expand-typed lookup (datum/annotation ($integer)))))
+    (expand-typed lookup #'($integer))))
 
 (check
   (equal?
-    (expand-typed lookup (datum/annotation inc))
+    (expand-typed lookup #'inc)
     (typed (function-type (list integer-type) integer-type) 'resolved-inc)))
 
 (check
   (equal?
-    (expand-typed lookup (datum/annotation (inc $integer)))
+    (expand-typed lookup #'(inc $integer))
     (typed integer-type '(resolved-inc $resolved-integer))))
 
 (check
   (raises
-    (expand-typed lookup (datum/annotation (inc)))))
+    (expand-typed lookup #'(inc))))
 
 (check
   (raises
-    (expand-typed lookup (datum/annotation (inc $boolean)))))
+    (expand-typed lookup #'(inc $boolean))))
 
 (check
   (raises
-    (expand-typed lookup (datum/annotation (inc $integer $integer)))))
+    (expand-typed lookup #'(inc $integer $integer))))
 
 (check
   (equal?
-    (expand-typed lookup (datum/annotation -))
+    (expand-typed lookup #'-)
     (typed (function-type (list* integer-type integer-type) integer-type) 'resolved-)))
 
 (check
   (raises
-    (expand-typed lookup (datum/annotation (-)))))
+    (expand-typed lookup #'(-))))
 
 (check
   (equal?
-    (expand-typed lookup (datum/annotation (- $integer)))
+    (expand-typed lookup #'(- $integer))
     (typed integer-type '(resolved- $resolved-integer))))
 
 (check
   (equal?
-    (expand-typed lookup (datum/annotation (- $integer $integer)))
+    (expand-typed lookup #'(- $integer $integer))
     (typed integer-type '(resolved- $resolved-integer $resolved-integer))))
 
 (check
   (raises
-    (expand-typed lookup (datum/annotation (- $boolean)))))
+    (expand-typed lookup #'(- $boolean))))
 
 (check
   (raises
-    (expand-typed lookup (datum/annotation (- $boolean $integer)))))
+    (expand-typed lookup #'(- $boolean $integer))))
 
 (check
   (equal?
-    (expand-typed lookup (datum/annotation macro))
+    (expand-typed lookup #'macro)
     (typed integer-type '(expanded macro))))
 
 (check
   (equal?
-    (expand-typed lookup (datum/annotation (macro 123)))
+    (expand-typed lookup #'(macro 123))
     (typed integer-type '(expanded (macro 123)))))
