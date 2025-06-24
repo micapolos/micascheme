@@ -5,10 +5,8 @@
     ($integer
       (lambda ($lookup $syntax)
         (syntax-case $syntax ($integer)
-          ($integer
-            (typed integer-type '$expanded-integer))
-          (other
-            (default-expand-typed $lookup #'other)))))
+          ($integer (typed integer-type '$expanded-integer))
+          (other (default-expand-typed $lookup #'other)))))
     (inc
       (lambda ($lookup $syntax)
         (syntax-case $syntax (inc)
@@ -30,10 +28,8 @@
     (macro
       (lambda ($lookup $syntax)
         (syntax-case $syntax (macro)
-          (macro
-            (typed integer-type 'expanded-macro))
-          (other
-            (typed integer-type `(expanded ,(datum other)))))))
+          (macro (typed integer-type 'expanded-macro))
+          (other (typed integer-type `(expanded ,(datum other)))))))
     (other
       (syntax-error #'other "unbound"))))
 
