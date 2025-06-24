@@ -41,22 +41,19 @@
     (syntax-case? $syntax ()
       ((fn arg ...)
         (lets
-          ($typed-fn (expand-typed $lookup #'fn))
-          (switch (typed-type $typed-fn)
-            ((function-type? $function-type)
-              (lets
-                ($typed-args (map (partial expand-typed $lookup) #'(arg ...)))
-                (typed
-                  (function-type-result-type $function-type)
-                  `(
-                    ,(typed-value $typed-fn)
-                    ,@(typed-arg-values
-                      $syntax
-                      (function-type-param-types $function-type)
-                      $typed-args
-                      #'(arg ...))))))
-            ((else $other-type)
-              (syntax-error #'fn "not a function")))))))
+          ((typed $function-type $function-value)
+            (expand-typed-function $lookup #'fn))
+            (lets
+              ($typed-args (map (partial expand-typed $lookup) #'(arg ...)))
+              (typed
+                (function-type-result-type $function-type)
+                `(
+                  ,$function-value
+                  ,@(typed-arg-values
+                    $syntax
+                    (function-type-param-types $function-type)
+                    $typed-args
+                    #'(arg ...)))))))))
 
   (define (typed-arg-values $syntax $param-types $typed-args $arg-syntaxes)
     (switch $param-types
@@ -81,4 +78,20 @@
         (typed-value $typed))
       (else
         (syntax-error $syntax "invalid type"))))
+
+  (define (expand-typed-function $lookup $syntax)
+    (lets
+      ($typed (expand-typed $lookup $syntax))
+      (switch (typed-type $typed)
+        ((function-type? $function-type) $typed)
+        ((else $other-type) (syntax-error #'fn "not a function")))))
+
+  (define (expand-value-of $lookup $type $syntax)
+    (lets
+      ($typed (expand-typed $lookup $syntax))
+      (cond
+        ((equal? $type (typed-type $typed))
+          (typed-value $typed))
+        (else
+          (syntax-error $syntax "invalid type")))))
 )
