@@ -86,7 +86,7 @@
       ((type=? $type (typed-type $typed))
         (typed-value $typed))
       (else
-        (syntax-error $syntax "invalid type"))))
+        (type-error $syntax (typed-type $typed) $type))))
 
   (define (expand-typed-function $lookup $syntax)
     (lets
