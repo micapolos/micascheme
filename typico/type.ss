@@ -53,5 +53,55 @@
         `(expander ,(expander-type-proc $expander-type)))))
 
   (define (type=? $type-a $type-b)
-    (equal? $type-a $type-b))
+    (switch? $type-a
+      ((primitive-type? $primitive-type-a)
+        (switch? $type-b
+          ((primitive-type? $primitive-type-b)
+            (symbol=?
+              (primitive-type-gensym $primitive-type-a)
+              (primitive-type-gensym $primitive-type-b)))))
+      ((function-type? $function-type-a)
+        (switch? $type-b
+          ((function-type? $function-type-b)
+            (and
+              (for-all*
+                type=?
+                (function-type-param-types $function-type-a)
+                (function-type-param-types $function-type-b))
+              (type=?
+                (function-type-result-type $function-type-a)
+                (function-type-result-type $function-type-b))))))
+      ((forall-type? $forall-type-a)
+        (switch? $type-b
+          ((forall-type? $forall-type-b)
+            (and
+              (=
+                (forall-type-arity $forall-type-a)
+                (forall-type-arity $forall-type-b))
+              (type=?
+                (forall-type-type $forall-type-a)
+                (forall-type-type $forall-type-b))))))
+      ((variable-type? $variable-type-a)
+        (switch? $type-b
+          ((variable-type? $variable-type-b)
+            (=
+              (variable-type-index $variable-type-a)
+              (variable-type-index $variable-type-b)))))
+      ((application-type? $application-type-a)
+        (switch? $type-b
+          ((application-type? $application-type-b)
+            (and
+              (type=?
+                (application-type-type $application-type-a)
+                (application-type-type $application-type-b))
+              (for-all*
+                (map type=?
+                  (application-type-args $application-type-a)
+                  (application-type-args $application-type-b)))))))
+      ((expander-type? $expander-type-a)
+        (switch? $type-b
+          ((expander-type? $expander-type-b)
+            (eq?
+              (expander-type-proc $expander-type-a)
+              (expander-type-proc $expander-type-b)))))))
 )
