@@ -2,6 +2,24 @@
   (export core-lookup)
   (import (micascheme) (typico typed) (typico expand) (typico type) (typico core types) (typico lookup))
 
+  (define-rule-syntax (lookup+primitive-type $lookup id type)
+    (lookup+ $lookup 'id
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          (id
+            (identifier? #'id)
+            (typed type-type type))
+          (other
+            (expand-typed/no-lookup $lookup #'other))))))
+
+  (define (lookup+typeof $lookup)
+    (lookup+ $lookup 'typeof
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          ((_ x)
+            (typed type-type
+              (typed-type (expand-typed $lookup #'x))))))))
+
   (define (lookup+let $lookup)
     (lookup+ $lookup 'let
       (lambda ($lookup $syntax)
@@ -91,6 +109,11 @@
 
   (define (core-lookup)
     (fluent (empty-lookup)
+      (lookup+primitive-type boolean boolean-type)
+      (lookup+primitive-type integer integer-type)
+      (lookup+primitive-type char char-type)
+      (lookup+primitive-type string string-type)
+      (lookup+typeof)
       (lookup+let)
       (lookup+primitive integer+ (function-type (list* integer-type) integer-type) +)
       (lookup+primitive string+ (function-type (list* string-type) string-type) string-append)

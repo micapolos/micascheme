@@ -1,10 +1,13 @@
 (library (typico core types)
   (export
+    type-type
     boolean-type integer-type number-type char-type string-type
     bytevector-type
     u2-type u3-type u7-type u8-type u16-type
     s8-type)
   (import (micascheme) (typico type))
+
+  (define type-type (primitive-type (gensym) 'type))
 
   (define boolean-type (primitive-type (gensym) 'boolean))
   (define integer-type (primitive-type (gensym) 'integer))

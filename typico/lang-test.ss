@@ -48,3 +48,13 @@
 (check-equal? (let ((x 10)) x) 10)
 (check-equal? (let ((x 10)) (+ x x)) 20)
 (check-equal? (let ((x 10) (y 20)) (+ x y)) 30)
+
+(check-equal? boolean boolean)
+(check-equal? integer integer)
+(check-equal? char char)
+(check-equal? string string)
+
+(check-equal? (typeof #t) boolean)
+(check-equal? (typeof 123) integer)
+(check-equal? (typeof #\a) char)
+(check-equal? (typeof "foo") string)

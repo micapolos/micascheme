@@ -2,20 +2,16 @@
   (export typico check-equal? check-primitive check-raises)
   (import
     (only (micascheme)
-      define-syntax define-rule-syntax define-case-syntax syntax-case
-      syntax quasisyntax datum->syntax
-      eval environment
-      quote check equal? raises $primitive logging)
+      define-rule-syntax define-case-syntax
+      syntax
+      check equal? raises $primitive)
     (typico typed)
     (typico expand)
+    (typico eval)
     (typico core lookup))
 
-  (define-syntax (typico $syntax)
-    (syntax-case $syntax ()
-      ((id expr)
-        #`(eval
-          (typed-value (expand-typed (core-lookup) #'expr))
-          (environment '(micascheme))))))
+  (define-rule-syntax (typico x)
+    (typed-eval (expand-typed (core-lookup) #'x)))
 
   (define-rule-syntax (check-equal? in out)
     (check (equal? (typico in) (typico out))))
