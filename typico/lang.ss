@@ -1,11 +1,11 @@
 (library (typico lang)
-  (export typico check-equal? check-primitive check-raises print)
+  (export typico check-equal? check-primitive check-raises check-works print)
   (import
     (only (micascheme)
       define-rule-syntax define-case-syntax
       define apply sc-expand environment quote
       syntax
-      check equal? raises $primitive displayln)
+      check equal? raises works $primitive displayln)
     (typico typed)
     (typico expand)
     (typico eval)
@@ -26,4 +26,7 @@
 
   (define-case-syntax (check-raises in)
     (check (raises (typico in))))
+
+  (define-case-syntax (check-works in)
+    (check (works (typico in))))
 )

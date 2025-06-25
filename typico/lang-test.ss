@@ -25,7 +25,8 @@
 
 ; === syntax/datum
 (check-equal? (datum 123) (datum 123))
-(check-equal? (datum (syntax 123)) (datum 123))
+(check-works (syntax 123))
+(check-equal? (datum (syntax 123)) 123)
 
 ; === list
 (check-raises (empty-list-of 1))

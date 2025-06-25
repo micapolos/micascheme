@@ -1,9 +1,18 @@
 (library (typico eval)
   (export typed-eval)
-  (import (micascheme) (typico expand) (typico typed) (typico type) (typico core types) (typico environment))
+  (import
+    (micascheme)
+    (typico expand)
+    (typico typed)
+    (typico type)
+    (typico core types)
+    (typico environment)
+    (typico scoped))
 
-  (define (typed-eval $typed)
+  (define (typed-eval (typed $type $value))
     (eval
-      (typed-value $typed)
+      (cond
+        ((type=? $type syntax-type) `(syntax ,(scoped-ref $value)))
+        (else $value))
       (typico-environment)))
 )
