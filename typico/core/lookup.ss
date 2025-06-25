@@ -12,6 +12,24 @@
           (other
             (expand-typed/no-lookup $lookup #'other))))))
 
+  (define (lookup+function $lookup)
+    (lookup+ $lookup 'function
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          ((_ (param ... last-param tail) result)
+            (equal? (datum tail) '...)
+            (typed type-type
+              (function-type
+                (append
+                  (map (partial expand-value-of $lookup type-type) #'(param ...))
+                  (expand-value-of $lookup type-type #'last-param))
+                (expand-value-of $lookup type-type #'result))))
+          ((_ (param ...) result)
+            (typed type-type
+              (function-type
+                (map (partial expand-value-of $lookup type-type) #'(param ...))
+                (expand-value-of $lookup type-type #'result))))))))
+
   (define (lookup+typeof $lookup)
     (lookup+ $lookup 'typeof
       (lambda ($lookup $syntax)
@@ -131,6 +149,7 @@
       (lookup+primitive-type char char-type)
       (lookup+primitive-type string string-type)
       (lookup+primitive-type bytevector bytevector-type)
+      (lookup+function)
       (lookup+typeof)
 
       (lookup+let)

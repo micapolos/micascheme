@@ -80,7 +80,14 @@
 (check-equal? string string)
 (check-equal? bytevector bytevector)
 
+(check-equal? (function () string) (function () string))
+(check-equal? (function (integer integer) string) (function (integer integer) string))
+(check-equal? (function (integer ...) string) (function (integer ...) string))
+
 (check-equal? (typeof #t) boolean)
 (check-equal? (typeof 123) integer)
 (check-equal? (typeof #\a) char)
 (check-equal? (typeof "foo") string)
+
+(check-equal? (typeof integer=?) (function (integer integer) boolean))
+(check-equal? (typeof integer+) (function (integer ...) integer))
