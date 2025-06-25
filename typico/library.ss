@@ -4,7 +4,7 @@
     empty-library
     library+syntax
     library->datum
-    check-library+syntax)
+    check-library)
   (import
     (rename
       (micascheme)
@@ -67,9 +67,6 @@
   (define (export->datum $export)
     `(,(typed-value $export) ,(type->datum (typed-type $export))))
 
-  (define-rule-syntax (check-library+syntax lookup in out)
-    (check
-      (equal?
-        (library->datum (library+syntax lookup (empty-library) (datum/annotation in)))
-        'out)))
+  (define-rule-syntax (check-library in out)
+    (check (equal? (library->datum in) 'out)))
 )
