@@ -117,6 +117,13 @@
 (check-equal? (let ((x 10)) (+ x x)) 20)
 (check-equal? (let ((x 10) (y 20)) (+ x y)) 30)
 
+(check-equal? (typeof (lambda () 10)) (function () integer))
+(check-equal? (typeof (lambda ((integer i) (string s)) i)) (function (integer string) integer))
+(check-equal? (typeof (lambda ((integer i) (string s)) s)) (function (integer string) string))
+(check-equal? (typeof (lambda ((integer is) ...) 123)) (function (integer ...) integer))
+;(check-equal? (typeof (lambda ((integer is) ...) is)) (function (integer ...) (list-of integer)))
+(check-equal? (typeof (lambda ((string s) (integer is) ...) s)) (function (string integer ...) string))
+
 (check-equal? ((lambda () 10)) 10)
 (check-equal? ((lambda ((integer x)) x) 10) 10)
 (check-equal? ((lambda ((integer x) (integer y)) (+ x y)) 10 20) 30)

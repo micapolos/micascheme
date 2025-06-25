@@ -129,7 +129,9 @@
                 (typed (list-of-type $vararg-type) $vararg-id))))
           ($typed-body (expand-typed $lookup #'body))
           (typed
-            (function-type $types (typed-type $typed-body))
+            (function-type
+              (append $types $vararg-type)
+              (typed-type $typed-body))
             `(lambda (,@$ids . ,$vararg-id)
               ,(typed-value $typed-body)))))
       ((_ ((type id) ...) body)
