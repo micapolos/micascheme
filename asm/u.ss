@@ -2,6 +2,7 @@
   (export
     u2? u2
     u3? u3
+    u7? u7
     u8? u8
     u16? u16
     s8? s8)
@@ -35,6 +36,7 @@
 
   (define-integer u 2)
   (define-integer u 3)
+  (define-integer u 7)
   (define-integer u 8)
   (define-integer u 16)
   (define-integer s 8)

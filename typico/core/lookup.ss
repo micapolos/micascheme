@@ -1,6 +1,6 @@
 (library (typico core lookup)
   (export core-lookup)
-  (import (micascheme) (typico typed) (typico expand) (typico type) (typico core types) (typico lookup) (asm u))
+  (import (micascheme) (typico typed) (typico expand) (typico type) (typico core types) (typico lookup))
 
   (define-rule-syntax (lookup+id $lookup id proc)
     (lookup+ $lookup 'id proc))
@@ -51,7 +51,7 @@
         (typed bytevector-type
           `(($primitive 3 bytevector)
             ,@(map
-              (partial expand-predicate-value-of $lookup u8? u8-type)
+              (partial expand-value-of $lookup u8-type)
               #'(u8 ...)))))
       (id
         (symbol? (datum id))

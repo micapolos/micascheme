@@ -12,7 +12,8 @@
     (micascheme)
     (typico type)
     (typico core types)
-    (typico typed))
+    (typico typed)
+    (asm u))
 
   (define (syntax-id $syntax)
     (syntax-case? $syntax ()
@@ -104,14 +105,30 @@
 
   (define (expand-predicate-value-of $lookup $predicate $type $syntax)
     (syntax-case $syntax ()
-      (x
-        ($predicate (datum x))
-        (datum x))
-      (other
-        (expand-value-of $lookup $type #'other))))
+      (x ($predicate (datum x)) (datum x))
+      (other (typed-value-of #'other $type (expand-typed $lookup #'other)))))
 
   (define (expand-value-of $lookup $type $syntax)
-    (typed-value-of $syntax $type (expand-typed $lookup $syntax)))
+    (syntax-case $syntax ()
+      (i
+        (integer? (datum i))
+        (cond
+          ((type=? $type u2-type)
+            (expand-predicate-value-of $lookup u2? $type $syntax))
+          ((type=? $type u3-type)
+            (expand-predicate-value-of $lookup u3? $type $syntax))
+          ((type=? $type u7-type)
+            (expand-predicate-value-of $lookup u7? $type $syntax))
+          ((type=? $type u8-type)
+            (expand-predicate-value-of $lookup u8? $type $syntax))
+          ((type=? $type u16-type)
+            (expand-predicate-value-of $lookup u16? $type $syntax))
+          ((type=? $type s8-type)
+            (expand-predicate-value-of $lookup s8? $type $syntax))
+          (else
+            (typed-value-of $syntax $type (expand-typed $lookup $syntax)))))
+      (other
+        (typed-value-of #'other $type (expand-typed $lookup #'other)))))
 
   (define (type-error $syntax $actual-type $expected-type)
     (syntax-error $syntax
