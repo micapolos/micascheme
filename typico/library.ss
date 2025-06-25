@@ -3,6 +3,7 @@
     library library? library-lookup-proc library-exports library-definitions
     empty-library
     library+syntax
+    library->datum
     check-library+syntax)
   (import
     (rename
@@ -11,6 +12,7 @@
       (library-exports %library-exports))
     (typico id)
     (typico expand)
+    (typico type)
     (typico typed)
     (typico lookup))
 
@@ -27,7 +29,7 @@
             (id? #'id)
             (lets
               ($symbol (id->symbol #'id))
-              ($typed (expand-typed $lookup #'expr))
+              ((typed $type $value) (expand-typed $lookup #'expr))
               (library
                 (lambda ($lookup)
                   (cond
@@ -39,15 +41,15 @@
                           (syntax-case $syntax ()
                             (id
                               (id? #'id)
-                              (typed (typed-type $typed) $symbol))
+                              (typed $type $symbol))
                             (other
                               (expand-typed/no-lookup $lookup #'other))))))))
-                (push (library-exports $library) $symbol)
+                (push
+                  (library-exports $library)
+                  (typed $type $symbol))
                 (push
                   (library-definitions $library)
-                  `(define
-                    ,(id->symbol #'id)
-                    ,(typed-value $typed))))))))
+                  `(define ,(id->symbol #'id) ,$value)))))))
       ((function . x)
         (syntax-case #'x ()
           (((id params ...) body)
@@ -57,23 +59,17 @@
                 #'(value id
                   (lambda (params ...) body)))))))))
 
-  (define-rule-syntax (library)
-    (check-library+syntax lookup in (library define ...) (id type) ...)
-    (lets
-      ($library (library+syntax lookup (empty-library) (datum/annotation in)))
-      (run
-        (check
-          (equal?
-            (reverse (library-definitions $library))
-            '(define ...)))
-        (check
-          (equal?
-            (lets
-              ($proc (library-lookup-proc $library))
-              ($lookup ($proc (empty-lookup)))
-              ($expander ($lookup 'id))
-              (run (check (not (false? $expander))))
-              ($typed ($expander $lookup (datum/annotation id)))
-              (typed->datum $typed))
-            '(typed type id))) ...)))
+  (define (library->datum $library)
+    `(library
+      (export ,@(map export->datum (reverse (library-exports $library))))
+      ,@(reverse (library-definitions $library))))
+
+  (define (export->datum $export)
+    `(,(typed-value $export) ,(type->datum (typed-type $export))))
+
+  (define-rule-syntax (check-library+syntax lookup in out)
+    (check
+      (equal?
+        (library->datum (library+syntax lookup (empty-library) (datum/annotation in)))
+        'out)))
 )
