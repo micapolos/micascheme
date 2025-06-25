@@ -1,14 +1,17 @@
 (library (typico lang)
-  (export typico check-equal? check-primitive check-raises)
+  (export typico check-equal? check-primitive check-raises print)
   (import
     (only (micascheme)
       define-rule-syntax define-case-syntax
       syntax
-      check equal? raises $primitive)
+      check equal? raises $primitive displayln)
     (typico typed)
     (typico expand)
     (typico eval)
     (typico core lookup))
+
+  (define-rule-syntax (print x)
+    (displayln (typed-eval (expand-typed (core-lookup) #'x))))
 
   (define-rule-syntax (typico x)
     (typed-eval (expand-typed (core-lookup) #'x)))

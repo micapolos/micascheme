@@ -49,7 +49,7 @@
                   (partial expand-predicate-value-of $lookup u8? u8-type)
                   #'(u8 ...)))))
           (id
-            (identifier? #'id)
+            (symbol? (datum id))
             (typed type-type bytevector-type))))))
 
   (define (lookup+let $lookup)
@@ -156,12 +156,34 @@
                   (types-error #'arg $arg-type
                     (list boolean-type integer-type))))))))))
 
+  (define (lookup+length $lookup)
+    (lookup+ $lookup 'length
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          ((_ x)
+            (lets
+              ($type (typed-type (expand-typed $lookup #'x)))
+              (cond
+                ((type=? $type string-type) (expand-typed $lookup #'(string-length x)))
+                ((type=? $type bytevector-type) (expand-typed $lookup #'(bytevector-length x)))
+                (else (types-error #'x $type (list string-type bytevector-type))))))))))
+
+  (define (lookup+string $lookup)
+    (lookup+ $lookup 'string
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          (id
+            (symbol? (datum id))
+            (typed type-type string-type))
+          ((_ x)
+            (typed string-type
+              `(format "~s" ,(typed-value (expand-typed $lookup #'x)))))))))
+
   (define (core-lookup)
     (fluent (empty-lookup)
       (lookup+primitive-type boolean boolean-type)
       (lookup+primitive-type integer integer-type)
       (lookup+primitive-type char char-type)
-      (lookup+primitive-type string string-type)
 
       (lookup+primitive-type u2 u2-type)
       (lookup+primitive-type u3 u3-type)
@@ -173,6 +195,8 @@
       (lookup+bytevector)
       (lookup+function)
       (lookup+typeof)
+      (lookup+length)
+      (lookup+string)
 
       (lookup+let)
 
@@ -184,6 +208,10 @@
 
       (lookup+primitive integer+ (function-type (list* integer-type) integer-type) +)
       (lookup+primitive string+ (function-type (list* string-type) string-type) string-append)
+
+      (lookup+primitive string-length (function-type (list string-type) integer-type) string-length)
+      (lookup+primitive bytevector-length (function-type (list bytevector-type) integer-type) bytevector-length)
+      (lookup+primitive integer->string (function-type (list integer-type) string-type) number->string)
 
       (lookup+=)
       (lookup++)

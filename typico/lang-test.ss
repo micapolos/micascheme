@@ -108,3 +108,5 @@
 (check-equal? (let ((x 10)) (+ x x)) 20)
 (check-equal? (let ((x 10) (y 20)) (+ x y)) 30)
 
+(check-equal? (integer->string 123) "123")
+(check-equal? (string-length "foo") 3)
