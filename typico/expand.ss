@@ -8,8 +8,7 @@
     expand-predicate-value-of
     expand-type
     type-error
-    types-error
-    syntax-id)
+    types-error)
   (import
     (micascheme)
     (typico type)
@@ -19,17 +18,8 @@
     (typico id)
     (asm u))
 
-  (define (syntax-id $syntax)
-    (syntax-case? $syntax ()
-      (id
-        (id? #'id)
-        #'id)
-      ((id . _)
-        (id? #'id)
-        #'id)))
-
   (define (expand-typed $lookup $syntax)
-    (switch (syntax-id $syntax)
+    (switch (syntax->selector-id? $syntax)
       ((false? _)
         (expand-typed/no-lookup $lookup $syntax))
       ((else $id)
