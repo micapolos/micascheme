@@ -19,6 +19,15 @@
 (check-equal? #\a #\a)
 (check-equal? "foo" "foo")
 
+; === list
+(check-raises (empty-list-of 1))
+(check-equal? (empty-list-of integer) (empty-list-of integer))
+
+(check-raises (list))
+(check-equal? (list 10) (list 10))
+(check-equal? (list 1 2 3) (list 1 2 3))
+(check-raises (list 1 #f))
+
 ; === bytevector
 (check-equal? (bytevector) (bytevector))
 (check-equal? (bytevector 1 2 3) (bytevector 1 2 3))
@@ -111,6 +120,8 @@
 (check-equal? ((lambda () 10)) 10)
 (check-equal? ((lambda ((integer x)) x) 10) 10)
 (check-equal? ((lambda ((integer x) (integer y)) (+ x y)) 10 20) 30)
+(check-equal? ((lambda ((integer xs) ...) xs)) (empty-list-of integer))
+;(check-equal? ((lambda ((integer xs) ...) xs) 1 2 3) (list 1 2 3))
 
 (check-equal? (integer->string 123) "123")
 (check-equal? (string-length "foo") 3)

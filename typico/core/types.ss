@@ -25,6 +25,10 @@
 
   (define s8-type (primitive-type (gensym) 's8))
 
-  (define list-type (forall-type 1 (primitive-type (gensym) 'list)))
-  (define (list-of-type $type) (application-type list-type (list $type)))
+  (define list-type (primitive-type (gensym) 'list))
+
+  (define (list-of-type $type)
+    (application-type
+      (forall-type 1 list-type)
+      (list $type)))
 )

@@ -57,6 +57,25 @@
         (symbol? (datum id))
         (typed type-type 'bytevector-type))))
 
+  (define-lookup+ (list $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ x xs ...)
+        (lets
+          ($typed-x (expand-typed $lookup #'x))
+          ($type (typed-type $typed-x))
+          ($value-x (typed-value $typed-x))
+          ($value-xs (map (partial expand-value-of $lookup (typed-type $typed-x)) #'(xs ...)))
+          (typed
+            (list-of-type $type)
+            `(($primitive 3 list) ,$value-x ,@$value-xs))))))
+
+  (define-lookup+ (empty-list-of $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ t)
+        (typed
+          (list-of-type (expand-type $lookup #'t))
+          `(($primitive 3 list))))))
+
   (define-lookup+ (let $lookup $syntax)
     (syntax-case $syntax ()
       ((_ ((id expr) ...) body)
@@ -86,6 +105,33 @@
 
   (define-lookup+ (lambda $lookup $syntax)
     (syntax-case $syntax ()
+      ((_ ((type id) ... (vararg-type vararg-id) dots) body)
+        (and
+          (for-all id? #'(id ... vararg-id))
+          (equal? (datum dots) '...))
+        (lets
+          ($ids (map id->symbol #'(id ...)))
+          ($vararg-id (id->symbol #'vararg-id))
+          ($types (map (partial expand-type $lookup) #'(type ...)))
+          ($vararg-type (expand-type $lookup #'vararg-type))
+          ($lookup
+            (fold-left
+              (lambda ($lookup $id $type)
+                (lookup+ $lookup $id
+                  (lambda ($lookup $syntax)
+                    (typed $type $id))))
+              $lookup
+              $ids
+              $types))
+          ($lookup
+            (lookup+ $lookup $vararg-id
+              (lambda ($lookup $syntax)
+                (typed (list-of-type $vararg-type) $vararg-id))))
+          ($typed-body (expand-typed $lookup #'body))
+          (typed
+            (function-type $types (typed-type $typed-body))
+            `(lambda (,@$ids . ,$vararg-id)
+              ,(typed-value $typed-body)))))
       ((_ ((type id) ...) body)
         (for-all id? #'(id ...))
         (lets
@@ -204,6 +250,7 @@
       (lookup+primitive-type u8 u8-type)
       (lookup+primitive-type u16 u16-type)
       (lookup+primitive-type s8 s8-type)
+      (lookup+primitive-type s8 list-type)
 
       (lookup+bytevector)
       (lookup+function)
@@ -213,6 +260,9 @@
 
       (lookup+let)
       (lookup+lambda)
+
+      (lookup+empty-list-of)
+      (lookup+list)
 
       (lookup+primitive boolean=? (function-type (list boolean-type boolean-type) boolean-type) boolean=?)
       (lookup+primitive integer=? (function-type (list integer-type integer-type) boolean-type) =)
