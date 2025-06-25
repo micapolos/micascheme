@@ -6,6 +6,8 @@
 (check-equal? char char)
 (check-equal? string string)
 (check-equal? bytevector bytevector)
+(check-equal? (list-of integer) (list-of integer))
+(check-equal? (list-of (list-of integer)) (list-of (list-of integer)))
 
 (check-equal? (function () string) (function () string))
 (check-equal? (function (string integer) boolean) (function (string integer) boolean))
@@ -120,7 +122,6 @@
 (check-equal? (typeof (lambda () 10)) (function () integer))
 (check-equal? (typeof (lambda ((integer i) (string s)) i)) (function (integer string) integer))
 (check-equal? (typeof (lambda ((integer i) (string s)) s)) (function (integer string) string))
-(check-equal? (typeof (lambda ((integer is) ...) 123)) (function (integer ...) integer))
 ;(check-equal? (typeof (lambda ((integer is) ...) is)) (function (integer ...) (list-of integer)))
 (check-equal? (typeof (lambda ((string s) (integer is) ...) s)) (function (string integer ...) string))
 

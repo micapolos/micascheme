@@ -37,6 +37,14 @@
             (list ,@(map (partial expand-value-of $lookup type-type) #'(param ...)))
             ,(expand-value-of $lookup type-type #'result))))))
 
+  (define-lookup+ (list-of $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ t)
+        (typed type-type
+          `(application-type
+            (forall-type 1 list-type)
+            (list ,(expand-value-of $lookup type-type #'t)))))))
+
   (define-lookup+ (typeof $lookup $syntax)
     (syntax-case $syntax ()
       ((_ x)
@@ -259,6 +267,7 @@
       (lookup+typeof)
       (lookup+length)
       (lookup+string)
+      (lookup+list-of)
 
       (lookup+let)
       (lookup+lambda)
