@@ -16,15 +16,16 @@
     (typico core types)
     (typico typed)
     (typico environment)
+    (typico id)
     (asm u))
 
   (define (syntax-id $syntax)
     (syntax-case? $syntax ()
       (id
-        (symbol? (datum id))
+        (id? #'id)
         #'id)
       ((id . _)
-        (symbol? (datum id))
+        (id? #'id)
         #'id)))
 
   (define (expand-typed $lookup $syntax)
@@ -32,7 +33,7 @@
       ((false? _)
         (expand-typed/no-lookup $lookup $syntax))
       ((else $id)
-        (switch ($lookup (syntax-case $id () (id (datum id))))
+        (switch ($lookup (id->symbol $id))
           ((false? _) (syntax-error $id "undefined"))
           ((else $proc) ($proc $lookup $syntax))))))
 

@@ -24,7 +24,7 @@
       (lambda ($lookup $syntax)
         (syntax-case $syntax ()
           (id
-            (symbol? (datum id))
+            (id? #'id)
             (typed type-type 'type))
           (other
             (expand-typed/no-lookup $lookup #'other))))))
@@ -94,7 +94,7 @@
               (partial expand-value-of $lookup u8-type)
               #'(u8 ...)))))
       (id
-        (symbol? (datum id))
+        (id? #'id)
         (typed type-type 'bytevector-type))))
 
   (define-lookup+ (list $lookup $syntax)
@@ -132,7 +132,7 @@
     (syntax-case $syntax ()
       ((_ ((id expr) ...) body)
         (lets
-          ($ids (map syntax->datum #'(id ...)))
+          ($ids (map id->symbol #'(id ...)))
           ($typed-list (map (partial expand-typed $lookup) #'(expr ...)))
           ($lookup
             (fold-left
@@ -141,7 +141,7 @@
                   (lambda ($lookup $syntax)
                     (syntax-case $syntax ()
                       (id
-                        (symbol? (datum id))
+                        (id? #'id)
                         (typed $type $id))))))
               $lookup
               $ids
@@ -151,7 +151,7 @@
             (typed-type $typed-body)
             `(let
               (,@(map list
-                (map syntax->datum $ids)
+                $ids
                 (map typed-value $typed-list)))
               ,(typed-value $typed-body)))))))
 
@@ -211,7 +211,7 @@
       (lambda ($lookup $syntax)
         (syntax-case $syntax ()
           (id
-            (symbol? (datum id))
+            (id? #'id)
             (typed type `($primitive 3 out)))
           (other
             (expand-typed/no-lookup $lookup #'other))))))
@@ -286,7 +286,7 @@
   (define-lookup+ (string $lookup $syntax)
     (syntax-case $syntax ()
       (id
-        (symbol? (datum id))
+        (id? #'id)
         (typed type-type 'string-type))
       ((_ x)
         (typed string-type

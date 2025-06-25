@@ -11,6 +11,6 @@
   (define (id->symbol $syntax)
     (syntax-case? $syntax ()
       (id
-        (symbol? (datum id))
+        (id? #'id)
         (datum id))))
 )
