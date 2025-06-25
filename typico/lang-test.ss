@@ -1,16 +1,41 @@
 (import (typico lang))
 
+; === types
+(check-equal? boolean boolean)
+(check-equal? integer integer)
+(check-equal? char char)
+(check-equal? string string)
+(check-equal? bytevector bytevector)
+
+(check-equal? (function () string) (function () string))
+(check-equal? (function (string integer) boolean) (function (string integer) boolean))
+(check-equal? (function (integer ...) boolean) (function (integer ...) boolean))
+(check-equal? (function (string integer ...) boolean) (function (string integer ...) boolean))
+
+; === literals
 (check-equal? #f #f)
 (check-equal? #t #t)
 (check-equal? 123 123)
 (check-equal? #\a #\a)
 (check-equal? "foo" "foo")
 
+; === typeof
+(check-equal? (typeof #t) boolean)
+(check-equal? (typeof 123) integer)
+(check-equal? (typeof #\a) char)
+(check-equal? (typeof "foo") string)
+
 (check-primitive boolean=? boolean=?)
 (check-primitive integer=? =)
 (check-primitive char=? char=?)
 (check-primitive string=? string=?)
 (check-primitive bytevector=? bytevector=?)
+
+(check-equal? (typeof boolean=?) (function (boolean boolean) boolean))
+(check-equal? (typeof integer=?) (function (integer integer) boolean))
+(check-equal? (typeof char=?) (function (char char) boolean))
+(check-equal? (typeof string=?) (function (string string) boolean))
+(check-equal? (typeof bytevector=?) (function (bytevector bytevector) boolean))
 
 (check-raises =)
 (check-raises (=))
@@ -38,11 +63,15 @@
 (check-equal? (+ "f" "o" "o") "foo")
 
 (check-primitive integer+ +)
+(check-equal? (typeof integer+) (function (integer ...) integer))
+
 (check-equal? (integer+) 0)
 (check-equal? (integer+ 1 2 3) 6)
 (check-raises (integer+ #t))
 
 (check-primitive string+ string-append)
+(check-equal? (typeof string+) (function (string ...) string))
+
 (check-equal? (string+) "")
 (check-equal? (string+ "a" "b" "c") "abc")
 (check-raises (string+ #t))
@@ -74,21 +103,3 @@
 (check-equal? (let ((x 10)) (+ x x)) 20)
 (check-equal? (let ((x 10) (y 20)) (+ x y)) 30)
 
-(check-equal? boolean boolean)
-(check-equal? integer integer)
-(check-equal? char char)
-(check-equal? string string)
-(check-equal? bytevector bytevector)
-
-(check-equal? (function () string) (function () string))
-(check-equal? (function (string integer) boolean) (function (string integer) boolean))
-(check-equal? (function (integer ...) boolean) (function (integer ...) boolean))
-(check-equal? (function (string integer ...) boolean) (function (string integer ...) boolean))
-
-(check-equal? (typeof #t) boolean)
-(check-equal? (typeof 123) integer)
-(check-equal? (typeof #\a) char)
-(check-equal? (typeof "foo") string)
-
-(check-equal? (typeof integer=?) (function (integer integer) boolean))
-(check-equal? (typeof integer+) (function (integer ...) integer))
