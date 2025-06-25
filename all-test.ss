@@ -52,6 +52,7 @@
   (pair)
   (parser)
   (port)
+  (predicate)
   (procedure)
   (proof)
   (property)

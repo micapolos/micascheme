@@ -1,5 +1,10 @@
 (import (micascheme) (typico type))
 
+(check (type? (primitive-type (gensym) 'integer)))
+(check (type? (function-type (list) (primitive-type (gensym) 'integer))))
+(check (type? (expander-type (lambda ($lookup $syntax) (void)))))
+(check (not (type? 123)))
+
 (check
   (equal?
     (type->datum (primitive-type (gensym) 'foo))

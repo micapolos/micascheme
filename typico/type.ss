@@ -1,5 +1,6 @@
 (library (typico type)
   (export
+    type?
     primitive-type primitive-type?
     function-type function-type? function-type-param-types function-type-result-type
     expander-type expander-type? expander-type-proc
@@ -10,6 +11,12 @@
   (data (primitive-type gensym datum))
   (data (function-type param-types result-type))
   (data (expander-type proc))
+
+  (define type?
+    (or-predicate
+      primitive-type?
+      function-type?
+      expander-type?))
 
   (define (type->datum $type)
     (switch-exhaustive $type
