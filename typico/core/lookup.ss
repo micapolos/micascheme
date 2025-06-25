@@ -149,6 +149,14 @@
       (lookup+primitive-type char char-type)
       (lookup+primitive-type string string-type)
       (lookup+primitive-type bytevector bytevector-type)
+
+      (lookup+primitive-type u2 u2-type)
+      (lookup+primitive-type u3 u3-type)
+      (lookup+primitive-type u7 u7-type)
+      (lookup+primitive-type u8 u8-type)
+      (lookup+primitive-type u16 u16-type)
+      (lookup+primitive-type s8 s8-type)
+
       (lookup+function)
       (lookup+typeof)
 
