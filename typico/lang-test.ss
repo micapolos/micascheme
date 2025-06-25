@@ -23,10 +23,15 @@
 (check-equal? #\a #\a)
 (check-equal? "foo" "foo")
 
-; === syntax/datum
+; === datum
 (check-equal? (datum 123) (datum 123))
-(check-works (syntax 123))
 (check-equal? (datum (syntax 123)) 123)
+(check-equal? (typeof (datum 123)) datum)
+(check-equal? (typeof (datum (syntax 123))) datum)
+
+; === syntax
+(check-works (syntax 123))
+(check-equal? (typeof (syntax 123)) syntax)
 
 ; === list
 (check-raises (empty-list-of 1))
