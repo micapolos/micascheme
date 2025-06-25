@@ -7,8 +7,8 @@
       (lambda ($lookup $syntax)
         (syntax-case $syntax ()
           (id
-            (identifier? #'id)
-            (typed type-type type))
+            (symbol? (datum id))
+            (typed type-type 'type))
           (other
             (expand-typed/no-lookup $lookup #'other))))))
 
@@ -19,24 +19,26 @@
           ((_ (param ... last-param tail) result)
             (equal? (datum tail) '...)
             (typed type-type
-              (function-type
-                (append
-                  (map (partial expand-value-of $lookup type-type) #'(param ...))
-                  (expand-value-of $lookup type-type #'last-param))
-                (expand-value-of $lookup type-type #'result))))
+              `(function-type
+                (list*
+                  ,@(map (partial expand-value-of $lookup type-type) #'(param ...))
+                  ,(expand-value-of $lookup type-type #'last-param))
+                ,(expand-value-of $lookup type-type #'result))))
           ((_ (param ...) result)
             (typed type-type
-              (function-type
-                (map (partial expand-value-of $lookup type-type) #'(param ...))
-                (expand-value-of $lookup type-type #'result))))))))
+              `(function-type
+                (list ,@(map (partial expand-value-of $lookup type-type) #'(param ...)))
+                ,(expand-value-of $lookup type-type #'result))))))))
 
   (define (lookup+typeof $lookup)
     (lookup+ $lookup 'typeof
       (lambda ($lookup $syntax)
         (syntax-case $syntax ()
           ((_ x)
-            (typed type-type
-              (typed-type (expand-typed $lookup #'x))))))))
+            (expand-typed $lookup
+              (type->datum
+                (typed-type
+                  (expand-typed $lookup #'x)))))))))
 
   (define (lookup+bytevector $lookup)
     (lookup+ $lookup 'bytevector
@@ -50,7 +52,7 @@
                   #'(u8 ...)))))
           (id
             (symbol? (datum id))
-            (typed type-type bytevector-type))))))
+            (typed type-type 'bytevector-type))))))
 
   (define (lookup+let $lookup)
     (lookup+ $lookup 'let
@@ -86,10 +88,8 @@
       (lambda ($lookup $syntax)
         (syntax-case $syntax ()
           (id
-            (identifier? #'id)
-            (typed
-              type
-              `($primitive 3 out)))
+            (symbol? (datum id))
+            (typed type `($primitive 3 out)))
           (other
             (expand-typed/no-lookup $lookup #'other))))))
 
@@ -174,7 +174,7 @@
         (syntax-case $syntax ()
           (id
             (symbol? (datum id))
-            (typed type-type string-type))
+            (typed type-type 'string-type))
           ((_ x)
             (typed string-type
               `(format "~s" ,(typed-value (expand-typed $lookup #'x)))))))))

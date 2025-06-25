@@ -14,12 +14,21 @@
     (typico core types)
     (typico typed))
 
+  (define (syntax-id $syntax)
+    (syntax-case? $syntax ()
+      (id
+        (symbol? (datum id))
+        #'id)
+      ((id . _)
+        (symbol? (datum id))
+        #'id)))
+
   (define (expand-typed $lookup $syntax)
-    (switch (syntax-selector $syntax)
+    (switch (syntax-id $syntax)
       ((false? _)
         (expand-typed/no-lookup $lookup $syntax))
       ((else $id)
-        (switch ($lookup (syntax->datum $id))
+        (switch ($lookup (syntax-case $id () (id (datum id))))
           ((false? _) (syntax-error $id "undefined"))
           ((else $proc) ($proc $lookup $syntax))))))
 

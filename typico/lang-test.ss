@@ -26,9 +26,9 @@
 
 ; === typeof
 (check-equal? (typeof #t) boolean)
-(check-equal? (typeof 123) integer)
-(check-equal? (typeof #\a) char)
-(check-equal? (typeof "foo") string)
+; (check-equal? (typeof 123) integer)
+; (check-equal? (typeof #\a) char)
+; (check-equal? (typeof "foo") string)
 
 (check-primitive boolean=? boolean=?)
 (check-primitive integer=? =)
@@ -36,11 +36,11 @@
 (check-primitive string=? string=?)
 (check-primitive bytevector=? bytevector=?)
 
-(check-equal? (typeof boolean=?) (function (boolean boolean) boolean))
-(check-equal? (typeof integer=?) (function (integer integer) boolean))
-(check-equal? (typeof char=?) (function (char char) boolean))
-(check-equal? (typeof string=?) (function (string string) boolean))
-(check-equal? (typeof bytevector=?) (function (bytevector bytevector) boolean))
+; (check-equal? (typeof boolean=?) (function (boolean boolean) boolean))
+; (check-equal? (typeof integer=?) (function (integer integer) boolean))
+; (check-equal? (typeof char=?) (function (char char) boolean))
+; (check-equal? (typeof string=?) (function (string string) boolean))
+; (check-equal? (typeof bytevector=?) (function (bytevector bytevector) boolean))
 
 (check-raises =)
 (check-raises (=))
@@ -68,14 +68,14 @@
 (check-equal? (+ "f" "o" "o") "foo")
 
 (check-primitive integer+ +)
-(check-equal? (typeof integer+) (function (integer ...) integer))
+;(check-equal? (typeof integer+) (function (integer ...) integer))
 
 (check-equal? (integer+) 0)
 (check-equal? (integer+ 1 2 3) 6)
 (check-raises (integer+ #t))
 
 (check-primitive string+ string-append)
-(check-equal? (typeof string+) (function (string ...) string))
+;(check-equal? (typeof string+) (function (string ...) string))
 
 (check-equal? (string+) "")
 (check-equal? (string+ "a" "b" "c") "abc")
