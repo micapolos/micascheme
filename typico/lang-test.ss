@@ -53,6 +53,7 @@
 (check-equal? integer integer)
 (check-equal? char char)
 (check-equal? string string)
+(check-equal? bytevector bytevector)
 
 (check-equal? (typeof #t) boolean)
 (check-equal? (typeof 123) integer)

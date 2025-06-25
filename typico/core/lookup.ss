@@ -113,6 +113,7 @@
       (lookup+primitive-type integer integer-type)
       (lookup+primitive-type char char-type)
       (lookup+primitive-type string string-type)
+      (lookup+primitive-type bytevector bytevector-type)
       (lookup+typeof)
       (lookup+let)
       (lookup+primitive integer+ (function-type (list* integer-type) integer-type) +)
