@@ -1,5 +1,5 @@
 (library (typico lang)
-  (export typico check-equal? check-primitive check-raises print typico-expand)
+  (export typico check-equal? check-primitive check-raises print)
   (import
     (only (micascheme)
       define-rule-syntax define-case-syntax
@@ -26,9 +26,4 @@
 
   (define-case-syntax (check-raises in)
     (check (raises (typico in))))
-
-  (define (typico-expand $syntax $environment . $options)
-    (sc-expand
-      (typed-value (expand-typed (core-lookup) $syntax))
-      (typico-environment)))
 )
