@@ -6,4 +6,5 @@
   (typico expand)
   (typico lookup)
   (typico lang)
-  (typico scoped))
+  (typico scoped)
+  (typico library))

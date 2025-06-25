@@ -3,12 +3,7 @@
   (typico typed)
   (typico core lookup)
   (typico core types)
-  (only (micascheme) define-rule-syntax stack datum/annotation))
-
-(define-rule-syntax (check-library-syntax in out)
-  (check-library
-    (library+syntax (core-lookup) (empty-library) (datum/annotation in))
-    out))
+  (rename (micascheme) (library %library) (library-exports %library-exports)))
 
 ; --- library
 
@@ -18,7 +13,7 @@
 
 (check-library
   (library
-    (lambda ($lookup) #f)
+    identity
     (stack
       (typed integer-type 'i)
       (typed string-type 's))
@@ -34,14 +29,14 @@
 
 ; --- library+syntax
 
-(check-library-syntax
+(check-library+syntax (core-lookup)
   (value x 10)
   (library
     (export
       (x integer))
     (define x 10)))
 
-(check-library-syntax
+(check-library+syntax (core-lookup)
   (function (foo (integer x) (integer y)) (+ x y))
   (library
     (export

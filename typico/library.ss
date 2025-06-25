@@ -4,10 +4,10 @@
     empty-library
     library+syntax
     library->datum
-    check-library)
+    check-library
+    check-library+syntax)
   (import
-    (rename
-      (micascheme)
+    (rename (micascheme)
       (library %library)
       (library-exports %library-exports))
     (typico id)
@@ -69,4 +69,9 @@
 
   (define-rule-syntax (check-library in out)
     (check (equal? (library->datum in) 'out)))
+
+  (define-rule-syntax (check-library+syntax lookup in out)
+    (check-library
+      (library+syntax lookup (empty-library) (datum/annotation in))
+      out))
 )
