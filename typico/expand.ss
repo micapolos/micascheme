@@ -111,13 +111,7 @@
         (expand-value-of $lookup $type #'other))))
 
   (define (expand-value-of $lookup $type $syntax)
-    (lets
-      ($typed (expand-typed $lookup $syntax))
-      (cond
-        ((type=? $type (typed-type $typed))
-          (typed-value $typed))
-        (else
-          (type-error $syntax (typed-type $typed) $type)))))
+    (typed-value-of $syntax $type (expand-typed $lookup $syntax)))
 
   (define (type-error $syntax $actual-type $expected-type)
     (syntax-error $syntax
