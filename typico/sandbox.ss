@@ -1,3 +1,3 @@
-(import (typico lang))
+(import (only (scheme) parameterize current-expand) (typico lang) (typico environment))
 
-(print (function () integer))
+(pretty-print (typico-expand '(+ "foo" "bar") (typico-environment)))

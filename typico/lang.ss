@@ -28,8 +28,7 @@
     (check (raises (typico in))))
 
   (define (typico-expand $syntax $environment . $options)
-    (apply sc-expand
-      (expand-typed (core-lookup) $syntax)
-      (typico-environment)
-      $options))
+    (sc-expand
+      (typed-value (expand-typed (core-lookup) $syntax))
+      (typico-environment)))
 )
