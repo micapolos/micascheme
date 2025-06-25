@@ -84,6 +84,23 @@
                   (types-error #'arg $arg-type
                     (list integer-type string-type))))))))))
 
+  (define (lookup+= $lookup)
+    (lookup+ $lookup '=
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          ((_ a b)
+            (lets
+              ($type (typed-type (expand-typed $lookup #'a)))
+              (cond
+                ((type=? $type boolean-type) (expand-typed $lookup #'(boolean=? a b)))
+                ((type=? $type integer-type) (expand-typed $lookup #'(integer=? a b)))
+                ((type=? $type char-type) (expand-typed $lookup #'(char=? a b)))
+                ((type=? $type string-type) (expand-typed $lookup #'(string=? a b)))
+                ((type=? $type bytevector-type) (expand-typed $lookup #'(bytevector=? a b)))
+                (else
+                  (types-error #'a $type
+                    (list boolean-type integer-type char-type string-type bytevector-type))))))))))
+
   (define (lookup+and $lookup)
     (lookup+ $lookup 'and
       (lambda ($lookup $syntax)
@@ -115,9 +132,19 @@
       (lookup+primitive-type string string-type)
       (lookup+primitive-type bytevector bytevector-type)
       (lookup+typeof)
+
       (lookup+let)
+
+      (lookup+primitive boolean=? (function-type (list boolean-type boolean-type) boolean-type) boolean=?)
+      (lookup+primitive integer=? (function-type (list integer-type integer-type) boolean-type) =)
+      (lookup+primitive char=? (function-type (list char-type char-type) boolean-type) char=?)
+      (lookup+primitive string=? (function-type (list string-type string-type) boolean-type) string=?)
+      (lookup+primitive bytevector=? (function-type (list bytevector-type bytevector-type) boolean-type) bytevector=?)
+
       (lookup+primitive integer+ (function-type (list* integer-type) integer-type) +)
       (lookup+primitive string+ (function-type (list* string-type) string-type) string-append)
+
+      (lookup+=)
       (lookup++)
       (lookup+and)))
 )

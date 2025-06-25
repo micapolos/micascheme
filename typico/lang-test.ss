@@ -6,6 +6,31 @@
 (check-equal? #\a #\a)
 (check-equal? "foo" "foo")
 
+(check-primitive boolean=? boolean=?)
+(check-primitive integer=? =)
+(check-primitive char=? char=?)
+(check-primitive string=? string=?)
+(check-primitive bytevector=? bytevector=?)
+
+(check-raises =)
+(check-raises (=))
+
+(check-equal? (= #f #f) #t)
+(check-equal? (= #f #t) #f)
+(check-raises (= #f 1))
+
+(check-equal? (= 1 1) #t)
+(check-equal? (= 1 2) #f)
+(check-raises (= 1 #f))
+
+(check-equal? (= #\a #\a) #t)
+(check-equal? (= #\a #\b) #f)
+(check-raises (= #\a #f))
+
+(check-equal? (= "a" "a") #t)
+(check-equal? (= "a" "b") #f)
+(check-raises (= "a" #f))
+
 (check-equal? (+ 1) 1)
 (check-equal? (+ 1 2 3) 6)
 
