@@ -52,7 +52,8 @@
     literal->syntax
     syntax-single
     get-property
-    syntax->list*)
+    syntax->list*
+    syntax-unpack)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -400,4 +401,10 @@
     (syntax-case $syntax ()
       ((x ... . y)
         (append #'(x ...) (if (null? (datum y)) '() #'y)))))
+
+  (define (syntax-unpack $syntax)
+    (syntax-case $syntax ()
+      ((x ...) #'(x ...))
+      ((x ... . y) (append #'(x ...) #'y))
+      (x #'x)))
 )
