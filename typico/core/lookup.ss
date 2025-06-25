@@ -1,6 +1,6 @@
 (library (typico core lookup)
   (export core-lookup)
-  (import (micascheme) (typico typed) (typico expand) (typico type) (typico core types) (typico lookup))
+  (import (micascheme) (typico typed) (typico expand) (typico type) (typico core types) (typico lookup) (asm u))
 
   (define-rule-syntax (lookup+primitive-type $lookup id type)
     (lookup+ $lookup 'id
@@ -37,6 +37,20 @@
           ((_ x)
             (typed type-type
               (typed-type (expand-typed $lookup #'x))))))))
+
+  (define (lookup+bytevector $lookup)
+    (lookup+ $lookup 'bytevector
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          ((_ u8 ...)
+            (typed bytevector-type
+              `(($primitive 3 bytevector)
+                ,@(map
+                  (partial expand-predicate-value-of $lookup u8? u8-type)
+                  #'(u8 ...)))))
+          (id
+            (identifier? #'id)
+            (typed type-type bytevector-type))))))
 
   (define (lookup+let $lookup)
     (lookup+ $lookup 'let
@@ -148,7 +162,6 @@
       (lookup+primitive-type integer integer-type)
       (lookup+primitive-type char char-type)
       (lookup+primitive-type string string-type)
-      (lookup+primitive-type bytevector bytevector-type)
 
       (lookup+primitive-type u2 u2-type)
       (lookup+primitive-type u3 u3-type)
@@ -157,6 +170,7 @@
       (lookup+primitive-type u16 u16-type)
       (lookup+primitive-type s8 s8-type)
 
+      (lookup+bytevector)
       (lookup+function)
       (lookup+typeof)
 

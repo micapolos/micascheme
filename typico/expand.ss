@@ -5,6 +5,7 @@
     expand-typed
     expand-typed/no-lookup
     expand-value-of
+    expand-predicate-value-of
     type-error
     types-error)
   (import
@@ -91,6 +92,14 @@
       (switch (typed-type $typed)
         ((function-type? $function-type) $typed)
         ((else $other-type) (syntax-error #'fn "not a function")))))
+
+  (define (expand-predicate-value-of $lookup $predicate $type $syntax)
+    (syntax-case $syntax ()
+      (x
+        ($predicate (datum x))
+        (datum x))
+      (other
+        (expand-value-of $lookup $type #'other))))
 
   (define (expand-value-of $lookup $type $syntax)
     (lets

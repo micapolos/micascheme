@@ -19,6 +19,11 @@
 (check-equal? #\a #\a)
 (check-equal? "foo" "foo")
 
+; === bytevector
+(check-equal? (bytevector) (bytevector))
+(check-equal? (bytevector 1 2 3) (bytevector 1 2 3))
+(check-raises (bytevector #x100))
+
 ; === typeof
 (check-equal? (typeof #t) boolean)
 (check-equal? (typeof 123) integer)
