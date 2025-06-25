@@ -1,6 +1,8 @@
 (import (typico lang))
 
 ; === types
+(check-equal? syntax syntax)
+(check-equal? datum datum)
 (check-equal? boolean boolean)
 (check-equal? integer integer)
 (check-equal? char char)
@@ -21,6 +23,10 @@
 (check-equal? #\a #\a)
 (check-equal? "foo" "foo")
 
+; === syntax/datum
+(check-equal? (datum 123) (datum 123))
+(check-equal? (datum (syntax 123)) (datum 123))
+
 ; === list
 (check-raises (empty-list-of 1))
 (check-equal? (empty-list-of integer) (empty-list-of integer))
@@ -40,6 +46,8 @@
 (check-equal? (typeof 123) integer)
 (check-equal? (typeof #\a) char)
 (check-equal? (typeof "foo") string)
+(check-equal? (typeof (syntax 123)) syntax)
+(check-equal? (typeof (datum 123)) datum)
 
 (check-primitive boolean=? boolean=?)
 (check-primitive integer=? =)

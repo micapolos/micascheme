@@ -5,4 +5,5 @@
   (typico typed)
   (typico expand)
   (typico lookup)
-  (typico lang))
+  (typico lang)
+  (typico scoped))

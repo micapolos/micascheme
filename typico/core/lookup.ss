@@ -1,6 +1,14 @@
 (library (typico core lookup)
   (export core-lookup)
-  (import (micascheme) (typico typed) (typico expand) (typico type) (typico core types) (typico lookup) (typico id))
+  (import
+    (micascheme)
+    (typico typed)
+    (typico expand)
+    (typico type)
+    (typico core types)
+    (typico lookup)
+    (typico id)
+    (typico scoped))
 
   (define-rule-syntax (lookup+id $lookup id proc)
     (lookup+ $lookup 'id proc))
@@ -20,6 +28,30 @@
             (typed type-type 'type))
           (other
             (expand-typed/no-lookup $lookup #'other))))))
+
+  (define-lookup+ (syntax $lookup $syntax)
+    (syntax-case $syntax ()
+      (id
+        (id? #'id)
+        (typed type-type 'syntax-type))
+      ((_ x)
+        (typed syntax-type
+          (scoped $lookup (syntax->datum/annotation #'x))))))
+
+  (define-lookup+ (datum $lookup $syntax)
+    (syntax-case $syntax ()
+      (id
+        (id? #'id)
+        (typed type-type 'datum-type))
+      ((_ x)
+        (lets
+          ($typed (expand-typed $lookup #'x))
+          ($type (typed-type $typed))
+          ($value (typed-value $typed))
+          (typed datum-type
+            (cond
+              ((type=? $type syntax-type) (scoped->datum $value))
+              (else $value)))))))
 
   (define-lookup+ (function $lookup $syntax)
     (syntax-case $syntax ()
@@ -287,6 +319,8 @@
       (lookup+if)
       (lookup+empty-list-of)
       (lookup+list)
+      (lookup+syntax)
+      (lookup+datum)
 
       (lookup+primitive boolean=? (function-type (list boolean-type boolean-type) boolean-type) boolean=?)
       (lookup+primitive integer=? (function-type (list integer-type integer-type) boolean-type) =)
