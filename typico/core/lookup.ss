@@ -84,6 +84,18 @@
           (list-of-type (expand-type $lookup #'t))
           `(($primitive 3 list))))))
 
+  (define-lookup+ (if $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ cond true false)
+        (lets
+          ($typed-true (expand-typed $lookup #'true))
+          ($type (typed-type $typed-true))
+          (typed $type
+            `(if
+              ,(expand-value-of $lookup boolean-type #'cond)
+              ,(typed-value $typed-true)
+              ,(expand-value-of $lookup $type #'false)))))))
+
   (define-lookup+ (let $lookup $syntax)
     (syntax-case $syntax ()
       ((_ ((id expr) ...) body)
@@ -272,6 +284,7 @@
       (lookup+let)
       (lookup+lambda)
 
+      (lookup+if)
       (lookup+empty-list-of)
       (lookup+list)
 

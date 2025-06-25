@@ -53,6 +53,13 @@
 (check-equal? (typeof string=?) (function (string string) boolean))
 (check-equal? (typeof bytevector=?) (function (bytevector bytevector) boolean))
 
+; === if
+
+(check-equal? (if #t "true" "false") "true")
+(check-equal? (if #f "true" "false") "false")
+(check-raises (if 123 "true" "false"))
+(check-raises (if #t "true" #f))
+
 (check-raises =)
 (check-raises (=))
 
