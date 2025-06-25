@@ -48,5 +48,15 @@
 
 (check
   (equal?
+    (type->datum (forall-type 3 (primitive-type (gensym) 'a)))
+    `(forall 3 a)))
+
+(check
+  (equal?
+    (type->datum (variable-type 3))
+    `(variable 3)))
+
+(check
+  (equal?
     (type->datum (expander-type identity))
     `(expander ,identity)))

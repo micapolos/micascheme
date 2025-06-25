@@ -4,7 +4,9 @@
     boolean-type integer-type char-type string-type
     bytevector-type
     u2-type u3-type u7-type u8-type u16-type
-    s8-type)
+    s8-type
+    list-type
+    list-of-type)
   (import (micascheme) (typico type))
 
   (define type-type (primitive-type (gensym) 'type))
@@ -22,4 +24,7 @@
   (define u16-type (primitive-type (gensym) 'u16))
 
   (define s8-type (primitive-type (gensym) 's8))
+
+  (define list-type (forall-type 1 (primitive-type (gensym) 'list)))
+  (define (list-of-type $type) (application-type list-type (list $type)))
 )
