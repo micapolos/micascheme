@@ -95,9 +95,9 @@
                 (application-type-type $application-type-a)
                 (application-type-type $application-type-b))
               (for-all*
-                (map type=?
-                  (application-type-args $application-type-a)
-                  (application-type-args $application-type-b)))))))
+                type=?
+                (application-type-args $application-type-a)
+                (application-type-args $application-type-b))))))
       ((expander-type? $expander-type-a)
         (switch? $type-b
           ((expander-type? $expander-type-b)
