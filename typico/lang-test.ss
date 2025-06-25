@@ -81,8 +81,9 @@
 (check-equal? bytevector bytevector)
 
 (check-equal? (function () string) (function () string))
-(check-equal? (function (integer integer) string) (function (integer integer) string))
-(check-equal? (function (integer ...) string) (function (integer ...) string))
+(check-equal? (function (string integer) boolean) (function (string integer) boolean))
+(check-equal? (function (integer ...) boolean) (function (integer ...) boolean))
+(check-equal? (function (string integer ...) boolean) (function (string integer ...) boolean))
 
 (check-equal? (typeof #t) boolean)
 (check-equal? (typeof 123) integer)
