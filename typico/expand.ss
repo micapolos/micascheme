@@ -6,13 +6,16 @@
     expand-typed/no-lookup
     expand-value-of
     expand-predicate-value-of
+    expand-type
     type-error
-    types-error)
+    types-error
+    syntax-id)
   (import
     (micascheme)
     (typico type)
     (typico core types)
     (typico typed)
+    (typico environment)
     (asm u))
 
   (define (syntax-id $syntax)
@@ -129,6 +132,9 @@
             (typed-value-of $syntax $type (expand-typed $lookup $syntax)))))
       (other
         (typed-value-of #'other $type (expand-typed $lookup #'other)))))
+
+  (define (expand-type $lookup $syntax)
+    (eval (expand-value-of $lookup type-type $syntax) (typico-environment)))
 
   (define (type-error $syntax $actual-type $expected-type)
     (syntax-error $syntax
