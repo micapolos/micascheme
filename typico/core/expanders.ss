@@ -17,6 +17,20 @@
   (define-rule-syntax (check-expand-core-raises in)
     (check-expand-raises core-expander in))
 
+  (define-rule-syntax (vararg-op-expander id op type predicate)
+    (case-expander (id x x* (... ...)) ($recurse)
+      (lets
+        ($typed-list (map (partial expand-inner $recurse) #'(x x* (... ...))))
+        ($types (map typed-type $typed-list))
+        (and
+          (for-all (partial type=? type) $types)
+          (typed type
+            (lets
+              ($values (map typed-value $typed-list))
+              (cond
+                ((for-all predicate $values) (apply op $values))
+                (else `(($primitive 3 op) ,@$values)))))))))
+
   (define core-expander
     (or-expander
       (predicate-expander boolean? boolean-type)
@@ -30,25 +44,19 @@
             (u8? (datum u8))
             (typed u8-type (datum u8)))))
 
-      (case-expander (if cond true false) ($recurse)
+      (case-expander (if condition true false) ($recurse)
         (lets
-          ($cond-value (expand-inner-value $recurse boolean-type #'cond))
+          ($condition-value (expand-inner-value $recurse boolean-type #'condition))
           ((typed $type $true-value) (expand-inner $recurse #'true))
           ($false-value (expand-inner-value $recurse $type #'false))
-          (typed $type `(if ,$cond-value ,$true-value ,$false-value))))
+          (typed $type
+            (cond
+              ((boolean? $condition-value) (if $condition-value $true-value $false-value))
+              (else `(if ,$condition-value ,$true-value ,$false-value))))))
 
       (case-expander integer-zero (typed integer-type 0))
       (case-expander integer-one (typed integer-type 1))
 
-      (case-expander (+ x x* ...) ($recurse)
-        (lets
-          ($typed-xs (map (partial expand-inner $recurse) #'(x x* ...)))
-          (and
-            (for-all (partial type=? integer-type) (map typed-type $typed-xs))
-            (typed integer-type
-              (lets
-                ($values (map typed-value $typed-xs))
-                (cond
-                  ((for-all integer? $values) (apply + $values))
-                  (else `(($primitive 3 +) ,@$values))))))))))
+      (vararg-op-expander + + integer-type integer?)
+      (vararg-op-expander + string-append string-type string?)))
 )

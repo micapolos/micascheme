@@ -5,17 +5,24 @@
 (check-expand-core #\a (typed char #\a))
 (check-expand-core "foo" (typed string "foo"))
 
-(check-expand-core
-  (if #t 10 20)
-  (typed integer (if #t 10 20)))
+(check-expand-core (if #t 10 20) (typed integer 10))
+(check-expand-core (if #f 10 20) (typed integer 20))
 
 (check-expand-core-raises (if #t 10 "foo"))
 (check-expand-core-raises (if "foo" 10 20))
 (check-expand-core-raises (if #t 10))
 (check-expand-core-raises (if #t 10 20 30))
 
+(check-expand-core-raises (+))
+
+(check-expand-core (+ 1) (typed integer 1))
 (check-expand-core (+ 1 2) (typed integer 3))
+(check-expand-core (+ 1 2 3) (typed integer 6))
 (check-expand-core (+ integer-zero integer-one) (typed integer 1))
+
+(check-expand-core (+ "a") (typed string "a"))
+(check-expand-core (+ "a" "b") (typed string "ab"))
+(check-expand-core (+ "a" "b" "c") (typed string "abc"))
 
 (check-expand-core (u8 0) (typed u8 0))
 (check-expand-core (u8 255) (typed u8 255))
