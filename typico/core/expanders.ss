@@ -1,7 +1,8 @@
 (library (typico core expanders)
   (export
     core-expander
-    check-expand-core)
+    check-expand-core
+    check-expand-core-raises)
   (import
     (typico base)
     (typico expander)
@@ -24,4 +25,7 @@
 
   (define-rule-syntax (check-expand-core in out)
     (check-expand core-expander in out))
+
+  (define-rule-syntax (check-expand-core-raises in)
+    (check-expand-raises core-expander in))
 )

@@ -7,7 +7,8 @@
     expand-typed
     expand-inner
     expand-inner-value
-    check-expand)
+    check-expand
+    check-expand-raises)
   (import
     (typico base)
     (typico type)
@@ -55,4 +56,9 @@
       (equal?
         (typed->datum (expand-typed expander (datum/annotation in)))
         'out)))
+
+  (define-rule-syntax (check-expand-raises expander in)
+    (check
+      (raises
+        (expand-typed expander (datum/annotation in)))))
 )
