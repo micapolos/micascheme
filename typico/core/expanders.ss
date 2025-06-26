@@ -8,7 +8,8 @@
     (typico expander)
     (typico typed)
     (typico type)
-    (typico core types))
+    (typico core types)
+    (asm u))
 
   (define-rule-syntax (check-expand-core in out)
     (check-expand core-expander in out))
@@ -22,6 +23,12 @@
       (predicate-expander integer? integer-type)
       (predicate-expander char? char-type)
       (predicate-expander string? string-type)
+
+      (case-expander (u8 x) ($recurse)
+        (syntax-case (expand-inner-value $recurse integer-type #'x) ()
+          (u8
+            (u8? (datum u8))
+            (typed u8-type (datum u8)))))
 
       (case-expander (if cond true false) ($recurse)
         (lets
