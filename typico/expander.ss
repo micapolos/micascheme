@@ -29,10 +29,11 @@
     (expander ($recurse $syntax)
       (or ($expander $recurse $syntax) ...)))
 
-  (define-rule-syntax (case-expander (id param ...) ($recurse) body)
-    (expander ($recurse $syntax)
-      (syntax-case? $syntax (id)
-        ((id param ...) body))))
+  (define-rules-syntax
+    ((case-expander (id param ...) ($recurse) body ...)
+      (expander ($recurse $syntax)
+        (syntax-case? $syntax (id)
+          ((id param ...) body ...)))))
 
   (define (expand-typed $expander $syntax)
     (or

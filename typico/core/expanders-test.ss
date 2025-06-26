@@ -13,3 +13,6 @@
 (check-expand-core-raises (if "foo" 10 20))
 (check-expand-core-raises (if #t 10))
 (check-expand-core-raises (if #t 10 20 30))
+
+(check-expand-core (+ 1 2) (typed integer 3))
+(check-expand-core (+ integer-0 integer-1) (typed integer (($primitive 3 +) 0 1)))

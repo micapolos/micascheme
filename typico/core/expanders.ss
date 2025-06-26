@@ -7,7 +7,14 @@
     (typico base)
     (typico expander)
     (typico typed)
+    (typico type)
     (typico core types))
+
+  (define-rule-syntax (check-expand-core in out)
+    (check-expand core-expander in out))
+
+  (define-rule-syntax (check-expand-core-raises in)
+    (check-expand-raises core-expander in))
 
   (define core-expander
     (or-expander
@@ -21,11 +28,24 @@
           ($cond-value (expand-inner-value $recurse boolean-type #'cond))
           ((typed $type $true-value) (expand-inner $recurse #'true))
           ($false-value (expand-inner-value $recurse $type #'false))
-          (typed $type `(if ,$cond-value ,$true-value ,$false-value))))))
+          (typed $type `(if ,$cond-value ,$true-value ,$false-value))))
 
-  (define-rule-syntax (check-expand-core in out)
-    (check-expand core-expander in out))
+      (expander ($recurse $syntax)
+        (syntax-case? $syntax (integer-0)
+          (integer-0 (typed integer-type 0))))
 
-  (define-rule-syntax (check-expand-core-raises in)
-    (check-expand-raises core-expander in))
+      (expander ($recurse $syntax)
+        (syntax-case? $syntax (integer-1)
+          (integer-1 (typed integer-type 1))))
+
+      (case-expander (+ x x* ...) ($recurse)
+        (for-all (dot number? datum/annotation-stripped) #'(x x* ...))
+        ($recurse (apply + (map datum/annotation-stripped #'(x x* ...)))))
+
+      (case-expander (+ x x* ...) ($recurse)
+        (lets
+          ($typed-xs (map (partial expand-inner $recurse) #'(x x* ...)))
+          (and
+            (for-all (partial type=? integer-type) (map typed-type $typed-xs))
+            (typed integer-type `(($primitive 3 +) ,@(map typed-value $typed-xs))))))))
 )
