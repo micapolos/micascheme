@@ -15,10 +15,11 @@
 (check-expand-core-raises (if #t 10 20 30))
 
 (check-expand-core (+ 1 2) (typed integer 3))
-(check-expand-core (+ integer-zero integer-one) (typed integer (($primitive 3 +) 0 1)))
+(check-expand-core (+ integer-zero integer-one) (typed integer 1))
 
 (check-expand-core (u8 0) (typed u8 0))
 (check-expand-core (u8 255) (typed u8 255))
 (check-expand-core-raises (u8 -1))
 (check-expand-core-raises (u8 256))
-(check-expand-core (u8 (+ 1 2)) (typed u8 3))
+(check-expand-core (u8 (+ integer-one 2)) (typed u8 3))
+(check-expand-core (u8 (+ 1 (+ 2 3))) (typed u8 6))

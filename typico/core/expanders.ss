@@ -41,14 +41,14 @@
       (case-expander integer-one (typed integer-type 1))
 
       (case-expander (+ x x* ...) ($recurse)
-        (and
-          (for-all (dot number? datum/annotation-stripped) #'(x x* ...))
-          ($recurse (apply + (map datum/annotation-stripped #'(x x* ...))))))
-
-      (case-expander (+ x x* ...) ($recurse)
         (lets
           ($typed-xs (map (partial expand-inner $recurse) #'(x x* ...)))
           (and
             (for-all (partial type=? integer-type) (map typed-type $typed-xs))
-            (typed integer-type `(($primitive 3 +) ,@(map typed-value $typed-xs))))))))
+            (typed integer-type
+              (lets
+                ($values (map typed-value $typed-xs))
+                (cond
+                  ((for-all integer? $values) (apply + $values))
+                  (else `(($primitive 3 +) ,@$values))))))))))
 )
