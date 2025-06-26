@@ -17,18 +17,26 @@
   (define-rule-syntax (check-expand-core-raises in)
     (check-expand-raises core-expander in))
 
-  (define-rule-syntax (vararg-op-expander id op type predicate)
+  (define-rule-syntax (vararg-op-expander id proc type)
     (case-expander (id x x* (... ...)) ($recurse)
       (lets
+        ($proc proc)
+        ($type type)
         ($typed-list (map (partial expand-inner $recurse) #'(x x* (... ...))))
         ($types (map typed-type $typed-list))
         (and
-          (for-all (partial type=? type) $types)
+          (for-all (partial type=? $type) $types)
           (typed type
             (lets
               ($values (map typed-value $typed-list))
+              ($type-predicate? (type-predicate? $type))
+              ($type-datum-proc? (type-datum-proc? $type))
               (cond
-                ((for-all predicate $values) (apply op $values))
+                ((and
+                  $type-predicate?
+                  $type-datum-proc?
+                  (for-all $type-predicate? $values))
+                  ($type-datum-proc? (apply $proc $values)))
                 (else `(($primitive 3 op) ,@$values)))))))))
 
   (define core-expander
@@ -57,7 +65,7 @@
       (case-expander integer-zero (typed integer-type 0))
       (case-expander integer-one (typed integer-type 1))
 
-      (vararg-op-expander + + integer-type integer?)
-      (vararg-op-expander - - integer-type integer?)
-      (vararg-op-expander + string-append string-type string?)))
+      (vararg-op-expander + + integer-type)
+      (vararg-op-expander - - integer-type)
+      (vararg-op-expander + string-append string-type)))
 )

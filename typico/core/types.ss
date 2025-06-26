@@ -9,25 +9,25 @@
     s8-type
     list-type
     list-of-type)
-  (import (micascheme) (typico type))
+  (import (micascheme) (typico type) (asm u))
 
   (define type-type (primitive-type (gensym) 'type))
   (define syntax-type (primitive-type (gensym) 'syntax))
   (define datum-type (primitive-type (gensym) 'datum))
 
-  (define boolean-type (primitive-type (gensym) 'boolean))
-  (define integer-type (primitive-type (gensym) 'integer))
-  (define char-type (primitive-type (gensym) 'char))
-  (define string-type (primitive-type (gensym) 'string))
-  (define bytevector-type (primitive-type (gensym) 'bytevector))
+  (define boolean-type (primitive-type (gensym) 'boolean boolean? identity))
+  (define integer-type (primitive-type (gensym) 'integer integer? identity))
+  (define char-type (primitive-type (gensym) 'char char? identity))
+  (define string-type (primitive-type (gensym) 'string string? identity))
+  (define bytevector-type (primitive-type (gensym) 'bytevector bytevector?))
 
-  (define u2-type (primitive-type (gensym) 'u2))
-  (define u3-type (primitive-type (gensym) 'u3))
-  (define u7-type (primitive-type (gensym) 'u7))
-  (define u8-type (primitive-type (gensym) 'u8))
-  (define u16-type (primitive-type (gensym) 'u16))
+  (define u2-type (primitive-type (gensym) 'u2 u2? identity))
+  (define u3-type (primitive-type (gensym) 'u3 u3? identity))
+  (define u7-type (primitive-type (gensym) 'u7 u7? identity))
+  (define u8-type (primitive-type (gensym) 'u8 u8? identity))
+  (define u16-type (primitive-type (gensym) 'u16 u16? identity))
 
-  (define s8-type (primitive-type (gensym) 's8))
+  (define s8-type (primitive-type (gensym) 's8 s8? identity))
 
   (define list-type
     (forall-type 1 (primitive-type (gensym) 'list)))
