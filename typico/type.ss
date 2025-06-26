@@ -1,20 +1,45 @@
 (library (typico type)
   (export
     type?
-    (rename (make-primitive-type primitive-type)) primitive-type? primitive-type-gensym primitive-type-datum primitive-type-predicate? primitive-type-datum-proc?
-    function-type function-type? function-type-param-types function-type-result-type
-    forall-type forall-type? forall-type-arity forall-type-type
-    variable-type variable-type? variable-type-index
-    application-type application-type? application-type-type application-type-args
-    expander-type expander-type? expander-type-proc
+
+    (rename (make-primitive-type primitive-type))
+    primitive-type?
+    primitive-type-gensym
+    primitive-type-datum
+    primitive-type-value-predicate?
+    primitive-type-value-datum-proc?
+
+    function-type
+    function-type?
+    function-type-param-types
+    function-type-result-type
+
+    forall-type
+    forall-type?
+    forall-type-arity
+    forall-type-type
+
+    variable-type
+    variable-type?
+    variable-type-index
+
+    application-type
+    application-type?
+    application-type-type
+    application-type-args
+
+    expander-type
+    expander-type?
+    expander-type-proc
+
     type->datum
     type=?
-    type-predicate?
-    type-datum-proc?
+    type-value-predicate?
+    type-value-datum-proc?
     gentype)
   (import (micascheme))
 
-  (data (primitive-type gensym datum predicate? datum-proc?))
+  (data (primitive-type gensym datum value-predicate? value-datum-proc?))
   (data (function-type param-types result-type))
   (data (forall-type arity type))
   (data (variable-type index))
@@ -34,10 +59,10 @@
     (case-lambda
       (($gensym $id)
         (make-primitive-type $gensym $id #f))
-      (($gensym $id $predicate?)
-        (make-primitive-type $gensym $id $predicate? #f))
-      (($gensym $id $predicate? $datum-proc?)
-        (primitive-type $gensym $id $predicate? $datum-proc?))))
+      (($gensym $id $value-predicate?)
+        (make-primitive-type $gensym $id $value-predicate? #f))
+      (($gensym $id $value-predicate? $value-datum-proc?)
+        (primitive-type $gensym $id $value-predicate? $value-datum-proc?))))
 
   (define-rule-syntax (gentype id)
     (primitive-type (gensym) 'id))
@@ -120,13 +145,13 @@
               (expander-type-proc $expander-type-a)
               (expander-type-proc $expander-type-b)))))))
 
-  (define (type-predicate? $type)
+  (define (type-value-predicate? $type)
     (switch? $type
       ((primitive-type? $primitive-type)
-        (primitive-type-predicate? $primitive-type))))
+        (primitive-type-value-predicate? $primitive-type))))
 
-  (define (type-datum-proc? $type)
+  (define (type-value-datum-proc? $type)
     (switch? $type
       ((primitive-type? $primitive-type)
-        (primitive-type-datum-proc? $primitive-type))))
+        (primitive-type-value-datum-proc? $primitive-type))))
 )

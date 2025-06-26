@@ -29,14 +29,14 @@
           (typed type
             (lets
               ($values (map typed-value $typed-list))
-              ($type-predicate? (type-predicate? $type))
-              ($type-datum-proc? (type-datum-proc? $type))
+              ($value-predicate? (type-value-predicate? $type))
+              ($value-datum-proc? (type-value-datum-proc? $type))
               (cond
                 ((and
-                  $type-predicate?
-                  $type-datum-proc?
-                  (for-all $type-predicate? $values))
-                  ($type-datum-proc? (apply $proc $values)))
+                  $value-predicate?
+                  $value-datum-proc?
+                  (for-all $value-predicate? $values))
+                  ($value-datum-proc? (apply $proc $values)))
                 (else `(($primitive 3 op) ,@$values)))))))))
 
   (define core-expander
