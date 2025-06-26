@@ -36,7 +36,8 @@
     type=?
     type-value-predicate?
     type-value-datum-proc?
-    gentype)
+    gentype
+    define-type)
   (import (micascheme))
 
   (data (primitive-type gensym datum value-predicate? value-datum-proc?))
@@ -57,15 +58,19 @@
 
   (define make-primitive-type
     (case-lambda
-      (($gensym $id)
-        (make-primitive-type $gensym $id #f))
-      (($gensym $id $value-predicate?)
-        (make-primitive-type $gensym $id $value-predicate? #f))
-      (($gensym $id $value-predicate? $value-datum-proc?)
-        (primitive-type $gensym $id $value-predicate? $value-datum-proc?))))
+      (($gensym $datum)
+        (make-primitive-type $gensym $datum #f))
+      (($gensym $datum $value-predicate?)
+        (make-primitive-type $gensym $datum $value-predicate? #f))
+      (($gensym $datum $value-predicate? $value-datum-proc?)
+        (primitive-type $gensym $datum $value-predicate? $value-datum-proc?))))
 
-  (define-rule-syntax (gentype id arg ...)
-    (make-primitive-type (gensym) 'id arg ...))
+  (define-rule-syntax (gentype datum arg ...)
+    (make-primitive-type (gensym) 'datum arg ...))
+
+  (define-case-syntax (define-type id arg ...)
+    #`(define #,(identifier-append #'id #'id #'- #'type)
+      (gentype id arg ...)))
 
   (define (type->datum $type)
     (switch-exhaustive $type

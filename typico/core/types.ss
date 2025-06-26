@@ -11,23 +11,23 @@
     list-of-type)
   (import (micascheme) (typico type) (asm u))
 
-  (define type-type (gentype type))
-  (define syntax-type (gentype syntax))
-  (define datum-type (gentype datum))
+  (define-type type)
+  (define-type syntax)
+  (define-type datum)
 
-  (define boolean-type (gentype boolean boolean? identity))
-  (define integer-type (gentype integer integer? identity))
-  (define char-type (gentype char char? identity))
-  (define string-type (gentype string string? identity))
-  (define bytevector-type (gentype bytevector bytevector?))
+  (define-type boolean boolean? identity)
+  (define-type integer integer? identity)
+  (define-type char char? identity)
+  (define-type string string? identity)
+  (define-type bytevector bytevector?)
 
-  (define u2-type (gentype u2 u2? identity))
-  (define u3-type (gentype u3 u3? identity))
-  (define u7-type (gentype u7 u7? identity))
-  (define u8-type (gentype u8 u8? identity))
-  (define u16-type (gentype u16 u16? identity))
+  (define-type u2 u2? identity)
+  (define-type u3 u3? identity)
+  (define-type u7 u7? identity)
+  (define-type u8 u8? identity)
+  (define-type u16 u16? identity)
 
-  (define s8-type (gentype s8 s8? identity))
+  (define-type s8 s8? identity)
 
   (define list-type (forall-type 1 (gentype list)))
 
