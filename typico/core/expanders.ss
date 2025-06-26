@@ -30,17 +30,13 @@
           ($false-value (expand-inner-value $recurse $type #'false))
           (typed $type `(if ,$cond-value ,$true-value ,$false-value))))
 
-      (expander ($recurse $syntax)
-        (syntax-case? $syntax (integer-zero)
-          (integer-zero (typed integer-type 0))))
-
-      (expander ($recurse $syntax)
-        (syntax-case? $syntax (integer-one)
-          (integer-one (typed integer-type 1))))
+      (case-expander integer-zero (typed integer-type 0))
+      (case-expander integer-one (typed integer-type 1))
 
       (case-expander (+ x x* ...) ($recurse)
-        (for-all (dot number? datum/annotation-stripped) #'(x x* ...))
-        ($recurse (apply + (map datum/annotation-stripped #'(x x* ...)))))
+        (and
+          (for-all (dot number? datum/annotation-stripped) #'(x x* ...))
+          ($recurse (apply + (map datum/annotation-stripped #'(x x* ...))))))
 
       (case-expander (+ x x* ...) ($recurse)
         (lets

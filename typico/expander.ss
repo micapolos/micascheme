@@ -29,11 +29,24 @@
     (expander ($recurse $syntax)
       (or ($expander $recurse $syntax) ...)))
 
-  (define-rules-syntax
-    ((case-expander (id param ...) ($recurse) body ...)
+  (define-rules-syntax (literals keywords)
+    ((case-expander (keywords keyword ...) (id param ...) ($recurse) body)
+      (expander ($recurse $syntax)
+        (syntax-case? $syntax (id keyword ...)
+          ((id param ...) body))))
+    ((case-expander (keywords keyword ...) (id param ...) body)
+      (case-expander (keywords keyword ...) (id param ...) ($recurse) body))
+    ((case-expander (id param ...) ($recurse) body)
+      (case-expander (keywords) (id param ...) ($recurse) body))
+    ((case-expander (id param ...) body)
+      (case-expander (id param ...) ($recurse) body))
+    ((case-expander id ($recurse) body)
       (expander ($recurse $syntax)
         (syntax-case? $syntax (id)
-          ((id param ...) body ...)))))
+          (id body))))
+    ((case-expander id body)
+      (case-expander id ($recurse) body)))
+
 
   (define (expand-typed $expander $syntax)
     (or
