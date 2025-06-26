@@ -64,8 +64,8 @@
       (($gensym $id $value-predicate? $value-datum-proc?)
         (primitive-type $gensym $id $value-predicate? $value-datum-proc?))))
 
-  (define-rule-syntax (gentype id)
-    (primitive-type (gensym) 'id))
+  (define-rule-syntax (gentype id arg ...)
+    (make-primitive-type (gensym) 'id arg ...))
 
   (define (type->datum $type)
     (switch-exhaustive $type
