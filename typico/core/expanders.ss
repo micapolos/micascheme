@@ -17,9 +17,9 @@
 
       (case-expander (if cond true false) ($recurse)
         (lets
-          ($cond-value (recurse-value $recurse boolean-type #'cond))
-          ((typed $type $true-value) ($recurse #'true))
-          ($false-value (recurse-value $recurse $type #'false))
+          ($cond-value (expand-inner-value $recurse boolean-type #'cond))
+          ((typed $type $true-value) (expand-inner $recurse #'true))
+          ($false-value (expand-inner-value $recurse $type #'false))
           (typed $type `(if ,$cond-value ,$true-value ,$false-value))))))
 
   (define-rule-syntax (check-expand-core in out)

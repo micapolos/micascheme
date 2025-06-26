@@ -4,8 +4,9 @@
     predicate-expander
     or-expander
     case-expander
-    expand
-    recurse-value
+    expand-typed
+    expand-inner
+    expand-inner-value
     check-expand)
   (import
     (typico base)
@@ -32,14 +33,19 @@
       (syntax-case? $syntax (id)
         ((id param ...) body))))
 
-  (define (expand $expander $syntax)
+  (define (expand-typed $expander $syntax)
     (or
-      ($expander (partial expand $expander) $syntax)
+      ($expander (partial expand-typed $expander) $syntax)
       (syntax-error $syntax)))
 
-  (define (recurse-value $recurse $expected-type $syntax)
+  (define (expand-inner $recurse $syntax)
+    (or
+      ($recurse $syntax)
+      (syntax-error $syntax)))
+
+  (define (expand-inner-value $recurse $expected-type $syntax)
     (lets
-      ((typed $type $value) ($recurse $syntax))
+      ((typed $type $value) (expand-inner $recurse $syntax))
       (cond
         ((type=? $type $expected-type) $value)
         (else (type-error $syntax $type $expected-type)))))
@@ -47,6 +53,6 @@
   (define-rule-syntax (check-expand expander in out)
     (check
       (equal?
-        (typed->datum (expand expander (datum/annotation in)))
+        (typed->datum (expand-typed expander (datum/annotation in)))
         'out)))
 )
