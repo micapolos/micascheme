@@ -31,12 +31,12 @@
           (typed $type `(if ,$cond-value ,$true-value ,$false-value))))
 
       (expander ($recurse $syntax)
-        (syntax-case? $syntax (integer-0)
-          (integer-0 (typed integer-type 0))))
+        (syntax-case? $syntax (integer-zero)
+          (integer-zero (typed integer-type 0))))
 
       (expander ($recurse $syntax)
-        (syntax-case? $syntax (integer-1)
-          (integer-1 (typed integer-type 1))))
+        (syntax-case? $syntax (integer-one)
+          (integer-one (typed integer-type 1))))
 
       (case-expander (+ x x* ...) ($recurse)
         (for-all (dot number? datum/annotation-stripped) #'(x x* ...))
