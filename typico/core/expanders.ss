@@ -58,5 +58,6 @@
       (case-expander integer-one (typed integer-type 1))
 
       (vararg-op-expander + + integer-type integer?)
+      (vararg-op-expander - - integer-type integer?)
       (vararg-op-expander + string-append string-type string?)))
 )
