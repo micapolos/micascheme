@@ -15,6 +15,7 @@
     (typico base)
     (typico type)
     (typico typed)
+    (typico environment)
     (only (typico expand) type-error))
 
   (define-rule-syntax (expander ($recurse $syntax) body)
@@ -132,6 +133,7 @@
                   ($value-datum-proc? (type-value-datum-proc? $result-type))
                   ($arg-value-predicate?s (map type-value-predicate? $param-types))
                   ($vararg-value-predicate? (type-value-predicate? $vararg-param-type))
+                  ($datum `(proc ,@$arg-values ,@$vararg-values))
                   (cond
                     ((and $value-datum-proc?
                       (for-all
@@ -142,8 +144,8 @@
                       (for-all
                         (lambda ($arg-value) ($vararg-value-predicate? $arg-value))
                         $vararg-values))
-                      ($value-datum-proc? (apply $proc (append $arg-values $vararg-values))))
-                    (else `(proc ,@$arg-values ,@$vararg-values))))))))))
+                      ($value-datum-proc? (eval $datum (typico-environment))))
+                    (else $datum)))))))))
     ((procedure-expander id (proc param-type ...) result-type)
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
