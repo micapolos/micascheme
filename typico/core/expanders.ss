@@ -102,7 +102,7 @@
 
       (vararg-op-expander + ($primitive 3 +) integer-type)
       (vararg-op-expander - ($primitive 3 +) integer-type)
-      (vararg-op-expander + ($primitive 3 string-append) string-type)
+      (vararg-op-expander append ($primitive 3 string-append) string-type)
 
       ;(procedure-expander and (and boolean-type boolean-type ...) boolean-type)
 
