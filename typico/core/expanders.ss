@@ -68,10 +68,15 @@
       (case-expander integer-zero (typed integer-type 0))
       (case-expander integer-one (typed integer-type 1))
 
+
       (function-expander (+ integer-type integer-type ...) integer-type    ($primitive 3 +))
       (function-expander (- integer-type integer-type ...) integer-type    ($primitive 3 -))
-      (function-expander (append string-type string-type ...) string-type  ($primitive 3 string-append))
 
+      (function-expander integer+      (function-type (list* integer-type) integer-type)               ($primitive 3 +))
+      (function-expander integer-      (function-type (list* integer-type integer-type) integer-type)  ($primitive 3 -))
+      (function-expander string-append (function-type (list* string-type) string-type)                 ($primitive 3 string-append))
+
+      (function-expander (append string-type string-type ...) string-type  ($primitive 3 string-append))
       (function-expander (string char-type ...) string-type                ($primitive 3 string))
       (function-expander (length string-type) integer-type                 ($primitive 3 string-length))
 

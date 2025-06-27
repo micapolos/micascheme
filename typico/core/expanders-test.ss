@@ -107,6 +107,10 @@
   (append (dynamic "a") "b" "c")
   (string (($primitive 3 string-append) (dynamic "a") "b" "c")))
 
+; string-append
+
+(check-expand-core string-append ((function (string ...) string ) ($primitive 3 string-append)))
+
 ; u8
 
 (check-expand-core (u8 0) (u8 0))
