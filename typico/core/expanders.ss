@@ -63,7 +63,7 @@
                         (and $value-predicate? ($value-predicate? $arg-value)))
                       $value-predicate?s $arg-values))
                     ($value-datum-proc? (apply $proc $arg-values)))
-                  (else `(,$proc ,@$arg-values))))))))))
+                  (else `(proc ,@$arg-values))))))))))
 
   (define core-expander
     (or-expander
