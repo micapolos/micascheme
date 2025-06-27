@@ -35,15 +35,15 @@
 ; let
 
 (check-expand-core
-  (let () 10)
+  (let 10)
   (integer (let () 10)))
 
 (check-expand-core
-  (let ((x 10)) x)
+  (let (x 10) x)
   (integer (let ((x 10)) x)))
 
 ; (check-expand-core
-;   (let ((x 10) (y 20)) (+ x y))
+;   (let (x 10) (y 20) (+ x y))
 ;   (integer (let ((x 10) (y 20)) (+ x y))))
 
 ; boolean and
