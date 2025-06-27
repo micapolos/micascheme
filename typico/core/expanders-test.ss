@@ -109,6 +109,8 @@
 
 ; string-append
 
+(check-expand-core integer+ ((function (integer ...) integer) ($primitive 3 +)))
+(check-expand-core integer- ((function (integer integer ...) integer) ($primitive 3 -)))
 (check-expand-core string-append ((function (string ...) string ) ($primitive 3 string-append)))
 
 ; u8
