@@ -37,7 +37,7 @@
                   $value-datum-proc?
                   (for-all $value-predicate? $values))
                   ($value-datum-proc? (apply $proc $values)))
-                (else `(($primitive 3 op) ,@$values)))))))))
+                (else `(proc ,@$values)))))))))
 
   (define core-expander
     (or-expander
@@ -65,7 +65,7 @@
       (case-expander integer-zero (typed integer-type 0))
       (case-expander integer-one (typed integer-type 1))
 
-      (vararg-op-expander + + integer-type)
-      (vararg-op-expander - - integer-type)
-      (vararg-op-expander + string-append string-type)))
+      (vararg-op-expander + ($primitive 3 +) integer-type)
+      (vararg-op-expander - ($primitive 3 +) integer-type)
+      (vararg-op-expander + ($primitive 3 string-append) string-type)))
 )
