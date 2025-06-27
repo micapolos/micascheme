@@ -8,6 +8,7 @@
     (typico expander)
     (typico typed)
     (typico type)
+    (typico id)
     (typico core types)
     (asm u))
 
@@ -44,6 +45,32 @@
         (typed-map-value
           (lambda ($value) `(dynamic ,$value))
           (expand-inner $recurse #'x)))
+
+      (case-expander (let ((id expr) ...) body) ($recurse)
+        (lets
+          ($ids #'(id ...))
+          ($typed-list (map (partial expand-inner $recurse) #'(expr ...)))
+          ($recurse
+            (fold-left
+              (lambda ($recurse $id $type)
+                (lambda ($syntax)
+                  (or
+                    (and
+                      (id? $syntax)
+                      (id=? $syntax $id)
+                      (typed $type (id->symbol $syntax)))
+                    ($recurse $syntax))))
+              $recurse
+              $ids
+              (map typed-type $typed-list)))
+          ($typed-body (expand-inner $recurse #'body))
+          (typed
+            (typed-type $typed-body)
+            `(let
+              (,@(map list
+                (map id->symbol $ids)
+                (map typed-value $typed-list)))
+              ,(typed-value $typed-body)))))
 
       (case-expander integer-zero (typed integer-type 0))
       (case-expander integer-one (typed integer-type 1))

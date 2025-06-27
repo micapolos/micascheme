@@ -32,6 +32,20 @@
 (check-expand-core-raises (if #t 10))
 (check-expand-core-raises (if #t 10 20 30))
 
+; let
+
+(check-expand-core
+  (let () 10)
+  (integer (let () 10)))
+
+(check-expand-core
+  (let ((x 10)) x)
+  (integer (let ((x 10)) x)))
+
+; (check-expand-core
+;   (let ((x 10) (y 20)) (+ x y))
+;   (integer (let ((x 10) (y 20)) (+ x y))))
+
 ; boolean and
 
 (check-expand-core (and #t) (boolean #t))

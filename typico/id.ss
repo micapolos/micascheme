@@ -1,5 +1,5 @@
 (library (typico id)
-  (export id? id->symbol syntax->selector-id?)
+  (export id? id->symbol id=? syntax->selector-id?)
   (import (micascheme))
 
   (define (syntax->selector-id? $syntax)
@@ -22,4 +22,7 @@
       (id
         (id? #'id)
         (datum id))))
+
+  (define (id=? $id-a $id-b)
+    (symbol=? (id->symbol $id-a) (id->symbol $id-b)))
 )
