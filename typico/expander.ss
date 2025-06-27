@@ -14,6 +14,7 @@
     (typico base)
     (typico type)
     (typico typed)
+    (typico id)
     (typico environment)
     (only (typico expand) type-error))
 
@@ -85,7 +86,7 @@
 
   (define-case-syntaxes
     ((function-expander (id param-type ... vararg-param-type dots) result-type proc)
-      (symbol=? (datum dots) '...)
+      (and (id? #'id) (symbol=? (datum dots) '...))
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
         ($vararg-temporary (car (generate-temporaries #'(vararg-param-type))))
@@ -123,6 +124,7 @@
                       ($value-datum-proc? (eval $datum (typico-environment))))
                     (else $datum)))))))))
     ((function-expander (id param-type ...) result-type proc)
+      (id? #'id)
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
         #`(case-expander (id #,@$param-temporaries) ($recurse)
