@@ -9,8 +9,7 @@
     expand-inner-value
     check-expand
     check-expand-raises
-    vararg-procedure-expander
-    procedure-expander)
+    function-expander)
   (import
     (typico base)
     (typico type)
@@ -84,31 +83,8 @@
       (raises
         (expand-typed expander (datum/annotation in)))))
 
-  ; TODO: unify with procedure-expander, using ... syntax
-  (define-rule-syntax (vararg-procedure-expander id proc type)
-    (case-expander (id x x* (... ...)) ($recurse)
-      (lets
-        ($proc proc)
-        ($type type)
-        ($typed-list (map (partial expand-inner $recurse) #'(x x* (... ...))))
-        ($types (map typed-type $typed-list))
-        (and
-          (for-all (partial type=? $type) $types)
-          (typed type
-            (lets
-              ($values (map typed-value $typed-list))
-              ($value-predicate? (type-value-predicate? $type))
-              ($value-datum-proc? (type-value-datum-proc? $type))
-              (cond
-                ((and
-                  $value-predicate?
-                  $value-datum-proc?
-                  (for-all $value-predicate? $values))
-                  ($value-datum-proc? (apply $proc $values)))
-                (else `(proc ,@$values)))))))))
-
   (define-case-syntaxes
-    ((procedure-expander id (proc param-type ... vararg-param-type dots) result-type)
+    ((function-expander id (proc param-type ... vararg-param-type dots) result-type)
       (symbol=? (datum dots) '...)
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
@@ -146,7 +122,7 @@
                         $vararg-values))
                       ($value-datum-proc? (eval $datum (typico-environment))))
                     (else $datum)))))))))
-    ((procedure-expander id (proc param-type ...) result-type)
+    ((function-expander id (proc param-type ...) result-type)
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
         #`(case-expander (id #,@$param-temporaries) ($recurse)
