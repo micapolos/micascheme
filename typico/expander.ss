@@ -65,10 +65,15 @@
         ((type=? $type $expected-type) $value)
         (else (type-error $syntax $type $expected-type)))))
 
+  (define (typed->test-datum $typed)
+    `(
+      ,(type->datum (typed-type $typed))
+      ,(typed-value $typed)))
+
   (define-rule-syntax (check-expand expander in out)
     (check
       (equal?
-        (typed->datum (expand-typed expander (datum/annotation in)))
+        (typed->test-datum (expand-typed expander (datum/annotation in)))
         'out)))
 
   (define-rule-syntax (check-expand-raises expander in)
