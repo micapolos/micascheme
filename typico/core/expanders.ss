@@ -48,9 +48,9 @@
       (case-expander integer-zero (typed integer-type 0))
       (case-expander integer-one (typed integer-type 1))
 
-      (vararg-procedure-expander + ($primitive 3 +) integer-type)
-      (vararg-procedure-expander - ($primitive 3 +) integer-type)
-      (vararg-procedure-expander append ($primitive 3 string-append) string-type)
+      (procedure-expander + (($primitive 3 +) integer-type integer-type ...) integer-type)
+      (procedure-expander - (($primitive 3 +) integer-type integer-type ...) integer-type)
+      (procedure-expander append (($primitive 3 string-append) string-type string-type ...) string-type)
 
       ;(procedure-expander and (and boolean-type boolean-type ...) boolean-type)
 

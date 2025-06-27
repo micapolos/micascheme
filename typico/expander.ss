@@ -107,9 +107,43 @@
                 (else `(proc ,@$values)))))))))
 
   (define-case-syntaxes
-    ((procedure-expander id (proc param-type ... vararg-type dots) result-type)
+    ((procedure-expander id (proc param-type ... vararg-param-type dots) result-type)
       (symbol=? (datum dots) '...)
-      (syntax-error #'TODO))
+      (lets
+        ($param-temporaries (generate-temporaries #'(param-type ...)))
+        ($vararg-temporary (car (generate-temporaries #'(vararg-param-type))))
+        #`(case-expander (id #,@$param-temporaries #,$vararg-temporary (... ...)) ($recurse)
+          (lets
+            ($proc proc)
+            ($param-types (list param-type ...))
+            ($vararg-param-type vararg-param-type)
+            ($result-type result-type)
+            ($typed-args (map (partial expand-inner $recurse) #'(#,@$param-temporaries)))
+            ($typed-varargs (map (partial expand-inner $recurse) #'(#,$vararg-temporary (... ...))))
+            ($arg-types (map typed-type $typed-args))
+            ($vararg-types (map typed-type $typed-varargs))
+            (and
+              (for-all type=? $param-types $arg-types)
+              (for-all (partial type=? $vararg-param-type) $vararg-types)
+              (typed $result-type
+                (lets
+                  ($arg-values (map typed-value $typed-args))
+                  ($vararg-values (map typed-value $typed-varargs))
+                  ($value-datum-proc? (type-value-datum-proc? $result-type))
+                  ($arg-value-predicate?s (map type-value-predicate? $param-types))
+                  ($vararg-value-predicate? (type-value-predicate? $vararg-param-type))
+                  (cond
+                    ((and $value-datum-proc?
+                      (for-all
+                        (lambda ($arg-value-predicate? $arg-value)
+                          (and $arg-value-predicate? ($arg-value-predicate? $arg-value)))
+                        $arg-value-predicate?s $arg-values)
+                      $vararg-value-predicate?
+                      (for-all
+                        (lambda ($arg-value) ($vararg-value-predicate? $arg-value))
+                        $vararg-values))
+                      ($value-datum-proc? (apply $proc (append $arg-values $vararg-values))))
+                    (else `(proc ,@$arg-values ,@$vararg-values))))))))))
     ((procedure-expander id (proc param-type ...) result-type)
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
@@ -126,7 +160,7 @@
                 (lets
                   ($arg-values (map typed-value $typed-args))
                   ($value-datum-proc? (type-value-datum-proc? $result-type))
-                  ($value-predicate?s (map type-value-predicate? $arg-types))
+                  ($value-predicate?s (map type-value-predicate? $param-types))
                   (cond
                     ((and $value-datum-proc?
                       (for-all
