@@ -84,7 +84,7 @@
         (expand-typed expander (datum/annotation in)))))
 
   (define-case-syntaxes
-    ((function-expander id (proc param-type ... vararg-param-type dots) result-type)
+    ((function-expander (id param-type ... vararg-param-type dots) result-type proc)
       (symbol=? (datum dots) '...)
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
@@ -122,7 +122,7 @@
                         $vararg-values))
                       ($value-datum-proc? (eval $datum (typico-environment))))
                     (else $datum)))))))))
-    ((function-expander id (proc param-type ...) result-type)
+    ((function-expander (id param-type ...) result-type proc)
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
         #`(case-expander (id #,@$param-temporaries) ($recurse)
