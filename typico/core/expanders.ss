@@ -37,7 +37,7 @@
                   $value-datum-proc?
                   (for-all $value-predicate? $values))
                   ($value-datum-proc? (apply $proc $values)))
-                (else `(,$proc ,@$values)))))))))
+                (else `(proc ,@$values)))))))))
 
   (define-case-syntaxes
     ((procedure-expander id (proc param-type ... vararg-type dots) result-type)
@@ -91,6 +91,11 @@
             (cond
               ((boolean? $condition-value) (if $condition-value $true-value $false-value))
               (else `(if ,$condition-value ,$true-value ,$false-value))))))
+
+      (case-expander (dynamic x) ($recurse)
+        (typed-map-value
+          (lambda ($value) `(dynamic ,$value))
+          (expand-inner $recurse #'x)))
 
       (case-expander integer-zero (typed integer-type 0))
       (case-expander integer-one (typed integer-type 1))

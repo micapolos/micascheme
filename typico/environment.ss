@@ -8,7 +8,8 @@
         '(micascheme)
         '(typico type)
         '(typico core types)
-        '(typico scoped))))
+        '(typico scoped)
+        '(typico dynamic))))
 
   (define (typico-environment)
     (force delay-typico-environment))
