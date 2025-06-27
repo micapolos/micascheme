@@ -30,3 +30,15 @@
 (check-expand-core-raises (u8 256))
 (check-expand-core (u8 (+ integer-one 2)) (typed u8 3))
 (check-expand-core (u8 (+ 1 (+ 2 3))) (typed u8 6))
+
+(check-expand-core (= #f #f) (typed boolean #t))
+(check-expand-core (= #f #t) (typed boolean #f))
+
+(check-expand-core (= 1 1) (typed boolean #t))
+(check-expand-core (= 1 2) (typed boolean #f))
+
+(check-expand-core (= #\a #\a) (typed boolean #t))
+(check-expand-core (= #\a #\b) (typed boolean #f))
+
+(check-expand-core (= "a" "a") (typed boolean #t))
+(check-expand-core (= "a" "b") (typed boolean #f))
