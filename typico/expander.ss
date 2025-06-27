@@ -83,6 +83,7 @@
       (raises
         (expand-typed expander (datum/annotation in)))))
 
+  ; TODO: unify with procedure-expander, using ... syntax
   (define-rule-syntax (vararg-procedure-expander id proc type)
     (case-expander (id x x* (... ...)) ($recurse)
       (lets
