@@ -39,31 +39,35 @@
                   ($value-datum-proc? (apply $proc $values)))
                 (else `(,$proc ,@$values)))))))))
 
-  (define-case-syntax (procedure-expander id (proc param-type ...) result-type)
-    (lets
-      ($param-temporaries (generate-temporaries #'(param-type ...)))
-      #`(case-expander (id #,@$param-temporaries) ($recurse)
-        (lets
-          ($proc proc)
-          ($param-types (list param-type ...))
-          ($result-type result-type)
-          ($typed-args (map (partial expand-inner $recurse) #'(#,@$param-temporaries)))
-          ($arg-types (map typed-type $typed-args))
-          (and
-            (for-all type=? $param-types $arg-types)
-            (typed $result-type
-              (lets
-                ($arg-values (map typed-value $typed-args))
-                ($value-datum-proc? (type-value-datum-proc? $result-type))
-                ($value-predicate?s (map type-value-predicate? $arg-types))
-                (cond
-                  ((and $value-datum-proc?
-                    (for-all
-                      (lambda ($value-predicate? $arg-value)
-                        (and $value-predicate? ($value-predicate? $arg-value)))
-                      $value-predicate?s $arg-values))
-                    ($value-datum-proc? (apply $proc $arg-values)))
-                  (else `(proc ,@$arg-values))))))))))
+  (define-case-syntaxes
+    ((procedure-expander id (proc param-type ... vararg-type dots) result-type)
+      (symbol=? (datum dots) '...)
+      (syntax-error #'TODO))
+    ((procedure-expander id (proc param-type ...) result-type)
+      (lets
+        ($param-temporaries (generate-temporaries #'(param-type ...)))
+        #`(case-expander (id #,@$param-temporaries) ($recurse)
+          (lets
+            ($proc proc)
+            ($param-types (list param-type ...))
+            ($result-type result-type)
+            ($typed-args (map (partial expand-inner $recurse) #'(#,@$param-temporaries)))
+            ($arg-types (map typed-type $typed-args))
+            (and
+              (for-all type=? $param-types $arg-types)
+              (typed $result-type
+                (lets
+                  ($arg-values (map typed-value $typed-args))
+                  ($value-datum-proc? (type-value-datum-proc? $result-type))
+                  ($value-predicate?s (map type-value-predicate? $arg-types))
+                  (cond
+                    ((and $value-datum-proc?
+                      (for-all
+                        (lambda ($value-predicate? $arg-value)
+                          (and $value-predicate? ($value-predicate? $arg-value)))
+                        $value-predicate?s $arg-values))
+                      ($value-datum-proc? (apply $proc $arg-values)))
+                    (else `(proc ,@$arg-values)))))))))))
 
   (define core-expander
     (or-expander
@@ -94,6 +98,8 @@
       (vararg-op-expander + ($primitive 3 +) integer-type)
       (vararg-op-expander - ($primitive 3 +) integer-type)
       (vararg-op-expander + ($primitive 3 string-append) string-type)
+
+      ;(procedure-expander and (and boolean-type boolean-type ...) boolean-type)
 
       (procedure-expander = (($primitive 3 boolean=?) boolean-type boolean-type) boolean-type)
       (procedure-expander = (($primitive 3 =) integer-type integer-type) boolean-type)
