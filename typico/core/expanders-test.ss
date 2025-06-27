@@ -89,3 +89,18 @@
 (check-expand-core
   (= (dynamic "a") "b")
   (boolean (($primitive 3 string=?) (dynamic "a") "b")))
+
+; string-length
+
+(check-expand-core (length "foo") (integer 3))
+(check-expand-core
+  (length (dynamic "foo"))
+  (integer (($primitive 3 string-length) (dynamic "foo"))))
+
+; string
+
+(check-expand-core (string) (string ""))
+(check-expand-core (string #\a #\b #\c) (string "abc"))
+(check-expand-core
+  (string (dynamic #\a) #\b #\c)
+  (string (($primitive 3 string) (dynamic #\a) #\b #\c)))

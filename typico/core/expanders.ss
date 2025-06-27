@@ -52,6 +52,9 @@
       (function-expander - (($primitive 3 +) integer-type integer-type ...) integer-type)
       (function-expander append (($primitive 3 string-append) string-type string-type ...) string-type)
 
+      (function-expander string (($primitive 3 string) char-type ...) string-type)
+      (function-expander length (($primitive 3 string-length) string-type) integer-type)
+
       ;(function-expander and (and boolean-type boolean-type ...) boolean-type)
 
       (function-expander = (($primitive 3 boolean=?) boolean-type boolean-type) boolean-type)
