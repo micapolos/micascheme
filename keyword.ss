@@ -7,13 +7,8 @@
     (syntax)
     (identifier))
 
-  (define-syntax (keyword-append $syntax)
-    (syntax-case $syntax ()
-      ((id part ...)
-        (apply
-          identifier-append
-          (syntax id)
-          (syntaxes part ...)))))
+  (define-case-syntax (keyword-append part ...)
+    (apply identifier-append #'keyword-append #'(part ...)))
 
   (define-rule-syntax (keyword-replace old new body)
     (let-syntax
