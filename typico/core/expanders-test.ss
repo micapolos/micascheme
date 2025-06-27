@@ -7,7 +7,7 @@
 (check-expand-core #\a (typed char #\a))
 (check-expand-core "foo" (typed string "foo"))
 
-; dynamic
+; dynamic (non compile-time constant)
 
 (check-expand-core
   (dynamic "foo")
