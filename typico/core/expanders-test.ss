@@ -42,9 +42,9 @@
   (let (x 10) x)
   (integer (let ((x 10)) x)))
 
-; (check-expand-core
-;   (let (x 10) (y 20) (+ x y))
-;   (integer (let ((x 10) (y 20)) (+ x y))))
+(check-expand-core
+  (let (x 10) (y 20) (+ x y))
+  (integer (let ((x 10) (y 20)) (($primitive 3 +) x y))))
 
 ; boolean and
 

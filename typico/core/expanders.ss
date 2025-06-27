@@ -25,47 +25,38 @@
       (predicate-expander char? char-type)
       (predicate-expander string? string-type)
 
-      (case-expander (u8 x) ($recurse)
-        (syntax-case (expand-inner-value $recurse integer-type #'x) ()
+      (case-expander (u8 x) ($expander)
+        (syntax-case (expand-value $expander integer-type #'x) ()
           (u8
             (u8? (datum u8))
             (typed u8-type (datum u8)))))
 
-      (case-expander (if condition true false) ($recurse)
+      (case-expander (if condition true false) ($expander)
         (lets
-          ($condition-value (expand-inner-value $recurse boolean-type #'condition))
-          ((typed $type $true-value) (expand-inner $recurse #'true))
-          ($false-value (expand-inner-value $recurse $type #'false))
+          ($condition-value (expand-value $expander boolean-type #'condition))
+          ((typed $type $true-value) (expand $expander #'true))
+          ($false-value (expand-value $expander $type #'false))
           (typed $type
             (cond
               ((boolean? $condition-value) (if $condition-value $true-value $false-value))
               (else `(if ,$condition-value ,$true-value ,$false-value))))))
 
-      (case-expander (dynamic x) ($recurse)
+      (case-expander (dynamic x) ($expander)
         (typed-map-value
           (lambda ($value) `(dynamic ,$value))
-          (expand-inner $recurse #'x)))
+          (expand $expander #'x)))
 
-      (case-expander (let (id expr) ... body) ($recurse)
+      (case-expander (let (id expr) ... body) ($expander)
         (and
           (for-all id? #'(id ...))
           (lets
             ($ids #'(id ...))
-            ($typed-list (map (partial expand-inner $recurse) #'(expr ...)))
-            ($recurse
-              (fold-left
-                (lambda ($recurse $id $type)
-                  (lambda ($syntax)
-                    (or
-                      (and
-                        (id? $syntax)
-                        (id=? $syntax $id)
-                        (typed $type (id->symbol $syntax)))
-                      ($recurse $syntax))))
-                $recurse
-                $ids
-                (map typed-type $typed-list)))
-            ($typed-body (expand-inner $recurse #'body))
+            ($typed-list (map (partial expand $expander) #'(expr ...)))
+            ($expander
+              (or-expander
+                (list->expander (map id-expander $ids (map typed-type $typed-list)))
+                $expander))
+            ($typed-body (expand $expander #'body))
             (typed
               (typed-type $typed-body)
               `(let

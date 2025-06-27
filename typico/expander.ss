@@ -1,12 +1,13 @@
 (library (typico expander)
   (export
     expander
+    id-expander
     predicate-expander
     or-expander
+    list->expander
     case-expander
-    expand-typed
-    expand-inner
-    expand-inner-value
+    expand
+    expand-value
     check-expand
     check-expand-raises
     function-expander)
@@ -18,52 +19,57 @@
     (typico environment)
     (only (typico expand) type-error))
 
-  (define-rule-syntax (expander ($recurse $syntax) body)
-    (lambda ($recurse $syntax) body))
+  (define-rule-syntax (expander ($expander $syntax) body)
+    (lambda ($expander $syntax) body))
+
+  (define (id-expander $id $type)
+    (expander ($expander $syntax)
+      (syntax-case? $syntax ()
+        (id
+          (and (id? #'id) (id=? #'id $id))
+          (typed $type (id->symbol #'id))))))
 
   (define-rule-syntax (predicate-expander test? type)
-    (expander ($recurse $syntax)
+    (expander ($expander $syntax)
       (syntax-case? $syntax ()
         (x
           (test? (datum x))
           (typed type (datum x))))))
 
-  (define-rule-syntax (or-expander $expander ...)
-    (expander ($recurse $syntax)
-      (or ($expander $recurse $syntax) ...)))
+  (define (or-expander . $expanders)
+    (list->expander $expanders))
+
+  (define (list->expander $expanders)
+    (expander ($expander $syntax)
+      (exists (lambda ($x) ($x $expander $syntax)) $expanders)))
 
   (define-rules-syntax (literals keywords)
-    ((case-expander (keywords keyword ...) (id param ...) ($recurse) body)
-      (expander ($recurse $syntax)
+    ((case-expander (keywords keyword ...) (id param ...) ($expander) body)
+      (expander ($expander $syntax)
         (syntax-case? $syntax (id keyword ...)
           ((id param ...) body))))
     ((case-expander (keywords keyword ...) (id param ...) body)
-      (case-expander (keywords keyword ...) (id param ...) ($recurse) body))
-    ((case-expander (id param ...) ($recurse) body)
-      (case-expander (keywords) (id param ...) ($recurse) body))
+      (case-expander (keywords keyword ...) (id param ...) ($expander) body))
+    ((case-expander (id param ...) ($expander) body)
+      (case-expander (keywords) (id param ...) ($expander) body))
     ((case-expander (id param ...) body)
-      (case-expander (id param ...) ($recurse) body))
-    ((case-expander id ($recurse) body)
-      (expander ($recurse $syntax)
+      (case-expander (id param ...) ($expander) body))
+    ((case-expander id ($expander) body)
+      (expander ($expander $syntax)
         (syntax-case? $syntax (id)
           (id body))))
     ((case-expander id body)
-      (case-expander id ($recurse) body)))
+      (case-expander id ($expander) body)))
 
 
-  (define (expand-typed $expander $syntax)
+  (define (expand $expander $syntax)
     (or
-      ($expander (partial expand-typed $expander) $syntax)
+      ($expander $expander $syntax)
       (syntax-error $syntax)))
 
-  (define (expand-inner $recurse $syntax)
-    (or
-      ($recurse $syntax)
-      (syntax-error $syntax)))
-
-  (define (expand-inner-value $recurse $expected-type $syntax)
+  (define (expand-value $expander $expected-type $syntax)
     (lets
-      ((typed $type $value) (expand-inner $recurse $syntax))
+      ((typed $type $value) (expand $expander $syntax))
       (cond
         ((type=? $type $expected-type) $value)
         (else (type-error $syntax $type $expected-type)))))
@@ -76,13 +82,13 @@
   (define-rule-syntax (check-expand expander in out)
     (check
       (equal?
-        (typed->test-datum (expand-typed expander (datum/annotation in)))
+        (typed->test-datum (expand expander (datum/annotation in)))
         'out)))
 
   (define-rule-syntax (check-expand-raises expander in)
     (check
       (raises
-        (expand-typed expander (datum/annotation in)))))
+        (expand expander (datum/annotation in)))))
 
   (define-case-syntaxes
     ((function-expander (id param-type ... vararg-param-type dots) result-type proc)
@@ -90,13 +96,13 @@
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
         ($vararg-temporary (car (generate-temporaries #'(vararg-param-type))))
-        #`(case-expander (id #,@$param-temporaries #,$vararg-temporary (... ...)) ($recurse)
+        #`(case-expander (id #,@$param-temporaries #,$vararg-temporary (... ...)) ($expander)
           (lets
             ($param-types (list param-type ...))
             ($vararg-param-type vararg-param-type)
             ($result-type result-type)
-            ($typed-args (map (partial expand-inner $recurse) #'(#,@$param-temporaries)))
-            ($typed-varargs (map (partial expand-inner $recurse) #'(#,$vararg-temporary (... ...))))
+            ($typed-args (map (partial expand $expander) #'(#,@$param-temporaries)))
+            ($typed-varargs (map (partial expand $expander) #'(#,$vararg-temporary (... ...))))
             ($arg-types (map typed-type $typed-args))
             ($vararg-types (map typed-type $typed-varargs))
             (and
@@ -126,11 +132,11 @@
       (id? #'id)
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
-        #`(case-expander (id #,@$param-temporaries) ($recurse)
+        #`(case-expander (id #,@$param-temporaries) ($expander)
           (lets
             ($param-types (list param-type ...))
             ($result-type result-type)
-            ($typed-args (map (partial expand-inner $recurse) #'(#,@$param-temporaries)))
+            ($typed-args (map (partial expand $expander) #'(#,@$param-temporaries)))
             ($arg-types (map typed-type $typed-args))
             (and
               (for-all type=? $param-types $arg-types)
