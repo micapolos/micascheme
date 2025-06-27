@@ -55,7 +55,12 @@
       (function-expander (string char-type ...) string-type                ($primitive 3 string))
       (function-expander (length string-type) integer-type                 ($primitive 3 string-length))
 
-      ;(function-expander (and boolean-type boolean-type ...) boolean-type and)
+      (function-expander (and boolean-type boolean-type ...) boolean-type  and)
+      (function-expander (or boolean-type boolean-type ...) boolean-type   or)
+
+      (function-expander (and integer-type integer-type ...) integer-type  ($primitive 3 bitwise-and))
+      (function-expander (or integer-type integer-type ...) integer-type   ($primitive 3 bitwise-ior))
+      (function-expander (xor integer-type integer-type ...) integer-type  ($primitive 3 bitwise-xor))
 
       (function-expander (= boolean-type boolean-type) boolean-type        ($primitive 3 boolean=?))
       (function-expander (= integer-type integer-type) boolean-type        ($primitive 3 =))

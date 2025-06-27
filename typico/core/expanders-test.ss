@@ -32,6 +32,26 @@
 (check-expand-core-raises (if #t 10))
 (check-expand-core-raises (if #t 10 20 30))
 
+; boolean and
+
+(check-expand-core (and #t) (boolean #t))
+(check-expand-core (and #t #t) (boolean #t))
+(check-expand-core (and #t #t #t) (boolean #t))
+(check-expand-core (and #t #f #t) (boolean #f))
+(check-expand-core
+  (and (dynamic #f) #t #f)
+  (boolean (and (dynamic #f) #t #f)))
+
+; boolean or
+
+(check-expand-core (or #f) (boolean #f))
+(check-expand-core (or #f #f) (boolean #f))
+(check-expand-core (or #f #f #f) (boolean #f))
+(check-expand-core (or #f #t #f) (boolean #t))
+(check-expand-core
+  (or (dynamic #t) #f #t)
+  (boolean (or (dynamic #t) #f #t)))
+
 ; integer +
 (check-expand-core-raises (+))
 (check-expand-core (+ 1) (integer 1))
@@ -39,6 +59,30 @@
 (check-expand-core (+ 1 2 3) (integer 6))
 (check-expand-core (+ (dynamic 1) 2 3) (integer (($primitive 3 +) (dynamic 1) 2 3)))
 (check-expand-core (+ integer-zero integer-one) (integer 1))
+
+; integer and
+(check-expand-core (and #b111) (integer #b111))
+(check-expand-core (and #b111 #b110) (integer #b110))
+(check-expand-core (and #b111 #b110 #b101) (integer #b100))
+(check-expand-core
+  (and (dynamic #b111) #b110 #b101)
+  (integer (($primitive 3 bitwise-and) (dynamic #b111) #b110 #b101)))
+
+; integer or
+(check-expand-core (or #b000) (integer #b000))
+(check-expand-core (or #b000 #b001) (integer #b001))
+(check-expand-core (or #b000 #b001 #b100) (integer #b101))
+(check-expand-core
+  (or (dynamic #b000) #b001 #b100)
+  (integer (($primitive 3 bitwise-ior) (dynamic #b000) #b001 #b100)))
+
+; integer xor
+(check-expand-core (xor #b000) (integer #b000))
+(check-expand-core (xor #b000 #b001) (integer #b001))
+(check-expand-core (xor #b000 #b001 #b111) (integer #b110))
+(check-expand-core
+  (xor (dynamic #b000) #b001 #b111)
+  (integer (($primitive 3 bitwise-xor) (dynamic #b000) #b001 #b111)))
 
 ; string append
 (check-expand-core-raises (append))
