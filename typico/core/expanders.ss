@@ -17,58 +17,6 @@
   (define-rule-syntax (check-expand-core-raises in)
     (check-expand-raises core-expander in))
 
-  (define-rule-syntax (vararg-op-expander id proc type)
-    (case-expander (id x x* (... ...)) ($recurse)
-      (lets
-        ($proc proc)
-        ($type type)
-        ($typed-list (map (partial expand-inner $recurse) #'(x x* (... ...))))
-        ($types (map typed-type $typed-list))
-        (and
-          (for-all (partial type=? $type) $types)
-          (typed type
-            (lets
-              ($values (map typed-value $typed-list))
-              ($value-predicate? (type-value-predicate? $type))
-              ($value-datum-proc? (type-value-datum-proc? $type))
-              (cond
-                ((and
-                  $value-predicate?
-                  $value-datum-proc?
-                  (for-all $value-predicate? $values))
-                  ($value-datum-proc? (apply $proc $values)))
-                (else `(proc ,@$values)))))))))
-
-  (define-case-syntaxes
-    ((procedure-expander id (proc param-type ... vararg-type dots) result-type)
-      (symbol=? (datum dots) '...)
-      (syntax-error #'TODO))
-    ((procedure-expander id (proc param-type ...) result-type)
-      (lets
-        ($param-temporaries (generate-temporaries #'(param-type ...)))
-        #`(case-expander (id #,@$param-temporaries) ($recurse)
-          (lets
-            ($proc proc)
-            ($param-types (list param-type ...))
-            ($result-type result-type)
-            ($typed-args (map (partial expand-inner $recurse) #'(#,@$param-temporaries)))
-            ($arg-types (map typed-type $typed-args))
-            (and
-              (for-all type=? $param-types $arg-types)
-              (typed $result-type
-                (lets
-                  ($arg-values (map typed-value $typed-args))
-                  ($value-datum-proc? (type-value-datum-proc? $result-type))
-                  ($value-predicate?s (map type-value-predicate? $arg-types))
-                  (cond
-                    ((and $value-datum-proc?
-                      (for-all
-                        (lambda ($value-predicate? $arg-value)
-                          (and $value-predicate? ($value-predicate? $arg-value)))
-                        $value-predicate?s $arg-values))
-                      ($value-datum-proc? (apply $proc $arg-values)))
-                    (else `(proc ,@$arg-values)))))))))))
-
   (define core-expander
     (or-expander
       (predicate-expander boolean? boolean-type)
@@ -100,9 +48,9 @@
       (case-expander integer-zero (typed integer-type 0))
       (case-expander integer-one (typed integer-type 1))
 
-      (vararg-op-expander + ($primitive 3 +) integer-type)
-      (vararg-op-expander - ($primitive 3 +) integer-type)
-      (vararg-op-expander append ($primitive 3 string-append) string-type)
+      (vararg-procedure-expander + ($primitive 3 +) integer-type)
+      (vararg-procedure-expander - ($primitive 3 +) integer-type)
+      (vararg-procedure-expander append ($primitive 3 string-append) string-type)
 
       ;(procedure-expander and (and boolean-type boolean-type ...) boolean-type)
 
