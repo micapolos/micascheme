@@ -54,6 +54,41 @@
               (map (partial expand-value $expander type-type) #'(param ...))
               (expand-value $expander type-type #'result)))))
 
+      ; lambda
+      (case-expander (lambda ((type id) ... (vararg-type vararg-id) dots) body) ($expander)
+        (and
+          (equal? (datum dots) '...)
+          (for-all id? #'(id ... vararg-id))
+          (lets
+            ($types (map (partial expand-value $expander type-type) #'(type ...)))
+            ($vararg-type (expand-value $expander type-type #'vararg-type))
+            ($expander
+              (or-expander
+                (list->expander (map id-expander #'(id ...) $types))
+                ; TODO: list-of type
+                (id-expander #'vararg-id $vararg-type)
+                $expander))
+            ($typed-body (expand $expander #'body))
+            (typed
+              (function-type (append $types $vararg-type) (typed-type $typed-body))
+              `(lambda (,@(map id->symbol #'(id ...)) . ,(id->symbol #'vararg-id))
+                ,(typed-value $typed-body))))))
+
+      (case-expander (lambda ((type id) ...) body) ($expander)
+        (and
+          (for-all id? #'(id ...))
+          (lets
+            ($types (map (partial expand-value $expander type-type) #'(type ...)))
+            ($expander
+              (or-expander
+                (list->expander (map id-expander #'(id ...) $types))
+                $expander))
+            ($typed-body (expand $expander #'body))
+            (typed
+              (function-type $types (typed-type $typed-body))
+              `(lambda (,@(map id->symbol #'(id ...)))
+                ,(typed-value $typed-body))))))
+
       (predicate-expander boolean? boolean-type)
       (predicate-expander (and? integer? exact?) integer-type)
       (predicate-expander char? char-type)

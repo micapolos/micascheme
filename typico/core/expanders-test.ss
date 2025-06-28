@@ -18,6 +18,33 @@
   (function (string char ...) integer)
   (function-type (list* string-type char-type) integer-type))
 
+; function
+
+(check-expand-core
+  (lambda ((integer i) (string s)) i)
+  (
+    (function (integer string) integer)
+    (lambda (i s) i)))
+
+(check-expand-core
+  (lambda ((integer i) (string s)) s)
+  (
+    (function (integer string) string)
+    (lambda (i s) s)))
+
+(check-expand-core
+  (lambda ((integer i) (string s) ...) i)
+  (
+    (function (integer string ...) integer)
+    (lambda (i . s) i)))
+
+; TODO: list-type
+; (check-expand-core
+;   (lambda ((integer i) (string s) ...) s)
+;   (
+;     (function (integer string ...) (list-of string))
+;     (lambda (i . s) s)))
+
 ; literals
 
 (check-expand-core #f (boolean #f))
