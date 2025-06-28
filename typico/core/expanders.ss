@@ -2,6 +2,7 @@
   (export
     core-expander
     check-expand-core
+    check-expand-core-type
     check-expand-core-raises)
   (import
     (typico base)
@@ -15,11 +16,45 @@
   (define-rule-syntax (check-expand-core in out)
     (check-expand core-expander in out))
 
+  (define-rule-syntax (check-expand-core-type in out)
+    (check
+      (equal?
+        (expand-value core-expander type-type (datum/annotation in))
+        out)))
+
   (define-rule-syntax (check-expand-core-raises in)
     (check-expand-raises core-expander in))
 
   (define core-expander
     (or-expander
+      ; primitive types
+      (case-expander      boolean (typed type-type boolean-type))
+      (case-expander      integer (typed type-type integer-type))
+      (case-expander      char    (typed type-type char-type))
+      (case-expander      string  (typed type-type string-type))
+      (case-expander      datum   (typed type-type datum-type))
+
+      ; function type
+      (case-expander (function (param ... vararg-param dots) result) ($expander)
+        (and
+          (equal? (datum dots) '...)
+          (for-all id? #'(param ... vararg-param))
+          (typed type-type
+            (function-type
+              (map*
+                (partial expand-value $expander type-type)
+                (partial expand-value $expander type-type)
+                #'(param ...))
+              (expand-value $expander type-type #'result)))))
+
+      (case-expander (function (param ...) result) ($expander)
+        (and
+          (for-all id? #'(param ...))
+          (typed type-type
+            (function-type
+              (map (partial expand-value $expander type-type) #'(param ...))
+              (expand-value $expander type-type #'result)))))
+
       (predicate-expander boolean? boolean-type)
       (predicate-expander (and? integer? exact?) integer-type)
       (predicate-expander char? char-type)

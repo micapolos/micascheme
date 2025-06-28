@@ -9,6 +9,7 @@
     expand
     expand-value
     check-expand
+    check-expand-typed
     check-expand-raises
     datum-expander)
   (import
@@ -86,6 +87,12 @@
       (equal?
         (typed->test-datum (expand expander (datum/annotation in)))
         'out)))
+
+  (define-rule-syntax (check-expand-typed expander in out)
+    (check
+      (equal?
+        (expand expander (datum/annotation in))
+        out)))
 
   (define-rule-syntax (check-expand-raises expander in)
     (check
