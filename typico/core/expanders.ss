@@ -72,7 +72,6 @@
       (datum-expander integer-      (function-type (list* integer-type integer-type) integer-type)  ($primitive 3 -))
       (datum-expander string-append (function-type (list* string-type) string-type)                 ($primitive 3 string-append))
 
-
       (datum-expander (+ integer-type integer-type ...)    (integer-type  ($primitive 3 +)))
       (datum-expander (- integer-type integer-type ...)    (integer-type  ($primitive 3 -)))
 
