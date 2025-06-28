@@ -11,6 +11,8 @@
     list-of-type)
   (import (micascheme) (typico type) (asm u))
 
+  (define-type scheme)
+
   (define-type type)
   (define-type syntax)
   (define-type datum)

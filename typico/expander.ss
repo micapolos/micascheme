@@ -10,7 +10,7 @@
     expand-value
     check-expand
     check-expand-raises
-    function-expander)
+    datum-expander)
   (import
     (typico base)
     (typico type)
@@ -93,10 +93,10 @@
         (expand expander (datum/annotation in)))))
 
   (define-case-syntaxes
-    ((function-expander id type proc)
+    ((datum-expander id type proc)
       (id? #'id)
       #'(case-expander id (typed type 'proc)))
-    ((function-expander (id param-type ... vararg-param-type dots) result-type proc)
+    ((datum-expander (id param-type ... vararg-param-type dots) (result-type proc))
       (and (id? #'id) (symbol=? (datum dots) '...))
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
@@ -133,7 +133,7 @@
                         $vararg-values))
                       ($value-datum-proc? (eval $datum (typico-environment))))
                     (else $datum)))))))))
-    ((function-expander (id param-type ...) result-type proc)
+    ((datum-expander (id param-type ...) (result-type proc))
       (id? #'id)
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
