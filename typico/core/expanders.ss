@@ -161,7 +161,7 @@
       (datum-expander (= char-type char-type)              (boolean-type  ($primitive 3 char=?)))
       (datum-expander (= bytevector-type bytevector-type)  (boolean-type  ($primitive 3 bytevector=?)))
 
-      ; application
+      ; application (must be the last one)
       (expander ($expander $syntax)
         (syntax-case? $syntax ()
           ((fn arg ...)
