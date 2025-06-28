@@ -18,6 +18,11 @@
   (function (string char ...) integer)
   (function-type (list* string-type char-type) integer-type))
 
+(check-expand-core-raises (function (string char)))
+(check-expand-core-raises (function (string char) foo))
+(check-expand-core-raises (function (string char) integer integer))
+(check-expand-core-raises (function (string foo) integer))
+
 ; function
 
 (check-expand-core
@@ -38,7 +43,7 @@
     (function (integer string ...) integer)
     (lambda (i . s) i)))
 
-; TODO: list-type
+; TODO: list-of type
 ; (check-expand-core
 ;   (lambda ((integer i) (string s) ...) s)
 ;   (
