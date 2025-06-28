@@ -1,12 +1,14 @@
 (import (typico base) (typico expander) (typico core expanders) (typico type) (typico core types) (typico typed))
 
-; types
+; primitive types
 
 (check-expand-core-type boolean boolean-type)
 (check-expand-core-type integer integer-type)
 (check-expand-core-type char    char-type)
 (check-expand-core-type string  string-type)
 (check-expand-core-type datum   datum-type)
+
+; function type
 
 (check-expand-core-type
   (function (string char) integer)
