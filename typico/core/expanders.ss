@@ -19,7 +19,7 @@
   (define-case-syntax (check-expand-core-type in out)
     #`(check
       (equal?
-        (expand-value core-expander type-type 'in) ; TODO: How to preserve annotations and still support ...
+        (expand-value core-expander type-type 'in)
         out)))
 
   (define-rule-syntax (check-expand-core-raises in)
