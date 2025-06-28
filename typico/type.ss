@@ -97,6 +97,31 @@
       ((expander-type? $expander-type)
         `(expander ,(expander-type-proc $expander-type)))))
 
+  (define (type->syntax $type)
+    (switch-exhaustive $type
+      ((primitive-type? $primitive-type)
+        (primitive-type-datum $primitive-type))
+      ((function-type? $function-type)
+        `(function
+          (
+          ,@(map*
+            type->datum
+            (lambda ($type) `(,(type->datum $type) ...))
+            (function-type-param-types $function-type)))
+          ,(type->datum (function-type-result-type $function-type))))
+      ((forall-type? $forall-type)
+        `(forall
+          ,(forall-type-arity $forall-type)
+          ,(type->datum (forall-type-type $forall-type))))
+      ((variable-type? $variable-type)
+        `(variable ,(variable-type-index $variable-type)))
+      ((application-type? $application-type)
+        `(
+          ,(type->datum (application-type-type $application-type))
+          ,@(map type->datum (application-type-args $application-type))))
+      ((expander-type? $expander-type)
+        `(expander ,(expander-type-proc $expander-type)))))
+
   (define (type=? $type-a $type-b)
     (switch? $type-a
       ((primitive-type? $primitive-type-a)
