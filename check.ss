@@ -22,15 +22,6 @@
       (syntax-case $syntax ()
         (_ (syntax-error $syntax)))))
 
-  (define (raises? $proc)
-    (call/cc
-      (lambda (cont)
-        (with-exception-handler
-          (lambda (_) (cont #t))
-          (lambda () ($proc) #f)))))
-
-  (define (works? expr) expr #t)
-
   (meta define (syntax->location-string $syntax)
     (let
       (($annotation (syntax->annotation $syntax)))
@@ -45,10 +36,19 @@
   (define-syntax check
     (lambda (stx)
       (syntax-case stx (not raises works)
+        ((_ (raises body))
+          #`(or
+            (guard
+              ($exception (else #'(void)))
+              body
+              #f)
+            (syntax-error #'body "did not raise")))
         ((_ (raises body ...))
-          #`(check (raises? (lambda () body ...))))
+          #'(check (raises (begin body ...))))
         ((_ (works body))
-          #`(check (works? body)))
+          #`body)
+        ((_ (works body ...))
+          #'(check (works (begin body ...))))
         ((_ (not (pred arg ...)))
           (let*
             (

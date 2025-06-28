@@ -20,4 +20,5 @@
 (check-foo (raises (bar (non-bar 10))))
 
 (check-datum=? #`(foo bar) #`(foo bar))
-(check (raises (check-datum=? #`(foo bar) #`(foo gar))))
+(check (raises (+ 1 "foo")))
+(check (works (+ 1 2)))
