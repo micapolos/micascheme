@@ -8,6 +8,7 @@
     case-expander
     expand
     expand-value
+    expand-function
     check-expand
     check-expand-typed
     check-expand-raises
@@ -76,6 +77,13 @@
       (cond
         ((type=? $type $expected-type) $value)
         (else (type-error $syntax $type $expected-type)))))
+
+  (define (expand-function $expander $syntax)
+    (lets
+      ($typed (expand $expander $syntax))
+      (switch (typed-type $typed)
+        ((function-type? _) $typed)
+        ((else $other) (syntax-error $syntax "not a function")))))
 
   (define (typed->test-datum $typed)
     `(

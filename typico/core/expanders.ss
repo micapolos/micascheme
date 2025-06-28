@@ -159,5 +159,22 @@
       (datum-expander (= integer-type integer-type)        (boolean-type  ($primitive 3 =)))
       (datum-expander (= string-type string-type)          (boolean-type  ($primitive 3 string=?)))
       (datum-expander (= char-type char-type)              (boolean-type  ($primitive 3 char=?)))
-      (datum-expander (= bytevector-type bytevector-type)  (boolean-type  ($primitive 3 bytevector=?)))))
+      (datum-expander (= bytevector-type bytevector-type)  (boolean-type  ($primitive 3 bytevector=?)))
+
+      ; application
+      (expander ($expander $syntax)
+        (syntax-case? $syntax ()
+          ((fn arg ...)
+            (lets
+              ((typed $fn-type $fn-value) (expand-function $expander #'fn))
+              ($arg-values
+                (map*
+                  (partial expand-value $expander)
+                  (lambda ($type $args)
+                    (map (partial expand-value $expander $type) $args))
+                  (function-type-param-types $fn-type)
+                  #'(arg ...)))
+              (typed
+                (function-type-result-type $fn-type)
+                `(,$fn-value ,@$arg-values))))))))
 )
