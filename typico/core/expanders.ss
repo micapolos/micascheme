@@ -21,7 +21,7 @@
   (define core-expander
     (or-expander
       (predicate-expander boolean? boolean-type)
-      (predicate-expander integer? integer-type)
+      (predicate-expander (and? integer? exact?) integer-type)
       (predicate-expander char? char-type)
       (predicate-expander string? string-type)
 

@@ -5,7 +5,7 @@
     expand-typed
     expand-typed/no-lookup
     expand-value-of
-    expand-predicate-value-of
+    expand?-value-of
     expand-type
     type-error
     types-error)
@@ -97,7 +97,7 @@
         ((function-type? $function-type) $typed)
         ((else $other-type) (syntax-error #'fn "not a function")))))
 
-  (define (expand-predicate-value-of $lookup $predicate $type $syntax)
+  (define (expand?-value-of $lookup $predicate $type $syntax)
     (syntax-case $syntax ()
       (x ($predicate (datum x)) (datum x))
       (other (typed-value-of #'other $type (expand-typed $lookup #'other)))))
@@ -108,17 +108,17 @@
         (integer? (datum i))
         (cond
           ((type=? $type u2-type)
-            (expand-predicate-value-of $lookup u2? $type $syntax))
+            (expand?-value-of $lookup u2? $type $syntax))
           ((type=? $type u3-type)
-            (expand-predicate-value-of $lookup u3? $type $syntax))
+            (expand?-value-of $lookup u3? $type $syntax))
           ((type=? $type u7-type)
-            (expand-predicate-value-of $lookup u7? $type $syntax))
+            (expand?-value-of $lookup u7? $type $syntax))
           ((type=? $type u8-type)
-            (expand-predicate-value-of $lookup u8? $type $syntax))
+            (expand?-value-of $lookup u8? $type $syntax))
           ((type=? $type u16-type)
-            (expand-predicate-value-of $lookup u16? $type $syntax))
+            (expand?-value-of $lookup u16? $type $syntax))
           ((type=? $type s8-type)
-            (expand-predicate-value-of $lookup s8? $type $syntax))
+            (expand?-value-of $lookup s8? $type $syntax))
           (else
             (typed-value-of $syntax $type (expand-typed $lookup $syntax)))))
       (other

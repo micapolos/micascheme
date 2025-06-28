@@ -16,7 +16,7 @@
   (define-type datum)
 
   (define-type boolean boolean? identity)
-  (define-type integer integer? identity)
+  (define-type integer (and? integer? exact?) identity)
   (define-type char char? identity)
   (define-type string string? identity)
   (define-type bytevector bytevector?)

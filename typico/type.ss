@@ -48,7 +48,7 @@
   (data (expander-type proc))
 
   (define type?
-    (or-predicate
+    (or?
       primitive-type?
       function-type?
       forall-type?

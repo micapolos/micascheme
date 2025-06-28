@@ -7,6 +7,8 @@
 (check-expand-core #\a (char #\a))
 (check-expand-core "foo" (string "foo"))
 
+(check-expand-core-raises 10.0)  ; integers must be exact
+
 ; dynamic (non compile-time constant)
 
 (check-expand-core
