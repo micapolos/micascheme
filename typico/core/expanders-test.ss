@@ -12,9 +12,9 @@
   (function (string char) integer)
   (function-type (list string-type char-type) integer-type))
 
-; (check-expand-core-type
-;   (function (string char ...) integer)
-;   (function-type (list* string-type char-type) integer-type))
+(check-expand-core-type
+  (function (string char ...) integer)
+  (function-type (list* string-type char-type) integer-type))
 
 ; literals
 

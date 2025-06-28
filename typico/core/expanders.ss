@@ -16,10 +16,10 @@
   (define-rule-syntax (check-expand-core in out)
     (check-expand core-expander in out))
 
-  (define-rule-syntax (check-expand-core-type in out)
-    (check
+  (define-case-syntax (check-expand-core-type in out)
+    #`(check
       (equal?
-        (expand-value core-expander type-type (datum/annotation in))
+        (expand-value core-expander type-type 'in) ; TODO: How to preserve annotations and still support ...
         out)))
 
   (define-rule-syntax (check-expand-core-raises in)
@@ -41,10 +41,9 @@
           (for-all id? #'(param ... vararg-param))
           (typed type-type
             (function-type
-              (map*
-                (partial expand-value $expander type-type)
-                (partial expand-value $expander type-type)
-                #'(param ...))
+              (append
+                (map (partial expand-value $expander type-type) #'(param ...))
+                (expand-value $expander type-type #'vararg-param))
               (expand-value $expander type-type #'result)))))
 
       (case-expander (function (param ...) result) ($expander)
