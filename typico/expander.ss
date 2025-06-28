@@ -61,10 +61,12 @@
     ((case-expander id body)
       (case-expander id ($expander) body)))
 
+  (define (expand? $expander $syntax)
+    ($expander $expander $syntax))
 
   (define (expand $expander $syntax)
     (or
-      ($expander $expander $syntax)
+      (expand? $expander $syntax)
       (syntax-error $syntax)))
 
   (define (expand-value $expander $expected-type $syntax)
