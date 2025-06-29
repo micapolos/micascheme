@@ -119,6 +119,7 @@
                           (and
                             (id? #'x)
                             (id=? #'x #'id)
+                            ; TODO: Use gensym to allow shadowing
                             (when
                               (expand? $expander0 #'id)
                               (syntax-error #'id "already defined"))
