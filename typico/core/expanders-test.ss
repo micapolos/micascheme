@@ -294,8 +294,13 @@
   (integer (let () (define i 10) (define i (($primitive 3 +) i 1)) i)))
 
 (check-expand-core
-  (begin (define (inc (integer i) (+ i 1))) (inc 10))
-  (integer (let () (define inc (lambda (i) (($primitive 3 +) i 1))) (inc 10))))
+  (begin
+    (define (inc (integer i) (+ i 1)))
+    (inc 10))
+  (integer
+    (let ()
+      (define inc (lambda (i) (($primitive 3 +) i 1)))
+      (inc 10))))
 
 (check-expand-core-raises (begin))
 (check-expand-core-raises (begin i (define i 20)))
