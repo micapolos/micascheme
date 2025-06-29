@@ -287,4 +287,5 @@
   (integer (begin (define s "foo") (define i (($primitive 3 string-length) s)) i)))
 
 (check-expand-core-raises (begin))
+(check-expand-core-raises (begin i (define i 20)))
 (check-expand-core-raises (begin (define i 10) (define i 20) i))
