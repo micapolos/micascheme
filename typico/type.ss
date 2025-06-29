@@ -30,7 +30,12 @@
 
     expander-type
     expander-type?
-    expander-type-proc
+    expander-type-expander
+
+    syntax-type
+    syntax-type?
+    syntax-type-expander
+    syntax-type-datum
 
     type->datum
     type=?
@@ -45,7 +50,8 @@
   (data (forall-type arity type))
   (data (variable-type index))
   (data (application-type type args))
-  (data (expander-type proc))
+  (data (expander-type expander))
+  (data (syntax-type expander datum))
 
   (define type?
     (or?
@@ -54,7 +60,8 @@
       forall-type?
       variable-type?
       application-type?
-      expander-type?))
+      expander-type?
+      syntax-type?))
 
   (define make-primitive-type
     (case-lambda
@@ -95,7 +102,11 @@
           ,(type->datum (application-type-type $application-type))
           ,@(map type->datum (application-type-args $application-type))))
       ((expander-type? $expander-type)
-        `(expander ,(expander-type-proc $expander-type)))))
+        `(expander ,(expander-type-expander $expander-type)))
+      ((syntax-type? $syntax-type)
+        `(syntax
+          ,(syntax-type-expander $syntax-type)
+          ,(syntax-type-datum $syntax-type)))))
 
   (define (type->syntax $type)
     (switch-exhaustive $type
@@ -120,7 +131,11 @@
           ,(type->datum (application-type-type $application-type))
           ,@(map type->datum (application-type-args $application-type))))
       ((expander-type? $expander-type)
-        `(expander ,(expander-type-proc $expander-type)))))
+        `(expander ,(expander-type-expander $expander-type)))
+      ((syntax-type? $syntax-type)
+        `(syntax
+          ,(syntax-type-expander $syntax-type)
+          ,(syntax-type-datum $syntax-type)))))
 
   (define (type=? $type-a $type-b)
     (switch? $type-a
@@ -172,8 +187,18 @@
         (switch? $type-b
           ((expander-type? $expander-type-b)
             (eq?
-              (expander-type-proc $expander-type-a)
-              (expander-type-proc $expander-type-b)))))))
+              (expander-type-expander $expander-type-a)
+              (expander-type-expander $expander-type-b)))))
+      ((syntax-type? $syntax-type-a)
+        (switch? $type-b
+          ((syntax-type? $syntax-type-b)
+            (and
+              (eq?
+                (syntax-type-expander $syntax-type-a)
+                (syntax-type-expander $syntax-type-b))
+              (equal?
+                (syntax-type-datum $syntax-type-a)
+                (syntax-type-datum $syntax-type-b))))))))
 
   (define (type-value-predicate? $type)
     (switch? $type

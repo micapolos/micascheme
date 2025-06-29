@@ -8,7 +8,6 @@
         '(micascheme)
         '(typico type)
         '(typico core types)
-        '(typico scoped)
         '(typico dynamic))))
 
   (define (typico-environment)

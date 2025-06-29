@@ -7,7 +7,10 @@
     list->expander
     case-expander
     expand
+    expand?
     expand-value
+    expand-value?
+    expand-syntax-type?
     expand-function
     check-expand
     check-expand-typed
@@ -77,6 +80,18 @@
       (cond
         ((type=? $type $expected-type) $value)
         (else (type-error $syntax $type $expected-type)))))
+
+  (define (expand-value? $expander $expected-type $syntax)
+    (lets
+      ($typed (expand $expander $syntax))
+      (and
+        (type=? (typed-type $typed) $expected-type)
+        (typed-value $typed))))
+
+  (define (expand-syntax-type? $expander $syntax)
+    (lets
+      ((typed $type _) (expand $expander $syntax))
+      (and (syntax-type? $type) $type)))
 
   (define (expand-function $expander $syntax)
     (lets

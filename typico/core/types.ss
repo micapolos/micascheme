@@ -1,7 +1,6 @@
 (library (typico core types)
   (export
     type-type
-    syntax-type
     datum-type
     boolean-type integer-type char-type string-type
     bytevector-type
@@ -14,7 +13,6 @@
   (define-type scheme)
 
   (define-type type)
-  (define-type syntax)
   (define-type datum)
 
   (define-type boolean boolean? identity)

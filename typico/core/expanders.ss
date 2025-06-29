@@ -34,6 +34,20 @@
       (case-expander      string  (typed type-type string-type))
       (case-expander      datum   (typed type-type datum-type))
 
+      ; syntax
+      (case-expander (syntax expr) ($expander)
+        (typed
+          (syntax-type $expander #'expr)
+          #f))
+
+      ; eval syntax
+      (case-expander (eval expr) ($expander)
+        (lets?
+          ($syntax-type (expand-syntax-type? $expander #'expr))
+          (expand
+            (syntax-type-expander $syntax-type)
+            (syntax-type-datum $syntax-type))))
+
       ; function type
       (case-expander (function (param ... vararg-param dots) result) ($expander)
         (and

@@ -6,13 +6,8 @@
     (typico typed)
     (typico type)
     (typico core types)
-    (typico environment)
-    (typico scoped))
+    (typico environment))
 
   (define (typed-eval (typed $type $value))
-    (eval
-      (cond
-        ((type=? $type syntax-type) `(syntax ,(scoped-ref $value)))
-        (else $value))
-      (typico-environment)))
+    (eval $value (typico-environment)))
 )

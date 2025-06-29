@@ -7,6 +7,5 @@
   (typico expander)
   (typico lookup)
   (typico lang)
-  (typico scoped)
   (typico library)
   (typico core all))
