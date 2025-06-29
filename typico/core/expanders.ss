@@ -119,10 +119,6 @@
                           (and
                             (id? #'x)
                             (id=? #'x #'id)
-                            ; TODO: Use gensym to allow shadowing
-                            (when
-                              (expand? $expander0 #'id)
-                              (syntax-error #'id "already defined"))
                             (typed (typed-type $typed) (id->symbol #'x))))))
                     $expander0)
                   `(define ,(id->symbol #'id) ,(typed-value $typed))))))))

@@ -286,6 +286,13 @@
   (begin (define s "foo") (define i (length s)) i)
   (integer (begin (define s "foo") (define i (($primitive 3 string-length) s)) i)))
 
+(check-expand-core
+  (begin (define i 10) (define i 20) i)
+  (integer (begin (define i 10) (define i 20) i)))
+
+(check-expand-core
+  (begin (define i 10) (define i (+ i 1)) i)
+  (integer (begin (define i 10) (define i (($primitive 3 +) i 1)) i)))
+
 (check-expand-core-raises (begin))
 (check-expand-core-raises (begin i (define i 20)))
-(check-expand-core-raises (begin (define i 10) (define i 20) i))
