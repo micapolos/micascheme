@@ -15,7 +15,8 @@
     check-expand
     check-expand-typed
     check-expand-raises
-    datum-expander)
+    datum-expander
+    macro-expander)
   (import
     (typico base)
     (typico type)
@@ -189,4 +190,12 @@
                         $value-predicate?s $arg-values))
                       ($value-datum-proc? (eval $datum (typico-environment))))
                     (else $datum))))))))))
+
+  (define-case-syntax (macro-expander (keyword ...) pattern body)
+    #`(expander ($expander $syntax)
+      (lets?
+        ($syntax
+          (syntax-case? $syntax (keyword ...)
+            (pattern #'body)))
+        (expand $expander $syntax))))
 )

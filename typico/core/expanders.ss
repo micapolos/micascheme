@@ -175,6 +175,10 @@
       (datum-expander (= char-type char-type)              (boolean-type  ($primitive 3 char=?)))
       (datum-expander (= bytevector-type bytevector-type)  (boolean-type  ($primitive 3 bytevector=?)))
 
+      (macro-expander (cond else) (cond (else x)) x)
+      (macro-expander (cond) (cond (condition body) rest ...)
+        (if condition body (cond rest ...)))
+
       ; application (must be the last one)
       (expander ($expander $syntax)
         (syntax-case? $syntax ()

@@ -245,3 +245,25 @@
 (check-expand-core
   (eval (syntax (+ 1 2)))
   (integer 3))
+
+; cond
+
+(check-expand-core
+  (cond (else 10))
+  (integer 10))
+
+(check-expand-core
+  (cond (#t 10) (else 20))
+  (integer 10))
+
+(check-expand-core
+  (cond ((dynamic #t) 10) (else 20))
+  (integer (if (dynamic #t) 10 20)))
+
+(check-expand-core
+  (cond ((dynamic #t) 10) ((dynamic #f) 20) (else 30))
+  (integer (if (dynamic #t) 10 (if (dynamic #f) 20 30))))
+
+(check-expand-core-raises (cond (#t 10)))  ; missing else
+(check-expand-core-raises (cond (0 10) (else 20)))  ; invalid condition type
+(check-expand-core-raises (cond (#t 10) (else "foo")))  ; invalid body type
