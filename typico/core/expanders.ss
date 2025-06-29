@@ -110,7 +110,7 @@
           (lets
             ($typed (expand $expander #'expr))
             (typed definition-type
-              (lambda ($expander)
+              (lambda ($expander0)
                 (values
                   (or-expander
                     (expander ($expander $syntax)
@@ -119,8 +119,11 @@
                           (and
                             (id? #'x)
                             (id=? #'x #'id)
+                            (when
+                              (expand? $expander0 #'id)
+                              (syntax-error #'id "already defined"))
                             (typed (typed-type $typed) (id->symbol #'x))))))
-                    $expander)
+                    $expander0)
                   `(define ,(id->symbol #'id) ,(typed-value $typed))))))))
 
       ; begin

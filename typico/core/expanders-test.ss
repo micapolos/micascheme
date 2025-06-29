@@ -282,9 +282,8 @@
   (begin (define i 10) (define s "foo") s)
   (string (begin (define i 10) (define s "foo") s)))
 
-(check-expand-core
-  (begin (define i 10) (define i "foo") i)
-  (string (begin (define i 10) (define i "foo") i)))
+(check-expand-core-raises
+  (begin (define i 10) (define i 20) i))
 
 (check-expand-core
   (begin (define s "foo") (define i (length s)) i)
