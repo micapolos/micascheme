@@ -69,7 +69,7 @@
               (expand-value $expander type-type #'result)))))
 
       ; lambda
-      (case-expander (lambda ((type id) ... (vararg-type vararg-id) dots) body) ($expander)
+      (case-expander (lambda (type id) ... (vararg-type vararg-id) dots body) ($expander)
         (and
           (equal? (datum dots) '...)
           (for-all id? #'(id ... vararg-id))
@@ -88,7 +88,7 @@
               `(lambda (,@(map id->symbol #'(id ...)) . ,(id->symbol #'vararg-id))
                 ,(typed-value $typed-body))))))
 
-      (case-expander (lambda ((type id) ...) body) ($expander)
+      (case-expander (lambda (type id) ... body) ($expander)
         (and
           (for-all id? #'(id ...))
           (lets
