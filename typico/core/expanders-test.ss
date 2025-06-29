@@ -245,11 +245,3 @@
 (check-expand-core
   (eval (syntax (+ 1 2)))
   (integer 3))
-
-; (check-expand-core
-;   (eval
-;     (let
-;       (foo "foo")
-;       (bar "bar")
-;       (syntax (append foo bar))))
-;   (string (($primitive 3 string-append) foo bar)))
