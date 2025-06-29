@@ -123,6 +123,10 @@
                     $expander0)
                   `(define ,(id->symbol #'id) ,(typed-value $typed))))))))
 
+      ; define function
+      (macro-expander (define) (define (id rest ...))
+        (define id (=> rest ...)))
+
       ; begin
       (case-expander (begin definition ... expr) ($expander)
         (lets
