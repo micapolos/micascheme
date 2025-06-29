@@ -13,3 +13,13 @@
 (check-typico-raises 1.0)
 (check-typico-equal? (+ 1 2) 3)
 (check-typico-raises (+ 1 "foo"))
+
+(check-typico-equal?
+  (begin
+    (define hello-world
+      (begin
+        (define hello "Hello")
+        (define world "world")
+        (append hello ", " world "!")))
+    (append hello-world " (" (string (length hello-world)) ")"))
+  "Hello, world! (13)")

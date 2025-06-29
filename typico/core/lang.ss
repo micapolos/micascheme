@@ -14,7 +14,7 @@
 
   (define-case-syntax (typico expr)
     #`(eval
-      '#,(typed-value (expand core-expander #'expr))
+      '#,(datum->syntax #'+ (typed-value (expand core-expander #'expr)))
       (typico-environment)))
 
   (define-rule-syntax (check-typico-equal? in out)

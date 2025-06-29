@@ -131,7 +131,6 @@
               (lambda ($expander-datums $definition)
                 (lets
                   ((pair $expander $datums) $expander-datums)
-                  ; TODO: Check redefinition
                   ($definer (expand-value $expander definition-type $definition))
                   ((values $expander $datum) ($definer $expander))
                   (cons $expander (push $datums $datum))))
@@ -139,7 +138,7 @@
               #'(definition ...)))
           (typed-map-value
             (lambda ($value)
-              `(begin ,@(reverse $datums) ,$value))
+              `(let () ,@(reverse $datums) ,$value))
             (expand $expander #'expr))))
 
       (predicate-expander boolean? boolean-type)
@@ -198,8 +197,10 @@
       (datum-expander (- integer-type integer-type ...)    (integer-type  ($primitive 3 -)))
 
       (datum-expander (append string-type string-type ...) (string-type   ($primitive 3 string-append)))
-      (datum-expander (string char-type ...)               (string-type   ($primitive 3 string)))
       (datum-expander (length string-type)                 (integer-type  ($primitive 3 string-length)))
+
+      (datum-expander (string char-type ...)               (string-type   ($primitive 3 string)))
+      (datum-expander (string integer-type)                (string-type   ($primitive 3 number->string)))
 
       (datum-expander (and boolean-type boolean-type ...)  (boolean-type  and))
       (datum-expander (or boolean-type boolean-type ...)   (boolean-type  or))
