@@ -103,6 +103,44 @@
               `(lambda (,@(map id->symbol #'(id ...)))
                 ,(typed-value $typed-body))))))
 
+      ; define value
+      (case-expander (define id expr) ($expander)
+        (and
+          (id? #'id)
+          (lets
+            ($typed (expand $expander #'expr))
+            (typed definition-type
+              (lambda ($expander)
+                (values
+                  (or-expander
+                    (expander ($expander $syntax)
+                      (syntax-case? $syntax ()
+                        (x
+                          (and
+                            (id? #'x)
+                            (id=? #'x #'id)
+                            (typed (typed-type $typed) (id->symbol #'x))))))
+                    $expander)
+                  `(define ,(id->symbol #'id) ,(typed-value $typed))))))))
+
+      ; begin
+      (case-expander (begin definition ... expr) ($expander)
+        (lets
+          ((pair $expander $datums)
+            (fold-left
+              (lambda ($expander-datums $definition)
+                (lets
+                  ((pair $expander $datums) $expander-datums)
+                  ($definer (expand-value $expander definition-type $definition))
+                  ((values $expander $datum) ($definer $expander))
+                  (cons $expander (push $datums $datum))))
+              (cons $expander (stack))
+              #'(definition ...)))
+          (typed-map-value
+            (lambda ($value)
+              `(begin ,@(reverse $datums) ,$value))
+            (expand $expander #'expr))))
+
       (predicate-expander boolean? boolean-type)
       (predicate-expander (and? integer? exact?) integer-type)
       (predicate-expander char? char-type)

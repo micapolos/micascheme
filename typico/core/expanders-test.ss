@@ -267,3 +267,25 @@
 (check-expand-core-raises (cond (#t 10)))  ; missing else
 (check-expand-core-raises (cond (0 10) (else 20)))  ; invalid condition type
 (check-expand-core-raises (cond (#t 10) (else "foo")))  ; invalid body type
+
+; do / define
+
+(check-expand-core
+  (begin 123)
+  (integer (begin 123)))
+
+(check-expand-core
+  (begin (define i 10) (define s "foo") i)
+  (integer (begin (define i 10) (define s "foo") i)))
+
+(check-expand-core
+  (begin (define i 10) (define s "foo") s)
+  (string (begin (define i 10) (define s "foo") s)))
+
+(check-expand-core
+  (begin (define i 10) (define i "foo") i)
+  (string (begin (define i 10) (define i "foo") i)))
+
+(check-expand-core
+  (begin (define s "foo") (define i (length s)) i)
+  (integer (begin (define s "foo") (define i (($primitive 3 string-length) s)) i)))
