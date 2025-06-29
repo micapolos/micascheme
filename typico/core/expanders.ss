@@ -131,6 +131,7 @@
               (lambda ($expander-datums $definition)
                 (lets
                   ((pair $expander $datums) $expander-datums)
+                  ; TODO: Check redefinition
                   ($definer (expand-value $expander definition-type $definition))
                   ((values $expander $datum) ($definer $expander))
                   (cons $expander (push $datums $datum))))
