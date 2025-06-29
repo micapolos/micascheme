@@ -55,14 +55,14 @@
 (check-typed $integer (typed integer $expanded-integer))
 (check-type-error ($integer))
 
-(check-typed inc (typed (function (integer) integer) expanded-inc))
+(check-typed inc (typed (-> integer integer) expanded-inc))
 (check-typed (inc $integer) (typed integer (expanded-inc $expanded-integer)))
 
 (check-type-error (inc))
 (check-type-error (inc $boolean))
 (check-type-error (inc $integer $integer))
 
-(check-typed - (typed (function (integer integer ...) integer) expanded-))
+(check-typed - (typed (-> integer integer ... integer) expanded-))
 (check-type-error (-))
 (check-typed (- $integer) (typed integer (expanded- $expanded-integer)))
 (check-typed (- $integer $integer) (typed integer (expanded- $expanded-integer $expanded-integer)))

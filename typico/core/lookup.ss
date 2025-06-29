@@ -40,9 +40,9 @@
           ($value (typed-value $typed))
           (typed datum-type $value)))))
 
-  (define-lookup+ (function $lookup $syntax)
+  (define-lookup+ (-> $lookup $syntax)
     (syntax-case $syntax ()
-      ((_ (param ... last-param tail) result)
+      ((_ param ... last-param tail result)
         (equal? (datum tail) '...)
         (typed type-type
           `(function-type
@@ -50,7 +50,7 @@
               ,@(map (partial expand-value-of $lookup type-type) #'(param ...))
               ,(expand-value-of $lookup type-type #'last-param))
             ,(expand-value-of $lookup type-type #'result))))
-      ((_ (param ...) result)
+      ((_ param ... result)
         (typed type-type
           `(function-type
             (list ,@(map (partial expand-value-of $lookup type-type) #'(param ...)))
@@ -294,7 +294,7 @@
       (lookup+primitive-type s8 list-type)
 
       (lookup+bytevector)
-      (lookup+function)
+      (lookup+->)
       (lookup+typeof)
       (lookup+length)
       (lookup+string)

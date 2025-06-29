@@ -143,7 +143,7 @@
       (function-type
         (list)
         (primitive-type (gensym) 'result)))
-    '(function () result)))
+    '(-> result)))
 
 (check
   (equal?
@@ -153,7 +153,7 @@
           (primitive-type (gensym) 'a)
           (primitive-type (gensym) 'b))
         (primitive-type (gensym) 'result)))
-    '(function (a b) result)))
+    '(-> a b result)))
 
 (check
   (equal?
@@ -161,7 +161,7 @@
       (function-type
         (list* (primitive-type (gensym) 'a))
         (primitive-type (gensym) 'result)))
-    '(function (a ...) result)))
+    '(-> a ... result)))
 
 (check
   (equal?
@@ -171,7 +171,7 @@
           (primitive-type (gensym) 'a)
           (primitive-type (gensym) 'b))
         (primitive-type (gensym) 'result)))
-    '(function (a b ...) result)))
+    '(-> a b ... result)))
 
 (check
   (equal?

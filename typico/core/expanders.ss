@@ -49,7 +49,7 @@
             (syntax-type-datum $syntax-type))))
 
       ; function type
-      (case-expander (function (param ... vararg-param dots) result) ($expander)
+      (case-expander (-> param ... vararg-param dots result) ($expander)
         (and
           (equal? (datum dots) '...)
           (for-all id? #'(param ... vararg-param))
@@ -60,7 +60,7 @@
                 (expand-value $expander type-type #'vararg-param))
               (expand-value $expander type-type #'result)))))
 
-      (case-expander (function (param ...) result) ($expander)
+      (case-expander (-> param ... result) ($expander)
         (and
           (for-all id? #'(param ...))
           (typed type-type

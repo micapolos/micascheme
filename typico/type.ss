@@ -84,12 +84,11 @@
       ((primitive-type? $primitive-type)
         (primitive-type-datum $primitive-type))
       ((function-type? $function-type)
-        `(function
-          (
+        `(->
           ,@(map*
             type->datum
             (lambda ($type) `(,(type->datum $type) ...))
-            (function-type-param-types $function-type)))
+            (function-type-param-types $function-type))
           ,(type->datum (function-type-result-type $function-type))))
       ((forall-type? $forall-type)
         `(forall

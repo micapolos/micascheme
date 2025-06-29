@@ -40,7 +40,7 @@
   (function (foo (integer x) (integer y)) (+ x y))
   (library
     (export
-      (foo (function (integer integer) integer)))
+      (foo (-> integer integer integer)))
     (define foo
       (lambda (x y)
         (($primitive 3 +) x y)))))

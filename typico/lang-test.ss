@@ -10,10 +10,10 @@
 (check-equal? (list-of integer) (list-of integer))
 (check-equal? (list-of (list-of integer)) (list-of (list-of integer)))
 
-(check-equal? (function () string) (function () string))
-(check-equal? (function (string integer) boolean) (function (string integer) boolean))
-(check-equal? (function (integer ...) boolean) (function (integer ...) boolean))
-(check-equal? (function (string integer ...) boolean) (function (string integer ...) boolean))
+(check-equal? (-> string) (-> string))
+(check-equal? (-> string integer boolean) (-> string integer boolean))
+(check-equal? (-> integer ... boolean) (-> integer ... boolean))
+(check-equal? (-> string integer ... boolean) (-> string integer ... boolean))
 
 ; === literals
 (check-equal? #f #f)
@@ -53,11 +53,11 @@
 (check-primitive string=? string=?)
 (check-primitive bytevector=? bytevector=?)
 
-(check-equal? (typeof boolean=?) (function (boolean boolean) boolean))
-(check-equal? (typeof integer=?) (function (integer integer) boolean))
-(check-equal? (typeof char=?) (function (char char) boolean))
-(check-equal? (typeof string=?) (function (string string) boolean))
-(check-equal? (typeof bytevector=?) (function (bytevector bytevector) boolean))
+(check-equal? (typeof boolean=?) (-> boolean boolean boolean))
+(check-equal? (typeof integer=?) (-> integer integer boolean))
+(check-equal? (typeof char=?) (-> char char boolean))
+(check-equal? (typeof string=?) (-> string string boolean))
+(check-equal? (typeof bytevector=?) (-> bytevector bytevector boolean))
 
 ; === if
 
@@ -92,14 +92,14 @@
 (check-equal? (+ "f" "o" "o") "foo")
 
 (check-primitive integer+ +)
-(check-equal? (typeof integer+) (function (integer ...) integer))
+(check-equal? (typeof integer+) (-> integer ... integer))
 
 (check-equal? (integer+) 0)
 (check-equal? (integer+ 1 2 3) 6)
 (check-raises (integer+ #t))
 
 (check-primitive string+ string-append)
-(check-equal? (typeof string+) (function (string ...) string))
+(check-equal? (typeof string+) (-> string ... string))
 
 (check-equal? (string+) "")
 (check-equal? (string+ "a" "b" "c") "abc")
@@ -132,11 +132,11 @@
 (check-equal? (let ((x 10)) (+ x x)) 20)
 (check-equal? (let ((x 10) (y 20)) (+ x y)) 30)
 
-(check-equal? (typeof (lambda () 10)) (function () integer))
-(check-equal? (typeof (lambda ((integer i) (string s)) i)) (function (integer string) integer))
-(check-equal? (typeof (lambda ((integer i) (string s)) s)) (function (integer string) string))
-;(check-equal? (typeof (lambda ((integer is) ...) is)) (function (integer ...) (list-of integer)))
-(check-equal? (typeof (lambda ((string s) (integer is) ...) s)) (function (string integer ...) string))
+(check-equal? (typeof (lambda () 10)) (-> integer))
+(check-equal? (typeof (lambda ((integer i) (string s)) i)) (-> integer string integer))
+(check-equal? (typeof (lambda ((integer i) (string s)) s)) (-> integer string string))
+;(check-equal? (typeof (lambda ((integer is) ...) is)) (-> integer ... (list-of integer)))
+(check-equal? (typeof (lambda ((string s) (integer is) ...) s)) (-> string integer ... string))
 
 (check-equal? ((lambda () 10)) 10)
 (check-equal? ((lambda ((integer x)) x) 10) 10)

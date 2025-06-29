@@ -11,43 +11,42 @@
 ; function type
 
 (check-expand-core-type
-  (function (string char) integer)
+  (-> string char integer)
   (function-type (list string-type char-type) integer-type))
 
 (check-expand-core-type
-  (function (string char ...) integer)
+  (-> string char ... integer)
   (function-type (list* string-type char-type) integer-type))
 
-(check-expand-core-raises (function (string char)))
-(check-expand-core-raises (function (string char) foo))
-(check-expand-core-raises (function (string char) integer integer))
-(check-expand-core-raises (function (string foo) integer))
+(check-expand-core-raises (->))
+(check-expand-core-raises (-> string foo integer))
+(check-expand-core-raises (-> string char foo))
 
 ; function
 
 (check-expand-core
   (lambda ((integer i) (string s)) i)
   (
-    (function (integer string) integer)
+    (-> integer string integer)
     (lambda (i s) i)))
 
 (check-expand-core
   (lambda ((integer i) (string s)) s)
   (
-    (function (integer string) string)
+    (-> integer string string)
     (lambda (i s) s)))
 
 (check-expand-core
   (lambda ((integer i) (string s) ...) i)
   (
-    (function (integer string ...) integer)
+    (-> integer string ... integer)
     (lambda (i . s) i)))
 
 ; TODO: list-of type
 ; (check-expand-core
 ;   (lambda ((integer i) (string s) ...) s)
 ;   (
-;     (function (integer string ...) (list-of string))
+;     (-> integer string ... (list-of string))
 ;     (lambda (i . s) s)))
 
 ; application
@@ -180,9 +179,9 @@
 
 ; string-append
 
-(check-expand-core integer+ ((function (integer ...) integer) ($primitive 3 +)))
-(check-expand-core integer- ((function (integer integer ...) integer) ($primitive 3 -)))
-(check-expand-core string-append ((function (string ...) string ) ($primitive 3 string-append)))
+(check-expand-core integer+ ((-> integer ... integer) ($primitive 3 +)))
+(check-expand-core integer- ((-> integer integer ... integer) ($primitive 3 -)))
+(check-expand-core string-append ((-> string ... string ) ($primitive 3 string-append)))
 
 ; u8
 
