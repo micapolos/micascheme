@@ -6,7 +6,8 @@
     fragment-obj
 
     fragment-with
-    fragment-bind)
+    fragment-bind
+    fragment-eval)
   (import
     (typico base))
 
@@ -28,4 +29,9 @@
             (lambda ($import) (not (member $import $imports)))
             $proc-imports))
         $proc-obj)))
+
+  (define (fragment-eval $fragment)
+    (eval
+      (fragment-obj $fragment)
+      (apply environment (fragment-imports $fragment))))
 )

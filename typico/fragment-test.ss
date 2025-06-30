@@ -28,3 +28,8 @@
       (list '(import a) '(import b) '(import c))
       '(b a))))
 
+(check
+  (equal?
+    (fragment-eval
+      (fragment-with (import (scheme)) (+ 1 2)))
+    3))
