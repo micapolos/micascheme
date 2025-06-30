@@ -1,4 +1,4 @@
-(library (typico dynamic)
+(library (typico core dynamic)
   (export dynamic)
   (import (micascheme))
 

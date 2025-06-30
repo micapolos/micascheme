@@ -22,7 +22,7 @@
     (typico type)
     (typico typed)
     (typico id)
-    (typico environment))
+    (typico core environment))
 
   (define-rule-syntax (expander ($expander $syntax) body)
     (lambda ($expander $syntax) body))

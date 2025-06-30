@@ -1,4 +1,4 @@
-(library (typico environment)
+(library (typico core environment)
   (export typico-environment)
   (import (micascheme))
 
@@ -8,7 +8,7 @@
         '(micascheme)
         '(typico type)
         '(typico core types)
-        '(typico dynamic))))
+        '(typico core dynamic))))
 
   (define (typico-environment)
     (force delay-typico-environment))

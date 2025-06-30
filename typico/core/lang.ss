@@ -9,7 +9,7 @@
     (typico typed)
     (typico expander)
     (typico core expanders)
-    (typico environment))
+    (typico core environment))
   (export (import (typico base)))
 
   (define-case-syntax (typico expr)
