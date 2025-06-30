@@ -22,5 +22,5 @@
         (world "world")
         (dodaj (=> (s1 string) (s2 string) (s3 string) (s4 string) (append s1 s2 s3 s4)))
         (dodaj hello ", " world "!")))
-    (append hello-world " (" (string (length hello-world)) ")"))
+    (append hello-world " " "(" (string (length hello-world)) ")"))
   "Hello, world! (13)")
