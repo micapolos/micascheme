@@ -20,7 +20,10 @@
       (let
         (hello "Hello")
         (world "world")
-        (dodaj (=> (s1 string) (s2 string) (s3 string) (s4 string) (append s1 s2 s3 s4)))
-        (dodaj hello ", " world "!")))
-    (append hello-world " " "(" (string (length hello-world)) ")"))
+        (comma-separated (=> (s1 string) (s2 string) (append s1 ", " s2)))
+        (exclamated (=> (s string) (append s "!")))
+        (exclamated (comma-separated hello world))))
+    (in-parentheses (=> (s string) (append "(" s ")")))
+    (space-separated (=> (s1 string) (s2 string) (append s1 " " s2)))
+    (space-separated hello-world (in-parentheses (string (length hello-world)))))
   "Hello, world! (13)")
