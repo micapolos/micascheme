@@ -22,8 +22,7 @@
     (typico type)
     (typico typed)
     (typico id)
-    (typico environment)
-    (only (typico expand) type-error))
+    (typico environment))
 
   (define-rule-syntax (expander ($expander $syntax) body)
     (lambda ($expander $syntax) body))
@@ -80,7 +79,7 @@
       ((typed $type $value) (expand $expander $syntax))
       (cond
         ((type=? $type $expected-type) $value)
-        (else (type-error $syntax $type $expected-type)))))
+        (else (syntax-error $syntax "invalid type")))))
 
   (define (expand-value? $expander $expected-type $syntax)
     (lets
