@@ -22,6 +22,7 @@
     (typico type)
     (typico typed)
     (typico id)
+    ; TODO: Get rid of this dependency
     (typico core environment))
 
   (define-rule-syntax (expander ($expander $syntax) body)
