@@ -6,9 +6,9 @@
     (prefix (typico base) %)
     (typico fragment))
 
-  (%define-rule-syntax (define-fragments import id %...)
+  (%define-rule-syntax (define-fragments imp id %...)
     (%begin
-      (%define id (fragment (%list (%quote import)) (%quote id))) %...))
+      (%define id (fragment (%import imp) id)) %...))
 
   (define-fragments (scheme)
     + -

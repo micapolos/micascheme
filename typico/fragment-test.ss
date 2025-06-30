@@ -4,13 +4,13 @@
 
 (check
   (equal?
-    (fragment-with (+ 1 2))
-    (fragment (list) '(+ 1 2))))
+    (fragment (+ 1 2))
+    (make-fragment (list) '(+ 1 2))))
 
 (check
   (equal?
-    (fragment-with (import (scheme) (data)) (+ 1 2))
-    (fragment (list '(scheme) '(data)) '(+ 1 2))))
+    (fragment (import (scheme) (data)) (+ 1 2))
+    (make-fragment (list '(scheme) '(data)) '(+ 1 2))))
 
 ; fragment-bind
 
@@ -18,18 +18,18 @@
   (equal?
     (fragment-bind
       (lambda ($obj)
-        (fragment
+        (make-fragment
           (list '(import b) '(import c))
           `(b ,$obj)))
-      (fragment
+      (make-fragment
         (list '(import a) '(import b))
         'a))
-    (fragment
+    (make-fragment
       (list '(import a) '(import b) '(import c))
       '(b a))))
 
 (check
   (equal?
     (fragment-eval
-      (fragment-with (import (scheme)) (+ 1 2)))
+      (fragment (import (scheme)) (+ 1 2)))
     3))

@@ -3,4 +3,4 @@
   (typico fragment)
   (prefix (typico core fragments) %))
 
-(check (equal? %string-append (fragment '((scheme)) 'string-append)))
+(check (equal? %string-append (fragment (import (scheme)) string-append)))

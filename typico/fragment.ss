@@ -1,11 +1,12 @@
 (library (typico fragment)
   (export
-    fragment
+    (rename
+      (fragment make-fragment)
+      (fragment-with fragment))
     fragment?
     fragment-imports
     fragment-obj
 
-    fragment-with
     fragment-bind
     fragment-eval)
   (import
