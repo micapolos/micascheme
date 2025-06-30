@@ -2,22 +2,23 @@
   (export
     fragment
     fragment?
-    fragment-obj
     fragment-imports
+    fragment-obj
 
     fragment-bind)
   (import
     (typico base))
 
-  (data (fragment obj imports))
+  (data (fragment imports obj))
 
   (define (fragment-bind $proc $fragment)
     (lets
-      ((fragment $obj $imports) $fragment)
-      ((fragment $proc-obj $proc-imports) ($proc (fragment-obj $fragment)))
-      (fragment $proc-obj
+      ((fragment $imports $obj) $fragment)
+      ((fragment $proc-imports $proc-obj) ($proc (fragment-obj $fragment)))
+      (fragment
         (append $imports
           (filter
             (lambda ($import) (not (member $import $imports)))
-            $proc-imports)))))
+            $proc-imports))
+        $proc-obj)))
 )

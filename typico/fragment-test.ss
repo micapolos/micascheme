@@ -4,8 +4,12 @@
   (equal?
     (fragment-bind
       (lambda ($obj)
-        (fragment `(b ,$obj) (list '(import b) '(import c))))
-      (fragment 'a (list '(import a) '(import b))))
+        (fragment
+          (list '(import b) '(import c))
+          `(b ,$obj)))
+      (fragment
+        (list '(import a) '(import b))
+        'a))
     (fragment
-      '(b a)
-      (list '(import a) '(import b) '(import c)))))
+      (list '(import a) '(import b) '(import c))
+      '(b a))))
