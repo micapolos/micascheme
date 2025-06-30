@@ -2,7 +2,6 @@
   (export
     type-type
     datum-type
-    definition-type
     boolean-type integer-type char-type string-type
     bytevector-type
     u2-type u3-type u7-type u8-type u16-type
@@ -15,7 +14,6 @@
 
   (define-type type)
   (define-type datum)
-  (define-type definition)
 
   (define-type boolean boolean? identity)
   (define-type integer (and? integer? exact?) identity)
