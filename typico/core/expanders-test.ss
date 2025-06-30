@@ -25,26 +25,26 @@
 ; function
 
 (check-expand-core
-  (=> (integer i) (string s) i)
+  (=> (i integer) (s string) i)
   (
     (-> integer string integer)
     (lambda (i s) i)))
 
 (check-expand-core
-  (=> (integer i) (string s) s)
+  (=> (i integer) (s string) s)
   (
     (-> integer string string)
     (lambda (i s) s)))
 
 (check-expand-core
-  (=> (integer i) (string s) ... i)
+  (=> (i integer) (s string) ... i)
   (
     (-> integer string ... integer)
     (lambda (i . s) i)))
 
 ; TODO: list-of type
 ; (check-expand-core
-;   (=> (integer i) (string s) ... s)
+;   (=> (i integer) (s string) ... s)
 ;   (
 ;     (-> integer string ... (list-of string))
 ;     (lambda (i . s) s)))
@@ -52,20 +52,20 @@
 ; application
 
 (check-expand-core
-  ((=> (integer i) (string s) i) 10 "foo")
+  ((=> (i integer) (s string) i) 10 "foo")
   (integer ((lambda (i s) i) 10 "foo")))
 
 (check-expand-core
-  ((=> (integer i) (string s) s) 10 "foo")
+  ((=> (i integer) (s string) s) 10 "foo")
   (string ((lambda (i s) s) 10 "foo")))
 
 (check-expand-core
-  ((=> (integer i) (string s) ... i) 10 "foo" "bar")
+  ((=> (i integer) (s string) ... i) 10 "foo" "bar")
   (integer ((lambda (i . s) i) 10 "foo" "bar")))
 
 ; TODO: list-of type
 ; (check-expand-core
-;   ((=> (integer i) (string s) ... s) 10 "foo" "bar")
+;   ((=> (i integer) (s string) ... s) 10 "foo" "bar")
 ;   ((list-of string) ((lambda (i . s) s) 10 "foo" "bar")))
 
 ; literals
