@@ -106,7 +106,7 @@
 
 (check-expand-core
   (let 10)
-  (integer (let () 10)))
+  (integer 10))
 
 (check-expand-core
   (let (x 10) x)
@@ -115,6 +115,26 @@
 (check-expand-core
   (let (x 10) (y 20) (+ x y))
   (integer (let ((x 10) (y 20)) (($primitive 3 +) x y))))
+
+(check-expand-core-raises (let (x 10) (y (+ x 1)) (+ x y)))
+
+; lets
+
+(check-expand-core
+  (lets 10)
+  (integer 10))
+
+(check-expand-core
+  (lets (x 10) x)
+  (integer (let ((x 10)) x)))
+
+(check-expand-core
+  (lets (x 10) (y 20) (+ x y))
+  (integer (let ((x 10)) (let ((y 20)) (($primitive 3 +) x y)))))
+
+(check-expand-core
+  (lets (x 10) (y (+ x 1)) (+ x y))
+  (integer (let ((x 10)) (let ((y (($primitive 3 +) x 1))) (($primitive 3 +) x y)))))
 
 ; boolean and
 
@@ -266,41 +286,3 @@
 (check-expand-core-raises (cond (#t 10)))  ; missing else
 (check-expand-core-raises (cond (0 10) (else 20)))  ; invalid condition type
 (check-expand-core-raises (cond (#t 10) (else "foo")))  ; invalid body type
-
-; begin / define
-
-(check-expand-core
-  (begin 123)
-  (integer (let () 123)))
-
-(check-expand-core
-  (begin (define i 10) (define s "foo") i)
-  (integer (let () (define i 10) (define s "foo") i)))
-
-(check-expand-core
-  (begin (define i 10) (define s "foo") s)
-  (string (let () (define i 10) (define s "foo") s)))
-
-(check-expand-core
-  (begin (define s "foo") (define i (length s)) i)
-  (integer (let () (define s "foo") (define i (($primitive 3 string-length) s)) i)))
-
-(check-expand-core
-  (begin (define i 10) (define i 20) i)
-  (integer (let () (define i 10) (define i 20) i)))
-
-(check-expand-core
-  (begin (define i 10) (define i (+ i 1)) i)
-  (integer (let () (define i 10) (define i (($primitive 3 +) i 1)) i)))
-
-(check-expand-core
-  (begin
-    (define (inc (integer i) (+ i 1)))
-    (inc 10))
-  (integer
-    (let ()
-      (define inc (lambda (i) (($primitive 3 +) i 1)))
-      (inc 10))))
-
-(check-expand-core-raises (begin))
-(check-expand-core-raises (begin i (define i 20)))

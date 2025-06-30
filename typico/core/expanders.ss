@@ -103,48 +103,6 @@
               `(lambda (,@(map id->symbol #'(id ...)))
                 ,(typed-value $typed-body))))))
 
-      ; define value
-      (case-expander (define id expr) ($expander)
-        (and
-          (id? #'id)
-          (lets
-            ($typed (expand $expander #'expr))
-            (typed definition-type
-              (lambda ($expander0)
-                (values
-                  (or-expander
-                    (expander ($expander $syntax)
-                      (syntax-case? $syntax ()
-                        (x
-                          (and
-                            (id? #'x)
-                            (id=? #'x #'id)
-                            (typed (typed-type $typed) (id->symbol #'x))))))
-                    $expander0)
-                  `(define ,(id->symbol #'id) ,(typed-value $typed))))))))
-
-      ; define function
-      (macro-expander (define) (define (id rest ...))
-        (define id (=> rest ...)))
-
-      ; begin
-      (case-expander (begin definition ... expr) ($expander)
-        (lets
-          ((pair $expander $datums)
-            (fold-left
-              (lambda ($expander-datums $definition)
-                (lets
-                  ((pair $expander $datums) $expander-datums)
-                  ($definer (expand-value $expander definition-type $definition))
-                  ((values $expander $datum) ($definer $expander))
-                  (cons $expander (push $datums $datum))))
-              (cons $expander (stack))
-              #'(definition ...)))
-          (typed-map-value
-            (lambda ($value)
-              `(let () ,@(reverse $datums) ,$value))
-            (expand $expander #'expr))))
-
       (predicate-expander boolean? boolean-type)
       (predicate-expander (and? integer? exact?) integer-type)
       (predicate-expander char? char-type)
@@ -171,6 +129,9 @@
           (lambda ($value) `(dynamic ,$value))
           (expand $expander #'x)))
 
+      (case-expander (let expr) ($expander)
+        (expand $expander #'expr))
+
       (case-expander (let (id expr) ... body) ($expander)
         (and
           (for-all id? #'(id ...))
@@ -189,6 +150,9 @@
                   (map id->symbol $ids)
                   (map typed-value $typed-list)))
                 ,(typed-value $typed-body))))))
+
+      (macro-expander (lets) (lets item) item)
+      (macro-expander (lets) (lets item item* ...) (let item (lets item* ...)))
 
       (case-expander integer-zero (typed integer-type 0))
       (case-expander integer-one (typed integer-type 1))
