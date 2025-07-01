@@ -11,6 +11,7 @@
     (typico type)
     (typico id)
     (typico core types)
+    (typico fragment)
     (asm u))
 
   (define-rule-syntax (check-expand-core in out)
@@ -74,34 +75,43 @@
           (equal? (datum dots) '...)
           (for-all id? #'(id ... vararg-id))
           (lets
+            ($ids #'(id ...))
+            ($vararg-id #'vararg-id)
             ($types (map (partial expand-value $expander type-type) #'(type ...)))
             ($vararg-type (expand-value $expander type-type #'vararg-type))
             ($expander
               (or-expander
-                (list->expander (map id-expander #'(id ...) $types))
+                (list->expander (map id-expander $ids $types))
                 ; TODO: list-of type
                 (id-expander #'vararg-id $vararg-type)
                 $expander))
             ($typed-body (expand $expander #'body))
             (typed
               (function-type (append $types $vararg-type) (typed-type $typed-body))
-              `(lambda (,@(map id->symbol #'(id ...)) . ,(id->symbol #'vararg-id))
-                ,(typed-value $typed-body))))))
+              (fragment-bind-with
+                ($lambda (fragment (import (scheme)) lambda))
+                ($body (typed-value $typed-body))
+                (pure-fragment
+                  `(,$lambda (,@(map id->symbol $ids) . ,(id->symbol $vararg-id))
+                    ,$body)))))))
 
       (case-expander (=> (id type) ... body) ($expander)
         (and
           (for-all id? #'(id ...))
           (lets
+            ($ids #'(id ...))
             ($types (map (partial expand-value $expander type-type) #'(type ...)))
             ($expander
               (or-expander
-                (list->expander (map id-expander #'(id ...) $types))
+                (list->expander (map id-expander $ids $types))
                 $expander))
             ($typed-body (expand $expander #'body))
             (typed
               (function-type $types (typed-type $typed-body))
-              `(lambda (,@(map id->symbol #'(id ...)))
-                ,(typed-value $typed-body))))))
+              (fragment-bind-with
+                ($lambda (fragment (import (scheme)) lambda))
+                ($body (typed-value $typed-body))
+                (pure-fragment `(,$lambda (,@(map id->symbol $ids)) ,$body)))))))
 
       (predicate-expander boolean? boolean-type)
       (predicate-expander (and? integer? exact?) integer-type)
@@ -109,28 +119,23 @@
       (predicate-expander string? string-type)
 
       (case-expander (u8 x) ($expander)
-        (syntax-case (expand-value $expander integer-type #'x) ()
-          (u8
-            (u8? (datum u8))
-            (typed u8-type (datum u8)))))
+        (lets
+          ($fragment (expand-value $expander integer-type #'x))
+          (switch? (fragment-obj $fragment)
+            ((u8? $u8) (typed u8-type $fragment)))))
 
       (case-expander (if condition true false) ($expander)
         (lets
-          ($condition-value (expand-value $expander boolean-type #'condition))
-          ((typed $type $true-value) (expand $expander #'true))
-          ($false-value (expand-value $expander $type #'false))
+          ($condition-fragment (expand-value $expander boolean-type #'condition))
+          ((typed $type $true-fragment) (expand $expander #'true))
+          ($false-fragment (expand-value $expander $type #'false))
           (typed $type
-            (cond
-              ((boolean? $condition-value) (if $condition-value $true-value $false-value))
-              (else `(if ,$condition-value ,$true-value ,$false-value))))))
-
-      (case-expander (dynamic x) ($expander)
-        (typed-map-value
-          (lambda ($value) `(dynamic ,$value))
-          (expand $expander #'x)))
-
-      (case-expander (let expr) ($expander)
-        (expand $expander #'expr))
+            (fragment-bind-with
+              ($if-value (fragment (import (scheme)) if))
+              ($condition-value $condition-fragment)
+              ($true-value $true-fragment)
+              ($false-value $false-fragment)
+              (pure-fragment `(,$if-value ,$condition-value ,$true-value ,$false-value))))))
 
       (case-expander (let (id expr) ... body) ($expander)
         (and
@@ -145,11 +150,16 @@
             ($typed-body (expand $expander #'body))
             (typed
               (typed-type $typed-body)
-              `(let
-                (,@(map list
-                  (map id->symbol $ids)
-                  (map typed-value $typed-list)))
-                ,(typed-value $typed-body))))))
+              (fragment-bind-with
+                ($let (fragment (import (scheme)) let))
+                ($values (list->fragment (map typed-value $typed-list)))
+                ($body (typed-value $typed-body))
+                (pure-fragment
+                  `(let
+                    (,@(map list
+                      (map id->symbol $ids)
+                      $values))
+                    ,$body)))))))
 
       (macro-expander (lets) (lets item) item)
       (macro-expander (lets) (lets item item* ...) (let item (lets item* ...)))
@@ -157,31 +167,31 @@
       (case-expander integer-zero (typed integer-type 0))
       (case-expander integer-one (typed integer-type 1))
 
-      (datum-expander integer+      (function-type (list* integer-type) integer-type)               ($primitive 3 +))
-      (datum-expander integer-      (function-type (list* integer-type integer-type) integer-type)  ($primitive 3 -))
-      (datum-expander string-append (function-type (list* string-type) string-type)                 ($primitive 3 string-append))
+      (primitive-expander integer+      (function-type (list* integer-type) integer-type)               +)
+      (primitive-expander integer-      (function-type (list* integer-type integer-type) integer-type)  -)
+      (primitive-expander string-append (function-type (list* string-type) string-type)                 string-append)
 
-      (datum-expander (+ integer-type integer-type ...)    (integer-type  ($primitive 3 +)))
-      (datum-expander (- integer-type integer-type ...)    (integer-type  ($primitive 3 -)))
+      (datum-expander (+ integer-type integer-type ... integer-type)     (fragment (import (scheme)) ($primitive 3 +)))
+      (datum-expander (- integer-type integer-type ... integer-type)     (fragment (import (scheme)) ($primitive 3 -)))
 
-      (datum-expander (append string-type string-type ...) (string-type   ($primitive 3 string-append)))
-      (datum-expander (length string-type)                 (integer-type  ($primitive 3 string-length)))
+      (datum-expander (append string-type string-type ... string-type)   (fragment (import (scheme)) ($primitive 3 string-append)))
+      (datum-expander (length string-type integer-type)                  (fragment (import (scheme)) ($primitive 3 string-length)))
 
-      (datum-expander (string char-type ...)               (string-type   ($primitive 3 string)))
-      (datum-expander (string integer-type)                (string-type   ($primitive 3 number->string)))
+      (datum-expander (string char-type ... string-type)                 (fragment (import (scheme)) ($primitive 3 string)))
+      (datum-expander (string integer-type string-type)                  (fragment (import (scheme)) ($primitive 3 number->string)))
 
-      (datum-expander (and boolean-type boolean-type ...)  (boolean-type  and))
-      (datum-expander (or boolean-type boolean-type ...)   (boolean-type  or))
+      (datum-expander (and boolean-type boolean-type ... boolean-type)   (fragment (import (scheme)) and))
+      (datum-expander (or boolean-type boolean-type ... boolean-type)    (fragment (import (scheme)) or))
 
-      (datum-expander (and integer-type integer-type ...)  (integer-type  ($primitive 3 bitwise-and)))
-      (datum-expander (or integer-type integer-type ...)   (integer-type  ($primitive 3 bitwise-ior)))
-      (datum-expander (xor integer-type integer-type ...)  (integer-type  ($primitive 3 bitwise-xor)))
+      (datum-expander (and integer-type integer-type ... integer-type)   (fragment (import (scheme)) ($primitive 3 bitwise-and)))
+      (datum-expander (or integer-type integer-type ... integer-type)    (fragment (import (scheme)) ($primitive 3 bitwise-ior)))
+      (datum-expander (xor integer-type integer-type ... integer-type)   (fragment (import (scheme)) ($primitive 3 bitwise-xor)))
 
-      (datum-expander (= boolean-type boolean-type)        (boolean-type  ($primitive 3 boolean=?)))
-      (datum-expander (= integer-type integer-type)        (boolean-type  ($primitive 3 =)))
-      (datum-expander (= string-type string-type)          (boolean-type  ($primitive 3 string=?)))
-      (datum-expander (= char-type char-type)              (boolean-type  ($primitive 3 char=?)))
-      (datum-expander (= bytevector-type bytevector-type)  (boolean-type  ($primitive 3 bytevector=?)))
+      (datum-expander (= boolean-type boolean-type boolean-type)         (fragment (import (scheme)) ($primitive 3 boolean=?)))
+      (datum-expander (= integer-type integer-type boolean-type)         (fragment (import (scheme)) ($primitive 3 =)))
+      (datum-expander (= string-type string-type boolean-type)           (fragment (import (scheme)) ($primitive 3 string=?)))
+      (datum-expander (= char-type char-type boolean-type)               (fragment (import (scheme)) ($primitive 3 char=?)))
+      (datum-expander (= bytevector-type bytevector-type boolean-type)   (fragment (import (scheme)) ($primitive 3 bytevector=?)))
 
       (macro-expander (cond else) (cond (else x)) x)
       (macro-expander (cond) (cond (condition body) rest ...)
@@ -192,8 +202,8 @@
         (syntax-case? $syntax ()
           ((fn arg ...)
             (lets
-              ((typed $fn-type $fn-value) (expand-function $expander #'fn))
-              ($arg-values
+              ((typed $fn-type $fn-fragment) (expand-function $expander #'fn))
+              ($arg-fragments
                 (map*
                   (partial expand-value $expander)
                   (lambda ($type $args)
@@ -202,5 +212,8 @@
                   #'(arg ...)))
               (typed
                 (function-type-result-type $fn-type)
-                `(,$fn-value ,@$arg-values))))))))
+                (fragment-bind-with
+                  ($fn $fn-fragment)
+                  ($args (list->fragment $arg-fragments))
+                  (pure-fragment `(,$fn ,@$args))))))))))
 )

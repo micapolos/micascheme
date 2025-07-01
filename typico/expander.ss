@@ -16,12 +16,14 @@
     check-expand-typed
     check-expand-raises
     datum-expander
+    primitive-expander
     macro-expander)
   (import
     (typico base)
     (typico type)
     (typico typed)
     (typico id)
+    (typico fragment)
     ; TODO: Get rid of this dependency
     (typico core environment))
 
@@ -33,14 +35,14 @@
       (syntax-case? $syntax ()
         (id
           (and (id? #'id) (id=? #'id $id))
-          (typed $type (id->symbol #'id))))))
+          (typed $type (id->fragment #'id))))))
 
   (define-rule-syntax (predicate-expander test? type)
     (expander ($expander $syntax)
       (syntax-case? $syntax ()
         (x
           (test? (datum x))
-          (typed type (datum x))))))
+          (typed type (pure-fragment (datum x)))))))
 
   (define (or-expander . $expanders)
     (list->expander $expanders))
@@ -102,9 +104,12 @@
         ((else $other) (syntax-error $syntax "not a function")))))
 
   (define (typed->test-datum $typed)
-    `(
-      ,(type->datum (typed-type $typed))
-      ,(typed-value $typed)))
+    (lets
+      ($fragment (typed-value $typed))
+      `(
+        ,(type->datum (typed-type $typed))
+        (import ,@(fragment-imports $fragment))
+        ,(fragment-obj $fragment))))
 
   (define-rule-syntax (check-expand expander in out)
     (check
@@ -124,10 +129,10 @@
         (expand expander (datum/annotation in)))))
 
   (define-case-syntaxes
-    ((datum-expander id type proc)
+    ((datum-expander id type fragment)
       (id? #'id)
-      #'(case-expander id (typed type 'proc)))
-    ((datum-expander (id param-type ... vararg-param-type dots) (result-type proc))
+      #'(case-expander id (typed type fragment)))
+    ((datum-expander (id param-type ... vararg-param-type dots result-type) proc-fragment)
       (and (id? #'id) (symbol=? (datum dots) '...))
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
@@ -145,26 +150,12 @@
               (for-all type=? $param-types $arg-types)
               (for-all (partial type=? $vararg-param-type) $vararg-types)
               (typed $result-type
-                (lets
-                  ($arg-values (map typed-value $typed-args))
-                  ($vararg-values (map typed-value $typed-varargs))
-                  ($value-datum-proc? (type-value-datum-proc? $result-type))
-                  ($arg-value-predicate?s (map type-value-predicate? $param-types))
-                  ($vararg-value-predicate? (type-value-predicate? $vararg-param-type))
-                  ($datum `(proc ,@$arg-values ,@$vararg-values))
-                  (cond
-                    ((and $value-datum-proc?
-                      (for-all
-                        (lambda ($arg-value-predicate? $arg-value)
-                          (and $arg-value-predicate? ($arg-value-predicate? $arg-value)))
-                        $arg-value-predicate?s $arg-values)
-                      $vararg-value-predicate?
-                      (for-all
-                        (lambda ($arg-value) ($vararg-value-predicate? $arg-value))
-                        $vararg-values))
-                      ($value-datum-proc? (eval $datum (typico-environment))))
-                    (else $datum)))))))))
-    ((datum-expander (id param-type ...) (result-type proc))
+                (fragment-bind-with
+                  ($proc proc-fragment)
+                  ($arg-values (list->fragment (map typed-value $typed-args)))
+                  ($vararg-values (list->fragment (map typed-value $typed-varargs)))
+                  (pure-fragment `(,$proc ,@$arg-values ,@$vararg-values)))))))))
+    ((datum-expander (id param-type ... result-type) proc-fragment)
       (id? #'id)
       (lets
         ($param-temporaries (generate-temporaries #'(param-type ...)))
@@ -177,19 +168,13 @@
             (and
               (for-all type=? $param-types $arg-types)
               (typed $result-type
-                (lets
-                  ($arg-values (map typed-value $typed-args))
-                  ($value-datum-proc? (type-value-datum-proc? $result-type))
-                  ($value-predicate?s (map type-value-predicate? $param-types))
-                  ($datum `(proc ,@$arg-values))
-                  (cond
-                    ((and $value-datum-proc?
-                      (for-all
-                        (lambda ($value-predicate? $arg-value)
-                          (and $value-predicate? ($value-predicate? $arg-value)))
-                        $value-predicate?s $arg-values))
-                      ($value-datum-proc? (eval $datum (typico-environment))))
-                    (else $datum))))))))))
+                (fragment-bind-with
+                  ($proc proc-fragment)
+                  ($arg-values (list->fragment (map typed-value $typed-args)))
+                  (pure-fragment `(,$proc ,@$arg-values))))))))))
+
+  (define-rule-syntax (primitive-expander id type prim)
+    (datum-expander id type (fragment (import (chezscheme)) ($primitive 3 prim))))
 
   (define-case-syntax (macro-expander (keyword ...) pattern body)
     #`(expander ($expander $syntax)

@@ -3,4 +3,5 @@
 (test
   (typico core fragments)
   (typico core expanders)
-  (typico core lang))
+  (typico core lang)
+  )

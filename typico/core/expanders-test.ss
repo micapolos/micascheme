@@ -22,24 +22,36 @@
 (check-expand-core-raises (-> string foo integer))
 (check-expand-core-raises (-> string char foo))
 
+; literals
+
+(check-expand-core #f (boolean (import) #f))
+(check-expand-core 10 (integer (import) 10))
+(check-expand-core #\a (char (import) #\a))
+(check-expand-core "foo" (string (import) "foo"))
+
+(check-expand-core-raises 10.0)  ; integers must be exact
+
 ; function
 
 (check-expand-core
   (=> (i integer) (s string) i)
   (
     (-> integer string integer)
+    (import (scheme))
     (lambda (i s) i)))
 
 (check-expand-core
   (=> (i integer) (s string) s)
   (
     (-> integer string string)
+    (import (scheme))
     (lambda (i s) s)))
 
 (check-expand-core
   (=> (i integer) (s string) ... i)
   (
     (-> integer string ... integer)
+    (import (scheme))
     (lambda (i . s) i)))
 
 ; TODO: list-of type
@@ -47,55 +59,41 @@
 ;   (=> (i integer) (s string) ... s)
 ;   (
 ;     (-> integer string ... (list-of string))
+;     (import (scheme))
 ;     (lambda (i . s) s)))
 
 ; application
 
 (check-expand-core
   ((=> (i integer) (s string) i) 10 "foo")
-  (integer ((lambda (i s) i) 10 "foo")))
+  (integer
+    (import (scheme))
+    ((lambda (i s) i) 10 "foo")))
 
 (check-expand-core
   ((=> (i integer) (s string) s) 10 "foo")
-  (string ((lambda (i s) s) 10 "foo")))
+  (string
+    (import (scheme))
+    ((lambda (i s) s) 10 "foo")))
 
 (check-expand-core
   ((=> (i integer) (s string) ... i) 10 "foo" "bar")
-  (integer ((lambda (i . s) i) 10 "foo" "bar")))
+  (integer
+    (import (scheme))
+    ((lambda (i . s) i) 10 "foo" "bar")))
 
 ; TODO: list-of type
 ; (check-expand-core
 ;   ((=> (i integer) (s string) ... s) 10 "foo" "bar")
-;   ((list-of string) ((lambda (i . s) s) 10 "foo" "bar")))
-
-; literals
-
-(check-expand-core #f (boolean #f))
-(check-expand-core 10 (integer 10))
-(check-expand-core #\a (char #\a))
-(check-expand-core "foo" (string "foo"))
-
-(check-expand-core-raises 10.0)  ; integers must be exact
-
-; dynamic (non compile-time constant)
-
-(check-expand-core
-  (dynamic "foo")
-  (string (dynamic "foo")))
+;   ((list-of string)
+;     (import (scheme)
+;     ((lambda (i . s) s) 10 "foo" "bar"))))
 
 ; if
 
 (check-expand-core
   (if #t 10 20)
-  (integer 10))
-
-(check-expand-core
-  (if #f 10 20)
-  (integer 20))
-
-(check-expand-core
-  (if (dynamic #t) 10 20)
-  (integer (if (dynamic #t) 10 20)))
+  (integer (import (scheme)) (if #t 10 20)))
 
 (check-expand-core-raises (if #t 10 "foo"))
 (check-expand-core-raises (if "foo" 10 20))
@@ -106,15 +104,21 @@
 
 (check-expand-core
   (let 10)
-  (integer 10))
+  (integer
+    (import (scheme))
+    (let () 10)))
 
 (check-expand-core
   (let (x 10) x)
-  (integer (let ((x 10)) x)))
+  (integer
+    (import (scheme))
+    (let ((x 10)) x)))
 
 (check-expand-core
   (let (x 10) (y 20) (+ x y))
-  (integer (let ((x 10) (y 20)) (($primitive 3 +) x y))))
+  (integer
+    (import (scheme))
+    (let ((x 10) (y 20)) (($primitive 3 +) x y))))
 
 (check-expand-core-raises (let (x 10) (y (+ x 1)) (+ x y)))
 
@@ -122,166 +126,233 @@
 
 (check-expand-core
   (lets 10)
-  (integer 10))
+  (integer (import) 10))
 
 (check-expand-core
   (lets (x 10) x)
-  (integer (let ((x 10)) x)))
+  (integer
+    (import (scheme))
+    (let ((x 10)) x)))
 
 (check-expand-core
   (lets (x 10) (y 20) (+ x y))
-  (integer (let ((x 10)) (let ((y 20)) (($primitive 3 +) x y)))))
+  (integer
+    (import (scheme))
+    (let ((x 10))
+      (let ((y 20))
+        (($primitive 3 +) x y)))))
 
 (check-expand-core
   (lets (x 10) (y (+ x 1)) (+ x y))
-  (integer (let ((x 10)) (let ((y (($primitive 3 +) x 1))) (($primitive 3 +) x y)))))
+  (integer
+    (import (scheme))
+    (let ((x 10))
+      (let ((y (($primitive 3 +) x 1)))
+        (($primitive 3 +) x y)))))
 
 ; boolean and
 
-(check-expand-core (and #t) (boolean #t))
-(check-expand-core (and #t #t) (boolean #t))
-(check-expand-core (and #t #t #t) (boolean #t))
-(check-expand-core (and #t #f #t) (boolean #f))
+(check-expand-core-raises (and))
+
 (check-expand-core
-  (and (dynamic #f) #t #f)
-  (boolean (and (dynamic #f) #t #f)))
+  (and #t)
+  (boolean (import (scheme)) (and #t)))
+
+(check-expand-core
+  (and #t #f #t)
+  (boolean (import (scheme)) (and #t #f #t)))
 
 ; boolean or
 
-(check-expand-core (or #f) (boolean #f))
-(check-expand-core (or #f #f) (boolean #f))
-(check-expand-core (or #f #f #f) (boolean #f))
-(check-expand-core (or #f #t #f) (boolean #t))
+(check-expand-core-raises (or))
+
 (check-expand-core
-  (or (dynamic #t) #f #t)
-  (boolean (or (dynamic #t) #f #t)))
+  (or #f)
+  (boolean (import (scheme)) (or #f)))
+
+(check-expand-core
+  (or #f #t #f)
+  (boolean (import (scheme)) (or #f #t #f)))
 
 ; integer +
 (check-expand-core-raises (+))
-(check-expand-core (+ 1) (integer 1))
-(check-expand-core (+ 1 2) (integer 3))
-(check-expand-core (+ 1 2 3) (integer 6))
-(check-expand-core (+ (dynamic 1) 2 3) (integer (($primitive 3 +) (dynamic 1) 2 3)))
-(check-expand-core (+ integer-zero integer-one) (integer 1))
+
+(check-expand-core
+  (+ 1)
+  (integer (import (scheme)) (($primitive 3 +) 1)))
+
+(check-expand-core
+  (+ 1 2 3)
+  (integer (import (scheme)) (($primitive 3 +) 1 2 3)))
 
 ; integer and
-(check-expand-core (and #b111) (integer #b111))
-(check-expand-core (and #b111 #b110) (integer #b110))
-(check-expand-core (and #b111 #b110 #b101) (integer #b100))
+(check-expand-core-raises (and))
+
 (check-expand-core
-  (and (dynamic #b111) #b110 #b101)
-  (integer (($primitive 3 bitwise-and) (dynamic #b111) #b110 #b101)))
+  (and #b111)
+  (integer (import (scheme)) (($primitive 3 bitwise-and) #b111)))
+
+(check-expand-core
+  (and #b111 #b110 #b101)
+  (integer (import (scheme)) (($primitive 3 bitwise-and) #b111 #b110 #b101)))
 
 ; integer or
-(check-expand-core (or #b000) (integer #b000))
-(check-expand-core (or #b000 #b001) (integer #b001))
-(check-expand-core (or #b000 #b001 #b100) (integer #b101))
+(check-expand-core-raises (or))
+
 (check-expand-core
-  (or (dynamic #b000) #b001 #b100)
-  (integer (($primitive 3 bitwise-ior) (dynamic #b000) #b001 #b100)))
+  (or #b000)
+  (integer (import (scheme)) (($primitive 3 bitwise-ior) #b000)))
+
+(check-expand-core
+  (or #b111 #b110 #b101)
+  (integer (import (scheme)) (($primitive 3 bitwise-ior) #b111 #b110 #b101)))
 
 ; integer xor
-(check-expand-core (xor #b000) (integer #b000))
-(check-expand-core (xor #b000 #b001) (integer #b001))
-(check-expand-core (xor #b000 #b001 #b111) (integer #b110))
+(check-expand-core-raises (xor))
+
 (check-expand-core
-  (xor (dynamic #b000) #b001 #b111)
-  (integer (($primitive 3 bitwise-xor) (dynamic #b000) #b001 #b111)))
+  (xor #b000)
+  (integer (import (scheme)) (($primitive 3 bitwise-xor) #b000)))
+
+(check-expand-core
+  (xor #b111 #b110 #b101)
+  (integer (import (scheme)) (($primitive 3 bitwise-xor) #b111 #b110 #b101)))
 
 ; string append
 (check-expand-core-raises (append))
-(check-expand-core (append "a") (string "a"))
-(check-expand-core (append "a" "b") (string "ab"))
-(check-expand-core (append "a" "b" "c") (string "abc"))
+
 (check-expand-core
-  (append (dynamic "a") "b" "c")
-  (string (($primitive 3 string-append) (dynamic "a") "b" "c")))
+  (append "foo")
+  (string (import (scheme)) (($primitive 3 string-append) "foo")))
 
-; string-append
+(check-expand-core
+  (append "a" "b" "c")
+  (string (import (scheme)) (($primitive 3 string-append) "a" "b" "c")))
 
-(check-expand-core integer+ ((-> integer ... integer) ($primitive 3 +)))
-(check-expand-core integer- ((-> integer integer ... integer) ($primitive 3 -)))
-(check-expand-core string-append ((-> string ... string ) ($primitive 3 string-append)))
+; integer +
+
+(check-expand-core
+  integer+
+  ((-> integer ... integer) (import (chezscheme)) ($primitive 3 +)))
+
+(check-expand-core
+  integer-
+  ((-> integer integer ... integer) (import (chezscheme)) ($primitive 3 -)))
+
+(check-expand-core
+  string-append
+  ((-> string ... string) (import (chezscheme)) ($primitive 3 string-append)))
 
 ; u8
 
-(check-expand-core (u8 0) (u8 0))
-(check-expand-core (u8 255) (u8 255))
+(check-expand-core (u8 0) (u8 (import) 0))
+(check-expand-core (u8 255) (u8 (import) 255))
 (check-expand-core-raises (u8 -1))
 (check-expand-core-raises (u8 256))
-(check-expand-core (u8 (+ integer-one 2)) (u8 3))
-(check-expand-core (u8 (+ 1 (+ 2 3))) (u8 6))
 
 ; boolean =
 
-(check-expand-core (= #f #f) (boolean #t))
-(check-expand-core (= #f #t) (boolean #f))
+(check-expand-core-raises (=))
+(check-expand-core-raises (= #f))
+(check-expand-core-raises (= #f #t #f))
+(check-expand-core-raises (= #f 10))
+
 (check-expand-core
-  (= (dynamic #f) #t)
-  (boolean (($primitive 3 boolean=?) (dynamic #f) #t)))
+  (= #f #t)
+  (boolean
+    (import (scheme))
+    (($primitive 3 boolean=?) #f #t)))
 
 ; integer =
 
-(check-expand-core (= 1 1) (boolean #t))
-(check-expand-core (= 1 2) (boolean #f))
+(check-expand-core-raises (=))
+(check-expand-core-raises (= 10))
+(check-expand-core-raises (= 10 20 30))
+(check-expand-core-raises (= 10 "a"))
+
 (check-expand-core
-  (= (dynamic 1) 2)
-  (boolean (($primitive 3 =) (dynamic 1) 2)))
+  (= 10 20)
+  (boolean
+    (import (scheme))
+    (($primitive 3 =) 10 20)))
 
 ; char =
 
-(check-expand-core (= #\a #\a) (boolean #t))
-(check-expand-core (= #\a #\b) (boolean #f))
+(check-expand-core-raises (=))
+(check-expand-core-raises (= #\a))
+(check-expand-core-raises (= #\a #\b #\c))
+(check-expand-core-raises (= #\a 10))
+
 (check-expand-core
-  (= (dynamic #\a) #\b)
-  (boolean (($primitive 3 char=?) (dynamic #\a) #\b)))
+  (= #\a #\b)
+  (boolean
+    (import (scheme))
+    (($primitive 3 char=?) #\a #\b)))
 
 ; string =
 
-(check-expand-core (= "a" "a") (boolean #t))
-(check-expand-core (= "a" "b") (boolean #f))
+(check-expand-core-raises (=))
+(check-expand-core-raises (= "a"))
+(check-expand-core-raises (= "a" "b" "c"))
+(check-expand-core-raises (= "a" 10))
+
 (check-expand-core
-  (= (dynamic "a") "b")
-  (boolean (($primitive 3 string=?) (dynamic "a") "b")))
+  (= "a" "b")
+  (boolean
+    (import (scheme))
+    (($primitive 3 string=?) "a" "b")))
 
 ; string-length
 
-(check-expand-core (length "foo") (integer 3))
+(check-expand-core-raises (length))
+(check-expand-core-raises (length "a" "b"))
+(check-expand-core-raises (length 10))
+
 (check-expand-core
-  (length (dynamic "foo"))
-  (integer (($primitive 3 string-length) (dynamic "foo"))))
+  (length "a")
+  (integer
+    (import (scheme))
+    (($primitive 3 string-length) "a")))
 
 ; string
 
-(check-expand-core (string) (string ""))
-(check-expand-core (string #\a #\b #\c) (string "abc"))
-(check-expand-core
-  (string (dynamic #\a) #\b #\c)
-  (string (($primitive 3 string) (dynamic #\a) #\b #\c)))
-
-; syntax / eval
+(check-expand-core-raises (string #\a 10))
 
 (check-expand-core
-  (eval (syntax (+ 1 2)))
-  (integer 3))
+  (string)
+  (string
+    (import (scheme))
+    (($primitive 3 string))))
+
+(check-expand-core
+  (string #\a #\b #\c)
+  (string
+    (import (scheme))
+    (($primitive 3 string) #\a #\b #\c)))
+
+; ; syntax / eval
+
+; (check-expand-core
+;   (eval (syntax (+ 1 2)))
+;   (integer 3))
 
 ; cond
 
 (check-expand-core
   (cond (else 10))
-  (integer 10))
+  (integer (import) 10))
 
 (check-expand-core
   (cond (#t 10) (else 20))
-  (integer 10))
+  (integer
+    (import (scheme))
+    (if #t 10 20)))
 
 (check-expand-core
-  (cond ((dynamic #t) 10) (else 20))
-  (integer (if (dynamic #t) 10 20)))
-
-(check-expand-core
-  (cond ((dynamic #t) 10) ((dynamic #f) 20) (else 30))
-  (integer (if (dynamic #t) 10 (if (dynamic #f) 20 30))))
+  (cond (#t 10) (#f 20) (else 30))
+  (integer
+    (import (scheme))
+    (if #t 10 (if #f 20 30))))
 
 (check-expand-core-raises (cond (#t 10)))  ; missing else
 (check-expand-core-raises (cond (0 10) (else 20)))  ; invalid condition type

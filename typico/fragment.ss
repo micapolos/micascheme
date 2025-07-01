@@ -7,24 +7,26 @@
     fragment-imports
     fragment-obj
 
-    obj->fragment
+    pure-fragment
     id->fragment
 
     list->fragment
     fragment-append
     fragment-bind
-    fragment-eval)
+    fragment-map
+    fragment-eval
+    fragment-bind-with)
   (import
     (typico base)
     (typico id))
 
   (data (fragment imports obj))
 
-  (define (obj->fragment $obj)
+  (define (pure-fragment $obj)
     (fragment (list) $obj))
 
   (define (id->fragment $id)
-    (obj->fragment (id->symbol $id)))
+    (pure-fragment (id->symbol $id)))
 
   (define-rules-syntax (literals import)
     ((fragment-with obj)
@@ -60,11 +62,18 @@
 
   (define (fragment-map $proc $fragment)
     (fragment-bind
-      (lambda ($obj) (obj->fragment ($proc $obj)))
+      (lambda ($obj) (pure-fragment ($proc $obj)))
       $fragment))
 
   (define (fragment-eval $fragment)
     (eval
       (fragment-obj $fragment)
       (apply environment (fragment-imports $fragment))))
+
+  (define-rules-syntax
+    ((fragment-bind-with body) body)
+    ((fragment-bind-with (obj frag) rest ...)
+      (fragment-bind
+        (lambda (obj) (fragment-bind-with rest ...))
+        frag)))
 )

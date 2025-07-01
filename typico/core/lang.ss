@@ -8,13 +8,15 @@
     (typico base)
     (typico typed)
     (typico expander)
+    (typico fragment)
     (typico core expanders)
     (typico core environment))
   (export (import (typico base)))
 
   (define-case-syntax (typico expr)
     #`(eval
-      '#,(datum->syntax #'+ (typed-value (expand core-expander #'expr)))
+      '#,(datum->syntax #'+ (fragment-obj (typed-value (expand core-expander #'expr))))
+      ; TODO: Use fragment-imports.
       (typico-environment)))
 
   (define-rule-syntax (check-typico-equal? in out)
