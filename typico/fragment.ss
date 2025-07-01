@@ -10,6 +10,8 @@
     obj->fragment
     id->fragment
 
+    list->fragment
+    fragment-append
     fragment-bind
     fragment-eval)
   (import
@@ -30,6 +32,21 @@
     ((fragment-with (import i ...) obj)
       (fragment (list 'i ...) 'obj)))
 
+  (define (list->fragment $fragments)
+    (switch-exhaustive $fragments
+      ((null? _)
+        (fragment (list) (list)))
+      ((pair? (pair $fragment $fragments))
+        (fragment-bind
+          (lambda ($obj)
+            (fragment-map
+              (lambda ($objs) (cons $obj $objs))
+              (list->fragment $fragments)))
+          $fragment))))
+
+  (define (fragment-append . $fragments)
+    (list->fragment $fragments))
+
   (define (fragment-bind $proc $fragment)
     (lets
       ((fragment $imports $obj) $fragment)
@@ -40,6 +57,11 @@
             (lambda ($import) (not (member $import $imports)))
             $proc-imports))
         $proc-obj)))
+
+  (define (fragment-map $proc $fragment)
+    (fragment-bind
+      (lambda ($obj) (obj->fragment ($proc $obj)))
+      $fragment))
 
   (define (fragment-eval $fragment)
     (eval

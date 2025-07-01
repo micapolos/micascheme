@@ -33,3 +33,11 @@
     (fragment-eval
       (fragment (import (scheme)) (+ 1 2)))
     3))
+
+(check
+  (equal?
+    (fragment-append
+      (fragment (import i1 i2) v1)
+      (fragment (import i2 i3) v2)
+      (fragment (import i2 i3 i4) v3))
+    (fragment (import i1 i2 i3 i4) (v1 v2 v3))))
