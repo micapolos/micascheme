@@ -7,12 +7,22 @@
     fragment-imports
     fragment-obj
 
+    obj->fragment
+    id->fragment
+
     fragment-bind
     fragment-eval)
   (import
-    (typico base))
+    (typico base)
+    (typico id))
 
   (data (fragment imports obj))
+
+  (define (obj->fragment $obj)
+    (fragment (list) $obj))
+
+  (define (id->fragment $id)
+    (obj->fragment (id->symbol $id)))
 
   (define-rules-syntax (literals import)
     ((fragment-with obj)
