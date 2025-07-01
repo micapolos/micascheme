@@ -1,6 +1,6 @@
 (import
   (typico base)
   (typico fragment)
-  (prefix (typico core fragments) %))
+  (prefix (typico core fragments) fragment-))
 
-(check (equal? %string-append (fragment (import (scheme)) string-append)))
+(check (equal? fragment-string-append (fragment (import (scheme)) string-append)))
