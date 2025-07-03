@@ -7,7 +7,8 @@
     u2-type u3-type u7-type u8-type u16-type
     s8-type
     list-of-type
-    list-of-kind)
+    list-of-kind
+    list-of-item?)
   (import (micascheme) (typico type) (asm u))
 
   (define-type scheme)
@@ -33,4 +34,11 @@
 
   (define (list-of-type $type)
     (application-type list-of-kind (list $type)))
+
+  (define (list-of-item? $type)
+    (switch? $type
+      ((application-type? $application-type)
+        (and
+          (type=? (application-type-type $application-type) list-of-kind)
+          (car (application-type-args $application-type))))))
 )

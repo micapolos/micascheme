@@ -26,6 +26,11 @@
   (define-rule-syntax (check-expand-core-raises in)
     (check-expand-raises core-expander in))
 
+  (define (expand-list-of-type-type? $expander $syntax)
+    (lets?
+      ($type (expand-value? $expander type-type $syntax))
+      (list-of-item? $type)))
+
   (define core-expander
     (or-expander
       ; primitive types
@@ -203,14 +208,14 @@
       (macro-expander (cond) (cond (condition body) rest ...)
         (if condition body (cond rest ...)))
 
+      ; list
+
       (case-expander (empty expr) ($expander)
-        (switch? (expand-value? $expander type-type #'expr)
-          ((application-type? $application-type)
-            (and
-              (type=? (application-type-type $application-type) list-of-kind)
-              (typed
-                (list-of-type (car (application-type-args $application-type)))
-                (pure-fragment '()))))))
+        (lets?
+          ($type (expand-list-of-type-type? $expander #'expr))
+          (typed
+            (list-of-type $type)
+            (pure-fragment ''()))))
 
       (case-expander (list head tail) ($expander)
         (lets
@@ -240,6 +245,17 @@
                 ($head (typed-value $typed-head))
                 ($xs (list->fragment $xs-fragments))
                 (pure-fragment `(,$list ,$head ,@$xs)))))))
+
+      (case-expander (length expr) ($expander)
+        (lets
+          ($typed-expr (expand $expander #'expr))
+          (lets?
+            ($type (list-of-item? (typed-type $typed-expr)))
+            (typed integer-type
+              (fragment-bind-with
+                ($length (fragment (import (scheme)) length))
+                ($list (typed-value $typed-expr))
+                (pure-fragment `(,$length ,$list)))))))
 
       ; application (must be the last one)
       (expander ($expander $syntax)

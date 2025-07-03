@@ -368,13 +368,13 @@
   (empty (list-of integer))
   ((list-of integer)
     (import)
-    ()))
+    '()))
 
 (check-expand-core
   (list 1 (empty (list-of integer)))
   ((list-of integer)
     (import (scheme))
-    (cons 1 ())))
+    (cons 1 '())))
 
 (check-expand-core
   (list 1 2 3)
@@ -392,3 +392,13 @@
 (check-expand-core-raises (list 1 "foo"))
 (check-expand-core-raises (list 1 (empty (list-of string))))
 (check-expand-core-raises (list 1 (list "foo")))
+
+; list length
+
+(check-expand-core
+  (length (empty (list-of integer)))
+  (integer (import (scheme)) (length '())))
+
+(check-expand-core
+  (length (list 1 2 3))
+  (integer (import (scheme)) (length (list 1 2 3))))
