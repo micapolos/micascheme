@@ -6,11 +6,6 @@
     bytevector-type
     u2-type u3-type u7-type u8-type u16-type
     s8-type
-    null-type
-    link-type
-    list-type
-    null-of-type
-    link-of-type
     list-of-type)
   (import (micascheme) (typico type) (asm u))
 
@@ -33,16 +28,8 @@
 
   (define-type s8 s8? identity)
 
-  (define null-type (forall-type 1 (gentype null)))
-  (define link-type (forall-type 1 (gentype link)))
-  (define list-type (forall-type 1 (gentype list)))
-
-  (define (null-of-type $type)
-    (application-type null-type (list $type)))
-
-  (define (link-of-type $type)
-    (application-type link-type (list $type)))
+  (define list-of-kind (forall-type 1 (gentype list-of)))
 
   (define (list-of-type $type)
-    (application-type list-type (list $type)))
+    (application-type list-of-kind (list $type)))
 )

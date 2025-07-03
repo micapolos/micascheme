@@ -90,7 +90,7 @@
         `(variable ,(variable-type-index $variable-type)))
       ((application-type? $application-type)
         `(
-          ,(type->datum (application-type-type $application-type))
+          ,(type->datum (forall-type-type (application-type-type $application-type)))
           ,@(map type->datum (application-type-args $application-type))))
       ((expander-type? $expander-type)
         `(expander ,(expander-type-expander $expander-type)))

@@ -22,6 +22,10 @@
 (check-expand-core-raises (-> string foo integer))
 (check-expand-core-raises (-> string char foo))
 
+; list types
+
+(check-expand-core-type (list-of integer) (list-of-type integer-type))
+
 ; literals
 
 (check-expand-core #f (boolean (import) #f))
@@ -357,3 +361,23 @@
 (check-expand-core-raises (cond (#t 10)))  ; missing else
 (check-expand-core-raises (cond (0 10) (else 20)))  ; invalid condition type
 (check-expand-core-raises (cond (#t 10) (else "foo")))  ; invalid body type
+
+; list values
+
+(check-expand-core
+  (empty-list integer)
+  ((list-of integer)
+    (import)
+    ()))
+
+(check-expand-core
+  (linked-list 1 (empty-list integer))
+  ((list-of integer)
+    (import (scheme))
+    (cons 1 ())))
+
+(check-expand-core
+  (list 1 2 3)
+  ((list-of integer)
+    (import (scheme))
+    (list 1 2 3)))
