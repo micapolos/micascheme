@@ -371,13 +371,23 @@
     ()))
 
 (check-expand-core
-  (linked-list 1 (empty-list integer))
+  (list 1 (empty-list integer))
   ((list-of integer)
     (import (scheme))
     (cons 1 ())))
+
+(check-expand-core
+  (list 1 (list 2))
+  ((list-of integer)
+    (import (scheme))
+    (cons 1 (list 2))))
 
 (check-expand-core
   (list 1 2 3)
   ((list-of integer)
     (import (scheme))
     (list 1 2 3)))
+
+(check-expand-core-raises (list))
+(check-expand-core-raises (list 1 "foo"))
+(check-expand-core-raises (list 1 (list "foo")))

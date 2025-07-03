@@ -208,31 +208,34 @@
           (list-of-type (expand-value $expander type-type #'expr))
           (pure-fragment '())))
 
-      (case-expander (linked-list head tail) ($expander)
+      (case-expander (list head tail) ($expander)
         (lets
           ($typed-head (expand $expander #'head))
           ($type (typed-type $typed-head))
-          ($tail-fragment (expand-value $expander (list-of-type $type) #'tail))
-          (typed
-            (list-of-type $type)
-            (fragment-bind-with
-              ($cons (fragment (import (scheme)) cons))
-              ($head (typed-value $typed-head))
-              ($tail $tail-fragment)
-              (pure-fragment `(,$cons ,$head ,$tail))))))
+          (lets?
+            ($tail-fragment (expand-value? $expander (list-of-type $type) #'tail))
+            (typed
+              (list-of-type $type)
+              (fragment-bind-with
+                ($cons (fragment (import (scheme)) cons))
+                ($head (typed-value $typed-head))
+                ($tail $tail-fragment)
+                (pure-fragment `(,$cons ,$head ,$tail)))))))
 
       (case-expander (list head xs ...) ($expander)
         (lets
           ($typed-head (expand $expander #'head))
           ($type (typed-type $typed-head))
-          ($xs-fragments (map (partial expand-value $expander $type) #'(xs ...)))
-          (typed
-            (list-of-type $type)
-            (fragment-bind-with
-              ($list (fragment (import (scheme)) list))
-              ($head (typed-value $typed-head))
-              ($xs (list->fragment $xs-fragments))
-              (pure-fragment `(,$list ,$head ,@$xs))))))
+          ($xs-fragments (map (partial expand-value? $expander $type) #'(xs ...)))
+          (and
+            (for-all identity $xs-fragments)
+            (typed
+              (list-of-type $type)
+              (fragment-bind-with
+                ($list (fragment (import (scheme)) list))
+                ($head (typed-value $typed-head))
+                ($xs (list->fragment $xs-fragments))
+                (pure-fragment `(,$list ,$head ,@$xs)))))))
 
       ; application (must be the last one)
       (expander ($expander $syntax)
