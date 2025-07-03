@@ -15,7 +15,7 @@
 (check-typico-raises (+ 1 "foo"))
 
 (check-typico-equal?
-  ((=> (i integer) (s string) ... (+ i (length s))) 10 "foo" "bar" "goo")
+  ((=> (i integer) (ss string) ... (+ i (length ss))) 10 "foo" "bar" "goo")
   13)
 
 (check-typico-equal?
