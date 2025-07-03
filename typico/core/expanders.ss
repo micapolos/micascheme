@@ -93,8 +93,7 @@
             ($expander
               (or-expander
                 (list->expander (map id-expander $ids $types))
-                ; TODO: list-of type
-                (id-expander #'vararg-id $vararg-type)
+                (id-expander #'vararg-id (list-of-type $vararg-type))
                 $expander))
             ($typed-body (expand $expander #'body))
             (typed

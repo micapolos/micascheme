@@ -86,12 +86,11 @@
     (import (scheme))
     ((lambda (i . s) i) 10 "foo" "bar")))
 
-; TODO: list-of type
-; (check-expand-core
-;   ((=> (i integer) (s string) ... s) 10 "foo" "bar")
-;   ((list-of string)
-;     (import (scheme)
-;     ((lambda (i . s) s) 10 "foo" "bar"))))
+(check-expand-core
+  ((=> (i integer) (s string) ... s) 10 "foo" "bar")
+  ((list-of string)
+    (import (scheme))
+    ((lambda (i . s) s) 10 "foo" "bar")))
 
 ; if
 
