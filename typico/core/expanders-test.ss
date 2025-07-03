@@ -362,7 +362,7 @@
 (check-expand-core-raises (cond (0 10) (else 20)))  ; invalid condition type
 (check-expand-core-raises (cond (#t 10) (else "foo")))  ; invalid body type
 
-; list values
+; list
 
 (check-expand-core
   (empty (list-of integer))
@@ -377,16 +377,16 @@
     (cons 1 ())))
 
 (check-expand-core
-  (list 1 (list 2))
-  ((list-of integer)
-    (import (scheme))
-    (cons 1 (list 2))))
-
-(check-expand-core
   (list 1 2 3)
   ((list-of integer)
     (import (scheme))
     (list 1 2 3)))
+
+(check-expand-core
+  (list 1 (list 2 3))
+  ((list-of integer)
+    (import (scheme))
+    (cons 1 (list 2 3))))
 
 (check-expand-core-raises (list))
 (check-expand-core-raises (list 1 "foo"))
