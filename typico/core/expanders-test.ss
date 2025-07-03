@@ -390,4 +390,5 @@
 
 (check-expand-core-raises (list))
 (check-expand-core-raises (list 1 "foo"))
+(check-expand-core-raises (list 1 (empty (list-of string))))
 (check-expand-core-raises (list 1 (list "foo")))
