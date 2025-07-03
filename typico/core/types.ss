@@ -6,7 +6,8 @@
     bytevector-type
     u2-type u3-type u7-type u8-type u16-type
     s8-type
-    list-of-type)
+    list-of-type
+    list-of-kind)
   (import (micascheme) (typico type) (asm u))
 
   (define-type scheme)

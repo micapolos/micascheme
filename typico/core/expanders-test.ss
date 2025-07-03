@@ -365,13 +365,13 @@
 ; list values
 
 (check-expand-core
-  (empty-list integer)
+  (empty (list-of integer))
   ((list-of integer)
     (import)
     ()))
 
 (check-expand-core
-  (list 1 (empty-list integer))
+  (list 1 (empty (list-of integer)))
   ((list-of integer)
     (import (scheme))
     (cons 1 ())))

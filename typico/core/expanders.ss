@@ -203,10 +203,14 @@
       (macro-expander (cond) (cond (condition body) rest ...)
         (if condition body (cond rest ...)))
 
-      (case-expander (empty-list expr) ($expander)
-        (typed
-          (list-of-type (expand-value $expander type-type #'expr))
-          (pure-fragment '())))
+      (case-expander (empty expr) ($expander)
+        (switch? (expand-value? $expander type-type #'expr)
+          ((application-type? $application-type)
+            (and
+              (type=? (application-type-type $application-type) list-of-kind)
+              (typed
+                (list-of-type (car (application-type-args $application-type)))
+                (pure-fragment '()))))))
 
       (case-expander (list head tail) ($expander)
         (lets
