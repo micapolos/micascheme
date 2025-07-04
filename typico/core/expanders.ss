@@ -225,7 +225,7 @@
             (typed
               (list-of-type $type)
               (fragment-bind-with
-                ($cons (fragment (import (scheme)) cons))
+                ($cons (fragment (import (scheme)) ($primitive 3 cons)))
                 ($head (typed-value $typed-head))
                 ($tail $tail-fragment)
                 (pure-fragment `(,$cons ,$head ,$tail)))))))
@@ -240,7 +240,7 @@
             (typed
               (list-of-type $type)
               (fragment-bind-with
-                ($list (fragment (import (scheme)) list))
+                ($list (fragment (import (scheme)) ($primitive 3 list)))
                 ($head (typed-value $typed-head))
                 ($xs (list->fragment $xs-fragments))
                 (pure-fragment `(,$list ,$head ,@$xs)))))))
@@ -252,7 +252,7 @@
             ($type (list-of-item? (typed-type $typed-expr)))
             (typed integer-type
               (fragment-bind-with
-                ($length (fragment (import (scheme)) length))
+                ($length (fragment (import (scheme)) ($primitive 3 length)))
                 ($list (typed-value $typed-expr))
                 (pure-fragment `(,$length ,$list)))))))
 

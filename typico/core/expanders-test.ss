@@ -373,19 +373,19 @@
   (list 1 (empty (list-of integer)))
   ((list-of integer)
     (import (scheme))
-    (cons 1 '())))
+    (($primitive 3 cons) 1 '())))
 
 (check-expand-core
   (list 1 2 3)
   ((list-of integer)
     (import (scheme))
-    (list 1 2 3)))
+    (($primitive 3 list) 1 2 3)))
 
 (check-expand-core
   (list 1 (list 2 3))
   ((list-of integer)
     (import (scheme))
-    (cons 1 (list 2 3))))
+    (($primitive 3 cons) 1 (($primitive 3 list) 2 3))))
 
 (check-expand-core-raises (list))
 (check-expand-core-raises (list 1 "foo"))
@@ -396,8 +396,13 @@
 
 (check-expand-core
   (length (empty (list-of integer)))
-  (integer (import (scheme)) (length '())))
+  (integer
+    (import (scheme))
+    (($primitive 3 length) '())))
 
 (check-expand-core
   (length (list 1 2 3))
-  (integer (import (scheme)) (length (list 1 2 3))))
+  (integer
+    (import (scheme))
+    (($primitive 3 length)
+      (($primitive 3 list) 1 2 3))))
