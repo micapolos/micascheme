@@ -130,7 +130,7 @@
       (expander-type +)
       (expander-type -))))
 
-; --- type->datum
+; --- depth-type->datum
 
 (check
   (equal?
@@ -175,13 +175,23 @@
 
 (check
   (equal?
-    (type->datum (forall-type 3 (primitive-type (gensym) 'a)))
-    '(forall 3 a)))
+    (type->datum (forall-type 3 (variable-type 0)))
+    '(forall t1 t2 t3 t3)))
 
 (check
   (equal?
-    (type->datum (variable-type 3))
-    '(variable 3)))
+    (type->datum (forall-type 3 (variable-type 1)))
+    '(forall t1 t2 t3 t2)))
+
+(check
+  (equal?
+    (depth-type->datum 3 (variable-type 0))
+    't3))
+
+(check
+  (equal?
+    (depth-type->datum 3 (variable-type 1))
+    't2))
 
 (check
   (equal?

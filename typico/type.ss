@@ -35,6 +35,7 @@
     syntax-type-expander
     syntax-type-datum
 
+    depth-type->datum
     type->datum
     type=?
     gentype
@@ -72,26 +73,37 @@
       (gentype id)))
 
   (define (type->datum $type)
+    (depth-type->datum 0 $type))
+
+  (define (depth-type->datum $depth $type)
     (switch-exhaustive $type
       ((primitive-type? $primitive-type)
         (primitive-type-datum $primitive-type))
       ((function-type? $function-type)
         `(->
           ,@(map*
-            type->datum
-            (lambda ($type) `(,(type->datum $type) ...))
+            (partial depth-type->datum $depth)
+            (lambda ($type) `(,(depth-type->datum $depth $type) ...))
             (function-type-param-types $function-type))
-          ,(type->datum (function-type-result-type $function-type))))
+          ,(depth-type->datum $depth (function-type-result-type $function-type))))
       ((forall-type? $forall-type)
-        `(forall
-          ,(forall-type-arity $forall-type)
-          ,(type->datum (forall-type-type $forall-type))))
+        (lets
+          ($arity (forall-type-arity $forall-type))
+          ($depth (+ $depth $arity))
+          `(forall
+            ,@(map (partial depth-type->datum $depth) (map variable-type (reverse (iota $arity))))
+            ,(depth-type->datum $depth (forall-type-type $forall-type)))))
       ((variable-type? $variable-type)
-        `(variable ,(variable-type-index $variable-type)))
+        (string->symbol
+          (string-append "t"
+            (number->string
+              (- $depth (variable-type-index $variable-type))))))
       ((application-type? $application-type)
         `(
-          ,(type->datum (forall-type-type (application-type-type $application-type)))
-          ,@(map type->datum (application-type-args $application-type))))
+          ,(depth-type->datum $depth (forall-type-type (application-type-type $application-type)))
+          ,@(map
+            (partial depth-type->datum $depth)
+            (application-type-args $application-type))))
       ((expander-type? $expander-type)
         `(expander ,(expander-type-expander $expander-type)))
       ((syntax-type? $syntax-type)
