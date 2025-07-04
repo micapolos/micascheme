@@ -30,10 +30,7 @@
 
   (define-type s8)
 
-  (define generic-list-of-type (generic-type 1 (gentype list-of)))
-
-  (define (list-of-type $type)
-    (application-type generic-list-of-type (list $type)))
+  (define-type (list-of item))
 
   (define (list-of-item? $type)
     (switch? $type

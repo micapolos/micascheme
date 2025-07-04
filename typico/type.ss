@@ -75,9 +75,23 @@
   (define-rule-syntax (gentype datum)
     (make-primitive-type (gensym) 'datum))
 
-  (define-case-syntax (define-type id)
-    #`(define #,(identifier-append #'id #'id #'- #'type)
-      (gentype id)))
+  (define-syntax (define-type $syntax)
+    (syntax-case $syntax ()
+      ((_ id)
+        (identifier? #'id)
+        #`(define #,(identifier-append #'id #'id #'- #'type)
+          (gentype id)))
+      ((_ (id param ...))
+        (for-all identifier? #'(id param ...))
+        #`(begin
+          (define #,(identifier-append #'id #'generic- #'id #'- #'type)
+            (generic-type
+              #,(literal->syntax (length #'(param ...)))
+              (gentype id)))
+          (define (#,(identifier-append #'id #'id #'- #'type) param ...)
+            (application-type
+              #,(identifier-append #'id #'generic- #'id #'- #'type)
+              (list param ...)))))))
 
   (define (type->datum $type)
     (depth-type->datum 0 $type))
