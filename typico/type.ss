@@ -23,8 +23,9 @@
 
     generic-type
     generic-type?
+    generic-type-gensym
     generic-type-arity
-    generic-type-type
+    generic-type-datum
 
     application-type
     application-type?
@@ -51,7 +52,7 @@
   (data (function-type param-types result-type))
   (data (forall-type arity type))
   (data (variable-type index))
-  (data (generic-type arity type))
+  (data (generic-type gensym arity datum))
   (data (application-type type args))
   (data (expander-type expander))
   (data (syntax-type expander datum))
@@ -86,8 +87,9 @@
         #`(begin
           (define #,(identifier-append #'id #'generic- #'id #'- #'type)
             (generic-type
+              (gensym)
               #,(literal->syntax (length #'(param ...)))
-              (gentype id)))
+              'id))
           (define (#,(identifier-append #'id #'id #'- #'type) param ...)
             (application-type
               #,(identifier-append #'id #'generic- #'id #'- #'type)
@@ -122,10 +124,10 @@
       ((generic-type? $generic-type)
         `(generic
           ,(generic-type-arity $generic-type)
-          ,(depth-type->datum $depth (generic-type-type $generic-type))))
+          ,(generic-type-datum $generic-type)))
       ((application-type? $application-type)
         `(
-          ,(depth-type->datum $depth (generic-type-type (application-type-type $application-type)))
+          ,(generic-type-datum (application-type-type $application-type))
           ,@(map
             (partial depth-type->datum $depth)
             (application-type-args $application-type))))
@@ -174,13 +176,9 @@
       ((generic-type? $generic-type-a)
         (switch? $type-b
           ((generic-type? $generic-type-b)
-            (and
-              (=
-                (generic-type-arity $generic-type-a)
-                (generic-type-arity $generic-type-b))
-              (type=?
-                (generic-type-type $generic-type-a)
-                (generic-type-type $generic-type-b))))))
+            (symbol=?
+              (generic-type-gensym $generic-type-a)
+              (generic-type-gensym $generic-type-b)))))
       ((application-type? $application-type-a)
         (switch? $type-b
           ((application-type? $application-type-b)
