@@ -175,23 +175,34 @@
 
 (check
   (equal?
-    (type->datum (forall-type 3 (variable-type 0)))
-    '(forall t1 t2 t3 t3)))
+    (type->datum (generic-type 2 (gentype pair-of)))
+    '(generic 2 pair-of)))
 
 (check
   (equal?
-    (type->datum (forall-type 3 (variable-type 1)))
-    '(forall t1 t2 t3 t2)))
+    (type->datum
+      (application-type
+        (generic-type 2 (gentype pair-of))
+        (list (gentype a) (gentype b))))
+    '(pair-of a b)))
 
 (check
   (equal?
-    (depth-type->datum 3 (variable-type 0))
-    't3))
+    (type->datum
+      (forall-type 1
+        (application-type
+          (generic-type 2 (gentype pair-of))
+          (list (variable-type 0) (variable-type 0)))))
+    '(forall t1 (pair-of t1 t1))))
 
 (check
   (equal?
-    (depth-type->datum 3 (variable-type 1))
-    't2))
+    (type->datum
+      (forall-type 2
+        (application-type
+          (generic-type 2 (gentype pair-of))
+          (list (variable-type 1) (variable-type 0)))))
+    '(forall t1 t2 (pair-of t1 t2))))
 
 (check
   (equal?

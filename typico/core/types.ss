@@ -6,8 +6,8 @@
     bytevector-type
     u2-type u3-type u7-type u8-type u16-type
     s8-type
+    generic-list-of-type
     list-of-type
-    list-of-kind
     list-of-item?)
   (import (micascheme) (typico type) (asm u))
 
@@ -30,15 +30,15 @@
 
   (define-type s8 s8? identity)
 
-  (define list-of-kind (forall-type 1 (gentype list-of)))
+  (define generic-list-of-type (generic-type 1 (gentype list-of)))
 
   (define (list-of-type $type)
-    (application-type list-of-kind (list $type)))
+    (application-type generic-list-of-type (list $type)))
 
   (define (list-of-item? $type)
     (switch? $type
       ((application-type? $application-type)
         (and
-          (type=? (application-type-type $application-type) list-of-kind)
+          (type=? (application-type-type $application-type) generic-list-of-type)
           (car (application-type-args $application-type))))))
 )

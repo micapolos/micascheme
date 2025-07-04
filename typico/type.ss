@@ -21,6 +21,11 @@
     variable-type?
     variable-type-index
 
+    generic-type
+    generic-type?
+    generic-type-arity
+    generic-type-type
+
     application-type
     application-type?
     application-type-type
@@ -46,6 +51,7 @@
   (data (function-type param-types result-type))
   (data (forall-type arity type))
   (data (variable-type index))
+  (data (generic-type arity type))
   (data (application-type type args))
   (data (expander-type expander))
   (data (syntax-type expander datum))
@@ -56,6 +62,7 @@
       function-type?
       forall-type?
       variable-type?
+      generic-type?
       application-type?
       expander-type?
       syntax-type?))
@@ -98,9 +105,13 @@
           (string-append "t"
             (number->string
               (- $depth (variable-type-index $variable-type))))))
+      ((generic-type? $generic-type)
+        `(generic
+          ,(generic-type-arity $generic-type)
+          ,(depth-type->datum $depth (generic-type-type $generic-type))))
       ((application-type? $application-type)
         `(
-          ,(depth-type->datum $depth (forall-type-type (application-type-type $application-type)))
+          ,(depth-type->datum $depth (generic-type-type (application-type-type $application-type)))
           ,@(map
             (partial depth-type->datum $depth)
             (application-type-args $application-type))))
@@ -146,6 +157,16 @@
             (=
               (variable-type-index $variable-type-a)
               (variable-type-index $variable-type-b)))))
+      ((generic-type? $generic-type-a)
+        (switch? $type-b
+          ((generic-type? $generic-type-b)
+            (and
+              (=
+                (generic-type-arity $generic-type-a)
+                (generic-type-arity $generic-type-b))
+              (type=?
+                (generic-type-type $generic-type-a)
+                (generic-type-type $generic-type-b))))))
       ((application-type? $application-type-a)
         (switch? $type-b
           ((application-type? $application-type-b)
