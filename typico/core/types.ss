@@ -16,19 +16,19 @@
   (define-type type)
   (define-type datum)
 
-  (define-type boolean boolean? identity)
-  (define-type integer (and? integer? exact?) identity)
-  (define-type char char? identity)
-  (define-type string string? identity)
-  (define-type bytevector bytevector?)
+  (define-type boolean)
+  (define-type integer)
+  (define-type char)
+  (define-type string)
+  (define-type bytevector)
 
-  (define-type u2 u2? identity)
-  (define-type u3 u3? identity)
-  (define-type u7 u7? identity)
-  (define-type u8 u8? identity)
-  (define-type u16 u16? identity)
+  (define-type u2)
+  (define-type u3)
+  (define-type u7)
+  (define-type u8)
+  (define-type u16)
 
-  (define-type s8 s8? identity)
+  (define-type s8)
 
   (define generic-list-of-type (generic-type 1 (gentype list-of)))
 

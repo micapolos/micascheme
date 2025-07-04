@@ -75,7 +75,7 @@
   (define-rule-syntax (gentype datum)
     (make-primitive-type (gensym) 'datum))
 
-  (define-case-syntax (define-type id arg ...)
+  (define-case-syntax (define-type id)
     #`(define #,(identifier-append #'id #'id #'- #'type)
       (gentype id)))
 
