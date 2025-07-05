@@ -200,31 +200,31 @@
       (case-expander integer-zero (typed integer-type 0))
       (case-expander integer-one (typed integer-type 1))
 
-      (primitive-expander integer+      (function-type (list* integer-type) integer-type)               +)
-      (primitive-expander integer-      (function-type (list* integer-type integer-type) integer-type)  -)
-      (primitive-expander string-append (function-type (list* string-type) string-type)                 string-append)
+      (scheme-expander integer+      (function-type (list* integer-type) integer-type)               +)
+      (scheme-expander integer-      (function-type (list* integer-type integer-type) integer-type)  -)
+      (scheme-expander string-append (function-type (list* string-type) string-type)                 string-append)
 
-      (datum-expander (+ integer-type integer-type ... integer-type)     (fragment (import (scheme)) ($primitive 3 +)))
-      (datum-expander (- integer-type integer-type ... integer-type)     (fragment (import (scheme)) ($primitive 3 -)))
+      (datum-expander (+ integer-type integer-type ... integer-type)     (fragment (import (scheme)) +))
+      (datum-expander (- integer-type integer-type ... integer-type)     (fragment (import (scheme)) -))
 
-      (datum-expander (append string-type string-type ... string-type)   (fragment (import (scheme)) ($primitive 3 string-append)))
-      (datum-expander (length string-type integer-type)                  (fragment (import (scheme)) ($primitive 3 string-length)))
+      (datum-expander (append string-type string-type ... string-type)   (fragment (import (scheme)) string-append))
+      (datum-expander (length string-type integer-type)                  (fragment (import (scheme)) string-length))
 
-      (datum-expander (string char-type ... string-type)                 (fragment (import (scheme)) ($primitive 3 string)))
-      (datum-expander (string integer-type string-type)                  (fragment (import (scheme)) ($primitive 3 number->string)))
+      (datum-expander (string char-type ... string-type)                 (fragment (import (scheme)) string))
+      (datum-expander (string integer-type string-type)                  (fragment (import (scheme)) number->string))
 
       (datum-expander (and boolean-type boolean-type ... boolean-type)   (fragment (import (scheme)) and))
       (datum-expander (or boolean-type boolean-type ... boolean-type)    (fragment (import (scheme)) or))
 
-      (datum-expander (and integer-type integer-type ... integer-type)   (fragment (import (scheme)) ($primitive 3 bitwise-and)))
-      (datum-expander (or integer-type integer-type ... integer-type)    (fragment (import (scheme)) ($primitive 3 bitwise-ior)))
-      (datum-expander (xor integer-type integer-type ... integer-type)   (fragment (import (scheme)) ($primitive 3 bitwise-xor)))
+      (datum-expander (and integer-type integer-type ... integer-type)   (fragment (import (scheme)) bitwise-and))
+      (datum-expander (or integer-type integer-type ... integer-type)    (fragment (import (scheme)) bitwise-ior))
+      (datum-expander (xor integer-type integer-type ... integer-type)   (fragment (import (scheme)) bitwise-xor))
 
-      (datum-expander (= boolean-type boolean-type boolean-type)         (fragment (import (scheme)) ($primitive 3 boolean=?)))
-      (datum-expander (= integer-type integer-type boolean-type)         (fragment (import (scheme)) ($primitive 3 =)))
-      (datum-expander (= string-type string-type boolean-type)           (fragment (import (scheme)) ($primitive 3 string=?)))
-      (datum-expander (= char-type char-type boolean-type)               (fragment (import (scheme)) ($primitive 3 char=?)))
-      (datum-expander (= bytevector-type bytevector-type boolean-type)   (fragment (import (scheme)) ($primitive 3 bytevector=?)))
+      (datum-expander (= boolean-type boolean-type boolean-type)         (fragment (import (scheme)) boolean=?))
+      (datum-expander (= integer-type integer-type boolean-type)         (fragment (import (scheme)) =))
+      (datum-expander (= string-type string-type boolean-type)           (fragment (import (scheme)) string=?))
+      (datum-expander (= char-type char-type boolean-type)               (fragment (import (scheme)) char=?))
+      (datum-expander (= bytevector-type bytevector-type boolean-type)   (fragment (import (scheme)) bytevector=?))
 
       (macro-expander (cond else) (cond (else x)) x)
       (macro-expander (cond) (cond (condition body) rest ...)
@@ -248,7 +248,7 @@
             (typed
               (list-of-type $type)
               (fragment-bind-with
-                ($cons (fragment (import (scheme)) ($primitive 3 cons)))
+                ($cons (fragment (import (scheme)) cons))
                 ($head (typed-value $typed-head))
                 ($tail $tail-fragment)
                 (pure-fragment `(,$cons ,$head ,$tail)))))))
@@ -263,7 +263,7 @@
             (typed
               (list-of-type $type)
               (fragment-bind-with
-                ($list (fragment (import (scheme)) ($primitive 3 list)))
+                ($list (fragment (import (scheme)) list))
                 ($head (typed-value $typed-head))
                 ($xs (list->fragment $xs-fragments))
                 (pure-fragment `(,$list ,$head ,@$xs)))))))
@@ -275,7 +275,7 @@
             ($type (list-of-item? (typed-type $typed-expr)))
             (typed integer-type
               (fragment-bind-with
-                ($length (fragment (import (scheme)) ($primitive 3 length)))
+                ($length (fragment (import (scheme)) length))
                 ($list (typed-value $typed-expr))
                 (pure-fragment `(,$length ,$list)))))))
 

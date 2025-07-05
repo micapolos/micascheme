@@ -126,7 +126,7 @@
   (let (x 10) (y 20) (+ x y))
   (integer
     (import (scheme))
-    (let ((x 10) (y 20)) (($primitive 3 +) x y))))
+    (let ((x 10) (y 20)) (+ x y))))
 
 (check-expand-core-raises (let (x 10) (y (+ x 1)) (+ x y)))
 
@@ -148,15 +148,15 @@
     (import (scheme))
     (let ((x 10))
       (let ((y 20))
-        (($primitive 3 +) x y)))))
+        (+ x y)))))
 
 (check-expand-core
   (lets (x 10) (y (+ x 1)) (+ x y))
   (integer
     (import (scheme))
     (let ((x 10))
-      (let ((y (($primitive 3 +) x 1)))
-        (($primitive 3 +) x y)))))
+      (let ((y (+ x 1)))
+        (+ x y)))))
 
 ; boolean and
 
@@ -187,69 +187,69 @@
 
 (check-expand-core
   (+ 1)
-  (integer (import (scheme)) (($primitive 3 +) 1)))
+  (integer (import (scheme)) (+ 1)))
 
 (check-expand-core
   (+ 1 2 3)
-  (integer (import (scheme)) (($primitive 3 +) 1 2 3)))
+  (integer (import (scheme)) (+ 1 2 3)))
 
 ; integer and
 (check-expand-core-raises (and))
 
 (check-expand-core
   (and #b111)
-  (integer (import (scheme)) (($primitive 3 bitwise-and) #b111)))
+  (integer (import (scheme)) (bitwise-and #b111)))
 
 (check-expand-core
   (and #b111 #b110 #b101)
-  (integer (import (scheme)) (($primitive 3 bitwise-and) #b111 #b110 #b101)))
+  (integer (import (scheme)) (bitwise-and #b111 #b110 #b101)))
 
 ; integer or
 (check-expand-core-raises (or))
 
 (check-expand-core
   (or #b000)
-  (integer (import (scheme)) (($primitive 3 bitwise-ior) #b000)))
+  (integer (import (scheme)) (bitwise-ior #b000)))
 
 (check-expand-core
   (or #b111 #b110 #b101)
-  (integer (import (scheme)) (($primitive 3 bitwise-ior) #b111 #b110 #b101)))
+  (integer (import (scheme)) (bitwise-ior #b111 #b110 #b101)))
 
 ; integer xor
 (check-expand-core-raises (xor))
 
 (check-expand-core
   (xor #b000)
-  (integer (import (scheme)) (($primitive 3 bitwise-xor) #b000)))
+  (integer (import (scheme)) (bitwise-xor #b000)))
 
 (check-expand-core
   (xor #b111 #b110 #b101)
-  (integer (import (scheme)) (($primitive 3 bitwise-xor) #b111 #b110 #b101)))
+  (integer (import (scheme)) (bitwise-xor #b111 #b110 #b101)))
 
 ; string append
 (check-expand-core-raises (append))
 
 (check-expand-core
   (append "foo")
-  (string (import (scheme)) (($primitive 3 string-append) "foo")))
+  (string (import (scheme)) (string-append "foo")))
 
 (check-expand-core
   (append "a" "b" "c")
-  (string (import (scheme)) (($primitive 3 string-append) "a" "b" "c")))
+  (string (import (scheme)) (string-append "a" "b" "c")))
 
 ; integer +
 
 (check-expand-core
   integer+
-  ((-> integer ... integer) (import (chezscheme)) ($primitive 3 +)))
+  ((-> integer ... integer) (import (scheme)) +))
 
 (check-expand-core
   integer-
-  ((-> integer integer ... integer) (import (chezscheme)) ($primitive 3 -)))
+  ((-> integer integer ... integer) (import (scheme)) -))
 
 (check-expand-core
   string-append
-  ((-> string ... string) (import (chezscheme)) ($primitive 3 string-append)))
+  ((-> string ... string) (import (scheme)) string-append))
 
 ; u8
 
@@ -269,7 +269,7 @@
   (= #f #t)
   (boolean
     (import (scheme))
-    (($primitive 3 boolean=?) #f #t)))
+    (boolean=? #f #t)))
 
 ; integer =
 
@@ -282,7 +282,7 @@
   (= 10 20)
   (boolean
     (import (scheme))
-    (($primitive 3 =) 10 20)))
+    (= 10 20)))
 
 ; char =
 
@@ -295,7 +295,7 @@
   (= #\a #\b)
   (boolean
     (import (scheme))
-    (($primitive 3 char=?) #\a #\b)))
+    (char=? #\a #\b)))
 
 ; string =
 
@@ -308,7 +308,7 @@
   (= "a" "b")
   (boolean
     (import (scheme))
-    (($primitive 3 string=?) "a" "b")))
+    (string=? "a" "b")))
 
 ; string-length
 
@@ -320,7 +320,7 @@
   (length "a")
   (integer
     (import (scheme))
-    (($primitive 3 string-length) "a")))
+    (string-length "a")))
 
 ; string
 
@@ -330,13 +330,13 @@
   (string)
   (string
     (import (scheme))
-    (($primitive 3 string))))
+    (string)))
 
 (check-expand-core
   (string #\a #\b #\c)
   (string
     (import (scheme))
-    (($primitive 3 string) #\a #\b #\c)))
+    (string #\a #\b #\c)))
 
 ; ; syntax / eval
 
@@ -378,19 +378,19 @@
   (list 1 (empty (list-of integer)))
   ((list-of integer)
     (import (scheme))
-    (($primitive 3 cons) 1 '())))
+    (cons 1 '())))
 
 (check-expand-core
   (list 1 2 3)
   ((list-of integer)
     (import (scheme))
-    (($primitive 3 list) 1 2 3)))
+    (list 1 2 3)))
 
 (check-expand-core
   (list 1 (list 2 3))
   ((list-of integer)
     (import (scheme))
-    (($primitive 3 cons) 1 (($primitive 3 list) 2 3))))
+    (cons 1 (list 2 3))))
 
 (check-expand-core-raises (list))
 (check-expand-core-raises (list 1 "foo"))
@@ -403,14 +403,13 @@
   (length (empty (list-of integer)))
   (integer
     (import (scheme))
-    (($primitive 3 length) '())))
+    (length '())))
 
 (check-expand-core
   (length (list 1 2 3))
   (integer
     (import (scheme))
-    (($primitive 3 length)
-      (($primitive 3 list) 1 2 3))))
+    (length (list 1 2 3))))
 
 ; pure
 

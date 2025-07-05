@@ -16,7 +16,7 @@
     check-expand-typed
     check-expand-raises
     datum-expander
-    primitive-expander
+    scheme-expander
     macro-expander)
   (import
     (typico base)
@@ -185,8 +185,8 @@
                   ($arg-values (list->fragment (map typed-value $typed-args)))
                   (pure-fragment `(,$proc ,@$arg-values))))))))))
 
-  (define-rule-syntax (primitive-expander id type prim)
-    (datum-expander id type (fragment (import (chezscheme)) ($primitive 3 prim))))
+  (define-rule-syntax (scheme-expander id type prim)
+    (datum-expander id type (fragment (import (scheme)) prim)))
 
   (define-case-syntax (macro-expander (keyword ...) pattern body)
     #`(expander ($expander $syntax)
