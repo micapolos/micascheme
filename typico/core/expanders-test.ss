@@ -22,9 +22,14 @@
 (check-expand-core-raises (-> string foo integer))
 (check-expand-core-raises (-> string char foo))
 
-; list types
+; generic types
 
 (check-expand-core-type (list-of integer) (list-of-type integer-type))
+(check-expand-core-type (unsafe integer) (unsafe-type integer-type))
+
+; type classes
+
+(check-expand-core-type unsafe generic-unsafe-type)
 
 ; literals
 
@@ -406,3 +411,9 @@
     (import (scheme))
     (($primitive 3 length)
       (($primitive 3 list) 1 2 3))))
+
+; pure
+
+(check-expand-core (pure optional 123) ((optional integer) (import) 123))
+(check-expand-core (pure unsafe 123) ((unsafe integer) (import) 123))
+(check-expand-core (pure list-of 123) ((list-of integer) (import (scheme)) (list 123)))

@@ -80,6 +80,29 @@
           (list-of-type
             (expand-value $expander type-type #'expr))))
 
+      ; unsafe type
+      (case-expander (unsafe expr) ($expander)
+        (typed type-type
+          (unsafe-type
+            (expand-value $expander type-type #'expr))))
+
+      ; optional type
+      (case-expander (optional expr) ($expander)
+        (typed type-type
+          (optional-type
+            (expand-value $expander type-type #'expr))))
+
+      ; type classes
+      (case-expander unsafe ($expander) (typed type-type generic-unsafe-type))
+      (case-expander optional ($expander) (typed type-type generic-optional-type))
+      (case-expander list-of ($expander) (typed type-type generic-list-of-type))
+
+      ; optional type
+      (case-expander (optional expr) ($expander)
+        (typed type-type
+          (optional-type
+            (expand-value $expander type-type #'expr))))
+
       ; lambda
       (case-expander (=> (id type) ... (vararg-id vararg-type) dots body) ($expander)
         (and
@@ -255,6 +278,29 @@
                 ($length (fragment (import (scheme)) ($primitive 3 length)))
                 ($list (typed-value $typed-expr))
                 (pure-fragment `(,$length ,$list)))))))
+
+      ; pure (HARDCODED!!!)
+
+      (case-expander (pure type expr) ($expander)
+        (lets?
+          ($type (expand-value? $expander type-type #'type))
+          ($typed (expand $expander #'expr))
+          (cond
+            ((type=? $type generic-unsafe-type)
+              (typed
+                (unsafe-type (typed-type $typed))
+                (typed-value $typed)))
+            ((type=? $type generic-optional-type)
+              (typed
+                (optional-type (typed-type $typed))
+                (typed-value $typed)))
+            ((type=? $type generic-list-of-type)
+              (typed
+                (list-of-type (typed-type $typed))
+                (fragment-bind-with
+                  ($list (fragment (import (scheme)) list))
+                  ($value (typed-value $typed))
+                  (pure-fragment `(,$list ,$value))))))))
 
       ; application (must be the last one)
       (expander ($expander $syntax)
