@@ -19,9 +19,9 @@
       (import (typico type) (scheme))
       (function-type
         (list
-          (primitive-type (quote id-a) (quote name-a))
-          (primitive-type (quote id-b) (quote name-b)))
-        (primitive-type (quote id-c) (quote name-c))))))
+          (primitive-type 'id-a 'name-a)
+          (primitive-type 'id-b 'name-b))
+        (primitive-type 'id-c 'name-c)))))
 
 (check
   (equal?
@@ -35,6 +35,6 @@
       (import (typico type) (scheme))
       (function-type
         (list*
-          (primitive-type (quote id-a) (quote name-a))
-          (primitive-type (quote id-b) (quote name-b)))
-        (primitive-type (quote id-c) (quote name-c))))))
+          (primitive-type 'id-a 'name-a)
+          (primitive-type 'id-b 'name-b))
+        (primitive-type 'id-c 'name-c)))))
