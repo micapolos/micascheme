@@ -16,3 +16,9 @@
 (check (equal? x 9))
 (set*! x 2)
 (check (equal? x 18))
+
+(check (equal? (cond?) #f))
+(check (equal? (cond? (#t "foo")) "foo"))
+(check (equal? (cond? (#f "foo")) #f))
+(check (equal? (cond? (#f "foo") (#t "bar")) "bar"))
+(check (equal? (cond? (#f "foo") (#f "bar")) #f))

@@ -284,23 +284,24 @@
       (case-expander (pure type expr) ($expander)
         (lets?
           ($type (expand-value? $expander type-type #'type))
-          ($typed (expand $expander #'expr))
-          (cond
-            ((type=? $type generic-unsafe-type)
-              (typed
-                (unsafe-type (typed-type $typed))
-                (typed-value $typed)))
-            ((type=? $type generic-optional-type)
-              (typed
-                (optional-type (typed-type $typed))
-                (typed-value $typed)))
-            ((type=? $type generic-list-of-type)
-              (typed
-                (list-of-type (typed-type $typed))
-                (fragment-bind-with
-                  ($list (fragment (import (scheme)) list))
-                  ($value (typed-value $typed))
-                  (pure-fragment `(,$list ,$value))))))))
+          (lets
+            ($typed (expand $expander #'expr))
+            (cond?
+              ((type=? $type generic-unsafe-type)
+                (typed
+                  (unsafe-type (typed-type $typed))
+                  (typed-value $typed)))
+              ((type=? $type generic-optional-type)
+                (typed
+                  (optional-type (typed-type $typed))
+                  (typed-value $typed)))
+              ((type=? $type generic-list-of-type)
+                (typed
+                  (list-of-type (typed-type $typed))
+                  (fragment-bind-with
+                    ($list (fragment (import (scheme)) list))
+                    ($value (typed-value $typed))
+                    (pure-fragment `(,$list ,$value)))))))))
 
       ; application (must be the last one)
       (expander ($expander $syntax)

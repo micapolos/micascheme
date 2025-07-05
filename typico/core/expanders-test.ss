@@ -414,6 +414,16 @@
 
 ; pure
 
-(check-expand-core (pure optional 123) ((optional integer) (import) 123))
-(check-expand-core (pure unsafe 123) ((unsafe integer) (import) 123))
-(check-expand-core (pure list-of 123) ((list-of integer) (import (scheme)) (list 123)))
+(check-expand-core
+  (pure optional 123)
+  ((optional integer) (import) 123))
+
+(check-expand-core
+  (pure unsafe 123)
+  ((unsafe integer) (import) 123))
+
+(check-expand-core
+  (pure list-of 123)
+  ((list-of integer) (import (scheme)) (list 123)))
+
+(check-expand-core-raises (pure integer 123))

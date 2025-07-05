@@ -5,7 +5,8 @@
     define-set-op!
     set+!
     set-!
-    set*!)
+    set*!
+    cond?)
   (import (scheme))
 
   (define-syntax cons!
@@ -32,4 +33,9 @@
   (define-set-op! set+! +)
   (define-set-op! set-! -)
   (define-set-op! set*! *)
+
+  (define-syntax cond?
+    (syntax-rules ()
+      ((_ x ...)
+        (cond x ... (else #f)))))
 )
