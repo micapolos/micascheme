@@ -563,3 +563,14 @@
       (list* #t #f #f)
       (list* #t #t #t))))
 
+; list*->list
+
+(check
+  (equal?
+    (list*->list '(1 2 3))
+    '(1 2 3)))
+
+(check
+  (equal?
+    (list*->list '(1 2 . 3))
+    '(1 2 3)))

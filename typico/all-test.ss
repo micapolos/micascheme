@@ -5,4 +5,5 @@
   (typico type)
   (typico typed)
   (typico expander)
-  (typico core all))
+  (typico core all)
+  (typico type fragment))

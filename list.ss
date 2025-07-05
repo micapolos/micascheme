@@ -57,7 +57,8 @@
 
     define-list->/append
 
-    ?list->list?)
+    ?list->list?
+    list*->list)
 
   (import
     (scheme)
@@ -450,4 +451,10 @@
 
   (define (?list->list? $?list)
     (and (for-all not-false? $?list) $?list))
+
+  (define (list*->list $list*)
+    (switch $list*
+      ((null? $null) $null)
+      ((pair? (pair $car $cdr)) (pair $car (list*->list $cdr)))
+      ((else $other) (list $other))))
 )

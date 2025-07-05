@@ -11,11 +11,14 @@
     id->fragment
 
     list->fragment
+    list*->fragment
     fragment-append
     fragment-bind
     fragment-map
     fragment-eval
-    fragment-bind-with)
+    fragment-bind-with
+
+    symbol->fragment)
   (import
     (typico base)
     (typico id))
@@ -39,12 +42,22 @@
       ((null? _)
         (fragment (list) (list)))
       ((pair? (pair $fragment $fragments))
-        (fragment-bind
-          (lambda ($obj)
-            (fragment-map
-              (lambda ($objs) (cons $obj $objs))
-              (list->fragment $fragments)))
-          $fragment))))
+        (fragment-bind-with
+          ($obj $fragment)
+          ($objs (list->fragment $fragments))
+          (pure-fragment (cons $obj $objs))))))
+
+  (define (list*->fragment $fragments)
+    (switch-exhaustive $fragments
+      ((null? $null)
+        (fragment (list) (list)))
+      ((pair? (pair $fragment $fragments))
+        (fragment-bind-with
+          ($obj $fragment)
+          ($objs (list*->fragment $fragments))
+          (pure-fragment (cons $obj $objs))))
+      ((fragment? $fragment)
+        $fragment)))
 
   (define (fragment-append . $fragments)
     (list->fragment $fragments))
@@ -76,4 +89,9 @@
       (fragment-bind
         (lambda (obj) (fragment-bind-with rest ...))
         frag)))
+
+  (define (symbol->fragment $symbol)
+    (fragment-bind-with
+      ($quote (fragment-with (import (scheme)) quote))
+      (pure-fragment `(,$quote ,$symbol))))
 )
