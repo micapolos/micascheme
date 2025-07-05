@@ -1,4 +1,4 @@
-(import (typico base) (typico type) (typico fragment) (typico type fragment))
+(import (typico base) (typico type) (typico fragment) (typico fragment type))
 
 (check
   (equal?

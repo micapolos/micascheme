@@ -1,4 +1,4 @@
-(library (typico type fragment)
+(library (typico fragment type)
   (export type->fragment)
   (import
     (typico base)

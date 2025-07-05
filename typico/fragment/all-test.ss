@@ -1,4 +1,4 @@
 (import (micascheme))
 
 (test
-  (typico type fragment))
+  (typico fragment type))
