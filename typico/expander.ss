@@ -91,6 +91,18 @@
         (type=? (typed-type $typed) $expected-type)
         (typed-value $typed))))
 
+  (define (expand-pure-value? $expander $expected-type $syntax)
+    (or
+      (expand-value? $expander $expected-type $syntax)
+      (switch? $expected-type
+        ((application-type? $application-type)
+          (switch (application-type-type $application-type)
+            ((generic-type? $generic-type)
+              (and
+                (= (generic-type-arity $generic-type) 1)
+                (expand-pure-value? $expander $expected-type
+                  (syntax->datum/annotation #`(pure #,$syntax))))))))))
+
   (define (expand-syntax-type? $expander $syntax)
     (lets
       ((typed $type _) (expand $expander $syntax))
