@@ -6,7 +6,9 @@
     resolver-append
     resolve?
     resolve)
-  (import (typico base))
+  (import
+    (typico base)
+    (typico resolved))
 
   (define-rule-syntax (resolver ($resolver $value) body)
     (lambda ($resolver $value) body))
@@ -28,5 +30,7 @@
     ($resolver $resolver $value))
 
   (define (resolve $resolver $value)
-    (or (resolve? $resolver $value) $value))
+    (switch (resolve? $resolver $value)
+      ((resolved? $resolved) (resolved-ref $resolved))
+      ((false? _) $value)))
 )
