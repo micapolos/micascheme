@@ -34,7 +34,7 @@
 
 ; generic types
 
-(check-expand-core-type (list-of integer) (list-of-type integer-type))
+(check-expand-core-type (list integer) (list-type integer-type))
 (check-expand-core-type (unsafe integer) (unsafe-type integer-type))
 
 ; type classes
@@ -73,11 +73,11 @@
     (-> integer string ... integer)
     (lambda (i . s) i)))
 
-; TODO: list-of type
+; TODO: list type
 ; (check-expand-core
 ;   (=> (i integer) (s string) ... s)
 ;   (
-;     (-> integer string ... (list-of string))
+;     (-> integer string ... (list string))
 ;     (import (scheme))
 ;     (lambda (i . s) s)))
 
@@ -97,7 +97,7 @@
 
 (check-expand-core
   ((=> (i integer) (s string) ... s) 10 "foo" "bar")
-  ((scheme) (list-of string) ((lambda (i . s) s) 10 "foo" "bar")))
+  ((scheme) (list string) ((lambda (i . s) s) 10 "foo" "bar")))
 
 ; if
 
@@ -343,30 +343,30 @@
 ; list
 
 (check-expand-core
-  (empty (list-of integer))
-  ((list-of integer) '()))
+  (empty (list integer))
+  ((list integer) '()))
 
 (check-expand-core
-  (list 1 (empty (list-of integer)))
-  ((scheme) (list-of integer) (cons 1 '())))
+  (list 1 (empty (list integer)))
+  ((scheme) (list integer) (cons 1 '())))
 
 (check-expand-core
   (list 1 2 3)
-  ((scheme) (list-of integer) (list 1 2 3)))
+  ((scheme) (list integer) (list 1 2 3)))
 
 (check-expand-core
   (list 1 (list 2 3))
-  ((scheme) (list-of integer) (cons 1 (list 2 3))))
+  ((scheme) (list integer) (cons 1 (list 2 3))))
 
 (check-expand-core-raises (list))
 (check-expand-core-raises (list 1 "foo"))
-(check-expand-core-raises (list 1 (empty (list-of string))))
+(check-expand-core-raises (list 1 (empty (list string))))
 (check-expand-core-raises (list 1 (list "foo")))
 
 ; list length
 
 (check-expand-core
-  (length (empty (list-of integer)))
+  (length (empty (list integer)))
   ((scheme) integer (length '())))
 
 (check-expand-core
@@ -384,7 +384,7 @@
   ((unsafe integer) 123))
 
 (check-expand-core
-  (pure list-of 123)
-  ((scheme) (list-of integer) (list 123)))
+  (pure list 123)
+  ((scheme) (list integer) (list 123)))
 
 (check-expand-core-raises (pure integer 123))

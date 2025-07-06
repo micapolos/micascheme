@@ -6,7 +6,7 @@
     bytevector-type
     u2-type u3-type u7-type u8-type u16-type
     s8-type
-    generic-list-of-type list-of-type list-of-item?
+    generic-list-type list-type list-item?
     generic-unsafe-type unsafe-type
     generic-optional-type optional-type)
   (import (micascheme) (typico type) (asm u))
@@ -30,15 +30,15 @@
 
   (define-type s8)
 
-  (define-type (list-of item))
+  (define-type (list item))
   (define-type (unsafe type))
   (define-type (optional type))
 
-  (define (list-of-item? $type)
+  (define (list-item? $type)
     (switch? $type
       ((application-type? $application-type)
         (and
-          (type=? (application-type-type $application-type) generic-list-of-type)
+          (type=? (application-type-type $application-type) generic-list-type)
           (car (application-type-args $application-type))))))
 
 )

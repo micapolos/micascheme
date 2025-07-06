@@ -26,10 +26,10 @@
   (define-rule-syntax (check-expand-core-raises in)
     (check-expand-raises core-expander in))
 
-  (define (expand-list-of-type-type? $expander $syntax)
+  (define (expand-list-type-type? $expander $syntax)
     (lets?
       ($type (expand-value? $expander type-type $syntax))
-      (list-of-item? $type)))
+      (list-item? $type)))
 
   (define core-expander
     (or-expander
@@ -83,11 +83,12 @@
               (map (partial expand-value $expander type-type) #'(param ...))
               (expand-value $expander type-type #'result)))))
 
-      ; list-of type
-      (case-expander (list-of expr) ($expander)
-        (typed type-type
-          (list-of-type
-            (expand-value $expander type-type #'expr))))
+      ; list type
+      (case-expander (list expr) ($expander)
+        (lets?
+          ($type (expand-value? $expander type-type #'expr))
+          (typed type-type
+            (list-type $type))))
 
       ; unsafe type
       (case-expander (unsafe expr) ($expander)
@@ -104,7 +105,7 @@
       ; type classes
       (case-expander unsafe ($expander) (typed type-type generic-unsafe-type))
       (case-expander optional ($expander) (typed type-type generic-optional-type))
-      (case-expander list-of ($expander) (typed type-type generic-list-of-type))
+      (case-expander list ($expander) (typed type-type generic-list-type))
 
       ; optional type
       (case-expander (optional expr) ($expander)
@@ -125,7 +126,7 @@
             ($expander
               (or-expander
                 (list->expander (map id-expander $ids $types))
-                (id-expander #'vararg-id (list-of-type $vararg-type))
+                (id-expander #'vararg-id (list-type $vararg-type))
                 $expander))
             ($typed-body (expand $expander #'body))
             (typed
@@ -243,9 +244,9 @@
 
       (case-expander (empty expr) ($expander)
         (lets?
-          ($type (expand-list-of-type-type? $expander #'expr))
+          ($type (expand-list-type-type? $expander #'expr))
           (typed
-            (list-of-type $type)
+            (list-type $type)
             (pure-fragment ''()))))
 
       (case-expander (list head tail) ($expander)
@@ -253,9 +254,9 @@
           ($typed-head (expand $expander #'head))
           ($type (typed-type $typed-head))
           (lets?
-            ($tail-fragment (expand-value? $expander (list-of-type $type) #'tail))
+            ($tail-fragment (expand-value? $expander (list-type $type) #'tail))
             (typed
-              (list-of-type $type)
+              (list-type $type)
               (fragment-bind-with
                 ($cons (fragment (import (scheme)) cons))
                 ($head (typed-value $typed-head))
@@ -270,7 +271,7 @@
           (and
             (for-all identity $xs-fragments)
             (typed
-              (list-of-type $type)
+              (list-type $type)
               (fragment-bind-with
                 ($list (fragment (import (scheme)) list))
                 ($head (typed-value $typed-head))
@@ -281,7 +282,7 @@
         (lets
           ($typed-expr (expand $expander #'expr))
           (lets?
-            ($type (list-of-item? (typed-type $typed-expr)))
+            ($type (list-item? (typed-type $typed-expr)))
             (typed integer-type
               (fragment-bind-with
                 ($length (fragment (import (scheme)) length))
@@ -304,9 +305,9 @@
                 (typed
                   (optional-type (typed-type $typed))
                   (typed-value $typed)))
-              ((type=? $type generic-list-of-type)
+              ((type=? $type generic-list-type)
                 (typed
-                  (list-of-type (typed-type $typed))
+                  (list-type (typed-type $typed))
                   (fragment-bind-with
                     ($list (fragment (import (scheme)) list))
                     ($value (typed-value $typed))
