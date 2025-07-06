@@ -303,6 +303,14 @@
                     ($value (typed-value $typed))
                     (pure-fragment `(,$list ,$value)))))))))
 
+      (case-expander (native type (path ...) ... body) ($expander)
+        (lets?
+          ($type (expand-value? $expander type-type #'type))
+          (typed $type
+            (make-fragment
+              (datum ((path ...) ...))
+              (datum body)))))
+
       ; application (must be the last one)
       (expander ($expander $syntax)
         (syntax-case? $syntax ()

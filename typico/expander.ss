@@ -119,8 +119,8 @@
     (lets
       ($fragment (typed-value $typed))
       `(
+        ,@(fragment-imports $fragment)
         ,(type->datum (typed-type $typed))
-        (import ,@(fragment-imports $fragment))
         ,(fragment-obj $fragment))))
 
   (define-rule-syntax (check-expand expander in out)
