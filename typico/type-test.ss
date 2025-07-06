@@ -130,6 +130,34 @@
       (expander-type +)
       (expander-type -))))
 
+(check
+  (type=?
+    (pair-type type-a type-b)
+    (pair-type type-a type-b)))
+
+(check
+  (not
+    (type=?
+      (pair-type type-a type-b)
+      (pair-type type-b type-b))))
+
+(check
+  (not
+    (type=?
+      (pair-type type-a type-b)
+      (pair-type type-a type-a))))
+
+(check
+  (type=?
+    (literal-type 1)
+    (literal-type 1)))
+
+(check
+  (not
+    (type=?
+      (literal-type 1)
+      (literal-type 2))))
+
 ; --- depth-type->datum
 
 (check

@@ -41,6 +41,15 @@
     syntax-type-expander
     syntax-type-datum
 
+    pair-type
+    pair-type?
+    pair-type-car
+    pair-type-cdr
+
+    literal-type
+    literal-type?
+    literal-type-literal
+
     depth-type->datum
     type->datum
     type=?
@@ -56,6 +65,8 @@
   (data (application-type type args))
   (data (expander-type expander))
   (data (syntax-type expander datum))
+  (data (pair-type car cdr))
+  (data (literal-type literal))
 
   (define type?
     (or?
@@ -66,7 +77,8 @@
       generic-type?
       application-type?
       expander-type?
-      syntax-type?))
+      syntax-type?
+      pair-type?))
 
   (define make-primitive-type
     (case-lambda
@@ -136,7 +148,13 @@
       ((syntax-type? $syntax-type)
         `(syntax
           ,(syntax-type-expander $syntax-type)
-          ,(syntax-type-datum $syntax-type)))))
+          ,(syntax-type-datum $syntax-type)))
+      ((pair-type? $pair-type)
+        `(
+          ,(depth-type->datum $depth (pair-type-car $pair-type))
+          ,(depth-type->datum $depth (pair-type-cdr $pair-type))))
+      ((literal-type? $literal-type)
+        (literal-type-literal $literal-type))))
 
   (define (type=? $type-a $type-b)
     (switch? $type-a
@@ -205,5 +223,21 @@
                 (syntax-type-expander $syntax-type-b))
               (equal?
                 (syntax-type-datum $syntax-type-a)
-                (syntax-type-datum $syntax-type-b))))))))
+                (syntax-type-datum $syntax-type-b))))))
+      ((pair-type? $pair-type-a)
+        (switch? $type-b
+          ((pair-type? $pair-type-b)
+            (and
+              (type=?
+                (pair-type-car $pair-type-a)
+                (pair-type-car $pair-type-b))
+              (type=?
+                (pair-type-cdr $pair-type-a)
+                (pair-type-cdr $pair-type-b))))))
+      ((literal-type? $literal-type-a)
+        (switch? $type-b
+          ((literal-type? $literal-type-b)
+            (equal?
+              (literal-type-literal $literal-type-a)
+              (literal-type-literal $literal-type-b)))))))
 )
