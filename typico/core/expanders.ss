@@ -33,6 +33,15 @@
 
   (define core-expander
     (or-expander
+      ; native
+      (case-expander (native (path ...) ... type body) ($expander)
+        (lets?
+          ($type (expand-value? $expander type-type #'type))
+          (typed $type
+            (make-fragment
+              (datum ((path ...) ...))
+              (datum body)))))
+
       ; primitive types
       (case-expander      boolean (typed type-type boolean-type))
       (case-expander      integer (typed type-type integer-type))
@@ -302,14 +311,6 @@
                     ($list (fragment (import (scheme)) list))
                     ($value (typed-value $typed))
                     (pure-fragment `(,$list ,$value)))))))))
-
-      (case-expander (native type (path ...) ... body) ($expander)
-        (lets?
-          ($type (expand-value? $expander type-type #'type))
-          (typed $type
-            (make-fragment
-              (datum ((path ...) ...))
-              (datum body)))))
 
       ; application (must be the last one)
       (expander ($expander $syntax)

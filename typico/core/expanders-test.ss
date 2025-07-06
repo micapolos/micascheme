@@ -7,7 +7,7 @@
   (integer 123))
 
 (check-expand-core
-  (native (-> integer ... integer) (scheme) +)
+  (native (scheme) (-> integer ... integer) +)
   ((scheme) (-> integer ... integer) +))
 
 ; primitive types
