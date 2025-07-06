@@ -78,7 +78,9 @@
       application-type?
       expander-type?
       syntax-type?
-      pair-type?))
+      pair-type?
+      pair?
+      symbol?))
 
   (define make-primitive-type
     (case-lambda
@@ -111,7 +113,7 @@
     (depth-type->datum 0 $type))
 
   (define (depth-type->datum $depth $type)
-    (switch-exhaustive $type
+    (switch $type
       ((primitive-type? $primitive-type)
         (primitive-type-datum $primitive-type))
       ((function-type? $function-type)
@@ -153,11 +155,16 @@
         `(
           ,(depth-type->datum $depth (pair-type-car $pair-type))
           ,(depth-type->datum $depth (pair-type-cdr $pair-type))))
+      ((pair? $pair)
+        `(
+          ,(depth-type->datum $depth (car $pair))
+          ,(depth-type->datum $depth (cdr $pair))))
       ((literal-type? $literal-type)
-        (literal-type-literal $literal-type))))
+        (literal-type-literal $literal-type))
+      ((else $other) $other)))
 
   (define (type=? $type-a $type-b)
-    (switch? $type-a
+    (switch $type-a
       ((primitive-type? $primitive-type-a)
         (switch? $type-b
           ((primitive-type? $primitive-type-b)
@@ -234,10 +241,22 @@
               (type=?
                 (pair-type-cdr $pair-type-a)
                 (pair-type-cdr $pair-type-b))))))
+      ((pair? $pair-a)
+        (switch? $type-b
+          ((pair? $pair-b)
+            (and
+              (type=?
+                (car $pair-a)
+                (car $pair-b))
+              (type=?
+                (cdr $pair-a)
+                (cdr $pair-b))))))
       ((literal-type? $literal-type-a)
         (switch? $type-b
           ((literal-type? $literal-type-b)
             (equal?
               (literal-type-literal $literal-type-a)
-              (literal-type-literal $literal-type-b)))))))
+              (literal-type-literal $literal-type-b)))))
+      ((else $other-a)
+        (equal? $other-a $type-b))))
 )

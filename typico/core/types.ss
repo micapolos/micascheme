@@ -2,7 +2,7 @@
   (export
     type-type
     datum-type
-    boolean-type integer-type char-type string-type
+    boolean-type integer-type char-type string-type symbol-type
     bytevector-type
     u2-type u3-type u7-type u8-type u16-type
     s8-type
@@ -20,6 +20,7 @@
   (define-type integer)
   (define-type char)
   (define-type string)
+  (define-type symbol)
   (define-type bytevector)
 
   (define-type u2)
