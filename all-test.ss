@@ -58,6 +58,7 @@
   (property)
   (proven)
   (put)
+  (quote)
   (random)
   (read)
   (seq)

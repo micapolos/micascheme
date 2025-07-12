@@ -2,6 +2,8 @@
   (export
     predicate-type->resolver
 
+    boolean-type-resolver
+
     boolean-resolver
     integer-resolver
     char-resolver
@@ -17,7 +19,9 @@
     (typico fragment)
     (typico core types)
     (typico typed)
-    (typico resolver))
+    (typico id)
+    (typico resolver)
+    (typico resolved))
 
   (define (resolve-value? $resolver $type $value)
     (lets
@@ -26,7 +30,15 @@
         (type=? (typed-type $typed) $type)
         (typed-value $typed))))
 
-  (define (predicate-type->resolver $predicate $type)
+  (define-rule-syntax (id-resolver id value)
+    (resolver ($resolver $value)
+      (syntax-case? $value ()
+        (x
+          (and
+            (id=? #'x 'id)
+            (resolved value))))))
+
+  (define (predicate-type->resolver $symbol $predicate $type)
     (resolver ($resolver $value)
       (syntax-case? $value ()
         (value
@@ -34,11 +46,13 @@
             ($predicate (datum value))
             (typed $type (pure-fragment (datum value))))))))
 
-  (define boolean-resolver (predicate-type->resolver boolean? boolean-type))
-  (define integer-resolver (predicate-type->resolver (and? integer? exact?) integer-type))
-  (define char-resolver    (predicate-type->resolver char? char-type))
-  (define string-resolver  (predicate-type->resolver string? string-type))
-  (define symbol-resolver  (predicate-type->resolver symbol? symbol-type))
+  (define boolean-type-resolver (id-resolver boolean boolean-type))
+
+  (define boolean-resolver (predicate-type->resolver 'boolean boolean? boolean-type))
+  (define integer-resolver (predicate-type->resolver 'integer (and? integer? exact?) integer-type))
+  (define char-resolver    (predicate-type->resolver 'char char? char-type))
+  (define string-resolver  (predicate-type->resolver 'string string? string-type))
+  (define symbol-resolver  (predicate-type->resolver 'symbol symbol? symbol-type))
 
   (define null-resolver
     (resolver ($resolver $value)

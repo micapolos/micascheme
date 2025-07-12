@@ -1,4 +1,9 @@
-(import (typico base) (typico core resolvers))
+(import (typico base) (typico resolver) (typico core resolvers) (typico core types))
+
+(check
+  (equal?
+    (resolve boolean-type-resolver 'boolean)
+    boolean-type))
 
 (check-resolves boolean-resolver #t (boolean #t))
 (check-resolves boolean-resolver #f (boolean #f))
