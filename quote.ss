@@ -4,6 +4,6 @@
 
   (define-syntax quote-operator
     (syntax-rules ()
-      ((_ (op arg ...))
-        `(op ,arg ...))))
+      ((_ (op arg ...)) `(op ,arg ...))
+      ((_ other) 'other)))
 )
