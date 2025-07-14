@@ -58,7 +58,10 @@
     define-list->/append
 
     ?list->list?
-    list*->list)
+    list*->list
+
+    cons/nodup
+    dedup)
 
   (import
     (scheme)
@@ -457,4 +460,17 @@
       ((null? $null) $null)
       ((pair? (pair $car $cdr)) (pair $car (list*->list $cdr)))
       ((else $other) (list $other))))
+
+  (define (cons/nodup $eq? $item $list)
+    (if (memp (partial $eq? $item) $list)
+      $list
+      (cons $item $list)))
+
+  (define (dedup $eq? $list)
+    (reverse
+      (fold-left
+        (lambda ($list $item)
+          (cons/nodup $eq? $item $list))
+        (list)
+        $list)))
 )

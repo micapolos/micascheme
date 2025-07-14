@@ -574,3 +574,22 @@
   (equal?
     (list*->list '(1 2 . 3))
     '(1 2 3)))
+
+; cons/nodup
+
+(check
+  (equal?
+    (cons/nodup string=? "foo" '("foo" "bar"))
+    '("foo" "bar")))
+
+(check
+  (equal?
+    (cons/nodup string=? "goo" '("foo" "bar"))
+    '("goo" "foo" "bar")))
+
+; dedup
+
+(check
+  (equal?
+    (dedup string=? '("foo" "bar" "bar" "foo" "goo"))
+    '("foo" "bar" "goo")))
