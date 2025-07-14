@@ -6,11 +6,18 @@
       (lookup-with
         (foo
           (fragment-with
-            (block ($org)
-              (u8-blob $org 10))))
+            (block 2
+              (lambda ($org)
+                (binary-append
+                  (u8-binary $org)
+                  (u8-binary 10))))))
         (bar
           (fragment-with (dep foo)
-            (block ($org) (u8-blob $org 20)))))
+            (block 2
+              (lambda ($org)
+                (binary-append
+                  (u8-binary $org)
+                  (u8-binary 20)))))))
       #'bar
       100)
     (bytevector 100 20 102 10)))

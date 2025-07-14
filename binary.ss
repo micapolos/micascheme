@@ -2,6 +2,7 @@
   (export
     binary
     put-binary
+    list->binary
     binary-append
     binary->bytevector
     fill-binary
@@ -27,11 +28,14 @@
       (lambda ($port)
         (put-binary $port $binary))))
 
-  (define (binary-append . $binaries)
+  (define (list->binary $binaries)
     (binary ($port)
       (for-each
         (partial put-binary $port)
         $binaries)))
+
+  (define (binary-append . $binaries)
+    (list->binary $binaries))
 
   (define (fill-binary $size $u8)
     (binary ($port)

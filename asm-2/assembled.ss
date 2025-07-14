@@ -1,11 +1,11 @@
 (library (asm-2 assembled)
   (export
-    assembled assembled? assembled-label-lookup assembled-org assembled-blob-stack
+    assembled assembled? assembled-label-lookup assembled-org assembled-binary-stack
     assembled+fragment
     fragment->bytevector)
   (import (micascheme) (syntax lookup) (asm-2 fragment) (asm-2 block) (asm-2 assembler))
 
-  (data (assembled label-lookup org blob-stack))
+  (data (assembled label-lookup org binary-stack))
 
   (define (empty-assembled $org)
     (assembled (empty-lookup) $org (stack)))
@@ -19,20 +19,21 @@
             ($org (assembled-org $assembled))
             ($fragment (lookup-ref $lookup $label))
             ($block (fragment-ref $fragment $label-lookup))
-            ($blob (block->blob $block $org))
+            ($size (block-size $block))
+            ($binary (block->binary $block $org))
             (fold-left
               (partial assembled+fragment $lookup)
               (assembled
                 (lookup+ $label-lookup $label $org)
-                (+ $org (blob-size $blob))
-                (push (assembled-blob-stack $assembled) $blob))
+                (+ $org $size)
+                (push (assembled-binary-stack $assembled) $binary))
               (fragment-deps $fragment))))
         ((else _) $assembled))))
 
   (define (fragment->bytevector $lookup $label $org)
-    (blob->bytevector
-      (list->blob
+    (binary->bytevector
+      (list->binary
         (reverse
-          (assembled-blob-stack
+          (assembled-binary-stack
             (assembled+fragment $lookup (empty-assembled $org) $label))))))
 )

@@ -1,10 +1,11 @@
 (library (asm-2 block)
-  (export block block->blob)
+  (export
+    block block? block-size block-org->binary-proc
+    block->binary)
   (import (micascheme) (syntax lookup))
 
-  (define-rule-syntax (block ($org) blob)
-    (lambda ($org) blob))
+  (data (block size org->binary-proc))
 
-  (define (block->blob $block $org)
-    ($block $org))
+  (define (block->binary $block $org)
+    ((block-org->binary-proc $block) $org))
 )
