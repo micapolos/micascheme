@@ -16,18 +16,20 @@
       (switch ($label-lookup $label)
         ((false? _)
           (lets
-            ($org (assembled-org $assembled))
             ($fragment (lookup-ref $lookup $label))
+            ($assembled
+              (fold-left
+                (partial assembled+fragment $lookup)
+                $assembled
+                (fragment-deps $fragment)))
+            ($org (assembled-org $assembled))
             ($block (fragment-ref $fragment $label-lookup))
             ($size (block-size $block))
             ($binary (block->binary $block $org))
-            (fold-left
-              (partial assembled+fragment $lookup)
-              (assembled
-                (lookup+ $label-lookup $label $org)
-                (+ $org $size)
-                (push (assembled-binary-stack $assembled) $binary))
-              (fragment-deps $fragment))))
+            (assembled
+              (lookup+ $label-lookup $label $org)
+              (+ $org $size)
+              (push (assembled-binary-stack $assembled) $binary))))
         ((else _) $assembled))))
 
   (define (fragment->bytevector $lookup $label $org)

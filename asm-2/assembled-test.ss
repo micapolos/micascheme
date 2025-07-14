@@ -20,4 +20,4 @@
                   (u8-binary 20)))))))
       #'bar
       100)
-    (bytevector 100 20 102 10)))
+    (bytevector 100 10 102 20)))
