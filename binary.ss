@@ -1,6 +1,7 @@
 (library (binary)
   (export
     binary
+    empty-binary
     put-binary
     list->binary
     binary-append
@@ -15,10 +16,13 @@
 
   (define-rules-syntax
     ((binary)
-      (lambda ($port) (void)))
+      (binary ($port) (void)))
     ((binary ($port) body body* ...)
       (identifier? #'$port)
       (lambda ($port) body body* ...)))
+
+  (define (empty-binary)
+    (lambda ($port) (void)))
 
   (define (put-binary $port $binary)
     ($binary $port))
