@@ -1,8 +1,10 @@
-(library (asm-2 asm)
-  (export asm)
+(library (asm-2 block-fragment)
+  (export
+    labeled-block-fragment
+    fragment->bytevector)
   (import (micascheme) (asm-2 fragment) (asm-2 block))
 
-  (define-case-syntax (asm line ...)
+  (define-case-syntax (labeled-block-fragment line ...)
     (lets
       ($labels
         (filter-opts
@@ -28,4 +30,9 @@
                 (fragment
                   #'fragment))))))))
 
+  (define (fragment->bytevector $fragment $lookup $org)
+    (binary->bytevector
+      (block->binary
+        (fragment-ref $fragment $lookup)
+        $org)))
 )
