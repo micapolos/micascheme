@@ -3,6 +3,7 @@
     fragment fragment? fragment-deps fragment-ref
     fragment-with
     fragment-ref
+    fragment-map
     pure-fragment
     list->fragment
     fragment-append)
@@ -33,7 +34,7 @@
     (fragment
       (fragment-deps $fragment)
       (lambda ($lookup)
-        ($proc (fragment-proc $fragment)))))
+        ($proc (fragment-ref $fragment $lookup)))))
 
   (define (list->fragment $fragments)
     (fragment

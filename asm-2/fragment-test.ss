@@ -3,6 +3,29 @@
 (check
   (equal?
     (fragment-ref
+      (fragment-with 10)
+      (empty-lookup))
+    10))
+
+(check
+  (equal?
+    (fragment-ref
+      (fragment-with (dep a b) (string-append (dep a) (dep b)))
+      (lookup-with (a "a") (b "b")))
+    "ab"))
+
+(check
+  (equal?
+    (fragment-ref
+      (fragment-map
+        (lambda ($string) (string-append $string "!"))
+        (fragment-with (dep a b) (string-append (dep a) (dep b))))
+      (lookup-with (a "a") (b "b")))
+    "ab!"))
+
+(check
+  (equal?
+    (fragment-ref
       (fragment-with (dep a b) (cons (dep a) (dep b)))
       (lookup-with (a "a") (b "b")))
     '("a" . "b")))
