@@ -1,4 +1,51 @@
-(import (micascheme) (asm-2 block-fragment) (asm-2 core) (syntax lookup))
+(import
+  (only (micascheme) check equal? bytevector lambda)
+  (asm-2 block-fragment)
+  (asm-2 fragment)
+  (asm-2 core)
+  (syntax lookup))
+
+(check
+  (equal?
+    ((fragment-ref (expr "foo") (empty-lookup)))
+    "foo"))
+
+; (check
+;   (equal?
+;     ((fragment-ref (expr a) (lookup-with (a (lambda () "foo")))))
+;     "foo"))
+
+(check
+  (equal?
+    (fragment->bytevector
+      (db 10 20 30)
+      (empty-lookup)
+      #xc000)
+    (bytevector 10 20 30)))
+
+; (check
+;   (equal?
+;     (fragment->bytevector
+;       (db a)
+;       (lookup-with (a (lambda () 10)))
+;       #xc000)
+;     (bytevector 10)))
+
+(check
+  (equal?
+    (fragment->bytevector
+      (db (+ 10 20))
+      (empty-lookup)
+      #xc000)
+    (bytevector 30)))
+
+(check
+  (equal?
+    (fragment->bytevector
+      (db 10 20 30)
+      (empty-lookup)
+      #xc000)
+    (bytevector 10 20 30)))
 
 (check
   (equal?
