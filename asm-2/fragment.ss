@@ -1,6 +1,7 @@
 (library (asm-2 fragment)
   (export
     fragment fragment? fragment-deps fragment-ref
+    wrap-fragment
     fragment-with
     fragment-ref
     fragment-map
@@ -23,6 +24,11 @@
               (syntax-rules ()
                 ((_ id) (lookup-ref $lookup #'id)))))
             body)))))
+
+  (define (wrap-fragment $obj)
+    (switch $obj
+      ((fragment? $fragment) $fragment)
+      ((else $value) (fragment-with $value))))
 
   (define (fragment-ref $fragment $lookup)
     ((fragment-proc $fragment) $lookup))
