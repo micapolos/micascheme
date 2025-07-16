@@ -35,20 +35,20 @@
         (+ $org $size)
         (push $binary-stack $binary))))
 
+  (define (assembler+fragment $lookup $assembler $identifier $fragment)
+    (lets
+      ($assembler
+        (fold-left
+          (partial assembler+identifier $lookup)
+          $assembler
+          (fragment-deps $fragment)))
+      (assembler+obj $lookup $assembler $identifier
+        (fragment-ref $fragment (assembler-lookup $assembler)))))
+
   (define (assembler+obj $lookup $assembler $identifier $obj)
     (switch $obj
       ((fragment? $fragment)
-        (lets
-          ($assembler
-            (fold-left
-              (partial assembler+identifier $lookup)
-              $assembler
-              (fragment-deps $fragment)))
-          ($org (assembler-org $assembler))
-          ($assembler-lookup (assembler-lookup $assembler))
-          ($binary-stack (assembler-binary-stack $assembler))
-          (assembler+obj $lookup $assembler $identifier
-            (fragment-ref $fragment $assembler-lookup))))
+        (assembler+fragment $lookup $assembler $identifier $fragment))
       ((block? $block)
         (assembler+block $assembler $identifier $block))
       ((else $value)
