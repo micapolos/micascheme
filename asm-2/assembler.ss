@@ -26,13 +26,21 @@
                 $assembler
                 (fragment-deps $fragment)))
             ($org (assembler-org $assembler))
-            ($block (fragment-ref $fragment $assembler-lookup))
-            ($size (block-size $block))
-            ($binary (block->binary $block $org))
-            (assembler
-              (lookup+ $assembler-lookup $identifier $org)
-              (+ $org $size)
-              (push (assembler-binary-stack $assembler) $binary))))
+            ($binary-stack (assembler-binary-stack $assembler))
+            (switch (fragment-ref $fragment $assembler-lookup)
+              ((block? $block)
+                (lets
+                  ($size (block-size $block))
+                  ($binary (block->binary $block $org))
+                  (assembler
+                    (lookup+ $assembler-lookup $identifier $org)
+                    (+ $org $size)
+                    (push $binary-stack $binary))))
+              ((else $value)
+                (assembler
+                  (lookup+ $assembler-lookup $identifier $value)
+                  $org
+                  $binary-stack)))))
         ((else _) $assembler))))
 
   (define (identifier-assembler $lookup $identifier $org)
