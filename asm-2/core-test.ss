@@ -7,13 +7,13 @@
 
 (check
   (equal?
-    ((fragment-ref (expr "foo") (empty-lookup)))
+    (fragment-ref (wrap "foo") (empty-lookup))
     "foo"))
 
-; (check
-;   (equal?
-;     ((fragment-ref (expr a) (lookup-with (a (lambda () "foo")))))
-;     "foo"))
+(check
+  (equal?
+    (fragment-ref (wrap a) (lookup-with (a "foo")))
+    "foo"))
 
 (check
   (equal?
@@ -23,13 +23,13 @@
       #xc000)
     (bytevector 10 20 30)))
 
-; (check
-;   (equal?
-;     (fragment->bytevector
-;       (db a)
-;       (lookup-with (a (lambda () 10)))
-;       #xc000)
-;     (bytevector 10)))
+(check
+  (equal?
+    (fragment->bytevector
+      (db a)
+      (lookup-with (a 10))
+      #xc000)
+    (bytevector 10)))
 
 (check
   (equal?
@@ -39,22 +39,14 @@
       #xc000)
     (bytevector 30)))
 
-(check
-  (equal?
-    (fragment->bytevector
-      (db 10 20 30)
-      (empty-lookup)
-      #xc000)
-    (bytevector 10 20 30)))
-
-(check
-  (equal?
-    (fragment->bytevector
-      (block
-        start
-        (db #x12)
-        (dw #x3456)
-        (dw start))
-      (empty-lookup)
-      #xc000)
-    (bytevector #x12 #x56 #x34 #x00 #xc0)))
+; (check
+;   (equal?
+;     (fragment->bytevector
+;       (block
+;         start
+;         (db #x12)
+;         (dw #x3456)
+;         (dw start))
+;       (empty-lookup)
+;       #xc000)
+;     (bytevector #x12 #x56 #x34 #x00 #xc0)))

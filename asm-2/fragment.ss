@@ -7,6 +7,7 @@
     fragment-map
     pure-fragment
     list->fragment
+    wrap-fragment
     fragment-append)
   (import (micascheme) (syntax lookup))
 

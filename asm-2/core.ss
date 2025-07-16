@@ -1,31 +1,24 @@
 (library (asm-2 core)
   (export
     (rename (%block block) (%+ +))
-    expr db dw)
+    wrap db dw)
   (import (micascheme) (asm-2 fragment) (asm-2 block) (asm-2 block-fragment))
 
   (define-rule-syntax (%block line ...)
     (labeled-block-fragment line ...))
 
-  (define-syntax (expr $syntax)
+  (define-syntax (wrap $syntax)
     (syntax-case $syntax ()
-      ; ((_ id)
-      ;   (identifier? #'id)
-      ;   #'(fragment
-      ;     (list #'id)
-      ;     (lambda ($lookup) ($lookup #'id))))
-      ((_ literal)
-        (literal? (datum literal))
-        #'(fragment-with (lambda () literal)))
-      ((_ fragment)
-        #'fragment)))
+      ((_ id)
+        (identifier? #'id)
+        #'(fragment-with (dep id) (dep id)))
+      ((_ other)
+        #'(wrap-fragment other))))
 
   (define-rule-syntax (%+ x ...)
     (fragment-map
-      (lambda ($exprs)
-        (lambda ()
-          (apply + (map (lambda ($expr) ($expr)) $exprs))))
-      (fragment-append (expr x) ...)))
+      (partial apply +)
+      (fragment-append (wrap x) ...)))
 
   (define-rule-syntax (db x ...)
     (fragment-map list->block
@@ -33,8 +26,8 @@
         (fragment-map
           (lambda ($expr)
             (block-with 1
-              (u8-binary ($expr))))
-          (expr x)) ...)))
+              (u8-binary $expr)))
+          (wrap x)) ...)))
 
   (define-rule-syntax (dw x ...)
     (fragment-map list->block
@@ -42,6 +35,6 @@
         (fragment-map
           (lambda ($expr)
             (block-with 2
-              (u16-binary ($expr) (endianness little))))
-          (expr x)) ...)))
+              (u16-binary $expr (endianness little))))
+          (wrap x)) ...)))
 )
