@@ -58,3 +58,14 @@
         (fragment-with (dep c d)
           (cons (dep c) (dep d)))))
     (syntaxes a b b c c d)))
+
+(check
+  (equal?
+    (fragment-ref
+      (fragment+local
+        (fragment-with (dep global)
+          (string-append (dep global) "-" (dep local)))
+        #'local
+        "local")
+      (lookup-with (global "global")))
+    "global-local"))

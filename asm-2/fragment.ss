@@ -5,6 +5,7 @@
     fragment-with
     fragment-ref
     fragment-map
+    fragment+local
     pure-fragment
     list->fragment
     wrap-fragment
@@ -53,4 +54,10 @@
 
   (define (fragment-append . $fragments)
     (list->fragment $fragments))
+
+  (define (fragment+local $fragment $identifier $local)
+    (fragment-with-proc $fragment
+      (lambda ($lookup)
+        (fragment-ref $fragment
+          (lookup+ $lookup $identifier $local)))))
 )
