@@ -32,9 +32,8 @@
       (fragment-append
         (fragment-map
           (lambda ($expr)
-            (block 1
-              (lambda (_)
-                (u8-binary ($expr)))))
+            (block-with 1
+              (u8-binary ($expr))))
           (expr x)) ...)))
 
   (define-rule-syntax (dw x ...)
@@ -42,8 +41,7 @@
       (fragment-append
         (fragment-map
           (lambda ($expr)
-            (block 2
-              (lambda (_)
-                (u16-binary ($expr) (endianness little)))))
+            (block-with 2
+              (u16-binary ($expr) (endianness little))))
           (expr x)) ...)))
 )

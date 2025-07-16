@@ -2,28 +2,20 @@
 
 (define-fragment db-10
   (fragment-with
-    (block 1
-      (lambda ($org)
-        (u8-binary 10)))))
+    (block-with 1 (u8-binary 10))))
 
 (define-fragment db-20
   (fragment-with
-    (block 1
-      (lambda ($org)
-        (u8-binary 20)))))
+    (block-with 1 (u8-binary 20))))
 
 (define-fragment db-org
   (fragment-with
-    (block 1
-      (lambda ($org)
-        (u8-binary $org)))))
+    (block-with 1 ($org) (u8-binary $org))))
 
 (define-fragment db-dep-10
   (fragment-with
     (dep db-10)
-    (block 1
-      (lambda ($org)
-        (u8-binary (dep db-10))))))
+    (block-with 1 (u8-binary (dep db-10)))))
 
 (check
   (equal?

@@ -23,8 +23,8 @@
                 (label
                   (identifier? #'label)
                   #'(fragment-with
-                    (block 0
-                      (lambda ($org)
+                    (block-with 0 ($org)
+                      (run
                         (set! label $org)
                         (empty-binary)))))
                 (fragment

@@ -3,9 +3,9 @@
 (lets
   ($block
     (block-append
-      (block 1 (lambda (_) (u8-binary 10)))
-      (block 2 (lambda (_) (binary-append (u8-binary 20) (u8-binary 30))))
-      (block 1 (lambda ($org) (u8-binary $org)))))
+      (block-with 1 (u8-binary 10))
+      (block-with 2 (binary-append (u8-binary 20) (u8-binary 30)))
+      (block-with 1 ($org) (u8-binary $org))))
   (run
     (check (= (block-size $block) 4))
     (check

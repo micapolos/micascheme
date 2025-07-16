@@ -8,8 +8,11 @@
 
   (data (expression org->value-proc))
 
-  (define-rule-syntax (expression-with ($org) body)
-    (expression (lambda ($org) body)))
+  (define-rules-syntax
+    ((expression-with body)
+      (expression-with (_) body))
+    ((expression-with ($org) body)
+      (expression (lambda ($org) body))))
 
   (define (expression->value $expression $org)
     ((expression-org->value-proc $expression) $org))

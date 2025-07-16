@@ -3,6 +3,13 @@
 (check
   (equal?
     (expression->value
+      (expression-with 10)
+      100)
+    10))
+
+(check
+  (equal?
+    (expression->value
       (expression-with ($org) (+ $org 10))
       100)
     110))
