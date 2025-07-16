@@ -7,7 +7,14 @@
     assembler-bytevector
     assembler-ref?
     assembler-ref)
-  (import (micascheme) (syntax lookup) (asm-2 relocable) (asm-2 fragment) (asm-2 block))
+  (import
+    (micascheme)
+    (syntax lookup)
+    (asm-2 label)
+    (asm-2 relocable)
+    (asm-2 relocable)
+    (asm-2 fragment)
+    (asm-2 block))
 
   (data (assembler lookup org binary-stack))
 
@@ -23,6 +30,11 @@
   (define (assembler+value $assembler $identifier $value)
     (assembler-with-lookup $assembler
       (lookup+ (assembler-lookup $assembler) $identifier $value)))
+
+  (define (assembler+label $assembler $label)
+    (assembler+value $assembler
+      (label-identifier $label)
+      (relocable-with ($org) $org)))
 
   (define (assembler+binary $assembler $size $binary)
     (assembler
@@ -62,6 +74,8 @@
         (assembler+block $assembler $identifier $block))
       ((relocable? $relocable)
         (assembler+relocable-value $assembler $identifier $relocable))
+      ((label? $label)
+        (assembler+label $assembler $label))
       ((else $value)
         (assembler+value $assembler $identifier $value))))
 
