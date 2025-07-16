@@ -9,4 +9,5 @@
   (asm-2 assembled)
   (asm-2 assembler)
   (asm-2 lang)
-  (asm-2 core))
+  (asm-2 core)
+  (asm-2 z80))
