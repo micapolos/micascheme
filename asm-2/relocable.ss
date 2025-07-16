@@ -2,7 +2,7 @@
   (export
     relocable relocable? relocable-org->value-proc
     relocable-with
-    relocable->value
+    relocable-ref
     relocable-map)
   (import (micascheme))
 
@@ -14,11 +14,11 @@
     ((relocable-with ($org) body)
       (relocable (lambda ($org) body))))
 
-  (define (relocable->value $relocable $org)
+  (define (relocable-ref $relocable $org)
     ((relocable-org->value-proc $relocable) $org))
 
   (define (relocable-map $proc $relocable)
     (relocable
       (lambda ($org)
-        ($proc (relocable->value $relocable $org)))))
+        ($proc (relocable-ref $relocable $org)))))
 )

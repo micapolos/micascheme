@@ -16,7 +16,7 @@
       (block size (relocable-with ($org) body))))
 
   (define (block->binary $block $org)
-    (relocable->value (block-relocable-binary $block) $org))
+    (relocable-ref (block-relocable-binary $block) $org))
 
   (define (list->block $blocks)
     (block
