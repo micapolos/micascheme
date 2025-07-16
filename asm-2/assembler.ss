@@ -26,6 +26,7 @@
                 $assembler
                 (fragment-deps $fragment)))
             ($org (assembler-org $assembler))
+            ($assembler-lookup (assembler-lookup $assembler))
             ($binary-stack (assembler-binary-stack $assembler))
             (switch (fragment-ref $fragment $assembler-lookup)
               ((block? $block)
