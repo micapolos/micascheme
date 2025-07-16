@@ -30,7 +30,7 @@
       (+ (assembler-org $assembler) $size)
       (push (assembler-binary-stack $assembler) $binary)))
 
-  (define (assembler+relocable $assembler $identifier $relocable)
+  (define (assembler+relocable-value $assembler $identifier $relocable)
     (assembler+value $assembler $identifier
       (relocable-ref $relocable (assembler-org $relocable))))
 
@@ -61,7 +61,7 @@
       ((block? $block)
         (assembler+block $assembler $identifier $block))
       ((relocable? $relocable)
-        (assembler+relocable $assembler $identifier $relocable))
+        (assembler+relocable-value $assembler $identifier $relocable))
       ((else $value)
         (assembler+value $assembler $identifier $value))))
 
