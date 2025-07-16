@@ -7,7 +7,7 @@
     assembler-bytevector
     assembler-ref?
     assembler-ref)
-  (import (micascheme) (syntax lookup) (asm-2 fragment) (asm-2 block))
+  (import (micascheme) (syntax lookup) (asm-2 relocable) (asm-2 fragment) (asm-2 block))
 
   (data (assembler lookup org binary-stack))
 
@@ -24,16 +24,25 @@
     (assembler-with-lookup $assembler
       (lookup+ (assembler-lookup $assembler) $identifier $value)))
 
+  (define (assembler+binary $assembler $size $binary)
+    (assembler
+      (assembler-lookup $assembler)
+      (+ (assembler-org $assembler) $size)
+      (push (assembler-binary-stack $assembler) $binary)))
+
+  (define (assembler+relocable $assembler $identifier $relocable)
+    (assembler+value $assembler $identifier
+      (relocable-ref $relocable (assembler-org $relocable))))
+
   (define (assembler+block $assembler $identifier $block)
     (lets
       ($size (block-size $block))
       ($org (assembler-org $assembler))
       ($binary-stack (assembler-binary-stack $assembler))
       ($binary (block->binary $block $org))
-      (assembler
-        (lookup+ (assembler-lookup $assembler) $identifier $org)
-        (+ $org $size)
-        (push $binary-stack $binary))))
+      (assembler+binary
+        (assembler+value $assembler $identifier $org)
+        $size $binary)))
 
   (define (assembler+fragment $lookup $assembler $identifier $fragment)
     (lets
@@ -51,6 +60,8 @@
         (assembler+fragment $lookup $assembler $identifier $fragment))
       ((block? $block)
         (assembler+block $assembler $identifier $block))
+      ((relocable? $relocable)
+        (assembler+relocable $assembler $identifier $relocable))
       ((else $value)
         (assembler+value $assembler $identifier $value))))
 
