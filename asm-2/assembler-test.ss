@@ -4,6 +4,16 @@
   (equal?
     (assembler-ref
       (identifier-assembler
+        (lookup-with (value 10))
+        #'value
+        100)
+      #'value)
+    10))
+
+(check
+  (equal?
+    (assembler-ref
+      (identifier-assembler
         (lookup-with
           (value (fragment-with 10)))
         #'value
