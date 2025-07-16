@@ -14,7 +14,8 @@
     (asm-2 relocable)
     (asm-2 relocable)
     (asm-2 fragment)
-    (asm-2 block))
+    (asm-2 block)
+    (asm-2 local))
 
   (data (assembler lookup org binary-stack))
 
@@ -46,6 +47,10 @@
     (assembler+value $assembler $identifier
       (relocable-ref $relocable (assembler-org $relocable))))
 
+  (define (assembler+local $assembler $local)
+    (assembler-with-lookup $assembler
+      (local-apply $local (assembler-lookup $assembler))))
+
   (define (assembler+block $assembler $identifier $block)
     (lets
       ($size (block-size $block))
@@ -70,6 +75,8 @@
     (switch $obj
       ((fragment? $fragment)
         (assembler+fragment $lookup $assembler $identifier $fragment))
+      ((local? $local)
+        (assembler+local $assembler $local))
       ((block? $block)
         (assembler+block $assembler $identifier $block))
       ((relocable? $relocable)

@@ -6,6 +6,7 @@
   (asm-2 aligned)
   (asm-2 block)
   (asm-2 fragment)
+  (asm-2 local)
   (asm-2 block-fragment)
   (asm-2 assembled)
   (asm-2 assembler)
