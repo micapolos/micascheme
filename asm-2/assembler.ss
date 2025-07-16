@@ -24,11 +24,21 @@
     (assembler-with-lookup $assembler
       (lookup+ (assembler-lookup $assembler) $identifier $value)))
 
-  (define (assembler+identifier $lookup $assembler $identifier)
-    (switch (assembler-ref? $assembler $identifier)
-      ((false? _)
+  (define (assembler+block $assembler $identifier $block)
+    (lets
+      ($size (block-size $block))
+      ($org (assembler-org $assembler))
+      ($binary-stack (assembler-binary-stack $assembler))
+      ($binary (block->binary $block $org))
+      (assembler
+        (lookup+ (assembler-lookup $assembler) $identifier $org)
+        (+ $org $size)
+        (push $binary-stack $binary))))
+
+  (define (assembler+obj $lookup $assembler $identifier $obj)
+    (switch $obj
+      ((fragment? $fragment)
         (lets
-          ($fragment (wrap-fragment (lookup-ref $lookup $identifier)))
           ($assembler
             (fold-left
               (partial assembler+identifier $lookup)
@@ -37,17 +47,18 @@
           ($org (assembler-org $assembler))
           ($assembler-lookup (assembler-lookup $assembler))
           ($binary-stack (assembler-binary-stack $assembler))
-          (switch (fragment-ref $fragment $assembler-lookup)
-            ((block? $block)
-              (lets
-                ($size (block-size $block))
-                ($binary (block->binary $block $org))
-                (assembler
-                  (lookup+ $assembler-lookup $identifier $org)
-                  (+ $org $size)
-                  (push $binary-stack $binary))))
-            ((else $value)
-              (assembler+value $assembler $identifier $value)))))
+          (assembler+obj $lookup $assembler $identifier
+            (fragment-ref $fragment $assembler-lookup))))
+      ((block? $block)
+        (assembler+block $assembler $identifier $block))
+      ((else $value)
+        (assembler+value $assembler $identifier $value))))
+
+  (define (assembler+identifier $lookup $assembler $identifier)
+    (switch (assembler-ref? $assembler $identifier)
+      ((false? _)
+        (assembler+obj $lookup $assembler $identifier
+          (lookup-ref $lookup $identifier)))
       ((else _) $assembler)))
 
   (define (identifier-assembler $lookup $identifier $org)
