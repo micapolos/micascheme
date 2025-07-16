@@ -1,9 +1,9 @@
-(import (micascheme) (asm-2 assembler) (asm-2 block) (asm-2 fragment) (syntax lookup))
+(import (micascheme) (asm-2 linker) (asm-2 block) (asm-2 fragment) (syntax lookup))
 
 (check
   (equal?
-    (assembler-ref
-      (identifier-assembler
+    (linker-ref
+      (identifier-linker
         (lookup-with (value 10))
         #'value
         100)
@@ -12,8 +12,8 @@
 
 (check
   (equal?
-    (assembler-ref
-      (identifier-assembler
+    (linker-ref
+      (identifier-linker
         (lookup-with
           (value (fragment-with 10)))
         #'value
@@ -23,8 +23,8 @@
 
 (check
   (equal?
-    (assembler-ref
-      (identifier-assembler
+    (linker-ref
+      (identifier-linker
         (lookup-with
           (value-10 (fragment-with 10))
           (value-11
@@ -37,8 +37,8 @@
 
 (check
   (equal?
-    (assembler-bytevector
-      (identifier-assembler
+    (linker-bytevector
+      (identifier-linker
         (lookup-with
           (value-10
             (fragment-with 10))

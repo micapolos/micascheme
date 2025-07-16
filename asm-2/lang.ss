@@ -2,7 +2,7 @@
   (export
     define-fragment
     fragment-bytevector)
-  (import (micascheme) (asm-2 assembler) (asm-2 fragment))
+  (import (micascheme) (asm-2 linker) (asm-2 fragment))
 
   (define-rule-syntax (define-fragment id fragment)
     (define-syntax id (make-compile-time-value fragment)))
@@ -11,8 +11,8 @@
     (syntax-case $syntax ()
       ((_ id org)
         (identifier? #'id)
-        (assembler-bytevector
-          (identifier-assembler
+        (linker-bytevector
+          (identifier-linker
             (lambda ($label)
               (switch ($lookup $label)
                 ((false? _) (syntax-error $label "fragment not found"))
