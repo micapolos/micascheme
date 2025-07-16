@@ -1,7 +1,7 @@
 (import (micascheme))
 
 (test
-  (asm-2 expression)
+  (asm-2 relocable)
   (asm-2 block)
   (asm-2 fragment)
   (asm-2 block-fragment)

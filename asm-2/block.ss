@@ -1,27 +1,27 @@
 (library (asm-2 block)
   (export
-    block block? block-size block-binary-expression
+    block block? block-size block-relocable-binary
     block-with
     block->binary
     list->block
     block-append)
-  (import (micascheme) (asm-2 expression) (syntax lookup))
+  (import (micascheme) (asm-2 relocable) (syntax lookup))
 
-  (data (block size binary-expression))
+  (data (block size relocable-binary))
 
   (define-rules-syntax
     ((block-with size body)
-      (block size (expression-with body)))
+      (block size (relocable-with body)))
     ((block-with size ($org) body)
-      (block size (expression-with ($org) body))))
+      (block size (relocable-with ($org) body))))
 
   (define (block->binary $block $org)
-    (expression->value (block-binary-expression $block) $org))
+    (relocable->value (block-relocable-binary $block) $org))
 
   (define (list->block $blocks)
     (block
       (apply + (map block-size $blocks))
-      (expression-with ($org)
+      (relocable-with ($org)
         (lets
           ((pair $org $binaries)
             (fold-left
