@@ -9,12 +9,22 @@
   (equal?
     (aligned-sort
       (list
-        (aligned 1 "a")
-        (aligned 8 "b")
-        (aligned 2 "c")
-        (aligned 4 "d")))
+        (aligned 1 "1")
+        (aligned 8 "8")
+        (aligned 2 "2")
+        (aligned 4 "4")))
     (list
-      (aligned 8 "b")
-      (aligned 4 "d")
-      (aligned 2 "c")
-      (aligned 1 "a"))))
+      (aligned 8 "8")
+      (aligned 4 "4")
+      (aligned 2 "2")
+      (aligned 1 "1"))))
+
+(check
+  (equal?
+    (aligned-sorted-refs
+      (list
+        (aligned 1 "1")
+        (aligned 8 "8")
+        (aligned 2 "2")
+        (aligned 4 "4")))
+    (list "8" "4" "2" "1")))

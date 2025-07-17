@@ -2,7 +2,8 @@
   (export
     aligned aligned? aligned-alignment aligned-ref
     aligned-more?
-    aligned-sort)
+    aligned-sort
+    aligned-sorted-refs)
   (import (micascheme))
 
   (data (aligned alignment ref))
@@ -14,4 +15,7 @@
 
   (define (aligned-sort $aligned-list)
     (sort aligned-more? $aligned-list))
+
+  (define (aligned-sorted-refs $aligned-list)
+    (map aligned-ref (aligned-sort $aligned-list)))
 )
