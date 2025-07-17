@@ -3,7 +3,10 @@
     relocable relocable? relocable-proc
     relocable-with
     relocable-ref
-    relocable-map)
+    relocable-map
+    relocable+offset
+    list->relocable
+    relocable-append)
   (import (micascheme))
 
   (data (relocable proc))
@@ -21,4 +24,17 @@
     (relocable
       (lambda ($org)
         ($proc (relocable-ref $relocable $org)))))
+
+  (define (relocable+offset $relocable $offset)
+    (relocable-with ($org)
+      (relocable-ref $relocable
+        (+ $org $offset))))
+
+  (define (list->relocable $relocables)
+    (relocable-with ($org)
+      (map-with ($relocable $relocables)
+        (relocable-ref $relocable $org))))
+
+  (define (relocable-append . $relocables)
+    (list->relocable $relocables))
 )

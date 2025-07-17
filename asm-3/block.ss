@@ -1,4 +1,4 @@
-(library (asm-3 block)
+ (library (asm-3 block)
   (export
     block? block-alignment block-size
 
@@ -8,23 +8,27 @@
     block+binary
     block+zeros
     block-align
-    block->syntax
+    block->aligned-sized-relocable-binary-syntax
     block->datum
     check-block)
-  (import (micascheme) (syntax lookup))
+  (import
+    (micascheme)
+    (syntax lookup)
+    (asm-2 relocable)
+    (asm-3 identified)
+    (asm-2 aligned)
+    (asm-3 sized))
 
-  (define-keywords $org $port)
-
-  (data (block alignment size label-syntaxes define-syntaxes run-syntaxes))
+  (data (block alignment size identified-offset-stack define-syntaxes relocable-binary-syntax-stack))
 
   (define (empty-block)
     (block 1 0 (stack) (stack) (stack)))
 
   (define (block+label $block $label)
-    (block-with-label-syntaxes $block
+    (block-with-identified-offset-stack $block
       (push
-        (block-label-syntaxes $block)
-        #`(#,$label (+ org #,(literal->syntax (block-size $block)))))))
+        (block-identified-offset-stack $block)
+        (identified $label (block-size $block)))))
 
   (define (block+define $block $identifier $syntax)
     (block-with-define-syntaxes $block
@@ -32,12 +36,12 @@
         (block-define-syntaxes $block)
         #`(#,$identifier #,$syntax))))
 
-  (define (block+binary $block $size $syntax)
+  (define (block+binary $block $size $relocable-binary-syntax)
     (fluent $block
-      (block-with-run-syntaxes
+      (block-with-relocable-binary-syntax-stack
         (push
-          (block-run-syntaxes $block)
-          #`(put-binary $port #,$syntax)))
+          (block-relocable-binary-syntax-stack $block)
+          (relocable+offset $relocable-binary-syntax (block-size $block))))
       (block-with-size
         (+ (block-size $block) $size))))
 
@@ -45,7 +49,8 @@
     (if (zero? $size)
       $block
       (block+binary $block $size
-        #`(zero-binary #,(literal->syntax $size)))))
+        (relocable-with
+          #`(zero-binary #,(literal->syntax $size))))))
 
   (define (block-align $block $alignment)
     (lets
@@ -54,20 +59,34 @@
         (block-with-alignment (max (block-alignment $block) $alignment))
         (block+zeros (- (bitwise-align $size $alignment) $size)))))
 
-  (define (block->syntax $block)
-    #`(lets
-      #,@(reverse (block-label-syntaxes $block))
-      #,@(reverse (block-define-syntaxes $block))
-      (run #,@(reverse (block-run-syntaxes $block)))))
+  (define (block->aligned-sized-relocable-binary-syntax $block)
+    (aligned (block-alignment $block)
+      (sized (block-size $block)
+        (relocable-with ($org)
+          #`(lets
+            #,@(map-with ($identified-offset (reverse (block-identified-offset-stack $block)))
+              #`(
+                #,(identified-identifier $identified-offset)
+                #,(literal->syntax (+ $org (identified-ref $identified-offset)))))
+            #,@(reverse (block-define-syntaxes $block))
+            (binary-append
+              #,@(relocable-ref
+                (list->relocable
+                  (reverse
+                    (block-relocable-binary-syntax-stack $block)))
+                $org)))))))
 
-  (define (block->datum $block)
+  (define (block->datum $block $org)
     `(block
       (alignment ,(block-alignment $block))
       (size ,(block-size $block))
-      (labels ,@(reverse (map syntax->datum (block-label-syntaxes $block))))
-      (defs ,@(reverse (map syntax->datum (block-define-syntaxes $block))))
-      (body ,@(reverse (map syntax->datum (block-run-syntaxes $block))))))
+      ,(syntax->datum
+        (relocable-ref
+          (sized-ref
+            (aligned-ref
+              (block->aligned-sized-relocable-binary-syntax $block)))
+          $org))))
 
-  (define-rule-syntax (check-block in out)
-    (check (equal? (block->datum in) 'out)))
+  (define-rule-syntax (check-block in org out)
+    (check (equal? (block->datum in org) 'out)))
 )
