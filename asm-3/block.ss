@@ -19,7 +19,13 @@
     (asm-2 aligned)
     (asm-3 sized))
 
-  (data (block alignment size identified-offset-stack define-syntaxes relocable-binary-syntax-stack))
+  (data
+    (block
+      alignment
+      size
+      identified-offset-stack
+      identified-expression-syntax-stack
+      relocable-binary-syntax-stack))
 
   (define (empty-block)
     (block 1 0 (stack) (stack) (stack)))
@@ -31,10 +37,10 @@
         (identified $label (block-size $block)))))
 
   (define (block+define $block $identifier $syntax)
-    (block-with-define-syntaxes $block
+    (block-with-identified-expression-syntax-stack $block
       (push
-        (block-define-syntaxes $block)
-        #`(#,$identifier #,$syntax))))
+        (block-identified-expression-syntax-stack $block)
+        (identified $identifier $syntax))))
 
   (define (block+binary $block $size $relocable-binary-syntax)
     (fluent $block
@@ -68,7 +74,10 @@
               #`(
                 #,(identified-identifier $identified-offset)
                 #,(literal->syntax (+ $org (identified-ref $identified-offset)))))
-            #,@(reverse (block-define-syntaxes $block))
+            #,@(map-with ($identified-expression-syntax (reverse (block-identified-expression-syntax-stack $block)))
+              #`(
+                #,(identified-identifier $identified-expression-syntax)
+                #,(identified-ref $identified-expression-syntax)))
             (binary-append
               #,@(relocable-ref
                 (list->relocable
