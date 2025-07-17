@@ -1,7 +1,7 @@
-(import (micascheme) (asm-3 identified-stack) (asm-3 dependent) (syntax lookup))
+(import (micascheme) (asm-3 dependencies) (asm-3 dependent) (syntax lookup))
 
-(check-identified-stack
-  (identifier->identified-stack
+(check-dependencies
+  (resolve-dependencies
     (lookup-with
       (a (dependent-with () "a"))
       (b (dependent-with () "b"))
@@ -12,7 +12,7 @@
       (ad (dependent-with (a d) "ad"))
       (main (dependent-with (ab bc ad) "main")))
     #'main)
-  (stack
+  (dependencies
     (identified a "a")
     (identified b "b")
     (identified ab "ab")
