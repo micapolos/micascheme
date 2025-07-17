@@ -1,6 +1,10 @@
 (import (micascheme) (asm-3 fragment))
 
 (check-fragment
+  (pure-fragment 10)
+  (fragment-with () 10))
+
+(check-fragment
   (fragment-with (a b) 10)
   (fragment-with (a b) 10))
 

@@ -1,6 +1,7 @@
 (library (asm-3 fragment)
   (export
     fragment fragment? fragment-dep-stack fragment-ref
+    pure-fragment
     fragment-with
     fragment->datum
     list->fragment
@@ -13,6 +14,9 @@
 
   (define-rule-syntax (fragment-with (dep ...) ref)
     (fragment (stack #'dep ...) ref))
+
+  (define (pure-fragment $ref)
+    (fragment-with () $ref))
 
   (define (fragment+dep $fragment $dep)
     (lets
