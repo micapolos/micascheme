@@ -1,6 +1,6 @@
  (library (asm-3 block)
   (export
-    block? block-alignment block-size
+    block block? block-alignment block-size
 
     empty-block
     block+label
@@ -10,7 +10,10 @@
     block-align
     block->aligned-sized-relocable-binary-syntax
     block->datum
-    check-block)
+    check-block
+
+    list->block
+    block-append)
   (import
     (micascheme)
     (syntax lookup)
@@ -36,6 +39,33 @@
         (block-identified-offset-stack $block)
         (identified $label (block-size $block)))))
 
+  (define (block+block $block $other-block)
+    (lets
+      ($block (block-align $block (block-alignment $other-block)))
+      (block
+        (max (block-alignment $block) (block-alignment $other-block))
+        (+ (block-size $block) (block-size $other-block))
+        (push-all
+          (block-identified-offset-stack $block)
+          (map-with ($other-identified-offset (block-identified-offset-stack $other-block))
+            (identified-map
+              (lambda ($offset) (+ (block-size $block) $offset))
+              $other-identified-offset)))
+        (push-all
+          (block-identified-expression-syntax-stack $block)
+          (block-identified-expression-syntax-stack $other-block))
+        (push-all
+          (block-relocable-binary-syntax-stack $block)
+          (map-with ($other-relocable-binary-syntax (block-relocable-binary-syntax-stack $other-block))
+            (relocable+offset $other-relocable-binary-syntax
+              (block-size $block)))))))
+
+  (define (list->block $blocks)
+    (fold-left block+block (empty-block) $blocks))
+
+  (define (block-append . $blocks)
+    (list->block $blocks))
+
   (define (block+define $block $identifier $syntax)
     (block-with-identified-expression-syntax-stack $block
       (push
@@ -50,6 +80,10 @@
           (relocable+offset $relocable-binary-syntax (block-size $block))))
       (block-with-size
         (+ (block-size $block) $size))))
+
+  (define (block+size $block $size)
+    (block-with-size $block
+      (+ (block-size $block) $size)))
 
   (define (block+zeros $block $size)
     (if (zero? $size)
