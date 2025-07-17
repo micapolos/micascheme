@@ -5,7 +5,7 @@
     identifier->identified-stack
     identified-stack->datum
     check-identified-stack)
-  (import (micascheme) (asm-3 identified) (asm-3 fragment) (syntax lookup))
+  (import (micascheme) (asm-3 identified) (asm-3 dependent) (syntax lookup))
 
   (define (identified-stack-ref? $identified-stack $identifier)
     (lets?
@@ -18,22 +18,22 @@
           $identified-stack))
       (identified-ref (car $identified-stack))))
 
-  (define (identified-stack+identifier $fragment-lookup $identified-stack $identifier)
+  (define (identified-stack+identifier $dependent-lookup $identified-stack $identifier)
     (cond
       ((identified-stack-ref? $identified-stack $identifier)
         $identified-stack)
       (else
         (lets
-          ($fragment (lookup-ref $fragment-lookup $identifier))
+          ($dependent (lookup-ref $dependent-lookup $identifier))
           (push
             (fold-left
-              (partial identified-stack+identifier $fragment-lookup)
+              (partial identified-stack+identifier $dependent-lookup)
               $identified-stack
-              (reverse (fragment-dep-stack $fragment)))
-            (identified $identifier (fragment-ref $fragment)))))))
+              (reverse (dependent-dep-stack $dependent)))
+            (identified $identifier (dependent-ref $dependent)))))))
 
-  (define (identifier->identified-stack $fragment-lookup $identifier)
-    (identified-stack+identifier $fragment-lookup (stack) $identifier))
+  (define (identifier->identified-stack $dependent-lookup $identifier)
+    (identified-stack+identifier $dependent-lookup (stack) $identifier))
 
   (define (identified-stack->datum $ref->datum $identified-stack)
     `(stack

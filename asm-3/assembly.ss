@@ -8,7 +8,7 @@
   (import
     (micascheme)
     (syntax lookup)
-    (asm-3 fragment)
+    (asm-3 dependent)
     (asm-3 block))
 
   (data (assembly bindings))
@@ -29,13 +29,13 @@
     (switch (assembly-ref? $assembly $dep)
       ((false? _)
         (switch (lookup-ref $lookup $dep)
-          ((fragment? $fragment)
+          ((dependent? $dependent)
             (assembly+binding
-              (fold-left (partial assembly+dep $lookup) $assembly (reverse (fragment-dep-stack $fragment)))
+              (fold-left (partial assembly+dep $lookup) $assembly (reverse (dependent-dep-stack $dependent)))
               $dep
-              (fragment-ref $fragment)))
+              (dependent-ref $dependent)))
           ((else $other)
-            (syntax-error $dep "not fragment"))))
+            (syntax-error $dep "not dependent"))))
       ((else _)
         $assembly)))
 

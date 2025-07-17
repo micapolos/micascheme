@@ -1,4 +1,4 @@
-(import (micascheme) (syntax lookup) (asm-3 assembly) (asm-3 fragment) (asm-3 block))
+(import (micascheme) (syntax lookup) (asm-3 assembly) (asm-3 dependent) (asm-3 block))
 
 (check-assembly
   (empty-assembly)
@@ -16,19 +16,19 @@
 (check-assembly
   (identifier->assembly
     (lookup-with
-      (a (fragment-with () #'a))
-      (b (fragment-with () #'b))
-      (c (fragment-with (a b) #'(+ a b)))
+      (a (dependent-with () #'a))
+      (b (dependent-with () #'b))
+      (c (dependent-with (a b) #'(+ a b)))
       (block-1
-        (fragment-with ()
+        (dependent-with ()
           (fluent (empty-block)
             (block+binary 1 #'binary-1))))
       (block-2
-        (fragment-with ()
+        (dependent-with ()
           (fluent (empty-block)
             (block+binary 2 #'binary-2))))
       (main
-        (fragment-with (c block-1 block-2)
+        (dependent-with (c block-1 block-2)
           (fluent
             (empty-block)
             (block+binary 10 #'main-binary)))))
