@@ -2,8 +2,14 @@
 
 (check
   (aligned-more?
-    (aligned 2 "foo")
-    (aligned 1 "bar")))
+    (aligned 2 "2")
+    (aligned 1 "1")))
+
+(check
+  (not
+    (aligned-more?
+      (aligned 1 "1")
+      (aligned 1 "1"))))
 
 (check
   (equal?
