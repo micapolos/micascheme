@@ -65,12 +65,10 @@
         (block+zeros (- (bitwise-align $size $alignment) $size)))))
 
   (define (block->syntax $block)
-    #`(lambda ($org)
-      (lambda ($port)
-        (lets
-          #,@(reverse (block-label-syntaxes $block))
-          #,@(reverse (block-define-syntaxes $block))
-          (run #,@(reverse (block-run-syntaxes $block)))))))
+    #`(lets
+      #,@(reverse (block-label-syntaxes $block))
+      #,@(reverse (block-define-syntaxes $block))
+      (run #,@(reverse (block-run-syntaxes $block)))))
 
   (define (block->datum $block)
     `(block

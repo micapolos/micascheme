@@ -1,9 +1,11 @@
 (library (asm-3 expression)
   (export
+    expression? expression-deps expression-syntax
     pure-expression
     dep-expression
     combine-expressions
     check-expression
+    expression->datum
     expression-with)
   (import (micascheme))
 
@@ -24,7 +26,7 @@
       ($proc (map expression-syntax $expressions))))
 
   (define (expression->datum $expression)
-    `(expression-with
+    `(expression
       (,@(map syntax->datum (expression-deps $expression)))
       ,(syntax->datum (expression-syntax $expression))))
 

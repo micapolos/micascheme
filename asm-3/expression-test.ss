@@ -2,11 +2,11 @@
 
 (check-expression
   (pure-expression #'string-append)
-  (expression-with () string-append))
+  (expression () string-append))
 
 (check-expression
   (dep-expression #'foo)
-  (expression-with (foo) foo))
+  (expression (foo) foo))
 
 (check-expression
   (combine-expressions
@@ -16,6 +16,6 @@
       (expression-with (a b) (+ a b))
       (expression-with (b c) (+ b c))
       (expression-with (a d) (+ a d))))
-  (expression-with
+  (expression
     (a b c d)
     (combined (+ a b) (+ b c) (+ a d))))
