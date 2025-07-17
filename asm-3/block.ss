@@ -1,9 +1,8 @@
 (library (asm-3 block)
   (export
-    block? block-alignment block-size block-deps
+    block? block-alignment block-size
 
     empty-block
-    block+dep
     block+label
     block+define
     block+binary
@@ -16,19 +15,10 @@
 
   (define-keywords $org $port)
 
-  (data (block-transformer proc))
-  (data (block alignment size deps label-syntaxes define-syntaxes run-syntaxes))
+  (data (block alignment size label-syntaxes define-syntaxes run-syntaxes))
 
   (define (empty-block)
-    (block 1 0 (stack) (stack) (stack) (stack)))
-
-  (define (block+dep $block $dep)
-    (lets
-      ($deps (block-deps $block))
-      (block-with-deps $block
-        (cond
-          ((memp (partial free-identifier=? $dep) $deps) $deps)
-          (else (push $deps $dep))))))
+    (block 1 0 (stack) (stack) (stack)))
 
   (define (block+label $block $label)
     (block-with-label-syntaxes $block
@@ -74,10 +64,9 @@
     `(block
       (alignment ,(block-alignment $block))
       (size ,(block-size $block))
-      (deps ,@(reverse (map syntax->datum (block-deps $block))))
-      ,@(reverse (map syntax->datum (block-label-syntaxes $block)))
-      ,@(reverse (map syntax->datum (block-define-syntaxes $block)))
-      ,@(reverse (map syntax->datum (block-run-syntaxes $block)))))
+      (labels ,@(reverse (map syntax->datum (block-label-syntaxes $block))))
+      (defs ,@(reverse (map syntax->datum (block-define-syntaxes $block))))
+      (body ,@(reverse (map syntax->datum (block-run-syntaxes $block))))))
 
   (define-rule-syntax (check-block in out)
     (check (equal? (block->datum in) 'out)))

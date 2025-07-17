@@ -2,7 +2,12 @@
 
 (check-block
   (fluent (empty-block))
-  (block (alignment 1) (size 0) (deps)))
+  (block
+    (alignment 1)
+    (size 0)
+    (labels)
+    (defs)
+    (body)))
 
 (check-block
   (fluent (empty-block)
@@ -13,19 +18,18 @@
     (block-align 8)
     (block+label #'mid)
     (block+binary 3 #`binary-3)
-    (block+dep #'foo)
-    (block+dep #'bar)
-    (block+dep #'foo)
     (block+label #'end))
   (block
     (alignment 8)
     (size 11)
-    (deps foo bar)
-    (start (+ org 0))
-    (mid (+ org 8))
-    (end (+ org 11))
-    (size (- end start))
-    (put-binary $port binary-1)
-    (put-binary $port binary-2)
-    (put-binary $port (zero-binary 5))
-    (put-binary $port binary-3)))
+    (labels
+      (start (+ org 0))
+      (mid (+ org 8))
+      (end (+ org 11)))
+    (defs
+      (size (- end start)))
+    (body
+      (put-binary $port binary-1)
+      (put-binary $port binary-2)
+      (put-binary $port (zero-binary 5))
+      (put-binary $port binary-3))))

@@ -8,8 +8,8 @@
   (import
     (micascheme)
     (syntax lookup)
-    (asm-3 block)
-    (asm-3 expression))
+    (asm-3 fragment)
+    (asm-3 block))
 
   (data (assembly bindings))
 
@@ -25,25 +25,17 @@
         (assembly-bindings $assembly)
         (cons $identifier $value))))
 
-  (define (assembly+deps $lookup $assembly $deps)
-    (fold-left (partial assembly+dep $lookup) $assembly $deps))
-
   (define (assembly+dep $lookup $assembly $dep)
     (switch (assembly-ref? $assembly $dep)
       ((false? _)
         (switch (lookup-ref $lookup $dep)
-          ((block? $block)
+          ((fragment? $fragment)
             (assembly+binding
-              (assembly+deps $lookup $assembly (reverse (block-deps $block)))
+              (fold-left (partial assembly+dep $lookup) $assembly (reverse (fragment-dep-stack $fragment)))
               $dep
-              $block))
-          ((expression? $expression)
-            (assembly+binding
-              (assembly+deps $lookup $assembly (expression-deps $expression))
-              $dep
-              $expression))
+              (fragment-ref $fragment)))
           ((else $other)
-            (syntax-error $dep "can not assemble"))))
+            (syntax-error $dep "not fragment"))))
       ((else _)
         $assembly)))
 
@@ -54,7 +46,7 @@
           ,(syntax->datum (car $binding))
           ,(switch-exhaustive (cdr $binding)
             ((block? $block) (block->datum $block))
-            ((expression? $expression) (expression->datum $expression)))))))
+            ((syntax? $syntax) (syntax->datum $syntax)))))))
 
   (define (identifier->assembly $lookup $identifier)
     (assembly+dep $lookup (empty-assembly) $identifier))
