@@ -70,14 +70,16 @@
       (sized (block-size $block)
         (relocable-with ($org)
           #`(lets
-            #,@(map-with ($identified-offset (reverse (block-identified-offset-stack $block)))
-              #`(
-                #,(identified-identifier $identified-offset)
-                #,(literal->syntax (+ $org (identified-ref $identified-offset)))))
-            #,@(map-with ($identified-expression-syntax (reverse (block-identified-expression-syntax-stack $block)))
-              #`(
-                #,(identified-identifier $identified-expression-syntax)
-                #,(identified-ref $identified-expression-syntax)))
+            #,@(map
+              (lambda ($identified-offset)
+                (identified->syntax $identified-offset
+                  (lambda ($offset)
+                    (literal->syntax (+ $org $offset)))))
+              (reverse (block-identified-offset-stack $block)))
+            #,@(map
+              (lambda ($identified-expression-syntax)
+                (identified->syntax $identified-expression-syntax identity))
+              (reverse (block-identified-expression-syntax-stack $block)))
             (binary-append
               #,@(relocable-ref
                 (list->relocable
