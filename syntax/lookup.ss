@@ -5,6 +5,7 @@
     lookup-undefined-id
     lookup+undefined
     lookup-gen
+    lookup-ref?
     lookup-ref
     lookup-transformer
     lookup-transform
@@ -20,6 +21,9 @@
 
   (define (empty-lookup)
     (lambda (_) #f))
+
+  (define (lookup-ref? $lookup $id)
+    ($lookup $id))
 
   (define (lookup-ref $lookup $id)
     (or
