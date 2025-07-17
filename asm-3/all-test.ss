@@ -5,6 +5,4 @@
   (asm-3 dependent)
   (asm-3 identified-stack)
   (asm-3 sized)
-  (asm-3 block)
-  ;(asm-3 assembly)
-  )
+  (asm-3 block))

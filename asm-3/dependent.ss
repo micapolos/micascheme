@@ -1,6 +1,6 @@
 (library (asm-3 dependent)
   (export
-    dependent dependent? dependent-dep-stack dependent-ref
+    dependent dependent? dependent-identifiers dependent-ref
     pure-dependent
     dependent-with
     dependent->datum
@@ -10,30 +10,22 @@
     check-dependent)
   (import (micascheme))
 
-  (data (dependent dep-stack ref))
+  (data (dependent identifiers ref))
 
-  (define-rule-syntax (dependent-with (dep ...) ref)
-    (dependent (stack #'dep ...) ref))
+  (define-rule-syntax (dependent-with (identifier ...) ref)
+    (dependent (list #'identifier ...) ref))
 
   (define (pure-dependent $ref)
     (dependent-with () $ref))
 
-  (define (dependent+dep $dependent $dep)
-    (lets
-      ($dep-stack (dependent-dep-stack $dependent))
-      (dependent-with-dep-stack $dependent
-        (cond
-          ((memp (partial free-identifier=? $dep) $dep-stack) $dep-stack)
-          (else (push $dep-stack $dep))))))
-
   (define (dependent->datum $dependent)
     `(dependent-with
-      (,@(reverse (map syntax->datum (dependent-dep-stack $dependent))))
+      (,@(map syntax->datum (dependent-identifiers $dependent)))
       ,(dependent-ref $dependent)))
 
   (define (list->dependent $dependents)
     (dependent
-      (reverse (dedup free-identifier=? (apply append (map (dot reverse dependent-dep-stack) $dependents))))
+      (dedup free-identifier=? (apply append (map dependent-identifiers $dependents)))
       (map dependent-ref $dependents)))
 
   (define (dependent-append . $dependents)

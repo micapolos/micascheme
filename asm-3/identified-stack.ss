@@ -29,7 +29,7 @@
             (fold-left
               (partial identified-stack+identifier $dependent-lookup)
               $identified-stack
-              (reverse (dependent-dep-stack $dependent)))
+              (dependent-identifiers $dependent))
             (identified $identifier (dependent-ref $dependent)))))))
 
   (define (identifier->identified-stack $dependent-lookup $identifier)
