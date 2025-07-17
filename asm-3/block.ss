@@ -60,11 +60,8 @@
             (relocable+offset $other-relocable-binary-syntax
               (block-size $block)))))))
 
-  (define (list->block $blocks)
+  (define-list->/append (block $blocks)
     (fold-left block+block (empty-block) $blocks))
-
-  (define (block-append . $blocks)
-    (list->block $blocks))
 
   (define (block+define $block $identifier $syntax)
     (block-with-identified-expression-syntax-stack $block

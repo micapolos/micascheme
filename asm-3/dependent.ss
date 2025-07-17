@@ -23,13 +23,10 @@
       (,@(map syntax->datum (dependent-identifiers $dependent)))
       ,(dependent-ref $dependent)))
 
-  (define (list->dependent $dependents)
+  (define-list->/append (dependent $dependents)
     (dependent
       (dedup free-identifier=? (apply append (map dependent-identifiers $dependents)))
       (map dependent-ref $dependents)))
-
-  (define (dependent-append . $dependents)
-    (list->dependent $dependents))
 
   (define (dependent-map $proc $dependent)
     (dependent-with-ref $dependent
