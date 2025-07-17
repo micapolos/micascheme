@@ -8,6 +8,7 @@
     nonnegative-integer?
     one?
     bitwise-align
+    bitwise-aligned?
     !=
     integer-mask
     integer-wraparound
@@ -54,6 +55,9 @@
       (bitwise-and
         (+ $value $mask)
         (bitwise-not $mask))))
+
+  (define (bitwise-aligned? $value $alignment)
+    (= (bitwise-align $value $alignment) $value))
 
   (define (!= a b)
     (not (= a b)))

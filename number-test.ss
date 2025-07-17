@@ -36,3 +36,6 @@
 (check (equal? (bitwise-align #x1237 4) #x1238))
 (check (equal? (bitwise-align #x1238 4) #x1238))
 (check (equal? (bitwise-align #x1239 4) #x123c))
+
+(check (bitwise-aligned? #x1234 4))
+(check (not (bitwise-aligned? #x1235 4)))
