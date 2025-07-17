@@ -53,4 +53,41 @@
 
   (define-rule-syntax (check-assembly in out)
     (check (equal? (assembly->datum in) 'out)))
+
+  (define (assembly-syntax-lets-entries $assembly)
+    (map-with
+      ($binding
+        (reverse
+          (filter
+            (lambda ($binding) (syntax? (cdr $binding)))
+            (assembly-bindings $assembly))))
+      #`(#,(car $binding) #,(cdr $binding))))
+
+  (define (assembly-block-bindings $assembly)
+    (sort
+      (lambda ($binding-1 $binding-2)
+        (>
+          (block-alignment (cdr $binding-1))
+          (block-alignment (cdr $binding-2))))
+      (filter
+        (lambda ($binding) (block? (cdr $binding)))
+        (assembly-bindings $assembly))))
+
+  (define (block-bindings->labels/runs $block-bindings)
+    (fold-left
+      (lambda ($labels/runs $block-binding)
+        (cons 1 2))
+      (cons (stack) (stack))
+      $block-bindings))
+
+  (define (assembly->syntax $assembly)
+    (lets
+      ((pair $label-entries $runs) (block-bindings->labels/runs (assembly-block-bindings $assembly)))
+      ($define-entries (assembly-syntax-lets-entries $assembly))
+      #`(lambda ($org)
+        (lambda ($port)
+          (lets
+            #,@$label-entries
+            #,@$define-entries
+            (run #,@$runs))))))
 )
