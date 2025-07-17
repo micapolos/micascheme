@@ -11,10 +11,7 @@
     assembler-align
     assembler->syntax
     assembler->datum
-    check-assembler
-
-    assembler+syntax
-    syntax->assembler)
+    check-assembler)
   (import (micascheme) (syntax lookup))
 
   (define-keywords $org $port)
@@ -86,19 +83,4 @@
 
   (define-rule-syntax (check-assembler in out)
     (check (equal? (assembler->datum in) 'out)))
-
-  (define (assembler+syntax $lookup $assembler $syntax)
-    (syntax-case $syntax ()
-      (id
-        (identifier? #'id)
-        (assembler+label $assembler #'id))
-      ((id . x)
-        (switch (lookup-ref $lookup (identifier id))
-          ((assembler-transformer? $assembler-transformer)
-            ($assembler-transformer $lookup $assembler $syntax))
-          ((else $other)
-            (syntax-error (identifier id) "not assembler transformer"))))))
-
-  (define (syntax->assembler $lookup $syntax)
-    (assembler+syntax $lookup (empty-assembler) $syntax))
 )
