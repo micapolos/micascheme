@@ -1,7 +1,7 @@
 (import (micascheme) (asm-2 aligned))
 
 (check
-  (aligned-more
+  (aligned-more?
     (aligned 2 "foo")
     (aligned 1 "bar")))
 
