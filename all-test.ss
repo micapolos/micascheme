@@ -87,6 +87,7 @@
   (z80)
   (asm all)
   (asm-2 all)
+  (asm-3 all)
   (c all)
   (emu all)
   (indico all)

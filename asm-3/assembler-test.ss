@@ -1,0 +1,31 @@
+(import (micascheme) (asm-3 assembler))
+
+(check-assembler
+  (fluent (empty-assembler))
+  (assembler (alignment 1) (size 0) (deps)))
+
+(check-assembler
+  (fluent (empty-assembler)
+    (assembler+define #'size #'(- end start))
+    (assembler+label #'start)
+    (assembler+binary 1 #`binary-1)
+    (assembler+binary 2 #`binary-2)
+    (assembler-align 8)
+    (assembler+label #'mid)
+    (assembler+binary 3 #`binary-3)
+    (assembler+dep #'foo)
+    (assembler+dep #'bar)
+    (assembler+dep #'foo)
+    (assembler+label #'end))
+  (assembler
+    (alignment 8)
+    (size 11)
+    (deps foo bar)
+    (start (+ org 0))
+    (mid (+ org 8))
+    (end (+ org 11))
+    (size (- end start))
+    (put-binary $port binary-1)
+    (put-binary $port binary-2)
+    (put-binary $port (zero-binary 5))
+    (put-binary $port binary-3)))
