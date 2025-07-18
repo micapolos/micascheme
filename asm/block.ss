@@ -77,7 +77,14 @@
         (stack (block-relocable-binary-syntax $block)))))
 
   (define (block-bind $block $proc)
-    (block+ $block (localize-block ($proc (empty-block)))))
+    (lets
+      ($local-block ($proc (empty-block)))
+      (fluent $block
+        (block-with-size (+ (block-size $block) (block-size $local-block)))
+        (block-with-relocable-binary-syntaxes
+          (push
+            (block-relocable-binary-syntaxes $block)
+            (relocable+offset (block-relocable-binary-syntax $local-block) (block-size $block)))))))
 
   (define (block+zeroes $block $size)
     (block+relocable-binary-syntax $block $size
