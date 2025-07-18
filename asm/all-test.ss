@@ -1,6 +1,7 @@
 (import (micascheme))
 
 (test
+  (asm lookable)
   (asm type)
   (asm u)
   (asm binary)
