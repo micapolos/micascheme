@@ -3,7 +3,8 @@
     aligned aligned? aligned-alignment aligned-ref
     aligned-more?
     aligned-sort
-    aligned-sorted-refs)
+    aligned-sorted-refs
+    aligned->datum)
   (import (micascheme))
 
   (data (aligned alignment ref))
@@ -18,4 +19,9 @@
 
   (define (aligned-sorted-refs $aligned-list)
     (map aligned-ref (aligned-sort $aligned-list)))
+
+  (define (aligned->datum $ref->datum $aligned)
+    `(aligned
+      ,(aligned-alignment $aligned)
+      ,($ref->datum (aligned-ref $aligned))))
 )

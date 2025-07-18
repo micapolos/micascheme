@@ -18,10 +18,14 @@
   (define (pure-dependent $ref)
     (dependent-with () $ref))
 
-  (define (dependent->datum $dependent)
-    `(dependent-with
-      (,@(map syntax->datum (dependent-identifiers $dependent)))
-      ,(dependent-ref $dependent)))
+  (define dependent->datum
+    (case-lambda
+      (($ref->datum $dependent)
+        `(dependent-with
+          (,@(map syntax->datum (dependent-identifiers $dependent)))
+          ,($ref->datum (dependent-ref $dependent))))
+      (($dependent)
+        (dependent->datum identity $dependent))))
 
   (define-list->/append (dependent $dependents)
     (dependent

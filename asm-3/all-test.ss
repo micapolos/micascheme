@@ -6,4 +6,5 @@
   (asm-3 dependencies)
   (asm-3 sized)
   (asm-3 sized-relocable)
-  (asm-3 block))
+  (asm-3 block)
+  (asm-3 expression))

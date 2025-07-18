@@ -4,7 +4,8 @@
     sized+size
     sized-map
     list->sized
-    sized-append)
+    sized-append
+    sized->datum)
   (import (micascheme))
 
   (data (sized size ref))
@@ -21,4 +22,9 @@
     (sized
       (apply + (map sized-size $sized-list))
       (map sized-ref $sized-list)))
+
+  (define (sized->datum $ref->datum $sized)
+    `(sized
+      ,(sized-size $sized)
+      ,($ref->datum (sized-ref $sized))))
 )
