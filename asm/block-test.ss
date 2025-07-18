@@ -2,6 +2,7 @@
 
 (check-block 100
   (block 30
+    (stack #'dep-a #'dep-b)
     (stack
       (cons #'a 10)
       (cons #'b 20))
@@ -13,6 +14,7 @@
     (stack #'(lib a) #'(lib b)))
   (block (asm test)
     (import (lib a) (lib b))
+    (deps dep-a dep-b)
     (let
       ((a 110) (b 120))
       (binary-append
@@ -35,6 +37,7 @@
     (block+label #'end))
   (block (asm test)
     (import)
+    (deps)
     (let
       ((pre 100) (post 105) (end 108))
       (binary-append

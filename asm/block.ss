@@ -1,8 +1,21 @@
 (library (asm block)
   (export
     block block?
-    block-size block-labels block-relocable-binary-syntaxes block-import-base block-imports
-    block-with-size block-with-labels block-with-relocable-binary-syntaxes block-with-import-base block-with-imports
+
+    block-size
+    block-deps
+    block-labels
+    block-relocable-binary-syntaxes
+    block-import-base
+    block-imports
+
+    block-with-size
+    block-with-deps
+    block-with-labels
+    block-with-relocable-binary-syntaxes
+    block-with-import-base
+    block-with-imports
+
     empty-block
     block-relocable-binary-syntax
     block+label
@@ -19,10 +32,10 @@
     (asm-2 relocable)
     (code))
 
-  (data (block size labels relocable-binary-syntaxes import-base imports))
+  (data (block size deps labels relocable-binary-syntaxes import-base imports))
 
   (define (empty-block)
-    (block 0 (stack) (stack) #'() (stack)))
+    (block 0 (stack) (stack) (stack) #'() (stack)))
 
   (define (block+label $block $label)
     (block-with-labels $block
@@ -110,6 +123,7 @@
     `(block
       ,(syntax->datum (block-import-base $block))
       (import ,@(map syntax->datum (reverse (block-imports $block))))
+      (deps ,@(map syntax->datum (reverse (block-deps $block))))
       ,(syntax->datum (relocable-ref (block-relocable-binary-syntax $block) $org))))
 
   (define-rules-syntax
