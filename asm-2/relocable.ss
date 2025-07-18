@@ -5,6 +5,7 @@
     relocable-ref
     relocable-map
     relocable+offset
+    offset-relocable
     list->relocable
     relocable-append)
   (import (micascheme))
@@ -29,6 +30,9 @@
     (relocable-with ($org)
       (relocable-ref $relocable
         (+ $org $offset))))
+
+  (define (offset-relocable $offset $relocable)
+    (relocable+offset $relocable $offset))
 
   (define (list->relocable $relocables)
     (relocable-with ($org)

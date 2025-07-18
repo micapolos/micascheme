@@ -3,8 +3,9 @@
   (import
     (rename (micascheme) (import %import) (reverse %reverse) (bytevector %bytevector) (make-bytevector %make-bytevector))
     (asm asm)
-    (only (asm block) empty-block block+binary-syntax block+label block-bind block+import block-import-base block-with-import-base)
+    (only (asm block) empty-block block+relocable-binary-syntax block+label block-bind block+import block-import-base block-with-import-base)
     (only (asm binary) db-binary dw-binary)
+    (only (asm-2 relocable) relocable-with)
     (only (binary) binary-append bytevector-binary)
     (only (asm std) bytevector make-bytevector))
 
@@ -12,15 +13,15 @@
     (syntax-case $syntax ()
       ((_ expr ...)
         (lambda ($block)
-          (block+binary-syntax $block (length #'(expr ...))
-            #'(binary-append (db-binary expr) ...))))))
+          (block+relocable-binary-syntax $block (length #'(expr ...))
+            (relocable-with #'(binary-append (db-binary expr) ...)))))))
 
   (define-asm (dw $lookup $syntax)
     (syntax-case $syntax ()
       ((_ expr ...)
         (lambda ($block)
-          (block+binary-syntax $block (* 2 (length #'(expr ...) ))
-            #'(binary-append (dw-binary expr) ...))))))
+          (block+relocable-binary-syntax $block (* 2 (length #'(expr ...) ))
+            (relocable-with #'(binary-append (dw-binary expr) ...)))))))
 
   (define-asm (ds $lookup $syntax)
     (syntax-case $syntax ()
@@ -29,9 +30,10 @@
       ((_ size value)
         (and (integer? (datum size)) (integer? (datum value)))
         (lambda ($block)
-          (block+binary-syntax $block (datum size)
-            #`(bytevector-binary
-              (make-bytevector size value)))))))
+          (block+relocable-binary-syntax $block (datum size)
+            (relocable-with
+              #`(bytevector-binary
+                (make-bytevector size value))))))))
 
   (define-asm (string-m $lookup $syntax)
     (syntax-case $syntax ()
@@ -52,16 +54,17 @@
                     (syntax-error $syntax "non-ascii chars"))
                   (else
                     (lambda ($block)
-                      (block+binary-syntax $block $length
-                        #`(bytevector-binary
-                          (bytevector
-                            #,@(map-with
-                              ($index (iota $length))
-                              ($u7 $u8-list)
-                              (literal->syntax
-                                (if (= $index $last-index)
-                                  (bitwise-ior $u7 #x80)
-                                  $u7))))))))))))))))
+                      (block+relocable-binary-syntax $block $length
+                        (relocable-with
+                          #`(bytevector-binary
+                            (bytevector
+                              #,@(map-with
+                                ($index (iota $length))
+                                ($u7 $u8-list)
+                                (literal->syntax
+                                  (if (= $index $last-index)
+                                    (bitwise-ior $u7 #x80)
+                                    $u7)))))))))))))))))
 
   (define-asm (string-z $lookup $syntax)
     (syntax-case $syntax ()
@@ -78,11 +81,12 @@
                 ($last-index (- $length 1))
                 ($u8-list (bytevector->u8-list $bytevector))
                 (lambda ($block)
-                  (block+binary-syntax $block $length
-                    #`(bytevector-binary
-                      (bytevector
-                        #,@(map literal->syntax $u8-list)
-                        #,(literal->syntax 0))))))))))))
+                  (block+relocable-binary-syntax $block $length
+                    (relocable-with
+                      #`(bytevector-binary
+                        (bytevector
+                          #,@(map literal->syntax $u8-list)
+                          #,(literal->syntax 0)))))))))))))
 
   (define-asm (label $lookup $syntax)
     (syntax-case $syntax ()

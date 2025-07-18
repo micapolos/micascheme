@@ -1,48 +1,78 @@
-(import (micascheme) (asm typed) (asm block) (syntax lookup))
+(import (micascheme) (asm typed) (asm-2 relocable) (asm block) (syntax lookup))
 
-(define-rules-syntax (literals org)
-  ((check-block block stx)
+(define-rules-syntax
+  ((check-block org block stx)
     (check-datum=?
-      (block-binary-syntax block)
+      (relocable-ref (block-relocable-binary-syntax block) org)
       'stx)))
 
-(check-block
-  (block 100
+(check-block 100
+  (block 30
     (stack
-      (cons #'a 110)
-      (cons #'b 120))
+      (cons #'a 10)
+      (cons #'b 20))
     (stack
-      #`(db-binary a)
-      #`(db-binary b))
+      (relocable-with #`(db-binary a))
+      (relocable-with #`(db-binary b))
+      (relocable-with ($org) #`(db-binary #,(literal->syntax (+ $org 2)))))
     #'()
     (stack))
   (let
     ((a 110) (b 120))
-    (binary-append (db-binary a) (db-binary b))))
+    (binary-append
+      (db-binary a)
+      (db-binary b)
+      (db-binary 102))))
 
-(check-block
-  (fluent (empty-block 100)
+(check-block 100
+  (block-append
+    (block 30
+      (stack
+        (cons #'a 10)
+        (cons #'b 20))
+      (stack
+        (relocable-with #`(db-binary a))
+        (relocable-with #`(db-binary b))
+        (relocable-with ($org) #`(db-binary #,(literal->syntax (+ $org 2)))))
+      #'()
+      (stack))
+    (block 50
+      (stack
+        (cons #'c 20)
+        (cons #'d 30))
+      (stack
+        (relocable-with #`(db-binary c))
+        (relocable-with #`(db-binary d))
+        (relocable-with ($org) #`(db-binary #,(literal->syntax (+ $org 5)))))
+      #'()
+      (stack)))
+  (let
+    ((a 110) (b 120) (c 150) (d 160))
+    (binary-append
+      (db-binary a)
+      (db-binary b)
+      (db-binary 102)
+      (db-binary c)
+      (db-binary d)
+      (db-binary 135))))
+
+(check-block 100
+  (fluent (empty-block)
     (block+label #'pre)
-    (block+binary-syntax 2 #'(pre-op))
-    (block-bind
-      (lambda ($block)
-        (fluent $block
-          (block+label #'local)
-          (block+binary-syntax 3 #'(local-op)))))
+    (block+relocable-binary-syntax 2 (relocable-with #'(pre-op)))
     (block+label #'post)
-    (block+binary-syntax 2 #'(post-op))
+    (block+relocable-binary-syntax 3 (relocable-with #'(post-op)))
     (block+label #'end))
   (let
-    ((pre 100) (post 105) (end 107))
+    ((pre 100) (post 102) (end 105))
     (binary-append
       (pre-op)
-      (let ((local 102)) (local-op))
       (post-op))))
 
 (check
   (equal?
     (block->map-string
-      (block-with-labels (empty-block 100)
+      (block-with-labels (empty-block)
         (stack
           (cons #'foo-bar #x1234)
           (cons #'goo->zar/gar #x2345))))

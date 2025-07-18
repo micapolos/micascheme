@@ -12,7 +12,8 @@
     org)
   (import
     (micascheme)
-    (only (asm block) block-binary-syntax empty-block block->map-string)
+    (only (asm block) block-relocable-binary-syntax empty-block block->map-string)
+    (asm-2 relocable)
     (binary)
     (only (asm typed) syntax->expr))
 
@@ -80,10 +81,10 @@
           ($block
             (fold-left
               (lambda ($block $asm) ((syntax->asm $lookup $asm) $block))
-              (empty-block (datum $org))
+              (empty-block)
               #'(asm ...)))
           #`(values
-            #,(syntax->expr $lookup #'binary (block-binary-syntax $block))
+            #,(syntax->expr $lookup #'binary (relocable-ref (block-relocable-binary-syntax $block) (datum $org)))
             #,(literal->syntax (block->map-string $block)))))
       ((_ asm ...)
         #`(asm-binary/map-string (org 0) asm ...))))
