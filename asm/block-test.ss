@@ -2,7 +2,6 @@
 
 (check-block 100
   (block 30
-    (stack #'dep-a #'dep-b)
     (stack
       (cons #'a 10)
       (cons #'b 20))
@@ -14,7 +13,6 @@
     (stack #'(lib a) #'(lib b)))
   (block (asm test)
     (import (lib a) (lib b))
-    (deps dep-a dep-b)
     (let
       ((a 110) (b 120))
       (binary-append
@@ -26,22 +24,17 @@
   (fluent (empty-block)
     (block-with-import-base #'(asm test))
     (block+label #'pre)
-    (block+dep #'dep-a)
-    (block+dep #'dep-b)
     (block+relocable-binary-syntax 2 (relocable-with #'(pre-op)))
     (block-bind
       (lambda ($block)
         (fluent $block
           (block+label #'local)
-          (block+dep #'dep-a)
-          (block+dep #'dep-c)
           (block+relocable-binary-syntax 3 (relocable-with #'(local-op))))))
     (block+label #'post)
     (block+relocable-binary-syntax 3 (relocable-with #'(post-op)))
     (block+label #'end))
   (block (asm test)
     (import)
-    (deps dep-a dep-b dep-c)
     (let
       ((pre 100) (post 105) (end 108))
       (binary-append
