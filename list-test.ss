@@ -593,3 +593,9 @@
   (equal?
     (dedup string=? '("foo" "bar" "bar" "foo" "goo"))
     '("foo" "bar" "goo")))
+
+(check
+  (equal?
+    (dedup-reversed string=? '("foo" "bar" "bar" "foo" "goo"))
+    '("bar" "foo" "goo")))
+

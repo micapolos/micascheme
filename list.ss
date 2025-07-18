@@ -61,7 +61,8 @@
     list*->list
 
     cons/nodup
-    dedup)
+    dedup
+    dedup-reversed)
 
   (import
     (scheme)
@@ -473,4 +474,7 @@
           (cons/nodup $eq? $item $list))
         (list)
         $list)))
+
+  (define (dedup-reversed $eq? $list)
+    (reverse (dedup $eq? (reverse $list))))
 )
