@@ -28,13 +28,19 @@
   (fluent (empty-block)
     (block+label #'pre)
     (block+relocable-binary-syntax 2 (relocable-with #'(pre-op)))
+    (block-bind
+      (lambda ($block)
+        (fluent $block
+          (block+label #'local)
+          (block+relocable-binary-syntax 3 (relocable-with #'(local-op))))))
     (block+label #'post)
     (block+relocable-binary-syntax 3 (relocable-with #'(post-op)))
     (block+label #'end))
   (let
-    ((pre 100) (post 102) (end 105))
+    ((pre 100) (post 105) (end 108))
     (binary-append
       (pre-op)
+      (let ((local 102)) (local-op))
       (post-op))))
 
 (check
