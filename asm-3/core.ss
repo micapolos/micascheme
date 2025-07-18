@@ -11,33 +11,6 @@
     (asm-3 sized)
     (asm-2 relocable))
 
-  (define (syntax->expression $syntax)
-    (syntax-case $syntax ()
-      (id
-        (identifier? #'id)
-        (dependent (list #'id)
-          (lookable ($lookup)
-            (relocable-with ($org)
-              ($lookup #'id)))))
-      (literal
-        ((or? boolean? integer? string? char?) (datum literal))
-        (dependent (list)
-          (lookable ($lookup)
-            (relocable-with ($org)
-              (datum literal)))))
-      (other
-        (syntax-error #'other "invalid expression"))))
-
-  (define (combine-expressions $proc $expressions)
-    (dependent-map
-      (lambda ($lookables)
-        (lookable-map
-          (lambda ($relocables)
-            (relocable-map $proc
-              (list->relocable $relocables)))
-          (list->lookable $lookables)))
-      (list->dependent $expressions)))
-
   (define (list->fragment $fragments)
     (aligned-map
       (lambda ($sized-list)
