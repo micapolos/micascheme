@@ -7,30 +7,34 @@
     (asm-2 aligned)
     (asm-3 sized)
     (asm-3 expression)
-    (asm-3 dependent))
+    (asm-3 dependent)
+    (asm-2 relocable)
+    (asm lookable))
 
-  (data (fragment aligned-sized-binary-expression))
+  ; fragment -> dependent-aligned-sized-relocable-lookable-binary
 
   (define-rule-syntax (expr x)
-    (syntax->dependent-expression #'x))
+    (syntax->expression #'x))
 
   (define-syntax (db $syntax)
     (syntax-case $syntax ()
       ((_ x ...)
-        #`(dependent-map
-          (lambda ($expression)
-            (fragment
-              (aligned 1
-                (sized #,(length #'(x ...))
-                  $expression))))
-          (combine-dependent-expressions
-            (lambda ($values) (list->binary (map u8-binary $values)))
-            (list (expr x) ...))))))
+        (lets
+          ($size (length #'(x ...)))
+          #`(dependent-map
+            (lambda ($relocable-lookable-binary)
+              (aligned 1 (sized #,$size $relocable-lookable-binary)))
+            (combine-expressions
+              (lambda ($values) (list->binary (map u8-binary $values)))
+              (list (expr x) ...)))))))
 
-  (define (fragment->bytevector $lookup $org $fragment)
+  (define (fragment->bytevector $org $lookup $fragment)
     (binary->bytevector
-      (expression-ref $lookup $org
-        (sized-ref
-          (aligned-ref
-            (fragment-aligned-sized-binary-expression $fragment))))))
+      (lookable-ref
+        (relocable-ref
+          (sized-ref
+            (aligned-ref
+              (dependent-ref $fragment)))
+          $org)
+        $lookup)))
 )
