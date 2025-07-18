@@ -1,14 +1,18 @@
-(import (micascheme) (asm typed) (asm-2 relocable) (asm block) (syntax lookup))
+(import (micascheme) (asm typed) (asm lookable) (asm-2 relocable) (asm block) (syntax lookup))
 
-(check-block 100
+(check-block
+  (lookup-with
+    (foo #'"foo")
+    (bar #'"bar"))
+  100
   (block 30
     (stack
       (cons #'a 10)
       (cons #'b 20))
     (stack
-      (relocable-with #`(db-binary a))
-      (relocable-with #`(db-binary b))
-      (relocable-with ($org) #`(db-binary #,(literal->syntax (+ $org 2)))))
+      (lookable (relocable-with #`(db-binary a)))
+      (lookable ($lookup) (relocable-with #`(db-binary #,($lookup #'foo) #,($lookup #'bar))))
+      (lookable (relocable-with ($org) #`(db-binary #,(literal->syntax (+ $org 2))))))
     #'(asm test)
     (stack #'(lib a) #'(lib b)))
   (block (asm test)
@@ -17,21 +21,26 @@
       ((a 110) (b 120))
       (binary-append
         (db-binary a)
-        (db-binary b)
+        (db-binary "foo" "bar")
         (db-binary 102)))))
 
-(check-block 100
+(check-block
+  (lookup-with)
+  100
   (fluent (empty-block)
     (block-with-import-base #'(asm test))
     (block+label #'pre)
-    (block+relocable-binary-syntax 2 (relocable-with #'(pre-op)))
+    (block+lookable-relocable-binary-syntax 2
+      (lookable (relocable-with #'(pre-op))))
     (block-bind
       (lambda ($block)
         (fluent $block
           (block+label #'local)
-          (block+relocable-binary-syntax 3 (relocable-with #'(local-op))))))
+          (block+lookable-relocable-binary-syntax 3
+            (lookable (relocable-with #'(local-op)))))))
     (block+label #'post)
-    (block+relocable-binary-syntax 3 (relocable-with #'(post-op)))
+    (block+lookable-relocable-binary-syntax 3
+      (lookable (relocable-with #'(post-op))))
     (block+label #'end))
   (block (asm test)
     (import)

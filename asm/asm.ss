@@ -12,8 +12,9 @@
     org)
   (import
     (micascheme)
-    (only (asm block) block-relocable-binary-syntax empty-block block->map-string)
+    (only (asm block) block-lookable-relocable-binary-syntax empty-block block->map-string)
     (asm-2 relocable)
+    (asm lookable)
     (binary)
     (only (asm typed) syntax->expr))
 
@@ -84,7 +85,12 @@
               (empty-block)
               #'(asm ...)))
           #`(values
-            #,(syntax->expr $lookup #'binary (relocable-ref (block-relocable-binary-syntax $block) (datum $org)))
+            #,(syntax->expr $lookup #'binary
+              (relocable-ref
+                (lookable-ref
+                  (block-lookable-relocable-binary-syntax $block)
+                  $lookup)
+                (datum $org)))
             #,(literal->syntax (block->map-string $block)))))
       ((_ asm ...)
         #`(asm-binary/map-string (org 0) asm ...))))

@@ -4,20 +4,20 @@
 
     block-size
     block-labels
-    block-relocable-binary-syntaxes
+    block-lookable-relocable-binary-syntaxes
     block-import-base
     block-imports
 
     block-with-size
     block-with-labels
-    block-with-relocable-binary-syntaxes
+    block-with-lookable-relocable-binary-syntaxes
     block-with-import-base
     block-with-imports
 
     empty-block
-    block-relocable-binary-syntax
+    block-lookable-relocable-binary-syntax
     block+label
-    block+relocable-binary-syntax
+    block+lookable-relocable-binary-syntax
     block+zeroes
     block-bind
     block+import
@@ -28,9 +28,10 @@
     (micascheme)
     (asm binary)
     (asm-2 relocable)
+    (asm lookable)
     (code))
 
-  (data (block size labels relocable-binary-syntaxes import-base imports))
+  (data (block size labels lookable-relocable-binary-syntaxes import-base imports))
 
   (define (empty-block)
     (block 0 (stack) (stack) #'() (stack)))
@@ -41,12 +42,15 @@
         (block-labels $block)
         (cons $label (block-size $block)))))
 
-  (define (block+relocable-binary-syntax $block $size $relocable-binary-syntax)
-    (block-with-relocable-binary-syntaxes
+  (define (block+lookable-relocable-binary-syntax $block $size $lookable-relocable-binary-syntax)
+    (block-with-lookable-relocable-binary-syntaxes
       (block-with-size $block (+ (block-size $block) $size))
       (push
-        (block-relocable-binary-syntaxes $block)
-        (relocable+offset $relocable-binary-syntax (block-size $block)))))
+        (block-lookable-relocable-binary-syntaxes $block)
+        (lookable-map
+          (lambda ($relocable-binary-syntax)
+            (relocable+offset $relocable-binary-syntax (block-size $block)))
+          $lookable-relocable-binary-syntax))))
 
   (define (block+import $block $import $proc)
     (cond
@@ -65,43 +69,52 @@
   (define (localize-block $block)
     (fluent $block
       (block-with-labels (stack))
-      (block-with-relocable-binary-syntaxes
-        (stack (block-relocable-binary-syntax $block)))))
+      (block-with-lookable-relocable-binary-syntaxes
+        (stack (block-lookable-relocable-binary-syntax $block)))))
 
   (define (block-bind $block $proc)
     (lets
       ($local-block ($proc (empty-block)))
       (fluent $block
         (block-with-size (+ (block-size $block) (block-size $local-block)))
-        (block-with-relocable-binary-syntaxes
+        (block-with-lookable-relocable-binary-syntaxes
           (push
-            (block-relocable-binary-syntaxes $block)
-            (relocable+offset (block-relocable-binary-syntax $local-block) (block-size $block)))))))
+            (block-lookable-relocable-binary-syntaxes $block)
+            (lookable-map
+              (lambda ($local-relocable-binary-syntax)
+                (relocable+offset $local-relocable-binary-syntax (block-size $block)))
+              (block-lookable-relocable-binary-syntax $local-block)))))))
 
   (define (block+zeroes $block $size)
-    (block+relocable-binary-syntax $block $size
-      (relocable-with
-        #`(zero-binary #,(literal->syntax $size)))))
+    (block+lookable-relocable-binary-syntax $block $size
+      (lookable
+        (relocable-with
+          #`(zero-binary #,(literal->syntax $size))))))
 
   (define (block-align $block $alignment)
     (block+zeroes $block
       (bitwise-align (block-size $block) $alignment)))
 
-  (define (block-relocable-binary-syntax $block)
-    (relocable-with ($org)
-      #`(let
-        (#,@(map-with ($label (reverse (block-labels $block)))
-          #`(
-            #,(car $label)
-            #,(literal->syntax (+ $org (cdr $label))))))
-        #,(relocable-ref
-          (relocable-map
-            (lambda ($binary-syntaxes)
-              (or
-                (single $binary-syntaxes)
-                #`(binary-append #,@$binary-syntaxes)))
-            (list->relocable (reverse (block-relocable-binary-syntaxes $block))))
-          $org))))
+  (define (block-lookable-relocable-binary-syntax $block)
+    (lookable ($lookup)
+      (relocable-with ($org)
+        #`(let
+          (#,@(map-with ($label (reverse (block-labels $block)))
+            #`(
+              #,(car $label)
+              #,(literal->syntax (+ $org (cdr $label))))))
+          #,(relocable-ref
+            (relocable-map
+              (lambda ($binary-syntaxes)
+                (or
+                  (single $binary-syntaxes)
+                  #`(binary-append #,@$binary-syntaxes)))
+              (list->relocable
+                (reverse
+                  (lookable-ref
+                    (list->lookable (block-lookable-relocable-binary-syntaxes $block))
+                    $lookup))))
+            $org)))))
 
   (define (block->map-string $block)
     (code-string
@@ -117,13 +130,16 @@
             (string-code (symbol->string (syntax->datum (car $label))))
             #\newline)))))
 
-  (define (block->datum $org $block)
+  (define (block->datum $lookup $org $block)
     `(block
       ,(syntax->datum (block-import-base $block))
       (import ,@(map syntax->datum (reverse (block-imports $block))))
-      ,(syntax->datum (relocable-ref (block-relocable-binary-syntax $block) $org))))
+      ,(syntax->datum
+        (relocable-ref
+          (lookable-ref (block-lookable-relocable-binary-syntax $block) $lookup)
+          $org))))
 
   (define-rules-syntax
-    ((check-block org block stx)
-      (check (equal? (block->datum org block) 'stx))))
+    ((check-block lookup org block stx)
+      (check (equal? (block->datum lookup org block) 'stx))))
 )
