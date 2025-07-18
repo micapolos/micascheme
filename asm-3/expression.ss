@@ -3,7 +3,8 @@
     syntax->expression
     combine-expressions
     org
-    expression-ref)
+    expression-ref
+    define-expression)
   (import
     (micascheme)
     (asm-3 dependent)
@@ -13,6 +14,11 @@
   (define-keywords org)
 
   (data (expression dependent-lookable-relocable-value))
+
+  (define-rule-syntax (define-expression id x)
+    (define id
+      (make-compile-time-value
+        (syntax->expression #'x))))
 
   (define (expression-ref $org $lookup $expression)
     (relocable-ref

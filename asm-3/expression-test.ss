@@ -1,5 +1,7 @@
 (import (micascheme) (asm-3 expression) (asm-3 dependent) (asm lookable) (asm-2 relocable) (syntax lookup))
 
+(define-expression foo 10)
+
 ; literal
 (check
   (equal?
