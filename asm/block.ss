@@ -21,6 +21,7 @@
     block+label
     block+relocable-binary-syntax
     block+zeroes
+    block+dep
     block-bind
     block+import
     block->map-string
@@ -70,11 +71,16 @@
       (block-with-relocable-binary-syntaxes
         (stack (block-relocable-binary-syntax $block)))))
 
+  (define (block+dep $block $dep)
+    (block-with-deps $block
+      (dedup-reversed free-identifier=? (push (block-deps $block) $dep))))
+
   (define (block-bind $block $proc)
     (lets
       ($local-block ($proc (empty-block)))
       (fluent $block
         (block-with-size (+ (block-size $block) (block-size $local-block)))
+        (block-with-deps (dedup-reversed free-identifier=? (push-all (block-deps $block) (block-deps $local-block))))
         (block-with-relocable-binary-syntaxes
           (push
             (block-relocable-binary-syntaxes $block)

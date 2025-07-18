@@ -26,18 +26,22 @@
   (fluent (empty-block)
     (block-with-import-base #'(asm test))
     (block+label #'pre)
+    (block+dep #'dep-a)
+    (block+dep #'dep-b)
     (block+relocable-binary-syntax 2 (relocable-with #'(pre-op)))
     (block-bind
       (lambda ($block)
         (fluent $block
           (block+label #'local)
+          (block+dep #'dep-a)
+          (block+dep #'dep-c)
           (block+relocable-binary-syntax 3 (relocable-with #'(local-op))))))
     (block+label #'post)
     (block+relocable-binary-syntax 3 (relocable-with #'(post-op)))
     (block+label #'end))
   (block (asm test)
     (import)
-    (deps)
+    (deps dep-a dep-b dep-c)
     (let
       ((pre 100) (post 105) (end 108))
       (binary-append
