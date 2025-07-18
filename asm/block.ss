@@ -10,7 +10,9 @@
     block+zeroes
     block-bind
     block+import
-    block->map-string)
+    block->map-string
+    block->datum
+    check-block)
   (import
     (micascheme)
     (asm binary)
@@ -103,4 +105,14 @@
             #\space
             (string-code (symbol->string (syntax->datum (car $label))))
             #\newline)))))
+
+  (define (block->datum $org $block)
+    `(block
+      ,(syntax->datum (block-import-base $block))
+      (import ,@(map syntax->datum (reverse (block-imports $block))))
+      ,(syntax->datum (relocable-ref (block-relocable-binary-syntax $block) $org))))
+
+  (define-rules-syntax
+    ((check-block org block stx)
+      (check (equal? (block->datum org block) 'stx))))
 )

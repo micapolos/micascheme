@@ -1,11 +1,5 @@
 (import (micascheme) (asm typed) (asm-2 relocable) (asm block) (syntax lookup))
 
-(define-rules-syntax
-  ((check-block org block stx)
-    (check-datum=?
-      (relocable-ref (block-relocable-binary-syntax block) org)
-      'stx)))
-
 (check-block 100
   (block 30
     (stack
@@ -15,17 +9,20 @@
       (relocable-with #`(db-binary a))
       (relocable-with #`(db-binary b))
       (relocable-with ($org) #`(db-binary #,(literal->syntax (+ $org 2)))))
-    #'()
-    (stack))
-  (let
-    ((a 110) (b 120))
-    (binary-append
-      (db-binary a)
-      (db-binary b)
-      (db-binary 102))))
+    #'(asm test)
+    (stack #'(lib a) #'(lib b)))
+  (block (asm test)
+    (import (lib a) (lib b))
+    (let
+      ((a 110) (b 120))
+      (binary-append
+        (db-binary a)
+        (db-binary b)
+        (db-binary 102)))))
 
 (check-block 100
   (fluent (empty-block)
+    (block-with-import-base #'(asm test))
     (block+label #'pre)
     (block+relocable-binary-syntax 2 (relocable-with #'(pre-op)))
     (block-bind
@@ -36,12 +33,14 @@
     (block+label #'post)
     (block+relocable-binary-syntax 3 (relocable-with #'(post-op)))
     (block+label #'end))
-  (let
-    ((pre 100) (post 105) (end 108))
-    (binary-append
-      (pre-op)
-      (let ((local 102)) (local-op))
-      (post-op))))
+  (block (asm test)
+    (import)
+    (let
+      ((pre 100) (post 105) (end 108))
+      (binary-append
+        (pre-op)
+        (let ((local 102)) (local-op))
+        (post-op)))))
 
 (check
   (equal?
