@@ -5,32 +5,36 @@
 ; literal
 (check
   (equal?
-    (expression-ref 100
+    (expression-ref
       (lookup-with)
-      (syntax->expression #'123))
+      100
+      (dependent-ref (syntax->dependent-expression #'123)))
     123))
 
 ; lookup
 (check
   (equal?
-    (expression-ref 100
+    (expression-ref
       (lookup-with (foo 123))
-      (syntax->expression #'foo))
+      100
+      (dependent-ref (syntax->dependent-expression #'foo)))
     123))
 
 ; org
 (check
   (equal?
-    (expression-ref 100
+    (expression-ref
       (lookup-with)
-      (syntax->expression #'org))
+      100
+      (dependent-ref (syntax->dependent-expression #'org)))
     100))
 
 ; application
 (check
   (equal?
-    (expression-ref 100
+    (expression-ref
       (lookup-with (+ +))
-      (syntax->expression #'(+ 10 org)))
+      100
+      (dependent-ref (syntax->dependent-expression #'(+ 10 org))))
     110))
 

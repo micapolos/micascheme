@@ -1,9 +1,10 @@
 (library (asm-3 expression)
   (export
-    syntax->expression
-    combine-expressions
+    syntax->dependent-expression
+    combine-dependent-expressions
     org
     expression-ref
+    dependent-expression-ref
     define-expression)
   (import
     (micascheme)
@@ -13,60 +14,61 @@
 
   (define-keywords org)
 
-  (data (expression dependent-lookable-relocable-value))
+  (data (expression lookable-relocable-value))
 
   (define-rule-syntax (define-expression id x)
     (define id
       (make-compile-time-value
-        (syntax->expression #'x))))
+        (syntax->dependent-expression #'x))))
 
-  (define (expression-ref $org $lookup $expression)
+  (define (dependent-expression-ref $lookup $org $dependent-expression)
+    (expression-ref $lookup $org (dependent-ref $dependent-expression)))
+
+  (define (expression-ref $lookup $org $expression)
     (relocable-ref
       (lookable-ref
-        (dependent-ref
-          (expression-dependent-lookable-relocable-value $expression))
+        (expression-lookable-relocable-value $expression)
         $lookup)
       $org))
 
-  (define (combine-expressions $value-proc $expressions)
-    (expression
-      (dependent-map
-        (lambda ($lookables)
+  (define (combine-dependent-expressions $value-proc $dependent-expressions)
+    (dependent-map
+      (lambda ($expressions)
+        (expression
           (lookable-map
             (lambda ($relocables)
               (relocable-map $value-proc
                 (list->relocable $relocables)))
-            (list->lookable $lookables)))
-        (list->dependent
-          (map expression-dependent-lookable-relocable-value $expressions)))))
+            (list->lookable (map expression-lookable-relocable-value $expressions)))))
+      (list->dependent $dependent-expressions)))
 
-  (define (syntax->expression $syntax)
+  (define (syntax->dependent-expression $syntax)
     (syntax-case $syntax (org)
       (org
-        (expression
-          (dependent (list #'id)
+        (dependent (list #'id)
+          (expression
             (lookable ($lookup)
               (relocable-with ($org)
                 $org)))))
       (id
         (identifier? #'id)
-        (expression
-          (dependent (list #'id)
+        (dependent (list #'id)
+          (expression
             (lookable ($lookup)
               (relocable-with ($org)
                 ($lookup #'id))))))
       (literal
         ((or? boolean? integer? string? char?) (datum literal))
-        (expression
-          (dependent (list)
+        (dependent (list)
+          (expression
             (lookable ($lookup)
               (relocable-with ($org)
                 (datum literal))))))
       ((fn arg ...)
-        (combine-expressions
+        (combine-dependent-expressions
           (lambda ($values)
             (apply (car $values) (cdr $values)))
-          (map syntax->expression #'(fn arg ...))))
+          (map syntax->dependent-expression #'(fn arg ...))))
       (other
         (syntax-error #'other "not expression"))))
 )
