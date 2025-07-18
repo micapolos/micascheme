@@ -10,8 +10,6 @@
     block+zeroes
     block-bind
     block+import
-    list->block
-    block-append
     block->map-string)
   (import
     (micascheme)
@@ -50,25 +48,6 @@
 
   (define (offset-label $offset $label)
     (cons (car $label) (+ (cdr $label) $offset)))
-
-  (define (block+ $block-a $block-b)
-    (lets
-      ($size-a (block-size $block-a))
-      (block
-        (+ $size-a (block-size $block-b))
-        (push-all
-          (block-labels $block-a)
-          (map (partial offset-label $size-a) (block-labels $block-b)))
-        (push-all
-          (block-relocable-binary-syntaxes $block-a)
-          (map (partial offset-relocable $size-a) (block-relocable-binary-syntaxes $block-b)))
-        (block-import-base $block-a)
-        (push-all
-          (block-imports $block-a)
-          (block-imports $block-b)))))
-
-  (define-list->/append (block $blocks)
-    (fold-left block+ (empty-block) $blocks))
 
   (define (localize-block $block)
     (fluent $block
