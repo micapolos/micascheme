@@ -63,6 +63,7 @@
     monoidical-with-ref
     pure-monoidical
     monoidical-map
+    monoidical-update-monoid
     monoidical-append
     list->monoidical)
   (define-case-syntax (define-monoidical (monoidical monoid))
