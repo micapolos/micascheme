@@ -8,5 +8,5 @@
     list->environmental)
   (import (asm-3 base) (asm-3 environment))
 
-  (define-scoped (environmental environment))
+  (define-monoidical (environmental environment))
 )

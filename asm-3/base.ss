@@ -1,7 +1,7 @@
 (library (asm-3 base)
   (export
     define-monoid
-    define-scoped)
+    define-monoidical)
   (import (micascheme) (keyword))
   (export
     (import
@@ -25,33 +25,33 @@
         (define-list->/append (monoid $list) (apply op $list)))))
 
   (expects
-    empty-scope
-    scope-append)
+    empty-monoid
+    monoid-append)
   (defines
-    scoped scoped? scoped-scope scoped-ref
-    scoped-with-scope scoped-with-ref
-    pure-scoped
-    scoped-map
-    scoped-append
-    list->scoped)
-  (define-case-syntax (define-scoped (scoped scope))
+    monoidical monoidical? monoidical-monoid monoidical-ref
+    monoidical-with-monoid monoidical-with-ref
+    pure-monoidical
+    monoidical-map
+    monoidical-append
+    list->monoidical)
+  (define-case-syntax (define-monoidical (monoidical monoid))
     (lets
-      ($scoped-map (identifier-append #'scoped #'scoped #'- #'map))
-      ($scoped-scope (identifier-append #'scoped #'scoped #'- #'scope))
-      ($scoped-ref (identifier-append #'scoped #'scoped #'- #'ref))
-      ($pure-scoped (identifier-append #'scoped #'pure #'- #'scoped))
-      ($empty-scope (identifier-append #'scoped #'empty #'- #'scope))
-      ($scope-append (identifier-append #'scoped #'scope #'- #'append))
+      ($monoidical-map (identifier-append #'monoidical #'monoidical #'- #'map))
+      ($monoidical-monoid (identifier-append #'monoidical #'monoidical #'- #'monoid))
+      ($monoidical-ref (identifier-append #'monoidical #'monoidical #'- #'ref))
+      ($pure-monoidical (identifier-append #'monoidical #'pure #'- #'monoidical))
+      ($empty-monoid (identifier-append #'monoidical #'empty #'- #'monoid))
+      ($monoid-append (identifier-append #'monoidical #'monoid #'- #'append))
       #`(begin
-        (data (scoped scope ref))
-        (define (#,$scoped-map $proc $scoped)
-          (scoped
-            (#,$scoped-scope $scoped)
-            ($proc (#,$scoped-ref $scoped))))
-        (define (#,$pure-scoped $ref)
-          (scoped (#,$empty-scope) $ref))
-        (define-list->/append (scoped $list)
-          (scoped
-            (apply #,$scope-append (map #,$scoped-scope $list))
-            (map #,$scoped-ref $list))))))
+        (data (monoidical monoid ref))
+        (define (#,$monoidical-map $proc $monoidical)
+          (monoidical
+            (#,$monoidical-monoid $monoidical)
+            ($proc (#,$monoidical-ref $monoidical))))
+        (define (#,$pure-monoidical $ref)
+          (monoidical (#,$empty-monoid) $ref))
+        (define-list->/append (monoidical $list)
+          (monoidical
+            (apply #,$monoid-append (map #,$monoidical-monoid $list))
+            (map #,$monoidical-ref $list))))))
 )
