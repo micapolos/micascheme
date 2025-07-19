@@ -11,7 +11,7 @@
     (asm-2 relocable)
     (asm lookable))
 
-  ; fragment -> dependent-aligned-sized-relocable-lookable-binary
+  (define-type fragment (dependent (aligned (sized (relocable (lookable (binary)))))))
 
   (define-rule-syntax (expr x)
     (syntax->expression #'x))

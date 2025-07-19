@@ -13,7 +13,7 @@
     (asm-2 relocable)
     (asm-3 org))
 
-  ; expression -> dependent-relocable-lookable-value
+  (define-type (expression ref) (dependent (relocable (lookable ref))))
 
   (define (pure-expression $value)
     (dependent (list)
