@@ -2,6 +2,7 @@
   (export
     org
     pure-expression
+    org-expression
     syntax->expression
     combine-expressions
     expression-ref)
@@ -19,6 +20,12 @@
       (relocable-with ($org)
         (lookable ($lookup)
           $value))))
+
+  (define (org-expression)
+    (pure-dependent
+      (relocable-with ($org)
+        (pure-lookable
+          $org))))
 
   (define (expression-ref $org $lookup $expression)
     (lookable-ref (relocable-ref (dependent-ref $expression) $org) $lookup))
