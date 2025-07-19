@@ -24,7 +24,7 @@
   (define (resolve-lookable $lookup $lookable)
     ($lookable $lookup))
 
-  (define (lookable-map $proc $lookable)
+  (define (lookable-map $lookable $proc)
     (lookable ($lookup)
       ($proc (lookable-ref $lookable $lookup))))
 
@@ -35,6 +35,6 @@
 
   (define (lookable-append-with $ref-append . $lookables)
     (lookable-map
-      (partial apply $ref-append)
-      (apply lookable-append $lookables)))
+      (apply lookable-append $lookables)
+      (partial apply $ref-append)))
 )

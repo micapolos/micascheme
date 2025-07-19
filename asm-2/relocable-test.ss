@@ -18,8 +18,8 @@
   (equal?
     (relocable-ref
       (relocable-map
-        (lambda ($value) (+ $value 1))
-        (relocable-with ($org) (+ $org 10)))
+        (relocable-with ($org) (+ $org 10))
+        (lambda ($value) (+ $value 1)))
       100)
     111))
 

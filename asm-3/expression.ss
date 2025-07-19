@@ -34,10 +34,9 @@
     (dependent-map (list->dependent $expressions)
       (lambda ($relocables)
         (relocable-map
+          (list->relocable $relocables)
           (lambda ($lookables)
-            (lookable-map $value-proc
-              (list->lookable $lookables)))
-          (list->relocable $relocables)))))
+            (lookable-map (list->lookable $lookables) $value-proc))))))
 
   (define (syntax->expression $syntax)
     (syntax-case $syntax (org)

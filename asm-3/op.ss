@@ -44,16 +44,13 @@
           (lambda ($sized)
             (sized-map $sized
               (lambda ($relocable)
-                (relocable-map
+                (relocable-map $relocable
                   (lambda ($lookable)
-                    (lookable-map
+                    (lookable-map $lookable
                       (lambda ($environmental)
-                        (environmental-update-environment
+                        (environmental-update-environment $environmental
                           (lambda ($environment)
-                            (environment+ $environment $identifier (sized-size $sized)))
-                          $environmental))
-                      $lookable))
-                  $relocable))))))))
+                            (environment+ $environment $identifier (sized-size $sized)))))))))))))))
 
   (define (block+u8-expression $block $expression)
     (dependent-append-with

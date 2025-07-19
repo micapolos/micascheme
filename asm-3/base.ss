@@ -39,7 +39,7 @@
             ($proc (#,$annotated-ref $annotated))))
         (define (#,$map-annotated $proc $annotated)
           (#,$annotated-map $annotated $proc))
-        (define (#,$annotated-update-annotation $proc $annotated)
+        (define (#,$annotated-update-annotation $annotated $proc)
           (#,$annotated-with-annotation $annotated
             ($proc (#,$annotated-annotation $annotated)))))))
 

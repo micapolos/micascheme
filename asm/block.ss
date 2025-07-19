@@ -47,10 +47,9 @@
       (block-with-size $block (+ (block-size $block) $size))
       (push
         (block-lookable-relocable-binary-syntaxes $block)
-        (lookable-map
+        (lookable-map $lookable-relocable-binary-syntax
           (lambda ($relocable-binary-syntax)
-            (relocable+offset $relocable-binary-syntax (block-size $block)))
-          $lookable-relocable-binary-syntax))))
+            (relocable+offset $relocable-binary-syntax (block-size $block)))))))
 
   (define (block+import $block $import $proc)
     (cond
@@ -81,9 +80,9 @@
           (push
             (block-lookable-relocable-binary-syntaxes $block)
             (lookable-map
+              (block-lookable-relocable-binary-syntax $local-block)
               (lambda ($local-relocable-binary-syntax)
-                (relocable+offset $local-relocable-binary-syntax (block-size $block)))
-              (block-lookable-relocable-binary-syntax $local-block)))))))
+                (relocable+offset $local-relocable-binary-syntax (block-size $block)))))))))
 
   (define (block+zeroes $block $size)
     (block+lookable-relocable-binary-syntax $block $size
@@ -105,15 +104,15 @@
               #,(literal->syntax (+ $org (cdr $label))))))
           #,(relocable-ref
             (relocable-map
-              (lambda ($binary-syntaxes)
-                (or
-                  (single $binary-syntaxes)
-                  #`(binary-append #,@$binary-syntaxes)))
               (list->relocable
                 (reverse
                   (lookable-ref
                     (list->lookable (block-lookable-relocable-binary-syntaxes $block))
-                    $lookup))))
+                    $lookup)))
+              (lambda ($binary-syntaxes)
+                (or
+                  (single $binary-syntaxes)
+                  #`(binary-append #,@$binary-syntaxes))))
             $org)))))
 
   (define (block->map-string $block)

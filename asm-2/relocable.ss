@@ -30,7 +30,7 @@
   (define (locate-relocable $org $relocable)
     ((relocable-proc $relocable) $org))
 
-  (define (relocable-map $proc $relocable)
+  (define (relocable-map $relocable $proc)
     (relocable
       (lambda ($org)
         ($proc (relocable-ref $relocable $org)))))
@@ -53,6 +53,6 @@
 
   (define (relocable-append-with $ref-append . $relocables)
     (relocable-map
-      (partial apply $ref-append)
-      (apply relocable-append $relocables)))
+      (apply relocable-append $relocables)
+      (partial apply $ref-append)))
 )
