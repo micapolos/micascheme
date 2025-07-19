@@ -63,22 +63,20 @@
       (lambda ($aligned $expression-relocable)
         (aligned-map
           (lambda ($sized)
-            (sized+size
-              (sized-map
-                (lambda ($block-relocable)
-                  (relocable-append-with
-                    (lambda ($block-lookable $expression-lookable)
-                      (lookable-append-with
-                        (lambda ($environmental $u8)
-                          (environmental-map
-                            (lambda ($binary-stack)
-                              (push $binary-stack (u8-binary $u8)))
-                            $environmental))
-                        $block-lookable $expression-lookable))
-                    $block-relocable
-                    (relocable+offset $expression-relocable (sized-size $sized))))
-                $sized)
-              1))
+            (sized-update $sized
+              (partial + 1)
+              (lambda ($block-relocable)
+                (relocable-append-with
+                  (lambda ($block-lookable $expression-lookable)
+                    (lookable-append-with
+                      (lambda ($environmental $u8)
+                        (environmental-map
+                          (lambda ($binary-stack)
+                            (push $binary-stack (u8-binary $u8)))
+                          $environmental))
+                      $block-lookable $expression-lookable))
+                  $block-relocable
+                  (relocable+offset $expression-relocable (sized-size $sized))))))
           $aligned))
       $block
       $expression))
@@ -88,22 +86,20 @@
       (lambda ($aligned $expression-relocable)
         (aligned-map
           (lambda ($sized)
-            (sized+size
-              (sized-map
-                (lambda ($block-relocable)
-                  (relocable-append-with
-                    (lambda ($block-lookable $expression-lookable)
-                      (lookable-append-with
-                        (lambda ($environmental $u16)
-                          (environmental-map
-                            (lambda ($binary-stack)
-                              (push $binary-stack (u16-binary $u16 $endianness)))
-                            $environmental))
-                        $block-lookable $expression-lookable))
-                    $block-relocable
-                    (relocable+offset $expression-relocable (sized-size $sized))))
-                $sized)
-              2))
+            (sized-update $sized
+              (partial + 2)
+              (lambda ($block-relocable)
+                (relocable-append-with
+                  (lambda ($block-lookable $expression-lookable)
+                    (lookable-append-with
+                      (lambda ($environmental $u16)
+                        (environmental-map
+                          (lambda ($binary-stack)
+                            (push $binary-stack (u16-binary $u16 $endianness)))
+                          $environmental))
+                      $block-lookable $expression-lookable))
+                  $block-relocable
+                  (relocable+offset $expression-relocable (sized-size $sized))))))
           $aligned))
       $block
       $expression))

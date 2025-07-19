@@ -3,7 +3,8 @@
     sized sized? sized-size sized-ref
     sized-map
     sized+size
-    sized->datum)
+    sized->datum
+    sized-update)
   (import (asm-3 base) (asm-3 size))
 
   (define-annotated (sized size))
@@ -16,4 +17,9 @@
     `(sized
       ,(sized-size $sized)
       ,($ref->datum (sized-ref $sized))))
+
+  (define (sized-update $sized $size-proc $ref-proc)
+    (sized
+      ($size-proc (sized-size $sized))
+      ($ref-proc (sized-ref $sized))))
 )
