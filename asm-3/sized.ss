@@ -2,13 +2,10 @@
   (export
     sized sized? sized-size sized-ref
     sized+size
-    sized-map
-    list->sized
-    sized-append
     sized->datum)
   (import (asm-3 base) (asm-3 size))
 
-  (define-monoidical (sized size))
+  (data (sized size ref))
 
   (define (sized+size $sized $size)
     (sized-with-size $sized
