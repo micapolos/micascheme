@@ -2,7 +2,11 @@
   (export
     (rename (%block block) (%+ +))
     wrap db dw)
-  (import (micascheme) (asm-2 fragment) (asm-2 block) (asm-2 block-fragment))
+  (import
+    (micascheme)
+    (asm-2 fragment)
+    (asm-2 block)
+    (asm-2 block-fragment))
 
   (define-rule-syntax (%block line ...)
     (labeled-block-fragment line ...))

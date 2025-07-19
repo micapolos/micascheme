@@ -1,6 +1,6 @@
 (library (asm-3 fragment)
   (export
-    db
+    db dw
     fragment->bytevector)
   (import
     (micascheme)
@@ -26,6 +26,21 @@
               (aligned 1 (sized #,$size $relocable-lookable-binary)))
             (combine-expressions
               (lambda ($values) (list->binary (map u8-binary $values)))
+              (list (expr x) ...)))))))
+
+  (define-syntax (dw $syntax)
+    (syntax-case $syntax ()
+      ((_ x ...)
+        (lets
+          ($size (* 2 (length #'(x ...))))
+          #`(dependent-map
+            (lambda ($relocable-lookable-binary)
+              (aligned 1 (sized #,$size $relocable-lookable-binary)))
+            (combine-expressions
+              (lambda ($values)
+                (list->binary
+                  (map-with ($value $values)
+                    (u16-binary $value (endianness little)))))
               (list (expr x) ...)))))))
 
   (define (fragment->bytevector $org $lookup $fragment)
