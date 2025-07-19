@@ -125,6 +125,6 @@
   (define-rule-syntax (combiner-2 combine proc)
     (combiner combine proc 2))
 
-  (define-rule-syntax (ordered-by order map)
-    (combiner-2 order map))
+  (define-rule-syntax (ordered-by order proc ...)
+    (combiner-2 order (dot proc ...)))
 )

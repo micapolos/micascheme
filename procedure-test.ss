@@ -94,8 +94,23 @@
 (check (equal? ((combiner string-append number->string 3) 1 2 3) "123"))
 (check (equal? ((combiner-2 string-append number->string) 1 2) "12"))
 
+; === ordered-by ===
+
 (check
   (equal?
-    (sort (ordered-by < string-length)
-      (list "foo" "a" "foobar"))
-    (list "a" "foo" "foobar")))
+    (sort (ordered-by <) `(3 1 4))
+    `(1 3 4)))
+
+(check
+  (equal?
+    (sort
+      (ordered-by < string-length)
+      '("foo" "a" "foobar"))
+    '("a" "foo" "foobar")))
+
+(check
+  (equal?
+    (sort
+      (ordered-by < string-length list->string)
+      '((#\f #\o #\o) (#\a) (#\f #\o #\o #\b #\a #\r)))
+    '((#\a) (#\f #\o #\o) (#\f #\o #\o #\b #\a #\r))))
