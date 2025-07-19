@@ -20,17 +20,24 @@
     annotated-ref
     annotated-with-annotation
     annotated-with-ref
-    annotated-map)
+    annotated-map
+    annotated-update-annotation)
   (define-case-syntax (define-annotated (annotated annotation))
     (lets
+      ($annotated-annotation (identifier-append #'annotated #'annotated #'- #'annotation))
+      ($annotated-with-annotation (identifier-append #'annotated #'annotated #'- #'with #'- #'annotation))
       ($annotated-ref (identifier-append #'annotated #'annotated #'- #'ref))
       ($annotated-with-ref (identifier-append #'annotated #'annotated #'- #'with #'- #'ref))
       ($annotated-map (identifier-append #'annotated #'annotated #'- #'map))
+      ($annotated-update-annotation (identifier-append #'annotated #'annotated #'- #'update #'- #'annotation))
       #`(begin
         (data (annotated annotation ref))
         (define (#,$annotated-map $proc $annotated)
           (#,$annotated-with-ref $annotated
-            ($proc (#,$annotated-ref $annotated)))))))
+            ($proc (#,$annotated-ref $annotated))))
+        (define (#,$annotated-update-annotation $proc $annotated)
+          (#,$annotated-with-annotation $annotated
+            ($proc (#,$annotated-annotation $annotated)))))))
 
   (defines
     empty-monoid

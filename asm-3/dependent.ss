@@ -6,6 +6,7 @@
     dependent->datum
     list->dependent
     dependent-append
+    dependent-append-with
     dependent-map
     check-dependent)
   (import (asm-3 base))
@@ -31,6 +32,11 @@
     (dependent
       (dedup free-identifier=? (apply append (map dependent-identifiers $dependents)))
       (map dependent-ref $dependents)))
+
+  (define (dependent-append-with $ref-append . $dependent-list)
+    (dependent-map
+      (partial apply $ref-append)
+      (apply dependent-append $dependent-list)))
 
   (define (dependent-map $proc $dependent)
     (dependent-with-ref $dependent

@@ -1,9 +1,11 @@
 (library (asm lookable)
   (export
     lookable lookable-ref
+    pure-lookable
     lookable-map
     list->lookable
     lookable-append
+    lookable-append-with
     resolve-lookable)
   (import (micascheme))
 
@@ -12,6 +14,9 @@
       (lookable (_) body))
     ((lookable ($lookup) body)
       (lambda ($lookup) body)))
+
+  (define (pure-lookable $obj)
+    (lookable $obj))
 
   (define (lookable-ref $lookable $lookup)
     ($lookable $lookup))
@@ -27,4 +32,9 @@
     (lookable ($lookup)
       (map-with ($lookable $lookables)
         (lookable-ref $lookable $lookup))))
+
+  (define (lookable-append-with $ref-append . $lookables)
+    (lookable-map
+      (partial apply $ref-append)
+      (apply lookable-append $lookables)))
 )

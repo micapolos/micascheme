@@ -1,6 +1,7 @@
 (library (asm-2 relocable)
   (export
     relocable relocable? relocable-proc
+    pure-relocable
     relocable-with
     relocable-ref
     locate-relocable
@@ -8,7 +9,8 @@
     relocable+offset
     offset-relocable
     list->relocable
-    relocable-append)
+    relocable-append
+    relocable-append-with)
   (import (micascheme))
 
   (data (relocable proc))
@@ -18,6 +20,9 @@
       (relocable-with (_) body))
     ((relocable-with ($org) body)
       (relocable (lambda ($org) body))))
+
+  (define (pure-relocable $ref)
+    (relocable-with $ref))
 
   (define (relocable-ref $relocable $org)
     ((relocable-proc $relocable) $org))
@@ -45,4 +50,9 @@
 
   (define (relocable-append . $relocables)
     (list->relocable $relocables))
+
+  (define (relocable-append-with $ref-append . $relocables)
+    (relocable-map
+      (partial apply $ref-append)
+      (apply relocable-append $relocables)))
 )

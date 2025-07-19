@@ -43,3 +43,9 @@
       (aligned 2 "2")
       (aligned 4 "4"))
     (aligned 8 "1824")))
+
+(check
+  (equal?
+    (aligned-map string-length
+      (aligned 16 "foo"))
+    (aligned 16 3)))

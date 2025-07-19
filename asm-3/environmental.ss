@@ -4,6 +4,7 @@
     environmental-with-environment environmental-with-ref
     pure-environmental
     environmental-map
+    environmental-update-environment
     environmental-append
     list->environmental)
   (import (asm-3 base) (asm-3 environment))
