@@ -1,5 +1,6 @@
 (library (asm-3 base)
   (export
+    define-annotated
     define-monoid
     define-monoidical)
   (import (micascheme) (keyword))
@@ -11,6 +12,21 @@
 
   (define-rule-syntax (defines id ...) (begin))
   (define-rule-syntax (expects id ...) (begin))
+
+  (defines
+    annotated annotated? annotated-annotation annotated-ref
+    annotated-with-annotation annotated-with-ref
+    annotated-map)
+  (define-case-syntax (define-annotated (annotated annotation))
+    (lets
+      ($annotated-ref (identifier-append #'annotated #'annotated #'- #'ref))
+      ($annotated-with-ref (identifier-append #'annotated #'annotated #'- #'with #'- #'ref))
+      ($annotated-map (identifier-append #'annotated #'annotated #'- #'map))
+      #`(begin
+        (data (annotated annotation ref))
+        (define (#,$annotated-map $proc $annotated)
+          (#,$annotated-with-ref $annotated
+            ($proc (#,$annotated-ref $annotated)))))))
 
   (defines
     empty-monoid
