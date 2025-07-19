@@ -1,5 +1,6 @@
 (library (asm-3 base)
   (export
+    define-type
     define-annotated
     define-monoid
     define-monoidical)
@@ -10,6 +11,8 @@
         environment
         environment?)))
 
+  ; for documentation purposes only
+  (define-rule-syntax (define-type id ...) (begin))
   (define-rule-syntax (defines id ...) (begin))
   (define-rule-syntax (expects id ...) (begin))
 

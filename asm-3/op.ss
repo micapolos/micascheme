@@ -22,8 +22,8 @@
     (asm-3 environment)
     (asm-3 sized))
 
-  ; block -> dependent-aligned-sized-relocable-lookable-environmental-binary-stack
-  ; op -> (lambda (block) block)
+  (define-type block (dependent (aligned (sized (relocable (lookable (environmental (stack binary))))))))
+  (define-type op (dependent (aligned (sized (relocable (lookable (environmental (stack binary))))))))
 
   (define-rule-syntax (op (block) body)
     (lambda (block) body))
