@@ -21,7 +21,8 @@
     annotated-with-annotation
     annotated-with-ref
     annotated-map
-    annotated-update-annotation)
+    annotated-update-annotation
+    map-annotated)
   (define-case-syntax (define-annotated (annotated annotation))
     (lets
       ($annotated-annotation (identifier-append #'annotated #'annotated #'- #'annotation))
@@ -29,12 +30,15 @@
       ($annotated-ref (identifier-append #'annotated #'annotated #'- #'ref))
       ($annotated-with-ref (identifier-append #'annotated #'annotated #'- #'with #'- #'ref))
       ($annotated-map (identifier-append #'annotated #'annotated #'- #'map))
+      ($map-annotated (identifier-append #'annotated #'map #'- #'annotated))
       ($annotated-update-annotation (identifier-append #'annotated #'annotated #'- #'update #'- #'annotation))
       #`(begin
         (data (annotated annotation ref))
         (define (#,$annotated-map $annotated $proc)
           (#,$annotated-with-ref $annotated
             ($proc (#,$annotated-ref $annotated))))
+        (define (#,$map-annotated $proc $annotated)
+          (#,$annotated-map $annotated $proc))
         (define (#,$annotated-update-annotation $proc $annotated)
           (#,$annotated-with-annotation $annotated
             ($proc (#,$annotated-annotation $annotated)))))))
@@ -65,7 +69,8 @@
     monoidical-map
     monoidical-update-monoid
     monoidical-append
-    list->monoidical)
+    list->monoidical
+    map-monoidical)
   (define-case-syntax (define-monoidical (monoidical monoid))
     (lets
       ($monoidical-monoid (identifier-append #'monoidical #'monoidical #'- #'monoid))
