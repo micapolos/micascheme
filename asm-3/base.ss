@@ -14,8 +14,12 @@
   (define-rule-syntax (expects id ...) (begin))
 
   (defines
-    annotated annotated? annotated-annotation annotated-ref
-    annotated-with-annotation annotated-with-ref
+    annotated
+    annotated?
+    annotated-annotation
+    annotated-ref
+    annotated-with-annotation
+    annotated-with-ref
     annotated-map)
   (define-case-syntax (define-annotated (annotated annotation))
     (lets
@@ -44,26 +48,25 @@
     empty-monoid
     monoid-append)
   (defines
-    monoidical monoidical? monoidical-monoid monoidical-ref
-    monoidical-with-monoid monoidical-with-ref
+    monoidical
+    monoidical?
+    monoidical-monoid
+    monoidical-ref
+    monoidical-with-monoid
+    monoidical-with-ref
     pure-monoidical
     monoidical-map
     monoidical-append
     list->monoidical)
   (define-case-syntax (define-monoidical (monoidical monoid))
     (lets
-      ($monoidical-map (identifier-append #'monoidical #'monoidical #'- #'map))
       ($monoidical-monoid (identifier-append #'monoidical #'monoidical #'- #'monoid))
       ($monoidical-ref (identifier-append #'monoidical #'monoidical #'- #'ref))
       ($pure-monoidical (identifier-append #'monoidical #'pure #'- #'monoidical))
       ($empty-monoid (identifier-append #'monoidical #'empty #'- #'monoid))
       ($monoid-append (identifier-append #'monoidical #'monoid #'- #'append))
       #`(begin
-        (data (monoidical monoid ref))
-        (define (#,$monoidical-map $proc $monoidical)
-          (monoidical
-            (#,$monoidical-monoid $monoidical)
-            ($proc (#,$monoidical-ref $monoidical))))
+        (define-annotated (monoidical monoid))
         (define (#,$pure-monoidical $ref)
           (monoidical (#,$empty-monoid) $ref))
         (define-list->/append (monoidical $list)
