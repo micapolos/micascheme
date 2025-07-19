@@ -88,3 +88,14 @@
 ; === ignore ===
 
 (check (equal? (ignore 10 20) 20))
+
+; === combiner ===
+
+(check (equal? ((combiner string-append number->string 3) 1 2 3) "123"))
+(check (equal? ((combiner-2 string-append number->string) 1 2) "12"))
+
+(check
+  (equal?
+    (sort (ordered-by < string-length)
+      (list "foo" "a" "foobar"))
+    (list "a" "foo" "foobar")))

@@ -14,7 +14,10 @@
     todo TODO
     dot
     dot-app
-    ignore)
+    ignore
+    combiner
+    combiner-2
+    ordered-by)
   (import
     (scheme)
     (syntax)
@@ -109,4 +112,19 @@
     (lambda ($x) (dot-app $fn ... $x)))
 
   (define (ignore $in $out) $out)
+
+  (define-case-syntax (combiner combine proc arity)
+    (let
+      (($temporaries (generate-temporaries (iota (datum arity))))
+       ($proc #'proc))
+      #`(lambda (#,@$temporaries)
+        (combine #,@(map
+          (lambda ($temporary) #`(#,$proc #,$temporary))
+          $temporaries)))))
+
+  (define-rule-syntax (combiner-2 combine proc)
+    (combiner combine proc 2))
+
+  (define-rule-syntax (ordered-by combine proc)
+    (combiner-2 combine proc))
 )
