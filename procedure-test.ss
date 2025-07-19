@@ -47,6 +47,11 @@
 
 (check (equal? ((partial string-append "a" "b") "c" "d") "abcd"))
 
+; === partial-tail ===
+
+(check (equal? ((partial-tail string-append) "a" "b") "ab"))
+(check (equal? ((partial-tail string-append "c" "d") "a" "b") "abcd"))
+
 ; === todo ===
 
 (check (raises (todo)))

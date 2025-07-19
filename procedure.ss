@@ -10,13 +10,12 @@
     app
     values-app
     partial
+    partial-tail
     values-apply
     todo TODO
     dot
     dot-app
     ignore
-    ;combiner
-    ;combiner-2
     ordered-by)
   (import
     (scheme)
@@ -88,6 +87,10 @@
   (define (partial $proc . $partial-args)
     (lambda $args
       (apply $proc (append $partial-args $args))))
+
+  (define (partial-tail $proc . $partial-args)
+    (lambda $args
+      (apply $proc (append $args $partial-args))))
 
   (define (todo)
     (throw todo))
