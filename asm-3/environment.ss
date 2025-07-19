@@ -5,7 +5,8 @@
     environment-with
     environment+
     environment+identified-value
-    environment-ref)
+    environment-ref
+    environment->lookup)
   (import
     (except (micascheme) environment environment?)
     (asm-3 identified))
@@ -41,4 +42,8 @@
             (environment-identified-values $environment)))
         (identified-ref (car $found)))
       (syntax-error $identifier "undefined")))
+
+  (define (environment->lookup $environment)
+    (lambda ($identifier)
+      (environment-ref $environment $identifier)))
 )

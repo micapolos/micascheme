@@ -1,7 +1,7 @@
 (library (asm-3 assembler)
   (export assemble)
   (import
-    (micascheme)
+    (except (micascheme) environment environment?)
     (syntax lookup)
     (asm-3 dependencies)
     (asm-2 relocable)
@@ -11,7 +11,8 @@
     (asm-3 sized)
     (asm-3 located)
     (asm-3 identified)
-    (asm-3 size-address))
+    (asm-3 size-address)
+    (asm-3 environment))
 
   (define (assemble $lookup $org $identifier)
     (lets
@@ -32,14 +33,15 @@
       ($offsets (sizes->addresses $sizes))
       ($addresses (map (partial + $org) $offsets))
       ($lookables (map locate-relocable $addresses $relocables))
-      ($lookup (fold-left lookup+ (empty-lookup) $identifiers $addresses))
-      ($lookup
+      ($environment (fold-left environment+ (empty-environment) $identifiers $addresses))
+      ($environment
         (fold-left
-          (lambda ($lookup $identifier $lookable)
-            (lookup+ $lookup $identifier (lookable-ref $lookable $lookup)))
-          $lookup
+          (lambda ($environment $identifier $lookable)
+            (environment+ $environment $identifier (lookable-ref $lookable (environment->lookup $environment))))
+          $environment
           (map identified-identifier $identified-relocable-list)
           (map (dot (partial locate-relocable $org) identified-ref) $identified-relocable-list)))
+      ($lookup (environment->lookup $environment))
       ($binaries (map (partial resolve-lookable $lookup) $lookables))
       ($binary (list->binary $binaries))
       ($bytevector (binary->bytevector $binary))
