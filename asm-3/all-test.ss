@@ -5,7 +5,7 @@
   (asm-3 dependent)
   (asm-3 dependencies)
   (asm-3 sized)
-  (asm-3 sized-located)
+  (asm-3 size-address)
   (asm-3 block)
   (asm-3 located)
   (asm-3 expression)
