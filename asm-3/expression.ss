@@ -30,7 +30,7 @@
   (define (syntax->expression $syntax)
     (syntax-case $syntax (org)
       (org
-        (dependent (list #'id)
+        (dependent (list)
           (relocable-with ($org)
             (lookable ($lookup)
               $org))))

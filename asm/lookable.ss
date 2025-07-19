@@ -3,7 +3,8 @@
     lookable lookable-ref
     lookable-map
     list->lookable
-    lookable-append)
+    lookable-append
+    resolve-lookable)
   (import (micascheme))
 
   (define-rules-syntax
@@ -13,6 +14,9 @@
       (lambda ($lookup) body)))
 
   (define (lookable-ref $lookable $lookup)
+    ($lookable $lookup))
+
+  (define (resolve-lookable $lookup $lookable)
     ($lookable $lookup))
 
   (define (lookable-map $proc $lookable)

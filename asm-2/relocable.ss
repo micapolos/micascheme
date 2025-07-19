@@ -3,6 +3,7 @@
     relocable relocable? relocable-proc
     relocable-with
     relocable-ref
+    locate-relocable
     relocable-map
     relocable+offset
     offset-relocable
@@ -19,6 +20,9 @@
       (relocable (lambda ($org) body))))
 
   (define (relocable-ref $relocable $org)
+    ((relocable-proc $relocable) $org))
+
+  (define (locate-relocable $org $relocable)
     ((relocable-proc $relocable) $org))
 
   (define (relocable-map $proc $relocable)
