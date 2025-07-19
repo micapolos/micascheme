@@ -17,16 +17,9 @@
   (define (assemble $lookup $org $identifier)
     (lets
       ($identified-list (resolve-dependencies $lookup $identifier))
-      ($identified-aligned-list
-        (filter
-          (lambda ($identified) (aligned? (identified-ref $identified)))
-          $identified-list))
-      ($identified-relocable-list
-        (filter
-          (lambda ($identified) (relocable? (identified-ref $identified)))
-          $identified-list))
-      ($identified-sized-list
-        (sort-identified-aligned-list $identified-aligned-list))
+      ($identified-aligned-list (filter (dot aligned? identified-ref) $identified-list))
+      ($identified-relocable-list (filter (dot relocable? identified-ref) $identified-list))
+      ($identified-sized-list (sort-identified-aligned-list $identified-aligned-list))
       ($identifiers (map identified-identifier $identified-sized-list))
       ($sizes (map (dot sized-size identified-ref) $identified-sized-list))
       ($relocables (map (dot sized-ref identified-ref) $identified-sized-list))
