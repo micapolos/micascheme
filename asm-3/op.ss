@@ -2,6 +2,8 @@
   (export
     empty-block
     block+op
+    block+u8-expression
+    block+u16-expression
     u8-op
     u16-op
     block->bytevector
