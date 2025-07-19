@@ -6,6 +6,7 @@
     block+u16-expression
     u8-op
     u16-op
+    identifier-op
     block->bytevector
     op->bytevector
     op-append
@@ -18,6 +19,7 @@
     (asm lookable)
     (asm-2 aligned)
     (asm-3 environmental)
+    (asm-3 environment)
     (asm-3 sized))
 
   ; block -> dependent-aligned-sized-relocable-lookable-environmental-binary-stack
@@ -34,6 +36,27 @@
             (pure-lookable
               (pure-environmental
                 (stack))))))))
+
+  (define (block+identifier $block $identifier)
+    (dependent-map
+      (lambda ($aligned)
+        (aligned-map
+          (lambda ($sized)
+            (sized-map
+              (lambda ($relocable)
+                (relocable-map
+                  (lambda ($lookable)
+                    (lookable-map
+                      (lambda ($environmental)
+                        (environmental-update-environment
+                          (lambda ($environment)
+                            (environment+ $environment $identifier (sized-size $sized)))
+                          $environmental))
+                      $lookable))
+                  $relocable))
+              $sized))
+          $aligned))
+      $block))
 
   (define (block+u8-expression $block $expression)
     (dependent-append-with
@@ -92,6 +115,10 @@
   (define (u16-op $expression $endianness)
     (op ($block)
       (block+u16-expression $block $expression $endianness)))
+
+  (define (identifier-op $identifier)
+    (op ($block)
+      (block+identifier $block $identifier)))
 
   (define (block+op $block $op)
     ($op $block))

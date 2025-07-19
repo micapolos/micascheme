@@ -43,3 +43,13 @@
         (u8-op (pure-expression 20))
         (u16-op (org-expression) (endianness big))))
     (bytevector 10 #xc0 #x01 20 #xc0 #x04)))
+
+(check
+  (equal?
+    (op->bytevector #xc000 (empty-lookup)
+      (op-append
+        (identifier-op #'start)
+        (u8-op (pure-expression 10))
+        (u8-op (pure-expression 20))
+        (identifier-op #'end)))
+    (bytevector 10 20)))
