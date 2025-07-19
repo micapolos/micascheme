@@ -7,8 +7,8 @@
     (syntax)
     (identifier))
 
-  (define-case-syntax (keyword-append part ...)
-    (apply identifier-append #'keyword-append #'(part ...)))
+  (define-case-syntax (keyword-append tpl part ...)
+    (apply identifier-append #'tpl #'(part ...)))
 
   (define-rule-syntax (keyword-replace old new body)
     (let-syntax

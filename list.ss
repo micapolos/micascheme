@@ -441,8 +441,8 @@
 
   (define-case-syntax (define-list->/append (id list) body ...)
     (lets
-      ($list->id (identifier-append #'define-list->/append #'list-> #'id))
-      ($append-id (identifier-append #'define-list->/append #'id #'- #'append))
+      ($list->id (identifier-append #'id #'list-> #'id))
+      ($append-id (identifier-append #'id #'id #'- #'append))
       #`(begin
         (define (#,$list->id list) body ...)
         (define (#,$append-id . list) (#,$list->id list)))))

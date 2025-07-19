@@ -6,7 +6,9 @@
     environment+
     environment+identified-value
     environment-ref
-    environment->lookup)
+    environment->lookup
+    list->environment
+    environment-append)
   (import
     (asm-3 base)
     (asm-3 identified))
@@ -46,4 +48,7 @@
   (define (environment->lookup $environment)
     (lambda ($identifier)
       (environment-ref $environment $identifier)))
+
+  (define-list->/append (environment $list)
+    (environment (apply append (map environment-identified-values $list))))
 )
