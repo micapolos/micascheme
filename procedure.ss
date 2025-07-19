@@ -15,8 +15,8 @@
     dot
     dot-app
     ignore
-    combiner
-    combiner-2
+    ;combiner
+    ;combiner-2
     ordered-by)
   (import
     (scheme)
