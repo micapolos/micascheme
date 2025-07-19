@@ -33,57 +33,63 @@
               (pure-environmental
                 (stack))))))))
 
+  (define (block+u8-expression $block $expression)
+    (dependent-append-with
+      (lambda ($aligned $expression-relocable)
+        (aligned-map
+          (lambda ($sized)
+            (sized+size
+              (sized-map
+                (lambda ($block-relocable)
+                  (relocable-append-with
+                    (lambda ($block-lookable $expression-lookable)
+                      (lookable-append-with
+                        (lambda ($environmental $u8)
+                          (environmental-map
+                            (lambda ($binary-stack)
+                              (push $binary-stack (u8-binary $u8)))
+                            $environmental))
+                        $block-lookable $expression-lookable))
+                    $block-relocable
+                    (relocable+offset $expression-relocable (sized-size $sized))))
+                $sized)
+              1))
+          $aligned))
+      $block
+      $expression))
+
+  (define (block+u16-expression $block $expression $endianness)
+    (dependent-append-with
+      (lambda ($aligned $expression-relocable)
+        (aligned-map
+          (lambda ($sized)
+            (sized+size
+              (sized-map
+                (lambda ($block-relocable)
+                  (relocable-append-with
+                    (lambda ($block-lookable $expression-lookable)
+                      (lookable-append-with
+                        (lambda ($environmental $u16)
+                          (environmental-map
+                            (lambda ($binary-stack)
+                              (push $binary-stack (u16-binary $u16 $endianness)))
+                            $environmental))
+                        $block-lookable $expression-lookable))
+                    $block-relocable
+                    (relocable+offset $expression-relocable (sized-size $sized))))
+                $sized)
+              2))
+          $aligned))
+      $block
+      $expression))
+
   (define (u8-op $expression)
     (op ($block)
-      (dependent-append-with
-        (lambda ($aligned $expression-relocable)
-          (aligned-map
-            (lambda ($sized)
-              (sized+size
-                (sized-map
-                  (lambda ($block-relocable)
-                    (relocable-append-with
-                      (lambda ($block-lookable $expression-lookable)
-                        (lookable-append-with
-                          (lambda ($environmental $u8)
-                            (environmental-map
-                              (lambda ($binary-stack)
-                                (push $binary-stack (u8-binary $u8)))
-                              $environmental))
-                          $block-lookable $expression-lookable))
-                      $block-relocable
-                      (relocable+offset $expression-relocable (sized-size $sized))))
-                  $sized)
-                1))
-            $aligned))
-        $block
-        $expression)))
+      (block+u8-expression $block $expression)))
 
-  (define (u16-op $expression)
+  (define (u16-op $expression $endianness)
     (op ($block)
-      (dependent-append-with
-        (lambda ($aligned $expression-relocable)
-          (aligned-map
-            (lambda ($sized)
-              (sized+size
-                (sized-map
-                  (lambda ($block-relocable)
-                    (relocable-append-with
-                      (lambda ($block-lookable $expression-lookable)
-                        (lookable-append-with
-                          (lambda ($environmental $u16)
-                            (environmental-map
-                              (lambda ($binary-stack)
-                                (push $binary-stack (u16-binary $u16 (endianness little))))
-                              $environmental))
-                          $block-lookable $expression-lookable))
-                      $block-relocable
-                      (relocable+offset $expression-relocable (sized-size $sized))))
-                  $sized)
-                2))
-            $aligned))
-        $block
-        $expression)))
+      (block+u16-expression $block $expression $endianness)))
 
   (define (block+op $block $op)
     ($op $block))
