@@ -23,7 +23,7 @@
     (asm-3 sized))
 
   (define-type block (dependent (aligned (sized (relocable (lookable (environmental (stack binary))))))))
-  (define-type op (dependent (aligned (sized (relocable (lookable (environmental (stack binary))))))))
+  (define-type op (lambda (block) block))
 
   (define-rule-syntax (op (block) body)
     (lambda (block) body))
