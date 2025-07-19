@@ -1,0 +1,6 @@
+(library (asm-3 org)
+  (export org org? org-address)
+  (import (micascheme))
+
+  (data (org address))
+)

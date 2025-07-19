@@ -9,9 +9,8 @@
     (micascheme)
     (asm-3 dependent)
     (asm lookable)
-    (asm-2 relocable))
-
-  (define-keywords org)
+    (asm-2 relocable)
+    (asm-3 org))
 
   ; expression -> dependent-relocable-lookable-value
 

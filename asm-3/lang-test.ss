@@ -8,10 +8,10 @@
 
 (check
   (equal?
-    (assembled-asm 100 db-10)
+    (assembled-asm (org 100) db-10)
     (assembled 100 (bytevector 10))))
 
 (check
   (equal?
-    (assembled-asm 100 empty-proc)
+    (assembled-asm (org 100) empty-proc)
     (assembled 100 (bytevector 201))))
