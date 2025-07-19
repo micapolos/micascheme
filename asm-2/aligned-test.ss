@@ -34,3 +34,12 @@
         (aligned 2 "2")
         (aligned 4 "4")))
     (list "8" "4" "2" "1")))
+
+(check
+  (equal?
+    (aligned-append-with string-append
+      (aligned 1 "1")
+      (aligned 8 "8")
+      (aligned 2 "2")
+      (aligned 4 "4"))
+    (aligned 8 "1824")))
