@@ -141,9 +141,10 @@
                     (sized-map $sized
                       (lambda ($relocable)
                         `(stack
-                          ,@(map binary->datum
-                            (environmental-ref
-                              (lookable-ref (relocable-ref $relocable $org) $lookup)))))))))))))))
+                          ,@(reverse
+                            (map binary->datum
+                              (environmental-ref
+                                (lookable-ref (relocable-ref $relocable $org) $lookup))))))))))))))))
 
   (define (op->datum $org $lookup $op)
     `(op ,(cadr (block->datum $org $lookup (block+op (empty-block) $op)))))
