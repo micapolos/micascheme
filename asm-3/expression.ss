@@ -3,9 +3,14 @@
     org
     pure-expression
     org-expression
+    identifier-expression
+    application-expression
     syntax->expression
     combine-expressions
-    expression-ref)
+    expression-map
+    expression-ref
+    expression->datum
+    check-expression)
   (import
     (asm-3 base)
     (asm-3 dependent)
@@ -27,8 +32,35 @@
         (pure-lookable
           $org))))
 
+  (define (identifier-expression $identifier)
+    (dependent (list $identifier)
+      (relocable-with ($org)
+        (lookable ($lookup)
+          ($lookup $identifier)))))
+
+  (define (application-expression $fn-expression . $arg-expressions)
+    (apply dependent-append-with
+      (lambda ($fn-relocable . $arg-relocables)
+        (apply relocable-append-with
+          (lambda ($fn-lookable . $arg-lookables)
+            (apply lookable-append-with
+              (lambda ($fn . $args)
+                (apply $fn $args))
+              (cons $fn-lookable $arg-lookables)))
+          (cons $fn-relocable $arg-relocables)))
+      (cons $fn-expression $arg-expressions)))
+
   (define (expression-ref $org $lookup $expression)
     (lookable-ref (relocable-ref (dependent-ref $expression) $org) $lookup))
+
+  (define (expression-map $expression $proc)
+    (dependent-map $expression
+      (lambda ($relocable)
+        (relocable-map $relocable
+          (lambda ($lookable)
+            (lookable-map $lookable
+              (lambda ($ref)
+                ($proc $ref))))))))
 
   (define (combine-expressions $value-proc $expressions)
     (dependent-map (list->dependent $expressions)
@@ -64,4 +96,14 @@
           (map syntax->expression #'(fn arg ...))))
       (other
         (syntax-error #'other "not expression"))))
+
+  (define (expression->datum $org $lookup $expression)
+    `(expression
+      ,(dependent->datum
+        (dependent-map $expression
+          (lambda ($relocable)
+            (lookable-ref (relocable-ref $relocable $org) $lookup))))))
+
+  (define-rule-syntax (check-expression org lookup expression datum)
+    (check (equal? (expression->datum org lookup expression) 'datum)))
 )
