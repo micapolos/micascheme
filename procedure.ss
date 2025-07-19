@@ -10,7 +10,7 @@
     app
     values-app
     partial
-    partial-tail
+    partial-flip
     values-apply
     todo TODO
     dot
@@ -88,7 +88,7 @@
     (lambda $args
       (apply $proc (append $partial-args $args))))
 
-  (define (partial-tail $proc . $partial-args)
+  (define (partial-flip $proc . $partial-args)
     (lambda $args
       (apply $proc (append $args $partial-args))))
 

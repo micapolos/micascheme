@@ -47,10 +47,10 @@
 
 (check (equal? ((partial string-append "a" "b") "c" "d") "abcd"))
 
-; === partial-tail ===
+; === partial-flip ===
 
-(check (equal? ((partial-tail string-append) "a" "b") "ab"))
-(check (equal? ((partial-tail string-append "c" "d") "a" "b") "abcd"))
+(check (equal? ((partial-flip string-append) "a" "b") "ab"))
+(check (equal? ((partial-flip string-append "c" "d") "a" "b") "abcd"))
 
 ; === todo ===
 
