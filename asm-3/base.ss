@@ -1,5 +1,7 @@
 (library (asm-3 base)
-  (export define-scoped)
+  (export
+    define-monoid
+    define-scoped)
   (import (micascheme) (keyword))
   (export
     (import
@@ -9,6 +11,18 @@
 
   (define-rule-syntax (defines id ...) (begin))
   (define-rule-syntax (expects id ...) (begin))
+
+  (defines
+    empty-monoid
+    monoid-append
+    list->monoid)
+  (define-case-syntax (define-monoid (monoid zero op))
+    (lets
+      ($empty-monoid (identifier-append #'monoid #'empty #'- #'monoid))
+      #`(begin
+        (data (monoid ref))
+        (define (#,$empty-monoid) zero)
+        (define-list->/append (monoid $list) (apply op $list)))))
 
   (expects
     empty-scope

@@ -6,22 +6,13 @@
     list->sized
     sized-append
     sized->datum)
-  (import (asm-3 base))
+  (import (asm-3 base) (asm-3 size))
 
-  (data (sized size ref))
+  (define-scoped (sized size))
 
   (define (sized+size $sized $size)
     (sized-with-size $sized
       (+ (sized-size $sized) $size)))
-
-  (define (sized-map $proc $sized)
-    (sized-with-ref $sized
-      ($proc (sized-ref $sized))))
-
-  (define-list->/append (sized $sized-list)
-    (sized
-      (apply + (map sized-size $sized-list))
-      (map sized-ref $sized-list)))
 
   (define (sized->datum $ref->datum $sized)
     `(sized
