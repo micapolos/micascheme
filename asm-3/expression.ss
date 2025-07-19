@@ -1,6 +1,7 @@
 (library (asm-3 expression)
   (export
     org
+    pure-expression
     syntax->expression
     combine-expressions
     expression-ref)
@@ -13,6 +14,12 @@
   (define-keywords org)
 
   ; expression -> dependent-relocable-lookable-value
+
+  (define (pure-expression $value)
+    (dependent (list)
+      (relocable-with ($org)
+        (lookable ($lookup)
+          $value))))
 
   (define (expression-ref $org $lookup $expression)
     (lookable-ref (relocable-ref (dependent-ref $expression) $org) $lookup))

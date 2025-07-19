@@ -2,11 +2,62 @@
 
 (define dependent-lookup
   (lookup-with
-    (val-20 (syntax->expression #'20))
+    (+ (pure-expression +))
+    (val-20 (pure-expression 20))
+    (val-30 (syntax->expression #'(+ 10 val-20)))
+    (data-10 (db 10))
+    (data-20 (db val-20))
+    (data-30 (db val-30))
+    (data-10-20-30 (db 10 val-20 val-30))
+    (data-org (db org))
+    (data-org+10 (db (+ org 10)))
+    (data-org+20 (db (+ org val-20)))
+    (data-org+30 (db (+ org val-30)))
+    (sub-20 (db val-20))
     (sub-30 (db 30))
     (sub-40 (db 40))
     (call-30-40 (db 255 sub-30 255 sub-40))
     (main (db 10 val-20 255 call-30-40 255 sub-40 255 sub-30 org))))
+
+(check
+  (equal?
+    (assemble dependent-lookup 100 #'data-10)
+    (located 100 (bytevector 10))))
+
+(check
+  (equal?
+    (assemble dependent-lookup 100 #'data-20)
+    (located 100 (bytevector 20))))
+
+(check
+  (equal?
+    (assemble dependent-lookup 100 #'data-30)
+    (located 100 (bytevector 30))))
+
+(check
+  (equal?
+    (assemble dependent-lookup 100 #'data-10-20-30)
+    (located 100 (bytevector 10 20 30))))
+
+(check
+  (equal?
+    (assemble dependent-lookup 100 #'data-org)
+    (located 100 (bytevector 100))))
+
+(check
+  (equal?
+    (assemble dependent-lookup 100 #'data-org+10)
+    (located 100 (bytevector 110))))
+
+(check
+  (equal?
+    (assemble dependent-lookup 100 #'data-org+20)
+    (located 100 (bytevector 120))))
+
+(check
+  (equal?
+    (assemble dependent-lookup 100 #'data-org+30)
+    (located 100 (bytevector 130))))
 
 (check
   (equal?
