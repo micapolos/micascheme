@@ -10,4 +10,5 @@
   (asm-3 located)
   (asm-3 expression)
   (asm-3 fragment)
-  (asm-3 assembler))
+  (asm-3 assembler)
+  (asm-3 lang))
