@@ -1,14 +1,14 @@
 (import (asm-3 base) (asm-3 op) (asm-3 expression) (syntax lookup))
 
-(check
-  (equal?
-    (block->bytevector #xc000 (empty-lookup) (empty-block))
-    (bytevector)))
+(check-block #xc000
+  (empty-lookup)
+  (empty-block)
+  (block (dependent (aligned 1 (sized 0 (stack))))))
 
-(check
-  (equal?
-    (op->bytevector #xc000 (empty-lookup) (u8-op (pure-expression 123)))
-    (bytevector 123)))
+(check-op #xc000
+  (empty-lookup)
+  (u8-op (pure-expression 123))
+  (op (dependent (aligned 1 (sized 1 (stack (binary 123)))))))
 
 (check
   (equal?

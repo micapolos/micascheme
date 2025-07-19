@@ -27,8 +27,8 @@
   (define (aligned-sorted-refs $aligned-list)
     (map aligned-ref (aligned-sort $aligned-list)))
 
-  (define (aligned->datum $ref->datum $aligned)
+  (define (aligned->datum $aligned)
     `(aligned
       ,(aligned-alignment $aligned)
-      ,($ref->datum (aligned-ref $aligned))))
+      ,(aligned-ref $aligned)))
 )

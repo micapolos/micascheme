@@ -13,10 +13,10 @@
     (sized-with-size $sized
       (+ (sized-size $sized) $size)))
 
-  (define (sized->datum $ref->datum $sized)
+  (define (sized->datum $sized)
     `(sized
       ,(sized-size $sized)
-      ,($ref->datum (sized-ref $sized))))
+      ,(sized-ref $sized)))
 
   (define (sized-update $sized $size-proc $ref-proc)
     (sized

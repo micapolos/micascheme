@@ -11,7 +11,8 @@
     u8-binary
     u16-binary
     bytevector-binary
-    utf8-binary)
+    utf8-binary
+    binary->datum)
   (import (scheme) (syntax) (syntaxes) (procedure) (port))
 
   (define-rules-syntax
@@ -64,4 +65,7 @@
   (define (utf8-binary $string)
     (binary ($port)
       (put-bytevector $port (string->utf8 $string))))
+
+  (define (binary->datum $binary)
+    `(binary ,@(bytevector->u8-list (binary->bytevector $binary))))
 )

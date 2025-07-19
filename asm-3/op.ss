@@ -10,7 +10,11 @@
     block->bytevector
     op->bytevector
     op-append
-    list->op)
+    list->op
+    block->datum
+    op->datum
+    check-block
+    check-op)
   (import
     (asm-3 base)
     (asm-3 expression)
@@ -124,6 +128,31 @@
       (reverse)
       (list->binary)
       (binary->bytevector)))
+
+  (define (block->datum $org $lookup $block)
+    `(block
+      ,(dependent->datum
+        (dependent-map $block
+          (lambda ($aligned)
+            (aligned->datum
+              (aligned-map $aligned
+                (lambda ($sized)
+                  (sized->datum
+                    (sized-map $sized
+                      (lambda ($relocable)
+                        `(stack
+                          ,@(map binary->datum
+                            (environmental-ref
+                              (lookable-ref (relocable-ref $relocable $org) $lookup)))))))))))))))
+
+  (define (op->datum $org $lookup $op)
+    `(op ,(cadr (block->datum $org $lookup (block+op (empty-block) $op)))))
+
+  (define-rule-syntax (check-block org lookup block out)
+    (check (equal? (block->datum org lookup block) 'out)))
+
+  (define-rule-syntax (check-op org lookup op out)
+    (check (equal? (op->datum org lookup op) 'out)))
 
   (define (op->bytevector $org $lookup $op)
     (block->bytevector $org $lookup (block+op (empty-block) $op)))
