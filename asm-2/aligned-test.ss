@@ -46,6 +46,5 @@
 
 (check
   (equal?
-    (aligned-map string-length
-      (aligned 16 "foo"))
+    (aligned-map (aligned 16 "foo") string-length)
     (aligned 16 3)))

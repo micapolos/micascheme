@@ -38,11 +38,11 @@
                 (stack))))))))
 
   (define (block+identifier $block $identifier)
-    (dependent-map
+    (dependent-map $block
       (lambda ($aligned)
-        (aligned-map
+        (aligned-map $aligned
           (lambda ($sized)
-            (sized-map
+            (sized-map $sized
               (lambda ($relocable)
                 (relocable-map
                   (lambda ($lookable)
@@ -53,15 +53,12 @@
                             (environment+ $environment $identifier (sized-size $sized)))
                           $environmental))
                       $lookable))
-                  $relocable))
-              $sized))
-          $aligned))
-      $block))
+                  $relocable))))))))
 
   (define (block+u8-expression $block $expression)
     (dependent-append-with
       (lambda ($aligned $expression-relocable)
-        (aligned-map
+        (aligned-map $aligned
           (lambda ($sized)
             (sized-update $sized
               (partial + 1)
@@ -70,21 +67,19 @@
                   (lambda ($block-lookable $expression-lookable)
                     (lookable-append-with
                       (lambda ($environmental $u8)
-                        (environmental-map
+                        (environmental-map $environmental
                           (lambda ($binary-stack)
-                            (push $binary-stack (u8-binary $u8)))
-                          $environmental))
+                            (push $binary-stack (u8-binary $u8)))))
                       $block-lookable $expression-lookable))
                   $block-relocable
-                  (relocable+offset $expression-relocable (sized-size $sized))))))
-          $aligned))
+                  (relocable+offset $expression-relocable (sized-size $sized))))))))
       $block
       $expression))
 
   (define (block+u16-expression $block $expression $endianness)
     (dependent-append-with
       (lambda ($aligned $expression-relocable)
-        (aligned-map
+        (aligned-map $aligned
           (lambda ($sized)
             (sized-update $sized
               (partial + 2)
@@ -93,14 +88,12 @@
                   (lambda ($block-lookable $expression-lookable)
                     (lookable-append-with
                       (lambda ($environmental $u16)
-                        (environmental-map
+                        (environmental-map $environmental
                           (lambda ($binary-stack)
-                            (push $binary-stack (u16-binary $u16 $endianness)))
-                          $environmental))
+                            (push $binary-stack (u16-binary $u16 $endianness)))))
                       $block-lookable $expression-lookable))
                   $block-relocable
-                  (relocable+offset $expression-relocable (sized-size $sized))))))
-          $aligned))
+                  (relocable+offset $expression-relocable (sized-size $sized))))))))
       $block
       $expression))
 

@@ -35,10 +35,10 @@
 
   (define (dependent-append-with $ref-append . $dependent-list)
     (dependent-map
-      (partial apply $ref-append)
-      (apply dependent-append $dependent-list)))
+      (apply dependent-append $dependent-list)
+      (partial apply $ref-append)))
 
-  (define (dependent-map $proc $dependent)
+  (define (dependent-map $dependent $proc)
     (dependent-with-ref $dependent
       ($proc (dependent-ref $dependent))))
 

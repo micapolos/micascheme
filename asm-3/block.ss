@@ -48,9 +48,8 @@
         (push-all
           (block-identified-offset-stack $block)
           (map-with ($other-identified-offset (block-identified-offset-stack $other-block))
-            (identified-map
-              (lambda ($offset) (+ (block-size $block) $offset))
-              $other-identified-offset)))
+            (identified-map $other-identified-offset
+              (lambda ($offset) (+ (block-size $block) $offset)))))
         (push-all
           (block-identified-expression-syntax-stack $block)
           (block-identified-expression-syntax-stack $other-block))

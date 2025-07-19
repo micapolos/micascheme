@@ -32,7 +32,7 @@
       ($annotated-update-annotation (identifier-append #'annotated #'annotated #'- #'update #'- #'annotation))
       #`(begin
         (data (annotated annotation ref))
-        (define (#,$annotated-map $proc $annotated)
+        (define (#,$annotated-map $annotated $proc)
           (#,$annotated-with-ref $annotated
             ($proc (#,$annotated-ref $annotated))))
         (define (#,$annotated-update-annotation $proc $annotated)

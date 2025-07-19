@@ -31,14 +31,13 @@
     (lookable-ref (relocable-ref (dependent-ref $expression) $org) $lookup))
 
   (define (combine-expressions $value-proc $expressions)
-    (dependent-map
+    (dependent-map (list->dependent $expressions)
       (lambda ($relocables)
         (relocable-map
           (lambda ($lookables)
             (lookable-map $value-proc
               (list->lookable $lookables)))
-          (list->relocable $relocables)))
-      (list->dependent $expressions)))
+          (list->relocable $relocables)))))
 
   (define (syntax->expression $syntax)
     (syntax-case $syntax (org)

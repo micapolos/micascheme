@@ -43,7 +43,7 @@
   (define (sort-identified-aligned-list $identified-aligned-list)
     (map
       (lambda ($identified)
-        (identified-map aligned-ref $identified))
+        (identified-map $identified aligned-ref))
       (sort
         (ordered-by aligned-more? identified-ref)
         $identified-aligned-list)))
