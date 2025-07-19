@@ -1,0 +1,44 @@
+(library (asm-3 environment)
+  (export
+    environment environment? environment-identified-values
+    empty-environment
+    environment-with
+    environment+
+    environment+identified-value
+    environment-ref)
+  (import
+    (except (micascheme) environment environment?)
+    (asm-3 identified))
+
+  (data (environment identified-values))
+
+  (define-rule-syntax (environment-with (id value) ...)
+    (fluent (empty-environment)
+      (environment+ #'id value) ...))
+
+  (define (empty-environment)
+    (environment (list)))
+
+  (define (environment+ $environment $identifier $value)
+    (environment
+      (cons
+        (identified $identifier $value)
+        (environment-identified-values $environment))))
+
+  (define (environment+identified-value $environment $identified-value)
+    (environment
+      (cons
+        $identified-value
+        (environment-identified-values $environment))))
+
+  (define (environment-ref $environment $identifier)
+    (or
+      (lets?
+        ($found
+          (memp
+            (lambda ($identified)
+              (identified-identifier=? $identified $identifier))
+            (environment-identified-values $environment)))
+        (identified-ref (car $found)))
+      (syntax-error $identifier "undefined")))
+)

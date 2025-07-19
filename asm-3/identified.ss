@@ -4,7 +4,8 @@
     identified-with
     identified->syntax
     identified-map
-    identified->datum)
+    identified->datum
+    identified-identifier=?)
   (import (micascheme))
 
   (data (identified identifier ref))
@@ -25,4 +26,7 @@
     `(identified
       ,(syntax->datum (identified-identifier $identified))
       ,($ref->datum (identified-ref $identified))))
+
+  (define (identified-identifier=? $identified $identifier)
+    (free-identifier=? $identifier (identified-identifier $identified)))
 )
