@@ -1,4 +1,4 @@
-(import (micascheme) (asm-3 dependencies) (asm-3 dependent) (syntax lookup))
+(import (asm-3 base) (asm-3 dependencies) (asm-3 dependent) (syntax lookup))
 
 (check-dependencies
   (resolve-dependencies

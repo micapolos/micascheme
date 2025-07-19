@@ -6,7 +6,7 @@
     identified-map
     identified->datum
     identified-identifier=?)
-  (import (micascheme))
+  (import (asm-3 base))
 
   (data (identified identifier ref))
 

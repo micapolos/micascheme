@@ -3,7 +3,7 @@
     db dw
     fragment->bytevector)
   (import
-    (micascheme)
+    (asm-3 base)
     (asm-2 aligned)
     (asm-3 sized)
     (asm-3 expression)

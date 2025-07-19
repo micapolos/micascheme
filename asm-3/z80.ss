@@ -38,7 +38,7 @@
     rcf)
 
   (import
-    (only (micascheme) define-keywords define-rules-syntaxes literals)
+    (only (asm-3 base) define-keywords define-rules-syntaxes literals)
     (asm-3 fragment))
 
   (define-keywords

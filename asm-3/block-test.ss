@@ -1,4 +1,4 @@
-(import (micascheme) (asm-3 block) (asm-2 relocable) (asm-3 identified))
+(import (asm-3 base) (asm-3 block) (asm-2 relocable) (asm-3 identified))
 
 (check-block
   (fluent (empty-block))

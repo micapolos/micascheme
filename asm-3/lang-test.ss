@@ -1,4 +1,4 @@
-(import (micascheme) (asm-3 lang) (asm-3 expression) (asm-3 fragment) (asm-3 assembled))
+(import (asm-3 base) (asm-3 lang) (asm-3 expression) (asm-3 fragment) (asm-3 assembled))
 
 (define-asm val-10 (pure-expression 10))
 (define-asm db-10 (db val-10))

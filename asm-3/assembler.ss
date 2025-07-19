@@ -1,7 +1,7 @@
 (library (asm-3 assembler)
   (export assemble)
   (import
-    (except (micascheme) environment environment?)
+    (asm-3 base)
     (syntax lookup)
     (asm-3 dependencies)
     (asm-2 relocable)

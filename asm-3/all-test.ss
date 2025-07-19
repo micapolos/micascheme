@@ -1,6 +1,7 @@
-(import (micascheme))
+(import (asm-3 base))
 
 (test
+  (asm-3 base)
   (asm-3 identified)
   (asm-3 environment)
   (asm-3 org)

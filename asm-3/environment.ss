@@ -8,7 +8,7 @@
     environment-ref
     environment->lookup)
   (import
-    (except (micascheme) environment environment?)
+    (asm-3 base)
     (asm-3 identified))
 
   (data (environment identified-values))

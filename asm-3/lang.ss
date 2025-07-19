@@ -3,7 +3,7 @@
     define-asm
     assembled-asm)
   (import
-    (micascheme)
+    (asm-3 base)
     (asm-3 located)
     (asm-3 assembler)
     (asm-3 assembled)

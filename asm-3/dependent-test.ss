@@ -1,4 +1,4 @@
-(import (micascheme) (asm-3 dependent))
+(import (asm-3 base) (asm-3 dependent))
 
 (check-dependent
   (pure-dependent 10)

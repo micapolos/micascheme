@@ -4,7 +4,7 @@
     resolve-dependencies
     dependencies->datum
     check-dependencies)
-  (import (micascheme) (asm-3 identified) (asm-3 dependent) (syntax lookup))
+  (import (asm-3 base) (asm-3 identified) (asm-3 dependent) (syntax lookup))
 
   (define (dependencies-ref? $dependencies $identifier)
     (lets?

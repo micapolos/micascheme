@@ -15,7 +15,7 @@
     list->block
     block-append)
   (import
-    (micascheme)
+    (asm-3 base)
     (syntax lookup)
     (asm-2 relocable)
     (asm-3 identified)

@@ -1,4 +1,4 @@
-(import (micascheme) (asm-3 size-address))
+(import (asm-3 base) (asm-3 size-address))
 
 (check
   (equal?

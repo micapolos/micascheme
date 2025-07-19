@@ -6,7 +6,7 @@
     list->sized
     sized-append
     sized->datum)
-  (import (micascheme))
+  (import (asm-3 base))
 
   (data (sized size ref))
 

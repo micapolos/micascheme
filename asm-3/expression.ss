@@ -6,7 +6,7 @@
     combine-expressions
     expression-ref)
   (import
-    (micascheme)
+    (asm-3 base)
     (asm-3 dependent)
     (asm lookable)
     (asm-2 relocable)

@@ -1,6 +1,6 @@
 (library (asm-3 size-address)
   (export sizes->addresses)
-  (import (micascheme) (asm-3 sized) (asm-3 located))
+  (import (asm-3 base) (asm-3 sized) (asm-3 located))
 
   (define (sizes->addresses $sizes)
     (reverse

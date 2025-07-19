@@ -5,7 +5,7 @@
     assembled-start-address
     assembled-bytevector
     assembled->syntax)
-  (import (micascheme))
+  (import (asm-3 base))
 
   (data (assembled start-address bytevector))
 
