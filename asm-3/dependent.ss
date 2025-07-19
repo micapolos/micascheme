@@ -22,9 +22,13 @@
   (define dependent->datum
     (case-lambda
       (($ref->datum $dependent)
-        `(dependent-with
-          (,@(map syntax->datum (dependent-identifiers $dependent)))
-          ,($ref->datum (dependent-ref $dependent))))
+        `(dependent
+          ,@(filter-opts
+            (list
+              (switch (dependent-identifiers $dependent)
+                ((null? _) #f)
+                ((else $identifiers) `(,@(map syntax->datum $identifiers))))
+              ($ref->datum (dependent-ref $dependent))))))
       (($dependent)
         (dependent->datum identity $dependent))))
 

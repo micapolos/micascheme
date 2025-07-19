@@ -4,64 +4,55 @@
 (check-expression 100
   (empty-lookup)
   (pure-expression 123)
-  (expression (dependent-with () 123)))
+  (expression (dependent 123)))
 
 ; identifier-expression
-(check
-  (equal?
-    (expression-ref 100
-      (lookup-with (foo 123))
-      (identifier-expression #'foo))
-    123))
+(check-expression 100
+  (lookup-with (foo 123))
+  (identifier-expression #'foo)
+  (expression (dependent (foo) 123)))
 
 ; org-expression
-(check
-  (equal?
-    (expression-ref 100
-      (lookup-with)
-      (org-expression))
-    100))
+(check-expression 100
+  (empty-lookup)
+  (org-expression)
+  (expression (dependent 100)))
 
 ; application-expression
-(check
-  (equal?
-    (expression-ref 100
-      (lookup-with (ten 10))
-      (application-expression
-        (pure-expression +)
-        (org-expression)
-        (identifier-expression #'ten)
-        (pure-expression 1)))
-    111))
+(check-expression 100
+  (lookup-with
+    (val-10 10)
+    (val-20 20))
+  (application-expression
+    (pure-expression +)
+    (org-expression)
+    (identifier-expression #'val-10)
+    (identifier-expression #'val-20)
+    (pure-expression 1))
+  (expression (dependent (val-10 val-20) 131)))
 
 ; literal
-(check
-  (equal?
-    (expression-ref 100
-      (lookup-with)
-      (syntax->expression #'123))
-    123))
+(check-expression 100
+  (empty-lookup)
+  (syntax->expression #'123)
+  (expression (dependent 123)))
 
 ; lookup
-(check
-  (equal?
-    (expression-ref 100
-      (lookup-with (foo 123))
-      (syntax->expression #'foo))
-    123))
+(check-expression 100
+  (lookup-with (foo 123))
+  (syntax->expression #'foo)
+  (expression (dependent (foo) 123)))
 
 ; org
-(check
-  (equal?
-    (expression-ref 100
-      (lookup-with)
-      (syntax->expression #'org))
-    100))
+(check-expression 100
+  (empty-lookup)
+  (syntax->expression #'org)
+  (expression (dependent 100)))
 
 ; application
-(check
-  (equal?
-    (expression-ref 100
-      (lookup-with (+ +))
-      (syntax->expression #'(+ 10 org)))
-    110))
+(check-expression 100
+  (lookup-with
+    (add +)
+    (val-20 20))
+  (syntax->expression #'(add 10 val-20 org))
+  (expression (dependent (add val-20) 130)))
