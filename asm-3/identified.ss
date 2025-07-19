@@ -8,7 +8,7 @@
     identified-identifier=?)
   (import (asm-3 base))
 
-  (data (identified identifier ref))
+  (define-annotated (identified identifier))
 
   (define-rule-syntax (identified-with id ref)
     (identified #'id ref))
@@ -17,10 +17,6 @@
     #`(
       #,(identified-identifier $identified)
       #,($ref->syntax (identified-ref $identified))))
-
-  (define (identified-map $proc $identified)
-    (identified-with-ref $identified
-      ($proc (identified-ref $identified))))
 
   (define (identified->datum $ref->datum $identified)
     `(identified
