@@ -73,27 +73,17 @@
   (define (syntax->expression $syntax)
     (syntax-case $syntax (org)
       (org
-        (dependent (list)
-          (relocable-with ($org)
-            (lookable ($lookup)
-              $org))))
+        (org-expression))
       (id
         (identifier? #'id)
-        (dependent (list #'id)
-          (relocable-with ($org)
-            (lookable ($lookup)
-              ($lookup #'id)))))
+        (identifier-expression #'id))
       (literal
         ((or? boolean? integer? string? char?) (datum literal))
-        (dependent (list)
-          (relocable-with ($org)
-            (lookable ($lookup)
-              (datum literal)))))
+        (pure-expression (datum literal)))
       ((fn arg ...)
-        (combine-expressions
-          (lambda ($values)
-            (apply (car $values) (cdr $values)))
-          (map syntax->expression #'(fn arg ...))))
+        (apply application-expression
+          (syntax->expression #'fn)
+          (map syntax->expression #'(arg ...))))
       (other
         (syntax-error #'other "not expression"))))
 
