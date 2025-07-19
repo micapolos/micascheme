@@ -21,7 +21,7 @@
             (name-string (symbol->string (datum name)))
             (name-syntax (datum->syntax #'id name-string))
             (constructor-identifier #'name)
-            (predicate-identifier (identifier-append #'id #'name #'?))
+            (predicate-identifier (identifier-append #'name #'name #'?))
             #`(define-values (#,constructor-identifier #,predicate-identifier)
               (let ((rtd (make-record-type #,name-syntax '())))
                 (record-writer rtd
@@ -45,28 +45,28 @@
             (all-fields (append fields (or (and list-field-opt (list list-field-opt)) '())))
             (name-string (symbol->string (datum name)))
             (tmp #'rtd)
-            (record-name (identifier-append #'id #'% #'name))
-            (make-name (identifier-append #'id #'make #'- #'name))
+            (record-name (identifier-append #'name #'% #'name))
+            (make-name (identifier-append #'name #'make #'- #'name))
             (make-all-name (if list-field-opt make-name #'name))
-            (rtd-name (identifier-append #'id #'name #'- #'rtd))
+            (rtd-name (identifier-append #'name #'name #'- #'rtd))
             (prefix-name (string-append name-string "-"))
-            (predicate-name (identifier-append #'id #'name #'?))
+            (predicate-name (identifier-append #'name #'name #'?))
             (accessors
               (map-with (field fields)
-                (identifier-append #'id #'name #'- field)))
+                (identifier-append #'name #'name #'- field)))
             (list-accessor-opt
               (and list-field-opt
-                (identifier-append #'id #'name #'- list-field-opt)))
+                (identifier-append #'name #'name #'- list-field-opt)))
             (all-accessors
               (if list-accessor-opt
                 (append accessors (list list-accessor-opt))
                 accessors))
             (setters
               (map-with (field fields)
-                (identifier-append #'id #'name #'- #'with #'- field)))
+                (identifier-append #'name #'name #'- #'with #'- field)))
             (list-setter-opt
               (and list-field-opt
-                (identifier-append #'id #'name #'- #'with #'- list-field-opt)))
+                (identifier-append #'name #'name #'- #'with #'- list-field-opt)))
             (all-setters
               (if list-setter-opt
                 (append setters (list list-setter-opt))
@@ -104,7 +104,7 @@
                       (and
                       #,@(map-with (field all-fields)
                         (lets
-                          (fld (identifier-append #'id #'name #'- field))
+                          (fld (identifier-append #'name #'name #'- field))
                           #`(eq (#,fld a) (#,fld b)))))))
                   (record-type-hash-procedure
                     #,tmp
@@ -112,7 +112,7 @@
                       (+
                       #,@(map-with (field all-fields)
                         (lets
-                          (fld (identifier-append #'id #'name #'- field))
+                          (fld (identifier-append #'name #'name #'- field))
                           #`(hash (#,fld a)))))))
                   rtd-body ...
                   #,tmp))
@@ -136,7 +136,7 @@
               #,@(map-with
                 (index (iota (length all-fields)))
                 (field all-fields)
-                #`(define #,(identifier-append #'id #'name #'- field)
+                #`(define #,(identifier-append #'name #'name #'- field)
                   (record-accessor #,rtd-name #,index)))
               #,@(map-with
                 ($setter-index (iota (length all-setters)))
