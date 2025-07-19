@@ -1,4 +1,10 @@
-(import (micascheme) (asm-3 assembler) (asm-3 expression) (asm-3 fragment) (asm-3 located) (syntax lookup))
+(import
+  (micascheme)
+  (asm-3 assembler)
+  (asm-3 expression)
+  (asm-3 fragment)
+  (asm-3 assembled)
+  (syntax lookup))
 
 (define dependent-lookup
   (lookup-with
@@ -22,59 +28,59 @@
 (check
   (equal?
     (assemble dependent-lookup 100 #'data-10)
-    (located 100 (bytevector 10))))
+    (assembled 100 (bytevector 10))))
 
 (check
   (equal?
     (assemble dependent-lookup 100 #'data-20)
-    (located 100 (bytevector 20))))
+    (assembled 100 (bytevector 20))))
 
 (check
   (equal?
     (assemble dependent-lookup 100 #'data-30)
-    (located 100 (bytevector 30))))
+    (assembled 100 (bytevector 30))))
 
 (check
   (equal?
     (assemble dependent-lookup 100 #'data-10-20-30)
-    (located 100 (bytevector 10 20 30))))
+    (assembled 100 (bytevector 10 20 30))))
 
 (check
   (equal?
     (assemble dependent-lookup 100 #'data-org)
-    (located 100 (bytevector 100))))
+    (assembled 100 (bytevector 100))))
 
 (check
   (equal?
     (assemble dependent-lookup 100 #'data-org+10)
-    (located 100 (bytevector 110))))
+    (assembled 100 (bytevector 110))))
 
 (check
   (equal?
     (assemble dependent-lookup 100 #'data-org+20)
-    (located 100 (bytevector 120))))
+    (assembled 100 (bytevector 120))))
 
 (check
   (equal?
     (assemble dependent-lookup 100 #'data-org+30)
-    (located 100 (bytevector 130))))
+    (assembled 100 (bytevector 130))))
 
 (check
   (equal?
     (assemble dependent-lookup 100 #'sub-30)
-    (located 100 (bytevector 30))))
+    (assembled 100 (bytevector 30))))
 
 (check
   (equal?
     (assemble dependent-lookup 100 #'sub-40)
-    (located 100 (bytevector 40))))
+    (assembled 100 (bytevector 40))))
 
 (check
   (equal?
     (assemble dependent-lookup 100 #'call-30-40)
-    (located 102 (bytevector 30 40 #xff 100 #xff 101))))
+    (assembled 102 (bytevector 30 40 #xff 100 #xff 101))))
 
 (check
   (equal?
     (assemble dependent-lookup 100 #'main)
-    (located 106 (bytevector 30 40 255 100 255 101 10 20 255 102 255 101 255 100 106))))
+    (assembled 106 (bytevector 30 40 255 100 255 101 10 20 255 102 255 101 255 100 106))))

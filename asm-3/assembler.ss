@@ -6,6 +6,7 @@
     (asm-3 dependencies)
     (asm-2 relocable)
     (asm lookable)
+    (asm-3 assembled)
     (asm-2 aligned)
     (asm-3 sized)
     (asm-3 located)
@@ -42,7 +43,7 @@
       ($binaries (map (partial resolve-lookable $lookup) $lookables))
       ($binary (list->binary $binaries))
       ($bytevector (binary->bytevector $binary))
-      (located ($lookup $identifier) $bytevector)))
+      (assembled ($lookup $identifier) $bytevector)))
 
   (define (sort-identified-aligned-list $identified-aligned-list)
     (map
