@@ -3,7 +3,8 @@
     define-type
     define-annotated
     define-monoid
-    define-monoidical)
+    define-monoidical
+    define-doable)
   (import (micascheme) (keyword))
   (export
     (import
@@ -15,6 +16,20 @@
   (define-rule-syntax (define-type id ...) (begin))
   (define-rule-syntax (defines id ...) (begin))
   (define-rule-syntax (expects id ...) (begin))
+
+  (defines doable doable?)
+  (define-case-syntax (define-doable (doable done))
+    (lets
+      ($doable? (identifier-append #'doable #'doable #'?))
+      ($done? (identifier-append #'done #'done #'?))
+      ($pure-done (identifier-append #'doable #'pure #'- #'done))
+      #`(begin
+        (define (#,$doable? $obj)
+          ((or? #,$doable? #,$done?) $obj))
+        (define (doable $obj)
+          (switch $obj
+            ((#,$done? $done) $done)
+            ((else $other) (#,$pure-done $other)))))))
 
   (defines
     annotated

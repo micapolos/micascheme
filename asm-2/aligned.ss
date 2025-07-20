@@ -1,6 +1,7 @@
 (library (asm-2 aligned)
   (export
     aligned aligned? aligned-alignment aligned-ref
+    pure-aligned
     aligned-more?
     aligned-sort
     aligned-sorted-refs
@@ -10,6 +11,9 @@
   (import (asm-3 base))
 
   (define-annotated (aligned alignment))
+
+  (define (pure-aligned $obj)
+    (aligned 1 $obj))
 
   (define (aligned-append-with $ref-append . $list)
     (aligned
