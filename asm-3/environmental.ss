@@ -6,8 +6,13 @@
     environmental-map
     environmental-update-environment
     environmental-append
-    list->environmental)
+    list->environmental
+    environmental-append-map)
   (import (asm-3 base) (asm-3 environment))
 
   (define-monoidical (environmental environment))
+
+  (define (environmental-append-map $proc . $list)
+    (environmental-map $proc
+      (apply environmental-append $list)))
 )

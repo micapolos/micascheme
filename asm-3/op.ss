@@ -1,6 +1,10 @@
 (library (asm-3 op)
   (export
     empty-block
+    u8-block
+    u16-block
+    list->block
+    block-append
     block+op
     block+u8-expression
     block+u16-expression
@@ -22,6 +26,7 @@
     (asm-2 relocable)
     (asm lookable)
     (asm-2 aligned)
+    (asm-2 aligned-sized)
     (asm-3 environmental)
     (asm-3 environment)
     (asm-3 sized))
@@ -41,14 +46,51 @@
               (pure-environmental
                 (stack))))))))
 
-  ; (define (list->block $blocks)
-  ;   (dependent-map (list->dependent $dependents)
-  ;     (lambda ($aligned-list)
-  ;       (aligned-map (list->alignned $aligned-list)
-  ;         (lambda ($sized-list)
-  ;           (sized-map (list->sized $sized-list)
-  ;             (lambda ($sized-list)
-  ;               )))))
+  (define (u8-block $u8-expression)
+    (dependent-map $u8-expression
+      (lambda ($relocable)
+        (pure-aligned
+          (sized 1
+            (relocable-map $relocable
+              (lambda ($lookable)
+                (lookable-map $lookable
+                  (lambda ($u8)
+                    (pure-environmental
+                      (stack (u8-binary $u8))))))))))))
+
+  (define (u16-block $u16-expression $endianness)
+    (dependent-map $u16-expression
+      (lambda ($relocable)
+        (pure-aligned
+          (sized 2
+            (relocable-map $relocable
+              (lambda ($lookable)
+                (lookable-map $lookable
+                  (lambda ($u16)
+                    (pure-environmental
+                      (stack (u16-binary $u16 $endianness))))))))))))
+
+  (define (item-slack $size)
+    (pure-relocable
+      (pure-lookable
+        (pure-environmental
+          (stack
+            (zero-binary $size))))))
+
+  (define (list->item . $relocable-list)
+    (relocable-append-map $relocable-list
+      (lambda ($lookable-list)
+        (lookable-append-map $lookable-list
+          (lambda ($environmental-list)
+            (environmental-append-map $environmental-list
+              (lambda ($binary-stacks)
+                (apply append $binary-stacks))))))))
+
+  (define-list->/append (block $blocks)
+    (dependent-map (list->dependent $blocks)
+      (lambda ($aligned-sized-list)
+        (aligned-map
+          (list->aligned-sized $aligned-sized-list item-slack list->item)))))
 
   (define (block+identifier $block $identifier)
     (dependent-map $block

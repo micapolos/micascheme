@@ -5,6 +5,31 @@
   (empty-block)
   (block (dependent (aligned 1 (sized 0 (stack))))))
 
+(check-block #xc000
+  (empty-lookup)
+  (u8-block (pure-expression 123))
+  (block (dependent (aligned 1 (sized 1 (stack (binary 123)))))))
+
+(check-block #xc000
+  (lookup-with (foo 123))
+  (u8-block (identifier-expression #'foo))
+  (block (dependent (foo) (aligned 1 (sized 1 (stack (binary 123)))))))
+
+(check-block 123
+  (lookup-with (foo 123))
+  (u8-block (org-expression))
+  (block (dependent (aligned 1 (sized 1 (stack (binary 123)))))))
+
+(check-block #xc000
+  (empty-lookup)
+  (u16-block (pure-expression #x1234) (endianness big))
+  (block (dependent (aligned 1 (sized 2 (stack (binary #x12 #x34)))))))
+
+(check-block #xc000
+  (empty-lookup)
+  (u16-block (pure-expression #x1234) (endianness little))
+  (block (dependent (aligned 1 (sized 2 (stack (binary #x34 #x12)))))))
+
 (check-op #xc000
   (empty-lookup)
   (u8-op (pure-expression 123))
