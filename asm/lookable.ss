@@ -5,7 +5,7 @@
     lookable-map
     list->lookable
     lookable-append
-    lookable-append-with
+    lookable-append-map
     resolve-lookable)
   (import (micascheme))
 
@@ -33,7 +33,7 @@
       (map-with ($lookable $lookables)
         (lookable-ref $lookable $lookup))))
 
-  (define (lookable-append-with $ref-append . $lookables)
+  (define (lookable-append-map $ref-append . $lookables)
     (lookable-map
       (apply lookable-append $lookables)
       (partial apply $ref-append)))

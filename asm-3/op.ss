@@ -57,16 +57,16 @@
                             (environment+ $environment $identifier (sized-size $sized)))))))))))))))
 
   (define (block+u8-expression $block $expression)
-    (dependent-append-with
+    (dependent-append-map
       (lambda ($aligned $expression-relocable)
         (aligned-map $aligned
           (lambda ($sized)
             (sized-update $sized
               (partial + 1)
               (lambda ($block-relocable)
-                (relocable-append-with
+                (relocable-append-map
                   (lambda ($block-lookable $expression-lookable)
-                    (lookable-append-with
+                    (lookable-append-map
                       (lambda ($environmental $u8)
                         (environmental-map $environmental
                           (lambda ($binary-stack)
@@ -78,16 +78,16 @@
       $expression))
 
   (define (block+u16-expression $block $expression $endianness)
-    (dependent-append-with
+    (dependent-append-map
       (lambda ($aligned $expression-relocable)
         (aligned-map $aligned
           (lambda ($sized)
             (sized-update $sized
               (partial + 2)
               (lambda ($block-relocable)
-                (relocable-append-with
+                (relocable-append-map
                   (lambda ($block-lookable $expression-lookable)
-                    (lookable-append-with
+                    (lookable-append-map
                       (lambda ($environmental $u16)
                         (environmental-map $environmental
                           (lambda ($binary-stack)

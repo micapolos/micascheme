@@ -39,11 +39,11 @@
           ($lookup $identifier)))))
 
   (define (application-expression $fn-expression . $arg-expressions)
-    (apply dependent-append-with
+    (apply dependent-append-map
       (lambda ($fn-relocable . $arg-relocables)
-        (apply relocable-append-with
+        (apply relocable-append-map
           (lambda ($fn-lookable . $arg-lookables)
-            (apply lookable-append-with
+            (apply lookable-append-map
               (lambda ($fn . $args)
                 (apply $fn $args))
               (cons $fn-lookable $arg-lookables)))

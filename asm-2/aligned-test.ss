@@ -37,7 +37,7 @@
 
 (check
   (equal?
-    (aligned-append-with string-append
+    (aligned-append-map string-append
       (aligned 1 "1")
       (aligned 8 "8")
       (aligned 2 "2")

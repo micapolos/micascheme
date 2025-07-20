@@ -10,7 +10,7 @@
     offset-relocable
     list->relocable
     relocable-append
-    relocable-append-with)
+    relocable-append-map)
   (import (micascheme))
 
   (data (relocable proc))
@@ -51,7 +51,7 @@
   (define (relocable-append . $relocables)
     (list->relocable $relocables))
 
-  (define (relocable-append-with $ref-append . $relocables)
+  (define (relocable-append-map $ref-append . $relocables)
     (relocable-map
       (apply relocable-append $relocables)
       (partial apply $ref-append)))

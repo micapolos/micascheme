@@ -6,7 +6,7 @@
     aligned-sort
     aligned-sorted-refs
     aligned->datum
-    aligned-append-with
+    aligned-append-map
     aligned-map)
   (import (asm-3 base))
 
@@ -15,7 +15,7 @@
   (define (pure-aligned $obj)
     (aligned 1 $obj))
 
-  (define (aligned-append-with $ref-append . $list)
+  (define (aligned-append-map $ref-append . $list)
     (aligned
       (apply max (map aligned-alignment $list))
       (apply $ref-append (map aligned-ref $list))))
