@@ -41,6 +41,15 @@
               (pure-environmental
                 (stack))))))))
 
+  ; (define (list->block $blocks)
+  ;   (dependent-map (list->dependent $dependents)
+  ;     (lambda ($aligned-list)
+  ;       (aligned-map (list->alignned $aligned-list)
+  ;         (lambda ($sized-list)
+  ;           (sized-map (list->sized $sized-list)
+  ;             (lambda ($sized-list)
+  ;               )))))
+
   (define (block+identifier $block $identifier)
     (dependent-map $block
       (lambda ($aligned)
