@@ -79,7 +79,7 @@
           (relocable-with ($org)
             (pure-lookable
               (environmental
-                (environment (identified $identifier $org))
+                (environment (list (identified $identifier $org)))
                 (stack))))))))
 
   (define (item-slack $size)
@@ -193,21 +193,21 @@
       (binary->bytevector)))
 
   (define (block->datum $org $lookup $block)
-    `(block
-      ,(dependent->datum
-        (dependent-map $block
-          (lambda ($aligned)
-            (aligned->datum
-              (aligned-map $aligned
-                (lambda ($sized)
-                  (sized->datum
-                    (sized-map $sized
-                      (lambda ($relocable)
-                        `(stack
-                          ,@(reverse
-                            (map binary->datum
-                              (environmental-ref
-                                (lookable-ref (relocable-ref $relocable $org) $lookup))))))))))))))))
+    (dependent->datum
+      (dependent-map $block
+        (lambda ($aligned)
+          (aligned->datum
+            (aligned-map $aligned
+              (lambda ($sized)
+                (sized->datum
+                  (sized-map $sized
+                    (lambda ($relocable)
+                      (environmental->datum
+                        (environmental-map (lookable-ref (relocable-ref $relocable $org) $lookup)
+                          (lambda ($binary-stack)
+                            `(block
+                              ,@(reverse
+                                (map binary->datum $binary-stack))))))))))))))))
 
   (define (op->datum $org $lookup $op)
     `(op ,(cadr (block->datum $org $lookup (block+op (empty-block) $op)))))
