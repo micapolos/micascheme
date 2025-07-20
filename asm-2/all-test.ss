@@ -3,6 +3,7 @@
 (test
   (asm-2 label)
   (asm-2 relocable)
+  (asm-2 alignment)
   (asm-2 aligned)
   (asm-2 alignable)
   (asm-2 block)
