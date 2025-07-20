@@ -5,8 +5,8 @@
   (sized 3 110))
 
 (check-sized-relocable 100
-  (sized-relocable-append string-append
-    (sized 3 (relocable-with ($org) (number->string $org)))
-    (sized 5 (relocable-with ($org) (number->string $org)))
-    (sized 0 (relocable-with ($org) (number->string $org))))
-  (sized 8 "100103108"))
+  (sized-relocable-append list
+    (sized 3 (relocable-with ($org) $org))
+    (sized 5 (relocable-with ($org) $org))
+    (sized 0 (relocable-with ($org) $org)))
+  (sized 8 (list 100 103 108)))
