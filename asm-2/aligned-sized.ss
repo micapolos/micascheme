@@ -1,6 +1,13 @@
 (library (asm-2 aligned-sized)
-  (export aligned-sized-append)
-  (import (asm-3 base) (asm-2 aligned) (asm-3 sized) (asm-3 size) (asm-2 alignment))
+  (export
+    aligned-sized-append
+    list->aligned-sized)
+  (import
+    (asm-3 base)
+    (asm-2 aligned)
+    (asm-3 sized)
+    (asm-3 size)
+    (asm-2 alignment))
 
   (define (map-aligned-sized $proc $aligned-sized)
     (aligned-map $aligned-sized
@@ -30,4 +37,7 @@
                   (push (push $stack ($slack-proc $slack-size)) $item))))))
         (pure-aligned (pure-sized (stack)))
         $aligned-sized-list)))
+
+  (define (list->aligned-sized $aligned-sized-list $slack-proc $ref-append)
+    (aligned-sized-append $slack-proc $ref-append $aligned-sized-list))
 )
