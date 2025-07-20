@@ -8,7 +8,8 @@
     environment-ref
     environment->lookup
     list->environment
-    environment-append)
+    environment-append
+    environment->entry-datums)
   (import
     (asm-3 base)
     (asm-3 identified))
@@ -51,4 +52,7 @@
 
   (define-list->/append (environment $list)
     (environment (apply append (map environment-identified-values $list))))
+
+  (define (environment->entry-datums $environment)
+    (map identified->entry-datum (environment-identified-values $environment)))
 )

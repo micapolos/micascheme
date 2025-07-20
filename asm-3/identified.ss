@@ -5,6 +5,7 @@
     identified->syntax
     identified-map
     identified->datum
+    identified->entry-datum
     identified-identifier=?)
   (import (asm-3 base))
 
@@ -22,6 +23,10 @@
     `(identified
       ,(syntax->datum (identified-identifier $identified))
       ,($ref->datum (identified-ref $identified))))
+
+  (define (identified->entry-datum $identified)
+    `(,(syntax->datum (identified-identifier $identified))
+      ,(identified-ref $identified)))
 
   (define (identified-identifier=? $identified $identifier)
     (free-identifier=? $identifier (identified-identifier $identified)))
