@@ -2,6 +2,7 @@
   (export
     relocable relocable? relocable-proc
     pure-relocable
+    org-relocable
     relocable-with
     relocable-ref
     locate-relocable
@@ -24,6 +25,9 @@
 
   (define (pure-relocable $ref)
     (relocable-with $ref))
+
+  (define (org-relocable)
+    (relocable-with ($org) $org))
 
   (define (relocable-ref $relocable $org)
     ((relocable-proc $relocable) $org))

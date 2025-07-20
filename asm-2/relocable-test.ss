@@ -5,6 +5,10 @@
   10)
 
 (check-relocable 100
+  (org-relocable)
+  100)
+
+(check-relocable 100
   (relocable-with ($org) (+ $org 10))
   110)
 
