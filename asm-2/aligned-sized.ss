@@ -1,5 +1,7 @@
 (library (asm-2 aligned-sized)
   (export
+    map-aligned-sized
+    aligned-sized-map
     aligned-sized-append
     list->aligned-sized)
   (import
@@ -13,6 +15,9 @@
     (aligned-map $aligned-sized
       (lambda ($sized)
         (sized-map $sized $proc))))
+
+  (define (aligned-sized-map $aligned-sized $proc)
+    (map-aligned-sized $proc $aligned-sized))
 
   (define (aligned-sized-append $slack-proc $ref-append . $aligned-sized-list)
     (map-aligned-sized (dot (partial apply $ref-append) reverse)
