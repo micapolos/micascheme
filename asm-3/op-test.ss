@@ -30,6 +30,11 @@
   (u16-block (pure-expression #x1234) (endianness little))
   (block (dependent (aligned 1 (sized 2 (stack (binary #x34 #x12)))))))
 
+(check-block #xc000
+  (empty-lookup)
+  (identifier-block #'foo)
+  (block (dependent (aligned 1 (sized 0 (stack))))))
+
 (check-op #xc000
   (empty-lookup)
   (u8-op (pure-expression 123))

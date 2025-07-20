@@ -3,6 +3,7 @@
     empty-block
     u8-block
     u16-block
+    identifier-block
     list->block
     block-append
     block+op
@@ -26,6 +27,7 @@
     (asm-2 relocable)
     (asm lookable)
     (asm-2 aligned)
+    (asm-3 identified)
     (asm-2 aligned-sized)
     (asm-3 environmental)
     (asm-3 environment)
@@ -69,6 +71,16 @@
                   (lambda ($u16)
                     (pure-environmental
                       (stack (u16-binary $u16 $endianness))))))))))))
+
+  (define (identifier-block $identifier)
+    (pure-dependent
+      (pure-aligned
+        (pure-sized
+          (relocable-with ($org)
+            (pure-lookable
+              (environmental
+                (environment (identified $identifier $org))
+                (stack))))))))
 
   (define (item-slack $size)
     (pure-relocable
