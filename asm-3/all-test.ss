@@ -10,6 +10,7 @@
   (asm-3 dependencies)
   (asm-3 size)
   (asm-3 sized)
+  (asm-3 sizable)
   (asm-3 size-address)
   (asm-3 block)
   (asm-3 located)
