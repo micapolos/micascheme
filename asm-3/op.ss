@@ -3,7 +3,11 @@
     empty-block
     u8-block
     u16-block
+    u8-expression-block
+    u16-expression-block
     identifier-block
+    align-block
+    bytevector-block
     list->block
     block-append
     block+op
@@ -48,7 +52,43 @@
               (pure-environmental
                 (stack))))))))
 
-  (define (u8-block $u8-expression)
+  (define (align-block $alignment)
+    (pure-dependent
+      (aligned $alignment
+        (pure-sized
+          (pure-relocable
+            (pure-lookable
+              (pure-environmental
+                (stack))))))))
+
+  (define (bytevector-block $bytevector)
+    (pure-dependent
+      (pure-aligned
+        (sized (bytevector-length $bytevector)
+          (pure-relocable
+            (pure-lookable
+              (pure-environmental
+                (stack (bytevector-binary $bytevector)))))))))
+
+  (define (u8-block $u8)
+    (pure-dependent
+      (pure-aligned
+        (sized 1
+          (pure-relocable
+            (pure-lookable
+              (pure-environmental
+                (stack (u8-binary $u8)))))))))
+
+  (define (u16-block $u16 $endianness)
+    (pure-dependent
+      (pure-aligned
+        (sized 2
+          (pure-relocable
+            (pure-lookable
+              (pure-environmental
+                (stack (u16-binary $u16 $endianness)))))))))
+
+  (define (u8-expression-block $u8-expression)
     (dependent-map $u8-expression
       (lambda ($relocable)
         (pure-aligned
@@ -60,7 +100,7 @@
                     (pure-environmental
                       (stack (u8-binary $u8))))))))))))
 
-  (define (u16-block $u16-expression $endianness)
+  (define (u16-expression-block $u16-expression $endianness)
     (dependent-map $u16-expression
       (lambda ($relocable)
         (pure-aligned
