@@ -43,6 +43,6 @@
         (pure-aligned (pure-sized (stack)))
         $aligned-sized-list)))
 
-  (define (list->aligned-sized $aligned-sized-list $slack-proc $ref-append)
-    (aligned-sized-append $slack-proc $ref-append $aligned-sized-list))
+  (define (list->aligned-sized $aligned-sized-list $slack-proc $list->ref)
+    (apply aligned-sized-append $slack-proc (lambda $list ($list->ref $list)) $aligned-sized-list))
 )

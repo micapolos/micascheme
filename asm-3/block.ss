@@ -107,27 +107,26 @@
                 (environment (list (identified $identifier $org)))
                 (stack))))))))
 
-  (define (item-slack $size)
+  (define (relocable-slack $size)
     (pure-relocable
       (pure-lookable
         (pure-environmental
           (stack
             (zero-binary $size))))))
 
-  (define (list->item . $relocable-list)
-    (relocable-append-map $relocable-list
+  (define (list->relocable-item $relocable-list)
+    (relocable-map (list->relocable $relocable-list)
       (lambda ($lookable-list)
-        (lookable-append-map $lookable-list
+        (lookable-map (list->lookable $lookable-list)
           (lambda ($environmental-list)
-            (environmental-append-map $environmental-list
+            (environmental-map (list->environmental $environmental-list)
               (lambda ($binary-stacks)
-                (apply append $binary-stacks))))))))
+                (reverse (flatten (map reverse $binary-stacks))))))))))
 
   (define-list->/append (block $blocks)
     (dependent-map (list->dependent $blocks)
       (lambda ($aligned-sized-list)
-        (aligned-map
-          (list->aligned-sized $aligned-sized-list item-slack list->item)))))
+        (list->aligned-sized $aligned-sized-list relocable-slack list->relocable-item))))
 
   (define (block+identifier $block $identifier)
     (dependent-map $block
