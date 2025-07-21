@@ -111,12 +111,26 @@
   (define (blob->datum $org $lookup $blob)
     (cadr (expression->datum $org $lookup (expression-map $blob binary->datum))))
 
+  (define (org-lookup+label $org $lookup $label)
+    (lookup+undefined $lookup
+      (identified-identifier $label)
+      (relocable-ref (identified-ref $label) $org)))
+
+  (define (org-lookup+block-labels $org $lookup $block)
+    (fold-left
+      (partial org-lookup+label $org)
+      $lookup
+      (reverse (block-labels $block))))
+
   (define (block->datum $org $lookup $block)
     `(block
       (alignment ,(block-alignment $block))
       (size ,(block-size $block))
       (labels ,@(map (partial label->datum $org) (reverse (block-labels $block))))
-      (blobs ,@(map (partial blob->datum $org $lookup) (reverse (block-blobs $block))))))
+      (blobs
+        ,@(map
+          (partial blob->datum $org (org-lookup+block-labels $org $lookup $block))
+          (reverse (block-blobs $block))))))
 
   (define-rule-syntax (check-block org lookup block out)
     (check (equal? (block->datum org lookup block) 'out)))

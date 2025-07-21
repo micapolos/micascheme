@@ -10,7 +10,8 @@
     (import
       (except (micascheme)
         environment
-        environment?)))
+        environment?)
+      (syntax lookup)))
 
   ; for documentation purposes only
   (define-rule-syntax (define-type id ...) (begin))

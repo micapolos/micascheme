@@ -86,3 +86,19 @@
       (dependent (binary 0))
       (dependent (binary #xc0 #x06)))))
 
+(check-block #xc000
+  (empty-lookup)
+  (block-append
+    (identifier-block #'start)
+    (u16-expression-block (identifier-expression #'start) (endianness big))
+    (u16-expression-block (org-expression) (endianness big))
+    (u16-expression-block (identifier-expression #'end) (endianness big))
+    (identifier-block #'end))
+  (block (alignment 1) (size 6)
+    (labels
+      (start #xc000)
+      (end #xc006))
+    (blobs
+      (dependent (start) (binary #xc0 #x00))
+      (dependent (binary #xc0 #x02))
+      (dependent (end) (binary #xc0 #x06)))))

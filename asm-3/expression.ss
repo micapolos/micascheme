@@ -16,7 +16,8 @@
     (asm-3 dependent)
     (asm lookable)
     (asm-2 relocable)
-    (asm-3 org))
+    (asm-3 org)
+    (syntax lookup))
 
   (define-type (expression ref) (dependent (relocable (lookable ref))))
 
@@ -36,7 +37,7 @@
     (dependent (list $identifier)
       (relocable-with ($org)
         (lookable ($lookup)
-          ($lookup $identifier)))))
+          (lookup-ref $lookup $identifier)))))
 
   (define (application-expression $fn-expression . $arg-expressions)
     (apply dependent-append-map
