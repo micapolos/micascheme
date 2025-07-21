@@ -1,6 +1,8 @@
 (library (asm-3 fragment)
   (export
     db dw
+    fragment->datum
+    check-fragment
     fragment->bytevector)
   (import
     (asm-3 base)
@@ -43,6 +45,22 @@
               (list (expr x) ...))
             (lambda ($relocable-lookable-binary)
               (aligned 1 (sized #,$size $relocable-lookable-binary))))))))
+
+  (define (fragment->datum $org $lookup $fragment)
+    (dependent->datum
+      (dependent-map $fragment
+        (lambda ($aligned)
+          (aligned->datum
+            (aligned-map $aligned
+              (lambda ($sized)
+                (sized->datum
+                  (sized-map $sized
+                    (lambda ($relocable)
+                      (binary->datum
+                        (lookable-ref (relocable-ref $relocable $org) $lookup))))))))))))
+
+  (define-rule-syntax (check-fragment org lookup fragment out)
+    (check (equal? (fragment->datum org lookup fragment) 'out)))
 
   (define (fragment->bytevector $org $lookup $fragment)
     (binary->bytevector
