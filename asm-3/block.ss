@@ -11,7 +11,9 @@
     list->block
     block-append
     block->datum
-    check-block)
+    check-block
+    org-lookup+label
+    org-lookup+labels)
   (import
     (asm-3 base)
     (asm-3 expression)
@@ -116,11 +118,11 @@
       (identified-identifier $label)
       (relocable-ref (identified-ref $label) $org)))
 
-  (define (org-lookup+block-labels $org $lookup $block)
+  (define (org-lookup+labels $org $lookup $labels)
     (fold-left
       (partial org-lookup+label $org)
       $lookup
-      (reverse (block-labels $block))))
+      $labels))
 
   (define (block->datum $org $lookup $block)
     `(block
@@ -129,7 +131,8 @@
       (labels ,@(map (partial label->datum $org) (reverse (block-labels $block))))
       (blobs
         ,@(map
-          (partial blob->datum $org (org-lookup+block-labels $org $lookup $block))
+          (partial blob->datum $org
+            (org-lookup+labels $org $lookup (reverse (block-labels $block))))
           (reverse (block-blobs $block))))))
 
   (define-rule-syntax (check-block org lookup block out)
