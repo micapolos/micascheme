@@ -1,5 +1,12 @@
 (library (asm-3 block)
   (export
+    block
+    block?
+    block-alignment
+    block-size
+    block-labels
+    block-blobs
+
     empty-block
     u8-block
     u16-block
