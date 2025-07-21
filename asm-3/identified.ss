@@ -4,6 +4,7 @@
     identified-with
     identified->syntax
     identified-map
+    map-identified
     identified->datum
     identified->entry-datum
     identified-identifier=?)

@@ -10,7 +10,6 @@
     bytevector-block
     list->block
     block-append
-    block->bytevector
     block->datum
     check-block)
   (import
@@ -21,99 +20,53 @@
     (asm lookable)
     (asm-2 aligned)
     (asm-3 identified)
+    (asm-2 alignment)
+    (asm-3 size)
     (asm-2 aligned-sized)
     (asm-3 environmental)
     (asm-3 environment)
     (asm-3 sized)
     (asm-3 sized-relocable))
 
-  (define-type block (dependent (aligned (sized (relocable (lookable (environmental (stack binary))))))))
+  (define-type label (identified (relocable offset)))
+  (define-type local (identified expression))
+  (define-type blob (expression binary))
+  (data (block alignment size labels locals blobs))
 
   (define (empty-block)
-    (pure-dependent
-      (aligned 1
-        (sized 0
-          (pure-relocable
-            (pure-lookable
-              (pure-environmental
-                (stack))))))))
+    (block 1 0 (stack) (stack) (stack)))
 
   (define (align-block $alignment)
-    (pure-dependent
-      (aligned $alignment
-        (pure-sized
-          (pure-relocable
-            (pure-lookable
-              (pure-environmental
-                (stack))))))))
+    (block-with-alignment (empty-block) $alignment))
 
-  (define (bytevector-block $bytevector)
-    (pure-dependent
-      (pure-aligned
-        (sized (bytevector-length $bytevector)
-          (pure-relocable
-            (pure-lookable
-              (pure-environmental
-                (stack (bytevector-binary $bytevector)))))))))
-
-  (define (u8-block $u8)
-    (pure-dependent
-      (pure-aligned
-        (sized 1
-          (pure-relocable
-            (pure-lookable
-              (pure-environmental
-                (stack (u8-binary $u8)))))))))
-
-  (define (u16-block $u16 $endianness)
-    (pure-dependent
-      (pure-aligned
-        (sized 2
-          (pure-relocable
-            (pure-lookable
-              (pure-environmental
-                (stack (u16-binary $u16 $endianness)))))))))
+  (define (size-binary-expression-block $size $binary-expression)
+    (fluent (empty-block)
+      (block-with-size $size)
+      (block-with-blobs (stack $binary-expression))))
 
   (define (u8-expression-block $u8-expression)
-    (dependent-map $u8-expression
-      (lambda ($relocable)
-        (pure-aligned
-          (sized 1
-            (relocable-map $relocable
-              (lambda ($lookable)
-                (lookable-map $lookable
-                  (lambda ($u8)
-                    (pure-environmental
-                      (stack (u8-binary $u8))))))))))))
+    (size-binary-expression-block 1
+      (expression-map $u8-expression u8-binary)))
 
   (define (u16-expression-block $u16-expression $endianness)
-    (dependent-map $u16-expression
-      (lambda ($relocable)
-        (pure-aligned
-          (sized 2
-            (relocable-map $relocable
-              (lambda ($lookable)
-                (lookable-map $lookable
-                  (lambda ($u16)
-                    (pure-environmental
-                      (stack (u16-binary $u16 $endianness))))))))))))
+    (size-binary-expression-block 2
+      (expression-map $u16-expression
+        (partial-flip u16-binary $endianness))))
+
+  (define (u8-block $u8)
+    (size-binary-expression-block 1 (pure-expression (u8-binary $u8))))
+
+  (define (u16-block $u16 $endianness)
+    (size-binary-expression-block 2 (pure-expression (u16-binary $u16 $endianness))))
+
+  (define (bytevector-block $bytevector)
+    (size-binary-expression-block
+      (bytevector-length $bytevector)
+      (pure-expression (bytevector-binary $bytevector))))
 
   (define (identifier-block $identifier)
-    (pure-dependent
-      (pure-aligned
-        (pure-sized
-          (relocable-with ($org)
-            (pure-lookable
-              (environmental
-                (environment (list (identified $identifier $org)))
-                (stack))))))))
-
-  (define (relocable-slack $size)
-    (pure-relocable
-      (pure-lookable
-        (pure-environmental
-          (stack
-            (zero-binary $size))))))
+    (block-with-labels (empty-block)
+      (stack (identified $identifier (org-relocable)))))
 
   (define (list->relocable-item $relocable-list)
     (relocable-map (list->relocable $relocable-list)
@@ -124,101 +77,57 @@
               (lambda ($binary-stacks)
                 (reverse (flatten (map reverse $binary-stacks))))))))))
 
+  (define (offset-label $offset $label)
+    (map-identified (partial offset-relocable $offset) $label))
+
+  (define (offset-local $offset $local)
+    (map-identified (partial offset-expression $offset) $local))
+
+  (define (offset-blob $offset $blob)
+    (offset-expression $offset $blob))
+
   (define-list->/append (block $blocks)
-    (dependent-map (list->dependent $blocks)
-      (lambda ($aligned-sized-list)
-        (aligned-map
-          (list->aligned-sized $aligned-sized-list relocable-slack)
-          (lambda ($sized-list)
-            (sized-map
-              (list->sized-relocable $sized-list)
-              list->relocable-item))))))
+    (fold-left
+      (lambda ($folded $block)
+        (lets
+          ($alignment (alignment-append (block-alignment $folded) (block-alignment $block)))
+          ($aligned-size (bitwise-align (block-size $folded) (block-alignment $block)))
+          ($offset (- $aligned-size (block-size $folded)))
+          (block
+            $alignment
+            (size+ $aligned-size (block-size $block))
+            (push-all
+              (block-labels $folded)
+              (map (partial offset-label $aligned-size) (block-labels $block)))
+            (push-all
+              (block-locals $folded)
+              (map (partial offset-local $aligned-size) (block-locals $block)))
+            (push-all
+              (if (zero? $offset)
+                (block-blobs $folded)
+                (push
+                  (block-blobs $folded)
+                  (pure-expression (zero-binary $offset))))
+              (map (partial offset-blob $aligned-size) (block-blobs $block))))))
+      (empty-block)
+      $blocks))
 
-  (define (block+identifier $block $identifier)
-    (dependent-map $block
-      (lambda ($aligned)
-        (aligned-map $aligned
-          (lambda ($sized)
-            (sized-map $sized
-              (lambda ($relocable)
-                (relocable-map $relocable
-                  (lambda ($lookable)
-                    (lookable-map $lookable
-                      (lambda ($environmental)
-                        (environmental-update-environment $environmental
-                          (lambda ($environment)
-                            (environment+ $environment $identifier (sized-size $sized)))))))))))))))
+  (define (label->datum $org $label)
+    (identified->entry-datum (identified-map $label (partial locate-relocable $org))))
 
-  (define (block+u8-expression $block $expression)
-    (dependent-append-map
-      (lambda ($aligned $expression-relocable)
-        (aligned-map $aligned
-          (lambda ($sized)
-            (sized-update $sized
-              (partial + 1)
-              (lambda ($block-relocable)
-                (relocable-append-map
-                  (lambda ($block-lookable $expression-lookable)
-                    (lookable-append-map
-                      (lambda ($environmental $u8)
-                        (environmental-map $environmental
-                          (lambda ($binary-stack)
-                            (push $binary-stack (u8-binary $u8)))))
-                      $block-lookable $expression-lookable))
-                  $block-relocable
-                  (relocable+offset $expression-relocable (sized-size $sized))))))))
-      $block
-      $expression))
+  (define (local->datum $org $lookup $label)
+    (identified->entry-datum (identified-map $label (partial expression->datum $org $lookup))))
 
-  (define (block+u16-expression $block $expression $endianness)
-    (dependent-append-map
-      (lambda ($aligned $expression-relocable)
-        (aligned-map $aligned
-          (lambda ($sized)
-            (sized-update $sized
-              (partial + 2)
-              (lambda ($block-relocable)
-                (relocable-append-map
-                  (lambda ($block-lookable $expression-lookable)
-                    (lookable-append-map
-                      (lambda ($environmental $u16)
-                        (environmental-map $environmental
-                          (lambda ($binary-stack)
-                            (push $binary-stack (u16-binary $u16 $endianness)))))
-                      $block-lookable $expression-lookable))
-                  $block-relocable
-                  (relocable+offset $expression-relocable (sized-size $sized))))))))
-      $block
-      $expression))
-
-  (define (block->bytevector $org $lookup $block)
-    (fluent $block
-      (dependent-ref)
-      (aligned-ref)
-      (sized-ref)
-      (relocable-ref $org)
-      (lookable-ref $lookup)
-      (environmental-ref)
-      (reverse)
-      (list->binary)
-      (binary->bytevector)))
+  (define (blob->datum $org $lookup $blob)
+    (cadr (expression->datum $org $lookup (expression-map $blob binary->datum))))
 
   (define (block->datum $org $lookup $block)
-    (dependent->datum
-      (dependent-map $block
-        (lambda ($aligned)
-          (aligned->datum
-            (aligned-map $aligned
-              (lambda ($sized)
-                (sized->datum
-                  (sized-map $sized
-                    (lambda ($relocable)
-                      (environmental->datum
-                        (environmental-map (lookable-ref (relocable-ref $relocable $org) $lookup)
-                          (lambda ($binary-stack)
-                            `(block
-                              ,@(reverse
-                                (map binary->datum $binary-stack))))))))))))))))
+    `(block
+      (alignment ,(block-alignment $block))
+      (size ,(block-size $block))
+      (labels ,@(map (partial label->datum $org) (reverse (block-labels $block))))
+      (locals ,@(map (partial local->datum $org $lookup) (reverse (block-locals $block))))
+      (blobs ,@(map (partial blob->datum $org $lookup) (reverse (block-blobs $block))))))
 
   (define-rule-syntax (check-block org lookup block out)
     (check (equal? (block->datum org lookup block) 'out)))

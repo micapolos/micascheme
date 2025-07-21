@@ -8,6 +8,7 @@
     dependent-append
     dependent-append-map
     dependent-map
+    map-dependent
     check-dependent)
   (import (asm-3 base))
 
@@ -45,6 +46,9 @@
   (define (dependent-map $dependent $proc)
     (dependent-with-ref $dependent
       ($proc (dependent-ref $dependent))))
+
+  (define (map-dependent $proc $dependent)
+    (dependent-map $dependent $proc))
 
   (define-rule-syntax (check-dependent in out)
     (check (equal? (dependent->datum in) (dependent->datum out))))

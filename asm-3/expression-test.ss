@@ -18,6 +18,12 @@
   (org-expression)
   (expression (dependent 100)))
 
+; org-expression
+(check-expression 100
+  (empty-lookup)
+  (offset-expression 10 (org-expression))
+  (expression (dependent 110)))
+
 ; application-expression
 (check-expression 100
   (lookup-with

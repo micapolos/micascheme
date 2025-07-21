@@ -3,54 +3,43 @@
 (check-syntax->block #xc000
   (empty-lookup)
   (db 10 20 30)
-  (dependent
-    (aligned 1
-      (sized 3
-        (environmental
-          (block
-            (binary 10)
-            (binary 20)
-            (binary 30)))))))
+  (block (alignment 1) (size 3) (labels) (locals)
+    (blobs
+      (dependent (binary 10))
+      (dependent (binary 20))
+      (dependent (binary 30)))))
 
 (check-syntax->block #xc000
   (empty-lookup)
   (dw #x1234 #x5678)
-  (dependent
-    (aligned 1
-      (sized 4
-        (environmental
-          (block
-            (binary #x34 #x12)
-            (binary #x78 #x56)))))))
+  (block (alignment 1) (size 4) (labels) (locals)
+    (blobs
+      (dependent (binary #x34 #x12))
+      (dependent (binary #x78 #x56)))))
 
 (check-syntax->block #xc000
   (empty-lookup)
   (dw org)
-  (dependent
-    (aligned 1
-      (sized 2
-        (environmental
-          (block (binary #x00 #xc0)))))))
+  (block (alignment 1) (size 2) (labels) (locals)
+    (blobs
+      (dependent (binary #x00 #xc0)))))
 
 (check-syntax->block #xc000
   (empty-lookup)
   (align 4)
-  (dependent (aligned 4 (sized 0 (environmental (block))))))
+  (block (alignment 4) (size 0) (labels) (locals) (blobs)))
 
 (check-syntax->block #xc000
   (empty-lookup)
   foo
-  (dependent (aligned 1 (sized 0 (environmental (foo #xc000) (block))))))
+  (block (alignment 1) (size 0) (labels (foo #xc000)) (locals) (blobs)))
 
 (check-syntax->block #xc000
   (empty-lookup)
   (begin
     (db 10)
     (db 20))
-  (dependent
-    (aligned 1
-      (sized 2
-        (environmental
-          (block
-            (binary 10)
-            (binary 20)))))))
+  (block (alignment 1) (size 2) (labels) (locals)
+    (blobs
+      (dependent (binary 10))
+      (dependent (binary 20)))) )

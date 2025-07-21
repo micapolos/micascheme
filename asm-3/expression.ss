@@ -9,6 +9,7 @@
     expression-map
     expression-ref
     expression->datum
+    offset-expression
     check-expression)
   (import
     (asm-3 base)
@@ -51,6 +52,9 @@
 
   (define (expression-ref $org $lookup $expression)
     (lookable-ref (relocable-ref (dependent-ref $expression) $org) $lookup))
+
+  (define (offset-expression $offset $expression)
+    (map-dependent (partial offset-relocable $offset) $expression))
 
   (define (expression-map $expression $proc)
     (dependent-map $expression

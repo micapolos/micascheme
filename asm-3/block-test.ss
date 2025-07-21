@@ -3,83 +3,87 @@
 (check-block #xc000
   (empty-lookup)
   (empty-block)
-  (dependent (aligned 1 (sized 0 (environmental (block))))))
+  (block (alignment 1) (size 0) (labels) (locals) (blobs)))
 
 (check-block 3
   (empty-lookup)
   (align-block 8)
-  (dependent (aligned 8 (sized 0 (environmental (block))))))
+  (block (alignment 8) (size 0) (labels) (locals) (blobs)))
 
 (check-block #xc000
   (empty-lookup)
   (u8-block 100)
-  (dependent (aligned 1 (sized 1 (environmental (block (binary 100)))))))
+  (block (alignment 1) (size 1) (labels) (locals) (blobs (dependent (binary 100)))))
 
 (check-block #xc000
   (empty-lookup)
   (u16-block #x1234 (endianness big))
-  (dependent (aligned 1 (sized 2 (environmental (block (binary #x12 #x34)))))))
+  (block (alignment 1) (size 2) (labels) (locals) (blobs (dependent (binary #x12 #x34)))))
 
 (check-block #xc000
   (empty-lookup)
   (u16-block #x1234 (endianness little))
-  (dependent (aligned 1 (sized 2 (environmental (block (binary #x34 #x12)))))))
+  (block (alignment 1) (size 2) (labels) (locals) (blobs (dependent (binary #x34 #x12)))))
 
 (check-block #xc000
   (empty-lookup)
   (bytevector-block (bytevector 10 20 30))
-  (dependent (aligned 1 (sized 3 (environmental (block (binary 10 20 30)))))))
+  (block (alignment 1) (size 3) (labels) (locals) (blobs (dependent (binary 10 20 30)))))
 
 (check-block #xc000
   (empty-lookup)
   (u8-expression-block (pure-expression 123))
-  (dependent (aligned 1 (sized 1 (environmental (block (binary 123)))))))
+  (block (alignment 1) (size 1) (labels) (locals) (blobs (dependent (binary 123)))))
 
 (check-block #xc000
   (lookup-with (foo 123))
   (u8-expression-block (identifier-expression #'foo))
-  (dependent (foo) (aligned 1 (sized 1 (environmental (block (binary 123)))))))
-
-(check-block 123
-  (lookup-with (foo 123))
-  (u8-expression-block (org-expression))
-  (dependent (aligned 1 (sized 1 (environmental (block (binary 123)))))))
+  (block (alignment 1) (size 1) (labels) (locals) (blobs (dependent (foo) (binary 123)))))
 
 (check-block #xc000
   (empty-lookup)
   (u16-expression-block (pure-expression #x1234) (endianness big))
-  (dependent (aligned 1 (sized 2 (environmental (block (binary #x12 #x34)))))))
+  (block (alignment 1) (size 2) (labels) (locals) (blobs (dependent (binary #x12 #x34)))))
 
 (check-block #xc000
   (empty-lookup)
   (u16-expression-block (pure-expression #x1234) (endianness little))
-  (dependent (aligned 1 (sized 2 (environmental (block (binary #x34 #x12)))))))
+  (block (alignment 1) (size 2) (labels) (locals) (blobs (dependent (binary #x34 #x12)))))
+
+(check-block #xc000
+  (empty-lookup)
+  (u16-expression-block (org-expression) (endianness big))
+  (block (alignment 1) (size 2) (labels) (locals) (blobs (dependent (binary #xc0 #x00)))))
 
 (check-block #xc000
   (empty-lookup)
   (identifier-block #'foo)
-  (dependent (aligned 1 (sized 0 (environmental (foo #xc000) (block))))))
+  (block (alignment 1) (size 0) (labels (foo #xc000)) (locals) (blobs)))
 
 (check-block #xc000
   (empty-lookup)
   (block-append)
-  (dependent (aligned 1 (sized 0 (environmental (block))))))
+  (block (alignment 1) (size 0) (labels) (locals) (blobs)))
 
 (check-block #xc000
   (lookup-with (foo 10) (bar 20))
   (block-append
     (identifier-block #'start)
     (u8-expression-block (identifier-expression #'foo))
+    (align-block 4)
     (u8-expression-block (identifier-expression #'bar))
+    (align-block 2)
     (u16-expression-block (org-expression) (endianness big))
     (identifier-block #'end))
-  (dependent (foo bar)
-    (aligned 1
-      (sized 4
-        (environmental
-          (start #xc000)
-          (end #xc004)
-          (block
-            (binary 10)
-            (binary 20)
-            (binary #xc0 #x02)))))))
+  (block
+    (alignment 4)
+    (size 8)
+    (labels (start #xc000) (end #xc008))
+    (locals)
+    (blobs
+      (dependent (foo) (binary 10))
+      (dependent (binary 0 0 0))
+      (dependent (bar) (binary 20))
+      (dependent (binary 0))
+      (dependent (binary #xc0 #x06)))))
+
