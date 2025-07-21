@@ -1,11 +1,12 @@
 (library (asm-3 sized-relocable)
   (export
     sized-relocable-append
+    list->sized-relocable
     check-sized-relocable)
   (import (asm-3 base) (asm-3 size) (asm-3 sized) (asm-2 relocable))
 
-  (define (sized-relocable-append $ref-append . $sized-relocables)
-    (sized-map
+  (define-list->/append (sized-relocable $sized-relocables)
+    (map-sized reverse
       (fold-left
         (lambda ($sized-relocable-stack $sized-relocable-item)
           (lets
@@ -17,9 +18,7 @@
               (size+ $stack-size $item-size)
               (push $relocable-stack (relocable+offset $relocable-item $stack-size)))))
         (pure-sized (stack))
-        $sized-relocables)
-      (lambda ($relocable-stack)
-        (apply relocable-append-map $ref-append (reverse $relocable-stack)))))
+        $sized-relocables)))
 
   (define-rule-syntax (check-sized-relocable org sized-relocable out)
     (check

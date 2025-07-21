@@ -24,7 +24,8 @@
     (asm-2 aligned-sized)
     (asm-3 environmental)
     (asm-3 environment)
-    (asm-3 sized))
+    (asm-3 sized)
+    (asm-3 sized-relocable))
 
   (define-type block (dependent (aligned (sized (relocable (lookable (environmental (stack binary))))))))
 
@@ -126,7 +127,12 @@
   (define-list->/append (block $blocks)
     (dependent-map (list->dependent $blocks)
       (lambda ($aligned-sized-list)
-        (list->aligned-sized $aligned-sized-list relocable-slack list->relocable-item))))
+        (aligned-map
+          (list->aligned-sized $aligned-sized-list relocable-slack)
+          (lambda ($sized-list)
+            (sized-map
+              (list->sized-relocable $sized-list)
+              list->relocable-item))))))
 
   (define (block+identifier $block $identifier)
     (dependent-map $block

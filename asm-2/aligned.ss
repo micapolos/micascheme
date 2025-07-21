@@ -7,7 +7,8 @@
     aligned-sorted-refs
     aligned->datum
     aligned-append-map
-    aligned-map)
+    aligned-map
+    map-aligned)
   (import (asm-3 base))
 
   (define-annotated (aligned alignment))

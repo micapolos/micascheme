@@ -5,8 +5,15 @@
   (sized 3 110))
 
 (check-sized-relocable 100
-  (sized-relocable-append list
-    (sized 3 (org-relocable))
-    (sized 5 (org-relocable))
-    (sized 0 (org-relocable)))
+  (map-sized list->relocable
+    (sized-relocable-append))
+  (sized 0 (list)))
+
+(check-sized-relocable 100
+  (map-sized list->relocable
+    (sized-relocable-append
+      (sized 3 (org-relocable))
+      (sized 5 (org-relocable))
+      (sized 0 (org-relocable))))
   (sized 8 (list 100 103 108)))
+

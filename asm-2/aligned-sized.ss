@@ -19,30 +19,31 @@
   (define (aligned-sized-map $aligned-sized $proc)
     (map-aligned-sized $proc $aligned-sized))
 
-  (define (aligned-sized-append $slack-proc $ref-append . $aligned-sized-list)
-    (map-aligned-sized (dot (partial apply $ref-append) reverse)
+  (define (aligned-sized-append $slack-proc . $aligned-sized-list)
+    (map-aligned (dot reverse sized-ref)
       (fold-left
-        (lambda ($aligned-sized-stack $aligned-sized)
+        (lambda ($aligned-sized-sized-stack $aligned-sized)
           (lets
-            ($stack-alignment (aligned-alignment $aligned-sized-stack))
+            ($stack-alignment (aligned-alignment $aligned-sized-sized-stack))
             ($item-alignment (aligned-alignment $aligned-sized))
             ($alignment (alignment-append $stack-alignment $item-alignment))
-            ($sized-stack (aligned-ref $aligned-sized-stack))
+            ($sized-sized-stack (aligned-ref $aligned-sized-sized-stack))
             ($sized-item (aligned-ref $aligned-sized))
-            ($stack-size (sized-size $sized-stack))
+            ($stack-size (sized-size $sized-sized-stack))
             ($item-size (sized-size $sized-item))
             ($slack-size (- (bitwise-align $stack-size $alignment) $stack-size))
             ($size (size+ $stack-size $slack-size $item-size))
-            ($stack (sized-ref $sized-stack))
-            ($item (sized-ref $sized-item))
+            ($sized-stack (sized-ref $sized-sized-stack))
             (aligned $alignment
               (sized $size
-                (if (zero? $slack-size)
-                  (push $stack $item)
-                  (push (push $stack ($slack-proc $slack-size)) $item))))))
+                (push
+                  (if (zero? $slack-size)
+                    $sized-stack
+                    (push $sized-stack (sized $slack-size ($slack-proc $slack-size))))
+                  $sized-item)))))
         (pure-aligned (pure-sized (stack)))
         $aligned-sized-list)))
 
-  (define (list->aligned-sized $aligned-sized-list $slack-proc $list->ref)
-    (apply aligned-sized-append $slack-proc (lambda $list ($list->ref $list)) $aligned-sized-list))
+  (define (list->aligned-sized $aligned-sized-list $slack-proc)
+    (apply aligned-sized-append $slack-proc $aligned-sized-list))
 )

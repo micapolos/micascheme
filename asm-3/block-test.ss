@@ -65,21 +65,21 @@
   (block-append)
   (dependent (aligned 1 (sized 0 (environmental (block))))))
 
-; (check-block #xc000
-;   (lookup-with (foo 10) (bar 20))
-;   (block-append
-;     (identifier-block #'start)
-;     (u8-expression-block (identifier-expression #'foo))
-;     (u8-expression-block (identifier-expression #'bar))
-;     (u16-expression-block (org-expression) (endianness big))
-;     (identifier-block #'end))
-;   (dependent (foo bar)
-;     (aligned 1
-;       (sized 4
-;         (environmental
-;           (start #xc000)
-;           (end #xc004)
-;           (block
-;             (binary 10)
-;             (binary 20)
-;             (binary #xc0 #x02)))))))
+(check-block #xc000
+  (lookup-with (foo 10) (bar 20))
+  (block-append
+    (identifier-block #'start)
+    (u8-expression-block (identifier-expression #'foo))
+    (u8-expression-block (identifier-expression #'bar))
+    (u16-expression-block (org-expression) (endianness big))
+    (identifier-block #'end))
+  (dependent (foo bar)
+    (aligned 1
+      (sized 4
+        (environmental
+          (start #xc000)
+          (end #xc004)
+          (block
+            (binary 10)
+            (binary 20)
+            (binary #xc0 #x02)))))))
