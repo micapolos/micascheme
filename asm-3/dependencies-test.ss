@@ -1,6 +1,6 @@
 (import (asm-3 base) (asm-3 dependencies) (asm-3 dependent) (syntax lookup))
 
-(check-dependencies
+(check-environment
   (resolve-dependencies
     (lookup-with
       (a (dependent-with () "a"))
@@ -21,3 +21,17 @@
     (identified d "d")
     (identified ad "ad")
     (identified main "main")))
+
+(check-dependencies
+  (dependencies-without (dependencies a b c) #'b)
+  (dependencies a c))
+
+(check-dependencies
+  (dependencies-without (dependencies a b c) #'d)
+  (dependencies a b c))
+
+(check-dependencies
+  (dependencies-without-all
+    (dependencies a b c d e)
+    (dependencies b e f))
+  (dependencies a c d))

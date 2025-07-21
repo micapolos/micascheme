@@ -1,10 +1,17 @@
 (library (asm-3 dependencies)
   (export
+    dependencies
     dependencies-ref?
     resolve-dependencies
     dependencies->datum
-    check-dependencies)
-  (import (asm-3 base) (asm-3 identified) (asm-3 dependent) (syntax lookup))
+    check-dependencies
+    dependencies-without
+    dependencies-without-all
+    check-environment)
+  (import (asm-3 base) (asm-3 identified) (asm-3 dependent) (syntax lookup) (asm-3 environment))
+
+  (define-rule-syntax (dependencies x ...)
+    (list #'x ...))
 
   (define (dependencies-ref? $dependencies $identifier)
     (lets?
@@ -34,14 +41,26 @@
       $dependencies
       $identifiers))
 
+  (define (dependencies-without $dependencies $identifier)
+    (remp (partial free-identifier=? $identifier) $dependencies))
+
+  (define (dependencies-without-all $dependencies $identifiers)
+    (fold-left dependencies-without $dependencies $identifiers))
+
   (define (resolve-dependencies $dependent-lookup $identifier)
     (reverse (dependencies+identifier $dependent-lookup (stack) $identifier)))
 
-  (define (dependencies->datum $ref->datum $dependencies)
+  (define (environment->datum $ref->datum $dependencies)
     `(dependencies
       ,@(map-with ($identified $dependencies)
           (identified->datum $ref->datum $identified))))
 
+  (define (dependencies->datum $dependencies)
+    `(dependencies ,@(map syntax->datum $dependencies)))
+
+  (define-rule-syntax (check-environment in out)
+    (check (equal? (environment->datum identity in) 'out)))
+
   (define-rule-syntax (check-dependencies in out)
-    (check (equal? (dependencies->datum identity in) 'out)))
+    (check (equal? (dependencies->datum in) 'out)))
 )
