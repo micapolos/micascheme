@@ -5,7 +5,6 @@
     org-expression
     identifier-expression
     application-expression
-    syntax->expression
     combine-expressions
     expression-map
     expression-ref
@@ -69,23 +68,6 @@
           (list->relocable $relocables)
           (lambda ($lookables)
             (lookable-map (list->lookable $lookables) $value-proc))))))
-
-  (define (syntax->expression $syntax)
-    (syntax-case $syntax (org)
-      (org
-        (org-expression))
-      (id
-        (identifier? #'id)
-        (identifier-expression #'id))
-      (literal
-        ((or? boolean? integer? string? char?) (datum literal))
-        (pure-expression (datum literal)))
-      ((fn arg ...)
-        (apply application-expression
-          (syntax->expression #'fn)
-          (map syntax->expression #'(arg ...))))
-      (other
-        (syntax-error #'other "not expression"))))
 
   (define (expression->datum $org $lookup $expression)
     `(expression

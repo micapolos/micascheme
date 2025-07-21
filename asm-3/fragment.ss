@@ -7,6 +7,7 @@
     (asm-2 aligned)
     (asm-3 sized)
     (asm-3 expression)
+    (asm-3 syntax-expression)
     (asm-3 dependent)
     (asm-2 relocable)
     (asm lookable))
