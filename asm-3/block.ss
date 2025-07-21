@@ -29,12 +29,11 @@
     (asm-3 sized-relocable))
 
   (define-type label (identified (relocable offset)))
-  (define-type (local ref) (identified (expression ref)))
   (define-type blob (expression binary))
-  (data (block alignment size labels locals blobs))
+  (data (block alignment size labels blobs))
 
   (define (empty-block)
-    (block 1 0 (stack) (stack) (stack)))
+    (block 1 0 (stack) (stack)))
 
   (define (align-block $alignment)
     (block-with-alignment (empty-block) $alignment))
@@ -80,9 +79,6 @@
   (define (offset-label $offset $label)
     (map-identified (partial offset-relocable $offset) $label))
 
-  (define (offset-local $offset $local)
-    (map-identified (partial offset-expression $offset) $local))
-
   (define (offset-blob $offset $blob)
     (offset-expression $offset $blob))
 
@@ -100,9 +96,6 @@
               (block-labels $folded)
               (map (partial offset-label $aligned-size) (block-labels $block)))
             (push-all
-              (block-locals $folded)
-              (map (partial offset-local $aligned-size) (block-locals $block)))
-            (push-all
               (if (zero? $offset)
                 (block-blobs $folded)
                 (push
@@ -115,9 +108,6 @@
   (define (label->datum $org $label)
     (identified->entry-datum (identified-map $label (partial locate-relocable $org))))
 
-  (define (local->datum $org $lookup $label)
-    (identified->entry-datum (identified-map $label (partial expression->datum $org $lookup))))
-
   (define (blob->datum $org $lookup $blob)
     (cadr (expression->datum $org $lookup (expression-map $blob binary->datum))))
 
@@ -126,7 +116,6 @@
       (alignment ,(block-alignment $block))
       (size ,(block-size $block))
       (labels ,@(map (partial label->datum $org) (reverse (block-labels $block))))
-      (locals ,@(map (partial local->datum $org $lookup) (reverse (block-locals $block))))
       (blobs ,@(map (partial blob->datum $org $lookup) (reverse (block-blobs $block))))))
 
   (define-rule-syntax (check-block org lookup block out)
