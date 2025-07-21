@@ -29,7 +29,7 @@
     (asm-3 sized-relocable))
 
   (define-type label (identified (relocable offset)))
-  (define-type local (identified expression))
+  (define-type (local ref) (identified (expression ref)))
   (define-type blob (expression binary))
   (data (block alignment size labels locals blobs))
 
