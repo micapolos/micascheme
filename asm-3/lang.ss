@@ -1,10 +1,10 @@
 (library (asm-3 lang)
   (export
-    proc const
+    proc data const
     define-asm
     assembled-asm)
   (import
-    (asm-3 base)
+    (except (asm-3 base) data)
     (asm-3 located)
     (asm-3 syntax-fragment)
     (asm-3 syntax-expression)
@@ -18,6 +18,9 @@
       (only (asm-3 syntax-block) db dw align)))
 
   (define-rule-syntax (proc id x ...)
+    (define-asm id (syntax->fragment #'(begin x ...))))
+
+  (define-rule-syntax (data id x ...)
     (define-asm id (syntax->fragment #'(begin x ...))))
 
   (define-rule-syntax (const id x)
