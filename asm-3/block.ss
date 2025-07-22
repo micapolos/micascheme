@@ -37,7 +37,7 @@
     (asm-3 sized)
     (asm-3 sized-relocable))
 
-  (define-type label (identified (relocable offset)))
+  (define-type label (identified offset))
   (define-type blob (expression binary))
   (data (block alignment size labels blobs))
 
@@ -74,7 +74,7 @@
 
   (define (identifier-block $identifier)
     (block-with-labels (empty-block)
-      (stack (identified $identifier (org-relocable)))))
+      (stack (identified $identifier 0))))
 
   (define (list->relocable-item $relocable-list)
     (relocable-map (list->relocable $relocable-list)
@@ -86,7 +86,7 @@
                 (reverse (flatten (map reverse $binary-stacks))))))))))
 
   (define (offset-label $offset $label)
-    (map-identified (partial offset-relocable $offset) $label))
+    (map-identified (partial + $offset) $label))
 
   (define (offset-blob $offset $blob)
     (offset-expression $offset $blob))
@@ -115,7 +115,7 @@
       $blocks))
 
   (define (label->datum $org $label)
-    (identified->entry-datum (identified-map $label (partial locate-relocable $org))))
+    (identified->entry-datum (identified-map $label (partial + $org))))
 
   (define (blob->datum $org $lookup $blob)
     (cadr (expression->datum $org $lookup (expression-map $blob binary->datum))))
@@ -123,7 +123,7 @@
   (define (org-lookup+label $org $lookup $label)
     (lookup+undefined $lookup
       (identified-identifier $label)
-      (relocable-ref (identified-ref $label) $org)))
+      (+ (identified-ref $label) $org)))
 
   (define (org-lookup+labels $org $lookup $labels)
     (fold-left
