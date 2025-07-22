@@ -42,7 +42,7 @@
         (and
           (integer? (datum $org))
           (identifier? #'id))
-        (assembled->syntax (assemble $lookup (datum $org) #'id)))))
+        (assembled->syntax (assemble-identifier $lookup (datum $org) #'id)))))
 
   (define-rule-syntax (check-assembled (org $org) x ... out)
     (check (equal? (assembled->datum (assembled-proc (org $org) x ...)) 'out)))
