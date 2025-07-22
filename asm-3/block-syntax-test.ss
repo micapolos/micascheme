@@ -2,7 +2,7 @@
 
 (check-block #xc000
   (empty-lookup)
-  (u8 10)
+  (db 10)
   (block
     (alignment 1)
     (size 1)
@@ -12,7 +12,7 @@
 
 (check-block #xc000
   (empty-lookup)
-  (u16-le org)
+  (dw-le org)
   (block
     (alignment 1)
     (size 2)
@@ -22,7 +22,7 @@
 
 (check-block #xc000
   (empty-lookup)
-  (u16-be org)
+  (dw-be org)
   (block
     (alignment 1)
     (size 2)
@@ -34,10 +34,10 @@
   (empty-lookup)
   (begin
     (label start)
-    (u8 10)
+    (db 10)
     (align 2)
-    (u16-le #x1234)
-    (u16-le org)
+    (dw-le #x1234)
+    (dw-le org)
     (label end))
   (block
     (alignment 2)

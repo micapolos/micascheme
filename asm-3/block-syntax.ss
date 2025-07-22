@@ -1,8 +1,8 @@
 (library (asm-3 block-syntax)
   (export
     label
-    u8
-    u16-le u16-be
+    db
+    dw-le dw-be
     align
     begin)
   (import
@@ -14,17 +14,20 @@
   (define-rule-syntax (label id)
     (identifier-block #'id))
 
-  (define-rule-syntax (u8 x)
+  (define-rule-syntax (db x ...)
     (block-append
-      (u8-expression-block (expr x))))
+      (u8-expression-block (expr x))
+      ...))
 
-  (define-rule-syntax (u16-le x)
+  (define-rule-syntax (dw-le x ...)
     (block-append
-      (u16-expression-block (expr x) (endianness little))))
+      (u16-expression-block (expr x) (endianness little))
+      ...))
 
-  (define-rule-syntax (u16-be x)
+  (define-rule-syntax (dw-be x ...)
     (block-append
-      (u16-expression-block (expr x) (endianness big))))
+      (u16-expression-block (expr x) (endianness big))
+      ...))
 
   (define-rule-syntax (align x)
     (align-block (datum x)))

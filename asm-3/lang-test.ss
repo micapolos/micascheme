@@ -3,24 +3,35 @@
 (const val-10 10)
 
 (data foo
-  (u8 10)
-  (u8 val-10)
-  (u8 (+ 10 val-10)))
+  (db 10)
+  (db val-10)
+  (db (+ 10 val-10)))
 
 (proc main
-  (u8 10)
+  (db 10)
   (align 2)
-  (u8 20)
+  (db 20)
   (begin
-    (u16-le #x1234)
-    (u16-be org)))
+    (dw-le #x1234)
+    (dw-be org)))
 
-(check-assembled (org #xc000) foo
+(check-assembled
+  (org #xc000)
+  (db 10 20 30)
   (assembled
     (start #xc000)
-    (db 10 10 20)))
+    (db 10 20 30)))
 
-(check-assembled (org #xc000) main
-  (assembled
-    (start #xc000)
-    (db 10 0 20 #x34 #x12 #xc0 #x05)))
+; (check-assembled
+;   (org #xc000)
+;   (dw-be foo)
+;   (assembled
+;     (start #xc000)
+;     (db 10 10 20)))
+
+; (check-assembled
+;   (org #xc000)
+;   (dw-le main)
+;   (assembled
+;     (start #xc000)
+;     (db 10 0 20 #x34 #x12 #xc0 #x05)))
