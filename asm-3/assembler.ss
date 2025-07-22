@@ -1,13 +1,13 @@
-(library (asm-3 linker)
+(library (asm-3 assembler)
   (export
-    link-fragment
-    link-identifier)
+    assemble-fragment
+    assemble-identifier)
   (import
     (asm-3 base)
     (asm-3 dependencies)
     (asm-2 relocable)
     (asm lookable)
-    (asm-3 linked)
+    (asm-3 assembled)
     (asm-2 aligned)
     (asm-3 sized)
     (asm-3 located)
@@ -15,10 +15,10 @@
     (asm-3 size-address)
     (asm-3 environment))
 
-  (define (link-identifier $lookup $org $identifier)
-    (link-fragment $lookup $org (lookup-ref $lookup $identifier)))
+  (define (assemble-identifier $lookup $org $identifier)
+    (assemble-fragment $lookup $org (lookup-ref $lookup $identifier)))
 
-  (define (link-fragment $lookup $org $fragment)
+  (define (assemble-fragment $lookup $org $fragment)
     (lets
       ($lookup (lookup+ $lookup #'main $fragment))
       ($identified-list (resolve-dependencies $lookup #'main))
@@ -43,7 +43,7 @@
       ($binaries (map (partial resolve-lookable $lookup) $lookables))
       ($binary (list->binary $binaries))
       ($bytevector (binary->bytevector $binary))
-      (linked ($lookup #'main) $bytevector)))
+      (assembled ($lookup #'main) $bytevector)))
 
   (define (sort-identified-aligned-list $identified-aligned-list)
     (map

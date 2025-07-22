@@ -15,23 +15,23 @@
     (dw-le #x1234)
     (dw-be org)))
 
-(check-linked
+(check-assembled
   (org #xc000)
   (db 10 20 30)
-  (linked
+  (assembled
     (start #xc000)
     (db 10 20 30)))
 
-; (check-linked
+; (check-assembled
 ;   (org #xc000)
 ;   (dw-be foo)
-;   (linked
+;   (assembled
 ;     (start #xc000)
 ;     (db 10 10 20)))
 
-; (check-linked
+; (check-assembled
 ;   (org #xc000)
 ;   (dw-le main)
-;   (linked
+;   (assembled
 ;     (start #xc000)
 ;     (db 10 0 20 #x34 #x12 #xc0 #x05)))
