@@ -1,22 +1,22 @@
 (library (asm-3 linked)
   (export
-    assembled
-    assembled?
-    assembled-start
-    assembled-bytevector
-    assembled->syntax
-    assembled->datum)
+    linked
+    linked?
+    linked-start
+    linked-bytevector
+    linked->syntax
+    linked->datum)
   (import (asm-3 base))
 
-  (data (assembled start bytevector))
+  (data (linked start bytevector))
 
-  (define (assembled->syntax $assembled)
-    #`(assembled
-      #,(literal->syntax (assembled-start $assembled))
-      #,(bytevector->syntax (assembled-bytevector $assembled))))
+  (define (linked->syntax $linked)
+    #`(linked
+      #,(literal->syntax (linked-start $linked))
+      #,(bytevector->syntax (linked-bytevector $linked))))
 
-  (define (assembled->datum $assembled)
-    `(assembled
-      (start ,(assembled-start $assembled))
-      (db ,@(bytevector->u8-list (assembled-bytevector $assembled)))))
+  (define (linked->datum $linked)
+    `(linked
+      (start ,(linked-start $linked))
+      (db ,@(bytevector->u8-list (linked-bytevector $linked)))))
 )

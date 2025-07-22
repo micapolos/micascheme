@@ -2,8 +2,8 @@
   (export
     proc data const
     + -
-    assembled
-    check-assembled)
+    linked
+    check-linked)
   (import
     (rename
       (except (asm-3 base) data begin)
@@ -13,7 +13,7 @@
     (asm-3 expression-syntax)
     (asm-3 block-fragment)
     (asm-3 linker)
-    (except (asm-3 linked) assembled)
+    (except (asm-3 linked) linked)
     (asm-3 org))
   (export
     (import
@@ -36,22 +36,22 @@
   (define-expr + %+)
   (define-expr - %-)
 
-  (define-syntax (assembled-proc $syntax $lookup)
+  (define-syntax (linked-proc $syntax $lookup)
     (syntax-case $syntax (org)
       ((_ (org $org) id)
         (and
           (integer? (datum $org))
           (identifier? #'id))
-        (assembled->syntax (assemble-identifier $lookup (datum $org) #'id)))))
+        (linked->syntax (assemble-identifier $lookup (datum $org) #'id)))))
 
-  (define-syntax (assembled $syntax $lookup)
+  (define-syntax (linked $syntax $lookup)
     (syntax-case $syntax (org)
       ((_ (org $org) x ...)
         (integer? (datum $org))
         #`(let ()
           (proc main x ...)
-          (assembled-proc (org $org) main)))))
+          (linked-proc (org $org) main)))))
 
-  (define-rule-syntax (check-assembled (org $org) x ... out)
-    (check (equal? (assembled->datum (assembled (org $org) x ...)) 'out)))
+  (define-rule-syntax (check-linked (org $org) x ... out)
+    (check (equal? (linked->datum (linked (org $org) x ...)) 'out)))
 )

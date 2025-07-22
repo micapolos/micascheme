@@ -43,7 +43,7 @@
       ($binaries (map (partial resolve-lookable $lookup) $lookables))
       ($binary (list->binary $binaries))
       ($bytevector (binary->bytevector $binary))
-      (assembled ($lookup #'main) $bytevector)))
+      (linked ($lookup #'main) $bytevector)))
 
   (define (sort-identified-aligned-list $identified-aligned-list)
     (map
