@@ -42,7 +42,7 @@
         (and
           (integer? (datum $org))
           (identifier? #'id))
-        (linked->syntax (assemble-identifier $lookup (datum $org) #'id)))))
+        (linked->syntax (link-identifier $lookup (datum $org) #'id)))))
 
   (define-syntax (linked $syntax $lookup)
     (syntax-case $syntax (org)

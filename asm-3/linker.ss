@@ -1,7 +1,7 @@
 (library (asm-3 linker)
   (export
-    assemble-fragment
-    assemble-identifier)
+    link-fragment
+    link-identifier)
   (import
     (asm-3 base)
     (asm-3 dependencies)
@@ -15,10 +15,10 @@
     (asm-3 size-address)
     (asm-3 environment))
 
-  (define (assemble-identifier $lookup $org $identifier)
-    (assemble-fragment $lookup $org (lookup-ref $lookup $identifier)))
+  (define (link-identifier $lookup $org $identifier)
+    (link-fragment $lookup $org (lookup-ref $lookup $identifier)))
 
-  (define (assemble-fragment $lookup $org $fragment)
+  (define (link-fragment $lookup $org $fragment)
     (lets
       ($lookup (lookup+ $lookup #'main $fragment))
       ($identified-list (resolve-dependencies $lookup #'main))

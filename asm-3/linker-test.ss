@@ -28,60 +28,60 @@
 
 (check
   (equal?
-    (assemble-identifier dependent-lookup 100 #'data-10)
+    (link-identifier dependent-lookup 100 #'data-10)
     (linked 100 (bytevector 10))))
 
 (check
   (equal?
-    (assemble-identifier dependent-lookup 100 #'data-20)
+    (link-identifier dependent-lookup 100 #'data-20)
     (linked 100 (bytevector 20))))
 
 (check
   (equal?
-    (assemble-identifier dependent-lookup 100 #'data-30)
+    (link-identifier dependent-lookup 100 #'data-30)
     (linked 100 (bytevector 30))))
 
 (check
   (equal?
-    (assemble-identifier dependent-lookup 100 #'data-10-20-30)
+    (link-identifier dependent-lookup 100 #'data-10-20-30)
     (linked 100 (bytevector 10 20 30))))
 
 (check
   (equal?
-    (assemble-identifier dependent-lookup 100 #'data-org)
+    (link-identifier dependent-lookup 100 #'data-org)
     (linked 100 (bytevector 100))))
 
 (check
   (equal?
-    (assemble-identifier dependent-lookup 100 #'data-org+10)
+    (link-identifier dependent-lookup 100 #'data-org+10)
     (linked 100 (bytevector 110))))
 
 (check
   (equal?
-    (assemble-identifier dependent-lookup 100 #'data-org+20)
+    (link-identifier dependent-lookup 100 #'data-org+20)
     (linked 100 (bytevector 120))))
 
 (check
   (equal?
-    (assemble-identifier dependent-lookup 100 #'data-org+30)
+    (link-identifier dependent-lookup 100 #'data-org+30)
     (linked 100 (bytevector 130))))
 
 (check
   (equal?
-    (assemble-identifier dependent-lookup 100 #'sub-30)
+    (link-identifier dependent-lookup 100 #'sub-30)
     (linked 100 (bytevector 30))))
 
 (check
   (equal?
-    (assemble-identifier dependent-lookup 100 #'sub-40)
+    (link-identifier dependent-lookup 100 #'sub-40)
     (linked 100 (bytevector 40))))
 
 (check
   (equal?
-    (assemble-identifier dependent-lookup 100 #'call-30-40)
+    (link-identifier dependent-lookup 100 #'call-30-40)
     (linked 102 (bytevector 30 40 #xff 100 #xff 101))))
 
 (check
   (equal?
-    (assemble-identifier dependent-lookup 100 #'main)
+    (link-identifier dependent-lookup 100 #'main)
     (linked 106 (bytevector 30 40 255 100 255 101 10 20 255 102 255 101 255 100 106))))
