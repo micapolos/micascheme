@@ -1,4 +1,4 @@
-(library (asm-3 assembled)
+(library (asm-3 linked)
   (export
     assembled
     assembled?
