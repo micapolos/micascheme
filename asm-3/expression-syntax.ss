@@ -25,5 +25,5 @@
           (expr fn)
           (list (expr arg) ...)))
       ((_ other)
-        (syntax-error #'other "not expression"))))
+        (syntax-error #'other "invalid expression"))))
 )

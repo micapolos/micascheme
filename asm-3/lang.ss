@@ -2,7 +2,8 @@
   (export
     proc data const
     + -
-    assembled-asm)
+    assembled-proc
+    check-assembled)
   (import
     (rename
       (except (asm-3 base) data begin)
@@ -12,7 +13,8 @@
     (asm-3 expression-syntax)
     (asm-3 block-fragment)
     (asm-3 assembler)
-    (asm-3 assembled))
+    (asm-3 assembled)
+    (asm-3 org))
   (export
     (import
       (asm-3 org)
@@ -29,16 +31,19 @@
     (define-asm id (block->fragment (begin x ...))))
 
   (define-rule-syntax (const id x)
-    (define-asm id (expr x)))
+    (define-asm id #'(expr x)))
 
   (define-expr + %+)
   (define-expr - %-)
 
-  (define-syntax (assembled-asm $syntax $lookup)
+  (define-syntax (assembled-proc $syntax $lookup)
     (syntax-case $syntax (org)
       ((_ (org $org) id)
         (and
           (integer? (datum $org))
           (identifier? #'id))
         (assembled->syntax (assemble $lookup (datum $org) #'id)))))
+
+  (define-rule-syntax (check-assembled (org $org) x ... out)
+    (check (equal? (assembled->datum (assembled-proc (org $org) x ...)) 'out)))
 )
