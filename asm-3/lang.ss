@@ -1,30 +1,31 @@
 (library (asm-3 lang)
   (export
-    proc data const
-    define-asm
+    proc data const native
     assembled-asm)
   (import
-    (except (asm-3 base) data)
-    (asm-3 located)
-    (asm-3 syntax-fragment)
-    (asm-3 syntax-expression)
+    (except (asm-3 base) data begin)
+    (asm-3 block-syntax)
+    (asm-3 expression-syntax)
+    (asm-3 block-fragment)
     (asm-3 assembler)
-    (asm-3 assembled)
-    (asm-3 org))
+    (asm-3 assembled))
   (export
     (import
-      (only (asm-3 base) begin)
-      (only (asm-3 org) org)
-      (only (asm-3 syntax-block) db dw align)))
+      (asm-3 org)
+      (asm-3 expression-syntax)
+      (asm-3 block-syntax)))
 
   (define-rule-syntax (proc id x ...)
-    (define-asm id (syntax->fragment #'(begin x ...))))
+    (define-asm id (block->fragment (begin x ...))))
 
   (define-rule-syntax (data id x ...)
-    (define-asm id (syntax->fragment #'(begin x ...))))
+    (define-asm id (block->fragment (begin x ...))))
 
   (define-rule-syntax (const id x)
-    (define-asm id (syntax->expression #'x)))
+    (define-asm id (expr x)))
+
+  (define-rule-syntax (native id x)
+    (define-expr id x))
 
   (define-rule-syntax (define-asm id value)
     (define-syntax id (make-compile-time-value value)))

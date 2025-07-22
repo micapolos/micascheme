@@ -12,7 +12,7 @@
 
 (check-block #xc000
   (empty-lookup)
-  (u16 org (endianness little))
+  (u16-le org)
   (block
     (alignment 1)
     (size 2)
@@ -22,12 +22,22 @@
 
 (check-block #xc000
   (empty-lookup)
+  (u16-be org)
+  (block
+    (alignment 1)
+    (size 2)
+    (labels)
+    (blobs
+      (dependent (binary #xc0 #x00)))))
+
+(check-block #xc000
+  (empty-lookup)
   (begin
     (label start)
     (u8 10)
     (align 2)
-    (u16 #x1234 (endianness little))
-    (u16 org (endianness little))
+    (u16-le #x1234)
+    (u16-le org)
     (label end))
   (block
     (alignment 2)

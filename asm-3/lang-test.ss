@@ -3,9 +3,13 @@
 (const val-10 10)
 
 (data foo
-  (db 10)
-  (db 20))
+  (u8 10)
+  (u8 20))
 
 (proc main
-  (db 10)
-  (db 20))
+  (u8 10)
+  (align 1)
+  (u8 20)
+  (begin
+    (u16-le 2)
+    (u16-be org)))
