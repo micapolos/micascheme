@@ -2,7 +2,7 @@
   (export
     assemble-fragment
     assemble-identifier
-    link)
+    assemble)
   (import
     (asm-3 base)
     (asm-3 dependencies)
@@ -22,9 +22,9 @@
   (define (assemble-fragment $lookup $org $fragment)
     (lets
       ($lookup (lookup+ $lookup #'main $fragment))
-      (link $org (resolve-dependencies $lookup #'main))))
+      (assemble $org (resolve-dependencies $lookup #'main))))
 
-  (define (link $org $identified-list)
+  (define (assemble $org $identified-list)
     (lets
       ($identified-aligned-list (filter (dot aligned? identified-ref) $identified-list))
       ($identified-relocable-list (filter (dot relocable? identified-ref) $identified-list))
