@@ -1,34 +1,23 @@
 (library (asm-3 syntax-block)
-  (export
-    db dw align
-    syntax->block
-    check-syntax->block)
+  (export syntax->block check-syntax->block)
   (import (asm-3 base) (asm-3 block) (asm-3 syntax-expression))
 
-  (define-keywords db dw align)
-
-  (define (syntax->block $syntax)
-    (syntax-case $syntax (db dw align begin)
-      ((db x ...)
-        (list->block
-          (map
-            (dot u8-expression-block syntax->expression)
-            #'(x ...))))
-      ((dw x ...)
-        (list->block
-          (map
-            (dot
-              (partial-flip u16-expression-block (endianness little))
-              syntax->expression)
-            #'(x ...))))
-      ((align x)
-        (align-block (datum x)))
+  (define (syntax->block $lookup $syntax)
+    (syntax-case $syntax (syntax begin)
       ((begin x ...)
-        (list->block (map syntax->block #'(x ...))))
+        (list->block (map (partial syntax->block $lookup) #'(x ...))))
       (id
         (identifier? #'id)
-        (identifier-block #'id))))
+        (identifier-block #'id))
+      ((id . x)
+        (identifier? #'id)
+        (switch ((lookup-ref $lookup #'id) $syntax)
+          ((syntax? $syntax) (syntax->block $lookup $syntax))
+          ((block? $block) $block)
+          ((else $other) (syntax-error $syntax "invalid block syntax"))))
+      (other
+        (syntax-error $syntax "invalid block syntax"))))
 
-  (define-rule-syntax (check-syntax->block org lookup in out)
-    (check (equal? (block->datum org lookup (syntax->block #'in)) 'out)))
+  (define-rule-syntax (check-syntax->block lookup org dependency-lookup in out)
+    (check-block org dependency-lookup (syntax->block lookup #'in) out))
 )
