@@ -2,6 +2,11 @@
 
 (const val-10 10)
 
+; (proc main
+;   (db 10)
+;   (align 2)
+;   (db 20))
+
 (check-assembled
   (org #xc000)
   (db 10 20 30)
@@ -40,36 +45,20 @@
     (start #xc000)
     (db 10 20 30)))
 
-; (check-assembled
-;   (org #xc000)
-;   start
-;   (assembled
-;     (start #xc000)
-;     (db 10 20 30)))
+(check-assembled
+  (org #xc000)
+  (label start)
+  (assembled
+    (start #xc000)
+    (db)))
 
-; (data foo
-;   (db 10)
-;   (db val-10)
-;   (db (+ 10 val-10)))
-
-; (proc main
-;   (db 10)
-;   (align 2)
-;   (db 20)
-;   (begin
-;     (dw-le #x1234)
-;     (dw-be org)))
-
-; (check-assembled
-;   (org #xc000)
-;   (dw-be foo)
-;   (assembled
-;     (start #xc000)
-;     (db 10 10 20)))
-
-; (check-assembled
-;   (org #xc000)
-;   (dw-le main)
-;   (assembled
-;     (start #xc000)
-;     (db 10 0 20 #x34 #x12 #xc0 #x05)))
+(check-assembled
+  (org #xc000)
+  (begin
+    (label start)
+    (dw start)
+    (dw end)
+    (label end))
+  (assembled
+    (start #xc000)
+    (db #x00 #xc0 #x04 #xc0)))

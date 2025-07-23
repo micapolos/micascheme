@@ -25,6 +25,7 @@
     (import
       (only (asm-3 base) syntax begin)
       (only (asm-3 block) block)
+      (only (asm-3 syntax-block) label)
       (asm-3 org)
       (asm-3 expression-syntax)))
 

@@ -121,7 +121,7 @@
     (cadr (expression->datum $org $lookup (expression-map $blob binary->datum))))
 
   (define (org-lookup+label $org $lookup $label)
-    (lookup+undefined $lookup
+    (lookup+ $lookup
       (identified-identifier $label)
       (+ (identified-ref $label) $org)))
 

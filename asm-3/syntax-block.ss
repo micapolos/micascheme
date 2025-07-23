@@ -1,11 +1,16 @@
 (library (asm-3 syntax-block)
-  (export syntax->block check-syntax->block)
+  (export label syntax->block check-syntax->block)
   (import (asm-3 base) (asm-3 block) (asm-3 syntax-expression))
 
+  (define-keywords label)
+
   (define (syntax->block $lookup $syntax)
-    (syntax-case $syntax (syntax begin)
+    (syntax-case $syntax (syntax begin label)
       ((begin x ...)
         (list->block (map (partial syntax->block $lookup) #'(x ...))))
+      ((label id)
+        (identifier? #'id)
+        (identifier-block #'id))
       (id
         (identifier? #'id)
         (identifier-block #'id))
