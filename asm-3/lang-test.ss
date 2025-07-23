@@ -23,22 +23,22 @@
     (start #xc000)
     (db 10)))
 
-; (check-assembled
-;   (org #xc000)
-;   (db (+ val-10 20))
-;   (assembled
-;     (start #xc000)
-;     (db 30)))
+(check-assembled
+  (org #xc000)
+  (db (+ val-10 20))
+  (assembled
+    (start #xc000)
+    (db 30)))
 
-; (check-assembled
-;   (org #xc000)
-;   (begin
-;     (db 10)
-;     (db 20)
-;     (db 30))
-;   (assembled
-;     (start #xc000)
-;     (db 10 20 30)))
+(check-assembled
+  (org #xc000)
+  (begin
+    (db 10)
+    (db 20)
+    (db 30))
+  (assembled
+    (start #xc000)
+    (db 10 20 30)))
 
 ; (check-assembled
 ;   (org #xc000)

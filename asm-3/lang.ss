@@ -3,6 +3,7 @@
     proc data const
     db dw
     op
+    +
     assembled
     check-assembled)
   (import
@@ -44,6 +45,18 @@
 
   (define-rule-syntax (const id x)
     (define-asm id (expr x)))
+
+  (define-syntax +
+    (make-compile-time-value
+      (lambda ($lookup $syntax)
+        (syntax-case $syntax ()
+          (id
+            (identifier? #'id)
+            (pure-expression %+))
+          ((_ x ...)
+            (apply application-expression
+              (pure-expression %+)
+              (map (partial syntax->expression $lookup) #'(x ...))))))))
 
   (define-syntax db
     (make-compile-time-value
