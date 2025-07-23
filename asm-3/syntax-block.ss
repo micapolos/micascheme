@@ -11,7 +11,7 @@
         (identifier-block #'id))
       ((id . x)
         (identifier? #'id)
-        (switch ((lookup-ref $lookup #'id) $syntax)
+        (switch ((lookup-ref $lookup #'id) $lookup $syntax)
           ((syntax? $syntax) (syntax->block $lookup $syntax))
           ((block? $block) $block)
           ((else $other) (syntax-error $syntax "invalid block syntax"))))

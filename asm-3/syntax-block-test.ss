@@ -3,11 +3,11 @@
 (define lookup
   (lookup-with
     (db
-      (lambda ($syntax)
+      (lambda ($lookup $syntax)
         (syntax-case $syntax ()
           ((_ x)
             (u8-expression-block
-              (syntax->expression #'x))))))))
+              (syntax->expression $lookup #'x))))))))
 
 (check-syntax->block lookup #xc000 (empty-lookup)
   foo

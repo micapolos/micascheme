@@ -1,6 +1,5 @@
 (library (asm-3 fragment)
   (export
-    db dw
     fragment->datum
     check-fragment
     fragment->bytevector)
@@ -15,36 +14,6 @@
     (asm lookable))
 
   (define-type fragment (dependent (aligned (sized (relocable (lookable (binary)))))))
-
-  (define-rule-syntax (expr x)
-    (syntax->expression #'x))
-
-  (define-syntax (db $syntax)
-    (syntax-case $syntax ()
-      ((_ x ...)
-        (lets
-          ($size (length #'(x ...)))
-          #`(dependent-map
-            (combine-expressions
-              (lambda ($values) (list->binary (map u8-binary $values)))
-              (list (expr x) ...))
-            (lambda ($relocable-lookable-binary)
-              (aligned 1 (sized #,$size $relocable-lookable-binary))))))))
-
-  (define-syntax (dw $syntax)
-    (syntax-case $syntax ()
-      ((_ x ...)
-        (lets
-          ($size (* 2 (length #'(x ...))))
-          #`(dependent-map
-            (combine-expressions
-              (lambda ($values)
-                (list->binary
-                  (map-with ($value $values)
-                    (u16-binary $value (endianness little)))))
-              (list (expr x) ...))
-            (lambda ($relocable-lookable-binary)
-              (aligned 1 (sized #,$size $relocable-lookable-binary))))))))
 
   (define (fragment->datum $org $lookup $fragment)
     (dependent->datum

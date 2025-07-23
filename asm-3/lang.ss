@@ -3,7 +3,6 @@
     proc data const
     db dw
     op
-    + -
     assembled
     check-assembled)
   (import
@@ -18,7 +17,7 @@
     (asm-3 expression)
     (asm-3 block)
     (asm-3 syntax-expression)
-    (except (asm-3 fragment) db dw)
+    (asm-3 fragment)
     (except (asm-3 assembled) assembled)
     (asm-3 org))
   (export
@@ -46,30 +45,27 @@
   (define-rule-syntax (const id x)
     (define-asm id (expr x)))
 
-  (define-syntax + (make-compile-time-value (pure-expression %+)))
-  (define-syntax - (make-compile-time-value (pure-expression %-)))
-
   (define-syntax db
     (make-compile-time-value
-      (lambda ($syntax)
+      (lambda ($lookup $syntax)
         (syntax-case $syntax ()
           ((_ x ...)
             (list->block
               (map
                 (lambda ($syntax)
-                  (u8-expression-block (syntax->expression $syntax)))
+                  (u8-expression-block (syntax->expression $lookup $syntax)))
                 #'(x ...))))))))
 
   (define-syntax dw
     (make-compile-time-value
-      (lambda ($syntax)
+      (lambda ($lookup $syntax)
         (syntax-case $syntax ()
           ((_ x ...)
             (list->block
               (map
                 (lambda ($syntax)
                   (u16-expression-block
-                    (syntax->expression $syntax)
+                    (syntax->expression $lookup $syntax)
                     (endianness little)))
                 #'(x ...))))))))
 

@@ -3,19 +3,19 @@
 ; literal
 (check-expression 100
   (empty-lookup)
-  (syntax->expression #'123)
+  (syntax->expression (empty-lookup) #'123)
   (expression (dependent 123)))
 
 ; lookup
 (check-expression 100
   (lookup-with (foo 123))
-  (syntax->expression #'foo)
+  (syntax->expression (empty-lookup) #'foo)
   (expression (dependent (foo) 123)))
 
 ; org
 (check-expression 100
   (empty-lookup)
-  (syntax->expression #'org)
+  (syntax->expression (empty-lookup) #'org)
   (expression (dependent 100)))
 
 ; application
@@ -23,5 +23,5 @@
   (lookup-with
     (add +)
     (val-20 20))
-  (syntax->expression #'(add 10 val-20 org))
+  (syntax->expression (empty-lookup) #'(add 10 val-20 org))
   (expression (dependent (add val-20) 130)))
