@@ -18,6 +18,10 @@
   (block (alignment 1) (size 0) (labels (foo #xc000)) (blobs)))
 
 (check-syntax->block lookup #xc000 (empty-lookup)
+  (align 4)
+  (block (alignment 4) (size 0) (labels) (blobs)))
+
+(check-syntax->block lookup #xc000 (empty-lookup)
   (db 10)
   (block (alignment 1) (size 1) (labels) (blobs (dependent (binary 10)))))
 

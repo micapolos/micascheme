@@ -47,6 +47,16 @@
 
 (check-assembled
   (org #xc000)
+  (begin
+    (db 10)
+    (align 4)
+    (db 20))
+  (assembled
+    (start #xc000)
+    (db 10 0 0 0 20)))
+
+(check-assembled
+  (org #xc000)
   (label start)
   (assembled
     (start #xc000)
