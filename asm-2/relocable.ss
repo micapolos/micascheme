@@ -7,6 +7,7 @@
     relocable-ref
     locate-relocable
     relocable-map
+    map-relocable
     relocable+offset
     offset-relocable
     list->relocable
@@ -39,6 +40,9 @@
     (relocable
       (lambda ($org)
         ($proc (relocable-ref $relocable $org)))))
+
+  (define (map-relocable $proc $relocable)
+    (relocable-map $relocable $proc))
 
   (define (relocable+offset $relocable $offset)
     (relocable-with ($org)

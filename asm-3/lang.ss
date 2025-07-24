@@ -1,9 +1,10 @@
 (library (asm-3 lang)
   (export
     proc data const
-    db dw
-    op
-    +
+    db
+    ; dw
+    ;op
+    ;+
     assembled
     check-assembled)
   (import
@@ -12,7 +13,6 @@
       (+ %+)
       (- %-))
     (asm-3 syntax-block)
-    (asm-3 expression-syntax)
     (asm-3 block-fragment)
     (asm-3 assembler)
     (asm-3 expression)
@@ -25,9 +25,8 @@
     (import
       (only (asm-3 base) syntax begin)
       (only (asm-3 block) block)
-      (only (asm-3 syntax-block) label align)
-      (asm-3 org)
-      (asm-3 expression-syntax)))
+      (only (asm-3 syntax-block) align)
+      (asm-3 org)))
 
   (define-rule-syntax (op (id x ...) body ...)
     (define-syntax id
@@ -35,62 +34,57 @@
         (syntax-rules ()
           ((_ x ...) body ...)))))
 
-  (define-rule-syntax (define-asm id value)
-    (define-syntax id (make-compile-time-value value)))
+  (define-rule-syntax (define-dependent id dependent)
+    (define-syntax id (make-compile-time-value dependent)))
+
+  (define-syntax (define-fragment $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ id x ...)
+        #`(define-dependent id
+          #,(fragment->syntax
+            (block->fragment
+              (syntax->block $lookup #'(begin x ...))))))))
 
   (define-rule-syntax (proc id x ...)
-    (define-asm id (block->fragment (begin x ...))))
+    (define-fragment id x ...))
 
   (define-rule-syntax (data id x ...)
-    (define-asm id (block->fragment (begin x ...))))
+    (define-fragment id x ...))
 
-  (define-rule-syntax (const id x)
-    (define-asm id (expr x)))
+  (define-syntax (const $syntax $lookup)
+    (syntax-case $syntax ()
+      ((_ id x)
+        #`(define-dependent id
+          #,(expression->syntax
+            (syntax->expression $lookup #'x))))))
 
-  (define-syntax +
-    (make-compile-time-value
-      (lambda ($lookup $syntax)
-        (syntax-case $syntax ()
-          (id
-            (identifier? #'id)
-            (pure-expression %+))
-          ((_ x ...)
-            (apply application-expression
-              (pure-expression %+)
-              (map (partial syntax->expression $lookup) #'(x ...))))))))
+  ; (define-syntax +
+  ;   (make-compile-time-value
+  ;     (lambda ($lookup $syntax)
+  ;       (syntax-case $syntax ()
+  ;         (id
+  ;           (identifier? #'id)
+  ;           (pure-expression %+))
+  ;         ((_ x ...)
+  ;           (apply application-expression
+  ;             (pure-expression %+)
+  ;             (map (partial syntax->expression $lookup) #'(x ...))))))))
 
   (define-syntax db
     (make-compile-time-value
       (lambda ($lookup $syntax)
         (syntax-case $syntax ()
           ((_ x ...)
-            (list->block
-              (map
-                (lambda ($syntax)
-                  (u8-expression-block (syntax->expression $lookup $syntax)))
-                #'(x ...))))))))
+            (apply db-block
+              (map (partial syntax->expression $lookup) #'(x ...))))))))
 
   (define-syntax dw
     (make-compile-time-value
       (lambda ($lookup $syntax)
         (syntax-case $syntax ()
           ((_ x ...)
-            (list->block
-              (map
-                (lambda ($syntax)
-                  (u16-expression-block
-                    (syntax->expression $lookup $syntax)
-                    (endianness little)))
-                #'(x ...))))))))
-
-  (define-syntax (assembled-proc $syntax $lookup)
-    (syntax-case $syntax (org)
-      ((_ (org $org) id)
-        (and
-          (integer? (datum $org))
-          (identifier? #'id))
-        (assembled->syntax
-          (assemble-identifier $lookup (datum $org) #'id)))))
+            (apply dw-block
+              (map (partial syntax->expression $lookup) #'(x ...))))))))
 
   (define-syntax (assembled $syntax $lookup)
     (syntax-case $syntax (org)

@@ -5,34 +5,36 @@
     (db
       (lambda ($lookup $syntax)
         (syntax-case $syntax ()
-          ((_ x)
-            (u8-expression-block
-              (syntax->expression $lookup #'x))))))))
+          ((_ x ...)
+            (apply db-block
+              (map (partial syntax->expression $lookup) #'(x ...)))))))))
 
-(check-syntax->block lookup #xc000 (empty-lookup)
+(check-syntax->block lookup
   foo
-  (block (alignment 1) (size 0) (labels (foo #xc000)) (blobs)))
+  (block 1 0 (stack (foo 0)) (stack)))
 
-(check-syntax->block lookup #xc000 (empty-lookup)
-  (label foo)
-  (block (alignment 1) (size 0) (labels (foo #xc000)) (blobs)))
-
-(check-syntax->block lookup #xc000 (empty-lookup)
+(check-syntax->block lookup
   (align 4)
-  (block (alignment 4) (size 0) (labels) (blobs)))
+  (block 4 0 (stack) (stack)))
 
-(check-syntax->block lookup #xc000 (empty-lookup)
-  (db 10)
-  (block (alignment 1) (size 1) (labels) (blobs (dependent (binary 10)))))
+(check-syntax->block lookup
+  (db 10 foo bar foo)
+  (block 1 4
+    (stack)
+    (stack
+      (dependent (foo bar)
+        (db-binary 10 foo bar foo)))))
 
-(check-syntax->block lookup #xc000 (lookup-with (foo 10))
-  (db foo)
-  (block (alignment 1) (size 1) (labels) (blobs (dependent (foo) (binary 10)))))
-
-(check-syntax->block lookup #xc000 (empty-lookup)
-  (begin (db 10) (db 20) (db 30))
-  (block (alignment 1) (size 3) (labels)
-    (blobs
-      (dependent (binary 10))
-      (dependent (binary 20))
-      (dependent (binary 30)))))
+(check-syntax->block lookup
+  (begin
+    start
+    (db 10 start end)
+    (db foo bar foo)
+    end)
+  (block 1 6
+    (stack
+      (start 0)
+      (end 6))
+    (stack
+      (dependent (start end) (db-binary 10 start end))
+      (dependent (foo bar) (db-binary foo bar foo)))))

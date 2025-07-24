@@ -2,6 +2,7 @@
 
 (test
   (asm-3 base)
+  (asm-3 binary)
   (asm-3 identified)
   (asm-3 environment)
   (asm-3 environmental)
@@ -17,11 +18,9 @@
   (asm-3 located)
   (asm-3 expression)
   (asm-3 fragment)
-  (asm-3 assembler)
-  (asm-3 assembled)
+  (asm-3 linked)
   (asm-3 block-fragment)
   (asm-3 syntax-expression)
   (asm-3 syntax-block)
-  (asm-3 expression-syntax)
-  (asm-3 block-syntax)
-  (asm-3 lang))
+  ;(asm-3 lang)
+  )

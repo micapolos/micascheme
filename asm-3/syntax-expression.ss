@@ -1,17 +1,15 @@
 (library (asm-3 syntax-expression)
   (export syntax->expression)
-  (import (asm-3 base) (asm-3 org) (asm-3 expression))
+  (import (asm-3 base) (asm-3 expression))
 
   (define (syntax->expression $lookup $syntax)
-    (syntax-case $syntax (org)
-      (org
-        (org-expression))
+    (syntax-case $syntax ()
       (id
         (identifier? #'id)
         (identifier-expression #'id))
       (literal
         ((or? boolean? integer? string? char?) (datum literal))
-        (pure-expression (datum literal)))
+        (pure-expression #'literal))
       ((id . x)
         (and (identifier? #'id) ($lookup #'id))
         (switch (($lookup #'id) $lookup $syntax)

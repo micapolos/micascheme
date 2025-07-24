@@ -1,21 +1,31 @@
 (library (asm-3 fragment)
   (export
+    fragment?
+    pure-fragment
     fragment->datum
-    check-fragment
-    fragment->bytevector)
+    fragment->syntax
+    check-fragment)
   (import
     (asm-3 base)
     (asm-2 aligned)
     (asm-3 sized)
-    (asm-3 expression)
-    (asm-3 syntax-expression)
-    (asm-3 dependent)
-    (asm-2 relocable)
-    (asm lookable))
+    (asm-3 dependent))
 
-  (define-type fragment (dependent (aligned (sized (relocable (lookable (binary)))))))
+  (define-type fragment (dependent (aligned (sized (syntax (relocable binary))))))
 
-  (define (fragment->datum $org $lookup $fragment)
+  (define (pure-fragment $syntax)
+    (pure-dependent (pure-aligned (pure-sized #'(pure-relocable #,$syntax)))))
+
+  (define (fragment? $obj)
+    (and (dependent? $obj)
+      (lets ($obj (dependent-ref $obj))
+        (and (aligned? $obj)
+          (lets ($obj (aligned-ref $obj))
+            (and (sized? $obj)
+              (lets ($obj (sized-ref $obj))
+                (syntax? $obj))))))))
+
+  (define (fragment->datum $fragment)
     (dependent->datum
       (dependent-map $fragment
         (lambda ($aligned)
@@ -23,21 +33,21 @@
             (aligned-map $aligned
               (lambda ($sized)
                 (sized->datum
-                  (sized-map $sized
-                    (lambda ($relocable)
-                      (binary->datum
-                        (lookable-ref (relocable-ref $relocable $org) $lookup))))))))))))
+                  (sized-map $sized syntax->datum)))))))))
 
-  (define-rule-syntax (check-fragment org lookup fragment out)
-    (check (equal? (fragment->datum org lookup fragment) 'out)))
+  (define (fragment->syntax $fragment)
+    (lets
+      ($dependencies (dependent-identifiers $fragment))
+      ($aligned (dependent-ref $fragment))
+      ($alignment (aligned-alignment $aligned))
+      ($sized (aligned-ref $aligned))
+      ($size (sized-size $sized))
+      ($relocable-binary-syntax (sized-ref $sized))
+      #`(dependent-with (#,@$dependencies)
+        (aligned #,$alignment
+          (sized #,$size
+            #,$relocable-binary-syntax)))))
 
-  (define (fragment->bytevector $org $lookup $fragment)
-    (binary->bytevector
-      (lookable-ref
-        (relocable-ref
-          (sized-ref
-            (aligned-ref
-              (dependent-ref $fragment)))
-          $org)
-        $lookup)))
+  (define-rule-syntax (check-fragment fragment out)
+    (check (equal? (fragment->datum fragment) 'out)))
 )

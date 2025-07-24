@@ -8,12 +8,8 @@
   (asm-3 dependent)
   (asm-2 relocable))
 
-(check-fragment 100
-  (lookup-with (foo 10))
-  (dependent-with (foo)
-    (aligned 2
-      (sized 4
-        (relocable-with ($org)
-          (lookable ($lookup)
-            (u8-binary (+ $org ($lookup #'foo))))))))
-  (dependent (foo) (aligned 2 (sized 4 (binary 110)))))
+(check (fragment? (dependent-with () (aligned 1 (sized 2 #'foo)))))
+
+(check-fragment
+  (dependent-with (foo bar) (aligned 2 (sized 4 #'relocable-binary)))
+  (dependent (foo bar) (aligned 2 (sized 4 relocable-binary))))

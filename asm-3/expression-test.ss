@@ -1,38 +1,39 @@
 (import (asm-3 base) (asm-3 expression) (asm-3 dependent) (asm lookable) (asm-2 relocable) (syntax lookup))
 
+(check (expression? (dependent-with () #'foo)))
+
 ; pure-expression
-(check-expression 100
-  (empty-lookup)
-  (pure-expression 123)
-  (expression (dependent 123)))
+(check-expression
+  (pure-expression #'123)
+  (dependent 123))
 
 ; identifier-expression
-(check-expression 100
-  (lookup-with (foo 123))
+(check-expression
   (identifier-expression #'foo)
-  (expression (dependent (foo) 123)))
-
-; org-expression
-(check-expression 100
-  (empty-lookup)
-  (org-expression)
-  (expression (dependent 100)))
-
-; org-expression
-(check-expression 100
-  (empty-lookup)
-  (offset-expression 10 (org-expression))
-  (expression (dependent 110)))
+  (dependent (foo) foo))
 
 ; application-expression
-(check-expression 100
-  (lookup-with
-    (val-10 10)
-    (val-20 20))
+(check-expression
   (application-expression
-    (pure-expression +)
-    (org-expression)
+    (pure-expression #'+)
     (identifier-expression #'val-10)
     (identifier-expression #'val-20)
-    (pure-expression 1))
-  (expression (dependent (val-10 val-20) 131)))
+    (pure-expression #'1))
+  (dependent (val-10 val-20)
+    (+ val-10 val-20 1)))
+
+; map-expression
+(check-expression
+  (map-expression
+    (lambda ($expression) #`(u8-binary #,$expression))
+    (identifier-expression #'foo))
+  (dependent (foo) (u8-binary foo)))
+
+; map-expressions
+(check-expression
+  (map-expressions list->syntax
+    (list
+      (pure-expression #'10)
+      (identifier-expression #'foo)
+      (identifier-expression #'bar)))
+  (dependent (foo bar) (10 foo bar)))

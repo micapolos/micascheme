@@ -1,8 +1,8 @@
 (library (asm-3 syntax-block)
-  (export label align syntax->block check-syntax->block)
+  (export align syntax->block check-syntax->block)
   (import (asm-3 base) (asm-3 block) (asm-3 syntax-expression))
 
-  (define-keywords label align)
+  (define-keywords align)
 
   (define (syntax->block $lookup $syntax)
     (syntax-case $syntax (syntax begin label align)
@@ -11,9 +11,6 @@
       ((align x)
         (integer? (datum x))
         (align-block (datum x)))
-      ((label id)
-        (identifier? #'id)
-        (identifier-block #'id))
       (id
         (identifier? #'id)
         (identifier-block #'id))
@@ -26,6 +23,6 @@
       (other
         (syntax-error $syntax "invalid block syntax"))))
 
-  (define-rule-syntax (check-syntax->block lookup org dependency-lookup in out)
-    (check-block org dependency-lookup (syntax->block lookup #'in) out))
+  (define-rule-syntax (check-syntax->block lookup in out)
+    (check-block (syntax->block lookup #'in) out))
 )

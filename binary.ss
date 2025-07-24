@@ -10,6 +10,7 @@
     zero-binary
     u8-binary
     u16-binary
+    endianness-u16-binary
     bytevector-binary
     utf8-binary
     binary->datum)
@@ -57,6 +58,9 @@
   (define (u16-binary $u16 $endianness)
     (binary ($port)
       (put-u16 $port $u16 $endianness)))
+
+  (define (endianness-u16-binary $endianness $u16)
+    (u16-binary $u16 $endianness))
 
   (define (bytevector-binary $bytevector)
     (binary ($port)

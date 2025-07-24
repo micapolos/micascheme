@@ -4,6 +4,7 @@
     pure-dependent
     dependent-with
     dependent->datum
+    dependent->syntax
     list->dependent
     dependent-append
     dependent-append-map
@@ -49,6 +50,10 @@
 
   (define (map-dependent $proc $dependent)
     (dependent-map $dependent $proc))
+
+  (define (dependent->syntax $dependent)
+    #`(dependent-with (#,@(dependent-identifiers $dependent))
+      #,(dependent-ref $dependent)))
 
   (define-rule-syntax (check-dependent in out)
     (check (equal? (dependent->datum in) (dependent->datum out))))

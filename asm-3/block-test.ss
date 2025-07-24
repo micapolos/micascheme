@@ -1,104 +1,77 @@
 (import (asm-3 base) (asm-3 block) (asm-3 expression) (syntax lookup))
 
-(check-block #xc000
-  (empty-lookup)
+(check-block
   (empty-block)
-  (block (alignment 1) (size 0) (labels) (blobs)))
+  (block 1 0 (stack) (stack)))
 
-(check-block 3
-  (empty-lookup)
+(check-block
   (align-block 8)
-  (block (alignment 8) (size 0) (labels) (blobs)))
+  (block 8 0 (stack) (stack)))
 
-(check-block #xc000
-  (empty-lookup)
-  (u8-block 100)
-  (block (alignment 1) (size 1) (labels) (blobs (dependent (binary 100)))))
-
-(check-block #xc000
-  (empty-lookup)
-  (u16-block #x1234 (endianness big))
-  (block (alignment 1) (size 2) (labels) (blobs (dependent (binary #x12 #x34)))))
-
-(check-block #xc000
-  (empty-lookup)
-  (u16-block #x1234 (endianness little))
-  (block (alignment 1) (size 2) (labels) (blobs (dependent (binary #x34 #x12)))))
-
-(check-block #xc000
-  (empty-lookup)
-  (bytevector-block (bytevector 10 20 30))
-  (block (alignment 1) (size 3) (labels) (blobs (dependent (binary 10 20 30)))))
-
-(check-block #xc000
-  (empty-lookup)
-  (u8-expression-block (pure-expression 123))
-  (block (alignment 1) (size 1) (labels) (blobs (dependent (binary 123)))))
-
-(check-block #xc000
-  (lookup-with (foo 123))
-  (u8-expression-block (identifier-expression #'foo))
-  (block (alignment 1) (size 1) (labels) (blobs (dependent (foo) (binary 123)))))
-
-(check-block #xc000
-  (empty-lookup)
-  (u16-expression-block (pure-expression #x1234) (endianness big))
-  (block (alignment 1) (size 2) (labels) (blobs (dependent (binary #x12 #x34)))))
-
-(check-block #xc000
-  (empty-lookup)
-  (u16-expression-block (pure-expression #x1234) (endianness little))
-  (block (alignment 1) (size 2) (labels) (blobs (dependent (binary #x34 #x12)))))
-
-(check-block #xc000
-  (empty-lookup)
-  (u16-expression-block (org-expression) (endianness big))
-  (block (alignment 1) (size 2) (labels) (blobs (dependent (binary #xc0 #x00)))))
-
-(check-block #xc000
-  (empty-lookup)
+(check-block
   (identifier-block #'foo)
-  (block (alignment 1) (size 0) (labels (foo #xc000)) (blobs)))
+  (block 1 0 (stack (foo 0)) (stack)))
 
-(check-block #xc000
-  (empty-lookup)
+(check-block
+  (size-blob-block 10 (pure-expression #'binary-10))
+  (block 1 10 (stack) (stack (dependent binary-10))))
+
+(check-block
+  (db-block
+    (pure-expression #'10)
+    (identifier-expression #'foo)
+    (identifier-expression #'bar)
+    (identifier-expression #'foo))
+  (block 1 4
+    (stack)
+    (stack
+      (dependent (foo bar)
+        (db-binary 10 foo bar foo)))))
+
+(check-block
+  (dw-block
+    (pure-expression #'#x1234)
+    (identifier-expression #'foo)
+    (identifier-expression #'bar)
+    (identifier-expression #'foo))
+  (block 1 8
+    (stack)
+    (stack
+      (dependent (foo bar)
+        (dw-binary #x1234 foo bar foo)))))
+
+(check-block
+  (offset-block 10 (identifier-block #'foo))
+  (block 1 0
+    (stack (foo 10))
+    (stack)))
+
+(check-block
+  (offset-block 10 (db-block (identifier-expression #'foo)))
+  (block 1 1 (stack) (stack (dependent (foo) (db-binary foo)))))
+
+(check-block
   (block-append)
-  (block (alignment 1) (size 0) (labels) (blobs)))
+  (block 1 0 (stack) (stack)))
 
-(check-block #xc000
-  (lookup-with (foo 10) (bar 20))
+(check-block
   (block-append
     (identifier-block #'start)
-    (u8-expression-block (identifier-expression #'foo))
+    (db-block (identifier-expression #'foo))
     (align-block 4)
-    (u8-expression-block (identifier-expression #'bar))
+    (db-block (identifier-expression #'bar))
     (align-block 2)
-    (u16-expression-block (org-expression) (endianness big))
+    (dw-block (identifier-expression #'end))
     (identifier-block #'end))
-  (block
-    (alignment 4)
-    (size 8)
-    (labels (start #xc000) (end #xc008))
-    (blobs
-      (dependent (foo) (binary 10))
-      (dependent (binary 0 0 0))
-      (dependent (bar) (binary 20))
-      (dependent (binary 0))
-      (dependent (binary #xc0 #x06)))))
+   (block 4 8
+    (stack
+      (start 0)
+      (end 8))
+    (stack
+      (dependent (foo) (db-binary foo))
+      (dependent (zero-binary 3))
+      (dependent (bar) (db-binary bar))
+      (dependent (zero-binary 1))
+      (dependent (end) (dw-binary end)))))
 
-(check-block #xc000
-  (empty-lookup)
-  (block-append
-    (identifier-block #'start)
-    (u16-expression-block (identifier-expression #'start) (endianness big))
-    (u16-expression-block (org-expression) (endianness big))
-    (u16-expression-block (identifier-expression #'end) (endianness big))
-    (identifier-block #'end))
-  (block (alignment 1) (size 6)
-    (labels
-      (start #xc000)
-      (end #xc006))
-    (blobs
-      (dependent (start) (binary #xc0 #x00))
-      (dependent (binary #xc0 #x02))
-      (dependent (end) (binary #xc0 #x06)))))
+

@@ -1,23 +1,33 @@
 (import (asm-3 base) (asm-3 block) (asm-3 fragment) (asm-3 expression) (asm-3 block-fragment))
 
-(check-fragment #xc000
-  (empty-lookup)
+(check-fragment
   (block->fragment (empty-block))
-  (dependent (aligned 1 (sized 0 (binary)))))
+  (dependent
+    (aligned 1
+      (sized 0
+        (relocable-with ($org)
+          (let ()
+            (binary-append)))))))
 
-(check-fragment #xc000
-  (lookup-with (foo 10) (bar 20))
+(check-fragment
   (block->fragment
     (block-append
       (identifier-block #'start)
-      (u16-expression-block (identifier-expression #'start) (endianness big))
-      (u16-expression-block (org-expression) (endianness big))
-      (u8-expression-block (identifier-expression #'foo))
-      (u8-expression-block (identifier-expression #'bar))
-      (u8-expression-block (identifier-expression #'foo))
-      (u16-expression-block (identifier-expression #'end) (endianness big))
+      (dw-block
+        (identifier-expression #'start)
+        (identifier-expression #'end))
+      (db-block
+        (identifier-expression #'foo)
+        (identifier-expression #'bar))
       (identifier-block #'end)))
   (dependent (foo bar)
     (aligned 1
-      (sized 9
-        (binary #xc0 #x00 #xc0 #x02 10 20 10 #xc0 #x09)))))
+      (sized 6
+        (relocable-with ($org)
+          (let
+            (
+              (start (+ $org 0))
+              (end (+ $org 6)))
+            (binary-append
+              (dw-binary start end)
+              (db-binary foo bar))))))))

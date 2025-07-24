@@ -7,18 +7,26 @@
     (asm-2 aligned)
     (asm-3 sized)
     (asm-3 block)
-    (asm-3 identified)
-    (asm-2 relocable)
-    (asm lookable))
+    (asm-3 identified))
 
   (define (block->fragment $block)
     (lets
       ($alignment (block-alignment $block))
       ($size (block-size $block))
       ($labels (reverse (block-labels $block)))
+      ($label-let-entries
+        (map
+          (lambda ($label)
+            #`(
+              #,(identified-identifier $label)
+              (+ $org #,(identified-ref $label))))
+          $labels))
       ($label-identifiers (map identified-identifier $labels))
-      ($binary-expressions (reverse (block-blobs $block)))
-      ($binary-expression (combine-expressions list->binary $binary-expressions))
+      ($binary-expression
+        (map-expressions
+          (lambda ($expressions)
+            #`(binary-append #,@$expressions))
+          (reverse (block-blobs $block))))
       ($dependencies
         (remp
           (lambda ($identifier)
@@ -27,9 +35,8 @@
       (dependent $dependencies
         (aligned (block-alignment $block)
           (sized (block-size $block)
-            (relocable-with ($org)
-              (lookable ($lookup)
-                (lookable-ref
-                  (relocable-ref (dependent-ref $binary-expression) $org)
-                  (org-lookup+labels $org $lookup $labels)))))))))
+            #`(relocable-with ($org)
+              (let
+                (#,@$label-let-entries)
+                #,(dependent-ref $binary-expression))))))))
 )
