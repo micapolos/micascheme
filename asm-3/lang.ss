@@ -5,8 +5,8 @@
     ; dw
     ;op
     ;+
-    assembled
-    check-assembled)
+    asm
+    check-asm)
   (import
     (rename
       (except (asm-3 base) data)
@@ -14,11 +14,16 @@
       (- %-))
     (asm-3 syntax-block)
     (asm-3 block-fragment)
-    (asm-3 assembler)
     (asm-3 expression)
     (asm-3 block)
     (asm-3 syntax-expression)
     (asm-3 fragment)
+    (asm-3 linked)
+    (asm-3 assembled)
+    (asm-3 environment)
+    (asm-3 environmental)
+    (asm-3 dependencies)
+    (asm-2 relocable)
     (except (asm-3 assembled) assembled)
     (asm-3 org))
   (export
@@ -86,15 +91,27 @@
             (apply dw-block
               (map (partial syntax->expression $lookup) #'(x ...))))))))
 
-  (define-syntax (assembled $syntax $lookup)
+  (define-syntax (asm $syntax $lookup)
     (syntax-case $syntax (org)
       ((_ (org $org) x ...)
         (integer? (datum $org))
-        (assembled->syntax
-          (assemble-fragment $lookup (datum $org)
+        (lets
+          ($main-fragment
             (block->fragment
-              (syntax->block $lookup #'(begin x ...))))))))
+              (syntax->block $lookup #'(begin x ...))))
+          ($lookup (lookup+ $lookup #'main $main-fragment))
+          ($dependencies (resolve-dependencies $lookup #'main))
+          ($linked (list->linked $dependencies))
+          ($main-offset (environment-ref (environmental-environment $linked) #'main))
+          #`(assembled
+            (%+ $org #,$main-offset)
+            (relocable-ref #,(environmental-ref $linked) $org))))))
 
-  (define-rule-syntax (check-assembled (org $org) x ... out)
-    (check (equal? (assembled->datum (assembled (org $org) x ...)) 'out)))
+  (define (asm->datum $asm)
+    `(asm
+      ,(assembled-start $asm)
+      ,(binary->datum (assembled-ref $asm))))
+
+  (define-rule-syntax (org) (check-asm x ... out)
+    (check (equal? (asm->datum (asm x ...)) 'out)))
 )

@@ -7,7 +7,8 @@
     (asm-2 aligned)
     (asm-3 sized)
     (asm-3 block)
-    (asm-3 identified))
+    (asm-3 identified)
+    (asm-2 relocable))
 
   (define (block->fragment $block)
     (lets
