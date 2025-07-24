@@ -53,7 +53,7 @@
 
   (define (dependent->syntax $dependent)
     #`(dependent-with (#,@(dependent-identifiers $dependent))
-      #,(dependent-ref $dependent)))
+      #'#,(dependent-ref $dependent)))
 
   (define-rule-syntax (check-dependent in out)
     (check (equal? (dependent->datum in) (dependent->datum out))))

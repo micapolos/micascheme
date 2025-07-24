@@ -45,7 +45,7 @@
           (relocable-append #,@$relocated-binary-syntax-list)))
       ($label-let-entries
         (map
-          (lambda ($identifier $offset) #`(#,$identifier #,$offset))
+          (lambda ($identifier $offset) #`(#,$identifier (+ $org #,$offset)))
           $sized-identifiers
           $offsets))
       ($expression-let-entries
@@ -57,10 +57,11 @@
           $identified-expression-syntax-list))
       (environmental
         (environment (map identified $sized-identifiers $offsets))
-        #`(lets
-          #,@$label-let-entries
-          #,@$expression-let-entries
-          #,$relocable-binary-syntax))))
+        #`(relocable-with ($org)
+          (lets
+            #,@$label-let-entries
+            #,@$expression-let-entries
+            (relocable-ref #,$relocable-binary-syntax $org))))))
 
   (define (sort-identified-aligned-list $identified-aligned-list)
     (map

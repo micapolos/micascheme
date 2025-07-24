@@ -46,7 +46,7 @@
       #`(dependent-with (#,@$dependencies)
         (aligned #,$alignment
           (sized #,$size
-            #,$relocable-binary-syntax)))))
+            #'#,$relocable-binary-syntax)))))
 
   (define-rule-syntax (check-fragment fragment out)
     (check (equal? (fragment->datum fragment) 'out)))

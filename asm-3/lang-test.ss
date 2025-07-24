@@ -2,10 +2,7 @@
 
 (const val-10 10)
 
-; (proc main
-;   (db 10)
-;   (align 2)
-;   (db 20))
+(proc proc-10 (db 10))
 
 (check-asm
   (org #xc000)
@@ -21,54 +18,54 @@
     (start #xc000)
     (db #x34 #x12 #x78 #x56)))
 
-; (check-asm
-;   (org #xc000)
-;   (db val-10)
-;   (asm
-;     (start #xc000)
-;     (db 10)))
+(check-asm
+  (org #xc000)
+  (db val-10)
+  (asm
+    (start #xc000)
+    (db 10)))
 
-; (check-asm
-;   (org #xc000)
-;   (db (+ val-10 20))
-;   (assembled
-;     (start #xc000)
-;     (db 30)))
+(check-asm
+  (org #xc000)
+  (begin
+    (db 10)
+    (db 20)
+    (db 30))
+  (asm
+    (start #xc000)
+    (db 10 20 30)))
 
-; (check-asm
-;   (org #xc000)
-;   (begin
-;     (db 10)
-;     (db 20)
-;     (db 30))
-;   (assembled
-;     (start #xc000)
-;     (db 10 20 30)))
+(check-asm
+  (org #xc000)
+  (begin
+    (db 10)
+    (align 4)
+    (db 20))
+  (asm
+    (start #xc000)
+    (db 10 0 0 0 20)))
 
-; (check-asm
-;   (org #xc000)
-;   (begin
-;     (db 10)
-;     (align 4)
-;     (db 20))
-;   (assembled
-;     (start #xc000)
-;     (db 10 0 0 0 20)))
+(check-asm
+  (org #xc000)
+  start
+  (asm
+    (start #xc000)
+    (db)))
 
-; (check-asm
-;   (org #xc000)
-;   (label start)
-;   (assembled
-;     (start #xc000)
-;     (db)))
+(check-asm
+  (org #xc000)
+  (begin
+    start
+    (dw start)
+    (dw end)
+    end)
+  (asm
+    (start #xc000)
+    (db #x00 #xc0 #x04 #xc0)))
 
-; (check-asm
-;   (org #xc000)
-;   (begin
-;     (label start)
-;     (dw start)
-;     (dw end)
-;     (label end))
-;   (assembled
-;     (start #xc000)
-;     (db #x00 #xc0 #x04 #xc0)))
+(check-asm
+  (org #xc000)
+  (dw proc-10)
+  (asm
+    (start #xc001)
+    (db 10 #x00 #xc0)))
