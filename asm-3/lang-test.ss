@@ -3,6 +3,8 @@
 (const val-10 10)
 
 (proc proc-10 (db 10))
+(proc proc-20 (db 20))
+(proc main (align 2) (dw proc-10) (dw proc-20))
 
 (check-asm
   (org #xc000)
@@ -69,3 +71,17 @@
   (asm
     (start #xc001)
     (db 10 #x00 #xc0)))
+
+(check-asm
+  (org #xc000)
+  (dw proc-20)
+  (asm
+    (start #xc001)
+    (db 20 #x00 #xc0)))
+
+(check-asm
+  (org #xc000)
+  (dw main)
+  (asm
+    (start #xc006)
+    (db #x04 #xc0 #x05 #xc0 10 20 #x00 #xc0)))
