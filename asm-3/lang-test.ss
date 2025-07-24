@@ -1,6 +1,6 @@
 (import (asm-3 lang))
 
-; (const val-10 10)
+(const val-10 10)
 
 ; (proc main
 ;   (db 10)
