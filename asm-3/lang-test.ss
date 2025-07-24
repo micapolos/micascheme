@@ -10,19 +10,21 @@
 (check-asm
   (org #xc000)
   (db 10 20 30)
-  (asm #xc000 (binary 10 20 30)))
+  (asm
+    (start #xc000)
+    (db 10 20 30)))
 
-; (check-asm
-;   (org #xc000)
-;   (dw #x1234 #x5678)
-;   (assembled
-;     (start #xc000)
-;     (db #x34 #x12 #x78 #x56)))
+(check-asm
+  (org #xc000)
+  (dw #x1234 #x5678)
+  (asm
+    (start #xc000)
+    (db #x34 #x12 #x78 #x56)))
 
 ; (check-asm
 ;   (org #xc000)
 ;   (db val-10)
-;   (assembled
+;   (asm
 ;     (start #xc000)
 ;     (db 10)))
 

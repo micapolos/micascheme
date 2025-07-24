@@ -1,8 +1,7 @@
 (library (asm-3 lang)
   (export
     proc data const
-    db
-    ; dw
+    db dw
     ;op
     ;+
     asm
@@ -107,10 +106,13 @@
             (%+ $org #,$main-offset)
             (relocable-ref #,(environmental-ref $linked) $org))))))
 
+  (define (binary->db-datum $binary)
+    `(db ,@(bytevector->u8-list (binary->bytevector $binary))))
+
   (define (asm->datum $asm)
     `(asm
-      ,(assembled-start $asm)
-      ,(binary->datum (assembled-ref $asm))))
+      (start ,(assembled-start $asm))
+      ,(binary->db-datum (assembled-ref $asm))))
 
   (define-rule-syntax (org) (check-asm x ... out)
     (check (equal? (asm->datum (asm x ...)) 'out)))
