@@ -1,7 +1,5 @@
 (import (asm-3 base) (asm-3 expression) (asm-3 dependent) (asm lookable) (asm-2 relocable) (syntax lookup))
 
-(check (expression? (dependent-with () #'foo)))
-
 ; pure-expression
 (check-expression
   (pure-expression #'123)

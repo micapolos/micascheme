@@ -1,6 +1,5 @@
 (library (asm-3 fragment)
   (export
-    fragment?
     pure-fragment
     fragment->datum
     fragment->syntax
@@ -15,15 +14,6 @@
 
   (define (pure-fragment $syntax)
     (pure-dependent (pure-aligned (pure-sized #'(pure-relocable #,$syntax)))))
-
-  (define (fragment? $obj)
-    (and (dependent? $obj)
-      (lets ($obj (dependent-ref $obj))
-        (and (aligned? $obj)
-          (lets ($obj (aligned-ref $obj))
-            (and (sized? $obj)
-              (lets ($obj (sized-ref $obj))
-                (syntax? $obj))))))))
 
   (define (fragment->datum $fragment)
     (dependent->datum

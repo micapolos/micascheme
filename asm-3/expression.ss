@@ -20,9 +20,7 @@
   (define-type (expression ref) (dependent (syntax ref)))
 
   (define (expression? $obj)
-    (and (dependent? $obj)
-      (lets ($obj (dependent-ref $obj))
-        (syntax? $obj))))
+    (dependent? $obj))
 
   (define (pure-expression $ref)
     (pure-dependent $ref))

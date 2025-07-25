@@ -23,8 +23,8 @@
       ((id . x)
         (and (identifier? #'id) ($lookup #'id))
         (switch (($lookup #'id) $lookup $syntax)
-          ((syntax? $syntax) (syntax->expression $lookup $syntax))
-          ((else $expression) $expression)))
+          ((expression? $expression) $expression)
+          ((else $syntax) (syntax->expression $lookup $syntax))))
       ((fn arg ...)
         (apply application-expression
           (syntax->expression $lookup #'fn)

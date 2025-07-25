@@ -8,8 +8,6 @@
   (asm-3 dependent)
   (asm-2 relocable))
 
-(check (fragment? (dependent-with () (aligned 1 (sized 2 #'foo)))))
-
 (check-fragment
   (dependent-with (foo bar) (aligned 2 (sized 4 #'relocable-binary)))
   (dependent (foo bar) (aligned 2 (sized 4 relocable-binary))))
