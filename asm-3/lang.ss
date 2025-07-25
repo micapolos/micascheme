@@ -144,9 +144,12 @@
           ($dependencies (resolve-dependencies $lookup #'main))
           ($linked (list->linked $dependencies))
           ($main-offset (environment-ref (environmental-environment $linked) #'main))
-          #`(assembled
-            (+ $org #,$main-offset)
-            (relocable-ref #,(environmental-ref $linked) $org))))))
+          ($assembled
+            #`(assembled
+              (+ $org #,$main-offset)
+              (relocable-ref #,(environmental-ref $linked) $org)))
+          ;(run (pretty-print (syntax->datum $assembled)))
+          $assembled))))
 
 
   (define (binary->db-datum $binary)

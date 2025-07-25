@@ -75,12 +75,12 @@
     (start #xc000)
     (db #x02 #xc0)))
 
-; (check-asm
-;   (org #xc000)
-;   (db val-30)
-;   (asm
-;     (start #xc000)
-;     (db 30)))
+(check-asm
+  (org #xc000)
+  (db val-30)
+  (asm
+    (start #xc000)
+    (db 30)))
 
 (check-asm
   (org #xc000)

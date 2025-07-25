@@ -1,5 +1,5 @@
 (library (predicate)
-  (export or? and?)
+  (export or? and? not?)
   (import (scheme) (syntax))
 
   (define-rule-syntax (or? pred ...)
@@ -9,4 +9,8 @@
   (define-rule-syntax (and? pred ...)
     (lambda ($obj)
       (and (pred $obj) ...)))
+
+  (define-rule-syntax (not? pred)
+    (lambda ($obj)
+      (not (pred $obj))))
 )

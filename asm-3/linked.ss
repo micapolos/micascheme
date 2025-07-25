@@ -26,7 +26,7 @@
 
   (define (list->linked $identified-list)
     (lets
-      ($identified-expression-syntax-list (filter (dot syntax? identified-ref) $identified-list))
+      ($identified-expression-syntax-list (filter (dot (not? aligned?) identified-ref) $identified-list))
       ($identified-aligned-list (filter (dot aligned? identified-ref) $identified-list))
       ($identified-sized-list (sort-identified-aligned-list $identified-aligned-list))
       ($sized-identifiers (map identified-identifier $identified-sized-list))
