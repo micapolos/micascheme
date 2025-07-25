@@ -6,7 +6,7 @@
 (run
   (ld de #x4000)
   (ld bc #x1800)
-  (ld a #b10010101)
+  (ld a #b11110000)
   (call mem-fill)
 
   (ld bc #x0100)
@@ -14,7 +14,7 @@
   (call mem-fill)
 
   (ld bc #x0100)
-  (ld a #b01111011)
+  (ld a #b11111011)
   (call mem-fill)
 
   (ld bc #x0100)
