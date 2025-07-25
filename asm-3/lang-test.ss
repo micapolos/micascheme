@@ -66,6 +66,15 @@
     (start #xc000)
     (db 255 254 253 2 1 0)))
 
+(check-asm
+  (org #xc000)
+  (with-tmp foo
+    (dw foo)
+    foo)
+  (asm
+    (start #xc000)
+    (db #x02 #xc0)))
+
 ; (check-asm
 ;   (org #xc000)
 ;   (db val-30)

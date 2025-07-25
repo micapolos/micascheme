@@ -4,6 +4,7 @@
     define-asm
     (rename (%define define))
     db dw db-e
+    with-tmp
     asm
     check-asm)
   (import
@@ -99,17 +100,22 @@
               (apply dw-block
                 (map (partial syntax->expression $lookup) #'(x ...)))))))))
 
-  (define-syntax db-e
+  (define-syntax with-tmp
     (make-compile-time-value
       (lambda ($syntax)
         (lambda ($lookup)
           (syntax-case $syntax ()
-            ((_ x)
+            ((_ id x ...)
+              (identifier? #'id)
               (lets
-                ($label (car (generate-temporaries #'(x))))
-                #`(begin
-                  (db (bitwise-and #xff (- x #,$label)))
-                  #,$label))))))))
+                ($tmp (car (generate-temporaries #'(id))))
+                (syntax-replace #'id $tmp #'(begin x ...)))))))))
+
+  (define-ops
+    ((db-e x)
+      (with-tmp label
+        (db (bitwise-and #xff (- x label)))
+        label)))
 
   (define-syntax (asm $syntax $lookup)
     (syntax-case $syntax (org)
