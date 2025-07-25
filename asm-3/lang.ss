@@ -4,7 +4,7 @@
     define-asm
     (rename (%define define))
     db dw db-e
-    with-temporaries
+    with-labels
     reverse
     asm
     check-asm)
@@ -104,7 +104,7 @@
               (apply dw-block
                 (map (partial syntax->expression $lookup) #'(x ...)))))))))
 
-  (define-syntax with-temporaries
+  (define-syntax with-labels
     (make-compile-time-value
       (lambda ($syntax)
         (lambda ($lookup)
@@ -128,7 +128,7 @@
 
   (define-ops
     ((db-e x)
-      (with-temporaries (tmp)
+      (with-labels (tmp)
         (db (bitwise-and #xff (- x tmp)))
         tmp)))
 

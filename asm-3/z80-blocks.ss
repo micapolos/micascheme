@@ -13,12 +13,12 @@
     ((input body ...))
     ((output body ...))
     ((loop body ...)
-      (with-temporaries (label)
+      (with-labels (label)
         label
         body ...
         (jp label)))
     ((loop-djnz body ...)
-      (with-temporaries (label)
+      (with-labels (label)
         label
         body ...
         (djnz label)))
@@ -27,7 +27,7 @@
       body ...
       (reverse (pop reg) ...))
     ((if flag (then then-body ...) (else else-body ...))
-      (with-temporaries (label-then label-end)
+      (with-labels (label-then label-end)
         (jp flag label-then)
         else-body ...
         (jp label-end)
