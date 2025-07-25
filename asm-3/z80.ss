@@ -38,18 +38,7 @@
     rcf)
 
   (import
-    (asm-3 lang)
-    (only (asm-3 base)
-      define-syntax
-      syntax
-      syntax-case
-      quasisyntax
-      unsyntax
-      lambda
-      lets
-      car
-      generate-temporaries
-      make-compile-time-value))
+    (asm-3 lang))
 
   (define-keywords
     a f b c d e h l
