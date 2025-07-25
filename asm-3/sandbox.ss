@@ -1,13 +1,3 @@
-(import (asm-3 run))
+(import (asm-3 run) (asm-3 sandbox-bars))
 
-(run
-  (ld a #b010)
-  (ld b 0)
-  loop
-  (out (#xfe) a)
-  (xor #b111)
-  stripe
-  (nop) (nop) (nop)
-  (dec b)
-  (jp nz stripe)
-  (jp loop))
+(run (call bars))
