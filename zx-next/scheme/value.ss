@@ -1,6 +1,8 @@
 (library (zx-next scheme value)
   (export ref)
-  (import (zx-next core))
+  (import
+    (zx-next core)
+    (zx-next mmu))
 
   (define slot 7)
 
@@ -14,7 +16,7 @@
   ; reading new value.
   (proc ref
     (ld a e)
-    (nextreg (+ #x50 slot) a)
+    (mmu slot a)
     (ld e (hl))
     (inc hl)
     (ld d (hl))

@@ -16,7 +16,9 @@
       ($path "/tmp/main.nex")
       ((assembled $start $binary) (asm (org #xc000) body ...))
       ($bytevector (binary->bytevector $binary))
-      (run (pretty-print $bytevector))
+      (run
+        (parameterize ((print-radix 16))
+          (pretty-print $bytevector)))
       ($nex-blob (nex-blob (bytevector->blob $bytevector) $start))
       (%run
         (call-with-port
