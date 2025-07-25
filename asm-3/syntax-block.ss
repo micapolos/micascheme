@@ -27,9 +27,12 @@
         (identifier-block #'id))
       ((id . x)
         (identifier? #'id)
-        (switch (transform (lookup-ref $lookup #'id) $syntax $lookup)
-          ((block? $block) $block)
-          ((else $other) (syntax->block $lookup $other))))
+        (switch ($lookup #'id)
+          ((false? _) (syntax-error#'id "undefined block syntax"))
+          ((else $transformer)
+            (switch (transform $transformer $syntax $lookup)
+              ((block? $block) $block)
+              ((else $other) (syntax->block $lookup $other))))))
       (other
         (syntax-error $syntax "invalid block syntax"))))
 
