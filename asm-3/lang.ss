@@ -2,7 +2,7 @@
   (export
     proc data const
     db dw
-    ;op
+    define-op
     ;+
     asm
     check-asm)
@@ -32,11 +32,12 @@
       (only (asm-3 syntax-block) align)
       (asm-3 org)))
 
-  (define-rule-syntax (op (id x ...) body ...)
+  (define-rule-syntax (define-op (id x ...) body ...)
     (define-syntax id
       (make-compile-time-value
-        (syntax-rules ()
-          ((_ x ...) body ...)))))
+        (lambda ($lookup $syntax)
+          (syntax-case $syntax ()
+            ((_ x ...) #'(begin body ...)))))))
 
   (define-rule-syntax (define-dependent id dependent)
     (define-syntax id (make-compile-time-value dependent)))

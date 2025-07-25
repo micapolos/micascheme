@@ -1,5 +1,7 @@
 (import (asm-3 lang))
 
+(define-op (ret) (db 201))
+
 (const val-10 10)
 
 (proc proc-10 (db 10))
@@ -64,6 +66,13 @@
   (asm
     (start #xc000)
     (db #x00 #xc0 #x04 #xc0)))
+
+(check-asm
+  (org #xc000)
+  (ret)
+  (asm
+    (start #xc000)
+    (db 201)))
 
 (check-asm
   (org #xc000)
