@@ -43,11 +43,11 @@
       (asm-3 org)))
 
   (define-rules-syntax
-    ((define-op-syntax id proc)
-      (define-syntax id (make-compile-time-value proc)))
     ((define-op-syntax (id $syntax) body)
       (define-op-syntax id
-        (lambda ($syntax) body))))
+        (lambda ($syntax) body)))
+    ((define-op-syntax id proc)
+      (define-syntax id (make-compile-time-value proc))))
 
   (define-rules-syntax (literals keywords)
     ((define-op (keywords keyword ...) pattern body )

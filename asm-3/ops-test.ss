@@ -1,14 +1,15 @@
 (import (asm-3 lang) (asm-3 ops))
 
-;(trace-block-expansion #t)
-
-; (check-asm
-;   (org #xc000)
-;   (dup 3
-;     (with-labels (start end)
-;       start
-;       (dw start 0 end)
-;       end))
-;   (asm
-;     (start #xc000)
-;     (db #x34 #x12 #x78 #x56)))
+(check-asm
+  (org #xc000)
+  (dup 3
+    (with-labels (start end)
+      start
+      (dw start #xffff end)
+      end))
+  (asm
+    (start #xc000)
+    (db
+      #x00 #xc0 #xff #xff #x06 #xc0
+      #x06 #xc0 #xff #xff #x0c #xc0
+      #x0c #xc0 #xff #xff #x12 #xc0)))
