@@ -1,6 +1,5 @@
 (library (asm-3 linked)
   (export
-    linked?
     list->linked
     linked->datum
     check-list->linked)
@@ -19,10 +18,6 @@
     (asm-3 environment))
 
   (define-type linked (environmental offset relocable-binary-syntax))
-
-  (define (linked? $obj)
-    (and (environmental? $obj)
-      (syntax? (environment-ref $obj))))
 
   (define (list->linked $identified-list)
     (lets
