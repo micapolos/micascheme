@@ -1,0 +1,10 @@
+(import (zx-next))
+
+(run
+  (ld a #b010)
+  (ld b 0)
+  (loop
+    (out (#xfe) a)
+    (xor #b111)
+    (loop-djnz
+      (dup 4 (nop)))))
