@@ -2,7 +2,7 @@
   (export
     proc data const
     db dw
-    define-op
+    define-ops
     ;+
     asm
     check-asm)
@@ -27,17 +27,35 @@
     (asm-3 org))
   (export
     (import
-      (only (asm-3 base) syntax begin)
+      (only (asm-3 base) keywords syntax begin)
       (only (asm-3 block) block)
       (only (asm-3 syntax-block) align)
       (asm-3 org)))
 
-  (define-rule-syntax (define-op (id x ...) body ...)
-    (define-syntax id
-      (make-compile-time-value
-        (lambda ($lookup $syntax)
-          (syntax-case $syntax ()
-            ((_ x ...) #'(begin body ...)))))))
+  (define-syntax (define-ops $syntax)
+    (syntax-case $syntax (keywords)
+      ((_ (keywords keyword ...) clause ...)
+        #`(begin
+          #,@(map
+            (lambda ($clauses-group)
+              (lets
+                ((pair $id $clauses) $clauses-group)
+                #`(define-syntax #,$id
+                  (make-compile-time-value
+                    (lambda ($syntax)
+                      (syntax-case $syntax (keyword ...)
+                        #,@(map
+                          (lambda ($clause)
+                            (syntax-case $clause ()
+                              ((pattern body ...)
+                                #'(pattern #'(begin body ...)))))
+                          $clauses)))))))
+            (group-by
+              syntax-clause-id
+              free-identifier=?
+              #'(clause ...)))))
+      ((_ clause ...)
+        #'(define-ops (keywords) clause ...))))
 
   (define-rule-syntax (define-dependent id dependent)
     (define-syntax id (make-compile-time-value dependent)))
@@ -77,19 +95,21 @@
 
   (define-syntax db
     (make-compile-time-value
-      (lambda ($lookup $syntax)
-        (syntax-case $syntax ()
-          ((_ x ...)
-            (apply db-block
-              (map (partial syntax->expression $lookup) #'(x ...))))))))
+      (lambda ($syntax)
+        (lambda ($lookup)
+          (syntax-case $syntax ()
+            ((_ x ...)
+              (apply db-block
+                (map (partial syntax->expression $lookup) #'(x ...)))))))))
 
   (define-syntax dw
     (make-compile-time-value
-      (lambda ($lookup $syntax)
-        (syntax-case $syntax ()
-          ((_ x ...)
-            (apply dw-block
-              (map (partial syntax->expression $lookup) #'(x ...))))))))
+      (lambda ($syntax)
+        (lambda ($lookup)
+          (syntax-case $syntax ()
+            ((_ x ...)
+              (apply dw-block
+                (map (partial syntax->expression $lookup) #'(x ...)))))))))
 
   (define-syntax (asm $syntax $lookup)
     (syntax-case $syntax (org)

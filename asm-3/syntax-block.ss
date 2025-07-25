@@ -5,7 +5,7 @@
   (define-keywords align)
 
   (define (syntax->block $lookup $syntax)
-    (syntax-case $syntax (syntax begin label align)
+    (syntax-case $syntax (syntax begin align)
       ((begin x ...)
         (list->block (map (partial syntax->block $lookup) #'(x ...))))
       ((align x)
@@ -16,10 +16,9 @@
         (identifier-block #'id))
       ((id . x)
         (identifier? #'id)
-        (switch ((lookup-ref $lookup #'id) $lookup $syntax)
-          ((syntax? $syntax) (syntax->block $lookup $syntax))
+        (switch (transform (lookup-ref $lookup #'id) $syntax $lookup)
           ((block? $block) $block)
-          ((else $other) (syntax-error $syntax "invalid block syntax"))))
+          ((else $other) (syntax->block $lookup $other))))
       (other
         (syntax-error $syntax "invalid block syntax"))))
 

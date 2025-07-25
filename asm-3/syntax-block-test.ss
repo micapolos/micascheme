@@ -3,11 +3,12 @@
 (define lookup
   (lookup-with
     (db
-      (lambda ($lookup $syntax)
-        (syntax-case $syntax ()
-          ((_ x ...)
-            (apply db-block
-              (map (partial syntax->expression $lookup) #'(x ...)))))))))
+      (lambda ($syntax)
+        (lambda ($lookup)
+          (syntax-case $syntax ()
+            ((_ x ...)
+              (apply db-block
+                (map (partial syntax->expression $lookup) #'(x ...))))))))))
 
 (check-syntax->block lookup
   foo
