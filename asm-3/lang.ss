@@ -27,7 +27,7 @@
     (asm-3 org))
   (export
     (import
-      (only (asm-3 base) keywords syntax begin)
+      (only (asm-3 base) define-keywords keywords syntax begin)
       (only (asm-3 block) block)
       (only (asm-3 syntax-block) align)
       (asm-3 org)))

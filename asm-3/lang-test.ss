@@ -1,8 +1,9 @@
 (import (asm-3 lang) (only (micascheme) syntax-rules))
 
-(define-ops (keywords a)
-  ((ret) (db 201))
-  ((ld a n) (db 62) (db n)))
+(define-ops (keywords a b)
+  ((ret)     (db 201))
+  ((ld a b)  (db 101))
+  ((ld a n)  (db 62) (db n)))
 
 (const val-10 10)
 
@@ -75,6 +76,13 @@
   (asm
     (start #xc000)
     (db 201)))
+
+(check-asm
+  (org #xc000)
+  (ld a b)
+  (asm
+    (start #xc000)
+    (db 101)))
 
 (check-asm
   (org #xc000)

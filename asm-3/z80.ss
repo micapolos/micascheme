@@ -38,8 +38,7 @@
     rcf)
 
   (import
-    (only (asm-3 base) define-keywords define-rules-syntaxes literals)
-    (asm-3 fragment))
+    (asm-3 lang))
 
   (define-keywords
     a f b c d e h l
@@ -50,8 +49,8 @@
     i r
     nz z nc po pe p m)
 
-  (define-rules-syntaxes
-    (literals
+  (define-ops
+    (keywords
       a f b c d e h l +
       af bc de hl
       ix iy
