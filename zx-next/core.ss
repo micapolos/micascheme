@@ -1,4 +1,4 @@
-(library (zx-next)
+(library (zx-next core)
   (export)
   (import (asm-3 base))
   (export

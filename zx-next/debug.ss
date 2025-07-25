@@ -1,6 +1,6 @@
 (library (zx-next debug)
   (export loop-bars)
-  (import (zx-next))
+  (import (zx-next core))
 
   (define-asm loop-bars
     (ld a #b010)
