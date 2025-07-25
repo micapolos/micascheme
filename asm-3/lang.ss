@@ -39,7 +39,7 @@
         bitwise-and bitwise-ior bitwise-xor
         ...)
       (only (asm-3 block) block)
-      (only (asm-3 syntax-block) align)
+      (only (asm-3 syntax-block) align trace-block-expansion)
       (asm-3 org)))
 
   (define-rules-syntax

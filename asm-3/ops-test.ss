@@ -1,5 +1,7 @@
 (import (asm-3 lang) (asm-3 ops))
 
+;(trace-block-expansion #t)
+
 ; (check-asm
 ;   (org #xc000)
 ;   (dup 3

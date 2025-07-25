@@ -1,11 +1,22 @@
 (library (asm-3 syntax-block)
-  (export align syntax->block check-syntax->block)
+  (export
+    align
+    syntax->block
+    check-syntax->block
+    trace-block-expansion)
   (import (asm-3 base) (asm-3 block) (asm-3 syntax-expression))
 
   (define-keywords align)
 
+  (define trace-block-expansion (make-parameter #f))
+
+  (define (tracing $syntax)
+    (lets
+      (run (when (trace-block-expansion) (pretty-print (syntax->datum $syntax))))
+      $syntax))
+
   (define (syntax->block $lookup $syntax)
-    (syntax-case $syntax (syntax begin align)
+    (syntax-case (tracing $syntax) (syntax begin align)
       ((begin x ...)
         (list->block (map (partial syntax->block $lookup) #'(x ...))))
       ((align x)
