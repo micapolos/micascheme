@@ -1,7 +1,7 @@
 (library (asm-3 run)
   (export run)
   (import
-    (except (asm-3 base) run)
+    (rename (asm-3 base) (run %run))
     (only (asm-3 lang) asm org)
     (asm-3 assembled)
     (cspect)
@@ -18,8 +18,9 @@
       ($bytevector (binary->bytevector $binary))
       (run (pretty-print $bytevector))
       ($nex-blob (nex-blob (bytevector->blob $bytevector) $start))
-      (run
-        (call-with-port (open-file-output-port $path (file-options no-fail))
+      (%run
+        (call-with-port
+          (open-file-output-port $path (file-options no-fail))
           (lambda ($port) (put-blob $port $nex-blob)))
         (cspect $path))))
 )

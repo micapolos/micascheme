@@ -10,15 +10,15 @@
   (call mem-fill)
 
   (ld bc #x0100)
-  (ld a #b00111000)
+  (ld a #b01111000)
   (call mem-fill)
 
   (ld bc #x0100)
-  (ld a #b00111011)
+  (ld a #b01111011)
   (call mem-fill)
 
   (ld bc #x0100)
-  (ld a #b00110101)
+  (ld a #b01110101)
   (call mem-fill)
 
   (call loop-bars))
