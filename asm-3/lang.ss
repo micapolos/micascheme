@@ -1,5 +1,7 @@
 (library (asm-3 lang)
   (export
+    define-op-syntax
+    define-op
     define-ops
     define-asm
     (rename (%define define))
@@ -40,6 +42,19 @@
       (only (asm-3 syntax-block) align)
       (asm-3 org)))
 
+  (define-rules-syntax
+    ((define-op-syntax id proc)
+      (define-syntax id (make-compile-time-value proc)))
+    ((define-op-syntax (id $syntax) body)
+      (define-op-syntax id
+        (lambda ($syntax) body))))
+
+  (define-rules-syntax (literals keywords)
+    ((define-op (keywords keyword ...) pattern body )
+      (define-ops (keywords keyword ...) (pattern body)))
+    ((define-op pattern body)
+      (define-op (keywords) pattern body)))
+
   (define-syntax (define-ops $syntax)
     (syntax-case $syntax (keywords)
       ((_ (keywords keyword ...) clause ...)
@@ -48,16 +63,15 @@
             (lambda ($clauses-group)
               (lets
                 ((pair $id $clauses) $clauses-group)
-                #`(define-syntax #,$id
-                  (make-compile-time-value
-                    (lambda ($syntax)
-                      (syntax-case $syntax (keyword ...)
-                        #,@(map
-                          (lambda ($clause)
-                            (syntax-case $clause ()
-                              ((pattern body ...)
-                                #'(pattern #'(begin body ...)))))
-                          $clauses)))))))
+                #`(define-op-syntax #,$id
+                  (lambda ($syntax)
+                    (syntax-case $syntax (keyword ...)
+                      #,@(map
+                        (lambda ($clause)
+                          (syntax-case $clause ()
+                            ((pattern body ...)
+                              #'(pattern #'(begin body ...)))))
+                        $clauses))))))
             (group-by
               syntax-clause-id
               free-identifier=?

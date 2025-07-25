@@ -4,8 +4,9 @@
 (define val-20 20)
 (define val-30 (+ val-10 val-20))
 
+(define-op (ret) (db 201))
+
 (define-ops (keywords a b)
-  ((ret)     (db 201))
   ((ld a b)  (db 101))
   ((ld a n)  (db 62) (db n)))
 
