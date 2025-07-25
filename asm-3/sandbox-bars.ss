@@ -9,8 +9,7 @@
     (out (#xfe) a)
     (xor #b111)
     stripe
-    (nop) (nop) (nop)
-    (dec b)
-    (jp nz stripe)
-    (jp loop))
+    (nop) (nop) (nop) (nop)
+    (djnz stripe)
+    (jr loop))
 )

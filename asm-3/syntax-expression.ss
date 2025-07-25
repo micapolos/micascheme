@@ -3,7 +3,7 @@
   (import (asm-3 base) (asm-3 expression))
 
   (define (syntax->expression $lookup $syntax)
-    (syntax-case $syntax (+ -)
+    (syntax-case $syntax (+ - bitwise-and bitwise-ior bitwise-xor)
       (id
         (identifier? #'id)
         (identifier-expression #'id))
@@ -13,6 +13,12 @@
       ((+ x ...)
         (syntax->op-expression $lookup $syntax))
       ((- x ...)
+        (syntax->op-expression $lookup $syntax))
+      ((bitwise-and x ...)
+        (syntax->op-expression $lookup $syntax))
+      ((bitwise-ior x ...)
+        (syntax->op-expression $lookup $syntax))
+      ((bitwise-xor x ...)
         (syntax->op-expression $lookup $syntax))
       ((id . x)
         (and (identifier? #'id) ($lookup #'id))

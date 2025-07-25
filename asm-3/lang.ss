@@ -3,7 +3,7 @@
     define-ops
     define-asm
     (rename (%define define))
-    db dw
+    db dw db-e
     asm
     check-asm)
   (import
@@ -24,7 +24,13 @@
     (asm-3 org))
   (export
     (import
-      (only (asm-3 base) define-keywords keywords syntax begin + -)
+      (only (asm-3 base)
+        define-keywords
+        keywords
+        syntax
+        begin
+        + -
+        bitwise-and bitwise-ior bitwise-xor)
       (only (asm-3 block) block)
       (only (asm-3 syntax-block) align)
       (asm-3 org)))
@@ -92,6 +98,18 @@
             ((_ x ...)
               (apply dw-block
                 (map (partial syntax->expression $lookup) #'(x ...)))))))))
+
+  (define-syntax db-e
+    (make-compile-time-value
+      (lambda ($syntax)
+        (lambda ($lookup)
+          (syntax-case $syntax ()
+            ((_ x)
+              (lets
+                ($label (car (generate-temporaries #'(x))))
+                #`(begin
+                  (db (bitwise-and #xff (- x #,$label)))
+                  #,$label))))))))
 
   (define-syntax (asm $syntax $lookup)
     (syntax-case $syntax (org)

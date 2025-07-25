@@ -22,7 +22,7 @@
 
     out
 
-    jp djnz
+    jp jr djnz
     call ret reti retn rst
 
     daa cpl ccf scf nop halt di ei im
@@ -38,7 +38,18 @@
     rcf)
 
   (import
-    (asm-3 lang))
+    (asm-3 lang)
+    (only (asm-3 base)
+      define-syntax
+      syntax
+      syntax-case
+      quasisyntax
+      unsyntax
+      lambda
+      lets
+      car
+      generate-temporaries
+      make-compile-time-value))
 
   (define-keywords
     a f b c d e h l
@@ -607,12 +618,10 @@
     ((jp (hl))         (db #xe9))
     ((jp (ix))         (db #xdd #xe9))
     ((jp (iy))         (db #xfd #xe9))
-    ((djnz nn)         (local
-                         (db #x10)
-                         (db (iand (s8 (- nn djnz-m8d4qeb8qqhh3nfolwvr1kr50)) #xff))
-                         (label djnz-m8d4qeb8qqhh3nfolwvr1kr50)))
+    ((djnz nm)         (db #x10) (db-e nm))
 
     ; Jump (argument)
+    ((jp nm)           (db #xc3) (dw nm))
     ((jp nz nm)        (db #b11000010) (dw nm))
     ((jp z nm)         (db #b11001010) (dw nm))
     ((jp nc nm)        (db #b11010010) (dw nm))
@@ -621,11 +630,15 @@
     ((jp pe nm)        (db #b11101010) (dw nm))
     ((jp p nm)         (db #b11110010) (dw nm))
     ((jp m nm)         (db #b11111010) (dw nm))
-    ((jp nm)           (db #xc3) (dw nm))
+
+    ((jr nm)           (db #b00011000) (db-e nm))
+    ((jr nz nm)        (db #b00100000) (db-e nm))
+    ((jr z nm)         (db #b00101000) (db-e nm))
+    ((jr nc nm)        (db #b00110000) (db-e nm))
+    ((jr c nm)         (db #b00111000) (db-e nm))
 
     ; Call and return
     ((call nm)         (db #xcd) (dw nm))
-
     ((call nz nm)      (db #b11000100) (dw nm))
     ((call z nm)       (db #b11001100) (dw nm))
     ((call nc nm)      (db #b11010100) (dw nm))

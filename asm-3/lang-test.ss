@@ -52,6 +52,20 @@
     (start #xc000)
     (db 30)))
 
+(check-asm
+  (org #xc000)
+  start
+  (db-e start)
+  (db-e start)
+  (db-e start)
+  (db-e end)
+  (db-e end)
+  (db-e end)
+  end
+  (asm
+    (start #xc000)
+    (db 255 254 253 2 1 0)))
+
 ; (check-asm
 ;   (org #xc000)
 ;   (db val-30)
