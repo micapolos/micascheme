@@ -5,10 +5,13 @@
     (rename (%define define))
     db dw db-e
     with-tmp
+    reverse
     asm
     check-asm)
   (import
-    (except (asm-3 base) data)
+    (rename (asm-3 base)
+      (data %data)
+      (reverse %reverse))
     (asm-3 syntax-block)
     (asm-3 block-fragment)
     (asm-3 expression)
@@ -111,6 +114,14 @@
               (lets
                 ($tmp (car (generate-temporaries #'(id))))
                 (syntax-replace #'id $tmp #'(begin x ...)))))))))
+
+  (define-syntax reverse
+    (make-compile-time-value
+      (lambda ($syntax)
+        (lambda ($lookup)
+          (syntax-case $syntax ()
+            ((_ x ...)
+              #`(begin #,@(%reverse #'(x ...)))))))))
 
   (define-ops
     ((db-e x)

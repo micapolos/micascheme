@@ -2,6 +2,7 @@
   (export
     input output
     loop loop-djnz
+    preserve
     if then else)
   (import
     (asm-3 lang) (asm-3 z80))
@@ -11,8 +12,20 @@
   (define-ops (keywords then else)
     ((input body ...))
     ((output body ...))
-    ((loop body ...) (with-tmp id id body ... (jp id)))
-    ((loop-djnz body ...) (with-tmp id id body ... (djnz id)))
+    ((loop body ...)
+      (with-tmp id
+        id
+        body ...
+        (jp id)))
+    ((loop-djnz body ...)
+      (with-tmp id
+        id
+        body ...
+        (djnz id)))
+    ((preserve (reg ...) body ...)
+      (push reg) ...
+      body ...
+      (reverse (pop reg) ...))
     ((if flag (then then-body ...) (else else-body ...))
       (with-tmp label-then
         (with-tmp label-end

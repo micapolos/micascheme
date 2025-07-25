@@ -94,6 +94,16 @@
 
 (check-asm
   (org #xc000)
+  (reverse
+    (db 10)
+    (db 20)
+    (db 30))
+  (asm
+    (start #xc000)
+    (db 30 20 10)))
+
+(check-asm
+  (org #xc000)
   (begin
     (db 10)
     (align 4)
