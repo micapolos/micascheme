@@ -12,5 +12,15 @@
 
 ; application
 (check-expression
-  (syntax->expression (empty-lookup) #'(+ 10 val-20))
-  (dependent (+ val-20) (+ 10 val-20)))
+  (syntax->expression (empty-lookup) #'(fn 10 val-20))
+  (dependent (fn val-20) (fn 10 val-20)))
+
+; +
+(check-expression
+  (syntax->expression (empty-lookup) #'(+ 10 val-10 val-20))
+  (dependent (val-10 val-20) (+ 10 val-10 val-20)))
+
+; -
+(check-expression
+  (syntax->expression (empty-lookup) #'(- 10 val-10 val-20))
+  (dependent (val-10 val-20) (- 10 val-10 val-20)))

@@ -40,6 +40,27 @@
 
 (check-asm
   (org #xc000)
+  (db val-20)
+  (asm
+    (start #xc000)
+    (db 20)))
+
+(check-asm
+  (org #xc000)
+  (db (+ val-10 val-20))
+  (asm
+    (start #xc000)
+    (db 30)))
+
+; (check-asm
+;   (org #xc000)
+;   (db val-30)
+;   (asm
+;     (start #xc000)
+;     (db 30)))
+
+(check-asm
+  (org #xc000)
   (begin
     (db 10)
     (db 20)

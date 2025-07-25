@@ -7,10 +7,7 @@
     asm
     check-asm)
   (import
-    (rename
-      (except (asm-3 base) data)
-      (+ %+)
-      (- %-))
+    (except (asm-3 base) data)
     (asm-3 syntax-block)
     (asm-3 block-fragment)
     (asm-3 expression)
@@ -27,7 +24,7 @@
     (asm-3 org))
   (export
     (import
-      (only (asm-3 base) define-keywords keywords syntax begin)
+      (only (asm-3 base) define-keywords keywords syntax begin + -)
       (only (asm-3 block) block)
       (only (asm-3 syntax-block) align)
       (asm-3 org)))
@@ -78,18 +75,6 @@
           #,(expression->syntax
             (syntax->expression $lookup #'x))))))
 
-  ; (define-syntax +
-  ;   (make-compile-time-value
-  ;     (lambda ($lookup $syntax)
-  ;       (syntax-case $syntax ()
-  ;         (id
-  ;           (identifier? #'id)
-  ;           (pure-expression %+))
-  ;         ((_ x ...)
-  ;           (apply application-expression
-  ;             (pure-expression %+)
-  ;             (map (partial syntax->expression $lookup) #'(x ...))))))))
-
   (define-syntax db
     (make-compile-time-value
       (lambda ($syntax)
@@ -121,7 +106,7 @@
           ($linked (list->linked $dependencies))
           ($main-offset (environment-ref (environmental-environment $linked) #'main))
           #`(assembled
-            (%+ $org #,$main-offset)
+            (+ $org #,$main-offset)
             (relocable-ref #,(environmental-ref $linked) $org))))))
 
 

@@ -3,13 +3,17 @@
   (import (asm-3 base) (asm-3 expression))
 
   (define (syntax->expression $lookup $syntax)
-    (syntax-case $syntax ()
+    (syntax-case $syntax (+ -)
       (id
         (identifier? #'id)
         (identifier-expression #'id))
       (literal
         ((or? boolean? integer? string? char?) (datum literal))
         (pure-expression #'literal))
+      ((+ x ...)
+        (syntax->op-expression $lookup $syntax))
+      ((- x ...)
+        (syntax->op-expression $lookup $syntax))
       ((id . x)
         (and (identifier? #'id) ($lookup #'id))
         (switch (($lookup #'id) $lookup $syntax)
@@ -21,4 +25,11 @@
           (map (partial syntax->expression $lookup) #'(arg ...))))
       (other
         (syntax-error #'other "not expression"))))
+
+  (define (syntax->op-expression $lookup $syntax)
+    (syntax-case $syntax ()
+      ((op x ...)
+        (map-expressions
+          (lambda ($syntaxes) #`(op #,@$syntaxes))
+          (map (partial syntax->expression $lookup) #'(x ...))))))
 )
