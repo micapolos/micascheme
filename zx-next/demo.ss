@@ -6,12 +6,19 @@
 (run
   (ld de #x4000)
   (ld bc #x1800)
-  (ld a #b10101010)
+  (ld a #b10010101)
   (call mem-fill)
 
-  (ld de #x1800)
-  (ld bc #x0300)
+  (ld bc #x0100)
   (ld a #b00111000)
+  (call mem-fill)
+
+  (ld bc #x0100)
+  (ld a #b00111011)
+  (call mem-fill)
+
+  (ld bc #x0100)
+  (ld a #b00110101)
   (call mem-fill)
 
   (call loop-bars))
