@@ -165,7 +165,6 @@
           ;(run (pretty-print (syntax->datum $assembled)))
           $assembled))))
 
-
   (define (binary->db-datum $binary)
     `(db ,@(bytevector->u8-list (binary->bytevector $binary))))
 
