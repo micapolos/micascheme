@@ -1,9 +1,9 @@
 (library (asm-3 lang)
   (export
-    proc data const
-    db dw
     define-ops
-    ;+
+    define-asm
+    (rename (%define define))
+    db dw
     asm
     check-asm)
   (import
@@ -68,13 +68,10 @@
             (block->fragment
               (syntax->block $lookup #'(begin x ...))))))))
 
-  (define-rule-syntax (proc id x ...)
+  (define-rule-syntax (define-asm id x ...)
     (define-fragment id x ...))
 
-  (define-rule-syntax (data id x ...)
-    (define-fragment id x ...))
-
-  (define-syntax (const $syntax $lookup)
+  (define-syntax (%define $syntax $lookup)
     (syntax-case $syntax ()
       ((_ id x)
         #`(define-dependent id

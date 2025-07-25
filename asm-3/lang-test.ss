@@ -5,11 +5,16 @@
   ((ld a b)  (db 101))
   ((ld a n)  (db 62) (db n)))
 
-(const val-10 10)
+(define val-10 10)
 
-(proc proc-10 (db 10))
-(proc proc-20 (db 20))
-(proc main (align 2) (dw proc-10) (dw proc-20))
+(define-asm proc-10 (db 10))
+
+(define-asm proc-20 (db 20))
+
+(define-asm main
+  (align 2)
+  (dw proc-10)
+  (dw proc-20))
 
 (check-asm
   (org #xc000)
