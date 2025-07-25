@@ -4,6 +4,7 @@
     define-op
     define-ops
     define-asm
+    proc data
     (rename (%define define))
     db dw db-e
     with-labels
@@ -92,6 +93,12 @@
 
   (define-rule-syntax (define-asm id x ...)
     (define-fragment id x ...))
+
+  (define-rule-syntax (proc id x ...)
+    (define-asm id x ...))
+
+  (define-rule-syntax (data id x ...)
+    (define-asm id x ...))
 
   (define-syntax (%define $syntax $lookup)
     (syntax-case $syntax ()

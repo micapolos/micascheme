@@ -2,7 +2,7 @@
   (export loop-bars)
   (import (zx-next core))
 
-  (define-asm loop-bars
+  (proc loop-bars
     (ld a #b010)
     (ld b 0)
     (loop
