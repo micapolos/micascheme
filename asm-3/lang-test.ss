@@ -68,7 +68,7 @@
 
 (check-asm
   (org #xc000)
-  (with-tmp foo
+  (with-temporaries (foo)
     (dw foo)
     foo)
   (asm

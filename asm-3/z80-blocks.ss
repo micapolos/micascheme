@@ -13,26 +13,25 @@
     ((input body ...))
     ((output body ...))
     ((loop body ...)
-      (with-tmp id
-        id
+      (with-temporaries (label)
+        label
         body ...
-        (jp id)))
+        (jp label)))
     ((loop-djnz body ...)
-      (with-tmp id
-        id
+      (with-temporaries (label)
+        label
         body ...
-        (djnz id)))
+        (djnz label)))
     ((preserve (reg ...) body ...)
       (push reg) ...
       body ...
       (reverse (pop reg) ...))
     ((if flag (then then-body ...) (else else-body ...))
-      (with-tmp label-then
-        (with-tmp label-end
-          (jp flag label-then)
-          else-body ...
-          (jp label-end)
-          label-then
-          then-body ...
-          label-end))))
+      (with-temporaries (label-then label-end)
+        (jp flag label-then)
+        else-body ...
+        (jp label-end)
+        label-then
+        then-body ...
+        label-end)))
 )
