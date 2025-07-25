@@ -31,7 +31,8 @@
         syntax
         begin
         + -
-        bitwise-and bitwise-ior bitwise-xor)
+        bitwise-and bitwise-ior bitwise-xor
+        ...)
       (only (asm-3 block) block)
       (only (asm-3 syntax-block) align)
       (asm-3 org)))
