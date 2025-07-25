@@ -1,14 +1,15 @@
 (import (asm-3 lang) (only (micascheme) syntax-rules))
 
+(define val-10 10)
+(define val-20 20)
+(define val-30 (+ val-10 val-20))
+
 (define-ops (keywords a b)
   ((ret)     (db 201))
   ((ld a b)  (db 101))
   ((ld a n)  (db 62) (db n)))
 
-(define val-10 10)
-
 (define-asm proc-10 (db 10))
-
 (define-asm proc-20 (db 20))
 
 (define-asm main
