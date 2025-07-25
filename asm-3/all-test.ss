@@ -24,4 +24,5 @@
   (asm-3 syntax-expression)
   (asm-3 syntax-block)
   (asm-3 lang)
-  (asm-3 z80))
+  (asm-3 z80)
+  (asm-3 run))
