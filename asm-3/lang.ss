@@ -38,6 +38,7 @@
         begin
         + -
         bitwise-and bitwise-ior bitwise-xor
+        fx+ fx- fxnot fxand fxior fxxor fxsrl fxsll
         ...)
       (only (asm-3 block) block)
       (only (asm-3 syntax-block) align trace-block-expansion)

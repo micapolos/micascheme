@@ -22,6 +22,6 @@
     (set 2 l)
     (jp ref))
 
-  (proc pair-alloc)
-
+  (proc pair-alloc
+    (ld hl (heap-top)))
 )

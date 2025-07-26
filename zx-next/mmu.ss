@@ -3,6 +3,6 @@
   (import (zx-next core))
 
   (define-ops (keywords a)
-    ((mmu slot a)   (nextreg (+ #x50 slot) a))
-    ((mmu slot n)   (nextreg (+ #x50 slot) n)))
+    ((mmu slot a)   (nextreg (fx+ #x50 slot) a))
+    ((mmu slot n)   (nextreg (fx+ #x50 slot) n)))
 )

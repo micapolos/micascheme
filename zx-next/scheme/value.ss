@@ -1,5 +1,9 @@
 (library (zx-next scheme value)
-  (export ref)
+  (export
+    value-ld
+    value-ref
+    value-push
+    value-pop)
   (import
     (zx-next core)
     (zx-next mmu))
@@ -14,7 +18,7 @@
 
   ; Dereferences pointer value, by switching to be given bank and
   ; reading new value.
-  (proc ref
+  (proc value-ref
     (ld a e)
     (mmu slot a)
     (ld e (hl))
@@ -26,4 +30,15 @@
     (ld h (hl))
     (ld l a)
     (ret))
+
+  (define-ops
+    ((value-ld n)
+      (ld de (fxsrl n 16))
+      (ld hl (fxand n #xffff)))
+    ((value-push)
+      (push de)
+      (push hl))
+    ((value-pop)
+      (pop hl)
+      (pop de)))
 )

@@ -1,9 +1,7 @@
 (import
   (zx-next core)
   (zx-next debug)
-  (zx-next mem)
-  (zx-next scheme value)
-  (zx-next scheme pair))
+  (zx-next mem))
 
 (run
   (ld de #x4000)
@@ -23,8 +21,4 @@
   (ld a #b01110101)
   (call mem-fill)
 
-  (call loop-bars)
-  ;(call ref)
-  ;(call car)
-  ;(call cdr)
-  )
+  (call loop-bars))
