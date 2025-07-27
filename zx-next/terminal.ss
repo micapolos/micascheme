@@ -52,7 +52,7 @@
     (loop-djnz
       (ld (hl) a)
       (inc hl)
-      (ld (hl) #b11100000)
+      (ld (hl) #b01000000)
       (inc hl)
       (inc a))
 
