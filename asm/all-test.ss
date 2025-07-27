@@ -5,7 +5,6 @@
   (asm relocable)
   (asm alignment)
   (asm aligned)
-  (asm alignable)
   (asm aligned-sized)
   (asm binary)
   (asm identified)
