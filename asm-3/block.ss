@@ -72,15 +72,6 @@
             (lambda ($dws) #`(dw-binary #,@$dws))
             $dw-expressions)))))
 
-  ; (define (list->relocable-item $relocable-list)
-  ;   (relocable-map (list->relocable $relocable-list)
-  ;     (lambda ($lookable-list)
-  ;       (lookable-map (list->lookable $lookable-list)
-  ;         (lambda ($environmental-list)
-  ;           (environmental-map (list->environmental $environmental-list)
-  ;             (lambda ($binary-stacks)
-  ;               (reverse (flatten (map reverse $binary-stacks))))))))))
-
   (define (offset-label $offset $label)
     (identified-map $label (partial + $offset)))
 

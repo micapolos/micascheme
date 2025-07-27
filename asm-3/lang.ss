@@ -95,10 +95,10 @@
   (define-rule-syntax (define-asm id x ...)
     (define-fragment id x ...))
 
-  (define-rule-syntax (proc id x ...)
+  (define-rule-syntax (block id x ...)
     (define-asm id x ...))
 
-  (define-rule-syntax (block id x ...)
+  (define-rule-syntax (proc id x ...)
     (define-asm id x ...))
 
   (define-rule-syntax (data id x ...)
