@@ -7,21 +7,21 @@
   ; Pair is stored aligned in memory, so switching between car and cdr pointers
   ; involves changing bit 2 of register L.
 
-  (data heap-bank
+  (block heap-bank
     (db #x01))
 
-  (data heap-top
+  (block heap-top
     (dw #x0000))
 
   ; Dereferences car of a pair.
-  (proc car
+  (block car
     (jp ref))
 
   ; Dereferences cdr of a pair.
-  (proc cdr
+  (block cdr
     (set 2 l)
     (jp ref))
 
-  (proc pair-alloc
+  (block pair-alloc
     (ld hl (heap-top)))
 )

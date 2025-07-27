@@ -4,7 +4,7 @@
     (zx-next core)
     (zx-next rgb))
 
-  (proc text-palette->palette
+  (block text-palette->palette
     (input
       (hl src-text-palette 2 arrays of 8 rgb-333 colors)
       (de dst-palette 256 rgb-333 colors))
@@ -34,7 +34,7 @@
     (jp nz outer-loop)
     (ret))
 
-  (proc copy-color
+  (block copy-color
     (input
       (hl src-palette)
       (de dst)
@@ -48,7 +48,7 @@
       (ldi))
     (ret)))
 
-  (data text-palette-default
+  (block text-palette-default
     normal
     (rgb-333 0 0 1)
     (rgb-333 0 0 6)

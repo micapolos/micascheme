@@ -2,10 +2,10 @@
   (export palette-load-9bit)
   (import (zx-next core))
 
-  (proc palette-load-9bit
+  (block palette-load-9bit
     (input
       (hl palette-addr)
-      (b colot-count))
+      (b color-count))
     (loop-djnz
       (dup 2
         (ld a (hl))

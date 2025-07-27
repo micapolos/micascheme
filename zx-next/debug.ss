@@ -2,7 +2,7 @@
   (export loop-bars)
   (import (zx-next core))
 
-  (proc loop-bars
+  (block loop-bars
     (ld a #b010)
     (ld b 0)
     (loop

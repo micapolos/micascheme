@@ -2,7 +2,7 @@
   (export terminal-init)
   (import (zx-next core))
 
-  (proc terminal-init
+  (block terminal-init
     (nextreg #x6b #b11001011)  ; enable tilemap, 80x32, 512 tiles, textmode, tilemap over ULA
     (nextreg #x6c #b00000000)  ; Default tilemap attribute
     (nextreg #x6e (fxsrl (fx- tileMap #x4000) 8))

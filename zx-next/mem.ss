@@ -2,11 +2,11 @@
   (export mem-fill mem-clear)
   (import (zx-next core))
 
-  (proc mem-clear
+  (block mem-clear
     (ld a 0)
     (jp mem-clear))
 
-  (proc mem-fill
+  (block mem-fill
     (input (a value) (de address) (bc size))
     (ld h d)
     (ld l e)

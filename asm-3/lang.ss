@@ -5,6 +5,7 @@
     define-ops
     define-asm
     proc data
+    block
     (rename (%define define))
     db dw db-e
     with-labels
@@ -18,7 +19,7 @@
     (asm-3 syntax-block)
     (asm-3 block-fragment)
     (asm-3 expression)
-    (asm-3 block)
+    (except (asm-3 block) block)
     (asm-3 syntax-expression)
     (asm-3 fragment)
     (asm-3 linked)
@@ -40,7 +41,6 @@
         bitwise-and bitwise-ior bitwise-xor
         fx+ fx- fxnot fxand fxior fxxor fxsrl fxsll
         ...)
-      (only (asm-3 block) block)
       (only (asm-3 syntax-block) align trace-block-expansion)
       (asm-3 org)))
 
@@ -96,6 +96,9 @@
     (define-fragment id x ...))
 
   (define-rule-syntax (proc id x ...)
+    (define-asm id x ...))
+
+  (define-rule-syntax (block id x ...)
     (define-asm id x ...))
 
   (define-rule-syntax (data id x ...)

@@ -18,7 +18,7 @@
 
   ; Dereferences pointer value, by switching to be given bank and
   ; reading new value.
-  (proc value-ref
+  (block value-ref
     (ld a e)
     (mmu slot a)
     (ld e (hl))
