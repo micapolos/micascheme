@@ -1,8 +1,7 @@
 (import
   (zx-next core)
   (zx-next debug)
-  (zx-next mem)
-  (zx-next default-text-palette))
+  (zx-next mem))
 
 (run
   ;(nextreg #x6b #b11001011)  ; enable tilemap, 80x32, 512 tiles, textmode, tilemap over ULA
@@ -28,7 +27,4 @@
   (ld a #b01110101)
   (call mem-fill)
 
-  (call loop-bars)
-  tileMap
-  tileDefs
-  (dw default-text-palette))
+  (call loop-bars))
