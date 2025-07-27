@@ -45,6 +45,7 @@
   (mico-c)
   (monad)
   (monad-syntax)
+  (monoid)
   ;(msdl)
   (nex)
   (number)

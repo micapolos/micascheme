@@ -1,6 +1,8 @@
 (library (list)
   (export 
     bindable-list
+    empty-list
+    list-append
 
     opt
     opt->list
@@ -82,6 +84,9 @@
     (pair))
 
   (define bindable-list list)
+
+  (define (empty-list) '())
+  (define list-append append)
 
   (define-bind bindable-list
     (syntax-rules ()

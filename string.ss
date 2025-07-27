@@ -1,8 +1,11 @@
 (library (string)
   (export
+    empty-string
     lines-string
     lines-string0)
   (import (scheme) (list) (list-syntax))
+
+  (define (empty-string) "")
 
   (define (lines-string . $lines)
     (apply string-append
