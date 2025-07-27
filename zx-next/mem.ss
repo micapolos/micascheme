@@ -4,7 +4,7 @@
 
   (block mem-clear
     (ld a 0)
-    (jp mem-clear))
+    (jp mem-fill))
 
   (block mem-fill
     (input (a value) (de address) (bc size))

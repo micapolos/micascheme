@@ -37,7 +37,7 @@
         keywords
         syntax
         begin
-        + -
+        + - *
         bitwise-and bitwise-ior bitwise-xor
         fx+ fx- fxnot fxand fxior fxxor fxsrl fxsll
         ...)

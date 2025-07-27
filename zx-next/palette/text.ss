@@ -1,8 +1,20 @@
 (library (zx-next palette text)
-  (export text-palette->palette)
+  (export
+    text-palette->palette
+    default-text-palette)
   (import
     (zx-next core)
     (zx-next rgb))
+
+  (block copy-color
+    (input (hl src-palette) (de dst) (a color))
+    (output (de advanced))
+    (preserve (hl bc)
+      (add hl a)
+      (add hl a)
+      (ldi)
+      (ldi))
+    (ret))
 
   (block text-palette->palette
     (input
@@ -34,21 +46,7 @@
       (while nz))
     (ret))
 
-  (block copy-color
-    (input
-      (hl src-palette)
-      (de dst)
-      (a color)
-    (output
-      (de advanced))
-    (preserve (hl bc)
-      (add hl a)
-      (add hl a)
-      (ldi)
-      (ldi))
-    (ret)))
-
-  (block text-palette-default
+  (block default-text-palette
     normal
     (rgb-333 0 0 1)
     (rgb-333 0 0 6)
