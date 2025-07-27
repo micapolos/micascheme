@@ -12,7 +12,6 @@
   (import
     (asm-3 base)
     (asm-3 dependent)
-    (asm lookable)
     (asm-2 relocable)
     (asm-3 org)
     (syntax lookup))

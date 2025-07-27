@@ -24,7 +24,6 @@
     (asm-3 expression)
     (asm-3 dependent)
     (asm-2 relocable)
-    (asm lookable)
     (asm-2 aligned)
     (asm-3 identified)
     (asm-2 alignment)

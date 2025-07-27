@@ -7,7 +7,6 @@
     (asm-3 base)
     (asm-3 dependencies)
     (asm-2 relocable)
-    (asm lookable)
     (asm-2 aligned)
     (asm-3 sized)
     (asm-3 located)
