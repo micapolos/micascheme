@@ -85,7 +85,7 @@
   (writer)
   (writing)
   (z80)
-  (asm-3 all)
+  (asm all)
   (c all)
   (emu all)
   (indico all)
