@@ -12,7 +12,7 @@
     (typico id)
     (typico core types)
     (typico fragment)
-    (asm u))
+    (u))
 
   (define-rule-syntax (check-expand-core in out)
     (check-expand core-expander in out))

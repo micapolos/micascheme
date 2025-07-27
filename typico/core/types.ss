@@ -9,7 +9,7 @@
     generic-list-type list-type list-item?
     generic-unsafe-type unsafe-type
     generic-optional-type optional-type)
-  (import (micascheme) (typico type) (asm u))
+  (import (micascheme) (typico type))
 
   (define-type scheme)
 

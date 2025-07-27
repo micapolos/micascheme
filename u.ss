@@ -1,4 +1,4 @@
-(library (asm u)
+(library (u)
   (export
     u2? u2
     u3? u3
