@@ -45,6 +45,7 @@
     (ld b 0)
     (call palette-load-9bit)
 
+    ; Write all chars
     (ld hl #x4000)
     (ld b 96)
     (ld a 0)
