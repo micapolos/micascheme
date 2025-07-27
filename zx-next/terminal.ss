@@ -14,7 +14,6 @@
     (ld bd tile-map-size)
     (call mem-clear)
 
-
     ; Copy font into tile defs
     (ld hl font)
     (ld de tile-defs)
