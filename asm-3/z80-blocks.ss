@@ -3,15 +3,21 @@
     input output
     loop loop-djnz
     preserve
-    if then else)
+    if then else
+    while)
   (import
     (asm-3 lang) (asm-3 z80))
 
-  (define-keywords then else)
+  (define-keywords then else while)
 
-  (define-ops (keywords then else)
+  (define-ops (keywords then else while)
     ((input body ...))
     ((output body ...))
+    ((loop body ... (while cond))
+      (with-labels (label)
+        label
+        body ...
+        (jp cond label)))
     ((loop body ...)
       (with-labels (label)
         label
