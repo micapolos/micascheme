@@ -1,3 +1,3 @@
 (import (zx-next core) (zx-next palette text))
 
-(run (call copy-text))
+(run (call text-palette->palette))
