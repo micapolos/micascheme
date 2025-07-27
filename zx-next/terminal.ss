@@ -47,7 +47,7 @@
 
     ; Write all chars
     (ld hl #x4000)
-    (ld b 96)
+    (ld b glyph-count)
     (ld a 0)
     (loop-djnz
       (ld (hl) a)
