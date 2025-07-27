@@ -1,4 +1,4 @@
-(import (micascheme) (asm-2 aligned))
+(import (micascheme) (asm-3 aligned))
 
 (check
   (aligned-more?

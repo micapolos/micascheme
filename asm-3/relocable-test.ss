@@ -1,4 +1,4 @@
-(import (micascheme) (asm-2 relocable))
+(import (micascheme) (asm-3 relocable))
 
 (check-relocable 100
   (relocable-with 10)

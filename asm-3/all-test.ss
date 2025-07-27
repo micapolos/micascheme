@@ -2,6 +2,11 @@
 
 (test
   (asm-3 base)
+  (asm-3 relocable)
+  (asm-3 alignment)
+  (asm-3 aligned)
+  (asm-3 alignable)
+  (asm-3 aligned-sized)
   (asm-3 binary)
   (asm-3 identified)
   (asm-3 environment)

@@ -4,11 +4,11 @@
     (asm-3 base)
     (asm-3 dependent)
     (asm-3 expression)
-    (asm-2 aligned)
+    (asm-3 aligned)
     (asm-3 sized)
     (asm-3 block)
     (asm-3 identified)
-    (asm-2 relocable))
+    (asm-3 relocable))
 
   (define (block->fragment $block)
     (lets

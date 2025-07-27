@@ -6,7 +6,7 @@
     (only (asm block) empty-block block+lookable-relocable-binary-syntax block+label block-bind block+import block-import-base block-with-import-base)
     (only (asm binary) db-binary dw-binary)
     (asm lookable)
-    (only (asm-2 relocable) relocable-with)
+    (only (asm-3 relocable) relocable-with)
     (only (binary) binary-append bytevector-binary)
     (only (asm std) bytevector make-bytevector))
 

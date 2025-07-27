@@ -1,4 +1,4 @@
-(library (asm-2 alignment)
+(library (asm-3 alignment)
   (export
     empty-alignment
     alignment-append

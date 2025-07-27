@@ -1,4 +1,4 @@
-(import (asm-3 base) (asm-3 sized) (asm-2 relocable) (asm-3 sized-relocable))
+(import (asm-3 base) (asm-3 sized) (asm-3 relocable) (asm-3 sized-relocable))
 
 (check-sized-relocable 100
   (sized 3 (relocable-with ($org) (+ $org 10)))

@@ -2,7 +2,7 @@
   (asm-3 base)
   (asm-3 identified)
   (asm-3 fragment)
-  (asm-2 aligned)
+  (asm-3 aligned)
   (asm-3 sized)
   (asm-3 linked))
 

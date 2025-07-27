@@ -1,4 +1,4 @@
-(library (asm-2 relocable)
+(library (asm-3 relocable)
   (export
     relocable relocable? relocable-proc
     pure-relocable

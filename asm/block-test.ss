@@ -1,4 +1,4 @@
-(import (micascheme) (asm typed) (asm lookable) (asm-2 relocable) (asm block) (syntax lookup))
+(import (micascheme) (asm typed) (asm lookable) (asm-3 relocable) (asm block) (syntax lookup))
 
 (check-block
   (lookup-with

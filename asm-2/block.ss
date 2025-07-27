@@ -5,7 +5,7 @@
     block->binary
     list->block
     block-append)
-  (import (micascheme) (asm-2 relocable) (syntax lookup))
+  (import (micascheme) (asm-3 relocable) (syntax lookup))
 
   (data (block size relocable-binary))
 

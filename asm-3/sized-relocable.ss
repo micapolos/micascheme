@@ -4,7 +4,7 @@
     list->sized-relocable
     check-sized-relocable
     offset-sized-list)
-  (import (asm-3 base) (asm-3 size) (asm-3 sized) (asm-2 relocable))
+  (import (asm-3 base) (asm-3 size) (asm-3 sized) (asm-3 relocable))
 
   (define-list->/append (sized-relocable $sized-relocables)
     (map-sized reverse

@@ -27,7 +27,7 @@
     (asm-3 environment)
     (asm-3 environmental)
     (asm-3 dependencies)
-    (asm-2 relocable)
+    (asm-3 relocable)
     (except (asm-3 assembled) assembled)
     (asm-3 org))
   (export

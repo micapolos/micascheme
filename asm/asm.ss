@@ -13,7 +13,7 @@
   (import
     (micascheme)
     (only (asm block) block-lookable-relocable-binary-syntax empty-block block->map-string)
-    (asm-2 relocable)
+    (asm-3 relocable)
     (asm lookable)
     (binary)
     (only (asm typed) syntax->expr))

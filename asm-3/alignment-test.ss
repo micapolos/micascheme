@@ -1,4 +1,4 @@
-(import (asm-3 base) (asm-2 alignment))
+(import (asm-3 base) (asm-3 alignment))
 
 (check (equal? (empty-alignment) 1))
 (check (equal? (alignment-append) 1))

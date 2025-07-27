@@ -1,4 +1,4 @@
-(import (asm-3 base) (asm-2 aligned) (asm-3 sized) (asm-2 aligned-sized))
+(import (asm-3 base) (asm-3 aligned) (asm-3 sized) (asm-3 aligned-sized))
 
 (define (test-slack $size)
   (make-string $size #\.))

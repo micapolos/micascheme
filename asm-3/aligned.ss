@@ -1,4 +1,4 @@
-(library (asm-2 aligned)
+(library (asm-3 aligned)
   (export
     aligned aligned? aligned-alignment aligned-ref
     pure-aligned

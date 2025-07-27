@@ -6,7 +6,7 @@
     check-fragment)
   (import
     (asm-3 base)
-    (asm-2 aligned)
+    (asm-3 aligned)
     (asm-3 sized)
     (asm-3 dependent))
 

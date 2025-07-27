@@ -1,4 +1,4 @@
-(library (asm-2 aligned-sized)
+(library (asm-3 aligned-sized)
   (export
     map-aligned-sized
     aligned-sized-map
@@ -6,10 +6,10 @@
     list->aligned-sized)
   (import
     (asm-3 base)
-    (asm-2 aligned)
+    (asm-3 aligned)
     (asm-3 sized)
     (asm-3 size)
-    (asm-2 alignment))
+    (asm-3 alignment))
 
   (define (map-aligned-sized $proc $aligned-sized)
     (aligned-map $aligned-sized

@@ -6,8 +6,8 @@
   (import
     (asm-3 base)
     (asm-3 dependencies)
-    (asm-2 relocable)
-    (asm-2 aligned)
+    (asm-3 relocable)
+    (asm-3 aligned)
     (asm-3 sized)
     (asm-3 located)
     (asm-3 identified)

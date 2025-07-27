@@ -1,4 +1,4 @@
-(import (asm-3 base) (asm-3 expression) (asm-3 dependent) (asm-2 relocable) (syntax lookup))
+(import (asm-3 base) (asm-3 expression) (asm-3 dependent) (asm-3 relocable) (syntax lookup))
 
 ; pure-expression
 (check-expression

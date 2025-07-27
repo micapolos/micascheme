@@ -27,7 +27,7 @@
   (import
     (micascheme)
     (asm binary)
-    (asm-2 relocable)
+    (asm-3 relocable)
     (asm lookable)
     (code))
 
