@@ -211,11 +211,6 @@
     ((ld iyh n)        (db #xfd #b00101110 n))
     ((ld (+ iy d) n)   (db #xfd #b00110110 d n))
 
-    ((ld bc nm)        (db #b00000001) (dw nm))
-    ((ld de nm)        (db #b00010001) (dw nm))
-    ((ld hl nm)        (db #b00100001) (dw nm))
-    ((ld sp nm)        (db #b00110001) (dw nm))
-
     ((ld bc (nm))      (db #xed #b01001011) (dw nm))
     ((ld de (nm))      (db #xed #b01011011) (dw nm))
     ((ld hl (nm))      (db      #b00101010) (dw nm))
@@ -229,6 +224,11 @@
     ((ld (nm) ix)      (db #xdd #b00100010) (dw nm))
     ((ld (nm) iy)      (db #xdd #b00100010) (dw nm))
     ((ld (nm) sp)      (db #xed #b01110011) (dw nm))
+
+    ((ld bc nm)        (db #b00000001) (dw nm))
+    ((ld de nm)        (db #b00010001) (dw nm))
+    ((ld hl nm)        (db #b00100001) (dw nm))
+    ((ld sp nm)        (db #b00110001) (dw nm))
 
     ; Arithmetic and logic
     ((add b)           (db #b10000000))
