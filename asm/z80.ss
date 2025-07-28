@@ -191,6 +191,9 @@
     ((ld sp iy)        (db #xdd #xf9))
 
     ; Load (argument)
+    ((ld (nm) a)       (db #b00110010) (dw nm))
+    ((ld a (nm))       (db #b00111010) (dw nm))
+
     ((ld b n)          (db #b00000110 n))
     ((ld c n)          (db #b00001110 n))
     ((ld d n)          (db #b00010110 n))
@@ -199,9 +202,6 @@
     ((ld l n)          (db #b00101110 n))
     ((ld (hl) n)       (db #b00110110 n))
     ((ld a n)          (db #b00111110 n))
-
-    ((ld (nm) a)       (db #b00110010) (dw nm))
-    ((ld a (nm))       (db #b00111010) (dw nm))
 
     ((ld ixl n)        (db #xdd #b00100110 n))
     ((ld ixh n)        (db #xdd #b00101110 n))
