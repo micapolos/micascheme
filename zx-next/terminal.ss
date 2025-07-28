@@ -7,16 +7,17 @@
     (zx-next palette text)
     (zx-next palette))
 
-  (define width 80)
-  (define height 32)
-  (define tile-map #x4000)
-  (define tile-size 2)
-  (define tile-map-size (* width height tile-size))
-  (define tile-defs (+ tile-map tile-map-size))
-  (define glyph-count 96)
-  (define glyph-size 8)
+  (define-values
+    (width 80)
+    (height 32)
+    (tile-map #x4000)
+    (tile-size 2)
+    (tile-map-size (* width height tile-size))
+    (tile-defs (+ tile-map tile-map-size))
+    (glyph-count 96)
+    (glyph-size 8))
 
-  (block terminal-init
+  (define-fragment terminal-init
     (nextreg #x6b #b11001011)  ; enable tilemap, 80x32, 512 tiles, textmode, tilemap over ULA
     (nextreg #x6c #b00000000)  ; Default tilemap attribute
     (nextreg #x6e (fxsrl (fx- tile-map #x4000) 8))

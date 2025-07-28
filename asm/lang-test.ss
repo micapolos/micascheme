@@ -55,6 +55,13 @@
 
 (check-asm
   (org #xc000)
+  (dz "foo")
+  (asm
+    (start #xc000)
+    (db 102 111 111 0)))
+
+(check-asm
+  (org #xc000)
   start
   (db-e start)
   (db-e start)

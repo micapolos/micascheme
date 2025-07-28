@@ -4,10 +4,17 @@
     define-op
     define-ops
     define-asm
+    define-fragment
+    define-fragments
+    define-value
+    define-constant
+    define-constants
     proc data
     block
-    (rename (%define define))
-    db dw db-e
+    (rename
+      (%define define)
+      (%define-values define-values))
+    db dw db-e dz
     with-labels
     reverse
     asm
@@ -92,6 +99,21 @@
             (block->fragment
               (syntax->block $lookup #'(begin x ...))))))))
 
+  (define-rule-syntax (define-fragments (id body ...) ...)
+    (begin (define-fragment id body ...) ...))
+
+  (define-rule-syntax (define-value id expr)
+    (%define id expr))
+
+  (define-rule-syntax (define-constant id expr)
+    (define-syntax id (eval 'expr (environment '(scheme)))))
+
+  (define-rule-syntax (define-constants (id expr) ...)
+    (begin (define-constant id expr) ...))
+
+  (define-rule-syntax (%define-values (id expr) ...)
+    (begin (define-value id expr) ...))
+
   (define-rule-syntax (define-asm id x ...)
     (define-fragment id x ...))
 
@@ -128,6 +150,15 @@
             ((_ x ...)
               (apply dw-block
                 (map (partial syntax->expression $lookup) #'(x ...)))))))))
+
+  (define-syntax dz
+    (make-compile-time-value
+      (lambda ($syntax)
+        (lambda ($lookup)
+          (syntax-case $syntax ()
+            ((_ s)
+              (string? (datum s))
+              (dz-block (datum s))))))))
 
   (define-syntax with-labels
     (make-compile-time-value

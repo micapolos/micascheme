@@ -11,6 +11,8 @@
     size-blob-block
     db-block
     dw-block
+    bytevector-block
+    dz-block
     identifier-block
     align-block
     offset-block
@@ -70,6 +72,20 @@
           (map-expressions
             (lambda ($dws) #`(dw-binary #,@$dws))
             $dw-expressions)))))
+
+  (define (bytevector-block $bytevector)
+    (fluent (empty-block)
+      (block-with-size (bytevector-length $bytevector))
+      (block-with-blobs
+        (stack
+          (pure-expression
+            #`(db-binary
+              #,@(bytevector->u8-list $bytevector)))))))
+
+  (define (dz-block $string)
+    (block-append
+      (bytevector-block (string->utf8 $string))
+      (db-block (pure-expression 0))))
 
   (define (offset-label $offset $label)
     (identified-map $label (partial + $offset)))

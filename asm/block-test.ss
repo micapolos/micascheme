@@ -74,4 +74,13 @@
       (dependent (zero-binary 1))
       (dependent (end) (dw-binary end)))))
 
+(check-block
+  (bytevector-block (bytevector 1 2 3))
+  (block 1 3 (stack) (stack (dependent (db-binary 1 2 3)))))
 
+(check-block
+  (dz-block "foo")
+  (block 1 4 (stack)
+    (stack
+      (dependent (db-binary 102 111 111))
+      (dependent (db-binary 0)))))
