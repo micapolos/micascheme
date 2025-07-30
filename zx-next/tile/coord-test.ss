@@ -4,19 +4,19 @@
   (ld hl #x0000)
   (ld de #x1020)
   (break)
-  (call tile-coord-advance)
+  (call tile-coord-inc)
   (break)
 
   (ld hl #x081f)
   (ld de #x1020)
   (break)
-  (call tile-coord-advance)
+  (call tile-coord-inc)
   (break)
 
   (ld hl #x0f1f)
   (ld de #x1020)
   (break)
-  (call tile-coord-advance)
+  (call tile-coord-inc)
   (break)
 
   (ld hl #x0205)

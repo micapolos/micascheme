@@ -18,6 +18,7 @@
     (height 32)
     (tile-map #x4000)
     (tile-size 2)
+    (terminal-size #x2050)
     (row-size (* width tile-size))
     (tile-map-size (* width height tile-size))
     (tile-defs (+ tile-map tile-map-size))
@@ -25,18 +26,8 @@
     (glyph-size 8))
 
   (define-fragments
-    (cursor-addr (dw #x4000))
+    (cursor-coord (dw #x0000))
     (attr (db #b11100000)))
-
-  (define-fragment put-char
-    (sub #x20)
-    (ld hl (cursor-addr))
-    (ld (hl) a)
-    (inc hl)
-    (ld (hl) #b01000000)
-    (inc hl)
-    (ld (cursor-addr) hl)
-    (ret))
 
   (define-fragment terminal-init
     (nextreg #x6b #b11001011)  ; enable tilemap, 80x32, 512 tiles, textmode, tilemap over ULA
@@ -69,51 +60,55 @@
 
   (define-fragment terminal-move-to
     (input (hl row col))
-    ; hl = index
-    (ld de #x2050)
-    (call tile-coord-index)
-
-    ; hl = address
-    (add hl hl)
-    (add hl tile-map)
-
-    ; store cursor addr
     (ex de hl)
-    (ld hl cursor-addr)
+    (ld hl cursor-coord)
     (ld (hl) e)
     (inc hl)
     (ld (hl) d)
-
     (ret))
 
   (define-fragment terminal-put-char
     (sub #x20)
     (ret m)
 
-    (ld hl cursor-addr)
+    (ld hl cursor-coord)
 
-    ; de = cursor addr
+    ; hl = cursor coord
     (ld e (hl))
     (inc hl)
     (ld d (hl))
+    (ex de hl)
 
-    ; put char and attr
-    (ld (de) a)
-    (inc de)
-    (ld a (attr))
-    (ld (de) a)
-    (inc de)
+    (preserve (de hl)
+      (preserve (af)
+        (ld de terminal-size)
+        (call tile-coord-index)
+        (add hl hl)
+        (add hl tile-map))
 
-    ; return to
-    (ld a e)
-    (cp (fxand (+ tile-map tile-map-size) #xff))
+      ; put char and attr
+      (ld (hl) a)
+      (inc hl)
+      (ld a (attr))
+      (ld (hl) a))
+
+    ; inc cursor coord
+    (preserve (de)
+      (ld de terminal-size)
+      (call tile-coord-inc))
+
+    ; check for overflow
+    (ld a h)
+    (or a)
     (when z
-      (ld a d)
-      (cp (fxsrl (+ tile-map tile-map-size) 8))
+      (ld a l)
+      (or a)
       (when z
-        (add de (- #x10000 row-size))
-        (preserve (de hl) (call terminal-scroll-up))))
+        (ld h (- height 1))
+        (preserve (de hl)
+          (call terminal-scroll-up))))
 
+    (ex de hl)
     (ld (hl) d)
     (dec hl)
     (ld (hl) e)

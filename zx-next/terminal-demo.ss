@@ -30,6 +30,20 @@
   (ld de hello-world)
   (call write-string)
 
+  (ld hl #x0306)
+  (call terminal-move-to)
+
+  (ld hl terminal-put-char)
+  (ld de hello-world)
+  (call write-string)
+
+  (ld hl #x0408)
+  (call terminal-move-to)
+
+  (ld hl terminal-put-char)
+  (ld de hello-world)
+  (call write-string)
+
   (ld hl #x1f00)
   (call terminal-move-to)
 

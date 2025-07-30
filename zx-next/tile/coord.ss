@@ -1,34 +1,28 @@
 (library (zx-next tile coord)
   (export
-    tile-coord-advance
+    tile-coord-inc
     tile-coord-index)
   (import
     (zx-next core)
     (zx-next tile map))
 
-  ; Advances tile coord by 1 character, wrapping to the next row if needed
-  ; reporting carry if last row is reached, and scroll-up is necessary.
-  (define-fragment tile-coord-advance
+  (define-fragment tile-coord-inc
     (input (hl row col) (de height width))
-    (output (hl row col) (cf scroll-up))
+    (output (hl row col))
 
     ; increment column
     (ld a l)
     (inc a)
     (cp e)
-    (if p
-      (then (xor a) (scf))
-      (else (rcf)))
+    (when z (xor a))
     (ld l a)
-    (ret nc)
+    (ret nz)
 
     ; increment row
     (ld a h)
     (inc a)
     (cp d)
-    (if p
-      (then (dec a) (scf))
-      (else (rcf)))
+    (when z (xor a))
     (ld h a)
     (ret))
 
