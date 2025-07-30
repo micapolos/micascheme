@@ -118,7 +118,7 @@
     (db 20))
   (asm
     (start #xc000)
-    (db 10 0 0 0 20 0 0 0)))
+    (db 10 0 0 0 20)))
 
 (check-asm
   (org #xc000)

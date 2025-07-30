@@ -34,12 +34,11 @@
           (lambda ($identifier)
             (memp (partial free-identifier=? $identifier) $label-identifiers))
           (dependent-identifiers $binary-expression)))
-      (fragment-pad
-        (dependent $dependencies
-          (aligned (block-alignment $block)
-            (sized (block-size $block)
-              #`(relocable-with ($org)
-                (let
-                  (#,@$label-let-entries)
-                  #,(dependent-ref $binary-expression)))))))))
+      (dependent $dependencies
+        (aligned (block-alignment $block)
+          (sized (block-size $block)
+            #`(relocable-with ($org)
+              (let
+                (#,@$label-let-entries)
+                #,(dependent-ref $binary-expression))))))))
 )
