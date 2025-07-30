@@ -11,6 +11,7 @@
     (asm sized)
     (asm located)
     (asm identified)
+    (asm fragment)
     (asm size-address)
     (asm environment)
     (asm environmental)
@@ -22,7 +23,7 @@
     (lets
       ($identified-expression-syntax-list (filter (dot (not? aligned?) identified-ref) $identified-list))
       ($identified-aligned-list (filter (dot aligned? identified-ref) $identified-list))
-      ($identified-sized-list (sort-identified-aligned-list $identified-aligned-list))
+      ($identified-sized-list (pack-fragments $identified-aligned-list))
       ($sized-identifiers (map identified-identifier $identified-sized-list))
       ($sized-list (map identified-ref $identified-sized-list))
       ($sizes (map sized-size $sized-list))
@@ -57,13 +58,48 @@
             #,@$expression-let-entries
             (relocable-ref #,$relocable-binary-syntax $org))))))
 
-  (define (sort-identified-aligned-list $identified-aligned-list)
-    (map
-      (lambda ($identified)
-        (identified-map $identified aligned-ref))
-      (sort
-        (ordered-by aligned-more? identified-ref)
-        $identified-aligned-list)))
+  (define (pack-fragments $fragments)
+    (lets
+      ($sorted
+        (sort
+          (ordered-by aligned-more? identified-ref)
+          $fragments))
+      (map
+        (lambda ($fragment) (identified-map $fragment aligned-ref))
+        (reverse
+          (fold-left
+            (lambda ($fragments $fragment)
+              (switch $fragments
+                ((null? _)
+                  (stack $fragment))
+                ((else (pair $top $fragments))
+                  (push
+                    (push $fragments
+                      (fragment-alignment-pad $top
+                        (fragment-alignment $fragment)))
+                    $fragment))))
+            (stack)
+            $sorted)))))
+
+  (define (fragment-alignment-pad $fragment $alignment)
+    (identified-map $fragment
+      (lambda ($aligned)
+        (aligned-map $aligned
+          (lambda ($sized)
+            (lets
+              ($size (sized-size $sized))
+              ($aligned-size (bitwise-align $size $alignment))
+              ($aligned-slack (- $aligned-size $size))
+              (if (zero? $aligned-slack)
+                $sized
+                (sized $aligned-size
+                  #`(relocable-map #,(sized-ref $sized)
+                    (lambda ($binary)
+                      (binary-append $binary
+                        (zero-binary #,$aligned-slack))))))))))))
+
+  (define (fragment-alignment $fragment)
+    (aligned-alignment (identified-ref $fragment)))
 
   (define (linked->datum $linked)
     `(linked
