@@ -12,35 +12,35 @@
 (run
   (call terminal-init)
 
-  (ld hl terminal-put-char)
+  (ld hl terminal-write-char)
   (ld de hello-world)
   (call write-string)
 
-  (ld hl terminal-put-char)
+  (ld hl terminal-write-char)
   (ld de hello-world)
   (call write-string)
 
-  (ld hl terminal-put-char)
+  (ld hl terminal-write-char)
   (ld de hello-world)
   (call write-string)
 
-  (ld hl terminal-put-char)
+  (ld hl terminal-write-char)
   (ld de hello-world)
   (call write-string)
 
   (ld hl #x1f00)
   (call terminal-move-to)
 
-  (ld hl terminal-put-char)
+  (ld hl terminal-write-char)
   (ld de press-space)
   (call write-string)
 
   (call wait-space)
 
-  (ld hl terminal-put-char)
+  (ld hl terminal-write-char)
   (call write-newline)
 
-  (ld hl terminal-put-char)
+  (ld hl terminal-write-char)
   (ld de long-line)
   (call write-string)
 

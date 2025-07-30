@@ -2,7 +2,7 @@
   (export
     terminal-init
     terminal-move-to
-    terminal-put-char)
+    terminal-write-char)
   (import
     (zx-next core)
     (zx-next mem)
@@ -79,7 +79,7 @@
       (ret))
     (jp terminal-scroll-up))
 
-  (define-fragment terminal-put-char
+  (define-fragment terminal-write-char
     (cp #x0d)
     (jp z terminal-newline)
 
