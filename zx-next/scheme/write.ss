@@ -42,8 +42,28 @@
   (define-fragment scheme-write-pointer
     (ex de hl)
     (mmu 7 a)
-    ; TODO: Differentiate between types
+    (ld a h)
+    (or #b11100000)
+    (ld h a)
+    (dec hl)
+    (break)
+    (ld a (hl))
+    (inc hl)
+    (bit 0 a)
+    (if z
+      (then (jp scheme-write-symbol))
+      (else (jp scheme-write-string))))
+
+  (define-fragment scheme-write-symbol
     (jp write-string))
+
+  (define-fragment scheme-write-string
+    (preserve (hl)
+      (ld a #\")
+      (call write-char))
+    (call write-string)
+    (ld a #\")
+    (jp write-char))
 
   (define-fragment write-dispatch-table
     (dw scheme-write-byte)      ; 0000

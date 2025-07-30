@@ -9,8 +9,12 @@
 
 (define-fragments
   (hello-world-symbol
-    (align 4)
-    (db 0)
+    (align 2)
+    (db #b000)
+    (dz "hello-world"))
+  (hello-world-string
+    (align 2)
+    (db #b001)
     (dz "hello-world")))
 
 (run
@@ -55,9 +59,11 @@
   (call scheme-write)
   (call write-newline)
 
-  ; symbol
-  (ld d #x0000)
-  (ld hl (fxior hello-world-symbol #x01))  ; why value-tag-symbol does not work?
+  (value-pointer #x00 hello-world-symbol)
+  (call scheme-write)
+  (call write-newline)
+
+  (value-pointer #x00 hello-world-string)
   (call scheme-write)
   (call write-newline)
 

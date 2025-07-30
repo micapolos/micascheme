@@ -10,6 +10,7 @@
     value-false
     value-true
     value-null
+    value-pointer
     value-load-byte
     value-load-word
     value-load-char)
@@ -68,6 +69,9 @@
     ((value-char n)
       (ld a n)
       (ld l value-char-tag))
+    ((value-pointer bank addr)
+      (ld a bank)
+      (ld hl (fxior (fxand addr #x1fff) 1)))
     ((value-false)
       (ld l value-false-tag))
     ((value-true)
