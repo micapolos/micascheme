@@ -7,5 +7,6 @@
       (asm ops)
       (asm z80)
       (asm z80-blocks)
-      (asm run)))
+      (asm run)
+      (asm make-dot)))
 )

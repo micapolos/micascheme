@@ -28,7 +28,7 @@
       ((id . x)
         (identifier? #'id)
         (switch ($lookup #'id)
-          ((false? _) (syntax-error#'id "undefined block syntax"))
+          ((false? _) (syntax-error #'id "undefined block syntax"))
           ((else $transformer)
             (switch (transform $transformer $syntax $lookup)
               ((block? $block) $block)

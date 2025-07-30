@@ -1,7 +1,7 @@
 (import
   (zx-next core)
   (zx-next terminal)
-  (zx-next writer)
+  (zx-next write)
   (zx-next debug))
 
 (define-fragments
@@ -12,36 +12,29 @@
 (run
   (call terminal-init)
 
-  (ld hl terminal-write-char)
-  (ld de hello-world)
+  (ld hl hello-world)
   (call write-string)
 
-  (ld hl terminal-write-char)
-  (ld de hello-world)
+  (ld hl hello-world)
   (call write-string)
 
-  (ld hl terminal-write-char)
-  (ld de hello-world)
+  (ld hl hello-world)
   (call write-string)
 
-  (ld hl terminal-write-char)
-  (ld de hello-world)
+  (ld hl hello-world)
   (call write-string)
 
   (ld hl #x1f00)
   (call terminal-move-to)
 
-  (ld hl terminal-write-char)
-  (ld de press-space)
+  (ld hl press-space)
   (call write-string)
 
   (call wait-space)
 
-  (ld hl terminal-write-char)
   (call write-newline)
 
-  (ld hl terminal-write-char)
-  (ld de long-line)
+  (ld hl long-line)
   (call write-string)
 
   (jp loop-bars))

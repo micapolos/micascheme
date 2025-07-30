@@ -2,14 +2,15 @@
   (export
     terminal-init
     terminal-move-to
-    terminal-write-char)
+    terminal-write-char
+    terminal-newline)
   (import
     (zx-next core)
     (zx-next mem)
     (zx-next font topaz-8)
     (zx-next palette text)
     (zx-next palette)
-    (zx-next writer)
+    (zx-next write)
     (zx-next tile map)
     (zx-next tile coord))
 
@@ -56,7 +57,12 @@
 
     (ld hl #x8000)
     (ld b 0)
-    (jp palette-load-9bit))
+    (call palette-load-9bit)
+
+    (ld hl terminal-write-char)
+    (call write-init)
+
+    (ret))
 
   (define-fragment terminal-move-to
     (input (hl row col))
