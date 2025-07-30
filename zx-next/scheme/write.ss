@@ -3,38 +3,34 @@
   (import
     (zx-next core)
     (zx-next mmu)
-    (zx-next write))
-
-  (define tag-mask   #x70)
-
-  (define tag-symbol #x00)
-  (define tag-pair   #x10)
-  (define tag-number #x20)
-  (define tag-other  #x30)
+    (zx-next write)
+    (zx-next scheme value))
 
   (define-fragments
-    (unknown-string (dz "#<unknown>")))
+    (byte-string      (dz "#<byte>"))
+    (word-string      (dz "#<word>"))
+    (pointer-string   (dz "#<pointer>")))
 
   (define-fragment scheme-write
     (input (hlde value))
-    (ld a e)
-    (and tag-mask)
-
-    (cp tag-symbol)
-    (when z
-      (ld a d)
-      (mmu 7 a)
-      (jp write-string))
-
-    (cp tag-pair)
-    (when z
-      (ld a #\()
-      (call write-char)
-      (ld hl unknown-string)
-      (call write-string)
-      (ld a #\))
-      (jp write-char))
-
-    (ld hl unknown-string)
-    (jp write-string))
+    (bit 0 l)
+    (if z
+      ; primitive
+      (then
+        (bit 1 l)
+        (if z
+          ; byte in d
+          (then
+            (ld hl byte-string)
+            (jp write-string))
+          ; word, low byte in d, high byte in h
+          (else
+            (ld hl byte-string)
+            (jp write-string))))
+      ; pointer: bank in d, address in hl
+      (else
+        (ld a d)
+        (mmu 7 a)
+        (jp write-string)))
+    (ret))
 )

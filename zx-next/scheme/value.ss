@@ -8,7 +8,8 @@
     (zx-next core)
     (zx-next mmu))
 
-  (define slot 7)
+  (define-values
+    (slot 7))
 
   ; Value in chez scheme is stored in registers DE and HL
   ; D - flags
