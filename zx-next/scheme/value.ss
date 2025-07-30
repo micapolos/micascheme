@@ -12,7 +12,8 @@
     value-pointer
     value-load-byte
     value-load-word
-    value-load-char)
+    value-load-char
+    value-preserve)
   (import
     (zx-next core)
     (zx-next mmu))
@@ -62,5 +63,7 @@
       (ld a l)
       (ld l value-word-tag))
     ((value-load-char)
-      (ld l value-char-tag)))
+      (ld l value-char-tag))
+    ((value-preserve body ...)
+      (preserve (af hl) body ...)))
 )
