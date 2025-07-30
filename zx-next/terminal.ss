@@ -67,7 +67,22 @@
     (ld (hl) d)
     (ret))
 
+  (define-fragment terminal-newline
+    (ld hl cursor-coord)
+    (ld (hl) 0)
+    (inc hl)
+    (ld a (hl))
+    (inc a)
+    (cp height)
+    (when nz
+      (ld (hl) a)
+      (ret))
+    (jp terminal-scroll-up))
+
   (define-fragment terminal-put-char
+    (cp #x0d)
+    (jp z terminal-newline)
+
     (sub #x20)
     (ret m)
 
@@ -91,6 +106,38 @@
       (inc hl)
       (ld a (attr))
       (ld (hl) a))
+
+    ; inc cursor coord
+    (preserve (de)
+      (ld de terminal-size)
+      (call tile-coord-inc))
+
+    ; check for overflow
+    (ld a h)
+    (or a)
+    (when z
+      (ld a l)
+      (or a)
+      (when z
+        (ld h (- height 1))
+        (preserve (de hl)
+          (call terminal-scroll-up))))
+
+    (ex de hl)
+    (ld (hl) d)
+    (dec hl)
+    (ld (hl) e)
+
+    (ret))
+
+  (define-fragment terminal-advance
+    (ld hl cursor-coord)
+
+    ; hl = cursor coord
+    (ld e (hl))
+    (inc hl)
+    (ld d (hl))
+    (ex de hl)
 
     ; inc cursor coord
     (preserve (de)

@@ -5,9 +5,9 @@
   (zx-next debug))
 
 (define-fragments
-  (hello-world (dz "Hello, world!"))
+  (hello-world (dz "Hello, world!\r"))
   (press-space (dz "... Press SPACE ..."))
-  (long-line (dz " Hello, this is a very long string which will overflow the terminal by a couple of lines. Really, this is how long it is. You won't believe how long a string can be.")))
+  (long-line (dz "Hello, this is a very long string which will overflow the terminal by a couple of lines. Really, this is how long it is.")))
 
 (run
   (call terminal-init)
@@ -16,29 +16,13 @@
   (ld de hello-world)
   (call write-string)
 
-  (ld hl #x0102)
-  (call terminal-move-to)
-
   (ld hl terminal-put-char)
   (ld de hello-world)
   (call write-string)
 
-  (ld hl #x0204)
-  (call terminal-move-to)
-
   (ld hl terminal-put-char)
   (ld de hello-world)
   (call write-string)
-
-  (ld hl #x0306)
-  (call terminal-move-to)
-
-  (ld hl terminal-put-char)
-  (ld de hello-world)
-  (call write-string)
-
-  (ld hl #x0408)
-  (call terminal-move-to)
 
   (ld hl terminal-put-char)
   (ld de hello-world)
@@ -53,8 +37,8 @@
 
   (call wait-space)
 
-  (ld hl #x1f4f)
-  (call terminal-move-to)
+  (ld hl terminal-put-char)
+  (call write-newline)
 
   (ld hl terminal-put-char)
   (ld de long-line)

@@ -7,24 +7,21 @@
 
   ; writer is an address of write-char proc
 
-  (define-fragments
-    (write-char
-      (input
-        (hl writer)
-        (a char))
-      (jp (hl)))
-    (write-string
-      (input
-        (hl writer)
-        (de string))
-      (loop
-        (ld a (de))
-        (inc de)
-        (or a)
-        (ret z)
-        (preserve (de hl)
-          (call write-char))))
-    (write-newline
-      (ld a #x0d)
-      (jp write-char)))
+  (define-fragment write-char
+    (input (hl writer) (a char))
+    (jp (hl)))
+
+  (define-fragment write-string
+    (input (hl writer) (de string))
+    (loop
+      (ld a (de))
+      (inc de)
+      (or a)
+      (ret z)
+      (preserve (de hl) (call write-char))))
+
+  (define-fragment write-newline
+    (input (hl writer))
+    (ld a #x0d)
+    (jp write-char))
 )
