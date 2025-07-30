@@ -2,7 +2,7 @@
   (export
     write-char
     write-string
-    newline)
+    write-newline)
   (import (zx-next core))
 
   ; writer is an address of write-char proc
@@ -24,7 +24,7 @@
         (ret z)
         (preserve (de hl)
           (call write-char))))
-    (newline
+    (write-newline
       (ld a #x0d)
       (jp write-char)))
 )

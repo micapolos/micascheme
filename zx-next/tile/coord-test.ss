@@ -1,27 +1,28 @@
-(import (zx-next core) (zx-next tile coord) (zx-next tile map) (zx-next debug))
-
-(define-fragments
-  (top-left-coord
-    (tile-coord))
-  (top-right-coord
-    (tile-coord 0 (- tile-map-width 1)))
-  (bottom-right-coord
-    (tile-coord (- tile-map-height 1) (- tile-map-width 1))))
+(import (zx-next core) (zx-next tile coord) (zx-next debug))
 
 (run
-  (ld hl top-left-coord)
+  (ld hl #x0000)
+  (ld de #x1020)
   (break)
   (call tile-coord-advance)
   (break)
 
-  (ld hl top-right-coord)
+  (ld hl #x081f)
+  (ld de #x1020)
   (break)
   (call tile-coord-advance)
   (break)
 
-  (ld hl bottom-right-coord)
+  (ld hl #x0f1f)
+  (ld de #x1020)
   (break)
   (call tile-coord-advance)
+  (break)
+
+  (ld hl #x0205)
+  (ld de #x1020)
+  (break)
+  (call tile-coord-index)
   (break)
 
   (call loop-bars))

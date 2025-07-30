@@ -1,12 +1,17 @@
 (library (zx-next terminal)
-  (export terminal-init)
+  (export
+    terminal-init
+    terminal-move-to
+    terminal-put-char)
   (import
     (zx-next core)
     (zx-next mem)
     (zx-next font topaz-8)
     (zx-next palette text)
     (zx-next palette)
-    (zx-next writer))
+    (zx-next writer)
+    (zx-next tile map)
+    (zx-next tile coord))
 
   (define-values
     (width 80)
@@ -20,9 +25,7 @@
     (glyph-size 8))
 
   (define-fragments
-    (hello-world (dz "Hello, world!"))
-    (data (db 0 0 #b11100000))  ; row / col / attr
-    (cursor-col-row (db 0 0))
+    (cursor-addr (dw #x4000))
     (attr (db #b11100000)))
 
   (define-fragment put-char
@@ -62,75 +65,67 @@
 
     (ld hl #x8000)
     (ld b 0)
-    (call palette-load-9bit)
+    (jp palette-load-9bit))
 
-    ; Write all chars
-    (ld hl put-char)
-    (ld de hello-world)
-    (call write-string)
-    (ld b glyph-count)
+  (define-fragment terminal-move-to
+    (input (hl row col))
+    ; hl = index
+    (ld de #x2050)
+    (call tile-coord-index)
+
+    ; hl = address
+    (add hl hl)
+    (add hl tile-map)
+
+    ; store cursor addr
+    (ex de hl)
+    (ld hl cursor-addr)
+    (ld (hl) e)
+    (inc hl)
+    (ld (hl) d)
 
     (ret))
 
-  (define-fragment move-to
-    (input (h col) (l row))
-    (ld (cursor-row-col) hl)
-    (ret))
+  (define-fragment terminal-put-char
+    (ld hl cursor-addr)
 
-  (define-fragment put-char
-    (ld hl (cursor-row-col))
-    (ld d l)
-    (ld e row-size)
-    (mul d e)
-    (ld a h)
-    (add de a)
-    (add de #x4000)
+    ; de = cursor addr
+    (ld e (hl))
+    (inc hl)
+    (ld d (hl))
+
+    ; put char and attr
+    (sub #x20)
     (ld (de) a)
+    (inc de)
     (ld a (attr))
     (ld (de) a)
+    (inc de)
+
+    ; return to
+    (ld a e)
+    (cp (fxand (+ tile-map tile-map-size) #xff))
+    (when z
+      (ld a d)
+      (cp (fxsrl (+ tile-map tile-map-size) 8))
+      (when z
+        (add de (- #x10000 row-size))
+        (preserve (de hl) (call terminal-scroll-up))))
+
+    (ld (hl) d)
+    (dec hl)
+    (ld (hl) e)
+
     (ret))
 
-  (define-fragment inc-row
-    (ld hl cursor-row-col)
-    (ld a (hl))
-    (inc a)
-    (cp width)
-    (if m
-      (then (rcf))
-      (else (ld a 0) (scf)))
-    (ld (hl) a)
-    (ret))
-
-  (define-fragment inc-col
-    (ld hl (+ cursor-row-col 1))
-    (ld a (hl))
-    (inc a)
-    (cp height)
-    (if m
-      (then (rcf))
-      (else (scf)))
-    (ld (hl) a)
-    (ret))
-
-  (define-fragment inc-row-col
-    (call inc-row)
-    (ret nc)
-    (jp inc-col))
-
-  (define-fragment advance
-    (inc-row-col)
-    (call inc-row)
-    (ret nc)
-    (jp inc-col))
-
-  (define-fragment scroll-up
+  (define-fragment terminal-scroll-up
     ; move one row up
     (ld hl (+ tile-map row-size))
     (ld de tile-map)
     (ld bc (* (- height 1) row-size))
     (ldir)
     ; clear last row
-    (ld hl (+ tilemap (* row-size (- height 1))))
+    (ld hl (+ tile-map (* row-size (- height 1))))
     (ld b width)
     (ld a (attr))
     (loop-djnz

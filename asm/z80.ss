@@ -31,7 +31,10 @@
 
     rla rlca rra rrca
 
+    in
+
     nextreg
+    mul
 
     break exit
 
@@ -836,9 +839,20 @@
     ((rst #x30)        (db #b11110111))
     ((rst #x38)        (db #b11111111))
 
+    ; Input/output
+    ((in b (c))        (db #xed #b01000000))
+    ((in c (c))        (db #xed #b01001000))
+    ((in d (c))        (db #xed #b01010000))
+    ((in e (c))        (db #xed #b01011000))
+    ((in h (c))        (db #xed #b01100000))
+    ((in l (c))        (db #xed #b01101000))
+    ((in (c))          (db #xed #b01110000))
+    ((in a (c))        (db #xed #b01111000))
+
     ; Next
     ((nextreg n a)     (db #xed #x92 n))
     ((nextreg n n2)    (db #xed #x91 n n2))
+    ((mul d e)         (db #xed #x30))
 
     ; Helpers
     ((rcf)             (or a))
