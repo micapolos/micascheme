@@ -2,7 +2,9 @@
   (export
     alloc-header-gc-mark-mask
     alloc-header-values-mask
-    alloc-header-pot-size-mask)
+    alloc-header-pot-size-mask
+    symbol-data
+    string-data)
   (import (zx-next core))
 
   (define-values
@@ -21,4 +23,14 @@
 
     ; allocation size as power-of-two
     (alloc-header-pot-size-mask   #b00001111))
+
+  (define-ops
+    ((symbol-data s)
+      (align 4)
+      (db #b00000000)
+      (dz s))
+    ((string-data s)
+      (align 4)
+      (db #b00010000)
+      (dz s)))
 )

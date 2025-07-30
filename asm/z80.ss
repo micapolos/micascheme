@@ -34,6 +34,7 @@
     in
 
     nextreg
+    swapnib
     mul
 
     break exit
@@ -852,6 +853,7 @@
     ; Next
     ((nextreg n a)     (db #xed #x92 n))
     ((nextreg n n2)    (db #xed #x91 n n2))
+    ((swapnib)         (db #xed #x23))
     ((mul d e)         (db #xed #x30))
 
     ; Helpers
