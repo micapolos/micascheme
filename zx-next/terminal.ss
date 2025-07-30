@@ -87,6 +87,9 @@
     (ret))
 
   (define-fragment terminal-put-char
+    (sub #x20)
+    (ret m)
+
     (ld hl cursor-addr)
 
     ; de = cursor addr
@@ -95,7 +98,6 @@
     (ld d (hl))
 
     ; put char and attr
-    (sub #x20)
     (ld (de) a)
     (inc de)
     (ld a (attr))
