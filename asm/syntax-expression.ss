@@ -7,6 +7,9 @@
       (id
         (identifier? #'id)
         (identifier-expression #'id))
+      (char
+        (char? (datum char))
+        (pure-expression #'(char->integer (datum char))))
       (literal
         ((or? boolean? integer? string? char?) (datum literal))
         (pure-expression #'literal))
