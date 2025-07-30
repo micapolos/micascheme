@@ -5,9 +5,12 @@
   (dependent
     (aligned 1
       (sized 0
-        (relocable-with ($org)
-          (let ()
-            (binary-append)))))))
+        (relocable-map
+          (relocable-with ($org)
+            (let () (binary-append)))
+          (lambda ($binary)
+            (binary-append $binary
+              (zero-binary 0))))))))
 
 (check-fragment
   (block->fragment
@@ -23,11 +26,11 @@
   (dependent (foo bar)
     (aligned 1
       (sized 6
-        (relocable-with ($org)
-          (let
-            (
-              (start (+ $org 0))
-              (end (+ $org 6)))
-            (binary-append
-              (dw-binary start end)
-              (db-binary foo bar))))))))
+        (relocable-map
+          (relocable-with ($org)
+            (let ((start (+ $org 0)) (end (+ $org 6)))
+              (binary-append
+                (dw-binary start end)
+                (db-binary foo bar))))
+          (lambda ($binary)
+            (binary-append $binary (zero-binary 0))))))))

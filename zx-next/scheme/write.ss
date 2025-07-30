@@ -46,7 +46,6 @@
     (or #b11100000)
     (ld h a)
     (dec hl)
-    (break)
     (ld a (hl))
     (inc hl)
     (bit 0 a)
