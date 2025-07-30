@@ -12,53 +12,79 @@
     (true-string         (dz "#t"))
     (char-prefix-string  (dz "#\\")))
 
+  (define-fragment scheme-write-byte
+    (jp write-byte))
+
+  (define-fragment scheme-write-word
+    (ex de hl)
+    (ld l a)
+    (jp write-word))
+
+  (define-fragment scheme-write-char
+    (ex de hl)
+    (preserve (af)
+      (ld hl char-prefix-string)
+      (call write-string))
+    (jp write-char))
+
+  (define-fragment scheme-write-false
+    (ld hl false-string)
+    (jp write-string))
+
+  (define-fragment scheme-write-true
+    (ld hl true-string)
+    (jp write-string))
+
+  (define-fragment scheme-write-null
+    (ld hl null-string)
+    (jp write-string))
+
+  (define-fragment scheme-write-pointer
+    (ex de hl)
+    (mmu 7 a)
+    ; TODO: Differentiate between types
+    (jp write-string))
+
+  (define-fragment write-dispatch-table
+    (dw scheme-write-byte)      ; 0000
+    (dw scheme-write-pointer)   ; 0001
+    (dw scheme-write-null)      ; 0010
+    (dw scheme-write-pointer)   ; 0011
+    (dw scheme-write-word)      ; 0100
+    (dw scheme-write-pointer)   ; 0101
+    (dw scheme-write-false)     ; 0110
+    (dw scheme-write-pointer)   ; 0111
+    (dw scheme-write-byte)      ; 1000
+    (dw scheme-write-pointer)   ; 1001
+    (dw scheme-write-char)      ; 1010
+    (dw scheme-write-pointer)   ; 1011
+    (dw scheme-write-word)      ; 1100
+    (dw scheme-write-pointer)   ; 1101
+    (dw scheme-write-true)      ; 1110
+    (dw scheme-write-pointer))  ; 1111
+
   (define-fragment scheme-write
-    (input (hlde value))
-    (bit 0 l)
-    (if z
-      ; primitive
-      (then
-        (bit 1 l)
-        (if z
-          ; integer
-          (then
-            (bit 2 l)
-            (if z
-              ; byte in a
-              (then
-                (jp write-byte))
-              ; word, low byte in a, high byte in h
-              (else
-                (ld l a)
-                (jp write-word))))
-          ; non-integer
-          (else
-            (bit 2 l)
-            (if z
-              ; null / char
-              (then
-                (bit 3 l)
-                (if z
-                  ; null
-                  (then
-                    (ld hl null-string)
-                    (jp write-string))
-                  ; char
-                  (else
-                    (preserve (af)
-                      (ld hl char-prefix-string)
-                      (call write-string))
-                    (jp write-char))))
-              ; boolean
-              (else
-                (bit 3 l)
-                (if z
-                  (then (ld hl false-string))
-                  (else (ld hl true-string)))
-                (jp write-string))))))
-      ; pointer: bank in a, 4-byte aligned address in hl
-      (else
-        (mmu 7 a)
-        (jp write-string)))
-    (ret))
+    (input (hla value))
+    ; save HL in DE, and A in B
+    (ex de hl)
+    (ld b a)
+
+    ; load tag offset
+    (ld a e)
+    (and #xf)
+    (add a)
+
+    ; load dispatch offset
+    (ld hl write-dispatch-table)
+    (add hl a)
+
+    ; load write address
+    (ld a (hl))
+    (inc hl)
+    (ld h (hl))
+    (ld l a)
+
+    ; restore A and dispatch (HL is in DE)
+    (ld a b)
+    (jp (hl)))
 )
