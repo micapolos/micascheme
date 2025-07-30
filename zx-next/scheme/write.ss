@@ -48,10 +48,19 @@
     (dec hl)
     (ld a (hl))
     (inc hl)
-    (bit 0 a)
+    (bit 6 a)
     (if z
-      (then (jp scheme-write-symbol))
-      (else (jp scheme-write-string))))
+      ; byte-like
+      (then
+        (bit 4 a)
+        (if z
+          ; symbol
+          (then (jp scheme-write-symbol))
+          ; string
+          (else (jp scheme-write-string))))
+      ; vector-like
+      (else
+        (ret))))
 
   (define-fragment scheme-write-symbol
     (jp write-string))

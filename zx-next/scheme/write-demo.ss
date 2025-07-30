@@ -10,11 +10,11 @@
 (define-fragments
   (hello-world-symbol
     (align 2)
-    (db #b000)
+    (db #b00000000)
     (dz "hello-world"))
   (hello-world-string
     (align 2)
-    (db #b001)
+    (db #b00010000)
     (dz "hello-world")))
 
 (run
