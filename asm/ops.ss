@@ -2,7 +2,7 @@
   (export dup ds)
   (import
     (asm base)
-    (only (asm lang) define-op-syntax define-ops))
+    (only (asm lang) define-op-syntax define-ops db))
 
   (define-op-syntax (dup $syntax)
     (syntax-case $syntax ()
