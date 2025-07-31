@@ -1,4 +1,4 @@
-(import (asm lang) (only (micascheme) syntax-rules))
+(import (asm lang) (only (micascheme) syntax-rules) (asm ops))
 
 (define val-10 10)
 (define val-20 20)
@@ -12,6 +12,7 @@
 
 (define-asm proc-10 (db 10))
 (define-asm proc-20 (db 20))
+(define-asm ds-4-5 (ds 4 5))
 
 (define-asm main
   (align 2)
@@ -175,7 +176,7 @@
 
 (check-asm
   (org #xc000)
-  (dw main)
+  (dw (+ ds-4-5 2))
   (asm
-    (start #xc006)
-    (db #x04 #xc0 #x05 #xc0 10 20 #x00 #xc0)))
+    (start #xc004)
+    (db 5 5 5 5 #x02 #xc0)))
