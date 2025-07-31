@@ -17,9 +17,13 @@
 (check-asm
   (org #xc000)
   (ds 8)
-  (asm (start 49152) (db 0 0 0 0 0 0 0 0)))
+  (asm
+    (start 49152)
+    (db 0 0 0 0 0 0 0 0)))
 
 (check-asm
   (org #xc000)
   (ds 8 #x10)
-  (asm (start 49152) (db #x10 #x10 #x10 #x10 #x10 #x10 #x10 #x10)))
+  (asm
+    (start 49152)
+    (db #x10 #x10 #x10 #x10 #x10 #x10 #x10 #x10)))
