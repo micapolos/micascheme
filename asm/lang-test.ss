@@ -1,4 +1,8 @@
-(import (asm lang) (only (micascheme) syntax-rules) (asm ops))
+(import
+  (asm lang)
+  (only (micascheme) syntax-rules)
+  (asm ops)
+  (asm lang-test-library))
 
 (define val-10 10)
 (define val-20 20)
@@ -177,6 +181,13 @@
 (check-asm
   (org #xc000)
   (dw (+ ds-4-5 2))
+  (asm
+    (start #xc004)
+    (db 5 5 5 5 #x02 #xc0)))
+
+(check-asm
+  (org #xc000)
+  (dw (+ library-ds-4-5 2))
   (asm
     (start #xc004)
     (db 5 5 5 5 #x02 #xc0)))
