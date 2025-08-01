@@ -45,6 +45,10 @@
     byte-mul)
   (import (zx-next core) (zx-next write))
 
+  ; Calling convention:
+  ; E - value stack offset
+  ; arguments - on the stack
+
   (define-fragments
     (hello-world-string (dz "Hello, world!"))
     (stack-string (dz "stack")))
