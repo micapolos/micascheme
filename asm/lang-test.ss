@@ -9,6 +9,9 @@
 (define val-20 20)
 (define val-30 (+ val-10 val-20))
 
+(define-fragment empty)
+(define-fragment dw-empty (dw empty))
+
 (define-op (ret) (db 201))
 
 (define-ops (keywords a b)
@@ -220,4 +223,13 @@
   (asm
     (start 49153)
     (db 201 0 192)))
+
+; Why it does not work?
+; (check-asm
+;   (org #xc000)
+;   (dw empty)
+;   (dw dw-empty)
+;   (asm
+;     (start 49153)
+;     (db 201 0 192)))
 
