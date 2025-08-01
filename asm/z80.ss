@@ -232,6 +232,8 @@
     ((ld bc nm)        (db #b00000001) (dw nm))
     ((ld de nm)        (db #b00010001) (dw nm))
     ((ld hl nm)        (db #b00100001) (dw nm))
+    ((ld ix nm)        (db #xdd) (db #b00100001) (dw nm))
+    ((ld iy nm)        (db #xfd) (db #b00100001) (dw nm))
     ((ld sp nm)        (db #b00110001) (dw nm))
 
     ; Arithmetic and logic

@@ -10,59 +10,31 @@
 (run
   (call terminal-init)
 
-  ; init stack
-  (init-stack)
+  (run-scheme
+    (push-char #\A)
+    (push-word #x1234)
 
-  (push-char #\A)
-  (push-word #x1234)
+    (call println-stack)
+    (call println)
 
-  (call println-stack)
-  (call println)
+    (ld bc #xdede)
+    (push-bc)
+    (call println-stack)
 
-  (ld bc #xdede)
-  (push-bc)
-  (call println-stack)
+    (pop-bc)
+    (call println-stack)
 
-  (pop-bc)
-  (call println-stack)
+    (push-byte #x20)
+    (push-byte #x40)
 
-  (push-byte #x20)
-  (push-byte #x40)
+    (call println-stack)
 
-  (call println-stack)
+    (byte-mul)
 
-  (byte-mul)
+    (call println-stack)
 
-  (call println-stack)
-
-  (pop-value)
-  (pop-value)
-  (call println-stack)
-
-  ; (call println)
-  ; (call println)
-  ; (call println)
-
-  ; (ld e #x00)
-  ; (byte-value #x12)
-  ; (push-value)
-
-  ; (ld e #x00)
-  ; (byte-value #x34)
-  ; (push-value)
-
-  ; (byte-add)
-  ; (call println)
-
-  ; (ld e #xff)
-  ; (byte-value #x12)
-  ; (push-value)
-
-  ; (ld e #x00)
-  ; (byte-value #x34)
-  ; (push-value)
-
-  ; (byte-sub)
-  ; (call println)
+    (pop-value)
+    (pop-value)
+    (call println-stack))
 
   (jp loop-bars))

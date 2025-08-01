@@ -1,7 +1,5 @@
 (library (zx-next scheme primitives)
   (export
-    init-stack
-
     byte-value
     char-value
     word-value
@@ -42,12 +40,16 @@
     byte-and
     byte-or
     byte-xor
-    byte-mul)
+    byte-mul
+
+    run-scheme)
   (import (zx-next core) (zx-next write))
 
   ; Calling convention:
-  ; E - value stack offset
-  ; arguments - on the stack
+  ;  E - value stack offset, must be preserved
+  ;  arguments - on the stack
+  ;  IY - exit handler
+  ;  HL - may contain return address, must be preserved
 
   (define-fragments
     (hello-world-string (dz "Hello, world!"))
@@ -62,13 +64,31 @@
     ((reset-offset)
       (ld e 0))
 
-    ((init-stack)
-      ; push end-of-stack marker
+    ((with-exit-handler body ...)
+      (ld iy 0)
+      (add iy sp)
+      body ...)
+
+    ((run-scheme body ...)
+      (with-exit-handler
+        (with-stack
+          body ...)))
+
+    ((with-stack body ...)
       (ld a #xff)
       (push af)
       (inc sp)
-      ; initialize stack offset to 0
-      (reset-offset))
+
+      (reset-offset)
+
+      body ...
+
+      (dec sp)
+      (pop af))
+
+    ((scheme-exit)
+      ; TODO
+      )
 
     ((d->value)
       (input (a byte))
