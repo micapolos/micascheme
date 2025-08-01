@@ -19,45 +19,54 @@
 
   (define-type linked (environmental offset relocable-binary-syntax))
 
-  (define (list->linked $identified-list)
-    (lets
-      ($identified-expression-syntax-list (filter (dot (not? aligned?) identified-ref) $identified-list))
-      ($identified-aligned-list (filter (dot aligned? identified-ref) $identified-list))
-      ($identified-sized-list (pack-fragments $identified-aligned-list))
-      ($sized-identifiers (map identified-identifier $identified-sized-list))
-      ($sized-list (map identified-ref $identified-sized-list))
-      ($sizes (map sized-size $sized-list))
-      ($relocable-binary-syntax-list (map sized-ref $sized-list))
-      ($offsets (sizes->addresses $sizes))
-      ($relocated-binary-syntax-list
-        (map
-          (lambda ($offset $relocable-binary-syntax)
-            #`(offset-relocable #,$offset #,$relocable-binary-syntax))
-          $offsets
-          $relocable-binary-syntax-list))
-      ($relocable-binary-syntax
-        #`(map-relocable list->binary
-          (relocable-append #,@$relocated-binary-syntax-list)))
-      ($sized-tmps (generate-temporaries $sized-identifiers))
-      ($label-let-entries
-        (map
-          (lambda ($identifier $offset) #`(#,$identifier (+ $org #,$offset)))
-          $sized-identifiers
-          $offsets))
-      ($expression-let-entries
-        (map
-          (lambda ($identified)
-            #`(
-              #,(identified-identifier $identified)
-              #,(identified-ref $identified)))
-          $identified-expression-syntax-list))
-      (environmental
-        (environment (map identified $sized-identifiers $offsets))
-        #`(relocable-with ($org)
-          (lets
-            #,@$label-let-entries
-            #,@$expression-let-entries
-            (relocable-ref #,$relocable-binary-syntax $org))))))
+  (define list->linked
+    (case-lambda
+      (($identified-list)
+        (list->linked $identified-list #t))
+      (($identified-list $gen?)
+        (lets
+          ($identified-expression-syntax-list (filter (dot (not? aligned?) identified-ref) $identified-list))
+          ($identified-aligned-list (filter (dot aligned? identified-ref) $identified-list))
+          ($identified-sized-list (pack-fragments $identified-aligned-list))
+          ($sized-identifiers (map identified-identifier $identified-sized-list))
+          ($sized-list (map identified-ref $identified-sized-list))
+          ($sizes (map sized-size $sized-list))
+          ($relocable-binary-syntax-list (map sized-ref $sized-list))
+          ($offsets (sizes->addresses $sizes))
+          ($relocated-binary-syntax-list
+            (map
+              (lambda ($offset $relocable-binary-syntax)
+                #`(offset-relocable #,$offset #,$relocable-binary-syntax))
+              $offsets
+              $relocable-binary-syntax-list))
+          ($relocable-binary-syntax
+            #`(map-relocable list->binary
+              (relocable-append #,@$relocated-binary-syntax-list)))
+          ($sized-tmps (if $gen? (generate-temporaries $sized-identifiers) $sized-identifiers))
+          ($relocable-binary-syntax
+            (syntax-replace-all
+              $sized-identifiers
+              $sized-tmps
+              $relocable-binary-syntax))
+          ($label-let-entries
+            (map
+              (lambda ($identifier $offset) #`(#,$identifier (+ $org #,$offset)))
+              $sized-tmps
+              $offsets))
+          ($expression-let-entries
+            (map
+              (lambda ($identified)
+                #`(
+                  #,(identified-identifier $identified)
+                  #,(identified-ref $identified)))
+              $identified-expression-syntax-list))
+          (environmental
+            (environment (map identified $sized-identifiers $offsets))
+            #`(relocable-with ($org)
+              (lets
+                #,@$label-let-entries
+                #,@$expression-let-entries
+                (relocable-ref #,$relocable-binary-syntax $org))))))))
 
   (define (pack-fragments $fragments)
     (lets
@@ -108,5 +117,5 @@
       ,(syntax->datum (environmental-ref $linked))))
 
   (define-rule-syntax (check-list->linked in ... out)
-    (check (equal? (linked->datum (list->linked (list in ...))) 'out)))
+    (check (equal? (linked->datum (list->linked (list in ...) #f)) 'out)))
 )
