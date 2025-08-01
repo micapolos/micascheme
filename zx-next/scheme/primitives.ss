@@ -8,6 +8,7 @@
 
     push-value
     pop-value
+    dup-value
 
     push-n
     push-nn
@@ -18,8 +19,6 @@
     or-r-n
     xor-r-n
 
-    add-r-r
-    sub-r-r
     and-r-r
     or-r-r
     xor-r-r
@@ -27,12 +26,16 @@
     inc-r
     dec-r
 
-    print
-    println)
+    println
+    println-stack
+
+    byte-add
+    byte-sub)
   (import (zx-next core) (zx-next write))
 
   (define-fragments
-    (hello-world-string (dz "Hello, world!")))
+    (hello-world-string (dz "Hello, world!"))
+    (stack-string (dz "stack")))
 
   (define-values
     (value-header 0)
@@ -56,17 +59,17 @@
       (ld d n)
       (ld bc #b0000000000000000))
 
-    ((char-value n)
-      (input (a byte))
-      (output (bcd value))
-      (ld d n)
-      (ld bc #b0100000000000000))
-
     ((word-value nn)
       (output (bcd value))
       (ld d (fxand nn #xff))
       (ld c (fxand (fxsrl nn 8) #xff))
       (ld b #b00100000))
+
+    ((char-value n)
+      (input (a byte))
+      (output (bcd value))
+      (ld d n)
+      (ld bc #b0100000000000000))
 
     ((a->char-value)
       (input (a byte))
@@ -147,15 +150,32 @@
       (pop-value)
       (value->bc))
 
+    ((dup-value)
+      (pop bc)
+      (pop de)
+      (push de)
+      (push bc)
+      (push de)
+      (push bc))
+
+    ((dup-value offset)
+      (preserve (hl)
+        (ld hl (+ 2 (* 4 offset)))
+        (add hl sp)
+        (ld e (hl))
+        (inc hl)
+        (ld d (hl))
+        (inc hl)
+        (ld c (hl))
+        (inc hl)
+        (ld b (hl)))
+      (push bc)
+      (push de))
+
     ((alu-r-r op)
-      (ex af)
       (pop-a)
-      (ex af)
-      (pop-a)
-      (ex af)
-      (ld b a)
-      (ex af)
-      (op b)
+      (pop-d)
+      (op d)
       (push-a))
 
     ((inc/dec-r op)
@@ -169,8 +189,8 @@
     ((or-r-n)   (alu-r-n or))
     ((xor-r-n)  (alu-r-n xor))
 
-    ((add-r-r)  (alu-r-r add))
-    ((sub-r-r)  (alu-r-r sub))
+    ((byte-add)  (alu-r-r add))
+    ((byte-sub)  (alu-r-r sub))
     ((and-r-r)  (alu-r-r and))
     ((or-r-r)   (alu-r-r or))
     ((xor-r-r)  (alu-r-r xor))
@@ -187,12 +207,6 @@
       (mul d e)
       (de->value)
       (push-value)))
-
-  (define-fragment print
-    (pop hl)
-    (pop-value)
-    (preserve (hl) (call write-value))
-    (jp (hl)))
 
   (define-fragment println
     (pop hl)
@@ -236,6 +250,45 @@
         (ld a #\\)
         (call write-char))
       (jp write-char))
+
+    (ret))
+
+  (define-fragment println-stack
+    (ld a #\()
+    (call write-char)
+    (ld hl stack-string)
+    (call write-string)
+
+    (ld hl 2)
+    (add hl sp)
+
+    (loop
+      ; Load value into bcde
+      (ld e (hl))
+      (inc hl)
+      (ld d (hl))
+      (inc hl)
+      (ld c (hl))
+      (inc hl)
+      (ld b (hl))
+      (inc hl)
+      (ld a e)
+
+      ; return if end of stack
+      (cp #xff)
+      (when z
+        (ld a #\))
+        (call write-char)
+        (call write-newline)
+        (ret))
+
+      ; advance to the next entry
+      (add hl a)
+      (preserve (hl)
+        (preserve (bc de)
+          (ld a #\space)
+          (call write-char))
+        (call write-value)))
 
     (ret))
 )
