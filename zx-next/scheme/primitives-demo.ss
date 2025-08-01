@@ -7,14 +7,24 @@
 (run
   (call terminal-init)
 
-  (break)
   (ld e #xff)
-  (push-n #x12)
-  (break)
+  (byte-value #x12)
+  (push-value)
+
   (ld e #x00)
-  (push-n #x34)
-  (break)
-  (add-r-r)
-  (break)
+  (word-value #x1234)
+  (push-value)
+
+  (ld e #x00)
+  (char-value #\A)
+  (push-value)
+
+  (ld e #x00)
+  (char-value #\A)
+  (push-value)
+
+  (call println)
+  (call println)
+  (call println)
 
   (jp loop-bars))

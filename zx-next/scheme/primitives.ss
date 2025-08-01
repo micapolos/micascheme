@@ -1,5 +1,14 @@
 (library (zx-next scheme primitives)
   (export
+    byte-value
+    char-value
+    word-value
+
+    a->char-value
+
+    push-value
+    pop-value
+
     push-n
     push-nn
 
@@ -16,8 +25,14 @@
     xor-r-r
 
     inc-r
-    dec-r)
-  (import (zx-next core))
+    dec-r
+
+    print
+    println)
+  (import (zx-next core) (zx-next write))
+
+  (define-fragments
+    (hello-world-string (dz "Hello, world!")))
 
   (define-values
     (value-header 0)
@@ -35,6 +50,29 @@
       (output (bcd value))
       (ld d a)
       (ld bc 0))
+
+    ((byte-value n)
+      (output (bcd value))
+      (ld d n)
+      (ld bc #b0000000000000000))
+
+    ((char-value n)
+      (input (a byte))
+      (output (bcd value))
+      (ld d n)
+      (ld bc #b0100000000000000))
+
+    ((word-value nn)
+      (output (bcd value))
+      (ld d (fxand nn #xff))
+      (ld c (fxand (fxsrl nn 8) #xff))
+      (ld b #b00100000))
+
+    ((a->char-value)
+      (input (a byte))
+      (output (bcd value))
+      (ld d a)
+      (ld bc #b0100000000000000))
 
     ((value->d)
       (input (bcd value))
@@ -149,4 +187,55 @@
       (mul d e)
       (de->value)
       (push-value)))
+
+  (define-fragment print
+    (pop hl)
+    (pop-value)
+    (preserve (hl) (call write-value))
+    (jp (hl)))
+
+  (define-fragment println
+    (pop hl)
+    (pop-value)
+    (preserve (hl)
+      (call write-value)
+      (call write-newline))
+    (jp (hl)))
+
+  (define-fragment write-value
+    (ld a b)
+    (and #b11100000)
+
+    (cp #b00000000)
+    (when z
+      (ld a d)
+      (preserve (af)
+        (ld a #\#)
+        (call write-char)
+        (ld a #\x)
+        (call write-char))
+      (jp write-byte))
+
+    (cp #b00100000)
+    (when z
+      (ld h c)
+      (ld l d)
+      (preserve (hl)
+        (ld a #\#)
+        (call write-char)
+        (ld a #\x)
+        (call write-char))
+      (jp write-word))
+
+    (cp #b01000000)
+    (when z
+      (ld a d)
+      (preserve (af)
+        (ld a #\#)
+        (call write-char)
+        (ld a #\\)
+        (call write-char))
+      (jp write-char))
+
+    (ret))
 )
