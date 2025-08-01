@@ -53,13 +53,30 @@
               (lambda ($identifier $offset) #`(#,$identifier (+ $org #,$offset)))
               $sized-tmps
               $offsets))
+          ($expression-identifiers (map identified-identifier $identified-expression-syntax-list))
+          ($expression-tmps (if $gen? (generate-temporaries $expression-identifiers) $expression-identifiers))
+          ($relocable-binary-syntax
+            (syntax-replace-all
+              $expression-identifiers
+              $expression-tmps
+              $relocable-binary-syntax))
+          ($expression-syntaxes (map identified-ref $identified-expression-syntax-list))
+          ($expression-syntaxes
+            (map
+              (lambda ($syntax)
+                (syntax-replace-all
+                  $sized-identifiers
+                  $sized-tmps
+                  (syntax-replace-all
+                    $expression-identifiers
+                    $expression-tmps
+                    $syntax)))
+              $expression-syntaxes))
           ($expression-let-entries
             (map
-              (lambda ($identified)
-                #`(
-                  #,(identified-identifier $identified)
-                  #,(identified-ref $identified)))
-              $identified-expression-syntax-list))
+              (lambda ($id $expr) #`(#,$id #,$expr))
+              $expression-tmps
+              $expression-syntaxes))
           (environmental
             (environment (map identified $sized-identifiers $offsets))
             #`(relocable-with ($org)
