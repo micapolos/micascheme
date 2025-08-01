@@ -43,38 +43,27 @@
             #`(map-relocable list->binary
               (relocable-append #,@$relocated-binary-syntax-list)))
           ($sized-tmps (if $gen? (generate-temporaries $sized-identifiers) $sized-identifiers))
-          ($relocable-binary-syntax
-            (syntax-replace-all
-              $sized-identifiers
-              $sized-tmps
-              $relocable-binary-syntax))
+          ($expression-identifiers (map identified-identifier $identified-expression-syntax-list))
+          ($expression-tmps (if $gen? (generate-temporaries $expression-identifiers) $expression-identifiers))
+          ($rewrite-ids
+            (lambda ($syntax)
+              (syntax-replace-all
+                $sized-identifiers
+                $sized-tmps
+                (syntax-replace-all
+                  $expression-identifiers
+                  $expression-tmps
+                  $syntax))))
+          ($relocable-binary-syntax ($rewrite-ids $relocable-binary-syntax))
           ($label-let-entries
             (map
               (lambda ($identifier $offset) #`(#,$identifier (+ $org #,$offset)))
               $sized-tmps
               $offsets))
-          ($expression-identifiers (map identified-identifier $identified-expression-syntax-list))
-          ($expression-tmps (if $gen? (generate-temporaries $expression-identifiers) $expression-identifiers))
-          ($relocable-binary-syntax
-            (syntax-replace-all
-              $expression-identifiers
-              $expression-tmps
-              $relocable-binary-syntax))
           ($expression-syntaxes (map identified-ref $identified-expression-syntax-list))
-          ($expression-syntaxes
-            (map
-              (lambda ($syntax)
-                (syntax-replace-all
-                  $sized-identifiers
-                  $sized-tmps
-                  (syntax-replace-all
-                    $expression-identifiers
-                    $expression-tmps
-                    $syntax)))
-              $expression-syntaxes))
           ($expression-let-entries
             (map
-              (lambda ($id $expr) #`(#,$id #,$expr))
+              (lambda ($id $expr) #`(#,$id #,($rewrite-ids $expr)))
               $expression-tmps
               $expression-syntaxes))
           (environmental
