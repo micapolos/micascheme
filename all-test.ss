@@ -107,6 +107,5 @@
   (u)
   (verilog all)
   (vm all)
-  (zasm all)
   (zexy all)
 )
