@@ -16,14 +16,20 @@
   (push-char #\A)
   (push-word #x1234)
 
+  (call println-stack)
+
   (ld bc #xdede)
   (push-bc)
   (pop-bc)
 
-  (push-byte #x12)
+  (call println-stack)
 
-  (dup-value)
-  (break)
+  (push-byte #x20)
+  (push-byte #x40)
+
+  (call println-stack)
+
+  (byte-mul)
 
   (call println-stack)
 

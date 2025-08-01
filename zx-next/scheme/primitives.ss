@@ -31,10 +31,6 @@
     or-r-n
     xor-r-n
 
-    and-r-r
-    or-r-r
-    xor-r-r
-
     inc-r
     dec-r
 
@@ -42,7 +38,11 @@
     println-stack
 
     byte-add
-    byte-sub)
+    byte-sub
+    byte-and
+    byte-or
+    byte-xor
+    byte-mul)
   (import (zx-next core) (zx-next write))
 
   (define-fragments
@@ -55,13 +55,16 @@
     (u16-tag #b00100000))
 
   (define-ops
+    ((reset-offset)
+      (ld e 0))
+
     ((init-stack)
       ; push end-of-stack marker
       (ld a #xff)
       (push af)
       (inc sp)
       ; initialize stack offset to 0
-      (ld e 0))
+      (reset-offset))
 
     ((d->value)
       (input (a byte))
@@ -206,13 +209,18 @@
       (value->bc))
 
     ((dup-value)
+      (dup-value 0))
+
+    ((dup-value 0)
       (pop de)
       (pop bc)
       (push bc)
       (push de)
-      (ld e 0)
+      (reset-offset)
       (push bc)
       (push de))
+
+    ; TODO: Make optimized version for (dup-value 1), where alternate register set will be used.
 
     ((dup-value offset)
       (preserve (hl)
@@ -225,6 +233,7 @@
         (ld c (hl))
         (inc hl)
         (ld b (hl)))
+      (reset-offset)
       (push bc)
       (push de))
 
@@ -247,21 +256,23 @@
 
     ((byte-add)  (alu-r-r add))
     ((byte-sub)  (alu-r-r sub))
-    ((and-r-r)  (alu-r-r and))
-    ((or-r-r)   (alu-r-r or))
-    ((xor-r-r)  (alu-r-r xor))
+    ((byte-and)  (alu-r-r and))
+    ((byte-or)   (alu-r-r or))
+    ((byte-xor)  (alu-r-r xor))
 
     ((inc-r)    (inc/dec-r inc))
     ((dec-r)    (inc/dec-r dec))
 
-    ((mul-r-r)
-      (pop-value)
-      (value->a)   ; a = rhs
-      (pop-value)
-      (value->d)   ; d = lhs
-      (ld e a)
+    ((byte-mul)
+      (pop-a)
+      (pop-d)    ; d = lhs
+      (ld b e)   ; preserve offset
+      (ld e a)   ; e = rhs
       (mul d e)
-      (de->value)
+      (ld c d)   ; high byte in c
+      (ld d e)   ; low byte in d
+      (ld e b)   ; restore offset
+      (ld b u16-tag)
       (push-value)))
 
   (define-fragment println
@@ -310,41 +321,43 @@
     (ret))
 
   (define-fragment println-stack
-    (ld a #\()
-    (call write-char)
-    (ld hl stack-string)
-    (call write-string)
+    (preserve (de)
+      (ld a #\()
+      (call write-char)
+      (ld hl stack-string)
+      (call write-string)
 
-    (ld hl 2)
-    (add hl sp)
+      (ld hl 4)
+      (add hl sp)
 
-    (loop
-      ; Load value into bcde
-      (ld e (hl))
-      (inc hl)
-      (ld d (hl))
-      (inc hl)
-      (ld c (hl))
-      (inc hl)
-      (ld b (hl))
-      (inc hl)
-      (ld a e)
+      (loop
+        ; Load value into bcde
+        (ld e (hl))
+        (inc hl)
+        (ld d (hl))
+        (inc hl)
+        (ld c (hl))
+        (inc hl)
+        (ld b (hl))
+        (inc hl)
+        (ld a e)
 
-      ; return if end of stack
-      (cp #xff)
-      (when z
-        (ld a #\))
-        (call write-char)
-        (call write-newline)
-        (ret))
+        ; return if end of stack
+        (cp #xff)
+        (when z
+          (ld a #\))
+          (call write-char)
+          (call write-newline)
+          (pop de)  ; compensate for (preserve (de)) - implement break from loop!!!
+          (ret))
 
-      ; advance to the next entry
-      (add hl a)
-      (preserve (hl)
-        (preserve (bc de)
-          (ld a #\space)
-          (call write-char))
-        (call write-value)))
+        ; advance to the next entry
+        (add hl a)
+        (preserve (hl)
+          (preserve (bc de)
+            (ld a #\space)
+            (call write-char))
+          (call write-value))))
 
     (ret))
 )
