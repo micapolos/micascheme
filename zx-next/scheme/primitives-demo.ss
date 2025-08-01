@@ -11,22 +11,19 @@
   (call terminal-init)
 
   ; init stack
-  (ld e #xff)
-  (push-value)
+  (init-stack)
 
-  (ld e #x00)
-  (char-value #\A)
-  (push-value)
+  (push-char #\A)
+  (push-word #x1234)
 
-  (ld e #x00)
-  (word-value #x1234)
-  (push-value)
+  (ld bc #xdede)
+  (push-bc)
+  (pop-bc)
 
-  (ld e #x00)
-  (byte-value #x12)
-  (push-value)
+  (push-byte #x12)
 
-  (dup-value 0)
+  (dup-value)
+  (break)
 
   (call println-stack)
 

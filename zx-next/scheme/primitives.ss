@@ -1,10 +1,22 @@
 (library (zx-next scheme primitives)
   (export
+    init-stack
+
     byte-value
     char-value
     word-value
 
     a->char-value
+
+    push-af
+    push-bc
+
+    pop-af
+    pop-bc
+
+    push-byte
+    push-char
+    push-word
 
     push-value
     pop-value
@@ -43,6 +55,14 @@
     (u16-tag #b00100000))
 
   (define-ops
+    ((init-stack)
+      ; push end-of-stack marker
+      (ld a #xff)
+      (push af)
+      (inc sp)
+      ; initialize stack offset to 0
+      (ld e 0))
+
     ((d->value)
       (input (a byte))
       (output (bcd value))
@@ -104,6 +124,41 @@
       (push bc)
       (push de))
 
+    ((push-af)
+      (push af)
+      (inc e)
+      (inc e))
+
+    ((push-bc)
+      (push bc)
+      (inc e)
+      (inc e))
+
+    ((pop-af)
+      (dec e)
+      (dec e)
+      (pop af))
+
+    ((pop-bc)
+      (dec e)
+      (dec e)
+      (pop bc))
+
+    ((push-byte n)
+      (ld d n)
+      (ld bc 0)
+      (push-value))
+
+    ((push-char n)
+      (ld d n)
+      (ld bc #b0100000000000000)
+      (push-value))
+
+    ((push-word nn)
+      (ld d (fxand nn #xff))
+      (ld bc (fxior (fxsll #b00100000 8) (fxand (fxsrl nn 8) #xff)))
+      (push-value))
+
     ((pop-value)
       (output (bcd value) (e offset))
       (pop de)
@@ -151,12 +206,13 @@
       (value->bc))
 
     ((dup-value)
-      (pop bc)
       (pop de)
-      (push de)
+      (pop bc)
       (push bc)
       (push de)
-      (push bc))
+      (ld e 0)
+      (push bc)
+      (push de))
 
     ((dup-value offset)
       (preserve (hl)
