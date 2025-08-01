@@ -79,7 +79,7 @@
                         (lambda ($clause)
                           (syntax-case $clause ()
                             ((pattern body ...)
-                              #'(pattern #'(begin body ...)))))
+                              #`(pattern #'(begin body ...)))))
                         $clauses))))))
             (group-by
               syntax-clause-id
