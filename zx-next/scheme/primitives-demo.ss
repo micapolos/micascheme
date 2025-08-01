@@ -14,6 +14,9 @@
   (call terminal-init)
 
   (run-scheme
+    (push-null)
+    (push-true)
+    (push-false)
     (push-symbol hello-symbol)
     (push-string hello-string)
     (push-char #\A)

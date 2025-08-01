@@ -12,6 +12,9 @@
     pop-af
     pop-bc
 
+    push-null
+    push-true
+    push-false
     push-byte
     push-char
     push-word
@@ -162,6 +165,21 @@
       (dec e)
       (dec e)
       (pop bc))
+
+    ((push-null)
+      (ld d 0)
+      (ld bc #b0110000000000000)
+      (push-value))
+
+    ((push-false)
+      (ld d 0)
+      (ld bc #b0111000000000000)
+      (push-value))
+
+    ((push-true)
+      (ld d 0)
+      (ld bc #b0111100000000000)
+      (push-value))
 
     ((push-byte n)
       (ld d n)
@@ -346,6 +364,35 @@
         (ld a #\\)
         (call write-char))
       (jp write-char))
+
+    ; constant
+    (cp #b01100000)
+    (when z
+      (ld a b)
+
+      ; null
+      (cp #b01100000)
+      (when z
+        (ld a #\()
+        (call write-char)
+        (ld a #\))
+        (jp write-char))
+
+      ; false
+      (cp #b01110000)
+      (when z
+        (ld a #\#)
+        (call write-char)
+        (ld a #\f)
+        (jp write-char))
+
+      ; true
+      (cp #b01111000)
+      (when z
+        (ld a #\#)
+        (call write-char)
+        (ld a #\t)
+        (jp write-char)))
 
     ; symbol
     (cp #b10000000)
