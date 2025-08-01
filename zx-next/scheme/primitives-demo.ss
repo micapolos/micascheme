@@ -6,8 +6,7 @@
   (zx-next debug))
 
 (define-fragments
-  (hello-symbol (dz "hello-world"))
-  (hello-string (dz "Hello, world!"))
+  (foo-string (dz "foo"))
   (goodbye-string (dz "Goodbye, world!")))
 
 (run
@@ -17,8 +16,8 @@
     (push-null)
     (push-true)
     (push-false)
-    (push-symbol hello-symbol)
-    (push-string hello-string)
+    (push-symbol foo-string)
+    (push-string foo-string)
     (push-char #\A)
     (push-word #x1234)
 
