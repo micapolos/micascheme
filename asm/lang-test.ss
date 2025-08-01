@@ -2,7 +2,8 @@
   (asm lang)
   (only (micascheme) syntax-rules)
   (asm ops)
-  (asm lang-test-library))
+  (asm lang-test-library)
+  (asm lang-test-write))
 
 (define val-10 10)
 (define val-20 20)
@@ -191,3 +192,32 @@
   (asm
     (start #xc004)
     (db 5 5 5 5 #x02 #xc0)))
+
+(check-asm
+  (org #xc000)
+  (dw write)
+  (asm
+    (start 49153)
+    (db 201 0 192)))
+
+(check-asm
+  (org #xc000)
+  (dw use-write)
+  (asm
+    (start 49155)
+    (db 201 0 192 1 192)))
+
+(check-asm
+  (org #xc000)
+  (write-op)
+  (asm
+    (start 49153)
+    (db 201 0 192)))
+
+(check-asm
+  (org #xc000)
+  (library-write-op)
+  (asm
+    (start 49153)
+    (db 201 0 192)))
+
