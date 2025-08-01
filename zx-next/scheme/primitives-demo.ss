@@ -1,6 +1,5 @@
 (import
   (zx-next core)
-  (zx-next write)
   (zx-next scheme primitives)
   (zx-next terminal)
   (zx-next debug))
