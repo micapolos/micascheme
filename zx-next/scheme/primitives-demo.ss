@@ -17,11 +17,13 @@
   (push-word #x1234)
 
   (call println-stack)
+  (call println)
 
   (ld bc #xdede)
   (push-bc)
-  (pop-bc)
+  (call println-stack)
 
+  (pop-bc)
   (call println-stack)
 
   (push-byte #x20)
@@ -31,6 +33,10 @@
 
   (byte-mul)
 
+  (call println-stack)
+
+  (pop-value)
+  (pop-value)
   (call println-stack)
 
   ; (call println)

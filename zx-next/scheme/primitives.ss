@@ -282,7 +282,7 @@
   (define-fragment println
     (pop hl)
     (pop-value)
-    (preserve (hl)
+    (preserve (de hl)
       (call write-value)
       (call write-newline))
     (jp (hl)))
@@ -326,13 +326,16 @@
 
   (define-fragment println-stack
     (preserve (de)
-      (ld a #\()
-      (call write-char)
-      (ld hl stack-string)
-      (call write-string)
+      (preserve (de)
+        (ld a #\()
+        (call write-char)
+        (ld hl stack-string)
+        (call write-string))
 
       (ld hl 4)
       (add hl sp)
+      (ld a e)
+      (add hl a)
 
       (loop
         ; Load value into bcde
