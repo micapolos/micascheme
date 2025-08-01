@@ -167,12 +167,10 @@
           (syntax-case $syntax ()
             ((_ (id ...) x ...)
               (for-all identifier? #'(id ...))
-              (fold-left
-                (lambda ($syntax $from $to)
-                  (syntax-replace $from $to $syntax))
-                #'(begin x ...)
+              (syntax-replace-all
                 #'(id ...)
-                (generate-temporaries #'(id ...)))))))))
+                (generate-temporaries #'(id ...))
+                #'(begin x ...))))))))
 
   (define-syntax reverse
     (make-compile-time-value

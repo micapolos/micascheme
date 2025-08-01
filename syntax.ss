@@ -29,6 +29,7 @@
     syntax=?
     syntax-datum=?
     syntax-replace
+    syntax-replace-all
     syntax-replace...
     transform
     syntaxes
@@ -186,6 +187,14 @@
           .
           #,(syntax-replace $from-id $to #'y)))
       (x #'x)))
+
+  (define (syntax-replace-all $from-ids $tos $syntax)
+    (fold-left
+      (lambda ($syntax $from $to)
+        (syntax-replace $from $to $syntax))
+      $syntax
+      $from-ids
+      $tos))
 
   (define (syntax-replace... $from-id $tos $syntax)
     (syntax-case $syntax ()

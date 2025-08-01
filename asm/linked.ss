@@ -38,6 +38,7 @@
       ($relocable-binary-syntax
         #`(map-relocable list->binary
           (relocable-append #,@$relocated-binary-syntax-list)))
+      ($sized-tmps (generate-temporaries $sized-identifiers))
       ($label-let-entries
         (map
           (lambda ($identifier $offset) #`(#,$identifier (+ $org #,$offset)))
