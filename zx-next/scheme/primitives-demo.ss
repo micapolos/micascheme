@@ -6,6 +6,7 @@
   (zx-next debug))
 
 (define-fragments
+  (hello-symbol (dz "hello-world"))
   (hello-string (dz "Hello, world!"))
   (goodbye-string (dz "Goodbye, world!")))
 
@@ -13,6 +14,8 @@
   (call terminal-init)
 
   (run-scheme
+    (push-symbol hello-symbol)
+    (push-string hello-string)
     (push-char #\A)
     (push-word #x1234)
 

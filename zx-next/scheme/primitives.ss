@@ -15,6 +15,8 @@
     push-byte
     push-char
     push-word
+    push-symbol
+    push-string
 
     push-value
     pop-value
@@ -176,6 +178,16 @@
       (ld bc (fxior (fxsll #b00100000 8) (fxand (fxsrl nn 8) #xff)))
       (push-value))
 
+    ((push-symbol nn)
+      (ld d (fxand nn #xff))
+      (ld bc (fxior (fxsll #b10000000 8) (fxand (fxsrl nn 8) #xff)))
+      (push-value))
+
+    ((push-string nn)
+      (ld d (fxand nn #xff))
+      (ld bc (fxior (fxsll #b10100000 8) (fxand (fxsrl nn 8) #xff)))
+      (push-value))
+
     ((pop-value)
       (output (bcd value) (e offset))
       (pop de)
@@ -301,6 +313,7 @@
     (ld a b)
     (and #b11100000)
 
+    ; byte
     (cp #b00000000)
     (when z
       (ld a d)
@@ -311,6 +324,7 @@
         (call write-char))
       (jp write-byte))
 
+    ; word
     (cp #b00100000)
     (when z
       (ld h c)
@@ -322,6 +336,7 @@
         (call write-char))
       (jp write-word))
 
+    ; char
     (cp #b01000000)
     (when z
       (ld a d)
@@ -330,6 +345,25 @@
         (call write-char)
         (ld a #\\)
         (call write-char))
+      (jp write-char))
+
+    ; symbol
+    (cp #b10000000)
+    (when z
+      (ld h c)
+      (ld l d)
+      (jp write-string))
+
+    ; string
+    (cp #b10100000)
+    (when z
+      (ld h c)
+      (ld l d)
+      (preserve (hl)
+        (ld a #\")
+        (call write-char))
+      (call write-string)
+      (ld a #\")
       (jp write-char))
 
     (ret))
