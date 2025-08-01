@@ -1,11 +1,13 @@
 (import
   (zx-next core)
+  (zx-next write)
   (zx-next scheme primitives)
   (zx-next terminal)
   (zx-next debug))
 
 (define-fragments
-  (hello-string (dz "Hello, world!")))
+  (hello-string (dz "Hello, world!"))
+  (goodbye-string (dz "Goodbye, world!")))
 
 (run
   (call terminal-init)

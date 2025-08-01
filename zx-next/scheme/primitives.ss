@@ -64,15 +64,9 @@
     ((reset-offset)
       (ld e 0))
 
-    ((with-exit-handler body ...)
-      (ld iy 0)
-      (add iy sp)
-      body ...)
-
     ((run-scheme body ...)
-      (with-exit-handler
-        (with-stack
-          body ...)))
+      (with-stack
+        body ...))
 
     ((with-stack body ...)
       (ld a #xff)
@@ -85,10 +79,6 @@
 
       (dec sp)
       (pop af))
-
-    ((scheme-exit)
-      ; TODO
-      )
 
     ((d->value)
       (input (a byte))
