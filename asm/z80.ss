@@ -437,6 +437,16 @@
     ((add iy iy)       (db #xfd #b00101001))
     ((add iy sp)       (db #xfd #b00111001))
 
+    ((adc hl bc)       (db #xed #b01001010))
+    ((adc hl de)       (db #xed #b01011010))
+    ((adc hl hl)       (db #xed #b01101010))
+    ((adc hl sp)       (db #xed #b01111010))
+
+    ((sbc hl bc)       (db #xed #b01000010))
+    ((sbc hl de)       (db #xed #b01010010))
+    ((sbc hl hl)       (db #xed #b01100010))
+    ((sbc hl sp)       (db #xed #b01110010))
+
     ; Next extension
     ((add hl a)        (db #xed #b00110001))
     ((add de a)        (db #xed #b00110010))
@@ -855,6 +865,7 @@
     ((nextreg n n2)    (db #xed #x91 n n2))
     ((swapnib)         (db #xed #x23))
     ((mul d e)         (db #xed #x30))
+    ((push nm)         (db #xed #x8a) (dw nm))
 
     ; Helpers
     ((rcf)             (or a))
