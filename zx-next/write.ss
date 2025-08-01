@@ -3,6 +3,7 @@
     write-init
     write-char
     write-string
+    writeln-string
     write-nibble
     write-byte
     write-word
@@ -30,6 +31,11 @@
       (or a)
       (ret z)
       (preserve (hl) (call write-char))))
+
+  (define-fragment writeln-string
+    (input (hl string))
+    (call write-string)
+    (jp write-newline))
 
   (define-fragment write-nibble
     (input (a nibble))

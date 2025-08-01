@@ -1,15 +1,20 @@
 (import
   (zx-next core)
+  (zx-next write)
   (zx-next scheme primitives)
   (zx-next terminal)
   (zx-next debug))
 
 (define-fragments
-  (foo-string (dz "foo"))
-  (goodbye-string (dz "Goodbye, world!")))
+  (hello-string (dz "=== Hello, Scheme!!! ==="))
+  (goodbye-string (dz "=== Goodbye, Scheme! ==="))
+  (foo-string (dz "foo")))
 
 (run
   (call terminal-init)
+
+  (ld hl hello-string)
+  (call writeln-string)
 
   (run-scheme
     (push-null)
@@ -42,5 +47,8 @@
     (pop-value)
     (pop-value)
     (call println-stack))
+
+  (ld hl goodbye-string)
+  (call writeln-string)
 
   (jp loop-bars))
