@@ -3,7 +3,8 @@
     terminal-init
     terminal-move-to
     terminal-write-char
-    terminal-newline)
+    terminal-newline
+    terminal-wait-space)
   (import
     (zx-next core)
     (zx-next mem)
@@ -12,7 +13,8 @@
     (zx-next palette)
     (zx-next write)
     (zx-next tile map)
-    (zx-next tile coord))
+    (zx-next tile coord)
+    (zx-next debug))
 
   (define-values
     (width 80)
@@ -184,4 +186,11 @@
       (ld (hl) a)
       (inc hl))
     (ret))
+
+  (define-fragment press-space-string (dz "=== PRESS SPACE ==="))
+
+  (define-fragment terminal-wait-space
+    (ld hl press-space-string)
+    (call writeln-string)
+    (call wait-space))
 )

@@ -2,6 +2,7 @@
   (export
     banks-init
     bank-alloc
+    bank-free
     write-banks)
   (import
     (zx-next core)
@@ -11,37 +12,35 @@
   (define-fragments
     (available-string (dz "Available banks: ")))
 
+  (define-values
+    (bank-status-free 0)
+    (bank-status-system 1)
+    (bank-status-unavailable #xff))
+
   (define-fragments
-    (bank-alloc-map
-      (db #x80)
-      (ds 27 0)
-      (ds 4 #xff))
-    (bank-index (db 0))
+    (bank-status-map
+      (ds 1     bank-status-system)
+      (ds 223   bank-status-free)
+      (ds 32    bank-status-unavailable))
+    (bank-current (db 0))
     (banks-free (db 223)))
 
   ; TODO: Initalize according to available memory (how to detect it?)
   (define-asm banks-init
     (ret))
 
-  (define-asm bank-index->addr/mask
+  (define-asm bank-index->addr
     (input (a bank-index))
-    (output (hl addr) (e mask))
-    (ld c a)
-
-    ; E = mask
-    (ld de #x0080)
-    (and #x07)
-    (ld b a)
-    (bsrl de b)
-
-    (ld hl bank-alloc-map)
-    (ld a c)
-    (dup 3 (rrca))
+    (output (hl addr))
+    (ld hl bank-status-map)
     (add hl a)
     (ret))
 
   (define-asm bank-alloc
-    (output (a bank) (fc out-of-memory))
+    (output (a non-zero type) (fc out-of-memory))
+
+    ; e - status
+    (ld e a)
 
     ; check out of memory
     (ld a (banks-free))
@@ -49,10 +48,31 @@
     (when z (scf) (ret))
 
     (loop
-      (call bank-index->addr/mask)
-      (ld a e)
-      (and a)
-      ))
+      (ld hl bank-current)
+      (inc (hl))
+      (ld a (hl))
+      (call bank-index->addr)
+      (ld a (hl))
+      (or a)
+      (when z
+        (ld (hl) e)
+        (ld hl banks-free)
+        (dec (hl))
+        (rcf)
+        (ret))))
+
+  (define-asm bank-free
+    (input (a bank-index))
+
+    (call bank-index->addr)
+    (ld a (hl))
+    (or a)
+    (ret z)
+
+    (ld (hl) 0)
+    (ld hl banks-free)
+    (inc (hl))
+    (ret))
 
   (define-asm write-banks
     (ld hl available-string)
@@ -61,6 +81,6 @@
     (call write-byte)
     (call write-newline)
 
-    (dump bank-alloc-map #x20)
+    (dump bank-status-map #x100)
     (ret))
 )

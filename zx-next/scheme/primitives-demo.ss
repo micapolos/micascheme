@@ -14,7 +14,20 @@
 (run
   (call terminal-init)
   (call banks-init)
-  ;(call write-banks)
+
+  (call write-banks)
+  (ld a #x23)
+  (call bank-alloc)
+  (ld a #x24)
+  (call bank-alloc)
+  (ld a #x22)
+  (call bank-alloc)
+
+  (ld a #x02)
+  (call bank-free)
+  (ld a #x02)
+  (call bank-free)
+  (call write-banks)
 
   (ld hl hello-string)
   (call writeln-string)
