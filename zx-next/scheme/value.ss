@@ -20,6 +20,14 @@
     (zx-next mmu)
     (zx-next scheme tag))
 
+  ; Value is stored in BCD:
+  ; - B:
+  ;   - bits 7..5: tag
+  ;   - bits 4..0: address MSB / constant value
+  ; - C: 16-bit value MSB
+  ; - D: 8-bit value / 16-bit MSB
+  ; - E contains stack offset and is preserved
+
   (define-values
     (mmu-slot 7)
     (addr-base-h #b11100000))
