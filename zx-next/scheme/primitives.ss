@@ -392,20 +392,26 @@
     (cp byte-tag)
     (when z
       (value->a)
-      (preserve (af) (write "#x"))
-      (jp write-byte))
+      (preserve (af) (write "\x10;\x5;#x\x10;\x6;"))
+      (call write-byte)
+      (write "\x10;\x7;")
+      (ret))
 
     (cp word-tag)
     (when z
       (value->hl)
-      (preserve (hl) (write "#x"))
-      (jp write-word))
+      (preserve (hl) (write "\x10;\x5;#x\x10;\x6;"))
+      (call write-word)
+      (write "\x10;\x7;")
+      (ret))
 
     (cp char-tag)
     (when z
       (value->a)
-      (preserve (af) (write "#\\"))
-      (jp write-char))
+      (preserve (af) (write "\x10;\x5;#\\\x10;\x6;"))
+      (call write-char)
+      (write "\x10;\x7;")
+      (ret))
 
     (cp constant-tag)
     (when z
@@ -418,12 +424,12 @@
 
       (cp false-tag)
       (when z
-        (write "#f")
+        (write "\x10;\x5;#f\x10;\x6;")
         (ret))
 
       (cp true-tag)
       (when z
-        (write "#t")
+        (write "\x10;\x5;#t\x10;\x7;")
         (ret))
 
       (write "#<unknown>")
@@ -432,14 +438,17 @@
     (cp symbol-tag)
     (when z
       (value->mmu/hl)
-      (jp write-string))
+      (preserve (hl) (write "\x10;\x3;"))
+      (call write-string)
+      (write "\x10;\x7;")
+      (ret))
 
     (cp string-tag)
     (when z
       (value->mmu/hl)
-      (preserve (hl) (write #\"))
+      (preserve (hl) (write "\x10;\x2;\""))
       (call write-string)
-      (write #\")
+      (write "\"\x10;\x7;")
       (ret))
 
     (write "#<unknown>")
@@ -447,7 +456,7 @@
 
   (define-fragment write-stack
     (preserve (de)
-      (preserve (de) (write "(stack"))
+      (preserve (de) (write "(\x10;\x3;stack\x10;\x7;"))
 
       (ld hl 4)
       (add hl sp)
