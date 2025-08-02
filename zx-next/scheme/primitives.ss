@@ -1,11 +1,5 @@
 (library (zx-next scheme primitives)
   (export
-    byte-value
-    char-value
-    word-value
-
-    a->char-value
-
     push-af
     push-bc
 
@@ -50,6 +44,7 @@
     (zx-next write)
     (zx-next mmu)
     (zx-next panic)
+    (zx-next scheme tag)
     (zx-next scheme value))
 
   ; Calling convention:
@@ -96,90 +91,6 @@
 
       (dec sp)
       (pop af))
-
-    ((d->value)
-      (input (a byte))
-      (output (bcd value))
-      (ld bc 0))
-
-    ((a->value)
-      (input (a byte))
-      (output (bcd value))
-      (ld d a)
-      (ld bc 0))
-
-    ((byte-value n)
-      (output (bcd value))
-      (ld d n)
-      (ld bc #b0000000000000000))
-
-    ((word-value nn)
-      (output (bcd value))
-      (ld d (fxand nn #xff))
-      (ld c (fxand (fxsrl nn 8) #xff))
-      (ld b #b00100000))
-
-    ((char-value n)
-      (input (a byte))
-      (output (bcd value))
-      (ld d n)
-      (ld bc #b0100000000000000))
-
-    ((a->char-value)
-      (input (a byte))
-      (output (bcd value))
-      (ld d a)
-      (ld bc #b0100000000000000))
-
-    ((value->d)
-      (input (bcd value))
-      (output (a byte)))
-
-    ((value->a)
-      (input (bcd value))
-      (output (a byte))
-      (ld a d))
-
-    ((bc->value)
-      (input (bc word))
-      (output (bcd value))
-      (ld d c)
-      (ld c b)
-      (ld b word-tag))
-
-    ((value->bc)
-      (input (bc word))
-      (output (bcd value))
-      (ld b c)
-      (ld c d))
-
-    ((value->de)
-      (input (bc word))
-      (output (bcd value))
-      (ld d c)
-      (ld e d))
-
-    ((value->tag)
-      (input (bcc value))
-      (output (a tag))
-      (ld a d)
-      (and #b11100000))
-
-    ((value->hl)
-      (input (bc word))
-      (output (bcd value))
-      (ld h c)
-      (ld l d))
-
-    ((value->mmu/hl)
-      (input (bcd value))
-      (output (mmu paged-in) (hl address))
-      (ld a d)   ; bank in D
-      (mmu 7 a)
-      (ld a b)   ; tag/addr in BC
-      (or #b11100000)
-      (ld h a)
-      (ld l c))
 
     ((push-value)
       (input (bcd value) (e offset))
