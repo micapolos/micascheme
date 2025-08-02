@@ -29,12 +29,6 @@
     push-n
     push-nn
 
-    add-r-n
-    sub-r-n
-    and-r-n
-    or-r-n
-    xor-r-n
-
     inc-r
     dec-r
 
@@ -357,6 +351,11 @@
       (push bc)
       (push de))
 
+    ((alu-r-n op n)
+      (pop-a)
+      (op n)
+      (push-a))
+
     ((alu-r-r op)
       (pop-a)
       (pop-d)
@@ -368,11 +367,11 @@
       (op d)
       (push-d))
 
-    ((add-r-n)  (alu-r-n add))
-    ((sub-r-n)  (alu-r-n sub))
-    ((and-r-n)  (alu-r-n and))
-    ((or-r-n)   (alu-r-n or))
-    ((xor-r-n)  (alu-r-n xor))
+    ((byte-add n)  (alu-r-n add))
+    ((byte-sub n)  (alu-r-n sub))
+    ((byte-and n)  (alu-r-n and))
+    ((byte-or n)   (alu-r-n or))
+    ((byte-xor n)  (alu-r-n xor))
 
     ((byte-add)  (alu-r-r add))
     ((byte-sub)  (alu-r-r sub))
@@ -382,6 +381,17 @@
 
     ((inc-r)    (inc/dec-r inc))
     ((dec-r)    (inc/dec-r dec))
+
+    ((byte-mul n)
+      (pop-d)    ; d = lhs
+      (ld b e)   ; preserve offset
+      (ld e n)   ; e = rhs
+      (mul d e)
+      (ld c d)   ; high byte in c
+      (ld d e)   ; low byte in d
+      (ld e b)   ; restore offset
+      (ld b word-tag)
+      (push-value))
 
     ((byte-mul)
       (pop-a)
