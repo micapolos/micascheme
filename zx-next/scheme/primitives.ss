@@ -47,8 +47,9 @@
     byte-xor
     byte-mul
 
-    run-scheme)
-  (import (zx-next core) (zx-next write))
+    run-scheme
+    throw)
+  (import (zx-next core) (zx-next write) (zx-next panic))
 
   ; Calling convention:
   ;  E - value stack offset, must be preserved
@@ -57,8 +58,7 @@
   ;  HL - may contain return address, must be preserved
 
   (define-fragments
-    (hello-world-string (dz "Hello, world!"))
-    (stack-string (dz "stack")))
+    (error-string (dz "Internal error")))
 
   (define-values
     (value-header 0)
@@ -70,8 +70,18 @@
       (ld e 0))
 
     ((run-scheme body ...)
-      (with-stack
-        body ...))
+      (with-panic (with-stack body ...))
+      (when c
+        (preserve (hl) (write "PANIC!!! "))
+        (call write-string)))
+
+    ((throw)
+      (ld hl error-string)
+      (panic))
+
+    ((throw string-address)
+      (ld hl string-address)
+      (panic))
 
     ((with-stack body ...)
       (ld a #xff)

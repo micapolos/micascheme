@@ -7,17 +7,13 @@
   (zx-next debug))
 
 (define-fragments
-  (hello-string (dz "=== Hello, Scheme!!! ==="))
-  (goodbye-string (dz "=== Goodbye, Scheme! ==="))
-  (foo-string (dz "foo")))
+  (foo-string (dz "foo"))
+  (custom-error-string (dz "I don't want to do it anymore.")))
 
 (run
   (call terminal-init)
   (call banks-init)
-  (dump hello-string #x30)
-  (dump goodbye-string #x30)
-  (dump foo-string #x30)
-  (writeln)
+
   (writeln "=== Hello, Scheme!!! ===")
   (writeln)
 

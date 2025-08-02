@@ -14,7 +14,9 @@
     (writeln "  Entered panic handler.")
     (writeln "  No panic, please!")
     (writeln "  Exiting panic handler..."))
-  (writeln "Exited panic handler.")
+  (if nc
+    (then (writeln "Did not panic."))
+    (else (writeln "Did panic.")))
   (writeln)
 
   (writeln "=== Trying panic flow ===")
@@ -25,6 +27,10 @@
     (panic)
     (writeln "  FIRE FIRE FIRE!!!")
     (writeln "  Exiting panic handler..."))
-  (writeln "Exited panic handler.")
+  (if nc
+    (then (writeln "Did not panic."))
+    (else (writeln "Did panic.")))
+  (writeln)
+
   (call terminal-wait-space)
   (rst 0))

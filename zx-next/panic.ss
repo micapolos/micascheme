@@ -12,8 +12,10 @@
 
         body ...
 
+        (rcf)
         no-panic))
     ((panic)
       (ld sp iy)
+      (scf)
       (ret)))
 )

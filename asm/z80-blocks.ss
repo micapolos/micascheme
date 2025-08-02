@@ -50,6 +50,7 @@
 
   (define-ops (keywords c nc z nz m p po pe)
     ((when nc body ...) (unless c body ...))
+    ((when c body ...) (unless nc body ...))
     ((when z body ...) (unless nz body ...))
     ((when nz body ...) (unless z body ...))
     ((when m body ...) (unless p body ...))
