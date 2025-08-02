@@ -1,37 +1,31 @@
 (library (zx-next scheme compiler)
   (export
+    scoped
     byte word
     byte+ byte-
-    write
-    syntax->expr
-    check-syntax->expr)
+    scoped-expr->asm
+    check-scoped-expr->asm)
   (import
-    (except (micascheme) write)
+    (micascheme)
+    (prefix (zx-next core) %)
     (prefix (zx-next scheme primitives) %))
 
-  (define-keywords byte word byte+ byte- write)
+  (define-keywords scoped byte word byte+ byte-)
 
-  (define (syntax->expr $lookup $syntax)
-    (syntax-case $syntax (byte word byte+ byte- write)
-      ((byte n)
-        #`((%push-byte n)))
-      ((word n)
-        #`((%push-word n)))
-      ((byte+ a b)
-        #`(
-          #,@(syntax->expr $lookup #'b)
-          #,@(syntax->expr $lookup #'a)
-          (%byte-add)))
-      ((byte- a b)
-        #`(
-          #,@(syntax->expr $lookup #'b)
-          #,@(syntax->expr $lookup #'a)
-          (%byte-sub)))
-      ((write x)
-        #`(
-          #,@(syntax->expr $lookup #'x)
-          (%write-value)))))
+  (define (scoped-expr->asm $lookup $scoped-expr)
+    (syntax-case $scoped-expr (scoped)
+      ((scoped params locals expr)
+        (let ()
+          (define-rule-syntax (recurse x)
+            (scoped-expr->asm $lookup #'(scoped params locals x)))
+          (define-rule-syntax (op-2 id a b)
+            #`(%begin #,(recurse b) #,(recurse a) (id)))
+          (syntax-case #'expr (byte word byte+ byte- let)
+            ((byte n) #'(%push-byte n))
+            ((word n) #'(%push-word n))
+            ((byte+ a b) (op-2 %byte-add a b))
+            ((byte- a b) (op-2 %byte-sub a b)))))))
 
-  (define-rule-syntax (check-syntax->expr lookup x op ...)
-    (check (equal? (syntax->datum (syntax->expr lookup #'x)) '(op ...))))
+  (define-rule-syntax (check-scoped-expr->asm lookup expr asm)
+    (check (equal? (syntax->datum (scoped-expr->asm lookup #'expr)) 'asm)))
 )
