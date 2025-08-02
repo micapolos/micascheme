@@ -50,6 +50,10 @@
   (%begin (%push-byte #x12) (%write-value)))
 
 (check-stmt->asm (empty-lookup)
+  (%%write-stack)
+  (%println-stack))
+
+(check-stmt->asm (empty-lookup)
   (%%begin
     (%%write (%%byte #x12))
     (%%write (%%byte #x34)))

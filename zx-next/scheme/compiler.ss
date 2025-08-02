@@ -12,11 +12,13 @@
     (prefix (zx-next scheme primitives) %))
 
   (define (stmt->asm $lookup $stmt)
-    (syntax-case $stmt (%%write %%begin %%lets)
+    (syntax-case $stmt (%%write %%write-stack %%begin %%lets)
       ((%%write expr)
         #`(%begin
           #,(expr->asm $lookup #'expr)
           (%write-value)))
+      ((%%write-stack)
+        #`(%println-stack))
       ((%%begin stmt ...)
         #`(%begin #,@(map (partial stmt->asm $lookup) #'(stmt ...))))
       ((%%lets expr ... stmt)
