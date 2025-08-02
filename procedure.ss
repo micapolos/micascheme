@@ -5,6 +5,7 @@
     repeat
     repeat-indexed
     identity
+    constant-procedure
     once-proc
     checking-once
     app
@@ -101,6 +102,9 @@
       (else (syntax-error $syntax))))
 
   (define identity (lambda (x) x))
+
+  (define (constant-procedure x)
+    (lambda (_) x))
 
   (define-rule-syntax (values-apply $expr $proc)
     (call-with-values (lambda () $expr) $proc))
