@@ -8,6 +8,7 @@
     write-byte
     write-word
     write-newline
+    write-regs
     write-mem
     write-mem-line
     write
@@ -180,7 +181,19 @@
     (ret))
 
   (define-op-syntax write
-    (syntax-rules ()
+    (syntax-rules (a b c d e h l af bc de hl sp)
+      ((_ a) (begin (call write-byte)))
+      ((_ b) (begin (ld a b) (call write-byte)))
+      ((_ c) (begin (ld a c) (call write-byte)))
+      ((_ d) (begin (ld a d) (call write-byte)))
+      ((_ e) (begin (ld a e) (call write-byte)))
+      ((_ h) (begin (ld a h) (call write-byte)))
+      ((_ l) (begin (ld a l) (call write-byte)))
+      ((_ af) (begin (push af) (pop hl) (call write-word)))
+      ((_ bc) (begin (ld h b) (ld c l) (call write-word)))
+      ((_ de) (begin (ld h d) (ld l e) (call write-word)))
+      ((_ hl) (begin (call write-word)))
+      ((_ sp) (begin (ld hl 0) (add hl sp) (call write-word)))
       ((_ ch)
         (char? (datum ch))
         (begin
@@ -197,15 +210,21 @@
           (ld hl u16)
           (call write-word)))
       ((_ s)
-      (string? (datum s))
+        (string? (datum s))
         (with-labels (here)
           (call here)
           (dz s)
           here
           (pop hl)
-          (call write-string)))))
+          (call write-string)))
+      ((_ s ...)
+        (begin (preserve (af bc de hl) (write s)) ...))))
 
-  (define-op (writeln s)
-    (write s)
+  (define-op (writeln s ...)
+    (write s ...)
     (call write-newline))
+
+  (define-fragment write-regs
+    (writeln "AF " af "\rBC " bc "\rDE " de "\rHL " hl "\rSP " sp)
+    (ret))
 )
