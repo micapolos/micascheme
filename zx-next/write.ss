@@ -9,8 +9,13 @@
     write-word
     write-newline
     write-mem
-    write-mem-line)
-  (import (zx-next core))
+    write-mem-line
+    write
+    writeln)
+  (import
+    (zx-next core)
+    (only (micascheme) syntax-rules char? string? datum)
+    (u))
 
   (define-fragment write-init
     (input (hl write-char-address))
@@ -173,4 +178,34 @@
     (preserve (hl)
       (call write-newline))
     (ret))
+
+  (define-op-syntax write
+    (syntax-rules ()
+      ((_ ch)
+        (char? (datum ch))
+        (begin
+          (ld a ch)
+          (call write-char)))
+      ((_ u8)
+        (u8? (datum u8))
+        (begin
+          (ld a u8)
+          (call write-byte)))
+      ((_ u16)
+        (u16? (datum u16))
+        (begin
+          (ld hl u16)
+          (call write-word)))
+      ((_ s)
+      (string? (datum s))
+        (with-labels (here)
+          (call here)
+          (dz s)
+          here
+          (pop hl)
+          (call write-string)))))
+
+  (define-op (writeln s)
+    (write s)
+    (call write-newline))
 )

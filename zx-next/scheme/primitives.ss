@@ -335,11 +335,7 @@
     (cp #b00000000)
     (when z
       (ld a d)
-      (preserve (af)
-        (ld a #\#)
-        (call write-char)
-        (ld a #\x)
-        (call write-char))
+      (preserve (af) (write "#x"))
       (jp write-byte))
 
     ; word
@@ -347,22 +343,14 @@
     (when z
       (ld h c)
       (ld l d)
-      (preserve (hl)
-        (ld a #\#)
-        (call write-char)
-        (ld a #\x)
-        (call write-char))
+      (preserve (hl) (write "#x"))
       (jp write-word))
 
     ; char
     (cp #b01000000)
     (when z
       (ld a d)
-      (preserve (af)
-        (ld a #\#)
-        (call write-char)
-        (ld a #\\)
-        (call write-char))
+      (preserve (af) (write "#\\"))
       (jp write-char))
 
     ; constant
@@ -372,27 +360,15 @@
 
       ; null
       (cp #b01100000)
-      (when z
-        (ld a #\()
-        (call write-char)
-        (ld a #\))
-        (jp write-char))
+      (when z (write "()"))
 
       ; false
       (cp #b01110000)
-      (when z
-        (ld a #\#)
-        (call write-char)
-        (ld a #\f)
-        (jp write-char))
+      (when z (write "#f"))
 
       ; true
       (cp #b01111000)
-      (when z
-        (ld a #\#)
-        (call write-char)
-        (ld a #\t)
-        (jp write-char)))
+      (when z (write "#t")))
 
     ; symbol
     (cp #b10000000)
@@ -406,22 +382,15 @@
     (when z
       (ld h c)
       (ld l d)
-      (preserve (hl)
-        (ld a #\")
-        (call write-char))
+      (preserve (hl) (write #\"))
       (call write-string)
-      (ld a #\")
-      (jp write-char))
+      (write #\"))
 
     (ret))
 
   (define-fragment println-stack
     (preserve (de)
-      (preserve (de)
-        (ld a #\()
-        (call write-char)
-        (ld hl stack-string)
-        (call write-string))
+      (preserve (de) (write "(stack"))
 
       (ld hl 4)
       (add hl sp)
@@ -443,18 +412,14 @@
         ; return if end of stack
         (cp #xff)
         (when z
-          (ld a #\))
-          (call write-char)
-          (call write-newline)
+          (writeln #\))
           (pop de)  ; compensate for (preserve (de)) - implement break from loop!!!
           (ret))
 
         ; advance to the next entry
         (add hl a)
         (preserve (hl)
-          (preserve (bc de)
-            (ld a #\space)
-            (call write-char))
+          (preserve (bc de) (write #\space))
           (call write-value))))
 
     (ret))

@@ -15,8 +15,7 @@
   (call terminal-init)
   (call banks-init)
 
-  (ld hl hello-string)
-  (call writeln-string)
+  (writeln "=== Hello, Scheme!!! ===")
 
   (run-scheme
     (push-null)
@@ -50,7 +49,6 @@
     (pop-value)
     (call println-stack))
 
-  (ld hl goodbye-string)
-  (call writeln-string)
+  (writeln "=== Goodbye, Scheme!!! ===")
 
   (jp loop-bars))
