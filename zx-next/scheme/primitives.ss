@@ -66,8 +66,17 @@
 
   (define-values
     (value-header 0)
-    (u8-tag  #b00000000)
-    (u16-tag #b00100000))
+    (byte-tag      #b00000000)
+    (word-tag      #b00100000)
+    (char-tag      #b01000000)
+    (constant-tag  #b01100000)
+    (symbol-tag    #b10000000)
+    (string-tag    #b10100000)
+
+    (null-tag      #b01100000)
+    (false-tag     #b01110000)
+    (true-tag      #b01111000))
+
 
   (define-ops
     ((reset-offset)
@@ -147,7 +156,7 @@
       (output (bcd value))
       (ld d c)
       (ld c b)
-      (ld b u16-tag))
+      (ld b word-tag))
 
     ((value->bc)
       (input (bc word))
@@ -160,6 +169,12 @@
       (output (bcd value))
       (ld d c)
       (ld e d))
+
+    ((value->tag)
+      (input (bcc value))
+      (output (a tag))
+      (ld a d)
+      (and #b11100000))
 
     ((value->hl)
       (input (bc word))
@@ -352,7 +367,7 @@
       (ld c d)   ; high byte in c
       (ld d e)   ; low byte in d
       (ld e b)   ; restore offset
-      (ld b u16-tag)
+      (ld b word-tag)
       (push-value)))
 
   (define-fragment println
@@ -367,58 +382,60 @@
     (ld a b)
     (and #b11100000)
 
-    ; byte
-    (cp #b00000000)
+    (cp byte-tag)
     (when z
       (value->a)
       (preserve (af) (write "#x"))
       (jp write-byte))
 
-    ; word
-    (cp #b00100000)
+    (cp word-tag)
     (when z
       (value->hl)
       (preserve (hl) (write "#x"))
       (jp write-word))
 
-    ; char
-    (cp #b01000000)
+    (cp char-tag)
     (when z
       (value->a)
       (preserve (af) (write "#\\"))
       (jp write-char))
 
-    ; constant
-    (cp #b01100000)
+    (cp constant-tag)
     (when z
       (ld a b)
 
-      ; null
-      (cp #b01100000)
-      (when z (write "()"))
+      (cp null-tag)
+      (when z
+        (write "()")
+        (ret))
 
-      ; false
-      (cp #b01110000)
-      (when z (write "#f"))
+      (cp false-tag)
+      (when z
+        (write "#f")
+        (ret))
 
-      ; true
-      (cp #b01111000)
-      (when z (write "#t")))
+      (cp true-tag)
+      (when z
+        (write "#t")
+        (ret))
 
-    ; symbol
-    (cp #b10000000)
+      (write "#<unknown>")
+      (ret))
+
+    (cp symbol-tag)
     (when z
       (value->mmu/hl)
       (jp write-string))
 
-    ; string
-    (cp #b10100000)
+    (cp string-tag)
     (when z
       (value->mmu/hl)
       (preserve (hl) (write #\"))
       (call write-string)
-      (write #\"))
+      (write #\")
+      (ret))
 
+    (write "#<unknown>")
     (ret))
 
   (define-fragment write-stack
