@@ -194,7 +194,7 @@
 
     ((ld sp hl)        (db #xf9))
     ((ld sp ix)        (db #xdd #xf9))
-    ((ld sp iy)        (db #xdd #xf9))
+    ((ld sp iy)        (db #xfd #xf9))
 
     ; Load (argument)
     ((ld (nm) a)       (db #b00110010) (dw nm))
