@@ -108,4 +108,5 @@
   (verilog all)
   (vm all)
   (zexy all)
+  (zx-next all)
 )
