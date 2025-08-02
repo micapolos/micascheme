@@ -21,33 +21,33 @@
     (push-null)
     (push-true)
     (push-false)
-    (push-symbol foo-string)
-    (push-string foo-string)
+    (push-symbol 0 foo-string)
+    (push-string 0 foo-string)
     (push-char #\A)
     (push-word #x1234)
 
-    (call println-stack)
+    (call write-stack)
     (call println)
 
     (ld bc #xdede)
     (push-bc)
-    (call println-stack)
+    (call write-stack)
 
     (pop-bc)
-    (call println-stack)
+    (call write-stack)
 
     (push-byte #x20)
     (push-byte #x40)
 
-    (call println-stack)
+    (call write-stack)
 
     (byte-mul)
 
-    (call println-stack)
+    (call write-stack)
 
     (pop-value)
     (pop-value)
-    (call println-stack))
+    (call write-stack))
 
   (writeln)
   (writeln "=== Goodbye, Scheme!!! ===")

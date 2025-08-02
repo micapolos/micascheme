@@ -63,7 +63,7 @@
 
 (check-stmt->asm (empty-lookup)
   (%%write-stack)
-  (%println-stack))
+  (%write-stack))
 
 (check-stmt->asm (empty-lookup)
   (%%begin

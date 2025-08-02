@@ -18,7 +18,7 @@
           #,(expr->asm $lookup #'expr)
           (%write-value)))
       ((%%write-stack)
-        #`(%println-stack))
+        #`(%write-stack))
       ((%%begin stmt ...)
         #`(%begin #,@(map (partial stmt->asm $lookup) #'(stmt ...))))
       ((%%lets expr ... stmt)

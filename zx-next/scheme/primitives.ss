@@ -38,7 +38,7 @@
     dec-r
 
     println
-    println-stack
+    write-stack
 
     byte-add
     byte-sub
@@ -49,7 +49,11 @@
 
     run-scheme
     throw)
-  (import (zx-next core) (zx-next write) (zx-next panic))
+  (import
+    (zx-next core)
+    (zx-next write)
+    (zx-next mmu)
+    (zx-next panic))
 
   ; Calling convention:
   ;  E - value stack offset, must be preserved
@@ -163,6 +167,16 @@
       (ld h c)
       (ld l d))
 
+    ((value->mmu/hl)
+      (input (bcd value))
+      (output (mmu paged-in) (hl address))
+      (ld a d)   ; bank in D
+      (mmu 7 a)
+      (ld a b)   ; tag/addr in BC
+      (or #b11100000)
+      (ld h a)
+      (ld l c))
+
     ((push-value)
       (input (bcd value) (e offset))
       (push bc)
@@ -218,14 +232,14 @@
       (ld bc (fxior (fxsll #b00100000 8) (fxand (fxsrl nn 8) #xff)))
       (push-value))
 
-    ((push-symbol nn)
-      (ld d (fxand nn #xff))
-      (ld bc (fxior (fxsll #b10000000 8) (fxand (fxsrl nn 8) #xff)))
+    ((push-symbol bank addr)
+      (ld d bank)
+      (ld bc (fxior (fxsll #b100 13) (fxand #x1fff addr)))
       (push-value))
 
-    ((push-string nn)
-      (ld d (fxand nn #xff))
-      (ld bc (fxior (fxsll #b10100000 8) (fxand (fxsrl nn 8) #xff)))
+    ((push-string bank addr)
+      (ld d bank)
+      (ld bc (fxior (fxsll #b101 13) (fxand #x1fff addr)))
       (push-value))
 
     ((pop-value)
@@ -394,20 +408,20 @@
     ; symbol
     (cp #b10000000)
     (when z
-      (value->hl)
+      (value->mmu/hl)
       (jp write-string))
 
     ; string
     (cp #b10100000)
     (when z
-      (value->hl)
+      (value->mmu/hl)
       (preserve (hl) (write #\"))
       (call write-string)
       (write #\"))
 
     (ret))
 
-  (define-fragment println-stack
+  (define-fragment write-stack
     (preserve (de)
       (preserve (de) (write "(stack"))
 
