@@ -64,7 +64,9 @@
   ;  HL - may contain return address, must be preserved
 
   (define-fragments
-    (error-string (dz "Internal error")))
+    (error-string (dz "Internal error"))
+    (stack-string (dz "stack"))
+    (unknown-string (dz "unknown")))
 
   (define-values
     (value-header 0)
@@ -95,15 +97,11 @@
     ((run-scheme body ...)
       (with-panic (with-stack body ...))
       (when c
-        (preserve (hl) (write "PANIC!!! "))
+        (preserve (hl) (write "(error "))
         (call write-string)))
 
     ((throw)
-      (ld hl error-string)
-      (panic))
-
-    ((throw string-address)
-      (ld hl string-address)
+      (pop-value)
       (panic))
 
     ((with-stack body ...)
@@ -411,78 +409,166 @@
       (call write-newline))
     (jp (hl)))
 
+  (define-values
+    (normal-color   7)
+    (symbol-color   3)
+    (boolean-color  5)
+    (char-color     5)
+    (string-color   2)
+    (paren-color    7)
+    (number-color   6)
+    (hash-color     5))
+
+  (define-fragment write-open
+    (write-ink paren-color)
+    (ld a #\()
+    (jp write-char))
+
+  (define-fragment write-close
+    (write-ink paren-color)
+    (ld a #\))
+    (call write-char)
+    (write-ink normal-color)
+    (ret))
+
+  (define-fragment write-quotes
+    (write-ink string-color)
+    (ld a #\")
+    (jp write-char))
+
+  (define-fragment write-hash
+    (write-ink hash-color)
+    (ld a #\#)
+    (jp write-char))
+
+  (define-fragment write-space
+    (ld a #\space)
+    (jp write-char))
+
+  (define-fragment write-true
+    (call write-hash)
+    (write-ink boolean-color)
+    (ld a #\t)
+    (jp write-char))
+
+  (define-fragment write-false
+    (call write-hash)
+    (write-ink boolean-color)
+    (ld a #\f)
+    (jp write-char))
+
+  (define-fragment write-null
+    (call write-open)
+    (jp write-close))
+
+  (define-fragment write-hex-prefix
+    (call write-hash)
+    (ld a #\x)
+    (call write-char)
+    (write-ink number-color)
+    (ret))
+
+  (define-fragment write-byte-literal
+    (input (a byte))
+    (preserve (af) (call write-hex-prefix))
+    (jp write-byte))
+
+  (define-fragment write-char-literal
+    (input (a char))
+    (preserve (af)
+      (call write-hash)
+      (ld a #\\)
+      (call write-char)
+      (write-ink char-color))
+    (jp write-char))
+
+  (define-fragment write-word-literal
+    (input (hl word))
+    (preserve (hl) (call write-hex-prefix))
+    (jp write-word))
+
+  (define-fragment write-symbol
+    (input (hl addr))
+    (preserve (hl) (write-ink symbol-color))
+    (call write-string)
+    (ret))
+
+  (define-fragment write-string-literal
+    (input (hl addr))
+    (preserve (hl) (call write-quotes))
+    (call write-string)
+    (jp write-quotes))
+
+  (define-fragment write-symbolic
+    (input (bcd value) (hl symbol-addr))
+    (preserve (bc de)
+      (preserve (hl) (call write-open))
+      (call write-symbol))
+    (call write-value)
+    (jp write-close))
+
+  (define-fragment write-unknown
+    (call write-hash)
+    (ld a #\<)
+    (call write-char)
+    (ld hl unknown-string)
+    (call write-symbol)
+    (ld a #\>)
+    (jp write-char))
+
   (define-fragment write-value
+    (input (bcd value))
     (ld a b)
     (and #b11100000)
 
     (cp byte-tag)
     (when z
       (value->a)
-      (preserve (af) (write "\x10;\x1;#x\x10;\x5;"))
-      (call write-byte)
-      (write "\x10;\x7;")
-      (ret))
+      (jp write-byte-literal))
 
     (cp word-tag)
     (when z
       (value->hl)
-      (preserve (hl) (write "\x10;\x1;#x\x10;\x5;"))
-      (call write-word)
-      (write "\x10;\x7;")
-      (ret))
+      (jp write-word-literal))
 
     (cp char-tag)
     (when z
       (value->a)
-      (preserve (af) (write "\x10;\x1;#\\\x10;\x5;"))
-      (call write-char)
-      (write "\x10;\x7;")
-      (ret))
+      (jp write-char-literal))
 
     (cp constant-tag)
     (when z
       (ld a b)
 
       (cp null-tag)
-      (when z
-        (write "()")
-        (ret))
+      (when z (jp write-null))
 
       (cp false-tag)
-      (when z
-        (write "\x10;\x2;#f\x10;\x6;")
-        (ret))
+      (when z (jp write-false))
 
       (cp true-tag)
-      (when z
-        (write "\x10;\x2;#t\x10;\x7;")
-        (ret))
+      (when z (jp write-true))
 
-      (write "#<unknown>")
-      (ret))
+      (jp write-unknown))
 
     (cp symbol-tag)
     (when z
       (value->mmu/hl)
-      (preserve (hl) (write "\x10;\x3;"))
-      (call write-string)
-      (write "\x10;\x7;")
-      (ret))
+      (jp write-symbol))
 
     (cp string-tag)
     (when z
       (value->mmu/hl)
-      (preserve (hl) (write "\x10;\x2;\""))
-      (call write-string)
-      (write "\"\x10;\x7;")
-      (ret))
+      (jp write-string-literal))
 
-    (write "#<unknown>")
-    (ret))
+    (jp write-unknown))
 
   (define-fragment write-stack
     (preserve (de)
-      (preserve (de) (write "(\x10;\x3;stack\x10;\x7;"))
+      (preserve (de)
+        (call write-open)
+        (ld hl stack-string)
+        (call write-symbol))
 
       (ld hl 4)
       (add hl sp)
@@ -504,14 +590,15 @@
         ; return if end of stack
         (cp #xff)
         (when z
-          (writeln #\))
+          (call write-close)
+          (call write-newline)
           (pop de)  ; compensate for (preserve (de)) - implement break from loop!!!
           (ret))
 
         ; advance to the next entry
         (add hl a)
         (preserve (hl)
-          (preserve (bc de) (write #\space))
+          (preserve (bc de) (call write-space))
           (call write-value))))
 
     (ret))
