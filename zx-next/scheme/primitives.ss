@@ -141,6 +141,18 @@
       (ld b c)
       (ld c d))
 
+    ((value->de)
+      (input (bc word))
+      (output (bcd value))
+      (ld d c)
+      (ld e d))
+
+    ((value->hl)
+      (input (bc word))
+      (output (bcd value))
+      (ld h c)
+      (ld l d))
+
     ((push-value)
       (input (bcd value) (e offset))
       (push bc)
@@ -334,22 +346,21 @@
     ; byte
     (cp #b00000000)
     (when z
-      (ld a d)
+      (value->a)
       (preserve (af) (write "#x"))
       (jp write-byte))
 
     ; word
     (cp #b00100000)
     (when z
-      (ld h c)
-      (ld l d)
+      (value->hl)
       (preserve (hl) (write "#x"))
       (jp write-word))
 
     ; char
     (cp #b01000000)
     (when z
-      (ld a d)
+      (value->a)
       (preserve (af) (write "#\\"))
       (jp write-char))
 
@@ -373,15 +384,13 @@
     ; symbol
     (cp #b10000000)
     (when z
-      (ld h c)
-      (ld l d)
+      (value->hl)
       (jp write-string))
 
     ; string
     (cp #b10100000)
     (when z
-      (ld h c)
-      (ld l d)
+      (value->hl)
       (preserve (hl) (write #\"))
       (call write-string)
       (write #\"))
