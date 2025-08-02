@@ -23,7 +23,7 @@
   ; Value is stored in BCDE:
   ; - B:
   ;   - bits 7..5: tag
-  ;   - bits 4..0: address MSB / constant value
+  ;   - bits 4..0: address MSB / 21-bit value MSB / constant value
   ; - C: address LSB / 16-bit value MSB
   ; - D: 8-bit value / 16-bit value MSB / bank
   ; - E: stack offset to the previous value on the stack
