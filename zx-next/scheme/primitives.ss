@@ -49,7 +49,8 @@
     (zx-next core)
     (zx-next write)
     (zx-next mmu)
-    (zx-next panic))
+    (zx-next panic)
+    (zx-next scheme value))
 
   ; Calling convention:
   ;  E - value stack offset, must be preserved
@@ -61,20 +62,6 @@
     (error-string (dz "Internal error"))
     (stack-string (dz "stack"))
     (unknown-string (dz "unknown")))
-
-  (define-values
-    (value-header 0)
-    (byte-tag      #b00000000)
-    (word-tag      #b00100000)
-    (char-tag      #b01000000)
-    (constant-tag  #b01100000)
-    (symbol-tag    #b10000000)
-    (string-tag    #b10100000)
-
-    (null-tag      #b01100000)
-    (false-tag     #b01110000)
-    (true-tag      #b01111000))
-
 
   (define-ops
     ((reset-offset)
