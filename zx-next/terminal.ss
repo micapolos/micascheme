@@ -28,9 +28,23 @@
     (glyph-count 96)
     (glyph-size 8))
 
+  (define-values
+    (char-ink    #x10)
+    (char-paper  #x11)
+    (char-at     #x16))
+
+  (define-values
+    (put-char-state-normal   0)
+    (put-char-state-ink      1)
+    (put-char-state-paper    2)
+    (put-char-state-at       3)
+    (put-char-state-at-row   4))
+
   (define-fragments
-    (cursor-coord (dw #x0000))
-    (attr (db #b11100000)))
+    (cursor-coord        (dw #x0000))
+    (attr                (db #b11100000))
+    (put-char-state      (db 0))
+    (put-char-state-arg  (db 0)))
 
   (define-fragment terminal-init
     (nextreg #x6b #b11001011)  ; enable tilemap, 80x32, 512 tiles, textmode, tilemap over ULA
@@ -88,8 +102,62 @@
     (jp terminal-scroll-up))
 
   (define-fragment terminal-write-char
+    (ld b a)
+    (ld hl put-char-state)
+
+    (ld a (hl))
+    (cp put-char-state-normal)
+    (when nz
+      (cp put-char-state-ink)
+      (when z
+        (ld (hl) put-char-state-normal)
+        (ld hl attr)
+        (ld a (hl))
+        (and #b00011111)
+        (ld c a)
+        (ld a b)
+        (and #b111)
+        (rrca)
+        (rrca)
+        (rrca)
+        (or c)
+        (ld (hl) a)
+        (ret))
+
+      (cp put-char-state-paper)
+      (when z
+        (ld (hl) put-char-state-normal)
+        (ld hl attr)
+        (ld a (hl))
+        (and #b11100011)
+        (ld c a)
+        (ld a b)
+        (and #b111)
+        (rlca)
+        (rlca)
+        (or c)
+        (ld (hl) a)
+        (ret))
+
+      (ld (hl) put-char-state-normal)
+      (ret))
+
+    (ld a b)
+
     (cp #x0d)
     (jp z terminal-newline)
+
+    (cp char-ink)
+    (when z
+      (ld hl put-char-state)
+      (ld (hl) put-char-state-ink)
+      (ret))
+
+    (cp char-paper)
+    (when z
+      (ld hl put-char-state)
+      (ld (hl) put-char-state-paper)
+      (ret))
 
     (sub #x20)
     (ret m)

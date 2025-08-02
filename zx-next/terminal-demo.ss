@@ -5,7 +5,7 @@
   (zx-next debug))
 
 (define-fragments
-  (hello-world (dz "Hello, world!\r"))
+  (hello-world (dz "Hello, \x10;\x5;\x11;\x1;world\x10;\x7;\x11;\x08;!\r"))
   (press-space (dz "... Press SPACE ..."))
   (long-line (dz "Hello, this is a very long string which will overflow the terminal by a couple of lines. Really, this is how long it is.")))
 
