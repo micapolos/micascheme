@@ -209,6 +209,22 @@
       (push bc)
       (push de))
 
+    ; TODO: Make optimized version for (dup-value 1), where alternate register set will be used.
+    ((dup-value offset)
+      (preserve (hl)
+        (ld hl (+ 2 (* 4 offset)))
+        (add hl sp)
+        (ld e (hl))
+        (inc hl)
+        (ld d (hl))
+        (inc hl)
+        (ld c (hl))
+        (inc hl)
+        (ld b (hl)))
+      (reset-offset)
+      (push bc)
+      (push de))
+
     ((local-enter)
       (push ix)
       (inc-offset)
@@ -229,23 +245,6 @@
       (ld c (+ ix 1))
       (ld d (+ ix 2))
       (reset-offset))
-
-    ; TODO: Make optimized version for (dup-value 1), where alternate register set will be used.
-
-    ((dup-value offset)
-      (preserve (hl)
-        (ld hl (+ 2 (* 4 offset)))
-        (add hl sp)
-        (ld e (hl))
-        (inc hl)
-        (ld d (hl))
-        (inc hl)
-        (ld c (hl))
-        (inc hl)
-        (ld b (hl)))
-      (reset-offset)
-      (push bc)
-      (push de))
 
     ((alu-r-n op n)
       (pop-a)
