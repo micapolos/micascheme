@@ -18,7 +18,9 @@
       ($bytevector (binary->bytevector $binary))
       (run
         (parameterize ((print-radix 16))
-          (pretty-print $bytevector)))
+          ;(pretty-print $bytevector)
+          (pretty-print `(size ,(bytevector-length $bytevector)))
+          (pretty-print `(start ,$start))))
       ($nex-blob (nex-blob (bytevector->blob $bytevector) $start))
       (%run
         (call-with-port
