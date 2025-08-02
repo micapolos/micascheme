@@ -25,7 +25,7 @@
             (scoped-expr->asm $lookup #'(scoped (arg (... ...)) (local (... ...)) x)))
           (define-rule-syntax (op-2 id a b)
             #`(%begin #,(recurse b) #,(recurse a) (id)))
-          (syntax-case #'expr (byte word byte+ byte- let)
+          (syntax-case #'expr (byte word byte+ byte- lets)
             (id (identifier? #'id)
               (switch (index? (local ...) id)
                 ((integer? $index) #`(%dup-value #,$index))
@@ -34,7 +34,7 @@
             ((word n) #'(%push-word n))
             ((byte+ a b) (op-2 %byte-add a b))
             ((byte- a b) (op-2 %byte-sub a b))
-            ((let ((id expr) ...) body)
+            ((lets (id expr) ... body)
               #`(%begin
                 #,@(map-with
                   ($expr #'(expr ...))

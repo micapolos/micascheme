@@ -35,10 +35,9 @@
 
 (check-scoped-expr->asm (empty-lookup)
   (scoped () ()
-    (let
-      (
-        ($byte-1 (byte #x12))
-        ($byte-2 (byte #x34)))
+    (lets
+      ($byte-1 (byte #x12))
+      ($byte-2 (byte #x34))
       (byte+ $byte-1 $byte-2)))
   (%begin
     (%push-byte #x12)
