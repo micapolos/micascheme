@@ -1,118 +1,208 @@
 (library (zx-next scheme write)
-  (export scheme-write)
+  (export
+    write-value
+    write-stack)
   (import
     (zx-next core)
-    (zx-next mmu)
     (zx-next write)
+    (zx-next scheme tag)
     (zx-next scheme value))
 
   (define-fragments
-    (null-string         (dz "()"))
-    (false-string        (dz "#f"))
-    (true-string         (dz "#t"))
-    (char-prefix-string  (dz "#\\")))
+    (stack-string (dz "stack"))
+    (unknown-string (dz "unknown")))
 
-  (define-fragment scheme-write-byte
-    (jp write-byte))
+  (define-values
+    (normal-color   7)
+    (symbol-color   3)
+    (boolean-color  5)
+    (char-color     5)
+    (string-color   2)
+    (paren-color    7)
+    (number-color   6)
+    (hash-color     5))
 
-  (define-fragment scheme-write-word
-    (ex de hl)
-    (ld l a)
-    (jp write-word))
-
-  (define-fragment scheme-write-char
-    (ex de hl)
-    (preserve (af)
-      (ld hl char-prefix-string)
-      (call write-string))
+  (define-fragment write-open
+    (write-ink paren-color)
+    (ld a #\()
     (jp write-char))
 
-  (define-fragment scheme-write-false
-    (ld hl false-string)
-    (jp write-string))
+  (define-fragment write-close
+    (write-ink paren-color)
+    (ld a #\))
+    (call write-char)
+    (write-ink normal-color)
+    (ret))
 
-  (define-fragment scheme-write-true
-    (ld hl true-string)
-    (jp write-string))
-
-  (define-fragment scheme-write-null
-    (ld hl null-string)
-    (jp write-string))
-
-  (define-fragment scheme-write-pointer
-    (ex de hl)
-    (mmu 7 a)
-    (ld a h)
-    (or #b11100000)
-    (ld h a)
-    (dec hl)
-    (ld a (hl))
-    (inc hl)
-    (bit 6 a)
-    (if z
-      ; byte-like
-      (then
-        (bit 4 a)
-        (if z
-          ; symbol
-          (then (jp scheme-write-symbol))
-          ; string
-          (else (jp scheme-write-string))))
-      ; vector-like
-      (else
-        (ret))))
-
-  (define-fragment scheme-write-symbol
-    (jp write-string))
-
-  (define-fragment scheme-write-string
-    (preserve (hl)
-      (ld a #\")
-      (call write-char))
-    (call write-string)
+  (define-fragment write-quotes
+    (write-ink string-color)
     (ld a #\")
     (jp write-char))
 
-  (define-fragment write-dispatch-table
-    (dw scheme-write-byte)      ; 0000
-    (dw scheme-write-pointer)   ; 0001
-    (dw scheme-write-null)      ; 0010
-    (dw scheme-write-pointer)   ; 0011
-    (dw scheme-write-word)      ; 0100
-    (dw scheme-write-pointer)   ; 0101
-    (dw scheme-write-false)     ; 0110
-    (dw scheme-write-pointer)   ; 0111
-    (dw scheme-write-byte)      ; 1000
-    (dw scheme-write-pointer)   ; 1001
-    (dw scheme-write-char)      ; 1010
-    (dw scheme-write-pointer)   ; 1011
-    (dw scheme-write-word)      ; 1100
-    (dw scheme-write-pointer)   ; 1101
-    (dw scheme-write-true)      ; 1110
-    (dw scheme-write-pointer))  ; 1111
+  (define-fragment write-hash
+    (write-ink hash-color)
+    (ld a #\#)
+    (jp write-char))
 
-  (define-fragment scheme-write
-    (input (hla value))
-    ; save HL in DE, and A in B
-    (ex de hl)
-    (ld b a)
+  (define-fragment write-space
+    (ld a #\space)
+    (jp write-char))
 
-    ; load tag offset
-    (ld a e)
-    (and #xf)
-    (add a)
+  (define-fragment write-true
+    (call write-hash)
+    (write-ink boolean-color)
+    (ld a #\t)
+    (jp write-char))
 
-    ; load dispatch offset
-    (ld hl write-dispatch-table)
-    (add hl a)
+  (define-fragment write-false
+    (call write-hash)
+    (write-ink boolean-color)
+    (ld a #\f)
+    (jp write-char))
 
-    ; load write address
-    (ld a (hl))
-    (inc hl)
-    (ld h (hl))
-    (ld l a)
+  (define-fragment write-null
+    (call write-open)
+    (jp write-close))
 
-    ; restore A and dispatch (HL is in DE)
+  (define-fragment write-hex-prefix
+    (call write-hash)
+    (ld a #\x)
+    (call write-char)
+    (write-ink number-color)
+    (ret))
+
+  (define-fragment write-byte-literal
+    (input (a byte))
+    (preserve (af) (call write-hex-prefix))
+    (jp write-byte))
+
+  (define-fragment write-char-literal
+    (input (a char))
+    (preserve (af)
+      (call write-hash)
+      (ld a #\\)
+      (call write-char)
+      (write-ink char-color))
+    (jp write-char))
+
+  (define-fragment write-word-literal
+    (input (hl word))
+    (preserve (hl) (call write-hex-prefix))
+    (jp write-word))
+
+  (define-fragment write-symbol
+    (input (hl addr))
+    (preserve (hl) (write-ink symbol-color))
+    (call write-string)
+    (ret))
+
+  (define-fragment write-string-literal
+    (input (hl addr))
+    (preserve (hl) (call write-quotes))
+    (call write-string)
+    (jp write-quotes))
+
+  (define-fragment write-symbolic
+    (input (bcd value) (hl symbol-addr))
+    (preserve (bc de)
+      (preserve (hl) (call write-open))
+      (call write-symbol))
+    (call write-value)
+    (jp write-close))
+
+  (define-fragment write-unknown
+    (call write-hash)
+    (ld a #\<)
+    (call write-char)
+    (ld hl unknown-string)
+    (call write-symbol)
+    (ld a #\>)
+    (jp write-char))
+
+  (define-fragment write-value
+    (input (bcd value))
     (ld a b)
-    (jp (hl)))
+    (and #b11100000)
+
+    (cp byte-tag)
+    (when z
+      (value->a)
+      (jp write-byte-literal))
+
+    (cp word-tag)
+    (when z
+      (value->hl)
+      (jp write-word-literal))
+
+    (cp char-tag)
+    (when z
+      (value->a)
+      (jp write-char-literal))
+
+    (cp constant-tag)
+    (when z
+      (ld a b)
+
+      (cp null-tag)
+      (when z (jp write-null))
+
+      (cp false-tag)
+      (when z (jp write-false))
+
+      (cp true-tag)
+      (when z (jp write-true))
+
+      (jp write-unknown))
+
+    (cp symbol-tag)
+    (when z
+      (value->mmu/hl)
+      (jp write-symbol))
+
+    (cp string-tag)
+    (when z
+      (value->mmu/hl)
+      (jp write-string-literal))
+
+    (jp write-unknown))
+
+  (define-fragment write-stack
+    (preserve (de)
+      (preserve (de)
+        (call write-open)
+        (ld hl stack-string)
+        (call write-symbol))
+
+      (ld hl 4)
+      (add hl sp)
+      (ld a e)
+      (add hl a)
+
+      (loop
+        ; Load value into bcde
+        (ld e (hl))
+        (inc hl)
+        (ld d (hl))
+        (inc hl)
+        (ld c (hl))
+        (inc hl)
+        (ld b (hl))
+        (inc hl)
+        (ld a e)
+
+        ; return if end of stack
+        (cp #xff)
+        (when z
+          (call write-close)
+          (call write-newline)
+          (pop de)  ; compensate for (preserve (de)) - implement break from loop!!!
+          (ret))
+
+        ; advance to the next entry
+        (add hl a)
+        (preserve (hl)
+          (preserve (bc de) (call write-space))
+          (call write-value))))
+
+    (ret))
 )

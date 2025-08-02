@@ -2,6 +2,7 @@
   (zx-next core)
   (zx-next write)
   (zx-next scheme primitives)
+  (zx-next scheme write)
   (zx-next terminal)
   (zx-next bank)
   (zx-next debug))
