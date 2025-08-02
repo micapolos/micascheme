@@ -13,7 +13,7 @@
   (import (zx-next core))
 
   (define-values
-    (tag-mask      #b00000000)
+    (tag-mask      #b11100000)
 
     (byte-tag      #b00000000)
     (word-tag      #b00100000)
