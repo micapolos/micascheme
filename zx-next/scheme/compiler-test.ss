@@ -5,6 +5,18 @@
   (syntax lookup))
 
 (check-expr->asm (empty-lookup)
+  #t
+  (%push-true))
+
+(check-expr->asm (empty-lookup)
+  #f
+  (%push-false))
+
+(check-expr->asm (empty-lookup)
+  ()
+  (%push-null))
+
+(check-expr->asm (empty-lookup)
   (%%top 2)
   (%dup-value 2))
 
