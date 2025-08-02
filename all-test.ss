@@ -9,6 +9,7 @@
   (blob)
   (bytevector)
   (case)
+  (char)
   (check)
   (code)
   (core)

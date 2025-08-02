@@ -76,6 +76,7 @@
       (boolean)
       (bytevector)
       (case)
+      (char)
       (check)
       (core)
       (current)
