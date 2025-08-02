@@ -392,7 +392,7 @@
     (cp byte-tag)
     (when z
       (value->a)
-      (preserve (af) (write "\x10;\x5;#x\x10;\x6;"))
+      (preserve (af) (write "\x10;\x1;#x\x10;\x5;"))
       (call write-byte)
       (write "\x10;\x7;")
       (ret))
@@ -400,7 +400,7 @@
     (cp word-tag)
     (when z
       (value->hl)
-      (preserve (hl) (write "\x10;\x5;#x\x10;\x6;"))
+      (preserve (hl) (write "\x10;\x1;#x\x10;\x5;"))
       (call write-word)
       (write "\x10;\x7;")
       (ret))
@@ -408,7 +408,7 @@
     (cp char-tag)
     (when z
       (value->a)
-      (preserve (af) (write "\x10;\x5;#\\\x10;\x6;"))
+      (preserve (af) (write "\x10;\x1;#\\\x10;\x5;"))
       (call write-char)
       (write "\x10;\x7;")
       (ret))
@@ -424,12 +424,12 @@
 
       (cp false-tag)
       (when z
-        (write "\x10;\x5;#f\x10;\x6;")
+        (write "\x10;\x2;#f\x10;\x6;")
         (ret))
 
       (cp true-tag)
       (when z
-        (write "\x10;\x5;#t\x10;\x7;")
+        (write "\x10;\x2;#t\x10;\x7;")
         (ret))
 
       (write "#<unknown>")

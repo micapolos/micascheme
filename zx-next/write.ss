@@ -12,6 +12,8 @@
     write-mem
     write-mem-line
     write
+    write-ink
+    write-paper
     writeln)
   (import
     (zx-next core)
@@ -76,6 +78,18 @@
   (define-fragment write-newline
     (ld a #x0d)
     (jp write-char))
+
+  (define-ops
+    ((write-ink n)
+      (ld a #x10)
+      (call write-char)
+      (ld a n)
+      (call write-char))
+    ((write-paper n)
+      (ld a #x11)
+      (call write-char)
+      (ld a n)
+      (call write-char)))
 
   (define-op-syntax write
     (syntax-rules (a b c d e h l af bc de hl sp)
