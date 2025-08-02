@@ -1,7 +1,7 @@
 (library (zx-next scheme compiler-keywords)
-  (export begin write write-stack arg top byte word symbol string byte+ byte- lets)
+  (export begin write write-stack local byte word symbol string byte+ byte- lets with-locals)
   (import (only (micascheme) define-keywords))
 
   (define-keywords
-    begin write write-stack arg top byte word symbol string byte+ byte- lets)
+    begin write write-stack local byte word symbol string byte+ byte- lets with-locals)
 )

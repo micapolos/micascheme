@@ -24,6 +24,7 @@
     push-value
     pop-value
     dup-value
+    local-value
 
     push-n
     push-nn
@@ -82,6 +83,14 @@
   (define-ops
     ((reset-offset)
       (ld e 0))
+
+    ((inc-offset)
+      (inc e)
+      (inc e))
+
+    ((dec-offset)
+      (dec e)
+      (dec e))
 
     ((run-scheme body ...)
       (with-panic (with-stack body ...))
@@ -200,22 +209,18 @@
 
     ((push-af)
       (push af)
-      (inc e)
-      (inc e))
+      (inc-offset))
 
     ((push-bc)
       (push bc)
-      (inc e)
-      (inc e))
+      (inc-offset))
 
     ((pop-af)
-      (dec e)
-      (dec e)
+      (dec-offset)
       (pop af))
 
     ((pop-bc)
-      (dec e)
-      (dec e)
+      (dec-offset)
       (pop bc))
 
     ((push-null)
@@ -315,6 +320,27 @@
       (reset-offset)
       (push bc)
       (push de))
+
+    ((local-enter)
+      (push ix)
+      (inc-offset)
+      (ld ix 0)
+      (add ix sp))
+
+    ((local-exit)
+      (dec-offset)
+      (pop ix))
+
+    ((with-local body ...)
+      (local-enter)
+      body ...
+      (local-exit))
+
+    ((local-value offset)
+      (ld b (+ ix 0))
+      (ld c (+ ix 1))
+      (ld d (+ ix 2))
+      (reset-offset))
 
     ; TODO: Make optimized version for (dup-value 1), where alternate register set will be used.
 

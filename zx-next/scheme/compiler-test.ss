@@ -17,8 +17,8 @@
   (%push-null))
 
 (check-expr->asm (empty-lookup)
-  (%%top 2)
-  (%dup-value 2))
+  (%%local 2)
+  (%local-value 2))
 
 (check-expr->asm (empty-lookup)
   (%%byte #x12)
@@ -46,13 +46,13 @@
   (%%lets
     (%%byte #x12)
     (%%byte #x34)
-    (%%byte+ (%%top 0) (%%top 1)))
+    (%%byte+ (%%local 0) (%%local 4)))
   (%begin
     (%push-byte #x12)
     (%push-byte #x34)
     (%begin
-      (%dup-value 1)
-      (%dup-value 0)
+      (%local-value 4)
+      (%local-value 0)
       (%byte-add))
     (%pop-value)
     (%pop-value)))
@@ -84,17 +84,17 @@
     (%%byte #x12)
     (%%byte #x34)
     (%%begin
-      (%%write (%%top 0))
-      (%%write (%%top 1))))
+      (%%write (%%local 0))
+      (%%write (%%local 4))))
   (%begin
     (%push-byte #x12)
     (%push-byte #x34)
     (%begin
       (%begin
-        (%dup-value 0)
+        (%local-value 0)
         (%call %println))
       (%begin
-        (%dup-value 1)
+        (%local-value 4)
         (%call %println)))
     (%pop-value)
     (%pop-value)))

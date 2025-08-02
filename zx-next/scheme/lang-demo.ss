@@ -22,6 +22,6 @@
     (lets
       (byte #x12)
       (byte #x34)
-      (write (byte+ (top 0) (top 1)))))
+      (write (byte+ (local 0) (local 4)))))
   (call terminal-wait-space)
   (jp 0))
