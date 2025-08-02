@@ -59,7 +59,9 @@
 
 (check-stmt->asm (empty-lookup)
   (%%write (%%byte #x12))
-  (%begin (%push-byte #x12) (%write-value)))
+  (%begin
+    (%push-byte #x12)
+    (%call %println)))
 
 (check-stmt->asm (empty-lookup)
   (%%write-stack)
@@ -72,10 +74,10 @@
   (%begin
     (%begin
       (%push-byte 18)
-      (%write-value))
+      (%call %println))
     (%begin
       (%push-byte 52)
-      (%write-value))))
+      (%call %println))))
 
 (check-stmt->asm (empty-lookup)
   (%%lets
@@ -90,10 +92,10 @@
     (%begin
       (%begin
         (%dup-value 0)
-        (%write-value))
+        (%call %println))
       (%begin
         (%dup-value 1)
-        (%write-value)))
+        (%call %println)))
     (%pop-value)
     (%pop-value)))
 

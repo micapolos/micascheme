@@ -37,6 +37,7 @@
     inc-r
     dec-r
 
+    print
     println
     write-stack
 
@@ -369,6 +370,12 @@
       (ld e b)   ; restore offset
       (ld b word-tag)
       (push-value)))
+
+  (define-fragment print
+    (pop hl)
+    (pop-value)
+    (preserve (de hl) (call write-value))
+    (jp (hl)))
 
   (define-fragment println
     (pop hl)

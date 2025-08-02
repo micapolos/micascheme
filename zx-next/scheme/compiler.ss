@@ -16,7 +16,7 @@
       ((%%write expr)
         #`(%begin
           #,(expr->asm $lookup #'expr)
-          (%write-value)))
+          (%call %println)))
       ((%%write-stack)
         #`(%write-stack))
       ((%%begin stmt ...)
@@ -27,16 +27,21 @@
           #,(stmt->asm $lookup #'stmt)
           #,@(map (constant-procedure #'(%pop-value)) #'(expr ...))))))
 
+  ; TODO: We need offset for %%top, to compensate for arguments which are already pushed
+
   (define (expr->asm $lookup $expr)
     (let ()
       (define-rule-syntax (recurse x)
         (expr->asm $lookup #'x))
       (define-rule-syntax (op-2 id a b)
         #`(%begin #,(recurse b) #,(recurse a) (id)))
-      (syntax-case $expr (%%top %%byte %%word %%byte+ %%byte- %%lets)
+      (syntax-case $expr (%%symbol %%string %%top %%byte %%word %%byte+ %%byte- %%lets)
         (#t #'(%push-true))
         (#f #'(%push-false))
         (() #'(%push-null))
+        (ch (char? (datum ch)) #'(%push-char ch))
+        ((%%symbol bank addr) #'(%push-symbol bank addr))
+        ((%%string bank addr) #'(%push-string bank addr))
         ((%%top index) #'(%dup-value index))
         ((%%byte n) #'(%push-byte n))
         ((%%word n) #'(%push-word n))
