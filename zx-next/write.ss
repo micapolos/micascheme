@@ -7,7 +7,9 @@
     write-nibble
     write-byte
     write-word
-    write-newline)
+    write-newline
+    write-mem
+    write-mem-line)
   (import (zx-next core))
 
   (define-fragment write-init
@@ -68,4 +70,107 @@
   (define-fragment write-newline
     (ld a #x0d)
     (jp write-char))
+
+  (define-fragments
+    (write-mem-columns (db 16))
+    (write-mem-3-spaces (dz "   "))
+    (write-mem-2-spaces (dz "  ")))
+
+  (define-fragment write-mem
+    (input (hl address) (bc length))
+    ; bc = advanced length
+    ; a = line length
+    (loop
+      (preserve (hl)
+        (ld h b)
+        (ld l c)
+        (ld a (write-mem-columns))
+        (ld d 0)
+        (ld e a)
+        (ld a l)
+        (rcf)
+        (sbc hl de)
+        (if c
+          (then (ld hl 0))
+          (else (ld a e)))
+        (ld b h)
+        (ld c l))
+
+      (preserve (bc)
+        (ld c a)
+        (call write-mem-line))
+
+      ; TODO: implement using _do / _while
+      (ld a b)
+      (or c)
+      (ret z)))
+
+  (define-fragment write-mem-line
+    (input (hl address) (c length))
+    (output (hl advanced-address))
+
+    (preserve (bc hl)
+      (call write-word)
+      (ld hl write-mem-3-spaces)
+      (call write-string))
+
+    (preserve (hl)
+      (preserve (bc)
+        (ld a (write-mem-columns))
+        (ld b a)
+        (loop-djnz
+          (ld d (hl))
+          (inc hl)
+          (preserve (hl)
+            (xor a)
+            (or c)
+            (if z
+              (then
+                (preserve (bc)
+                  (ld hl write-mem-3-spaces)
+                  (call write-string)))
+              (else
+                (preserve (bc)
+                  (ld a d)
+                  (call write-byte)
+                  (ld a #\space)
+                  (call write-char))
+                (dec c))))))
+        (ld hl write-mem-2-spaces)
+        (call write-string))
+
+    (ld a (write-mem-columns))
+    (ld b a)
+    (loop-djnz
+      (ld d (hl))
+      (inc hl)
+      (preserve (hl)
+        (xor a)
+        (or c)
+        (if z
+          (then
+            (preserve (bc)
+              (ld a #\space)
+              (call write-char)))
+          (else
+            (ld a d)
+            (cp #x20)
+            (preserve (bc)
+              (if c
+                (then
+                  (ld a #\.)
+                  (call write-char))
+                (else
+                  (cp #x7f)
+                  (if c
+                    (then
+                      (call write-char))
+                    (else
+                      (ld a #\.)
+                      (call write-char))))))
+            (dec c)))))
+
+    (preserve (hl)
+      (call write-newline))
+    (ret))
 )

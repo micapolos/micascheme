@@ -59,10 +59,10 @@
       (define-syntax id (make-compile-time-value proc))))
 
   (define-rules-syntax (literals keywords)
-    ((define-op (keywords keyword ...) pattern body )
-      (define-ops (keywords keyword ...) (pattern body)))
-    ((define-op pattern body)
-      (define-op (keywords) pattern body)))
+    ((define-op (keywords keyword ...) pattern body ...)
+      (define-ops (keywords keyword ...) (pattern body ...)))
+    ((define-op pattern body ...)
+      (define-op (keywords) pattern body ...)))
 
   (define-syntax (define-ops $syntax)
     (syntax-case $syntax (keywords)

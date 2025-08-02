@@ -1,6 +1,6 @@
 (library (zx-next debug)
-  (export loop-bars wait-space)
-  (import (zx-next core))
+  (export loop-bars wait-space dump)
+  (import (zx-next core) (zx-next write))
 
   (define-fragment loop-bars
     (ld a #b010)
@@ -22,4 +22,9 @@
       (and #b00000001)
       (while nz))
     (ret))
+
+  (define-op (dump start size)
+    (ld hl start)
+    (ld bc size)
+    (call write-mem))
 )
