@@ -44,3 +44,40 @@
       (%byte-add))
     (%pop-value)
     (%pop-value)))
+
+(check-stmt->asm (empty-lookup)
+  (%%write (%%byte #x12))
+  (%begin (%push-byte #x12) (%write-value)))
+
+(check-stmt->asm (empty-lookup)
+  (%%begin
+    (%%write (%%byte #x12))
+    (%%write (%%byte #x34)))
+  (%begin
+    (%begin
+      (%push-byte 18)
+      (%write-value))
+    (%begin
+      (%push-byte 52)
+      (%write-value))))
+
+(check-stmt->asm (empty-lookup)
+  (%%lets
+    (%%byte #x12)
+    (%%byte #x34)
+    (%%begin
+      (%%write (%%top 0))
+      (%%write (%%top 1))))
+  (%begin
+    (%push-byte #x12)
+    (%push-byte #x34)
+    (%begin
+      (%begin
+        (%dup-value 0)
+        (%write-value))
+      (%begin
+        (%dup-value 1)
+        (%write-value)))
+    (%pop-value)
+    (%pop-value)))
+

@@ -2,5 +2,5 @@
   (export arg top byte word byte+ byte- lets)
   (import (only (micascheme) define-keywords))
 
-  (define-keywords arg top byte word byte+ byte- lets)
+  (define-keywords begin write arg top byte word byte+ byte- lets)
 )
