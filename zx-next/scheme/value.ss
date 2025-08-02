@@ -24,9 +24,9 @@
   ; - B:
   ;   - bits 7..5: tag
   ;   - bits 4..0: address MSB / constant value
-  ; - C: 16-bit value MSB
-  ; - D: 8-bit value / 16-bit MSB
-  ; - E contains stack offset and is preserved
+  ; - C: address LSB / 16-bit value MSB
+  ; - D: 8-bit value / 16-bit value MSB / bank
+  ; - E: reserved for stack offset
 
   (define-values
     (mmu-slot 7)
