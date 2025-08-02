@@ -3,6 +3,7 @@
   (zx-next write)
   (zx-next scheme primitives)
   (zx-next terminal)
+  (zx-next bank)
   (zx-next debug))
 
 (define-fragments
@@ -12,6 +13,8 @@
 
 (run
   (call terminal-init)
+  (call banks-init)
+  ;(call write-banks)
 
   (ld hl hello-string)
   (call writeln-string)

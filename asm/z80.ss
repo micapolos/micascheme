@@ -31,6 +31,8 @@
 
     rla rlca rra rrca
 
+    bsla bsra bsrl bsrf brlc
+
     in
 
     nextreg
@@ -868,6 +870,12 @@
     ((swapnib)         (db #xed #x23))
     ((mul d e)         (db #xed #x30))
     ((push nm)         (db #xed #x8a) (dw nm))
+
+    ((bsla de b)       (db #xed #x28))
+    ((bsra de b)       (db #xed #x29))
+    ((bsrl de b)       (db #xed #x2a))
+    ((bsrf de b)       (db #xed #x2b))
+    ((brlc de b)       (db #xed #x2c))
 
     ; Helpers
     ((rcf)             (or a))
