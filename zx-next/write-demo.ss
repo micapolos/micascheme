@@ -5,5 +5,5 @@
 
 (run
   (call terminal-init)
-  (dump test-data #x100)
+  (dump test-data)
   (jp loop-bars))

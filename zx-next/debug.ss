@@ -23,8 +23,11 @@
       (while nz))
     (ret))
 
-  (define-op (dump start size)
-    (ld hl start)
-    (ld bc size)
-    (call write-mem))
+  (define-ops
+    ((dump start)
+      (dump start #x0100))
+    ((dump start size)
+      (ld hl start)
+      (ld bc size)
+      (call write-mem)))
 )
