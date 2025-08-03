@@ -9,8 +9,8 @@
     (zx-next write)
     (zx-next interrupt))
 
-  ; AFHLBCDE AFHLBCDE' IXIY PC SP IR
-  (define-value regs-size 26)
+  ; AFHLBCDE AFHLBCDE' IXIY
+  (define-value regs-size 20)
 
   (define-ops
     ((pop-regs)
@@ -80,15 +80,6 @@
     (call write-ihl++)
 
     (preserve (hl) (write " IY "))
-    (call write-ihl)
-
-    (preserve (hl) (write "\rPC "))
-    (call write-ihl++)
-
-    (preserve (hl) (write " SP "))
-    (call write-ihl)
-
-    (preserve (hl) (write "\rIR "))
     (call write-ihl)
 
     (jp write-newline))
