@@ -43,6 +43,7 @@
     (ld (hl) b)
     (inc hl)
 
+    ; DE = allocated pointer
     (ld d h)
     (ld e l)
 
