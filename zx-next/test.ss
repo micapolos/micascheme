@@ -16,8 +16,12 @@
       (%catch
         (%catch body ...)
         (%if %nc
-          (%then (%writeln-ok "All tests passed.") (%exit))
-          (%else (%throw))))))
+          (%then
+            (%writeln-ok "All tests passed.")
+            (%call %wait-a-sec)
+            (%exit))
+          (%else
+            (%throw))))))
 
   (%define-op-syntax (case $syntax)
     (syntax-case $syntax ()
