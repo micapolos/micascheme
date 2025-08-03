@@ -222,6 +222,32 @@
     ((ld iyl n)        (db #xfd #b00101110 n))
     ((ld (+ iy n) m)   (db #xfd #b00110110 n m))
 
+    ; 16-bit load (pseudo ops)
+    ((ld af af))
+    ((ld af bc)        (push bc) (pop af))
+    ((ld af de)        (push de) (pop af))
+    ((ld af hl)        (push hl) (pop af))
+
+    ((ld bc af)        (push af) (pop bc))
+    ((ld bc bc))
+    ((ld bc de)        (ld b d) (ld c e))
+    ((ld bc hl)        (ld b h) (ld c l))
+
+    ((ld de af)        (push af) (pop de))
+    ((ld de bc)        (ld d b) (ld e c))
+    ((ld de de))
+    ((ld de hl)        (ld d h) (ld e l))
+
+    ((ld hl af)        (push af) (pop hl))
+    ((ld hl bc)        (ld h b) (ld l c))
+    ((ld hl de)        (ld h d) (ld l e))
+    ((ld hl hl))
+
+    ((ld hl sp)        (ld hl 0) (add hl sp))
+    ((ld ix sp)        (ld ix 0) (add ix sp))
+    ((ld iy sp)        (ld iy 0) (add iy sp))
+
+    ; 16-bit load
     ((ld bc (nm))      (db #xed #b01001011) (dw nm))
     ((ld de (nm))      (db #xed #b01011011) (dw nm))
     ((ld hl (nm))      (db      #b00101010) (dw nm))

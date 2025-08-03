@@ -49,8 +49,7 @@
     (inc hl)
 
     ; DE = allocated pointer
-    (ld d h)
-    (ld e l)
+    (ld de hl)
 
     ; Increment bump pointer
     (add hl bc)
