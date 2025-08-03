@@ -6,6 +6,15 @@
 
 (demo
   (catch
+    (writeln "Testing asserts...")
+    (ld a #x10)
+    (ld bc #x1234)
+
+    (assert a #x10)
+    (assert b #x12)
+    (assert c #x34)
+    (catch (assert c #x35))
+
     (writeln "Testing equal regs...")
     (ld hl expected-regs)
     (ld de expected-regs)
