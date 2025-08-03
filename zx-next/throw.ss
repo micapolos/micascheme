@@ -5,18 +5,26 @@
   (define-ops
     ((catch body ...)
       (with-labels (end)
-        (ld iy end)
-        (push iy)
-        (ld iy 0)
-        (add iy sp)
+        (preserve (iy)
+          ; push catch return address on the stack
+          (ld hl end)
+          (push hl)
 
-        body ...
+          ; save catch stack pointer in IY
+          (ld iy 0)
+          (add iy sp)
 
-        (rcf)
-        end))
+          ; Execute catch body
+          body ...
+
+          ; Restore state after normal execution
+          (pop hl)
+          (rcf)  ; reset carry flag on no-throw
+
+          end)))
 
     ((throw)
       (ld sp iy)
-      (scf)
+      (scf)  ; set carry flag on throw
       (ret)))
 )
