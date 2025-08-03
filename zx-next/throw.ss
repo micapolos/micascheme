@@ -7,8 +7,8 @@
       (with-labels (end)
         (preserve (iy)
           ; push catch return address on the stack
-          (ld hl end)
-          (push hl)
+          (ld iy end)
+          (push iy)
 
           ; save catch stack pointer in IY
           (ld iy 0)
@@ -18,7 +18,7 @@
           body ...
 
           ; Restore state after normal execution
-          (pop hl)
+          (pop iy)
           (rcf)  ; reset carry flag on no-throw
 
           end)))

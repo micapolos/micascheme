@@ -53,7 +53,11 @@
   (define-ops (keywords a b c d e h l bc de hl ix iy)
     ((assert a n) (preserve (de hl) (ld d a) (ld e n) (ld hl label-a) (call assert-byte)))
     ((assert b n) (preserve (de hl) (ld d b) (ld e n) (ld hl label-b) (call assert-byte)))
-    ((assert c n) (preserve (de hl) (ld d c) (ld e n) (ld hl label-c) (call assert-byte))))
+    ((assert c n) (preserve (de hl) (ld d c) (ld e n) (ld hl label-c) (call assert-byte)))
+    ((assert d n) (preserve (de hl) (ex de hl) (ld d h) (ld e n) (ld hl label-d) (call assert-byte)))
+    ((assert e n) (preserve (de hl) (ex de hl) (ld d l) (ld e n) (ld hl label-e) (call assert-byte)))
+    ((assert h n) (preserve (de hl) (ld d h) (ld e n) (ld hl label-h) (call assert-byte)))
+    ((assert l n) (preserve (de hl) (ld d l) (ld e n) (ld hl label-l) (call assert-byte))))
 
   (define-asm assert-regs-expected-colors (ds 20))
   (define-asm assert-regs-actual-colors   (ds 20))
