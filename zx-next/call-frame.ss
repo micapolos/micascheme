@@ -1,9 +1,9 @@
-(library (zx-next local)
-  (export local ld-local ld-arg)
+(library (zx-next call-frame)
+  (export call-frame ld-local ld-arg)
   (import (zx-next core))
 
   (define-ops (keywords a b c d e bc de)
-    ((local body ...)
+    ((call-frame body ...)
       (preserve (ix)
         (ld ix 0)
         (add ix sp)

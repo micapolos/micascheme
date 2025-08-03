@@ -1,9 +1,9 @@
 (import
   (zx-next demo)
-  (zx-next local))
+  (zx-next call-frame))
 
 (define-asm my-proc
-  (local
+  (call-frame
     (ld hl #x5566)
     (push hl)
     (ld hl #x7788)
