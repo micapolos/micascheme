@@ -15,7 +15,11 @@
     regs-size
     push-regs
     pop-regs
-    write-regs)
+    write-regs
+
+    preserve-regs
+    capture-regs
+    captured-regs)
   (import
     (zx-next core)
     (zx-next write)
@@ -52,6 +56,7 @@
   (define-fragment reg-names (ascii "AF HL BC DE AF'HL'BC'DE'IX IY "))
 
   (define-value regs-size 20)
+  (define-fragment captured-regs (ds 20))
 
   (define-ops
     ((pop-regs)
@@ -59,28 +64,42 @@
       (pop hl)
       (pop bc)
       (pop de)
-      (exx)
+      (exx) (ex af)
       (pop af)
       (pop hl)
       (pop bc)
       (pop de)
-      (exx)
+      (exx) (ex af)
       (pop ix)
       (pop iy))
 
     ((push-regs)
       (push iy)
       (push ix)
-      (exx)
+      (exx) (ex af)
       (push de)
       (push bc)
       (push hl)
       (push af)
-      (exx)
+      (exx) (ex af)
       (push de)
       (push bc)
       (push hl)
       (push af)))
+
+  (define-op (preserve-regs body ...)
+    (push-regs)
+    body ...
+    (pop-regs))
+
+  (define-op (capture-regs)
+    (push-regs)
+    (ld de captured-regs)
+    (ld hl 0)
+    (add hl sp)
+    (ld bc regs-size)
+    (ldir)
+    (pop-regs))
 
   ; TODO: Try to make it more compact.
   (define-asm write-regs
