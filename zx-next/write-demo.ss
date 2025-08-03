@@ -1,7 +1,15 @@
 (import (zx-next core) (zx-next terminal) (zx-next debug) (zx-next write))
 
-(define-asm test-data
-  (db 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31))
+(define-fragments
+  (test-data (db 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31))
+  (chars-10 (ascii "0123456789abcdef!!!"))
+  (chars-100
+    (ascii
+      "0123456789abcdef" "0123456789abcdef" "0123456789abcdef" "0123456789abcdef"
+      "0123456789abcdef" "0123456789abcdef" "0123456789abcdef" "0123456789abcdef"
+      "0123456789abcdef" "0123456789abcdef" "0123456789abcdef" "0123456789abcdef"
+      "0123456789abcdef" "0123456789abcdef" "0123456789abcdef" "0123456789abcdef"
+      "!!!")))
 
 (run
   (call terminal-init)
@@ -15,4 +23,15 @@
   (write-ink 2)
   (writeln "foo")
   (write-ink 7)
-  (jp loop-bars))
+
+  (ld b #x10)
+  (ld hl chars-10)
+  (call write-b-chars)
+  (writeln)
+
+  (ld bc #x100)
+  (ld hl chars-100)
+  (call write-bc-chars)
+  (writeln)
+
+  (call terminal-wait-space))

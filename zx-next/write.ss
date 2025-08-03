@@ -2,6 +2,8 @@
   (export
     write-init
     write-char
+    write-b-chars
+    write-bc-chars
     write-string
     writeln-string
     write-nibble
@@ -34,6 +36,26 @@
   (define-fragment write-char
     (input (a char))
     (jp #x0008))
+
+  (define-fragment write-b-chars
+    (input (hl address) (b count))
+    (loop-djnz
+      (ld a (hl))
+      (inc hl)
+      (preserve (hl bc) (call write-char)))
+    (ret))
+
+  (define-fragment write-bc-chars
+    (input (hl address) (bc count))
+    (loop
+      (ld a (hl))
+      (inc hl)
+      (preserve (hl bc) (call write-char))
+      (dec bc)
+      (ld a b)
+      (or c)
+      (while nz))
+    (ret))
 
   (define-fragment write-string
     (input (hl string))
