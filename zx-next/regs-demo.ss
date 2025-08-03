@@ -4,4 +4,9 @@
 
 (demo
   (ld hl regs)
-  (call write-regs))
+  (call write-regs)
+
+  (ld bc #xbcbc)
+  (ld a reg-bc)
+  (call reg-load)
+  (writeln "Loaded reg: " hl))
