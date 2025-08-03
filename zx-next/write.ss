@@ -131,7 +131,7 @@
     (write-af (push af) (pop hl) (jp write-word))
     (write-hl (jp write-word))
     (write-bc (ld h b) (ld l c) (jp write-word))
-    (write-de (ld h b) (ld l c) (jp write-word))
+    (write-de (ld h d) (ld l e) (jp write-word))
 
     (write-ix (push ix) (pop hl) (jp write-word))
     (write-iy (push iy) (pop hl) (jp write-word))

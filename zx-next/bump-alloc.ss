@@ -2,48 +2,44 @@
   (export bump-alloc)
   (import (zx-next core))
 
+  (define-values
+    (tag-mask #b11100000)
+    (size-mask #b00011111))
+
   (define-asm bump-alloc
     (input
-      (hl bump pointer)
-      (bc size)
-      (e region-mask
-        (#b1110000 to allocate within 8 K bank)
-        (#b1100000 to allocate within 16 K segment)
-        (#b0000000 to allocate without limits)))
+      (hl - bump pointer)
+      (bc - 13 bit size)
+      (de - tag in bits 7 ... 5 / slot in bits 7 ... 5))
     (output
-      (cf 0 ok / 1 out of memory)
-      (hl advanced bump pointer)
-      (de allocated pointer))
+      (cf 0 = ok / 1 = out of memory)
+      (hl advanced bump pointer / preserved on out of memory)
+      (de allocated pointer if ok))
 
-    ; d = preserve pointer MSB
+    ; Check out of memory by comparing bump pointer bits 15 ... 13 with slot bits.
     (ld a h)
-    (and e)
-    (ld d a)
+    (and tag-mask)
+    (cp e)
+    (when nz (scf) (ret))
 
-    ; Increment bump pointer to store allocation size
-    ; de = potential allocated pointer
+    ; Increment bump pointer to point to the last allocation byte
     (preserve (hl)
       (inc hl)
-      (inc hl)
-
-      ; Increment bump pointer to point to the last allocation byte
       (add hl bc)
-      (dec hl)
-
-      ; Check if last byte is still in the same region.
       (ld a h)
-      (and e)
-      (cp d))
 
-    ; If not, return carry to indicate overflow
-    (when nz
-      (scf)
-      (ret))
+      ; Check overflow
+      (and tag-mask)
+      (cp e))
 
-    ; Write allocated size
+    (when nz (scf) (ret))
+
+    ; Write size with tag
     (ld (hl) c)
     (inc hl)
-    (ld (hl) b)
+    (ld a b)
+    (or d)
+    (ld (hl) a)
     (inc hl)
 
     ; DE = allocated pointer

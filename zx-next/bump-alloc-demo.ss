@@ -3,31 +3,47 @@
   (zx-next bump-alloc))
 
 (demo
-  (ld hl #x2000)
-  (ld bc #x0124)
-  (ld e #b11100000)
-  (preserve (bc de hl) (writeln "alloc " hl #\space bc #\space e))
+  (ld hl #xe000)
+  (ld bc #x00fe)
+  (ld d #b10100000) ; tag
+  (ld e #b11100000) ; bank
+  (preserve (bc de hl) (writeln "alloc " hl #\space bc #\space d #\space e))
   (call bump-alloc)
-  (if c
-    (then (writeln-error "out of memory " hl))
-    (else (writeln-ok "allocated " hl #\space de)))
-  (writeln)
+  (preserve (hl)
+    (if c
+      (then (writeln-error "out of memory " hl))
+      (else (writeln-ok "allocated " hl #\space de)))
+    (writeln))
 
-  (ld hl #x2000)
-  (ld bc #x1ffe)
-  (ld e #b11100000)
-  (preserve (bc de hl) (writeln "alloc " hl #\space bc #\space e))
+  (ld bc #x00fe)
+  (ld d #b10100000) ; tag
+  (ld e #b11100000) ; bank
+  (preserve (bc de hl) (writeln "alloc " hl #\space bc #\space d #\space e))
   (call bump-alloc)
-  (if c
-    (then (writeln-error "out of memory " hl))
-    (else (writeln-ok "allocated " hl #\space de)))
-  (writeln)
+  (preserve (hl)
+    (if c
+      (then (writeln-error "out of memory " hl))
+      (else (writeln-ok "allocated " hl #\space de)))
+    (writeln))
 
-  (ld hl #x2000)
-  (ld bc #x1fff)
-  (ld e #b11100000)
-  (preserve (bc de hl) (writeln "alloc " hl #\space bc #\space e))
+  (ld bc #x1dff)
+  (ld d #b10100000) ; tag
+  (ld e #b11100000) ; bank
+  (preserve (bc de hl) (writeln "alloc " hl #\space bc #\space d #\space e))
   (call bump-alloc)
-  (if c
-    (then (writeln-ok "out of memory " hl))
-    (else (writeln-error "allocated " hl #\space de))))
+  (preserve (hl)
+    (if c
+      (then (writeln-ok "out of memory " hl))
+      (else (writeln-error "allocated " hl #\space de)))
+    (writeln))
+
+  (ld bc #x1dfe)
+  (ld d #b10100000) ; tag
+  (ld e #b11100000) ; bank
+  (preserve (bc de hl) (writeln "alloc " hl #\space bc #\space d #\space e))
+  (call bump-alloc)
+  (preserve (hl)
+    (if c
+      (then (writeln-error "out of memory " hl))
+      (else (writeln-ok "allocated " hl #\space de)))))
+
