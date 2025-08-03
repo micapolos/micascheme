@@ -44,5 +44,4 @@
     (ex de hl)
     (preserve (hl) (call write-tag))
     (jp write-word))
-
 )
