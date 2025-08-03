@@ -151,13 +151,13 @@
     ((ld a ixh)        (db #xdd #b01111100))
     ((ld a ixl)        (db #xdd #b01111101))
 
-    ((ld b (+ ix d))   (db #xdd #b01000110 d))
-    ((ld c (+ ix d))   (db #xdd #b01001110 d))
-    ((ld d (+ ix d))   (db #xdd #b01010110 d))
-    ((ld e (+ ix d))   (db #xdd #b01011110 d))
-    ((ld h (+ ix d))   (db #xdd #b01100110 d))
-    ((ld l (+ ix d))   (db #xdd #b01101110 d))
-    ((ld a (+ ix d))   (db #xdd #b01111110 d))
+    ((ld b (+ ix n))   (db #xdd #b01000110 n))
+    ((ld c (+ ix n))   (db #xdd #b01001110 n))
+    ((ld d (+ ix n))   (db #xdd #b01010110 n))
+    ((ld e (+ ix n))   (db #xdd #b01011110 n))
+    ((ld h (+ ix n))   (db #xdd #b01100110 n))
+    ((ld l (+ ix n))   (db #xdd #b01101110 n))
+    ((ld a (+ ix n))   (db #xdd #b01111110 n))
 
     ((ld b iyh)        (db #xfd #b01000100))
     ((ld b iyl)        (db #xfd #b01000101))
@@ -174,13 +174,13 @@
     ((ld a iyh)        (db #xfd #b01111100))
     ((ld a iyl)        (db #xfd #b01111101))
 
-    ((ld b (+ iy d))   (db #xfd #b01000110 d))
-    ((ld c (+ iy d))   (db #xfd #b01001110 d))
-    ((ld d (+ iy d))   (db #xfd #b01010110 d))
-    ((ld e (+ iy d))   (db #xfd #b01011110 d))
-    ((ld h (+ iy d))   (db #xfd #b01100110 d))
-    ((ld l (+ iy d))   (db #xfd #b01101110 d))
-    ((ld a (+ iy d))   (db #xfd #b01111110 d))
+    ((ld b (+ iy n))   (db #xfd #b01000110 n))
+    ((ld c (+ iy n))   (db #xfd #b01001110 n))
+    ((ld d (+ iy n))   (db #xfd #b01010110 n))
+    ((ld e (+ iy n))   (db #xfd #b01011110 n))
+    ((ld h (+ iy n))   (db #xfd #b01100110 n))
+    ((ld l (+ iy n))   (db #xfd #b01101110 n))
+    ((ld a (+ iy n))   (db #xfd #b01111110 n))
 
     ((ld (bc) a)       (db #b00000010))
     ((ld (de) a)       (db #b00010010))
@@ -211,11 +211,11 @@
 
     ((ld ixl n)        (db #xdd #b00100110 n))
     ((ld ixh n)        (db #xdd #b00101110 n))
-    ((ld (+ ix d) n)   (db #xdd #b00110110 d n))
+    ((ld (+ ix n) m)   (db #xdd #b00110110 n m))
 
     ((ld iyl n)        (db #xfd #b00100110 n))
     ((ld iyh n)        (db #xfd #b00101110 n))
-    ((ld (+ iy d) n)   (db #xfd #b00110110 d n))
+    ((ld (+ iy n) m)   (db #xfd #b00110110 n m))
 
     ((ld bc (nm))      (db #xed #b01001011) (dw nm))
     ((ld de (nm))      (db #xed #b01011011) (dw nm))
@@ -250,11 +250,11 @@
 
     ((add ixh)         (db #xdd #b10000100))
     ((add ixl)         (db #xdd #b10000101))
-    ((add (+ ix d))    (db #xdd #b10000110 d))
+    ((add (+ ix n))    (db #xdd #b10000110 n))
 
     ((add iyh)         (db #xfd #b10000100))
     ((add iyl)         (db #xfd #b10000101))
-    ((add (+ iy d))    (db #xfd #b10000110 d))
+    ((add (+ iy n))    (db #xfd #b10000110 n))
 
     ((add n)           (db #b11000110 n))
 
@@ -269,11 +269,11 @@
 
     ((adc ixh)         (db #xdd #b10001100))
     ((adc ixl)         (db #xdd #b10001101))
-    ((adc (+ ix d))    (db #xdd #b10001110 d))
+    ((adc (+ ix n))    (db #xdd #b10001110 n))
 
     ((adc iyh)         (db #xfd #b10001100))
     ((adc iyl)         (db #xfd #b10001101))
-    ((adc (+ iy d))    (db #xfd #b10001110 d))
+    ((adc (+ iy n))    (db #xfd #b10001110 n))
 
     ((adc n)           (db #b11001110 n))
 
@@ -288,11 +288,11 @@
 
     ((sub ixh)         (db #xdd #b10010100))
     ((sub ixl)         (db #xdd #b10010101))
-    ((sub (+ ix d))    (db #xdd #b10010110 d))
+    ((sub (+ ix n))    (db #xdd #b10010110 n))
 
     ((sub iyh)         (db #xfd #b10010100))
     ((sub iyl)         (db #xfd #b10010101))
-    ((sub (+ iy d))    (db #xfd #b10010110 d))
+    ((sub (+ iy n))    (db #xfd #b10010110 n))
 
     ((sub n)           (db #b11010110 n))
 
@@ -307,11 +307,11 @@
 
     ((sbc ixh)         (db #xdd #b10011100))
     ((sbc ixl)         (db #xdd #b10011101))
-    ((sbc (+ ix d))    (db #xdd #b10011110 d))
+    ((sbc (+ ix n))    (db #xdd #b10011110 n))
 
     ((sbc iyh)         (db #xfd #b10011100))
     ((sbc iyl)         (db #xfd #b10011101))
-    ((sbc (+ iy d))    (db #xfd #b10011110 d))
+    ((sbc (+ iy n))    (db #xfd #b10011110 n))
 
     ((sbc n)           (db #b11011110 n))
 
@@ -326,11 +326,11 @@
 
     ((and ixh)         (db #xdd #b10100100))
     ((and ixl)         (db #xdd #b10100101))
-    ((and (+ ix d))    (db #xdd #b10100110 d))
+    ((and (+ ix n))    (db #xdd #b10100110 n))
 
     ((and iyh)         (db #xfd #b10100100))
     ((and iyl)         (db #xfd #b10100101))
-    ((and (+ iy d))    (db #xfd #b10100110 d))
+    ((and (+ iy n))    (db #xfd #b10100110 n))
 
     ((and n)           (db #b11100110 n))
 
@@ -345,11 +345,11 @@
 
     ((xor ixh)         (db #xdd #b10101100))
     ((xor ixl)         (db #xdd #b10101101))
-    ((xor (+ ix d))    (db #xdd #b10101110 d))
+    ((xor (+ ix n))    (db #xdd #b10101110 n))
 
     ((xor iyh)         (db #xfd #b10101100))
     ((xor iyl)         (db #xfd #b10101101))
-    ((xor (+ iy d))    (db #xfd #b10101110 d))
+    ((xor (+ iy n))    (db #xfd #b10101110 n))
 
     ((xor n)           (db #b11101110 n))
 
@@ -364,11 +364,11 @@
 
     ((or ixh)          (db #xdd #b10110100))
     ((or ixl)          (db #xdd #b10110101))
-    ((or (+ ix d))     (db #xdd #b10110110 d))
+    ((or (+ ix n))     (db #xdd #b10110110 n))
 
     ((or iyh)          (db #xfd #b10110100))
     ((or iyl)          (db #xfd #b10110101))
-    ((or (+ iy d))     (db #xfd #b10110110 d))
+    ((or (+ iy n))     (db #xfd #b10110110 n))
 
     ((or n)            (db #b11110110 n))
 
@@ -383,11 +383,11 @@
 
     ((cp ixh)          (db #xdd #b10111100))
     ((cp ixl)          (db #xdd #b10111101))
-    ((cp (+ ix d))     (db #xdd #b10111110 d))
+    ((cp (+ ix n))     (db #xdd #b10111110 n))
 
     ((cp iyh)          (db #xfd #b10111100))
     ((cp iyl)          (db #xfd #b10111101))
-    ((cp (+ iy d))     (db #xfd #b10111110 d))
+    ((cp (+ iy n))     (db #xfd #b10111110 n))
 
     ((cp n)            (db #b11111110 n))
 
@@ -402,11 +402,11 @@
 
     ((inc ixh)         (db #xdd #b00100100))
     ((inc ixl)         (db #xdd #b00101100))
-    ((inc (+ ix d))    (db #xdd #b00110100 d))
+    ((inc (+ ix n))    (db #xdd #b00110100 n))
 
     ((inc iyh)         (db #xfd #b00100100))
     ((inc iyl)         (db #xfd #b00101100))
-    ((inc (+ iy d))    (db #xfd #b00110100 d))
+    ((inc (+ iy n))    (db #xfd #b00110100 n))
 
     ((dec b)           (db #b00000101))
     ((dec c)           (db #b00001101))
@@ -419,11 +419,11 @@
 
     ((dec ixh)         (db #xdd #b00100101))
     ((dec ixl)         (db #xdd #b00101101))
-    ((dec (+ ix d))    (db #xdd #b00110101 d))
+    ((dec (+ ix n))    (db #xdd #b00110101 n))
 
     ((dec iyh)         (db #xfd #b00100101))
     ((dec iyl)         (db #xfd #b00101101))
-    ((dec (+ iy d))    (db #xfd #b00110101 d))
+    ((dec (+ iy n))    (db #xfd #b00110101 n))
 
     ; 16-bit arithmetic
     ((add hl bc)       (db #b00001001))
@@ -482,8 +482,8 @@
     ((bit 0 h)         (db      #xcb   #b01000100))
     ((bit 0 l)         (db      #xcb   #b01000101))
     ((bit 0 (hl))      (db      #xcb   #b01000110))
-    ((bit 0 (+ ix d))  (db #xdd #xcb d #b01000110))
-    ((bit 0 (+ iy d))  (db #xfd #xcb d #b01000110))
+    ((bit 0 (+ ix n))  (db #xdd #xcb n #b01000110))
+    ((bit 0 (+ iy n))  (db #xfd #xcb n #b01000110))
     ((bit 0 a)         (db      #xcb   #b01000111))
 
     ((bit 1 b)         (db      #xcb   #b01001000))
@@ -493,8 +493,8 @@
     ((bit 1 h)         (db      #xcb   #b01001100))
     ((bit 1 l)         (db      #xcb   #b01001101))
     ((bit 1 (hl))      (db      #xcb   #b01001110))
-    ((bit 1 (+ ix d))  (db #xdd #xcb d #b01001110))
-    ((bit 1 (+ iy d))  (db #xfd #xcb d #b01001110))
+    ((bit 1 (+ ix n))  (db #xdd #xcb n #b01001110))
+    ((bit 1 (+ iy n))  (db #xfd #xcb n #b01001110))
     ((bit 1 a)         (db      #xcb   #b01001111))
 
     ((bit 2 b)         (db      #xcb   #b01010000))
@@ -504,8 +504,8 @@
     ((bit 2 h)         (db      #xcb   #b01010100))
     ((bit 2 l)         (db      #xcb   #b01010101))
     ((bit 2 (hl))      (db      #xcb   #b01010110))
-    ((bit 2 (+ ix d))  (db #xdd #xcb d #b01010110))
-    ((bit 2 (+ iy d))  (db #xfd #xcb d #b01010110))
+    ((bit 2 (+ ix n))  (db #xdd #xcb n #b01010110))
+    ((bit 2 (+ iy n))  (db #xfd #xcb n #b01010110))
     ((bit 2 a)         (db      #xcb   #b01010111))
 
     ((bit 3 b)         (db      #xcb   #b01011000))
@@ -515,8 +515,8 @@
     ((bit 3 h)         (db      #xcb   #b01011100))
     ((bit 3 l)         (db      #xcb   #b01011101))
     ((bit 3 (hl))      (db      #xcb   #b01011110))
-    ((bit 3 (+ ix d))  (db #xdd #xcb d #b01011110))
-    ((bit 3 (+ iy d))  (db #xfd #xcb d #b01011110))
+    ((bit 3 (+ ix n))  (db #xdd #xcb n #b01011110))
+    ((bit 3 (+ iy n))  (db #xfd #xcb n #b01011110))
     ((bit 3 a)         (db      #xcb   #b01011111))
 
     ((bit 4 b)         (db      #xcb   #b01100000))
@@ -526,8 +526,8 @@
     ((bit 4 h)         (db      #xcb   #b01100100))
     ((bit 4 l)         (db      #xcb   #b01100101))
     ((bit 4 (hl))      (db      #xcb   #b01100110))
-    ((bit 4 (+ ix d))  (db #xdd #xcb d #b01100110))
-    ((bit 4 (+ iy d))  (db #xfd #xcb d #b01100110))
+    ((bit 4 (+ ix n))  (db #xdd #xcb n #b01100110))
+    ((bit 4 (+ iy n))  (db #xfd #xcb n #b01100110))
     ((bit 4 a)         (db      #xcb   #b01100111))
 
     ((bit 5 b)         (db      #xcb   #b01101000))
@@ -537,8 +537,8 @@
     ((bit 5 h)         (db      #xcb   #b01101100))
     ((bit 5 l)         (db      #xcb   #b01101101))
     ((bit 5 (hl))      (db      #xcb   #b01101110))
-    ((bit 5 (+ ix d))  (db #xdd #xcb d #b01101110))
-    ((bit 5 (+ iy d))  (db #xfd #xcb d #b01101110))
+    ((bit 5 (+ ix n))  (db #xdd #xcb n #b01101110))
+    ((bit 5 (+ iy n))  (db #xfd #xcb n #b01101110))
     ((bit 5 a)         (db      #xcb   #b01101111))
 
     ((bit 6 b)         (db      #xcb   #b01110000))
@@ -548,8 +548,8 @@
     ((bit 6 h)         (db      #xcb   #b01110100))
     ((bit 6 l)         (db      #xcb   #b01110101))
     ((bit 6 (hl))      (db      #xcb   #b01110110))
-    ((bit 6 (+ ix d))  (db #xdd #xcb d #b01110110))
-    ((bit 6 (+ iy d))  (db #xfd #xcb d #b01110110))
+    ((bit 6 (+ ix n))  (db #xdd #xcb n #b01110110))
+    ((bit 6 (+ iy n))  (db #xfd #xcb n #b01110110))
     ((bit 6 a)         (db      #xcb   #b01110111))
 
     ((bit 7 b)         (db      #xcb   #b01111000))
@@ -559,8 +559,8 @@
     ((bit 7 h)         (db      #xcb   #b01111100))
     ((bit 7 l)         (db      #xcb   #b01111101))
     ((bit 7 (hl))      (db      #xcb   #b01111110))
-    ((bit 7 (+ ix d))  (db #xdd #xcb d #b01111110))
-    ((bit 7 (+ iy d))  (db #xfd #xcb d #b01111110))
+    ((bit 7 (+ ix n))  (db #xdd #xcb n #b01111110))
+    ((bit 7 (+ iy n))  (db #xfd #xcb n #b01111110))
     ((bit 7 a)         (db      #xcb   #b01111111))
 
     ((set 0 b)         (db      #xcb   #b11000000))
@@ -570,8 +570,8 @@
     ((set 0 h)         (db      #xcb   #b11000100))
     ((set 0 l)         (db      #xcb   #b11000101))
     ((set 0 (hl))      (db      #xcb   #b11000110))
-    ((set 0 (+ ix d))  (db #xdd #xcb d #b11000110))
-    ((set 0 (+ iy d))  (db #xfd #xcb d #b11000110))
+    ((set 0 (+ ix n))  (db #xdd #xcb n #b11000110))
+    ((set 0 (+ iy n))  (db #xfd #xcb n #b11000110))
     ((set 0 a)         (db      #xcb   #b11000111))
 
     ((set 1 b)         (db      #xcb   #b11001000))
@@ -581,8 +581,8 @@
     ((set 1 h)         (db      #xcb   #b11001100))
     ((set 1 l)         (db      #xcb   #b11001101))
     ((set 1 (hl))      (db      #xcb   #b11001110))
-    ((set 1 (+ ix d))  (db #xdd #xcb d #b11001110))
-    ((set 1 (+ iy d))  (db #xfd #xcb d #b11001110))
+    ((set 1 (+ ix n))  (db #xdd #xcb n #b11001110))
+    ((set 1 (+ iy n))  (db #xfd #xcb n #b11001110))
     ((set 1 a)         (db      #xcb   #b11001111))
 
     ((set 2 b)         (db      #xcb   #b11010000))
@@ -592,8 +592,8 @@
     ((set 2 h)         (db      #xcb   #b11010100))
     ((set 2 l)         (db      #xcb   #b11010101))
     ((set 2 (hl))      (db      #xcb   #b11010110))
-    ((set 2 (+ ix d))  (db #xdd #xcb d #b11010110))
-    ((set 2 (+ iy d))  (db #xfd #xcb d #b11010110))
+    ((set 2 (+ ix n))  (db #xdd #xcb n #b11010110))
+    ((set 2 (+ iy n))  (db #xfd #xcb n #b11010110))
     ((set 2 a)         (db      #xcb   #b11010111))
 
     ((set 3 b)         (db      #xcb   #b11011000))
@@ -603,8 +603,8 @@
     ((set 3 h)         (db      #xcb   #b11011100))
     ((set 3 l)         (db      #xcb   #b11011101))
     ((set 3 (hl))      (db      #xcb   #b11011110))
-    ((set 3 (+ ix d))  (db #xdd #xcb d #b11011110))
-    ((set 3 (+ iy d))  (db #xfd #xcb d #b11011110))
+    ((set 3 (+ ix n))  (db #xdd #xcb n #b11011110))
+    ((set 3 (+ iy n))  (db #xfd #xcb n #b11011110))
     ((set 3 a)         (db      #xcb   #b11011111))
 
     ((set 4 b)         (db      #xcb   #b11100000))
@@ -614,8 +614,8 @@
     ((set 4 h)         (db      #xcb   #b11100100))
     ((set 4 l)         (db      #xcb   #b11100101))
     ((set 4 (hl))      (db      #xcb   #b11100110))
-    ((set 4 (+ ix d))  (db #xdd #xcb d #b11100110))
-    ((set 4 (+ iy d))  (db #xfd #xcb d #b11100110))
+    ((set 4 (+ ix n))  (db #xdd #xcb n #b11100110))
+    ((set 4 (+ iy n))  (db #xfd #xcb n #b11100110))
     ((set 4 a)         (db      #xcb   #b11100111))
 
     ((set 5 b)         (db      #xcb   #b11101000))
@@ -625,8 +625,8 @@
     ((set 5 h)         (db      #xcb   #b11101100))
     ((set 5 l)         (db      #xcb   #b11101101))
     ((set 5 (hl))      (db      #xcb   #b11101110))
-    ((set 5 (+ ix d))  (db #xdd #xcb d #b11101110))
-    ((set 5 (+ iy d))  (db #xfd #xcb d #b11101110))
+    ((set 5 (+ ix n))  (db #xdd #xcb n #b11101110))
+    ((set 5 (+ iy n))  (db #xfd #xcb n #b11101110))
     ((set 5 a)         (db      #xcb   #b11101111))
 
     ((set 6 b)         (db      #xcb   #b11110000))
@@ -636,8 +636,8 @@
     ((set 6 h)         (db      #xcb   #b11110100))
     ((set 6 l)         (db      #xcb   #b11110101))
     ((set 6 (hl))      (db      #xcb   #b11110110))
-    ((set 6 (+ ix d))  (db #xdd #xcb d #b11110110))
-    ((set 6 (+ iy d))  (db #xfd #xcb d #b11110110))
+    ((set 6 (+ ix n))  (db #xdd #xcb n #b11110110))
+    ((set 6 (+ iy n))  (db #xfd #xcb n #b11110110))
     ((set 6 a)         (db      #xcb   #b11110111))
 
     ((set 7 b)         (db      #xcb   #b11111000))
@@ -647,8 +647,8 @@
     ((set 7 h)         (db      #xcb   #b11111100))
     ((set 7 l)         (db      #xcb   #b11111101))
     ((set 7 (hl))      (db      #xcb   #b11111110))
-    ((set 7 (+ ix d))  (db #xdd #xcb d #b11111110))
-    ((set 7 (+ iy d))  (db #xfd #xcb d #b11111110))
+    ((set 7 (+ ix n))  (db #xdd #xcb n #b11111110))
+    ((set 7 (+ iy n))  (db #xfd #xcb n #b11111110))
     ((set 7 a)         (db      #xcb   #b11111111))
 
     ((res 0 b)         (db      #xcb   #b10000000))
@@ -658,8 +658,8 @@
     ((res 0 h)         (db      #xcb   #b10000100))
     ((res 0 l)         (db      #xcb   #b10000101))
     ((res 0 (hl))      (db      #xcb   #b10000110))
-    ((res 0 (+ ix d))  (db #xdd #xcb d #b10000110))
-    ((res 0 (+ iy d))  (db #xfd #xcb d #b10000110))
+    ((res 0 (+ ix n))  (db #xdd #xcb n #b10000110))
+    ((res 0 (+ iy n))  (db #xfd #xcb n #b10000110))
     ((res 0 a)         (db      #xcb   #b10000111))
 
     ((res 1 b)         (db      #xcb   #b10001000))
@@ -669,8 +669,8 @@
     ((res 1 h)         (db      #xcb   #b10001100))
     ((res 1 l)         (db      #xcb   #b10001101))
     ((res 1 (hl))      (db      #xcb   #b10001110))
-    ((res 1 (+ ix d))  (db #xdd #xcb d #b10001110))
-    ((res 1 (+ iy d))  (db #xfd #xcb d #b10001110))
+    ((res 1 (+ ix n))  (db #xdd #xcb n #b10001110))
+    ((res 1 (+ iy n))  (db #xfd #xcb n #b10001110))
     ((res 1 a)         (db      #xcb   #b10001111))
 
     ((res 2 b)         (db      #xcb   #b10010000))
@@ -680,8 +680,8 @@
     ((res 2 h)         (db      #xcb   #b10010100))
     ((res 2 l)         (db      #xcb   #b10010101))
     ((res 2 (hl))      (db      #xcb   #b10010110))
-    ((res 2 (+ ix d))  (db #xdd #xcb d #b10010110))
-    ((res 2 (+ iy d))  (db #xfd #xcb d #b10010110))
+    ((res 2 (+ ix n))  (db #xdd #xcb n #b10010110))
+    ((res 2 (+ iy n))  (db #xfd #xcb n #b10010110))
     ((res 2 a)         (db      #xcb   #b10010111))
 
     ((res 3 b)         (db      #xcb   #b10011000))
@@ -691,8 +691,8 @@
     ((res 3 h)         (db      #xcb   #b10011100))
     ((res 3 l)         (db      #xcb   #b10011101))
     ((res 3 (hl))      (db      #xcb   #b10011110))
-    ((res 3 (+ ix d))  (db #xdd #xcb d #b10011110))
-    ((res 3 (+ iy d))  (db #xfd #xcb d #b10011110))
+    ((res 3 (+ ix n))  (db #xdd #xcb n #b10011110))
+    ((res 3 (+ iy n))  (db #xfd #xcb n #b10011110))
     ((res 3 a)         (db      #xcb   #b10011111))
 
     ((res 4 b)         (db      #xcb   #b10100000))
@@ -702,8 +702,8 @@
     ((res 4 h)         (db      #xcb   #b10100100))
     ((res 4 l)         (db      #xcb   #b10100101))
     ((res 4 (hl))      (db      #xcb   #b10100110))
-    ((res 4 (+ ix d))  (db #xdd #xcb d #b10100110))
-    ((res 4 (+ iy d))  (db #xfd #xcb d #b10100110))
+    ((res 4 (+ ix n))  (db #xdd #xcb n #b10100110))
+    ((res 4 (+ iy n))  (db #xfd #xcb n #b10100110))
     ((res 4 a)         (db      #xcb   #b10100111))
 
     ((res 5 b)         (db      #xcb   #b10101000))
@@ -713,8 +713,8 @@
     ((res 5 h)         (db      #xcb   #b10101100))
     ((res 5 l)         (db      #xcb   #b10101101))
     ((res 5 (hl))      (db      #xcb   #b10101110))
-    ((res 5 (+ ix d))  (db #xdd #xcb d #b10101110))
-    ((res 5 (+ iy d))  (db #xfd #xcb d #b10101110))
+    ((res 5 (+ ix n))  (db #xdd #xcb n #b10101110))
+    ((res 5 (+ iy n))  (db #xfd #xcb n #b10101110))
     ((res 5 a)         (db      #xcb   #b10101111))
 
     ((res 6 b)         (db      #xcb   #b10110000))
@@ -724,8 +724,8 @@
     ((res 6 h)         (db      #xcb   #b10110100))
     ((res 6 l)         (db      #xcb   #b10110101))
     ((res 6 (hl))      (db      #xcb   #b10110110))
-    ((res 6 (+ ix d))  (db #xdd #xcb d #b10110110))
-    ((res 6 (+ iy d))  (db #xfd #xcb d #b10110110))
+    ((res 6 (+ ix n))  (db #xdd #xcb n #b10110110))
+    ((res 6 (+ iy n))  (db #xfd #xcb n #b10110110))
     ((res 6 a)         (db      #xcb   #b10110111))
 
     ((res 7 b)         (db      #xcb   #b10111000))
@@ -735,8 +735,8 @@
     ((res 7 h)         (db      #xcb   #b10111100))
     ((res 7 l)         (db      #xcb   #b10111101))
     ((res 7 (hl))      (db      #xcb   #b10111110))
-    ((res 7 (+ ix d))  (db #xdd #xcb d #b10111110))
-    ((res 7 (+ iy d))  (db #xfd #xcb d #b10111110))
+    ((res 7 (+ ix n))  (db #xdd #xcb n #b10111110))
+    ((res 7 (+ iy n))  (db #xfd #xcb n #b10111110))
     ((res 7 a)         (db      #xcb   #b10111111))
 
     ; General purpose

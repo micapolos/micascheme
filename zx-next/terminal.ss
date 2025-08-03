@@ -4,7 +4,8 @@
     terminal-move-to
     terminal-write-char
     terminal-newline
-    terminal-wait-space)
+    terminal-wait-space
+    with-terminal)
   (import
     (zx-next core)
     (zx-next mem)
@@ -261,4 +262,8 @@
     (ld hl press-space-string)
     (call writeln-string)
     (call wait-space))
+
+  (define-op (with-terminal body ...)
+    (call terminal-init)
+    body ...)
 )
