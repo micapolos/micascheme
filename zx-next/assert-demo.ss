@@ -24,7 +24,26 @@
     (assert de #x5678)
     (assert hl #x9abc)
 
-    (catch (assert hl #xbd23))
+    (scf) (assert c)
+    (rcf) (assert nc)
+    (xor a) (assert z)
+    (cp 1) (assert nz)
+
+    ; failures
+    (catch (assert a #xff))
+    (catch (assert b #xff))
+    (catch (assert c #xff))
+    (catch (assert d #xff))
+    (catch (assert e #xff))
+    (catch (assert h #xff))
+    (catch (assert l #xff))
+    (catch (assert bc #xffff))
+    (catch (assert de #xffff))
+    (catch (assert hl #xffff))
+    (catch (scf) (assert nc))
+    (catch (scf) (ccf) (assert c))
+    (catch (xor a) (assert nz))
+    (catch (cp 1) (assert z))
 
     (writeln "Testing equal regs...")
     (ld hl expected-regs)

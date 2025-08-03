@@ -21,7 +21,10 @@
     (label-de (dz "DE"))
     (label-hl (dz "HL"))
     (label-ix (dz "IX"))
-    (label-iy (dz "IY")))
+    (label-iy (dz "IY"))
+    (label-nc (dz "NC"))
+    (label-z (dz "Z"))
+    (label-nz (dz "NZ")))
 
   (define-op (cp-bc-de)
     (ld a b)
@@ -29,6 +32,22 @@
     (when z
       (ld a c)
       (cp e)))
+
+  (define-fragment assert-flag
+    (input (fc - 0 ok / 1 failure) (hl label))
+    (preserve-regs
+      (when c
+        (preserve (hl)
+          (write-ink 4)
+          (write "[ERROR] ")
+          (write-ink 7)
+          (write "assert ")
+          (write-ink 4))
+        (call write-string)
+        (write-ink 7)
+        (writeln)
+        (throw)))
+    (ret))
 
   (define-fragment assert-byte
     (input (d actual) (e expected) (hl label))
@@ -85,7 +104,12 @@
         (throw)))
     (ret))
 
-  (define-ops (keywords a b c d e h l bc de hl ix iy)
+  (define-ops (keywords a b c d e h l bc de hl ix iy nc z nz)
+    ((assert c) (preserve (af hl) (ccf) (ld hl label-c) (call assert-flag)))
+    ((assert nc) (preserve (af hl) (ld hl label-nc) (call assert-flag)))
+    ((assert z) (preserve (af hl) (scf) (when z (ccf)) (ld hl label-z) (call assert-flag)))
+    ((assert nz) (preserve (af hl) (scf) (when nz (ccf)) (ld hl label-nz) (call assert-flag)))
+
     ((assert a n) (preserve (de hl) (ld d a) (ld e n) (ld hl label-a) (call assert-byte)))
     ((assert b n) (preserve (de hl) (ld d b) (ld e n) (ld hl label-b) (call assert-byte)))
     ((assert c n) (preserve (de hl) (ld d c) (ld e n) (ld hl label-c) (call assert-byte)))
