@@ -21,7 +21,7 @@
               (%ld %hl table)
 
               (%call
-                #,(if (<= (length #'(entry ...)) #x7f)
+                #,(if (zero? (fxand #x80 (length #'(entry ...))))
                   #'lookup-word-7
                   #'lookup-word))
 
