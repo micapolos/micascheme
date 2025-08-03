@@ -13,7 +13,6 @@
 
 (run
   (call terminal-init)
-  (call write-regs)
   (dump test-data #x20)
 
   (writeln #x10)

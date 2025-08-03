@@ -10,7 +10,6 @@
     write-byte
     write-word
     write-newline
-    write-regs
     write-mem
     write-mem-line
     write
@@ -18,7 +17,11 @@
     write-paper
     writeln
     writeln-error
-    writeln-ok)
+    writeln-ok
+
+    write-a write-f write-h write-l write-b write-c write-d write-e
+    write-af write-hl write-bc write-de
+    write-ihl write-ihl++)
   (import
     (zx-next core)
     (only (micascheme) syntax-rules char? string? datum)
@@ -75,7 +78,7 @@
     (input (a nibble))
     (cp 10)
     (jp c digit)
-    (add (- #\A 10))
+    (add (- #\a 10))
     (jp write)
     digit
     (add #\0)
@@ -115,35 +118,67 @@
       (ld a n)
       (call write-char)))
 
+  (define-fragments
+    (write-a (jp write-byte))
+    (write-f (push af) (pop hl) (jp write-byte))
+    (write-h (ld a h) (jp write-byte))
+    (write-l (ld a l) (jp write-byte))
+    (write-b (ld a b) (jp write-byte))
+    (write-c (ld a c) (jp write-byte))
+    (write-d (ld a d) (jp write-byte))
+    (write-e (ld a e) (jp write-byte))
+
+    (write-af (push af) (pop hl) (jp write-word))
+    (write-hl (jp write-word))
+    (write-bc (ld h b) (ld l c) (jp write-word))
+    (write-de (ld h b) (ld l c) (jp write-word))
+
+    (write-ix (push ix) (pop hl) (jp write-word))
+    (write-iy (push iy) (pop hl) (jp write-word))
+
+    (write-sp (ld hl 0) (add hl sp) (jp write-word))
+
+    (write-ihl
+      (ld e (hl))
+      (inc hl)
+      (ld d (hl))
+      (ex de hl)
+      (jp write-word))
+
+    (write-ihl++
+      (ld e (hl))
+      (inc hl)
+      (ld d (hl))
+      (inc hl)
+      (ex de hl)
+      (preserve (de) (call write-word))
+      (ex de hl)
+      (ret)))
+
   (define-op-syntax write
-    (syntax-rules (a b c d e h l af bc de hl sp)
-      ((_ a) (begin (call write-byte)))
-      ((_ b) (begin (ld a b) (call write-byte)))
-      ((_ c) (begin (ld a c) (call write-byte)))
-      ((_ d) (begin (ld a d) (call write-byte)))
-      ((_ e) (begin (ld a e) (call write-byte)))
-      ((_ h) (begin (ld a h) (call write-byte)))
-      ((_ l) (begin (ld a l) (call write-byte)))
-      ((_ af) (begin (push af) (pop hl) (call write-word)))
-      ((_ bc) (begin (ld h b) (ld l c) (call write-word)))
-      ((_ de) (begin (ld h d) (ld l e) (call write-word)))
-      ((_ hl) (begin (call write-word)))
-      ((_ sp) (begin (ld hl 0) (add hl sp) (call write-word)))
+    (syntax-rules (a f h l b c d e af hl bc de sp)
+      ((_ a) (call write-a))
+      ((_ f) (call write-f))
+      ((_ h) (call write-h))
+      ((_ l) (call write-l))
+      ((_ b) (call write-b))
+      ((_ c) (call write-c))
+      ((_ d) (call write-d))
+      ((_ e) (call write-e))
+      ((_ af) (call write-af))
+      ((_ hl) (call write-hl))
+      ((_ bc) (call write-bc))
+      ((_ de) (call write-de))
+      ((_ sp) (call write-sp))
       ((_ ch)
         (char? (datum ch))
-        (begin
-          (ld a ch)
-          (call write-char)))
+        (begin (ld a ch) (call write-char)))
       ((_ u8)
         (u8? (datum u8))
-        (begin
-          (ld a u8)
-          (call write-byte)))
+        (begin (ld a u8) (call write-byte)))
       ((_ u16)
         (u16? (datum u16))
-        (begin
-          (ld hl u16)
-          (call write-word)))
+        (begin (ld hl u16) (call write-word)))
       ((_ s)
         (string? (datum s))
         (with-labels (here)
@@ -174,10 +209,6 @@
     (writeln s ...))
 
   ; TODO === Move to (zx-next debug) ===
-
-  (define-fragment write-regs
-    (writeln "AF " af "\rBC " bc "\rDE " de "\rHL " hl "\rSP " sp)
-    (ret))
 
   (define-fragments
     (write-mem-columns (db 16)))
