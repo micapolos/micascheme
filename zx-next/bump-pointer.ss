@@ -14,7 +14,7 @@
 
   (define-asm bump-pointer-alloc
     (input
-      (de - tag in bits 7 ... 5 / allocation slot in bits 7 ... 5)
+      (de - non-zero tag in bits 7 ... 5 / allocation slot in bits 7 ... 5)
       (hl - bump pointer / out of memory if outside of allocation slot)
       (bc - 13 bit size))
     (output
