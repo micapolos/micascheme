@@ -7,6 +7,7 @@
     (ld d #b10100000) ; tag
     (ld e #b11100000) ; bank
     (call bump-pointer-alloc)
+    (assert nc)
     (assert hl #xe100)
     (assert de #xe002))
 
@@ -15,6 +16,7 @@
     (ld d #b10100000) ; tag
     (ld e #b11100000) ; bank
     (call bump-pointer-alloc)
+    (assert nc)
     (assert hl #xe200)
     (assert de #xe102))
 
@@ -23,6 +25,7 @@
     (ld d #b10100000) ; tag
     (ld e #b11100000) ; bank
     (call bump-pointer-alloc)
+    (assert c)
     (assert hl #xe200))
 
   (case fill-up
@@ -30,6 +33,7 @@
     (ld d #b10100000) ; tag
     (ld e #b11100000) ; bank
     (call bump-pointer-alloc)
+    (assert nc)
     (assert hl #x0000)
     (assert de #xe202))
 
@@ -38,5 +42,6 @@
     (ld d #b10100000) ; tag
     (ld e #b11100000) ; bank
     (call bump-pointer-alloc)
+    (assert c)
     (assert hl #x0000))
 )
