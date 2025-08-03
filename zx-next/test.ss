@@ -13,6 +13,8 @@
   (define-rule-syntax (test body ...)
     (%demo
       (%catch
-        body ...
-        (%writeln-ok "All tests passed."))))
+        (%catch body ...)
+        (%if %nc
+          (%then (%writeln-ok "All tests passed."))
+          (%else (%throw))))))
 )
