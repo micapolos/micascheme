@@ -2,6 +2,12 @@
   (export bump-pointer-alloc)
   (import (zx-next core))
 
+  ; Bump pointer is used for allocation within a 8K bank in dedicated slot.
+  ; It consists of 13-bit address in dedicated slot.
+  ; If MSB bits do not match the dedicated slot, it indicates out of memory.
+  ; Allocation starts with 13-bit size with a 3-bit tag,
+  ; followed by allocated region of memory.
+
   (define-values
     (tag-mask #b11100000)
     (size-mask #b00011111))
