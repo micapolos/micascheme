@@ -9,7 +9,6 @@
     (prefix (zx-next core) %)
     (asm base))
 
-  ; input: A = dispatch index
   (%define-op-syntax tail-dispatch
     (lambda ($syntax)
       (syntax-case $syntax ()
