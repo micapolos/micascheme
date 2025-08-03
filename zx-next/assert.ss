@@ -1,7 +1,10 @@
 (library (zx-next assert)
   (export
     fail
-    assert)
+    assert
+    (rename
+      (%assert-byte assert-byte)
+      (%assert-word assert-word)))
   (import
     (zx-next core)
     (zx-next throw)
@@ -27,7 +30,10 @@
     (label-iy (dz "iy"))
     (label-nc (dz "nc"))
     (label-z (dz "z"))
-    (label-nz (dz "nz")))
+    (label-nz (dz "nz"))
+    (label-ibc (dz "(bc)"))
+    (label-ide (dz "(de)"))
+    (label-ihl (dz "(hl)")))
 
   (define-op (cp-bc-de)
     (ld a b)
@@ -81,6 +87,36 @@
         (throw)))
     (ret))
 
+  (define-fragment assert-ibyte
+    (input (e expected) (hl addr))
+    (preserve-regs
+      (ld d (hl))
+      (ld a d)
+      (cp e)
+      (when nz
+        (preserve (de)
+          (preserve (hl)
+            (write-ink 4)
+            (write "[ERROR] ")
+            (write-ink 7)
+            (write "assert ($"))
+          (call write-word)
+          (write ") ")
+          (write-ink 2)
+          (write #\$))
+        (ld a e)
+        (preserve (de)
+          (call write-byte)
+          (write #\space)
+          (write-ink 4)
+          (write #\$))
+        (ld a d)
+        (call write-byte)
+        (write-ink 7)
+        (writeln)
+        (throw)))
+    (ret))
+
   (define-fragment assert-word
     (input (bc actual) (de expected) (hl label))
     (preserve-regs
@@ -111,6 +147,38 @@
         (throw)))
     (ret))
 
+  (define-fragment assert-iword
+    (input (de expected) (hl address))
+    (preserve-regs
+      (ld c (hl))
+      (inc hl)
+      (ld b (hl))
+      (dec hl)
+      (cp-bc-de)
+      (when nz
+        (preserve (bc de)
+          (preserve (hl)
+            (write-ink 4)
+            (write "[ERROR] ")
+            (write-ink 7)
+            (write "assert ($"))
+          (call write-word)
+          (write ") ")
+          (write-ink 2)
+          (write #\$))
+        (ld hl de)
+        (preserve (bc de)
+          (call write-word)
+          (write #\space)
+          (write-ink 4)
+          (write #\$))
+        (ld hl bc)
+        (call write-word)
+        (write-ink 7)
+        (writeln)
+        (throw)))
+    (ret))
+
   (define-ops (keywords a b c d e h l bc de hl ix iy nc z nz)
     ((assert c) (preserve (af hl) (ccf) (ld hl label-c) (call assert-flag)))
     ((assert nc) (preserve (af hl) (ld hl label-nc) (call assert-flag)))
@@ -129,7 +197,14 @@
     ((assert de nn) (preserve (bc de hl) (ld b d) (ld c e) (ld de nn) (ld hl label-de) (call assert-word)))
     ((assert hl nn) (preserve (bc de hl) (ld b h) (ld c l) (ld de nn) (ld hl label-hl) (call assert-word)))
     ((assert ix nn) (preserve (bc de hl) (ld b ixh) (ld c ixl) (ld de nn) (ld hl label-ix) (call assert-word)))
-    ((assert iy nn) (preserve (bc de hl) (ld b iyh) (ld c iyl) (ld de nn) (ld hl label-iy) (call assert-word))))
+    ((assert iy nn) (preserve (bc de hl) (ld b iyh) (ld c iyl) (ld de nn) (ld hl label-iy) (call assert-word)))
+
+    ((assert (bc) n) (preserve (de hl) (ld d (bc)) (ld e n) (ld hl label-ibc) (call assert-byte)))
+    ((assert (de) n) (preserve (de hl) (ld d (de)) (ld e n) (ld hl label-ide) (call assert-byte)))
+    ((assert (hl) n) (preserve (de hl) (ld d (hl)) (ld e n) (ld hl label-ihl) (call assert-byte)))
+
+    ((%assert-byte (mm) n) (preserve (de hl) (ld e n) (ld hl mm) (call assert-ibyte)))
+    ((%assert-word (mm) nn) (preserve (de hl) (ld de nn) (ld hl mm) (call assert-iword))))
 
   (define-asm assert-regs-expected-colors (ds 20))
   (define-asm assert-regs-actual-colors   (ds 20))

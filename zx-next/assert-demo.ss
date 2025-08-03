@@ -1,5 +1,9 @@
 (import (zx-next demo) (zx-next assert) (zx-next regs) (zx-next throw))
 
+(define-fragments
+  (test-byte (db #x12))
+  (test-word (dw #x1234)))
+
 (demo
   (catch
     (writeln "testing passing asserts...")
@@ -21,6 +25,9 @@
     (assert bc #x1234)
     (assert de #x5678)
     (assert hl #x9abc)
+
+    (assert-byte (test-byte) #x12)
+    (assert-word (test-word) #x1234)
 
     (scf) (assert c)
     (rcf) (assert nc)
@@ -51,6 +58,12 @@
     (assert c)
     (catch (assert hl #xffff))
     (assert c)
+
+    (catch (assert-byte (test-byte) #x13))
+    (assert c)
+    (catch (assert-word (test-word) #x1235))
+    (assert c)
+
     (catch (scf) (assert nc))
     (assert c)
     (catch (scf) (ccf) (assert c))
