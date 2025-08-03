@@ -1,5 +1,11 @@
 (library (zx-next lookup)
-  (export lookup-byte lookup-word lookup-7 lookup)
+  (export
+    lookup
+    lookup-7
+
+    lookup-byte
+    lookup-word
+    lookup-word-7)
   (import (zx-next core))
 
   (define-ops (keywords a de)
@@ -31,5 +37,11 @@
     (input (a index) (hl table))
     (output (de value))
     (lookup de)
+    (ret))
+
+  (define-fragment lookup-word-7
+    (input (a index) (hl table))
+    (output (de value))
+    (lookup-7 de)
     (ret))
 )

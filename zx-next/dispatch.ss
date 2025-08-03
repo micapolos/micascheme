@@ -20,9 +20,10 @@
             #`(%with-labels (table)
               (%ld %hl table)
 
-              #,(if (<= (length #'(entry ...)) #x7f)
-                #`(lookup-7 %de)
-                #`(lookup %de))
+              (%call
+                #,(if (<= (length #'(entry ...)) #x7f)
+                  #'lookup-word-7
+                  #'lookup-word))
 
               (%ex %de %hl)
 
