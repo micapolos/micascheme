@@ -8,9 +8,9 @@
 
   (define-asm bump-pointer-alloc
     (input
-      (hl - bump pointer)
-      (bc - 13 bit size)
-      (de - tag in bits 7 ... 5 / slot in bits 7 ... 5))
+      (de - tag in bits 7 ... 5 / allocation slot in bits 7 ... 5)
+      (hl - bump pointer / out of memory if outside of allocation slot)
+      (bc - 13 bit size))
     (output
       (cf 0 = ok / 1 = out of memory)
       (hl advanced bump pointer / preserved on out of memory)
