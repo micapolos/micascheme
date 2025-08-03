@@ -1,5 +1,5 @@
 (library (zx-next rgb)
-  (export rgb-333)
+  (export rgb-333 rgb-332)
   (import (zx-next core))
 
   (define-ops
