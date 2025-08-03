@@ -24,7 +24,9 @@
     write-reg-byte/color
     write-reg-word/color
     write-regs/colors
-    write-ireg-word/color++)
+    write-ireg-word/color++
+
+    regs-diff-colors)
   (import
     (zx-next core)
     (zx-next write)
@@ -206,4 +208,66 @@
     (call write-ireg-word/color++)
 
     (jp write-newline))
+
+  (define-fragment regs-diff-colors
+    (input
+      (hl expected-regs)
+      (de actual-regs)
+      (bc regs-mask))
+    (output
+      (hl2 expected-colors)
+      (de2 actual-colors)
+      (fz 1 no diff / 0 diff))
+    (preserve (ix iy)
+      (ld iyh 0)  ; for result
+      (exx)
+      (ld b 20)
+      (loop-djnz
+        (exx)
+
+        ; Load expected reg
+        (ld a (hl))
+        (ld ixl a)
+        (inc hl)
+
+        ; Load actual reg
+        (ld a (de))
+        (ld ixh a)
+        (inc de)
+
+        ; Load mask
+        (ld a (bc))
+        (ld iyl a)
+        (inc bc)
+
+        ; Compare
+        (ld a ixl)
+        (and iyl)
+        (ld ixl a)
+
+        (ld a ixh)
+        (and iyl)
+        (xor ixl)
+
+        (exx)
+
+        ; Pick color
+        (if z
+          (then
+            (ld a #x07)
+            (ld (hl) a)
+            (inc hl)
+            (ld (de) a)
+            (inc de))
+          (else
+            (ld iyh 1)
+            (ld a #x02)
+            (ld (hl) a)
+            (inc hl)
+            (ld a #x04)
+            (ld (de) a)
+            (inc de))))
+      (ld a iyh))
+    (or a)
+    (ret))
 )
