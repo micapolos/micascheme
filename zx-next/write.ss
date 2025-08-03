@@ -14,7 +14,9 @@
     write
     write-ink
     write-paper
-    writeln)
+    writeln
+    writeln-error
+    writeln-ok)
   (import
     (zx-next core)
     (only (micascheme) syntax-rules char? string? datum)
@@ -134,6 +136,18 @@
   (define-op (writeln s ...)
     (write s ...)
     (call write-newline))
+
+  (define-op (writeln-error s ...)
+    (write-ink 4)
+    (write "[ERROR] ")
+    (write-ink 7)
+    (writeln s ...))
+
+  (define-op (writeln-ok s ...)
+    (write-ink 2)
+    (write "[OK] ")
+    (write-ink 7)
+    (writeln s ...))
 
   ; TODO === Move to (zx-next debug) ===
 

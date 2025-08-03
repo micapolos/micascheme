@@ -37,12 +37,12 @@
     byte-mul
 
     run-scheme
-    throw)
+    throw-value)
   (import
     (zx-next core)
     (zx-next write)
     (zx-next mmu)
-    (zx-next panic)
+    (zx-next throw)
     (zx-next scheme tag)
     (zx-next scheme value)
     (zx-next scheme write))
@@ -69,14 +69,14 @@
       (dec e))
 
     ((run-scheme body ...)
-      (with-panic (with-stack body ...))
+      (catch (with-stack body ...))
       (when c
-        (preserve (hl) (write "(error "))
+        (preserve (hl) (writeln-error "(error "))
         (call write-string)))
 
-    ((throw)
+    ((throw-value)
       (pop-value)
-      (panic))
+      (throw))
 
     ((with-stack body ...)
       (ld a #xff)
