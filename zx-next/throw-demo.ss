@@ -19,11 +19,27 @@
   (writeln)
 
   (writeln "=== Trying throw flow ===")
-  (writeln "Entering  catch...")
+  (writeln "Entering catch...")
   (catch
     (writeln "Inside catch.")
     (writeln "Throw!!!")
     (throw)
+    (writeln-error "Should do be there after throw."))
+  (if nc
+    (then (writeln-error "Did not throw."))
+    (else (writeln-ok "Did throw.")))
+  (writeln)
+
+  (writeln "=== Trying nested throw flow ===")
+  (writeln "Entering outer catch...")
+  (catch
+    (writeln "Inside outer catch.")
+    (writeln "Entering inner catch...")
+    (catch
+      (writeln "Inside inner catch.")
+      (writeln "Throw!!!")
+      (throw)
+      (writeln-error "Should do be there after throw."))
     (writeln-error "Should do be there after throw."))
   (if nc
     (then (writeln-error "Did not throw."))
