@@ -22,5 +22,3 @@
   (untag de hl)
   (preserve (de) (call write-tag))
   (writeln de))
-
-
