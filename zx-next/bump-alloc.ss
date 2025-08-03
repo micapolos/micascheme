@@ -6,7 +6,10 @@
     (input
       (hl bump pointer)
       (bc size)
-      (e msb-mask))
+      (e msb-mask
+        (#b1110000 to allocate within 8K bank)
+        (#b1100000 to allocate within 16K segment)
+        (#b0000000 to allocate without limits)))
     (output
       (cf 0 ok / 1 out of memory)
       (hl advanced bump pointer)
