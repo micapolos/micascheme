@@ -2,7 +2,6 @@
   (export
     tail-dispatch
     ret-dispatch
-    jp-dispatch
     dispatch
     dispatch-jp
     dispatch-call)
@@ -38,14 +37,11 @@
   (%define-op (ret-dispatch entry ...)
     (tail-dispatch (%ret) entry ...))
 
-  (%define-op (jp-dispatch address entry ...)
-    (tail-dispatch (%jp address) entry ...))
-
   (%define-op (dispatch-jp addr ...)
     (tail-dispatch (%begin) (%jp addr) ...))
 
   (%define-op (dispatch-call addr ...)
-    (tail-dispatch (%begin) (%call addr) ...))
+    (dispatch (%call addr) ...))
 
   (%define-op (dispatch entry ...)
     (%with-labels (end)
