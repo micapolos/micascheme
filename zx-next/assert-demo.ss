@@ -19,9 +19,12 @@
     (assert e #x78)
     (assert h #x9a)
     (assert l #xbc)
-    (break)
-    (catch (assert l #xbd))
-    (break)
+
+    (assert bc #x1234)
+    (assert de #x5678)
+    (assert hl #x9abc)
+
+    (catch (assert hl #xbd23))
 
     (writeln "Testing equal regs...")
     (ld hl expected-regs)

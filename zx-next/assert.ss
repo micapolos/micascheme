@@ -23,6 +23,13 @@
     (label-ix (dz "IX"))
     (label-iy (dz "IY")))
 
+  (define-op (cp-bc-de)
+    (ld a b)
+    (cp d)
+    (when z
+      (ld a c)
+      (cp e)))
+
   (define-fragment assert-byte
     (input (d actual) (e expected) (hl label))
     (preserve-regs
@@ -50,6 +57,34 @@
         (throw)))
     (ret))
 
+  (define-fragment assert-word
+    (input (bc actual) (de expected) (hl label))
+    (preserve-regs
+      (cp-bc-de)
+      (when nz
+        (preserve (bc de)
+          (preserve (hl)
+            (write-ink 4)
+            (write "[ERROR] ")
+            (write-ink 7)
+            (write "assert "))
+          (call write-string)
+          (write #\space)
+          (write-ink 2))
+        (ld h d)
+        (ld l e)
+        (preserve (bc de)
+          (call write-word)
+          (write #\space)
+          (write-ink 4))
+        (ld h b)
+        (ld l c)
+        (call write-word)
+        (write-ink 7)
+        (writeln)
+        (throw)))
+    (ret))
+
   (define-ops (keywords a b c d e h l bc de hl ix iy)
     ((assert a n) (preserve (de hl) (ld d a) (ld e n) (ld hl label-a) (call assert-byte)))
     ((assert b n) (preserve (de hl) (ld d b) (ld e n) (ld hl label-b) (call assert-byte)))
@@ -57,7 +92,13 @@
     ((assert d n) (preserve (de hl) (ex de hl) (ld d h) (ld e n) (ld hl label-d) (call assert-byte)))
     ((assert e n) (preserve (de hl) (ex de hl) (ld d l) (ld e n) (ld hl label-e) (call assert-byte)))
     ((assert h n) (preserve (de hl) (ld d h) (ld e n) (ld hl label-h) (call assert-byte)))
-    ((assert l n) (preserve (de hl) (ld d l) (ld e n) (ld hl label-l) (call assert-byte))))
+    ((assert l n) (preserve (de hl) (ld d l) (ld e n) (ld hl label-l) (call assert-byte)))
+
+    ((assert bc nn) (preserve (de hl) (ld de nn) (ld hl label-bc) (call assert-word)))
+    ((assert de nn) (preserve (bc de hl) (ld b d) (ld c e) (ld de nn) (ld hl label-de) (call assert-word)))
+    ((assert hl nn) (preserve (bc de hl) (ld b h) (ld c l) (ld de nn) (ld hl label-hl) (call assert-word)))
+    ((assert ix nn) (preserve (bc de hl) (ld b ixh) (ld c ixl) (ld de nn) (ld hl label-ix) (call assert-word)))
+    ((assert iy nn) (preserve (bc de hl) (ld b iyh) (ld c iyl) (ld de nn) (ld hl label-iy) (call assert-word))))
 
   (define-asm assert-regs-expected-colors (ds 20))
   (define-asm assert-regs-actual-colors   (ds 20))
