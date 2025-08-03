@@ -26,11 +26,9 @@
                   #'lookup-word))
 
               (%ex %de %hl)
-
               (%jp (%hl))
 
-              table
-              #,@(map-with ($tmp $tmps) #`(%dw #,$tmp))
+              table #,@(map-with ($tmp $tmps) #`(%dw #,$tmp))
 
               #,@(map-with
                 ($tmp $tmps)
