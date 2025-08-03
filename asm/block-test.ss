@@ -84,3 +84,17 @@
     (stack
       (dependent (db-binary 102 111 111))
       (dependent (db-binary 0)))))
+
+(check-block
+  (utf8-block "\x0;\x10;\x20;" "\x1234;")
+  (block 1 6 (stack)
+    (stack
+      (dependent (db-binary #x00 #x10 #x20))
+      (dependent (db-binary #xe1 #x88 #xb4)))))
+
+(check-block
+  (ascii-block "\x0;\x10;\x20;" "\xff;\x1234;")
+  (block 1 5 (stack)
+    (stack
+      (dependent (db-binary #x00 #x10 #x20))
+      (dependent (db-binary #xff #x34)))))

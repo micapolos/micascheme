@@ -14,7 +14,7 @@
     (rename
       (%define define)
       (%define-values define-values))
-    db dw db-e dz
+    db dw db-e dz utf8 ascii
     with-labels
     reverse
     asm
@@ -159,6 +159,24 @@
             ((_ s)
               (string? (datum s))
               (dz-block (datum s))))))))
+
+  (define-syntax utf8
+    (make-compile-time-value
+      (lambda ($syntax)
+        (lambda ($lookup)
+          (syntax-case $syntax ()
+            ((_ x ...)
+              (for-all string? (map syntax->datum #'(x ...)))
+              (apply utf8-block (map syntax->datum #'(x ...)))))))))
+
+  (define-syntax ascii
+    (make-compile-time-value
+      (lambda ($syntax)
+        (lambda ($lookup)
+          (syntax-case $syntax ()
+            ((_ x ...)
+              (for-all string? (map syntax->datum #'(x ...)))
+              (apply ascii-block (map syntax->datum #'(x ...)))))))))
 
   (define-syntax with-labels
     (make-compile-time-value

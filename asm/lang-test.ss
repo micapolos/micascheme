@@ -71,6 +71,20 @@
 
 (check-asm
   (org #xc000)
+  (utf8 "\x0;\x10;\x20;" "\x7f;\xff;\x1234;")
+  (asm
+    (start #xc000)
+    (db #x00 #x10 #x20 #x7f 195 191 225 136 180)))
+
+(check-asm
+  (org #xc000)
+  (ascii "\x0;\x10;\x20;" "\x7f;\xff;\x1234;")
+  (asm
+    (start #xc000)
+    (db #x00 #x10 #x20 #x7f #xff #x34)))
+
+(check-asm
+  (org #xc000)
   start
   (db-e start)
   (db-e start)

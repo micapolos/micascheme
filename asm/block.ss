@@ -13,6 +13,8 @@
     dw-block
     bytevector-block
     dz-block
+    utf8-block
+    ascii-block
     identifier-block
     align-block
     offset-block
@@ -84,8 +86,16 @@
 
   (define (dz-block $string)
     (block-append
-      (bytevector-block (string->utf8 $string))
+      (bytevector-block (string->ascii $string))
       (db-block (pure-expression 0))))
+
+  (define (utf8-block . $strings)
+    (apply block-append
+      (map (dot bytevector-block string->utf8) $strings)))
+
+  (define (ascii-block . $strings)
+    (apply block-append
+      (map (dot bytevector-block string->ascii) $strings)))
 
   (define (offset-label $offset $label)
     (identified-map $label (partial + $offset)))
