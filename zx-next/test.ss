@@ -25,6 +25,8 @@
         #`(%begin
           ; TODO: Make sure that all registers are preserved.
           (%preserve (%hl %af)
-            (%writeln #,(symbol->string (datum label))))
+            (%write "testing ")
+            (%write #,(symbol->string (datum label)))
+            (%writeln "..."))
           body ...))))
 )
