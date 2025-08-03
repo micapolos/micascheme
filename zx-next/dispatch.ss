@@ -18,16 +18,14 @@
           (lets
             ($tmps (generate-temporaries #'(entry ...)))
             #`(%with-labels (table)
-              ; HL = dispatch table address
               (%ld %hl table)
 
-              ; HL = dispatch address pointer
               #,(if (<= (length #'(entry ...)) #x7f)
                 #`(lookup-7 %de)
                 #`(lookup %de))
 
-              ; dispatch
               (%ex %de %hl)
+
               (%jp (%hl))
 
               table
