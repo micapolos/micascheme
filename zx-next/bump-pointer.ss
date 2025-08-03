@@ -12,9 +12,9 @@
       (hl - bump pointer / out of memory if outside of allocation slot)
       (bc - 13 bit size))
     (output
-      (cf 0 = ok / 1 = out of memory)
-      (hl advanced bump pointer / preserved on out of memory)
-      (de allocated pointer if ok))
+      (cf - 0 = ok / 1 = out of memory)
+      (hl - advanced bump pointer / preserved on out of memory)
+      (de - allocated pointer if ok))
 
     ; Check out of memory by comparing bump pointer bits 15 ... 13 with slot bits.
     (ld a h)
