@@ -4,7 +4,7 @@
     write-stack)
   (import
     (zx-next core)
-    (zx-next write)
+    (except (zx-next write) write-byte-literal write-word-literal)
     (zx-next scheme tag)
     (zx-next scheme value))
 

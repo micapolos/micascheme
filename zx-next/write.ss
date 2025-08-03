@@ -8,7 +8,9 @@
     writeln-string
     write-nibble
     write-byte
+    write-byte-literal
     write-word
+    write-word-literal
     write-newline
     write-mem
     write-mem-line
@@ -94,6 +96,13 @@
     (and #x0f)
     (jp write-nibble))
 
+  (define-fragment write-byte-literal
+    (input (a byte))
+    (preserve (af)
+      (ld a #\$)
+      (call write-char))
+    (jp write-byte))
+
   (define-fragment write-word
     (input (hl word))
     (preserve (hl)
@@ -101,6 +110,13 @@
       (call write-byte))
     (ld a l)
     (jp write-byte))
+
+  (define-fragment write-word-literal
+    (input (hl word))
+    (preserve (af)
+      (ld a #\$)
+      (call write-char))
+    (jp write-word))
 
   (define-fragment write-newline
     (ld a #x0d)
@@ -119,31 +135,31 @@
       (call write-char)))
 
   (define-fragments
-    (write-a (jp write-byte))
-    (write-f (push af) (pop hl) (jp write-byte))
-    (write-h (ld a h) (jp write-byte))
-    (write-l (ld a l) (jp write-byte))
-    (write-b (ld a b) (jp write-byte))
-    (write-c (ld a c) (jp write-byte))
-    (write-d (ld a d) (jp write-byte))
-    (write-e (ld a e) (jp write-byte))
+    (write-a (jp write-byte-literal))
+    (write-f (push af) (pop hl) (jp write-byte-literal))
+    (write-h (ld a h) (jp write-byte-literal))
+    (write-l (ld a l) (jp write-byte-literal))
+    (write-b (ld a b) (jp write-byte-literal))
+    (write-c (ld a c) (jp write-byte-literal))
+    (write-d (ld a d) (jp write-byte-literal))
+    (write-e (ld a e) (jp write-byte-literal))
 
-    (write-af (push af) (pop hl) (jp write-word))
-    (write-hl (jp write-word))
-    (write-bc (ld h b) (ld l c) (jp write-word))
-    (write-de (ld h d) (ld l e) (jp write-word))
+    (write-af (push af) (pop hl) (jp write-word-literal))
+    (write-hl (jp write-word-literal))
+    (write-bc (ld h b) (ld l c) (jp write-word-literal))
+    (write-de (ld h d) (ld l e) (jp write-word-literal))
 
-    (write-ix (push ix) (pop hl) (jp write-word))
-    (write-iy (push iy) (pop hl) (jp write-word))
+    (write-ix (push ix) (pop hl) (jp write-word-literal))
+    (write-iy (push iy) (pop hl) (jp write-word-literal))
 
-    (write-sp (ld hl 0) (add hl sp) (jp write-word))
+    (write-sp (ld hl 0) (add hl sp) (jp write-word-literal))
 
     (write-ihl
       (ld e (hl))
       (inc hl)
       (ld d (hl))
       (ex de hl)
-      (jp write-word))
+      (jp write-word-literal))
 
     (write-ihl++
       (ld e (hl))
@@ -151,7 +167,7 @@
       (ld d (hl))
       (inc hl)
       (ex de hl)
-      (preserve (de) (call write-word))
+      (preserve (de) (call write-word-literal))
       (ex de hl)
       (ret)))
 
@@ -175,10 +191,10 @@
         (begin (ld a ch) (call write-char)))
       ((_ u8)
         (u8? (datum u8))
-        (begin (ld a u8) (call write-byte)))
+        (begin (ld a u8) (call write-byte-literal)))
       ((_ u16)
         (u16? (datum u16))
-        (begin (ld hl u16) (call write-word)))
+        (begin (ld hl u16) (call write-word-literal)))
       ((_ s)
         (string? (datum s))
         (with-labels (here)

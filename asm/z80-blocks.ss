@@ -6,7 +6,8 @@
     if then else
     while
     when unless
-    ld-inc dec-ld)
+    ld-inc dec-ld
+    loop-byte loop-word)
   (import
     (asm lang) (asm z80))
 
@@ -30,6 +31,17 @@
         label
         body ...
         (djnz label)))
+    ((loop-byte n body ...)
+      (ld b n)
+      (loop-djnz (preserve (bc) body ...)))
+    ((loop-word nn body ...)
+      (ld bc nn)
+      (loop
+        (preserve (af)
+          (preserve (bc) body ...)
+          (ld a b)
+          (or c))
+        (while nz)))
     ((preserve (reg ...) body ...)
       (push reg) ...
       body ...

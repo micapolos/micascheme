@@ -10,7 +10,7 @@
     (zx-next write))
 
   (define-fragments
-    (available-string (dz "Available banks: ")))
+    (free-string (dz "free ")))
 
   (define-values
     (bank-status-free 0)
@@ -34,6 +34,14 @@
     (output (hl addr))
     (ld hl bank-status-map)
     (add hl a)
+    (ret))
+
+  (define-asm bank-free?
+    (input (a bank-index))
+    (output (z free?))
+    (call bank-index->addr)
+    (ld a (hl))
+    (or a)
     (ret))
 
   (define-asm bank-alloc
@@ -75,12 +83,20 @@
     (ret))
 
   (define-asm write-banks
-    (ld hl available-string)
-    (call write-string)
     (ld a (banks-free))
-    (call write-byte)
-    (call write-newline)
+    (writeln "free: " a)
 
-    (dump bank-status-map #x100)
+    (ld a 0)
+    (loop-byte 4
+      (write a #\space)
+      (loop-byte 64
+        (preserve (af)
+          (call bank-free?)
+          (if z
+            (then (ld a #\.))
+            (else (ld a #\X)))
+          (call write-char))
+        (inc a))
+      (preserve (af) (writeln)))
     (ret))
 )
