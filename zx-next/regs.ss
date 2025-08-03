@@ -19,7 +19,12 @@
 
     preserve-regs
     capture-regs
-    captured-regs)
+    captured-regs
+
+    write-reg-byte/color
+    write-reg-word/color
+    write-regs/colors
+    write-ireg-word/color++)
   (import
     (zx-next core)
     (zx-next write)
@@ -101,47 +106,104 @@
     (ldir)
     (pop-regs))
 
-  ; TODO: Try to make it more compact.
+  (define-asm write-reg-byte/color
+    (input (a reg) (l color))
+    (preserve (af)
+      (preserve (hl)
+        (ld a #x10)
+        (call write-char))
+      (ld a l)
+      (call write-char))
+    (call write-byte)
+    (ld a #x10)
+    (call write-char)
+    (ld a #x07)
+    (jp write-char))
+
+  (define-asm write-reg-word/color
+    (input (hl reg) (de color))
+    (preserve (hl de)
+      (ld a h)
+      (ld l d)
+      (call write-reg-byte/color))
+    (ld a l)
+    (ld l e)
+    (jp write-reg-byte/color))
+
+  (define-asm write-ireg-word/color++
+    (input (hl reg ptr) (de color ptr))
+    (ld c (hl))
+    (inc hl)
+    (ld b (hl))
+    (inc hl)
+    (preserve (hl)
+      (ex de hl)
+      (ld e (hl))
+      (inc hl)
+      (ld d (hl))
+      (inc hl)
+      (ex de hl)
+      (preserve (de)
+        (ld d h)
+        (ld e l)
+        (ld h b)
+        (ld l c)
+        (call write-reg-word/color)))
+    (ret))
+
+  (define-fragment regs-default-colors (ds 20 #x07))
+
   (define-asm write-regs
-    (input (hl regs-pointer))
-    (ld de reg-names)
+    (input (hl regs))
+    (ld de regs-default-colors)
+    (jp write-regs/colors))
 
-    (preserve (hl) (write "AF "))
-    (call write-ihl++)
+  (define-asm write-regs/colors
+    (input (hl regs) (de colors))
+
+    (preserve (hl de) (write "AF "))
+    (call write-ireg-word/color++)
     (add hl 6)
+    (add de 6)
 
-    (preserve (hl) (write " AF'"))
-    (call write-ihl++)
+    (preserve (hl de) (write " AF'"))
+    (call write-ireg-word/color++)
     (add hl (- #x10000 8))
+    (add de (- #x10000 8))
 
-    (preserve (hl) (write "\rHL "))
-    (call write-ihl++)
+    (preserve (hl de) (write "\rHL "))
+    (call write-ireg-word/color++)
     (add hl 6)
+    (add de 6)
 
-    (preserve (hl) (write " HL'"))
-    (call write-ihl++)
+    (preserve (hl de) (write " HL'"))
+    (call write-ireg-word/color++)
     (add hl (- #x10000 8))
+    (add de (- #x10000 8))
 
-    (preserve (hl) (write "\rBC "))
-    (call write-ihl++)
+    (preserve (hl de) (write "\rBC "))
+    (call write-ireg-word/color++)
     (add hl 6)
+    (add de 6)
 
-    (preserve (hl) (write " BC'"))
-    (call write-ihl++)
+    (preserve (hl de) (write " BC'"))
+    (call write-ireg-word/color++)
     (add hl (- #x10000 8))
+    (add de (- #x10000 8))
 
-    (preserve (hl) (write "\rDE "))
-    (call write-ihl++)
+    (preserve (hl de) (write "\rDE "))
+    (call write-ireg-word/color++)
     (add hl 6)
+    (add de 6)
 
-    (preserve (hl) (write " DE'"))
-    (call write-ihl++)
+    (preserve (hl de) (write " DE'"))
+    (call write-ireg-word/color++)
 
-    (preserve (hl) (write "\rIX "))
-    (call write-ihl++)
+    (preserve (hl de) (write "\rIX "))
+    (call write-ireg-word/color++)
 
-    (preserve (hl) (write " IY "))
-    (call write-ihl)
+    (preserve (hl de) (write " IY "))
+    (call write-ireg-word/color++)
 
     (jp write-newline))
 )
