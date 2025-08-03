@@ -1,55 +1,42 @@
 (library (zx-next bump-alloc)
-  (export bump-alloc)
+  (export)
   (import (zx-next core))
 
-  (define-values
-    (tag-mask #b11100000)
-    (size-mask #b00011111))
+  ; Allocation happens in slot 7.
 
-  (define-asm bump-alloc
+  (define-op (bump-alloc)
+    bump-pointer (dw #xe000))
+
+  (define-fragment bump-allocator-alloc
     (input
-      (hl - bump pointer)
-      (bc - 13 bit size)
+      (hl bump-allocator)
+      (bc 13 bit size)
       (de - tag in bits 7 ... 5 / slot in bits 7 ... 5))
     (output
-      (cf 0 = ok / 1 = out of memory)
-      (hl advanced bump pointer / preserved on out of memory)
-      (de allocated pointer if ok))
+      (cf 0 ok / 1 overflow)
+      (de allocated-address))
 
-    ; Check out of memory by comparing bump pointer bits 15 ... 13 with slot bits.
-    (ld a h)
-    (and tag-mask)
-    (cp e)
-    (when nz (scf) (ret))
-
-    ; Increment bump pointer to point to the last allocation byte
-    (preserve (hl)
-      (inc hl)
-      (add hl bc)
-      (ld a h)
-
-      ; Check overflow
-      (and tag-mask)
-      (cp e))
-
-    (when nz (scf) (ret))
-
-    ; Write size with tag
-    (ld (hl) c)
+    ; HL = bump pointer
+    (ld e (hl))
     (inc hl)
-    (ld a b)
-    (or d)
-    (ld (hl) a)
-    (inc hl)
+    (ld d (hl))
+    (ex de hl)
 
-    ; DE = allocated pointer
-    (ld d h)
-    (ld e l)
+    (preserve (de)
+      ; HL = bump pointer
+      ; BC = size
+      ; D = tag
+      (ld d a)
+      (call bump-alloc)
 
-    ; Increment bump pointer
-    (add hl bc)
+      ; HL = allocated pointer
+      (ex de hl))
 
-    ; Reset carry on success
-    (rcf)
+    ; Write back bump pointer
+    (ex de hl)
+    (ld (hl) d)
+    (dec hl)
+    (ld (hl) e)
+
     (ret))
 )
