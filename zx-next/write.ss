@@ -125,7 +125,7 @@
       ((_ h) (begin (ld a h) (call write-byte)))
       ((_ l) (begin (ld a l) (call write-byte)))
       ((_ af) (begin (push af) (pop hl) (call write-word)))
-      ((_ bc) (begin (ld h b) (ld c l) (call write-word)))
+      ((_ bc) (begin (ld h b) (ld l c) (call write-word)))
       ((_ de) (begin (ld h d) (ld l e) (call write-word)))
       ((_ hl) (begin (call write-word)))
       ((_ sp) (begin (ld hl 0) (add hl sp) (call write-word)))
@@ -160,15 +160,17 @@
     (call write-newline))
 
   (define-op (writeln-error s ...)
-    (write-ink 4)
-    (write "[ERROR] ")
-    (write-ink 7)
+    (preserve (af bc de hl)
+      (write-ink 4)
+      (write "[ERROR] ")
+      (write-ink 7))
     (writeln s ...))
 
   (define-op (writeln-ok s ...)
-    (write-ink 2)
-    (write "[OK] ")
-    (write-ink 7)
+    (preserve (af bc de hl)
+      (write-ink 2)
+      (write "[OK] ")
+      (write-ink 7))
     (writeln s ...))
 
   ; TODO === Move to (zx-next debug) ===
