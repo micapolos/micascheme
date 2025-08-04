@@ -41,10 +41,10 @@
     ((loop-word nn body ...)
       (ld bc nn)
       (loop
-        (preserve (af)
-          (preserve (bc) body ...)
-          (ld a b)
-          (or c))
+        (preserve (af bc) body ...)
+        (dec bc)
+        (ld a b)
+        (or c)
         (while nz)))
     ((preserve (reg ...) body ...)
       (push reg) ...

@@ -6,25 +6,25 @@
 
   (case free-banks
     (load-free-banks a)
-    (assert a #xdf))
+    (assert a #xd0))
 
   (case free-bank-0?
     (ld a #x00)
     (call bank-free?)
     (assert nz))
 
-  (case free-bank-1?
-    (ld a #x01)
+  (case free-bank-0f?
+    (ld a #x0f)
     (call bank-free?)
-    (assert z))
+    (assert nz))
 
-  (case free-bank-2?
-    (ld a #x02)
+  (case free-bank-10?
+    (ld a #x10)
     (call bank-free?)
     (assert z))
 
   (case free-bank-df?
-    (ld a #xdf)
+    (ld a #xd0)
     (call bank-free?)
     (assert z))
 
@@ -37,11 +37,11 @@
     (ld a #x34)  ; some type
     (call bank-alloc)
     (assert nc)
-    (assert a 1))
+    (assert a #x10))
 
   (case free-banks
     (load-free-banks a)
-    (assert a #xde))
+    (assert a #xcf))
 
   (case free-bank-1?
     (ld a #x01)
@@ -52,11 +52,11 @@
     (ld a #x34)  ; some type
     (call bank-alloc)
     (assert nc)
-    (assert a 2))
+    (assert a #x11))
 
   (case free-banks
     (load-free-banks a)
-    (assert a #xdd))
+    (assert a #xce))
 
   (case free-bank-2?
     (ld a #x02)

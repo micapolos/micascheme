@@ -21,11 +21,11 @@
 
   (define-fragments
     (bank-status-map
-      (ds 1     bank-status-system)
-      (ds 223   bank-status-free)
+      (ds 16    bank-status-system)
+      (ds 208   bank-status-free)
       (ds 32    bank-status-unavailable))
     (bank-current (db 0))
-    (banks-free (db 223)))
+    (banks-free (db 208)))
 
   ; TODO: Initalize according to available memory (how to detect it?)
   (define-asm banks-init

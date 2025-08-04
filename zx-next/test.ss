@@ -9,7 +9,9 @@
     (import
       (zx-next core)
       (zx-next assert)
-      (zx-next throw)))
+      (zx-next throw)
+      (zx-next write)
+      (zx-next debug)))
 
   (define-rule-syntax (test body ...)
     (%demo
