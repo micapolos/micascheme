@@ -6,7 +6,9 @@
     banked-allocator-allocator
 
     banked-allocator-init
-    banked-allocator-alloc)
+    banked-allocator-init-tc
+    banked-allocator-alloc
+    banked-allocator-alloc-tc)
   (import
     (zx-next core)
     (zx-next allocator)
