@@ -24,21 +24,7 @@
     (current-bank db)
     (allocator    dw))
 
-  (define-ops (keywords hl)
-    ((banked-allocator-init hl)
-      (call banked-allocator-init-proc))
-    ((banked-allocator-init ptr)
-      (ld hl ptr)
-      (banked-allocator-init hl))
-    ((banked-allocator-alloc hl bc a)
-      (call banked-allocator-alloc-proc))
-    ((banked-allocator-alloc ptr size tag)
-      (ld hl ptr)
-      (ld bc size)
-      (ld a tag)
-      (banked-allocator-alloc hl bc a)))
-
-  (define-fragment banked-allocator-init-proc
+  (define-proc (banked-allocator-init hl)
     (input (hl banked-allocator))
 
     ; a = allocated bank
@@ -55,9 +41,9 @@
     (inc hl)
 
     ; init allocator
-    (jp allocator-init-proc))
+    (allocator-init-tc hl))
 
-  (define-fragment banked-allocator-alloc-next-bank-proc
+  (define-proc (banked-allocator-alloc-next-bank hl)
     (input (hl banked-allocator))
 
     ; a = allocated bank
@@ -73,9 +59,9 @@
     (inc hl)
 
     ; init allocator
-    (jp allocator-init-proc))
+    (allocator-init-tc hl))
 
-  (define-fragment banked-allocator-alloc-proc
+  (define-proc (banked-allocator-alloc hl bc a)
     (input (hl banked-allocator) (bc size) (a tag))
 
     (preserve (hl bc af)
@@ -101,7 +87,7 @@
     (ret nc)
 
     ; a = new bank
-    (preserve (hl bc af) (call banked-allocator-alloc-next-bank-proc))
+    (preserve (hl bc af) (banked-allocator-alloc-next-bank hl))
     (ret c)
 
     ; recursively allocate in new bank

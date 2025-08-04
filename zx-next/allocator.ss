@@ -2,9 +2,9 @@
   (export
     allocator-size
     allocator-init
-    allocator-init-proc
+    allocator-init-tc
     allocator-alloc
-    allocator-alloc-proc)
+    allocator-alloc-tc)
   (import
     (zx-next core)
     (zx-next bump-pointer))
@@ -19,7 +19,7 @@
     (slot-tag #b11100000)
     (allocator-size 2))
 
-  (define-asm allocator-init-proc
+  (define-proc (allocator-init hl)
     (input (hl - bump allocator ptr))
     (preserve (hl)
       (ld e slot-tag)
@@ -30,14 +30,7 @@
     (ld (hl) d)
     (ret))
 
-  (define-ops (keywords hl)
-    ((allocator-init hl)
-      (call allocator-init-proc))
-    ((allocator-init ptr)
-      (ld hl ptr)
-      (allocator-init hl)))
-
-  (define-fragment allocator-alloc-proc
+  (define-proc (allocator-alloc hl bc a)
     (input
       (hl - allocator pointer)
       (bc - size in bits 12 ... 0)
@@ -74,13 +67,4 @@
 
     ; DE = allocated pointer
     (ret))
-
-  (define-ops (keywords hl bc a)
-    ((allocator-alloc hl bc a)
-      (call allocator-alloc-proc))
-    ((allocator-alloc ptr size tag)
-      (ld hl ptr)
-      (ld bc size)
-      (ld a tag)
-      (allocator-alloc hl bc a)))
 )
