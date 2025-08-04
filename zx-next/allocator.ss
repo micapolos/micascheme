@@ -2,7 +2,9 @@
   (export
     allocator-size
     allocator-init
-    allocator-alloc)
+    allocator-init-proc
+    allocator-alloc
+    allocator-alloc-proc)
   (import
     (zx-next core)
     (zx-next bump-pointer))
