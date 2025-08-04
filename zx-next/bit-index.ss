@@ -1,7 +1,9 @@
 (library (zx-next bit-index)
   (export
     lbi bii bid
-    load-bit-index)
+
+    load-bit-index
+    load-bit-index-tc)
   (import (zx-next core))
 
   (define-ops (keywords de b)
