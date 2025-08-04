@@ -99,6 +99,5 @@
     (inc hl)
     (ld d (hl))
     (ex de hl)
-    (allocator-alloc hl bc a)
-    (ret))
+    (allocator-alloc-tc hl bc a))
 )
