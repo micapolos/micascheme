@@ -7,5 +7,5 @@
   (zx-next bank)
   (zx-next bump-pointer)
   (zx-next allocator)
-  ;(zx-next banked-allocator)
+  (zx-next banked-allocator)
   (zx-next lookup))

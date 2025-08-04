@@ -1,7 +1,8 @@
 (import
   (zx-next test)
   (zx-next banked-allocator)
-  (zx-next tagged))
+  (zx-next tagged)
+  (zx-next mem))
 
 (define-asm banked-allocator (ds 4))
 
@@ -41,6 +42,9 @@
     (loop-word (* 80 20)
       (write #\.)
       (banked-allocator-alloc banked-allocator (tagged-word #xa0 #x01fe))
-      (assert nc)))
+      (assert nc)
+      (ld bc #x01fe)
+      (ld a #xbb)
+      (mem-fill de bc a)))
 )
 

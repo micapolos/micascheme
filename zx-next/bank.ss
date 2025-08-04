@@ -3,6 +3,7 @@
     banks-init
     bank-fill
     bank-alloc
+    bank-dealloc
     bank-free
     bank-free?
     write-banks
@@ -92,6 +93,16 @@
         (ld a (bank-current))
         (rcf)
         (ret))))
+
+  (define-asm bank-dealloc
+    (call bank-index->addr)
+    (ld a (hl))
+    (or a)
+    (ret z)
+    (ld (hl) 0)
+    (ld hl banks-free)
+    (inc (hl))
+    (ret))
 
   (define-asm bank-free
     (input (a bank-index))

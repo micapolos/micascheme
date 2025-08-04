@@ -1,5 +1,10 @@
 (import (zx-next test) (zx-next terminal) (zx-next bank) (zx-next mem) (zx-next mmu))
 
+(define-fragments
+  (banks (ds 256))
+  (bank-count (db 0))
+  (free-bank-count (db 0)))
+
 (test
   (case init
     (call banks-init))
@@ -64,26 +69,46 @@
     (assert nz))
 
   (case alloc-all
+    (load-free-banks a)
+    (ld hl free-bank-count)
+    (ld (hl) a)
+
     (ld b 0)
+    (ld hl banks)
     (loop
       (ld a #x34)
-      (preserve (bc) (call bank-alloc))
+      (preserve (bc hl) (call bank-alloc))
       (if nc
         (then
           (mmu 7 a)
-          (preserve (bc)
+          (ld (hl) a)
+          (inc hl)
+          (inc b)
+          (preserve (bc hl)
             (ld l #xbb)
             (bank-fill a l)
             (write #\.))
-          (inc b)
           (rcf))
-        (else
-          (preserve (bc) (write #\!))
-          (scf)))
+        (else (scf)))
         (while nc))
-    (writeln "\rAllocated " b " banks.")
-    (call write-banks))
+    (ld hl bank-count)
+    (ld (hl) b)
+    (writeln))
 
-  ; TODO
-  (case free-all)
+  (case free-all
+    (ld hl bank-count)
+    (ld b (hl))
+    (ld hl banks)
+    (loop-djnz
+      (ld a (hl))
+      (inc hl)
+      (preserve (hl bc)
+        (call bank-dealloc)
+        (write #\.)))
+    (writeln)
+
+    (load-free-banks a)
+    (ld hl free-bank-count)
+    (cp (hl))
+    (assert z))
 )

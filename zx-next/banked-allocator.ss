@@ -73,6 +73,7 @@
 
   (define-proc (banked-allocator-alloc hl bc)
     (input (hl banked-allocator) (bc size))
+    (output (fc 0 ok / 1 out-of-memory) (de address) (a bank) (mmu 7 paged-in))
 
     ; Try to allocate
     ; DE = allocated address
