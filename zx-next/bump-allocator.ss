@@ -1,10 +1,11 @@
 (library (zx-next bump-allocator)
   (export
-    bump-allocator-data
     bump-allocator-size
     bump-allocator-init
     bump-allocator-alloc)
-  (import (zx-next core))
+  (import
+    (zx-next core)
+    (zx-next bump-pointer))
 
   ; Allocation happens in slot 7.
   ; Allocated pointers are 13-bits.
@@ -13,25 +14,35 @@
     (tag-mask  #b11100000)
     (size-mask #b00011111)
     (slot 7)
+    (slot-tag #b11100000)
     (bump-allocator-size 2))
 
-  (define-op (bump-allocator-data) (dw #xe000))
-
-  (define-fragment bump-allocator-init
-    (input (hl - bump allocator pointer))
-    (ld (hl) #x00)
+  (define-asm bump-allocator-init-proc
+    (input (hl - bump allocator ptr))
+    (preserve (hl)
+      (ld e slot-tag)
+      (call bump-pointer-init)
+      (ex de hl))
+    (ld (hl) e)
     (inc hl)
-    (ld (hl) #xe0)
+    (ld (hl) d)
     (ret))
 
-  (define-fragment bump-allocator-alloc
+  (define-ops (keywords hl)
+    ((bump-allocator-init hl)
+      (call bump-allocator-init-proc))
+    ((bump-allocator-init ptr)
+      (ld hl ptr)
+      (bump-allocator-init hl)))
+
+  (define-fragment bump-allocator-alloc-proc
     (input
       (hl - bump-allocator pointer)
-      (bc - non-zero tag in bits 15 ... 13 / size in bits 12 ... 0))
+      (bc - size in bits 12 ... 0)
+      (a - tag in bits 7 ... 5))
     (output
       (cf - 0 ok / 1 overflow)
       (de - allocated-address))
-
     (preserve (hl)
       ; hl = bump pointer
       (ld e (hl))
@@ -39,31 +50,33 @@
       (ld d (hl))
       (ex de hl)
 
-      ; BC = size
-      (ld a b)
-      (and size-mask)
-      (ld b a)
+      ; E = slot-tag
+      (ld e slot-tag)
 
       ; D = tag
-      (ld a b)
-      (and tag-mask)
       (ld d a)
 
-      ; E = slot
-      (ld e slot)
-
+      ; HL = advanced bump pointer
       ; DE = allocated pointer
-      ; HL = bump pointer
-      (call bump-alloc)
+      (call bump-pointer-alloc)
 
       ; BC = bump-pointer
-      (ld b h)
-      (ld c l))
+      (ld bc hl))
 
     ; Write back bump pointer to bump-allocator
     (ld (hl) b)
     (dec hl)
     (ld (hl) c)
 
+    ; DE = allocated pointer
     (ret))
+
+  (define-ops (keywords hl bc a)
+    ((bump-allocator-alloc hl bc a)
+      (call bump-allocator-alloc-proc))
+    ((bump-allocator-alloc ptr size tag)
+      (ld hl ptr)
+      (ld bc size)
+      (ld a tag)
+      (bump-allocator-alloc hl bc a)))
 )

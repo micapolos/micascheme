@@ -1,11 +1,7 @@
 (import (zx-next test) (zx-next mem) (zx-next bump-pointer))
 
 (test
-  ; Fill bank with garbage
-  (ld de #xe000)
-  (ld bc #x2000)
-  (ld a #xbb)
-  (call mem-fill)
+  (mem-fill #xe000 #x2000 #xbb)
 
   (case init
     (ld e #xe0) ; bank

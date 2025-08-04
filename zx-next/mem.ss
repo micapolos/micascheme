@@ -2,11 +2,7 @@
   (export mem-fill mem-clear)
   (import (zx-next core))
 
-  (define-fragment mem-clear
-    (ld a 0)
-    (jp mem-fill))
-
-  (define-fragment mem-fill
+  (define-fragment mem-fill-proc
     (input (a value) (de address) (bc size))
     (ld h d)
     (ld l e)
@@ -15,4 +11,15 @@
     (dec bc)
     (ldir)
     (ret))
+
+  (define-ops (keywords de bc a)
+    ((mem-fill de bc a)
+      (call mem-fill-proc))
+    ((mem-fill start size value)
+      (ld de start)
+      (ld bc size)
+      (ld a value)
+      (mem-fill de bc a))
+    ((mem-clear start size)
+      (mem-fill start size 0)))
 )

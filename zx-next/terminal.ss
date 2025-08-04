@@ -55,9 +55,7 @@
     (nextreg #x68 #b10010000)  ; ulaOff, extKeysOff
 
     ; Clear tilemap
-    (ld de tile-map)
-    (ld bc tile-map-size)
-    (call mem-clear)
+    (mem-clear tile-map tile-map-size)
 
     ; Copy font into tile defs
     ;(ld hl font-topaz-8)
