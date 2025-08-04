@@ -23,19 +23,14 @@
     (banked-allocator-allocator          1)          ; (dw 0)
     (banked-allocator-banks              3))         ; (ds 128)
 
-  (define-proc (banked-allocator-check-free-banks hl)
-    (ld a (hl))
-    (cp max-bank)
-    (when z (ret-c))
-    (ret-nc))
-
-  (define-op (banked-allocator-page-in hl)
-    (ld a (hl))
-    (mmu 7 a))
-
   (define-proc (banked-allocator-alloc-bank hl)
     (input (hl - banked-allocator))
     (output (fc - out of memory))
+
+    ; Check free banks
+    (ld a (hl))
+    (cp max-bank)
+    (when z (ret-c))
 
     ; a = allocated bank
     (ld a bank-type)
@@ -50,7 +45,8 @@
     (ld c (hl))
 
     ; Page-in
-    (banked-allocator-page-in hl)
+    (ld a (hl))
+    (mmu 7 a)
 
     ; Init allocator
     (inc hl)
@@ -70,19 +66,27 @@
     (input (hl - banked allocator))
     (ld (hl) #xff)
     (inc hl)
-    (allocator-init-full-tc hl))
+    (ld (hl) #xff)
+    (inc hl)
+    (ld (hl) #xff)
+    (ret))
 
-  (define-proc (banked-allocator-alloc hl bc a)
-    (input (hl banked-allocator) (bc size) (a tag))
+  (define-proc (banked-allocator-alloc hl bc)
+    (input (hl banked-allocator) (bc size))
 
-    (preserve (bc af hl) (banked-allocator-check-free-banks hl))
+    ; Try to allocate
+    ; DE = allocated address
+    (preserve (hl bc)
+      (inc hl)
+      (allocator-alloc hl bc))
+
+    ; Return on success.
+    (ret nc)
+
+    ; Allocated new bank.
+    (preserve (hl bc) (banked-allocator-alloc-bank hl))
     (ret c)
-
-    (preserve (bc af hl) (banked-allocator-alloc-bank hl))
-    (ret c)
-
-    (banked-allocator-page-in hl)
 
     (inc hl)
-    (allocator-alloc-tc hl bc a))
+    (allocator-alloc-tc hl bc))
 )

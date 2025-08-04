@@ -7,6 +7,7 @@
     define-fragment
     define-fragments
     define-value
+    define-expression
     define-constant
     define-constants
     define-struct
@@ -105,6 +106,12 @@
 
   (define-rule-syntax (define-value id expr)
     (%define id expr))
+
+  (define-rule-syntax (define-expression (id param ...) body)
+    (define-syntax id
+      (make-compile-time-value
+        (syntax-rules ()
+          ((_ param ...) body)))))
 
   (define-rule-syntax (define-constant id expr)
     (define-syntax id (eval 'expr (environment '(scheme)))))

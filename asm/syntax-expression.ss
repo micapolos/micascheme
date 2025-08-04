@@ -43,7 +43,7 @@
         (syntax->op-expression $lookup $syntax))
       ((id . x)
         (and (identifier? #'id) ($lookup #'id))
-        (switch (($lookup #'id) $lookup $syntax)
+        (switch (($lookup #'id) $syntax)
           ((expression? $expression) $expression)
           ((else $syntax) (syntax->expression $lookup $syntax))))
       ((fn arg ...)

@@ -27,6 +27,8 @@
   (dw proc-10)
   (dw proc-20))
 
+(define-expression (plus a b) (+ a b))
+
 (check-asm
   (org #xc000)
   (db 10 20 30)
@@ -243,3 +245,9 @@
   (dw empty)
   (dw dw-empty)
   (asm (start 49154) (db 0 192 0 192 0 192)))
+
+(check-asm
+  (org #xc000)
+  (db (plus 10 20))
+  (asm (start #xc000) (db 30)))
+

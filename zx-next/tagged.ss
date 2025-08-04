@@ -1,5 +1,6 @@
 (library (zx-next tagged)
   (export
+    tagged-byte tagged-word
     tag untag
     write-tagged-byte
     write-tagged-word
@@ -8,6 +9,12 @@
     (zx-next core)
     (zx-next tag)
     (zx-next write))
+
+  (define-expression (tagged-byte tag byte)
+    (fxior (fxand byte #x1f) tag))
+
+  (define-expression (tagged-word tag word)
+    (fxior (fxand word #x1fff) (fxsll tag 8)))
 
   (define-ops (keywords a l de hl)
     ; a <- l tagged with a
@@ -38,6 +45,14 @@
       (ld d a)
       (ld e l)
       (ld a h)
+      (and tag-mask))
+
+    ((untag de bc)
+      (ld a b)
+      (and tag-inv-mask)
+      (ld d a)
+      (ld e c)
+      (ld a b)
       (and tag-mask)))
 
   (define-fragment write-tagged-byte

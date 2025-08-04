@@ -1,4 +1,4 @@
-(import (zx-next test) (zx-next mem) (zx-next allocator))
+(import (zx-next test) (zx-next mem) (zx-next allocator) (zx-next tagged))
 
 (define-asm allocator (ds 2))
 
@@ -12,7 +12,7 @@
     (assert-word (#xe000) #x00bb))
 
   (case alloc
-    (allocator-alloc allocator #x100 #xa0)
+    (allocator-alloc allocator (tagged-word #xa0 #x0100))
     (assert nc)
     (assert de #xe002)
     (assert-word (allocator) #xe102)
@@ -20,6 +20,6 @@
     (assert-word (#xe102) #x00bb))
 
   (case overflow
-    (allocator-alloc allocator #x1ff0 #xa0)
+    (allocator-alloc allocator (tagged-word #xa0 #x1ff0))
     (assert c)
     (assert-word (allocator) #xe102)))

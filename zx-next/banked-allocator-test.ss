@@ -1,4 +1,7 @@
-(import (zx-next test) (zx-next banked-allocator))
+(import
+  (zx-next test)
+  (zx-next banked-allocator)
+  (zx-next tagged))
 
 (define-asm banked-allocator (ds 4))
 
@@ -6,11 +9,10 @@
   (case init
     (banked-allocator-init banked-allocator)
     (assert-byte ((+ banked-allocator banked-allocator-current-bank)) #xff)
-    (assert-word ((+ banked-allocator banked-allocator-allocator)) #x0000))
+    (assert-word ((+ banked-allocator banked-allocator-allocator)) #xffff))
 
   (case alloc-00fe
-    (break)
-    (banked-allocator-alloc banked-allocator #x00fe #xa0)
+    (banked-allocator-alloc banked-allocator (tagged-word #xa0 #x00fe))
     (assert nc)
     (assert de #xe002)
     (assert-byte ((+ banked-allocator banked-allocator-current-bank)) 0)
