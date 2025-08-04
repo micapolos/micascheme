@@ -72,15 +72,17 @@
         (then
           (mmu 7 a)
           (preserve (bc)
-            (write #\.)
-            (mem-fill #xe000 #x2000 #xbb))
+            (ld l #xbb)
+            (bank-fill a l)
+            (write #\.))
           (inc b)
           (rcf))
         (else
           (preserve (bc) (write #\!))
           (scf)))
         (while nc))
-    (writeln "\rAllocated " b " banks."))
+    (writeln "\rAllocated " b " banks.")
+    (call write-banks))
 
   ; TODO
   (case free-all)

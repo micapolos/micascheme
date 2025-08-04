@@ -1,6 +1,7 @@
 (library (zx-next bank)
   (export
     banks-init
+    bank-fill
     bank-alloc
     bank-free
     bank-free?
@@ -9,7 +10,17 @@
   (import
     (zx-next core)
     (zx-next debug)
-    (zx-next write))
+    (zx-next write)
+    (zx-next mem)
+    (zx-next mmu))
+
+  (define-proc (bank-fill a l)
+    (mmu 7 a)
+    (ld de #xe000)
+    (ld bc #x2000)
+    (ld a l)
+    (mem-fill de bc a)
+    (ret))
 
   (define-fragments
     (free-string (dz "free ")))
