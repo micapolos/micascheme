@@ -3,6 +3,8 @@
     allocator-size
     allocator-init
     allocator-init-tc
+    allocator-init-full
+    allocator-init-full-tc
     allocator-alloc
     allocator-alloc-tc)
   (import
@@ -20,7 +22,7 @@
     (allocator-size 2))
 
   (define-proc (allocator-init hl)
-    (input (hl - bump allocator ptr))
+    (input (hl - allocator))
     (preserve (hl)
       (ld e slot-tag)
       (call bump-pointer-init)
@@ -28,6 +30,14 @@
     (ld (hl) e)
     (inc hl)
     (ld (hl) d)
+    (ret))
+
+  (define-proc (allocator-init-full hl)
+    (input (hl - allocator))
+    (xor a)
+    (ld (hl) 0)
+    (inc hl)
+    (ld (hl) 0)
     (ret))
 
   (define-proc (allocator-alloc hl bc a)

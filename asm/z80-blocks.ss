@@ -8,7 +8,8 @@
     when unless
     ld-inc dec-ld
     loop-byte loop-word
-    define-proc define-procs)
+    define-proc define-procs
+    ret-c ret-nc)
   (import
     (asm lang)
     (asm z80)
@@ -109,6 +110,10 @@
 
     ((dec-ld (hl) bc)  (dec-ld (hl) b) (dec-ld (hl) c))
     ((dec-ld (hl) de)  (dec-ld (hl) d) (dec-ld (hl) e)))
+
+  (define-ops (keywords c nc)
+    ((ret-c) (scf) (ret))
+    ((ret-nc) (rcf) (ret)))
 
   (define-syntax (define-proc $syntax)
     (syntax-case $syntax ()
