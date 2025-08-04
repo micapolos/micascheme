@@ -1,8 +1,8 @@
-(library (zx-next bump-allocator)
+(library (zx-next allocator)
   (export
-    bump-allocator-size
-    bump-allocator-init
-    bump-allocator-alloc)
+    allocator-size
+    allocator-init
+    allocator-alloc)
   (import
     (zx-next core)
     (zx-next bump-pointer))
@@ -15,9 +15,9 @@
     (size-mask #b00011111)
     (slot 7)
     (slot-tag #b11100000)
-    (bump-allocator-size 2))
+    (allocator-size 2))
 
-  (define-asm bump-allocator-init-proc
+  (define-asm allocator-init-proc
     (input (hl - bump allocator ptr))
     (preserve (hl)
       (ld e slot-tag)
@@ -29,15 +29,15 @@
     (ret))
 
   (define-ops (keywords hl)
-    ((bump-allocator-init hl)
-      (call bump-allocator-init-proc))
-    ((bump-allocator-init ptr)
+    ((allocator-init hl)
+      (call allocator-init-proc))
+    ((allocator-init ptr)
       (ld hl ptr)
-      (bump-allocator-init hl)))
+      (allocator-init hl)))
 
-  (define-fragment bump-allocator-alloc-proc
+  (define-fragment allocator-alloc-proc
     (input
-      (hl - bump-allocator pointer)
+      (hl - allocator pointer)
       (bc - size in bits 12 ... 0)
       (a - tag in bits 7 ... 5))
     (output
@@ -65,7 +65,7 @@
       ; BC = bump-pointer
       (ld bc hl))
 
-    ; Write back bump pointer to bump-allocator
+    ; Write back bump pointer to allocator
     (ld (hl) b)
     (dec hl)
     (ld (hl) c)
@@ -74,11 +74,11 @@
     (ret))
 
   (define-ops (keywords hl bc a)
-    ((bump-allocator-alloc hl bc a)
-      (call bump-allocator-alloc-proc))
-    ((bump-allocator-alloc ptr size tag)
+    ((allocator-alloc hl bc a)
+      (call allocator-alloc-proc))
+    ((allocator-alloc ptr size tag)
       (ld hl ptr)
       (ld bc size)
       (ld a tag)
-      (bump-allocator-alloc hl bc a)))
+      (allocator-alloc hl bc a)))
 )

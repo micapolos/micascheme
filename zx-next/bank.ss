@@ -3,7 +3,9 @@
     banks-init
     bank-alloc
     bank-free
-    write-banks)
+    bank-free?
+    write-banks
+    load-free-banks)
   (import
     (zx-next core)
     (zx-next debug)
@@ -36,6 +38,10 @@
     (add hl a)
     (ret))
 
+  (define-ops (keywords a)
+    ((load-free-banks a)
+      (ld a (banks-free))))
+
   (define-asm bank-free?
     (input (a bank-index))
     (output (z free?))
@@ -45,7 +51,8 @@
     (ret))
 
   (define-asm bank-alloc
-    (output (a non-zero type) (fc out-of-memory))
+    (input (a non-zero bank type))
+    (output (a bank index) (fc out-of-memory))
 
     ; e - status
     (ld e a)
@@ -66,6 +73,7 @@
         (ld (hl) e)
         (ld hl banks-free)
         (dec (hl))
+        (ld a (bank-current))
         (rcf)
         (ret))))
 

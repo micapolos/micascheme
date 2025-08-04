@@ -9,6 +9,7 @@
     define-value
     define-constant
     define-constants
+    define-struct
     proc data
     block
     (rename
@@ -233,4 +234,7 @@
 
   (define-rule-syntax (org) (check-asm x ... out)
     (check (equal? (asm->datum (asm x ...)) 'out)))
+
+  (define-rule-syntax (define-struct x ...)
+    (begin))
 )

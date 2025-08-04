@@ -5,5 +5,5 @@
   (zx-next rgb)
   (zx-next tagged)
   (zx-next bump-pointer)
-  ;(zx-next bump-allocator)
+  (zx-next allocator)
   (zx-next lookup))
