@@ -25,7 +25,7 @@
     (input (hl - allocator))
     (preserve (hl)
       (ld e slot-tag)
-      (call bump-pointer-init)
+      (bump-pointer-init e)
       (ex de hl))
     (ld (hl) e)
     (inc hl)
@@ -65,7 +65,7 @@
 
       ; HL = advanced bump pointer
       ; DE = allocated pointer
-      (call bump-pointer-alloc)
+      (bump-pointer-alloc hl de bc)
 
       ; BC = bump-pointer
       (ld bc hl))

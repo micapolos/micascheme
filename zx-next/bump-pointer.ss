@@ -1,7 +1,9 @@
 (library (zx-next bump-pointer)
   (export
     bump-pointer-init
-    bump-pointer-alloc)
+    bump-pointer-init-tc
+    bump-pointer-alloc
+    bump-pointer-alloc-tc)
   (import (zx-next core))
 
   ; Bump pointer is used for allocation within a 8K bank in dedicated slot.
@@ -14,9 +16,10 @@
     (tag-mask #b11100000)
     (size-mask #b00011111))
 
-  (define-asm bump-pointer-init
+  (define-proc (bump-pointer-init e)
     (input (e - allocation slot in bits 7 ... 5))
     (output (hl - bump pointer))
+
     ; initialize pointer
     (ld h e)
     (ld l 0)
@@ -28,7 +31,7 @@
 
     (ret))
 
-  (define-asm bump-pointer-alloc
+  (define-proc (bump-pointer-alloc hl de bc)
     (input
       (de - non-zero tag in bits 7 ... 5 / allocation slot in bits 7 ... 5)
       (hl - bump pointer / out of memory if outside of allocation slot)
@@ -42,7 +45,7 @@
     (ld a h)
     (and tag-mask)
     (cp e)
-    (when nz (scf) (ret))
+    (when nz (ret-c))
 
     ; Increment bump pointer to check for overflow
     (preserve (hl)
@@ -62,7 +65,7 @@
       (and tag-mask)
       (cp e))
 
-    (when nz (scf) (ret))
+    (when nz (ret-c))
 
     ; Write size with tag
     (ld (hl) c)
@@ -84,6 +87,5 @@
     (dec hl)
 
     ; Reset carry on success
-    (rcf)
-    (ret))
+    (ret-nc))
 )
