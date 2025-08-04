@@ -81,4 +81,7 @@
           (scf)))
         (while nc))
     (writeln "\rAllocated " b " banks."))
+
+  ; TODO
+  (case free-all)
 )
