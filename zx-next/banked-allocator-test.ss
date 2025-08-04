@@ -19,12 +19,21 @@
     (assert-word ((+ banked-allocator banked-allocator-allocator)) #xe100)
     (assert-byte ((+ banked-allocator banked-allocator-banks 0)) 1))
 
-  ; (case alloc-00fe
-  ;   (banked-allocator-alloc banked-allocator #x00fe #xa0)
-  ;   (assert nc)
-  ;   (assert de #xe102)
-  ;   (assert-byte ((+ banked-allocator banked-allocator-current-bank)) 0)
-  ;   (assert-word ((+ banked-allocator banked-allocator-allocator)) #xe200)
-  ;   (assert-byte ((+ banked-allocator banked-allocator-banks 0)) 1))
+  (case alloc-10fe
+    (banked-allocator-alloc banked-allocator (tagged-word #xa0 #x10fe))
+    (assert nc)
+    (assert de #xe102)
+    (assert-byte ((+ banked-allocator banked-allocator-current-bank)) 0)
+    (assert-word ((+ banked-allocator banked-allocator-allocator)) #xf200)
+    (assert-byte ((+ banked-allocator banked-allocator-banks 0)) 1))
+
+  (case alloc-0ffe
+    (banked-allocator-alloc banked-allocator (tagged-word #xa0 #x0ffe))
+    (assert nc)
+    (assert de #xe002)
+    (assert-byte ((+ banked-allocator banked-allocator-current-bank)) 1)
+    (assert-word ((+ banked-allocator banked-allocator-allocator)) #xf000)
+    (assert-byte ((+ banked-allocator banked-allocator-banks 0)) 1)
+    (assert-byte ((+ banked-allocator banked-allocator-banks 1)) 2))
 )
 

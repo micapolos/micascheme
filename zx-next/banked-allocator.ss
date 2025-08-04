@@ -45,7 +45,7 @@
     (ld c (hl))
 
     ; Page-in
-    (ld a (hl))
+    (ld a b)
     (mmu 7 a)
 
     ; Init allocator
