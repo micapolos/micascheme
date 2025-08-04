@@ -7,9 +7,12 @@
     while
     when unless
     ld-inc dec-ld
-    loop-byte loop-word)
+    loop-byte loop-word
+    define-proc define-procs)
   (import
-    (asm lang) (asm z80))
+    (asm lang)
+    (asm z80)
+    (except (micascheme) and or xor pop push break exit data define define-values reverse else unless if when))
 
   (define-keywords then else while)
 
@@ -106,4 +109,26 @@
 
     ((dec-ld (hl) bc)  (dec-ld (hl) b) (dec-ld (hl) c))
     ((dec-ld (hl) de)  (dec-ld (hl) d) (dec-ld (hl) e)))
+
+  (define-syntax (define-proc $syntax)
+    (syntax-case $syntax ()
+      ((_ (id reg ...) body ...)
+        (for-all identifier? #'(id reg ...))
+        (lets
+          ($proc (identifier-append #'id #'id #'- #'proc))
+          ($tc (identifier-append #'id #'id #'- #'tc))
+          ($call #`(call #,$proc))
+          ($jp #`(jp #,$proc))
+          ($tmps (generate-temporaries #'(reg ...)))
+          ($lds (map-with ($reg #'(reg ...)) ($tmp $tmps) #`(ld #,$reg #,$tmp)))
+          #`(begin
+            (define-fragment #,$proc body ...)
+            (define-ops (keywords reg ...)
+              ((id reg ...) #,$call)
+              ((#,$tc reg ...) #,$jp)
+              ((id #,@$tmps) #,@$lds #,$call)
+              ((#,$tc #,@$tmps) #,@$lds #,$jp)))))))
+
+  (define-rule-syntax (define-procs (id . x) ...)
+    (begin (define-proc id . x) ...))
 )
