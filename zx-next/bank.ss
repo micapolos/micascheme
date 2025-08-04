@@ -14,10 +14,15 @@
     (zx-next mem)
     (zx-next mmu))
 
+  (define-values
+    (slot      7)
+    (base-addr #xe000)
+    (bank-size #x2000))
+
   (define-proc (bank-fill a l)
-    (mmu 7 a)
-    (ld de #xe000)
-    (ld bc #x2000)
+    (mmu slot a)
+    (ld de base-addr)
+    (ld bc bank-size)
     (ld a l)
     (mem-fill de bc a)
     (ret))
