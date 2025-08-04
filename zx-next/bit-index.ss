@@ -1,5 +1,7 @@
 (library (zx-next bit-index)
-  (export lbi bii bid)
+  (export
+    lbi bii bid
+    load-bit-index)
   (import (zx-next core))
 
   (define-ops (keywords de b)
@@ -49,4 +51,8 @@
       (rrca)
       (ld e a)
       (when c (dec d))))
+
+  (define-proc (load-bit-index b)
+    (lbi de b)
+    (ret))
 )

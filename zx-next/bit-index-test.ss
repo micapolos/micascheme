@@ -28,4 +28,13 @@
   (case bid-carry
     (ld de #x1201)
     (bid de)
-    (assert de #x1180)))
+    (assert de #x1180))
+
+  (case load-bit-index
+    (load-bit-index #x75)
+    (assert de #xc020))
+
+  (case load-bit-index
+    (ld b #x75)
+    (load-bit-index b)
+    (assert de #xc020)))
