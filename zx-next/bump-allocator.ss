@@ -43,11 +43,13 @@
     (output
       (cf - 0 ok / 1 overflow)
       (de - allocated-address))
+    ; de = bump pointer
+    (ld e (hl))
+    (inc hl)
+    (ld d (hl))
+
     (preserve (hl)
       ; hl = bump pointer
-      (ld e (hl))
-      (inc hl)
-      (ld d (hl))
       (ex de hl)
 
       ; E = slot-tag
