@@ -1,4 +1,4 @@
-(import (zx-next test) (zx-next terminal) (zx-next bank))
+(import (zx-next test) (zx-next terminal) (zx-next bank) (zx-next mem) (zx-next mmu))
 
 (test
   (case init
@@ -62,4 +62,23 @@
     (ld a #x02)
     (call bank-free?)
     (assert nz))
+
+  (case alloc-all
+    (ld b 0)
+    (loop
+      (ld a #x34)
+      (preserve (bc) (call bank-alloc))
+      (if nc
+        (then
+          (mmu 7 a)
+          (preserve (bc)
+            (write #\.)
+            (mem-fill #xe000 #x2000 #xbb))
+          (inc b)
+          (rcf))
+        (else
+          (preserve (bc) (write #\!))
+          (scf)))
+        (while nc))
+    (writeln "\rAllocated " b " banks."))
 )
