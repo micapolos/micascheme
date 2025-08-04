@@ -32,6 +32,7 @@
     rla rlca rra rrca
 
     bsla bsra bsrl bsrf brlc
+    setae
 
     in
 
@@ -907,6 +908,8 @@
     ((bsrl de b)       (db #xed #x2a))
     ((bsrf de b)       (db #xed #x2b))
     ((brlc de b)       (db #xed #x2c))
+
+    ((setae)           (db #xed #x95))
 
     ; Helpers
     ((rcf)             (or a))
