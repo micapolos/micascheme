@@ -29,6 +29,7 @@
 
     cpd cpdr cpi cpir ldd lddr ldi ldir
 
+    rlc rrc
     rla rlca rra rrca
 
     bsla bsra bsrl bsrf brlc
@@ -821,6 +822,24 @@
     ((ldir)            (db #xed #xb0))
 
     ; Shift/rotate
+    ((rlc b)           (db #xcb #b00000000))
+    ((rlc c)           (db #xcb #b00000001))
+    ((rlc d)           (db #xcb #b00000010))
+    ((rlc e)           (db #xcb #b00000011))
+    ((rlc h)           (db #xcb #b00000100))
+    ((rlc l)           (db #xcb #b00000101))
+    ((rlc (hl))        (db #xcb #b00000110))
+    ((rlc a)           (db #xcb #b00000111))
+
+    ((rrc b)           (db #xcb #b00001000))
+    ((rrc c)           (db #xcb #b00001001))
+    ((rrc d)           (db #xcb #b00001010))
+    ((rrc e)           (db #xcb #b00001011))
+    ((rrc h)           (db #xcb #b00001100))
+    ((rrc l)           (db #xcb #b00001101))
+    ((rrc (hl))        (db #xcb #b00001110))
+    ((rrc a)           (db #xcb #b00001111))
+
     ((rla)             (db #x17))
     ((rlca)            (db #x07))
     ((rra)             (db #x1f))

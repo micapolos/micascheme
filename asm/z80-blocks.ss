@@ -9,11 +9,12 @@
     ld-inc dec-ld
     loop-byte loop-word
     define-proc define-procs
-    ret-c ret-nc)
+    ret-c ret-nc
+    with)
   (import
     (asm lang)
     (asm z80)
-    (except (micascheme) and or xor pop push break exit data define define-values reverse else unless if when))
+    (except (micascheme) with and or xor pop push break exit data define define-values reverse else unless if when))
 
   (define-keywords then else while)
 
@@ -114,6 +115,20 @@
   (define-ops (keywords c nc)
     ((ret-c) (scf) (ret))
     ((ret-nc) (rcf) (ret)))
+
+  (define-ops (keywords ex exx af de hl)
+    ((with (exx) body ...)
+      (exx)
+      body ...
+      (exx))
+    ((with (ex af) body ...)
+      (ex af)
+      body ...
+      (ex af))
+    ((with (ex de hl) body ...)
+      (ex de hl)
+      body ...
+      (ex de hl)))
 
   (define-syntax (define-proc $syntax)
     (syntax-case $syntax ()
