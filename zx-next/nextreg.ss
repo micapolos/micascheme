@@ -1,5 +1,7 @@
 (library (zx-next nextreg)
-  (export nextreg-load nextreg-save)
+  (export
+    nextreg-load
+    nextreg-save)
   (import (zx-next core))
 
   ; preserves regs

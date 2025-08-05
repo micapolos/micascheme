@@ -4,12 +4,12 @@
   (mmu 7 a)
   (mmu 7 #x20)
 
-  (ld e 2)
-  (ld a #x40)
-  (mmu e a)
+  (ld a 2)
+  (ld e #x40)
+  (mmu a e)
 
-  (ld e 3)
-  (ld a #x41)
-  (mmu e a)
+  (ld a 3)
+  (ld e #x41)
+  (mmu a e)
 
   (break))

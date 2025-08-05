@@ -846,6 +846,15 @@
     ((rrca)            (db #x0f))
 
     ; Output
+    ((out (c) b)       (db #xed #b01000001))
+    ((out (c) c)       (db #xed #b01001001))
+    ((out (c) d)       (db #xed #b01010001))
+    ((out (c) e)       (db #xed #b01011001))
+    ((out (c) h)       (db #xed #b01100001))
+    ((out (c) l)       (db #xed #b01101001))
+    ((out (c) 0)       (db #xed #b01110001))
+    ((out (c) a)       (db #xed #b01111001))
+
     ((out (n) a)       (db #xd3 n))
 
     ; Jump
@@ -916,8 +925,16 @@
     ((in a (c))        (db #xed #b01111000))
 
     ; Next
+    ((nextreg a e)
+      (ld bc #x243b)
+      (out (c) a)
+      (ld a e)
+      (inc b)
+      (out (c) a))
+
     ((nextreg n a)     (db #xed #x92 n))
     ((nextreg n n2)    (db #xed #x91 n n2))
+
     ((swapnib)         (db #xed #x23))
     ((mul d e)         (db #xed #x30))
     ((push nm)         (db #xed #x8a) (dw nm))
