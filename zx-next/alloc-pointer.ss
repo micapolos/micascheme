@@ -1,9 +1,9 @@
-(library (zx-next bump-pointer)
+(library (zx-next alloc-pointer)
   (export
-    bump-pointer-init
-    bump-pointer-init-tc
-    bump-pointer-alloc
-    bump-pointer-alloc-tc)
+    alloc-pointer-init
+    alloc-pointer-init-tc
+    alloc-pointer-alloc
+    alloc-pointer-alloc-tc)
   (import
     (zx-next core)
     (zx-next tag))
@@ -14,12 +14,12 @@
   ; Allocation starts with tagged size followed by allocated region of memory.
   ; Maximum allocable region is #1ffe.
 
-  (define-proc (bump-pointer-init hl)
+  (define-proc (alloc-pointer-init hl)
     (inc hl)
     (ld (hl) 0)
     (ret))
 
-  (define-proc (bump-pointer-alloc hl bc)
+  (define-proc (alloc-pointer-alloc hl bc)
     (input
       (hl - bump pointer)
       (bc - tagged size))

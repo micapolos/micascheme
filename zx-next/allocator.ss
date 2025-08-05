@@ -7,7 +7,7 @@
     allocator-alloc-tc)
   (import
     (zx-next core)
-    (zx-next bump-pointer))
+    (zx-next alloc-pointer))
 
   ; Allocation happens in slot 7.
 
@@ -30,7 +30,7 @@
 
     ; Initalize first allcation entry
     (ex de hl)
-    (bump-pointer-init-tc hl))
+    (alloc-pointer-init-tc hl))
 
   (define-proc (allocator-alloc hl bc)
     (input
@@ -51,9 +51,9 @@
 
       ; HL = advanced bump pointer
       ; DE = allocated pointer
-      (bump-pointer-alloc hl bc)
+      (alloc-pointer-alloc hl bc)
 
-      ; BC = bump-pointer
+      ; BC = alloc-pointer
       (ld bc hl))
 
     ; Write back bump pointer to allocator
