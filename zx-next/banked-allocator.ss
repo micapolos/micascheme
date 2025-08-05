@@ -13,7 +13,9 @@
     (zx-next core)
     (zx-next allocator)
     (zx-next bank-alloc)
-    (zx-next mmu))
+    (zx-next mmu)
+    (zx-next write)
+    (zx-next debug))
 
   (define-values
     (bank-type  #x01)
@@ -22,6 +24,19 @@
     (banked-allocator-current-bank       0)          ; (db #xff)
     (banked-allocator-allocator          1)          ; (dw 0)
     (banked-allocator-banks              3))         ; (ds 128)
+
+  (define-proc (banked-allocator-page-in hl)
+    (ld a (hl))
+    (cp #xff)
+    (ret z)
+
+    (inc hl)
+    (inc hl)
+    (inc hl)
+    (ld a (hl))
+
+    (mmu 7 a)
+    (ret))
 
   (define-proc (banked-allocator-alloc-bank hl)
     (input (hl - banked-allocator))
@@ -78,13 +93,17 @@
     ; Try to allocate
     ; DE = allocated address
     (preserve (hl bc)
+      ; Page in
+      (preserve (hl bc af) (banked-allocator-page-in hl))
+
+      ; Allocate within paged-in bank
       (inc hl)
       (allocator-alloc hl bc))
 
     ; Return on success.
     (ret nc)
 
-    ; Allocated new bank.
+    ; Otherwise, allocate new bank.
     (preserve (hl bc) (banked-allocator-alloc-bank hl))
     (ret c)
 

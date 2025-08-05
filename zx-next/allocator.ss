@@ -39,6 +39,7 @@
     (output
       (cf - 0 ok / 1 overflow)
       (de - allocated-address))
+
     ; de = bump pointer
     (ld e (hl))
     (inc hl)
