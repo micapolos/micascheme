@@ -10,7 +10,8 @@
     loop-byte loop-word
     define-proc define-procs
     ret-c ret-nc
-    with)
+    with
+    pop-regs push-regs preserve-regs)
   (import
     (asm lang)
     (asm z80)
@@ -129,6 +130,40 @@
       (ex de hl)
       body ...
       (ex de hl)))
+
+  (define-ops
+    ((pop-regs)
+      (pop af)
+      (pop hl)
+      (pop bc)
+      (pop de)
+      (exx) (ex af)
+      (pop af)
+      (pop hl)
+      (pop bc)
+      (pop de)
+      (exx) (ex af)
+      (pop ix)
+      (pop iy))
+
+    ((push-regs)
+      (push iy)
+      (push ix)
+      (exx) (ex af)
+      (push de)
+      (push bc)
+      (push hl)
+      (push af)
+      (exx) (ex af)
+      (push de)
+      (push bc)
+      (push hl)
+      (push af)))
+
+  (define-op (preserve-regs body ...)
+    (push-regs)
+    body ...
+    (pop-regs))
 
   (define-syntax (define-proc $syntax)
     (syntax-case $syntax ()

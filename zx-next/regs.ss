@@ -13,11 +13,8 @@
 
     reg-load
     regs-size
-    push-regs
-    pop-regs
     write-regs
 
-    preserve-regs
     capture-regs
     captured-regs
 
@@ -64,40 +61,6 @@
 
   (define-value regs-size 20)
   (define-fragment captured-regs (ds 20))
-
-  (define-ops
-    ((pop-regs)
-      (pop af)
-      (pop hl)
-      (pop bc)
-      (pop de)
-      (exx) (ex af)
-      (pop af)
-      (pop hl)
-      (pop bc)
-      (pop de)
-      (exx) (ex af)
-      (pop ix)
-      (pop iy))
-
-    ((push-regs)
-      (push iy)
-      (push ix)
-      (exx) (ex af)
-      (push de)
-      (push bc)
-      (push hl)
-      (push af)
-      (exx) (ex af)
-      (push de)
-      (push bc)
-      (push hl)
-      (push af)))
-
-  (define-op (preserve-regs body ...)
-    (push-regs)
-    body ...
-    (pop-regs))
 
   (define-op (capture-regs)
     (push-regs)
