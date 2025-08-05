@@ -18,8 +18,10 @@
       (de allocated-address)
       (mmu paged-in))
 
+    ; E = bank
+    (ld e a)
+
     ; A = slot
-    (ex af)
     (ld a h)
     (rlca)
     (rlca)
@@ -27,38 +29,22 @@
     (and #x7)
 
     ; mmu in correct slot
-    (dispatch
-      (begin (ex af) (nextreg #x40 a))
-      (begin (ex af) (nextreg #x41 a))
-      (begin (ex af) (nextreg #x42 a))
-      (begin (ex af) (nextreg #x43 a))
-      (begin (ex af) (nextreg #x44 a))
-      (begin (ex af) (nextreg #x45 a))
-      (begin (ex af) (nextreg #x46 a))
-      (begin (ex af) (nextreg #x47 a)))
+    (preserve (bc) (mmu bc a e))
 
     ; Allocate in that bank
-    (preserve (hl bc) (alloc-pointer-alloc hl bc))
+    (preserve (hl bc de) (alloc-pointer-alloc hl bc))
 
     ; Allocation OK? Return.
     (ret nc)
 
     ; Out of memory in this bank, allocate new one and repeat
-    (preserve (hl bc) (bank-alloc))
+    (preserve (hl bc de) (bank-alloc))
 
     ; No more banks? return with out-of-memory
     (ret c)
 
     ; mmu in correct slot
-    (dispatch
-      (begin (ex af) (nextreg #x40 a))
-      (begin (ex af) (nextreg #x41 a))
-      (begin (ex af) (nextreg #x42 a))
-      (begin (ex af) (nextreg #x43 a))
-      (begin (ex af) (nextreg #x44 a))
-      (begin (ex af) (nextreg #x45 a))
-      (begin (ex af) (nextreg #x46 a))
-      (begin (ex af) (nextreg #x47 a)))
+    (preserve (bc) (mmu bc a e))
 
     (alloc-pointer-alloc-tc hl bc))
 )
