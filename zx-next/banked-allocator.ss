@@ -12,7 +12,7 @@
   (import
     (zx-next core)
     (zx-next allocator)
-    (zx-next bank)
+    (zx-next bank-alloc)
     (zx-next mmu))
 
   (define-values
@@ -34,7 +34,7 @@
 
     ; a = allocated bank
     (ld a bank-type)
-    (preserve (hl) (call bank-alloc))
+    (preserve (hl) (bank-alloc))
     (ret c)
 
     ; b = allocated bank
