@@ -1,11 +1,21 @@
 (library (zx-next banked-alloc-pointer)
-  (export)
+  (export
+    banked-alloc-pointer-init
+    banked-alloc-pointer-alloc)
   (import
     (zx-next core)
-    (zx-next alloc-pointer))
+    (zx-next alloc-pointer)
+    (zx-next bank-alloc)
+    (zx-next mmu))
 
   ; Banked alloc pointer consists of 8-byte bank and address.
   ; It's passed in A HL registers.
+
+  (define-proc (banked-alloc-pointer-init a hl)
+    (input (a bank) (hl pointer))
+    (inc hl)
+    (ld (hl) 0)
+    (ret))
 
   (define-proc (banked-alloc-pointer-alloc a hl bc)
     (input
@@ -29,7 +39,7 @@
     (and #x7)
 
     ; mmu in correct slot
-    (preserve (bc) (mmu bc a e))
+    (preserve (bc) (mmu a e))
 
     ; Allocate in that bank
     (preserve (hl bc de) (alloc-pointer-alloc hl bc))
@@ -44,7 +54,7 @@
     (ret c)
 
     ; mmu in correct slot
-    (preserve (bc) (mmu bc a e))
+    (preserve (bc) (mmu a e))
 
     (alloc-pointer-alloc-tc hl bc))
 )
