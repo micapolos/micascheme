@@ -1,5 +1,7 @@
 (library (zx-next bank-alloc)
-  (export bank-alloc)
+  (export
+    bank-alloc
+    bank-alloc-all)
   (import
     (zx-next core)
     (zx-next bank-table))
@@ -76,4 +78,10 @@
     ; Out of banks
     (scf)
     (ret))
+
+  ; Allocates all banks, for testing purposes.
+  (define-proc (bank-alloc-all)
+    (loop
+      (bank-alloc)
+      (ret c)))
 )

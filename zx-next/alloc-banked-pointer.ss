@@ -11,23 +11,9 @@
   ; Banked alloc pointer consists of 8-byte bank and address.
   ; It's passed in A HL registers.
 
-  (define-proc (alloc-banked-pointer-init a hl)
-    (input (a bank) (hl pointer))
-    (inc hl)
-    (ld (hl) 0)
-    (ret))
-
-  (define-proc (alloc-banked-pointer-alloc a hl bc)
-    (input
-      (a bank)
-      (hl alloc-pointer)
-      (bc tagged size))
-    (output
-      (fc 0 ok / 1 out-of-memory)
-      (a allocated-bank)
-      (de allocated-address)
-      (mmu paged-in))
-
+  (define-proc (page-in a hl)
+    (input (a bank) (hl address))
+    (output (hl preserved) (de preserved))
     ; E = bank
     (ld e a)
 
@@ -39,22 +25,89 @@
     (and #x7)
 
     ; mmu in correct slot
-    (preserve (bc) (mmu a e))
+    (mmu a e)
+    (ret))
+
+  (define-proc (alloc-banked-pointer-init a hl)
+    (input (a bank) (hl pointer))
+    (output (a bank) (hl initialized pointer) (mmu paged-in))
+
+    (preserve (af)
+      (page-in a hl)
+
+      ; Reset pointer
+      (ld a h)
+      (and #xe0)
+      (ld h a)
+      (ld l 0)
+
+      (inc hl)
+      (ld (hl) 0)
+      (dec hl))
+
+    (ret))
+
+  (define-proc (alloc-banked-pointer-alloc a hl bc)
+    (input
+      (a bank)
+      (hl banked-alloc-pointer)
+      (bc tagged size))
+    (output
+      (fc 0 ok / 1 out-of-memory)
+      (de allocated-address)
+      (a advanced-bank)
+      (hl advanced-banked-alloc-pointer)
+      (mmu paged-in))
 
     ; Allocate in that bank
-    (preserve (hl bc de) (alloc-pointer-alloc hl bc))
+    (preserve (af hl bc)
+      ; Page-in target bank.
+      (preserve (bc) (page-in a hl))
 
-    ; Allocation OK? Return.
-    (ret nc)
+      ; Allocate in target bank.
+      (alloc-pointer-alloc hl bc)
 
-    ; Out of memory in this bank, allocate new one and repeat
-    (preserve (hl bc de) (bank-alloc))
+      ; Allocation OK? Return.
+      (when nc
+        ; Return preserving A, HL, DE
+        (pop bc)
+        (pop bc)
+        (pop af)
+        (rcf)
+        (ret)))
 
-    ; No more banks? return with out-of-memory
-    (ret c)
+    ; Allocate new bank
+    (push af)
+    (push hl)
+    (push bc)
+    (bank-alloc)
 
-    ; mmu in correct slot
-    (preserve (bc) (mmu a e))
+    ; No more banks?
+    (when c
+      ; Return C, preserving A HL BC.
+      (pop bc)
+      (pop hl)
+      (pop af)
+      (scf)
+      (ret))
 
-    (alloc-pointer-alloc-tc hl bc))
+    (pop bc)
+    (pop hl)
+    (pop de) ; preserve newly allocated bank in A
+
+    ; Initialize alloc pointer in new bank.
+    (preserve (bc)
+      (alloc-banked-pointer-init a hl))
+
+    ; Allocate in the new bank, preserving A
+    (preserve (af)
+      (alloc-pointer-alloc hl bc)
+      (when c
+        (pop af)
+        (scf)
+        (ret)))
+
+    ; Success.
+    (rcf)
+    (ret))
 )
