@@ -8,7 +8,7 @@
     (zx-next core)
     (zx-next tag))
 
-  ; Bump pointer is used for allocation within a 8K bank in dedicated slot.
+  ; alloc pointer is used for allocation within a 8K bank in dedicated slot.
   ; It's a 13-bit address tagged with slot number.
   ; Address #x1fff means bank is full.
   ; Allocation starts with tagged size followed by allocated region of memory.
@@ -21,11 +21,11 @@
 
   (define-proc (alloc-pointer-alloc hl bc)
     (input
-      (hl - bump pointer)
+      (hl - alloc pointer)
       (bc - tagged size))
     (output
       (cf - 0 = ok / 1 = out of memory)
-      (hl - advanced bump pointer / preserved if out of memory)
+      (hl - advanced alloc pointer / preserved if out of memory)
       (de - allocated pointer if ok))
 
     ; Check out of memory
@@ -42,7 +42,7 @@
     (and tag-mask)
     (ld e a)
 
-    ; Increment bump pointer to check for overflow
+    ; Increment alloc pointer to check for overflow
     (preserve (bc hl)
       ; Increment by 2 bytes of tagged size
       (inc hl)
