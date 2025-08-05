@@ -9,6 +9,7 @@
   (zx-next bank-table)
   (zx-next bank-alloc)
   (zx-next alloc-pointer)
+  (zx-next alloc-banked-pointer)
   (zx-next allocator)
   (zx-next banked-allocator)
   (zx-next lookup))
