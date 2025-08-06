@@ -11,11 +11,7 @@
     banked-allocator-alloc-tc)
   (import
     (zx-next core)
-    (zx-next allocator)
-    (zx-next bank-alloc)
-    (zx-next mmu)
-    (zx-next write)
-    (zx-next debug))
+    (zx-next alloc-banked-pointer))
 
   (define-values
     (bank-type  #x01)

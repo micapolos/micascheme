@@ -9,39 +9,44 @@
 (define-fragment bank (db 0))
 
 (test
-  (mmu 7 #x40)
-  (mem-fill #xe000 #x2000 #xbb)
-
-  ; We know that this is the first available bank, but it may not always be true.
+  ; We know that the first two banks are 1 and 2, but it may not always be true.
   ; Update bank-alloc to allow querying the next available bank.
   (mmu 7 #x01)
   (mem-fill #xe000 #x2000 #xbb)
+  (mmu 7 #x02)
+  (mem-fill #xe000 #x2000 #xbb)
 
-  (case alloc-banked-pointer-init
-    (alloc-banked-pointer-init #x40 #xf800)
-    (mmu 7 #x40)
-    (assert a #x40)
-    (assert hl #xe000)
-    (assert-word (#xe000) #x00bb))
-
-  (case alloc-banked-pointer-alloc
-    (alloc-banked-pointer-alloc #x40 #xe000 (tagged-word #xa0 #x17fe))
-    (assert nc)
-    (assert a #x40)
-    (assert hl #xf800)
-    (assert de #xe002)
-    (mmu 7 #x40)
-    (assert-word (#xe000) (tagged-word #xa0 #x17fe))
-    (assert-word (#xf800) #x00bb))
-
-  (case alloc-banked-pointer-alloc/bank-overflow
-    (alloc-banked-pointer-alloc #x40 #xf800 (tagged-word #xa0 #x17fe))
+  (case alloc-banked-pointer-new-bank-alloc
+    (alloc-banked-pointer-new-bank-alloc #xff #xf800 (tagged-word #xa0 #x17fd))
     (assert nc)
     (assert a #x01)
-    (mmu 7 a)
     (assert hl #xf800)
-    (assert de #xe002)
-    (assert-word (#xe000) (tagged-word #xa0 #x17fe))
+    (assert de #xe003)
+    (mmu 7 #x01)
+    (assert-word (#xe001) (tagged-word #xa0 #x17fd))
+    (assert-word (#xf800) #x00bb))
+
+  (case alloc-banked-pointer-same-bank-alloc
+    (alloc-banked-pointer-alloc #x01 #xf800 (tagged-word #xa0 #x00fe))
+    (assert nc)
+    (assert a #x01)
+    (assert hl #xf900)
+    (assert de #xf802)
+    (mmu 7 #x01)
+    (assert-word (#xf800) (tagged-word #xa0 #x00fe))
+    (assert-word (#xf900) #x00bb))
+
+  (case alloc-banked-pointer-alloc/bank-overflow
+    (alloc-banked-pointer-alloc #x01 #xf800 (tagged-word #xa0 #x17fd))
+    (assert nc)
+    (assert a #x02)
+    (assert hl #xf800)
+    (assert de #xe003)
+    (mmu 7 #x01)
+    (assert-byte (#xe000) #x02)
+    (mmu 7 #x02)
+    (assert-byte (#xe000) #xff)
+    (assert-word (#xe001) (tagged-word #xa0 #x17fd))
     (assert-word (#xf800) #x00bb))
 
   (bank-alloc-all)
