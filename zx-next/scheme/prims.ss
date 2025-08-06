@@ -15,7 +15,7 @@
   ; All procedures use __sdcccall(1) calling convention.
   ; If no value is passed in registers, offset to the value is passed in A.
 
-  (define-expression (value n mm)
+  (define-expression (value offset n mm)
     (fxior (fxsll n 16) mm))
 
   (define-ops
