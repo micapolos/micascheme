@@ -1,13 +1,50 @@
 (library (zx-next scheme prims)
   (export
-    cons
-    cons-tc)
+    value
+    value-data
+    pair-data
+    unbox unbox-tc
+    car car-tc
+    cdr cdr-tc
+    cons cons-tc)
   (import
     (zx-next core)
-    (zx-next scheme alloc))
+    (zx-next scheme alloc)
+    (zx-next banked-pointer))
 
-  ; DEHL - car, where D = 4 (offset to previous entry on the stack)
-  ; stack - cdr (4 bytes)
+  ; All procedures use __sdcccall(1) calling convention.
+  ; If no value is passed in registers, offset to the value is passed in A.
+
+  (define-expression (value n mm)
+    (fxior (fxsll n 16) mm))
+
+  (define-ops
+    ((value-data value)
+      (dw (fxand #xffff value))
+      (db (fxsrl value 16)))
+    ((pair-data car cdr)
+      (value-data car)
+      (value-data cdr)))
+
+  (define-proc (unbox)
+    (ld a e)
+    (preserve (de) (banked-pointer-page-in a hl))
+    (ld c (hl))
+    (inc hl)
+    (ld b (hl))
+    (inc hl)
+    (ld e (hl))
+    (ld h c)
+    (ld l b)
+    (ret))
+
+  (define-proc (car)
+    (unbox-tc))
+
+  (define-proc (cdr)
+    (add hl 3)
+    (unbox-tc))
+
   (define-proc (cons)
     ; Push car on the stack
     (push de)

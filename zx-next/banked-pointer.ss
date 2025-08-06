@@ -1,5 +1,7 @@
 (library (zx-next banked-pointer)
-  (export banked-pointer-page-in)
+  (export
+    banked-pointer-page-in
+    banked-pointer-page-in-tc)
   (import
     (zx-next core)
     (zx-next mmu))
