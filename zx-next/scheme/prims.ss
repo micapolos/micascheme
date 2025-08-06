@@ -1,6 +1,8 @@
 (library (zx-next scheme prims)
   (export
     value
+    byte-value
+    word-value
     value-data
     pair-data
     box box-tx
@@ -11,13 +13,27 @@
   (import
     (zx-next core)
     (zx-next scheme alloc)
-    (zx-next banked-pointer))
+    (zx-next banked-pointer)
+    (zx-next scheme tag))
 
   ; All procedures use __sdcccall(1) calling convention.
-  ; If no value is passed in registers, offset to the value is passed in A.
+  ; There are two types of procedures: primitive and non-primitive.
+  ; Primitive procedures can only call other primitive ones.
+  ; Non-primitive procedures can call primitive and non-primitive ones.
+  ; You can pass values only to non-primitive procedures.
+  ; If no value is passed in registers to non-primitive procedure,
+  ; offset to the top value on the stack must be passed in A.
 
   (define-expression (value offset n mm)
     (fxior (fxsll n 16) mm))
+
+  (define-expression (byte-value offset n)
+    (value offset n (tagged-word byte-tag 0)))
+
+  (define-expression (word-value offset nn)
+    (value offset
+      (fxand #xff nn)
+      (tagged-word word-tag (fxsrl nn 8))))
 
   (define-ops
     ((value-data value)
