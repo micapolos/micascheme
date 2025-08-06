@@ -4,6 +4,7 @@
   (zx-next test)
   (zx-next mmu)
   (zx-next rgb)
+  (zx-next call-frame)
   (zx-next lookup)
   (zx-next tagged)
   (zx-next bit-index)
