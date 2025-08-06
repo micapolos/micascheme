@@ -137,19 +137,19 @@
   (define-proc (load-null d)
     (input (d offset))
     (ld e 0)
-    (ld hl null-word)
+    (ld hl null-constant-word)
     (ret))
 
   (define-proc (load-false d)
     (input (d offset))
     (ld e 0)
-    (ld hl false-word)
+    (ld hl false-constant-word)
     (ret))
 
   (define-proc (load-true d)
     (input (d offset))
     (ld e 0)
-    (ld hl true-word)
+    (ld hl true-constant-word)
     (ret))
 
   (define-proc (ref)

@@ -26,49 +26,49 @@
     (load-value (null-value offset-1))
     (null?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl true-word))
+    (assert hl true-constant-word))
 
   (case not-null?
     (load-value (byte-value offset-1 #x12))
     (null?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl false-word))
+    (assert hl false-constant-word))
 
   (case byte?
     (load-value (byte-value offset-1 #x12))
     (byte?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl true-word))
+    (assert hl true-constant-word))
 
   (case not-byte?
     (load-value (word-value offset-1 #x1234))
     (byte?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl false-word))
+    (assert hl false-constant-word))
 
   (case word?
     (load-value (word-value offset-1 #x1234))
     (word?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl true-word))
+    (assert hl true-constant-word))
 
   (case not-word?
     (load-value (byte-value offset-1 #x12))
     (word?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl false-word))
+    (assert hl false-constant-word))
 
   (case pair?
     (load-value (pair-value offset-1 pair-data-1))
     (pair?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl (tagged-word constant-tag true-word)))
+    (assert hl (tagged-word constant-tag true-constant-word)))
 
   (case not-pair?
     (load-value (byte-value offset-1 #x12))
     (pair?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl (tagged-word constant-tag false-word)))
+    (assert hl (tagged-word constant-tag false-constant-word)))
 
   (case unsafe-unbox
     (ld de (offset/byte #x04 #x00))

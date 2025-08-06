@@ -6,9 +6,9 @@
     string-constant
     symbol-constant
 
-    null-word
-    true-word
-    false-word)
+    null-constant-word
+    true-constant-word
+    false-constant-word)
   (import
     (zx-next core)
     (zx-next tag)
@@ -26,7 +26,7 @@
     (symbol-constant (constant #x12)))
 
   (define-values
-    (null-word  (fxsll null-constant 8))
-    (false-word (fxsll false-constant 8))
-    (true-word  (fxsll true-constant 8)))
+    (null-constant-word  (fxsll null-constant 8))
+    (false-constant-word (fxsll false-constant 8))
+    (true-constant-word  (fxsll true-constant 8)))
 )
