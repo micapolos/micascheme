@@ -5,7 +5,7 @@
     word-value
     value-data
     pair-data
-    box box-tx
+    box box-tc
     unbox unbox-tc
     car car-tc
     cdr cdr-tc
@@ -24,21 +24,28 @@
   ; If no value is passed in registers to non-primitive procedure,
   ; 8-bit offset to the top value on the stack is passed as first argument.
 
-  (define-expression (value offset n mm)
-    (fxior (fxsll n 16) mm))
+  (define-expression (value offset byte tagged-word)
+    (fxior
+      (fxsll offset 24)
+      (fxsll byte 16)
+      tagged-word))
 
-  (define-expression (byte-value offset n)
-    (value offset n (tagged-word byte-tag 0)))
+  (define-expression (byte-value offset byte)
+    (value
+      offset
+      byte
+      (tagged-word byte-tag 0)))
 
-  (define-expression (word-value offset nn)
-    (value offset
-      (fxand #xff nn)
-      (tagged-word word-tag (fxsrl nn 8))))
+  (define-expression (word-value offset word)
+    (value
+      offset
+      (fxand #xff word)
+      (tagged-word word-tag (fxsrl word 8))))
 
   (define-ops
     ((value-data value)
       (dw (fxand #xffff value))
-      (db (fxsrl value 16)))
+      (db (fxand #xff (fxsrl value 16))))
     ((pair-data car cdr)
       (value-data car)
       (value-data cdr)))
@@ -78,8 +85,8 @@
     (ld b (hl))
     (inc hl)
     (ld e (hl))
-    (ld h c)
-    (ld l b)
+    (ld h b)
+    (ld l c)
     (ret))
 
   (define-proc (car)

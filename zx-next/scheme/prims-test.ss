@@ -2,13 +2,18 @@
   (zx-next test)
   (zx-next scheme prims))
 
-(define-fragment test-box
-  (value-data (value #x56 #x1234)))
+(define-values
+  (offset-1 #xa1)
+  (offset-2 #xa2)
+  (value-1 (value offset-1 #x45 #x0123))
+  (value-2 (value offset-2 #xcd #x89ab)))
 
-(define-fragment test-pair
-  (pair-data
-    (value #x56 #x1234)
-    (value #xbc #x789a)))
+(define-fragments
+  (test-box (value-data (value offset-1 #x56 #x1234)))
+  (test-pair
+    (pair-data
+      (value offset-1 #x56 #x1234)
+      (value offset-2 #xbc #x789a))))
 
 (test
   (case unbox
@@ -16,28 +21,21 @@
     (ld hl test-box)
     (unbox)
     (assert de #x0456)
-    (assert hl #x3412))
-
-  (case unbox
-    (ld de #x0400)
-    (ld hl test-box)
-    (unbox)
-    (assert de #x0456)
-    (assert hl #x3412))
+    (assert hl #x1234))
 
   (case car
     (ld de #x0400)
     (ld hl test-pair)
     (car)
     (assert de #x0456)
-    (assert hl #x3412))
+    (assert hl #x1234))
 
   (case cdr
     (ld de #x0400)
     (ld hl test-pair)
     (cdr)
     (assert de #x04bc)
-    (assert hl #x9a78))
+    (assert hl #x789a))
 
   (case cons
     ; Load cdr
