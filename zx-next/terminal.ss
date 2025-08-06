@@ -58,8 +58,8 @@
     (mem-clear tile-map tile-map-size)
 
     ; Copy font into tile defs
-    ;(ld hl font-topaz-8)
-    (ld hl #x3d00)
+    (ld hl font-topaz-8)
+    ;(ld hl #x3d00)
     (ld de tile-defs)
     (ld bc (* glyph-count glyph-size))
     (ldir)
