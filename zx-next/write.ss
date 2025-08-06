@@ -113,7 +113,7 @@
 
   (define-fragment write-word-literal
     (input (hl word))
-    (preserve (af)
+    (preserve (hl)
       (ld a #\$)
       (call write-char))
     (jp write-word))
@@ -182,7 +182,7 @@
       ((_ d) (call write-d))
       ((_ e) (call write-e))
       ((_ af) (call write-af))
-      ((_ hl) (call write-hl))
+      ((_ hl) (begin (break) (call write-hl)))
       ((_ bc) (call write-bc))
       ((_ de) (call write-de))
       ((_ sp) (call write-sp))

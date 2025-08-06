@@ -9,48 +9,57 @@
 
 (test
   (case init
-    (banked-allocator-init banked-allocator)
-    (assert-byte ((+ banked-allocator banked-allocator-current-bank)) #xff)
-    (assert-word ((+ banked-allocator banked-allocator-allocator)) #xffff))
+    (banked-allocator-init banked-allocator #xe000)
+    (assert-byte ((+ banked-allocator 0)) #xff)
+    (assert-word ((+ banked-allocator 1)) #xe000))
 
-  (case alloc-00fe
-    (banked-allocator-alloc banked-allocator (tagged-word #xa0 #x00fe))
+  (case alloc-new-bank
+    (banked-allocator-alloc banked-allocator (tagged-word #xa0 #x00fd))
     (assert nc)
-    (assert de #xe002)
-    (assert-byte ((+ banked-allocator banked-allocator-current-bank)) 0)
-    (assert-word ((+ banked-allocator banked-allocator-allocator)) #xe100)
-    (assert-byte ((+ banked-allocator banked-allocator-banks 0)) 1))
+    (assert a #x01)
+    (assert de #xe003)
+    (assert-byte ((+ banked-allocator 0)) #x01)
+    (assert-word ((+ banked-allocator 1)) #xe100))
 
-  (case alloc-10fe
+  (case alloc-same-bank
     (banked-allocator-alloc banked-allocator (tagged-word #xa0 #x10fe))
     (assert nc)
+    (assert a #x01)
     (assert de #xe102)
-    (assert-byte ((+ banked-allocator banked-allocator-current-bank)) 0)
-    (assert-word ((+ banked-allocator banked-allocator-allocator)) #xf200)
-    (assert-byte ((+ banked-allocator banked-allocator-banks 0)) 1))
+    (assert-byte ((+ banked-allocator 0)) #x01)
+    (assert-word ((+ banked-allocator 1)) #xf200))
 
-  (case alloc-0ffe
-    (banked-allocator-alloc banked-allocator (tagged-word #xa0 #x0ffe))
+  (case alloc-new-bank
+    (banked-allocator-alloc banked-allocator (tagged-word #xa0 #x0ffd))
     (assert nc)
-    (assert de #xe002)
-    (assert-byte ((+ banked-allocator banked-allocator-current-bank)) 1)
-    (assert-word ((+ banked-allocator banked-allocator-allocator)) #xf000)
-    (assert-byte ((+ banked-allocator banked-allocator-banks 0)) 1)
-    (assert-byte ((+ banked-allocator banked-allocator-banks 1)) 2))
+    (assert a #x02)
+    (assert de #xe003)
+    (assert-byte ((+ banked-allocator 0)) 2)
+    (assert-word ((+ banked-allocator 1)) #xf000))
 
-  ;(write-bank-table)
+  (write-bank-table)
 
   ; It should be possible to allocate 80 * 20 * 510 ~= 800KB
-  (case bulk-alloc-2000-6
-    (loop-word (* 80 20)
-      (write #\.)
-      (banked-allocator-alloc banked-allocator (tagged-word #xa0 #x01fe))
-      (assert nc)
-      (ld bc #x01fe)
-      (ld a #xbb)
-      (mem-fill de bc a)))
+  (case alloc-fill-up
+    (ld bc 0)
+    (loop
+      (preserve (bc)
+        (banked-allocator-alloc banked-allocator (tagged-word #xa0 #x0400)))
 
-  ;(write-bank-table)
-  ;(call wait-space)
+      (when nc
+        (preserve (bc)
+          (ld bc #x0400)
+          (ld a #xbb)
+          (mem-fill de bc a)
+          (write #\.))
+
+        ; Increment alloc counter
+        (inc bc)
+
+        (rcf))
+      (while nc))
+    (writeln "\rallocated " bc " banks of #x400 bytes"))
+
+  (write-bank-table)
 )
 
