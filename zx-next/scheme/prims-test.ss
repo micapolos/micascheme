@@ -2,7 +2,8 @@
   (zx-next scheme test)
   (zx-next scheme prims)
   (zx-next tagged)
-  (zx-next scheme tag))
+  (zx-next scheme tag)
+  (zx-next scheme constant))
 
 (define-values
   (offset-1 #xa1)
@@ -25,37 +26,37 @@
     (load-value (null-value offset-1))
     (null?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl (tagged-word constant-tag true-word)))
+    (assert hl true-word))
 
   (case not-null?
     (load-value (byte-value offset-1 #x12))
     (null?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl (tagged-word constant-tag false-word)))
+    (assert hl false-word))
 
   (case byte?
     (load-value (byte-value offset-1 #x12))
     (byte?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl (tagged-word constant-tag true-word)))
+    (assert hl true-word))
 
   (case not-byte?
     (load-value (word-value offset-1 #x1234))
     (byte?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl (tagged-word constant-tag false-word)))
+    (assert hl false-word))
 
   (case word?
     (load-value (word-value offset-1 #x1234))
     (word?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl (tagged-word constant-tag true-word)))
+    (assert hl true-word))
 
   (case not-word?
     (load-value (byte-value offset-1 #x12))
     (word?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl (tagged-word constant-tag false-word)))
+    (assert hl false-word))
 
   (case pair?
     (load-value (pair-value offset-1 pair-data-1))

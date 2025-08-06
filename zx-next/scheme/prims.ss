@@ -36,8 +36,10 @@
     (zx-next core)
     (zx-next scheme alloc)
     (zx-next banked-pointer)
+    (zx-next tag)
     (zx-next tagged)
     (zx-next scheme tag)
+    (zx-next scheme constant)
     (rename (zx-next throw)
       (throw zx-throw)))
 
@@ -62,19 +64,19 @@
     (value
       offset
       0
-      (tagged-word constant-tag null-word)))
+      (fxsll null-constant 8)))
 
   (define-expression (false-value offset)
     (value
       offset
       0
-      (tagged-word constant-tag false-word)))
+      (fxsll false-constant 8)))
 
   (define-expression (true-value offset)
     (value
       offset
       0
-      (tagged-word constant-tag true-word)))
+      (fxsll true-constant 8)))
 
   (define-expression (byte-value offset byte)
     (value
@@ -135,19 +137,19 @@
   (define-proc (load-null d)
     (input (d offset))
     (ld e 0)
-    (ld hl (tagged-word constant-tag null-word))
+    (ld hl null-word)
     (ret))
 
   (define-proc (load-false d)
     (input (d offset))
     (ld e 0)
-    (ld hl (tagged-word constant-tag false-word))
+    (ld hl false-word)
     (ret))
 
   (define-proc (load-true d)
     (input (d offset))
     (ld e 0)
-    (ld hl (tagged-word constant-tag true-word))
+    (ld hl true-word)
     (ret))
 
   (define-proc (ref)
@@ -190,10 +192,9 @@
     (ld a h)
     (and tag-mask)
     (cp tag)
-    (when z
-      (load-true d)
-      (ret))
-    (load-false d))
+    (if z
+      (then (load-true d))
+      (else (load-false d))))
 
   (define-op (load-constant? constant)
     (ld a h)
@@ -204,7 +205,7 @@
     (load-false d))
 
   (define-proc (null?)
-    (load-constant? null-byte)
+    (load-constant? null-constant)
     (ret))
 
   (define-proc (byte?)
