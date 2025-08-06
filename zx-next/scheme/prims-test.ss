@@ -1,39 +1,89 @@
 (import
   (zx-next test)
-  (zx-next scheme prims))
+  (zx-next scheme prims)
+  (zx-next tagged)
+  (zx-next scheme tag))
 
 (define-values
   (offset-1 #xa1)
   (offset-2 #xa2)
-  (value-1 (value offset-1 #x45 #x0123))
-  (value-2 (value offset-2 #xcd #x89ab)))
+  (value-1 (value offset-1 #x56 #x1234))
+  (value-2 (value offset-2 #xbc #x789a))
+  (pair-1 (pair-value offset-1 pair-data-1)))
 
 (define-fragments
   (test-box (value-data (value offset-1 #x56 #x1234)))
-  (test-pair
-    (pair-data
-      (value offset-1 #x56 #x1234)
-      (value offset-2 #xbc #x789a))))
+  (value-data-1 (value-data value-1))
+  (value-data-2 (value-data value-2))
+  (pair-data-1 (pair-data value-1 value-2)))
 
 (test
-  (case unbox
-    (ld de #x0400)
+  (case null?
+    (load-value (null-value offset-1))
+    (null?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl (tagged-word constant-tag true-word)))
+
+  (case not-null?
+    (load-value (byte-value offset-1 #x12))
+    (null?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl (tagged-word constant-tag false-word)))
+
+  (case byte?
+    (load-value (byte-value offset-1 #x12))
+    (byte?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl (tagged-word constant-tag true-word)))
+
+  (case not-byte?
+    (load-value (word-value offset-1 #x1234))
+    (byte?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl (tagged-word constant-tag false-word)))
+
+  (case word?
+    (load-value (word-value offset-1 #x1234))
+    (word?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl (tagged-word constant-tag true-word)))
+
+  (case not-word?
+    (load-value (byte-value offset-1 #x12))
+    (word?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl (tagged-word constant-tag false-word)))
+
+  (case pair?
+    (load-value (pair-value offset-1 pair-data-1))
+    (pair?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl (tagged-word constant-tag true-word)))
+
+  (case not-pair?
+    (load-value (byte-value offset-1 #x12))
+    (pair?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl (tagged-word constant-tag false-word)))
+
+  (case unsafe-unbox
+    (ld de (offset/byte #x04 #x00))
     (ld hl test-box)
-    (unbox)
+    (unsafe-unbox)
     (assert de #x0456)
     (assert hl #x1234))
 
-  (case car
-    (ld de #x0400)
-    (ld hl test-pair)
-    (car)
+  (case unsafe-car
+    (ld de (offset/byte #x04 #x00))
+    (ld hl pair-data-1)
+    (unsafe-car)
     (assert de #x0456)
     (assert hl #x1234))
 
-  (case cdr
-    (ld de #x0400)
-    (ld hl test-pair)
-    (cdr)
+  (case unsafe-cdr
+    (ld de (offset/byte #x04 #x00))
+    (ld hl pair-data-1)
+    (unsafe-cdr)
     (assert de #x04bc)
     (assert hl #x789a))
 
@@ -58,5 +108,6 @@
     (assert-byte (#xe003) #xde)
     (assert-word (#xe004) #x0abc)
     (assert-byte (#xe006) #x67)
-    (assert-word (#xe007) #x2345)))
+    (assert-word (#xe007) #x2345))
 
+)
