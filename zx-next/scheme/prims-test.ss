@@ -18,6 +18,13 @@
     (assert de #x0456)
     (assert hl #x3412))
 
+  (case unbox
+    (ld de #x0400)
+    (ld hl test-box)
+    (unbox)
+    (assert de #x0456)
+    (assert hl #x3412))
+
   (case car
     (ld de #x0400)
     (ld hl test-pair)

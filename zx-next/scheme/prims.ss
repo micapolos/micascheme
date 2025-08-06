@@ -3,6 +3,7 @@
     value
     value-data
     pair-data
+    box box-tx
     unbox unbox-tc
     car car-tc
     cdr cdr-tc
@@ -25,6 +26,33 @@
     ((pair-data car cdr)
       (value-data car)
       (value-data cdr)))
+
+  (define-proc (box)
+    ; Push value on the stack
+    (push de)
+    (push hl)
+
+    ; EHL - banked pointer, paged-in
+    (byte-alloc 3)
+
+    ; Preserve banked pointer on the stack
+    (preserve (de hl)
+      ; DE = box pointer
+      (ex de hl)
+
+      ; HL = box pointer
+      (ld hl 4)
+      (add hl sp)
+
+      ; Copy value
+      (dup 3 (ldi)))
+
+    ; Clean-up stack
+    (pop bc)  ; return address
+    (pop af)  ; value
+    (pop af)
+    (push bc) ; return address
+    (ret))
 
   (define-proc (unbox)
     (ld a e)
