@@ -3,6 +3,7 @@
     byte-constant
     word-constant
     null-constant
+    void-constant
     true-constant
     false-constant
     string-constant
@@ -25,8 +26,9 @@
 
   (define-values
     (null-constant   (constant #x00))
-    (byte-constant   (constant #x01))
-    (word-constant   (constant #x02))
+    (void-constant   (constant #x01))
+    (byte-constant   (constant #x02))
+    (word-constant   (constant #x03))
     (true-constant   (constant #x10))
     (false-constant  (constant #x18))
     (string-constant (constant #x11))

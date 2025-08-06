@@ -5,10 +5,12 @@
 
     load-value
     load-null
+    load-void
     load-false
     load-true
 
     null-value
+    void-value
     false-value
     true-value
     byte-value
@@ -71,6 +73,12 @@
       offset
       0
       (fxsll null-constant 8)))
+
+  (define-expression (void-value offset)
+    (value
+      offset
+      0
+      (fxsll void-constant 8)))
 
   (define-expression (false-value offset)
     (value
@@ -162,6 +170,12 @@
     (input (d offset))
     (ld e 0)
     (ld hl null-constant-word)
+    (ret))
+
+  (define-proc (load-void d)
+    (input (d offset))
+    (ld e 0)
+    (ld hl void-constant-word)
     (ret))
 
   (define-proc (load-false d)
