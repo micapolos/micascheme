@@ -1,5 +1,5 @@
 (import
-  (zx-next test)
+  (zx-next scheme test)
   (zx-next scheme prims)
   (zx-next tagged)
   (zx-next scheme tag))
@@ -18,6 +18,9 @@
   (pair-data-1 (pair-data value-1 value-2)))
 
 (test
+  (case throw
+    (assert-throws (throw)))
+
   (case null?
     (load-value (null-value offset-1))
     (null?)

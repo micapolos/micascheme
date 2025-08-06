@@ -2,6 +2,7 @@
   (export
     fail
     assert
+    assert-throws
     (rename
       (%assert-byte assert-byte)
       (%assert-word assert-word)))
@@ -205,6 +206,12 @@
 
     ((%assert-byte (mm) n) (preserve (de hl) (ld e n) (ld hl mm) (call assert-ibyte)))
     ((%assert-word (mm) nn) (preserve (de hl) (ld de nn) (ld hl mm) (call assert-iword))))
+
+  (define-op (assert-throws body ...)
+    (catch body ...)
+    (when nc
+      (writeln-error "Did not throw.")
+      (throw)))
 
   (define-asm assert-regs-expected-colors (ds 20))
   (define-asm assert-regs-actual-colors   (ds 20))

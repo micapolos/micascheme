@@ -25,15 +25,17 @@
     null? null?-tc
     byte? byte?-tc
     word? word?-tc
-    pair? pair?-tc)
+    pair? pair?-tc
+
+    throw)
   (import
     (zx-next core)
     (zx-next scheme alloc)
     (zx-next banked-pointer)
     (zx-next tagged)
     (zx-next scheme tag)
-    (zx-next scheme tag)
-    (zx-next throw))
+    (rename (zx-next throw)
+      (throw zx-throw)))
 
   ; All procedures use __sdcccall(1) calling convention.
   ; There are two types of procedures: primitive and non-primitive.
@@ -198,6 +200,9 @@
   (define-proc (pair?)
     (load-tagged? pair-tag)
     (ret))
+
+  (define-proc (throw)
+    (zx-throw))
 
   (define-proc (cons)
     ; Push car on the stack

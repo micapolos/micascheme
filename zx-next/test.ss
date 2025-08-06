@@ -23,6 +23,7 @@
             (%call %wait-a-sec)
             (%exit))
           (%else
+            (%writeln-error "Test failed.")
             (%throw))))))
 
   (%define-op-syntax (case $syntax)
