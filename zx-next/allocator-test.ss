@@ -22,4 +22,11 @@
   (case overflow
     (allocator-alloc allocator (tagged-word #xa0 #x1ff0))
     (assert c)
-    (assert-word (allocator) #xe102)))
+    (assert-word (allocator) #xe102))
+
+  (case fill-up
+    (loop
+      (allocator-alloc allocator (tagged-word #xa0 #x0006))
+      (preserve (af) (write #\.))
+      (while nc))
+    (writeln)))
