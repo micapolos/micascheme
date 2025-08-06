@@ -932,6 +932,12 @@
       (inc b)
       (out (c) a))
 
+    ((ld nextreg)
+      (ld bc #x243b)
+      (out (c) a)
+      (inc b)
+      (in a (c)))
+
     ((nextreg n a)     (db #xed #x92 n))
     ((nextreg n n2)    (db #xed #x91 n n2))
 
