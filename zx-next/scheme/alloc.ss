@@ -9,8 +9,23 @@
     alloc-header-pair-tag
 
     symbol-data
-    string-data)
-  (import (zx-next core))
+    string-data
+
+    byte-alloc
+    byte-alloc-tc)
+  (import
+    (zx-next core)
+    (prefix (zx-next alloc) zx-))
+
+  (define-proc (byte-alloc a)
+    (input (a size))
+    (output
+      (ehl banked pointer)
+      (throws out of memory))
+
+    (ld c a)
+    (ld b #b11100000)  ; tag
+    (zx-alloc-tc bc))
 
   (define-values
     ; 0 = non marked, 1 = marked

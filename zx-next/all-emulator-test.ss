@@ -15,4 +15,7 @@
   (zx-next banked-pointer)
   (zx-next alloc-banked-pointer)
   (zx-next allocator)
-  (zx-next banked-allocator))
+  (zx-next banked-allocator)
+  (zx-next alloc)
+  (zx-next scheme alloc)
+  (zx-next scheme prims))

@@ -25,6 +25,7 @@
       (bc - tagged size))
     (output
       (cf - 0 ok / 1 overflow)
+      (a - allocated bank)
       (de - allocated-address))
 
     ; a, de = alloc banked pointer
