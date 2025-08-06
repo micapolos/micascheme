@@ -13,6 +13,10 @@
   (pair-1 (pair-value offset-1 pair-data-1)))
 
 (define-fragments
+  (hello-string (dz "hello"))
+  (hello-world-string (dz "Hello, world!")))
+
+(define-fragments
   (test-box (value-data (value offset-1 #x56 #x1234)))
   (value-data-1 (value-data value-1))
   (value-data-2 (value-data value-2))
@@ -62,13 +66,49 @@
     (load-value (pair-value offset-1 pair-data-1))
     (pair?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl (tagged-word constant-tag true-constant-word)))
+    (assert hl true-constant-word))
 
   (case not-pair?
     (load-value (byte-value offset-1 #x12))
     (pair?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl (tagged-word constant-tag false-constant-word)))
+    (assert hl false-constant-word))
+
+  (case char?
+    (load-value (char-value offset-1 #\A))
+    (char?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl true-constant-word))
+
+  (case not-char?
+    (load-value (byte-value offset-1 #x12))
+    (char?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl false-constant-word))
+
+  (case string?
+    (load-value (string-value offset-1 hello-world-string))
+    (string?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl true-constant-word))
+
+  (case not-string?
+    (load-value (symbol-value offset-1 hello-string))
+    (string?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl false-constant-word))
+
+  (case symbol?
+    (load-value (symbol-value offset-1 hello-string))
+    (symbol?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl true-constant-word))
+
+  (case not-symbol?
+    (load-value (string-value offset-1 hello-world-string))
+    (symbol?)
+    (assert de (offset/byte offset-1 #x00))
+    (assert hl false-constant-word))
 
   (case unsafe-unbox
     (ld de (offset/byte #x04 #x00))

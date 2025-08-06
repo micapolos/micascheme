@@ -5,6 +5,7 @@
     false-constant
     string-constant
     symbol-constant
+    char-constant
 
     null-constant-word
     true-constant-word
@@ -23,7 +24,8 @@
     (true-constant   (constant #x10))
     (false-constant  (constant #x18))
     (string-constant (constant #x11))
-    (symbol-constant (constant #x12)))
+    (symbol-constant (constant #x12))
+    (char-constant   (constant #x13)))
 
   (define-values
     (null-constant-word  (fxsll null-constant 8))

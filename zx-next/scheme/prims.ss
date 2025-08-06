@@ -13,6 +13,9 @@
     true-value
     byte-value
     word-value
+    char-value
+    string-value
+    symbol-value
     pair-value
     value-data
     pair-data
@@ -30,6 +33,9 @@
     byte? byte?-tc
     word? word?-tc
     pair? pair?-tc
+    char? char?-tc
+    string? string?-tc
+    symbol? symbol?-tc
 
     throw)
   (import
@@ -89,6 +95,24 @@
       offset
       (fxand #xff word)
       (tagged-word word-tag (fxsrl word 8))))
+
+  (define-expression (char-value offset char)
+    (value
+      offset
+      char
+      (fxior (fxsll char-constant 8))))
+
+  (define-expression (string-value offset address)
+    (value
+      offset
+      (fxand #xff address)
+      (fxior (fxsll string-constant 8) (fxsrl address 8))))
+
+  (define-expression (symbol-value offset address)
+    (value
+      offset
+      (fxand #xff address)
+      (fxior (fxsll symbol-constant 8) (fxsrl address 8))))
 
   (define-expression (pair-value offset address)
     (value
@@ -218,6 +242,18 @@
 
   (define-proc (pair?)
     (load-tagged? pair-tag)
+    (ret))
+
+  (define-proc (char?)
+    (load-constant? char-constant)
+    (ret))
+
+  (define-proc (string?)
+    (load-constant? string-constant)
+    (ret))
+
+  (define-proc (symbol?)
+    (load-constant? symbol-constant)
     (ret))
 
   (define-proc (throw)
