@@ -6,7 +6,7 @@
 
   (define-proc (banked-pointer-page-in a hl)
     (input (a bank) (hl address))
-    (output (mmu paged-in))
+    (output (mmu paged-in) (hl preserved))
 
     ; E = bank
     (ld e a)

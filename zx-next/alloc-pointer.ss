@@ -3,7 +3,12 @@
     alloc-pointer-init
     alloc-pointer-init-tc
     alloc-pointer-alloc
-    alloc-pointer-alloc-tc)
+    alloc-pointer-alloc-tc
+    alloc-pointer-next
+    alloc-pointer-next-tc
+    pointer->alloc-pointer
+    pointer->alloc-pointer-tc)
+
   (import
     (zx-next core)
     (zx-next tag))
@@ -90,4 +95,33 @@
 
     ; Return NC on success
     (ret-nc))
+
+  (define-proc (alloc-pointer-next hl)
+    (input (hl alloc-pointer))
+    (output
+      (c - 0 ok / 1 already last)
+      (hl next alloc-pointer))
+
+    (ld e (hl))
+    (inc hl)
+    (ld a (hl))
+    (inc hl)
+
+    (or a)
+    (if z
+      (then
+        (dec hl)
+        (dec hl)
+        (scf))
+      (else
+        (and #x1f)
+        (ld d a)
+        (add hl de)
+        (rcf)))
+    (ret))
+
+  (define-proc (pointer->alloc-pointer hl)
+    (dec hl)
+    (dec hl)
+    (ret))
 )

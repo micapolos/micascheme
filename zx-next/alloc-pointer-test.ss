@@ -37,6 +37,20 @@
     (assert hl #xe200)
     (assert-word (#xe1fe) #xa000))
 
+  (case alloc-pointer-next
+    (alloc-pointer-next #xe000)
+    (assert nc)
+    (assert hl #xe100))
+
+  (case alloc-pointer-next/null
+    (alloc-pointer-next #xe200)
+    (assert c)
+    (assert hl #xe200))
+
+  (case pointer->alloc-pointer
+    (pointer->alloc-pointer #xe003)
+    (assert hl #xe001))
+
   (case fill-up
     (alloc-pointer-alloc #xe200 (tagged-word #xa0 #x1dfc))
     (assert nc)

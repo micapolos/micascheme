@@ -1,7 +1,13 @@
 (library (zx-next alloc-banked-pointer)
   (export
     alloc-banked-pointer-new-bank-alloc
-    alloc-banked-pointer-alloc)
+    alloc-banked-pointer-new-bank-alloc-tc
+    alloc-banked-pointer-alloc
+    alloc-banked-pointer-alloc-tc
+    alloc-banked-pointer-next
+    alloc-banked-pointer-next-tc
+    banked-pointer->alloc-banked-pointer
+    banked-pointer->alloc-banked-pointer-tc)
   (import
     (zx-next core)
     (zx-next alloc-pointer)
@@ -92,7 +98,7 @@
     ; Allocate in that bank
     (preserve (af)
       ; Page-in target bank.
-      (preserve (hl bc) (banked-pointer-page-in a hl))
+      (preserve (bc) (banked-pointer-page-in a hl))
 
       ; Allocate in target bank.
       (alloc-pointer-alloc hl bc)
@@ -115,4 +121,42 @@
     ; Success.
     (rcf)
     (ret))
+
+  (define-proc (banked-pointer->alloc-banked-pointer a hl)
+    (input
+      (a bank)
+      (hl pointer))
+    (output
+      (mmu paged-in)
+      (a bank)
+      (hl alloc-pointer))
+
+    (banked-pointer-page-in a hl)
+    (preserve (af) (pointer->alloc-pointer hl))
+    (ret))
+
+  (define-proc (alloc-banked-pointer-next e hl)
+    (input
+      (e bank)
+      (hl pointer))
+    (output
+      (c 0 ok / 1 no next)
+      (e next bank)
+      (hl next pointer))
+
+    (ld a e)
+    (preserve (de) (banked-pointer-page-in a hl))
+    (preserve (de) (alloc-pointer-next hl))
+    (ret nc)
+
+    (ld a h)
+    (and #xe0)
+    (ld h a)
+    (ld l 0)
+    (ld a (hl))
+    (cp #xff)
+    (when z (ret-c))
+    (ld e a)
+    (inc hl)
+    (ret-nc))
 )

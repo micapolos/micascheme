@@ -37,7 +37,7 @@
     (assert-word (#xf900) #x00bb))
 
   (case alloc-banked-pointer-alloc/bank-overflow
-    (alloc-banked-pointer-alloc #x01 #xf800 (tagged-word #xa0 #x17fd))
+    (alloc-banked-pointer-alloc #x01 #xf900 (tagged-word #xa0 #x17fd))
     (assert nc)
     (assert a #x02)
     (assert hl #xf800)
@@ -48,6 +48,29 @@
     (assert-byte (#xe000) #xff)
     (assert-word (#xe001) (tagged-word #xa0 #x17fd))
     (assert-word (#xf800) #x00bb))
+
+  (case banked-pointer->alloc-banked-pointer
+    (banked-pointer->alloc-banked-pointer #x01 #xe003)
+    (assert a #x01)
+    (assert hl #xe001)
+    (mmu 7)
+    (assert a #x01))
+
+  (case alloc-banked-pointer-next/same-bank
+    (alloc-banked-pointer-next #x01 #xe001)
+    (assert nc)
+    (assert e #x01)
+    (assert hl #xf800))
+
+  (case alloc-banked-pointer-next/next-bank
+    (alloc-banked-pointer-next #x01 #xf900)
+    (assert nc)
+    (assert e #x02)
+    (assert hl #xe001))
+
+  (case alloc-banked-pointer-next/end
+    (alloc-banked-pointer-next #x02 #xf800)
+    (assert c))
 
   (bank-alloc-all)
 
