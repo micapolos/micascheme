@@ -22,7 +22,7 @@
   ; Non-primitive procedures can call primitive and non-primitive ones.
   ; You can pass values only to non-primitive procedures.
   ; If no value is passed in registers to non-primitive procedure,
-  ; offset to the top value on the stack must be passed in A.
+  ; 8-bit offset to the top value on the stack is passed as first argument.
 
   (define-expression (value offset n mm)
     (fxior (fxsll n 16) mm))
