@@ -17,9 +17,13 @@
     value-data
     pair-data
     box box-tc
+
     unsafe-unbox unsafe-unbox-tc
     unsafe-car unsafe-car-tc
     unsafe-cdr unsafe-cdr-tc
+
+    car car-tc
+    cdr cdr-tc
     cons cons-tc
 
     null? null?-tc
@@ -158,6 +162,12 @@
     (ld l c)
     (ret))
 
+  (define-op (ensure-tagged? tag)
+    (ld a h)
+    (and tag-mask)
+    (cp tag)
+    (when nz (zx-throw)))
+
   (define-proc (unsafe-unbox)
     (ref-tc))
 
@@ -167,6 +177,14 @@
   (define-proc (unsafe-cdr)
     (add hl 3)
     (ref-tc))
+
+  (define-proc (car)
+    (ensure-tagged? pair-tag)
+    (unsafe-car-tc))
+
+  (define-proc (cdr)
+    (ensure-tagged? pair-tag)
+    (unsafe-cdr-tc))
 
   (define-op (load-tagged? tag)
     (ld a h)

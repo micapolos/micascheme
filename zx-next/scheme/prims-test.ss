@@ -90,6 +90,26 @@
     (assert de #x04bc)
     (assert hl #x789a))
 
+  (case car
+    (load-value (pair-value offset-1 pair-data-1))
+    (car)
+    (assert de (offset/byte #xa1 #x56))
+    (assert hl #x1234))
+
+  (case cdr
+    (load-value (pair-value offset-1 pair-data-1))
+    (cdr)
+    (assert de (offset/byte #xa1 #xbc))
+    (assert hl #x789a))
+
+  (case car/throws
+    (load-value (byte-value offset-1 #x12))
+    (assert-throws (car)))
+
+  (case cdr/throws
+    (load-value (byte-value offset-1 #x12))
+    (assert-throws (cdr)))
+
   (case cons
     ; Load cdr
     (ld de #x0123)
