@@ -5,5 +5,5 @@
     (zx-next test))
   (export
     (import
-      (except (zx-next test) assert)
+      (except (zx-next test) assert throw)
       (zx-next scheme assert))))
