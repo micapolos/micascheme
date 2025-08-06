@@ -88,13 +88,13 @@
     (value
       offset
       byte
-      (tagged-word byte-tag 0)))
+      byte-constant-word))
 
   (define-expression (word-value offset word)
     (value
       offset
       (fxand #xff word)
-      (tagged-word word-tag (fxsrl word 8))))
+      (fxior word-constant-word (fxsrl word 8))))
 
   (define-expression (char-value offset char)
     (value
@@ -233,11 +233,11 @@
     (ret))
 
   (define-proc (byte?)
-    (load-tagged? byte-tag)
+    (load-constant? byte-constant)
     (ret))
 
   (define-proc (word?)
-    (load-tagged? word-tag)
+    (load-constant? word-constant)
     (ret))
 
   (define-proc (pair?)
