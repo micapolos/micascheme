@@ -197,5 +197,5 @@
     (assert-byte (#xe006) #x67)
     (assert-word (#xe007) #x2345))
 
-  (call wait-space)
+  ;(call wait-space)
 )
