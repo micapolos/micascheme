@@ -26,6 +26,42 @@
   (case throw
     (assert-throws (throw)))
 
+  (case unsafe-put-char
+    (load-value (char-value offset-1 #\a))
+    (unsafe-put-char)
+    (assert de (offset/byte offset-1 0))
+    (assert hl void-constant-word)
+    (writeln))
+
+  (case put-char
+    (load-value (char-value offset-1 #\a))
+    (unsafe-put-char)
+    (assert de (offset/byte offset-1 0))
+    (assert hl void-constant-word)
+    (writeln))
+
+  (case put-char/throws
+    (load-value (byte-value offset-1 #x12))
+    (assert-throws (put-char)))
+
+  (case unsafe-put-string
+    (load-value (string-value offset-1 hello-world-string))
+    (unsafe-put-string)
+    (assert de (offset/byte offset-1 0))
+    (assert hl void-constant-word)
+    (writeln))
+
+  (case put-string
+    (load-value (string-value offset-1 hello-world-string))
+    (unsafe-put-string)
+    (assert de (offset/byte offset-1 0))
+    (assert hl void-constant-word)
+    (writeln))
+
+  (case put-string/throws
+    (load-value (byte-value offset-1 #x12))
+    (assert-throws (put-string)))
+
   (case null?
     (load-value (null-value offset-1))
     (null?)

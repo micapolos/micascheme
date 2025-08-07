@@ -48,5 +48,5 @@
   (case-write write-string (string-value offset-1 hello-string))
   (case-write write-pair (pair-value offset-1 pair-data-1))
 
-  ;(call wait-space)
+  (call wait-space)
 )

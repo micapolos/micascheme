@@ -23,6 +23,9 @@
     pair-data
     box box-tc
 
+    put-char unsafe-put-char
+    put-string unsafe-put-string
+
     unsafe-unbox unsafe-unbox-tc
     unsafe-car unsafe-car-tc
     unsafe-cdr unsafe-cdr-tc
@@ -49,6 +52,7 @@
     (zx-next dispatch)
     (zx-next scheme tag)
     (zx-next scheme constant)
+    (prefix (zx-next write) zx-)
     (rename (zx-next throw)
       (throw zx-throw)))
 
@@ -140,6 +144,40 @@
       (ld de (fxsrl value 16))
       (ld hl (fxand value #xffff))))
 
+  (define-op (ensure-tagged? tag)
+    (ld a h)
+    (and tag-mask)
+    (cp tag)
+    (when nz (zx-throw)))
+
+  (define-op (ensure-constant? constant)
+    (ld a h)
+    (cp constant)
+    (when nz (zx-throw)))
+
+  (define-proc (unsafe-put-char)
+    (preserve (de) (ld a e) (call zx-write-char))
+    (ld e 0)
+    (ld hl void-constant-word)
+    (ret))
+
+  (define-proc (put-char)
+    (ensure-constant? char-constant)
+    (unsafe-put-char-tc))
+
+  (define-proc (unsafe-put-string)
+    (preserve (de)
+      (ld h l)
+      (ld l e)
+      (call zx-write-string))
+    (ld e 0)
+    (ld hl void-constant-word)
+    (ret))
+
+  (define-proc (put-string)
+    (ensure-constant? string-constant)
+    (unsafe-put-string-tc))
+
   (define-proc (box)
     ; Push value on the stack
     (push de)
@@ -202,12 +240,6 @@
     (ld h b)
     (ld l c)
     (ret))
-
-  (define-op (ensure-tagged? tag)
-    (ld a h)
-    (and tag-mask)
-    (cp tag)
-    (when nz (zx-throw)))
 
   (define-proc (unsafe-unbox)
     (ref-tc))
