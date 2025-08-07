@@ -173,6 +173,7 @@
   (case-write write-char (logging (char-value offset-1 #\A)))
   (case-write write-symbol (symbol-value offset-1 hello-string))
   (case-write write-string (string-value offset-1 hello-string))
+  (case-write write-pair (pair-value offset-1 pair-data-1))
 
   (case cons
     ; Load cdr
