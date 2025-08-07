@@ -6,7 +6,8 @@
     (zx-next core)
     (except (zx-next write) write-byte-literal write-word-literal)
     (zx-next scheme tag)
-    (zx-next scheme value))
+    (zx-next tag)
+    (zx-next dispatch))
 
   (define-fragments
     (stack-string (dz "stack"))
@@ -119,52 +120,57 @@
     (ld a #\>)
     (jp write-char))
 
-  (define-fragment write-value
-    (input (bcd value))
+  (define-proc (write-value de hl)
+    (ld bc hl)
     (ld a b)
-    (and #b11100000)
-
-    (cp byte-tag)
-    (when z
-      (value->a)
-      (jp write-byte-literal))
-
-    (cp word-tag)
-    (when z
-      (value->hl)
-      (jp write-word-literal))
-
-    (cp char-tag)
-    (when z
-      (value->a)
-      (jp write-char-literal))
-
-    (cp constant-tag)
-    (when z
-      (ld a b)
-
-      (cp null-tag)
-      (when z (jp write-null))
-
-      (cp false-tag)
-      (when z (jp write-false))
-
-      (cp true-tag)
-      (when z (jp write-true))
-
-      (jp write-unknown))
-
-    (cp symbol-tag)
-    (when z
-      (value->mmu/hl)
-      (jp write-symbol))
-
-    (cp string-tag)
-    (when z
-      (value->mmu/hl)
-      (jp write-string-literal))
-
-    (jp write-unknown))
+    (and tag-mask)
+    (dup 3 (rlca))
+    (dispatch
+      (write "#<tag-0>")
+      (write "#<tag-1>")
+      (write "#<tag-2>")
+      (begin
+        (ld a b)
+        (and #x1f)
+        (dispatch
+          (call write-null)
+          (write "#<void>")
+          (begin (ld a e) (call write-byte-literal))
+          (begin (ld h c) (ld l e) (call write-word-literal))
+          (write "#<constant-04>")
+          (write "#<constant-05>")
+          (write "#<constant-06>")
+          (write "#<constant-07>")
+          (write "#<constant-08>")
+          (write "#<constant-09>")
+          (write "#<constant-0a>")
+          (write "#<constant-0b>")
+          (write "#<constant-0c>")
+          (write "#<constant-0d>")
+          (write "#<constant-0e>")
+          (write "#<constant-0f>")
+          (call write-true)
+          (begin (ld h c) (ld l e) (call write-string-literal))
+          (begin (ld h c) (ld l e) (call write-symbol))
+          (begin (ld a e) (call write-char-literal))
+          (write "#<constant-14>")
+          (write "#<constant-15>")
+          (write "#<constant-16>")
+          (write "#<constant-17>")
+          (call write-false)
+          (write "#<constant-19>")
+          (write "#<constant-1a>")
+          (write "#<constant-1b>")
+          (write "#<constant-1c>")
+          (write "#<constant-1d>")
+          (write "#<constant-1e>")
+          (write "#<constant-1f>")))
+      (write "#<tag-4>")
+      (write "#<tag-5>")
+      (write "#<tag-6>")
+      (write "#<tag-7>"))
+    (write-ink normal-color)
+    (ret))
 
   (define-fragment write-stack
     (preserve (de)

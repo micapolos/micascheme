@@ -10,6 +10,7 @@
     (zx-next lookup)
     (asm base))
 
+  ; All registers preserved except HL.
   (%define-op-syntax tail-dispatch
     (lambda ($syntax)
       (syntax-case $syntax ()
@@ -17,14 +18,15 @@
           (lets
             ($tmps (generate-temporaries #'(entry ...)))
             #`(%with-labels (table)
-              (%ld %hl table)
+              (%preserve (%de)
+                (%ld %hl table)
 
-              (%call
-                #,(if (zero? (fxand #x80 (length #'(entry ...))))
-                  #'lookup-word-7
-                  #'lookup-word))
+                (%call
+                  #,(if (zero? (fxand #x80 (length #'(entry ...))))
+                    #'lookup-word-7
+                    #'lookup-word))
 
-              (%ex %de %hl)
+                (%ex %de %hl))
               (%jp (%hl))
 
               table #,@(map-with ($tmp $tmps) #`(%dw #,$tmp))

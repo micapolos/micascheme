@@ -49,6 +49,7 @@
         + - *
         bitwise-and bitwise-ior bitwise-xor
         fx+ fx- fxnot fxand fxior fxxor fxsrl fxsll
+        logging
         ...)
       (only (asm syntax-block) align trace-block-expansion)
       (asm org)))

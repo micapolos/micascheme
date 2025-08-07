@@ -39,15 +39,18 @@
     string? string?-tc
     symbol? symbol?-tc
 
-    throw)
+    throw write)
   (import
     (zx-next core)
     (zx-next scheme alloc)
     (zx-next banked-pointer)
     (zx-next tag)
     (zx-next tagged)
+    (zx-next dispatch)
     (zx-next scheme tag)
     (zx-next scheme constant)
+    (zx-next scheme write)
+    (prefix (zx-next write) zx-)
     (rename (zx-next throw)
       (throw zx-throw)))
 
@@ -108,7 +111,7 @@
     (value
       offset
       char
-      (fxior (fxsll char-constant 8))))
+      char-constant-word))
 
   (define-expression (string-value offset address)
     (value
@@ -306,5 +309,11 @@
     (pop af)  ; cdr
     (pop af)
     (push bc) ; return address
+    (ret))
+
+  (define-proc (write)
+    (preserve (de) (write-value de hl))
+    (ld e 0)
+    (ld hl void-constant-word)
     (ret))
 )

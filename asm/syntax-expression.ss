@@ -3,7 +3,7 @@
   (import (asm base) (asm expression))
 
   (define (syntax->expression $lookup $syntax)
-    (syntax-case $syntax (+ - * bitwise-and bitwise-ior bitwise-xor fx+ fx- fxnot fxand fxior fxxor fxsrl fxsll)
+    (syntax-case $syntax (+ - * bitwise-and bitwise-ior bitwise-xor fx+ fx- fxnot fxand fxior fxxor fxsrl fxsll logging)
       (id
         (identifier? #'id)
         (identifier-expression #'id))
@@ -40,6 +40,8 @@
       ((fxsrl x ...)
         (syntax->op-expression $lookup $syntax))
       ((fxsll x ...)
+        (syntax->op-expression $lookup $syntax))
+      ((logging x ...)
         (syntax->op-expression $lookup $syntax))
       ((id . x)
         (and (identifier? #'id) ($lookup #'id))

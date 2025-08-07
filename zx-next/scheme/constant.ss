@@ -10,9 +10,11 @@
     symbol-constant
     char-constant
 
-    word-constant-word
-    byte-constant-word
     null-constant-word
+    void-constant-word
+    byte-constant-word
+    word-constant-word
+    char-constant-word
     true-constant-word
     false-constant-word)
   (import
@@ -36,8 +38,10 @@
     (char-constant   (constant #x13)))
 
   (define-values
+    (void-constant-word  (fxsll void-constant 8))
     (byte-constant-word  (fxsll byte-constant 8))
     (word-constant-word  (fxsll word-constant 8))
+    (char-constant-word  (fxsll char-constant 8))
     (null-constant-word  (fxsll null-constant 8))
     (false-constant-word (fxsll false-constant 8))
     (true-constant-word  (fxsll true-constant 8)))
