@@ -50,7 +50,7 @@
 
     throw
 
-    unsafe-invoke unsafe-invoke-tc unsafe-invoke-proc)
+    unsafe-apply unsafe-apply-tc unsafe-apply-proc)
   (import
     (zx-next core)
     (zx-next scheme alloc)
@@ -299,7 +299,7 @@
     (push bc) ; return address
     (ret))
 
-  (define-proc (unsafe-invoke)
+  (define-proc (unsafe-apply)
     (pointer-ref de hl)
     (jp (hl)))
 )
