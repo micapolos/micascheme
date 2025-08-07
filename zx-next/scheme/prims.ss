@@ -19,12 +19,31 @@
     string-value
     symbol-value
     pair-value
+    procedure-value
+
     value-data
     pair-data
     box box-tc
 
-    put-char unsafe-put-char
-    put-string unsafe-put-string
+    void
+    void-tc
+    void-proc
+
+    put-char
+    put-char-tc
+    put-char-proc
+
+    unsafe-put-char
+    unsafe-put-char-tc
+    unsafe-put-char-proc
+
+    put-string
+    put-string-tc
+    put-string-proc
+
+    unsafe-put-string
+    unsafe-put-string-tc
+    unsafe-put-string-proc
 
     unsafe-unbox unsafe-unbox-tc
     unsafe-car unsafe-car-tc
@@ -44,15 +63,10 @@
 
     throw
 
-    unsafe-invoke-void-0-args
-    unsafe-invoke-void-1-arg
-    unsafe-invoke-void-2-args
-    unsafe-invoke-void-n-args
-
-    unsafe-invoke-0-args
-    unsafe-invoke-1-arg
-    unsafe-invoke-2-args
-    unsafe-invoke-n-args)
+    invoke-0
+    invoke-1
+    invoke-2
+    invoke-n)
   (import
     (zx-next core)
     (zx-next scheme alloc)
@@ -143,6 +157,12 @@
       0
       (tagged-word pair-tag (fxand #x1fff address))))
 
+  (define-expression (procedure-value offset address)
+    (value
+      offset
+      (fxand address #xff)
+      (fxior (fxsll procedure-tag 8) (fxand address #x1fff))))
+
   (define-ops
     ((value-data value)
       (dw (fxand #xffff value))
@@ -164,6 +184,20 @@
     (ld a h)
     (cp constant)
     (when nz (zx-throw)))
+
+  (define-op (pointer-ref de hl)
+    (input (de hl value))
+    (output (mmu paged-in) (hl address) (de preserved))
+    (ld a e)
+    (preserve (de) (banked-pointer-page-in a hl))
+    (ld h l)
+    (ld l d))
+
+  ; D = offset
+  (define-proc (void)
+    (ld e 0)
+    (ld hl void-constant-word)
+    (ret))
 
   (define-proc (unsafe-put-char)
     (preserve (de) (ld a e) (call zx-write-char))
@@ -351,27 +385,16 @@
     (push bc) ; return address
     (ret))
 
-  (define-proc (unsafe-invoke-void-0-args)
-    (ret))
+  (define-proc (invoke-0)
+    (pointer-ref de hl)
+    (jp (hl)))
 
-  (define-proc (unsafe-invoke-void-1-arg)
-    (ret))
+  (define-proc (invoke-1)
+    (throw))
 
-  (define-proc (unsafe-invoke-void-2-args)
-    (ret))
+  (define-proc (invoke-2)
+    (throw))
 
-  (define-proc (unsafe-invoke-void-n-args)
-    (ret))
-
-  (define-proc (unsafe-invoke-0-args)
-    (ret))
-
-  (define-proc (unsafe-invoke-1-arg)
-    (ret))
-
-  (define-proc (unsafe-invoke-2-args)
-    (ret))
-
-  (define-proc (unsafe-invoke-n-args)
-    (ret))
+  (define-proc (invoke-n)
+    (throw))
 )
