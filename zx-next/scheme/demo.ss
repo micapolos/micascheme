@@ -4,7 +4,8 @@
     (except (micascheme) define)
     (zx-next scheme compiler)
     (prefix (zx-next scheme keywords) %)
-    (prefix (zx-next demo) %%))
+    (prefix (zx-next demo) %%)
+    (prefix (zx-next throw) %%))
   (export (import (zx-next scheme keywords)))
 
   (define-syntax (define $syntax $lookup)
@@ -16,5 +17,7 @@
         (syntax-case (compile-op $lookup #'(0 (%begin x ...))) ()
           ((begin def ... body)
             #`(begin def ...
-              (%%demo body)))))))
+              (%%demo
+                (%%catch body)
+                (%%when %%c (%%writeln-error "thrown")))))))))
 )
