@@ -1,11 +1,18 @@
-(import
-  (zx-next core)
-  (zx-next scheme value)
-  (zx-next scheme pair))
+(library (zx-next scheme lang)
+  (export define demo)
+  (import
+    (micascheme)
+    (zx-next scheme compiler)
+    (prefix (zx-next scheme keywords) %)
+    (prefix (zx-next demo) %%))
+  (export (import (zx-next scheme keywords)))
 
-(run
-  (ld de #x0001)
-  (ld hl #x1300)
-  (break)
-  (call ref)
-  (break))
+  (define-syntax (define $lookup $syntax)
+    (compile-define $lookup $syntax))
+
+  (define-syntax (demo $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ x ...)
+        #`(begin
+          #,@(map (partial compile-expression $lookup) #'(x ...))))))
+)
