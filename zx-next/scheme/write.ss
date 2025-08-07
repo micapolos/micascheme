@@ -10,9 +10,9 @@
     (zx-next dispatch))
 
   (define-fragments
-    (tag-string (dz "tag"))
+    (tag-string      (dz "tag"))
     (constant-string (dz "constant"))
-    (stack-string (dz "stack")))
+    (stack-string    (dz "stack")))
 
   (define-values
     (normal-color   7)
