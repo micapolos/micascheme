@@ -58,19 +58,19 @@
     (value
       offset
       byte
-      byte-constant-word))
+      (constant-word byte-constant)))
 
   (define-expression (word-value offset word)
     (value
       offset
       (fxand #xff word)
-      (fxior word-constant-word (fxsrl word 8))))
+      (fxior (constant-word word-constant) (fxsrl word 8))))
 
   (define-expression (char-value offset char)
     (value
       offset
       char
-      char-constant-word))
+      (constant-word char-constant)))
 
   (define-expression (string-value offset address)
     (value

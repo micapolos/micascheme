@@ -110,13 +110,13 @@
   ; D = offset
   (define-proc (void)
     (ld e 0)
-    (ld hl void-constant-word)
+    (ld hl (constant-word void-constant))
     (ret))
 
   (define-proc (unsafe-put-char)
     (preserve (de) (ld a e) (call zx-write-char))
     (ld e 0)
-    (ld hl void-constant-word)
+    (ld hl (constant-word void-constant))
     (ret))
 
   (define-proc (put-char)
@@ -129,7 +129,7 @@
       (ld l e)
       (call zx-write-string))
     (ld e 0)
-    (ld hl void-constant-word)
+    (ld hl (constant-word void-constant))
     (ret))
 
   (define-proc (put-string)
@@ -166,25 +166,25 @@
   (define-proc (load-null d)
     (input (d offset))
     (ld e 0)
-    (ld hl null-constant-word)
+    (ld hl (constant-word null-constant))
     (ret))
 
   (define-proc (load-void d)
     (input (d offset))
     (ld e 0)
-    (ld hl void-constant-word)
+    (ld hl (constant-word void-constant))
     (ret))
 
   (define-proc (load-false d)
     (input (d offset))
     (ld e 0)
-    (ld hl false-constant-word)
+    (ld hl (constant-word false-constant))
     (ret))
 
   (define-proc (load-true d)
     (input (d offset))
     (ld e 0)
-    (ld hl true-constant-word)
+    (ld hl (constant-word true-constant))
     (ret))
 
   (define-proc (ref)

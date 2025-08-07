@@ -31,20 +31,20 @@
     (ld d offset-1)
     (void)
     (assert de (offset/byte offset-1 0))
-    (assert hl void-constant-word))
+    (assert hl (constant-word void-constant)))
 
   (case unsafe-put-char
     (load-value (char-value offset-1 #\a))
     (unsafe-put-char)
     (assert de (offset/byte offset-1 0))
-    (assert hl void-constant-word)
+    (assert hl (constant-word void-constant))
     (writeln))
 
   (case put-char
     (load-value (char-value offset-1 #\a))
     (unsafe-put-char)
     (assert de (offset/byte offset-1 0))
-    (assert hl void-constant-word)
+    (assert hl (constant-word void-constant))
     (writeln))
 
   (case put-char/throws
@@ -55,14 +55,14 @@
     (load-value (string-value offset-1 hello-world-string))
     (unsafe-put-string)
     (assert de (offset/byte offset-1 0))
-    (assert hl void-constant-word)
+    (assert hl (constant-word void-constant))
     (writeln))
 
   (case put-string
     (load-value (string-value offset-1 hello-world-string))
     (unsafe-put-string)
     (assert de (offset/byte offset-1 0))
-    (assert hl void-constant-word)
+    (assert hl (constant-word void-constant))
     (writeln))
 
   (case put-string/throws
@@ -73,85 +73,85 @@
     (load-value (null-value offset-1))
     (null?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl true-constant-word))
+    (assert hl (constant-word true-constant)))
 
   (case not-null?
     (load-value (byte-value offset-1 #x12))
     (null?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl false-constant-word))
+    (assert hl (constant-word false-constant)))
 
   (case byte?
     (load-value (byte-value offset-1 #x12))
     (byte?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl true-constant-word))
+    (assert hl (constant-word true-constant)))
 
   (case not-byte?
     (load-value (word-value offset-1 #x1234))
     (byte?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl false-constant-word))
+    (assert hl (constant-word false-constant)))
 
   (case word?
     (load-value (word-value offset-1 #x1234))
     (word?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl true-constant-word))
+    (assert hl (constant-word true-constant)))
 
   (case not-word?
     (load-value (byte-value offset-1 #x12))
     (word?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl false-constant-word))
+    (assert hl (constant-word false-constant)))
 
   (case pair?
     (load-value (pair-value offset-1 pair-data-1))
     (pair?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl true-constant-word))
+    (assert hl (constant-word true-constant)))
 
   (case not-pair?
     (load-value (byte-value offset-1 #x12))
     (pair?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl false-constant-word))
+    (assert hl (constant-word false-constant)))
 
   (case char?
     (load-value (char-value offset-1 #\A))
     (char?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl true-constant-word))
+    (assert hl (constant-word true-constant)))
 
   (case not-char?
     (load-value (byte-value offset-1 #x12))
     (char?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl false-constant-word))
+    (assert hl (constant-word false-constant)))
 
   (case string?
     (load-value (string-value offset-1 hello-world-string))
     (string?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl true-constant-word))
+    (assert hl (constant-word true-constant)))
 
   (case not-string?
     (load-value (symbol-value offset-1 hello-string))
     (string?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl false-constant-word))
+    (assert hl (constant-word false-constant)))
 
   (case symbol?
     (load-value (symbol-value offset-1 hello-string))
     (symbol?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl true-constant-word))
+    (assert hl (constant-word true-constant)))
 
   (case not-symbol?
     (load-value (string-value offset-1 hello-world-string))
     (symbol?)
     (assert de (offset/byte offset-1 #x00))
-    (assert hl false-constant-word))
+    (assert hl (constant-word false-constant)))
 
   (case unsafe-unbox
     (ld de (offset/byte #x04 #x00))
@@ -221,14 +221,14 @@
     (load-value (procedure-value offset-1 void-proc))
     (unsafe-invoke)
     (assert de (offset/byte offset-1 0))
-    (assert hl void-constant-word))
+    (assert hl (constant-word void-constant)))
 
   (case unsafe-invoke-1
     (push-value (string-value offset-1 hello-world-string))
     (load-value (procedure-value 0 unsafe-put-string-proc))
     (unsafe-invoke)
     (assert de (offset/byte offset-1 0))
-    (assert hl void-constant-word))
+    (assert hl (constant-word void-constant)))
 
   ;(call wait-space)
 )

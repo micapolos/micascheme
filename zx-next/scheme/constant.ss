@@ -10,13 +10,7 @@
     symbol-constant
     char-constant
 
-    null-constant-word
-    void-constant-word
-    byte-constant-word
-    word-constant-word
-    char-constant-word
-    true-constant-word
-    false-constant-word)
+    constant-word)
   (import
     (zx-next core)
     (zx-next tag)
@@ -31,18 +25,12 @@
     (void-constant   (constant #x01))
     (byte-constant   (constant #x02))
     (word-constant   (constant #x03))
-    (true-constant   (constant #x10))
-    (false-constant  (constant #x18))
-    (string-constant (constant #x11))
-    (symbol-constant (constant #x12))
-    (char-constant   (constant #x13)))
+    (true-constant   (constant #x04))
+    (false-constant  (constant #x05))
+    (string-constant (constant #x06))
+    (symbol-constant (constant #x07))
+    (char-constant   (constant #x08)))
 
-  (define-values
-    (void-constant-word  (fxsll void-constant 8))
-    (byte-constant-word  (fxsll byte-constant 8))
-    (word-constant-word  (fxsll word-constant 8))
-    (char-constant-word  (fxsll char-constant 8))
-    (null-constant-word  (fxsll null-constant 8))
-    (false-constant-word (fxsll false-constant 8))
-    (true-constant-word  (fxsll true-constant 8)))
+  (define-expression (constant-word constant)
+    (fxsll constant 8))
 )

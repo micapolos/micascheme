@@ -18,4 +18,5 @@
   (zx-next banked-allocator)
   (zx-next alloc)
   (zx-next scheme alloc)
+  (zx-next scheme value)
   (zx-next scheme prims))
