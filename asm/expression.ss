@@ -14,12 +14,15 @@
     (asm dependent)
     (asm relocable)
     (asm org)
+    (asm aligned)
     (syntax lookup))
 
   (define-type (expression ref) (dependent (syntax ref)))
 
   (define (expression? $obj)
-    (dependent? $obj))
+    (and
+      (dependent? $obj)
+      (not (aligned? (dependent-ref $obj)))))
 
   (define (pure-expression $ref)
     (pure-dependent $ref))

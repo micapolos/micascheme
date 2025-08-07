@@ -28,13 +28,13 @@
       ((id . x)
         (identifier? #'id)
         (switch ($lookup #'id)
-          ((false? _) (syntax-error #'id "undefined block syntax"))
+          ((false? _) (syntax-error #'id "undefined op"))
           ((else $transformer)
             (switch (transform $transformer $syntax $lookup)
               ((block? $block) $block)
               ((else $other) (syntax->block $lookup $other))))))
       (other
-        (syntax-error $syntax "invalid block syntax"))))
+        (syntax-error $syntax "invalid op"))))
 
   (define-rule-syntax (check-syntax->block lookup in out)
     (check-block (syntax->block lookup #'in) out))

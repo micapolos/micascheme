@@ -117,15 +117,14 @@
     (write-quotes-tc))
 
   (define-proc (write-pair)
-    (writeln "Dupa, nie umiemy jeszcze")
-    ; (preserve (de hl)
-    ;   (preserve (de hl) (write-open))
-    ;   (car)
-    ;   (scheme-write)
-    ;   (write-space))
-    ; (cdr)
-    ; (scheme-write)
-    ; (write-close)
+    (preserve (de hl)
+      (preserve (de hl) (write-open))
+      (car)
+      (call write-value)
+      (write-space))
+    (cdr)
+    (call write-value)
+    (write-close)
     (ret))
 
   (define-proc (write-unknown-tag a)
@@ -154,7 +153,8 @@
     (ld a #\>)
     (jp write-char))
 
-  (define-proc (write-value de hl)
+  (define-fragment write-value
+    (input (de hl value))
     (ld bc hl)
     (ld a b)
     (and tag-mask)
@@ -247,7 +247,7 @@
     (ret))
 
   (define-proc (scheme-write)
-    (preserve (de) (write-value de hl))
+    (preserve (de) (call write-value))
     (ld e 0)
     (ld hl void-constant-word)
     (ret))
