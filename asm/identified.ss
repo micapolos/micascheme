@@ -29,6 +29,6 @@
     `(,(syntax->datum (identified-identifier $identified))
       ,(identified-ref $identified)))
 
-  (define (identified-identifier=? $identified $identifier)
+  (define (identified-identifier=? $identifier $identified)
     (free-identifier=? $identifier (identified-identifier $identified)))
 )

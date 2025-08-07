@@ -22,6 +22,13 @@
     (identified ad "ad")
     (identified main "main")))
 
+(check-environment
+  (resolve-dependencies
+    (lookup-with (recursive (dependent-with (recursive) "recursive")))
+    #'recursive)
+  (dependencies
+    (identified recursive "recursive")))
+
 (check-dependencies
   (dependencies-without (dependencies a b c) #'b)
   (dependencies a c))

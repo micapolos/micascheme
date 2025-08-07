@@ -117,7 +117,15 @@
     (write-quotes-tc))
 
   (define-proc (write-pair)
-    (writeln "Dupa, nie umiemy jeszcze rekurencji.")
+    (writeln "Dupa, nie umiemy jeszcze")
+    ; (preserve (de hl)
+    ;   (preserve (de hl) (write-open))
+    ;   (car)
+    ;   (scheme-write)
+    ;   (write-space))
+    ; (cdr)
+    ; (scheme-write)
+    ; (write-close)
     (ret))
 
   (define-proc (write-unknown-tag a)

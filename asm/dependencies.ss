@@ -13,27 +13,38 @@
   (define-rule-syntax (dependencies x ...)
     (list #'x ...))
 
+  (data recursion)
+
   (define (dependencies-ref? $dependencies $identifier)
     (lets?
-      ($dependencies
-        (memp
-          (lambda ($identified)
-            (free-identifier=?
-              (identified-identifier $identified)
-              $identifier))
-          $dependencies))
+      ($dependencies (memp (partial identified-identifier=? $identifier) $dependencies))
       (identified-ref (car $dependencies))))
 
   (define (dependencies+identifier $dependent-lookup $dependencies $identifier)
-    (cond
-      ((dependencies-ref? $dependencies $identifier)
-        $dependencies)
-      (else
+    (switch (dependencies-ref? $dependencies $identifier)
+      ((false? _)
         (lets
           ($dependent (lookup-ref $dependent-lookup $identifier))
-          (push
-            (dependencies+identifiers $dependent-lookup $dependencies (dependent-identifiers $dependent))
-            (identified $identifier (dependent-ref $dependent)))))))
+          (dependencies+dependent $dependent-lookup $dependencies $identifier $dependent)))
+      ((else $other)
+        $dependencies)))
+
+  (define (dependencies+dependent $dependent-lookup $dependencies $identifier $dependent)
+    (dependencies+non-recursive
+      (dependencies+identifiers
+        $dependent-lookup
+        (dependencies+recursion $dependencies $identifier)
+        (dependent-identifiers $dependent))
+      $identifier
+      (dependent-ref $dependent)))
+
+  (define (dependencies+non-recursive $dependencies $identifier $ref)
+    (push
+      (remp (partial identified-identifier=? $identifier) $dependencies)
+      (identified $identifier $ref)))
+
+  (define (dependencies+recursion $dependencies $identifier)
+    (push $dependencies (identified $identifier recursion)))
 
   (define (dependencies+identifiers $dependent-lookup $dependencies $identifiers)
     (fold-left

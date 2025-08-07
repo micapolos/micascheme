@@ -42,7 +42,7 @@
         ($found
           (memp
             (lambda ($identified)
-              (identified-identifier=? $identified $identifier))
+              (identified-identifier=? $identifier $identified))
             (environment-identified-values $environment)))
         (identified-ref (car $found)))
       (syntax-error $identifier "undefined")))
