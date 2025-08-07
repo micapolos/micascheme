@@ -1,3 +1,4 @@
 (import (micascheme))
 
-(test)
+(test
+  (zx-next scheme compiler))
