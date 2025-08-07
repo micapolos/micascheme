@@ -42,7 +42,17 @@
     string? string?-tc
     symbol? symbol?-tc
 
-    throw)
+    throw
+
+    unsafe-invoke-void-0-args
+    unsafe-invoke-void-1-arg
+    unsafe-invoke-void-2-args
+    unsafe-invoke-void-n-args
+
+    unsafe-invoke-0-args
+    unsafe-invoke-1-arg
+    unsafe-invoke-2-args
+    unsafe-invoke-n-args)
   (import
     (zx-next core)
     (zx-next scheme alloc)
@@ -339,5 +349,29 @@
     (pop af)  ; cdr
     (pop af)
     (push bc) ; return address
+    (ret))
+
+  (define-proc (unsafe-invoke-void-0-args)
+    (ret))
+
+  (define-proc (unsafe-invoke-void-1-arg)
+    (ret))
+
+  (define-proc (unsafe-invoke-void-2-args)
+    (ret))
+
+  (define-proc (unsafe-invoke-void-n-args)
+    (ret))
+
+  (define-proc (unsafe-invoke-0-args)
+    (ret))
+
+  (define-proc (unsafe-invoke-1-arg)
+    (ret))
+
+  (define-proc (unsafe-invoke-2-args)
+    (ret))
+
+  (define-proc (unsafe-invoke-n-args)
     (ret))
 )
