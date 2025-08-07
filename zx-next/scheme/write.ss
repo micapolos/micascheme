@@ -12,8 +12,7 @@
   (define-fragments
     (tag-string (dz "tag"))
     (constant-string (dz "constant"))
-    (stack-string (dz "stack"))
-    (unknown-string (dz "unknown")))
+    (stack-string (dz "stack")))
 
   (define-values
     (normal-color   7)
@@ -112,15 +111,6 @@
       (call write-symbol))
     (call write-value)
     (jp write-close))
-
-  (define-fragment write-unknown
-    (call write-hash)
-    (ld a #\<)
-    (call write-char)
-    (ld hl unknown-string)
-    (call write-symbol)
-    (ld a #\>)
-    (jp write-char))
 
   (define-proc (write-unknown-tag a)
     (preserve (af)
