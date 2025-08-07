@@ -10,7 +10,10 @@
 
     value-data
     pair-data
-    box box-tc
+
+    box
+    box-tc
+    box-proc
 
     void
     void-tc
@@ -32,25 +35,65 @@
     unsafe-put-string-tc
     unsafe-put-string-proc
 
-    unsafe-unbox unsafe-unbox-tc
-    unsafe-car unsafe-car-tc
-    unsafe-cdr unsafe-cdr-tc
+    unsafe-unbox
+    unsafe-unbox-tc
+    unsafe-unbox-proc
 
-    car car-tc
-    cdr cdr-tc
-    cons cons-tc
+    unsafe-car
+    unsafe-car-tc
+    unsafe-car-proc
 
-    null? null?-tc
-    byte? byte?-tc
-    word? word?-tc
-    pair? pair?-tc
-    char? char?-tc
-    string? string?-tc
-    symbol? symbol?-tc
+    unsafe-cdr
+    unsafe-cdr-tc
+    unsafe-cdr-proc
+
+    car
+    car-tc
+    car-proc
+
+    cdr
+    cdr-tc
+    cdr-proc
+
+    cons
+    cons-tc
+    cons-proc
+
+    null?
+    null?-tc
+    null?-proc
+
+    byte?
+    byte?-tc
+    byte?-proc
+
+    word?
+    word?-tc
+    word?-proc
+
+    pair?
+    pair?-tc
+    pair?-proc
+
+    char?
+    char?-tc
+    char?-proc
+
+    string?
+    string?-tc
+    string?-proc
+
+    symbol?
+    symbol?-tc
+    symbol?-proc
 
     throw
+    throw-tc
+    throw-proc
 
-    unsafe-apply unsafe-apply-tc unsafe-apply-proc)
+    unsafe-apply
+    unsafe-apply-tc
+    unsafe-apply-proc)
   (import
     (zx-next core)
     (zx-next scheme alloc)
