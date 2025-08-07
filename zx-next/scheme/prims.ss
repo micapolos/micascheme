@@ -9,6 +9,8 @@
     load-false
     load-true
 
+    push-value
+
     null-value
     void-value
     false-value
@@ -63,10 +65,7 @@
 
     throw
 
-    invoke-0
-    invoke-1
-    invoke-2
-    invoke-n)
+    unsafe-invoke unsafe-invoke-tc unsafe-invoke-proc)
   (import
     (zx-next core)
     (zx-next scheme alloc)
@@ -172,7 +171,11 @@
       (value-data cdr))
     ((load-value value)
       (ld de (fxsrl value 16))
-      (ld hl (fxand value #xffff))))
+      (ld hl (fxand value #xffff)))
+    ((push-value value)
+      (load-value value)
+      (push de)
+      (push hl)))
 
   (define-op (ensure-tagged? tag)
     (ld a h)
@@ -385,16 +388,7 @@
     (push bc) ; return address
     (ret))
 
-  (define-proc (invoke-0)
+  (define-proc (unsafe-invoke)
     (pointer-ref de hl)
     (jp (hl)))
-
-  (define-proc (invoke-1)
-    (throw))
-
-  (define-proc (invoke-2)
-    (throw))
-
-  (define-proc (invoke-n)
-    (throw))
 )

@@ -216,9 +216,16 @@
     (assert-byte (#xe006) #x67)
     (assert-word (#xe007) #x2345))
 
-  (case invoke-0
+  (case unsafe-invoke-0
     (load-value (procedure-value offset-1 void-proc))
-    (invoke-0)
+    (unsafe-invoke)
+    (assert de (offset/byte offset-1 0))
+    (assert hl void-constant-word))
+
+  (case unsafe-invoke-1
+    (push-value (string-value offset-1 hello-world-string))
+    (load-value (procedure-value 0 unsafe-put-string-proc))
+    (unsafe-invoke)
     (assert de (offset/byte offset-1 0))
     (assert hl void-constant-word))
 
