@@ -71,7 +71,12 @@
             (syntax-case (compile-statement $lookup #'(offset a)) ()
               ((begin def ... body)
                 #`(begin def ...
-                  (%%begin body (%%cdr))))))))))
+                  (%%begin body (%%cdr))))))
+          ((%write s)
+            (syntax-case (compile-statement $lookup #'(offset s)) ()
+              ((begin def ... body)
+                #`(begin def ...
+                  (%%begin body (%%write))))))))))
 
   (define-rule-syntax (check-compile-statement lookup in out)
     (check (equal? (syntax->datum (compile-statement lookup #'in)) 'out)))

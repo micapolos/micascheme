@@ -49,3 +49,11 @@
       (%%push-value)
       (%%load-value (%%false-value 0))
       (%%cons))))
+
+(check-compile-statement (empty-lookup)
+  (2 (%write #x12))
+  (begin
+    (%%begin
+      (%%load-value (%%byte-value 2 #x12))
+      (%%write))))
+
