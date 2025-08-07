@@ -1,12 +1,14 @@
 (library (zx-next scheme write)
   (export
-    write-value
+    (rename (scheme-write write))
     write-stack)
   (import
     (zx-next core)
     (except (zx-next write) write-byte-literal write-word-literal)
     (zx-next scheme tag)
     (zx-next tag)
+    (zx-next scheme prims)
+    (zx-next scheme constant)
     (zx-next dispatch))
 
   (define-fragments
@@ -114,6 +116,10 @@
     (call write-string)
     (write-quotes-tc))
 
+  (define-proc (write-pair)
+    (writeln "Dupa, nie umiemy jeszcze rekurencji.")
+    (ret))
+
   (define-proc (write-unknown-tag a)
     (preserve (af)
       (write-hash)
@@ -188,7 +194,7 @@
       (write-unknown-tag #x04)
       (write-unknown-tag #x05)
       (write-unknown-tag #x06)
-      (write-unknown-tag #x07))
+      (begin (ld hl bc) (write-pair)))
     (write-ink normal-color)
     (ret))
 
@@ -230,5 +236,11 @@
           (preserve (bc de) (write-space))
           (call write-value))))
 
+    (ret))
+
+  (define-proc (scheme-write)
+    (preserve (de) (write-value de hl))
+    (ld e 0)
+    (ld hl void-constant-word)
     (ret))
 )

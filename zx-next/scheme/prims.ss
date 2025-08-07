@@ -39,7 +39,7 @@
     string? string?-tc
     symbol? symbol?-tc
 
-    throw write)
+    throw)
   (import
     (zx-next core)
     (zx-next scheme alloc)
@@ -49,8 +49,6 @@
     (zx-next dispatch)
     (zx-next scheme tag)
     (zx-next scheme constant)
-    (zx-next scheme write)
-    (prefix (zx-next write) zx-)
     (rename (zx-next throw)
       (throw zx-throw)))
 
@@ -309,11 +307,5 @@
     (pop af)  ; cdr
     (pop af)
     (push bc) ; return address
-    (ret))
-
-  (define-proc (write)
-    (preserve (de) (write-value de hl))
-    (ld e 0)
-    (ld hl void-constant-word)
     (ret))
 )
