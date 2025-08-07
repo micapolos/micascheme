@@ -24,74 +24,48 @@
   (define-expression (offset/byte offset byte)
     (fxior (fxsll offset 8) byte))
 
-  (define-expression (value offset byte tagged-word)
-    (fxior
-      (fxsll offset 24)
-      (fxsll byte 16)
-      tagged-word))
+  (define-expression (value byte tagged-word)
+    (fxior (fxsll byte 16) tagged-word))
 
-  (define-expression (null-value offset)
-    (value
-      offset
-      0
-      (fxsll null-constant 8)))
+  (define-expression (null-value)
+    (value 0 (fxsll null-constant 8)))
 
-  (define-expression (void-value offset)
-    (value
-      offset
-      0
-      (fxsll void-constant 8)))
+  (define-expression (void-value)
+    (value 0 (fxsll void-constant 8)))
 
-  (define-expression (false-value offset)
-    (value
-      offset
-      0
-      (fxsll false-constant 8)))
+  (define-expression (false-value)
+    (value 0 (fxsll false-constant 8)))
 
-  (define-expression (true-value offset)
-    (value
-      offset
-      0
-      (fxsll true-constant 8)))
+  (define-expression (true-value)
+    (value 0 (fxsll true-constant 8)))
 
-  (define-expression (byte-value offset byte)
-    (value
-      offset
-      byte
-      (constant-word byte-constant)))
+  (define-expression (byte-value byte)
+    (value byte (constant-word byte-constant)))
 
-  (define-expression (word-value offset word)
+  (define-expression (word-value word)
     (value
-      offset
       (fxand #xff word)
       (fxior (constant-word word-constant) (fxsrl word 8))))
 
-  (define-expression (char-value offset char)
-    (value
-      offset
-      char
-      (constant-word char-constant)))
+  (define-expression (char-value char)
+    (value char (constant-word char-constant)))
 
-  (define-expression (string-value offset address)
+  (define-expression (string-value address)
     (value
-      offset
       (fxand #xff address)
       (fxior (fxsll string-constant 8) (fxsrl address 8))))
 
-  (define-expression (symbol-value offset address)
+  (define-expression (symbol-value  address)
     (value
-      offset
       (fxand #xff address)
-      (fxior (fxsll symbol-constant 8) (fxsrl address 8))))
+      (fxior
+        (fxsll symbol-constant 8)
+        (fxsrl address 8))))
 
-  (define-expression (pair-value offset address)
-    (value
-      offset
-      0
-      (tagged-word pair-tag (fxand #x1fff address))))
+  (define-expression (pair-value address)
+    (value 0 (tagged-word pair-tag (fxand #x1fff address))))
 
-  (define-expression (procedure-value offset address)
+  (define-expression (procedure-value address)
     (value
-      offset
       (fxand address #xff)
       (fxior (fxsll procedure-tag 8) (fxand address #x1fff)))))

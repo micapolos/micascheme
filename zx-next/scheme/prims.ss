@@ -125,7 +125,7 @@
       (value-data car)
       (value-data cdr))
     ((load-value value)
-      (ld de (fxsrl value 16))
+      (ld e (fxsrl value 16))
       (ld hl (fxand value #xffff)))
     ((push-value value)
       (load-value value)
