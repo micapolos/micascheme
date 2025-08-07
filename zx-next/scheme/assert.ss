@@ -2,7 +2,7 @@
   (export value assert)
   (import
     (zx-next core)
-    (zx-next scheme prims)
+    (zx-next scheme value)
     (prefix (zx-next assert) zx-))
 
   (define-ops (keywords value)

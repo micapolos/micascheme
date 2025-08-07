@@ -3,7 +3,8 @@
   (zx-next scheme prims)
   (zx-next tagged)
   (zx-next scheme tag)
-  (zx-next scheme constant))
+  (zx-next scheme constant)
+  (zx-next scheme value))
 
 (define-values
   (offset-1 #xa1)
