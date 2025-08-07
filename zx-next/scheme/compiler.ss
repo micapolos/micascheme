@@ -8,11 +8,14 @@
     (micascheme)
     (u)
     (prefix (zx-next scheme keywords) %)
-    (prefix (zx-next scheme prims) %%))
+    (prefix (zx-next core) %%)
+    (prefix (zx-next scheme value) %%)
+    (prefix (zx-next scheme prims) %%)
+    (prefix (zx-next scheme write) %%))
 
   (define (compile-define $lookup $syntax)
     (syntax-case $syntax ()
-      ((%define id x)
+      ((_ id x)
         (identifier? #'id)
         (syntax-case (compile-op $lookup #'(2 x)) ()
           ((begin def ... body)
@@ -22,7 +25,7 @@
   (define (compile-op $lookup $syntax)
     (syntax-case $syntax ()
       ((offset expr)
-        (syntax-case #'expr (%begin %quote %quote %void %cons %car %cdr %write)
+        (syntax-case #'expr (%begin %quote %quote %void %cons %car %cdr %write %put-char %put-string)
           (()
             #`(begin (%%load-value (%%null-value offset))))
           (n
@@ -69,7 +72,7 @@
                     #`(begin def-a ... def-b ...
                       (%%begin
                         body-b
-                        (%%push-value)
+                        (%%push-top)
                         body-a
                         (%%cons))))))))
           ((%car a)
@@ -82,6 +85,16 @@
               ((begin def ... body)
                 #`(begin def ...
                   (%%begin body (%%cdr))))))
+          ((%put-char x)
+            (syntax-case (compile-op $lookup #'(offset x)) ()
+              ((begin def ... body)
+                #`(begin def ...
+                  (%%begin body (%%put-char))))))
+          ((%put-string x)
+            (syntax-case (compile-op $lookup #'(offset x)) ()
+              ((begin def ... body)
+                #`(begin def ...
+                  (%%begin body (%%put-string))))))
           ((%write s)
             (syntax-case (compile-op $lookup #'(offset s)) ()
               ((begin def ... body)

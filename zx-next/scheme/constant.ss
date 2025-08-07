@@ -27,8 +27,8 @@
     (word-constant   (constant #x03))
     (true-constant   (constant #x04))
     (false-constant  (constant #x05))
-    (string-constant (constant #x06))
-    (symbol-constant (constant #x07))
+    (symbol-constant (constant #x06))
+    (string-constant (constant #x07))
     (char-constant   (constant #x08)))
 
   (define-expression (constant-word constant)

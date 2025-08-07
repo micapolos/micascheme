@@ -63,7 +63,7 @@
   (begin
     (%%begin
       (%%load-value (%%byte-value 2 #x12))
-      (%%push-value)
+      (%%push-top)
       (%%load-value (%%false-value 0))
       (%%cons))))
 
@@ -77,18 +77,18 @@
 ; ==================================================
 
 (check-compile-define (empty-lookup)
-  (%define foo (%cons "foo" (%quote bar)))
+  (%define foo (%write (%cons "foo" (%quote bar))))
   (begin
     (%%define-fragment $symbol_0 (%%dz "bar"))
     (%%define-fragment $string_1 (%%dz "foo"))
     (%%define-proc (foo)
       (%%begin
-        (%%load-value (%%string-value 2 $string_1))
-        (%%push-value)
-        (%%load-value (%%symbol-value 0 $symbol_0))
-        (%%cons)))))
-
-
+        (%%begin
+          (%%load-value (%%string-value 2 $string_1))
+          (%%push-top)
+          (%%load-value (%%symbol-value 0 $symbol_0))
+          (%%cons))
+        (%%write)))))
 
 
 

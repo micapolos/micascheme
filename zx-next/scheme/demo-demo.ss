@@ -1,4 +1,5 @@
 (import (zx-next scheme demo))
 
 (demo
-  (write (cons #t #f)))
+  (write "foo")
+  (put-char #\return))

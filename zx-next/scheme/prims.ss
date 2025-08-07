@@ -7,6 +7,7 @@
     load-true
 
     push-value
+    push-top
 
     value-data
     pair-data
@@ -178,6 +179,10 @@
   (define-proc (put-string)
     (ensure-constant? string-constant)
     (unsafe-put-string-tc))
+
+  (define-proc (push-top)
+    (push de)
+    (push hl))
 
   (define-proc (box)
     ; Push value on the stack
