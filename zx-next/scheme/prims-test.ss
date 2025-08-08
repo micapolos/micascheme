@@ -217,19 +217,37 @@
     (load-value (byte-value #x12))
     (assert-throws (cdr)))
 
-  (case cons
+  ; (case cons
+  ;   (ld d offset)
+  ;   (load-value (string-value hello-world-string))
+  ;   (push-top)
+  ;   (ld d 0)
+  ;   (load-value (symbol-value hello-string))
+  ;   (cons)
+  ;   (assert e #x01)
+  ;   (assert hl #xe003)
+  ;   (assert-byte (#xe003) #xde)
+  ;   (assert-word (#xe004) #x0abc)
+  ;   (assert-byte (#xe006) #x67)
+  ;   (assert-word (#xe007) #x2345))
+
+  (case if/true
     (ld d offset)
-    (load-value (string-value hello-world-string))
-    (push-top)
-    (ld d 0)
-    (load-value (symbol-value hello-string))
-    (cons)
-    (assert e #x01)
-    (assert hl #xe003)
-    (assert-byte (#xe003) #xde)
-    (assert-word (#xe004) #x0abc)
-    (assert-byte (#xe006) #x67)
-    (assert-word (#xe007) #x2345))
+    (load-value (true-value))
+    (if
+      (load-value (byte-value #x12))
+      (load-value (byte-value #x34)))
+    (assert de (offset/byte offset #x12))
+    (assert hl (constant-word byte-constant)))
+
+  (case if/false
+    (ld d offset)
+    (load-value (false-value))
+    (if
+      (load-value (byte-value #x12))
+      (load-value (byte-value #x34)))
+    (assert de (offset/byte offset #x34))
+    (assert hl (constant-word byte-constant)))
 
   ;(call wait-space)
 )

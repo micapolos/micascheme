@@ -8,7 +8,7 @@
     (micascheme)
     (u)
     (prefix (zx-next scheme keywords) %)
-    (prefix (zx-next core) %%)
+    (prefix (except (zx-next core) if when) %%)
     (prefix (zx-next scheme value) %%)
     (prefix (zx-next scheme prims) %%)
     (prefix (zx-next scheme write) %%))
@@ -33,7 +33,8 @@
         %null? %void? %boolean? %byte? %word? %char? %symbol? %string? %pair?
         %void %box %cons %car %cdr
         %write
-        %put-char %put-string)
+        %put-char %put-string
+        %if %when)
       ((%asm op ...)
         #`(begin (%%begin op ...)))
       ((%quote ())
@@ -88,7 +89,27 @@
       ((%cdr a) (compile-op-1 $lookup #'%%cdr #'a))
       ((%put-char a) (compile-op-1 $lookup #'%%put-char #'a))
       ((%put-string a) (compile-op-1 $lookup #'%%put-string #'a))
-      ((%write a) (compile-op-1 $lookup #'%%write #'a))))
+      ((%write a) (compile-op-1 $lookup #'%%write #'a))
+      ((%if a b c)
+        (syntax-case (compile-op $lookup #'a) (begin)
+          ((begin def-a ... body-a)
+            (syntax-case (compile-op $lookup #'b) (begin)
+              ((begin def-b ... body-b)
+                (syntax-case (compile-op $lookup #'c) (begin)
+                  ((begin def-c ... body-c)
+                    #`(begin def-a ... def-b ... def-c ...
+                      (%%begin
+                        body-a
+                        (%%if body-b body-c))))))))))
+      ((%when a b ...)
+        (syntax-case (compile-op $lookup #'a) (begin)
+          ((begin def-a ... body-a)
+            (syntax-case (compile-op $lookup #'(%begin b ...)) (begin)
+              ((begin def-b ... body-b)
+                #`(begin def-a ... def-b ...
+                  (%%begin
+                    body-a
+                    (%%when body-b))))))))))
 
   (define (compile-op-1 $lookup $op $arg)
     (syntax-case (compile-op $lookup $arg) ()

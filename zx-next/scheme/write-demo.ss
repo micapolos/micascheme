@@ -2,6 +2,10 @@
 
 (demo
   (asm (writeln "This is from asm"))
+  (write (if (cons 1 2) "true" "false"))
+  (put-char #\return)
+  (write (if #f "true" "false"))
+  (put-char #\return)
   (write #t)
   (put-char #\return)
   (write #f)

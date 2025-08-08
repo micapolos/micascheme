@@ -75,6 +75,22 @@
       (%%load-value (%%byte-value #x12))
       (%%write))))
 
+(check-compile-op (empty-lookup)
+  (%if #x12 #x13 #x14)
+  (begin
+    (%%begin
+      (%%load-value (%%byte-value #x12))
+      (%%if
+        (%%load-value (%%byte-value #x13))
+        (%%load-value (%%byte-value #x14))))))
+
+(check-compile-op (empty-lookup)
+  (%when #x12 #x13)
+  (begin
+    (%%begin
+      (%%load-value (%%byte-value #x12))
+      (%%when (%%begin (%%load-value (%%byte-value #x13)))))))
+
 ; ==================================================
 
 (check-compile-define (empty-lookup)

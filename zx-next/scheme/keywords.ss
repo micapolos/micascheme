@@ -5,7 +5,8 @@
     void? null? boolean? byte? word? char? string? symbol? pair?
     box cons car cdr
     write
-    put-char put-string)
+    put-char put-string
+    if when)
   (import (only (micascheme) define-keywords))
 
   (define-keywords
@@ -14,5 +15,6 @@
     void? null? boolean? byte? word? char? string? symbol? pair?
     box cons car cdr
     write
-    put-char put-string)
+    put-char put-string
+    if when)
 )
