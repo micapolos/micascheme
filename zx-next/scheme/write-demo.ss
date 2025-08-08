@@ -1,8 +1,12 @@
 (import (zx-next scheme demo) (zx-next write))
 
 (demo
-  (asm (writeln "This is from asm"))
-  (write (if (cons 1 2) "true" "false"))
+  (asm (writeln "This is from asm..."))
+  (put-string "...and this is from Scheme\r")
+  (write
+    (if (cons 1 2)
+      (begin "true")
+      (begin "false")))
   (put-char #\return)
   (write (if #f "true" "false"))
   (put-char #\return)
