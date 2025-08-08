@@ -33,7 +33,7 @@
         %void %box %cons %car %cdr
         %write
         %put-char %put-string)
-      (()
+      ((%quote ())
         #`(begin (%%load-value (%%null-value))))
       (n
         (u8? (datum n))

@@ -36,7 +36,7 @@
   (begin (%%load-value (%%false-value))))
 
 (check-compile-op (empty-lookup)
-  ()
+  (%quote ())
   (begin (%%load-value (%%null-value))))
 
 (check-compile-op (empty-lookup)
