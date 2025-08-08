@@ -26,7 +26,13 @@
                 body)))))))
 
   (define (compile-op $lookup $syntax)
-    (syntax-case $syntax (%begin %quote %quote %void %cons %car %cdr %write %put-char %put-string)
+    (syntax-case $syntax
+      (
+        %begin %quote %throw
+        %null? %void? %boolean? %byte? %word? %char? %symbol? %string? %pair?
+        %void %box %cons %car %cdr
+        %write
+        %put-char %put-string)
       (()
         #`(begin (%%load-value (%%null-value))))
       (n
@@ -62,6 +68,18 @@
             #`(begin
               def ... ...
               (%%begin op ...)))))
+      ((%throw a) (compile-op-1 $lookup #'%%throw #'a))
+      ((%null? a) (compile-op-1 $lookup #'%%null? #'a))
+      ((%void? a) (compile-op-1 $lookup #'%%void? #'a))
+      ((%boolean? a) (compile-op-1 $lookup #'%%boolean? #'a))
+      ((%byte? a) (compile-op-1 $lookup #'%%byte? #'a))
+      ((%word? a) (compile-op-1 $lookup #'%%word? #'a))
+      ((%char? a) (compile-op-1 $lookup #'%%char? #'a))
+      ((%symbol? a) (compile-op-1 $lookup #'%%symbol? #'a))
+      ((%string? a) (compile-op-1 $lookup #'%%string? #'a))
+      ((%pair? a) (compile-op-1 $lookup #'%%pair? #'a))
+      ((%void) #'(%%void))
+      ((%box a) (compile-op-1 $lookup #'%%box #'a))
       ((%cons a b) (compile-op-2 $lookup #'%%cons #'a #'b))
       ((%car a) (compile-op-1 $lookup #'%%car #'a))
       ((%cdr a) (compile-op-1 $lookup #'%%cdr #'a))
