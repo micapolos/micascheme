@@ -15,7 +15,7 @@
     (allocation starts with 8 byte header followed by data)
     (the header has the following structure
       (bit 7 : 0 = bytes / 1 = banked pointers)
-      (bit 6 ... 0 : number of bytes / banked pointers)))
+      (bit 6 ... 0 : 0 = number of items)))
 
   (define-ops
     ((bytes-allocation x ...)
