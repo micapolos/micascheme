@@ -6,72 +6,69 @@
   (prefix (zx-next scheme prims) %%))
 
 (check-compile-op (empty-lookup)
-  (2 (%begin))
+  (%begin)
   (begin (%%begin)))
 
 (check-compile-op (empty-lookup)
-  (2 (%begin 1 "foo" (%quote bar)))
+  (%begin 1 "foo" (%quote bar))
   (begin
-   (%%define-fragment $string_0 (%%dz "foo"))
-   (%%define-fragment $symbol_1 (%%dz "bar"))
-   (%%begin
-    (%%load-value (%%byte-value 2 1))
+    (%%define-fragment $string_1 (%%dz "foo"))
+    (%%define-fragment $symbol_0 (%%dz "bar"))
     (%%begin
-      (%%load-value (%%string-value 0 $string_0))
-      (%%begin
-        (%%load-value (%%symbol-value 0 $symbol_1))
-        (%%begin))))))
+      (%%load-value (%%byte-value 1))
+      (%%load-value (%%string-value $string_1))
+      (%%load-value (%%symbol-value $symbol_0)))))
 
 (check-compile-op (empty-lookup)
-  (2 #x12)
-  (begin (%%load-value (%%byte-value 2 #x12))))
+  #x12
+  (begin (%%load-value (%%byte-value #x12))))
 
 (check-compile-op (empty-lookup)
-  (2 #x1234)
-  (begin (%%load-value (%%word-value 2 #x1234))))
+  #x1234
+  (begin (%%load-value (%%word-value #x1234))))
 
 (check-compile-op (empty-lookup)
-  (2 #f)
-  (begin (%%load-value (%%false-value 2))))
+  #f
+  (begin (%%load-value (%%false-value))))
 
 (check-compile-op (empty-lookup)
-  (2 #f)
-  (begin (%%load-value (%%false-value 2))))
+  #f
+  (begin (%%load-value (%%false-value))))
 
 (check-compile-op (empty-lookup)
-  (2 ())
-  (begin (%%load-value (%%null-value 2))))
+  ()
+  (begin (%%load-value (%%null-value))))
 
 (check-compile-op (empty-lookup)
-  (2 #\a)
-  (begin (%%load-value (%%char-value 2 #\a))))
+  #\a
+  (begin (%%load-value (%%char-value #\a))))
 
 (check-compile-op (empty-lookup)
-  (2 "foo")
+  "foo"
   (begin
     (%%define-fragment $string_0 (%%dz "foo"))
-    (%%load-value (%%string-value 2 $string_0))))
+    (%%load-value (%%string-value $string_0))))
 
 (check-compile-op (empty-lookup)
-  (2 (%quote foo))
+  (%quote foo)
   (begin
     (%%define-fragment $symbol_0 (%%dz "foo"))
-    (%%load-value (%%symbol-value 2 $symbol_0))))
+    (%%load-value (%%symbol-value $symbol_0))))
 
 (check-compile-op (empty-lookup)
-  (2 (%cons #x12 #f))
+  (%cons #x12 #f)
   (begin
     (%%begin
-      (%%load-value (%%byte-value 2 #x12))
+      (%%load-value (%%byte-value #x12))
       (%%push-top)
-      (%%load-value (%%false-value 0))
+      (%%load-value (%%false-value))
       (%%cons))))
 
 (check-compile-op (empty-lookup)
-  (2 (%write #x12))
+  (%write #x12)
   (begin
     (%%begin
-      (%%load-value (%%byte-value 2 #x12))
+      (%%load-value (%%byte-value #x12))
       (%%write))))
 
 ; ==================================================
@@ -82,11 +79,13 @@
     (%%define-fragment $symbol_0 (%%dz "bar"))
     (%%define-fragment $string_1 (%%dz "foo"))
     (%%define-proc (foo)
+      (%%inc %%d)
+      (%%inc %%d)
       (%%begin
         (%%begin
-          (%%load-value (%%string-value 2 $string_1))
+          (%%load-value (%%string-value $string_1))
           (%%push-top)
-          (%%load-value (%%symbol-value 0 $symbol_0))
+          (%%load-value (%%symbol-value $symbol_0))
           (%%cons))
         (%%write)))))
 

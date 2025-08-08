@@ -14,7 +14,7 @@
   (define-syntax (demo $syntax $lookup)
     (syntax-case $syntax ()
       ((_ x ...)
-        (syntax-case (compile-op $lookup #'(0 (%begin x ...))) ()
+        (syntax-case (compile-op $lookup #'(%begin x ...)) ()
           ((begin def ... body)
             #`(begin def ...
               (%%demo
