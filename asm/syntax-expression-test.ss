@@ -31,3 +31,9 @@
       (plus (syntax-rules () ((_ a b) (+ a b)))))
     #'(plus 10 20))
   (dependent (+ 10 20)))
+
+; length
+(check-expression
+  (syntax->expression (empty-lookup) #'(length foo bar 123 #'asd))
+  (dependent 4))
+

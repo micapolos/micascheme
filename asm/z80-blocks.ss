@@ -64,7 +64,9 @@
         (jp label-end)
         label-then
         then-body ...
-        label-end)))
+        label-end))
+    ((if flag then-op else-op)
+      (if flag (then then-op) (else else-op))))
 
   (define-ops (keywords c nc z nz m p po pe)
     ((when nc body ...) (unless c body ...))
