@@ -22,6 +22,9 @@
 (println-leo-line (() foo (() . (bar (() . (goo))))))
 
 (display-string "=== Leo script ===\n")
+(print-leo 10 20 30)
+(leo-print `(10 20 (ld a n) (ret) . 30))
+
 (print-leo
   10
   foo
