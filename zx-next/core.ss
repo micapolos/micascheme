@@ -8,4 +8,5 @@
       (asm z80)
       (asm z80-blocks)
       (asm run)
-      (asm make-dot))))
+      (asm make-dot)))
+)

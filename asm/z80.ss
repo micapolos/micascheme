@@ -7,6 +7,8 @@
     pc sp
     i r
 
+    ehl dehl
+
     nz z nc po pe p m
 
     ld
@@ -55,6 +57,7 @@
     ixh ixl iyh iyl
     pc sp
     i r
+    ehl dehl
     nz z nc po pe p m)
 
   (define-ops
@@ -65,6 +68,7 @@
       ixh ixl iyh iyl
       pc sp
       i r
+      ehl dehl
       nz z nc po pe p m)
     ; Load
     ((ld b b)          (db #b01000000))
@@ -270,6 +274,9 @@
     ((ld ix nm)        (db #xdd) (db #b00100001) (dw nm))
     ((ld iy nm)        (db #xfd) (db #b00100001) (dw nm))
     ((ld sp nm)        (db #b00110001) (dw nm))
+
+    ((ld ehl nnn)      (ld e (fxsrl nnn 16)) (ld hl (fxand #xffff nnn)))
+    ((ld dehl nnnn)    (ld de (fxsrl nnnn 16)) (ld hl (fxand #xffff nnnn)))
 
     ; Arithmetic and logic
     ((add b)           (db #b10000000))
@@ -795,6 +802,8 @@
     ((pop ix)          (db #xdd #b11100001))
     ((pop iy)          (db #xfd #b11100001))
 
+    ((pop dehl)        (pop hl) (pop de))
+
     ((push bc)         (db #b11000101))
     ((push de)         (db #b11010101))
     ((push hl)         (db #b11100101))
@@ -802,6 +811,8 @@
 
     ((push ix)         (db #xdd #b11100101))
     ((push iy)         (db #xfd #b11100101))
+
+    ((push dehl)       (push de) (push hl))
 
     ; Exchange
     ((ex af)           (db #x08))

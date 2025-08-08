@@ -27,6 +27,8 @@
     (label-bc (dz "bc"))
     (label-de (dz "de"))
     (label-hl (dz "hl"))
+    (label-ehl (dz "ehl"))
+    (label-dehl (dz "dehl"))
     (label-ix (dz "ix"))
     (label-iy (dz "iy"))
     (label-nc (dz "nc"))
