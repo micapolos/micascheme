@@ -53,6 +53,10 @@
     (ld a #\space)
     (jp write-char))
 
+  (define-proc (write-dot)
+    (ld a #\.)
+    (jp write-char))
+
   (define-proc (write-true)
     (write-hash)
     (write-ink boolean-color)
@@ -121,6 +125,8 @@
       (preserve (de hl) (write-open))
       (car)
       (call write-value)
+      (write-space)
+      (write-dot)
       (write-space))
     (cdr)
     (call write-value)

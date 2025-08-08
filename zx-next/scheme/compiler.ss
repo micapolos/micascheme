@@ -77,9 +77,9 @@
 
   (define (compile-op-2 $lookup $op $arg-a $arg-b)
     (syntax-case (compile-op $lookup $arg-b) (begin)
-      ((begin def-a ... body-a)
+      ((begin def-b ... body-b)
         (syntax-case (compile-op $lookup $arg-a) (begin)
-          ((begin def-b ... body-b)
+          ((begin def-a ... body-a)
             #`(begin def-a ... def-b ...
               (%%begin
                 body-b

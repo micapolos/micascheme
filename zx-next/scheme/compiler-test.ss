@@ -59,9 +59,9 @@
   (%cons #x12 #f)
   (begin
     (%%begin
-      (%%load-value (%%byte-value #x12))
-      (%%push-top)
       (%%load-value (%%false-value))
+      (%%push-top)
+      (%%load-value (%%byte-value 18))
       (%%cons))))
 
 (check-compile-op (empty-lookup)
@@ -76,19 +76,17 @@
 (check-compile-define (empty-lookup)
   (%define foo (%write (%cons "foo" (%quote bar))))
   (begin
-    (%%define-fragment $symbol_0 (%%dz "bar"))
     (%%define-fragment $string_1 (%%dz "foo"))
+    (%%define-fragment $symbol_0 (%%dz "bar"))
     (%%define-proc (foo)
       (%%inc %%d)
       (%%inc %%d)
       (%%begin
         (%%begin
-          (%%load-value (%%string-value $string_1))
-          (%%push-top)
           (%%load-value (%%symbol-value $symbol_0))
+          (%%push-top)
+          (%%load-value (%%string-value $string_1))
           (%%cons))
         (%%write)))))
-
-
 
 

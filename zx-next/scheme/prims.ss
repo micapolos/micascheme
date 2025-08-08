@@ -180,7 +180,7 @@
     (ensure-constant? string-constant)
     (unsafe-put-string-tc))
 
-  (define-proc (push-top)
+  (define-op (push-top)
     (push de)
     (push hl))
 

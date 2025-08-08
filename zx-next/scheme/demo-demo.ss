@@ -17,5 +17,5 @@
   (put-char #\return)
   (write ())
   (put-char #\return)
-  (put-char #\a)
-  (put-string "sdf"))
+  (write (cons #\a (cons "foo" 'bar)))
+  (put-char #\return))
