@@ -6,6 +6,10 @@
   (prefix (zx-next scheme prims) %%))
 
 (check-compile-op (empty-lookup)
+  (%asm (%%inc %%a) (%%ret))
+  (begin (%%begin (%%inc %%a) (%%ret))))
+
+(check-compile-op (empty-lookup)
   (%begin)
   (begin (%%begin)))
 

@@ -1,6 +1,7 @@
-(import (zx-next scheme demo))
+(import (zx-next scheme demo) (zx-next write))
 
 (demo
+  (asm (writeln "This is from asm"))
   (write #t)
   (put-char #\return)
   (write #f)

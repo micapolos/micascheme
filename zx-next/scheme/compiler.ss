@@ -28,11 +28,14 @@
   (define (compile-op $lookup $syntax)
     (syntax-case $syntax
       (
+        %asm
         %begin %quote %throw
         %null? %void? %boolean? %byte? %word? %char? %symbol? %string? %pair?
         %void %box %cons %car %cdr
         %write
         %put-char %put-string)
+      ((%asm op ...)
+        #`(begin (%%begin op ...)))
       ((%quote ())
         #`(begin (%%load-value (%%null-value))))
       (n

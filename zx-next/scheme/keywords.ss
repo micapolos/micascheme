@@ -1,5 +1,6 @@
 (library (zx-next scheme keywords)
   (export
+    asm
     void begin quote lets throw
     void? null? boolean? byte? word? char? string? symbol? pair?
     box cons car cdr
@@ -8,6 +9,7 @@
   (import (only (micascheme) define-keywords))
 
   (define-keywords
+    asm
     void begin quote lets throw
     void? null? boolean? byte? word? char? string? symbol? pair?
     box cons car cdr
