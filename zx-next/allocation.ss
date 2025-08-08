@@ -12,7 +12,7 @@
     (zx-next banked-pointer))
 
   (comment
-    (allocation starts with 8 byte header followed by data)
+    (allocation starts with 1 byte header followed by data)
     (the header has the following structure
       (bit 7 : 0 = bytes / 1 = banked pointers)
       (bit 6 ... 0 : 0 = number of items)))
