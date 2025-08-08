@@ -62,42 +62,30 @@
             #`(begin
               def ... ...
               (%%begin op ...)))))
-      ((%cons a b)
-        (syntax-case (compile-op $lookup #'b) (begin)
-          ((begin def-a ... body-a)
-            (syntax-case (compile-op $lookup #'a) (begin)
-              ((begin def-b ... body-b)
-                #`(begin def-a ... def-b ...
-                  (%%begin
-                    body-b
-                    (%%push-top)
-                    body-a
-                    (%%cons))))))))
-      ((%car a)
-        (syntax-case (compile-op $lookup #'a) ()
-          ((begin def ... body)
-            #`(begin def ...
-              (%%begin body (%%car))))))
-      ((%cdr a)
-        (syntax-case (compile-op $lookup #'a) ()
-          ((begin def ... body)
-            #`(begin def ...
-              (%%begin body (%%cdr))))))
-      ((%put-char x)
-        (syntax-case (compile-op $lookup #'x) ()
-          ((begin def ... body)
-            #`(begin def ...
-              (%%begin body (%%put-char))))))
-      ((%put-string x)
-        (syntax-case (compile-op $lookup #'x) ()
-          ((begin def ... body)
-            #`(begin def ...
-              (%%begin body (%%put-string))))))
-      ((%write s)
-        (syntax-case (compile-op $lookup #'s) ()
-          ((begin def ... body)
-            #`(begin def ...
-              (%%begin body (%%write))))))))
+      ((%cons a b) (compile-op-2 $lookup #'%%cons #'a #'b))
+      ((%car a) (compile-op-1 $lookup #'%%car #'a))
+      ((%cdr a) (compile-op-1 $lookup #'%%cdr #'a))
+      ((%put-char a) (compile-op-1 $lookup #'%%put-char #'a))
+      ((%put-string a) (compile-op-1 $lookup #'%%put-string #'a))
+      ((%write a) (compile-op-1 $lookup #'%%write #'a))))
+
+  (define (compile-op-1 $lookup $op $arg)
+    (syntax-case (compile-op $lookup $arg) ()
+      ((begin def ... body)
+        #`(begin def ...
+          (%%begin body (#,$op))))))
+
+  (define (compile-op-2 $lookup $op $arg-a $arg-b)
+    (syntax-case (compile-op $lookup $arg-b) (begin)
+      ((begin def-a ... body-a)
+        (syntax-case (compile-op $lookup $arg-a) (begin)
+          ((begin def-b ... body-b)
+            #`(begin def-a ... def-b ...
+              (%%begin
+                body-b
+                (%%push-top)
+                body-a
+                (#,$op))))))))
 
   (define-rule-syntax (check-compile-define lookup in out)
     (check (equal? (syntax->datum (compile-define lookup #'in)) 'out)))
