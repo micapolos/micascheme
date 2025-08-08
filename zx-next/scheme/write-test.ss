@@ -9,8 +9,8 @@
 
 (define-values
   (offset #xa1)
-  (value-1 (value #x56 #x1234))
-  (value-2 (value #xbc #x789a))
+  (value-1 (byte-value #x12))
+  (value-2 (byte-value #x34))
   (pair-1 (pair-value pair-data-1)))
 
 (define-fragments
@@ -18,7 +18,6 @@
   (hello-world-string (dz "Hello, world!")))
 
 (define-fragments
-  (test-box (value-data (value #x56 #x1234)))
   (value-data-1 (value-data value-1))
   (value-data-2 (value-data value-2))
   (pair-data-1 (pair-data value-1 value-2)))
