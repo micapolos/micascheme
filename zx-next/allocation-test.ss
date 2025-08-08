@@ -21,4 +21,6 @@
 
   (case write-allocation/pointers
     (write-allocation pointers))
+
+  ;(press-space)
 )

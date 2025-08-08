@@ -255,12 +255,10 @@
       (inc hl))
     (ret))
 
-  (define-fragment press-space-string (dz "=== PRESS SPACE ==="))
-
   (define-fragment terminal-wait-space
     (ld hl press-space-string)
     (call writeln-string)
-    (call wait-space))
+    (jp wait-space))
 
   (define-op (with-terminal body ...)
     (call terminal-init)

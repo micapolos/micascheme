@@ -3,8 +3,15 @@
     loop-bars
     wait-space
     wait-a-sec
-    dump)
+    dump
+
+    press-space-string
+    press-space
+    press-space-tc
+    press-space-proc)
   (import (zx-next core) (zx-next write))
+
+  (define-fragment press-space-string (dz "\x10;\x6;Press \x10;\x2;SPACE\x10;\x6; to continue...\x10;\x7;"))
 
   (define-fragment loop-bars
     (ld a #b010)
@@ -49,4 +56,9 @@
       (ld hl start)
       (ld bc size)
       (call write-mem)))
+
+  (define-proc (press-space)
+    (ld hl press-space-string)
+    (call writeln-string)
+    (jp wait-space))
 )
