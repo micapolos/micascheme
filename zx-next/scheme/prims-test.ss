@@ -26,6 +26,15 @@
   (case throw
     (assert-throws (throw)))
 
+  (case unsafe-add-byte-value
+    (ld d offset)
+    (push-value (byte-value #x12))
+    (load-value (byte-value #x34))
+    (unsafe-add-byte-value)
+    (assert d offset)
+    (assert de (offset/byte offset #x46))
+    (assert hl (constant-word byte-constant)))
+
   (case void
     (ld d offset)
     (void)

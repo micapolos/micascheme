@@ -9,6 +9,9 @@
     push-value
     push-top
 
+    unsafe-add-byte-value
+    unsafe-add-word-value
+
     value-data
     pair-data
 
@@ -132,7 +135,23 @@
     ((push-value value)
       (load-value value)
       (push de)
-      (push hl)))
+      (push hl))
+    ((pop-value)
+      (pop hl)
+      (pop de))
+    ((unsafe-add-byte-value)
+      (ld a e)
+      (pop-value)
+      (add e)
+      (ld e a))
+    ((unsafe-add-word-value)
+      (ld h l)
+      (ld l e)
+      (pop bc)
+      (pop de)
+      (ld b l)
+      (ld c e)
+      (add hl bc)))
 
   (define-op (ensure-tagged? tag)
     (ld a h)

@@ -19,7 +19,8 @@
     (zx-next tag)
     (zx-next tagged)
     (zx-next scheme tag)
-    (zx-next scheme constant))
+    (zx-next scheme constant)
+    (zx-next write))
 
   (define-expression (offset/byte offset byte)
     (fxior (fxsll offset 8) byte))
@@ -68,4 +69,5 @@
   (define-expression (procedure-value address)
     (value
       (fxand address #xff)
-      (fxior (fxsll procedure-tag 8) (fxand address #x1fff)))))
+      (fxior (fxsll procedure-tag 8) (fxand address #x1fff))))
+)
