@@ -1,8 +1,6 @@
 (library (zx-next scheme compiler)
   (export
-    compile-define
     compile-op
-    check-compile-define
     check-compile-op)
   (import
     (micascheme)
@@ -12,18 +10,6 @@
     (prefix (zx-next scheme value) %%)
     (prefix (zx-next scheme prims) %%)
     (prefix (zx-next scheme write) %%))
-
-  (define (compile-define $lookup $syntax)
-    (syntax-case $syntax ()
-      ((_ id x)
-        (identifier? #'id)
-        (syntax-case (compile-op $lookup #'x) ()
-          ((begin def ... body)
-            #`(begin def ...
-              (%%define-proc (id)
-                (%%inc %%d)
-                (%%inc %%d)
-                body)))))))
 
   (define (compile-op $lookup $syntax)
     (syntax-case $syntax

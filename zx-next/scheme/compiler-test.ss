@@ -90,23 +90,3 @@
     (%%begin
       (%%load-value (%%byte-value #x12))
       (%%when-true (%%begin (%%load-value (%%byte-value #x13)))))))
-
-; ==================================================
-
-(check-compile-define (empty-lookup)
-  (%define foo (%write (%cons "foo" (%quote bar))))
-  (begin
-    (%%define-fragment $string_1 (%%dz "foo"))
-    (%%define-fragment $symbol_0 (%%dz "bar"))
-    (%%define-proc (foo)
-      (%%inc %%d)
-      (%%inc %%d)
-      (%%begin
-        (%%begin
-          (%%load-value (%%symbol-value $symbol_0))
-          (%%push-top)
-          (%%load-value (%%string-value $string_1))
-          (%%cons))
-        (%%write)))))
-
-

@@ -1,15 +1,12 @@
 (library (zx-next scheme demo)
-  (export define demo)
+  (export demo)
   (import
-    (except (micascheme) define)
+    (micascheme)
     (zx-next scheme compiler)
     (prefix (zx-next scheme keywords) %)
     (prefix (zx-next demo) %%)
     (prefix (zx-next throw) %%))
   (export (import (zx-next scheme keywords)))
-
-  (define-syntax (define $syntax $lookup)
-    (compile-define $lookup $syntax))
 
   (define-syntax (demo $syntax $lookup)
     (syntax-case $syntax ()
