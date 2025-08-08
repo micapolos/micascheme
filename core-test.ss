@@ -22,3 +22,7 @@
 (check (equal? (cond? (#f "foo")) #f))
 (check (equal? (cond? (#f "foo") (#t "bar")) "bar"))
 (check (equal? (cond? (#f "foo") (#f "bar")) #f))
+
+(comment
+  (This is a comment)
+  (Do you like it?))

@@ -6,7 +6,8 @@
     set+!
     set-!
     set*!
-    cond?)
+    cond?
+    comment)
   (import (scheme))
 
   (define-syntax cons!
@@ -38,4 +39,8 @@
     (syntax-rules ()
       ((_ x ...)
         (cond x ... (else #f)))))
+
+  (define-syntax comment
+    (syntax-rules ()
+      ((_ . x) (begin))))
 )
