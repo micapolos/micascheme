@@ -3,19 +3,20 @@
 (print-leo
   10
   foo
-  #\A
-  #\newline
-  #t
-  #f
+  "bar"
+  (complex-stuff
+    #\A
+    #\newline
+    #t
+    #f)
   'foo
   #'foo
   `(foo ,bar)
+  #`(foo #,bar)
   (scheme
     (ld a h)
     (ret)
     (lambda (a) a))
-  #`(foo #,bar)
-  "bar"
   (x 10)
   (radius (length 10))
   (point (x 10) (y 20))
