@@ -8,7 +8,7 @@
     (micascheme)
     (u)
     (prefix (zx-next scheme keywords) %)
-    (prefix (except (zx-next core) if when) %%)
+    (prefix (zx-next core) %%)
     (prefix (zx-next scheme value) %%)
     (prefix (zx-next scheme prims) %%)
     (prefix (zx-next scheme write) %%))
@@ -100,7 +100,7 @@
                     #`(begin def-a ... def-b ... def-c ...
                       (%%begin
                         body-a
-                        (%%if body-b body-c))))))))))
+                        (%%if-true body-b body-c))))))))))
       ((%when a b ...)
         (syntax-case (compile-op $lookup #'a) (begin)
           ((begin def-a ... body-a)
@@ -109,7 +109,7 @@
                 #`(begin def-a ... def-b ...
                   (%%begin
                     body-a
-                    (%%when body-b))))))))))
+                    (%%when-true body-b))))))))))
 
   (define (compile-op-1 $lookup $op $arg)
     (syntax-case (compile-op $lookup $arg) ()

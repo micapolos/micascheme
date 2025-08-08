@@ -3,7 +3,7 @@
     (rename (scheme-write write))
     write-stack)
   (import
-    (except (zx-next core) if when)
+    (zx-next core)
     (except (zx-next write) write-byte-literal write-word-literal)
     (zx-next scheme tag)
     (zx-next tag)

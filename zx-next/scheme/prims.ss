@@ -96,10 +96,9 @@
     unsafe-apply-tc
     unsafe-apply-proc
 
-    if when)
+    if-true when-true)
   (import
-    (except (zx-next core) if when)
-    (prefix (only (zx-next core) if when) zx-)
+    (zx-next core)
     (zx-next scheme alloc)
     (zx-next banked-pointer)
     (zx-next tag)
@@ -139,12 +138,12 @@
     (ld a h)
     (and tag-mask)
     (cp tag)
-    (zx-when nz (zx-throw)))
+    (when nz (zx-throw)))
 
   (define-op (ensure-constant? constant)
     (ld a h)
     (cp constant)
-    (zx-when nz (zx-throw)))
+    (when nz (zx-throw)))
 
   (define-op (pointer-ref de hl)
     (input (de hl value))
@@ -187,15 +186,15 @@
     (push de)
     (push hl))
 
-  (define-op (if true-op false-op)
+  (define-op (if-true true-op false-op)
     (ld a h)
     (cp false-constant)
-    (zx-if nz (then true-op) (else false-op)))
+    (if nz (then true-op) (else false-op)))
 
-  (define-op (when b ...)
+  (define-op (when-true b ...)
     (ld a h)
     (cp false-constant)
-    (zx-when nz b ...))
+    (when nz b ...))
 
   (define-proc (box)
     ; Push value on the stack
@@ -282,14 +281,14 @@
     (ld a h)
     (and tag-mask)
     (cp tag)
-    (zx-if z
+    (if z
       (then (load-true d))
       (else (load-false d))))
 
   (define-op (load-constant? constant)
     (ld a h)
     (cp (tagged-byte constant-tag constant))
-    (zx-when z
+    (when z
       (load-true d)
       (ret))
     (load-false d))

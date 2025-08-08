@@ -80,7 +80,7 @@
   (begin
     (%%begin
       (%%load-value (%%byte-value #x12))
-      (%%if
+      (%%if-true
         (%%load-value (%%byte-value #x13))
         (%%load-value (%%byte-value #x14))))))
 
@@ -89,7 +89,7 @@
   (begin
     (%%begin
       (%%load-value (%%byte-value #x12))
-      (%%when (%%begin (%%load-value (%%byte-value #x13)))))))
+      (%%when-true (%%begin (%%load-value (%%byte-value #x13)))))))
 
 ; ==================================================
 
