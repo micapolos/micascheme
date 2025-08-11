@@ -24,7 +24,7 @@
 
   (define-ops
     (keywords
-      a de hl
+      a de hl ehl dehl
       u8 u16 u24 u32
       u8-neg u8-not
       u8+1 u8-1 u8+ u8- u8-and u8-or u8-xor u8-mul
@@ -34,10 +34,13 @@
       u16+1 u16-1 u16+ u16-
       u16-peek-nn)
 
-    ; 8-bit load
-    ((ld-expr r (u8 n))
-      (ld r n))
+    ; Load
+    ((ld-expr r    (u8 n))     (ld r n))
+    ((ld-expr rr   (u16 nn))   (ld rr nn))
+    ((ld-expr ehl  (u24 nnn))  (ld ehl nnn))
+    ((ld-expr dehl (u32 nnnn)) (ld dehl nnnn))
 
+    ; Load indirect
     ((ld-expr a (u8-peek-nn nn))
       (ld a (nn)))
 
@@ -134,10 +137,6 @@
     ((ld-expr rr (u8-mul lhs rhs))
       (ld-expr de (u8-mul lhs rhs))
       (ld rr de))
-
-    ; 16-bit
-    ((ld-expr rr (u16 nn))
-      (ld rr nn))
 
     ((ld-u16-op1 rr op lhs)
       (ld-expr rr lhs)

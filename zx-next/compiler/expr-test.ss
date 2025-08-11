@@ -4,8 +4,23 @@
 
 (test
   (case u8
-    (ld-expr a (u8 #x22))
-    (assert a #x22))
+    (ld-expr h (u8 #x22))
+    (assert h #x22))
+
+  (case u16
+    (ld-expr de (u16 #x1234))
+    (break)
+    (assert de #x1234))
+
+  (case u24
+    (ld-expr ehl (u24 #x123456))
+    (assert e #x12)
+    (assert hl #x3456))
+
+  (case u32
+    (ld-expr dehl (u32 #x12345678))
+    (assert de #x1234)
+    (assert hl #x5678))
 
   (case u8+1
     (ld-expr a (u8+1 (u8 #x11)))
