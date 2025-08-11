@@ -7,6 +7,7 @@
     define-fragment
     define-fragments
     define-value
+    define-expression-syntax
     define-expression
     define-constant
     define-constants
@@ -110,11 +111,14 @@
   (define-rule-syntax (define-value id expr)
     (%define id expr))
 
-  (define-rule-syntax (define-expression (id param ...) body)
+  (define-rule-syntax (define-expression-syntax id transformer)
     (define-syntax id
-      (make-compile-time-value
-        (syntax-rules ()
-          ((_ param ...) body)))))
+      (make-compile-time-value transformer)))
+
+  (define-rule-syntax (define-expression (id param ...) body)
+    (define-expression-syntax id
+      (syntax-rules ()
+        ((_ param ...) body))))
 
   (define-rule-syntax (define-constant id expr)
     (define-syntax id (eval 'expr (environment '(scheme)))))

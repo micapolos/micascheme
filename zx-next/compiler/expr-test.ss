@@ -9,7 +9,6 @@
 
   (case u16
     (ld-expr de (u16 #x1234))
-    (break)
     (assert de #x1234))
 
   (case u24
