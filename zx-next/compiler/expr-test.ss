@@ -7,28 +7,28 @@
     (ld-expr a (u8 #x22))
     (assert a #x22))
 
-  (case u8-inc
-    (ld-expr a (u8-inc (u8 #x11)))
+  (case u8+1
+    (ld-expr a (u8+1 (u8 #x11)))
     (assert a #x12))
 
-  (case u8-dec
-    (ld-expr a (u8-dec (u8 #x11)))
+  (case u8-1
+    (ld-expr a (u8-1 (u8 #x11)))
     (assert a #x10))
 
-  (case u8-add-n
-    (ld-expr a (u8-add-n (u8 #x11) #x22))
+  (case u8+n
+    (ld-expr a (u8+n (u8 #x11) #x22))
     (assert a #x33))
 
-  (case u8-add
-    (ld-expr a (u8-add (u8 #x11) (u8 #x22)))
+  (case u8+
+    (ld-expr a (u8+ (u8 #x11) (u8 #x22)))
     (assert a #x33))
 
-  (case u8-sub-n
-    (ld-expr a (u8-sub-n (u8 #x33) #x22))
+  (case u8-n
+    (ld-expr a (u8-n (u8 #x33) #x22))
     (assert a #x11))
 
-  (case u8-sub
-    (ld-expr a (u8-sub (u8 #x33) (u8 #x22)))
+  (case u8-
+    (ld-expr a (u8- (u8 #x33) (u8 #x22)))
     (assert a #x11))
 
   (case u8-and-n
@@ -72,7 +72,7 @@
     (assert a #x34))
 
   (case u8-peek+1
-    (ld-expr a (u8-peek (u16-inc (u16 test-data))))
+    (ld-expr a (u8-peek (u16+1 (u16 test-data))))
     (assert a #x12))
 
   (case u8-peek-local
