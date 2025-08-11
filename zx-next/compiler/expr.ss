@@ -5,6 +5,7 @@
     byte-add-n byte-sub-n byte-and-n byte-or-n byte-xor-n
     byte-add byte-sub byte-and byte-or byte-xor byte-mul
     byte-peek-nn byte-peek-local byte-peek
+    byte-zero? byte=? byte<?
     word word-inc word-dec word-add word-sub
     word-peek-nn)
   (import (zx-next core))
@@ -13,6 +14,7 @@
     byte byte-inc byte-dec byte-add byte-sub byte-and byte-or byte-xor byte-mul
     byte-add-n byte-sub-n byte-and-n byte-or-n byte-xor-n
     byte-peek-nn byte-peek-local byte-peek
+    byte-zero? byte=? byte<?
     word word-inc word-dec word-add word-sub
     word-peek-nn)
 
@@ -22,6 +24,7 @@
       byte byte-inc byte-dec byte-add byte-sub byte-and byte-or byte-xor byte-mul
       byte-add-n byte-sub-n byte-and-n byte-or-n byte-xor-n
       byte-peek-nn byte-peek-local byte-peek
+      byte-zero? byte=? byte<?
       word word-inc word-dec word-add word-sub
       word-peek-nn)
 
@@ -152,5 +155,28 @@
 
     ((ld-expr rr (word-peek-nn nn))
       (ld hl (nn))
-      (ld rr hl)))
+      (ld rr hl))
+
+    ; Conditionals
+    ((ld-expr r (if (byte-zero? lhs) then-body else-body))
+      (ld-expr a lhs)
+      (or a)
+      (if z (ld-expr r then-body) (ld-expr r else-body)))
+
+    ((ld-expr r (if (byte=? lhs rhs) then-body else-body))
+      (ld-expr l lhs)
+      (push hl)
+      (ld-expr a rhs)
+      (pop hl)
+      (xor l)
+      (if z (ld-expr r then-body) (ld-expr r else-body)))
+
+    ((ld-expr r (if (byte<? lhs rhs) then-body else-body))
+      (ld-expr l rhs)
+      (push hl)
+      (ld-expr a lhs)
+      (pop hl)
+      (cp l)
+      (if c (ld-expr r then-body) (ld-expr r else-body)))
+  )
 )

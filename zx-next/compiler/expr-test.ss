@@ -33,4 +33,28 @@
   (case byte-mul
     (ld-expr de (byte-mul (byte #x02) (byte #x03)))
     (assert de #x0006))
+
+  (case if-byte-zero?-positive
+    (ld-expr a (if (byte-zero? (byte #x00)) (byte #x34) (byte #x56)))
+    (assert a #x34))
+
+  (case if-byte-zero?-negative
+    (ld-expr a (if (byte-zero? (byte #x12)) (byte #x34) (byte #x56)))
+    (assert a #x56))
+
+  (case if-byte=?-positive
+    (ld-expr a (if (byte=? (byte #x01) (byte #x01)) (byte #x34) (byte #x56)))
+    (assert a #x34))
+
+  (case if-byte=?-negative
+    (ld-expr a (if (byte=? (byte #x01) (byte #x02)) (byte #x34) (byte #x56)))
+    (assert a #x56))
+
+  (case if-byte<?-positive
+    (ld-expr a (if (byte<? (byte #x01) (byte #x02)) (byte #x34) (byte #x56)))
+    (assert a #x34))
+
+  (case if-byte<?-negative
+    (ld-expr a (if (byte<? (byte #x02) (byte #x02)) (byte #x34) (byte #x56)))
+    (assert a #x56))
 )
