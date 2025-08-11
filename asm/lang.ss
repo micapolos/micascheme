@@ -43,9 +43,11 @@
   (export
     (import
       (only (asm base)
+        lambda datum
         define-keywords
+        define-syntax syntax quasisyntax unsyntax unsyntax-splicing
+        syntax-case syntax-rules
         keywords
-        syntax
         begin
         + - *
         bitwise-and bitwise-ior bitwise-xor

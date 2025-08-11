@@ -97,16 +97,16 @@
     (ld-expr a (u8-peek (u16+1 (u16 test-data))))
     (assert a #x12))
 
-  (case u8-peek-local
+  (case u8-peek-offset
     (preserve (ix)
       (ld ix test-data)
-      (ld-expr a (u8-peek-local 0))
+      (ld-expr a (u8-peek-offset 0))
       (assert a #x34)))
 
-  (case u8-peek-local+1
+  (case u8-peek-offset+1
     (preserve (ix)
       (ld ix test-data)
-      (ld-expr a (u8-peek-local 1))
+      (ld-expr a (u8-peek-offset 1))
       (assert a #x12)))
 
   (case if-u8-zero?-positive
@@ -132,4 +132,25 @@
   (case if-u8<-negative
     (ld-expr a (if (u8> (u8 #x02) (u8 #x02)) (u8 #x34) (u8 #x56)))
     (assert a #x56))
+
+  (case local-u16-0
+    (with-locals
+      (push #x3412)
+      (push #x7856)
+      (ld-expr hl () () (local u16 0)))
+    (assert hl #x1234))
+
+  (case local-u8-1
+    (with-locals
+      (push #x3412)
+      (push #x7856)
+      (ld-expr a () (u16) (local u8 1)))
+    (assert a #x56))
+
+  (case local-u8-2
+    (with-locals
+      (push #x3412)
+      (push #x7856)
+      (ld-expr a () (u16 u8) (local u8 2)))
+    (assert a #x78))
 )
