@@ -2,6 +2,7 @@
 
 (test
   (asm base)
+  (asm data)
   (asm relocable)
   (asm alignment)
   (asm aligned)
@@ -31,4 +32,5 @@
   (asm ops)
   (asm z80)
   (asm z80-blocks)
-  (asm run))
+  (asm run)
+  (asm z80-data))
