@@ -153,4 +153,28 @@
       (push #x7856)
       (ld-expr a () (u16 u8) (local u8 2)))
     (assert a #x78))
+
+  (case arg-u16-0
+    (push #x3412)
+    (push #x7856)
+    (preserve (af) ; fake return address
+      (with-locals
+        (ld-expr hl () () (arg u16 0)))
+      (assert hl #x5678)))
+
+  (case arg-u8-1
+    (push #x3412)
+    (push #x7856)
+    (preserve (af) ; fake return address
+      (with-locals
+        (ld-expr a (u16) () (arg u8 1)))
+      (assert a #x34)))
+
+  (case arg-u8-2
+    (push #x3412)
+    (push #x7856)
+    (preserve (af) ; fake return address
+      (with-locals
+        (ld-expr a (u16 u8) () (arg u8 2)))
+      (assert a #x12)))
 )
