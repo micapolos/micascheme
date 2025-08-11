@@ -3,58 +3,58 @@
 (define-fragment test-data (dw #x1234))
 
 (test
-  (case byte-add
-    (ld-expr a (byte-add (byte #x11) (byte #x22)))
+  (case u8-add
+    (ld-expr a (u8-add (u8 #x11) (u8 #x22)))
     (assert a #x33))
 
-  (case byte-add/transitive
+  (case u8-add/transitive
     (ld-expr a
-      (byte-add
-        (byte-add (byte #x01) (byte #x02))
-        (byte-add (byte #x03) (byte #x04))))
+      (u8-add
+        (u8-add (u8 #x01) (u8 #x02))
+        (u8-add (u8 #x03) (u8 #x04))))
     (assert a #x0a))
 
-  (case byte-peek-nn
-    (ld-expr a (byte-peek-nn test-data))
+  (case u8-peek-nn
+    (ld-expr a (u8-peek-nn test-data))
     (assert a #x34))
 
-  (case byte-peek-nn
-    (ld-expr a (byte-peek-nn (+ test-data 1)))
+  (case u8-peek-nn
+    (ld-expr a (u8-peek-nn (+ test-data 1)))
     (assert a #x12))
 
-  (case byte-peek
-    (ld-expr a (byte-peek (word test-data)))
+  (case u8-peek
+    (ld-expr a (u8-peek (u16 test-data)))
     (assert a #x34))
 
-  (case byte-peek
-    (ld-expr a (byte-peek (word-inc (word test-data))))
+  (case u8-peek
+    (ld-expr a (u8-peek (u16-inc (u16 test-data))))
     (assert a #x12))
 
-  (case byte-mul
-    (ld-expr de (byte-mul (byte #x02) (byte #x03)))
+  (case u8-mul
+    (ld-expr de (u8-mul (u8 #x02) (u8 #x03)))
     (assert de #x0006))
 
-  (case if-byte-zero?-positive
-    (ld-expr a (if (byte-zero? (byte #x00)) (byte #x34) (byte #x56)))
+  (case if-u8-zero?-positive
+    (ld-expr a (if (u8-zero? (u8 #x00)) (u8 #x34) (u8 #x56)))
     (assert a #x34))
 
-  (case if-byte-zero?-negative
-    (ld-expr a (if (byte-zero? (byte #x12)) (byte #x34) (byte #x56)))
+  (case if-u8-zero?-negative
+    (ld-expr a (if (u8-zero? (u8 #x12)) (u8 #x34) (u8 #x56)))
     (assert a #x56))
 
-  (case if-byte=?-positive
-    (ld-expr a (if (byte=? (byte #x01) (byte #x01)) (byte #x34) (byte #x56)))
+  (case if-u8=?-positive
+    (ld-expr a (if (u8=? (u8 #x01) (u8 #x01)) (u8 #x34) (u8 #x56)))
     (assert a #x34))
 
-  (case if-byte=?-negative
-    (ld-expr a (if (byte=? (byte #x01) (byte #x02)) (byte #x34) (byte #x56)))
+  (case if-u8=?-negative
+    (ld-expr a (if (u8=? (u8 #x01) (u8 #x02)) (u8 #x34) (u8 #x56)))
     (assert a #x56))
 
-  (case if-byte<?-positive
-    (ld-expr a (if (byte<? (byte #x01) (byte #x02)) (byte #x34) (byte #x56)))
+  (case if-u8<?-positive
+    (ld-expr a (if (u8<? (u8 #x01) (u8 #x02)) (u8 #x34) (u8 #x56)))
     (assert a #x34))
 
-  (case if-byte<?-negative
-    (ld-expr a (if (byte<? (byte #x02) (byte #x02)) (byte #x34) (byte #x56)))
+  (case if-u8<?-negative
+    (ld-expr a (if (u8<? (u8 #x02) (u8 #x02)) (u8 #x34) (u8 #x56)))
     (assert a #x56))
 )
