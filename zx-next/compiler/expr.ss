@@ -4,7 +4,7 @@
     byte byte-inc byte-dec
     byte-add-n byte-sub-n byte-and-n byte-or-n byte-xor-n
     byte-add byte-sub byte-and byte-or byte-xor byte-mul
-    byte-peek-nn byte-peek
+    byte-peek-nn byte-peek-local byte-peek
     word word-inc word-dec word-add word-sub
     word-peek-nn)
   (import (zx-next core))
@@ -12,7 +12,7 @@
   (define-keywords
     byte byte-inc byte-dec byte-add byte-sub byte-and byte-or byte-xor byte-mul
     byte-add-n byte-sub-n byte-and-n byte-or-n byte-xor-n
-    byte-peek-nn byte-peek
+    byte-peek-nn byte-peek-local byte-peek
     word word-inc word-dec word-add word-sub
     word-peek-nn)
 
@@ -21,13 +21,27 @@
       a de hl
       byte byte-inc byte-dec byte-add byte-sub byte-and byte-or byte-xor byte-mul
       byte-add-n byte-sub-n byte-and-n byte-or-n byte-xor-n
-      byte-peek-nn byte-peek
+      byte-peek-nn byte-peek-local byte-peek
       word word-inc word-dec word-add word-sub
       word-peek-nn)
 
     ; 8-bit load
     ((ld-expr r (byte n))
       (ld r n))
+
+    ((ld-expr a (byte-peek-nn nn))
+      (ld a (nn)))
+
+    ((ld-expr r (byte-peek-nn nn))
+      (ld a (nn))
+      (ld r a))
+
+    ((ld-expr r (byte-peek lhs))
+      (ld-expr hl lhs)
+      (ld r (hl)))
+
+    ((ld-expr r (byte-peek-local offset))
+      (ld r (+ ix offset)))
 
     ; 8-bit increment/decrement
     ((ld-byte-op1 r op lhs)
@@ -95,18 +109,6 @@
     ((ld-expr rr (byte-mul lhs rhs))
       (ld-expr de (byte-mul lhs rhs))
       (ld rr de))
-
-    ; 8-bit peek
-    ((ld-expr a (byte-peek-nn nn))
-      (ld a (nn)))
-
-    ((ld-expr r (byte-peek-nn nn))
-      (ld a (nn))
-      (ld r a))
-
-    ((ld-expr r (byte-peek lhs))
-      (ld-expr hl lhs)
-      (ld r (hl)))
 
     ; 16-bit
     ((ld-expr rr (word nn))
