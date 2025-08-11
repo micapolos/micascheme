@@ -4,13 +4,10 @@
   (equal?
     (html-string
       (html
-        (title "My page")
-        (link
-          (with
-            (href "tspl.css")
-            (rel "stylesheet")
-            (type "text/css")))
+        (head
+          (title "My page")
+          (meta (with (charset "UTF-8"))))
         (body
           (h1 "Hello, world!")
           (p "This is my paragraph"))))
-    "<html><title>My page</title><link href=\"tspl.css\" rel=\"stylesheet\" type=\"text/css\"></link><body><h1>Hello, world!</h1><p>This is my paragraph</p></body></html>"))
+    "<!DOCTYPE html><html><head><title>My page</title><meta charset=\"UTF-8\"/></head><body><h1>Hello, world!</h1><p>This is my paragraph</p></body></html>"))
