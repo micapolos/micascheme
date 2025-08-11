@@ -15,6 +15,14 @@
     (ld-expr a (u8-1 (u8 #x11)))
     (assert a #x10))
 
+  (case u8-neg
+    (ld-expr a (u8-neg (u8 #x22)))
+    (assert a #xde))
+
+  (case u8-not
+    (ld-expr a (u8-not (u8 #x22)))
+    (assert a #xdd))
+
   (case u8+n
     (ld-expr a (u8+n (u8 #x11) #x22))
     (assert a #x33))

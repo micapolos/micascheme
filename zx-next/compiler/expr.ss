@@ -3,6 +3,7 @@
     u8 u16 u24 u32
     ld-expr
     u8+1 u8-1
+    u8-neg u8-not
     u8+n u8-n u8-and-n u8-or-n u8-xor-n
     u8+ u8- u8-and u8-or u8-xor u8-mul
     u8-peek-nn u8-peek-local u8-peek
@@ -13,6 +14,7 @@
 
   (define-keywords
     u8 u16 u24 u32
+    u8-neg u8-not
     u8+1 u8-1 u8+ u8- u8-and u8-or u8-xor u8-mul
     u8+n u8-n u8-and-n u8-or-n u8-xor-n
     u8-peek-nn u8-peek-local u8-peek
@@ -24,6 +26,7 @@
     (keywords
       a de hl
       u8 u16 u24 u32
+      u8-neg u8-not
       u8+1 u8-1 u8+ u8- u8-and u8-or u8-xor u8-mul
       u8+n u8-n u8-and-n u8-or-n u8-xor-n
       u8-peek-nn u8-peek-local u8-peek
@@ -81,6 +84,22 @@
       (ld-u8-op2-n r xor lhs n))
 
     ; 8-bit math
+    ((ld-expr a (u8-neg lhs))
+      (ld-expr a lhs)
+      (neg))
+
+    ((ld-expr r (u8-neg lhs))
+      (ld-expr a (u8-neg lhs))
+      (ld r a))
+
+    ((ld-expr a (u8-not lhs))
+      (ld-expr a lhs)
+      (cpl))
+
+    ((ld-expr r (u8-not lhs))
+      (ld-expr a (u8-not lhs))
+      (ld r a))
+
     ((ld-u8-op2 a op lhs rhs)
       (ld-expr l rhs)
       (push hl)

@@ -27,7 +27,7 @@
     jp jr djnz
     call ret reti retn rst
 
-    daa cpl ccf scf nop halt di ei im
+    daa neg cpl ccf scf nop halt di ei im
 
     cpd cpdr cpi cpir ldd lddr ldi ldir
 
