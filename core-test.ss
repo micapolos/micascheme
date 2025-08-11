@@ -26,3 +26,13 @@
 (comment
   (This is a comment)
   (Do you like it?))
+
+(check
+  (equal?
+    (let ((x "!"))
+      (backward
+        (set! x (string-append "a" x))
+        (set! x (string-append "b" x))
+        (set! x (string-append "c" x)))
+      x)
+    "abc!"))

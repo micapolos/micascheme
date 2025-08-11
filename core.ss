@@ -7,7 +7,8 @@
     set-!
     set*!
     cond?
-    comment)
+    comment
+    backward)
   (import (scheme))
 
   (define-syntax cons!
@@ -43,4 +44,9 @@
   (define-syntax comment
     (syntax-rules ()
       ((_ . x) (begin))))
+
+  (define-syntax (backward $syntax)
+    (syntax-case $syntax ()
+      ((_ x ...)
+        #`(begin #,@(reverse #'(x ...))))))
 )
