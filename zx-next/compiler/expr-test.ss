@@ -50,11 +50,11 @@
     (ld-expr a (if (u8=? (u8 #x01) (u8 #x02)) (u8 #x34) (u8 #x56)))
     (assert a #x56))
 
-  (case if-u8<?-positive
-    (ld-expr a (if (u8<? (u8 #x01) (u8 #x02)) (u8 #x34) (u8 #x56)))
+  (case if-u8<-positive
+    (ld-expr a (if (u8> (u8 #x03) (u8 #x02)) (u8 #x34) (u8 #x56)))
     (assert a #x34))
 
-  (case if-u8<?-negative
-    (ld-expr a (if (u8<? (u8 #x02) (u8 #x02)) (u8 #x34) (u8 #x56)))
+  (case if-u8<-negative
+    (ld-expr a (if (u8> (u8 #x02) (u8 #x02)) (u8 #x34) (u8 #x56)))
     (assert a #x56))
 )

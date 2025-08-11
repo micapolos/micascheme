@@ -6,7 +6,7 @@
     u8-add-n u8-sub-n u8-and-n u8-or-n u8-xor-n
     u8-add u8-sub u8-and u8-or u8-xor u8-mul
     u8-peek-nn u8-peek-local u8-peek
-    u8-zero? u8=? u8<?
+    u8-zero? u8=? u8>
     u16-inc u16-dec u16-add u16-sub
     u16-peek-nn)
   (import (zx-next core))
@@ -16,7 +16,7 @@
     u8-inc u8-dec u8-add u8-sub u8-and u8-or u8-xor u8-mul
     u8-add-n u8-sub-n u8-and-n u8-or-n u8-xor-n
     u8-peek-nn u8-peek-local u8-peek
-    u8-zero? u8=? u8<?
+    u8-zero? u8=? u8>
     u16-inc u16-dec u16-add u16-sub
     u16-peek-nn)
 
@@ -27,7 +27,7 @@
       u8-inc u8-dec u8-add u8-sub u8-and u8-or u8-xor u8-mul
       u8-add-n u8-sub-n u8-and-n u8-or-n u8-xor-n
       u8-peek-nn u8-peek-local u8-peek
-      u8-zero? u8=? u8<?
+      u8-zero? u8=? u8>
       u16-inc u16-dec u16-add u16-sub
       u16-peek-nn)
 
@@ -174,10 +174,10 @@
       (xor l)
       (if z (ld-expr r then-body) (ld-expr r else-body)))
 
-    ((ld-expr r (if (u8<? lhs rhs) then-body else-body))
-      (ld-expr l rhs)
+    ((ld-expr r (if (u8> lhs rhs) then-body else-body))
+      (ld-expr l lhs)
       (push hl)
-      (ld-expr a lhs)
+      (ld-expr a rhs)
       (pop hl)
       (cp l)
       (if c (ld-expr r then-body) (ld-expr r else-body)))
