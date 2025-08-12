@@ -45,40 +45,40 @@
     (ld-expr a 1 (cpl (const #x22)))
     (assert a #xdd))
 
-  (case add-n-1
-    (ld-expr a 1 (add-n (const #x11) #x22))
+  (case add-const-1
+    (ld-expr a 1 (add-const (const #x11) #x22))
     (assert a #x33))
 
   (case add-1
     (ld-expr a 1 (add (const #x11) (const #x22)))
     (assert a #x33))
 
-  (case sub-n-1
-    (ld-expr a 1 (sub-n (const #x33) #x22))
+  (case sub-const-1
+    (ld-expr a 1 (sub-const (const #x33) #x22))
     (assert a #x11))
 
   (case sub-1
     (ld-expr a 1 (sub (const #x33) (const #x22)))
     (assert a #x11))
 
-  (case and-n-1
-    (ld-expr a 1 (and-n (const #x33) #x0f))
+  (case and-const-1
+    (ld-expr a 1 (and-const (const #x33) #x0f))
     (assert a #x03))
 
   (case and-1
     (ld-expr a 1 (and (const #x33) (const #x0f)))
     (assert a #x03))
 
-  (case or-n-1
-    (ld-expr a 1 (or-n (const #x33) #x0f))
+  (case or-const-1
+    (ld-expr a 1 (or-const (const #x33) #x0f))
     (assert a #x3f))
 
   (case or-1
     (ld-expr a 1 (or (const #x33) (const #x0f)))
     (assert a #x3f))
 
-  (case xor-n-1
-    (ld-expr a 1 (xor-n (const #x33) #x0f))
+  (case xor-const-1
+    (ld-expr a 1 (xor-const (const #x33) #x0f))
     (assert a #x3c))
 
   (case xor-1
@@ -89,12 +89,12 @@
     (ld-expr de 2 (mul (const #x02) (const #x03)))
     (assert de #x0006))
 
-  (case peek-nn
-    (ld-expr a 1 (peek-nn test-data))
+  (case peek-const
+    (ld-expr a 1 (peek-const test-data))
     (assert a #x34))
 
-  (case peek-nn+1
-    (ld-expr a 1 (peek-nn (+ test-data 1)))
+  (case peek-const+1
+    (ld-expr a 1 (peek-const (+ test-data 1)))
     (assert a #x12))
 
   (case peek

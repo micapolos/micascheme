@@ -1,7 +1,7 @@
 (library (zx-next compiler expr)
   (export
     ld-expr
-    peek-nn peek peek-offset const
+    peek-const peek peek-offset const
     zero? eq? gt?
     with-locals lets local arg)
   (import
@@ -9,7 +9,7 @@
     (only (micascheme) -))
 
   (define-keywords
-    peek-nn peek peek-offset
+    peek-const peek peek-offset
     lets local arg const
     zero? eq? gt?)
 
@@ -20,9 +20,9 @@
       neg cpl
       inc dec
       add sub and or xor
-      add-n sub-n and-n or-n xor-n
+      add-const sub-const and-const or-const xor-const
       mul
-      peek-nn peek peek-offset
+      peek-const peek peek-offset
       lets local arg
       zero? eq? gt?)
 
@@ -33,10 +33,10 @@
     ((ld-expr r args locals size (const n)) (ld r n))
 
     ; Load indirect
-    ((ld-expr a args locals 1 (peek-nn nn))
+    ((ld-expr a args locals 1 (peek-const nn))
       (ld a (nn)))
 
-    ((ld-expr r args locals 1 (peek-nn nn))
+    ((ld-expr r args locals 1 (peek-const nn))
       (ld a (nn))
       (ld r a))
 
@@ -59,24 +59,24 @@
       (ld-u8-op1 r args locals dec lhs))
 
     ; 8-bit math with constant
-    ((ld-u8-op2-n a args locals op lhs n)
+    ((ld-u8-op2-const a args locals op lhs n)
       (ld-expr a args locals 1 lhs)
       (op n))
 
-    ((ld-u8-op2-n r args locals op lhs n)
-      (ld-u8-op2-n a args locals op lhs n)
+    ((ld-u8-op2-const r args locals op lhs n)
+      (ld-u8-op2-const a args locals op lhs n)
       (ld r a))
 
-    ((ld-expr r args locals 1 (add-n lhs n))
-      (ld-u8-op2-n r args locals add lhs n))
-    ((ld-expr r args locals 1 (sub-n lhs n))
-      (ld-u8-op2-n r args locals sub lhs n))
-    ((ld-expr r args locals 1 (and-n lhs n))
-      (ld-u8-op2-n r args locals and lhs n))
-    ((ld-expr r args locals 1 (or-n lhs n))
-      (ld-u8-op2-n r args locals or lhs n))
-    ((ld-expr r args locals 1 (xor-n lhs n))
-      (ld-u8-op2-n r args locals xor lhs n))
+    ((ld-expr r args locals 1 (add-const lhs n))
+      (ld-u8-op2-const r args locals add lhs n))
+    ((ld-expr r args locals 1 (sub-const lhs n))
+      (ld-u8-op2-const r args locals sub lhs n))
+    ((ld-expr r args locals 1 (and-const lhs n))
+      (ld-u8-op2-const r args locals and lhs n))
+    ((ld-expr r args locals 1 (or-const lhs n))
+      (ld-u8-op2-const r args locals or lhs n))
+    ((ld-expr r args locals 1 (xor-const lhs n))
+      (ld-u8-op2-const r args locals xor lhs n))
 
     ; 8-bit math
     ((ld-expr a args locals 1 (neg lhs))
@@ -131,11 +131,11 @@
       (ld rr de))
 
     ; 16-bit
-    ((ld-expr hl args locals 2 (peek-nn nn))
+    ((ld-expr hl args locals 2 (peek-const nn))
       (ld hl (nn)))
 
-    ((ld-expr rr args locals 2 (peek-nn nn))
-      (ld-expr hl args locals 2 (peek-nn nn))
+    ((ld-expr rr args locals 2 (peek-const nn))
+      (ld-expr hl args locals 2 (peek-const nn))
       (ld rr hl))
 
     ((ld-expr de args locals 2 (peek 2 lhs))
@@ -200,10 +200,10 @@
       (ld-expr hl args locals 2 (sub lhs rhs))
       (ld rr hl))
 
-    ((ld-expr hl args locals 2 (peek-nn nn))
+    ((ld-expr hl args locals 2 (peek-const nn))
       (ld hl (nn)))
 
-    ((ld-expr rr args locals 2 (peek-nn nn))
+    ((ld-expr rr args locals 2 (peek-const nn))
       (ld hl (nn))
       (ld rr hl))
 
