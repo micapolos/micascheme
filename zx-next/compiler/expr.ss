@@ -9,7 +9,9 @@
     u8-peek-nn u8-peek-offset u8-peek
     u8-zero? u8=? u8>
     u16+1 u16-1 u16+ u16-
-    u16-peek-nn
+    u16-peek-nn u16-peek u16-peek-offset
+    u24-peek-offset
+    u32-peek-offset
     with-locals lets local arg)
   (import
     (zx-next core)
@@ -23,7 +25,9 @@
     u8-peek-nn u8-peek-offset u8-peek
     u8-zero? u8=? u8>
     u16+1 u16-1 u16+ u16-
-    u16-peek-nn
+    u16-peek-nn u16-peek u16-peek-offset
+    u24-peek-offset
+    u32-peek-offset
     lets local arg)
 
   (define-ops
@@ -36,7 +40,9 @@
       u8-peek-nn u8-peek-offset u8-peek
       u8-zero? u8=? u8>
       u16+1 u16-1 u16+ u16-
-      u16-peek-nn
+      u16-peek-nn u16-peek u16-peek-offset
+      u24-peek-offset
+      u32-peek-offset
       lets local arg)
 
     ; Top-level
@@ -146,6 +152,43 @@
       (ld-expr de args locals (u8-mul lhs rhs))
       (ld rr de))
 
+    ; 16-bit
+    ((ld-expr hl args locals (u16-peek-nn nn))
+      (ld hl (nn)))
+
+    ((ld-expr rr args locals (u16-peek-nn nn))
+      (ld-expr hl args locals (u16-peek-nn nn))
+      (ld rr hl))
+
+    ((ld-expr de args locals (u16-peek lhs))
+      (ld-expr hl args locals (u16 lhs))
+      (ld e (hl))
+      (inc hl)
+      (ld d (hl)))
+
+    ((ld-expr rr args locals (u16-peek lhs))
+      (ld-expr de args locals (u16-peek lhs))
+      (ld rr de))
+
+    ((ld-expr hl args locals (u16-peek-offset n))
+      (ld-expr l args locals (u8-peek-offset n))
+      (ld-expr h args locals (u8-peek-offset (+ n 1))))
+
+    ((ld-expr de args locals (u16-peek-offset n))
+      (ld-expr e args locals (u8-peek-offset n))
+      (ld-expr d args locals (u8-peek-offset (+ n 1))))
+
+    ((ld-expr ehl args locals (u24-peek-offset n))
+      (ld-expr l args locals (u8-peek-offset n))
+      (ld-expr h args locals (u8-peek-offset (+ n 1)))
+      (ld-expr e args locals (u8-peek-offset (+ n 2))))
+
+    ((ld-expr dehl args locals (u32-peek-offset n))
+      (ld-expr l args locals (u8-peek-offset n))
+      (ld-expr h args locals (u8-peek-offset (+ n 1)))
+      (ld-expr e args locals (u8-peek-offset (+ n 2)))
+      (ld-expr d args locals (u8-peek-offset (+ n 3))))
+
     ((ld-u16-op1 rr args locals op lhs)
       (ld-expr rr args locals lhs)
       (op rr))
@@ -232,30 +275,19 @@
     (lambda ($syntax)
       (syntax-case $syntax (de gl ehl dehl u8 u16 u24 u32)
         ((ld-local r args locals offset u8 0)
-          #`(ld-expr r (u8-peek-offset #,(- (datum offset) 1))))
+          #`(ld-expr r args locals (u8-peek-offset #,(- (datum offset) 1))))
 
-        ((ld-local de args locals offset u16 0)
+        ((ld-local rr args locals offset u16 0)
           #`(begin
-            (ld-expr d (u8-peek-offset #,(- (datum offset) 1)))
-            (ld-expr e (u8-peek-offset #,(- (datum offset) 2)))))
+            (ld-expr rr args locals (u16-peek-offset #,(- (datum offset) 2)))))
 
-        ((ld-local hl args locals offset u16 0)
+        ((ld-local rrr args locals offset u24 0)
           #`(begin
-            (ld-expr h (u8-peek-offset #,(- (datum offset) 1)))
-            (ld-expr l (u8-peek-offset #,(- (datum offset) 2)))))
+            (ld-expr rrr args locals (u24-peek-offset #,(- (datum offset) 3)))))
 
-        ((ld-local ehl args locals offset u24 0)
+        ((ld-local rrrr args locals offset u32 0)
           #`(begin
-            (ld-expr e (u8-peek-offset #,(- (datum offset) 1)))
-            (ld-expr h (u8-peek-offset #,(- (datum offset) 2)))
-            (ld-expr l (u8-peek-offset #,(- (datum offset) 3)))))
-
-        ((ld-local dehl args locals offset u32 0)
-          #`(begin
-            (ld-expr d (u8-peek-offset #,(- (datum offset) 1)))
-            (ld-expr e (u8-peek-offset #,(- (datum offset) 2)))
-            (ld-expr h (u8-peek-offset #,(- (datum offset) 3)))
-            (ld-expr l (u8-peek-offset #,(- (datum offset) 4)))))
+            (ld-expr rrrr args locals (u32-peek-offset #,(- (datum offset) 4)))))
 
         ((ld-local r args (u8 . locals) offset type n)
           #`(ld-local r args locals #,(- (datum offset) 1) type #,(- (datum n) 1)))
@@ -273,30 +305,19 @@
     (lambda ($syntax)
       (syntax-case $syntax (de gl ehl dehl u8 u16 u24 u32)
         ((ld-arg r args locals offset u8 0)
-          #`(ld-expr r (u8-peek-offset #,(+ (datum offset) 4))))
+          #`(ld-expr r args locals (u8-peek-offset #,(+ (datum offset) 4))))
 
-        ((ld-arg de args locals offset u16 0)
+        ((ld-arg rr args locals offset u16 0)
           #`(begin
-            (ld-expr d (u8-peek-offset #,(+ (datum offset) 5)))
-            (ld-expr e (u8-peek-offset #,(+ (datum offset) 4)))))
+            (ld-expr rr args locals (u16-peek-offset #,(+ (datum offset) 4)))))
 
-        ((ld-arg hl args locals offset u16 0)
+        ((ld-arg rrr args locals offset u24 0)
           #`(begin
-            (ld-expr h (u8-peek-offset #,(+ (datum offset) 5)))
-            (ld-expr l (u8-peek-offset #,(+ (datum offset) 4)))))
+            (ld-expr rrr args locals (u24-peek-offset #,(+ (datum offset) 4)))))
 
-        ((ld-arg ehl args locals offset u24 0)
+        ((ld-arg rrrr args locals offset u32 0)
           #`(begin
-            (ld-expr e (u8-peek-offset #,(+ (datum offset) 6)))
-            (ld-expr h (u8-peek-offset #,(+ (datum offset) 5)))
-            (ld-expr l (u8-peek-offset #,(+ (datum offset) 4)))))
-
-        ((ld-arg dehl args locals offset u32 0)
-          #`(begin
-            (ld-expr d (u8-peek-offset #,(+ (datum offset) 7)))
-            (ld-expr e (u8-peek-offset #,(+ (datum offset) 6)))
-            (ld-expr h (u8-peek-offset #,(+ (datum offset) 5)))
-            (ld-expr l (u8-peek-offset #,(+ (datum offset) 4)))))
+            (ld-expr rrrr args locals (u32-peek-offset #,(+ (datum offset) 4)))))
 
         ((ld-arg r (u8 . args) locals offset type n)
           #`(ld-arg r args locals #,(+ (datum offset) 1) type #,(- (datum n) 1)))
