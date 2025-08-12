@@ -49,7 +49,7 @@
 
   (define-fragment assert-flag
     (input (fc - 0 ok / 1 failure) (hl label))
-    (preserve-regs
+    (preserve-all
       (when c
         (preserve (hl)
           (write-ink 4)
@@ -65,7 +65,7 @@
 
   (define-fragment assert-byte
     (input (d actual) (e expected) (hl label))
-    (preserve-regs
+    (preserve-all
       (ld a d)
       (cp e)
       (when nz
@@ -94,7 +94,7 @@
 
   (define-fragment assert-ibyte
     (input (e expected) (hl addr))
-    (preserve-regs
+    (preserve-all
       (ld d (hl))
       (ld a d)
       (cp e)
@@ -124,7 +124,7 @@
 
   (define-fragment assert-word
     (input (bc actual) (de expected) (hl label))
-    (preserve-regs
+    (preserve-all
       (cp-bc-de)
       (when nz
         (preserve (bc de)
@@ -154,7 +154,7 @@
 
   (define-fragment assert-iword
     (input (de expected) (hl address))
-    (preserve-regs
+    (preserve-all
       (ld c (hl))
       (inc hl)
       (ld b (hl))

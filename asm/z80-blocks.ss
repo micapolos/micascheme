@@ -11,7 +11,8 @@
     define-proc define-procs
     ret-c ret-nc
     with
-    pop-regs push-regs preserve-regs)
+    pop-regs push-regs preserve-all
+    preserve-main preserve-main/alternate)
   (import
     (asm lang)
     (asm z80)
@@ -162,10 +163,25 @@
       (push hl)
       (push af)))
 
-  (define-op (preserve-regs body ...)
-    (push-regs)
-    body ...
-    (pop-regs))
+  (define-op (preserve-main body ...)
+    (preserve (af bc de hl) body ...))
+
+  (define-op (preserve-main/alternate body ...)
+    (preserve-main
+      (exx)
+      (preserve-main
+        (exx)
+        body ...
+        (exx))
+      (exx)))
+
+  (define-op (preserve-indexed body ...)
+    (preserve (ix iy) body ...))
+
+  (define-op (preserve-all body ...)
+    (preserve-main/alternate
+      (preserve-indexed
+        body ...)))
 
   (define-syntax (define-proc $syntax)
     (syntax-case $syntax ()

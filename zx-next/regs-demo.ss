@@ -81,6 +81,6 @@
   (ld hl #x0011) (push hl)
   (pop-regs)
   (capture-regs)
-  (preserve-regs
+  (preserve-all
     (ld hl captured-regs)
     (call write-regs)))
