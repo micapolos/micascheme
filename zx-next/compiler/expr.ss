@@ -159,15 +159,12 @@
       (ld-expr d args locals 1 (peek-offset (+ n 1))))
 
     ((ld-expr ehl args locals 3 (peek-offset n))
-      (ld-expr l args locals 1 (peek-offset n))
-      (ld-expr h args locals 1 (peek-offset (+ n 1)))
+      (ld-expr hl args locals 2 (peek-offset n))
       (ld-expr e args locals 1 (peek-offset (+ n 2))))
 
     ((ld-expr dehl args locals 4 (peek-offset n))
-      (ld-expr l args locals 1 (peek-offset n))
-      (ld-expr h args locals 1 (peek-offset (+ n 1)))
-      (ld-expr e args locals 1 (peek-offset (+ n 2)))
-      (ld-expr d args locals 1 (peek-offset (+ n 3))))
+      (ld-expr hl args locals 1 (peek-offset n))
+      (ld-expr de args locals 1 (peek-offset (+ n 2))))
 
     ((ld-u16-op1 rr args locals op lhs)
       (ld-expr rr args locals 2 lhs)
