@@ -1,6 +1,3 @@
-; Unsafe (non-checked) language with indexed access to arguments and locals,
-; with support for values with size from 0 to 4.
-
 (library (zx-next compiler indexed)
   (export
     ld-indexed
@@ -17,6 +14,11 @@
     (only (zx-next call-frame) call-frame)
     (only (micascheme) -))
   (export (import (only (zx-next call-frame) call-frame)))
+
+  (comment
+    unsafe (not type checked) language
+    with indexed access to arguments and locals
+    and support for values of size from 0 to 4)
 
   (define-keywords
     peek-const peek peek-offset
