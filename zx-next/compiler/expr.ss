@@ -278,16 +278,13 @@
           #`(ld-expr r args locals (u8-peek-offset #,(- (datum offset) 1))))
 
         ((ld-local rr args locals offset u16 0)
-          #`(begin
-            (ld-expr rr args locals (u16-peek-offset #,(- (datum offset) 2)))))
+          #`(ld-expr rr args locals (u16-peek-offset #,(- (datum offset) 2))))
 
         ((ld-local rrr args locals offset u24 0)
-          #`(begin
-            (ld-expr rrr args locals (u24-peek-offset #,(- (datum offset) 3)))))
+          #`(ld-expr rrr args locals (u24-peek-offset #,(- (datum offset) 3))))
 
         ((ld-local rrrr args locals offset u32 0)
-          #`(begin
-            (ld-expr rrrr args locals (u32-peek-offset #,(- (datum offset) 4)))))
+          #`(ld-expr rrrr args locals (u32-peek-offset #,(- (datum offset) 4))))
 
         ((ld-local r args (u8 . locals) offset type n)
           #`(ld-local r args locals #,(- (datum offset) 1) type #,(- (datum n) 1)))
@@ -308,16 +305,13 @@
           #`(ld-expr r args locals (u8-peek-offset #,(+ (datum offset) 4))))
 
         ((ld-arg rr args locals offset u16 0)
-          #`(begin
-            (ld-expr rr args locals (u16-peek-offset #,(+ (datum offset) 4)))))
+          #`(ld-expr rr args locals (u16-peek-offset #,(+ (datum offset) 4))))
 
         ((ld-arg rrr args locals offset u24 0)
-          #`(begin
-            (ld-expr rrr args locals (u24-peek-offset #,(+ (datum offset) 4)))))
+          #`(ld-expr rrr args locals (u24-peek-offset #,(+ (datum offset) 4))))
 
         ((ld-arg rrrr args locals offset u32 0)
-          #`(begin
-            (ld-expr rrrr args locals (u32-peek-offset #,(+ (datum offset) 4)))))
+          #`(ld-expr rrrr args locals (u32-peek-offset #,(+ (datum offset) 4))))
 
         ((ld-arg r (u8 . args) locals offset type n)
           #`(ld-arg r args locals #,(+ (datum offset) 1) type #,(- (datum n) 1)))
