@@ -3,19 +3,21 @@
     ld-expr
     peek-const peek peek-offset const
     add-const sub-const and-const or-const xor-const
-    with-locals lets local arg
+    lets local arg
     drop native
     zero? eq? gt?
     void ignore)
   (import
     (zx-next core)
     (zx-next write)
+    (only (zx-next call-frame) call-frame)
     (only (micascheme) -))
+  (export (import (only (zx-next call-frame) call-frame)))
 
   (define-keywords
     peek-const peek peek-offset
     add-const sub-const and-const or-const xor-const
-    lets local arg const with-locals
+    lets local arg const
     zero? eq? gt?
     drop native
     void ignore)
@@ -33,7 +35,7 @@
       peek-const peek peek-offset
       lets local arg
       write-char write-string
-      with-locals
+      call-frame
       push pop drop native
       void ignore call
       zero? eq? gt?)
@@ -273,10 +275,8 @@
         (ld-expr r args locals size else-body)))
 
     ; Locals
-    ((ld-expr r args locals size (with-locals body ...))
-      (preserve (ix)
-        (ld ix 0)
-        (add ix sp)
+    ((ld-expr r args locals size (call-frame body ...))
+      (call-frame
         (ld-expr r args locals size (begin body ...))))
 
     ; Lets

@@ -54,6 +54,7 @@
         fx+ fx- fxnot fxand fxior fxxor fxsrl fxsll
         logging
         length
+        export
         ...
         comment)
       (only (asm syntax-block) align trace-block-expansion)

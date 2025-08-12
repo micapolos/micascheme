@@ -150,7 +150,7 @@
 
   (case local-2-1
     (ld-expr hl () () 2
-      (with-locals
+      (call-frame
         (native
           (push #x3412)
           (push #x7856))
@@ -159,7 +159,7 @@
 
   (case local-1-1
     (ld-expr a () (2) 1
-      (with-locals
+      (call-frame
         (native
           (push #x3412)
           (push #x7856))
@@ -170,7 +170,7 @@
     (push #x3412)
     (push #x7856)
     (ld-expr a () (2 1) 1
-      (with-locals
+      (call-frame
         (native
           (push #x3412)
           (push #x7856))
@@ -181,21 +181,21 @@
     (push #x3412)
     (push #x7856)
     (preserve (af) ; fake return address
-      (ld-expr hl () () 2 (with-locals (arg 0)))
+      (ld-expr hl () () 2 (call-frame (arg 0)))
       (assert hl #x5678)))
 
   (case arg-1-1
     (push #x3412)
     (push #x7856)
     (preserve (af) ; fake return address
-      (ld-expr a (2) () 1 (with-locals (arg 1)))
+      (ld-expr a (2) () 1 (call-frame (arg 1)))
       (assert a #x34)))
 
   (case arg-1-2
     (push #x3412)
     (push #x7856)
     (preserve (af) ; fake return address
-      (ld-expr a (2 1) () 1 (with-locals (arg 2)))
+      (ld-expr a (2 1) () 1 (call-frame (arg 2)))
       (assert a #x12)))
 
   (case write
@@ -264,7 +264,7 @@
 
   (case lets-1-1
     (ld-expr a 1
-      (with-locals
+      (call-frame
         (lets
           (1 (const #x12))
           (local 0))))
@@ -272,7 +272,7 @@
 
   (case lets-2-2
     (ld-expr a 1
-      (with-locals
+      (call-frame
         (lets
           (1 (const #x46))
           (1 (const #x34))
