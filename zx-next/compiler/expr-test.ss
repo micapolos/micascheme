@@ -109,28 +109,28 @@
       (ld-expr a (peek-offset 1 1))
       (assert a #x12)))
 
-  (case if-u8-zero?-positive
-    (ld-expr a (if (u8-zero? (1 #x00)) (1 #x34) (1 #x56)))
+  (case if-zero?-1-positive
+    (ld-expr a (if (zero? 1 (1 #x00)) (1 #x34) (1 #x56)))
     (assert a #x34))
 
-  (case if-u8-zero?-negative
-    (ld-expr a (if (u8-zero? (1 #x12)) (1 #x34) (1 #x56)))
+  (case if-zero?-1-negative
+    (ld-expr a (if (zero? 1 (1 #x12)) (1 #x34) (1 #x56)))
     (assert a #x56))
 
-  (case if-u8=?-positive
-    (ld-expr a (if (u8=? (1 #x01) (1 #x01)) (1 #x34) (1 #x56)))
+  (case if-eq?-1-positive
+    (ld-expr a (if (eq? 1 (1 #x01) (1 #x01)) (1 #x34) (1 #x56)))
     (assert a #x34))
 
-  (case if-u8=?-negative
-    (ld-expr a (if (u8=? (1 #x01) (1 #x02)) (1 #x34) (1 #x56)))
+  (case if-eq?-1-negative
+    (ld-expr a (if (eq? 1 (1 #x01) (1 #x02)) (1 #x34) (1 #x56)))
     (assert a #x56))
 
-  (case if-u8<-positive
-    (ld-expr a (if (u8> (1 #x03) (1 #x02)) (1 #x34) (1 #x56)))
+  (case if-gt?-1-positive
+    (ld-expr a (if (gt? 1 (1 #x03) (1 #x02)) (1 #x34) (1 #x56)))
     (assert a #x34))
 
-  (case if-u8<-negative
-    (ld-expr a (if (u8> (1 #x02) (1 #x02)) (1 #x34) (1 #x56)))
+  (case if-gt?-1-negative
+    (ld-expr a (if (gt? 1 (1 #x02) (1 #x02)) (1 #x34) (1 #x56)))
     (assert a #x56))
 
   (case local-2-1

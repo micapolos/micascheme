@@ -9,6 +9,7 @@
     peek-nn peek peek-offset
     u8-zero? u8=? u8>
     u16+1 u16-1 u16+ u16-
+    zero? eq? gt?
     with-locals lets local arg)
   (import
     (zx-next core)
@@ -22,7 +23,8 @@
     peek-nn peek peek-offset
     u8-zero? u8=? u8>
     u16+1 u16-1 u16+ u16-
-    lets local arg)
+    lets local arg
+    zero? eq? gt?)
 
   (define-ops
     (keywords
@@ -38,7 +40,8 @@
       peek-nn peek peek-offset
       u8-zero? u8=? u8>
       u16+1 u16-1 u16+ u16-
-      lets local arg)
+      lets local arg
+      zero? eq? gt?)
 
     ; Top-level
     ((ld-expr r x) (ld-expr r () () x))
@@ -225,14 +228,14 @@
       (ld rr hl))
 
     ; Conditionals
-    ((ld-expr r args locals (if (u8-zero? lhs) then-body else-body))
+    ((ld-expr r args locals (if (zero? 1 lhs) then-body else-body))
       (ld-expr a args locals lhs)
       (or a)
       (if z
         (ld-expr r args locals then-body)
         (ld-expr r args locals else-body)))
 
-    ((ld-expr r args locals (if (u8=? lhs rhs) then-body else-body))
+    ((ld-expr r args locals (if (eq? 1 lhs rhs) then-body else-body))
       (ld-expr l args locals lhs)
       (push hl)
       (ld-expr a args locals rhs)
@@ -242,7 +245,7 @@
         (ld-expr r args locals then-body)
         (ld-expr r args locals else-body)))
 
-    ((ld-expr r args locals (if (u8> lhs rhs) then-body else-body))
+    ((ld-expr r args locals (if (gt? 1 lhs rhs) then-body else-body))
       (ld-expr l args locals lhs)
       (push hl)
       (ld-expr a args locals rhs)
