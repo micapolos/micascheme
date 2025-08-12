@@ -18,7 +18,7 @@
   (zx-next allocator)
   (zx-next banked-allocator)
   (zx-next alloc)
-  (zx-next compiler expr)
+  (zx-next compiler indexed)
   (zx-next scheme alloc)
   (zx-next scheme value)
   (zx-next scheme prims))
