@@ -207,13 +207,12 @@
   (case call-2
     (indexed (write-string (2 (const foo-string)))))
 
-  (case call-1/2
+  (case calls
     (indexed
-      (begin
-        (write-string (2 (const foo-string)))
-        (write-char (1 (const #\space)))
-        (write-string (2 (const bar-string)))
-        (write-char (1 (const #\return))))))
+      (write-string (2 (const foo-string)))
+      (write-char (1 (const #\space)))
+      (write-string (2 (const bar-string)))
+      (write-char (1 (const #\return)))))
 
   (case push-1
     (ld-indexed void 1 (push (const #x12)))

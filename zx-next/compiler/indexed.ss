@@ -46,7 +46,7 @@
       zero? eq? gt?)
 
     ; Top-level
-    ((indexed x) (ld-indexed void 0 x))
+    ((indexed x ...) (ld-indexed void 0 x) ...)
 
     ((ld-indexed r size x) (ld-indexed r () () size x))
 
