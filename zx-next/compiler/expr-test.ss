@@ -7,6 +7,10 @@
 
 (test
   (case const-1
+    (ld-expr void 0 (native (ld a #x12)))
+    (assert a #x12))
+
+  (case const-1
     (ld-expr h 1 (const #x22))
     (assert h #x22))
 
@@ -145,48 +149,53 @@
     (assert a #x56))
 
   (case local-2-1
-    (with-locals
-      (push #x3412)
-      (push #x7856)
-      (ld-expr hl () () 2 (local 0)))
+    (ld-expr hl () () 2
+      (with-locals
+        (native
+          (push #x3412)
+          (push #x7856))
+        (local 0)))
     (assert hl #x1234))
 
   (case local-1-1
-    (with-locals
-      (push #x3412)
-      (push #x7856)
-      (ld-expr a () (2) 1 (local 1)))
+    (ld-expr a () (2) 1
+      (with-locals
+        (native
+          (push #x3412)
+          (push #x7856))
+        (local 1)))
     (assert a #x56))
 
   (case local-1-2
-    (with-locals
-      (push #x3412)
-      (push #x7856)
-      (ld-expr a () (2 1) 1 (local 2)))
+    (push #x3412)
+    (push #x7856)
+    (ld-expr a () (2 1) 1
+      (with-locals
+        (native
+          (push #x3412)
+          (push #x7856))
+        (local 2)))
     (assert a #x78))
 
   (case arg-2-0
     (push #x3412)
     (push #x7856)
     (preserve (af) ; fake return address
-      (with-locals
-        (ld-expr hl () () 2 (arg 0)))
+      (ld-expr hl () () 2 (with-locals (arg 0)))
       (assert hl #x5678)))
 
   (case arg-1-1
     (push #x3412)
     (push #x7856)
     (preserve (af) ; fake return address
-      (with-locals
-        (ld-expr a (2) () 1 (arg 1)))
+      (ld-expr a (2) () 1 (with-locals (arg 1)))
       (assert a #x34)))
 
   (case arg-1-2
     (push #x3412)
     (push #x7856)
     (preserve (af) ; fake return address
-      (with-locals
-        (ld-expr a (2 1) () 1 (arg 2)))
+      (ld-expr a (2 1) () 1 (with-locals (arg 2)))
       (assert a #x12)))
 
   (case write
@@ -222,13 +231,13 @@
   (case pop-1
     (ld a #x12)
     (push a)
-    (ld-expr b () (1) 1 (pop))
+    (ld-expr b 1 (pop))
     (assert b #x12))
 
   (case pop-2
     (ld hl #x1234)
     (push hl)
-    (ld-expr de () (2) 2 (pop))
+    (ld-expr de 2 (pop))
     (assert de #x1234))
 
   (case pop-3
@@ -236,7 +245,7 @@
     (push a)
     (ld hl #x3456)
     (push hl)
-    (ld-expr lde () (3) 3 (pop))
+    (ld-expr lde 3 (pop))
     (assert l #x12)
     (assert de #x3456))
 
@@ -245,7 +254,28 @@
     (push hl)
     (ld hl #x5678)
     (push hl)
-    (ld-expr hlde () (4) 4 (pop))
+    (ld-expr hlde 4 (pop))
     (assert hl #x1234)
     (assert de #x5678))
+
+  (case lets/empty
+    (ld-expr hl 2 (lets (const #x1234)))
+    (assert hl #x1234))
+
+  (case lets-1-1
+    (ld-expr a 1
+      (with-locals
+        (lets
+          (1 (const #x12))
+          (local 0))))
+    (assert a #x12))
+
+  (case lets-2-2
+    (ld-expr a 1
+      (with-locals
+        (lets
+          (1 (const #x11))
+          (1 (const #x22))
+          (add (local 0) (local 1)))))
+    (assert a #x33))
 )

@@ -4,6 +4,7 @@
     peek-const peek peek-offset const
     add-const sub-const and-const or-const xor-const
     with-locals lets local arg
+    drop native
     zero? eq? gt?
     void ignore)
   (import
@@ -14,8 +15,9 @@
   (define-keywords
     peek-const peek peek-offset
     add-const sub-const and-const or-const xor-const
-    lets local arg const
+    lets local arg const with-locals
     zero? eq? gt?
+    drop native
     void ignore)
 
   (define-ops
@@ -31,25 +33,35 @@
       peek-const peek peek-offset
       lets local arg
       write-char write-string
-      push pop
+      with-locals
+      push pop drop native
       void ignore call
       zero? eq? gt?)
 
     ; Top-level
     ((ld-expr r size x) (ld-expr r () () size x))
 
-    ; Push/pop
-    ((ld-expr void args locals 0 (push x)) (ld-expr void args (0 . locals) 0 x))
-    ((ld-expr void args locals 1 (push x)) (ld-expr a    args (1 . locals) 1 x) (push a))
-    ((ld-expr void args locals 2 (push x)) (ld-expr hl   args (2 . locals) 2 x) (push hl))
-    ((ld-expr void args locals 3 (push x)) (ld-expr lde  args (3 . locals) 3 x) (push lde))
-    ((ld-expr void args locals 4 (push x)) (ld-expr hlde args (4 . locals) 4 x) (push hlde))
+    ; Native
+    ((ld-expr r args locals size (native x ...)) (begin x ...))
 
-    ((ld-expr void args (0 . locals) 0 (pop)))
-    ((ld-expr r    args (1 . locals) 1 (pop))   (pop r))
-    ((ld-expr rr   args (2 . locals) 2 (pop))   (pop rr))
-    ((ld-expr rrr  args (3 . locals) 3 (pop))   (pop rrr))
-    ((ld-expr rrrr args (4 . locals) 4 (pop))   (pop rrrr))
+    ; Push/pop
+    ((ld-expr void args locals 0 (push x)) (ld-expr void args locals 0 x))
+    ((ld-expr void args locals 1 (push x)) (ld-expr a    args locals 1 x) (push a))
+    ((ld-expr void args locals 2 (push x)) (ld-expr hl   args locals 2 x) (push hl))
+    ((ld-expr void args locals 3 (push x)) (ld-expr lde  args locals 3 x) (push lde))
+    ((ld-expr void args locals 4 (push x)) (ld-expr hlde args locals 4 x) (push hlde))
+
+    ((ld-expr void args locals 0 (pop)))
+    ((ld-expr r    args locals 1 (pop))   (pop r))
+    ((ld-expr rr   args locals 2 (pop))   (pop rr))
+    ((ld-expr rrr  args locals 3 (pop))   (pop rrr))
+    ((ld-expr rrrr args locals 4 (pop))   (pop rrrr))
+
+    ((ld-expr void args locals 0 (drop)))
+    ((ld-expr void args locals 1 (drop))   (inc sp))
+    ((ld-expr void args locals 2 (drop))   (inc sp) (inc sp))
+    ((ld-expr void args locals 3 (drop))   (inc sp) (inc sp) (inc sp))
+    ((ld-expr void args locals 4 (drop))   (inc sp) (inc sp) (inc sp) (inc sp))
 
     ; Ignore
     ((ld-expr void args locals 1 (ignore x)) (ld-expr a args locals 1 x))
@@ -261,15 +273,27 @@
         (ld-expr r args locals size else-body)))
 
     ; Locals
-    ((with-locals body ...)
+    ((ld-expr r args locals size (with-locals body ...))
       (preserve (ix)
         (ld ix 0)
         (add ix sp)
-        body ...))
+        (ld-expr r args locals size (begin body ...))))
 
+    ; Lets
+    ((ld-expr r args locals size (lets x))
+      (ld-expr r args locals size x))
+
+    ((ld-expr r args (loc ...) size (lets (arg-size arg-expr) . x))
+      (begin
+        (ld-expr void args locals arg-size (push arg-expr))
+        (ld-expr r args (loc ... arg-size) size (lets . x))
+        (ld-expr void args locals arg-size (drop))))
+
+    ; Local access
     ((ld-expr r args locals size (local n))
       (ld-local r args locals 0 size n))
 
+    ; Argument access
     ((ld-expr r args locals size (arg n))
       (ld-arg r args locals 0 size n))
 
