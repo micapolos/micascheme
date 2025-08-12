@@ -22,8 +22,8 @@
       (extract part of this language which does not use locals to indexed-direct)
       (or rename this one to indexed-call-frame))
     (TODO
-      (extract part of this language which implements sdcc-1 calling convention)
-      (to a separate language))
+      (extract part of this language which implements sdcc-1 calling convention to a separate language)
+      (and make this language push all arguments on the stack))
     (TODO
       (stack can contain locals and other temporary values)
       (so we need to adjust locals with every native push/pop))
