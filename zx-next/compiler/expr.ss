@@ -29,6 +29,10 @@
       a de hl ehl dehl
       u8 u16 u24 u32
       u8-neg u8-not
+      inc dec
+      add sub and or xor
+      add-n sub-n and-n or-n xor-n
+      mul
       u8+1 u8-1 u8+ u8- u8-and u8-or u8-xor u8-mul
       u8+n u8-n u8-and-n u8-or-n u8-xor-n
       peek-nn peek peek-offset
@@ -65,10 +69,10 @@
       (ld-expr r args locals lhs)
       (op r))
 
-    ((ld-expr r args locals (u8+1 lhs))
+    ((ld-expr r args locals (inc 1 lhs))
       (ld-u8-op1 r args locals inc lhs))
 
-    ((ld-expr r args locals (u8-1 lhs))
+    ((ld-expr r args locals (dec 1 lhs))
       (ld-u8-op1 r args locals dec lhs))
 
     ; 8-bit math with constant
@@ -80,15 +84,15 @@
       (ld-u8-op2-n a args locals op lhs n)
       (ld r a))
 
-    ((ld-expr r args locals (u8+n lhs n))
+    ((ld-expr r args locals (add-n 1 lhs n))
       (ld-u8-op2-n r args locals add lhs n))
-    ((ld-expr r args locals (u8-n lhs n))
+    ((ld-expr r args locals (sub-n 1 lhs n))
       (ld-u8-op2-n r args locals sub lhs n))
-    ((ld-expr r args locals (u8-and-n lhs n))
+    ((ld-expr r args locals (and-n 1 lhs n))
       (ld-u8-op2-n r args locals and lhs n))
-    ((ld-expr r args locals (u8-or-n lhs n))
+    ((ld-expr r args locals (or-n 1 lhs n))
       (ld-u8-op2-n r args locals or lhs n))
-    ((ld-expr r args locals (u8-xor-n lhs n))
+    ((ld-expr r args locals (xor-n 1 lhs n))
       (ld-u8-op2-n r args locals xor lhs n))
 
     ; 8-bit math
@@ -119,19 +123,19 @@
       (ld-u8-op2 a args locals op lhs rhs)
       (ld r a))
 
-    ((ld-expr r args locals (u8+ lhs rhs))
+    ((ld-expr r args locals (add 1 lhs rhs))
       (ld-u8-op2 r args locals add lhs rhs))
-    ((ld-expr r args locals (u8- lhs rhs))
+    ((ld-expr r args locals (sub 1 lhs rhs))
       (ld-u8-op2 r args locals sub lhs rhs))
-    ((ld-expr r args locals (u8-and lhs rhs))
+    ((ld-expr r args locals (and 1 lhs rhs))
       (ld-u8-op2 r args locals and lhs rhs))
-    ((ld-expr r args locals (u8-or lhs rhs))
+    ((ld-expr r args locals (or 1 lhs rhs))
       (ld-u8-op2 r args locals or lhs rhs))
-    ((ld-expr r args locals (u8-xor lhs rhs))
+    ((ld-expr r args locals (xor 1 lhs rhs))
       (ld-u8-op2 r args locals xor lhs rhs))
 
     ; 8-bit mul
-    ((ld-expr de args locals (u8-mul lhs rhs))
+    ((ld-expr de args locals (mul 1 lhs rhs))
       (ld-expr e args locals rhs)
       (push de)
       (ld-expr a args locals lhs)

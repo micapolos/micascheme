@@ -3,30 +3,30 @@
 (define-fragment test-data (dw #x1234))
 
 (test
-  (case u8
+  (case const-1
     (ld-expr h (1 #x22))
     (assert h #x22))
 
-  (case u16
+  (case const-2
     (ld-expr de (2 #x1234))
     (assert de #x1234))
 
-  (case u24
+  (case const-3
     (ld-expr ehl (3 #x123456))
     (assert e #x12)
     (assert hl #x3456))
 
-  (case u32
+  (case const-4
     (ld-expr dehl (4 #x12345678))
     (assert de #x1234)
     (assert hl #x5678))
 
-  (case u8+1
-    (ld-expr a (u8+1 (1 #x11)))
+  (case inc-1
+    (ld-expr a (inc 1 (1 #x11)))
     (assert a #x12))
 
-  (case u8-1
-    (ld-expr a (u8-1 (1 #x11)))
+  (case dec-1
+    (ld-expr a (dec 1 (1 #x11)))
     (assert a #x10))
 
   (case u8-neg
@@ -37,49 +37,49 @@
     (ld-expr a (u8-not (1 #x22)))
     (assert a #xdd))
 
-  (case u8+n
-    (ld-expr a (u8+n (1 #x11) #x22))
+  (case add-n-1
+    (ld-expr a (add-n 1 (1 #x11) #x22))
     (assert a #x33))
 
-  (case u8+
-    (ld-expr a (u8+ (1 #x11) (1 #x22)))
+  (case add-1
+    (ld-expr a (add 1 (1 #x11) (1 #x22)))
     (assert a #x33))
 
-  (case u8-n
-    (ld-expr a (u8-n (1 #x33) #x22))
+  (case sub-n-1
+    (ld-expr a (sub-n 1 (1 #x33) #x22))
     (assert a #x11))
 
-  (case u8-
-    (ld-expr a (u8- (1 #x33) (1 #x22)))
+  (case sub-1
+    (ld-expr a (sub 1 (1 #x33) (1 #x22)))
     (assert a #x11))
 
-  (case u8-and-n
-    (ld-expr a (u8-and-n (1 #x33) #x0f))
+  (case and-n-1
+    (ld-expr a (and-n 1 (1 #x33) #x0f))
     (assert a #x03))
 
-  (case u8-and
-    (ld-expr a (u8-and (1 #x33) (1 #x0f)))
+  (case and-1
+    (ld-expr a (and 1 (1 #x33) (1 #x0f)))
     (assert a #x03))
+
+  (case or-n-1
+    (ld-expr a (or-n 1 (1 #x33) #x0f))
+    (assert a #x3f))
+
+  (case or-1
+    (ld-expr a (or 1 (1 #x33) (1 #x0f)))
+    (assert a #x3f))
+
+  (case xor-n-1
+    (ld-expr a (xor-n 1 (1 #x33) #x0f))
+    (assert a #x3c))
+
+  (case xor-1
+    (ld-expr a (xor 1 (1 #x33) (1 #x0f)))
+    (assert a #x3c))
 
   (case u8-mul
-    (ld-expr de (u8-mul (1 #x02) (1 #x03)))
+    (ld-expr de (mul 1 (1 #x02) (1 #x03)))
     (assert de #x0006))
-
-  (case u8-and-n
-    (ld-expr a (u8-or-n (1 #x33) #x0f))
-    (assert a #x3f))
-
-  (case u8-and
-    (ld-expr a (u8-or (1 #x33) (1 #x0f)))
-    (assert a #x3f))
-
-  (case u8-and-n
-    (ld-expr a (u8-xor-n (1 #x33) #x0f))
-    (assert a #x3c))
-
-  (case u8-and
-    (ld-expr a (u8-xor (1 #x33) (1 #x0f)))
-    (assert a #x3c))
 
   (case peek-nn
     (ld-expr a (peek-nn 1 test-data))
