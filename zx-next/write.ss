@@ -15,15 +15,44 @@
     write-mem
     write-mem-line
     write
+    write/preserve
     write-ink
     write-paper
     writeln
     writeln-error
     writeln-ok
 
-    write-a write-f write-h write-l write-b write-c write-d write-e
-    write-af write-hl write-bc write-de
-    write-ihl write-ihl++)
+    write-a
+    write-f
+    write-h
+    write-l
+    write-b
+    write-c
+    write-d
+    write-e
+    write-af
+    write-hl
+    write-bc
+    write-de
+    write-sp
+    write-ihl
+    write-ihl++
+
+    write-a/preserve
+    write-f/preserve
+    write-h/preserve
+    write-l/preserve
+    write-b/preserve
+    write-c/preserve
+    write-d/preserve
+    write-e/preserve
+    write-af/preserve
+    write-hl/preserve
+    write-bc/preserve
+    write-de/preserve
+    write-sp/preserve
+    write-ihl/preserve
+    write-ihl++/preserve)
   (import
     (zx-next core)
     (only (micascheme) syntax-rules char? string? datum)
@@ -41,6 +70,10 @@
   (define-fragment write-char
     (input (a char))
     (jp #x0008))
+
+  (define-fragment write-char/preserve
+    (input (a char))
+    (preserve-main/alternate (call write-char)))
 
   (define-fragment write-b-chars
     (input (hl address) (b count))
@@ -70,6 +103,10 @@
       (or a)
       (ret z)
       (preserve (hl) (call write-char))))
+
+  (define-fragment write-string/preserve
+    (input (hl string))
+    (preserve-main/alternate (call write-string)))
 
   (define-fragment writeln-string
     (input (hl string))
@@ -103,6 +140,10 @@
       (call write-char))
     (jp write-byte))
 
+  (define-fragment write-byte-literal/preserve
+    (input (a byte))
+    (preserve-main/alternate (call write-byte-literal)))
+
   (define-fragment write-word
     (input (hl word))
     (preserve (hl)
@@ -112,11 +153,15 @@
     (jp write-byte))
 
   (define-fragment write-word-literal
+     (input (hl word))
+     (preserve (hl)
+       (ld a #\$)
+       (call write-char))
+     (jp write-word))
+
+  (define-fragment write-word-literal/preserve
     (input (hl word))
-    (preserve (hl)
-      (ld a #\$)
-      (call write-char))
-    (jp write-word))
+    (preserve-main/alternate (call write-word-literal)))
 
   (define-fragment write-newline
     (ld a #x0d)
@@ -171,6 +216,29 @@
       (ex de hl)
       (ret)))
 
+  (define-fragments
+    (write-a/preserve (preserve-main/alternate (call write-a)))
+    (write-f/preserve (preserve-main/alternate (call write-f)))
+    (write-h/preserve (preserve-main/alternate (call write-h)))
+    (write-l/preserve (preserve-main/alternate (call write-l)))
+    (write-b/preserve (preserve-main/alternate (call write-b)))
+    (write-c/preserve (preserve-main/alternate (call write-c)))
+    (write-d/preserve (preserve-main/alternate (call write-d)))
+    (write-e/preserve (preserve-main/alternate (call write-e)))
+
+    (write-af/preserve (preserve-main/alternate (call write-af)))
+    (write-hl/preserve (preserve-main/alternate (call write-hl)))
+    (write-bc/preserve (preserve-main/alternate (call write-bc)))
+    (write-de/preserve (preserve-main/alternate (call write-de)))
+
+    (write-ix/preserve (preserve-main/alternate (call write-ix)))
+    (write-iy/preserve (preserve-main/alternate (call write-iy)))
+
+    (write-sp/preserve (preserve-main/alternate (call write-sp)))
+
+    (write-ihl/preserve (preserve-main/alternate (call write-ihl)))
+    (write-ihl++/preserve (preserve-main/alternate (call write-ihl++))))
+
   (define-op-syntax write
     (syntax-rules (a f h l b c d e af hl bc de sp)
       ((_ a) (call write-a))
@@ -204,7 +272,37 @@
           (pop hl)
           (call write-string)))
       ((_ s ...)
-        (begin (preserve (af bc de hl) (write s)) ...))))
+        (begin (write/preserve s) ...))))
+
+  (define-op-syntax write/preserve
+    (syntax-rules (a f h l b c d e af hl bc de sp)
+      ((_ a) (call write-a/preserve))
+      ((_ f) (call write-f/preserve))
+      ((_ h) (call write-h/preserve))
+      ((_ l) (call write-l/preserve))
+      ((_ b) (call write-b/preserve))
+      ((_ c) (call write-c/preserve))
+      ((_ d) (call write-d/preserve))
+      ((_ e) (call write-e/preserve))
+      ((_ af) (call write-af/preserve))
+      ((_ hl) (call write-hl/preserve))
+      ((_ bc) (call write-bc/preserve))
+      ((_ de) (call write-de/preserve))
+      ((_ sp) (call write-sp/preserve))
+      ((_ ch)
+        (char? (datum ch))
+        (preserve (af) (write ch)))
+      ((_ u8)
+        (u8? (datum u8))
+        (preserve (af) (write u8)))
+      ((_ u16)
+        (u16? (datum u16))
+        (preserve (hl) (write u16)))
+      ((_ s)
+        (string? (datum s))
+        (preserve (hl) (write s)))
+      ((_ s ...)
+        (begin (write/preserve s) ...))))
 
   (define-op (writeln s ...)
     (write s ...)
