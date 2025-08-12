@@ -18,7 +18,8 @@
     unsafe (not type checked) language
     with indexed access to arguments and locals
     and support for values of size from 0 to 4
-    (fixit (stack can contain locals and other temporary values)))
+    (TODO (stack can contain locals and other temporary values))
+    (TODO (optimize access to last local using push/pop)))
 
   (define-keywords
     peek-const peek peek-offset
