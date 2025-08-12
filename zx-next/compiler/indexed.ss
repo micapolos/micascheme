@@ -79,7 +79,7 @@
     ((ld-indexed void args locals 3 (ignore x)) (ld-indexed ehl args locals 3 x))
     ((ld-indexed void args locals 4 (ignore x)) (ld-indexed dehl args locals 4 x))
 
-    ; Load
+    ; Load into register
     ((ld-indexed r args locals size (const n)) (ld r n))
 
     ; Load indirect
