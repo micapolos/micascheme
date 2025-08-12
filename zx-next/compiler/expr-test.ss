@@ -81,32 +81,32 @@
     (ld-expr a (u8-xor (u8 #x33) (u8 #x0f)))
     (assert a #x3c))
 
-  (case u8-peek-nn
-    (ld-expr a (u8-peek-nn test-data))
+  (case peek-nn
+    (ld-expr a (peek-nn 1 test-data))
     (assert a #x34))
 
-  (case u8-peek-nn+1
-    (ld-expr a (u8-peek-nn (+ test-data 1)))
+  (case peek-nn+1
+    (ld-expr a (peek-nn 1 (+ test-data 1)))
     (assert a #x12))
 
-  (case u8-peek
-    (ld-expr a (u8-peek (u16 test-data)))
+  (case peek
+    (ld-expr a (peek 1 (u16 test-data)))
     (assert a #x34))
 
-  (case u8-peek+1
-    (ld-expr a (u8-peek (u16+1 (u16 test-data))))
+  (case peek+1
+    (ld-expr a (peek 1 (u16+1 (u16 test-data))))
     (assert a #x12))
 
-  (case u8-peek-offset
+  (case peek-offset
     (preserve (ix)
       (ld ix test-data)
-      (ld-expr a (u8-peek-offset 0))
+      (ld-expr a (peek-offset 1 0))
       (assert a #x34)))
 
-  (case u8-peek-offset+1
+  (case peek-offset+1
     (preserve (ix)
       (ld ix test-data)
-      (ld-expr a (u8-peek-offset 1))
+      (ld-expr a (peek-offset 1 1))
       (assert a #x12)))
 
   (case if-u8-zero?-positive
@@ -133,48 +133,48 @@
     (ld-expr a (if (u8> (u8 #x02) (u8 #x02)) (u8 #x34) (u8 #x56)))
     (assert a #x56))
 
-  (case local-u16-0
+  (case local-2-1
     (with-locals
       (push #x3412)
       (push #x7856)
-      (ld-expr hl () () (local u16 0)))
+      (ld-expr hl () () (local 2 0)))
     (assert hl #x1234))
 
-  (case local-u8-1
+  (case local-1-1
     (with-locals
       (push #x3412)
       (push #x7856)
-      (ld-expr a () (u16) (local u8 1)))
+      (ld-expr a () (2) (local 1 1)))
     (assert a #x56))
 
-  (case local-u8-2
+  (case local-1-2
     (with-locals
       (push #x3412)
       (push #x7856)
-      (ld-expr a () (u16 u8) (local u8 2)))
+      (ld-expr a () (2 1) (local 1 2)))
     (assert a #x78))
 
-  (case arg-u16-0
+  (case arg-2-0
     (push #x3412)
     (push #x7856)
     (preserve (af) ; fake return address
       (with-locals
-        (ld-expr hl () () (arg u16 0)))
+        (ld-expr hl () () (arg 2 0)))
       (assert hl #x5678)))
 
-  (case arg-u8-1
+  (case arg-1-1
     (push #x3412)
     (push #x7856)
     (preserve (af) ; fake return address
       (with-locals
-        (ld-expr a (u16) () (arg u8 1)))
+        (ld-expr a (2) () (arg 1 1)))
       (assert a #x34)))
 
-  (case arg-u8-2
+  (case arg-1-2
     (push #x3412)
     (push #x7856)
     (preserve (af) ; fake return address
       (with-locals
-        (ld-expr a (u16 u8) () (arg u8 2)))
+        (ld-expr a (2 1) () (arg 1 2)))
       (assert a #x12)))
 )
