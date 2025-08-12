@@ -10,7 +10,6 @@
     indexed)
   (import
     (zx-next core)
-    (zx-next write)
     (only (zx-next call-frame) call-frame)
     (only (micascheme) -))
   (export (import (only (zx-next call-frame) call-frame)))
@@ -41,10 +40,9 @@
       mul
       peek-const peek peek-offset
       lets local arg
-      write-char write-string
       call-frame
       push pop drop native
-      void ignore call
+      void ignore
       zero? eq? gt?)
 
     ; Top-level
@@ -306,19 +304,54 @@
     ((ld-indexed r args locals size (arg n))
       (ld-arg r args locals 0 size n))
 
-    ; Statements
-    ((ld-indexed void args locals 0 (write-char ch))
-      (ld-indexed a args locals 1 ch)
-      (call write-char))
-
-    ((ld-indexed void args locals 0 (write-string addr))
-      (ld-indexed hl args locals 2 addr)
-      (call write-string))
-
     ; Begin block
     ((ld-indexed r args locals size (begin stmt ... indexed))
       (ld-indexed void args locals 0 stmt) ...
       (ld-indexed r args locals size indexed))
+
+    ; Everything else is a call, where all arguments ar pushed on the stack
+    ; Use SDCC-1 calling convention.
+    ((ld-indexed r args locals size (addr (4 x) xs ...))
+      (ld-indexed hlde args locals 4 x)
+      (ld-indexed r args locals size
+        (lets xs ... (native (call addr)))))
+
+    ((ld-indexed r args locals size (addr (3 x) xs ...))
+      (ld-indexed lde args locals 3 x)
+      (ld-indexed r args locals size
+        (lets xs ... (native (call addr)))))
+
+    ((ld-indexed r args locals size (addr (2 x) (2 y) xs ...))
+      (ld-indexed de args locals 2 y)
+      (preserve (de) (ld-indexed hl args locals 2 x))
+      (ld-indexed r args locals size
+        (lets xs ... (native (call addr)))))
+
+    ((ld-indexed r args locals size (addr (2 x) xs ...))
+      (ld-indexed hl args locals 2 x)
+      (ld-indexed r args locals size
+        (lets xs ... (native (call addr)))))
+
+    ((ld-indexed r args locals size (addr (1 x) (2 y) xs ...))
+      (ld-indexed hl args locals 2 y)
+      (preserve (hl) (ld-indexed a args locals 1 x))
+      (ld-indexed r args locals size
+        (lets xs ... (native (call addr)))))
+
+    ((ld-indexed r args locals size (addr (1 x) (1 y) xs ...))
+      (ld-indexed l args locals 1 y)
+      (preserve (hl) (ld-indexed a args locals 1 x))
+      (ld-indexed r args locals size
+        (lets xs ... (native (call addr)))))
+
+    ((ld-indexed r args locals size (addr (1 x) xs ...))
+      (ld-indexed a args locals 1 x)
+      (ld-indexed r args locals size
+        (lets xs ... (native (call addr)))))
+
+    ((ld-indexed r args locals size (addr xs ...))
+      (ld-indexed r args locals size
+        (lets xs ... (native (call addr)))))
   )
 
   (define-op-syntax ld-local

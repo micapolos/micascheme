@@ -198,13 +198,22 @@
       (ld-indexed a (2 1) () 1 (call-frame (arg 2)))
       (assert a #x12)))
 
-  (case write
+  (case call-0
+    (indexed (write-newline)))
+
+  (case call-1
+    (indexed (write-char (1 (const #\a)))))
+
+  (case call-2
+    (indexed (write-string (2 (const foo-string)))))
+
+  (case call-1/2
     (indexed
       (begin
-        (write-string (const foo-string))
-        (write-char (const #\space))
-        (write-string (const bar-string))
-        (write-char (const #\return)))))
+        (write-string (2 (const foo-string)))
+        (write-char (1 (const #\space)))
+        (write-string (2 (const bar-string)))
+        (write-char (1 (const #\return))))))
 
   (case push-1
     (ld-indexed void 1 (push (const #x12)))
@@ -278,4 +287,6 @@
           (1 (const #x34))
           (sub (local 0) (local 1)))))
     (assert a #x12))
+
+  ;(call wait-space)
 )
