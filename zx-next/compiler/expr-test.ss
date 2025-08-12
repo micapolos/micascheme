@@ -29,12 +29,12 @@
     (ld-expr a (dec 1 (1 #x11)))
     (assert a #x10))
 
-  (case u8-neg
-    (ld-expr a (u8-neg (1 #x22)))
+  (case neg-1
+    (ld-expr a (neg 1 (1 #x22)))
     (assert a #xde))
 
-  (case u8-not
-    (ld-expr a (u8-not (1 #x22)))
+  (case cpl-1
+    (ld-expr a (cpl 1 (1 #x22)))
     (assert a #xdd))
 
   (case add-n-1

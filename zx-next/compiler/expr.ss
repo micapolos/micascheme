@@ -28,7 +28,7 @@
     (keywords
       a de hl ehl dehl
       u8 u16 u24 u32
-      u8-neg u8-not
+      neg cpl
       inc dec
       add sub and or xor
       add-n sub-n and-n or-n xor-n
@@ -96,20 +96,20 @@
       (ld-u8-op2-n r args locals xor lhs n))
 
     ; 8-bit math
-    ((ld-expr a args locals (u8-neg lhs))
+    ((ld-expr a args locals (neg 1 lhs))
       (ld-expr a args locals lhs)
       (neg))
 
-    ((ld-expr r args locals (u8-neg lhs))
-      (ld-expr a args locals (u8-neg lhs))
+    ((ld-expr r args locals (neg 1 lhs))
+      (ld-expr a args locals (neg 1 lhs))
       (ld r a))
 
-    ((ld-expr a args locals (u8-not lhs))
+    ((ld-expr a args locals (cpl 1 lhs))
       (ld-expr a args locals lhs)
       (cpl))
 
-    ((ld-expr r args locals (u8-not lhs))
-      (ld-expr a args locals (u8-not lhs))
+    ((ld-expr r args locals (cpl 1 lhs))
+      (ld-expr a args locals (cpl 1 lhs))
       (ld r a))
 
     ((ld-u8-op2 a args locals op lhs rhs)
