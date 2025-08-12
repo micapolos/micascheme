@@ -77,7 +77,7 @@
     (ld-expr a (xor 1 (1 #x33) (1 #x0f)))
     (assert a #x3c))
 
-  (case u8-mul
+  (case mul-1
     (ld-expr de (mul 1 (1 #x02) (1 #x03)))
     (assert de #x0006))
 
