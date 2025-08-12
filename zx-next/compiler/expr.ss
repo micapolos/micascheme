@@ -10,7 +10,7 @@
     u8-zero? u8=? u8>
     u16+1 u16-1 u16+ u16-
     u16-peek-nn
-    with-locals local arg)
+    with-locals lets local arg)
   (import
     (zx-next core)
     (only (micascheme) -))
@@ -24,7 +24,7 @@
     u8-zero? u8=? u8>
     u16+1 u16-1 u16+ u16-
     u16-peek-nn
-    local arg)
+    lets local arg)
 
   (define-ops
     (keywords
@@ -37,173 +37,182 @@
       u8-zero? u8=? u8>
       u16+1 u16-1 u16+ u16-
       u16-peek-nn
-      local arg)
+      lets local arg)
+
+    ; Top-level
+    ((ld-expr r x) (ld-expr r () () x))
 
     ; Load
-    ((ld-expr r    (u8 n))     (ld r n))
-    ((ld-expr rr   (u16 nn))   (ld rr nn))
-    ((ld-expr ehl  (u24 nnn))  (ld ehl nnn))
-    ((ld-expr dehl (u32 nnnn)) (ld dehl nnnn))
+    ((ld-expr r    args locals (u8 n))     (ld r n))
+    ((ld-expr rr   args locals (u16 nn))   (ld rr nn))
+    ((ld-expr ehl  args locals (u24 nnn))  (ld ehl nnn))
+    ((ld-expr dehl args locals (u32 nnnn)) (ld dehl nnnn))
 
     ; Load indirect
-    ((ld-expr a (u8-peek-nn nn))
+    ((ld-expr a args locals (u8-peek-nn nn))
       (ld a (nn)))
 
-    ((ld-expr r (u8-peek-nn nn))
+    ((ld-expr r args locals (u8-peek-nn nn))
       (ld a (nn))
       (ld r a))
 
-    ((ld-expr r (u8-peek lhs))
-      (ld-expr hl lhs)
+    ((ld-expr r args locals (u8-peek lhs))
+      (ld-expr hl args locals lhs)
       (ld r (hl)))
 
-    ((ld-expr r (u8-peek-offset offset))
+    ((ld-expr r args locals (u8-peek-offset offset))
       (ld r (+ ix offset)))
 
     ; 8-bit increment/decrement
-    ((ld-u8-op1 r op lhs)
-      (ld-expr r lhs)
+    ((ld-u8-op1 r args locals op lhs)
+      (ld-expr r args locals lhs)
       (op r))
 
-    ((ld-expr r (u8+1 lhs))
-      (ld-u8-op1 r inc lhs))
+    ((ld-expr r args locals (u8+1 lhs))
+      (ld-u8-op1 r args locals inc lhs))
 
-    ((ld-expr r (u8-1 lhs))
-      (ld-u8-op1 r dec lhs))
+    ((ld-expr r args locals (u8-1 lhs))
+      (ld-u8-op1 r args locals dec lhs))
 
     ; 8-bit math with constant
-    ((ld-u8-op2-n a op lhs n)
-      (ld-expr a lhs)
+    ((ld-u8-op2-n a args locals op lhs n)
+      (ld-expr a args locals lhs)
       (op n))
 
-    ((ld-u8-op2-n r op lhs n)
-      (ld-u8-op2-n a op lhs n)
+    ((ld-u8-op2-n r args locals op lhs n)
+      (ld-u8-op2-n a args locals op lhs n)
       (ld r a))
 
-    ((ld-expr r (u8+n lhs n))
-      (ld-u8-op2-n r add lhs n))
-    ((ld-expr r (u8-n lhs n))
-      (ld-u8-op2-n r sub lhs n))
-    ((ld-expr r (u8-and-n lhs n))
-      (ld-u8-op2-n r and lhs n))
-    ((ld-expr r (u8-or-n lhs n))
-      (ld-u8-op2-n r or lhs n))
-    ((ld-expr r (u8-xor-n lhs n))
-      (ld-u8-op2-n r xor lhs n))
+    ((ld-expr r args locals (u8+n lhs n))
+      (ld-u8-op2-n r args locals add lhs n))
+    ((ld-expr r args locals (u8-n lhs n))
+      (ld-u8-op2-n r args locals sub lhs n))
+    ((ld-expr r args locals (u8-and-n lhs n))
+      (ld-u8-op2-n r args locals and lhs n))
+    ((ld-expr r args locals (u8-or-n lhs n))
+      (ld-u8-op2-n r args locals or lhs n))
+    ((ld-expr r args locals (u8-xor-n lhs n))
+      (ld-u8-op2-n r args locals xor lhs n))
 
     ; 8-bit math
-    ((ld-expr a (u8-neg lhs))
-      (ld-expr a lhs)
+    ((ld-expr a args locals (u8-neg lhs))
+      (ld-expr a args locals lhs)
       (neg))
 
-    ((ld-expr r (u8-neg lhs))
-      (ld-expr a (u8-neg lhs))
+    ((ld-expr r args locals (u8-neg lhs))
+      (ld-expr a args locals (u8-neg lhs))
       (ld r a))
 
-    ((ld-expr a (u8-not lhs))
-      (ld-expr a lhs)
+    ((ld-expr a args locals (u8-not lhs))
+      (ld-expr a args locals lhs)
       (cpl))
 
-    ((ld-expr r (u8-not lhs))
-      (ld-expr a (u8-not lhs))
+    ((ld-expr r args locals (u8-not lhs))
+      (ld-expr a args locals (u8-not lhs))
       (ld r a))
 
-    ((ld-u8-op2 a op lhs rhs)
-      (ld-expr l rhs)
+    ((ld-u8-op2 a args locals op lhs rhs)
+      (ld-expr l args locals rhs)
       (push hl)
-      (ld-expr a lhs)
+      (ld-expr a args locals lhs)
       (pop hl)
       (op l))
 
-    ((ld-u8-op2 r op lhs rhs)
-      (ld-u8-op2 a op lhs rhs)
+    ((ld-u8-op2 r args locals op lhs rhs)
+      (ld-u8-op2 a args locals op lhs rhs)
       (ld r a))
 
-    ((ld-expr r (u8+ lhs rhs))
-      (ld-u8-op2 r add lhs rhs))
-    ((ld-expr r (u8- lhs rhs))
-      (ld-u8-op2 r sub lhs rhs))
-    ((ld-expr r (u8-and lhs rhs))
-      (ld-u8-op2 r and lhs rhs))
-    ((ld-expr r (u8-or lhs rhs))
-      (ld-u8-op2 r or lhs rhs))
-    ((ld-expr r (u8-xor lhs rhs))
-      (ld-u8-op2 r xor lhs rhs))
+    ((ld-expr r args locals (u8+ lhs rhs))
+      (ld-u8-op2 r args locals add lhs rhs))
+    ((ld-expr r args locals (u8- lhs rhs))
+      (ld-u8-op2 r args locals sub lhs rhs))
+    ((ld-expr r args locals (u8-and lhs rhs))
+      (ld-u8-op2 r args locals and lhs rhs))
+    ((ld-expr r args locals (u8-or lhs rhs))
+      (ld-u8-op2 r args locals or lhs rhs))
+    ((ld-expr r args locals (u8-xor lhs rhs))
+      (ld-u8-op2 r args locals xor lhs rhs))
 
     ; 8-bit mul
-    ((ld-expr de (u8-mul lhs rhs))
-      (ld-expr e rhs)
+    ((ld-expr de args locals (u8-mul lhs rhs))
+      (ld-expr e args locals rhs)
       (push de)
-      (ld-expr a lhs)
+      (ld-expr a args locals lhs)
       (pop de)
       (ld d a)
       (mul d e))
 
-    ((ld-expr rr (u8-mul lhs rhs))
-      (ld-expr de (u8-mul lhs rhs))
+    ((ld-expr rr args locals (u8-mul lhs rhs))
+      (ld-expr de args locals (u8-mul lhs rhs))
       (ld rr de))
 
-    ((ld-u16-op1 rr op lhs)
-      (ld-expr rr lhs)
+    ((ld-u16-op1 rr args locals op lhs)
+      (ld-expr rr args locals lhs)
       (op rr))
 
-    ((ld-expr rr (u16+1 lhs))
-      (ld-u16-op1 rr inc lhs))
+    ((ld-expr rr args locals (u16+1 lhs))
+      (ld-u16-op1 rr args locals inc lhs))
 
-    ((ld-expr rr (u16-1 lhs))
-      (ld-u16-op1 rr dec lhs))
+    ((ld-expr rr args locals (u16-1 lhs))
+      (ld-u16-op1 rr args locals dec lhs))
 
-    ((ld-expr hl (u16+ lhs rhs))
-      (ld-expr rr rhs)
+    ((ld-expr hl args locals (u16+ lhs rhs))
+      (ld-expr rr args locals rhs)
       (push hl)
-      (ld-expr rr lhs)
+      (ld-expr rr args locals lhs)
       (pop de)
       (add hl de))
 
-    ((ld-expr rr (u16+ lhs rhs))
-      (ld-expr hl (u16+ lhs rhs))
+    ((ld-expr rr args locals (u16+ lhs rhs))
+      (ld-expr hl args locals (u16+ lhs rhs))
       (ld rr hl))
 
-    ((ld-expr hl (u16- lhs rhs))
-      (ld-expr rr rhs)
+    ((ld-expr hl args locals (u16- lhs rhs))
+      (ld-expr rr args locals rhs)
       (push hl)
-      (ld-expr rr lhs)
+      (ld-expr rr args locals lhs)
       (pop de)
       (rcf)
       (sbc hl de))
 
-    ((ld-expr rr (u16- lhs rhs))
-      (ld-expr hl (u16- lhs rhs))
+    ((ld-expr rr args locals (u16- lhs rhs))
+      (ld-expr hl args locals (u16- lhs rhs))
       (ld rr hl))
 
-    ((ld-expr hl (u16-peek-nn nn))
+    ((ld-expr hl args locals (u16-peek-nn nn))
       (ld hl (nn)))
 
-    ((ld-expr rr (u16-peek-nn nn))
+    ((ld-expr rr args locals (u16-peek-nn nn))
       (ld hl (nn))
       (ld rr hl))
 
     ; Conditionals
-    ((ld-expr r (if (u8-zero? lhs) then-body else-body))
-      (ld-expr a lhs)
+    ((ld-expr r args locals (if (u8-zero? lhs) then-body else-body))
+      (ld-expr a args locals lhs)
       (or a)
-      (if z (ld-expr r then-body) (ld-expr r else-body)))
+      (if z
+        (ld-expr r args locals then-body)
+        (ld-expr r args locals else-body)))
 
-    ((ld-expr r (if (u8=? lhs rhs) then-body else-body))
-      (ld-expr l lhs)
+    ((ld-expr r args locals (if (u8=? lhs rhs) then-body else-body))
+      (ld-expr l args locals lhs)
       (push hl)
-      (ld-expr a rhs)
+      (ld-expr a args locals rhs)
       (pop hl)
       (xor l)
-      (if z (ld-expr r then-body) (ld-expr r else-body)))
+      (if z
+        (ld-expr r args locals then-body)
+        (ld-expr r args locals else-body)))
 
-    ((ld-expr r (if (u8> lhs rhs) then-body else-body))
-      (ld-expr l lhs)
+    ((ld-expr r args locals (if (u8> lhs rhs) then-body else-body))
+      (ld-expr l args locals lhs)
       (push hl)
-      (ld-expr a rhs)
+      (ld-expr a args locals rhs)
       (pop hl)
       (cp l)
-      (if c (ld-expr r then-body) (ld-expr r else-body)))
+      (if c
+        (ld-expr r args locals then-body)
+        (ld-expr r args locals else-body)))
 
     ; Locals
     ((with-locals body ...)
