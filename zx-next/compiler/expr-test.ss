@@ -1,6 +1,9 @@
 (import (zx-next test) (zx-next compiler expr))
 
-(define-fragment test-data (dw #x1234))
+(define-fragments
+  (test-data (dw #x1234))
+  (foo-string (dz "foo"))
+  (bar-string (dz "bar")))
 
 (test
   (case const-1
@@ -185,4 +188,13 @@
       (with-locals
         (ld-expr a (2 1) () 1 (arg 2)))
       (assert a #x12)))
+
+  (case write
+    (do-stmt
+      (begin
+        (write-string (const foo-string))
+        (write-char (const #\space))
+        (write-string (const bar-string))
+        (write-char (const #\return)))))
+
 )

@@ -1,12 +1,13 @@
 (library (zx-next compiler expr)
   (export
-    ld-expr
+    ld-expr do-stmt
     peek-const peek peek-offset const
     add-const sub-const and-const or-const xor-const
     with-locals lets local arg
     zero? eq? gt?)
   (import
     (zx-next core)
+    (zx-next write)
     (only (micascheme) -))
 
   (define-keywords
@@ -18,6 +19,7 @@
   (define-ops
     (keywords
       a de hl ehl dehl
+      begin
       const
       neg cpl
       inc dec
@@ -26,9 +28,11 @@
       mul
       peek-const peek peek-offset
       lets local arg
+      write-char write-string
       zero? eq? gt?)
 
     ; Top-level
+    ((do-stmt x) (do-stmt () () x))
     ((ld-expr r size x) (ld-expr r () () size x))
 
     ; Load
@@ -246,6 +250,29 @@
 
     ((ld-expr r args locals size (arg n))
       (ld-arg r args locals 0 size n))
+
+    ; Statements
+    ((do-stmt args locals (write-char ch))
+      (ld-expr a args locals 1 ch)
+      (call write-char))
+
+    ((do-stmt args locals (write-string addr))
+      (ld-expr hl args locals 2 addr)
+      (call write-string))
+
+    ; Ignore expression result
+    ((do-stmt args locals (1 x)) (ld-expr a args locals 1 x))
+    ((do-stmt args locals (2 x)) (ld-expr hl args locals 2 x))
+    ((do-stmt args locals (3 x)) (ld-expr ehl args locals 3 x))
+    ((do-stmt args locals (4 x)) (ld-expr dehl args locals 4 x))
+
+    ; Begin block
+    ((do-stmt args locals (begin stmt ...))
+      (do-stmt args locals stmt) ...)
+
+    ((ld-expr r args locals size (begin stmt ... expr))
+      (do-stmt args locals stmt) ...
+      (ld-expr r args locals size expr))
   )
 
   (define-op-syntax ld-local
