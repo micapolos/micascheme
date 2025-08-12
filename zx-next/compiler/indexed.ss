@@ -10,6 +10,7 @@
     indexed)
   (import
     (zx-next core)
+    (zx-next assert)
     (only (zx-next call-frame) call-frame)
     (only (micascheme) -))
   (export (import (only (zx-next call-frame) call-frame)))
@@ -53,7 +54,8 @@
       call-frame
       push pop drop native
       void ignore
-      zero? eq? gt?)
+      zero? eq? gt?
+      assert)
 
     ; Top-level
     ((indexed x ...) (ld-indexed void 0 x) ...)
@@ -185,8 +187,8 @@
       (ld d a)
       (mul d e))
 
-    ((ld-indexed rr args locals 1 (mul lhs rhs))
-      (ld-indexed de args locals 1 (mul lhs rhs))
+    ((ld-indexed rr args locals 2 (mul lhs rhs))
+      (ld-indexed de args locals 2 (mul lhs rhs))
       (ld rr de))
 
     ; 16-bit
@@ -319,6 +321,26 @@
       (ld-indexed void args locals 0 stmt) ...
       (ld-indexed r args locals size indexed))
 
+    ; Assertions
+    ((ld-indexed void args locals 0 (assert 1 x n))
+      (ld-indexed a args locals 1 x)
+      (assert a n))
+
+    ((ld-indexed void args locals 0 (assert 2 x nn))
+      (ld-indexed hl args locals 2 x)
+      (assert hl nn))
+
+    ((ld-indexed void args locals 0 (assert 3 x nnn))
+      (ld-indexed lde args locals 3 x)
+      (assert l (fxsrl nnn 16))
+      (assert de (fxand nnn #xffff)))
+
+    ((ld-indexed void args locals 0 (assert 4 x nnnn))
+      (ld-indexed hlde args locals 4 x)
+      (assert hl (fxsrl nnnn 16))
+      (assert de (fxand nnnn #xffff)))
+
+    ; =====================================================================
     ; Everything else is a call, where all arguments ar pushed on the stack
     ; Use SDCC-1 calling convention.
     ((ld-indexed r args locals size (addr (4 x) xs ...))
@@ -362,23 +384,22 @@
     ((ld-indexed r args locals size (addr xs ...))
       (ld-indexed r args locals size
         (lets xs ... (native (call addr)))))
+
+    ; === Don't add anything here, because it won't be matched ===
+    ; ============================================================
   )
 
-  (define-op-syntax ld-local
-    (lambda ($syntax)
-      (syntax-case $syntax (de gl ehl dehl)
-        ((ld-local r args locals offset size 0)
-          #`(ld-indexed r args locals size (peek-offset #,(- (datum offset) (datum size)))))
+  (define-op-syntax (ld-local $syntax)
+    (syntax-case $syntax ()
+      ((ld-local r args locals offset size 0)
+        #`(ld-indexed r args locals size (peek-offset #,(- (datum offset) (datum size)))))
+      ((ld-local r args (local-size . locals) offset size n)
+        #`(ld-local r args locals #,(- (datum offset) (datum local-size)) size #,(- (datum n) 1)))))
 
-        ((ld-local r args (local-size . locals) offset size n)
-          #`(ld-local r args locals #,(- (datum offset) (datum local-size)) size #,(- (datum n) 1))))))
-
-  (define-op-syntax ld-arg
-    (lambda ($syntax)
-      (syntax-case $syntax (de gl ehl dehl)
-        ((ld-arg r args locals offset size 0)
-          #`(ld-indexed r args locals size (peek-offset #,(+ (datum offset) 4))))
-
-        ((ld-arg r (arg-size . args) locals offset size n)
-          #`(ld-arg r args locals #,(+ (datum offset) (datum arg-size)) size #,(- (datum n) 1))))))
+  (define-op-syntax (ld-arg $syntax)
+    (syntax-case $syntax ()
+      ((ld-arg r args locals offset size 0)
+        #`(ld-indexed r args locals size (peek-offset #,(+ (datum offset) 4))))
+      ((ld-arg r (arg-size . args) locals offset size n)
+        #`(ld-arg r args locals #,(+ (datum offset) (datum arg-size)) size #,(- (datum n) 1)))))
 )

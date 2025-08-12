@@ -7,146 +7,110 @@
 
 (test
   (case const-1
-    (ld-indexed void 0 (native (ld a #x12)))
-    (assert a #x12))
+    (indexed (assert 1 (native (ld a #x12)) #x12)))
 
   (case const-1
-    (ld-indexed h 1 (const #x22))
-    (assert h #x22))
+    (indexed (assert 1 (const #x22) #x22)))
 
   (case const-2
-    (ld-indexed de 2 (const #x1234))
-    (assert de #x1234))
+    (indexed (assert 2 (const #x1234) #x1234)))
 
   (case const-3
-    (ld-indexed ehl 3 (const #x123456))
-    (assert e #x12)
-    (assert hl #x3456))
+    (indexed (assert 3 (const #x123456) #x123456)))
 
   (case const-4
-    (ld-indexed dehl 4 (const #x12345678))
-    (assert de #x1234)
-    (assert hl #x5678))
+    (indexed (assert 4 (const #x12345678) #x12345678)))
 
   (case inc-1
-    (ld-indexed a 1 (inc (const #x11)))
-    (assert a #x12))
+    (indexed (assert 1 (inc (const #x11)) #x12)))
 
   (case dec-1
-    (ld-indexed a 1 (dec (const #x11)))
-    (assert a #x10))
+    (indexed (assert 1 (dec (const #x11)) #x10)))
 
   (case inc-2
-    (ld-indexed hl 2 (inc (const #x1122)))
-    (assert hl #x1123))
+    (indexed (assert 2 (inc (const #x1122)) #x1123)))
 
   (case dec-2
-    (ld-indexed hl 2 (dec (const #x1122)))
-    (assert hl #x1121))
+    (indexed (assert 2 (dec (const #x1122)) #x1121)))
 
   (case neg-1
-    (ld-indexed a 1 (neg (const #x22)))
-    (assert a #xde))
+    (indexed (assert 1 (neg (const #x22)) #xde)))
 
   (case cpl-1
-    (ld-indexed a 1 (cpl (const #x22)))
-    (assert a #xdd))
+    (indexed (assert 1 (cpl (const #x22)) #xdd)))
 
   (case add-const-1
-    (ld-indexed a 1 (add-const (const #x11) #x22))
-    (assert a #x33))
+    (indexed (assert 1 (add-const (const #x11) #x22) #x33)))
 
   (case add-1
-    (ld-indexed a 1 (add (const #x11) (const #x22)))
-    (assert a #x33))
+    (indexed (assert 1 (add (const #x11) (const #x22)) #x33)))
 
   (case sub-const-1
-    (ld-indexed a 1 (sub-const (const #x33) #x22))
-    (assert a #x11))
+    (indexed (assert 1 (sub-const (const #x33) #x22) #x11)))
 
   (case sub-1
-    (ld-indexed a 1 (sub (const #x33) (const #x22)))
-    (assert a #x11))
+    (indexed (assert 1 (sub (const #x33) (const #x22)) #x11)))
 
   (case and-const-1
-    (ld-indexed a 1 (and-const (const #x33) #x0f))
-    (assert a #x03))
+    (indexed (assert 1 (and-const (const #x33) #x0f) #x03)))
 
   (case and-1
-    (ld-indexed a 1 (and (const #x33) (const #x0f)))
-    (assert a #x03))
+    (indexed (assert 1 (and (const #x33) (const #x0f)) #x03)))
 
   (case or-const-1
-    (ld-indexed a 1 (or-const (const #x33) #x0f))
-    (assert a #x3f))
+    (indexed (assert 1 (or-const (const #x33) #x0f) #x3f)))
 
   (case or-1
-    (ld-indexed a 1 (or (const #x33) (const #x0f)))
-    (assert a #x3f))
+    (indexed (assert 1 (or (const #x33) (const #x0f)) #x3f)))
 
   (case xor-const-1
-    (ld-indexed a 1 (xor-const (const #x33) #x0f))
-    (assert a #x3c))
+    (indexed (assert 1 (xor-const (const #x33) #x0f) #x3c)))
 
   (case xor-1
-    (ld-indexed a 1 (xor (const #x33) (const #x0f)))
-    (assert a #x3c))
+    (indexed (assert 1 (xor (const #x33) (const #x0f)) #x3c)))
 
   (case mul-1
-    (ld-indexed de 2 (mul (const #x02) (const #x03)))
-    (assert de #x0006))
+    (indexed (assert 2 (mul (const #x02) (const #x03)) #x0006)))
 
   (case peek-const
-    (ld-indexed a 1 (peek-const test-data))
-    (assert a #x34))
+    (indexed (assert 1 (peek-const test-data) #x34)))
 
   (case peek-const+1
-    (ld-indexed a 1 (peek-const (+ test-data 1)))
-    (assert a #x12))
+    (indexed (assert 1 (peek-const (+ test-data 1)) #x12)))
 
   (case peek
-    (ld-indexed a 1 (peek 2 (const test-data)))
-    (assert a #x34))
+    (indexed (assert 1 (peek 2 (const test-data)) #x34)))
 
   (case peek+1
-    (ld-indexed a 1 (peek 2 (inc (const test-data))))
-    (assert a #x12))
+    (indexed (assert 1 (peek 2 (inc (const test-data))) #x12)))
 
   (case peek-offset
     (preserve (ix)
       (ld ix test-data)
-      (ld-indexed a 1 (peek-offset 0))
-      (assert a #x34)))
+      (indexed (assert 1 (peek-offset 0) #x34))))
 
   (case peek-offset+1
     (preserve (ix)
       (ld ix test-data)
-      (ld-indexed a 1 (peek-offset 1))
-      (assert a #x12)))
+      (indexed (assert 1 (peek-offset 1) #x12))))
 
   (case if-zero?-1-positive
-    (ld-indexed a 1 (if 1 (zero? (const #x00)) (const #x34) (const #x56)))
-    (assert a #x34))
+    (indexed (assert 1 (if 1 (zero? (const #x00)) (const #x34) (const #x56)) #x34)))
 
   (case if-zero?-1-negative
-    (ld-indexed a 1 (if 1 (zero? (const #x12)) (const #x34) (const #x56)))
-    (assert a #x56))
+    (indexed (assert 1 (if 1 (zero? (const #x12)) (const #x34) (const #x56)) #x56)))
 
   (case if-eq?-1-positive
-    (ld-indexed a 1 (if 1 (eq? (const #x01) (const #x01)) (const #x34) (const #x56)))
-    (assert a #x34))
+    (indexed (assert 1 (if 1 (eq? (const #x01) (const #x01)) (const #x34) (const #x56)) #x34)))
 
   (case if-eq?-1-negative
-    (ld-indexed a 1 (if 1 (eq? (const #x01) (const #x02)) (const #x34) (const #x56)))
-    (assert a #x56))
+    (indexed (assert 1 (if 1 (eq? (const #x01) (const #x02)) (const #x34) (const #x56)) #x56)))
 
   (case if-gt?-1-positive
-    (ld-indexed a 1 (if 1 (gt? (const #x03) (const #x02)) (const #x34) (const #x56)))
-    (assert a #x34))
+    (indexed (assert 1 (if 1 (gt? (const #x03) (const #x02)) (const #x34) (const #x56)) #x34)))
 
   (case if-gt?-1-negative
-    (ld-indexed a 1 (if 1 (gt? (const #x02) (const #x02)) (const #x34) (const #x56)))
-    (assert a #x56))
+    (indexed (assert 1 (if 1 (gt? (const #x02) (const #x02)) (const #x34) (const #x56)) #x56)))
 
   (case local-2-1
     (ld-indexed hl () () 2
@@ -239,53 +203,48 @@
   (case pop-1
     (ld a #x12)
     (push a)
-    (ld-indexed b 1 (pop))
-    (assert b #x12))
+    (indexed (assert 1 (pop) #x12)))
 
   (case pop-2
     (ld hl #x1234)
     (push hl)
-    (ld-indexed de 2 (pop))
-    (assert de #x1234))
+    (indexed (assert 2 (pop) #x1234)))
 
   (case pop-3
     (ld a #x12)
     (push a)
     (ld hl #x3456)
     (push hl)
-    (ld-indexed lde 3 (pop))
-    (assert l #x12)
-    (assert de #x3456))
+    (indexed (assert 3 (pop) #x123456)))
 
   (case pop-4
     (ld hl #x1234)
     (push hl)
     (ld hl #x5678)
     (push hl)
-    (ld-indexed hlde 4 (pop))
-    (assert hl #x1234)
-    (assert de #x5678))
+    (indexed (assert 4 (pop) #x12345678)))
 
   (case lets/empty
-    (ld-indexed hl 2 (lets (const #x1234)))
-    (assert hl #x1234))
+    (indexed (assert 2 (lets (const #x1234))  #x1234)))
 
   (case lets-1-1
-    (ld-indexed a 1
-      (call-frame
-        (lets
-          (1 (const #x12))
-          (local 0))))
-    (assert a #x12))
+    (indexed
+      (assert 1
+        (call-frame
+          (lets
+            (1 (const #x12))
+            (local 0)))
+        #x12)))
 
   (case lets-2-2
-    (ld-indexed a 1
-      (call-frame
-        (lets
-          (1 (const #x46))
-          (1 (const #x34))
-          (sub (local 0) (local 1)))))
-    (assert a #x12))
+    (indexed
+      (assert 1
+        (call-frame
+          (lets
+            (1 (const #x46))
+            (1 (const #x34))
+            (sub (local 0) (local 1))))
+        #x12)))
 
   ;(call wait-space)
 )

@@ -47,6 +47,7 @@
         define-keywords
         define-syntax syntax quasisyntax unsyntax unsyntax-splicing
         syntax-case syntax-rules
+        define-rules-syntaxes literals
         keywords
         begin
         + - *
