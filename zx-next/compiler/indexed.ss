@@ -18,7 +18,8 @@
   (comment
     unsafe (not type checked) language
     with indexed access to arguments and locals
-    and support for values of size from 0 to 4)
+    and support for values of size from 0 to 4
+    (fixit (stack can contain locals and other temporary values)))
 
   (define-keywords
     peek-const peek peek-offset
