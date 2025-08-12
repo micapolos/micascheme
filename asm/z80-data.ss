@@ -32,7 +32,7 @@
     ixh ixl iyh iyl
     pc sp
     i r
-    ehl dehl
+    ehl dehl lde hlde
     nz z nc po pe p m
     +)
 

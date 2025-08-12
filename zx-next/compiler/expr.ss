@@ -20,7 +20,7 @@
 
   (define-ops
     (keywords
-      a de hl ehl dehl
+      a de hl lde hlde
       begin
       const
       neg cpl
@@ -40,19 +40,16 @@
 
     ; Push/pop
     ((ld-expr void args locals 0 (push x)) (ld-expr void args (0 . locals) 0 x))
-    ((ld-expr void args locals 1 (push x)) (ld-expr a    args (1 . locals) 1 x) (push af) (inc sp))
+    ((ld-expr void args locals 1 (push x)) (ld-expr a    args (1 . locals) 1 x) (push a))
     ((ld-expr void args locals 2 (push x)) (ld-expr hl   args (2 . locals) 2 x) (push hl))
-    ((ld-expr void args locals 3 (push x)) (ld-expr ehl  args (3 . locals) 3 x) (ld d e) (push de) (inc sp) (push hl))
-    ((ld-expr void args locals 4 (push x)) (ld-expr dehl args (4 . locals) 4 x) (push de) (push hl))
+    ((ld-expr void args locals 3 (push x)) (ld-expr lde  args (3 . locals) 3 x) (push lde))
+    ((ld-expr void args locals 4 (push x)) (ld-expr hlde args (4 . locals) 4 x) (push hlde))
 
-    ((ld-expr void args locals 0 (pop)))
-    ((ld-expr a    args locals 1 (pop)) (dec sp) (pop af))
-    ((ld-expr r    args locals 1 (pop)) (ld-expr a args locals 1 (pop)) (ld r a))
-    ((ld-expr hl   args locals 2 (pop)) (pop hl))
-    ((ld-expr de   args locals 2 (pop)) (pop de))
-    ((ld-expr bc   args locals 2 (pop)) (pop bc))
-    ((ld-expr ehl  args locals 3 (pop)) (pop hl) (dec sp) (pop de) (ld e d))
-    ((ld-expr dehl args locals 4 (pop)) (pop hl) (pop de))
+    ((ld-expr void args (0 . locals) 0 (pop)))
+    ((ld-expr r    args (1 . locals) 1 (pop))   (pop r))
+    ((ld-expr rr   args (2 . locals) 2 (pop))   (pop rr))
+    ((ld-expr rrr  args (3 . locals) 3 (pop))   (pop rrr))
+    ((ld-expr rrrr args (4 . locals) 4 (pop))   (pop rrrr))
 
     ; Ignore
     ((ld-expr void args locals 1 (ignore x)) (ld-expr a args locals 1 x))

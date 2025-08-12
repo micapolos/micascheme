@@ -199,8 +199,7 @@
 
   (case push-1
     (ld-expr void 1 (push (const #x12)))
-    (dec sp)
-    (pop af)
+    (pop a)
     (assert a #x12))
 
   (case push-2
@@ -209,19 +208,44 @@
     (assert hl #x1234))
 
   (case push-3
-    (break)
     (ld-expr void 3 (push (const #x123456)))
-    (pop hl)
-    (dec sp)
-    (pop de)
-    (ld e d)
-    (assert e #x12)
-    (assert hl #x3456))
+    (pop lde)
+    (assert l #x12)
+    (assert de #x3456))
 
   (case push-4
     (ld-expr void 4 (push (const #x12345678)))
-    (pop hl)
-    (pop de)
-    (assert de #x1234)
-    (assert hl #x5678))
+    (pop hlde)
+    (assert hl #x1234)
+    (assert de #x5678))
+
+  (case pop-1
+    (ld a #x12)
+    (push a)
+    (ld-expr b () (1) 1 (pop))
+    (assert b #x12))
+
+  (case pop-2
+    (ld hl #x1234)
+    (push hl)
+    (ld-expr de () (2) 2 (pop))
+    (assert de #x1234))
+
+  (case pop-3
+    (ld a #x12)
+    (push a)
+    (ld hl #x3456)
+    (push hl)
+    (ld-expr lde () (3) 3 (pop))
+    (assert l #x12)
+    (assert de #x3456))
+
+  (case pop-4
+    (ld hl #x1234)
+    (push hl)
+    (ld hl #x5678)
+    (push hl)
+    (ld-expr hlde () (4) 4 (pop))
+    (assert hl #x1234)
+    (assert de #x5678))
 )

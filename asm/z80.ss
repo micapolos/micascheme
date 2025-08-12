@@ -7,7 +7,7 @@
     pc sp
     i r
 
-    ehl dehl
+    ehl dehl lde hlde
 
     nz z nc po pe p m
 
@@ -57,7 +57,7 @@
     ixh ixl iyh iyl
     pc sp
     i r
-    ehl dehl
+    ehl dehl lde hlde
     nz z nc po pe p m)
 
   (define-ops
@@ -68,7 +68,7 @@
       ixh ixl iyh iyl
       pc sp
       i r
-      ehl dehl
+      ehl dehl lde hlde
       nz z nc po pe p m)
     ; Load
     ((ld b b)          (db #b01000000))
@@ -275,8 +275,10 @@
     ((ld iy nm)        (db #xfd) (db #b00100001) (dw nm))
     ((ld sp nm)        (db #b00110001) (dw nm))
 
-    ((ld ehl nnn)      (ld e (fxsrl nnn 16)) (ld hl (fxand #xffff nnn)))
+    ((ld ehl  nnn)     (ld e (fxsrl nnn 16)) (ld hl (fxand #xffff nnn)))
     ((ld dehl nnnn)    (ld de (fxsrl nnnn 16)) (ld hl (fxand #xffff nnnn)))
+    ((ld lde  nnn)     (ld l (fxsrl nnn 16)) (ld de (fxand #xffff nnn)))
+    ((ld hlde nnnn)    (ld hl (fxsrl nnnn 16)) (ld de (fxand #xffff nnnn)))
 
     ; Arithmetic and logic
     ((add b)           (db #b10000000))
@@ -802,7 +804,19 @@
     ((pop ix)          (db #xdd #b11100001))
     ((pop iy)          (db #xfd #b11100001))
 
+    ((pop b)           (dec sp) (pop bc))
+    ((pop c)           (pop b) (ld c b))
+    ((pop d)           (dec sp) (pop de))
+    ((pop e)           (pop d) (ld e d))
+    ((pop h)           (dec sp) (pop hl))
+    ((pop l)           (pop h) (ld l h))
+    ((pop a)           (dec sp) (pop af))
+
+    ((pop ehl)         (pop hl) (dec sp) (pop de) (ld e d))
+    ((pop lde)         (pop de) (dec sp) (pop hl) (ld l h))
+
     ((pop dehl)        (pop hl) (pop de))
+    ((pop hlde)        (pop de) (pop hl))
 
     ((push bc)         (db #b11000101))
     ((push de)         (db #b11010101))
@@ -812,7 +826,19 @@
     ((push ix)         (db #xdd #b11100101))
     ((push iy)         (db #xfd #b11100101))
 
+    ((push b)          (push bc) (inc sp))
+    ((push c)          (ld b c) (push b))
+    ((push d)          (push de) (inc sp))
+    ((push e)          (ld d e) (push d))
+    ((push h)          (push hl) (inc sp))
+    ((push l)          (ld h l) (push h))
+    ((push a)          (push af) (inc sp))
+
+    ((push ehl)        (push e) (push hl))
+    ((push lde)        (push l) (push de))
+
     ((push dehl)       (push de) (push hl))
+    ((push hlde)       (push hl) (push de))
 
     ; Exchange
     ((ex af)           (db #x08))
