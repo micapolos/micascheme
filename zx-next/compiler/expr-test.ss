@@ -274,8 +274,8 @@
     (ld-expr a 1
       (with-locals
         (lets
-          (1 (const #x11))
-          (1 (const #x22))
-          (add (local 0) (local 1)))))
-    (assert a #x33))
+          (1 (const #x46))
+          (1 (const #x34))
+          (sub (local 0) (local 1)))))
+    (assert a #x12))
 )
