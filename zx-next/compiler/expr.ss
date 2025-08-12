@@ -1,14 +1,7 @@
 (library (zx-next compiler expr)
   (export
-    u8 u16 u24 u32
     ld-expr
-    u8+1 u8-1
-    u8-neg u8-not
-    u8+n u8-n u8-and-n u8-or-n u8-xor-n
-    u8+ u8- u8-and u8-or u8-xor u8-mul
     peek-nn peek peek-offset
-    u8-zero? u8=? u8>
-    u16+1 u16-1 u16+ u16-
     zero? eq? gt?
     with-locals lets local arg)
   (import
@@ -16,30 +9,19 @@
     (only (micascheme) -))
 
   (define-keywords
-    u8 u16 u24 u32
-    u8-neg u8-not
-    u8+1 u8-1 u8+ u8- u8-and u8-or u8-xor u8-mul
-    u8+n u8-n u8-and-n u8-or-n u8-xor-n
     peek-nn peek peek-offset
-    u8-zero? u8=? u8>
-    u16+1 u16-1 u16+ u16-
     lets local arg
     zero? eq? gt?)
 
   (define-ops
     (keywords
       a de hl ehl dehl
-      u8 u16 u24 u32
       neg cpl
       inc dec
       add sub and or xor
       add-n sub-n and-n or-n xor-n
       mul
-      u8+1 u8-1 u8+ u8- u8-and u8-or u8-xor u8-mul
-      u8+n u8-n u8-and-n u8-or-n u8-xor-n
       peek-nn peek peek-offset
-      u8-zero? u8=? u8>
-      u16+1 u16-1 u16+ u16-
       lets local arg
       zero? eq? gt?)
 
@@ -146,8 +128,8 @@
       (ld d a)
       (mul d e))
 
-    ((ld-expr rr args locals (u8-mul lhs rhs))
-      (ld-expr de args locals (u8-mul lhs rhs))
+    ((ld-expr rr args locals (mul 1 lhs rhs))
+      (ld-expr de args locals (mul 1 lhs rhs))
       (ld rr de))
 
     ; 16-bit
@@ -159,7 +141,7 @@
       (ld rr hl))
 
     ((ld-expr de args locals (peek 2 lhs))
-      (ld-expr hl args locals (u16 lhs))
+      (ld-expr hl args locals (2 lhs))
       (ld e (hl))
       (inc hl)
       (ld d (hl)))
@@ -191,24 +173,24 @@
       (ld-expr rr args locals lhs)
       (op rr))
 
-    ((ld-expr rr args locals (u16+1 lhs))
+    ((ld-expr rr args locals (inc 2 lhs))
       (ld-u16-op1 rr args locals inc lhs))
 
-    ((ld-expr rr args locals (u16-1 lhs))
+    ((ld-expr rr args locals (dec 2 lhs))
       (ld-u16-op1 rr args locals dec lhs))
 
-    ((ld-expr hl args locals (u16+ lhs rhs))
+    ((ld-expr hl args locals (add 2 lhs rhs))
       (ld-expr rr args locals rhs)
       (push hl)
       (ld-expr rr args locals lhs)
       (pop de)
       (add hl de))
 
-    ((ld-expr rr args locals (u16+ lhs rhs))
-      (ld-expr hl args locals (u16+ lhs rhs))
+    ((ld-expr rr args locals (add 2 lhs rhs))
+      (ld-expr hl args locals (add 2 lhs rhs))
       (ld rr hl))
 
-    ((ld-expr hl args locals (u16- lhs rhs))
+    ((ld-expr hl args locals (sub 2 lhs rhs))
       (ld-expr rr args locals rhs)
       (push hl)
       (ld-expr rr args locals lhs)
@@ -216,8 +198,8 @@
       (rcf)
       (sbc hl de))
 
-    ((ld-expr rr args locals (u16- lhs rhs))
-      (ld-expr hl args locals (u16- lhs rhs))
+    ((ld-expr rr args locals (sub 2 lhs rhs))
+      (ld-expr hl args locals (sub 2 lhs rhs))
       (ld rr hl))
 
     ((ld-expr hl args locals (peek-nn 2 nn))

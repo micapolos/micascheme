@@ -94,7 +94,7 @@
     (assert a #x34))
 
   (case peek+1
-    (ld-expr a (peek 1 (u16+1 (2 test-data))))
+    (ld-expr a (peek 1 (inc 2 (2 test-data))))
     (assert a #x12))
 
   (case peek-offset
