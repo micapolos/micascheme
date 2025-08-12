@@ -24,8 +24,11 @@
     (TODO
       (extract part of this language which implements sdcc-1 calling convention)
       (to a separate language))
-    (TODO (stack can contain locals and other temporary values))
-    (TODO (optimize access to last local using push/pop)))
+    (TODO
+      (stack can contain locals and other temporary values)
+      (so we need to adjust locals with every native push/pop))
+    (TODO
+      (optimize access to last local using push/pop)))
 
   (define-keywords
     peek-const peek peek-offset
