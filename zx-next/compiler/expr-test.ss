@@ -199,7 +199,7 @@
       (assert a #x12)))
 
   (case write
-    (ld-expr void 0
+    (expr
       (begin
         (write-string (const foo-string))
         (write-char (const #\space))

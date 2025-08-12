@@ -6,7 +6,8 @@
     lets local arg
     drop native
     zero? eq? gt?
-    void ignore)
+    void ignore
+    expr)
   (import
     (zx-next core)
     (zx-next write)
@@ -41,6 +42,8 @@
       zero? eq? gt?)
 
     ; Top-level
+    ((expr x) (ld-expr void 0 x))
+
     ((ld-expr r size x) (ld-expr r () () size x))
 
     ; Native
