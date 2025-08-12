@@ -58,6 +58,7 @@
         ...
         comment)
       (only (asm syntax-block) align trace-block-expansion)
+      (asm linked)
       (asm org)))
 
   (define-rules-syntax

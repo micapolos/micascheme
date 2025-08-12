@@ -14,7 +14,8 @@
   (define-rule-syntax (run body ...)
     (lets
       ($path "/tmp/main.nex")
-      ((assembled $start $binary) (asm (org #xc000) body ...))
+      ((assembled $start $binary)
+        (asm (org #xc000) body ...))
       ($bytevector (binary->bytevector $binary))
       (run
         (parameterize ((print-radix 16))

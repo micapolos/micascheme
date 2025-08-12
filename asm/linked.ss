@@ -1,5 +1,6 @@
 (library (asm linked)
   (export
+    print-linked?
     list->linked
     linked->datum
     check-list->linked)
@@ -16,6 +17,8 @@
     (asm environment)
     (asm environmental)
     (asm environment))
+
+  (define print-linked? (make-thread-parameter #f))
 
   (define-type linked (environmental offset relocable-binary-syntax))
 
@@ -66,17 +69,18 @@
               (lambda ($id $expr) #`(#,$id #,($rewrite-ids $expr)))
               $expression-tmps
               $expression-syntaxes))
-          ; (run
-          ;   (parameterize ((print-radix 16))
-          ;     (pretty-print
-          ;       `(fragments
-          ;         ,@(map
-          ;           (lambda ($id $offset $size)
-          ;             `(,(syntax->datum $id)
-          ;               (offset ,$offset) (size ,$size)))
-          ;           $sized-identifiers
-          ;           $offsets
-          ;           $sizes)))))
+          (run
+            (when (print-linked?)
+              (parameterize ((print-radix 16))
+                (pretty-print
+                  `(fragments
+                    ,@(map
+                      (lambda ($id $offset $size)
+                        `(,(syntax->datum $id)
+                          (offset ,$offset) (size ,$size)))
+                      $sized-identifiers
+                      $offsets
+                      $sizes))))))
           (environmental
             (environment (map identified $sized-identifiers $offsets))
             #`(relocable-with ($org)
