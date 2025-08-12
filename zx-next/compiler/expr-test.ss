@@ -190,11 +190,10 @@
       (assert a #x12)))
 
   (case write
-    (do-stmt
+    (ld-expr void 0
       (begin
         (write-string (const foo-string))
         (write-char (const #\space))
         (write-string (const bar-string))
         (write-char (const #\return)))))
-
 )
