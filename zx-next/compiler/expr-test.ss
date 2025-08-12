@@ -4,81 +4,81 @@
 
 (test
   (case u8
-    (ld-expr h (u8 #x22))
+    (ld-expr h (1 #x22))
     (assert h #x22))
 
   (case u16
-    (ld-expr de (u16 #x1234))
+    (ld-expr de (2 #x1234))
     (assert de #x1234))
 
   (case u24
-    (ld-expr ehl (u24 #x123456))
+    (ld-expr ehl (3 #x123456))
     (assert e #x12)
     (assert hl #x3456))
 
   (case u32
-    (ld-expr dehl (u32 #x12345678))
+    (ld-expr dehl (4 #x12345678))
     (assert de #x1234)
     (assert hl #x5678))
 
   (case u8+1
-    (ld-expr a (u8+1 (u8 #x11)))
+    (ld-expr a (u8+1 (1 #x11)))
     (assert a #x12))
 
   (case u8-1
-    (ld-expr a (u8-1 (u8 #x11)))
+    (ld-expr a (u8-1 (1 #x11)))
     (assert a #x10))
 
   (case u8-neg
-    (ld-expr a (u8-neg (u8 #x22)))
+    (ld-expr a (u8-neg (1 #x22)))
     (assert a #xde))
 
   (case u8-not
-    (ld-expr a (u8-not (u8 #x22)))
+    (ld-expr a (u8-not (1 #x22)))
     (assert a #xdd))
 
   (case u8+n
-    (ld-expr a (u8+n (u8 #x11) #x22))
+    (ld-expr a (u8+n (1 #x11) #x22))
     (assert a #x33))
 
   (case u8+
-    (ld-expr a (u8+ (u8 #x11) (u8 #x22)))
+    (ld-expr a (u8+ (1 #x11) (1 #x22)))
     (assert a #x33))
 
   (case u8-n
-    (ld-expr a (u8-n (u8 #x33) #x22))
+    (ld-expr a (u8-n (1 #x33) #x22))
     (assert a #x11))
 
   (case u8-
-    (ld-expr a (u8- (u8 #x33) (u8 #x22)))
+    (ld-expr a (u8- (1 #x33) (1 #x22)))
     (assert a #x11))
 
   (case u8-and-n
-    (ld-expr a (u8-and-n (u8 #x33) #x0f))
+    (ld-expr a (u8-and-n (1 #x33) #x0f))
     (assert a #x03))
 
   (case u8-and
-    (ld-expr a (u8-and (u8 #x33) (u8 #x0f)))
+    (ld-expr a (u8-and (1 #x33) (1 #x0f)))
     (assert a #x03))
 
   (case u8-mul
-    (ld-expr de (u8-mul (u8 #x02) (u8 #x03)))
+    (ld-expr de (u8-mul (1 #x02) (1 #x03)))
     (assert de #x0006))
 
   (case u8-and-n
-    (ld-expr a (u8-or-n (u8 #x33) #x0f))
+    (ld-expr a (u8-or-n (1 #x33) #x0f))
     (assert a #x3f))
 
   (case u8-and
-    (ld-expr a (u8-or (u8 #x33) (u8 #x0f)))
+    (ld-expr a (u8-or (1 #x33) (1 #x0f)))
     (assert a #x3f))
 
   (case u8-and-n
-    (ld-expr a (u8-xor-n (u8 #x33) #x0f))
+    (ld-expr a (u8-xor-n (1 #x33) #x0f))
     (assert a #x3c))
 
   (case u8-and
-    (ld-expr a (u8-xor (u8 #x33) (u8 #x0f)))
+    (ld-expr a (u8-xor (1 #x33) (1 #x0f)))
     (assert a #x3c))
 
   (case peek-nn
@@ -90,11 +90,11 @@
     (assert a #x12))
 
   (case peek
-    (ld-expr a (peek 1 (u16 test-data)))
+    (ld-expr a (peek 1 (2 test-data)))
     (assert a #x34))
 
   (case peek+1
-    (ld-expr a (peek 1 (u16+1 (u16 test-data))))
+    (ld-expr a (peek 1 (u16+1 (2 test-data))))
     (assert a #x12))
 
   (case peek-offset
@@ -110,27 +110,27 @@
       (assert a #x12)))
 
   (case if-u8-zero?-positive
-    (ld-expr a (if (u8-zero? (u8 #x00)) (u8 #x34) (u8 #x56)))
+    (ld-expr a (if (u8-zero? (1 #x00)) (1 #x34) (1 #x56)))
     (assert a #x34))
 
   (case if-u8-zero?-negative
-    (ld-expr a (if (u8-zero? (u8 #x12)) (u8 #x34) (u8 #x56)))
+    (ld-expr a (if (u8-zero? (1 #x12)) (1 #x34) (1 #x56)))
     (assert a #x56))
 
   (case if-u8=?-positive
-    (ld-expr a (if (u8=? (u8 #x01) (u8 #x01)) (u8 #x34) (u8 #x56)))
+    (ld-expr a (if (u8=? (1 #x01) (1 #x01)) (1 #x34) (1 #x56)))
     (assert a #x34))
 
   (case if-u8=?-negative
-    (ld-expr a (if (u8=? (u8 #x01) (u8 #x02)) (u8 #x34) (u8 #x56)))
+    (ld-expr a (if (u8=? (1 #x01) (1 #x02)) (1 #x34) (1 #x56)))
     (assert a #x56))
 
   (case if-u8<-positive
-    (ld-expr a (if (u8> (u8 #x03) (u8 #x02)) (u8 #x34) (u8 #x56)))
+    (ld-expr a (if (u8> (1 #x03) (1 #x02)) (1 #x34) (1 #x56)))
     (assert a #x34))
 
   (case if-u8<-negative
-    (ld-expr a (if (u8> (u8 #x02) (u8 #x02)) (u8 #x34) (u8 #x56)))
+    (ld-expr a (if (u8> (1 #x02) (1 #x02)) (1 #x34) (1 #x56)))
     (assert a #x56))
 
   (case local-2-1

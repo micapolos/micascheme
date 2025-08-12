@@ -40,10 +40,10 @@
     ((ld-expr r x) (ld-expr r () () x))
 
     ; Load
-    ((ld-expr r    args locals (u8 n))     (ld r n))
-    ((ld-expr rr   args locals (u16 nn))   (ld rr nn))
-    ((ld-expr ehl  args locals (u24 nnn))  (ld ehl nnn))
-    ((ld-expr dehl args locals (u32 nnnn)) (ld dehl nnnn))
+    ((ld-expr r    args locals (1 n))    (ld r n))
+    ((ld-expr rr   args locals (2 nn))   (ld rr nn))
+    ((ld-expr ehl  args locals (3 nnn))  (ld ehl nnn))
+    ((ld-expr dehl args locals (4 nnnn)) (ld dehl nnnn))
 
     ; Load indirect
     ((ld-expr a args locals (peek-nn 1 nn))
