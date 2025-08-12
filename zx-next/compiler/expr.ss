@@ -2,14 +2,16 @@
   (export
     ld-expr
     peek-const peek peek-offset const
-    zero? eq? gt?
-    with-locals lets local arg)
+    add-const sub-const and-const or-const xor-const
+    with-locals lets local arg
+    zero? eq? gt?)
   (import
     (zx-next core)
     (only (micascheme) -))
 
   (define-keywords
     peek-const peek peek-offset
+    add-const sub-const and-const or-const xor-const
     lets local arg const
     zero? eq? gt?)
 
