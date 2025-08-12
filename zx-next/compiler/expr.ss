@@ -292,14 +292,14 @@
         ((ld-local r args (u8 . locals) offset type n)
           #`(ld-local r args locals #,(- (datum offset) 1) type #,(- (datum n) 1)))
 
-        ((ld-local r args (u16 . locals) offset type n)
-          #`(ld-local r args locals #,(- (datum offset) 2) type #,(- (datum n) 1)))
+        ((ld-local rr args (u16 . locals) offset type n)
+          #`(ld-local rr args locals #,(- (datum offset) 2) type #,(- (datum n) 1)))
 
-        ((ld-local r args (u24 . locals) offset type n)
-          #`(ld-local r args locals #,(- (datum offset) 3) type #,(- (datum n) 1)))
+        ((ld-local rrr args (u24 . locals) offset type n)
+          #`(ld-local rrr args locals #,(- (datum offset) 3) type #,(- (datum n) 1)))
 
-        ((ld-local r args (u32 . locals) offset type n)
-          #`(ld-local r args locals #,(- (datum offset) 4) type #,(- (datum n) 1))))))
+        ((ld-local rrrr args (u32 . locals) offset type n)
+          #`(ld-local rrrr args locals #,(- (datum offset) 4) type #,(- (datum n) 1))))))
 
   (define-op-syntax ld-arg
     (lambda ($syntax)
@@ -322,12 +322,12 @@
         ((ld-arg r (u8 . args) locals offset type n)
           #`(ld-arg r args locals #,(+ (datum offset) 1) type #,(- (datum n) 1)))
 
-        ((ld-arg r (u16 . args) locals offset type n)
-          #`(ld-arg r args locals #,(+ (datum offset) 2) type #,(- (datum n) 1)))
+        ((ld-arg rr (u16 . args) locals offset type n)
+          #`(ld-arg rr args locals #,(+ (datum offset) 2) type #,(- (datum n) 1)))
 
-        ((ld-arg r (u24 . args) locals offset type n)
-          #`(ld-arg r args locals #,(+ (datum offset) 3) type #,(- (datum n) 1)))
+        ((ld-arg rrr (u24 . args) locals offset type n)
+          #`(ld-arg rrr args locals #,(+ (datum offset) 3) type #,(- (datum n) 1)))
 
-        ((ld-arg r (u32 . args) locals offset type n)
-          #`(ld-arg r args locals #,(+ (datum offset) 4) type #,(- (datum n) 1))))))
+        ((ld-arg rrrr (u32 . args) locals offset type n)
+          #`(ld-arg rrrr args locals #,(+ (datum offset) 4) type #,(- (datum n) 1))))))
 )
