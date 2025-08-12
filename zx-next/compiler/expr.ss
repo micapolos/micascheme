@@ -5,7 +5,7 @@
     add-const sub-const and-const or-const xor-const
     with-locals lets local arg
     zero? eq? gt?
-    void)
+    void ignore)
   (import
     (zx-next core)
     (zx-next write)
@@ -16,7 +16,7 @@
     add-const sub-const and-const or-const xor-const
     lets local arg const
     zero? eq? gt?
-    void)
+    void ignore)
 
   (define-ops
     (keywords
@@ -31,17 +31,34 @@
       peek-const peek peek-offset
       lets local arg
       write-char write-string
-      void call
+      push pop
+      void ignore call
       zero? eq? gt?)
 
     ; Top-level
     ((ld-expr r size x) (ld-expr r () () size x))
 
-    ; Void
-    ((ld-expr void args locals 1 x) (ld-expr a args locals 1 x))
-    ((ld-expr void args locals 2 x) (ld-expr hl args locals 2 x))
-    ((ld-expr void args locals 3 x) (ld-expr ehl args locals 3 x))
-    ((ld-expr void args locals 4 x) (ld-expr dehl args locals 4 x))
+    ; Push/pop
+    ((ld-expr void args locals 0 (push x)) (ld-expr void args (0 . locals) 0 x))
+    ((ld-expr void args locals 1 (push x)) (ld-expr a    args (1 . locals) 1 x) (push af) (inc sp))
+    ((ld-expr void args locals 2 (push x)) (ld-expr hl   args (2 . locals) 2 x) (push hl))
+    ((ld-expr void args locals 3 (push x)) (ld-expr ehl  args (3 . locals) 3 x) (ld d e) (push de) (inc sp) (push hl))
+    ((ld-expr void args locals 4 (push x)) (ld-expr dehl args (4 . locals) 4 x) (push de) (push hl))
+
+    ((ld-expr void args locals 0 (pop)))
+    ((ld-expr a    args locals 1 (pop)) (dec sp) (pop af))
+    ((ld-expr r    args locals 1 (pop)) (ld-expr a args locals 1 (pop)) (ld r a))
+    ((ld-expr hl   args locals 2 (pop)) (pop hl))
+    ((ld-expr de   args locals 2 (pop)) (pop de))
+    ((ld-expr bc   args locals 2 (pop)) (pop bc))
+    ((ld-expr ehl  args locals 3 (pop)) (pop hl) (dec sp) (pop de) (ld e d))
+    ((ld-expr dehl args locals 4 (pop)) (pop hl) (pop de))
+
+    ; Ignore
+    ((ld-expr void args locals 1 (ignore x)) (ld-expr a args locals 1 x))
+    ((ld-expr void args locals 2 (ignore x)) (ld-expr hl args locals 2 x))
+    ((ld-expr void args locals 3 (ignore x)) (ld-expr ehl args locals 3 x))
+    ((ld-expr void args locals 4 (ignore x)) (ld-expr dehl args locals 4 x))
 
     ; Load
     ((ld-expr r args locals size (const n)) (ld r n))

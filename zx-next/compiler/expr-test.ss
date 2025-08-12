@@ -196,4 +196,32 @@
         (write-char (const #\space))
         (write-string (const bar-string))
         (write-char (const #\return)))))
+
+  (case push-1
+    (ld-expr void 1 (push (const #x12)))
+    (dec sp)
+    (pop af)
+    (assert a #x12))
+
+  (case push-2
+    (ld-expr void 2 (push (const #x1234)))
+    (pop hl)
+    (assert hl #x1234))
+
+  (case push-3
+    (break)
+    (ld-expr void 3 (push (const #x123456)))
+    (pop hl)
+    (dec sp)
+    (pop de)
+    (ld e d)
+    (assert e #x12)
+    (assert hl #x3456))
+
+  (case push-4
+    (ld-expr void 4 (push (const #x12345678)))
+    (pop hl)
+    (pop de)
+    (assert de #x1234)
+    (assert hl #x5678))
 )
