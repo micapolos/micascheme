@@ -19,8 +19,11 @@
     with indexed access to arguments and locals
     and support for values of size from 0 to 4
     (TODO
-      (extract part of the language which does not use locals to indexed-direct)
+      (extract part of this language which does not use locals to indexed-direct)
       (or rename this one to indexed-call-frame))
+    (TODO
+      (extract part of this language which implements sdcc-1 calling convention)
+      (to a separate language))
     (TODO (stack can contain locals and other temporary values))
     (TODO (optimize access to last local using push/pop)))
 
