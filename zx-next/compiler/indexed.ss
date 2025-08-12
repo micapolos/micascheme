@@ -343,8 +343,8 @@
         (lets xs ... (native (call addr)))))
 
     ((ld-indexed r args locals size (addr (1 x) (2 y) xs ...))
-      (ld-indexed hl args locals 2 y)
-      (preserve (hl) (ld-indexed a args locals 1 x))
+      (ld-indexed de args locals 2 y)
+      (preserve (de) (ld-indexed a args locals 1 x))
       (ld-indexed r args locals size
         (lets xs ... (native (call addr)))))
 
