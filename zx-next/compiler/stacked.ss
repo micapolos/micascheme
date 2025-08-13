@@ -1,6 +1,14 @@
 (library (zx-next compiler stacked)
-  (export stacked const op2 add)
+  (export
+    stacked op op1 op2 peek
+    const
+    inc dec
+    add sub and or xor)
   (import (only (micascheme) define-keywords))
 
-  (define-keywords stacked const op2 add)
+  (define-keywords
+    stacked op op1 op2 peek
+    const
+    inc dec
+    add sub and or xor)
 )

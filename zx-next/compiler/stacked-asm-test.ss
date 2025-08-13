@@ -62,15 +62,50 @@
   (%stacked (hlde) (%const 2 #x1234))
   (asm (hl) (push hlde) (ld hl #x1234)))
 
-; op2 1
+; inc 1
 (check-stacked-asm
-  (%stacked () (%op2 add 1))
-  (asm (a) (pop hl) (ld a l) (add h)))
+  (%stacked () (%op 1 1 (inc a)))
+  (asm (a) (pop a) (inc a)))
 
 (check-stacked-asm
-  (%stacked (a) (%op2 add 1))
+  (%stacked (a) (%op 1 1 (inc a)))
+  (asm (a) (inc a)))
+
+(check-stacked-asm
+  (%stacked (a l) (%op 1 1 (inc a)))
+  (asm (a l) (inc a)))
+
+(check-stacked-asm
+  (%stacked (a de) (%op 1 1 (inc a)))
+  (asm (a de) (inc a)))
+
+; add 1
+(check-stacked-asm
+  (%stacked () (%add 1))
+  (asm (a) (pop hl) (ld a l) (ld l h) (add l)))
+
+(check-stacked-asm
+  (%stacked (a) (%add 1))
   (asm (a) (pop l) (add l)))
 
 (check-stacked-asm
-  (%stacked (a l) (%op2 add 1))
+  (%stacked (a l) (%add 1))
   (asm (a) (add l)))
+
+; peek 1
+(check-stacked-asm
+  (%stacked () (%peek 1))
+  (asm (a) (pop hl) (ld a (hl))))
+
+(check-stacked-asm
+  (%stacked (hl) (%peek 1))
+  (asm (a) (ld a (hl))))
+
+; peek-offset 1
+(check-stacked-asm
+  (%stacked () (%peek 1 12))
+  (asm (a) (ld a (+ ix 12))))
+
+(check-stacked-asm
+  (%stacked (a) (%peek 1 12))
+  (asm (a l) (ld l a) (ld a (+ ix 12))))
