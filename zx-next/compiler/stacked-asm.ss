@@ -14,6 +14,14 @@
     ((asm . x)
       #`(asm . x))
 
+    ; top-level
+    ((stacked-asm x)
+      (stacked-asm () x))
+
+    ; op 0
+    ((stacked-asm regs (%op 0 op))
+      (asm regs op))
+
     ; op 1
     ((stacked-asm () (%op 1 op))
       (asm (a) op))

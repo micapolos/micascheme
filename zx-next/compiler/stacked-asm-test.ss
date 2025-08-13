@@ -1,5 +1,19 @@
 (import (asm z80) (prefix (zx-next compiler stacked) %) (zx-next compiler stacked-asm))
 
+; top-level
+(check-stacked-asm
+  (%stacked (%op 0 (nop)))
+  (asm () (nop)))
+
+; op 0
+(check-stacked-asm
+  (%stacked () (%op 0 (nop)))
+  (asm () (nop)))
+
+(check-stacked-asm
+  (%stacked (a) (%op 0 (nop)))
+  (asm (a) (nop)))
+
 ; op 1
 (check-stacked-asm
   (%stacked () (%op 1 (ld a #x12)))
