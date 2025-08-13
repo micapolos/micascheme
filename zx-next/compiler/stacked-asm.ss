@@ -3,7 +3,7 @@
     stacked->asm
     check-stacked->asm)
   (import
-    (only (micascheme) define logging syntax-eval define-rule-syntax syntax-case ... syntax->list quasisyntax unsyntax reverse quote syntax check equal? syntax->datum literals)
+    (only (micascheme) define define-rule-syntax syntax-case ... quote syntax check equal? syntax->datum)
     (prefix (zx-next compiler stacked) %)
     (asm z80))
 
