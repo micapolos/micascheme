@@ -1,68 +1,126 @@
 (import (asm z80) (prefix (zx-next compiler stacked) %) (zx-next compiler stacked-asm))
 
-; const 1
+; op 1
 (check-stacked-asm
-  (%stacked () (%const 1 #x12))
+  (%stacked () (%op 1 (ld a #x12)))
   (asm (a) (ld a #x12)))
 
 (check-stacked-asm
-  (%stacked (a) (%const 1 #x12))
+  (%stacked (a) (%op 1 (ld a #x12)))
   (asm (a l) (ld l a) (ld a #x12)))
 
 (check-stacked-asm
-  (%stacked (a de) (%const 1 #x12))
+  (%stacked (a de) (%op 1 (ld a #x12)))
   (asm (a l) (push de) (ld l a) (ld a #x12)))
 
 (check-stacked-asm
-  (%stacked (hl) (%const 1 #x12))
+  (%stacked (hl) (%op 1 (ld a #x12)))
   (asm (a de) (ex de hl) (ld a #x12)))
 
 (check-stacked-asm
-  (%stacked (hl de) (%const 1 #x12))
+  (%stacked (hl de) (%op 1 (ld a #x12)))
   (asm (a de) (push de) (ex de hl) (ld a #x12)))
 
 (check-stacked-asm
-  (%stacked (lde) (%const 1 #x12))
+  (%stacked (lde) (%op 1 (ld a #x12)))
   (asm (a ) (push lde) (ld a #x12)))
 
 (check-stacked-asm
-  (%stacked (hlde) (%const 1 #x12))
+  (%stacked (hlde) (%op 1 (ld a #x12)))
   (asm (a ) (push hlde) (ld a #x12)))
 
-; const 2
+; op 2
 (check-stacked-asm
-  (%stacked () (%const 2 #x1234))
+  (%stacked () (%op 2 (ld hl #x1234)))
   (asm (hl) (ld hl #x1234)))
 
 (check-stacked-asm
-  (%stacked (a) (%const 2 #x1234))
+  (%stacked (a) (%op 2 (ld hl #x1234)))
   (asm (hl) (push a) (ld hl #x1234)))
 
 (check-stacked-asm
-  (%stacked (a l) (%const 2 #x1234))
+  (%stacked (a l) (%op 2 (ld hl #x1234)))
   (asm (hl) (ld h a) (push hl) (ld hl #x1234)))
 
 (check-stacked-asm
-  (%stacked (a de) (%const 2 #x1234))
+  (%stacked (a de) (%op 2 (ld hl #x1234)))
   (asm (hl) (push de) (push a) (ld hl #x1234)))
 
 (check-stacked-asm
-  (%stacked (hl) (%const 2 #x1234))
+  (%stacked (hl) (%op 2 (ld hl #x1234)))
   (asm (hl de) (ex de hl) (ld hl #x1234)))
 
 (check-stacked-asm
-  (%stacked (hl de) (%const 2 #x1234))
+  (%stacked (hl de) (%op 2 (ld hl #x1234)))
   (asm (hl de) (push de) (ex de hl) (ld hl #x1234)))
 
 (check-stacked-asm
-  (%stacked (lde) (%const 2 #x1234))
+  (%stacked (lde) (%op 2 (ld hl #x1234)))
   (asm (hl) (push lde) (ld hl #x1234)))
 
 (check-stacked-asm
-  (%stacked (hlde) (%const 2 #x1234))
+  (%stacked (hlde) (%op 2 (ld hl #x1234)))
   (asm (hl) (push hlde) (ld hl #x1234)))
 
-; inc 1
+; op 3
+(check-stacked-asm
+  (%stacked () (%op 3 (ld lde #x123456)))
+  (asm (lde) (ld lde #x123456)))
+
+(check-stacked-asm
+  (%stacked (a) (%op 3 (ld lde #x123456)))
+  (asm (lde) (push a) (ld lde #x123456)))
+
+(check-stacked-asm
+  (%stacked (a l) (%op 3 (ld lde #x123456)))
+  (asm (lde) (ld h a) (push hl) (ld lde #x123456)))
+
+(check-stacked-asm
+  (%stacked (hl) (%op 3 (ld lde #x123456)))
+  (asm (lde) (push hl) (ld lde #x123456)))
+
+(check-stacked-asm
+  (%stacked (hl de) (%op 3 (ld lde #x123456)))
+  (asm (lde) (push de) (push hl) (ld lde #x123456)))
+
+(check-stacked-asm
+  (%stacked (lde) (%op 3 (ld lde #x123456)))
+  (asm (lde) (push lde) (ld lde #x123456)))
+
+(check-stacked-asm
+  (%stacked (hlde) (%op 3 (ld lde #x123456)))
+  (asm (hlde) (push hlde) (ld lde #x123456)))
+
+; op 4
+(check-stacked-asm
+  (%stacked () (%op 4 (ld hlde #x12345678)))
+  (asm (hlde) (ld hlde #x12345678)))
+
+(check-stacked-asm
+  (%stacked (a) (%op 4 (ld hlde #x12345678)))
+  (asm (hlde) (push a) (ld hlde #x12345678)))
+
+(check-stacked-asm
+  (%stacked (a l) (%op 4 (ld hlde #x12345678)))
+  (asm (hlde) (ld h a) (push hl) (ld hlde #x12345678)))
+
+(check-stacked-asm
+  (%stacked (hl) (%op 4 (ld hlde #x12345678)))
+  (asm (hlde) (push hl) (ld hlde #x12345678)))
+
+(check-stacked-asm
+  (%stacked (hl de) (%op 4 (ld hlde #x12345678)))
+  (asm (hlde) (push de) (push hl) (ld hlde #x12345678)))
+
+(check-stacked-asm
+  (%stacked (lde) (%op 4 (ld hlde #x12345678)))
+  (asm (hlde) (push lde) (ld hlde #x12345678)))
+
+(check-stacked-asm
+  (%stacked (hlde) (%op 4 (ld hlde #x12345678)))
+  (asm (hlde) (push hlde) (ld hlde #x12345678)))
+
+; op 1 1
 (check-stacked-asm
   (%stacked () (%op 1 1 (inc a)))
   (asm (a) (pop a) (inc a)))
@@ -79,43 +137,15 @@
   (%stacked (a de) (%op 1 1 (inc a)))
   (asm (a de) (inc a)))
 
-; neg 1
+; op 1 1 1
 (check-stacked-asm
-  (%stacked (a) (%neg 1))
-  (asm (a) (neg)))
-
-; cpl 1
-(check-stacked-asm
-  (%stacked (a) (%cpl 1))
-  (asm (a) (cpl)))
-
-; add 1
-(check-stacked-asm
-  (%stacked () (%add 1))
+  (%stacked () (%op 1 1 1 (add l)))
   (asm (a) (pop hl) (ld a l) (ld l h) (add l)))
 
 (check-stacked-asm
-  (%stacked (a) (%add 1))
+  (%stacked (a) (%op 1 1 1 (add l)))
   (asm (a) (pop l) (add l)))
 
 (check-stacked-asm
-  (%stacked (a l) (%add 1))
+  (%stacked (a l) (%op 1 1 1 (add l)))
   (asm (a) (add l)))
-
-; peek 1
-(check-stacked-asm
-  (%stacked () (%peek 1))
-  (asm (a) (pop hl) (ld a (hl))))
-
-(check-stacked-asm
-  (%stacked (hl) (%peek 1))
-  (asm (a) (ld a (hl))))
-
-; peek-offset 1
-(check-stacked-asm
-  (%stacked () (%peek 1 12))
-  (asm (a) (ld a (+ ix 12))))
-
-(check-stacked-asm
-  (%stacked (a) (%peek 1 12))
-  (asm (a l) (ld l a) (ld a (+ ix 12))))

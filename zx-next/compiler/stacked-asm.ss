@@ -8,11 +8,7 @@
     (asm z80))
 
   (define-rules-syntaxes
-    (literals a l hl %stacked %op %op1 %op2 %peek
-      %const
-      %inc %dec
-      %add %sub %and %or %xor
-      %neg cpl)
+    (literals a l hl %stacked %op)
 
     ; terminal
     ((stacked-asm regs () ops)
@@ -56,6 +52,56 @@
     ((stacked-asm (r) ((%op 2 op) . xs) ops)
       (stacked-asm (hl) xs (op (push r) . ops)))
 
+    ; op 3
+    ((stacked-asm () ((%op 3 op) . xs) ops)
+      (stacked-asm (lde) xs (op . ops)))
+
+    ((stacked-asm (a) ((%op 3 op) . xs) ops)
+      (stacked-asm (lde) xs (op (push a) . ops)))
+
+    ((stacked-asm (a l) ((%op 3 op) . xs) ops)
+      (stacked-asm (lde) xs (op (push hl) (ld h a). ops)))
+
+    ((stacked-asm (a de) ((%op 3 op) . xs) ops)
+      (stacked-asm (lde) xs (op (push a) (push de). ops)))
+
+    ((stacked-asm (hl) ((%op 3 op) . xs) ops)
+      (stacked-asm (lde) xs (op (push hl) . ops)))
+
+    ((stacked-asm (hl de) ((%op 3 op) . xs) ops)
+      (stacked-asm (lde) xs (op (push hl) (push de). ops)))
+
+    ((stacked-asm (lde) ((%op 3 op) . xs) ops)
+      (stacked-asm (lde) xs (op (push lde). ops)))
+
+    ((stacked-asm (hlde) ((%op 3 op) . xs) ops)
+      (stacked-asm (hlde) xs (op (push hlde). ops)))
+
+    ; op 4
+    ((stacked-asm () ((%op 4 op) . xs) ops)
+      (stacked-asm (hlde) xs (op . ops)))
+
+    ((stacked-asm (a) ((%op 4 op) . xs) ops)
+      (stacked-asm (hlde) xs (op (push a) . ops)))
+
+    ((stacked-asm (a l) ((%op 4 op) . xs) ops)
+      (stacked-asm (hlde) xs (op (push hl) (ld h a). ops)))
+
+    ((stacked-asm (a de) ((%op 4 op) . xs) ops)
+      (stacked-asm (hlde) xs (op (push a) (push de). ops)))
+
+    ((stacked-asm (hl) ((%op 4 op) . xs) ops)
+      (stacked-asm (hlde) xs (op (push hl) . ops)))
+
+    ((stacked-asm (hl de) ((%op 4 op) . xs) ops)
+      (stacked-asm (hlde) xs (op (push hl) (push de). ops)))
+
+    ((stacked-asm (lde) ((%op 4 op) . xs) ops)
+      (stacked-asm (hlde) xs (op (push lde). ops)))
+
+    ((stacked-asm (hlde) ((%op 4 op) . xs) ops)
+      (stacked-asm (hlde) xs (op (push hlde). ops)))
+
     ; op 1 1
     ((stacked-asm () ((%op 1 1 op) . xs) ops)
       (stacked-asm (a) xs (op (pop a) . ops)))
@@ -80,51 +126,6 @@
 
     ((stacked-asm (hl . regs) ((%op 2 1 op) . xs) ops)
       (stacked-asm (a . regs) xs (op . ops)))
-
-    ; const 1
-    ((stacked-asm regs ((%const 1 n) . xs) ops)
-      (stacked-asm regs ((%op 1 (ld a n)) . xs) ops))
-
-    ; const 2
-    ((stacked-asm regs ((%const 2 nn) . xs) ops)
-      (stacked-asm regs ((%op 2 (ld hl nn) . xs)) ops))
-
-    ; inc/dec 1
-    ((stacked-asm regs ((%inc 1) . xs) ops)
-      (stacked-asm regs ((%op 1 1 (inc a)) . xs) ops))
-
-    ((stacked-asm regs ((%dec 1) . xs) ops)
-      (stacked-asm regs ((%op 1 1 (dec a)) . xs) ops))
-
-    ; add/sub/and/or/xor 1
-    ((stacked-asm regs ((%add 1) . xs) ops)
-      (stacked-asm regs ((%op 1 1 1 (add l)) . xs) ops))
-
-    ((stacked-asm regs ((%sub 1) . xs) ops)
-      (stacked-asm regs ((%op 1 1 1 (sub l)) . xs) ops))
-
-    ((stacked-asm regs ((%and 1) . xs) ops)
-      (stacked-asm regs ((%op 1 1 1 (and l)) . xs) ops))
-
-    ((stacked-asm regs ((%or 1) . xs) ops)
-      (stacked-asm regs ((%op 1 1 1 (or l)) . xs) ops))
-
-    ((stacked-asm regs ((%xor 1) . xs) ops)
-      (stacked-asm regs ((%op 1 1 1 (xor l)) . xs) ops))
-
-    ; peek
-    ((stacked-asm regs ((%peek 1) . xs) ops)
-      (stacked-asm regs ((%op 2 1 (ld a (hl))) . xs) ops))
-
-    ; peek offset
-    ((stacked-asm regs ((%peek 1 offset) . xs) ops)
-      (stacked-asm regs ((%op 1 (ld a (+ ix offset))) . xs) ops))
-
-    ((stacked-asm regs ((%neg 1) . xs) ops)
-      (stacked-asm regs ((%op 1 1 (neg)) . xs) ops))
-
-    ((stacked-asm regs ((%cpl 1) . xs) ops)
-      (stacked-asm regs ((%op 1 1 (cpl)) . xs) ops))
 
     ; === test ====
     ((check-stacked-asm (%stacked regs x) out)
