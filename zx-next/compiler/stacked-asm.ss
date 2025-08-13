@@ -3,7 +3,7 @@
     stacked-asm
     check-stacked-asm)
   (import
-    (only (micascheme) define-rules-syntaxes ... syntax->list quasisyntax unsyntax reverse quote syntax check equal? syntax->datum literals)
+    (only (micascheme) logging define-rules-syntaxes syntax-case ... syntax->list quasisyntax unsyntax reverse quote syntax check equal? syntax->datum literals)
     (prefix (zx-next compiler stacked) %)
     (asm z80))
 
@@ -17,6 +17,14 @@
     ; top-level
     ((stacked-asm x)
       (stacked-asm () x))
+
+    ; append
+    ((stacked-asm regs x y z ...)
+      (syntax-case (stacked-asm regs x) ()
+        ((asm regs-1 op-1 (... ...))
+          (syntax-case (stacked-asm regs-1 y z ...) ()
+            ((asm regs-2 op-2 (... ...))
+              #'(asm regs-2 op-1 (... ...) op-2 (... ...)))))))
 
     ; op 0
     ((stacked-asm regs (%op 0 op))
@@ -137,6 +145,5 @@
 
     ; === test ====
     ((check-stacked-asm (%stacked . x) out)
-      (check (equal? (syntax->datum (stacked-asm . x)) 'out)))
-  )
+      (check (equal? (syntax->datum (stacked-asm . x)) 'out))))
 )

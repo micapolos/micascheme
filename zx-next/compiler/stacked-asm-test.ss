@@ -163,3 +163,12 @@
 (check-stacked-asm
   (%stacked (a l) (%op 1 1 1 (add l)))
   (asm (a) (add l)))
+
+; append
+; (check-stacked-asm
+;   (%stacked ()
+;     (%op 1 (ld a #x12))
+;     (%op 1 (ld a #x13))
+;     (%op 1 1 1 (add l))
+;     (%op 1 0 (write a)))
+;   (asm (a) (ld a 18) (write-char a)))
