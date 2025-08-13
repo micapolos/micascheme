@@ -11,7 +11,8 @@
     (literals a l hl %stacked %op %op1 %op2 %peek
       %const
       %inc %dec
-      %add %sub %and %or %xor)
+      %add %sub %and %or %xor
+      %neg cpl)
 
     ; terminal
     ((stacked-asm regs () ops)
@@ -118,6 +119,12 @@
     ; peek offset
     ((stacked-asm regs ((%peek 1 offset) . xs) ops)
       (stacked-asm regs ((%op 1 (ld a (+ ix offset))) . xs) ops))
+
+    ((stacked-asm regs ((%neg 1) . xs) ops)
+      (stacked-asm regs ((%op 1 1 (neg)) . xs) ops))
+
+    ((stacked-asm regs ((%cpl 1) . xs) ops)
+      (stacked-asm regs ((%op 1 1 (cpl)) . xs) ops))
 
     ; === test ====
     ((check-stacked-asm (%stacked regs x) out)

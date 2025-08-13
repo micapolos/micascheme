@@ -79,6 +79,16 @@
   (%stacked (a de) (%op 1 1 (inc a)))
   (asm (a de) (inc a)))
 
+; neg 1
+(check-stacked-asm
+  (%stacked (a) (%neg 1))
+  (asm (a) (neg)))
+
+; cpl 1
+(check-stacked-asm
+  (%stacked (a) (%cpl 1))
+  (asm (a) (cpl)))
+
 ; add 1
 (check-stacked-asm
   (%stacked () (%add 1))
