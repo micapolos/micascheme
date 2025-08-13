@@ -22,8 +22,45 @@
   (asm (a de) (push de) (ex de hl) (ld a #x12)))
 
 (check-stacked-asm
+  (%stacked (lde) (%const 1 #x12))
+  (asm (a ) (push lde) (ld a #x12)))
+
+(check-stacked-asm
   (%stacked (hlde) (%const 1 #x12))
   (asm (a ) (push hlde) (ld a #x12)))
+
+; const 2
+(check-stacked-asm
+  (%stacked () (%const 2 #x1234))
+  (asm (hl) (ld hl #x1234)))
+
+(check-stacked-asm
+  (%stacked (a) (%const 2 #x1234))
+  (asm (hl) (push a) (ld hl #x1234)))
+
+(check-stacked-asm
+  (%stacked (a l) (%const 2 #x1234))
+  (asm (hl) (ld h a) (push hl) (ld hl #x1234)))
+
+(check-stacked-asm
+  (%stacked (a de) (%const 2 #x1234))
+  (asm (hl) (push de) (push a) (ld hl #x1234)))
+
+(check-stacked-asm
+  (%stacked (hl) (%const 2 #x1234))
+  (asm (hl de) (ex de hl) (ld hl #x1234)))
+
+(check-stacked-asm
+  (%stacked (hl de) (%const 2 #x1234))
+  (asm (hl de) (push de) (ex de hl) (ld hl #x1234)))
+
+(check-stacked-asm
+  (%stacked (lde) (%const 2 #x1234))
+  (asm (hl) (push lde) (ld hl #x1234)))
+
+(check-stacked-asm
+  (%stacked (hlde) (%const 2 #x1234))
+  (asm (hl) (push hlde) (ld hl #x1234)))
 
 ; op2 1
 (check-stacked-asm

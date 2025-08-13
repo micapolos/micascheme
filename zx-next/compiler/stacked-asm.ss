@@ -8,7 +8,7 @@
     (asm z80))
 
   (define-rules-syntaxes
-    (literals a hl %stacked %const %op2 %add %sub %and %or %xor)
+    (literals a l hl %stacked %const %op2 %add %sub %and %or %xor)
 
     ; terminal
     ((stacked-asm regs () ops)
@@ -32,6 +32,25 @@
 
     ((stacked-asm (r) ((%const 1 n) . xs) ops)
       (stacked-asm (a) xs ((ld a n) (push r) . ops)))
+
+    ; const 2
+    ((stacked-asm () ((%const 2 nn) . xs) ops)
+      (stacked-asm (hl) xs ((ld hl nn) . ops)))
+
+    ((stacked-asm (a l) ((%const 2 nn) . xs) ops)
+      (stacked-asm (hl) xs ((ld hl nn) (push hl) (ld h a) . ops)))
+
+    ((stacked-asm (a de) ((%const 2 nn) . xs) ops)
+      (stacked-asm (hl) xs ((ld hl nn) (push a) (push de) . ops)))
+
+    ((stacked-asm (hl) ((%const 2 nn) . xs) ops)
+      (stacked-asm (hl de) xs ((ld hl nn) (ex de hl) . ops)))
+
+    ((stacked-asm (hl de) ((%const 2 nn) . xs) ops)
+      (stacked-asm (hl de) xs ((ld hl nn) (ex de hl) (push de) . ops)))
+
+    ((stacked-asm (r) ((%const 2 nn) . xs) ops)
+      (stacked-asm (hl) xs ((ld hl nn) (push r) . ops)))
 
     ; op2 1
     ((stacked-asm () ((%op2 op 1) . xs) ops)
