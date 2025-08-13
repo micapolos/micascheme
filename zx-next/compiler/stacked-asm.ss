@@ -64,6 +64,7 @@
 
     ; op 1 1 1
     ((stacked-asm () ((%op 1 1 1 op) . xs) ops)
+      ; TODO: This one could be optimized not to require two ld's.
       (stacked-asm (a) xs (op (ld l h) (ld a l) (pop hl) . ops)))
 
     ((stacked-asm (a) ((%op 1 1 1 op) . xs) ops)
