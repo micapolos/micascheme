@@ -129,6 +129,23 @@
   ((hlde) (4 (ld hlde #x12345678)))
   ((hlde) (push hlde) (ld hlde #x12345678)))
 
+; op 1 0
+(check-stacked->asm
+  (() (1 0 (write a)))
+  (() (pop a) (write a)))
+
+(check-stacked->asm
+  ((a) (1 0 (write a)))
+  (() (write a)))
+
+(check-stacked->asm
+  ((a l) (1 0 (write a)))
+  ((l) (write a)))
+
+(check-stacked->asm
+  ((a de) (1 0 (write a)))
+  ((hl) (ex de hl) (write a)))
+
 ; op 1 1
 (check-stacked->asm
   (() (1 1 (inc a)))
