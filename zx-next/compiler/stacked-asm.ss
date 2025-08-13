@@ -1,10 +1,13 @@
 (library (zx-next compiler stacked-asm)
   (export
+    push
     stacked->asm
     check-stacked->asm)
   (import
-    (only (micascheme) define define-rule-syntax syntax-case ... quote syntax check equal? syntax->datum)
+    (only (micascheme) define-keywords define define-rule-syntax syntax-case ... quote syntax check equal? syntax->datum)
     (asm z80))
+
+  (define-keywords push-all)
 
   (define (stacked->asm $stacked)
     (syntax-case $stacked (a l hl de %op)
@@ -14,6 +17,34 @@
             (syntax-case (stacked->asm #'(regs-1 y z ...)) ()
               ((regs-2 op-2 ...)
                 #'(regs-2 op-1 ... op-2 ...))))))
+
+      ; push-all
+      ((() (push-all))
+        #'(()))
+
+      (((a) (push-all))
+        #'(() (push a)))
+
+      (((a l) (push-all))
+        #'(() (ld h a) (push hl)))
+
+      (((a de) (push-all))
+        #'(() (push de) (push a)))
+
+      (((hl) (push-all))
+        #'(() (push hl)))
+
+      (((hl de) (push-all))
+        #'(() (push de) (push hl)))
+
+      (((hl de) (push-all))
+        #'(() (push de) (push hl)))
+
+      (((lde) (push-all))
+        #'(() (push lde)))
+
+      (((hlde) (push-all))
+        #'(() (push hlde)))
 
       ; op 0
       ((regs (0 op))
