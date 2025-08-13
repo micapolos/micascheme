@@ -144,7 +144,38 @@
 
 (check-stacked->asm
   ((a de) (1 0 (write a)))
-  ((hl) (ex de hl) (write a)))
+  ((hl) (write a) (ex de hl)))
+
+; op 2 0
+(check-stacked->asm
+  (() (2 0 (write hl)))
+  (() (pop hl) (write hl)))
+
+(check-stacked->asm
+  ((hl) (2 0 (write hl)))
+  (() (write hl)))
+
+(check-stacked->asm
+  ((hl de) (2 0 (write hl)))
+  ((hl) (write hl) (ex de hl)))
+
+; op 3 0
+(check-stacked->asm
+  (() (3 0 (write lde)))
+  (() (pop lde) (write lde)))
+
+(check-stacked->asm
+  ((lde) (3 0 (write lde)))
+  (() (write lde)))
+
+; op 4 0
+(check-stacked->asm
+  (() (4 0 (write hlde)))
+  (() (pop hlde) (write hlde)))
+
+(check-stacked->asm
+  ((hlde) (4 0 (write hlde)))
+  (() (write hlde)))
 
 ; op 1 1
 (check-stacked->asm

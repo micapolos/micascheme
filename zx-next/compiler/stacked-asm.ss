@@ -118,7 +118,31 @@
         #'((l) op))
 
       (((a de) (1 0 op))
-        #'((hl) (ex de hl) op))
+        #'((hl) op (ex de hl)))
+
+      ; op 2 0
+      ((() (2 0 op))
+        #'(() (pop hl) op))
+
+      (((hl) (2 0 op))
+        #'(() op))
+
+      (((hl de) (2 0 op))
+        #'((hl) op (ex de hl)))
+
+      ; op 3 0
+      ((() (3 0 op))
+        #'(() (pop lde) op))
+
+      (((lde) (3 0 op))
+        #'(() op))
+
+      ; op 4 0
+      ((() (4 0 op))
+        #'(() (pop hlde) op))
+
+      (((hlde) (4 0 op))
+        #'(() op))
 
       ; op 1 1
       ((() (1 1 op))
