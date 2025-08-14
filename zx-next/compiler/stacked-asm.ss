@@ -4,10 +4,19 @@
     stacked->asm
     check-stacked->asm)
   (import
-    (only (micascheme) define-keywords define define-rule-syntax syntax-case ... quote syntax check equal? syntax->datum)
+    (only (micascheme) comment define-keywords define define-rule-syntax syntax-case ... quote syntax check equal? syntax->datum)
     (asm z80))
 
   (define-keywords push-all)
+
+  (comment
+    (stacked regs (param-size ... return-size op) op-preserves-regs?)
+    (regs contains registers which hold top elements of the logical stack)
+    (remaining values are stored on the physical stack)
+    (param-size ... contains sizes in bytes of op parameters)
+    (return-size is byte size of the return value from the op)
+    (op is assembler code)
+    (op-preserves-regs? specifies whether the op preserves regs or not))
 
   (define (stacked->asm $stacked)
     (syntax-case $stacked (a l hl de %op)
@@ -17,34 +26,6 @@
             (syntax-case (stacked->asm #'(regs-1 y z ...)) ()
               ((regs-2 op-2 ...)
                 #'(regs-2 op-1 ... op-2 ...))))))
-
-      ; push-all
-      ((() (push-all))
-        #'(()))
-
-      (((a) (push-all))
-        #'(() (push a)))
-
-      (((a l) (push-all))
-        #'(() (ld h a) (push hl)))
-
-      (((a de) (push-all))
-        #'(() (push de) (push a)))
-
-      (((hl) (push-all))
-        #'(() (push hl)))
-
-      (((hl de) (push-all))
-        #'(() (push de) (push hl)))
-
-      (((hl de) (push-all))
-        #'(() (push de) (push hl)))
-
-      (((lde) (push-all))
-        #'(() (push lde)))
-
-      (((hlde) (push-all))
-        #'(() (push hlde)))
 
       ; op 0
       ((regs (0 op))

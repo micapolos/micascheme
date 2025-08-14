@@ -1,38 +1,5 @@
 (import (asm z80) (zx-next compiler stacked-asm))
 
-; push-all
-(check-stacked->asm
-  (() (push-all))
-  (()))
-
-(check-stacked->asm
-  ((a) (push-all))
-  (() (push a)))
-
-(check-stacked->asm
-  ((a l) (push-all))
-  (() (ld h a) (push hl)))
-
-(check-stacked->asm
-  ((a de) (push-all))
-  (() (push de) (push a)))
-
-(check-stacked->asm
-  ((hl) (push-all))
-  (() (push hl)))
-
-(check-stacked->asm
-  ((hl de) (push-all))
-  (() (push de) (push hl)))
-
-(check-stacked->asm
-  ((lde) (push-all))
-  (() (push lde)))
-
-(check-stacked->asm
-  ((hlde) (push-all))
-  (() (push hlde)))
-
 ; op 0
 (check-stacked->asm
   (() (0 (nop)))
