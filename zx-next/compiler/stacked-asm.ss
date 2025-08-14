@@ -64,6 +64,9 @@
       ((() (2 _ asm))
         #'((hl) asm))
 
+      (((reg ...) (2 #f asm))
+        #'((hl) (reverse (push reg) ...) asm))
+
       (((a l) (2 _ asm))
         #'((hl) (ld h a) (push hl) asm))
 

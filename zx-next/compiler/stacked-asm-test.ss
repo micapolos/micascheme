@@ -21,6 +21,11 @@
   ((a) (0 #f (nop)))
   (() (reverse (push a)) (nop)))
 
+; TODO: Optimize to (ld h a) (push hl)
+(check-stacked->asm
+  ((a l) (0 #f (nop)))
+  (() (reverse (push a) (push l)) (nop)))
+
 (check-stacked->asm
   ((a de) (0 #f (nop)))
   (() (reverse (push a) (push de)) (nop)))
@@ -62,6 +67,10 @@
 (check-stacked->asm
   (() (2 #t (ld hl #x1234)))
   ((hl) (ld hl #x1234)))
+
+(check-stacked->asm
+  ((a de) (2 #f (ld hl #x1234)))
+  ((hl) (reverse (push a) (push de)) (ld hl #x1234)))
 
 (check-stacked->asm
   ((a) (2 #t (ld hl #x1234)))
