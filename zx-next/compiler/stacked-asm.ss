@@ -28,8 +28,14 @@
                 #'(regs-2 op-1 ... op-2 ...))))))
 
       ; op 0
-      ((regs (0 _ op))
+      ((() (0 _ op))
+        #'(() op))
+
+      ((regs (0 #t op))
         #'(regs op))
+
+      (((reg ...) (0 #f op))
+        #'(() (reverse (push reg) ...) op))
 
       ; op 1
       ((() (1 _ op))

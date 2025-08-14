@@ -9,6 +9,22 @@
   ((a) (0 #t (nop)))
   ((a) (nop)))
 
+(check-stacked->asm
+  ((a de) (0 #t (nop)))
+  ((a de) (nop)))
+
+(check-stacked->asm
+  (() (0 #f (nop)))
+  (() (nop)))
+
+(check-stacked->asm
+  ((a) (0 #f (nop)))
+  (() (reverse (push a)) (nop)))
+
+(check-stacked->asm
+  ((a de) (0 #f (nop)))
+  (() (reverse (push a) (push de)) (nop)))
+
 ; op 1
 (check-stacked->asm
   (() (1 #t (ld a #x12)))
