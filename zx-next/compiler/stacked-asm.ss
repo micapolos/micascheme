@@ -10,13 +10,13 @@
   (define-keywords push-all)
 
   (comment
-    (stacked regs (param-size ... return-size op) op-preserves-regs?)
+    (stacked regs (param-size ... return-size preserves-regs? op) ...)
     (regs contains registers which hold top elements of the logical stack)
     (remaining values are stored on the physical stack)
     (param-size ... contains sizes in bytes of op parameters)
-    (return-size is byte size of the return value from the op)
-    (op is assembler code)
-    (op-preserves-regs? specifies whether the op preserves regs or not))
+    (return-size is byte size of the return value from the asm)
+    (preserves-regs? specifies whether the op preserves regs or not)
+    (op is abstract operation performed on the stack (for example block of assembler code)))
 
   (define (stacked->asm $stacked)
     (syntax-case $stacked (a l hl de %op)
