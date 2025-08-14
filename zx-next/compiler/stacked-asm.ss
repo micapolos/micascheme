@@ -4,7 +4,23 @@
     stacked->asm
     check-stacked->asm)
   (import
-    (only (micascheme) comment define-keywords define define-rules-syntax syntax-case ... quote syntax check equal? syntax->datum)
+    (rename
+      (only (micascheme)
+        and
+        identifier?
+        transform
+        comment
+        define-keywords
+        define
+        define-rules-syntax
+        syntax-case
+        ...
+        quote
+        syntax
+        check
+        equal?
+        syntax->datum)
+      (and %and))
     (asm z80)
     (syntax lookup))
 
@@ -30,6 +46,11 @@
             (syntax-case (stacked->asm $lookup #'(regs-1 y z ...)) ()
               ((regs-2 asm-2 ...)
                 #'(regs-2 asm-1 ... asm-2 ...))))))
+
+      ; lookup
+      ((regs (id . x))
+        (%and (identifier? #'id) ($lookup #'id))
+        (stacked->asm $lookup #'(regs (transform ($lookup #'id) #'(id . x) $lookup))))
 
       ; handling of preserves-regs?
       ((() (size ... #f asm))
