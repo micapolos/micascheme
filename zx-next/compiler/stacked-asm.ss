@@ -1,6 +1,5 @@
 (library (zx-next compiler stacked-asm)
   (export
-    stacked-op
     stacked->asm
     check-stacked->asm)
   (import
@@ -48,22 +47,6 @@
             (syntax-case (stacked->asm $lookup #'(regs-1 y z ...)) ()
               ((regs-2 asm-2 ...)
                 #'(regs-2 asm-1 ... asm-2 ...))))))
-
-      ; lookup
-      ((regs (id . x))
-        (identifier? #'id)
-        (stacked->asm $lookup
-          #`(regs
-            #,(transform
-              (syntax-case
-                (%or
-                  ($lookup #'id)
-                  (syntax-error #'id "undefined stacked"))
-                ()
-                ((stacked-op x) #'x)
-                (_ (syntax-error #'x "not stacked")))
-              #'(id . x)
-              $lookup))))
 
       ; handling of preserves-regs?
       ((() (size ... #f asm))
