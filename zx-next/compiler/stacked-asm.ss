@@ -18,7 +18,7 @@
       (return-size is byte size of the return value from the asm)
       (preserves-regs? specifies whether the op preserves regs or not)
       (asm contains code executed on the registers and the physical stack))
-    (valid combinations of regs are () (a) (a de) (hl) (hl de) (lde) (hlde)))
+    (valid combinations of regs are () (a) (a l) (a de) (hl) (hl de) (lde) (hlde)))
 
   (define (stacked->asm $stacked)
     (syntax-case $stacked (a l hl de)
