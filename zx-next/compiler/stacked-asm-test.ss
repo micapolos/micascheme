@@ -1,6 +1,6 @@
 (import (asm z80) (zx-next compiler stacked-asm))
 
-; not preserves-regs?
+; not preserve-regs?
 (check-stacked->asm
   (() (0 #f (nop)))
   (() (nop)))
@@ -32,6 +32,34 @@
 (check-stacked->asm
   ((hlde) (0 #f (nop)))
   (() (push hlde) (nop)))
+
+(check-stacked->asm
+  ((a) (1 0 #f (nop)))
+  (() (nop)))
+
+(check-stacked->asm
+  ((a l) (1 0 #f (nop)))
+  (() (push l) (nop)))
+
+(check-stacked->asm
+  ((a de) (1 0 #f (nop)))
+  (() (push de) (nop)))
+
+(check-stacked->asm
+  ((hl) (2 0 #f (nop)))
+  (() (nop)))
+
+(check-stacked->asm
+  ((hl de) (2 0 #f (nop)))
+  (() (push de) (nop)))
+
+(check-stacked->asm
+  ((lde) (3 0 #f (nop)))
+  (() (nop)))
+
+(check-stacked->asm
+  ((hlde) (4 0 #f (nop)))
+  (() (nop)))
 
 ; op 0
 (check-stacked->asm

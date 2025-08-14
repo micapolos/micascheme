@@ -30,14 +30,24 @@
               ((regs-2 asm-2 ...)
                 #'(regs-2 asm-1 ... asm-2 ...))))))
 
+      ; handling of preserves-regs?
       ((() (size ... #f asm))
         (stacked->asm #'(() (size ... #t asm))))
 
-      (((a l) (size ... #f asm))
-        (stacked->asm #'(() (0 #t (ld h a)) (0 #t (push hl)) (size ... #t asm))))
+      (((r ... a l) (size #f asm))
+        (stacked->asm #'((r ...) (0 #t (ld h a)) (0 #t (push hl)) (size #f asm))))
 
-      (((regs ... reg) (size ... #f asm))
-        (stacked->asm #'((regs ...) (0 #t (push reg)) (size ... #f asm))))
+      (((r* ... r) (size #f asm))
+        (stacked->asm #'((r* ...) (0 #t (push r)) (size #f asm))))
+
+      (((r) (param-size ret-size #f asm))
+        (stacked->asm #'((r) (param-size ret-size #t asm))))
+
+      (((r* ... r) (param-size ret-size #f asm))
+        (stacked->asm #'((r* ...) (0 #t (push r)) (param-size ret-size #f asm))))
+
+      ((regs (size ... #f asm))
+        (stacked->asm #'(regs (size ... #f asm))))
 
       ; op 0
       ((() (0 _ asm))
