@@ -29,167 +29,167 @@
                 #'(regs-2 asm-1 ... asm-2 ...))))))
 
       ; op 0
-      ((() (0 _ op))
-        #'(() op))
+      ((() (0 _ asm))
+        #'(() asm))
 
-      (((reg ...) (0 #f op))
-        #'(() (reverse (push reg) ...) op))
+      (((reg ...) (0 #f asm))
+        #'(() (reverse (push reg) ...) asm))
 
-      ((regs (0 _ op))
-        #'(regs op))
+      ((regs (0 _ asm))
+        #'(regs asm))
 
       ; op 1
-      ((() (1 _ op))
-        #'((a) op))
+      ((() (1 _ asm))
+        #'((a) asm))
 
-      (((reg ...) (1 #f op))
-        #'((a) (reverse (push reg) ...) op))
+      (((reg ...) (1 #f asm))
+        #'((a) (reverse (push reg) ...) asm))
 
-      (((a) (1 _ op))
-        #'((a l) (ld l a) op))
+      (((a) (1 _ asm))
+        #'((a l) (ld l a) asm))
 
-      (((a r) (1 _ op))
-        #'((a l) (push r) (ld l a) op))
+      (((a r) (1 _ asm))
+        #'((a l) (push r) (ld l a) asm))
 
-      (((hl) (1 _ op))
-        #'((a de) (ex de hl) op))
+      (((hl) (1 _ asm))
+        #'((a de) (ex de hl) asm))
 
-      (((hl r) (1 _ op))
-        #'((a de) (push r) (ex de hl) op))
+      (((hl r) (1 _ asm))
+        #'((a de) (push r) (ex de hl) asm))
 
-      (((r) (1 _ op))
-        #'((a) (push r) op))
+      (((r) (1 _ asm))
+        #'((a) (push r) asm))
 
       ; op 2
-      ((() (2 _ op))
-        #'((hl) op))
+      ((() (2 _ asm))
+        #'((hl) asm))
 
-      (((a l) (2 _ op))
-        #'((hl) (ld h a) (push hl) op))
+      (((a l) (2 _ asm))
+        #'((hl) (ld h a) (push hl) asm))
 
-      (((a de) (2 _ op))
-        #'((hl) (push de) (push a) op))
+      (((a de) (2 _ asm))
+        #'((hl) (push de) (push a) asm))
 
-      (((hl) (2 _ op))
-        #'((hl de) (ex de hl) op))
+      (((hl) (2 _ asm))
+        #'((hl de) (ex de hl) asm))
 
-      (((hl de) (2 _ op))
-        #'((hl de) (push de) (ex de hl) op))
+      (((hl de) (2 _ asm))
+        #'((hl de) (push de) (ex de hl) asm))
 
-      (((r) (2 _ op))
-        #'((hl) (push r) op))
+      (((r) (2 _ asm))
+        #'((hl) (push r) asm))
 
       ; op 3
-      ((() (3 _ op))
-        #'((lde) op))
+      ((() (3 _ asm))
+        #'((lde) asm))
 
-      (((a) (3 _ op))
-        #'((lde) (push a) op))
+      (((a) (3 _ asm))
+        #'((lde) (push a) asm))
 
-      (((a l) (3 _ op))
-        #'((lde) (ld h a) (push hl) op))
+      (((a l) (3 _ asm))
+        #'((lde) (ld h a) (push hl) asm))
 
-      (((a de) (3 _ op))
-        #'((lde) (push de) (push a) op))
+      (((a de) (3 _ asm))
+        #'((lde) (push de) (push a) asm))
 
-      (((hl) (3 _ op))
-        #'((lde) (push hl) op))
+      (((hl) (3 _ asm))
+        #'((lde) (push hl) asm))
 
-      (((hl de) (3 _ op))
-        #'((lde) (push de) (push hl) op))
+      (((hl de) (3 _ asm))
+        #'((lde) (push de) (push hl) asm))
 
-      (((lde) (3 _ op))
-        #'((lde) (push lde) op))
+      (((lde) (3 _ asm))
+        #'((lde) (push lde) asm))
 
-      (((hlde) (3 _ op))
-        #'((hlde) (push hlde) op))
+      (((hlde) (3 _ asm))
+        #'((hlde) (push hlde) asm))
 
       ; op 4
-      ((() (4 _ op))
-        #'((hlde) op))
+      ((() (4 _ asm))
+        #'((hlde) asm))
 
-      (((a) (4 _ op))
-        #'((hlde) (push a) op))
+      (((a) (4 _ asm))
+        #'((hlde) (push a) asm))
 
-      (((a l) (4 _ op))
-        #'((hlde) (ld h a) (push hl) op))
+      (((a l) (4 _ asm))
+        #'((hlde) (ld h a) (push hl) asm))
 
-      (((a de) (4 _ op))
-        #'((hlde) (push de) (push a) op))
+      (((a de) (4 _ asm))
+        #'((hlde) (push de) (push a) asm))
 
-      (((hl) (4 _ op))
-        #'((hlde) (push hl) op))
+      (((hl) (4 _ asm))
+        #'((hlde) (push hl) asm))
 
-      (((hl de) (4 _ op))
-        #'((hlde) (push de) (push hl) op))
+      (((hl de) (4 _ asm))
+        #'((hlde) (push de) (push hl) asm))
 
-      (((lde) (4 _ op))
-        #'((hlde) (push lde) op))
+      (((lde) (4 _ asm))
+        #'((hlde) (push lde) asm))
 
-      (((hlde) (4 _ op))
-        #'((hlde) (push hlde) op))
+      (((hlde) (4 _ asm))
+        #'((hlde) (push hlde) asm))
 
       ; op 1 0
-      ((() (1 0 _ op))
-        #'(() (pop a) op))
+      ((() (1 0 _ asm))
+        #'(() (pop a) asm))
 
-      (((a) (1 0 _ op))
-        #'(() op))
+      (((a) (1 0 _ asm))
+        #'(() asm))
 
-      (((a l) (1 0 _ op))
-        #'((l) op))
+      (((a l) (1 0 _ asm))
+        #'((l) asm))
 
-      (((a de) (1 0 _ op))
-        #'((hl) op (ex de hl)))
+      (((a de) (1 0 _ asm))
+        #'((hl) asm (ex de hl)))
 
       ; op 2 0
-      ((() (2 0 _ op))
-        #'(() (pop hl) op))
+      ((() (2 0 _ asm))
+        #'(() (pop hl) asm))
 
-      (((hl) (2 0 _ op))
-        #'(() op))
+      (((hl) (2 0 _ asm))
+        #'(() asm))
 
-      (((hl de) (2 0 _ op))
-        #'((hl) op (ex de hl)))
+      (((hl de) (2 0 _ asm))
+        #'((hl) asm (ex de hl)))
 
       ; op 3 0
-      ((() (3 0 _ op))
-        #'(() (pop lde) op))
+      ((() (3 0 _ asm))
+        #'(() (pop lde) asm))
 
-      (((lde) (3 0 _ op))
-        #'(() op))
+      (((lde) (3 0 _ asm))
+        #'(() asm))
 
       ; op 4 0
-      ((() (4 0 _ op))
-        #'(() (pop hlde) op))
+      ((() (4 0 _ asm))
+        #'(() (pop hlde) asm))
 
-      (((hlde) (4 0 _ op))
-        #'(() op))
+      (((hlde) (4 0 _ asm))
+        #'(() asm))
 
       ; op 1 1
-      ((() (1 1 _ op))
-        #'((a) (pop a) op))
+      ((() (1 1 _ asm))
+        #'((a) (pop a) asm))
 
-      (((a . x) (1 1 _ op))
-        #'((a . x) op))
+      (((a . x) (1 1 _ asm))
+        #'((a . x) asm))
 
       ; op 1 1 1
-      ((() (1 1 1 _ op))
+      ((() (1 1 1 _ asm))
         ; TODO: This one could be optimized not to require two ld's.
-        #'((a) (pop hl) (ld a l) (ld l h) op))
+        #'((a) (pop hl) (ld a l) (ld l h) asm))
 
-      (((a) (1 1 1 _ op))
-        #'((a) (pop l) op))
+      (((a) (1 1 1 _ asm))
+        #'((a) (pop l) asm))
 
-      (((a l) (1 1 1 _ op))
-        #'((a) op))
+      (((a l) (1 1 1 _ asm))
+        #'((a) asm))
 
       ; op 2 1
-      ((() (2 1 _ op))
-        #'((a) (pop hl) op))
+      ((() (2 1 _ asm))
+        #'((a) (pop hl) asm))
 
-      (((hl . regs) (2 1 _ op))
-        #'((a . regs) op))))
+      (((hl . regs) (2 1 _ asm))
+        #'((a . regs) asm))))
 
   ; === test ====
   (define-rule-syntax (check-stacked->asm x out)
