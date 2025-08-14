@@ -1,30 +1,32 @@
 (library (zx-next compiler stacked-asm)
   (export
-    push
+    stacked
     stacked->asm
     check-stacked->asm)
   (import
     (rename
       (only (micascheme)
-        and
+        and or not
         identifier?
         transform
         comment
-        define-keywords
         define
-        define-rules-syntax
+        define-rules-syntax define-keywords
         syntax-case
+        nonnegative-integer? datum syntax-error
         ...
         quote
-        syntax
-        check
+        syntax quasisyntax unsyntax for-all
+        check map
         equal?
         syntax->datum)
-      (and %and))
+      (and %and)
+      (not %not)
+      (or %or))
     (asm z80)
     (syntax lookup))
 
-  (define-keywords push-all)
+  (define-keywords stacked)
 
   (comment
     (stacked (reg ...) (param-size ... return-size preserves-regs? asm) ...)
@@ -49,8 +51,19 @@
 
       ; lookup
       ((regs (id . x))
-        (%and (identifier? #'id) ($lookup #'id))
-        (stacked->asm $lookup #'(regs (transform ($lookup #'id) #'(id . x) $lookup))))
+        (identifier? #'id)
+        (stacked->asm $lookup
+          #`(regs
+            #,(transform
+              (syntax-case
+                (%or
+                  ($lookup #'id)
+                  (syntax-error #'id "undefined stacked"))
+                ()
+                ((stacked x) #'x)
+                (_ (syntax-error #'x "not stacked")))
+              #'(id . x)
+              $lookup))))
 
       ; handling of preserves-regs?
       ((() (size ... #f asm))

@@ -1,4 +1,8 @@
-(import (asm z80) (zx-next compiler stacked-asm))
+(import
+  (only (micascheme) quasisyntax unsyntax define-syntax make-compile-time-value syntax-rules)
+  (asm z80)
+  (syntax lookup)
+  (zx-next compiler stacked-asm))
 
 ; not preserve-regs?
 (check-stacked->asm
@@ -306,7 +310,14 @@
     (pop hl)
     (write hl)))
 
+; custom
 
-
-
-
+(check-stacked->asm
+  (lookup-with
+    (add-8
+      #`(stacked
+        #,(syntax-rules ()
+          ((add-8)
+            (1 1 1 #t (add l)))))))
+  (() (add-8))
+  ((a) (pop hl) (ld a l) (ld l h) (add l)))
