@@ -286,7 +286,10 @@
     (1 #t (ld a #x12))
     (1 #t (ld a #x13))
     (1 1 1 #t (add a l))
-    (1 0 #t (write a)))
+    (1 #t (ld a #x14))
+    (1 0 #f (write a))
+    (1 0 #f (write a))
+    (2 0 #f (write hl)))
   (()
     (ex de hl)
     (ld a #x12)
@@ -294,4 +297,16 @@
     (ld l a)
     (ld a #x13)
     (add a l)
-    (write a)))
+    (ld l a)
+    (ld a #x14)
+    (push l)
+    (write a)
+    (pop a)
+    (write a)
+    (pop hl)
+    (write hl)))
+
+
+
+
+
