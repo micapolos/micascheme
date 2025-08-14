@@ -16,7 +16,7 @@
     (param-size ... contains sizes in bytes of op parameters)
     (return-size is byte size of the return value from the asm)
     (preserves-regs? specifies whether the op preserves regs or not)
-    (op is abstract operation performed on the stack (for example block of assembler code)))
+    (op is asm performed on the registers and stack))
 
   (define (stacked->asm $stacked)
     (syntax-case $stacked (a l hl de %op)
@@ -31,15 +31,18 @@
       ((() (0 _ op))
         #'(() op))
 
-      ((regs (0 #t op))
-        #'(regs op))
-
       (((reg ...) (0 #f op))
         #'(() (reverse (push reg) ...) op))
+
+      ((regs (0 _ op))
+        #'(regs op))
 
       ; op 1
       ((() (1 _ op))
         #'((a) op))
+
+      (((reg ...) (1 #f op))
+        #'((a) (reverse (push reg) ...) op))
 
       (((a) (1 _ op))
         #'((a l) (ld l a) op))

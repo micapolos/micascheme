@@ -31,6 +31,10 @@
   ((a) (ld a #x12)))
 
 (check-stacked->asm
+  ((a de) (1 #f (ld a #x12)))
+  ((a) (reverse (push a) (push de)) (ld a #x12)))
+
+(check-stacked->asm
   ((a) (1 #t (ld a #x12)))
   ((a l) (ld l a) (ld a #x12)))
 
