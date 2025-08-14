@@ -1,7 +1,6 @@
 (library (zx-next compiler stacked-asm)
   (export
-    stacked
-    define-stacked
+    stacked-op
     stacked->asm
     check-stacked->asm)
   (import
@@ -39,15 +38,7 @@
     (valid combinations of regs are () (a) (a l) (a de) (hl) (hl de) (lde) (hlde))
     (it corresponds to sdcc-1 calling conversion))
 
-  (define-keywords stacked)
-
-  (define-rules-syntax
-    ((define-stacked id x)
-      (define-syntax x (make-compile-time-value #`(stacked #,x))))
-    ((define-stacked (id $syntax) body)
-      (define-stacked id
-        (lambda ($syntax)
-          body))))
+  (define-keywords stacked-op)
 
   (define (stacked->asm $lookup $stacked)
     (syntax-case $stacked (a l hl de)
@@ -69,7 +60,7 @@
                   ($lookup #'id)
                   (syntax-error #'id "undefined stacked"))
                 ()
-                ((stacked x) #'x)
+                ((stacked-op x) #'x)
                 (_ (syntax-error #'x "not stacked")))
               #'(id . x)
               $lookup))))
