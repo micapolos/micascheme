@@ -1,6 +1,7 @@
 (library (zx-next compiler stacked-asm)
   (export
     stacked
+    define-stacked
     stacked->asm
     check-stacked->asm)
   (import
@@ -26,8 +27,6 @@
     (asm z80)
     (syntax lookup))
 
-  (define-keywords stacked)
-
   (comment
     (stacked (reg ...) (param-size ... return-size preserves-regs? asm) ...)
     (details
@@ -39,6 +38,16 @@
       (asm contains code executed on the registers and the physical stack))
     (valid combinations of regs are () (a) (a l) (a de) (hl) (hl de) (lde) (hlde))
     (it corresponds to sdcc-1 calling conversion))
+
+  (define-keywords stacked)
+
+  (define-rules-syntax
+    ((define-stacked id x)
+      (define-syntax x (make-compile-time-value #`(stacked #,x))))
+    ((define-stacked (id $syntax) body)
+      (define-stacked id
+        (lambda ($syntax)
+          body))))
 
   (define (stacked->asm $lookup $stacked)
     (syntax-case $stacked (a l hl de)
