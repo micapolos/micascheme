@@ -17,7 +17,8 @@
       (param-size ... contains sizes in bytes of op parameters)
       (return-size is byte size of the return value from the asm)
       (preserves-regs? specifies whether the op preserves regs or not)
-      (asm contains code executed on the registers and the physical stack)))
+      (asm contains code executed on the registers and the physical stack))
+    (valid combinations of regs are () (a) (a de) (hl) (hl de) (lde) (hlde)))
 
   (define (stacked->asm $stacked)
     (syntax-case $stacked (a l hl de)
@@ -28,12 +29,18 @@
               ((regs-2 asm-2 ...)
                 #'(regs-2 asm-1 ... asm-2 ...))))))
 
+      ((() (size ... #f asm))
+        (stacked->asm #'(() (size ... #t asm))))
+
+      (((a l) (size ... #f asm))
+        (stacked->asm #'(() (0 #t (ld h a)) (0 #t (push hl)) (size ... #t asm))))
+
+      (((regs ... reg) (size ... #f asm))
+        (stacked->asm #'((regs ...) (0 #t (push reg)) (size ... #f asm))))
+
       ; op 0
       ((() (0 _ asm))
         #'(() asm))
-
-      (((reg ...) (0 #f asm))
-        #'(() (reverse (push reg) ...) asm))
 
       ((regs (0 _ asm))
         #'(regs asm))

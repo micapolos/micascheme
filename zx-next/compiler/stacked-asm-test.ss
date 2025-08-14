@@ -1,5 +1,38 @@
 (import (asm z80) (zx-next compiler stacked-asm))
 
+; not preserves-regs?
+(check-stacked->asm
+  (() (0 #f (nop)))
+  (() (nop)))
+
+(check-stacked->asm
+  ((a) (0 #f (nop)))
+  (() (push a) (nop)))
+
+(check-stacked->asm
+  ((a l) (0 #f (nop)))
+  (() (ld h a) (push hl) (nop)))
+
+(check-stacked->asm
+  ((a de) (0 #f (nop)))
+  (() (push de) (push a) (nop)))
+
+(check-stacked->asm
+  ((hl) (0 #f (nop)))
+  (() (push hl) (nop)))
+
+(check-stacked->asm
+  ((hl de) (0 #f (nop)))
+  (() (push de) (push hl) (nop)))
+
+(check-stacked->asm
+  ((lde) (0 #f (nop)))
+  (() (push lde) (nop)))
+
+(check-stacked->asm
+  ((hlde) (0 #f (nop)))
+  (() (push hlde) (nop)))
+
 ; op 0
 (check-stacked->asm
   (() (0 #t (nop)))
@@ -13,23 +46,6 @@
   ((a de) (0 #t (nop)))
   ((a de) (nop)))
 
-(check-stacked->asm
-  (() (0 #f (nop)))
-  (() (nop)))
-
-(check-stacked->asm
-  ((a) (0 #f (nop)))
-  (() (reverse (push a)) (nop)))
-
-; TODO: Optimize to (ld h a) (push hl)
-(check-stacked->asm
-  ((a l) (0 #f (nop)))
-  (() (reverse (push a) (push l)) (nop)))
-
-(check-stacked->asm
-  ((a de) (0 #f (nop)))
-  (() (reverse (push a) (push de)) (nop)))
-
 ; op 1
 (check-stacked->asm
   (() (1 #t (ld a #x12)))
@@ -37,7 +53,7 @@
 
 (check-stacked->asm
   ((a de) (1 #f (ld a #x12)))
-  ((a) (reverse (push a) (push de)) (ld a #x12)))
+  ((a) (push de) (push a) (ld a #x12)))
 
 (check-stacked->asm
   ((a) (1 #t (ld a #x12)))
@@ -70,7 +86,7 @@
 
 (check-stacked->asm
   ((a de) (2 #f (ld hl #x1234)))
-  ((hl) (reverse (push a) (push de)) (ld hl #x1234)))
+  ((hl) (push de) (push a) (ld hl #x1234)))
 
 (check-stacked->asm
   ((a) (2 #t (ld hl #x1234)))
