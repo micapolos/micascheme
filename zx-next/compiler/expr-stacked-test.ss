@@ -2,7 +2,8 @@
 
 (check-expr->stacked
   (1 #t (ld a #x12))
-  ((1 #t (ld a 18))))
+  (
+    (1 #t (ld a 18))))
 
 (check-expr->stacked
   (1 #t (add l)
