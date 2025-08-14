@@ -39,33 +39,33 @@
 
   (define-keywords stacked-op)
 
-  (define (stacked->asm $lookup $stacked)
+  (define (stacked->asm $stacked)
     (syntax-case $stacked (a l hl de)
       ((regs x y z ...)
-        (syntax-case (stacked->asm $lookup #'(regs x)) ()
+        (syntax-case (stacked->asm #'(regs x)) ()
           ((regs-1 asm-1 ...)
-            (syntax-case (stacked->asm $lookup #'(regs-1 y z ...)) ()
+            (syntax-case (stacked->asm #'(regs-1 y z ...)) ()
               ((regs-2 asm-2 ...)
                 #'(regs-2 asm-1 ... asm-2 ...))))))
 
       ; handling of preserves-regs?
       ((() (size ... #f asm))
-        (stacked->asm $lookup #'(() (size ... #t asm))))
+        (stacked->asm #'(() (size ... #t asm))))
 
       (((r ... a l) (size #f asm))
-        (stacked->asm $lookup #'((r ...) (0 #t (ld h a)) (0 #t (push hl)) (size #f asm))))
+        (stacked->asm #'((r ...) (0 #t (ld h a)) (0 #t (push hl)) (size #f asm))))
 
       (((r* ... r) (size #f asm))
-        (stacked->asm $lookup #'((r* ...) (0 #t (push r)) (size #f asm))))
+        (stacked->asm #'((r* ...) (0 #t (push r)) (size #f asm))))
 
       (((r) (param-size ret-size #f asm))
-        (stacked->asm $lookup #'((r) (param-size ret-size #t asm))))
+        (stacked->asm #'((r) (param-size ret-size #t asm))))
 
       (((r* ... r) (param-size ret-size #f asm))
-        (stacked->asm $lookup #'((r* ...) (0 #t (push r)) (param-size ret-size #f asm))))
+        (stacked->asm #'((r* ...) (0 #t (push r)) (param-size ret-size #f asm))))
 
       ((regs (size ... #f asm))
-        (stacked->asm $lookup #'(regs (size ... #f asm))))
+        (stacked->asm #'(regs (size ... #f asm))))
 
       ; op 0
       ((() (0 _ asm))
@@ -232,8 +232,6 @@
 
   ; === test ====
   (define-rules-syntax
-    ((check-stacked->asm lookup x out)
-      (check (equal? (syntax->datum (stacked->asm lookup #'x)) 'out)))
     ((check-stacked->asm x out)
-      (check-stacked->asm (empty-lookup) x out)))
+      (check (equal? (syntax->datum (stacked->asm #'x)) 'out))))
 )
