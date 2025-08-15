@@ -170,6 +170,12 @@
     ((ld l (+ ix n))   (db #xdd #b01101110 n))
     ((ld a (+ ix n))   (db #xdd #b01111110 n))
 
+    ((ld bc (+ ix n))    (ld c  (+ ix n)) (ld b  (+ ix (+ n 1))))
+    ((ld de (+ ix n))    (ld e  (+ ix n)) (ld d  (+ ix (+ n 1))))
+    ((ld hl (+ ix n))    (ld l  (+ ix n)) (ld h  (+ ix (+ n 1))))
+    ((ld lde (+ ix n))   (ld de (+ ix n)) (ld l  (+ ix (+ n 2))))
+    ((ld hlde (+ ix n))  (ld de (+ ix n)) (ld hl (+ ix (+ n 2))))
+
     ((ld b iyh)        (db #xfd #b01000100))
     ((ld b iyl)        (db #xfd #b01000101))
     ((ld c iyh)        (db #xfd #b01001100))
