@@ -5,7 +5,7 @@
     (import
       (asm lang)
       (asm ops)
-      (asm z80)
+      (asm z80-cspect)
       (asm z80-blocks)
       (asm run)
       (asm make-dot)))

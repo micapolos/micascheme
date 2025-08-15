@@ -43,8 +43,6 @@
     swapnib
     mul
 
-    break exit
-
     rcf)
 
   (import
@@ -998,9 +996,5 @@
 
     ; Helpers
     ((rcf)             (or a))
-
-    ; CSpect
-    ((break)           (db #xfd #x00))
-    ((exit)            (db #xdd #x00))
   )
 )
