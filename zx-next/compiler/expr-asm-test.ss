@@ -1,0 +1,15 @@
+(import (zx-next compiler expr-asm))
+
+(check-expr->asm
+  ((lhde)
+    (0 #f (call write-char)
+      (1 #t (add l)
+        (1 #t (ld a #x12))
+        (1 #t (ld a #x13)))))
+  (()
+    (push lhde)
+    (ld a #x13)
+    (ld l a)
+    (ld a #x12)
+    (add l)
+    (call write-char)))
