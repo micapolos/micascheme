@@ -1,4 +1,4 @@
-(library (zx-next compiler named-indexed)
+/(library (zx-next compiler named-indexed)
   (export
     lets indexed
     named->indexed
