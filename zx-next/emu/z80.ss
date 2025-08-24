@@ -1,82 +1,99 @@
 (library (zx-next emu z80)
-  (export make-z80 make-dispatch-table)
+  (export
+    make-z80
+    z80-af
+    z80-bc
+    z80-de
+    z80-hl
+    z80-ix
+    z80-iy
+    z80-pc
+    z80-sp
+
+    z80-a
+    z80-f
+    z80-b
+    z80-c
+    z80-d
+    z80-e
+    z80-h
+    z80-l
+
+    set-z80-af!
+    set-z80-bc!
+    set-z80-de!
+    set-z80-hl!
+    set-z80-ix!
+    set-z80-iy!
+    set-z80-pc!
+    set-z80-sp!
+
+    set-z80-a!
+    set-z80-f!
+    set-z80-b!
+    set-z80-c!
+    set-z80-d!
+    set-z80-e!
+    set-z80-h!
+    set-z80-l!)
+
   (import (micascheme))
 
-  (define-record z80
-    (
-      (immutable regs)
-      (immutable mem-ref-proc)
-      (immutable mem-set!-proc)
-      (immutable io-ref-proc)
-      (immutable io-set!-proc)))
+  (define-syntax (hi-offset $syntax)
+    (syntax-case $syntax (hi-offset)
+      (hi-offset (if (symbol=? (native-endianness) (endianness little)) #'1 #'0))))
 
-  (define-syntax (z80-af z80) (u16-ref (+ z80 #x00)))
-  (define-syntax (z80-bc z80) (u16-ref (+ z80 #x02)))
-  (define-syntax (z80-de z80) (u16-ref (+ z80 #x04)))
-  (define-syntax (z80-hl z80) (u16-ref (+ z80 #x06)))
+  (define-syntax (lo-offset $syntax)
+    (syntax-case $syntax (lo-offset)
+      (lo-offset (if (symbol=? (native-endianness) (endianness little)) #'0 #'1))))
 
-  (define-syntax (z80-af2 z80) (u16-ref (+ z80 #x08)))
-  (define-syntax (z80-bc2 z80) (u16-ref (+ z80 #x0a)))
-  (define-syntax (z80-de2 z80) (u16-ref (+ z80 #x0c)))
-  (define-syntax (z80-hl2 z80) (u16-ref (+ z80 #x0e)))
+  (define-rules-syntaxes
+    ((make-z80)                   (make-bytevector #x20 0))
 
-  (define-syntax (z80-ix z80) (u16-ref (+ z80 #x10)))
-  (define-syntax (z80-iy z80) (u16-ref (+ z80 #x12)))
-  (define-syntax (z80-sp z80) (u16-ref (+ z80 #x14)))
-  (define-syntax (z80-pc z80) (u16-ref (+ z80 #x16)))
+    ((z80-16 z80 offset)          (bytevector-u16-native-ref z80 offset))
+    ((set-z80-16! z80 offset u16) (bytevector-u16-native-set z80 offset u16))
 
-  (define-syntax (z80-mem-ref  z80 addr)    ((ref (u16-ref (+ z80 #x18))) addr))
-  (define-syntax (z80-mem-set! z80 addr u8) ((ref (u16-ref (+ z80 #x1a))) addr u8))
-  (define-syntax (z80-io-ref   z80 port)    ((ref (u16-ref (+ z80 #x1c))) port))
-  (define-syntax (z80-io-set!  z80 port u8) ((ref (u16-ref (+ z80 #x1e))) port u8))
+    ((z80-hi z80 offset)          (bytevector-u8-ref z80 (+ offset hi-offset)))
+    ((z80-lo z80 offset)          (bytevector-u8-ref z80 (+ offset lo-offset)))
 
-  (define-syntax (make-dispatch-table $syntax)
-    (syntax-case $syntax ()
-      ((_ z80)
-        (let ()
-          (define $vector (make-vector 256 #'(lambda () (void))))
-          (define (reg-index $reg)
-            (case (native-endianness)
-              ((little)
-                (case $reg
-                  ((0) 3)
-                  ((1) 2)
-                  ((2) 5)
-                  ((3) 4)
-                  ((4) 7)
-                  ((5) 6)
-                  ((6) 0)
-                  ((7) 1)))
-              ((big)
-                (case $reg
-                  ((0) 2)
-                  ((1) 3)
-                  ((2) 4)
-                  ((3) 5)
-                  ((4) 6)
-                  ((5) 7)
-                  ((6) 1)
-                  ((7) 0)))))
-          (repeat-indexed (r1 8)
-            (repeat-indexed (r2 8)
-              (vector-set! $vector
-                (fxior (fxsll #b10 6) (fxsll r1 3) r2)
-                #`(lambda ()
-                  (bytevector-u8-set! $regs #,(reg-index r1)
-                    (bytevector-u8-ref $regs #,(reg-index r2)))))))
-          #`(lets
-            ($z80 z80)
-            ($regs (z80-regs $z80))
-            ($mem-ref (z80-mem-ref-proc $z80))
-            (immutable-vector #,@(vector->list $vector)))))))
+    ((set-z80-hi! z80 offset u8) (bytevector-u8-set! z80 (+ offset hi-offset) u8))
+    ((set-z80-lo! z80 offset u8) (bytevector-u8-set! z80 (+ offset lo-offset) u8))
 
-  (define-syntax (u8-ref $syntax)
-    (syntax-case $syntax ()
-      ((u8-ref offset)
-        #`(bytevector-u8-ref #,(datum->syntax #'u8-ref 'mem) offset))))
+    ((z80-af z80)  (z80-16 z80 #x00))
+    ((z80-bc z80)  (z80-16 z80 #x02))
+    ((z80-de z80)  (z80-16 z80 #x04))
+    ((z80-hl z80)  (z80-16 z80 #x06))
 
-  (define-syntax (u8-set! $syntax)
-    (syntax-case $syntax ()
-      ((u8-set! offset value)
-        #`(bytevector-u8-set! #,(datum->syntax #'u8-set! 'mem) offset value))))
+    ((z80-ix z80)  (z80-16 z80 #x10))
+    ((z80-iy z80)  (z80-16 z80 #x12))
+    ((z80-pc z80)  (z80-16 z80 #x14))
+    ((z80-sp z80)  (z80-16 z80 #x16))
+
+    ((set-z80-af! z80 u16)  (set-z80-16! z80 #x00 u16))
+    ((set-z80-bc! z80 u16)  (set-z80-16! z80 #x02 u16))
+    ((set-z80-de! z80 u16)  (set-z80-16! z80 #x04 u16))
+    ((set-z80-hl! z80 u16)  (set-z80-16! z80 #x06 u16))
+
+    ((set-z80-ix! z80 u16)  (set-z80-16! z80 #x10 u16))
+    ((set-z80-iy! z80 u16)  (set-z80-16! z80 #x12 u16))
+    ((set-z80-pc! z80 u16)  (set-z80-16! z80 #x14 u16))
+    ((set-z80-sp! z80 u16)  (set-z80-16! z80 #x16 u16))
+
+    ((z80-a z80)   (z80-hi z80 #x00))
+    ((z80-f z80)   (z80-lo z80 #x00))
+    ((z80-b z80)   (z80-hi z80 #x02))
+    ((z80-c z80)   (z80-lo z80 #x02))
+    ((z80-d z80)   (z80-hi z80 #x04))
+    ((z80-e z80)   (z80-hi z80 #x04))
+    ((z80-h z80)   (z80-lo z80 #x06))
+    ((z80-l z80)   (z80-hi z80 #x06))
+
+    ((set-z80-a! z80 u8)  (set-z80-hi! z80 #x00 u8))
+    ((set-z80-f! z80 u8)  (set-z80-lo! z80 #x00 u8))
+    ((set-z80-b! z80 u8)  (set-z80-hi! z80 #x02 u8))
+    ((set-z80-c! z80 u8)  (set-z80-lo! z80 #x02 u8))
+    ((set-z80-d! z80 u8)  (set-z80-hi! z80 #x04 u8))
+    ((set-z80-e! z80 u8)  (set-z80-hi! z80 #x04 u8))
+    ((set-z80-h! z80 u8)  (set-z80-lo! z80 #x06 u8))
+    ((set-z80-l! z80 u8)  (set-z80-hi! z80 #x06 u8)))
 )

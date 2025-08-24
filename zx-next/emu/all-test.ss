@@ -1,4 +1,4 @@
 (import (micascheme))
 
 (test
-  (zx-next emu runtime))
+  (zx-next emu z80))
