@@ -44,8 +44,16 @@
             (%%define-fragment #,$tmp (%%dz #,(symbol->string (datum s))))
             (%%load-value (%%symbol-value #,$tmp)))))
       ((x . xs)
-        (compile-op (empty-lookup)
-          #'(%cons (%quote x) (%quote xs))))))
+        (syntax-case (compile-quote #'xs) (begin)
+          ((begin def-b ... body-b)
+            (syntax-case (compile-quote #'x) (begin)
+              ((begin def-a ... body-a)
+                #`(begin def-a ... def-b ...
+                  (%%begin
+                    body-b
+                    (%%push-top)
+                    body-a
+                    (%%cons))))))))))
 
   (define (compile-op $lookup $syntax)
     (syntax-case $syntax
