@@ -1,3 +1,4 @@
+#!chezscheme
 (library (fib)
   (export fib fxfib fx3fib flfib flsinglefib)
   (import (micascheme))
@@ -17,11 +18,11 @@
         (fxfib (fx-/wraparound n 1)))))
 
   (define (fx3fib n)
-    (if (($primitive 3 fx<) n 2)
+    (if (#3%fx< n 2)
       n
-      (($primitive 3 fx+/wraparound)
-        (fxfib (($primitive 3 fx-/wraparound) n 2))
-        (fxfib (($primitive 3 fx-/wraparound) n 1)))))
+      (#3%fx+/wraparound
+        (fxfib (#3%fx-/wraparound n 2))
+        (fxfib (#3%fx-/wraparound n 1)))))
 
   (define (flfib n)
     (if (fl< n 2.0)

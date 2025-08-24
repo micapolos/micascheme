@@ -1,3 +1,4 @@
+#!chezscheme
 (import
   (zx-next scheme demo)
   (prefix (zx-next write) %))
@@ -5,7 +6,7 @@
 (demo
   (asm (%writeln "This is from asm..."))
   (put-string "...and this is from Scheme\r")
-  (write ($primitive byte-zero))
+  (write #%byte-zero)
   (put-char #\return)
   (write
     (if (cons 1 2)

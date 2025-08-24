@@ -1,3 +1,4 @@
+#!chezscheme
 (import (scheme) (check) (blob) (syntax) (lets) (procedure))
 
 (check (blob? (blob 0 (lambda ($port) (void)))))
@@ -56,4 +57,4 @@
 
 (check-datum=?
   (blob->syntax (u8-blob 1 2 3))
-  '(bytevector->blob (($primitive 3 bytevector) 1 2 3)))
+  '(bytevector->blob (#3%bytevector 1 2 3)))
