@@ -37,4 +37,6 @@
   (write (cons #\a (cons "foo" 'bar)))
   (put-char #\return)
   (write (cons #\a (cons "foo" (cons 'bar '()))))
+  (put-char #\return)
+  (write '(circle (name "foo") (radius 10) (center (point (x 10) (y 20)))))
   (put-char #\return))

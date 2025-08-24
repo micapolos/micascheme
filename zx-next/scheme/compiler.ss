@@ -4,6 +4,7 @@
     check-compile-op)
   (import
     (micascheme)
+    (syntax lookup)
     (u)
     (prefix (zx-next scheme keywords) %)
     (prefix (zx-next core) %%)
@@ -11,19 +12,9 @@
     (prefix (zx-next scheme prims) %%)
     (prefix (zx-next scheme write) %%))
 
-  (define (compile-op $lookup $syntax)
-    (syntax-case $syntax
-      (
-        %asm
-        %begin %quote %throw
-        %null? %void? %boolean? %byte? %word? %char? %symbol? %string? %pair?
-        %void %box %cons %car %cdr
-        %write
-        %put-char %put-string
-        %if %when)
-      ((%asm op ...)
-        #`(begin (%%begin op ...)))
-      ((%quote ())
+  (define (compile-quote $syntax)
+    (syntax-case $syntax ()
+      (()
         #`(begin (%%load-value (%%null-value))))
       (n
         (u8? (datum n))
@@ -45,13 +36,51 @@
           #`(begin
             (%%define-fragment #,$tmp (%%dz s))
             (%%load-value (%%string-value #,$tmp)))))
-      ((%quote s)
+      (s
         (symbol? (datum s))
         (lets
           ($tmp (generate-identifier #'$symbol))
           #`(begin
             (%%define-fragment #,$tmp (%%dz #,(symbol->string (datum s))))
             (%%load-value (%%symbol-value #,$tmp)))))
+      ((x . xs)
+        (compile-op (empty-lookup)
+          #'(%cons (%quote x) (%quote xs))))))
+
+  (define (compile-op $lookup $syntax)
+    (syntax-case $syntax
+      (
+        %asm
+        %begin %quote %throw
+        %null? %void? %boolean? %byte? %word? %char? %symbol? %string? %pair?
+        %void %box %cons %car %cdr
+        %write
+        %put-char %put-string
+        %if %when)
+      ((%asm op ...)
+        #`(begin (%%begin op ...)))
+      ((%quote x)
+        (compile-quote #'x))
+      (n
+        (u8? (datum n))
+        #`(begin (%%load-value (%%byte-value n))))
+      (nn
+        (u16? (datum nn))
+        #`(begin (%%load-value (%%word-value nn))))
+      (#f
+        #`(begin (%%load-value (%%false-value))))
+      (#t
+        #`(begin (%%load-value (%%true-value))))
+      (ch
+        (char? (datum ch))
+        #`(begin (%%load-value (%%char-value ch))))
+      (s
+        (string? (datum s))
+        (lets
+          ($tmp (generate-identifier #'$string))
+          #`(begin
+            (%%define-fragment #,$tmp (%%dz s))
+            (%%load-value (%%string-value #,$tmp)))))
       ((%begin x ...)
         (syntax-case (map (partial compile-op $lookup) #'(x ...)) ()
           (((_ def ... op) ...)

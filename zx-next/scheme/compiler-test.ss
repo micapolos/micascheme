@@ -90,3 +90,86 @@
     (%%begin
       (%%load-value (%%byte-value #x12))
       (%%when-true (%%begin (%%load-value (%%byte-value #x13)))))))
+
+(check-compile-op (empty-lookup)
+  (%quote (circle (label "my circle") (radius 10) (center (point (x 10) (y 20)))))
+  (begin
+    (%%define-fragment $symbol_7 (%%dz "circle"))
+    (%%define-fragment $symbol_6 (%%dz "label"))
+    (%%define-fragment $string_5 (%%dz "my circle"))
+    (%%define-fragment $symbol_4 (%%dz "radius"))
+    (%%define-fragment $symbol_3 (%%dz "center"))
+    (%%define-fragment $symbol_2 (%%dz "point"))
+    (%%define-fragment $symbol_1 (%%dz "x"))
+    (%%define-fragment $symbol_0 (%%dz "y"))
+    (%%begin
+      (%%begin
+        (%%begin
+          (%%begin
+            (%%load-value (%%null-value))
+            (%%push-top)
+            (%%begin
+              (%%begin
+                (%%load-value (%%null-value))
+                (%%push-top)
+                (%%begin
+                  (%%begin
+                    (%%begin
+                      (%%load-value (%%null-value))
+                      (%%push-top)
+                      (%%begin
+                        (%%begin
+                          (%%load-value (%%null-value))
+                          (%%push-top)
+                          (%%load-value (%%byte-value 20))
+                          (%%cons))
+                        (%%push-top)
+                        (%%load-value (%%symbol-value $symbol_0))
+                        (%%cons))
+                      (%%cons))
+                    (%%push-top)
+                    (%%begin
+                      (%%begin
+                        (%%load-value (%%null-value))
+                        (%%push-top)
+                        (%%load-value (%%byte-value 10))
+                        (%%cons))
+                      (%%push-top)
+                      (%%load-value (%%symbol-value $symbol_1))
+                      (%%cons))
+                    (%%cons))
+                  (%%push-top)
+                  (%%load-value (%%symbol-value $symbol_2))
+                  (%%cons))
+                (%%cons))
+              (%%push-top)
+              (%%load-value (%%symbol-value $symbol_3))
+              (%%cons))
+            (%%cons))
+          (%%push-top)
+          (%%begin
+            (%%begin
+              (%%load-value (%%null-value))
+              (%%push-top)
+              (%%load-value (%%byte-value 10))
+              (%%cons))
+            (%%push-top)
+            (%%load-value (%%symbol-value $symbol_4))
+            (%%cons))
+          (%%cons))
+        (%%push-top)
+        (%%begin
+          (%%begin
+            (%%load-value (%%null-value))
+            (%%push-top)
+            (%%load-value (%%string-value $string_5))
+            (%%cons))
+          (%%push-top)
+          (%%load-value (%%symbol-value $symbol_6))
+          (%%cons))
+        (%%cons))
+      (%%push-top)
+      (%%load-value (%%symbol-value $symbol_7))
+      (%%cons))))
+
+
