@@ -47,14 +47,14 @@
     ((make-z80)                   (make-bytevector z80-size 0))
 
     (af-offset #x00)
-    (bc-offset #x02)
-    (de-offset #x04)
-    (hl-offset #x06)
+    (hl-offset #x02)
+    (bc-offset #x04)
+    (de-offset #x06)
 
     (af2-offset #x08)
-    (bc2-offset #x0a)
-    (de2-offset #x0c)
-    (hl2-offset #x0e)
+    (hl2-offset #x0a)
+    (bc2-offset #x0c)
+    (de2-offset #x0e)
 
     (ix-offset #x10)
     (iy-offset #x12)
