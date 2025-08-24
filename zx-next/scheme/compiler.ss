@@ -61,26 +61,9 @@
         #`(begin (%%begin op ...)))
       ((%quote x)
         (compile-quote #'x))
-      (n
-        (u8? (datum n))
-        #`(begin (%%load-value (%%byte-value n))))
-      (nn
-        (u16? (datum nn))
-        #`(begin (%%load-value (%%word-value nn))))
-      (#f
-        #`(begin (%%load-value (%%false-value))))
-      (#t
-        #`(begin (%%load-value (%%true-value))))
-      (ch
-        (char? (datum ch))
-        #`(begin (%%load-value (%%char-value ch))))
-      (s
-        (string? (datum s))
-        (lets
-          ($tmp (generate-identifier #'$string))
-          #`(begin
-            (%%define-fragment #,$tmp (%%dz s))
-            (%%load-value (%%string-value #,$tmp)))))
+      (x
+        ((or? u8? u16? boolean? char? string?) (datum x))
+        (compile-quote #'x))
       ((%begin x ...)
         (syntax-case (map (partial compile-op $lookup) #'(x ...)) ()
           (((_ def ... op) ...)
