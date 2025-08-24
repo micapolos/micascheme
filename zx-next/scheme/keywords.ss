@@ -6,7 +6,8 @@
     box cons car cdr
     write
     put-char put-string
-    if when)
+    if when
+    $primitive)
   (import (only (micascheme) define-keywords))
 
   (define-keywords
@@ -16,5 +17,6 @@
     box cons car cdr
     write
     put-char put-string
-    if when)
+    if when
+    $primitive)
 )

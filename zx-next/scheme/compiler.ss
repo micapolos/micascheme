@@ -64,9 +64,12 @@
         %void %box %cons %car %cdr
         %write
         %put-char %put-string
-        %if %when)
+        %if %when %$primitive)
       ((%asm op ...)
         #`(begin (%%begin op ...)))
+      ((%$primitive x)
+        (identifier? #'x)
+        ($lookup #'x))
       ((%quote x)
         (compile-quote #'x))
       (x
