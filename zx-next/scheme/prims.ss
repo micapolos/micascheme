@@ -8,6 +8,7 @@
 
     push-value
     push-top
+    pop-top
 
     unsafe-add-byte-value
     unsafe-add-word-value
@@ -204,6 +205,10 @@
   (define-op (push-top)
     (push de)
     (push hl))
+
+  (define-op (pop-top)
+    (pop hl)
+    (pop de))
 
   (define-op (if-true true-op false-op)
     (ld a h)

@@ -135,16 +135,14 @@
     (preserve (de hl)
       (null?)
       (when-true
-        (pop hl)
-        (pop de)
+        (pop-top)
         (write-close)
         (ret)))
     (preserve (de hl)
       (pair?)
       (when-true
         (write-space)
-        (pop hl)
-        (pop de)
+        (pop-top)
         (jp write-pair-body-proc)))
     (preserve (de hl)
       (write-space)
