@@ -5,6 +5,10 @@
     z80-bc
     z80-de
     z80-hl
+    z80-af2
+    z80-bc2
+    z80-de2
+    z80-hl2
     z80-ix
     z80-iy
     z80-pc
@@ -43,6 +47,33 @@
     (hi-offset (if (symbol=? (native-endianness) (endianness little)) #'1 #'0))
     (lo-offset (if (symbol=? (native-endianness) (endianness little)) #'0 #'1)))
 
+  (define-case-syntaxes
+    ((define-r id offset)
+      #`(define-rules-syntaxes
+        ((#,(identifier-append #'id #'z80- #'id) z80)
+          (bytevector-u8-ref z80 offset))
+        ((#,(identifier-append #'id #'set-z80- #'id #'!) z80 u8)
+          (bytevector-u8-set! z80 u8 offset))))
+    ((define-rr id offset)
+      #`(define-rules-syntaxes
+        ((#,(identifier-append #'id #'z80- #'id) z80)
+          (bytevector-u16-native-ref z80 offset))
+        ((#,(identifier-append #'id #'set-z80- #'id #'!) z80 u16)
+          (bytevector-u16-native-set! z80 u16 offset))))
+    ((define-rr+alt id offset)
+      #`(begin
+        (define-rr id offset)
+        (define-rr #,(identifier-append #'id #'id (datum->syntax #'id (string->symbol "2"))) #,(+ (datum offset) 8)))))
+
+  (define-rr+alt af #x00)
+  (define-rr+alt bc #x02)
+  (define-rr+alt de #x04)
+  (define-rr+alt hl #x06)
+  (define-rr ix #x10)
+  (define-rr iy #x12)
+  (define-rr pc #x14)
+  (define-rr sp #x16)
+
   (define-rules-syntaxes
     ((make-z80)                   (make-bytevector z80-size 0))
 
@@ -71,26 +102,6 @@
 
     ((set-z80-hi! z80 offset u8) (bytevector-u8-set! z80 (+ offset hi-offset) u8))
     ((set-z80-lo! z80 offset u8) (bytevector-u8-set! z80 (+ offset lo-offset) u8))
-
-    ((z80-af z80)  (z80-16 z80 af-offset))
-    ((z80-bc z80)  (z80-16 z80 bc-offset))
-    ((z80-de z80)  (z80-16 z80 de-offset))
-    ((z80-hl z80)  (z80-16 z80 hl-offset))
-
-    ((z80-ix z80)  (z80-16 z80 ix-offset))
-    ((z80-iy z80)  (z80-16 z80 iy-offset))
-    ((z80-pc z80)  (z80-16 z80 pc-offset))
-    ((z80-sp z80)  (z80-16 z80 sp-offset))
-
-    ((set-z80-af! z80 u16)  (set-z80-16! z80 af-offset u16))
-    ((set-z80-bc! z80 u16)  (set-z80-16! z80 bc-offset u16))
-    ((set-z80-de! z80 u16)  (set-z80-16! z80 de-offset u16))
-    ((set-z80-hl! z80 u16)  (set-z80-16! z80 hl-offset u16))
-
-    ((set-z80-ix! z80 u16)  (set-z80-16! z80 ix-offset u16))
-    ((set-z80-iy! z80 u16)  (set-z80-16! z80 iy-offset u16))
-    ((set-z80-pc! z80 u16)  (set-z80-16! z80 pc-offset u16))
-    ((set-z80-sp! z80 u16)  (set-z80-16! z80 sp-offset u16))
 
     ((z80-a z80)   (z80-hi z80 af-offset))
     ((z80-f z80)   (z80-lo z80 af-offset))
