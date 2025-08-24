@@ -69,7 +69,7 @@
         #`(begin (%%begin op ...)))
       ((%$primitive x)
         (identifier? #'x)
-        ($lookup #'x))
+        #`(begin #,($lookup #'x)))
       ((%quote x)
         (compile-quote #'x))
       (x
