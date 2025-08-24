@@ -1,7 +1,6 @@
 (import (micascheme) (zx-next emu runtime))
 
-(define mem (make-bytevector 4 0))
-(define fmem (immutable-vector "foo" "bar" string-append))
+(define-runtime 4 "foo" "bar" string-append)
 
 (check (equal? (u8-ref 0) 0))
 (check (equal? (u8-ref 1) 0))

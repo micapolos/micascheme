@@ -10,6 +10,26 @@
       (immutable io-ref-proc)
       (immutable io-set!-proc)))
 
+  (define-syntax (z80-af z80) (u16-ref (+ z80 #x00)))
+  (define-syntax (z80-bc z80) (u16-ref (+ z80 #x02)))
+  (define-syntax (z80-de z80) (u16-ref (+ z80 #x04)))
+  (define-syntax (z80-hl z80) (u16-ref (+ z80 #x06)))
+
+  (define-syntax (z80-af2 z80) (u16-ref (+ z80 #x08)))
+  (define-syntax (z80-bc2 z80) (u16-ref (+ z80 #x0a)))
+  (define-syntax (z80-de2 z80) (u16-ref (+ z80 #x0c)))
+  (define-syntax (z80-hl2 z80) (u16-ref (+ z80 #x0e)))
+
+  (define-syntax (z80-ix z80) (u16-ref (+ z80 #x10)))
+  (define-syntax (z80-iy z80) (u16-ref (+ z80 #x12)))
+  (define-syntax (z80-sp z80) (u16-ref (+ z80 #x14)))
+  (define-syntax (z80-pc z80) (u16-ref (+ z80 #x16)))
+
+  (define-syntax (z80-mem-ref  z80 addr)    ((ref (u16-ref (+ z80 #x18))) addr))
+  (define-syntax (z80-mem-set! z80 addr u8) ((ref (u16-ref (+ z80 #x1a))) addr u8))
+  (define-syntax (z80-io-ref   z80 port)    ((ref (u16-ref (+ z80 #x1c))) port))
+  (define-syntax (z80-io-set!  z80 port u8) ((ref (u16-ref (+ z80 #x1e))) port u8))
+
   (define-syntax (make-dispatch-table $syntax)
     (syntax-case $syntax ()
       ((_ z80)

@@ -1,5 +1,7 @@
 (library (zx-next emu runtime)
   (export
+    define-runtime
+
     u8-ref u16-ref u32-ref
     u8-set! u16-set! u32-set!
     u16-lo-ref u16-hi-ref
@@ -8,6 +10,12 @@
   (import (micascheme))
 
   (define-case-syntaxes
+    ((define-runtime size f ...)
+      (with-implicit (define-runtime mem fmem)
+        #`(begin
+          (define mem (make-bytevector size 0))
+          (define fmem (immutable-vector f ...)))))
+
     ((u8-ref address)
       (with-implicit (u8-ref mem)
         #'(bytevector-u8-ref mem address)))
