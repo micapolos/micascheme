@@ -4,7 +4,7 @@
     u8-set! u16-set! u32-set!
     u16-lo-ref u16-hi-ref
 
-    call)
+    ref)
   (import (micascheme))
 
   (define-case-syntaxes
@@ -51,8 +51,8 @@
       (with-implicit (u16-lo-ref mem)
         #'(bytevector-u8-ref mem (+ address (if (symbol=? (native-endianness) (endianness little)) 0 1)))))
 
-    ((call index arg ...)
-      (with-implicit (call fmem)
-        #'((vector-ref fmem index) arg ...)))
+    ((ref index)
+      (with-implicit (ref fmem)
+        #'(vector-ref fmem index)))
   )
 )
