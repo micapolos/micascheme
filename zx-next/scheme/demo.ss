@@ -6,7 +6,10 @@
     (prefix (zx-next scheme keywords) %)
     (prefix (zx-next demo) %%)
     (prefix (zx-next throw) %%))
-  (export (import (zx-next scheme keywords)))
+  (export
+    (import
+      (zx-next scheme keywords)
+      (zx-next scheme primitives)))
 
   (define-syntax (demo $syntax $lookup)
     (syntax-case $syntax ()

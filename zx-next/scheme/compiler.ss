@@ -1,8 +1,7 @@
 (library (zx-next scheme compiler)
   (export
     compile-op
-    check-compile-op
-    define-primitive)
+    check-compile-op)
   (import
     (micascheme)
     (syntax lookup)
@@ -55,10 +54,6 @@
                     (%%push-top)
                     body-a
                     (%%cons))))))))))
-
-  (define-rule-syntax (define-primitive id x)
-    (define-syntax id
-      (make-compile-time-value #'x)))
 
   (define (compile-op $lookup $syntax)
     (syntax-case $syntax
