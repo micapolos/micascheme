@@ -44,7 +44,7 @@
     (lo-offset (if (symbol=? (native-endianness) (endianness little)) #'0 #'1)))
 
   (define-rules-syntaxes
-    ((make-z80)                   (make-bytevector #x20 0))
+    ((make-z80)                   (make-bytevector z80-size 0))
 
     (af-offset #x00)
     (bc-offset #x02)
@@ -60,6 +60,8 @@
     (iy-offset #x12)
     (pc-offset #x14)
     (sp-offset #x16)
+
+    (z80-size #x18)
 
     ((z80-16 z80 offset)          (bytevector-u16-native-ref z80 offset))
     ((set-z80-16! z80 offset u16) (bytevector-u16-native-set z80 offset u16))
