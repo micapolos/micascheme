@@ -6,7 +6,7 @@
 (demo
   (asm (%writeln "This is from asm..."))
   (put-string "...and this is from Scheme\r")
-  (write #%byte-zero)
+  (write (#%%%cons 0 1))
   (put-char #\return)
   (write
     (if (cons 1 2)

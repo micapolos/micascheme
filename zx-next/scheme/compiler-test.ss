@@ -5,10 +5,14 @@
   (prefix (zx-next scheme keywords) %)
   (prefix (zx-next scheme prims) %%))
 
-(check-compile-op
-  (lookup-with (byte-zero #'(%%load-value (%%byte-value 0))))
-  (%$primitive byte-zero)
-  (begin (%%load-value (%%byte-value 0))))
+(check-compile-op (empty-lookup)
+  ((%$primitive %cons) #x12 #f)
+  (begin
+    (%%begin
+      (%%load-value (%%false-value))
+      (%%push-top)
+      (%%load-value (%%byte-value 18))
+      (%cons))))
 
 (check-compile-op (empty-lookup)
   (%asm (%%inc %%a) (%%ret))

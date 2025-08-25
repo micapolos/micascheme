@@ -96,10 +96,6 @@
     throw-tc
     throw-proc
 
-    unsafe-apply
-    unsafe-apply-tc
-    unsafe-apply-proc
-
     if-true when-true)
   (import
     (zx-next core)
@@ -382,8 +378,4 @@
     (pop af)
     (push bc) ; return address
     (ret))
-
-  (define-proc (unsafe-apply)
-    (pointer-ref de hl)
-    (jp (hl)))
 )

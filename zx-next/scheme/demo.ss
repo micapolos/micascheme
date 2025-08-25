@@ -9,7 +9,7 @@
   (export
     (import
       (zx-next scheme keywords)
-      (zx-next scheme primitives)))
+      (prefix (zx-next scheme prims) %%)))
 
   (define-syntax (demo $syntax $lookup)
     (syntax-case $syntax ()
