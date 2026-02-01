@@ -6,7 +6,7 @@
     arrow arrow? arrow-in arrow-out
     typed typed? typed-type typed-ref
     parse evaluate
-    inc)
+    inc add)
   (import (micascheme))
 
   (data a-type)
@@ -19,6 +19,7 @@
   (define evaluate-environment (environment '(micascheme) '(micalang idris)))
 
   (define (inc x) (+ x 1))
+  (define (add x) (lambda (y) (+ x y)))
 
   (define (index? $obj)
     (nonnegative-integer? $obj))
@@ -50,7 +51,7 @@
       ((else $ass) (cdr $ass))))
 
   (define (parse $env $term)
-    (syntax-case $term (type index string arrow inc switch lambda)
+    (syntax-case $term (type index string arrow inc add switch lambda)
       (type
         (typed a-type a-type))
       (index
@@ -70,6 +71,8 @@
         (typed a-string (datum s)))
       (inc
         (typed (arrow an-index an-index) 'inc))
+      (add
+        (typed (arrow an-index (arrow an-index an-index)) 'add))
       ((switch idx branch ... default)
         (lets
           ($index (parse-typed $env an-index #'idx))

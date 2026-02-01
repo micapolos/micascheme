@@ -47,6 +47,16 @@
 
 (check
   (equal?
+    (parse '() 'add)
+    (typed (arrow an-index (arrow an-index an-index)) 'add)))
+
+(check
+  (equal?
+    (parse '() '((add 2) 3))
+    (typed an-index '((add 2) 3))))
+
+(check
+  (equal?
     (parse '() '(switch (inc 0) "foo" "bar"))
     (typed a-string '(index-switch (inc 0) "foo" "bar"))))
 
