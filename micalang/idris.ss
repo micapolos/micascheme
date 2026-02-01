@@ -3,7 +3,7 @@
     a-type a-type?
     an-index an-index?
     a-string a-string?
-    forall forall? forall-in forall-out
+    arrow arrow? arrow-in arrow-out
     typed typed? typed-type typed-ref
     parse evaluate
     inc)
@@ -12,7 +12,7 @@
   (data a-type)
   (data an-index)
   (data a-string)
-  (data (forall in out))
+  (data (arrow in out))
 
   (data (typed type ref))
 
@@ -45,16 +45,16 @@
         (syntax-error $term "invalid type"))))
 
   (define (parse $env $term)
-    (syntax-case $term (type index string forall inc switch var lambda)
+    (syntax-case $term (type index string arrow inc switch var lambda)
       (type
         (typed a-type a-type))
       (index
         (typed a-type an-index))
       (string
         (typed a-type a-string))
-      ((forall in out)
+      ((arrow in out)
         (typed a-type
-          (forall
+          (arrow
             (parse-typed $env a-type #'in)
             (parse-typed $env a-type #'out))))
       (n
@@ -64,7 +64,7 @@
         (string? (datum s))
         (typed a-string (datum s)))
       (inc
-        (typed (forall an-index an-index) 'inc))
+        (typed (arrow an-index an-index) 'inc))
       ((switch idx branch ... default)
         (lets
           ($index (parse-typed $env an-index #'idx))
@@ -89,20 +89,20 @@
               (env->var $env)))
           ($typed-out (parse (cons $typed-var $env) #'out))
           (typed
-            (forall (typed-type $typed-var) (typed-type $typed-out))
+            (arrow (typed-type $typed-var) (typed-type $typed-out))
             `(lambda (,(typed-ref $typed-var)) ,(typed-ref $typed-out)))))
       ((fn arg)
         (lets
           ($typed-fn (parse $env #'fn))
           ($typed-arg (parse $env #'arg))
           (switch (typed-type $typed-fn)
-            ((forall? $forall)
-              (if (equal? (forall-in $forall) (typed-type $typed-arg))
+            ((arrow? $arrow)
+              (if (equal? (arrow-in $arrow) (typed-type $typed-arg))
                 (typed
-                  (forall-out $forall)
+                  (arrow-out $arrow)
                   `(,(typed-ref $typed-fn) ,(typed-ref $typed-arg)))
                 (syntax-error #'arg "invalid type")))
             ((else $other)
-              (syntax-error #'fn "not forall")))))
+              (syntax-error #'fn "not arrow")))))
       (_ (syntax-error $term))))
 )
