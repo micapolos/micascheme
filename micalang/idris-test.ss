@@ -4,37 +4,40 @@
 
 (check
   (equal?
-    (normalize (list) (native "foo") 1)
+    (normalize (list) (native "foo"))
     (native "foo")))
 
 (check
   (equal?
-    (normalize (list (native "foo") hole (native "bar")) (variable 0) 1)
+    (normalize (list (native "foo") hole (native "bar")) (variable 0))
     (native "foo")))
 
 (check
   (equal?
-    (normalize (list (native "foo") hole (native "bar")) (variable 1) 1)
-    (variable 0)))
+    (normalize (list (native "foo") hole (native "bar")) (variable 1))
+    (variable 1)))
 
 (check
   (equal?
-    (normalize (list (native "foo") hole (native "bar")) (variable 2) 1)
+    (normalize (list (native "foo") hole (native "bar")) (variable 2))
     (native "bar")))
 
 (check
   (equal?
-    (normalize (list) (application (abstraction (variable 0)) (native "foo")) 0)
+    (normalize (list)
+      (application (abstraction (variable 0)) (native "foo")))
     (native "foo")))
 
 (check
   (equal?
-    (normalize (list) (abstraction (application (abstraction (variable 0)) (native "foo"))) 0)
+    (normalize (list)
+      (abstraction (application (abstraction (variable 0)) (native "foo"))))
     (abstraction (native "foo"))))
 
 (check
   (equal?
-    (normalize (list) (abstraction (application (abstraction (variable 0)) (variable 0))) 0)
+    (normalize (list)
+      (abstraction (application (abstraction (variable 0)) (variable 0))))
     (abstraction (variable 0))))
 
 ; === parse
