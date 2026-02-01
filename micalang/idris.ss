@@ -50,7 +50,7 @@
       ((else $ass) (cdr $ass))))
 
   (define (parse $env $term)
-    (syntax-case $term (type index string arrow inc switch var lambda)
+    (syntax-case $term (type index string arrow inc switch lambda)
       (type
         (typed a-type a-type))
       (index
