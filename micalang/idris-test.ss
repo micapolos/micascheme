@@ -52,25 +52,25 @@
 
 (check
   (equal?
-    (parse (list (typed an-index 'x)) '(var 0))
+    (parse (list (cons 'x an-index)) 'x)
     (typed an-index 'x)))
 
 (check
   (equal?
-    (parse (list (typed an-index 'x) (typed a-string 'y)) '(var 0))
+    (parse (list (cons 'x an-index) (cons 'y a-string)) 'x)
     (typed an-index 'x)))
 
 (check
   (equal?
-    (parse (list (typed an-index 'x) (typed a-string 'y)) '(var 1))
+    (parse (list (cons 'x an-index) (cons 'y a-string)) 'y)
     (typed a-string 'y)))
 
 (check
   (equal?
-    (parse '() '(lambda index (inc (var 0))))
-    (typed (arrow an-index an-index) '(lambda (v0) (inc v0)))))
+    (parse '() '(lambda (x index) (inc x)))
+    (typed (arrow an-index an-index) '(lambda (x) (inc x)))))
 
 (check
   (equal?
-    (parse '() '((lambda index (inc (var 0))) 10))
-    (typed an-index '((lambda (v0) (inc v0)) 10))))
+    (parse '() '((lambda (x index) (inc x)) 10))
+    (typed an-index '((lambda (x) (inc x)) 10))))

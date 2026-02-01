@@ -44,6 +44,11 @@
         (typed-ref $typed)
         (syntax-error $term "invalid type"))))
 
+  (define (env-ref $env $symbol)
+    (switch (assq $symbol $env)
+      ((false? _) (syntax-error $symbol "undefined"))
+      ((else $ass) (cdr $ass))))
+
   (define (parse $env $term)
     (syntax-case $term (type index string arrow inc switch var lambda)
       (type
@@ -73,24 +78,15 @@
           (typed
             (typed-type $typed-default)
             `(index-switch ,$index ,@$branches ,(typed-ref $typed-default)))))
-      ((var n)
-        (switch (datum n)
-          ((index? $index)
-            (or
-              (list-ref? $env $index)
-              (syntax-error $term "undefined")))
-          ((else $other)
-            (syntax-error $term))))
-      ((lambda in out)
+      ((lambda (id typ) out)
+        (symbol? (datum id))
         (lets
-          ($typed-var
-            (typed
-              (parse-typed $env a-type #'in)
-              (env->var $env)))
-          ($typed-out (parse (cons $typed-var $env) #'out))
+          ($id (datum id))
+          ($type (parse-typed $env a-type #'typ))
+          ($typed-out (parse (cons (cons $id $type) $env) #'out))
           (typed
-            (arrow (typed-type $typed-var) (typed-type $typed-out))
-            `(lambda (,(typed-ref $typed-var)) ,(typed-ref $typed-out)))))
+            (arrow $type (typed-type $typed-out))
+            `(lambda (,$id) ,(typed-ref $typed-out)))))
       ((fn arg)
         (lets
           ($typed-fn (parse $env #'fn))
@@ -104,5 +100,8 @@
                 (syntax-error #'arg "invalid type")))
             ((else $other)
               (syntax-error #'fn "not arrow")))))
+      (s
+        (symbol? (datum s))
+        (typed (env-ref $env (datum s)) (datum s)))
       (_ (syntax-error $term))))
 )
