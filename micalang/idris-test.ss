@@ -17,8 +17,8 @@
 
 (check
   (equal?
-    (parse '() '(arrow index string))
-    (typed a-type '(arrow an-index a-string))))
+    (parse '() '(arrow (index string) string))
+    (typed a-type '(arrow (list an-index a-string) a-string))))
 
 (check
   (equal?
@@ -57,10 +57,10 @@
 
 (check
   (equal?
-    (parse '() '(lambda index (inc (var 0))))
-    (typed (arrow an-index an-index) '(lambda (v0) (+ v0 1)))))
+    (parse '() '(lambda (index) (inc (var 0))))
+    (typed (arrow (list an-index) an-index) '(lambda (v0) (+ v0 1)))))
 
 (check
   (equal?
-    (parse '() '((lambda index (inc (var 0))) 10))
+    (parse '() '((lambda (index) (inc (var 0))) 10))
     (typed an-index '((lambda (v0) (+ v0 1)) 10))))
