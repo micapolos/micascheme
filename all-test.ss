@@ -95,6 +95,7 @@
   (leo all)
   (masm all)
   (micac all)
+  (micalang all)
   (micalog all)
   (minic all)
   (scheme all)
