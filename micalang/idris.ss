@@ -6,11 +6,14 @@
     arrow arrow? arrow-in arrow-out
     typed typed? typed-type typed-ref
 
+    native native? native-ref
     variable variable? variable-index
     abstraction abstraction? abstraction-body
     application application? application-lhs application-rhs
+    hole hole?
 
     parse evaluate
+    normalize
     compile-term
     inc add)
   (import (micascheme))
@@ -23,9 +26,12 @@
 
   (data (typed type ref))
 
+  (data (native ref))
   (data (abstraction body))
   (data (application lhs rhs))
   (data (variable index))
+
+  (data hole)
 
   (define evaluate-environment (environment '(micascheme) '(micalang idris)))
 
@@ -169,4 +175,19 @@
         `(
           ,(compile-term $env (application-lhs $application))
           ,(compile-term $env (application-rhs $application))))))
+
+  (define (normalize $env $term $offset)
+    (switch-exhaustive $term
+      ((native? $native) $native)
+      ((variable? $variable)
+        (switch (list-ref $env (variable-index $variable))
+          ((hole? $hole) (variable (- (variable-index $variable) $offset)))
+          ((else $other) $other)))
+      ((abstraction? $abstraction)
+        (abstraction (normalize (cons hole $env) (abstraction-body $abstraction) $offset)))
+      ((application? $application)
+        (lets
+          ($abstraction (normalize $env (application-lhs $application) $offset))
+          ($rhs (normalize $env (application-rhs $application) $offset))
+          (normalize (cons $rhs $env) (abstraction-body $abstraction) (+ $offset 1))))))
 )

@@ -1,5 +1,44 @@
 (import (micascheme) (micalang idris))
 
+; === normalize
+
+(check
+  (equal?
+    (normalize (list) (native "foo") 1)
+    (native "foo")))
+
+(check
+  (equal?
+    (normalize (list (native "foo") hole (native "bar")) (variable 0) 1)
+    (native "foo")))
+
+(check
+  (equal?
+    (normalize (list (native "foo") hole (native "bar")) (variable 1) 1)
+    (variable 0)))
+
+(check
+  (equal?
+    (normalize (list (native "foo") hole (native "bar")) (variable 2) 1)
+    (native "bar")))
+
+(check
+  (equal?
+    (normalize (list) (application (abstraction (variable 0)) (native "foo")) 0)
+    (native "foo")))
+
+(check
+  (equal?
+    (normalize (list) (abstraction (application (abstraction (variable 0)) (native "foo"))) 0)
+    (abstraction (native "foo"))))
+
+(check
+  (equal?
+    (normalize (list) (abstraction (application (abstraction (variable 0)) (variable 0))) 0)
+    (abstraction (variable 0))))
+
+; === parse
+
 (check
   (equal?
     (parse '() '(native string (string-append "foo" "bar")))
