@@ -33,12 +33,17 @@
 (check
   (equal?
     (parse '() '(inc 0))
-    (typed an-index '(+ 0 1))))
+    (typed an-index '(inc 0))))
+
+(check
+  (equal?
+    (parse '() '(+ 1 2))
+    (typed an-index '(+ 1 2))))
 
 (check
   (equal?
     (parse '() '(switch (inc 0) "foo" "bar"))
-    (typed a-string '(index-switch (+ 0 1) "foo" "bar"))))
+    (typed a-string '(index-switch (inc 0) "foo" "bar"))))
 
 (check
   (equal?
@@ -58,9 +63,9 @@
 (check
   (equal?
     (parse '() '(lambda (index) (inc (var 0))))
-    (typed (arrow (list an-index) an-index) '(lambda (v0) (+ v0 1)))))
+    (typed (arrow (list an-index) an-index) '(lambda (v0) (inc v0)))))
 
 (check
   (equal?
     (parse '() '((lambda (index) (inc (var 0))) 10))
-    (typed an-index '((lambda (v0) (+ v0 1)) 10))))
+    (typed an-index '((lambda (v0) (inc v0)) 10))))
