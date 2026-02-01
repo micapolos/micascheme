@@ -63,8 +63,8 @@
       (s
         (string? (datum s))
         (typed a-string (datum s)))
-      ((inc n)
-        (typed an-index `(inc ,(parse-typed $env an-index #'n))))
+      (inc
+        (typed (arrow an-index an-index) 'inc))
       ((switch idx branch ... default)
         (lets
           ($index (parse-typed $env an-index #'idx))

@@ -32,6 +32,11 @@
 
 (check
   (equal?
+    (parse '() 'inc)
+    (typed (arrow an-index an-index) 'inc)))
+
+(check
+  (equal?
     (parse '() '(inc 0))
     (typed an-index '(inc 0))))
 
