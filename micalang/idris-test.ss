@@ -3,22 +3,22 @@
 (check
   (equal?
     (parse '() 'type)
-    (typed a-type 'a-type)))
+    (typed a-type a-type)))
 
 (check
   (equal?
     (parse '() 'index)
-    (typed a-type 'an-index)))
+    (typed a-type an-index)))
 
 (check
   (equal?
     (parse '() 'string)
-    (typed a-type 'a-string)))
+    (typed a-type a-string)))
 
 (check
   (equal?
     (parse '() '(arrow index string))
-    (typed a-type '(arrow an-index a-string))))
+    (typed a-type (arrow an-index a-string))))
 
 (check
   (equal?

@@ -47,16 +47,16 @@
   (define (parse $env $term)
     (syntax-case $term (type index string arrow inc switch var lambda)
       (type
-        (typed a-type 'a-type))
+        (typed a-type a-type))
       (index
-        (typed a-type 'an-index))
+        (typed a-type an-index))
       (string
-        (typed a-type 'a-string))
+        (typed a-type a-string))
       ((arrow in out)
         (typed a-type
-          `(arrow
-            ,(parse-typed $env a-type #'in)
-            ,(parse-typed $env a-type #'out))))
+          (arrow
+            (parse-typed $env a-type #'in)
+            (parse-typed $env a-type #'out))))
       (n
         (number? (datum n))
         (typed an-index (datum n)))
@@ -85,7 +85,7 @@
         (lets
           ($typed-var
             (typed
-              (evaluate-typed $env a-type #'in)
+              (parse-typed $env a-type #'in)
               (env->var $env)))
           ($typed-out (parse (cons $typed-var $env) #'out))
           (typed
