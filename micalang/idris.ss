@@ -3,22 +3,19 @@
     a-type a-type?
     an-index an-index?
     a-string a-string?
-    arrow arrow? arrow-ins arrow-out
+    arrow arrow? arrow-in arrow-out
     typed typed? typed-type typed-ref
-    inc
     parse evaluate)
   (import (micascheme))
 
   (data a-type)
   (data an-index)
   (data a-string)
-  (data (arrow ins out))
+  (data (arrow in out))
 
   (data (typed type ref))
 
   (define evaluate-environment (environment '(micascheme) '(micalang idris)))
-
-  (define inc (lambda (x) (+ x 1)))
 
   (define (index? $obj)
     (nonnegative-integer? $obj))
@@ -28,11 +25,8 @@
       ((pi in out) #t)))
 
   (define (env->var $env)
-    (env-index->var $env 0))
-
-  (define (env-index->var $env $index)
     (string->symbol
-      (string-append "v" (number->string (+ (length $env) $index)))))
+      (string-append "v" (number->string (length $env)))))
 
   (define (evaluate $env $term)
     (eval (typed-ref (parse $env $term)) evaluate-environment))
@@ -48,17 +42,17 @@
         (syntax-error $term "invalid type"))))
 
   (define (parse $env $term)
-    (syntax-case $term (type index string arrow inc + switch var lambda)
+    (syntax-case $term (type index string arrow inc switch var lambda)
       (type
         (typed a-type 'a-type))
       (index
         (typed a-type 'an-index))
       (string
         (typed a-type 'a-string))
-      ((arrow (in ...) out)
+      ((arrow in out)
         (typed a-type
           `(arrow
-            (list ,@(map (partial parse-typed $env a-type) #'(in ...)))
+            ,(parse-typed $env a-type #'in)
             ,(parse-typed $env a-type #'out))))
       (n
         (number? (datum n))
@@ -66,10 +60,8 @@
       (s
         (string? (datum s))
         (typed a-string (datum s)))
-      (inc
-        (typed (arrow (list an-index) an-index) 'inc))
-      (+
-        (typed (arrow (list an-index an-index) an-index) '+))
+      ((inc n)
+        (typed an-index `(+ ,(parse-typed $env an-index #'n) 1)))
       ((switch idx branch ... default)
         (lets
           ($index (parse-typed $env an-index #'idx))
@@ -86,29 +78,27 @@
               (syntax-error $term "undefined")))
           ((else $other)
             (syntax-error $term))))
-      ((lambda (in ...) out)
+      ((lambda in out)
         (lets
-          ($in-types (map (partial evaluate-typed $env a-type) #'(in ...)))
-          ($vars (map (partial env-index->var $env) (indices (length $in-types))))
-          ($typed-vars (map typed $in-types $vars))
-          ($typed-out (parse (append $typed-vars $env) #'out))
+          ($typed-var
+            (typed
+              (evaluate-typed $env a-type #'in)
+              (env->var $env)))
+          ($typed-out (parse (cons $typed-var $env) #'out))
           (typed
-            (arrow $in-types (typed-type $typed-out))
-            `(lambda (,@$vars) ,(typed-ref $typed-out)))))
-      ((fn arg ...)
+            (arrow (typed-type $typed-var) (typed-type $typed-out))
+            `(lambda (,(typed-ref $typed-var)) ,(typed-ref $typed-out)))))
+      ((fn arg)
         (lets
           ($typed-fn (parse $env #'fn))
-          ($typed-args (map (partial parse $env) #'(arg ...)))
+          ($typed-arg (parse $env #'arg))
           (switch (typed-type $typed-fn)
             ((arrow? $arrow)
-              (if
-                (and
-                  (= (length (arrow-ins $arrow)) (length $typed-args))
-                  (for-all equal? (arrow-ins $arrow) (map typed-type $typed-args)))
+              (if (equal? (arrow-in $arrow) (typed-type $typed-arg))
                 (typed
                   (arrow-out $arrow)
-                  `(,(typed-ref $typed-fn) ,@(map typed-ref $typed-args)))
-                (syntax-error $term "application type error")))
+                  `(,(typed-ref $typed-fn) ,(typed-ref $typed-arg)))
+                (syntax-error #'arg "invalid type")))
             ((else $other)
               (syntax-error #'fn "not arrow")))))
       (_ (syntax-error $term))))
