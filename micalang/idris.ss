@@ -5,7 +5,8 @@
     a-string a-string?
     arrow arrow? arrow-in arrow-out
     typed typed? typed-type typed-ref
-    parse evaluate)
+    parse evaluate
+    inc)
   (import (micascheme))
 
   (data a-type)
@@ -16,6 +17,8 @@
   (data (typed type ref))
 
   (define evaluate-environment (environment '(micascheme) '(micalang idris)))
+
+  (define (inc x) (+ x 1))
 
   (define (index? $obj)
     (nonnegative-integer? $obj))
@@ -61,7 +64,7 @@
         (string? (datum s))
         (typed a-string (datum s)))
       ((inc n)
-        (typed an-index `(+ ,(parse-typed $env an-index #'n) 1)))
+        (typed an-index `(inc ,(parse-typed $env an-index #'n))))
       ((switch idx branch ... default)
         (lets
           ($index (parse-typed $env an-index #'idx))
