@@ -2,6 +2,11 @@
 
 (check
   (equal?
+    (parse '() '(native string (string-append "foo" "bar")))
+    (typed a-string '(string-append "foo" "bar"))))
+
+(check
+  (equal?
     (parse '() 'type)
     (typed a-type a-type)))
 
