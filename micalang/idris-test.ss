@@ -3,64 +3,64 @@
 (check
   (equal?
     (parse '() 'type)
-    '(type type)))
+    (typed a-type 'a-type)))
 
 (check
   (equal?
     (parse '() 'index)
-    '(type index)))
+    (typed a-type 'an-index)))
 
 (check
   (equal?
     (parse '() 'string)
-    '(type string)))
+    (typed a-type 'a-string)))
 
 (check
   (equal?
-    (parse '() '(pi index string))
-    '(type (pi index string))))
+    (parse '() '(arrow index string))
+    (typed a-type '(arrow an-index a-string))))
 
 (check
   (equal?
     (parse '() 0)
-    '(index 0)))
+    (typed an-index 0)))
 
 (check
   (equal?
     (parse '() "foo")
-    '(string "foo")))
+    (typed a-string "foo")))
 
 (check
   (equal?
     (parse '() '(inc 0))
-    '(index (+ 0 1))))
+    (typed an-index '(+ 0 1))))
 
 (check
   (equal?
     (parse '() '(switch (inc 0) "foo" "bar"))
-    '(string (index-switch (+ 0 1) "foo" "bar"))))
+    (typed a-string '(index-switch (+ 0 1) "foo" "bar"))))
 
 (check
   (equal?
-    (parse '((index 10)) '(var 0))
-    '(index 10)))
+    (parse (list (typed an-index 'x)) '(var 0))
+    (typed an-index 'x)))
 
 (check
   (equal?
-    (parse '((index 10) (string "foo")) '(var 0))
-    '(index 10)))
+    (parse (list (typed an-index 'x) (typed a-string 'y)) '(var 0))
+    (typed an-index 'x)))
 
 (check
   (equal?
-    (parse '((index 10) (string "foo")) '(var 1))
-    '(string "foo")))
+    (parse (list (typed an-index 'x) (typed a-string 'y)) '(var 1))
+    (typed a-string 'y)))
 
 (check
   (equal?
     (parse '() '(lambda index (inc (var 0))))
-    `((pi index index) (lambda (v0) (+ v0 1)))))
+    (typed (arrow an-index an-index) '(lambda (v0) (+ v0 1)))))
 
 (check
   (equal?
     (parse '() '((lambda index (inc (var 0))) 10))
-    `(index ((lambda (v0) (+ v0 1)) 10))))
+    (typed an-index '((lambda (v0) (+ v0 1)) 10))))

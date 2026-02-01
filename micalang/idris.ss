@@ -1,8 +1,21 @@
 (library (micalang idris)
-  (export parse evaluate)
+  (export
+    a-type a-type?
+    an-index an-index?
+    a-string a-string?
+    arrow arrow? arrow-in arrow-out
+    typed typed? typed-type typed-ref
+    parse evaluate)
   (import (micascheme))
 
-  (define parse-environment (environment '(micascheme)))
+  (data a-type)
+  (data an-index)
+  (data a-string)
+  (data (arrow in out))
+
+  (data (typed type ref))
+
+  (define evaluate-environment (environment '(micascheme) '(micalang idris)))
 
   (define (index? $obj)
     (nonnegative-integer? $obj))
@@ -16,38 +29,47 @@
       (string-append "v" (number->string (length $env)))))
 
   (define (evaluate $env $term)
-    (eval (cadr (parse $env $term)) parse-environment))
+    (eval (typed-ref (parse $env $term)) evaluate-environment))
 
-  (define (parse-typed $env $expected-type $term)
+  (define (evaluate-typed $env $expected-type $term)
+    (eval (parse-typed $env $expected-type $term) evaluate-environment))
+
+  (define (parse-typed $env $type $term)
     (lets
-      ($parsed (parse $env $term))
-      (if (equal? (car $parsed) $expected-type)
-        (cadr $parsed)
+      ($typed (parse $env $term))
+      (if (equal? (typed-type $typed) $type)
+        (typed-ref $typed)
         (syntax-error $term "invalid type"))))
 
   (define (parse $env $term)
-    (syntax-case $term (type index string pi inc switch var lambda)
-      (type '(type type))
-      (index '(type index))
-      (string '(type string))
-      ((pi in out)
-        `(type (pi ,#'in ,#'out)))
+    (syntax-case $term (type index string arrow inc switch var lambda)
+      (type
+        (typed a-type 'a-type))
+      (index
+        (typed a-type 'an-index))
+      (string
+        (typed a-type 'a-string))
+      ((arrow in out)
+        (typed a-type
+          `(arrow
+            ,(parse-typed $env a-type #'in)
+            ,(parse-typed $env a-type #'out))))
       (n
         (number? (datum n))
-        `(index ,(datum n)))
+        (typed an-index (datum n)))
       (s
         (string? (datum s))
-        `(string ,(datum s)))
+        (typed a-string (datum s)))
       ((inc n)
-        `(index (+ ,(parse-typed $env 'index #'n) 1)))
+        (typed an-index `(+ ,(parse-typed $env an-index #'n) 1)))
       ((switch idx branch ... default)
         (lets
-          ($index (parse-typed $env 'index #'idx))
-          ($parsed-default (parse $env #'default))
-          ($branches (map (partial parse-typed $env (car $parsed-default)) #'(branch ...)))
-          `(
-            ,(car $parsed-default)
-            (index-switch ,$index ,@$branches ,(cadr $parsed-default)))))
+          ($index (parse-typed $env an-index #'idx))
+          ($typed-default (parse $env #'default))
+          ($branches (map (partial parse-typed $env (typed-type $typed-default)) #'(branch ...)))
+          (typed
+            (typed-type $typed-default)
+            `(index-switch ,$index ,@$branches ,(typed-ref $typed-default)))))
       ((var n)
         (switch (datum n)
           ((index? $index)
@@ -58,24 +80,26 @@
             (syntax-error $term))))
       ((lambda in out)
         (lets
-          ($var (env->var $env))
-          ($entry `(,#'in ,$var))
-          ($typed-out (parse (cons $entry $env) #'out))
-          `(
-            (pi ,#'in ,(car $typed-out))
-            (lambda (,$var) ,(cadr $typed-out)))))
+          ($typed-var
+            (typed
+              (evaluate-typed $env a-type #'in)
+              (env->var $env)))
+          ($typed-out (parse (cons $typed-var $env) #'out))
+          (typed
+            (arrow (typed-type $typed-var) (typed-type $typed-out))
+            `(lambda (,(typed-ref $typed-var)) ,(typed-ref $typed-out)))))
       ((fn arg)
         (lets
           ($typed-fn (parse $env #'fn))
           ($typed-arg (parse $env #'arg))
-          (switch (car $typed-fn)
-            ((pi? $pi)
-              (if (equal? (cadr $pi) (car $typed-arg))
-                `(
-                  ,(caddr $pi)
-                  (,(cadr $typed-fn) ,(cadr $typed-arg)))
+          (switch (typed-type $typed-fn)
+            ((arrow? $arrow)
+              (if (equal? (arrow-in $arrow) (typed-type $typed-arg))
+                (typed
+                  (arrow-out $arrow)
+                  `(,(typed-ref $typed-fn) ,(typed-ref $typed-arg)))
                 (syntax-error #'arg "invalid type")))
             ((else $other)
-              (syntax-error #'fn "not func")))))
+              (syntax-error #'fn "not arrow")))))
       (_ (syntax-error $term))))
 )
