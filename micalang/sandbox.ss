@@ -11,17 +11,17 @@
 (define (literal? expr)
   (or (number? expr) (boolean? expr)))
 
-(define (type-literal? expr)
-  (memq expr '(Type Nat Bool)))
-
 (define globals
   `(
-    (inc ,(make-v-pi 'Nat (lambda (_) 'Nat)) inc)
-    (dec ,(make-v-pi 'Nat (lambda (_) 'Nat)) dec)
-    (not ,(make-v-pi 'Bool (lambda (_) 'Bool)) not)
-    (< ,(make-v-pi 'Nat (lambda (_) (make-v-pi 'Nat (lambda (_) 'Bool)))) curry<)
-    (+ ,(make-v-pi 'Nat (lambda (_) (make-v-pi 'Nat (lambda (_) 'Nat)))) curry+)
-    (- ,(make-v-pi 'Nat (lambda (_) (make-v-pi 'Nat (lambda (_) 'Nat)))) curry-)))
+    (Type Type 'Type)
+    (Bool Type 'Bool)
+    (Nat  Type 'Nat)
+    (inc  ,(make-v-pi 'Nat (lambda (_) 'Nat)) inc)
+    (dec  ,(make-v-pi 'Nat (lambda (_) 'Nat)) dec)
+    (not  ,(make-v-pi 'Bool (lambda (_) 'Bool)) not)
+    (<    ,(make-v-pi 'Nat (lambda (_) (make-v-pi 'Nat (lambda (_) 'Bool)))) curry<)
+    (+    ,(make-v-pi 'Nat (lambda (_) (make-v-pi 'Nat (lambda (_) 'Nat)))) curry+)
+    (-    ,(make-v-pi 'Nat (lambda (_) (make-v-pi 'Nat (lambda (_) 'Nat)))) curry-)))
 
 ;; =============================================================================
 ;; 1. THE DUAL-MODE COMPILER (FIXED SYNTAX)
@@ -29,7 +29,6 @@
 (define (to-native expr depth fast-mode?)
   (cond
     [(literal? expr) expr]
-    [(type-literal? expr) `',expr]
     [(symbol? expr) (caddr (assq expr globals))]
     [(list? expr)
      (case (car expr)
@@ -89,7 +88,6 @@
 (define (quote-term depth val)
   (cond
     [(literal? val) val]
-    [(type-literal? val) val]
     [(symbol? val) val]
     [(v-pi? val)
      `(pi ,(quote-term depth (v-pi-arg-type val))
@@ -114,7 +112,6 @@
 
 (define (infer context env expr)
   (cond
-    [(type-literal? expr) 'Type]
     [(number? expr) 'Nat]
     [(boolean? expr) 'Bool]
     [(symbol? expr)
