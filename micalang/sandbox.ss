@@ -70,7 +70,7 @@
      `(pi ,(quote-term depth (v-pi-arg-type val))
           ,(quote-term (+ depth 1) ((v-pi-body val) (make-v-neut depth '()))))]
     [(procedure? val)
-     `(lambda (unknown) ,(quote-term (+ depth 1) (val (make-v-neut depth '()))))]
+     `(lambda unknown ,(quote-term (+ depth 1) (val (make-v-neut depth '()))))]
     [(v-neut? val)
      (let ([index (- (- depth (v-neut-head val)) 1)])
        (fold-left (lambda (acc arg) `(,acc ,(quote-term depth arg)))
@@ -147,8 +147,8 @@
 
 (define fib-program
   '(fix (pi Nat Nat)
-    (lambda ((pi Nat Nat))
-      (lambda (Nat)
+    (lambda (pi Nat Nat)
+      (lambda Nat
         (if (< (var 0) 2)
           (var 0)
           (+
