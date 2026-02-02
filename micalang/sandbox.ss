@@ -1,4 +1,4 @@
-(import (only (micascheme) logging) (scheme) (micalang rt) (fib))
+(import (only (micascheme) logging displayln) (scheme) (micalang rt) (fib))
 
 (optimize-level 3)
 
@@ -244,46 +244,41 @@
         ((var 1) (- (var 0) 1))
         ((var 1) (- (var 0) 2))))))
 
-(display "--- Phase 0: Small programs ---\n")
-(display (compile-and-run-native '(inc (inc 0)) 'Nat))
-(newline)
-
-(display (compile-and-run-native '(dec (dec 0)) 'Nat))
-(newline)
-
-(display (compile-and-run-native '(not #t) 'Bool))
-(newline)
+(displayln "--- Phase 0: Small programs ---")
+(displayln (compile-and-run-native '(inc (inc 0)) 'Nat))
+(displayln (compile-and-run-native '(dec (dec 0)) 'Nat))
+(displayln (compile-and-run-native '(not #t) 'Bool))
+(displayln (compile-and-run-native '(pi Nat Nat) 'Type))
+(displayln (compile-and-run-native '(pi Type (var 0)) 'Type))
+(displayln (compile-and-run-native '(pi Type (pi (var 0) (var 1))) 'Type))
 
 (newline)
-(display "--- Phase 1: Native Type-Level Computation ---\n")
-(display "Goal: Verify that '102334155' is of type Fib(40)\n")
+(displayln "--- Phase 1: Native Type-Level Computation ---")
+(displayln "Goal: Verify that '102334155' is of type Fib(40)")
 
 ;; This measures how fast the TYPE CHECKER reduces the type expression
 (time
  (begin
    ;; We are checking if the value 9227465 matches the result of (fib 40)
    (compile-and-run-native 102334155 `(,fib-program 40))
-   (display "Verified: Fib(40) type reduction completed natively.\n")))
+   (displayln "Verified: Fib(40) type reduction completed natively.")))
 
 (newline)
-(display "--- Phase 2: Runtime Performance (Fast Mode) ---\n")
+(displayln "--- Phase 2: Runtime Performance (Fast Mode) ---")
 (define fib-fast (compile-and-run-native fib-program '(pi Nat Nat)))
 
-(display "Mica-Fib Result (Native Optimized):\n")
-(time (display (fib-fast 40)))
-(newline)
+(displayln "Mica-Fib Result (Native Optimized):")
+(time (displayln (fib-fast 40)))
 
-(display "Scheme-Fib Result (Library Native):\n")
-(time (display (fib 40)))
-(newline)
+(displayln "Scheme-Fib Result (Library Native):")
+(time (displayln (fib 40)))
 
-(display "Scheme-Curry-Fib Result (Library Native):\n")
-(time (display (curry-fib 40)))
-(newline)
+(displayln "Scheme-Curry-Fib Result (Library Native):")
+(time (displayln (curry-fib 40)))
 
 (newline)
-(display "--- Phase 3: Error Handling Test ---\n")
+(displayln "--- Phase 3: Error Handling Test ---")
 ;; Using 'guard' to catch the mismatch error properly
-(guard (x [else (display "Successfully caught Type Mismatch as expected.\n")])
-  (display "Checking invalid type (expecting error)...\n")
+(guard (x [else (displayln "Successfully caught Type Mismatch as expected.")])
+  (displayln "Checking invalid type (expecting error)...")
   (compile-and-run-native 10 `(,fib-program 40)))
