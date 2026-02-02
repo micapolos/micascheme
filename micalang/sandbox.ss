@@ -133,22 +133,42 @@
     [(boolean? expr) 'Bool]
     [(list? expr)
      (case (car expr)
-       [(var) (list-ref context (cadr expr))]
-       [(pi)  (check context env (cadr expr) 'Type)
-              (let ([arg-v (eval-native (cadr expr) env)])
-                (check (cons arg-v context) (cons (make-v-neut (length context) '()) env) (caddr expr) 'Type) 'Type)]
-       [(fix) (let ([t (eval-native (cadr expr) env)])
-                (check context env (cadr expr) 'Type)
-                (check context env (caddr expr) (make-v-pi t (lambda (_) t))) t)]
-       [(+ -) (check context env (cadr expr) 'Nat) (check context env (caddr expr) 'Nat) 'Nat]
-       [(<)       (check context env (cadr expr) 'Nat) (check context env (caddr expr) 'Nat) 'Bool]
-       [(if)      (check context env (cadr expr) 'Bool)
-                  (let ([t (infer context env (caddr expr))]) (check context env (cadddr expr) t) t)]
-       [else (let ([f-t (infer context env (car expr))])
-                (if (v-pi? f-t)
-                    (begin (check context env (cadr expr) (v-pi-arg-type f-t))
-                           (do-apply f-t (eval-native (cadr expr) env)))
-                    (error 'infer "Expected Pi type" f-t)))]
+       [(var)
+          (list-ref context (cadr expr))]
+       [(pi)
+          (check context env (cadr expr) 'Type)
+          (let ([arg-v (eval-native (cadr expr) env)])
+            (check
+              (cons arg-v context)
+              (cons (make-v-neut (length context) '()) env)
+              (caddr expr)
+              'Type)
+            'Type)]
+       [(fix)
+          (let ([t (eval-native (cadr expr) env)])
+            (check context env (cadr expr) 'Type)
+            (check context env (caddr expr) (make-v-pi t (lambda (_) t)))
+            t)]
+       [(+ -)
+          (check context env (cadr expr) 'Nat)
+          (check context env (caddr expr) 'Nat)
+          'Nat]
+       [(<)
+          (check context env (cadr expr) 'Nat)
+          (check context env (caddr expr) 'Nat)
+          'Bool]
+       [(if)
+          (check context env (cadr expr) 'Bool)
+          (let ([t (infer context env (caddr expr))])
+            (check context env (cadddr expr) t)
+            t)]
+       [else
+          (let ([f-t (infer context env (car expr))])
+            (cond
+              [(v-pi? f-t)
+                (check context env (cadr expr) (v-pi-arg-type f-t))
+                (do-apply f-t (eval-native (cadr expr) env))]
+              [else (error 'infer "Expected Pi type" f-t)]))]
        )]
     [else (error 'infer "Syntax error" expr)]))
 
