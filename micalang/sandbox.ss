@@ -2,6 +2,9 @@
 
 (optimize-level 3)
 
+(define (depth->symbol depth)
+  (string->symbol (format "v~a" depth)))
+
 ;; =============================================================================
 ;; 1. THE DUAL-MODE COMPILER (FIXED SYNTAX)
 ;; =============================================================================
@@ -11,15 +14,15 @@
     [(memq expr '(Type Nat Bool)) `',expr]
     [(list? expr)
      (case (car expr)
-       [(var) (string->symbol (format "v~a" (- (- depth (cadr expr)) 1)))]
-       [(pi)  (let ([v (string->symbol (format "v~a" depth))])
+       [(var) (depth->symbol (- (- depth (cadr expr)) 1))]
+       [(pi)  (let ([v (depth->symbol depth)])
                 `(make-v-pi ,(to-native (cadr expr) depth fast-mode?)
                             (lambda (,v) ,(to-native (caddr expr) (+ depth 1) fast-mode?))))]
-       [(lambda) (let ([v (string->symbol (format "v~a" depth))])
+       [(lambda) (let ([v (depth->symbol depth)])
                 `(lambda (,v) ,(to-native (caddr expr) (+ depth 1) fast-mode?)))]
 
-       [(fix) (let* ([v-self (string->symbol (format "v~a" depth))]
-                     [v-arg  (string->symbol (format "v~a" (+ depth 1)))]
+       [(fix) (let* ([v-self (depth->symbol depth)]
+                     [v-arg  (depth->symbol (+ depth 1))]
                      [logic (caddr (caddr (caddr expr)))])
                 `(letrec ([,v-self (lambda (,v-arg) ,(to-native logic (+ depth 2) fast-mode?))])
                    ,v-self))]
@@ -79,7 +82,7 @@
 
 (define (eval-native expr env)
   (let* ([depth (length env)]
-         [params (map (lambda (i) (string->symbol (format "v~a" i))) (iota depth))]
+         [params (map (lambda (i) (depth->symbol i)) (iota depth))]
          [jit (eval `(lambda ,params ,(to-native expr depth #f)) (environment '(scheme) '(micalang rt)))])
     (apply jit (reverse env))))
 
