@@ -14,7 +14,7 @@
     [(memq expr '(Type Nat Bool)) `',expr]
     [(list? expr)
      (case (car expr)
-       [(var) (depth->symbol (- (- depth (cadr expr)) 1))]
+       [(var) (depth->symbol (- depth (cadr expr) 1))]
        [(pi)  (let ([v (depth->symbol depth)])
                 `(make-v-pi ,(to-native (cadr expr) depth fast-mode?)
                             (lambda (,v) ,(to-native (caddr expr) (+ depth 1) fast-mode?))))]
