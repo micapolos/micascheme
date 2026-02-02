@@ -73,12 +73,13 @@
                   [else (make-v-neut 'if (list cond-v))]))))]
 
        [else
-          (let
-            ([f (to-native (car expr) depth fast-mode?)]
-             [a (to-native (cadr expr) depth fast-mode?)])
-            (if fast-mode?
-              `(,f ,a)
-              `(do-apply ,f ,a)))])]
+          (fold-left
+            (lambda (acc arg)
+              (let
+                [(arg (to-native arg depth fast-mode?))]
+                (if fast-mode? `(,acc ,arg) `(do-apply ,acc ,arg))))
+            (to-native (car expr) depth fast-mode?)
+            (cdr expr))])]
     [else expr]))
 
 ;; =============================================================================
@@ -98,11 +99,11 @@
       ,(quote-term (+ depth 1) (val (make-v-neut depth '()))))]
     [(v-neut? val)
      (let ([index (- depth (v-neut-head val) 1)])
-       (fold-left
-        (lambda (acc arg)
-          `(,acc ,(quote-term depth arg)))
-        `(var ,(max 0 index))
-        (v-neut-args val)))]
+      `(
+        (var ,(max 0 index))
+        ,@(map
+          (lambda (x) (quote-term depth x))
+          (reverse (v-neut-args val)))))]
     [else val]))
 
 (define (eval-native expr env)
@@ -150,12 +151,15 @@
             (check context env (cadddr expr) t)
             t)]
        [else
-          (let ([f-t (infer context env (car expr))])
-            (cond
-              [(v-pi? f-t)
-                (check context env (cadr expr) (v-pi-arg-type f-t))
-                (do-apply f-t (eval-native (cadr expr) env))]
-              [else (error 'infer "Expected Pi type" f-t)]))]
+          (fold-left
+            (lambda (acc x)
+              (cond
+                [(v-pi? acc)
+                  (check context env (cadr expr) (v-pi-arg-type acc))
+                  (do-apply acc (eval-native x env))]
+                [else (error 'infer "Expected Pi type" acc)]))
+            (infer context env (car expr))
+            (cdr expr))]
        )]
     [else (error 'infer "Syntax error" expr)]))
 
@@ -200,11 +204,11 @@
 
 (define fib-program
   '(fix Nat
-    (if ((< (var 0)) 2)
+    (if (< (var 0) 2)
       (var 0)
-      ((+
-        ((var 1) (dec (var 0))))
-        ((var 1) (dec (dec (var 0))))))))
+      (+
+        ((var 1) (- (var 0) 1))
+        ((var 1) (- (var 0) 2))))))
 
 (displayln "--- Phase 0: Small programs ---")
 (displayln (compile-and-run-native '(inc (inc 0)) 'Nat))
