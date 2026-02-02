@@ -32,7 +32,7 @@
                 (if fast-mode?
                     `(< ,a ,b)
                     `(let ([v1 ,a] [v2 ,b])
-                       (if (and (number? v1) (number? v2)) (< v1 v2) (make-v-neut 'lt (list v1 v2))))))]
+                       (if (and (number? v1) (number? v2)) (< v1 v2) (make-v-neut '< (list v1 v2))))))]
 
        [(+) (let ([a (to-native (cadr expr) depth fast-mode?)]
                     [b (to-native (caddr expr) depth fast-mode?)])
@@ -179,6 +179,10 @@
 
 (display "Scheme-Fib Result (Library Native):\n")
 (time (display (fib 40)))
+(newline)
+
+(display "Scheme-Curry-Fib Result (Library Native):\n")
+(time (display (curry-fib 40)))
 (newline)
 
 (newline)

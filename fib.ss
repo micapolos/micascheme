@@ -1,7 +1,7 @@
 #!chezscheme
 (library (fib)
-  (export fib fxfib fx3fib flfib flsinglefib)
-  (import (micascheme))
+  (export fib fxfib fx3fib flfib flsinglefib curry-fib)
+  (import (micascheme) (curry))
 
   (define (fib n)
     (if (< n 2)
@@ -38,4 +38,10 @@
         (fl+
           (flsinglefib (flsingle (fl- n (flsingle 2.0))))
           (flsinglefib (flsingle (fl- n (flsingle 1.0))))))))
+
+  (define (curry-fib n)
+    (if ((curry< n) 2)
+      n
+      ((curry+ (fib ((curry- n) 2)))
+        (fib ((curry- n) 1)))))
 )
