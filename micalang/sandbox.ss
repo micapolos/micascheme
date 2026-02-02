@@ -8,13 +8,19 @@
 (define native-environment
   (environment '(micascheme) '(micalang rt)))
 
+(define (literal? expr)
+  (or (number? expr) (boolean? expr)))
+
+(define (type-literal? expr)
+  (memq expr '(Type Nat Bool)))
+
 ;; =============================================================================
 ;; 1. THE DUAL-MODE COMPILER (FIXED SYNTAX)
 ;; =============================================================================
 (define (to-native expr depth fast-mode?)
   (cond
-    [(or (number? expr) (boolean? expr)) expr]
-    [(memq expr '(Type Nat Bool)) `',expr]
+    [(literal? expr) expr]
+    [(type-literal? expr) `',expr]
     [(list? expr)
      (case (car expr)
        [(var)
@@ -104,8 +110,8 @@
 
 (define (quote-term depth val)
   (cond
-    [(memq val '(Type Nat Bool)) val]
-    [(or (number? val) (boolean? val)) val]
+    [(literal? val) val]
+    [(type-literal? val) val]
     [(v-pi? val)
      `(pi ,(quote-term depth (v-pi-arg-type val))
           ,(quote-term (+ depth 1) ((v-pi-body val) (make-v-neut depth '()))))]
@@ -129,7 +135,7 @@
 
 (define (infer context env expr)
   (cond
-    [(memq expr '(Nat Bool Type)) 'Type]
+    [(type-literal? expr) 'Type]
     [(number? expr) 'Nat]
     [(boolean? expr) 'Bool]
     [(list? expr)
