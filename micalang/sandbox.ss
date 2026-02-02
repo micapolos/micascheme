@@ -92,40 +92,42 @@
     (unless (equal? s1 s2) (error 'check "Mismatch" (list 'got s1 'expected s2)))))
 
 ;; --- 4. The Native Compiler (Stripping Interpreter Overhead) ---
-(define (to-native expr env-names)
+(define (to-native expr depth)
   (cond
     [(or (number? expr) (boolean? expr)) expr]
     [(list? expr)
      (case (car expr)
-       [(var) (list-ref env-names (cadr expr))]
-       [(lam) (let ([v (gensym "arg")])
-                `(lambda (,v) ,(to-native (caddr expr) (cons v env-names))))]
-       [(app) `(,(to-native (cadr expr) env-names) ,(to-native (caddr expr) env-names))]
+       ;; Calculate the name based on depth: v(depth - index - 1)
+       [(var) (string->symbol (format "v~a" (- (- depth (cadr expr)) 1)))]
+
+       [(lam) (let ([v-name (string->symbol (format "v~a" depth))])
+                `(lambda (,v-name) ,(to-native (caddr expr) (+ depth 1))))]
+
+       [(app) `(,(to-native (cadr expr) depth) ,(to-native (caddr expr) depth))]
+
        [(fix)
-        ;; expr is (fix type (lam self (lam n body)))
-        (let* ([pi-type (cadr expr)]
-               [fix-body (caddr expr)]     ;; (lam self (lam n body))
-               [inner-lam (caddr fix-body)] ;; (lam n body)
-               [v-self (gensym "self")]
-               [v-arg  (gensym "n")])
+        (let* ([fix-body (caddr expr)]
+               [inner-lam (caddr fix-body)]
+               [v-self (string->symbol (format "v~a" depth))]
+               [v-arg  (string->symbol (format "v~a" (+ depth 1)))] )
           `(letrec ([,v-self (lambda (,v-arg)
-                              ,(to-native (caddr inner-lam)
-                                          (cons v-arg (cons v-self env-names))))])
+                              ,(to-native (caddr inner-lam) (+ depth 2)))])
              ,v-self))]
-       [(<) `(< ,(to-native (cadr expr) env-names) ,(to-native (caddr expr) env-names))]
-       [(if) `(if ,(to-native (cadr expr) env-names)
-                  ,(to-native (caddr expr) env-names)
-                  ,(to-native (cadddr expr) env-names))]
-       [(sub) `(- ,(to-native (cadr expr) env-names) ,(to-native (caddr expr) env-names))]
-       [(add)  `(+ ,(to-native (cadr expr) env-names) ,(to-native (caddr expr) env-names))]
-       [else (error 'to-native "Unknown primitive" (car expr))])]
+
+       [(<)  `(< ,(to-native (cadr expr) depth) ,(to-native (caddr expr) depth))]
+       [(if)  `(if ,(to-native (cadr expr) depth)
+                   ,(to-native (caddr expr) depth)
+                   ,(to-native (cadddr expr) depth))]
+       [(sub) `(- ,(to-native (cadr expr) depth) ,(to-native (caddr expr) depth))]
+       [(add) `(+ ,(to-native (cadr expr) depth) ,(to-native (caddr expr) depth))]
+       [else (error 'to-native "Unknown" expr)])]
     [else expr]))
 
 (define (compile-and-run-native expr type-expr)
   ;; Step 1: Verify logic via Type Checker
   (check '() '() expr (eval-term type-expr '()))
   ;; Step 2: Compile to machine code via Chez eval
-  (eval (logging (to-native expr '())) (scheme-environment)))
+  (eval (logging (to-native expr 0)) (scheme-environment)))
 
 ;; --- 5. Examples ---
 
