@@ -1,158 +1,182 @@
-(import (only (micascheme) logging) (scheme) (fib))
+(import (only (micascheme) logging) (scheme) (micalang rt) (fib))
 
 (optimize-level 3)
 
-;; --- 1. Records for the Type Checker (NbE) ---
-(define-record-type v-pi   (fields arg-type body))
-(define-record-type v-neut (fields head args))
-
-;; --- 2. Symbolic Evaluator (for Type Checking) ---
-(define (do-apply f a)
-  (cond [(procedure? f) (f a)]
-        [(v-pi? f)      ((v-pi-body f) a)]
-        [(v-neut? f)    (make-v-neut (v-neut-head f) (append (v-neut-args f) (list a)))]
-        [else (error 'do-apply "Not a function" f)]))
-
-(define (eval-term expr env)
+;; =============================================================================
+;; 1. THE DUAL-MODE COMPILER (FIXED SYNTAX)
+;; =============================================================================
+(define (to-native expr depth fast-mode?)
   (cond
     [(or (number? expr) (boolean? expr)) expr]
-    [(memq expr '(Type Nat Bool)) expr]
+    [(memq expr '(Type Nat Bool)) `',expr]
     [(list? expr)
      (case (car expr)
-       [(var) (list-ref env (cadr expr))]
-       [(pi)  (make-v-pi (eval-term (cadr expr) env)
-                         (lambda (x) (eval-term (caddr expr) (cons x env))))]
-       [(lam) (lambda (x) (eval-term (caddr expr) (cons x env)))]
-       [(app) (do-apply (eval-term (cadr expr) env) (eval-term (caddr expr) env))]
-       [(fix) (let* ([fix-body (eval-term (caddr expr) env)])
-                (letrec ([rec (lambda (x) (do-apply (do-apply fix-body rec) x))]) rec))]
-       [(<) (let ([v1 (eval-term (cadr expr) env)] [v2 (eval-term (caddr expr) env)])
-               (if (and (number? v1) (number? v2)) (< v1 v2)
-                   (make-v-neut 0 (list '< v1 v2))))]
-       [(if) (let ([cond-v (eval-term (cadr expr) env)])
-               (cond [(boolean? cond-v) (if cond-v (eval-term (caddr expr) env) (eval-term (cadddr expr) env))]
-                     [else (make-v-neut 0 (list 'if cond-v))]))]
-       [(sub)
-          (let ([v1 (eval-term (cadr expr) env)]
-             [v2 (eval-term (caddr expr) env)])
-         (if (and (number? v1) (number? v2))
-             (- v1 v2)
-             (make-v-neut 0 (list 'sub v1 v2))))]
-       [(add)  (let ([v1 (eval-term (cadr expr) env)] [v2 (eval-term (caddr expr) env)])
-                 (if (and (number? v1) (number? v2)) (+ v1 v2) (make-v-neut 0 (list 'add v1 v2))))]
-       [else expr])]
+       [(var) (string->symbol (format "v~a" (- (- depth (cadr expr)) 1)))]
+       [(pi)  (let ([v (string->symbol (format "v~a" depth))])
+                `(make-v-pi ,(to-native (cadr expr) depth fast-mode?)
+                            (lambda (,v) ,(to-native (caddr expr) (+ depth 1) fast-mode?))))]
+       [(lam) (let ([v (string->symbol (format "v~a" depth))])
+                `(lambda (,v) ,(to-native (caddr expr) (+ depth 1) fast-mode?)))]
+
+       [(app) (let ([f (to-native (cadr expr) depth fast-mode?)]
+                    [a (to-native (caddr expr) depth fast-mode?)])
+                (if fast-mode? `(,f ,a) `(do-apply ,f ,a)))]
+
+       [(fix) (let* ([v-self (string->symbol (format "v~a" depth))]
+                     [v-arg  (string->symbol (format "v~a" (+ depth 1)))]
+                     [logic (caddr (caddr (caddr expr)))])
+                `(letrec ([,v-self (lambda (,v-arg) ,(to-native logic (+ depth 2) fast-mode?))])
+                   ,v-self))]
+
+       [(<)   (let ([a (to-native (cadr expr) depth fast-mode?)]
+                    [b (to-native (caddr expr) depth fast-mode?)])
+                (if fast-mode?
+                    `(< ,a ,b)
+                    `(let ([v1 ,a] [v2 ,b])
+                       (if (and (number? v1) (number? v2)) (< v1 v2) (make-v-neut 'lt (list v1 v2))))))]
+
+       [(add) (let ([a (to-native (cadr expr) depth fast-mode?)]
+                    [b (to-native (caddr expr) depth fast-mode?)])
+                (if fast-mode?
+                    `(+ ,a ,b)
+                    `(let ([v1 ,a] [v2 ,b])
+                       (if (and (number? v1) (number? v2)) (+ v1 v2) (make-v-neut 'add (list v1 v2))))))]
+
+       [(sub) (let ([a (to-native (cadr expr) depth fast-mode?)]
+                    [b (to-native (caddr expr) depth fast-mode?)])
+                (if fast-mode?
+                    `(- ,a ,b)
+                    `(let ([v1 ,a] [v2 ,b])
+                       (if (and (number? v1) (number? v2)) (- v1 v2) (make-v-neut 'sub (list v1 v2))))))]
+
+       [(if)  (let ([c (to-native (cadr expr) depth fast-mode?)])
+                (if fast-mode?
+                    `(if ,c ,(to-native (caddr expr) depth #t) ,(to-native (cadddr expr) depth #t))
+                    `(let ([cond-v ,c])
+                       (cond [(boolean? cond-v) (if cond-v ,(to-native (caddr expr) depth #f) ,(to-native (cadddr expr) depth #f))]
+                             [else (make-v-neut 'if (list cond-v))]))))]
+       [else (error 'to-native "Unknown term" expr)])]
     [else expr]))
 
-;; --- 3. The Quoter & Type Checker ---
+;; =============================================================================
+;; 2. REIFICATION & KERNEL
+;; =============================================================================
+
 (define (quote-term depth val)
   (cond
     [(memq val '(Type Nat Bool)) val]
     [(or (number? val) (boolean? val)) val]
-    [(v-pi? val) `(pi ,(quote-term depth (v-pi-arg-type val))
-                      ,(quote-term (+ depth 1) ((v-pi-body val) (make-v-neut depth '()))))]
-    [(procedure? val) `(lam unknown ,(quote-term (+ depth 1) (val (make-v-neut depth '()))))]
-    [(v-neut? val) (let ([index (- (- depth (v-neut-head val)) 1)])
-                     (fold-left (lambda (acc arg) `(app ,acc ,(quote-term depth arg)))
-                                `(var ,(max 0 index)) (v-neut-args val)))]
+    [(v-pi? val)
+     `(pi ,(quote-term depth (v-pi-arg-type val))
+          ,(quote-term (+ depth 1) ((v-pi-body val) (make-v-neut depth '()))))]
+    [(procedure? val)
+     `(lam unknown ,(quote-term (+ depth 1) (val (make-v-neut depth '()))))]
+    [(v-neut? val)
+     (let ([index (- (- depth (v-neut-head val)) 1)])
+       (fold-left (lambda (acc arg) `(app ,acc ,(quote-term depth arg)))
+                  `(var ,(max 0 index)) (v-neut-args val)))]
     [else val]))
+
+(define (eval-native expr env)
+  (let* ([depth (length env)]
+         [params (map (lambda (i) (string->symbol (format "v~a" i))) (iota depth))]
+         [jit (eval `(lambda ,params ,(to-native expr depth #f)) (environment '(scheme) '(micalang rt)))])
+    (apply jit (reverse env))))
 
 (define (infer context env expr)
   (cond
-    [(eq? expr 'Nat) 'Type]
+    [(memq expr '(Nat Bool Type)) 'Type]
     [(number? expr) 'Nat]
-    [(eq? expr 'Bool) 'Type]
     [(boolean? expr) 'Bool]
-    [(eq? expr 'Type) 'Type]
     [(list? expr)
      (case (car expr)
        [(var) (list-ref context (cadr expr))]
        [(pi)  (check context env (cadr expr) 'Type)
-              (let ([arg-v (eval-term (cadr expr) env)])
+              (let ([arg-v (eval-native (cadr expr) env)])
                 (check (cons arg-v context) (cons (make-v-neut (length context) '()) env) (caddr expr) 'Type) 'Type)]
-       [(lam) (let ([arg-t (eval-term (cadr expr) env)])
-                (check context env (cadr expr) 'Type)
-                (make-v-pi arg-t (lambda (x) (infer (cons arg-t context) (cons x env) (caddr expr)))))]
        [(app) (let ([f-t (infer context env (cadr expr))])
-                (if (v-pi? f-t) (begin (check context env (caddr expr) (v-pi-arg-type f-t)) (do-apply f-t (eval-term (caddr expr) env)))
+                (if (v-pi? f-t)
+                    (begin (check context env (caddr expr) (v-pi-arg-type f-t))
+                           (do-apply f-t (eval-native (caddr expr) env)))
                     (error 'infer "Expected Pi type" f-t)))]
-       [(fix) (let ([t (eval-term (cadr expr) env)])
+       [(fix) (let ([t (eval-native (cadr expr) env)])
                 (check context env (cadr expr) 'Type)
                 (check context env (caddr expr) (make-v-pi t (lambda (_) t))) t)]
-       [(<) (check context env (cadr expr) 'Nat) (check context env (caddr expr) 'Nat) 'Bool]
-       [(if) (check context env (cadr expr) 'Bool)
-             (let ([t (infer context env (caddr expr))]) (check context env (cadddr expr) t) t)]
-       [(sub) (check context env (cadr expr) 'Nat) (check context env (caddr expr) 'Nat) 'Nat]
-       [(add)  (check context env (cadr expr) 'Nat) (check context env (caddr expr) 'Nat) 'Nat]
-       [else (error 'infer "Unknown" expr)])]
-    [else (error 'infer "Syntax" expr)]))
+       [(add sub) (check context env (cadr expr) 'Nat) (check context env (caddr expr) 'Nat) 'Nat]
+       [(<)       (check context env (cadr expr) 'Nat) (check context env (caddr expr) 'Nat) 'Bool]
+       [(if)      (check context env (cadr expr) 'Bool)
+                  (let ([t (infer context env (caddr expr))]) (check context env (cadddr expr) t) t)]
+       [else (error 'infer "Unknown expression" expr)])]
+    [else (error 'infer "Syntax error" expr)]))
 
 (define (check context env expr expected-v)
-  (let* ([actual-v (infer context env expr)] [d (length context)]
-         [s1 (quote-term d actual-v)] [s2 (quote-term d expected-v)])
-    (unless (equal? s1 s2) (error 'check "Mismatch" (list 'got s1 'expected s2)))))
-
-;; --- 4. The Native Compiler (Stripping Interpreter Overhead) ---
-(define (to-native expr depth)
   (cond
-    [(or (number? expr) (boolean? expr)) expr]
-    [(list? expr)
-     (case (car expr)
-       ;; Calculate the name based on depth: v(depth - index - 1)
-       [(var) (string->symbol (format "v~a" (- (- depth (cadr expr)) 1)))]
+    ;; 1. Handle Lambda with Pi types
+    [(and (list? expr) (eq? (car expr) 'lam) (v-pi? expected-v))
+     (let* ([new-v (make-v-neut (length context) '())])
+       (check (cons (v-pi-arg-type expected-v) context)
+              (cons new-v env) (caddr expr) ((v-pi-body expected-v) new-v)))]
 
-       [(lam) (let ([v-name (string->symbol (format "v~a" depth))])
-                `(lambda (,v-name) ,(to-native (caddr expr) (+ depth 1))))]
+    ;; 2. NEW: Literal equality (Crucial for Phase 1)
+    ;; If the expected "type" is a number, and our expression is that same number, it passes.
+    [(and (number? expected-v) (number? expr) (= expected-v expr))
+     #t]
 
-       [(app) `(,(to-native (cadr expr) depth) ,(to-native (caddr expr) depth))]
+    ;; 3. Fallback to standard inference comparison
+    [else
+     (let* ([actual-v (infer context env expr)]
+            [d (length context)]
+            [s1 (quote-term d actual-v)]
+            [s2 (quote-term d expected-v)])
+       (unless (equal? s1 s2)
+         (error 'check (format "Type Mismatch! Got ~a, expected ~a" s1 s2))))]))
 
-       [(fix)
-        (let* ([fix-body (caddr expr)]
-               [inner-lam (caddr fix-body)]
-               [v-self (string->symbol (format "v~a" depth))]
-               [v-arg  (string->symbol (format "v~a" (+ depth 1)))] )
-          `(letrec ([,v-self (lambda (,v-arg)
-                              ,(to-native (caddr inner-lam) (+ depth 2)))])
-             ,v-self))]
-
-       [(<)  `(< ,(to-native (cadr expr) depth) ,(to-native (caddr expr) depth))]
-       [(if)  `(if ,(to-native (cadr expr) depth)
-                   ,(to-native (caddr expr) depth)
-                   ,(to-native (cadddr expr) depth))]
-       [(sub) `(- ,(to-native (cadr expr) depth) ,(to-native (caddr expr) depth))]
-       [(add) `(+ ,(to-native (cadr expr) depth) ,(to-native (caddr expr) depth))]
-       [else (error 'to-native "Unknown" expr)])]
-    [else expr]))
+;; =============================================================================
+;; 3. UNIFIED ENTRY POINT
+;; =============================================================================
 
 (define (compile-and-run-native expr type-expr)
-  ;; Step 1: Verify logic via Type Checker
-  (check '() '() expr (eval-term type-expr '()))
-  ;; Step 2: Compile to machine code via Chez eval
-  (eval (logging (to-native expr 0)) (scheme-environment)))
+  ;; STEP 1: Type checking (Symbolic Reduction)
+  (check '() '() expr (eval-native type-expr '()))
+  ;; STEP 2: Compilation (Native Fast-Mode)
+  (eval (logging (to-native expr 0 #t)) (environment '(scheme) '(micalang rt))))
 
-;; --- 5. Examples ---
+;; =============================================================================
+;; 4. EXECUTION & NATIVE TYPE-CHECKING BENCHMARKS
+;; =============================================================================
 
+(define fib-program
+  '(fix (pi Nat Nat) (lam (pi Nat Nat) (lam Nat
+         (if (< (var 0) 2) (var 0)
+             (add (app (var 1) (sub (var 0) 1))
+                  (app (var 1) (sub (var 0) 2))))))))
 
-;; Standard setup as before...
-(define fib-body
-  '(lam (pi Nat Nat)
-     (lam Nat
-       (if (< (var 0) 2)
-           (var 0)
-           (add (app (var 1) (sub (var 0) 1))
-                (app (var 1) (sub (var 0) 2)))))))
-
-(define fib-program `(fix (pi Nat Nat) ,fib-body))
-
-;; Compile
-(define fib-native (compile-and-run-native fib-program '(pi Nat Nat)))
-
-;; THE CORRECT CALL
 (newline)
-(display "--- Benchmarking Recursive Fibonacci ---")
-(newline)
-;; On an M4, Fib(40) should take roughly 0.5 to 1.5 seconds natively.
-(time (let ([res (fib-native 40)])
-        (format #t "Fib(40) = ~a\n" res)))
+(display "--- Phase 1: Native Type-Level Computation ---\n")
+(display "Goal: Verify that '102334155' is of type Fib(40)\n")
 
-(time (let ([res (fib 40)])
-        (format #t "Fib(40) = ~a\n" res)))
+;; This measures how fast the TYPE CHECKER reduces the type expression
+(time
+ (begin
+   ;; We are checking if the value 9227465 matches the result of (fib 40)
+   (compile-and-run-native 102334155 `(app ,fib-program 40))
+   (display "Verified: Fib(40) type reduction completed natively.\n")))
+
+(newline)
+(display "--- Phase 2: Runtime Performance (Fast Mode) ---\n")
+(define fib-fast (compile-and-run-native fib-program '(pi Nat Nat)))
+
+(display "Mica-Fib Result (Native Optimized):\n")
+(time (display (fib-fast 40)))
+(newline)
+
+(display "Scheme-Fib Result (Library Native):\n")
+(time (display (fib 40)))
+(newline)
+
+(newline)
+(display "--- Phase 3: Error Handling Test ---\n")
+;; Using 'guard' to catch the mismatch error properly
+(guard (x [else (display "Successfully caught Type Mismatch as expected.\n")])
+  (display "Checking invalid type (expecting error)...\n")
+  (compile-and-run-native 10 `(app ,fib-program 40)))
