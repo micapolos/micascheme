@@ -15,12 +15,8 @@
        [(pi)  (let ([v (string->symbol (format "v~a" depth))])
                 `(make-v-pi ,(to-native (cadr expr) depth fast-mode?)
                             (lambda (,v) ,(to-native (caddr expr) (+ depth 1) fast-mode?))))]
-       [(lam) (let ([v (string->symbol (format "v~a" depth))])
+       [(lambda) (let ([v (string->symbol (format "v~a" depth))])
                 `(lambda (,v) ,(to-native (caddr expr) (+ depth 1) fast-mode?)))]
-
-       [(app) (let ([f (to-native (cadr expr) depth fast-mode?)]
-                    [a (to-native (caddr expr) depth fast-mode?)])
-                (if fast-mode? `(,f ,a) `(do-apply ,f ,a)))]
 
        [(fix) (let* ([v-self (string->symbol (format "v~a" depth))]
                      [v-arg  (string->symbol (format "v~a" (+ depth 1)))]
@@ -35,19 +31,19 @@
                     `(let ([v1 ,a] [v2 ,b])
                        (if (and (number? v1) (number? v2)) (< v1 v2) (make-v-neut 'lt (list v1 v2))))))]
 
-       [(add) (let ([a (to-native (cadr expr) depth fast-mode?)]
+       [(+) (let ([a (to-native (cadr expr) depth fast-mode?)]
                     [b (to-native (caddr expr) depth fast-mode?)])
                 (if fast-mode?
                     `(+ ,a ,b)
                     `(let ([v1 ,a] [v2 ,b])
-                       (if (and (number? v1) (number? v2)) (+ v1 v2) (make-v-neut 'add (list v1 v2))))))]
+                       (if (and (number? v1) (number? v2)) (+ v1 v2) (make-v-neut '+ (list v1 v2))))))]
 
-       [(sub) (let ([a (to-native (cadr expr) depth fast-mode?)]
+       [(-) (let ([a (to-native (cadr expr) depth fast-mode?)]
                     [b (to-native (caddr expr) depth fast-mode?)])
                 (if fast-mode?
                     `(- ,a ,b)
                     `(let ([v1 ,a] [v2 ,b])
-                       (if (and (number? v1) (number? v2)) (- v1 v2) (make-v-neut 'sub (list v1 v2))))))]
+                       (if (and (number? v1) (number? v2)) (- v1 v2) (make-v-neut '- (list v1 v2))))))]
 
        [(if)  (let ([c (to-native (cadr expr) depth fast-mode?)])
                 (if fast-mode?
@@ -55,7 +51,11 @@
                     `(let ([cond-v ,c])
                        (cond [(boolean? cond-v) (if cond-v ,(to-native (caddr expr) depth #f) ,(to-native (cadddr expr) depth #f))]
                              [else (make-v-neut 'if (list cond-v))]))))]
-       [else (error 'to-native "Unknown term" expr)])]
+       [else
+          (let ([f (to-native (car expr) depth fast-mode?)]
+                [a (to-native (cadr expr) depth fast-mode?)])
+            (if fast-mode? `(,f ,a) `(do-apply ,f ,a)))]
+          )]
     [else expr]))
 
 ;; =============================================================================
@@ -70,10 +70,10 @@
      `(pi ,(quote-term depth (v-pi-arg-type val))
           ,(quote-term (+ depth 1) ((v-pi-body val) (make-v-neut depth '()))))]
     [(procedure? val)
-     `(lam unknown ,(quote-term (+ depth 1) (val (make-v-neut depth '()))))]
+     `(lambda (unknown) ,(quote-term (+ depth 1) (val (make-v-neut depth '()))))]
     [(v-neut? val)
      (let ([index (- (- depth (v-neut-head val)) 1)])
-       (fold-left (lambda (acc arg) `(app ,acc ,(quote-term depth arg)))
+       (fold-left (lambda (acc arg) `(,acc ,(quote-term depth arg)))
                   `(var ,(max 0 index)) (v-neut-args val)))]
     [else val]))
 
@@ -94,25 +94,25 @@
        [(pi)  (check context env (cadr expr) 'Type)
               (let ([arg-v (eval-native (cadr expr) env)])
                 (check (cons arg-v context) (cons (make-v-neut (length context) '()) env) (caddr expr) 'Type) 'Type)]
-       [(app) (let ([f-t (infer context env (cadr expr))])
-                (if (v-pi? f-t)
-                    (begin (check context env (caddr expr) (v-pi-arg-type f-t))
-                           (do-apply f-t (eval-native (caddr expr) env)))
-                    (error 'infer "Expected Pi type" f-t)))]
        [(fix) (let ([t (eval-native (cadr expr) env)])
                 (check context env (cadr expr) 'Type)
                 (check context env (caddr expr) (make-v-pi t (lambda (_) t))) t)]
-       [(add sub) (check context env (cadr expr) 'Nat) (check context env (caddr expr) 'Nat) 'Nat]
+       [(+ -) (check context env (cadr expr) 'Nat) (check context env (caddr expr) 'Nat) 'Nat]
        [(<)       (check context env (cadr expr) 'Nat) (check context env (caddr expr) 'Nat) 'Bool]
        [(if)      (check context env (cadr expr) 'Bool)
                   (let ([t (infer context env (caddr expr))]) (check context env (cadddr expr) t) t)]
-       [else (error 'infer "Unknown expression" expr)])]
+       [else (let ([f-t (infer context env (car expr))])
+                (if (v-pi? f-t)
+                    (begin (check context env (cadr expr) (v-pi-arg-type f-t))
+                           (do-apply f-t (eval-native (cadr expr) env)))
+                    (error 'infer "Expected Pi type" f-t)))]
+       )]
     [else (error 'infer "Syntax error" expr)]))
 
 (define (check context env expr expected-v)
   (cond
     ;; 1. Handle Lambda with Pi types
-    [(and (list? expr) (eq? (car expr) 'lam) (v-pi? expected-v))
+    [(and (list? expr) (eq? (car expr) 'lambda) (v-pi? expected-v))
      (let* ([new-v (make-v-neut (length context) '())])
        (check (cons (v-pi-arg-type expected-v) context)
               (cons new-v env) (caddr expr) ((v-pi-body expected-v) new-v)))]
@@ -146,10 +146,14 @@
 ;; =============================================================================
 
 (define fib-program
-  '(fix (pi Nat Nat) (lam (pi Nat Nat) (lam Nat
-         (if (< (var 0) 2) (var 0)
-             (add (app (var 1) (sub (var 0) 1))
-                  (app (var 1) (sub (var 0) 2))))))))
+  '(fix (pi Nat Nat)
+    (lambda ((pi Nat Nat))
+      (lambda (Nat)
+        (if (< (var 0) 2)
+          (var 0)
+          (+
+            ((var 1) (- (var 0) 1))
+            ((var 1) (- (var 0) 2))))))))
 
 (newline)
 (display "--- Phase 1: Native Type-Level Computation ---\n")
@@ -159,7 +163,7 @@
 (time
  (begin
    ;; We are checking if the value 9227465 matches the result of (fib 40)
-   (compile-and-run-native 102334155 `(app ,fib-program 40))
+   (compile-and-run-native 102334155 `(,fib-program 40))
    (display "Verified: Fib(40) type reduction completed natively.\n")))
 
 (newline)
@@ -179,4 +183,4 @@
 ;; Using 'guard' to catch the mismatch error properly
 (guard (x [else (display "Successfully caught Type Mismatch as expected.\n")])
   (display "Checking invalid type (expecting error)...\n")
-  (compile-and-run-native 10 `(app ,fib-program 40)))
+  (compile-and-run-native 10 `(,fib-program 40)))
