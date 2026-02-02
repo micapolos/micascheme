@@ -109,11 +109,15 @@
      `(pi ,(quote-term depth (v-pi-arg-type val))
           ,(quote-term (+ depth 1) ((v-pi-body val) (make-v-neut depth '()))))]
     [(procedure? val)
-     `(lambda unknown ,(quote-term (+ depth 1) (val (make-v-neut depth '()))))]
+     `(lambda unknown-type
+      ,(quote-term (+ depth 1) (val (make-v-neut depth '()))))]
     [(v-neut? val)
-     (let ([index (- (- depth (v-neut-head val)) 1)])
-       (fold-left (lambda (acc arg) `(,acc ,(quote-term depth arg)))
-                  `(var ,(max 0 index)) (v-neut-args val)))]
+     (let ([index (- depth (v-neut-head val) 1)])
+       (fold-left
+        (lambda (acc arg)
+          `(,acc ,(quote-term depth arg)))
+        `(var ,(max 0 index))
+        (v-neut-args val)))]
     [else val]))
 
 (define (eval-native expr env)
