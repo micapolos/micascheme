@@ -36,7 +36,8 @@
           (let*
             ([v-self (depth->symbol depth)]
              [v-arg  (depth->symbol (+ depth 1))]
-             [logic (caddr (caddr (caddr expr)))])
+             [t (cadr expr)]
+             [logic (caddr expr)])
             `(letrec
               ([,v-self
                 (lambda (,v-arg)
@@ -145,9 +146,14 @@
               'Type)
             'Type)]
        [(fix)
-          (let ([t (eval-native (cadr expr) env)])
-            (check context env (cadr expr) 'Type)
-            (check context env (caddr expr) (make-v-pi t (lambda (_) t)))
+          (let* ([t-expr (cadr expr)]
+                 [t (eval-native `(pi ,t-expr ,t-expr) env)])
+            (check context env t-expr 'Type)
+            (check context env
+              `(lambda (pi ,t-expr ,t-expr)
+                (lambda ,t-expr
+                  ,(caddr expr)))
+              (make-v-pi t (lambda (_) t)))
             t)]
        [(+ -)
           (check context env (cadr expr) 'Nat)
@@ -212,14 +218,12 @@
 ;; =============================================================================
 
 (define fib-program
-  '(fix (pi Nat Nat)
-    (lambda (pi Nat Nat)
-      (lambda Nat
-        (if (< (var 0) 2)
-          (var 0)
-          (+
-            ((var 1) (- (var 0) 1))
-            ((var 1) (- (var 0) 2))))))))
+  '(fix Nat
+    (if (< (var 0) 2)
+      (var 0)
+      (+
+        ((var 1) (- (var 0) 1))
+        ((var 1) (- (var 0) 2))))))
 
 (newline)
 (display "--- Phase 1: Native Type-Level Computation ---\n")
