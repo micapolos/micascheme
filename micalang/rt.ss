@@ -6,7 +6,7 @@
     do-apply
 
     Type Bool Nat
-    pi)
+    (rename (%v-pi v-pi) (%v-neut v-neut)))
   (import (scheme) (only (micascheme) define-rules-syntax))
 
   (define-record-type v-pi   (fields arg-type body))
@@ -30,10 +30,14 @@
   (define Nat 'Nat)
 
   (define-rules-syntax
-    ((pi (var type) body)
+    ((%v-pi (var type) body)
       (make-v-pi type (lambda (var) body)))
-    ((pi type body)
-      (pi (_ type) body))
-    ((pi decl decls ... body)
-      (pi decl (pi decls ... body))))
+    ((%v-pi type body)
+      (%v-pi (_ type) body))
+    ((%v-pi decl decls ... body)
+      (%v-pi decl (%v-pi decls ... body))))
+
+  (define-rules-syntax
+    ((%v-neut head arg ...)
+      (make-v-neut head (list arg ...))))
 )

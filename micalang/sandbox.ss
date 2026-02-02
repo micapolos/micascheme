@@ -13,15 +13,15 @@
 
 (define globals
   `(
-    (Type ,Type               Type)
-    (Bool ,Type               Bool)
-    (Nat  ,Type               Nat)
-    (inc  ,(pi Nat Nat)       inc)
-    (dec  ,(pi Nat Nat)       dec)
-    (not  ,(pi Bool Bool)     not)
-    (<    ,(pi Nat Nat Bool)  curry<)
-    (+    ,(pi Nat Nat Nat)   curry+)
-    (-    ,(pi Nat Nat Nat)   curry-)))
+    (Type ,Type                 Type)
+    (Bool ,Type                 Bool)
+    (Nat  ,Type                 Nat)
+    (inc  ,(v-pi Nat Nat)       inc)
+    (dec  ,(v-pi Nat Nat)       dec)
+    (not  ,(v-pi Bool Bool)     not)
+    (<    ,(v-pi Nat Nat Bool)  curry<)
+    (+    ,(v-pi Nat Nat Nat)   curry+)
+    (-    ,(v-pi Nat Nat Nat)   curry-)))
 
 ;; =============================================================================
 ;; 1. THE DUAL-MODE COMPILER (FIXED SYNTAX)
@@ -37,10 +37,9 @@
 
        [(pi)
           (let ([v (depth->symbol depth)])
-            `(make-v-pi
-              ,(to-native (cadr expr) depth fast-mode?)
-              (lambda (,v)
-                ,(to-native (caddr expr) (+ depth 1) fast-mode?))))]
+            `(v-pi
+              (,v ,(to-native (cadr expr) depth fast-mode?))
+              ,(to-native (caddr expr) (+ depth 1) fast-mode?)))]
 
        [(lambda)
           (let ([v (depth->symbol depth)])
@@ -69,7 +68,7 @@
               `(let [(cond-v ,c)]
                 (cond
                   [(boolean? cond-v) (if cond-v ,a ,b)]
-                  [else (make-v-neut 'if (list cond-v))]))))]
+                  [else (v-neut 'if cond-v)]))))]
 
        [else
           (fold-left
@@ -91,10 +90,10 @@
     [(symbol? val) val]
     [(v-pi? val)
      `(pi ,(quote-term depth (v-pi-arg-type val))
-          ,(quote-term (+ depth 1) ((v-pi-body val) (make-v-neut depth '()))))]
+          ,(quote-term (+ depth 1) ((v-pi-body val) (v-neut depth))))]
     [(procedure? val)
      `(lambda unknown-type
-      ,(quote-term (+ depth 1) (val (make-v-neut depth '()))))]
+      ,(quote-term (+ depth 1) (val (v-neut depth))))]
     [(v-neut? val)
      (let ([index (- depth (v-neut-head val) 1)])
       `(
@@ -128,7 +127,7 @@
           (let ([arg-v (eval-native (cadr expr) env)])
             (check
               (cons arg-v context)
-              (cons (make-v-neut (length context) '()) env)
+              (cons (v-neut (length context)) env)
               (caddr expr)
               'Type)
             'Type)]
@@ -140,7 +139,7 @@
               `(lambda (pi ,t-expr ,t-expr)
                 (lambda ,t-expr
                   ,(caddr expr)))
-              (make-v-pi t (lambda (_) t)))
+              (v-pi t t))
             t)]
        [(if)
           (check context env (cadr expr) 'Bool)
@@ -164,7 +163,7 @@
   (cond
     ;; 1. Handle Lambda with Pi types
     [(and (list? expr) (eq? (car expr) 'lambda) (v-pi? expected-v))
-      (let* ([new-v (make-v-neut (length context) '())])
+      (let* ([new-v (v-neut (length context))])
         (check
           (cons (v-pi-arg-type expected-v) context)
           (cons new-v env)
