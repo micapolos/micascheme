@@ -5,6 +5,9 @@
 (define (depth->symbol depth)
   (string->symbol (format "v~a" depth)))
 
+(define native-environment
+  (environment '(micascheme) '(micalang rt)))
+
 ;; =============================================================================
 ;; 1. THE DUAL-MODE COMPILER (FIXED SYNTAX)
 ;; =============================================================================
@@ -14,51 +17,84 @@
     [(memq expr '(Type Nat Bool)) `',expr]
     [(list? expr)
      (case (car expr)
-       [(var) (depth->symbol (- depth (cadr expr) 1))]
-       [(pi)  (let ([v (depth->symbol depth)])
-                `(make-v-pi ,(to-native (cadr expr) depth fast-mode?)
-                            (lambda (,v) ,(to-native (caddr expr) (+ depth 1) fast-mode?))))]
-       [(lambda) (let ([v (depth->symbol depth)])
-                `(lambda (,v) ,(to-native (caddr expr) (+ depth 1) fast-mode?)))]
+       [(var)
+          (depth->symbol (- depth (cadr expr) 1))]
 
-       [(fix) (let* ([v-self (depth->symbol depth)]
-                     [v-arg  (depth->symbol (+ depth 1))]
-                     [logic (caddr (caddr (caddr expr)))])
-                `(letrec ([,v-self (lambda (,v-arg) ,(to-native logic (+ depth 2) fast-mode?))])
-                   ,v-self))]
+       [(pi)
+          (let ([v (depth->symbol depth)])
+            `(make-v-pi
+              ,(to-native (cadr expr) depth fast-mode?)
+              (lambda (,v)
+                ,(to-native (caddr expr) (+ depth 1) fast-mode?))))]
 
-       [(<)   (let ([a (to-native (cadr expr) depth fast-mode?)]
-                    [b (to-native (caddr expr) depth fast-mode?)])
-                (if fast-mode?
-                    `(< ,a ,b)
-                    `(let ([v1 ,a] [v2 ,b])
-                       (if (and (number? v1) (number? v2)) (< v1 v2) (make-v-neut '< (list v1 v2))))))]
+       [(lambda)
+          (let ([v (depth->symbol depth)])
+            `(lambda (,v)
+              ,(to-native (caddr expr) (+ depth 1) fast-mode?)))]
 
-       [(+) (let ([a (to-native (cadr expr) depth fast-mode?)]
-                    [b (to-native (caddr expr) depth fast-mode?)])
-                (if fast-mode?
-                    `(+ ,a ,b)
-                    `(let ([v1 ,a] [v2 ,b])
-                       (if (and (number? v1) (number? v2)) (+ v1 v2) (make-v-neut '+ (list v1 v2))))))]
+       [(fix)
+          (let*
+            ([v-self (depth->symbol depth)]
+             [v-arg  (depth->symbol (+ depth 1))]
+             [logic (caddr (caddr (caddr expr)))])
+            `(letrec
+              ([,v-self
+                (lambda (,v-arg)
+                  ,(to-native logic (+ depth 2) fast-mode?))])
+              ,v-self))]
 
-       [(-) (let ([a (to-native (cadr expr) depth fast-mode?)]
-                    [b (to-native (caddr expr) depth fast-mode?)])
-                (if fast-mode?
-                    `(- ,a ,b)
-                    `(let ([v1 ,a] [v2 ,b])
-                       (if (and (number? v1) (number? v2)) (- v1 v2) (make-v-neut '- (list v1 v2))))))]
+       [(<)
+          (let
+            ([a (to-native (cadr expr) depth fast-mode?)]
+             [b (to-native (caddr expr) depth fast-mode?)])
+            (if fast-mode?
+              `(< ,a ,b)
+              `(let ([v1 ,a] [v2 ,b])
+                (if (and (number? v1) (number? v2))
+                  (< v1 v2)
+                  (make-v-neut '< (list v1 v2))))))]
 
-       [(if)  (let ([c (to-native (cadr expr) depth fast-mode?)])
-                (if fast-mode?
-                    `(if ,c ,(to-native (caddr expr) depth #t) ,(to-native (cadddr expr) depth #t))
-                    `(let ([cond-v ,c])
-                       (cond [(boolean? cond-v) (if cond-v ,(to-native (caddr expr) depth #f) ,(to-native (cadddr expr) depth #f))]
-                             [else (make-v-neut 'if (list cond-v))]))))]
+       [(+)
+         (let
+            ([a (to-native (cadr expr) depth fast-mode?)]
+             [b (to-native (caddr expr) depth fast-mode?)])
+            (if fast-mode?
+              `(+ ,a ,b)
+              `(let ([v1 ,a] [v2 ,b])
+                (if (and (number? v1) (number? v2))
+                  (+ v1 v2)
+                  (make-v-neut '+ (list v1 v2))))))]
+
+       [(-)
+          (let
+            ([a (to-native (cadr expr) depth fast-mode?)]
+             [b (to-native (caddr expr) depth fast-mode?)])
+            (if fast-mode?
+              `(- ,a ,b)
+              `(let ([v1 ,a] [v2 ,b])
+                (if (and (number? v1) (number? v2))
+                  (- v1 v2)
+                  (make-v-neut '- (list v1 v2))))))]
+
+       [(if)
+          (let
+            ([c (to-native (cadr expr) depth fast-mode?)]
+             [a (to-native (caddr expr) depth fast-mode?)]
+             [b (to-native (cadddr expr) depth fast-mode?)])
+            (if fast-mode?
+              `(if ,c ,a ,b)
+              `(let [(cond-v ,c)]
+                (cond
+                  [(boolean? cond-v) (if cond-v ,a ,b)]
+                  [else (make-v-neut 'if (list cond-v))]))))]
+
        [else
-          (let ([f (to-native (car expr) depth fast-mode?)]
-                [a (to-native (cadr expr) depth fast-mode?)])
-            (if fast-mode? `(,f ,a) `(do-apply ,f ,a)))]
-          )]
+          (let
+            ([f (to-native (car expr) depth fast-mode?)]
+             [a (to-native (cadr expr) depth fast-mode?)])
+            (if fast-mode?
+              `(,f ,a)
+              `(do-apply ,f ,a)))])]
     [else expr]))
 
 ;; =============================================================================
@@ -83,7 +119,7 @@
 (define (eval-native expr env)
   (let* ([depth (length env)]
          [params (map (lambda (i) (depth->symbol i)) (iota depth))]
-         [jit (eval `(lambda ,params ,(to-native expr depth #f)) (environment '(scheme) '(micalang rt)))])
+         [jit (eval `(lambda ,params ,(to-native expr depth #f)) native-environment)])
     (apply jit (reverse env))))
 
 (define (infer context env expr)
@@ -142,7 +178,7 @@
   ;; STEP 1: Type checking (Symbolic Reduction)
   (check '() '() expr (eval-native type-expr '()))
   ;; STEP 2: Compilation (Native Fast-Mode)
-  (eval (logging (to-native expr 0 #t)) (environment '(scheme) '(micalang rt))))
+  (eval (logging (to-native expr 0 #t)) native-environment))
 
 ;; =============================================================================
 ;; 4. EXECUTION & NATIVE TYPE-CHECKING BENCHMARKS
