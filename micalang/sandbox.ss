@@ -13,15 +13,15 @@
 
 (define globals
   `(
-    (Type Type 'Type)
-    (Bool Type 'Bool)
-    (Nat  Type 'Nat)
-    (inc  ,(make-v-pi 'Nat (lambda (_) 'Nat)) inc)
-    (dec  ,(make-v-pi 'Nat (lambda (_) 'Nat)) dec)
-    (not  ,(make-v-pi 'Bool (lambda (_) 'Bool)) not)
-    (<    ,(make-v-pi 'Nat (lambda (_) (make-v-pi 'Nat (lambda (_) 'Bool)))) curry<)
-    (+    ,(make-v-pi 'Nat (lambda (_) (make-v-pi 'Nat (lambda (_) 'Nat)))) curry+)
-    (-    ,(make-v-pi 'Nat (lambda (_) (make-v-pi 'Nat (lambda (_) 'Nat)))) curry-)))
+    (Type ,Type               Type)
+    (Bool ,Type               Bool)
+    (Nat  ,Type               Nat)
+    (inc  ,(pi Nat Nat)       inc)
+    (dec  ,(pi Nat Nat)       dec)
+    (not  ,(pi Bool Bool)     not)
+    (<    ,(pi Nat Nat Bool)  curry<)
+    (+    ,(pi Nat Nat Nat)   curry+)
+    (-    ,(pi Nat Nat Nat)   curry-)))
 
 ;; =============================================================================
 ;; 1. THE DUAL-MODE COMPILER (FIXED SYNTAX)
