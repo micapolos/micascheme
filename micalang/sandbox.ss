@@ -14,6 +14,12 @@
 (define (type-literal? expr)
   (memq expr '(Type Nat Bool)))
 
+(define globals
+  `(
+    (inc ,(make-v-pi 'Nat (lambda (_) 'Nat)))
+    (dec ,(make-v-pi 'Nat (lambda (_) 'Nat)))
+    (not ,(make-v-pi 'Bool (lambda (_) 'Bool)))))
+
 ;; =============================================================================
 ;; 1. THE DUAL-MODE COMPILER (FIXED SYNTAX)
 ;; =============================================================================
@@ -21,6 +27,7 @@
   (cond
     [(literal? expr) expr]
     [(type-literal? expr) `',expr]
+    [(symbol? expr) expr]
     [(list? expr)
      (case (car expr)
        [(var)
@@ -112,6 +119,7 @@
   (cond
     [(literal? val) val]
     [(type-literal? val) val]
+    [(symbol? val) val]
     [(v-pi? val)
      `(pi ,(quote-term depth (v-pi-arg-type val))
           ,(quote-term (+ depth 1) ((v-pi-body val) (make-v-neut depth '()))))]
@@ -138,6 +146,11 @@
     [(type-literal? expr) 'Type]
     [(number? expr) 'Nat]
     [(boolean? expr) 'Bool]
+    [(symbol? expr)
+      (cadr
+        (or
+          (assq expr globals)
+          (error 'infer "Undefined" expr)))]
     [(list? expr)
      (case (car expr)
        [(var)
@@ -230,6 +243,16 @@
       (+
         ((var 1) (- (var 0) 1))
         ((var 1) (- (var 0) 2))))))
+
+(display "--- Phase 0: Small programs ---\n")
+(display (compile-and-run-native '(inc (inc 0)) 'Nat))
+(newline)
+
+(display (compile-and-run-native '(dec (dec 0)) 'Nat))
+(newline)
+
+(display (compile-and-run-native '(not #t) 'Bool))
+(newline)
 
 (newline)
 (display "--- Phase 1: Native Type-Level Computation ---\n")

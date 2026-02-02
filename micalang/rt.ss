@@ -2,6 +2,7 @@
   (export
     make-v-pi v-pi? v-pi-arg-type v-pi-body
     make-v-neut v-neut? v-neut-head v-neut-args
+    inc dec
     do-apply)
   (import (scheme))
 
@@ -13,4 +14,8 @@
    (cond [(procedure? f) (f a)]
          [(v-pi? f) ((v-pi-body f) a)]
          [(v-neut? f) (make-v-neut (v-neut-head f) (append (v-neut-args f) (list a)))]
-         [else (error 'do-apply "Bad app" f)])))
+         [else (error 'do-apply "Bad app" f)]))
+
+  (define (inc x) (+ x 1))
+  (define (dec x) (- x 1))
+)
