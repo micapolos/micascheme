@@ -11,7 +11,10 @@
   (define-record-type v-neut (fields head args))
 
   (define (do-apply f a)
-   (cond [(procedure? f) (f a)]
+   (cond [(procedure? f)
+            (cond
+              [(v-neut? a) (make-v-neut f (list a))]
+              [else (f a)])]
          [(v-pi? f) ((v-pi-body f) a)]
          [(v-neut? f) (make-v-neut (v-neut-head f) (append (v-neut-args f) (list a)))]
          [else (error 'do-apply "Bad app" f)]))

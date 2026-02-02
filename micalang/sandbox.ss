@@ -6,7 +6,7 @@
   (string->symbol (format "v~a" depth)))
 
 (define native-environment
-  (environment '(micascheme) '(micalang rt)))
+  (environment '(micascheme) '(micalang rt) '(curry)))
 
 (define (literal? expr)
   (or (number? expr) (boolean? expr)))
@@ -16,9 +16,12 @@
 
 (define globals
   `(
-    (inc ,(make-v-pi 'Nat (lambda (_) 'Nat)))
-    (dec ,(make-v-pi 'Nat (lambda (_) 'Nat)))
-    (not ,(make-v-pi 'Bool (lambda (_) 'Bool)))))
+    (inc ,(make-v-pi 'Nat (lambda (_) 'Nat)) inc)
+    (dec ,(make-v-pi 'Nat (lambda (_) 'Nat)) dec)
+    (not ,(make-v-pi 'Bool (lambda (_) 'Bool)) not)
+    (< ,(make-v-pi 'Nat (lambda (_) (make-v-pi 'Nat (lambda (_) 'Bool)))) curry<)
+    (+ ,(make-v-pi 'Nat (lambda (_) (make-v-pi 'Nat (lambda (_) 'Nat)))) curry+)
+    (- ,(make-v-pi 'Nat (lambda (_) (make-v-pi 'Nat (lambda (_) 'Nat)))) curry-)))
 
 ;; =============================================================================
 ;; 1. THE DUAL-MODE COMPILER (FIXED SYNTAX)
@@ -27,7 +30,7 @@
   (cond
     [(literal? expr) expr]
     [(type-literal? expr) `',expr]
-    [(symbol? expr) expr]
+    [(symbol? expr) (caddr (assq expr globals))]
     [(list? expr)
      (case (car expr)
        [(var)
@@ -56,39 +59,6 @@
                 (lambda (,v-arg)
                   ,(to-native logic (+ depth 2) fast-mode?))])
               ,v-self))]
-
-       [(<)
-          (let
-            ([a (to-native (cadr expr) depth fast-mode?)]
-             [b (to-native (caddr expr) depth fast-mode?)])
-            (if fast-mode?
-              `(< ,a ,b)
-              `(let ([v1 ,a] [v2 ,b])
-                (if (and (number? v1) (number? v2))
-                  (< v1 v2)
-                  (make-v-neut '< (list v1 v2))))))]
-
-       [(+)
-         (let
-            ([a (to-native (cadr expr) depth fast-mode?)]
-             [b (to-native (caddr expr) depth fast-mode?)])
-            (if fast-mode?
-              `(+ ,a ,b)
-              `(let ([v1 ,a] [v2 ,b])
-                (if (and (number? v1) (number? v2))
-                  (+ v1 v2)
-                  (make-v-neut '+ (list v1 v2))))))]
-
-       [(-)
-          (let
-            ([a (to-native (cadr expr) depth fast-mode?)]
-             [b (to-native (caddr expr) depth fast-mode?)])
-            (if fast-mode?
-              `(- ,a ,b)
-              `(let ([v1 ,a] [v2 ,b])
-                (if (and (number? v1) (number? v2))
-                  (- v1 v2)
-                  (make-v-neut '- (list v1 v2))))))]
 
        [(if)
           (let
@@ -174,14 +144,6 @@
                   ,(caddr expr)))
               (make-v-pi t (lambda (_) t)))
             t)]
-       [(+ -)
-          (check context env (cadr expr) 'Nat)
-          (check context env (caddr expr) 'Nat)
-          'Nat]
-       [(<)
-          (check context env (cadr expr) 'Nat)
-          (check context env (caddr expr) 'Nat)
-          'Bool]
        [(if)
           (check context env (cadr expr) 'Bool)
           (let ([t (infer context env (caddr expr))])
@@ -238,16 +200,21 @@
 
 (define fib-program
   '(fix Nat
-    (if (< (var 0) 2)
+    (if ((< (var 0)) 2)
       (var 0)
-      (+
-        ((var 1) (- (var 0) 1))
-        ((var 1) (- (var 0) 2))))))
+      ((+
+        ((var 1) (dec (var 0))))
+        ((var 1) (dec (dec (var 0))))))))
 
 (displayln "--- Phase 0: Small programs ---")
 (displayln (compile-and-run-native '(inc (inc 0)) 'Nat))
 (displayln (compile-and-run-native '(dec (dec 0)) 'Nat))
 (displayln (compile-and-run-native '(not #t) 'Bool))
+
+(displayln (compile-and-run-native '((< 10) 20) 'Bool))
+(displayln (compile-and-run-native '((+ 10) 20) 'Nat))
+(displayln (compile-and-run-native '((- 10) 20) 'Nat))
+
 (displayln (compile-and-run-native '(pi Nat Nat) 'Type))
 (displayln (compile-and-run-native '(pi Type (var 0)) 'Type))
 (displayln (compile-and-run-native '(pi Type (pi (var 0) (var 1))) 'Type))
