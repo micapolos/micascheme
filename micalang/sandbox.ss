@@ -176,21 +176,24 @@
   (cond
     ;; 1. Handle Lambda with Pi types
     [(and (list? expr) (eq? (car expr) 'lambda) (v-pi? expected-v))
-     (let* ([new-v (make-v-neut (length context) '())])
-       (check (cons (v-pi-arg-type expected-v) context)
-              (cons new-v env) (caddr expr) ((v-pi-body expected-v) new-v)))]
+      (let* ([new-v (make-v-neut (length context) '())])
+        (check
+          (cons (v-pi-arg-type expected-v) context)
+          (cons new-v env)
+          (caddr expr)
+          ((v-pi-body expected-v) new-v)))]
 
     ;; 2. NEW: Literal equality (Crucial for Phase 1)
     ;; If the expected "type" is a number, and our expression is that same number, it passes.
     [(and (number? expected-v) (number? expr) (= expected-v expr))
-     #t]
+      #t]
 
     ;; 3. Fallback to standard inference comparison
     [else
-     (let* ([actual-v (infer context env expr)]
-            [d (length context)]
-            [s1 (quote-term d actual-v)]
-            [s2 (quote-term d expected-v)])
+      (let* ([actual-v (infer context env expr)]
+             [d (length context)]
+             [s1 (quote-term d actual-v)]
+             [s2 (quote-term d expected-v)])
        (unless (equal? s1 s2)
          (error 'check (format "Type Mismatch! Got ~a, expected ~a" s1 s2))))]))
 
