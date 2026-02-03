@@ -38,7 +38,7 @@
        [(pi)
           (let ([v (depth->symbol depth)])
             `(v-pi
-              (,v ,(to-native (cadr expr) depth fast-mode?))
+              (let ,v ,(to-native (cadr expr) depth fast-mode?))
               ,(to-native (caddr expr) (+ depth 1) fast-mode?)))]
 
        [(lambda)
