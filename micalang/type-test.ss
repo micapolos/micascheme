@@ -18,7 +18,7 @@
 
 (check-type->datum
   (pi 'nat (lambda (t) (application 'inc t)))
-  (pi (let v0 nat) (inc v0)))
+  (pi (v0 : nat) (inc v0)))
 
 (check-type->datum
   (branch #t 10 20)

@@ -41,7 +41,7 @@
           `(pi
             ,(if (equal? $body-datum $hole-body-datum)
               $param-datum
-              `(let ,$symbol ,$param-datum))
+              `(,$symbol : ,$param-datum))
             ,$body-datum)))
       ((branch? $branch)
         `(if
