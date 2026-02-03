@@ -2,4 +2,5 @@
 
 (test
   (micalang expand)
-  (micalang idris))
+  (micalang idris)
+  (micalang type))
