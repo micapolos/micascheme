@@ -1,4 +1,4 @@
-(library (micalang type)
+(library (micalang term)
   (export
     variable variable? variable-index
     application application? application-lhs application-rhs

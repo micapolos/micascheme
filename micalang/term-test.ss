@@ -1,4 +1,4 @@
-(import (except (micascheme) pi) (micalang type))
+(import (except (micascheme) pi) (micalang term))
 
 (check-type->datum 10 10)
 (check-type->datum "foo" "foo")

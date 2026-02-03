@@ -3,4 +3,4 @@
 (test
   (micalang expand)
   (micalang idris)
-  (micalang type))
+  (micalang term))
