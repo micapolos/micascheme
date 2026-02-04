@@ -12,7 +12,8 @@
       (only (micascheme) lambda equal?)
       (only (micalang term) native variable application)))
 
-  (data hole)
+  (data %pi?)
+  (data %param)
 
   (define type (native 'type))
   (define bool (native 'bool))
@@ -22,18 +23,21 @@
     (lambda (x)
       (switch x
         ((fixnum? $fixnum) (fxzero? $fixnum))
+        ((%pi?? _) #f)
         ((else $other) (application (native zero?) $other)))))
 
   (define inc
     (lambda (x)
       (switch x
         ((fixnum? $fixnum) (fx+/wraparound $fixnum 1))
+        ((%pi?? _) #f)
         ((else $other) (application (native inc) $other)))))
 
   (define dec
     (lambda (x)
       (switch x
         ((fixnum? $fixnum) (fx-/wraparound $fixnum 1))
+        ((%pi?? _) #f)
         ((else $other) (application (native dec) $other)))))
 
   (define +
@@ -44,8 +48,10 @@
             (switch y
               ((fixnum? $fixnum-y)
                 (fx+/wraparound $fixnum-x $fixnum-y))
+              ((%pi?? _) #f)
               ((else $other-y)
                 (application (application (native +) $fixnum-x) $other-y))))
+          ((%pi?? _) #f)
           ((else $other-x)
             (application (application (native +) $other-x) y))))))
 
@@ -57,8 +63,10 @@
             (switch y
               ((fixnum? $fixnum-y)
                 (fx-/wraparound $fixnum-x $fixnum-y))
+              ((%pi?? _) #f)
               ((else $other-y)
                 (application (application (native -) $fixnum-x) $other-y))))
+          ((%pi?? _) #f)
           ((else $other-x)
             (application (application (native -) $other-x) y))))))
 
@@ -70,23 +78,28 @@
             (switch y
               ((fixnum? $fixnum-y)
                 (fx< $fixnum-x $fixnum-y))
+              ((%pi?? _) #f)
               ((else $other-y)
                 (application (application (native <) $fixnum-x) $other-y))))
+          ((%pi?? _) #f)
           ((else $other-x)
             (application (application (native <) $other-x) y))))))
 
   (define list
     (lambda (x)
-      (application (native list) x)))
+      (switch x
+        ((%pi?? _) #f)
+        ((else _) (application (native list) x)))))
 
   (define pi-param
     (lambda ($pi)
-      ($pi hole)))
+      ($pi %param)))
 
   (define-rules-syntax
     ((pi (id in) out)
       (lambda (id)
         (switch id
-          ((hole? _) in)
+          ((%pi?? _) #t)
+          ((%param? _) in)
           ((else _) out)))))
 )
