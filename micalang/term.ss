@@ -16,7 +16,7 @@
     apply-term
     term-equal?
     typed-equal?)
-  (import (except (micascheme) pi))
+  (import (micalang base))
 
   (data (native ref))
   (data (variable index))

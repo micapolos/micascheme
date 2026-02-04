@@ -1,5 +1,5 @@
 (import
-  (except (micascheme) pi)
+  (micalang base)
   (micalang term)
   (micalang compiler))
 

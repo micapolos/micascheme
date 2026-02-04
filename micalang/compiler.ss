@@ -6,7 +6,7 @@
     check-compiles
     check-compile-raises)
   (import
-    (except (micascheme) pi)
+    (micalang base)
     (micalang term))
 
   (define (mica-environment $fast?)
