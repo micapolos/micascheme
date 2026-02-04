@@ -8,7 +8,8 @@
   (import
     (micalang base)
     (micalang term)
-    (micalang typed))
+    (micalang typed)
+    (micalang env))
 
   (define (mica-environment $fast?)
     (if $fast?
@@ -89,7 +90,7 @@
 
   (define-rule-syntax (check-compiles (id expr) ... in out)
     (lets
-      ($typed (mica-compile #t `((id ,expr) ...) 'in))
+      ($typed (mica-compile #t `((id ,expr) ... ,@mica-env) 'in))
       (check
         (equal?
           `(typed
@@ -98,5 +99,5 @@
           'out))))
 
   (define-rule-syntax (check-compile-raises (id expr) ... in)
-    (check (raises (mica-compile #t `((id ,expr) ...) 'in))))
+    (check (raises (mica-compile #t `((id ,expr) ... ,@mica-env) 'in))))
 )

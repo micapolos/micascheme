@@ -20,7 +20,7 @@
 (check (equal? (app (app < (literal 2)) (literal 3)) (literal #t)))
 
 (check (equal? (pi-param (pi (_ int) bool)) int))
-(check (equal? (app (pi (_ int) bool) (literal '())) bool))
+(check (equal? (app (pi int bool) (literal '())) bool))
 
 (check (equal? (pi-param (pi (x type) x)) type))
 (check (equal? (app (pi (x type) x) int) int))

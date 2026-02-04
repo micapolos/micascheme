@@ -133,5 +133,7 @@
 
   (define-rules-syntax
     ((pi (id in) out)
-      (%pi in (lambda (id) out))))
+      (%pi in (lambda (id) out)))
+    ((pi in out)
+      (pi (_ in) out)))
 )

@@ -31,16 +31,13 @@
 ; === lambda
 
 (check-compiles
-  (int (typed (native 'type) 'int))
   (lambda (i : int) i)
   (typed (pi int int) (lambda (i) i)))
 
 (check-compiles
-  (inc (typed (pi (native 'int) (lambda (_) (native 'int))) 'inc))
   inc
   (typed (pi int int) inc))
 
 (check-compiles
-  (inc (typed (pi (native 'int) (lambda (_) (native 'int))) 'inc))
   (inc 1)
   (typed int (app inc (literal 1))))

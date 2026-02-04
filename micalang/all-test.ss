@@ -6,4 +6,5 @@
   (micalang term)
   (micalang runtime)
   (micalang runtime-term)
+  (micalang env)
   (micalang compiler))
