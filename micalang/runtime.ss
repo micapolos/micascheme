@@ -1,11 +1,11 @@
 (library (micalang runtime)
   (export
     type bool int
-    inc dec + - < zero?
+    inc dec = + - < zero?
     list
     pi)
   (import
-    (except (micalang base) + - < zero? list)
+    (except (micalang base) = + - < zero? list)
     (rename (micalang term) (pi %pi)))
   (export
     (import
@@ -20,6 +20,7 @@
   (define inc (lambda (x) (fx+/wraparound x 1)))
   (define dec (lambda (x) (fx-/wraparound x 1)))
 
+  (define = (lambda (x) (lambda (y) (fx= x y))))
   (define + (lambda (x) (lambda (y) (fx+/wraparound x y))))
   (define - (lambda (x) (lambda (y) (fx-/wraparound x y))))
   (define < (lambda (x) (lambda (y) (fx< x y))))

@@ -1,11 +1,11 @@
 (library (micalang runtime-term)
   (export
     type bool int
-    inc dec + - < zero?
+    inc dec = + - < zero?
     list
     pi pi-param)
   (import
-    (except (micalang base) + - < zero? list)
+    (except (micalang base) = + - < zero? list)
     (rename (micalang term) (pi %pi) (pi-param %%pi-param)))
   (export
     (import
@@ -40,6 +40,21 @@
         ((fixnum? $fixnum) (fx-/wraparound $fixnum 1))
         ((%pi?? _) #f)
         ((else $other) (application (native dec) $other)))))
+
+  (define =
+    (lambda (x)
+      (lambda (y)
+        (switch x
+          ((fixnum? $fixnum-x)
+            (switch y
+              ((fixnum? $fixnum-y)
+                (fx= $fixnum-x $fixnum-y))
+              ((%pi?? _) #f)
+              ((else $other-y)
+                (application (application (native =) $fixnum-x) $other-y))))
+          ((%pi?? _) #f)
+          ((else $other-x)
+            (application (application (native =) $other-x) y))))))
 
   (define +
     (lambda (x)
