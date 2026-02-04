@@ -1,21 +1,24 @@
 (library (micalang term)
   (export
     variable variable? variable-index
+    abstraction abstraction? abstraction-procedure
     application application? application-lhs application-rhs
     pi pi? pi-param pi-procedure
-    branch branch? branch-cond branch-lhs branch-rhs
+    branch branch? branch-cond branch-true branch-false
 
     depth-term->datum
     check-term->datum
 
     term-neutral?
-    term-apply)
+    term-apply
+    term-equal?)
   (import (except (micascheme) pi))
 
   (data (variable index))
+  (data (abstraction procedure))
   (data (application lhs rhs))
   (data (pi param procedure))
-  (data (branch cond lhs rhs))
+  (data (branch cond true false))
 
   (define (index->symbol $index)
     (string->symbol (format "v~a" $index)))
@@ -23,12 +26,14 @@
   (define (depth-term->datum $depth $term)
     (switch $term
       ((variable? $variable)
-        (index->symbol (- $depth (variable-index $variable))))
-      ((procedure? $procedure)
+        (index->symbol (variable-index $variable)))
+      ((abstraction? $abstraction)
         (lets
-          ($symbol (index->symbol $depth))
-          `(lambda (,$symbol)
-            ,(depth-term->datum (+ $depth 1) ($procedure $symbol)))))
+          ($variable (variable $depth))
+          `(lambda (,(index->symbol $depth))
+            ,(depth-term->datum
+              (+ $depth 1)
+              ((abstraction-procedure $abstraction) $variable)))))
       ((application? $application)
         `(
           ,(depth-term->datum $depth (application-lhs $application))
@@ -49,8 +54,8 @@
       ((branch? $branch)
         `(if
           ,(depth-term->datum $depth (branch-cond $branch))
-          ,(depth-term->datum $depth (branch-lhs $branch))
-          ,(depth-term->datum $depth (branch-rhs $branch))))
+          ,(depth-term->datum $depth (branch-true $branch))
+          ,(depth-term->datum $depth (branch-false $branch))))
       ((else $other)
         $other)))
 
@@ -59,14 +64,61 @@
 
   (define term-neutral? (or? variable? application? branch?))
 
-  (define (term-apply $lhs $rhs)
+  (define (term-apply $procedure $rhs)
+    (if (term-neutral? $rhs)
+      (application $procedure $rhs)
+      ($procedure $rhs)))
+
+  (define (depth-term-equal? $depth $lhs $rhs)
     (switch $lhs
-      ((procedure? $procedure)
-        (if (term-neutral? $rhs)
-          (application $procedure $rhs)
-          ($procedure $rhs)))
-      ((pi? $pi)
-        ((pi-procedure $pi) $rhs))
-      ((else $other)
-        (application $other $rhs))))
+      ((variable? $lhs-variable)
+        (switch? $rhs
+          ((variable? $rhs-variable)
+            (=
+              (variable-index $lhs-variable)
+              (variable-index $rhs-variable)))))
+      ((abstraction? $lhs-abstraction)
+        (switch? $rhs
+          ((abstraction? $rhs-abstraction)
+            (depth-term-equal? (+ $depth 1)
+              ((abstraction-procedure $lhs-abstraction) (variable $depth))
+              ((abstraction-procedure $rhs-abstraction) (variable $depth))))))
+      ((application? $lhs-application)
+        (switch? $rhs
+          ((application? $rhs-application)
+            (and
+              (depth-term-equal? $depth
+                (application-lhs $lhs-application)
+                (application-lhs $rhs-application))
+              (depth-term-equal? $depth
+                (application-rhs $lhs-application)
+                (application-rhs $rhs-application))))))
+      ((pi? $lhs-pi)
+        (switch? $rhs
+          ((pi? $rhs-pi)
+            (and
+              (depth-term-equal? $depth
+                (pi-param $lhs-pi)
+                (pi-param $rhs-pi))
+              (depth-term-equal? (+ $depth 1)
+                ((pi-procedure $lhs-pi) (variable $depth))
+                ((pi-procedure $rhs-pi) (variable $depth)))))))
+      ((branch? $lhs-branch)
+        (switch? $rhs
+          ((branch? $rhs-branch)
+            (and
+              (depth-term-equal? $depth
+                (branch-cond $lhs-branch)
+                (branch-cond $rhs-branch))
+              (depth-term-equal? $depth
+                (branch-true $lhs-branch)
+                (branch-true $rhs-branch))
+              (depth-term-equal? $depth
+                (branch-false $lhs-branch)
+                (branch-false $rhs-branch))))))
+      ((else _)
+        (equal? $lhs $rhs))))
+
+  (define (term-equal? $lhs $rhs)
+    (depth-term-equal? 0 $lhs $rhs))
 )
