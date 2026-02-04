@@ -11,6 +11,7 @@
     check-term->datum
 
     term-apply
+    apply-term
     term-equal?)
   (import (except (micascheme) pi))
 
@@ -64,10 +65,21 @@
   (define-rule-syntax (check-term->datum in out)
     (check (equal? (depth-term->datum 0 in) `out)))
 
-  (define (term-apply $procedure $rhs)
+  (define (apply-term $procedure $rhs)
     (if (native? $rhs)
-      ($procedure $rhs)
-      (application $procedure $rhs)))
+      ($procedure (native-ref $rhs))
+      (application (native $procedure) $rhs)))
+
+  (define (term-apply $lhs $rhs)
+    (switch $lhs
+      ((native? $native)
+        (apply-term (native-ref $native) $rhs))
+      ((abstraction? $abstraction)
+        ((abstraction-procedure $abstraction) $rhs))
+      ((pi? $pi)
+        ((pi-procedure $pi) $rhs))
+      ((else $other)
+        (application $other $rhs))))
 
   (define (depth-term-equal? $depth $lhs $rhs)
     (switch-exhaustive $lhs

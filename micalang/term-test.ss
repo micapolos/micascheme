@@ -11,11 +11,11 @@
   (foo bar))
 
 (check-term->datum
-  (abstraction (lambda (x) (term-apply (native zero?) x)))
+  (abstraction (lambda (x) (apply-term zero? x)))
   (lambda (v0) (,zero? v0)))
 
 (check-term->datum
-  (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (term-apply (native +) x) y)))))
+  (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (apply-term + x) y)))))
   (lambda (v0) (lambda (v1) ((,+ v0) v1))))
 
 (check-term->datum
@@ -37,6 +37,22 @@
 (check-term->datum
   (conditional (variable 2) (native 10) (native 20))
   (if v2 10 20))
+
+; --- term-apply
+
+(check
+  (equal?
+    (term-apply (native (lambda (x) (native (zero? x)))) (native 0))
+    (native #t)))
+
+(check
+  (equal?
+    (term-apply
+      (term-apply
+        (native (lambda (x) (native (lambda (y) (native (- x y))))))
+        (native 5))
+      (native 3))
+    (native 2)))
 
 ; --- term-equal?
 
@@ -67,11 +83,23 @@
 
 (check
   (term-equal?
-    (abstraction (lambda (x) (term-apply (native zero?) x)))
-    (abstraction (lambda (x) (term-apply (native zero?) x)))))
+    (abstraction (lambda (x) (apply-term zero? x)))
+    (abstraction (lambda (x) (apply-term zero? x)))))
 
 (check
   (not
     (term-equal?
-      (abstraction (lambda (x) (term-apply (native odd?) x)))
-      (abstraction (lambda (x) (term-apply (native even?) x))))))
+      (abstraction (lambda (x) (apply-term odd? x)))
+      (abstraction (lambda (x) (apply-term even? x))))))
+
+(check
+  (term-equal?
+    (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (apply-term + x) y)))))
+    (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (apply-term + x) y)))))))
+
+(check
+  (not
+    (term-equal?
+      (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (apply-term + x) y)))))
+      (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (apply-term + y) x))))))))
+
