@@ -1,6 +1,6 @@
 (import
   (only (micascheme) check equal? quote procedure? let)
-  (micalang runtime-term))
+  (micalang comptime))
 
 (check (equal? bool (literal 'bool)))
 (check (equal? int (literal 'int)))

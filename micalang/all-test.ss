@@ -5,6 +5,6 @@
   (micalang idris)
   (micalang term)
   (micalang runtime)
-  (micalang runtime-term)
+  (micalang comptime)
   (micalang env)
   (micalang compiler))

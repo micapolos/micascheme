@@ -1,4 +1,4 @@
-(library (micalang runtime-term)
+(library (micalang comptime)
   (export
     literal app
     type bool int

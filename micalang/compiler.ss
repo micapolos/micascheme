@@ -14,7 +14,7 @@
   (define (mica-environment $fast?)
     (if $fast?
       (environment '(micalang runtime))
-      (environment '(micalang runtime-term))))
+      (environment '(micalang comptime))))
 
   (define (mica-evaluate-typed $fast? $env $term)
     (eval

@@ -3,7 +3,7 @@
   (import
     (only (micalang base) define quote quasiquote unquote)
     (micalang typed)
-    (micalang runtime-term))
+    (micalang comptime))
 
   (define mica-env
     `(
