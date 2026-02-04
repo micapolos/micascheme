@@ -57,5 +57,8 @@
 (check (equal? (pi-param (pi (_ int) bool)) int))
 (check (equal? ((pi (_ int) bool) '()) bool))
 
+(check (equal? (pi-param (pi (x type) x)) type))
+(check (equal? ((pi (x type) x) int) int))
+
 (check (equal? (pi-param (pi (x type) (list x))) type))
 (check (equal? ((pi (x type) (list x)) int) (list int)))
