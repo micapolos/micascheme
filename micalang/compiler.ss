@@ -11,14 +11,14 @@
     (micalang typed)
     (micalang env))
 
-  (define (mica-environment $fast?)
-    (if $fast?
+  (define (mica-environment $comptime?)
+    (if $comptime?
       (environment '(micalang runtime))
       (environment '(micalang comptime))))
 
-  (define (mica-evaluate-typed $fast? $env $term)
+  (define (mica-evaluate-typed $comptime? $env $term)
     (eval
-      (typed-ref (mica-compile $fast? $env $term))
+      (typed-ref (mica-compile $comptime? $env $term))
       mica-environment))
 
   (define (evaluate-type $env $term)
@@ -35,7 +35,7 @@
       (typed-ref (mica-compile #t $env $term))
       (mica-environment #t)))
 
-  (define (mica-compile $fast? $env $term)
+  (define (mica-compile $comptime? $env $term)
     (switch $term
       ((typed? $typed) $typed)
       ((else _)
@@ -63,7 +63,7 @@
                   ($type (evaluate-type $env #'t))
                   ($typed-body
                     (mica-compile
-                      $fast?
+                      $comptime?
                       (cons `(,$symbol ,(typed $type $symbol)) $env)
                       #'body))
                   ($body-type (typed-type $typed-body))
@@ -74,8 +74,8 @@
                 (syntax-error #'id "not identifier"))))
           ((fn arg)
             (lets
-              ($typed-fn (mica-compile $fast? $env #'fn))
-              ($typed-arg (mica-compile $fast? $env #'arg))
+              ($typed-fn (mica-compile $comptime? $env #'fn))
+              ($typed-arg (mica-compile $comptime? $env #'arg))
               (switch (typed-type $typed-fn)
                 ((pi? $pi)
                   (typed
@@ -93,7 +93,7 @@
                 (lets
                   ($type (evaluate-type $env #'t))
                   ($inner-typed
-                    (mica-compile $fast?
+                    (mica-compile $comptime?
                       (cons `(,$symbol ,(typed $type $symbol)) $env)
                       `(lambda ,@#'(params ...) ,#'body)))
                   ($inner-type (typed-type $inner-typed))
@@ -104,9 +104,9 @@
                 (syntax-error #'id "not identifier"))))
 
           ((fn arg args ...)
-            (mica-compile $fast? $env
+            (mica-compile $comptime? $env
               `(
-                ,(mica-compile $fast? $env `(,#'fn ,#'arg))
+                ,(mica-compile $comptime? $env `(,#'fn ,#'arg))
                 ,@#'(args ...))))))))
 
   (define-rule-syntax (check-compiles (id expr) ... in out)
