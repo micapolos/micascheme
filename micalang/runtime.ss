@@ -26,9 +26,7 @@
 
   (define list (lambda (x) (application list x)))
 
-  (define-rules-syntax (literals :)
-    ((pi (id : in) out)
-      (lambda (id) out))
-    ((pi in out)
-      (pi (_ : in) out)))
+  (define-rules-syntax
+    ((pi (id in) out)
+      (lambda (id) out)))
 )

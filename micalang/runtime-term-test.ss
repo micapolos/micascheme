@@ -1,5 +1,5 @@
 (import
-  (only (micascheme) check equal? quote)
+  (only (micascheme) check equal? quote procedure? let)
   (micalang runtime-term))
 
 (check (equal? bool (native 'bool)))
@@ -54,3 +54,8 @@
     ((< 2) (variable 1))
     (application (application (native <) 2) (variable 1))))
 
+(check (equal? (pi-param (pi (_ int) bool)) int))
+(check (equal? ((pi (_ int) bool) '()) bool))
+
+(check (equal? (pi-param (pi (x type) (list x))) type))
+(check (equal? ((pi (x type) (list x)) int) (list int)))

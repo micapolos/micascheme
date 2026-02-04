@@ -1,13 +1,20 @@
 (library (micalang runtime-term)
-  (export bool int inc dec + - < zero?)
+  (export
+    type bool int
+    inc dec + - < zero?
+    list
+    pi pi-param)
   (import
-    (except (micalang base) + - < zero?)
-    (micalang term))
+    (except (micalang base) + - < zero? list)
+    (rename (micalang term) (pi %pi) (pi-param %pi-param)))
   (export
     (import
       (only (micascheme) lambda equal?)
-      (micalang term)))
+      (only (micalang term) native variable application)))
 
+  (data hole)
+
+  (define type (native 'type))
   (define bool (native 'bool))
   (define int (native 'int))
 
@@ -67,4 +74,19 @@
                 (application (application (native <) $fixnum-x) $other-y))))
           ((else $other-x)
             (application (application (native <) $other-x) y))))))
+
+  (define list
+    (lambda (x)
+      (application (native list) x)))
+
+  (define pi-param
+    (lambda ($pi)
+      ($pi hole)))
+
+  (define-rules-syntax
+    ((pi (id in) out)
+      (lambda (id)
+        (switch id
+          ((hole? _) in)
+          ((else _) out)))))
 )
