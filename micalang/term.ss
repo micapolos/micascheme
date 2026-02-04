@@ -1,5 +1,6 @@
 (library (micalang term)
   (export
+    native native? native-ref
     variable variable? variable-index
     abstraction abstraction? abstraction-procedure
     application application? application-lhs application-rhs
@@ -9,11 +10,11 @@
     depth-term->datum
     check-term->datum
 
-    term-neutral?
     term-apply
     term-equal?)
   (import (except (micascheme) pi))
 
+  (data (native ref))
   (data (variable index))
   (data (abstraction procedure))
   (data (application lhs rhs))
@@ -24,7 +25,9 @@
     (string->symbol (format "v~a" $index)))
 
   (define (depth-term->datum $depth $term)
-    (switch $term
+    (switch-exhaustive $term
+      ((native? $native)
+        (native-ref $native))
       ((variable? $variable)
         (index->symbol (variable-index $variable)))
       ((abstraction? $abstraction)
@@ -41,11 +44,12 @@
       ((pi? $pi)
         (lets
           ($param-datum (depth-term->datum $depth (pi-param $pi)))
+          ($variable (variable $depth))
           ($symbol (index->symbol $depth))
           ($procedure (pi-procedure $pi))
           ($body-depth (+ $depth 1))
-          ($body-datum (depth-term->datum $body-depth ($procedure $symbol)))
-          ($hole-body-datum (depth-term->datum $body-depth ($procedure 'hole)))
+          ($body-datum (depth-term->datum $body-depth ($procedure $variable)))
+          ($hole-body-datum (depth-term->datum $body-depth ($procedure (native 'hole))))
           `(pi
             ,(if (equal? $body-datum $hole-body-datum)
               $param-datum
@@ -55,22 +59,24 @@
         `(if
           ,(depth-term->datum $depth (branch-cond $branch))
           ,(depth-term->datum $depth (branch-true $branch))
-          ,(depth-term->datum $depth (branch-false $branch))))
-      ((else $other)
-        $other)))
+          ,(depth-term->datum $depth (branch-false $branch))))))
 
   (define-rule-syntax (check-term->datum in out)
     (check (equal? (depth-term->datum 0 in) 'out)))
 
-  (define term-neutral? (or? variable? application? branch?))
-
   (define (term-apply $procedure $rhs)
-    (if (term-neutral? $rhs)
-      (application $procedure $rhs)
-      ($procedure $rhs)))
+    (if (native? $rhs)
+      ($procedure $rhs)
+      (application $procedure $rhs)))
 
   (define (depth-term-equal? $depth $lhs $rhs)
-    (switch $lhs
+    (switch-exhaustive $lhs
+      ((native? $lhs-native)
+        (switch? $rhs
+          ((native? $rhs-native)
+            (equal?
+              (native-ref $lhs-native)
+              (native-ref $rhs-native)))))
       ((variable? $lhs-variable)
         (switch? $rhs
           ((variable? $rhs-variable)
@@ -115,9 +121,7 @@
                 (branch-true $rhs-branch))
               (depth-term-equal? $depth
                 (branch-false $lhs-branch)
-                (branch-false $rhs-branch))))))
-      ((else _)
-        (equal? $lhs $rhs))))
+                (branch-false $rhs-branch))))))))
 
   (define (term-equal? $lhs $rhs)
     (depth-term-equal? 0 $lhs $rhs))
