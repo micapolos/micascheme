@@ -3,14 +3,22 @@
     literal app
     type bool int
     inc dec = + - < zero?
-    list)
+    list lambda)
   (import
-    (except (micalang base) = + - < zero? list)
+    (except (micalang base) = + - < zero? list lambda)
+    (prefix (only (micalang base) lambda) %)
     (rename (micalang term) (pi %pi)))
   (export
     (import
-      (only (micascheme) lambda equal? app)
+      (only (micascheme) equal? app)
       (only (micalang term) native)))
+
+  (define-rules-syntax
+    ((lambda (id) body)
+      (%lambda (id) body))
+    ((lambda (id ids ...) body)
+      (lambda id
+        (lambda ids ... body))))
 
   (define-rule-syntax (literal x) x)
 
