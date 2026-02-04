@@ -6,13 +6,15 @@
     application application? application-lhs application-rhs
     pi pi? pi-param pi-procedure
     conditional conditional? conditional-cond conditional-true conditional-false
+    typed typed? typed-type typed-ref
 
     depth-term->datum
     check-term->datum
 
     term-apply
     apply-term
-    term-equal?)
+    term-equal?
+    typed-equal?)
   (import (except (micascheme) pi))
 
   (data (native ref))
@@ -21,6 +23,7 @@
   (data (application lhs rhs))
   (data (pi param procedure))
   (data (conditional cond true false))
+  (data (typed type ref))
 
   (define (index->symbol $index)
     (string->symbol (format "v~a" $index)))
@@ -137,4 +140,9 @@
 
   (define (term-equal? $lhs $rhs)
     (depth-term-equal? 0 $lhs $rhs))
+
+  (define (typed-equal? $lhs $rhs)
+    (and
+      (term-equal? (typed-type $lhs) (typed-type $rhs))
+      (equal? (typed-ref $lhs) (typed-ref $rhs))))
 )
