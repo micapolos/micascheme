@@ -21,4 +21,3 @@
 (check (procedure? (pi (x : type) x)))
 (check (equal? ((pi (x : type) x) int) int))
 (check (equal? ((pi (x : type) (list x)) int) (list int)))
-
