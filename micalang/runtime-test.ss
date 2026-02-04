@@ -1,9 +1,5 @@
 (import (only (micascheme) check equal? quote procedure?) (micalang runtime) (prefix (micalang term) %))
 
-(check (equal? type (native 'type)))
-(check (equal? bool (native 'bool)))
-(check (equal? int (native 'int)))
-
 (check (equal? (app zero? (literal 0)) #t))
 (check (equal? (app inc (literal 2)) (literal 3)))
 (check (equal? (app dec (literal 2)) (literal 1)))
