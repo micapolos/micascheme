@@ -11,20 +11,15 @@
     (micalang typed)
     (micalang env))
 
-  (define (mica-environment $comptime?)
-    (if $comptime?
+  (define (mica-environment $runtime?)
+    (if $runtime?
       (environment '(micalang runtime))
       (environment '(micalang comptime))))
-
-  (define (mica-evaluate-typed $comptime? $env $term)
-    (eval
-      (typed-ref (mica-compile $comptime? $env $term))
-      mica-environment))
 
   (define (evaluate-type $env $term)
     (eval
       (lets
-        ($typed (mica-compile #f $env $term))
+        ($typed (mica-compile $env $term))
         (cond
           ((term-equal? (typed-type $typed) (native 'type)) (typed-ref $typed))
           (else (syntax-error $term "not type"))))
@@ -32,10 +27,10 @@
 
   (define (mica-evaluate $env $term)
     (eval
-      (typed-ref (mica-compile #t $env $term))
+      (typed-ref (mica-compile $env $term))
       (mica-environment #t)))
 
-  (define (mica-compile $comptime? $env $term)
+  (define (mica-compile $env $term)
     (switch $term
       ((typed? $typed) $typed)
       ((else _)
@@ -63,7 +58,6 @@
                   ($type (evaluate-type $env #'t))
                   ($typed-body
                     (mica-compile
-                      $comptime?
                       (cons `(,$symbol ,(typed $type $symbol)) $env)
                       #'body))
                   ($body-type (typed-type $typed-body))
@@ -74,8 +68,8 @@
                 (syntax-error #'id "not identifier"))))
           ((fn arg)
             (lets
-              ($typed-fn (mica-compile $comptime? $env #'fn))
-              ($typed-arg (mica-compile $comptime? $env #'arg))
+              ($typed-fn (mica-compile $env #'fn))
+              ($typed-arg (mica-compile $env #'arg))
               (switch (typed-type $typed-fn)
                 ((pi? $pi)
                   (typed
@@ -93,7 +87,7 @@
                 (lets
                   ($type (evaluate-type $env #'t))
                   ($inner-typed
-                    (mica-compile $comptime?
+                    (mica-compile
                       (cons `(,$symbol ,(typed $type $symbol)) $env)
                       `(lambda ,@#'(params ...) ,#'body)))
                   ($inner-type (typed-type $inner-typed))
@@ -104,14 +98,14 @@
                 (syntax-error #'id "not identifier"))))
 
           ((fn arg args ...)
-            (mica-compile $comptime? $env
+            (mica-compile $env
               `(
-                ,(mica-compile $comptime? $env `(,#'fn ,#'arg))
+                ,(mica-compile $env `(,#'fn ,#'arg))
                 ,@#'(args ...))))))))
 
   (define-rule-syntax (check-compiles (id expr) ... in out)
     (lets
-      ($typed (mica-compile #t `((id ,expr) ... ,@mica-env) 'in))
+      ($typed (mica-compile `((id ,expr) ... ,@mica-env) 'in))
       (check
         (equal?
           `(typed
@@ -120,5 +114,5 @@
           'out))))
 
   (define-rule-syntax (check-compile-raises (id expr) ... in)
-    (check (raises (mica-compile #t `((id ,expr) ... ,@mica-env) 'in))))
+    (check (raises (mica-compile `((id ,expr) ... ,@mica-env) 'in))))
 )
