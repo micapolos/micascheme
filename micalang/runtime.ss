@@ -2,8 +2,7 @@
   (export
     type bool int
     inc dec = + - < zero?
-    list
-    pi)
+    list)
   (import
     (except (micalang base) = + - < zero? list)
     (rename (micalang term) (pi %pi)))
@@ -26,8 +25,4 @@
   (define < (lambda (x) (lambda (y) (fx< x y))))
 
   (define list (lambda (x) (application list x)))
-
-  (define-rules-syntax
-    ((pi (id in) out)
-      (lambda (id) out)))
 )

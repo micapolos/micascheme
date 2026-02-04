@@ -16,9 +16,3 @@
 
 (check (procedure? list))
 (check (equal? (list int) (%application list int)))
-
-(check (procedure? (pi (_ bool) int)))
-
-(check (equal? ((pi (_ bool) int) '()) int))
-(check (equal? ((pi (x type) x) int) int))
-(check (equal? ((pi (x type) (list x)) int) (list int)))
