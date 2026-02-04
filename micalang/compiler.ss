@@ -103,9 +103,9 @@
                 ,(mica-compile $env `(,#'fn ,#'arg))
                 ,@#'(args ...))))))))
 
-  (define-rule-syntax (check-compiles (id expr) ... in out)
+  (define-rule-syntax (check-compiles in out)
     (lets
-      ($typed (mica-compile `((id ,expr) ... ,@mica-env) 'in))
+      ($typed (mica-compile `(,@mica-env) 'in))
       (check
         (equal?
           `(typed
@@ -113,6 +113,6 @@
             ,(typed-ref $typed))
           'out))))
 
-  (define-rule-syntax (check-compile-raises (id expr) ... in)
-    (check (raises (mica-compile `((id ,expr) ... ,@mica-env) 'in))))
+  (define-rule-syntax (check-compile-raises in)
+    (check (raises (mica-compile `(,@mica-env) 'in))))
 )

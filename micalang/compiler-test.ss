@@ -9,24 +9,13 @@
 (check-compiles 123 (typed int (literal 123)))
 (check-compile-raises 123123123123123123123123)
 
-; === variable
+; === globals
 
-(check-compiles
-  (x1 (typed (native 't1) 'v1))
-  (x2 (typed (native 't2) 'v2))
-  x1
-  (typed t1 v1))
-
-(check-compiles
-  (x1 (typed (native 't1) 'v1))
-  (x2 (typed (native 't2) 'v2))
-  x2
-  (typed t2 v2))
-
-(check-compile-raises
-  (x1 (typed (native 't1) 'v1))
-  (x2 (typed (native 't2) 'v2))
-  x3)
+(check-compiles type (typed type type))
+(check-compiles bool (typed type bool))
+(check-compiles int (typed type int))
+(check-compiles zero? (typed (pi int bool) zero?))
+(check-compiles < (typed (pi int (pi int bool)) <))
 
 ; === application
 
