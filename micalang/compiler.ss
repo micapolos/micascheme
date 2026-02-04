@@ -38,7 +38,7 @@
       (fx
         (fixnum? (datum fx))
         (typed
-          (native 'int)
+          (eval 'int (mica-environment #f))
           (if $fast?
             (datum fx)
             `(native ,(datum fx)))))
