@@ -1,7 +1,7 @@
 (library (micalang runtime-term)
   (export bool int inc dec + - < zero?)
   (import
-    (only (micascheme) switch else fixnum? export quote define lambda fx+/wraparound fx-/wraparound fx< fxzero?)
+    (except (micalang base) + - < zero?)
     (micalang term))
   (export
     (import

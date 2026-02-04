@@ -1,13 +1,18 @@
 (library (micalang runtime)
-  (export bool int inc dec + - < zero?)
+  (export
+    type bool int
+    inc dec + - < zero?
+    list
+    pi)
   (import
-    (only (micascheme) export quote define lambda fx+/wraparound fx-/wraparound fx< fxzero?)
-    (micalang term))
+    (except (micalang base) + - < zero? list)
+    (rename (micalang term) (pi %pi)))
   (export
     (import
       (only (micascheme) lambda equal?)
-      (micalang term)))
+      (only (micalang term) native)))
 
+  (define type (native 'type))
   (define bool (native 'bool))
   (define int (native 'int))
 
@@ -18,4 +23,12 @@
   (define + (lambda (x) (lambda (y) (fx+/wraparound x y))))
   (define - (lambda (x) (lambda (y) (fx-/wraparound x y))))
   (define < (lambda (x) (lambda (y) (fx< x y))))
+
+  (define list (lambda (x) (application list x)))
+
+  (define-rules-syntax (literals :)
+    ((pi (id : in) out)
+      (lambda (id) out))
+    ((pi in out)
+      (pi (_ : in) out)))
 )
