@@ -69,9 +69,7 @@
                   ($body-type (typed-type $typed-body))
                   (typed
                     (pi $type (lambda (_) $body-type))
-                    (if $fast?
-                      `(lambda (,$symbol) ,(typed-ref $typed-body))
-                      `(abstraction (lambda (,$symbol) ,(typed-ref $typed-body)))))))
+                    `(lambda ,$symbol ,(typed-ref $typed-body)))))
               ((else _)
                 (syntax-error #'id "not identifier"))))
           ((fn arg)
@@ -82,13 +80,9 @@
                 ((pi? $pi)
                   (typed
                     ((pi-procedure $pi) (typed-type $typed-arg))
-                    (if $fast?
-                      `(app
-                        ,(typed-ref $typed-fn)
-                        ,(typed-ref $typed-arg))
-                      `(app
-                        ,(typed-ref $typed-fn)
-                        ,(typed-ref $typed-arg)))))
+                    `(app
+                      ,(typed-ref $typed-fn)
+                      ,(typed-ref $typed-arg))))
                 ((else _)
                   (syntax-error #'fn "not function")))))
 
@@ -105,7 +99,7 @@
                   ($inner-type (typed-type $inner-typed))
                   (typed
                     (pi $type (lambda (_) $inner-type))
-                    `(lambda (,$symbol) ,(typed-ref $inner-typed)))))
+                    `(lambda ,$symbol ,(typed-ref $inner-typed)))))
               ((else _)
                 (syntax-error #'id "not identifier"))))
 

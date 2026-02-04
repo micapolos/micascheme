@@ -9,3 +9,5 @@
 (check (equal? (app (app + (literal 2)) (literal 3)) (literal 5)))
 (check (equal? (app (app - (literal 5)) (literal 3)) (literal 2)))
 (check (equal? (app (app < (literal 2)) (literal 3)) (literal #t)))
+
+(check (equal? (app < (literal 1) (literal 3)) (literal #t)))

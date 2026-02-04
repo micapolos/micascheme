@@ -18,13 +18,13 @@
     (native x))
 
   (define-rules-syntax
-    ((lambda (id) body)
+    ((lambda id body)
       (abstraction (%lambda (id) body)))
-    ((lambda (id ids ...) body)
+    ((lambda id ids ... body)
       (lambda id
         (lambda ids ... body))))
 
-  (define (app $lhs $rhs)
+  (define (app1 $lhs $rhs)
     (switch $lhs
       ((pi? $pi)
         ((pi-procedure $pi) $rhs))
@@ -32,6 +32,12 @@
         ((abstraction-procedure $abstraction) $rhs))
       ((else $other)
         (application (native $other) $rhs))))
+
+  (define-rules-syntax
+    ((app lhs rhs)
+      (app1 lhs rhs))
+    ((app lhs rhs rhss ...)
+      (app (app lhs rhs) rhss ...)))
 
   ; === selectors passed to procedures:
   (data %pi?)       ; #t for pi, #f for lambda
@@ -42,90 +48,85 @@
   (define int (native 'int))
 
   (define zero?
-    (lambda (x)
+    (lambda x
       (switch x
         ((native? $native) (native (fxzero? (native-ref $native))))
         ((else $other) (application (native zero?) $other)))))
 
   (define inc
-    (lambda (x)
+    (lambda x
       (switch x
         ((native? $native) (native (fx+/wraparound (native-ref $native) 1)))
         ((else $other) (application (native inc) $other)))))
 
   (define dec
-    (lambda (x)
+    (lambda x
       (switch x
         ((native? $native) (native (fx-/wraparound (native-ref $native) 1)))
         ((else $other) (application (native dec) $other)))))
 
   (define =
-    (lambda (x)
-      (lambda (y)
-        (switch x
-          ((native? $native-x)
-            (switch y
-              ((native? $native-y)
-                (native
-                  (fx=
-                    (native-ref $native-x)
-                    (native-ref $native-y))))
-              ((else $other-y)
-                (application (application (native =) $native-x) $other-y))))
-          ((else $other-x)
-            (application (application (native =) $other-x) y))))))
+    (lambda x y
+      (switch x
+        ((native? $native-x)
+          (switch y
+            ((native? $native-y)
+              (native
+                (fx=
+                  (native-ref $native-x)
+                  (native-ref $native-y))))
+            ((else $other-y)
+              (application (application (native =) $native-x) $other-y))))
+        ((else $other-x)
+          (application (application (native =) $other-x) y)))))
 
   (define +
-    (lambda (x)
-      (lambda (y)
-        (switch x
-          ((native? $native-x)
-            (switch y
-              ((native? $native-y)
-                (native
-                  (fx+/wraparound
-                    (native-ref $native-x)
-                    (native-ref $native-y))))
-              ((else $other-y)
-                (application (application (native +) $native-x) $other-y))))
-          ((else $other-x)
-            (application (application (native +) $other-x) y))))))
+    (lambda x y
+      (switch x
+        ((native? $native-x)
+          (switch y
+            ((native? $native-y)
+              (native
+                (fx+/wraparound
+                  (native-ref $native-x)
+                  (native-ref $native-y))))
+            ((else $other-y)
+              (application (application (native +) $native-x) $other-y))))
+        ((else $other-x)
+          (application (application (native +) $other-x) y)))))
 
   (define -
-    (lambda (x)
-      (lambda (y)
-        (switch x
-          ((native? $native-x)
-            (switch y
-              ((native? $native-y)
-                (native
-                  (fx-/wraparound
-                    (native-ref $native-x)
-                    (native-ref $native-y))))
-              ((else $other-y)
-                (application (application (native -) $native-x) $other-y))))
-          ((else $other-x)
-            (application (application (native -) $other-x) y))))))
+    (lambda x y
+      (switch x
+        ((native? $native-x)
+          (switch y
+            ((native? $native-y)
+              (native
+                (fx-/wraparound
+                  (native-ref $native-x)
+                  (native-ref $native-y))))
+            ((else $other-y)
+              (application (application (native -) $native-x) $other-y))))
+        ((else $other-x)
+          (application (application (native -) $other-x) y)))))
 
   (define <
-    (lambda (x)
-      (lambda (y)
-        (switch x
-          ((native? $native-x)
-            (switch y
-              ((native? $native-y)
-                (native
-                  (fx<
-                    (native-ref $native-x)
-                    (native-ref $native-y))))
-              ((else $other-y)
-                (application (application (native <) $native-x) $other-y))))
-          ((else $other-x)
-            (application (application (native <) $other-x) y))))))
+    (lambda x y
+      (switch x
+        ((native? $native-x)
+          (switch y
+            ((native? $native-y)
+              (native
+                (fx<
+                  (native-ref $native-x)
+                  (native-ref $native-y))))
+            ((else $other-y)
+              (application (application (native <) $native-x) $other-y))))
+        ((else $other-x)
+          (application (application (native <) $other-x) y)))))
 
   (define list
-    (lambda (x)
-      (application (native list) x)))
+    (lambda x (application (native list) x)))
 
   (define-rules-syntax
     ((pi (id in) out)

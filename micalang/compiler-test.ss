@@ -46,13 +46,13 @@
 
 (check-compiles
   (lambda (i : int) i)
-  (typed (pi int int) (lambda (i) i)))
+  (typed (pi int int) (lambda i i)))
 
 (check-compiles
   (lambda (i : int) (j : int) (+ i j))
   (typed
     (pi int (pi int int))
-    (lambda (i) (lambda (j) (app (app + i) j)))))
+    (lambda i (lambda j (app (app + i) j)))))
 
 (check-compiles
   inc
