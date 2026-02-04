@@ -1,6 +1,7 @@
 (import
   (micalang base)
   (micalang term)
+  (micalang typed)
   (micalang compiler))
 
 ; === int

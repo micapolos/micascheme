@@ -7,7 +7,8 @@
     check-compile-raises)
   (import
     (micalang base)
-    (micalang term))
+    (micalang term)
+    (micalang typed))
 
   (define (mica-environment $fast?)
     (if $fast?
