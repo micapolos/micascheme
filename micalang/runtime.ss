@@ -1,5 +1,6 @@
 (library (micalang runtime)
   (export
+    literal app
     type bool int
     inc dec = + - < zero?
     list)
@@ -8,8 +9,10 @@
     (rename (micalang term) (pi %pi)))
   (export
     (import
-      (only (micascheme) lambda equal?)
+      (only (micascheme) lambda equal? app)
       (only (micalang term) native)))
+
+  (define-rule-syntax (literal x) x)
 
   (define type (native 'type))
   (define bool (native 'bool))
