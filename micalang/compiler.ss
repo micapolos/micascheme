@@ -1,14 +1,22 @@
 (library (micalang compiler)
-  (export mica-compile)
+  (export
+    mica-compile
+    mica-evaluate
+
+    check-compiles
+    check-compile-raises)
   (import
     (except (micascheme) pi)
     (micalang term))
 
-  (define mica-environment (environment '(scheme) '(micalang term)))
+  (define (mica-environment $fast?)
+    (if $fast?
+      (environment '(micalang runtime))
+      (environment '(micalang runtime-term))))
 
   (define (mica-evaluate-typed $fast? $env $term)
     (eval
-      (typed-ref (mica-compile $fast? '() $env $term))
+      (typed-ref (mica-compile $fast? $env $term))
       mica-environment))
 
   (define (evaluate-type $env $term)
@@ -18,7 +26,12 @@
         (cond
           ((term-equal? (typed-type $typed) (native 'type)) (typed-ref $typed))
           (else (syntax-error $term "not type"))))
-      mica-environment))
+      (mica-environment #f)))
+
+  (define (mica-evaluate $env $term)
+    (eval
+      (typed-ref (mica-compile #t $env $term))
+      (mica-environment #t)))
 
   (define (mica-compile $fast? $env $term)
     (syntax-case $term (typed lambda :)
@@ -49,20 +62,20 @@
               ($typed-body
                 (mica-compile
                   $fast?
-                  (cons `(,$symbol ,$type) $env)
+                  (cons `(,$symbol ,(typed $type $symbol)) $env)
                   #'body))
               ($body-type (typed-type $typed-body))
               (typed
                 (pi $type (lambda (_) $body-type))
                 (if $fast?
-                  `(lambda (id) ,(typed-ref $typed-body))
-                  `(abstraction (lambda (id) ,(typed-ref $typed-body)))))))
+                  `(lambda (,$symbol) ,(typed-ref $typed-body))
+                  `(abstraction (lambda (,$symbol) ,(typed-ref $typed-body)))))))
           ((else _)
             (syntax-error #'id "not identifier"))))
       ((fn arg)
         (lets
           ($typed-fn (mica-compile $fast? $env #'fn))
-          ($typed-arg (mica-compile $fast? $env #'fn))
+          ($typed-arg (mica-compile $fast? $env #'arg))
           (switch (typed-type $typed-fn)
             ((pi? $pi)
               (typed
@@ -76,4 +89,17 @@
                     ,(typed-ref $typed-arg)))))
             ((else _)
               (syntax-error #'fn "not function")))))))
+
+  (define-rule-syntax (check-compiles (id expr) ... in out)
+    (lets
+      ($typed (mica-compile #t `((id ,expr) ...) 'in))
+      (check
+        (equal?
+          `(typed
+            ,(term->datum (typed-type $typed))
+            ,(typed-ref $typed))
+          'out))))
+
+  (define-rule-syntax (check-compile-raises (id expr) ... in)
+    (check (raises (mica-compile #t `((id ,expr) ...) 'in))))
 )

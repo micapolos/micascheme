@@ -3,7 +3,10 @@
   (import
     (only (micascheme) export quote define lambda fx+/wraparound fx-/wraparound fx< fxzero?)
     (micalang term))
-  (export (import (micalang term)))
+  (export
+    (import
+      (only (micascheme) lambda equal?)
+      (micalang term)))
 
   (define bool (native 'bool))
   (define int (native 'int))

@@ -8,6 +8,7 @@
     conditional conditional? conditional-cond conditional-true conditional-false
     typed typed? typed-type typed-ref
 
+    term->datum
     depth-term->datum
     check-term->datum
 
@@ -27,6 +28,9 @@
 
   (define (index->symbol $index)
     (string->symbol (format "v~a" $index)))
+
+  (define (term->datum $term)
+    (depth-term->datum 0 $term))
 
   (define (depth-term->datum $depth $term)
     (switch-exhaustive $term
