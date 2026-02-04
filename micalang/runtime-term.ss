@@ -6,14 +6,15 @@
     pi pi-param)
   (import
     (except (micalang base) + - < zero? list)
-    (rename (micalang term) (pi %pi) (pi-param %pi-param)))
+    (rename (micalang term) (pi %pi) (pi-param %%pi-param)))
   (export
     (import
       (only (micascheme) lambda equal?)
       (only (micalang term) native variable application)))
 
-  (data %pi?)
-  (data %param)
+  ; === selectors passed to procedures:
+  (data %pi?)       ; #t for pi, #f for lambda
+  (data %pi-param)  ; pi param
 
   (define type (native 'type))
   (define bool (native 'bool))
@@ -93,13 +94,13 @@
 
   (define pi-param
     (lambda ($pi)
-      ($pi %param)))
+      ($pi %pi-param)))
 
   (define-rules-syntax
     ((pi (id in) out)
       (lambda (id)
         (switch id
           ((%pi?? _) #t)
-          ((%param? _) in)
+          ((%pi-param? _) in)
           ((else _) out)))))
 )
