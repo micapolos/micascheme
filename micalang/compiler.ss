@@ -36,57 +36,84 @@
       (mica-environment #t)))
 
   (define (mica-compile $fast? $env $term)
-    (syntax-case $term (typed lambda :)
-      (fx
-        (fixnum? (datum fx))
-        (typed
-          (eval 'int (mica-environment #f))
-          `(literal ,(datum fx))))
-      (id
-        (symbol? (datum id))
-        (cadr
-          (or
-            (assq (datum id) $env)
-            (syntax-error #'id "undefined"))))
-      ((typed t v)
-        (typed
-          (evaluate-type $env #'t)
-          `(literal ',#'v)))
-      ((lambda (id : t) body)
-        (switch (datum id)
-          ((symbol? $symbol)
+    (switch $term
+      ((typed? $typed) $typed)
+      ((else _)
+        (syntax-case $term (typed lambda :)
+          ; === core forms
+          (fx
+            (fixnum? (datum fx))
+            (typed
+              (eval 'int (mica-environment #f))
+              `(literal ,(datum fx))))
+          (id
+            (symbol? (datum id))
+            (cadr
+              (or
+                (assq (datum id) $env)
+                (syntax-error #'id "undefined"))))
+          ((typed t v)
+            (typed
+              (evaluate-type $env #'t)
+              `(literal ',#'v)))
+          ((lambda (id : t) body)
+            (switch (datum id)
+              ((symbol? $symbol)
+                (lets
+                  ($type (evaluate-type $env #'t))
+                  ($typed-body
+                    (mica-compile
+                      $fast?
+                      (cons `(,$symbol ,(typed $type $symbol)) $env)
+                      #'body))
+                  ($body-type (typed-type $typed-body))
+                  (typed
+                    (pi $type (lambda (_) $body-type))
+                    (if $fast?
+                      `(lambda (,$symbol) ,(typed-ref $typed-body))
+                      `(abstraction (lambda (,$symbol) ,(typed-ref $typed-body)))))))
+              ((else _)
+                (syntax-error #'id "not identifier"))))
+          ((fn arg)
             (lets
-              ($type (evaluate-type $env #'t))
-              ($typed-body
-                (mica-compile
-                  $fast?
-                  (cons `(,$symbol ,(typed $type $symbol)) $env)
-                  #'body))
-              ($body-type (typed-type $typed-body))
-              (typed
-                (pi $type (lambda (_) $body-type))
-                (if $fast?
-                  `(lambda (,$symbol) ,(typed-ref $typed-body))
-                  `(abstraction (lambda (,$symbol) ,(typed-ref $typed-body)))))))
-          ((else _)
-            (syntax-error #'id "not identifier"))))
-      ((fn arg)
-        (lets
-          ($typed-fn (mica-compile $fast? $env #'fn))
-          ($typed-arg (mica-compile $fast? $env #'arg))
-          (switch (typed-type $typed-fn)
-            ((pi? $pi)
-              (typed
-                ((pi-procedure $pi) (typed-type $typed-arg))
-                (if $fast?
-                  `(app
-                    ,(typed-ref $typed-fn)
-                    ,(typed-ref $typed-arg))
-                  `(app
-                    ,(typed-ref $typed-fn)
-                    ,(typed-ref $typed-arg)))))
-            ((else _)
-              (syntax-error #'fn "not function")))))))
+              ($typed-fn (mica-compile $fast? $env #'fn))
+              ($typed-arg (mica-compile $fast? $env #'arg))
+              (switch (typed-type $typed-fn)
+                ((pi? $pi)
+                  (typed
+                    ((pi-procedure $pi) (typed-type $typed-arg))
+                    (if $fast?
+                      `(app
+                        ,(typed-ref $typed-fn)
+                        ,(typed-ref $typed-arg))
+                      `(app
+                        ,(typed-ref $typed-fn)
+                        ,(typed-ref $typed-arg)))))
+                ((else _)
+                  (syntax-error #'fn "not function")))))
+
+          ; === macros
+          ((lambda (id : t) params ... body)
+            (switch (datum id)
+              ((symbol? $symbol)
+                (lets
+                  ($type (evaluate-type $env #'t))
+                  ($inner-typed
+                    (mica-compile $fast?
+                      (cons `(,$symbol ,(typed $type $symbol)) $env)
+                      `(lambda ,@#'(params ...) ,#'body)))
+                  ($inner-type (typed-type $inner-typed))
+                  (typed
+                    (pi $type (lambda (_) $inner-type))
+                    `(lambda (,$symbol) ,(typed-ref $inner-typed)))))
+              ((else _)
+                (syntax-error #'id "not identifier"))))
+
+          ((fn arg args ...)
+            (mica-compile $fast? $env
+              `(
+                ,(mica-compile $fast? $env `(,#'fn ,#'arg))
+                ,@#'(args ...))))))))
 
   (define-rule-syntax (check-compiles (id expr) ... in out)
     (lets

@@ -28,11 +28,31 @@
   (x2 (typed (native 't2) 'v2))
   x3)
 
+; === application
+
+(check-compiles
+  (inc 10)
+  (typed int (app inc (literal 10))))
+
+(check-compiles
+  ((+ 10) 20)
+  (typed int (app (app + (literal 10)) (literal 20))))
+
+(check-compiles
+  (+ 10 20)
+  (typed int (app (app + (literal 10)) (literal 20))))
+
 ; === lambda
 
 (check-compiles
   (lambda (i : int) i)
   (typed (pi int int) (lambda (i) i)))
+
+(check-compiles
+  (lambda (i : int) (j : int) (+ i j))
+  (typed
+    (pi int (pi int int))
+    (lambda (i) (lambda (j) (app (app + i) j)))))
 
 (check-compiles
   inc
