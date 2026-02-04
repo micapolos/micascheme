@@ -39,9 +39,7 @@
         (fixnum? (datum fx))
         (typed
           (eval 'int (mica-environment #f))
-          (if $fast?
-            (datum fx)
-            `(native ,(datum fx)))))
+          `(literal ,(datum fx))))
       (id
         (symbol? (datum id))
         (cadr
@@ -51,9 +49,7 @@
       ((typed t v)
         (typed
           (evaluate-type $env #'t)
-          (if $fast?
-            `',#'v
-            `(native ',#'v))))
+          `(literal ',#'v)))
       ((lambda (id : t) body)
         (switch (datum id)
           ((symbol? $symbol)
@@ -81,10 +77,10 @@
               (typed
                 ((pi-procedure $pi) (typed-type $typed-arg))
                 (if $fast?
-                  `(
+                  `(app
                     ,(typed-ref $typed-fn)
                     ,(typed-ref $typed-arg))
-                  `(term-apply
+                  `(app
                     ,(typed-ref $typed-fn)
                     ,(typed-ref $typed-arg)))))
             ((else _)

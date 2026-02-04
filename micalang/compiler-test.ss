@@ -5,7 +5,7 @@
 
 ; === int
 
-(check-compiles 123 (typed int 123))
+(check-compiles 123 (typed int (literal 123)))
 (check-compile-raises 123123123123123123123123)
 
 ; === variable
@@ -42,4 +42,4 @@
 (check-compiles
   (inc (typed (pi (native 'int) (lambda (_) (native 'int))) 'inc))
   (inc 1)
-  (typed int (inc 1)))
+  (typed int (app inc (literal 1))))
