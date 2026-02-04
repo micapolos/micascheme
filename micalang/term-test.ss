@@ -35,7 +35,7 @@
   (pi (v0 : nat) (pi (v1 : string) (v0 v1))))
 
 (check-term->datum
-  (branch (variable 2) (native 10) (native 20))
+  (conditional (variable 2) (native 10) (native 20))
   (if v2 10 20))
 
 ; --- term-equal?
