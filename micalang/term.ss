@@ -62,7 +62,7 @@
           ,(depth-term->datum $depth (branch-false $branch))))))
 
   (define-rule-syntax (check-term->datum in out)
-    (check (equal? (depth-term->datum 0 in) 'out)))
+    (check (equal? (depth-term->datum 0 in) `out)))
 
   (define (term-apply $procedure $rhs)
     (if (native? $rhs)

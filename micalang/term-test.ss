@@ -11,12 +11,12 @@
   (foo bar))
 
 (check-term->datum
-  (abstraction (lambda (x) (term-apply (native 'inc) x)))
-  (lambda (v0) (inc v0)))
+  (abstraction (lambda (x) (term-apply (native zero?) x)))
+  (lambda (v0) (,zero? v0)))
 
 (check-term->datum
-  (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (term-apply (native '+) x) y)))))
-  (lambda (v0) (lambda (v1) ((+ v0) v1))))
+  (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (term-apply (native +) x) y)))))
+  (lambda (v0) (lambda (v1) ((,+ v0) v1))))
 
 (check-term->datum
   (pi (native 'nat) (lambda (_) (native 'nat)))
