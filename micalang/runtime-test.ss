@@ -11,3 +11,11 @@
 (check (equal? (app (app < (literal 2)) (literal 3)) (literal #t)))
 
 (check (equal? (app < (literal 1) (literal 3)) (literal #t)))
+
+(check
+  (equal?
+    (let
+      (x (literal 10))
+      (y (literal 20))
+      (app + x y))
+    (literal 30)))

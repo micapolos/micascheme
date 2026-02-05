@@ -1,13 +1,13 @@
 (library (micalang comptime)
   (export
-    literal app
+    literal app let
     type bool int
     inc dec = + - < zero?
     list
     pi)
   (import
-    (except (micalang base) = + - < zero? list app lambda)
-    (prefix (only (micalang base) lambda) %)
+    (except (micalang base) = + - < zero? list app lambda let)
+    (prefix (only (micalang base) lambda let) %)
     (rename (micalang term) (pi %pi)))
   (export
     (import
@@ -16,6 +16,9 @@
 
   (define-rule-syntax (literal x)
     (native x))
+
+  (define-rule-syntax (let (id x) ... body)
+    (%let ((id x) ...) body))
 
   (define-rules-syntax
     ((lambda id body)

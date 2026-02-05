@@ -34,7 +34,7 @@
     (switch $term
       ((typed? $typed) $typed)
       ((else _)
-        (syntax-case $term (typed lambda)
+        (syntax-case $term (typed lambda let)
           ; === core forms
           (fx
             (fixnum? (datum fx))
@@ -56,21 +56,38 @@
             (typed
               (evaluate-type $env #'t)
               `(literal ',#'v)))
-          ((lambda (id t) body)
-            (switch (datum id)
-              ((symbol? $symbol)
-                (lets
-                  ($type (evaluate-type $env #'t))
-                  ($typed-body
-                    (mica-compile
-                      (cons `(,$symbol ,(typed $type $symbol)) $env)
-                      #'body))
-                  ($body-type (typed-type $typed-body))
-                  (typed
-                    (pi $type (lambda (_) $body-type))
-                    `(lambda ,$symbol ,(typed-ref $typed-body)))))
-              ((else _)
-                (syntax-error #'id "not identifier"))))
+          ((lambda (id t) ... body)
+            (lets
+              ($symbols (map syntax->datum #'(id ...)))
+              ($types (map (partial evaluate-type $env) #'(t ...)))
+              ($typed-symbols (map typed $types $symbols))
+              ($entries (map list $symbols $typed-symbols))
+              ($env (append $entries $env))
+              ($typed-body (mica-compile $env #'body))
+              ($body-type (typed-type $typed-body))
+              (typed
+                (fold-left
+                  (lambda ($acc $type) (pi $type (lambda (_) $acc)))
+                  $body-type
+                  (reverse $types))
+                (fold-left
+                  (lambda ($acc $symbol) `(lambda ,$symbol ,$acc))
+                  (typed-ref $typed-body)
+                  (reverse $symbols)))))
+          ((let (id x) ... body)
+            (lets
+              ($symbols (map syntax->datum #'(id ...)))
+              ($typed-xs (map (partial mica-compile $env) #'(x ...)))
+              ($types (map typed-type $typed-xs))
+              ($typed-symbols (map typed $types $symbols))
+              ($entries (map list $symbols $typed-symbols))
+              ($env (append $entries $env))
+              ($typed-body (mica-compile $env #'body))
+              ($body-type (typed-type $typed-body))
+              (typed $body-type
+                `(let
+                  ,@(map list $symbols (map typed-ref $typed-xs))
+                  ,(typed-ref $typed-body)))))
           ((fn arg)
             (lets
               ($typed-fn (mica-compile $env #'fn))
@@ -93,23 +110,6 @@
                   (syntax-error #'fn
                     (format "invalid type ~s, expected pi, in"
                       (term->datum $other)))))))
-
-          ; === macros
-          ((lambda (id t) params ... body)
-            (switch (datum id)
-              ((symbol? $symbol)
-                (lets
-                  ($type (evaluate-type $env #'t))
-                  ($inner-typed
-                    (mica-compile
-                      (cons `(,$symbol ,(typed $type $symbol)) $env)
-                      `(lambda ,@#'(params ...) ,#'body)))
-                  ($inner-type (typed-type $inner-typed))
-                  (typed
-                    (pi $type (lambda (_) $inner-type))
-                    `(lambda ,$symbol ,(typed-ref $inner-typed)))))
-              ((else _)
-                (syntax-error #'id "not identifier"))))
 
           ((fn arg args ...)
             (mica-compile $env

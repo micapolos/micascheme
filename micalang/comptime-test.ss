@@ -1,5 +1,5 @@
 (import
-  (only (micascheme) check equal? quote procedure? let)
+  (only (micascheme) check equal? quote procedure?)
   (micalang comptime))
 
 (check (equal? type (literal 'type)))
@@ -26,3 +26,11 @@
 
 (check (equal? (pi-param (pi (x type) (list x))) type))
 (check (equal? (app (pi (x type) (app list x)) int) (app list int)))
+
+(check
+  (equal?
+    (let
+      (x (literal 10))
+      (y (literal 20))
+      (app + x y))
+    (literal 30)))
