@@ -39,11 +39,11 @@
 ; === lambda
 
 (check-compiles
-  (lambda (i : int) i)
+  (lambda (i int) i)
   (typed (pi int int) (lambda i i)))
 
 (check-compiles
-  (lambda (i : int) (j : int) (+ i j))
+  (lambda (i int) (j int) (+ i j))
   (typed
     (pi int (pi int int))
     (lambda i (lambda j (app (app + i) j)))))

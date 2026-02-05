@@ -34,7 +34,7 @@
     (switch $term
       ((typed? $typed) $typed)
       ((else _)
-        (syntax-case $term (typed lambda :)
+        (syntax-case $term (typed lambda)
           ; === core forms
           (fx
             (fixnum? (datum fx))
@@ -56,7 +56,7 @@
             (typed
               (evaluate-type $env #'t)
               `(literal ',#'v)))
-          ((lambda (id : t) body)
+          ((lambda (id t) body)
             (switch (datum id)
               ((symbol? $symbol)
                 (lets
@@ -95,7 +95,7 @@
                       (term->datum $other)))))))
 
           ; === macros
-          ((lambda (id : t) params ... body)
+          ((lambda (id t) params ... body)
             (switch (datum id)
               ((symbol? $symbol)
                 (lets
