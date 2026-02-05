@@ -27,6 +27,34 @@
       (lambda id
         (lambda ids ... body))))
 
+  (define-rules-syntax
+    ((define-prim id prim)
+      (define id (native prim)))
+    ((define-prim id x prim)
+      (define id
+        (lambda x
+          (switch x
+            ((native? $native) (native (prim (native-ref $native))))
+            ((else $other) (application (native id) $other))))))
+    ((define-prim id x y prim)
+      (define id
+        (lambda x y
+          (switch x
+            ((native? $native-x)
+              (switch y
+                ((native? $native-y)
+                  (native
+                    (prim
+                      (native-ref $native-x)
+                      (native-ref $native-y))))
+                ((else $other-y)
+                  (application (application (native id) $native-x) $other-y))))
+            ((else $other-x)
+              (application (application (native id) $other-x) y)))))))
+
+  (define-rule-syntax (define-prims (id arg ... prim) ...)
+    (begin (define-prim id arg ... prim) ...))
+
   (define (app1 $lhs $rhs)
     (switch $lhs
       ((pi? $pi)
@@ -46,87 +74,19 @@
   (data %pi?)       ; #t for pi, #f for lambda
   (data %pi-param)  ; pi param
 
-  (define type (native 'type))
-  (define bool (native 'bool))
-  (define int (native 'int))
+  (define-prims
+    (type 'type)
+    (bool 'bool)
+    (int 'int)
 
-  (define zero?
-    (lambda x
-      (switch x
-        ((native? $native) (native (fxzero? (native-ref $native))))
-        ((else $other) (application (native zero?) $other)))))
+    (zero? x fxzero?)
+    (inc x fx+1/wraparound)
+    (dec x fx-1/wraparound)
 
-  (define inc
-    (lambda x
-      (switch x
-        ((native? $native) (native (fx+/wraparound (native-ref $native) 1)))
-        ((else $other) (application (native inc) $other)))))
-
-  (define dec
-    (lambda x
-      (switch x
-        ((native? $native) (native (fx-/wraparound (native-ref $native) 1)))
-        ((else $other) (application (native dec) $other)))))
-
-  (define =
-    (lambda x y
-      (switch x
-        ((native? $native-x)
-          (switch y
-            ((native? $native-y)
-              (native
-                (fx=
-                  (native-ref $native-x)
-                  (native-ref $native-y))))
-            ((else $other-y)
-              (application (application (native =) $native-x) $other-y))))
-        ((else $other-x)
-          (application (application (native =) $other-x) y)))))
-
-  (define +
-    (lambda x y
-      (switch x
-        ((native? $native-x)
-          (switch y
-            ((native? $native-y)
-              (native
-                (fx+/wraparound
-                  (native-ref $native-x)
-                  (native-ref $native-y))))
-            ((else $other-y)
-              (application (application (native +) $native-x) $other-y))))
-        ((else $other-x)
-          (application (application (native +) $other-x) y)))))
-
-  (define -
-    (lambda x y
-      (switch x
-        ((native? $native-x)
-          (switch y
-            ((native? $native-y)
-              (native
-                (fx-/wraparound
-                  (native-ref $native-x)
-                  (native-ref $native-y))))
-            ((else $other-y)
-              (application (application (native -) $native-x) $other-y))))
-        ((else $other-x)
-          (application (application (native -) $other-x) y)))))
-
-  (define <
-    (lambda x y
-      (switch x
-        ((native? $native-x)
-          (switch y
-            ((native? $native-y)
-              (native
-                (fx<
-                  (native-ref $native-x)
-                  (native-ref $native-y))))
-            ((else $other-y)
-              (application (application (native <) $native-x) $other-y))))
-        ((else $other-x)
-          (application (application (native <) $other-x) y)))))
+    (= x y fx=)
+    (+ x y fx+/wraparound)
+    (- x y fx-/wraparound)
+    (< x y fx<))
 
   (define list
     (lambda x (application (native list) x)))

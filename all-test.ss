@@ -20,6 +20,7 @@
   (evaluator)
   (failable)
   (failure)
+  (fixnum)
   (fluent)
   (foreign)
   (from)

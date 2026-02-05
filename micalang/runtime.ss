@@ -1,7 +1,6 @@
 (library (micalang runtime)
   (export
     literal app
-    type bool int
     inc dec = + - < zero?
     list let lambda app)
   (import
@@ -24,6 +23,19 @@
         (lambda ids ... body))))
 
   (define-rules-syntax
+    ((define-prim id prim)
+      (define id prim))
+    ((define-prim id x prim)
+      (define id
+        (lambda x (prim x))))
+    ((define-prim id x y prim)
+      (define id
+        (lambda x y (prim x y)))))
+
+  (define-rule-syntax (define-prims (id arg ... prim) ...)
+    (begin (define-prim id arg ... prim) ...))
+
+  (define-rules-syntax
     ((app lhs rhs)
       (%app lhs rhs))
     ((app lhs rhs rhss ...)
@@ -31,18 +43,15 @@
 
   (define-rule-syntax (literal x) x)
 
-  (define type (native 'type))
-  (define bool (native 'bool))
-  (define int (native 'int))
+  (define-prims
+    (zero? x fxzero?)
+    (inc x fx+1/wraparound)
+    (dec x fx-1/wraparound)
 
-  (define zero? (lambda x (fxzero? x)))
-  (define inc (lambda x (fx+/wraparound x 1)))
-  (define dec (lambda x (fx-/wraparound x 1)))
-
-  (define = (lambda x y (fx= x y)))
-  (define + (lambda x y (fx+/wraparound x y)))
-  (define - (lambda x y (fx-/wraparound x y)))
-  (define < (lambda x y (fx< x y)))
+    (= x y fx=)
+    (+ x y fx+/wraparound)
+    (- x y fx-/wraparound)
+    (< x y fx<))
 
   (define list (lambda x (application list x)))
 )
