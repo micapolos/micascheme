@@ -18,12 +18,17 @@
 
   (define (evaluate-type $env $term)
     (eval
-      (lets
-        ($typed (mica-compile $env $term))
-        (cond
-          ((term-equal? (typed-type $typed) (native 'type)) (typed-ref $typed))
-          (else (syntax-error $term "not type"))))
+      (compile-type $env $term)
       (mica-environment #f)))
+
+  (define (compile-type $env $term)
+    (lets
+      ($typed (mica-compile $env $term))
+      (cond
+        ((term-equal? (typed-type $typed) (native 'type))
+          (typed-ref $typed))
+        (else
+          (syntax-error $term "not type")))))
 
   (define (mica-evaluate $env $term)
     (eval
@@ -34,7 +39,7 @@
     (switch $term
       ((typed? $typed) $typed)
       ((else _)
-        (syntax-case $term (typed lambda let)
+        (syntax-case $term (typed lambda pi let)
           ; === core forms
           (fx
             (fixnum? (datum fx))
@@ -74,6 +79,25 @@
                   (lambda ($acc $symbol) `(lambda ,$symbol ,$acc))
                   (typed-ref $typed-body)
                   (reverse $symbols)))))
+          ((pi (id in) out)
+            (lets
+              ($id (datum id))
+              ($in-type-datum (compile-type $env #'in))
+              ($in-type (eval $in-type-datum (mica-environment #f)))
+              ($env (push $env `(,$id ,(typed $in-type $id))))
+              ($out-type-datum (compile-type $env #'out))
+              (typed
+                (eval 'type (mica-environment #f))
+                `(pi
+                  (,$id ,$in-type-datum)
+                  ,$out-type-datum))))
+          ((pi in out)
+            (lets
+              ($in-type-datum (compile-type $env #'in))
+              ($out-type-datum (compile-type $env #'out))
+              (typed
+                (eval 'type (mica-environment #f))
+                `(pi ,$in-type-datum ,$out-type-datum))))
           ((let (id x) ... body)
             (lets
               ($symbols (map syntax->datum #'(id ...)))

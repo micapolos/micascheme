@@ -69,3 +69,13 @@
 (check-compiles
   (inc 1)
   (typed int (app inc (literal 1))))
+
+; === pi
+
+(check-compiles
+  (pi int bool)
+  (typed type (pi int bool)))
+
+(check-compiles
+  (pi (x type) x)
+  (typed type (pi (x type) x)))
