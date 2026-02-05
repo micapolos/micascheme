@@ -41,6 +41,11 @@
             (typed
               (eval 'int (mica-environment #f))
               `(literal ,(datum fx))))
+          (b
+            (boolean? (datum b))
+            (typed
+              (eval 'bool (mica-environment #f))
+              `(literal ,(datum b))))
           (id
             (symbol? (datum id))
             (cadr
@@ -69,14 +74,18 @@
           ((fn arg)
             (lets
               ($typed-fn (mica-compile $env #'fn))
-              ($typed-arg (mica-compile $env #'arg))
               (switch (typed-type $typed-fn)
                 ((pi? $pi)
-                  (typed
-                    ((pi-procedure $pi) (typed-type $typed-arg))
-                    `(app
-                      ,(typed-ref $typed-fn)
-                      ,(typed-ref $typed-arg))))
+                  (lets
+                    ($typed-arg (mica-compile $env #'arg))
+                    ($arg-type (typed-type $typed-arg))
+                    (if (term-equal? (pi-param $pi) $arg-type)
+                      (typed
+                        ((pi-procedure $pi) $arg-type)
+                        `(app
+                          ,(typed-ref $typed-fn)
+                          ,(typed-ref $typed-arg)))
+                      (syntax-error #'arg "invalid type"))))
                 ((else _)
                   (syntax-error #'fn "not function")))))
 

@@ -7,6 +7,7 @@
 ; === int
 
 (check-compiles 123 (typed int (literal 123)))
+(check-compiles #f (typed bool (literal #f)))
 (check-compile-raises 123123123123123123123123)
 
 ; === globals
@@ -30,6 +31,10 @@
 (check-compiles
   (+ 10 20)
   (typed int (app (app + (literal 10)) (literal 20))))
+
+(check-compile-raises (inc #t))
+(check-compile-raises (+ 1 #t))
+(check-compile-raises (+ #t 2))
 
 ; === lambda
 
