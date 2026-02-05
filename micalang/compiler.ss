@@ -85,9 +85,14 @@
                         `(app
                           ,(typed-ref $typed-fn)
                           ,(typed-ref $typed-arg)))
-                      (syntax-error #'arg "invalid type"))))
-                ((else _)
-                  (syntax-error #'fn "not function")))))
+                      (syntax-error #'arg
+                        (format "invalid type ~s, expected ~s, in"
+                          (term->datum $arg-type)
+                          (term->datum (pi-param $pi)))))))
+                ((else $other)
+                  (syntax-error #'fn
+                    (format "invalid type ~s, expected pi, in"
+                      (term->datum $other)))))))
 
           ; === macros
           ((lambda (id : t) params ... body)

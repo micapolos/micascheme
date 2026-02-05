@@ -9,7 +9,8 @@
     (syntax-case $syntax ()
       ((mica x)
         (literal->syntax
-          (mica-evaluate mica-env (datum x))))))
+          (mica-evaluate mica-env
+            (syntax->datum/annotation #'x))))))
 
   (define-rule-syntax (check-mica in out)
     (check (equal? (mica in) (mica out))))
