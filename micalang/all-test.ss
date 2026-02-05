@@ -7,4 +7,5 @@
   (micalang runtime)
   (micalang comptime)
   (micalang env)
-  (micalang compiler))
+  (micalang compiler)
+  (micalang mica))
