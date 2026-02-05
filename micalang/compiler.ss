@@ -10,7 +10,7 @@
     (micalang term)
     (micalang typed)
     (micalang env)
-    (only (micalang comptime) type int bool))
+    (prefix (micalang comptime) comptime-))
 
   (define (mica-environment $runtime?)
     (if $runtime?
@@ -44,10 +44,10 @@
           ; === core forms
           (fx
             (fixnum? (datum fx))
-            (typed int `(literal ,(datum fx))))
+            (typed comptime-int `(literal ,(datum fx))))
           (b
             (boolean? (datum b))
-            (typed bool `(literal ,(datum b))))
+            (typed comptime-bool `(literal ,(datum b))))
           (id
             (symbol? (datum id))
             (cadr
@@ -80,16 +80,14 @@
             (lets
               ($id (datum id))
               ($in (compile-type $env #'in))
-              ($env (push $env `(,$id ,(typed type $id))))
+              ($env (push $env `(,$id ,(typed comptime-type $id))))
               ($out (compile-type $env #'out))
-              (typed
-                (eval 'type (mica-environment #f))
-                `(pi (,$id ,$in) ,$out))))
+              (typed comptime-type `(pi (,$id ,$in) ,$out))))
           ((pi in out)
             (lets
               ($in (compile-type $env #'in))
               ($out (compile-type $env #'out))
-              (typed type `(pi ,$in ,$out))))
+              (typed comptime-type `(pi ,$in ,$out))))
           ((let (id x) ... body)
             (lets
               ($symbols (map syntax->datum #'(id ...)))
