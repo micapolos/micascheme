@@ -1,12 +1,12 @@
 (library (micalang comptime)
   (export
     literal app let
-    type bool int
+    type bool int string
     inc dec = + - < zero?
     list
     pi)
   (import
-    (except (micalang base) = + - < zero? list app lambda let)
+    (except (micalang base) = + - < zero? list app lambda let string)
     (prefix (only (micalang base) lambda let) %)
     (rename (micalang term) (pi %pi)))
   (export
@@ -70,6 +70,7 @@
     (type 'type)
     (bool 'bool)
     (int 'int)
+    (string 'string)
 
     (zero? x fxzero?)
     (inc x fx+1/wraparound)

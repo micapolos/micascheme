@@ -25,9 +25,9 @@
 
 (check-mica
   (let
-    (n10 10)
-    (n20 20)
+    (a 10)
+    (b 20)
     (double (x int) (+ x x))
     (negate (x int) (- 0 x))
-    (negate (+ (double n10) n20)))
+    (negate (+ (double a) b)))
   -40)

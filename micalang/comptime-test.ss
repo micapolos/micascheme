@@ -5,6 +5,7 @@
 (check (equal? type (literal 'type)))
 (check (equal? bool (literal 'bool)))
 (check (equal? int (literal 'int)))
+(check (equal? string (literal 'string)))
 
 (check (equal? (app zero? (literal 0)) (literal #t)))
 (check (equal? (app inc (literal 2)) (literal 3)))

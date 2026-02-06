@@ -6,8 +6,10 @@
 
 ; === int
 
-(check-compiles 123 (typed int (literal 123)))
 (check-compiles #f (typed bool (literal #f)))
+(check-compiles 123 (typed int (literal 123)))
+(check-compiles "foo" (typed string (literal "foo")))
+
 (check-compile-raises 123123123123123123123123)
 
 ; === globals
