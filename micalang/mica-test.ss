@@ -22,3 +22,12 @@
 
 (check-mica
   ((lambda (x int) (y int) (+ x y)) 2 3) 5)
+
+(check-mica
+  (let
+    (n10 10)
+    (n20 20)
+    (double (x int) (+ x x))
+    (negate (x int) (- 0 x))
+    (negate (+ (double n10) n20)))
+  -40)
