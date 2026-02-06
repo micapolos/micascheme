@@ -141,15 +141,16 @@
           ((fn arg)
             (lets
               ($typed-fn (mica-compile $env #'fn))
-              (switch (typed-type $typed-fn)
+              ($fn-type (typed-type $typed-fn))
+              (switch $fn-type
                 ((pi? $pi)
                   (lets
-                    ($arg (mica-compile-typed $env (pi-param $pi) #'arg))
+                    ($fn (typed-ref $typed-fn))
+                    ($param-type (pi-param $pi))
+                    ($arg (mica-compile-typed $env $param-type #'arg))
                     (typed
-                      ((pi-procedure $pi) (pi-param $pi))
-                      `(app
-                        ,(typed-ref $typed-fn)
-                        ,$arg))))
+                      ((pi-procedure $pi) $param-type)
+                      `(app ,$fn ,$arg))))
                 ((else $other)
                   (syntax-error #'fn
                     (format "invalid type ~s, expected pi, in"
