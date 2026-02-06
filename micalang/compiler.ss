@@ -59,6 +59,9 @@
               (evaluate-type $env #'t)
               `(literal ',#'v)))
 
+          ((pi out)
+            (mica-compile $env #'out))
+
           ((pi (id in) out)
             (lets
               ($id (datum id))
@@ -66,11 +69,16 @@
               ($env (push $env `(,$id ,(typed comptime-type $id))))
               ($out (compile-type $env #'out))
               (typed comptime-type `(pi (,$id ,$in) ,$out))))
+
           ((pi in out)
             (lets
               ($in (compile-type $env #'in))
               ($out (compile-type $env #'out))
               (typed comptime-type `(pi ,$in ,$out))))
+
+          ((pi x xs ... body)
+            (mica-compile $env
+              `(pi ,#'x (pi ,@#'(xs ...) ,#'body))))
 
           ((let body)
             (mica-compile $env #'body))

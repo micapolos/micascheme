@@ -56,6 +56,10 @@
 ; === lambda
 
 (check-compiles
+  (lambda 12)
+  (typed int (literal 12)))
+
+(check-compiles
   (lambda (i int) i)
   (typed (pi int int) (lambda i i)))
 
@@ -82,3 +86,7 @@
 (check-compiles
   (pi (x type) x)
   (typed type (pi (x type) x)))
+
+(check-compiles
+  (pi (x type) (y type) x)
+  (typed type (pi (x type) (pi (y type) x))))
