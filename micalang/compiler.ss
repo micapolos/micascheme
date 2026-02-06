@@ -14,8 +14,8 @@
 
   (define (mica-environment $runtime?)
     (if $runtime?
-      (environment '(micalang runtime))
-      (environment '(micalang comptime))))
+      (environment '(micalang runtime)  '(only (micascheme) quote fx+1/wraparound))
+      (environment '(micalang comptime) '(only (micascheme) quote fx+1/wraparound))))
 
   (define (evaluate-type $env $term)
     (eval
@@ -45,7 +45,7 @@
     (switch $term
       ((typed? $typed) $typed)
       ((else _)
-        (syntax-case $term (typed lambda pi let)
+        (syntax-case $term (native lambda pi let)
           (b
             (boolean? (datum b))
             (typed comptime-bool `(literal ,(datum b))))
@@ -65,10 +65,10 @@
                 (assq (datum id) $env)
                 (syntax-error #'id "undefined"))))
 
-          ((typed t v)
+          ((native t v)
             (typed
               (evaluate-type $env #'t)
-              `(literal ',#'v)))
+              `(literal ,#'v)))
 
           ((pi out)
             (mica-compile $env #'out))

@@ -34,3 +34,9 @@
 
 (check-mica (first-index 16) 0)
 (check-mica (last-index 16) 15)
+
+(check-mica
+  (let
+    (increment (native (pi int int) fx+1/wraparound))
+    (increment (increment 10)))
+  12)

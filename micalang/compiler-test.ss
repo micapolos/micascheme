@@ -4,6 +4,10 @@
   (micalang typed)
   (micalang compiler))
 
+; === native
+
+(check-compiles (native bool +) (typed bool (literal +)))
+
 ; === literals
 
 (check-compiles #f (typed bool (literal #f)))
