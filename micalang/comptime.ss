@@ -17,15 +17,12 @@
   (define-rule-syntax (literal x)
     (native x))
 
-  (define-rule-syntax (let (id x) ... body)
-    (%let ((id x) ...) body))
+  (define-rule-syntax (let (id x) body)
+    (%let ((id x)) body))
 
   (define-rules-syntax
     ((lambda id body)
-      (abstraction (%lambda (id) body)))
-    ((lambda id ids ... body)
-      (lambda id
-        (lambda ids ... body))))
+      (abstraction (%lambda (id) body))))
 
   (define-rules-syntax
     ((define-prim id prim)
@@ -38,24 +35,25 @@
             ((else $other) (application (native id) $other))))))
     ((define-prim id x y prim)
       (define id
-        (lambda x y
-          (switch x
-            ((native? $native-x)
-              (switch y
-                ((native? $native-y)
-                  (native
-                    (prim
-                      (native-ref $native-x)
-                      (native-ref $native-y))))
-                ((else $other-y)
-                  (application (application (native id) $native-x) $other-y))))
-            ((else $other-x)
-              (application (application (native id) $other-x) y)))))))
+        (lambda x
+          (lambda y
+            (switch x
+              ((native? $native-x)
+                (switch y
+                  ((native? $native-y)
+                    (native
+                      (prim
+                        (native-ref $native-x)
+                        (native-ref $native-y))))
+                  ((else $other-y)
+                    (application (application (native id) $native-x) $other-y))))
+              ((else $other-x)
+                (application (application (native id) $other-x) y))))))))
 
   (define-rule-syntax (define-prims (id arg ... prim) ...)
     (begin (define-prim id arg ... prim) ...))
 
-  (define (app1 $lhs $rhs)
+  (define (app $lhs $rhs)
     (switch $lhs
       ((pi? $pi)
         ((pi-procedure $pi) $rhs))
@@ -63,12 +61,6 @@
         ((abstraction-procedure $abstraction) $rhs))
       ((else $other)
         (application (native $other) $rhs))))
-
-  (define-rules-syntax
-    ((app lhs rhs)
-      (app1 lhs rhs))
-    ((app lhs rhs rhss ...)
-      (app (app lhs rhs) rhss ...)))
 
   ; === selectors passed to procedures:
   (data %pi?)       ; #t for pi, #f for lambda

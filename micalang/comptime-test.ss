@@ -16,8 +16,6 @@
 (check (equal? (app (app - (literal 5)) (literal 3)) (literal 2)))
 (check (equal? (app (app < (literal 2)) (literal 3)) (literal #t)))
 
-(check (equal? (app < (literal 1) (literal 3)) (literal #t)))
-
 (check (equal? (pi-param (pi int bool)) int))
 (check (equal? (app (pi int bool) (literal '())) bool))
 
@@ -29,8 +27,7 @@
 
 (check
   (equal?
-    (let
-      (x (literal 10))
-      (y (literal 20))
-      (app + x y))
+    (let (x (literal 10))
+      (let (y (literal 20))
+        (app (app + x) y)))
     (literal 30)))

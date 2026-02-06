@@ -17,10 +17,7 @@
 
   (define-rules-syntax
     ((lambda id body)
-      (%lambda (id) body))
-    ((lambda id ids ... body)
-      (lambda id
-        (lambda ids ... body))))
+      (%lambda (id) body)))
 
   (define-rules-syntax
     ((define-prim id prim)
@@ -30,16 +27,15 @@
         (lambda x (prim x))))
     ((define-prim id x y prim)
       (define id
-        (lambda x y (prim x y)))))
+        (lambda x
+          (lambda y (prim x y))))))
 
   (define-rule-syntax (define-prims (id arg ... prim) ...)
     (begin (define-prim id arg ... prim) ...))
 
   (define-rules-syntax
     ((app lhs rhs)
-      (%app lhs rhs))
-    ((app lhs rhs rhss ...)
-      (app (app lhs rhs) rhss ...)))
+      (%app lhs rhs)))
 
   (define-rule-syntax (literal x) x)
 

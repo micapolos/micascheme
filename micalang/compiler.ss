@@ -58,24 +58,17 @@
             (typed
               (evaluate-type $env #'t)
               `(literal ',#'v)))
-          ((lambda (id t) ... body)
+          ((lambda (id t) body)
             (lets
-              ($symbols (map syntax->datum #'(id ...)))
-              ($types (map (partial evaluate-type $env) #'(t ...)))
-              ($typed-symbols (map typed $types $symbols))
-              ($entries (map list $symbols $typed-symbols))
-              ($env (append $entries $env))
+              ($symbol (datum id))
+              ($type (evaluate-type $env #'t))
+              ($env (push $env `(,$symbol ,(typed $type $symbol))))
               ($typed-body (mica-compile $env #'body))
               ($body-type (typed-type $typed-body))
+              ($body (typed-ref $typed-body))
               (typed
-                (fold-left
-                  (lambda ($acc $type) (pi $type (lambda (_) $acc)))
-                  $body-type
-                  (reverse $types))
-                (fold-left
-                  (lambda ($acc $symbol) `(lambda ,$symbol ,$acc))
-                  (typed-ref $typed-body)
-                  (reverse $symbols)))))
+                (pi $type (lambda (_) $body-type))
+                `(lambda ,$symbol ,$body))))
           ((pi (id in) out)
             (lets
               ($id (datum id))
@@ -88,20 +81,34 @@
               ($in (compile-type $env #'in))
               ($out (compile-type $env #'out))
               (typed comptime-type `(pi ,$in ,$out))))
-          ((let (id x) ... body)
+          ((let (id x) body)
             (lets
-              ($symbols (map syntax->datum #'(id ...)))
-              ($typed-xs (map (partial mica-compile $env) #'(x ...)))
-              ($types (map typed-type $typed-xs))
-              ($typed-symbols (map typed $types $symbols))
-              ($entries (map list $symbols $typed-symbols))
-              ($env (append $entries $env))
+              ($symbol (datum id))
+              ($typed-x (mica-compile $env #'x))
+              ($x-type (typed-type $typed-x))
+              ($x (typed-ref $typed-x))
+              ($env (cons `(,$symbol ,(typed $x-type $symbol)) $env))
               ($typed-body (mica-compile $env #'body))
               ($body-type (typed-type $typed-body))
-              (typed $body-type
-                `(let
-                  ,@(map list $symbols (map typed-ref $typed-xs))
-                  ,(typed-ref $typed-body)))))
+              ($body (typed-ref $typed-body))
+              (typed $body-type `(let (,$symbol ,$x) ,$body))))
+
+          ; --- macros
+          ((let body)
+            (mica-compile $env #'body))
+
+          ((let x xs ... body)
+            (mica-compile $env
+              `(let ,#'x (let ,@#'(xs ...) ,#'body))))
+
+          ((lambda body)
+            (mica-compile $env #'body))
+
+          ((lambda x xs ... body)
+            (mica-compile $env
+              `(lambda ,#'x (lambda ,@#'(xs ...) ,#'body))))
+
+          ; --- application
           ((fn arg)
             (lets
               ($typed-fn (mica-compile $env #'fn))
@@ -124,12 +131,9 @@
                   (syntax-error #'fn
                     (format "invalid type ~s, expected pi, in"
                       (term->datum $other)))))))
-
           ((fn arg args ...)
             (mica-compile $env
-              `(
-                ,(mica-compile $env `(,#'fn ,#'arg))
-                ,@#'(args ...))))))))
+              `((,#'fn ,#'arg) ,@#'(args ...))))))))
 
   (define-rule-syntax (check-compiles in out)
     (lets

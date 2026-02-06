@@ -40,7 +40,7 @@
 
 (check-compiles
   (let 10)
-  (typed int (let (literal 10))))
+  (typed int (literal 10)))
 
 (check-compiles
   (let (x 10) (inc x))
@@ -48,7 +48,10 @@
 
 (check-compiles
   (let (x 10) (y 20) (< x y))
-  (typed bool (let (x (literal 10)) (y (literal 20)) (app (app < x) y))))
+  (typed bool
+    (let (x (literal 10))
+      (let (y (literal 20))
+        (app (app < x) y)))))
 
 ; === lambda
 
