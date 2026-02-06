@@ -1,25 +1,34 @@
 (library (micalang env)
   (export mica-env)
   (import
-    (only (micalang base) define quote quasiquote unquote)
+    (only (micalang base) define quote quasiquote unquote define-rules-syntax define-rule-syntax quote quasiquote unquote ...)
     (micalang typed)
     (micalang comptime))
 
+  (define-rules-syntax
+    ((entry id type datum)
+      `(id ,(typed type 'datum)))
+    ((entry id type)
+      (entry id type id)))
+
+  (define-rule-syntax (env x ...)
+    `(,(entry . x) ...))
+
   (define mica-env
-    `(
-      (type   ,(typed type 'type))
-      (bool   ,(typed type 'bool))
-      (int    ,(typed type 'int))
-      (string ,(typed type 'string))
+    (env
+      (type type)
+      (bool type)
+      (int type)
+      (string type)
 
-      (zero? ,(typed (pi int bool) 'zero?))
-      (inc   ,(typed (pi int int)  'inc))
-      (dec   ,(typed (pi int int)  'dec))
+      (zero? (pi int bool))
+      (inc   (pi int int))
+      (dec   (pi int int))
 
-      (=     ,(typed (pi int (pi int int))  '-))
-      (+     ,(typed (pi int (pi int int))  '+))
-      (-     ,(typed (pi int (pi int int))  '-))
-      (<     ,(typed (pi int (pi int bool)) '<))
+      (=     (pi int (pi int int)))
+      (+     (pi int (pi int int)))
+      (-     (pi int (pi int int)))
+      (<     (pi int (pi int bool)))
 
-      (list  ,(typed (pi (x type) x) 'list))))
+      (list  (pi (x type) x))))
 )
