@@ -23,18 +23,23 @@
       (mica-environment #f)))
 
   (define (compile-type $env $term)
-    (lets
-      ($typed (mica-compile $env $term))
-      (cond
-        ((term-equal? (typed-type $typed) (native 'type))
-          (typed-ref $typed))
-        (else
-          (syntax-error $term "not type")))))
+    (mica-compile-typed $env comptime-type $term))
 
   (define (mica-evaluate $env $term)
     (eval
       (typed-ref (mica-compile $env $term))
       (mica-environment #t)))
+
+  (define (mica-compile-typed $env $expected-type $term)
+    (lets
+      ($typed (mica-compile $env $term))
+      ($type (typed-type $typed))
+      (if (term-equal? $type $expected-type)
+        (typed-ref $typed)
+        (syntax-error $term
+          (format "invalid type ~s, expected ~s, in"
+            (term->datum $type)
+            (term->datum $expected-type))))))
 
   (define (mica-compile $env $term)
     (switch $term
@@ -129,18 +134,12 @@
               (switch (typed-type $typed-fn)
                 ((pi? $pi)
                   (lets
-                    ($typed-arg (mica-compile $env #'arg))
-                    ($arg-type (typed-type $typed-arg))
-                    (if (term-equal? (pi-param $pi) $arg-type)
-                      (typed
-                        ((pi-procedure $pi) $arg-type)
-                        `(app
-                          ,(typed-ref $typed-fn)
-                          ,(typed-ref $typed-arg)))
-                      (syntax-error #'arg
-                        (format "invalid type ~s, expected ~s, in"
-                          (term->datum $arg-type)
-                          (term->datum (pi-param $pi)))))))
+                    ($arg (mica-compile-typed $env (pi-param $pi) #'arg))
+                    (typed
+                      ((pi-procedure $pi) (pi-param $pi))
+                      `(app
+                        ,(typed-ref $typed-fn)
+                        ,$arg))))
                 ((else $other)
                   (syntax-error #'fn
                     (format "invalid type ~s, expected pi, in"
