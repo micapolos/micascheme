@@ -102,6 +102,12 @@
               ($body (typed-ref $typed-body))
               (typed $body-type `(let (,$symbol ,$x) ,$body))))
 
+          ((let (id param params ... lambda-body) body)
+            (mica-compile $env
+              `(let
+                (,#'id (lambda ,#'param ,@#'(params ...) ,#'lambda-body))
+                ,#'body)))
+
           ((let x xs ... body)
             (mica-compile $env
               `(let ,#'x (let ,@#'(xs ...) ,#'body))))

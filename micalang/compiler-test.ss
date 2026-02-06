@@ -53,6 +53,15 @@
       (let (y (literal 20))
         (app (app < x) y)))))
 
+(check-compiles
+  (let
+    (zwiększ (x int) (inc x))
+    (zwiększ 10))
+  (typed int
+    (let
+      (zwiększ (lambda x (app inc x)))
+      (app zwiększ (literal 10)))))
+
 ; === lambda
 
 (check-compiles
