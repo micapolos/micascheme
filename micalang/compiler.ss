@@ -41,19 +41,21 @@
       ((typed? $typed) $typed)
       ((else _)
         (syntax-case $term (typed lambda pi let)
-          ; === core forms
           (fx
             (fixnum? (datum fx))
             (typed comptime-int `(literal ,(datum fx))))
+
           (b
             (boolean? (datum b))
             (typed comptime-bool `(literal ,(datum b))))
+
           (id
             (symbol? (datum id))
             (cadr
               (or
                 (assq (datum id) $env)
                 (syntax-error #'id "undefined"))))
+
           ((typed t v)
             (typed
               (evaluate-type $env #'t)
@@ -118,7 +120,6 @@
             (mica-compile $env
               `(lambda ,#'x (lambda ,@#'(xs ...) ,#'body))))
 
-          ; --- application
           ((fn)
             (mica-compile $env #'fn))
 
