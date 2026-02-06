@@ -31,3 +31,6 @@
     (negate (x int) (- 0 x))
     (negate (+ (double a) b)))
   -40)
+
+(check-mica (first-index 16) 0)
+(check-mica (last-index 16) 15)

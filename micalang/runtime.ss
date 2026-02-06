@@ -2,7 +2,8 @@
   (export
     literal app
     inc dec = + - < zero?
-    list let lambda app)
+    list let lambda app
+    first-index last-index)
   (import
     (except (micalang base) = + - < zero? list lambda app let)
     (prefix (only (micalang base) let lambda app) %)
@@ -39,6 +40,9 @@
 
   (define-rule-syntax (literal x) x)
 
+  (define (%first-index _) 0)
+  (define (%last-index n) (fx-1/wraparound n))
+
   (define-prims
     (zero? x fxzero?)
     (inc x fx+1/wraparound)
@@ -47,7 +51,9 @@
     (= x y fx=)
     (+ x y fx+/wraparound)
     (- x y fx-/wraparound)
-    (< x y fx<))
+    (< x y fx<)
+    (first-index n %first-index)
+    (last-index   n %last-index))
 
   (define list (lambda x (application list x)))
 )

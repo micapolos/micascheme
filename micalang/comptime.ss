@@ -3,6 +3,8 @@
     literal app let
     type bool int string
     inc dec = + - < zero?
+    index first-index last-index
+    array
     list
     pi)
   (import
@@ -66,6 +68,13 @@
   (data %pi?)       ; #t for pi, #f for lambda
   (data %pi-param)  ; pi param
 
+  (define (index n) (application index n))
+  (define (%first-index n) 0)
+  (define (%last-index   n) (fx-1/wraparound n))
+
+  (define array
+    (lambda n (application (native array) n)))
+
   (define-prims
     (type 'type)
     (bool 'bool)
@@ -79,7 +88,10 @@
     (= x y fx=)
     (+ x y fx+/wraparound)
     (- x y fx-/wraparound)
-    (< x y fx<))
+    (< x y fx<)
+
+    (first-index n %first-index)
+    (last-index   n %last-index))
 
   (define list
     (lambda x (application (native list) x)))

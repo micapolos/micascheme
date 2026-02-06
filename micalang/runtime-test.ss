@@ -17,3 +17,6 @@
       (y (literal 20))
       ((app + x) y))
     (literal 30)))
+
+(check (equal? (first-index 16) 0))
+(check (equal? (last-index 16) 15))

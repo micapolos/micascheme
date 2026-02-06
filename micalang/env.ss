@@ -30,6 +30,12 @@
       (-      (pi int (pi int int)))
       (<      (pi int (pi int bool)))
 
-      (list   (pi (x type) x))))
+      (list   (pi (x type) x))
+
+      (index        (pi (n int) type))
+      (first-index  (pi (n int) (index n)))
+      (last-index   (pi (n int) (index n)))
+
+      (array        (pi (n int) type))))
 )
 

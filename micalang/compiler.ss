@@ -100,7 +100,7 @@
               ($typed-x (mica-compile $env #'x))
               ($x-type (typed-type $typed-x))
               ($x (typed-ref $typed-x))
-              ($env (cons `(,$symbol ,(typed $x-type $symbol)) $env))
+              ($env (push $env `(,$symbol ,(typed $x-type $symbol))))
               ($typed-body (mica-compile $env #'body))
               ($body-type (typed-type $typed-body))
               ($body (typed-ref $typed-body))
