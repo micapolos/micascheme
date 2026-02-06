@@ -16,19 +16,19 @@
 
   (define mica-env
     (env
-      (type type)
-      (bool type)
-      (int type)
+      (type   type)
+      (bool   type)
+      (int    type)
       (string type)
 
-      (zero? (pi int bool))
-      (inc   (pi int int))
-      (dec   (pi int int))
+      (zero?  (pi int bool))
+      (inc    (pi int int))
+      (dec    (pi int int))
 
-      (=     (pi int (pi int int)))
-      (+     (pi int (pi int int)))
-      (-     (pi int (pi int int)))
-      (<     (pi int (pi int bool)))
+      (=      (pi int (pi int int)))
+      (+      (pi int (pi int int)))
+      (-      (pi int (pi int int)))
+      (<      (pi int (pi int bool)))
 
-      (list  (pi (x type) x))))
+      (list   (pi (x type) x))))
 )
