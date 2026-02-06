@@ -58,17 +58,7 @@
             (typed
               (evaluate-type $env #'t)
               `(literal ',#'v)))
-          ((lambda (id t) body)
-            (lets
-              ($symbol (datum id))
-              ($type (evaluate-type $env #'t))
-              ($env (push $env `(,$symbol ,(typed $type $symbol))))
-              ($typed-body (mica-compile $env #'body))
-              ($body-type (typed-type $typed-body))
-              ($body (typed-ref $typed-body))
-              (typed
-                (pi $type (lambda (_) $body-type))
-                `(lambda ,$symbol ,$body))))
+
           ((pi (id in) out)
             (lets
               ($id (datum id))
@@ -81,6 +71,10 @@
               ($in (compile-type $env #'in))
               ($out (compile-type $env #'out))
               (typed comptime-type `(pi ,$in ,$out))))
+
+          ((let body)
+            (mica-compile $env #'body))
+
           ((let (id x) body)
             (lets
               ($symbol (datum id))
@@ -93,10 +87,6 @@
               ($body (typed-ref $typed-body))
               (typed $body-type `(let (,$symbol ,$x) ,$body))))
 
-          ; --- macros
-          ((let body)
-            (mica-compile $env #'body))
-
           ((let x xs ... body)
             (mica-compile $env
               `(let ,#'x (let ,@#'(xs ...) ,#'body))))
@@ -104,11 +94,26 @@
           ((lambda body)
             (mica-compile $env #'body))
 
+          ((lambda (id t) body)
+            (lets
+              ($symbol (datum id))
+              ($type (evaluate-type $env #'t))
+              ($env (push $env `(,$symbol ,(typed $type $symbol))))
+              ($typed-body (mica-compile $env #'body))
+              ($body-type (typed-type $typed-body))
+              ($body (typed-ref $typed-body))
+              (typed
+                (pi $type (lambda (_) $body-type))
+                `(lambda ,$symbol ,$body))))
+
           ((lambda x xs ... body)
             (mica-compile $env
               `(lambda ,#'x (lambda ,@#'(xs ...) ,#'body))))
 
           ; --- application
+          ((fn)
+            (mica-compile $env #'fn))
+
           ((fn arg)
             (lets
               ($typed-fn (mica-compile $env #'fn))
@@ -131,6 +136,7 @@
                   (syntax-error #'fn
                     (format "invalid type ~s, expected pi, in"
                       (term->datum $other)))))))
+
           ((fn arg args ...)
             (mica-compile $env
               `((,#'fn ,#'arg) ,@#'(args ...))))))))
