@@ -7,9 +7,10 @@
 
   (define mica-env
     `(
-      (type  ,(typed type 'type))
-      (bool  ,(typed type 'bool))
-      (int   ,(typed type 'int))
+      (type   ,(typed type 'type))
+      (bool   ,(typed type 'bool))
+      (int    ,(typed type 'int))
+      (string ,(typed type 'string))
 
       (zero? ,(typed (pi int bool) 'zero?))
       (inc   ,(typed (pi int int)  'inc))

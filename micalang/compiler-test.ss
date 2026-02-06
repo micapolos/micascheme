@@ -4,19 +4,23 @@
   (micalang typed)
   (micalang compiler))
 
-; === int
+; === literals
 
 (check-compiles #f (typed bool (literal #f)))
+(check-compiles #t (typed bool (literal #t)))
 (check-compiles 123 (typed int (literal 123)))
 (check-compiles "foo" (typed string (literal "foo")))
 
 (check-compile-raises 123123123123123123123123)
+(check-compile-raises #\a)
 
 ; === globals
 
 (check-compiles type (typed type type))
 (check-compiles bool (typed type bool))
 (check-compiles int (typed type int))
+(check-compiles string (typed type string))
+
 (check-compiles zero? (typed (pi int bool) zero?))
 (check-compiles < (typed (pi int (pi int bool)) <))
 
