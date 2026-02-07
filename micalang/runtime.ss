@@ -1,6 +1,6 @@
 (library (micalang runtime)
   (export
-    prim curry
+    prim
     literal app
     inc dec = + - < zero?
     list let lambda app
@@ -21,15 +21,19 @@
     ((lambda id body)
       (%lambda (id) body)))
 
-  (define-rule-syntax (prim x)
-    ($primitive 3 x))
-
   (define-rules-syntax
     ((curry x) x)
     ((curry a x) (lambda a (x a)))
     ((curry a b x) (lambda a (lambda b (x a b))))
     ((curry a b c x) (lambda a (lambda b (lambda c (x a b c)))))
     ((curry a b c d x) (lambda a (lambda b (lambda c (lambda d (x a b c d)))))))
+
+  (define-rules-syntax
+    ((prim id) ($primitive 3 id))
+    ((prim id a) (lambda a (($primitive 3 id) a)))
+    ((prim id a b) (lambda a (lambda b (($primitive 3 id) a b))))
+    ((prim id a b c) (lambda a (lambda b (lambda c (($primitive 3 id) a b c)))))
+    ((prim id a b c d) (lambda a (lambda b (lambda c (lambda d (($primitive 3 id) a b c d)))))))
 
   (define-rules-syntax
     ((define-curry id arg ... p)

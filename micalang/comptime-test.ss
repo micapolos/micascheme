@@ -6,7 +6,7 @@
 
 (check
   (equal?
-    (app (app (curry a b (prim +)) (literal 2)) (literal 3))
+    (app (app (prim + a b) (literal 2)) (literal 3))
     (literal 5)))
 
 (check (equal? type (literal 'type)))

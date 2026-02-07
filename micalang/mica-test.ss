@@ -4,7 +4,7 @@
   (let
     (+ (native
       (pi string string string)
-      (curry a b (prim string-append))))
+      (prim string-append a b)))
     (+ "foo" "bar"))
   "foobar")
 

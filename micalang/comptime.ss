@@ -27,8 +27,30 @@
     ((lambda id body)
       (abstraction (%lambda (id) body))))
 
-  (define-rule-syntax (prim x)
-    ($primitive 3 x))
+  (define-rules-syntax
+    ((prim id)
+      (native ($primitive 3 id)))
+    ((prim id x)
+      (lambda x
+        (switch x
+          ((native? $native) (native (($primitive 3 id) (native-ref $native))))
+          ((else $other) (application (native ($primitive 3 id)) $other)))))
+    ((prim id x y)
+      (lambda x
+        (lambda y
+          (switch x
+            ((native? $native-x)
+              (switch y
+                ((native? $native-y)
+                  (native
+                    (($primitive 3 id)
+                      (native-ref $native-x)
+                      (native-ref $native-y))))
+                ((else $other-y)
+                  (application (application (native ($primitive 3 id)) $native-x) $other-y))))
+            ((else $other-x)
+              (application (application (native ($primitive 3 id)) $other-x) y)))))))
+
 
   (define-rules-syntax
     ((curry p)
