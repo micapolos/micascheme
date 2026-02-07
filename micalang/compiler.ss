@@ -165,7 +165,7 @@
                     ($param-type (pi-param $pi))
                     ($arg (mica-compile-typed $env $param-type #'arg))
                     (typed
-                      ((pi-procedure $pi) $param-type)
+                      (pi-apply $pi $param-type)
                       `(app ,$fn ,$arg))))
                 ((else $other)
                   (syntax-error #'fn

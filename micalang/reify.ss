@@ -19,7 +19,7 @@
           ($symbol (abstraction-symbol $abstraction))
           `(lambda (,$symbol type) .
             ,(lets
-              ($body ((abstraction-procedure $abstraction) (native $symbol)))
+              ($body (abstraction-apply $abstraction (native $symbol)))
               ($reified-body (depth-reify (+ $depth 1) $body))
               (if (abstraction? $body)
                 (cdr $reified-body)
@@ -44,7 +44,7 @@
           `(pi
             ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param) .
             ,(lets
-              ($body ((pi-procedure $pi) (native $symbol?)))
+              ($body (pi-apply $pi (native $symbol?)))
               ($reified-body (depth-reify (+ $depth 1) $body))
               (if (pi? $body)
                 (cdr $reified-body)

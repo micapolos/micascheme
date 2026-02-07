@@ -86,9 +86,9 @@
   (define (app $lhs $rhs)
     (switch $lhs
       ((pi? $pi)
-        ((pi-procedure $pi) $rhs))
+        (pi-apply $pi $rhs))
       ((abstraction? $abstraction)
-        ((abstraction-procedure $abstraction) $rhs))
+        (abstraction-apply $abstraction $rhs))
       ((else $other)
         (application (native $other) $rhs))))
 

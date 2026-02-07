@@ -2,9 +2,9 @@
   (export
     native native? native-ref
     variable variable? variable-index
-    abstraction abstraction? abstraction-symbol abstraction-procedure
+    abstraction abstraction? abstraction-symbol abstraction-procedure abstraction-apply
     application application? application-lhs application-rhs
-    pi pi? pi-symbol? pi-param pi-procedure
+    pi pi? pi-symbol? pi-param pi-procedure pi-apply
     conditional conditional? conditional-cond conditional-true conditional-false
 
     term-apply
@@ -29,9 +29,9 @@
       ((native? $native)
         (apply-term (native-ref $native) $rhs))
       ((abstraction? $abstraction)
-        ((abstraction-procedure $abstraction) $rhs))
+        (abstraction-apply $abstraction $rhs))
       ((pi? $pi)
-        ((pi-procedure $pi) $rhs))
+        (pi-apply $pi $rhs))
       ((else $other)
         (application $other $rhs))))
 
@@ -53,8 +53,8 @@
         (switch? $rhs
           ((abstraction? $rhs-abstraction)
             (depth-term-equal? (+ $depth 1)
-              ((abstraction-procedure $lhs-abstraction) (variable $depth))
-              ((abstraction-procedure $rhs-abstraction) (variable $depth))))))
+              (abstraction-apply $lhs-abstraction (variable $depth))
+              (abstraction-apply $rhs-abstraction (variable $depth))))))
       ((application? $lhs-application)
         (switch? $rhs
           ((application? $rhs-application)
@@ -73,8 +73,8 @@
                 (pi-param $lhs-pi)
                 (pi-param $rhs-pi))
               (depth-term-equal? (+ $depth 1)
-                ((pi-procedure $lhs-pi) (variable $depth))
-                ((pi-procedure $rhs-pi) (variable $depth)))))))
+                (pi-apply $lhs-pi (variable $depth))
+                (pi-apply $rhs-pi (variable $depth)))))))
       ((conditional? $lhs-conditional)
         (switch? $rhs
           ((conditional? $rhs-conditional)
@@ -88,6 +88,12 @@
               (depth-term-equal? $depth
                 (conditional-false $lhs-conditional)
                 (conditional-false $rhs-conditional))))))))
+
+  (define (abstraction-apply $abstraction $arg)
+    ((abstraction-procedure $abstraction) $arg))
+
+  (define (pi-apply $pi $arg)
+    ((pi-procedure $pi) $arg))
 
   (define (term-equal? $lhs $rhs)
     (depth-term-equal? 0 $lhs $rhs))
