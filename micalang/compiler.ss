@@ -138,7 +138,8 @@
               ($body-type (typed-type $typed-body))
               ($body (typed-ref $typed-body))
               (typed
-                (pi 'id $type (lambda (_) $body-type))
+                ; TODO: This is suspicious. Help me fix it.
+                (pi $symbol $type (lambda (_) $body-type))
                 `(lambda ,$symbol ,$body))))
 
           ((lambda x xs ... body)

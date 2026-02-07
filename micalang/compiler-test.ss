@@ -86,13 +86,13 @@
 ; TODO: this is wrong: 'id should be 'i
 (check-compiles
   (lambda (i number) i)
-  ((pi (id number) number) (lambda i i)))
+  ((pi (i number) number) (lambda i i)))
 
 ; TODO: this is wrong: 'id should be 'i and 'j
 (check-compiles
   (lambda (i number) (j number) (+ i j))
   (
-    (pi (id number) (id number) number)
+    (pi (i number) (j number) number)
     (lambda i (lambda j (app (app + i) j)))))
 
 (check-compiles
