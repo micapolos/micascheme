@@ -3,12 +3,12 @@
   (import
     (micalang base)
     (micalang compiler)
-    (micalang env))
+    (micalang context))
 
   (define-syntax (mica $syntax)
     (syntax-case $syntax ()
       ((_ x)
-        #`(mica-evaluate mica-env
+        #`(mica-evaluate mica-context
           (syntax->datum/annotation #'x)))))
 
   (define-rule-syntax (check-mica in out)
