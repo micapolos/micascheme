@@ -8,6 +8,7 @@
   (import
     (micalang base)
     (micalang term)
+    (micalang reify)
     (micalang typed)
     (micalang env)
     (prefix (micalang comptime) comptime-))
