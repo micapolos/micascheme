@@ -8,9 +8,6 @@
     (string->symbol (format "v~a" $index)))
 
   (define (reify $term)
-    (depth-reify 0 $term))
-
-  (define (depth-reify $depth $term)
     (switch-exhaustive $term
       ((native? $native)
         (native-ref $native))
@@ -20,36 +17,36 @@
           `(lambda (,$symbol type) .
             ,(lets
               ($body (abstraction-apply $abstraction (native $symbol)))
-              ($reified-body (depth-reify (+ $depth 1) $body))
+              ($reified-body (reify $body))
               (if (abstraction? $body)
                 (cdr $reified-body)
                 `(,$reified-body))))))
       ((application? $application)
         (lets
           ($lhs (application-lhs $application))
-          ($reified-lhs (depth-reify $depth (application-lhs $application)))
-          ($reified-rhs (depth-reify $depth (application-rhs $application)))
+          ($reified-lhs (reify (application-lhs $application)))
+          ($reified-rhs (reify  (application-rhs $application)))
           (if (application? $lhs)
             (append $reified-lhs `(,$reified-rhs))
             `(,$reified-lhs ,$reified-rhs))))
       ((conditional? $conditional)
         `(if
-          ,(depth-reify $depth (conditional-cond $conditional))
-          ,(depth-reify $depth (conditional-true $conditional))
-          ,(depth-reify $depth (conditional-false $conditional))))
+          ,(reify (conditional-cond $conditional))
+          ,(reify (conditional-true $conditional))
+          ,(reify (conditional-false $conditional))))
       ((pi? $pi)
         (lets
           ($symbol? (pi-symbol? $pi))
-          ($reified-param (depth-reify $depth (pi-param $pi)))
+          ($reified-param (reify (pi-param $pi)))
           `(pi
             ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param) .
             ,(lets
               ($body (pi-apply $pi (native $symbol?)))
-              ($reified-body (depth-reify (+ $depth 1) $body))
+              ($reified-body (reify $body))
               (if (pi? $body)
                 (cdr $reified-body)
                 `(,$reified-body))))))))
 
   (define-rule-syntax (check-reify in out)
-    (check (equal? (depth-reify 0 in) `out)))
+    (check (equal? (reify in) `out)))
 )
