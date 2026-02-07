@@ -5,11 +5,6 @@
 
 (check
   (equal?
-    (variable equal?)
-    (%variable 'equal?)))
-
-(check
-  (equal?
     (%abstraction-symbol (prim zero? a))
     'a))
 

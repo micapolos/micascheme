@@ -4,18 +4,16 @@
     literal app
     type boolean number symbol char string
     inc dec = + - < zero?
-    list variable let lambda pi app if
+    list let lambda pi app if
     first-index last-index)
   (import
     (except (micalang base) = + - < zero? list lambda app let if string)
     (prefix (only (micalang base) let lambda app if zero? = + - <) %)
-    (rename (micalang term) (pi %pi) (variable %variable)))
+    (rename (micalang term) (pi %pi)))
   (export
     (import
       (only (micascheme) equal? from quote)
       (only (micalang term) native)))
-
-  (define-rule-syntax (variable x) x)
 
   (define-rule-syntax (let (id x) ... body)
     (%let ((id x) ...) body))
