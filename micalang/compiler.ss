@@ -13,15 +13,16 @@
     (micalang env)
     (prefix (micalang comptime) comptime-))
 
-  (define (mica-environment $runtime?)
-    (if $runtime?
-      (environment '(micalang runtime))
-      (environment '(micalang comptime))))
+  (define runtime-environment
+    (environment '(micalang runtime)))
+
+  (define comptime-environment
+    (environment '(micalang comptime)))
 
   (define (evaluate-type $env $term)
     (eval
       (compile-type $env $term)
-      (mica-environment #f)))
+      comptime-environment))
 
   (define (compile-type $env $term)
     (mica-compile-typed $env comptime-type $term))
@@ -29,7 +30,7 @@
   (define (mica-evaluate $env $term)
     (eval
       (typed-ref (mica-compile $env $term))
-      (mica-environment #t)))
+      runtime-environment))
 
   (define (mica-compile-typed $env $expected-type $term)
     (lets
