@@ -87,6 +87,11 @@
     (abstraction 'x (lambda (x) (apply-term zero? x)))))
 
 (check
+  (term-equal?
+    (abstraction 'x (lambda (x) (apply-term zero? x)))
+    (abstraction 'y (lambda (y) (apply-term zero? y)))))
+
+(check
   (not
     (term-equal?
       (abstraction 'x (lambda (x) (apply-term odd? x)))
@@ -102,4 +107,41 @@
     (term-equal?
       (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (term-apply (apply-term + x) y)))))
       (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (term-apply (apply-term + y) x))))))))
+
+(check
+  (term-equal?
+    (pi 'x (native 't1) (lambda (x) (apply-term zero? x)))
+    (pi 'x (native 't1) (lambda (x) (apply-term zero? x)))))
+
+(check
+  (term-equal?
+    (pi 'x (native 't1) (lambda (x) (apply-term zero? x)))
+    (pi 'y (native 't1) (lambda (x) (apply-term zero? x)))))
+
+(check
+  (not
+    (term-equal?
+      (pi 'x (native 't1) (lambda (x) (apply-term zero? x)))
+      (pi 'x (native 't2) (lambda (x) (apply-term zero? x))))))
+
+(check
+  (not
+    (term-equal?
+      (pi 'x (native 't1) (lambda (x) (apply-term zero? x)))
+      (pi 'x (native 't1) (lambda (x) (apply-term one? x))))))
+
+(check
+  (term-equal?
+    (pi 'x (native 't1) (lambda (x) (native 't2)))
+    (pi #f (native 't1) (lambda (_) (native 't2)))))
+
+(check
+  (not
+    (term-equal?
+      (pi 'x (native 't1) (lambda (x) (native 't2)))
+      (pi #f (native 't1) (lambda (_) (native 't3))))))
+
+
+
+
 
