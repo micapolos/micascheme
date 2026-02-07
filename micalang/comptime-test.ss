@@ -10,7 +10,7 @@
 (check
   (equal?
     (app (app (prim + a b) (literal 2)) (literal 3))
-    (literal 5)))
+    (%native 5)))
 
 (check (equal? type (%native 'type)))
 (check (equal? boolean (%native 'boolean)))
