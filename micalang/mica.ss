@@ -11,6 +11,7 @@
         #`(mica-evaluate
           (environment '(micalang runtime) '(prefix (scheme) %))
           (environment '(micalang comptime) '(prefix (scheme) %))
+          `()
           mica-context
           (syntax->datum/annotation #'x)))))
 

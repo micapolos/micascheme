@@ -12,7 +12,7 @@
     (micalang typed)
     (micalang context))
 
-  (define (evaluate-type $comptime-environment $context $term)
+  (define (evaluate-type $comptime-environment $env $context $term)
     (eval
       (fold-left
         (lambda ($acc $symbol)
@@ -20,27 +20,28 @@
         (fold-left
           (lambda ($acc $symbol)
             `(lambda ,$symbol ,$acc))
-          (compile-type $comptime-environment $context $term)
+          (compile-type $comptime-environment $env $context $term)
           (reverse (map car $context)))
         (map car $context))
       $comptime-environment))
 
-  (define (compile-type $comptime-environment $context $term)
+  (define (compile-type $comptime-environment $env $context $term)
     (mica-compile-typed
       $comptime-environment
       $comptime-environment
+      $env
       $context
       (eval 'type $comptime-environment)
       $term))
 
-  (define (mica-evaluate $runtime-environment $comptime-environment $context $term)
+  (define (mica-evaluate $runtime-environment $comptime-environment $env $context $term)
     (eval
-      (typed-ref (mica-compile $runtime-environment $comptime-environment $context $term))
+      (typed-ref (mica-compile $runtime-environment $comptime-environment $env $context $term))
       $runtime-environment))
 
-  (define (mica-compile-typed $runtime-environment $comptime-environment $context $expected-type $term)
+  (define (mica-compile-typed $runtime-environment $comptime-environment $env $context $expected-type $term)
     (lets
-      ($typed (mica-compile $runtime-environment $comptime-environment $context $term))
+      ($typed (mica-compile $runtime-environment $comptime-environment $env $context $term))
       ($type (typed-type $typed))
       (if (term-equal? $type $expected-type)
         (typed-ref $typed)
@@ -49,7 +50,7 @@
             (reify $type)
             (reify $expected-type))))))
 
-  (define (mica-compile $runtime-environment $comptime-environment $context $term)
+  (define (mica-compile $runtime-environment $comptime-environment $env $context $term)
     (switch $term
       ((typed? $typed) $typed)
       ((else _)
@@ -85,100 +86,100 @@
 
           ((native t v)
             (typed
-              (evaluate-type $comptime-environment $context #'t)
+              (evaluate-type $comptime-environment $env $context #'t)
               `(literal ,#'v)))
 
           ((pi out)
-            (mica-compile $runtime-environment $comptime-environment $context #'out))
+            (mica-compile $runtime-environment $comptime-environment $env $context #'out))
 
           ((pi (id in) out)
             (lets
               ($id (datum id))
-              ($in (compile-type $comptime-environment $context #'in))
+              ($in (compile-type $comptime-environment $env $context #'in))
               ($context (push $context (cons $id (eval 'type $comptime-environment))))
-              ($out (compile-type $comptime-environment $context #'out))
+              ($out (compile-type $comptime-environment $env $context #'out))
               (typed (eval 'type $comptime-environment) `(pi (,$id ,$in) ,$out))))
 
           ((pi in out)
             (lets
-              ($in (compile-type $comptime-environment $context #'in))
-              ($out (compile-type $comptime-environment $context #'out))
+              ($in (compile-type $comptime-environment $env $context #'in))
+              ($out (compile-type $comptime-environment $env $context #'out))
               (typed (eval 'type $comptime-environment) `(pi ,$in ,$out))))
 
           ((pi x xs ... body)
-            (mica-compile $runtime-environment $comptime-environment $context
+            (mica-compile $runtime-environment $comptime-environment $env $context
               `(pi ,#'x (pi ,@#'(xs ...) ,#'body))))
 
           ((let body)
-            (mica-compile $runtime-environment $comptime-environment $context #'body))
+            (mica-compile $runtime-environment $comptime-environment $env $context #'body))
 
           ((let (id x) body)
             (lets
               ($symbol (datum id))
-              ($typed-x (mica-compile $runtime-environment $comptime-environment $context #'x))
+              ($typed-x (mica-compile $runtime-environment $comptime-environment $env $context #'x))
               ($x-type (typed-type $typed-x))
               ($x (typed-ref $typed-x))
               ($context (push $context (cons $symbol $x-type)))
-              ($typed-body (mica-compile $runtime-environment $comptime-environment $context #'body))
+              ($typed-body (mica-compile $runtime-environment $comptime-environment $env $context #'body))
               ($body-type (typed-type $typed-body))
               ($body (typed-ref $typed-body))
               (typed $body-type `(let (,$symbol ,$x) ,$body))))
 
           ((let (id param params ... lambda-body) body)
-            (mica-compile $runtime-environment $comptime-environment $context
+            (mica-compile $runtime-environment $comptime-environment $env $context
               `(let
                 (,#'id (lambda ,#'param ,@#'(params ...) ,#'lambda-body))
                 ,#'body)))
 
           ((let x xs ... body)
-            (mica-compile $runtime-environment $comptime-environment $context
+            (mica-compile $runtime-environment $comptime-environment $env $context
               `(let ,#'x (let ,@#'(xs ...) ,#'body))))
 
           ((lambda body)
-            (mica-compile $runtime-environment $comptime-environment $context #'body))
+            (mica-compile $runtime-environment $comptime-environment $env $context #'body))
 
           ((lambda (id t) body)
             (lets
               ($symbol (datum id))
-              ($type (evaluate-type $comptime-environment $context #'t))
+              ($type (evaluate-type $comptime-environment $env $context #'t))
               ($context (push $context (cons $symbol $type)))
-              ($typed-body (mica-compile $runtime-environment $comptime-environment $context #'body))
+              ($typed-body (mica-compile $runtime-environment $comptime-environment $env $context #'body))
               ($body-type (typed-type $typed-body))
               ($body (typed-ref $typed-body))
               (typed
                 ; TODO: This is suspicious. Help me fix it.
                 (pi $symbol $type
                   (lambda ($x)
-                    (evaluate-type $comptime-environment $context
+                    (evaluate-type $comptime-environment $env $context
                       (reify $body-type))))
                 `(lambda ,$symbol ,$body))))
 
           ((lambda x xs ... body)
-            (mica-compile $runtime-environment $comptime-environment $context
+            (mica-compile $runtime-environment $comptime-environment $env $context
               `(lambda ,#'x (lambda ,@#'(xs ...) ,#'body))))
 
           ((if cond true false)
             (lets
-              ($cond (mica-compile-typed $runtime-environment $comptime-environment $context (eval 'boolean $comptime-environment) #'cond))
-              ($typed-true (mica-compile $runtime-environment $comptime-environment $context #'true))
+              ($cond (mica-compile-typed $runtime-environment $comptime-environment $env $context (eval 'boolean $comptime-environment) #'cond))
+              ($typed-true (mica-compile $runtime-environment $comptime-environment $env $context #'true))
               ($type (typed-type $typed-true))
               ($true (typed-ref $typed-true))
-              ($false (mica-compile-typed $runtime-environment $comptime-environment $context $type #'false))
+              ($false (mica-compile-typed $runtime-environment $comptime-environment $env $context $type #'false))
               (typed $type `(if ,$cond ,$true ,$false))))
 
           ((fn)
-            (mica-compile $runtime-environment $comptime-environment $context #'fn))
+            (mica-compile $runtime-environment $comptime-environment $env $context #'fn))
 
           ((fn arg)
             (lets
-              ($typed-fn (mica-compile $runtime-environment $comptime-environment $context #'fn))
+              ($typed-fn (mica-compile $runtime-environment $comptime-environment $env $context #'fn))
               ($fn-type (typed-type $typed-fn))
               (switch $fn-type
                 ((pi? $pi)
                   (lets
                     ($fn (typed-ref $typed-fn))
                     ($param-type (pi-param $pi))
-                    ($arg (mica-compile-typed $runtime-environment $comptime-environment $context $param-type #'arg))
+                    ($arg (mica-compile-typed $runtime-environment $comptime-environment $env $context $param-type #'arg))
                     (typed
                       (pi-apply $pi $param-type)
                       `(app ,$fn ,$arg))))
@@ -188,7 +189,7 @@
                       (reify $other)))))))
 
           ((fn arg args ...)
-            (mica-compile $runtime-environment $comptime-environment $context
+            (mica-compile $runtime-environment $comptime-environment $env $context
               `((,#'fn ,#'arg) ,@#'(args ...))))))))
 
   (define check-runtime-environment
@@ -199,12 +200,12 @@
 
   (define-rule-syntax (check-compiles in out)
     (lets
-      ($typed (mica-compile check-runtime-environment check-comptime-environment `(,@mica-context) 'in))
+      ($typed (mica-compile check-runtime-environment check-comptime-environment `() `(,@mica-context) 'in))
       (check
         (equal?
           `(,(reify (typed-type $typed)) ,(typed-ref $typed))
           'out))))
 
   (define-rule-syntax (check-compile-raises in)
-    (check (raises (mica-compile check-runtime-environment check-comptime-environment `(,@mica-context) 'in))))
+    (check (raises (mica-compile check-runtime-environment check-comptime-environment `() `(,@mica-context) 'in))))
 )
