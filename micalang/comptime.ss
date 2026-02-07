@@ -2,7 +2,7 @@
   (export
     prim
     literal app let if
-    type boolean number symbol string
+    type boolean number symbol char string
     inc dec = + - < zero?
     index first-index last-index
     array
@@ -107,11 +107,12 @@
   (define (%dec x) (%- x 1))
 
   (define-prims
-    (type 'type)
+    (type    'type)
     (boolean 'boolean)
-    (number 'number)
-    (symbol 'symbol)
-    (string 'string)
+    (number  'number)
+    (symbol  'symbol)
+    (char    'char)
+    (string  'string)
 
     (zero? x %zero?)
     (inc x %inc)

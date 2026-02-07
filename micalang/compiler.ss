@@ -56,6 +56,10 @@
             (number? (datum n))
             (typed comptime-number `(literal ,(datum n))))
 
+          (ch
+            (char? (datum ch))
+            (typed comptime-char `(literal ,(datum ch))))
+
           (s
             (string? (datum s))
             (typed comptime-string `(literal ,(datum s))))

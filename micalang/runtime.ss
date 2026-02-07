@@ -2,7 +2,7 @@
   (export
     prim
     literal app
-    type boolean number symbol string
+    type boolean number symbol char string
     inc dec = + - < zero?
     list let lambda pi app if
     first-index last-index)
@@ -64,11 +64,12 @@
   (define (%dec x) (%- x 1))
 
   (define-currys
-    (type 'type)
+    (type    'type)
     (boolean 'boolean)
-    (number 'number)
-    (symbol 'symbol)
-    (string 'string)
+    (number  'number)
+    (symbol  'symbol)
+    (char    'char)
+    (string  'string)
 
     (zero? x %zero?)
     (inc x %inc)

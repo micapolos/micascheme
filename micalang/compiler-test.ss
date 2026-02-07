@@ -21,9 +21,8 @@
 (check-compiles 123 (typed number (literal 123)))
 (check-compiles 3.14 (typed number (literal 3.14)))
 (check-compiles 'foo (typed symbol (literal 'foo)))
+(check-compiles #\a (typed char (literal #\a)))
 (check-compiles "foo" (typed string (literal "foo")))
-
-(check-compile-raises #\a)
 
 ; === globals
 
