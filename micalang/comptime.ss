@@ -1,6 +1,6 @@
 (library (micalang comptime)
   (export
-    prim
+    prim curry
     literal app let
     type bool int string
     inc dec = + - < zero?
@@ -14,7 +14,7 @@
     (rename (micalang term) (pi %pi)))
   (export
     (import
-      (only (micascheme) lambda equal? from $primitive)
+      (only (micascheme) lambda equal? from)
       (only (micalang term) native variable application pi-param)))
 
   (define-rule-syntax (literal x)
@@ -27,15 +27,18 @@
     ((lambda id body)
       (abstraction (%lambda (id) body))))
 
+  (define-rule-syntax (prim x)
+    ($primitive 3 x))
+
   (define-rules-syntax
-    ((prim p)
+    ((curry p)
       (native p))
-    ((prim x p)
+    ((curry x p)
       (lambda x
         (switch x
           ((native? $native) (native (p (native-ref $native))))
           ((else $other) (application (native p) $other)))))
-    ((prim x y p)
+    ((curry x y p)
       (lambda x
         (lambda y
           (switch x
@@ -53,7 +56,7 @@
 
   (define-rules-syntax
     ((define-prim id arg ... p)
-      (define id (prim arg ... p))))
+      (define id (curry arg ... p))))
 
   (define-rule-syntax (define-prims (id arg ... prim) ...)
     (begin (define-prim id arg ... prim) ...))

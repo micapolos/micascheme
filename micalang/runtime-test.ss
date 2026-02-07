@@ -1,7 +1,7 @@
 (import (only (micascheme) check equal? quote procedure?) (micalang runtime) (prefix (micalang term) %))
 
-(check (equal? ($primitive 3 fx+) ($primitive 3 fx+)))
-(check (equal? (app (app (prim a b ($primitive 3 +)) 2) 3) 5))
+(check (equal? (prim fx+) (prim fx+)))
+(check (equal? (app (app (curry a b (prim +)) 2) 3) 5))
 
 (check (equal? (app zero? (literal 0)) #t))
 (check (equal? (app inc (literal 2)) (literal 3)))

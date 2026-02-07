@@ -1,16 +1,17 @@
 (library (micalang runtime)
   (export
+    prim curry
     literal app
     inc dec = + - < zero?
     list let lambda app
-    first-index last-index prim)
+    first-index last-index)
   (import
     (except (micalang base) = + - < zero? list lambda app let)
     (prefix (only (micalang base) let lambda app) %)
     (rename (micalang term) (pi %pi)))
   (export
     (import
-      (only (micascheme) equal? from $primitive)
+      (only (micascheme) equal? from)
       (only (micalang term) native)))
 
   (define-rule-syntax (let (id x) ... body)
@@ -20,19 +21,22 @@
     ((lambda id body)
       (%lambda (id) body)))
 
-  (define-rules-syntax
-    ((prim x) x)
-    ((prim a x) (lambda a (x a)))
-    ((prim a b x) (lambda a (lambda b (x a b))))
-    ((prim a b c x) (lambda a (lambda b (lambda c (x a b c)))))
-    ((prim a b c d x) (lambda a (lambda b (lambda c (lambda d (x a b c d)))))))
+  (define-rule-syntax (prim x)
+    ($primitive 3 x))
 
   (define-rules-syntax
-    ((define-prim id arg ... p)
-      (define id (prim arg ... p))))
+    ((curry x) x)
+    ((curry a x) (lambda a (x a)))
+    ((curry a b x) (lambda a (lambda b (x a b))))
+    ((curry a b c x) (lambda a (lambda b (lambda c (x a b c)))))
+    ((curry a b c d x) (lambda a (lambda b (lambda c (lambda d (x a b c d)))))))
 
-  (define-rule-syntax (define-prims (id arg ... prim) ...)
-    (begin (define-prim id arg ... prim) ...))
+  (define-rules-syntax
+    ((define-curry id arg ... p)
+      (define id (curry arg ... p))))
+
+  (define-rule-syntax (define-currys (id arg ... prim) ...)
+    (begin (define-curry id arg ... prim) ...))
 
   (define-rules-syntax
     ((app lhs rhs)
@@ -43,7 +47,7 @@
   (define (%first-index _) 0)
   (define (%last-index n) (fx-1/wraparound n))
 
-  (define-prims
+  (define-currys
     (zero? x fxzero?)
     (inc x fx+1/wraparound)
     (dec x fx-1/wraparound)

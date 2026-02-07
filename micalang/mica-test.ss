@@ -1,5 +1,13 @@
 (import (micalang base) (micalang mica))
 
+(check-mica
+  (let
+    (+ (native
+      (pi string string string)
+      (curry a b (prim string-append))))
+    (+ "foo" "bar"))
+  "foobar")
+
 (check-mica 1 1)
 (check-mica (zero? 0) #t)
 (check-mica (zero? 1) #f)
