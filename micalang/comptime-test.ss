@@ -2,6 +2,13 @@
   (only (micascheme) check equal? quote procedure?)
   (micalang comptime))
 
+(check (equal? ($primitive 3 fx+) ($primitive 3 fx+)))
+
+(check
+  (equal?
+    (app (app (prim a b ($primitive 3 +)) (literal 2)) (literal 3))
+    (literal 5)))
+
 (check (equal? type (literal 'type)))
 (check (equal? bool (literal 'bool)))
 (check (equal? int (literal 'int)))

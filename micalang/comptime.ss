@@ -1,5 +1,6 @@
 (library (micalang comptime)
   (export
+    prim
     literal app let
     type bool int string
     inc dec = + - < zero?
@@ -13,7 +14,7 @@
     (rename (micalang term) (pi %pi)))
   (export
     (import
-      (only (micascheme) lambda equal? from)
+      (only (micascheme) lambda equal? from $primitive)
       (only (micalang term) native variable application pi-param)))
 
   (define-rule-syntax (literal x)
@@ -27,30 +28,32 @@
       (abstraction (%lambda (id) body))))
 
   (define-rules-syntax
-    ((define-prim id prim)
-      (define id (native prim)))
-    ((define-prim id x prim)
-      (define id
-        (lambda x
+    ((prim p)
+      (native p))
+    ((prim x p)
+      (lambda x
+        (switch x
+          ((native? $native) (native (p (native-ref $native))))
+          ((else $other) (application (native p) $other)))))
+    ((prim x y p)
+      (lambda x
+        (lambda y
           (switch x
-            ((native? $native) (native (prim (native-ref $native))))
-            ((else $other) (application (native id) $other))))))
-    ((define-prim id x y prim)
-      (define id
-        (lambda x
-          (lambda y
-            (switch x
-              ((native? $native-x)
-                (switch y
-                  ((native? $native-y)
-                    (native
-                      (prim
-                        (native-ref $native-x)
-                        (native-ref $native-y))))
-                  ((else $other-y)
-                    (application (application (native id) $native-x) $other-y))))
-              ((else $other-x)
-                (application (application (native id) $other-x) y))))))))
+            ((native? $native-x)
+              (switch y
+                ((native? $native-y)
+                  (native
+                    (p
+                      (native-ref $native-x)
+                      (native-ref $native-y))))
+                ((else $other-y)
+                  (application (application (native p) $native-x) $other-y))))
+            ((else $other-x)
+              (application (application (native p) $other-x) y)))))))
+
+  (define-rules-syntax
+    ((define-prim id arg ... p)
+      (define id (prim arg ... p))))
 
   (define-rule-syntax (define-prims (id arg ... prim) ...)
     (begin (define-prim id arg ... prim) ...))

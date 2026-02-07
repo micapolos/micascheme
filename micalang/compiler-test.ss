@@ -6,7 +6,13 @@
 
 ; === native
 
-(check-compiles (native bool +) (typed bool (literal +)))
+(check-compiles
+  (native bool ($primitive 3 +))
+  (typed bool (literal ($primitive 3 +))))
+
+(check-compiles
+  (native (pi int int int) (prim a b ($primitive 3 +)))
+  (typed (pi int (pi int int)) (literal (prim a b ($primitive 3 +)))))
 
 ; === literals
 
