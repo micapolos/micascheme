@@ -1,13 +1,13 @@
 (library (micalang env)
   (export mica-env)
   (import
-    (only (micalang base) define quote quasiquote unquote define-rules-syntax define-rule-syntax quote quasiquote unquote ...)
+    (only (micalang base) cons define quote quasiquote unquote define-rules-syntax define-rule-syntax quote quasiquote unquote ...)
     (micalang typed)
     (micalang comptime))
 
   (define-rules-syntax
     ((entry id type)
-      `(id . ,type)))
+      (cons 'id type)))
 
   (define-rule-syntax (env x ...)
     `(,(entry . x) ...))

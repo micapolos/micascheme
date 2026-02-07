@@ -83,7 +83,7 @@
             (lets
               ($id (datum id))
               ($in (compile-type $env #'in))
-              ($env (push $env `(,$id . ,comptime-type)))
+              ($env (push $env (cons $id comptime-type)))
               ($out (compile-type $env #'out))
               (typed comptime-type `(pi (,$id ,$in) ,$out))))
 
@@ -106,7 +106,7 @@
               ($typed-x (mica-compile $env #'x))
               ($x-type (typed-type $typed-x))
               ($x (typed-ref $typed-x))
-              ($env (push $env `(,$symbol . ,$x-type)))
+              ($env (push $env (cons $symbol $x-type)))
               ($typed-body (mica-compile $env #'body))
               ($body-type (typed-type $typed-body))
               ($body (typed-ref $typed-body))
@@ -129,7 +129,7 @@
             (lets
               ($symbol (datum id))
               ($type (evaluate-type $env #'t))
-              ($env (push $env `(,$symbol . ,$type)))
+              ($env (push $env (cons $symbol $type)))
               ($typed-body (mica-compile $env #'body))
               ($body-type (typed-type $typed-body))
               ($body (typed-ref $typed-body))
