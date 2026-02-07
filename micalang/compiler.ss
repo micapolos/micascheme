@@ -179,8 +179,11 @@
             (mica-compile $runtime-environment $comptime-environment $context
               `((,#'fn ,#'arg) ,@#'(args ...))))))))
 
-  (define check-runtime-environment (environment '(micalang runtime)))
-  (define check-comptime-environment(environment '(micalang comptime)))
+  (define check-runtime-environment
+    (environment '(micalang runtime)))
+
+  (define check-comptime-environment
+    (environment '(micalang comptime)))
 
   (define-rule-syntax (check-compiles in out)
     (lets
