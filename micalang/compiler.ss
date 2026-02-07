@@ -12,16 +12,20 @@
     (micalang typed)
     (micalang context))
 
-  (define (evaluate-type $comptime-environment $env $context $term)
+  (define (evaluate-runtime $runtime-environment $env $code)
     (lets
       ($symbols (map car $env))
-      ($values  (map cdr $env))
+      ($values (map cdr $env))
+      ($nested (fold-right (lambda (s acc) `(lambda ,s ,acc)) $code $symbols))
+      ($proc (eval $nested $runtime-environment))
+      (fold-left (lambda (f v) (f v)) $proc $values)))
+
+  (define (evaluate-comptime $comptime-environment $env $context $term)
+    (lets
+      ($symbols (map car $env))
+      ($values (map cdr $env))
       ($code (compile-type $comptime-environment $env $context $term))
-      ($nested-lambda
-        (fold-right
-          (lambda (s acc) `(lambda ,s ,acc))
-          $code
-          $symbols))
+      ($nested-lambda (fold-right (lambda (s acc) `(lambda ,s ,acc)) $code $symbols))
       ($proc (eval $nested-lambda $comptime-environment))
       (fold-left (lambda (f v) (term-apply f v)) $proc $values)))
 
@@ -86,7 +90,7 @@
 
           ((native t v)
             (typed
-              (evaluate-type $comptime-environment $env $context #'t)
+              (evaluate-comptime $comptime-environment $env $context #'t)
               `(literal ,#'v)))
 
           ((pi out)
@@ -120,7 +124,7 @@
               ($typed-x (mica-compile $runtime-environment $comptime-environment $env $context #'x))
               ($x-type (typed-type $typed-x))
               ($x (typed-ref $typed-x))
-              ($x-val (mica-runtime-eval $runtime-environment $env $x))
+              ($x-val (evaluate-runtime $runtime-environment $env $x))
               ($env (push $env (cons $symbol $x-val)))
               ($context (push $context (cons $symbol $x-type)))
               ($typed-body (mica-compile $runtime-environment $comptime-environment $env $context #'body))
@@ -144,7 +148,7 @@
           ((lambda (id t) body)
             (lets
               ($symbol (datum id))
-              ($type (evaluate-type $comptime-environment $env $context #'t))
+              ($type (evaluate-comptime $comptime-environment $env $context #'t))
               ($body-env (push $env (cons $symbol (variable $symbol))))
               ($body-context (push $context (cons $symbol $type)))
               ($typed-body (mica-compile $runtime-environment $comptime-environment $body-env $body-context #'body))
@@ -153,7 +157,7 @@
               (typed
                 (pi $symbol $type
                   (lambda ($x)
-                    (evaluate-type
+                    (evaluate-comptime
                       $comptime-environment
                       (push $env (cons $symbol $x))
                       $body-context
@@ -186,7 +190,7 @@
                     ($fn (typed-ref $typed-fn))
                     ($param-type (pi-param $pi))
                     ($arg (mica-compile-typed $runtime-environment $comptime-environment $env $context $param-type #'arg))
-                    ($arg-val (mica-runtime-eval $runtime-environment $env $arg))
+                    ($arg-val (evaluate-runtime $runtime-environment $env $arg))
                     (typed
                       (pi-apply $pi $arg-val)
                       `(app ,$fn ,$arg))))
@@ -198,14 +202,6 @@
           ((fn arg args ...)
             (mica-compile $runtime-environment $comptime-environment $env $context
               `((,#'fn ,#'arg) ,@#'(args ...))))))))
-
-  (define (mica-runtime-eval $runtime-env $env $code)
-    (lets
-      ($symbols (map car $env))
-      ($values (map cdr $env))
-      ($nested (fold-right (lambda (s acc) `(lambda ,s ,acc)) $code $symbols))
-      ($proc (eval $nested $runtime-env))
-      (fold-left (lambda (f v) (f v)) $proc $values)))
 
   (define check-runtime-environment
     (environment '(micalang runtime)))
