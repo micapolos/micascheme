@@ -14,7 +14,7 @@
     (rename (micalang term) (pi %pi)))
   (export
     (import
-      (only (micascheme) lambda equal? from)
+      (only (micascheme) lambda equal? quote)
       (only (micalang term) native variable application pi-param)))
 
   (define-rule-syntax (literal x)
