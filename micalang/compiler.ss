@@ -96,6 +96,7 @@
             (lets
               ($id (datum id))
               ($in (compile-type $comptime-environment $env $context #'in))
+              ($env (push $env (cons $id (variable $id))))
               ($context (push $context (cons $id (eval 'type $comptime-environment))))
               ($out (compile-type $comptime-environment $env $context #'out))
               (typed (eval 'type $comptime-environment) `(pi (,$id ,$in) ,$out))))
@@ -142,15 +143,19 @@
             (lets
               ($symbol (datum id))
               ($type (evaluate-type $comptime-environment $env $context #'t))
+              ($new-env (push $env (cons $symbol (variable $symbol))))
               ($context (push $context (cons $symbol $type)))
-              ($typed-body (mica-compile $runtime-environment $comptime-environment $env $context #'body))
+              ($typed-body (mica-compile $runtime-environment $comptime-environment $new-env $context #'body))
               ($body-type (typed-type $typed-body))
               ($body (typed-ref $typed-body))
               (typed
                 ; TODO: This is suspicious. Help me fix it.
                 (pi $symbol $type
                   (lambda ($x)
-                    (evaluate-type $comptime-environment $env $context
+                    (evaluate-type
+                      $comptime-environment
+                      (push $env (cons $symbol $x))
+                      $context
                       (reify $body-type))))
                 `(lambda ,$symbol ,$body))))
 
