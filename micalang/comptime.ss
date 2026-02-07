@@ -120,7 +120,7 @@
     (< x y fx<)
 
     (first-index n %first-index)
-    (last-index   n %last-index))
+    (last-index  n %last-index))
 
   (define list
     (lambda x (application (native list) x)))
