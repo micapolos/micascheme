@@ -199,14 +199,13 @@
             (mica-compile $runtime-environment $comptime-environment $env $context
               `((,#'fn ,#'arg) ,@#'(args ...))))))))
 
-(define (mica-runtime-eval $runtime-env $env $code)
-  (let* ([$symbols (map car $env)]
-         [$values  (map cdr $env)]
-         ;; Wrap the code in nested lambdas to handle shadowing correctly
-         [$nested (fold-right (lambda (s acc) `(lambda ,s ,acc)) $code $symbols)]
-         [$proc (eval $nested $runtime-env)])
-    ;; Apply to the live values from our alist
-    (fold-left (lambda (f v) (f v)) $proc $values)))
+  (define (mica-runtime-eval $runtime-env $env $code)
+    (lets
+      ($symbols (map car $env))
+      ($values (map cdr $env))
+      ($nested (fold-right (lambda (s acc) `(lambda ,s ,acc)) $code $symbols))
+      ($proc (eval $nested $runtime-env))
+      (fold-left (lambda (f v) (f v)) $proc $values)))
 
   (define check-runtime-environment
     (environment '(micalang runtime)))
