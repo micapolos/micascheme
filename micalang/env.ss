@@ -6,10 +6,8 @@
     (micalang comptime))
 
   (define-rules-syntax
-    ((entry id type datum)
-      `(id ,(typed type 'datum)))
     ((entry id type)
-      (entry id type id)))
+      `(id . ,type)))
 
   (define-rule-syntax (env x ...)
     `(,(entry . x) ...))
