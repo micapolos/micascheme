@@ -19,10 +19,10 @@
 (check-compiles #f (typed bool (literal #f)))
 (check-compiles #t (typed bool (literal #t)))
 (check-compiles 123 (typed number (literal 123)))
+(check-compiles 3.14 (typed number (literal 3.14)))
 (check-compiles 'foo (typed symbol (literal 'foo)))
 (check-compiles "foo" (typed string (literal "foo")))
 
-(check-compile-raises 123123123123123123123123)
 (check-compile-raises #\a)
 
 ; === globals

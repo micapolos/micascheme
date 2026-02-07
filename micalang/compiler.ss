@@ -52,9 +52,9 @@
             (boolean? (datum b))
             (typed comptime-bool `(literal ,(datum b))))
 
-          (fx
-            (fixnum? (datum fx))
-            (typed comptime-number `(literal ,(datum fx))))
+          (n
+            (number? (datum n))
+            (typed comptime-number `(literal ,(datum n))))
 
           (s
             (string? (datum s))

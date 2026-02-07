@@ -8,7 +8,7 @@
     first-index last-index)
   (import
     (except (micalang base) = + - < zero? list lambda app let if string)
-    (prefix (only (micalang base) let lambda app if) %)
+    (prefix (only (micalang base) let lambda app if zero? = + - <) %)
     (rename (micalang term) (pi %pi)))
   (export
     (import
@@ -55,10 +55,13 @@
   (define-rule-syntax (literal x) x)
 
   (define (%first-index _) 0)
-  (define (%last-index n) (fx-1/wraparound n))
+  (define (%last-index n) (%dec n))
 
   (define-rule-syntax (if cond true false)
     (%if cond true false))
+
+  (define (%inc x) (%+ x 1))
+  (define (%dec x) (%- x 1))
 
   (define-currys
     (type 'type)
@@ -67,14 +70,14 @@
     (symbol 'symbol)
     (string 'string)
 
-    (zero? x fxzero?)
-    (inc x fx+1/wraparound)
-    (dec x fx-1/wraparound)
+    (zero? x %zero?)
+    (inc x %inc)
+    (dec x %dec)
 
-    (= x y fx=)
-    (+ x y fx+/wraparound)
-    (- x y fx-/wraparound)
-    (< x y fx<)
+    (= x y %=)
+    (+ x y %+)
+    (- x y %-)
+    (< x y %<)
     (first-index n %first-index)
     (last-index  n %last-index))
 

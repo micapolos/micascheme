@@ -2,7 +2,7 @@
   (only (micascheme) check equal? quote procedure?)
   (micalang comptime))
 
-(check (equal? (prim fx+) (prim fx+)))
+(check (equal? (prim +) (prim +)))
 
 (check
   (equal?

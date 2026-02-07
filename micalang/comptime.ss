@@ -10,7 +10,7 @@
     pi)
   (import
     (except (micalang base) = + - < zero? list app lambda let string if)
-    (prefix (only (micalang base) lambda let if) %)
+    (prefix (only (micalang base) lambda let if = + - < zero?) %)
     (rename (micalang term) (pi %pi)))
   (export
     (import
@@ -98,10 +98,13 @@
 
   (define (index n) (application index n))
   (define (%first-index n) 0)
-  (define (%last-index   n) (fx-1/wraparound n))
+  (define (%last-index  n) (%dec n))
 
   (define array
     (lambda n (application (native array) n)))
+
+  (define (%inc x) (%+ x 1))
+  (define (%dec x) (%- x 1))
 
   (define-prims
     (type 'type)
@@ -110,14 +113,14 @@
     (symbol 'symbol)
     (string 'string)
 
-    (zero? x fxzero?)
-    (inc x fx+1/wraparound)
-    (dec x fx-1/wraparound)
+    (zero? x %zero?)
+    (inc x %inc)
+    (dec x %dec)
 
-    (= x y fx=)
-    (+ x y fx+/wraparound)
-    (- x y fx-/wraparound)
-    (< x y fx<)
+    (= x y %=)
+    (+ x y %+)
+    (- x y %-)
+    (< x y %<)
 
     (first-index n %first-index)
     (last-index  n %last-index))

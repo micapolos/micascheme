@@ -49,10 +49,10 @@
 
 (check-mica
   (let
-    (increment (native (pi number number)     (from (micascheme) fx+1/wraparound)))
-    (add       (native (pi number number number) (from (micascheme) fx+1/wraparound)))
-    (increment (increment 10)))
-  12)
+    (zero? (native (pi number bool)          (prim zero? a)))
+    (add   (native (pi number number number) (prim + a b)))
+    (zero? (add 10 20)))
+  #f)
 
 (check-mica (if (zero? 0) "zero" "not-zero") "zero")
 (check-mica (if (zero? 1) "zero" "not-zero") "not-zero")
