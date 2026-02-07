@@ -53,3 +53,6 @@
     (add       (native (pi int int int) (from (micascheme) fx+1/wraparound)))
     (increment (increment 10)))
   12)
+
+(check-mica (if (zero? 0) "zero" "not-zero") "zero")
+(check-mica (if (zero? 1) "zero" "not-zero") "not-zero")

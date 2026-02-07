@@ -116,3 +116,12 @@
 (check-compiles
   (pi (x type) (y type) x)
   (typed type (pi (x type) (pi (y type) x))))
+
+; === if
+
+(check-compiles
+  (if (zero? 0) "zero" "not-zero")
+  (typed string (if (app zero? (literal 0)) (literal "zero") (literal "not-zero"))))
+
+(check-compile-raises (if "not-boolean" "zero" "not-zero"))
+(check-compile-raises (if #t 10 "not-int"))
