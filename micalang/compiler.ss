@@ -39,8 +39,8 @@
         (typed-ref $typed)
         (syntax-error $term
           (format "invalid type ~s, expected ~s, in"
-            (term->datum $type)
-            (term->datum $expected-type))))))
+            (reify $type)
+            (reify $expected-type))))))
 
   (define (mica-compile $env $term)
     (switch $term
@@ -170,7 +170,7 @@
                 ((else $other)
                   (syntax-error #'fn
                     (format "invalid type ~s, expected pi, in"
-                      (term->datum $other)))))))
+                      (reify $other)))))))
 
           ((fn arg args ...)
             (mica-compile $env
