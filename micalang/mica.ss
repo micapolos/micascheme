@@ -8,7 +8,10 @@
   (define-syntax (mica $syntax)
     (syntax-case $syntax ()
       ((_ x)
-        #`(mica-evaluate mica-context
+        #`(mica-evaluate
+          (environment '(micalang runtime))
+          (environment '(micalang comptime))
+          mica-context
           (syntax->datum/annotation #'x)))))
 
   (define-rule-syntax (check-mica in out)
