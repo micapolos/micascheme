@@ -12,12 +12,6 @@
     (micalang typed)
     (micalang context))
 
-  (define runtime-environment
-    (environment '(micalang runtime)))
-
-  (define comptime-environment
-    (environment '(micalang comptime)))
-
   (define (evaluate-type $comptime-environment $context $term)
     (eval
       (compile-type $comptime-environment $context $term)
@@ -185,14 +179,17 @@
             (mica-compile $runtime-environment $comptime-environment $context
               `((,#'fn ,#'arg) ,@#'(args ...))))))))
 
+  (define check-runtime-environment (environment '(micalang runtime)))
+  (define check-comptime-environment(environment '(micalang comptime)))
+
   (define-rule-syntax (check-compiles in out)
     (lets
-      ($typed (mica-compile runtime-environment comptime-environment `(,@mica-context) 'in))
+      ($typed (mica-compile check-runtime-environment check-comptime-environment `(,@mica-context) 'in))
       (check
         (equal?
           `(,(reify (typed-type $typed)) ,(typed-ref $typed))
           'out))))
 
   (define-rule-syntax (check-compile-raises in)
-    (check (raises (mica-compile runtime-environment comptime-environment `(,@mica-context) 'in))))
+    (check (raises (mica-compile check-runtime-environment check-comptime-environment `(,@mica-context) 'in))))
 )
