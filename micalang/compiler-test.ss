@@ -70,11 +70,11 @@
 
 (check-compiles
   (let
-    (zwiększ (x number) (inc x))
+    (zwiększ (x number) (+ x 1))
     (zwiększ 10))
   (number
     (let
-      (zwiększ (lambda x (app inc x)))
+      (zwiększ (lambda x (app (app + x) (literal 1))))
       (app zwiększ (literal 10)))))
 
 ; === lambda
