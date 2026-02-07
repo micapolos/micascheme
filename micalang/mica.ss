@@ -5,8 +5,11 @@
     (micalang compiler)
     (micalang env))
 
-  (define-rule-syntax (mica x)
-    (mica-evaluate mica-env 'x))
+  (define-syntax (mica $syntax)
+    (syntax-case $syntax ()
+      ((_ x)
+        #`(mica-evaluate mica-env
+          (syntax->datum/annotation #'x)))))
 
   (define-rule-syntax (check-mica in out)
     (check (equal? (mica in) (mica out))))

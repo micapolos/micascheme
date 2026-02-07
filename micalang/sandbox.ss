@@ -14,5 +14,5 @@
   ((lambda (a number) (b number) (+ a b)) 10 20)
   (let
     (połącz (native (pi string string string) (prim string-append a b)))
-    (połącz "foo" "bar")))
+    (połącz "Hello, " "world!")))
 
