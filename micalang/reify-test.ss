@@ -1,8 +1,12 @@
 (import (micalang base) (micalang term) (micalang reify))
 
+(check-reify (native #t) #t)
+(check-reify (native 1) 1)
+(check-reify (native #\a) #\a)
+(check-reify (native "foo") "foo")
 (check-reify (native 'a) a)
 
-(check-reify (variable 'a) a)
+(check-reify (variable 'zero?) zero?)
 
 (check-reify
   (conditional (native 'cond) (native 't) (native 'f))
