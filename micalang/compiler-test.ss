@@ -11,14 +11,14 @@
   (typed bool (literal (prim +))))
 
 (check-compiles
-  (native (pi int int int) (curry a b (prim +)))
-  (typed (pi int int int) (literal (curry a b (prim +)))))
+  (native (pi number number number) (curry a b (prim +)))
+  (typed (pi number number number) (literal (curry a b (prim +)))))
 
 ; === literals
 
 (check-compiles #f (typed bool (literal #f)))
 (check-compiles #t (typed bool (literal #t)))
-(check-compiles 123 (typed int (literal 123)))
+(check-compiles 123 (typed number (literal 123)))
 (check-compiles 'foo (typed symbol (literal 'foo)))
 (check-compiles "foo" (typed string (literal "foo")))
 
@@ -29,25 +29,25 @@
 
 (check-compiles type (typed type type))
 (check-compiles bool (typed type bool))
-(check-compiles int (typed type int))
+(check-compiles number (typed type number))
 (check-compiles string (typed type string))
 
-(check-compiles zero? (typed (pi int bool) zero?))
-(check-compiles < (typed (pi int int bool) <))
+(check-compiles zero? (typed (pi number bool) zero?))
+(check-compiles < (typed (pi number number bool) <))
 
 ; === application
 
 (check-compiles
   (inc 10)
-  (typed int (app inc (literal 10))))
+  (typed number (app inc (literal 10))))
 
 (check-compiles
   ((+ 10) 20)
-  (typed int (app (app + (literal 10)) (literal 20))))
+  (typed number (app (app + (literal 10)) (literal 20))))
 
 (check-compiles
   (+ 10 20)
-  (typed int (app (app + (literal 10)) (literal 20))))
+  (typed number (app (app + (literal 10)) (literal 20))))
 
 (check-compile-raises (inc #t))
 (check-compile-raises (+ 1 #t))
@@ -57,11 +57,11 @@
 
 (check-compiles
   (let 10)
-  (typed int (literal 10)))
+  (typed number (literal 10)))
 
 (check-compiles
   (let (x 10) (inc x))
-  (typed int (let (x (literal 10)) (app inc x))))
+  (typed number (let (x (literal 10)) (app inc x))))
 
 (check-compiles
   (let (x 10) (y 20) (< x y))
@@ -72,9 +72,9 @@
 
 (check-compiles
   (let
-    (zwiększ (x int) (inc x))
+    (zwiększ (x number) (inc x))
     (zwiększ 10))
-  (typed int
+  (typed number
     (let
       (zwiększ (lambda x (app inc x)))
       (app zwiększ (literal 10)))))
@@ -83,33 +83,33 @@
 
 (check-compiles
   (lambda 12)
-  (typed int (literal 12)))
+  (typed number (literal 12)))
 
 ; TODO: this is wrong: 'id should be 'i
 (check-compiles
-  (lambda (i int) i)
-  (typed (pi (id int) int) (lambda i i)))
+  (lambda (i number) i)
+  (typed (pi (id number) number) (lambda i i)))
 
 ; TODO: this is wrong: 'id should be 'i and 'j
 (check-compiles
-  (lambda (i int) (j int) (+ i j))
+  (lambda (i number) (j number) (+ i j))
   (typed
-    (pi (id int) (id int) int)
+    (pi (id number) (id number) number)
     (lambda i (lambda j (app (app + i) j)))))
 
 (check-compiles
   inc
-  (typed (pi int int) inc))
+  (typed (pi number number) inc))
 
 (check-compiles
   (inc 1)
-  (typed int (app inc (literal 1))))
+  (typed number (app inc (literal 1))))
 
 ; === pi
 
 (check-compiles
-  (pi int bool)
-  (typed type (pi int bool)))
+  (pi number bool)
+  (typed type (pi number bool)))
 
 (check-compiles
   (pi (x type) x)
@@ -126,4 +126,4 @@
   (typed string (if (app zero? (literal 0)) (literal "zero") (literal "not-zero"))))
 
 (check-compile-raises (if "not-boolean" "zero" "not-zero"))
-(check-compile-raises (if #t 10 "not-int"))
+(check-compile-raises (if #t 10 "not-number"))

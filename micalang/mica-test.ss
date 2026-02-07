@@ -2,12 +2,12 @@
 
 (check-mica
   (let
-    (zero?          (native (pi int bool)             (prim zero? a)))
-    (+              (native (pi int int int)          (prim + a b)))
-    (-              (native (pi int int int)          (prim - a b)))
-    (<              (native (pi int int bool)         (prim < a b)))
-    (number->string (native (pi int string)           (prim number->string a)))
-    (string-length  (native (pi string int)           (prim string-length a)))
+    (zero?          (native (pi number bool)             (prim zero? a)))
+    (+              (native (pi number number number)          (prim + a b)))
+    (-              (native (pi number number number)          (prim - a b)))
+    (<              (native (pi number number bool)         (prim < a b)))
+    (number->string (native (pi number string)           (prim number->string a)))
+    (string-length  (native (pi string number)           (prim string-length a)))
     (string-append  (native (pi string string string) (prim string-append a b)))
     (string-append "Hello " (number->string (string-length "foo"))))
   "Hello 3")
@@ -30,17 +30,17 @@
   30)
 
 (check-mica
-  ((lambda (x int) (inc x)) 2) 3)
+  ((lambda (x number) (inc x)) 2) 3)
 
 (check-mica
-  ((lambda (x int) (y int) (+ x y)) 2 3) 5)
+  ((lambda (x number) (y number) (+ x y)) 2 3) 5)
 
 (check-mica
   (let
     (a 10)
     (b 20)
-    (double (x int) (+ x x))
-    (negate (x int) (- 0 x))
+    (double (x number) (+ x x))
+    (negate (x number) (- 0 x))
     (negate (+ (double a) b)))
   -40)
 
@@ -49,8 +49,8 @@
 
 (check-mica
   (let
-    (increment (native (pi int int)     (from (micascheme) fx+1/wraparound)))
-    (add       (native (pi int int int) (from (micascheme) fx+1/wraparound)))
+    (increment (native (pi number number)     (from (micascheme) fx+1/wraparound)))
+    (add       (native (pi number number number) (from (micascheme) fx+1/wraparound)))
     (increment (increment 10)))
   12)
 

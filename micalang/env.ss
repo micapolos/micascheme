@@ -16,24 +16,24 @@
     (env
       (type   type)
       (bool   type)
-      (int    type)
+      (number    type)
       (string type)
 
-      (zero?  (pi int bool))
-      (inc    (pi int int))
-      (dec    (pi int int))
+      (zero?  (pi number bool))
+      (inc    (pi number number))
+      (dec    (pi number number))
 
-      (=      (pi int (pi int int)))
-      (+      (pi int (pi int int)))
-      (-      (pi int (pi int int)))
-      (<      (pi int (pi int bool)))
+      (=      (pi number (pi number number)))
+      (+      (pi number (pi number number)))
+      (-      (pi number (pi number number)))
+      (<      (pi number (pi number bool)))
 
       (list   (pi (x type) x))
 
-      (index        (pi (n int) type))
-      (first-index  (pi (n int) (index n)))
-      (last-index   (pi (n int) (index n)))
+      (index        (pi (n number) type))
+      (first-index  (pi (n number) (index n)))
+      (last-index   (pi (n number) (index n)))
 
-      (array        (pi (n int) type))))
+      (array        (pi (n number) type))))
 )
 

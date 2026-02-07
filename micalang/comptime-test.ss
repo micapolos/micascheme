@@ -11,7 +11,7 @@
 
 (check (equal? type (literal 'type)))
 (check (equal? bool (literal 'bool)))
-(check (equal? int (literal 'int)))
+(check (equal? number (literal 'number)))
 (check (equal? symbol (literal 'symbol)))
 (check (equal? string (literal 'string)))
 
@@ -25,14 +25,14 @@
 (check (equal? (app (app - (literal 5)) (literal 3)) (literal 2)))
 (check (equal? (app (app < (literal 2)) (literal 3)) (literal #t)))
 
-(check (equal? (pi-param (pi int bool)) int))
-(check (equal? (app (pi int bool) (literal '())) bool))
+(check (equal? (pi-param (pi number bool)) number))
+(check (equal? (app (pi number bool) (literal '())) bool))
 
 (check (equal? (pi-param (pi (x type) x)) type))
-(check (equal? (app (pi (x type) x) int) int))
+(check (equal? (app (pi (x type) x) number) number))
 
 (check (equal? (pi-param (pi (x type) (list x))) type))
-(check (equal? (app (pi (x type) (app list x)) int) (app list int)))
+(check (equal? (app (pi (x type) (app list x)) number) (app list number)))
 
 (check
   (equal?

@@ -27,10 +27,10 @@
   (pi t1 t2))
 
 (check-reify
-  (pi 'x (native 'int) (lambda (x) x))
-  (pi (x int) x))
+  (pi 'x (native 'number) (lambda (x) x))
+  (pi (x number) x))
 
 (check-reify
-  (pi 'x (native 'int) (lambda (x) (pi 'y (native 'bool) (lambda (y) (application x y)))))
-  (pi (x int) (y bool) (x y)))
+  (pi 'x (native 'number) (lambda (x) (pi 'y (native 'bool) (lambda (y) (application x y)))))
+  (pi (x number) (y bool) (x y)))
 

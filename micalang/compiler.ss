@@ -54,7 +54,7 @@
 
           (fx
             (fixnum? (datum fx))
-            (typed comptime-int `(literal ,(datum fx))))
+            (typed comptime-number `(literal ,(datum fx))))
 
           (s
             (string? (datum s))
