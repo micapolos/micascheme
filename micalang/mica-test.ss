@@ -37,6 +37,7 @@
 
 (check-mica
   (let
-    (increment (native (pi int int) fx+1/wraparound))
+    (increment (native (pi int int)     (from (micascheme) fx+1/wraparound)))
+    (add       (native (pi int int int) (from (micascheme) fx+1/wraparound)))
     (increment (increment 10)))
   12)

@@ -14,8 +14,8 @@
 
   (define (mica-environment $runtime?)
     (if $runtime?
-      (environment '(micalang runtime)  '(only (micascheme) quote fx+1/wraparound))
-      (environment '(micalang comptime) '(only (micascheme) quote fx+1/wraparound))))
+      (environment '(micalang runtime))
+      (environment '(micalang comptime))))
 
   (define (evaluate-type $env $term)
     (eval
