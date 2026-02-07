@@ -7,10 +7,6 @@
     pi pi? pi-symbol? pi-param pi-procedure
     conditional conditional? conditional-cond conditional-true conditional-false
 
-    term->datum
-    depth-term->datum
-    check-term->datum
-
     term-apply
     apply-term
     term-equal?)
@@ -22,52 +18,6 @@
   (data (application lhs rhs))
   (data (pi symbol? param procedure))
   (data (conditional cond true false))
-
-  (define (index->symbol $index)
-    (string->symbol (format "v~a" $index)))
-
-  (define (term->datum $term)
-    (depth-term->datum 0 $term))
-
-  (define (depth-term->datum $depth $term)
-    (switch-exhaustive $term
-      ((native? $native)
-        (native-ref $native))
-      ((variable? $variable)
-        (index->symbol (variable-index $variable)))
-      ((abstraction? $abstraction)
-        (lets
-          ($variable (variable $depth))
-          `(lambda (,(index->symbol $depth))
-            ,(depth-term->datum
-              (+ $depth 1)
-              ((abstraction-procedure $abstraction) $variable)))))
-      ((application? $application)
-        `(
-          ,(depth-term->datum $depth (application-lhs $application))
-          ,(depth-term->datum $depth (application-rhs $application))))
-      ((pi? $pi)
-        (lets
-          ($param-datum (depth-term->datum $depth (pi-param $pi)))
-          ($variable (variable $depth))
-          ($symbol (index->symbol $depth))
-          ($procedure (pi-procedure $pi))
-          ($body-depth (+ $depth 1))
-          ($body-datum (depth-term->datum $body-depth ($procedure $variable)))
-          ($hole-body-datum (depth-term->datum $body-depth ($procedure (native 'hole))))
-          `(pi
-            ,(if (equal? $body-datum $hole-body-datum)
-              $param-datum
-              `(,$symbol : ,$param-datum))
-            ,$body-datum)))
-      ((conditional? $conditional)
-        `(if
-          ,(depth-term->datum $depth (conditional-cond $conditional))
-          ,(depth-term->datum $depth (conditional-true $conditional))
-          ,(depth-term->datum $depth (conditional-false $conditional))))))
-
-  (define-rule-syntax (check-term->datum in out)
-    (check (equal? (depth-term->datum 0 in) `out)))
 
   (define (apply-term $procedure $rhs)
     (if (native? $rhs)

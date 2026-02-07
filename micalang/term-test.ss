@@ -1,43 +1,5 @@
 (import (except (micascheme) pi) (micalang term))
 
-; term->datum
-
-(check-term->datum (native 10) 10)
-(check-term->datum (native "foo") "foo")
-(check-term->datum (native 'inc) inc)
-
-(check-term->datum
-  (application (native 'foo) (native 'bar))
-  (foo bar))
-
-(check-term->datum
-  (abstraction 'x (lambda (x) (apply-term zero? x)))
-  (lambda (v0) (,zero? v0)))
-
-(check-term->datum
-  (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (term-apply (apply-term + x) y)))))
-  (lambda (v0) (lambda (v1) ((,+ v0) v1))))
-
-(check-term->datum
-  (pi '_ (native 'nat) (lambda (_) (native 'nat)))
-  (pi nat nat))
-
-(check-term->datum
-  (pi '_ (native 'nat) (lambda (_) (pi '_ (native 'string) (lambda (_) (native 'bool)))))
-  (pi nat (pi string bool)))
-
-(check-term->datum
-  (pi 't (native 'nat) (lambda (t) (application (native 'inc) t)))
-  (pi (v0 : nat) (inc v0)))
-
-(check-term->datum
-  (pi 'a (native 'nat) (lambda (a) (pi 'b (native 'string) (lambda (b) (application a b)))))
-  (pi (v0 : nat) (pi (v1 : string) (v0 v1))))
-
-(check-term->datum
-  (conditional (variable 2) (native 10) (native 20))
-  (if v2 10 20))
-
 ; --- term-apply
 
 (check
