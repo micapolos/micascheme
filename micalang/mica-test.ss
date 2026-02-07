@@ -9,9 +9,7 @@
     (number->string (native (pi int string)           (prim number->string a)))
     (string-length  (native (pi string int)           (prim string-length a)))
     (string-append  (native (pi string string string) (prim string-append a b)))
-    (string-append "Hello "
-      (number->string
-        (string-length "foo"))))
+    (string-append "Hello " (number->string (string-length "foo"))))
   "Hello 3")
 
 (check-mica 1 1)
