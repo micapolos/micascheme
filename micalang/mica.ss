@@ -9,8 +9,8 @@
     (syntax-case $syntax ()
       ((_ x)
         #`(mica-evaluate
-          (environment '(micalang runtime))
-          (environment '(micalang comptime))
+          (environment '(micalang runtime) '(prefix (scheme) %))
+          (environment '(micalang comptime) '(prefix (scheme) %))
           mica-context
           (syntax->datum/annotation #'x)))))
 

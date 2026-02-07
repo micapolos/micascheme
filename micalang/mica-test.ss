@@ -2,13 +2,13 @@
 
 (check-mica
   (let
-    (zero?          (native (pi number boolean)             (prim zero? a)))
-    (+              (native (pi number number number)          (prim + a b)))
-    (-              (native (pi number number number)          (prim - a b)))
-    (<              (native (pi number number boolean)         (prim < a b)))
+    (zero?          (native (pi number boolean)          (prim zero? a)))
+    (+              (native (pi number number number)    (prim + a b)))
+    (-              (native (pi number number number)    (prim - a b)))
+    (<              (native (pi number number boolean)   (prim < a b)))
     (number->string (native (pi number string)           (prim number->string a)))
     (string-length  (native (pi string number)           (prim string-length a)))
-    (string-append  (native (pi string string string) (prim string-append a b)))
+    (string-append  (native (pi string string string)    (prim string-append a b)))
     (string-append "Hello " (number->string (string-length "foo"))))
   "Hello 3")
 
