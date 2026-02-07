@@ -143,19 +143,18 @@
             (lets
               ($symbol (datum id))
               ($type (evaluate-type $comptime-environment $env $context #'t))
-              ($new-env (push $env (cons $symbol (variable $symbol))))
-              ($context (push $context (cons $symbol $type)))
-              ($typed-body (mica-compile $runtime-environment $comptime-environment $new-env $context #'body))
+              ($body-env (push $env (cons $symbol (variable $symbol))))
+              ($body-context (push $context (cons $symbol $type)))
+              ($typed-body (mica-compile $runtime-environment $comptime-environment $body-env $body-context #'body))
               ($body-type (typed-type $typed-body))
               ($body (typed-ref $typed-body))
               (typed
-                ; TODO: This is suspicious. Help me fix it.
                 (pi $symbol $type
                   (lambda ($x)
                     (evaluate-type
                       $comptime-environment
                       (push $env (cons $symbol $x))
-                      $context
+                      $body-context
                       (reify $body-type))))
                 `(lambda ,$symbol ,$body))))
 
