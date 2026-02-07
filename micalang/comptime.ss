@@ -31,10 +31,7 @@
     ((prim id)
       (native ($primitive 3 id)))
     ((prim id x)
-      (lambda x
-        (switch x
-          ((native? $native) (native (($primitive 3 id) (native-ref $native))))
-          ((else $other) (application (native ($primitive 3 id)) $other)))))
+      (lambda x (term-apply (native ($primitive 3 id)) x)))
     ((prim id x y)
       (lambda x
         (lambda y

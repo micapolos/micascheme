@@ -4,14 +4,14 @@
 
 (check
   (equal?
-    (term-apply (native (lambda (x) (native (zero? x)))) (native 0))
+    (term-apply (native zero?) (native 0))
     (native #t)))
 
 (check
   (equal?
     (term-apply
       (term-apply
-        (native (lambda (x) (native (lambda (y) (native (- x y))))))
+        (native (lambda (x) (lambda (y) (- x y))))
         (native 5))
       (native 3))
     (native 2)))
@@ -102,8 +102,3 @@
     (term-equal?
       (pi 'x (native 't1) (lambda (x) (native 't2)))
       (pi #f (native 't1) (lambda (_) (native 't3))))))
-
-
-
-
-

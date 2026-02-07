@@ -21,7 +21,7 @@
 
   (define (apply-term $procedure $rhs)
     (if (native? $rhs)
-      ($procedure (native-ref $rhs))
+      (native ($procedure (native-ref $rhs)))
       (application (native $procedure) $rhs)))
 
   (define (term-apply $lhs $rhs)
