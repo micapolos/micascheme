@@ -1,7 +1,7 @@
 (library (micalang term)
   (export
     native native? native-ref
-    variable variable? variable-index
+    variable variable? variable-symbol
     abstraction abstraction? abstraction-symbol abstraction-procedure abstraction-apply
     application application? application-lhs application-rhs
     pi pi? pi-symbol? pi-param pi-procedure pi-apply
@@ -13,7 +13,7 @@
   (import (micalang base))
 
   (data (native ref))
-  (data (variable index))
+  (data (variable symbol))
   (data (abstraction symbol procedure))
   (data (application lhs rhs))
   (data (pi symbol? param procedure))
@@ -35,7 +35,7 @@
       ((else $other)
         (application $other $rhs))))
 
-  (define (depth-term-equal? $depth $lhs $rhs)
+  (define (term-equal? $lhs $rhs)
     (switch-exhaustive $lhs
       ((native? $lhs-native)
         (switch? $rhs
@@ -46,46 +46,46 @@
       ((variable? $lhs-variable)
         (switch? $rhs
           ((variable? $rhs-variable)
-            (=
-              (variable-index $lhs-variable)
-              (variable-index $rhs-variable)))))
+            (symbol=?
+              (variable-symbol $lhs-variable)
+              (variable-symbol $rhs-variable)))))
       ((abstraction? $lhs-abstraction)
         (switch? $rhs
           ((abstraction? $rhs-abstraction)
-            (depth-term-equal? (+ $depth 1)
-              (abstraction-apply $lhs-abstraction (variable $depth))
-              (abstraction-apply $rhs-abstraction (variable $depth))))))
+            (term-equal?
+              (abstraction-apply $lhs-abstraction (variable (abstraction-symbol $lhs-abstraction)))
+              (abstraction-apply $rhs-abstraction (variable (abstraction-symbol $lhs-abstraction)))))))
       ((application? $lhs-application)
         (switch? $rhs
           ((application? $rhs-application)
             (and
-              (depth-term-equal? $depth
+              (term-equal?
                 (application-lhs $lhs-application)
                 (application-lhs $rhs-application))
-              (depth-term-equal? $depth
+              (term-equal?
                 (application-rhs $lhs-application)
                 (application-rhs $rhs-application))))))
       ((pi? $lhs-pi)
         (switch? $rhs
           ((pi? $rhs-pi)
             (and
-              (depth-term-equal? $depth
+              (term-equal?
                 (pi-param $lhs-pi)
                 (pi-param $rhs-pi))
-              (depth-term-equal? (+ $depth 1)
-                (pi-apply $lhs-pi (variable $depth))
-                (pi-apply $rhs-pi (variable $depth)))))))
+              (term-equal?
+                (pi-apply $lhs-pi (variable (pi-symbol? $lhs-pi)))
+                (pi-apply $rhs-pi (variable (pi-symbol? $lhs-pi))))))))
       ((conditional? $lhs-conditional)
         (switch? $rhs
           ((conditional? $rhs-conditional)
             (and
-              (depth-term-equal? $depth
+              (term-equal?
                 (conditional-cond $lhs-conditional)
                 (conditional-cond $rhs-conditional))
-              (depth-term-equal? $depth
+              (term-equal?
                 (conditional-true $lhs-conditional)
                 (conditional-true $rhs-conditional))
-              (depth-term-equal? $depth
+              (term-equal?
                 (conditional-false $lhs-conditional)
                 (conditional-false $rhs-conditional))))))))
 
@@ -94,7 +94,4 @@
 
   (define (pi-apply $pi $arg)
     ((pi-procedure $pi) $arg))
-
-  (define (term-equal? $lhs $rhs)
-    (depth-term-equal? 0 $lhs $rhs))
 )

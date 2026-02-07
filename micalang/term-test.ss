@@ -23,25 +23,25 @@
 
 (check
   (term-equal?
-    (variable 3)
-    (variable 3)))
+    (variable 'x)
+    (variable 'x)))
 
 (check
   (not
     (term-equal?
-      (variable 3)
-      (variable 4))))
+      (variable 'x)
+      (variable 'y))))
 
 (check
   (term-equal?
-    (application (variable 3) (variable 3))
-    (application (variable 3) (variable 3))))
+    (application (variable 'x) (variable 'x))
+    (application (variable 'x) (variable 'x))))
 
 (check
   (not
     (term-equal?
-      (application (variable 3) (variable 3))
-      (application (variable 3) (variable 4)))))
+      (application (variable 'x) (variable 'x))
+      (application (variable 'x) (variable 'y)))))
 
 (check
   (term-equal?
