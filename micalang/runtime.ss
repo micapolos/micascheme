@@ -2,11 +2,12 @@
   (export
     prim
     literal app
+    type bool int symbol string
     inc dec = + - < zero?
-    list let lambda app if
+    list let lambda pi app if
     first-index last-index)
   (import
-    (except (micalang base) = + - < zero? list lambda app let if)
+    (except (micalang base) = + - < zero? list lambda app let if string)
     (prefix (only (micalang base) let lambda app if) %)
     (rename (micalang term) (pi %pi)))
   (export
@@ -17,9 +18,14 @@
   (define-rule-syntax (let (id x) ... body)
     (%let ((id x) ...) body))
 
+  (define-rule-syntax (lambda id body)
+    (%lambda (id) body))
+
   (define-rules-syntax
-    ((lambda id body)
-      (%lambda (id) body)))
+    ((pi (id in) out)
+      (%pi 'id in (%lambda (id) out)))
+    ((pi in out)
+      (%pi #f in (%lambda (id) out))))
 
   (define-rules-syntax
     ((curry x) x)
@@ -55,6 +61,12 @@
     (%if cond true false))
 
   (define-currys
+    (type 'type)
+    (bool 'bool)
+    (int 'int)
+    (symbol 'symbol)
+    (string 'string)
+
     (zero? x fxzero?)
     (inc x fx+1/wraparound)
     (dec x fx-1/wraparound)

@@ -1,4 +1,7 @@
-(import (only (micascheme) check equal? quote procedure?) (micalang runtime) (prefix (micalang term) %))
+(import
+  (only (micascheme) check equal? quote procedure?)
+  (micalang runtime)
+  (prefix (micalang term) %))
 
 (check (equal? (prim fx+) (prim fx+)))
 (check (equal? (app (app (prim + a b) 2) 3) 5))
@@ -12,6 +15,11 @@
 (check (equal? (app (app + (literal 2)) (literal 3)) (literal 5)))
 (check (equal? (app (app - (literal 5)) (literal 3)) (literal 2)))
 (check (equal? (app (app < (literal 2)) (literal 3)) (literal #t)))
+
+(check (equal? ((lambda x x) (literal 10)) 10))
+(check (equal? (%pi-symbol? (pi (x type) x)) 'x))
+(check (equal? (%pi-param (pi (x type) x)) type))
+(check (equal? ((%pi-procedure (pi (x type) x)) int) int))
 
 (check
   (equal?
