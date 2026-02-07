@@ -40,8 +40,6 @@
 (check (equal? string (%native 'string)))
 
 (check (equal? (app zero? (literal 0)) (%native #t)))
-(check (equal? (app inc (literal 2)) (%native 3)))
-(check (equal? (app dec (literal 2)) (%native 1)))
 
 (check (equal? (app (app = (literal 2)) (literal 2)) (%native #t)))
 (check (equal? (app (app = (literal 2)) (literal 3)) (%native #f)))

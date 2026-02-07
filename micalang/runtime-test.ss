@@ -7,8 +7,6 @@
 (check (equal? (app (app (prim + a b) 2) 3) 5))
 
 (check (equal? (app zero? (literal 0)) #t))
-(check (equal? (app inc (literal 2)) (literal 3)))
-(check (equal? (app dec (literal 2)) (literal 1)))
 
 (check (equal? (app (app = (literal 2)) (literal 2)) (literal #t)))
 (check (equal? (app (app = (literal 2)) (literal 3)) (literal #f)))

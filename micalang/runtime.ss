@@ -3,7 +3,7 @@
     prim
     literal app
     type boolean number symbol char string
-    inc dec = + - < zero?
+    = + - < zero?
     list let lambda pi app if
     first-index last-index)
   (import
@@ -55,13 +55,10 @@
   (define-rule-syntax (literal x) x)
 
   (define (%first-index _) 0)
-  (define (%last-index n) (%dec n))
+  (define (%last-index n) (%- n 1))
 
   (define-rule-syntax (if cond true false)
     (%if cond true false))
-
-  (define (%inc x) (%+ x 1))
-  (define (%dec x) (%- x 1))
 
   (define-currys
     (type    'type)
@@ -72,8 +69,6 @@
     (string  'string)
 
     (zero? x %zero?)
-    (inc x %inc)
-    (dec x %dec)
 
     (= x y %=)
     (+ x y %+)

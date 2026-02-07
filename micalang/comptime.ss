@@ -3,7 +3,7 @@
     prim
     literal app let if
     type boolean number symbol char string
-    inc dec = + - < zero?
+    = + - < zero?
     index first-index last-index
     array
     list
@@ -95,13 +95,10 @@
 
   (define (index n) (application index n))
   (define (%first-index n) 0)
-  (define (%last-index  n) (%dec n))
+  (define (%last-index  n) (%- n 1))
 
   (define array
     (lambda n (application (native array) n)))
-
-  (define (%inc x) (%+ x 1))
-  (define (%dec x) (%- x 1))
 
   (define-prims
     (type    'type)
@@ -112,8 +109,6 @@
     (string  'string)
 
     (zero? x %zero?)
-    (inc x %inc)
-    (dec x %dec)
 
     (= x y %=)
     (+ x y %+)
