@@ -182,7 +182,7 @@
       (check
         (equal?
           `(typed
-            ,(term->datum (typed-type $typed))
+            ,(reify (typed-type $typed))
             ,(typed-ref $typed))
           'out))))
 

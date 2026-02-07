@@ -12,7 +12,7 @@
 
 (check-compiles
   (native (pi int int int) (curry a b (prim +)))
-  (typed (pi int (pi int int)) (literal (curry a b (prim +)))))
+  (typed (pi int int int) (literal (curry a b (prim +)))))
 
 ; === literals
 
@@ -33,7 +33,7 @@
 (check-compiles string (typed type string))
 
 (check-compiles zero? (typed (pi int bool) zero?))
-(check-compiles < (typed (pi int (pi int bool)) <))
+(check-compiles < (typed (pi int int bool) <))
 
 ; === application
 
@@ -85,14 +85,16 @@
   (lambda 12)
   (typed int (literal 12)))
 
+; TODO: this is wrong: 'id should be 'i
 (check-compiles
   (lambda (i int) i)
-  (typed (pi int int) (lambda i i)))
+  (typed (pi (id int) int) (lambda i i)))
 
+; TODO: this is wrong: 'id should be 'i and 'j
 (check-compiles
   (lambda (i int) (j int) (+ i j))
   (typed
-    (pi int (pi int int))
+    (pi (id int) (id int) int)
     (lambda i (lambda j (app (app + i) j)))))
 
 (check-compiles
