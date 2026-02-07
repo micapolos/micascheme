@@ -12,7 +12,7 @@
     (rename (micalang term) (pi %pi)))
   (export
     (import
-      (only (micascheme) equal? from quote)
+      (only (micascheme) equal? quote)
       (only (micalang term) native)))
 
   (define-rule-syntax (let (id x) ... body)
