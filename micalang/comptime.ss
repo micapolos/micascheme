@@ -1,6 +1,6 @@
 (library (micalang comptime)
   (export
-    prim curry
+    prim
     literal app let
     type bool int string
     inc dec = + - < zero?
