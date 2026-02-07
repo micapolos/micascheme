@@ -1,7 +1,7 @@
 (library (micalang comptime)
   (export
     prim
-    literal app let
+    literal app let if
     type bool int symbol string
     inc dec = + - < zero?
     index first-index last-index
@@ -9,8 +9,8 @@
     list
     pi)
   (import
-    (except (micalang base) = + - < zero? list app lambda let string)
-    (prefix (only (micalang base) lambda let) %)
+    (except (micalang base) = + - < zero? list app lambda let string if)
+    (prefix (only (micalang base) lambda let if) %)
     (rename (micalang term) (pi %pi)))
   (export
     (import
@@ -130,4 +130,12 @@
       (%pi in (%lambda (id) out)))
     ((pi in out)
       (pi (_ in) out)))
+
+  (define-rule-syntax (if cond true false)
+    (switch cond
+      ((native? $native)
+        (%if (native-ref $native) true false))
+      ((else $other-cond)
+        (conditional $other-cond true false))))
+
 )

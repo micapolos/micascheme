@@ -36,6 +36,16 @@
 
 (check
   (equal?
+    (if (literal #t) (literal 10) (literal 20))
+    (literal 10)))
+
+(check
+  (equal?
+    (if (literal #f) (literal 10) (literal 20))
+    (literal 20)))
+
+(check
+  (equal?
     (let (x (literal 10))
       (let (y (literal 20))
         (app (app + x) y)))

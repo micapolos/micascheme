@@ -45,7 +45,7 @@
     (switch $term
       ((typed? $typed) $typed)
       ((else _)
-        (syntax-case $term (quote native lambda pi let)
+        (syntax-case $term (quote native lambda pi let if)
           (b
             (boolean? (datum b))
             (typed comptime-bool `(literal ,(datum b))))
@@ -141,6 +141,15 @@
             (mica-compile $env
               `(lambda ,#'x (lambda ,@#'(xs ...) ,#'body))))
 
+          ((if cond true false)
+            (lets
+              ($cond (mica-compile-typed $env comptime-bool #'cond))
+              ($typed-true (mica-compile $env #'true))
+              ($type (typed-type $typed-true))
+              ($true (typed-ref $typed-true))
+              ($false (mica-compile-typed $env $type #'false))
+              (typed $type `(if ,$cond ,$true ,$false))))
+
           ((fn)
             (mica-compile $env #'fn))
 
@@ -178,4 +187,7 @@
 
   (define-rule-syntax (check-compile-raises in)
     (check (raises (mica-compile `(,@mica-env) 'in))))
+
+  (define (index->symbol $index)
+    (string->symbol (format "v~a" $index)))
 )

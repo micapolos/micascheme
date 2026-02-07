@@ -3,11 +3,11 @@
     prim
     literal app
     inc dec = + - < zero?
-    list let lambda app
+    list let lambda app if
     first-index last-index)
   (import
-    (except (micalang base) = + - < zero? list lambda app let)
-    (prefix (only (micalang base) let lambda app) %)
+    (except (micalang base) = + - < zero? list lambda app let if)
+    (prefix (only (micalang base) let lambda app if) %)
     (rename (micalang term) (pi %pi)))
   (export
     (import
@@ -50,6 +50,9 @@
 
   (define (%first-index _) 0)
   (define (%last-index n) (fx-1/wraparound n))
+
+  (define-rule-syntax (if cond true false)
+    (%if cond true false))
 
   (define-currys
     (zero? x fxzero?)
