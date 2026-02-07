@@ -186,9 +186,7 @@
       ($typed (mica-compile `(,@mica-env) 'in))
       (check
         (equal?
-          `(
-            ,(reify (typed-type $typed))
-            ,(typed-ref $typed))
+          `(,(reify (typed-type $typed)) ,(typed-ref $typed))
           'out))))
 
   (define-rule-syntax (check-compile-raises in)
