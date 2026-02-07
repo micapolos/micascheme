@@ -2,11 +2,17 @@
 
 (check-mica
   (let
-    (+ (native
-      (pi string string string)
-      (prim string-append a b)))
-    (+ "foo" "bar"))
-  "foobar")
+    (zero?          (native (pi int bool)             (prim zero? a)))
+    (+              (native (pi int int int)          (prim + a b)))
+    (-              (native (pi int int int)          (prim - a b)))
+    (<              (native (pi int int bool)         (prim < a b)))
+    (number->string (native (pi int string)           (prim number->string a)))
+    (string-length  (native (pi string int)           (prim string-length a)))
+    (string-append  (native (pi string string string) (prim string-append a b)))
+    (string-append "Hello "
+      (number->string
+        (string-length "foo"))))
+  "Hello 3")
 
 (check-mica 1 1)
 (check-mica (zero? 0) #t)
