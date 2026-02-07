@@ -186,7 +186,7 @@
       ($typed (mica-compile `(,@mica-env) 'in))
       (check
         (equal?
-          `(typed
+          `(
             ,(reify (typed-type $typed))
             ,(typed-ref $typed))
           'out))))
