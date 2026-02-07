@@ -16,14 +16,21 @@
       ((abstraction? $abstraction)
         (lets
           ($symbol (index->symbol $depth))
-          `(lambda (,$symbol type)
-            ,(depth-reify (+ $depth 1)
-              ((abstraction-procedure $abstraction)
-                (native $symbol))))))
+          `(lambda (,$symbol type) .
+            ,(lets
+              ($body ((abstraction-procedure $abstraction) (native $symbol)))
+              ($reified-body (depth-reify (+ $depth 1) $body))
+              (if (abstraction? $body)
+                (cdr $reified-body)
+                `(,$reified-body))))))
       ((application? $application)
-        `(
-          ,(depth-reify $depth (application-lhs $application))
-          ,(depth-reify $depth (application-rhs $application))))
+        (lets
+          ($lhs (application-lhs $application))
+          ($reified-lhs (depth-reify $depth (application-lhs $application)))
+          ($reified-rhs (depth-reify $depth (application-rhs $application)))
+          (if (application? $lhs)
+            (append $reified-lhs `(,$reified-rhs))
+            `(,$reified-lhs ,$reified-rhs))))
       ((conditional? $conditional)
         `(if
           ,(depth-reify $depth (conditional-cond $conditional))
@@ -32,9 +39,13 @@
       ((pi? $pi)
         (lets
           ($symbol (index->symbol $depth))
-          `(pi (,$symbol ,(depth-reify $depth (pi-param $pi)))
-            ,(depth-reify (+ $depth 1)
-              ((pi-procedure $pi) (native $symbol))))))))
+          `(pi (,$symbol ,(depth-reify $depth (pi-param $pi))) .
+            ,(lets
+              ($body ((pi-procedure $pi) (native $symbol)))
+              ($reified-body (depth-reify (+ $depth 1) $body))
+              (if (pi? $body)
+                (cdr $reified-body)
+                `(,$reified-body))))))))
 
   (define-rule-syntax (check-reify in out)
     (check (equal? (depth-reify 0 in) `out)))
