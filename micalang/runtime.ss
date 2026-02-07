@@ -23,9 +23,9 @@
 
   (define-rules-syntax
     ((pi (id in) out)
-      (%pi 'id in (%lambda (id) out)))
+      (%lambda (id) out))
     ((pi in out)
-      (%pi #f in (%lambda (id) out))))
+      (pi (_ in) out)))
 
   (define-rules-syntax
     ((curry x) x)

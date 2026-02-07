@@ -16,13 +16,9 @@
 
 (check (equal? ((lambda x x) (literal 10)) 10))
 
-(check (equal? (%pi-symbol? (pi number boolean)) #f))
-(check (equal? (%pi-param (pi number boolean)) number))
-(check (equal? ((%pi-procedure (pi number boolean)) #f) boolean))
-
-(check (equal? (%pi-symbol? (pi (x type) x)) 'x))
-(check (equal? (%pi-param (pi (x type) x)) type))
-(check (equal? ((%pi-procedure (pi (x type) x)) number) number))
+(check (equal? ((pi number boolean) (literal 10)) boolean))
+(check (equal? ((pi (x number) (app (app + x) (literal 1))) (literal 10)) 11))
+(check (equal? ((pi (x type) x) number) number))
 
 (check
   (equal?
