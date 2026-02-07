@@ -187,7 +187,4 @@
 
   (define-rule-syntax (check-compile-raises in)
     (check (raises (mica-compile `(,@mica-env) 'in))))
-
-  (define (index->symbol $index)
-    (string->symbol (format "v~a" $index)))
 )
