@@ -14,7 +14,15 @@
 
   (define (evaluate-type $comptime-environment $context $term)
     (eval
-      (compile-type $comptime-environment $context $term)
+      (fold-left
+        (lambda ($acc $symbol)
+          `(app ,$acc (native ',$symbol)))
+        (fold-left
+          (lambda ($acc $symbol)
+            `(lambda ,$symbol ,$acc))
+          (compile-type $comptime-environment $context $term)
+          (reverse (map car $context)))
+        (map car $context))
       $comptime-environment))
 
   (define (compile-type $comptime-environment $context $term)

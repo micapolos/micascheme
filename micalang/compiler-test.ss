@@ -83,12 +83,10 @@
   (lambda 12)
   (number (literal 12)))
 
-; TODO: this is wrong: 'id should be 'i
 (check-compiles
   (lambda (i number) i)
   ((pi (i number) number) (lambda i i)))
 
-; TODO: this is wrong: 'id should be 'i and 'j
 (check-compiles
   (lambda (i number) (j number) (+ i j))
   (
@@ -102,6 +100,10 @@
 (check-compiles
   (inc 1)
   (number (app inc (literal 1))))
+
+(check-compiles
+  (lambda (t type) t)
+  ((pi (t type) type) (lambda t t)))
 
 ; === pi
 
