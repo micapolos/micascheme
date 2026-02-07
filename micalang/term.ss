@@ -30,6 +30,8 @@
         (apply-term (native-ref $native) $rhs))
       ((abstraction? $abstraction)
         (abstraction-apply $abstraction $rhs))
+      ((pi? $pi)
+        (pi-apply $pi $rhs))
       ((else $other)
         (application $other $rhs))))
 

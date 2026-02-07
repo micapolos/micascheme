@@ -127,3 +127,11 @@
 
 (check-compile-raises (if "not boolean" "zero" "not-zero"))
 (check-compile-raises (if #t 10 "not-number"))
+
+; === identity
+
+; (check-compiles
+;   (let
+;     (identity (lambda (t type) (pi (x t) t)))
+;     ((identity number) 10))
+;   (number 123))
