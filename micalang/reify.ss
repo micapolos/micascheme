@@ -12,7 +12,8 @@
 
   (define (depth-reify $depth $term)
     (switch-exhaustive $term
-      ((native? $native) (native-ref $native))
+      ((native? $native)
+        (native-ref $native))
       ((abstraction? $abstraction)
         (lets
           ($symbol (abstraction-symbol $abstraction))
@@ -41,8 +42,7 @@
           ($symbol? (pi-symbol? $pi))
           ($reified-param (depth-reify $depth (pi-param $pi)))
           `(pi
-            ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param)
-            .
+            ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param) .
             ,(lets
               ($body ((pi-procedure $pi) (native $symbol?)))
               ($reified-body (depth-reify (+ $depth 1) $body))
