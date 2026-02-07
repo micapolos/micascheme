@@ -2,6 +2,8 @@
 
 (check-reify (native 'a) a)
 
+(check-reify (variable 'a) a)
+
 (check-reify
   (conditional (native 'cond) (native 't) (native 'f))
   (if cond t f))

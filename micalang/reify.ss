@@ -11,6 +11,8 @@
     (switch-exhaustive $term
       ((native? $native)
         (native-ref $native))
+      ((variable? $variable)
+        (variable-symbol $variable))
       ((abstraction? $abstraction)
         (lets
           ($symbol (abstraction-symbol $abstraction))
