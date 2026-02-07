@@ -14,10 +14,12 @@
 
   (define mica-context
     (context
-      (type   type)
-      (boolean   type)
-      (number    type)
-      (string type)
+      (type    type)
+      (boolean type)
+      (number  type)
+      (char    type)
+      (string  type)
+      (symbol  type)
 
       (zero?  (pi number boolean))
       (inc    (pi number number))
