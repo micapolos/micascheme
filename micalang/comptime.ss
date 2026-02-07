@@ -2,7 +2,7 @@
   (export
     prim
     literal app let
-    type bool int string
+    type bool int symbol string
     inc dec = + - < zero?
     index first-index last-index
     array
@@ -107,6 +107,7 @@
     (type 'type)
     (bool 'bool)
     (int 'int)
+    (symbol 'symbol)
     (string 'string)
 
     (zero? x fxzero?)

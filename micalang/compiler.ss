@@ -45,7 +45,7 @@
     (switch $term
       ((typed? $typed) $typed)
       ((else _)
-        (syntax-case $term (native lambda pi let)
+        (syntax-case $term (quote native lambda pi let)
           (b
             (boolean? (datum b))
             (typed comptime-bool `(literal ,(datum b))))
@@ -57,6 +57,10 @@
           (s
             (string? (datum s))
             (typed comptime-string `(literal ,(datum s))))
+
+          ((quote s)
+            (symbol? (datum s))
+            (typed comptime-symbol `(literal ',(datum s))))
 
           (id
             (symbol? (datum id))

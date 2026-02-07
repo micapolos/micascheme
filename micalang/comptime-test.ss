@@ -12,6 +12,7 @@
 (check (equal? type (literal 'type)))
 (check (equal? bool (literal 'bool)))
 (check (equal? int (literal 'int)))
+(check (equal? symbol (literal 'symbol)))
 (check (equal? string (literal 'string)))
 
 (check (equal? (app zero? (literal 0)) (literal #t)))
