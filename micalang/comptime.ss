@@ -21,7 +21,7 @@
     (native x))
 
   (define-rule-syntax (variable x)
-    (variable 'x))
+    (%variable 'x))
 
   (define-rule-syntax (let (id x) body)
     (%let ((id x)) body))

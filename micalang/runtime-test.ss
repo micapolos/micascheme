@@ -3,6 +3,8 @@
   (micalang runtime)
   (prefix (micalang term) %))
 
+(check (equal? (variable equal?) equal?))
+
 (check (equal? (prim +) (prim +)))
 (check (equal? (app (app (prim + a b) 2) 3) 5))
 

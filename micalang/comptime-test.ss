@@ -1,6 +1,9 @@
 (import
   (only (micascheme) check equal? quote procedure?)
+  (prefix (micalang term) %)
   (micalang comptime))
+
+(check (equal? (variable equal?) (%variable 'equal?)))
 
 (check (equal? (prim +) (prim +)))
 
