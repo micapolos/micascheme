@@ -147,7 +147,10 @@
               ($body (typed-ref $typed-body))
               (typed
                 ; TODO: This is suspicious. Help me fix it.
-                (pi $symbol $type (lambda (_) $body-type))
+                (pi $symbol $type
+                  (lambda ($x)
+                    (evaluate-type $comptime-environment $context
+                      (reify $body-type))))
                 `(lambda ,$symbol ,$body))))
 
           ((lambda x xs ... body)
