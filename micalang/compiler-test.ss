@@ -7,8 +7,8 @@
 ; === native
 
 (check-compiles
-  (native bool (prim +))
-  (typed bool (literal (prim +))))
+  (native boolean (prim +))
+  (typed boolean (literal (prim +))))
 
 (check-compiles
   (native (pi number number number) (curry a b (prim +)))
@@ -16,8 +16,8 @@
 
 ; === literals
 
-(check-compiles #f (typed bool (literal #f)))
-(check-compiles #t (typed bool (literal #t)))
+(check-compiles #f (typed boolean (literal #f)))
+(check-compiles #t (typed boolean (literal #t)))
 (check-compiles 123 (typed number (literal 123)))
 (check-compiles 3.14 (typed number (literal 3.14)))
 (check-compiles 'foo (typed symbol (literal 'foo)))
@@ -28,12 +28,12 @@
 ; === globals
 
 (check-compiles type (typed type type))
-(check-compiles bool (typed type bool))
+(check-compiles boolean (typed type boolean))
 (check-compiles number (typed type number))
 (check-compiles string (typed type string))
 
-(check-compiles zero? (typed (pi number bool) zero?))
-(check-compiles < (typed (pi number number bool) <))
+(check-compiles zero? (typed (pi number boolean) zero?))
+(check-compiles < (typed (pi number number boolean) <))
 
 ; === application
 
@@ -65,7 +65,7 @@
 
 (check-compiles
   (let (x 10) (y 20) (< x y))
-  (typed bool
+  (typed boolean
     (let (x (literal 10))
       (let (y (literal 20))
         (app (app < x) y)))))
@@ -108,8 +108,8 @@
 ; === pi
 
 (check-compiles
-  (pi number bool)
-  (typed type (pi number bool)))
+  (pi number boolean)
+  (typed type (pi number boolean)))
 
 (check-compiles
   (pi (x type) x)
@@ -125,5 +125,5 @@
   (if (zero? 0) "zero" "not-zero")
   (typed string (if (app zero? (literal 0)) (literal "zero") (literal "not-zero"))))
 
-(check-compile-raises (if "not-boolean" "zero" "not-zero"))
+(check-compile-raises (if "not boolean" "zero" "not-zero"))
 (check-compile-raises (if #t 10 "not-number"))

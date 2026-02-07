@@ -10,7 +10,7 @@
     (literal 5)))
 
 (check (equal? type (literal 'type)))
-(check (equal? bool (literal 'bool)))
+(check (equal? boolean (literal 'boolean)))
 (check (equal? number (literal 'number)))
 (check (equal? symbol (literal 'symbol)))
 (check (equal? string (literal 'string)))
@@ -25,8 +25,8 @@
 (check (equal? (app (app - (literal 5)) (literal 3)) (literal 2)))
 (check (equal? (app (app < (literal 2)) (literal 3)) (literal #t)))
 
-(check (equal? (pi-param (pi number bool)) number))
-(check (equal? (app (pi number bool) (literal '())) bool))
+(check (equal? (pi-param (pi number boolean)) number))
+(check (equal? (app (pi number boolean) (literal '())) boolean))
 
 (check (equal? (pi-param (pi (x type) x)) type))
 (check (equal? (app (pi (x type) x) number) number))

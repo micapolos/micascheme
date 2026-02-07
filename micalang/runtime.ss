@@ -2,7 +2,7 @@
   (export
     prim
     literal app
-    type bool number symbol string
+    type boolean number symbol string
     inc dec = + - < zero?
     list let lambda pi app if
     first-index last-index)
@@ -65,7 +65,7 @@
 
   (define-currys
     (type 'type)
-    (bool 'bool)
+    (boolean 'boolean)
     (number 'number)
     (symbol 'symbol)
     (string 'string)

@@ -15,18 +15,18 @@
   (define mica-env
     (env
       (type   type)
-      (bool   type)
+      (boolean   type)
       (number    type)
       (string type)
 
-      (zero?  (pi number bool))
+      (zero?  (pi number boolean))
       (inc    (pi number number))
       (dec    (pi number number))
 
       (=      (pi number (pi number number)))
       (+      (pi number (pi number number)))
       (-      (pi number (pi number number)))
-      (<      (pi number (pi number bool)))
+      (<      (pi number (pi number boolean)))
 
       (list   (pi (x type) x))
 

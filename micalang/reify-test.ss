@@ -31,6 +31,6 @@
   (pi (x number) x))
 
 (check-reify
-  (pi 'x (native 'number) (lambda (x) (pi 'y (native 'bool) (lambda (y) (application x y)))))
-  (pi (x number) (y bool) (x y)))
+  (pi 'x (native 'number) (lambda (x) (pi 'y (native 'boolean) (lambda (y) (application x y)))))
+  (pi (x number) (y boolean) (x y)))
 

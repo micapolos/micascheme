@@ -50,7 +50,7 @@
         (syntax-case $term (quote native lambda pi let if)
           (b
             (boolean? (datum b))
-            (typed comptime-bool `(literal ,(datum b))))
+            (typed comptime-boolean `(literal ,(datum b))))
 
           (n
             (number? (datum n))
@@ -145,7 +145,7 @@
 
           ((if cond true false)
             (lets
-              ($cond (mica-compile-typed $env comptime-bool #'cond))
+              ($cond (mica-compile-typed $env comptime-boolean #'cond))
               ($typed-true (mica-compile $env #'true))
               ($type (typed-type $typed-true))
               ($true (typed-ref $typed-true))
