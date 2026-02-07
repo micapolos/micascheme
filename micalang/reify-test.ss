@@ -15,18 +15,22 @@
   (a b c))
 
 (check-reify
-  (abstraction (lambda (x) x))
-  (lambda (v0 type) v0))
+  (abstraction 'x (lambda (x) x))
+  (lambda (x type) x))
 
 (check-reify
-  (abstraction (lambda (x) (abstraction (lambda (y) (application x y)))))
-  (lambda (v0 type) (v1 type) (v0 v1)))
+  (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (application x y)))))
+  (lambda (x type) (y type) (x y)))
 
 (check-reify
-  (pi (native 'int) (lambda (x) x))
-  (pi (v0 int) v0))
+  (pi #f (native 't1) (lambda (_) (native 't2)))
+  (pi t1 t2))
 
 (check-reify
-  (pi (native 'int) (lambda (x) (pi (native 'bool) (lambda (y) (application x y)))))
-  (pi (v0 int) (v1 bool) (v0 v1)))
+  (pi 'x (native 'int) (lambda (x) x))
+  (pi (x int) x))
+
+(check-reify
+  (pi 'x (native 'int) (lambda (x) (pi 'y (native 'bool) (lambda (y) (application x y)))))
+  (pi (x int) (y bool) (x y)))
 

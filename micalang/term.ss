@@ -2,9 +2,9 @@
   (export
     native native? native-ref
     variable variable? variable-index
-    abstraction abstraction? abstraction-procedure
+    abstraction abstraction? abstraction-symbol abstraction-procedure
     application application? application-lhs application-rhs
-    pi pi? pi-param pi-procedure
+    pi pi? pi-symbol? pi-param pi-procedure
     conditional conditional? conditional-cond conditional-true conditional-false
 
     term->datum
@@ -18,9 +18,9 @@
 
   (data (native ref))
   (data (variable index))
-  (data (abstraction procedure))
+  (data (abstraction symbol procedure))
   (data (application lhs rhs))
-  (data (pi param procedure))
+  (data (pi symbol? param procedure))
   (data (conditional cond true false))
 
   (define (index->symbol $index)

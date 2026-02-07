@@ -25,7 +25,7 @@
 
   (define-rules-syntax
     ((lambda id body)
-      (abstraction (%lambda (id) body))))
+      (abstraction 'id (%lambda (id) body))))
 
   (define-rules-syntax
     ((prim id)
@@ -127,9 +127,9 @@
 
   (define-rules-syntax
     ((pi (id in) out)
-      (%pi in (%lambda (id) out)))
+      (%pi 'id in (%lambda (id) out)))
     ((pi in out)
-      (pi (_ in) out)))
+      (%pi #f in (%lambda (id) out))))
 
   (define-rule-syntax (if cond true false)
     (switch cond

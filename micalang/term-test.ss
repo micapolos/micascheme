@@ -11,27 +11,27 @@
   (foo bar))
 
 (check-term->datum
-  (abstraction (lambda (x) (apply-term zero? x)))
+  (abstraction 'x (lambda (x) (apply-term zero? x)))
   (lambda (v0) (,zero? v0)))
 
 (check-term->datum
-  (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (apply-term + x) y)))))
+  (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (term-apply (apply-term + x) y)))))
   (lambda (v0) (lambda (v1) ((,+ v0) v1))))
 
 (check-term->datum
-  (pi (native 'nat) (lambda (_) (native 'nat)))
+  (pi '_ (native 'nat) (lambda (_) (native 'nat)))
   (pi nat nat))
 
 (check-term->datum
-  (pi (native 'nat) (lambda (_) (pi (native 'string) (lambda (_) (native 'bool)))))
+  (pi '_ (native 'nat) (lambda (_) (pi '_ (native 'string) (lambda (_) (native 'bool)))))
   (pi nat (pi string bool)))
 
 (check-term->datum
-  (pi (native 'nat) (lambda (t) (application (native 'inc) t)))
+  (pi 't (native 'nat) (lambda (t) (application (native 'inc) t)))
   (pi (v0 : nat) (inc v0)))
 
 (check-term->datum
-  (pi (native 'nat) (lambda (a) (pi (native 'string) (lambda (b) (application a b)))))
+  (pi 'a (native 'nat) (lambda (a) (pi 'b (native 'string) (lambda (b) (application a b)))))
   (pi (v0 : nat) (pi (v1 : string) (v0 v1))))
 
 (check-term->datum
@@ -83,23 +83,23 @@
 
 (check
   (term-equal?
-    (abstraction (lambda (x) (apply-term zero? x)))
-    (abstraction (lambda (x) (apply-term zero? x)))))
+    (abstraction 'x (lambda (x) (apply-term zero? x)))
+    (abstraction 'x (lambda (x) (apply-term zero? x)))))
 
 (check
   (not
     (term-equal?
-      (abstraction (lambda (x) (apply-term odd? x)))
-      (abstraction (lambda (x) (apply-term even? x))))))
+      (abstraction 'x (lambda (x) (apply-term odd? x)))
+      (abstraction 'x (lambda (x) (apply-term even? x))))))
 
 (check
   (term-equal?
-    (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (apply-term + x) y)))))
-    (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (apply-term + x) y)))))))
+    (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (term-apply (apply-term + x) y)))))
+    (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (term-apply (apply-term + x) y)))))))
 
 (check
   (not
     (term-equal?
-      (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (apply-term + x) y)))))
-      (abstraction (lambda (x) (abstraction (lambda (y) (term-apply (apply-term + y) x))))))))
+      (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (term-apply (apply-term + x) y)))))
+      (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (term-apply (apply-term + y) x))))))))
 

@@ -135,7 +135,7 @@
               ($body-type (typed-type $typed-body))
               ($body (typed-ref $typed-body))
               (typed
-                (pi $type (lambda (_) $body-type))
+                (pi 'id  $type (lambda (_) $body-type))
                 `(lambda ,$symbol ,$body))))
 
           ((lambda x xs ... body)

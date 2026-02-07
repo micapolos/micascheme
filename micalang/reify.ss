@@ -15,7 +15,7 @@
       ((native? $native) (native-ref $native))
       ((abstraction? $abstraction)
         (lets
-          ($symbol (index->symbol $depth))
+          ($symbol (abstraction-symbol $abstraction))
           `(lambda (,$symbol type) .
             ,(lets
               ($body ((abstraction-procedure $abstraction) (native $symbol)))
@@ -38,10 +38,13 @@
           ,(depth-reify $depth (conditional-false $conditional))))
       ((pi? $pi)
         (lets
-          ($symbol (index->symbol $depth))
-          `(pi (,$symbol ,(depth-reify $depth (pi-param $pi))) .
+          ($symbol? (pi-symbol? $pi))
+          ($reified-param (depth-reify $depth (pi-param $pi)))
+          `(pi
+            ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param)
+            .
             ,(lets
-              ($body ((pi-procedure $pi) (native $symbol)))
+              ($body ((pi-procedure $pi) (native $symbol?)))
               ($reified-body (depth-reify (+ $depth 1) $body))
               (if (pi? $body)
                 (cdr $reified-body)
