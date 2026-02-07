@@ -3,9 +3,35 @@
   (prefix (micalang term) %)
   (micalang comptime))
 
-(check (equal? (variable equal?) (%variable 'equal?)))
+(check
+  (equal?
+    (variable equal?)
+    (%variable 'equal?)))
 
-(check (equal? (prim +) (prim +)))
+(check
+  (equal?
+    (%abstraction-symbol (prim zero? a))
+    'a))
+
+(check
+  (equal?
+    (%abstraction-apply (prim string-length s) (native "foo"))
+    (%native 3)))
+
+(check
+  (equal?
+    (%abstraction-symbol (prim + a b))
+    'a))
+
+(check
+  (equal?
+    (%abstraction-symbol (%abstraction-apply (prim + a b) (native 2)))
+    'b))
+
+(check
+  (equal?
+    (%abstraction-apply (%abstraction-apply (prim + a b) (native 2)) (native 3))
+    (%native 5)))
 
 (check
   (equal?
