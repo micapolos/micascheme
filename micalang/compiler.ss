@@ -10,8 +10,7 @@
     (micalang term)
     (micalang reify)
     (micalang typed)
-    (micalang context)
-    (prefix (micalang comptime) comptime-))
+    (micalang context))
 
   (define runtime-environment
     (environment '(micalang runtime)))
@@ -22,15 +21,20 @@
   (define (evaluate-type $comptime-environment $context $term)
     (eval
       (compile-type $comptime-environment $context $term)
-      comptime-environment))
+      $comptime-environment))
 
   (define (compile-type $comptime-environment $context $term)
-    (mica-compile-typed $comptime-environment $comptime-environment $context comptime-type $term))
+    (mica-compile-typed
+      $comptime-environment
+      $comptime-environment
+      $context
+      (eval 'type $comptime-environment)
+      $term))
 
   (define (mica-evaluate $runtime-environment $comptime-environment $context $term)
     (eval
       (typed-ref (mica-compile $runtime-environment $comptime-environment $context $term))
-      runtime-environment))
+      $runtime-environment))
 
   (define (mica-compile-typed $runtime-environment $comptime-environment $context $expected-type $term)
     (lets
@@ -50,23 +54,23 @@
         (syntax-case $term (quote native lambda pi let if)
           (b
             (boolean? (datum b))
-            (typed comptime-boolean `(literal ,(datum b))))
+            (typed (eval 'boolean $comptime-environment) `(literal ,(datum b))))
 
           (n
             (number? (datum n))
-            (typed comptime-number `(literal ,(datum n))))
+            (typed (eval 'number $comptime-environment) `(literal ,(datum n))))
 
           (ch
             (char? (datum ch))
-            (typed comptime-char `(literal ,(datum ch))))
+            (typed (eval 'char $comptime-environment) `(literal ,(datum ch))))
 
           (s
             (string? (datum s))
-            (typed comptime-string `(literal ,(datum s))))
+            (typed (eval 'string $comptime-environment) `(literal ,(datum s))))
 
           ((quote s)
             (symbol? (datum s))
-            (typed comptime-symbol `(literal ',(datum s))))
+            (typed (eval 'symbol $comptime-environment) `(literal ',(datum s))))
 
           (id
             (symbol? (datum id))
@@ -89,15 +93,15 @@
             (lets
               ($id (datum id))
               ($in (compile-type $comptime-environment $context #'in))
-              ($context (push $context (cons $id comptime-type)))
+              ($context (push $context (cons $id (eval 'type $comptime-environment))))
               ($out (compile-type $comptime-environment $context #'out))
-              (typed comptime-type `(pi (,$id ,$in) ,$out))))
+              (typed (eval 'type $comptime-environment) `(pi (,$id ,$in) ,$out))))
 
           ((pi in out)
             (lets
               ($in (compile-type $comptime-environment $context #'in))
               ($out (compile-type $comptime-environment $context #'out))
-              (typed comptime-type `(pi ,$in ,$out))))
+              (typed (eval 'type $comptime-environment) `(pi ,$in ,$out))))
 
           ((pi x xs ... body)
             (mica-compile $runtime-environment $comptime-environment $context
@@ -149,7 +153,7 @@
 
           ((if cond true false)
             (lets
-              ($cond (mica-compile-typed $runtime-environment $comptime-environment $context comptime-boolean #'cond))
+              ($cond (mica-compile-typed $runtime-environment $comptime-environment $context (eval 'boolean $comptime-environment) #'cond))
               ($typed-true (mica-compile $runtime-environment $comptime-environment $context #'true))
               ($type (typed-type $typed-true))
               ($true (typed-ref $typed-true))
