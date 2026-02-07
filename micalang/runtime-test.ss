@@ -14,10 +14,16 @@
 (check (equal? (app (app - (literal 5)) (literal 3)) (literal 2)))
 (check (equal? (app (app < (literal 2)) (literal 3)) (literal #t)))
 
+(check (procedure? (lambda x x)))
 (check (equal? ((lambda x x) (literal 10)) 10))
 
+(check (procedure? (pi number boolean)))
 (check (equal? ((pi number boolean) (literal 10)) boolean))
+
+(check (procedure? (pi (x number) (app (app + x) (literal 1)))))
 (check (equal? ((pi (x number) (app (app + x) (literal 1))) (literal 10)) 11))
+
+(check (procedure? (pi (x type) x)))
 (check (equal? ((pi (x type) x) number) number))
 
 (check
