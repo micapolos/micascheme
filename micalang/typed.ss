@@ -9,5 +9,6 @@
   (define (typed-equal? $lhs $rhs)
     (and
       (term-equal? (typed-type $lhs) (typed-type $rhs))
+      (equal? (typed-type-term $lhs) (typed-type-term $rhs))
       (equal? (typed-ref $lhs) (typed-ref $rhs))))
 )
