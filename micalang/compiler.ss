@@ -24,13 +24,13 @@
     (micalang env)
     (micalang context))
 
-  (data (compiler runtime-environment comptime-environment fallback env context))
+  (data (compiler fallback runtime-environment comptime-environment env context))
 
   (define (empty-compiler $runtime-environment $comptime-environment)
     (compiler
+      compiler-compile-fallback
       $runtime-environment
       $comptime-environment
-      compiler-compile-fallback
       '()
       '()))
 
@@ -43,9 +43,9 @@
 
   (define (compiler-push $compiler $id $value $type)
     (compiler
+      (compiler-fallback $compiler)
       (compiler-runtime-environment $compiler)
       (compiler-comptime-environment $compiler)
-      (compiler-fallback $compiler)
       (push (compiler-env $compiler) (cons $id $value))
       (push (compiler-context $compiler) (cons $id $type))))
 
@@ -289,9 +289,9 @@
       ($compiled
         (compiler-compile
           (compiler
+            compiler-compile-fallback
             check-runtime-environment
             check-comptime-environment
-            compiler-compile-fallback
             mica-env
             mica-context)
           'in))
@@ -308,9 +308,9 @@
       (raises
         (compiler-compile
           (compiler
+            compiler-compile-fallback
             check-runtime-environment
             check-comptime-environment
-            compiler-compile-fallback
             mica-env
             mica-context)
           'in))))

@@ -11,9 +11,9 @@
       ((_ x)
         #`(compiler-evaluate
           (compiler
+            compiler-compile-fallback
             (environment '(micalang runtime) '(prefix (scheme) %))
             (environment '(micalang comptime) '(prefix (scheme) %))
-            compiler-compile-fallback
             mica-env
             mica-context)
           (syntax->datum/annotation #'x)))))
