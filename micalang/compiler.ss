@@ -20,13 +20,12 @@
       ($proc (eval $nested $runtime-environment))
       (fold-left (lambda (f v) (f v)) $proc $values)))
 
-  (define (evaluate-comptime $comptime-environment $env $context $term)
+  (define (evaluate-comptime $comptime-environment $env $context $code)
     (lets
       ($symbols (map car $env))
       ($values (map cdr $env))
-      ($code (compile-type $comptime-environment $env $context $term))
-      ($nested-lambda (fold-right (lambda (s acc) `(lambda ,s ,acc)) $code $symbols))
-      ($proc (eval $nested-lambda $comptime-environment))
+      ($nested (fold-right (lambda (s acc) `(lambda ,s ,acc)) $code $symbols))
+      ($proc (eval $nested $comptime-environment))
       (fold-left (lambda (f v) (term-apply f v)) $proc $values)))
 
   (define (compile-type $comptime-environment $env $context $term)
@@ -89,9 +88,10 @@
               (datum id)))
 
           ((native t v)
-            (typed
-              (evaluate-comptime $comptime-environment $env $context #'t)
-              `(literal ,#'v)))
+            (lets
+             ($typed-t (mica-compile $runtime-environment $comptime-environment $env $context #'t))
+             ($t-value (evaluate-comptime $comptime-environment $env $context (typed-ref $typed-t)))
+             (typed $t-value `(literal ,#'v))))
 
           ((pi out)
             (mica-compile $runtime-environment $comptime-environment $env $context #'out))
@@ -128,7 +128,7 @@
               ($typed-x (mica-compile $runtime-environment $comptime-environment $env $context #'x))
               ($x-type (typed-type $typed-x))
               ($x (typed-ref $typed-x))
-              ($x-val (evaluate-runtime $runtime-environment $env $x))
+              ($x-val (evaluate-comptime $comptime-environment $env $context $x))
               ($env (push $env (cons $symbol $x-val)))
               ($context (push $context (cons $symbol $x-type)))
               ($typed-body (mica-compile $runtime-environment $comptime-environment $env $context #'body))
@@ -152,14 +152,15 @@
           ((lambda (id t) body)
             (lets
               ($symbol (datum id))
-              ($type (evaluate-comptime $comptime-environment $env $context #'t))
+              ($typed-t (mica-compile $runtime-environment $comptime-environment $env $context #'t))
+              ($t-value (evaluate-comptime $comptime-environment $env $context (typed-ref $typed-t)))
               ($body-env (push $env (cons $symbol (variable $symbol))))
-              ($body-context (push $context (cons $symbol $type)))
+              ($body-context (push $context (cons $symbol $t-value)))
               ($typed-body (mica-compile $runtime-environment $comptime-environment $body-env $body-context #'body))
               ($body-type (typed-type $typed-body))
               ($body (typed-ref $typed-body))
               (typed
-                (pi $symbol $type
+                (pi $symbol $t-value
                   (lambda ($x)
                     (evaluate-comptime
                       $comptime-environment
@@ -194,9 +195,9 @@
                     ($fn (typed-ref $typed-fn))
                     ($param-type (pi-param $pi))
                     ($arg (mica-compile-typed $runtime-environment $comptime-environment $env $context $param-type #'arg))
-                    ($arg-val (evaluate-runtime $runtime-environment $env $arg))
+                    ($arg-value (evaluate-comptime $comptime-environment $env $context $arg))
                     (typed
-                      (pi-apply $pi $arg-val)
+                      (pi-apply $pi $arg-value)
                       `(app ,$fn ,$arg))))
                 ((else $other)
                   (syntax-error #'fn
