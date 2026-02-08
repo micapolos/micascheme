@@ -1,6 +1,6 @@
 (library (micalang comptime)
   (export
-    prim
+    prim curry
     literal app lambda let if
     type boolean number symbol char string
     = + - < zero?

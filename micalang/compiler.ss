@@ -10,6 +10,7 @@
     (micalang term)
     (micalang reify)
     (micalang typed)
+    (micalang env)
     (micalang context))
 
   (define (evaluate-runtime $runtime-environment $env $code)
@@ -250,12 +251,25 @@
 
   (define-rule-syntax (check-compiles in out)
     (lets
-      ($typed (mica-compile check-runtime-environment check-comptime-environment `() `(,@mica-context) 'in))
+      ($typed
+        (mica-compile
+          check-runtime-environment
+          check-comptime-environment
+          mica-env
+          mica-context
+          'in))
       (check
         (equal?
           `(,(reify (typed-type $typed)) ,(typed-ref $typed))
           'out))))
 
   (define-rule-syntax (check-compile-raises in)
-    (check (raises (mica-compile check-runtime-environment check-comptime-environment `() `(,@mica-context) 'in))))
+    (check
+      (raises
+        (mica-compile
+          check-runtime-environment
+          check-comptime-environment
+          mica-env
+          mica-context
+          'in))))
 )
