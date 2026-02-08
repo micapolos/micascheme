@@ -11,6 +11,10 @@
 (check-reify (variable 'zero?) zero?)
 
 (check-reify
+  (constant '(this is my (constant)))
+  (constant (this is my (constant))))
+
+(check-reify
   (conditional (native 'cond) (native 't) (native 'f))
   (if cond t f))
 

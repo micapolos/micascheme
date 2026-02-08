@@ -3,6 +3,7 @@
     type type?
     native native? native-ref
     variable variable? variable-symbol
+    constant constant? constant-ref
     abstraction abstraction? abstraction-symbol abstraction-procedure abstraction-apply
     application application? application-lhs application-rhs
     pi pi? pi-symbol? pi-param pi-procedure pi-apply
@@ -16,6 +17,7 @@
   (data type)
   (data (native ref))
   (data (variable symbol))
+  (data (constant ref))
   (data (abstraction symbol procedure))
   (data (application lhs rhs))
   (data (pi symbol? param procedure))
@@ -60,6 +62,12 @@
             (symbol=?
               (variable-symbol $lhs-variable)
               (variable-symbol $rhs-variable)))))
+      ((constant? $lhs-constant)
+        (switch? $rhs
+          ((constant? $rhs-constant)
+            (equal?
+              (constant-ref $lhs-constant)
+              (constant-ref $rhs-constant)))))
       ((abstraction? $lhs-abstraction)
         (switch? $rhs
           ((abstraction? $rhs-abstraction)

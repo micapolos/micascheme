@@ -7,8 +7,7 @@
     (micalang context)
     (micalang compiled)
     (micalang term)
-    (micalang reify)
-    (micalang fx))
+    (micalang reify))
 
   (define-syntax (mica $syntax)
     (syntax-case $syntax ()
@@ -18,24 +17,15 @@
             (lambda ($compiler $term)
               (syntax-case $term (fx)
                 (fx
-                  (compiled type 'type 'fx))
+                  (compiled type 'type '(constant fx)))
                 ((fx n)
                   (if (fixnum? (datum n))
-                    (compiled fx 'fx `(native ,(datum n)))
+                    (compiled (constant 'fx) 'fx `(native ,(datum n)))
                     (syntax-error #'n "not fx")))
                 (other
                   (compiler-compile-default $compiler #'other))))
-
-            (lambda ($default $term)
-              (switch-exhaustive $term
-                ((fx? _) 'fx)))
-
-            (lambda ($default $lhs $rhs)
-              (switch-exhaustive $lhs
-                ((fx? _)
-                  (switch? $rhs
-                    ((fx? _) #t)))))
-
+            default-compiler-reify
+            default-compiler-term-equal?
             (environment '(micalang runtime) '(prefix (scheme) %))
             (environment '(micalang comptime) '(prefix (scheme) %))
             mica-env

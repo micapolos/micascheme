@@ -37,6 +37,17 @@
 
 (check
   (term-equal?
+    (constant '(this is my (constant)))
+    (constant '(this is my (constant)))))
+
+(check
+  (not
+    (term-equal?
+      (constant `(this is my (constant)))
+      (constant `(this is other (constant))))))
+
+(check
+  (term-equal?
     (application (variable 'x) (variable 'x))
     (application (variable 'x) (variable 'x))))
 

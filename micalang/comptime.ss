@@ -1,6 +1,6 @@
 (library (micalang comptime)
   (export
-    curry
+    curry constant
     native app lambda let if
     boolean number symbol char string
     = + - < zero?
@@ -8,16 +8,18 @@
   (import
     (except (micalang base) = + - < zero? list app lambda let string if)
     (prefix (only (micalang base) lambda let if = + - < zero?) %)
-    (rename (micalang term) (pi %pi) (native %native)))
+    (rename (micalang term) (pi %pi) (native %native) (constant %constant)))
   (export
     (import
       (only (micascheme) equal? quote)
       (prefix (micascheme) %%)
-      (only (micalang term) application pi-param type)
-      (only (micalang fx) fx)))
+      (only (micalang term) application pi-param type)))
 
   (define-rule-syntax (native x)
     (%native x))
+
+  (define-rule-syntax (constant x)
+    (%constant 'x))
 
   (define-rule-syntax (let (id x) body)
     (%let ((id x)) body))

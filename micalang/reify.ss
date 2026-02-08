@@ -20,6 +20,8 @@
         (native-ref $native))
       ((variable? $variable)
         (variable-symbol $variable))
+      ((constant? $constant)
+        `(constant ,(constant-ref $constant)))
       ((abstraction? $abstraction)
         (lets
           ($symbol (abstraction-symbol $abstraction))

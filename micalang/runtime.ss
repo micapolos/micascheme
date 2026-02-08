@@ -1,24 +1,25 @@
 (library (micalang runtime)
   (export
-    native app
+    native app constant
     boolean number symbol char string
     = + - < zero?
     list let lambda pi app if)
   (import
     (except (micalang base) = + - < zero? list lambda app let if string)
     (prefix (only (micalang base) let lambda app if zero? = + - <) %)
-    (rename (micalang term) (pi %pi) (native %native)))
+    (rename (micalang term) (pi %pi) (native %native) (constant %constant)))
   (export
     (import
       (only (micascheme) equal? quote)
-      (prefix (micascheme) %%)
-      (only (micalang fx) fx)))
+      (prefix (micascheme) %%)))
 
   (define-rule-syntax (let (id x) ... body)
     (%let ((id x) ...) body))
 
   (define-rule-syntax (lambda id body)
     (%lambda (id) body))
+
+  (define-rule-syntax (constant x) 'x)
 
   (define-rules-syntax
     ((pi (id in) out)

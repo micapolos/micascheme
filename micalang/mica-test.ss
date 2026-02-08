@@ -54,11 +54,14 @@
 
 (check-mica ((lambda (x fx) x) (fx 12)) 12)
 
+(check-mica fx 'fx)
+(check-mica (fx 1) 1)
+
 (check-mica
   (let
     (max-fx (native fx (%%most-positive-fixnum)))
     (min-fx (native fx (%%most-negative-fixnum)))
     (fx+ (a fx) (b fx) (native fx (%%fx+/wraparound a b)))
     (fx+1 (a fx) (fx+ a (fx 1)))
-    (fx+1 max-fx))
+    (fx+ max-fx (fx 1)))
   (native fx (%%most-negative-fixnum)))

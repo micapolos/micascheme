@@ -9,6 +9,11 @@
 (check (equal? symbol (%native 'symbol)))
 (check (equal? string (%native 'string)))
 
+(check
+  (equal?
+    (constant (this is my (constant)))
+    (%constant '(this is my (constant)))))
+
 (check (equal? (app zero? (native 0)) (%native #t)))
 
 (check (equal? (app (app = (native 2)) (native 2)) (%native #t)))
