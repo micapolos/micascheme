@@ -1,6 +1,15 @@
 (library (micalang compiler)
   (export
-    compiler
+    compiler compiler?
+    compiler-runtime-environment
+    compiler-comptime-environment
+    compiler-env
+    compiler-context
+
+    empty-compiler
+    compiler-push
+    compiler-type-ref
+
     mica-compile
     mica-evaluate
 
