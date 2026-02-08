@@ -26,14 +26,20 @@
   (data (conditional cond true false))
 
   (define (apply-term $procedure $rhs)
-    (if (native? $rhs)
-      (native ($procedure (native-ref $rhs)))
-      (application (native $procedure) $rhs)))
+    (switch $rhs
+      ((native? $native)
+        (native ($procedure (native-ref $native))))
+      ((tagged? $tagged)
+        (apply-term $procedure (tagged-ref $tagged)))
+      ((else $other)
+        (application (native $procedure) $other))))
 
   (define (term-apply $lhs $rhs)
     (switch $lhs
       ((native? $native)
         (apply-term (native-ref $native) $rhs))
+      ((tagged? $tagged)
+        (term-apply (tagged-ref $tagged) $rhs))
       ((abstraction? $abstraction)
         (abstraction-apply $abstraction $rhs))
       ((pi? $pi)

@@ -16,6 +16,20 @@
       (native 3))
     (native 2)))
 
+(check
+  (equal?
+    (term-apply
+      (native (lambda (x) (+ x 1)))
+      (tagged (constant 'fx) (native 5)))
+    (native 6)))
+
+(check
+  (equal?
+    (term-apply
+      (tagged (constant 'tag) (native (lambda (x) (+ x 1))))
+      (native 5))
+    (native 6)))
+
 ; --- term-equal?
 
 (check (term-equal? type type))
