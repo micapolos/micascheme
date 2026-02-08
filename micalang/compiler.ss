@@ -41,7 +41,7 @@
       (push (compiler-env $compiler) (cons $id $value))
       (push (compiler-context $compiler) (cons $id $type))))
 
-  (define (compiler-type? $compiler $id)
+  (define (compiler-type-ref? $compiler $id)
     (lets
       ($ass? (assq $id (compiler-context $compiler)))
       (and $ass? (cdr $ass?))))
@@ -128,7 +128,7 @@
           (id
             (symbol? (datum id))
             (lets
-              ($type? (compiler-type? $compiler (datum id)))
+              ($type? (compiler-type-ref? $compiler (datum id)))
               (if $type?
                 (compiled $type? (reify $type?) (datum id))
                 ((compiler-fallback $compiler) $compiler #'id))))
