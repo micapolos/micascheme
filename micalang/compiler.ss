@@ -99,11 +99,15 @@
           ((pi (id in) out)
             (lets
               ($id (datum id))
-              ($in (compile-type $comptime-environment $env $context #'in))
+              ($typed-in (mica-compile $runtime-environment $comptime-environment $env $context #'in))
+              ($in-type (typed-type $typed-in))
+              ($in-term (typed-ref $typed-in))
+              ($in-value (evaluate-comptime $comptime-environment $env $context $in-term))
               ($env (push $env (cons $id (variable $id))))
-              ($context (push $context (cons $id (eval 'type $comptime-environment))))
-              ($out (compile-type $comptime-environment $env $context #'out))
-              (typed (eval 'type $comptime-environment) `(pi (,$id ,$in) ,$out))))
+              ($context (push $context (cons $id $in-value)))
+              ($typed-out (mica-compile $runtime-environment $comptime-environment $env $context #'out))
+              ($out-term (typed-ref $typed-out))
+              (typed (eval 'type $comptime-environment) `(pi (,$id ,$in-term) ,$out-term))))
 
           ((pi in out)
             (lets
