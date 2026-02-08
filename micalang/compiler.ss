@@ -96,13 +96,16 @@
 
           (id
             (symbol? (datum id))
-            (typed
-              (cdr
-                (or
-                  (assq (datum id) $context)
-                  (syntax-error #'id "undefined")))
-              (datum id)
-              (datum id)))
+            (lets
+              ($type
+                (cdr
+                  (or
+                    (assq (datum id) $context)
+                    (syntax-error #'id "undefined"))))
+              (typed
+                $type
+                (reify $type)
+                (datum id))))
 
           ((native t v)
             (lets

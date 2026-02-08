@@ -85,7 +85,7 @@
 
 (check-compiles
   (lambda (i number) i)
-  ((pi (i number) i) (lambda i i)))
+  ((pi (i number) number) (lambda i i)))
 
 (check-compiles
   (lambda (i number) (j number) (+ i j))
@@ -103,7 +103,7 @@
 
 (check-compiles
   (lambda (t type) t)
-  ((pi (t type) t) (lambda t t)))
+  ((pi (t type) type) (lambda t t)))
 
 ; === pi
 
@@ -134,7 +134,7 @@
   (let
     (identity (lambda (t type) (lambda (x t) t)))
     ((identity number) 10))
-  (number
+  (type
     (let
       (identity (lambda t (lambda x t)))
       (app (app identity number) (literal 10)))))
