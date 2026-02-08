@@ -15,7 +15,7 @@
 (check
   (equal?
     (constant (this is my (constant)))
-    '(this is my (constant))))
+    #f))
 
 (check
   (equal?

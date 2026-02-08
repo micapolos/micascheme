@@ -19,8 +19,8 @@
   (define-rule-syntax (lambda id body)
     (%lambda (id) body))
 
-  (define-rule-syntax (constant x) 'x)
-
+  (define-rule-syntax (native x) x)
+  (define-rule-syntax (constant x) #f)
   (define-rule-syntax (tagged tag x) x)
 
   (define-rules-syntax
@@ -53,8 +53,6 @@
   (define-rules-syntax
     ((app lhs rhs)
       (%app lhs rhs)))
-
-  (define-rule-syntax (native x) x)
 
   (define-rule-syntax (if cond true false)
     (%if cond true false))
