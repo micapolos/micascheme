@@ -87,9 +87,6 @@
       ((else $other)
         (application (native $other) $rhs))))
 
-  (define array
-    (lambda n (application (native array) n)))
-
   (define-prims
     (type    'type)
     (boolean 'boolean)
@@ -104,9 +101,6 @@
     (+ x y %+)
     (- x y %-)
     (< x y %<))
-
-  (define list
-    (lambda x (application (native list) x)))
 
   (define-rules-syntax
     ((pi (id in) out)
