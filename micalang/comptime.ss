@@ -87,10 +87,6 @@
       ((else $other)
         (application (native $other) $rhs))))
 
-  ; === selectors passed to procedures:
-  (data %pi?)       ; #t for pi, #f for lambda
-  (data %pi-param)  ; pi param
-
   (define array
     (lambda n (application (native array) n)))
 
