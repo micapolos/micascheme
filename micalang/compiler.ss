@@ -15,6 +15,22 @@
 
   (data (compiler runtime-environment comptime-environment env context))
 
+  (define (empty-compiler $runtime-environment $comptime-environment)
+    (compiler $runtime-environment $comptime-environment '() '()))
+
+  (define (compiler-push $compiler $id $value $type)
+    (compiler
+      (compiler-runtime-environment $compiler)
+      (compiler-comptime-environment $compiler)
+      (push (compiler-env $compiler) $value)
+      (push (compiler-context $compiler) $type)))
+
+  (define (compiler-type-ref $compiler $id)
+    (cdr
+      (or
+        (assq (datum id) (compiler-context $compiler))
+        (syntax-error #'id "undefined"))))
+
   (define (evaluate-runtime $runtime-environment $env $code)
     (lets
       ($symbols (map car $env))
