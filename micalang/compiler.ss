@@ -9,7 +9,6 @@
 
     empty-compiler
     compiler-push
-    compiler-type-ref
 
     compiler-compile
     compiler-evaluate
@@ -42,11 +41,10 @@
       (push (compiler-env $compiler) (cons $id $value))
       (push (compiler-context $compiler) (cons $id $type))))
 
-  (define (compiler-type-ref $compiler $syntax)
-    (cdr
-      (or
-        (assq (syntax->datum $syntax) (compiler-context $compiler))
-        (syntax-error $syntax "undefined"))))
+  (define (compiler-type? $compiler $id)
+    (lets
+      ($ass? (assq $id (compiler-context $compiler)))
+      (and $ass? (cdr $ass?))))
 
   (define (compiler-evaluate-runtime $compiler $code)
     (lets
@@ -130,11 +128,10 @@
           (id
             (symbol? (datum id))
             (lets
-              ($type (compiler-type-ref $compiler #'id))
-              (compiled
-                $type
-                (reify $type)
-                (datum id))))
+              ($type? (compiler-type? $compiler (datum id)))
+              (if $type?
+                (compiled $type? (reify $type?) (datum id))
+                ((compiler-fallback $compiler) $compiler #'id))))
 
           ((native t v)
             (lets
