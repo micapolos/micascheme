@@ -13,7 +13,7 @@
           (compiler
             (environment '(micalang runtime) '(prefix (scheme) %))
             (environment '(micalang comptime) '(prefix (scheme) %))
-            (lambda ($compiler $syntax) #f)
+            compiler-compile-fallback
             mica-env
             mica-context)
           (syntax->datum/annotation #'x)))))
