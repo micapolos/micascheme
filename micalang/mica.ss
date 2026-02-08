@@ -17,7 +17,8 @@
           (compiler
             (lambda ($compiler $term)
               (syntax-case $term (fx)
-                (fx (compiled type 'type 'fx))
+                (fx
+                  (compiled type 'type 'fx))
                 ((fx n)
                   (if (fixnum? (datum n))
                     (compiled fx 'fx `(native ,(datum n)))
