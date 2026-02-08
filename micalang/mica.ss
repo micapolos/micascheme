@@ -3,6 +3,7 @@
   (import
     (micalang base)
     (micalang compiler)
+    (micalang env)
     (micalang context))
 
   (define-syntax (mica $syntax)
@@ -12,7 +13,7 @@
           (compiler
             (environment '(micalang runtime) '(prefix (scheme) %))
             (environment '(micalang comptime) '(prefix (scheme) %))
-            `()
+            mica-env
             mica-context)
           (syntax->datum/annotation #'x)))))
 
