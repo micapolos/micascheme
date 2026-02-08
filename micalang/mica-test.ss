@@ -48,3 +48,15 @@
 
 (check-mica (if (zero? 0) "zero" "not-zero") "zero")
 (check-mica (if (zero? 1) "zero" "not-zero") "not-zero")
+
+(check-mica fx 'fx)
+(check-mica (fx 12) 12)
+;(check-mica ((lambda (x fx) x) (fx 12)) 12)
+
+(check-mica
+  (let
+    (max-fx (native fx (%%most-positive-fixnum)))
+    (min-fx (native fx (%%most-negative-fixnum)))
+    (fx+ (lambda (a fx) (b fx) (native fx (%%fx+/wraparound a b))))
+    (fx+ max-fx (fx 1)))
+  (native fx (%%most-negative-fixnum)))

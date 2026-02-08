@@ -4,14 +4,24 @@
     (micalang base)
     (micalang compiler)
     (micalang env)
-    (micalang context))
+    (micalang context)
+    (micalang compiled)
+    (micalang term))
 
   (define-syntax (mica $syntax)
     (syntax-case $syntax ()
       ((_ x)
         #`(compiler-evaluate
           (compiler
-            default-compiler-recurse
+            (lambda ($compiler $term)
+              (syntax-case $term (fx)
+                (fx (compiled type 'type `(native 'fx)))
+                ((fx n)
+                  (if (fixnum? (datum n))
+                    (compiled (native 'fx) 'fx `(native ,(datum n)))
+                    (syntax-error #'n "not fx")))
+                (other
+                  (compiler-compile-default $compiler #'other))))
             default-compiler-reify
             default-compiler-term-equal?
             (environment '(micalang runtime) '(prefix (scheme) %))
