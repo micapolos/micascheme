@@ -1,10 +1,10 @@
 (library (micalang typed)
   (export
-    typed typed? typed-type typed-ref
+    typed typed? typed-type typed-type-term typed-ref
     typed-equal?)
   (import (micalang base) (micalang term))
 
-  (data (typed type ref))
+  (data (typed type type-term ref))
 
   (define (typed-equal? $lhs $rhs)
     (and
