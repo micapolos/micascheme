@@ -14,6 +14,11 @@
     (constant (this is my (constant)))
     (%constant '(this is my (constant)))))
 
+(check
+  (equal?
+    (tagged (constant fx) (native 10))
+    (%tagged (%constant 'fx) (%native 10))))
+
 (check (equal? (app zero? (native 0)) (%native #t)))
 
 (check (equal? (app (app = (native 2)) (native 2)) (%native #t)))

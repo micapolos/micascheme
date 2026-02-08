@@ -21,7 +21,12 @@
       ((variable? $variable)
         (variable-symbol $variable))
       ((constant? $constant)
-        `(constant ,(constant-ref $constant)))
+        (constant-ref $constant))
+      ((tagged? $tagged)
+        ; TODO: Allow chaining like application.
+        `(
+          ,(default-reify $default (tagged-tag $tagged))
+          ,(default-reify $default (tagged-ref $tagged))))
       ((abstraction? $abstraction)
         (lets
           ($symbol (abstraction-symbol $abstraction))

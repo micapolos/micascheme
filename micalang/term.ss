@@ -4,6 +4,7 @@
     native native? native-ref
     variable variable? variable-symbol
     constant constant? constant-ref
+    tagged tagged? tagged-tag tagged-ref
     abstraction abstraction? abstraction-symbol abstraction-procedure abstraction-apply
     application application? application-lhs application-rhs
     pi pi? pi-symbol? pi-param pi-procedure pi-apply
@@ -18,6 +19,7 @@
   (data (native ref))
   (data (variable symbol))
   (data (constant ref))
+  (data (tagged tag ref))
   (data (abstraction symbol procedure))
   (data (application lhs rhs))
   (data (pi symbol? param procedure))
@@ -68,6 +70,16 @@
             (equal?
               (constant-ref $lhs-constant)
               (constant-ref $rhs-constant)))))
+      ((tagged? $lhs-tagged)
+        (switch? $rhs
+          ((tagged? $rhs-tagged)
+            (and
+              (default-term-equal? $default
+                (tagged-tag $lhs-tagged)
+                (tagged-tag $rhs-tagged))
+              (default-term-equal? $default
+                (tagged-ref $lhs-tagged)
+                (tagged-ref $rhs-tagged))))))
       ((abstraction? $lhs-abstraction)
         (switch? $rhs
           ((abstraction? $rhs-abstraction)

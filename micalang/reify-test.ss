@@ -12,7 +12,15 @@
 
 (check-reify
   (constant '(this is my (constant)))
-  (constant (this is my (constant))))
+  (this is my (constant)))
+
+(check-reify
+  (tagged (constant 'fx) (native 10))
+  (fx 10))
+
+(check-reify
+  (tagged (constant 'list) (tagged (constant 'fx) (native 10)))
+  (list (fx 10)))
 
 (check-reify
   (conditional (native 'cond) (native 't) (native 'f))

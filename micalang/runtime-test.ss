@@ -17,6 +17,11 @@
     (constant (this is my (constant)))
     '(this is my (constant))))
 
+(check
+  (equal?
+    (tagged (constant fx) (native 10))
+    10))
+
 (check (equal? (app zero? (native 0)) #t))
 
 (check (equal? (app (app = (native 2)) (native 2)) (native #t)))

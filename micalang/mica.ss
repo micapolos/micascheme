@@ -20,7 +20,7 @@
                   (compiled type 'type '(constant fx)))
                 ((fx n)
                   (if (fixnum? (datum n))
-                    (compiled (constant 'fx) 'fx `(native ,(datum n)))
+                    (compiled (constant 'fx) 'fx `(tagged (constant fx) (native ,(datum n))))
                     (syntax-error #'n "not fx")))
                 (other
                   (compiler-compile-default $compiler #'other))))
@@ -33,7 +33,7 @@
           (syntax->datum/annotation #'x)))))
 
   (define-rule-syntax (check-mica in out)
-    (check (equal? (mica in) (mica out))))
+    (check (equal? (mica in) out)))
 
   (define-rule-syntax (mica-print x ...)
     (begin (displayln (mica x)) ...))

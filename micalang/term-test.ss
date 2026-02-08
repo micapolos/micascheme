@@ -48,6 +48,23 @@
 
 (check
   (term-equal?
+    (tagged (constant 'my-tag) (native 10))
+    (tagged (constant 'my-tag) (native 10))))
+
+(check
+  (not
+    (term-equal?
+      (tagged (constant 'my-tag) (native 10))
+      (tagged (constant 'other-tag) (native 10)))))
+
+(check
+  (not
+    (term-equal?
+      (tagged (constant 'my-tag) (native 10))
+      (tagged (constant 'my-tag) (native 20)))))
+
+(check
+  (term-equal?
     (application (variable 'x) (variable 'x))
     (application (variable 'x) (variable 'x))))
 
