@@ -3,6 +3,8 @@
   (prefix (micalang term) %)
   (micalang comptime))
 
+(check (equal? (app (app (curry a b %%+) (literal 10)) (literal 20)) (literal 30)))
+
 (check
   (equal?
     (%abstraction-symbol (prim zero? a))

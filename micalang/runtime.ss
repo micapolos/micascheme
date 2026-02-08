@@ -1,6 +1,6 @@
 (library (micalang runtime)
   (export
-    prim
+    prim curry
     literal app
     type boolean number symbol char string
     = + - < zero?
@@ -12,6 +12,7 @@
   (export
     (import
       (only (micascheme) equal? quote)
+      (prefix (micascheme) %%)
       (only (micalang term) native)))
 
   (define-rule-syntax (let (id x) ... body)

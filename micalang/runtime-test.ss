@@ -3,6 +3,8 @@
   (micalang runtime)
   (prefix (micalang term) %))
 
+(check (equal? (app (app (curry a b %%+) (literal 10)) (literal 20)) (literal 30)))
+
 (check (equal? (prim +) (prim +)))
 (check (equal? (app (app (prim + a b) 2) 3) 5))
 

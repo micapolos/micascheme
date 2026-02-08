@@ -12,6 +12,7 @@
   (export
     (import
       (only (micascheme) equal? quote)
+      (prefix (micascheme) %%)
       (only (micalang term) native application pi-param)))
 
   (define-rule-syntax (literal x)
