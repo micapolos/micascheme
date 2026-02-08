@@ -29,7 +29,7 @@
     (compiler
       $runtime-environment
       $comptime-environment
-      (lambda ($compiler $syntax) (syntax-error $syntax))
+      (lambda ($compiler $syntax) #f)
       '()
       '()))
 
@@ -131,7 +131,9 @@
               ($type? (compiler-type-ref? $compiler (datum id)))
               (if $type?
                 (compiled $type? (reify $type?) (datum id))
-                ((compiler-fallback $compiler) $compiler #'id))))
+                (lets
+                  ($fallback? ((compiler-fallback $compiler) $compiler #'id))
+                  (or $fallback? (syntax-error #'id "undefined"))))))
 
           ((native t v)
             (lets
@@ -268,7 +270,9 @@
               `((,#'fn ,#'arg) ,@#'(args ...))))
 
           (other
-            ((compiler-fallback $compiler) $compiler #'other))))))
+            (or
+              ((compiler-fallback $compiler) $compiler #'other)
+              (syntax-error #'other)))))))
 
   (define check-runtime-environment
     (environment '(micalang runtime)))
@@ -283,7 +287,7 @@
           (compiler
             check-runtime-environment
             check-comptime-environment
-            (lambda ($compiler $syntax) (syntax-error $syntax))
+            (lambda ($compiler $syntax) #f)
             mica-env
             mica-context)
           'in))
@@ -302,7 +306,7 @@
           (compiler
             check-runtime-environment
             check-comptime-environment
-            (lambda ($compiler $syntax) (syntax-error $syntax))
+            (lambda ($compiler $syntax) #f)
             mica-env
             mica-context)
           'in))))
