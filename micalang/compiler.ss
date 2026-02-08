@@ -195,7 +195,8 @@
                       (push $env (cons $symbol $x))
                       $body-context
                       (reify $body-type))))
-                'type
+                `(pi (,$symbol ,(typed-ref $typed-t))
+                  ,(typed-type-term $typed-body))
                 `(lambda ,$symbol ,$body))))
 
           ((lambda x xs ... body)
