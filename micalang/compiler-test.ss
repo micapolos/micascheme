@@ -130,8 +130,11 @@
 
 ; === identity
 
-; (check-compiles
-;   (let
-;     (identity (lambda (t type) (pi (x t) t)))
-;     ((identity number) 10))
-;   (number 123))
+(check-compiles
+  (let
+    (identity (lambda (t type) (lambda (x t) t)))
+    ((identity number) 10))
+  (type
+    (let
+      (identity (lambda t (lambda x t)))
+      (app (app identity number) (literal 10)))))
