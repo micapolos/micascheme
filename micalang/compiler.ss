@@ -195,7 +195,7 @@
                       $comptime-environment
                       (push $env (cons $symbol $x))
                       $body-context
-                      (reify $body-type))))
+                      (typed-type-term $typed-body))))
                 `(pi (,$symbol ,(typed-ref $typed-t))
                   ,(typed-type-term $typed-body))
                 `(lambda ,$symbol ,$body))))
@@ -232,7 +232,7 @@
                     ($arg-value (evaluate-comptime $comptime-environment $env $context $arg-term))
                     (typed
                       (pi-apply $pi $arg-value)
-                      `(app ,(typed-type-term $typed-fn) ,$arg-term)
+                      (reify (pi-apply $pi $arg-value))
                       `(app ,$fn-term ,$arg-term))))
                 ((else $other)
                   (syntax-error #'fn
