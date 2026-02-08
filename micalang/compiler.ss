@@ -1,9 +1,11 @@
 (library (micalang compiler)
   (export
     compiler compiler?
+    compiler-default
+    compiler-default-reify
+    compiler-default-term-equal?
     compiler-runtime-environment
     compiler-comptime-environment
-    compiler-default
     compiler-env
     compiler-context
 
@@ -13,6 +15,9 @@
     compiler-compile
     compiler-compile-default
     compiler-evaluate
+
+    default-compiler-reify
+    default-compiler-term-equal?
 
     check-compiles
     check-compile-raises)
@@ -24,11 +29,13 @@
     (micalang env)
     (micalang context))
 
-  (data (compiler default runtime-environment comptime-environment env context))
+  (data (compiler default default-reify default-term-equal? runtime-environment comptime-environment env context))
 
   (define (empty-compiler $runtime-environment $comptime-environment)
     (compiler
       compiler-compile-default
+      default-compiler-reify
+      default-compiler-term-equal?
       $runtime-environment
       $comptime-environment
       '()
@@ -41,9 +48,23 @@
       (other
         (syntax-error #'other))))
 
+  (define (default-compiler-reify $default $term)
+    (throw 'reify))
+
+  (define (default-compiler-term-equal? $default $lhs $rhs)
+    #f)
+
+  (define (compiler-reify $compiler $term)
+    (default-reify (compiler-default-reify $compiler) $term))
+
+  (define (compiler-term-equal? $compiler $lhs $rhs)
+    (default-term-equal? (compiler-default-term-equal? $compiler) $lhs $rhs))
+
   (define (compiler-push $compiler $id $value $type)
     (compiler
       (compiler-default $compiler)
+      (compiler-default-reify $compiler)
+      (compiler-default-term-equal? $compiler)
       (compiler-runtime-environment $compiler)
       (compiler-comptime-environment $compiler)
       (push (compiler-env $compiler) (cons $id $value))
@@ -84,12 +105,12 @@
     (lets
       ($compiled (compiler-compile $compiler $term))
       ($type (compiled-type $compiled))
-      (if (term-equal? $type $expected-type)
+      (if (compiler-term-equal? $compiler $type $expected-type)
         (compiled-ref $compiled)
         (syntax-error $term
           (format "invalid type ~s, expected ~s, in"
-            (reify $type)
-            (reify $expected-type))))))
+            (compiler-reify $compiler $type)
+            (compiler-reify $compiler $expected-type))))))
 
   (define (compiler-compile $compiler $term)
     (switch $term
@@ -138,7 +159,7 @@
             (lets
               ($type? (compiler-type-ref? $compiler (datum id)))
               (if $type?
-                (compiled $type? (reify $type?) (datum id))
+                (compiled $type? (compiler-reify $compiler $type?) (datum id))
                 ((compiler-default $compiler) $compiler #'id))))
 
           ((native t v)
@@ -264,12 +285,12 @@
                     ($arg-value (compiler-evaluate-comptime $compiler $arg-term))
                     (compiled
                       (pi-apply $pi $arg-value)
-                      (reify (pi-apply $pi $arg-value))
+                      (compiler-reify $compiler (pi-apply $pi $arg-value))
                       `(app ,$fn-term ,$arg-term))))
                 ((else $other)
                   (syntax-error #'fn
                     (format "invalid type ~s, expected pi, in"
-                      (reify $other)))))))
+                      (compiler-reify $compiler $other)))))))
 
           ((fn arg args ...)
             (compiler-compile $compiler
@@ -290,6 +311,8 @@
         (compiler-compile
           (compiler
             compiler-compile-default
+            default-compiler-reify
+            default-compiler-term-equal?
             check-runtime-environment
             check-comptime-environment
             mica-env
@@ -309,6 +332,8 @@
         (compiler-compile
           (compiler
             compiler-compile-default
+            default-compiler-reify
+            default-compiler-term-equal?
             check-runtime-environment
             check-comptime-environment
             mica-env

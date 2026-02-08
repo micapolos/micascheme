@@ -12,6 +12,8 @@
         #`(compiler-evaluate
           (compiler
             compiler-compile-default
+            default-compiler-reify
+            default-compiler-term-equal?
             (environment '(micalang runtime) '(prefix (scheme) %))
             (environment '(micalang comptime) '(prefix (scheme) %))
             mica-env
