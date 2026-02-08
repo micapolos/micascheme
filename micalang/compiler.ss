@@ -13,6 +13,8 @@
     (micalang env)
     (micalang context))
 
+  (data (compiler runtime-environment comptime-environment env context))
+
   (define (evaluate-runtime $runtime-environment $env $code)
     (lets
       ($symbols (map car $env))
@@ -35,7 +37,7 @@
       $comptime-environment
       $env
       $context
-      (eval 'type $comptime-environment)
+      type
       $term))
 
   (define (mica-evaluate $runtime-environment $comptime-environment $env $context $term)
@@ -59,11 +61,8 @@
       ((typed? $typed) $typed)
       ((else _)
         (syntax-case $term (type quote native lambda pi let if)
-          (type
-            (typed
-              type
-              'type
-              `type))
+          (type (typed type 'type 'type))
+
           (b
             (boolean? (datum b))
             (typed
@@ -136,7 +135,7 @@
               ($typed-out (mica-compile $runtime-environment $comptime-environment $env $context #'out))
               ($out-term (typed-ref $typed-out))
               (typed
-                (eval 'type $comptime-environment)
+                type
                 'type
                 `(pi (,$id ,$in-term) ,$out-term))))
 
@@ -145,7 +144,7 @@
               ($in (compile-type $comptime-environment $env $context #'in))
               ($out (compile-type $comptime-environment $env $context #'out))
               (typed
-                (eval 'type $comptime-environment)
+                type
                 'type
                 `(pi ,$in ,$out))))
 
