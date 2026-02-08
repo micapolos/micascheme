@@ -10,8 +10,8 @@
     compiler-push
     compiler-type-ref
 
-    mica-compile
-    mica-evaluate
+    compiler-compile
+    compiler-evaluate
 
     check-compiles
     check-compile-raises)
@@ -41,7 +41,7 @@
         (assq (syntax->datum $syntax) (compiler-context $compiler))
         (syntax-error $syntax "undefined"))))
 
-  (define (evaluate-runtime $compiler $code)
+  (define (compiler-evaluate-runtime $compiler $code)
     (lets
       ($env (compiler-env $compiler))
       ($symbols (map car $env))
@@ -50,7 +50,7 @@
       ($proc (eval $nested (compiler-runtime-environment $compiler)))
       (fold-left (lambda (f v) (f v)) $proc $values)))
 
-  (define (evaluate-comptime $compiler $code)
+  (define (compiler-evaluate-comptime $compiler $code)
     (lets
       ($env (compiler-env $compiler))
       ($symbols (map car $env))
@@ -59,17 +59,17 @@
       ($proc (eval $nested (compiler-comptime-environment $compiler)))
       (fold-left (lambda (f v) (term-apply f v)) $proc $values)))
 
-  (define (compile-type $compiler $term)
-    (mica-compile-compiled $compiler type $term))
+  (define (compiler-compile-type $compiler $term)
+    (compiler-compile-typed $compiler type $term))
 
-  (define (mica-evaluate $compiler $term)
+  (define (compiler-evaluate $compiler $term)
     (eval
-      (compiled-ref (mica-compile $compiler $term))
+      (compiled-ref (compiler-compile $compiler $term))
       (compiler-runtime-environment $compiler)))
 
-  (define (mica-compile-compiled $compiler $expected-type $term)
+  (define (compiler-compile-typed $compiler $expected-type $term)
     (lets
-      ($compiled (mica-compile $compiler $term))
+      ($compiled (compiler-compile $compiler $term))
       ($type (compiled-type $compiled))
       (if (term-equal? $type $expected-type)
         (compiled-ref $compiled)
@@ -78,7 +78,7 @@
             (reify $type)
             (reify $expected-type))))))
 
-  (define (mica-compile $compiler $term)
+  (define (compiler-compile $compiler $term)
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
@@ -131,25 +131,25 @@
 
           ((native t v)
             (lets
-              ($compiled-t (mica-compile $compiler #'t))
-              ($t-value (evaluate-comptime $compiler (compiled-ref $compiled-t)))
+              ($compiled-t (compiler-compile $compiler #'t))
+              ($t-value (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
               (compiled
                 $t-value
                 (compiled-ref $compiled-t)
                 `(native ,#'v))))
 
           ((pi out)
-            (mica-compile $compiler #'out))
+            (compiler-compile $compiler #'out))
 
           ((pi (id in) out)
             (lets
               ($id (datum id))
-              ($compiled-in (mica-compile $compiler #'in))
+              ($compiled-in (compiler-compile $compiler #'in))
               ($in-type (compiled-type $compiled-in))
               ($in-term (compiled-ref $compiled-in))
-              ($in-value (evaluate-comptime $compiler $in-term))
+              ($in-value (compiler-evaluate-comptime $compiler $in-term))
               ($compiler (compiler-push $compiler $id (variable $id) $in-value))
-              ($compiled-out (mica-compile $compiler #'out))
+              ($compiled-out (compiler-compile $compiler #'out))
               ($out-term (compiled-ref $compiled-out))
               (compiled
                 type
@@ -158,29 +158,29 @@
 
           ((pi in out)
             (lets
-              ($in (compile-type $compiler #'in))
-              ($out (compile-type $compiler #'out))
+              ($in (compiler-compile-type $compiler #'in))
+              ($out (compiler-compile-type $compiler #'out))
               (compiled
                 type
                 'type
                 `(pi ,$in ,$out))))
 
           ((pi x xs ... body)
-            (mica-compile $compiler
+            (compiler-compile $compiler
               `(pi ,#'x (pi ,@#'(xs ...) ,#'body))))
 
           ((let body)
-            (mica-compile $compiler #'body))
+            (compiler-compile $compiler #'body))
 
           ((let (id x) body)
             (lets
               ($symbol (datum id))
-              ($compiled-x (mica-compile $compiler #'x))
+              ($compiled-x (compiler-compile $compiler #'x))
               ($x-type (compiled-type $compiled-x))
               ($x (compiled-ref $compiled-x))
-              ($x-val (evaluate-comptime $compiler $x))
+              ($x-val (compiler-evaluate-comptime $compiler $x))
               ($compiler (compiler-push $compiler $symbol $x-val $x-type))
-              ($compiled-body (mica-compile $compiler #'body))
+              ($compiled-body (compiler-compile $compiler #'body))
               ($body-type (compiled-type $compiled-body))
               ($body (compiled-ref $compiled-body))
               (compiled
@@ -189,31 +189,31 @@
                 `(let (,$symbol ,$x) ,$body))))
 
           ((let (id param params ... lambda-body) body)
-            (mica-compile $compiler
+            (compiler-compile $compiler
               `(let
                 (,#'id (lambda ,#'param ,@#'(params ...) ,#'lambda-body))
                 ,#'body)))
 
           ((let x xs ... body)
-            (mica-compile $compiler
+            (compiler-compile $compiler
               `(let ,#'x (let ,@#'(xs ...) ,#'body))))
 
           ((lambda body)
-            (mica-compile $compiler #'body))
+            (compiler-compile $compiler #'body))
 
           ((lambda (id t) body)
             (lets
               ($symbol (datum id))
-              ($compiled-t (mica-compile $compiler #'t))
-              ($t-value (evaluate-comptime $compiler (compiled-ref $compiled-t)))
+              ($compiled-t (compiler-compile $compiler #'t))
+              ($t-value (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
               ($body-compiler (compiler-push $compiler $symbol (variable $symbol) $t-value))
-              ($compiled-body (mica-compile $body-compiler #'body))
+              ($compiled-body (compiler-compile $body-compiler #'body))
               ($body-type (compiled-type $compiled-body))
               ($body (compiled-ref $compiled-body))
               (compiled
                 (pi $symbol $t-value
                   (lambda ($x)
-                    (evaluate-comptime
+                    (compiler-evaluate-comptime
                       (compiler
                         (compiler-runtime-environment $compiler)
                         (compiler-comptime-environment $compiler)
@@ -225,35 +225,35 @@
                 `(lambda ,$symbol ,$body))))
 
           ((lambda x xs ... body)
-            (mica-compile $compiler
+            (compiler-compile $compiler
               `(lambda ,#'x (lambda ,@#'(xs ...) ,#'body))))
 
           ((if cond true false)
             (lets
-              ($cond (mica-compile-compiled $compiler (eval 'boolean (compiler-comptime-environment $compiler)) #'cond))
-              ($compiled-true (mica-compile $compiler #'true))
+              ($cond (compiler-compile-typed $compiler (eval 'boolean (compiler-comptime-environment $compiler)) #'cond))
+              ($compiled-true (compiler-compile $compiler #'true))
               ($type (compiled-type $compiled-true))
               ($true (compiled-ref $compiled-true))
-              ($false (mica-compile-compiled $compiler $type #'false))
+              ($false (compiler-compile-typed $compiler $type #'false))
               (compiled
                 $type
                 (compiled-type-term $compiled-true)
                 `(if ,$cond ,$true ,$false))))
 
           ((fn)
-            (mica-compile $compiler #'fn))
+            (compiler-compile $compiler #'fn))
 
           ((fn arg)
             (lets
-              ($compiled-fn (mica-compile $compiler #'fn))
+              ($compiled-fn (compiler-compile $compiler #'fn))
               ($fn-type (compiled-type $compiled-fn))
               (switch $fn-type
                 ((pi? $pi)
                   (lets
                     ($fn-term (compiled-ref $compiled-fn))
                     ($param-type (pi-param $pi))
-                    ($arg-term (mica-compile-compiled $compiler $param-type #'arg))
-                    ($arg-value (evaluate-comptime $compiler $arg-term))
+                    ($arg-term (compiler-compile-typed $compiler $param-type #'arg))
+                    ($arg-value (compiler-evaluate-comptime $compiler $arg-term))
                     (compiled
                       (pi-apply $pi $arg-value)
                       (reify (pi-apply $pi $arg-value))
@@ -264,7 +264,7 @@
                       (reify $other)))))))
 
           ((fn arg args ...)
-            (mica-compile $compiler
+            (compiler-compile $compiler
               `((,#'fn ,#'arg) ,@#'(args ...))))))))
 
   (define check-runtime-environment
@@ -276,7 +276,7 @@
   (define-rule-syntax (check-compiles in out)
     (lets
       ($compiled
-        (mica-compile
+        (compiler-compile
           (compiler
             check-runtime-environment
             check-comptime-environment
@@ -294,7 +294,7 @@
   (define-rule-syntax (check-compile-raises in)
     (check
       (raises
-        (mica-compile
+        (compiler-compile
           (compiler
             check-runtime-environment
             check-comptime-environment

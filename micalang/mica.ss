@@ -9,7 +9,7 @@
   (define-syntax (mica $syntax)
     (syntax-case $syntax ()
       ((_ x)
-        #`(mica-evaluate
+        #`(compiler-evaluate
           (compiler
             (environment '(micalang runtime) '(prefix (scheme) %))
             (environment '(micalang comptime) '(prefix (scheme) %))
