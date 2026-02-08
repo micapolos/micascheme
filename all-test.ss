@@ -15,6 +15,7 @@
   (core)
   (compiler)
   (current)
+  (curry)
   (datum)
   (decompiler)
   (evaluator)
