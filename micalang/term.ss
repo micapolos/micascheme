@@ -44,7 +44,7 @@
       $rhs))
 
   (define (default-term-equal? $default $lhs $rhs)
-    (switch-exhaustive $lhs
+    (switch $lhs
       ((type? _)
         (switch? $rhs
           ((type? _) #t)))
@@ -98,7 +98,9 @@
                 (conditional-true $rhs-conditional))
               (default-term-equal? $default
                 (conditional-false $lhs-conditional)
-                (conditional-false $rhs-conditional))))))))
+                (conditional-false $rhs-conditional))))))
+      ((else $other)
+        ($default $default $lhs $rhs))))
 
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))

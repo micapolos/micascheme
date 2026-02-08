@@ -11,7 +11,8 @@
   (export
     (import
       (only (micascheme) equal? quote)
-      (prefix (micascheme) %%)))
+      (prefix (micascheme) %%)
+      (only (micalang fx) fx)))
 
   (define-rule-syntax (let (id x) ... body)
     (%let ((id x) ...) body))

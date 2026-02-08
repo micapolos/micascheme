@@ -13,7 +13,8 @@
     (import
       (only (micascheme) equal? quote)
       (prefix (micascheme) %%)
-      (only (micalang term) application pi-param type)))
+      (only (micalang term) application pi-param type)
+      (only (micalang fx) fx)))
 
   (define-rule-syntax (native x)
     (%native x))
