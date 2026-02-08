@@ -35,12 +35,5 @@
     (negate (+ (double a) b)))
   -40)
 
-(check-mica
-  (let
-    (zero? (native (pi number boolean)          (prim zero? a)))
-    (add   (native (pi number number number) (prim + a b)))
-    (zero? (add 10 20)))
-  #f)
-
 (check-mica (if (zero? 0) "zero" "not-zero") "zero")
 (check-mica (if (zero? 1) "zero" "not-zero") "not-zero")

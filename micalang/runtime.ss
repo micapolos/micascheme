@@ -1,6 +1,5 @@
 (library (micalang runtime)
   (export
-    prim curry
     native app
     type boolean number symbol char string
     = + - < zero?

@@ -3,10 +3,14 @@
   (micalang runtime)
   (prefix (micalang term) %))
 
-(check (equal? (app (app (curry a b %%+) (native 10)) (native 20)) (native 30)))
-
-(check (equal? (prim +) (prim +)))
-(check (equal? (app (app (prim + a b) 2) 3) 5))
+(check
+  (equal?
+    (app
+      (app
+        (lambda a (lambda b (native (%%+ a b))))
+        (native 10))
+      (native 20))
+    (native 30)))
 
 (check (equal? (app zero? (native 0)) #t))
 
