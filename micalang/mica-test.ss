@@ -2,9 +2,9 @@
 
 (check-mica
   (let
-    (number->string (native (pi number string)           (curry a %%number->string)))
-    (string-length  (native (pi string number)           (curry a %%string-length)))
-    (string-append  (native (pi string string string)    (curry a b %%string-append)))
+    (number->string (native (pi number string) %%number->string))
+    (string-length  (native (pi string number) %%string-length))
+    (string-append  (native (pi string string string) (%%lambda (a) (%%lambda (b) (%%string-append a b)))))
     (string-append "Hello " (number->string (string-length "foo"))))
   "Hello 3")
 

@@ -6,12 +6,12 @@
 ; === native
 
 (check-compiles
-  (native boolean (prim +))
-  (boolean (native (prim +))))
+  (native boolean foo)
+  (boolean (native foo)))
 
 (check-compiles
-  (native (pi number number number) (curry a b (prim +)))
-  ((pi number number number) (native (curry a b (prim +)))))
+  (native (pi number number number) (%lambda (x) (%lambda (y) (%+ x y))))
+  ((pi number number number) (native (%lambda (x) (%lambda (y) (%+ x y))))))
 
 ; === natives
 
