@@ -9,10 +9,11 @@
     (syntax-case $syntax ()
       ((_ x)
         #`(mica-evaluate
-          (environment '(micalang runtime) '(prefix (scheme) %))
-          (environment '(micalang comptime) '(prefix (scheme) %))
-          `()
-          mica-context
+          (compiler
+            (environment '(micalang runtime) '(prefix (scheme) %))
+            (environment '(micalang comptime) '(prefix (scheme) %))
+            `()
+            mica-context)
           (syntax->datum/annotation #'x)))))
 
   (define-rule-syntax (check-mica in out)
