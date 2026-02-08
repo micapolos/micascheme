@@ -1,7 +1,7 @@
 (library (micalang compiler)
   (export
     compiler compiler?
-    compiler-default
+    compiler-recurse
     compiler-default-reify
     compiler-default-term-equal?
     compiler-runtime-environment
@@ -16,6 +16,7 @@
     compiler-compile-default
     compiler-evaluate
 
+    default-compiler-recurse
     default-compiler-reify
     default-compiler-term-equal?
 
@@ -29,11 +30,11 @@
     (micalang env)
     (micalang context))
 
-  (data (compiler default default-reify default-term-equal? runtime-environment comptime-environment env context))
+  (data (compiler recurse default-reify default-term-equal? runtime-environment comptime-environment env context))
 
   (define (empty-compiler $runtime-environment $comptime-environment)
     (compiler
-      compiler-compile-default
+      default-compiler-recurse
       default-compiler-reify
       default-compiler-term-equal?
       $runtime-environment
@@ -41,12 +42,8 @@
       '()
       '()))
 
-  (define (compiler-compile-default $compiler $syntax)
-    (syntax-case $syntax ()
-      (id (symbol? (datum id))
-        (syntax-error #'id "undefined"))
-      (other
-        (syntax-error #'other))))
+  (define (default-compiler-recurse $compiler $term)
+    (compiler-compile-default $compiler $term))
 
   (define (default-compiler-reify $default $term)
     (throw 'reify))
@@ -62,7 +59,7 @@
 
   (define (compiler-push $compiler $id $value $type)
     (compiler
-      (compiler-default $compiler)
+      (compiler-recurse $compiler)
       (compiler-default-reify $compiler)
       (compiler-default-term-equal? $compiler)
       (compiler-runtime-environment $compiler)
@@ -113,6 +110,9 @@
             (compiler-reify $compiler $expected-type))))))
 
   (define (compiler-compile $compiler $term)
+    ((compiler-recurse $compiler) $compiler $term))
+
+  (define (compiler-compile-default $compiler $term)
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
@@ -160,7 +160,7 @@
               ($type? (compiler-type-ref? $compiler (datum id)))
               (if $type?
                 (compiled $type? (compiler-reify $compiler $type?) (datum id))
-                ((compiler-default $compiler) $compiler #'id))))
+                (syntax-error #'id "undefined"))))
 
           ((native t v)
             (lets
@@ -172,7 +172,7 @@
                 `(native ,#'v))))
 
           ((pi out)
-            (compiler-compile $compiler #'out))
+            (compiler-compile-default $compiler #'out))
 
           ((pi (id in) out)
             (lets
@@ -199,11 +199,11 @@
                 `(pi ,$in ,$out))))
 
           ((pi x xs ... body)
-            (compiler-compile $compiler
+            (compiler-compile-default $compiler
               `(pi ,#'x (pi ,@#'(xs ...) ,#'body))))
 
           ((let body)
-            (compiler-compile $compiler #'body))
+            (compiler-compile-default $compiler #'body))
 
           ((let (id x) body)
             (lets
@@ -222,17 +222,17 @@
                 `(let (,$symbol ,$x) ,$body))))
 
           ((let (id param params ... lambda-body) body)
-            (compiler-compile $compiler
+            (compiler-compile-default $compiler
               `(let
                 (,#'id (lambda ,#'param ,@#'(params ...) ,#'lambda-body))
                 ,#'body)))
 
           ((let x xs ... body)
-            (compiler-compile $compiler
+            (compiler-compile-default $compiler
               `(let ,#'x (let ,@#'(xs ...) ,#'body))))
 
           ((lambda body)
-            (compiler-compile $compiler #'body))
+            (compiler-compile-default $compiler #'body))
 
           ((lambda (id t) body)
             (lets
@@ -254,7 +254,7 @@
                 `(lambda ,$symbol ,$body))))
 
           ((lambda x xs ... body)
-            (compiler-compile $compiler
+            (compiler-compile-default $compiler
               `(lambda ,#'x (lambda ,@#'(xs ...) ,#'body))))
 
           ((if cond true false)
@@ -270,7 +270,7 @@
                 `(if ,$cond ,$true ,$false))))
 
           ((fn)
-            (compiler-compile $compiler #'fn))
+            (compiler-compile-default $compiler #'fn))
 
           ((fn arg)
             (lets
@@ -293,11 +293,8 @@
                       (compiler-reify $compiler $other)))))))
 
           ((fn arg args ...)
-            (compiler-compile $compiler
-              `((,#'fn ,#'arg) ,@#'(args ...))))
-
-          (other
-            ((compiler-default $compiler) $compiler #'other))))))
+            (compiler-compile-default $compiler
+              `((,#'fn ,#'arg) ,@#'(args ...))))))))
 
   (define check-runtime-environment
     (environment '(micalang runtime)))
@@ -310,7 +307,7 @@
       ($compiled
         (compiler-compile
           (compiler
-            compiler-compile-default
+            default-compiler-recurse
             default-compiler-reify
             default-compiler-term-equal?
             check-runtime-environment
@@ -331,7 +328,7 @@
       (raises
         (compiler-compile
           (compiler
-            compiler-compile-default
+            default-compiler-recurse
             default-compiler-reify
             default-compiler-term-equal?
             check-runtime-environment

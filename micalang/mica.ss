@@ -11,7 +11,7 @@
       ((_ x)
         #`(compiler-evaluate
           (compiler
-            compiler-compile-default
+            default-compiler-recurse
             default-compiler-reify
             default-compiler-term-equal?
             (environment '(micalang runtime) '(prefix (scheme) %))
