@@ -1,5 +1,5 @@
 (library (micalang reify)
-  (export fallback-reify reify check-reify)
+  (export default-reify reify check-reify)
   (import
     (micalang base)
     (micalang term))
@@ -8,12 +8,12 @@
     (string->symbol (format "v~a" $index)))
 
   (define (reify $term)
-    (fallback-reify
-      (lambda ($fallback $term)
+    (default-reify
+      (lambda ($default $term)
         (throw 'dupa))
       $term))
 
-  (define (fallback-reify $fallback $term)
+  (define (default-reify $default $term)
     (switch $term
       ((type? _) 'type)
       ((native? $native)
@@ -26,37 +26,37 @@
           `(lambda (,$symbol type) .
             ,(lets
               ($body (abstraction-apply $abstraction (native $symbol)))
-              ($reified-body (fallback-reify $fallback $body))
+              ($reified-body (default-reify $default $body))
               (if (abstraction? $body)
                 (cdr $reified-body)
                 `(,$reified-body))))))
       ((application? $application)
         (lets
           ($lhs (application-lhs $application))
-          ($reified-lhs (fallback-reify $fallback (application-lhs $application)))
-          ($reified-rhs (fallback-reify $fallback (application-rhs $application)))
+          ($reified-lhs (default-reify $default (application-lhs $application)))
+          ($reified-rhs (default-reify $default (application-rhs $application)))
           (if (application? $lhs)
             (append $reified-lhs `(,$reified-rhs))
             `(,$reified-lhs ,$reified-rhs))))
       ((conditional? $conditional)
         `(if
-          ,(fallback-reify $fallback (conditional-cond $conditional))
-          ,(fallback-reify $fallback (conditional-true $conditional))
-          ,(fallback-reify $fallback (conditional-false $conditional))))
+          ,(default-reify $default (conditional-cond $conditional))
+          ,(default-reify $default (conditional-true $conditional))
+          ,(default-reify $default (conditional-false $conditional))))
       ((pi? $pi)
         (lets
           ($symbol? (pi-symbol? $pi))
-          ($reified-param (fallback-reify $fallback (pi-param $pi)))
+          ($reified-param (default-reify $default (pi-param $pi)))
           `(pi
             ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param) .
             ,(lets
               ($body (pi-apply $pi (native $symbol?)))
-              ($reified-body (fallback-reify $fallback $body))
+              ($reified-body (default-reify $default $body))
               (if (pi? $body)
                 (cdr $reified-body)
                 `(,$reified-body))))))
       ((else $other)
-        ($fallback $fallback $other))))
+        ($default $default $other))))
 
   (define-rule-syntax (check-reify in out)
     (check (equal? (reify in) `out)))

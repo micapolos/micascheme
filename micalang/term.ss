@@ -10,7 +10,7 @@
 
     term-apply
     apply-term
-    term-equal?)
+    default-term-equal? term-equal?)
   (import (micalang base))
 
   (data type)
@@ -38,6 +38,12 @@
         (application $other $rhs))))
 
   (define (term-equal? $lhs $rhs)
+    (default-term-equal?
+      (lambda ($default $lhs $rhs) #f)
+      $lhs
+      $rhs))
+
+  (define (default-term-equal? $default $lhs $rhs)
     (switch-exhaustive $lhs
       ((type? _)
         (switch? $rhs
@@ -57,40 +63,40 @@
       ((abstraction? $lhs-abstraction)
         (switch? $rhs
           ((abstraction? $rhs-abstraction)
-            (term-equal?
+            (default-term-equal? $default
               (abstraction-apply $lhs-abstraction (variable (abstraction-symbol $lhs-abstraction)))
               (abstraction-apply $rhs-abstraction (variable (abstraction-symbol $lhs-abstraction)))))))
       ((application? $lhs-application)
         (switch? $rhs
           ((application? $rhs-application)
             (and
-              (term-equal?
+              (default-term-equal? $default
                 (application-lhs $lhs-application)
                 (application-lhs $rhs-application))
-              (term-equal?
+              (default-term-equal? $default
                 (application-rhs $lhs-application)
                 (application-rhs $rhs-application))))))
       ((pi? $lhs-pi)
         (switch? $rhs
           ((pi? $rhs-pi)
             (and
-              (term-equal?
+              (default-term-equal? $default
                 (pi-param $lhs-pi)
                 (pi-param $rhs-pi))
-              (term-equal?
+              (default-term-equal? $default
                 (pi-apply $lhs-pi (variable (pi-symbol? $lhs-pi)))
                 (pi-apply $rhs-pi (variable (pi-symbol? $lhs-pi))))))))
       ((conditional? $lhs-conditional)
         (switch? $rhs
           ((conditional? $rhs-conditional)
             (and
-              (term-equal?
+              (default-term-equal? $default
                 (conditional-cond $lhs-conditional)
                 (conditional-cond $rhs-conditional))
-              (term-equal?
+              (default-term-equal? $default
                 (conditional-true $lhs-conditional)
                 (conditional-true $rhs-conditional))
-              (term-equal?
+              (default-term-equal? $default
                 (conditional-false $lhs-conditional)
                 (conditional-false $rhs-conditional))))))))
 

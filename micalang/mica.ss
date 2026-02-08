@@ -11,7 +11,7 @@
       ((_ x)
         #`(compiler-evaluate
           (compiler
-            compiler-compile-fallback
+            compiler-compile-default
             (environment '(micalang runtime) '(prefix (scheme) %))
             (environment '(micalang comptime) '(prefix (scheme) %))
             mica-env

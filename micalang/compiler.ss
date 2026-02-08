@@ -3,7 +3,7 @@
     compiler compiler?
     compiler-runtime-environment
     compiler-comptime-environment
-    compiler-fallback
+    compiler-default
     compiler-env
     compiler-context
 
@@ -11,7 +11,7 @@
     compiler-push
 
     compiler-compile
-    compiler-compile-fallback
+    compiler-compile-default
     compiler-evaluate
 
     check-compiles
@@ -24,17 +24,17 @@
     (micalang env)
     (micalang context))
 
-  (data (compiler fallback runtime-environment comptime-environment env context))
+  (data (compiler default runtime-environment comptime-environment env context))
 
   (define (empty-compiler $runtime-environment $comptime-environment)
     (compiler
-      compiler-compile-fallback
+      compiler-compile-default
       $runtime-environment
       $comptime-environment
       '()
       '()))
 
-  (define (compiler-compile-fallback $compiler $syntax)
+  (define (compiler-compile-default $compiler $syntax)
     (syntax-case $syntax ()
       (id (symbol? (datum id))
         (syntax-error #'id "undefined"))
@@ -43,7 +43,7 @@
 
   (define (compiler-push $compiler $id $value $type)
     (compiler
-      (compiler-fallback $compiler)
+      (compiler-default $compiler)
       (compiler-runtime-environment $compiler)
       (compiler-comptime-environment $compiler)
       (push (compiler-env $compiler) (cons $id $value))
@@ -139,7 +139,7 @@
               ($type? (compiler-type-ref? $compiler (datum id)))
               (if $type?
                 (compiled $type? (reify $type?) (datum id))
-                ((compiler-fallback $compiler) $compiler #'id))))
+                ((compiler-default $compiler) $compiler #'id))))
 
           ((native t v)
             (lets
@@ -276,7 +276,7 @@
               `((,#'fn ,#'arg) ,@#'(args ...))))
 
           (other
-            ((compiler-fallback $compiler) $compiler #'other))))))
+            ((compiler-default $compiler) $compiler #'other))))))
 
   (define check-runtime-environment
     (environment '(micalang runtime)))
@@ -289,7 +289,7 @@
       ($compiled
         (compiler-compile
           (compiler
-            compiler-compile-fallback
+            compiler-compile-default
             check-runtime-environment
             check-comptime-environment
             mica-env
@@ -308,7 +308,7 @@
       (raises
         (compiler-compile
           (compiler
-            compiler-compile-fallback
+            compiler-compile-default
             check-runtime-environment
             check-comptime-environment
             mica-env
