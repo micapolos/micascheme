@@ -1,5 +1,6 @@
 (library (micalang term)
   (export
+    type type?
     native native? native-ref
     variable variable? variable-symbol
     abstraction abstraction? abstraction-symbol abstraction-procedure abstraction-apply
@@ -12,6 +13,7 @@
     term-equal?)
   (import (micalang base))
 
+  (data type)
   (data (native ref))
   (data (variable symbol))
   (data (abstraction symbol procedure))
@@ -37,6 +39,9 @@
 
   (define (term-equal? $lhs $rhs)
     (switch-exhaustive $lhs
+      ((type? _)
+        (switch? $rhs
+          ((type? _) #t)))
       ((native? $lhs-native)
         (switch? $rhs
           ((native? $rhs-native)

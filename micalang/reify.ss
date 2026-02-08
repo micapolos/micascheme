@@ -9,6 +9,7 @@
 
   (define (reify $term)
     (switch-exhaustive $term
+      ((type? _) 'type)
       ((native? $native)
         (native-ref $native))
       ((variable? $variable)

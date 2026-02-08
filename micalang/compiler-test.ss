@@ -3,6 +3,10 @@
   (micalang term)
   (micalang compiler))
 
+; === type
+
+(check-compiles type (type type))
+
 ; === native
 
 (check-compiles

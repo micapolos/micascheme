@@ -58,7 +58,12 @@
     (switch $term
       ((typed? $typed) $typed)
       ((else _)
-        (syntax-case $term (quote native lambda pi let if)
+        (syntax-case $term (type quote native lambda pi let if)
+          (type
+            (typed
+              type
+              'type
+              `type))
           (b
             (boolean? (datum b))
             (typed

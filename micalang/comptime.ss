@@ -2,7 +2,7 @@
   (export
     curry
     native app lambda let if
-    type boolean number symbol char string
+    boolean number symbol char string
     = + - < zero?
     pi)
   (import
@@ -13,7 +13,7 @@
     (import
       (only (micascheme) equal? quote)
       (prefix (micascheme) %%)
-      (only (micalang term) application pi-param)))
+      (only (micalang term) application pi-param type)))
 
   (define-rule-syntax (native x)
     (%native x))
@@ -88,7 +88,6 @@
         (application (native $other) $rhs))))
 
   (define-prims
-    (type    'type)
     (boolean 'boolean)
     (number  'number)
     (symbol  'symbol)

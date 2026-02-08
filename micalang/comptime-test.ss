@@ -3,7 +3,7 @@
   (prefix (micalang term) %)
   (micalang comptime))
 
-(check (equal? type (%native 'type)))
+(check (equal? type type))
 (check (equal? boolean (%native 'boolean)))
 (check (equal? number (%native 'number)))
 (check (equal? symbol (%native 'symbol)))

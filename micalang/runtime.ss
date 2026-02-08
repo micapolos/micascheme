@@ -1,7 +1,7 @@
 (library (micalang runtime)
   (export
     native app
-    type boolean number symbol char string
+    boolean number symbol char string
     = + - < zero?
     list let lambda pi app if)
   (import
@@ -56,7 +56,6 @@
     (%if cond true false))
 
   (define-currys
-    (type    'type)
     (boolean 'boolean)
     (number  'number)
     (symbol  'symbol)
