@@ -2,7 +2,7 @@
   (export mica-env)
   (import
     (micalang base)
-    (micalang typed)
+    (micalang compiled)
     (prefix (micalang comptime) %))
 
   (define mica-env

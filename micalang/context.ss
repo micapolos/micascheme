@@ -2,7 +2,7 @@
   (export mica-context)
   (import
     (only (micalang base) cons define quote quasiquote unquote define-rules-syntax define-rule-syntax quote quasiquote unquote ...)
-    (micalang typed)
+    (micalang compiled)
     (micalang comptime))
 
   (define-rules-syntax

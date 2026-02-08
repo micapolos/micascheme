@@ -5,47 +5,47 @@
 
 ; === type
 
-(check-compiles type (typed type type type))
+(check-compiles type (compiled type type type))
 
 ; === native
 
 (check-compiles
   (native boolean foo)
-  (typed boolean boolean (native foo)))
+  (compiled boolean boolean (native foo)))
 
 (check-compiles
   (native (pi number number number) (%lambda (x) (%lambda (y) (%+ x y))))
-  (typed
+  (compiled
     (pi number number number)
     (pi number (pi number number))
     (native (%lambda (x) (%lambda (y) (%+ x y))))))
 
 ; === natives
 
-(check-compiles #f (typed boolean boolean (native #f)))
-(check-compiles #t (typed boolean boolean (native #t)))
-(check-compiles 123 (typed number number (native 123)))
-(check-compiles 3.14 (typed number number (native 3.14)))
-(check-compiles 'foo (typed symbol symbol (native 'foo)))
-(check-compiles #\a (typed char char (native #\a)))
-(check-compiles "foo" (typed string string (native "foo")))
+(check-compiles #f (compiled boolean boolean (native #f)))
+(check-compiles #t (compiled boolean boolean (native #t)))
+(check-compiles 123 (compiled number number (native 123)))
+(check-compiles 3.14 (compiled number number (native 3.14)))
+(check-compiles 'foo (compiled symbol symbol (native 'foo)))
+(check-compiles #\a (compiled char char (native #\a)))
+(check-compiles "foo" (compiled string string (native "foo")))
 
 ; === globals
 
-(check-compiles boolean (typed type type boolean))
-(check-compiles number (typed type type number))
-(check-compiles string (typed type type string))
+(check-compiles boolean (compiled type type boolean))
+(check-compiles number (compiled type type number))
+(check-compiles string (compiled type type string))
 
 (check-compiles
   zero?
-  (typed
+  (compiled
     (pi number boolean)
     (pi number boolean)
     zero?))
 
 (check-compiles
   <
-  (typed
+  (compiled
     (pi number number boolean)
     (pi number number boolean)
     <))
@@ -54,21 +54,21 @@
 
 (check-compiles
   (inc 10)
-  (typed
+  (compiled
     number
     number
     (app inc (native 10))))
 
 (check-compiles
   ((+ 10) 20)
-  (typed
+  (compiled
     number
     number
     (app (app + (native 10)) (native 20))))
 
 (check-compiles
   (+ 10 20)
-  (typed
+  (compiled
     number
     number
     (app (app + (native 10)) (native 20))))
@@ -81,15 +81,15 @@
 
 (check-compiles
   (let 10)
-  (typed number number (native 10)))
+  (compiled number number (native 10)))
 
 (check-compiles
   (let (x 10) (inc x))
-  (typed number number (let (x (native 10)) (app inc x))))
+  (compiled number number (let (x (native 10)) (app inc x))))
 
 (check-compiles
   (let (x 10) (y 20) (< x y))
-  (typed
+  (compiled
     boolean
     boolean
     (let (x (native 10))
@@ -100,7 +100,7 @@
   (let
     (zwiększ (x number) (+ x 1))
     (zwiększ 10))
-  (typed
+  (compiled
     number
     number
     (let
@@ -111,39 +111,39 @@
 
 (check-compiles
   (lambda 12)
-  (typed number number (native 12)))
+  (compiled number number (native 12)))
 
 (check-compiles
   (lambda (i number) i)
-  (typed
+  (compiled
     (pi (i number) number)
     (pi (i number) number)
     (lambda i i)))
 
 (check-compiles
   (lambda (i number) (j number) (+ i j))
-  (typed
+  (compiled
     (pi (i number) (j number) number)
     (pi (i number) (pi (j number) number))
     (lambda i (lambda j (app (app + i) j)))))
 
 (check-compiles
   inc
-  (typed
+  (compiled
     (pi number number)
     (pi number number)
     inc))
 
 (check-compiles
   (inc 1)
-  (typed
+  (compiled
     number
     number
     (app inc (native 1))))
 
 (check-compiles
   (lambda (t type) t)
-  (typed
+  (compiled
     (pi (t type) type)
     (pi (t type) type)
     (lambda t t)))
@@ -152,21 +152,21 @@
 
 (check-compiles
   (pi number boolean)
-  (typed
+  (compiled
     type
     type
     (pi number boolean)))
 
 (check-compiles
   (pi (x type) x)
-  (typed
+  (compiled
     type
     type
     (pi (x type) x)))
 
 (check-compiles
   (pi (x type) (y type) x)
-  (typed
+  (compiled
     type
     type
     (pi (x type) (pi (y type) x))))
@@ -175,7 +175,7 @@
 
 (check-compiles
   (if (zero? 0) "zero" "not-zero")
-  (typed
+  (compiled
     string
     string
     (if (app zero? (native 0)) (native "zero") (native "not-zero"))))
@@ -189,7 +189,7 @@
   (let
     (identity (lambda (t type) (lambda (x t) t)))
     ((identity number) 10))
-  (typed
+  (compiled
     type
     type
     (let
