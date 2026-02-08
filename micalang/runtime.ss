@@ -1,19 +1,18 @@
 (library (micalang runtime)
   (export
     prim curry
-    literal app
+    native app
     type boolean number symbol char string
     = + - < zero?
     list let lambda pi app if)
   (import
     (except (micalang base) = + - < zero? list lambda app let if string)
     (prefix (only (micalang base) let lambda app if zero? = + - <) %)
-    (rename (micalang term) (pi %pi)))
+    (rename (micalang term) (pi %pi) (native %native)))
   (export
     (import
       (only (micascheme) equal? quote)
-      (prefix (micascheme) %%)
-      (only (micalang term) native)))
+      (prefix (micascheme) %%)))
 
   (define-rule-syntax (let (id x) ... body)
     (%let ((id x) ...) body))
@@ -52,7 +51,7 @@
     ((app lhs rhs)
       (%app lhs rhs)))
 
-  (define-rule-syntax (literal x) x)
+  (define-rule-syntax (native x) x)
 
   (define-rule-syntax (if cond true false)
     (%if cond true false))

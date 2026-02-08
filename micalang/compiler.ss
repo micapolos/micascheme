@@ -64,35 +64,35 @@
             (typed
               (eval 'boolean $comptime-environment)
               'boolean
-              `(literal ,(datum b))))
+              `(native ,(datum b))))
 
           (n
             (number? (datum n))
             (typed
               (eval 'number $comptime-environment)
               'number
-              `(literal ,(datum n))))
+              `(native ,(datum n))))
 
           (ch
             (char? (datum ch))
             (typed
               (eval 'char $comptime-environment)
               'char
-              `(literal ,(datum ch))))
+              `(native ,(datum ch))))
 
           (s
             (string? (datum s))
             (typed
               (eval 'string $comptime-environment)
               'string
-              `(literal ,(datum s))))
+              `(native ,(datum s))))
 
           ((quote s)
             (symbol? (datum s))
             (typed
               (eval 'symbol $comptime-environment)
               'symbol
-              `(literal ',(datum s))))
+              `(native ',(datum s))))
 
           (id
             (symbol? (datum id))
@@ -114,7 +114,7 @@
               (typed
                 $t-value
                 (typed-ref $typed-t)
-                `(literal ,#'v))))
+                `(native ,#'v))))
 
           ((pi out)
             (mica-compile $runtime-environment $comptime-environment $env $context #'out))

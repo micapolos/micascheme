@@ -1,22 +1,22 @@
 (library (micalang comptime)
   (export
     prim curry
-    literal app lambda let if
+    native app lambda let if
     type boolean number symbol char string
     = + - < zero?
     pi)
   (import
     (except (micalang base) = + - < zero? list app lambda let string if)
     (prefix (only (micalang base) lambda let if = + - < zero?) %)
-    (rename (micalang term) (pi %pi)))
+    (rename (micalang term) (pi %pi) (native %native)))
   (export
     (import
       (only (micascheme) equal? quote)
       (prefix (micascheme) %%)
-      (only (micalang term) native application pi-param)))
+      (only (micalang term) application pi-param)))
 
-  (define-rule-syntax (literal x)
-    (native x))
+  (define-rule-syntax (native x)
+    (%native x))
 
   (define-rule-syntax (let (id x) body)
     (%let ((id x)) body))
@@ -27,9 +27,9 @@
 
   (define-rules-syntax
     ((prim id)
-      (native ($primitive 3 id)))
+      (%native ($primitive 3 id)))
     ((prim id x)
-      (lambda x (term-apply (native ($primitive 3 id)) x)))
+      (lambda x (term-apply (%native ($primitive 3 id)) x)))
     ((prim id x y)
       (lambda x
         (lambda y
