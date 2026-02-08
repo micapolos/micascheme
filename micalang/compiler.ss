@@ -3,6 +3,7 @@
     compiler compiler?
     compiler-runtime-environment
     compiler-comptime-environment
+    compiler-fallback
     compiler-env
     compiler-context
 
@@ -23,15 +24,21 @@
     (micalang env)
     (micalang context))
 
-  (data (compiler runtime-environment comptime-environment env context))
+  (data (compiler runtime-environment comptime-environment fallback env context))
 
   (define (empty-compiler $runtime-environment $comptime-environment)
-    (compiler $runtime-environment $comptime-environment '() '()))
+    (compiler
+      $runtime-environment
+      $comptime-environment
+      (lambda ($compiler $syntax) (syntax-error $syntax))
+      '()
+      '()))
 
   (define (compiler-push $compiler $id $value $type)
     (compiler
       (compiler-runtime-environment $compiler)
       (compiler-comptime-environment $compiler)
+      (compiler-fallback $compiler)
       (push (compiler-env $compiler) (cons $id $value))
       (push (compiler-context $compiler) (cons $id $type))))
 
@@ -261,7 +268,10 @@
 
           ((fn arg args ...)
             (compiler-compile $compiler
-              `((,#'fn ,#'arg) ,@#'(args ...))))))))
+              `((,#'fn ,#'arg) ,@#'(args ...))))
+
+          (other
+            ((compiler-fallback $compiler) $compiler #'other))))))
 
   (define check-runtime-environment
     (environment '(micalang runtime)))
@@ -276,6 +286,7 @@
           (compiler
             check-runtime-environment
             check-comptime-environment
+            (lambda ($compiler $syntax) (syntax-error $syntax))
             mica-env
             mica-context)
           'in))
@@ -294,6 +305,7 @@
           (compiler
             check-runtime-environment
             check-comptime-environment
+            (lambda ($compiler $syntax) (syntax-error $syntax))
             mica-env
             mica-context)
           'in))))

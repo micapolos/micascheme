@@ -13,6 +13,7 @@
           (compiler
             (environment '(micalang runtime) '(prefix (scheme) %))
             (environment '(micalang comptime) '(prefix (scheme) %))
+            (lambda ($compiler $syntax) (syntax-error $syntax))
             mica-env
             mica-context)
           (syntax->datum/annotation #'x)))))
