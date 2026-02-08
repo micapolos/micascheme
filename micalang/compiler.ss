@@ -267,7 +267,10 @@
           'in))
       (check
         (equal?
-          `(,(reify (typed-type $typed)) ,(typed-ref $typed))
+          `(typed
+            ,(reify (typed-type $typed))
+            ,(typed-type-term $typed)
+            ,(typed-ref $typed))
           'out))))
 
   (define-rule-syntax (check-compile-raises in)
