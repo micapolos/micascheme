@@ -225,14 +225,14 @@
               (switch $fn-type
                 ((pi? $pi)
                   (lets
-                    ($fn (typed-ref $typed-fn))
+                    ($fn-term (typed-ref $typed-fn))
                     ($param-type (pi-param $pi))
-                    ($arg (mica-compile-typed $runtime-environment $comptime-environment $env $context $param-type #'arg))
-                    ($arg-value (evaluate-comptime $comptime-environment $env $context $arg))
+                    ($arg-term (mica-compile-typed $runtime-environment $comptime-environment $env $context $param-type #'arg))
+                    ($arg-value (evaluate-comptime $comptime-environment $env $context $arg-term))
                     (typed
                       (pi-apply $pi $arg-value)
-                      `(app ,(typed-type-term $typed-fn) ,$arg)
-                      `(app ,$fn ,$arg))))
+                      `(app ,(typed-type-term $typed-fn) ,$arg-term)
+                      `(app ,$fn-term ,$arg-term))))
                 ((else $other)
                   (syntax-error #'fn
                     (format "invalid type ~s, expected pi, in"
