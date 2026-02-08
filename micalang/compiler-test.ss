@@ -15,23 +15,23 @@
 
 ; === literals
 
-(check-compiles #f ( boolean (literal #f)))
-(check-compiles #t ( boolean (literal #t)))
-(check-compiles 123 ( number (literal 123)))
-(check-compiles 3.14 ( number (literal 3.14)))
-(check-compiles 'foo ( symbol (literal 'foo)))
-(check-compiles #\a ( char (literal #\a)))
-(check-compiles "foo" ( string (literal "foo")))
+(check-compiles #f (boolean (literal #f)))
+(check-compiles #t (boolean (literal #t)))
+(check-compiles 123 (number (literal 123)))
+(check-compiles 3.14 (number (literal 3.14)))
+(check-compiles 'foo (symbol (literal 'foo)))
+(check-compiles #\a (char (literal #\a)))
+(check-compiles "foo" (string (literal "foo")))
 
 ; === globals
 
-(check-compiles type ( type type))
-(check-compiles boolean ( type boolean))
-(check-compiles number ( type number))
-(check-compiles string ( type string))
+(check-compiles type (type type))
+(check-compiles boolean (type boolean))
+(check-compiles number (type number))
+(check-compiles string (type string))
 
-(check-compiles zero? ( (pi number boolean) zero?))
-(check-compiles < ( (pi number number boolean) <))
+(check-compiles zero? ((pi number boolean) zero?))
+(check-compiles < ((pi number number boolean) <))
 
 ; === application
 
@@ -109,7 +109,7 @@
 
 (check-compiles
   (pi number boolean)
-  ( type (pi number boolean)))
+  (type (pi number boolean)))
 
 (check-compiles
   (pi (x type) x)
