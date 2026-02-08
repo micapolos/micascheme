@@ -4,9 +4,6 @@
     literal app lambda let if
     type boolean number symbol char string
     = + - < zero?
-    index first-index last-index
-    array
-    list
     pi)
   (import
     (except (micalang base) = + - < zero? list app lambda let string if)
@@ -93,10 +90,6 @@
   (data %pi?)       ; #t for pi, #f for lambda
   (data %pi-param)  ; pi param
 
-  (define (index n) (application index n))
-  (define (%first-index n) 0)
-  (define (%last-index  n) (%- n 1))
-
   (define array
     (lambda n (application (native array) n)))
 
@@ -113,10 +106,7 @@
     (= x y %=)
     (+ x y %+)
     (- x y %-)
-    (< x y %<)
-
-    (first-index n %first-index)
-    (last-index  n %last-index))
+    (< x y %<))
 
   (define list
     (lambda x (application (native list) x)))

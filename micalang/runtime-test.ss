@@ -34,9 +34,6 @@
       ((app + x) y))
     (literal 30)))
 
-(check (equal? (first-index 16) 0))
-(check (equal? (last-index 16) 15))
-
 (check
   (equal?
     (if (literal #t) (literal 10) (literal 20))

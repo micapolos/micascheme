@@ -53,9 +53,6 @@
 (check (equal? (pi-param (pi (x type) x)) type))
 (check (equal? (app (pi (x type) x) number) number))
 
-(check (equal? (pi-param (pi (x type) (list x))) type))
-(check (equal? (app (pi (x type) (app list x)) number) (app list number)))
-
 (check
   (equal?
     (if (literal #t) (literal 10) (literal 20))
@@ -72,27 +69,3 @@
       (let (y (literal 20))
         (app (app + x) y)))
     (%native 30)))
-
-; index type
-(check
-  (equal?
-    (app index (literal 16))
-    (application (native index) (%native 16))))
-
-; array type
-(check
-  (equal?
-    (app array (literal 16))
-    (application (native array) (%native 16))))
-
-; start index
-(check
-  (equal?
-    (app first-index (literal 16))
-    (%native 0)))
-
-; end index
-(check
-  (equal?
-    (app last-index (literal 16))
-    (%native 15)))

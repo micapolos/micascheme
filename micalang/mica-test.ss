@@ -39,9 +39,6 @@
     (negate (+ (double a) b)))
   -40)
 
-(check-mica (first-index 16) 0)
-(check-mica (last-index 16) 15)
-
 (check-mica
   (let
     (zero? (native (pi number boolean)          (prim zero? a)))

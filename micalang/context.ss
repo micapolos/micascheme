@@ -28,14 +28,6 @@
       (=      (pi number (pi number number)))
       (+      (pi number (pi number number)))
       (-      (pi number (pi number number)))
-      (<      (pi number (pi number boolean)))
-
-      (list   (pi (x type) x))
-
-      (index        (pi (n number) type))
-      (first-index  (pi (n number) (index n)))
-      (last-index   (pi (n number) (index n)))
-
-      (array        (pi (n number) type))))
+      (<      (pi number (pi number boolean)))))
 )
 

@@ -4,8 +4,7 @@
     literal app
     type boolean number symbol char string
     = + - < zero?
-    list let lambda pi app if
-    first-index last-index)
+    list let lambda pi app if)
   (import
     (except (micalang base) = + - < zero? list lambda app let if string)
     (prefix (only (micalang base) let lambda app if zero? = + - <) %)
@@ -54,9 +53,6 @@
 
   (define-rule-syntax (literal x) x)
 
-  (define (%first-index _) 0)
-  (define (%last-index n) (%- n 1))
-
   (define-rule-syntax (if cond true false)
     (%if cond true false))
 
@@ -73,9 +69,7 @@
     (= x y %=)
     (+ x y %+)
     (- x y %-)
-    (< x y %<)
-    (first-index n %first-index)
-    (last-index  n %last-index))
+    (< x y %<))
 
   (define list (lambda x (application list x)))
 )
