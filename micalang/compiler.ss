@@ -214,11 +214,7 @@
                 (pi $symbol $t-value
                   (lambda ($x)
                     (compiler-evaluate-comptime
-                      (compiler
-                        (compiler-runtime-environment $compiler)
-                        (compiler-comptime-environment $compiler)
-                        (push (compiler-env $compiler) (cons $symbol $x))
-                        (compiler-context $body-compiler))
+                      (compiler-push $compiler $symbol $x $t-value)
                       (compiled-type-term $compiled-body))))
                 `(pi (,$symbol ,(compiled-ref $compiled-t))
                   ,(compiled-type-term $compiled-body))
