@@ -31,7 +31,7 @@
           ($symbol? (abstraction-symbol? $abstraction))
           ($reified-param (default-reify $default (abstraction-param $abstraction)))
           `(lambda
-            ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param) .
+            ,(if $symbol? `(val ,$symbol? ,$reified-param) $reified-param) .
             ,(lets
               ($body (abstraction-apply $abstraction (native $symbol?)))
               ($reified-body (default-reify $default $body))
@@ -56,7 +56,7 @@
           ($symbol? (pi-symbol? $pi))
           ($reified-param (default-reify $default (pi-param $pi)))
           `(pi
-            ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param) .
+            ,(if $symbol? `(val ,$symbol? ,$reified-param) $reified-param) .
             ,(lets
               ($body (pi-apply $pi (native $symbol?)))
               ($reified-body (default-reify $default $body))

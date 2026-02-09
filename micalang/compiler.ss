@@ -117,7 +117,7 @@
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
-        (syntax-case $term (type quote native lambda pi let if macro)
+        (syntax-case $term (val type quote native lambda pi let if macro)
           (type (compiled type 'type 'type))
 
           (b
@@ -182,6 +182,9 @@
                 (compiled-ref $compiled-t)
                 `(native ,(datum v)))))
 
+          ((native . _)
+            (syntax-error $term))
+
           ((pi out)
             (compiler-compile-default $compiler #'out))
 
@@ -208,10 +211,13 @@
             (compiler-compile-default $compiler
               `(pi ,#'x (pi ,@#'(xs ...) ,#'body))))
 
+          ((pi . _)
+            (syntax-error $term))
+
           ((let body)
             (compiler-compile-default $compiler #'body))
 
-          ((let (id x) body)
+          ((let (val id x) body)
             (lets
               ($symbol (datum id))
               ($compiled-x (compiler-compile $compiler #'x))
@@ -227,15 +233,18 @@
                 (compiled-type-term $compiled-body)
                 `(let (,$symbol ,$x) ,$body))))
 
-          ((let (id param params ... lambda-body) body)
+          ((let (val id param params ... lambda-body) body)
             (compiler-compile-default $compiler
               `(let
-                (,#'id (lambda ,#'param ,@#'(params ...) ,#'lambda-body))
+                (val ,#'id (lambda ,#'param ,@#'(params ...) ,#'lambda-body))
                 ,#'body)))
 
           ((let x xs ... body)
             (compiler-compile-default $compiler
               `(let ,#'x (let ,@#'(xs ...) ,#'body))))
+
+          ((let . _)
+            (syntax-error $term))
 
           ((lambda body)
             (compiler-compile-default $compiler #'body))
@@ -268,6 +277,9 @@
             (compiler-compile-default $compiler
               `(lambda ,#'x (lambda ,@#'(xs ...) ,#'body))))
 
+          ((lambda . _)
+            (syntax-error $term))
+
           ((if cond true false)
             (lets
               ($cond (compiler-compile-typed $compiler (eval 'boolean (compiler-comptime-environment $compiler)) #'cond))
@@ -280,6 +292,9 @@
                 (compiled-type-term $compiled-true)
                 `(if ,$cond ,$true ,$false))))
 
+          ((if . _)
+            (syntax-error $term))
+
           ((macro (compiler-id term-id) body)
             (and
               (symbol? (datum compiler-id))
@@ -290,6 +305,9 @@
                   `(%%lambda (,#'compiler-id ,#'term-id) ,#'body)))
               (syntax->datum $term)
               `(native #f)))
+
+          ((macro . _)
+            (syntax-error $term))
 
           ((fn)
             (compiler-compile-default $compiler #'fn))
@@ -324,8 +342,8 @@
       (_ (syntax-error #'id "not identifier"))))
 
   (define (compiler-compile-param $compiler $binder)
-    (syntax-case $binder ()
-      ((id type)
+    (syntax-case $binder (val)
+      ((val id type)
         (values (compile-id #'id) (compiler-compile $compiler #'type)))
       (type
         (values #f (compiler-compile $compiler #'type)))))

@@ -2,15 +2,15 @@
 
 (check-mica
   (let
-    (number->string
+    (val number->string
       (native
         (pi number string)
         %%number->string))
-    (string-length
+    (val string-length
       (native
         (pi string number)
         %%string-length))
-    (string-append
+    (val string-append
       (native
         (pi string string string)
         (%%lambda (a) (%%lambda (b) (%%string-append a b)))))
@@ -29,20 +29,20 @@
 
 (check-mica
   (let
-    (x 10)
-    (y 20)
+    (val x 10)
+    (val y 20)
     (+ x y))
   30)
 
 (check-mica
-  ((lambda (x number) (y number) (+ x y)) 2 3) 5)
+  ((lambda (val x number) (val y number) (+ x y)) 2 3) 5)
 
 (check-mica
   (let
-    (a 10)
-    (b 20)
-    (double (x number) (+ x x))
-    (negate (x number) (- 0 x))
+    (val a 10)
+    (val b 20)
+    (val double (val x number) (+ x x))
+    (val negate (val x number) (- 0 x))
     (negate (+ (double a) b)))
   -40)
 
@@ -56,9 +56,9 @@
 
 (check-mica
   (let
-    (max-fx (native fx (%%most-positive-fixnum)))
-    (min-fx (native fx (%%most-negative-fixnum)))
-    (fx+ (a fx) (b fx) (native fx (%%fx+/wraparound a b)))
-    (fx+1 (a fx) (fx+ a (fx 1)))
+    (val max-fx (native fx (%%most-positive-fixnum)))
+    (val min-fx (native fx (%%most-negative-fixnum)))
+    (val fx+ (val a fx) (val b fx) (native fx (%%fx+/wraparound a b)))
+    (val fx+1 (val a fx) (fx+ a (fx 1)))
     (fx+ max-fx (fx 1)))
   (most-negative-fixnum))
