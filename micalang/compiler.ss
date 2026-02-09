@@ -185,9 +185,9 @@
           ((pi out)
             (compiler-compile-default $compiler #'out))
 
-          ((pi binder out)
+          ((pi param body)
             (lets
-              ((values $symbol? $compiled-in) (compiler-compile-binder $compiler #'binder))
+              ((values $symbol? $compiled-in) (compiler-compile-param $compiler #'param))
               ($in-type (compiled-type $compiled-in))
               ($in-term (compiled-ref $compiled-in))
               ($in-value (compiler-evaluate-comptime $compiler $in-term))
@@ -195,7 +195,7 @@
                 (if $symbol?
                   (compiler-push $compiler $symbol? (variable $symbol?) $in-value)
                   $compiler))
-              ($compiled-out (compiler-compile $compiler #'out))
+              ($compiled-out (compiler-compile $compiler #'body))
               ($out-term (compiled-ref $compiled-out))
               (compiled
                 type
@@ -240,9 +240,9 @@
           ((lambda body)
             (compiler-compile-default $compiler #'body))
 
-          ((lambda binder body)
+          ((lambda param body)
             (lets
-              ((values $symbol? $compiled-t) (compiler-compile-binder $compiler #'binder))
+              ((values $symbol? $compiled-t) (compiler-compile-param $compiler #'param))
               ($t-value (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
               ($body-compiler
                 (if $symbol?
@@ -323,7 +323,7 @@
       (id (symbol? (datum id)) (datum id))
       (_ (syntax-error #'id "not identifier"))))
 
-  (define (compiler-compile-binder $compiler $binder)
+  (define (compiler-compile-param $compiler $binder)
     (syntax-case $binder ()
       ((id type)
         (values (compile-id #'id) (compiler-compile $compiler #'type)))
