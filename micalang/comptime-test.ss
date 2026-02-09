@@ -19,6 +19,11 @@
     (tagged (constant fx) (native 10))
     (%tagged (%constant 'fx) (%native 10))))
 
+(check
+  (equal?
+    ((%macro-procedure (macro ($compiler $term) $term)) 'comp 123)
+    123))
+
 (check (equal? (app zero? (native 0)) (%native #t)))
 
 (check (equal? (app (app = (native 2)) (native 2)) (%native #t)))

@@ -9,6 +9,7 @@
     application application? application-lhs application-rhs
     pi pi? pi-symbol? pi-param pi-procedure pi-apply
     conditional conditional? conditional-cond conditional-true conditional-false
+    macro macro? macro-procedure
 
     term-apply
     apply-term
@@ -24,6 +25,7 @@
   (data (application lhs rhs))
   (data (pi symbol? param procedure))
   (data (conditional cond true false))
+  (data (macro procedure))
 
   (define (apply-term $procedure $rhs)
     (switch $rhs
@@ -125,6 +127,12 @@
               (default-term-equal? $default
                 (conditional-false $lhs-conditional)
                 (conditional-false $rhs-conditional))))))
+      ((macro? $lhs-macro)
+        (switch? $rhs
+          ((macro? $rhs-macro)
+            (eq?
+              (macro-procedure $lhs-macro)
+              (macro-procedure $rhs-macro)))))
       ((else $other)
         ($default $default $lhs $rhs))))
 

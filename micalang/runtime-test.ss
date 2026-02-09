@@ -12,15 +12,9 @@
       (native 20))
     (native 30)))
 
-(check
-  (equal?
-    (constant (this is my (constant)))
-    #f))
-
-(check
-  (equal?
-    (tagged (constant fx) (native 10))
-    10))
+(check (equal? (constant (this is my (constant))) #f))
+(check (equal? (tagged (constant fx) (native 10)) 10))
+(check (equal? (macro ($compiler $term) 'foo) #f))
 
 (check (equal? (app zero? (native 0)) #t))
 

@@ -3,11 +3,11 @@
     native app constant tagged
     boolean number symbol char string
     = + - < zero?
-    list let lambda pi app if)
+    list let lambda macro pi app if)
   (import
     (except (micalang base) = + - < zero? list lambda app let if string)
     (prefix (only (micalang base) let lambda app if zero? = + - <) %)
-    (rename (micalang term) (pi %pi) (native %native) (constant %constant) (tagged %tagged)))
+    (rename (micalang term) (pi %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro)))
   (export
     (import
       (only (micascheme) equal? quote)
@@ -22,6 +22,7 @@
   (define-rule-syntax (native x) x)
   (define-rule-syntax (constant x) #f)
   (define-rule-syntax (tagged tag x) x)
+  (define-rule-syntax (macro x ...) #f)
 
   (define-rules-syntax
     ((pi (id in) out)

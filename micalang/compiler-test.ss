@@ -196,3 +196,11 @@
       (identity (lambda t (lambda x t)))
       (app (app identity number) (native 10)))))
 
+; === macro
+
+(check-compiles
+  (macro (c t) t)
+  (compiled
+    macro
+    (macro (c t) t)
+    (native #f)))

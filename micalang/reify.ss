@@ -9,8 +9,7 @@
 
   (define (reify $term)
     (default-reify
-      (lambda ($default $term)
-        (throw 'dupa))
+      (lambda ($default $term) (throw 'reify))
       $term))
 
   (define (default-reify $default $term)
@@ -62,6 +61,8 @@
               (if (pi? $body)
                 (cdr $reified-body)
                 `(,$reified-body))))))
+      ((macro? $macro)
+        'macro)
       ((else $other)
         ($default $default $other))))
 

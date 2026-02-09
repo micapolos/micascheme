@@ -147,3 +147,10 @@
     (term-equal?
       (pi 'x (native 't1) (lambda (x) (native 't2)))
       (pi #f (native 't1) (lambda (_) (native 't3))))))
+
+(lets
+  ($procedure1 (lambda ($compiler $term) 'foo))
+  ($procedure2 (lambda ($compiler $term) 'bar))
+  (run
+    (check (term-equal? (macro $procedure1) (macro $procedure1)))
+    (check (not (term-equal? (macro $procedure1) (macro $procedure2))))))

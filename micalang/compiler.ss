@@ -117,7 +117,7 @@
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
-        (syntax-case $term (type quote native lambda pi let if)
+        (syntax-case $term (type quote native lambda pi let if macro)
           (type (compiled type 'type 'type))
 
           (b
@@ -269,6 +269,17 @@
                 $type
                 (compiled-type-term $compiled-true)
                 `(if ,$cond ,$true ,$false))))
+
+          ((macro (compiler-id term-id) body)
+            (and
+              (symbol? (datum compiler-id))
+              (symbol? (datum term-id)))
+            (compiled
+              (macro
+                (compiler-evaluate-comptime $compiler
+                  `(%%lambda (,#'compiler-id ,#'term-id) ,#'body)))
+              (syntax->datum $term)
+              `(native #f)))
 
           ((fn)
             (compiler-compile-default $compiler #'fn))
