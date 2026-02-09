@@ -90,30 +90,36 @@
 
 (check
   (term-equal?
-    (abstraction 'x (lambda (x) (apply-term zero? x)))
-    (abstraction 'x (lambda (x) (apply-term zero? x)))))
+    (abstraction 'x (native 'int) (lambda (x) (apply-term zero? x)))
+    (abstraction 'x (native 'int) (lambda (x) (apply-term zero? x)))))
 
 (check
   (term-equal?
-    (abstraction 'x (lambda (x) (apply-term zero? x)))
-    (abstraction 'y (lambda (y) (apply-term zero? y)))))
+    (abstraction 'x (native 'int) (lambda (x) (apply-term zero? x)))
+    (abstraction 'y (native 'int) (lambda (y) (apply-term zero? y)))))
 
 (check
   (not
     (term-equal?
-      (abstraction 'x (lambda (x) (apply-term odd? x)))
-      (abstraction 'x (lambda (x) (apply-term even? x))))))
-
-(check
-  (term-equal?
-    (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (term-apply (apply-term + x) y)))))
-    (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (term-apply (apply-term + x) y)))))))
+      (abstraction 'x (native 'int) (lambda (x) (apply-term zero? x)))
+      (abstraction 'y (native 'bool) (lambda (y) (apply-term zero? y))))))
 
 (check
   (not
     (term-equal?
-      (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (term-apply (apply-term + x) y)))))
-      (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (term-apply (apply-term + y) x))))))))
+      (abstraction 'x (native 'int) (lambda (x) (apply-term odd? x)))
+      (abstraction 'x (native 'int) (lambda (x) (apply-term even? x))))))
+
+(check
+  (term-equal?
+    (abstraction 'x (native 'int) (lambda (x) (abstraction 'y (native 'int) (lambda (y) (term-apply (apply-term + x) y)))))
+    (abstraction 'x (native 'int) (lambda (x) (abstraction 'y (native 'int) (lambda (y) (term-apply (apply-term + x) y)))))))
+
+(check
+  (not
+    (term-equal?
+      (abstraction 'x (native 'int) (lambda (x) (abstraction 'y (native 'int) (lambda (y) (term-apply (apply-term + x) y)))))
+      (abstraction 'x (native 'int) (lambda (x) (abstraction 'y (native 'int) (lambda (y) (term-apply (apply-term + y) x))))))))
 
 (check
   (term-equal?

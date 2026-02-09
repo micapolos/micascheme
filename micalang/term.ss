@@ -5,7 +5,7 @@
     variable variable? variable-symbol
     constant constant? constant-ref
     tagged tagged? tagged-tag tagged-ref
-    abstraction abstraction? abstraction-symbol abstraction-procedure abstraction-apply
+    abstraction abstraction? abstraction-symbol? abstraction-param abstraction-procedure abstraction-apply
     application application? application-lhs application-rhs
     pi pi? pi-symbol? pi-param pi-procedure pi-apply
     conditional conditional? conditional-cond conditional-true conditional-false
@@ -21,7 +21,7 @@
   (data (variable symbol))
   (data (constant ref))
   (data (tagged tag ref))
-  (data (abstraction symbol procedure))
+  (data (abstraction symbol? param procedure))
   (data (application lhs rhs))
   (data (pi symbol? param procedure))
   (data (conditional cond true false))
@@ -51,7 +51,7 @@
 
   (define (term-equal? $lhs $rhs)
     (default-term-equal?
-      (lambda ($default $lhs $rhs) #f)
+      (lambda ($default $lhs $rhs) (throw 'term-equal?))
       $lhs
       $rhs))
 
@@ -91,9 +91,13 @@
       ((abstraction? $lhs-abstraction)
         (switch? $rhs
           ((abstraction? $rhs-abstraction)
-            (default-term-equal? $default
-              (abstraction-apply $lhs-abstraction (variable (abstraction-symbol $lhs-abstraction)))
-              (abstraction-apply $rhs-abstraction (variable (abstraction-symbol $lhs-abstraction)))))))
+            (and
+              (default-term-equal? $default
+                (abstraction-param $lhs-abstraction)
+                (abstraction-param $rhs-abstraction))
+              (default-term-equal? $default
+                (abstraction-apply $lhs-abstraction (variable (abstraction-symbol? $lhs-abstraction)))
+                (abstraction-apply $rhs-abstraction (variable (abstraction-symbol? $lhs-abstraction))))))))
       ((application? $lhs-application)
         (switch? $rhs
           ((application? $rhs-application)

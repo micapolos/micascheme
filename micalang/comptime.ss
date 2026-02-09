@@ -32,7 +32,7 @@
 
   (define-rules-syntax
     ((lambda id body)
-      (abstraction 'id (%lambda (id) body))))
+      (abstraction 'id (native 'type) (%lambda (id) body))))
 
   (define-rules-syntax
     ((prim id)

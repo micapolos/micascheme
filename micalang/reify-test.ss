@@ -35,12 +35,12 @@
   (a b c))
 
 (check-reify
-  (abstraction 'x (lambda (x) x))
-  (lambda (x type) x))
+  (abstraction 'x (native 'int) (lambda (x) x))
+  (lambda (x int) x))
 
 (check-reify
-  (abstraction 'x (lambda (x) (abstraction 'y (lambda (y) (application x y)))))
-  (lambda (x type) (y type) (x y)))
+  (abstraction 'x (native 'int) (lambda (x) (abstraction 'y (native 'bool) (lambda (y) (application x y)))))
+  (lambda (x int) (y bool) (x y)))
 
 (check-reify
   (pi #f (native 't1) (lambda (_) (native 't2)))

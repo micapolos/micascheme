@@ -28,10 +28,12 @@
           ,(default-reify $default (tagged-ref $tagged))))
       ((abstraction? $abstraction)
         (lets
-          ($symbol (abstraction-symbol $abstraction))
-          `(lambda (,$symbol type) .
+          ($symbol? (abstraction-symbol? $abstraction))
+          ($reified-param (default-reify $default (abstraction-param $abstraction)))
+          `(lambda
+            ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param) .
             ,(lets
-              ($body (abstraction-apply $abstraction (native $symbol)))
+              ($body (abstraction-apply $abstraction (native $symbol?)))
               ($reified-body (default-reify $default $body))
               (if (abstraction? $body)
                 (cdr $reified-body)
