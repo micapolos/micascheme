@@ -204,3 +204,12 @@
     macro
     (macro (c t) t)
     (native #f)))
+
+(check-compiles
+  (let
+    (pi (macro (c t) 3.14))
+    (pi some random params))
+  (compiled
+    number
+    number
+    (let (pi (native #f)) (native 3.14))))

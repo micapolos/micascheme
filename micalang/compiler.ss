@@ -163,6 +163,16 @@
                 (compiled $type? (compiler-reify $compiler $type?) (datum id))
                 (syntax-error #'id "undefined"))))
 
+          ((id . x)
+            (and
+              (symbol? (datum id))
+              (macro? (compiler-type-ref? $compiler (datum id))))
+            (compiler-compile $compiler
+              (macro-apply
+                (compiler-type-ref? $compiler (datum id))
+                $compiler
+                $term)))
+
           ((native t v)
             (lets
               ($compiled-t (compiler-compile $compiler #'t))

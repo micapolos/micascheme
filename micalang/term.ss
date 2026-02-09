@@ -9,7 +9,7 @@
     application application? application-lhs application-rhs
     pi pi? pi-symbol? pi-param pi-procedure pi-apply
     conditional conditional? conditional-cond conditional-true conditional-false
-    macro macro? macro-procedure
+    macro macro? macro-procedure macro-apply
 
     term-apply
     apply-term
@@ -141,4 +141,7 @@
 
   (define (pi-apply $pi $arg)
     ((pi-procedure $pi) $arg))
+
+  (define (macro-apply $macro $compiler $term)
+    ((macro-procedure $macro) $compiler $term))
 )
