@@ -33,7 +33,7 @@
   ; TODO: Provide a type
   (define-rules-syntax
     ((lambda id body)
-      (abstraction 'id (native 'type) (%lambda (id) body))))
+      (abstraction 'id (native 'unknown) (%lambda (id) body))))
 
   (define-rules-syntax
     ((prim id)
