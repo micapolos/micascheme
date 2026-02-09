@@ -185,29 +185,24 @@
           ((pi out)
             (compiler-compile-default $compiler #'out))
 
-          ((pi (id in) out)
+          ((pi binder out)
             (lets
-              ($id (datum id))
-              ($compiled-in (compiler-compile $compiler #'in))
+              ((values $symbol? $compiled-in) (compiler-compile-binder $compiler #'binder))
               ($in-type (compiled-type $compiled-in))
               ($in-term (compiled-ref $compiled-in))
               ($in-value (compiler-evaluate-comptime $compiler $in-term))
-              ($compiler (compiler-push $compiler $id (variable $id) $in-value))
+              ($compiler
+                (if $symbol?
+                  (compiler-push $compiler $symbol? (variable $symbol?) $in-value)
+                  $compiler))
               ($compiled-out (compiler-compile $compiler #'out))
               ($out-term (compiled-ref $compiled-out))
               (compiled
                 type
                 'type
-                `(pi (,$id ,$in-term) ,$out-term))))
-
-          ((pi in out)
-            (lets
-              ($in (compiler-compile-type $compiler #'in))
-              ($out (compiler-compile-type $compiler #'out))
-              (compiled
-                type
-                'type
-                `(pi ,$in ,$out))))
+                `(pi
+                  ,(if $symbol? `(,$symbol? ,$in-term) $in-term)
+                  ,$out-term))))
 
           ((pi x xs ... body)
             (compiler-compile-default $compiler
@@ -245,24 +240,29 @@
           ((lambda body)
             (compiler-compile-default $compiler #'body))
 
-          ((lambda (id t) body)
+          ((lambda binder body)
             (lets
-              ($symbol (datum id))
-              ($compiled-t (compiler-compile $compiler #'t))
+              ((values $symbol? $compiled-t) (compiler-compile-binder $compiler #'binder))
               ($t-value (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
-              ($body-compiler (compiler-push $compiler $symbol (variable $symbol) $t-value))
+              ($body-compiler
+                (if $symbol?
+                  (compiler-push $compiler $symbol? (variable $symbol?) $t-value)
+                  $compiler))
               ($compiled-body (compiler-compile $body-compiler #'body))
               ($body-type (compiled-type $compiled-body))
               ($body (compiled-ref $compiled-body))
               (compiled
-                (pi $symbol $t-value
+                (pi $symbol? $t-value
                   (lambda ($x)
                     (compiler-evaluate-comptime
-                      (compiler-push $compiler $symbol $x $t-value)
+                      (if $symbol?
+                        (compiler-push $compiler $symbol? $x $t-value)
+                        $compiler)
                       (compiled-type-term $compiled-body))))
-                `(pi (,$symbol ,(compiled-ref $compiled-t))
+                `(pi
+                  ,(if $symbol? `(,$symbol? ,(compiled-ref $compiled-t)) (compiled-ref $compiled-t))
                   ,(compiled-type-term $compiled-body))
-                `(lambda ,$symbol ,$body))))
+                `(lambda ,$symbol? ,$body))))
 
           ((lambda x xs ... body)
             (compiler-compile-default $compiler
@@ -317,6 +317,18 @@
           ((fn arg args ...)
             (compiler-compile-default $compiler
               `((,#'fn ,#'arg) ,@#'(args ...))))))))
+
+  (define (compile-id $term)
+    (syntax-case $term ()
+      (id (symbol? (datum id)) (datum id))
+      (_ (syntax-error #'id "not identifier"))))
+
+  (define (compiler-compile-binder $compiler $binder)
+    (syntax-case $binder ()
+      ((id type)
+        (values (compile-id #'id) (compiler-compile $compiler #'type)))
+      (type
+        (values #f (compiler-compile $compiler #'type)))))
 
   (define check-runtime-environment
     (environment '(micalang runtime)))
