@@ -30,6 +30,7 @@
   (define-rule-syntax (let (id x) body)
     (%let ((id x)) body))
 
+  ; TODO: Provide a type
   (define-rules-syntax
     ((lambda id body)
       (abstraction 'id (native 'type) (%lambda (id) body))))
