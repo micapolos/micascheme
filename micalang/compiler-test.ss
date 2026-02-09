@@ -14,6 +14,29 @@
   (compiled boolean boolean (native foo)))
 
 (check-compiles
+  (let
+    (increment (n number) (native number (%%+ n 1)))
+    (increment 1))
+  (compiled
+    number
+    number
+    (let (increment (lambda n (native (%%+ n 1))))
+      (app increment (native 1)))))
+
+; TODO: Why it does not compile?
+; (check-compiles
+;   (let
+;     (increment (n number) (native number (%%+ n 1)))
+;     (double (n number) (native number (%%+ n n)))
+;     (double (increment 1)))
+;   (compiled
+;     number
+;     number
+;     (let (increment (lambda n (native (%%+ n 1))))
+;       (let (double (lambda n (native (%%+ n n)))))
+;         (app double (app increment (native 1))))))
+
+(check-compiles
   (native (pi number number number) (%lambda (x) (%lambda (y) (%+ x y))))
   (compiled
     (pi number number number)
