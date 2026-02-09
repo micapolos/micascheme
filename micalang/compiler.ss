@@ -14,6 +14,7 @@
 
     compiler-compile
     compiler-compile-default
+    compiler-reify
     compiler-evaluate
 
     default-compiler-recurse
@@ -169,7 +170,7 @@
               (compiled
                 $t-value
                 (compiled-ref $compiled-t)
-                `(native ,#'v))))
+                `(native ,(datum v)))))
 
           ((pi out)
             (compiler-compile-default $compiler #'out))
