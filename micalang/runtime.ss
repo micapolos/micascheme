@@ -7,7 +7,7 @@
   (import
     (except (micalang base) = + - < zero? lambda app let if string)
     (prefix (only (micalang base) let lambda app if zero? = + - <) %)
-    (rename (micalang term) (pi %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro)))
+    (rename (micalang term) (pi %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro) (type %type)))
   (export
     (import
       (only (micascheme) equal? quote)
@@ -25,10 +25,7 @@
   (define-rule-syntax (macro x ...) #f)
 
   (define-rules-syntax
-    ((pi (id in) out)
-      (%lambda (id) out))
-    ((pi in out)
-      (pi (_ in) out)))
+    ((pi . _) #f))
 
   (define-rules-syntax
     ((curry x)
@@ -69,11 +66,12 @@
     (%if cond true false))
 
   (define-currys
-    (boolean 'boolean)
-    (number  'number)
-    (symbol  'symbol)
-    (char    'char)
-    (string  'string)
+    (type    #f)
+    (boolean #f)
+    (number  #f)
+    (symbol  #f)
+    (char    #f)
+    (string  #f)
 
     (zero? %zero? (x number))
 

@@ -27,14 +27,7 @@
 (check (procedure? (lambda (x number) x)))
 (check (equal? ((lambda (x number) x) (native 10)) 10))
 
-(check (procedure? (pi number boolean)))
-(check (equal? ((pi number boolean) (native 10)) boolean))
-
-(check (procedure? (pi (x number) (app (app + x) (native 1)))))
-(check (equal? ((pi (x number) (app (app + x) (native 1))) (native 10)) 11))
-
-(check (procedure? (pi (x type) x)))
-(check (equal? ((pi (x type) x) number) number))
+(check (equal? (pi number boolean) #f))
 
 (check
   (equal?
