@@ -74,7 +74,7 @@
       ($environment (compiler-environment $compiler))
       ($symbols (map car $environment))
       ($values (map caddr $environment))
-      ($nested (fold-right (lambda (s acc) `(lambda ,s ,acc)) $code $symbols))
+      ($nested (fold-right (lambda (s acc) `(lambda (,s 'unknown) ,acc)) $code $symbols))
       ($proc (eval $nested (compiler-runtime-environment $compiler)))
       (fold-left (lambda (f v) (f v)) $proc $values)))
 
@@ -83,7 +83,7 @@
       ($environment (compiler-environment $compiler))
       ($symbols (map car $environment))
       ($values (map caddr $environment))
-      ($nested (fold-right (lambda (s acc) `(lambda ,s ,acc)) $code $symbols))
+      ($nested (fold-right (lambda (s acc) `(lambda (,s 'unknown) ,acc)) $code $symbols))
       ($proc (eval $nested (compiler-comptime-environment $compiler)))
       (fold-left (lambda (f v) (term-apply f v)) $proc $values)))
 
@@ -290,7 +290,7 @@
                 `(pi
                   ,(if $symbol? `(,$symbol? ,(compiled-ref $compiled-t)) (compiled-ref $compiled-t))
                   ,(compiled-type-term $compiled-body))
-                `(lambda ,$symbol? ,$body))))
+                `(lambda (,$symbol? ,(compiled-ref $compiled-t)) ,$body))))
 
           ((lambda x xs ... body)
             (compiler-compile-default $compiler

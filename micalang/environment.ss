@@ -51,10 +51,10 @@
       (char    type   char)
       (string  type   string)
 
-      (zero?   (pi number boolean)              (curry %%zero? a))
+      (zero?   (pi number boolean)              (curry %%zero? (a number)))
 
-      (=       (pi number (pi number number))   (curry %%= a b))
-      (+       (pi number (pi number number))   (curry %%+ a b))
-      (-       (pi number (pi number number))   (curry %%- a b) )
-      (<       (pi number (pi number boolean))  (curry %%< a b) )))
+      (=       (pi number (pi number number))   (curry %%= (a number) (b number)))
+      (+       (pi number (pi number number))   (curry %%+ (a number) (b number)))
+      (-       (pi number (pi number number))   (curry %%- (a number) (b number)))
+      (<       (pi number (pi number boolean))  (curry %%< (a number) (b number)))))
 )

@@ -15,25 +15,25 @@
 
 (check-compiles
   (let
-    (zero? (native (pi number boolean) (curry %%zero? x)))
+    (zero? (native (pi number boolean) (curry %%zero? (x number))))
     (zero? 1))
   (compiled boolean boolean
     (let
-      (zero? (native (curry %%zero? x)))
+      (zero? (native (curry %%zero? (x number))))
       (app zero? (native 1)))))
 
 (check-compiles
   (let
-    (add (native (pi number number number) (curry %%+ a b)))
+    (add (native (pi number number number) (curry %%+ (a number) (b number))))
     (increment (a number) (+ a 1))
     (double (a number) (b number) (add a b))
     (double (increment 1)))
   (compiled
     (pi (b number) number)
     (pi (b number) number)
-    (let (add (native (curry %%+ a b)))
-      (let (increment (lambda a (app (app + a) (native 1))))
-        (let (double (lambda a (lambda b (app (app add a) b))))
+    (let (add (native (curry %%+ (a number) (b number))))
+      (let (increment (lambda (a number) (app (app + a) (native 1))))
+        (let (double (lambda (a number) (lambda (b number) (app (app add a) b))))
           (app double (app increment (native 1))))))))
 
 (check-compiles
@@ -168,7 +168,7 @@
     number
     number
     (let
-      (zwiększ (lambda x (app (app + x) (native 1))))
+      (zwiększ (lambda (x number) (app (app + x) (native 1))))
       (app zwiększ (native 10)))))
 
 ; === lambda
@@ -182,14 +182,14 @@
   (compiled
     (pi (i number) number)
     (pi (i number) number)
-    (lambda i i)))
+    (lambda (i number) i)))
 
 (check-compiles
   (lambda (i number) (j number) (+ i j))
   (compiled
     (pi (i number) (j number) number)
     (pi (i number) (pi (j number) number))
-    (lambda i (lambda j (app (app + i) j)))))
+    (lambda (i number) (lambda (j number) (app (app + i) j)))))
 
 (check-compiles
   zero?
@@ -210,7 +210,7 @@
   (compiled
     (pi (t type) type)
     (pi (t type) type)
-    (lambda t t)))
+    (lambda (t type) t)))
 
 ; === pi
 
@@ -257,7 +257,7 @@
     type
     type
     (let
-      (identity (lambda t (lambda x t)))
+      (identity (lambda (t type) (lambda (x t) t)))
       (app (app identity number) (native 10)))))
 
 ; === macro

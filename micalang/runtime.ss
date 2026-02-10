@@ -3,9 +3,9 @@
     curry native app constant tagged
     boolean number symbol char string
     = + - < zero?
-    list let lambda macro pi app if)
+    let lambda macro pi app if)
   (import
-    (except (micalang base) = + - < zero? list lambda app let if string)
+    (except (micalang base) = + - < zero? lambda app let if string)
     (prefix (only (micalang base) let lambda app if zero? = + - <) %)
     (rename (micalang term) (pi %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro)))
   (export
@@ -16,7 +16,7 @@
   (define-rule-syntax (let (id x) ... body)
     (%let ((id x) ...) body))
 
-  (define-rule-syntax (lambda id body)
+  (define-rule-syntax (lambda (id _) body)
     (%lambda (id) body))
 
   (define-rule-syntax (native x) x)
@@ -31,18 +31,28 @@
       (pi (_ in) out)))
 
   (define-rules-syntax
-    ((curry x) x)
-    ((curry x a) (lambda a (x a)))
-    ((curry x a b) (lambda a (lambda b (x a b))))
-    ((curry x a b c) (lambda a (lambda b (lambda c (x a b c)))))
-    ((curry x a b c d) (lambda a (lambda b (lambda c (lambda d (x a b c d)))))))
+    ((curry x)
+      x)
+    ((curry x (p1 t1))
+      (lambda (p1 t1) (x p1)))
+    ((curry x (p1 t1) (p2 t2))
+      (lambda (p1 t1) (lambda (p2 t2) (x p1 p2))))
+    ((curry x (p1 t1) (p2 t2) (p3 t3))
+      (lambda (p1 t1) (lambda (p2 t2) (lambda (p3 t3) (x p1 p2 p3)))))
+    ((curry x (p1 t1) (p2 t2) (p3 t3) (p4 t4))
+      (lambda (p1 t1) (lambda (p2 t2) (lambda (p3 t3) (lambda (p4 t4) (x p1 p2 p3 p4)))))))
 
   (define-rules-syntax
-    ((prim id) ($primitive 3 id))
-    ((prim id a) (lambda a (($primitive 3 id) a)))
-    ((prim id a b) (lambda a (lambda b (($primitive 3 id) a b))))
-    ((prim id a b c) (lambda a (lambda b (lambda c (($primitive 3 id) a b c)))))
-    ((prim id a b c d) (lambda a (lambda b (lambda c (lambda d (($primitive 3 id) a b c d)))))))
+    ((prim id)
+      ($primitive 3 id))
+    ((prim id (p1 t1))
+      (lambda (p1 t1) (($primitive 3 id) p1)))
+    ((prim id (p1 t1) (p2 t2))
+      (lambda (p1 t1) (lambda (p2 t2) (($primitive 3 id) p1 p2))))
+    ((prim id (p1 t1) (p2 t2) (p3 t3))
+      (lambda (p1 t1) (lambda (p2 t2) (lambda (p3 t3) (($primitive 3 id) p1 p2 p3)))))
+    ((prim id (p1 t1) (p2 t2) (p3 t3) (p4 t4))
+      (lambda (p1 t1) (lambda (p2 t2) (lambda (p3 t3) (lambda (p4 t4) (($primitive 3 id) p1 p2 p3 p4)))))))
 
   (define-rules-syntax
     ((define-curry id p arg ...)
@@ -65,12 +75,10 @@
     (char    'char)
     (string  'string)
 
-    (zero? %zero? x)
+    (zero? %zero? (x number))
 
-    (= %= x y)
-    (+ %+ x y)
-    (- %- x y)
-    (< %< x y))
-
-  (define list (lambda x (application list x)))
+    (= %= (x number) (y number))
+    (+ %+ (x number) (y number))
+    (- %- (x number) (y number))
+    (< %< (x number) (y number)))
 )

@@ -32,20 +32,21 @@
 
   ; TODO: Provide a type
   (define-rules-syntax
-    ((lambda id body)
-      (abstraction 'id (native 'unknown) (%lambda (id) body))))
+    ((lambda (id t) body)
+      (abstraction 'id t (%lambda (id) body))))
 
   (define-rules-syntax
     ((prim id)
       (%native ($primitive 3 id)))
-    ((prim id x)
-      (lambda x (term-apply (%native ($primitive 3 id)) x)))
-    ((prim id x y)
-      (lambda x
-        (lambda y
-          (switch x
+    ((prim id (p1 t1))
+      (lambda (p1 t1)
+        (term-apply (%native ($primitive 3 id)) p1)))
+    ((prim id (p1 t1) (p2 t2))
+      (lambda (p1 t1)
+        (lambda (p2 t2)
+          (switch p1
             ((native? $native-x)
-              (switch y
+              (switch p2
                 ((native? $native-y)
                   (native
                     (($primitive 3 id)
@@ -56,21 +57,20 @@
             ((else $other-x)
               (application (application (native ($primitive 3 id)) $other-x) y)))))))
 
-
   (define-rules-syntax
     ((curry p)
       (native p))
-    ((curry p x)
-      (lambda x
-        (switch x
+    ((curry p (p1 t1))
+      (lambda (p1 t1)
+        (switch p1
           ((native? $native) (native (p (native-ref $native))))
           ((else $other) (application (native p) $other)))))
-    ((curry p x y)
-      (lambda x
-        (lambda y
-          (switch x
+    ((curry p (p1 t1) (p2 t2))
+      (lambda (p1 t1)
+        (lambda (p2 t2)
+          (switch p1
             ((native? $native-x)
-              (switch y
+              (switch p2
                 ((native? $native-y)
                   (native
                     (p
@@ -79,7 +79,7 @@
                 ((else $other-y)
                   (application (application (native p) $native-x) $other-y))))
             ((else $other-x)
-              (application (application (native p) $other-x) y)))))))
+              (application (application (native p) $other-x) p2)))))))
 
   (define-rules-syntax
     ((define-prim id p arg ...)
@@ -104,12 +104,12 @@
     (char    'char)
     (string  'string)
 
-    (zero? %zero? x)
+    (zero? %zero? (x number))
 
-    (= %= x y)
-    (+ %+ x y)
-    (- %- x y)
-    (< %< x y))
+    (= %= (x number) (y number))
+    (+ %+ (x number) (y number))
+    (- %- (x number) (y number))
+    (< %< (x number) (y number)))
 
   (define-rules-syntax
     ((pi (id in) out)
