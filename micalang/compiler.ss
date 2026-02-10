@@ -113,7 +113,7 @@
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
-        (syntax-case $term (type quote native lambda pi let if macro)
+        (syntax-case $term (the type quote native lambda pi let if macro)
           (type (compiled type 'type 'type))
 
           (b
@@ -150,6 +150,29 @@
               (eval 'symbol (compiler-comptime-environment $compiler))
               'symbol
               `(native ',(datum s))))
+
+          ((the t)
+            (lets
+              ($compiled-t (compiler-compile $compiler #'t))
+              ($type (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
+              ($id? (environment-id? (compiler-environment $compiler) $type))
+              (if $id?
+                (compiled $type (compiler-reify $compiler $type) $id?)
+                (syntax-error #'t "undefined"))))
+
+          ((the t id)
+            (symbol? (datum id))
+            (lets
+              ($id (datum id))
+              ($compiled-t (compiler-compile $compiler #'t))
+              ($type (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
+              ($type? (environment-type? (compiler-environment $compiler) $id))
+              (if (term-equal? $type? $type)
+                (compiled $type? (compiler-reify $compiler $type) $id)
+                (syntax-error #'(t id) "undefined"))))
+
+          ((the . _)
+            (syntax-error $term))
 
           (id
             (symbol? (datum id))
