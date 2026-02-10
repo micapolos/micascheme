@@ -217,7 +217,7 @@
               ($in-value (compiler-evaluate-comptime $compiler $in-term))
               ($compiler
                 (if $symbol?
-                  (compiler-push $compiler $symbol? $in-value $in-term (variable $symbol?))
+                  (compiler-push $compiler $symbol? $in-type $in-term $in-value)
                   $compiler))
               ($compiled-out (compiler-compile $compiler #'body))
               ($out-term (compiled-ref $compiled-out))
