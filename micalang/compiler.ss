@@ -38,7 +38,7 @@
       default-compiler-term-equal?
       $runtime-environment
       $comptime-environment
-      '()))
+      (environment)))
 
   (define (default-compiler-recurse $compiler $term)
     (compiler-compile-default $compiler $term))
