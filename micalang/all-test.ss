@@ -5,7 +5,6 @@
   (micalang reify)
   (micalang runtime)
   (micalang comptime)
-  (micalang env)
-  (micalang context)
+  (micalang environment)
   (micalang compiler)
   (micalang mica))
