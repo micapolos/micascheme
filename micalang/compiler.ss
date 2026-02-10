@@ -55,14 +55,14 @@
   (define (compiler-term-equal? $compiler $lhs $rhs)
     (default-term-equal? (compiler-default-term-equal? $compiler) $lhs $rhs))
 
-  (define (compiler-push $compiler $id $type $value)
+  (define (compiler-push $compiler $id $type $type-term $value)
     (compiler
       (compiler-recurse $compiler)
       (compiler-default-reify $compiler)
       (compiler-default-term-equal? $compiler)
       (compiler-runtime-environment $compiler)
       (compiler-comptime-environment $compiler)
-      (push (compiler-environment $compiler) (list $id $type $value))))
+      (environment-push (compiler-environment $compiler) $id $type $type-term $value)))
 
   (define (compiler-type-ref? $compiler $id)
     (lets
@@ -72,8 +72,9 @@
   (define (compiler-evaluate-runtime $compiler $code)
     (lets
       ($environment (compiler-environment $compiler))
-      ($symbols (map car $environment))
-      ($values (map caddr $environment))
+      ($symbols (environment-symbols $environment))
+      ($type-terms (environment-type-terms $environment))
+      ($values (environment-values $environment))
       ($nested (fold-right (lambda (s acc) `(lambda (,s 'unknown) ,acc)) $code $symbols))
       ($proc (eval $nested (compiler-runtime-environment $compiler)))
       (fold-left (lambda (f v) (f v)) $proc $values)))
@@ -81,8 +82,9 @@
   (define (compiler-evaluate-comptime $compiler $code)
     (lets
       ($environment (compiler-environment $compiler))
-      ($symbols (map car $environment))
-      ($values (map caddr $environment))
+      ($symbols (environment-symbols $environment))
+      ($type-terms (environment-type-terms $environment))
+      ($values (environment-values $environment))
       ($nested (fold-right (lambda (s acc) `(lambda (,s 'unknown) ,acc)) $code $symbols))
       ($proc (eval $nested (compiler-comptime-environment $compiler)))
       (fold-left (lambda (f v) (term-apply f v)) $proc $values)))
@@ -215,7 +217,7 @@
               ($in-value (compiler-evaluate-comptime $compiler $in-term))
               ($compiler
                 (if $symbol?
-                  (compiler-push $compiler $symbol? $in-value (variable $symbol?))
+                  (compiler-push $compiler $symbol? $in-value $in-term (variable $symbol?))
                   $compiler))
               ($compiled-out (compiler-compile $compiler #'body))
               ($out-term (compiled-ref $compiled-out))
@@ -243,7 +245,7 @@
               ($x-type (compiled-type $compiled-x))
               ($x (compiled-ref $compiled-x))
               ($x-val (compiler-evaluate-comptime $compiler $x))
-              ($compiler (compiler-push $compiler $symbol $x-type $x-val))
+              ($compiler (compiler-push $compiler $symbol $x-type $compiled-x $x-val))
               ($compiled-body (compiler-compile $compiler #'body))
               ($body-type (compiled-type $compiled-body))
               ($body (compiled-ref $compiled-body))
@@ -274,7 +276,7 @@
               ($t-value (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
               ($body-compiler
                 (if $symbol?
-                  (compiler-push $compiler $symbol? $t-value (variable $symbol?))
+                  (compiler-push $compiler $symbol? $t-value $compiled-t (variable $symbol?))
                   $compiler))
               ($compiled-body (compiler-compile $body-compiler #'body))
               ($body-type (compiled-type $compiled-body))
@@ -284,7 +286,7 @@
                   (lambda ($x)
                     (compiler-evaluate-comptime
                       (if $symbol?
-                        (compiler-push $compiler $symbol? $t-value $x)
+                        (compiler-push $compiler $symbol? $t-value $compiled-t $x)
                         $compiler)
                       (compiled-type-term $compiled-body))))
                 `(pi
