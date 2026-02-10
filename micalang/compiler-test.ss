@@ -15,7 +15,7 @@
 
 (check-compiles
   (let
-    (val increment (val n number) (native number (%%+ n 1)))
+    (increment (n number) (native number (%%+ n 1)))
     (increment 1))
   (compiled
     number
@@ -107,11 +107,11 @@
   (compiled number number (native 10)))
 
 (check-compiles
-  (let (val x 10) (inc x))
+  (let (x 10) (inc x))
   (compiled number number (let (x (native 10)) (app inc x))))
 
 (check-compiles
-  (let (val x 10) (val y 20) (< x y))
+  (let (x 10) (y 20) (< x y))
   (compiled
     boolean
     boolean
@@ -121,7 +121,7 @@
 
 (check-compiles
   (let
-    (val zwiększ (val x number) (+ x 1))
+    (zwiększ (x number) (+ x 1))
     (zwiększ 10))
   (compiled
     number
@@ -137,16 +137,16 @@
   (compiled number number (native 12)))
 
 (check-compiles
-  (lambda (val i number) i)
+  (lambda (i number) i)
   (compiled
-    (pi (val i number) number)
+    (pi (i number) number)
     (pi (i number) number)
     (lambda i i)))
 
 (check-compiles
-  (lambda (val i number) (val j number) (+ i j))
+  (lambda (i number) (j number) (+ i j))
   (compiled
-    (pi (val i number) (val j number) number)
+    (pi (i number) (j number) number)
     (pi (i number) (pi (j number) number))
     (lambda i (lambda j (app (app + i) j)))))
 
@@ -165,9 +165,9 @@
     (app inc (native 1))))
 
 (check-compiles
-  (lambda (val t type) t)
+  (lambda (t type) t)
   (compiled
-    (pi (val t type) type)
+    (pi (t type) type)
     (pi (t type) type)
     (lambda t t)))
 
@@ -181,14 +181,14 @@
     (pi number boolean)))
 
 (check-compiles
-  (pi (val x type) x)
+  (pi (x type) x)
   (compiled
     type
     type
     (pi (x type) x)))
 
 (check-compiles
-  (pi (val x type) (val y type) x)
+  (pi (x type) (y type) x)
   (compiled
     type
     type
@@ -210,7 +210,7 @@
 
 (check-compiles
   (let
-    (val identity (lambda (val t type) (lambda (val x t) t)))
+    (identity (lambda (t type) (lambda (x t) t)))
     ((identity number) 10))
   (compiled
     type
@@ -230,7 +230,7 @@
 
 (check-compiles
   (let
-    (val pi (macro (c t) 3.14))
+    (pi (macro (c t) 3.14))
     (pi some random params))
   (compiled
     number

@@ -36,11 +36,11 @@
 
 (check-reify
   (abstraction 'x (native 'int) (lambda (x) x))
-  (lambda (val x int) x))
+  (lambda (x int) x))
 
 (check-reify
   (abstraction 'x (native 'int) (lambda (x) (abstraction 'y (native 'bool) (lambda (y) (application x y)))))
-  (lambda (val x int) (val y bool) (x y)))
+  (lambda (x int) (y bool) (x y)))
 
 (check-reify
   (pi #f (native 't1) (lambda (_) (native 't2)))
@@ -48,9 +48,9 @@
 
 (check-reify
   (pi 'x (native 'number) (lambda (x) x))
-  (pi (val x number) x))
+  (pi (x number) x))
 
 (check-reify
   (pi 'x (native 'number) (lambda (x) (pi 'y (native 'boolean) (lambda (y) (application x y)))))
-  (pi (val x number) (val y boolean) (x y)))
+  (pi (x number) (y boolean) (x y)))
 

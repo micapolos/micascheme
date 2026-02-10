@@ -117,7 +117,7 @@
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
-        (syntax-case $term (val type quote native lambda pi let if macro)
+        (syntax-case $term (type quote native lambda pi let if macro)
           (type (compiled type 'type 'type))
 
           (b
@@ -217,7 +217,7 @@
           ((let body)
             (compiler-compile-default $compiler #'body))
 
-          ((let (val id x) body)
+          ((let (id x) body)
             (lets
               ($symbol (datum id))
               ($compiled-x (compiler-compile $compiler #'x))
@@ -233,10 +233,10 @@
                 (compiled-type-term $compiled-body)
                 `(let (,$symbol ,$x) ,$body))))
 
-          ((let (val id param params ... lambda-body) body)
+          ((let (id param params ... lambda-body) body)
             (compiler-compile-default $compiler
               `(let
-                (val ,#'id (lambda ,#'param ,@#'(params ...) ,#'lambda-body))
+                (,#'id (lambda ,#'param ,@#'(params ...) ,#'lambda-body))
                 ,#'body)))
 
           ((let x xs ... body)
@@ -343,7 +343,7 @@
 
   (define (compiler-compile-param $compiler $binder)
     (syntax-case $binder (val)
-      ((val id type)
+      ((id type)
         (values (compile-id #'id) (compiler-compile $compiler #'type)))
       (type
         (values #f (compiler-compile $compiler #'type)))))
