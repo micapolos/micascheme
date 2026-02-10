@@ -6,8 +6,7 @@
     compiler-default-term-equal?
     compiler-runtime-environment
     compiler-comptime-environment
-    compiler-env
-    compiler-context
+    compiler-environment
 
     empty-compiler
     compiler-push
@@ -28,10 +27,9 @@
     (micalang term)
     (micalang reify)
     (micalang compiled)
-    (micalang env)
-    (micalang context))
+    (micalang environment))
 
-  (data (compiler recurse default-reify default-term-equal? runtime-environment comptime-environment env context))
+  (data (compiler recurse default-reify default-term-equal? runtime-environment comptime-environment environment))
 
   (define (empty-compiler $runtime-environment $comptime-environment)
     (compiler
@@ -40,7 +38,6 @@
       default-compiler-term-equal?
       $runtime-environment
       $comptime-environment
-      '()
       '()))
 
   (define (default-compiler-recurse $compiler $term)
@@ -65,28 +62,27 @@
       (compiler-default-term-equal? $compiler)
       (compiler-runtime-environment $compiler)
       (compiler-comptime-environment $compiler)
-      (push (compiler-env $compiler) (cons $id $value))
-      (push (compiler-context $compiler) (cons $id $type))))
+      (push (compiler-environment $compiler) (list $id $value $type))))
 
   (define (compiler-type-ref? $compiler $id)
     (lets
-      ($ass? (assq $id (compiler-context $compiler)))
-      (and $ass? (cdr $ass?))))
+      ($ass? (assq $id (compiler-environment $compiler)))
+      (and $ass? (caddr $ass?))))
 
   (define (compiler-evaluate-runtime $compiler $code)
     (lets
-      ($env (compiler-env $compiler))
-      ($symbols (map car $env))
-      ($values (map cdr $env))
+      ($environment (compiler-environment $compiler))
+      ($symbols (map car $environment))
+      ($values (map cadr $environment))
       ($nested (fold-right (lambda (s acc) `(lambda ,s ,acc)) $code $symbols))
       ($proc (eval $nested (compiler-runtime-environment $compiler)))
       (fold-left (lambda (f v) (f v)) $proc $values)))
 
   (define (compiler-evaluate-comptime $compiler $code)
     (lets
-      ($env (compiler-env $compiler))
-      ($symbols (map car $env))
-      ($values (map cdr $env))
+      ($environment (compiler-environment $compiler))
+      ($symbols (map car $environment))
+      ($values (map cadr $environment))
       ($nested (fold-right (lambda (s acc) `(lambda ,s ,acc)) $code $symbols))
       ($proc (eval $nested (compiler-comptime-environment $compiler)))
       (fold-left (lambda (f v) (term-apply f v)) $proc $values)))
@@ -364,8 +360,7 @@
             default-compiler-term-equal?
             check-runtime-environment
             check-comptime-environment
-            mica-env
-            mica-context)
+            mica-environment)
           'in))
       (check
         (equal?
@@ -385,7 +380,6 @@
             default-compiler-term-equal?
             check-runtime-environment
             check-comptime-environment
-            mica-env
-            mica-context)
+            mica-environment)
           'in))))
 )

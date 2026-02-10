@@ -76,11 +76,11 @@
 ; === application
 
 (check-compiles
-  (inc 10)
+  (zero? 10)
   (compiled
-    number
-    number
-    (app inc (native 10))))
+    boolean
+    boolean
+    (app zero? (native 10))))
 
 (check-compiles
   ((+ 10) 20)
@@ -96,7 +96,7 @@
     number
     (app (app + (native 10)) (native 20))))
 
-(check-compile-raises (inc #t))
+(check-compile-raises (zero? #t))
 (check-compile-raises (+ 1 #t))
 (check-compile-raises (+ #t 2))
 
@@ -107,8 +107,8 @@
   (compiled number number (native 10)))
 
 (check-compiles
-  (let (x 10) (inc x))
-  (compiled number number (let (x (native 10)) (app inc x))))
+  (let (x 10) (zero? x))
+  (compiled boolean boolean (let (x (native 10)) (app zero? x))))
 
 (check-compiles
   (let (x 10) (y 20) (< x y))
@@ -151,18 +151,18 @@
     (lambda i (lambda j (app (app + i) j)))))
 
 (check-compiles
-  inc
+  zero?
   (compiled
-    (pi number number)
-    (pi number number)
-    inc))
+    (pi number boolean)
+    (pi number boolean)
+    zero?))
 
 (check-compiles
-  (inc 1)
+  (zero? 1)
   (compiled
-    number
-    number
-    (app inc (native 1))))
+    boolean
+    boolean
+    (app zero? (native 1))))
 
 (check-compiles
   (lambda (t type) t)

@@ -7,8 +7,7 @@
   (import
     (micalang base)
     (micalang compiler)
-    (micalang env)
-    (micalang context)
+    (micalang environment)
     (micalang compiled)
     (micalang term)
     (micalang reify))
@@ -32,8 +31,7 @@
             default-compiler-term-equal?
             (environment '(micalang runtime) '(prefix (scheme) %))
             (environment '(micalang comptime) '(prefix (scheme) %))
-            mica-env
-            mica-context)
+            mica-environment)
           (syntax->datum/annotation #'x)))))
 
   (define-syntax (mica-debug $syntax)
@@ -56,8 +54,7 @@
               default-compiler-term-equal?
               (environment '(micalang runtime) '(prefix (scheme) %))
               (environment '(micalang comptime) '(prefix (scheme) %))
-              mica-env
-              mica-context))
+              mica-environment))
           ($compiled (compiler-compile $compiler (syntax->datum/annotation #'x)))
           #`(pretty-print
             '(compiled
