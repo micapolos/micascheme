@@ -9,17 +9,17 @@
 
   (define mica-environment
     (environment
-    ; (symbol  value   type)
-      (type    type    type)
-      (boolean boolean type)
-      (number  number  type)
-      (char    char    type)
-      (string  string  type)
+    ; (symbol  type   value)
+      (type    type   type)
+      (boolean type   boolean)
+      (number  type   number)
+      (char    type   char)
+      (string  type   string)
 
-      (zero?   (curry %%zero? a) (pi number boolean))
+      (zero?   (pi number boolean)              (curry %%zero? a))
 
-      (=       (curry %%= a b) (pi number (pi number number)))
-      (+       (curry %%+ a b) (pi number (pi number number)))
-      (-       (curry %%- a b) (pi number (pi number number)))
-      (<       (curry %%< a b) (pi number (pi number boolean)))))
+      (=       (pi number (pi number number))   (curry %%= a b))
+      (+       (pi number (pi number number))   (curry %%+ a b))
+      (-       (pi number (pi number number))   (curry %%- a b) )
+      (<       (pi number (pi number boolean))  (curry %%< a b) )))
 )
