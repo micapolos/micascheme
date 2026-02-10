@@ -75,7 +75,7 @@
       ($symbols (environment-symbols $environment))
       ($type-terms (environment-type-terms $environment))
       ($values (environment-values $environment))
-      ($nested (fold-right (lambda (s acc) `(lambda (,s 'unknown) ,acc)) $code $symbols))
+      ($nested (fold-right (lambda (s tt acc) `(lambda (,s ,tt) ,acc)) $code $symbols $type-terms))
       ($proc (eval $nested (compiler-runtime-environment $compiler)))
       (fold-left (lambda (f v) (f v)) $proc $values)))
 
@@ -85,7 +85,7 @@
       ($symbols (environment-symbols $environment))
       ($type-terms (environment-type-terms $environment))
       ($values (environment-values $environment))
-      ($nested (fold-right (lambda (s acc) `(lambda (,s 'unknown) ,acc)) $code $symbols))
+      ($nested (fold-right (lambda (s tt acc) `(lambda (,s ,tt) ,acc)) $code $symbols $type-terms))
       ($proc (eval $nested (compiler-comptime-environment $compiler)))
       (fold-left (lambda (f v) (term-apply f v)) $proc $values)))
 
@@ -243,9 +243,10 @@
               ($symbol (datum id))
               ($compiled-x (compiler-compile $compiler #'x))
               ($x-type (compiled-type $compiled-x))
+              ($x-type-term (compiled-type-term $compiled-x))
               ($x (compiled-ref $compiled-x))
               ($x-val (compiler-evaluate-comptime $compiler $x))
-              ($compiler (compiler-push $compiler $symbol $x-type $compiled-x $x-val))
+              ($compiler (compiler-push $compiler $symbol $x-type $x-type-term $x-val))
               ($compiled-body (compiler-compile $compiler #'body))
               ($body-type (compiled-type $compiled-body))
               ($body (compiled-ref $compiled-body))
@@ -276,7 +277,7 @@
               ($t-value (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
               ($body-compiler
                 (if $symbol?
-                  (compiler-push $compiler $symbol? $t-value $compiled-t (variable $symbol?))
+                  (compiler-push $compiler $symbol? $t-value (compiled-ref $compiled-t) (variable $symbol?))
                   $compiler))
               ($compiled-body (compiler-compile $body-compiler #'body))
               ($body-type (compiled-type $compiled-body))
@@ -286,7 +287,7 @@
                   (lambda ($x)
                     (compiler-evaluate-comptime
                       (if $symbol?
-                        (compiler-push $compiler $symbol? $t-value $compiled-t $x)
+                        (compiler-push $compiler $symbol? $t-value (compiled-ref $compiled-t) $x)
                         $compiler)
                       (compiled-type-term $compiled-body))))
                 `(pi

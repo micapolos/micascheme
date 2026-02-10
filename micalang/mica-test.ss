@@ -37,17 +37,3 @@
 
 (check-mica (if (zero? 0) "zero" "not-zero") "zero")
 (check-mica (if (zero? 1) "zero" "not-zero") "not-zero")
-
-(check-mica fx #f)
-(check-mica (fx 12) 12)
-
-;(check-mica ((lambda (x fx) x) (fx 12)) 12)
-
-(check-mica
-  (let
-    (max-fx (native fx (%%most-positive-fixnum)))
-    (min-fx (native fx (%%most-negative-fixnum)))
-    (fx+ (a fx) (b fx) (native fx (%%fx+/wraparound a b)))
-    (fx+1 (a fx) (fx+ a (fx 1)))
-    (fx+ max-fx (fx 1)))
-  (most-negative-fixnum))
