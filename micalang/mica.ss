@@ -29,8 +29,8 @@
                   (compiler-compile-default $compiler #'other))))
             default-compiler-reify
             default-compiler-term-equal?
-            (environment '(micalang runtime) '(prefix (scheme) %))
-            (environment '(micalang comptime) '(prefix (scheme) %))
+            (%environment '(micalang runtime) '(prefix (scheme) %))
+            (%environment '(micalang comptime) '(prefix (scheme) %))
             mica-environment)
           (syntax->datum/annotation #'x)))))
 
@@ -52,8 +52,8 @@
                     (compiler-compile-default $compiler #'other))))
               default-compiler-reify
               default-compiler-term-equal?
-              (environment '(micalang runtime) '(prefix (scheme) %))
-              (environment '(micalang comptime) '(prefix (scheme) %))
+              (%environment '(micalang runtime) '(prefix (scheme) %))
+              (%environment '(micalang comptime) '(prefix (scheme) %))
               mica-environment))
           ($compiled (compiler-compile $compiler (syntax->datum/annotation #'x)))
           #`(pretty-print

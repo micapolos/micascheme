@@ -1,11 +1,31 @@
 (library (micalang environment)
-  (export mica-environment)
+  (export
+    environment
+    environment-type?
+    environment-symbols
+    environment-types
+    environment-values
+    mica-environment)
   (import
-    (only (micalang base) define define-rule-syntax quasiquote unquote ...)
+    (only (micalang base) define lets map car cadr caddr assq and define-rule-syntax quasiquote unquote ...)
     (micalang comptime))
 
   (define-rule-syntax (environment (id value type) ...)
     `((id ,value ,type) ...))
+
+  (define (environment-type? $environment $id)
+    (lets
+      ($ass? (assq $id $environment))
+      (and $ass? (cadr $ass?))))
+
+  (define (environment-symbols $environment)
+    (map car $environment))
+
+  (define (environment-types $environment)
+    (map cadr $environment))
+
+  (define (environment-values $environment)
+    (map caddr $environment))
 
   (define mica-environment
     (environment

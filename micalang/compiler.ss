@@ -345,10 +345,10 @@
         (values #f (compiler-compile $compiler #'type)))))
 
   (define check-runtime-environment
-    (environment '(micalang runtime)))
+    (%environment '(micalang runtime)))
 
   (define check-comptime-environment
-    (environment '(micalang comptime)))
+    (%environment '(micalang comptime)))
 
   (define-rule-syntax (check-compiles in out)
     (lets
