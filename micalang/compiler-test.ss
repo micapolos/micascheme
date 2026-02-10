@@ -15,26 +15,26 @@
 
 (check-compiles
   (let
-    (increment (n number) (native number (%%+ n 1)))
-    (increment 1))
-  (compiled
-    number
-    number
-    (let (increment (lambda n (native (%%+ n 1))))
-      (app increment (native 1)))))
+    (zero? (native (pi number boolean) (curry %%zero? x)))
+    (zero? 1))
+  (compiled boolean boolean
+    (let
+      (zero? (native (curry %%zero? x)))
+      (app zero? (native 1)))))
 
-; TODO: Why it does not compile?
-; (check-compiles
-;   (let
-;     (increment (n number) (native number (%%+ n 1)))
-;     (double (n number) (native number (%%+ n n)))
-;     (double (increment 1)))
-;   (compiled
-;     number
-;     number
-;     (let (increment (lambda n (native (%%+ n 1))))
-;       (let (double (lambda n (native (%%+ n n)))))
-;         (app double (app increment (native 1))))))
+(check-compiles
+  (let
+    (add (native (pi number number number) (curry %%+ a b)))
+    (increment (a number) (+ a 1))
+    (double (a number) (b number) (add a b))
+    (double (increment 1)))
+  (compiled
+    (pi (b number) number)
+    (pi (b number) number)
+    (let (add (native (curry %%+ a b)))
+      (let (increment (lambda a (app (app + a) (native 1))))
+        (let (double (lambda a (lambda b (app (app add a) b))))
+          (app double (app increment (native 1))))))))
 
 (check-compiles
   (native (pi number number number) (%lambda (x) (%lambda (y) (%+ x y))))
