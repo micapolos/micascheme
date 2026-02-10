@@ -69,16 +69,6 @@
       ($ass? (assq $id (compiler-environment $compiler)))
       (and $ass? (cadr $ass?))))
 
-  (define (compiler-evaluate-runtime $compiler $code)
-    (lets
-      ($environment (compiler-environment $compiler))
-      ($symbols (environment-symbols $environment))
-      ($type-terms (environment-type-terms $environment))
-      ($values (environment-values $environment))
-      ($nested (fold-right (lambda (s tt acc) `(lambda (,s ,tt) ,acc)) $code $symbols $type-terms))
-      ($proc (eval $nested (compiler-runtime-environment $compiler)))
-      (fold-left (lambda (f v) (f v)) $proc $values)))
-
   (define (compiler-evaluate-comptime $compiler $code)
     (lets
       ($environment (compiler-environment $compiler))
