@@ -10,8 +10,8 @@
     (only (micalang base) define lets map car cadr caddr assq and define-rule-syntax quasiquote unquote ...)
     (micalang comptime))
 
-  (define-rule-syntax (environment (id value type) ...)
-    `((id ,value ,type) ...))
+  (define-rule-syntax (environment (id type value) ...)
+    `((id ,type ,value) ...))
 
   (define (environment-type? $environment $id)
     (lets
@@ -29,7 +29,6 @@
 
   (define mica-environment
     (environment
-    ; (symbol  type   value)
       (type    type   type)
       (boolean type   boolean)
       (number  type   number)
