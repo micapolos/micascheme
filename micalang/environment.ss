@@ -10,6 +10,7 @@
 
   (define mica-environment
     (environment
+    ; (symbol  value    type)
       (type    %type    %type)
       (boolean %boolean %type)
       (number  %number  %type)
