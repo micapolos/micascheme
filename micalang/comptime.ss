@@ -60,12 +60,12 @@
   (define-rules-syntax
     ((curry p)
       (native p))
-    ((curry x p)
+    ((curry p x)
       (lambda x
         (switch x
           ((native? $native) (native (p (native-ref $native))))
           ((else $other) (application (native p) $other)))))
-    ((curry x y p)
+    ((curry p x y)
       (lambda x
         (lambda y
           (switch x
@@ -82,8 +82,8 @@
               (application (application (native p) $other-x) y)))))))
 
   (define-rules-syntax
-    ((define-prim id arg ... p)
-      (define id (curry arg ... p))))
+    ((define-prim id p arg ...)
+      (define id (curry p arg ...))))
 
   (define-rule-syntax (define-prims (id arg ... prim) ...)
     (begin (define-prim id arg ... prim) ...))
@@ -104,12 +104,12 @@
     (char    'char)
     (string  'string)
 
-    (zero? x %zero?)
+    (zero? %zero? x)
 
-    (= x y %=)
-    (+ x y %+)
-    (- x y %-)
-    (< x y %<))
+    (= %= x y)
+    (+ %+ x y)
+    (- %- x y)
+    (< %< x y))
 
   (define-rules-syntax
     ((pi (id in) out)

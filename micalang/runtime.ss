@@ -1,6 +1,6 @@
 (library (micalang runtime)
   (export
-    native app constant tagged
+    curry native app constant tagged
     boolean number symbol char string
     = + - < zero?
     list let lambda macro pi app if)
@@ -32,10 +32,10 @@
 
   (define-rules-syntax
     ((curry x) x)
-    ((curry a x) (lambda a (x a)))
-    ((curry a b x) (lambda a (lambda b (x a b))))
-    ((curry a b c x) (lambda a (lambda b (lambda c (x a b c)))))
-    ((curry a b c d x) (lambda a (lambda b (lambda c (lambda d (x a b c d)))))))
+    ((curry x a) (lambda a (x a)))
+    ((curry x a b) (lambda a (lambda b (x a b))))
+    ((curry x a b c) (lambda a (lambda b (lambda c (x a b c)))))
+    ((curry x a b c d) (lambda a (lambda b (lambda c (lambda d (x a b c d)))))))
 
   (define-rules-syntax
     ((prim id) ($primitive 3 id))
@@ -45,8 +45,8 @@
     ((prim id a b c d) (lambda a (lambda b (lambda c (lambda d (($primitive 3 id) a b c d)))))))
 
   (define-rules-syntax
-    ((define-curry id arg ... p)
-      (define id (curry arg ... p))))
+    ((define-curry id p arg ...)
+      (define id (curry p arg ...))))
 
   (define-rule-syntax (define-currys (id arg ... prim) ...)
     (begin (define-curry id arg ... prim) ...))
@@ -65,12 +65,12 @@
     (char    'char)
     (string  'string)
 
-    (zero? x %zero?)
+    (zero? %zero? x)
 
-    (= x y %=)
-    (+ x y %+)
-    (- x y %-)
-    (< x y %<))
+    (= %= x y)
+    (+ %+ x y)
+    (- %- x y)
+    (< %< x y))
 
   (define list (lambda x (application list x)))
 )

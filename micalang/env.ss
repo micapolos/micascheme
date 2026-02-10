@@ -14,11 +14,11 @@
       (string  . ,%string)
       (symbol  . ,%symbol)
 
-      (zero?   . ,(%curry a zero?))
+      (zero?   . ,(%curry zero? a))
 
-      (=       . ,(%curry a b =))
-      (+       . ,(%curry a b +))
-      (-       . ,(%curry a b -))
-      (<       . ,(%curry a b <))))
+      (=       . ,(%curry = a b))
+      (+       . ,(%curry + a b))
+      (-       . ,(%curry - a b))
+      (<       . ,(%curry < a b))))
 )
 
