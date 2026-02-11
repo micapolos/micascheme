@@ -11,7 +11,7 @@
     (rename (micalang term) (pi %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro)))
   (export
     (import
-      (only (micascheme) equal? quote)
+      (only (micascheme) equal? quote quasiquote unquote syntax unsyntax quasisyntax ... datum syntax-case)
       (prefix (micascheme) %%)
       (only (micalang term) application pi-param type)))
 

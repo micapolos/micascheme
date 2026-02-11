@@ -37,3 +37,17 @@
 
 (check-mica (if (zero? 0) "zero" "not-zero") "zero")
 (check-mica (if (zero? 1) "zero" "not-zero") "not-zero")
+
+(check-mica
+  (let
+    (fx (macro (c t)
+      (%%syntax-case t ()
+        (id (%%symbol? (%%datum id))
+          '(native type (constant fx)))
+        ((_ n)
+          (%%if (%%fixnum? (%%datum n))
+            `(native fx (tagged (constant fx) ,(%%datum n)))
+            (%%syntax-error #'n "not fixnum"))))))
+;    (fx-id (lambda (x fx) x))
+    (fx 10))
+  10)

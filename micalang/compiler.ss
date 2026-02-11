@@ -167,6 +167,16 @@
             (syntax-error $term))
 
           (id
+            (and
+              (symbol? (datum id))
+              (macro? (compiler-type-ref? $compiler (datum id))))
+            (compiler-compile $compiler
+              (macro-apply
+                (compiler-type-ref? $compiler (datum id))
+                $compiler
+                $term)))
+
+          (id
             (symbol? (datum id))
             (lets
               ($type? (compiler-type-ref? $compiler (datum id)))
@@ -191,7 +201,7 @@
               (compiled
                 $t-value
                 (compiled-ref $compiled-t)
-                `(native ,(datum v)))))
+                (datum v))))
 
           ((native . _)
             (syntax-error $term))

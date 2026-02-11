@@ -11,7 +11,7 @@
 
 (check-compiles
   (native boolean foo)
-  (compiled boolean boolean (native foo)))
+  (compiled boolean boolean foo))
 
 (check-compiles
   (let
@@ -19,7 +19,7 @@
     (zero? 1))
   (compiled boolean boolean
     (let
-      (zero? (native (curry %%zero? (x number))))
+      (zero? (curry %%zero? (x number)))
       (app zero? (native 1)))))
 
 (check-compiles
@@ -31,13 +31,13 @@
   (compiled
     (pi (b number) number)
     (pi (b number) number)
-    (let (add (native (curry %%+ (a number) (b number))))
+    (let (add (curry %%+ (a number) (b number)))
       (let (increment (lambda (a number) (app (app + a) (native 1))))
         (let (double (lambda (a number) (lambda (b number) (app (app add a) b))))
           (app double (app increment (native 1))))))))
 
 (check-compiles
-  (native (pi number number number) (%lambda (x) (%lambda (y) (%+ x y))))
+  (native (pi number number number) (native (%lambda (x) (%lambda (y) (%+ x y)))))
   (compiled
     (pi number number number)
     (pi number (pi number number))
@@ -277,3 +277,23 @@
     number
     number
     (let (pi (native #f)) (native 3.14))))
+
+; === custom types
+
+(check-compiles
+  (let
+    (fx (macro (c t)
+      (%%syntax-case t ()
+        (id (%%symbol? (%%datum id))
+          '(native type (constant fx)))
+        ((_ n)
+          (%%if (%%fixnum? (%%datum n))
+            `(native fx (tagged (constant fx) ,(%%datum n)))
+            (%%syntax-error #'n "not fixnum"))))))
+;    (fx-id (lambda (x fx) x))
+    (fx 10))
+  (compiled
+    fx
+    (constant fx)
+    (let (fx (native #f))
+      (tagged (constant fx) 10))))

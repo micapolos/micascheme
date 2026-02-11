@@ -10,7 +10,7 @@
     (rename (micalang term) (pi %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro) (type %type)))
   (export
     (import
-      (only (micascheme) equal? quote)
+      (only (micascheme) equal? quote quasiquote unquote syntax unsyntax quasisyntax ... datum syntax-case)
       (prefix (micascheme) %%)))
 
   (define-rule-syntax (let (id x) ... body)
