@@ -75,9 +75,9 @@
       ($symbols (environment-symbols $environment))
       ($type-terms (environment-type-terms $environment))
       ($values (environment-values $environment))
-      ($nested (fold-right (lambda (s tt acc) `(lambda (,s ,tt) ,acc)) $code $symbols $type-terms))
+      ($nested (fold-left (lambda (acc s tt) `(lambda (,s ,tt) ,acc)) $code $symbols $type-terms))
       ($proc (eval $nested (compiler-comptime-environment $compiler)))
-      (fold-left (lambda (f v) (term-apply f v)) $proc $values)))
+      (fold-left (lambda (f v) (term-apply f v)) $proc (reverse $values))))
 
   (define (compiler-compile-type $compiler $term)
     (compiler-compile-typed $compiler type $term))

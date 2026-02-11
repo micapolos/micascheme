@@ -291,8 +291,12 @@
             `(native fx (tagged (constant fx) ,(%%datum n)))
             (%%syntax-error #'n "not fixnum"))))))
     (fx-10 (fx 10))
-    fx-10)
-  (compiled fx fx
+    (fx-id (lambda (x fx) x))
+    (fx-id (fx 10)))
+  (compiled #f #f
     (let (fx (native #f))
       (let (fx-10 (tagged (constant fx) 10))
-        fx-10))))
+        (let (fx-id (lambda (x (constant fx)) x))
+          (app fx-id (tagged (constant fx) 10)))))))
+
+

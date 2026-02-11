@@ -49,5 +49,6 @@
             `(native fx (tagged (constant fx) ,(%%datum n)))
             (%%syntax-error #'n "not fixnum"))))))
     (fx-10 (fx 10))
-    fx-10)
+    (fx-id (lambda (x fx) x))
+    (fx-id fx-10))
   10)
