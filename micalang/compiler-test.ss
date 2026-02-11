@@ -290,10 +290,9 @@
           (%%if (%%fixnum? (%%datum n))
             `(native fx (tagged (constant fx) ,(%%datum n)))
             (%%syntax-error #'n "not fixnum"))))))
-;    (fx-id (lambda (x fx) x))
-    (fx 10))
-  (compiled
-    fx
-    (constant fx)
+    (fx-10 (fx 10))
+    fx-10)
+  (compiled fx fx
     (let (fx (native #f))
-      (tagged (constant fx) 10))))
+      (let (fx-10 (tagged (constant fx) 10))
+        fx-10))))

@@ -48,6 +48,6 @@
           (%%if (%%fixnum? (%%datum n))
             `(native fx (tagged (constant fx) ,(%%datum n)))
             (%%syntax-error #'n "not fixnum"))))))
-;    (fx-id (lambda (x fx) x))
-    (fx 10))
+    (fx-10 (fx 10))
+    fx-10)
   10)
