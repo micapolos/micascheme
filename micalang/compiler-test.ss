@@ -299,4 +299,14 @@
         (let (fx-id (lambda (x (constant fx)) x))
           (app fx-id (tagged (constant fx) 10)))))))
 
+; === dependent identity
+
+(check-compiles
+  (let
+    (id (lambda (t type) (x t) x))
+    (id number 12))
+  (compiled number number
+    (let (id (lambda (t type) (lambda (x t) x)))
+      (app (app id number) (native 12)))))
+
 

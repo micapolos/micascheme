@@ -52,3 +52,12 @@
     (fx-id (lambda (x fx) x))
     (fx-id fx-10))
   10)
+
+; === dependent identity
+
+(check-mica
+  (let
+    (id (lambda (t type) (x t) x))
+    (id number 12))
+  12)
+
