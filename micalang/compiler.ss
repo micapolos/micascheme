@@ -72,21 +72,18 @@
   (define (compiler-evaluate-comptime $compiler $code)
     (lets
       ($environment (compiler-environment $compiler))
-      ($symbols (environment-symbols $environment))
-      ($type-terms (environment-type-terms $environment))
-      ($values (environment-values $environment))
       ($code
         (fold-left
           (lambda ($nested $symbol $type-term)
             `(lambda (,$symbol ,$type-term) ,$nested))
           $code
-          $symbols
-          $type-terms))
+          (environment-symbols $environment)
+          (environment-type-terms $environment)))
       ($proc (eval $code (compiler-comptime-environment $compiler)))
       (fold-left
         (lambda ($proc $value) (term-apply $proc $value))
         $proc
-        (reverse $values))))
+        (reverse (environment-values $environment)))))
 
   (define (compiler-compile-type $compiler $term)
     (compiler-compile-typed $compiler type $term))
