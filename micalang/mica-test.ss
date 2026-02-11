@@ -61,3 +61,22 @@
     (id number 12))
   12)
 
+; === a 2D vector of anything
+
+(check-mica
+  (let
+    (any-vec2
+      (lambda (t type)
+        (
+          (native
+            (pi symbol type type)
+            (curry %%list (s symbol) (t type)))
+          'any-vec2
+          t)))
+    (vec2
+      (lambda (element type)
+        (native
+          (pi element element (any-vec2 element))
+          (curry %%cons (a element) (b element)))))
+    (vec2 (any-vec2 number) (vec2 number 10 20) (vec2 number 10 20)))
+  `((10 . 20) . (10 . 20)))

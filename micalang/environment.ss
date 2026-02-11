@@ -57,6 +57,7 @@
       (boolean type   boolean)
       (number  type   number)
       (char    type   char)
+      (symbol  type   symbol)
       (string  type   string)
 
       (zero?   (pi number boolean)              (curry %%zero? (a number)))
