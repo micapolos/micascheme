@@ -30,11 +30,7 @@
             ,(default-term-compile $default
               (abstraction-apply $abstraction (variable $symbol))))))
       ((pi? $pi)
-        (lets
-          ($symbol (or (pi-symbol? $pi) '_))
-          `(lambda (,$symbol)
-            ,(default-term-compile $default
-              (pi-apply $pi (variable $symbol))))))
+        (throw erased))
       ((application? $application)
         `(
           ,(default-term-compile $default (application-lhs $application))
