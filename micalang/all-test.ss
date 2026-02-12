@@ -2,6 +2,7 @@
 
 (test
   (micalang term)
+  (micalang term-eval)
   (micalang reify)
   (micalang runtime)
   (micalang comptime)
