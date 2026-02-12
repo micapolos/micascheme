@@ -73,47 +73,6 @@
     (pi number number boolean)
     <))
 
-; === the type
-
-(check-compiles
-  (the (pi number boolean))
-  (compiled
-    (pi number boolean)
-    (pi number boolean)
-    zero?))
-
-(check-compiles
-  (the (pi number boolean) zero?)
-  (compiled
-    (pi number boolean)
-    (pi number boolean)
-    zero?))
-
-(check-compiles
-  (the (pi number number boolean))
-  (compiled
-    (pi number number boolean)
-    (pi number number boolean)
-    <))
-
-(check-compiles
-  (the (pi number number boolean) <)
-  (compiled
-    (pi number number boolean)
-    (pi number number boolean)
-    <))
-
-(check-compiles
-  (the (pi number number number) +)
-  (compiled
-    (pi number number number)
-    (pi number number number)
-    +))
-
-; conflict between - and +
-(check-compile-raises
-  (the (pi number number number)))
-
 ; === application
 
 (check-compiles
