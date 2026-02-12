@@ -1,0 +1,44 @@
+(library (micalang term-compile)
+  (export
+    term-compile
+    default-term-compile)
+  (import
+    (micalang base)
+    (micalang term))
+
+  (define (term-compile $term)
+    (default-term-compile
+      (lambda ($default $term) (throw term-compile))
+      $term))
+
+  (define (default-term-compile $default $term)
+    (switch $term
+      ((type? $type)
+        (throw erased))
+      ((native? $native)
+        ($default $default (native-ref $native)))
+      ((variable? $variable)
+        (variable-symbol $variable))
+      ((constant? $constant)
+        (default-term-compile $default (constant-ref $constant)))
+      ((tagged? $tagged)
+        (default-term-compile $default (tagged-ref $tagged)))
+      ((abstraction? $abstraction)
+        (lets
+          ($symbol (or (abstraction-symbol? $abstraction) '_))
+          `(lambda (,$symbol)
+            ,(default-term-compile $default
+              (abstraction-apply $abstraction (variable $symbol))))))
+      ((pi? $pi)
+        (lets
+          ($symbol (or (pi-symbol? $pi) '_))
+          `(lambda (,$symbol)
+            ,(default-term-compile $default
+              (pi-apply $pi (variable $symbol))))))
+      ((application? $application)
+        `(
+          ,(default-term-compile $default (application-lhs $application))
+          ,(default-term-compile $default (application-rhs $application))))
+      ((else $other)
+        ($default $default $other))))
+)
