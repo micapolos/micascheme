@@ -12,5 +12,9 @@
   (zero? 1))
 
 (check-compiles
-  (abstraction 'x (native 'int) (lambda (x) x))
-  (lambda (x) x))
+  (abstraction 'x (native 'int) (lambda (x) (application x x)))
+  (lambda (x) (x x)))
+
+(check-compiles
+  (native '(dupa jasiu))
+  (dupa jasiu))
