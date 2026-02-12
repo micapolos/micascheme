@@ -9,4 +9,5 @@
   (micalang comptime)
   (micalang environment)
   (micalang compiler)
-  (micalang mica))
+  (micalang mica)
+  (micalang syntax-eval))
