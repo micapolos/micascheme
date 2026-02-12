@@ -7,7 +7,6 @@
     environment-types
     environment-type-terms
     environment-values
-    environment-id?
     mica-environment)
   (import
     (only (micalang base) push list define lets not cdr map car cadr caddr cadddr caar assq memp lambda and define-rule-syntax quasiquote unquote ...)
@@ -24,20 +23,6 @@
     (lets
       ($ass? (assq $id $environment))
       (and $ass? (cadr $ass?))))
-
-  (define (environment-id? $environment $type)
-    (lets
-      ($tail?
-        (memp
-          (lambda ($ass) (term-equal? (cadr $ass) $type))
-          $environment))
-      (and
-        $tail?
-        (not
-          (memp
-            (lambda ($ass) (term-equal? (cadr $ass) $type))
-            (cdr $tail?)))
-        (caar $tail?))))
 
   (define (environment-symbols $environment)
     (map car $environment))
