@@ -65,9 +65,7 @@
       (environment-push (compiler-environment $compiler) $id $type $type-term $value)))
 
   (define (compiler-type-ref? $compiler $id)
-    (lets
-      ($ass? (assq $id (compiler-environment $compiler)))
-      (and $ass? (cadr $ass?))))
+    (environment-type? (compiler-environment $compiler) $id))
 
   (define (compiler-evaluate-comptime $compiler $code)
     (lets

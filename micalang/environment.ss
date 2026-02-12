@@ -9,32 +9,35 @@
     environment-values
     mica-environment)
   (import
-    (only (micalang base) push list define lets not cdr map car cadr caddr cadddr caar assq memp lambda and define-rule-syntax quasiquote unquote ...)
+    (only (micalang base) cons dot push list define lets not cdr map car cadr caddr cadddr caar assq memp lambda and define-rule-syntax quasiquote unquote ...)
     (only (micalang term) term-equal?)
+    (micalang compiled)
     (except (micalang comptime) lambda))
 
   (define-rule-syntax (environment (id type value) ...)
-    `((id ,type type ,value) ...))
+    `((id . ,(compiled type 'type value)) ...))
 
   (define (environment-push $environment $id $type $type-term $value)
-    (push $environment (list $id $type $type-term $value)))
+    (push $environment
+      (cons $id
+        (compiled $type $type-term $value))))
 
   (define (environment-type? $environment $id)
     (lets
       ($ass? (assq $id $environment))
-      (and $ass? (cadr $ass?))))
+      (and $ass? (compiled-type (cdr $ass?)))))
 
   (define (environment-symbols $environment)
     (map car $environment))
 
   (define (environment-types $environment)
-    (map cadr $environment))
+    (map (dot compiled-type cdr) $environment))
 
   (define (environment-type-terms $environment)
-    (map caddr $environment))
+    (map (dot compiled-type-term cdr) $environment))
 
   (define (environment-values $environment)
-    (map cadddr $environment))
+    (map (dot compiled-ref cdr) $environment))
 
   (define mica-environment
     (environment
