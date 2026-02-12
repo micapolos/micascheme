@@ -35,6 +35,11 @@
         `(
           ,(default-term-compile $default (application-lhs $application))
           ,(default-term-compile $default (application-rhs $application))))
+      ((conditional? $conditional)
+        `(if
+          ,(default-term-compile $default (conditional-cond $conditional))
+          ,(default-term-compile $default (conditional-true $conditional))
+          ,(default-term-compile $default (conditional-false $conditional))))
       ((else $other)
         ($default $default $other))))
 )

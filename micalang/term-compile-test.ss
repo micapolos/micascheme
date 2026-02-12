@@ -24,6 +24,14 @@
   (zero? x))
 
 (check-compiles
+  (constant (variable 'a))
+  a)
+
+(check-compiles
+  (tagged (variable 'a) (variable 'b))
+  b)
+
+(check-compiles
   (abstraction 'x (native 'int) (lambda (x) (application x x)))
   (lambda (x) (x x)))
 
@@ -32,3 +40,8 @@
   (lambda (_) (a b)))
 
 (check-throws (pi 'x (native 'int) (lambda (x) (pi x x))))
+
+(check-compiles
+  (conditional (variable 'a) (variable 'b) (variable 'c))
+  (if a b c))
+
