@@ -1,18 +1,33 @@
 (library (micalang reify)
-  (export default-reify reify check-reify)
+  (export
+    unique-id
+    default-ids-reify
+    ids-reify
+    reify
+    check-reify)
   (import
     (micalang base)
     (micalang term))
 
-  (define (index->symbol $index)
-    (string->symbol (format "v~a" $index)))
+  (define (unique-id $ids $symbol?)
+    (cond
+      ((not $symbol?)
+        (unique-id $ids 'x))
+      ((member $symbol? $ids)
+        (unique-id $ids (symbol-append '$ $symbol?)))
+      (else
+        $symbol?)))
 
   (define (reify $term)
-    (default-reify
-      (lambda ($default $term) (throw reify $term))
+    (ids-reify (stack) $term))
+
+  (define (ids-reify $ids $term)
+    (default-ids-reify
+      (lambda ($default $ids $term) (throw reify $term))
+      $ids
       $term))
 
-  (define (default-reify $default $term)
+  (define (default-ids-reify $default $ids $term)
     (switch $term
       ((a-type? _) 'a-type)
       ((a-symbol? _) 'a-symbol)
@@ -23,56 +38,60 @@
       ((native? $native)
         (native-ref $native))
       ((variable? $variable)
-        (variable-symbol $variable))
+        (list-ref $ids (variable-index $variable)))
       ((constant? $constant)
         (constant-ref $constant))
       ((tagged? $tagged)
         ; TODO: Allow chaining like application.
         `(
-          ,(default-reify $default (tagged-tag $tagged))
-          ,(default-reify $default (tagged-ref $tagged))))
+          ,(default-ids-reify $default $ids (tagged-tag $tagged))
+          ,(default-ids-reify $default $ids (tagged-ref $tagged))))
       ((abstraction? $abstraction)
         (lets
           ($symbol? (abstraction-symbol? $abstraction))
-          ($reified-param (default-reify $default (abstraction-param $abstraction)))
+          ($id (unique-id $ids $symbol?))
+          ($reified-param (default-ids-reify $default $ids (abstraction-param $abstraction)))
           `(lambda
-            ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param) .
+            ,(if $symbol? `(,$id ,$reified-param) $reified-param) .
             ,(lets
-              ($body (abstraction-apply $abstraction (native $symbol?)))
-              ($reified-body (default-reify $default $body))
+              ($body (abstraction-apply $abstraction (native $id)))
+              ($ids (push $ids $id))
+              ($reified-body (default-ids-reify $default $ids $body))
               (if (abstraction? $body)
+                (cdr $reified-body)
+                `(,$reified-body))))))
+      ((type-abstraction? $type-abstraction)
+        (lets
+          ($symbol? (type-abstraction-symbol? $type-abstraction))
+          ($id (unique-id $ids $symbol?))
+          ($reified-param (default-ids-reify $default $ids (type-abstraction-param $type-abstraction)))
+          `(a-lambda
+            ,(if $symbol? `(,$id ,$reified-param) $reified-param) .
+            ,(lets
+              ($body (type-abstraction-apply $type-abstraction (native $id)))
+              ($ids (push $ids $id))
+              ($reified-body (default-ids-reify $default $ids $body))
+              (if (type-abstraction? $body)
                 (cdr $reified-body)
                 `(,$reified-body))))))
       ((application? $application)
         (lets
           ($lhs (application-lhs $application))
-          ($reified-lhs (default-reify $default (application-lhs $application)))
-          ($reified-rhs (default-reify $default (application-rhs $application)))
+          ($reified-lhs (default-ids-reify $default $ids (application-lhs $application)))
+          ($reified-rhs (default-ids-reify $default $ids (application-rhs $application)))
           (if (application? $lhs)
             (append $reified-lhs `(,$reified-rhs))
             `(,$reified-lhs ,$reified-rhs))))
       ((conditional? $conditional)
         `(if
-          ,(default-reify $default (conditional-cond $conditional))
-          ,(default-reify $default (conditional-true $conditional))
-          ,(default-reify $default (conditional-false $conditional))))
-      ((type-abstraction? $type-abstraction)
-        (lets
-          ($symbol? (type-abstraction-symbol? $type-abstraction))
-          ($reified-param (default-reify $default (type-abstraction-param $type-abstraction)))
-          `(a-lambda
-            ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param) .
-            ,(lets
-              ($body (type-abstraction-apply $type-abstraction (native $symbol?)))
-              ($reified-body (default-reify $default $body))
-              (if (type-abstraction? $body)
-                (cdr $reified-body)
-                `(,$reified-body))))))
+          ,(default-ids-reify $default $ids (conditional-cond $conditional))
+          ,(default-ids-reify $default $ids (conditional-true $conditional))
+          ,(default-ids-reify $default $ids (conditional-false $conditional))))
       ((macro? $macro)
         'macro)
       ((else $other)
         ($default $default $other))))
 
   (define-rule-syntax (check-reify in out)
-    (check (equal? (reify in) `out)))
+    (check (equal? (ids-reify '(v0 v1) in) `out)))
 )

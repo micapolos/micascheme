@@ -40,14 +40,14 @@
 
 (check
   (term-equal?
-    (variable 'x)
-    (variable 'x)))
+    (variable 0)
+    (variable 0)))
 
 (check
   (not
     (term-equal?
-      (variable 'x)
-      (variable 'y))))
+      (variable 0)
+      (variable 1))))
 
 (check
   (term-equal?
@@ -79,14 +79,14 @@
 
 (check
   (term-equal?
-    (application (variable 'x) (variable 'x))
-    (application (variable 'x) (variable 'x))))
+    (application (variable 0) (variable 0))
+    (application (variable 0) (variable 0))))
 
 (check
   (not
     (term-equal?
-      (application (variable 'x) (variable 'x))
-      (application (variable 'x) (variable 'y)))))
+      (application (variable 0) (variable 0))
+      (application (variable 0) (variable 1)))))
 
 (check
   (term-equal?

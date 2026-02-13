@@ -53,10 +53,17 @@
     (throw term-equal? $lhs $rhs))
 
   (define (compiler-reify $compiler $term)
-    (default-reify (compiler-default-reify $compiler) $term))
+    (default-ids-reify
+      (compiler-default-reify $compiler)
+      (environment-symbols (compiler-environment $compiler))
+      $term))
 
   (define (compiler-term-equal? $compiler $lhs $rhs)
-    (default-term-equal? (compiler-default-term-equal? $compiler) $lhs $rhs))
+    (default-depth-term-equal?
+      (compiler-default-term-equal? $compiler)
+      (length (environment-symbols (compiler-environment $compiler)))
+      $lhs
+      $rhs))
 
   (define (compiler-push $compiler $id $compiled)
     (compiler
@@ -276,7 +283,10 @@
               ($param (compiler-evaluate-comptime $compiler $param-term))
               ($compiled-body
                 (compiler-compile
-                  (compiler-push? $compiler $symbol? (compiled $param $param-term (variable $symbol?)))
+                  (compiler-push? $compiler $symbol?
+                    (compiled $param $param-term
+                      ; TODO: Should it be constant something else?
+                      (constant $symbol?)))
                   #'body))
               ($body-type (compiled-type $compiled-body))
               ($body-type-term (compiled-type-term $compiled-body))

@@ -1,5 +1,11 @@
 (import (micalang base) (micalang term) (micalang reify))
 
+(check (equal? (unique-id '(a b $b) #f) 'x))
+(check (equal? (unique-id '(a b $b) #f) 'x))
+(check (equal? (unique-id '(a b $b) 'a) '$a))
+(check (equal? (unique-id '(a b $b) 'b) '$$b))
+(check (equal? (unique-id '(a b $b) 'c) 'c))
+
 (check-reify a-type a-type)
 
 (check-reify (native #t) #t)
@@ -8,7 +14,8 @@
 (check-reify (native "foo") "foo")
 (check-reify (native 'a) a)
 
-(check-reify (variable 'zero?) zero?)
+(check-reify (variable 0) v0)
+(check-reify (variable 1) v1)
 
 (check-reify
   (constant '(this is my (constant)))
@@ -37,6 +44,13 @@
 (check-reify
   (abstraction 'x (native 'int) (lambda (x) x))
   (lambda (x int) x))
+
+(check-reify
+  (abstraction 'x (native 'int)
+    (lambda (a)
+      (abstraction 'x (native 'int)
+        (lambda (b) (application a b)))))
+  (lambda (x int) ($x int) (x $x)))
 
 (check-reify
   (abstraction 'x (native 'int) (lambda (x) (abstraction 'y (native 'bool) (lambda (y) (application x y)))))

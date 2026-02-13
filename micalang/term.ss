@@ -7,7 +7,7 @@
     a-char a-char?
     a-string a-string?
     native native? native-ref
-    variable variable? variable-symbol
+    variable variable? variable-index
     constant constant? constant-ref
     tagged tagged? tagged-tag tagged-ref
     abstraction abstraction? abstraction-symbol? abstraction-param abstraction-procedure abstraction-apply
@@ -18,7 +18,7 @@
 
     term-apply
     apply-term
-    default-term-equal? term-equal?)
+    default-depth-term-equal? term-equal?)
   (import (micalang base))
 
   (data a-type)
@@ -28,7 +28,7 @@
   (data a-char)
   (data a-string)
   (data (native ref))
-  (data (variable symbol))
+  (data (variable index))
   (data (constant ref))
   (data (tagged tag ref))
   (data (abstraction symbol? param procedure))
@@ -60,12 +60,13 @@
         (application $other $rhs))))
 
   (define (term-equal? $lhs $rhs)
-    (default-term-equal?
-      (lambda ($default $lhs $rhs) (throw term-equal? $lhs $rhs))
+    (default-depth-term-equal?
+      (lambda ($default $depth $lhs $rhs) (throw term-equal? $lhs $rhs))
+      0
       $lhs
       $rhs))
 
-  (define (default-term-equal? $default $lhs $rhs)
+  (define (default-depth-term-equal? $default $depth $lhs $rhs)
     (switch $lhs
       ((a-type? _)
         (switch? $rhs
@@ -94,9 +95,9 @@
       ((variable? $lhs-variable)
         (switch? $rhs
           ((variable? $rhs-variable)
-            (symbol=?
-              (variable-symbol $lhs-variable)
-              (variable-symbol $rhs-variable)))))
+            (=
+              (variable-index $lhs-variable)
+              (variable-index $rhs-variable)))))
       ((constant? $lhs-constant)
         (switch? $rhs
           ((constant? $rhs-constant)
@@ -107,53 +108,53 @@
         (switch? $rhs
           ((tagged? $rhs-tagged)
             (and
-              (default-term-equal? $default
+              (default-depth-term-equal? $default $depth
                 (tagged-tag $lhs-tagged)
                 (tagged-tag $rhs-tagged))
-              (default-term-equal? $default
+              (default-depth-term-equal? $default $depth
                 (tagged-ref $lhs-tagged)
                 (tagged-ref $rhs-tagged))))))
       ((abstraction? $lhs-abstraction)
         (switch? $rhs
           ((abstraction? $rhs-abstraction)
             (and
-              (default-term-equal? $default
+              (default-depth-term-equal? $default $depth
                 (abstraction-param $lhs-abstraction)
                 (abstraction-param $rhs-abstraction))
-              (default-term-equal? $default
-                (abstraction-apply $lhs-abstraction (variable (abstraction-symbol? $lhs-abstraction)))
-                (abstraction-apply $rhs-abstraction (variable (abstraction-symbol? $lhs-abstraction))))))))
+              (default-depth-term-equal? $default (+ $depth 1)
+                (abstraction-apply $lhs-abstraction (variable $depth))
+                (abstraction-apply $rhs-abstraction (variable $depth)))))))
       ((application? $lhs-application)
         (switch? $rhs
           ((application? $rhs-application)
             (and
-              (default-term-equal? $default
+              (default-depth-term-equal? $default $depth
                 (application-lhs $lhs-application)
                 (application-lhs $rhs-application))
-              (default-term-equal? $default
+              (default-depth-term-equal? $default $depth
                 (application-rhs $lhs-application)
                 (application-rhs $rhs-application))))))
       ((type-abstraction? $lhs-pi)
         (switch? $rhs
           ((type-abstraction? $rhs-pi)
             (and
-              (default-term-equal? $default
+              (default-depth-term-equal? $default $depth
                 (type-abstraction-param $lhs-pi)
                 (type-abstraction-param $rhs-pi))
-              (default-term-equal? $default
-                (type-abstraction-apply $lhs-pi (variable (type-abstraction-symbol? $lhs-pi)))
-                (type-abstraction-apply $rhs-pi (variable (type-abstraction-symbol? $lhs-pi))))))))
+              (default-depth-term-equal? $default (+ $depth 1)
+                (type-abstraction-apply $lhs-pi (variable $depth))
+                (type-abstraction-apply $rhs-pi (variable $depth)))))))
       ((conditional? $lhs-conditional)
         (switch? $rhs
           ((conditional? $rhs-conditional)
             (and
-              (default-term-equal? $default
+              (default-depth-term-equal? $default $depth
                 (conditional-cond $lhs-conditional)
                 (conditional-cond $rhs-conditional))
-              (default-term-equal? $default
+              (default-depth-term-equal? $default $depth
                 (conditional-true $lhs-conditional)
                 (conditional-true $rhs-conditional))
-              (default-term-equal? $default
+              (default-depth-term-equal? $default $depth
                 (conditional-false $lhs-conditional)
                 (conditional-false $rhs-conditional))))))
       ((macro? $lhs-macro)
@@ -163,7 +164,7 @@
               (macro-procedure $lhs-macro)
               (macro-procedure $rhs-macro)))))
       ((else $other)
-        ($default $default $lhs $rhs))))
+        ($default $default $depth $lhs $rhs))))
 
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))
