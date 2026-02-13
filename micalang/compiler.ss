@@ -64,6 +64,9 @@
       (compiler-comptime-environment $compiler)
       (environment-push (compiler-environment $compiler) $id $compiled)))
 
+  (define (compiler-push? $compiler $id? $compiled)
+    (if $id? (compiler-push $compiler $id? $compiled) $compiler))
+
   (define (compiler-type-ref? $compiler $id)
     (environment-type? (compiler-environment $compiler) $id))
 
@@ -196,10 +199,7 @@
               ($in-type (compiled-type $compiled-in))
               ($in-term (compiled-ref $compiled-in))
               ($in-value (compiler-evaluate-comptime $compiler $in-term))
-              ($compiler
-                (if $symbol?
-                  (compiler-push $compiler $symbol? (compiled $in-type $in-term $in-value))
-                  $compiler))
+              ($compiler (compiler-push? $compiler $symbol? (compiled $in-type $in-term $in-value)))
               ($compiled-out (compiler-compile $compiler #'body))
               ($out-term (compiled-ref $compiled-out))
               (compiled
@@ -258,9 +258,7 @@
               ($t-value (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
               ($compiled-body
                 (compiler-compile
-                  (if $symbol?
-                    (compiler-push $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) (variable $symbol?)))
-                    $compiler)
+                  (compiler-push $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) (variable $symbol?)))
                   #'body))
               ($body-type (compiled-type $compiled-body))
               ($body (compiled-ref $compiled-body))
@@ -269,9 +267,7 @@
                   (lambda ($x)
                     (compiled-type
                       (compiler-compile
-                        (if $symbol?
-                          (compiler-push $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) $x))
-                          $compiler)
+                        (compiler-push $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) $x))
                         #'body))))
                 `(pi
                   ,(if $symbol? `(,$symbol? ,(compiled-ref $compiled-t)) (compiled-ref $compiled-t))
