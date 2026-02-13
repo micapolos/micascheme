@@ -32,8 +32,8 @@
           (switch $lhs
             ((abstraction? $abstraction)
               (default-term-eval $default (abstraction-apply $abstraction $rhs)))
-            ((pi? $pi)
-              (default-term-eval $default (pi-apply $pi $rhs)))
+            ((type-abstraction? $type-abstraction)
+              (default-term-eval $default (type-abstraction-apply $type-abstraction $rhs)))
             ((native? $native)
               (switch $rhs
                 ((native? $rhs)
@@ -42,7 +42,7 @@
                   (application $native $rhs))))
             ((else $other)
               (application $lhs $rhs)))))
-      ((pi? $pi) $pi)
+      ((type-abstraction? $type-abstraction) $type-abstraction)
       ((conditional? $conditional)
         (lets
           ($cond (default-term-eval $default (conditional-cond $conditional)))

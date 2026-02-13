@@ -266,7 +266,7 @@
               ($body-type-term (compiled-type-term $compiled-body))
               ($body (compiled-ref $compiled-body))
               (compiled
-                (pi $symbol? $param
+                (type-abstraction $symbol? $param
                   (lambda ($x)
                     (compiled-type
                       (compiler-compile
@@ -321,15 +321,15 @@
               ($compiled-fn (compiler-compile $compiler #'fn))
               ($fn-type (compiled-type $compiled-fn))
               (switch $fn-type
-                ((pi? $pi)
+                ((type-abstraction? $type-abstraction)
                   (lets
                     ($fn-term (compiled-ref $compiled-fn))
-                    ($param-type (pi-param $pi))
+                    ($param-type (type-abstraction-param $type-abstraction))
                     ($arg-term (compiler-compile-typed $compiler $param-type #'arg))
                     ($arg-value (compiler-evaluate-comptime $compiler $arg-term))
                     (compiled
-                      (pi-apply $pi $arg-value)
-                      (compiler-reify $compiler (pi-apply $pi $arg-value))
+                      (type-abstraction-apply $type-abstraction $arg-value)
+                      (compiler-reify $compiler (type-abstraction-apply $type-abstraction $arg-value))
                       `(app ,$fn-term ,$arg-term))))
                 ((else $other)
                   (syntax-error #'fn

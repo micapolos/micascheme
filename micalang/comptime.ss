@@ -8,12 +8,12 @@
   (import
     (except (micalang base) = + - < zero? list app lambda let string if)
     (prefix (only (micalang base) lambda let if = + - < zero?) %)
-    (rename (micalang term) (pi %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro)))
+    (rename (micalang term) (type-abstraction %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro)))
   (export
     (import
       (only (micascheme) equal? quote quasiquote unquote syntax unsyntax quasisyntax ... datum syntax-case)
       (prefix (micascheme) %%)
-      (only (micalang term) application pi-param any-type)))
+      (only (micalang term) application type-abstraction-param any-type)))
 
   (define-rule-syntax (native x)
     (%native x))
@@ -90,8 +90,8 @@
 
   (define (app $lhs $rhs)
     (switch $lhs
-      ((pi? $pi)
-        (pi-apply $pi $rhs))
+      ((type-abstraction? $type-abstraction)
+        (type-abstraction-apply $type-abstraction $rhs))
       ((abstraction? $abstraction)
         (abstraction-apply $abstraction $rhs))
       ((else $other)

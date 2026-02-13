@@ -7,7 +7,7 @@
     tagged tagged? tagged-tag tagged-ref
     abstraction abstraction? abstraction-symbol? abstraction-param abstraction-procedure abstraction-apply
     application application? application-lhs application-rhs
-    pi pi? pi-symbol? pi-param pi-procedure pi-apply
+    type-abstraction type-abstraction? type-abstraction-symbol? type-abstraction-param type-abstraction-procedure type-abstraction-apply
     conditional conditional? conditional-cond conditional-true conditional-false
     macro macro? macro-procedure macro-apply
 
@@ -23,7 +23,7 @@
   (data (tagged tag ref))
   (data (abstraction symbol? param procedure))
   (data (application lhs rhs))
-  (data (pi symbol? param procedure))
+  (data (type-abstraction symbol? param procedure))
   (data (conditional cond true false))
   (data (macro procedure))
 
@@ -44,8 +44,8 @@
         (term-apply (tagged-ref $tagged) $rhs))
       ((abstraction? $abstraction)
         (abstraction-apply $abstraction $rhs))
-      ((pi? $pi)
-        (pi-apply $pi $rhs))
+      ((type-abstraction? $type-abstraction)
+        (type-abstraction-apply $type-abstraction $rhs))
       ((else $other)
         (application $other $rhs))))
 
@@ -108,16 +108,16 @@
               (default-term-equal? $default
                 (application-rhs $lhs-application)
                 (application-rhs $rhs-application))))))
-      ((pi? $lhs-pi)
+      ((type-abstraction? $lhs-pi)
         (switch? $rhs
-          ((pi? $rhs-pi)
+          ((type-abstraction? $rhs-pi)
             (and
               (default-term-equal? $default
-                (pi-param $lhs-pi)
-                (pi-param $rhs-pi))
+                (type-abstraction-param $lhs-pi)
+                (type-abstraction-param $rhs-pi))
               (default-term-equal? $default
-                (pi-apply $lhs-pi (variable (pi-symbol? $lhs-pi)))
-                (pi-apply $rhs-pi (variable (pi-symbol? $lhs-pi))))))))
+                (type-abstraction-apply $lhs-pi (variable (type-abstraction-symbol? $lhs-pi)))
+                (type-abstraction-apply $rhs-pi (variable (type-abstraction-symbol? $lhs-pi))))))))
       ((conditional? $lhs-conditional)
         (switch? $rhs
           ((conditional? $rhs-conditional)
@@ -143,8 +143,8 @@
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))
 
-  (define (pi-apply $pi $arg)
-    ((pi-procedure $pi) $arg))
+  (define (type-abstraction-apply $type-abstraction $arg)
+    ((type-abstraction-procedure $type-abstraction) $arg))
 
   (define (macro-apply $macro $compiler $term)
     ((macro-procedure $macro) $compiler $term))

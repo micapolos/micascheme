@@ -39,7 +39,7 @@
   (abstraction #f (native 'int) (lambda (_) (application (variable 'a) (variable 'b))))
   (lambda (_) (a b)))
 
-(check-throws (pi 'x (native 'int) (lambda (x) (pi x x))))
+(check-throws (type-abstraction 'x (native 'int) (lambda (x) (type-abstraction x x))))
 
 (check-compiles
   (conditional (variable 'a) (variable 'b) (variable 'c))

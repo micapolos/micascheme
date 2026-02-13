@@ -51,16 +51,16 @@
           ,(default-reify $default (conditional-cond $conditional))
           ,(default-reify $default (conditional-true $conditional))
           ,(default-reify $default (conditional-false $conditional))))
-      ((pi? $pi)
+      ((type-abstraction? $type-abstraction)
         (lets
-          ($symbol? (pi-symbol? $pi))
-          ($reified-param (default-reify $default (pi-param $pi)))
+          ($symbol? (type-abstraction-symbol? $type-abstraction))
+          ($reified-param (default-reify $default (type-abstraction-param $type-abstraction)))
           `(any-lambda
             ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param) .
             ,(lets
-              ($body (pi-apply $pi (native $symbol?)))
+              ($body (type-abstraction-apply $type-abstraction (native $symbol?)))
               ($reified-body (default-reify $default $body))
-              (if (pi? $body)
+              (if (type-abstraction? $body)
                 (cdr $reified-body)
                 `(,$reified-body))))))
       ((macro? $macro)

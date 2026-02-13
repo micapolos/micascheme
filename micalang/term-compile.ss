@@ -29,7 +29,7 @@
           `(lambda (,$symbol)
             ,(default-term-compile $default
               (abstraction-apply $abstraction (variable $symbol))))))
-      ((pi? $pi)
+      ((type-abstraction? $type-abstraction)
         (throw erased))
       ((application? $application)
         `(

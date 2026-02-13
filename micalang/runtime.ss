@@ -7,7 +7,7 @@
   (import
     (except (micalang base) = + - < zero? lambda app let if string)
     (prefix (only (micalang base) let lambda app if zero? = + - <) %)
-    (rename (micalang term) (pi %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro) (any-type %any-type)))
+    (rename (micalang term) (type-abstraction %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro) (any-type %any-type)))
   (export
     (import
       (only (micascheme) equal? quote quasiquote unquote syntax unsyntax quasisyntax ... datum syntax-case)

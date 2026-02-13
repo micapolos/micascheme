@@ -9,10 +9,10 @@
   "foo"
   'foo
   (+ 1 2)
-  (pi (x type) x)
+  (type-abstraction (x type) x)
   (lambda (a number) (b number) (+ a b))
   ((lambda (a number) (b number) (+ a b)) 10 20)
   (let
-    (połącz (native (pi string string string) (prim string-append a b)))
+    (połącz (native (type-abstraction string string string) (prim string-append a b)))
     (połącz "Hello, " "world!")))
 

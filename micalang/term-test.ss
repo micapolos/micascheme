@@ -123,36 +123,36 @@
 
 (check
   (term-equal?
-    (pi 'x (native 't1) (lambda (x) (apply-term zero? x)))
-    (pi 'x (native 't1) (lambda (x) (apply-term zero? x)))))
+    (type-abstraction 'x (native 't1) (lambda (x) (apply-term zero? x)))
+    (type-abstraction 'x (native 't1) (lambda (x) (apply-term zero? x)))))
 
 (check
   (term-equal?
-    (pi 'x (native 't1) (lambda (x) (apply-term zero? x)))
-    (pi 'y (native 't1) (lambda (x) (apply-term zero? x)))))
+    (type-abstraction 'x (native 't1) (lambda (x) (apply-term zero? x)))
+    (type-abstraction 'y (native 't1) (lambda (x) (apply-term zero? x)))))
 
 (check
   (not
     (term-equal?
-      (pi 'x (native 't1) (lambda (x) (apply-term zero? x)))
-      (pi 'x (native 't2) (lambda (x) (apply-term zero? x))))))
+      (type-abstraction 'x (native 't1) (lambda (x) (apply-term zero? x)))
+      (type-abstraction 'x (native 't2) (lambda (x) (apply-term zero? x))))))
 
 (check
   (not
     (term-equal?
-      (pi 'x (native 't1) (lambda (x) (apply-term zero? x)))
-      (pi 'x (native 't1) (lambda (x) (apply-term one? x))))))
+      (type-abstraction 'x (native 't1) (lambda (x) (apply-term zero? x)))
+      (type-abstraction 'x (native 't1) (lambda (x) (apply-term one? x))))))
 
 (check
   (term-equal?
-    (pi 'x (native 't1) (lambda (x) (native 't2)))
-    (pi #f (native 't1) (lambda (_) (native 't2)))))
+    (type-abstraction 'x (native 't1) (lambda (x) (native 't2)))
+    (type-abstraction #f (native 't1) (lambda (_) (native 't2)))))
 
 (check
   (not
     (term-equal?
-      (pi 'x (native 't1) (lambda (x) (native 't2)))
-      (pi #f (native 't1) (lambda (_) (native 't3))))))
+      (type-abstraction 'x (native 't1) (lambda (x) (native 't2)))
+      (type-abstraction #f (native 't1) (lambda (_) (native 't3))))))
 
 (lets
   ($procedure1 (lambda ($compiler $term) 'foo))

@@ -3,5 +3,5 @@
   (import (micascheme))
   (export
     (import
-      (except (micascheme) pi environment environment-symbols)
+      (except (micascheme) environment environment-symbols)
       (prefix (only (scheme) environment) %))))
