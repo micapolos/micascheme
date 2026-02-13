@@ -15,18 +15,18 @@
 
 (check-compiles
   (let
-    (zero? (native (a-lambda a-number a-boolean) (curry %%zero? (x a-number))))
+    (zero? (native (a-lambda a-number a-boolean) (curry %%zero? x)))
     (zero? 1))
   (compiled a-boolean
     (let
-      (zero? (curry %%zero? (x a-number)))
+      (zero? (curry %%zero? x))
       (app zero? (native 1)))))
 
 (check-compiles
   (native-lambda + a-number a-number a-number)
   (compiled
     (a-lambda a-number a-number a-number)
-    (curry %%+ ($0 a-number) ($1 a-number))))
+    (curry %%+ v-0 v-1)))
 
 (check-compiles
   (let
@@ -34,7 +34,7 @@
     (zero? 1))
   (compiled a-boolean
     (let
-      (zero? (curry %%zero? ($0 a-number)))
+      (zero? (curry %%zero? v-0))
       (app zero? (native 1)))))
 
 (check-compiles
@@ -45,7 +45,7 @@
     (double (increment 1)))
   (compiled
     (a-lambda (b a-number) a-number)
-    (let (add (curry %%+ ($0 a-number) ($1 a-number)))
+    (let (add (curry %%+ v-0 v-1))
       (let (increment (lambda a (app (app + a) (native 1))))
         (let (double (lambda a (lambda b (app (app add a) b))))
           (app double (app increment (native 1))))))))

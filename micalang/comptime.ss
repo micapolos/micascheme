@@ -63,12 +63,12 @@
   (define-rules-syntax
     ((curry p)
       (native p))
-    ((curry p (p1 t1))
+    ((curry p p1)
       (lambda p1
         (switch p1
           ((native? $native) (native (p (native-ref $native))))
           ((else $other) (application (native p) $other)))))
-    ((curry p (p1 t1) (p2 t2))
+    ((curry p p1 p2)
       (lambda p1
         (lambda p2
           (switch p1
@@ -101,16 +101,16 @@
         (application (native $other) $rhs))))
 
   (define-prims
-    (zero? %zero? (x a-number))
+    (zero? %zero? x)
 
-    (= %= (x a-number) (y a-number))
-    (+ %+ (x a-number) (y a-number))
-    (- %- (x a-number) (y a-number))
-    (< %< (x a-number) (y a-number))
+    (= %= x y)
+    (+ %+ x y)
+    (- %- x y)
+    (< %< x y)
 
-    (string-append %%string-append (a a-string) (b a-string))
-    (string-length %%string-length (a a-string))
-    (number->string %%number->string (a a-number)))
+    (string-append %%string-append a b)
+    (string-length %%string-length a)
+    (number->string %%number->string a))
 
   (define-rules-syntax
     ((a-lambda (id in) out)

@@ -38,28 +38,28 @@
     (environment
       (zero?
         (a-lambda a-number a-boolean)
-        (curry %%zero? (a a-number)))
+        (curry %%zero? a))
 
       (=
         (a-lambda a-number (a-lambda a-number a-number))
-        (curry %%= (a a-number) (b a-number)))
+        (curry %%= a b))
       (+
         (a-lambda a-number (a-lambda a-number a-number))
-        (curry %%+ (a a-number) (b a-number)))
+        (curry %%+ a b))
       (-
         (a-lambda a-number (a-lambda a-number a-number))
-        (curry %%- (a a-number) (b a-number)))
+        (curry %%- a b))
       (<
         (a-lambda a-number (a-lambda a-number a-boolean))
-        (curry %%< (a a-number) (b a-number)))
+        (curry %%< a b))
 
       (string-append
         (a-lambda a-string (a-lambda a-string a-string))
-        (curry %%string-append (a a-string) (b a-string)))
+        (curry %%string-append a b))
       (string-length
         (a-lambda a-string a-number)
-        (curry %%string-length (a a-string)))
+        (curry %%string-length a))
       (number->string
         (a-lambda a-number a-string)
-        (curry %%number->string (a a-number)))))
+        (curry %%number->string a))))
 )
