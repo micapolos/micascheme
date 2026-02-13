@@ -35,18 +35,18 @@
 
   ; TODO: Provide a type
   (define-rules-syntax
-    ((lambda (id t) body)
-      (abstraction 'id t (%lambda (id) body))))
+    ((lambda id body)
+      (abstraction 'id 'foo (%lambda (id) body))))
 
   (define-rules-syntax
     ((prim id)
       (%native ($primitive 3 id)))
     ((prim id (p1 t1))
-      (lambda (p1 t1)
+      (lambda p1
         (term-apply (%native ($primitive 3 id)) p1)))
     ((prim id (p1 t1) (p2 t2))
-      (lambda (p1 t1)
-        (lambda (p2 t2)
+      (lambda p1
+        (lambda p2
           (switch p1
             ((native? $native-x)
               (switch p2
@@ -64,13 +64,13 @@
     ((curry p)
       (native p))
     ((curry p (p1 t1))
-      (lambda (p1 t1)
+      (lambda p1
         (switch p1
           ((native? $native) (native (p (native-ref $native))))
           ((else $other) (application (native p) $other)))))
     ((curry p (p1 t1) (p2 t2))
-      (lambda (p1 t1)
-        (lambda (p2 t2)
+      (lambda p1
+        (lambda p2
           (switch p1
             ((native? $native-x)
               (switch p2

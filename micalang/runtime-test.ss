@@ -7,7 +7,7 @@
   (equal?
     (app
       (app
-        (lambda (a number) (lambda (b number) (native (%%+ a b))))
+        (lambda a (lambda b (native (%%+ a b))))
         (native 10))
       (native 20))
     (native 30)))
@@ -24,8 +24,8 @@
 (check (equal? (app (app - (native 5)) (native 3)) (native 2)))
 (check (equal? (app (app < (native 2)) (native 3)) (native #t)))
 
-(check (procedure? (lambda (x number) x)))
-(check (equal? ((lambda (x number) x) (native 10)) 10))
+(check (procedure? (lambda x x)))
+(check (equal? ((lambda x x) (native 10)) 10))
 
 (check (equal? (a-lambda a-number a-boolean) #f))
 

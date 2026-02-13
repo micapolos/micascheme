@@ -46,8 +46,8 @@
   (compiled
     (a-lambda (b a-number) a-number)
     (let (add (curry %%+ ($0 a-number) ($1 a-number)))
-      (let (increment (lambda (a a-number) (app (app + a) (native 1))))
-        (let (double (lambda (a a-number) (lambda (b a-number) (app (app add a) b))))
+      (let (increment (lambda a (app (app + a) (native 1))))
+        (let (double (lambda a (lambda b (app (app add a) b))))
           (app double (app increment (native 1))))))))
 
 (check-compiles
@@ -131,7 +131,7 @@
     (zwiększ 10))
   (compiled a-number
     (let
-      (zwiększ (lambda (x a-number) (app (app + x) (native 1))))
+      (zwiększ (lambda x (app (app + x) (native 1))))
       (app zwiększ (native 10)))))
 
 ; === lambda
@@ -144,13 +144,13 @@
   (lambda (i a-number) i)
   (compiled
     (a-lambda (i a-number) a-number)
-    (lambda (i a-number) i)))
+    (lambda i i)))
 
 (check-compiles
   (lambda (i a-number) (j a-number) (+ i j))
   (compiled
     (a-lambda (i a-number) (j a-number) a-number)
-    (lambda (i a-number) (lambda (j a-number) (app (app + i) j)))))
+    (lambda i (lambda j (app (app + i) j)))))
 
 (check-compiles
   zero?
@@ -167,7 +167,7 @@
   (lambda (t a-type) t)
   (compiled
     (a-lambda (t a-type) a-type)
-    (lambda (t a-type) t)))
+    (lambda t t)))
 
 ; === pi
 
@@ -204,7 +204,7 @@
     ((identity a-number) 10))
   (compiled a-type
     (let
-      (identity (lambda (t a-type) (lambda (x t) t)))
+      (identity (lambda t (lambda x t)))
       (app (app identity a-number) (native 10)))))
 
 ; === macro
@@ -239,7 +239,7 @@
     (let (a-fx (constant a-fx))
       (let (fx (native #f))
         (let (fx-10 (tagged (constant a-fx) 10))
-          (let (fx-id (lambda (x a-fx) x))
+          (let (fx-id (lambda x x))
             (app fx-id (tagged (constant a-fx) 10))))))))
 
 ; === dependent identity
@@ -249,5 +249,5 @@
     (id (lambda (t a-type) (x t) x))
     (id a-number 12))
   (compiled a-number
-    (let (id (lambda (t a-type) (lambda (x t) x)))
+    (let (id (lambda t (lambda x x)))
       (app (app id a-number) (native 12)))))

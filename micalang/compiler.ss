@@ -86,7 +86,7 @@
       ($code
         (fold-left
           (lambda ($nested $symbol)
-            `(lambda (,$symbol 'foo) ,$nested))
+            `(lambda ,$symbol ,$nested))
           $code
           (environment-symbols $environment)))
       ($proc (eval $code (compiler-comptime-environment $compiler)))
@@ -237,7 +237,7 @@
             (compiler-compile $compiler #'(let (id x) body)))
 
           ((let (expect id t) body)
-            (compiler-compile $compiler #'(lambda (id t) body)))
+            (compiler-compile $compiler #'(lambda id body)))
 
           ((let (id x) body)
             (lets
@@ -291,7 +291,7 @@
                       (compiler-compile
                         (compiler-push? $compiler $symbol? (compiled $param $x))
                         #'body))))
-                `(lambda (,$symbol? ,$param-term) ,$body))))
+                `(lambda ,$symbol? ,$body))))
 
           ((lambda x xs ... body)
             (compiler-compile-default $compiler
