@@ -9,12 +9,19 @@
     (micalang base)
     (micalang term))
 
-  (define (unique-id $ids $symbol?)
+  (define (unique-id $ids $symbol? $base $count)
     (cond
       ((not $symbol?)
-        (unique-id $ids 'x))
+        (unique-id $ids 'v-0 'v 0))
       ((member $symbol? $ids)
-        (unique-id $ids (symbol-append '$ $symbol?)))
+        (unique-id $ids
+          (string->symbol
+            (string-append
+              (symbol->string $base)
+              "-"
+              (number->string $count)))
+          $base
+          (+ $count 1)))
       (else
         $symbol?)))
 
@@ -49,7 +56,7 @@
       ((abstraction? $abstraction)
         (lets
           ($symbol? (abstraction-symbol? $abstraction))
-          ($id (unique-id $ids $symbol?))
+          ($id (unique-id $ids $symbol? (or $symbol? 'var) 0))
           ($reified-param (default-ids-reify $default $ids (abstraction-param $abstraction)))
           `(lambda
             ,(if $symbol? `(,$id ,$reified-param) $reified-param) .
@@ -63,7 +70,7 @@
       ((type-abstraction? $type-abstraction)
         (lets
           ($symbol? (type-abstraction-symbol? $type-abstraction))
-          ($id (unique-id $ids $symbol?))
+          ($id (unique-id $ids $symbol? (or $symbol? 'var) 0))
           ($reified-param (default-ids-reify $default $ids (type-abstraction-param $type-abstraction)))
           `(a-lambda
             ,(if $symbol? `(,$id ,$reified-param) $reified-param) .

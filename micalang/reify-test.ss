@@ -1,10 +1,9 @@
 (import (micalang base) (micalang term) (micalang reify))
 
-(check (equal? (unique-id '(a b $b) #f) 'x))
-(check (equal? (unique-id '(a b $b) #f) 'x))
-(check (equal? (unique-id '(a b $b) 'a) '$a))
-(check (equal? (unique-id '(a b $b) 'b) '$$b))
-(check (equal? (unique-id '(a b $b) 'c) 'c))
+(check (equal? (unique-id '(a b b-0) #f 'v 0) 'v-0))
+(check (equal? (unique-id '(a b b-0) 'a 'a 0) 'a-0))
+(check (equal? (unique-id '(a b b-0) 'b 'b 0) 'b-1))
+(check (equal? (unique-id '(a b b-0) 'c 'c 0) 'c))
 
 (check-reify a-type a-type)
 
@@ -50,7 +49,7 @@
     (lambda (a)
       (abstraction 'x (native 'int)
         (lambda (b) (application a b)))))
-  (lambda (x int) ($x int) (x $x)))
+  (lambda (x int) (x-0 int) (x x-0)))
 
 (check-reify
   (abstraction 'x (native 'int) (lambda (x) (abstraction 'y (native 'bool) (lambda (y) (application x y)))))
