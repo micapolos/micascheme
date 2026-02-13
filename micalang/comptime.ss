@@ -2,10 +2,10 @@
   (export
     curry constant tagged
     native app lambda macro let if
-    any-boolean any-number any-symbol any-char any-string
+    a-boolean a-number a-symbol a-char a-string
     = + - < zero?
     string-append string-length number->string
-    any-lambda)
+    a-lambda)
   (import
     (except (micalang base) = + - < zero? list app lambda let string if string-append string-length number->string)
     (prefix (only (micalang base) lambda let if = + - < zero?) %)
@@ -15,7 +15,7 @@
     (import
       (only (micascheme) equal? quote quasiquote unquote syntax unsyntax quasisyntax ... datum syntax-case)
       (prefix (micascheme) %%)
-      (only (micalang term) application type-abstraction-param any-type)))
+      (only (micalang term) application type-abstraction-param a-type)))
 
   (define-rule-syntax (native x)
     (%native x))
@@ -100,27 +100,27 @@
         (application (native $other) $rhs))))
 
   (define-prims
-    (any-boolean 'any-boolean)
-    (any-number  'any-number)
-    (any-symbol  'any-symbol)
-    (any-char    'any-char)
-    (any-string  'any-string)
+    (a-boolean 'a-boolean)
+    (a-number  'a-number)
+    (a-symbol  'a-symbol)
+    (a-char    'a-char)
+    (a-string  'a-string)
 
-    (zero? %zero? (x any-number))
+    (zero? %zero? (x a-number))
 
-    (= %= (x any-number) (y any-number))
-    (+ %+ (x any-number) (y any-number))
-    (- %- (x any-number) (y any-number))
-    (< %< (x any-number) (y any-number))
+    (= %= (x a-number) (y a-number))
+    (+ %+ (x a-number) (y a-number))
+    (- %- (x a-number) (y a-number))
+    (< %< (x a-number) (y a-number))
 
-    (string-append %%string-append (a any-string) (b any-string))
-    (string-length %%string-length (a any-string))
-    (number->string %%number->string (a any-number)))
+    (string-append %%string-append (a a-string) (b a-string))
+    (string-length %%string-length (a a-string))
+    (number->string %%number->string (a a-number)))
 
   (define-rules-syntax
-    ((any-lambda (id in) out)
+    ((a-lambda (id in) out)
       (%pi 'id in (%lambda (id) out)))
-    ((any-lambda in out)
+    ((a-lambda in out)
       (%pi #f in (%lambda (id) out))))
 
   (define-rule-syntax (if cond true false)

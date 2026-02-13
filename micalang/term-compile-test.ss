@@ -9,7 +9,7 @@
 (define-rule-syntax (check-throws in)
   (check (raises (default-term-compile default-native-compile in))))
 
-(check-throws any-type)
+(check-throws a-type)
 
 (check-compiles
   (variable 'zero?)

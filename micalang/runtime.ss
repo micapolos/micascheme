@@ -1,15 +1,15 @@
 (library (micalang runtime)
   (export
     curry native app constant tagged
-    any-type any-boolean any-number any-symbol any-char any-string
+    a-type a-boolean a-number a-symbol a-char a-string
     = + - < zero?
     string-append string-length number->string
-    let lambda macro any-lambda app if)
+    let lambda macro a-lambda app if)
   (import
     (except (micalang base) = + - < zero? lambda app let if string string-append string-length number->string)
     (prefix (only (micalang base) let lambda app if zero? = + - <) %)
     (prefix (micascheme) %%)
-    (rename (micalang term) (type-abstraction %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro) (any-type %any-type)))
+    (rename (micalang term) (type-abstraction %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro) (a-type %a-type)))
   (export
     (import
       (only (micascheme) equal? quote quasiquote unquote syntax unsyntax quasisyntax ... datum syntax-case)
@@ -27,7 +27,7 @@
   (define-rule-syntax (macro x ...) #f)
 
   (define-rules-syntax
-    ((any-lambda . _) #f))
+    ((a-lambda . _) #f))
 
   (define-rules-syntax
     ((curry x)
@@ -68,21 +68,21 @@
     (%if cond true false))
 
   (define-currys
-    (any-type    #f)
-    (any-boolean #f)
-    (any-number  #f)
-    (any-symbol  #f)
-    (any-char    #f)
-    (any-string  #f)
+    (a-type    #f)
+    (a-boolean #f)
+    (a-number  #f)
+    (a-symbol  #f)
+    (a-char    #f)
+    (a-string  #f)
 
-    (zero? %zero? (x any-number))
+    (zero? %zero? (x a-number))
 
-    (= %= (x any-number) (y any-number))
-    (+ %+ (x any-number) (y any-number))
-    (- %- (x any-number) (y any-number))
-    (< %< (x any-number) (y any-number))
+    (= %= (x a-number) (y a-number))
+    (+ %+ (x a-number) (y a-number))
+    (- %- (x a-number) (y a-number))
+    (< %< (x a-number) (y a-number))
 
-    (string-append %%string-append (a any-string) (b any-string))
-    (string-length %%string-length (a any-string))
-    (number->string %%number->string (a any-number)))
+    (string-append %%string-append (a a-string) (b a-string))
+    (string-length %%string-length (a a-string))
+    (number->string %%number->string (a a-number)))
 )

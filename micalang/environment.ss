@@ -40,27 +40,27 @@
 
   (define mica-environment
     (environment
-      (any-type    any-type   any-type)
-      (any-boolean any-type   any-boolean)
-      (any-number  any-type   any-number)
-      (any-char    any-type   any-char)
-      (any-symbol  any-type   any-symbol)
-      (any-string  any-type   any-string)
+      (a-type    a-type   a-type)
+      (a-boolean a-type   a-boolean)
+      (a-number  a-type   a-number)
+      (a-char    a-type   a-char)
+      (a-symbol  a-type   a-symbol)
+      (a-string  a-type   a-string)
 
-      (zero?   (any-lambda any-number any-boolean)              (curry %%zero? (a any-number)))
+      (zero?   (a-lambda a-number a-boolean)              (curry %%zero? (a a-number)))
 
-      (=       (any-lambda any-number (any-lambda any-number any-number))   (curry %%= (a any-number) (b any-number)))
-      (+       (any-lambda any-number (any-lambda any-number any-number))   (curry %%+ (a any-number) (b any-number)))
-      (-       (any-lambda any-number (any-lambda any-number any-number))   (curry %%- (a any-number) (b any-number)))
-      (<       (any-lambda any-number (any-lambda any-number any-boolean))  (curry %%< (a any-number) (b any-number)))
+      (=       (a-lambda a-number (a-lambda a-number a-number))   (curry %%= (a a-number) (b a-number)))
+      (+       (a-lambda a-number (a-lambda a-number a-number))   (curry %%+ (a a-number) (b a-number)))
+      (-       (a-lambda a-number (a-lambda a-number a-number))   (curry %%- (a a-number) (b a-number)))
+      (<       (a-lambda a-number (a-lambda a-number a-boolean))  (curry %%< (a a-number) (b a-number)))
 
       (string-append
-        (any-lambda any-string (any-lambda any-string any-string))
-        (curry %%string-append (a any-string) (b any-string)))
+        (a-lambda a-string (a-lambda a-string a-string))
+        (curry %%string-append (a a-string) (b a-string)))
       (string-length
-        (any-lambda any-string any-number)
-        (curry %%string-length (a any-string)))
+        (a-lambda a-string a-number)
+        (curry %%string-length (a a-string)))
       (number->string
-        (any-lambda any-number any-string)
-        (curry %%number->string (a any-number)))))
+        (a-lambda a-number a-string)
+        (curry %%number->string (a a-number)))))
 )

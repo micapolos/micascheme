@@ -90,7 +90,7 @@
         (reverse (environment-values $environment)))))
 
   (define (compiler-compile-type $compiler $term)
-    (compiler-compile-typed $compiler any-type $term))
+    (compiler-compile-typed $compiler a-type $term))
 
   (define (compiler-evaluate $compiler $term)
     (eval
@@ -115,40 +115,40 @@
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
-        (syntax-case $term (quote native native-lambda input local lambda any-lambda let if macro)
+        (syntax-case $term (quote native native-lambda input local lambda a-lambda let if macro)
           (b
             (boolean? (datum b))
             (compiled
-              (compiler-comptime $compiler any-boolean)
-              'any-boolean
+              (compiler-comptime $compiler a-boolean)
+              'a-boolean
               `(native ,(datum b))))
 
           (n
             (number? (datum n))
             (compiled
-              (compiler-comptime $compiler any-number)
-              'any-number
+              (compiler-comptime $compiler a-number)
+              'a-number
               `(native ,(datum n))))
 
           (ch
             (char? (datum ch))
             (compiled
-              (compiler-comptime $compiler any-char)
-              'any-char
+              (compiler-comptime $compiler a-char)
+              'a-char
               `(native ,(datum ch))))
 
           (s
             (string? (datum s))
             (compiled
-              (compiler-comptime $compiler any-string)
-              'any-string
+              (compiler-comptime $compiler a-string)
+              'a-string
               `(native ,(datum s))))
 
           ((quote s)
             (symbol? (datum s))
             (compiled
-              (compiler-comptime $compiler any-symbol)
-              'any-symbol
+              (compiler-comptime $compiler a-symbol)
+              'a-symbol
               `(native ',(datum s))))
 
           (id
@@ -203,16 +203,16 @@
                     ,(syntax->datum $param))))
               (compiler-compile $compiler
                 `(native
-                  (any-lambda ,@#'(param ...) ,#'body)
+                  (a-lambda ,@#'(param ...) ,#'body)
                   (curry ,$native-symbol ,@$binders)))))
 
           ((native-lambda . _)
             (syntax-error $term))
 
-          ((any-lambda out)
+          ((a-lambda out)
             (compiler-compile-default $compiler #'out))
 
-          ((any-lambda param body)
+          ((a-lambda param body)
             (lets
               ((values $symbol? $compiled-param) (compiler-compile-param $compiler #'param))
               ($param-type (compiled-type $compiled-param))
@@ -222,17 +222,17 @@
               ($compiled-body (compiler-compile $compiler #'body))
               ($body-term (compiled-ref $compiled-body))
               (compiled
-                any-type
-                'any-type
-                `(any-lambda
+                a-type
+                'a-type
+                `(a-lambda
                   ,(if $symbol? `(,$symbol? ,$param-term) $param-term)
                   ,$body-term))))
 
-          ((any-lambda x xs ... body)
+          ((a-lambda x xs ... body)
             (compiler-compile-default $compiler
-              `(any-lambda ,#'x (any-lambda ,@#'(xs ...) ,#'body))))
+              `(a-lambda ,#'x (a-lambda ,@#'(xs ...) ,#'body))))
 
-          ((any-lambda . _)
+          ((a-lambda . _)
             (syntax-error $term))
 
           ((let body)
@@ -296,7 +296,7 @@
                       (compiler-compile
                         (compiler-push? $compiler $symbol? (compiled $param $param-term $x))
                         #'body))))
-                `(any-lambda
+                `(a-lambda
                   ,(if $symbol? `(,$symbol? ,$param-term) $param-term)
                   ,$body-type-term)
                 `(lambda (,$symbol? ,$param-term) ,$body))))
@@ -310,7 +310,7 @@
 
           ((if cond true false)
             (lets
-              ($cond (compiler-compile-typed $compiler (compiler-comptime $compiler any-boolean) #'cond))
+              ($cond (compiler-compile-typed $compiler (compiler-comptime $compiler a-boolean) #'cond))
               ($compiled-true (compiler-compile $compiler #'true))
               ($type (compiled-type $compiled-true))
               ($true (compiled-ref $compiled-true))

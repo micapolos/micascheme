@@ -13,7 +13,7 @@
 
   (define (default-term-compile $default $term)
     (switch $term
-      ((any-type? $type)
+      ((a-type? $type)
         (throw erased))
       ((native? $native)
         ($default $default (native-ref $native)))

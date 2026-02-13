@@ -14,7 +14,7 @@
 
   (define (default-reify $default $term)
     (switch $term
-      ((any-type? _) 'any-type)
+      ((a-type? _) 'a-type)
       ((native? $native)
         (native-ref $native))
       ((variable? $variable)
@@ -55,7 +55,7 @@
         (lets
           ($symbol? (type-abstraction-symbol? $type-abstraction))
           ($reified-param (default-reify $default (type-abstraction-param $type-abstraction)))
-          `(any-lambda
+          `(a-lambda
             ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param) .
             ,(lets
               ($body (type-abstraction-apply $type-abstraction (native $symbol?)))

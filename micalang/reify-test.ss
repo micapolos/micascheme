@@ -1,6 +1,6 @@
 (import (micalang base) (micalang term) (micalang reify))
 
-(check-reify any-type any-type)
+(check-reify a-type a-type)
 
 (check-reify (native #t) #t)
 (check-reify (native 1) 1)
@@ -44,13 +44,13 @@
 
 (check-reify
   (type-abstraction #f (native 't1) (lambda (_) (native 't2)))
-  (any-lambda t1 t2))
+  (a-lambda t1 t2))
 
 (check-reify
   (type-abstraction 'x (native 'number) (lambda (x) x))
-  (any-lambda (x number) x))
+  (a-lambda (x number) x))
 
 (check-reify
   (type-abstraction 'x (native 'number) (lambda (x) (type-abstraction 'y (native 'boolean) (lambda (y) (application x y)))))
-  (any-lambda (x number) (y boolean) (x y)))
+  (a-lambda (x number) (y boolean) (x y)))
 

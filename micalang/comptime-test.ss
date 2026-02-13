@@ -3,12 +3,12 @@
   (prefix (micalang term) %)
   (micalang comptime))
 
-(check (equal? any-type any-type))
-(check (equal? any-boolean (%native 'any-boolean)))
-(check (equal? any-number (%native 'any-number)))
-(check (equal? any-symbol (%native 'any-symbol)))
-(check (equal? any-char (%native 'any-char)))
-(check (equal? any-string (%native 'any-string)))
+(check (equal? a-type a-type))
+(check (equal? a-boolean (%native 'a-boolean)))
+(check (equal? a-number (%native 'a-number)))
+(check (equal? a-symbol (%native 'a-symbol)))
+(check (equal? a-char (%native 'a-char)))
+(check (equal? a-string (%native 'a-string)))
 
 (check
   (equal?
@@ -33,11 +33,11 @@
 (check (equal? (app (app - (native 5)) (native 3)) (%native 2)))
 (check (equal? (app (app < (native 2)) (native 3)) (%native #t)))
 
-(check (equal? (type-abstraction-param (any-lambda any-number any-boolean)) any-number))
-(check (equal? (app (any-lambda any-number any-boolean) (native '())) any-boolean))
+(check (equal? (type-abstraction-param (a-lambda a-number a-boolean)) a-number))
+(check (equal? (app (a-lambda a-number a-boolean) (native '())) a-boolean))
 
-(check (equal? (type-abstraction-param (any-lambda (x any-type) x)) any-type))
-(check (equal? (app (any-lambda (x any-type) x) any-number) any-number))
+(check (equal? (type-abstraction-param (a-lambda (x a-type) x)) a-type))
+(check (equal? (app (a-lambda (x a-type) x) a-number) a-number))
 
 (check
   (equal?
