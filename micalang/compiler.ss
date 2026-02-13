@@ -258,7 +258,7 @@
               ($t-value (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
               ($compiled-body
                 (compiler-compile
-                  (compiler-push $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) (variable $symbol?)))
+                  (compiler-push? $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) (variable $symbol?)))
                   #'body))
               ($body-type (compiled-type $compiled-body))
               ($body (compiled-ref $compiled-body))
@@ -267,7 +267,7 @@
                   (lambda ($x)
                     (compiled-type
                       (compiler-compile
-                        (compiler-push $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) $x))
+                        (compiler-push? $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) $x))
                         #'body))))
                 `(pi
                   ,(if $symbol? `(,$symbol? ,(compiled-ref $compiled-t)) (compiled-ref $compiled-t))
