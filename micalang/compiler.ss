@@ -195,19 +195,19 @@
 
           ((pi param body)
             (lets
-              ((values $symbol? $compiled-in) (compiler-compile-param $compiler #'param))
-              ($in-type (compiled-type $compiled-in))
-              ($in-term (compiled-ref $compiled-in))
-              ($in-value (compiler-evaluate-comptime $compiler $in-term))
-              ($compiler (compiler-push? $compiler $symbol? (compiled $in-type $in-term $in-value)))
-              ($compiled-out (compiler-compile $compiler #'body))
-              ($out-term (compiled-ref $compiled-out))
+              ((values $symbol? $compiled-param) (compiler-compile-param $compiler #'param))
+              ($param-type (compiled-type $compiled-param))
+              ($param-term (compiled-ref $compiled-param))
+              ($param (compiler-evaluate-comptime $compiler $param-term))
+              ($compiler (compiler-push? $compiler $symbol? (compiled $param-type $param-term $param)))
+              ($compiled-body (compiler-compile $compiler #'body))
+              ($body-term (compiled-ref $compiled-body))
               (compiled
                 type
                 'type
                 `(pi
-                  ,(if $symbol? `(,$symbol? ,$in-term) $in-term)
-                  ,$out-term))))
+                  ,(if $symbol? `(,$symbol? ,$param-term) $param-term)
+                  ,$body-term))))
 
           ((pi x xs ... body)
             (compiler-compile-default $compiler
