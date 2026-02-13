@@ -3,10 +3,12 @@
     curry native app constant tagged
     any-type any-boolean any-number any-symbol any-char any-string
     = + - < zero?
+    string-append string-length number->string
     let lambda macro any-lambda app if)
   (import
-    (except (micalang base) = + - < zero? lambda app let if string)
+    (except (micalang base) = + - < zero? lambda app let if string string-append string-length number->string)
     (prefix (only (micalang base) let lambda app if zero? = + - <) %)
+    (prefix (micascheme) %%)
     (rename (micalang term) (type-abstraction %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro) (any-type %any-type)))
   (export
     (import
@@ -78,5 +80,9 @@
     (= %= (x any-number) (y any-number))
     (+ %+ (x any-number) (y any-number))
     (- %- (x any-number) (y any-number))
-    (< %< (x any-number) (y any-number)))
+    (< %< (x any-number) (y any-number))
+
+    (string-append %%string-append (a any-string) (b any-string))
+    (string-length %%string-length (a any-string))
+    (number->string %%number->string (a any-number)))
 )

@@ -4,10 +4,12 @@
     native app lambda macro let if
     any-boolean any-number any-symbol any-char any-string
     = + - < zero?
+    string-append string-length number->string
     any-lambda)
   (import
-    (except (micalang base) = + - < zero? list app lambda let string if)
+    (except (micalang base) = + - < zero? list app lambda let string if string-append string-length number->string)
     (prefix (only (micalang base) lambda let if = + - < zero?) %)
+    (prefix (micascheme) %%)
     (rename (micalang term) (type-abstraction %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro)))
   (export
     (import
@@ -109,7 +111,11 @@
     (= %= (x any-number) (y any-number))
     (+ %+ (x any-number) (y any-number))
     (- %- (x any-number) (y any-number))
-    (< %< (x any-number) (y any-number)))
+    (< %< (x any-number) (y any-number))
+
+    (string-append %%string-append (a any-string) (b any-string))
+    (string-length %%string-length (a any-string))
+    (number->string %%number->string (a any-number)))
 
   (define-rules-syntax
     ((any-lambda (id in) out)

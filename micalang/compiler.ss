@@ -115,7 +115,7 @@
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
-        (syntax-case $term (quote native native-lambda input val lambda any-lambda let if macro)
+        (syntax-case $term (quote native native-lambda input local lambda any-lambda let if macro)
           (b
             (boolean? (datum b))
             (compiled
@@ -238,14 +238,11 @@
           ((let body)
             (compiler-compile-default $compiler #'body))
 
-          ((let (val id x) body)
+          ((let (local id x) body)
             (compiler-compile $compiler #'(let (id x) body)))
 
           ((let (input id t) body)
             (compiler-compile $compiler #'(lambda (id t) body)))
-
-          ((let (output body))
-            (compiler-compile $compiler #'body))
 
           ((let (id x) body)
             (lets

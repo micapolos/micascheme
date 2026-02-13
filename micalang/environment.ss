@@ -52,5 +52,15 @@
       (=       (any-lambda any-number (any-lambda any-number any-number))   (curry %%= (a any-number) (b any-number)))
       (+       (any-lambda any-number (any-lambda any-number any-number))   (curry %%+ (a any-number) (b any-number)))
       (-       (any-lambda any-number (any-lambda any-number any-number))   (curry %%- (a any-number) (b any-number)))
-      (<       (any-lambda any-number (any-lambda any-number any-boolean))  (curry %%< (a any-number) (b any-number)))))
+      (<       (any-lambda any-number (any-lambda any-number any-boolean))  (curry %%< (a any-number) (b any-number)))
+
+      (string-append
+        (any-lambda any-string (any-lambda any-string any-string))
+        (curry %%string-append (a any-string) (b any-string)))
+      (string-length
+        (any-lambda any-string any-number)
+        (curry %%string-length (a any-string)))
+      (number->string
+        (any-lambda any-number any-string)
+        (curry %%number->string (a any-number)))))
 )
