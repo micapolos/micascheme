@@ -2,9 +2,18 @@
 
 (check-mica
   (let
-    (number->string (native (any-lambda any-number any-string) (curry %%number->string (n any-number))))
-    (string-length (native (any-lambda any-string any-number) (curry %%string-length (s any-string))))
-    (string-append (native (any-lambda any-string any-string any-string) (curry %%string-append (a any-string) (b any-string))))
+    (number->string
+      (native
+        (any-lambda any-number any-string)
+        (curry %%number->string (n any-number))))
+    (string-length
+      (native
+        (any-lambda any-string any-number)
+        (curry %%string-length (s any-string))))
+    (string-append
+      (native
+        (any-lambda any-string any-string any-string)
+        (curry %%string-append (a any-string) (b any-string))))
     (string-append "Hello " (number->string (string-length "foo"))))
   "Hello 3")
 
