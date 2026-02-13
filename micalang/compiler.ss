@@ -47,7 +47,7 @@
     (throw 'reify))
 
   (define (default-compiler-term-equal? $default $lhs $rhs)
-    #f)
+    (throw term-equal?))
 
   (define (compiler-reify $compiler $term)
     (default-reify (compiler-default-reify $compiler) $term))
