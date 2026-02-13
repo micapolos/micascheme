@@ -115,7 +115,7 @@
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
-        (syntax-case $term (quote native native-curry lambda any-lambda let if macro)
+        (syntax-case $term (quote native native-lambda lambda any-lambda let if macro)
           (b
             (boolean? (datum b))
             (compiled
@@ -191,7 +191,7 @@
           ((native . _)
             (syntax-error $term))
 
-          ((native-curry id param ... body)
+          ((native-lambda id param ... body)
             (lets
               ($binders
                 (map-with
@@ -205,7 +205,7 @@
                   (any-lambda ,@#'(param ...) ,#'body)
                   (curry ,#'id ,@$binders)))))
 
-          ((native-curry . _)
+          ((native-lambda . _)
             (syntax-error $term))
 
           ((any-lambda out)
