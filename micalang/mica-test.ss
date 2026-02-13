@@ -49,8 +49,10 @@
             (%%syntax-error #'n "not fixnum"))))))
     (fx-10 (fx 10))
     (fx-id (lambda (x any-fx) x))
-    (fx-id (fx 10)))
-  10)
+    (fx+ (native (pi any-fx any-fx any-fx) (curry %%fx+ (a any-fx) (b any-fx))))
+    (fx+1 (a any-fx) (fx+ a (fx 1)))
+    (fx+1 (fx+ (fx 10) (fx 20))))
+  31)
 
 ; === dependent identity
 
