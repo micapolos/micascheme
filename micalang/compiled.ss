@@ -8,7 +8,7 @@
 
   (define (compiled-equal? $lhs $rhs)
     (and
-      (term-equal? (compiled-type $lhs) (compiled-type $rhs))
+      (term=? (compiled-type $lhs) (compiled-type $rhs))
       (equal? (compiled-type-term $lhs) (compiled-type-term $rhs))
       (equal? (compiled-ref $lhs) (compiled-ref $rhs))))
 )

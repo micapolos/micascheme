@@ -19,7 +19,7 @@
           (compiler
             default-compiler-recurse
             default-compiler-reify
-            default-compiler-term-equal?
+            default-compiler-term=?
             (%environment '(micalang runtime) '(prefix (scheme) %))
             (%environment '(micalang comptime) '(prefix (scheme) %))
             mica-environment)
@@ -33,7 +33,7 @@
             (compiler
               default-compiler-recurse
               default-compiler-reify
-              default-compiler-term-equal?
+              default-compiler-term=?
               (%environment '(micalang runtime) '(prefix (scheme) %))
               (%environment '(micalang comptime) '(prefix (scheme) %))
               mica-environment))

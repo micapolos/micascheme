@@ -30,127 +30,127 @@
       (native 5))
     (native 6)))
 
-; --- term-equal?
+; --- term=?
 
-(check (term-equal? a-type a-type))
-(check (not (term-equal? a-type (native a-type))))
+(check (term=? a-type a-type))
+(check (not (term=? a-type (native a-type))))
 
-(check (term-equal? (native 1) (native 1)))
-(check (not (term-equal? (native 1) (native 2))))
+(check (term=? (native 1) (native 1)))
+(check (not (term=? (native 1) (native 2))))
 
 (check
-  (term-equal?
+  (term=?
     (variable 0)
     (variable 0)))
 
 (check
   (not
-    (term-equal?
+    (term=?
       (variable 0)
       (variable 1))))
 
 (check
-  (term-equal?
+  (term=?
     (constant '(this is my (constant)))
     (constant '(this is my (constant)))))
 
 (check
   (not
-    (term-equal?
+    (term=?
       (constant `(this is my (constant)))
       (constant `(this is other (constant))))))
 
 (check
-  (term-equal?
+  (term=?
     (tagged (constant 'my-tag) (native 10))
     (tagged (constant 'my-tag) (native 10))))
 
 (check
   (not
-    (term-equal?
+    (term=?
       (tagged (constant 'my-tag) (native 10))
       (tagged (constant 'other-tag) (native 10)))))
 
 (check
   (not
-    (term-equal?
+    (term=?
       (tagged (constant 'my-tag) (native 10))
       (tagged (constant 'my-tag) (native 20)))))
 
 (check
-  (term-equal?
+  (term=?
     (application (variable 0) (variable 0))
     (application (variable 0) (variable 0))))
 
 (check
   (not
-    (term-equal?
+    (term=?
       (application (variable 0) (variable 0))
       (application (variable 0) (variable 1)))))
 
 (check
-  (term-equal?
+  (term=?
     (abstraction 'x (native 'int) (lambda (x) (apply-term zero? x)))
     (abstraction 'x (native 'int) (lambda (x) (apply-term zero? x)))))
 
 (check
-  (term-equal?
+  (term=?
     (abstraction 'x (native 'int) (lambda (x) (apply-term zero? x)))
     (abstraction 'y (native 'int) (lambda (y) (apply-term zero? y)))))
 
 (check
   (not
-    (term-equal?
+    (term=?
       (abstraction 'x (native 'int) (lambda (x) (apply-term zero? x)))
       (abstraction 'y (native 'bool) (lambda (y) (apply-term zero? y))))))
 
 (check
   (not
-    (term-equal?
+    (term=?
       (abstraction 'x (native 'int) (lambda (x) (apply-term odd? x)))
       (abstraction 'x (native 'int) (lambda (x) (apply-term even? x))))))
 
 (check
-  (term-equal?
+  (term=?
     (abstraction 'x (native 'int) (lambda (x) (abstraction 'y (native 'int) (lambda (y) (term-apply (apply-term + x) y)))))
     (abstraction 'x (native 'int) (lambda (x) (abstraction 'y (native 'int) (lambda (y) (term-apply (apply-term + x) y)))))))
 
 (check
   (not
-    (term-equal?
+    (term=?
       (abstraction 'x (native 'int) (lambda (x) (abstraction 'y (native 'int) (lambda (y) (term-apply (apply-term + x) y)))))
       (abstraction 'x (native 'int) (lambda (x) (abstraction 'y (native 'int) (lambda (y) (term-apply (apply-term + y) x))))))))
 
 (check
-  (term-equal?
+  (term=?
     (type-abstraction 'x (native 't1) (lambda (x) (apply-term zero? x)))
     (type-abstraction 'x (native 't1) (lambda (x) (apply-term zero? x)))))
 
 (check
-  (term-equal?
+  (term=?
     (type-abstraction 'x (native 't1) (lambda (x) (apply-term zero? x)))
     (type-abstraction 'y (native 't1) (lambda (x) (apply-term zero? x)))))
 
 (check
   (not
-    (term-equal?
+    (term=?
       (type-abstraction 'x (native 't1) (lambda (x) (apply-term zero? x)))
       (type-abstraction 'x (native 't2) (lambda (x) (apply-term zero? x))))))
 
 (check
   (not
-    (term-equal?
+    (term=?
       (type-abstraction 'x (native 't1) (lambda (x) (apply-term zero? x)))
       (type-abstraction 'x (native 't1) (lambda (x) (apply-term one? x))))))
 
 (check
-  (term-equal?
+  (term=?
     (type-abstraction 'x (native 't1) (lambda (x) (native 't2)))
     (type-abstraction #f (native 't1) (lambda (_) (native 't2)))))
 
 (check
   (not
-    (term-equal?
+    (term=?
       (type-abstraction 'x (native 't1) (lambda (x) (native 't2)))
       (type-abstraction #f (native 't1) (lambda (_) (native 't3))))))
 
@@ -158,5 +158,5 @@
   ($procedure1 (lambda ($compiler $term) 'foo))
   ($procedure2 (lambda ($compiler $term) 'bar))
   (run
-    (check (term-equal? (macro $procedure1) (macro $procedure1)))
-    (check (not (term-equal? (macro $procedure1) (macro $procedure2))))))
+    (check (term=? (macro $procedure1) (macro $procedure1)))
+    (check (not (term=? (macro $procedure1) (macro $procedure2))))))

@@ -10,7 +10,7 @@
     mica-environment)
   (import
     (only (micalang base) cons dot push list define lets not cdr map car cadr caddr cadddr caar assq memp lambda and define-rule-syntax quasiquote unquote ...)
-    (only (micalang term) term-equal?)
+    (only (micalang term) term=?)
     (micalang compiled)
     (except (micalang comptime) lambda))
 

@@ -3,7 +3,7 @@
     compiler compiler?
     compiler-recurse
     compiler-default-reify
-    compiler-default-term-equal?
+    compiler-default-term=?
     compiler-runtime-environment
     compiler-comptime-environment
     compiler-environment
@@ -18,7 +18,7 @@
 
     default-compiler-recurse
     default-compiler-reify
-    default-compiler-term-equal?
+    default-compiler-term=?
 
     check-compiles
     check-compile-raises)
@@ -29,7 +29,7 @@
     (micalang compiled)
     (micalang environment))
 
-  (data (compiler recurse default-reify default-term-equal? runtime-environment comptime-environment environment))
+  (data (compiler recurse default-reify default-term=? runtime-environment comptime-environment environment))
 
   (define-rule-syntax (compiler-comptime compiler datum)
     (eval 'datum (compiler-comptime-environment compiler)))
@@ -38,7 +38,7 @@
     (compiler
       default-compiler-recurse
       default-compiler-reify
-      default-compiler-term-equal?
+      default-compiler-term=?
       $runtime-environment
       $comptime-environment
       (environment)))
@@ -49,8 +49,8 @@
   (define (default-compiler-reify $default $term)
     (throw reify $term))
 
-  (define (default-compiler-term-equal? $default $lhs $rhs)
-    (throw term-equal? $lhs $rhs))
+  (define (default-compiler-term=? $default $lhs $rhs)
+    (throw term=? $lhs $rhs))
 
   (define (compiler-reify $compiler $term)
     (default-ids-reify
@@ -58,9 +58,9 @@
       (environment-symbols (compiler-environment $compiler))
       $term))
 
-  (define (compiler-term-equal? $compiler $lhs $rhs)
-    (default-depth-term-equal?
-      (compiler-default-term-equal? $compiler)
+  (define (compiler-term=? $compiler $lhs $rhs)
+    (default-depth-term=?
+      (compiler-default-term=? $compiler)
       (length (environment-symbols (compiler-environment $compiler)))
       $lhs
       $rhs))
@@ -69,7 +69,7 @@
     (compiler
       (compiler-recurse $compiler)
       (compiler-default-reify $compiler)
-      (compiler-default-term-equal? $compiler)
+      (compiler-default-term=? $compiler)
       (compiler-runtime-environment $compiler)
       (compiler-comptime-environment $compiler)
       (environment-push (compiler-environment $compiler) $id $compiled)))
@@ -108,7 +108,7 @@
     (lets
       ($compiled (compiler-compile $compiler $term))
       ($type (compiled-type $compiled))
-      (if (compiler-term-equal? $compiler $type $expected-type)
+      (if (compiler-term=? $compiler $type $expected-type)
         (compiled-ref $compiled)
         (syntax-error $term
           (format "found ~s, expected ~s, in"
@@ -391,7 +391,7 @@
           (compiler
             default-compiler-recurse
             default-compiler-reify
-            default-compiler-term-equal?
+            default-compiler-term=?
             check-runtime-environment
             check-comptime-environment
             mica-environment)
@@ -411,7 +411,7 @@
           (compiler
             default-compiler-recurse
             default-compiler-reify
-            default-compiler-term-equal?
+            default-compiler-term=?
             check-runtime-environment
             check-comptime-environment
             mica-environment)
