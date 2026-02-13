@@ -5,7 +5,6 @@
     environment-push
     environment-symbols
     environment-types
-    environment-type-terms
     environment-values
     mica-environment)
   (import
@@ -15,7 +14,7 @@
     (except (micalang comptime) lambda))
 
   (define-rule-syntax (environment (id type value) ...)
-    `((id . ,(compiled type 'type value)) ...))
+    `((id . ,(compiled type value)) ...))
 
   (define (environment-push $environment $id $compiled)
     (push $environment
@@ -31,9 +30,6 @@
 
   (define (environment-types $environment)
     (map (dot compiled-type cdr) $environment))
-
-  (define (environment-type-terms $environment)
-    (map (dot compiled-type-term cdr) $environment))
 
   (define (environment-values $environment)
     (map (dot compiled-ref cdr) $environment))
