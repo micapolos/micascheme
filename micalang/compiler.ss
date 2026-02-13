@@ -254,25 +254,27 @@
 
           ((lambda param body)
             (lets
-              ((values $symbol? $compiled-t) (compiler-compile-param $compiler #'param))
-              ($t-value (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
+              ((values $symbol? $compiled-param) (compiler-compile-param $compiler #'param))
+              ($param-term (compiled-ref $compiled-param))
+              ($param (compiler-evaluate-comptime $compiler $param-term))
               ($compiled-body
                 (compiler-compile
-                  (compiler-push? $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) (variable $symbol?)))
+                  (compiler-push? $compiler $symbol? (compiled $param $param-term (variable $symbol?)))
                   #'body))
               ($body-type (compiled-type $compiled-body))
+              ($body-type-term (compiled-type-term $compiled-body))
               ($body (compiled-ref $compiled-body))
               (compiled
-                (pi $symbol? $t-value
+                (pi $symbol? $param
                   (lambda ($x)
                     (compiled-type
                       (compiler-compile
-                        (compiler-push? $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) $x))
+                        (compiler-push? $compiler $symbol? (compiled $param $param-term $x))
                         #'body))))
                 `(pi
-                  ,(if $symbol? `(,$symbol? ,(compiled-ref $compiled-t)) (compiled-ref $compiled-t))
-                  ,(compiled-type-term $compiled-body))
-                `(lambda (,$symbol? ,(compiled-ref $compiled-t)) ,$body))))
+                  ,(if $symbol? `(,$symbol? ,$param-term) $param-term)
+                  ,$body-type-term)
+                `(lambda (,$symbol? ,$param-term) ,$body))))
 
           ((lambda x xs ... body)
             (compiler-compile-default $compiler
