@@ -104,7 +104,7 @@
       (if (compiler-term-equal? $compiler $type $expected-type)
         (compiled-ref $compiled)
         (syntax-error $term
-          (format "invalid type ~s, expected ~s, in"
+          (format "found ~s, expected ~s, in"
             (compiler-reify $compiler $type)
             (compiler-reify $compiler $expected-type))))))
 
@@ -115,7 +115,7 @@
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
-        (syntax-case $term (quote native native-lambda lambda any-lambda let if macro)
+        (syntax-case $term (quote native native-lambda input val lambda any-lambda let if macro)
           (b
             (boolean? (datum b))
             (compiled
@@ -238,6 +238,15 @@
           ((let body)
             (compiler-compile-default $compiler #'body))
 
+          ((let (val id x) body)
+            (compiler-compile $compiler #'(let (id x) body)))
+
+          ((let (input id t) body)
+            (compiler-compile $compiler #'(lambda (id t) body)))
+
+          ((let (output body))
+            (compiler-compile $compiler #'body))
+
           ((let (id x) body)
             (lets
               ($symbol (datum id))
@@ -351,7 +360,7 @@
                       `(app ,$fn-term ,$arg-term))))
                 ((else $other)
                   (syntax-error #'fn
-                    (format "invalid type ~s, expected pi, in"
+                    (format "found ~s, expected pi, in"
                       (compiler-reify $compiler $other)))))))
 
           ((fn arg args ...)
