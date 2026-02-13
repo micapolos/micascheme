@@ -256,11 +256,12 @@
             (lets
               ((values $symbol? $compiled-t) (compiler-compile-param $compiler #'param))
               ($t-value (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
-              ($body-compiler
-                (if $symbol?
-                  (compiler-push $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) (variable $symbol?)))
-                  $compiler))
-              ($compiled-body (compiler-compile $body-compiler #'body))
+              ($compiled-body
+                (compiler-compile
+                  (if $symbol?
+                    (compiler-push $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) (variable $symbol?)))
+                    $compiler)
+                  #'body))
               ($body-type (compiled-type $compiled-body))
               ($body (compiled-ref $compiled-body))
               (compiled
