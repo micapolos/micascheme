@@ -66,7 +66,6 @@
     (%if cond true false))
 
   (define-currys
-    (type    #f)
     (boolean #f)
     (number  #f)
     (symbol  #f)
