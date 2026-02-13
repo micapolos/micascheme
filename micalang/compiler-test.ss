@@ -23,6 +23,13 @@
       (app zero? (native 1)))))
 
 (check-compiles
+  (native-curry %%+ any-number any-number any-number)
+  (compiled
+    (any-lambda any-number any-number any-number)
+    (any-lambda any-number (any-lambda any-number any-number))
+    (curry %%+ ($0 any-number) ($1 any-number))))
+
+(check-compiles
   (let
     (zero? (native-curry %%zero? any-number any-boolean))
     (zero? 1))
@@ -33,14 +40,14 @@
 
 (check-compiles
   (let
-    (add (native (any-lambda any-number any-number any-number) (curry %%+ (a any-number) (b any-number))))
+    (add (native-curry %%+ any-number any-number any-number))
     (increment (a any-number) (+ a 1))
     (double (a any-number) (b any-number) (add a b))
     (double (increment 1)))
   (compiled
     (any-lambda (b any-number) any-number)
     (any-lambda (b any-number) any-number)
-    (let (add (curry %%+ (a any-number) (b any-number)))
+    (let (add (curry %%+ ($0 any-number) ($1 any-number)))
       (let (increment (lambda (a any-number) (app (app + a) (native 1))))
         (let (double (lambda (a any-number) (lambda (b any-number) (app (app add a) b))))
           (app double (app increment (native 1))))))))
