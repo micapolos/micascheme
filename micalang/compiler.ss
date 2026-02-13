@@ -85,10 +85,11 @@
       ($environment (compiler-environment $compiler))
       ($code
         (fold-left
-          (lambda ($nested $symbol)
-            `(lambda ,$symbol ,$nested))
+          (lambda ($nested $symbol $type-term)
+            `(lambda (,$symbol ,$type-term) ,$nested))
           $code
-          (environment-symbols $environment)))
+          (environment-symbols $environment)
+          (environment-type-terms $environment)))
       ($proc (eval $code (compiler-comptime-environment $compiler)))
       (fold-left
         (lambda ($proc $value) (term-apply $proc $value))
@@ -122,32 +123,32 @@
       ((compiled? $compiled) $compiled)
       ((else _)
         (syntax-case $term (a-type a-symbol a-boolean a-number a-char a-string quote native native-lambda define expect lambda a-lambda let if macro)
-          (a-type (compiled a-type 'a-type))
-          (a-symbol (compiled a-type 'a-symbol))
-          (a-boolean (compiled a-type 'a-boolean))
-          (a-number (compiled a-type 'a-number))
-          (a-char (compiled a-type 'a-char))
-          (a-string (compiled a-type 'a-string))
+          (a-type (compiled a-type 'a-type 'a-type))
+          (a-symbol (compiled a-type 'a-type 'a-symbol))
+          (a-boolean (compiled a-type 'a-type 'a-boolean))
+          (a-number (compiled a-type 'a-type 'a-number))
+          (a-char (compiled a-type 'a-type 'a-char))
+          (a-string (compiled a-type 'a-type 'a-string))
 
           (b
             (boolean? (datum b))
-            (compiled a-boolean `(native ,(datum b))))
+            (compiled a-boolean 'a-boolean `(native ,(datum b))))
 
           (n
             (number? (datum n))
-            (compiled a-number `(native ,(datum n))))
+            (compiled a-number 'a-number `(native ,(datum n))))
 
           (ch
             (char? (datum ch))
-            (compiled a-char `(native ,(datum ch))))
+            (compiled a-char 'a-char `(native ,(datum ch))))
 
           (s
             (string? (datum s))
-            (compiled a-string `(native ,(datum s))))
+            (compiled a-string 'a-string `(native ,(datum s))))
 
           ('s
             (symbol? (datum s))
-            (compiled a-symbol `(native ',(datum s))))
+            (compiled a-symbol 'a-symbol `(native ',(datum s))))
 
           (id
             (and
@@ -164,7 +165,7 @@
             (lets
               ($type? (compiler-type-ref? $compiler (datum id)))
               (if $type?
-                (compiled $type? (datum id))
+                (compiled $type? (compiler-reify $compiler $type?) (datum id))
                 (syntax-error #'id "undefined"))))
 
           ((id . x)
@@ -183,6 +184,7 @@
               ($t-value (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
               (compiled
                 $t-value
+                (compiled-ref $compiled-t)
                 (datum v))))
 
           ((native . _)
@@ -191,14 +193,17 @@
           ((native-lambda id param ... body)
             (lets
               ($native-symbol (symbol-append '%% (datum id)))
-              ($symbols
+              ($binders
                 (map-with
                   ($index (indices (length #'(param ...))))
-                  (string->symbol (string-append "v-" (number->string $index)))))
+                  ($param #'(param ...))
+                  `(
+                    ,(string->symbol (string-append "$" (number->string $index)))
+                    ,(syntax->datum $param))))
               (compiler-compile $compiler
                 `(native
                   (a-lambda ,@#'(param ...) ,#'body)
-                  (curry ,$native-symbol ,@$symbols)))))
+                  (curry ,$native-symbol ,@$binders)))))
 
           ((native-lambda . _)
             (syntax-error $term))
@@ -212,10 +217,12 @@
               ($param-type (compiled-type $compiled-param))
               ($param-term (compiled-ref $compiled-param))
               ($param (compiler-evaluate-comptime $compiler $param-term))
-              ($compiler (compiler-push? $compiler $symbol? (compiled $param-type $param)))
+              ($compiler (compiler-push? $compiler $symbol? (compiled $param-type $param-term $param)))
               ($compiled-body (compiler-compile $compiler #'body))
               ($body-term (compiled-ref $compiled-body))
-              (compiled a-type
+              (compiled
+                a-type
+                'a-type
                 `(a-lambda
                   ,(if $symbol? `(,$symbol? ,$param-term) $param-term)
                   ,$body-term))))
@@ -241,14 +248,16 @@
               ($symbol (datum id))
               ($compiled-x (compiler-compile $compiler #'x))
               ($x-type (compiled-type $compiled-x))
+              ($x-type-term (compiled-type-term $compiled-x))
               ($x (compiled-ref $compiled-x))
               ($x-val (compiler-evaluate-comptime $compiler $x))
-              ($compiler (compiler-push $compiler $symbol (compiled $x-type $x-val)))
+              ($compiler (compiler-push $compiler $symbol (compiled $x-type $x-type-term $x-val)))
               ($compiled-body (compiler-compile $compiler #'body))
               ($body-type (compiled-type $compiled-body))
               ($body (compiled-ref $compiled-body))
               (compiled
                 $body-type
+                (compiled-type-term $compiled-body)
                 `(let (,$symbol ,$x) ,$body))))
 
           ((let (id param params ... lambda-body) body)
@@ -275,20 +284,24 @@
               ($compiled-body
                 (compiler-compile
                   (compiler-push? $compiler $symbol?
-                    (compiled $param
+                    (compiled $param $param-term
                       ; TODO: Should it be constant something else?
                       (constant $symbol?)))
                   #'body))
               ($body-type (compiled-type $compiled-body))
+              ($body-type-term (compiled-type-term $compiled-body))
               ($body (compiled-ref $compiled-body))
               (compiled
                 (type-abstraction $symbol? $param
                   (lambda ($x)
                     (compiled-type
                       (compiler-compile
-                        (compiler-push? $compiler $symbol? (compiled $param $x))
+                        (compiler-push? $compiler $symbol? (compiled $param $param-term $x))
                         #'body))))
-                `(lambda ,$symbol? ,$body))))
+                `(a-lambda
+                  ,(if $symbol? `(,$symbol? ,$param-term) $param-term)
+                  ,$body-type-term)
+                `(lambda (,$symbol? ,$param-term) ,$body))))
 
           ((lambda x xs ... body)
             (compiler-compile-default $compiler
@@ -304,7 +317,9 @@
               ($type (compiled-type $compiled-true))
               ($true (compiled-ref $compiled-true))
               ($false (compiler-compile-typed $compiler $type #'false))
-              (compiled $type
+              (compiled
+                $type
+                (compiled-type-term $compiled-true)
                 `(if ,$cond ,$true ,$false))))
 
           ((if . _)
@@ -318,6 +333,7 @@
               (macro
                 (compiler-evaluate-comptime $compiler
                   `(%%lambda (,#'compiler-id ,#'term-id) ,#'body)))
+              (syntax->datum $term)
               `(native #f)))
 
           ((macro . _)
@@ -339,6 +355,7 @@
                     ($arg-value (compiler-evaluate-comptime $compiler $arg-term))
                     (compiled
                       (type-abstraction-apply $type-abstraction $arg-value)
+                      (compiler-reify $compiler (type-abstraction-apply $type-abstraction $arg-value))
                       `(app ,$fn-term ,$arg-term))))
                 ((else $other)
                   (syntax-error #'fn
@@ -383,6 +400,7 @@
         (equal?
           `(compiled
             ,(reify (compiled-type $compiled))
+            ,(compiled-type-term $compiled)
             ,(compiled-ref $compiled))
           'out))))
 

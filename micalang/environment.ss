@@ -5,6 +5,7 @@
     environment-push
     environment-symbols
     environment-types
+    environment-type-terms
     environment-values
     mica-environment)
   (import
@@ -14,7 +15,7 @@
     (except (micalang comptime) lambda))
 
   (define-rule-syntax (environment (id type value) ...)
-    `((id . ,(compiled type value)) ...))
+    `((id . ,(compiled type 'type value)) ...))
 
   (define (environment-push $environment $id $compiled)
     (push $environment
@@ -31,6 +32,9 @@
   (define (environment-types $environment)
     (map (dot compiled-type cdr) $environment))
 
+  (define (environment-type-terms $environment)
+    (map (dot compiled-type-term cdr) $environment))
+
   (define (environment-values $environment)
     (map (dot compiled-ref cdr) $environment))
 
@@ -38,28 +42,28 @@
     (environment
       (zero?
         (a-lambda a-number a-boolean)
-        (curry %%zero? a))
+        (curry %%zero? (a a-number)))
 
       (=
         (a-lambda a-number (a-lambda a-number a-number))
-        (curry %%= a b))
+        (curry %%= (a a-number) (b a-number)))
       (+
         (a-lambda a-number (a-lambda a-number a-number))
-        (curry %%+ a b))
+        (curry %%+ (a a-number) (b a-number)))
       (-
         (a-lambda a-number (a-lambda a-number a-number))
-        (curry %%- a b))
+        (curry %%- (a a-number) (b a-number)))
       (<
         (a-lambda a-number (a-lambda a-number a-boolean))
-        (curry %%< a b))
+        (curry %%< (a a-number) (b a-number)))
 
       (string-append
         (a-lambda a-string (a-lambda a-string a-string))
-        (curry %%string-append a b))
+        (curry %%string-append (a a-string) (b a-string)))
       (string-length
         (a-lambda a-string a-number)
-        (curry %%string-length a))
+        (curry %%string-length (a a-string)))
       (number->string
         (a-lambda a-number a-string)
-        (curry %%number->string a))))
+        (curry %%number->string (a a-number)))))
 )

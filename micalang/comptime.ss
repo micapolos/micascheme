@@ -35,18 +35,18 @@
 
   ; TODO: Provide a type
   (define-rules-syntax
-    ((lambda id body)
-      (abstraction 'id 'foo (%lambda (id) body))))
+    ((lambda (id t) body)
+      (abstraction 'id t (%lambda (id) body))))
 
   (define-rules-syntax
     ((prim id)
       (%native ($primitive 3 id)))
     ((prim id (p1 t1))
-      (lambda p1
+      (lambda (p1 t1)
         (term-apply (%native ($primitive 3 id)) p1)))
     ((prim id (p1 t1) (p2 t2))
-      (lambda p1
-        (lambda p2
+      (lambda (p1 t1)
+        (lambda (p2 t2)
           (switch p1
             ((native? $native-x)
               (switch p2
@@ -63,14 +63,14 @@
   (define-rules-syntax
     ((curry p)
       (native p))
-    ((curry p p1)
-      (lambda p1
+    ((curry p (p1 t1))
+      (lambda (p1 t1)
         (switch p1
           ((native? $native) (native (p (native-ref $native))))
           ((else $other) (application (native p) $other)))))
-    ((curry p p1 p2)
-      (lambda p1
-        (lambda p2
+    ((curry p (p1 t1) (p2 t2))
+      (lambda (p1 t1)
+        (lambda (p2 t2)
           (switch p1
             ((native? $native-x)
               (switch p2
@@ -101,16 +101,16 @@
         (application (native $other) $rhs))))
 
   (define-prims
-    (zero? %zero? x)
+    (zero? %zero? (x a-number))
 
-    (= %= x y)
-    (+ %+ x y)
-    (- %- x y)
-    (< %< x y)
+    (= %= (x a-number) (y a-number))
+    (+ %+ (x a-number) (y a-number))
+    (- %- (x a-number) (y a-number))
+    (< %< (x a-number) (y a-number))
 
-    (string-append %%string-append a b)
-    (string-length %%string-length a)
-    (number->string %%number->string a))
+    (string-append %%string-append (a a-string) (b a-string))
+    (string-length %%string-length (a a-string))
+    (number->string %%number->string (a a-number)))
 
   (define-rules-syntax
     ((a-lambda (id in) out)
