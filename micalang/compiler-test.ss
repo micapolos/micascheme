@@ -267,5 +267,3 @@
   (compiled number number
     (let (id (lambda (t type) (lambda (x t) x)))
       (app (app id number) (native 12)))))
-
-
