@@ -1,6 +1,9 @@
 (import (micalang base) (micalang term) (micalang reify))
 
-(check (equal? (unique-id '(a b b-0) #f 'v 0) 'v-0))
+(check (equal? (unique-id '(a b b-0) #f 'v 0) 'v))
+(check (equal? (unique-id '(a b b-0 v) #f 'v 0) 'v-0))
+(check (equal? (unique-id '(a b b-0 v v-0 v) #f 'v 0) 'v-1))
+(check (equal? (unique-id '(a b b-0 v v-0 v-1) #f 'v 0) 'v-2))
 (check (equal? (unique-id '(a b b-0) 'a 'a 0) 'a-0))
 (check (equal? (unique-id '(a b b-0) 'b 'b 0) 'b-1))
 (check (equal? (unique-id '(a b b-0) 'c 'c 0) 'c))
