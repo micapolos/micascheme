@@ -1,6 +1,6 @@
 (import (micalang mica))
 
-(mica-print
+(print
   (let
     (local x "foo")
     (local y "bar")

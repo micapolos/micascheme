@@ -2,7 +2,7 @@
   (export
     mica
     check-mica
-    mica-print
+    print
     mica-debug)
   (import
     (micalang base)
@@ -46,6 +46,6 @@
   (define-rule-syntax (check-mica in out)
     (check (equal? (mica in) out)))
 
-  (define-rule-syntax (mica-print x ...)
+  (define-rule-syntax (print x ...)
     (begin (displayln (mica x)) ...))
 )
