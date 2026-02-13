@@ -24,6 +24,15 @@
 
 (check-compiles
   (let
+    (zero? (native-curry %%zero? any-number any-boolean))
+    (zero? 1))
+  (compiled any-boolean any-boolean
+    (let
+      (zero? (curry %%zero? ($0 any-number)))
+      (app zero? (native 1)))))
+
+(check-compiles
+  (let
     (add (native (any-lambda any-number any-number any-number) (curry %%+ (a any-number) (b any-number))))
     (increment (a any-number) (+ a 1))
     (double (a any-number) (b any-number) (add a b))
