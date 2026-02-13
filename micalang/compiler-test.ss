@@ -1,7 +1,17 @@
 (import
   (micalang base)
   (micalang term)
-  (micalang compiler))
+  (micalang compiler)
+  (micalang compiled)
+  (micalang reify))
+
+(check
+  (term=?
+    (compiler-evaluate-comptime
+      (compiler-push default-compiler 't
+        (compiled a-type 'a-type a-number))
+      '(a-lambda t t))
+    (type-abstraction #f a-number (lambda (_) a-number))))
 
 ; === type
 

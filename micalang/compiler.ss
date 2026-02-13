@@ -8,6 +8,8 @@
     compiler-comptime-environment
     compiler-environment
 
+    compiler-evaluate-comptime
+
     empty-compiler
     compiler-push
 
@@ -16,6 +18,7 @@
     compiler-reify
     compiler-evaluate
 
+    default-compiler
     default-compiler-recurse
     default-compiler-reify
     default-compiler-term=?
@@ -384,18 +387,18 @@
   (define check-comptime-environment
     (%environment '(micalang comptime)))
 
+  (define default-compiler
+    (compiler
+      default-compiler-recurse
+      default-compiler-reify
+      default-compiler-term=?
+      check-runtime-environment
+      check-comptime-environment
+      mica-environment))
+
   (define-rule-syntax (check-compiles in out)
     (lets
-      ($compiled
-        (compiler-compile
-          (compiler
-            default-compiler-recurse
-            default-compiler-reify
-            default-compiler-term=?
-            check-runtime-environment
-            check-comptime-environment
-            mica-environment)
-          'in))
+      ($compiled (compiler-compile default-compiler 'in))
       (check
         (equal?
           `(compiled
@@ -405,15 +408,5 @@
           'out))))
 
   (define-rule-syntax (check-compile-raises in)
-    (check
-      (raises
-        (compiler-compile
-          (compiler
-            default-compiler-recurse
-            default-compiler-reify
-            default-compiler-term=?
-            check-runtime-environment
-            check-comptime-environment
-            mica-environment)
-          'in))))
+    (check (raises (compiler-compile default-compiler 'in))))
 )
