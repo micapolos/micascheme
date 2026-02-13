@@ -14,6 +14,24 @@
   (compiled a-boolean a-boolean foo))
 
 (check-compiles
+  (native a-number (%native 10))
+  (compiled a-number a-number (%native 10)))
+
+(check-compiles
+  (native (a-lambda a-number a-boolean) (curry %%zero? (x a-number)))
+  (compiled
+    (a-lambda a-number a-boolean)
+    (a-lambda a-number a-boolean)
+    (curry %%zero? (x a-number))))
+
+(check-compiles
+  (native (a-lambda a-number a-number a-boolean) (curry %%< (x a-number) (y a-number)))
+  (compiled
+    (a-lambda a-number a-number a-boolean)
+    (a-lambda a-number (a-lambda a-number a-boolean))
+    (curry %%< (x a-number) (y a-number))))
+
+(check-compiles
   (let
     (zero? (native (a-lambda a-number a-boolean) (curry %%zero? (x a-number))))
     (zero? 1))
@@ -21,13 +39,6 @@
     (let
       (zero? (curry %%zero? (x a-number)))
       (app zero? (native 1)))))
-
-(check-compiles
-  (native-lambda + a-number a-number a-number)
-  (compiled
-    (a-lambda a-number a-number a-number)
-    (a-lambda a-number (a-lambda a-number a-number))
-    (curry %%+ ($0 a-number) ($1 a-number))))
 
 (check-compiles
   (let
