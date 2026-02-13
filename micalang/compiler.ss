@@ -104,7 +104,7 @@
 
   (define (compiler-evaluate $compiler $term)
     (eval
-      (compiled-ref (compiler-compile $compiler $term))
+      (compiled-value-term (compiler-compile $compiler $term))
       (compiler-runtime-environment $compiler)))
 
   (define (compiler-compile-typed $compiler $expected-type $term)
@@ -112,7 +112,7 @@
       ($compiled (compiler-compile $compiler $term))
       ($type (compiled-type $compiled))
       (if (compiler-term=? $compiler $type $expected-type)
-        (compiled-ref $compiled)
+        (compiled-value-term $compiled)
         (syntax-error $term
           (format "found ~s, expected ~s, in"
             (compiler-reify $compiler $type)
@@ -184,10 +184,10 @@
           ((native t v)
             (lets
               ($compiled-t (compiler-compile $compiler #'t))
-              ($t-value (compiler-evaluate-comptime $compiler (compiled-ref $compiled-t)))
+              ($t-value (compiler-evaluate-comptime $compiler (compiled-value-term $compiled-t)))
               (compiled
                 $t-value
-                (compiled-ref $compiled-t)
+                (compiled-value-term $compiled-t)
                 (datum v))))
 
           ((native . _)
@@ -218,11 +218,11 @@
             (lets
               ((values $symbol? $compiled-param) (compiler-compile-param $compiler #'param))
               ($param-type (compiled-type $compiled-param))
-              ($param-term (compiled-ref $compiled-param))
+              ($param-term (compiled-value-term $compiled-param))
               ($param (compiler-evaluate-comptime $compiler $param-term))
               ($compiler (compiler-push? $compiler $symbol? (compiled $param-type $param-term $param)))
               ($compiled-body (compiler-compile $compiler #'body))
-              ($body-term (compiled-ref $compiled-body))
+              ($body-term (compiled-value-term $compiled-body))
               (compiled
                 a-type
                 'a-type
@@ -252,12 +252,12 @@
               ($compiled-x (compiler-compile $compiler #'x))
               ($x-type (compiled-type $compiled-x))
               ($x-type-term (compiled-type-term $compiled-x))
-              ($x (compiled-ref $compiled-x))
+              ($x (compiled-value-term $compiled-x))
               ($x-val (compiler-evaluate-comptime $compiler $x))
               ($compiler (compiler-push $compiler $symbol (compiled $x-type $x-type-term $x-val)))
               ($compiled-body (compiler-compile $compiler #'body))
               ($body-type (compiled-type $compiled-body))
-              ($body (compiled-ref $compiled-body))
+              ($body (compiled-value-term $compiled-body))
               (compiled
                 $body-type
                 (compiled-type-term $compiled-body)
@@ -282,7 +282,7 @@
           ((lambda param body)
             (lets
               ((values $symbol? $compiled-param) (compiler-compile-param $compiler #'param))
-              ($param-term (compiled-ref $compiled-param))
+              ($param-term (compiled-value-term $compiled-param))
               ($param (compiler-evaluate-comptime $compiler $param-term))
               ($compiled-body
                 (compiler-compile
@@ -293,7 +293,7 @@
                   #'body))
               ($body-type (compiled-type $compiled-body))
               ($body-type-term (compiled-type-term $compiled-body))
-              ($body (compiled-ref $compiled-body))
+              ($body (compiled-value-term $compiled-body))
               (compiled
                 (type-abstraction $symbol? $param
                   (lambda ($x)
@@ -318,7 +318,7 @@
               ($cond (compiler-compile-typed $compiler (compiler-comptime $compiler a-boolean) #'cond))
               ($compiled-true (compiler-compile $compiler #'true))
               ($type (compiled-type $compiled-true))
-              ($true (compiled-ref $compiled-true))
+              ($true (compiled-value-term $compiled-true))
               ($false (compiler-compile-typed $compiler $type #'false))
               (compiled
                 $type
@@ -352,7 +352,7 @@
               (switch $fn-type
                 ((type-abstraction? $type-abstraction)
                   (lets
-                    ($fn-term (compiled-ref $compiled-fn))
+                    ($fn-term (compiled-value-term $compiled-fn))
                     ($param-type (type-abstraction-param $type-abstraction))
                     ($arg-term (compiler-compile-typed $compiler $param-type #'arg))
                     ($arg-value (compiler-evaluate-comptime $compiler $arg-term))
@@ -404,7 +404,7 @@
           `(compiled
             ,(reify (compiled-type $compiled))
             ,(compiled-type-term $compiled)
-            ,(compiled-ref $compiled))
+            ,(compiled-value-term $compiled))
           'out))))
 
   (define-rule-syntax (check-compile-raises in)

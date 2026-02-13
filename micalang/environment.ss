@@ -36,7 +36,7 @@
     (map (dot compiled-type-term cdr) $environment))
 
   (define (environment-values $environment)
-    (map (dot compiled-ref cdr) $environment))
+    (map (dot compiled-value-term cdr) $environment))
 
   (define mica-environment
     (environment

@@ -41,7 +41,7 @@
           #`(pretty-print
             '(compiled
               #,(datum->syntax #'mica-debug (compiler-reify $compiler (compiled-type $compiled)))
-              #,(datum->syntax #'mica-debug (compiled-ref $compiled))))))))
+              #,(datum->syntax #'mica-debug (compiled-value-term $compiled))))))))
 
   (define-rule-syntax (check-mica in out)
     (check (equal? (mica in) out)))
