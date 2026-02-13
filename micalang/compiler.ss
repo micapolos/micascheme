@@ -97,7 +97,7 @@
       (fold-left
         (lambda ($proc $value) (term-apply $proc $value))
         $proc
-        (reverse (environment-values $environment)))))
+        (reverse (environment-value-terms $environment)))))
 
   (define (compiler-compile-type $compiler $term)
     (compiler-compile-typed $compiler a-type $term))

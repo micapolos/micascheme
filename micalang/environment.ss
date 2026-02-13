@@ -6,7 +6,7 @@
     environment-symbols
     environment-types
     environment-type-terms
-    environment-values
+    environment-value-terms
     mica-environment)
   (import
     (only (micalang base) cons dot push list define lets not cdr map car cadr caddr cadddr caar assq memp lambda and define-rule-syntax quasiquote unquote ...)
@@ -35,7 +35,7 @@
   (define (environment-type-terms $environment)
     (map (dot compiled-type-term cdr) $environment))
 
-  (define (environment-values $environment)
+  (define (environment-value-terms $environment)
     (map (dot compiled-value-term cdr) $environment))
 
   (define mica-environment
