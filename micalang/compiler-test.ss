@@ -252,7 +252,7 @@
     (fx-10 (fx 10))
     (fx-id (lambda (x fx) x))
     (fx-id (fx 10)))
-  (compiled #f #f
+  (compiled fx fx
     (let (fx (native #f))
       (let (fx-10 (tagged (constant fx) 10))
         (let (fx-id (lambda (x (constant fx)) x))

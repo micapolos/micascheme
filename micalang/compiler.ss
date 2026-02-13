@@ -266,11 +266,12 @@
               (compiled
                 (pi $symbol? $t-value
                   (lambda ($x)
-                    (compiler-evaluate-comptime
-                      (if $symbol?
-                        (compiler-push $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) $x))
-                        $compiler)
-                      (compiled-type-term $compiled-body))))
+                    (compiled-type
+                      (compiler-compile
+                        (if $symbol?
+                          (compiler-push $compiler $symbol? (compiled $t-value (compiled-ref $compiled-t) $x))
+                          $compiler)
+                        #'body))))
                 `(pi
                   ,(if $symbol? `(,$symbol? ,(compiled-ref $compiled-t)) (compiled-ref $compiled-t))
                   ,(compiled-type-term $compiled-body))
