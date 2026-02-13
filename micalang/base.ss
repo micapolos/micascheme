@@ -4,4 +4,5 @@
   (export
     (import
       (except (micascheme) environment environment-symbols)
+      (symbol)
       (prefix (only (scheme) environment) %))))

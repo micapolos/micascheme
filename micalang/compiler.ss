@@ -193,6 +193,7 @@
 
           ((native-lambda id param ... body)
             (lets
+              ($native-symbol (symbol-append '%% (datum id)))
               ($binders
                 (map-with
                   ($index (indices (length #'(param ...))))
@@ -203,7 +204,7 @@
               (compiler-compile $compiler
                 `(native
                   (any-lambda ,@#'(param ...) ,#'body)
-                  (curry ,#'id ,@$binders)))))
+                  (curry ,$native-symbol ,@$binders)))))
 
           ((native-lambda . _)
             (syntax-error $term))

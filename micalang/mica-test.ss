@@ -2,9 +2,9 @@
 
 (check-mica
   (let
-    (number->string (native-lambda %%number->string any-number any-string))
-    (string-length (native-lambda %%string-length any-string any-number))
-    (string-append (native-lambda %%string-append any-string any-string any-string))
+    (number->string (native-lambda number->string any-number any-string))
+    (string-length (native-lambda string-length any-string any-number))
+    (string-append (native-lambda string-append any-string any-string any-string))
     (string-append "Hello " (number->string (string-length "foo"))))
   "Hello 3")
 
@@ -49,7 +49,7 @@
             (%%syntax-error #'n "not fixnum"))))))
     (fx-10 (fx 10))
     (fx-id (lambda (x any-fx) x))
-    (fx+ (native-lambda %%fx+ any-fx any-fx any-fx))
+    (fx+ (native-lambda fx+ any-fx any-fx any-fx))
     (fx+1 (a any-fx) (fx+ a (fx 1)))
     (fx+1 (fx+ (fx 10) (fx 20))))
   31)
@@ -69,11 +69,11 @@
     (any-vec2
       (lambda (t any-type)
         (
-          (native-lambda %%list any-symbol any-type any-type)
+          (native-lambda list any-symbol any-type any-type)
           'any-vec2
           t)))
     (vec2
       (lambda (element any-type)
-        (native-lambda %%cons element element (any-vec2 element))))
+        (native-lambda cons element element (any-vec2 element))))
     (vec2 (any-vec2 any-number) (vec2 any-number 10 20) (vec2 any-number 10 20)))
   `((10 . 20) . (10 . 20)))

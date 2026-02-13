@@ -23,7 +23,7 @@
       (app zero? (native 1)))))
 
 (check-compiles
-  (native-lambda %%+ any-number any-number any-number)
+  (native-lambda + any-number any-number any-number)
   (compiled
     (any-lambda any-number any-number any-number)
     (any-lambda any-number (any-lambda any-number any-number))
@@ -31,7 +31,7 @@
 
 (check-compiles
   (let
-    (zero? (native-lambda %%zero? any-number any-boolean))
+    (zero? (native-lambda zero? any-number any-boolean))
     (zero? 1))
   (compiled any-boolean any-boolean
     (let
@@ -40,7 +40,7 @@
 
 (check-compiles
   (let
-    (add (native-lambda %%+ any-number any-number any-number))
+    (add (native-lambda + any-number any-number any-number))
     (increment (a any-number) (+ a 1))
     (double (a any-number) (b any-number) (add a b))
     (double (increment 1)))
