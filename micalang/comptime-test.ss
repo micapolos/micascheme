@@ -4,11 +4,11 @@
   (micalang comptime))
 
 (check (equal? a-type a-type))
-(check (equal? a-boolean (%native 'a-boolean)))
-(check (equal? a-number (%native 'a-number)))
-(check (equal? a-symbol (%native 'a-symbol)))
-(check (equal? a-char (%native 'a-char)))
-(check (equal? a-string (%native 'a-string)))
+(check (equal? a-boolean a-boolean))
+(check (equal? a-number a-number))
+(check (equal? a-symbol a-symbol))
+(check (equal? a-char a-char))
+(check (equal? a-string a-string))
 
 (check
   (equal?

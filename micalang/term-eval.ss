@@ -14,6 +14,11 @@
   (define (default-term-eval $default $term)
     (switch $term
       ((a-type? $a-type) $a-type)
+      ((a-symbol? $a-symbol) $a-symbol)
+      ((a-boolean? $a-boolean) $a-boolean)
+      ((a-number? $a-number) $a-number)
+      ((a-char? $a-char) $a-char)
+      ((a-string? $a-string) $a-string)
       ((native? $native) $native)
       ((variable? $variable) $variable)
       ((constant? $constant)

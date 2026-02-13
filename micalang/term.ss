@@ -1,6 +1,11 @@
 (library (micalang term)
   (export
     a-type a-type?
+    a-symbol a-symbol?
+    a-boolean a-boolean?
+    a-number a-number?
+    a-char a-char?
+    a-string a-string?
     native native? native-ref
     variable variable? variable-symbol
     constant constant? constant-ref
@@ -17,6 +22,11 @@
   (import (micalang base))
 
   (data a-type)
+  (data a-symbol)
+  (data a-boolean)
+  (data a-number)
+  (data a-char)
+  (data a-string)
   (data (native ref))
   (data (variable symbol))
   (data (constant ref))
@@ -60,6 +70,21 @@
       ((a-type? _)
         (switch? $rhs
           ((a-type? _) #t)))
+      ((a-symbol? _)
+        (switch? $rhs
+          ((a-symbol? _) #t)))
+      ((a-boolean? _)
+        (switch? $rhs
+          ((a-boolean? _) #t)))
+      ((a-number? _)
+        (switch? $rhs
+          ((a-number? _) #t)))
+      ((a-char? _)
+        (switch? $rhs
+          ((a-char? _) #t)))
+      ((a-string? _)
+        (switch? $rhs
+          ((a-string? _) #t)))
       ((native? $lhs-native)
         (switch? $rhs
           ((native? $rhs-native)

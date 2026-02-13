@@ -115,41 +115,33 @@
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
-        (syntax-case $term (quote native native-lambda define expect lambda a-lambda let if macro)
+        (syntax-case $term (a-type a-symbol a-boolean a-number a-char a-string quote native native-lambda define expect lambda a-lambda let if macro)
+          (a-type (compiled a-type 'a-type 'a-type))
+          (a-symbol (compiled a-type 'a-type 'a-symbol))
+          (a-boolean (compiled a-type 'a-type 'a-boolean))
+          (a-number (compiled a-type 'a-type 'a-number))
+          (a-char (compiled a-type 'a-type 'a-char))
+          (a-string (compiled a-type 'a-type 'a-string))
+
           (b
             (boolean? (datum b))
-            (compiled
-              (compiler-comptime $compiler a-boolean)
-              'a-boolean
-              `(native ,(datum b))))
+            (compiled a-boolean 'a-boolean `(native ,(datum b))))
 
           (n
             (number? (datum n))
-            (compiled
-              (compiler-comptime $compiler a-number)
-              'a-number
-              `(native ,(datum n))))
+            (compiled a-number 'a-number `(native ,(datum n))))
 
           (ch
             (char? (datum ch))
-            (compiled
-              (compiler-comptime $compiler a-char)
-              'a-char
-              `(native ,(datum ch))))
+            (compiled a-char 'a-char `(native ,(datum ch))))
 
           (s
             (string? (datum s))
-            (compiled
-              (compiler-comptime $compiler a-string)
-              'a-string
-              `(native ,(datum s))))
+            (compiled a-string 'a-string `(native ,(datum s))))
 
-          ((quote s)
+          ('s
             (symbol? (datum s))
-            (compiled
-              (compiler-comptime $compiler a-symbol)
-              'a-symbol
-              `(native ',(datum s))))
+            (compiled a-symbol 'a-symbol `(native ',(datum s))))
 
           (id
             (and

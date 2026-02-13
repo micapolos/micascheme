@@ -40,13 +40,6 @@
 
   (define mica-environment
     (environment
-      (a-type a-type a-type)
-      (a-boolean a-type a-boolean)
-      (a-number a-type a-number)
-      (a-char a-type a-char)
-      (a-symbol a-type a-symbol)
-      (a-string a-type a-string)
-
       (zero?
         (a-lambda a-number a-boolean)
         (curry %%zero? (a a-number)))

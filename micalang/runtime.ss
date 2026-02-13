@@ -1,7 +1,6 @@
 (library (micalang runtime)
   (export
     curry native app constant tagged
-    a-type a-boolean a-number a-symbol a-char a-string
     = + - < zero?
     string-append string-length number->string
     let lambda macro a-lambda app if)
@@ -14,7 +13,8 @@
     (import
       (only (micascheme) equal? quote quasiquote unquote syntax unsyntax quasisyntax ... datum syntax-case)
       (prefix (micascheme) %%)
-      (prefix (micalang term) %%)))
+      (prefix (micalang term) %%)
+      (only (micalang term) a-type a-symbol a-boolean a-number a-char a-string)))
 
   (define-rule-syntax (let (id x) ... body)
     (%let ((id x) ...) body))
@@ -69,13 +69,6 @@
     (%if cond true false))
 
   (define-currys
-    (a-type    #f)
-    (a-boolean #f)
-    (a-number  #f)
-    (a-symbol  #f)
-    (a-char    #f)
-    (a-string  #f)
-
     (zero? %zero? (x a-number))
 
     (= %= (x a-number) (y a-number))

@@ -15,6 +15,11 @@
   (define (default-reify $default $term)
     (switch $term
       ((a-type? _) 'a-type)
+      ((a-symbol? _) 'a-symbol)
+      ((a-boolean? _) 'a-boolean)
+      ((a-number? _) 'a-number)
+      ((a-char? _) 'a-char)
+      ((a-string? _) 'a-string)
       ((native? $native)
         (native-ref $native))
       ((variable? $variable)

@@ -2,7 +2,6 @@
   (export
     curry constant tagged
     native app lambda macro let if
-    a-boolean a-number a-symbol a-char a-string
     = + - < zero?
     string-append string-length number->string
     a-lambda)
@@ -16,7 +15,8 @@
       (only (micascheme) equal? quote quasiquote unquote syntax unsyntax quasisyntax ... datum syntax-case)
       (prefix (micascheme) %%)
       (only (micalang term) application type-abstraction-param a-type)
-      (prefix (micalang term) %%)))
+      (prefix (micalang term) %%)
+      (only (micalang term) a-type a-symbol a-boolean a-number a-char a-string)))
 
   (define-rule-syntax (native x)
     (%native x))
@@ -101,12 +101,6 @@
         (application (native $other) $rhs))))
 
   (define-prims
-    (a-boolean 'a-boolean)
-    (a-number  'a-number)
-    (a-symbol  'a-symbol)
-    (a-char    'a-char)
-    (a-string  'a-string)
-
     (zero? %zero? (x a-number))
 
     (= %= (x a-number) (y a-number))
