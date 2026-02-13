@@ -1,7 +1,7 @@
 (import (micalang mica))
 
 (print
-  (local x "Hello, ")
-  (local y "world")
-  (local z (string-append x y))
+  (define x "Hello, ")
+  (define y "world")
+  (define z (string-append x 10))
   (string-append z "!"))
