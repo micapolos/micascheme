@@ -3,5 +3,5 @@
 (print
   (define x "Hello, ")
   (define y "world")
-  (define z (string-append x 10))
+  (define z (string-append x y))
   (string-append z "!"))

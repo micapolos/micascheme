@@ -15,7 +15,8 @@
     (import
       (only (micascheme) equal? quote quasiquote unquote syntax unsyntax quasisyntax ... datum syntax-case)
       (prefix (micascheme) %%)
-      (only (micalang term) application type-abstraction-param a-type)))
+      (only (micalang term) application type-abstraction-param a-type)
+      (prefix (micalang term) %%)))
 
   (define-rule-syntax (native x)
     (%native x))

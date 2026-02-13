@@ -51,7 +51,7 @@
 
   (define (term-equal? $lhs $rhs)
     (default-term-equal?
-      (lambda ($default $lhs $rhs) (throw 'term-equal?))
+      (lambda ($default $lhs $rhs) (throw term-equal? $lhs $rhs))
       $lhs
       $rhs))
 

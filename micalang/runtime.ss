@@ -13,7 +13,8 @@
   (export
     (import
       (only (micascheme) equal? quote quasiquote unquote syntax unsyntax quasisyntax ... datum syntax-case)
-      (prefix (micascheme) %%)))
+      (prefix (micascheme) %%)
+      (prefix (micalang term) %%)))
 
   (define-rule-syntax (let (id x) ... body)
     (%let ((id x) ...) body))

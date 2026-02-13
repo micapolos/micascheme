@@ -8,8 +8,7 @@
 
   (define (term-eval $term)
     (default-term-eval
-      (lambda ($default $term)
-        (throw term-eval))
+      (lambda ($default $term) (throw term-eval $term))
       $term))
 
   (define (default-term-eval $default $term)

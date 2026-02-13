@@ -8,13 +8,13 @@
 
   (define (term-compile $term)
     (default-term-compile
-      (lambda ($default $term) (throw term-compile))
+      (lambda ($default $term) (throw term-compile $term))
       $term))
 
   (define (default-term-compile $default $term)
     (switch $term
       ((a-type? $type)
-        (throw erased))
+        (throw erased $type))
       ((native? $native)
         ($default $default (native-ref $native)))
       ((variable? $variable)
@@ -30,7 +30,7 @@
             ,(default-term-compile $default
               (abstraction-apply $abstraction (variable $symbol))))))
       ((type-abstraction? $type-abstraction)
-        (throw erased))
+        (throw erased $type-abstraction))
       ((application? $application)
         `(
           ,(default-term-compile $default (application-lhs $application))

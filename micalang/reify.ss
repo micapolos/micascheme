@@ -9,7 +9,7 @@
 
   (define (reify $term)
     (default-reify
-      (lambda ($default $term) (throw 'reify))
+      (lambda ($default $term) (throw reify $term))
       $term))
 
   (define (default-reify $default $term)
