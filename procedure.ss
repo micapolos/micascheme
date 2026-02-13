@@ -17,7 +17,8 @@
     dot
     dot-app
     ignore
-    ordered-by)
+    ordered-by
+    fix)
   (import
     (scheme)
     (syntax)
@@ -134,4 +135,10 @@
 
   (define-rule-syntax (ordered-by order proc ...)
     (combiner-2 order (dot proc ...)))
+
+  (define (fix f)
+    ((lambda (x)
+      (f (lambda (v) ((x x) v))))
+     (lambda (x)
+      (f (lambda (v) ((x x) v))))))
 )

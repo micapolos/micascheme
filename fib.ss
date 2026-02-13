@@ -1,6 +1,6 @@
 #!chezscheme
 (library (fib)
-  (export fib fxfib fx3fib flfib flsinglefib curry-fib)
+  (export fib fxfib fx3fib flfib flsinglefib curry-fib fixfib)
   (import (micascheme) (curry))
 
   (define (fib n)
@@ -44,4 +44,14 @@
       n
       ((curry+ (fib ((curry- n) 2)))
         (fib ((curry- n) 1)))))
+
+  (define fixfib
+    (fix
+      (lambda (fib)
+        (lambda (n)
+          (if (< n 2)
+            n
+            (+
+              (fib (- n 2))
+              (fib (- n 1))))))))
 )
