@@ -47,5 +47,5 @@
     (check (equal? (mica in) out)))
 
   (define-rule-syntax (print x ...)
-    (begin (displayln (mica x)) ...))
+    (begin (displayln (mica (let x ...)))))
 )
