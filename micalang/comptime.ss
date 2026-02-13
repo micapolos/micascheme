@@ -4,7 +4,7 @@
     native app lambda macro let if
     any-boolean any-number any-symbol any-char any-string
     = + - < zero?
-    pi)
+    any-lambda)
   (import
     (except (micalang base) = + - < zero? list app lambda let string if)
     (prefix (only (micalang base) lambda let if = + - < zero?) %)
@@ -112,9 +112,9 @@
     (< %< (x any-number) (y any-number)))
 
   (define-rules-syntax
-    ((pi (id in) out)
+    ((any-lambda (id in) out)
       (%pi 'id in (%lambda (id) out)))
-    ((pi in out)
+    ((any-lambda in out)
       (%pi #f in (%lambda (id) out))))
 
   (define-rule-syntax (if cond true false)

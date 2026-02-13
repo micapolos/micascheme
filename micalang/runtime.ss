@@ -3,7 +3,7 @@
     curry native app constant tagged
     any-type any-boolean any-number any-symbol any-char any-string
     = + - < zero?
-    let lambda macro pi app if)
+    let lambda macro any-lambda app if)
   (import
     (except (micalang base) = + - < zero? lambda app let if string)
     (prefix (only (micalang base) let lambda app if zero? = + - <) %)
@@ -25,7 +25,7 @@
   (define-rule-syntax (macro x ...) #f)
 
   (define-rules-syntax
-    ((pi . _) #f))
+    ((any-lambda . _) #f))
 
   (define-rules-syntax
     ((curry x)

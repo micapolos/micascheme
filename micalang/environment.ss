@@ -47,10 +47,10 @@
       (any-symbol  any-type   any-symbol)
       (any-string  any-type   any-string)
 
-      (zero?   (pi any-number any-boolean)              (curry %%zero? (a any-number)))
+      (zero?   (any-lambda any-number any-boolean)              (curry %%zero? (a any-number)))
 
-      (=       (pi any-number (pi any-number any-number))   (curry %%= (a any-number) (b any-number)))
-      (+       (pi any-number (pi any-number any-number))   (curry %%+ (a any-number) (b any-number)))
-      (-       (pi any-number (pi any-number any-number))   (curry %%- (a any-number) (b any-number)))
-      (<       (pi any-number (pi any-number any-boolean))  (curry %%< (a any-number) (b any-number)))))
+      (=       (any-lambda any-number (any-lambda any-number any-number))   (curry %%= (a any-number) (b any-number)))
+      (+       (any-lambda any-number (any-lambda any-number any-number))   (curry %%+ (a any-number) (b any-number)))
+      (-       (any-lambda any-number (any-lambda any-number any-number))   (curry %%- (a any-number) (b any-number)))
+      (<       (any-lambda any-number (any-lambda any-number any-boolean))  (curry %%< (a any-number) (b any-number)))))
 )

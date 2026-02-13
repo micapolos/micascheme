@@ -55,7 +55,7 @@
         (lets
           ($symbol? (pi-symbol? $pi))
           ($reified-param (default-reify $default (pi-param $pi)))
-          `(pi
+          `(any-lambda
             ,(if $symbol? `(,$symbol? ,$reified-param) $reified-param) .
             ,(lets
               ($body (pi-apply $pi (native $symbol?)))

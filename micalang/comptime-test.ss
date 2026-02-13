@@ -33,11 +33,11 @@
 (check (equal? (app (app - (native 5)) (native 3)) (%native 2)))
 (check (equal? (app (app < (native 2)) (native 3)) (%native #t)))
 
-(check (equal? (pi-param (pi any-number any-boolean)) any-number))
-(check (equal? (app (pi any-number any-boolean) (native '())) any-boolean))
+(check (equal? (pi-param (any-lambda any-number any-boolean)) any-number))
+(check (equal? (app (any-lambda any-number any-boolean) (native '())) any-boolean))
 
-(check (equal? (pi-param (pi (x any-type) x)) any-type))
-(check (equal? (app (pi (x any-type) x) any-number) any-number))
+(check (equal? (pi-param (any-lambda (x any-type) x)) any-type))
+(check (equal? (app (any-lambda (x any-type) x) any-number) any-number))
 
 (check
   (equal?

@@ -27,7 +27,7 @@
 (check (procedure? (lambda (x number) x)))
 (check (equal? ((lambda (x number) x) (native 10)) 10))
 
-(check (equal? (pi number boolean) #f))
+(check (equal? (any-lambda any-number any-boolean) #f))
 
 (check
   (equal?

@@ -115,7 +115,7 @@
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
-        (syntax-case $term (quote native lambda pi let if macro)
+        (syntax-case $term (quote native lambda any-lambda let if macro)
           (b
             (boolean? (datum b))
             (compiled
@@ -191,10 +191,10 @@
           ((native . _)
             (syntax-error $term))
 
-          ((pi out)
+          ((any-lambda out)
             (compiler-compile-default $compiler #'out))
 
-          ((pi param body)
+          ((any-lambda param body)
             (lets
               ((values $symbol? $compiled-param) (compiler-compile-param $compiler #'param))
               ($param-type (compiled-type $compiled-param))
@@ -206,15 +206,15 @@
               (compiled
                 any-type
                 'any-type
-                `(pi
+                `(any-lambda
                   ,(if $symbol? `(,$symbol? ,$param-term) $param-term)
                   ,$body-term))))
 
-          ((pi x xs ... body)
+          ((any-lambda x xs ... body)
             (compiler-compile-default $compiler
-              `(pi ,#'x (pi ,@#'(xs ...) ,#'body))))
+              `(any-lambda ,#'x (any-lambda ,@#'(xs ...) ,#'body))))
 
-          ((pi . _)
+          ((any-lambda . _)
             (syntax-error $term))
 
           ((let body)
@@ -272,7 +272,7 @@
                       (compiler-compile
                         (compiler-push? $compiler $symbol? (compiled $param $param-term $x))
                         #'body))))
-                `(pi
+                `(any-lambda
                   ,(if $symbol? `(,$symbol? ,$param-term) $param-term)
                   ,$body-type-term)
                 `(lambda (,$symbol? ,$param-term) ,$body))))

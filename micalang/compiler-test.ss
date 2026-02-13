@@ -15,7 +15,7 @@
 
 (check-compiles
   (let
-    (zero? (native (pi any-number any-boolean) (curry %%zero? (x any-number))))
+    (zero? (native (any-lambda any-number any-boolean) (curry %%zero? (x any-number))))
     (zero? 1))
   (compiled any-boolean any-boolean
     (let
@@ -24,23 +24,23 @@
 
 (check-compiles
   (let
-    (add (native (pi any-number any-number any-number) (curry %%+ (a any-number) (b any-number))))
+    (add (native (any-lambda any-number any-number any-number) (curry %%+ (a any-number) (b any-number))))
     (increment (a any-number) (+ a 1))
     (double (a any-number) (b any-number) (add a b))
     (double (increment 1)))
   (compiled
-    (pi (b any-number) any-number)
-    (pi (b any-number) any-number)
+    (any-lambda (b any-number) any-number)
+    (any-lambda (b any-number) any-number)
     (let (add (curry %%+ (a any-number) (b any-number)))
       (let (increment (lambda (a any-number) (app (app + a) (native 1))))
         (let (double (lambda (a any-number) (lambda (b any-number) (app (app add a) b))))
           (app double (app increment (native 1))))))))
 
 (check-compiles
-  (native (pi any-number any-number any-number) (native (%lambda (x) (%lambda (y) (%+ x y)))))
+  (native (any-lambda any-number any-number any-number) (native (%lambda (x) (%lambda (y) (%+ x y)))))
   (compiled
-    (pi any-number any-number any-number)
-    (pi any-number (pi any-number any-number))
+    (any-lambda any-number any-number any-number)
+    (any-lambda any-number (any-lambda any-number any-number))
     (native (%lambda (x) (%lambda (y) (%+ x y))))))
 
 ; === natives
@@ -62,15 +62,15 @@
 (check-compiles
   zero?
   (compiled
-    (pi any-number any-boolean)
-    (pi any-number any-boolean)
+    (any-lambda any-number any-boolean)
+    (any-lambda any-number any-boolean)
     zero?))
 
 (check-compiles
   <
   (compiled
-    (pi any-number any-number any-boolean)
-    (pi any-number any-number any-boolean)
+    (any-lambda any-number any-number any-boolean)
+    (any-lambda any-number any-number any-boolean)
     <))
 
 ; === application
@@ -139,22 +139,22 @@
 (check-compiles
   (lambda (i any-number) i)
   (compiled
-    (pi (i any-number) any-number)
-    (pi (i any-number) any-number)
+    (any-lambda (i any-number) any-number)
+    (any-lambda (i any-number) any-number)
     (lambda (i any-number) i)))
 
 (check-compiles
   (lambda (i any-number) (j any-number) (+ i j))
   (compiled
-    (pi (i any-number) (j any-number) any-number)
-    (pi (i any-number) (pi (j any-number) any-number))
+    (any-lambda (i any-number) (j any-number) any-number)
+    (any-lambda (i any-number) (any-lambda (j any-number) any-number))
     (lambda (i any-number) (lambda (j any-number) (app (app + i) j)))))
 
 (check-compiles
   zero?
   (compiled
-    (pi any-number any-boolean)
-    (pi any-number any-boolean)
+    (any-lambda any-number any-boolean)
+    (any-lambda any-number any-boolean)
     zero?))
 
 (check-compiles
@@ -167,32 +167,32 @@
 (check-compiles
   (lambda (t any-type) t)
   (compiled
-    (pi (t any-type) any-type)
-    (pi (t any-type) any-type)
+    (any-lambda (t any-type) any-type)
+    (any-lambda (t any-type) any-type)
     (lambda (t any-type) t)))
 
 ; === pi
 
 (check-compiles
-  (pi any-number any-boolean)
+  (any-lambda any-number any-boolean)
   (compiled
     any-type
     any-type
-    (pi any-number any-boolean)))
+    (any-lambda any-number any-boolean)))
 
 (check-compiles
-  (pi (x any-type) x)
+  (any-lambda (x any-type) x)
   (compiled
     any-type
     any-type
-    (pi (x any-type) x)))
+    (any-lambda (x any-type) x)))
 
 (check-compiles
-  (pi (x any-type) (y any-type) x)
+  (any-lambda (x any-type) (y any-type) x)
   (compiled
     any-type
     any-type
-    (pi (x any-type) (pi (y any-type) x))))
+    (any-lambda (x any-type) (any-lambda (y any-type) x))))
 
 ; === if
 
@@ -230,12 +230,12 @@
 
 (check-compiles
   (let
-    (pi (macro (c t) 3.14))
-    (pi some random params))
+    (any-lambda (macro (c t) 3.14))
+    (any-lambda some random params))
   (compiled
     any-number
     any-number
-    (let (pi (native #f)) (native 3.14))))
+    (let (any-lambda (native #f)) (native 3.14))))
 
 ; === custom types
 

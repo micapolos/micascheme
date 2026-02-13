@@ -44,13 +44,13 @@
 
 (check-reify
   (pi #f (native 't1) (lambda (_) (native 't2)))
-  (pi t1 t2))
+  (any-lambda t1 t2))
 
 (check-reify
   (pi 'x (native 'number) (lambda (x) x))
-  (pi (x number) x))
+  (any-lambda (x number) x))
 
 (check-reify
   (pi 'x (native 'number) (lambda (x) (pi 'y (native 'boolean) (lambda (y) (application x y)))))
-  (pi (x number) (y boolean) (x y)))
+  (any-lambda (x number) (y boolean) (x y)))
 

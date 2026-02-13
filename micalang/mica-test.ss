@@ -2,9 +2,9 @@
 
 (check-mica
   (let
-    (number->string (native (pi any-number any-string) (curry %%number->string (n any-number))))
-    (string-length (native (pi any-string any-number) (curry %%string-length (s any-string))))
-    (string-append (native (pi any-string any-string any-string) (curry %%string-append (a any-string) (b any-string))))
+    (number->string (native (any-lambda any-number any-string) (curry %%number->string (n any-number))))
+    (string-length (native (any-lambda any-string any-number) (curry %%string-length (s any-string))))
+    (string-append (native (any-lambda any-string any-string any-string) (curry %%string-append (a any-string) (b any-string))))
     (string-append "Hello " (number->string (string-length "foo"))))
   "Hello 3")
 
@@ -49,7 +49,7 @@
             (%%syntax-error #'n "not fixnum"))))))
     (fx-10 (fx 10))
     (fx-id (lambda (x any-fx) x))
-    (fx+ (native (pi any-fx any-fx any-fx) (curry %%fx+ (a any-fx) (b any-fx))))
+    (fx+ (native (any-lambda any-fx any-fx any-fx) (curry %%fx+ (a any-fx) (b any-fx))))
     (fx+1 (a any-fx) (fx+ a (fx 1)))
     (fx+1 (fx+ (fx 10) (fx 20))))
   31)
@@ -70,14 +70,14 @@
       (lambda (t any-type)
         (
           (native
-            (pi any-symbol any-type any-type)
+            (any-lambda any-symbol any-type any-type)
             (curry %%list (s any-symbol) (t any-type)))
           'any-vec2
           t)))
     (vec2
       (lambda (element any-type)
         (native
-          (pi element element (any-vec2 element))
+          (any-lambda element element (any-vec2 element))
           (curry %%cons (a element) (b element)))))
     (vec2 (any-vec2 any-number) (vec2 any-number 10 20) (vec2 any-number 10 20)))
   `((10 . 20) . (10 . 20)))
