@@ -17,10 +17,9 @@
   (define-rule-syntax (environment (id type value) ...)
     `((id . ,(compiled type 'type value)) ...))
 
-  (define (environment-push $environment $id $type $type-term $value)
+  (define (environment-push $environment $id $compiled)
     (push $environment
-      (cons $id
-        (compiled $type $type-term $value))))
+      (cons $id $compiled)))
 
   (define (environment-type? $environment $id)
     (lets
