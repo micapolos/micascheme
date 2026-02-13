@@ -40,17 +40,17 @@
 
   (define mica-environment
     (environment
-      (type    type   type)
-      (boolean type   boolean)
-      (number  type   number)
-      (char    type   char)
-      (symbol  type   symbol)
-      (string  type   string)
+      (any-type    any-type   any-type)
+      (any-boolean any-type   any-boolean)
+      (any-number  any-type   any-number)
+      (any-char    any-type   any-char)
+      (any-symbol  any-type   any-symbol)
+      (any-string  any-type   any-string)
 
-      (zero?   (pi number boolean)              (curry %%zero? (a number)))
+      (zero?   (pi any-number any-boolean)              (curry %%zero? (a any-number)))
 
-      (=       (pi number (pi number number))   (curry %%= (a number) (b number)))
-      (+       (pi number (pi number number))   (curry %%+ (a number) (b number)))
-      (-       (pi number (pi number number))   (curry %%- (a number) (b number)))
-      (<       (pi number (pi number boolean))  (curry %%< (a number) (b number)))))
+      (=       (pi any-number (pi any-number any-number))   (curry %%= (a any-number) (b any-number)))
+      (+       (pi any-number (pi any-number any-number))   (curry %%+ (a any-number) (b any-number)))
+      (-       (pi any-number (pi any-number any-number))   (curry %%- (a any-number) (b any-number)))
+      (<       (pi any-number (pi any-number any-boolean))  (curry %%< (a any-number) (b any-number)))))
 )

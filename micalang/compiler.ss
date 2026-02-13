@@ -90,7 +90,7 @@
         (reverse (environment-values $environment)))))
 
   (define (compiler-compile-type $compiler $term)
-    (compiler-compile-typed $compiler type $term))
+    (compiler-compile-typed $compiler any-type $term))
 
   (define (compiler-evaluate $compiler $term)
     (eval
@@ -115,42 +115,40 @@
     (switch $term
       ((compiled? $compiled) $compiled)
       ((else _)
-        (syntax-case $term (type quote native lambda pi let if macro)
-          (type (compiled type 'type 'type))
-
+        (syntax-case $term (quote native lambda pi let if macro)
           (b
             (boolean? (datum b))
             (compiled
-              (compiler-comptime $compiler boolean)
-              'boolean
+              (compiler-comptime $compiler any-boolean)
+              'any-boolean
               `(native ,(datum b))))
 
           (n
             (number? (datum n))
             (compiled
-              (compiler-comptime $compiler number)
-              'number
+              (compiler-comptime $compiler any-number)
+              'any-number
               `(native ,(datum n))))
 
           (ch
             (char? (datum ch))
             (compiled
-              (compiler-comptime $compiler char)
-              'char
+              (compiler-comptime $compiler any-char)
+              'any-char
               `(native ,(datum ch))))
 
           (s
             (string? (datum s))
             (compiled
-              (compiler-comptime $compiler string)
-              'string
+              (compiler-comptime $compiler any-string)
+              'any-string
               `(native ,(datum s))))
 
           ((quote s)
             (symbol? (datum s))
             (compiled
-              (compiler-comptime $compiler symbol)
-              'symbol
+              (compiler-comptime $compiler any-symbol)
+              'any-symbol
               `(native ',(datum s))))
 
           (id
@@ -206,8 +204,8 @@
               ($compiled-body (compiler-compile $compiler #'body))
               ($body-term (compiled-ref $compiled-body))
               (compiled
-                type
-                'type
+                any-type
+                'any-type
                 `(pi
                   ,(if $symbol? `(,$symbol? ,$param-term) $param-term)
                   ,$body-term))))
@@ -288,7 +286,7 @@
 
           ((if cond true false)
             (lets
-              ($cond (compiler-compile-typed $compiler (compiler-comptime $compiler boolean) #'cond))
+              ($cond (compiler-compile-typed $compiler (compiler-comptime $compiler any-boolean) #'cond))
               ($compiled-true (compiler-compile $compiler #'true))
               ($type (compiled-type $compiled-true))
               ($true (compiled-ref $compiled-true))

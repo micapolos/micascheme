@@ -1,6 +1,6 @@
 (import (micalang base) (micalang term) (micalang reify))
 
-(check-reify type type)
+(check-reify any-type any-type)
 
 (check-reify (native #t) #t)
 (check-reify (native 1) 1)

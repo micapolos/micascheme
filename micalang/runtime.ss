@@ -1,13 +1,13 @@
 (library (micalang runtime)
   (export
     curry native app constant tagged
-    boolean number symbol char string
+    any-type any-boolean any-number any-symbol any-char any-string
     = + - < zero?
     let lambda macro pi app if)
   (import
     (except (micalang base) = + - < zero? lambda app let if string)
     (prefix (only (micalang base) let lambda app if zero? = + - <) %)
-    (rename (micalang term) (pi %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro) (type %type)))
+    (rename (micalang term) (pi %pi) (native %native) (constant %constant) (tagged %tagged) (macro %macro) (any-type %any-type)))
   (export
     (import
       (only (micascheme) equal? quote quasiquote unquote syntax unsyntax quasisyntax ... datum syntax-case)
@@ -66,16 +66,17 @@
     (%if cond true false))
 
   (define-currys
-    (boolean #f)
-    (number  #f)
-    (symbol  #f)
-    (char    #f)
-    (string  #f)
+    (any-type    #f)
+    (any-boolean #f)
+    (any-number  #f)
+    (any-symbol  #f)
+    (any-char    #f)
+    (any-string  #f)
 
-    (zero? %zero? (x number))
+    (zero? %zero? (x any-number))
 
-    (= %= (x number) (y number))
-    (+ %+ (x number) (y number))
-    (- %- (x number) (y number))
-    (< %< (x number) (y number)))
+    (= %= (x any-number) (y any-number))
+    (+ %+ (x any-number) (y any-number))
+    (- %- (x any-number) (y any-number))
+    (< %< (x any-number) (y any-number)))
 )

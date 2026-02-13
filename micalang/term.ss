@@ -1,6 +1,6 @@
 (library (micalang term)
   (export
-    type type?
+    any-type any-type?
     native native? native-ref
     variable variable? variable-symbol
     constant constant? constant-ref
@@ -16,7 +16,7 @@
     default-term-equal? term-equal?)
   (import (micalang base))
 
-  (data type)
+  (data any-type)
   (data (native ref))
   (data (variable symbol))
   (data (constant ref))
@@ -57,9 +57,9 @@
 
   (define (default-term-equal? $default $lhs $rhs)
     (switch $lhs
-      ((type? _)
+      ((any-type? _)
         (switch? $rhs
-          ((type? _) #t)))
+          ((any-type? _) #t)))
       ((native? $lhs-native)
         (switch? $rhs
           ((native? $rhs-native)

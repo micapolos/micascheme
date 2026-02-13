@@ -3,11 +3,12 @@
   (prefix (micalang term) %)
   (micalang comptime))
 
-(check (equal? type type))
-(check (equal? boolean (%native 'boolean)))
-(check (equal? number (%native 'number)))
-(check (equal? symbol (%native 'symbol)))
-(check (equal? string (%native 'string)))
+(check (equal? any-type any-type))
+(check (equal? any-boolean (%native 'any-boolean)))
+(check (equal? any-number (%native 'any-number)))
+(check (equal? any-symbol (%native 'any-symbol)))
+(check (equal? any-char (%native 'any-char)))
+(check (equal? any-string (%native 'any-string)))
 
 (check
   (equal?
@@ -32,11 +33,11 @@
 (check (equal? (app (app - (native 5)) (native 3)) (%native 2)))
 (check (equal? (app (app < (native 2)) (native 3)) (%native #t)))
 
-(check (equal? (pi-param (pi number boolean)) number))
-(check (equal? (app (pi number boolean) (native '())) boolean))
+(check (equal? (pi-param (pi any-number any-boolean)) any-number))
+(check (equal? (app (pi any-number any-boolean) (native '())) any-boolean))
 
-(check (equal? (pi-param (pi (x type) x)) type))
-(check (equal? (app (pi (x type) x) number) number))
+(check (equal? (pi-param (pi (x any-type) x)) any-type))
+(check (equal? (app (pi (x any-type) x) any-number) any-number))
 
 (check
   (equal?

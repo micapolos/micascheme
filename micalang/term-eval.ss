@@ -14,7 +14,7 @@
 
   (define (default-term-eval $default $term)
     (switch $term
-      ((type? $type) $type)
+      ((any-type? $any-type) $any-type)
       ((native? $native) $native)
       ((variable? $variable) $variable)
       ((constant? $constant)

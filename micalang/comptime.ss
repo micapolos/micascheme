@@ -2,7 +2,7 @@
   (export
     curry constant tagged
     native app lambda macro let if
-    boolean number symbol char string
+    any-boolean any-number any-symbol any-char any-string
     = + - < zero?
     pi)
   (import
@@ -13,7 +13,7 @@
     (import
       (only (micascheme) equal? quote quasiquote unquote syntax unsyntax quasisyntax ... datum syntax-case)
       (prefix (micascheme) %%)
-      (only (micalang term) application pi-param type)))
+      (only (micalang term) application pi-param any-type)))
 
   (define-rule-syntax (native x)
     (%native x))
@@ -98,18 +98,18 @@
         (application (native $other) $rhs))))
 
   (define-prims
-    (boolean 'boolean)
-    (number  'number)
-    (symbol  'symbol)
-    (char    'char)
-    (string  'string)
+    (any-boolean 'any-boolean)
+    (any-number  'any-number)
+    (any-symbol  'any-symbol)
+    (any-char    'any-char)
+    (any-string  'any-string)
 
-    (zero? %zero? (x number))
+    (zero? %zero? (x any-number))
 
-    (= %= (x number) (y number))
-    (+ %+ (x number) (y number))
-    (- %- (x number) (y number))
-    (< %< (x number) (y number)))
+    (= %= (x any-number) (y any-number))
+    (+ %+ (x any-number) (y any-number))
+    (- %- (x any-number) (y any-number))
+    (< %< (x any-number) (y any-number)))
 
   (define-rules-syntax
     ((pi (id in) out)

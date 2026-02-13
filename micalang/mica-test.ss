@@ -2,9 +2,9 @@
 
 (check-mica
   (let
-    (number->string (native (pi number string) (curry %%number->string (n number))))
-    (string-length (native (pi string number) (curry %%string-length (s string))))
-    (string-append (native (pi string string string) (curry %%string-append (a string) (b string))))
+    (number->string (native (pi any-number any-string) (curry %%number->string (n any-number))))
+    (string-length (native (pi any-string any-number) (curry %%string-length (s any-string))))
+    (string-append (native (pi any-string any-string any-string) (curry %%string-append (a any-string) (b any-string))))
     (string-append "Hello " (number->string (string-length "foo"))))
   "Hello 3")
 
@@ -24,14 +24,14 @@
   30)
 
 (check-mica
-  ((lambda (x number) (y number) (+ x y)) 2 3) 5)
+  ((lambda (x any-number) (y any-number) (+ x y)) 2 3) 5)
 
 (check-mica
   (let
     (a 10)
     (b 20)
-    (double (x number) (+ x x))
-    (negate (x number) (- 0 x))
+    (double (x any-number) (+ x x))
+    (negate (x any-number) (- 0 x))
     (negate (+ (double a) b)))
   -40)
 
@@ -40,7 +40,7 @@
 
 (check-mica
   (let
-    (any-fx (native type (constant any-fx)))
+    (any-fx (native any-type (constant any-fx)))
     (fx (macro (c t)
       (%%syntax-case t ()
         ((_ n)
@@ -58,8 +58,8 @@
 
 (check-mica
   (let
-    (id (lambda (t type) (x t) x))
-    (id number 12))
+    (id (lambda (t any-type) (x t) x))
+    (id any-number 12))
   12)
 
 ; === a 2D vector of anything
@@ -67,17 +67,17 @@
 (check-mica
   (let
     (any-vec2
-      (lambda (t type)
+      (lambda (t any-type)
         (
           (native
-            (pi symbol type type)
-            (curry %%list (s symbol) (t type)))
+            (pi any-symbol any-type any-type)
+            (curry %%list (s any-symbol) (t any-type)))
           'any-vec2
           t)))
     (vec2
-      (lambda (element type)
+      (lambda (element any-type)
         (native
           (pi element element (any-vec2 element))
           (curry %%cons (a element) (b element)))))
-    (vec2 (any-vec2 number) (vec2 number 10 20) (vec2 number 10 20)))
+    (vec2 (any-vec2 any-number) (vec2 any-number 10 20) (vec2 any-number 10 20)))
   `((10 . 20) . (10 . 20)))

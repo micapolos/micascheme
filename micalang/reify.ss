@@ -14,7 +14,7 @@
 
   (define (default-reify $default $term)
     (switch $term
-      ((type? _) 'type)
+      ((any-type? _) 'any-type)
       ((native? $native)
         (native-ref $native))
       ((variable? $variable)

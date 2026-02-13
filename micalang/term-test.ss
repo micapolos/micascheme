@@ -32,8 +32,8 @@
 
 ; --- term-equal?
 
-(check (term-equal? type type))
-(check (not (term-equal? type (native type))))
+(check (term-equal? any-type any-type))
+(check (not (term-equal? any-type (native any-type))))
 
 (check (term-equal? (native 1) (native 1)))
 (check (not (term-equal? (native 1) (native 2))))
