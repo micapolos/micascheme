@@ -49,7 +49,7 @@
             (%%syntax-error #'n "not fixnum"))))))
     (fx-10 (fx 10))
     (fx-id (lambda (x any-fx) x))
-    (fx+ (native (any-lambda any-fx any-fx any-fx) (curry %%fx+ (a any-fx) (b any-fx))))
+    (fx+ (native-lambda %%fx+ any-fx any-fx any-fx))
     (fx+1 (a any-fx) (fx+ a (fx 1)))
     (fx+1 (fx+ (fx 10) (fx 20))))
   31)
@@ -69,15 +69,11 @@
     (any-vec2
       (lambda (t any-type)
         (
-          (native
-            (any-lambda any-symbol any-type any-type)
-            (curry %%list (s any-symbol) (t any-type)))
+          (native-lambda %%list any-symbol any-type any-type)
           'any-vec2
           t)))
     (vec2
       (lambda (element any-type)
-        (native
-          (any-lambda element element (any-vec2 element))
-          (curry %%cons (a element) (b element)))))
+        (native-lambda %%cons element element (any-vec2 element))))
     (vec2 (any-vec2 any-number) (vec2 any-number 10 20) (vec2 any-number 10 20)))
   `((10 . 20) . (10 . 20)))
