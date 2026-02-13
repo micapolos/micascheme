@@ -31,16 +31,7 @@
         (lets
           ($compiler
             (compiler
-              (lambda ($compiler $term)
-                (syntax-case $term (fx)
-                  (fx
-                    (compiled type 'type '(constant fx)))
-                  ((fx n)
-                    (if (fixnum? (datum n))
-                      (compiled (constant 'fx) 'fx `(tagged (constant fx) (native ,(datum n))))
-                      (syntax-error #'n "not fx")))
-                  (other
-                    (compiler-compile-default $compiler #'other))))
+              default-compiler-recurse
               default-compiler-reify
               default-compiler-term-equal?
               (%environment '(micalang runtime) '(prefix (scheme) %))

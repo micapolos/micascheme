@@ -40,17 +40,16 @@
 
 (check-mica
   (let
+    (any-fx (native type (constant any-fx)))
     (fx (macro (c t)
       (%%syntax-case t ()
-        (id (%%symbol? (%%datum id))
-          '(native type (constant fx)))
         ((_ n)
           (%%if (%%fixnum? (%%datum n))
-            `(native fx (tagged (constant fx) ,(%%datum n)))
+            `(native any-fx (tagged (constant any-fx) ,(%%datum n)))
             (%%syntax-error #'n "not fixnum"))))))
     (fx-10 (fx 10))
-    (fx-id (lambda (x fx) x))
-    (fx-id fx-10))
+    (fx-id (lambda (x any-fx) x))
+    (fx-id (fx 10)))
   10)
 
 ; === dependent identity

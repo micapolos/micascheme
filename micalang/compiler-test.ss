@@ -241,22 +241,22 @@
 
 (check-compiles
   (let
+    (any-fx (native type (constant any-fx)))
     (fx (macro (c t)
       (%%syntax-case t ()
-        (id (%%symbol? (%%datum id))
-          '(native type (constant fx)))
         ((_ n)
           (%%if (%%fixnum? (%%datum n))
-            `(native fx (tagged (constant fx) ,(%%datum n)))
+            `(native any-fx (tagged (constant any-fx) ,(%%datum n)))
             (%%syntax-error #'n "not fixnum"))))))
     (fx-10 (fx 10))
-    (fx-id (lambda (x fx) x))
+    (fx-id (lambda (x any-fx) x))
     (fx-id (fx 10)))
-  (compiled fx fx
-    (let (fx (native #f))
-      (let (fx-10 (tagged (constant fx) 10))
-        (let (fx-id (lambda (x (constant fx)) x))
-          (app fx-id (tagged (constant fx) 10)))))))
+  (compiled any-fx any-fx
+    (let (any-fx (constant any-fx))
+      (let (fx (native #f))
+        (let (fx-10 (tagged (constant any-fx) 10))
+          (let (fx-id (lambda (x any-fx) x))
+            (app fx-id (tagged (constant any-fx) 10))))))))
 
 ; === dependent identity
 
