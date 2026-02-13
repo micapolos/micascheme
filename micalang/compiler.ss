@@ -31,6 +31,9 @@
 
   (data (compiler recurse default-reify default-term-equal? runtime-environment comptime-environment environment))
 
+  (define-rule-syntax (compiler-comptime compiler datum)
+    (eval 'datum (compiler-comptime-environment compiler)))
+
   (define (empty-compiler $runtime-environment $comptime-environment)
     (compiler
       default-compiler-recurse
@@ -118,35 +121,35 @@
           (b
             (boolean? (datum b))
             (compiled
-              (eval 'boolean (compiler-comptime-environment $compiler))
+              (compiler-comptime $compiler boolean)
               'boolean
               `(native ,(datum b))))
 
           (n
             (number? (datum n))
             (compiled
-              (eval 'number (compiler-comptime-environment $compiler))
+              (compiler-comptime $compiler number)
               'number
               `(native ,(datum n))))
 
           (ch
             (char? (datum ch))
             (compiled
-              (eval 'char (compiler-comptime-environment $compiler))
+              (compiler-comptime $compiler char)
               'char
               `(native ,(datum ch))))
 
           (s
             (string? (datum s))
             (compiled
-              (eval 'string (compiler-comptime-environment $compiler))
+              (compiler-comptime $compiler string)
               'string
               `(native ,(datum s))))
 
           ((quote s)
             (symbol? (datum s))
             (compiled
-              (eval 'symbol (compiler-comptime-environment $compiler))
+              (compiler-comptime $compiler symbol)
               'symbol
               `(native ',(datum s))))
 
@@ -285,7 +288,7 @@
 
           ((if cond true false)
             (lets
-              ($cond (compiler-compile-typed $compiler (eval 'boolean (compiler-comptime-environment $compiler)) #'cond))
+              ($cond (compiler-compile-typed $compiler (compiler-comptime $compiler boolean) #'cond))
               ($compiled-true (compiler-compile $compiler #'true))
               ($type (compiled-type $compiled-true))
               ($true (compiled-ref $compiled-true))
