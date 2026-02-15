@@ -1,21 +1,25 @@
 (library (leo2 term)
   (export
-    normalized normalized? normalized-ref
-    native native? native-arity native-ref
+    normalized normalized? normalized-body
+    native native? native-arity native-body
     type type? type-depth
     variable variable? variable-index
     abstraction abstraction? abstraction-param abstraction-body
     abstraction-type abstraction-type? abstraction-type-param abstraction-type-body
     application application? application-lhs application-rhs
-    branch branch? branch-condition branch-motive branch-consequent branch-alternate)
+    injection-type injection-type? injection-type-lhs injection-type-rhs
+    injection injection? injection-lhs? injection-body
+    decision decision? decision-target decision-motive decision-lhs decision-rhs)
   (import (leo2 base))
 
-  (data (normalized ref))
-  (data (native arity ref))
+  (data (normalized body))
+  (data (native arity body))
   (data (type depth))
   (data (variable index))
-  (data (abstraction param body recursive?))
   (data (abstraction-type param body recursive?))
+  (data (abstraction param body recursive?))
   (data (application lhs rhs))
-  (data (branch condition motive consequent alternate))
+  (data (injection-type lhs rhs))
+  (data (injection lhs? body))
+  (data (decision target motive lhs rhs))
 )
