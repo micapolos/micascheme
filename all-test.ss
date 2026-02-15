@@ -95,6 +95,7 @@
   (indico all)
   (labs all)
   (leo all)
+  (leo2 all)
   (masm all)
   (micac all)
   (micalang all)
