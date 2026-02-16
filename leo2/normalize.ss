@@ -26,7 +26,7 @@
           (normalize
             (push $env hole)
             (abstraction-type-body $abstraction-type))))
-      ((application $application)
+      ((application? $application)
         (term-apply $env
           (normalize $env (application-lhs $application))
           (normalize $env (application-rhs $application))))
@@ -67,18 +67,17 @@
           (abstraction-type-body $abstraction-type)))
       ((native? $native)
         (switch (native-arity $native)
-        ((zero? _)
-          (application $native $rhs))
-        ((one? _)
-          (native
-            0
-            ((native-value $native) $rhs)
-            (list)))
-        ((else $arity)
-          (native
-            (- $arity 1)
-            (native-value $native)
-            (push (native-args $native) $rhs)))))
+          ((zero? _)
+            (application $native $rhs))
+          ((one? _)
+            (apply
+              (native-value $native)
+              (reverse (push (native-args $native) $rhs))))
+          ((else $arity)
+            (native
+              (- $arity 1)
+              (native-value $native)
+              (push (native-args $native) $rhs)))))
       ((else $lhs)
         (application $lhs $rhs))))
 )
