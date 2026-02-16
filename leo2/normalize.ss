@@ -8,7 +8,7 @@
       ((type? $type) $type)
       ((variable? $variable)
         (switch (list-ref $env (variable-index $variable))
-          ((hole? $hole) $variable)
+          ((hole? _) $variable)
           ((else $other) $other)))
       ((abstraction? $abstraction)
         (abstraction
