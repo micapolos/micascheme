@@ -34,6 +34,18 @@
 (check
   (equal?
     (normalize (stack)
+      (abstraction
+        (native 0 'a-number (stack))
+        (application
+          (native 1 %string-length (stack))
+          (variable 0))))
+    (abstraction
+      (native 0 'a-number (stack))
+      (native 0 %string-length (stack (variable 0))))))
+
+(check
+  (equal?
+    (normalize (stack)
       (application
         (application
           (native 2 %string-append (stack))
