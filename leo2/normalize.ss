@@ -16,19 +16,19 @@
   (define (normalize $env $term)
     (switch-exhaustive $term
       ((normalized? $normalized) $normalized)
-      ((native? $native)
+      ((native-application? $native)
         (lets
           ($args
             (map
               (partial normalize $env)
-              (native-args $native)))
+              (native-application-args $native)))
           (if (for-all normalized? $args)
             (normalized
               (apply
-                (native-procedure $native)
+                (native-application-procedure $native)
                 (map normalized-value $args)))
-            (native
-              (native-procedure $native)
+            (native-application
+              (native-application-procedure $native)
               $args))))
       ((type? $type)
         (normalized $type))

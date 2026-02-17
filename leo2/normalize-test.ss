@@ -23,10 +23,10 @@
   (equal?
     (normalize (stack)
       (abstraction
-        (native string-length
+        (native-application string-length
           (list (variable 0)))))
     (abstraction
-      (native string-length
+      (native-application string-length
         (list (variable 0))))))
 
 (check
@@ -34,7 +34,7 @@
     (normalize (stack)
       (application
         (abstraction
-          (native string-length
+          (native-application string-length
             (list (variable 0))))
         (normalized "foo")))
     (normalized 3)))
@@ -44,11 +44,11 @@
     (normalize (stack)
       (abstraction
         (abstraction
-          (native string-append
+          (native-application string-append
             (list (variable 1) (variable 0))))))
     (abstraction
       (abstraction
-        (native string-append
+        (native-application string-append
           (list (variable 1) (variable 0)))))))
 
 (check
@@ -57,11 +57,11 @@
       (application
         (abstraction
           (abstraction
-            (native string-append
+            (native-application string-append
               (list (variable 1) (variable 0)))))
         (normalized "foo")))
     (abstraction
-      (native string-append
+      (native-application string-append
         (list (normalized "foo") (variable 0))))))
 
 (check
@@ -71,7 +71,7 @@
         (application
           (abstraction
             (abstraction
-              (native string-append
+              (native-application string-append
                 (list (variable 1) (variable 0)))))
           (normalized "foo"))
         (normalized "bar")))
