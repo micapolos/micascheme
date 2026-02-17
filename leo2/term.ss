@@ -8,7 +8,10 @@
     abstraction-type abstraction-type? abstraction-type-param abstraction-type-body
     application application? application-lhs application-rhs
     branch branch? branch-condition branch-consequent branch-alternate
-    recursive recursive? recursive-body)
+    recursive recursive? recursive-body
+    hole hole?
+    normalized normalized? normalized-value
+    closure closure? closure-env closure-body)
   (import (leo2 base))
 
   (data (native value))
@@ -20,4 +23,8 @@
   (data (application lhs rhs))
   (data (branch condition consequent alternate))
   (data (recursive body))
+
+  (data hole)
+  (data (normalized value))
+  (data (closure env body))
 )

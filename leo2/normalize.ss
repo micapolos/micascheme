@@ -1,14 +1,6 @@
 (library (leo2 normalize)
-  (export
-    hole hole?
-    normalized normalized? normalized-value
-    closure closure? closure-env closure-body
-    normalize)
+  (export normalize)
   (import (leo2 base) (leo2 term))
-
-  (data hole)
-  (data (normalized value))
-  (data (closure env body))
 
   (define (env-ref $env $variable)
     (switch (list-ref $env (variable-index $variable))
