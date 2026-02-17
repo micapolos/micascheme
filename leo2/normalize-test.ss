@@ -7,7 +7,7 @@
 ; raises because of invalid term
 (check
   (raises
-    (normalize (stack) "error")))
+    (normalize (stack) 'error)))
 
 (check
   (equal?
@@ -158,6 +158,6 @@
     (normalize (stack hole)
       (branch
         (variable 0)
-        "true"
-        "false"))))
+        'true-error
+        'false-error))))
 
