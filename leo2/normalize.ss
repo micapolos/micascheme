@@ -1,6 +1,12 @@
 (library (leo2 normalize)
-  (export normalize)
+  (export
+    hole hole?
+    normalized normalized? normalized-value
+    normalize)
   (import (leo2 base) (leo2 term))
+
+  (data hole)
+  (data (normalized value))
 
   (define (env-ref $env $variable)
     (switch (list-ref $env (variable-index $variable))
@@ -26,10 +32,6 @@
               $args))))
       ((type? $type)
         (normalized $type))
-      ((boolean? $boolean)
-        (normalized $boolean))
-      ((boolean-type? $boolean-type)
-        (normalized $boolean-type))
       ((variable? $variable)
         (env-ref $env $variable))
       ((abstraction? $abstraction)
