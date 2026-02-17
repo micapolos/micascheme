@@ -75,3 +75,18 @@
         (lambda (v0)
           (evaluated v0))))))
 
+(check-evaluates
+  (branch (native #t) (native "true") 'error)
+  (evaluated (native "true")))
+
+(check-evaluates
+  (branch (native #f) 'error (native "false"))
+  (evaluated (native "false")))
+
+(check-evaluates
+  (branch (variable 'x) (native "true") (native "false"))
+  (evaluated
+    (branch
+      (evaluated (variable 'x))
+      (evaluated (native "true"))
+      (evaluated (native "false")))))

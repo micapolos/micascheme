@@ -55,7 +55,20 @@
             (recursive
               (abstraction
                 (lambda ($self)
-                  (evaluate ($procedure $self))))))))))
+                  (evaluate ($procedure $self))))))))
+      ((branch? $branch)
+        (lets
+          ($condition (evaluate (branch-condition $branch)))
+          (if (evaluated-native? $condition)
+            (evaluate
+              (if (native-ref (evaluated-ref $condition))
+                (branch-consequent $branch)
+                (branch-alternate $branch)))
+            (evaluated
+              (branch
+                $condition
+                (evaluate (branch-consequent $branch))
+                (evaluate (branch-alternate $branch)))))))))
 
   (define (term-apply $lhs $rhs)
     (switch (evaluated-ref $lhs)

@@ -51,5 +51,10 @@
                   (+ $depth 1)
                   (
                     (abstraction-procedure (recursive-abstraction $recursive))
-                    (variable $symbol))))))))))
+                    (variable $symbol))))))))
+      ((branch? $branch)
+        `(branch
+          ,(term->datum $depth (branch-condition $branch))
+          ,(term->datum $depth (branch-consequent $branch))
+          ,(term->datum $depth (branch-alternate $branch))))))
 )
