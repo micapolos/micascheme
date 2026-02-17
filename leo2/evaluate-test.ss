@@ -90,3 +90,34 @@
       (evaluated (variable 'x))
       (evaluated (native "true"))
       (evaluated (native "false")))))
+
+(check-evaluates
+  (recursive
+    (abstraction
+      (lambda ($self)
+        (abstraction
+          (lambda ($n) $self)))))
+  (evaluated
+    (recursive
+      (abstraction
+        (lambda (v0)
+          (evaluated
+            (abstraction
+              (lambda (v1)
+                (evaluated v0)))))))))
+
+(check-evaluates
+  (recursive
+    (abstraction
+      (lambda ($self)
+        (abstraction
+          (lambda ($n) $n)))))
+  (evaluated
+    (recursive
+      (abstraction
+        (lambda (v0)
+          (evaluated
+            (abstraction
+              (lambda (v1)
+                (evaluated v1)))))))))
+
