@@ -4,6 +4,30 @@
 (data number-type)
 (data string-type)
 
+(define native-string-length
+  (abstraction
+    (native-application string-length (list (variable 0)))))
+
+(define native-string-append
+  (abstraction
+    (abstraction
+      (native-application string-append (list (variable 1) (variable 0))))))
+
+(define native+
+  (abstraction
+    (abstraction
+      (native-application + (list (variable 1) (variable 0))))))
+
+(define native-
+  (abstraction
+    (abstraction
+      (native-application - (list (variable 1) (variable 0))))))
+
+(define native<
+  (abstraction
+    (abstraction
+      (native-application < (list (variable 1) (variable 0))))))
+
 ; raises because of invalid term
 (check
   (raises
@@ -142,6 +166,30 @@
 
 (check
   (equal?
+    (normalize (stack)
+      (application
+        (abstraction
+          (branch
+            (variable 0)
+            (native "true")
+            (native "false")))
+        (native #t)))
+    (normalized "true")))
+
+(check
+  (equal?
+    (normalize (stack)
+      (application
+        (abstraction
+          (branch
+            (variable 0)
+            (native "true")
+            (native "false")))
+        (native #f)))
+    (normalized "false")))
+
+(check
+  (equal?
     (normalize (stack hole)
       (branch
         (variable 0)
@@ -160,4 +208,50 @@
         (variable 0)
         'true-error
         'false-error))))
+
+(check
+  (equal?
+    (normalize (stack)
+      (recursive
+        (abstraction
+          (native "foo"))))
+    (recursive
+      (abstraction
+        (normalized "foo")))))
+
+(check
+  (equal?
+    (normalize (stack)
+      (application
+        (recursive
+          (abstraction
+            (variable 1)))
+        (native "foo")))
+    (recursive
+      (abstraction
+        (variable 1)))))
+
+(check
+  (equal?
+    (normalize (stack)
+      (application
+        (recursive
+          (abstraction
+            (variable 0)))
+        (native "foo")))
+    (normalized "foo")))
+
+; fib
+
+; (check
+;   (equal?
+;     (normalize (stack)
+;       (application
+;         (abstraction
+;           (branch
+;             (application (application native< (variable 0)) (native 2))
+;             (native 10)
+;             (native 20)))
+;         (native 0)))
+;     (normalized 123)))
 

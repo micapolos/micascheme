@@ -15,7 +15,8 @@
 
   (define (normalize $env $term)
     (switch-exhaustive $term
-      ((normalized? $normalized) $normalized)
+      ((normalized? $normalized)
+        $normalized)
       ((native? $native)
         (normalized (native-value $native)))
       ((native-application? $native)
@@ -54,21 +55,19 @@
           (normalize $env (application-lhs $application))
           (normalize $env (application-rhs $application))))
       ((recursive? $recursive)
-        (lets
-          ($body
-            (normalize
-              (push $env hole)
-              (recursive-body $recursive)))
-          (if (normalized? $body)
-            (normalized (recursive (normalized-value $body)))
-            (recursive $body))))
+        (recursive
+          (normalize
+            (push $env hole)
+            (recursive-body $recursive))))
       ((branch? $branch)
         (lets
           ($condition (normalize $env (branch-condition $branch)))
           (if (normalized? $condition)
             (normalize
               $env
-              ((if (normalized-value $condition) branch-consequent branch-alternate) $branch))
+              (app
+                (if (normalized-value $condition) branch-consequent branch-alternate)
+                $branch))
             (branch
               $condition
               (normalize $env (branch-consequent $branch))
