@@ -2,19 +2,38 @@
   (export normalize)
   (import (leo2 base) (leo2 term))
 
+  (define (env-ref $env $variable)
+    (switch (list-ref $env (variable-index $variable))
+      ((hole? _) $variable)
+      ((else $other) $other)))
+
   (define (normalize $env $term)
-    (switch $term
-      ((native? $native) $native)
-      ((type? $type) $type)
+    (switch-exhaustive $term
+      ((normalized? $normalized) $normalized)
+      ((native? $native)
+        (lets
+          ($args
+            (map
+              (partial normalize $env)
+              (native-args $native)))
+          (if (for-all normalized? $args)
+            (normalized
+              (apply
+                (native-procedure $native)
+                (map normalized-value $args)))
+            (native
+              (native-procedure $native)
+              $args))))
+      ((type? $type)
+        (normalized $type))
+      ((boolean? $boolean)
+        (normalized $boolean))
+      ((boolean-type? $boolean-type)
+        (normalized $boolean-type))
       ((variable? $variable)
-        (switch (list-ref $env (variable-index $variable))
-          ((hole? _) $variable)
-          ((else $other) $other)))
+        (env-ref $env $variable))
       ((abstraction? $abstraction)
         (abstraction
-          (normalize
-            $env
-            (abstraction-param $abstraction))
           (normalize
             (push $env hole)
             (abstraction-body $abstraction))))
@@ -31,32 +50,28 @@
           (normalize $env (application-lhs $application))
           (normalize $env (application-rhs $application))))
       ((recursive? $recursive)
-        (recursive
-          (normalize
-            (push $env hole)
-            (recursive-body $recursive))))
+        (lets
+          ($body
+            (normalize
+              (push $env hole)
+              (recursive-body $recursive)))
+          (if (normalized? $body)
+            (normalized (recursive (normalized-value $body)))
+            (recursive $body))))
       ((branch? $branch)
-        (switch (normalize $env (branch-condition $branch))
-          ((boolean? $boolean)
+        (lets
+          ($condition (normalize $env (branch-condition $branch)))
+          (if (normalized? $condition)
             (normalize
               $env
-              ((if $boolean branch-consequent branch-alternate) $branch)))
-          ((else $condition)
+              ((if (normalized-value $condition) branch-consequent branch-alternate) $branch))
             (branch
               $condition
-              (normalize
-                (push $env $condition)
-                (branch-motive $branch))
               (normalize $env (branch-consequent $branch))
               (normalize $env (branch-alternate $branch))))))))
 
   (define (term-apply $env $lhs $rhs)
     (switch $lhs
-      ((recursive? $recursive)
-        (term-apply
-          (push $env $recursive)
-          (recursive-body $recursive)
-          $rhs))
       ((abstraction? $abstraction)
         (normalize
           (push $env $rhs)
@@ -65,19 +80,11 @@
         (normalize
           (push $env $rhs)
           (abstraction-type-body $abstraction-type)))
-      ((native? $native)
-        (switch (native-arity $native)
-          ((zero? _)
-            (application $native $rhs))
-          ((one? _)
-            (apply
-              (native-value $native)
-              (reverse (push (native-args $native) $rhs))))
-          ((else $arity)
-            (native
-              (- $arity 1)
-              (native-value $native)
-              (push (native-args $native) $rhs)))))
-      ((else $lhs)
+      ((recursive? $recursive)
+        (term-apply
+          (push $env $recursive)
+          (recursive-body $recursive)
+          $rhs))
+      ((else $other)
         (application $lhs $rhs))))
 )
