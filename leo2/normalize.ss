@@ -20,7 +20,7 @@
       ((normalized? $normalized)
         $normalized)
       ((native? $native)
-        (normalized (native-value $native)))
+        (normalized $native))
       ((native-application? $native)
         (lets
           ($args
@@ -29,9 +29,10 @@
               (native-application-args $native)))
           (if (for-all normalized? $args)
             (normalized
-              (apply
-                (native-application-procedure $native)
-                (map normalized-value $args)))
+              (native
+                (apply
+                  (native-application-procedure $native)
+                  (map (dot native-value normalized-value) $args))))
             (native-application
               (native-application-procedure $native)
               $args))))
@@ -68,7 +69,9 @@
             (normalize
               $env
               (app
-                (if (normalized-value $condition) branch-consequent branch-alternate)
+                (if (native-value (normalized-value $condition))
+                  branch-consequent
+                  branch-alternate)
                 $branch))
             (branch
               $condition

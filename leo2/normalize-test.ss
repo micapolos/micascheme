@@ -41,7 +41,7 @@
 (check
   (equal?
     (normalize (stack) (native "foo"))
-    (normalized "foo")))
+    (normalized (native "foo"))))
 
 (check
   (equal?
@@ -66,7 +66,7 @@
           (native-application string-length
             (list (variable 0))))
         (native "foo")))
-    (normalized 3)))
+    (normalized (native 3))))
 
 (check
   (equal?
@@ -91,7 +91,9 @@
         (native "foo")))
     (abstraction
       (native-application string-append
-        (list (normalized "foo") (variable 0))))))
+        (list
+          (normalized (native "foo"))
+          (variable 0))))))
 
 (check
   (equal?
@@ -104,7 +106,7 @@
                 (list (variable 1) (variable 0)))))
           (native "foo"))
         (native "bar")))
-    (normalized "foobar")))
+    (normalized (native "foobar"))))
 
 (check
   (equal?
@@ -113,8 +115,8 @@
         (native number-type)
         (native boolean-type)))
     (abstraction-type
-      (normalized number-type)
-      (normalized boolean-type))))
+      (normalized (native number-type))
+      (normalized (native boolean-type)))))
 
 (check
   (equal?
@@ -134,7 +136,7 @@
           (native number-type)
           (native boolean-type))
         (native 10)))
-    (normalized boolean-type)))
+    (normalized (native boolean-type))))
 
 (check
   (equal?
@@ -143,8 +145,9 @@
         (abstraction-type
           (type 0)
           (variable 0))
-        (normalized number-type)))
-    (normalized number-type)))
+        (native number-type)))
+    (normalized
+      (native number-type))))
 
 (check
   (equal?
@@ -153,7 +156,7 @@
         (native #t)
         (native "true")
         "false"))
-    (normalized "true")))
+    (normalized (native "true"))))
 
 (check
   (equal?
@@ -162,7 +165,7 @@
         (native #f)
         "true"
         (native "false")))
-    (normalized "false")))
+    (normalized (native "false"))))
 
 (check
   (equal?
@@ -174,7 +177,7 @@
             (native "true")
             (native "false")))
         (native #t)))
-    (normalized "true")))
+    (normalized (native "true"))))
 
 (check
   (equal?
@@ -186,7 +189,7 @@
             (native "true")
             (native "false")))
         (native #f)))
-    (normalized "false")))
+    (normalized (native "false"))))
 
 (check
   (equal?
@@ -197,8 +200,8 @@
         (native "false")))
     (branch
       (variable 0)
-      (normalized "true")
-      (normalized "false"))))
+      (normalized (native "true"))
+      (normalized (native "false")))))
 
 ; raises because branches are normalized and are invalid
 (check
@@ -217,7 +220,7 @@
           (native "foo"))))
     (recursive
       (abstraction
-        (normalized "foo")))))
+        (normalized (native "foo"))))))
 
 (check
   (equal?
@@ -239,7 +242,7 @@
           (abstraction
             (variable 0)))
         (native "foo")))
-    (normalized "foo")))
+    (normalized (native "foo"))))
 
 ; fib
 
