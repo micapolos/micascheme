@@ -11,7 +11,12 @@
 
 (check
   (equal?
-    (normalize (stack) (normalized "foo"))
+    (normalize (stack) (normalized (variable 0)))
+    (normalized (variable 0))))
+
+(check
+  (equal?
+    (normalize (stack) (native "foo"))
     (normalized "foo")))
 
 (check
@@ -36,7 +41,7 @@
         (abstraction
           (native-application string-length
             (list (variable 0))))
-        (normalized "foo")))
+        (native "foo")))
     (normalized 3)))
 
 (check
@@ -59,7 +64,7 @@
           (abstraction
             (native-application string-append
               (list (variable 1) (variable 0)))))
-        (normalized "foo")))
+        (native "foo")))
     (abstraction
       (native-application string-append
         (list (normalized "foo") (variable 0))))))
@@ -73,16 +78,16 @@
             (abstraction
               (native-application string-append
                 (list (variable 1) (variable 0)))))
-          (normalized "foo"))
-        (normalized "bar")))
+          (native "foo"))
+        (native "bar")))
     (normalized "foobar")))
 
 (check
   (equal?
     (normalize (stack)
       (abstraction-type
-        (normalized number-type)
-        (normalized boolean-type)))
+        (native number-type)
+        (native boolean-type)))
     (abstraction-type
       (normalized number-type)
       (normalized boolean-type))))
@@ -91,7 +96,7 @@
   (equal?
     (normalize (stack)
       (abstraction-type
-        (normalized (type 0))
+        (type 0)
         (variable 0)))
     (abstraction-type
       (normalized (type 0))
@@ -102,9 +107,9 @@
     (normalize (stack)
       (application
         (abstraction-type
-          (normalized number-type)
-          (normalized boolean-type))
-        (normalized 10)))
+          (native number-type)
+          (native boolean-type))
+        (native 10)))
     (normalized boolean-type)))
 
 (check
@@ -121,8 +126,8 @@
   (equal?
     (normalize (stack)
       (branch
-        (normalized #t)
-        (normalized "true")
+        (native #t)
+        (native "true")
         "false"))
     (normalized "true")))
 
@@ -130,9 +135,9 @@
   (equal?
     (normalize (stack)
       (branch
-        (normalized #f)
+        (native #f)
         "true"
-        (normalized "false")))
+        (native "false")))
     (normalized "false")))
 
 (check
@@ -140,8 +145,8 @@
     (normalize (stack hole)
       (branch
         (variable 0)
-        (normalized "true")
-        (normalized "false")))
+        (native "true")
+        (native "false")))
     (branch
       (variable 0)
       (normalized "true")

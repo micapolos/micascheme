@@ -16,6 +16,8 @@
   (define (normalize $env $term)
     (switch-exhaustive $term
       ((normalized? $normalized) $normalized)
+      ((native? $native)
+        (normalized (native-value $native)))
       ((native-application? $native)
         (lets
           ($args
