@@ -2,4 +2,5 @@
 
 (test
   (leo2 term)
+  (leo2 datum)
   (leo2 evaluate))

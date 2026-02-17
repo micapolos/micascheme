@@ -3,7 +3,7 @@
     native native? native-ref
     native-application native-application? native-application-procedure native-application-args
     type type? type-depth
-    variable variable? variable-index
+    variable variable? variable-symbol
     abstraction abstraction? abstraction-procedure
     abstraction-type abstraction-type? abstraction-type-param abstraction-type-abstraction
     application application? application-lhs application-rhs
@@ -15,7 +15,7 @@
   (data (native ref))
   (data (native-application procedure args))
   (data (type depth))
-  (data (variable index))
+  (data (variable symbol))
   (data (abstraction procedure))
   (data (abstraction-type param abstraction))
   (data (application lhs rhs))
