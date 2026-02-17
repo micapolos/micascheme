@@ -1,30 +1,25 @@
 (library (leo2 term)
   (export
-    native native? native-value
+    native native? native-ref
     native-application native-application? native-application-procedure native-application-args
     type type? type-depth
     variable variable? variable-index
-    abstraction abstraction? abstraction-body
-    abstraction-type abstraction-type? abstraction-type-param abstraction-type-body
+    abstraction abstraction? abstraction-procedure
+    abstraction-type abstraction-type? abstraction-type-param abstraction-type-abstraction
     application application? application-lhs application-rhs
     branch branch? branch-condition branch-consequent branch-alternate
-    recursive recursive? recursive-body
-    hole hole?
-    normalized normalized? normalized-value
-    closure closure? closure-env closure-body)
+    recursive recursive? recursive-abstraction
+    evaluated evaluated? evaluated-ref)
   (import (leo2 base))
 
-  (data (native value))
+  (data (native ref))
   (data (native-application procedure args))
   (data (type depth))
   (data (variable index))
-  (data (abstraction body))
-  (data (abstraction-type param body))
+  (data (abstraction procedure))
+  (data (abstraction-type param abstraction))
   (data (application lhs rhs))
   (data (branch condition consequent alternate))
-  (data (recursive body))
-
-  (data hole)
-  (data (normalized value))
-  (data (closure env body))
+  (data (recursive abstraction))
+  (data (evaluated ref))
 )
