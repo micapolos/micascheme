@@ -74,6 +74,18 @@
         (evaluated v0)))))
 
 (check-evaluates
+  (application
+    (application
+      (abstraction
+        (lambda ($x)
+          (abstraction
+            (lambda ($y)
+              (native-application string-append (list $x $y))))))
+      (native "foo"))
+    (native "bar"))
+  (evaluated (native "foobar")))
+
+(check-evaluates
   (branch (native #t) (native "true") 'error)
   (evaluated (native "true")))
 
@@ -127,3 +139,19 @@
               (application $self (native-application - (list $n (native 1)))))))))
     (native 1))
   (evaluated (native "Done")))
+
+(check-evaluates
+  (application
+    (recursive
+      (lambda ($self)
+        (abstraction
+          (lambda ($n)
+            (branch
+              (native-application < (list $n (native 2)))
+              $n
+              (native-application +
+                (list
+                  (application $self (native-application - (list $n (native 1))))
+                  (application $self (native-application - (list $n (native 2)))))))))))
+    (native 10))
+  (evaluated (native 55)))
