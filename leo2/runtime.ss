@@ -18,6 +18,9 @@
       (native %native)
       (variable %variable)
       (recursive %recursive)))
+  (export
+    (import
+      (only (leo2 base) quote)))
 
   (define-rule-syntax (type n) 'erased)
 

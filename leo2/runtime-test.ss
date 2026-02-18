@@ -1,6 +1,5 @@
 (import
   (prefix (leo2 base) %)
-  (only (leo2 base) quote)
   (leo2 runtime))
 
 (check=?

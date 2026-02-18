@@ -27,6 +27,9 @@
         (expanded (type 1) 'a-type))
       (a-boolean
         (expanded (type 0) '(native 'a-boolean)))
+      (b
+        (boolean? (datum b))
+        (expanded (native 'a-boolean) (native (datum b))))
       ((native t x)
         (expanded
           (evaluate $env #'t)
