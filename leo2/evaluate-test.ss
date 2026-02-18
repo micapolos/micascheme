@@ -114,3 +114,16 @@
           (abstraction
             (lambda (v1)
               (evaluated v1))))))))
+
+(check-evaluates
+  (application
+    (recursive
+      (lambda ($self)
+        (abstraction
+          (lambda ($n)
+            (branch
+              (native-application zero? (list $n))
+              (native "Done")
+              (application $self (native-application - (list $n (native 1)))))))))
+    (native 1))
+  (evaluated (native "Done")))
