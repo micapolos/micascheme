@@ -33,29 +33,34 @@
                   (map (dot native-ref evaluated-ref) $args)))
               (native-application $procedure $args)))))
       ((abstraction? $abstraction)
-        (lets
-          ($procedure (abstraction-procedure $abstraction))
-          (evaluated
-            (abstraction
-              (lambda ($arg)
-                (evaluate ($procedure $arg)))))))
+        (evaluated
+          (abstraction
+            (lambda ($arg)
+              (evaluate
+                (app
+                  (abstraction-procedure $abstraction)
+                  $arg))))))
       ((abstraction-type? $abstraction-type)
         (evaluated
           (abstraction-type
             (evaluate (abstraction-type-param $abstraction-type))
-            (evaluated-ref (evaluate (abstraction-type-abstraction $abstraction-type))))))
+            (lambda ($arg)
+              (evaluate
+                (app
+                  (abstraction-type-procedure $abstraction-type)
+                  $arg))))))
       ((application? $application)
         (term-apply
           (evaluate (application-lhs $application))
           (evaluate (application-rhs $application))))
       ((recursive? $recursive)
-        (lets
-          ($procedure (abstraction-procedure (recursive-abstraction $recursive)))
-          (evaluated
-            (recursive
-              (abstraction
-                (lambda ($self)
-                  (evaluate ($procedure $self))))))))
+        (evaluated
+          (recursive
+            (lambda ($self)
+              (evaluate
+                (app
+                  (recursive-procedure $recursive)
+                  $self))))))
       ((branch? $branch)
         (lets
           ($condition (evaluate (branch-condition $branch)))
@@ -73,12 +78,9 @@
   (define (term-apply $lhs $rhs)
     (switch (evaluated-ref $lhs)
       ((abstraction? $abstraction)
-       ((abstraction-procedure $abstraction) $rhs))
+        (app (abstraction-procedure $abstraction) $rhs))
       ((recursive? $recursive)
-       (lets
-        ($procedure (abstraction-procedure (recursive-abstraction $recursive)))
-        ($value ($procedure $lhs))
-        (term-apply $value $rhs)))
+        (term-apply (app (recursive-procedure $recursive) $lhs) $rhs))
       ((else _)
        (evaluated (application $lhs $rhs)))))
 

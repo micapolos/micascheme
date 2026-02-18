@@ -5,10 +5,10 @@
     type type? type-depth
     variable variable? variable-symbol
     abstraction abstraction? abstraction-procedure
-    abstraction-type abstraction-type? abstraction-type-param abstraction-type-abstraction
+    abstraction-type abstraction-type? abstraction-type-param abstraction-type-procedure
     application application? application-lhs application-rhs
     branch branch? branch-condition branch-consequent branch-alternate
-    recursive recursive? recursive-abstraction
+    recursive recursive? recursive-procedure
     evaluated evaluated? evaluated-ref)
   (import (leo2 base))
 
@@ -17,9 +17,9 @@
   (data (type depth))
   (data (variable symbol))
   (data (abstraction procedure))
-  (data (abstraction-type param abstraction))
+  (data (abstraction-type param procedure))
   (data (application lhs rhs))
   (data (branch condition consequent alternate))
-  (data (recursive abstraction))
+  (data (recursive procedure))
   (data (evaluated ref))
 )

@@ -66,14 +66,12 @@
 (check-evaluates
   (abstraction-type
     (type 0)
-    (abstraction
-      (lambda ($x) $x)))
+    (lambda ($x) $x))
   (evaluated
     (abstraction-type
       (evaluated (type 0))
-      (abstraction
-        (lambda (v0)
-          (evaluated v0))))))
+      (lambda (v0)
+        (evaluated v0)))))
 
 (check-evaluates
   (branch (native #t) (native "true") 'error)
@@ -93,31 +91,26 @@
 
 (check-evaluates
   (recursive
-    (abstraction
-      (lambda ($self)
-        (abstraction
-          (lambda ($n) $self)))))
+    (lambda ($self)
+      (abstraction
+        (lambda ($n) $self))))
   (evaluated
     (recursive
-      (abstraction
-        (lambda (v0)
-          (evaluated
-            (abstraction
-              (lambda (v1)
-                (evaluated v0)))))))))
+      (lambda (v0)
+        (evaluated
+          (abstraction
+            (lambda (v1)
+              (evaluated v0))))))))
 
 (check-evaluates
   (recursive
-    (abstraction
-      (lambda ($self)
-        (abstraction
-          (lambda ($n) $n)))))
+    (lambda ($self)
+      (abstraction
+        (lambda ($n) $n))))
   (evaluated
     (recursive
-      (abstraction
-        (lambda (v0)
-          (evaluated
-            (abstraction
-              (lambda (v1)
-                (evaluated v1)))))))))
-
+      (lambda (v0)
+        (evaluated
+          (abstraction
+            (lambda (v1)
+              (evaluated v1))))))))
