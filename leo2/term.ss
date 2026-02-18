@@ -1,7 +1,7 @@
 (library (leo2 term)
   (export
     native native? native-ref
-    native-application native-application? native-application-procedure native-application-args
+    native-application native-application? native-application-target native-application-args
     type type? type-depth
     variable variable? variable-symbol
     abstraction abstraction? abstraction-procedure
@@ -13,7 +13,7 @@
   (import (leo2 base))
 
   (data (native ref))
-  (data (native-application procedure args))
+  (data (native-application target args))
   (data (type depth))
   (data (variable symbol))
   (data (abstraction procedure))

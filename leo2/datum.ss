@@ -22,7 +22,7 @@
         `(native ,(native-ref $native)))
       ((native-application? $native-application)
         `(native-application
-          ,(native-application-procedure $native-application)
+          ,(native-application-target $native-application)
           (list
             ,@(map
               (partial term->datum $depth $strip-evaluated?)

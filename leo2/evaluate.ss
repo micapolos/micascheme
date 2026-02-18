@@ -24,7 +24,7 @@
         (evaluated $native))
       ((native-application? $native-application)
         (lets
-          ($procedure (native-application-procedure $native-application))
+          ($procedure (native-application-target $native-application))
           ($args (map evaluate (native-application-args $native-application)))
           (evaluated
             (if (for-all evaluated-native? $args)

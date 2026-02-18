@@ -13,7 +13,7 @@
         (native-ref $native))
       ((native-application? $native-application)
         `(
-          ,(native-application-procedure $native-application)
+          ,(native-application-target $native-application)
           ,@(map
             (partial compile $depth)
             (native-application-args $native-application))))
