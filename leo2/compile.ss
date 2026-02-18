@@ -1,5 +1,7 @@
 (library (leo2 compile)
-  (export)
+  (export
+    compile
+    check-compiles)
   (import
     (leo2 base)
     (leo2 term)
@@ -12,7 +14,9 @@
       ((native-application? $native-application)
         `(
           ,(native-application-procedure $native-application)
-          ,@(native-application-args $native-application)))
+          ,@(map
+            (partial compile $depth)
+            (native-application-args $native-application))))
       ((variable? $variable)
         (variable-symbol $variable))
       ((abstraction? $abstraction)
@@ -25,10 +29,13 @@
       ((recursive? $recursive)
         (lets
           ($symbol (depth->symbol $depth))
-          `(let ,$symbol
-            ,(compile
-              (+ $depth 1)
-              ((recursive-procedure $recursive) (variable $symbol))))))
+          `(letrec
+            ((
+              ,$symbol
+              ,(compile
+                (+ $depth 1)
+                ((recursive-procedure $recursive) (variable $symbol)))))
+            ,$symbol)))
       ((application? $application)
         `(
           ,(compile $depth (application-lhs $application))
@@ -38,4 +45,7 @@
           ,(compile $depth (branch-condition $branch))
           ,(compile $depth (branch-consequent $branch))
           ,(compile $depth (branch-alternate $branch))))))
+
+  (define-rule-syntax (check-compiles in out)
+    (check (equal? (compile 0 in) 'out)))
 )
