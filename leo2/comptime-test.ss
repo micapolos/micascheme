@@ -40,13 +40,13 @@
           (%application x y))))))
 
 (check=?
-  (a-lambda (variable a-boolean) (variable a-string))
+  (a-lambda (_ (variable a-boolean)) (variable a-string))
   (%abstraction-type (%variable 'a-boolean)
-    (%lambda (_)
+    (%lambda (x)
       (%variable 'a-string))))
 
 (check=?
-  (a-lambda (x : a-type) (apply x x))
+  (a-lambda (x a-type) (apply x x))
   (%abstraction-type (%type 0)
     (%lambda (x)
       (%application x x))))

@@ -32,11 +32,9 @@
   (define-rule-syntax (lambda id body)
     (abstraction (%lambda (id) body)))
 
-  (define-rules-syntax (literals :)
-    ((a-lambda (id : t) body)
-      (abstraction-type t (%lambda (id) body)))
-    ((a-lambda t body)
-      (a-lambda (_ : t) body)))
+  (define-rules-syntax
+    ((a-lambda (id t) body)
+      (abstraction-type t (%lambda (id) body))))
 
   (define-rule-syntax (apply lhs rhs)
     (application lhs rhs))
