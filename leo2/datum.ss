@@ -10,7 +10,12 @@
   (define (term->datum $depth $strip-evaluated? $term)
     (switch $term
       ((evaluated? $evaluated)
-        (term->datum $depth $strip-evaluated? (evaluated-ref $evaluated)))
+        (if $strip-evaluated?
+          (term->datum $depth $strip-evaluated?
+            (evaluated-ref $evaluated))
+          `(evaluated
+            ,(term->datum $depth $strip-evaluated?
+              (evaluated-ref $evaluated)))))
       ((variable? $variable)
         (variable-symbol $variable))
       ((type? $type)
@@ -44,10 +49,11 @@
             (recursive-procedure $recursive))))
       ((branch? $branch)
         `(branch
-          ,(term->datum $strip-evaluated? $depth (branch-condition $branch))
-          ,(term->datum $strip-evaluated? $depth (branch-consequent $branch))
-          ,(term->datum $strip-evaluated? $depth (branch-alternate $branch))))
-      ((else $other) $other)))
+          ,(term->datum $depth $strip-evaluated? (branch-condition $branch))
+          ,(term->datum $depth $strip-evaluated? (branch-consequent $branch))
+          ,(term->datum $depth $strip-evaluated? (branch-alternate $branch))))
+      ((else $other)
+        $other)))
 
   (define (procedure->datum $depth $strip-evaluated? $procedure)
     (lets
