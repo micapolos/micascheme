@@ -72,8 +72,8 @@
             (evaluated
               (branch
                 $condition
-                (evaluate (branch-consequent $branch))
-                (evaluate (branch-alternate $branch)))))))))
+                (branch-consequent $branch)
+                (branch-alternate $branch))))))))
 
   (define (term-apply $lhs $rhs)
     (switch (evaluated-ref $lhs)

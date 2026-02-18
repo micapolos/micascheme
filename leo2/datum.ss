@@ -8,7 +8,7 @@
     (string->symbol (format "v~a" $depth)))
 
   (define (term->datum $depth $term)
-    (switch-exhaustive $term
+    (switch $term
       ((evaluated? $evaluated)
         `(evaluated
           ,(term->datum $depth (evaluated-ref $evaluated))))
@@ -47,7 +47,8 @@
         `(branch
           ,(term->datum $depth (branch-condition $branch))
           ,(term->datum $depth (branch-consequent $branch))
-          ,(term->datum $depth (branch-alternate $branch))))))
+          ,(term->datum $depth (branch-alternate $branch))))
+      ((else $other) $other)))
 
   (define (procedure->datum $depth $procedure)
     (lets

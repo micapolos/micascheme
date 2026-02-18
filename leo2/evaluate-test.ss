@@ -82,12 +82,12 @@
   (evaluated (native "false")))
 
 (check-evaluates
-  (branch (variable 'x) (native "true") (native "false"))
+  (branch (variable 'x) 'true-error 'false-error)
   (evaluated
     (branch
       (evaluated (variable 'x))
-      (evaluated (native "true"))
-      (evaluated (native "false")))))
+      'true-error
+      'false-error)))
 
 (check-evaluates
   (recursive
