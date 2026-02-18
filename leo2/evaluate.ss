@@ -12,7 +12,7 @@
       ((evaluated? $evaluated)
         (native? (evaluated-ref $evaluated)))))
 
-  (define (evaluate $evaluate-native $term)
+  (define (evaluate $term)
     (switch-exhaustive $term
       ((evaluated? $evaluated)
         $evaluated)
@@ -21,56 +21,51 @@
       ((type? $type)
         (evaluated $type))
       ((native? $native)
-        (evaluated ($evaluate-native $native)))
+        (evaluated $native))
       ((native-application? $native-application)
         (lets
-          ($procedure
-            (native-application-target $native-application))
-          ($args
-            (map
-              (partial evaluate $evaluate-native)
-              (native-application-args $native-application)))
+          ($procedure (native-application-target $native-application))
+          ($args (map evaluate (native-application-args $native-application)))
           (evaluated
             (if (for-all evaluated-native? $args)
               (native
-                (apply
-                  ($evaluate-native $procedure)
+                (apply $procedure
                   (map (dot native-ref evaluated-ref) $args)))
               (native-application $procedure $args)))))
       ((abstraction? $abstraction)
         (evaluated
           (abstraction
             (lambda ($arg)
-              (evaluate $evaluate-native
+              (evaluate
                 (app
                   (abstraction-procedure $abstraction)
                   $arg))))))
       ((abstraction-type? $abstraction-type)
         (evaluated
           (abstraction-type
-            (evaluate $evaluate-native (abstraction-type-param $abstraction-type))
+            (evaluate (abstraction-type-param $abstraction-type))
             (lambda ($arg)
-              (evaluate $evaluate-native
+              (evaluate
                 (app
                   (abstraction-type-procedure $abstraction-type)
                   $arg))))))
       ((application? $application)
         (term-apply
-          (evaluate $evaluate-native (application-lhs $application))
-          (evaluate $evaluate-native (application-rhs $application))))
+          (evaluate (application-lhs $application))
+          (evaluate (application-rhs $application))))
       ((recursive? $recursive)
         (evaluated
           (recursive
             (lambda ($self)
-              (evaluate $evaluate-native
+              (evaluate
                 (app
                   (recursive-procedure $recursive)
                   $self))))))
       ((branch? $branch)
         (lets
-          ($condition (evaluate $evaluate-native (branch-condition $branch)))
+          ($condition (evaluate (branch-condition $branch)))
           (if (evaluated-native? $condition)
-            (evaluate $evaluate-native
+            (evaluate
               (if (native-ref (evaluated-ref $condition))
                 (branch-consequent $branch)
                 (branch-alternate $branch)))
@@ -92,6 +87,6 @@
   (define-rule-syntax (check-evaluates in out)
     (check
       (equal?
-        (term->datum 0 #f (evaluate identity in))
+        (term->datum 0 #f (evaluate in))
         (term->datum 0 #f out))))
 )
