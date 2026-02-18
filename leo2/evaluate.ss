@@ -24,12 +24,13 @@
         (evaluated $native))
       ((native-application? $native-application)
         (lets
-          ($procedure (native-application-target $native-application))
+          ($procedure (evaluate (native-application-target $native-application)))
           ($args (map evaluate (native-application-args $native-application)))
           (evaluated
-            (if (for-all evaluated-native? $args)
+            (if (for-all evaluated-native? (cons $procedure $args))
               (native
-                (apply $procedure
+                (apply
+                  (native-ref (evaluated-ref $procedure))
                   (map (dot native-ref evaluated-ref) $args)))
               (native-application $procedure $args)))))
       ((abstraction? $abstraction)

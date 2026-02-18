@@ -21,30 +21,35 @@
   (evaluated (native "foo")))
 
 (check-evaluates
-  (native-application string-append
+  (native-application
+    (native string-append)
     (list
       (native "foo")
       (native "bar")))
   (evaluated (native "foobar")))
 
 (check-evaluates
-  (native-application string-append
+  (native-application
+    (native string-append)
     (list
       (native "foo")
       (variable 'x)))
   (evaluated
-    (native-application string-append
+    (native-application
+      (evaluated (native string-append))
       (list
         (evaluated (native "foo"))
         (evaluated (variable 'x))))))
 
 (check-evaluates
-  (native-application string-append
+  (native-application
+    (native string-append)
     (list
       (native "foo")
       (variable 'x)))
   (evaluated
-    (native-application string-append
+    (native-application
+      (evaluated (native string-append))
       (list
         (evaluated (native "foo"))
         (evaluated (variable 'x))))))
@@ -80,7 +85,9 @@
         (lambda ($x)
           (abstraction
             (lambda ($y)
-              (native-application string-append (list $x $y))))))
+              (native-application
+                (native string-append)
+                (list $x $y))))))
       (native "foo"))
     (native "bar"))
   (evaluated (native "foobar")))
@@ -134,9 +141,9 @@
         (abstraction
           (lambda ($n)
             (branch
-              (native-application zero? (list $n))
+              (native-application (native zero?) (list $n))
               (native "Done")
-              (application $self (native-application - (list $n (native 1)))))))))
+              (application $self (native-application (native -) (list $n (native 1)))))))))
     (native 1))
   (evaluated (native "Done")))
 
@@ -147,11 +154,11 @@
         (abstraction
           (lambda ($n)
             (branch
-              (native-application < (list $n (native 2)))
+              (native-application (native <) (list $n (native 2)))
               $n
-              (native-application +
+              (native-application (native +)
                 (list
-                  (application $self (native-application - (list $n (native 1))))
-                  (application $self (native-application - (list $n (native 2)))))))))))
+                  (application $self (native-application (native -) (list $n (native 1))))
+                  (application $self (native-application (native -) (list $n (native 2)))))))))))
     (native 10))
   (evaluated (native 55)))
