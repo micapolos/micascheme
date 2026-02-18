@@ -9,7 +9,7 @@
   (%variable 'x))
 
 (check=?
-  a-type
+  (type 0)
   (%type 0))
 
 (check=?
@@ -46,7 +46,7 @@
       (%variable 'a-string))))
 
 (check=?
-  (a-lambda (x a-type) (apply x x))
+  (a-lambda (x (type 0)) (apply x x))
   (%abstraction-type (%type 0)
     (%lambda (x)
       (%application x x))))

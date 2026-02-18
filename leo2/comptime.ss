@@ -1,6 +1,6 @@
 (library (leo2 comptime)
   (export
-    a-type
+    type
     native native-apply
     variable
     lambda a-lambda
@@ -14,11 +14,13 @@
       (apply %apply)
       (if %if))
     (rename (leo2 term)
+      (type %type)
       (native %native)
       (variable %variable)
       (recursive %recursive)))
 
-  (define a-type (type 0))
+  (define-rule-syntax (type n)
+    (%type n))
 
   (define-rule-syntax (native x)
     (%native x))

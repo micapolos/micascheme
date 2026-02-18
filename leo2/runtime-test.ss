@@ -7,7 +7,9 @@
   (variable %list)
   %list)
 
-(check=? a-type 'erased)
+(check=?
+  (type 0)
+  'erased)
 
 (check=?
   (native 10)
