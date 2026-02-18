@@ -6,4 +6,5 @@
   (leo2 equal)
   (leo2 evaluate)
   (leo2 compile)
-  (leo2 comptime))
+  (leo2 comptime)
+  (leo2 runtime))
