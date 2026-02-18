@@ -7,11 +7,10 @@
   (define (depth->symbol $depth)
     (string->symbol (format "v~a" $depth)))
 
-  (define (term->datum $depth $term)
+  (define (term->datum $depth $strip-evaluated? $term)
     (switch $term
       ((evaluated? $evaluated)
-        `(evaluated
-          ,(term->datum $depth (evaluated-ref $evaluated))))
+        (term->datum $depth $strip-evaluated? (evaluated-ref $evaluated)))
       ((variable? $variable)
         (variable-symbol $variable))
       ((type? $type)
@@ -23,38 +22,39 @@
           ,(native-application-procedure $native-application)
           (list
             ,@(map
-              (partial term->datum $depth)
+              (partial term->datum $depth $strip-evaluated?)
               (native-application-args $native-application)))))
       ((abstraction? $abstraction)
         `(abstraction
-          ,(procedure->datum $depth
+          ,(procedure->datum $depth $strip-evaluated?
             (abstraction-procedure $abstraction))))
       ((abstraction-type? $abstraction-type)
         `(abstraction-type
-          ,(term->datum $depth
+          ,(term->datum $depth $strip-evaluated?
             (abstraction-type-param $abstraction-type))
-          ,(procedure->datum $depth
+          ,(procedure->datum $depth $strip-evaluated?
             (abstraction-type-procedure $abstraction-type))))
       ((application? $application)
         `(application
-          ,(term->datum $depth (application-lhs $application))
-          ,(term->datum $depth (application-rhs $application))))
+          ,(term->datum $depth $strip-evaluated? (application-lhs $application))
+          ,(term->datum $depth $strip-evaluated? (application-rhs $application))))
       ((recursive? $recursive)
         `(recursive
-          ,(procedure->datum $depth
+          ,(procedure->datum $depth $strip-evaluated?
             (recursive-procedure $recursive))))
       ((branch? $branch)
         `(branch
-          ,(term->datum $depth (branch-condition $branch))
-          ,(term->datum $depth (branch-consequent $branch))
-          ,(term->datum $depth (branch-alternate $branch))))
+          ,(term->datum $strip-evaluated? $depth (branch-condition $branch))
+          ,(term->datum $strip-evaluated? $depth (branch-consequent $branch))
+          ,(term->datum $strip-evaluated? $depth (branch-alternate $branch))))
       ((else $other) $other)))
 
-  (define (procedure->datum $depth $procedure)
+  (define (procedure->datum $depth $strip-evaluated? $procedure)
     (lets
       ($symbol (depth->symbol $depth))
       `(lambda (,$symbol)
         ,(term->datum
           (+ $depth 1)
+          $strip-evaluated?
           (app $procedure (variable $symbol))))))
 )
