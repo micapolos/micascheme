@@ -1,4 +1,4 @@
 (library (leo2 base)
   (export)
   (import (scheme))
-  (export (import (micascheme))))
+  (export (import (except (micascheme) compile))))

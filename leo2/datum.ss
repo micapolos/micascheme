@@ -2,10 +2,8 @@
   (export term->datum)
   (import
     (leo2 base)
-    (leo2 term))
-
-  (define (depth->symbol $depth)
-    (string->symbol (format "v~a" $depth)))
+    (leo2 term)
+    (leo2 symbol))
 
   (define (term->datum $depth $strip-evaluated? $term)
     (switch $term
