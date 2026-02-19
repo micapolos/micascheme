@@ -41,10 +41,10 @@
         `(application
           ,(term->datum $depth $strip-evaluated? (application-lhs $application))
           ,(term->datum $depth $strip-evaluated? (application-rhs $application))))
-      ((recursive? $recursive)
-        `(recursive
+      ((recursion? $recursion)
+        `(recursion
           ,(procedure->datum $depth $strip-evaluated?
-            (recursive-procedure $recursive))))
+            (recursion-procedure $recursion))))
       ((branch? $branch)
         `(branch
           ,(term->datum $depth $strip-evaluated? (branch-condition $branch))

@@ -109,12 +109,12 @@
       'false-error)))
 
 (check-evaluates
-  (recursive
+  (recursion
     (lambda ($self)
       (abstraction
         (lambda ($n) $self))))
   (evaluated
-    (recursive
+    (recursion
       (lambda (v0)
         (evaluated
           (abstraction
@@ -122,12 +122,12 @@
               (evaluated v0))))))))
 
 (check-evaluates
-  (recursive
+  (recursion
     (lambda ($self)
       (abstraction
         (lambda ($n) $n))))
   (evaluated
-    (recursive
+    (recursion
       (lambda (v0)
         (evaluated
           (abstraction
@@ -136,7 +136,7 @@
 
 (check-evaluates
   (application
-    (recursive
+    (recursion
       (lambda ($self)
         (abstraction
           (lambda ($n)
@@ -149,7 +149,7 @@
 
 (check-evaluates
   (application
-    (recursive
+    (recursion
       (lambda ($self)
         (abstraction
           (lambda ($n)

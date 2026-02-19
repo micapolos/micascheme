@@ -34,11 +34,11 @@
   (a-lambda (v0 : a-type) (v1 : a-number) (list v0 v1)))
 
 (check-reify
-  (recursive (lambda (fn) fn))
+  (recursion (lambda (fn) fn))
   (recursive lambda v0 v0))
 
 (check-reify
-  (recursive (lambda (fn)
+  (recursion (lambda (fn)
     (abstraction (lambda (n)
       (application fn n)))))
    (recursive lambda v0 v1 (v0 v1)))

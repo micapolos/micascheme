@@ -25,7 +25,7 @@
   (lambda (v0) (lambda (v1) (v0 v1))))
 
 (check-compiles
-  (recursive (lambda (f) (abstraction (lambda (x) (application f x)))))
+  (recursion (lambda (f) (abstraction (lambda (x) (application f x)))))
   (letrec ((v0 (lambda (v1) (v0 v1)))) v0))
 
 (check-compiles

@@ -54,13 +54,13 @@
         (term-apply
           (evaluate (application-lhs $application))
           (evaluate (application-rhs $application))))
-      ((recursive? $recursive)
+      ((recursion? $recursion)
         (evaluated
-          (recursive
+          (recursion
             (lambda ($self)
               (evaluate
                 (app
-                  (recursive-procedure $recursive)
+                  (recursion-procedure $recursion)
                   $self))))))
       ((branch? $branch)
         (lets
@@ -80,8 +80,8 @@
     (switch (evaluated-ref $lhs)
       ((abstraction? $abstraction)
         (app (abstraction-procedure $abstraction) $rhs))
-      ((recursive? $recursive)
-        (term-apply (app (recursive-procedure $recursive) $lhs) $rhs))
+      ((recursion? $recursion)
+        (term-apply (app (recursion-procedure $recursion) $lhs) $rhs))
       ((else _)
        (evaluated (application $lhs $rhs)))))
 

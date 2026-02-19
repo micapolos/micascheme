@@ -2,7 +2,7 @@
   (export
     abstraction-dependent?
     abstraction-type-dependent?
-    recursive-dependent?)
+    recursion-dependent?)
   (import
     (leo2 base)
     (leo2 term)
@@ -20,9 +20,9 @@
         (abstraction-type-apply $abstraction-type (variable 'a))
         (abstraction-type-apply $abstraction-type (variable 'b)))))
 
-  (define (recursive-dependent? $recursive)
+  (define (recursion-dependent? $recursion)
     (not
       (term=? 0
-        (recursive-apply $recursive (variable 'a))
-        (recursive-apply $recursive (variable 'b)))))
+        (recursion-apply $recursion (variable 'a))
+        (recursion-apply $recursion (variable 'b)))))
 )

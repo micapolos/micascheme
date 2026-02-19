@@ -44,7 +44,7 @@
 
 (check=?
   (apply
-    (recursive fn
+    (recursion fn
       (lambda x
         (if (native-apply (native %zero?) x)
           (native "Done")

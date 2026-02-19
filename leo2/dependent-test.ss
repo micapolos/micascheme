@@ -19,11 +19,11 @@
       (abstraction-type (variable 't) (lambda (x) (native 1))))))
 
 (check
-  (recursive-dependent?
-    (recursive (lambda (x) x))))
+  (recursion-dependent?
+    (recursion (lambda (x) x))))
 
 (check
   (not
-    (recursive-dependent?
-      (recursive (lambda (x) (native 1))))))
+    (recursion-dependent?
+      (recursion (lambda (x) (native 1))))))
 

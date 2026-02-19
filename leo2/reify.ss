@@ -36,10 +36,10 @@
             ,@(app
               (if (abstraction? $body) cdr list)
               (reify (+ $depth 1) $body)))))
-      ((recursive? $recursive)
+      ((recursion? $recursion)
         (lets
           ($symbol (depth->symbol $depth))
-          ($body (recursive-apply $recursive (variable $symbol)))
+          ($body (recursion-apply $recursion (variable $symbol)))
           `(recursive lambda ,$symbol
             ,@(app
               (if (abstraction? $body) cdr list)

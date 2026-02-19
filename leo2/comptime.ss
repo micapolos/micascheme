@@ -4,7 +4,7 @@
     native native-apply
     variable
     lambda a-lambda
-    apply recursive
+    apply recursion
     if
     check=?)
   (import
@@ -17,7 +17,7 @@
       (type %type)
       (native %native)
       (variable %variable)
-      (recursive %recursive)))
+      (recursion %recursion)))
   (export
     (import
       (only (leo2 base) quote)))
@@ -44,8 +44,8 @@
   (define-rule-syntax (apply lhs rhs)
     (application lhs rhs))
 
-  (define-rule-syntax (recursive id body)
-    (%recursive (%lambda (id) body)))
+  (define-rule-syntax (recursion id body)
+    (%recursion (%lambda (id) body)))
 
   (define-rule-syntax (if a b c)
     (branch a b c))

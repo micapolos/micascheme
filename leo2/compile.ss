@@ -26,7 +26,7 @@
             ,(compile
               (+ $depth 1)
               ((abstraction-procedure $abstraction) (variable $symbol))))))
-      ((recursive? $recursive)
+      ((recursion? $recursion)
         (lets
           ($symbol (depth->symbol $depth))
           `(letrec
@@ -34,7 +34,7 @@
               ,$symbol
               ,(compile
                 (+ $depth 1)
-                ((recursive-procedure $recursive) (variable $symbol)))))
+                ((recursion-procedure $recursion) (variable $symbol)))))
             ,$symbol)))
       ((application? $application)
         `(

@@ -51,8 +51,8 @@
       (%application x x))))
 
 (check=?
-  (recursive fn (lambda x (apply fn x)))
-  (%recursive
+  (recursion fn (lambda x (apply fn x)))
+  (%recursion
     (%lambda (fn)
       (%abstraction
         (%lambda (x)
