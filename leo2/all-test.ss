@@ -4,6 +4,7 @@
   (leo2 term)
   (leo2 datum)
   (leo2 equal)
+  (leo2 dependent)
   (leo2 evaluate)
   (leo2 compile)
   (leo2 comptime)
