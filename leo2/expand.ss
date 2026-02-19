@@ -120,6 +120,11 @@
                         `(variable ,$symbol))))
                   #'body))))))
 
+      ((lambda param params ... body)
+        (expand $env
+          #'(lambda param
+            (lambda params ... body))))
+
       ((a-lambda (id : t) body)
         (lets
           ($symbol (depth->symbol (length $env)))

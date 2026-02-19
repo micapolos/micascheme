@@ -36,7 +36,7 @@
 
 ; (check
 ;   (expand (native-lambda %< a-number a-number a-boolean))
-;   TODO))
+;   (expanded 1 2))
 
 (check
   (expand (native-apply a-number %string-length "foo"))
@@ -57,6 +57,37 @@
   (expanded
     (%a-lambda (v0 (%variable a-number)) (%variable a-number))
     (lambda v0 (variable v0))))
+
+(check
+  (expand
+    (lambda (x : a-number)
+      (native-apply a-boolean %zero? x)))
+  (expanded
+    (%a-lambda
+      (v0 (%variable a-number))
+      (%variable a-boolean))
+    (lambda v0
+      (native-application
+        (native %zero?)
+        (list (variable v0))))))
+
+(check
+  (expand
+    (lambda
+      (x : a-number)
+      (y : a-number)
+      (native-apply a-boolean %< x y)))
+  (expanded
+    (%a-lambda
+      (v0 (%variable a-number))
+      (%a-lambda
+        (v1 (%variable a-number))
+        (%variable a-boolean)))
+    (lambda v0
+      (lambda v1
+        (native-application
+          (native %<)
+          (list (variable v0) (variable v1)))))))
 
 (check
   (expand (a-lambda a-number a-string))
