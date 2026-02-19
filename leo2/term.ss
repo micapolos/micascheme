@@ -55,8 +55,8 @@
   (define (binding-ref $binding)
     (application-rhs $binding))
 
-  (define (binding-apply $binding)
+  (define (binding-apply $binding $arg)
     (app
       (binding-procedure $binding)
-      (binding-ref $binding)))
+      $arg))
 )

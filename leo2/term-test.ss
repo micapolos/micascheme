@@ -26,5 +26,6 @@
       (binding
         (native "foo")
         (lambda (x)
-          (application (variable 'list) x))))
-    (application (variable 'list) (native "foo"))))
+          (application (variable 'list) x)))
+      (variable 'x))
+    (application (variable 'list) (variable 'x))))

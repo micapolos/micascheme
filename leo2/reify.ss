@@ -59,6 +59,15 @@
             ,@(app
               (if (abstraction-type? $body) cdr list)
               (reify (+ $depth 1) $body)))))
+      ((binding? $binding)
+        (lets
+          ($symbol (depth->symbol $depth))
+          ($body (binding-apply $binding (variable $symbol)))
+          `(let
+            (,$symbol ,(binding-ref $binding))
+            ,@(app
+              (if (binding? $body) cdr list)
+              (reify (+ $depth 1) $body)))))
       ((application? $application)
         (lets
           ($lhs (application-lhs $application))
