@@ -27,3 +27,17 @@
 (check
   (expand "foo")
   (expanded (%native 'a-string) (native "foo")))
+
+(check
+  (expand (native a-string (string-append "foo" "bar")))
+  (expanded
+    (%variable a-string)
+    (native (string-append "foo" "bar"))))
+
+(check
+  (expand (native-apply a-number %string-length "foo"))
+  (expanded
+    (%variable a-number)
+    (native-application
+      (native %string-length)
+      (list (native "foo")))))

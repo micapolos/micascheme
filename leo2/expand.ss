@@ -28,6 +28,7 @@
         a-string
         a-lambda
         native
+        native-apply
         lambda)
 
       (a-type (expanded (type 1) 'a-type))
@@ -48,10 +49,18 @@
       (s
         (string? (datum s))
         (expand-literal a-string s))
+
       ((native t x)
         (expanded
           (evaluate $env #'t)
-          (native (datum x))))))
+          `(native ,(datum x))))
+
+      ((native-apply t fn arg ...)
+        (expanded
+          (evaluate $env #'t)
+          `(native-application
+            (native ,(datum fn))
+            (list ,@(map expanded-ref (map (partial expand $env) #'(arg ...)))))))))
 
   (define-rule-syntax (expand-type t)
     (expanded (type 0) '(variable t)))
