@@ -25,18 +25,13 @@
 
 (check-reify
   (abstraction-type (type 0) (lambda (x) (application (native 'list) x)))
-  (a-lambda
-    (v0 : a-type)
-    (list v0)))
+  (a-lambda (v0 : a-type) (list v0)))
 
 (check-reify
   (abstraction-type (type 0) (lambda (x)
     (abstraction-type (native 'a-number) (lambda (y)
       (application (application (native 'list) x) y)))))
-  (a-lambda
-    (v0 : a-type)
-    (v1 : a-number)
-    (list v0 v1)))
+  (a-lambda (v0 : a-type) (v1 : a-number) (list v0 v1)))
 
 (check-reify
   (recursive (lambda (fn) fn))
