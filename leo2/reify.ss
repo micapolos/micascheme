@@ -74,5 +74,5 @@
           ,(reify $depth (branch-alternate $branch))))))
 
   (define-rule-syntax (check-reify in out)
-    (check (equal? (reify 0 in) 'out)))
+    (check (equal? (reify 0 in) `out)))
 )

@@ -6,6 +6,14 @@
 
 (check-reify (variable 'x) x)
 
+(check-reify (native "foo") "foo")
+
+(check-reify
+  (native-application
+    (native string-append)
+    (list (native "foo") (native "bar")))
+  (native-apply ,string-append "foo" "bar"))
+
 (check-reify
   (abstraction (lambda (x) (native "foo")))
   (lambda _ "foo"))
