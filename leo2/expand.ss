@@ -87,9 +87,9 @@
       ((native-apply t fn arg ...)
         (expanded
           (evaluate $env #'t)
-          `(native-application
+          `(native-apply
             (native ,(datum fn))
-            (list ,@(map expanded-ref (map (partial expand $env) #'(arg ...)))))))
+            ,@(map expanded-ref (map (partial expand $env) #'(arg ...))))))
 
       ((lambda (id : t) body)
         (lets

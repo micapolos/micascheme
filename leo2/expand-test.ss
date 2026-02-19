@@ -42,9 +42,9 @@
   (expand (native-apply a-number %string-length "foo"))
   (expanded
     (%variable a-number)
-    (native-application
+    (native-apply
       (native %string-length)
-      (list (native "foo")))))
+      (native "foo"))))
 
 (check
   (expand (lambda (x : a-number) "foo"))
@@ -67,9 +67,9 @@
       (v0 (%variable a-number))
       (%variable a-boolean))
     (lambda v0
-      (native-application
+      (native-apply
         (native %zero?)
-        (list (variable v0))))))
+        (variable v0)))))
 
 (check
   (expand
@@ -85,9 +85,10 @@
         (%variable a-boolean)))
     (lambda v0
       (lambda v1
-        (native-application
+        (native-apply
           (native %<)
-          (list (variable v0) (variable v1)))))))
+          (variable v0)
+          (variable v1))))))
 
 (check
   (expand (a-lambda a-number a-string))
