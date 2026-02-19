@@ -7,7 +7,9 @@
     (rename (leo2 base) (check %check))
     (leo2 term)
     (leo2 datum)
-    (leo2 symbol))
+    (leo2 symbol)
+    (leo2 equal)
+    (leo2 reify))
 
   (data (expanded type ref))
 
@@ -34,6 +36,7 @@
         a-string
         a-lambda
         native
+        native-lambda
         native-apply
         lambda
         :)
@@ -66,12 +69,56 @@
           (evaluate $env #'t)
           `(native ,(datum x))))
 
+      ((native-lambda id t ... r)
+        (lets
+          ($depth (length $env))
+          ($symbols
+            (map depth->symbol
+              (map (partial + $depth)
+                (indices (length #'(t ...))))))
+          (expand $env
+            #`(lambda
+              #,@(map-with
+                ($symbol $symbols)
+                ($t #'(t ...))
+                #`(#,$symbol : #,$t))
+                (native-apply r id #,$symbols)))))
+
       ((native-apply t fn arg ...)
         (expanded
           (evaluate $env #'t)
           `(native-application
             (native ,(datum fn))
             (list ,@(map expanded-ref (map (partial expand $env) #'(arg ...)))))))
+
+      ((lambda (id : t) body)
+        (lets
+          ($symbol (depth->symbol (length $env)))
+          ($param (evaluate $env #'t))
+          (expanded
+            (abstraction-type
+              (evaluate $env #'t)
+              (lambda (x)
+                (expanded-type
+                  (expand
+                    (push $env
+                      (cons
+                        (datum id)
+                        (expanded
+                          $param
+                          `(variable ,$symbol))))
+                    #'body))))
+            `(lambda
+              ,$symbol
+              ,(expanded-ref
+                (expand
+                  (push $env
+                    (cons
+                      (datum id)
+                      (expanded
+                        $param
+                        `(variable ,$symbol))))
+                  #'body))))))
 
       ((a-lambda (id : t) body)
         (lets
@@ -100,7 +147,26 @@
             (a-lambda params ... body))))
 
       ((fn arg)
-        TODO)
+        (lets
+          ($depth (length $env))
+          ($fn (expand $env #'fn))
+          (switch (expanded-type $fn)
+            ((abstraction-type? $abstraction-type)
+              (lets
+                ($arg (expand $env #'arg))
+                ($expected-type (abstraction-type-param $abstraction-type))
+                ($actual-type (expanded-type $arg))
+                (if
+                  (term=? $depth $expected-type $actual-type)
+                  `(
+                    ,(expanded-ref $fn)
+                    ,(expanded-ref $arg))
+                  (syntax-error #'arg
+                    (format "expected ~a, got ~a, in "
+                      (reify $depth $expected-type)
+                      (reify $depth $actual-type))))))
+            ((else $other)
+              (syntax-error #'fn "not a-lambda")))))
 
       (id
         (symbol? (datum id))

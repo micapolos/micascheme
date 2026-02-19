@@ -34,6 +34,10 @@
     (%variable a-string)
     (native (string-append "foo" "bar"))))
 
+; (check
+;   (expand (native-lambda %< a-number a-number a-boolean))
+;   TODO))
+
 (check
   (expand (native-apply a-number %string-length "foo"))
   (expanded
@@ -41,6 +45,18 @@
     (native-application
       (native %string-length)
       (list (native "foo")))))
+
+(check
+  (expand (lambda (x : a-number) "foo"))
+  (expanded
+    (%a-lambda (v0 (%variable a-number)) (%native 'a-string))  ; TODO: is (%native a-string) correct?
+    (lambda v0 (native "foo"))))
+
+(check
+  (expand (lambda (x : a-number) x))
+  (expanded
+    (%a-lambda (v0 (%variable a-number)) (%variable a-number))
+    (lambda v0 (variable v0))))
 
 (check
   (expand (a-lambda a-number a-string))
