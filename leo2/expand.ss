@@ -173,6 +173,10 @@
             ((else $other)
               (syntax-error #'fn "not a-lambda")))))
 
+      ((fn arg args ...)
+        (expand $env
+          #'((fn arg) args ...)))
+
       (id
         (symbol? (datum id))
         (syntax-error #'id "undefined"))))
