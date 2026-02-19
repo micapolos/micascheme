@@ -10,6 +10,7 @@
     branch branch? branch-condition branch-consequent branch-alternate
     recursion recursion? recursion-procedure
     evaluated evaluated? evaluated-ref
+    typed typed? typed-type typed-ref
 
     abstraction-apply
     abstraction-type-apply
@@ -29,6 +30,7 @@
   (data (branch condition consequent alternate))
   (data (recursion procedure))
   (data (evaluated ref))
+  (data (typed type ref))
 
   (define (abstraction-apply $abstraction $arg)
     (app (abstraction-procedure $abstraction) $arg))
