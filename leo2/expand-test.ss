@@ -41,3 +41,29 @@
     (native-application
       (native %string-length)
       (list (native "foo")))))
+
+(check
+  (expand (a-lambda a-number a-string))
+  (expanded
+    (%type 0)
+    (a-lambda
+      (v0 (variable a-number))
+      (variable a-string))))
+
+(check
+  (expand (a-lambda a-number a-boolean a-string))
+  (expanded
+    (%type 0)
+    (a-lambda
+      (v0 (variable a-number))
+      (a-lambda
+        (v1 (variable a-boolean))
+        (variable a-string)))))
+
+(check
+  (expand (a-lambda (x : a-number) x))
+  (expanded
+    (%type 0)
+    (a-lambda
+      (v0 (variable a-number))
+      (variable v0))))

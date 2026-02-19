@@ -6,9 +6,15 @@
   (import
     (rename (leo2 base) (check %check))
     (leo2 term)
-    (leo2 datum))
+    (leo2 datum)
+    (leo2 symbol))
 
   (data (expanded type ref))
+
+  (define (env-ref? $env $id)
+    (lets
+      ($ass? (assq (syntax->datum $id) $env))
+      (and $ass? (cdr $ass?))))
 
   ; TODO: inject $env
   (define (evaluate $env $syntax)
@@ -29,7 +35,12 @@
         a-lambda
         native
         native-apply
-        lambda)
+        lambda
+        :)
+
+      (s
+        (env-ref? $env (datum s))
+        (env-ref? $env (datum s)))
 
       (a-type (expanded (type 1) 'a-type))
       (a-boolean (expand-type a-boolean))
@@ -60,7 +71,40 @@
           (evaluate $env #'t)
           `(native-application
             (native ,(datum fn))
-            (list ,@(map expanded-ref (map (partial expand $env) #'(arg ...)))))))))
+            (list ,@(map expanded-ref (map (partial expand $env) #'(arg ...)))))))
+
+      ((a-lambda (id : t) body)
+        (lets
+          ($symbol (depth->symbol (length $env)))
+          ($expanded-t (expand $env #'t))
+          (expanded
+            (type 0)
+            `(a-lambda
+              (,$symbol ,(expanded-ref $expanded-t))
+              ,(expanded-ref
+                (expand
+                  (push $env
+                    (cons
+                      (datum id)
+                      (expanded
+                        (expanded-type $expanded-t)
+                        `(variable ,$symbol))))
+                  #'body))))))
+
+      ((a-lambda t body)
+        (expand $env #'(a-lambda (_ : t) body)))
+
+      ((a-lambda param params ... body)
+        (expand $env
+          #'(a-lambda param
+            (a-lambda params ... body))))
+
+      ((fn arg)
+        TODO)
+
+      (id
+        (symbol? (datum id))
+        (syntax-error #'id "undefined"))))
 
   (define-rule-syntax (expand-type t)
     (expanded (type 0) '(variable t)))
