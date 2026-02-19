@@ -15,6 +15,7 @@
       (if %if))
     (rename (leo2 term)
       (type %type)
+      (typed %typed)
       (native %native)
       (variable %variable)
       (recursion %recursion)))
@@ -24,6 +25,9 @@
 
   (define-rule-syntax (type n)
     (%type n))
+
+  (define-rule-syntax (typed t v)
+    (%typed t v))
 
   (define-rule-syntax (native x)
     (%native x))
