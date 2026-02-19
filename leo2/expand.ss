@@ -2,9 +2,9 @@
   (export
     expanded expanded? expanded-type expanded-ref
     expand
-    check-expanded=?)
+    check)
   (import
-    (leo2 base)
+    (rename (leo2 base) (check %check))
     (leo2 term)
     (leo2 datum))
 
@@ -20,30 +20,56 @@
 
   (define (expand $env $syntax)
     (syntax-case (syntax->datum/annotation $syntax)
-      (a-type a-boolean a-number a-string a-lambda
-        native lambda)
+      (
+        a-type
+        a-boolean
+        a-number
+        a-char
+        a-string
+        a-lambda
+        native
+        lambda)
 
-      (a-type
-        (expanded (type 1) 'a-type))
-      (a-boolean
-        (expanded (type 0) '(native 'a-boolean)))
+      (a-type (expanded (type 1) 'a-type))
+      (a-boolean (expand-type a-boolean))
+      (a-number (expand-type a-number))
+      (a-char (expand-type a-char))
+      (a-string (expand-type a-string))
+
       (b
         (boolean? (datum b))
-        (expanded (native 'a-boolean) (native (datum b))))
+        (expand-literal a-boolean b))
+      (n
+        (number? (datum n))
+        (expand-literal a-number n))
+      (ch
+        (char? (datum ch))
+        (expand-literal a-char ch))
+      (s
+        (string? (datum s))
+        (expand-literal a-string s))
       ((native t x)
         (expanded
           (evaluate $env #'t)
           (native (datum x))))))
 
-  (define-rule-syntax (check-expanded=? in (_ t v))
-    (lets
-      ($expanded (expand (list) #'in))
-      (check
-        (equal?
-          (expanded
-            (term->datum 0 #f (expanded-type $expanded))
-            (expanded-ref $expanded))
-          (expanded
-            (term->datum 0 #f t)
-            'v)))))
+  (define-rule-syntax (expand-type t)
+    (expanded (type 0) '(variable t)))
+
+  (define-rule-syntax (expand-literal t x)
+    (expanded (native 't) `(native ,(datum x))))
+
+  (define-rules-syntaxes
+    (literals expand expanded)
+    ((check (expand in) (expanded t v))
+      (lets
+        ($expanded (expand (list) #'in))
+        (%check
+          (equal?
+            (expanded
+              (term->datum 0 #t (expanded-type $expanded))
+              (expanded-ref $expanded))
+            (expanded
+              (term->datum 0 #t t)
+              'v))))))
 )

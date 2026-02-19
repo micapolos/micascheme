@@ -8,6 +8,8 @@
 
 (check-reify (native "foo") "foo")
 
+(check-reify (evaluated (native "foo")) "foo")
+
 (check-reify
   (native-application
     (native string-append)

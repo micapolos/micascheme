@@ -1,18 +1,29 @@
 (import
+  (only (leo2 base) quote)
   (leo2 expand)
   (prefix (leo2 comptime) %)
   (prefix (leo2 term) %%))
 
-(check-expanded=?
-  a-type
+(check
+  (expand a-type)
   (expanded (%type 1) a-type))
 
-; (check-expanded=?
-;   a-boolean
-;   (expanded (%type 0) (native 'a-boolean)))
+(check
+  (expand a-boolean)
+  (expanded (%type 0) (variable a-boolean)))
 
-; (check-expanded=?
-;   (native a-boolean #t)
-;   (expanded
-;     (%%native (%quote a-boolean))
-;     (native #t)))
+(check
+  (expand #t)
+  (expanded (%native 'a-boolean) (native #t)))
+
+(check
+  (expand 123)
+  (expanded (%native 'a-number) (native 123)))
+
+(check
+  (expand #\a)
+  (expanded (%native 'a-char) (native #\a)))
+
+(check
+  (expand "foo")
+  (expanded (%native 'a-string) (native "foo")))

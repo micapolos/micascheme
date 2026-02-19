@@ -11,6 +11,8 @@
 
   (define (reify $depth $term)
     (switch-exhaustive $term
+      ((evaluated? $evaluated)
+        (reify $depth (evaluated-ref $evaluated)))
       ((type? $type)
         (case (type-depth $type)
           ((0) `a-type)
