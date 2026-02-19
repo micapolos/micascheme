@@ -7,6 +7,10 @@
 (check-reify (variable 'x) x)
 
 (check-reify
+  (abstraction (lambda (x) (native "foo")))
+  (lambda _ "foo"))
+
+(check-reify
   (abstraction (lambda (x) x))
   (lambda v0 v0))
 
@@ -24,6 +28,16 @@
   (lambda v0 v1 v2 (v0 v1 v2)))
 
 (check-reify
+  (abstraction-type (variable 'a-number) (lambda (x) (variable 'a-string)))
+  (a-lambda a-number a-string))
+
+(check-reify
+  (abstraction-type (variable 'a-number) (lambda (x)
+    (abstraction-type (variable 'a-boolean) (lambda (x)
+      (variable 'a-string)))))
+  (a-lambda a-number a-boolean a-string))
+
+(check-reify
   (abstraction-type (type 0) (lambda (x) (application (native 'list) x)))
   (a-lambda (v0 : a-type) (list v0)))
 
@@ -32,6 +46,10 @@
     (abstraction-type (native 'a-number) (lambda (y)
       (application (application (native 'list) x) y)))))
   (a-lambda (v0 : a-type) (v1 : a-number) (list v0 v1)))
+
+(check-reify
+  (recursion (lambda (fn) (native "foo")))
+  (recursive lambda _ "foo"))
 
 (check-reify
   (recursion (lambda (fn) fn))

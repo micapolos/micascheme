@@ -6,7 +6,8 @@
     (leo2 base)
     (leo2 term)
     (symbol)
-    (leo2 symbol))
+    (leo2 symbol)
+    (leo2 dependent))
 
   (define (reify $depth $term)
     (switch-exhaustive $term
@@ -32,7 +33,8 @@
         (lets
           ($symbol (depth->symbol $depth))
           ($body (abstraction-apply $abstraction (variable $symbol)))
-          `(lambda ,$symbol
+          `(lambda
+            ,(if (abstraction-dependent? $abstraction) $symbol '_)
             ,@(app
               (if (abstraction? $body) cdr list)
               (reify (+ $depth 1) $body)))))
@@ -40,7 +42,8 @@
         (lets
           ($symbol (depth->symbol $depth))
           ($body (recursion-apply $recursion (variable $symbol)))
-          `(recursive lambda ,$symbol
+          `(recursive lambda
+            ,(if (recursion-dependent? $recursion) $symbol '_)
             ,@(app
               (if (abstraction? $body) cdr list)
               (reify (+ $depth 1) $body)))))
@@ -48,9 +51,11 @@
         (lets
           ($symbol (depth->symbol $depth))
           ($body (abstraction-type-apply $abstraction-type (variable $symbol)))
+          ($param (reify $depth (abstraction-type-param $abstraction-type)))
           `(a-lambda
-            (,$symbol :
-              ,(reify $depth (abstraction-type-param $abstraction-type)))
+            ,(if (abstraction-type-dependent? $abstraction-type)
+              `(,$symbol : ,$param)
+              $param)
             ,@(app
               (if (abstraction-type? $body) cdr list)
               (reify (+ $depth 1) $body)))))
