@@ -74,28 +74,28 @@
   (if x y z))
 
 ; TODO: Why they do not work?
-; (check-reify
-;   (binding
-;     (native "foo")
-;     (lambda (x)
-;       (application
-;         (application (variable 'string-append) x)
-;         (native "!"))))
-;   (let
-;     (v0 (native "foo"))
-;     (string-append v0 "!")))
+(check-reify
+  (binding
+    (native "foo")
+    (lambda (x)
+      (application
+        (application (variable 'string-append) x)
+        (native "!"))))
+  (let
+    (v0 "foo")
+    (string-append v0 "!")))
 
-; (check-reify
-;   (binding
-;     (native "foo")
-;     (lambda (x)
-;       (binding
-;         (native "bar")
-;         (lambda (y)
-;           (application
-;             (application (variable 'string-append) x)
-;             y)))))
-;   (let
-;     (v0 (native "foo"))
-;     (v1 (native "bar"))
-;     (string-append v0 v1)))
+(check-reify
+  (binding
+    (native "foo")
+    (lambda (x)
+      (binding
+        (native "bar")
+        (lambda (y)
+          (application
+            (application (variable 'string-append) x)
+            y)))))
+  (let
+    (v0 "foo")
+    (v1 "bar")
+    (string-append v0 v1)))

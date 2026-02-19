@@ -64,7 +64,7 @@
           ($symbol (depth->symbol $depth))
           ($body (binding-apply $binding (variable $symbol)))
           `(let
-            (,$symbol ,(binding-ref $binding))
+            (,$symbol ,(reify $depth (binding-ref $binding)))
             ,@(app
               (if (binding? $body) cdr list)
               (reify (+ $depth 1) $body)))))
