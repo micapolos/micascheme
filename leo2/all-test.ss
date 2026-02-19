@@ -8,4 +8,5 @@
   (leo2 compile)
   (leo2 comptime)
   (leo2 runtime)
+  (leo2 reify)
   (leo2 expand))
