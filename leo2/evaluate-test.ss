@@ -77,41 +77,38 @@
   (evaluated (string-term "foobar")))
 
 (check-evaluates
-  (typed string-type
-    (branch
-      (boolean-term #t)
-      (string-term "true")
-      (number-term 10)))
+  (branch-term
+    (boolean-term #t)
+    (string-term "true")
+    (number-term 10))
   (evaluated (string-term "true")))
 
 (check-evaluates
-  (typed string-type
-    (branch
-      (boolean-term #f)
-      (number-term 10)
-      (string-term "false")))
+  (branch-term
+    (boolean-term #f)
+    (number-term 10)
+    (string-term "false"))
   (evaluated (string-term "false")))
 
 (check-evaluates
-  (typed string-type
-    (branch
-      (variable-term boolean-type 'x)
-      (string-term "foo")
-      (string-term "bar")))
+  (branch-term
+    (variable-term boolean-type 'x)
+    (string-term "foo")
+    (string-term "foo"))
+  (evaluated (string-term "foo")))
+
+(check-evaluates
+  (branch-term
+    (variable-term boolean-type 'x)
+    (string-term "foo")
+    (string-term "bar"))
   (evaluated
-    (typed string-type
+    (typed
+      (branch-type-term (variable-term boolean-type 'x) string-type string-type)
       (branch
         (evaluated (variable-term boolean-type 'x))
         (evaluated (string-term "foo"))
         (evaluated (string-term "bar"))))))
-
-(check-evaluates
-  (typed string-type
-    (branch
-      (variable-term boolean-type 'x)
-      (string-term "foo")
-      (string-term "foo")))
-  (evaluated (string-term "foo")))
 
 ; (check-evaluates
 ;   (recursion
