@@ -202,9 +202,9 @@
         (%check
           (equal?
             (expanded
-              (term->datum 0 #t (expanded-type $expanded))
+              (term->datum #f #t 0 (expanded-type $expanded))
               (expanded-ref $expanded))
             (expanded
-              (term->datum 0 #t t)
+              (term->datum #f #t 0 t)
               'v))))))
 )

@@ -102,6 +102,6 @@
   (define-rule-syntax (check-evaluates in out)
     (check
       (equal?
-        (term->datum 0 #f (evaluate in))
-        (term->datum 0 #f out))))
+        (term->datum #f #f 0 (evaluate in))
+        (term->datum #f #f 0 out))))
 )

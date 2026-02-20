@@ -7,12 +7,12 @@
 
   (define (term=? $depth $term-a $term-b)
     (equal?
-      (term->datum $depth #t $term-a)
-      (term->datum $depth #t $term-b)))
+      (term->datum #t #t $depth $term-a)
+      (term->datum #t #t $depth $term-b)))
 
   (define-rule-syntax (check-term=? in out)
     (check
       (equal?
-        (term->datum 0 #t in)
-        (term->datum 0 #t out))))
+        (term->datum #t #t 0 in)
+        (term->datum #t #t 0 out))))
 )

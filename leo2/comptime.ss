@@ -57,6 +57,6 @@
   (define-rule-syntax (check=? in out)
     (check
       (equal?
-        (term->datum 0 #f in)
-        (term->datum 0 #f out))))
+        (term->datum #f #f 0 in)
+        (term->datum #f #f 0 out))))
 )
