@@ -21,6 +21,7 @@
     abstraction-term
     application-term
     branch-term
+    branch-type-term
     error-term)
 
   (import
@@ -91,8 +92,13 @@
       (abstraction-type-apply (typed-ref (type-of $lhs)) $rhs)
       (application $lhs $rhs)))
 
-  (define (branch-term $type $cond $cons $alt)
-    (typed $type
+  (define (branch-type-term $cond $cons $alt)
+    (typed (type 0)
+      (branch $cond $cons $alt)))
+
+  (define (branch-term $cond $cons $alt)
+    (typed
+      (branch-type-term $cond (type-of $cons) (type-of $alt))
       (branch $cond $cons $alt)))
 
   (define (error-term $type)

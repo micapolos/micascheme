@@ -29,3 +29,14 @@
         (string-term "foo"))
       (string-term "bar")))
   string-type)
+
+(check-term=?
+  (type-of
+    (branch-term
+      (variable-term boolean-type 'a)
+      (variable-term string-type 'b)
+      (variable-term number-type 'c)))
+  (branch-type-term
+    (variable-term boolean-type 'a)
+    string-type
+    number-type))

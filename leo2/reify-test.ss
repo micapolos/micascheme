@@ -97,7 +97,7 @@
 ;    (recursive lambda v0 v1 (v0 v1)))
 
 (check-reify
-  (branch-term string-type
+  (branch-term
     (variable-term boolean-type 'x)
     (variable-term string-type 'y)
     (variable-term string-type 'z))
