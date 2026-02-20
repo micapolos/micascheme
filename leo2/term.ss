@@ -12,6 +12,7 @@
     evaluated evaluated? evaluated-ref
     typed typed? typed-type typed-ref
     labeled labeled? labeled-label labeled-ref
+    unit unit?
 
     type-of
 
@@ -38,6 +39,7 @@
   (data (evaluated ref))
   (data (typed type ref))
   (data (labeled label ref))
+  (data unit)
 
   (define (type-of $term)
     (switch-exhaustive $term
