@@ -16,7 +16,10 @@
 
     abstraction-apply
     abstraction-type-apply
-    recursion-apply)
+    recursion-apply
+
+    binding binding? binding-ref binding-procedure
+    binding-apply)
   (import (leo2 base))
 
   (data (native ref))
@@ -48,4 +51,25 @@
 
   (define (recursion-apply $recursion $arg)
     (app (recursion-procedure $recursion) $arg))
+
+  (define (binding $term $procedure)
+    (application
+      (abstraction $procedure)
+      $term))
+
+  (define (binding? $term)
+    (switch? $term
+      ((application? $application)
+        (abstraction? (application-lhs $application)))))
+
+  (define (binding-procedure $binding)
+    (abstraction-procedure (application-lhs $binding)))
+
+  (define (binding-ref $binding)
+    (application-rhs $binding))
+
+  (define (binding-apply $binding $arg)
+    (app
+      (binding-procedure $binding)
+      $arg))
 )
