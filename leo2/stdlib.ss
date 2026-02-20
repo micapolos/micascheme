@@ -22,12 +22,36 @@
     application-term
     branch-term
     branch-type-term
-    error-term)
+    error-term
+
+    binding binding? binding-ref binding-procedure
+    binding-apply)
 
   (import
     (leo2 base)
     (leo2 term)
     (leo2 type-of))
+
+  (define (binding $term $procedure)
+    (application
+      (abstraction $procedure)
+      $term))
+
+  (define (binding? $term)
+    (switch? $term
+      ((application? $application)
+        (abstraction? (application-lhs $application)))))
+
+  (define (binding-procedure $binding)
+    (abstraction-procedure (application-lhs $binding)))
+
+  (define (binding-ref $binding)
+    (application-rhs $binding))
+
+  (define (binding-apply $binding $arg)
+    (app
+      (binding-procedure $binding)
+      $arg))
 
   (define (type-term $depth)
     (type $depth))
