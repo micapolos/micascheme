@@ -15,6 +15,14 @@
   10)
 
 (check=?
+  (symbolic lucky (native number-type 7))
+  7)
+
+(check=?
+  unit
+  '())
+
+(check=?
   (native-apply #f
     (native #f %string-append)
     (native #f "foo")

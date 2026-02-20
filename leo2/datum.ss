@@ -73,6 +73,11 @@
           ,(term->datum $strip-typed? $strip-evaluated? $depth (branch-condition $branch))
           ,(term->datum $strip-typed? $strip-evaluated? $depth (branch-consequent $branch))
           ,(term->datum $strip-typed? $strip-evaluated? $depth (branch-alternate $branch))))
+      ((symbolic? $symbolic)
+        `(symbolic
+          ,(symbolic-symbol $symbolic)
+          ,(term->datum $strip-typed? $strip-evaluated? $depth (symbolic-ref $symbolic))))
+      ((unit? $unit) '())
       ((else $other)
         $other)))
 

@@ -22,7 +22,13 @@
     application-term
     branch-term
     branch-type-term
-    error-term)
+    error-term
+
+    symbolic-type-term
+    symbolic-term
+
+    unit-type-term
+    unit-term)
 
   (import
     (leo2 base)
@@ -99,6 +105,20 @@
     (typed
       (branch-type-term $cond (type-of $cons) (type-of $alt))
       (branch $cond $cons $alt)))
+
+  (define (symbolic-type-term $symbol $term)
+    (typed (type 0)
+      (symbolic $symbol $term)))
+
+  (define (symbolic-term $symbol $term)
+    (typed
+      (symbolic-type-term $symbol (type-of $term))
+      (symbolic $symbol $term)))
+
+  (define unit-type-term (typed (type 0) unit))
+
+  (define unit-term
+    (typed unit-type-term unit))
 
   (define (error-term $type)
     (typed $type 'error))

@@ -13,6 +13,14 @@
   (%type 0))
 
 (check=?
+  (symbolic lucky (native number-type 7))
+  (symbolic-term 'lucky (number-term 7)))
+
+(check=?
+  unit
+  unit-term)
+
+(check=?
   (native number-type 10)
   (native-term number-type 10))
 
