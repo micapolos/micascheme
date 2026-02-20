@@ -2,7 +2,6 @@
 
 (test
   (leo2 term)
-  (leo2 type-of)
   (leo2 datum)
   (leo2 equal)
   (leo2 dependent)

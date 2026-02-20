@@ -29,8 +29,7 @@
 
   (import
     (leo2 base)
-    (leo2 term)
-    (leo2 type-of))
+    (leo2 term))
 
   (define (binding $term $procedure)
     (application

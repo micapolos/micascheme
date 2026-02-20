@@ -2,8 +2,7 @@
   (leo2 base)
   (leo2 stdlib)
   (leo2 equal)
-  (leo2 term)
-  (leo2 type-of))
+  (leo2 term))
 
 (check
   (binding?

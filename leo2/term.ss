@@ -12,6 +12,8 @@
     evaluated evaluated? evaluated-ref
     typed typed? typed-type typed-ref
 
+    type-of
+
     abstraction-apply
     abstraction-type-apply
     recursion-apply)
@@ -28,6 +30,15 @@
   (data (recursion procedure))
   (data (evaluated ref))
   (data (typed type ref))
+
+  (define (type-of $term)
+    (switch-exhaustive $term
+      ((evaluated? $evaluated)
+        (type-of (evaluated-ref $evaluated)))
+      ((type? $type)
+        (type (+ (type-depth $type) 1)))
+      ((typed? $typed)
+        (typed-type $typed))))
 
   (define (abstraction-apply $abstraction $arg)
     (app (abstraction-procedure $abstraction) $arg))
