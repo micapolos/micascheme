@@ -11,6 +11,7 @@
     recursion recursion? recursion-procedure
     evaluated evaluated? evaluated-ref
     typed typed? typed-type typed-ref
+    labeled labeled? labeled-label labeled-ref
 
     type-of
 
@@ -36,6 +37,7 @@
   (data (recursion procedure))
   (data (evaluated ref))
   (data (typed type ref))
+  (data (labeled label ref))
 
   (define (type-of $term)
     (switch-exhaustive $term
