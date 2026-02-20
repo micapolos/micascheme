@@ -5,11 +5,29 @@
   (import
     (leo2 base)
     (leo2 term)
+    (leo2 stdlib)
     (symbol)
     (leo2 symbol)
     (leo2 dependent))
 
   (define (reify $depth $term)
+    (switch-exhaustive $term
+      ((evaluated? $evaluated)
+        (reify $depth (evaluated-ref $evaluated)))
+      ((type? $type)
+        (case (type-depth $type)
+          ((0) `a-type)
+          (else
+            (symbol-append
+              (reify $depth (type (- (type-depth $type) 1)))
+              `-
+              `type))))
+      ((typed? $typed)
+        (type-reify $depth
+          (typed-type $typed)
+          (typed-ref $typed)))))
+
+  (define (type-reify $depth $type $term)
     (switch-exhaustive $term
       ((evaluated? $evaluated)
         (reify $depth (evaluated-ref $evaluated)))
@@ -27,18 +45,26 @@
         (native-ref $native))
       ((native-application? $native-application)
         `(native-apply
-          ,(reify $depth (native-application-target $native-application))
+          ,(reify $depth $type)
+          ,(native-application-procedure $native-application)
           ,@(map
             (partial reify $depth)
             (native-application-args $native-application))))
       ((abstraction? $abstraction)
         (lets
           ($symbol (depth->symbol $depth))
-          ($body (abstraction-apply $abstraction (variable $symbol)))
+          ($body
+            (abstraction-apply $abstraction
+              (variable-term
+                (abstraction-type-param (typed-ref $type))
+                $symbol)))
           `(lambda
-            ,(if (abstraction-dependent? $abstraction) $symbol '_)
+            (
+              ,(if (abstraction-dependent? $abstraction) $symbol '_)
+              :
+              ,(reify $depth (abstraction-type-param (typed-ref $type))))
             ,@(app
-              (if (abstraction? $body) cdr list)
+              (if (abstraction? (typed-ref $body)) cdr list)
               (reify (+ $depth 1) $body)))))
       ((recursion? $recursion)
         (lets
@@ -47,19 +73,21 @@
           `(recursive lambda
             ,(if (recursion-dependent? $recursion) $symbol '_)
             ,@(app
-              (if (abstraction? $body) cdr list)
+              (if (abstraction? (typed-ref $body)) cdr list)
               (reify (+ $depth 1) $body)))))
       ((abstraction-type? $abstraction-type)
         (lets
           ($symbol (depth->symbol $depth))
-          ($body (abstraction-type-apply $abstraction-type (variable $symbol)))
+          ($body
+            (abstraction-type-apply $abstraction-type
+              (variable-term (abstraction-type-param $abstraction-type) $symbol)))
           ($param (reify $depth (abstraction-type-param $abstraction-type)))
           `(a-lambda
             ,(if (abstraction-type-dependent? $abstraction-type)
               `(,$symbol : ,$param)
               $param)
             ,@(app
-              (if (abstraction-type? $body) cdr list)
+              (if (abstraction-type? (typed-ref $body)) cdr list)
               (reify (+ $depth 1) $body)))))
       ((binding? $binding)
         (lets
@@ -68,14 +96,14 @@
           `(let
             (,$symbol ,(reify $depth (binding-ref $binding)))
             ,@(app
-              (if (binding? $body) cdr list)
+              (if (binding? (typed-ref $body)) cdr list)
               (reify (+ $depth 1) $body)))))
       ((application? $application)
         (lets
           ($lhs (application-lhs $application))
           (append
             (app
-              (if (application? $lhs) identity list)
+              (if (application? (typed-ref $lhs)) identity list)
               (reify $depth $lhs))
             (list (reify $depth (application-rhs $application))))))
       ((branch? $branch)

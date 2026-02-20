@@ -23,27 +23,27 @@
     (import
       (only (leo2 base) quote)))
 
-  (define-rule-syntax (type n) 'erased)
+  (define-rule-syntax (type n) #f)
 
-  (define-rule-syntax (typed t v) v)
+  (define-rule-syntax (typed _ v) v)
 
-  (define-rule-syntax (native x) x)
+  (define-rule-syntax (native _ x) x)
 
-  (define-rule-syntax (native-apply fn arg ...)
+  (define-rule-syntax (native-apply _ fn arg ...)
     (fn arg ...))
 
-  (define-rule-syntax (variable x) x)
+  (define-rule-syntax (variable _ x) x)
 
-  (define-rule-syntax (lambda id body)
+  (define-rule-syntax (lambda (id _) body)
     (%lambda (id) body))
 
   (define-rules-syntax
-    ((a-lambda (id t) body) 'erased))
+    ((a-lambda (id t) body) #f))
 
   (define-rule-syntax (apply lhs rhs)
     (lhs rhs))
 
-  (define-rule-syntax (recursion id body)
+  (define-rule-syntax (recursion id _ body)
     (letrec ((id body)) id))
 
   (define-rule-syntax (if a b c)

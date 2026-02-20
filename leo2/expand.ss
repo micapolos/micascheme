@@ -9,7 +9,8 @@
     (leo2 datum)
     (leo2 symbol)
     (leo2 equal)
-    (leo2 reify))
+    (leo2 reify)
+    (leo2 stdlib))
 
   (data (expanded type ref))
 
@@ -67,7 +68,9 @@
       ((native t x)
         (expanded
           (evaluate $env #'t)
-          `(native ,(datum x))))
+          `(native
+            ,(expanded-ref (expand $env #'t))
+            ,(datum x))))
 
       ((native-lambda id t ... r)
         (lets
@@ -82,21 +85,23 @@
                 ($symbol $symbols)
                 ($t #'(t ...))
                 #`(#,$symbol : #,$t))
-                (native-apply r id #,$symbols)))))
+              (native-apply r id #,@$symbols)))))
 
-      ((native-apply t fn arg ...)
+      ((native-apply t id arg ...)
         (expanded
           (evaluate $env #'t)
           `(native-apply
-            (native ,(datum fn))
+            ,(expanded-ref (expand $env #'t))
+            ,(datum id)
             ,@(map expanded-ref (map (partial expand $env) #'(arg ...))))))
 
       ((lambda (id : t) body)
         (lets
           ($symbol (depth->symbol (length $env)))
           ($param (evaluate $env #'t))
+          ($t (expanded-ref (expand $env #'t)))
           (expanded
-            (abstraction-type
+            (abstraction-type-term
               (evaluate $env #'t)
               (lambda (x)
                 (expanded-type
@@ -106,10 +111,10 @@
                         (datum id)
                         (expanded
                           $param
-                          `(variable ,$symbol))))
+                          `(variable ,$t ,$symbol))))
                     #'body))))
             `(lambda
-              ,$symbol
+              (,$symbol ,$t)
               ,(expanded-ref
                 (expand
                   (push $env
@@ -117,7 +122,7 @@
                       (datum id)
                       (expanded
                         $param
-                        `(variable ,$symbol))))
+                        `(variable ,$t ,$symbol))))
                   #'body))))))
 
       ((lambda param params ... body)
@@ -140,7 +145,7 @@
                       (datum id)
                       (expanded
                         (expanded-type $expanded-t)
-                        `(variable ,$symbol))))
+                        `(variable ,(expanded-ref $expanded-t) ,$symbol))))
                   #'body))))))
 
       ((a-lambda t body)
@@ -182,10 +187,12 @@
         (syntax-error #'id "undefined"))))
 
   (define-rule-syntax (expand-type t)
-    (expanded (type 0) '(variable t)))
+    (expanded (type 0) '(native (type 0) 't)))
 
   (define-rule-syntax (expand-literal t x)
-    (expanded (native 't) `(native ,(datum x))))
+    (expanded
+      (native-type 't)
+      `(native (native (type 0) 't) ,(datum x))))
 
   (define-rules-syntaxes
     (literals expand expanded)

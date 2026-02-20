@@ -9,6 +9,7 @@
     check=?)
   (import
     (leo2 datum)
+    (leo2 stdlib)
     (rename (leo2 base)
       (lambda %lambda)
       (apply %apply)
@@ -29,27 +30,26 @@
   (define-rule-syntax (typed t v)
     (%typed t v))
 
-  (define-rule-syntax (native x)
-    (%native x))
+  (define-rule-syntax (native t x)
+    (native-term t x))
 
-  (define-rule-syntax (native-apply fn arg ...)
-    (native-application fn (list arg ...)))
+  (define-rule-syntax (native-apply t fn arg ...)
+    (native-application-term t fn arg ...))
 
-  (define-rule-syntax (variable x)
-    (%variable 'x))
+  (define-rule-syntax (variable t x)
+    (variable-term t 'x))
 
-  (define-rule-syntax (lambda id body)
-    (abstraction (%lambda (id) body)))
+  (define-rule-syntax (lambda (id t) body)
+    (abstraction-term t (%lambda (id) body)))
 
-  (define-rules-syntax
-    ((a-lambda (id t) body)
-      (abstraction-type t (%lambda (id) body))))
+  (define-rule-syntax (a-lambda (id t) body)
+    (abstraction-type-term t (%lambda (id) body)))
 
   (define-rule-syntax (apply lhs rhs)
-    (application lhs rhs))
+    (application-term lhs rhs))
 
-  (define-rule-syntax (recursion id body)
-    (%recursion (%lambda (id) body)))
+  (define-rule-syntax (recursion id t body)
+    (typed t (%recursion (%lambda (id) body))))
 
   (define-rule-syntax (if a b c)
     (branch a b c))

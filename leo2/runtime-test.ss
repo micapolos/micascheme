@@ -3,59 +3,59 @@
   (leo2 runtime))
 
 (check=?
-  (variable %list)
+  (variable #f %list)
   %list)
 
 (check=?
   (type 0)
-  'erased)
+  #f)
 
 (check=?
-  (native 10)
+  (native #f 10)
   10)
 
 (check=?
-  (native-apply
-    (native %string-append)
-    (native "foo")
-    (native "bar"))
+  (native-apply #f
+    (native #f %string-append)
+    (native #f "foo")
+    (native #f "bar"))
   "foobar")
 
 (check=?
   (apply
     (apply
-      (lambda x
-        (lambda y
-          (native-apply
-            (native %string-append)
+      (lambda (x #f)
+        (lambda (y #f)
+          (native-apply #f
+            (native #f %string-append)
             x
             y)))
-      (native "foo"))
-    (native "bar"))
+      (native #f "foo"))
+    (native #f "bar"))
   "foobar")
 
 (check=?
   (a-lambda (_ (variable a-boolean)) (variable a-string))
-  'erased)
+  #f)
 
 (check=?
   (a-lambda (x a-type) (apply x x))
-  'erased)
+  #f)
 
 (check=?
   (apply
-    (recursion fn
-      (lambda x
-        (if (native-apply (native %zero?) x)
-          (native "Done")
-          (apply fn (native-apply (native %-) x (native 1))))))
-    10)
+    (recursion fn #f
+      (lambda (x #f)
+        (if (native-apply #f (native #f %zero?) x)
+          (native #f "Done")
+          (apply fn (native-apply #f (native #f %-) x (native #f 1))))))
+    (native #f 10))
   "Done")
 
 (check=?
-  (if (native #t) (native "foo") (native "bar"))
+  (if (native #f #t) (native #f "foo") (native #f "bar"))
   "foo")
 
 (check=?
-  (if (native #f) (native "foo") (native "bar"))
+  (if (native #f #f) (native #f "foo") (native #f "bar"))
   "bar")

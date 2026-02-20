@@ -1,56 +1,100 @@
 (library (leo2 stdlib)
   (export
-    native-type
     boolean-type
     fixnum-type
     number-type
     char-type
     string-type
 
-    native-value
-    boolean-value
-    fixnum-type
-    number-value
-    char-value
-    string-value)
+    type-term
+    boolean-term
+    fixnum-term
+    number-term
+    char-term
+    string-term
+
+    native-type
+    native-term
+    variable-term
+    native-application-term
+    abstraction-type-term
+    abstraction-term
+    application-term
+    branch-term
+    error-term)
 
   (import
     (leo2 base)
-    (leo2 term))
+    (leo2 term)
+    (leo2 type-of))
+
+  (define (type-term $depth)
+    (type $depth))
 
   (define (native-type $symbol)
     (typed (type 0) (native $symbol)))
 
-  (define (native-value $type $value)
-    (typed $type (native $value)))
-
   (define boolean-type
-    (native-type 'boolean))
+    (native-type 'a-boolean))
 
   (define fixnum-type
-    (native-type 'fixnum))
+    (native-type 'a-fixnum))
 
   (define number-type
-    (native-type 'number))
+    (native-type 'a-number))
 
   (define char-type
-    (native-type 'char))
+    (native-type 'a-char))
 
   (define string-type
-    (native-type 'string))
+    (native-type 'a-string))
 
-  (define (boolean-value $boolean)
-    (native-value boolean-type $boolean))
+  (define (native-term $type $value)
+    (typed $type (native $value)))
 
-  (define (number-value $number)
-    (native-value number-type $number))
+  (define (boolean-term $boolean)
+    (native-term boolean-type $boolean))
 
-  (define (fixnum-value $fixnum)
-    (native-value fixnum-type $fixnum))
+  (define (number-term $number)
+    (native-term number-type $number))
 
-  (define (char-value $char)
-    (native-value char-type $char))
+  (define (fixnum-term $fixnum)
+    (native-term fixnum-type $fixnum))
 
-  (define (string-value $string)
-    (native-value string-type $string))
+  (define (char-term $char)
+    (native-term char-type $char))
+
+  (define (string-term $string)
+    (native-term string-type $string))
+
+  (define (variable-term $type $symbol)
+    (typed $type (variable $symbol)))
+
+  (define (native-application-term $type $procedure . $args)
+    (typed $type
+      (native-application $procedure $args)))
+
+  (define (abstraction-type-term $param $procedure)
+    (typed
+      (type 0)
+      (abstraction-type $param $procedure)))
+
+  (define (abstraction-term $param $procedure)
+    (typed
+      (abstraction-type-term $param
+        (lambda ($x)
+          (type-of ($procedure $x))))
+      (abstraction $procedure)))
+
+  (define (application-term $lhs $rhs)
+    (typed
+      (abstraction-type-apply (typed-ref (type-of $lhs)) $rhs)
+      (application $lhs $rhs)))
+
+  (define (branch-term $type $cond $cons $alt)
+    (typed $type
+      (branch $cond $cons $alt)))
+
+  (define (error-term $type)
+    (typed $type 'error))
 )

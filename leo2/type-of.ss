@@ -6,8 +6,10 @@
 
   (define (type-of $term)
     (switch-exhaustive $term
+      ((evaluated? $evaluated)
+        (type-of (evaluated-ref $evaluated)))
       ((type? $type)
         (type (+ (type-depth $type) 1)))
-      ((typed? $type)
-        (typed-type $type))))
+      ((typed? $typed)
+        (typed-type $typed))))
 )

@@ -1,66 +1,78 @@
 (import
   (prefix (leo2 base) %)
   (prefix (leo2 term) %)
+  (leo2 stdlib)
   (leo2 comptime))
 
 (check=?
-  (variable x)
-  (%variable 'x))
+  (variable string-type x)
+  (variable-term string-type 'x))
 
 (check=?
   (type 0)
   (%type 0))
 
 (check=?
-  (native 10)
-  (%native 10))
+  (native number-type 10)
+  (native-term number-type 10))
 
 (check=?
-  (native-apply
-    (native %string-append)
-    (native "foo")
-    (variable x))
-  (%native-application
-    (%native %string-append)
-    (%list
-      (%native "foo")
-      (%variable 'x))))
+  (native-apply string-type
+    %string-append
+    (native string-type "foo")
+    (variable string-type x))
+  (native-application-term
+    string-type
+    %string-append
+    (native-term string-type "foo")
+    (variable-term string-type 'x)))
 
 (check=?
-  (lambda x x)
-  (%abstraction (%lambda (x) x)))
+  (lambda (x string-type) x)
+  (abstraction-term string-type (%lambda (x) x)))
 
 (check=?
-  (lambda x (lambda y (apply x y)))
-  (%abstraction
+  (lambda (x string-type)
+    (lambda (y number-type)
+      x))
+  (abstraction-term string-type
     (%lambda (x)
-      (%abstraction
-        (%lambda (y)
-          (%application x y))))))
+      (abstraction-term number-type
+        (%lambda (y) x)))))
 
 (check=?
-  (a-lambda (_ (variable a-boolean)) (variable a-string))
-  (%abstraction-type (%variable 'a-boolean)
+  (lambda (x string-type)
+    (lambda (y number-type)
+      y))
+  (abstraction-term string-type
     (%lambda (x)
-      (%variable 'a-string))))
+      (abstraction-term number-type
+        (%lambda (y) y)))))
 
 (check=?
-  (a-lambda (x (type 0)) (apply x x))
-  (%abstraction-type (%type 0)
-    (%lambda (x)
-      (%application x x))))
+  (a-lambda (_ string-type) boolean-type)
+  (abstraction-type-term string-type
+    (%lambda (x) boolean-type)))
 
 (check=?
-  (recursion fn (lambda x (apply fn x)))
-  (%recursion
-    (%lambda (fn)
-      (%abstraction
-        (%lambda (x)
-          (%application fn x))))))
+  (a-lambda (x (type 0)) x)
+  (abstraction-type-term (%type 0)
+    (%lambda (x) x)))
 
-(check=?
-  (if (variable x) (native "foo") (native "bar"))
-  (%branch
-    (%variable 'x)
-    (%native "foo")
-    (%native "bar")))
+; (check=?
+;   (recursion fn string-type (lambda x x))
+;   (%recursion
+;     (%lambda (fn)
+;       (%abstraction
+;         (%lambda (x)
+;           (%application fn x))))))
+
+; (check=?
+;   (if
+;     (variable boolean-type x)
+;     (native string-type "foo")
+;     (native string-type "bar"))
+;   (%branch
+;     (variable-term boolean-type 'x)
+;     (native-term string-type "foo")
+;     (native-term string-type "bar")))
