@@ -110,7 +110,22 @@
         `(if
           ,(reify $depth (branch-condition $branch))
           ,(reify $depth (branch-consequent $branch))
-          ,(reify $depth (branch-alternate $branch))))))
+          ,(reify $depth (branch-alternate $branch))))
+      ((symbolic? $symbolic)
+        (lets
+          ($term (symbolic-ref $symbolic))
+          `(
+            ,(symbolic-symbol $symbolic) .
+            ,(app
+              (if
+                (and
+                  (typed? $term)
+                  (app (or? symbolic?) (typed-ref $term)))
+                identity
+                list)
+              (reify $depth $term)))))
+      ((unit? $unit)
+        'unit)))
 
   (define-rule-syntax (check-reify in out)
     (check (equal? (reify 0 in) `out)))

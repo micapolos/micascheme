@@ -107,7 +107,8 @@
       (branch $cond $cons $alt)))
 
   (define (symbolic-type-term $symbol $term)
-    (typed (type 0)
+    (typed
+      (type 0)
       (symbolic $symbol $term)))
 
   (define (symbolic-term $symbol $term)

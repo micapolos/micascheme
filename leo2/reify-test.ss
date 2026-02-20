@@ -103,6 +103,30 @@
     (variable-term string-type 'z))
   (if x y z))
 
+(check-reify
+  unit-term
+  unit)
+
+(check-reify
+  (symbolic-term 'lucky (number-term 7))
+  (lucky 7))
+
+(check-reify
+  (symbolic-term 'very
+    (symbolic-term 'lucky
+      (number-term 7)))
+  (very lucky 7))
+
+(check-reify
+  (symbolic-term 'lucky unit-term)
+  (lucky unit))
+
+(check-reify
+  (symbolic-term 'very
+    (symbolic-term 'lucky
+      unit-term))
+  (very lucky unit))
+
 ; ; TODO: Why they do not work?
 ; (check-reify
 ;   (binding
