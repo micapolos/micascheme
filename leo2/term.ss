@@ -22,6 +22,9 @@
     binding-apply)
   (import (leo2 base))
 
+  ; TODO: Remove abstraction-type as it can be represented as abstraction,
+  ; assuming that there'll be param field.
+
   (data (native ref))
   (data (native-application procedure args))
   (data (type depth))
