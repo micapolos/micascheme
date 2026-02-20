@@ -5,7 +5,8 @@
   (import
     (leo2 base)
     (leo2 term)
-    (leo2 datum))
+    (leo2 datum)
+    (leo2 equal))
 
   (define (evaluated-typed-native? $term)
     (switch? $term
@@ -78,17 +79,17 @@
       ((branch? $branch)
         (lets
           ($condition (evaluate (branch-condition $branch)))
+          ($consequent (evaluate (branch-consequent $branch)))
+          ($alternate (evaluate (branch-alternate $branch)))
           (if (evaluated-typed-native? $condition)
-            (evaluate
-              (if (native-ref (typed-ref (evaluated-ref $condition)))
-                (branch-consequent $branch)
-                (branch-alternate $branch)))
-            (evaluated
-              (typed $type
-                (branch
-                  $condition
-                  (branch-consequent $branch)
-                  (branch-alternate $branch)))))))))
+            (if (native-ref (typed-ref (evaluated-ref $condition)))
+              $consequent
+              $alternate)
+            (if (term=? 0 $consequent $alternate)
+              $consequent
+              (evaluated
+                (typed $type
+                  (branch $condition $consequent $alternate)))))))))
 
   (define (term-apply $type $lhs $rhs)
     (switch (typed-ref (evaluated-ref $lhs))

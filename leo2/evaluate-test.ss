@@ -81,14 +81,14 @@
     (branch
       (boolean-term #t)
       (string-term "true")
-      (error-term string-type)))
+      (number-term 10)))
   (evaluated (string-term "true")))
 
 (check-evaluates
   (typed string-type
     (branch
       (boolean-term #f)
-      (error-term string-type)
+      (number-term 10)
       (string-term "false")))
   (evaluated (string-term "false")))
 
@@ -96,14 +96,22 @@
   (typed string-type
     (branch
       (variable-term boolean-type 'x)
-      (error-term string-type)
-      (error-term string-type)))
+      (string-term "foo")
+      (string-term "bar")))
   (evaluated
     (typed string-type
       (branch
         (evaluated (variable-term boolean-type 'x))
-        (error-term string-type)
-        (error-term string-type)))))
+        (evaluated (string-term "foo"))
+        (evaluated (string-term "bar"))))))
+
+(check-evaluates
+  (typed string-type
+    (branch
+      (variable-term boolean-type 'x)
+      (string-term "foo")
+      (string-term "foo")))
+  (evaluated (string-term "foo")))
 
 ; (check-evaluates
 ;   (recursion

@@ -24,11 +24,12 @@
             (type-term->datum $strip-typed? $strip-evaluated? $depth
               (typed-type $typed)
               (typed-ref $typed)))
-          (if $strip-typed? $datum
+          (if $strip-typed?
+            $datum
             `(typed
               ,(term->datum $strip-typed? $strip-evaluated? $depth
                 (typed-type $typed))
-              $datum))))))
+              ,$datum))))))
 
   (define (type-term->datum $strip-typed? $strip-evaluated? $depth $type $term)
     (switch $term
