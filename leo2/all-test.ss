@@ -10,4 +10,5 @@
   (leo2 runtime)
   (leo2 comptime)
   (leo2 reify)
-  (leo2 expand))
+  (leo2 expand)
+  (leo2 code))

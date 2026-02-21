@@ -30,8 +30,10 @@
     code-in-square-brackets
     code-in-angle-brackets
     code-in-curly-brackets
-    code-in-newlines)
-  (import (scheme) (lets) (list) (list-syntax) (procedure) (syntaxes) (syntax) (switch) (fluent))
+    code-in-newlines
+
+    check-code=?)
+  (import (scheme) (check) (lets) (list) (list-syntax) (procedure) (syntaxes) (syntax) (switch) (fluent))
 
   ; (typeof code) => (lambda ($line-start? $indent $port) $line-start?) or #f if empty
 
@@ -143,4 +145,10 @@
       #`(code "{" $code ... "}"))
     ((code-in-newlines $code ...)
       #`(code "\n" $code ... "\n")))
+
+  (define-rule-syntax (check-code=? in out)
+    (check
+      (string=?
+        (code-string in)
+        out)))
 )
