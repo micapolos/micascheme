@@ -18,6 +18,18 @@
   (evaluated (variable-term string-type 'x)))
 
 (check-evaluates
+  (indexed-term 3 (string-term "foo"))
+  (evaluated (indexed-term 3 (evaluated (string-term "foo")))))
+
+(check-evaluates
+  (symbol-term 'thing)
+  (evaluated (symbol-term 'thing)))
+
+(check-evaluates
+  (symbolic-term 'lucky (symbol-term 'number))
+  (evaluated (symbolic-term 'lucky (evaluated (symbol-term 'number)))))
+
+(check-evaluates
   (string-term "foo")
   (evaluated (string-term "foo")))
 

@@ -30,6 +30,20 @@
     (switch-exhaustive $term
       ((variable? $variable)
         (evaluated (typed $type $variable)))
+      ((symbol? $symbol)
+        (evaluated (typed $type $symbol)))
+      ((indexed? $indexed)
+        (evaluated
+          (typed $type
+            (indexed
+              (indexed-index $indexed)
+              (evaluate (indexed-ref $indexed))))))
+      ((symbolic? $symbolic)
+        (evaluated
+          (typed $type
+            (symbolic
+              (symbolic-symbol $symbolic)
+              (evaluate (symbolic-ref $symbolic))))))
       ((native? $native)
         (evaluated (typed $type $term)))
       ((native-application? $native-application)
