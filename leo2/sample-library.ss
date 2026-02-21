@@ -3,7 +3,7 @@
 (this lucky 7)
 
 (this doubly lucky
-  (+
+  (add
     (the lucky number)
     (the lucky number)))
 
@@ -24,17 +24,9 @@
 (this increment
   (with
     (any number)
-    (do (+ (the number) 1))))
+    (do (add (the number) 1))))
 
 (this decrement
   (with
     (any number)
-    (do (- (the number) 1))))
-
-(this add
-  (with
-    (any number)
-    (any number)
-    (do
-      (+ (the number number 1))
-      (+ (the number number 2)))))
+    (do (subtract (the number) 1))))
