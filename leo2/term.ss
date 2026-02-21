@@ -21,7 +21,9 @@
     recursion-apply
 
     binding binding? binding-ref binding-procedure
-    binding-apply)
+    binding-apply
+
+    term-body)
   (import (leo2 base))
 
   ; TODO: Remove abstraction-type as it can be represented as abstraction,
@@ -80,4 +82,11 @@
     (app
       (binding-procedure $binding)
       $arg))
+
+  (define (term-body $term)
+    (switch $term
+      ((evaluated? $evaluated)
+        (term-body (evaluated-ref $evaluated)))
+      ((else $other)
+        $other)))
 )
