@@ -30,16 +30,10 @@
     (import
       (only (leo2 base) quote)))
 
-  (define-rule-syntax (type n)
-    (%type n))
-
-  (define-rule-syntax (typed t v)
-    (%typed t v))
-
-  (define-rule-syntax (native t x)
-    (native-term t x))
-
-  (define-rules-syntax
+  (define-rules-syntaxes
+    ((type n) (%type n))
+    ((typed t v) (%typed t v))
+    ((native t x) (native-term t x))
     ((literal x)
       (boolean? (datum x))
       (boolean-term x))
@@ -51,44 +45,32 @@
       (char-term x))
     ((literal x)
       (string? (datum x))
-      (string-term x)))
-
-  (define-rule-syntax (native-apply t fn arg ...)
-    (native-application-term t fn arg ...))
-
-  (define-rule-syntax (indexed index x)
-    (indexed-term index x))
-
-  (define-rule-syntax (symbol x)
-    (symbol-term 'x))
-
-  (define-rule-syntax (a-symbol x)
-    (symbol-type-term 'x))
-
-  (define-rule-syntax (symbolic symbol x)
-    (symbolic-term 'symbol x))
-
-  (define-rule-syntax (variable t x)
-    (variable-term t 'x))
-
-  (define-rule-syntax (lambda (id t) body)
-    (abstraction-term t (%lambda (id) body)))
-
-  (define-rule-syntax (a-lambda (id t) body)
-    (abstraction-type-term t (%lambda (id) body)))
-
-  (define-rule-syntax (apply lhs rhs)
-    (application-term lhs rhs))
-
-  (define-rule-syntax (recursion id t body)
-    (typed t (%recursion (%lambda (id) body))))
-
-  (define-rule-syntax (if a b c)
-    (branch a b c))
-
-  (define-rule-syntax (check=? in out)
-    (check
-      (equal?
-        (term->datum #f #f 0 in)
-        (term->datum #f #f 0 out))))
+      (string-term x))
+    ((native-apply t fn arg ...)
+      (native-application-term t fn arg ...))
+    ((indexed index x)
+      (indexed-term index x))
+    ((symbol x)
+      (symbol-term 'x))
+    ((a-symbol x)
+      (symbol-type-term 'x))
+    ((symbolic symbol x)
+      (symbolic-term 'symbol x))
+    ((variable t x)
+      (variable-term t 'x))
+    ((lambda (id t) body)
+      (abstraction-term t (%lambda (id) body)))
+    ((a-lambda (id t) body)
+      (abstraction-type-term t (%lambda (id) body)))
+    ((apply lhs rhs)
+      (application-term lhs rhs))
+    ((recursion id t body)
+      (typed t (%recursion (%lambda (id) body))))
+    ((if a b c)
+      (branch a b c))
+    ((check=? in out)
+      (check
+        (equal?
+          (term->datum #f #f 0 in)
+          (term->datum #f #f 0 out)))))
 )
