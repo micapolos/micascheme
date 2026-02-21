@@ -23,12 +23,10 @@
       (and $ass? (cdr $ass?))))
 
   ; TODO: inject $env
-  (define (evaluate $env $syntax)
-    (lets
-      ($expanded (expand $env $syntax))
-      (eval
-        (syntax->datum (expanded-datum $expanded))
-        (environment '(leo2 comptime) '(prefix (micascheme) %)))))
+  (define (evaluate $env $datum)
+    (eval
+      (syntax->datum $datum)
+      (environment '(leo2 comptime) '(prefix (micascheme) %))))
 
   (define (expand $env $syntax)
     (syntax-case (syntax->datum/annotation $syntax)
@@ -109,11 +107,11 @@
               ,(expanded-datum $x)))))
 
       ((native t x)
-        (expanded
-          (evaluate $env #'t)
-          `(native
-            ,(expanded-datum (expand $env #'t))
-            ,(datum x))))
+        (lets
+          ($t-datum (expanded-datum (expand $env #'t)))
+          (expanded
+            (evaluate $env $t-datum)
+            `(native ,$t-datum ,(datum x)))))
 
       ((native-lambda id t ... r)
         (lets
@@ -131,23 +129,27 @@
               (native-apply r id #,@$symbols)))))
 
       ((native-apply t id arg ...)
-        (expanded
-          (evaluate $env #'t)
-          `(native-apply
-            ,(expanded-datum (expand $env #'t))
-            ,(datum id)
-            ,@(map expanded-datum (map (partial expand $env) #'(arg ...))))))
+        (lets
+          ($t-datum (expanded-datum (expand $env #'t)))
+          ($id (datum id))
+          ($arg-datums
+            (map expanded-datum
+              (map (partial expand $env)
+                #'(arg ...))))
+          (expanded
+            (evaluate $env $t-datum)
+            `(native-apply ,$t-datum ,$id ,@$arg-datums))))
 
       ((lambda (id : t) body)
         (lets
           ($id (datum $id))
           ($symbol (depth->symbol (length $env)))
-          ($param-type (evaluate $env #'t))
-          ($t (expanded-datum (expand $env #'t)))
+          ($t-datum (expanded-datum (expand $env #'t)))
+          ($param-type (evaluate $env $t-datum))
           ($body-env
             (env-push $env $id
               (expanded $param-type
-                `(variable ,$t ,$symbol))))
+                `(variable ,$t-datum ,$symbol))))
           (expanded
             (abstraction-type-term $param-type
               (lambda ($arg)
@@ -155,11 +157,11 @@
                   ($body-env
                     (env-push $env $id
                       (expanded $param-type
-                        `(variable ,$t ,$symbol))))
+                        `(variable ,$t-datum ,$symbol))))
                   (expanded-type
                     (expand $body-env #'body)))))
             `(lambda
-              (,$symbol ,$t)
+              (,$symbol ,$t-datum)
               ,(expanded-datum
                 (expand $body-env #'body))))))
 
