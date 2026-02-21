@@ -119,6 +119,7 @@
       (test)
       (throw)
       (top-level)
+      (union)
       (variable)
       (vector)))
 )

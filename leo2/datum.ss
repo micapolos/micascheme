@@ -8,7 +8,7 @@
     (leo2 symbol))
 
   (define (term->datum $strip-typed? $strip-evaluated? $depth $term)
-    (switch-exhaustive $term
+    (term-switch $term
       ((evaluated? $evaluated)
         (if $strip-evaluated?
           (term->datum $strip-typed? $strip-evaluated? $depth
@@ -32,11 +32,12 @@
               ,$datum))))))
 
   (define (type-term->datum $strip-typed? $strip-evaluated? $depth $type $term)
-    (switch $term
-      ((variable? $variable)
-        (variable-symbol $variable))
-      ((type? $type)
-        `(type ,(type-depth $type)))
+    (term-ref-switch $term
+      ((boolean? $boolean) $boolean)
+      ((number? $number) $number)
+      ((char? $char) $char)
+      ((string? $string) $string)
+      ((symbol? $symbol) $symbol)
       ((native? $native)
         `(native
           ,(term->datum $strip-typed? $strip-evaluated? $depth $type)
@@ -49,6 +50,8 @@
             ,@(map
               (partial term->datum $strip-typed? $strip-evaluated? $depth)
               (native-application-args $native-application)))))
+      ((variable? $variable)
+        (variable-symbol $variable))
       ((abstraction? $abstraction)
         `(lambda
           ,(procedure->datum $strip-typed? $strip-evaluated? $depth
@@ -63,28 +66,24 @@
         `(apply
           ,(term->datum $strip-typed? $strip-evaluated? $depth (application-lhs $application))
           ,(term->datum $strip-typed? $strip-evaluated? $depth (application-rhs $application))))
-      ((recursion? $recursion)
-        `(recursive
-          ,(procedure->datum $strip-typed? $strip-evaluated? $depth
-            (recursion-procedure $recursion)
-            (abstraction-type-param (typed-ref $type)))))
       ((branch? $branch)
         `(if
           ,(term->datum $strip-typed? $strip-evaluated? $depth (branch-condition $branch))
           ,(term->datum $strip-typed? $strip-evaluated? $depth (branch-consequent $branch))
           ,(term->datum $strip-typed? $strip-evaluated? $depth (branch-alternate $branch))))
-      ((symbolic? $symbolic)
-        `(symbolic
-          ,(symbolic-symbol $symbolic)
-          ,(term->datum $strip-typed? $strip-evaluated? $depth (symbolic-ref $symbolic))))
+      ((recursion? $recursion)
+        `(recursive
+          ,(procedure->datum $strip-typed? $strip-evaluated? $depth
+            (recursion-procedure $recursion)
+            (abstraction-type-param (typed-ref $type)))))
       ((indexed? $indexed)
         `(indexed
           ,(indexed-index $indexed)
           ,(term->datum $strip-typed? $strip-evaluated? $depth (indexed-ref $indexed))))
-      ((symbol? $symbol)
-        $symbol)
-      ((else $other)
-        $other)))
+      ((symbolic? $symbolic)
+        `(symbolic
+          ,(symbolic-symbol $symbolic)
+          ,(term->datum $strip-typed? $strip-evaluated? $depth (symbolic-ref $symbolic))))))
 
   (define (procedure->datum $strip-datum? $strip-evaluated? $depth $procedure $type)
     (lets

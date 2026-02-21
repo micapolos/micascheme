@@ -14,6 +14,9 @@
     symbolic symbolic? symbolic-symbol symbolic-ref
     indexed indexed? indexed-index indexed-ref
 
+    term? term-switch
+    term-ref? term-ref-switch
+
     type-of
 
     abstraction-apply
@@ -29,20 +32,40 @@
   ; TODO: Remove abstraction-type as it can be represented as abstraction,
   ; assuming that there'll be param field.
 
+  (data (evaluated ref))
+  (data (type depth))
+  (data (typed type ref))
+
+  (union (term evaluated type typed))
+
   (data (native ref))
   (data (native-application procedure args))
-  (data (type depth))
   (data (variable symbol))
   (data (abstraction procedure))
   (data (abstraction-type param procedure))
   (data (application lhs rhs))
   (data (branch condition consequent alternate))
   (data (recursion procedure))
-  (data (evaluated ref))
-  (data (typed type ref))
   (data (symbolic symbol ref))
   (data (indexed index ref))
-  ; ... and symbol
+
+  (union
+    (term-ref
+      boolean
+      number
+      char
+      string
+      symbol
+      native
+      native-application
+      variable
+      abstraction
+      abstraction-type
+      application
+      branch
+      recursion
+      indexed
+      symbolic))
 
   (define (type-of $term)
     (switch-exhaustive $term

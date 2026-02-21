@@ -110,6 +110,7 @@
   (typed-scheme all)
   (typico all)
   (u)
+  (union)
   (verilog all)
   (vm all)
   (zasm all)
