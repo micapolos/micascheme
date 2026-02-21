@@ -5,4 +5,5 @@
     (import
       (except (micascheme)
         compile
-        expand))))
+        expand
+        indexed indexed? indexed-index indexed-value))))

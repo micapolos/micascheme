@@ -15,8 +15,12 @@
   10)
 
 (check=?
+  (indexed 6 (symbol thing))
+  #f)
+
+(check=?
   (symbol thing)
-  'thing)
+  #f)
 
 (check=?
   (symbolic lucky (native number-type 7))

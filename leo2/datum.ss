@@ -77,6 +77,10 @@
         `(symbolic
           ,(symbolic-symbol $symbolic)
           ,(term->datum $strip-typed? $strip-evaluated? $depth (symbolic-ref $symbolic))))
+      ((indexed? $indexed)
+        `(indexed
+          ,(indexed-index $indexed)
+          ,(term->datum $strip-typed? $strip-evaluated? $depth (indexed-ref $indexed))))
       ((symbol? $symbol)
         $symbol)
       ((else $other)

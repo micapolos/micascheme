@@ -111,6 +111,11 @@
           ,(reify $depth (branch-condition $branch))
           ,(reify $depth (branch-consequent $branch))
           ,(reify $depth (branch-alternate $branch))))
+      ((indexed? $indexed)
+        `(
+          ,(reify $depth (indexed-ref $indexed))
+          number
+          ,(+ (indexed-index $indexed) 1)))
       ((symbolic? $symbolic)
         (lets
           ($term (symbolic-ref $symbolic))

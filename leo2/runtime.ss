@@ -2,7 +2,7 @@
   (export
     type
     native native-apply
-    symbolic symbol
+    indexed symbolic symbol
     variable
     lambda a-lambda
     apply recursion
@@ -15,6 +15,7 @@
       (apply %apply)
       (if %if))
     (rename (leo2 term)
+      (indexed %indexed)
       (symbolic %symbolic)
       (type %type)
       (typed %typed)
@@ -29,7 +30,9 @@
 
   (define-rule-syntax (typed _ v) v)
 
-  (define-rule-syntax (symbol x) 'x)
+  (define-rule-syntax (symbol x) #f)
+
+  (define-rule-syntax (indexed index x) x)
 
   (define-rule-syntax (symbolic symbol x) x)
 

@@ -27,6 +27,9 @@
     symbolic-type-term
     symbolic-term
 
+    indexed-type-term
+    indexed-term
+
     symbol-type-term
     symbol-term)
 
@@ -123,6 +126,16 @@
     (typed
       (symbolic-type-term $symbol (type-of $term))
       (symbolic $symbol $term)))
+
+  (define (indexed-type-term $index $term)
+    (typed
+      (type 0)
+      (indexed $index $term)))
+
+  (define (indexed-term $index $term)
+    (typed
+      (indexed-type-term $index (type-of $term))
+      (indexed $index $term)))
 
   (define (error-term $type)
     (typed $type 'error))

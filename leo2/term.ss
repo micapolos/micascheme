@@ -12,6 +12,7 @@
     evaluated evaluated? evaluated-ref
     typed typed? typed-type typed-ref
     symbolic symbolic? symbolic-symbol symbolic-ref
+    indexed indexed? indexed-index indexed-ref
 
     type-of
 
@@ -38,6 +39,7 @@
   (data (evaluated ref))
   (data (typed type ref))
   (data (symbolic symbol ref))
+  (data (indexed index ref))
   ; ... and symbol
 
   (define (type-of $term)

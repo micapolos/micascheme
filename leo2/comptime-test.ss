@@ -13,6 +13,10 @@
   (%type 0))
 
 (check=?
+  (indexed 6 (symbol car))
+  (indexed-term 6 (symbol-term 'car)))
+
+(check=?
   (symbol thing)
   (symbol-term 'thing))
 

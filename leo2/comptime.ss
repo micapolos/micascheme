@@ -2,6 +2,7 @@
   (export
     type
     native native-apply
+    indexed
     symbolic symbol
     variable
     lambda a-lambda
@@ -17,6 +18,7 @@
       (if %if))
     (rename (leo2 term)
       (type %type)
+      (indexed %indexed)
       (symbolic %symbolic)
       (typed %typed)
       (native %native)
@@ -37,6 +39,9 @@
 
   (define-rule-syntax (native-apply t fn arg ...)
     (native-application-term t fn arg ...))
+
+  (define-rule-syntax (indexed index x)
+    (indexed-term index x))
 
   (define-rule-syntax (symbol x)
     (symbol-term 'x))

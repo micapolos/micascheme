@@ -16,5 +16,9 @@
   (symbolic pretty number))
 
 (check-term->datum=?
+  (indexed-term 10 (symbol-term 'thing))
+  (indexed 10 thing))
+
+(check-term->datum=?
   (symbol-term 'thing)
   thing)
