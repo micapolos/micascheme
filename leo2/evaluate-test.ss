@@ -58,7 +58,7 @@
   (abstraction-term string-type
     (lambda ($x) $x))
   (evaluated
-    (abstraction-term string-type
+    (abstraction-term (evaluate string-type)
       (lambda ($x) (evaluated $x)))))
 
 (check-evaluates

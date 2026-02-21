@@ -6,7 +6,8 @@
     (leo2 base)
     (leo2 term)
     (leo2 datum)
-    (leo2 equal))
+    (leo2 equal)
+    (leo2 stdlib))
 
   (define (evaluated-typed-native? $term)
     (switch? $term
@@ -67,14 +68,13 @@
         (evaluated (typed $type $variable)))
       ((abstraction? $abstraction)
         (evaluated
-          (typed $type
-            (abstraction
-              (abstraction-param $abstraction) ; TODO: it should be evaluated!!!
-              (lambda ($arg)
-                (evaluate
-                  (app
-                    (abstraction-procedure $abstraction)
-                    $arg)))))))
+          (abstraction-term
+            (evaluate (abstraction-param $abstraction))
+            (lambda ($arg)
+              (evaluate
+                (app
+                  (abstraction-procedure $abstraction)
+                  $arg))))))
       ((abstraction-type? $abstraction-type)
         (evaluated
           (typed $type
