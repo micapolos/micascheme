@@ -1,4 +1,4 @@
-(this exclamation "!")
+(this stop "!")
 (this separator ", ")
 (this lucky 7)
 
@@ -15,9 +15,11 @@
         "Hello"
         (the separator string)
         (the string)
-        (the exclamation string)))))
+        (the stop string (default "!"))))))
 
 (this hello world (greet "world"))
+
+(this hello hell (greet "hell" (stop "?")))
 
 (this increment
   (with
