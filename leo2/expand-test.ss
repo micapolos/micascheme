@@ -91,12 +91,12 @@
 ;       (variable (native (type 0) 'a-number) v0))))
 
 ; (check
-;   (expand (lambda (x : a-number) "foo"))
+;   (expand (lambda (x : number) "foo"))
 ;   (expanded
 ;     (%a-lambda (x number-type) string-type)
 ;     (lambda
-;       (v0 (native (type 0) 'a-number))
-;       (native (native (type 0) 'a-string) "foo"))))
+;       (v0 (symbol number))
+;       (literal "foo"))))
 
 ; (check
 ;   (expand (lambda (x : a-number) x))

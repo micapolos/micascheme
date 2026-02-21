@@ -14,6 +14,9 @@
 
   (data (expanded type ref))
 
+  (define (env-push $env $id $expanded)
+    (push $env (cons $id $expanded)))
+
   (define (env-ref? $env $id)
     (lets
       ($ass? (assq (syntax->datum $id) $env))
@@ -44,8 +47,18 @@
         :)
 
       (s
-        (env-ref? $env (datum s))
+        (and (symbol? (datum s)) (env-ref? $env (datum s)))
         (env-ref? $env (datum s)))
+
+      (idx
+        (and
+          (symbol? (datum idx))
+          (symbol->index? (datum idx)))
+        (list-ref $env
+          (-
+            (length $env)
+            (symbol->index? (datum idx))
+            1)))
 
       (type (expanded (type 1) 'type))
 
@@ -112,33 +125,26 @@
 
       ((lambda (id : t) body)
         (lets
+          ($id (datum $id))
           ($symbol (depth->symbol (length $env)))
           ($param (evaluate $env #'t))
           ($t (expanded-ref (expand $env #'t)))
+          ($body-env
+            (env-push $env $id
+              (expanded $param `(variable ,$t ,$symbol))))
           (expanded
-            (abstraction-type-term
-              (evaluate $env #'t)
-              (lambda (x)
-                (expanded-type
-                  (expand
-                    (push $env
-                      (cons
-                        (datum id)
-                        (expanded
-                          $param
-                          `(variable ,$t ,$symbol))))
-                    #'body))))
+            (abstraction-type-term $param
+              (lambda ($param)
+                (lets
+                  ($body-env
+                    (env-push $env $id
+                      (expanded $param `(variable ,$t ,$symbol))))
+                  (expanded-type
+                    (expand $body-env #'body)))))
             `(lambda
               (,$symbol ,$t)
               ,(expanded-ref
-                (expand
-                  (push $env
-                    (cons
-                      (datum id)
-                      (expanded
-                        $param
-                        `(variable ,$t ,$symbol))))
-                  #'body))))))
+                (expand $body-env #'body))))))
 
       ((lambda param params ... body)
         (expand $env
