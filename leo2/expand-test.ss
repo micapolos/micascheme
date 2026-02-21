@@ -27,11 +27,11 @@
   (expand string)
   (expanded (type-term 0) (symbol string)))
 
-; (check
-;   (expand #t)
-;   (expanded
-;     boolean-type
-;     (native (native (type 0) 'a-boolean) #t)))
+(check
+  (expand #t)
+  (expanded
+    boolean-type
+    (native (a-symbol boolean) #t)))
 
 ; (check
 ;   (expand 123)

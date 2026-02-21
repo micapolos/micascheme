@@ -55,13 +55,19 @@
 
       (b
         (boolean? (datum b))
-        (expand-literal a-boolean b))
+        (expanded
+          boolean-type
+          `(native (a-symbol boolean) ,(datum b))))
       (n
         (number? (datum n))
-        (expand-literal a-number n))
+        (expanded
+          number-type
+          `(native (a-symbol number) ,(datum n))))
       (ch
         (char? (datum ch))
-        (expand-literal a-char ch))
+        (expanded
+          char-type
+          `(native (a-symbol char) ,(datum ch))))
       (s
         (string? (datum s))
         (expanded
