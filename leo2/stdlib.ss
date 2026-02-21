@@ -1,14 +1,12 @@
 (library (leo2 stdlib)
   (export
     boolean-type
-    fixnum-type
     number-type
     char-type
     string-type
 
     type-term
     boolean-term
-    fixnum-term
     number-term
     char-term
     string-term
@@ -52,16 +50,13 @@
     (symbol-term $symbol))
 
   (define boolean-type
-    (native-type 'a-boolean))
-
-  (define fixnum-type
-    (native-type 'a-fixnum))
+    (symbol-type-term 'boolean))
 
   (define number-type
-    (native-type 'a-number))
+    (symbol-type-term 'number))
 
   (define char-type
-    (native-type 'a-char))
+    (symbol-type-term 'char))
 
   (define string-type
     (symbol-type-term 'string))
@@ -74,9 +69,6 @@
 
   (define (number-term $number)
     (native-term number-type $number))
-
-  (define (fixnum-term $fixnum)
-    (native-term fixnum-type $fixnum))
 
   (define (char-term $char)
     (native-term char-type $char))

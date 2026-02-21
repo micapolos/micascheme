@@ -55,14 +55,14 @@
 (check-reify
   (abstraction-type-term number-type
     (lambda (x) string-type))
-  (a-lambda a-number string))
+  (a-lambda number string))
 
 (check-reify
   (abstraction-type-term number-type
     (lambda (x)
       (abstraction-type-term boolean-type
         (lambda (x) string-type))))
-  (a-lambda a-number a-boolean string))
+  (a-lambda number boolean string))
 
 (check-reify
   (abstraction-type-term (type 0)
@@ -79,7 +79,7 @@
           (native-application-term (type 0) list x y)))))
   (a-lambda
     (v0 : a-type)
-    (v1 : a-number)
+    (v1 : number)
     (native-apply a-type ,list v0 v1)))
 
 ; (check-reify
