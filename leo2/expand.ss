@@ -154,16 +154,9 @@
           (expanded
             (abstraction-type-term $param-type
               (lambda ($arg)
-                (lets
-                  ($body-env
-                    (env-push $env $id
-                      (expanded $param-type
-                        `(variable ,$t-datum ,$symbol))))
-                  (expanded-type
-                    (expand $body-env #'body)))))
-            `(lambda
-              (,$symbol ,$t-datum)
-              ,$body-datum))))
+                (expanded-type
+                  (expand $body-env #'body))))
+            `(lambda (,$symbol ,$t-datum) ,$body-datum))))
 
       ((lambda param params ... body)
         (expand $env
