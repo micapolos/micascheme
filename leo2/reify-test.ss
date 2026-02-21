@@ -4,9 +4,9 @@
   (leo2 stdlib)
   (leo2 reify))
 
-(check-reify (type 0) a-type)
-(check-reify (type 1) a-type-type)
-(check-reify (type 2) a-type-type-type)
+(check-reify (type 0) kind)
+(check-reify (type 1) kind-of-kind)
+(check-reify (type 2) kind-of-kind-of-kind)
 
 (check-reify (variable-term string-type 'x) x)
 
@@ -68,8 +68,8 @@
   (abstraction-type-term (type 0)
     (lambda (x)
       (native-application-term (type 0) list x)))
-  (a-lambda (v0 : a-type)
-    (native-apply a-type ,list v0)))
+  (a-lambda (v0 : kind)
+    (native-apply kind ,list v0)))
 
 (check-reify
   (abstraction-type-term (type 0)
@@ -78,9 +78,9 @@
         (lambda (y)
           (native-application-term (type 0) list x y)))))
   (a-lambda
-    (v0 : a-type)
+    (v0 : kind)
     (v1 : number)
-    (native-apply a-type ,list v0 v1)))
+    (native-apply kind ,list v0 v1)))
 
 ; (check-reify
 ;   (recursion (lambda (fn) (native "foo")))

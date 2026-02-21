@@ -16,12 +16,12 @@
         (reify $depth (evaluated-ref $evaluated)))
       ((type? $type)
         (case (type-depth $type)
-          ((0) `a-type)
+          ((0) `kind)
           (else
             (symbol-append
               (reify $depth (type (- (type-depth $type) 1)))
               `-
-              `type))))
+              `of-kind))))
       ((typed? $typed)
         (type-reify $depth
           (typed-type $typed)
