@@ -38,6 +38,7 @@
   (data (evaluated ref))
   (data (typed type ref))
   (data (symbolic symbol ref))
+  ; ... and symbol
 
   (define (type-of $term)
     (switch-exhaustive $term
