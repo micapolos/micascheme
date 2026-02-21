@@ -1,6 +1,7 @@
 (import (micascheme))
 
 (test
+  (leo2 symbol)
   (leo2 term)
   (leo2 datum)
   (leo2 equal)

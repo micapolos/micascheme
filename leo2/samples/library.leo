@@ -17,11 +17,9 @@ greet
         the string
         the stop string (default "!")
 
-hello world, as string
-  greet "world"
+hello world (as string) greet "world"
 
-this hello hell,
-  as string
+this hello hell (as string)
   greet "hell" (stop "?")
 
 increment

@@ -67,9 +67,12 @@
         (string? (datum s))
         (expanded string-type `(literal ,(datum s))))
 
-      ((x at n)
+      ((x n)
+        (and
+          (symbol? (datum n))
+          (symbol->index? (datum n)))
         (lets
-          ($index (- (datum n) 1))
+          ($index (symbol->index? (datum n)))
           ($x (expand $env #'x))
           (expanded
             (indexed-type-term $index (expanded-type $x))

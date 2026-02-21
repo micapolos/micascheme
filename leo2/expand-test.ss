@@ -44,7 +44,7 @@
   (expanded string-type (literal "foo")))
 
 (check
-  (expand ("foo" at 3))
+  (expand ("foo" $3))
   (expanded
     (indexed-type-term 2 string-type)
     (indexed 2 (literal "foo"))))

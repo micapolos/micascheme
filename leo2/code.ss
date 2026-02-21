@@ -92,12 +92,14 @@
   ;         (code ", ")
   ;         (map line-element->code $pair)))))
 
-  ; (define (script-element->code $script-element)
-  ;   (switch-exhaustive $script-element
-  ;     ((atom? $atom)
-  ;       (atom->code $atom))
-  ;     ((pair? $pair)
-  ;       (phrase->code $pair))))
+  (define (script-element->code? $max $script-element)
+    (and
+      (positive? $max)
+      (switch-exhaustive $script-element
+        ((atom? $atom)
+          (atom->code $atom))
+        ((pair? $pair)
+          (phrase->code $pair)))))
 
   ; (define (leo->code $x)
   ;   (switch $x
