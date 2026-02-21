@@ -1,6 +1,6 @@
 (library (leo2 expand)
   (export
-    expanded expanded? expanded-type expanded-ref
+    expanded expanded? expanded-type expanded-datum
     expand
     check)
   (import
@@ -12,7 +12,7 @@
     (leo2 reify)
     (leo2 stdlib))
 
-  (data (expanded type ref))
+  (data (expanded type datum))
 
   (define (env-push $env $id $expanded)
     (push $env (cons $id $expanded)))
@@ -27,7 +27,7 @@
     (lets
       ($expanded (expand $env $syntax))
       (eval
-        (syntax->datum (expanded-ref $expanded))
+        (syntax->datum (expanded-datum $expanded))
         (environment '(leo2 comptime) '(prefix (micascheme) %)))))
 
   (define (expand $env $syntax)
@@ -106,13 +106,13 @@
             (indexed-type-term $index (expanded-type $x))
             `(indexed
               ,$index
-              ,(expanded-ref $x)))))
+              ,(expanded-datum $x)))))
 
       ((native t x)
         (expanded
           (evaluate $env #'t)
           `(native
-            ,(expanded-ref (expand $env #'t))
+            ,(expanded-datum (expand $env #'t))
             ,(datum x))))
 
       ((native-lambda id t ... r)
@@ -134,16 +134,16 @@
         (expanded
           (evaluate $env #'t)
           `(native-apply
-            ,(expanded-ref (expand $env #'t))
+            ,(expanded-datum (expand $env #'t))
             ,(datum id)
-            ,@(map expanded-ref (map (partial expand $env) #'(arg ...))))))
+            ,@(map expanded-datum (map (partial expand $env) #'(arg ...))))))
 
       ((lambda (id : t) body)
         (lets
           ($id (datum $id))
           ($symbol (depth->symbol (length $env)))
           ($param-type (evaluate $env #'t))
-          ($t (expanded-ref (expand $env #'t)))
+          ($t (expanded-datum (expand $env #'t)))
           ($body-env
             (env-push $env $id
               (expanded $param-type
@@ -160,7 +160,7 @@
                     (expand $body-env #'body)))))
             `(lambda
               (,$symbol ,$t)
-              ,(expanded-ref
+              ,(expanded-datum
                 (expand $body-env #'body))))))
 
       ((lambda param params ... body)
@@ -175,15 +175,15 @@
           (expanded
             (type 0)
             `(a-lambda
-              (,$symbol ,(expanded-ref $expanded-t))
-              ,(expanded-ref
+              (,$symbol ,(expanded-datum $expanded-t))
+              ,(expanded-datum
                 (expand
                   (push $env
                     (cons
                       (datum id)
                       (expanded
                         (expanded-type $expanded-t)
-                        `(variable ,(expanded-ref $expanded-t) ,$symbol))))
+                        `(variable ,(expanded-datum $expanded-t) ,$symbol))))
                   #'body))))))
 
       ((a-lambda t body)
@@ -207,8 +207,8 @@
                 (if
                   (term=? $depth $expected-type $actual-type)
                   `(
-                    ,(expanded-ref $fn)
-                    ,(expanded-ref $arg))
+                    ,(expanded-datum $fn)
+                    ,(expanded-datum $arg))
                   (syntax-error #'arg
                     (format "expected ~a, got ~a, in "
                       (reify $depth $expected-type)
@@ -233,7 +233,7 @@
           (equal?
             (expanded
               (term->datum #f #t 0 (expanded-type $expanded))
-              (expanded-ref $expanded))
+              (expanded-datum $expanded))
             (expanded
               (term->datum #f #t 0 t)
               'v))))))
