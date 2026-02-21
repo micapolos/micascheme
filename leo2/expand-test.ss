@@ -6,34 +6,22 @@
   (leo2 stdlib))
 
 (check
-  (expand a-type)
+  (expand type)
   (expanded
     (type-term 1)
-    a-type))
+    type))
 
 (check
-  (expand a-boolean)
-  (expanded
-    (type-term 0)
-    (native (type 0) 'a-boolean)))
+  (expand boolean)
+  (expanded (type-term 0) (symbol boolean)))
 
 (check
-  (expand a-number)
-  (expanded
-    (type-term 0)
-    (native (type 0) 'a-number)))
+  (expand number)
+  (expanded (type-term 0) (symbol number)))
 
 (check
-  (expand a-char)
-  (expanded
-    (type-term 0)
-    (native (type 0) 'a-char)))
-
-(check
-  (expand a-string)
-  (expanded
-    (type-term 0)
-    (native (type 0) 'a-string)))
+  (expand char)
+  (expanded (type-term 0) (symbol char)))
 
 (check
   (expand string)

@@ -30,11 +30,10 @@
   (define (expand $env $syntax)
     (syntax-case (syntax->datum/annotation $syntax)
       (
-        a-type
-        a-boolean
-        a-number
-        a-char
-        a-string
+        type
+        boolean
+        number
+        char
         string
         a-lambda
         native
@@ -48,12 +47,10 @@
         (env-ref? $env (datum s))
         (env-ref? $env (datum s)))
 
-      (a-type (expanded (type 1) 'a-type))
-      (a-boolean (expand-type a-boolean))
-      (a-number (expand-type a-number))
-      (a-char (expand-type a-char))
-      (a-string (expand-type a-string))
-
+      (type (expanded (type 1) 'type))
+      (boolean (expanded (type 0) '(symbol boolean)))
+      (number (expanded (type 0) '(symbol number)))
+      (char (expanded (type 0) '(symbol char)))
       (string (expanded (type 0) '(symbol string)))
 
       (b
