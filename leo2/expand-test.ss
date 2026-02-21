@@ -13,19 +13,27 @@
 
 (check
   (expand boolean)
-  (expanded (type-term 0) (symbol boolean)))
+  (expanded
+    (symbol-type-term 'boolean)
+    (symbol boolean)))
 
 (check
   (expand number)
-  (expanded (type-term 0) (symbol number)))
+  (expanded
+    (symbol-type-term 'number)
+    (symbol number)))
 
 (check
   (expand char)
-  (expanded (type-term 0) (symbol char)))
+  (expanded
+    (symbol-type-term 'char)
+    (symbol char)))
 
 (check
   (expand string)
-  (expanded (type-term 0) (symbol string)))
+  (expanded
+    (symbol-type-term 'string)
+    (symbol string)))
 
 (check
   (expand #t)
@@ -90,13 +98,13 @@
 ;       (v0 (native (type 0) 'a-number))
 ;       (variable (native (type 0) 'a-number) v0))))
 
-; (check
-;   (expand (lambda (x : number) "foo"))
-;   (expanded
-;     (%a-lambda (x number-type) string-type)
-;     (lambda
-;       (v0 (symbol number))
-;       (literal "foo"))))
+(check
+  (expand (lambda (x : number) "foo"))
+  (expanded
+    (%a-lambda (x number-type) string-type)
+    (lambda
+      (v0 (symbol number))
+      (literal "foo"))))
 
 ; (check
 ;   (expand (lambda (x : a-number) x))

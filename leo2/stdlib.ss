@@ -50,16 +50,16 @@
     (symbol-term $symbol))
 
   (define boolean-type
-    (symbol-type-term 'boolean))
+    (symbol-term 'boolean))
 
   (define number-type
-    (symbol-type-term 'number))
+    (symbol-term 'number))
 
   (define char-type
-    (symbol-type-term 'char))
+    (symbol-term 'char))
 
   (define string-type
-    (symbol-type-term 'string))
+    (symbol-term 'string))
 
   (define (native-term $type $value)
     (typed $type (native $value)))

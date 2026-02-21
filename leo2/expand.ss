@@ -62,10 +62,25 @@
 
       (type (expanded (type 1) 'type))
 
-      (boolean (expanded (type 0) '(symbol boolean)))
-      (number (expanded (type 0) '(symbol number)))
-      (char (expanded (type 0) '(symbol char)))
-      (string (expanded (type 0) '(symbol string)))
+      (boolean
+        (expanded
+          (symbol-type-term 'boolean)
+          '(symbol boolean)))
+
+      (number
+        (expanded
+          (symbol-type-term 'number)
+          '(symbol number)))
+
+      (char
+        (expanded
+          (symbol-type-term 'char)
+          '(symbol char)))
+
+      (string
+        (expanded
+          (symbol-type-term 'string)
+          '(symbol string)))
 
       (b
         (boolean? (datum b))
@@ -127,18 +142,20 @@
         (lets
           ($id (datum $id))
           ($symbol (depth->symbol (length $env)))
-          ($param (evaluate $env #'t))
+          ($param-type (evaluate $env #'t))
           ($t (expanded-ref (expand $env #'t)))
           ($body-env
             (env-push $env $id
-              (expanded $param `(variable ,$t ,$symbol))))
+              (expanded $param-type
+                `(variable ,$t ,$symbol))))
           (expanded
-            (abstraction-type-term $param
-              (lambda ($param)
+            (abstraction-type-term $param-type
+              (lambda ($arg)
                 (lets
                   ($body-env
                     (env-push $env $id
-                      (expanded $param `(variable ,$t ,$symbol))))
+                      (expanded $param-type
+                        `(variable ,$t ,$symbol))))
                   (expanded-type
                     (expand $body-env #'body)))))
             `(lambda
