@@ -59,11 +59,11 @@
     string-type
     (native (native (type 0) 'a-string) "foo")))
 
-; (check
-;   (expand ("foo" number 3))
-;   (expanded
-;     (indexed-type-term 2 (string-term "foo"))
-;     (indexed 2 (native (native (type 0) 'a-string) "foo"))))
+(check
+  (expand ("foo" number 3))
+  (expanded
+    (indexed-type-term 2 string-type)
+    (indexed 2 (native (native (type 0) 'a-string) "foo"))))
 
 (check
   (expand (native a-string (string-append "foo" "bar")))

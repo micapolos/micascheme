@@ -69,7 +69,7 @@
       ((x number n)
         (lets
           ($index (- (datum n) 1))
-          ($x (expanded $env #'x))
+          ($x (expand $env #'x))
           (expanded
             (indexed-type-term $index (expanded-type $x))
             `(indexed
