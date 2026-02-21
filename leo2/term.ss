@@ -4,7 +4,7 @@
     native-application native-application? native-application-procedure native-application-args
     type type? type-depth
     variable variable? variable-symbol
-    abstraction abstraction? abstraction-procedure
+    abstraction abstraction? abstraction-param abstraction-procedure
     abstraction-type abstraction-type? abstraction-type-param abstraction-type-procedure
     application application? application-lhs application-rhs
     branch branch? branch-condition branch-consequent branch-alternate
@@ -41,7 +41,7 @@
   (data (native ref))
   (data (native-application procedure args))
   (data (variable symbol))
-  (data (abstraction procedure))
+  (data (abstraction param procedure))
   (data (abstraction-type param procedure))
   (data (application lhs rhs))
   (data (branch condition consequent alternate))
@@ -87,7 +87,7 @@
 
   (define (binding $term $procedure)
     (application
-      (abstraction $procedure)
+      (abstraction (type-of $term) $procedure)
       $term))
 
   (define (binding? $term)

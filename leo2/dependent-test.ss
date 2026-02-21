@@ -6,12 +6,14 @@
 
 (check
   (abstraction-dependent?
-    (abstraction (lambda (x) x))))
+    (abstraction string-type
+      (lambda (x) x))))
 
 (check
   (not
     (abstraction-dependent?
-      (abstraction (lambda (x) (number-term 1))))))
+      (abstraction string-type
+        (lambda (x) (number-term 1))))))
 
 (check
   (abstraction-type-dependent?

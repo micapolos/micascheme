@@ -93,7 +93,7 @@
       (abstraction-type-term $param
         (lambda ($x)
           (type-of ($procedure $x))))
-      (abstraction $procedure)))
+      (abstraction $param $procedure)))
 
   (define (application-term $lhs $rhs)
     (typed

@@ -62,11 +62,15 @@
         (variable-symbol $variable))
       ((abstraction? $abstraction)
         `(lambda
+          ,(term->datum $strip-typed? $strip-evaluated? $depth
+            (abstraction-param $abstraction))
           ,(procedure->datum $strip-typed? $strip-evaluated? $depth
             (abstraction-procedure $abstraction)
             (abstraction-type-param (typed-ref $type)))))
       ((abstraction-type? $abstraction-type)
         `(a-lambda
+          ,(term->datum $strip-typed? $strip-evaluated? $depth
+            (abstraction-type-param $abstraction-type))
           ,(procedure->datum $strip-typed? $strip-evaluated? $depth
             (abstraction-type-procedure $abstraction-type)
             (abstraction-type-param $abstraction-type))))

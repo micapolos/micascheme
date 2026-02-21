@@ -69,6 +69,7 @@
         (evaluated
           (typed $type
             (abstraction
+              (abstraction-param $abstraction) ; TODO: it should be evaluated!!!
               (lambda ($arg)
                 (evaluate
                   (app
