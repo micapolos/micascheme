@@ -1,7 +1,8 @@
 (library (leo2 symbol)
   (export
     depth->symbol
-    symbol->index?)
+    symbol->index?
+    index->symbol)
   (import (leo2 base))
 
   (define (depth->symbol $depth)
@@ -21,5 +22,9 @@
             (positive? $number)
             (- $number 1))))))
 
+  (define (index->symbol $index)
+    (string->symbol
+      (string-append "$"
+        (number->string (+ $index 1)))))
 )
 

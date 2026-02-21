@@ -109,7 +109,7 @@
 
 (check-reify
   (indexed-term 6 (symbol-term 'thing))
-  (thing number 7))
+  (thing $7))
 
 (check-reify
   (symbolic-term 'lucky (number-term 7))
@@ -130,11 +130,6 @@
     (symbolic-term 'lucky
       (symbol-term 'number)))
   (very lucky number))
-
-(check-reify
-  (indexed-term 6
-    (symbol-term 'door))
-  (door number 7))
 
 ; ; TODO: Why they do not work?
 ; (check-reify

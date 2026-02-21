@@ -114,8 +114,7 @@
       ((indexed? $indexed)
         `(
           ,(reify $depth (indexed-ref $indexed))
-          number
-          ,(+ (indexed-index $indexed) 1)))
+          ,(index->symbol (indexed-index $indexed))))
       ((symbolic? $symbolic)
         (lets
           ($term (symbolic-ref $symbolic))
