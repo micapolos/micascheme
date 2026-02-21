@@ -107,12 +107,12 @@
       (literal "foo"))))
 
 ; (check
-;   (expand (lambda (x : a-number) x))
+;   (expand (lambda (x : number) x))
 ;   (expanded
 ;     (%a-lambda (x number-type) number-type)
 ;     (lambda
-;       (v0 (native (type 0) 'a-number))
-;       (variable (native (type 0) 'a-number) v0))))
+;       (v0 (symbol number))
+;       (variable (symbol number) v0))))
 
 ; (check
 ;   (expand
