@@ -16,5 +16,5 @@
   (symbolic pretty number))
 
 (check-term->datum=?
-  unit-term
-  ())
+  (symbol-term 'thing)
+  thing)

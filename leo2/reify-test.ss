@@ -104,8 +104,8 @@
   (if x y z))
 
 (check-reify
-  unit-term
-  unit)
+  (symbol-term 'thing)
+  thing)
 
 (check-reify
   (symbolic-term 'lucky (number-term 7))
@@ -118,14 +118,14 @@
   (very lucky 7))
 
 (check-reify
-  (symbolic-term 'lucky unit-term)
-  (lucky unit))
+  (symbolic-term 'lucky (symbol-term 'number))
+  (lucky number))
 
 (check-reify
   (symbolic-term 'very
     (symbolic-term 'lucky
-      unit-term))
-  (very lucky unit))
+      (symbol-term 'number)))
+  (very lucky number))
 
 ; ; TODO: Why they do not work?
 ; (check-reify

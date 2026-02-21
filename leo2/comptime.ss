@@ -2,7 +2,7 @@
   (export
     type
     native native-apply
-    symbolic unit
+    symbolic symbol
     variable
     lambda a-lambda
     apply recursion
@@ -18,7 +18,6 @@
     (rename (leo2 term)
       (type %type)
       (symbolic %symbolic)
-      (unit %unit)
       (typed %typed)
       (native %native)
       (variable %variable)
@@ -39,14 +38,11 @@
   (define-rule-syntax (native-apply t fn arg ...)
     (native-application-term t fn arg ...))
 
+  (define-rule-syntax (symbol x)
+    (symbol-term 'x))
+
   (define-rule-syntax (symbolic symbol x)
     (symbolic-term 'symbol x))
-
-  (define-syntax (unit $syntax)
-    (syntax-case $syntax ()
-      (id
-        (identifier? #'id)
-        #'unit-term)))
 
   (define-rule-syntax (variable t x)
     (variable-term t 'x))

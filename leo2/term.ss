@@ -12,7 +12,6 @@
     evaluated evaluated? evaluated-ref
     typed typed? typed-type typed-ref
     symbolic symbolic? symbolic-symbol symbolic-ref
-    unit unit?
 
     type-of
 
@@ -39,7 +38,6 @@
   (data (evaluated ref))
   (data (typed type ref))
   (data (symbolic symbol ref))
-  (data unit)
 
   (define (type-of $term)
     (switch-exhaustive $term

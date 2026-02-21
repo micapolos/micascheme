@@ -15,12 +15,12 @@
   10)
 
 (check=?
-  (symbolic lucky (native number-type 7))
-  7)
+  (symbol thing)
+  'thing)
 
 (check=?
-  unit
-  '())
+  (symbolic lucky (native number-type 7))
+  7)
 
 (check=?
   (native-apply #f

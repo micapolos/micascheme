@@ -124,8 +124,8 @@
                 identity
                 list)
               (reify $depth $term)))))
-      ((unit? $unit)
-        'unit)))
+      ((symbol? $symbol)
+        $symbol)))
 
   (define-rule-syntax (check-reify in out)
     (check (equal? (reify 0 in) `out)))

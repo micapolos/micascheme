@@ -77,7 +77,8 @@
         `(symbolic
           ,(symbolic-symbol $symbolic)
           ,(term->datum $strip-typed? $strip-evaluated? $depth (symbolic-ref $symbolic))))
-      ((unit? $unit) '())
+      ((symbol? $symbol)
+        $symbol)
       ((else $other)
         $other)))
 

@@ -27,8 +27,8 @@
     symbolic-type-term
     symbolic-term
 
-    unit-type-term
-    unit-term)
+    symbol-type-term
+    symbol-term)
 
   (import
     (leo2 base)
@@ -106,6 +106,14 @@
       (branch-type-term $cond (type-of $cons) (type-of $alt))
       (branch $cond $cons $alt)))
 
+  (define (symbol-type-term $symbol)
+    (typed (type 0) $symbol))
+
+  (define (symbol-term $symbol)
+    (typed
+      (symbol-type-term $symbol)
+      $symbol))
+
   (define (symbolic-type-term $symbol $term)
     (typed
       (type 0)
@@ -115,11 +123,6 @@
     (typed
       (symbolic-type-term $symbol (type-of $term))
       (symbolic $symbol $term)))
-
-  (define unit-type-term (typed (type 0) unit))
-
-  (define unit-term
-    (typed unit-type-term unit))
 
   (define (error-term $type)
     (typed $type 'error))
