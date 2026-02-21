@@ -16,6 +16,11 @@
   (indexed 6 (symbol car))
   (indexed-term 6 (symbol-term 'car)))
 
+(check=? (literal #f) (boolean-term #f))
+(check=? (literal 123) (number-term 123))
+(check=? (literal #\a) (char-term #\a))
+(check=? (literal "foo") (string-term "foo"))
+
 (check=?
   (symbol thing)
   (symbol-term 'thing))

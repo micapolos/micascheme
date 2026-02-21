@@ -18,6 +18,11 @@
   (indexed 6 (symbol thing))
   #f)
 
+(check=? (literal #t) #t)
+(check=? (literal 123) 123)
+(check=? (literal #\a) #\a)
+(check=? (literal "foo") "foo")
+
 (check=?
   (symbol thing)
   #f)

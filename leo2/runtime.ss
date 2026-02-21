@@ -2,7 +2,7 @@
   (export
     type
     native native-apply
-    indexed symbolic symbol
+    indexed symbolic symbol literal
     variable
     lambda a-lambda
     apply recursion
@@ -31,6 +31,8 @@
   (define-rule-syntax (typed _ v) v)
 
   (define-rule-syntax (symbol x) #f)
+
+  (define-rule-syntax (literal x) x)
 
   (define-rule-syntax (indexed index x) x)
 

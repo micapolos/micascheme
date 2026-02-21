@@ -5,6 +5,7 @@
     indexed
     symbolic
     symbol a-symbol
+    literal
     variable
     lambda a-lambda
     apply recursion
@@ -37,6 +38,20 @@
 
   (define-rule-syntax (native t x)
     (native-term t x))
+
+  (define-rules-syntax
+    ((literal x)
+      (boolean? (datum x))
+      (boolean-term x))
+    ((literal x)
+      (number? (datum x))
+      (number-term x))
+    ((literal x)
+      (char? (datum x))
+      (char-term x))
+    ((literal x)
+      (string? (datum x))
+      (string-term x)))
 
   (define-rule-syntax (native-apply t fn arg ...)
     (native-application-term t fn arg ...))
