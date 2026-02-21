@@ -17,9 +17,9 @@ this greet
         the string
         the stop string (default "!")
 
-this hello world (greet "world")
+this hello world: greet "world"
 
-this hello hell (greet "hell" (stop "?"))
+this hello hell: greet "hell" (stop "?")
 
 this increment
   with
