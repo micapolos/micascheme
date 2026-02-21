@@ -29,33 +29,25 @@
 
 (check
   (expand #t)
-  (expanded
-    boolean-type
-    (native (a-symbol boolean) #t)))
+  (expanded boolean-type (literal #t)))
 
-; (check
-;   (expand 123)
-;   (expanded
-;     number-type
-;     (native (native (type 0) 'a-number) 123)))
+(check
+  (expand 123)
+  (expanded number-type (literal 123)))
 
-; (check
-;   (expand #\a)
-;   (expanded
-;     char-type
-;     (native (native (type 0) 'a-char) #\a)))
+(check
+  (expand #\a)
+  (expanded char-type (literal #\a)))
 
 (check
   (expand "foo")
-  (expanded
-    string-type
-    (native (a-symbol string) "foo")))
+  (expanded string-type (literal "foo")))
 
 (check
   (expand ("foo" at 3))
   (expanded
     (indexed-type-term 2 string-type)
-    (indexed 2 (native (a-symbol string) "foo"))))
+    (indexed 2 (literal "foo"))))
 
 ; (check
 ;   (expand (native a-string (string-append "foo" "bar")))

@@ -56,24 +56,16 @@
 
       (b
         (boolean? (datum b))
-        (expanded
-          boolean-type
-          `(native (a-symbol boolean) ,(datum b))))
+        (expanded boolean-type `(literal ,(datum b))))
       (n
         (number? (datum n))
-        (expanded
-          number-type
-          `(native (a-symbol number) ,(datum n))))
+        (expanded number-type `(literal ,(datum n))))
       (ch
         (char? (datum ch))
-        (expanded
-          char-type
-          `(native (a-symbol char) ,(datum ch))))
+        (expanded char-type `(literal ,(datum ch))))
       (s
         (string? (datum s))
-        (expanded
-          string-type
-          `(native (a-symbol string) ,(datum s))))
+        (expanded string-type `(literal ,(datum s))))
 
       ((x at n)
         (lets
