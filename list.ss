@@ -64,7 +64,9 @@
 
     cons/nodup
     dedup
-    dedup-reversed)
+    dedup-reversed
+
+    length<=)
 
   (import
     (scheme)
@@ -482,4 +484,12 @@
 
   (define (dedup-reversed $eq? $list)
     (reverse (dedup $eq? (reverse $list))))
+
+  (define (length<= list n)
+    (switch list
+      ((null? _) (>= n 0))
+      ((else pair)
+        (and
+          (> n 0)
+          (length<= (cdr pair) (- n 1))))))
 )

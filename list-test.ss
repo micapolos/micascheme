@@ -599,3 +599,15 @@
     (dedup-reversed string=? '("foo" "bar" "bar" "foo" "goo"))
     '("bar" "foo" "goo")))
 
+(check (not (length<= '() -1)))
+(check (length<= '() 0))
+(check (length<= '() 1))
+
+(check (not (length<= '(a) 0)))
+(check (length<= '(a) 1))
+(check (length<= '(a) 2))
+
+(check (not (length<= '(a b) 1)))
+(check (length<= '(a b) 2))
+(check (length<= '(a b) 3))
+
