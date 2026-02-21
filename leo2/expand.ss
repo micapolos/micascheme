@@ -35,6 +35,7 @@
         a-number
         a-char
         a-string
+        string
         a-lambda
         native
         native-lambda
@@ -53,6 +54,8 @@
       (a-char (expand-type a-char))
       (a-string (expand-type a-string))
 
+      (string (expanded (type 0) '(symbol string)))
+
       (b
         (boolean? (datum b))
         (expand-literal a-boolean b))
@@ -64,7 +67,9 @@
         (expand-literal a-char ch))
       (s
         (string? (datum s))
-        (expand-literal a-string s))
+        (expanded
+          string-type
+          `(native (a-symbol string) ,(datum s))))
 
       ((x number n)
         (lets

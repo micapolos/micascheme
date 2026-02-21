@@ -5,11 +5,11 @@
 
 (check-term->datum=?
   (string-term "foo")
-  (native (native (type 0) a-string) "foo"))
+  (native string "foo"))
 
 (check-term->datum=?
   (string-term "foo")
-  (native (native (type 0) a-string) "foo"))
+  (native string "foo"))
 
 (check-term->datum=?
   (symbolic-term 'pretty (variable-term string-type 'number))

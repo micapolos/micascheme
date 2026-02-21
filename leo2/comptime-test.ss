@@ -21,6 +21,10 @@
   (symbol-term 'thing))
 
 (check=?
+  (a-symbol thing)
+  (symbol-type-term 'thing))
+
+(check=?
   (symbolic lucky (native number-type 7))
   (symbolic-term 'lucky (number-term 7)))
 

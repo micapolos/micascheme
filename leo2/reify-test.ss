@@ -20,24 +20,24 @@
     string-append
     (string-term "foo")
     (string-term "bar"))
-  (native-apply a-string ,string-append "foo" "bar"))
+  (native-apply string ,string-append "foo" "bar"))
 
 (check-reify
   (abstraction-term string-type (lambda (x) (string-term "foo")))
-  (lambda (_ : a-string) "foo"))
+  (lambda (_ : string) "foo"))
 
 (check-reify
   (abstraction-term string-type (lambda (x) x))
-  (lambda (v0 : a-string) v0))
+  (lambda (v0 : string) v0))
 
 (check-reify
   (abstraction-term string-type (lambda (x)
     (abstraction-term string-type (lambda (y)
       (native-application-term string-type string-append x y)))))
   (lambda
-    (v0 : a-string)
-    (v1 : a-string)
-    (native-apply a-string ,string-append v0 v1)))
+    (v0 : string)
+    (v1 : string)
+    (native-apply string ,string-append v0 v1)))
 
 ; (check-reify
 ;   (application-term
@@ -50,19 +50,19 @@
 ;         (string-term "foo"))
 ;       (number-term 10))
 ;     (char-term #\a))
-;   ((((lambda (_ : a-string) (_ : a-number) (_ : a-char) "OK") "foo") 10) #\a)
+;   ((((lambda (_ : string) (_ : a-number) (_ : a-char) "OK") "foo") 10) #\a)
 
 (check-reify
   (abstraction-type-term number-type
     (lambda (x) string-type))
-  (a-lambda a-number a-string))
+  (a-lambda a-number string))
 
 (check-reify
   (abstraction-type-term number-type
     (lambda (x)
       (abstraction-type-term boolean-type
         (lambda (x) string-type))))
-  (a-lambda a-number a-boolean a-string))
+  (a-lambda a-number a-boolean string))
 
 (check-reify
   (abstraction-type-term (type 0)

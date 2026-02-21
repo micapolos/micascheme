@@ -3,7 +3,8 @@
     type
     native native-apply
     indexed
-    symbolic symbol
+    symbolic
+    symbol a-symbol
     variable
     lambda a-lambda
     apply recursion
@@ -45,6 +46,9 @@
 
   (define-rule-syntax (symbol x)
     (symbol-term 'x))
+
+  (define-rule-syntax (a-symbol x)
+    (symbol-type-term 'x))
 
   (define-rule-syntax (symbolic symbol x)
     (symbolic-term 'symbol x))

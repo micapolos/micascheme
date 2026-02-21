@@ -40,8 +40,16 @@
   (define (type-term $depth)
     (type $depth))
 
+  (define (symbol-type-term $symbol)
+    (typed (type 0) $symbol))
+
+  (define (symbol-term $symbol)
+    (typed
+      (symbol-type-term $symbol)
+      $symbol))
+
   (define (native-type $symbol)
-    (typed (type 0) (native $symbol)))
+    (symbol-term $symbol))
 
   (define boolean-type
     (native-type 'a-boolean))
@@ -56,7 +64,7 @@
     (native-type 'a-char))
 
   (define string-type
-    (native-type 'a-string))
+    (symbol-type-term 'string))
 
   (define (native-term $type $value)
     (typed $type (native $value)))
@@ -108,14 +116,6 @@
     (typed
       (branch-type-term $cond (type-of $cons) (type-of $alt))
       (branch $cond $cons $alt)))
-
-  (define (symbol-type-term $symbol)
-    (typed (type 0) $symbol))
-
-  (define (symbol-term $symbol)
-    (typed
-      (symbol-type-term $symbol)
-      $symbol))
 
   (define (symbolic-type-term $symbol $term)
     (typed
