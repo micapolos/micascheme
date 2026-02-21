@@ -1,38 +1,48 @@
-(this stop "!")
-(this separator ", ")
-(this lucky 7)
+(stop "!")
+(separator ", ")
+(lucky 7)
 
-(this doubly lucky
-  (add
-    (the lucky number)
-    (the lucky number)))
+(doubly lucky
+  (the
+    (added
+      (the lucky number)
+      (the lucky number)))
 
-(this greet
+(greeting
   (with
     (any string)
-    (do
-      (append
-        "Hello"
-        (the separator string)
-        (the string)
-        (the stop string (default "!"))))))
+    (giving
+      (the
+        (appended
+          "Hello"
+          (the separator string)
+          (the string)
+          (the stop string (default "!")))))))
 
-(this hello world
+(hello world
   (as string)
-  (greet "world"))
+  (the greeting "world"))
 
-(this hello hell
+(hello hell
   (as string)
-  (greet "hell" (stop "?")))
+  (the greeting "hell" (stop "?")))
 
-(this increment
+(increment
   (as number)
   (with
     (any number)
-    (do (add (the number) 1))))
+    (giving
+      (the
+        (sum
+          (of (the number))
+          (and 1))))))
 
-(this decrement
+(decrement
   (as number)
   (with
     (any number)
-    (do (subtract (the number) 1))))
+    (giving
+      (the
+        (difference
+          (between (the number))
+          (and 1))))))

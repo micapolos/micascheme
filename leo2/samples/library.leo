@@ -1,38 +1,43 @@
-this stop "!"
-this separator ", "
-this lucky 7
+stop "!"
+separator ", "
+lucky 7
 
-this doubly lucky
-  add
-    the lucky number
-    the lucky number
+doubly lucky
+  the sum
+    of: the lucky number
+    and: the lucky number
 
-this greet
+greet
   with
     any string
-    do
-      append
+    giving
+      the appended
         "Hello"
         the separator string
         the string
         the stop string (default "!")
 
-this hello world,
-  as string
+hello world, as string
   greet "world"
 
 this hello hell,
   as string
   greet "hell" (stop "?")
 
-this increment,
+increment
   as number
   with
     any number
-    do: add: the number, 1
+    giving
+      the sum
+        of: the number
+        and 1
 
 this decrement,
   as number
   with
     any number
-    do: subtract: the number, 1
+    giving
+      the difference
+        between: the number
+        and 1
