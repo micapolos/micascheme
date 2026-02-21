@@ -48,6 +48,7 @@
         (env-ref? $env (datum s)))
 
       (type (expanded (type 1) 'type))
+
       (boolean (expanded (type 0) '(symbol boolean)))
       (number (expanded (type 0) '(symbol number)))
       (char (expanded (type 0) '(symbol char)))
@@ -204,14 +205,6 @@
       (id
         (symbol? (datum id))
         (syntax-error #'id "undefined"))))
-
-  (define-rule-syntax (expand-type t)
-    (expanded (type 0) '(native (type 0) 't)))
-
-  (define-rule-syntax (expand-literal t x)
-    (expanded
-      (native-type 't)
-      `(native (native (type 0) 't) ,(datum x))))
 
   (define-rules-syntaxes
     (literals expand expanded)
