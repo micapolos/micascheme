@@ -40,7 +40,7 @@
         native-lambda
         native-apply
         lambda
-        number
+        at
         :)
 
       (s
@@ -75,7 +75,7 @@
           string-type
           `(native (a-symbol string) ,(datum s))))
 
-      ((x number n)
+      ((x at n)
         (lets
           ($index (- (datum n) 1))
           ($x (expand $env #'x))
