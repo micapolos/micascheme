@@ -1,14 +1,22 @@
 (library (leo2 code)
   (export
-    datum->code
-    check-datum->code=?)
+    atom->code
+    phrase->code
+    check-atom->code=?
+    check-phrase->code=?)
   (import
     (leo2 base)
     (code))
 
-  (define (datum->code $datum)
-    (string-code (format "~s" $datum)))
+  (define (atom->code $atom)
+    (string-code (format "~s" $atom)))
 
-  (define-rule-syntax (check-datum->code=? in out)
-    (check-code=? (datum->code in) out))
+  (define (phrase->code $phrase)
+    (list->separated-code (code " ") (map atom->code $phrase)))
+
+  (define-rule-syntax (check-atom->code=? in out)
+    (check-code=? (atom->code in) out))
+
+  (define-rule-syntax (check-phrase->code=? in out)
+    (check-code=? (phrase->code in) out))
 )
