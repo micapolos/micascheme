@@ -16,7 +16,7 @@
             (native? (typed-ref $typed)))))))
 
   (define (evaluate $term)
-    (switch-exhaustive $term
+    (term-switch $term
       ((evaluated? $evaluated)
         $evaluated)
       ((type? $type)
@@ -27,9 +27,15 @@
           (typed-ref $typed)))))
 
   (define (type-evaluate $type $term)
-    (switch-exhaustive $term
-      ((variable? $variable)
-        (evaluated (typed $type $variable)))
+    (term-ref-switch $term
+      ((boolean? $boolean)
+        (evaluated (typed $type $boolean)))
+      ((number? $number)
+        (evaluated (typed $type $number)))
+      ((char? $char)
+        (evaluated (typed $type $char)))
+      ((string? $string)
+        (evaluated (typed $type $string)))
       ((symbol? $symbol)
         (evaluated (typed $type $symbol)))
       ((indexed? $indexed)
@@ -57,6 +63,8 @@
                   (apply $procedure
                     (map (dot native-ref typed-ref evaluated-ref) $args)))
                 (native-application $procedure $args))))))
+      ((variable? $variable)
+        (evaluated (typed $type $variable)))
       ((abstraction? $abstraction)
         (evaluated
           (typed $type
@@ -81,15 +89,6 @@
           $type
           (evaluate (application-lhs $application))
           (evaluate (application-rhs $application))))
-      ((recursion? $recursion)
-        (evaluated
-          (typed $type
-            (recursion
-              (lambda ($self)
-                (evaluate
-                  (app
-                    (recursion-procedure $recursion)
-                    $self)))))))
       ((branch? $branch)
         (lets
           ($condition (evaluate (branch-condition $branch)))
@@ -103,7 +102,16 @@
               $consequent
               (evaluated
                 (typed $type
-                  (branch $condition $consequent $alternate)))))))))
+                  (branch $condition $consequent $alternate)))))))
+      ((recursion? $recursion)
+        (evaluated
+          (typed $type
+            (recursion
+              (lambda ($self)
+                (evaluate
+                  (app
+                    (recursion-procedure $recursion)
+                    $self)))))))))
 
   (define (term-apply $type $lhs $rhs)
     (switch (typed-ref (evaluated-ref $lhs))

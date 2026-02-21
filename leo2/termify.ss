@@ -5,7 +5,7 @@
     (leo2 term))
 
   (define (termify $type $value)
-    (switch-exhaustive $type
+    (term-switch $type
       ((evaluated? $evaluated)
         (termify (evaluated-ref $evaluated $value)))
       ((type? $type)

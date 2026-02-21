@@ -38,6 +38,14 @@
       ((char? $char) $char)
       ((string? $string) $string)
       ((symbol? $symbol) $symbol)
+      ((indexed? $indexed)
+        `(indexed
+          ,(indexed-index $indexed)
+          ,(term->datum $strip-typed? $strip-evaluated? $depth (indexed-ref $indexed))))
+      ((symbolic? $symbolic)
+        `(symbolic
+          ,(symbolic-symbol $symbolic)
+          ,(term->datum $strip-typed? $strip-evaluated? $depth (symbolic-ref $symbolic))))
       ((native? $native)
         `(native
           ,(term->datum $strip-typed? $strip-evaluated? $depth $type)
@@ -75,15 +83,8 @@
         `(recursive
           ,(procedure->datum $strip-typed? $strip-evaluated? $depth
             (recursion-procedure $recursion)
-            (abstraction-type-param (typed-ref $type)))))
-      ((indexed? $indexed)
-        `(indexed
-          ,(indexed-index $indexed)
-          ,(term->datum $strip-typed? $strip-evaluated? $depth (indexed-ref $indexed))))
-      ((symbolic? $symbolic)
-        `(symbolic
-          ,(symbolic-symbol $symbolic)
-          ,(term->datum $strip-typed? $strip-evaluated? $depth (symbolic-ref $symbolic))))))
+            (abstraction-type-param (typed-ref $type)))))))
+
 
   (define (procedure->datum $strip-datum? $strip-evaluated? $depth $procedure $type)
     (lets

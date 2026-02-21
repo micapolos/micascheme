@@ -56,6 +56,8 @@
       char
       string
       symbol
+      indexed
+      symbolic
       native
       native-application
       variable
@@ -63,9 +65,7 @@
       abstraction-type
       application
       branch
-      recursion
-      indexed
-      symbolic))
+      recursion))
 
   (define (type-of $term)
     (switch-exhaustive $term
