@@ -40,6 +40,7 @@
         native-lambda
         native-apply
         lambda
+        number
         :)
 
       (s
@@ -64,6 +65,16 @@
       (s
         (string? (datum s))
         (expand-literal a-string s))
+
+      ((x number n)
+        (lets
+          ($index (- (datum n) 1))
+          ($x (expanded $env #'x))
+          (expanded
+            (indexed-type-term $index (expanded-type $x))
+            `(indexed
+              ,$index
+              ,(expanded-ref $x)))))
 
       ((native t x)
         (expanded
