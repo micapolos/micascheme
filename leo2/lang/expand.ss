@@ -10,6 +10,7 @@
     (leo2 symbol)
     (leo2 equal)
     (leo2 stdlib)
+    (leo2 lang symbol)
     (leo2 lang reify))
 
   (data (expanded type datum))

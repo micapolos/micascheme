@@ -8,6 +8,7 @@
     (leo2 stdlib)
     (symbol)
     (leo2 symbol)
+    (leo2 lang symbol)
     (leo2 dependent))
 
   (define (reify $depth $term)
