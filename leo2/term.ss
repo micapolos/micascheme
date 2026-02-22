@@ -25,8 +25,7 @@
     binding-apply
 
     term-body
-    branch-ref
-    term-procedure?)
+    branch-ref)
   (import (leo2 base))
 
   (data nothing)
@@ -86,10 +85,10 @@
       ((typed? $typed) $typed)))
 
   (define (signature-apply $signature $arg)
-    (app (signature-procedure $signature) $arg))
+    ((signature-procedure $signature) $arg))
 
   (define (recursion-apply $recursion $arg)
-    (app (recursion-procedure $recursion) $arg))
+    ((recursion-procedure $recursion) $arg))
 
   (define (binding $term $procedure)
     (application $procedure $term))
@@ -118,14 +117,7 @@
         $other)))
 
   (define (branch-ref $branch $condition)
-    (app (if $condition branch-consequent branch-alternate) $branch))
-
-  (define (term-procedure? $term)
-    (switch? $term
-      ((procedure? $procedure)
-        $procedure)
-      ((signature? $signature)
-        (signature-procedure $signature))
-      ((recursion? $recursion)
-        (recursion-procedure $recursion))))
+    (
+      (if $condition branch-consequent branch-alternate)
+      $branch))
 )

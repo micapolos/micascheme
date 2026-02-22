@@ -78,8 +78,8 @@
         (switch-b? $term-b
           ((procedure? $procedure-b)
             (depth-term=? (+ $depth 1)
-              (app $procedure-a (variable $depth))
-              (app $procedure-b (variable $depth))))))
+              ($procedure-a (variable $depth))
+              ($procedure-b (variable $depth))))))
       ((signature? $signature-a)
         (switch-b? $term-b
           ((signature? $signature-b)

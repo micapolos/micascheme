@@ -88,7 +88,7 @@
             `(,$symbol ,(depth-term->datum $depth $param))))
         ,(depth-term->datum
           (+ $depth 1)
-          (app $procedure (variable $symbol))))))
+          ($procedure (variable $symbol))))))
 
   (define-rule-syntax (check-term->datum=? in out)
     (check (equal? (term->datum in) `out)))

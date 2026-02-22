@@ -11,8 +11,8 @@
   (define (procedure-dependent? $procedure)
     (not
       (term=?
-        (app $procedure (variable 0))
-        (app $procedure (variable 1)))))
+        ($procedure (variable 0))
+        ($procedure (variable 1)))))
 
   (define (signature-dependent? $signature)
     (procedure-dependent?

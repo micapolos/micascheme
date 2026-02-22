@@ -103,9 +103,9 @@
       ((procedure? $procedure)
         ($procedure $rhs))
       ((signature? $signature)
-        ((signature-procedure $signature) $rhs))
+        (signature-apply $signature $rhs))
       ((recursion? $recursion)
-        (term-apply ((recursion-procedure $recursion) $lhs) $rhs))
+        (term-apply (recursion-apply $recursion $lhs) $rhs))
       ((else _)
        (evaluated (application $lhs $rhs)))))
 

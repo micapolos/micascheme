@@ -48,7 +48,7 @@
               (if
                 (and
                   (typed? $term)
-                  (app (or? symbolic?) (typed-ref $term)))
+                  (symbolic? (typed-ref $term)))
                 identity
                 list)
               (reify $depth $term)))))
