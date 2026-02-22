@@ -21,9 +21,6 @@
     signature-apply
     recursion-apply
 
-    binding binding? binding-ref binding-procedure
-    binding-apply
-
     term-body
     branch-ref)
   (import (leo2 base))
@@ -89,25 +86,6 @@
 
   (define (recursion-apply $recursion $arg)
     ((recursion-procedure $recursion) $arg))
-
-  (define (binding $term $procedure)
-    (application $procedure $term))
-
-  (define (binding? $term)
-    (switch? $term
-      ((application? $application)
-        (procedure? (application-lhs $application)))))
-
-  (define (binding-procedure $binding)
-    (application-lhs $binding))
-
-  (define (binding-ref $binding)
-    (application-rhs $binding))
-
-  (define (binding-apply $binding $arg)
-    (app
-      (binding-procedure $binding)
-      $arg))
 
   (define (term-body $term)
     (switch $term

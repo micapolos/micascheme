@@ -3,6 +3,7 @@
 (test
   (leo2 symbol)
   (leo2 term)
+  (leo2 binding)
   (leo2 datum)
   (leo2 lang)
   (leo2 equal)
