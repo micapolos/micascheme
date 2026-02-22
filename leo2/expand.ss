@@ -82,16 +82,24 @@
 
       (b
         (boolean? (datum b))
-        (expanded boolean-type `(literal ,(datum b))))
+        (expanded
+          (symbol-term 'boolean)
+          `(literal ,(datum b))))
       (n
         (number? (datum n))
-        (expanded number-type `(literal ,(datum n))))
+        (expanded
+          (symbol-term 'number)
+          `(literal ,(datum n))))
       (ch
         (char? (datum ch))
-        (expanded char-type `(literal ,(datum ch))))
+        (expanded
+          (symbol-term 'char)
+          `(literal ,(datum ch))))
       (s
         (string? (datum s))
-        (expanded string-type `(literal ,(datum s))))
+        (expanded
+          (symbol-term 'string)
+          `(literal ,(datum s))))
 
       ((x n)
         (and
