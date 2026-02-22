@@ -7,7 +7,7 @@
 (check-term->datum=? anything anything)
 
 (check-term->datum=? (type 12) (type 12))
-(check-term->datum=? 'foo 'foo)
+(check-term->datum=? 'foo (symbol foo))
 
 (check-term->datum=?
   (indexed 10 (native "foo"))
@@ -51,11 +51,11 @@
 
 (check-term->datum=?
   (annotated 'good (native "milk"))
-  (annotated 'good (native "milk")))
+  (annotated (symbol good) (native "milk")))
 
 (check-term->datum=?
   (typed 'string (native "milk"))
-  (typed 'string (native "milk")))
+  (typed (symbol string) (native "milk")))
 
 (check-term->datum=?
   (evaluated (native "milk"))

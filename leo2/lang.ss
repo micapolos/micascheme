@@ -1,7 +1,7 @@
 (library (leo2 lang)
   (export
     nothing anything
-    quote
+    symbol
     type
     native native-apply
     indexed
@@ -18,7 +18,6 @@
   (import
     (rename (leo2 base)
       (lambda %lambda)
-      (quote %quote)
       (apply %apply)
       (if %if))
     (prefix (leo2 term) %)
@@ -31,9 +30,9 @@
     ((type n)
       (nonnegative-integer? (datum n))
       (%type n))
-    ((quote s)
+    ((symbol s)
       (symbol? (datum s))
-      (%quote s))
+      's)
     ((indexed i x)
       (nonnegative-integer? (datum i))
       (%indexed i x))

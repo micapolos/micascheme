@@ -5,7 +5,7 @@
 (check-lang
   nothing
   anything
-  'foo
+  (symbol foo)
   (the x)
   (indexed 10 (the x))
   (symbolic good (the x))

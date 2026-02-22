@@ -17,7 +17,8 @@
       ((anything? _) 'anything)
       ((type? $type)
         `(type ,(type-depth $type)))
-      ((symbol? $symbol) `',$symbol)
+      ((symbol? $symbol)
+        `(symbol ,$symbol))
       ((indexed? $indexed)
         `(indexed
           ,(indexed-index $indexed)
