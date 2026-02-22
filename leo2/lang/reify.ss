@@ -125,7 +125,16 @@
             ,(if (recursion-dependent? $recursion) $symbol '_)
             ,@(app
               (if (abstraction? (typed-ref $body)) cdr list)
-              (reify (+ $depth 1) $body)))))))
+              (reify (+ $depth 1) $body)))))
+      ((annotated? $annotated)
+        (lets
+          ($ref (annotated-ref $annotated))
+          `(annotated
+            ,(reify $depth (annotated-annotation $annotated))
+            .
+            ,(app
+              (if (annotated? (typed-ref $ref)) cdr list)
+              (reify $depth $ref)))))))
 
   (define-rule-syntax (check-reify in out)
     (check (equal? (reify 0 in) `out)))

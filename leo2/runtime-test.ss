@@ -76,3 +76,7 @@
 (check=?
   (if (native #f #f) (native #f "foo") (native #f "bar"))
   "bar")
+
+(check=?
+  (annotated (symbol good) (literal "milk"))
+  "milk")

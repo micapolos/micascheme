@@ -29,7 +29,10 @@
     indexed-term
 
     symbol-type-term
-    symbol-term)
+    symbol-term
+
+    annotated-type-term
+    annotated-term)
 
   (import
     (leo2 base)
@@ -131,4 +134,16 @@
 
   (define (error-term $type)
     (typed $type 'error))
+
+  (define (annotated-type-term $annotation $term)
+    (typed
+      (type 0)
+      (annotated $annotation $term)))
+
+  (define (annotated-term $annotation $term)
+    (typed
+      (annotated-type-term
+        (type-of $annotation)
+        (type-of $term))
+      (annotated $annotation $term)))
 )

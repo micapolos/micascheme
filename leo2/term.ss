@@ -13,6 +13,7 @@
     typed typed? typed-type typed-ref
     symbolic symbolic? symbolic-symbol symbolic-ref
     indexed indexed? indexed-index indexed-ref
+    annotated annotated? annotated-annotation annotated-ref
 
     term? term-switch
     term-ref? term-ref-switch
@@ -48,6 +49,7 @@
   (data (recursion procedure))
   (data (symbolic symbol ref))
   (data (indexed index ref))
+  (data (annotated annotation ref))
 
   (union
     (term-ref
@@ -65,7 +67,8 @@
       abstraction-type
       application
       branch
-      recursion))
+      recursion
+      annotated))
 
   (define (type-of $term)
     (switch-exhaustive $term

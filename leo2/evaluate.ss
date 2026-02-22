@@ -112,7 +112,12 @@
                 (evaluate
                   (app
                     (recursion-procedure $recursion)
-                    $self)))))))))
+                    $self)))))))
+      ((annotated? $annotated)
+        (evaluated
+          (annotated
+            (evaluate (annotated-annotation $annotated))
+            (evaluate (annotated-ref $annotated)))))))
 
   (define (term-apply $type $lhs $rhs)
     (switch (typed-ref (evaluated-ref $lhs))

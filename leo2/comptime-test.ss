@@ -80,6 +80,12 @@
   (abstraction-type-term (%type 0)
     (%lambda (x) x)))
 
+(check=?
+  (annotated (symbol good) (literal "milk"))
+  (annotated-term
+    (symbol-term 'good)
+    (string-term "milk")))
+
 ; (check=?
 ;   (recursion fn string-type (lambda x x))
 ;   (%recursion

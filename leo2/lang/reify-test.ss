@@ -131,6 +131,24 @@
       (symbol-term 'number)))
   (very lucky number))
 
+(check-reify
+  (annotated-term (symbol-term 'good)
+    (symbol-term 'milk))
+  (annotated good milk))
+
+(check-reify
+  (annotated-term (symbol-term 'very)
+    (annotated-term (symbol-term 'good)
+      (symbol-term 'milk)))
+  (annotated very good milk))
+
+(check-reify
+  (annotated-term (symbol-term 'really)
+    (annotated-term (symbol-term 'very)
+      (annotated-term (symbol-term 'good)
+        (symbol-term 'milk))))
+  (annotated really very good milk))
+
 ; ; TODO: Why they do not work?
 ; (check-reify
 ;   (binding

@@ -87,7 +87,13 @@
         `(recursive
           ,(procedure->datum $strip-typed? $strip-evaluated? $depth
             (recursion-procedure $recursion)
-            (abstraction-type-param (typed-ref $type)))))))
+            (abstraction-type-param (typed-ref $type)))))
+      ((annotated? $annotated)
+        `(annotated
+          ,(term->datum $strip-typed? $strip-evaluated? $depth
+            (annotated-annotation $annotated))
+          ,(term->datum $strip-typed? $strip-evaluated? $depth
+            (annotated-ref $annotated))))))
 
 
   (define (procedure->datum $strip-datum? $strip-evaluated? $depth $procedure $type)

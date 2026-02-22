@@ -7,6 +7,7 @@
     lambda a-lambda
     apply recursion
     if
+    annotated
     check=?)
   (import
     (leo2 datum)
@@ -21,7 +22,8 @@
       (typed %typed)
       (native %native)
       (variable %variable)
-      (recursion %recursion)))
+      (recursion %recursion)
+      (annotated %annotated)))
   (export
     (import
       (only (leo2 base) quote)))
@@ -41,5 +43,6 @@
     ((apply lhs rhs) (lhs rhs))
     ((recursion id _ body) (letrec ((id body)) id))
     ((if a b c) (%if a b c))
+    ((annotated _ x) x)
     ((check=? in out) (check (equal? in out))))
 )
