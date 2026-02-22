@@ -11,7 +11,7 @@
 
 (check-evaluates 'foo (evaluated 'foo))
 
-(check-evaluates (variable 'x) (evaluated (variable 'x)))
+(check-evaluates (variable 0) (evaluated (variable 0)))
 
 (check-evaluates
   (indexed 3 (native "foo"))
@@ -36,12 +36,12 @@
   (native-application string-append
     (list
       (native "foo")
-      (variable 'x)))
+      (variable 0)))
   (evaluated
     (native-application string-append
       (list
         (evaluated (native "foo"))
-        (evaluated (variable 'x))))))
+        (evaluated (variable 0))))))
 
 (check-evaluates
   (abstraction (lambda (x) x))
@@ -90,21 +90,21 @@
 
 (check-evaluates
   (branch
-    (variable 'x)
-    (variable 'y)
-    (variable 'y))
-  (evaluated (variable 'y)))
+    (variable 0)
+    (variable 1)
+    (variable 1))
+  (evaluated (variable 1)))
 
 (check-evaluates
   (branch
-    (variable 'x)
-    (variable 'y)
-    (variable 'z))
+    (variable 0)
+    (variable 1)
+    (variable 2))
   (evaluated
     (branch
-      (evaluated (variable 'x))
-      (evaluated (variable 'y))
-      (evaluated (variable 'z)))))
+      (evaluated (variable 0))
+      (evaluated (variable 1))
+      (evaluated (variable 2)))))
 
 (check-evaluates
   (recursion

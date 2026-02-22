@@ -6,16 +6,16 @@
 ; nothing
 (check (term=? nothing anything))
 (check (not (term=? nothing nothing)))
-(check (not (term=? nothing (variable 'x))))
+(check (not (term=? nothing (variable 0))))
 
 ; anything
 (check (term=? anything nothing))
-(check (term=? anything (variable 'x)))
+(check (term=? anything (variable 0)))
 
 ; type
 (check (term=? (type 1) (type 1)))
 (check (not (term=? (type 1) (type 2))))
-(check (not (term=? (type 1) (variable 'x))))
+(check (not (term=? (type 1) (variable 0))))
 
 ; symbol
 (check (term=? 'foo 'foo))
@@ -25,43 +25,43 @@
 ; symbolic
 (check
   (term=?
-    (symbolic 'foo (variable 'x))
-    (symbolic 'foo (variable 'x))))
+    (symbolic 'foo (variable 0))
+    (symbolic 'foo (variable 0))))
 
 (check
   (not
     (term=?
-      (symbolic 'foo (variable 'x))
-      (symbolic 'foo2 (variable 'x)))))
+      (symbolic 'foo (variable 0))
+      (symbolic 'foo2 (variable 0)))))
 
 (check
   (not
     (term=?
-      (symbolic 'foo (variable 'x))
-      (symbolic 'foo (variable 'y)))))
+      (symbolic 'foo (variable 0))
+      (symbolic 'foo (variable 1)))))
 
 ; indexed
 (check
   (term=?
-    (indexed 2 (variable 'x))
-    (indexed 2 (variable 'x))))
+    (indexed 2 (variable 0))
+    (indexed 2 (variable 0))))
 
 (check
   (not
     (term=?
-      (indexed 2 (variable 'x))
-      (indexed 3 (variable 'x)))))
+      (indexed 2 (variable 0))
+      (indexed 3 (variable 0)))))
 
 (check
   (not
     (term=?
-      (indexed 2 (variable 'x))
-      (indexed 2 (variable 'y)))))
+      (indexed 2 (variable 0))
+      (indexed 2 (variable 1)))))
 
 ; native
 (check (term=? (native 10) (native 10)))
 (check (not (term=? (native 10) (native 12))))
-(check (not (term=? (native 10) (variable 'x))))
+(check (not (term=? (native 10) (variable 0))))
 
 ; native-application
 (check
@@ -94,9 +94,9 @@
       (native-application string-append (list (native "foo") (native "bar2"))))))
 
 ; variable
-(check (term=? (variable 'x) (variable 'x)))
-(check (not (term=? (variable 'x) (variable 'y))))
-(check (not (term=? (variable 'x) 'x)))
+(check (term=? (variable 0) (variable 0)))
+(check (not (term=? (variable 0) (variable 1))))
+(check (not (term=? (variable 0) 0)))
 
 ; abstraction
 (check
@@ -113,7 +113,7 @@
   (not
     (term=?
       (abstraction (lambda (x) x))
-      (abstraction (lambda (x) (variable 'x))))))
+      (abstraction (lambda (x) (variable 1))))))
 
 (check
   (not
@@ -153,7 +153,7 @@
   (not
     (term=?
       (signature (type 0) (lambda (x) x))
-      (signature (type 0) (lambda (x) (variable 'x))))))
+      (signature (type 0) (lambda (x) (variable 1))))))
 
 (check
   (not
@@ -188,26 +188,26 @@
 ; branch
 (check
   (term=?
-    (branch (variable 'x) (variable 'y) (variable 'z))
-    (branch (variable 'x) (variable 'y) (variable 'z))))
+    (branch (variable 0) (variable 1) (variable 2))
+    (branch (variable 0) (variable 1) (variable 2))))
 
 (check
   (not
     (term=?
-      (branch (variable 'x) (variable 'y) (variable 'z))
-      (branch (variable 'x2) (variable 'y) (variable 'z)))))
+      (branch (variable 0) (variable 1) (variable 2))
+      (branch (variable 02) (variable 1) (variable 2)))))
 
 (check
   (not
     (term=?
-      (branch (variable 'x) (variable 'y) (variable 'z))
-      (branch (variable 'x2) (variable 'y2) (variable 'z)))))
+      (branch (variable 0) (variable 1) (variable 2))
+      (branch (variable 02) (variable 12) (variable 2)))))
 
 (check
   (not
     (term=?
-      (branch (variable 'x) (variable 'y) (variable 'z))
-      (branch (variable 'x) (variable 'y) (variable 'z2)))))
+      (branch (variable 0) (variable 1) (variable 2))
+      (branch (variable 0) (variable 1) (variable 22)))))
 
 ; recursion
 (check
@@ -224,7 +224,7 @@
   (not
     (term=?
       (recursion (lambda (x) x))
-      (recursion (lambda (x) (variable 'x))))))
+      (recursion (lambda (x) (variable 1))))))
 
 (check
   (not

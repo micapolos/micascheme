@@ -12,8 +12,8 @@
   (define (procedure-dependent? $procedure)
     (not
       (term=?
-        (app $procedure (variable 'x))
-        (app $procedure (variable 'y)))))
+        (app $procedure (variable 0))
+        (app $procedure (variable 1)))))
 
   (define (abstraction-dependent? $abstraction)
     (procedure-dependent?

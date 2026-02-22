@@ -5,8 +5,7 @@
   (import
     (leo2 base)
     (leo2 term)
-    (leo2 datum)
-    (leo2 symbol))
+    (leo2 datum))
 
   (define-rule-syntax (switch-b? $term ((id? $id) body))
     (switch? $term
@@ -72,9 +71,9 @@
       ((variable? $variable-a)
         (switch-b? $term-b
           ((variable? $variable-b)
-            (symbol=?
-              (variable-symbol $variable-a)
-              (variable-symbol $variable-b)))))
+            (=
+              (variable-index $variable-a)
+              (variable-index $variable-b)))))
       ((abstraction? $abstraction-a)
         (switch-b? $term-b
           ((abstraction? $abstraction-b)
@@ -148,12 +147,9 @@
                 (typed-ref $typed-b))))))))
 
   (define (depth-procedure=? $depth $procedure-a $procedure-b)
-    (lets
-      ($symbol (depth->symbol $depth))
-      ($variable (variable $symbol))
-      (depth-term=? (+ $depth 1)
-        (app $procedure-a $variable)
-        (app $procedure-b $variable))))
+    (depth-term=? (+ $depth 1)
+      (app $procedure-a (variable $depth))
+      (app $procedure-b (variable $depth))))
 
   (define (term=? $term-a $term-b)
     (depth-term=? 0 $term-a $term-b))

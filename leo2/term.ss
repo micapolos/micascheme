@@ -5,7 +5,7 @@
     native native? native-ref
     native-application native-application? native-application-procedure native-application-args
     type type? type-depth
-    variable variable? variable-symbol
+    variable variable? variable-index
     abstraction abstraction? abstraction-procedure
     signature signature? signature-param signature-procedure
     application application? application-lhs application-rhs
@@ -36,7 +36,7 @@
   (data (type depth))
   (data (native ref))
   (data (native-application procedure args))
-  (data (variable symbol))
+  (data (variable index))
   (data (abstraction procedure))
   (data (signature param procedure))
   (data (application lhs rhs))

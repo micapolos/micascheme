@@ -36,7 +36,7 @@
             (partial depth-term->datum $depth)
             (native-application-args $native-application))))
       ((variable? $variable)
-        `(the ,(variable-symbol $variable)))
+        `(var ,(variable-index $variable)))
       ((abstraction? $abstraction)
         `(lambda
           . ,(procedure->datum $depth #f
