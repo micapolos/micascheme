@@ -1,4 +1,4 @@
-(library (leo2 expand)
+(library (leo2 lang expand)
   (export
     expanded expanded? expanded-type expanded-datum
     expand
@@ -9,8 +9,8 @@
     (leo2 datum)
     (leo2 symbol)
     (leo2 equal)
-    (leo2 reify)
-    (leo2 stdlib))
+    (leo2 stdlib)
+    (leo2 lang reify))
 
   (data (expanded type datum))
 

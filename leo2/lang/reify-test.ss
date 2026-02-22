@@ -2,7 +2,7 @@
   (leo2 base)
   (leo2 term)
   (leo2 stdlib)
-  (leo2 reify))
+  (leo2 lang reify))
 
 (check-reify (type 0) kind)
 (check-reify (type 1) kind-of-kind)

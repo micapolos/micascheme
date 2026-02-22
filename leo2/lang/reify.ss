@@ -1,4 +1,4 @@
-(library (leo2 reify)
+(library (leo2 lang reify)
   (export
     reify
     check-reify)

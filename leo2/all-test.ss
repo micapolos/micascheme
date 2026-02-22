@@ -10,6 +10,5 @@
   (leo2 evaluate)
   (leo2 runtime)
   (leo2 comptime)
-  (leo2 reify)
-  (leo2 expand)
+  (leo2 lang all)
   (leo2 code))

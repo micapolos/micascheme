@@ -1,6 +1,6 @@
 (import
   (only (leo2 base) quote)
-  (leo2 expand)
+  (leo2 lang expand)
   (prefix (leo2 comptime) %)
   (prefix (leo2 term) %%)
   (leo2 stdlib))
