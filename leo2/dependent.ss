@@ -1,7 +1,6 @@
 (library (leo2 dependent)
   (export
     procedure-dependent?
-    abstraction-dependent?
     signature-dependent?
     recursion-dependent?)
   (import
@@ -14,10 +13,6 @@
       (term=?
         (app $procedure (variable 0))
         (app $procedure (variable 1)))))
-
-  (define (abstraction-dependent? $abstraction)
-    (procedure-dependent?
-      (abstraction-procedure $abstraction)))
 
   (define (signature-dependent? $signature)
     (procedure-dependent?

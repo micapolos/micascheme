@@ -44,12 +44,12 @@
         (evaluated (variable 0))))))
 
 (check-evaluates
-  (abstraction (lambda (x) x))
-  (evaluated (abstraction (lambda (x) (evaluated x)))))
+  (lambda (x) x)
+  (evaluated (lambda (x) (evaluated x))))
 
 (check-evaluates
   (application
-    (abstraction (lambda (x) x))
+    (lambda (x) x)
     (native "foo"))
   (evaluated (native "foo")))
 
@@ -65,11 +65,9 @@
 (check-evaluates
   (application
     (application
-      (abstraction
-        (lambda (x)
-          (abstraction
-            (lambda (y)
-              (native-application string-append (list x y))))))
+      (lambda (x)
+        (lambda (y)
+          (native-application string-append (list x y))))
       (native "foo"))
     (native "bar"))
   (evaluated (native "foobar")))
@@ -109,39 +107,34 @@
 (check-evaluates
   (recursion
     (lambda (fn)
-      (abstraction
-        (lambda (n) fn))))
+      (lambda (n) fn)))
   (evaluated
     (recursion
       (lambda (v0)
         (evaluated
-          (abstraction
-            (lambda (v1)
-              (evaluated v0))))))))
+          (lambda (v1)
+            (evaluated v0)))))))
 
 (check-evaluates
   (recursion
     (lambda (fn)
-      (abstraction
-        (lambda (n) n))))
+      (lambda (n) n)))
   (evaluated
     (recursion
       (lambda (v0)
         (evaluated
-          (abstraction
-            (lambda (v1)
-              (evaluated v1))))))))
+          (lambda (v1)
+            (evaluated v1)))))))
 
 (check-evaluates
   (application
     (recursion
       (lambda (fn)
-        (abstraction
-          (lambda (n)
-            (branch
-              (native-application zero? (list n))
-              (native "Done")
-              (application fn (native-application - (list n (native 1)))))))))
+        (lambda (n)
+          (branch
+            (native-application zero? (list n))
+            (native "Done")
+            (application fn (native-application - (list n (native 1))))))))
     (native 10))
   (evaluated (native "Done")))
 
@@ -149,14 +142,13 @@
   (application
     (recursion
       (lambda (fib)
-        (abstraction
-          (lambda (n)
-            (branch
-              (native-application < (list n (native 2)))
-              n
-              (native-application +
-                (list
-                  (application fib (native-application - (list n (native 1))))
-                  (application fib (native-application - (list n (native 2)))))))))))
+        (lambda (n)
+          (branch
+            (native-application < (list n (native 2)))
+            n
+            (native-application +
+              (list
+                (application fib (native-application - (list n (native 1))))
+                (application fib (native-application - (list n (native 2))))))))))
     (native 10))
   (evaluated (native 55)))

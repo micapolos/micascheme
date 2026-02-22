@@ -26,9 +26,8 @@
           (map untyped (native-application-args $native-application))))
       ((variable? $variable)
         $variable)
-      ((abstraction? $abstraction)
-        (abstraction
-          (procedure-untyped (abstraction-procedure $abstraction))))
+      ((procedure? $procedure)
+        (lambda (x) (untyped ($procedure x))))
       ((signature? $signature)
         (throw untyped $signature))
       ((application? $application)
@@ -42,14 +41,11 @@
           (untyped (branch-alternate $branch))))
       ((recursion? $recursion)
         (recursion
-          (procedure-untyped (recursion-procedure $recursion))))
+          (untyped (recursion-procedure $recursion))))
       ((annotated? $annotated)
         (untyped (annotated-ref $annotated)))
       ((evaluated? $evaluated)
         (untyped (evaluated-ref $evaluated)))
       ((typed? $typed)
         (untyped (typed-ref $typed)))))
-
-  (define (procedure-untyped $procedure)
-    (lambda (x) (untyped ($procedure x))))
 )

@@ -30,7 +30,7 @@
   (variable x))
 
 (check-term->datum=?
-  (abstraction (lambda (x) (application (variable 'the) x)))
+  (lambda (x) (application (variable 'the) x))
   (lambda v0 (apply (variable the) (variable v0))))
 
 (check-term->datum=?
@@ -38,7 +38,7 @@
   (lambda (v0 (variable string)) (apply (variable the) (variable v0))))
 
 (check-term->datum=?
-  (recursion (lambda (fn) (abstraction (lambda(x) (application fn x)))))
+  (recursion (lambda (fn) (lambda(x) (application fn x))))
   (recursive v0 (lambda v1 (apply (variable v0) (variable v1)))))
 
 (check-term->datum=?

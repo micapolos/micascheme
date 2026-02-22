@@ -47,14 +47,10 @@
               (native-application $procedure $evaluated-args)))))
       ((variable? $variable)
         (evaluated $variable))
-      ((abstraction? $abstraction)
+      ((procedure? $procedure)
         (evaluated
-          (abstraction
-            (lambda ($arg)
-              (evaluate
-                (app
-                  (abstraction-procedure $abstraction)
-                  $arg))))))
+          (lambda ($arg)
+            (evaluate ($procedure $arg)))))
       ((signature? $signature)
         (evaluated
           (signature
@@ -104,12 +100,12 @@
 
   (define (term-apply $lhs $rhs)
     (switch (evaluated-ref $lhs)
-      ((abstraction? $abstraction)
-        (app (abstraction-procedure $abstraction) $rhs))
+      ((procedure? $procedure)
+        ($procedure $rhs))
       ((signature? $signature)
-        (app (signature-procedure $signature) $rhs))
+        ((signature-procedure $signature) $rhs))
       ((recursion? $recursion)
-        (term-apply (app (recursion-procedure $recursion) $lhs) $rhs))
+        (term-apply ((recursion-procedure $recursion) $lhs) $rhs))
       ((else _)
        (evaluated (application $lhs $rhs)))))
 

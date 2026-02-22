@@ -4,15 +4,13 @@
   (leo2 dependent))
 
 (check
-  (abstraction-dependent?
-    (abstraction
-      (lambda (x) x))))
+  (procedure-dependent?
+    (lambda (x) x)))
 
 (check
   (not
-    (abstraction-dependent?
-      (abstraction
-        (lambda (_) (native 1))))))
+    (procedure-dependent?
+      (lambda (_) (native 1)))))
 
 (check
   (signature-dependent?

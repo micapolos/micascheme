@@ -37,10 +37,9 @@
             (native-application-args $native-application))))
       ((variable? $variable)
         `(variable ,(variable-index $variable)))
-      ((abstraction? $abstraction)
+      ((procedure? $procedure)
         `(lambda
-          . ,(procedure->datum $depth #f
-            (abstraction-procedure $abstraction))))
+          . ,(procedure->datum $depth #f $procedure)))
       ((signature? $signature)
         `(lambda
           . ,(procedure->datum $depth

@@ -98,34 +98,34 @@
 (check (not (term=? (variable 0) (variable 1))))
 (check (not (term=? (variable 0) 0)))
 
-; abstraction
+; procedure
 (check
   (term=?
-    (abstraction (lambda (x) x))
-    (abstraction (lambda (x) x))))
+    (lambda (x) x)
+    (lambda (x) x)))
 
 (check
   (term=?
-    (abstraction (lambda (x) (abstraction (lambda (y) x))))
-    (abstraction (lambda (x) (abstraction (lambda (y) x))))))
+    (lambda (x) (lambda (y) x))
+    (lambda (x) (lambda (y) x))))
 
 (check
   (not
     (term=?
-      (abstraction (lambda (x) x))
-      (abstraction (lambda (x) (variable 1))))))
+      (lambda (x) x)
+      (lambda (x) (variable 1)))))
 
 (check
   (not
     (term=?
-      (abstraction (lambda (x) x))
-      (abstraction (lambda (x) (abstraction (lambda (y) x)))))))
+      (lambda (x) x)
+      (lambda (x) (lambda (y) x)))))
 
 (check
   (not
     (term=?
-      (abstraction (lambda (x) (abstraction (lambda (y) x))))
-      (abstraction (lambda (x) (abstraction (lambda (y) y)))))))
+      (lambda (x) (lambda (y) x))
+      (lambda (x) (lambda (y) y)))))
 
 ; signature
 (check
@@ -217,8 +217,8 @@
 
 (check
   (term=?
-    (recursion (lambda (x) (abstraction (lambda (y) x))))
-    (recursion (lambda (x) (abstraction (lambda (y) x))))))
+    (recursion (lambda (x) (lambda (y) x)))
+    (recursion (lambda (x) (lambda (y) x)))))
 
 (check
   (not
@@ -230,12 +230,12 @@
   (not
     (term=?
       (recursion (lambda (x) x))
-      (recursion (lambda (x) (abstraction (lambda (y) x)))))))
+      (recursion (lambda (x) (lambda (y) x))))))
 
 (check
   (not
     (term=?
-      (recursion (lambda (x) (abstraction (lambda (y) x))))
-      (recursion (lambda (x) (abstraction (lambda (y) y)))))))
+      (recursion (lambda (x) (lambda (y) x)))
+      (recursion (lambda (x) (lambda (y) y))))))
 
 ; TODO: annotated, evaluated, typed

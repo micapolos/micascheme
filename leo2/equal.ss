@@ -74,12 +74,12 @@
             (=
               (variable-index $variable-a)
               (variable-index $variable-b)))))
-      ((abstraction? $abstraction-a)
+      ((procedure? $procedure-a)
         (switch-b? $term-b
-          ((abstraction? $abstraction-b)
-            (depth-procedure=? $depth
-              (abstraction-procedure $abstraction-a)
-              (abstraction-procedure $abstraction-b)))))
+          ((procedure? $procedure-b)
+            (depth-term=? (+ $depth 1)
+              (app $procedure-a (variable $depth))
+              (app $procedure-b (variable $depth))))))
       ((signature? $signature-a)
         (switch-b? $term-b
           ((signature? $signature-b)
@@ -87,7 +87,7 @@
               (depth-term=? $depth
                 (signature-param $signature-a)
                 (signature-param $signature-b))
-              (depth-procedure=? $depth
+              (depth-term=? $depth
                 (signature-procedure $signature-a)
                 (signature-procedure $signature-b))))))
       ((application? $application-a)
@@ -116,7 +116,7 @@
       ((recursion? $recursion-a)
         (switch-b? $term-b
           ((recursion? $recursion-b)
-            (depth-procedure=? $depth
+            (depth-term=? $depth
               (recursion-procedure $recursion-a)
               (recursion-procedure $recursion-b)))))
       ((annotated? $annotated-a)
@@ -145,11 +145,6 @@
               (depth-term=? $depth
                 (typed-ref $typed-a)
                 (typed-ref $typed-b))))))))
-
-  (define (depth-procedure=? $depth $procedure-a $procedure-b)
-    (depth-term=? (+ $depth 1)
-      (app $procedure-a (variable $depth))
-      (app $procedure-b (variable $depth))))
 
   (define (term=? $term-a $term-b)
     (depth-term=? 0 $term-a $term-b))

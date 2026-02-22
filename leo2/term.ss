@@ -6,7 +6,6 @@
     native-application native-application? native-application-procedure native-application-args
     type type? type-depth
     variable variable? variable-index
-    abstraction abstraction? abstraction-procedure
     signature signature? signature-param signature-procedure
     application application? application-lhs application-rhs
     branch branch? branch-condition branch-consequent branch-alternate
@@ -19,7 +18,6 @@
 
     term? term-switch
 
-    abstraction-apply
     signature-apply
     recursion-apply
 
@@ -37,7 +35,6 @@
   (data (native ref))
   (data (native-application procedure args))
   (data (variable index))
-  (data (abstraction procedure))
   (data (signature param procedure))
   (data (application lhs rhs))
   (data (branch condition consequent alternate))
@@ -59,7 +56,7 @@
       native
       native-application
       variable
-      abstraction
+      procedure
       signature
       application
       branch
@@ -79,7 +76,7 @@
       ((native? $native) $native)
       ((native-application? $native-application) $native-application)
       ((variable? $variable) $variable)
-      ((abstraction? $abstraction) $abstraction)
+      ((procedure? $procedure) $procedure)
       ((signature? $signature) $signature)
       ((application? $application) $application)
       ((branch? $branch) $branch)
@@ -88,9 +85,6 @@
       ((evaluated? $evaluated) $evaluated)
       ((typed? $typed) $typed)))
 
-  (define (abstraction-apply $abstraction $arg)
-    (app (abstraction-procedure $abstraction) $arg))
-
   (define (signature-apply $signature $arg)
     (app (signature-procedure $signature) $arg))
 
@@ -98,17 +92,15 @@
     (app (recursion-procedure $recursion) $arg))
 
   (define (binding $term $procedure)
-    (application
-      (abstraction $procedure)
-      $term))
+    (application $procedure $term))
 
   (define (binding? $term)
     (switch? $term
       ((application? $application)
-        (abstraction? (application-lhs $application)))))
+        (procedure? (application-lhs $application)))))
 
   (define (binding-procedure $binding)
-    (abstraction-procedure (application-lhs $binding)))
+    (application-lhs $binding))
 
   (define (binding-ref $binding)
     (application-rhs $binding))
@@ -130,8 +122,8 @@
 
   (define (term-procedure? $term)
     (switch? $term
-      ((abstraction? $abstraction)
-        (abstraction-procedure $abstraction))
+      ((procedure? $procedure)
+        $procedure)
       ((signature? $signature)
         (signature-procedure $signature))
       ((recursion? $recursion)

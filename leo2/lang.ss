@@ -48,7 +48,7 @@
       (%variable n))
     ((lambda id body)
       (identifier? #'id)
-      (%abstraction (%lambda (id) body)))
+      (%lambda (id) body))
     ((lambda (id t) body)
       (identifier? #'id)
       (%signature t (%lambda (id) body)))
