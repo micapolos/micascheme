@@ -41,7 +41,8 @@
           (untyped (branch-alternate $branch))))
       ((recursion? $recursion)
         (recursion
-          (untyped (recursion-procedure $recursion))))
+          (lambda (f)
+            (untyped ((recursion-procedure $recursion) f)))))
       ((annotated? $annotated)
         (untyped (annotated-ref $annotated)))
       ((evaluated? $evaluated)
