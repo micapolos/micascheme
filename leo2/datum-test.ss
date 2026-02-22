@@ -27,27 +27,27 @@
 
 (check-term->datum=?
   (variable 'x)
-  (var x))
+  (variable x))
 
 (check-term->datum=?
   (abstraction (lambda (x) (application (variable 'the) x)))
-  (lambda v0 (apply (var the) (var v0))))
+  (lambda v0 (apply (variable the) (variable v0))))
 
 (check-term->datum=?
   (signature (variable 'string) (lambda (x) (application (variable 'the) x)))
-  (lambda (v0 (var string)) (apply (var the) (var v0))))
+  (lambda (v0 (variable string)) (apply (variable the) (variable v0))))
 
 (check-term->datum=?
   (recursion (lambda (fn) (abstraction (lambda(x) (application fn x)))))
-  (recursive v0 (lambda v1 (apply (var v0) (var v1)))))
+  (recursive v0 (lambda v1 (apply (variable v0) (variable v1)))))
 
 (check-term->datum=?
   (application (variable 'x) (variable 'y))
-  (apply (var x) (var y)))
+  (apply (variable x) (variable y)))
 
 (check-term->datum=?
   (branch (variable 'a) (variable 'b) (variable 'c))
-  (if (var a) (var b) (var c)))
+  (if (variable a) (variable b) (variable c)))
 
 (check-term->datum=?
   (annotated 'good (native "milk"))

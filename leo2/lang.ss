@@ -6,7 +6,7 @@
     native native-apply
     indexed
     symbolic
-    var
+    variable
     lambda
     recursive
     apply
@@ -43,7 +43,7 @@
       (%native x))
     ((native-apply fn arg ...)
       (%native-application fn (list arg ...)))
-    ((var n)
+    ((variable n)
       (nonnegative-integer? (datum n))
       (%variable n))
     ((lambda id body)
