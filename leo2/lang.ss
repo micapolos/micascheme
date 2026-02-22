@@ -1,6 +1,5 @@
 (library (leo2 lang)
   (export
-    any
     nothing anything
     quote
     type
@@ -28,9 +27,7 @@
   (define-syntax nothing (identifier-syntax %nothing))
   (define-syntax anything (identifier-syntax %anything))
 
-  (define-keywords any)
-
-  (define-rules-syntaxes (literals any)
+  (define-rules-syntaxes
     ((type n)
       (nonnegative-integer? (datum n))
       (%type n))
@@ -53,7 +50,7 @@
     ((lambda id body)
       (identifier? #'id)
       (%abstraction (%lambda (id) body)))
-    ((lambda (any id t) body)
+    ((lambda (id t) body)
       (identifier? #'id)
       (%signature t (%lambda (id) body)))
     ((apply lhs rhs)

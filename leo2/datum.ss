@@ -85,7 +85,7 @@
           ((false? _)
             $symbol)
           ((else $param)
-            `(any ,$symbol ,(depth-term->datum $depth $param))))
+            `(,$symbol ,(depth-term->datum $depth $param))))
         ,(depth-term->datum
           (+ $depth 1)
           (app $procedure (variable $symbol))))))

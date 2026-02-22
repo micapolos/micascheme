@@ -35,7 +35,7 @@
 
 (check-term->datum=?
   (signature (variable 'string) (lambda (x) (application (variable 'the) x)))
-  (lambda (any v0 (the string)) (apply (the the) (the v0))))
+  (lambda (v0 (the string)) (apply (the the) (the v0))))
 
 (check-term->datum=?
   (recursion (lambda (fn) (abstraction (lambda(x) (application fn x)))))
