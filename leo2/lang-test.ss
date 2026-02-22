@@ -5,9 +5,9 @@
 (check-lang
   nothing
   anything
-  (symbol foo)
   (the x)
   (indexed 10 (the x))
+  (symbol foo)
   (symbolic good (the x))
   (native 10)
   (native-apply "foo" (the x) (the y))
