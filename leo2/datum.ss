@@ -1,110 +1,95 @@
 (library (leo2 datum)
   (export
     term->datum
+    depth-term->datum
     check-term->datum=?)
   (import
     (leo2 base)
     (leo2 term)
     (leo2 symbol))
 
-  (define (term->datum $strip-typed? $strip-evaluated? $depth $term)
+  (define (term->datum $term)
+    (depth-term->datum 0 $term))
+
+  (define (depth-term->datum $depth $term)
     (term-switch $term
-      ((evaluated? $evaluated)
-        (if $strip-evaluated?
-          (term->datum $strip-typed? $strip-evaluated? $depth
-            (evaluated-ref $evaluated))
-          `(evaluated
-            ,(term->datum $strip-typed? $strip-evaluated? $depth
-              (evaluated-ref $evaluated)))))
+      ((nothing? _) 'nothing)
+      ((anything? _) 'anything)
       ((type? $type)
         `(type ,(type-depth $type)))
-      ((typed? $typed)
-        (lets
-          ($datum
-            (type-term->datum $strip-typed? $strip-evaluated? $depth
-              (typed-type $typed)
-              (typed-ref $typed)))
-          (if $strip-typed?
-            $datum
-            `(typed
-              ,(term->datum $strip-typed? $strip-evaluated? $depth
-                (typed-type $typed))
-              ,$datum))))))
-
-  (define (type-term->datum $strip-typed? $strip-evaluated? $depth $type $term)
-    (term-ref-switch $term
-      ((boolean? $boolean) $boolean)
-      ((number? $number) $number)
-      ((char? $char) $char)
-      ((string? $string) $string)
-      ((symbol? $symbol) $symbol)
+      ((symbol? $symbol) `',$symbol)
       ((indexed? $indexed)
         `(indexed
           ,(indexed-index $indexed)
-          ,(term->datum $strip-typed? $strip-evaluated? $depth (indexed-ref $indexed))))
+          ,(depth-term->datum $depth (indexed-ref $indexed))))
       ((symbolic? $symbolic)
         `(symbolic
           ,(symbolic-symbol $symbolic)
-          ,(term->datum $strip-typed? $strip-evaluated? $depth (symbolic-ref $symbolic))))
+          ,(depth-term->datum $depth (symbolic-ref $symbolic))))
       ((native? $native)
-        `(native
-          ,(term->datum $strip-typed? $strip-evaluated? $depth $type)
-          ,(native-ref $native)))
+        `(native ,(native-ref $native)))
       ((native-application? $native-application)
         `(native-apply
-          ,(term->datum $strip-typed? $strip-evaluated? $depth $type)
           ,(native-application-procedure $native-application)
-          (list
-            ,@(map
-              (partial term->datum $strip-typed? $strip-evaluated? $depth)
-              (native-application-args $native-application)))))
+          ,@(map
+            (partial depth-term->datum $depth)
+            (native-application-args $native-application))))
       ((variable? $variable)
-        (variable-symbol $variable))
+        `(the ,(variable-symbol $variable)))
       ((abstraction? $abstraction)
         `(lambda
-          ,(term->datum $strip-typed? $strip-evaluated? $depth
-            (abstraction-param $abstraction))
-          ,(procedure->datum $strip-typed? $strip-evaluated? $depth
-            (abstraction-procedure $abstraction)
-            (abstraction-type-param (typed-ref $type)))))
-      ((abstraction-type? $abstraction-type)
-        `(a-lambda
-          ,(term->datum $strip-typed? $strip-evaluated? $depth
-            (abstraction-type-param $abstraction-type))
-          ,(procedure->datum $strip-typed? $strip-evaluated? $depth
-            (abstraction-type-procedure $abstraction-type)
-            (abstraction-type-param $abstraction-type))))
+          . ,(procedure->datum $depth #f
+            (abstraction-procedure $abstraction))))
+      ((signature? $signature)
+        `(lambda
+          . ,(procedure->datum $depth
+            (signature-param $signature)
+            (signature-procedure $signature))))
       ((application? $application)
         `(apply
-          ,(term->datum $strip-typed? $strip-evaluated? $depth (application-lhs $application))
-          ,(term->datum $strip-typed? $strip-evaluated? $depth (application-rhs $application))))
+          ,(depth-term->datum $depth (application-lhs $application))
+          ,(depth-term->datum $depth (application-rhs $application))))
       ((branch? $branch)
         `(if
-          ,(term->datum $strip-typed? $strip-evaluated? $depth (branch-condition $branch))
-          ,(term->datum $strip-typed? $strip-evaluated? $depth (branch-consequent $branch))
-          ,(term->datum $strip-typed? $strip-evaluated? $depth (branch-alternate $branch))))
+          ,(depth-term->datum $depth (branch-condition $branch))
+          ,(depth-term->datum $depth (branch-consequent $branch))
+          ,(depth-term->datum $depth (branch-alternate $branch))))
       ((recursion? $recursion)
-        `(recursive
-          ,(procedure->datum $strip-typed? $strip-evaluated? $depth
-            (recursion-procedure $recursion)
-            (abstraction-type-param (typed-ref $type)))))
+        `(recursive .
+          ,(procedure->datum $depth #f
+            (recursion-procedure $recursion))))
       ((annotated? $annotated)
         `(annotated
-          ,(term->datum $strip-typed? $strip-evaluated? $depth
+          ,(depth-term->datum $depth
             (annotated-annotation $annotated))
-          ,(term->datum $strip-typed? $strip-evaluated? $depth
-            (annotated-ref $annotated))))))
+          ,(depth-term->datum $depth
+            (annotated-ref $annotated))))
+      ((evaluated? $evaluated)
+        `(evaluated
+          ,(depth-term->datum $depth
+            (evaluated-ref $evaluated))))
+      ((typed? $typed)
+        (lets
+          ($ref-datum
+            (depth-term->datum $depth
+              (typed-ref $typed)))
+          `(typed
+            ,(depth-term->datum $depth (typed-type $typed))
+            ,$ref-datum)))))
 
-
-  (define (procedure->datum $strip-datum? $strip-evaluated? $depth $procedure $type)
+  (define (procedure->datum $depth $param? $procedure)
     (lets
       ($symbol (depth->symbol $depth))
-      `(lambda (,$symbol ,(term->datum $strip-datum? $strip-evaluated? $depth $type))
-        ,(term->datum
-          $strip-datum? $strip-evaluated?
+      `(
+        ,(switch $param?
+          ((false? _)
+            $symbol)
+          ((else $param)
+            `(any ,$symbol ,(depth-term->datum $depth $param))))
+        ,(depth-term->datum
           (+ $depth 1)
-          (app $procedure (typed $type (variable $symbol)))))))
+          (app $procedure (variable $symbol))))))
 
   (define-rule-syntax (check-term->datum=? in out)
-    (check (equal? (term->datum #t #t 0 in) 'out)))
+    (check (equal? (term->datum in) `out)))
 )

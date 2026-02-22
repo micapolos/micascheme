@@ -6,131 +6,116 @@
     (leo2 base)
     (leo2 term)
     (leo2 datum)
-    (leo2 equal)
-    (leo2 stdlib))
+    (leo2 equal))
 
-  (define (evaluated-typed-native? $term)
+  (define (evaluated-native? $term)
     (switch? $term
       ((evaluated? $evaluated)
-        (switch? (evaluated-ref $evaluated)
-          ((typed? $typed)
-            (native? (typed-ref $typed)))))))
+        (native?
+          (evaluated-ref $evaluated)))))
 
   (define (evaluate $term)
     (term-switch $term
-      ((evaluated? $evaluated)
-        $evaluated)
+      ((nothing? $nothing)
+        (evaluated $nothing))
+      ((anything? $anything)
+        (evaluated $anything))
       ((type? $type)
         (evaluated $term))
-      ((typed? $typed)
-        (type-evaluate
-          (typed-type $typed)
-          (typed-ref $typed)))))
-
-  (define (type-evaluate $type $term)
-    (term-ref-switch $term
-      ((boolean? $boolean)
-        (evaluated (typed $type $boolean)))
-      ((number? $number)
-        (evaluated (typed $type $number)))
-      ((char? $char)
-        (evaluated (typed $type $char)))
-      ((string? $string)
-        (evaluated (typed $type $string)))
       ((symbol? $symbol)
-        (evaluated (typed $type $symbol)))
+        (evaluated $symbol))
       ((indexed? $indexed)
         (evaluated
-          (typed $type
-            (indexed
-              (indexed-index $indexed)
-              (evaluate (indexed-ref $indexed))))))
+          (indexed
+            (indexed-index $indexed)
+            (evaluate (indexed-ref $indexed)))))
       ((symbolic? $symbolic)
         (evaluated
-          (typed $type
-            (symbolic
-              (symbolic-symbol $symbolic)
-              (evaluate (symbolic-ref $symbolic))))))
+          (symbolic
+            (symbolic-symbol $symbolic)
+            (evaluate (symbolic-ref $symbolic)))))
       ((native? $native)
-        (evaluated (typed $type $term)))
+        (evaluated $native))
       ((native-application? $native-application)
         (lets
           ($procedure (native-application-procedure $native-application))
-          ($args (map evaluate (native-application-args $native-application)))
+          ($evaluated-args (map evaluate (native-application-args $native-application)))
+          ($args (map evaluated-ref $evaluated-args))
           (evaluated
-            (typed $type
-              (if (for-all evaluated-typed-native? $args)
-                (native
-                  (apply $procedure
-                    (map (dot native-ref typed-ref evaluated-ref) $args)))
-                (native-application $procedure $args))))))
+            (if (for-all native? $args)
+              (native (apply $procedure (map native-ref $args)))
+              (native-application $procedure $evaluated-args)))))
       ((variable? $variable)
-        (evaluated (typed $type $variable)))
+        (evaluated $variable))
       ((abstraction? $abstraction)
         (evaluated
-          (abstraction-term
-            (evaluate (abstraction-param $abstraction))
+          (abstraction
             (lambda ($arg)
               (evaluate
                 (app
                   (abstraction-procedure $abstraction)
                   $arg))))))
-      ((abstraction-type? $abstraction-type)
+      ((signature? $signature)
         (evaluated
-          (typed $type
-            (abstraction-type
-              (evaluate (abstraction-type-param $abstraction-type))
-              (lambda ($arg)
-                (evaluate
-                  (app
-                    (abstraction-type-procedure $abstraction-type)
-                    $arg)))))))
+          (signature
+            (evaluate (signature-param $signature))
+            (lambda ($arg)
+              (evaluate
+                (app
+                  (signature-procedure $signature)
+                  $arg))))))
       ((application? $application)
         (term-apply
-          $type
           (evaluate (application-lhs $application))
           (evaluate (application-rhs $application))))
       ((branch? $branch)
         (lets
           ($condition (evaluate (branch-condition $branch)))
-          ($consequent (evaluate (branch-consequent $branch)))
-          ($alternate (evaluate (branch-alternate $branch)))
-          (if (evaluated-typed-native? $condition)
-            (if (native-ref (typed-ref (evaluated-ref $condition)))
-              $consequent
-              $alternate)
-            (if (term=? 0 $consequent $alternate)
-              $consequent
-              (evaluated
-                (typed $type
-                  (branch $condition $consequent $alternate)))))))
+          (if (evaluated-native? $condition)
+            (evaluate
+              (branch-ref $branch
+                (native-ref (evaluated-ref $condition))))
+            (lets
+              ($consequent (evaluate (branch-consequent $branch)))
+              ($alternate (evaluate (branch-alternate $branch)))
+              (if (term=? $consequent $alternate)
+                $consequent
+                (evaluated (branch $condition $consequent $alternate)))))))
       ((recursion? $recursion)
         (evaluated
-          (typed $type
-            (recursion
-              (lambda ($self)
-                (evaluate
-                  (app
-                    (recursion-procedure $recursion)
-                    $self)))))))
+          (recursion
+            (lambda ($self)
+              (evaluate
+                (app
+                  (recursion-procedure $recursion)
+                  $self))))))
       ((annotated? $annotated)
         (evaluated
           (annotated
             (evaluate (annotated-annotation $annotated))
-            (evaluate (annotated-ref $annotated)))))))
+            (evaluate (annotated-ref $annotated)))))
+      ((evaluated? $evaluated)
+        $evaluated)
+      ((typed? $typed)
+        (evaluated
+          (typed
+            (evaluate (typed-type $typed))
+            (evaluate (typed-ref $typed)))))))
 
-  (define (term-apply $type $lhs $rhs)
-    (switch (typed-ref (evaluated-ref $lhs))
+  (define (term-apply $lhs $rhs)
+    (switch (evaluated-ref $lhs)
       ((abstraction? $abstraction)
         (app (abstraction-procedure $abstraction) $rhs))
+      ((signature? $signature)
+        (app (signature-procedure $signature) $rhs))
       ((recursion? $recursion)
-        (term-apply $type (app (recursion-procedure $recursion) $lhs) $rhs))
+        (term-apply (app (recursion-procedure $recursion) $lhs) $rhs))
       ((else _)
-       (evaluated (typed $type (application $lhs $rhs))))))
+       (evaluated (application $lhs $rhs)))))
 
   (define-rule-syntax (check-evaluates in out)
     (check
       (equal?
-        (term->datum #f #f 0 (evaluate in))
-        (term->datum #f #f 0 out))))
+        (term->datum (evaluate in))
+        (term->datum out))))
 )

@@ -1,35 +1,29 @@
 (library (leo2 dependent)
   (export
+    procedure-dependent?
     abstraction-dependent?
-    abstraction-type-dependent?
+    signature-dependent?
     recursion-dependent?)
   (import
     (leo2 base)
     (leo2 term)
-    (leo2 equal)
-    (leo2 stdlib))
+    (leo2 equal))
+
+  (define (procedure-dependent? $procedure)
+    (not
+      (term=?
+        (app $procedure (variable 'x))
+        (app $procedure (variable 'y)))))
 
   (define (abstraction-dependent? $abstraction)
-    (not
-      (term=? 0
-        (abstraction-apply $abstraction
-          (variable-term string-type (variable 'a)))
-        (abstraction-apply $abstraction
-          (variable-term string-type (variable 'b))))))
+    (procedure-dependent?
+      (abstraction-procedure $abstraction)))
 
-  (define (abstraction-type-dependent? $abstraction-type)
-    (not
-      (term=? 0
-        (abstraction-type-apply $abstraction-type
-          (variable-term string-type (variable 'a)))
-        (abstraction-type-apply $abstraction-type
-          (variable-term string-type (variable 'b))))))
+  (define (signature-dependent? $signature)
+    (procedure-dependent?
+      (signature-procedure $signature)))
 
   (define (recursion-dependent? $recursion)
-    (not
-      (term=? 0
-        (recursion-apply $recursion
-          (variable-term string-type (variable 'a)))
-        (recursion-apply $recursion
-          (variable-term string-type (variable 'b))))))
+    (procedure-dependent?
+      (recursion-procedure $recursion)))
 )

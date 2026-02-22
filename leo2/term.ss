@@ -1,11 +1,13 @@
 (library (leo2 term)
   (export
+    nothing nothing?
+    anything anything?
     native native? native-ref
     native-application native-application? native-application-procedure native-application-args
     type type? type-depth
     variable variable? variable-symbol
-    abstraction abstraction? abstraction-param abstraction-procedure
-    abstraction-type abstraction-type? abstraction-type-param abstraction-type-procedure
+    abstraction abstraction? abstraction-procedure
+    signature signature? signature-param signature-procedure
     application application? application-lhs application-rhs
     branch branch? branch-condition branch-consequent branch-alternate
     recursion recursion? recursion-procedure
@@ -16,47 +18,41 @@
     annotated annotated? annotated-annotation annotated-ref
 
     term? term-switch
-    term-ref? term-ref-switch
-
-    type-of
 
     abstraction-apply
-    abstraction-type-apply
+    signature-apply
     recursion-apply
 
     binding binding? binding-ref binding-procedure
     binding-apply
 
-    term-body)
+    term-body
+    branch-ref
+    term-procedure?)
   (import (leo2 base))
 
-  ; TODO: Remove abstraction-type as it can be represented as abstraction,
-  ; assuming that there'll be param field.
-
-  (data (evaluated ref))
+  (data nothing)
+  (data anything)
   (data (type depth))
-  (data (typed type ref))
-
-  (union (term evaluated type typed))
-
   (data (native ref))
   (data (native-application procedure args))
   (data (variable symbol))
-  (data (abstraction param procedure))
-  (data (abstraction-type param procedure))
+  (data (abstraction procedure))
+  (data (signature param procedure))
   (data (application lhs rhs))
   (data (branch condition consequent alternate))
   (data (recursion procedure))
   (data (symbolic symbol ref))
   (data (indexed index ref))
   (data (annotated annotation ref))
+  (data (evaluated ref))
+  (data (typed type ref))
 
   (union
-    (term-ref
-      boolean
-      number
-      char
-      string
+    (term
+      nothing
+      anything
+      type
       symbol
       indexed
       symbolic
@@ -64,33 +60,46 @@
       native-application
       variable
       abstraction
-      abstraction-type
+      signature
       application
       branch
       recursion
-      annotated))
+      annotated
+      evaluated
+      typed))
 
-  (define (type-of $term)
-    (switch-exhaustive $term
-      ((evaluated? $evaluated)
-        (type-of (evaluated-ref $evaluated)))
-      ((type? $type)
-        (type (+ (type-depth $type) 1)))
-      ((typed? $typed)
-        (typed-type $typed))))
+  (comment
+    (term-switch $term
+      ((nothing? $nothing) (todo))
+      ((anything? $anything) (todo))
+      ((type? $type) (todo))
+      ((symbol? $symbol) (todo))
+      ((indexed? $indexed) (todo))
+      ((symbolic? $symbolic) (todo))
+      ((native? $native) (todo))
+      ((native-application? $native-application) (todo))
+      ((variable? $variable) (todo))
+      ((abstraction? $abstraction) (todo))
+      ((signature? $signature) (todo))
+      ((application? $application) (todo))
+      ((branch? $branch) (todo))
+      ((recursion? $recursion) (todo))
+      ((annotated? $annotated) (todo))
+      ((evaluated? $evaluated) (todo))
+      ((typed? $typed) (todo))))
 
   (define (abstraction-apply $abstraction $arg)
     (app (abstraction-procedure $abstraction) $arg))
 
-  (define (abstraction-type-apply $abstraction-type $arg)
-    (app (abstraction-type-procedure $abstraction-type) $arg))
+  (define (signature-apply $signature $arg)
+    (app (signature-procedure $signature) $arg))
 
   (define (recursion-apply $recursion $arg)
     (app (recursion-procedure $recursion) $arg))
 
   (define (binding $term $procedure)
     (application
-      (abstraction (type-of $term) $procedure)
+      (abstraction $procedure)
       $term))
 
   (define (binding? $term)
@@ -115,4 +124,16 @@
         (term-body (evaluated-ref $evaluated)))
       ((else $other)
         $other)))
+
+  (define (branch-ref $branch $condition)
+    (app (if $condition branch-consequent branch-alternate) $branch))
+
+  (define (term-procedure? $term)
+    (switch? $term
+      ((abstraction? $abstraction)
+        (abstraction-procedure $abstraction))
+      ((signature? $signature)
+        (signature-procedure $signature))
+      ((recursion? $recursion)
+        (recursion-procedure $recursion))))
 )

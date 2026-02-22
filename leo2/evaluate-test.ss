@@ -1,176 +1,162 @@
 (import
   (leo2 base)
   (leo2 term)
-  (leo2 stdlib)
   (leo2 evaluate)
   (leo2 datum))
 
-(check-evaluates
-  (evaluated (string-term "foo"))
-  (evaluated (string-term "foo")))
+(check-evaluates nothing (evaluated nothing))
+(check-evaluates anything (evaluated anything))
+
+(check-evaluates (type 12) (evaluated (type 12)))
+
+(check-evaluates 'foo (evaluated 'foo))
+
+(check-evaluates (variable 'x) (evaluated (variable 'x)))
 
 (check-evaluates
-  (type 12)
-  (evaluated (type 12)))
+  (indexed 3 (native "foo"))
+  (evaluated (indexed 3 (evaluated (native "foo")))))
 
 (check-evaluates
-  (variable-term string-type 'x)
-  (evaluated (variable-term string-type 'x)))
+  (symbolic 'lucky (native 7))
+  (evaluated (symbolic 'lucky (evaluated (native 7)))))
 
 (check-evaluates
-  (indexed-term 3 (string-term "foo"))
-  (evaluated (indexed-term 3 (evaluated (string-term "foo")))))
+  (native string-append)
+  (evaluated (native string-append)))
 
 (check-evaluates
-  (symbol-term 'thing)
-  (evaluated (symbol-term 'thing)))
+  (native-application string-append
+    (list
+      (native "foo")
+      (native "bar")))
+  (evaluated (native "foobar")))
 
 (check-evaluates
-  (symbolic-term 'lucky (symbol-term 'number))
-  (evaluated (symbolic-term 'lucky (evaluated (symbol-term 'number)))))
-
-(check-evaluates
-  (string-term "foo")
-  (evaluated (string-term "foo")))
-
-(check-evaluates
-  (native-application-term
-    string-type
-    string-append
-    (string-term "foo")
-    (string-term "bar"))
-  (evaluated (string-term "foobar")))
-
-(check-evaluates
-  (native-application-term
-    string-type
-    string-append
-    (string-term "foo")
-    (variable-term string-type 'x))
+  (native-application string-append
+    (list
+      (native "foo")
+      (variable 'x)))
   (evaluated
-    (native-application-term
-      string-type
-      string-append
-      (evaluated (string-term "foo"))
-      (evaluated (variable-term string-type 'x)))))
+    (native-application string-append
+      (list
+        (evaluated (native "foo"))
+        (evaluated (variable 'x))))))
 
 (check-evaluates
-  (abstraction-term string-type
-    (lambda ($x) $x))
-  (evaluated
-    (abstraction-term (evaluate string-type)
-      (lambda ($x) (evaluated $x)))))
+  (abstraction (lambda (x) x))
+  (evaluated (abstraction (lambda (x) (evaluated x)))))
 
 (check-evaluates
-  (application-term
-    (abstraction-term string-type
-      (lambda ($x) $x))
-    (string-term "foo"))
-  (evaluated (string-term "foo")))
+  (application
+    (abstraction (lambda (x) x))
+    (native "foo"))
+  (evaluated (native "foo")))
 
 (check-evaluates
-  (abstraction-type-term
+  (signature
     (type 0)
-    (lambda ($x) $x))
+    (lambda (x) x))
   (evaluated
-    (abstraction-type-term (evaluated (type 0))
+    (signature
+      (evaluated (type 0))
       (lambda (v0) (evaluated v0)))))
 
 (check-evaluates
-  (application-term
-    (application-term
-      (abstraction-term string-type
-        (lambda ($x)
-          (abstraction-term string-type
-            (lambda ($y)
-              (native-application-term string-type string-append $x $y)))))
-      (string-term "foo"))
-    (string-term "bar"))
-  (evaluated (string-term "foobar")))
+  (application
+    (application
+      (abstraction
+        (lambda (x)
+          (abstraction
+            (lambda (y)
+              (native-application string-append (list x y))))))
+      (native "foo"))
+    (native "bar"))
+  (evaluated (native "foobar")))
 
 (check-evaluates
-  (branch-type-term
-    (boolean-term #t)
-    string-type
-    number-type)
-  (evaluated string-type))
+  (branch
+    (native #t)
+    (native "true")
+    (native "false"))
+  (evaluated (native "true")))
 
 (check-evaluates
-  (branch-type-term
-    (boolean-term #f)
-    string-type
-    number-type)
-  (evaluated number-type))
+  (branch
+    (native #f)
+    (native "true")
+    (native "false"))
+  (evaluated (native "false")))
 
 (check-evaluates
-  (branch-type-term
-    (variable-term boolean-type 'x)
-    string-type
-    string-type)
-  (evaluated string-type))
+  (branch
+    (variable 'x)
+    (variable 'y)
+    (variable 'y))
+  (evaluated (variable 'y)))
 
 (check-evaluates
-  (branch-type-term
-    (variable-term boolean-type 'x)
-    string-type
-    number-type)
+  (branch
+    (variable 'x)
+    (variable 'y)
+    (variable 'z))
   (evaluated
-    (branch-type-term
-      (evaluated (variable-term boolean-type 'x))
-      (evaluated string-type)
-      (evaluated number-type))))
+    (branch
+      (evaluated (variable 'x))
+      (evaluated (variable 'y))
+      (evaluated (variable 'z)))))
 
-; (check-evaluates
-;   (recursion
-;     (lambda ($self)
-;       (abstraction
-;         (lambda ($n) $self))))
-;   (evaluated
-;     (recursion
-;       (lambda (v0)
-;         (evaluated
-;           (abstraction
-;             (lambda (v1)
-;               (evaluated v0))))))))
+(check-evaluates
+  (recursion
+    (lambda (fn)
+      (abstraction
+        (lambda (n) fn))))
+  (evaluated
+    (recursion
+      (lambda (v0)
+        (evaluated
+          (abstraction
+            (lambda (v1)
+              (evaluated v0))))))))
 
-; (check-evaluates
-;   (recursion
-;     (lambda ($self)
-;       (abstraction
-;         (lambda ($n) $n))))
-;   (evaluated
-;     (recursion
-;       (lambda (v0)
-;         (evaluated
-;           (abstraction
-;             (lambda (v1)
-;               (evaluated v1))))))))
+(check-evaluates
+  (recursion
+    (lambda (fn)
+      (abstraction
+        (lambda (n) n))))
+  (evaluated
+    (recursion
+      (lambda (v0)
+        (evaluated
+          (abstraction
+            (lambda (v1)
+              (evaluated v1))))))))
 
-; (check-evaluates
-;   (application
-;     (recursion
-;       (lambda ($self)
-;         (abstraction
-;           (lambda ($n)
-;             (branch
-;               (native-application (native zero?) (list $n))
-;               (native "Done")
-;               (application $self (native-application (native -) (list $n (native 1)))))))))
-;     (native 1))
-;   (evaluated (native "Done")))
+(check-evaluates
+  (application
+    (recursion
+      (lambda (fn)
+        (abstraction
+          (lambda (n)
+            (branch
+              (native-application zero? (list n))
+              (native "Done")
+              (application fn (native-application - (list n (native 1)))))))))
+    (native 10))
+  (evaluated (native "Done")))
 
-; (check-evaluates
-;   (application
-;     (recursion
-;       (lambda ($self)
-;         (abstraction
-;           (lambda ($n)
-;             (branch
-;               (native-application (native <) (list $n (native 2)))
-;               $n
-;               (native-application (native +)
-;                 (list
-;                   (application $self (native-application (native -) (list $n (native 1))))
-;                   (application $self (native-application (native -) (list $n (native 2)))))))))))
-;     (native 10))
-;   (evaluated (native 55)))
+(check-evaluates
+  (application
+    (recursion
+      (lambda (fib)
+        (abstraction
+          (lambda (n)
+            (branch
+              (native-application < (list n (native 2)))
+              n
+              (native-application +
+                (list
+                  (application fib (native-application - (list n (native 1))))
+                  (application fib (native-application - (list n (native 2)))))))))))
+    (native 10))
+  (evaluated (native 55)))

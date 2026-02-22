@@ -2,8 +2,7 @@
   (only (leo2 base) quote)
   (leo2 lang expand)
   (prefix (leo2 comptime) %)
-  (prefix (leo2 term) %%)
-  (leo2 stdlib))
+  (prefix (leo2 term) %%))
 
 (check
   (expand type)
