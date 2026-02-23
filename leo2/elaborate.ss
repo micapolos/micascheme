@@ -22,7 +22,7 @@
         $type)
 
       ((native? $native)
-        (throw elaborate $native))
+        (throw elaborate `(unsupported-native ,(native-ref $native))))
 
       ((native-application? $native-application)
         (lets
@@ -39,7 +39,7 @@
           $variable))
 
       ((procedure? $procedure)
-        (throw elaborate $procedure))
+        (throw elaborate (list 'raw-procedure-unsupported (term->datum $procedure))))
 
       ((signature? $signature)
         (lets
@@ -72,7 +72,7 @@
                 ($res-type-term (signature-apply $signature $rhs-core))
                 (typed $res-type-term (application $typed-lhs $rhs))))
             ((else $other-type)
-              (throw elaborate "Application LHS must have a signature type" $other-type)))))
+              (throw elaborate `(invalid-application-lhs ,(term->datum $other-type)))))))
 
       ((branch? $branch)
         (lets
@@ -88,7 +88,10 @@
             (typed
               (term->typed $consequent-type)
               (branch $condition $consequent $alternate))
-            (throw elaborate "Branch arm type mismatch" $consequent-type $alternate-type))))
+            (throw elaborate
+              `(branch-type-mismatch
+                ,(term->datum $consequent-type)
+                ,(term->datum $alternate-type))))))
 
       ((recursion? $recursion)
         (lets
@@ -120,15 +123,16 @@
     (lets
       ($elaborated (elaborate $term))
       ($actual-type (term-type $elaborated))
-      ($term-coreed-actual (term-core $actual-type))
-      ($term-coreed-expected (term-core $expected-type))
+      ($actual-core (term-core $actual-type))
+      ($expected-core (term-core $expected-type))
       (cond
-        ((term=? $term-coreed-actual $term-coreed-expected) $elaborated)
-        ((term=? $term-coreed-expected anything) $elaborated)
+        ((term=? $actual-core $expected-core) $elaborated)
+        ((term=? $expected-core anything) $elaborated)
         (else
-          (throw elaborate "Type Mismatch"
-            `(expected ,(term->datum $term-coreed-expected))
-            `(actual ,(term->datum $term-coreed-actual)))))))
+          (throw elaborate
+            `(type-mismatch
+              (expected ,(term->datum $expected-core))
+              (actual ,(term->datum $actual-core))))))))
 
   (define (term-type $term)
     (switch $term
