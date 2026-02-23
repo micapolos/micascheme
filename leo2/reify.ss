@@ -6,21 +6,11 @@
     (leo2 base)
     (leo2 term)
     (leo2 symbol)
-    (leo2 datum))
+    (leo2 datum)
+    (leo2 annotation))
 
   (define (reify $term)
     (depth-reify 0 #f $term))
-
-  (define (labeled-datum? $labeled $symbol)
-    (switch? (labeled-label $labeled)
-      ((quoted? $quoted)
-        (lets
-          ($ref (quoted-ref $quoted))
-          (and
-            (pair? $ref)
-            (eq? (car $ref) $symbol)
-            (pair? (cdr $ref))
-            (cadr $ref))))))
 
   (define (depth-reify $depth $native-datum? $term)
     (term-switch $term
@@ -74,7 +64,9 @@
       ((labeled? $labeled)
         (depth-reify
           $depth
-          (or (labeled-datum? $labeled 'native) $native-datum?)
+          (or
+            (labeled-annotation-ref? $labeled 'native)
+            $native-datum?)
           (labeled-ref $labeled)))
       ((evaluated? $evaluated)
         (throw reify $evaluated))
