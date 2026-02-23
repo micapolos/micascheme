@@ -77,24 +77,25 @@
                 `(invalid-application-lhs
                   ,(term->datum $other-type)))))))
 
-      ((branch? $branch)
+((branch? $branch)
         (lets
           ($condition
             (type-elaborate
-              (typed (type 0) (native 'boolean))
+              (typed (type 0) (native 'Boolean))
               (branch-condition $branch)))
           ($consequent (elaborate (branch-consequent $branch)))
           ($alternate (elaborate (branch-alternate $branch)))
           ($consequent-type (term-type $consequent))
           ($alternate-type (term-type $alternate))
-          (if (term=? (term-core $consequent-type) (term-core $alternate-type))
-            (typed
-              (term->typed $consequent-type)
-              (branch $condition $consequent $alternate))
-            (throw elaborate
-              `(branch-type-mismatch
-                ,(term->datum $consequent-type)
-                ,(term->datum $alternate-type))))))
+          ;; Instead of throwing on mismatch, we construct a dependent type.
+          ;; The type of a branch is itself a branch of the types.
+          (typed
+            (term->typed
+              (branch
+                (term-core $condition)
+                (term-core $consequent-type)
+                (term-core $alternate-type)))
+            (branch $condition $consequent $alternate))))
 
       ((recursion? $recursion)
         (lets
