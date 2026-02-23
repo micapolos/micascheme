@@ -22,7 +22,8 @@
         $type)
 
       ((native? $native)
-        (throw elaborate `(unsupported-native ,(native-ref $native))))
+        (throw elaborate
+          `(unsupported-native ,(native-ref $native))))
 
       ((native-application? $native-application)
         (lets
@@ -72,7 +73,9 @@
                 ($res-type-term (signature-apply $signature $rhs-core))
                 (typed $res-type-term (application $typed-lhs $rhs))))
             ((else $other-type)
-              (throw elaborate `(invalid-application-lhs ,(term->datum $other-type)))))))
+              (throw elaborate
+                `(invalid-application-lhs
+                  ,(term->datum $other-type)))))))
 
       ((branch? $branch)
         (lets
