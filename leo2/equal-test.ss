@@ -17,46 +17,11 @@
 (check (not (term=? (type 1) (type 2))))
 (check (not (term=? (type 1) (variable 0))))
 
-; symbol
-(check (term=? 'foo 'foo))
-(check (not (term=? 'foo 'bar)))
-(check (not (term=? 'foo (native 'foo))))
+; quoted
+(check (term=? (quoted 'foo) (quoted 'foo)))
+(check (not (term=? (quoted 'foo) (quoted 'bar))))
+(check (not (term=? (quoted 'foo) (native 'foo))))
 
-; symbolic
-(check
-  (term=?
-    (symbolic 'foo (variable 0))
-    (symbolic 'foo (variable 0))))
-
-(check
-  (not
-    (term=?
-      (symbolic 'foo (variable 0))
-      (symbolic 'foo2 (variable 0)))))
-
-(check
-  (not
-    (term=?
-      (symbolic 'foo (variable 0))
-      (symbolic 'foo (variable 1)))))
-
-; indexed
-(check
-  (term=?
-    (indexed 2 (variable 0))
-    (indexed 2 (variable 0))))
-
-(check
-  (not
-    (term=?
-      (indexed 2 (variable 0))
-      (indexed 3 (variable 0)))))
-
-(check
-  (not
-    (term=?
-      (indexed 2 (variable 0))
-      (indexed 2 (variable 1)))))
 
 ; native
 (check (term=? (native 10) (native 10)))
@@ -238,4 +203,4 @@
       (recursion (lambda (x) (lambda (y) x)))
       (recursion (lambda (x) (lambda (y) y))))))
 
-; TODO: annotated, evaluated, typed
+; TODO: labeled, evaluated, typed

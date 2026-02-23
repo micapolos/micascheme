@@ -17,16 +17,8 @@
       ((anything? _) 'anything)
       ((type? $type)
         `(type ,(type-depth $type)))
-      ((symbol? $symbol)
-        `(symbol ,$symbol))
-      ((indexed? $indexed)
-        `(indexed
-          ,(indexed-index $indexed)
-          ,(depth-term->datum $depth (indexed-ref $indexed))))
-      ((symbolic? $symbolic)
-        `(symbolic
-          ,(symbolic-symbol $symbolic)
-          ,(depth-term->datum $depth (symbolic-ref $symbolic))))
+      ((quoted? $quoted)
+        `(quote ,(quoted-ref $quoted)))
       ((native? $native)
         `(native ,(native-ref $native)))
       ((native-application? $native-application)
@@ -58,12 +50,12 @@
         `(recursive .
           ,(procedure->datum $depth #f
             (recursion-procedure $recursion))))
-      ((annotated? $annotated)
-        `(annotated
+      ((labeled? $labeled)
+        `(labeled
           ,(depth-term->datum $depth
-            (annotated-annotation $annotated))
+            (labeled-label $labeled))
           ,(depth-term->datum $depth
-            (annotated-ref $annotated))))
+            (labeled-ref $labeled))))
       ((evaluated? $evaluated)
         `(evaluated
           ,(depth-term->datum $depth
@@ -88,7 +80,7 @@
             `(,$symbol ,(depth-term->datum $depth $param))))
         ,(depth-term->datum
           (+ $depth 1)
-          ($procedure (variable $symbol))))))
+          ($procedure (variable $depth))))))
 
   (define-rule-syntax (check-term->datum=? in out)
     (check (equal? (term->datum in) `out)))

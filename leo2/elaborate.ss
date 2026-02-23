@@ -12,20 +12,7 @@
       ((nothing? _) #f)
       ((anything? _) #t)
       ((type? $type) $type)
-      ((symbol? $symbol)
-        (typed
-          (typed (type 0) $symbol)
-          $symbol))
-      ((indexed? $indexed)
-        (lets
-          ($typed-ref (elaborate (indexed-ref $indexed)))
-          (typed
-            (typed (type 0)
-              (indexed
-                (indexed-index $indexed)
-                (typed-type $typed-ref)))
-            (typed-ref $typed-ref))))
-      ((symbolic? $symbolic) (todo))
+      ((quoted? $quoted) (todo))
       ((native? $native) (todo))
       ((native-application? $native-application) (todo))
       ((variable? $variable) (todo))
@@ -34,7 +21,7 @@
       ((application? $application) (todo))
       ((branch? $branch) (todo))
       ((recursion? $recursion) (todo))
-      ((annotated? $annotated) (todo))
+      ((labeled? $labeled) (todo))
       ((evaluated? $evaluated) (todo))
       ((typed? $typed)
         (type-elaborate
@@ -46,20 +33,7 @@
       ((nothing? _) #f)
       ((anything? _) #t)
       ((type? $type) $type)
-      ((symbol? $symbol)
-        (typed
-          (typed (type 0) $symbol)
-          $symbol))
-      ((indexed? $indexed)
-        (lets
-          ($typed-ref (elaborate (indexed-ref $indexed)))
-          (typed
-            (typed (type 0)
-              (indexed
-                (indexed-index $indexed)
-                (typed-type $typed-ref)))
-            (typed-ref $typed-ref))))
-      ((symbolic? $symbolic) (todo))
+      ((quoted? $quoted) (todo))
       ((native? $native) (todo))
       ((native-application? $native-application) (todo))
       ((variable? $variable) (todo))
@@ -68,7 +42,7 @@
       ((application? $application) (todo))
       ((branch? $branch) (todo))
       ((recursion? $recursion) (todo))
-      ((annotated? $annotated) (todo))
+      ((labeled? $labeled) (todo))
       ((evaluated? $evaluated) (todo))
       ((typed? $typed)
         (type-elaborate

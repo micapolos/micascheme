@@ -127,14 +127,14 @@
             ,@(app
               (if (abstraction? (typed-ref $body)) cdr list)
               (reify (+ $depth 1) $body)))))
-      ((annotated? $annotated)
+      ((labeled? $labeled)
         (lets
-          ($ref (annotated-ref $annotated))
-          `(annotated
-            ,(reify $depth (annotated-annotation $annotated))
+          ($ref (labeled-ref $labeled))
+          `(labeled
+            ,(reify $depth (labeled-label $labeled))
             .
             ,(app
-              (if (annotated? (typed-ref $ref)) cdr list)
+              (if (labeled? (typed-ref $ref)) cdr list)
               (reify $depth $ref)))))))
 
   (define-rule-syntax (check-reify in out)

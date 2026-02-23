@@ -25,32 +25,12 @@
             (=
               (type-depth $type-a)
               (type-depth $type-b)))))
-      ((symbol? $symbol-a)
+      ((quoted? $quoted-a)
         (switch-b? $term-b
-          ((symbol? $symbol-b)
-            (symbol=?
-              $symbol-a
-              $symbol-b))))
-      ((indexed? $indexed-a)
-        (switch-b? $term-b
-          ((indexed? $indexed-b)
-            (and
-              (=
-                (indexed-index $indexed-a)
-                (indexed-index $indexed-b))
-              (depth-term=? $depth
-                (indexed-ref $indexed-a)
-                (indexed-ref $indexed-b))))))
-      ((symbolic? $symbolic-a)
-        (switch-b? $term-b
-          ((symbolic? $symbolic-b)
-            (and
-              (symbol=?
-                (symbolic-symbol $symbolic-a)
-                (symbolic-symbol $symbolic-b))
-              (depth-term=? $depth
-                (symbolic-ref $symbolic-a)
-                (symbolic-ref $symbolic-b))))))
+          ((quoted? $quoted-b)
+            (equal?
+              (quoted-ref $quoted-a)
+              (quoted-ref $quoted-b)))))
       ((native? $native-a)
         (switch-b? $term-b
           ((native? $native-b)
@@ -119,16 +99,16 @@
             (depth-term=? $depth
               (recursion-procedure $recursion-a)
               (recursion-procedure $recursion-b)))))
-      ((annotated? $annotated-a)
+      ((labeled? $labeled-a)
         (switch-b? $term-b
-          ((annotated? $annotated-b)
+          ((labeled? $labeled-b)
             (and
               (depth-term=? $depth
-                (annotated-annotation $annotated-a)
-                (annotated-annotation $annotated-b))
+                (labeled-label $labeled-a)
+                (labeled-label $labeled-b))
               (depth-term=? $depth
-                (annotated-ref $annotated-a)
-                (annotated-ref $annotated-b))))))
+                (labeled-ref $labeled-a)
+                (labeled-ref $labeled-b))))))
       ((evaluated? $evaluated-a)
         (switch-b? $term-b
           ((evaluated? $evaluated-b)

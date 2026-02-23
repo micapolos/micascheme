@@ -7,15 +7,7 @@
 (check-term->datum=? anything anything)
 
 (check-term->datum=? (type 12) (type 12))
-(check-term->datum=? 'foo (symbol foo))
-
-(check-term->datum=?
-  (indexed 10 (native "foo"))
-  (indexed 10 (native "foo")))
-
-(check-term->datum=?
-  (symbolic 'lucky (native 10))
-  (symbolic lucky (native 10)))
+(check-term->datum=? (quoted '(foo bar)) '(foo bar))
 
 (check-term->datum=?
   (native string-append)
@@ -25,37 +17,35 @@
   (native-application string-append (list (native "foo") (native "bar")))
   (native-apply ,string-append (native "foo") (native "bar")))
 
-(check-term->datum=?
-  (variable 'x)
-  (variable x))
+(check-term->datum=? (variable 0) (variable 0))
 
 (check-term->datum=?
-  (lambda (x) (application (variable 'the) x))
-  (lambda v0 (apply (variable the) (variable v0))))
+  (lambda (x) (application (variable 10) x))
+  (lambda v0 (apply (variable 10) (variable 0))))
 
 (check-term->datum=?
-  (signature (variable 'string) (lambda (x) (application (variable 'the) x)))
-  (lambda (v0 (variable string)) (apply (variable the) (variable v0))))
+  (signature (variable 10) (lambda (x) (application (variable 20) x)))
+  (lambda (v0 (variable 10)) (apply (variable 20) (variable 0))))
 
 (check-term->datum=?
-  (recursion (lambda (fn) (lambda(x) (application fn x))))
-  (recursive v0 (lambda v1 (apply (variable v0) (variable v1)))))
+  (recursion (lambda (fn) (lambda (x) (application fn x))))
+  (recursive v0 (lambda v1 (apply (variable 0) (variable 1)))))
 
 (check-term->datum=?
-  (application (variable 'x) (variable 'y))
-  (apply (variable x) (variable y)))
+  (application (variable 0) (variable 1))
+  (apply (variable 0) (variable 1)))
 
 (check-term->datum=?
-  (branch (variable 'a) (variable 'b) (variable 'c))
-  (if (variable a) (variable b) (variable c)))
+  (branch (variable 0) (variable 1) (variable 2))
+  (if (variable 0) (variable 1) (variable 2)))
 
 (check-term->datum=?
-  (annotated 'good (native "milk"))
-  (annotated (symbol good) (native "milk")))
+  (labeled (variable 0) (native "milk"))
+  (labeled (variable 0) (native "milk")))
 
 (check-term->datum=?
-  (typed 'string (native "milk"))
-  (typed (symbol string) (native "milk")))
+  (typed (variable 0) (native "milk"))
+  (typed (variable 0) (native "milk")))
 
 (check-term->datum=?
   (evaluated (native "milk"))

@@ -22,18 +22,8 @@
         (evaluated $anything))
       ((type? $type)
         (evaluated $term))
-      ((symbol? $symbol)
-        (evaluated $symbol))
-      ((indexed? $indexed)
-        (evaluated
-          (indexed
-            (indexed-index $indexed)
-            (evaluate (indexed-ref $indexed)))))
-      ((symbolic? $symbolic)
-        (evaluated
-          (symbolic
-            (symbolic-symbol $symbolic)
-            (evaluate (symbolic-ref $symbolic)))))
+      ((quoted? $quoted)
+        (evaluated $quoted))
       ((native? $native)
         (evaluated $native))
       ((native-application? $native-application)
@@ -85,11 +75,11 @@
                 (app
                   (recursion-procedure $recursion)
                   $self))))))
-      ((annotated? $annotated)
+      ((labeled? $labeled)
         (evaluated
-          (annotated
-            (evaluate (annotated-annotation $annotated))
-            (evaluate (annotated-ref $annotated)))))
+          (labeled
+            (evaluate (labeled-label $labeled))
+            (evaluate (labeled-ref $labeled)))))
       ((evaluated? $evaluated)
         $evaluated)
       ((typed? $typed)

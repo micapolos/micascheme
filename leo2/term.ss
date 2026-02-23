@@ -2,6 +2,7 @@
   (export
     nothing nothing?
     anything anything?
+    quoted quoted? quoted-ref
     native native? native-ref
     native-application native-application? native-application-procedure native-application-args
     type type? type-depth
@@ -12,9 +13,7 @@
     recursion recursion? recursion-procedure
     evaluated evaluated? evaluated-ref
     typed typed? typed-type typed-ref
-    symbolic symbolic? symbolic-symbol symbolic-ref
-    indexed indexed? indexed-index indexed-ref
-    annotated annotated? annotated-annotation annotated-ref
+    labeled labeled? labeled-label labeled-ref
 
     term? term-switch
 
@@ -28,6 +27,7 @@
   (data nothing)
   (data anything)
   (data (type depth))
+  (data (quoted ref))
   (data (native ref))
   (data (native-application procedure args))
   (data (variable index))
@@ -35,9 +35,7 @@
   (data (application lhs rhs))
   (data (branch condition consequent alternate))
   (data (recursion procedure))
-  (data (symbolic symbol ref))
-  (data (indexed index ref))
-  (data (annotated annotation ref))
+  (data (labeled label ref))
   (data (evaluated ref))
   (data (typed type ref))
 
@@ -46,9 +44,7 @@
       nothing
       anything
       type
-      symbol
-      indexed
-      symbolic
+      quoted
       native
       native-application
       variable
@@ -57,7 +53,7 @@
       application
       branch
       recursion
-      annotated
+      labeled
       evaluated
       typed))
 
@@ -66,9 +62,7 @@
       ((nothing? $nothing) $nothing)
       ((anything? $anything) $anything)
       ((type? $type) $type)
-      ((symbol? $symbol) $symbol)
-      ((indexed? $indexed) $indexed)
-      ((symbolic? $symbolic) $symbolic)
+      ((quoted? $quoted) $quoted)
       ((native? $native) $native)
       ((native-application? $native-application) $native-application)
       ((variable? $variable) $variable)
@@ -77,7 +71,7 @@
       ((application? $application) $application)
       ((branch? $branch) $branch)
       ((recursion? $recursion) $recursion)
-      ((annotated? $annotated) $annotated)
+      ((labeled? $labeled) $labeled)
       ((evaluated? $evaluated) $evaluated)
       ((typed? $typed) $typed)))
 

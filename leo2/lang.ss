@@ -1,17 +1,15 @@
 (library (leo2 lang)
   (export
     nothing anything
-    symbol
+    quote
     type
     native native-apply
-    indexed
-    symbolic
     variable
     lambda
     recursive
     apply
     if
-    annotated
+    labeled
     evaluated
     typed
     check-lang)
@@ -19,6 +17,7 @@
     (rename (leo2 base)
       (lambda %lambda)
       (apply %apply)
+      (quote %quote)
       (if %if))
     (prefix (leo2 term) %)
     (leo2 datum))
@@ -30,15 +29,8 @@
     ((type n)
       (nonnegative-integer? (datum n))
       (%type n))
-    ((symbol s)
-      (symbol? (datum s))
-      's)
-    ((indexed i x)
-      (nonnegative-integer? (datum i))
-      (%indexed i x))
-    ((symbolic s x)
-      (symbol? (datum s))
-      (%symbolic 's x))
+    ((quote s)
+      (%quoted (%quote s)))
     ((native x)
       (%native x))
     ((native-apply fn arg ...)
@@ -59,8 +51,8 @@
       (%recursion (%lambda (id) body)))
     ((if a b c)
       (%branch a b c))
-    ((annotated ann x)
-      (%annotated ann x))
+    ((labeled ann x)
+      (%labeled ann x))
     ((evaluated x)
       (%evaluated x))
     ((typed t v)

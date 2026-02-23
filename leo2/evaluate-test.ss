@@ -9,17 +9,9 @@
 
 (check-evaluates (type 12) (evaluated (type 12)))
 
-(check-evaluates 'foo (evaluated 'foo))
+(check-evaluates (quoted 'foo) (evaluated (quoted 'foo)))
 
 (check-evaluates (variable 0) (evaluated (variable 0)))
-
-(check-evaluates
-  (indexed 3 (native "foo"))
-  (evaluated (indexed 3 (evaluated (native "foo")))))
-
-(check-evaluates
-  (symbolic 'lucky (native 7))
-  (evaluated (symbolic 'lucky (evaluated (native 7)))))
 
 (check-evaluates
   (native string-append)
