@@ -35,6 +35,14 @@
 ; --- native-application
 
 (check-elaborates
+  (typed
+    (native boolean-type)
+    (native-application zero? (list (variable 100))))
+  (typed
+    (native ,boolean-type)
+    (native-application ,zero? (list (variable 100)))))
+
+(check-elaborates
   (native-application zero? (list (variable 100)))
   (typed
     (typed (type 0) anything)
