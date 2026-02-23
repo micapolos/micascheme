@@ -12,117 +12,130 @@
 
   (define (elaborate $term)
     (term-switch $term
-      ((nothing? _)
-       (typed (type 0) nothing))
-
-      ((anything? _)
-       (typed (type 0) anything))
-
+      ((nothing? $nothing)
+        (typed (type 0) $nothing))
+      ((anything? $anything)
+        (typed (type 0) $anything))
       ((type? $type)
-       $type)
-
+        $type)
       ((native? $native)
-       (throw type-error "Cannot infer type for native value" $native))
-
-      ((native-application? $na)
-       (let ([$args (map elaborate (native-application-args $na))])
-         (typed (typed (type 0) anything)
-                (native-application (native-application-procedure $na) $args))))
-
-      ((variable? $v)
-       (typed (typed (type 0) anything) $v))
-
-      ((procedure? $proc)
-       (throw type-error "Cannot infer signature for raw procedure" $proc))
-
-      ((signature? $sig)
-       (let* ([$param (signature-param $sig)]
-              [$proc  (signature-procedure $sig)]
-              [$elab-param (elaborate $param)])
-         (let ([$elab-proc
-                (lambda ($v)
-                  ;; Manually wrap the variable so it has its local type.
-                  (typed $elab-param $v))])
-           ;; The content of the signature (the function's type logic)
-           (let ([$sig-content (signature $elab-param (lambda ($v) (get-type ($elab-proc $v))))])
-             ;; FIX: Wrap the signature in its OWN type, then wrap that in (type 0).
-             ;; This makes it a "Double Onion" that is still a signature.
-             (typed (typed (type 0) $sig-content)
-                    (signature $elab-param $elab-proc))))))
-
-      ((application? $app)
-       (let* ([$rhs (elaborate (application-rhs $app))]
-              [$rhs-core (peel $rhs)]
-              [$rhs-type (get-type $rhs)])
-         (let ([$lhs-raw (application-lhs $app)])
-           (let ([$lhs (if (procedure? $lhs-raw)
-                           (elaborate (signature $rhs-type $lhs-raw))
-                           (elaborate $lhs-raw))])
-             (let ([$lhs-type (get-type $lhs)])
-               (switch (peel $lhs-type)
-                 ((signature? $sig)
-                  (let ([$res-type-term (signature-apply $sig $rhs-core)])
-                    (typed $res-type-term (application $lhs $rhs))))
-                 ((else _)
-                  (throw type-error "Application LHS must have a signature type" $lhs-type))))))))
-
+        (throw elaborate $native))
+      ((native-application? $native-application)
+        (lets
+          ($args (map elaborate (native-application-args $native-application)))
+          (typed (typed (type 0) anything)
+            (native-application
+              (native-application-procedure $native-application)
+              $args))))
+      ((variable? $variable)
+        (typed
+          (typed (type 0) anything)
+          $variable))
+      ((procedure? $procedure)
+        (throw elaborate $procedure))
+      ((signature? $signature)
+        (lets
+          ($param (signature-param $signature))
+          ($procedure (signature-procedure $signature))
+          ($elab-param (elaborate $param))
+          ($elab-proc (lambda ($v) (typed $elab-param $v)))
+          ($sig-content (signature $elab-param (lambda ($v) (get-type ($elab-proc $v)))))
+          (typed
+            (typed (type 0) $sig-content)
+            (signature $elab-param $elab-proc))))
+      ((application? $application)
+        (lets
+          ($rhs (elaborate (application-rhs $application)))
+          ($rhs-core (peel $rhs))
+          ($rhs-type (get-type $rhs))
+          ($lhs-raw (application-lhs $application))
+          ($lhs
+            (if (procedure? $lhs-raw)
+              (elaborate (signature $rhs-type $lhs-raw))
+              (elaborate $lhs-raw)))
+          ($lhs-type (get-type $lhs))
+            (switch (peel $lhs-type)
+              ((signature? $sig)
+                (lets
+                  ($res-type-term (signature-apply $sig $rhs-core))
+                  (typed $res-type-term (application $lhs $rhs))))
+              ((else _)
+                (throw elaborate "Application LHS must have a signature type" $lhs-type)))))
       ((branch? $branch)
-       (let* ([$cond (type-elaborate (typed (type 0) (native 'Boolean)) (branch-condition $branch))]
-              [$then (elaborate (branch-consequent $branch))]
-              [$else (elaborate (branch-alternate $branch))]
-              [$then-type (get-type $then)]
-              [$else-type (get-type $else)])
-         (if (term=? (peel $then-type) (peel $else-type))
-             (typed (smart-wrap $then-type) (branch $cond $then $else))
-             (throw type-error "Branch arm type mismatch" (list $then-type $else-type)))))
-
-      ((recursion? $rec)
-       (let ([$proc (elaborate (recursion-procedure $rec))])
-         (typed (smart-wrap (get-type $proc)) (recursion (peel $proc)))))
-
-      ((labeled? $l)
-       (let ([$inner (elaborate (labeled-ref $l))])
-         (typed (smart-wrap (get-type $inner)) (labeled (labeled-label $l) $inner))))
-
-      ((evaluated? $e)
-       (elaborate (evaluated-ref $e)))
-
-      ((typed? $t)
-       $t)))
+        (lets
+          ($condition
+            (type-elaborate
+              (typed (type 0) (native 'Boolean))
+              (branch-condition $branch)))
+          ($consequent (elaborate (branch-consequent $branch)))
+          ($alternate (elaborate (branch-alternate $branch)))
+          ($consequent-type (get-type $consequent))
+          ($alternate-type (get-type $alternate))
+          (if (term=? (peel $consequent-type) (peel $alternate-type))
+            (typed
+              (smart-wrap $consequent-type)
+              (branch $condition $consequent $alternate))
+            (throw elaborate "Branch arm type mismatch" (list $consequent-type $alternate-type)))))
+      ((recursion? $recursion)
+        (lets
+          ($procedure (elaborate (recursion-procedure $recursion)))
+          (typed
+            (smart-wrap (get-type $procedure))
+            (recursion (peel $procedure)))))
+      ((labeled? $labeled)
+        (lets
+          ($inner (elaborate (labeled-ref $labeled)))
+          (typed
+            (smart-wrap (get-type $inner))
+            (labeled (labeled-label $labeled) $inner))))
+      ((evaluated? $evaluated)
+        (elaborate (evaluated-ref $evaluated)))
+      ((typed? $typed)
+        $typed)))
 
   (define (smart-wrap $term)
     (switch $term
-      ((type? _) $term)
-      ((typed? _) $term)
-      ((else _) (typed (get-type $term) $term))))
+      ((type? $type) $type)
+      ((typed? $typed) $typed)
+      ((else $other)
+        (typed (get-type $other) $other))))
 
   (define (type-elaborate $expected-type $term)
-    (let* ([$elaborated (elaborate $term)]
-           [$actual-type (get-type $elaborated)]
-           [$peeled-actual (peel $actual-type)]
-           [$peeled-expected (peel $expected-type)])
+    (lets
+      ($elaborated (elaborate $term))
+      ($actual-type (get-type $elaborated))
+      ($peeled-actual (peel $actual-type))
+      ($peeled-expected (peel $expected-type))
       (cond
         ((term=? $peeled-actual $peeled-expected)
-         $elaborated)
+          $elaborated)
         ((term=? $peeled-expected anything)
-         $elaborated)
+          $elaborated)
         (else
-         (throw type-error "Type Mismatch"
-                (list 'expected (term->datum $peeled-expected)
-                      'got (term->datum $peeled-actual)))))))
+          (throw elaborate "Type Mismatch"
+            (list 'expected
+              (term->datum $peeled-expected)
+              'got (term->datum $peeled-actual)))))))
 
   (define (get-type $term)
     (switch $term
-      ((typed? $t) (typed-type $t))
-      ((type? $t)  (type (+ (type-depth $t) 1)))
-      ((else _)    (typed (type 0) anything))))
+      ((typed? $typed)
+        (typed-type $typed))
+      ((type? $type)
+        (type (+ (type-depth $type) 1)))
+      ((else _)
+        (typed (type 0) anything))))
 
   (define (peel $term)
     (switch $term
-      ((typed? $t)     (peel (typed-ref $t)))
-      ((labeled? $l)   (peel (labeled-ref $l)))
-      ((evaluated? $e) (peel (evaluated-ref $e)))
-      ((else _)        $term)))
+      ((typed? $typed)
+        (peel (typed-ref $typed)))
+      ((labeled? $labeled)
+        (peel (labeled-ref $labeled)))
+      ((evaluated? $evaluated)
+        (peel (evaluated-ref $evaluated)))
+      ((else $other)
+        $other)))
 
   (define-rule-syntax (check-elaborates in out)
     (check-term->datum=? (elaborate in) out))
