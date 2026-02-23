@@ -7,8 +7,8 @@ doubly lucky:
     the lucky number
     the lucky number
 
-greeting:
-  with: any string
+greeting: with
+  any string
   giving: the: appended
     "Hello"
     the separator string
@@ -25,14 +25,16 @@ hello hell:
 
 increment:
   as number
-  with: (any number)
-  giving: the: sum
-    of (the number)
-    and 1
+  with
+    any number
+    giving: the: sum
+      of (the number)
+      and 1
 
 decrement:
   as number
-  with: (any number)
-  giving: the: difference
-    between (the number)
-    and 1
+  with
+    any number
+    giving: the: difference
+      between (the number)
+      and 1
