@@ -59,45 +59,45 @@
 
 ;; --- Dependent Branches ---
 
-;; Case 1: Matching types (Type 0)
-; (check-elaborates
-;   (branch
-;     (typed (type 0) (native 'boolean))
-;     (type 0)
-;     (type 0))
-;   (typed
-;     (branch
-;       (native boolean)
-;       (type 1)
-;       (type 1))
-;     (branch
-;       (typed (type 0) (native boolean))
-;       (type 0)
-;       (type 0))))
+;; Case 1: Matching types
+(check-elaborates
+  (branch
+    (typed (type 0) (native 'boolean))
+    (type 0)
+    (type 0))
+  (typed
+    (branch
+      (native boolean)
+      (type 1)
+      (type 1))
+    (branch
+      (typed (type 0) (native boolean))
+      (type 0)
+      (type 0))))
 
-; ;; Case 2: Mismatching types (Dependent Type)
-; (check-elaborates
-;   (branch
-;     (typed (type 0) (native 'boolean))
-;     (type 0)
-;     (type 1))
-;   (typed
-;     (branch
-;       (native boolean)
-;       (type 1)
-;       (type 2))
-;     (branch
-;       (typed (type 0) (native boolean))
-;       (type 0)
-;       (type 1))))
+;; Case 2: Mismatching types (Dependent Type Selection)
+(check-elaborates
+  (branch
+    (typed (type 0) (native 'boolean))
+    (type 0)
+    (type 1))
+  (typed
+    (branch
+      (native boolean)
+      (type 1)
+      (type 2))
+    (branch
+      (typed (type 0) (native boolean))
+      (type 0)
+      (type 1))))
 
 ;; --- Recursion & Labeling ---
 
 (check-elaborates
-  (labeled (variable 40) (type 0))
+  (labeled (variable 100) (type 0))
   (typed
     (type 1)
-    (labeled (variable 40) (type 0))))
+    (labeled (variable 100) (type 0))))
 
 (check-elaborates
   (recursion
@@ -114,10 +114,10 @@
             (type 0)
             (variable 0)))))))
 
-;; --- Variables ---
+;; --- Neutral Variables ---
 
 (check-elaborates
-  (variable 0)
+  (variable 100)
   (typed
     (typed (type 0) anything)
-    (variable 0)))
+    (variable 100)))
