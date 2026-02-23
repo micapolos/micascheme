@@ -2,40 +2,38 @@ stop "!"
 separator ", "
 lucky 7
 
-doubly lucky
-  the sum
-    of: the lucky number
-    and: the lucky number
+doubly lucky:
+  the: added
+    the lucky number
+    the lucky number
 
-greet
-  with
-    any string
-    giving
-      the appended
-        "Hello"
-        the separator string
-        the string
-        the stop string (default "!")
+greeting:
+  with: (any string)
+  giving:
+    the: appended
+      "Hello"
+      (the separator string)
+      (the string)
+      the stop string (default "!")
 
-hello world (as string) greet "world"
+hello world:
+  as string
+  the greeting "world"
 
-this hello hell (as string)
-  greet "hell" (stop "?")
+hello hell:
+  as string
+  the greeting "hell" (stop "?")
 
-increment
+increment:
   as number
-  with
-    any number
-    giving
-      the sum
-        of: the number
-        and 1
+  with: (any number)
+  giving: the: sum
+    of (the number)
+    and 1
 
-this decrement,
+decrement:
   as number
-  with
-    any number
-    giving
-      the difference
-        between: the number
-        and 1
+  with: (any number)
+  giving: the: difference
+    between (the number)
+    and 1
