@@ -2,9 +2,12 @@
   (export procedure-name)
   (import (scheme))
 
-(define (procedure-name $proc)
-  (let* ([$str (format "~a" $proc)]
-         [$len (string-length $str)])
+  ; Tries to return original procedure name, by parsing it from
+  ; its string representation, like "<#procedure +>"
+  (define (procedure-name $proc)
+    (let*
+      ([$str (format "~a" $proc)]
+       [$len (string-length $str)])
     (let find-proc ([$i 0])
       (cond
         ;; Give up if "procedure" can't possibly fit
@@ -34,13 +37,13 @@
                          (find-end (+ $k 1))))]))]))]
         [else (find-proc (+ $i 1))]))))
 
-(define (string-match-at? $str $pos $pat)
-  (let ([$pat-len (string-length $pat)])
-    (let loop ([$i 0])
-      (cond
-        [(= $i $pat-len) #t]
-        [(>= (+ $pos $i) (string-length $str)) #f]
-        [(char=? (string-ref $str (+ $pos $i)) (string-ref $pat $i))
-         (loop (+ $i 1))]
-        [else #f]))))
+  (define (string-match-at? $str $pos $pat)
+    (let ([$pat-len (string-length $pat)])
+      (let loop ([$i 0])
+        (cond
+          [(= $i $pat-len) #t]
+          [(>= (+ $pos $i) (string-length $str)) #f]
+          [(char=? (string-ref $str (+ $pos $i)) (string-ref $pat $i))
+           (loop (+ $i 1))]
+          [else #f]))))
 )
