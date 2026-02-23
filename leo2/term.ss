@@ -20,7 +20,6 @@
     signature-apply
     recursion-apply
 
-    term-body
     branch-ref)
   (import (leo2 base))
 
@@ -80,13 +79,6 @@
 
   (define (recursion-apply $recursion $arg)
     ((recursion-procedure $recursion) $arg))
-
-  (define (term-body $term)
-    (switch $term
-      ((evaluated? $evaluated)
-        (term-body (evaluated-ref $evaluated)))
-      ((else $other)
-        $other)))
 
   (define (branch-ref $branch $condition)
     ((if $condition branch-consequent branch-alternate) $branch))
