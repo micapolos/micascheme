@@ -48,7 +48,7 @@
       native
       native-application
       variable
-      procedure  ; assumed arity 1
+      procedure  ; arity 1
       signature
       application
       branch
