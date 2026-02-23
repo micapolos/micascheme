@@ -8,7 +8,8 @@
     (leo2 base)
     (leo2 term)
     (leo2 equal)
-    (leo2 datum))
+    (leo2 datum)
+    (leo2 stdlib))
 
   (define (elaborate $term)
     (term-switch $term
@@ -81,7 +82,7 @@
         (lets
           ($condition
             (type-elaborate
-              (typed (type 0) (native 'boolean))
+              (typed (type 0) (native boolean-type))
               (branch-condition $branch)))
           ($consequent (elaborate (branch-consequent $branch)))
           ($alternate (elaborate (branch-alternate $branch)))
