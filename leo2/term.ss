@@ -89,7 +89,5 @@
         $other)))
 
   (define (branch-ref $branch $condition)
-    (
-      (if $condition branch-consequent branch-alternate)
-      $branch))
+    ((if $condition branch-consequent branch-alternate) $branch))
 )
