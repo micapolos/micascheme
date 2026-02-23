@@ -1,5 +1,8 @@
 (library (data)
-  (export data enum)
+  (export
+    data
+    data-group
+    enum)
   (import
     (scheme)
     (syntax)
@@ -221,4 +224,7 @@
           (display " " port)
           (wr ((record-accessor rtd i) record) port))
         (display ")" port))))
+
+  (define-rule-syntax (data-group x ...)
+    (begin (data x) ...))
 )

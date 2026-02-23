@@ -22,19 +22,20 @@
     branch-ref)
   (import (leo2 base))
 
-  (data nothing)
-  (data anything)
-  (data (type depth))
-  (data (native ref))
-  (data (native-application procedure args))
-  (data (variable index))
-  (data (signature param procedure))
-  (data (application lhs rhs))
-  (data (branch condition consequent alternate))
-  (data (recursion procedure))
-  (data (labeled label ref))
-  (data (evaluated ref))
-  (data (typed type ref))
+  (data-group
+    nothing
+    anything
+    (type depth)
+    (native ref)
+    (native-application procedure args)
+    (variable index)
+    (signature param procedure)
+    (application lhs rhs)
+    (branch condition consequent alternate)
+    (recursion procedure)
+    (labeled label ref)
+    (evaluated ref)
+    (typed type ref))
 
   (union
     (term
