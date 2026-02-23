@@ -45,29 +45,32 @@
         (lets
           ($param (signature-param $signature))
           ($procedure (signature-procedure $signature))
-          ($elab-param (elaborate $param))
-          ($elab-proc (lambda ($v) (typed $elab-param $v)))
-          ($sig-content (signature $elab-param (lambda ($v) (term-type ($elab-proc $v)))))
+          ($typed-param (elaborate $param))
+          ($typed-proc (lambda ($v) (typed $typed-param $v)))
+          ($signature-type
+            (signature $typed-param
+              (lambda ($v)
+                (term-type ($typed-proc $v)))))
           (typed
-            (typed (type 0) $sig-content)
-            (signature $elab-param $elab-proc))))
+            (typed (type 0) $signature-type)
+            (signature $typed-param $typed-proc))))
 
       ((application? $application)
         (lets
           ($rhs (elaborate (application-rhs $application)))
-          ($rhs-core (peel $rhs))
+          ($rhs-core (term-core $rhs))
           ($rhs-type (term-type $rhs))
-          ($lhs-raw (application-lhs $application))
-          ($lhs
-            (if (procedure? $lhs-raw)
-              (elaborate (signature $rhs-type $lhs-raw))
-              (elaborate $lhs-raw)))
-          ($lhs-type (term-type $lhs))
-          (switch (peel $lhs-type)
-            ((signature? $sig)
+          ($lhs (application-lhs $application))
+          ($typed-lhs
+            (if (procedure? $lhs)
+              (elaborate (signature $rhs-type $lhs))
+              (elaborate $lhs)))
+          ($lhs-type (term-type $typed-lhs))
+          (switch (term-core $lhs-type)
+            ((signature? $signature)
               (lets
-                ($res-type-term (signature-apply $sig $rhs-core))
-                (typed $res-type-term (application $lhs $rhs))))
+                ($res-type-term (signature-apply $signature $rhs-core))
+                (typed $res-type-term (application $typed-lhs $rhs))))
             ((else $other-type)
               (throw elaborate "Application LHS must have a signature type" $other-type)))))
 
@@ -81,7 +84,7 @@
           ($alternate (elaborate (branch-alternate $branch)))
           ($consequent-type (term-type $consequent))
           ($alternate-type (term-type $alternate))
-          (if (term=? (peel $consequent-type) (peel $alternate-type))
+          (if (term=? (term-core $consequent-type) (term-core $alternate-type))
             (typed
               (term->typed $consequent-type)
               (branch $condition $consequent $alternate))
@@ -89,17 +92,17 @@
 
       ((recursion? $recursion)
         (lets
-          ($procedure (elaborate (recursion-procedure $recursion)))
+          ($typed-procedure (elaborate (recursion-procedure $recursion)))
           (typed
-            (term->typed (term-type $procedure))
-            (recursion (peel $procedure)))))
+            (term->typed (term-type $typed-procedure))
+            (recursion (term-core $typed-procedure)))))
 
       ((labeled? $labeled)
         (lets
-          ($inner (elaborate (labeled-ref $labeled)))
+          ($typed-ref (elaborate (labeled-ref $labeled)))
           (typed
-            (term->typed (term-type $inner))
-            (labeled (labeled-label $labeled) $inner))))
+            (term->typed (term-type $typed-ref))
+            (labeled (labeled-label $labeled) $typed-ref))))
 
       ((evaluated? $evaluated)
         (elaborate (evaluated-ref $evaluated)))
@@ -117,15 +120,15 @@
     (lets
       ($elaborated (elaborate $term))
       ($actual-type (term-type $elaborated))
-      ($peeled-actual (peel $actual-type))
-      ($peeled-expected (peel $expected-type))
+      ($term-coreed-actual (term-core $actual-type))
+      ($term-coreed-expected (term-core $expected-type))
       (cond
-        ((term=? $peeled-actual $peeled-expected) $elaborated)
-        ((term=? $peeled-expected anything) $elaborated)
+        ((term=? $term-coreed-actual $term-coreed-expected) $elaborated)
+        ((term=? $term-coreed-expected anything) $elaborated)
         (else
           (throw elaborate "Type Mismatch"
-            `(expected ,(term->datum $peeled-expected))
-            `(actual ,(term->datum $peeled-actual)))))))
+            `(expected ,(term->datum $term-coreed-expected))
+            `(actual ,(term->datum $term-coreed-actual)))))))
 
   (define (term-type $term)
     (switch $term
@@ -136,14 +139,14 @@
       ((else $other)
         (typed (type 0) anything))))
 
-  (define (peel $term)
+  (define (term-core $term)
     (switch $term
       ((typed? $typed)
-        (peel (typed-ref $typed)))
+        (term-core (typed-ref $typed)))
       ((labeled? $labeled)
-        (peel (labeled-ref $labeled)))
+        (term-core (labeled-ref $labeled)))
       ((evaluated? $evaluated)
-        (peel (evaluated-ref $evaluated)))
+        (term-core (evaluated-ref $evaluated)))
       ((else $other)
         $other)))
 
