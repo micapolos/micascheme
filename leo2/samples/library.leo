@@ -8,13 +8,12 @@ doubly lucky:
     the lucky number
 
 greeting:
-  with: (any string)
-  giving:
-    the: appended
-      "Hello"
-      (the separator string)
-      (the string)
-      the stop string (default "!")
+  with: any string
+  giving: the: appended
+    "Hello"
+    the separator string
+    the string
+    the stop string (default "!")
 
 hello world:
   as string
