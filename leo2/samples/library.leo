@@ -20,7 +20,7 @@ hello world:
 
 hello hell:
   as string
-  the greeting "hell" (stop "?")
+  the greeting "hell": stop "?"
 
 increment:
   as number
