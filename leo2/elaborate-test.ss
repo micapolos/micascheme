@@ -11,30 +11,36 @@
   (lambda (x) x))
 
 (check-elaborates
-  (application (lambda (x) x) (type 1))
+  (application
+    (lambda (x) x)
+    (type 50))
   (typed
-    (type 0)
+    (type 51)
     (application
       (typed
-        (typed (type 0)
-          (signature (type 2) (lambda (type 0))))
-        (signature (type 2)
+        (typed
+          (type 0)
+          (signature
+            (type 51)
+            (lambda (type 51))))
+        (signature (type 51)
           (lambda
             (typed
-              (typed (type 0) anything)
+              (type 51)
               (variable 0)))))
-      (type 1))))
+      (type 50))))
 
 (check-elaborates
   (signature (type 0)
     (lambda (x) x))
   (typed
-    (typed (type 0)
-      (signature (type 0)
+    (typed
+      (type 0)
+      (signature
+        (type 0)
         (lambda (type 0))))
     (signature (type 0)
       (lambda
         (typed
-          (typed (type 0) anything)
+          (type 0)
           (variable 0))))))
-

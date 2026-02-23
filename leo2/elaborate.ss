@@ -30,9 +30,7 @@
                 (native-application (native-application-procedure $na) $args))))
 
       ((variable? $v)
-       (switch $v
-         ((typed? _) $v)
-         ((else _) (typed (typed (type 0) anything) $v))))
+       (typed (typed (type 0) anything) $v))
 
       ((procedure? $proc)
        (throw type-error "Cannot infer signature for raw procedure" $proc))
@@ -40,14 +38,17 @@
       ((signature? $sig)
        (let* ([$param (signature-param $sig)]
               [$proc  (signature-procedure $sig)]
-              [$elab-param (elaborate $param)]
-              [$elab-proc
-               (lambda ($v) (elaborate ($proc $v)))])
-         (let ([$sig-type (signature $elab-param (lambda ($v) (type 0)))])
-           ;; We wrap signature types in Type 0, but use a local wrapper
-           ;; to avoid re-elaborating the whole signature.
-           (typed (typed (type 0) $sig-type)
-                  (signature $elab-param $elab-proc)))))
+              [$elab-param (elaborate $param)])
+         (let ([$elab-proc
+                (lambda ($v)
+                  ;; Manually wrap the variable so it has its local type.
+                  (typed $elab-param $v))])
+           ;; The content of the signature (the function's type logic)
+           (let ([$sig-content (signature $elab-param (lambda ($v) (get-type ($elab-proc $v))))])
+             ;; FIX: Wrap the signature in its OWN type, then wrap that in (type 0).
+             ;; This makes it a "Double Onion" that is still a signature.
+             (typed (typed (type 0) $sig-content)
+                    (signature $elab-param $elab-proc))))))
 
       ((application? $app)
        (let* ([$rhs (elaborate (application-rhs $app))]
@@ -60,10 +61,8 @@
              (let ([$lhs-type (get-type $lhs)])
                (switch (peel $lhs-type)
                  ((signature? $sig)
-                  (let ([$res-type (signature-apply $sig $rhs-core)])
-                    ;; LOOP FIX: Don't call elaborate here.
-                    ;; Use a smart-wrap that respects the Bedrock rule.
-                    (typed (smart-wrap $res-type) (application $lhs $rhs))))
+                  (let ([$res-type-term (signature-apply $sig $rhs-core)])
+                    (typed $res-type-term (application $lhs $rhs))))
                  ((else _)
                   (throw type-error "Application LHS must have a signature type" $lhs-type))))))))
 
@@ -89,13 +88,12 @@
        (elaborate (evaluated-ref $e)))
 
       ((typed? $t)
-       (type-elaborate (typed-type $t) (typed-ref $t)))))
+       $t)))
 
-  ;; --- Smart Wrap to prevent infinite recursion ---
   (define (smart-wrap $term)
     (switch $term
-      ((type? _) $term) ;; Universes are already bedrock
-      ((typed? _) $term) ;; Already wrapped
+      ((type? _) $term)
+      ((typed? _) $term)
       ((else _) (typed (get-type $term) $term))))
 
   (define (type-elaborate $expected-type $term)
@@ -125,11 +123,6 @@
       ((labeled? $l)   (peel (labeled-ref $l)))
       ((evaluated? $e) (peel (evaluated-ref $e)))
       ((else _)        $term)))
-
-  (define (untyped-internal $term)
-    (switch $term
-      ((typed? $t) (typed-ref $t))
-      ((else _)    $term)))
 
   (define-rule-syntax (check-elaborates in out)
     (check-term->datum=? (elaborate in) out))
