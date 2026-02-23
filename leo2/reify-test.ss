@@ -8,7 +8,7 @@
   (lambda (v0) (lambda (v1) (v0 v1))))
 
 (check-reify
-  (recursion (lambda (x) (lambda (y) (application x y))))
+  (recursion (lambda (fn) (lambda (x) (application fn x))))
   (letrec ((v0 (lambda (v1) (v0 v1)))) v0))
 
 (check-reify
