@@ -81,7 +81,7 @@
         (lets
           ($condition
             (type-elaborate
-              (typed (type 0) (native 'Boolean))
+              (typed (type 0) (native 'boolean))
               (branch-condition $branch)))
           ($consequent (elaborate (branch-consequent $branch)))
           ($alternate (elaborate (branch-alternate $branch)))
