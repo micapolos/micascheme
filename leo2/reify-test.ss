@@ -15,12 +15,14 @@
   (branch (variable 0) (variable 1) (variable 2))
   (if v0 v1 v2))
 
+; self-labeled literals
 (check-reify (native #f) #f)
 (check-reify (native #t) #t)
 (check-reify (native 123) 123)
 (check-reify (native #\a) #\a)
 (check-reify (native "foo") "foo")
 
+; labeled native procedures
 (check-reify
   (labeled (native 'string-append) (native string-append))
   string-append)
