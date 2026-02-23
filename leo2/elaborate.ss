@@ -47,7 +47,7 @@
           ($procedure (signature-procedure $signature))
           ($elab-param (elaborate $param))
           ($elab-proc (lambda ($v) (typed $elab-param $v)))
-          ($sig-content (signature $elab-param (lambda ($v) (get-type ($elab-proc $v)))))
+          ($sig-content (signature $elab-param (lambda ($v) (term-type ($elab-proc $v)))))
           (typed
             (typed (type 0) $sig-content)
             (signature $elab-param $elab-proc))))
@@ -56,13 +56,13 @@
         (lets
           ($rhs (elaborate (application-rhs $application)))
           ($rhs-core (peel $rhs))
-          ($rhs-type (get-type $rhs))
+          ($rhs-type (term-type $rhs))
           ($lhs-raw (application-lhs $application))
           ($lhs
             (if (procedure? $lhs-raw)
               (elaborate (signature $rhs-type $lhs-raw))
               (elaborate $lhs-raw)))
-          ($lhs-type (get-type $lhs))
+          ($lhs-type (term-type $lhs))
           (switch (peel $lhs-type)
             ((signature? $sig)
               (lets
@@ -79,11 +79,11 @@
               (branch-condition $branch)))
           ($consequent (elaborate (branch-consequent $branch)))
           ($alternate (elaborate (branch-alternate $branch)))
-          ($consequent-type (get-type $consequent))
-          ($alternate-type (get-type $alternate))
+          ($consequent-type (term-type $consequent))
+          ($alternate-type (term-type $alternate))
           (if (term=? (peel $consequent-type) (peel $alternate-type))
             (typed
-              (smart-wrap $consequent-type)
+              (term->typed $consequent-type)
               (branch $condition $consequent $alternate))
             (throw elaborate "Branch arm type mismatch" $consequent-type $alternate-type))))
 
@@ -91,14 +91,14 @@
         (lets
           ($procedure (elaborate (recursion-procedure $recursion)))
           (typed
-            (smart-wrap (get-type $procedure))
+            (term->typed (term-type $procedure))
             (recursion (peel $procedure)))))
 
       ((labeled? $labeled)
         (lets
           ($inner (elaborate (labeled-ref $labeled)))
           (typed
-            (smart-wrap (get-type $inner))
+            (term->typed (term-type $inner))
             (labeled (labeled-label $labeled) $inner))))
 
       ((evaluated? $evaluated)
@@ -107,16 +107,16 @@
       ((typed? $typed)
         $typed)))
 
-  (define (smart-wrap $term)
+  (define (term->typed $term)
     (switch $term
       ((type? $type) $type)
       ((typed? $typed) $typed)
-      ((else $other) (typed (get-type $other) $other))))
+      ((else $other) (typed (term-type $other) $other))))
 
   (define (type-elaborate $expected-type $term)
     (lets
       ($elaborated (elaborate $term))
-      ($actual-type (get-type $elaborated))
+      ($actual-type (term-type $elaborated))
       ($peeled-actual (peel $actual-type))
       ($peeled-expected (peel $expected-type))
       (cond
@@ -127,7 +127,7 @@
             `(expected ,(term->datum $peeled-expected))
             `(actual ,(term->datum $peeled-actual)))))))
 
-  (define (get-type $term)
+  (define (term-type $term)
     (switch $term
       ((typed? $typed)
         (typed-type $typed))
