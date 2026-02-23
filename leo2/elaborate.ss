@@ -13,93 +13,93 @@
   (define (elaborate $term)
     (term-switch $term
       ((nothing? $nothing)
-       (typed (type 0) $nothing))
+        (typed (type 0) $nothing))
 
       ((anything? $anything)
-       (typed (type 0) $anything))
+        (typed (type 0) $anything))
 
       ((type? $type)
-       $type)
+        $type)
 
       ((native? $native)
-       (throw elaborate $native))
+        (throw elaborate $native))
 
       ((native-application? $native-application)
-       (lets
-         ($args (map elaborate (native-application-args $native-application)))
-         (typed
-          (typed (type 0) anything)
-          (native-application
-            (native-application-procedure $native-application)
-            $args))))
+        (lets
+          ($args (map elaborate (native-application-args $native-application)))
+          (typed
+            (typed (type 0) anything)
+            (native-application
+              (native-application-procedure $native-application)
+              $args))))
 
       ((variable? $variable)
-       (typed
-         (typed (type 0) anything)
-         $variable))
+        (typed
+          (typed (type 0) anything)
+          $variable))
 
       ((procedure? $procedure)
-       (throw elaborate $procedure))
+        (throw elaborate $procedure))
 
       ((signature? $signature)
-       (lets
-         ($param (signature-param $signature))
-         ($procedure (signature-procedure $signature))
-         ($elab-param (elaborate $param))
-         ($elab-proc (lambda ($v) (typed $elab-param $v)))
-         ($sig-content (signature $elab-param (lambda ($v) (get-type ($elab-proc $v)))))
-         (typed
-           (typed (type 0) $sig-content)
-           (signature $elab-param $elab-proc))))
+        (lets
+          ($param (signature-param $signature))
+          ($procedure (signature-procedure $signature))
+          ($elab-param (elaborate $param))
+          ($elab-proc (lambda ($v) (typed $elab-param $v)))
+          ($sig-content (signature $elab-param (lambda ($v) (get-type ($elab-proc $v)))))
+          (typed
+            (typed (type 0) $sig-content)
+            (signature $elab-param $elab-proc))))
 
       ((application? $application)
-       (lets
-         ($rhs (elaborate (application-rhs $application)))
-         ($rhs-core (peel $rhs))
-         ($rhs-type (get-type $rhs))
-         ($lhs-raw (application-lhs $application))
-         ($lhs
-           (if (procedure? $lhs-raw)
-               (elaborate (signature $rhs-type $lhs-raw))
-               (elaborate $lhs-raw)))
-         ($lhs-type (get-type $lhs))
-         (switch (peel $lhs-type)
-           ((signature? $sig)
-            (lets
-              ($res-type-term (signature-apply $sig $rhs-core))
-              (typed $res-type-term (application $lhs $rhs))))
-           ((else $other-type)
-            (throw elaborate "Application LHS must have a signature type" $other-type)))))
+        (lets
+          ($rhs (elaborate (application-rhs $application)))
+          ($rhs-core (peel $rhs))
+          ($rhs-type (get-type $rhs))
+          ($lhs-raw (application-lhs $application))
+          ($lhs
+            (if (procedure? $lhs-raw)
+              (elaborate (signature $rhs-type $lhs-raw))
+              (elaborate $lhs-raw)))
+          ($lhs-type (get-type $lhs))
+          (switch (peel $lhs-type)
+            ((signature? $sig)
+              (lets
+                ($res-type-term (signature-apply $sig $rhs-core))
+                (typed $res-type-term (application $lhs $rhs))))
+            ((else $other-type)
+              (throw elaborate "Application LHS must have a signature type" $other-type)))))
 
       ((branch? $branch)
-       (lets
-         ($condition
-           (type-elaborate
-             (typed (type 0) (native 'Boolean))
-             (branch-condition $branch)))
-         ($consequent (elaborate (branch-consequent $branch)))
-         ($alternate (elaborate (branch-alternate $branch)))
-         ($consequent-type (get-type $consequent))
-         ($alternate-type (get-type $alternate))
-         (if (term=? (peel $consequent-type) (peel $alternate-type))
+        (lets
+          ($condition
+            (type-elaborate
+              (typed (type 0) (native 'Boolean))
+              (branch-condition $branch)))
+          ($consequent (elaborate (branch-consequent $branch)))
+          ($alternate (elaborate (branch-alternate $branch)))
+          ($consequent-type (get-type $consequent))
+          ($alternate-type (get-type $alternate))
+          (if (term=? (peel $consequent-type) (peel $alternate-type))
             (typed
               (smart-wrap $consequent-type)
               (branch $condition $consequent $alternate))
             (throw elaborate "Branch arm type mismatch" $consequent-type $alternate-type))))
 
       ((recursion? $recursion)
-       (lets
-         ($procedure (elaborate (recursion-procedure $recursion)))
-         (typed
-           (smart-wrap (get-type $procedure))
-           (recursion (peel $procedure)))))
+        (lets
+          ($procedure (elaborate (recursion-procedure $recursion)))
+          (typed
+            (smart-wrap (get-type $procedure))
+            (recursion (peel $procedure)))))
 
       ((labeled? $labeled)
-       (lets
-         ($inner (elaborate (labeled-ref $labeled)))
-         (typed
-           (smart-wrap (get-type $inner))
-           (labeled (labeled-label $labeled) $inner))))
+        (lets
+          ($inner (elaborate (labeled-ref $labeled)))
+          (typed
+            (smart-wrap (get-type $inner))
+            (labeled (labeled-label $labeled) $inner))))
 
       ((evaluated? $evaluated)
         (elaborate (evaluated-ref $evaluated)))
