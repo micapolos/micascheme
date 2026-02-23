@@ -14,29 +14,29 @@
 
 (check-term->datum=?
   (native-application string-append (list (native "foo") (native "bar")))
-  (native-apply ,string-append (native "foo") (native "bar")))
+  (native-application ,string-append (list (native "foo") (native "bar"))))
 
 (check-term->datum=? (variable 0) (variable 0))
 
 (check-term->datum=?
   (lambda (x) (application (variable 10) x))
-  (lambda v0 (apply (variable 10) (variable 0))))
+  (lambda (application (variable 10) (variable 0))))
 
 (check-term->datum=?
   (signature (variable 10) (lambda (x) (application (variable 20) x)))
-  (lambda (v0 (variable 10)) (apply (variable 20) (variable 0))))
+  (signature (variable 10) (lambda (application (variable 20) (variable 0)))))
 
 (check-term->datum=?
   (recursion (lambda (fn) (lambda (x) (application fn x))))
-  (recursive v0 (lambda v1 (apply (variable 0) (variable 1)))))
+  (recursion (lambda (lambda (application (variable 0) (variable 1))))))
 
 (check-term->datum=?
   (application (variable 0) (variable 1))
-  (apply (variable 0) (variable 1)))
+  (application (variable 0) (variable 1)))
 
 (check-term->datum=?
   (branch (variable 0) (variable 1) (variable 2))
-  (if (variable 0) (variable 1) (variable 2)))
+  (branch (variable 0) (variable 1) (variable 2)))
 
 (check-term->datum=?
   (labeled (variable 0) (native "milk"))

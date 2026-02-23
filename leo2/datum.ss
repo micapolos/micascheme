@@ -20,65 +20,48 @@
       ((native? $native)
         `(native ,(native-ref $native)))
       ((native-application? $native-application)
-        `(native-apply
+        `(native-application
           ,(native-application-procedure $native-application)
-          ,@(map
-            (partial depth-term->datum $depth)
-            (native-application-args $native-application))))
+          (list
+            ,@(map
+              (partial depth-term->datum $depth)
+              (native-application-args $native-application)))))
       ((variable? $variable)
         `(variable ,(variable-index $variable)))
       ((procedure? $procedure)
-        `(lambda
-          . ,(procedure->datum $depth #f $procedure)))
+        (lets
+          ($symbol (depth->symbol $depth))
+          `(lambda
+            ,(depth-term->datum
+              (+ $depth 1)
+              ($procedure (variable $depth))))))
       ((signature? $signature)
-        `(lambda
-          . ,(procedure->datum $depth
-            (signature-param $signature)
-            (signature-procedure $signature))))
+        `(signature
+          ,(depth-term->datum $depth (signature-param $signature))
+          ,(depth-term->datum $depth (signature-procedure $signature))))
       ((application? $application)
-        `(apply
+        `(application
           ,(depth-term->datum $depth (application-lhs $application))
           ,(depth-term->datum $depth (application-rhs $application))))
       ((branch? $branch)
-        `(if
+        `(branch
           ,(depth-term->datum $depth (branch-condition $branch))
           ,(depth-term->datum $depth (branch-consequent $branch))
           ,(depth-term->datum $depth (branch-alternate $branch))))
       ((recursion? $recursion)
-        `(recursive .
-          ,(procedure->datum $depth #f
-            (recursion-procedure $recursion))))
+        `(recursion
+          ,(depth-term->datum $depth (recursion-procedure $recursion))))
       ((labeled? $labeled)
         `(labeled
-          ,(depth-term->datum $depth
-            (labeled-label $labeled))
-          ,(depth-term->datum $depth
-            (labeled-ref $labeled))))
+          ,(depth-term->datum $depth (labeled-label $labeled))
+          ,(depth-term->datum $depth (labeled-ref $labeled))))
       ((evaluated? $evaluated)
         `(evaluated
-          ,(depth-term->datum $depth
-            (evaluated-ref $evaluated))))
+          ,(depth-term->datum $depth (evaluated-ref $evaluated))))
       ((typed? $typed)
-        (lets
-          ($ref-datum
-            (depth-term->datum $depth
-              (typed-ref $typed)))
-          `(typed
-            ,(depth-term->datum $depth (typed-type $typed))
-            ,$ref-datum)))))
-
-  (define (procedure->datum $depth $param? $procedure)
-    (lets
-      ($symbol (depth->symbol $depth))
-      `(
-        ,(switch $param?
-          ((false? _)
-            $symbol)
-          ((else $param)
-            `(,$symbol ,(depth-term->datum $depth $param))))
-        ,(depth-term->datum
-          (+ $depth 1)
-          ($procedure (variable $depth))))))
+        `(typed
+          ,(depth-term->datum $depth (typed-type $typed))
+          ,(depth-term->datum $depth (typed-ref $typed))))))
 
   (define-rule-syntax (check-term->datum=? in out)
     (check (equal? (term->datum in) `out)))

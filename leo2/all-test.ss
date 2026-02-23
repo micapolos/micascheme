@@ -5,7 +5,6 @@
   (leo2 term)
   (leo2 binding)
   (leo2 datum)
-  (leo2 lang)
   (leo2 equal)
   (leo2 dependent)
   (leo2 evaluate)

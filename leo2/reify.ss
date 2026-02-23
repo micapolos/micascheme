@@ -9,9 +9,9 @@
     (leo2 datum))
 
   (define (reify $term)
-    (depth-reify 0 #f $term))
+    (depth-native?-reify 0 #f $term))
 
-  (define (depth-reify $depth $native? $term)
+  (define (depth-native?-reify $depth $native? $term)
     (term-switch $term
       ((nothing? $nothing) #f)
       ((anything? $anything) #f)
@@ -28,7 +28,7 @@
           ((native? $native)
             `(,(native-ref $native)
               ,@(map
-                (partial depth-reify $depth #f)
+                (partial depth-native?-reify $depth #f)
                 (native-application-args $native-application))))
           ((else _)
             (throw reify $native-application))))
@@ -38,29 +38,29 @@
         (lets
           ($symbol (depth->symbol $depth))
           `(lambda (,$symbol)
-            ,(depth-reify (+ $depth 1) #f
+            ,(depth-native?-reify (+ $depth 1) #f
               ($procedure (variable $depth))))))
       ((signature? $signature) #f)
       ((application? $application)
         `(
-          ,(depth-reify $depth #f (application-lhs $application))
-          ,(depth-reify $depth #f (application-rhs $application))))
+          ,(depth-native?-reify $depth #f (application-lhs $application))
+          ,(depth-native?-reify $depth #f (application-rhs $application))))
       ((branch? $branch)
         `(if
-          ,(depth-reify $depth #f (branch-condition $branch))
-          ,(depth-reify $depth #f (branch-consequent $branch))
-          ,(depth-reify $depth #f (branch-alternate $branch))))
+          ,(depth-native?-reify $depth #f (branch-condition $branch))
+          ,(depth-native?-reify $depth #f (branch-consequent $branch))
+          ,(depth-native?-reify $depth #f (branch-alternate $branch))))
       ((recursion? $recursion)
         (lets
           ($symbol (depth->symbol $depth))
           `(letrec
             ((
               ,$symbol
-              ,(depth-reify (+ $depth 1) #f
+              ,(depth-native?-reify (+ $depth 1) #f
                  (recursion-apply $recursion (variable $depth)))))
             ,$symbol)))
       ((labeled? $labeled)
-        (depth-reify
+        (depth-native?-reify
           $depth
           (or
             (switch? (labeled-label $labeled)
@@ -68,9 +68,9 @@
             $native?)
           (labeled-ref $labeled)))
       ((evaluated? $evaluated)
-        (depth-reify $depth (evaluated-ref $evaluated)))
+        (depth-native?-reify $depth #f (evaluated-ref $evaluated)))
       ((typed? $typed)
-        (depth-reify $depth (typed-ref $typed)))))
+        (depth-native?-reify $depth #f (typed-ref $typed)))))
 
   (define-rule-syntax (check-reify in out)
     (check (equal? (reify in) 'out)))
