@@ -6,13 +6,12 @@
     (leo2 base)
     (leo2 term)
     (leo2 symbol)
-    (leo2 datum)
-    (leo2 annotation))
+    (leo2 datum))
 
   (define (reify $term)
     (depth-reify 0 #f $term))
 
-  (define (depth-reify $depth $native-datum? $term)
+  (define (depth-reify $depth $native? $term)
     (term-switch $term
       ((nothing? $nothing)
         (throw reify $nothing))
@@ -23,16 +22,21 @@
       ((quoted? $quoted)
         (throw reify $quoted))
       ((native? $native)
-        (or $native-datum? (throw reify $native)))
+        (switch $native?
+          ((native? $native) (native-ref $native))
+          ((else _)
+            (switch (native-ref $native)
+              ((literal? $literal) $literal)
+              ((else _) (throw reify $native))))))
       ((native-application? $native-application)
-        (or
-          (and
-            $native-datum?
-            `(,$native-datum?
+        (switch $native?
+          ((native? $native)
+            `(,(native-ref $native)
               ,@(map
                 (partial depth-reify $depth #f)
                 (native-application-args $native-application))))
-          (throw reify $native-application)))
+          ((else _)
+            (throw reify $native-application))))
       ((variable? $variable)
         (depth->symbol (variable-index $variable)))
       ((procedure? $procedure)
@@ -65,8 +69,9 @@
         (depth-reify
           $depth
           (or
-            (labeled-annotation-ref? $labeled 'native)
-            $native-datum?)
+            (switch? (labeled-label $labeled)
+              ((native? $native) $native))
+            $native?)
           (labeled-ref $labeled)))
       ((evaluated? $evaluated)
         (throw reify $evaluated))
