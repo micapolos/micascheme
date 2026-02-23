@@ -38,7 +38,7 @@
       ((recursion? $recursion)
         (recursion
           (lambda (f)
-            (untyped ((recursion-procedure $recursion) f)))))
+            (untyped (recursion apply $recursion f)))))
       ((labeled? $labeled)
         (untyped (labeled-ref $labeled)))
       ((evaluated? $evaluated)
