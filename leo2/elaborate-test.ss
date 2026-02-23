@@ -4,6 +4,12 @@
   (leo2 elaborate)
   (leo2 stdlib))
 
+; --- typed
+
+(check-elaborates
+  (typed (type 2) (native "foo"))
+  (typed (type 2) (native "foo")))
+
 ; --- type
 
 (check-elaborates
@@ -12,11 +18,8 @@
 
 ; --- native
 
-(check-elaborate-throws (native "foo"))
-
-(check-elaborates
-  (typed (type 2) (native "foo"))
-  (typed (type 2) (native "foo")))
+(check-elaborate-throws
+  (native "foo"))
 
 (check-elaborate-throws
   (application
