@@ -2,18 +2,17 @@ stop "!"
 separator ", "
 lucky 7
 
-doubly lucky:
-  the: added
-    the lucky number
-    the lucky number
+doubly lucky: the: added:
+  the lucky number
+  the lucky number
 
-greeting: with
+greeting: with:
   any string
-  giving: the: appended
+  giving: the: appended:
     "Hello"
     the separator string
     the string
-    the stop string (default "!")
+    the stop string: default "!"
 
 hello world:
   as string
@@ -25,16 +24,16 @@ hello hell:
 
 increment:
   as number
-  with
+  with:
     any number
-    giving: the: sum
-      of (the number)
+    giving: the: sum:
+      of: the number
       and 1
 
 decrement:
   as number
-  with
+  with:
     any number
-    giving: the: difference
-      between (the number)
+    giving: the: difference:
+      between: the number
       and 1
