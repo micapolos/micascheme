@@ -1,5 +1,7 @@
 (library (leo2 annotation)
-  (export labeled-annotation-ref?)
+  (export
+    annotated
+    labeled-annotation-ref?)
   (import
     (leo2 base)
     (leo2 term))
@@ -12,6 +14,11 @@
       (and cadr contains annotation value))
     (example
       (labeled (quoted '(annotation-id "this is annotation value")))))
+
+  (define (annotated $annotation $ref)
+    (labeled
+      (quoted $annotation)
+      $ref))
 
   (define (labeled-annotation-ref? $labeled $symbol)
     (switch? (labeled-label $labeled)

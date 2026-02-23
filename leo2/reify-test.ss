@@ -1,6 +1,7 @@
 (import
   (leo2 base)
   (leo2 term)
+  (leo2 annotation)
   (leo2 reify))
 
 (check-reify
@@ -16,20 +17,13 @@
   (if v0 v1 v2))
 
 (check-reify
-  (labeled
-    (quoted '(native 10))
-    (native 10))
+  (annotated '(native 10) (native 10))
   10)
 
 (check-reify
-  (labeled
-    (quoted '(native string-append))
+  (annotated '(native string-append)
     (native-application string-append
       (list
-        (labeled
-          (quoted '(native "foo"))
-          (native "foo"))
-        (labeled
-          (quoted '(native "bar"))
-          (native "bar")))))
+        (annotated '(native "foo") (native "foo"))
+        (annotated '(native "bar") (native "bar")))))
   (string-append "foo" "bar"))
