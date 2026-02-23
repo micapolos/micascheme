@@ -21,7 +21,5 @@
     (application-rhs $binding))
 
   (define (binding-apply $binding $arg)
-    (app
-      (binding-procedure $binding)
-      $arg))
+    ((binding-procedure $binding) $arg))
 )
