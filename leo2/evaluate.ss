@@ -22,8 +22,6 @@
         (evaluated $anything))
       ((type? $type)
         (evaluated $term))
-      ((quoted? $quoted)
-        (evaluated $quoted))
       ((native? $native)
         (evaluated $native))
       ((native-application? $native-application)

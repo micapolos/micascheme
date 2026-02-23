@@ -19,8 +19,6 @@
         (throw reify $anything))
       ((type? $type)
         (throw reify $type))
-      ((quoted? $quoted)
-        (throw reify $quoted))
       ((native? $native)
         (switch $native?
           ((native? $native) (native-ref $native))

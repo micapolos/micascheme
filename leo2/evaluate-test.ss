@@ -9,8 +9,6 @@
 
 (check-evaluates (type 12) (evaluated (type 12)))
 
-(check-evaluates (quoted 'foo) (evaluated (quoted 'foo)))
-
 (check-evaluates (variable 0) (evaluated (variable 0)))
 
 (check-evaluates

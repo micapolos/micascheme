@@ -25,12 +25,6 @@
             (=
               (type-depth $type-a)
               (type-depth $type-b)))))
-      ((quoted? $quoted-a)
-        (switch-b? $term-b
-          ((quoted? $quoted-b)
-            (equal?
-              (quoted-ref $quoted-a)
-              (quoted-ref $quoted-b)))))
       ((native? $native-a)
         (switch-b? $term-b
           ((native? $native-b)

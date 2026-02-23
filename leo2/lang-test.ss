@@ -6,7 +6,6 @@
   nothing
   anything
   (variable 3)
-  '(foo bar)
   (native 10)
   (native-apply "foo" (variable 3) (variable 4))
   (lambda v0 (variable 0))

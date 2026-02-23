@@ -2,7 +2,6 @@
   (export
     nothing nothing?
     anything anything?
-    quoted quoted? quoted-ref
     native native? native-ref
     native-application native-application? native-application-procedure native-application-args
     type type? type-depth
@@ -26,7 +25,6 @@
   (data nothing)
   (data anything)
   (data (type depth))
-  (data (quoted ref))
   (data (native ref))
   (data (native-application procedure args))
   (data (variable index))
@@ -43,7 +41,6 @@
       nothing
       anything
       type
-      quoted
       native
       native-application
       variable
@@ -61,7 +58,6 @@
       ((nothing? $nothing) $nothing)
       ((anything? $anything) $anything)
       ((type? $type) $type)
-      ((quoted? $quoted) $quoted)
       ((native? $native) $native)
       ((native-application? $native-application) $native-application)
       ((variable? $variable) $variable)

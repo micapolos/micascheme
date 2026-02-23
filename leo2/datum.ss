@@ -17,8 +17,6 @@
       ((anything? _) 'anything)
       ((type? $type)
         `(type ,(type-depth $type)))
-      ((quoted? $quoted)
-        `(quote ,(quoted-ref $quoted)))
       ((native? $native)
         `(native ,(native-ref $native)))
       ((native-application? $native-application)

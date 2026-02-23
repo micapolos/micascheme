@@ -1,7 +1,6 @@
 (library (leo2 lang)
   (export
     nothing anything
-    quote
     type
     native native-apply
     variable
@@ -17,7 +16,6 @@
     (rename (leo2 base)
       (lambda %lambda)
       (apply %apply)
-      (quote %quote)
       (if %if))
     (prefix (leo2 term) %)
     (leo2 datum))
@@ -29,8 +27,6 @@
     ((type n)
       (nonnegative-integer? (datum n))
       (%type n))
-    ((quote s)
-      (%quoted (%quote s)))
     ((native x)
       (%native x))
     ((native-apply fn arg ...)

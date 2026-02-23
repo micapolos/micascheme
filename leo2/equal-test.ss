@@ -17,12 +17,6 @@
 (check (not (term=? (type 1) (type 2))))
 (check (not (term=? (type 1) (variable 0))))
 
-; quoted
-(check (term=? (quoted 'foo) (quoted 'foo)))
-(check (not (term=? (quoted 'foo) (quoted 'bar))))
-(check (not (term=? (quoted 'foo) (native 'foo))))
-
-
 ; native
 (check (term=? (native 10) (native 10)))
 (check (not (term=? (native 10) (native 12))))

@@ -7,7 +7,6 @@
 (check-term->datum=? anything anything)
 
 (check-term->datum=? (type 12) (type 12))
-(check-term->datum=? (quoted '(foo bar)) '(foo bar))
 
 (check-term->datum=?
   (native string-append)

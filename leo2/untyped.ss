@@ -12,8 +12,6 @@
         (throw untyped $anything))
       ((type? $type)
         (throw untyped $type))
-      ((quoted? $quoted)
-        (throw untyped $quoted))
       ((native? $native)
         $native)
       ((native-application? $native-application)
