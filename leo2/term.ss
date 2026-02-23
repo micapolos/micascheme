@@ -22,7 +22,7 @@
     branch-ref)
   (import (leo2 base))
 
-  (data-group
+  (data*
     nothing
     anything
     (type depth)

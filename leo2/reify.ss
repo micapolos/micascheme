@@ -13,12 +13,9 @@
 
   (define (depth-reify $depth $native? $term)
     (term-switch $term
-      ((nothing? $nothing)
-        (throw reify $nothing))
-      ((anything? $anything)
-        (throw reify $anything))
-      ((type? $type)
-        (throw reify $type))
+      ((nothing? $nothing) #f)
+      ((anything? $anything) #f)
+      ((type? $type) #f)
       ((native? $native)
         (switch $native?
           ((native? $native) (native-ref $native))
@@ -43,8 +40,7 @@
           `(lambda (,$symbol)
             ,(depth-reify (+ $depth 1) #f
               ($procedure (variable $depth))))))
-      ((signature? $signature)
-        (throw reify $signature))
+      ((signature? $signature) #f)
       ((application? $application)
         `(
           ,(depth-reify $depth #f (application-lhs $application))
@@ -72,9 +68,9 @@
             $native?)
           (labeled-ref $labeled)))
       ((evaluated? $evaluated)
-        (throw reify $evaluated))
+        (depth-reify $depth (evaluated-ref $evaluated)))
       ((typed? $typed)
-        (throw reify $typed))))
+        (depth-reify $depth (typed-ref $typed)))))
 
   (define-rule-syntax (check-reify in out)
     (check (equal? (reify in) 'out)))

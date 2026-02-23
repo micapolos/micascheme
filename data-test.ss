@@ -80,9 +80,9 @@
 (check (not (foo? bar)))
 (check (not (bar? foo)))
 
-; === data group
+; === data*
 
-(data-group
+(data*
   (circle radius)
   (square size)
   (rectangle width height))
