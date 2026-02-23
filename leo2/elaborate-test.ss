@@ -7,6 +7,12 @@
   (type 12)
   (type 12))
 
+(check-elaborate-throws (native "foo"))
+
+(check-elaborates
+  (typed (type 2) (native "foo"))
+  (typed (type 2) (native "foo")))
+
 (check-elaborate-throws
   (lambda (x) x))
 

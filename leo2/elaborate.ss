@@ -22,7 +22,7 @@
        $type)
 
       ((native? $native)
-       (typed (typed (type 0) anything) $native))
+       (throw type-error "Cannot infer type for native value" $native))
 
       ((native-application? $na)
        (let ([$args (map elaborate (native-application-args $na))])
