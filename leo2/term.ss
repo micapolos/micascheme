@@ -57,7 +57,7 @@
       evaluated
       typed))
 
-  (define (term-template $term)
+  (define (term-switch-template $term)
     (term-switch $term
       ((nothing? $nothing) $nothing)
       ((anything? $anything) $anything)
