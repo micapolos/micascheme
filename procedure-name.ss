@@ -1,17 +1,17 @@
 (library (procedure-name)
-  (export procedure-name)
+  (export procedure-name?)
   (import (scheme))
 
   ; Tries to return original procedure name, by parsing it from
   ; its string representation, like "<#procedure +>"
-  (define (procedure-name $proc)
+  (define (procedure-name? $proc)
     (let*
       ([$str (format "~a" $proc)]
        [$len (string-length $str)])
     (let find-proc ([$i 0])
       (cond
         ;; Give up if "procedure" can't possibly fit
-        [(>= $i (- $len 9)) 'anonymous-native]
+        [(>= $i (- $len 9)) #f]
         ;; Look for "procedure"
         [(string-match-at? $str $i "procedure")
          (let skip-headers ([$j (+ $i 9)]) ;; Move past "procedure"
@@ -32,7 +32,7 @@
                      (if (or (char=? $c #\space) (char=? $c #\>))
                          (let ([$name (substring $str $j $k)])
                            (if (string=? $name "")
-                               'anonymous-native
+                               #f
                                (string->symbol $name)))
                          (find-end (+ $k 1))))]))]))]
         [else (find-proc (+ $i 1))]))))

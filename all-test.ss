@@ -58,6 +58,7 @@
   (port)
   (predicate)
   (procedure)
+  (procedure-name)
   (proof)
   (property)
   (proven)

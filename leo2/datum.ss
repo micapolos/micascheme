@@ -15,7 +15,9 @@
   (define (native->datum $ref)
     (switch $ref
       ((procedure? $procedure)
-        (procedure-name $procedure))
+        (or
+          (procedure-name? $procedure)
+          $procedure))
       ((symbol? $symbol)
         `',$symbol)
       ((literal? $literal)
