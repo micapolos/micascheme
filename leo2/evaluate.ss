@@ -47,9 +47,7 @@
             (evaluate (signature-param $signature))
             (lambda ($arg)
               (evaluate
-                (app
-                  (signature-procedure $signature)
-                  $arg))))))
+                (signature-apply $signature $arg))))))
       ((application? $application)
         (term-apply
           (evaluate (application-lhs $application))
@@ -70,11 +68,9 @@
       ((recursion? $recursion)
         (evaluated
           (recursion
-            (lambda ($self)
+            (lambda ($arg)
               (evaluate
-                (app
-                  (recursion-procedure $recursion)
-                  $self))))))
+                (recursion-apply $recursion $arg))))))
       ((labeled? $labeled)
         (evaluated
           (labeled
