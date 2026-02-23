@@ -6,10 +6,24 @@
   (import
     (leo2 base)
     (leo2 term)
-    (leo2 symbol))
+    (leo2 symbol)
+    (procedure-name))
 
   (define (term->datum $term)
     (depth-term->datum 0 $term))
+
+  (define (native->datum $ref)
+    (switch $ref
+      ((procedure? $procedure)
+        (procedure-name $procedure))
+      ((symbol? $symbol)
+        `',$symbol)
+      ((literal? $literal)
+        $literal)
+      ((record? $record)
+        (record-type-name (record-rtd $record)))
+      ((else $other)
+        `',$other)))
 
   (define (depth-term->datum $depth $term)
     (term-switch $term
@@ -18,10 +32,10 @@
       ((type? $type)
         `(type ,(type-depth $type)))
       ((native? $native)
-        `(native ,(native-ref $native)))
+        `(native ,(native->datum (native-ref $native))))
       ((native-application? $native-application)
         `(native-application
-          ,(native-application-procedure $native-application)
+          ,(native->datum (native-application-procedure $native-application))
           (list
             ,@(map
               (partial depth-term->datum $depth)

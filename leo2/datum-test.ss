@@ -10,11 +10,18 @@
 
 (check-term->datum=?
   (native string-append)
-  (native ,string-append))
+  (native string-append))
+
+(check-term->datum=? (native #t) (native #t))
+(check-term->datum=? (native 123) (native 123))
+(check-term->datum=? (native #\a) (native #\a))
+(check-term->datum=? (native "foo") (native "foo"))
+(check-term->datum=? (native 'foo) (native 'foo))
+(check-term->datum=? (native '(foo bar)) (native '(foo bar)))
 
 (check-term->datum=?
   (native-application string-append (list (native "foo") (native "bar")))
-  (native-application ,string-append (list (native "foo") (native "bar"))))
+  (native-application string-append (list (native "foo") (native "bar"))))
 
 (check-term->datum=? (variable 0) (variable 0))
 

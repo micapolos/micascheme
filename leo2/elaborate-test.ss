@@ -39,14 +39,14 @@
     (native boolean-type)
     (native-application zero? (list (variable 100))))
   (typed
-    (native ,boolean-type)
-    (native-application ,zero? (list (variable 100)))))
+    (native boolean-type)
+    (native-application zero? (list (variable 100)))))
 
 (check-elaborates
   (native-application zero? (list (variable 100)))
   (typed
     (typed (type 0) anything)
-    (native-application ,zero?
+    (native-application zero?
       (list
         (typed
           (typed (type 0) anything)
@@ -114,11 +114,11 @@
     (type 0))
   (typed
     (branch
-      (native ,boolean-type)
+      (native boolean-type)
       (type 1)
       (type 1))
     (branch
-      (typed (type 0) (native ,boolean-type))
+      (typed (type 0) (native boolean-type))
       (type 0)
       (type 0))))
 
@@ -130,11 +130,11 @@
     (type 1))
   (typed
     (branch
-      (native ,boolean-type)
+      (native boolean-type)
       (type 1)
       (type 2))
     (branch
-      (typed (type 0) (native ,boolean-type))
+      (typed (type 0) (native boolean-type))
       (type 0)
       (type 1))))
 
