@@ -1,5 +1,6 @@
 (library (leo2 term)
   (export
+    hole hole? hole-index
     nothing nothing?
     anything anything?
     native native? native-ref
@@ -23,6 +24,7 @@
   (import (leo2 base))
 
   (data*
+    (hole index)
     nothing
     anything
     (type depth)
@@ -39,6 +41,7 @@
 
   (union
     (term
+      ; hole
       nothing
       anything
       type

@@ -9,16 +9,33 @@
     (leo2 term))
 
   (define (deduction $val)
-    (lambda ($subst)
-      (values $val $subst)))
+    (lambda ($deduced)
+      (values $val $deduced)))
+
+  (define deduced-deduction
+    (lambda ($deduced)
+      (values $deduced $deduced)))
+
+  (define (push-deduction $hole $term)
+    (lambda ($deduced)
+      (values $term
+        (push $deduced (cons $hole $term)))))
 
   (define (deduction-bind $deduction $fn)
-    (lambda ($subst)
+    (lambda ($deduced)
       (lets
-        ((values $val? $subst) ($deduction $subst))
+        ((values $val? $deduced) ($deduction $deduced))
         (switch $val?
-          ((false? $false) (values $false $subst))
-          ((else $val) (($fn $val) $subst))))))
+          ((false? $false) (values $false $deduced))
+          ((else $val) (($fn $val) $deduced))))))
+
+  (define (deduced-resolve $deduced $term)
+    (switch $term
+      ((hole? $term)
+        (switch (assoc $term $deduced)
+          ((false? _) $term)
+          ((else $ass)  (deduced-resolve $deduced (cdr $ass)))))
+      ((else $term) $term)))
 
   (define-rules-syntax
     ((deduction-lets deduction) deduction)
