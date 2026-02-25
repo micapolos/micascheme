@@ -9,16 +9,16 @@
     (leo2 term))
 
   (define (deduction $val)
-    (lambda ($env)
-      (values $val $env)))
+    (lambda ($subst)
+      (values $val $subst)))
 
   (define (deduction-bind $deduction $fn)
-    (lambda ($env)
+    (lambda ($subst)
       (lets
-        ((values $val? $env) ($deduction $env))
+        ((values $val? $subst) ($deduction $subst))
         (switch $val?
-          ((false? $false) (values $false $env))
-          ((else $val) (($fn $val) $env))))))
+          ((false? $false) (values $false $subst))
+          ((else $val) (($fn $val) $subst))))))
 
   (define-rules-syntax
     ((deduction-lets deduction) deduction)
@@ -26,49 +26,30 @@
       (deduction-bind deduction
         (lambda (id) (deduction-lets x ...)))))
 
-  (define (push-deduction $term $deduce)
-    (lambda ($env)
-      (lets
-        ((values $val _) ($deduce (cons $term $env)))
-        (values $val $env))))
-
   (define (deduce $evaluate $source $target)
     (letrec
       ((deduce
-        (lambda ($source $target)
+        (lambda ($env $source $target)
           (lets
-            ($source ($evaluate $source))
-            ($target ($evaluate $target))
+            ($source (evaluated-ref ($evaluate $source)))
+            ($target (evaluated-ref ($evaluate $target)))
             (cond
               ((eq? $source $target)
                 (deduction $source))
               ((variable? $source)
-                (deduction-lets
-                  ($source (lookup-deduction $source))
-                  (deduce $source $target)))
+                (todo))
               ((and (signature? $source) (signature? $target))
                 (deduction-lets
                   (_
                     (deduce
+                      $env
                       (signature-param $target)
                       (signature-param $source)))
-                  (push-deduction
-                    (signature-param $source)
-                    (deduce
-                      (signature-apply $source (variable 0))
-                      (signature-apply $target (variable 0))))))
+                  (deduce
+                    (push $env (signature-param $target))
+                    (signature-apply $source (variable 0))
+                    (signature-apply $target (variable 0)))))
               (else
                 (deduction #f)))))))
-      (deduce $source $target)))
-
-  (define env-deduction
-    (lambda ($env)
-      (values $env $env)))
-
-  (define (lookup-deduction $variable)
-    (deduction-lets
-      ($env env-deduction)
-      (deduction
-        (list-ref $env
-          (variable-index $variable)))))
+      (deduce '() $source $target)))
 )
