@@ -60,14 +60,10 @@
       (lets
         ($source (deduced-resolve $deduction $source))
         ($target (deduced-resolve $deduction $target))
-        (cond
-          ((eq? $source $target)
-            (deduction-with $source))
-
-          ((hole? (evaluated-ref $target))
-            (push-deduction (evaluated-ref $target) $source))
-
-          (else
+        (switch $target
+          ((hole? $target-hole)
+            (push-deduction $target-hole (deduced-resolve $deduction $source)))
+          ((else $target)
             (or
               (term-switch $source
                 ((hole? $source-hole)
