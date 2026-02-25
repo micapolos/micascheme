@@ -10,15 +10,17 @@
   (define-rule-syntax (switch-b? $term ((id? $id) body))
     (switch? $term
       ((nothing? _) #f)
-      ((anything? _) #t)
       ((id? $id) body)))
 
   (define (depth-term=? $depth $term-a $term-b)
     (term-switch $term-a
-      ((nothing? _)
-        (anything? $term-b))
-      ((anything? _)
-        #t)
+      ((hole? $hole-a)
+        (switch? $term-b
+          ((hole? $hole-b)
+            (=
+              (hole-index $hole-a)
+              (hole-index $hole-b)))))
+      ((nothing? _) #f)
       ((type? $type-a)
         (switch? $term-b
           ((type? $type-b)

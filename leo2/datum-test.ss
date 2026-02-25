@@ -3,8 +3,9 @@
   (leo2 term)
   (leo2 datum))
 
+(check-term->datum=? (hole 12) (hole 12))
+
 (check-term->datum=? nothing nothing)
-(check-term->datum=? anything anything)
 
 (check-term->datum=? (type 12) (type 12))
 

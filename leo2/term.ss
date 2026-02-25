@@ -2,7 +2,6 @@
   (export
     hole hole? hole-index
     nothing nothing?
-    anything anything?
     native native? native-ref
     native-application native-application? native-application-procedure native-application-args
     type type? type-depth
@@ -26,7 +25,6 @@
   (data*
     (hole index)
     nothing
-    anything
     (type depth)
     (native ref)
     (native-application procedure args)
@@ -41,9 +39,8 @@
 
   (union
     (term
-      ; hole
+      hole
       nothing
-      anything
       type
       native
       native-application
@@ -59,8 +56,8 @@
 
   (define (term-switch-template $term)
     (term-switch $term
+      ((hole? $hole) $hole)
       ((nothing? $nothing) $nothing)
-      ((anything? $anything) $anything)
       ((type? $type) $type)
       ((native? $native) $native)
       ((native-application? $native-application) $native-application)

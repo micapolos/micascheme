@@ -29,8 +29,8 @@
 
   (define (depth-term->datum $depth $term)
     (term-switch $term
+      ((hole? $hole) `(hole ,(hole-index $hole)))
       ((nothing? _) 'nothing)
-      ((anything? _) 'anything)
       ((type? $type)
         `(type ,(type-depth $type)))
       ((native? $native)

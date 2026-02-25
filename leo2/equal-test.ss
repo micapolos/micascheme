@@ -3,14 +3,14 @@
   (leo2 term)
   (leo2 equal))
 
+; hole
+(check (term=? (hole 12) (hole 12)))
+(check (not (term=? (hole 12) (hole 13))))
+(check (not (term=? (hole 12) (variable 13))))
+
 ; nothing
-(check (term=? nothing anything))
 (check (not (term=? nothing nothing)))
 (check (not (term=? nothing (variable 0))))
-
-; anything
-(check (term=? anything nothing))
-(check (term=? anything (variable 0)))
 
 ; type
 (check (term=? (type 1) (type 1)))

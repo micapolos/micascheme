@@ -6,10 +6,10 @@
 
   (define (untyped $term)
     (term-switch $term
+      ((hole? $hole)
+        (throw untyped $hole))
       ((nothing? $nothing)
         (throw untyped $nothing))
-      ((anything? $anything)
-        (throw untyped $anything))
       ((type? $type)
         (throw untyped $type))
       ((native? $native)

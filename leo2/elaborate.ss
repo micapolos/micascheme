@@ -13,11 +13,11 @@
 
   (define (elaborate $term)
     (term-switch $term
+      ((hole? $hole)
+        (typed (type 0) $hole))
+
       ((nothing? $nothing)
         (typed (type 0) $nothing))
-
-      ((anything? $anything)
-        (typed (type 0) $anything))
 
       ((type? $type)
         $type)
@@ -30,14 +30,14 @@
         (lets
           ($args (map elaborate (native-application-args $native-application)))
           (typed
-            (typed (type 0) anything)
+            (typed (type 0) (hole 0))
             (native-application
               (native-application-procedure $native-application)
               $args))))
 
       ((variable? $variable)
         (typed
-          (typed (type 0) anything)
+          (typed (type 0) (hole 0))
           $variable))
 
       ((procedure? $procedure)
@@ -129,7 +129,7 @@
       ($expected-core (term-core $expected-type))
       (cond
         ((term=? $actual-core $expected-core) $elaborated)
-        ((term=? $expected-core anything) $elaborated)
+        ((term=? $expected-core (hole 0)) $elaborated)
         (else
           (throw elaborate
             `(type-mismatch
@@ -143,7 +143,7 @@
       ((type? $type)
         (type (+ (type-depth $type) 1)))
       ((else $other)
-        (typed (type 0) anything))))
+        (typed (type 0) (hole 0)))))
 
   (define (term-core $term)
     (switch $term

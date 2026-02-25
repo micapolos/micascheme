@@ -16,10 +16,10 @@
 
   (define (evaluate $term)
     (term-switch $term
+      ((hole? $hole)
+        (evaluated $hole))
       ((nothing? $nothing)
         (evaluated $nothing))
-      ((anything? $anything)
-        (evaluated $anything))
       ((type? $type)
         (evaluated $term))
       ((native? $native)
