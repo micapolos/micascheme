@@ -54,7 +54,7 @@
           ((else $ass)  (deduced-resolve $deduced (cdr $ass)))))
       ((else $term) $term)))
 
-  (define (deduce $evaluate $source $target)
+  (define (deduce $evaluate $env $source $target)
     (letrec
       ((deduce
         (lambda ($env $source $target)
@@ -79,5 +79,5 @@
                     (signature-apply $target (variable 0)))))
               (else
                 (failed-deduction)))))))
-      (deduce '() $source $target)))
+      (deduce $env $source $target)))
 )
