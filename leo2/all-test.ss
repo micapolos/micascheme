@@ -10,6 +10,7 @@
   (leo2 evaluate)
   (leo2 reify)
   (leo2 elaborate)
+  (leo2 deduce)
   (leo2 lang all)
   (leo2 code)
   (leo2 untyped))
