@@ -20,7 +20,7 @@
         (deduction ($deduced)
           (values $val $deduced)))))
 
-  (define (failed-deduction)
+  (define failed-deduction
     (deduction-with #f))
 
   (define (deduction-bind $deduction $fn)
@@ -54,27 +54,154 @@
           ((else $ass)  (deduced-resolve $deduced (cdr $ass)))))
       ((else $term) $term)))
 
-  (define (deduce $evaluate $env $source $target)
-    (lets-recursive deduce
-      ($env $env)
-      ($source (evaluated-ref ($evaluate $source)))
-      ($target (evaluated-ref ($evaluate $target)))
-      (cond
-        ((eq? $source $target)
-          (deduction-with $source))
-        ((variable? $source)
-          (todo))
-        ((and (signature? $source) (signature? $target))
-          (deduction-lets
-            (_
-              (deduce
-                $env
-                (signature-param $target)
-                (signature-param $source)))
-            (deduce
-              (push $env (signature-param $target))
-              (signature-apply $source (variable 0))
-              (signature-apply $target (variable 0)))))
-        (else
-          (failed-deduction)))))
+  (define-recursive (deduce $env $source $target)
+    (deduction-lets
+      ($deduction deduced-deduction)
+      (lets
+        ($source (deduced-resolve $deduction $source))
+        ($target (deduced-resolve $deduction $target))
+        (cond
+          ((eq? $source $target)
+            (deduction-with $source))
+
+          ((hole? (evaluated-ref $target))
+            (push-deduction (evaluated-ref $target) $source))
+
+          (else
+            (or
+              (term-switch $source
+                ((hole? $source-hole)
+                  (push-deduction $source-hole $target))
+
+                ((nothing? _)
+                  (switch? $target
+                    ((nothing? _) (deduction-with $source))))
+
+                ((type? $source-type)
+                  (switch? $target
+                    ((type? $target-type)
+                      (and
+                        (=
+                          (type-depth $source-type)
+                          (type-depth $target-type))
+                        (deduction-with $source)))))
+
+                ((native? $source-native)
+                  (switch? $target
+                    ((native? $target-native)
+                      (and
+                        (equal?
+                          (native $source-native)
+                          (native $target-native))
+                        (deduction-with $source)))))
+
+                ((native-application? $source-native-application)
+                  (switch? $target
+                    ((native-application? $target-native-application)
+                      (and
+                        (eq?
+                          (native-application-procedure $source-native-application)
+                          (native-application-procedure $target-native-application))
+                        (lets-recursive deduce-args
+                          ($args-s (native-application-args $source-native-application))
+                          ($args-t (native-application-args $target-native-application))
+                          (cond
+                            ((and (null? $args-s) (null? $args-t)) (deduction-with $source))
+                            ((and (pair? $args-s) (pair? $args-t))
+                              (deduction-lets
+                                (_ (deduce $env (car $args-s) (car $args-t)))
+                                (deduce-args (cdr $args-s) (cdr $args-t))))
+                            (else (failed-deduction))))))))
+
+                ((variable? $source-variable)
+                  (lets
+                    ($source (list $env (variable-index $source-variable)))
+                    (deduce $env $source $target)))
+
+                ((procedure? $source-procedure)
+                  (switch? $target
+                    ((procedure? $target-procedure)
+                      (deduce
+                        (push $env nothing)
+                        ($source-procedure (variable 0))
+                        ($target-procedure (variable 0))))))
+
+                ((signature? $source-signature)
+                  (switch? $target
+                    ((signature? $target-signature)
+                      (deduction-lets
+                        (_
+                          (deduce $env
+                            (signature-param $target-signature)
+                            (signature-param $source-signature)))
+                        (deduce
+                          (push $env (signature-param $target-signature))
+                          (signature-apply $source-signature (variable 0))
+                          (signature-apply $target-signature (variable 0)))))))
+
+                ((application? $source-application)
+                  (switch? $target
+                    ((application? $target-application)
+                      (deduction-lets
+                        (_
+                          (deduce $env
+                            (application-lhs $source-application)
+                            (application-lhs $target-application)))
+                        (deduce $env
+                          (application-rhs $source-application)
+                          (application-rhs $target-application))))))
+
+                ((branch? $source-branch)
+                  (switch? $target
+                    ((branch? $target-branch)
+                      (deduction-lets
+                        (_
+                          (deduce $env
+                            (branch-condition $source-branch)
+                            (branch-condition $target-branch)))
+                        (_
+                          (deduce $env
+                            (branch-consequent $source-branch)
+                            (branch-consequent $target-branch)))
+                        (deduce $env
+                          (branch-alternate $source-branch)
+                          (branch-alternate $target-branch))))))
+
+                ((recursion? $source-recursion)
+                  (switch? $target
+                    ((recursion? $target-recursion)
+                      (deduce $env
+                        (recursion-procedure $source-recursion)
+                        (recursion-procedure $target-recursion)))))
+
+                ((labeled? $source-labeled)
+                  (switch? $target
+                    ((labeled? $target-labeled)
+                      (and
+                        (eq?
+                          (labeled-label $source-labeled)
+                          (labeled-label $target-labeled))
+                        (deduce $env
+                          (labeled $source-labeled)
+                          (labeled $target-labeled))))))
+
+                ((evaluated? $source-evaluated)
+                  (switch? $target
+                    ((evaluated? $target-evaluated)
+                      (deduce $env
+                        (evaluated-ref $source-evaluated)
+                        (evaluated-ref $target-evaluated)))))
+
+                ((typed? $source-typed)
+                  (switch? $target
+                    ((typed? $target-typed)
+                      (deduction-lets
+                        (_
+                          (deduce $env
+                            (typed-type $source-typed)
+                            (typed-type $target-typed)))
+                        (deduce $env
+                          (typed-ref $source-typed)
+                          (typed-ref $target-typed)))))))
+              failed-deduction))))))
 )
