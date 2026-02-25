@@ -114,3 +114,14 @@
       (ordered-by < string-length list->string)
       '((#\f #\o #\o) (#\a) (#\f #\o #\o #\b #\a #\r)))
     '((#\a) (#\f #\o #\o) (#\f #\o #\o #\b #\a #\r))))
+
+; === recursive-lambda
+
+(check
+  (equal?
+    (
+      (recursive-lambda (fib n)
+        (if (< n 2) n (+ (fib (- n 1)) (fib (- n 2)))))
+      10)
+    55))
+

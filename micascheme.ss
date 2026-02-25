@@ -83,6 +83,7 @@
       (current)
       (data)
       (datum)
+      (define)
       (failable)
       (failure)
       (fixnum)

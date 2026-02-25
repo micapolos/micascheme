@@ -1,5 +1,7 @@
 (library (lets)
-  (export lets)
+  (export
+    lets
+    recursive-lets)
   (import
     (scheme)
     (binder)
@@ -38,4 +40,7 @@
           #'(lets $decls ... $result)))
       ((_ $result)
         #'$result)))
+
+  (define-rule-syntax (recursive-lets fn param ... body)
+    (let fn (param ...) body))
 )

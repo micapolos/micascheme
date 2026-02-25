@@ -18,7 +18,8 @@
     dot-app
     ignore
     ordered-by
-    fix)
+    fix
+    recursive-lambda)
   (import
     (scheme)
     (syntax)
@@ -141,4 +142,7 @@
       (f (lambda (v) ((x x) v))))
      (lambda (x)
       (f (lambda (v) ((x x) v))))))
+
+  (define-rule-syntax (recursive-lambda (id . params) body ...)
+    (letrec ((id (lambda params body ...))) id))
 )

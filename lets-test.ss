@@ -103,3 +103,10 @@
         (set! $string (string-append $string "c")))
       $string)
     "abc"))
+
+(check
+  (equal?
+    (recursive-lets fib
+      (n 10)
+      (if (< n 2) n (+ (fib (- n 1)) (fib (- n 2)))))
+    55))

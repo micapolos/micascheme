@@ -18,6 +18,7 @@
   (curry)
   (datum)
   (decompiler)
+  (define)
   (evaluator)
   (failable)
   (failure)

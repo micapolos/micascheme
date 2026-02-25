@@ -55,29 +55,26 @@
       ((else $term) $term)))
 
   (define (deduce $evaluate $env $source $target)
-    (letrec
-      ((deduce
-        (lambda ($env $source $target)
-          (lets
-            ($source (evaluated-ref ($evaluate $source)))
-            ($target (evaluated-ref ($evaluate $target)))
-            (cond
-              ((eq? $source $target)
-                (deduction-with $source))
-              ((variable? $source)
-                (todo))
-              ((and (signature? $source) (signature? $target))
-                (deduction-lets
-                  (_
-                    (deduce
-                      $env
-                      (signature-param $target)
-                      (signature-param $source)))
-                  (deduce
-                    (push $env (signature-param $target))
-                    (signature-apply $source (variable 0))
-                    (signature-apply $target (variable 0)))))
-              (else
-                (failed-deduction)))))))
-      (deduce $env $source $target)))
+    (recursive-lets deduce
+      ($env $env)
+      ($source (evaluated-ref ($evaluate $source)))
+      ($target (evaluated-ref ($evaluate $target)))
+      (cond
+        ((eq? $source $target)
+          (deduction-with $source))
+        ((variable? $source)
+          (todo))
+        ((and (signature? $source) (signature? $target))
+          (deduction-lets
+            (_
+              (deduce
+                $env
+                (signature-param $target)
+                (signature-param $source)))
+            (deduce
+              (push $env (signature-param $target))
+              (signature-apply $source (variable 0))
+              (signature-apply $target (variable 0)))))
+        (else
+          (failed-deduction)))))
 )
