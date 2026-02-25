@@ -8,9 +8,34 @@
     (leo2 base)
     (leo2 term))
 
-  (define (deduction $val)
+  (define-rule-syntax (deduction ($deduced) expr)
     (lambda ($deduced)
-      (values $val $deduced)))
+      (values expr $deduced)))
+
+  (define (deduction-with $val)
+    (switch $val
+      ((false? $false)
+        (throw deduction-with $false))
+      ((else $val)
+        (deduction ($deduced)
+          (values $val $deduced)))))
+
+  (define (failed-deduction)
+    (deduction-with #f))
+
+  (define (deduction-bind $deduction $fn)
+    (lambda ($deduced)
+      (lets
+        ((values $val? $deduced) ($deduction $deduced))
+        (switch $val?
+          ((false? $false) (values $false $deduced))
+          ((else $val) (($fn $val) $deduced))))))
+
+  (define-rules-syntax
+    ((deduction-lets deduction) deduction)
+    ((deduction-lets (id deduction) x ...)
+      (deduction-bind deduction
+        (lambda (id) (deduction-lets x ...)))))
 
   (define deduced-deduction
     (lambda ($deduced)
@@ -21,14 +46,6 @@
       (values $term
         (push $deduced (cons $hole $term)))))
 
-  (define (deduction-bind $deduction $fn)
-    (lambda ($deduced)
-      (lets
-        ((values $val? $deduced) ($deduction $deduced))
-        (switch $val?
-          ((false? $false) (values $false $deduced))
-          ((else $val) (($fn $val) $deduced))))))
-
   (define (deduced-resolve $deduced $term)
     (switch $term
       ((hole? $term)
@@ -36,12 +53,6 @@
           ((false? _) $term)
           ((else $ass)  (deduced-resolve $deduced (cdr $ass)))))
       ((else $term) $term)))
-
-  (define-rules-syntax
-    ((deduction-lets deduction) deduction)
-    ((deduction-lets (id deduction) x ...)
-      (deduction-bind deduction
-        (lambda (id) (deduction-lets x ...)))))
 
   (define (deduce $evaluate $source $target)
     (letrec
@@ -52,7 +63,7 @@
             ($target (evaluated-ref ($evaluate $target)))
             (cond
               ((eq? $source $target)
-                (deduction $source))
+                (deduction-with $source))
               ((variable? $source)
                 (todo))
               ((and (signature? $source) (signature? $target))
@@ -67,6 +78,6 @@
                     (signature-apply $source (variable 0))
                     (signature-apply $target (variable 0)))))
               (else
-                (deduction #f)))))))
+                (failed-deduction)))))))
       (deduce '() $source $target)))
 )
