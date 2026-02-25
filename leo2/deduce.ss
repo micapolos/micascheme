@@ -55,7 +55,7 @@
       ((else $term) $term)))
 
   (define (deduce $evaluate $env $source $target)
-    (recursive-lets deduce
+    (lets-recursive deduce
       ($env $env)
       ($source (evaluated-ref ($evaluate $source)))
       ($target (evaluated-ref ($evaluate $target)))

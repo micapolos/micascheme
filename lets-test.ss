@@ -106,7 +106,7 @@
 
 (check
   (equal?
-    (recursive-lets fib
+    (lets-recursive fib
       (n 10)
       (if (< n 2) n (+ (fib (- n 1)) (fib (- n 2)))))
     55))
