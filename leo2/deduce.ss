@@ -11,10 +11,11 @@
 
     deduce
 
+    term-deduction->datum
     term-deduction-from-to
 
-    term-deduction->datum
-    check-term-deduction)
+    check-term-deduction
+    check-term-deduction-from-to)
   (import
     (leo2 base)
     (leo2 term)
@@ -234,4 +235,7 @@
 
   (define-rule-syntax (check-term-deduction deduction out)
     (check (equal? (term-deduction->datum deduction) 'out)))
+
+  (define-rule-syntax (check-term-deduction-from-to from to out)
+    (check-term-deduction (term-deduction-from-to '() from to) out))
 )

@@ -7,10 +7,12 @@
   (deduction-with (native "foo"))
   (deduction (native "foo")))
 
-(check-term-deduction
-  (term-deduction-from-to '() (native "foo") (native "foo"))
+(check-term-deduction-from-to
+  (native "foo")
+  (native "foo")
   (deduction (native "foo")))
 
-(check-term-deduction
-  (term-deduction-from-to '() (native "foo") (native "bar"))
+(check-term-deduction-from-to
+  (native "foo")
+  (native "bar")
   (deduction #f))
