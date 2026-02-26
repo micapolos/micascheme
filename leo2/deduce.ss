@@ -158,13 +158,15 @@
                   (switch? $target
                     ((application? $target-application)
                       (deduction-lets
-                        (_
+                        ($lhs
                           (term-deduction-from-to $env
                             (application-lhs $source-application)
                             (application-lhs $target-application)))
-                        (term-deduction-from-to $env
-                          (application-rhs $source-application)
-                          (application-rhs $target-application))))))
+                        ($rhs
+                          (term-deduction-from-to $env
+                            (application-rhs $source-application)
+                            (application-rhs $target-application)))
+                        (deduction-with (application $lhs $rhs))))))
 
                 ((branch? $source-branch)
                   (switch? $target

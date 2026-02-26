@@ -16,3 +16,25 @@
   (native "foo")
   (native "bar")
   (deduction #f))
+
+(check-term-deduction-from-to
+  (native "apple")
+  (hole 0)
+  (deduction
+    (hole 0 (native "apple"))
+    (native "apple")))
+
+(check-term-deduction-from-to
+  (hole 0)
+  (native "banana")
+  (deduction
+    (hole 0 (native "banana"))
+    (native "banana")))
+
+(check-term-deduction-from-to
+  (application (native "fn") (hole 0))
+  (application (hole 1) (native "arg"))
+  (deduction
+    (hole 0 (native "arg"))
+    (hole 1 (native "fn"))
+    (application (native "fn") (native "arg"))))
