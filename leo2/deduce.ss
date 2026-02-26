@@ -91,7 +91,7 @@
                         (=
                           (type-depth $source-type)
                           (type-depth $target-type))
-                        (deduction-with $source)))))
+                        (deduction-with $source-type)))))
 
                 ((native? $source-native)
                   (switch? $target
@@ -119,11 +119,11 @@
                               (deduction-lets
                                 (_ (term-deduction $env (car $args-s) (car $args-t)))
                                 (deduce-args (cdr $args-s) (cdr $args-t))))
-                            (else #f)))))))
+                            (else failed-deduction)))))))
 
                 ((variable? $source-variable)
                   (lets
-                    ($source (list $env (variable-index $source-variable)))
+                    ($source (list-ref $env (variable-index $source-variable)))
                     (term-deduction $env $source $target)))
 
                 ((procedure? $source-procedure)
@@ -190,8 +190,8 @@
                           (labeled-label $source-labeled)
                           (labeled-label $target-labeled))
                         (term-deduction $env
-                          (labeled $source-labeled)
-                          (labeled $target-labeled))))))
+                          (labeled-ref $source-labeled)
+                          (labeled-ref $target-labeled))))))
 
                 ((evaluated? $source-evaluated)
                   (switch? $target
