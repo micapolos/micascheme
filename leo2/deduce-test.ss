@@ -3,7 +3,7 @@
   (leo2 term)
   (leo2 deduce))
 
-; (check-deduces-to
-;   (native "foo")
-;   (native "foo")
-;   (native "foo"))
+(check-term-deduction
+  (deduction ($deduced)
+    (values $deduced (native "foo")))
+  (deduction (native "foo")))

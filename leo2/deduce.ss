@@ -9,16 +9,19 @@
     deduction-bind
     deduction-lets
 
-    term-deduction
-    check-term-deduces-to)
+    deduce
+
+    term-deduction-from-to
+
+    term-deduction->datum
+    check-term-deduction)
   (import
     (leo2 base)
     (leo2 term)
     (leo2 datum))
 
-  (define-rule-syntax (deduction ($deduced) body?)
-    (lambda ($deduced)
-      (values body? $deduced)))
+  (define-rule-syntax (deduction ($deduced) body)
+    (lambda ($deduced) body))
 
   (define failed-deduction
     (deduction ($deduced)
@@ -55,6 +58,9 @@
       (deduction-bind deduction
         (lambda (id) (deduction-lets x ...)))))
 
+  (define (deduce $deduction)
+    ($deduction '()))
+
   (define (deduced-resolve $deduced $term)
     (switch $term
       ((hole? $term)
@@ -64,7 +70,7 @@
             (deduced-resolve $deduced (cdr $ass)))))
       ((else $term) $term)))
 
-  (define-recursive (term-deduction $env $source $target)
+  (define-recursive (term-deduction-from-to $env $source $target)
     (deduction-lets
       ($deduction deduced-deduction)
       (lets
@@ -117,19 +123,19 @@
                               (deduction-with $source))
                             ((and (pair? $args-s) (pair? $args-t))
                               (deduction-lets
-                                (_ (term-deduction $env (car $args-s) (car $args-t)))
+                                (_ (term-deduction-from-to $env (car $args-s) (car $args-t)))
                                 (deduce-args (cdr $args-s) (cdr $args-t))))
                             (else failed-deduction)))))))
 
                 ((variable? $source-variable)
                   (lets
                     ($source (list-ref $env (variable-index $source-variable)))
-                    (term-deduction $env $source $target)))
+                    (term-deduction-from-to $env $source $target)))
 
                 ((procedure? $source-procedure)
                   (switch? $target
                     ((procedure? $target-procedure)
-                      (term-deduction
+                      (term-deduction-from-to
                         (push $env nothing)
                         ($source-procedure (variable 0))
                         ($target-procedure (variable 0))))))
@@ -139,10 +145,10 @@
                     ((signature? $target-signature)
                       (deduction-lets
                         (_
-                          (term-deduction $env
+                          (term-deduction-from-to $env
                             (signature-param $target-signature)
                             (signature-param $source-signature)))
-                        (term-deduction
+                        (term-deduction-from-to
                           (push $env (signature-param $target-signature))
                           (signature-apply $source-signature (variable 0))
                           (signature-apply $target-signature (variable 0)))))))
@@ -152,10 +158,10 @@
                     ((application? $target-application)
                       (deduction-lets
                         (_
-                          (term-deduction $env
+                          (term-deduction-from-to $env
                             (application-lhs $source-application)
                             (application-lhs $target-application)))
-                        (term-deduction $env
+                        (term-deduction-from-to $env
                           (application-rhs $source-application)
                           (application-rhs $target-application))))))
 
@@ -164,21 +170,21 @@
                     ((branch? $target-branch)
                       (deduction-lets
                         (_
-                          (term-deduction $env
+                          (term-deduction-from-to $env
                             (branch-condition $source-branch)
                             (branch-condition $target-branch)))
                         (_
-                          (term-deduction $env
+                          (term-deduction-from-to $env
                             (branch-consequent $source-branch)
                             (branch-consequent $target-branch)))
-                        (term-deduction $env
+                        (term-deduction-from-to $env
                           (branch-alternate $source-branch)
                           (branch-alternate $target-branch))))))
 
                 ((recursion? $source-recursion)
                   (switch? $target
                     ((recursion? $target-recursion)
-                      (term-deduction $env
+                      (term-deduction-from-to $env
                         (recursion-procedure $source-recursion)
                         (recursion-procedure $target-recursion)))))
 
@@ -189,14 +195,14 @@
                         (eq?
                           (labeled-label $source-labeled)
                           (labeled-label $target-labeled))
-                        (term-deduction $env
+                        (term-deduction-from-to $env
                           (labeled-ref $source-labeled)
                           (labeled-ref $target-labeled))))))
 
                 ((evaluated? $source-evaluated)
                   (switch? $target
                     ((evaluated? $target-evaluated)
-                      (term-deduction $env
+                      (term-deduction-from-to $env
                         (evaluated-ref $source-evaluated)
                         (evaluated-ref $target-evaluated)))))
 
@@ -205,16 +211,25 @@
                     ((typed? $target-typed)
                       (deduction-lets
                         (_
-                          (term-deduction $env
+                          (term-deduction-from-to $env
                             (typed-type $source-typed)
                             (typed-type $target-typed)))
-                        (term-deduction $env
+                        (term-deduction-from-to $env
                           (typed-ref $source-typed)
                           (typed-ref $target-typed)))))))
               failed-deduction))))))
 
-  (define-rule-syntax (check-term-deduces-to source target out)
-    (check-term->datum=?
-      (app (term-deduction '() source target) '())
-      'out))
+  (define (term-deduction->datum $term-deduction)
+    (lets
+      ((values $deduced $term)
+        (deduce $term-deduction))
+      `(deduction
+        ,@(map-with ($entry $deduced)
+          `(hole
+            ,(hole-index (car $entry))
+            ,(term->datum (cdr $entry))))
+        ,(term->datum $term))))
+
+  (define-rule-syntax (check-term-deduction deduction out)
+    (check (equal? (term-deduction->datum deduction) 'out)))
 )
