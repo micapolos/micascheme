@@ -4,6 +4,13 @@
   (leo2 deduce))
 
 (check-term-deduction
-  (deduction ($deduced)
-    (values $deduced (native "foo")))
+  (deduction-with (native "foo"))
   (deduction (native "foo")))
+
+(check-term-deduction
+  (term-deduction-from-to '() (native "foo") (native "foo"))
+  (deduction (native "foo")))
+
+(check-term-deduction
+  (term-deduction-from-to '() (native "foo") (native "bar"))
+  (deduction #f))

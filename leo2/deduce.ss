@@ -36,13 +36,13 @@
       (values $term
         (push $deduced (cons $hole $term)))))
 
-  (define (deduction-with $val)
-    (switch $val
+  (define (deduction-with $value)
+    (switch $value
       ((false? $false)
         (throw deduction-with $false))
-      ((else $val)
+      ((else $value)
         (deduction ($deduced)
-          (values $val $deduced)))))
+          (values $value $deduced)))))
 
   (define (deduction-bind $deduction $fn)
     (lambda ($deduced)
@@ -221,14 +221,16 @@
 
   (define (term-deduction->datum $term-deduction)
     (lets
-      ((values $deduced $term)
+      ((values $term? $deduced)
         (deduce $term-deduction))
       `(deduction
         ,@(map-with ($entry $deduced)
           `(hole
             ,(hole-index (car $entry))
             ,(term->datum (cdr $entry))))
-        ,(term->datum $term))))
+        ,(switch $term?
+          ((false? $false) $false)
+          ((else $term) (term->datum $term))))))
 
   (define-rule-syntax (check-term-deduction deduction out)
     (check (equal? (term-deduction->datum deduction) 'out)))
