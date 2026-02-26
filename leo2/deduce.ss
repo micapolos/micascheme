@@ -3,10 +3,13 @@
     deduction
     deduction-bind
     deduction-lets
-    deduce)
+
+    deduction-to
+    check-deduces-to)
   (import
     (leo2 base)
-    (leo2 term))
+    (leo2 term)
+    (leo2 datum))
 
   (define-rule-syntax (deduction ($deduced) expr)
     (lambda ($deduced)
@@ -21,7 +24,8 @@
           (values $val $deduced)))))
 
   (define failed-deduction
-    (deduction-with #f))
+    (deduction ($deduced)
+      (values #f $deduced)))
 
   (define (deduction-bind $deduction $fn)
     (lambda ($deduced)
@@ -51,10 +55,11 @@
       ((hole? $term)
         (switch (assoc $term $deduced)
           ((false? _) $term)
-          ((else $ass)  (deduced-resolve $deduced (cdr $ass)))))
+          ((else $ass)
+            (deduced-resolve $deduced (cdr $ass)))))
       ((else $term) $term)))
 
-  (define-recursive (deduce $env $source $target)
+  (define-recursive (deduction-to $env $source $target)
     (deduction-lets
       ($deduction deduced-deduction)
       (lets
@@ -62,7 +67,8 @@
         ($target (deduced-resolve $deduction $target))
         (switch $target
           ((hole? $target-hole)
-            (push-deduction $target-hole (deduced-resolve $deduction $source)))
+            (push-deduction $target-hole
+              (deduced-resolve $deduction $source)))
           ((else $target)
             (or
               (term-switch $source
@@ -87,9 +93,9 @@
                     ((native? $target-native)
                       (and
                         (equal?
-                          (native $source-native)
-                          (native $target-native))
-                        (deduction-with $source)))))
+                          (native-ref $source-native)
+                          (native-ref $target-native))
+                        (deduction-with $source-native)))))
 
                 ((native-application? $source-native-application)
                   (switch? $target
@@ -102,22 +108,23 @@
                           ($args-s (native-application-args $source-native-application))
                           ($args-t (native-application-args $target-native-application))
                           (cond
-                            ((and (null? $args-s) (null? $args-t)) (deduction-with $source))
+                            ((and (null? $args-s) (null? $args-t))
+                              (deduction-with $source))
                             ((and (pair? $args-s) (pair? $args-t))
                               (deduction-lets
-                                (_ (deduce $env (car $args-s) (car $args-t)))
+                                (_ (deduction-to $env (car $args-s) (car $args-t)))
                                 (deduce-args (cdr $args-s) (cdr $args-t))))
-                            (else (failed-deduction))))))))
+                            (else #f)))))))
 
                 ((variable? $source-variable)
                   (lets
                     ($source (list $env (variable-index $source-variable)))
-                    (deduce $env $source $target)))
+                    (deduction-to $env $source $target)))
 
                 ((procedure? $source-procedure)
                   (switch? $target
                     ((procedure? $target-procedure)
-                      (deduce
+                      (deduction-to
                         (push $env nothing)
                         ($source-procedure (variable 0))
                         ($target-procedure (variable 0))))))
@@ -127,10 +134,10 @@
                     ((signature? $target-signature)
                       (deduction-lets
                         (_
-                          (deduce $env
+                          (deduction-to $env
                             (signature-param $target-signature)
                             (signature-param $source-signature)))
-                        (deduce
+                        (deduction-to
                           (push $env (signature-param $target-signature))
                           (signature-apply $source-signature (variable 0))
                           (signature-apply $target-signature (variable 0)))))))
@@ -140,10 +147,10 @@
                     ((application? $target-application)
                       (deduction-lets
                         (_
-                          (deduce $env
+                          (deduction-to $env
                             (application-lhs $source-application)
                             (application-lhs $target-application)))
-                        (deduce $env
+                        (deduction-to $env
                           (application-rhs $source-application)
                           (application-rhs $target-application))))))
 
@@ -152,21 +159,21 @@
                     ((branch? $target-branch)
                       (deduction-lets
                         (_
-                          (deduce $env
+                          (deduction-to $env
                             (branch-condition $source-branch)
                             (branch-condition $target-branch)))
                         (_
-                          (deduce $env
+                          (deduction-to $env
                             (branch-consequent $source-branch)
                             (branch-consequent $target-branch)))
-                        (deduce $env
+                        (deduction-to $env
                           (branch-alternate $source-branch)
                           (branch-alternate $target-branch))))))
 
                 ((recursion? $source-recursion)
                   (switch? $target
                     ((recursion? $target-recursion)
-                      (deduce $env
+                      (deduction-to $env
                         (recursion-procedure $source-recursion)
                         (recursion-procedure $target-recursion)))))
 
@@ -177,14 +184,14 @@
                         (eq?
                           (labeled-label $source-labeled)
                           (labeled-label $target-labeled))
-                        (deduce $env
+                        (deduction-to $env
                           (labeled $source-labeled)
                           (labeled $target-labeled))))))
 
                 ((evaluated? $source-evaluated)
                   (switch? $target
                     ((evaluated? $target-evaluated)
-                      (deduce $env
+                      (deduction-to $env
                         (evaluated-ref $source-evaluated)
                         (evaluated-ref $target-evaluated)))))
 
@@ -193,11 +200,16 @@
                     ((typed? $target-typed)
                       (deduction-lets
                         (_
-                          (deduce $env
+                          (deduction-to $env
                             (typed-type $source-typed)
                             (typed-type $target-typed)))
-                        (deduce $env
+                        (deduction-to $env
                           (typed-ref $source-typed)
                           (typed-ref $target-typed)))))))
               failed-deduction))))))
+
+  (define-rule-syntax (check-deduces-to source target out)
+    (check-term->datum=?
+      (app (deduction-to '() source target) '())
+      'out))
 )
