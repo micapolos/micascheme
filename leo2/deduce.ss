@@ -16,9 +16,9 @@
     (leo2 term)
     (leo2 datum))
 
-  (define-rule-syntax (deduction ($deduced) expr)
+  (define-rule-syntax (deduction ($deduced) body?)
     (lambda ($deduced)
-      (values expr $deduced)))
+      (values body? $deduced)))
 
   (define failed-deduction
     (deduction ($deduced)
