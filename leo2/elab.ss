@@ -2,7 +2,7 @@
   (export
     elab
     check-elabs
-    check-elab-throws)
+    check-evaluates)
   (import
     (leo2 base)
     (leo2 term)
@@ -180,19 +180,6 @@
   (define (cast $meta-context $context $type $term)
     (todo))
 
-  (define (evaluate* $meta-context $context $terms)
-    (switch-exhaustive $terms
-      ((null? $null)
-        (values $meta-context $null))
-      ((pair? $pair)
-        (lets
-          ((values $meta-context $typed-car)
-            (evaluate $meta-context $context (car $pair)))
-          ((values $meta-context $typed-cdr)
-            (evaluate* $meta-context $context (cdr $pair)))
-          (values $meta-context
-            (cons $typed-car $typed-cdr))))))
-
   (define (evaluate $meta-context $context $term)
     (switch $term
       ((evaluated? $evaluated)
@@ -203,18 +190,22 @@
         (lets
           ($procedure
             (native-application-procedure $native-application))
-          ((values $meta-context $evaluated-args)
-            (evaluate* $meta-context $context (native-application-args $native-application)))
+          ($evaluated-args
+            (map
+              (partial evaluate $meta-context $context)
+              (native-application-args $native-application)))
           ($typed-args (map evaluated-ref $evaluated-args))
-          ($args (map typed-ref $typed-args))
+          ($evaluated-args (map typed-ref $typed-args))
+          ($args (map evaluated-ref $evaluated-args))
           (evaluated
             (if (for-all native? $args)
               (native (apply $procedure (map native-ref $args)))
               (native-application $procedure $evaluated-args)))))
       ((typed? $typed)
-        (typed
-          (typed-type $typed)
-          (evaluate $meta-context $context (typed-ref $typed))))
+        (evaluated
+          (typed
+            (typed-type $typed)
+            (evaluate $meta-context $context (typed-ref $typed)))))
       ; TODO
       ((else $other)
         (evaluated $other))))
@@ -225,10 +216,16 @@
     ((check-elabs meta-context context in out)
       (check-term-datum=?
         (lets
-          ((values $meta-context $typed) (elab meta-context context in))
+          ((values $meta-context $typed)
+            (elab meta-context context in))
           $typed)
         out)))
 
-  (define-rule-syntax (check-elab-throws in)
-    (check (raises (elab '() '() in))))
+  (define-rules-syntax
+    ((check-evaluates in out)
+      (check-evaluates '() '() in out))
+    ((check-evaluates meta-context context in out)
+      (check-term-datum=?
+        (evaluate meta-context context in)
+        out)))
 )
