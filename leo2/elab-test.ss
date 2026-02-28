@@ -29,6 +29,17 @@
   (native "foo")
   (typed nothing (native "foo")))
 
+; === native-application
+
+(check-elabs
+  (native-application string-append
+    (list (native "foo") (native "bar")))
+  (typed nothing
+    (native-application string-append
+    (list
+      (typed nothing (native "foo"))
+      (typed nothing (native "bar"))))))
+
 ; === type
 
 (check-elabs

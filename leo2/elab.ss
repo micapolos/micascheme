@@ -9,6 +9,19 @@
     (leo2 datum)
     (leo2 equal))
 
+  (define (elab* $meta-context $context $terms)
+    (switch-exhaustive $terms
+      ((null? $null)
+        (values $meta-context $null))
+      ((pair? $pair)
+        (lets
+          ((values $meta-context $typed-car)
+            (elab $meta-context $context (car $pair)))
+          ((values $meta-context $typed-cdr)
+            (elab* $meta-context $context (cdr $pair)))
+          (values $meta-context
+            (cons $typed-car $typed-cdr))))))
+
   (define (elab $meta-context $context $term)
     (switch $term
       ((typed? $typed)
@@ -30,9 +43,15 @@
           (typed nothing $native)))
 
       ((native-application? $native-application)
-        ; TODO: elaborate args.
-        (values $meta-context
-          (typed nothing $native-application)))
+        (lets
+          ((values $meta-context $typed-args)
+            (elab* $meta-context $context
+              (native-application-args $native-application)))
+          (values $meta-context
+            (typed nothing
+              (native-application
+                (native-application-procedure $native-application)
+                $typed-args)))))
 
       ((type? $type)
         (values $meta-context
@@ -160,6 +179,12 @@
 
   (define (cast $meta-context $context $type $term)
     (todo))
+
+  (define (evaluate $meta-context $context $term)
+    (switch $term
+      ((evaluated? $evaluated) $evaluated)
+      ((else $other)
+        (throw evaluate $meta-context $context $term))))
 
   (define-rules-syntax
     ((check-elabs in out)
