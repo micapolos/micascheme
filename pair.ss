@@ -2,6 +2,7 @@
   (export
     null-or-pair?
     pair
+    pair-map
     map-car
     map-cdr
     with-car
@@ -23,6 +24,11 @@
           ($car (car $pair))
           ($cdr (cdr $pair))
           $body))))
+
+  (define (pair-map $fn $pair)
+    (cons
+      ($fn (car $pair))
+      ($fn (cdr $pair))))
 
   (define (map-car $proc $pair)
     (cons ($proc (car $pair)) (cdr $pair)))

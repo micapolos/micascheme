@@ -1,5 +1,6 @@
 (library (leo2 term)
   (export
+    primitive?
     hole hole? hole-index
     nothing nothing?
     unknown unknown?
@@ -27,6 +28,15 @@
 
     branch-ref)
   (import (leo2 base))
+
+  (define (primitive? $x)
+    (or
+      (null? $x)
+      (boolean? $x)
+      (number? $x)
+      (char? $x)
+      (string? $x)
+      (bytevector? $x)))
 
   (data*
     (hole index)

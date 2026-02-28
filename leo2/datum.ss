@@ -31,6 +31,12 @@
   (define (depth-term->datum $depth $term)
     ; TODO: Integrate in term-switch
     (switch $term
+      ((primitive? $primitive)
+        $primitive)
+      ((pair? $pair)
+        (pair-map (partial depth-term->datum $depth) $pair))
+      ((vector? $vector)
+        (vector-map (partial depth-term->datum $depth) $vector))
       ((mismatch? $mismatch)
         `(mismatch
           ,(depth-term->datum $depth (mismatch-expected $mismatch))
