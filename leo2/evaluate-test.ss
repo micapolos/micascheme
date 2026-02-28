@@ -150,5 +150,5 @@
     (native "bar"))
   (evaluated
     (typed
-      (native "foo")
+      (evaluated (native "foo"))
       (evaluated (native "bar")))))
