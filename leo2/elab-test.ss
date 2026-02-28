@@ -9,6 +9,16 @@
   (typed (type 0) (native "foo"))
   (typed (type 0) (native "foo")))
 
+; === ann
+
+(check-elabs
+  (ann (type 0) (typed (type 0) (native "foo")))
+  (typed (type 0) (native "foo")))
+
+(check-elabs
+  (ann (type 1) (typed (type 0) (native "foo")))
+  (typed nothing (native "foo")))
+
 ; === native
 
 (check-elabs

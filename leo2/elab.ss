@@ -14,6 +14,17 @@
       ((typed? $typed)
         (values $meta-context $typed))
 
+      ((ann? $ann)
+        (lets
+          ((values $meta-context $typed)
+            (elab $meta-context $context (ann-ref $ann)))
+          ((values $meta-context $type)
+            (meta-resolve $meta-context $context
+              (ann-type $ann)
+              (typed-type $typed)))
+          (values $meta-context
+            (typed $type (typed-ref $typed)))))
+
       ((native? $native)
         (values $meta-context (typed nothing $native)))
 
@@ -129,9 +140,10 @@
           ((hole? $actual-hole)
             (meta-resolve $meta-context $context $actual-hole $expected-other))
           ((else $actual-other)
+            ; TODO: meta-resolve should handle all terms.
             (if (term=? $expected-other $actual-other)
               (values $meta-context $actual-other)
-              (throw type-mismatch $meta-context $context $expected $actual)))))))
+              (values $meta-context nothing)))))))
 
   (define (infer $meta-context $context $term)
     (switch $term
