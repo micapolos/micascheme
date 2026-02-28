@@ -1,5 +1,11 @@
 (library (git)
-  (export git add all changed? commit push)
+  (export
+    git
+    add
+    all
+    changed?
+    commit
+    push)
   (import
     (only (micascheme)
       define-rules-syntaxes
