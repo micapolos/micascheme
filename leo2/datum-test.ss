@@ -28,15 +28,15 @@
 
 (check-term->datum=?
   (lambda (x) (application (variable 10) x))
-  (lambda (application (variable 10) (variable 0))))
+  (lambda (v0) (application (variable 10) v0)))
 
 (check-term->datum=?
-  (signature (variable 10) (lambda (x) (application (variable 20) x)))
-  (signature (variable 10) (lambda (application (variable 20) (variable 0)))))
+  (signature (variable 10) (lambda (v0) (application (variable 20) v0)))
+  (signature (variable 10) (lambda (v0) (application (variable 20) v0))))
 
 (check-term->datum=?
-  (recursion (lambda (fn) (lambda (x) (application fn x))))
-  (recursion (lambda (lambda (application (variable 0) (variable 1))))))
+  (recursion (lambda (v0) (lambda (v1) (application v0 v1))))
+  (recursion (lambda (v0) (lambda (v1) (application v0 v1)))))
 
 (check-term->datum=?
   (application (variable 0) (variable 1))

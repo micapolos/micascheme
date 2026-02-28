@@ -44,11 +44,15 @@
               (partial depth-term->datum $depth)
               (native-application-args $native-application)))))
       ((variable? $variable)
-        `(variable ,(variable-index $variable)))
+        (lets
+          ($index (variable-index $variable))
+          (if (>= $index $depth)
+            `(variable ,$index)
+            (depth->symbol $index))))
       ((procedure? $procedure)
         (lets
           ($symbol (depth->symbol $depth))
-          `(lambda
+          `(lambda (,(depth->symbol $depth))
             ,(depth-term->datum
               (+ $depth 1)
               ($procedure (variable $depth))))))

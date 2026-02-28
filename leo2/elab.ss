@@ -223,10 +223,10 @@
     ((check-elabs in out)
       (check-elabs '() '() in out))
     ((check-elabs meta-context context in out)
-      (check-term->datum=?
+      (check-term-datum=?
         (lets
-          ((values $meta-context $typed)
-          (elab meta-context context in)) $typed)
+          ((values $meta-context $typed) (elab meta-context context in))
+          $typed)
         out)))
 
   (define-rule-syntax (check-elab-throws in)
