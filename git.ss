@@ -1,9 +1,11 @@
 (library (git)
   (export
-    git add all
-    git changed?
-    git commit
-    git push)
+    git
+    add
+    all
+    changed?
+    commit
+    push)
   (import (except (micascheme) push))
 
   (define-keywords add all changed? commit push)
