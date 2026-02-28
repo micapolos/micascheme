@@ -180,7 +180,8 @@
   (application
     (typed (type 0) (native "string"))
     (typed (type 0) (native "string")))
-  (typed nothing
+  (typed
+    (typed (type 0) (application (type 0) (type 0)))
     (application
       (typed (type 0) (native "string"))
       (typed (type 0) (native "string")))))

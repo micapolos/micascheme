@@ -136,8 +136,12 @@
                     (application $typed-lhs $typed-rhs)))))
             ((else $other)
               (values $meta-context
-                (typed nothing
-                (application $typed-lhs $typed-rhs)))))))
+                (typed
+                  (typed (type 0)
+                    (application
+                      (typed-type $typed-lhs)
+                      (typed-type $typed-rhs)))
+                  (application $typed-lhs $typed-rhs)))))))
 
       ((else $other)
         (throw elab $meta-context $context $other))))
