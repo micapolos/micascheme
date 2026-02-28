@@ -1,27 +1,23 @@
 (library (git)
-  (export git)
-  (import (micascheme))
+  (export git add all changed? commit push)
+  (import
+    (only (micascheme)
+      define-rules-syntaxes
+      define-keywords
+      keywords
+      system
+      zero?
+      format))
 
-  (define-syntax (git $syntax)
-    (syntax-case $syntax ()
-      ((_ command arg ...)
-        (lets
-          ($args #'(arg ...))
-          (case (datum command)
-            ((add)
-              (syntax-case $args ()
-                ((all)
-                  (equal? (datum all) 'all)
-                  #'(system "git add -A"))))
-            ((changed?)
-              (syntax-case $args ()
-                (()
-                  #'(zero? (system "git status --porcelain=v1 | grep -q .")))))
-            ((commit)
-              (syntax-case $args ()
-                ((msg)
-                  #`(system (format "git commit -m ~s" msg)))))
-            ((push)
-              (syntax-case $args ()
-                (() #'(system "git push")))))))))
+  (define-keywords add all changed? commit push)
+
+  (define-rules-syntaxes (keywords add all changed? commit push)
+    ((git add all)
+      (system "git add -A"))
+    ((git changed?)
+      (zero? (system "git status --porcelain=v1 | grep -q .")))
+    ((git commit $message)
+      (system (format "git commit -m ~s" $message)))
+    ((git push)
+      (system "git push")))
 )
