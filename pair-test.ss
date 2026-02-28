@@ -6,6 +6,13 @@
 (check-equal? (null-or-pair? (cons 1 2)) #t)
 (check-equal? (null-or-pair? 123) #f)
 
+; === pair-map ===
+
+(check
+  (equal?
+    (pair-map number->string (cons 1 2))
+    (cons "1" "2")))
+
 ; === car-lets ===
 
 (check-equal?
