@@ -3,6 +3,6 @@
   (import (leo2 base))
 
   (define (depth->symbol $depth)
-    (string->symbol (format "v~a" $depth)))
+    (string->symbol (format "$~a" $depth)))
 )
 

@@ -5,15 +5,15 @@
 
 (check-reify
   (lambda (x) (lambda (y) (application x y)))
-  (lambda (v0) (lambda (v1) (v0 v1))))
+  (lambda ($0) (lambda ($1) ($0 $1))))
 
 (check-reify
   (recursion (lambda (fn) (lambda (x) (application fn x))))
-  (letrec ((v0 (lambda (v1) (v0 v1)))) v0))
+  (letrec (($0 (lambda ($1) ($0 $1)))) $0))
 
 (check-reify
   (branch (variable 0) (variable 1) (variable 2))
-  (if v0 v1 v2))
+  (if $0 $1 $2))
 
 ; self-labeled literals
 (check-reify (native #f) #f)
