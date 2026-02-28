@@ -3,6 +3,20 @@
   (leo2 term)
   (leo2 elab))
 
+; === evaluate native
+
+(check-evaluates
+  (native "foo")
+  (evaluated (native "foo")))
+
+; === evaluate typed native
+
+(check-evaluates
+  (typed nothing (native "foo"))
+  (evaluated
+    (typed nothing
+      (evaluated (native "foo")))))
+
 ; === evaluate native-application
 
 (check-evaluates
