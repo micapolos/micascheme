@@ -2,7 +2,8 @@
   (export
     term->datum
     depth-term->datum
-    check-term->datum=?)
+    check-term->datum=?
+    check-term-datum=?)
   (import
     (leo2 base)
     (leo2 term)
@@ -81,4 +82,10 @@
 
   (define-rule-syntax (check-term->datum=? in out)
     (check (equal? (term->datum in) `out)))
+
+  (define-rule-syntax (check-term-datum=? in out)
+    (check
+      (equal?
+        (term->datum in)
+        (term->datum out))))
 )

@@ -2,6 +2,7 @@
   (export
     hole hole? hole-index
     nothing nothing?
+    unknown unknown?
     native native? native-ref
     native-application native-application? native-application-procedure native-application-args
     type type? type-depth
@@ -26,6 +27,7 @@
   (data*
     (hole index)
     nothing
+    unknown
     (type depth)
     (native ref)
     (native-application procedure args)

@@ -94,7 +94,7 @@
       ((procedure? $procedure)
         (lets
           ($param-type (hole (length $meta-context)))
-          ($meta-context (push $meta-context #f))
+          ($meta-context (push $meta-context unknown))
           ($body-context (push $context $param-type))
           ($body ($procedure (variable 0)))
           ((values $meta-context $typed-body)
@@ -154,7 +154,7 @@
         (lets
           ($index (meta-context-index $meta-context $expected-hole))
           (switch (list-ref $meta-context $index)
-            ((false? _)
+            ((unknown? _)
               (values
                 (list-set $meta-context $index $actual)
                 $actual))
