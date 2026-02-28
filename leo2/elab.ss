@@ -26,7 +26,13 @@
             (typed $type (typed-ref $typed)))))
 
       ((native? $native)
-        (values $meta-context (typed nothing $native)))
+        (values $meta-context
+          (typed nothing $native)))
+
+      ((native-application? $native-application)
+        ; TODO: elaborate args.
+        (values $meta-context
+          (typed nothing $native-application)))
 
       ((type? $type)
         (values $meta-context
@@ -155,10 +161,15 @@
   (define (cast $meta-context $context $type $term)
     (todo))
 
-  (define-rule-syntax (check-elabs in out)
-    (check-term->datum=?
-      (lets ((values _ $typed) (elab '() '() in)) $typed)
-      out))
+  (define-rules-syntax
+    ((check-elabs in out)
+      (check-elabs '() '() in out))
+    ((check-elabs meta-context context in out)
+      (check-term->datum=?
+        (lets
+          ((values $meta-context $typed)
+          (elab meta-context context in)) $typed)
+        out)))
 
   (define-rule-syntax (check-elab-throws in)
     (check (raises (elab '() '() in))))
