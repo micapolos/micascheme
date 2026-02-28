@@ -12,6 +12,18 @@
       (typed nothing (native "bar"))))
    (evaluated (native "foobar")))
 
+; === evaluate typed native-application
+
+(check-evaluates
+  (typed nothing
+    (native-application string-append
+      (list
+        (typed nothing (native "foo"))
+        (typed nothing (native "bar")))))
+  (evaluated
+    (typed nothing
+      (evaluated (native "foobar")))))
+
 ; === typed
 
 (check-elabs
