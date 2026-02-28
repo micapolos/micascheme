@@ -1,13 +1,13 @@
 (library (git)
   (export
-    git-add
+    git-add-all
     git-clean?
     git-commit
     git-push)
   (import (micascheme))
 
   (define-rules-syntaxes
-    ((git-add)
+    ((git-add-all)
       (system "git add -A"))
     ((git-clean?)
       (zero? (system "! git status --porcelain=v1 | grep -q .")))
