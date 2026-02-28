@@ -38,6 +38,33 @@
     (typed nothing
       (evaluated (native "foobar")))))
 
+; === evaluate procedure?
+
+(check-evaluates
+  (lambda ($0) $0)
+  (evaluated (lambda ($0) (evaluated $0))))
+
+; === evaluate application
+
+(check-evaluates
+  (application
+    (typed nothing (lambda ($0) $0))
+    (typed nothing (native "foo")))
+  (evaluated
+    (typed nothing
+      (evaluated (native "foo")))))
+
+; === evaluate application
+
+(check-evaluates
+  (application
+    (typed nothing (variable 0))
+    (typed nothing (native "foo")))
+  (evaluated
+    (application
+      (evaluated (typed nothing (evaluated (variable 0))))
+      (evaluated (typed nothing (evaluated (native "foo")))))))
+
 ; === typed
 
 (check-elabs

@@ -201,6 +201,22 @@
             (if (for-all native? $args)
               (native (apply $procedure (map native-ref $args)))
               (native-application $procedure $evaluated-args)))))
+      ((procedure? $procedure)
+        (evaluated
+          (lambda ($0)
+            (evaluate $meta-context $context
+              ($procedure $0)))))
+      ((application? $application)
+        (lets
+          ($evaluated-lhs
+            (evaluate $meta-context $context (application-lhs $application)))
+          ($evaluated-rhs
+            (evaluate $meta-context $context (application-rhs $application)))
+          (switch (evaluated-ref (typed-ref (evaluated-ref $evaluated-lhs)))
+            ((procedure? $procedure)
+              ($procedure $evaluated-rhs))
+            ((else _)
+              (evaluated (application $evaluated-lhs $evaluated-rhs))))))
       ((typed? $typed)
         (evaluated
           (typed
