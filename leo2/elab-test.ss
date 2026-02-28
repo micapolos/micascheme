@@ -9,6 +9,12 @@
   (typed (type 0) (native "foo"))
   (typed (type 0) (native "foo")))
 
+; === native
+
+(check-elabs
+  (native "foo")
+  (typed nothing (native "foo")))
+
 ; === type
 
 (check-elabs
@@ -81,4 +87,13 @@
       (typed
         (signature (hole 0) (lambda (type 0)))
         (lambda (typed (type 0) (native "number"))))
+      (typed (type 0) (native "string")))))
+
+(check-elabs
+  (application
+    (typed (type 0) (native "string"))
+    (typed (type 0) (native "string")))
+  (typed nothing
+    (application
+      (typed (type 0) (native "string"))
       (typed (type 0) (native "string")))))

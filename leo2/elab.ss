@@ -1,8 +1,8 @@
 (library (leo2 elab)
   (export
     elab
-    meta-resolve
-    check-elabs)
+    check-elabs
+    check-elab-throws)
   (import
     (leo2 base)
     (leo2 term)
@@ -13,6 +13,9 @@
     (switch $term
       ((typed? $typed)
         (values $meta-context $typed))
+
+      ((native? $native)
+        (values $meta-context (typed nothing $native)))
 
       ((type? $type)
         (values $meta-context
@@ -96,8 +99,9 @@
                     (signature-apply $signature $typed-rhs)
                     (application $typed-lhs $typed-rhs)))))
             ((else $other)
-              (throw not-procedure $meta-context $context
-                (application-lhs $application))))))
+              (values $meta-context
+                (typed nothing
+                (application $typed-lhs $typed-rhs)))))))
 
       ((else $other)
         (throw elab $meta-context $context $other))))
@@ -143,4 +147,7 @@
     (check-term->datum=?
       (lets ((values _ $typed) (elab '() '() in)) $typed)
       out))
+
+  (define-rule-syntax (check-elab-throws in)
+    (check (raises (elab '() '() in))))
 )
