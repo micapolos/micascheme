@@ -182,9 +182,13 @@
 
   (define (evaluate $meta-context $context $term)
     (switch $term
-      ((evaluated? $evaluated) $evaluated)
+      ((evaluated? $evaluated)
+        $evaluated)
+      ((native? $native)
+        (evaluated $native))
+      ; TODO
       ((else $other)
-        (throw evaluate $meta-context $context $term))))
+        (evaluated $other))))
 
   (define-rules-syntax
     ((check-elabs in out)
