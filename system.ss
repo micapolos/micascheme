@@ -6,12 +6,14 @@
     current-seconds
     current-file-string
     pretty-print-current
-    display-current)
+    display-current
+    system0)
   (import
     (scheme)
     (lets)
     (number)
-    (current))
+    (current)
+    (throw))
 
   (define (displayln x)
     (display x)
@@ -57,4 +59,8 @@
         (+
           (time-second $time)
           (/ (time-nanosecond $time) 1000000000.0)))))
+
+  (define (system0 $cmd)
+    (unless (zero? (system $cmd))
+      (throw system0 $cmd)))
 )
