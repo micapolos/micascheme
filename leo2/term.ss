@@ -16,6 +16,10 @@
     ann ann? ann-type ann-ref
     labeled labeled? labeled-label labeled-ref
 
+    mismatch mismatch? mismatch-expected mismatch-actual
+    expected expected? expected-ref
+    actual actual? actual-ref
+
     term? term-switch
 
     signature-apply
@@ -39,7 +43,10 @@
     (labeled label ref)
     (evaluated ref)
     (typed type ref)
-    (ann type ref))
+    (ann type ref)
+    (mismatch expected actual)
+    (expected ref)
+    (actual ref))
 
   (union
     (term

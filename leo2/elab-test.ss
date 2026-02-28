@@ -79,11 +79,11 @@
 
 (check-elabs
   (ann (type 1) (typed (type 0) (native "foo")))
-  (typed nothing (native "foo")))
-
-(check-elabs
-  (ann (type 1) (typed (type 0) (native "foo")))
-  (typed nothing (native "foo")))
+  (typed
+    (mismatch
+      (expected (type 1))
+      (actual (type 0)))
+    (native "foo")))
 
 ; === native
 

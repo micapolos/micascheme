@@ -165,10 +165,12 @@
           ((hole? $actual-hole)
             (meta-resolve $meta-context $context $actual-hole $expected-other))
           ((else $actual-other)
-            ; TODO: meta-resolve should handle all terms.
             (if (term=? $expected-other $actual-other)
               (values $meta-context $actual-other)
-              (values $meta-context nothing)))))))
+              (values $meta-context
+                (mismatch
+                  (expected $expected-other)
+                  (actual $actual-other)))))))))
 
   (define (infer $meta-context $context $term)
     (switch $term
