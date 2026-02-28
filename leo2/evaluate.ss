@@ -79,7 +79,7 @@
       ((typed? $typed)
         (evaluated
           (typed
-            (evaluate (typed-type $typed))
+            (typed-type $typed)
             (evaluate (typed-ref $typed)))))))
 
   (define (term-apply $lhs $rhs)

@@ -143,3 +143,12 @@
                 (application fib (native-application - (list n (native 2))))))))))
     (native 10))
   (evaluated (native 55)))
+
+(check-evaluates
+  (typed
+    (native "foo")
+    (native "bar"))
+  (evaluated
+    (typed
+      (native "foo")
+      (evaluated (native "bar")))))
