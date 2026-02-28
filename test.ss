@@ -7,7 +7,7 @@
       ((_ $spec ...)
         (begin
           (let ()
-            (display (format "Testing ~a\n" '$spec))
+            (pretty-print `(testing ,'$spec))
             (let (($start-time (current-time 'time-process)))
               (load-program
                 (string-append
