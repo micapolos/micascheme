@@ -9,7 +9,7 @@
     (micac c)
     (micac run))
   (export (import (micac keywords)))
-  (export (import (only (syntaxes) literals)))
+  (export (import (only (syntaxes) keywords)))
   (export (import (only (scheme)
     include
     = < <= > >= + - * div

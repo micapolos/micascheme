@@ -51,7 +51,7 @@
     (expander ($expander $syntax)
       (exists (lambda ($x) ($x $expander $syntax)) $expanders)))
 
-  (define-rules-syntax (literals keywords)
+  (define-rules-syntax (keywords keywords)
     ((case-expander (keywords keyword ...) (id param ...) ($expander) body)
       (expander ($expander $syntax)
         (syntax-case? $syntax (id keyword ...)

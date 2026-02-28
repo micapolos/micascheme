@@ -1,8 +1,8 @@
 (library (syntax-keywords)
-  (export fenders implicit literals)
+  (export fenders implicit keywords)
   (import (scheme))
 
-  (define-syntax literals
+  (define-syntax keywords
     (lambda ($syntax)
       (syntax-case $syntax ()
         (id (identifier? #'id)

@@ -9,7 +9,7 @@
 
   (define-keywords a f b c d e h l)
   (define-reg-16 org)
-  (define-rules-syntaxes (literals a f b c d e h l)
+  (define-rules-syntaxes (keywords a f b c d e h l)
     ((asm write body ...)
       (parameterize ((param (lambda (addr u8) (write addr u8))))
         (org 0)

@@ -41,7 +41,7 @@
                   #`(set! #,(reg-id $offset) #,$expr))))
 
             (syntax-case $op
-              ( ; literals
+              ( ; keywords
                 local
                 const ld inc dec add sub
                 in out

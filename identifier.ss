@@ -4,7 +4,7 @@
     build-identifier
     identifier-append
     datum?
-    keywords
+    identifiers
     identifier)
   (import
     (scheme)
@@ -32,7 +32,7 @@
       (syntax->datum #'(x ...))
       '(x ...)))
 
-  (define-rule-syntax (keywords id ...)
+  (define-rule-syntax (identifiers id ...)
     (and
       (or
         (datum? id)

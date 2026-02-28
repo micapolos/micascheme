@@ -10,7 +10,7 @@
 
   (define-keywords add all changed? commit push)
 
-  (define-rules-syntaxes (literals add all changed? commit push)
+  (define-rules-syntaxes (keywords add all changed? commit push)
     ((git add all)
       (system "git add -A"))
     ((git changed?)

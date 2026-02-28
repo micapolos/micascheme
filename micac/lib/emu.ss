@@ -31,7 +31,7 @@
         (video width-expr height-expr h-blank-expr v-blank-expr cycles-per-pixel-expr)
         body ...
         (update update-body ...))
-      (literals video init update)
+      (keywords video init update)
       (macro width width-expr)
       (macro height height-expr)
       (macro h-blank h-blank-expr)

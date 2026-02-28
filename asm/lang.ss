@@ -47,7 +47,7 @@
         define-keywords
         define-syntax syntax quasisyntax unsyntax unsyntax-splicing
         syntax-case syntax-rules
-        define-rules-syntaxes literals
+        define-rules-syntaxes keywords
         keywords
         begin
         + - *
@@ -69,7 +69,7 @@
     ((define-op-syntax id proc)
       (define-syntax id (make-compile-time-value proc))))
 
-  (define-rules-syntax (literals keywords)
+  (define-rules-syntax (keywords keywords)
     ((define-op (keywords keyword ...) pattern body ...)
       (define-ops (keywords keyword ...) (pattern body ...)))
     ((define-op pattern body ...)

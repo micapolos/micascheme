@@ -8,7 +8,7 @@
         (put-string $port "<!DOCTYPE html>")
         (put-html $port html))))
 
-  (define-rules-syntax (literals with)
+  (define-rules-syntax (keywords with)
     ((put-html $port s)
       (string? (datum s))
       (put-string $port s))

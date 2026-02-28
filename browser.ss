@@ -4,7 +4,7 @@
     (micascheme)
     (html))
 
-  (define-rules-syntax (literals html)
+  (define-rules-syntax (keywords html)
     ((browse x)
       (lets
         ($path "/tmp/index.html")

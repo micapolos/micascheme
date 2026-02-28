@@ -11,7 +11,7 @@
   (check (equal? (bar "foo") "barfoo")))
 
 (run-void
-  (define-case-syntaxes (literals +)
+  (define-case-syntaxes (keywords +)
     ((foo $a) #`(string-append "foo" $a))
     ((foo $a $b) #`(string-append $a $b))
     ((foo $a + $b) #`(string-append $a "+" $b))
@@ -35,7 +35,7 @@
   (check (equal? (bar "foo") "barfoo")))
 
 (run-void
-  (define-rules-syntaxes (literals +)
+  (define-rules-syntaxes (keywords +)
     ((foo $a) (string-append "foo" $a))
     ((foo $a $b) (string-append $a $b))
     ((foo $a + $b) (string-append $a "+" $b))
@@ -57,7 +57,7 @@
   (check (equal? (foo "foo" "bar") "foobar")))
 
 (run-void
-  (define-rules-syntax (literals +)
+  (define-rules-syntax (keywords +)
     ((foo $a) (string-append "foo" $a))
     ((foo $a $b) (string-append $a $b))
     ((foo $a + $b) (string-append $a "+" $b))

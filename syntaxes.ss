@@ -14,8 +14,8 @@
   (export (import (syntax-keywords)))
 
   (define-syntax (define-case-syntaxes $syntax)
-    (syntax-case $syntax (literals)
-      ((_ (literals $literal ...) $clause ...)
+    (syntax-case $syntax (keywords)
+      ((_ (keywords $literal ...) $clause ...)
         #`(begin
           #,@(map
             (lambda ($clauses-group)
@@ -30,19 +30,19 @@
               free-identifier=?
               (syntax->list #'($clause ...))))))
       ((_ $clause ...)
-        #`(define-case-syntaxes (literals) $clause ...))))
+        #`(define-case-syntaxes (keywords) $clause ...))))
 
   (define-syntax (define-rules-syntaxes $syntax)
-    (syntax-case $syntax (literals)
-      ((_ (literals $literal ...) $rule ...)
-        #`(define-case-syntaxes (literals $literal ...)
+    (syntax-case $syntax (keywords)
+      ((_ (keywords $literal ...) $rule ...)
+        #`(define-case-syntaxes (keywords $literal ...)
           #,@(map syntax-rule->clause (syntax->list #'($rule ...)))))
       ((_ $rule ...)
-        #`(define-rules-syntaxes (literals) $rule ...))))
+        #`(define-rules-syntaxes (keywords) $rule ...))))
 
   (define-syntax (define-rules-syntax $syntax)
-    (syntax-case $syntax (literals)
-      ((_ (literals $literal ...) $rule $rule* ...)
+    (syntax-case $syntax (keywords)
+      ((_ (keywords $literal ...) $rule $rule* ...)
         (lets
           ($id (syntax-rule-id #'$rule))
           (run
@@ -50,7 +50,7 @@
               (for-all (partial free-identifier=? $id)
                 (map syntax-rule-id (syntax->list #'($rule* ...))))
               (syntax-error $syntax "multiple ids")))
-          #`(define-rules-syntaxes (literals $literal ...) $rule $rule* ...)))
+          #`(define-rules-syntaxes (keywords $literal ...) $rule $rule* ...)))
       ((_ $rule ...)
-        #`(define-rules-syntax (literals) $rule ...))))
+        #`(define-rules-syntax (keywords) $rule ...))))
 )

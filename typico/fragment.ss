@@ -31,7 +31,7 @@
   (define (id->fragment $id)
     (pure-fragment (id->symbol $id)))
 
-  (define-rules-syntax (literals import)
+  (define-rules-syntax (keywords import)
     ((fragment-with obj)
       (fragment-with (import) obj))
     ((fragment-with (import i ...) obj)

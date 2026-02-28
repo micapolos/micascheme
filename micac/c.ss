@@ -15,20 +15,20 @@
   (define-rule-syntax (micac-define id item)
     (define-syntax id (make-compile-time-value item)))
 
-  (define-rules-syntax (literals literals)
-    ((micac-macro (id arg ...) (literals literal ...) body)
+  (define-rules-syntax (keywords keywords)
+    ((micac-macro (id arg ...) (keywords literal ...) body)
       (micac-define id
         (lambda ($syntax)
           (syntax-case $syntax (literal ...)
             ((_ arg ...) #'body)))))
-    ((micac-macro (id arg ...) (literals literal ...) body ...)
+    ((micac-macro (id arg ...) (keywords literal ...) body ...)
       (micac-define id
         (lambda ($syntax)
           (syntax-case $syntax (literal ...)
             ((_ arg ...)
               #'(begin body ...))))))
     ((micac-macro (id arg ...) body ...)
-      (micac-macro (id arg ...) (literals) body ...)))
+      (micac-macro (id arg ...) (keywords) body ...)))
 
   (define-syntax (micac-c $syntax $lookup)
     (syntax-case $syntax ()

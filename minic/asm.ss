@@ -27,7 +27,7 @@
 
           (define (op-syntax $op)
             (syntax-case $op
-              ( ; literals
+              ( ; keywords
                 local
                 const ld inc dec add sub
                 in out

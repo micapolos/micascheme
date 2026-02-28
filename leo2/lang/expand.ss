@@ -227,8 +227,7 @@
         (symbol? (datum id))
         (syntax-error #'id "undefined"))))
 
-  (define-rules-syntaxes
-    (literals expand expanded)
+  (define-rules-syntaxes (keywords expand expanded)
     ((check (expand in) (expanded t v))
       (lets
         ($expanded (expand (list) #'in))

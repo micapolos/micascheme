@@ -13,7 +13,7 @@
             (datum->syntax #'i-mask (fx-/wraparound (fxsll 1 $datum) 1))
             (syntax-error $syntax (format "outside 0..~s range:" (fixnum-width))))))))
 
-  (define-rules-syntaxes (literals const extend clamp add sub inc dec)
+  (define-rules-syntaxes (keywords const extend clamp add sub inc dec)
     ((int bits const value) value)
     ((int bits extend rhs) rhs)
     ((int bits clamp rhs) (($primitive 3 fxand) (int-mask bits) rhs))

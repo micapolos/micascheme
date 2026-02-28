@@ -62,7 +62,7 @@
       (syntax-case #'(print something new x) ()
         ((print something new b)
           (and
-            (keywords print something new)
+            (identifiers print something new)
             #`(displayln x)))))
     `(displayln x)))
 
