@@ -1,6 +1,7 @@
 (library (leo2 binding)
   (export
     binding binding? binding-procedure binding-ref
+
     binding-apply)
   (import
     (leo2 base)
