@@ -12,6 +12,7 @@
     recursion recursion? recursion-procedure
     evaluated evaluated? evaluated-ref
     typed typed? typed-type typed-ref
+    ann ann? ann-type ann-ref
     labeled labeled? labeled-label labeled-ref
 
     term? term-switch
@@ -35,7 +36,8 @@
     (recursion procedure)
     (labeled label ref)
     (evaluated ref)
-    (typed type ref))
+    (typed type ref)
+    (ann type ref))
 
   (union
     (term
