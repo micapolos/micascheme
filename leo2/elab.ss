@@ -15,11 +15,11 @@
     (leo2 equal))
 
   (define-rules-syntaxes
-    ((task ($solutions $errors) solutions-errors-value)
-      (lambda ($solutions $errors) solutions-errors-value))
-    ((task value)
+    ((task ($solutions $errors) solutions-errors-result)
+      (lambda ($solutions $errors) solutions-errors-result))
+    ((task result)
       (task ($solutions $errors)
-        (values $solutions $errors value)))
+        (values $solutions $errors result)))
     ((task-lets (id first) x ... last)
       (lambda ($solutions $errors)
         (lets
