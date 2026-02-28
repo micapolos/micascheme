@@ -180,12 +180,41 @@
   (define (cast $meta-context $context $type $term)
     (todo))
 
+  (define (evaluate* $meta-context $context $terms)
+    (switch-exhaustive $terms
+      ((null? $null)
+        (values $meta-context $null))
+      ((pair? $pair)
+        (lets
+          ((values $meta-context $typed-car)
+            (evaluate $meta-context $context (car $pair)))
+          ((values $meta-context $typed-cdr)
+            (evaluate* $meta-context $context (cdr $pair)))
+          (values $meta-context
+            (cons $typed-car $typed-cdr))))))
+
   (define (evaluate $meta-context $context $term)
     (switch $term
       ((evaluated? $evaluated)
         $evaluated)
       ((native? $native)
         (evaluated $native))
+      ((native-application? $native-application)
+        (lets
+          ($procedure
+            (native-application-procedure $native-application))
+          ((values $meta-context $evaluated-args)
+            (evaluate* $meta-context $context (native-application-args $native-application)))
+          ($typed-args (map evaluated-ref $evaluated-args))
+          ($args (map typed-ref $typed-args))
+          (evaluated
+            (if (for-all native? $args)
+              (native (apply $procedure (map native-ref $args)))
+              (native-application $procedure $evaluated-args)))))
+      ((typed? $typed)
+        (typed
+          (typed-type $typed)
+          (evaluate $meta-context $context (typed-ref $typed))))
       ; TODO
       ((else $other)
         (evaluated $other))))
