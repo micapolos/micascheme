@@ -1,5 +1,10 @@
 (library (leo2 elab)
   (export
+    task task-lets
+    list->task task-append
+    task->datum
+    check-task=?
+
     elab
     check-elabs
     check-evaluates)
@@ -8,6 +13,37 @@
     (leo2 term)
     (leo2 datum)
     (leo2 equal))
+
+  (define-rules-syntaxes
+    ((task ($solutions $errors) solutions-errors-value)
+      (lambda ($solutions $errors) solutions-errors-value))
+    ((task value)
+      (task ($solutions $errors)
+        (values $solutions $errors value)))
+    ((task-lets (id first) x ... last)
+      (lambda ($solutions $errors)
+        (lets
+          ((values $solutions $errors id) (first $solutions $errors))
+          (task-lets x ... (last $solutions $errors)))))
+    ((task-lets x) x))
+
+  (define-list->/append (task $tasks)
+    (switch-exhaustive $tasks
+      ((null? $null)
+        (task $null))
+      ((pair? $pair)
+        (task-lets
+          ($car (car $pair))
+          ($cdr (list->task (cdr $pair)))
+          (task (cons $car $cdr))))))
+
+  (define (task->datum $task)
+    (lets
+      ((values $solutions $errors $result) ($task '() '()))
+      `(task
+        (solutions ,@(reverse (map term->datum $solutions)))
+        (errors ,@(reverse (map term->datum $errors)))
+        (result ,(term->datum $result)))))
 
   (define (elab* $meta-context $context $terms)
     (switch-exhaustive $terms
@@ -231,6 +267,12 @@
       ; TODO
       ((else $other)
         (evaluated $other))))
+
+  (define-rule-syntax (check-task=? in out)
+    (check
+      (equal?
+        (task->datum in)
+        (task->datum out))))
 
   (define-rules-syntax
     ((check-elabs in out)

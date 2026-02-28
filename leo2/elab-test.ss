@@ -3,6 +3,12 @@
   (leo2 term)
   (leo2 elab))
 
+; === task
+
+(check-task=?
+  (task (native "foo"))
+  (task (native "foo")))
+
 ; === evaluate native
 
 (check-evaluates
