@@ -194,7 +194,8 @@
       ((variable? $variable)
         (switch (list-ref? $env (variable-index $variable))
           ((false? _)
-            (push-error-task "unbound variable"
+            (push-error-task
+              (unbound $variable)
               (typed nothing $variable)))
           ((else $type)
             (task (typed $type $variable)))))

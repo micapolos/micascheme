@@ -45,6 +45,8 @@
         `(expected ,(expected-ref $expected)))
       ((actual? $actual)
         `(actual ,(actual-ref $actual)))
+      ((unbound? $unbound)
+        `(unbound ,(unbound-ref $unbound)))
       ((native-type? _)
         `native-type)
       ((unknown? _)

@@ -22,6 +22,7 @@
     mismatch mismatch? mismatch-expected mismatch-actual
     expected expected? expected-ref
     actual actual? actual-ref
+    unbound unbound? unbound-ref
 
     term? term-switch
 
@@ -60,7 +61,8 @@
     (ann type ref)
     (mismatch expected actual)
     (expected ref)
-    (actual ref))
+    (actual ref)
+    (unbound ref))
 
   (union
     (term

@@ -235,9 +235,8 @@
 
 (check-task=?
   (elab-task (stack (type 10) (type 20)) (variable 2))
-  (task
-    (solutions)
-    (errors "unbound variable")
+  (push-error-task
+    (unbound (variable 2))
     (typed nothing (variable 2))))
 
 ; === elab-task lambda-type
