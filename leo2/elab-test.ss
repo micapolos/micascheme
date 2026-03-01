@@ -156,13 +156,17 @@
 ; === elab-task variable
 
 (check-task=?
-  (elab-task (list (type 0)) (variable 0))
-  (task (typed (type 0) (variable 0))))
+  (elab-task (stack (type 10) (type 20)) (variable 0))
+  (task (typed (type 20) (variable 0))))
 
 (check-task=?
-  (elab-task empty-env (variable 0))
+  (elab-task (stack (type 10) (type 20)) (variable 1))
+  (task (typed (type 10) (variable 1))))
+
+(check-task=?
+  (elab-task (stack (type 10) (type 20)) (variable 2))
   (error-task "unbound variable"
-    (typed nothing (variable 0))))
+    (typed nothing (variable 2))))
 
 ; === typed
 
