@@ -349,7 +349,10 @@
 
 (check-task=?
   (elab-task empty-env (ann (type 1) (type 0)))
-  (task (typed (type 1) (type 0))))
+  (task
+    (typed
+      (evaluated (type 1))
+      (type 0))))
 
 (check-task=?
   (elab-task empty-env (ann (type 2) (type 0)))
@@ -357,7 +360,9 @@
     (mismatch
       (expected (type 2))
       (actual (type 1)))
-    (typed nothing (type 0))))
+    (typed
+      (evaluated nothing)
+      (type 0))))
 
 ; === elab-task native-type
 
@@ -386,11 +391,15 @@
         (native "foo")
         (native "bar"))))
   (task
-    (typed native-type
+    (typed (evaluated native-type)
       (native-application string-append
       (list
-        (typed native-type (native "foo"))
-        (typed native-type (native "bar")))))))
+        (typed
+          (evaluated native-type)
+          (native "foo"))
+        (typed
+          (evaluated native-type)
+          (native "bar")))))))
 
 (check-task=?
   (elab-task empty-env
@@ -405,8 +414,12 @@
     (typed nothing
       (native-application string-append
         (list
-          (typed native-type (native "foo"))
-          (typed nothing (type 0)))))))
+          (typed
+            (evaluated native-type)
+            (native "foo"))
+          (typed
+            (evaluated nothing)
+            (type 0)))))))
 
 ; === elab-task variable
 

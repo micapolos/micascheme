@@ -174,8 +174,11 @@
   (define (check-task $env $type $term)
     (task-lets
       ($typed (elab-task $env $term))
-      ($type (solve-task $env $type (type-of $typed)))
-      (task (typed-from $type (value-of $typed)))))
+      ($expected-type (eval-task $env $type))
+      ($actual-type (eval-task $env (type-of $typed)))
+      ($type (solve-task $env $expected-type $actual-type))
+      ($evaluated-type (eval-task $env $type))
+      (task (typed-from $evaluated-type (value-of $typed)))))
 
   (define (elab-task $env $term)
     (switch $term
@@ -199,8 +202,8 @@
                 (native-application-args $native-application))))
           (task
             (typed
-              (if (for-all native-type? (map type-of $typed-args))
-                native-type
+              (if (for-all native-type? (map (dot evaluated-ref type-of) $typed-args))
+                (evaluated native-type)
                 nothing)
               (native-application
                 (native-application-lambda $native-application)
@@ -402,6 +405,8 @@
     (switch $term
       ((evaluated? $evaluated)
         (task $evaluated))
+      ((nothing? $nothing)
+        (task (evaluated $nothing)))
       ((type? $type)
         (task (evaluated $type)))
       ((native-type? $native-type)
