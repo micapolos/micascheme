@@ -13,6 +13,7 @@
   (check)
   (code)
   (core)
+  (commented)
   (compiler)
   (current)
   (curry)

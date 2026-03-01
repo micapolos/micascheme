@@ -79,6 +79,7 @@
       (case)
       (char)
       (check)
+      (commented)
       (core)
       (current)
       (data)
