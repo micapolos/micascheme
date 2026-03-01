@@ -6,8 +6,8 @@
 
   (define (untyped $term)
     (term-switch $term
-      ((solution? $solution)
-        (throw untyped $solution))
+      ((hole? $hole)
+        (throw untyped $hole))
       ((nothing? $nothing)
         (throw untyped $nothing))
       ((type? $type)

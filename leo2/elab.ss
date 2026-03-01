@@ -5,7 +5,7 @@
     task->datum
     task-apply
     push-error-task
-    push-solution-task
+    push-hole-task
     solutions-task
     errors-task
     empty-env
@@ -75,7 +75,7 @@
 
   (define (task-result $task)
     (lets
-      ((values $solution $errors $result) (task-apply $task '() '()))
+      ((values $hole $errors $result) (task-apply $task '() '()))
       $result))
 
   (define (task-apply $task $solutions $errors)
@@ -89,12 +89,12 @@
     (task ($solutions $errors)
       (values $solutions $errors $errors)))
 
-  (define new-solution-task
+  (define new-hole-task
     (task ($solutions $errors)
       (values
         (push $solutions unknown)
         $errors
-        (solution (length $solutions)))))
+        (hole (length $solutions)))))
 
   (define-list->/append (task $tasks)
     (switch-exhaustive $tasks
@@ -113,10 +113,10 @@
         (push $errors $error)
         $result)))
 
-  (define (push-solution-task $solution $result)
+  (define (push-hole-task $hole $result)
     (task ($solutions $errors)
       (values
-        (push $solutions $solution)
+        (push $solutions $hole)
         $errors
         $result)))
 
@@ -218,7 +218,7 @@
                       (lambda-type-apply $lambda-type $arg)))))))))
       ((lambda? $lambda)
         (task-lets
-          ($param-type new-solution-task)
+          ($param-type new-hole-task)
           ($typed-body
             (elab-task
               (push $env $param-type)

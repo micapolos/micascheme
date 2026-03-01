@@ -51,7 +51,7 @@
         'unknown)
       ((else $term)
         (term-switch $term
-          ((solution? $solution) `(solution ,(solution-index $solution)))
+          ((hole? $hole) `(hole ,(hole-index $hole)))
           ((nothing? _) 'nothing)
           ((type? $type)
             `(type ,(type-depth $type)))

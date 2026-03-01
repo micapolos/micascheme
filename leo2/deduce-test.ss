@@ -19,22 +19,22 @@
 
 (check-term-deduction-from-to
   (native "apple")
-  (solution 0)
+  (hole 0)
   (deduction
-    (solution 0 (native "apple"))
+    (hole 0 (native "apple"))
     (native "apple")))
 
 (check-term-deduction-from-to
-  (solution 0)
+  (hole 0)
   (native "banana")
   (deduction
-    (solution 0 (native "banana"))
+    (hole 0 (native "banana"))
     (native "banana")))
 
 (check-term-deduction-from-to
-  (application (native "fn") (solution 0))
-  (application (solution 1) (native "arg"))
+  (application (native "fn") (hole 0))
+  (application (hole 1) (native "arg"))
   (deduction
-    (solution 0 (native "arg"))
-    (solution 1 (native "fn"))
+    (hole 0 (native "arg"))
+    (hole 1 (native "fn"))
     (application (native "fn") (native "arg"))))

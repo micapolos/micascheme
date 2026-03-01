@@ -16,8 +16,8 @@
 
   (define (evaluate $term)
     (term-switch $term
-      ((solution? $solution)
-        (evaluated $solution))
+      ((hole? $hole)
+        (evaluated $hole))
       ((nothing? $nothing)
         (evaluated $nothing))
       ((type? $type)

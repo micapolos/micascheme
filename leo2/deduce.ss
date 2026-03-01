@@ -32,10 +32,10 @@
     (lambda ($deduced)
       (values $deduced $deduced)))
 
-  (define (push-deduction $solution $term)
+  (define (push-deduction $hole $term)
     (lambda ($deduced)
       (values $term
-        (push $deduced (cons $solution $term)))))
+        (push $deduced (cons $hole $term)))))
 
   (define (deduction-with $value)
     (switch $value
@@ -64,7 +64,7 @@
 
   (define (deduced-resolve $deduced $term)
     (switch $term
-      ((solution? $term)
+      ((hole? $term)
         (switch (assoc $term $deduced)
           ((false? _) $term)
           ((else $ass)
@@ -78,14 +78,14 @@
         ($source (deduced-resolve $deduction $source))
         ($target (deduced-resolve $deduction $target))
         (switch $target
-          ((solution? $target-solution)
-            (push-deduction $target-solution
+          ((hole? $target-hole)
+            (push-deduction $target-hole
               (deduced-resolve $deduction $source)))
           ((else $target)
             (or
               (term-switch $source
-                ((solution? $source-solution)
-                  (push-deduction $source-solution $target))
+                ((hole? $source-hole)
+                  (push-deduction $source-hole $target))
 
                 ((nothing? _)
                   (switch? $target
@@ -228,8 +228,8 @@
         (deduce $term-deduction))
       `(deduction
         ,@(map-with ($entry $deduced)
-          `(solution
-            ,(solution-index (car $entry))
+          `(hole
+            ,(hole-index (car $entry))
             ,(term->datum (cdr $entry))))
         ,(switch $term?
           ((false? $false) $false)
