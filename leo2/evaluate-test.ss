@@ -89,7 +89,7 @@
   (evaluated
     (lambda-type
       (evaluated (type 0))
-      (lambda (v0) (evaluated v0)))))
+      (evaluated (lambda (v0) (evaluated v0))))))
 
 (check-evaluates
   (application

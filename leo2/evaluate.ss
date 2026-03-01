@@ -81,9 +81,7 @@
         (evaluated
           (lambda-type
             (evaluate (lambda-type-param $lambda-type))
-            (lambda ($arg)
-              (evaluate
-                (lambda-type-apply $lambda-type $arg))))))
+            (evaluate (lambda-type-lambda $lambda-type)))))
       ((application? $application)
         (term-apply
           (evaluate (application-lhs $application))
