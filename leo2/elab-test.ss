@@ -59,7 +59,6 @@
   (solve-task empty-env unknown unknown)
   (task unknown))
 
-; unknown
 (check-task=?
   (solve-task empty-env unknown native-type)
   (task native-type))
@@ -96,6 +95,27 @@
     (mismatch
       (expected (type 0))
       (actual (variable 0)))
+    nothing))
+
+; native
+(check-task=?
+  (solve-task empty-env (native "foo") (native "foo"))
+  (task (native "foo")))
+
+(check-task=?
+  (solve-task empty-env (native "foo") (native "bar"))
+  (push-error-task
+    (mismatch
+      (expected (native "foo"))
+      (actual (native "bar")))
+    nothing))
+
+(check-task=?
+  (solve-task empty-env (variable 0) (native "bar"))
+  (push-error-task
+    (mismatch
+      (expected (variable 0))
+      (actual (native "bar")))
     nothing))
 
 ; ==================== eval-task =======================

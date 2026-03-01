@@ -274,6 +274,14 @@
           (switch? $actual
             ((native-type? $native-type)
               (task $native-type))))
+        ((native? $expected-native)
+          (switch? $actual
+            ((native? $actual-native)
+              (and
+                (equal?
+                  (native-ref $expected-native)
+                  (native-ref $actual-native))
+                (task $actual-native)))))
         ((type? $expected-type)
           (switch? $actual
             ((type? $actual-type)
