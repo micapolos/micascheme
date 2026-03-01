@@ -63,17 +63,17 @@
     (typed nothing
       (evaluated (native "foobar")))))
 
-; === evaluate procedure?
+; === evaluate lambda?
 
 (check-evaluates
-  (procedure ($0) $0)
-  (evaluated (procedure ($0) (evaluated $0))))
+  (lambda ($0) $0)
+  (evaluated (lambda ($0) (evaluated $0))))
 
 ; === evaluate application
 
 (check-evaluates
   (application
-    (typed nothing (procedure ($0) $0))
+    (typed nothing (lambda ($0) $0))
     (typed nothing (native "foo")))
   (evaluated
     (typed nothing
@@ -168,25 +168,25 @@
   (error-task "unbound variable"
     (typed nothing (variable 2))))
 
-; === elab-task procedure-type
+; === elab-task lambda-type
 
 (check-task=?
   (elab-task empty-env
-    (procedure-type (type 1)
-      (procedure ($0) (type 2))))
+    (lambda-type (type 1)
+      (lambda ($0) (type 2))))
   (task
     (typed (type 3)
-      (procedure-type (type 1)
-        (procedure ($0) (type 2))))))
+      (lambda-type (type 1)
+        (lambda ($0) (type 2))))))
 
 ; (check-elabs
 ;   (elab-task empty-env
-;     (procedure-type (type 1)
-;       (procedure ($0) $0)))
+;     (lambda-type (type 1)
+;       (lambda ($0) $0)))
 ;   (task
 ;     (typed (type 2)
-;       (procedure-type (type 1)
-;         (procedure ($0) $0)))))
+;       (lambda-type (type 1)
+;         (lambda ($0) $0)))))
 
 ; === typed
 
@@ -241,68 +241,68 @@
   (type 1)
   (typed (type 2) (type 1)))
 
-; === procedure-type
+; === lambda-type
 
 (check-elabs
-  (procedure-type
+  (lambda-type
     (typed (type 0) (native "string"))
-    (procedure (_)
+    (lambda (_)
       (typed (type 0) (native "number"))))
   (typed
     (type 0)
-    (procedure-type
+    (lambda-type
       (typed (type 0) (native "string"))
-      (procedure (_)
+      (lambda (_)
         (typed (type 0) (native "number"))))))
 
 (check-elabs
-  (procedure-type
+  (lambda-type
     (typed (type 0) (native "string"))
-    (procedure ($arg) $arg))
+    (lambda ($arg) $arg))
   (typed
     (type 0)
-    (procedure-type
+    (lambda-type
       (typed (type 0) (native "string"))
-      (procedure (v0)
+      (lambda (v0)
         (typed (type 0) v0)))))
 
-; === procedure
+; === lambda
 
 (check-elabs
-  (procedure ($arg) $arg)
+  (lambda ($arg) $arg)
   (typed
-    (procedure-type (hole 0) (procedure (v0) (hole 0)))
-    (procedure (v0) (typed (hole 0) v0))))
+    (lambda-type (hole 0) (lambda (v0) (hole 0)))
+    (lambda (v0) (typed (hole 0) v0))))
 
 (check-elabs
-  (procedure ($arg) (typed (type 0) (native "string")))
+  (lambda ($arg) (typed (type 0) (native "string")))
   (typed
-    (procedure-type (hole 0) (procedure (v0) (type 0)))
-    (procedure (v0) (typed (type 0) (native "string")))))
+    (lambda-type (hole 0) (lambda (v0) (type 0)))
+    (lambda (v0) (typed (type 0) (native "string")))))
 
 ; === application
 
 (check-elabs
   (application
-    (procedure ($arg) $arg)
+    (lambda ($arg) $arg)
     (typed (type 0) (native "string")))
   (typed (type 0)
     (application
       (typed
-        (procedure-type (hole 0) (procedure (v0) (hole 0)))
-        (procedure (v0) (typed (hole 0) v0)))
+        (lambda-type (hole 0) (lambda (v0) (hole 0)))
+        (lambda (v0) (typed (hole 0) v0)))
       (typed (type 0) (native "string")))))
 
 (check-elabs
   (application
-    (procedure (_) (typed (type 0) (native "number")))
+    (lambda (_) (typed (type 0) (native "number")))
     (typed (type 0) (native "string")))
   (typed
     (type 0)
     (application
       (typed
-        (procedure-type (hole 0) (procedure (_) (type 0)))
-        (procedure (_) (typed (type 0) (native "number"))))
+        (lambda-type (hole 0) (lambda (_) (type 0)))
+        (lambda (_) (typed (type 0) (native "number"))))
       (typed (type 0) (native "string")))))
 
 (check-elabs

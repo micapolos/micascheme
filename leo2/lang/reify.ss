@@ -58,7 +58,7 @@
       ((native-application? $native-application)
         `(native-apply
           ,(reify $depth $type)
-          ,(native-application-procedure $native-application)
+          ,(native-application-lambda $native-application)
           ,@(map
             (partial reify $depth)
             (native-application-args $native-application))))

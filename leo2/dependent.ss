@@ -1,24 +1,24 @@
 (library (leo2 dependent)
   (export
-    procedure-dependent?
-    procedure-type-dependent?
+    lambda-dependent?
+    lambda-type-dependent?
     recursion-dependent?)
   (import
     (leo2 base)
     (leo2 term)
     (leo2 equal))
 
-  (define (procedure-dependent? $procedure)
+  (define (lambda-dependent? $lambda)
     (not
       (term=?
-        ($procedure (variable 0))
-        ($procedure (variable 1)))))
+        ($lambda (variable 0))
+        ($lambda (variable 1)))))
 
-  (define (procedure-type-dependent? $procedure-type)
-    (procedure-dependent?
-      (procedure-type-procedure $procedure-type)))
+  (define (lambda-type-dependent? $lambda-type)
+    (lambda-dependent?
+      (lambda-type-lambda $lambda-type)))
 
   (define (recursion-dependent? $recursion)
-    (procedure-dependent?
-      (recursion-procedure $recursion)))
+    (lambda-dependent?
+      (recursion-lambda $recursion)))
 )

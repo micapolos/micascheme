@@ -27,16 +27,16 @@
 (check-term->datum=? (variable 0) (variable 0))
 
 (check-term->datum=?
-  (procedure (x) (application (variable 10) x))
-  (procedure ($0) (application (variable 10) $0)))
+  (lambda (x) (application (variable 10) x))
+  (lambda ($0) (application (variable 10) $0)))
 
 (check-term->datum=?
-  (procedure-type (variable 10) (procedure ($0) (application (variable 20) $0)))
-  (procedure-type (variable 10) (procedure ($0) (application (variable 20) $0))))
+  (lambda-type (variable 10) (lambda ($0) (application (variable 20) $0)))
+  (lambda-type (variable 10) (lambda ($0) (application (variable 20) $0))))
 
 (check-term->datum=?
-  (recursion (procedure ($0) (procedure ($1) (application $0 $1))))
-  (recursion (procedure ($0) (procedure ($1) (application $0 $1)))))
+  (recursion (lambda ($0) (lambda ($1) (application $0 $1))))
+  (recursion (lambda ($0) (lambda ($1) (application $0 $1)))))
 
 (check-term->datum=?
   (application (variable 0) (variable 1))

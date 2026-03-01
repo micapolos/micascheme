@@ -25,7 +25,7 @@
 
 ; (check-elaborate-throws
 ;   (application
-;     (procedure-type (type 1) (lambda (x) x))
+;     (lambda-type (type 1) (lambda (x) x))
 ;     (native "not-a-type-0")))
 
 ; ; --- evaluated
@@ -62,23 +62,23 @@
 ;     (typed (type 0) (hole 0))
 ;     (variable 100)))
 
-; ; --- procedure
+; ; --- lambda
 
 ; (check-elaborate-throws
 ;   (lambda (x) x))
 
-; ; --- procedure-type
+; ; --- lambda-type
 
 ; (check-elaborates
-;   (procedure-type (type 0)
+;   (lambda-type (type 0)
 ;     (lambda (x) x))
 ;   (typed
 ;     (typed
 ;       (type 0)
-;       (procedure-type
+;       (lambda-type
 ;         (type 0)
 ;         (lambda (type 0))))
-;     (procedure-type (type 0)
+;     (lambda-type (type 0)
 ;       (lambda
 ;         (typed
 ;           (type 0)
@@ -96,10 +96,10 @@
 ;       (typed
 ;         (typed
 ;           (type 0)
-;           (procedure-type
+;           (lambda-type
 ;             (type 51)
 ;             (lambda (type 51))))
-;         (procedure-type (type 51)
+;         (lambda-type (type 51)
 ;           (lambda
 ;             (typed
 ;               (type 51)
@@ -160,14 +160,14 @@
 
 ; (check-elaborates
 ;   (recursion
-;     (procedure-type (type 0)
+;     (lambda-type (type 0)
 ;       (lambda (x) x)))
 ;   (typed
 ;     (typed
 ;       (type 0)
-;       (procedure-type (type 0) (lambda (type 0))))
+;       (lambda-type (type 0) (lambda (type 0))))
 ;     (recursion
-;       (procedure-type (type 0)
+;       (lambda-type (type 0)
 ;         (lambda
 ;           (typed
 ;             (type 0)

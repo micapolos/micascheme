@@ -57,7 +57,7 @@
 (check (not (term=? (variable 0) (variable 1))))
 (check (not (term=? (variable 0) 0)))
 
-; procedure
+; lambda
 (check
   (term=?
     (lambda (x) x)
@@ -86,45 +86,45 @@
       (lambda (x) (lambda (y) x))
       (lambda (x) (lambda (y) y)))))
 
-; procedure-type
+; lambda-type
 (check
   (term=?
-    (procedure-type (type 0) (lambda (x) x))
-    (procedure-type (type 0) (lambda (x) x))))
-
-(check
-  (term=?
-    (procedure-type (type 0) (lambda (x) (procedure-type (type 1) (lambda (y) x))))
-    (procedure-type (type 0) (lambda (x) (procedure-type (type 1) (lambda (y) x))))))
+    (lambda-type (type 0) (lambda (x) x))
+    (lambda-type (type 0) (lambda (x) x))))
 
 (check
   (term=?
-    (procedure-type (type 0) (lambda (x) (procedure-type x (lambda (y) x))))
-    (procedure-type (type 0) (lambda (x) (procedure-type x (lambda (y) x))))))
+    (lambda-type (type 0) (lambda (x) (lambda-type (type 1) (lambda (y) x))))
+    (lambda-type (type 0) (lambda (x) (lambda-type (type 1) (lambda (y) x))))))
+
+(check
+  (term=?
+    (lambda-type (type 0) (lambda (x) (lambda-type x (lambda (y) x))))
+    (lambda-type (type 0) (lambda (x) (lambda-type x (lambda (y) x))))))
 
 (check
   (not
     (term=?
-      (procedure-type (type 0) (lambda (x) x))
-      (procedure-type (type 1) (lambda (x) x)))))
+      (lambda-type (type 0) (lambda (x) x))
+      (lambda-type (type 1) (lambda (x) x)))))
 
 (check
   (not
     (term=?
-      (procedure-type (type 0) (lambda (x) x))
-      (procedure-type (type 0) (lambda (x) (variable 1))))))
+      (lambda-type (type 0) (lambda (x) x))
+      (lambda-type (type 0) (lambda (x) (variable 1))))))
 
 (check
   (not
     (term=?
-      (procedure-type (type 0) (lambda (x) x))
-      (procedure-type (type 0) (lambda (x) (procedure-type x (lambda (y) x)))))))
+      (lambda-type (type 0) (lambda (x) x))
+      (lambda-type (type 0) (lambda (x) (lambda-type x (lambda (y) x)))))))
 
 (check
   (not
     (term=?
-      (procedure-type (type 0) (lambda (x) (procedure-type (type 0) (lambda (y) x))))
-      (procedure-type (type 0) (lambda (x) (procedure-type (type 0) (lambda (y) y)))))))
+      (lambda-type (type 0) (lambda (x) (lambda-type (type 0) (lambda (y) x))))
+      (lambda-type (type 0) (lambda (x) (lambda-type (type 0) (lambda (y) y)))))))
 
 ; application
 (check

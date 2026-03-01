@@ -6,18 +6,18 @@
     unknown unknown?
     native-type native-type?
     native native? native-ref
-    native-application native-application? native-application-procedure native-application-args
+    native-application native-application? native-application-lambda native-application-args
     type type? type-depth
     variable variable? variable-index
-    procedure-type procedure-type? procedure-type-param procedure-type-procedure
+    lambda-type lambda-type? lambda-type-param lambda-type-lambda
     application application? application-lhs application-rhs
     branch branch? branch-condition branch-consequent branch-alternate
-    recursion recursion? recursion-procedure
+    recursion recursion? recursion-lambda
     evaluated evaluated? evaluated-ref
     typed typed? typed-type typed-ref
     ann ann? ann-type ann-ref
     labeled labeled? labeled-label labeled-ref
-    procedure
+    lambda?
 
     mismatch mismatch? mismatch-expected mismatch-actual
     expected expected? expected-ref
@@ -25,7 +25,7 @@
 
     term? term-switch
 
-    procedure-type-apply
+    lambda-type-apply
     recursion-apply
 
     branch-ref)
@@ -47,12 +47,12 @@
     (type depth)
     native-type
     (native ref)
-    (native-application procedure args)
+    (native-application lambda args)
     (variable index)
-    (procedure-type param procedure)
+    (lambda-type param lambda)
     (application lhs rhs)
     (branch condition consequent alternate)
-    (recursion procedure)
+    (recursion lambda)
     (labeled label ref)
     (evaluated ref)
     (typed type ref)
@@ -69,8 +69,8 @@
       native
       native-application
       variable
-      procedure  ; arity 1
-      procedure-type
+      lambda  ; arity 1
+      lambda-type
       application
       branch
       recursion
@@ -78,8 +78,7 @@
       evaluated
       typed))
 
-  (define-rule-syntax (procedure (id) body)
-    (lambda (id) body))
+  (define lambda? procedure?)
 
   (define (term-switch-template $term)
     (term-switch $term
@@ -89,8 +88,8 @@
       ((native? $native) $native)
       ((native-application? $native-application) $native-application)
       ((variable? $variable) $variable)
-      ((procedure? $procedure) $procedure)
-      ((procedure-type? $procedure-type) $procedure-type)
+      ((lambda? $lambda) $lambda)
+      ((lambda-type? $lambda-type) $lambda-type)
       ((application? $application) $application)
       ((branch? $branch) $branch)
       ((recursion? $recursion) $recursion)
@@ -98,11 +97,11 @@
       ((evaluated? $evaluated) $evaluated)
       ((typed? $typed) $typed)))
 
-  (define (procedure-type-apply $procedure-type $arg)
-    ((procedure-type-procedure $procedure-type) $arg))
+  (define (lambda-type-apply $lambda-type $arg)
+    ((lambda-type-lambda $lambda-type) $arg))
 
   (define (recursion-apply $recursion $arg)
-    ((recursion-procedure $recursion) $arg))
+    ((recursion-lambda $recursion) $arg))
 
   (define (branch-ref $branch $condition)
     ((if $condition branch-consequent branch-alternate) $branch))

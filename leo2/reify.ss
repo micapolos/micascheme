@@ -34,13 +34,13 @@
             (throw reify $native-application))))
       ((variable? $variable)
         (depth->symbol (variable-index $variable)))
-      ((procedure? $procedure)
+      ((lambda? $lambda)
         (lets
           ($symbol (depth->symbol $depth))
           `(lambda (,$symbol)
             ,(depth-native?-reify (+ $depth 1) #f
-              ($procedure (variable $depth))))))
-      ((procedure-type? $procedure-type) #f)
+              ($lambda (variable $depth))))))
+      ((lambda-type? $lambda-type) #f)
       ((application? $application)
         `(
           ,(depth-native?-reify $depth #f (application-lhs $application))

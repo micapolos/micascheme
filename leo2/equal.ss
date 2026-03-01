@@ -38,8 +38,8 @@
           ((native-application? $native-application-b)
             (and
               (eq?
-                (native-application-procedure $native-application-a)
-                (native-application-procedure $native-application-b))
+                (native-application-lambda $native-application-a)
+                (native-application-lambda $native-application-b))
               (for-all*
                 (partial depth-term=? $depth)
                 (native-application-args $native-application-a)
@@ -50,22 +50,22 @@
             (=
               (variable-index $variable-a)
               (variable-index $variable-b)))))
-      ((procedure? $procedure-a)
+      ((lambda? $lambda-a)
         (switch-b? $term-b
-          ((procedure? $procedure-b)
+          ((lambda? $lambda-b)
             (depth-term=? (+ $depth 1)
-              ($procedure-a (variable $depth))
-              ($procedure-b (variable $depth))))))
-      ((procedure-type? $procedure-type-a)
+              ($lambda-a (variable $depth))
+              ($lambda-b (variable $depth))))))
+      ((lambda-type? $lambda-type-a)
         (switch-b? $term-b
-          ((procedure-type? $procedure-type-b)
+          ((lambda-type? $lambda-type-b)
             (and
               (depth-term=? $depth
-                (procedure-type-param $procedure-type-a)
-                (procedure-type-param $procedure-type-b))
+                (lambda-type-param $lambda-type-a)
+                (lambda-type-param $lambda-type-b))
               (depth-term=? $depth
-                (procedure-type-procedure $procedure-type-a)
-                (procedure-type-procedure $procedure-type-b))))))
+                (lambda-type-lambda $lambda-type-a)
+                (lambda-type-lambda $lambda-type-b))))))
       ((application? $application-a)
         (switch-b? $term-b
           ((application? $application-b)
@@ -93,8 +93,8 @@
         (switch-b? $term-b
           ((recursion? $recursion-b)
             (depth-term=? $depth
-              (recursion-procedure $recursion-a)
-              (recursion-procedure $recursion-b)))))
+              (recursion-lambda $recursion-a)
+              (recursion-lambda $recursion-b)))))
       ((labeled? $labeled-a)
         (switch-b? $term-b
           ((labeled? $labeled-b)

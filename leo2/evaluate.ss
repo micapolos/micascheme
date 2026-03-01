@@ -26,26 +26,26 @@
         (evaluated $native))
       ((native-application? $native-application)
         (lets
-          ($procedure (native-application-procedure $native-application))
+          ($lambda (native-application-lambda $native-application))
           ($evaluated-args (map evaluate (native-application-args $native-application)))
           ($args (map evaluated-ref $evaluated-args))
           (evaluated
             (if (for-all native? $args)
-              (native (apply $procedure (map native-ref $args)))
-              (native-application $procedure $evaluated-args)))))
+              (native (apply $lambda (map native-ref $args)))
+              (native-application $lambda $evaluated-args)))))
       ((variable? $variable)
         (evaluated $variable))
-      ((procedure? $procedure)
+      ((lambda? $lambda)
         (evaluated
           (lambda ($arg)
-            (evaluate ($procedure $arg)))))
-      ((procedure-type? $procedure-type)
+            (evaluate ($lambda $arg)))))
+      ((lambda-type? $lambda-type)
         (evaluated
-          (procedure-type
-            (evaluate (procedure-type-param $procedure-type))
+          (lambda-type
+            (evaluate (lambda-type-param $lambda-type))
             (lambda ($arg)
               (evaluate
-                (procedure-type-apply $procedure-type $arg))))))
+                (lambda-type-apply $lambda-type $arg))))))
       ((application? $application)
         (term-apply
           (evaluate (application-lhs $application))
@@ -84,10 +84,10 @@
 
   (define (term-apply $lhs $rhs)
     (switch (evaluated-ref $lhs)
-      ((procedure? $procedure)
-        ($procedure $rhs))
-      ((procedure-type? $procedure-type)
-        (procedure-type-apply $procedure-type $rhs))
+      ((lambda? $lambda)
+        ($lambda $rhs))
+      ((lambda-type? $lambda-type)
+        (lambda-type-apply $lambda-type $rhs))
       ((recursion? $recursion)
         (term-apply (recursion-apply $recursion $lhs) $rhs))
       ((else _)

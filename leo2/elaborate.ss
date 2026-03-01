@@ -32,7 +32,7 @@
           (typed
             (typed (type 0) (hole 0))
             (native-application
-              (native-application-procedure $native-application)
+              (native-application-lambda $native-application)
               $args))))
 
       ((variable? $variable)
@@ -40,22 +40,22 @@
           (typed (type 0) (hole 0))
           $variable))
 
-      ((procedure? $procedure)
-        (throw elaborate (list 'raw-procedure-unsupported (term->datum $procedure))))
+      ((lambda? $lambda)
+        (throw elaborate (list 'raw-lambda-unsupported (term->datum $lambda))))
 
-      ((procedure-type? $procedure-type)
+      ((lambda-type? $lambda-type)
         (lets
-          ($param (procedure-type-param $procedure-type))
-          ($procedure (procedure-type-procedure $procedure-type))
+          ($param (lambda-type-param $lambda-type))
+          ($lambda (lambda-type-lambda $lambda-type))
           ($typed-param (elaborate $param))
           ($typed-proc (lambda ($v) (typed $typed-param $v)))
-          ($procedure-type-type
-            (procedure-type $typed-param
+          ($lambda-type-type
+            (lambda-type $typed-param
               (lambda ($v)
                 (term-type ($typed-proc $v)))))
           (typed
-            (typed (type 0) $procedure-type-type)
-            (procedure-type $typed-param $typed-proc))))
+            (typed (type 0) $lambda-type-type)
+            (lambda-type $typed-param $typed-proc))))
 
       ((application? $application)
         (lets
@@ -64,14 +64,14 @@
           ($rhs-type (term-type $rhs))
           ($lhs (application-lhs $application))
           ($typed-lhs
-            (if (procedure? $lhs)
-              (elaborate (procedure-type $rhs-type $lhs))
+            (if (lambda? $lhs)
+              (elaborate (lambda-type $rhs-type $lhs))
               (elaborate $lhs)))
           ($lhs-type (term-type $typed-lhs))
           (switch (term-core $lhs-type)
-            ((procedure-type? $procedure-type)
+            ((lambda-type? $lambda-type)
               (lets
-                ($res-type-term (procedure-type-apply $procedure-type $rhs-core))
+                ($res-type-term (lambda-type-apply $lambda-type $rhs-core))
                 (typed $res-type-term (application $typed-lhs $rhs))))
             ((else $other-type)
               (throw elaborate
@@ -97,10 +97,10 @@
 
       ((recursion? $recursion)
         (lets
-          ($typed-procedure (elaborate (recursion-procedure $recursion)))
+          ($typed-lambda (elaborate (recursion-lambda $recursion)))
           (typed
-            (term->typed (term-type $typed-procedure))
-            (recursion (term-core $typed-procedure)))))
+            (term->typed (term-type $typed-lambda))
+            (recursion (term-core $typed-lambda)))))
 
       ((labeled? $labeled)
         (lets

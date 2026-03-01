@@ -15,10 +15,10 @@
 
   (define (native->datum $ref)
     (switch $ref
-      ((procedure? $procedure)
+      ((lambda? $lambda)
         (or
-          (procedure-name? $procedure)
-          $procedure))
+          (procedure-name? $lambda)
+          $lambda))
       ((symbol? $symbol)
         `',$symbol)
       ((literal? $literal)
@@ -57,7 +57,7 @@
             `(native ,(native->datum (native-ref $native))))
           ((native-application? $native-application)
             `(native-application
-              ,(native->datum (native-application-procedure $native-application))
+              ,(native->datum (native-application-lambda $native-application))
               (list
                 ,@(map
                   (partial depth-term->datum $depth)
@@ -68,17 +68,17 @@
               (if (>= $index $depth)
                 `(variable ,$index)
                 (depth->symbol $index))))
-          ((procedure? $procedure)
+          ((lambda? $lambda)
             (lets
               ($symbol (depth->symbol $depth))
-              `(procedure (,(depth->symbol $depth))
+              `(lambda (,(depth->symbol $depth))
                 ,(depth-term->datum
                   (+ $depth 1)
-                  ($procedure (variable $depth))))))
-          ((procedure-type? $procedure-type)
-            `(procedure-type
-              ,(depth-term->datum $depth (procedure-type-param $procedure-type))
-              ,(depth-term->datum $depth (procedure-type-procedure $procedure-type))))
+                  ($lambda (variable $depth))))))
+          ((lambda-type? $lambda-type)
+            `(lambda-type
+              ,(depth-term->datum $depth (lambda-type-param $lambda-type))
+              ,(depth-term->datum $depth (lambda-type-lambda $lambda-type))))
           ((application? $application)
             `(application
               ,(depth-term->datum $depth (application-lhs $application))
@@ -90,7 +90,7 @@
               ,(depth-term->datum $depth (branch-alternate $branch))))
           ((recursion? $recursion)
             `(recursion
-              ,(depth-term->datum $depth (recursion-procedure $recursion))))
+              ,(depth-term->datum $depth (recursion-lambda $recursion))))
           ((labeled? $labeled)
             `(labeled
               ,(depth-term->datum $depth (labeled-label $labeled))

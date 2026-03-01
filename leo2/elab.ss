@@ -126,7 +126,7 @@
                 native-type
                 nothing)
               (native-application
-                (native-application-procedure $native-application)
+                (native-application-lambda $native-application)
                 $typed-args)))))
       ((variable? $variable)
         (switch (list-ref? $env (variable-index $variable))
@@ -135,10 +135,10 @@
               (typed nothing $variable)))
           ((else $type)
             (task (typed $type $variable)))))
-      ((procedure-type? $procedure-type)
+      ((lambda-type? $lambda-type)
         (task-lets
-          ($typed-param (elab-task $env (procedure-type-param $procedure-type)))
-          ($body (task (procedure-type-apply $procedure-type (variable 0))))
+          ($typed-param (elab-task $env (lambda-type-param $lambda-type)))
+          ($body (task (lambda-type-apply $lambda-type (variable 0))))
           ($typed-body (elab-task (push $env (type-of $typed-param)) $body))
           ($max-depth
             (task
@@ -148,12 +148,12 @@
           (task
             (typed
               (type $max-depth)
-              (procedure-type $typed-param
-                (procedure ($arg)
+              (lambda-type $typed-param
+                (lambda ($arg)
                   (task-result
                     (elab-task
                       (push $env (type-of $typed-param))
-                      (procedure-type-apply $procedure-type $arg)))))))))))
+                      (lambda-type-apply $lambda-type $arg)))))))))))
 
   (define (elab $meta-context $context $term)
     (switch $term
@@ -183,7 +183,7 @@
           (values $meta-context
             (typed native-type
               (native-application
-                (native-application-procedure $native-application)
+                (native-application-lambda $native-application)
                 $typed-args)))))
 
       ((type? $type)
@@ -196,12 +196,12 @@
         (values $meta-context
           (typed (type 0) $native-type)))
 
-      ((procedure-type? $procedure-type)
+      ((lambda-type? $lambda-type)
         (lets
           ((values $meta-context $typed-param)
             (elab $meta-context $context
-              (procedure-type-param $procedure-type)))
-          ($body (procedure-type-apply $procedure-type (variable 0)))
+              (lambda-type-param $lambda-type)))
+          ($body (lambda-type-apply $lambda-type (variable 0)))
           ((values $meta-context $typed-body)
             (elab $meta-context
               (push $context (typed-type $typed-param))
@@ -213,13 +213,13 @@
           (values $meta-context
             (typed
               (type $max-depth)
-              (procedure-type $typed-param
-                (procedure ($arg)
+              (lambda-type $typed-param
+                (lambda ($arg)
                   (lets
                     ((values _ $typed-body)
                       (elab $meta-context
                         (push $context (typed-type $typed-param))
-                        (procedure-type-apply $procedure-type $arg)))
+                        (lambda-type-apply $lambda-type $arg)))
                     $typed-body)))))))
 
       ((variable? $variable)
@@ -228,30 +228,30 @@
             (list-ref $context (variable-index $variable))
             $variable)))
 
-      ((procedure? $procedure)
+      ((lambda? $lambda)
         (lets
           ($param-type (hole (length $meta-context)))
           ($meta-context (push $meta-context unknown))
           ($body-context (push $context $param-type))
-          ($body ($procedure (variable 0)))
+          ($body ($lambda (variable 0)))
           ((values $meta-context $typed-body)
             (elab $meta-context $body-context $body))
           (values $meta-context
             (typed
-              (procedure-type $param-type
-                (procedure ($arg)
+              (lambda-type $param-type
+                (lambda ($arg)
                   (lets
                     ((values _ $typed-body)
                       (elab $meta-context
                         (push $context $param-type)
-                        ($procedure $arg)))
+                        ($lambda $arg)))
                     (typed-type $typed-body))))
-              (procedure ($arg)
+              (lambda ($arg)
                 (lets
                   ((values _ $typed-body)
                     (elab $meta-context
                       (push $context $param-type)
-                      ($procedure $arg)))
+                      ($lambda $arg)))
                   $typed-body))))))
 
       ((application? $application)
@@ -261,15 +261,15 @@
           ((values $meta-context $typed-rhs)
             (elab $meta-context $context (application-rhs $application)))
           (switch (typed-type $typed-lhs)
-            ((procedure-type? $procedure-type)
+            ((lambda-type? $lambda-type)
               (lets
                 ((values $meta-context $type)
                   (meta-resolve $meta-context $context
-                    (procedure-type-param $procedure-type)
+                    (lambda-type-param $lambda-type)
                     (typed-type $typed-rhs)))
                 (values $meta-context
                   (typed
-                    (procedure-type-apply $procedure-type $typed-rhs)
+                    (lambda-type-apply $lambda-type $typed-rhs)
                     (application $typed-lhs $typed-rhs)))))
             ((else $other)
               (values $meta-context
@@ -345,8 +345,8 @@
         (evaluated $native))
       ((native-application? $native-application)
         (lets
-          ($procedure
-            (native-application-procedure $native-application))
+          ($lambda
+            (native-application-lambda $native-application))
           ($evaluated-args
             (map
               (partial evaluate $meta-context $context)
@@ -356,13 +356,13 @@
           ($args (map evaluated-ref $evaluated-args))
           (evaluated
             (if (for-all native? $args)
-              (native (apply $procedure (map native-ref $args)))
-              (native-application $procedure $evaluated-args)))))
-      ((procedure? $procedure)
+              (native (apply $lambda (map native-ref $args)))
+              (native-application $lambda $evaluated-args)))))
+      ((lambda? $lambda)
         (evaluated
-          (procedure ($0)
+          (lambda ($0)
             (evaluate $meta-context $context
-              ($procedure $0)))))
+              ($lambda $0)))))
       ((application? $application)
         (lets
           ($evaluated-lhs
@@ -370,8 +370,8 @@
           ($evaluated-rhs
             (evaluate $meta-context $context (application-rhs $application)))
           (switch (evaluated-ref (typed-ref (evaluated-ref $evaluated-lhs)))
-            ((procedure? $procedure)
-              ($procedure $evaluated-rhs))
+            ((lambda? $lambda)
+              ($lambda $evaluated-rhs))
             ((else _)
               (evaluated (application $evaluated-lhs $evaluated-rhs))))))
       ((typed? $typed)

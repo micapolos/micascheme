@@ -114,8 +114,8 @@
                     ((native-application? $target-native-application)
                       (and
                         (eq?
-                          (native-application-procedure $source-native-application)
-                          (native-application-procedure $target-native-application))
+                          (native-application-lambda $source-native-application)
+                          (native-application-lambda $target-native-application))
                         (lets-recursive deduce-args
                           ($args-s (native-application-args $source-native-application))
                           ($args-t (native-application-args $target-native-application))
@@ -133,26 +133,26 @@
                     ($source (list-ref $env (variable-index $source-variable)))
                     (term-deduction-from-to $env $source $target)))
 
-                ((procedure? $source-procedure)
+                ((lambda? $source-lambda)
                   (switch? $target
-                    ((procedure? $target-procedure)
+                    ((lambda? $target-lambda)
                       (term-deduction-from-to
                         (push $env nothing)
-                        ($source-procedure (variable 0))
-                        ($target-procedure (variable 0))))))
+                        ($source-lambda (variable 0))
+                        ($target-lambda (variable 0))))))
 
-                ((procedure-type? $source-procedure-type)
+                ((lambda-type? $source-lambda-type)
                   (switch? $target
-                    ((procedure-type? $target-procedure-type)
+                    ((lambda-type? $target-lambda-type)
                       (deduction-lets
                         (_
                           (term-deduction-from-to $env
-                            (procedure-type-param $target-procedure-type)
-                            (procedure-type-param $source-procedure-type)))
+                            (lambda-type-param $target-lambda-type)
+                            (lambda-type-param $source-lambda-type)))
                         (term-deduction-from-to
-                          (push $env (procedure-type-param $target-procedure-type))
-                          (procedure-type-apply $source-procedure-type (variable 0))
-                          (procedure-type-apply $target-procedure-type (variable 0)))))))
+                          (push $env (lambda-type-param $target-lambda-type))
+                          (lambda-type-apply $source-lambda-type (variable 0))
+                          (lambda-type-apply $target-lambda-type (variable 0)))))))
 
                 ((application? $source-application)
                   (switch? $target
@@ -188,8 +188,8 @@
                   (switch? $target
                     ((recursion? $target-recursion)
                       (term-deduction-from-to $env
-                        (recursion-procedure $source-recursion)
-                        (recursion-procedure $target-recursion)))))
+                        (recursion-lambda $source-recursion)
+                        (recursion-lambda $target-recursion)))))
 
                 ((labeled? $source-labeled)
                   (switch? $target

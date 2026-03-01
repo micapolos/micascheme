@@ -45,11 +45,11 @@
   (evaluated (native "foo")))
 
 (check-evaluates
-  (procedure-type
+  (lambda-type
     (type 0)
     (lambda (x) x))
   (evaluated
-    (procedure-type
+    (lambda-type
       (evaluated (type 0))
       (lambda (v0) (evaluated v0)))))
 

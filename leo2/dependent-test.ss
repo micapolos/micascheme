@@ -4,23 +4,23 @@
   (leo2 dependent))
 
 (check
-  (procedure-dependent?
+  (lambda-dependent?
     (lambda (x) x)))
 
 (check
   (not
-    (procedure-dependent?
+    (lambda-dependent?
       (lambda (_) (native 1)))))
 
 (check
-  (procedure-type-dependent?
-    (procedure-type (type 0)
+  (lambda-type-dependent?
+    (lambda-type (type 0)
       (lambda (x) x))))
 
 (check
   (not
-    (procedure-type-dependent?
-      (procedure-type (type 0)
+    (lambda-type-dependent?
+      (lambda-type (type 0)
         (lambda (_) (native 1))))))
 
 (check

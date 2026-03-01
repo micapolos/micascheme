@@ -22,7 +22,7 @@
 (check-reify (native #\a) #\a)
 (check-reify (native "foo") "foo")
 
-; labeled native procedures
+; labeled native lambdas
 (check-reify
   (labeled (native 'string-append) (native string-append))
   string-append)
