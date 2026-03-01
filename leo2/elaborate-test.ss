@@ -47,11 +47,11 @@
 ; (check-elaborates
 ;   (native-application zero? (list (variable 100)))
 ;   (typed
-;     (typed (type 0) (hole 0))
+;     (typed (type 0) (solution 0))
 ;     (native-application zero?
 ;       (list
 ;         (typed
-;           (typed (type 0) (hole 0))
+;           (typed (type 0) (solution 0))
 ;           (variable 100))))))
 
 ; ; --- variable
@@ -59,7 +59,7 @@
 ; (check-elaborates
 ;   (variable 100)
 ;   (typed
-;     (typed (type 0) (hole 0))
+;     (typed (type 0) (solution 0))
 ;     (variable 100)))
 
 ; ; --- lambda
@@ -152,7 +152,7 @@
 ;       (type 1)
 ;       (type 1))
 ;     (branch
-;       (typed (typed (type 0) (hole 0)) (variable 100))
+;       (typed (typed (type 0) (solution 0)) (variable 100))
 ;       (type 0)
 ;       (type 0))))
 

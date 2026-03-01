@@ -14,12 +14,12 @@
 
   (define (depth-term=? $depth $term-a $term-b)
     (term-switch $term-a
-      ((hole? $hole-a)
+      ((solution? $solution-a)
         (switch? $term-b
-          ((hole? $hole-b)
+          ((solution? $solution-b)
             (=
-              (hole-index $hole-a)
-              (hole-index $hole-b)))))
+              (solution-index $solution-a)
+              (solution-index $solution-b)))))
       ((nothing? _) #f)
       ((type? $type-a)
         (switch? $term-b

@@ -3,7 +3,7 @@
   (leo2 term)
   (leo2 datum))
 
-(check-term->datum=? (hole 12) (hole 12))
+(check-term->datum=? (solution 12) (solution 12))
 
 (check-term->datum=? nothing nothing)
 

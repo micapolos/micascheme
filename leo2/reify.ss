@@ -13,7 +13,7 @@
 
   (define (depth-native?-reify $depth $native? $term)
     (term-switch $term
-      ((hole? $hole) #f)
+      ((solution? $solution) #f)
       ((nothing? $nothing) #f)
       ((type? $type) #f)
       ((native? $native)

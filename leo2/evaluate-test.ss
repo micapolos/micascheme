@@ -4,7 +4,7 @@
   (leo2 evaluate)
   (leo2 datum))
 
-(check-evaluates (hole 12) (evaluated (hole 12)))
+(check-evaluates (solution 12) (evaluated (solution 12)))
 
 (check-evaluates nothing (evaluated nothing))
 

@@ -3,10 +3,10 @@
   (leo2 term)
   (leo2 equal))
 
-; hole
-(check (term=? (hole 12) (hole 12)))
-(check (not (term=? (hole 12) (hole 13))))
-(check (not (term=? (hole 12) (variable 13))))
+; solution
+(check (term=? (solution 12) (solution 12)))
+(check (not (term=? (solution 12) (solution 13))))
+(check (not (term=? (solution 12) (variable 13))))
 
 ; nothing
 (check (not (term=? nothing nothing)))

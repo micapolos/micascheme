@@ -227,8 +227,8 @@
     (solutions unknown)
     (errors)
     (typed
-      (lambda-type (hole 0) (lambda ($0) (hole 0)))
-      (lambda ($0) (typed (hole 0) $0)))))
+      (lambda-type (solution 0) (lambda ($0) (solution 0)))
+      (lambda ($0) (typed (solution 0) $0)))))
 
 (check-task=?
   (elab-task empty-env
@@ -237,7 +237,7 @@
     (solutions unknown)
     (errors)
     (typed
-      (lambda-type (hole 0)
+      (lambda-type (solution 0)
         (lambda ($0) native-type))
       (lambda ($0)
         (typed native-type (native "string"))))))

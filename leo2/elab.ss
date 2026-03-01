@@ -89,12 +89,12 @@
     (task ($solutions $errors)
       (values $solutions $errors $errors)))
 
-  (define new-hole-task
+  (define new-solution-task
     (task ($solutions $errors)
       (values
         (push $solutions unknown)
         $errors
-        (hole (length $solutions)))))
+        (solution (length $solutions)))))
 
   (define-list->/append (task $tasks)
     (switch-exhaustive $tasks
@@ -218,7 +218,7 @@
                       (lambda-type-apply $lambda-type $arg)))))))))
       ((lambda? $lambda)
         (task-lets
-          ($param-type new-hole-task)
+          ($param-type new-solution-task)
           ($typed-body
             (elab-task
               (push $env $param-type)

@@ -1,7 +1,7 @@
 (library (leo2 term)
   (export
     primitive?
-    hole hole? hole-index
+    solution solution? solution-index
     nothing nothing?
     unknown unknown?
     native-type native-type?
@@ -41,7 +41,7 @@
       (bytevector? $x)))
 
   (data*
-    (hole index)
+    (solution index)
     nothing
     unknown
     (type depth)
@@ -63,7 +63,7 @@
 
   (union
     (term
-      hole
+      solution
       nothing
       type
       native
@@ -82,7 +82,7 @@
 
   (define (term-switch-template $term)
     (term-switch $term
-      ((hole? $hole) $hole)
+      ((solution? $solution) $solution)
       ((nothing? $nothing) $nothing)
       ((type? $type) $type)
       ((native? $native) $native)
