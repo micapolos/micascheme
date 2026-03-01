@@ -137,6 +137,14 @@
                 (solutions-set-solver $hole $actual))
               ((else $other)
                 (term-solver $depth $other $actual)))))
+        ((variable? $expected-variable)
+          (switch? $actual
+            ((variable? $actual-variable)
+              (and
+                (=
+                  (variable-index $expected-variable)
+                  (variable-index $actual-variable))
+                (solver $actual-variable)))))
         ((unknown? _)
           (solver $actual))
         ((native-type? _)
@@ -180,10 +188,8 @@
                   (lambda-type-lambda $expected-lambda-type)
                   (lambda-type-lambda $actual-lambda-type))))))
         ; TODO: Cover all term types, and don't use term=?
-        ((else _)
-          (and
-            (term=? $expected $actual)
-            (solver $actual))))
+        ((else $other)
+          (throw term-solver $depth $other)))
       (solver nothing)))
 
   (define-rule-syntax (check-solver=? in out)
