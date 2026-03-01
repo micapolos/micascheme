@@ -265,6 +265,16 @@
                 (solve-task $env
                   (evaluated-ref $expected-evaluated)
                   (evaluated-ref $actual-evaluated))))))
+        ((typed? $expected-typed)
+          (switch? $actual
+            ((typed? $actual-typed)
+              (apply-task typed
+                (solve-task $env
+                  (typed-type $expected-typed)
+                  (typed-type $actual-typed))
+                (solve-task $env
+                  (typed-ref $expected-typed)
+                  (typed-ref $actual-typed))))))
         ((hole? $hole)
           (task ($solutions $errors)
             (lets
