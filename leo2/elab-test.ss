@@ -91,6 +91,12 @@
       (actual (type 0)))
     (native "foo")))
 
+; === native-type
+
+(check-elabs
+  native-type
+  (typed (type 0) native-type))
+
 ; === native
 
 (check-elabs

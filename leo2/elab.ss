@@ -95,6 +95,10 @@
             (type (+ (type-depth $type) 1))
             $type)))
 
+      ((native-type? $native-type)
+        (values $meta-context
+          (typed (type 0) $native-type)))
+
       ((signature? $signature)
         (lets
           ((values $meta-context $typed-param)
