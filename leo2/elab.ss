@@ -31,9 +31,8 @@
       ((typed? $typed) (typed-ref $typed))))
 
   (define (typed-from $type $value)
-    (switch $value
-      ((type? $type) $type)
-      ((else $other) (typed $type $value))))
+    ; (todo (collapse (and (type (+ n 1)) (type n)) (into (type n))))
+    (typed $type $value))
 
   (define-rules-syntaxes
     ((task ($solutions $errors) solutions-errors-result)

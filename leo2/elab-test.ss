@@ -143,7 +143,7 @@
         (native-application string-append
           (list
             (typed native-type (native "foo"))
-            (type 0)))))))
+            (typed nothing (type 0))))))))
 
 ; === typed
 
