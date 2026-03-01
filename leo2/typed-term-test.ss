@@ -14,9 +14,7 @@
   (term-type (typed (native "type") (native "value")))
   (native "type"))
 
-(check-term-datum=?
-  (term-type (native "type"))
-  unknown)
+(check (raises (term-type (native "type"))))
 
 ; === term-value
 
@@ -28,9 +26,7 @@
   (term-value (typed (native "type") (native "value")))
   (native "value"))
 
-(check-term-datum=?
-  (term-value (native "value"))
-  nothing)
+(check (raises (term-value (native "value"))))
 
 ; === type-value->term
 

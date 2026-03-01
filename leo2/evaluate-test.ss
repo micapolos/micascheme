@@ -27,6 +27,7 @@
       (evaluated 20))))
 
 (check-evaluates native-type (evaluated native-type))
+
 (check-evaluates unknown (evaluated unknown))
 
 (check-evaluates (hole 12) (evaluated (hole 12)))
@@ -44,20 +45,24 @@
 (check-evaluates
   (native-application string-append
     (list
-      (native "foo")
-      (native "bar")))
+      (typed unknown (native "foo"))
+      (typed unknown (native "bar"))))
   (evaluated (native "foobar")))
 
 (check-evaluates
   (native-application string-append
     (list
-      (native "foo")
-      (variable 0)))
+      (typed unknown (native "foo"))
+      (typed unknown (variable 0))))
   (evaluated
     (native-application string-append
       (list
-        (evaluated (native "foo"))
-        (evaluated (variable 0))))))
+        (evaluated
+          (typed unknown
+            (evaluated (native "foo"))))
+        (evaluated
+          (typed unknown
+            (evaluated (variable 0))))))))
 
 (check-evaluates
   (lambda (x) x)
@@ -65,9 +70,11 @@
 
 (check-evaluates
   (application
-    (lambda (x) x)
-    (native "foo"))
-  (evaluated (native "foo")))
+    (typed unknown (lambda (x) x))
+    (typed unknown (native "foo")))
+  (evaluated
+    (typed unknown
+      (evaluated (native "foo")))))
 
 (check-evaluates
   (lambda-type
@@ -151,7 +158,7 @@
             (native-application zero? (list n))
             (native "Done")
             (application fn (native-application - (list n (native 1))))))))
-    (native 10))
+    (typed native-type (native 10)))
   (evaluated (native "Done")))
 
 (check-evaluates
@@ -175,5 +182,5 @@
     (native "bar"))
   (evaluated
     (typed
-      (evaluated (native "foo"))
+      (native "foo")
       (evaluated (native "bar")))))

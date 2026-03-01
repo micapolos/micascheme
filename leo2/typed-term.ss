@@ -11,13 +11,13 @@
     (switch $term
       ((typed? $typed) (typed-type $term))
       ((type? $type) (type+1 $type))
-      ((else _) unknown)))
+      ((else $other) (throw term-type $other))))
 
   (define (term-value $term)
     (switch $term
       ((typed? $typed) (typed-ref $term))
       ((type? $type) $type)
-      ((else _) nothing)))
+      ((else $other) (throw term-value $other))))
 
   (define (type-value->term $type $value)
     (switch $value

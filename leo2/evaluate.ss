@@ -6,13 +6,19 @@
     (leo2 base)
     (leo2 term)
     (leo2 datum)
-    (leo2 equal))
+    (leo2 equal)
+    (leo2 typed-term))
 
-  (define (evaluated-native? $term)
-    (switch? $term
+  (define (unpeel $term)
+    (switch $term
       ((evaluated? $evaluated)
-        (native?
-          (evaluated-ref $evaluated)))))
+        (unpeel (evaluated-ref $evaluated)))
+      ((labeled? $labeled)
+        (unpeel (labeled-ref $labeled)))
+      ((typed? $typed)
+        (unpeel (typed-ref $typed)))
+      ((else $unpeeled)
+        $unpeeled)))
 
   (define (evaluate $obj)
     (switch $obj
@@ -60,10 +66,10 @@
         (lets
           ($lambda (native-application-lambda $native-application))
           ($evaluated-args (map evaluate (native-application-args $native-application)))
-          ($args (map evaluated-ref $evaluated-args))
+          ($unpeeled-args (map unpeel $evaluated-args))
           (evaluated
-            (if (for-all native? $args)
-              (native (apply $lambda (map native-ref $args)))
+            (if (for-all native? $unpeeled-args)
+              (native (apply $lambda (map native-ref $unpeeled-args)))
               (native-application $lambda $evaluated-args)))))
       ((variable? $variable)
         (evaluated $variable))
@@ -85,10 +91,9 @@
       ((branch? $branch)
         (lets
           ($condition (evaluate (branch-condition $branch)))
-          (if (evaluated-native? $condition)
-            (evaluate
-              (branch-ref $branch
-                (native-ref (evaluated-ref $condition))))
+          ($unpeeled-condition (unpeel $condition))
+          (if (native? $unpeeled-condition)
+            (evaluate (branch-ref $branch (native-ref $unpeeled-condition)))
             (lets
               ($consequent (evaluate (branch-consequent $branch)))
               ($alternate (evaluate (branch-alternate $branch)))
@@ -111,11 +116,11 @@
       ((typed? $typed)
         (evaluated
           (typed
-            (evaluate (typed-type $typed))
+            (typed-type $typed)
             (evaluate (typed-ref $typed)))))))
 
   (define (term-apply $lhs $rhs)
-    (switch (evaluated-ref $lhs)
+    (switch (unpeel $lhs)
       ((lambda? $lambda)
         ($lambda $rhs))
       ((lambda-type? $lambda-type)
