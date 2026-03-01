@@ -56,6 +56,11 @@
 
 ; unknown
 (check-task=?
+  (solve-task empty-env unknown unknown)
+  (task unknown))
+
+; unknown
+(check-task=?
   (solve-task empty-env unknown native-type)
   (task native-type))
 
