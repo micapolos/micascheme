@@ -58,10 +58,12 @@
     (native-application string-append
       (list
         (evaluated
-          (typed unknown
+          (typed
+            (evaluated unknown)
             (evaluated (native "foo"))))
         (evaluated
-          (typed unknown
+          (typed
+            (evaluated unknown)
             (evaluated (variable 0))))))))
 
 (check-evaluates
@@ -73,7 +75,8 @@
     (typed unknown (lambda (x) x))
     (typed unknown (native "foo")))
   (evaluated
-    (typed unknown
+    (typed
+      (evaluated unknown)
       (evaluated (native "foo")))))
 
 (check-evaluates
@@ -182,5 +185,5 @@
     (native "bar"))
   (evaluated
     (typed
-      (native "foo")
+      (evaluated (native "foo"))
       (evaluated (native "bar")))))
