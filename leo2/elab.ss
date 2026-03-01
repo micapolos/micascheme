@@ -122,7 +122,14 @@
                 nothing)
               (native-application
                 (native-application-procedure $native-application)
-                $typed-args)))))))
+                $typed-args)))))
+      ((variable? $variable)
+        (switch (list-ref? $env (variable-index $variable))
+          ((false? _)
+            (error-task "unbound variable"
+              (typed nothing $variable)))
+          ((else $type)
+            (task (typed $type $variable)))))))
 
   (define (elab $meta-context $context $term)
     (switch $term

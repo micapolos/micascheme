@@ -153,6 +153,17 @@
           (typed native-type (native "foo"))
           (typed nothing (type 0)))))))
 
+; === elab-task variable
+
+(check-task=?
+  (elab-task (list (type 0)) (variable 0))
+  (task (typed (type 0) (variable 0))))
+
+(check-task=?
+  (elab-task empty-env (variable 0))
+  (error-task "unbound variable"
+    (typed nothing (variable 0))))
+
 ; === typed
 
 (check-elabs
