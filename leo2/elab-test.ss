@@ -28,6 +28,24 @@
   (list->task (list (task (native "foo")) (task (native "bar"))))
   (task (list (native "foo") (native "bar"))))
 
+; === eval-task native
+
+(check-task=?
+  (eval-task empty-env (evaluated (native "foo")))
+  (task (evaluated (native "foo"))))
+
+; === eval-task type
+
+(check-task=?
+  (eval-task empty-env (type 10))
+  (task (evaluated (type 10))))
+
+; === eval-task native-type
+
+(check-task=?
+  (eval-task empty-env native-type)
+  (task (evaluated native-type)))
+
 ; === evaluate native
 
 (check-evaluates

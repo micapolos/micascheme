@@ -14,6 +14,7 @@
     errors
 
     elab-task
+    eval-task
 
     check-evaluates
 
@@ -60,6 +61,17 @@
           ((values $solutions $errors id) (first $solutions $errors))
           ((task-lets x ... last) $solutions $errors))))
     ((task-lets x) x))
+
+  (define-case-syntax (apply-task fn arg ...)
+    (lets
+      ($args #'(arg ...))
+      ($tmps (generate-temporaries $args))
+      #`(task-lets
+        #,@(map-with
+          ($tmp $tmps)
+          ($arg $args)
+          #`(#,$tmp #,$arg))
+        (task (fn #,@$tmps)))))
 
   (define (task-result $task)
     (lets
@@ -279,6 +291,19 @@
 
   (define (cast $meta-context $context $type $term)
     (todo))
+
+  (define (eval-task $env $term)
+    (switch $term
+      ((evaluated? $evaluated)
+        (task $evaluated))
+      ((type? $type)
+        (task (evaluated $type)))
+      ((native-type? $native-type)
+        (task (evaluated $native-type)))
+      ((typed? $typed)
+        (apply-task typed
+          (eval-task $env (typed-type $typed))
+          (eval-task $env (typed-ref $typed))))))
 
   (define (evaluate $meta-context $context $term)
     (switch $term
