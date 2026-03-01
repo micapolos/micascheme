@@ -188,6 +188,42 @@
 ;       (lambda-type (type 1)
 ;         (lambda ($0) $0)))))
 
+; === elab-task application
+
+(check-task=?
+  (elab-task empty-env
+    (application
+      (typed
+        (lambda-type native-type
+          (lambda (_) native-type))
+        (variable 0))
+      (native "string")))
+  (task
+    (typed native-type
+      (application
+        (typed
+          (lambda-type native-type
+            (lambda ($0) native-type))
+          (variable 0))
+        (typed native-type (native "string"))))))
+
+(check-task=?
+  (elab-task empty-env
+    (application
+      (typed
+        (lambda-type native-type
+          (lambda (_) native-type))
+        (variable 0))
+      (type 0)))
+  (push-error-task "not native"
+    (typed native-type ; TODO: should be nothing
+      (application
+        (typed
+          (lambda-type native-type
+            (lambda ($0) native-type))
+          (variable 0))
+        (type 0)))))
+
 ; === typed
 
 (check-elabs

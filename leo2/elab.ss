@@ -146,6 +146,28 @@
               (native-application
                 (native-application-lambda $native-application)
                 $typed-args)))))
+      ((application? $application)
+        (task-lets
+          ($typed-lhs (elab-task $env (application-lhs $application)))
+          ($typed-rhs (elab-task $env (application-rhs $application)))
+          (switch (type-of $typed-lhs)
+            ((lambda-type? $lambda-type)
+              (task-lets
+                ($type (resolve-task $env
+                  (lambda-type-param $lambda-type)
+                  (type-of $typed-rhs)))
+                (task
+                  (typed
+                    (lambda-type-apply $lambda-type $typed-rhs)
+                    (application $typed-lhs $typed-rhs)))))
+            ((else $other)
+              (task
+                (typed
+                  (typed (type 0)
+                    (application
+                      (type-of $typed-lhs)
+                      (type-of $typed-rhs)))
+                  (application $typed-lhs $typed-rhs)))))))
       ((variable? $variable)
         (switch (list-ref? $env (variable-index $variable))
           ((false? _)
