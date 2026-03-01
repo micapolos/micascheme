@@ -347,7 +347,19 @@
               (task-result
                 (eval-task
                   (push $env (type-of $0))
-                  $0))))))))
+                  $0))))))
+      ((application? $application)
+        (task-lets
+          ($evaluated-lhs (eval-task $env (application-lhs $application)))
+          ($evaluated-rhs (eval-task $env (application-rhs $application)))
+          (task
+            (switch (unpeel? $evaluated-lhs)
+              ((lambda? $lambda)
+                ($lambda $evaluated-rhs))
+              ((else $other-lhs)
+                (evaluated (application $other-lhs $evaluated-rhs)))))))
+      ((else $other)
+        (throw eval-task $env $other))))
 
   (define (evaluate $meta-context $context $term)
     (switch $term
