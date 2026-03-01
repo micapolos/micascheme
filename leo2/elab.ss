@@ -123,6 +123,33 @@
         $errors
         $result)))
 
+  (define (task-with-solutions $solutions $result)
+    (task ($unused-solutions $errors)
+      (values $solutions $errors $result)))
+
+  (define (task-with-errors $errors $result)
+    (task ($solutions $unused-errors)
+      (values $solutions $errors $result)))
+
+  (define (solutions-index $solutions $hole)
+    (- (length $solutions) (hole-index $hole) 1))
+
+  (define (solutions-ref-task $hole)
+    (task-lets
+      ($solutions solutions-task)
+      (switch (list-ref? $solutions (solutions-index $solutions $hole))
+        ((false? _)
+          (push-error-task (unbound $hole) nothing))
+        ((else $term)
+          (task $term)))))
+
+  (define (solutions-set-task $hole $term)
+    (task-lets
+      ($solutions solutions-task)
+      (task-with-solutions
+        (list-set $solutions (solutions-index $solutions $hole) $term)
+        $term)))
+
   (define (task->datum $task)
     (solutions-task->datum '() $task))
 
@@ -276,25 +303,15 @@
                   (typed-ref $expected-typed)
                   (typed-ref $actual-typed))))))
         ((hole? $hole)
-          (task ($solutions $errors)
-            (lets
-              ($index (- (length $solutions) (hole-index $hole) 1))
-              (switch (list-ref? $solutions $index)
-                ((false? _)
-                  (values
-                    $solutions
-                    (push $errors (unbound $hole))
-                    nothing))
-                ((unknown? _)
-                  (values
-                    (list-set $solutions $index $actual)
-                    $errors
-                    $actual))
-                ((else $other)
-                  (task-apply
-                    (solve-task $env $other $actual)
-                    $solutions
-                    $errors))))))
+          (task-lets
+            ($solution (solutions-ref-task $hole))
+            (switch $solution
+              ((nothing? $nothing)
+                (task $nothing))
+              ((unknown? _)
+                (solutions-set-task $hole $actual))
+              ((else $other)
+                (solve-task $env $other $actual)))))
         ((unknown? _)
           (task $actual))
         ((native-type? _)
