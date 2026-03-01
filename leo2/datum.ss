@@ -42,11 +42,17 @@
           ,(depth-term->datum $depth (mismatch-expected $mismatch))
           ,(depth-term->datum $depth (mismatch-actual $mismatch))))
       ((expected? $expected)
-        `(expected ,(expected-ref $expected)))
+        `(expected
+          ,(depth-term->datum $depth
+            (expected-ref $expected))))
       ((actual? $actual)
-        `(actual ,(actual-ref $actual)))
+        `(actual
+          ,(depth-term->datum $depth
+            (actual-ref $actual))))
       ((unbound? $unbound)
-        `(unbound ,(unbound-ref $unbound)))
+        `(unbound
+          ,(depth-term->datum $depth
+            (unbound-ref $unbound))))
       ((native-type? _)
         `native-type)
       ((unknown? _)

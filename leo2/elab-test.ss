@@ -182,6 +182,45 @@
         (actual (native "v1"))))
     nothing))
 
+; lambda
+(check-task=?
+  (solve-task empty-env
+    (lambda ($0) $0)
+    (lambda ($0) $0))
+  (task (lambda ($0) $0)))
+
+(check-task=?
+  (solve-task empty-env
+    (lambda ($0) (lambda ($1) $0))
+    (lambda ($0) (lambda ($1) $0)))
+  (task (lambda ($0) (lambda ($1) $0))))
+
+(check-task=?
+  (solve-task empty-env
+    (lambda ($0) (lambda ($1) $1))
+    (lambda ($0) (lambda ($1) $1)))
+  (task (lambda ($0) (lambda ($1) $1))))
+
+(check-task=?
+  (solve-task empty-env
+    (lambda ($0) (lambda ($1) $1))
+    (lambda ($0) (lambda ($1) $0)))
+  (push-error-task
+    (mismatch
+      (expected (variable 1))
+      (actual (variable 0)))
+    nothing))
+
+(check-task=?
+  (solve-task empty-env
+    (lambda ($0) $0)
+    (variable 0))
+  (push-error-task
+    (mismatch
+      (expected (lambda ($0) $0))
+      (actual (variable 0)))
+    nothing))
+
 ; ==================== eval-task =======================
 
 ; === eval-task native

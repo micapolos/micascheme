@@ -345,6 +345,16 @@
                   (type-depth $expected-type)
                   (type-depth $actual-type))
                 (task $actual-type)))))
+        ((lambda? $expected-lambda)
+          (switch? $actual
+            ((lambda? $actual-lambda)
+              (solve-task-lets
+                ($body
+                  (solve-task
+                    (push $env unknown)
+                    ($expected-lambda (variable (length $env)))
+                    ($actual-lambda (variable (length $env)))))
+                (task (lambda ($0) $body))))))
         ; TODO: Cover all term types, and don't use term=?
         ((else _)
           (and
