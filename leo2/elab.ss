@@ -274,13 +274,24 @@
 
   (define-rules-syntax
     ((solve-task-lets x) x)
-    ((solve-task-lets (id x) rest ...)
-      (lets-task (id x)
+    ((solve-task-lets (id x) param ... body)
+      (task-lets (id x)
         (switch id
           ((nothing? $nothing)
-            (task $nothing))
+            (solve-task-lets param ... (task nothing)))
           ((else $other)
-            (solve-task-lets rest ...))))))
+            (solve-task-lets param ... body))))))
+
+  (define-case-syntax (apply-solve-task fn arg ...)
+    (lets
+      ($args #'(arg ...))
+      ($tmps (generate-temporaries $args))
+      #`(solve-task-lets
+        #,@(map-with
+          ($tmp $tmps)
+          ($arg $args)
+          #`(#,$tmp #,$arg))
+        (task (fn #,@$tmps)))))
 
   (define (solve-task $env $expected $actual)
     (or
@@ -288,14 +299,14 @@
         ((evaluated? $expected-evaluated)
           (switch? $actual
             ((evaluated? $actual-evaluated)
-              (apply-task evaluated
+              (apply-solve-task evaluated
                 (solve-task $env
                   (evaluated-ref $expected-evaluated)
                   (evaluated-ref $actual-evaluated))))))
         ((typed? $expected-typed)
           (switch? $actual
             ((typed? $actual-typed)
-              (apply-task typed
+              (apply-solve-task typed
                 (solve-task $env
                   (typed-type $expected-typed)
                   (typed-type $actual-typed))
@@ -303,7 +314,7 @@
                   (typed-ref $expected-typed)
                   (typed-ref $actual-typed))))))
         ((hole? $hole)
-          (task-lets
+          (solve-task-lets
             ($solution (solutions-ref-task $hole))
             (switch $solution
               ((nothing? $nothing)

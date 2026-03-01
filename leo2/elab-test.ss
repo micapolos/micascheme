@@ -133,7 +133,7 @@
     (mismatch
       (expected (native "foo"))
       (actual (native "bar")))
-    (evaluated nothing)))
+    nothing))
 
 ; typed
 (check-task=?
@@ -149,7 +149,7 @@
     (typed (native "t1") (native "v2")))
   (push-error-task
     (mismatch (expected (native "v1")) (actual (native "v2")))
-    (typed (native "t1") nothing)))
+    nothing))
 
 (check-task=?
   (solve-task empty-env
@@ -157,7 +157,7 @@
     (typed (native "t2") (native "v1")))
   (push-error-task
     (mismatch (expected (native "t1")) (actual (native "t2")))
-    (typed nothing (native "v1"))))
+    nothing))
 
 (check-task=?
   (solve-task empty-env
@@ -168,7 +168,7 @@
     (errors
       (mismatch (expected (native "t1")) (actual (native "t2")))
       (mismatch (expected (native "v1")) (actual (native "v2"))))
-    (typed nothing nothing)))
+    nothing))
 
 (check-task=?
   (solve-task empty-env
