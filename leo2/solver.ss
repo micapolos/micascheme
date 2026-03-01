@@ -1,5 +1,10 @@
 (library (leo2 solver)
   (export
+    empty-solutions
+    solutions-push
+    solutions-ref
+    solutions-update
+
     solver
     solver-with
     solver-lets
@@ -16,6 +21,26 @@
     (leo2 term)
     (leo2 datum)
     (leo2 equal))
+
+  (define empty-solutions '())
+
+  (define (solutions-hole-index $solutions $hole)
+    (- (length $solutions) (hole-index $hole) 1))
+
+  (define (solutions-push $solutions $term)
+    (values
+      (push $solutions $term)
+      (hole (length $solutions))))
+
+  (define (solutions-ref $solutions $hole)
+    (list-ref $solutions
+      (solutions-hole-index $solutions $hole)))
+
+  (define (solutions-update $solutions $hole $fn)
+    (list-update
+      $solutions
+      (solutions-hole-index $solutions $hole)
+      $fn))
 
   (define (solver-apply $solver $solutions)
     ($solver $solutions))
@@ -83,13 +108,10 @@
     (solver (_)
       (solver-apply $solver $solutions)))
 
-  (define (solutions-index $solutions $hole)
-    (- (length $solutions) (hole-index $hole) 1))
-
   (define (solutions-ref-solver $hole)
     (solver-lets
       ($solutions solutions-solver)
-      (switch (list-ref? $solutions (solutions-index $solutions $hole))
+      (switch (list-ref? $solutions (solutions-hole-index $solutions $hole))
         ((false? _) (solver nothing))
         ((else $term) (solver $term)))))
 
@@ -97,7 +119,7 @@
     (solver-lets
       ($solutions solutions-solver)
       (solver-with
-        (list-set $solutions (solutions-index $solutions $hole) $term)
+        (list-set $solutions (solutions-hole-index $solutions $hole) $term)
         $term)))
 
   (define (term-solver $depth $expected $actual)
