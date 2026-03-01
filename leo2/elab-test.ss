@@ -194,35 +194,52 @@
   (elab-task empty-env
     (application
       (typed
-        (lambda-type native-type
-          (lambda (_) native-type))
+        (lambda-type (type 1)
+          (lambda (_) (type 2)))
         (variable 0))
-      (native "string")))
+      (type 0)))
   (task
-    (typed native-type
+    (typed (type 2)
       (application
         (typed
-          (lambda-type native-type
-            (lambda ($0) native-type))
+          (lambda-type (type 1)
+            (lambda (_) (type 2)))
           (variable 0))
-        (typed native-type (native "string"))))))
+        (type 0)))))
 
 (check-task=?
   (elab-task empty-env
     (application
       (typed
-        (lambda-type native-type
-          (lambda (_) native-type))
+        (lambda-type (type 1)
+          (lambda ($0) $0))
         (variable 0))
       (type 0)))
-  (push-error-task "not native"
+  (task
+    (typed (type 0)
+      (application
+        (typed
+          (lambda-type (type 1)
+            (lambda ($0) $0))
+          (variable 0))
+        (type 0)))))
+
+(check-task=?
+  (elab-task empty-env
+    (application
+      (typed
+        (lambda-type (type 1)
+          (lambda ($0) $0))
+        (variable 0))
+      (type 2)))
+  (push-error-task "type error"
     (typed nothing
       (application
         (typed
-          (lambda-type native-type
-            (lambda ($0) native-type))
+          (lambda-type (type 1)
+            (lambda ($0) $0))
           (variable 0))
-        (type 0)))))
+        (type 2)))))
 
 ; === typed
 
