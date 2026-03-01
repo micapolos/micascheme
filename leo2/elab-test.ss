@@ -216,7 +216,7 @@
         (variable 0))
       (type 0)))
   (push-error-task "not native"
-    (typed native-type ; TODO: should be nothing
+    (typed nothing
       (application
         (typed
           (lambda-type native-type

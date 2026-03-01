@@ -156,10 +156,16 @@
                 ($type (resolve-task $env
                   (lambda-type-param $lambda-type)
                   (type-of $typed-rhs)))
-                (task
-                  (typed
-                    (lambda-type-apply $lambda-type $typed-rhs)
-                    (application $typed-lhs $typed-rhs)))))
+                (switch $type
+                  ((nothing? $nothing)
+                    (task
+                      (typed nothing
+                        (application $typed-lhs $typed-rhs))))
+                  ((else $type)
+                    (task
+                      (typed
+                        (lambda-type-apply $lambda-type $typed-rhs)
+                        (application $typed-lhs $typed-rhs)))))))
             ((else $other)
               (task
                 (typed
