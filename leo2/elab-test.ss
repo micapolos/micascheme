@@ -221,6 +221,25 @@
       (actual (variable 0)))
     nothing))
 
+; lambda-type
+(check-task=?
+  (solve-task empty-env
+    (lambda-type native-type (lambda ($0) $0))
+    (lambda-type native-type (lambda ($0) $0)))
+  (task
+    (lambda-type native-type
+      (lambda ($0) $0))))
+
+(check-task=?
+  (solve-task empty-env
+    (lambda-type native-type (lambda ($0) $0))
+    (lambda-type native-type (lambda ($0) native-type)))
+  (push-error-task
+    (mismatch
+      (expected (variable 0))
+      (actual native-type))
+    nothing))
+
 ; ==================== eval-task =======================
 
 ; === eval-task native

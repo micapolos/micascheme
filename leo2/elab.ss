@@ -355,6 +355,16 @@
                     ($expected-lambda (variable (length $env)))
                     ($actual-lambda (variable (length $env)))))
                 (task (lambda ($0) $body))))))
+        ((lambda-type? $expected-lambda-type)
+          (switch? $actual
+            ((lambda-type? $actual-lambda-type)
+              (apply-solve-task lambda-type
+                (solve-task $env
+                  (lambda-type-param $expected-lambda-type)
+                  (lambda-type-param $actual-lambda-type))
+                (solve-task $env
+                  (lambda-type-lambda $expected-lambda-type)
+                  (lambda-type-lambda $actual-lambda-type))))))
         ; TODO: Cover all term types, and don't use term=?
         ((else _)
           (and
