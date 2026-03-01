@@ -1,0 +1,26 @@
+(library (leo2 typed-term)
+  (export
+    term-type
+    term-value
+    type-value->term)
+  (import
+    (leo2 base)
+    (leo2 term))
+
+  (define (term-type $term)
+    (switch $term
+      ((typed? $typed) (typed-type $term))
+      ((type? $type) (type+1 $type))
+      ((else _) unknown)))
+
+  (define (term-value $term)
+    (switch $term
+      ((typed? $typed) (typed-ref $term))
+      ((type? $type) $type)
+      ((else _) nothing)))
+
+  (define (type-value->term $type $value)
+    (switch $value
+      ((type? $type) $type)
+      ((else $other) (typed $type $other))))
+)
