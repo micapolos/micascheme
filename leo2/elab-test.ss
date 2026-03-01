@@ -129,6 +129,22 @@
         (typed native-type (native "foo"))
         (typed native-type (native "bar")))))))
 
+(check-task=?
+  (elab-task
+    (native-application string-append
+      (list
+        (native "foo")
+        (type 0))))
+  (task ($solutions $errors)
+    (values
+      (list)
+      (push $errors "not native")
+      (typed native-type
+        (native-application string-append
+          (list
+            (typed native-type (native "foo"))
+            (type 0)))))))
+
 ; === typed
 
 (check-elabs

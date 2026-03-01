@@ -18,6 +18,23 @@
     (leo2 datum)
     (leo2 equal))
 
+  (define (type-of $term)
+    (switch-exhaustive $term
+      ((type? $type)
+        (type (+ (type-depth $type) 1)))
+      ((typed? $typed)
+        (typed-type $typed))))
+
+  (define (value-of $term)
+    (switch-exhaustive $term
+      ((type? $type) $type)
+      ((typed? $typed) (typed-ref $typed))))
+
+  (define (typed-from $type $value)
+    (switch $value
+      ((type? $type) $type)
+      ((else $other) (typed $type $value))))
+
   (define-rules-syntaxes
     ((task ($solutions $errors) solutions-errors-result)
       (lambda ($solutions $errors) solutions-errors-result))
@@ -62,6 +79,12 @@
           (values $meta-context
             (cons $typed-car $typed-cdr))))))
 
+  (define (check-task $type $term)
+    (task-lets
+      ($typed (elab-task $term))
+      ($type (resolve-task $type (type-of $typed)))
+      (task (typed-from $type (value-of $typed)))))
+
   (define (elab-task $term)
     (switch $term
       ((typed? $typed)
@@ -76,7 +99,7 @@
         (task-lets
           ($typed-args
             (list->task
-              (map elab-task
+              (map (partial check-task native-type)
                 (native-application-args $native-application))))
           (task
             (typed native-type
@@ -217,6 +240,20 @@
       (length $meta-context)
       (hole-index $hole)
       1))
+
+  (define (resolve-task $expected $actual)
+    (task ($solutions $errors)
+      (switch $expected
+        ((native-type? $native-type)
+          (switch $actual
+            ((native-type? _)
+              (values $solutions $errors $native-type))
+            ((else $other)
+              (values $solutions (push $errors "not native") nothing))))
+        ((else _)
+          (if (term=? $expected $actual)
+            (values $solutions $errors $expected)
+            (values $solutions (push $errors "type error") nothing))))))
 
   (define (meta-resolve $meta-context $context $expected $actual)
     (switch $expected
