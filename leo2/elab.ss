@@ -14,6 +14,7 @@
 
     elab-task
     eval-task
+    solve-task
 
     check-task=?)
   (import
@@ -245,6 +246,14 @@
           (switch? $actual
             ((native-type? $native-type)
               (task $native-type))))
+        ((type? $expected-type)
+          (switch? $actual
+            ((type? $actual-type)
+              (and
+                (=
+                  (type-depth $expected-type)
+                  (type-depth $actual-type))
+                (task $actual-type)))))
         ((else _)
           (and
             (term=? $expected $actual)

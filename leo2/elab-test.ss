@@ -28,6 +28,32 @@
   (list->task (list (task (native "foo")) (task (native "bar"))))
   (task (list (native "foo") (native "bar"))))
 
+; ==================== solve-task =======================
+
+; native-type
+(check-task=?
+  (solve-task empty-env native-type native-type)
+  (task native-type))
+
+(check-task=?
+  (solve-task empty-env native-type (variable 0))
+  (push-error-task "type error" nothing))
+
+; type
+(check-task=?
+  (solve-task empty-env (type 0) (type 0))
+  (task (type 0)))
+
+(check-task=?
+  (solve-task empty-env (type 0) (type 1))
+  (push-error-task "type error" nothing))
+
+(check-task=?
+  (solve-task empty-env (type 0) (variable 0))
+  (push-error-task "type error" nothing))
+
+; ==================== eval-task =======================
+
 ; === eval-task native
 
 (check-task=?
@@ -113,6 +139,8 @@
       (typed
         (evaluated native-type)
         (evaluated (native "foo"))))))
+
+; ==================== eval-task =======================
 
 ; === elab-task typed
 
