@@ -248,6 +248,18 @@
   (define (solve-task $env $expected $actual)
     (or
       (switch $expected
+        ((evaluated? $expected-evaluated)
+          (switch? $actual
+            ((evaluated? $actual-evaluated)
+              (task-lets
+                ($solved-ref
+                  (solve-task $env
+                    (evaluated-ref $expected-evaluated)
+                    (evaluated-ref $actual-evaluated)))
+                (task
+                  (switch $solved-ref
+                    ((nothing? $nothing) $nothing)
+                    ((else $other) (evaluated $other))))))))
         ((hole? $hole)
           (task ($solutions $errors)
             (lets
