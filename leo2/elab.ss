@@ -131,7 +131,7 @@
   (define (check-task $env $type $term)
     (task-lets
       ($typed (elab-task $env $term))
-      ($type (resolve-task $env $type (type-of $typed)))
+      ($type (solve-task $env $type (type-of $typed)))
       (task (typed-from $type (value-of $typed)))))
 
   (define (elab-task $env $term)
@@ -169,7 +169,7 @@
           (switch (type-of $typed-lhs)
             ((lambda-type? $lambda-type)
               (task-lets
-                ($type (resolve-task $env
+                ($type (solve-task $env
                   (lambda-type-param $lambda-type)
                   (type-of $typed-rhs)))
                 (switch $type
@@ -238,7 +238,7 @@
                     (push $env $param-type)
                     ($lambda $arg))))))))))
 
-  (define (resolve-task $env $expected $actual)
+  (define (solve-task $env $expected $actual)
     (or
       (switch $expected
         ((native-type? _)
