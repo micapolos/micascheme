@@ -12,5 +12,5 @@
   (leo2 reify)
   (leo2 untyped)
   (leo2 solver)
-  (leo2 elab)
+  (leo2 elaborator)
   (leo2 lang all))

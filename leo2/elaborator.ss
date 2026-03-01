@@ -1,24 +1,24 @@
-(library (leo2 elab)
+(library (leo2 elaborator)
   (export
-    task task-lets
-    list->task task-append
-    task->datum
-    solutions-task->datum
-    task-apply
-    push-error-task
-    push-hole-task
-    solutions-task
-    errors-task
+    elaborator elaborator-lets
+    list->elaborator elaborator-append
+    elaborator->datum
+    solutions-elaborator->datum
+    elaborator-apply
+    push-error-elaborator
+    push-hole-elaborator
+    solutions-elaborator
+    errors-elaborator
     empty-env
     solutions
     errors
 
-    elab-task
-    eval-task
-    solve-task
+    term-elaborator
+    eval-elaborator
+    solve-elaborator
 
-    check-task=?
-    check-solutions-task=?)
+    check-elaborator=?
+    check-solutions-elaborator=?)
   (import
     (leo2 base)
     (leo2 term)
@@ -60,147 +60,147 @@
   (define errors stack)
 
   (define-rules-syntaxes
-    ((task ($solutions $errors) solutions-errors-result)
+    ((elaborator ($solutions $errors) solutions-errors-result)
       (lambda ($solutions $errors) solutions-errors-result))
-    ((task result)
-      (task ($solutions $errors)
+    ((elaborator result)
+      (elaborator ($solutions $errors)
         (values $solutions $errors result)))
-    ((task solutions errors result)
+    ((elaborator solutions errors result)
       (lambda ($unused-solutions $unused-errors)
         (values solutions errors result)))
-    ((task-lets (id first) x ... last)
+    ((elaborator-lets (id first) x ... last)
       (lambda ($solutions $errors)
         (lets
           ((values $solutions $errors id) (first $solutions $errors))
-          ((task-lets x ... last) $solutions $errors))))
-    ((task-lets x) x))
+          ((elaborator-lets x ... last) $solutions $errors))))
+    ((elaborator-lets x) x))
 
-  (define-case-syntax (apply-task fn arg ...)
+  (define-case-syntax (apply-elaborator fn arg ...)
     (lets
       ($args #'(arg ...))
       ($tmps (generate-temporaries $args))
-      #`(task-lets
+      #`(elaborator-lets
         #,@(map-with
           ($tmp $tmps)
           ($arg $args)
           #`(#,$tmp #,$arg))
-        (task (fn #,@$tmps)))))
+        (elaborator (fn #,@$tmps)))))
 
-  (define (task-result $task)
+  (define (elaborator-result $elaborator)
     (lets
-      ((values $hole $errors $result) (task-apply $task '() '()))
+      ((values $hole $errors $result) (elaborator-apply $elaborator '() '()))
       $result))
 
-  (define (task-apply $task $solutions $errors)
-    ($task $solutions $errors))
+  (define (elaborator-apply $elaborator $solutions $errors)
+    ($elaborator $solutions $errors))
 
-  (define solutions-task
-    (task ($solutions $errors)
+  (define solutions-elaborator
+    (elaborator ($solutions $errors)
       (values $solutions $errors $solutions)))
 
-  (define errors-task
-    (task ($solutions $errors)
+  (define errors-elaborator
+    (elaborator ($solutions $errors)
       (values $solutions $errors $errors)))
 
-  (define new-hole-task
-    (task ($solutions $errors)
+  (define new-hole-elaborator
+    (elaborator ($solutions $errors)
       (values
         (push $solutions unknown)
         $errors
         (hole (length $solutions)))))
 
-  (define-list->/append (task $tasks)
-    (switch-exhaustive $tasks
+  (define-list->/append (elaborator $elaborators)
+    (switch-exhaustive $elaborators
       ((null? $null)
-        (task $null))
+        (elaborator $null))
       ((pair? $pair)
-        (task-lets
+        (elaborator-lets
           ($car (car $pair))
-          ($cdr (list->task (cdr $pair)))
-          (task (cons $car $cdr))))))
+          ($cdr (list->elaborator (cdr $pair)))
+          (elaborator (cons $car $cdr))))))
 
-  (define (push-error-task $error $result)
-    (task ($solutions $errors)
+  (define (push-error-elaborator $error $result)
+    (elaborator ($solutions $errors)
       (values
         $solutions
         (push $errors $error)
         $result)))
 
-  (define (push-hole-task $hole $result)
-    (task ($solutions $errors)
+  (define (push-hole-elaborator $hole $result)
+    (elaborator ($solutions $errors)
       (values
         (push $solutions $hole)
         $errors
         $result)))
 
-  (define (task-with-solutions $solutions $result)
-    (task ($unused-solutions $errors)
+  (define (elaborator-with-solutions $solutions $result)
+    (elaborator ($unused-solutions $errors)
       (values $solutions $errors $result)))
 
-  (define (task-with-errors $errors $result)
-    (task ($solutions $unused-errors)
+  (define (elaborator-with-errors $errors $result)
+    (elaborator ($solutions $unused-errors)
       (values $solutions $errors $result)))
 
   (define (solutions-index $solutions $hole)
     (- (length $solutions) (hole-index $hole) 1))
 
-  (define (solutions-ref-task $hole)
-    (task-lets
-      ($solutions solutions-task)
+  (define (solutions-ref-elaborator $hole)
+    (elaborator-lets
+      ($solutions solutions-elaborator)
       (switch (list-ref? $solutions (solutions-index $solutions $hole))
         ((false? _)
-          (push-error-task (unbound $hole) nothing))
+          (push-error-elaborator (unbound $hole) nothing))
         ((else $term)
-          (task $term)))))
+          (elaborator $term)))))
 
-  (define (solutions-set-task $hole $term)
-    (task-lets
-      ($solutions solutions-task)
-      (task-with-solutions
+  (define (solutions-set-elaborator $hole $term)
+    (elaborator-lets
+      ($solutions solutions-elaborator)
+      (elaborator-with-solutions
         (list-set $solutions (solutions-index $solutions $hole) $term)
         $term)))
 
-  (define (task->datum $task)
-    (solutions-task->datum '() $task))
+  (define (elaborator->datum $elaborator)
+    (solutions-elaborator->datum '() $elaborator))
 
-  (define (solutions-task->datum $solutions $task)
+  (define (solutions-elaborator->datum $solutions $elaborator)
     (lets
-      ((values $solutions $errors $result) ($task $solutions '()))
-      `(task
+      ((values $solutions $errors $result) ($elaborator $solutions '()))
+      `(elaborator
         (solutions ,@(reverse (map term->datum $solutions)))
         (errors ,@(reverse (map term->datum $errors)))
         (result ,(term->datum $result)))))
 
-  (define (check-task $env $type $term)
-    (task-lets
-      ($typed (elab-task $env $term))
-      ($expected-type (eval-task $env $type))
-      ($actual-type (eval-task $env (type-of $typed)))
-      ($type (solve-task $env $expected-type $actual-type))
-      ($evaluated-type (eval-task $env $type))
-      (task (typed-from $evaluated-type (value-of $typed)))))
+  (define (check-elaborator $env $type $term)
+    (elaborator-lets
+      ($typed (term-elaborator $env $term))
+      ($expected-type (eval-elaborator $env $type))
+      ($actual-type (eval-elaborator $env (type-of $typed)))
+      ($type (solve-elaborator $env $expected-type $actual-type))
+      ($evaluated-type (eval-elaborator $env $type))
+      (elaborator (typed-from $evaluated-type (value-of $typed)))))
 
-  (define (elab-task $env $term)
+  (define (term-elaborator $env $term)
     (switch $term
       ((typed? $typed)
-        (task $typed))
+        (elaborator $typed))
       ((ann? $ann)
-        (check-task $env
+        (check-elaborator $env
           (ann-type $ann)
           (ann-ref $ann)))
       ((type? $type)
-        (task $type))
+        (elaborator $type))
       ((native-type? $native-type)
-        (task (typed (type 0) $native-type)))
+        (elaborator (typed (type 0) $native-type)))
       ((native? $native)
-        (task (typed native-type $native)))
+        (elaborator (typed native-type $native)))
       ((native-application? $native-application)
-        (task-lets
+        (elaborator-lets
           ($typed-args
-            (list->task
-              (map (partial check-task $env native-type)
+            (list->elaborator
+              (map (partial check-elaborator $env native-type)
                 (native-application-args $native-application))))
-          (task
+          (elaborator
             (typed
               (if (for-all native-type? (map (dot evaluated-ref type-of) $typed-args))
                 (evaluated native-type)
@@ -209,28 +209,28 @@
                 (native-application-lambda $native-application)
                 $typed-args)))))
       ((application? $application)
-        (task-lets
-          ($typed-lhs (elab-task $env (application-lhs $application)))
-          ($typed-rhs (elab-task $env (application-rhs $application)))
+        (elaborator-lets
+          ($typed-lhs (term-elaborator $env (application-lhs $application)))
+          ($typed-rhs (term-elaborator $env (application-rhs $application)))
           (switch (type-of $typed-lhs)
             ((lambda-type? $lambda-type)
-              (task-lets
-                ($eval-param (eval-task $env (lambda-type-param $lambda-type)))
-                ($eval-rhs-type (eval-task $env (type-of $typed-rhs)))
-                ($type (solve-task $env $eval-param $eval-rhs-type))
+              (elaborator-lets
+                ($eval-param (eval-elaborator $env (lambda-type-param $lambda-type)))
+                ($eval-rhs-type (eval-elaborator $env (type-of $typed-rhs)))
+                ($type (solve-elaborator $env $eval-param $eval-rhs-type))
                 (switch $type
                   ((nothing? $nothing)
-                    (task
+                    (elaborator
                       (typed
                         (evaluated nothing)
                         (application $typed-lhs $typed-rhs))))
                   ((else $type)
-                    (task
+                    (elaborator
                       (typed
                         (lambda-type-apply $lambda-type $typed-rhs)
                         (application $typed-lhs $typed-rhs)))))))
             ((else $other)
-              (task
+              (elaborator
                 (typed
                   (typed (type 0)
                     (application
@@ -240,122 +240,122 @@
       ((variable? $variable)
         (switch (list-ref? $env (variable-index $variable))
           ((false? _)
-            (push-error-task
+            (push-error-elaborator
               (unbound $variable)
               (typed nothing $variable)))
           ((else $type)
-            (task (typed $type $variable)))))
+            (elaborator (typed $type $variable)))))
       ((lambda-type? $lambda-type)
-        (task-lets
-          ($typed-param (elab-task $env (lambda-type-param $lambda-type)))
-          ($body (task (lambda-type-apply $lambda-type (variable 0))))
-          ($typed-body (elab-task (push $env (type-of $typed-param)) $body))
+        (elaborator-lets
+          ($typed-param (term-elaborator $env (lambda-type-param $lambda-type)))
+          ($body (elaborator (lambda-type-apply $lambda-type (variable 0))))
+          ($typed-body (term-elaborator (push $env (type-of $typed-param)) $body))
           ($max-depth
-            (task
+            (elaborator
               (max
                 (type-depth (type-of $typed-param))
                 (type-depth (type-of $typed-body)))))
-          (task
+          (elaborator
             (typed
               (type $max-depth)
               (lambda-type $typed-param
                 (lambda ($arg)
-                  (task-result
-                    (elab-task
+                  (elaborator-result
+                    (term-elaborator
                       (push $env $typed-param)
                       (lambda-type-apply $lambda-type $arg)))))))))
       ((lambda? $lambda)
-        (task-lets
-          ($param-type new-hole-task)
+        (elaborator-lets
+          ($param-type new-hole-elaborator)
           ($typed-body
-            (elab-task
+            (term-elaborator
               (push $env $param-type)
               (variable 0)))
-          (task
+          (elaborator
             (typed
               (lambda-type $param-type
                 (lambda ($arg)
                   (type-of
-                    (task-result
-                      (elab-task
+                    (elaborator-result
+                      (term-elaborator
                         (push $env $param-type)
                         ($lambda $arg))))))
               (lambda ($arg)
-                (task-result
-                  (elab-task
+                (elaborator-result
+                  (term-elaborator
                     (push $env $param-type)
                     ($lambda $arg))))))))))
 
   (define-rules-syntax
-    ((solve-task-lets x) x)
-    ((solve-task-lets (id x) param ... body)
-      (task-lets (id x)
+    ((solve-elaborator-lets x) x)
+    ((solve-elaborator-lets (id x) param ... body)
+      (elaborator-lets (id x)
         (switch id
           ((nothing? $nothing)
-            (solve-task-lets param ... (task nothing)))
+            (solve-elaborator-lets param ... (elaborator nothing)))
           ((else $other)
-            (solve-task-lets param ... body))))))
+            (solve-elaborator-lets param ... body))))))
 
-  (define-case-syntax (apply-solve-task fn arg ...)
+  (define-case-syntax (apply-solve-elaborator fn arg ...)
     (lets
       ($args #'(arg ...))
       ($tmps (generate-temporaries $args))
-      #`(solve-task-lets
+      #`(solve-elaborator-lets
         #,@(map-with
           ($tmp $tmps)
           ($arg $args)
           #`(#,$tmp #,$arg))
-        (task (fn #,@$tmps)))))
+        (elaborator (fn #,@$tmps)))))
 
-  (define (eval-solve-task $env $expected $actual)
-    (task-lets
-      ($eval-expected (eval-task $env $expected))
-      ($eval-actual (eval-task $env $actual))
-      (solve-task $env $eval-expected $eval-actual)))
+  (define (eval-solve-elaborator $env $expected $actual)
+    (elaborator-lets
+      ($eval-expected (eval-elaborator $env $expected))
+      ($eval-actual (eval-elaborator $env $actual))
+      (solve-elaborator $env $eval-expected $eval-actual)))
 
-  (define (solve-task $env $expected $actual)
+  (define (solve-elaborator $env $expected $actual)
     (switch $actual
       ((hole? $actual-hole)
-        (solve-task $env $actual $expected))
+        (solve-elaborator $env $actual $expected))
       ((else $actual-other)
-        (solve-non-hole-task $env $expected $actual-other))))
+        (solve-non-hole-elaborator $env $expected $actual-other))))
 
-  (define (solve-non-hole-task $env $expected $actual)
+  (define (solve-non-hole-elaborator $env $expected $actual)
     (or
       (switch $expected
         ((evaluated? $expected-evaluated)
           (switch? $actual
             ((evaluated? $actual-evaluated)
-              (apply-solve-task evaluated
-                (solve-task $env
+              (apply-solve-elaborator evaluated
+                (solve-elaborator $env
                   (evaluated-ref $expected-evaluated)
                   (evaluated-ref $actual-evaluated))))))
         ((typed? $expected-typed)
           (switch? $actual
             ((typed? $actual-typed)
-              (apply-solve-task typed
-                (solve-task $env
+              (apply-solve-elaborator typed
+                (solve-elaborator $env
                   (typed-type $expected-typed)
                   (typed-type $actual-typed))
-                (solve-task $env
+                (solve-elaborator $env
                   (typed-ref $expected-typed)
                   (typed-ref $actual-typed))))))
         ((hole? $hole)
-          (solve-task-lets
-            ($solution (solutions-ref-task $hole))
+          (solve-elaborator-lets
+            ($solution (solutions-ref-elaborator $hole))
             (switch $solution
               ((nothing? $nothing)
-                (task $nothing))
+                (elaborator $nothing))
               ((unknown? _)
-                (solutions-set-task $hole $actual))
+                (solutions-set-elaborator $hole $actual))
               ((else $other)
-                (solve-task $env $other $actual)))))
+                (solve-elaborator $env $other $actual)))))
         ((unknown? _)
-          (task $actual))
+          (elaborator $actual))
         ((native-type? _)
           (switch? $actual
             ((native-type? $native-type)
-              (task $native-type))))
+              (elaborator $native-type))))
         ((native? $expected-native)
           (switch? $actual
             ((native? $actual-native)
@@ -363,7 +363,7 @@
                 (equal?
                   (native-ref $expected-native)
                   (native-ref $actual-native))
-                (task $actual-native)))))
+                (elaborator $actual-native)))))
         ((type? $expected-type)
           (switch? $actual
             ((type? $actual-type)
@@ -371,33 +371,33 @@
                 (=
                   (type-depth $expected-type)
                   (type-depth $actual-type))
-                (task $actual-type)))))
+                (elaborator $actual-type)))))
         ((lambda? $expected-lambda)
           (switch? $actual
             ((lambda? $actual-lambda)
-              (solve-task-lets
+              (solve-elaborator-lets
                 ($body
-                  (solve-task
+                  (solve-elaborator
                     (push $env unknown)
                     ($expected-lambda (variable (length $env)))
                     ($actual-lambda (variable (length $env)))))
-                (task (lambda ($0) $body))))))
+                (elaborator (lambda ($0) $body))))))
         ((lambda-type? $expected-lambda-type)
           (switch? $actual
             ((lambda-type? $actual-lambda-type)
-              (apply-solve-task lambda-type
-                (solve-task $env
+              (apply-solve-elaborator lambda-type
+                (solve-elaborator $env
                   (lambda-type-param $expected-lambda-type)
                   (lambda-type-param $actual-lambda-type))
-                (solve-task $env
+                (solve-elaborator $env
                   (lambda-type-lambda $expected-lambda-type)
                   (lambda-type-lambda $actual-lambda-type))))))
         ; TODO: Cover all term types, and don't use term=?
         ((else _)
           (and
             (term=? $expected $actual)
-            (task $actual))))
-      (push-error-task
+            (elaborator $actual))))
+      (push-error-elaborator
         (mismatch (expected $expected) (actual $actual))
         nothing)))
 
@@ -408,76 +408,76 @@
           ((evaluated? $evaluated)
             (evaluated-ref $evaluated))))))
 
-  (define (eval-task $env $term)
+  (define (eval-elaborator $env $term)
     (switch $term
       ((evaluated? $evaluated)
-        (task $evaluated))
+        (elaborator $evaluated))
       ((nothing? $nothing)
-        (task (evaluated $nothing)))
+        (elaborator (evaluated $nothing)))
       ((type? $type)
-        (task (evaluated $type)))
+        (elaborator (evaluated $type)))
       ((native-type? $native-type)
-        (task (evaluated $native-type)))
+        (elaborator (evaluated $native-type)))
       ((native? $native)
-        (task (evaluated $native)))
+        (elaborator (evaluated $native)))
       ((native-application? $native-application)
-        (task-lets
+        (elaborator-lets
           ($lambda
-            (task
+            (elaborator
               (native-application-lambda $native-application)))
           ($evaluated-args
-            (list->task
+            (list->elaborator
               (map
-                (partial eval-task $env)
+                (partial eval-elaborator $env)
                 (native-application-args $native-application))))
-          ($unpeeled-args (task (map unpeel? $evaluated-args)))
-          (task
+          ($unpeeled-args (elaborator (map unpeel? $evaluated-args)))
+          (elaborator
             (evaluated
               (if (for-all native? $unpeeled-args)
                 (native (apply $lambda (map native-ref $unpeeled-args)))
                 (native-application $lambda $evaluated-args))))))
       ((typed? $typed)
-        (apply-task evaluated
-          (apply-task typed
-            (eval-task $env (typed-type $typed))
-            (eval-task $env (typed-ref $typed)))))
+        (apply-elaborator evaluated
+          (apply-elaborator typed
+            (eval-elaborator $env (typed-type $typed))
+            (eval-elaborator $env (typed-ref $typed)))))
       ((variable? $variable)
-        (task (evaluated $variable)))
+        (elaborator (evaluated $variable)))
       ((lambda-type? $lambda-type)
-        (apply-task evaluated
-          (apply-task lambda-type
-            (eval-task $env (lambda-type-param $lambda-type))
-            (eval-task $env (lambda-type-lambda $lambda-type)))))
+        (apply-elaborator evaluated
+          (apply-elaborator lambda-type
+            (eval-elaborator $env (lambda-type-param $lambda-type))
+            (eval-elaborator $env (lambda-type-lambda $lambda-type)))))
       ((lambda? $lambda)
-        (task
+        (elaborator
           (evaluated
             (lambda ($0)
-              (task-result
-                (eval-task
+              (elaborator-result
+                (eval-elaborator
                   (push $env (type-of $0))
                   $0))))))
       ((application? $application)
-        (task-lets
-          ($evaluated-lhs (eval-task $env (application-lhs $application)))
-          ($evaluated-rhs (eval-task $env (application-rhs $application)))
-          (task
+        (elaborator-lets
+          ($evaluated-lhs (eval-elaborator $env (application-lhs $application)))
+          ($evaluated-rhs (eval-elaborator $env (application-rhs $application)))
+          (elaborator
             (switch (unpeel? $evaluated-lhs)
               ((lambda? $lambda)
                 ($lambda $evaluated-rhs))
               ((else $other-lhs)
                 (evaluated (application $other-lhs $evaluated-rhs)))))))
       ((else $other)
-        (throw eval-task $env $other))))
+        (throw eval-elaborator $env $other))))
 
-  (define-rule-syntax (check-task=? in out)
+  (define-rule-syntax (check-elaborator=? in out)
     (check
       (equal?
-        (task->datum in)
-        (task->datum out))))
+        (elaborator->datum in)
+        (elaborator->datum out))))
 
-  (define-rule-syntax (check-solutions-task=? sol in out)
+  (define-rule-syntax (check-solutions-elaborator=? sol in out)
     (check
       (equal?
-        (solutions-task->datum sol in)
-        (task->datum out))))
+        (solutions-elaborator->datum sol in)
+        (elaborator->datum out))))
 )

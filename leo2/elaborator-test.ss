@@ -1,189 +1,189 @@
 (import
   (leo2 base)
   (leo2 term)
-  (leo2 elab))
+  (leo2 elaborator))
 
-; === task
+; === elaborator
 
-(check-task=?
-  (task "foo")
-  (task "foo"))
+(check-elaborator=?
+  (elaborator "foo")
+  (elaborator "foo"))
 
-; === task-lets
+; === elaborator-lets
 
-(check-task=?
-  (task-lets (task "foo"))
-  (task "foo"))
+(check-elaborator=?
+  (elaborator-lets (elaborator "foo"))
+  (elaborator "foo"))
 
-(check-task=?
-  (task-lets
-    ($foo (task "foo"))
-    ($bar (task "bar"))
-    (task (string-append $foo $bar)))
-  (task "foobar"))
+(check-elaborator=?
+  (elaborator-lets
+    ($foo (elaborator "foo"))
+    ($bar (elaborator "bar"))
+    (elaborator (string-append $foo $bar)))
+  (elaborator "foobar"))
 
-; === list->task
+; === list->elaborator
 
-(check-task=?
-  (list->task (list (task (native "foo")) (task (native "bar"))))
-  (task (list (native "foo") (native "bar"))))
+(check-elaborator=?
+  (list->elaborator (list (elaborator (native "foo")) (elaborator (native "bar"))))
+  (elaborator (list (native "foo") (native "bar"))))
 
-; ==================== solve-task =======================
+; ==================== solve-elaborator =======================
 
 ; rhs hole
-(check-solutions-task=?
+(check-solutions-elaborator=?
   (stack native-type)
-  (solve-task empty-env native-type (hole 0))
-  (task
+  (solve-elaborator empty-env native-type (hole 0))
+  (elaborator
     (solutions native-type)
     (errors)
     native-type))
 
 ; hole
-(check-task=?
-  (solve-task empty-env (hole 0) native-type)
-  (task
+(check-elaborator=?
+  (solve-elaborator empty-env (hole 0) native-type)
+  (elaborator
     (solutions)
     (errors (unbound (hole 0)))
     nothing))
 
-(check-solutions-task=?
+(check-solutions-elaborator=?
   (stack native-type)
-  (solve-task empty-env (hole 0) native-type)
-  (task
+  (solve-elaborator empty-env (hole 0) native-type)
+  (elaborator
     (solutions native-type)
     (errors)
     native-type))
 
-(check-solutions-task=?
+(check-solutions-elaborator=?
   (stack (variable 0))
-  (solve-task empty-env (hole 0) native-type)
-  (task
+  (solve-elaborator empty-env (hole 0) native-type)
+  (elaborator
     (solutions (variable 0))
     (errors (mismatch (expected (variable 0)) (actual native-type)))
     nothing))
 
 ; unknown
-(check-task=?
-  (solve-task empty-env unknown unknown)
-  (task unknown))
+(check-elaborator=?
+  (solve-elaborator empty-env unknown unknown)
+  (elaborator unknown))
 
-(check-task=?
-  (solve-task empty-env unknown native-type)
-  (task native-type))
+(check-elaborator=?
+  (solve-elaborator empty-env unknown native-type)
+  (elaborator native-type))
 
 ; native-type
-(check-task=?
-  (solve-task empty-env native-type native-type)
-  (task native-type))
+(check-elaborator=?
+  (solve-elaborator empty-env native-type native-type)
+  (elaborator native-type))
 
-(check-task=?
-  (solve-task empty-env native-type (variable 0))
-  (push-error-task
+(check-elaborator=?
+  (solve-elaborator empty-env native-type (variable 0))
+  (push-error-elaborator
     (mismatch
       (expected native-type)
       (actual (variable 0)))
     nothing))
 
 ; type
-(check-task=?
-  (solve-task empty-env (type 0) (type 0))
-  (task (type 0)))
+(check-elaborator=?
+  (solve-elaborator empty-env (type 0) (type 0))
+  (elaborator (type 0)))
 
-(check-task=?
-  (solve-task empty-env (type 0) (type 1))
-  (push-error-task
+(check-elaborator=?
+  (solve-elaborator empty-env (type 0) (type 1))
+  (push-error-elaborator
     (mismatch
       (expected (type 0))
       (actual (type 1)))
     nothing))
 
-(check-task=?
-  (solve-task empty-env (type 0) (variable 0))
-  (push-error-task
+(check-elaborator=?
+  (solve-elaborator empty-env (type 0) (variable 0))
+  (push-error-elaborator
     (mismatch
       (expected (type 0))
       (actual (variable 0)))
     nothing))
 
 ; native
-(check-task=?
-  (solve-task empty-env (native "foo") (native "foo"))
-  (task (native "foo")))
+(check-elaborator=?
+  (solve-elaborator empty-env (native "foo") (native "foo"))
+  (elaborator (native "foo")))
 
-(check-task=?
-  (solve-task empty-env (native "foo") (native "bar"))
-  (push-error-task
+(check-elaborator=?
+  (solve-elaborator empty-env (native "foo") (native "bar"))
+  (push-error-elaborator
     (mismatch
       (expected (native "foo"))
       (actual (native "bar")))
     nothing))
 
-(check-task=?
-  (solve-task empty-env (variable 0) (native "bar"))
-  (push-error-task
+(check-elaborator=?
+  (solve-elaborator empty-env (variable 0) (native "bar"))
+  (push-error-elaborator
     (mismatch
       (expected (variable 0))
       (actual (native "bar")))
     nothing))
 
 ; evaluated
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (evaluated (native "foo"))
     (evaluated (native "foo")))
-  (task (evaluated (native "foo"))))
+  (elaborator (evaluated (native "foo"))))
 
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (evaluated (native "foo"))
     (evaluated (native "bar")))
-  (push-error-task
+  (push-error-elaborator
     (mismatch
       (expected (native "foo"))
       (actual (native "bar")))
     nothing))
 
 ; typed
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (typed (native "t1") (native "v1"))
     (typed (native "t1") (native "v1")))
-  (task
+  (elaborator
     (typed (native "t1") (native "v1"))))
 
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (typed (native "t1") (native "v1"))
     (typed (native "t1") (native "v2")))
-  (push-error-task
+  (push-error-elaborator
     (mismatch (expected (native "v1")) (actual (native "v2")))
     nothing))
 
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (typed (native "t1") (native "v1"))
     (typed (native "t2") (native "v1")))
-  (push-error-task
+  (push-error-elaborator
     (mismatch (expected (native "t1")) (actual (native "t2")))
     nothing))
 
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (typed (native "t1") (native "v1"))
     (typed (native "t2") (native "v2")))
-  (task
+  (elaborator
     (solutions)
     (errors
       (mismatch (expected (native "t1")) (actual (native "t2")))
       (mismatch (expected (native "v1")) (actual (native "v2"))))
     nothing))
 
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (typed (native "t1") (native "v1"))
     (native "v1"))
-  (task
+  (elaborator
     (solutions)
     (errors
       (mismatch
@@ -192,171 +192,171 @@
     nothing))
 
 ; lambda
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (lambda ($0) $0)
     (lambda ($0) $0))
-  (task (lambda ($0) $0)))
+  (elaborator (lambda ($0) $0)))
 
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (lambda ($0) (lambda ($1) $0))
     (lambda ($0) (lambda ($1) $0)))
-  (task (lambda ($0) (lambda ($1) $0))))
+  (elaborator (lambda ($0) (lambda ($1) $0))))
 
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (lambda ($0) (lambda ($1) $1))
     (lambda ($0) (lambda ($1) $1)))
-  (task (lambda ($0) (lambda ($1) $1))))
+  (elaborator (lambda ($0) (lambda ($1) $1))))
 
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (lambda ($0) (lambda ($1) $1))
     (lambda ($0) (lambda ($1) $0)))
-  (push-error-task
+  (push-error-elaborator
     (mismatch
       (expected (variable 1))
       (actual (variable 0)))
     nothing))
 
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (lambda ($0) $0)
     (variable 0))
-  (push-error-task
+  (push-error-elaborator
     (mismatch
       (expected (lambda ($0) $0))
       (actual (variable 0)))
     nothing))
 
 ; lambda-type
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (lambda-type native-type (lambda ($0) $0))
     (lambda-type native-type (lambda ($0) $0)))
-  (task
+  (elaborator
     (lambda-type native-type
       (lambda ($0) $0))))
 
-(check-task=?
-  (solve-task empty-env
+(check-elaborator=?
+  (solve-elaborator empty-env
     (lambda-type native-type (lambda ($0) $0))
     (lambda-type native-type (lambda ($0) native-type)))
-  (push-error-task
+  (push-error-elaborator
     (mismatch
       (expected (variable 0))
       (actual native-type))
     nothing))
 
-; ==================== eval-task =======================
+; ==================== eval-elaborator =======================
 
-; === eval-task native
+; === eval-elaborator native
 
-(check-task=?
-  (eval-task empty-env (evaluated (native "foo")))
-  (task (evaluated (native "foo"))))
+(check-elaborator=?
+  (eval-elaborator empty-env (evaluated (native "foo")))
+  (elaborator (evaluated (native "foo"))))
 
-; === eval-task type
+; === eval-elaborator type
 
-(check-task=?
-  (eval-task empty-env (type 10))
-  (task (evaluated (type 10))))
+(check-elaborator=?
+  (eval-elaborator empty-env (type 10))
+  (elaborator (evaluated (type 10))))
 
-; === eval-task native-type
+; === eval-elaborator native-type
 
-(check-task=?
-  (eval-task empty-env native-type)
-  (task (evaluated native-type)))
+(check-elaborator=?
+  (eval-elaborator empty-env native-type)
+  (elaborator (evaluated native-type)))
 
-; === eval-task native
+; === eval-elaborator native
 
-(check-task=?
-  (eval-task empty-env (native "foo"))
-  (task (evaluated (native "foo"))))
+(check-elaborator=?
+  (eval-elaborator empty-env (native "foo"))
+  (elaborator (evaluated (native "foo"))))
 
-; === eval-task typed
+; === eval-elaborator typed
 
-(check-task=?
-  (eval-task empty-env
+(check-elaborator=?
+  (eval-elaborator empty-env
     (typed native-type (native "foo")))
-  (task
+  (elaborator
     (evaluated
       (typed
         (evaluated native-type)
         (evaluated (native "foo"))))))
 
-; === eval-task native-application
+; === eval-elaborator native-application
 
-(check-task=?
-  (eval-task empty-env
+(check-elaborator=?
+  (eval-elaborator empty-env
     (native-application string-append
       (list
         (typed native-type (native "foo"))
         (typed native-type (native "bar")))))
-  (task (evaluated (native "foobar"))))
+  (elaborator (evaluated (native "foobar"))))
 
-; === eval-task variable
+; === eval-elaborator variable
 
-(check-task=?
-  (eval-task (stack (native "foo")) (variable 0))
-  (task (evaluated (variable 0))))
+(check-elaborator=?
+  (eval-elaborator (stack (native "foo")) (variable 0))
+  (elaborator (evaluated (variable 0))))
 
-; === eval-task lambda
+; === eval-elaborator lambda
 
-(check-task=?
-  (eval-task empty-env
+(check-elaborator=?
+  (eval-elaborator empty-env
     (lambda ($0) $0))
-  (task
+  (elaborator
     (evaluated
       (lambda ($0)
         (evaluated $0)))))
 
-; === eval-task lambda-type
+; === eval-elaborator lambda-type
 
-(check-task=?
-  (eval-task empty-env
+(check-elaborator=?
+  (eval-elaborator empty-env
     (lambda-type (type 0)
       (lambda ($0) $0)))
-  (task
+  (elaborator
      (evaluated
       (lambda-type
         (evaluated (type 0))
         (evaluated (lambda ($0) (evaluated $0)))))))
 
-; === eval-task application
+; === eval-elaborator application
 
-(check-task=?
-  (eval-task empty-env
+(check-elaborator=?
+  (eval-elaborator empty-env
     (application
       (typed native-type (lambda ($0) $0))
       (typed native-type (native "foo"))))
-  (task
+  (elaborator
     (evaluated
       (typed
         (evaluated native-type)
         (evaluated (native "foo"))))))
 
-; ==================== eval-task =======================
+; ==================== eval-elaborator =======================
 
-; === elab-task typed
+; === term-elaborator typed
 
-(check-task=?
-  (elab-task empty-env (typed (variable 10) (variable 20)))
-  (task (typed (variable 10) (variable 20))))
+(check-elaborator=?
+  (term-elaborator empty-env (typed (variable 10) (variable 20)))
+  (elaborator (typed (variable 10) (variable 20))))
 
-; === elab-task ann
+; === term-elaborator ann
 
-(check-task=?
-  (elab-task empty-env (ann (type 1) (type 0)))
-  (task
+(check-elaborator=?
+  (term-elaborator empty-env (ann (type 1) (type 0)))
+  (elaborator
     (typed
       (evaluated (type 1))
       (type 0))))
 
-(check-task=?
-  (elab-task empty-env (ann (type 2) (type 0)))
-  (push-error-task
+(check-elaborator=?
+  (term-elaborator empty-env (ann (type 2) (type 0)))
+  (push-error-elaborator
     (mismatch
       (expected (type 2))
       (actual (type 1)))
@@ -364,33 +364,33 @@
       (evaluated nothing)
       (type 0))))
 
-; === elab-task native-type
+; === term-elaborator native-type
 
-(check-task=?
-  (elab-task empty-env native-type)
-  (task (typed (type 0) native-type)))
+(check-elaborator=?
+  (term-elaborator empty-env native-type)
+  (elaborator (typed (type 0) native-type)))
 
-; === elab-task type
+; === term-elaborator type
 
-(check-task=?
-  (elab-task empty-env (type 0))
-  (task (type 0)))
+(check-elaborator=?
+  (term-elaborator empty-env (type 0))
+  (elaborator (type 0)))
 
-; === elab-task native
+; === term-elaborator native
 
-(check-task=?
-  (elab-task empty-env (native "foo"))
-  (task (typed native-type (native "foo"))))
+(check-elaborator=?
+  (term-elaborator empty-env (native "foo"))
+  (elaborator (typed native-type (native "foo"))))
 
-; === elab-task native-application
+; === term-elaborator native-application
 
-(check-task=?
-  (elab-task empty-env
+(check-elaborator=?
+  (term-elaborator empty-env
     (native-application string-append
       (list
         (native "foo")
         (native "bar"))))
-  (task
+  (elaborator
     (typed (evaluated native-type)
       (native-application string-append
       (list
@@ -401,13 +401,13 @@
           (evaluated native-type)
           (native "bar")))))))
 
-(check-task=?
-  (elab-task empty-env
+(check-elaborator=?
+  (term-elaborator empty-env
     (native-application string-append
       (list
         (native "foo")
         (type 0))))
-  (push-error-task
+  (push-error-elaborator
     (mismatch
       (expected native-type)
       (actual (type 1)))
@@ -421,58 +421,58 @@
             (evaluated nothing)
             (type 0)))))))
 
-; === elab-task variable
+; === term-elaborator variable
 
-(check-task=?
-  (elab-task (stack (type 10) (type 20)) (variable 0))
-  (task (typed (type 20) (variable 0))))
+(check-elaborator=?
+  (term-elaborator (stack (type 10) (type 20)) (variable 0))
+  (elaborator (typed (type 20) (variable 0))))
 
-(check-task=?
-  (elab-task (stack (type 10) (type 20)) (variable 1))
-  (task (typed (type 10) (variable 1))))
+(check-elaborator=?
+  (term-elaborator (stack (type 10) (type 20)) (variable 1))
+  (elaborator (typed (type 10) (variable 1))))
 
-(check-task=?
-  (elab-task (stack (type 10) (type 20)) (variable 2))
-  (push-error-task
+(check-elaborator=?
+  (term-elaborator (stack (type 10) (type 20)) (variable 2))
+  (push-error-elaborator
     (unbound (variable 2))
     (typed nothing (variable 2))))
 
-; === elab-task lambda-type
+; === term-elaborator lambda-type
 
-(check-task=?
-  (elab-task empty-env
+(check-elaborator=?
+  (term-elaborator empty-env
     (lambda-type (type 1)
       (lambda ($0) (type 2))))
-  (task
+  (elaborator
     (typed (type 3)
       (lambda-type (type 1)
         (lambda ($0) (type 2))))))
 
-(check-task=?
-  (elab-task empty-env
+(check-elaborator=?
+  (term-elaborator empty-env
     (lambda-type (type 1)
       (lambda ($0) $0)))
-  (task
+  (elaborator
     (typed (type 2)
       (lambda-type (type 1)
         (lambda ($0)
           (typed (type 1) $0))))))
 
-; === elab-task lambda
+; === term-elaborator lambda
 
-(check-task=?
-  (elab-task empty-env (lambda ($0) $0))
-  (task
+(check-elaborator=?
+  (term-elaborator empty-env (lambda ($0) $0))
+  (elaborator
     (solutions unknown)
     (errors)
     (typed
       (lambda-type (hole 0) (lambda ($0) (hole 0)))
       (lambda ($0) (typed (hole 0) $0)))))
 
-(check-task=?
-  (elab-task empty-env
+(check-elaborator=?
+  (term-elaborator empty-env
     (lambda ($arg) (native "string")))
-  (task
+  (elaborator
     (solutions unknown)
     (errors)
     (typed
@@ -481,17 +481,17 @@
       (lambda ($0)
         (typed native-type (native "string"))))))
 
-; === elab-task application
+; === term-elaborator application
 
-(check-task=?
-  (elab-task empty-env
+(check-elaborator=?
+  (term-elaborator empty-env
     (application
       (typed
         (lambda-type (type 1)
           (lambda (_) (type 2)))
         (variable 0))
       (type 0)))
-  (task
+  (elaborator
     (typed (type 2)
       (application
         (typed
@@ -500,15 +500,15 @@
           (variable 0))
         (type 0)))))
 
-(check-task=?
-  (elab-task empty-env
+(check-elaborator=?
+  (term-elaborator empty-env
     (application
       (typed
         (lambda-type (type 1)
           (lambda ($0) $0))
         (variable 0))
       (type 0)))
-  (task
+  (elaborator
     (typed (type 0)
       (application
         (typed
@@ -517,15 +517,15 @@
           (variable 0))
         (type 0)))))
 
-(check-task=?
-  (elab-task empty-env
+(check-elaborator=?
+  (term-elaborator empty-env
     (application
       (typed
         (lambda-type (type 1)
           (lambda ($0) $0))
         (variable 0))
       (type 2)))
-  (push-error-task
+  (push-error-elaborator
     (mismatch
       (expected (type 1))
       (actual (type 3)))
@@ -538,15 +538,15 @@
           (variable 0))
         (type 2)))))
 
-; === eval-task ann lambda
+; === eval-elaborator ann lambda
 
-; (check-task=?
-;   (elab-task empty-env
+; (check-elaborator=?
+;   (term-elaborator empty-env
 ;     (ann
 ;       (lambda-type native-type
 ;         (lambda ($0) native-type))
 ;       (lambda ($0) $0)))
-;   (task
+;   (elaborator
 ;     (typed
 ;       (lambda-type native-type
 ;         (lambda ($0) native-type))
