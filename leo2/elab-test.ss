@@ -30,6 +30,13 @@
 
 ; ==================== solve-task =======================
 
+; hole
+(check-task=?
+  (solve-task empty-env (hole 0) native-type)
+  (push-error-task
+    (unbound (hole 0))
+    native-type))
+
 ; native-type
 (check-task=?
   (solve-task empty-env native-type native-type)

@@ -243,6 +243,17 @@
   (define (solve-task $env $expected $actual)
     (or
       (switch $expected
+        ((hole? $hole)
+          (task ($solutions $errors)
+            (lets
+              ($index (- (length $solutions) (hole-index $hole) 1))
+              (switch (list-ref? $solutions $index)
+                ((false? _)
+                  (values $solutions (push $errors (unbound $hole)) $actual))
+                ((unknown? _)
+                  (list-set $solutions $index $actual))
+                ((else $other)
+                  (solve-task $env $other $actual))))))
         ((native-type? _)
           (switch? $actual
             ((native-type? $native-type)
@@ -255,6 +266,7 @@
                   (type-depth $expected-type)
                   (type-depth $actual-type))
                 (task $actual-type)))))
+        ; TODO: Cover all term types, and don't use term=?
         ((else _)
           (and
             (term=? $expected $actual)
