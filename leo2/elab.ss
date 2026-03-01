@@ -33,13 +33,23 @@
         (type+1 $type))
       ((typed? $typed)
         (typed-type $typed))
+      ((evaluated? $evaluated)
+        (evaluated
+          (type-of
+            (evaluated-ref $evaluated))))
       ((else _)
         unknown)))
 
   (define (value-of $term)
     (switch $term
-      ((type? $type) $type)
-      ((typed? $typed) (typed-ref $typed))
+      ((type? $type)
+        $type)
+      ((typed? $typed)
+        (typed-ref $typed))
+      ((evaluated? $evaluated)
+        (evaluated
+          (value-of
+            (evaluated-ref $evaluated))))
       ((else _) nothing)))
 
   (define (typed-from $type $value)
