@@ -30,7 +30,7 @@
 
 ; ==================== solve-task =======================
 
-; hole
+; lhs hole
 (check-task=?
   (solve-task empty-env (hole 0) native-type)
   (task
@@ -53,6 +53,15 @@
     (solutions (variable 0))
     (errors (mismatch (expected (variable 0)) (actual native-type)))
     nothing))
+
+; rhs hole
+(check-solutions-task=?
+  (stack native-type)
+  (solve-task empty-env native-type (hole 0))
+  (task
+    (solutions native-type)
+    (errors)
+    native-type))
 
 ; unknown
 (check-task=?
@@ -523,4 +532,8 @@
 ;       (lambda-type native-type
 ;         (lambda ($0) native-type))
 ;       (lambda ($0) $0)))
-;   (task 123))
+;   (task
+;     (typed
+;       (lambda-type native-type
+;         (lambda ($0) native-type))
+;       (lambda ($0) $0))))

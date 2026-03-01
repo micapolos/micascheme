@@ -294,6 +294,13 @@
         (task (fn #,@$tmps)))))
 
   (define (solve-task $env $expected $actual)
+    (switch $actual
+      ((hole? $actual-hole)
+        (solve-task $env $actual $expected))
+      ((else $actual-other)
+        (solve-non-hole-task $env $expected $actual-other))))
+
+  (define (solve-non-hole-task $env $expected $actual)
     (or
       (switch $expected
         ((evaluated? $expected-evaluated)
