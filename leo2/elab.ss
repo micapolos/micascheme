@@ -4,6 +4,8 @@
     list->task task-append
     task->datum
     error-task
+    solutions-task
+    errors-task
     check-task=?
     empty-env
 
@@ -55,6 +57,14 @@
     (lets
       ((values $solution $errors $result) ($task '() '()))
       $result))
+
+  (define solutions-task
+    (task ($solutions $errors)
+      (values $solutions $errors $solutions)))
+
+  (define errors-task
+    (task ($solutions $errors)
+      (values $solutions $errors $errors)))
 
   (define-list->/append (task $tasks)
     (switch-exhaustive $tasks
