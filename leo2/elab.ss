@@ -28,16 +28,19 @@
   (define empty-env '())
 
   (define (type-of $term)
-    (switch-exhaustive $term
+    (switch $term
       ((type? $type)
         (type (+ (type-depth $type) 1)))
       ((typed? $typed)
-        (typed-type $typed))))
+        (typed-type $typed))
+      ((else _)
+        unknown)))
 
   (define (value-of $term)
-    (switch-exhaustive $term
+    (switch $term
       ((type? $type) $type)
-      ((typed? $typed) (typed-ref $typed))))
+      ((typed? $typed) (typed-ref $typed))
+      ((else _) nothing)))
 
   (define (typed-from $type $value)
     ; (todo (collapse (and (type (+ n 1)) (type n)) (into (type n))))
@@ -329,7 +332,17 @@
         (apply-task evaluated
           (apply-task typed
             (eval-task $env (typed-type $typed))
-            (eval-task $env (typed-ref $typed)))))))
+            (eval-task $env (typed-ref $typed)))))
+      ((variable? $variable)
+        (task (list-ref $env (variable-index $variable))))
+      ((lambda? $lambda)
+        (task
+          (evaluated
+            (lambda ($0)
+              (task-result
+                (eval-task
+                  (push $env (type-of $0))
+                  $0))))))))
 
   (define (evaluate $meta-context $context $term)
     (switch $term

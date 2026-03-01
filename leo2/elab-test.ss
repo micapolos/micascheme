@@ -73,6 +73,21 @@
         (typed native-type (native "bar")))))
   (task (evaluated (native "foobar"))))
 
+; === eval-task variable
+
+(check-task=?
+  (eval-task (stack (native "foo")) (variable 0))
+  (task (native "foo")))
+
+; === eval-task lambda
+
+(check-task=?
+  (eval-task empty-env
+    (lambda ($0) $0))
+  (task
+    (evaluated
+      (lambda ($0) unknown))))
+
 ; === evaluate native
 
 (check-evaluates
