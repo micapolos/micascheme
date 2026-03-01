@@ -28,6 +28,7 @@
 
     lambda-type-apply
     recursion-apply
+    unlabeled
 
     type+1
 
@@ -113,4 +114,11 @@
 
   (define (type+1 $type)
     (type (+ (type-depth $type) 1)))
+
+  (define (unlabeled $term)
+    (switch $term
+      ((labeled? $labeled)
+        (unlabeled (labeled-ref $labeled)))
+      ((else $unlabeled)
+        $unlabeled)))
 )
