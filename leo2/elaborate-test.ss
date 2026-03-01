@@ -25,7 +25,7 @@
 
 ; (check-elaborate-throws
 ;   (application
-;     (signature (type 1) (lambda (x) x))
+;     (procedure-type (type 1) (lambda (x) x))
 ;     (native "not-a-type-0")))
 
 ; ; --- evaluated
@@ -67,18 +67,18 @@
 ; (check-elaborate-throws
 ;   (lambda (x) x))
 
-; ; --- signature
+; ; --- procedure-type
 
 ; (check-elaborates
-;   (signature (type 0)
+;   (procedure-type (type 0)
 ;     (lambda (x) x))
 ;   (typed
 ;     (typed
 ;       (type 0)
-;       (signature
+;       (procedure-type
 ;         (type 0)
 ;         (lambda (type 0))))
-;     (signature (type 0)
+;     (procedure-type (type 0)
 ;       (lambda
 ;         (typed
 ;           (type 0)
@@ -96,10 +96,10 @@
 ;       (typed
 ;         (typed
 ;           (type 0)
-;           (signature
+;           (procedure-type
 ;             (type 51)
 ;             (lambda (type 51))))
-;         (signature (type 51)
+;         (procedure-type (type 51)
 ;           (lambda
 ;             (typed
 ;               (type 51)
@@ -160,14 +160,14 @@
 
 ; (check-elaborates
 ;   (recursion
-;     (signature (type 0)
+;     (procedure-type (type 0)
 ;       (lambda (x) x)))
 ;   (typed
 ;     (typed
 ;       (type 0)
-;       (signature (type 0) (lambda (type 0))))
+;       (procedure-type (type 0) (lambda (type 0))))
 ;     (recursion
-;       (signature (type 0)
+;       (procedure-type (type 0)
 ;         (lambda
 ;           (typed
 ;             (type 0)

@@ -9,7 +9,7 @@
     native-application native-application? native-application-procedure native-application-args
     type type? type-depth
     variable variable? variable-index
-    signature signature? signature-param signature-procedure
+    procedure-type procedure-type? procedure-type-param procedure-type-procedure
     application application? application-lhs application-rhs
     branch branch? branch-condition branch-consequent branch-alternate
     recursion recursion? recursion-procedure
@@ -24,7 +24,7 @@
 
     term? term-switch
 
-    signature-apply
+    procedure-type-apply
     recursion-apply
 
     branch-ref)
@@ -48,7 +48,7 @@
     (native ref)
     (native-application procedure args)
     (variable index)
-    (signature param procedure)
+    (procedure-type param procedure)
     (application lhs rhs)
     (branch condition consequent alternate)
     (recursion procedure)
@@ -69,7 +69,7 @@
       native-application
       variable
       procedure  ; arity 1
-      signature
+      procedure-type
       application
       branch
       recursion
@@ -86,7 +86,7 @@
       ((native-application? $native-application) $native-application)
       ((variable? $variable) $variable)
       ((procedure? $procedure) $procedure)
-      ((signature? $signature) $signature)
+      ((procedure-type? $procedure-type) $procedure-type)
       ((application? $application) $application)
       ((branch? $branch) $branch)
       ((recursion? $recursion) $recursion)
@@ -94,8 +94,8 @@
       ((evaluated? $evaluated) $evaluated)
       ((typed? $typed) $typed)))
 
-  (define (signature-apply $signature $arg)
-    ((signature-procedure $signature) $arg))
+  (define (procedure-type-apply $procedure-type $arg)
+    ((procedure-type-procedure $procedure-type) $arg))
 
   (define (recursion-apply $recursion $arg)
     ((recursion-procedure $recursion) $arg))

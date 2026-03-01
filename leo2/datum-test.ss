@@ -31,8 +31,8 @@
   (lambda ($0) (application (variable 10) $0)))
 
 (check-term->datum=?
-  (signature (variable 10) (lambda ($0) (application (variable 20) $0)))
-  (signature (variable 10) (lambda ($0) (application (variable 20) $0))))
+  (procedure-type (variable 10) (lambda ($0) (application (variable 20) $0)))
+  (procedure-type (variable 10) (lambda ($0) (application (variable 20) $0))))
 
 (check-term->datum=?
   (recursion (lambda ($0) (lambda ($1) (application $0 $1))))

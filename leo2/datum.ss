@@ -75,10 +75,10 @@
                 ,(depth-term->datum
                   (+ $depth 1)
                   ($procedure (variable $depth))))))
-          ((signature? $signature)
-            `(signature
-              ,(depth-term->datum $depth (signature-param $signature))
-              ,(depth-term->datum $depth (signature-procedure $signature))))
+          ((procedure-type? $procedure-type)
+            `(procedure-type
+              ,(depth-term->datum $depth (procedure-type-param $procedure-type))
+              ,(depth-term->datum $depth (procedure-type-procedure $procedure-type))))
           ((application? $application)
             `(application
               ,(depth-term->datum $depth (application-lhs $application))

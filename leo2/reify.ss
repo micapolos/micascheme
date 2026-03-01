@@ -40,7 +40,7 @@
           `(lambda (,$symbol)
             ,(depth-native?-reify (+ $depth 1) #f
               ($procedure (variable $depth))))))
-      ((signature? $signature) #f)
+      ((procedure-type? $procedure-type) #f)
       ((application? $application)
         `(
           ,(depth-native?-reify $depth #f (application-lhs $application))

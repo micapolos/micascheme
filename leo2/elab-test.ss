@@ -217,27 +217,27 @@
   (type 1)
   (typed (type 2) (type 1)))
 
-; === signature
+; === procedure-type
 
 (check-elabs
-  (signature
+  (procedure-type
     (typed (type 0) (native "string"))
     (lambda (_)
       (typed (type 0) (native "number"))))
   (typed
     (type 0)
-    (signature
+    (procedure-type
       (typed (type 0) (native "string"))
       (lambda (_)
         (typed (type 0) (native "number"))))))
 
 (check-elabs
-  (signature
+  (procedure-type
     (typed (type 0) (native "string"))
     (lambda ($arg) $arg))
   (typed
     (type 0)
-    (signature
+    (procedure-type
       (typed (type 0) (native "string"))
       (lambda (v0)
         (typed (type 0) v0)))))
@@ -247,13 +247,13 @@
 (check-elabs
   (lambda ($arg) $arg)
   (typed
-    (signature (hole 0) (lambda (v0) (hole 0)))
+    (procedure-type (hole 0) (lambda (v0) (hole 0)))
     (lambda (v0) (typed (hole 0) v0))))
 
 (check-elabs
   (lambda ($arg) (typed (type 0) (native "string")))
   (typed
-    (signature (hole 0) (lambda (v0) (type 0)))
+    (procedure-type (hole 0) (lambda (v0) (type 0)))
     (lambda (v0) (typed (type 0) (native "string")))))
 
 ; === application
@@ -265,7 +265,7 @@
   (typed (type 0)
     (application
       (typed
-        (signature (hole 0) (lambda (v0) (hole 0)))
+        (procedure-type (hole 0) (lambda (v0) (hole 0)))
         (lambda (v0) (typed (hole 0) v0)))
       (typed (type 0) (native "string")))))
 
@@ -277,7 +277,7 @@
     (type 0)
     (application
       (typed
-        (signature (hole 0) (lambda (_) (type 0)))
+        (procedure-type (hole 0) (lambda (_) (type 0)))
         (lambda (_) (typed (type 0) (native "number"))))
       (typed (type 0) (native "string")))))
 

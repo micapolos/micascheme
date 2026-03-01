@@ -43,19 +43,19 @@
       ((procedure? $procedure)
         (throw elaborate (list 'raw-procedure-unsupported (term->datum $procedure))))
 
-      ((signature? $signature)
+      ((procedure-type? $procedure-type)
         (lets
-          ($param (signature-param $signature))
-          ($procedure (signature-procedure $signature))
+          ($param (procedure-type-param $procedure-type))
+          ($procedure (procedure-type-procedure $procedure-type))
           ($typed-param (elaborate $param))
           ($typed-proc (lambda ($v) (typed $typed-param $v)))
-          ($signature-type
-            (signature $typed-param
+          ($procedure-type-type
+            (procedure-type $typed-param
               (lambda ($v)
                 (term-type ($typed-proc $v)))))
           (typed
-            (typed (type 0) $signature-type)
-            (signature $typed-param $typed-proc))))
+            (typed (type 0) $procedure-type-type)
+            (procedure-type $typed-param $typed-proc))))
 
       ((application? $application)
         (lets
@@ -65,13 +65,13 @@
           ($lhs (application-lhs $application))
           ($typed-lhs
             (if (procedure? $lhs)
-              (elaborate (signature $rhs-type $lhs))
+              (elaborate (procedure-type $rhs-type $lhs))
               (elaborate $lhs)))
           ($lhs-type (term-type $typed-lhs))
           (switch (term-core $lhs-type)
-            ((signature? $signature)
+            ((procedure-type? $procedure-type)
               (lets
-                ($res-type-term (signature-apply $signature $rhs-core))
+                ($res-type-term (procedure-type-apply $procedure-type $rhs-core))
                 (typed $res-type-term (application $typed-lhs $rhs))))
             ((else $other-type)
               (throw elaborate

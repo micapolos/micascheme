@@ -56,16 +56,16 @@
             (depth-term=? (+ $depth 1)
               ($procedure-a (variable $depth))
               ($procedure-b (variable $depth))))))
-      ((signature? $signature-a)
+      ((procedure-type? $procedure-type-a)
         (switch-b? $term-b
-          ((signature? $signature-b)
+          ((procedure-type? $procedure-type-b)
             (and
               (depth-term=? $depth
-                (signature-param $signature-a)
-                (signature-param $signature-b))
+                (procedure-type-param $procedure-type-a)
+                (procedure-type-param $procedure-type-b))
               (depth-term=? $depth
-                (signature-procedure $signature-a)
-                (signature-procedure $signature-b))))))
+                (procedure-type-procedure $procedure-type-a)
+                (procedure-type-procedure $procedure-type-b))))))
       ((application? $application-a)
         (switch-b? $term-b
           ((application? $application-b)

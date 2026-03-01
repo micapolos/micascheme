@@ -13,14 +13,14 @@
       (lambda (_) (native 1)))))
 
 (check
-  (signature-dependent?
-    (signature (type 0)
+  (procedure-type-dependent?
+    (procedure-type (type 0)
       (lambda (x) x))))
 
 (check
   (not
-    (signature-dependent?
-      (signature (type 0)
+    (procedure-type-dependent?
+      (procedure-type (type 0)
         (lambda (_) (native 1))))))
 
 (check

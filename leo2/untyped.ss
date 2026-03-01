@@ -22,8 +22,8 @@
         $variable)
       ((procedure? $procedure)
         (lambda (x) (untyped ($procedure x))))
-      ((signature? $signature)
-        (throw untyped $signature))
+      ((procedure-type? $procedure-type)
+        (throw untyped $procedure-type))
       ((application? $application)
         (application
           (untyped (application-lhs $application))

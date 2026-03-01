@@ -172,12 +172,12 @@
         (values $meta-context
           (typed (type 0) $native-type)))
 
-      ((signature? $signature)
+      ((procedure-type? $procedure-type)
         (lets
           ((values $meta-context $typed-param)
             (elab $meta-context $context
-              (signature-param $signature)))
-          ($body (signature-apply $signature (variable 0)))
+              (procedure-type-param $procedure-type)))
+          ($body (procedure-type-apply $procedure-type (variable 0)))
           ((values $meta-context $typed-body)
             (elab $meta-context
               (push $context (typed-type $typed-param))
@@ -189,13 +189,13 @@
           (values $meta-context
             (typed
               (type $max-depth)
-              (signature $typed-param
+              (procedure-type $typed-param
                 (lambda ($arg)
                   (lets
                     ((values _ $typed-body)
                       (elab $meta-context
                         (push $context (typed-type $typed-param))
-                        (signature-apply $signature $arg)))
+                        (procedure-type-apply $procedure-type $arg)))
                     $typed-body)))))))
 
       ((variable? $variable)
@@ -214,7 +214,7 @@
             (elab $meta-context $body-context $body))
           (values $meta-context
             (typed
-              (signature $param-type
+              (procedure-type $param-type
                 (lambda ($arg)
                   (lets
                     ((values _ $typed-body)
@@ -237,15 +237,15 @@
           ((values $meta-context $typed-rhs)
             (elab $meta-context $context (application-rhs $application)))
           (switch (typed-type $typed-lhs)
-            ((signature? $signature)
+            ((procedure-type? $procedure-type)
               (lets
                 ((values $meta-context $type)
                   (meta-resolve $meta-context $context
-                    (signature-param $signature)
+                    (procedure-type-param $procedure-type)
                     (typed-type $typed-rhs)))
                 (values $meta-context
                   (typed
-                    (signature-apply $signature $typed-rhs)
+                    (procedure-type-apply $procedure-type $typed-rhs)
                     (application $typed-lhs $typed-rhs)))))
             ((else $other)
               (values $meta-context

@@ -39,13 +39,13 @@
         (evaluated
           (lambda ($arg)
             (evaluate ($procedure $arg)))))
-      ((signature? $signature)
+      ((procedure-type? $procedure-type)
         (evaluated
-          (signature
-            (evaluate (signature-param $signature))
+          (procedure-type
+            (evaluate (procedure-type-param $procedure-type))
             (lambda ($arg)
               (evaluate
-                (signature-apply $signature $arg))))))
+                (procedure-type-apply $procedure-type $arg))))))
       ((application? $application)
         (term-apply
           (evaluate (application-lhs $application))
@@ -86,8 +86,8 @@
     (switch (evaluated-ref $lhs)
       ((procedure? $procedure)
         ($procedure $rhs))
-      ((signature? $signature)
-        (signature-apply $signature $rhs))
+      ((procedure-type? $procedure-type)
+        (procedure-type-apply $procedure-type $rhs))
       ((recursion? $recursion)
         (term-apply (recursion-apply $recursion $lhs) $rhs))
       ((else _)

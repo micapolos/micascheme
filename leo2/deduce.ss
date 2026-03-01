@@ -141,18 +141,18 @@
                         ($source-procedure (variable 0))
                         ($target-procedure (variable 0))))))
 
-                ((signature? $source-signature)
+                ((procedure-type? $source-procedure-type)
                   (switch? $target
-                    ((signature? $target-signature)
+                    ((procedure-type? $target-procedure-type)
                       (deduction-lets
                         (_
                           (term-deduction-from-to $env
-                            (signature-param $target-signature)
-                            (signature-param $source-signature)))
+                            (procedure-type-param $target-procedure-type)
+                            (procedure-type-param $source-procedure-type)))
                         (term-deduction-from-to
-                          (push $env (signature-param $target-signature))
-                          (signature-apply $source-signature (variable 0))
-                          (signature-apply $target-signature (variable 0)))))))
+                          (push $env (procedure-type-param $target-procedure-type))
+                          (procedure-type-apply $source-procedure-type (variable 0))
+                          (procedure-type-apply $target-procedure-type (variable 0)))))))
 
                 ((application? $source-application)
                   (switch? $target

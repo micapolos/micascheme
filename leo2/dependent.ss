@@ -1,7 +1,7 @@
 (library (leo2 dependent)
   (export
     procedure-dependent?
-    signature-dependent?
+    procedure-type-dependent?
     recursion-dependent?)
   (import
     (leo2 base)
@@ -14,9 +14,9 @@
         ($procedure (variable 0))
         ($procedure (variable 1)))))
 
-  (define (signature-dependent? $signature)
+  (define (procedure-type-dependent? $procedure-type)
     (procedure-dependent?
-      (signature-procedure $signature)))
+      (procedure-type-procedure $procedure-type)))
 
   (define (recursion-dependent? $recursion)
     (procedure-dependent?
