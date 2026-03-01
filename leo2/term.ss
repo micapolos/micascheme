@@ -38,6 +38,7 @@
       (number? $x)
       (char? $x)
       (string? $x)
+      (symbol? $x)
       (bytevector? $x)))
 
   (data*

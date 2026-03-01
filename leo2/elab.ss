@@ -258,7 +258,9 @@
           (and
             (term=? $expected $actual)
             (task $actual))))
-      (push-error-task "type error" nothing)))
+      (push-error-task
+        (mismatch (expected $expected) (actual $actual))
+        nothing)))
 
   (define (unpeel? $term)
     (switch? $term

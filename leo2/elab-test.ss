@@ -37,7 +37,11 @@
 
 (check-task=?
   (solve-task empty-env native-type (variable 0))
-  (push-error-task "type error" nothing))
+  (push-error-task
+    (mismatch
+      (expected native-type)
+      (actual (variable 0)))
+    nothing))
 
 ; type
 (check-task=?
@@ -46,11 +50,19 @@
 
 (check-task=?
   (solve-task empty-env (type 0) (type 1))
-  (push-error-task "type error" nothing))
+  (push-error-task
+    (mismatch
+      (expected (type 0))
+      (actual (type 1)))
+    nothing))
 
 (check-task=?
   (solve-task empty-env (type 0) (variable 0))
-  (push-error-task "type error" nothing))
+  (push-error-task
+    (mismatch
+      (expected (type 0))
+      (actual (variable 0)))
+    nothing))
 
 ; ==================== eval-task =======================
 
@@ -156,9 +168,10 @@
 
 (check-task=?
   (elab-task empty-env (ann (type 2) (type 0)))
-  (task
-    (solutions)
-    (errors "type error")
+  (push-error-task
+    (mismatch
+      (expected (type 2))
+      (actual (type 1)))
     (typed nothing (type 0))))
 
 ; === elab-task native-type
@@ -200,9 +213,10 @@
       (list
         (native "foo")
         (type 0))))
-  (task
-    (solutions)
-    (errors "type error")
+  (push-error-task
+    (mismatch
+      (expected native-type)
+      (actual (type 1)))
     (typed nothing
       (native-application string-append
         (list
@@ -314,9 +328,10 @@
           (lambda ($0) $0))
         (variable 0))
       (type 2)))
-  (task
-    (solutions)
-    (errors "type error")
+  (push-error-task
+    (mismatch
+      (expected (type 1))
+      (actual (type 3)))
     (typed nothing
       (application
         (typed
