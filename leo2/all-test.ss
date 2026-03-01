@@ -13,4 +13,5 @@
   (leo2 deduce)
   (leo2 lang all)
   (leo2 untyped)
+  (leo2 solver)
   (leo2 elab))
