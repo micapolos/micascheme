@@ -47,6 +47,8 @@
         `(actual ,(actual-ref $actual)))
       ((native-type? _)
         `native-type)
+      ((unknown? _)
+        'unknown)
       ((else $term)
         (term-switch $term
           ((hole? $hole) `(hole ,(hole-index $hole)))

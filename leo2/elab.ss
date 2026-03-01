@@ -10,6 +10,8 @@
     errors-task
     check-task=?
     empty-env
+    solutions
+    errors
 
     elab-task
 
@@ -42,12 +44,18 @@
     ; (todo (collapse (and (type (+ n 1)) (type n)) (into (type n))))
     (typed $type $value))
 
+  (define solutions stack)
+  (define errors stack)
+
   (define-rules-syntaxes
     ((task ($solutions $errors) solutions-errors-result)
       (lambda ($solutions $errors) solutions-errors-result))
     ((task result)
       (task ($solutions $errors)
         (values $solutions $errors result)))
+    ((task solutions errors result)
+      (lambda ($unused-solutions $unused-errors)
+        (values solutions errors result)))
     ((task-lets (id first) x ... last)
       (lambda ($solutions $errors)
         (lets
@@ -70,6 +78,13 @@
   (define errors-task
     (task ($solutions $errors)
       (values $solutions $errors $errors)))
+
+  (define new-hole-task
+    (task ($solutions $errors)
+      (values
+        (push $solutions unknown)
+        $errors
+        (hole (length $solutions)))))
 
   (define-list->/append (task $tasks)
     (switch-exhaustive $tasks
@@ -203,7 +218,28 @@
                   (task-result
                     (elab-task
                       (push $env $typed-param)
-                      (lambda-type-apply $lambda-type $arg)))))))))))
+                      (lambda-type-apply $lambda-type $arg)))))))))
+      ((lambda? $lambda)
+        (task-lets
+          ($param-type new-hole-task)
+          ($typed-body
+            (elab-task
+              (push $env $param-type)
+              (variable 0)))
+          (task
+            (typed
+              (lambda-type $param-type
+                (lambda ($arg)
+                  (type-of
+                    (task-result
+                      (elab-task
+                        (push $env $param-type)
+                        ($lambda $arg))))))
+              (lambda ($arg)
+                (task-result
+                  (elab-task
+                    (push $env $param-type)
+                    ($lambda $arg))))))))))
 
   (define (elab $meta-context $context $term)
     (switch $term

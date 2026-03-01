@@ -104,7 +104,9 @@
 
 (check-task=?
   (elab-task empty-env (ann (type 2) (type 0)))
-  (push-error-task "type error"
+  (task
+    (solutions)
+    (errors "type error")
     (typed nothing (type 0))))
 
 ; === elab-task native-type
@@ -146,7 +148,9 @@
       (list
         (native "foo")
         (type 0))))
-  (push-error-task "not native"
+  (task
+    (solutions)
+    (errors "not native")
     (typed nothing
       (native-application string-append
         (list
@@ -165,7 +169,9 @@
 
 (check-task=?
   (elab-task (stack (type 10) (type 20)) (variable 2))
-  (push-error-task "unbound variable"
+  (task
+    (solutions)
+    (errors "unbound variable")
     (typed nothing (variable 2))))
 
 ; === elab-task lambda-type
@@ -188,6 +194,23 @@
       (lambda-type (type 1)
         (lambda ($0)
           (typed (type 1) $0))))))
+
+; === elab-task lambda
+
+(check-task=?
+  (elab-task empty-env (lambda ($0) $0))
+  (task
+    (solutions unknown)
+    (errors)
+    (typed
+      (lambda-type (hole 0) (lambda ($0) (hole 0)))
+      (lambda ($0) (typed (hole 0) $0)))))
+
+; (check-elabs
+;   (lambda ($arg) (typed (type 0) (native "string")))
+;   (typed
+;     (lambda-type (hole 0) (lambda (v0) (type 0)))
+;     (lambda (v0) (typed (type 0) (native "string")))))
 
 ; === elab-task application
 
@@ -233,7 +256,9 @@
           (lambda ($0) $0))
         (variable 0))
       (type 2)))
-  (push-error-task "type error"
+  (task
+    (solutions)
+    (errors "type error")
     (typed nothing
       (application
         (typed
