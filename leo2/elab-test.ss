@@ -77,7 +77,7 @@
 
 (check-task=?
   (eval-task (stack (native "foo")) (variable 0))
-  (task (native "foo")))
+  (task (evaluated (variable 0))))
 
 ; === eval-task lambda
 
@@ -86,7 +86,8 @@
     (lambda ($0) $0))
   (task
     (evaluated
-      (lambda ($0) unknown))))  ; TODO: this is wrong
+      (lambda ($0)
+        (evaluated $0)))))
 
 ; === evaluate native
 

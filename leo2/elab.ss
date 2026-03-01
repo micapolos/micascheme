@@ -334,7 +334,7 @@
             (eval-task $env (typed-type $typed))
             (eval-task $env (typed-ref $typed)))))
       ((variable? $variable)
-        (task (list-ref $env (variable-index $variable))))
+        (task (evaluated $variable)))
       ((lambda? $lambda)
         (task
           (evaluated
