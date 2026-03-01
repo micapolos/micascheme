@@ -261,11 +261,10 @@
         ((evaluated? $expected-evaluated)
           (switch? $actual
             ((evaluated? $actual-evaluated)
-              (task-lets
-                (apply-task evaluated
-                  (solve-task $env
-                    (evaluated-ref $expected-evaluated)
-                    (evaluated-ref $actual-evaluated)))))))
+              (apply-task evaluated
+                (solve-task $env
+                  (evaluated-ref $expected-evaluated)
+                  (evaluated-ref $actual-evaluated))))))
         ((hole? $hole)
           (task ($solutions $errors)
             (lets
