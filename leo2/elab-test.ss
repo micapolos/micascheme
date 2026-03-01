@@ -33,9 +33,28 @@
 ; hole
 (check-task=?
   (solve-task empty-env (hole 0) native-type)
-  (push-error-task
-    (unbound (hole 0))
+  (task
+    (solutions)
+    (errors (unbound (hole 0)))
+    nothing))
+
+; hole
+(check-solutions-task=?
+  (stack native-type)
+  (solve-task empty-env (hole 0) native-type)
+  (task
+    (solutions native-type)
+    (errors)
     native-type))
+
+; hole
+(check-solutions-task=?
+  (stack (variable 0))
+  (solve-task empty-env (hole 0) native-type)
+  (task
+    (solutions (variable 0))
+    (errors (mismatch (expected (variable 0)) (actual native-type)))
+    nothing))
 
 ; native-type
 (check-task=?

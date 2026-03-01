@@ -3,6 +3,7 @@
     task task-lets
     list->task task-append
     task->datum
+    solutions-task->datum
     task-apply
     push-error-task
     push-hole-task
@@ -16,7 +17,8 @@
     eval-task
     solve-task
 
-    check-task=?)
+    check-task=?
+    check-solutions-task=?)
   (import
     (leo2 base)
     (leo2 term)
@@ -122,8 +124,11 @@
         $result)))
 
   (define (task->datum $task)
+    (solutions-task->datum '() $task))
+
+  (define (solutions-task->datum $solutions $task)
     (lets
-      ((values $solutions $errors $result) ($task '() '()))
+      ((values $solutions $errors $result) ($task $solutions '()))
       `(task
         (solutions ,@(reverse (map term->datum $solutions)))
         (errors ,@(reverse (map term->datum $errors)))
@@ -249,11 +254,20 @@
               ($index (- (length $solutions) (hole-index $hole) 1))
               (switch (list-ref? $solutions $index)
                 ((false? _)
-                  (values $solutions (push $errors (unbound $hole)) $actual))
+                  (values
+                    $solutions
+                    (push $errors (unbound $hole))
+                    nothing))
                 ((unknown? _)
-                  (list-set $solutions $index $actual))
+                  (values
+                    (list-set $solutions $index $actual)
+                    $errors
+                    $actual))
                 ((else $other)
-                  (solve-task $env $other $actual))))))
+                  (task-apply
+                    (solve-task $env $other $actual)
+                    $solutions
+                    $errors))))))
         ((native-type? _)
           (switch? $actual
             ((native-type? $native-type)
@@ -345,5 +359,11 @@
     (check
       (equal?
         (task->datum in)
+        (task->datum out))))
+
+  (define-rule-syntax (check-solutions-task=? sol in out)
+    (check
+      (equal?
+        (solutions-task->datum sol in)
         (task->datum out))))
 )
