@@ -215,13 +215,14 @@
           (switch (type-of $typed-lhs)
             ((lambda-type? $lambda-type)
               (task-lets
-                ($type (solve-task $env
-                  (lambda-type-param $lambda-type)
-                  (type-of $typed-rhs)))
+                ($eval-param (eval-task $env (lambda-type-param $lambda-type)))
+                ($eval-rhs-type (eval-task $env (type-of $typed-rhs)))
+                ($type (solve-task $env $eval-param $eval-rhs-type))
                 (switch $type
                   ((nothing? $nothing)
                     (task
-                      (typed nothing
+                      (typed
+                        (evaluated nothing)
                         (application $typed-lhs $typed-rhs))))
                   ((else $type)
                     (task
@@ -305,6 +306,12 @@
           ($arg $args)
           #`(#,$tmp #,$arg))
         (task (fn #,@$tmps)))))
+
+  (define (eval-solve-task $env $expected $actual)
+    (task-lets
+      ($eval-expected (eval-task $env $expected))
+      ($eval-actual (eval-task $env $actual))
+      (solve-task $env $eval-expected $eval-actual)))
 
   (define (solve-task $env $expected $actual)
     (switch $actual

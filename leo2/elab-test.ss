@@ -529,7 +529,8 @@
     (mismatch
       (expected (type 1))
       (actual (type 3)))
-    (typed nothing
+    (typed
+      (evaluated nothing)
       (application
         (typed
           (lambda-type (type 1)
