@@ -198,7 +198,7 @@
                 (lambda ($arg)
                   (task-result
                     (elab-task
-                      (push $env (type-of $typed-param))
+                      (push $env $typed-param)
                       (lambda-type-apply $lambda-type $arg)))))))))))
 
   (define (elab $meta-context $context $term)

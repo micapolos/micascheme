@@ -179,14 +179,15 @@
       (lambda-type (type 1)
         (lambda ($0) (type 2))))))
 
-; (check-elabs
-;   (elab-task empty-env
-;     (lambda-type (type 1)
-;       (lambda ($0) $0)))
-;   (task
-;     (typed (type 2)
-;       (lambda-type (type 1)
-;         (lambda ($0) $0)))))
+(check-task=?
+  (elab-task empty-env
+    (lambda-type (type 1)
+      (lambda ($0) $0)))
+  (task
+    (typed (type 2)
+      (lambda-type (type 1)
+        (lambda ($0)
+          (typed (type 1) $0))))))
 
 ; === elab-task application
 
