@@ -95,18 +95,18 @@
 
 (check-elabs
   (native "foo")
-  (typed nothing (native "foo")))
+  (typed native-type (native "foo")))
 
 ; === native-application
 
 (check-elabs
   (native-application string-append
     (list (native "foo") (native "bar")))
-  (typed nothing
+  (typed native-type
     (native-application string-append
     (list
-      (typed nothing (native "foo"))
-      (typed nothing (native "bar"))))))
+      (typed native-type (native "foo"))
+      (typed native-type (native "bar"))))))
 
 ; === type
 

@@ -45,6 +45,8 @@
         `(expected ,(expected-ref $expected)))
       ((actual? $actual)
         `(actual ,(actual-ref $actual)))
+      ((native-type? _)
+        `native-type)
       ((else $term)
         (term-switch $term
           ((hole? $hole) `(hole ,(hole-index $hole)))

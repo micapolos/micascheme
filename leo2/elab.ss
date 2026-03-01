@@ -76,7 +76,7 @@
 
       ((native? $native)
         (values $meta-context
-          (typed nothing $native)))
+          (typed native-type $native)))
 
       ((native-application? $native-application)
         (lets
@@ -84,7 +84,7 @@
             (elab* $meta-context $context
               (native-application-args $native-application)))
           (values $meta-context
-            (typed nothing
+            (typed native-type
               (native-application
                 (native-application-procedure $native-application)
                 $typed-args)))))

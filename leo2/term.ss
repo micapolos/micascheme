@@ -4,6 +4,7 @@
     hole hole? hole-index
     nothing nothing?
     unknown unknown?
+    native-type native-type?
     native native? native-ref
     native-application native-application? native-application-procedure native-application-args
     type type? type-depth
@@ -43,6 +44,7 @@
     nothing
     unknown
     (type depth)
+    native-type
     (native ref)
     (native-application procedure args)
     (variable index)
