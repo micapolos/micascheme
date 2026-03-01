@@ -174,7 +174,7 @@
         (type 0))))
   (task
     (solutions)
-    (errors "not native")
+    (errors "type error")
     (typed nothing
       (native-application string-append
         (list
@@ -296,3 +296,13 @@
             (lambda ($0) $0))
           (variable 0))
         (type 2)))))
+
+; === eval-task ann lambda
+
+; (check-task=?
+;   (elab-task empty-env
+;     (ann
+;       (lambda-type native-type
+;         (lambda ($0) native-type))
+;       (lambda ($0) $0)))
+;   (task 123))

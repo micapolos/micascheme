@@ -239,18 +239,17 @@
                     ($lambda $arg))))))))))
 
   (define (resolve-task $env $expected $actual)
-    (task ($solutions $errors)
+    (or
       (switch $expected
-        ((native-type? $native-type)
-          (switch $actual
-            ((native-type? _)
-              (values $solutions $errors $native-type))
-            ((else $other)
-              (values $solutions (push $errors "not native") nothing))))
+        ((native-type? _)
+          (switch? $actual
+            ((native-type? $native-type)
+              (task $native-type))))
         ((else _)
-          (if (term=? $expected $actual)
-            (values $solutions $errors $expected)
-            (values $solutions (push $errors "type error") nothing))))))
+          (and
+            (term=? $expected $actual)
+            (task $actual))))
+      (push-error-task "type error" nothing)))
 
   (define (unpeel? $term)
     (switch? $term
