@@ -29,6 +29,8 @@
     lambda-type-apply
     recursion-apply
 
+    type+1
+
     branch-ref)
   (import (leo2 base))
 
@@ -108,4 +110,7 @@
 
   (define (branch-ref $branch $condition)
     ((if $condition branch-consequent branch-alternate) $branch))
+
+  (define (type+1 $type)
+    (type (+ (type-depth $type) 1)))
 )

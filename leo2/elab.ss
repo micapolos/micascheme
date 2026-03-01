@@ -30,7 +30,7 @@
   (define (type-of $term)
     (switch $term
       ((type? $type)
-        (type (+ (type-depth $type) 1)))
+        (type+1 $type))
       ((typed? $typed)
         (typed-type $typed))
       ((else _)
