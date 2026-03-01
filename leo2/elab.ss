@@ -5,9 +5,13 @@
     task->datum
     check-task=?
 
+    elab-task
+
     elab
     check-elabs
-    check-evaluates)
+    check-evaluates
+
+    check-elab-task=?)
   (import
     (leo2 base)
     (leo2 term)
@@ -24,7 +28,7 @@
       (lambda ($solutions $errors)
         (lets
           ((values $solutions $errors id) (first $solutions $errors))
-          (task-lets x ... (last $solutions $errors)))))
+          ((task-lets x ... last) $solutions $errors))))
     ((task-lets x) x))
 
   (define-list->/append (task $tasks)
@@ -57,6 +61,28 @@
             (elab* $meta-context $context (cdr $pair)))
           (values $meta-context
             (cons $typed-car $typed-cdr))))))
+
+  (define (elab-task $term)
+    (switch $term
+      ((typed? $typed)
+        (task $typed))
+      ((type? $type)
+        (task $type))
+      ((native-type? $native-type)
+        (task (typed (type 0) $native-type)))
+      ((native? $native)
+        (task (typed native-type $native)))
+      ((native-application? $native-application)
+        (task-lets
+          ($typed-args
+            (list->task
+              (map elab-task
+                (native-application-args $native-application))))
+          (task
+            (typed native-type
+              (native-application
+                (native-application-procedure $native-application)
+                $typed-args)))))))
 
   (define (elab $meta-context $context $term)
     (switch $term
@@ -288,6 +314,9 @@
             (elab meta-context context in))
           $typed)
         out)))
+
+  (define-rule-syntax (check-elab-task=? in out)
+    (check-task=? (elab-task in) out))
 
   (define-rules-syntax
     ((check-evaluates in out)

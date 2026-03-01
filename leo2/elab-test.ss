@@ -6,8 +6,27 @@
 ; === task
 
 (check-task=?
-  (task (native "foo"))
-  (task (native "foo")))
+  (task "foo")
+  (task "foo"))
+
+; === task-lets
+
+(check-task=?
+  (task-lets (task "foo"))
+  (task "foo"))
+
+(check-task=?
+  (task-lets
+    ($foo (task "foo"))
+    ($bar (task "bar"))
+    (task (string-append $foo $bar)))
+  (task "foobar"))
+
+; === list->task
+
+(check-task=?
+  (list->task (list (task (native "foo")) (task (native "bar"))))
+  (task (list (native "foo") (native "bar"))))
 
 ; === evaluate native
 
@@ -70,6 +89,45 @@
     (application
       (evaluated (typed nothing (evaluated (variable 0))))
       (evaluated (typed nothing (evaluated (native "foo")))))))
+
+; === elab-task typed
+
+(check-task=?
+  (elab-task (typed (variable 10) (variable 20)))
+  (task (typed (variable 10) (variable 20))))
+
+; === elab-task native-type
+
+(check-task=?
+  (elab-task native-type)
+  (task (typed (type 0) native-type)))
+
+; === elab-task type
+
+(check-task=?
+  (elab-task (type 0))
+  (task (type 0)))
+
+; === elab-task native
+
+(check-task=?
+  (elab-task (native "foo"))
+  (task (typed native-type (native "foo"))))
+
+; === elab-task native-application
+
+(check-task=?
+  (elab-task
+    (native-application string-append
+      (list
+        (native "foo")
+        (native "bar"))))
+  (task
+    (typed native-type
+      (native-application string-append
+      (list
+        (typed native-type (native "foo"))
+        (typed native-type (native "bar")))))))
 
 ; === typed
 
