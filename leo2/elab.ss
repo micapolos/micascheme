@@ -51,6 +51,11 @@
           ((task-lets x ... last) $solutions $errors))))
     ((task-lets x) x))
 
+  (define (task-result $task)
+    (lets
+      ((values $solution $errors $result) ($task '() '()))
+      $result))
+
   (define-list->/append (task $tasks)
     (switch-exhaustive $tasks
       ((null? $null)
@@ -129,7 +134,26 @@
             (error-task "unbound variable"
               (typed nothing $variable)))
           ((else $type)
-            (task (typed $type $variable)))))))
+            (task (typed $type $variable)))))
+      ((procedure-type? $procedure-type)
+        (task-lets
+          ($typed-param (elab-task $env (procedure-type-param $procedure-type)))
+          ($body (task (procedure-type-apply $procedure-type (variable 0))))
+          ($typed-body (elab-task (push $env (type-of $typed-param)) $body))
+          ($max-depth
+            (task
+              (max
+                (type-depth (type-of $typed-param))
+                (type-depth (type-of $typed-body)))))
+          (task
+            (typed
+              (type $max-depth)
+              (procedure-type $typed-param
+                (procedure ($arg)
+                  (task-result
+                    (elab-task
+                      (push $env (type-of $typed-param))
+                      (procedure-type-apply $procedure-type $arg)))))))))))
 
   (define (elab $meta-context $context $term)
     (switch $term
@@ -190,7 +214,7 @@
             (typed
               (type $max-depth)
               (procedure-type $typed-param
-                (lambda ($arg)
+                (procedure ($arg)
                   (lets
                     ((values _ $typed-body)
                       (elab $meta-context
@@ -215,14 +239,14 @@
           (values $meta-context
             (typed
               (procedure-type $param-type
-                (lambda ($arg)
+                (procedure ($arg)
                   (lets
                     ((values _ $typed-body)
                       (elab $meta-context
                         (push $context $param-type)
                         ($procedure $arg)))
                     (typed-type $typed-body))))
-              (lambda ($arg)
+              (procedure ($arg)
                 (lets
                   ((values _ $typed-body)
                     (elab $meta-context
@@ -336,7 +360,7 @@
               (native-application $procedure $evaluated-args)))))
       ((procedure? $procedure)
         (evaluated
-          (lambda ($0)
+          (procedure ($0)
             (evaluate $meta-context $context
               ($procedure $0)))))
       ((application? $application)

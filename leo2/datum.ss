@@ -71,7 +71,7 @@
           ((procedure? $procedure)
             (lets
               ($symbol (depth->symbol $depth))
-              `(lambda (,(depth->symbol $depth))
+              `(procedure (,(depth->symbol $depth))
                 ,(depth-term->datum
                   (+ $depth 1)
                   ($procedure (variable $depth))))))

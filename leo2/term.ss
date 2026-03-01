@@ -17,6 +17,7 @@
     typed typed? typed-type typed-ref
     ann ann? ann-type ann-ref
     labeled labeled? labeled-label labeled-ref
+    procedure
 
     mismatch mismatch? mismatch-expected mismatch-actual
     expected expected? expected-ref
@@ -76,6 +77,9 @@
       labeled
       evaluated
       typed))
+
+  (define-rule-syntax (procedure (id) body)
+    (lambda (id) body))
 
   (define (term-switch-template $term)
     (term-switch $term
