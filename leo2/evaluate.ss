@@ -14,7 +14,39 @@
         (native?
           (evaluated-ref $evaluated)))))
 
-  (define (evaluate $term)
+  (define (evaluate $obj)
+    (switch $obj
+      ((primitive? $primitive)
+        (evaluated $primitive))
+      ((pair? $pair)
+        (evaluated (pair-map evaluate $pair)))
+      ((vector? $vector)
+        (evaluated (vector-map evaluate $vector)))
+      ((mismatch? $mismatch)
+        (evaluated
+          (mismatch
+            (evaluate (mismatch-expected $mismatch))
+            (evaluate (mismatch-actual $mismatch)))))
+      ((expected? $expected)
+        (evaluated
+          (expected
+            (evaluate (expected-ref $expected)))))
+      ((actual? $actual)
+        (evaluated
+          (actual
+            (evaluate (actual-ref $actual)))))
+      ((unbound? $unbound)
+        (evaluated
+          (unbound
+            (evaluate (unbound-ref $unbound)))))
+      ((native-type? $native-type)
+        (evaluated $native-type))
+      ((unknown? $unknown)
+        (evaluated $unknown))
+      ((else $term)
+        (evaluate-term $term))))
+
+  (define (evaluate-term $term)
     (term-switch $term
       ((hole? $hole)
         (evaluated $hole))
