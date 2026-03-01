@@ -3,6 +3,7 @@
     task task-lets
     list->task task-append
     task->datum
+    error-task
     check-task=?
 
     elab-task
@@ -57,6 +58,13 @@
           ($cdr (list->task (cdr $pair)))
           (task (cons $car $cdr))))))
 
+  (define (error-task $error $result)
+    (task ($solutions $errors)
+      (values
+        $solutions
+        (push $errors $error)
+        $result)))
+
   (define (task->datum $task)
     (lets
       ((values $solutions $errors $result) ($task '() '()))
@@ -88,6 +96,8 @@
     (switch $term
       ((typed? $typed)
         (task $typed))
+      ((ann? $ann)
+        (check-task (ann-type $ann) (ann-ref $ann)))
       ((type? $type)
         (task $type))
       ((native-type? $native-type)

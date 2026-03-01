@@ -96,6 +96,17 @@
   (elab-task (typed (variable 10) (variable 20)))
   (task (typed (variable 10) (variable 20))))
 
+; === elab-task ann
+
+(check-task=?
+  (elab-task (ann (type 1) (type 0)))
+  (task (typed (type 1) (type 0))))
+
+(check-task=?
+  (elab-task (ann (type 2) (type 0)))
+  (error-task "type error"
+    (typed nothing (type 0))))
+
 ; === elab-task native-type
 
 (check-task=?
@@ -135,15 +146,12 @@
       (list
         (native "foo")
         (type 0))))
-  (task ($solutions $errors)
-    (values
-      (list)
-      (push $errors "not native")
-      (typed native-type
-        (native-application string-append
-          (list
-            (typed native-type (native "foo"))
-            (typed nothing (type 0))))))))
+  (error-task "not native"
+    (typed native-type
+      (native-application string-append
+        (list
+          (typed native-type (native "foo"))
+          (typed nothing (type 0)))))))
 
 ; === typed
 
