@@ -3,6 +3,7 @@
     task task-lets
     list->task task-append
     task->datum
+    task-apply
     push-error-task
     push-solution-task
     solutions-task
@@ -56,8 +57,11 @@
 
   (define (task-result $task)
     (lets
-      ((values $solution $errors $result) ($task '() '()))
+      ((values $solution $errors $result) (task-apply $task '() '()))
       $result))
+
+  (define (task-apply $task $solutions $errors)
+    ($task $solutions $errors))
 
   (define solutions-task
     (task ($solutions $errors)
