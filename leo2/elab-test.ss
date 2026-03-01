@@ -114,68 +114,6 @@
         (evaluated native-type)
         (evaluated (native "foo"))))))
 
-; === evaluate native
-
-(check-evaluates
-  (native "foo")
-  (evaluated (native "foo")))
-
-; === evaluate typed native
-
-(check-evaluates
-  (typed nothing (native "foo"))
-  (evaluated
-    (typed nothing
-      (evaluated (native "foo")))))
-
-; === evaluate native-application
-
-(check-evaluates
-  (native-application string-append
-    (list
-      (typed nothing (native "foo"))
-      (typed nothing (native "bar"))))
-   (evaluated (native "foobar")))
-
-; === evaluate typed native-application
-
-(check-evaluates
-  (typed nothing
-    (native-application string-append
-      (list
-        (typed nothing (native "foo"))
-        (typed nothing (native "bar")))))
-  (evaluated
-    (typed nothing
-      (evaluated (native "foobar")))))
-
-; === evaluate lambda?
-
-(check-evaluates
-  (lambda ($0) $0)
-  (evaluated (lambda ($0) (evaluated $0))))
-
-; === evaluate application
-
-(check-evaluates
-  (application
-    (typed nothing (lambda ($0) $0))
-    (typed nothing (native "foo")))
-  (evaluated
-    (typed nothing
-      (evaluated (native "foo")))))
-
-; === evaluate application
-
-(check-evaluates
-  (application
-    (typed nothing (variable 0))
-    (typed nothing (native "foo")))
-  (evaluated
-    (application
-      (evaluated (typed nothing (evaluated (variable 0))))
-      (evaluated (typed nothing (evaluated (native "foo")))))))
-
 ; === elab-task typed
 
 (check-task=?

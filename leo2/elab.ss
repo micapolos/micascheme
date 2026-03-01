@@ -8,7 +8,6 @@
     push-solution-task
     solutions-task
     errors-task
-    check-task=?
     empty-env
     solutions
     errors
@@ -16,9 +15,7 @@
     elab-task
     eval-task
 
-    check-evaluates
-
-    check-elab-task=?)
+    check-task=?)
   (import
     (leo2 base)
     (leo2 term)
@@ -241,12 +238,6 @@
                     (push $env $param-type)
                     ($lambda $arg))))))))))
 
-  (define (meta-context-index $meta-context $hole)
-    (-
-      (length $meta-context)
-      (hole-index $hole)
-      1))
-
   (define (resolve-task $env $expected $actual)
     (task ($solutions $errors)
       (switch $expected
@@ -260,40 +251,6 @@
           (if (term=? $expected $actual)
             (values $solutions $errors $expected)
             (values $solutions (push $errors "type error") nothing))))))
-
-  (define (meta-resolve $meta-context $context $expected $actual)
-    (switch $expected
-      ((hole? $expected-hole)
-        (lets
-          ($index (meta-context-index $meta-context $expected-hole))
-          (switch (list-ref $meta-context $index)
-            ((unknown? _)
-              (values
-                (list-set $meta-context $index $actual)
-                $actual))
-            ((else $term)
-              (meta-resolve $meta-context $context $term $actual)))))
-      ((else $expected-other)
-        (switch $actual
-          ((hole? $actual-hole)
-            (meta-resolve $meta-context $context $actual-hole $expected-other))
-          ((else $actual-other)
-            (if (term=? $expected-other $actual-other)
-              (values $meta-context $actual-other)
-              (values $meta-context
-                (mismatch
-                  (expected $expected-other)
-                  (actual $actual-other)))))))))
-
-  (define (infer $meta-context $context $term)
-    (switch $term
-      ((typed? $typed)
-        (values $meta-context (typed-type $typed)))
-      ((else $other)
-        (throw infer $meta-context $context $term))))
-
-  (define (cast $meta-context $context $type $term)
-    (todo))
 
   (define (unpeel? $term)
     (switch? $term
@@ -361,77 +318,9 @@
       ((else $other)
         (throw eval-task $env $other))))
 
-  (define (evaluate $meta-context $context $term)
-    (switch $term
-      ((evaluated? $evaluated)
-        $evaluated)
-      ((native? $native)
-        (evaluated $native))
-      ((native-application? $native-application)
-        (lets
-          ($lambda
-            (native-application-lambda $native-application))
-          ($evaluated-args
-            (map
-              (partial evaluate $meta-context $context)
-              (native-application-args $native-application)))
-          ($typed-args (map evaluated-ref $evaluated-args))
-          ($evaluated-args (map typed-ref $typed-args))
-          ($args (map evaluated-ref $evaluated-args))
-          (evaluated
-            (if (for-all native? $args)
-              (native (apply $lambda (map native-ref $args)))
-              (native-application $lambda $evaluated-args)))))
-      ((lambda? $lambda)
-        (evaluated
-          (lambda ($0)
-            (evaluate $meta-context $context
-              ($lambda $0)))))
-      ((application? $application)
-        (lets
-          ($evaluated-lhs
-            (evaluate $meta-context $context (application-lhs $application)))
-          ($evaluated-rhs
-            (evaluate $meta-context $context (application-rhs $application)))
-          (switch (evaluated-ref (typed-ref (evaluated-ref $evaluated-lhs)))
-            ((lambda? $lambda)
-              ($lambda $evaluated-rhs))
-            ((else _)
-              (evaluated (application $evaluated-lhs $evaluated-rhs))))))
-      ((typed? $typed)
-        (evaluated
-          (typed
-            (typed-type $typed)
-            (evaluate $meta-context $context (typed-ref $typed)))))
-      ; TODO
-      ((else $other)
-        (evaluated $other))))
-
   (define-rule-syntax (check-task=? in out)
     (check
       (equal?
         (task->datum in)
         (task->datum out))))
-
-  (define-rules-syntax
-    ((check-elabs in out)
-      (check-elabs '() '() in out))
-    ((check-elabs meta-context context in out)
-      (check-term-datum=?
-        (lets
-          ((values $meta-context $typed)
-            (elab meta-context context in))
-          $typed)
-        out)))
-
-  (define-rule-syntax (check-elab-task=? in out)
-    (check-task=? (elab-task empty-env in) out))
-
-  (define-rules-syntax
-    ((check-evaluates in out)
-      (check-evaluates '() '() in out))
-    ((check-evaluates meta-context context in out)
-      (check-term-datum=?
-        (evaluate meta-context context in)
-        out)))
 )
