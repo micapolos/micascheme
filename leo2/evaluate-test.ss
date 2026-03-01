@@ -4,6 +4,31 @@
   (leo2 evaluate)
   (leo2 datum))
 
+(check-evaluates '() (evaluated '()))
+(check-evaluates #f (evaluated #f))
+(check-evaluates 123 (evaluated 123))
+(check-evaluates #\a (evaluated #\a))
+(check-evaluates "foo" (evaluated "foo"))
+(check-evaluates 'foo (evaluated 'foo))
+(check-evaluates (bytevector 1 2 3) (evaluated (bytevector 1 2 3)))
+
+(check-evaluates
+  (cons 10 20)
+  (evaluated
+    (cons
+      (evaluated 10)
+      (evaluated 20))))
+
+(check-evaluates
+  (vector 10 20)
+  (evaluated
+    (vector
+      (evaluated 10)
+      (evaluated 20))))
+
+(check-evaluates native-type (evaluated native-type))
+(check-evaluates unknown (evaluated unknown))
+
 (check-evaluates (hole 12) (evaluated (hole 12)))
 
 (check-evaluates nothing (evaluated nothing))
