@@ -46,6 +46,33 @@
   (eval-task empty-env native-type)
   (task (evaluated native-type)))
 
+; === eval-task native
+
+(check-task=?
+  (eval-task empty-env (native "foo"))
+  (task (evaluated (native "foo"))))
+
+; === eval-task typed
+
+(check-task=?
+  (eval-task empty-env
+    (typed native-type (native "foo")))
+  (task
+    (evaluated
+      (typed
+        (evaluated native-type)
+        (evaluated (native "foo"))))))
+
+; === eval-task native-application
+
+(check-task=?
+  (eval-task empty-env
+    (native-application string-append
+      (list
+        (typed native-type (native "foo"))
+        (typed native-type (native "bar")))))
+  (task (evaluated (native "foobar"))))
+
 ; === evaluate native
 
 (check-evaluates

@@ -292,6 +292,13 @@
   (define (cast $meta-context $context $type $term)
     (todo))
 
+  (define (unpeel? $term)
+    (switch? $term
+      ((evaluated? $evaluated)
+        (switch? (value-of (evaluated-ref $evaluated))
+          ((evaluated? $evaluated)
+            (evaluated-ref $evaluated))))))
+
   (define (eval-task $env $term)
     (switch $term
       ((evaluated? $evaluated)
@@ -300,10 +307,29 @@
         (task (evaluated $type)))
       ((native-type? $native-type)
         (task (evaluated $native-type)))
+      ((native? $native)
+        (task (evaluated $native)))
+      ((native-application? $native-application)
+        (task-lets
+          ($lambda
+            (task
+              (native-application-lambda $native-application)))
+          ($evaluated-args
+            (list->task
+              (map
+                (partial eval-task $env)
+                (native-application-args $native-application))))
+          ($unpeeled-args (task (map unpeel? $evaluated-args)))
+          (task
+            (evaluated
+              (if (for-all native? $unpeeled-args)
+                (native (apply $lambda (map native-ref $unpeeled-args)))
+                (native-application $lambda $evaluated-args))))))
       ((typed? $typed)
-        (apply-task typed
-          (eval-task $env (typed-type $typed))
-          (eval-task $env (typed-ref $typed))))))
+        (apply-task evaluated
+          (apply-task typed
+            (eval-task $env (typed-type $typed))
+            (eval-task $env (typed-ref $typed)))))))
 
   (define (evaluate $meta-context $context $term)
     (switch $term
