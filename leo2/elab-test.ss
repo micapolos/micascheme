@@ -89,6 +89,18 @@
       (lambda ($0)
         (evaluated $0)))))
 
+; === eval-task lambda-type
+
+(check-task=?
+  (eval-task empty-env
+    (lambda-type (type 0)
+      (lambda ($0) $0)))
+  (task
+     (evaluated
+      (lambda-type
+        (evaluated (type 0))
+        (evaluated (lambda ($0) (evaluated $0)))))))
+
 ; === evaluate native
 
 (check-evaluates

@@ -335,6 +335,11 @@
             (eval-task $env (typed-ref $typed)))))
       ((variable? $variable)
         (task (evaluated $variable)))
+      ((lambda-type? $lambda-type)
+        (apply-task evaluated
+          (apply-task lambda-type
+            (eval-task $env (lambda-type-param $lambda-type))
+            (eval-task $env (lambda-type-lambda $lambda-type)))))
       ((lambda? $lambda)
         (task
           (evaluated
