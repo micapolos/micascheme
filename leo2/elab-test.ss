@@ -147,7 +147,7 @@
         (native "foo")
         (type 0))))
   (error-task "not native"
-    (typed native-type
+    (typed nothing
       (native-application string-append
         (list
           (typed native-type (native "foo"))

@@ -111,7 +111,10 @@
               (map (partial check-task native-type)
                 (native-application-args $native-application))))
           (task
-            (typed native-type
+            (typed
+              (if (for-all native-type? (map type-of $typed-args))
+                native-type
+                nothing)
               (native-application
                 (native-application-procedure $native-application)
                 $typed-args)))))))
