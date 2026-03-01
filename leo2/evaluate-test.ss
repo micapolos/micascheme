@@ -10,7 +10,10 @@
 (check-evaluates #\a (evaluated #\a))
 (check-evaluates "foo" (evaluated "foo"))
 (check-evaluates 'foo (evaluated 'foo))
-(check-evaluates (bytevector 1 2 3) (evaluated (bytevector 1 2 3)))
+
+(check-evaluates
+  (bytevector 1 2 3)
+  (evaluated (bytevector 1 2 3)))
 
 (check-evaluates
   (cons 10 20)
