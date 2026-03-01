@@ -268,6 +268,8 @@
                     (solve-task $env $other $actual)
                     $solutions
                     $errors))))))
+        ((unknown? _)
+          (task $actual))
         ((native-type? _)
           (switch? $actual
             ((native-type? $native-type)
