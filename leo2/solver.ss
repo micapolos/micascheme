@@ -100,31 +100,31 @@
         (list-set $solutions (solutions-index $solutions $hole) $term)
         $term)))
 
-  (define (term-solver $env $expected $actual)
+  (define (term-solver $depth $expected $actual)
     (switch $actual
       ((hole? $actual-hole)
-        (term-solver $env $actual $expected))
+        (term-solver $depth $actual $expected))
       ((else $actual-other)
-        (non-hole-term-solver $env $expected $actual-other))))
+        (non-hole-term-solver $depth $expected $actual-other))))
 
-  (define (non-hole-term-solver $env $expected $actual)
+  (define (non-hole-term-solver $depth $expected $actual)
     (or
       (switch $expected
         ((evaluated? $expected-evaluated)
           (switch? $actual
             ((evaluated? $actual-evaluated)
               (apply-solver evaluated
-                (term-solver $env
+                (term-solver $depth
                   (evaluated-ref $expected-evaluated)
                   (evaluated-ref $actual-evaluated))))))
         ((typed? $expected-typed)
           (switch? $actual
             ((typed? $actual-typed)
               (apply-solver typed
-                (term-solver $env
+                (term-solver $depth
                   (typed-type $expected-typed)
                   (typed-type $actual-typed))
-                (term-solver $env
+                (term-solver $depth
                   (typed-ref $expected-typed)
                   (typed-ref $actual-typed))))))
         ((hole? $hole)
@@ -136,7 +136,7 @@
               ((unknown? _)
                 (solutions-set-solver $hole $actual))
               ((else $other)
-                (term-solver $env $other $actual)))))
+                (term-solver $depth $other $actual)))))
         ((unknown? _)
           (solver $actual))
         ((native-type? _)
@@ -165,18 +165,18 @@
               (solver-lets
                 ($body
                   (term-solver
-                    (push $env unknown)
-                    ($expected-lambda (variable (length $env)))
-                    ($actual-lambda (variable (length $env)))))
+                    (+ $depth 1)
+                    ($expected-lambda (variable $depth))
+                    ($actual-lambda (variable $depth))))
                 (solver (lambda ($0) $body))))))
         ((lambda-type? $expected-lambda-type)
           (switch? $actual
             ((lambda-type? $actual-lambda-type)
               (apply-solver lambda-type
-                (term-solver $env
+                (term-solver $depth
                   (lambda-type-param $expected-lambda-type)
                   (lambda-type-param $actual-lambda-type))
-                (term-solver $env
+                (term-solver $depth
                   (lambda-type-lambda $expected-lambda-type)
                   (lambda-type-lambda $actual-lambda-type))))))
         ; TODO: Cover all term types, and don't use term=?
