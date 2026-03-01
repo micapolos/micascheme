@@ -104,7 +104,7 @@
 
 (check-task=?
   (elab-task empty-env (ann (type 2) (type 0)))
-  (error-task "type error"
+  (push-error-task "type error"
     (typed nothing (type 0))))
 
 ; === elab-task native-type
@@ -146,7 +146,7 @@
       (list
         (native "foo")
         (type 0))))
-  (error-task "not native"
+  (push-error-task "not native"
     (typed nothing
       (native-application string-append
         (list
@@ -165,7 +165,7 @@
 
 (check-task=?
   (elab-task (stack (type 10) (type 20)) (variable 2))
-  (error-task "unbound variable"
+  (push-error-task "unbound variable"
     (typed nothing (variable 2))))
 
 ; === elab-task lambda-type

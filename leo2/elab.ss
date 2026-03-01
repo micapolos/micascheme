@@ -3,7 +3,8 @@
     task task-lets
     list->task task-append
     task->datum
-    error-task
+    push-error-task
+    push-solution-task
     solutions-task
     errors-task
     check-task=?
@@ -76,11 +77,18 @@
           ($cdr (list->task (cdr $pair)))
           (task (cons $car $cdr))))))
 
-  (define (error-task $error $result)
+  (define (push-error-task $error $result)
     (task ($solutions $errors)
       (values
         $solutions
         (push $errors $error)
+        $result)))
+
+  (define (push-solution-task $solution $result)
+    (task ($solutions $errors)
+      (values
+        (push $solutions $solution)
+        $errors
         $result)))
 
   (define (task->datum $task)
@@ -141,7 +149,7 @@
       ((variable? $variable)
         (switch (list-ref? $env (variable-index $variable))
           ((false? _)
-            (error-task "unbound variable"
+            (push-error-task "unbound variable"
               (typed nothing $variable)))
           ((else $type)
             (task (typed $type $variable)))))
