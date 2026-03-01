@@ -15,8 +15,6 @@
 
     elab-task
 
-    elab
-    check-elabs
     check-evaluates
 
     check-elab-task=?)
@@ -117,19 +115,6 @@
         (solutions ,@(reverse (map term->datum $solutions)))
         (errors ,@(reverse (map term->datum $errors)))
         (result ,(term->datum $result)))))
-
-  (define (elab* $meta-context $context $terms)
-    (switch-exhaustive $terms
-      ((null? $null)
-        (values $meta-context $null))
-      ((pair? $pair)
-        (lets
-          ((values $meta-context $typed-car)
-            (elab $meta-context $context (car $pair)))
-          ((values $meta-context $typed-cdr)
-            (elab* $meta-context $context (cdr $pair)))
-          (values $meta-context
-            (cons $typed-car $typed-cdr))))))
 
   (define (check-task $env $type $term)
     (task-lets
@@ -240,134 +225,6 @@
                   (elab-task
                     (push $env $param-type)
                     ($lambda $arg))))))))))
-
-  (define (elab $meta-context $context $term)
-    (switch $term
-      ((typed? $typed)
-        (values $meta-context $typed))
-
-      ((ann? $ann)
-        (lets
-          ((values $meta-context $typed)
-            (elab $meta-context $context (ann-ref $ann)))
-          ((values $meta-context $type)
-            (meta-resolve $meta-context $context
-              (ann-type $ann)
-              (typed-type $typed)))
-          (values $meta-context
-            (typed $type (typed-ref $typed)))))
-
-      ((native? $native)
-        (values $meta-context
-          (typed native-type $native)))
-
-      ((native-application? $native-application)
-        (lets
-          ((values $meta-context $typed-args)
-            (elab* $meta-context $context
-              (native-application-args $native-application)))
-          (values $meta-context
-            (typed native-type
-              (native-application
-                (native-application-lambda $native-application)
-                $typed-args)))))
-
-      ((type? $type)
-        (values $meta-context
-          (typed
-            (type (+ (type-depth $type) 1))
-            $type)))
-
-      ((native-type? $native-type)
-        (values $meta-context
-          (typed (type 0) $native-type)))
-
-      ((lambda-type? $lambda-type)
-        (lets
-          ((values $meta-context $typed-param)
-            (elab $meta-context $context
-              (lambda-type-param $lambda-type)))
-          ($body (lambda-type-apply $lambda-type (variable 0)))
-          ((values $meta-context $typed-body)
-            (elab $meta-context
-              (push $context (typed-type $typed-param))
-              $body))
-          ($max-depth
-            (max
-              (type-depth (typed-type $typed-param))
-              (type-depth (typed-type $typed-body))))
-          (values $meta-context
-            (typed
-              (type $max-depth)
-              (lambda-type $typed-param
-                (lambda ($arg)
-                  (lets
-                    ((values _ $typed-body)
-                      (elab $meta-context
-                        (push $context (typed-type $typed-param))
-                        (lambda-type-apply $lambda-type $arg)))
-                    $typed-body)))))))
-
-      ((variable? $variable)
-        (values $meta-context
-          (typed
-            (list-ref $context (variable-index $variable))
-            $variable)))
-
-      ((lambda? $lambda)
-        (lets
-          ($param-type (hole (length $meta-context)))
-          ($meta-context (push $meta-context unknown))
-          ($body-context (push $context $param-type))
-          ($body ($lambda (variable 0)))
-          ((values $meta-context $typed-body)
-            (elab $meta-context $body-context $body))
-          (values $meta-context
-            (typed
-              (lambda-type $param-type
-                (lambda ($arg)
-                  (lets
-                    ((values _ $typed-body)
-                      (elab $meta-context
-                        (push $context $param-type)
-                        ($lambda $arg)))
-                    (typed-type $typed-body))))
-              (lambda ($arg)
-                (lets
-                  ((values _ $typed-body)
-                    (elab $meta-context
-                      (push $context $param-type)
-                      ($lambda $arg)))
-                  $typed-body))))))
-
-      ((application? $application)
-        (lets
-          ((values $meta-context $typed-lhs)
-            (elab $meta-context $context (application-lhs $application)))
-          ((values $meta-context $typed-rhs)
-            (elab $meta-context $context (application-rhs $application)))
-          (switch (typed-type $typed-lhs)
-            ((lambda-type? $lambda-type)
-              (lets
-                ((values $meta-context $type)
-                  (meta-resolve $meta-context $context
-                    (lambda-type-param $lambda-type)
-                    (typed-type $typed-rhs)))
-                (values $meta-context
-                  (typed
-                    (lambda-type-apply $lambda-type $typed-rhs)
-                    (application $typed-lhs $typed-rhs)))))
-            ((else $other)
-              (values $meta-context
-                (typed
-                  (typed (type 0)
-                    (application
-                      (typed-type $typed-lhs)
-                      (typed-type $typed-rhs)))
-                  (application $typed-lhs $typed-rhs)))))))
-
-      ((else $other)
-        (throw elab $meta-context $context $other))))
 
   (define (meta-context-index $meta-context $hole)
     (-

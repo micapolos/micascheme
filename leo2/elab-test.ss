@@ -206,11 +206,17 @@
       (lambda-type (hole 0) (lambda ($0) (hole 0)))
       (lambda ($0) (typed (hole 0) $0)))))
 
-; (check-elabs
-;   (lambda ($arg) (typed (type 0) (native "string")))
-;   (typed
-;     (lambda-type (hole 0) (lambda (v0) (type 0)))
-;     (lambda (v0) (typed (type 0) (native "string")))))
+(check-task=?
+  (elab-task empty-env
+    (lambda ($arg) (native "string")))
+  (task
+    (solutions unknown)
+    (errors)
+    (typed
+      (lambda-type (hole 0)
+        (lambda ($0) native-type))
+      (lambda ($0)
+        (typed native-type (native "string"))))))
 
 ; === elab-task application
 
@@ -266,130 +272,3 @@
             (lambda ($0) $0))
           (variable 0))
         (type 2)))))
-
-; === typed
-
-(check-elabs
-  (typed (type 0) (native "foo"))
-  (typed (type 0) (native "foo")))
-
-; === ann
-
-(check-elabs
-  (ann (type 0) (typed (type 0) (native "foo")))
-  (typed (type 0) (native "foo")))
-
-(check-elabs
-  (ann (type 1) (typed (type 0) (native "foo")))
-  (typed
-    (mismatch
-      (expected (type 1))
-      (actual (type 0)))
-    (native "foo")))
-
-; === native-type
-
-(check-elabs
-  native-type
-  (typed (type 0) native-type))
-
-; === native
-
-(check-elabs
-  (native "foo")
-  (typed native-type (native "foo")))
-
-; === native-application
-
-(check-elabs
-  (native-application string-append
-    (list (native "foo") (native "bar")))
-  (typed native-type
-    (native-application string-append
-    (list
-      (typed native-type (native "foo"))
-      (typed native-type (native "bar"))))))
-
-; === type
-
-(check-elabs
-  (type 0)
-  (typed (type 1) (type 0)))
-
-(check-elabs
-  (type 1)
-  (typed (type 2) (type 1)))
-
-; === lambda-type
-
-(check-elabs
-  (lambda-type
-    (typed (type 0) (native "string"))
-    (lambda (_)
-      (typed (type 0) (native "number"))))
-  (typed
-    (type 0)
-    (lambda-type
-      (typed (type 0) (native "string"))
-      (lambda (_)
-        (typed (type 0) (native "number"))))))
-
-(check-elabs
-  (lambda-type
-    (typed (type 0) (native "string"))
-    (lambda ($arg) $arg))
-  (typed
-    (type 0)
-    (lambda-type
-      (typed (type 0) (native "string"))
-      (lambda (v0)
-        (typed (type 0) v0)))))
-
-; === lambda
-
-(check-elabs
-  (lambda ($arg) $arg)
-  (typed
-    (lambda-type (hole 0) (lambda (v0) (hole 0)))
-    (lambda (v0) (typed (hole 0) v0))))
-
-(check-elabs
-  (lambda ($arg) (typed (type 0) (native "string")))
-  (typed
-    (lambda-type (hole 0) (lambda (v0) (type 0)))
-    (lambda (v0) (typed (type 0) (native "string")))))
-
-; === application
-
-(check-elabs
-  (application
-    (lambda ($arg) $arg)
-    (typed (type 0) (native "string")))
-  (typed (type 0)
-    (application
-      (typed
-        (lambda-type (hole 0) (lambda (v0) (hole 0)))
-        (lambda (v0) (typed (hole 0) v0)))
-      (typed (type 0) (native "string")))))
-
-(check-elabs
-  (application
-    (lambda (_) (typed (type 0) (native "number")))
-    (typed (type 0) (native "string")))
-  (typed
-    (type 0)
-    (application
-      (typed
-        (lambda-type (hole 0) (lambda (_) (type 0)))
-        (lambda (_) (typed (type 0) (native "number"))))
-      (typed (type 0) (native "string")))))
-
-(check-elabs
-  (application
-    (typed (type 0) (native "string"))
-    (typed (type 0) (native "string")))
-  (typed
-    (typed (type 0) (application (type 0) (type 0)))
-    (application
-      (typed (type 0) (native "string"))
-      (typed (type 0) (native "string")))))
