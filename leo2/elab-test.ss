@@ -118,6 +118,23 @@
       (actual (native "bar")))
     nothing))
 
+; evaluated
+(check-task=?
+  (solve-task empty-env
+    (evaluated (native "foo"))
+    (evaluated (native "foo")))
+  (task (evaluated (native "foo"))))
+
+(check-task=?
+  (solve-task empty-env
+    (evaluated (native "foo"))
+    (evaluated (native "bar")))
+  (push-error-task
+    (mismatch
+      (expected (native "foo"))
+      (actual (native "bar")))
+    (evaluated nothing)))
+
 ; ==================== eval-task =======================
 
 ; === eval-task native

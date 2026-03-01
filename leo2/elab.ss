@@ -245,6 +245,16 @@
                     (push $env $param-type)
                     ($lambda $arg))))))))))
 
+  (define-rules-syntax
+    ((solve-task-lets x) x)
+    ((solve-task-lets (id x) rest ...)
+      (lets-task (id x)
+        (switch id
+          ((nothing? $nothing)
+            (task $nothing))
+          ((else $other)
+            (solve-task-lets rest ...))))))
+
   (define (solve-task $env $expected $actual)
     (or
       (switch $expected
@@ -252,14 +262,10 @@
           (switch? $actual
             ((evaluated? $actual-evaluated)
               (task-lets
-                ($solved-ref
+                (apply-task evaluated
                   (solve-task $env
                     (evaluated-ref $expected-evaluated)
-                    (evaluated-ref $actual-evaluated)))
-                (task
-                  (switch $solved-ref
-                    ((nothing? $nothing) $nothing)
-                    ((else $other) (evaluated $other))))))))
+                    (evaluated-ref $actual-evaluated)))))))
         ((hole? $hole)
           (task ($solutions $errors)
             (lets
