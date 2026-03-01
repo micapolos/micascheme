@@ -5,6 +5,7 @@
     task->datum
     error-task
     check-task=?
+    empty-env
 
     elab-task
 
@@ -18,6 +19,8 @@
     (leo2 term)
     (leo2 datum)
     (leo2 equal))
+
+  (define empty-env '())
 
   (define (type-of $term)
     (switch-exhaustive $term
@@ -86,18 +89,20 @@
           (values $meta-context
             (cons $typed-car $typed-cdr))))))
 
-  (define (check-task $type $term)
+  (define (check-task $env $type $term)
     (task-lets
-      ($typed (elab-task $term))
-      ($type (resolve-task $type (type-of $typed)))
+      ($typed (elab-task $env $term))
+      ($type (resolve-task $env $type (type-of $typed)))
       (task (typed-from $type (value-of $typed)))))
 
-  (define (elab-task $term)
+  (define (elab-task $env $term)
     (switch $term
       ((typed? $typed)
         (task $typed))
       ((ann? $ann)
-        (check-task (ann-type $ann) (ann-ref $ann)))
+        (check-task $env
+          (ann-type $ann)
+          (ann-ref $ann)))
       ((type? $type)
         (task $type))
       ((native-type? $native-type)
@@ -108,7 +113,7 @@
         (task-lets
           ($typed-args
             (list->task
-              (map (partial check-task native-type)
+              (map (partial check-task $env native-type)
                 (native-application-args $native-application))))
           (task
             (typed
@@ -253,7 +258,7 @@
       (hole-index $hole)
       1))
 
-  (define (resolve-task $expected $actual)
+  (define (resolve-task $env $expected $actual)
     (task ($solutions $errors)
       (switch $expected
         ((native-type? $native-type)
@@ -365,7 +370,7 @@
         out)))
 
   (define-rule-syntax (check-elab-task=? in out)
-    (check-task=? (elab-task in) out))
+    (check-task=? (elab-task empty-env in) out))
 
   (define-rules-syntax
     ((check-evaluates in out)

@@ -93,42 +93,42 @@
 ; === elab-task typed
 
 (check-task=?
-  (elab-task (typed (variable 10) (variable 20)))
+  (elab-task empty-env (typed (variable 10) (variable 20)))
   (task (typed (variable 10) (variable 20))))
 
 ; === elab-task ann
 
 (check-task=?
-  (elab-task (ann (type 1) (type 0)))
+  (elab-task empty-env (ann (type 1) (type 0)))
   (task (typed (type 1) (type 0))))
 
 (check-task=?
-  (elab-task (ann (type 2) (type 0)))
+  (elab-task empty-env (ann (type 2) (type 0)))
   (error-task "type error"
     (typed nothing (type 0))))
 
 ; === elab-task native-type
 
 (check-task=?
-  (elab-task native-type)
+  (elab-task empty-env native-type)
   (task (typed (type 0) native-type)))
 
 ; === elab-task type
 
 (check-task=?
-  (elab-task (type 0))
+  (elab-task empty-env (type 0))
   (task (type 0)))
 
 ; === elab-task native
 
 (check-task=?
-  (elab-task (native "foo"))
+  (elab-task empty-env (native "foo"))
   (task (typed native-type (native "foo"))))
 
 ; === elab-task native-application
 
 (check-task=?
-  (elab-task
+  (elab-task empty-env
     (native-application string-append
       (list
         (native "foo")
@@ -141,7 +141,7 @@
         (typed native-type (native "bar")))))))
 
 (check-task=?
-  (elab-task
+  (elab-task empty-env
     (native-application string-append
       (list
         (native "foo")
