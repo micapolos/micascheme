@@ -111,8 +111,6 @@
     (switch (unpeel $lhs)
       ((lambda? $lambda)
         ($lambda $rhs))
-      ((lambda-type? $lambda-type)
-        (lambda-type-apply $lambda-type $rhs))
       ((recursion? $recursion)
         (term-apply (recursion-apply $recursion $lhs) $rhs))
       ((else _)
