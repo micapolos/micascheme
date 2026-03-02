@@ -8,6 +8,7 @@
   (leo2 equal)
   (leo2 typed-term)
   (leo2 dependent)
+  (leo2 unpeel)
   (leo2 evaluate)
   (leo2 reify)
   (leo2 untyped)

@@ -7,18 +7,8 @@
     (leo2 term)
     (leo2 datum)
     (leo2 equal)
+    (leo2 unpeel)
     (leo2 typed-term))
-
-  (define (unpeel $term)
-    (switch $term
-      ((evaluated? $evaluated)
-        (unpeel (evaluated-ref $evaluated)))
-      ((labeled? $labeled)
-        (unpeel (labeled-ref $labeled)))
-      ((typed? $typed)
-        (unpeel (typed-ref $typed)))
-      ((else $unpeeled)
-        $unpeeled)))
 
   (define (evaluate $obj)
     (switch $obj
