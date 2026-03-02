@@ -23,6 +23,7 @@
     (leo2 term)
     (leo2 datum)
     (leo2 solver)
+    (leo2 evaluate)
     (leo2 equal))
 
   (define empty-env '())
@@ -174,10 +175,10 @@
   (define (check-elaborator $env $type $term)
     (elaborator-lets
       ($typed (term-elaborator $env $term))
-      ($expected-type (eval-elaborator $env $type))
-      ($actual-type (eval-elaborator $env (type-of $typed)))
+      ($expected-type (transitional-eval-elaborator $env $type))
+      ($actual-type (transitional-eval-elaborator $env (type-of $typed)))
       ($type (solve-elaborator $env $expected-type $actual-type))
-      ($evaluated-type (eval-elaborator $env $type))
+      ($evaluated-type (transitional-eval-elaborator $env $type))
       (elaborator (typed-from $evaluated-type (value-of $typed)))))
 
   (define (term-elaborator $env $term)
@@ -215,8 +216,8 @@
           (switch (type-of $typed-lhs)
             ((lambda-type? $lambda-type)
               (elaborator-lets
-                ($eval-param (eval-elaborator $env (lambda-type-param $lambda-type)))
-                ($eval-rhs-type (eval-elaborator $env (type-of $typed-rhs)))
+                ($eval-param (transitional-eval-elaborator $env (lambda-type-param $lambda-type)))
+                ($eval-rhs-type (transitional-eval-elaborator $env (type-of $typed-rhs)))
                 ($type (solve-elaborator $env $eval-param $eval-rhs-type))
                 (switch $type
                   ((nothing? $nothing)
@@ -286,31 +287,10 @@
                     (push $env $param-type)
                     ($lambda $arg))))))))))
 
-  (define-rules-syntax
-    ((solve-elaborator-lets x) x)
-    ((solve-elaborator-lets (id x) param ... body)
-      (elaborator-lets (id x)
-        (switch id
-          ((nothing? $nothing)
-            (solve-elaborator-lets param ... (elaborator nothing)))
-          ((else $other)
-            (solve-elaborator-lets param ... body))))))
-
-  (define-case-syntax (apply-solve-elaborator fn arg ...)
-    (lets
-      ($args #'(arg ...))
-      ($tmps (generate-temporaries $args))
-      #`(solve-elaborator-lets
-        #,@(map-with
-          ($tmp $tmps)
-          ($arg $args)
-          #`(#,$tmp #,$arg))
-        (elaborator (fn #,@$tmps)))))
-
   (define (eval-solve-elaborator $env $expected $actual)
     (elaborator-lets
-      ($eval-expected (eval-elaborator $env $expected))
-      ($eval-actual (eval-elaborator $env $actual))
+      ($eval-expected (transitional-eval-elaborator $env $expected))
+      ($eval-actual (transitional-eval-elaborator $env $actual))
       (solve-elaborator $env $eval-expected $eval-actual)))
 
   (define (solve-elaborator $env $expected $actual)
@@ -328,6 +308,19 @@
         (switch? (value-of (evaluated-ref $evaluated))
           ((evaluated? $evaluated)
             (evaluated-ref $evaluated))))))
+
+  (define (transitional-eval-elaborator $env $term)
+    (lets
+      ($old (eval-elaborator $env $term))
+      ($new (new-eval-elaborator $env $term))
+      ; (run
+      ;   (pretty-print `(old ,(elaborator-result $old)))
+      ;   (pretty-print `(new ,(elaborator-result $new))))
+      $old))
+
+  (define (new-eval-elaborator $env $term)
+    (elaborator ($solutions $errors)
+      (values $solutions $errors (evaluate $term))))
 
   (define (eval-elaborator $env $term)
     (switch $term
