@@ -15,7 +15,6 @@
 
     term-elaborator
     eval-elaborator
-    solve-elaborator
 
     check-elaborator=?
     check-solutions-elaborator=?)
@@ -23,6 +22,7 @@
     (leo2 base)
     (leo2 term)
     (leo2 datum)
+    (leo2 solver)
     (leo2 equal))
 
   (define empty-env '())
@@ -314,92 +314,13 @@
       (solve-elaborator $env $eval-expected $eval-actual)))
 
   (define (solve-elaborator $env $expected $actual)
-    (switch $actual
-      ((hole? $actual-hole)
-        (solve-elaborator $env $actual $expected))
-      ((else $actual-other)
-        (solve-non-hole-elaborator $env $expected $actual-other))))
-
-  (define (solve-non-hole-elaborator $env $expected $actual)
-    (or
-      (switch $expected
-        ((evaluated? $expected-evaluated)
-          (switch? $actual
-            ((evaluated? $actual-evaluated)
-              (apply-solve-elaborator evaluated
-                (solve-elaborator $env
-                  (evaluated-ref $expected-evaluated)
-                  (evaluated-ref $actual-evaluated))))))
-        ((typed? $expected-typed)
-          (switch? $actual
-            ((typed? $actual-typed)
-              (apply-solve-elaborator typed
-                (solve-elaborator $env
-                  (typed-type $expected-typed)
-                  (typed-type $actual-typed))
-                (solve-elaborator $env
-                  (typed-ref $expected-typed)
-                  (typed-ref $actual-typed))))))
-        ((hole? $hole)
-          (solve-elaborator-lets
-            ($solution (solutions-ref-elaborator $hole))
-            (switch $solution
-              ((nothing? $nothing)
-                (elaborator $nothing))
-              ((unknown? _)
-                (solutions-set-elaborator $hole $actual))
-              ((else $other)
-                (solve-elaborator $env $other $actual)))))
-        ((unknown? _)
-          (elaborator $actual))
-        ((native-type? _)
-          (switch? $actual
-            ((native-type? $native-type)
-              (elaborator $native-type))))
-        ((native? $expected-native)
-          (switch? $actual
-            ((native? $actual-native)
-              (and
-                (equal?
-                  (native-ref $expected-native)
-                  (native-ref $actual-native))
-                (elaborator $actual-native)))))
-        ((type? $expected-type)
-          (switch? $actual
-            ((type? $actual-type)
-              (and
-                (=
-                  (type-depth $expected-type)
-                  (type-depth $actual-type))
-                (elaborator $actual-type)))))
-        ((lambda? $expected-lambda)
-          (switch? $actual
-            ((lambda? $actual-lambda)
-              (solve-elaborator-lets
-                ($body
-                  (solve-elaborator
-                    (push $env unknown)
-                    ($expected-lambda (variable (length $env)))
-                    ($actual-lambda (variable (length $env)))))
-                (elaborator (lambda ($0) $body))))))
-        ((lambda-type? $expected-lambda-type)
-          (switch? $actual
-            ((lambda-type? $actual-lambda-type)
-              (apply-solve-elaborator lambda-type
-                (solve-elaborator $env
-                  (lambda-type-param $expected-lambda-type)
-                  (lambda-type-param $actual-lambda-type))
-                (solve-elaborator $env
-                  (lambda-type-lambda $expected-lambda-type)
-                  (lambda-type-lambda $actual-lambda-type))))))
-        ; TODO: Cover all term types, and don't use term=?
-        ((else _)
-          (and
-            (term=? $expected $actual)
-            (elaborator $actual))))
-      (push-error-elaborator
-        (mismatch (expected $expected) (actual $actual))
-        nothing)))
+    (elaborator ($solutions $errors)
+      (lets
+        ((values $solutions $result)
+          (solver-apply
+            (term-solver (length $env) $expected $actual)
+            $solutions))
+        (values $solutions $errors $result))))
 
   (define (unpeel? $term)
     (switch? $term

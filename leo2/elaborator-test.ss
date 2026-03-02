@@ -28,227 +28,6 @@
   (list->elaborator (list (elaborator (native "foo")) (elaborator (native "bar"))))
   (elaborator (list (native "foo") (native "bar"))))
 
-; ==================== solve-elaborator =======================
-
-; rhs hole
-(check-solutions-elaborator=?
-  (stack native-type)
-  (solve-elaborator empty-env native-type (hole 0))
-  (elaborator
-    (solutions native-type)
-    (errors)
-    native-type))
-
-; hole
-(check-elaborator=?
-  (solve-elaborator empty-env (hole 0) native-type)
-  (elaborator
-    (solutions)
-    (errors (unbound (hole 0)))
-    nothing))
-
-(check-solutions-elaborator=?
-  (stack native-type)
-  (solve-elaborator empty-env (hole 0) native-type)
-  (elaborator
-    (solutions native-type)
-    (errors)
-    native-type))
-
-(check-solutions-elaborator=?
-  (stack (variable 0))
-  (solve-elaborator empty-env (hole 0) native-type)
-  (elaborator
-    (solutions (variable 0))
-    (errors (mismatch (expected (variable 0)) (actual native-type)))
-    nothing))
-
-; unknown
-(check-elaborator=?
-  (solve-elaborator empty-env unknown unknown)
-  (elaborator unknown))
-
-(check-elaborator=?
-  (solve-elaborator empty-env unknown native-type)
-  (elaborator native-type))
-
-; native-type
-(check-elaborator=?
-  (solve-elaborator empty-env native-type native-type)
-  (elaborator native-type))
-
-(check-elaborator=?
-  (solve-elaborator empty-env native-type (variable 0))
-  (push-error-elaborator
-    (mismatch
-      (expected native-type)
-      (actual (variable 0)))
-    nothing))
-
-; type
-(check-elaborator=?
-  (solve-elaborator empty-env (type 0) (type 0))
-  (elaborator (type 0)))
-
-(check-elaborator=?
-  (solve-elaborator empty-env (type 0) (type 1))
-  (push-error-elaborator
-    (mismatch
-      (expected (type 0))
-      (actual (type 1)))
-    nothing))
-
-(check-elaborator=?
-  (solve-elaborator empty-env (type 0) (variable 0))
-  (push-error-elaborator
-    (mismatch
-      (expected (type 0))
-      (actual (variable 0)))
-    nothing))
-
-; native
-(check-elaborator=?
-  (solve-elaborator empty-env (native "foo") (native "foo"))
-  (elaborator (native "foo")))
-
-(check-elaborator=?
-  (solve-elaborator empty-env (native "foo") (native "bar"))
-  (push-error-elaborator
-    (mismatch
-      (expected (native "foo"))
-      (actual (native "bar")))
-    nothing))
-
-(check-elaborator=?
-  (solve-elaborator empty-env (variable 0) (native "bar"))
-  (push-error-elaborator
-    (mismatch
-      (expected (variable 0))
-      (actual (native "bar")))
-    nothing))
-
-; evaluated
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (evaluated (native "foo"))
-    (evaluated (native "foo")))
-  (elaborator (evaluated (native "foo"))))
-
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (evaluated (native "foo"))
-    (evaluated (native "bar")))
-  (push-error-elaborator
-    (mismatch
-      (expected (native "foo"))
-      (actual (native "bar")))
-    nothing))
-
-; typed
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (typed (native "t1") (native "v1"))
-    (typed (native "t1") (native "v1")))
-  (elaborator
-    (typed (native "t1") (native "v1"))))
-
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (typed (native "t1") (native "v1"))
-    (typed (native "t1") (native "v2")))
-  (push-error-elaborator
-    (mismatch (expected (native "v1")) (actual (native "v2")))
-    nothing))
-
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (typed (native "t1") (native "v1"))
-    (typed (native "t2") (native "v1")))
-  (push-error-elaborator
-    (mismatch (expected (native "t1")) (actual (native "t2")))
-    nothing))
-
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (typed (native "t1") (native "v1"))
-    (typed (native "t2") (native "v2")))
-  (elaborator
-    (solutions)
-    (errors
-      (mismatch (expected (native "t1")) (actual (native "t2")))
-      (mismatch (expected (native "v1")) (actual (native "v2"))))
-    nothing))
-
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (typed (native "t1") (native "v1"))
-    (native "v1"))
-  (elaborator
-    (solutions)
-    (errors
-      (mismatch
-        (expected (typed (native "t1") (native "v1")))
-        (actual (native "v1"))))
-    nothing))
-
-; lambda
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (lambda ($0) $0)
-    (lambda ($0) $0))
-  (elaborator (lambda ($0) $0)))
-
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (lambda ($0) (lambda ($1) $0))
-    (lambda ($0) (lambda ($1) $0)))
-  (elaborator (lambda ($0) (lambda ($1) $0))))
-
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (lambda ($0) (lambda ($1) $1))
-    (lambda ($0) (lambda ($1) $1)))
-  (elaborator (lambda ($0) (lambda ($1) $1))))
-
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (lambda ($0) (lambda ($1) $1))
-    (lambda ($0) (lambda ($1) $0)))
-  (push-error-elaborator
-    (mismatch
-      (expected (variable 1))
-      (actual (variable 0)))
-    nothing))
-
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (lambda ($0) $0)
-    (variable 0))
-  (push-error-elaborator
-    (mismatch
-      (expected (lambda ($0) $0))
-      (actual (variable 0)))
-    nothing))
-
-; lambda-type
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (lambda-type native-type (lambda ($0) $0))
-    (lambda-type native-type (lambda ($0) $0)))
-  (elaborator
-    (lambda-type native-type
-      (lambda ($0) $0))))
-
-(check-elaborator=?
-  (solve-elaborator empty-env
-    (lambda-type native-type (lambda ($0) $0))
-    (lambda-type native-type (lambda ($0) native-type)))
-  (push-error-elaborator
-    (mismatch
-      (expected (variable 0))
-      (actual native-type))
-    nothing))
-
 ; ==================== eval-elaborator =======================
 
 ; === eval-elaborator native
@@ -337,7 +116,7 @@
         (evaluated native-type)
         (evaluated (native "foo"))))))
 
-; ==================== eval-elaborator =======================
+; ==================== term-elaborator =======================
 
 ; === term-elaborator typed
 
@@ -356,10 +135,7 @@
 
 (check-elaborator=?
   (term-elaborator empty-env (ann (type 2) (type 0)))
-  (push-error-elaborator
-    (mismatch
-      (expected (type 2))
-      (actual (type 1)))
+  (elaborator
     (typed
       (evaluated nothing)
       (type 0))))
@@ -407,10 +183,7 @@
       (list
         (native "foo")
         (type 0))))
-  (push-error-elaborator
-    (mismatch
-      (expected native-type)
-      (actual (type 1)))
+  (elaborator
     (typed nothing
       (native-application string-append
         (list
@@ -525,10 +298,7 @@
           (lambda ($0) $0))
         (variable 0))
       (type 2)))
-  (push-error-elaborator
-    (mismatch
-      (expected (type 1))
-      (actual (type 3)))
+  (elaborator
     (typed
       (evaluated nothing)
       (application
