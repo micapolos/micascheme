@@ -319,8 +319,7 @@
       $old))
 
   (define (new-eval-elaborator $env $term)
-    (elaborator ($solutions $errors)
-      (values $solutions $errors (evaluate $term))))
+    (elaborator (evaluate $term)))
 
   (define (eval-elaborator $env $term)
     (switch $term
