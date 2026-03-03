@@ -2,11 +2,12 @@
 (separator ", ")
 (lucky 7)
 
-(doubly lucky
-  (the
-    (added
-      (the lucky number)
-      (the lucky number)))
+(doubly
+  (lucky
+    (the
+      (added
+        (the (lucky number))
+        (the (lucky number))))))
 
 (greeting
   (with
@@ -15,17 +16,19 @@
       (the
         (appended
           "Hello"
-          (the separator string)
+          (the (separator string))
           (the string)
-          (the stop string (default "!")))))))
+          (the (stop string)))))))
 
-(hello world
-  (as string)
-  (the greeting "world"))
+(hello
+  (world
+    (as string)
+    (the (greeting "world"))))
 
-(hello hell
-  (as string)
-  (the greeting "hell" (stop "?")))
+(hello
+  (hell
+    (as string)
+    (the (greeting "hell"))))
 
 (increment
   (as number)
