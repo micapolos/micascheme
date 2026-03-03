@@ -1,6 +1,6 @@
-library sample-library
+library sample program
 
-begin
+do
   print lucky number
   print hello world string
   print hello hell string
