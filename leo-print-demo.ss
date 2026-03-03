@@ -1,4 +1,4 @@
-(import (leo-print))
+(import (scheme) (leo-print))
 
 (display-string "=== Primitive lines ===\n")
 (println-leo-line #t)
