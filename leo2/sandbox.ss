@@ -1,9 +1,9 @@
 (import
   (leo2 base)
-  (leo writing-reader))
+  (leo2 script))
 
 (display
-  (script-string
+  (leo-script
     (stop "!")
     (separator ", ")
     (lucky 7)
