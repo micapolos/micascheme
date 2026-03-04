@@ -24,3 +24,6 @@
       (labeled (native "label")
         (evaluated (native "foo")))))
   (native "foo"))
+
+(check (not (unpeel? native? native-type)))
+(check (not (unpeel? native? (evaluated native-type))))
