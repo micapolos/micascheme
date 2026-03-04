@@ -57,10 +57,7 @@
           ((values $solutions id)
             (solver-apply first-solver $solutions))
           (solver-apply
-            (solver-lets x ...
-              (switch id
-                ((nothing? $nothing) (solver $nothing))
-                ((else _) last-solver)))
+            (solver-lets x ... last-solver)
             $solutions)))))
 
   (define (solver->datum $solver)
