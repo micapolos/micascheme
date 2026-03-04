@@ -112,8 +112,10 @@
     (solver-lets
       ($solutions solutions-solver)
       (switch (list-ref? $solutions (solutions-hole-index $solutions $hole))
-        ((false? _) (solver nothing))
-        ((else $term) (solver $term)))))
+        ((false? _)
+          (solver nothing))
+        ((else $term)
+          (solver $term)))))
 
   (define (solutions-set-solver $hole $term)
     (solver-lets
@@ -131,7 +133,7 @@
 
   (define (non-hole-term-solver $depth $expected $actual)
     (or
-      (switch $expected
+      (switch? $expected
         ((evaluated? $expected-evaluated)
           (switch? $actual
             ((evaluated? $actual-evaluated)
@@ -218,11 +220,8 @@
                   (application-lhs $actual-application))
                 (term-solver $depth
                   (application-rhs $expected-application)
-                  (application-rhs $actual-application))))))
-        ; TODO: Cover all term types, and don't use term=?
-        ((else $other)
-          (throw term-solver $depth $other)))
-      (solver nothing)))
+                  (application-rhs $actual-application)))))))
+      (solver (mismatch $expected $actual))))
 
   (define-rule-syntax (check-solver=? in out)
     (check

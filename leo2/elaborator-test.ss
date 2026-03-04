@@ -137,7 +137,7 @@
   (term-elaborator empty-env (ann (type 2) (type 0)))
   (elaborator
     (typed
-      (evaluated nothing)
+      (evaluated (mismatch (type 2) (type 1)))
       (type 0))))
 
 ; === term-elaborator native-type
@@ -191,7 +191,7 @@
             (evaluated native-type)
             (native "foo"))
           (typed
-            (evaluated nothing)
+            (evaluated (mismatch native-type (type 1)))
             (type 0)))))))
 
 ; === term-elaborator variable
@@ -299,8 +299,7 @@
         (variable 0))
       (type 2)))
   (elaborator
-    (typed
-      (evaluated nothing)
+    (typed (type 2)
       (application
         (typed
           (lambda-type (type 1)

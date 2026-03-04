@@ -41,15 +41,15 @@
 ; rhs hole
 (check-solver=?
   (set-solutions-solver
-    (stack native-type)
-    (term-solver depth-0 native-type (hole 0)))
+    (stack (native "foo"))
+    (term-solver depth-0 (native "foo") (hole 0)))
   (solver-with
-    (stack native-type)
-    native-type))
+    (stack (native "foo"))
+    (native "foo")))
 
 ; hole
 (check-solver=?
-  (term-solver depth-0 (hole 0) native-type)
+  (term-solver depth-0 (hole 0) (native "foo"))
   (solver nothing))
 
 (check-solver=?
@@ -62,11 +62,11 @@
 
 (check-solver=?
   (set-solutions-solver
-    (stack (variable 0))
-    (term-solver depth-0 (hole 0) native-type))
+    (stack (native "foo"))
+    (term-solver depth-0 (hole 0) (native "bar")))
   (solver-with
-    (stack (variable 0))
-    nothing))
+    (stack (native "foo"))
+    (mismatch (native "foo") (native "bar"))))
 
 ; unknown
 (check-solver=?
@@ -84,7 +84,7 @@
 
 (check-solver=?
   (term-solver depth-0 native-type (variable 0))
-  (solver nothing))
+  (solver (mismatch native-type (variable 0))))
 
 ; type
 (check-solver=?
@@ -93,11 +93,11 @@
 
 (check-solver=?
   (term-solver depth-0 (type 0) (type 1))
-  (solver nothing))
+  (solver (mismatch (type 0) (type 1))))
 
 (check-solver=?
   (term-solver depth-0 (type 0) (variable 0))
-  (solver nothing))
+  (solver (mismatch (type 0) (variable 0))))
 
 ; native
 (check-solver=?
@@ -106,11 +106,11 @@
 
 (check-solver=?
   (term-solver depth-0 (native "foo") (native "bar"))
-  (solver nothing))
+  (solver (mismatch (native "foo") (native "bar"))))
 
 (check-solver=?
-  (term-solver depth-0 (variable 0) (native "bar"))
-  (solver nothing))
+  (term-solver depth-0 (native "foo") (variable 0))
+  (solver (mismatch (native "foo") (variable 0))))
 
 ; evaluated
 (check-solver=?
@@ -123,7 +123,11 @@
   (term-solver depth-0
     (evaluated (native "foo"))
     (evaluated (native "bar")))
-  (solver nothing))
+  (solver
+    (evaluated
+      (mismatch
+        (native "foo")
+        (native "bar")))))
 
 ; typed
 (check-solver=?
@@ -137,25 +141,37 @@
   (term-solver depth-0
     (typed (native "t1") (native "v1"))
     (typed (native "t1") (native "v2")))
-  (solver nothing))
+  (solver
+    (typed
+      (native "t1")
+      (mismatch (native "v1") (native "v2")))))
 
 (check-solver=?
   (term-solver depth-0
     (typed (native "t1") (native "v1"))
     (typed (native "t2") (native "v1")))
-  (solver nothing))
+  (solver
+    (typed
+      (mismatch (native "t1") (native "t2"))
+      (native "v1"))))
 
 (check-solver=?
   (term-solver depth-0
     (typed (native "t1") (native "v1"))
     (typed (native "t2") (native "v2")))
-  (solver nothing))
+  (solver
+    (typed
+      (mismatch (native "t1") (native "t2"))
+      (mismatch (native "v1") (native "v2")))))
 
 (check-solver=?
   (term-solver depth-0
     (typed (native "t1") (native "v1"))
     (native "v1"))
-  (solver nothing))
+  (solver
+    (mismatch
+      (typed (native "t1") (native "v1"))
+      (native "v1"))))
 
 ; lambda
 (check-solver=?
@@ -180,13 +196,17 @@
   (term-solver depth-0
     (lambda ($0) (lambda ($1) $1))
     (lambda ($0) (lambda ($1) $0)))
-  (solver nothing))
+  (solver
+    (lambda ($0) (lambda ($1) (mismatch $1 $0)))))
 
 (check-solver=?
   (term-solver depth-0
     (lambda ($0) $0)
     (variable 0))
-  (solver nothing))
+  (solver
+    (mismatch
+      (lambda ($0) $0)
+      (variable 0))))
 
 ; lambda-type
 (check-solver=?
@@ -201,7 +221,10 @@
   (term-solver depth-0
     (lambda-type native-type (lambda ($0) $0))
     (lambda-type native-type (lambda ($0) native-type)))
-  (solver nothing))
+  (solver
+    (lambda-type native-type
+      (lambda ($0)
+        (mismatch $0 native-type)))))
 
 ; application
 (check-solver=?
@@ -215,13 +238,19 @@
   (term-solver depth-0
     (application (native "foo") (native "foo"))
     (application (native "foo") (native "bar")))
-  (solver nothing))
+  (solver
+    (application
+      (native "foo")
+      (mismatch (native "foo") (native "bar")))))
 
 (check-solver=?
   (term-solver depth-0
     (application (native "foo") (native "bar"))
     (application (native "bar") (native "bar")))
-  (solver nothing))
+  (solver
+    (application
+      (mismatch (native "foo") (native "bar"))
+      (native "bar"))))
 
 (check-solver=?
   (set-solutions-solver
@@ -241,7 +270,9 @@
       (application (native "foo") (native "bar"))))
   (solver-with
     (stack (native "foo"))
-    nothing))
+    (application
+      (native "foo")
+      (mismatch (native "foo") (native "bar")))))
 
 (check-solver=?
   (set-solutions-solver
@@ -281,4 +312,6 @@
       (application (native "foo") (native "bar"))))
   (solver-with
     (stack (native "foo"))
-    nothing))
+    (application
+      (native "foo")
+      (mismatch (native "foo") (native "bar")))))
