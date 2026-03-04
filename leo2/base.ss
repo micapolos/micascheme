@@ -7,4 +7,5 @@
         compile
         expand
         atom?
-        indexed indexed? indexed-index indexed-value))))
+        indexed indexed? indexed-index indexed-value
+        error error?))))

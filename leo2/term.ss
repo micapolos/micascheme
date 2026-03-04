@@ -4,6 +4,7 @@
     hole hole? hole-index
     nothing nothing?
     unknown unknown?
+    error error? error-ref
     native-type native-type?
     native native? native-ref
     native-application native-application? native-application-lambda native-application-args
@@ -48,6 +49,7 @@
     (hole index)
     nothing
     unknown
+    (error ref)
     (type depth)
     native-type
     (native ref)
