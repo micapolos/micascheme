@@ -57,6 +57,8 @@
         `native-type)
       ((unknown? _)
         'unknown)
+      ((error? $error)
+        `(error ,(depth-term->datum $depth (error-ref $error))))
       ((else $term)
         (term-switch $term
           ((hole? $hole) `(hole ,(hole-index $hole)))

@@ -21,6 +21,10 @@
 (check-term->datum=? (native '(foo bar)) (native '(foo bar)))
 
 (check-term->datum=?
+  (error (unbound (variable 2)))
+  (error (unbound (variable 2))))
+
+(check-term->datum=?
   (native-application string-append (list (native "foo") (native "bar")))
   (native-application string-append (list (native "foo") (native "bar"))))
 
