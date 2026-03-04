@@ -2,8 +2,6 @@
   (export
     empty-solutions
     solutions-push
-    solutions-ref
-    solutions-update
 
     solver
     solver-with
@@ -24,23 +22,15 @@
 
   (define empty-solutions '())
 
-  (define (solutions-hole-index $solutions $hole)
-    (- (length $solutions) (hole-index $hole) 1))
+  (define (solutions-hole-index? $solutions $hole)
+    (lets
+      ($index (- (length $solutions) (hole-index $hole) 1))
+      (and (not (negative? $index)) $index)))
 
   (define (solutions-push $solutions $term)
     (values
       (push $solutions $term)
       (hole (length $solutions))))
-
-  (define (solutions-ref $solutions $hole)
-    (list-ref $solutions
-      (solutions-hole-index $solutions $hole)))
-
-  (define (solutions-update $solutions $hole $fn)
-    (list-update
-      $solutions
-      (solutions-hole-index $solutions $hole)
-      $fn))
 
   (define (solver-apply $solver $solutions)
     ($solver $solutions))
@@ -108,22 +98,6 @@
     (solver (_)
       (solver-apply $solver $solutions)))
 
-  (define (solutions-ref-solver $hole)
-    (solver-lets
-      ($solutions solutions-solver)
-      (switch (list-ref? $solutions (solutions-hole-index $solutions $hole))
-        ((false? _)
-          (solver nothing))
-        ((else $term)
-          (solver $term)))))
-
-  (define (solutions-set-solver $hole $term)
-    (solver-lets
-      ($solutions solutions-solver)
-      (solver-with
-        (list-set $solutions (solutions-hole-index $solutions $hole) $term)
-        $term)))
-
   (define (term-solver $depth $expected $actual)
     (switch $actual
       ((hole? $actual-hole)
@@ -153,14 +127,18 @@
                   (typed-ref $actual-typed))))))
         ((hole? $hole)
           (solver-lets
-            ($solution (solutions-ref-solver $hole))
-            (switch $solution
-              ((nothing? $nothing)
-                (solver $nothing))
-              ((unknown? _)
-                (solutions-set-solver $hole $actual))
-              ((else $other)
-                (term-solver $depth $other $actual)))))
+            ($solutions solutions-solver)
+            (switch (solutions-hole-index? $solutions $hole)
+              ((false? _)
+                (solver (unbound $hole)))
+              ((else $index)
+                (switch (list-ref $solutions $index)
+                  ((unknown? _)
+                    (solver-with
+                      (list-set $solutions $index $actual)
+                      $actual))
+                  ((else $other)
+                    (term-solver $depth $other $actual)))))))
         ((variable? $expected-variable)
           (switch? $actual
             ((variable? $actual-variable)

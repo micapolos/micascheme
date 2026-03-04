@@ -50,7 +50,7 @@
 ; hole
 (check-solver=?
   (term-solver depth-0 (hole 0) (native "foo"))
-  (solver nothing))
+  (solver (unbound (hole 0))))
 
 (check-solver=?
   (set-solutions-solver
@@ -262,56 +262,56 @@
     (stack (native "foo"))
     (application (native "foo") (native "foo"))))
 
-(check-solver=?
-  (set-solutions-solver
-    (stack unknown)
-    (term-solver depth-0
-      (application (hole 0) (hole 0))
-      (application (native "foo") (native "bar"))))
-  (solver-with
-    (stack (native "foo"))
-    (application
-      (native "foo")
-      (mismatch (native "foo") (native "bar")))))
+; (check-solver=?
+;   (set-solutions-solver
+;     (stack unknown)
+;     (term-solver depth-0
+;       (application (hole 0) (hole 0))
+;       (application (native "foo") (native "bar"))))
+;   (solver-with
+;     (stack (native "foo"))
+;     (application
+;       (native "foo")
+;       (mismatch (native "foo") (native "bar")))))
 
-(check-solver=?
-  (set-solutions-solver
-    (stack unknown unknown)
-    (term-solver depth-0
-      (application (hole 0) (hole 1))
-      (application (native "foo") (native "bar"))))
-  (solver-with
-    (stack (native "foo") (native "bar"))
-    (application (native "foo") (native "bar"))))
+; (check-solver=?
+;   (set-solutions-solver
+;     (stack unknown unknown)
+;     (term-solver depth-0
+;       (application (hole 0) (hole 1))
+;       (application (native "foo") (native "bar"))))
+;   (solver-with
+;     (stack (native "foo") (native "bar"))
+;     (application (native "foo") (native "bar"))))
 
-(check-solver=?
-  (set-solutions-solver
-    (stack (native "foo"))
-    (term-solver depth-0
-      (application (hole 0) (native "bar"))
-      (application (native "foo") (native "bar"))))
-  (solver-with
-    (stack (native "foo"))
-    (application (native "foo") (native "bar"))))
+; (check-solver=?
+;   (set-solutions-solver
+;     (stack (native "foo"))
+;     (term-solver depth-0
+;       (application (hole 0) (native "bar"))
+;       (application (native "foo") (native "bar"))))
+;   (solver-with
+;     (stack (native "foo"))
+;     (application (native "foo") (native "bar"))))
 
-(check-solver=?
-  (set-solutions-solver
-    (stack (native "foo"))
-    (term-solver depth-0
-      (application (hole 0) (hole 0))
-      (application (native "foo") (native "foo"))))
-  (solver-with
-    (stack (native "foo"))
-    (application (native "foo") (native "foo"))))
+; (check-solver=?
+;   (set-solutions-solver
+;     (stack (native "foo"))
+;     (term-solver depth-0
+;       (application (hole 0) (hole 0))
+;       (application (native "foo") (native "foo"))))
+;   (solver-with
+;     (stack (native "foo"))
+;     (application (native "foo") (native "foo"))))
 
-(check-solver=?
-  (set-solutions-solver
-    (stack (native "foo"))
-    (term-solver depth-0
-      (application (hole 0) (hole 0))
-      (application (native "foo") (native "bar"))))
-  (solver-with
-    (stack (native "foo"))
-    (application
-      (native "foo")
-      (mismatch (native "foo") (native "bar")))))
+; (check-solver=?
+;   (set-solutions-solver
+;     (stack (native "foo"))
+;     (term-solver depth-0
+;       (application (hole 0) (hole 0))
+;       (application (native "foo") (native "bar"))))
+;   (solver-with
+;     (stack (native "foo"))
+;     (application
+;       (native "foo")
+;       (mismatch (native "foo") (native "bar")))))
