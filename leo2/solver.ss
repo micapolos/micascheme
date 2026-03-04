@@ -209,6 +209,16 @@
                 (term-solver $depth
                   (lambda-type-lambda $expected-lambda-type)
                   (lambda-type-lambda $actual-lambda-type))))))
+        ((application? $expected-application)
+          (switch $actual
+            ((application? $actual-application)
+              (apply-solver application
+                (term-solver $depth
+                  (application-lhs $expected-application)
+                  (application-lhs $actual-application))
+                (term-solver $depth
+                  (application-rhs $expected-application)
+                  (application-rhs $actual-application))))))
         ; TODO: Cover all term types, and don't use term=?
         ((else $other)
           (throw term-solver $depth $other)))

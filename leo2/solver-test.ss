@@ -202,3 +202,83 @@
     (lambda-type native-type (lambda ($0) $0))
     (lambda-type native-type (lambda ($0) native-type)))
   (solver nothing))
+
+; application
+(check-solver=?
+  (term-solver depth-0
+    (application (native "foo") (native "bar"))
+    (application (native "foo") (native "bar")))
+  (solver
+    (application (native "foo") (native "bar"))))
+
+(check-solver=?
+  (term-solver depth-0
+    (application (native "foo") (native "foo"))
+    (application (native "foo") (native "bar")))
+  (solver nothing))
+
+(check-solver=?
+  (term-solver depth-0
+    (application (native "foo") (native "bar"))
+    (application (native "bar") (native "bar")))
+  (solver nothing))
+
+(check-solver=?
+  (set-solutions-solver
+    (stack unknown)
+    (term-solver depth-0
+      (application (hole 0) (hole 0))
+      (application (native "foo") (native "foo"))))
+  (solver-with
+    (stack (native "foo"))
+    (application (native "foo") (native "foo"))))
+
+(check-solver=?
+  (set-solutions-solver
+    (stack unknown)
+    (term-solver depth-0
+      (application (hole 0) (hole 0))
+      (application (native "foo") (native "bar"))))
+  (solver-with
+    (stack (native "foo"))
+    nothing))
+
+(check-solver=?
+  (set-solutions-solver
+    (stack unknown unknown)
+    (term-solver depth-0
+      (application (hole 0) (hole 1))
+      (application (native "foo") (native "bar"))))
+  (solver-with
+    (stack (native "foo") (native "bar"))
+    (application (native "foo") (native "bar"))))
+
+(check-solver=?
+  (set-solutions-solver
+    (stack (native "foo"))
+    (term-solver depth-0
+      (application (hole 0) (native "bar"))
+      (application (native "foo") (native "bar"))))
+  (solver-with
+    (stack (native "foo"))
+    (application (native "foo") (native "bar"))))
+
+(check-solver=?
+  (set-solutions-solver
+    (stack (native "foo"))
+    (term-solver depth-0
+      (application (hole 0) (hole 0))
+      (application (native "foo") (native "foo"))))
+  (solver-with
+    (stack (native "foo"))
+    (application (native "foo") (native "foo"))))
+
+(check-solver=?
+  (set-solutions-solver
+    (stack (native "foo"))
+    (term-solver depth-0
+      (application (hole 0) (hole 0))
+      (application (native "foo") (native "bar"))))
+  (solver-with
+    (stack (native "foo"))
+    nothing))
