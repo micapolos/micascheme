@@ -186,6 +186,13 @@
                 (term-solver $depth
                   (lambda-type-lambda $expected-lambda-type)
                   (lambda-type-lambda $actual-lambda-type))))))
+        ((recursion? $expected-recursion)
+          (switch? $actual
+            ((recursion? $actual-recursion)
+              (apply-solver recursion
+                (term-solver $depth
+                  (recursion-lambda $expected-recursion)
+                  (recursion-lambda $actual-recursion))))))
         ((application? $expected-application)
           (switch $actual
             ((application? $actual-application)

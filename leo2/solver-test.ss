@@ -315,3 +315,26 @@
     (application
       (native "foo")
       (mismatch (native "foo") (native "bar")))))
+
+; recursion
+(check-solver=?
+  (term-solver depth-0
+    (recursion (lambda ($0) (lambda ($1) $0)))
+    (recursion (lambda ($0) (lambda ($1) $0))))
+  (solver
+    (recursion (lambda ($0) (lambda ($1) $0)))))
+
+(check-solver=?
+  (term-solver depth-0
+    (recursion (lambda ($0) (lambda ($1) $1)))
+    (recursion (lambda ($0) (lambda ($1) $1))))
+  (solver
+    (recursion (lambda ($0) (lambda ($1) $1)))))
+
+(check-solver=?
+  (term-solver depth-0
+    (recursion (lambda ($0) (lambda ($1) $1)))
+    (recursion (lambda ($0) (lambda ($1) $0))))
+  (solver
+    (recursion
+      (lambda ($0) (lambda ($1) (mismatch $1 $0))))))
