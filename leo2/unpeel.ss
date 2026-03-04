@@ -1,5 +1,7 @@
 (library (leo2 unpeel)
-  (export unpeel)
+  (export
+    unpeel
+    unpeel?)
   (import
     (leo2 base)
     (leo2 term))
@@ -14,4 +16,15 @@
         (unpeel (typed-ref $typed)))
       ((else $unpeeled)
         $unpeeled)))
+
+  (define (unpeel? $unpeeled? $term)
+    (switch? $term
+      (($unpeeled? $unpeeled)
+        $unpeeled)
+      ((evaluated? $evaluated)
+        (unpeel? $unpeeled?
+          (evaluated-ref $evaluated)))
+      ((labeled? $labeled)
+        (unpeel? $unpeeled?
+          (labeled-ref $labeled)))))
 )
