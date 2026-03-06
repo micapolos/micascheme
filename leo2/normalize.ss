@@ -8,6 +8,7 @@
 
   (define (normalize $term)
     (switch-exhaustive $term
+      ((native? $native) $native)
       ((neutral? $neutral) $neutral)
       ((primitive? $primitive) $primitive)
       ((variable? $variable) $variable)
