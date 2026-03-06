@@ -11,41 +11,6 @@
 (define (application-2 $fn $lhs $rhs)
   (application (application $fn $lhs) $rhs))
 
-(define true-term selector)
-(define false-term (rejector selector))
-
-(define (if-term $condition $consequent $alternate)
-  (match-term $condition
-    (application
-      (lambda (_) $alternate)
-      (lambda (_) $consequent))))
-
-(define (cons-term $car $cdr)
-  (application (application selector $car) $cdr))
-
-(define (match-term $pair $body)
-  (application (application matcher $pair) $body))
-
-(define (car-term $pair)
-  (match-term $pair
-    (lambda ($cdr)     ;; Outer: "bar" is peeled first
-      (lambda ($car)   ;; Inner: "foo" is peeled second
-        $car))))       ;; Return the inner one for 'car'
-
-(define (cdr-term $pair)
-  (match-term $pair
-    (lambda ($cdr)     ;; Outer: "bar"
-      (lambda ($car)   ;; Inner: "foo"
-        $cdr))))       ;; Return the outer one for 'cdr'
-
-(define (pair-ref-term $pair $boolean)
-  (match-term $pair
-    (lambda ($cdr-val)      ;; Outer branch (RHS)
-      (lambda ($car-val)    ;; Inner branch (LHS)
-        ;; Applying the boolean to the branches.
-        ;; Since selector picks RHS, we put $car-val on the RHS.
-        (application (application $boolean $cdr-val) $car-val)))))
-
 (check-term-datum=?
   (normalize (native 123))
   (native 123))
@@ -168,19 +133,3 @@
 ;             (application (native string-append) $inner)
 ;             $outer)))))
 ;   (native "innerouter"))
-
-; (check-term-datum=?
-;   (normalize (car-term (cons-term (native "foo") (native "bar"))))
-;   (native "foo"))
-
-; (check-term-datum=?
-;   (normalize (cdr-term (cons-term (native "foo") (native "bar"))))
-;   (native "bar"))
-
-; (check-term-datum=?
-;   (normalize (if-term true-term (native "true") (native "false")))
-;   (native "false"))
-
-; (check-term-datum=?
-;   (normalize (if-term false-term (native "true") (native "false")))
-;   (native "false"))
