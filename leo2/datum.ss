@@ -59,10 +59,6 @@
         'unknown)
       ((error? $error)
         `(error ,(depth-term->datum $depth (error-ref $error))))
-      ((neutral? $neutral)
-        `(neutral
-          ,(depth-term->datum $depth
-            (neutral-ref $neutral))))
       ((else $term)
         (term-switch $term
           ((hole? $hole) `(hole ,(hole-index $hole)))

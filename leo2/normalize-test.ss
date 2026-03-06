@@ -45,18 +45,16 @@
     (application
       (application lambda- (variable 0))
       (variable 1)))
-  (neutral
-    (application
-      (neutral (application (native -) (variable 0)))
-      (variable 1))))
+  (application
+    (application (native -) (variable 0))
+    (variable 1)))
 
 (check-term-datum=?
   (normalize (application lambda- 30))
   (lambda ($0)
-    (neutral
-      (application
-        (neutral (application (native -) 30))
-        $0))))
+    (application
+      (application (native -) 30)
+      $0)))
 
 (check-term-datum=?
   (normalize
