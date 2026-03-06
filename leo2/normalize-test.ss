@@ -15,9 +15,9 @@
           ((number? $rhs-number)
             (- $lhs-number $rhs-number))
           ((else $rhs-other)
-            (application (native `(- ,$lhs-number)) $rhs-other)))))
+            (application (application (native -) $lhs-number) $rhs-other)))))
     ((else $lhs-other)
-      (application '- $lhs-other))))
+      (application (native -) $lhs-other))))
 
 (define (dec $number) (- $number 1))
 
@@ -41,12 +41,22 @@
   10)
 
 (check-term-datum=?
-  (normalize (application (application lambda- (variable 0)) (variable 1)))
-  (neutral (application (neutral (application '- (variable 0))) (variable 1))))
+  (normalize
+    (application
+      (application lambda- (variable 0))
+      (variable 1)))
+  (neutral
+    (application
+      (neutral (application (native -) (variable 0)))
+      (variable 1))))
 
 (check-term-datum=?
   (normalize (application lambda- 30))
-  (lambda ($0) (neutral (application (native '(- 30)) $0))))
+  (lambda ($0)
+    (neutral
+      (application
+        (neutral (application (native -) 30))
+        $0))))
 
 (check-term-datum=?
   (normalize
