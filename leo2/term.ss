@@ -18,6 +18,7 @@
     typed typed? typed-type typed-ref
     ann ann? ann-type ann-ref
     labeled labeled? labeled-label labeled-ref
+    neutral neutral? neutral-ref
     lambda?
 
     mismatch mismatch? mismatch-expected mismatch-actual
@@ -67,7 +68,8 @@
     (mismatch expected actual)
     (expected ref)
     (actual ref)
-    (unbound ref))
+    (unbound ref)
+    (neutral ref))
 
   (union
     (term

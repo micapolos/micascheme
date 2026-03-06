@@ -10,6 +10,7 @@
   (leo2 dependent)
   (leo2 unpeel)
   (leo2 evaluate)
+  (leo2 evaluator)
   (leo2 reify)
   (leo2 untyped)
   (leo2 solver)

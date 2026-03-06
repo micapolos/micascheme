@@ -1,22 +1,26 @@
 (library (leo2 evaluator)
-  (export)
+  (export
+    evaluate
+    term-apply)
   (import
     (leo2 base)
     (leo2 term))
 
   (define (evaluate $term)
-    (evaluated
-      (switch $term
-        ((primitive? $primitive) $primitive)
-        ((variable? $variable) $variable)
-        ((lambda? $lambda)
-          (evaluated
-            (lambda ($0)
-              (evaluate (lambda-apply $lambda $0)))))
-        ((application? $application)
-          (term-apply
-            (evaluate (application-lhs $application))
-            (evaluate (application-rhs $application)))))))
+    (switch-exhaustive $term
+      ((neutral? $neutral)
+        $neutral)
+      ((primitive? $primitive)
+        $primitive)
+      ((variable? $variable)
+        $variable)
+      ((lambda? $lambda)
+        (lambda ($0)
+          (evaluate (lambda-apply $lambda $0))))
+      ((application? $application)
+        (term-apply
+          (evaluate (application-lhs $application))
+          (evaluate (application-rhs $application))))))
 
   (define (term-apply $lhs $rhs)
     (switch $lhs
@@ -27,5 +31,5 @@
       ((recursion? $recursion)
         (term-apply (recursion-apply $recursion $lhs) $rhs))
       ((else $other)
-        (application $lhs $rhs))))
+        (neutral (application $lhs $rhs)))))
 )
