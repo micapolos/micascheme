@@ -12,7 +12,7 @@
       ((selector? $selector) $selector)
       ((rejector? $rejector) $rejector)
       ((matcher? $matcher) $matcher)
-      ((switcher? $s) (switcher (normalize (switcher-ref $s))))
+      ((switcher? $s) $s)
       ((lambda? $lambda)
         (lambda ($arg)
           (normalize (lambda-apply $lambda $arg))))
