@@ -4,17 +4,13 @@
   (leo2 normalize)
   (leo2 datum))
 
-(define (zero?-term $term)
-  (switch $term
-    ((number? $number)
-      (zero? $number))
-    ((else $other)
-      (neutral (application zero? $other)))))
+(define lambda-zero?
+  (native-lambda zero? number?))
 
 (check-term-datum=?
-  (normalize (application zero?-term 0))
+  (normalize (application lambda-zero? 0))
   #t)
 
 (check-term-datum=?
-  (normalize (application zero?-term 123))
+  (normalize (application lambda-zero? 123))
   #f)

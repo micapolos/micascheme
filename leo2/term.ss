@@ -34,7 +34,8 @@
 
     type+1
 
-    branch-ref)
+    branch-ref
+    native-lambda)
   (import (leo2 base))
 
   (define (primitive? $x)
@@ -121,4 +122,12 @@
 
   (define (type+1 $type)
     (type (+ (type-depth $type) 1)))
+
+  (define (native-lambda $lambda $normal?)
+    (lambda ($term)
+      (switch $term
+        (($normal? $normal)
+          (lambda-apply $lambda $normal))
+        ((else $other)
+          (application (native $lambda) $other)))))
 )

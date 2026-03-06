@@ -4,15 +4,11 @@
   (leo2 datum)
   (leo2 apply))
 
-(define (zero?-term $term)
-  (switch $term
-    ((number? $number)
-      (zero? $number))
-    ((else $other)
-      (application (native zero?) $term))))
+(define lambda-zero?
+  (native-lambda zero? number?))
 
 (check-term-datum=?
-  (term-apply zero?-term 123)
+  (term-apply lambda-zero? 123)
   #f)
 
 (check-term-datum=?
