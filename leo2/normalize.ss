@@ -17,9 +17,7 @@
           (normalize (lambda-type-param $lambda-type))
           (normalize (lambda-type-lambda $lambda-type))))
       ((recursion? $recursion)
-        (recursion
-          (normalize
-            (recursion-lambda $recursion))))
+        $recursion)
       ((application? $application)
         (lets
           ($lhs (normalize (application-lhs $application)))

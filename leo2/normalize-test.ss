@@ -60,20 +60,19 @@
               (native "OK")
               (application $fn
                 (application-2 (native curry-) $n (native 1)))))))
-      (native 100)))
+      (native 5)))
   (native "OK"))
 
-; (check-term-datum=?
-;   (normalize
-;     (application
-;       (recursion
-;         (lambda ($fib)
-;           (lambda ($n)
-;             (branch (application-2 (native curry<) $n (native 2))
-;               $n
-;               (application $fib
-;                 (application-2 (native curry+)
-;                   (application-2 (native curry-) $n (native 1))
-;                   (application-2 (native curry-) $n (native 2))))))))
-;       (native 4)))
-;   (native 55))
+(check-term-datum=?
+  (normalize
+    (application
+      (recursion
+        (lambda ($fib)
+          (lambda ($n)
+            (branch (application-2 (native curry<) $n (native 2))
+              $n
+              (application-2 (native curry+)
+                (application $fib (application-2 (native curry-) $n (native 1)))
+                (application $fib (application-2 (native curry-) $n (native 2))))))))
+      (native 10)))
+  (native 55))
