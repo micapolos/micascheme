@@ -27,6 +27,7 @@
 
     term? term-switch
 
+    lambda-apply
     lambda-type-apply
     recursion-apply
 
@@ -103,6 +104,9 @@
       ((labeled? $labeled) $labeled)
       ((evaluated? $evaluated) $evaluated)
       ((typed? $typed) $typed)))
+
+  (define (lambda-apply $lambda $arg)
+    ($lambda $arg))
 
   (define (lambda-type-apply $lambda-type $arg)
     ((lambda-type-lambda $lambda-type) $arg))
