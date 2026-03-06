@@ -9,6 +9,9 @@
     (switch-exhaustive $term
       ((native? $native) $native)
       ((variable? $variable) $variable)
+      ((selector? $selector) $selector)
+      ((rejector? $rejector) $rejector)
+      ((matcher? $matcher) $matcher)
       ((lambda? $lambda)
         (lambda ($arg)
           (normalize (lambda-apply $lambda $arg))))
@@ -32,14 +35,43 @@
                       (native-ref $rhs-native))))
                 ((else $rhs-other)
                   (application $lhs $rhs))))
-            ((lambda? $lambda)
-              (lambda-apply $lambda $rhs))
-            ((lambda-type? $lambda-type)
-              (lambda-type-apply $lambda-type $rhs))
-            ((recursion? $recursion)
-              (normalize (application (recursion-apply $recursion $lhs) $rhs)))
-            ((else $other)
+            ((application? $lhs-application)
+              (switch (application-lhs $lhs-application)
+                ((matcher? $matcher)
+                  (normalize
+                    (switcher
+                      (application-rhs $lhs-application)
+                      (application $matcher $rhs))))
+                ((else $other)
+                  (application $lhs $rhs))))
+            ((lambda? $lhs-lambda)
+              (normalize (lambda-apply $lhs-lambda $rhs)))
+            ((lambda-type? $lhs-lambda-type)
+              (normalize (lambda-type-apply $lhs-lambda-type $rhs)))
+            ((recursion? $lhs-recursion)
+              (normalize (application (recursion-apply $lhs-recursion $lhs) $rhs)))
+            ((else _)
               (application $lhs $rhs)))))
+      ((switcher? $switcher)
+        (lets
+          ($lhs (normalize (switcher-lhs $switcher)))
+          ($rhs (normalize (switcher-rhs $switcher)))
+          (switch $lhs
+            ((selector? $selector)
+              (normalize (application-rhs $rhs)))
+            ((rejector? $rejector)
+              (normalize
+                (switcher
+                  (rejector-ref $rejector)
+                  (application-lhs $rhs))))
+            ((application? $application)
+              (normalize
+                (application
+                  (switcher
+                    (application-lhs $application) $rhs)
+                    (application-rhs $application))))
+           ((else $other)
+            (switcher $lhs $rhs)))))
       ((branch? $branch)
         (lets
           ($condition (normalize (branch-condition $branch)))

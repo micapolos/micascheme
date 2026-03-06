@@ -59,6 +59,17 @@
         'unknown)
       ((error? $error)
         `(error ,(depth-term->datum $depth (error-ref $error))))
+      ((matcher? $matcher)
+        `matcher)
+      ((selector? $selector)
+        `selector)
+      ((rejector? $rejector)
+        `(rejector
+          ,(depth-term->datum $depth (rejector-ref $rejector))))
+      ((switcher? $switcher)
+        `(switcher
+          ,(depth-term->datum $depth (switcher-lhs $switcher))
+          ,(depth-term->datum $depth (switcher-rhs $switcher))))
       ((else $term)
         (term-switch $term
           ((hole? $hole) `(hole ,(hole-index $hole)))

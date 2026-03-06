@@ -11,6 +11,22 @@
 (define (application-2 $fn $lhs $rhs)
   (application (application $fn $lhs) $rhs))
 
+(define (cons-term $car $cdr)
+  (application (application selector $car) $cdr))
+
+(define (pair-switch-term $pair $body)
+  (application (application matcher $pair) $body))
+
+(define (car-term $pair)
+  (pair-switch-term $pair
+    (lambda ($car)
+      (lambda ($cdr) $car))))
+
+(define (cdr-term $pair)
+  (pair-switch-term $pair
+    (lambda ($car)
+      (lambda ($cdr) $cdr))))
+
 (check-term-datum=?
   (normalize (native 123))
   (native 123))
@@ -76,3 +92,7 @@
                 (application $fib (application-2 (native curry-) $n (native 2))))))))
       (native 10)))
   (native 55))
+
+(check-term-datum=?
+  (normalize (car-term (cons-term (native "foo") (native "bar"))))
+  (native "foo"))
