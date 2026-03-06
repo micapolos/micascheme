@@ -7,8 +7,8 @@
   (define (evaluate $term)
     (evaluated
       (switch $term
-        ((variable? $variable)
-          $variable)
+        ((primitive? $primitive) $primitive)
+        ((variable? $variable) $variable)
         ((lambda? $lambda)
           (evaluated
             (lambda ($0)
