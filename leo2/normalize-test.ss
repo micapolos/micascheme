@@ -2,59 +2,53 @@
   (leo2 base)
   (leo2 term)
   (leo2 normalize)
-  (leo2 datum))
+  (leo2 datum)
+  (curry))
 
-(define lambda-zero?
-  (native-lambda zero? number?))
+(define (unreachable $value)
+  (application (native raise) (native $value)))
 
-(define (lambda- $lhs)
-  (switch $lhs
-    ((number? $lhs-number)
-      (lambda ($rhs)
-        (switch $rhs
-          ((number? $rhs-number)
-            (- $lhs-number $rhs-number))
-          ((else $rhs-other)
-            (application (application (native -) $lhs-number) $rhs-other)))))
-    ((else $lhs-other)
-      (application (native -) $lhs-other))))
-
-(define (dec $number) (- $number 1))
-
-(define lambda-dec
-  (native-lambda dec number?))
+(define (application-2 $fn $lhs $rhs)
+  (application (application $fn $lhs) $rhs))
 
 (check-term-datum=?
-  (normalize (application lambda-zero? 0))
-  #t)
+  (normalize (native 123))
+  (native 123))
 
 (check-term-datum=?
-  (normalize (application lambda-zero? 123))
-  #f)
+  (normalize (application (native number->string) (native 123)))
+  (native "123"))
 
 (check-term-datum=?
-  (normalize (application lambda-dec 10))
-  9)
-
-(check-term-datum=?
-  (normalize (application (application lambda- 30) 20))
-  10)
+  (normalize (application-2 (native curry-) (native 30) (native 20)))
+  (native 10))
 
 (check-term-datum=?
   (normalize
-    (application
-      (application lambda- (variable 0))
-      (variable 1)))
-  (application
-    (application (native -) (variable 0))
-    (variable 1)))
+    (branch
+      (native #t)
+      (native "true")
+      (unreachable "false")))
+  (native "true"))
 
 (check-term-datum=?
-  (normalize (application lambda- 30))
-  (lambda ($0)
-    (application
-      (application (native -) 30)
-      $0)))
+  (normalize
+    (branch
+      (native #f)
+      (unreachable "true")
+      (native "false")))
+  (native "false"))
+
+(check-term-datum=?
+  (normalize
+    (branch
+      (variable 0)
+      (application (native number->string) (native 10))
+      (application (native number->string) (native 20))))
+  (branch
+    (variable 0)
+    (native "10")
+    (native "20")))
 
 (check-term-datum=?
   (normalize
@@ -62,20 +56,24 @@
       (recursion
         (lambda ($fn)
           (lambda ($n)
-            (branch (application zero? $n)
-              "OK"
-              (application $fn (application lambda-dec $n))))))
-      10))
-  "OK")
+            (branch (application (native zero?) $n)
+              (native "OK")
+              (application $fn
+                (application-2 (native curry-) $n (native 1)))))))
+      (native 100)))
+  (native "OK"))
 
-(check-term-datum=?
-  (normalize
-    (application
-      (recursion
-        (lambda ($fn)
-          (lambda ($n)
-            (branch (application zero? $n)
-              "OK"
-              (application $fn (application lambda-dec $n))))))
-      0))
-  "OK")
+; (check-term-datum=?
+;   (normalize
+;     (application
+;       (recursion
+;         (lambda ($fib)
+;           (lambda ($n)
+;             (branch (application-2 (native curry<) $n (native 2))
+;               $n
+;               (application $fib
+;                 (application-2 (native curry+)
+;                   (application-2 (native curry-) $n (native 1))
+;                   (application-2 (native curry-) $n (native 2))))))))
+;       (native 4)))
+;   (native 55))

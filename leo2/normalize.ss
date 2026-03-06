@@ -8,7 +8,6 @@
   (define (normalize $term)
     (switch-exhaustive $term
       ((native? $native) $native)
-      ((primitive? $primitive) $primitive)
       ((variable? $variable) $variable)
       ((lambda? $lambda)
         (lambda ($arg)
@@ -26,6 +25,15 @@
           ($lhs (normalize (application-lhs $application)))
           ($rhs (normalize (application-rhs $application)))
           (switch $lhs
+            ((native? $lhs-native)
+              (switch $rhs
+                ((native? $rhs-native)
+                  (native
+                    (app
+                      (native-ref $lhs-native)
+                      (native-ref $rhs-native))))
+                ((else $rhs-other)
+                  (application $lhs $rhs))))
             ((lambda? $lambda)
               (lambda-apply $lambda $rhs))
             ((lambda-type? $lambda-type)
@@ -38,8 +46,8 @@
         (lets
           ($condition (normalize (branch-condition $branch)))
           (switch $condition
-            ((boolean? $boolean)
-              (normalize (branch-ref $branch $boolean)))
+            ((native? $native)
+              (normalize (branch-ref $branch (native-ref $native))))
             ((else $other)
               (branch $condition
                 (normalize (branch-consequent $branch))
