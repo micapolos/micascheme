@@ -1,11 +1,10 @@
 (library (leo2 normalize)
   (export
-    normalize
-    reduce)
+    normalize)
   (import
     (leo2 base)
     (leo2 term)
-    (leo2 reduce))
+    (leo2 apply))
 
   (define (normalize $term)
     (switch-exhaustive $term
@@ -16,7 +15,7 @@
         (lambda ($0)
           (normalize (lambda-apply $lambda $0))))
       ((application? $application)
-        (reduce
+        (term-apply
           (normalize (application-lhs $application))
           (normalize (application-rhs $application))))))
 )

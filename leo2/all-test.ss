@@ -10,7 +10,7 @@
   (leo2 dependent)
   (leo2 unpeel)
   (leo2 evaluate)
-  (leo2 reduce)
+  (leo2 apply)
   (leo2 normalize)
   (leo2 reify)
   (leo2 untyped)
