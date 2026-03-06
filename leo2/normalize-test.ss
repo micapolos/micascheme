@@ -112,13 +112,70 @@
       (native 10)))
   (native 55))
 
+; selector
 (check-term-datum=?
-  (normalize (car-term (cons-term (native "foo") (native "bar"))))
+  (normalize selector)
+  selector)
+
+; rejector
+(check-term-datum=?
+  (normalize (rejector selector))
+  (rejector selector))
+
+(check-term-datum=?
+  (normalize (rejector (rejector selector)))
+  (rejector (rejector selector)))
+
+; application with selector
+(check-term-datum=?
+  (normalize (application selector (native "foo")))
   (native "foo"))
 
 (check-term-datum=?
-  (normalize (cdr-term (cons-term (native "foo") (native "bar"))))
-  (native "bar"))
+  (normalize (application (rejector selector) (native "foo")))
+  selector)
+
+(check-term-datum=?
+  (normalize
+    (application
+      (application (rejector selector) (native "inner"))
+      (native "outer")))
+  (native "outer"))
+
+; matcher
+(check-term-datum=?
+  (normalize (application matcher (native "foo")))
+  (switcher (native "foo")))
+
+; switcher
+(check-term-datum=?
+  (normalize
+    (application
+      (switcher (native "foo"))
+      selector))
+  (native "foo"))
+
+; (check-term-datum=?
+;   (normalize
+;     (application
+;       (switcher
+;         (application
+;           (application selector (native "inner"))
+;           (native "outer")))
+;       (lambda ($outer)
+;         (lambda ($inner)
+;           (application
+;             (application (native string-append) $inner)
+;             $outer)))))
+;   (native "innerouter"))
+
+; (check-term-datum=?
+;   (normalize (car-term (cons-term (native "foo") (native "bar"))))
+;   (native "foo"))
+
+; (check-term-datum=?
+;   (normalize (cdr-term (cons-term (native "foo") (native "bar"))))
+;   (native "bar"))
 
 ; (check-term-datum=?
 ;   (normalize (if-term true-term (native "true") (native "false")))

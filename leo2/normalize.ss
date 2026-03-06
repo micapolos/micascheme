@@ -5,7 +5,7 @@
     (leo2 base)
     (leo2 term))
 
-  (define (normalize $term)
+(define (normalize $term)
     (switch-exhaustive $term
       ((native? $native) $native)
       ((variable? $variable) $variable)
@@ -36,6 +36,12 @@
                       (native-ref $rhs-native))))
                 ((else $rhs-other)
                   (application $lhs $rhs))))
+            ((selector? $sel)
+              $rhs)
+            ((rejector? $rej)
+              (normalize (rejector-ref $rej)))
+            ((matcher? $m)
+              (switcher $rhs))
             ((application? $lhs-application)
               (switch (application-lhs $lhs-application)
                 ((matcher? $matcher)
@@ -50,56 +56,33 @@
                 ($data (switcher-ref $switcher))
                 (switch $data
                   ((application? $app-data)
+                    (normalize
+                      (application
+                        (switcher (application-lhs $app-data))
+                        ;; IMPORTANT: We do NOT normalize the result of the logic yet.
+                        ;; We build a naked application of (Logic RHS-Data)
+                        (application $rhs (application-rhs $app-data)))))
+                  ((native? $n)
                     (switch $rhs
-                      ((application? $app-logic)
-                        (normalize
-                          (application
-                            (switcher (application-lhs $app-data))
-                            (lambda-apply
-                              (application-rhs $app-logic)
-                              (application-rhs $app-data)))))
-                     ((lambda? $lam-logic)
-                        (normalize
-                          (application
-                            (switcher (application-lhs $app-data))
-                            (lambda-apply $lam-logic
-                              (application-rhs $app-data)))))
-                     ((else _)
-                      (application $lhs $rhs))))
+                      ((selector? $sel) $n)
+                      ((rejector? $rej) (normalize (rejector-ref $rej)))
+                      ;; Ensure Logic is on the LHS and Data is on the RHS
+                      ((else _) (normalize (application $rhs $n)))))
                   ((selector? $sel)
-                    (switch $rhs
-                      ((application? $app-logic)
-                        (normalize
-                          (lambda-apply
-                            (application-rhs $app-logic)
-                            $data)))
-                      ((lambda? $lam-logic)
-                        (normalize
-                          (lambda-apply $lam-logic $data)))
-                      ((else $val)
-                        $val)))
-                    ((rejector? $rej)
-                      (switch $rhs
-                        ((application? $app-logic)
-                          (normalize
-                            (application
-                              (switcher (rejector-ref $rej))
-                              (application-lhs $app-logic))))
-                        ((else _)
-                          (normalize
-                            (application
-                              (switcher (rejector-ref $rej))
-                              $rhs)))))
+                    (normalize (application $rhs $data)))
                   ((else _)
                     (application $lhs $rhs)))))
             ((lambda? $lhs-lambda)
-              (normalize (lambda-apply $lhs-lambda $rhs)))
+              (switch $rhs
+                ((switcher? $s) (normalize (application $rhs $lhs)))
+                ((else _) (normalize (lambda-apply $lhs-lambda $rhs)))))
             ((lambda-type? $lhs-lambda-type)
               (normalize (lambda-type-apply $lhs-lambda-type $rhs)))
             ((recursion? $lhs-recursion)
               (normalize (application (recursion-apply $lhs-recursion $lhs) $rhs)))
             ((else _)
               (application $lhs $rhs)))))
+
       ((branch? $branch)
         (lets
           ($condition (normalize (branch-condition $branch)))
