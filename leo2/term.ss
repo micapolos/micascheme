@@ -23,7 +23,7 @@
     matcher matcher?
     selector selector?
     rejector rejector? rejector-ref
-    switcher switcher? switcher-lhs switcher-rhs
+    switcher switcher? switcher-ref
 
     mismatch mismatch? mismatch-expected mismatch-actual
     expected expected? expected-ref
@@ -68,7 +68,7 @@
     matcher
     selector
     (rejector ref)
-    (switcher lhs rhs)
+    (switcher ref)
 
     (branch condition consequent alternate)
     (recursion lambda)

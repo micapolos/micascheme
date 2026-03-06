@@ -68,8 +68,7 @@
           ,(depth-term->datum $depth (rejector-ref $rejector))))
       ((switcher? $switcher)
         `(switcher
-          ,(depth-term->datum $depth (switcher-lhs $switcher))
-          ,(depth-term->datum $depth (switcher-rhs $switcher))))
+          ,(depth-term->datum $depth (switcher-ref $switcher))))
       ((else $term)
         (term-switch $term
           ((hole? $hole) `(hole ,(hole-index $hole)))

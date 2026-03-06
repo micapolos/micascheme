@@ -11,21 +11,32 @@
 (define (application-2 $fn $lhs $rhs)
   (application (application $fn $lhs) $rhs))
 
+(define true-term selector)
+(define false-term (rejector selector))
+
+(define (if-term $condition $consequent $alternate)
+  (match-term $condition
+    (application
+      (lambda (_) $alternate)
+      (lambda (_) $consequent))))
+
 (define (cons-term $car $cdr)
   (application (application selector $car) $cdr))
 
-(define (pair-switch-term $pair $body)
+(define (match-term $pair $body)
   (application (application matcher $pair) $body))
 
 (define (car-term $pair)
-  (pair-switch-term $pair
-    (lambda ($car)
-      (lambda ($cdr) $car))))
+  (match-term $pair
+    (lambda ($cdr)     ;; Outer: "bar" is peeled first
+      (lambda ($car)   ;; Inner: "foo" is peeled second
+        $car))))       ;; Return the inner one for 'car'
 
 (define (cdr-term $pair)
-  (pair-switch-term $pair
-    (lambda ($car)
-      (lambda ($cdr) $cdr))))
+  (match-term $pair
+    (lambda ($cdr)     ;; Outer: "bar"
+      (lambda ($car)   ;; Inner: "foo"
+        $cdr))))       ;; Return the outer one for 'cdr'
 
 (check-term-datum=?
   (normalize (native 123))
@@ -96,3 +107,15 @@
 (check-term-datum=?
   (normalize (car-term (cons-term (native "foo") (native "bar"))))
   (native "foo"))
+
+(check-term-datum=?
+  (normalize (cdr-term (cons-term (native "foo") (native "bar"))))
+  (native "bar"))
+
+(check-term-datum=?
+  (normalize (if-term true-term (native "true") (native "false")))
+  (native "false"))
+
+(check-term-datum=?
+  (normalize (if-term false-term (native "true") (native "false")))
+  (native "false"))
