@@ -13,6 +13,14 @@
       ((lambda? $lambda)
         (lambda ($arg)
           (normalize (lambda-apply $lambda $arg))))
+      ((lambda-type? $lambda-type)
+        (lambda-type
+          (normalize (lambda-type-param $lambda-type))
+          (normalize (lambda-type-lambda $lambda-type))))
+      ((recursion? $recursion)
+        (recursion
+          (normalize
+            (recursion-lambda $recursion))))
       ((application? $application)
         (lets
           ($lhs (normalize (application-lhs $application)))
@@ -26,10 +34,6 @@
               (normalize (application (recursion-apply $recursion $lhs) $rhs)))
             ((else $other)
               (application $lhs $rhs)))))
-      ((recursion? $recursion)
-        (recursion
-          (normalize
-            (recursion-lambda $recursion))))
       ((branch? $branch)
         (lets
           ($condition (normalize (branch-condition $branch)))
