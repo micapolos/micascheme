@@ -12,10 +12,24 @@
       ((primitive? $primitive) $primitive)
       ((variable? $variable) $variable)
       ((lambda? $lambda)
-        (lambda ($0)
-          (normalize (lambda-apply $lambda $0))))
+        (lambda ($arg)
+          (normalize (lambda-apply $lambda $arg))))
       ((application? $application)
         (term-apply
           (normalize (application-lhs $application))
-          (normalize (application-rhs $application))))))
+          (normalize (application-rhs $application))))
+      ((recursion? $recursion)
+        (recursion
+          (normalize
+            (recursion-lambda $recursion))))
+      ((branch? $branch)
+        (lets
+          ($condition (normalize (branch-condition $branch)))
+          (switch $condition
+            ((boolean? $boolean)
+              (normalize (branch-ref $branch $boolean)))
+            ((else $other)
+              (branch $condition
+                (normalize (branch-consequent $branch))
+                (normalize (branch-alternate $branch)))))))))
 )
