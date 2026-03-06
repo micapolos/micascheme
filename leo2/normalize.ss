@@ -46,39 +46,52 @@
                 ((else $other)
                   (application $lhs $rhs))))
             ((switcher? $switcher)
-              (lets ($data (switcher-ref $switcher))
+              (lets
+                ($data (switcher-ref $switcher))
                 (switch $data
                   ((application? $app-data)
-                   (switch $rhs
-                     ((application? $app-logic)
-                      (normalize
-                        (application
-                          (switcher (application-lhs $app-data))
-                          (lambda-apply (application-rhs $app-logic) (application-rhs $app-data)))))
+                    (switch $rhs
+                      ((application? $app-logic)
+                        (normalize
+                          (application
+                            (switcher (application-lhs $app-data))
+                            (lambda-apply
+                              (application-rhs $app-logic)
+                              (application-rhs $app-data)))))
                      ((lambda? $lam-logic)
-                      (normalize
-                        (application
-                          (switcher (application-lhs $app-data))
-                          (lambda-apply $lam-logic (application-rhs $app-data)))))
-                     ((else _) (application $lhs $rhs))))
-                  ((selector? $sel)
-                   (switch $rhs
-                     ((application? $app-logic)
-                      (normalize (lambda-apply (application-rhs $app-logic) $data)))
-                     ((lambda? $lam-logic)
-                      (normalize (lambda-apply $lam-logic $data)))
-                     ((else $val) $val)))
-                  ((rejector? $rej)
-                   (switch $rhs
-                     ((application? $app-logic)
-                      ;; SUCCESS: Skip the RHS branch, move to the LHS branch
-                      (normalize (application (switcher (rejector-ref $rej)) (application-lhs $app-logic))))
+                        (normalize
+                          (application
+                            (switcher (application-lhs $app-data))
+                            (lambda-apply $lam-logic
+                              (application-rhs $app-data)))))
                      ((else _)
-                      ;; If there's no more application spine to peel,
-                      ;; just pass the switcher reference forward.
-                      (normalize (application (switcher (rejector-ref $rej)) $rhs)))))
-                  ((else _) (application $lhs $rhs)))))
-
+                      (application $lhs $rhs))))
+                  ((selector? $sel)
+                    (switch $rhs
+                      ((application? $app-logic)
+                        (normalize
+                          (lambda-apply
+                            (application-rhs $app-logic)
+                            $data)))
+                      ((lambda? $lam-logic)
+                        (normalize
+                          (lambda-apply $lam-logic $data)))
+                      ((else $val)
+                        $val)))
+                    ((rejector? $rej)
+                      (switch $rhs
+                        ((application? $app-logic)
+                          (normalize
+                            (application
+                              (switcher (rejector-ref $rej))
+                              (application-lhs $app-logic))))
+                        ((else _)
+                          (normalize
+                            (application
+                              (switcher (rejector-ref $rej))
+                              $rhs)))))
+                  ((else _)
+                    (application $lhs $rhs)))))
             ((lambda? $lhs-lambda)
               (normalize (lambda-apply $lhs-lambda $rhs)))
             ((lambda-type? $lhs-lambda-type)
