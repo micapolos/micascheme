@@ -9,8 +9,12 @@
     ((number? $number)
       (zero? $number))
     ((else $other)
-      (neutral (application zero?-term $term)))))
+      (application (native zero?) $term))))
 
 (check-term-datum=?
   (term-apply zero?-term 123)
   #f)
+
+(check-term-datum=?
+  (term-apply (native zero?) 123)
+  (neutral (application (native zero?) 123)))
