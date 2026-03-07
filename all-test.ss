@@ -50,6 +50,7 @@
   (mico-c)
   (monad)
   (monad-syntax)
+  (monadic)
   (monoid)
   ;(msdl)
   (nex)
