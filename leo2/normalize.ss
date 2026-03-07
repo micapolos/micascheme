@@ -5,19 +5,11 @@
     (leo2 base)
     (leo2 term))
 
-(define (normalize $term)
+  (define (normalize $term)
     (switch-exhaustive $term
-      ((native? $native) $native)
-      ((variable? $variable) $variable)
       ((lambda? $lambda)
         (lambda ($arg)
           (normalize (lambda-apply $lambda $arg))))
-      ((lambda-type? $lambda-type)
-        (lambda-type
-          (normalize (lambda-type-param $lambda-type))
-          (normalize (lambda-type-lambda $lambda-type))))
-      ((recursion? $recursion)
-        $recursion)
       ((application? $application)
         (lets
           ($lhs (normalize (application-lhs $application)))
@@ -39,5 +31,12 @@
             ((recursion? $lhs-recursion)
               (normalize (application (recursion-apply $lhs-recursion $lhs) $rhs)))
             ((else _)
-              (application $lhs $rhs)))))))
+              (application $lhs $rhs)))))
+      ((native? $native) $native)
+      ((type? $type) $type)
+      ((lambda-type? $lambda-type)
+        (lambda-type
+          (normalize (lambda-type-param $lambda-type))
+          (normalize (lambda-type-lambda $lambda-type))))
+      ((variable? $variable) $variable)))
 )
