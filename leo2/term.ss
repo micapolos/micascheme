@@ -30,6 +30,7 @@
     lambda-apply
     lambda-type-apply
     recursion-apply
+    native-apply
 
     type+1
 
@@ -114,6 +115,12 @@
 
   (define (recursion-apply $recursion $arg)
     ((recursion-lambda $recursion) $arg))
+
+  (define (native-apply $native $arg)
+    (native
+      (app
+        (native-ref $native)
+        (native-ref $arg))))
 
   (define (branch-ref $branch $condition)
     ((if $condition branch-consequent branch-alternate) $branch))

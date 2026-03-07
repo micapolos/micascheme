@@ -6,37 +6,37 @@
     (leo2 term))
 
   (define (normalize $term)
+    (recurse-normalize normalize $term))
+
+  (define (recurse-normalize $recurse $term)
     (switch-exhaustive $term
       ((lambda? $lambda)
         (lambda ($arg)
-          (normalize (lambda-apply $lambda $arg))))
+          ($recurse (lambda-apply $lambda $arg))))
       ((application? $application)
         (lets
-          ($lhs (normalize (application-lhs $application)))
-          ($rhs (normalize (application-rhs $application)))
+          ($lhs ($recurse (application-lhs $application)))
+          ($rhs ($recurse (application-rhs $application)))
           (switch $lhs
             ((native? $lhs-native)
               (switch $rhs
                 ((native? $rhs-native)
-                  (native
-                    (app
-                      (native-ref $lhs-native)
-                      (native-ref $rhs-native))))
+                  (native-apply $lhs-native $rhs-native))
                 ((else $rhs-other)
                   (application $lhs $rhs))))
             ((lambda? $lhs-lambda)
-              (normalize (lambda-apply $lhs-lambda $rhs)))
+              ($recurse (lambda-apply $lhs-lambda $rhs)))
             ((lambda-type? $lhs-lambda-type)
-              (normalize (lambda-type-apply $lhs-lambda-type $rhs)))
+              ($recurse (lambda-type-apply $lhs-lambda-type $rhs)))
             ((recursion? $lhs-recursion)
-              (normalize (application (recursion-apply $lhs-recursion $lhs) $rhs)))
+              ($recurse (application (recursion-apply $lhs-recursion $lhs) $rhs)))
             ((else _)
               (application $lhs $rhs)))))
       ((native? $native) $native)
       ((type? $type) $type)
       ((lambda-type? $lambda-type)
         (lambda-type
-          (normalize (lambda-type-param $lambda-type))
-          (normalize (lambda-type-lambda $lambda-type))))
+          ($recurse (lambda-type-param $lambda-type))
+          ($recurse (lambda-type-lambda $lambda-type))))
       ((variable? $variable) $variable)))
 )

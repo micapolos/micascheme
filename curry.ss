@@ -1,5 +1,8 @@
 (library (curry)
-  (export curry curry< curry+ curry-)
+  (export
+    curry
+    curry< curry+ curry-
+    curry-string-append)
   (import (scheme))
 
   (define-syntax (curry $syntax)
@@ -26,4 +29,8 @@
   (define (curry- a)
     (lambda (b)
       (- a b)))
+
+  (define (curry-string-append a)
+    (lambda (b)
+      (string-append a b)))
 )
