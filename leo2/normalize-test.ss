@@ -48,6 +48,17 @@
       $condition)
     null-term))
 
+(define (recursive-term $f)
+  (application
+    (lambda ($x)
+      (application $f
+        (lambda ($v)
+          (application (application $x $x) $v))))
+    (lambda ($x)
+      (application $f
+        (lambda ($v)
+          (application (application $x $x) $v))))))
+
 (check-term-datum=?
   (normalize (native 123))
   (native 123))
@@ -87,7 +98,7 @@
 (check-term-datum=?
   (normalize
     (application
-      (recursion
+      (recursive-term
         (lambda ($fn)
           (lambda ($n)
             (branch-term (application boolean-term (application (native zero?) $n))
@@ -100,7 +111,7 @@
 (check-term-datum=?
   (normalize
     (application
-      (recursion
+      (recursive-term
         (lambda ($fib)
           (lambda ($n)
             (branch-term (application boolean-term (application-2 (native curry<) $n (native 2)))
