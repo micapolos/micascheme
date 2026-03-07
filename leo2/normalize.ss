@@ -38,8 +38,7 @@
       ((lambda-type? $lambda-type)
         (lambda-type
           ($recurse (lambda-type-param $lambda-type))
-          ($recurse (lambda-type-lambda $lambda-type))))
-      ((variable? $variable) $variable)))
+          ($recurse (lambda-type-lambda $lambda-type))))))
 
   (define (typed-normalize $typed)
     (recurse-typed-normalize typed-normalize $typed))
