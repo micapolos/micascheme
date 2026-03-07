@@ -9,10 +9,6 @@
     (switch-exhaustive $term
       ((native? $native) $native)
       ((variable? $variable) $variable)
-      ((selector? $selector) $selector)
-      ((rejector? $rejector) $rejector)
-      ((matcher? $matcher) $matcher)
-      ((switcher? $s) $s)
       ((lambda? $lambda)
         (lambda ($arg)
           (normalize (lambda-apply $lambda $arg))))
@@ -36,46 +32,8 @@
                       (native-ref $rhs-native))))
                 ((else $rhs-other)
                   (application $lhs $rhs))))
-            ((selector? $sel)
-              $rhs)
-            ((rejector? $rej)
-              (normalize (rejector-ref $rej)))
-            ((matcher? $m)
-              (switcher $rhs))
-            ((application? $lhs-application)
-              (switch (application-lhs $lhs-application)
-                ((matcher? $matcher)
-                  (normalize
-                    (application
-                      (switcher (application-rhs $lhs-application))
-                      $rhs)))
-                ((else $other)
-                  (application $lhs $rhs))))
-            ((switcher? $switcher)
-              (lets
-                ($data (switcher-ref $switcher))
-                (switch $data
-                  ((application? $app-data)
-                    (normalize
-                      (application
-                        (switcher (application-lhs $app-data))
-                        ;; IMPORTANT: We do NOT normalize the result of the logic yet.
-                        ;; We build a naked application of (Logic RHS-Data)
-                        (application $rhs (application-rhs $app-data)))))
-                  ((native? $n)
-                    (switch $rhs
-                      ((selector? $sel) $n)
-                      ((rejector? $rej) (normalize (rejector-ref $rej)))
-                      ;; Ensure Logic is on the LHS and Data is on the RHS
-                      ((else _) (normalize (application $rhs $n)))))
-                  ((selector? $sel)
-                    (normalize (application $rhs $data)))
-                  ((else _)
-                    (application $lhs $rhs)))))
             ((lambda? $lhs-lambda)
-              (switch $rhs
-                ((switcher? $s) (normalize (application $rhs $lhs)))
-                ((else _) (normalize (lambda-apply $lhs-lambda $rhs)))))
+              (normalize (lambda-apply $lhs-lambda $rhs)))
             ((lambda-type? $lhs-lambda-type)
               (normalize (lambda-type-apply $lhs-lambda-type $rhs)))
             ((recursion? $lhs-recursion)

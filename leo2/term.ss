@@ -20,11 +20,6 @@
     labeled labeled? labeled-label labeled-ref
     lambda?
 
-    matcher matcher?
-    selector selector?
-    rejector rejector? rejector-ref
-    switcher switcher? switcher-ref
-
     mismatch mismatch? mismatch-expected mismatch-actual
     expected expected? expected-ref
     actual actual? actual-ref
@@ -64,12 +59,6 @@
     (variable index)
     (lambda-type param lambda)
     (application lhs rhs)
-
-    matcher
-    selector
-    (rejector ref)
-    (switcher ref)
-
     (branch condition consequent alternate)
     (recursion lambda)
     (labeled label ref)
