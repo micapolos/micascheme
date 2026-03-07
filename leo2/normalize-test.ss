@@ -39,7 +39,6 @@
 (define (cdr-term $pair)
   (application $pair false-term))
 
-
 (define (branch-term $condition $consequent $alternate)
   (application
     (application
