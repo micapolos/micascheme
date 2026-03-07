@@ -8,7 +8,7 @@
     (leo2 datum)
     (leo2 equal)
     (leo2 unpeel)
-    (leo2 typed-term))
+    (leo2 typed))
 
   (define (evaluate $obj)
     (switch $obj

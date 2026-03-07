@@ -6,7 +6,7 @@
   (leo2 binding)
   (leo2 datum)
   (leo2 equal)
-  (leo2 typed-term)
+  (leo2 typed)
   (leo2 dependent)
   (leo2 unpeel)
   (leo2 evaluate)

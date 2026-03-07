@@ -4,7 +4,7 @@
   (import
     (leo2 base)
     (leo2 term)
-    (leo2 typed-term))
+    (leo2 typed))
 
   (define (normalize $term)
     (recurse-normalize normalize $term))
@@ -44,7 +44,7 @@
     (recurse-typed-normalize typed-normalize $typed))
 
   (define (recurse-typed-normalize $recurse $typed)
-    (type-value->term
+    (typed-term
       (term-type $typed)
       ($recurse (term-value $typed))))
 )

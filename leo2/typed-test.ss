@@ -1,7 +1,7 @@
 (import
   (leo2 base)
   (leo2 term)
-  (leo2 typed-term)
+  (leo2 typed)
   (leo2 datum))
 
 ; === term-type
@@ -28,12 +28,12 @@
 
 (check (raises (term-value (native "value"))))
 
-; === type-value->term
+; === typed-term
 
 (check-term-datum=?
-  (type-value->term (type 2) (type 1))
+  (typed-term (type 2) (type 1))
   (type 1))
 
 (check-term-datum=?
-  (type-value->term (native "type") (native "value"))
+  (typed-term (native "type") (native "value"))
   (typed (native "type") (native "value")))

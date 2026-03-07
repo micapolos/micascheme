@@ -1,8 +1,8 @@
-(library (leo2 typed-term)
+(library (leo2 typed)
   (export
     term-type
     term-value
-    type-value->term)
+    typed-term)
   (import
     (leo2 base)
     (leo2 term))
@@ -19,7 +19,7 @@
       ((type? $type) $type)
       ((else $other) (throw term-value $other))))
 
-  (define (type-value->term $type $value)
+  (define (typed-term $type $value)
     (switch $value
       ((type? $type) $type)
       ((else $other) (typed $type $other))))
