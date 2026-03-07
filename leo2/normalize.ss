@@ -11,6 +11,7 @@
 
   (define (recurse-normalize $recurse $term)
     (switch-exhaustive $term
+      ((native? $native) $native)
       ((lambda? $lambda)
         (lambda ($arg)
           ($recurse (lambda-apply $lambda $arg))))
@@ -33,7 +34,6 @@
               ($recurse (application (recursion-apply $lhs-recursion $lhs) $rhs)))
             ((else _)
               (application $lhs $rhs)))))
-      ((native? $native) $native)
       ((type? $type) $type)
       ((lambda-type? $lambda-type)
         (lambda-type
