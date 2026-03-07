@@ -40,7 +40,6 @@
               (normalize (application (recursion-apply $lhs-recursion $lhs) $rhs)))
             ((else _)
               (application $lhs $rhs)))))
-
       ((branch? $branch)
         (lets
           ($condition (normalize (branch-condition $branch)))
