@@ -3,7 +3,8 @@
     normalize)
   (import
     (leo2 base)
-    (leo2 term))
+    (leo2 term)
+    (leo2 typed-term))
 
   (define (normalize $term)
     (recurse-normalize normalize $term))
@@ -39,4 +40,12 @@
           ($recurse (lambda-type-param $lambda-type))
           ($recurse (lambda-type-lambda $lambda-type))))
       ((variable? $variable) $variable)))
+
+  (define (typed-normalize $typed)
+    (recurse-typed-normalize typed-normalize $typed))
+
+  (define (recurse-typed-normalize $recurse $typed)
+    (type-value->term
+      (term-type $typed)
+      ($recurse (term-value $typed))))
 )

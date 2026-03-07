@@ -3,6 +3,7 @@
     native->datum
     term->datum
     depth-term->datum
+    recurse-depth-term->datum
     check-term->datum=?
     check-term-datum=?)
   (import
@@ -30,36 +31,36 @@
         `',$other)))
 
   (define (depth-term->datum $depth $term)
+    (recurse-depth-term->datum depth-term->datum $depth $term))
+
+  (define (recurse-depth-term->datum $recurse $depth $term)
     ; TODO: Integrate in term-switch
     (switch $term
       ((primitive? $primitive)
         $primitive)
       ((pair? $pair)
-        (pair-map (partial depth-term->datum $depth) $pair))
+        (pair-map (partial $recurse $depth) $pair))
       ((vector? $vector)
-        (vector-map (partial depth-term->datum $depth) $vector))
+        (vector-map (partial $recurse $depth) $vector))
       ((mismatch? $mismatch)
         `(mismatch
-          ,(depth-term->datum $depth (mismatch-expected $mismatch))
-          ,(depth-term->datum $depth (mismatch-actual $mismatch))))
+          ,($recurse $depth (mismatch-expected $mismatch))
+          ,($recurse $depth (mismatch-actual $mismatch))))
       ((expected? $expected)
         `(expected
-          ,(depth-term->datum $depth
-            (expected-ref $expected))))
+          ,($recurse $depth (expected-ref $expected))))
       ((actual? $actual)
         `(actual
-          ,(depth-term->datum $depth
-            (actual-ref $actual))))
+          ,($recurse $depth (actual-ref $actual))))
       ((unbound? $unbound)
         `(unbound
-          ,(depth-term->datum $depth
-            (unbound-ref $unbound))))
+          ,($recurse $depth (unbound-ref $unbound))))
       ((native-type? _)
         `native-type)
       ((unknown? _)
         'unknown)
       ((error? $error)
-        `(error ,(depth-term->datum $depth (error-ref $error))))
+        `(error ,($recurse $depth (error-ref $error))))
       ((else $term)
         (term-switch $term
           ((hole? $hole) `(hole ,(hole-index $hole)))
@@ -73,7 +74,7 @@
               ,(native->datum (native-application-lambda $native-application))
               (list
                 ,@(map
-                  (partial depth-term->datum $depth)
+                  (partial $recurse $depth)
                   (native-application-args $native-application)))))
           ((variable? $variable)
             (lets
@@ -85,36 +86,36 @@
             (lets
               ($symbol (depth->symbol $depth))
               `(lambda (,(depth->symbol $depth))
-                ,(depth-term->datum
+                ,($recurse
                   (+ $depth 1)
                   ($lambda (variable $depth))))))
           ((lambda-type? $lambda-type)
             `(lambda-type
-              ,(depth-term->datum $depth (lambda-type-param $lambda-type))
-              ,(depth-term->datum $depth (lambda-type-lambda $lambda-type))))
+              ,($recurse $depth (lambda-type-param $lambda-type))
+              ,($recurse $depth (lambda-type-lambda $lambda-type))))
           ((application? $application)
             `(application
-              ,(depth-term->datum $depth (application-lhs $application))
-              ,(depth-term->datum $depth (application-rhs $application))))
+              ,($recurse $depth (application-lhs $application))
+              ,($recurse $depth (application-rhs $application))))
           ((branch? $branch)
             `(branch
-              ,(depth-term->datum $depth (branch-condition $branch))
-              ,(depth-term->datum $depth (branch-consequent $branch))
-              ,(depth-term->datum $depth (branch-alternate $branch))))
+              ,($recurse $depth (branch-condition $branch))
+              ,($recurse $depth (branch-consequent $branch))
+              ,($recurse $depth (branch-alternate $branch))))
           ((recursion? $recursion)
             `(recursion
-              ,(depth-term->datum $depth (recursion-lambda $recursion))))
+              ,($recurse $depth (recursion-lambda $recursion))))
           ((labeled? $labeled)
             `(labeled
-              ,(depth-term->datum $depth (labeled-label $labeled))
-              ,(depth-term->datum $depth (labeled-ref $labeled))))
+              ,($recurse $depth (labeled-label $labeled))
+              ,($recurse $depth (labeled-ref $labeled))))
           ((evaluated? $evaluated)
             `(evaluated
-              ,(depth-term->datum $depth (evaluated-ref $evaluated))))
+              ,($recurse $depth (evaluated-ref $evaluated))))
           ((typed? $typed)
             `(typed
-              ,(depth-term->datum $depth (typed-type $typed))
-              ,(depth-term->datum $depth (typed-ref $typed))))))))
+              ,($recurse $depth (typed-type $typed))
+              ,($recurse $depth (typed-ref $typed))))))))
 
   (define-rule-syntax (check-term->datum=? in out)
     (check (equal? (term->datum in) `out)))
