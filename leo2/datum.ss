@@ -1,5 +1,6 @@
 (library (leo2 datum)
   (export
+    native->datum
     term->datum
     depth-term->datum
     check-term->datum=?
