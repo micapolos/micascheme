@@ -39,15 +39,5 @@
             ((recursion? $lhs-recursion)
               (normalize (application (recursion-apply $lhs-recursion $lhs) $rhs)))
             ((else _)
-              (application $lhs $rhs)))))
-      ((branch? $branch)
-        (lets
-          ($condition (normalize (branch-condition $branch)))
-          (switch $condition
-            ((native? $native)
-              (normalize (branch-ref $branch (native-ref $native))))
-            ((else $other)
-              (branch $condition
-                (normalize (branch-consequent $branch))
-                (normalize (branch-alternate $branch)))))))))
+              (application $lhs $rhs)))))))
 )
