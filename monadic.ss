@@ -17,6 +17,7 @@
           ($lets-id (identifier-append #'id #'id #'- #'lets))
           ($list->id (identifier-append #'id #'list #'-> #'id))
           ($append-id (identifier-append #'id #'append #'- #'id))
+          ($apply-id (identifier-append #'id #'apply #'- #'id))
           #`(begin
             (define-rules-syntax
               ((#,$lets-id x) x)
@@ -35,5 +36,9 @@
                     ($cdr (#,$list->id (cdr $pair)))
                     (id (cons $car $cdr))))))
             (define (#,$append-id . x)
-              (#,$list->id x)))))))
+              (#,$list->id x))
+            (define (#,$apply-id fn . x)
+              (#,$lets-id
+                ($list (#,$list->id x))
+                (id (apply fn $list)))))))))
 )

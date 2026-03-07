@@ -18,7 +18,8 @@
     (leo2 base)
     (leo2 term)
     (leo2 datum)
-    (leo2 equal))
+    (leo2 equal)
+    (monadic))
 
   (define empty-solutions '())
 
@@ -38,6 +39,14 @@
   (define (solver-solve $solver)
     (solver-apply $solver '()))
 
+  (define (solver-bind $solver $fn)
+    (solver ($solutions)
+      (lets
+        ((values $solutions $value) (solver-apply $solver $solutions))
+        (solver-apply ($fn $value) $solutions))))
+
+  (define-monadic solver)
+
   (define-rules-syntaxes
     ((solver ($solutions) body)
       (identifier? #'$solutions)
@@ -47,18 +56,7 @@
         (values $solutions $result)))
     ((solver-with $solutions $result)
       (solver (_)
-        (values $solutions $result)))
-    ((solver-lets solver)
-      solver)
-    ((solver-lets (id first-solver) x ... last-solver)
-      (identifier? #'id)
-      (solver ($solutions)
-        (lets
-          ((values $solutions id)
-            (solver-apply first-solver $solutions))
-          (solver-apply
-            (solver-lets x ... last-solver)
-            $solutions)))))
+        (values $solutions $result))))
 
   (define (solver->datum $solver)
     (lets
@@ -66,26 +64,6 @@
       `(solver
         (stack ,@(map term->datum (reverse $solutions)))
         ,(term->datum $result))))
-
-  (define (list->solver $solvers)
-    (switch-exhaustive $solvers
-      ((null? $null)
-        (solver $null))
-      ((pair? $pair)
-        (apply-solver cons
-          (car $pair)
-          (list->solver (cdr $pair))))))
-
-  (define-case-syntax (apply-solver fn arg ...)
-    (lets
-      ($args #'(arg ...))
-      ($tmps (generate-temporaries $args))
-      #`(solver-lets
-        #,@(map-with
-          ($tmp $tmps)
-          ($arg $args)
-          #`(#,$tmp #,$arg))
-        (solver (fn #,@$tmps)))))
 
   (define solutions-solver
     (solver ($solutions)

@@ -7,5 +7,6 @@
         compile
         expand
         atom?
+        define-monadic
         indexed indexed? indexed-index indexed-value
         error error?))))
