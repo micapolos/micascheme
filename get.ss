@@ -23,6 +23,8 @@
     datum/annotation-getter
     datum-getter
 
+    annotation-getter
+
     check-gets)
   (import
     (scheme)
@@ -111,6 +113,18 @@
     (getter-lets
       ($chars (test?-push-chars-getter $test? (stack)))
       (getter (apply string (reverse $chars)))))
+
+  (define (annotation-getter $getter)
+    (getter-lets
+      ($bfp bfp-getter)
+      ($value $getter)
+      ($efp bfp-getter)
+      ($sfd sfd-getter)
+      (getter
+        (make-annotation
+          $value
+          (make-source-object $sfd $bfp $efp)
+          $value))))
 
   (define-rule-syntax (keywords values) (check-gets getter string out bfp)
     (lets

@@ -6,25 +6,18 @@
     (micascheme)
     (get))
 
-  (define word-annotation?-getter
+  (define word?-getter
     (getter-lets
-      ($bfp bfp-getter)
       ($string (test?-string-getter char-alphabetic?))
-      ($efp bfp-getter)
-      ($sfd sfd-getter)
       (getter
         (and
           (not (string-empty? $string))
-          (make-annotation
-            (string->symbol $string)
-            (make-source-object $sfd $bfp $efp)
-            (string->symbol $string))))))
+          (string->symbol $string)))))
 
-  (define word?-getter
+  (define word-annotation?-getter
     (getter-lets
-      ($word-annotation? word-annotation?-getter)
-      (getter
-        (and $word-annotation?
-          (annotation-stripped $word-annotation?)))))
-
+      ($word?-annotation (annotation-getter word?-getter))
+      (and
+        (annotation-stripped $word?-annotation)
+        $word?-annotation)))
 )
