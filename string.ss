@@ -1,12 +1,16 @@
 (library (string)
   (export
     empty-string
+    string-empty?
     lines-string
     lines-string0
     string->ascii)
   (import (scheme) (list) (list-syntax) (procedure) (char))
 
   (define (empty-string) "")
+
+  (define (string-empty? $string)
+    (= (string-length $string) 0))
 
   (define (lines-string . $lines)
     (apply string-append

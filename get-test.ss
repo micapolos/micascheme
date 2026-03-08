@@ -27,3 +27,7 @@
   1)
 
 (check-gets datum-getter "(foo bar) (zoo zar)" '(foo bar) 9)
+
+(check-gets (test?-string-getter char-alphabetic?) "" "" 0)
+(check-gets (test?-string-getter char-alphabetic?) "foo" "foo" 3)
+(check-gets (test?-string-getter char-alphabetic?) "foo123" "foo" 3)

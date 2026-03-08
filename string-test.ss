@@ -1,5 +1,9 @@
 (import (scheme) (check) (string))
 
+(check (equal? (empty-string) ""))
+(check (string-empty? ""))
+(check (not (string-empty? " ")))
+
 (check (equal? (lines-string) ""))
 (check (equal? (lines-string "foo") "foo\n"))
 (check (equal? (lines-string "foo" "bar") "foo\nbar\n"))

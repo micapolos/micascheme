@@ -13,6 +13,8 @@
     char-getter
     char-ungetter
 
+    test?-string-getter
+
     datum/annotation-getter
     datum-getter
 
@@ -26,7 +28,9 @@
     (syntax)
     (check)
     (switch)
-    (annotation))
+    (annotation)
+    (boolean)
+    (stack))
 
   (define (get $getter $port $sfd $bfp)
     ($getter $port $sfd $bfp))
@@ -71,6 +75,25 @@
     (getter-lets
       ($datum/annotation datum/annotation-getter)
       (getter (datum/annotation-stripped $datum/annotation))))
+
+  (define (test?-push-chars-getter $test? $chars)
+    (getter-lets
+      ($char? char?-getter)
+      (switch $char?
+        ((false? _)
+          (getter $chars))
+        ((char-alphabetic? $char-alphabetic)
+          (test?-push-chars-getter $test?
+            (push $chars $char-alphabetic)))
+        ((else $char-other)
+          (getter-lets
+            (_ (char-ungetter $char-other))
+            (getter $chars))))))
+
+  (define (test?-string-getter $test?)
+    (getter-lets
+      ($chars (test?-push-chars-getter $test? (stack)))
+      (getter (apply string (reverse $chars)))))
 
   (define-rule-syntax (keywords values) (check-gets getter string out bfp)
     (lets
