@@ -1,14 +1,14 @@
 (library (get)
   (export
-    substring->get!
-    string->get!
-    textual-port->get!)
+    substring->get-char/eof!
+    string->get-char/eof!
+    textual-port->get-char/eof!)
   (import
     (scheme)
     (eof)
     (lets))
 
-  (define (substring->get! $string $from $to)
+  (define (substring->get-char/eof! $string $from $to)
     (lambda ()
       (if (= $from $to)
         eof
@@ -17,10 +17,17 @@
           (run (set! $from (+ $from 1)))
           $char))))
 
-  (define (string->get! $string)
-    (substring->get! $string 0 (string-length $string)))
+  (define (string->get-char/eof! $string)
+    (substring->get-char/eof! $string 0 (string-length $string)))
 
-  (define (textual-port->get! $textual-port)
+  (define (textual-port->get-char/eof! $textual-port)
     (lambda ()
       (get-char $textual-port)))
+
+  ; (define (indent-get-char/eof! $get-char/eof! $last-char-box)
+  ;   (lambda ()
+  ;     (lets
+  ;       ($char/eof $get-char/eof!)
+  ;       (switch $char/eof
+  ;         ((eof? $eof) (throw eof))
 )
