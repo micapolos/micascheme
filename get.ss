@@ -8,10 +8,12 @@
     append-getter
     apply-getter
 
-    eof?-getter
-    char?-getter
     char-getter
     char-ungetter
+    peek-char-getter
+
+    eof?-getter
+    char?-getter
 
     test?-string-getter
 
@@ -66,6 +68,10 @@
       (lets
         (run (unget-char $port $char))
         (values $char (- $bfp 1)))))
+
+  (define peek-char-getter
+    (lambda ($port $sfd $bfp)
+      (values (peek-char $port) $bfp)))
 
   (define-monadic getter)
 

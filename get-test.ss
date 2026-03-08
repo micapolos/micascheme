@@ -8,6 +8,9 @@
 (check-gets char-getter "" (eof-object) 1)
 (check-gets char-getter "abc" #\a 1)
 
+(check-gets peek-char-getter "" (eof-object) 0)
+(check-gets peek-char-getter "abc" #\a 0)
+
 (check-gets
   (append-getter char-getter char-getter)
   "abc"
