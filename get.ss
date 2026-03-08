@@ -23,11 +23,4 @@
   (define (textual-port->get-char/eof! $textual-port)
     (lambda ()
       (get-char $textual-port)))
-
-  ; (define (indent-get-char/eof! $get-char/eof! $last-char-box)
-  ;   (lambda ()
-  ;     (lets
-  ;       ($char/eof $get-char/eof!)
-  ;       (switch $char/eof
-  ;         ((eof? $eof) (throw eof))
 )
