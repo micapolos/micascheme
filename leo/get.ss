@@ -72,5 +72,7 @@
     (apply-getter annotation/eof-stripped line-annotation/eof-getter))
 
   (define script-getter
-    (apply-getter annotation-stripped script-annotation-getter))
+    (getter-lets
+      ($annotations script-annotation-getter)
+      (getter (map annotation-stripped $annotations))))
 )

@@ -25,4 +25,7 @@
 
 (check-get-raises line/eof-getter "123 ")
 
-;(check-gets script-getter "123\n" '(123) 0)
+(check-gets script-getter "" '() 0)
+(check-gets script-getter "10\n" '(10) 3)
+(check-gets script-getter "10\n20\n" '(10 20) 6)
+(check-gets script-getter "foo\nfoo bar\n" '(foo (foo bar)) 12)
