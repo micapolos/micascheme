@@ -72,7 +72,7 @@
       ($datum/annotation datum/annotation-getter)
       (getter (datum/annotation-stripped $datum/annotation))))
 
-  (define-rule-syntax (keywords values) (check-gets getter string (values out bfp))
+  (define-rule-syntax (keywords values) (check-gets getter string out bfp)
     (lets
       ((values $value $bfp)
         (get getter
@@ -81,6 +81,6 @@
           0))
       (check
         (equal?
-          `(values ,$value ,$bfp)
-          `(values ,out ,bfp)))))
+          `(,$value ,$bfp)
+          `(,out ,bfp)))))
 )
