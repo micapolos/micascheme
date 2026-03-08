@@ -54,10 +54,30 @@
   '(#\a #\b 2 #\c)
   3)
 
+(check-gets (ending-getter char-getter char-getter) "ab" #\a 2)
+(check-gets (ending-getter char-getter char-getter) "abc" #\a 2)
+(check-get-raises (ending-getter char-getter char-getter) "a")
+
 (check-gets (list-getter datum/eof-getter) "" '() 0)
 (check-gets (list-getter datum/eof-getter) "10 20 30" '(10 20 30) 8)
 (check-gets (list-getter datum/eof-getter) "   " '() 3)
 (check-gets (list-getter datum/eof-getter) "  10  20 30  " '(10 20 30) 13)
+
+(check-gets newline-getter "\nabc" #\newline 1)
+(check-get-raises newline-getter "")
+(check-get-raises newline-getter "abc")
+
+(check-gets space-getter " abc" #\space 1)
+(check-get-raises space-getter "")
+(check-get-raises space-getter "abc")
+
+(check-gets comma-getter ",abc" #\, 1)
+(check-get-raises comma-getter "")
+(check-get-raises comma-getter "abc")
+
+(check-gets colon-getter ":abc" #\: 1)
+(check-get-raises colon-getter "")
+(check-get-raises colon-getter "abc")
 
 ; uses (source-file-descriptor "test.txt" 0)
 (check-gets (apply-getter source-file-descriptor-path sfd-getter) "" "test.txt" 0)

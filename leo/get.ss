@@ -2,12 +2,10 @@
   (export
     atom-annotation/eof-getter
     line-annotation/eof-getter
-    line-annotation-getter
     script-annotation-getter
 
     atom/eof-getter
     line/eof-getter
-    line-getter
     script-getter)
   (import
     (micascheme)
@@ -54,39 +52,24 @@
               (((partial char=? #\space) _)
                 (apply-getter append-annotation
                   (getter $atom-annotation/eof)
-                  line-annotation-getter))
-              ((else $other)
-                (throw line-annotation/eof-getter $other)))))
-        ((else $other)
-          (getter-lets
-            ($char/eof char/eof-getter)
-            (switch $char/eof
-              ((eof-object? _) (getter $atom-annotation/eof))
-              (((partial char=? #\newline) _) (getter $atom-annotation/eof))
-              ((else $other) (throw atom-getter $other))))))))
+                  line-annotation/eof-getter))
+              (((partial char=? #\newline) _)
+                (getter $atom-annotation/eof))
+              ((else _)
+                (throw line-annotation/eof-getter $atom-annotation/eof)))))
+        ((else _)
+          (ending-getter
+            (getter $atom-annotation/eof)
+            newline-getter)))))
 
   (define script-annotation-getter
     (list-getter line-annotation/eof-getter))
-
-  (define line-annotation-getter
-    (getter-lets
-      ($line-annotation/eof line-annotation/eof-getter)
-      (getter
-        (switch $line-annotation/eof
-          ((eof-object? $eof-object)
-            (throw line-annotation-getter $eof-object))
-          ((else $line-annotation)
-            $line-annotation)))))
-
 
   (define atom/eof-getter
     (apply-getter annotation/eof-stripped atom-annotation/eof-getter))
 
   (define line/eof-getter
     (apply-getter annotation/eof-stripped line-annotation/eof-getter))
-
-  (define line-getter
-    (apply-getter annotation-stripped line-annotation-getter))
 
   (define script-getter
     (apply-getter annotation-stripped script-annotation-getter))

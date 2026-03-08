@@ -29,6 +29,12 @@
 
     annotation-getter
     skip-until-getter
+    ending-getter
+
+    newline-getter
+    space-getter
+    comma-getter
+    colon-getter
 
     push-getter
     list-getter
@@ -171,6 +177,17 @@
           $value
           (make-source-object $sfd $bfp $efp)
           $value))))
+
+  (define (ending-getter $getter $end-getter)
+    (getter-lets
+      ($value $getter)
+      (_ $end-getter)
+      (getter $value)))
+
+  (define newline-getter (exact-char-getter #\newline))
+  (define space-getter (exact-char-getter #\space))
+  (define comma-getter (exact-char-getter #\,))
+  (define colon-getter (exact-char-getter #\:))
 
   (define-rule-syntax (check-gets getter string out bfp)
     (check
