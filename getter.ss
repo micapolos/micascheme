@@ -1,6 +1,7 @@
 (library (getter)
   (export
-    get
+    getter-get!
+
     getter
     getter-bind
     getter-map
@@ -57,7 +58,7 @@
     (throw)
     (eof))
 
-  (define (get $getter $port $sfd $bfp)
+  (define (getter-get! $getter $port $sfd $bfp)
     ($getter $port $sfd $bfp))
 
   (define (getter $value)
@@ -67,8 +68,8 @@
   (define (getter-bind $getter $fn)
     (lambda ($port $sfd $bfp)
       (lets
-        ((values $value $bfp) (get $getter $port $sfd $bfp))
-        (app ($fn $value) $port $sfd $bfp))))
+        ((values $value $bfp) (getter-get! $getter $port $sfd $bfp))
+        (getter-get! ($fn $value) $port $sfd $bfp))))
 
   (define sfd-getter
     (lambda ($port $sfd $bfp)
@@ -200,7 +201,7 @@
     (check
       (equal?
         (values->list
-          (get getter
+          (getter-get! getter
             (open-input-string string)
             (source-file-descriptor "test.txt" 0)
             0))
@@ -209,7 +210,7 @@
   (define-rule-syntax (check-get-raises getter string)
     (check
       (raises
-        (get getter
+        (getter-get! getter
           (open-input-string string)
           (source-file-descriptor "test.txt" 0)
           0))))
