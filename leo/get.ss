@@ -1,30 +1,29 @@
 (library (leo get)
-  (export
-    symbol-getter)
+  (export word-getter)
   (import
     (micascheme)
     (get))
 
-  (define (push-symbol-chars-getter $chars)
+  (define (push-word-chars-getter $chars)
     (getter-lets
       ($char? char?-getter)
       (switch $char?
         ((false? _)
           (getter $chars))
         ((char-alphabetic? $char-alphabetic)
-          (push-symbol-chars-getter
+          (push-word-chars-getter
             (push $chars $char-alphabetic)))
         ((else $char-other)
           (getter-lets
             (_ (char-ungetter $char-other))
             (getter $chars))))))
 
-  (define symbol-getter
+  (define word-getter
     (getter-lets
-      ($chars (push-symbol-chars-getter (stack)))
+      ($chars (push-word-chars-getter (stack)))
       (switch $chars
         ((null? _)
-          (throw null-symbol-getter))
+          (throw null-word-getter))
         ((else $chars)
           (getter (string->symbol (apply string (reverse $chars))))))))
 
