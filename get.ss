@@ -13,6 +13,7 @@
     bfp-getter
 
     exact-char-getter
+    exact-string-getter
 
     char/eof-getter
     char-getter
@@ -113,6 +114,11 @@
       (if (char=? $char $exact-char)
         (getter $char)
         (throw exact-char-getter $char))))
+
+  (define (exact-string-getter $string)
+    (getter-lets
+      ($chars (list->getter (map exact-char-getter (string->list $string))))
+      (getter (apply string $chars))))
 
   (define (skip-until-getter $test?)
     (getter-lets

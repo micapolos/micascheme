@@ -11,6 +11,8 @@
     (micascheme)
     (get))
 
+  (define indent-getter (exact-string-getter "  "))
+
   (define atom-annotation/eof-getter
     (getter-lets
       ($char/eof peek-char/eof-getter)

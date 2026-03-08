@@ -13,6 +13,11 @@
 (check-get-raises (exact-char-getter #\a) "")
 (check-get-raises (exact-char-getter #\a) "bca")
 
+(check-gets (exact-string-getter "foo") "foo" "foo" 3)
+(check-gets (exact-string-getter "foo") "foobar" "foo" 3)
+(check-get-raises (exact-string-getter "foo") "")
+(check-get-raises (exact-string-getter "foo") "fo")
+
 (check-gets peek-char/eof-getter "" (eof-object) 0)
 (check-gets peek-char/eof-getter "abc" #\a 0)
 
