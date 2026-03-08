@@ -127,14 +127,12 @@
           $value))))
 
   (define-rule-syntax (keywords values) (check-gets getter string out bfp)
-    (lets
-      ((values $value $bfp)
-        (get getter
-          (open-input-string string)
-          (source-file-descriptor "test.txt" 0)
-          0))
-      (check
-        (equal?
-          `(,$value ,$bfp)
-          `(,out ,bfp)))))
+    (check
+      (equal?
+        (values->list
+          (get getter
+            (open-input-string string)
+            (source-file-descriptor "test.txt" 0)
+            0))
+        `(,out ,bfp))))
 )
