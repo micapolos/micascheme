@@ -26,6 +26,11 @@
       ((annotation? $annotation) (annotation-expression $annotation))
       ((else $datum) $datum)))
 
+  ; (define (cons-annotation $first-annotation $second-annotation)
+  ;   (make-annotation
+  ;     (cons $first-annotation $second-annotation)
+  ;     (annotation-source-object $annotation)
+
   (define-rule-syntax (datum/annotation obj)
     (syntax->datum/annotation #'obj))
 

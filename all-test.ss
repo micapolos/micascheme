@@ -73,6 +73,8 @@
   (seq)
   (sequential-syntax)
   (sequential)
+  (source-file-descriptor)
+  (source-object)
   (stack)
   (string)
   (switch)

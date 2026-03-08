@@ -111,6 +111,8 @@
       (quote)
       (random)
       (read)
+      (source-file-descriptor)
+      (source-object)
       (stack)
       (string)
       (switch)
