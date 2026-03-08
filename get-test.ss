@@ -5,6 +5,7 @@
 
 (check-gets char?-getter "" #f 0)
 (check-gets char?-getter "abc" #\a 1)
+
 (check-gets char-getter "" (eof-object) 1)
 (check-gets char-getter "abc" #\a 1)
 
