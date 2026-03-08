@@ -29,3 +29,10 @@
 (check-gets script-getter "10\n" '(10) 3)
 (check-gets script-getter "10\n20\n" '(10 20) 6)
 (check-gets script-getter "foo\nfoo bar\n" '(foo (foo bar)) 12)
+
+(check-gets indent?-getter "" #f 0)
+(check-gets indent?-getter "abc" #f 0)
+(check-gets indent?-getter "  " #t 2)
+(check-gets indent?-getter "  abc" #t 2)
+(check-get-raises indent?-getter " abc")
+(check-get-raises indent?-getter " \t")

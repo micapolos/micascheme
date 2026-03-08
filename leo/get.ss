@@ -1,6 +1,6 @@
 (library (leo get)
   (export
-    indent-getter
+    indent?-getter
 
     atom-annotation/eof-getter
     line-annotation/eof-getter
@@ -13,7 +13,16 @@
     (micascheme)
     (get))
 
-  (define indent-getter (exact-string-getter "  "))
+  (define indent?-getter
+    (getter-lets
+      ($char/eof peek-char/eof-getter)
+      (switch $char/eof
+        ((eof-object? $eof)
+          (getter #f))
+        (((partial char=? #\space) _)
+          (getter-map (exact-string-getter "  ") (lambda (_) #t)))
+        ((else $other)
+          (getter #f)))))
 
   (define atom-annotation/eof-getter
     (getter-lets
