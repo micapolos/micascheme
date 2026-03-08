@@ -87,3 +87,5 @@
 ; uses (source-file-descriptor "test.txt" 0)
 (check-gets (apply-getter source-file-descriptor-path sfd-getter) "" "test.txt" 0)
 (check-gets (apply-getter source-file-descriptor-checksum sfd-getter) "" 0 0)
+
+(check-get-raises (error-getter "dupa" 3 6) "")

@@ -9,6 +9,7 @@
     list->getter
     append-getter
     apply-getter
+    error-getter
 
     sfd-getter
     bfp-getter
@@ -79,16 +80,16 @@
 
   (define-monadic getter)
 
-  (define (raise-getter-error $message $port $sfd $bfp)
+  (define (raise-getter-error $message $port $sfd $bfp $efp)
     (raise
       (condition
         (make-message-condition $message)
         (make-i/o-read-error)
-        (make-source-condition (make-source-object $sfd $bfp $bfp)))))
+        (make-source-condition (make-source-object $sfd $bfp $efp)))))
 
-  (define (error-getter $message)
+  (define (error-getter $message $bfp $efp)
     (getter ($port $sfd $indent $bfp $column)
-      (raise-getter-error $message $port $sfd $bfp)))
+      (raise-getter-error $message $port $sfd $bfp $efp)))
 
   (define sfd-getter
     (getter ($port $sfd $indent $bfp $column)
@@ -112,7 +113,7 @@
               ((zero? $column)
                 (values $eof $bfp $column))
               ((<= $column $indent)
-                (raise-getter-error "eof during indent" $port $sfd $bfp))
+                (raise-getter-error "eof during indent" $port $sfd $bfp (+ $bfp 1)))
               (else
                 (values $eof $bfp $column))))
           ((char-newline? $newline)
@@ -120,7 +121,7 @@
               ((zero? $column)
                 (values $newline (+ $bfp 1) 0))
               ((<= $column $indent)
-                (raise-getter-error "empty indent" $port $sfd $bfp))
+                (raise-getter-error "empty indent" $port $sfd $bfp (+ $bfp 1)))
               (else
                 (values $newline (+ $bfp 1) 0))))
           ((else $char)
@@ -130,7 +131,7 @@
                   ((char=? $char #\space)
                     (values $char (+ $bfp 1) (+ $column 1)))
                   (else
-                    (raise-getter-error "invalid indent" $port $sfd $bfp))))
+                    (raise-getter-error "invalid indent" $port $sfd $bfp (+ $bfp 1)))))
               (else
                 (values $char (+ $bfp 1) (+ $column 1)))))))))
 
