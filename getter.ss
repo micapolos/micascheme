@@ -50,6 +50,7 @@
     (procedure)
     (list)
     (syntax)
+    (syntaxes)
     (check)
     (switch)
     (annotation)
@@ -58,44 +59,55 @@
     (throw)
     (eof))
 
-  (define (getter-get! $getter $port $sfd $bfp)
-    ($getter $port $sfd $bfp))
+  (define (getter-get! $getter $port $sfd $indent $bfp $ip)
+    ($getter $port $sfd $indent $bfp $ip))
 
-  (define (getter $value)
-    (lambda ($port $sfd $bfp)
-      (values $value $bfp)))
+  (define-rules-syntax
+    ((getter ($port $sfd $indent $bfp $ip) value/bfp/ip)
+      (lambda ($port $sfd $indent $bfp $ip) value/bfp/ip))
+    ((getter $value)
+      (getter ($port $sfd $indent $bfp $ip)
+        (values $value $bfp $ip))))
 
   (define (getter-bind $getter $fn)
-    (lambda ($port $sfd $bfp)
+    (getter ($port $sfd $indent $bfp $ip)
       (lets
-        ((values $value $bfp) (getter-get! $getter $port $sfd $bfp))
-        (getter-get! ($fn $value) $port $sfd $bfp))))
+        ((values $value $bfp $ip)
+          (getter-get! $getter $port $sfd $indent $bfp $ip))
+        (getter-get! ($fn $value) $port $sfd $indent $bfp $ip))))
 
   (define sfd-getter
-    (lambda ($port $sfd $bfp)
-      (values $sfd $bfp)))
+    (getter ($port $sfd $indent $bfp $ip)
+      (values $sfd $bfp $ip)))
 
   (define bfp-getter
-    (lambda ($port $sfd $bfp)
-      (values $bfp $bfp)))
+    (getter ($port $sfd $indent $bfp $ip)
+      (values $bfp $bfp $ip)))
 
   (define eof?-getter
-    (lambda ($port $sfd $bfp)
-      (values (port-eof? $port) $bfp)))
+    (getter ($port $sfd $indent $bfp $ip)
+      (values (port-eof? $port) $bfp $ip)))
 
   (define char/eof-getter
-    (lambda ($port $sfd $bfp)
+    (getter ($port $sfd $indent $bfp $ip)
       (lets
         ($char/eof (get-char $port))
         (values
           $char/eof
           (switch $char/eof
             ((eof? _) $bfp)
-            ((else _) (+ $bfp 1)))))))
+            ((else _) (+ $bfp 1)))
+          $ip))))
 
   (define peek-char/eof-getter
-    (lambda ($port $sfd $bfp)
-      (values (peek-char $port) $bfp)))
+    (getter ($port $sfd $indent $bfp $ip)
+      (values (peek-char $port) $bfp $ip)))
+
+  (define (char-ungetter $char)
+    (getter ($port $sfd $indent $bfp $ip)
+      (lets
+        (run (unget-char $port $char))
+        (values $char (- $bfp 1) $ip))))
 
   (define char-getter
     (getter-lets
@@ -103,12 +115,6 @@
       (switch $char/eof
         ((eof? $eof) (throw char-getter $eof))
         ((else $char) (getter $char)))))
-
-  (define (char-ungetter $char)
-    (lambda ($port $sfd $bfp)
-      (lets
-        (run (unget-char $port $char))
-        (values $char (- $bfp 1)))))
 
   (define (exact-char-getter $exact-char)
     (getter-lets
@@ -132,7 +138,12 @@
 
   (define-monadic getter)
 
-  (define datum-annotation/eof-getter get-datum/annotations)
+  (define datum-annotation/eof-getter
+    (getter ($port $sfd $indent $bfp $ip)
+      (lets
+        ((values $datum/annotation $bfp)
+          (get-datum/annotations $port $sfd $bfp))
+        (values $datum/annotation $bfp $ip))))
 
   (define datum/eof-getter
     (getter-lets
@@ -140,7 +151,8 @@
       (getter
         (switch $datum-annotation/eof
           ((eof? $eof) $eof)
-          ((else $datum/annotation) (datum/annotation-stripped $datum/annotation))))))
+          ((else $datum/annotation)
+            (datum/annotation-stripped $datum/annotation))))))
 
   (define (test?-push-chars-getter $test? $chars)
     (getter-lets
@@ -197,15 +209,46 @@
   (define comma-getter (exact-char-getter #\,))
   (define colon-getter (exact-char-getter #\:))
 
-  (define-rule-syntax (check-gets getter string out bfp)
-    (check
-      (equal?
-        (values->list
-          (getter-get! getter
-            (open-input-string string)
-            (source-file-descriptor "test.txt" 0)
-            0))
-        `(,out ,bfp))))
+  (define-rules-syntax
+    ((check-gets getter string out)
+      (check
+        (equal?
+          (lets
+            ((values $value $bfp $ip)
+              (getter-get! getter
+                (open-input-string string)
+                (source-file-descriptor "test.txt" 0)
+                ""
+                0
+                0))
+            $value)
+          out)))
+    ((check-gets getter string out bfp)
+      (check
+        (equal?
+          (lets
+            ((values $value $bfp $ip)
+              (getter-get! getter
+                (open-input-string string)
+                (source-file-descriptor "test.txt" 0)
+                ""
+                0
+                0))
+            (list $value $bfp))
+          (list out bfp))))
+      ((check-gets getter string out bfp ip)
+        (check
+          (equal?
+            (lets
+              ((values $value $bfp $ip)
+                (getter-get! getter
+                  (open-input-string string)
+                  (source-file-descriptor "test.txt" 0)
+                  ""
+                  0
+                  0))
+              (list $value $bfp))
+            (list out bfp ip)))))
 
   (define-rule-syntax (check-get-raises getter string)
     (check
@@ -213,5 +256,7 @@
         (getter-get! getter
           (open-input-string string)
           (source-file-descriptor "test.txt" 0)
+          ""
+          0
           0))))
 )
