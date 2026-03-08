@@ -1,5 +1,5 @@
 (library (leo get)
-  (export word-getter)
+  (export word?-getter)
   (import
     (micascheme)
     (get))
@@ -18,12 +18,12 @@
             (_ (char-ungetter $char-other))
             (getter $chars))))))
 
-  (define word-getter
+  (define word?-getter
     (getter-lets
       ($chars (push-word-chars-getter (stack)))
       (switch $chars
         ((null? _)
-          (throw null-word-getter))
+          (getter #f))
         ((else $chars)
           (getter (string->symbol (apply string (reverse $chars))))))))
 
