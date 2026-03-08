@@ -6,5 +6,5 @@
   (leo evaluator)
   (leo parser)
   (leo reader)
-  (leo get)
+  (leo getter)
   (leo writing-reader))

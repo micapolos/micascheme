@@ -31,6 +31,7 @@
   (fstack)
   (function)
   (get)
+  (getter)
   (identifier)
   (indexed)
   (inline)

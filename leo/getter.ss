@@ -1,4 +1,4 @@
-(library (leo get)
+(library (leo getter)
   (export
     indent?-getter
 
@@ -11,7 +11,7 @@
     script-getter)
   (import
     (micascheme)
-    (get))
+    (getter))
 
   (define indent?-getter
     (getter-lets

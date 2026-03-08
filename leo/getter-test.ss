@@ -1,4 +1,4 @@
-(import (micascheme) (get) (leo get))
+(import (micascheme) (getter) (leo getter))
 
 (check-gets atom/eof-getter "" eof 0)
 (check-gets atom/eof-getter "foo" 'foo 3)
