@@ -20,7 +20,6 @@
     exact-string-getter
 
     char/eof-getter
-    string-getter
     char-getter
     indented-getter
 
@@ -28,7 +27,8 @@
 
     eof?-getter
 
-    test?-string-getter
+    string-getter
+    string-while-getter
 
     datum-annotation/eof-getter
     datum/eof-getter
@@ -177,16 +177,16 @@
       ($skipped-char char/eof-getter)
       $getter))
 
-  (define (skip-until-getter $test?)
+  (define (skip-until-getter $test? $getter)
     (getter-lets
       ($char/eof peek-char/eof-getter)
       (switch $char/eof
         ((eof? $eof)
           (getter $eof))
         (($test? _)
-          (skip-char-getter (skip-until-getter $test?)))
+          (skip-char-getter (skip-until-getter $test? $getter)))
         ((else $char)
-          (getter $char)))))
+          $getter))))
 
   (define datum-annotation/eof-getter
     (getter ($port $sfd $indent $bfp $column)
@@ -204,7 +204,7 @@
           ((else $datum/annotation)
             (datum/annotation-stripped $datum/annotation))))))
 
-  (define (test?-push-chars-getter $test? $chars)
+  (define (push-while-getter $test? $chars)
     (getter-lets
       ($char/eof peek-char/eof-getter)
       (switch $char/eof
@@ -212,14 +212,14 @@
           (getter $chars))
         (($test? $tested-char)
           (skip-char-getter
-            (test?-push-chars-getter $test?
+            (push-while-getter $test?
               (push $chars $tested-char))))
         ((else $untested-char)
           (getter $chars)))))
 
-  (define (test?-string-getter $test?)
+  (define (string-while-getter $test?)
     (getter-lets
-      ($chars (test?-push-chars-getter $test? (stack)))
+      ($chars (push-while-getter $test? (stack)))
       (getter (apply string (reverse $chars)))))
 
   (define (push-chars-getter $chars)

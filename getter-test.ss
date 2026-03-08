@@ -58,13 +58,13 @@
 (check-gets datum/eof-getter "(foo bar)" '(foo bar) 9)
 (check-gets datum/eof-getter "(foo bar) (zoo zar)" '(foo bar) 9)
 
-(check-gets (skip-until-getter char-whitespace?) "" eof 0)
-(check-gets (skip-until-getter char-whitespace?) "   " eof 3)
-(check-gets (skip-until-getter char-whitespace?) "   foo" #\f 3)
+(check-gets (skip-until-getter char-whitespace? string-getter) "" eof 0)
+(check-gets (skip-until-getter char-whitespace? string-getter) "   " eof 3)
+(check-gets (skip-until-getter char-whitespace? string-getter) "   foo" "foo" 6)
 
-(check-gets (test?-string-getter char-alphabetic?) "" "" 0)
-(check-gets (test?-string-getter char-alphabetic?) "foo" "foo" 3)
-(check-gets (test?-string-getter char-alphabetic?) "foo123" "foo" 3)
+(check-gets (string-while-getter char-alphabetic?) "" "" 0)
+(check-gets (string-while-getter char-alphabetic?) "foo" "foo" 3)
+(check-gets (string-while-getter char-alphabetic?) "foo123" "foo" 3)
 
 (check-gets bfp-getter "" 0 0)
 (check-gets
