@@ -57,57 +57,92 @@
     (boolean)
     (stack)
     (throw)
+    (char)
     (eof))
 
-  (define (getter-get! $getter $port $sfd $indent $bfp $ip)
-    ($getter $port $sfd $indent $bfp $ip))
+  (define (getter-get! $getter $port $sfd $indent $bfp $column)
+    ($getter $port $sfd $indent $bfp $column))
 
   (define-rules-syntax
-    ((getter ($port $sfd $indent $bfp $ip) value/bfp/ip)
-      (lambda ($port $sfd $indent $bfp $ip) value/bfp/ip))
+    ((getter ($port $sfd $indent $bfp $column) value/bfp/ip)
+      (lambda ($port $sfd $indent $bfp $column) value/bfp/ip))
     ((getter $value)
-      (getter ($port $sfd $indent $bfp $ip)
-        (values $value $bfp $ip))))
+      (getter ($port $sfd $indent $bfp $column)
+        (values $value $bfp $column))))
 
   (define (getter-bind $getter $fn)
-    (getter ($port $sfd $indent $bfp $ip)
+    (getter ($port $sfd $indent $bfp $column)
       (lets
-        ((values $value $bfp $ip)
-          (getter-get! $getter $port $sfd $indent $bfp $ip))
-        (getter-get! ($fn $value) $port $sfd $indent $bfp $ip))))
+        ((values $value $bfp $column)
+          (getter-get! $getter $port $sfd $indent $bfp $column))
+        (getter-get! ($fn $value) $port $sfd $indent $bfp $column))))
+
+  (define-monadic getter)
+
+  (define (raise-getter-error $message $port $sfd $bfp)
+    (raise
+      (condition
+        (make-message-condition $message)
+        (make-i/o-read-error)
+        (make-source-condition (make-source-object $sfd $bfp $bfp)))))
+
+  (define (error-getter $message)
+    (getter ($port $sfd $indent $bfp $column)
+      (raise-getter-error $message $port $sfd $bfp)))
 
   (define sfd-getter
-    (getter ($port $sfd $indent $bfp $ip)
-      (values $sfd $bfp $ip)))
+    (getter ($port $sfd $indent $bfp $column)
+      (values $sfd $bfp $column)))
 
   (define bfp-getter
-    (getter ($port $sfd $indent $bfp $ip)
-      (values $bfp $bfp $ip)))
+    (getter ($port $sfd $indent $bfp $column)
+      (values $bfp $bfp $column)))
 
   (define eof?-getter
-    (getter ($port $sfd $indent $bfp $ip)
-      (values (port-eof? $port) $bfp $ip)))
+    (getter ($port $sfd $indent $bfp $column)
+      (values (port-eof? $port) $bfp $column)))
 
   (define char/eof-getter
-    (getter ($port $sfd $indent $bfp $ip)
+    (getter ($port $sfd $indent $bfp $column)
       (lets
         ($char/eof (get-char $port))
-        (values
-          $char/eof
-          (switch $char/eof
-            ((eof? _) $bfp)
-            ((else _) (+ $bfp 1)))
-          $ip))))
+        (switch $char/eof
+          ((eof? $eof)
+            (cond
+              ((zero? $column)
+                (values $eof $bfp $column))
+              ((<= $column $indent)
+                (raise-getter-error "eof during indent" $port $sfd $bfp))
+              (else
+                (values $eof $bfp $column))))
+          ((char-newline? $newline)
+            (cond
+              ((zero? $column)
+                (values $newline (+ $bfp 1) 0))
+              ((<= $column $indent)
+                (raise-getter-error "empty indent" $port $sfd $bfp))
+              (else
+                (values $newline (+ $bfp 1) 0))))
+          ((else $char)
+            (cond
+              ((< $column $indent)
+                (cond
+                  ((char=? $char #\space)
+                    (values $char (+ $bfp 1) (+ $column 1)))
+                  (else
+                    (raise-getter-error "invalid indent" $port $sfd $bfp))))
+              (else
+                (values $char (+ $bfp 1) (+ $column 1)))))))))
 
   (define peek-char/eof-getter
-    (getter ($port $sfd $indent $bfp $ip)
-      (values (peek-char $port) $bfp $ip)))
+    (getter ($port $sfd $indent $bfp $column)
+      (values (peek-char $port) $bfp $column)))
 
   (define (char-ungetter $char)
-    (getter ($port $sfd $indent $bfp $ip)
+    (getter ($port $sfd $indent $bfp $column)
       (lets
         (run (unget-char $port $char))
-        (values $char (- $bfp 1) $ip))))
+        (values $char (- $bfp 1) $column))))
 
   (define char-getter
     (getter-lets
@@ -136,14 +171,12 @@
         (($test? _) (skip-until-getter $test?))
         ((else $char) (char-ungetter $char)))))
 
-  (define-monadic getter)
-
   (define datum-annotation/eof-getter
-    (getter ($port $sfd $indent $bfp $ip)
+    (getter ($port $sfd $indent $bfp $column)
       (lets
         ((values $datum/annotation $bfp)
           (get-datum/annotations $port $sfd $bfp))
-        (values $datum/annotation $bfp $ip))))
+        (values $datum/annotation $bfp $column))))
 
   (define datum/eof-getter
     (getter-lets
@@ -214,11 +247,11 @@
       (check
         (equal?
           (lets
-            ((values $value $bfp $ip)
+            ((values $value $bfp $column)
               (getter-get! getter
                 (open-input-string string)
                 (source-file-descriptor "test.txt" 0)
-                ""
+                0
                 0
                 0))
             $value)
@@ -227,11 +260,11 @@
       (check
         (equal?
           (lets
-            ((values $value $bfp $ip)
+            ((values $value $bfp $column)
               (getter-get! getter
                 (open-input-string string)
                 (source-file-descriptor "test.txt" 0)
-                ""
+                0
                 0
                 0))
             (list $value $bfp))
@@ -240,11 +273,11 @@
         (check
           (equal?
             (lets
-              ((values $value $bfp $ip)
+              ((values $value $bfp $column)
                 (getter-get! getter
                   (open-input-string string)
                   (source-file-descriptor "test.txt" 0)
-                  ""
+                  0
                   0
                   0))
               (list $value $bfp))
@@ -256,7 +289,7 @@
         (getter-get! getter
           (open-input-string string)
           (source-file-descriptor "test.txt" 0)
-          ""
+          0
           0
           0))))
 )
