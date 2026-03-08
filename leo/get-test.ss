@@ -3,6 +3,9 @@
 (check-gets word?-getter ""
   (values #f 0))
 
+(check-gets word?-getter "(foo)"
+  (values #f 0))
+
 (check-gets word?-getter "foo"
   (values 'foo 3))
 
