@@ -1,5 +1,7 @@
 (library (leo get)
   (export
+    indent-getter
+
     atom-annotation/eof-getter
     line-annotation/eof-getter
     script-annotation-getter
