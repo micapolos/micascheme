@@ -16,11 +16,11 @@
 (check-get-raises atom/eof-getter "(foo) bar")
 (check-get-raises atom/eof-getter "#t bar")
 
-; (check-gets line/eof-getter "" (eof-object) 0)
-; (check-gets line/eof-getter "123" 123 3)
-; (check-gets line/eof-getter "\"foo\"" "foo" 5)
-; (check-gets line/eof-getter "foo" 'foo 3)
-; (check-gets line/eof-getter "foo bar" '(foo bar) 7)
-; (check-gets line/eof-getter "foo bar goo" '(foo (bar goo)) 11)
+(check-gets line/eof-getter "" (eof-object) 0)
+(check-gets line/eof-getter "123" 123 3)
+(check-gets line/eof-getter "\"foo\"" "foo" 5)
+(check-gets line/eof-getter "foo" 'foo 3)
+(check-gets line/eof-getter "foo bar" '(foo bar) 7)
+(check-gets line/eof-getter "foo bar goo" '(foo (bar goo)) 11)
 
-; (check-get-raises line/eof-getter "123 ")
+(check-get-raises line/eof-getter "123 ")

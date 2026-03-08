@@ -40,21 +40,24 @@
       (switch (annotation/eof-stripped $atom-annotation/eof)
         ((eof-object? $eof-object)
           (getter $eof-object))
-        ((symbol? $atom)
+        ((symbol? $symbol)
           (getter-lets
             ($eof? eof?-getter)
             (if $eof?
-              (getter $atom)
+              (getter $atom-annotation/eof)
               (getter-lets
                 ($space (exact-char-getter #\space))
                 ($line-annotation/eof line-annotation/eof-getter)
-                (getter (append-annotation $atom-annotation/eof $line-annotation/eof))))))
+                (getter
+                  (append-annotation
+                    $atom-annotation/eof
+                    $line-annotation/eof))))))
         ((else $other)
           (getter-lets
             ($char/eof char/eof-getter)
             (switch $char/eof
-              ((eof-object? _) (getter $other))
-              (((partial char=? #\newline) _) (getter $other))
+              ((eof-object? _) (getter $atom-annotation/eof))
+              (((partial char=? #\newline) _) (getter $atom-annotation/eof))
               ((else $other) (throw atom-getter $other))))))))
 
   (define atom/eof-getter

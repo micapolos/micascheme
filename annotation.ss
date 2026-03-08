@@ -45,11 +45,13 @@
 
   (define (append-annotation $annotation . $annotations)
     (make-annotation
-      (apply append $annotation $annotations)
+      (apply list
+        (annotation-expression $annotation)
+        (map annotation-expression $annotations))
       (apply append-source-object
         (annotation-source $annotation)
         (map annotation-source $annotations))
-      (apply append
+      (apply list
         (annotation-stripped $annotation)
         (map annotation-stripped $annotations))))
 
