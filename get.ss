@@ -8,6 +8,9 @@
     append-getter
     apply-getter
 
+    sfd-getter
+    bfp-getter
+
     char-getter
     char-ungetter
     peek-char-getter
@@ -48,6 +51,14 @@
         (switch $value
           ((eof-object? $eof) (values $eof $bfp))
           ((else $other) (app ($fn $other) $port $sfd $bfp))))))
+
+  (define sfd-getter
+    (lambda ($port $sfd $bfp)
+      (values $sfd $bfp)))
+
+  (define bfp-getter
+    (lambda ($port $sfd $bfp)
+      (values $bfp $bfp)))
 
   (define eof?-getter
     (lambda ($port $sfd $bfp)

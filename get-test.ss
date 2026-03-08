@@ -35,3 +35,15 @@
 (check-gets (test?-string-getter char-alphabetic?) "" "" 0)
 (check-gets (test?-string-getter char-alphabetic?) "foo" "foo" 3)
 (check-gets (test?-string-getter char-alphabetic?) "foo123" "foo" 3)
+
+(check-gets bfp-getter "" 0 0)
+(check-gets
+  (append-getter char-getter char-getter bfp-getter char-getter)
+  "abcd"
+  '(#\a #\b 2 #\c)
+  3)
+
+; uses (source-file-descriptor "test.txt" 0)
+(check-gets (apply-getter source-file-descriptor-path sfd-getter) "" "test.txt" 0)
+(check-gets (apply-getter source-file-descriptor-checksum sfd-getter) "" 0 0)
+
