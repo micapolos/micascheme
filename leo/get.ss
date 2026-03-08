@@ -17,15 +17,15 @@
 
   (define atom?-getter
     (getter-lets
-      ($char/eof peek-char-getter)
+      ($char peek-char-getter)
       (lets
         ($atom?
           (and
-            (not (eof-object? $char/eof))
+            (not (eof-object? $char))
             (or
-              (char=? $char/eof #\")
-              (char-numeric? $char/eof)
-              (char-alphabetic? $char/eof))))
+              (char=? $char #\")
+              (char-numeric? $char)
+              (char-alphabetic? $char))))
         (if $atom? datum-getter (getter #f)))))
 
   (define word-annotation?-getter
