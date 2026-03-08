@@ -85,6 +85,7 @@
       (data)
       (datum)
       (define)
+      (eof)
       (failable)
       (failure)
       (fixnum)

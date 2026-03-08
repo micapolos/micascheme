@@ -20,6 +20,7 @@
   (datum)
   (decompiler)
   (define)
+  (eof)
   (evaluator)
   (failable)
   (failure)

@@ -1,4 +1,4 @@
-(import (scheme) (check) (get))
+(import (scheme) (check) (get) (eof))
 
 (check-gets eof?-getter "" #t 0)
 (check-gets eof?-getter "abc" #f 0)
@@ -6,7 +6,7 @@
 (check-get-raises char-getter "")
 (check-gets char-getter "abc" #\a 1)
 
-(check-gets char/eof-getter "" (eof-object) 0)
+(check-gets char/eof-getter "" eof 0)
 (check-gets char/eof-getter "abc" #\a 1)
 
 (check-gets (exact-char-getter #\a) "abc" #\a 1)
@@ -18,7 +18,7 @@
 (check-get-raises (exact-string-getter "foo") "")
 (check-get-raises (exact-string-getter "foo") "fo")
 
-(check-gets peek-char/eof-getter "" (eof-object) 0)
+(check-gets peek-char/eof-getter "" eof 0)
 (check-gets peek-char/eof-getter "abc" #\a 0)
 
 (check-gets
@@ -39,13 +39,13 @@
   '(#\a #\a #\a)
   1)
 
-(check-gets datum/eof-getter "" (eof-object) 0)
-(check-gets datum/eof-getter "   " (eof-object) 3)
+(check-gets datum/eof-getter "" eof 0)
+(check-gets datum/eof-getter "   " eof 3)
 (check-gets datum/eof-getter "(foo bar)" '(foo bar) 9)
 (check-gets datum/eof-getter "(foo bar) (zoo zar)" '(foo bar) 9)
 
-(check-gets (skip-until-getter char-whitespace?) "" (eof-object) 0)
-(check-gets (skip-until-getter char-whitespace?) "   " (eof-object) 3)
+(check-gets (skip-until-getter char-whitespace?) "" eof 0)
+(check-gets (skip-until-getter char-whitespace?) "   " eof 3)
 (check-gets (skip-until-getter char-whitespace?) "   foo" #\f 3)
 
 (check-gets (test?-string-getter char-alphabetic?) "" "" 0)

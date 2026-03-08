@@ -17,9 +17,9 @@
     (getter-lets
       ($char/eof peek-char/eof-getter)
       (switch $char/eof
-        ((eof-object? $eof)
+        ((eof? $eof)
           (getter #f))
-        (((partial char=? #\space) _)
+        ((char-space? _)
           (getter-map (exact-string-getter "  ") (lambda (_) #t)))
         ((else $other)
           (getter #f)))))
@@ -28,8 +28,8 @@
     (getter-lets
       ($char/eof peek-char/eof-getter)
       (switch $char/eof
-        ((eof-object? $eof-object)
-          (getter $eof-object))
+        ((eof? $eof)
+          (getter $eof))
         ((char-whitespace? $char-whitespace)
           (throw atom-getter $char-whitespace))
         ((else _)
@@ -37,8 +37,8 @@
             ($datum-annotation/eof datum-annotation/eof-getter)
             (getter
               (switch $datum-annotation/eof
-                ((eof-object? $eof-object)
-                  (throw atom-getter $eof-object))
+                ((eof? $eof)
+                  (throw atom-getter $eof))
                 ((else $datum-annotation)
                   (switch (annotation-stripped $datum-annotation)
                     ((number? $number)
@@ -54,19 +54,19 @@
     (getter-lets
       ($atom-annotation/eof atom-annotation/eof-getter)
       (switch (annotation/eof-stripped $atom-annotation/eof)
-        ((eof-object? $eof-object)
-          (getter $eof-object))
+        ((eof? $eof)
+          (getter $eof))
         ((symbol? $symbol)
           (getter-lets
             ($char/eof char/eof-getter)
             (switch $char/eof
-              ((eof-object? _)
+              ((eof? _)
                 (getter $atom-annotation/eof))
-              (((partial char=? #\space) _)
+              ((char-space? _)
                 (apply-getter append-annotation
                   (getter $atom-annotation/eof)
                   line-annotation/eof-getter))
-              (((partial char=? #\newline) _)
+              ((char-newline? _)
                 (getter $atom-annotation/eof))
               ((else _)
                 (throw line-annotation/eof-getter $atom-annotation/eof)))))

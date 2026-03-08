@@ -54,7 +54,8 @@
     (annotation)
     (boolean)
     (stack)
-    (throw))
+    (throw)
+    (eof))
 
   (define (get $getter $port $sfd $bfp)
     ($getter $port $sfd $bfp))
@@ -88,7 +89,7 @@
         (values
           $char/eof
           (switch $char/eof
-            ((eof-object? _) $bfp)
+            ((eof? _) $bfp)
             ((else _) (+ $bfp 1)))))))
 
   (define peek-char/eof-getter
@@ -99,7 +100,7 @@
     (getter-lets
       ($char/eof char/eof-getter)
       (switch $char/eof
-        ((eof-object? $eof) (throw char-getter $eof))
+        ((eof? $eof) (throw char-getter $eof))
         ((else $char) (getter $char)))))
 
   (define (char-ungetter $char)
@@ -124,7 +125,7 @@
     (getter-lets
       ($char/eof char/eof-getter)
       (switch $char/eof
-        ((eof-object? $eof-object) (getter $eof-object))
+        ((eof? $eof) (getter $eof))
         (($test? _) (skip-until-getter $test?))
         ((else $char) (char-ungetter $char)))))
 
@@ -137,14 +138,14 @@
       ($datum-annotation/eof datum-annotation/eof-getter)
       (getter
         (switch $datum-annotation/eof
-          ((eof-object? $eof-object) $eof-object)
+          ((eof? $eof) $eof)
           ((else $datum/annotation) (datum/annotation-stripped $datum/annotation))))))
 
   (define (test?-push-chars-getter $test? $chars)
     (getter-lets
       ($char/eof char/eof-getter)
       (switch $char/eof
-        ((eof-object? _)
+        ((eof? _)
           (getter $chars))
         ((char-alphabetic? $char-alphabetic)
           (test?-push-chars-getter $test?
@@ -163,7 +164,7 @@
     (getter-lets
       ($value/eof $getter)
       (switch $value/eof
-        ((eof-object? _)
+        ((eof? _)
           (getter $stack))
         ((else $value)
           (push-getter (push $stack $value) $getter)))))
