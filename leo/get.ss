@@ -24,6 +24,8 @@
             (not (eof-object? $char))
             (or
               (char=? $char #\")
+              (char=? $char #\-)
+              (char=? $char #\+)
               (char-numeric? $char)
               (char-alphabetic? $char))))
         (if $atom? datum-getter (getter #f)))))
