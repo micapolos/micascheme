@@ -8,7 +8,14 @@
     append-getter
     apply-getter
 
+    eof?-getter
+    char?-getter
+    char-getter
+    char-ungetter
+
+    datum/annotation-getter
     datum-getter
+
     check-gets)
   (import
     (scheme)
@@ -26,7 +33,7 @@
 
   (define (getter $value)
     (lambda ($port $sfd $bfp)
-      (values $bfp $value)))
+      (values $value $bfp)))
 
   (define (getter-bind $getter $fn)
     (lambda ($port $sfd $bfp)
@@ -36,20 +43,44 @@
           ((eof-object? $eof) (values $eof $bfp))
           ((else $other) (app ($fn $other) $port $sfd $bfp))))))
 
+  (define eof?-getter
+    (lambda ($port $sfd $bfp)
+      (values (port-eof? $port) $bfp)))
+
+  (define char?-getter
+    (lambda ($port $sfd $bfp)
+      (if (port-eof? $port)
+        (values #f $bfp)
+        (values (get-char $port) (+ $bfp 1)))))
+
+  (define char-getter
+    (lambda ($port $sfd $bfp)
+      (values (get-char $port) (+ $bfp 1))))
+
+  (define (char-ungetter $char)
+    (lambda ($port $sfd $bfp)
+      (lets
+        (run (unget-char $port $char))
+        (values $char (- $bfp 1)))))
+
   (define-monadic getter)
 
-  (define (datum-getter $port $sfd $bfp)
-    (get-datum/annotations $port $sfd $bfp))
+  (define datum/annotation-getter get-datum/annotations)
+
+  (define datum-getter
+    (getter-lets
+      ($datum/annotation datum/annotation-getter)
+      (getter (datum/annotation-stripped $datum/annotation))))
 
   (define-rule-syntax (keywords values) (check-gets getter string (values out bfp))
     (lets
-      ((values $annotation $bfp)
+      ((values $value $bfp)
         (get getter
           (open-input-string string)
           (source-file-descriptor "test.txt" 0)
           0))
       (check
         (equal?
-          `(values ,(datum/annotation-stripped $annotation) ,$bfp)
-          `(values out ,bfp)))))
+          `(values ,$value ,$bfp)
+          `(values ,out ,bfp)))))
 )
