@@ -2,7 +2,8 @@
   (export
     word-annotation?-getter
     word?-getter
-    atom?-getter)
+    atom-getter
+    line-getter)
   (import
     (micascheme)
     (get))
@@ -15,20 +16,41 @@
           (not (string-empty? $string))
           (string->symbol $string)))))
 
-  (define atom?-getter
+  (define atom-getter
     (getter-lets
       ($char peek-char-getter)
-      (lets
-        ($atom?
-          (and
-            (not (eof-object? $char))
-            (or
-              (char=? $char #\")
-              (char=? $char #\-)
-              (char=? $char #\+)
-              (char-numeric? $char)
-              (char-alphabetic? $char))))
-        (if $atom? datum-getter (getter #f)))))
+      (if (char-whitespace? $char)
+        (throw atom-getter $char)
+        (getter-lets
+          ($datum datum-getter)
+          (getter
+            (switch $datum
+              ((number? $number) $number)
+              ((string? $string) $string)
+              ((symbol? $symbol) $symbol)
+              ((else $other) (throw atom-getter $other))))))))
+
+  (define line-getter
+    (getter-lets
+      ($atom atom-getter)
+      (switch $atom
+        ((symbol? $atom)
+          (getter-lets
+            ($eof? eof?-getter)
+            (if $eof?
+              (getter $atom)
+              (getter-lets
+                ($space (exact-char-getter #\space))
+                ($line line-getter)
+                (getter (list $atom $line))))))
+        ((else $other)
+          (getter-lets
+            ($char? char?-getter)
+            (switch $char?
+              ((false? _) (getter $other))
+              (((char=? $char? #\newline) _) (getter $other))
+              ((else $other) (throw atom-getter $other))))))))
+
 
   (define word-annotation?-getter
     (getter-lets

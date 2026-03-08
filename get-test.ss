@@ -9,6 +9,10 @@
 (check-gets char-getter "" (eof-object) 1)
 (check-gets char-getter "abc" #\a 1)
 
+(check-gets (exact-char-getter #\a) "abc" #\a 1)
+(check-get-raises (exact-char-getter #\a) "")
+(check-get-raises (exact-char-getter #\a) "bca")
+
 (check-gets peek-char-getter "" (eof-object) 0)
 (check-gets peek-char-getter "abc" #\a 0)
 
@@ -32,6 +36,9 @@
 
 (check-gets datum-getter "(foo bar) (zoo zar)" '(foo bar) 9)
 
+(check-gets (skip-until-getter char-whitespace?) "   " #f 3)
+(check-gets (skip-until-getter char-whitespace?) "   foo" #f 3)
+
 (check-gets (test?-string-getter char-alphabetic?) "" "" 0)
 (check-gets (test?-string-getter char-alphabetic?) "foo" "foo" 3)
 (check-gets (test?-string-getter char-alphabetic?) "foo123" "foo" 3)
@@ -46,4 +53,3 @@
 ; uses (source-file-descriptor "test.txt" 0)
 (check-gets (apply-getter source-file-descriptor-path sfd-getter) "" "test.txt" 0)
 (check-gets (apply-getter source-file-descriptor-checksum sfd-getter) "" 0 0)
-

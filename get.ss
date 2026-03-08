@@ -3,6 +3,7 @@
     get
     getter
     getter-bind
+    getter-map
     getter-lets
     list->getter
     append-getter
@@ -10,6 +11,8 @@
 
     sfd-getter
     bfp-getter
+
+    exact-char-getter
 
     char-getter
     char-ungetter
@@ -24,8 +27,10 @@
     datum-getter
 
     annotation-getter
+    skip-until-getter
 
-    check-gets)
+    check-gets
+    check-get-raises)
   (import
     (scheme)
     (lets)
@@ -37,7 +42,8 @@
     (switch)
     (annotation)
     (boolean)
-    (stack))
+    (stack)
+    (throw))
 
   (define (get $getter $port $sfd $bfp)
     ($getter $port $sfd $bfp))
@@ -82,9 +88,27 @@
         (run (unget-char $port $char))
         (values $char (- $bfp 1)))))
 
+  (define (exact-char-getter $char)
+    (getter-lets
+      ($char? char?-getter)
+      (if (equal? $char? $char)
+        (getter $char)
+        (throw exact-char-getter $char))))
+
   (define peek-char-getter
     (lambda ($port $sfd $bfp)
       (values (peek-char $port) $bfp)))
+
+  (define (skip-until-getter $test?)
+    (getter-map
+      (getter-lets
+        ($char? char?-getter)
+        (if $char?
+          (if ($test? $char?)
+            (skip-until-getter $test?)
+            (char-ungetter $char?))
+          (getter #f)))
+      (lambda (_) #f)))
 
   (define-monadic getter)
 
@@ -126,7 +150,7 @@
           (make-source-object $sfd $bfp $efp)
           $value))))
 
-  (define-rule-syntax (keywords values) (check-gets getter string out bfp)
+  (define-rule-syntax (check-gets getter string out bfp)
     (check
       (equal?
         (values->list
@@ -135,4 +159,12 @@
             (source-file-descriptor "test.txt" 0)
             0))
         `(,out ,bfp))))
+
+  (define-rule-syntax (check-get-raises getter string)
+    (check
+      (raises
+        (get getter
+          (open-input-string string)
+          (source-file-descriptor "test.txt" 0)
+          0))))
 )

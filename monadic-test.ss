@@ -31,6 +31,10 @@
 (define-monadic counter)
 
 (check-counter
+  (counter-map (counter 123) number->string)
+  (1 "123"))
+
+(check-counter
   (counter-lets (counter "foo"))
   (0 "foo"))
 
