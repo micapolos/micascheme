@@ -32,6 +32,7 @@
 
 (check-gets indent?-getter "" #f 0)
 (check-gets indent?-getter "abc" #f 0)
+(check-gets indent?-getter "\t" #f 0)
 (check-gets indent?-getter "  " #t 2)
 (check-gets indent?-getter "  abc" #t 2)
 (check-get-raises indent?-getter " abc")
