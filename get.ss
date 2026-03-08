@@ -18,7 +18,8 @@
     (list)
     (syntax)
     (check)
-    (switch))
+    (switch)
+    (annotation))
 
   (define (get $getter $port $sfd $bfp)
     ($getter $port $sfd $bfp))
@@ -49,6 +50,6 @@
           0))
       (check
         (equal?
-          `(values ,(annotation-stripped $annotation) ,$bfp)
+          `(values ,(datum/annotation-stripped $annotation) ,$bfp)
           `(values out ,bfp)))))
 )
