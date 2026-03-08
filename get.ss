@@ -30,6 +30,9 @@
     annotation-getter
     skip-until-getter
 
+    push-getter
+    list-getter
+
     check-gets
     check-get-raises)
   (import
@@ -143,6 +146,19 @@
     (getter-lets
       ($chars (test?-push-chars-getter $test? (stack)))
       (getter (apply string (reverse $chars)))))
+
+  (define (push-getter $stack $getter)
+    (getter-lets
+      ($value/eof $getter)
+      (switch $value/eof
+        ((eof-object? _)
+          (getter $stack))
+        ((else $value)
+          (push-getter (push $stack $value) $getter)))))
+
+  (define (list-getter $getter)
+    (apply-getter reverse
+      (push-getter (stack) $getter)))
 
   (define (annotation-getter $getter)
     (getter-lets

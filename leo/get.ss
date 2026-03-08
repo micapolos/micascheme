@@ -2,8 +2,13 @@
   (export
     atom-annotation/eof-getter
     line-annotation/eof-getter
+    line-annotation-getter
+    script-annotation-getter
+
     atom/eof-getter
-    line/eof-getter)
+    line/eof-getter
+    line-getter
+    script-getter)
   (import
     (micascheme)
     (get))
@@ -42,16 +47,16 @@
           (getter $eof-object))
         ((symbol? $symbol)
           (getter-lets
-            ($eof? eof?-getter)
-            (if $eof?
-              (getter $atom-annotation/eof)
-              (getter-lets
-                ($space (exact-char-getter #\space))
-                ($line-annotation/eof line-annotation/eof-getter)
-                (getter
-                  (append-annotation
-                    $atom-annotation/eof
-                    $line-annotation/eof))))))
+            ($char/eof char/eof-getter)
+            (switch $char/eof
+              ((eof-object? _)
+                (getter $atom-annotation/eof))
+              (((partial char=? #\space) _)
+                (apply-getter append-annotation
+                  (getter $atom-annotation/eof)
+                  line-annotation-getter))
+              ((else $other)
+                (throw line-annotation/eof-getter $other)))))
         ((else $other)
           (getter-lets
             ($char/eof char/eof-getter)
@@ -60,9 +65,29 @@
               (((partial char=? #\newline) _) (getter $atom-annotation/eof))
               ((else $other) (throw atom-getter $other))))))))
 
+  (define script-annotation-getter
+    (list-getter line-annotation/eof-getter))
+
+  (define line-annotation-getter
+    (getter-lets
+      ($line-annotation/eof line-annotation/eof-getter)
+      (getter
+        (switch $line-annotation/eof
+          ((eof-object? $eof-object)
+            (throw line-annotation-getter $eof-object))
+          ((else $line-annotation)
+            $line-annotation)))))
+
+
   (define atom/eof-getter
     (apply-getter annotation/eof-stripped atom-annotation/eof-getter))
 
   (define line/eof-getter
     (apply-getter annotation/eof-stripped line-annotation/eof-getter))
+
+  (define line-getter
+    (apply-getter annotation-stripped line-annotation-getter))
+
+  (define script-getter
+    (apply-getter annotation-stripped script-annotation-getter))
 )

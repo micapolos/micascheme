@@ -54,6 +54,11 @@
   '(#\a #\b 2 #\c)
   3)
 
+(check-gets (list-getter datum/eof-getter) "" '() 0)
+(check-gets (list-getter datum/eof-getter) "10 20 30" '(10 20 30) 8)
+(check-gets (list-getter datum/eof-getter) "   " '() 3)
+(check-gets (list-getter datum/eof-getter) "  10  20 30  " '(10 20 30) 13)
+
 ; uses (source-file-descriptor "test.txt" 0)
 (check-gets (apply-getter source-file-descriptor-path sfd-getter) "" "test.txt" 0)
 (check-gets (apply-getter source-file-descriptor-checksum sfd-getter) "" 0 0)

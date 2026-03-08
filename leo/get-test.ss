@@ -24,3 +24,5 @@
 (check-gets line/eof-getter "foo bar goo" '(foo (bar goo)) 11)
 
 (check-get-raises line/eof-getter "123 ")
+
+;(check-gets script-getter "123" '(123) 0)
