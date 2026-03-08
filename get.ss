@@ -14,17 +14,18 @@
 
     exact-char-getter
 
+    char/eof-getter
     char-getter
     char-ungetter
-    peek-char-getter
+
+    peek-char/eof-getter
 
     eof?-getter
-    char?-getter
 
     test?-string-getter
 
-    datum/annotation-getter
-    datum-getter
+    datum-annotation/eof-getter
+    datum/eof-getter
 
     annotation-getter
     skip-until-getter
@@ -56,9 +57,7 @@
     (lambda ($port $sfd $bfp)
       (lets
         ((values $value $bfp) (get $getter $port $sfd $bfp))
-        (switch $value
-          ((eof-object? $eof) (values $eof $bfp))
-          ((else $other) (app ($fn $other) $port $sfd $bfp))))))
+        (app ($fn $value) $port $sfd $bfp))))
 
   (define sfd-getter
     (lambda ($port $sfd $bfp)
@@ -72,15 +71,26 @@
     (lambda ($port $sfd $bfp)
       (values (port-eof? $port) $bfp)))
 
-  (define char?-getter
+  (define char/eof-getter
     (lambda ($port $sfd $bfp)
-      (if (port-eof? $port)
-        (values #f $bfp)
-        (values (get-char $port) (+ $bfp 1)))))
+      (lets
+        ($char/eof (get-char $port))
+        (values
+          $char/eof
+          (switch $char/eof
+            ((eof-object? _) $bfp)
+            ((else _) (+ $bfp 1)))))))
+
+  (define peek-char/eof-getter
+    (lambda ($port $sfd $bfp)
+      (values (peek-char $port) $bfp)))
 
   (define char-getter
-    (lambda ($port $sfd $bfp)
-      (values (get-char $port) (+ $bfp 1))))
+    (getter-lets
+      ($char/eof char/eof-getter)
+      (switch $char/eof
+        ((eof-object? $eof) (throw char-getter $eof))
+        ((else $char) (getter $char)))))
 
   (define (char-ungetter $char)
     (lambda ($port $sfd $bfp)
@@ -88,42 +98,38 @@
         (run (unget-char $port $char))
         (values $char (- $bfp 1)))))
 
-  (define (exact-char-getter $char)
+  (define (exact-char-getter $exact-char)
     (getter-lets
-      ($char? char?-getter)
-      (if (equal? $char? $char)
+      ($char char-getter)
+      (if (char=? $char $exact-char)
         (getter $char)
         (throw exact-char-getter $char))))
 
-  (define peek-char-getter
-    (lambda ($port $sfd $bfp)
-      (values (peek-char $port) $bfp)))
-
   (define (skip-until-getter $test?)
-    (getter-map
-      (getter-lets
-        ($char? char?-getter)
-        (if $char?
-          (if ($test? $char?)
-            (skip-until-getter $test?)
-            (char-ungetter $char?))
-          (getter #f)))
-      (lambda (_) #f)))
+    (getter-lets
+      ($char/eof char/eof-getter)
+      (switch $char/eof
+        ((eof-object? $eof-object) (getter $eof-object))
+        (($test? _) (skip-until-getter $test?))
+        ((else $char) (char-ungetter $char)))))
 
   (define-monadic getter)
 
-  (define datum/annotation-getter get-datum/annotations)
+  (define datum-annotation/eof-getter get-datum/annotations)
 
-  (define datum-getter
+  (define datum/eof-getter
     (getter-lets
-      ($datum/annotation datum/annotation-getter)
-      (getter (datum/annotation-stripped $datum/annotation))))
+      ($datum-annotation/eof datum-annotation/eof-getter)
+      (getter
+        (switch $datum-annotation/eof
+          ((eof-object? $eof-object) $eof-object)
+          ((else $datum/annotation) (datum/annotation-stripped $datum/annotation))))))
 
   (define (test?-push-chars-getter $test? $chars)
     (getter-lets
-      ($char? char?-getter)
-      (switch $char?
-        ((false? _)
+      ($char/eof char/eof-getter)
+      (switch $char/eof
+        ((eof-object? _)
           (getter $chars))
         ((char-alphabetic? $char-alphabetic)
           (test?-push-chars-getter $test?

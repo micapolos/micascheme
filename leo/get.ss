@@ -1,39 +1,45 @@
 (library (leo get)
   (export
-    word-annotation?-getter
-    word?-getter
-    atom-getter
-    line-getter)
+    atom-annotation/eof-getter
+    line-annotation/eof-getter
+    atom/eof-getter
+    line/eof-getter)
   (import
     (micascheme)
     (get))
 
-  (define word?-getter
+  (define atom-annotation/eof-getter
     (getter-lets
-      ($string (test?-string-getter char-alphabetic?))
-      (getter
-        (and
-          (not (string-empty? $string))
-          (string->symbol $string)))))
+      ($char/eof peek-char/eof-getter)
+      (switch $char/eof
+        ((eof-object? $eof-object)
+          (getter $eof-object))
+        ((char-whitespace? $char-whitespace)
+          (throw atom-getter $char-whitespace))
+        ((else _)
+          (getter-lets
+            ($datum-annotation/eof datum-annotation/eof-getter)
+            (getter
+              (switch $datum-annotation/eof
+                ((eof-object? $eof-object)
+                  (throw atom-getter $eof-object))
+                ((else $datum-annotation)
+                  (switch (annotation-stripped $datum-annotation)
+                    ((number? $number)
+                      $datum-annotation)
+                    ((string? $string)
+                      $datum-annotation)
+                    ((symbol? $symbol)
+                      $datum-annotation)
+                    ((else $other)
+                      (throw atom-getter $datum-annotation)))))))))))
 
-  (define atom-getter
+  (define line-annotation/eof-getter
     (getter-lets
-      ($char peek-char-getter)
-      (if (char-whitespace? $char)
-        (throw atom-getter $char)
-        (getter-lets
-          ($datum datum-getter)
-          (getter
-            (switch $datum
-              ((number? $number) $number)
-              ((string? $string) $string)
-              ((symbol? $symbol) $symbol)
-              ((else $other) (throw atom-getter $other))))))))
-
-  (define line-getter
-    (getter-lets
-      ($atom atom-getter)
-      (switch $atom
+      ($atom-annotation/eof atom-annotation/eof-getter)
+      (switch (annotation/eof-stripped $atom-annotation/eof)
+        ((eof-object? $eof-object)
+          (getter $eof-object))
         ((symbol? $atom)
           (getter-lets
             ($eof? eof?-getter)
@@ -41,21 +47,19 @@
               (getter $atom)
               (getter-lets
                 ($space (exact-char-getter #\space))
-                ($line line-getter)
-                (getter (list $atom $line))))))
+                ($line-annotation/eof line-annotation/eof-getter)
+                (getter (append-annotation $atom-annotation/eof $line-annotation/eof))))))
         ((else $other)
           (getter-lets
-            ($char? char?-getter)
-            (switch $char?
-              ((false? _) (getter $other))
-              (((char=? $char? #\newline) _) (getter $other))
+            ($char/eof char/eof-getter)
+            (switch $char/eof
+              ((eof-object? _) (getter $other))
+              (((partial char=? #\newline) _) (getter $other))
               ((else $other) (throw atom-getter $other))))))))
 
+  (define atom/eof-getter
+    (apply-getter annotation/eof-stripped atom-annotation/eof-getter))
 
-  (define word-annotation?-getter
-    (getter-lets
-      ($word?-annotation (annotation-getter word?-getter))
-      (and
-        (annotation-stripped $word?-annotation)
-        $word?-annotation)))
+  (define line/eof-getter
+    (apply-getter annotation/eof-stripped line-annotation/eof-getter))
 )

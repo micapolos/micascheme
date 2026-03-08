@@ -3,41 +3,45 @@
 (check-gets eof?-getter "" #t 0)
 (check-gets eof?-getter "abc" #f 0)
 
-(check-gets char?-getter "" #f 0)
-(check-gets char?-getter "abc" #\a 1)
-
-(check-gets char-getter "" (eof-object) 1)
+(check-get-raises char-getter "")
 (check-gets char-getter "abc" #\a 1)
+
+(check-gets char/eof-getter "" (eof-object) 0)
+(check-gets char/eof-getter "abc" #\a 1)
 
 (check-gets (exact-char-getter #\a) "abc" #\a 1)
 (check-get-raises (exact-char-getter #\a) "")
 (check-get-raises (exact-char-getter #\a) "bca")
 
-(check-gets peek-char-getter "" (eof-object) 0)
-(check-gets peek-char-getter "abc" #\a 0)
+(check-gets peek-char/eof-getter "" (eof-object) 0)
+(check-gets peek-char/eof-getter "abc" #\a 0)
 
 (check-gets
-  (append-getter char-getter char-getter)
+  (append-getter char/eof-getter char/eof-getter)
   "abc"
   '(#\a #\b)
   2)
 
 (check-gets
-  (append-getter char-getter (char-ungetter #\a))
+  (append-getter char/eof-getter (char-ungetter #\a))
   "abc"
   '(#\a #\a)
   0)
 
 (check-gets
-  (append-getter char-getter (char-ungetter #\a) char-getter)
+  (append-getter char/eof-getter (char-ungetter #\a) char/eof-getter)
   "abc"
   '(#\a #\a #\a)
   1)
 
-(check-gets datum-getter "(foo bar) (zoo zar)" '(foo bar) 9)
+(check-gets datum/eof-getter "" (eof-object) 0)
+(check-gets datum/eof-getter "   " (eof-object) 3)
+(check-gets datum/eof-getter "(foo bar)" '(foo bar) 9)
+(check-gets datum/eof-getter "(foo bar) (zoo zar)" '(foo bar) 9)
 
-(check-gets (skip-until-getter char-whitespace?) "   " #f 3)
-(check-gets (skip-until-getter char-whitespace?) "   foo" #f 3)
+(check-gets (skip-until-getter char-whitespace?) "" (eof-object) 0)
+(check-gets (skip-until-getter char-whitespace?) "   " (eof-object) 3)
+(check-gets (skip-until-getter char-whitespace?) "   foo" #\f 3)
 
 (check-gets (test?-string-getter char-alphabetic?) "" "" 0)
 (check-gets (test?-string-getter char-alphabetic?) "foo" "foo" 3)
