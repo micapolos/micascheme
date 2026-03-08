@@ -14,13 +14,14 @@
     sfd-getter
     bfp-getter
 
+    skip-char-getter
+
     exact-char-getter
     exact-string-getter
 
     char/eof-getter
     string-getter
     char-getter
-    char-ungetter
     indented-getter
 
     peek-char/eof-getter
@@ -152,12 +153,6 @@
     (getter ($port $sfd $indent $bfp $column)
       (values (peek-char $port) $bfp $column)))
 
-  (define (char-ungetter $char)
-    (getter ($port $sfd $indent $bfp $column)
-      (lets
-        (run (unget-char $port $char))
-        (values $char (- $bfp 1) $column))))
-
   (define char-getter
     (getter-lets
       ($char/eof char/eof-getter)
@@ -177,13 +172,21 @@
       ($chars (list->getter (map exact-char-getter (string->list $string))))
       (getter (apply string $chars))))
 
+  (define (skip-char-getter $getter)
+    (getter-lets
+      ($skipped-char char/eof-getter)
+      $getter))
+
   (define (skip-until-getter $test?)
     (getter-lets
-      ($char/eof char/eof-getter)
+      ($char/eof peek-char/eof-getter)
       (switch $char/eof
-        ((eof? $eof) (getter $eof))
-        (($test? _) (skip-until-getter $test?))
-        ((else $char) (char-ungetter $char)))))
+        ((eof? $eof)
+          (getter $eof))
+        (($test? _)
+          (skip-char-getter (skip-until-getter $test?)))
+        ((else $char)
+          (getter $char)))))
 
   (define datum-annotation/eof-getter
     (getter ($port $sfd $indent $bfp $column)
@@ -203,25 +206,33 @@
 
   (define (test?-push-chars-getter $test? $chars)
     (getter-lets
-      ($char/eof char/eof-getter)
+      ($char/eof peek-char/eof-getter)
       (switch $char/eof
         ((eof? _)
           (getter $chars))
         (($test? $tested-char)
-          (test?-push-chars-getter $test?
-            (push $chars $tested-char)))
+          (skip-char-getter
+            (test?-push-chars-getter $test?
+              (push $chars $tested-char))))
         ((else $untested-char)
-          (getter-lets
-            (_ (char-ungetter $untested-char))
-            (getter $chars))))))
+          (getter $chars)))))
 
   (define (test?-string-getter $test?)
     (getter-lets
       ($chars (test?-push-chars-getter $test? (stack)))
       (getter (apply string (reverse $chars)))))
 
+  (define (push-chars-getter $chars)
+    (getter-lets
+      ($char/eof char/eof-getter)
+      (switch $char/eof
+        ((eof? _) (getter $chars))
+        ((else $char) (push-chars-getter (push $chars $char))))))
+
   (define string-getter
-    (test?-string-getter (lambda (_) #t)))
+    (getter-lets
+      ($chars (push-chars-getter (stack)))
+      (getter (apply string (reverse $chars)))))
 
   (define (push-getter $stack $getter)
     (getter-lets

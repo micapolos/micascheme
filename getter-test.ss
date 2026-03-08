@@ -9,6 +9,8 @@
 (check-gets string-getter "ab\ncd" "ab\ncd" 5 2)
 (check-gets string-getter "ab\ncd\n" "ab\ncd\n" 6 0)
 
+(check-gets (skip-char-getter string-getter) "abc" "bc" 3 3)
+
 (check-gets (indented-getter string-getter) "" "" 0 0)
 (check-gets (indented-getter string-getter) "a" "" 0 0) ; unindented
 (check-get-raises (indented-getter string-getter) " ")  ; incomplete indent
@@ -50,18 +52,6 @@
   "abc"
   '(#\a #\b)
   2)
-
-(check-gets
-  (append-getter char/eof-getter (char-ungetter #\a))
-  "abc"
-  '(#\a #\a)
-  0)
-
-(check-gets
-  (append-getter char/eof-getter (char-ungetter #\a) char/eof-getter)
-  "abc"
-  '(#\a #\a #\a)
-  1)
 
 (check-gets datum/eof-getter "" eof 0)
 (check-gets datum/eof-getter "   " eof 3)
