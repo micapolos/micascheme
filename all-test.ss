@@ -29,6 +29,7 @@
   (from)
   (fstack)
   (function)
+  (get)
   (identifier)
   (indexed)
   (inline)
