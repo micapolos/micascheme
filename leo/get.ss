@@ -1,7 +1,8 @@
 (library (leo get)
   (export
     word-annotation?-getter
-    word?-getter)
+    word?-getter
+    atom?-getter)
   (import
     (micascheme)
     (get))
@@ -13,6 +14,17 @@
         (and
           (not (string-empty? $string))
           (string->symbol $string)))))
+
+  (define atom?-getter
+    (getter-lets
+      ($char peek-char-getter)
+      (lets
+        ($atom-char?
+          (or
+            (char=? $char #\")
+            (char-numeric? $char)
+            (char-alphabetic? $char)))
+        (if $atom-char? datum-getter (getter #f)))))
 
   (define word-annotation?-getter
     (getter-lets
