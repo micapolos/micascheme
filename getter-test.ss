@@ -66,7 +66,6 @@
 (check-gets (string-while-getter char-alphabetic?) "foo" "foo" 3)
 (check-gets (string-while-getter char-alphabetic?) "foo123" "foo" 3)
 
-
 (check-gets bfp-getter "" 0 0 0 0)
 (check-gets line-getter "" 0 0 0 0)
 (check-gets column-getter "" 0 0 0 0)
