@@ -51,7 +51,6 @@
       (first-number-char? $char)
       (first-string-char? $char)))
 
-  ; TODO: maybe allow non-alphabetic characters inside?
   (define word-getter
     (getter-lets
       ($string (string-while-getter char-word?))
