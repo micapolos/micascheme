@@ -13,8 +13,8 @@
 
     sfd-getter
     bfp-getter
-    line-getter
-    column-getter
+    line-number-getter
+    column-number-getter
 
     indented-getter
     or-eof-getter
@@ -113,13 +113,13 @@
     (getter ($port $sfd $indent $bfp $line $column)
       (values $bfp $bfp $line $column)))
 
-  (define line-getter
+  (define line-number-getter
     (getter ($port $sfd $indent $bfp $line $column)
-      (values $line $bfp $line $column)))
+      (values (+ $line 1) $bfp $line $column)))
 
-  (define column-getter
+  (define column-number-getter
     (getter ($port $sfd $indent $bfp $line $column)
-      (values $column $bfp $line $column)))
+      (values (+ $column 1) $bfp $line $column)))
 
   (define eof?-getter
     (getter ($port $sfd $indent $bfp $line $column)

@@ -1,6 +1,6 @@
 (import
   (micascheme)
-  (except (getter) line-getter)
+  (getter)
   (leo getter))
 
 (check-get-raises atom-getter "")

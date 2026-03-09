@@ -11,7 +11,7 @@
     lines-getter)
   (import
     (micascheme)
-    (except (getter) line-getter))
+    (getter))
 
   ; TODO: maybe allow non-alphabetic characters inside?
   (define word-getter

@@ -72,12 +72,12 @@
 (check-gets (string-while-getter char-alphabetic?) "foo123" "foo" 3)
 
 (check-gets bfp-getter "" 0 0 0 0)
-(check-gets line-getter "" 0 0 0 0)
-(check-gets column-getter "" 0 0 0 0)
+(check-gets line-number-getter "" 1 0 0 0)
+(check-gets column-number-getter "" 1 0 0 0)
 
 (check-gets (append-getter string-getter bfp-getter) "ab\ncd\ne" (list "ab\ncd\ne" 7) 7 2 1)
-(check-gets (append-getter string-getter line-getter) "ab\ncd\ne" (list "ab\ncd\ne" 2) 7 2 1)
-(check-gets (append-getter string-getter column-getter) "ab\ncd\ne" (list "ab\ncd\ne" 1) 7 2 1)
+(check-gets (append-getter string-getter line-number-getter) "ab\ncd\ne" (list "ab\ncd\ne" 3) 7 2 1)
+(check-gets (append-getter string-getter column-number-getter) "ab\ncd\ne" (list "ab\ncd\ne" 2) 7 2 1)
 
 (check-gets (ending-getter char-getter char-getter) "ab" #\a 2)
 (check-gets (ending-getter char-getter char-getter) "abc" #\a 2)
