@@ -26,6 +26,8 @@
 (check-gets (indented-getter string-getter) "  a\n  b" "a\nb" 7 1 3)
 (check-gets (indented-getter string-getter) "  a\n  b\n" "a\nb\n" 8 2 0)
 
+(check-gets (getter-map (annotation-getter string-getter) annotation-stripped) "abc" "abc" 3)
+
 (check-gets eof?-getter "" #t 0)
 (check-gets eof?-getter "abc" #f 0)
 

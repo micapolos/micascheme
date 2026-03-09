@@ -16,6 +16,8 @@
     line-getter
     column-getter
 
+    indented-getter
+
     skip-char-getter
 
     exact-char-getter
@@ -23,20 +25,21 @@
 
     char/eof-getter
     char-getter
-    indented-getter
 
     peek-char/eof-getter
+    peek-char-getter
 
     eof?-getter
 
     string-getter
     string-while-getter
 
+    annotation-getter
+
     ; TODO: remove these, as they don't preserve line and column
     datum-annotation/eof-getter
     datum/eof-getter
 
-    annotation-getter
     skip-until-getter
     ending-getter
 
@@ -94,7 +97,8 @@
       (condition
         (make-message-condition $message)
         (make-i/o-read-error)
-        (make-source-condition (make-source-object $sfd $bfp $bfp $line $column)))))
+        (make-source-condition
+          (make-source-object $sfd $bfp $bfp (+ $line 1) (+ $column 1))))))
 
   (define (error-getter $message)
     (getter ($port $sfd $indent $bfp $line $column)
@@ -201,6 +205,13 @@
       ($char/eof char/eof-getter)
       (switch $char/eof
         ((eof? $eof) (throw char-getter $eof))
+        ((else $char) (getter $char)))))
+
+  (define peek-char-getter
+    (getter-lets
+      ($char/eof peek-char/eof-getter)
+      (switch $char/eof
+        ((eof? $eof) (throw peek-char-getter $eof))
         ((else $char) (getter $char)))))
 
   (define (exact-char-getter $exact-char)

@@ -1,5 +1,7 @@
 (library (leo getter)
   (export
+    atom-getter
+
     atom-annotation/eof-getter
     line-annotation/eof-getter
     line-annotations-getter
@@ -11,31 +13,45 @@
     (micascheme)
     (getter))
 
+  ; TODO: maybe allow non-alphabetic characters inside?
+  (define word-getter
+    (getter-lets
+      ($string (string-while-getter char-alphabetic?))
+      (if (string-empty? $string)
+        (error-getter "empty word")
+        (getter (string->symbol $string)))))
+
+  ; TODO: negative, positive, floating-point
+  (define number-getter
+    (getter-lets
+      ($string (string-while-getter char-numeric?))
+      (if (string-empty? $string)
+        (error-getter "empty word")
+        (getter (string->number $string)))))
+
+  ; TODO: escaping!!!
+  (define string-literal-getter
+    (getter-lets
+      (_ (exact-char-getter #\"))
+      ($string (string-while-getter (lambda ($char) (not (char=? $char #\")))))
+      (_ (exact-char-getter #\"))
+      (getter $string)))
+
+  (define atom-getter
+    (getter-lets
+      ($char peek-char-getter)
+      (cond
+        ((char-alphabetic? $char) word-getter)
+        ((char-numeric? $char) number-getter)
+        ((char=? $char #\") string-literal-getter)
+        (else (error-getter "invalid char")))))
+
   (define atom-annotation/eof-getter
     (getter-lets
       ($char/eof peek-char/eof-getter)
       (switch $char/eof
-        ((eof? $eof)
-          (getter $eof))
-        ((char-whitespace? $char-whitespace)
-          (throw atom-getter $char-whitespace))
-        ((else _)
-          (getter-lets
-            ($datum-annotation/eof datum-annotation/eof-getter)
-            (getter
-              (switch $datum-annotation/eof
-                ((eof? $eof)
-                  (throw atom-getter $eof))
-                ((else $datum-annotation)
-                  (switch (annotation-stripped $datum-annotation)
-                    ((number? $number)
-                      $datum-annotation)
-                    ((string? $string)
-                      $datum-annotation)
-                    ((symbol? $symbol)
-                      $datum-annotation)
-                    ((else $other)
-                      (throw atom-getter $datum-annotation)))))))))))
+        ((eof? $eof) (getter $eof))
+        ((else $atom) (annotation-getter atom-getter)))))
 
   (define line-annotation/eof-getter
     (getter-lets
