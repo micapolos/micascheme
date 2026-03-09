@@ -15,6 +15,8 @@
 (check-gets (skip-char-getter string-getter) "abc" "bc" 3 0 3)
 
 (check-gets (indented-getter string-getter) "" "" 0 0 0)
+(check-gets (indented-getter string-getter) "\n" "\n" 1 1 0)
+(check-gets (indented-getter string-getter) "\n\n" "\n\n" 2 2 0)
 (check-gets (indented-getter string-getter) "a" "" 0 0 0) ; unindented
 (check-get-raises (indented-getter string-getter) " ")  ; incomplete indent
 (check-get-raises (indented-getter string-getter) " a") ; invalid indent char
@@ -28,6 +30,8 @@
 (check-get-raises (indented-getter string-getter) "  a\n  ") ; empty indent
 (check-gets (indented-getter string-getter) "  a\n  b" "a\nb" 7 1 3)
 (check-gets (indented-getter string-getter) "  a\n  b\n" "a\nb\n" 8 2 0)
+(check-gets (indented-getter string-getter) "  a\n\n  b\n" "a\n\nb\n" 9 3 0) ; skipping newlines
+(check-gets (indented-getter string-getter) "  a\n\n  b\n" "a\n\nb\n" 9 3 0) ; skipping newlines
 
 (check-gets (getter-map (annotation-getter string-getter) annotation-stripped) "abc" "abc" 3)
 
