@@ -11,7 +11,7 @@
 
   (commented
     (expects (id id-bind))
-    (defines (id-map id-lets list->id append-id apply-id))
+    (defines (id-map id-lets id-switch list->id append-id apply-id))
     (define-syntax (define-monadic $syntax)
       (syntax-case $syntax ()
         ((_ id)
@@ -20,6 +20,7 @@
             ($id-bind (identifier-append #'id #'id #'- #'bind))
             ($id-map (identifier-append #'id #'id #'- #'map))
             ($id-lets (identifier-append #'id #'id #'- #'lets))
+            ($id-switch (identifier-append #'id #'id #'- #'switch))
             ($list->id (identifier-append #'id #'list #'-> #'id))
             ($append-id (identifier-append #'id #'append #'- #'id))
             ($apply-id (identifier-append #'id #'apply #'- #'id))
@@ -33,6 +34,11 @@
                   (#,$id-bind expr
                     (lambda (var)
                       (#,$id-lets . x)))))
+              (define-rules-syntax
+                ((#,$id-switch expr case (... ...))
+                  (#,$id-lets
+                    (id expr)
+                    (switch id case (... ...)))))
               (define (#,$list->id $list)
                 (switch $list
                   ((null? $null)

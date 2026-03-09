@@ -53,3 +53,25 @@
 (check-counter
   (append-counter (counter "foo") (counter "bar") (counter "gar"))
   (6 ("foo" "bar" "gar")))
+
+(check-counter
+  (counter-switch (counter 12)
+    ((number? $number) (counter (+ $number 1)))
+    ((string? $string) (counter (string-append $string "!")))
+    ((else $other) (counter (list $other))))
+  (1 13))
+
+(check-counter
+  (counter-switch (counter "foo")
+    ((number? $number) (counter (+ $number 1)))
+    ((string? $string) (counter (string-append $string "!")))
+    ((else $other) (counter (list $other))))
+  (1 "foo!"))
+
+(check-counter
+  (counter-switch (counter #\space)
+    ((number? $number) (counter (+ $number 1)))
+    ((string? $string) (counter (string-append $string "!")))
+    ((else $other) (counter (list $other))))
+  (1 (#\space)))
+
