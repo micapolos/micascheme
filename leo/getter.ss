@@ -9,6 +9,7 @@
     line-annotations-getter
 
     inline-annotation-getter
+    inlines-annotation-getter
 
     line-getter
     lines-getter
@@ -32,23 +33,23 @@
         allowed-word-general-categories)
       (not (member $char disallowed-word-chars))))
 
-  (define (char-word-selector? $char)
+  (define (first-word-char? $char)
     (char-word? $char))
 
-  (define (char-number-selector? $char)
+  (define (first-number-char? $char)
     (or
       (char-numeric? $char)
       (char=? $char #\+)
       (char=? $char #\-)))
 
-  (define (char-string-selector? $char)
+  (define (first-string-char? $char)
     (char=? $char #\"))
 
-  (define (char-atom-selector? $char)
+  (define (first-atom-char? $char)
     (or
-      (char-word-selector? $char)
-      (char-number-selector? $char)
-      (char-string-selector? $char)))
+      (first-word-char? $char)
+      (first-number-char? $char)
+      (first-string-char? $char)))
 
   ; TODO: maybe allow non-alphabetic characters inside?
   (define word-getter
@@ -76,9 +77,9 @@
 
   (define atom-getter
     (getter-switch peek-char-getter
-      ((char-word-selector? _) word-getter)
-      ((char-number-selector? _) number-getter)
-      ((char-string-selector? _) string-literal-getter)
+      ((first-word-char? _) word-getter)
+      ((first-number-char? _) number-getter)
+      ((first-string-char? _) string-literal-getter)
       ((else $char) (error-getter "unexpected char" $char))))
 
   (define atom-annotation-getter
@@ -95,6 +96,12 @@
                 (apply-getter append-annotation
                   (getter $atom-annotation)
                   line-annotation-getter))
+              ((char-colon? _)
+                (ending-getter
+                  (getter-lets
+                    ($inline-annotations (starting-getter space-getter inline-annotations-getter))
+                    (getter (cons $atom-annotation $inline-annotations)))
+                  newline-getter))
               ((char-newline? _)
                 (getter-lets
                   ($line-annotations (indented-getter line-annotations-getter))
@@ -102,10 +109,7 @@
                     ((null? _)
                       (getter $atom-annotation))
                     ((else _)
-                      (getter
-                        (cons
-                          $atom-annotation
-                          $line-annotations))))))
+                      (getter (cons $atom-annotation $line-annotations))))))
               ((else $unexpected-char)
                 (error-getter "unexpected char" $unexpected-char))))
           ((else _)
@@ -130,7 +134,7 @@
                 (getter $atom-annotation)
                 (skip-char-getter inline-annotation-getter)))
             ((else $unexpected-char)
-              (error-getter "unexpected char" $unexpected-char))))
+              (getter $atom-annotation))))
         ((else _)
           (getter $atom-annotation)))))
 
@@ -138,13 +142,12 @@
     (list-getter (skip-newlines-getter line-annotation-getter)))
 
   (define inline-annotations-getter
-    (apply-getter annotation-cons
+    (non-empty-separated-getter
       inline-annotation-getter
-      (eol?-list-getter char-newline?
-        (or-eof-getter
-          (starting-getter
-            (exact-string-getter ", ")
-            inline-annotation-getter)))))
+      (getter-item char-comma? (exact-getter ", "))))
+
+  (define inlines-annotation-getter
+    (annotation-getter inline-annotations-getter list-annotation))
 
   (define line-getter
     (apply-getter annotation-stripped line-annotation-getter))
@@ -158,7 +161,5 @@
       (getter (map annotation-stripped $annotations))))
 
   (define inlines-getter
-    (getter-lets
-      ($annotations inline-annotations-getter)
-      (getter (map annotation-stripped $annotations))))
+    (apply-getter annotation-stripped inlines-annotation-getter))
 )

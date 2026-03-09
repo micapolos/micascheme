@@ -8,6 +8,17 @@
   (lets)
   (procedure))
 
+(check-gets char/eof-getter "" eof 0)
+(check-gets char/eof-getter "abc" #\a 1)
+
+(check-get-raises char-getter "")
+(check-gets char-getter "abc" #\a 1)
+
+(check-get-raises (test?-char-getter char-numeric?) "")
+(check-get-raises (test?-char-getter char-numeric?) "a")
+(check-gets (test?-char-getter char-numeric?) "1" #\1 1)
+(check-gets (test?-char-getter char-numeric?) "1a" #\1 1)
+
 (check-gets string-getter "" "" 0 0 0)
 (check-gets string-getter "\n" "\n" 1 1 0)
 (check-gets string-getter "a" "a" 1 0 1)
@@ -62,12 +73,6 @@
 
 (check-gets eof?-getter "" #t 0)
 (check-gets eof?-getter "abc" #f 0)
-
-(check-get-raises char-getter "")
-(check-gets char-getter "abc" #\a 1)
-
-(check-gets char/eof-getter "" eof 0)
-(check-gets char/eof-getter "abc" #\a 1)
 
 (check-gets (exact-char-getter #\a) "abc" #\a 1)
 (check-get-raises (exact-char-getter #\a) "")
@@ -145,17 +150,36 @@
 (check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "foofoo bar" '("foo" "foo") 6)
 
 (lets
-  ($getter (separated-getter char-numeric? numeric-string-getter (exact-getter ", ")))
+  ($getter
+    (separated-getter
+      (getter-item char-alphabetic? (test?-char-getter char-alphabetic?))
+      (getter-item char-comma? (exact-getter ", "))))
   (run
     (check-gets $getter "" (list))
     (check-gets $getter "," (list) 0)
-    (check-gets $getter "abc" (list) 0)
-    (check-gets $getter "123" (list "123") 3)
-    (check-get-raises $getter "123,")
-    (check-gets $getter "123, " (list "123" "") 5)
-    (check-gets $getter "123, 456" (list "123" "456") 8)
-    (check-gets $getter "123, 456, 789" (list "123" "456" "789") 13)
-    (check-gets $getter "abc" (list) 0)))
+    (check-gets $getter "1" (list) 0)
+    (check-gets $getter "a" (list #\a) 1)
+    (check-gets $getter "a1" (list #\a) 1)
+    (check-get-raises $getter "a,")
+    (check-get-raises $getter "a, ")
+    (check-gets $getter "a, b" (list #\a #\b) 4)
+    (check-gets $getter "a, b, c" (list #\a #\b #\c) 7)))
+
+(lets
+  ($getter
+    (non-empty-separated-getter
+      (test?-char-getter char-alphabetic?)
+      (getter-item char-comma? (exact-getter ", "))))
+  (run
+    (check-get-raises $getter "")
+    (check-get-raises $getter ",")
+    (check-get-raises $getter "1")
+    (check-gets $getter "a" (list #\a) 1)
+    (check-gets $getter "a1" (list #\a) 1)
+    (check-get-raises $getter "a,")
+    (check-get-raises $getter "a, ")
+    (check-gets $getter "a, b" (list #\a #\b) 4)
+    (check-gets $getter "a, b, c" (list #\a #\b #\c) 7)))
 
 (check-gets newline-getter "\nabc" #\newline 1)
 (check-get-raises newline-getter "")

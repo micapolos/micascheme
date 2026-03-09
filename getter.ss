@@ -30,6 +30,7 @@
 
     char/eof-getter
     char-getter
+    test?-char-getter
 
     peek-char/eof-getter
     peek-char-getter
@@ -69,9 +70,15 @@
 
     test-sfd
     check-gets
-    check-get-raises)
+    check-get-raises
+
+    getter-item
+    getter-item?
+    getter-item-getter
+    getter-item-first-char?)
   (import
     (scheme)
+    (data)
     (lets)
     (monadic)
     (procedure)
@@ -86,7 +93,8 @@
     (char)
     (eof)
     (system)
-    (source-file-descriptor))
+    (source-file-descriptor)
+    (predicate))
 
   (define indent-size 2)
 
@@ -265,6 +273,13 @@
       ($chars (list->getter (map exact-char-getter (string->list $string))))
       (getter (apply string $chars))))
 
+  (define (test?-char-getter $test?)
+    (getter-lets
+      ($char char-getter)
+      (switch $char
+        (($test? $char) (getter $char))
+        ((else $char) (error-getter "unexpected char" $char)))))
+
   (define (skip-char-getter $getter)
     (getter-lets
       ($skipped-char char/eof-getter)
@@ -368,10 +383,12 @@
       (_ $end-getter)
       (getter $value)))
 
-  (define newline-getter (exact-char-getter #\newline))
-  (define space-getter (exact-char-getter #\space))
-  (define comma-getter (exact-char-getter #\,))
-  (define colon-getter (exact-char-getter #\:))
+  (define newline-getter (exact-getter #\newline))
+  (define space-getter (exact-getter #\space))
+  (define comma-getter (exact-getter #\,))
+  (define colon-getter (exact-getter #\:))
+
+  (data (getter-item first-char? getter))
 
   (define (optional-getter $first-char? $getter)
     (getter-switch peek-char/eof-getter
@@ -379,19 +396,32 @@
       (($first-char? $first-char) $getter)
       ((else _) (getter #f))))
 
-  (define (separated-getter $first-char? $item-getter $separator-getter)
-    (getter-switch (optional-getter $first-char? $item-getter)
-      ((false? _)
-        (getter null))
-      ((else $item)
-        (getter-lets
-          ($items (list-getter (starting-getter $separator-getter $item-getter)))
-          (getter (cons $item $items))))))
+  (define (optional-item-getter $item)
+    (optional-getter
+      (getter-item-first-char? $item)
+      (getter-item-getter $item)))
 
-  (define (non-empty-separated-getter $item-getter $separator-getter)
+  (define (separated-getter $getter-item $separator-getter-item)
+    (getter-switch (optional-item-getter $getter-item)
+      ((false? _) (getter null))
+      ((else $item)
+        (getter-switch (optional-item-getter $separator-getter-item)
+          ((false? _) (getter (list $item)))
+          ((else _)
+            (apply-getter cons
+              (getter $item)
+              (non-empty-separated-getter
+                (getter-item-getter $getter-item)
+                $separator-getter-item)))))))
+
+  (define (non-empty-separated-getter $item-getter $separator-getter-item)
     (apply-getter cons
       $item-getter
-      (list-getter (starting-getter $separator-getter $item-getter))))
+      (eol?-list-getter
+        (not? (getter-item-first-char? $separator-getter-item))
+        (starting-getter
+          (getter-item-getter $separator-getter-item)
+          $item-getter))))
 
   (define test-sfd (source-file-descriptor "test.txt" 0))
 

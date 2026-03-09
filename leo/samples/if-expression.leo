@@ -1,4 +1,1 @@
-if
-  condition
-  consequent
-  alternate
+if: true, 10, 20

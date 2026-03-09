@@ -42,10 +42,20 @@
 
 (check-gets inline-getter "123 " 123 3)
 
-;(check-gets inlines-getter "" '() 0)
-;(check-gets inlines-getter "10" '(10) 3)
-; (check-gets inlines-getter "10, 20" '(10 20) 6)
-; (check-gets inlines-getter "foo, foo bar" '(foo (foo bar)) 12)
+(check-get-raises inlines-getter "")
+(check-gets inlines-getter "10" '(10) 2)
+(check-gets inlines-getter "10, 20" '(10 20) 6)
+(check-gets inlines-getter "foo" '(foo) 3)
+(check-gets inlines-getter "foo bar" '((foo bar)) 7)
+(check-gets inlines-getter "foo, foo bar" '(foo (foo bar)) 12)
+(check-gets inlines-getter "foo bar, foo" '((foo bar) foo) 12)
+(check-gets inlines-getter "10, foo, \"foo\"" '(10 foo "foo") 14)
+
+; colon line
+(check-get-raises line-getter "foo:")
+(check-get-raises line-getter "foo: ")
+(check-gets line-getter "foo: 10\n" '(foo 10) 8)
+(check-gets line-getter "foo: 10, 20\n" '(foo 10 20) 12)
 
 (check-gets
   line-getter
@@ -72,7 +82,6 @@
     (radius 10))
   52 5 0)
 
-; TODO: Fixit!!!
 ; (check-gets
 ;   line-getter
 ;   (lines-string
