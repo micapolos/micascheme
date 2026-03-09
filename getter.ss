@@ -44,6 +44,7 @@
     datum/eof-getter
 
     skip-until-getter
+    skip-newlines-getter
     ending-getter
 
     newline-getter
@@ -264,6 +265,9 @@
           (skip-char-getter (skip-until-getter $test? $getter)))
         ((else $char)
           $getter))))
+
+  (define (skip-newlines-getter $getter)
+    (skip-until-getter char-newline? $getter))
 
   (define datum-annotation/eof-getter
     (getter ($port $sfd $indent $bfp $line $column)
