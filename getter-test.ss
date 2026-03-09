@@ -1,30 +1,30 @@
 (import (scheme) (check) (getter) (eof))
 
-(check-gets string-getter "" "" 0 0)
-(check-gets string-getter "\n" "\n" 1 0)
-(check-gets string-getter "a" "a" 1 1)
-(check-gets string-getter "ab" "ab" 2 2)
-(check-gets string-getter "ab\n" "ab\n" 3 0)
-(check-gets string-getter "ab\nc" "ab\nc" 4 1)
-(check-gets string-getter "ab\ncd" "ab\ncd" 5 2)
-(check-gets string-getter "ab\ncd\n" "ab\ncd\n" 6 0)
+(check-gets string-getter "" "" 0 0 0)
+(check-gets string-getter "\n" "\n" 1 1 0)
+(check-gets string-getter "a" "a" 1 0 1)
+(check-gets string-getter "ab" "ab" 2 0 2)
+(check-gets string-getter "ab\n" "ab\n" 3 1 0)
+(check-gets string-getter "ab\nc" "ab\nc" 4 1 1)
+(check-gets string-getter "ab\ncd" "ab\ncd" 5 1 2)
+(check-gets string-getter "ab\ncd\n" "ab\ncd\n" 6 2 0)
 
-(check-gets (skip-char-getter string-getter) "abc" "bc" 3 3)
+(check-gets (skip-char-getter string-getter) "abc" "bc" 3 0 3)
 
-(check-gets (indented-getter string-getter) "" "" 0 0)
-(check-gets (indented-getter string-getter) "a" "" 0 0) ; unindented
+(check-gets (indented-getter string-getter) "" "" 0 0 0)
+(check-gets (indented-getter string-getter) "a" "" 0 0 0) ; unindented
 (check-get-raises (indented-getter string-getter) " ")  ; incomplete indent
 (check-get-raises (indented-getter string-getter) " a") ; invalid indent char
 (check-get-raises (indented-getter string-getter) "  ") ; empty indent
 (check-get-raises (indented-getter string-getter) "  \n") ; indent-only line
-(check-gets (indented-getter string-getter) "  a" "a" 3 3)
-(check-gets (indented-getter string-getter) "  ab" "ab" 4 4)
-(check-gets (indented-getter string-getter) "  a\n" "a\n" 4 0)
-(check-gets (indented-getter string-getter) "  a\nb" "a\n" 4 0) ; unindented
+(check-gets (indented-getter string-getter) "  a" "a" 3 0 3)
+(check-gets (indented-getter string-getter) "  ab" "ab" 4 0 4)
+(check-gets (indented-getter string-getter) "  a\n" "a\n" 4 1 0)
+(check-gets (indented-getter string-getter) "  a\nb" "a\n" 4 1 0) ; unindented
 (check-get-raises (indented-getter string-getter) "  a\n ") ; incomplete indent
 (check-get-raises (indented-getter string-getter) "  a\n  ") ; empty indent
-(check-gets (indented-getter string-getter) "  a\n  b" "a\nb" 7 3)
-(check-gets (indented-getter string-getter) "  a\n  b\n" "a\nb\n" 8 0)
+(check-gets (indented-getter string-getter) "  a\n  b" "a\nb" 7 1 3)
+(check-gets (indented-getter string-getter) "  a\n  b\n" "a\nb\n" 8 2 0)
 
 (check-gets eof?-getter "" #t 0)
 (check-gets eof?-getter "abc" #f 0)

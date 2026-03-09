@@ -67,91 +67,91 @@
 
   (define indent-size 2)
 
-  (define (getter-get! $getter $port $sfd $indent $bfp $column)
-    ($getter $port $sfd $indent $bfp $column))
+  (define (getter-get! $getter $port $sfd $indent $bfp $line $column)
+    ($getter $port $sfd $indent $bfp $line $column))
 
   (define-rules-syntax
-    ((getter ($port $sfd $indent $bfp $column) value/bfp/ip)
-      (lambda ($port $sfd $indent $bfp $column) value/bfp/ip))
+    ((getter ($port $sfd $indent $bfp $line $column) value/bfp/line/column)
+      (lambda ($port $sfd $indent $bfp $line $column) value/bfp/line/column))
     ((getter $value)
-      (getter ($port $sfd $indent $bfp $column)
-        (values $value $bfp $column))))
+      (getter ($port $sfd $indent $bfp $line $column)
+        (values $value $bfp $line $column))))
 
   (define (getter-bind $getter $fn)
-    (getter ($port $sfd $indent $bfp $column)
+    (getter ($port $sfd $indent $bfp $line $column)
       (lets
-        ((values $value $bfp $column)
-          (getter-get! $getter $port $sfd $indent $bfp $column))
-        (getter-get! ($fn $value) $port $sfd $indent $bfp $column))))
+        ((values $value $bfp $line $column)
+          (getter-get! $getter $port $sfd $indent $bfp $line $column))
+        (getter-get! ($fn $value) $port $sfd $indent $bfp $line $column))))
 
   (define-monadic getter)
 
-  (define (raise-getter-error $message $port $sfd $bfp $efp)
+  (define (raise-getter-error $message $port $sfd $bfp $line $column)
     (raise
       (condition
         (make-message-condition $message)
         (make-i/o-read-error)
-        (make-source-condition (make-source-object $sfd $bfp $efp)))))
+        (make-source-condition (make-source-object $sfd $bfp $bfp $line $column)))))
 
-  (define (error-getter $message $bfp $efp)
-    (getter ($port $sfd $indent $bfp $column)
-      (raise-getter-error $message $port $sfd $bfp $efp)))
+  (define (error-getter $message)
+    (getter ($port $sfd $indent $bfp $line $column)
+      (raise-getter-error $message $port $sfd $bfp $line $column)))
 
   (define sfd-getter
-    (getter ($port $sfd $indent $bfp $column)
-      (values $sfd $bfp $column)))
+    (getter ($port $sfd $indent $bfp $line $column)
+      (values $sfd $bfp $line $column)))
 
   (define bfp-getter
-    (getter ($port $sfd $indent $bfp $column)
-      (values $bfp $bfp $column)))
+    (getter ($port $sfd $indent $bfp $line $column)
+      (values $bfp $bfp $line $column)))
 
   (define eof?-getter
-    (getter ($port $sfd $indent $bfp $column)
-      (values (port-eof? $port) $bfp $column)))
+    (getter ($port $sfd $indent $bfp $line $column)
+      (values (port-eof? $port) $bfp $line $column)))
+
+  (define (indented-getter $getter)
+    (getter ($port $sfd $indent $bfp $line $column)
+      (getter-get! $getter $port $sfd (+ $indent indent-size) $bfp $line $column)))
 
   (define char/eof-getter
-    (getter ($port $sfd $indent $bfp $column)
+    (getter ($port $sfd $indent $bfp $line $column)
       (lets
         ($char/eof (peek-char $port))
         (switch $char/eof
           ((eof? $eof)
             (cond
               ((zero? $column)
-                (values $eof $bfp $column))
+                (values $eof $bfp $line $column))
               ((<= $column $indent)
-                (raise-getter-error "eof during indent" $port $sfd $bfp (+ $bfp 1)))
+                (raise-getter-error "eof during indent" $port $sfd $bfp $line $column))
               (else
-                (values $eof $bfp $column))))
+                (values $eof $bfp $line $column))))
           ((char-newline? $newline)
             (cond
               ((zero? $column)
-                (values (get-char $port) (+ $bfp 1) 0))
+                (values (get-char $port) (+ $bfp 1) (+ $line 1) 0))
               ((<= $column $indent)
-                (raise-getter-error "empty indent" $port $sfd $bfp (+ $bfp 1)))
+                (raise-getter-error "empty indent" $port $sfd $bfp $line $column))
               (else
-                (values (get-char $port) (+ $bfp 1) 0))))
+                (values (get-char $port) (+ $bfp 1) (+ $line 1) 0))))
           ((else $char)
             (cond
               ((< $column $indent)
                 (cond
                   ((char=? $char #\space)
-                    (lets
-                      (run (get-char $port))
-                      (char/eof-getter $port $sfd $indent (+ $bfp 1) (+ $column 1))))
+                    (getter-get!
+                      (run (get-char $port) char/eof-getter)
+                      $port $sfd $indent (+ $bfp 1) $line (+ $column 1)))
                   ((zero? (mod $column indent-size))
-                    (values eof $bfp $column))
+                    (values eof $bfp $line $column))
                   (else
-                    (raise-getter-error "invalid indent char" $port $sfd $bfp (+ $bfp 1)))))
+                    (raise-getter-error "invalid indent char" $port $sfd $bfp $line $column))))
               (else
-                (values (get-char $port) (+ $bfp 1) (+ $column 1)))))))))
-
-  (define (indented-getter $getter)
-    (getter ($port $sfd $indent $bfp $column)
-      (getter-get! $getter $port $sfd (+ $indent 2) $bfp $column)))
+                (values (get-char $port) (+ $bfp 1) $line (+ $column 1)))))))))
 
   (define peek-char/eof-getter
-    (getter ($port $sfd $indent $bfp $column)
-      (values (peek-char $port) $bfp $column)))
+    (getter ($port $sfd $indent $bfp $line $column)
+      (values (peek-char $port) $bfp $line $column)))
 
   (define char-getter
     (getter-lets
@@ -189,11 +189,11 @@
           $getter))))
 
   (define datum-annotation/eof-getter
-    (getter ($port $sfd $indent $bfp $column)
+    (getter ($port $sfd $indent $bfp $line $column)
       (lets
         ((values $datum/annotation $bfp)
           (get-datum/annotations $port $sfd $bfp))
-        (values $datum/annotation $bfp $column))))
+        (values $datum/annotation $bfp $line $column))))
 
   (define datum/eof-getter
     (getter-lets
@@ -275,41 +275,35 @@
       (check
         (equal?
           (lets
-            ((values $value $bfp $column)
+            ((values $value $bfp $line $column)
               (getter-get! getter
                 (open-input-string string)
                 (source-file-descriptor "test.txt" 0)
-                0
-                0
-                0))
+                0 0 0 0))
             $value)
           out)))
     ((check-gets getter string out bfp)
       (check
         (equal?
           (lets
-            ((values $value $bfp $column)
+            ((values $value $bfp $line $column)
               (getter-get! getter
                 (open-input-string string)
                 (source-file-descriptor "test.txt" 0)
-                0
-                0
-                0))
+                0 0 0 0))
             (list $value $bfp))
           (list out bfp))))
-      ((check-gets getter string out bfp ip)
-        (check
-          (equal?
-            (lets
-              ((values $value $bfp $column)
-                (getter-get! getter
-                  (open-input-string string)
-                  (source-file-descriptor "test.txt" 0)
-                  0
-                  0
-                  0))
-              (list $value $bfp $column))
-            (list out bfp ip)))))
+    ((check-gets getter string out bfp line column)
+      (check
+        (equal?
+          (lets
+            ((values $value $bfp $line $column)
+              (getter-get! getter
+                (open-input-string string)
+                (source-file-descriptor "test.txt" 0)
+                0 0 0 0))
+            (list $value $bfp $line $column))
+          (list out bfp line column)))))
 
   (define-rule-syntax (check-get-raises getter string)
     (check
@@ -317,7 +311,5 @@
         (getter-get! getter
           (open-input-string string)
           (source-file-descriptor "test.txt" 0)
-          0
-          0
-          0))))
+          0 0 0 0))))
 )
