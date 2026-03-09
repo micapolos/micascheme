@@ -82,7 +82,7 @@
                           $line-annotations))))))
               ((else _)
                 (error-getter "unexpected char" $char)))))
-        ((else _)
+        ((else $atom)
           (ending-getter
             (getter $atom-annotation)
             newline-getter)))))

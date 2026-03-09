@@ -8,6 +8,7 @@
     getter-bind
     getter-map
     getter-lets
+    getter-switch
     list->getter
     append-getter
     apply-getter
@@ -149,75 +150,71 @@
 
   (define char/eof-getter
     (getter ($port $sfd $indent $bfp $line $column)
-      (lets
-        ($char/eof (peek-char $port))
-        (switch $char/eof
-          ((eof? $eof)
-            (cond
-              ((zero? $column)
-                (values $eof $bfp $line $column))
-              ((<= $column $indent)
-                (raise-getter-error "invalid" 'indent $port $sfd $bfp))
-              (else
-                (values $eof $bfp $line $column))))
-          ((char-newline? $newline)
-            (cond
-              ((zero? $column)
-                (values (get-char $port) (+ $bfp 1) (+ $line 1) 0))
-              ((<= $column $indent)
-                (raise-getter-error "invalid" 'indent $port $sfd $bfp))
-              (else
-                (values (get-char $port) (+ $bfp 1) (+ $line 1) 0))))
-          ((else $char)
-            (cond
-              ((< $column $indent)
-                (cond
-                  ((char=? $char #\space)
-                    (getter-get!
-                      (run (get-char $port) char/eof-getter)
-                      $port $sfd $indent (+ $bfp 1) $line (+ $column 1)))
-                  ((zero? (mod $column indent-size))
-                    (values eof $bfp $line $column))
-                  (else
-                    (raise-getter-error "invalid" 'indent $port $sfd $bfp))))
-              (else
-                (values (get-char $port) (+ $bfp 1) $line (+ $column 1)))))))))
+      (switch (peek-char $port)
+        ((eof? $eof)
+          (cond
+            ((zero? $column)
+              (values $eof $bfp $line $column))
+            ((<= $column $indent)
+              (raise-getter-error "invalid" 'indent $port $sfd $bfp))
+            (else
+              (values $eof $bfp $line $column))))
+        ((char-newline? $newline)
+          (cond
+            ((zero? $column)
+              (values (get-char $port) (+ $bfp 1) (+ $line 1) 0))
+            ((<= $column $indent)
+              (raise-getter-error "invalid" 'indent $port $sfd $bfp))
+            (else
+              (values (get-char $port) (+ $bfp 1) (+ $line 1) 0))))
+        ((else $char)
+          (cond
+            ((< $column $indent)
+              (cond
+                ((char=? $char #\space)
+                  (getter-get!
+                    (run (get-char $port) char/eof-getter)
+                    $port $sfd $indent (+ $bfp 1) $line (+ $column 1)))
+                ((zero? (mod $column indent-size))
+                  (values eof $bfp $line $column))
+                (else
+                  (raise-getter-error "invalid" 'indent $port $sfd $bfp))))
+            (else
+              (values (get-char $port) (+ $bfp 1) $line (+ $column 1))))))))
 
   (define peek-char/eof-getter
     (getter ($port $sfd $indent $bfp $line $column)
-      (lets
-        ($char/eof (peek-char $port))
-        (switch $char/eof
-          ((eof? $eof)
-            (cond
-              ((zero? $column)
-                (values $eof $bfp $line $column))
-              ((<= $column $indent)
-                (raise-getter-error "invalid" 'indent $port $sfd $bfp))
-              (else
-                (values $eof $bfp $line $column))))
-          ((char-newline? $newline)
-            (cond
-              ((zero? $column)
-                (values $newline $bfp $line $column))
-              ((<= $column $indent)
-                (raise-getter-error "invalid" 'indent $port $sfd $bfp))
-              (else
-                (values $newline $bfp $line $column))))
-          ((else $char)
-            (cond
-              ((< $column $indent)
-                (cond
-                  ((char=? $char #\space)
-                    (getter-get!
-                      (run (get-char $port) peek-char/eof-getter)
-                      $port $sfd $indent (+ $bfp 1) $line (+ $column 1)))
-                  ((zero? (mod $column indent-size))
-                    (values eof $bfp $line $column))
-                  (else
-                    (raise-getter-error "invalid" 'indent $port $sfd $bfp))))
-              (else
-                (values $char $bfp $line $column))))))))
+      (switch (peek-char $port)
+        ((eof? $eof)
+          (cond
+            ((zero? $column)
+              (values $eof $bfp $line $column))
+            ((<= $column $indent)
+              (raise-getter-error "invalid" 'indent $port $sfd $bfp))
+            (else
+              (values $eof $bfp $line $column))))
+        ((char-newline? $newline)
+          (cond
+            ((zero? $column)
+              (values $newline $bfp $line $column))
+            ((<= $column $indent)
+              (raise-getter-error "invalid" 'indent $port $sfd $bfp))
+            (else
+              (values $newline $bfp $line $column))))
+        ((else $char)
+          (cond
+            ((< $column $indent)
+              (cond
+                ((char=? $char #\space)
+                  (getter-get!
+                    (run (get-char $port) peek-char/eof-getter)
+                    $port $sfd $indent (+ $bfp 1) $line (+ $column 1)))
+                ((zero? (mod $column indent-size))
+                  (values eof $bfp $line $column))
+                (else
+                  (raise-getter-error "invalid" 'indent $port $sfd $bfp))))
+            (else
+              (values $char $bfp $line $column)))))))
 
   (define (or-eof-getter $getter)
     (getter-lets
@@ -234,11 +231,9 @@
         ((else $char) (getter $char)))))
 
   (define peek-char-getter
-    (getter-lets
-      ($char/eof peek-char/eof-getter)
-      (switch $char/eof
-        ((eof? $eof) (error-getter "unexpected end of" 'file))
-        ((else $char) (getter $char)))))
+    (getter-switch peek-char/eof-getter
+      ((eof? $eof) (error-getter "unexpected end of" 'file))
+      ((else $char) (getter $char))))
 
   (define (exact-char-getter $exact-char)
     (getter-lets
@@ -258,15 +253,13 @@
       $getter))
 
   (define (skip-until-getter $test? $getter)
-    (getter-lets
-      ($char/eof peek-char/eof-getter)
-      (switch $char/eof
-        ((eof? $eof)
-          (getter $eof))
-        (($test? _)
-          (skip-char-getter (skip-until-getter $test? $getter)))
-        ((else $char)
-          $getter))))
+    (getter-switch peek-char/eof-getter
+      ((eof? $eof)
+        (getter $eof))
+      (($test? _)
+        (skip-char-getter (skip-until-getter $test? $getter)))
+      ((else $char)
+        $getter)))
 
   (define (skip-newlines-getter $getter)
     (skip-until-getter char-newline? $getter))
@@ -279,26 +272,22 @@
         (values $datum/annotation $bfp $line $column))))
 
   (define datum/eof-getter
-    (getter-lets
-      ($datum-annotation/eof datum-annotation/eof-getter)
-      (getter
-        (switch $datum-annotation/eof
-          ((eof? $eof) $eof)
-          ((else $datum/annotation)
-            (datum/annotation-stripped $datum/annotation))))))
+    (getter-switch datum-annotation/eof-getter
+      ((eof? $eof)
+        (getter $eof))
+      ((else $datum/annotation)
+        (getter (datum/annotation-stripped $datum/annotation)))))
 
   (define (push-while-getter $test? $chars)
-    (getter-lets
-      ($char/eof peek-char/eof-getter)
-      (switch $char/eof
-        ((eof? _)
-          (getter $chars))
-        (($test? $tested-char)
-          (skip-char-getter
-            (push-while-getter $test?
-              (push $chars $tested-char))))
-        ((else $untested-char)
-          (getter $chars)))))
+    (getter-switch peek-char/eof-getter
+      ((eof? _)
+        (getter $chars))
+      (($test? $tested-char)
+        (skip-char-getter
+          (push-while-getter $test?
+            (push $chars $tested-char))))
+      ((else $untested-char)
+        (getter $chars))))
 
   (define (string-while-getter $test?)
     (getter-lets
@@ -306,11 +295,9 @@
       (getter (apply string (reverse $chars)))))
 
   (define (push-chars-getter $chars)
-    (getter-lets
-      ($char/eof char/eof-getter)
-      (switch $char/eof
-        ((eof? _) (getter $chars))
-        ((else $char) (push-chars-getter (push $chars $char))))))
+    (getter-switch char/eof-getter
+      ((eof? _) (getter $chars))
+      ((else $char) (push-chars-getter (push $chars $char)))))
 
   (define string-getter
     (getter-lets
@@ -318,13 +305,11 @@
       (getter (apply string (reverse $chars)))))
 
   (define (push-getter $stack $getter)
-    (getter-lets
-      ($value/eof $getter)
-      (switch $value/eof
-        ((eof? _)
-          (getter $stack))
-        ((else $value)
-          (push-getter (push $stack $value) $getter)))))
+    (getter-switch $getter
+      ((eof? _)
+        (getter $stack))
+      ((else $value)
+        (push-getter (push $stack $value) $getter))))
 
   (define (list-getter $getter)
     (apply-getter reverse
