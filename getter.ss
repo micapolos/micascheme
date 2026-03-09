@@ -388,13 +388,14 @@
   (define comma-getter (exact-getter #\,))
   (define colon-getter (exact-getter #\:))
 
-  (data (getter-item first-char? getter))
-
   (define (optional-getter $first-char? $getter)
     (getter-switch peek-char/eof-getter
       ((eof? _) (getter #f))
       (($first-char? $first-char) $getter)
       ((else _) (getter #f))))
+
+  ; predicate for first char and the getter itself.
+  (data (getter-item first-char? getter))
 
   (define (optional-item-getter $item)
     (optional-getter

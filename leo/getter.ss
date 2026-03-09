@@ -82,6 +82,12 @@
       ((first-string-char? _) string-literal-getter)
       ((else $char) (error-getter "unexpected char" $char))))
 
+  (define word-getter-item (getter-item first-word-char? word-getter))
+  (define number-getter-item (getter-item first-number-char? number-getter))
+  (define string-getter-item (getter-item first-string-char? string-literal-getter))
+  (define atom-getter-item (getter-item first-atom-char? atom-getter))
+  (define comma-separator-getter-item (getter-item char-comma? (exact-getter ", ")))
+
   (define atom-annotation-getter
     (annotation-getter atom-getter stripped-annotation))
 
@@ -144,7 +150,7 @@
   (define inline-annotations-getter
     (non-empty-separated-getter
       inline-annotation-getter
-      (getter-item char-comma? (exact-getter ", "))))
+      comma-separator-getter-item))
 
   (define inlines-annotation-getter
     (annotation-getter inline-annotations-getter list-annotation))
