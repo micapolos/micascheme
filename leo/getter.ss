@@ -19,7 +19,7 @@
     (getter-lets
       ($string (string-while-getter char-alphabetic?))
       (if (string-empty? $string)
-        (error-getter "empty word")
+        (error-getter "empty" 'word)
         (getter (string->symbol $string)))))
 
   ; TODO: negative, positive, floating-point
@@ -27,7 +27,7 @@
     (getter-lets
       ($string (string-while-getter char-numeric?))
       (if (string-empty? $string)
-        (error-getter "empty word")
+        (error-getter "empty" 'number)
         (getter (string->number $string)))))
 
   ; TODO: escaping!!!
@@ -45,7 +45,7 @@
         ((char-alphabetic? $char) word-getter)
         ((char-numeric? $char) number-getter)
         ((char=? $char #\") string-literal-getter)
-        (else (error-getter "invalid char")))))
+        (else (error-getter "invalid char" $char)))))
 
   (define line-annotation-getter
     (getter-lets
@@ -71,7 +71,7 @@
                           $atom-annotation
                           $line-annotations))))))
               ((else _)
-                (error-getter "expected space or newline")))))
+                (error-getter "expected space or newline" $char)))))
         ((else _)
           (ending-getter
             (getter $atom-annotation)
