@@ -157,7 +157,7 @@
               ((zero? $column)
                 (values $eof $bfp $line $column))
               ((<= $column $indent)
-                (raise-getter-error "invalid" 'indent $eof $port $sfd $bfp))
+                (raise-getter-error "invalid" 'indent $port $sfd $bfp))
               (else
                 (values $eof $bfp $line $column))))
           ((char-newline? $newline)

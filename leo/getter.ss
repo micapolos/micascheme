@@ -14,10 +14,20 @@
     (micascheme)
     (getter))
 
+  (define allowed-word-general-categories '(Lu Ll Lt Lm Lo Sc Sm Sk So Pd Po))
+  (define disallowed-word-chars '(#\" #\' #\` #\, #\#))
+
+  (define (char-word? $char)
+    (and
+      (member
+        (char-general-category $char)
+        allowed-word-general-categories)
+      (not (member $char disallowed-word-chars))))
+
   ; TODO: maybe allow non-alphabetic characters inside?
   (define word-getter
     (getter-lets
-      ($string (string-while-getter char-alphabetic?))
+      ($string (string-while-getter char-word?))
       (if (string-empty? $string)
         (error-getter "empty" 'word)
         (getter (string->symbol $string)))))
@@ -42,7 +52,7 @@
     (getter-lets
       ($char peek-char-getter)
       (cond
-        ((char-alphabetic? $char) word-getter)
+        ((char-word? $char) word-getter)
         ((char-numeric? $char) number-getter)
         ((char=? $char #\") string-literal-getter)
         (else (error-getter "unexpected char" $char)))))
