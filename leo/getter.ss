@@ -67,27 +67,25 @@
       ($atom-annotation (annotation-getter atom-getter))
       (switch (annotation-stripped $atom-annotation)
         ((symbol? $symbol)
-          (getter-lets
-            ($char char-getter)
-            (switch $char
-              ((char-space? _)
-                (apply-getter append-annotation
-                  (getter $atom-annotation)
-                  line-annotation-getter))
-              ((char-newline? _)
-                (getter-lets
-                  ($line-annotations (indented-getter line-annotations-getter))
-                  (switch $line-annotations
-                    ((null? _)
-                      (getter $atom-annotation))
-                    ((else _)
-                      (getter
-                        (apply append-annotation
-                          $atom-annotation
-                          $line-annotations))))))
-              ((else _)
-                (error-getter "unexpected char" $char)))))
-        ((else $atom)
+          (getter-switch char-getter
+            ((char-space? _)
+              (apply-getter append-annotation
+                (getter $atom-annotation)
+                line-annotation-getter))
+            ((char-newline? _)
+              (getter-lets
+                ($line-annotations (indented-getter line-annotations-getter))
+                (switch $line-annotations
+                  ((null? _)
+                    (getter $atom-annotation))
+                  ((else _)
+                    (getter
+                      (apply append-annotation
+                        $atom-annotation
+                        $line-annotations))))))
+            ((else $unexpected-char)
+              (error-getter "unexpected char" $unexpected-char))))
+        ((else _)
           (ending-getter
             (getter $atom-annotation)
             newline-getter)))))
@@ -97,18 +95,16 @@
       ($atom-annotation (annotation-getter atom-getter))
       (switch (annotation-stripped $atom-annotation)
         ((symbol? $symbol)
-          (getter-lets
-            ($char peek-char/eof-getter)
-            (switch $char
-              ((eof? $eof)
-                (getter $atom-annotation))
-              ((char-space? _)
-                (apply-getter append-annotation
-                  (getter $atom-annotation)
-                  (skip-char-getter inline-annotation-getter)))
-              ((else _)
-                (error-getter "unexpected char" $char)))))
-        ((else $atom)
+          (getter-switch peek-char/eof-getter
+            ((eof? _)
+              (getter $atom-annotation))
+            ((char-space? _)
+              (apply-getter append-annotation
+                (getter $atom-annotation)
+                (skip-char-getter inline-annotation-getter)))
+            ((else $unexpected-char)
+              (error-getter "unexpected char" $unexpected-char))))
+        ((else _)
           (getter $atom-annotation)))))
 
   (define line-annotations-getter
