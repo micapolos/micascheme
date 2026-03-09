@@ -70,7 +70,6 @@
     (annotation)
     (boolean)
     (stack)
-    (throw)
     (char)
     (eof)
     (system)
@@ -231,14 +230,14 @@
     (getter-lets
       ($char/eof char/eof-getter)
       (switch $char/eof
-        ((eof? $eof) (throw char-getter $eof))
+        ((eof? $eof) (error-getter "unexpected end of" 'file))
         ((else $char) (getter $char)))))
 
   (define peek-char-getter
     (getter-lets
       ($char/eof peek-char/eof-getter)
       (switch $char/eof
-        ((eof? $eof) (throw peek-char-getter $eof))
+        ((eof? $eof) (error-getter "unexpected end of" 'file))
         ((else $char) (getter $char)))))
 
   (define (exact-char-getter $exact-char)
@@ -246,7 +245,7 @@
       ($char char-getter)
       (if (char=? $char $exact-char)
         (getter $char)
-        (throw exact-char-getter $char))))
+        (error-getter "unexpected char" $char))))
 
   (define (exact-string-getter $string)
     (getter-lets

@@ -45,7 +45,7 @@
         ((char-alphabetic? $char) word-getter)
         ((char-numeric? $char) number-getter)
         ((char=? $char #\") string-literal-getter)
-        (else (error-getter "invalid char" $char)))))
+        (else (error-getter "unexpected char" $char)))))
 
   (define line-annotation-getter
     (getter-lets
@@ -71,7 +71,7 @@
                           $atom-annotation
                           $line-annotations))))))
               ((else _)
-                (error-getter "expected space or newline" $char)))))
+                (error-getter "unexpected char" $char)))))
         ((else _)
           (ending-getter
             (getter $atom-annotation)
