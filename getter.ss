@@ -13,6 +13,8 @@
 
     sfd-getter
     bfp-getter
+    line-getter
+    column-getter
 
     skip-char-getter
 
@@ -104,6 +106,14 @@
   (define bfp-getter
     (getter ($port $sfd $indent $bfp $line $column)
       (values $bfp $bfp $line $column)))
+
+  (define line-getter
+    (getter ($port $sfd $indent $bfp $line $column)
+      (values $line $bfp $line $column)))
+
+  (define column-getter
+    (getter ($port $sfd $indent $bfp $line $column)
+      (values $column $bfp $line $column)))
 
   (define eof?-getter
     (getter ($port $sfd $indent $bfp $line $column)
