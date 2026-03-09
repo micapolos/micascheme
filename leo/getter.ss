@@ -108,12 +108,12 @@
           (getter $atom-annotation)))))
 
   (define line-annotations-getter
-    (list-getter (skip-newlines-getter (or-eof-getter line-annotation-getter))))
+    (list-getter (skip-newlines-getter line-annotation-getter)))
 
   (define inline-annotations-getter
     (apply-getter annotation-cons
       inline-annotation-getter
-      (list-getter
+      (eol?-list-getter char-newline?
         (or-eof-getter
           (starting-getter
             (exact-string-getter ", ")

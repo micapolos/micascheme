@@ -40,10 +40,6 @@
 
     annotation-getter
 
-    ; TODO: remove these, as they don't preserve line and column
-    datum-annotation/eof-getter
-    datum/eof-getter
-
     skip-until-getter
     skip-newlines-getter
     ending-getter
@@ -54,8 +50,14 @@
     comma-getter
     colon-getter
 
+    eol?-push-getter
     push-getter
+
+    eol?-list-getter
     list-getter
+
+    alphabetic-string-getter
+    numeric-string-getter
 
     check-gets
     check-get-raises)
@@ -265,20 +267,6 @@
   (define (skip-newlines-getter $getter)
     (skip-until-getter char-newline? $getter))
 
-  (define datum-annotation/eof-getter
-    (getter ($port $sfd $indent $bfp $line $column)
-      (lets
-        ((values $datum/annotation $bfp)
-          (get-datum/annotations $port $sfd $bfp))
-        (values $datum/annotation $bfp $line $column))))
-
-  (define datum/eof-getter
-    (getter-switch datum-annotation/eof-getter
-      ((eof? $eof)
-        (getter $eof))
-      ((else $datum/annotation)
-        (getter (datum/annotation-stripped $datum/annotation)))))
-
   (define (push-while-getter $test? $chars)
     (getter-switch peek-char/eof-getter
       ((eof? _)
@@ -305,12 +293,32 @@
       ($chars (push-chars-getter (stack)))
       (getter (apply string (reverse $chars)))))
 
-  (define (push-getter $stack $getter)
-    (getter-switch $getter
+  (define alphabetic-string-getter
+    (string-while-getter char-alphabetic?))
+
+  (define numeric-string-getter
+    (string-while-getter char-numeric?))
+
+  (define (eol?-push-getter $eol? $stack $getter)
+    (getter-switch peek-char/eof-getter
       ((eof? _)
         (getter $stack))
-      ((else $value)
-        (push-getter (push $stack $value) $getter))))
+      (($eol? _)
+        (getter $stack))
+      ((else _)
+        (getter-lets
+          ($value $getter)
+          (eol?-push-getter
+            $eol?
+            (push $stack $value)
+            $getter)))))
+
+  (define (push-getter $stack $getter)
+    (eol?-push-getter (lambda (_) #f) $stack $getter))
+
+  (define (eol?-list-getter $eol? $getter)
+    (apply-getter reverse
+      (eol?-push-getter $eol? (stack) $getter)))
 
   (define (list-getter $getter)
     (apply-getter reverse

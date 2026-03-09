@@ -62,11 +62,6 @@
   '(#\a #\b)
   2)
 
-(check-gets datum/eof-getter "" eof 0)
-(check-gets datum/eof-getter "   " eof 3)
-(check-gets datum/eof-getter "(foo bar)" '(foo bar) 9)
-(check-gets datum/eof-getter "(foo bar) (zoo zar)" '(foo bar) 9)
-
 (check-gets (skip-until-getter char-whitespace? string-getter) "" eof 0)
 (check-gets (skip-until-getter char-whitespace? string-getter) "   " eof 3)
 (check-gets (skip-until-getter char-whitespace? string-getter) "   foo" "foo" 6)
@@ -74,6 +69,9 @@
 (check-gets (string-while-getter char-alphabetic?) "" "" 0)
 (check-gets (string-while-getter char-alphabetic?) "foo" "foo" 3)
 (check-gets (string-while-getter char-alphabetic?) "foo123" "foo" 3)
+
+(check-gets alphabetic-string-getter "foo123" "foo" 3 0 3)
+(check-gets numeric-string-getter "123abc" "123" 3 0 3)
 
 (check-gets bfp-getter "" 0 0 0 0)
 (check-gets line-number-getter "" 1 0 0 0)
@@ -87,10 +85,11 @@
 (check-gets (ending-getter char-getter char-getter) "abc" #\a 2)
 (check-get-raises (ending-getter char-getter char-getter) "a")
 
-(check-gets (list-getter datum/eof-getter) "" '() 0)
-(check-gets (list-getter datum/eof-getter) "10 20 30" '(10 20 30) 8)
-(check-gets (list-getter datum/eof-getter) "   " '() 3)
-(check-gets (list-getter datum/eof-getter) "  10  20 30  " '(10 20 30) 13)
+(check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "" '() 0)
+(check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) " " '() 0)
+(check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "foo" '("foo") 3)
+(check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "foo bar" '("foo") 3)
+(check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "foofoo bar" '("foo" "foo") 6)
 
 (check-gets newline-getter "\nabc" #\newline 1)
 (check-get-raises newline-getter "")
