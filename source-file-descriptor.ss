@@ -1,8 +1,9 @@
 (library (source-file-descriptor)
   (export
     source-file-descriptor=?
-    path->source-file-descriptor)
-  (import (chezscheme))
+    path->source-file-descriptor
+    load-datum/annotations)
+  (import (chezscheme) (lets))
 
   (define (source-file-descriptor=? $a $b)
     (and
@@ -18,4 +19,9 @@
       (open-file-input-port $path)
       (lambda ($port)
         (make-source-file-descriptor $path $port))))
+
+  (define (load-datum/annotations $path)
+    (lets
+      ($sfd (path->source-file-descriptor $path))
+      (get-datum/annotations (open-source-file $sfd) $sfd 0)))
 )
