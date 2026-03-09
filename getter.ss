@@ -338,7 +338,7 @@
   (define comma-getter (exact-char-getter #\,))
   (define colon-getter (exact-char-getter #\:))
 
-  (define-rules-syntax
+  (define-rules-syntaxes
     ((check-gets getter string out)
       (check
         (equal?
@@ -371,13 +371,12 @@
                 (source-file-descriptor "test.txt" 0)
                 0 0 0 0))
             (list $value $bfp $line $column))
-          (list out bfp line column)))))
-
-  (define-rule-syntax (check-get-raises getter string)
-    (check
-      (raises
-        (getter-get! getter
-          (open-input-string string)
-          (source-file-descriptor "test.txt" 0)
-          0 0 0 0))))
+          (list out bfp line column))))
+    ((check-get-raises getter string)
+      (check
+        (raises
+          (getter-get! getter
+            (open-input-string string)
+            (source-file-descriptor "test.txt" 0)
+            0 0 0 0)))))
 )
