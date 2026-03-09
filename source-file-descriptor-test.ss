@@ -1,4 +1,7 @@
-(import (chezscheme) (check) (source-file-descriptor))
+(import
+  (chezscheme)
+  (check)
+  (source-file-descriptor))
 
 (check
   (source-file-descriptor=?
@@ -16,3 +19,7 @@
     (source-file-descriptor=?
       (source-file-descriptor "foo" 3)
       (source-file-descriptor "foo" 5))))
+
+(check
+  (source-file-descriptor?
+    (path->source-file-descriptor "source-file-descriptor.ss")))
