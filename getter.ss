@@ -47,6 +47,7 @@
     skip-until-getter
     skip-newlines-getter
     ending-getter
+    starting-getter
 
     newline-getter
     space-getter
@@ -331,6 +332,12 @@
     (getter-lets
       ($value $getter)
       (_ $end-getter)
+      (getter $value)))
+
+  (define (starting-getter $start-getter $getter)
+    (getter-lets
+      (_ $start-getter)
+      ($value $getter)
       (getter $value)))
 
   (define newline-getter (exact-char-getter #\newline))

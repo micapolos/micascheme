@@ -34,6 +34,19 @@
 (check-gets lines-getter "10\n20\n" '(10 20) 6)
 (check-gets lines-getter "foo\nfoo bar\n" '(foo (foo bar)) 12)
 
+(check-gets inline-getter "123" 123 3)
+(check-gets inline-getter "\"foo\"" "foo" 5)
+(check-gets inline-getter "foo" 'foo 3)
+(check-gets inline-getter "foo bar" '(foo bar) 7)
+(check-gets inline-getter "foo bar goo" '(foo (bar goo)) 11)
+
+(check-gets inline-getter "123 " 123 3)
+
+; (check-gets inlines-getter "" '() 0)
+; (check-gets inlines-getter "10" '(10) 3)
+; (check-gets inlines-getter "10, 20" '(10 20) 6)
+; (check-gets inlines-getter "foo, foo bar" '(foo (foo bar)) 12)
+
 (check-gets
   line-getter
   (lines-string

@@ -8,8 +8,13 @@
     line-annotation-getter
     line-annotations-getter
 
+    inline-annotation-getter
+
     line-getter
-    lines-getter)
+    lines-getter
+
+    inline-getter
+    inlines-getter)
   (import
     (micascheme)
     (getter))
@@ -87,14 +92,50 @@
             (getter $atom-annotation)
             newline-getter)))))
 
+  (define inline-annotation-getter
+    (getter-lets
+      ($atom-annotation (annotation-getter atom-getter))
+      (switch (annotation-stripped $atom-annotation)
+        ((symbol? $symbol)
+          (getter-lets
+            ($char peek-char/eof-getter)
+            (switch $char
+              ((eof? $eof)
+                (getter $atom-annotation))
+              ((char-space? _)
+                (apply-getter append-annotation
+                  (getter $atom-annotation)
+                  (skip-char-getter inline-annotation-getter)))
+              ((else _)
+                (error-getter "unexpected char" $char)))))
+        ((else $atom)
+          (getter $atom-annotation)))))
+
   (define line-annotations-getter
     (list-getter (skip-newlines-getter (or-eof-getter line-annotation-getter))))
+
+  (define inline-annotations-getter
+    (apply-getter annotation-cons
+      inline-annotation-getter
+      (list-getter
+        (or-eof-getter
+          (starting-getter
+            (exact-string-getter ", ")
+            inline-annotation-getter)))))
 
   (define line-getter
     (apply-getter annotation-stripped line-annotation-getter))
 
+  (define inline-getter
+    (apply-getter annotation-stripped inline-annotation-getter))
+
   (define lines-getter
     (getter-lets
       ($annotations line-annotations-getter)
+      (getter (map annotation-stripped $annotations))))
+
+  (define inlines-getter
+    (getter-lets
+      ($annotations inline-annotations-getter)
       (getter (map annotation-stripped $annotations))))
 )
