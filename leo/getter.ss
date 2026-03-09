@@ -26,7 +26,7 @@
   (define disallowed-word-chars
     '(#\" #\' #\` #\, #\# #\:))
 
-  (define (char-word? $char)
+  (define (word-char? $char)
     (and
       (member
         (char-general-category $char)
@@ -34,7 +34,7 @@
       (not (member $char disallowed-word-chars))))
 
   (define (first-word-char? $char)
-    (char-word? $char))
+    (word-char? $char))
 
   (define (first-number-char? $char)
     (or
@@ -53,7 +53,7 @@
 
   (define word-getter
     (getter-lets
-      ($string (string-while-getter char-word?))
+      ($string (string-while-getter word-char?))
       (if (string-empty? $string)
         (error-getter "empty" 'word)
         (getter (string->symbol $string)))))
