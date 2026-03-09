@@ -59,6 +59,7 @@
     alphabetic-string-getter
     numeric-string-getter
 
+    test-sfd
     check-gets
     check-get-raises)
   (import
@@ -324,17 +325,15 @@
     (apply-getter reverse
       (push-getter (stack) $getter)))
 
-  (define (annotation-getter $getter)
+  (define (annotation-getter $getter $make-annotation)
     (getter-lets
       ($bfp bfp-getter)
       ($value $getter)
       ($efp bfp-getter)
       ($sfd sfd-getter)
       (getter
-        (make-annotation
-          $value
-          (make-source-object $sfd $bfp $efp)
-          $value))))
+        ($make-annotation $value
+          (make-source-object $sfd $bfp $efp)))))
 
   (define (ending-getter $getter $end-getter)
     (getter-lets
@@ -353,37 +352,39 @@
   (define comma-getter (exact-char-getter #\,))
   (define colon-getter (exact-char-getter #\:))
 
+  (define test-sfd (source-file-descriptor "test.txt" 0))
+
   (define-rules-syntaxes
     ((check-gets getter string out)
       (check
-        (equal?
+        (datum/annotation=?
           (lets
             ((values $value $bfp $line $column)
               (getter-get! getter
                 (open-input-string string)
-                (source-file-descriptor "test.txt" 0)
+                test-sfd
                 0 0 0 0))
             $value)
           out)))
     ((check-gets getter string out bfp)
       (check
-        (equal?
+        (datum/annotation=?
           (lets
             ((values $value $bfp $line $column)
               (getter-get! getter
                 (open-input-string string)
-                (source-file-descriptor "test.txt" 0)
+                test-sfd
                 0 0 0 0))
             (list $value $bfp))
           (list out bfp))))
     ((check-gets getter string out bfp line column)
       (check
-        (equal?
+        (datum/annotation=?
           (lets
             ((values $value $bfp $line $column)
               (getter-get! getter
                 (open-input-string string)
-                (source-file-descriptor "test.txt" 0)
+                test-sfd
                 0 0 0 0))
             (list $value $bfp $line $column))
           (list out bfp line column))))
@@ -392,6 +393,6 @@
         (raises
           (getter-get! getter
             (open-input-string string)
-            (source-file-descriptor "test.txt" 0)
+            test-sfd
             0 0 0 0)))))
 )

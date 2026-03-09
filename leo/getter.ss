@@ -81,9 +81,12 @@
       ((char-string-selector? _) string-literal-getter)
       ((else $char) (error-getter "unexpected char" $char))))
 
+  (define atom-annotation-getter
+    (annotation-getter atom-getter stripped-annotation))
+
   (define line-annotation-getter
     (getter-lets
-      ($atom-annotation (annotation-getter atom-getter))
+      ($atom-annotation atom-annotation-getter)
       (switch (annotation-stripped $atom-annotation)
         ((symbol? $symbol)
           (getter-switch char-getter
@@ -111,7 +114,7 @@
 
   (define inline-annotation-getter
     (getter-lets
-      ($atom-annotation (annotation-getter atom-getter))
+      ($atom-annotation atom-annotation-getter)
       (switch (annotation-stripped $atom-annotation)
         ((symbol? $symbol)
           (getter-switch peek-char/eof-getter

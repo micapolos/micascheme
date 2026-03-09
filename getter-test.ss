@@ -1,4 +1,9 @@
-(import (scheme) (check) (getter) (eof))
+(import
+  (scheme)
+  (check)
+  (getter)
+  (eof)
+  (annotation))
 
 (check-gets string-getter "" "" 0 0 0)
 (check-gets string-getter "\n" "\n" 1 1 0)
@@ -33,7 +38,24 @@
 (check-gets (indented-getter string-getter) "  a\n\n  b\n" "a\n\nb\n" 9 3 0) ; skipping newlines
 (check-gets (indented-getter string-getter) "  a\n\n  b\n" "a\n\nb\n" 9 3 0) ; skipping newlines
 
-(check-gets (getter-map (annotation-getter string-getter) annotation-stripped) "abc" "abc" 3)
+(check-gets
+  (annotation-getter string-getter stripped-annotation)
+  "abc"
+  (stripped-annotation "abc" (make-source-object test-sfd 0 3))
+  3)
+
+(check-gets
+  (annotation-getter
+    (list-getter (annotation-getter char-getter stripped-annotation))
+    list-annotation)
+  "abc"
+  (list-annotation
+    (list
+      (stripped-annotation #\a (make-source-object test-sfd 0 1))
+      (stripped-annotation #\b (make-source-object test-sfd 0 1))
+      (stripped-annotation #\c (make-source-object test-sfd 0 1)))
+    (make-source-object test-sfd 0 3))
+  3)
 
 (check-gets eof?-getter "" #t 0)
 (check-gets eof?-getter "abc" #f 0)

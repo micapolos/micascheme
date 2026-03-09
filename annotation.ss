@@ -7,7 +7,11 @@
     fake-annotation
     annotation-cons
     append-annotation
-    annotation/eof-stripped)
+    annotation/eof-stripped
+    stripped-annotation
+    list-annotation
+    datum/annotation=?
+    annotation=?)
   (import
     (scheme)
     (switch)
@@ -65,4 +69,48 @@
     (switch $annotation/eof
       ((eof-object? $eof-object) $eof-object)
       ((else $annotation) (annotation-stripped $annotation))))
+
+  (define (stripped-annotation $stripped $source-object)
+    (make-annotation $stripped $source-object $stripped))
+
+  (define (list-annotation $list $source-object)
+    (make-annotation
+      (map datum/annotation-expression $list)
+      $source-object
+      (map datum/annotation-stripped $list)))
+
+  (define (datum/annotation=? $a $b)
+    (switch $a
+      ((annotation? $annotation-a)
+        (switch? $b
+          ((annotation? $annotation-b)
+            (annotation=? $annotation-a $annotation-b))))
+      ((pair? $pair-a)
+        (switch? $b
+          ((pair? $pair-b)
+            (and
+              (datum/annotation=? (car $pair-a) (car $pair-b))
+              (datum/annotation=? (cdr $pair-a) (cdr $pair-b))))))
+      ; TODO: Check vector?, bytevector?, box?
+      ((else $datum-a)
+        (equal? $datum-a $b))))
+
+  (define (annotation=? $a $b)
+    (and
+      (switch (annotation-expression $a)
+        ((pair? $pair-a)
+          (switch? (annotation-expression $b)
+            ((pair? $pair-b)
+              (and
+                (datum/annotation=? (car $pair-a) (car $pair-b))
+                (datum/annotation=? (cdr $pair-a) (cdr $pair-b))))))
+        ; TODO: Check vector?, bytevector?, box?
+        ((else $other-a)
+          (equal? $other-a (annotation-expression $b))))
+      (source-object=?
+        (annotation-source $a)
+        (annotation-source $b))
+      (equal?
+        (annotation-stripped $a)
+        (annotation-stripped $b))))
 )
