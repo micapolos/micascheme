@@ -151,7 +151,39 @@
 
   (define peek-char/eof-getter
     (getter ($port $sfd $indent $bfp $line $column)
-      (values (peek-char $port) $bfp $line $column)))
+      (lets
+        ($char/eof (peek-char $port))
+        (switch $char/eof
+          ((eof? $eof)
+            (cond
+              ((zero? $column)
+                (values $eof $bfp $line $column))
+              ((<= $column $indent)
+                (raise-getter-error "eof during indent" $port $sfd $bfp $line $column))
+              (else
+                (values $eof $bfp $line $column))))
+          ((char-newline? $newline)
+            (cond
+              ((zero? $column)
+                (values $newline $bfp $line $column))
+              ((<= $column $indent)
+                (raise-getter-error "empty indent" $port $sfd $bfp $line $column))
+              (else
+                (values $newline $bfp $line $column))))
+          ((else $char)
+            (cond
+              ((< $column $indent)
+                (cond
+                  ((char=? $char #\space)
+                    (getter-get!
+                      (run (get-char $port) peek-char/eof-getter)
+                      $port $sfd $indent (+ $bfp 1) $line (+ $column 1)))
+                  ((zero? (mod $column indent-size))
+                    (values eof $bfp $line $column))
+                  (else
+                    (raise-getter-error "invalid indent char" $port $sfd $bfp $line $column))))
+              (else
+                (values $char $bfp $line $column))))))))
 
   (define char-getter
     (getter-lets
