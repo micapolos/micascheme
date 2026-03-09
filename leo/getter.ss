@@ -6,6 +6,7 @@
     atom-getter
 
     line-annotation-getter
+    line-annotations-getter
 
     line-getter
     lines-getter)
