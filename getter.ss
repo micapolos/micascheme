@@ -24,6 +24,7 @@
 
     skip-char-getter
 
+    exact-getter
     exact-char-getter
     exact-string-getter
 
@@ -42,8 +43,10 @@
 
     skip-until-getter
     skip-newlines-getter
-    ending-getter
+
     starting-getter
+    enclosing-getter
+    ending-getter
 
     newline-getter
     space-getter
@@ -97,12 +100,18 @@
   (define (getter-load! $getter $path)
     (getter-sfd-get! $getter (path->source-file-descriptor $path)))
 
-  (define-rules-syntax
+  (define-rules-syntaxes
     ((getter ($port $sfd $indent $bfp $line $column) value/bfp/line/column)
       (lambda ($port $sfd $indent $bfp $line $column) value/bfp/line/column))
     ((getter $value)
       (getter ($port $sfd $indent $bfp $line $column)
-        (values $value $bfp $line $column))))
+        (values $value $bfp $line $column)))
+    ((exact-getter ch)
+      (char? (datum ch))
+      (exact-char-getter ch))
+    ((exact-getter s)
+      (string? (datum s))
+      (exact-string-getter s)))
 
   (define (getter-bind $getter $fn)
     (getter ($port $sfd $indent $bfp $line $column)
@@ -335,16 +344,23 @@
         ($make-annotation $value
           (make-source-object $sfd $bfp $efp)))))
 
-  (define (ending-getter $getter $end-getter)
-    (getter-lets
-      ($value $getter)
-      (_ $end-getter)
-      (getter $value)))
-
   (define (starting-getter $start-getter $getter)
     (getter-lets
       (_ $start-getter)
       ($value $getter)
+      (getter $value)))
+
+  (define (enclosing-getter $start-getter $getter $end-getter)
+    (getter-lets
+      (_ $start-getter)
+      ($value $getter)
+      (_ $end-getter)
+      (getter $value)))
+
+  (define (ending-getter $getter $end-getter)
+    (getter-lets
+      ($value $getter)
+      (_ $end-getter)
       (getter $value)))
 
   (define newline-getter (exact-char-getter #\newline))

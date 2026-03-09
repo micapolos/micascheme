@@ -70,10 +70,19 @@
 (check-get-raises (exact-char-getter #\a) "")
 (check-get-raises (exact-char-getter #\a) "bca")
 
+(check-gets (exact-getter #\a) "abc" #\a 1)
+(check-get-raises (exact-getter #\a) "")
+(check-get-raises (exact-getter #\a) "bca")
+
 (check-gets (exact-string-getter "foo") "foo" "foo" 3)
 (check-gets (exact-string-getter "foo") "foobar" "foo" 3)
 (check-get-raises (exact-string-getter "foo") "")
 (check-get-raises (exact-string-getter "foo") "fo")
+
+(check-gets (exact-getter "foo") "foo" "foo" 3)
+(check-gets (exact-getter "foo") "foobar" "foo" 3)
+(check-get-raises (exact-getter "foo") "")
+(check-get-raises (exact-getter "foo") "fo")
 
 (check-gets peek-char/eof-getter "" eof 0)
 (check-gets peek-char/eof-getter "abc" #\a 0)
@@ -103,9 +112,25 @@
 (check-gets (append-getter string-getter line-number-getter) "ab\ncd\ne" (list "ab\ncd\ne" 3) 7 2 1)
 (check-gets (append-getter string-getter column-number-getter) "ab\ncd\ne" (list "ab\ncd\ne" 2) 7 2 1)
 
-(check-gets (ending-getter char-getter char-getter) "ab" #\a 2)
-(check-gets (ending-getter char-getter char-getter) "abc" #\a 2)
-(check-get-raises (ending-getter char-getter char-getter) "a")
+(check-gets (starting-getter (exact-getter #\<) char-getter) "<b" #\b 2)
+(check-gets (starting-getter (exact-getter #\<) char-getter) "<bc" #\b 2)
+(check-get-raises (starting-getter (exact-getter #\<) char-getter) "<")
+
+(check-gets
+  (enclosing-getter (exact-getter #\<) char-getter (exact-getter #\>))
+  "<b>" #\b 3)
+
+(check-gets
+  (enclosing-getter (exact-getter #\<) char-getter (exact-getter #\>))
+  "<b>d" #\b 3)
+
+(check-get-raises
+  (enclosing-getter (exact-getter #\<) char-getter (exact-getter #\>))
+  "<b")
+
+(check-gets (ending-getter char-getter (exact-getter #\>)) "a>" #\a 2)
+(check-gets (ending-getter char-getter (exact-getter #\>)) "a>c" #\a 2)
+(check-get-raises (ending-getter char-getter (exact-getter #\>)) "a")
 
 (check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "" '() 0)
 (check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) " " '() 0)
