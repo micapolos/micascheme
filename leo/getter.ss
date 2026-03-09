@@ -19,8 +19,11 @@
     (micascheme)
     (getter))
 
-  (define allowed-word-general-categories '(Lu Ll Lt Lm Lo Sc Sm Sk So Pd Po))
-  (define disallowed-word-chars '(#\" #\' #\` #\, #\# #\:))
+  (define allowed-word-general-categories
+    '(Lu Ll Lt Lm Lo Sc Sm Sk So Pd Po))
+
+  (define disallowed-word-chars
+    '(#\" #\' #\` #\, #\# #\:))
 
   (define (char-word? $char)
     (and
@@ -28,6 +31,24 @@
         (char-general-category $char)
         allowed-word-general-categories)
       (not (member $char disallowed-word-chars))))
+
+  (define (char-word-selector? $char)
+    (char-word? $char))
+
+  (define (char-number-selector? $char)
+    (or
+      (char-numeric? $char)
+      (char=? $char #\+)
+      (char=? $char #\-)))
+
+  (define (char-string-selector? $char)
+    (char=? $char #\"))
+
+  (define (char-atom-selector? $char)
+    (or
+      (char-word-selector? $char)
+      (char-number-selector? $char)
+      (char-string-selector? $char)))
 
   ; TODO: maybe allow non-alphabetic characters inside?
   (define word-getter
@@ -54,13 +75,11 @@
       (getter $string)))
 
   (define atom-getter
-    (getter-lets
-      ($char peek-char-getter)
-      (cond
-        ((char-word? $char) word-getter)
-        ((char-numeric? $char) number-getter)
-        ((char=? $char #\") string-literal-getter)
-        (else (error-getter "unexpected char" $char)))))
+    (getter-switch peek-char-getter
+      ((char-word-selector? _) word-getter)
+      ((char-number-selector? _) number-getter)
+      ((char-string-selector? _) string-literal-getter)
+      ((else $char) (error-getter "unexpected char" $char))))
 
   (define line-annotation-getter
     (getter-lets
