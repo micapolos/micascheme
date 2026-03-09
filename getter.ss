@@ -1,6 +1,8 @@
 (library (getter)
   (export
     getter-get!
+    getter-sfd-get!
+    getter-load!
 
     getter
     getter-bind
@@ -70,12 +72,25 @@
     (throw)
     (char)
     (eof)
-    (system))
+    (system)
+    (source-file-descriptor))
 
   (define indent-size 2)
 
   (define (getter-get! $getter $port $sfd $indent $bfp $line $column)
     ($getter $port $sfd $indent $bfp $line $column))
+
+  (define (getter-sfd-get! $getter $sfd)
+    (lets
+      ((values $value $bfp $line $column)
+        (getter-get! $getter
+          (open-source-file $sfd)
+          $sfd
+          0 0 0 0))
+      $value))
+
+  (define (getter-load! $getter $path)
+    (getter-sfd-get! $getter (path->source-file-descriptor $path)))
 
   (define-rules-syntax
     ((getter ($port $sfd $indent $bfp $line $column) value/bfp/line/column)

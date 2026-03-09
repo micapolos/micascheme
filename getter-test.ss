@@ -109,3 +109,5 @@
 (check-gets (apply-getter source-file-descriptor-checksum sfd-getter) "" 0 0)
 
 (check-get-raises (error-getter "dupa" 3 6) "")
+
+(check (string? (getter-load! string-getter "getter-test.ss")))
