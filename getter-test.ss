@@ -3,7 +3,10 @@
   (check)
   (getter)
   (eof)
-  (annotation))
+  (annotation)
+  (char)
+  (lets)
+  (procedure))
 
 (check-gets string-getter "" "" 0 0 0)
 (check-gets string-getter "\n" "\n" 1 1 0)
@@ -132,11 +135,27 @@
 (check-gets (ending-getter char-getter (exact-getter #\>)) "a>c" #\a 2)
 (check-get-raises (ending-getter char-getter (exact-getter #\>)) "a")
 
+(check-gets (optional-getter char-numeric? numeric-string-getter) "abc" #f)
+(check-gets (optional-getter char-numeric? numeric-string-getter) "123abc" "123")
+
 (check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "" '() 0)
 (check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) " " '() 0)
 (check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "foo" '("foo") 3)
 (check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "foo bar" '("foo") 3)
 (check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "foofoo bar" '("foo" "foo") 6)
+
+(lets
+  ($getter (separated-getter char-numeric? numeric-string-getter (exact-getter ", ")))
+  (run
+    (check-gets $getter "" (list))
+    (check-gets $getter "," (list) 0)
+    (check-gets $getter "abc" (list) 0)
+    (check-gets $getter "123" (list "123") 3)
+    (check-get-raises $getter "123,")
+    (check-gets $getter "123, " (list "123" "") 5)
+    (check-gets $getter "123, 456" (list "123" "456") 8)
+    (check-gets $getter "123, 456, 789" (list "123" "456" "789") 13)
+    (check-gets $getter "abc" (list) 0)))
 
 (check-gets newline-getter "\nabc" #\newline 1)
 (check-get-raises newline-getter "")

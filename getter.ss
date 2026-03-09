@@ -48,10 +48,15 @@
     enclosing-getter
     ending-getter
 
+    separated-getter
+    non-empty-separated-getter
+
     newline-getter
     space-getter
     comma-getter
     colon-getter
+
+    optional-getter
 
     eol?-push-getter
     push-getter
@@ -367,6 +372,26 @@
   (define space-getter (exact-char-getter #\space))
   (define comma-getter (exact-char-getter #\,))
   (define colon-getter (exact-char-getter #\:))
+
+  (define (optional-getter $first-char? $getter)
+    (getter-switch peek-char/eof-getter
+      ((eof? _) (getter #f))
+      (($first-char? $first-char) $getter)
+      ((else _) (getter #f))))
+
+  (define (separated-getter $first-char? $item-getter $separator-getter)
+    (getter-switch (optional-getter $first-char? $item-getter)
+      ((false? _)
+        (getter null))
+      ((else $item)
+        (getter-lets
+          ($items (list-getter (starting-getter $separator-getter $item-getter)))
+          (getter (cons $item $items))))))
+
+  (define (non-empty-separated-getter $item-getter $separator-getter)
+    (apply-getter cons
+      $item-getter
+      (list-getter (starting-getter $separator-getter $item-getter))))
 
   (define test-sfd (source-file-descriptor "test.txt" 0))
 
