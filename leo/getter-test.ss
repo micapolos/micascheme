@@ -25,15 +25,32 @@
 
 (check-get-raises line/eof-getter "123 ")
 
-(check-gets script-getter "" '() 0)
-(check-gets script-getter "10\n" '(10) 3)
-(check-gets script-getter "10\n20\n" '(10 20) 6)
-(check-gets script-getter "foo\nfoo bar\n" '(foo (foo bar)) 12)
+(check-gets lines-getter "" '() 0)
+(check-gets lines-getter "10\n" '(10) 3)
+(check-gets lines-getter "10\n20\n" '(10 20) 6)
+(check-gets lines-getter "foo\nfoo bar\n" '(foo (foo bar)) 12)
 
-(check-gets indent?-getter "" #f 0)
-(check-gets indent?-getter "abc" #f 0)
-(check-gets indent?-getter "\t" #f 0)
-(check-gets indent?-getter "  " #t 2)
-(check-gets indent?-getter "  abc" #t 2)
-(check-get-raises indent?-getter " abc")
-(check-get-raises indent?-getter " \t")
+(check-gets
+  line/eof-getter
+  (lines-string
+    "point"
+    "  x 10"
+    "  y 20")
+  '(point (x 10) (y 20))
+  20 3 0)
+
+(check-gets
+  line/eof-getter
+  (lines-string
+    "circle"
+    "  center point"
+    "    x 10"
+    "    y 10"
+    "  radius 10")
+  '(circle
+    (center
+      (point
+        (x 10)
+        (y 10)))
+    (radius 10))
+  52 5 0)

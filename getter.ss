@@ -32,6 +32,7 @@
     string-getter
     string-while-getter
 
+    ; TODO: remove these, as they don't preserve line and column
     datum-annotation/eof-getter
     datum/eof-getter
 

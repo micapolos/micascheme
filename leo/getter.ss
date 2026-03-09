@@ -1,28 +1,15 @@
 (library (leo getter)
   (export
-    indent?-getter
-
     atom-annotation/eof-getter
     line-annotation/eof-getter
-    script-annotation-getter
+    line-annotations-getter
 
     atom/eof-getter
     line/eof-getter
-    script-getter)
+    lines-getter)
   (import
     (micascheme)
     (getter))
-
-  (define indent?-getter
-    (getter-lets
-      ($char/eof peek-char/eof-getter)
-      (switch $char/eof
-        ((eof? $eof)
-          (getter #f))
-        ((char-space? _)
-          (getter-map (exact-string-getter "  ") (lambda (_) #t)))
-        ((else $other)
-          (getter #f)))))
 
   (define atom-annotation/eof-getter
     (getter-lets
@@ -67,7 +54,16 @@
                   (getter $atom-annotation/eof)
                   line-annotation/eof-getter))
               ((char-newline? _)
-                (getter $atom-annotation/eof))
+                (getter-lets
+                  ($line-annotations (indented-getter line-annotations-getter))
+                  (switch $line-annotations
+                    ((null? _)
+                      (getter $atom-annotation/eof))
+                    ((else _)
+                      (getter
+                        (apply append-annotation
+                          $atom-annotation/eof
+                          $line-annotations))))))
               ((else _)
                 (throw line-annotation/eof-getter $atom-annotation/eof)))))
         ((else _)
@@ -75,7 +71,7 @@
             (getter $atom-annotation/eof)
             newline-getter)))))
 
-  (define script-annotation-getter
+  (define line-annotations-getter
     (list-getter line-annotation/eof-getter))
 
   (define atom/eof-getter
@@ -84,8 +80,8 @@
   (define line/eof-getter
     (apply-getter annotation/eof-stripped line-annotation/eof-getter))
 
-  (define script-getter
+  (define lines-getter
     (getter-lets
-      ($annotations script-annotation-getter)
+      ($annotations line-annotations-getter)
       (getter (map annotation-stripped $annotations))))
 )
