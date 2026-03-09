@@ -8,8 +8,8 @@
 
 (pretty-print
   (eval
-    (getter-load! line-getter "leo/samples/expression.leo")))
+    (getter-load! line-annotation-getter "leo/samples/expression.leo")))
 
 (pretty-print
   (eval
-    (getter-load! line-getter "leo/samples/if-expression.leo")))
+    (getter-load! line-annotation-getter "leo/samples/if-expression.leo")))

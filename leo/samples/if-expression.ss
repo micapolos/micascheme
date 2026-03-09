@@ -1,1 +1,1 @@
-(begin (if condition consequent alternate))
+(if condition consequent alternate)

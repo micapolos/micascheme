@@ -85,32 +85,37 @@
     (annotation-getter atom-getter stripped-annotation))
 
   (define line-annotation-getter
-    (getter-lets
-      ($atom-annotation atom-annotation-getter)
-      (switch (annotation-stripped $atom-annotation)
-        ((symbol? $symbol)
-          (getter-switch char-getter
-            ((char-space? _)
-              (apply-getter append-annotation
-                (getter $atom-annotation)
-                line-annotation-getter))
-            ((char-newline? _)
-              (getter-lets
-                ($line-annotations (indented-getter line-annotations-getter))
-                (switch $line-annotations
-                  ((null? _)
-                    (getter $atom-annotation))
-                  ((else _)
-                    (getter
-                      (apply append-annotation
-                        $atom-annotation
-                        $line-annotations))))))
-            ((else $unexpected-char)
-              (error-getter "unexpected char" $unexpected-char))))
-        ((else _)
-          (ending-getter
-            (getter $atom-annotation)
-            newline-getter)))))
+    (annotation-getter
+      (getter-lets
+        ($atom-annotation atom-annotation-getter)
+        (switch (annotation-stripped $atom-annotation)
+          ((symbol? $symbol)
+            (getter-switch char-getter
+              ((char-space? _)
+                (apply-getter append-annotation
+                  (getter $atom-annotation)
+                  line-annotation-getter))
+              ((char-newline? _)
+                (getter-lets
+                  ($line-annotations (indented-getter line-annotations-getter))
+                  (switch $line-annotations
+                    ((null? _)
+                      (getter $atom-annotation))
+                    ((else _)
+                      (getter
+                        (cons
+                          $atom-annotation
+                          $line-annotations))))))
+              ((else $unexpected-char)
+                (error-getter "unexpected char" $unexpected-char))))
+          ((else _)
+            (ending-getter
+              (getter $atom-annotation)
+              newline-getter))))
+      (lambda ($line $source-object)
+        (switch $line
+          ((annotation? $line) $line)
+          ((else $list) (list-annotation $list $source-object))))))
 
   (define inline-annotation-getter
     (getter-lets

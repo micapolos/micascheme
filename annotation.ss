@@ -10,6 +10,7 @@
     annotation/eof-stripped
     stripped-annotation
     list-annotation
+    to-annotation
     datum/annotation=?
     annotation=?)
   (import
@@ -70,12 +71,17 @@
       ((eof-object? $eof-object) $eof-object)
       ((else $annotation) (annotation-stripped $annotation))))
 
+  (define (to-annotation $obj $source-object)
+    (switch $obj
+      ((annotation? $annotation) $annotation)
+      ((else $other) (stripped-annotation $other $source-object))))
+
   (define (stripped-annotation $stripped $source-object)
     (make-annotation $stripped $source-object $stripped))
 
   (define (list-annotation $list $source-object)
     (make-annotation
-      (map datum/annotation-expression $list)
+      $list
       $source-object
       (map datum/annotation-stripped $list)))
 

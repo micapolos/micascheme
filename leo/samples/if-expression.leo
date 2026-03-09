@@ -1,5 +1,4 @@
-begin
-  if
+if
   condition
   consequent
   alternate

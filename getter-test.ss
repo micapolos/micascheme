@@ -52,8 +52,8 @@
   (list-annotation
     (list
       (stripped-annotation #\a (make-source-object test-sfd 0 1))
-      (stripped-annotation #\b (make-source-object test-sfd 0 1))
-      (stripped-annotation #\c (make-source-object test-sfd 0 1)))
+      ( stripped-annotation #\b (make-source-object test-sfd 1 2))
+      (stripped-annotation #\c (make-source-object test-sfd 2 3)))
     (make-source-object test-sfd 0 3))
   3)
 
