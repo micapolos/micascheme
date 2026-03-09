@@ -15,7 +15,7 @@
     (getter))
 
   (define allowed-word-general-categories '(Lu Ll Lt Lm Lo Sc Sm Sk So Pd Po))
-  (define disallowed-word-chars '(#\" #\' #\` #\, #\#))
+  (define disallowed-word-chars '(#\" #\' #\` #\, #\# #\:))
 
   (define (char-word? $char)
     (and
