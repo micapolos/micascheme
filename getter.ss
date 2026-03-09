@@ -17,6 +17,7 @@
     column-getter
 
     indented-getter
+    or-eof-getter
 
     skip-char-getter
 
@@ -199,6 +200,13 @@
                     (raise-getter-error "invalid indent char" $port $sfd $bfp $line $column))))
               (else
                 (values $char $bfp $line $column))))))))
+
+  (define (or-eof-getter $getter)
+    (getter-lets
+      ($char/eof peek-char/eof-getter)
+      (switch $char/eof
+        ((eof? $eof) (getter $eof))
+        ((else _) $getter))))
 
   (define char-getter
     (getter-lets

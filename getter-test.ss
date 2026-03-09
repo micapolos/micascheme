@@ -9,6 +9,9 @@
 (check-gets string-getter "ab\ncd" "ab\ncd" 5 1 2)
 (check-gets string-getter "ab\ncd\n" "ab\ncd\n" 6 2 0)
 
+(check-gets (or-eof-getter string-getter) "" eof 0 0 0)
+(check-gets (or-eof-getter string-getter) "abc" "abc" 3 0 3)
+
 (check-gets (skip-char-getter string-getter) "abc" "bc" 3 0 3)
 
 (check-gets (indented-getter string-getter) "" "" 0 0 0)
