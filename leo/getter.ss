@@ -1,17 +1,17 @@
 (library (leo getter)
   (export
+    word-getter
+    number-getter
+    string-literal-getter
     atom-getter
 
-    atom-annotation/eof-getter
-    line-annotation/eof-getter
-    line-annotations-getter
+    line-annotation-getter
 
-    atom/eof-getter
-    line/eof-getter
+    line-getter
     lines-getter)
   (import
     (micascheme)
-    (getter))
+    (except (getter) line-getter))
 
   ; TODO: maybe allow non-alphabetic characters inside?
   (define word-getter
@@ -46,55 +46,41 @@
         ((char=? $char #\") string-literal-getter)
         (else (error-getter "invalid char")))))
 
-  (define atom-annotation/eof-getter
+  (define line-annotation-getter
     (getter-lets
-      ($char/eof peek-char/eof-getter)
-      (switch $char/eof
-        ((eof? $eof) (getter $eof))
-        ((else $atom) (annotation-getter atom-getter)))))
-
-  (define line-annotation/eof-getter
-    (getter-lets
-      ($atom-annotation/eof atom-annotation/eof-getter)
-      (switch (annotation/eof-stripped $atom-annotation/eof)
-        ((eof? $eof)
-          (getter $eof))
+      ($atom-annotation (annotation-getter atom-getter))
+      (switch (annotation-stripped $atom-annotation)
         ((symbol? $symbol)
           (getter-lets
-            ($char/eof char/eof-getter)
-            (switch $char/eof
-              ((eof? _)
-                (getter $atom-annotation/eof))
+            ($char char-getter)
+            (switch $char
               ((char-space? _)
                 (apply-getter append-annotation
-                  (getter $atom-annotation/eof)
-                  line-annotation/eof-getter))
+                  (getter $atom-annotation)
+                  line-annotation-getter))
               ((char-newline? _)
                 (getter-lets
                   ($line-annotations (indented-getter line-annotations-getter))
                   (switch $line-annotations
                     ((null? _)
-                      (getter $atom-annotation/eof))
+                      (getter $atom-annotation))
                     ((else _)
                       (getter
                         (apply append-annotation
-                          $atom-annotation/eof
+                          $atom-annotation
                           $line-annotations))))))
               ((else _)
-                (throw line-annotation/eof-getter $atom-annotation/eof)))))
+                (error-getter "expected space or newline")))))
         ((else _)
           (ending-getter
-            (getter $atom-annotation/eof)
+            (getter $atom-annotation)
             newline-getter)))))
 
   (define line-annotations-getter
-    (list-getter line-annotation/eof-getter))
+    (list-getter (or-eof-getter line-annotation-getter)))
 
-  (define atom/eof-getter
-    (apply-getter annotation/eof-stripped atom-annotation/eof-getter))
-
-  (define line/eof-getter
-    (apply-getter annotation/eof-stripped line-annotation/eof-getter))
+  (define line-getter
+    (apply-getter annotation-stripped line-annotation-getter))
 
   (define lines-getter
     (getter-lets

@@ -1,4 +1,7 @@
-(import (micascheme) (getter) (leo getter))
+(import
+  (micascheme)
+  (except (getter) line-getter)
+  (leo getter))
 
 (check-get-raises atom-getter "")
 (check-gets atom-getter "foo" 'foo 3)
@@ -18,14 +21,13 @@
 ;(check-get-raises atom-getter "foo-bar! bar")
 ;(check-get-raises atom-getter "foo: bar")
 
-(check-gets line/eof-getter "" eof 0)
-(check-gets line/eof-getter "123\n" 123 4)
-(check-gets line/eof-getter "\"foo\"\n" "foo" 6)
-(check-gets line/eof-getter "foo\n" 'foo 4)
-(check-gets line/eof-getter "foo bar\n" '(foo bar) 8)
-(check-gets line/eof-getter "foo bar goo\n" '(foo (bar goo)) 12)
+(check-gets line-getter "123\n" 123 4)
+(check-gets line-getter "\"foo\"\n" "foo" 6)
+(check-gets line-getter "foo\n" 'foo 4)
+(check-gets line-getter "foo bar\n" '(foo bar) 8)
+(check-gets line-getter "foo bar goo\n" '(foo (bar goo)) 12)
 
-(check-get-raises line/eof-getter "123 ")
+(check-get-raises line-getter "123 ")
 
 (check-gets lines-getter "" '() 0)
 (check-gets lines-getter "10\n" '(10) 3)
@@ -33,7 +35,7 @@
 (check-gets lines-getter "foo\nfoo bar\n" '(foo (foo bar)) 12)
 
 (check-gets
-  line/eof-getter
+  line-getter
   (lines-string
     "point"
     "  x 10"
@@ -42,7 +44,7 @@
   20 3 0)
 
 (check-gets
-  line/eof-getter
+  line-getter
   (lines-string
     "circle"
     "  center point"
