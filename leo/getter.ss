@@ -78,7 +78,7 @@
             newline-getter)))))
 
   (define line-annotations-getter
-    (list-getter (or-eof-getter line-annotation-getter)))
+    (list-getter (skip-newlines-getter (or-eof-getter line-annotation-getter))))
 
   (define line-getter
     (apply-getter annotation-stripped line-annotation-getter))

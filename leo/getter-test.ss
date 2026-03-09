@@ -58,3 +58,17 @@
         (y 10)))
     (radius 10))
   52 5 0)
+
+(check-gets
+  line-getter
+  (lines-string
+    "point"
+    ""
+    "  x 10"
+    ""
+    ""
+    "  y 20"
+    ""
+    "")
+  '(point (x 10) (y 20))
+  25 8 0)
