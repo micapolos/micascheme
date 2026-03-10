@@ -72,3 +72,20 @@
         (export foo bar)
         (import (zoo zar zoo))
         a b c))))
+
+(check
+  (equal?
+    (syntax->datum
+      (transform-define
+        #'(define (x 10))))
+    (syntax->datum
+      '(define x 10))))
+
+(check
+  (equal?
+    (syntax->datum
+      (transform-lambda
+        #'(lambda x y (+ x y))))
+    (syntax->datum
+      '(lambda (x y) (+ x y)))))
+

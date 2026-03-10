@@ -17,6 +17,7 @@
 (pretty-print (native 10))
 (pretty-print (application (native 20) (native 30)))
 (pretty-print (abstraction (lambda (x) x)))
+(pretty-print hello-world)
 
 (pretty-print
   (eval

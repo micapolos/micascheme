@@ -11,9 +11,24 @@ library
     abstraction
     abstraction?
     abstraction-procedure
+    hello-world
   import
-    micascheme
-
+    leo lang
   data native: ref
   data application: lhs, rhs
   data abstraction: procedure
+  define foo "foo"
+  define bar "bar"
+  define exclamate
+    lambda
+      string
+      string-append: string, "!"
+  define comma-separated
+    lambda
+      string-a
+      string-b
+      string-append: string-a, ", ", string-b
+  define hello-world
+    comma-separated
+      "Hello"
+      exclamate "world"

@@ -4,7 +4,9 @@
     transform-export
     transform-import
     transform-spec
-    transform-library)
+    transform-library
+    transform-define
+    transform-lambda)
   (import (micascheme))
 
   (define (transform-name $syntax)
@@ -43,7 +45,7 @@
       (name (transform-name #'name))))
 
   (define (transform-library $syntax)
-    (syntax-case $syntax (library)
+    (syntax-case $syntax ()
       ((_ name exports imports body ...)
         #`(library
           #,(transform-name #'name)
@@ -51,4 +53,13 @@
           #,(transform-import #'imports)
           body ...))))
 
+  (define (transform-define $syntax)
+    (syntax-case $syntax ()
+      ((_ (id x))
+        #`(define id x))))
+
+  (define (transform-lambda $syntax)
+    (syntax-case $syntax ()
+      ((_ param ... body)
+        #`(lambda (param ...) body))))
 )
