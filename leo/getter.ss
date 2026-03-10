@@ -20,6 +20,14 @@
     (micascheme)
     (getter))
 
+  (data*
+    inline-style
+    colon-style
+    block-style
+    (fragment style ref))
+
+  (enum (style inline-style colon-style block-style))
+
   (define allowed-word-general-categories
     '(Lu Ll Lt Lm Lo Sc Sm Sk So Pd Po))
 
