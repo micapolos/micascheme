@@ -14,13 +14,13 @@ library
     hello-world
   import
     leo lang
-  data native: ref
+  data native ref
   data application: lhs, rhs
-  data abstraction: procedure
+  data abstraction procedure
   define foo "foo"
   define bar "bar"
   define
-    exclamate: string
+    exclamate string
     string-append: string, "!"
   define
     comma-separated: string-a, string-b
