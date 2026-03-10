@@ -37,12 +37,17 @@
     (lambda (stx)
       (syntax-case stx (not raises works)
         ((_ (raises body))
-          #`(or
-            (guard
-              ($exception (else #'(void)))
-              body
-              #f)
-            (syntax-error #'body "did not raise")))
+          (let
+            ((ann-string (syntax->location-string stx)))
+            #`(or
+              (guard
+                ($exception (else #'(void)))
+                body
+                #f)
+              (error `check
+                (format "\n~a   expr: ~s\n raises: did not raise!\n"
+                  #,ann-string
+                  (quote body))))))
         ((_ (raises body ...))
           #'(check (raises (begin body ...))))
         ((_ (works body))
