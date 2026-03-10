@@ -8,5 +8,5 @@
   (define (leo-load $path)
     (eval
       `(top-level-program ,@(getter-load! line-annotations-getter $path))
-      (copy-environment (environment '(leo lang)) #t)))
+      (copy-environment (environment '(micascheme)) #t)))
 )
