@@ -3,7 +3,9 @@
   (import
     (micascheme)
     (getter)
-    (leo getter))
+    (leo getter)
+    ; Force loading (leo lang), so it's available when reading leo files.
+    (only (leo lang)))
 
   (define (leo-read $port $sfd? $ann? $bfp?)
     (lets
