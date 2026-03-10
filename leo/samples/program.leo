@@ -7,9 +7,14 @@ define
   string-append: string, exclamation
 define
   comma-separated: string-a, string-b
-  string-append: string-a, ", ", string-b
+  string-append
+    string-a
+    ", "
+    string-b
 define hello-world
-  comma-separated: hello, exclamate world
+  comma-separated
+    hello
+    exclamate world
 displayln "=== This is produced by program.leo ==="
 display hello-world
 with newline
