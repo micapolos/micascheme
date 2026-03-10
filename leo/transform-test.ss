@@ -84,6 +84,16 @@
 (check
   (equal?
     (syntax->datum
+      (transform-define
+        #'(define (comma-separated x y)
+          (string-append x y))))
+    (syntax->datum
+      '(define (comma-separated x y)
+        (string-append x y)))))
+
+(check
+  (equal?
+    (syntax->datum
       (transform-lambda
         #'(lambda x y (+ x y))))
     (syntax->datum

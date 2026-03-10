@@ -19,15 +19,12 @@ library
   data abstraction: procedure
   define foo "foo"
   define bar "bar"
-  define exclamate
-    lambda
-      string
-      string-append: string, "!"
-  define comma-separated
-    lambda
-      string-a
-      string-b
-      string-append: string-a, ", ", string-b
+  define
+    exclamate: string
+    string-append: string, "!"
+  define
+    comma-separated: string-a, string-b
+    string-append: string-a, string-b
   define hello-world
     comma-separated
       "Hello"

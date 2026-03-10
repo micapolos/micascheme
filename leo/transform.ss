@@ -56,7 +56,9 @@
   (define (transform-define $syntax)
     (syntax-case $syntax ()
       ((_ (id x))
-        #`(define id x))))
+        #`(define id x))
+      ((_ (id x ...) body)
+        #`(define (id x ...) body))))
 
   (define (transform-lambda $syntax)
     (syntax-case $syntax ()
