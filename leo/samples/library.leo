@@ -27,6 +27,4 @@ library
     comma-separated: string-a, string-b
     string-append: string-a, string-b
   define hello-world
-    comma-separated
-      hello
-      exclamate world
+    comma-separated: hello, exclamate world
