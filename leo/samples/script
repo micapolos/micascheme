@@ -1,0 +1,24 @@
+#!/usr/local/leo
+import git
+
+when
+  null? command-line-arguments
+  print error no commit message
+  exit 1
+
+unless
+  zero? git add all
+  print error git add
+  exit 1
+
+unless
+  git changed?
+  print nothing to commit
+  exit 0
+
+unless
+  zero? git commit first command-line-arguments
+  print error git commit
+  exit 1
+
+exit git push
