@@ -6,7 +6,8 @@
     transform-spec
     transform-library
     transform-define
-    transform-lambda)
+    transform-lambda
+    transform-with)
   (import (micascheme))
 
   (define (transform-name $syntax)
@@ -64,4 +65,9 @@
     (syntax-case $syntax ()
       ((_ param ... body)
         #`(lambda (param ...) body))))
+
+  (define (transform-with $syntax)
+    (syntax-case $syntax ()
+      ((_ x)
+        #`(x))))
 )

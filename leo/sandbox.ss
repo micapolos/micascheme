@@ -9,6 +9,9 @@
 (pretty-print
   (getter-load! line-getter "leo/samples/library.leo"))
 
+(pretty-print
+  (getter-load! lines-getter "leo/samples/program.leo"))
+
 (eval
   (getter-load! line-annotation-getter "leo/samples/library.leo")
   (copy-environment (environment '(leo lang)) #t))
