@@ -8,4 +8,6 @@
   (leo reader)
   (leo getter)
   (leo writing-reader)
-  (leo transform))
+  (leo transform)
+  (leo lang)
+  (leo load))

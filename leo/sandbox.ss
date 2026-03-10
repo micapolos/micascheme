@@ -1,7 +1,8 @@
 (import
   (micascheme)
   (getter)
-  (leo getter))
+  (leo getter)
+  (leo load))
 
 (pretty-print
   (getter-load! lines-getter "leo/samples/example.leo"))
@@ -15,6 +16,8 @@
 (eval
   (getter-load! line-annotation-getter "leo/samples/library.leo")
   (copy-environment (environment '(leo lang)) #t))
+
+(leo-load "leo/samples/program.leo")
 
 (import (leo term))
 (pretty-print (native 10))
