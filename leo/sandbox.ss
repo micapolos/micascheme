@@ -9,6 +9,15 @@
 (pretty-print
   (getter-load! line-getter "leo/samples/library.leo"))
 
+(eval
+  (getter-load! line-annotation-getter "leo/samples/library.leo")
+  (copy-environment (environment '(leo lang)) #t))
+
+(import (leo term))
+(pretty-print (native 10))
+(pretty-print (application (native 20) (native 30)))
+(pretty-print (abstraction (lambda (x) x)))
+
 (pretty-print
   (eval
     (getter-load! line-annotation-getter "leo/samples/expression.leo")))

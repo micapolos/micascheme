@@ -12,8 +12,7 @@ library
     abstraction?
     abstraction-procedure
   import
-    leo base
-    leo datum
+    micascheme
   data native: ref
   data application: lhs, rhs
   data abstraction: procedure
