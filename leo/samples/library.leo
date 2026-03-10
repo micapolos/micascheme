@@ -1,5 +1,5 @@
 library
-  leo term
+  leo samples library
   export
     native
     native?
