@@ -17,15 +17,16 @@ library
   data native ref
   data application: lhs, rhs
   data abstraction procedure
-  define foo "foo"
-  define bar "bar"
+  define hello "Hello"
+  define world "world"
+  define exclamation "!"
   define
     exclamate string
-    string-append: string, "!"
+    string-append: string, exclamation
   define
     comma-separated: string-a, string-b
     string-append: string-a, string-b
   define hello-world
     comma-separated
-      "Hello"
-      exclamate "world"
+      hello
+      exclamate world
