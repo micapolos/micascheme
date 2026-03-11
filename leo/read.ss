@@ -2,7 +2,8 @@
   (export
     leo-read
     make-leo-read
-    with-leo-read)
+    with-leo-read
+    leo-path)
   (import
     (micascheme)
     (getter)
@@ -45,6 +46,11 @@
             (set! $line $new-line)
             (set! $column $new-column))
           $value))))
+
+  (define (leo-path $components)
+    (string-append
+      (apply string-append (intercalate $components "/"))
+      ".leo"))
 
   (define-rule-syntax (with-leo-read body ...)
     (parameterize
