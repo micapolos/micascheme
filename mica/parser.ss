@@ -66,7 +66,7 @@
       (string? (datum s))
       (if (string-empty? (datum s))
         (getter-item
-          (lambda (_) #t)
+          (lambda (_) #f)
           (exact-string-getter (datum s)))
         (getter-item
           (partial char=? (string-ref (datum s) 0))
