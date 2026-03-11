@@ -43,14 +43,14 @@
     (check-parse-error $parser "cd")
     (check-parses $parser "de" "de")))
 
-; (%lets
-;   ($parser (first-char (> #\c) alphabetic-string))
-;   (%run
-;     (check-parse-error $parser "12")
-;     (check-parse-error $parser "ab")
-;     (check-parse-error $parser "bc")
-;     (check-parses $parser "cd" "cd")
-;     (check-parses $parser "de" "de")))
+(%lets
+  ($parser (first-char (> #\b) alphabetic-string))
+  (%run
+    (check-parse-error $parser "12")
+    (check-parse-error $parser "ab")
+    (check-parse-error $parser "bc")
+    (check-parses $parser "cd" "cd")
+    (check-parses $parser "de" "de")))
 
 (check-parses string "" "")
 (check-parses string "a" "a")
