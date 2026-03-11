@@ -16,9 +16,9 @@ library
     one-of
       letter-char
       first-char
-        greater-than char delete
+        greater than char delete
         not char colon
-        category-char: Lu, Ll, Lt, Lm, Lo, Mn, Nl, No, Pd, Pc, Po, Sc, Sm, Sk, So, Co
+        char category: Lu, Ll, Lt, Lm, Lo, Mn, Nl, No, Pd, Pc, Po, Sc, Sm, Sk, So, Co
 
   define special-initial-char
     one-of
