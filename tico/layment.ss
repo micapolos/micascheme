@@ -75,7 +75,7 @@
   (define (bindings-layout-datum->layment $binding-layments $layout $datum)
     (layment $layout
       (bindings-datum->compilation
-        (filter-opts (map layment-compilation $binding-layments))
+        (?filter (map layment-compilation $binding-layments))
         $datum)))
 
   (define (layment-datum $layment)
@@ -118,7 +118,7 @@
         (map layment-layout $body-layments))
       (compilation-abstraction
         (layment-compilation $scope)
-        (filter-opts (map layment-compilation $param-layments))
+        (?filter (map layment-compilation $param-layments))
         (map layment-compilation $body-layments))))
 
   (define (parameter-layment $layout $datum)
@@ -144,7 +144,7 @@
       (layout-args
         (map layment-layout $layments))
       (compilation-args
-        (filter-opts
+        (?filter
           (map layment-compilation $layments)))))
 
   (define (layment-struct $name $field-layments)
@@ -152,7 +152,7 @@
       (layout-struct $name
         (map layment-layout $field-layments))
       (compilation-struct $name
-        (filter-opts
+        (?filter
           (map layment-compilation $field-layments)))))
 
   (define (layment-ref $layment $index)

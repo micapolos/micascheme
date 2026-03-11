@@ -251,7 +251,7 @@
       $index))
 
   (define (stack-compilation-bindings $stack-compilation)
-    (filter-opts
+    (?filter
       (map
         (lambda ($datum $evaluation)
           (switch? $evaluation

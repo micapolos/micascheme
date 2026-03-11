@@ -23,7 +23,7 @@
     list-set list-ref? list-drop
     list-update
     associ
-    filter-map filter-opts
+    filter-map ?filter
     map-find-indexed
     map-indexed list-indexed
     assmap-cdr
@@ -155,7 +155,7 @@
   (define (filter-map $proc . $list)
     (filter (lambda (x) x) (apply map (cons $proc $list))))
 
-  (define (filter-opts $opts)
+  (define (?filter $opts)
     (filter identity $opts))
 
   (define-syntax (lift? $syntax)
@@ -448,7 +448,7 @@
     (if $opt (list $opt) (list)))
 
   (define (non-false-list . $item)
-    (filter-opts $item))
+    (?filter $item))
 
   (define-case-syntax (define-list->/append (id list) body ...)
     (lets

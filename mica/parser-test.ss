@@ -89,7 +89,7 @@
         (map
           (optional (apply %prepend #\. (non-empty-list numeric-char)))
           (%default %null)))
-      %filter-opts
+      %?filter
       %list->string
       %string->number))
   (%run

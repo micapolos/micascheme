@@ -266,14 +266,14 @@
 
   (define (make-oneof-parser $parsers $else)
     (lets
-      ($thunks (filter-opts $parsers))
+      ($thunks (?filter $parsers))
       (case (length $thunks)
         ((0) $else)
         ((1) (car $thunks))
         (else 
           (thunk
             (lets
-              ($values (map parsed-value (filter-opts (map thunk-parsed? $thunks))))
+              ($values (map parsed-value (?filter (map thunk-parsed? $thunks))))
               (case (length $values)
                 ((0) (parser-parsed? $else))
                 ((1) (parsed (car $values)))

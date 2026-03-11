@@ -24,8 +24,8 @@
             #,(name->verilog #'name)
             #,@(map input->verilog (declaration-syntaxes-of %input body ...))
             #,@(map output->verilog (declaration-syntaxes-of %output body ...)))
-          #,@(filter-opts (map declaration->verilog? (syntaxes body ...)))
-          #,@(filter-opts (map instr->verilog? (syntaxes body ...)))))))
+          #,@(?filter (map declaration->verilog? (syntaxes body ...)))
+          #,@(?filter (map instr->verilog? (syntaxes body ...)))))))
 
   (define (input->verilog $input)
     (syntax-case $input (%input)
@@ -58,7 +58,7 @@
       ((%on (edge name) body ...)
         #`(%%always
           (#,(edge->verilog #'edge) #,(name->verilog #'name))
-          #,@(filter-opts (map instr->verilog? (syntaxes body ...)))))
+          #,@(?filter (map instr->verilog? (syntaxes body ...)))))
       (_ #f)))
 
   (define (declaration->verilog $declaration)
@@ -79,7 +79,7 @@
       ((%cond clause ... (%else body ...))
         #`(%%cond
           #,@(map clause->verilog (syntaxes clause ...))
-          (%%else #,@(filter-opts (map instr->verilog? (syntaxes body ...))))))
+          (%%else #,@(?filter (map instr->verilog? (syntaxes body ...))))))
       ((%cond clause-1 clause ...)
         #`(%%cond
           #,@(map clause->verilog (syntaxes clause-1 clause ...))))
@@ -90,7 +90,7 @@
       ((cond body ...)
         #`(
           #,(expr->verilog #'cond)
-          #,@(filter-opts (map instr->verilog? (syntaxes body ...)))))))
+          #,@(?filter (map instr->verilog? (syntaxes body ...)))))))
 
   (define (instr->verilog $instr)
     (or

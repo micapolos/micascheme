@@ -25,7 +25,7 @@
     (case-lambda
       (($ref->datum $dependent)
         `(dependent
-          ,@(filter-opts
+          ,@(?filter
             (list
               (switch (dependent-identifiers $dependent)
                 ((null? _) #f)

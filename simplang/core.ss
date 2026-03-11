@@ -18,7 +18,7 @@
                 (arrow (,@$types) ,$body-type)
                 (lambda
                   (
-                    ,@(filter-opts
+                    ,@(?filter
                       (map-with
                         ($var $vars)
                         ($type $types)
@@ -42,7 +42,7 @@
                 ,(car $typed-body)
                 (let
                   (
-                    ,@(filter-opts
+                    ,@(?filter
                       (map-with
                         ($var #'(var ...))
                         ($typed $typed-exprs)

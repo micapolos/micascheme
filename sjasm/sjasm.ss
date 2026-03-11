@@ -26,7 +26,7 @@
         ((_ line ...)
           (lets
             ($split (map split #'(line ...)))
-            ($defs (filter-opts (map car $split)))
+            ($defs (?filter (map car $split)))
             ($lines (map cdr $split))
             #`(let (#,@$defs) #,@$lines))))))
 )
