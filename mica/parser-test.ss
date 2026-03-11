@@ -41,6 +41,7 @@
 (check-parse-error (optional numeric-string) "12a")
 
 (check-parses (map numeric-string %string->number) "123" 123)
+(check-parses (map numeric-string %string->number %-) "123" -123)
 
 (check-parses (indented string) "" "")
 (check-parse-error (indented string) "abc")

@@ -114,8 +114,7 @@
             (not? $first-char?)
             (getter-item-getter $item))))))
 
-  (define digit
-    (map (?char char-numeric?) %string string->number))
+  (define digit (map (?char char-numeric?) %string string->number))
 
   (define-rule-syntax (check-parses parser in out)
     (check (datum/annotation=? (parse-string (the parser) in) out)))
