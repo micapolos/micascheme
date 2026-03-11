@@ -1,7 +1,8 @@
 (library (leo read)
   (export
     leo-read
-    make-leo-read)
+    make-leo-read
+    with-leo-read)
   (import
     (micascheme)
     (getter)
@@ -44,4 +45,12 @@
             (set! $line $new-line)
             (set! $column $new-column))
           $value))))
+
+  (define-rule-syntax (with-leo-read body ...)
+    (parameterize
+      (
+        (make-read-handler make-leo-read)
+        (library-extensions '((".leo" . ".so"))))
+      body
+      ...))
 )
