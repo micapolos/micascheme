@@ -13,7 +13,7 @@ library
   define digit char
     range: char 0, char 9
 
-  define constituent-char
+  define constituent char
     one of
       letter char
       first char
