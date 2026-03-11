@@ -4,6 +4,7 @@
     empty-list
     list-append
 
+    prepend
     opt
     opt->list
     non-false-list
@@ -255,6 +256,9 @@
 
   (define (indexed-find $proc $list)
     (indexed-find+ $proc $list 0))
+
+  (define (prepend $item $list)
+    (cons $item $list))
 
   (define (push-intercalated $stack $item $list)
     (cond

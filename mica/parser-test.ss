@@ -82,12 +82,19 @@
 (%lets
   (number
     (map
-      (apply %string-append
-        (one-of "+" "-" "")
-        (map (non-empty-list numeric-char) %list->string))
+      (apply %append
+        (apply %prepend
+          (optional (one-of #\+ #\-))
+          (non-empty-list numeric-char))
+        (map
+          (optional (apply %prepend #\. (non-empty-list numeric-char)))
+          (%default %null)))
+      %filter-opts
+      %list->string
       %string->number))
   (%run
     (check-parses number "123" 123)
     (check-parses number "+123" 123)
-    (check-parses number "-123" -123)))
+    (check-parses number "-123" -123)
+    (check-parses number "-123.45" -123.45)))
 

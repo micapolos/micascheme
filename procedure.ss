@@ -17,6 +17,8 @@
     dot
     dot-app
     ignore
+    always
+    default
     ordered-by
     fix
     recursive-lambda)
@@ -121,6 +123,12 @@
     (lambda ($x) (dot-app $fn ... $x)))
 
   (define (ignore $in $out) $out)
+
+  (define (always $x)
+    (lambda (_) $x))
+
+  (define (default $x)
+    (lambda ($value) (or $value $x)))
 
   (define-case-syntax (combiner combine proc arity)
     (let

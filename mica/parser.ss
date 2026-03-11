@@ -97,9 +97,9 @@
     ((one-of first ... last)
       (getter-item
         (or?
-          (getter-item-first-char? first)
+          (getter-item-first-char? (the first))
           ...
-          (getter-item-first-char? last))
+          (getter-item-first-char? (the last)))
         (getter-switch peek-char/eof-getter
           (((getter-item-first-char? (the first)) _)
             (getter-item-getter (the first)))

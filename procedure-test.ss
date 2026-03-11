@@ -1,5 +1,14 @@
 (import (scheme) (check) (procedure))
 
+; === always ===
+
+(check (equal? (app (always 123) "foo") 123))
+
+; === default ===
+
+(check (equal? (app (default 123) #f) 123))
+(check (equal? (app (default 123) "foo") "foo"))
+
 ; === once-proc ===
 
 (check
