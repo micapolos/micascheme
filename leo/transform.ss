@@ -76,8 +76,7 @@
 
   (define (transform-with $syntax)
     (syntax-case $syntax ()
-      ((_ x)
-        #`(x))))
+      ((_ x) #`(x))))
 
   (define (transform-leo $syntax)
     (syntax-case $syntax (library import define lambda with top-level-program)
