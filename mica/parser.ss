@@ -112,7 +112,7 @@
         (getter-map (getter-item-getter (the item)) fn)))
     ((map item fn fns ...)
       (map (map item fn) fns ...))
-    ((apply fn item items ...)
+    ((apply (fn item items ...))
       (getter-item
         (getter-item-first-char? (the item))
         (apply-getter fn
@@ -128,7 +128,7 @@
             (not? $first-char?)
             (getter-item-getter $item)))))
     ((non-empty-list item)
-      (apply cons item (list item))))
+      (apply (cons item (list item)))))
 
   (define digit (map (?char char-numeric?) %string string->number))
 
