@@ -51,7 +51,7 @@
 
   (define (leo-path $components)
     (string-append
-      (apply string-append (intercalate $components "/"))
+      (apply string-append (intercalate (cons "leo" $components) "/"))
       ".leo"))
 
   (define-rule-syntax (with-leo-read body ...)
