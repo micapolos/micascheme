@@ -8,10 +8,7 @@
   (import
     (micascheme)
     (getter)
-    (leo getter)
-    ; Force loading (leo lang), so it's available when reading leo files.
-    ; TODO: Find a workaround around that.
-    (only (leo lang)))
+    (leo getter))
 
   (define (leo-read $port $sfd? $ann? $bfp?)
     (lets
@@ -54,12 +51,27 @@
       (apply string-append (intercalate (cons "leo" $components) "/"))
       ".leo"))
 
+  (define leo-path-extension "leo")
+
+  (define (path-leo? $path)
+    (string=? (path-extension $path) leo-path-extension))
+
+  (define (source-file-descriptor-leo? $sfd)
+    (path-leo? (source-file-descriptor-path $sfd)))
+
   (define-rule-syntax (with-leo-read body ...)
     (parameterize
       (
         (optimize-level 3)
-        (make-read-handler make-leo-read)
-        (library-extensions '((".leo" . ".so"))))
+        (make-read-handler
+          (lambda ($port $sfd $bfp)
+            (if (source-file-descriptor-leo? $sfd)
+              (make-leo-read $port $sfd $bfp)
+              (default-make-read-handler $port $sfd $bfp))))
+        (library-extensions
+          (cons
+            '(".leo" . ".so")
+            (library-extensions))))
       body
       ...))
 
