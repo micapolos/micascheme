@@ -3,12 +3,14 @@
     leo-read
     make-leo-read
     with-leo-read
-    leo-path)
+    leo-path
+    load-leo-program)
   (import
     (micascheme)
     (getter)
     (leo getter)
     ; Force loading (leo lang), so it's available when reading leo files.
+    ; TODO: Find a workaround around that.
     (only (leo lang)))
 
   (define (leo-read $port $sfd? $ann? $bfp?)
@@ -59,4 +61,7 @@
         (library-extensions '((".leo" . ".so"))))
       body
       ...))
+
+  (define (load-leo-program $path)
+    (with-leo-read (load-program $path)))
 )
