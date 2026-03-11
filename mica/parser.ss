@@ -3,6 +3,8 @@
     parse-string
     eof
     char ?char
+    category-char
+    range-char
     whitespace-char
     alphabetic-char
     numeric-char
@@ -95,6 +97,21 @@
           (partial char=? (string-ref (datum s) 0))
           (exact-string-getter (datum s)))))
     ((the x) x)
+    ((category-char cat ...)
+      (?char
+        (lambda ($char)
+          (lets
+            ($category (char-general-category $char))
+            (or (symbol=? $category 'cat) ...)))))
+    ((range-char from to)
+      (and (char? (datum from)) (char? (datum to)))
+      (?char
+        (lambda ($char)
+          (lets
+            ($integer (char->integer $char))
+            (and
+              (>= $integer (char->integer from))
+              (<= $integer (char->integer to)))))))
     ((prefixed $prefix $item)
       (getter-item
         (getter-item-first-char? (the $prefix))
