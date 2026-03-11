@@ -1,6 +1,7 @@
 library
   leo math
   export
+    number-equal?
     add
     subtract
     multiply
@@ -18,6 +19,7 @@ library
   define fx-subtract/wraparound fx-/wraparound
   define fx-less? fx<
 
+  define number-equal? =
   define add +
   define subtract -
   define multiply *
