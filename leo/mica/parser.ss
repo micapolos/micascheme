@@ -49,7 +49,6 @@
   (define peculiar-identifier-string
     (one-of "+" "..."
       (string-append "-"
-        ; TODO: Implement (or x ...)
         (map
           (optional (string-append ">" subsequent-list-string))
           (default "")))))
@@ -71,7 +70,7 @@
         (map #\t (always #t))
         (map #\f (always #f))
         (map
-          (prefixed #\\ identifier-string)
+          (prefixed #\\ (one-of (string digit-char) identifier-string))
           (lambda ($string)
             (read
               (open-input-string

@@ -4,29 +4,36 @@
   (leo getter)
   (leo load))
 
+(displayln "--------------------------------------------")
 (pretty-print
   (getter-load! lines-getter "leo/samples/example.leo"))
 
+(displayln "--------------------------------------------")
 (pretty-print
   (getter-load! line-getter "leo/samples/library.leo"))
 
+(displayln "--------------------------------------------")
 (pretty-print
   (getter-load! lines-getter "leo/samples/program.leo"))
 
-; TODO: Implement character literal!!!
+; (displayln "--------------------------------------------")
 ; (pretty-print
-;   (getter-load! lines-getter "leo/samples/parser.leo"))
+;   (getter-load! lines-getter "leo/mica/parser.leo"))
 
+(displayln "--------------------------------------------")
 (eval
   (getter-load! line-annotation-getter "leo/samples/library.leo")
   (copy-environment (environment '(leo lang)) #t))
 
+(displayln "--------------------------------------------")
 (load-leo-program "leo/samples/program.leo")
 
+(displayln "--------------------------------------------")
 (pretty-print
   (eval
     (getter-load! line-annotation-getter "leo/samples/expression.leo")))
 
+(displayln "--------------------------------------------")
 (pretty-print
   (eval
     (getter-load! line-annotation-getter "leo/samples/if-expression.leo")
