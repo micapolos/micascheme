@@ -16,9 +16,9 @@
 (pretty-print
   (getter-load! lines-getter "leo/samples/program.leo"))
 
-; (displayln "--------------------------------------------")
-; (pretty-print
-;   (getter-load! lines-getter "leo/mica/parser.leo"))
+(displayln "--------------------------------------------")
+(pretty-print
+  (getter-load! lines-getter "leo/mica/parser/identifier.leo"))
 
 (displayln "--------------------------------------------")
 (eval

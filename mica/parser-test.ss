@@ -1,5 +1,6 @@
 (import
   (prefix (micascheme) %)
+  (only (micascheme) quote)
   (mica parser))
 
 (check-parses eof "" %eof)
@@ -137,3 +138,5 @@
     (check-parses number "-123" -123)
     (check-parses number "-123.45" -123.45)))
 
+(check-parses (string->datum string) "foo" 'foo)
+(check-parses (string->datum string) "(a b)" '(a b))

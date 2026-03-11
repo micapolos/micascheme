@@ -20,6 +20,7 @@
     optional
     map
     apply
+    string->datum
     list non-empty-list
     prepend
     append
@@ -138,6 +139,10 @@
     ((char-test (not ch ...))
       (lambda ($char)
         (and (%not (char=? $char ch)) ...)))
+    ((string->datum s)
+      (map s
+        (lambda ($string)
+          (read (open-input-string $string)))))
     ((first-char test? ... parser)
       (lets
         ($parser (the parser))

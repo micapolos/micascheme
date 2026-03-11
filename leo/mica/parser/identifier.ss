@@ -77,8 +77,5 @@
       peculiar-identifier-string))
 
   (define identifier
-    (map identifier-string
-      (lambda ($string)
-        (read
-          (open-input-string $string)))))
+    (string->datum identifier-string))
 )

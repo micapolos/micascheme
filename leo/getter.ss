@@ -44,15 +44,14 @@
       (not (member $char disallowed-word-chars))))
 
   (define (first-word-char? $char)
-    (and
-      (word-char? $char)
-      (not (char-numeric? $char))))
+    (getter-item-first-char? %identifier))
 
   (define (first-number-char? $char)
     (or
       (char-numeric? $char)
-      (char=? $char #\+)
-      (char=? $char #\-)))
+      ; (char=? $char #\+)
+      ; (char=? $char #\-)
+      ))
 
   (define (first-string-char? $char)
     (char=? $char #\"))
@@ -67,11 +66,7 @@
     ((getter-item-first-char? %literal) $char))
 
   (define word-getter
-    (getter-lets
-      ($string (string-while-getter word-char?))
-      (if (string-empty? $string)
-        (error-getter "empty" 'word)
-        (getter (string->symbol $string)))))
+    (getter-item-getter %identifier))
 
   ; TODO: negative, positive, floating-point
   (define number-getter
@@ -94,10 +89,10 @@
 
   (define atom-getter
     (getter-switch peek-char-getter
-      ((first-word-char? _) word-getter)
       ((first-number-char? _) number-getter)
       ((first-string-char? _) string-literal-getter)
       ((first-special-atom-char? _) special-atom-getter)
+      ((first-word-char? _) word-getter)
       ((else $char) (error-getter "unexpected char" $char))))
 
   (define word-getter-item (getter-item first-word-char? word-getter))
