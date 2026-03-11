@@ -1,4 +1,8 @@
-(import (mica parser))
+(import
+  (prefix (micascheme) %)
+  (mica parser))
+
+(check-parses eof "" %eof)
 
 (check-parses char "a" #\a)
 (check-parse-error char "")

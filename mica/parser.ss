@@ -1,13 +1,14 @@
 (library (mica parser)
   (export
     parse-string
+    eof
     char string
     the
     prefixed suffixed
     check-parses
     check-parse-error)
   (import
-    (except (micascheme) string)
+    (except (micascheme) string eof)
     (getter))
 
   (define (parse-string $parser $string)
@@ -19,6 +20,9 @@
           test-sfd
           0 0 0 0))
       $value))
+
+  (define eof
+    (getter-item (lambda (_) #f) eof-getter))
 
   (define char
     (getter-item char? char-getter))
