@@ -18,7 +18,8 @@
     inlines-getter)
   (import
     (micascheme)
-    (getter))
+    (getter)
+    (prefix (leo mica parser) %))
 
   (data*
     inline-style
