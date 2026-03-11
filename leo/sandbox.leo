@@ -12,11 +12,11 @@ displayln comma-separated
   hello
   exclamated world
 displayln time lets-recursive
-  fib
-  n 40
+  fibonacci
+  number 40
   if
-    less?: n, 2
-    n
+    less?: number, 2
+    number
     add
-      fib subtract: n, 1
-      fib subtract: n, 2
+      fibonacci subtract: number, 1
+      fibonacci subtract: number, 2
