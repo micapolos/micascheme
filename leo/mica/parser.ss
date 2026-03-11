@@ -43,6 +43,7 @@
   (define peculiar-identifier-string
     (one-of "+" "..."
       (string-append "-"
+        ; TODO: Implement (or x ...)
         (map
           (optional (string-append ">" subsequent-list-string))
           (default "")))))
