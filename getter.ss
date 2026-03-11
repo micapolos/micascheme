@@ -31,6 +31,7 @@
     char/eof-getter
     char-getter
     test?-char-getter
+    eof-getter
 
     peek-char/eof-getter
     peek-char-getter
@@ -241,6 +242,11 @@
                   (raise-getter-error "invalid" 'indent $port $sfd $bfp))))
             (else
               (values $char $bfp $line $column)))))))
+
+  (define eof-getter
+    (getter-switch peek-char/eof-getter
+      ((eof? $eof) (getter $eof))
+      ((else $char) (error-getter "expected eof, found" 'char))))
 
   (define (or-eof-getter $getter)
     (getter-lets

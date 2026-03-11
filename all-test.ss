@@ -106,6 +106,7 @@
   (leo all)
   (leo2 all)
   (masm all)
+  (mica all)
   (micac all)
   (micalang all)
   (micalog all)
