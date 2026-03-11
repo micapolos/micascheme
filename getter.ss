@@ -336,12 +336,14 @@
       (($eol? _)
         (getter $stack))
       ((else _)
-        (getter-lets
-          ($value $getter)
-          (eol?-push-getter
-            $eol?
-            (push $stack $value)
-            $getter)))))
+        (getter-switch $getter
+          ((eof? _)
+            (getter $stack))
+          ((else $value)
+            (eol?-push-getter
+              $eol?
+              (push $stack $value)
+              $getter))))))
 
   (define (push-getter $stack $getter)
     (eol?-push-getter (lambda (_) #f) $stack $getter))

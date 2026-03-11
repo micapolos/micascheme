@@ -13,9 +13,11 @@ library
     fx-subtract/wraparound
     fx-less?
   import leo lang
+
   define fx-add/wraparound fx+/wraparound
   define fx-subtract/wraparound fx-/wraparound
   define fx-less? fx<
+
   define add +
   define subtract -
   define multiply *
