@@ -35,13 +35,22 @@
 (check-parse-error (char<= #\c) "d")
 
 (%lets
-  ($parser (first-char (not #\a #\b) alphabetic-string))
+  ($parser (first-char (not #\b #\c) alphabetic-string))
   (%run
     (check-parse-error $parser "12")
-    (check-parse-error $parser "ab")
+    (check-parses $parser "ab" "ab")
     (check-parse-error $parser "bc")
-    (check-parses $parser "cd" "cd")
+    (check-parse-error $parser "cd")
     (check-parses $parser "de" "de")))
+
+; (%lets
+;   ($parser (first-char (> #\c) alphabetic-string))
+;   (%run
+;     (check-parse-error $parser "12")
+;     (check-parse-error $parser "ab")
+;     (check-parse-error $parser "bc")
+;     (check-parses $parser "cd" "cd")
+;     (check-parses $parser "de" "de")))
 
 (check-parses string "" "")
 (check-parses string "a" "a")

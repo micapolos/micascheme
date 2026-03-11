@@ -28,6 +28,7 @@
     list->string
     first-char
     not
+    >
     list-string
     or-null
     one-of
@@ -41,10 +42,11 @@
       (string-append %string-append)
       (list->string %list->string)
       (apply %apply)
-      (not %not))
+      (not %not)
+      (> %>))
     (getter))
 
-  (define-keywords not)
+  (define-keywords not >)
 
   (define (parse-string $parser $string)
     (lets
@@ -87,7 +89,7 @@
         (identifier? #'id)
         #'(getter-item char? string-getter))))
 
-  (define-rules-syntaxes (keywords else nots)
+  (define-rules-syntaxes (keywords else not >)
     ((the ch)
       (char? (datum ch))
       (getter-item
@@ -122,6 +124,21 @@
     ((char<= ch)
       (char? (datum ch))
       (?char (lambda ($char) (char<=? $char ch))))
+    ((first-char (> ch) parser)
+      (lets
+        ($parser (the parser))
+        (getter-item
+          (lambda ($char)
+            (and
+              (char>? $char ch)
+              ((getter-item-first-char? $parser) $char)))
+          (getter-switch peek-char/eof-getter
+            ((char? $char)
+              (if (char>? $char ch)
+                (getter-item-getter parser)
+                (error-getter "unexpected char" $char)))
+            ((else $other)
+              (getter-item-getter parser))))))
     ((first-char (not ch ...) parser)
       (lets
         ($parser (the parser))

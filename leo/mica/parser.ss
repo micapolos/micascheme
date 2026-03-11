@@ -5,20 +5,28 @@
   (import
     (prefix (micascheme) %)
     (only (micascheme) define lambda read open-input-string always default)
-    (mica parser)
-    (leo char))
+    (mica parser))
 
-  (define constituent-char
-    (?char char-constituent?))
-
-  (define special-initial-char
-    (?char char-special-initial?))
-
-  (define special-subsequent-char
-    (?char char-special-subsequent?))
+  (define letter-char
+    (one-of
+      (range-char #\a #\z)
+      (range-char #\A #\Z)))
 
   (define digit-char
-    (?char char-digit?))
+    (range-char #\0 #\9))
+
+  (define constituent-char
+    (one-of
+      letter-char
+      (first-char (> #\delete)
+        (first-char (not #\:)
+          (category-char Lu Ll Lt Lm Lo Mn Nl No Pd Pc Po Sc Sm Sk So Co)))))
+
+  (define special-initial-char
+    (one-of #\! #\$ #\% #\& #\* #\/ #\< #\= #\> #\? #\^ #\_ #\~))
+
+  (define special-subsequent-char
+    (one-of #\+ #\- #\. #\@))
 
   (define initial-string
     (one-of
@@ -27,14 +35,11 @@
       ; inline-hex-escape-string
       ))
 
-  (define subsequent-category-char
-    (?char char-subsequent-category?))
-
   (define subsequent-string
     (one-of
       initial-string
       (string digit-char)
-      (string subsequent-category-char)
+      (string (category-char Nd Mc Me))
       (string special-subsequent-char)))
 
   (define subsequent-list-string
