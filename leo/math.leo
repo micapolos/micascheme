@@ -1,15 +1,14 @@
 library
   leo math
   export
-    number-equal?
     add
     subtract
     multiply
     divide
     less?
-    less=?
+    less/equal?
     greater?
-    greater=?
+    greater/equal?
     fx-add/wraparound
     fx-subtract/wraparound
     fx-less?
@@ -19,12 +18,11 @@ library
   define fx-subtract/wraparound fx-/wraparound
   define fx-less? fx<
 
-  define number-equal? =
   define add +
   define subtract -
   define multiply *
   define divide /
   define less? <
-  define less=? <=
+  define less/equal? <=
   define greater? >
-  define greater=? >=
+  define greater/equal? >=
