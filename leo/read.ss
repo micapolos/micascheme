@@ -9,10 +9,7 @@
     (leo getter)
     (leo path)
     (leo expand)
-    (leo source-file-descriptor)
-    ; Force loading this library, so it won't be loaded again using leo reader
-    ; TODO: Is there a way to make it cleaner?
-    (only (leo lang)))
+    (leo source-file-descriptor))
 
   (define (leo-read $port $sfd? $ann? $bfp?)
     (lets
@@ -53,7 +50,6 @@
   (define-rule-syntax (with-leo-read body ...)
     (parameterize
       (
-        (optimize-level 3)
         (make-read-handler
           (lambda ($port $sfd $bfp)
             (if (source-file-descriptor-leo? $sfd)
@@ -68,4 +64,7 @@
             (library-extensions))))
       body
       ...))
+
+  ; Invoke lang library not, so it's loaded and cached using scheme reader, and not leo reader.
+  (invoke-library '(leo lang))
 )
