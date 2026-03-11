@@ -76,5 +76,10 @@
       ...))
 
   (define (load-leo-program $path)
-    (with-leo-read (load-program $path)))
+    (with-leo-read
+      (eval
+        `(top-level-program
+          (import (leo lang))
+          ,@(getter-load! line-annotations-getter $path))
+        (copy-environment (scheme-environment) #t))))
 )

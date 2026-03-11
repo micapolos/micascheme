@@ -1,4 +1,3 @@
-import leo lang
 import leo math
 define hello "Hello"
 define world "world"
