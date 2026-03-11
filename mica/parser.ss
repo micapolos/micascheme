@@ -17,13 +17,18 @@
     map
     apply
     list non-empty-list
+    prepend
+    append
+    or-null
     one-of
     check-parses
     check-parse-error)
   (import
     (rename
       (except (micascheme) apply map eof list)
-      (string %string))
+      (string %string)
+      (prepend %prepend)
+      (append %append))
     (getter))
 
   (define (parse-string $parser $string)
@@ -118,6 +123,12 @@
         (apply-getter fn
           (getter-item-getter (the item))
           (getter-item-getter (the items)) ...)))
+    ((prepend item list)
+      (apply (%prepend (the item) (the list))))
+    ((append item ...)
+      (apply (%append (the item) ...)))
+    ((or-null item)
+      (map (the item) (default null)))
     ((list item)
       (lets
         ($item (the item))

@@ -82,17 +82,13 @@
 (%lets
   (number
     (map
-      (apply
-        (%append
-          (apply
-            (%prepend
-              (optional (one-of #\+ #\-))
-              (non-empty-list numeric-char)))
-          (map
-            (optional
-              (apply
-                (%prepend #\. (non-empty-list numeric-char))))
-            (%default %null))))
+      (append
+        (prepend
+          (optional (one-of #\+ #\-))
+          (non-empty-list numeric-char))
+        (or-null
+          (optional
+            (prepend #\. (non-empty-list numeric-char)))))
       %?filter
       %list->string
       %string->number))
