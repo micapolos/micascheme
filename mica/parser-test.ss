@@ -9,6 +9,13 @@
 (check-parse-error char "")
 (check-parse-error char "ab")
 
+(check-parses (?char %char-numeric?) "1" #\1)
+(check-parse-error (?char %char-numeric?) "a")
+
+(check-parses digit "1" 1)
+(check-parse-error digit "")
+(check-parse-error digit "a")
+
 (check-parses string "" "")
 (check-parses string "a" "a")
 (check-parses string "ab\n\\" "ab\n\\")
@@ -63,3 +70,9 @@
     alphabetic-string
     (map numeric-string %string->number))
   "123!")
+
+(check-parses (list digit) "" (%list))
+(check-parses (list digit) "1" (%list 1))
+(check-parses (list digit) "123" (%list 1 2 3))
+(check-parse-error (list digit) "a")
+(check-parse-error (list digit) "1a")

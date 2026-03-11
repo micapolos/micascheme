@@ -2,20 +2,24 @@
   (export
     parse-string
     eof
-    char
+    char ?char
     string
     alphabetic-string
     numeric-string
+    digit
     the
     prefixed suffixed
     indented
     optional
     map
+    list
     one-of
     check-parses
     check-parse-error)
   (import
-    (except (micascheme) string map eof)
+    (rename
+      (except (micascheme) map eof list)
+      (string %string))
     (getter))
 
   (define (parse-string $parser $string)
@@ -33,6 +37,9 @@
 
   (define char
     (getter-item char? char-getter))
+
+  (define (?char $test?)
+    (getter-item $test? (test?-char-getter $test?)))
 
   (define string
     (getter-item char? string-getter))
@@ -94,7 +101,21 @@
     ((map item fn)
       (getter-item
         (getter-item-first-char? (the item))
-        (getter-map (getter-item-getter (the item)) fn))))
+        (getter-map (getter-item-getter (the item)) fn)))
+    ((map item fn fns ...)
+      (map (map item fn) fns ...))
+    ((list item)
+      (lets
+        ($item (the item))
+        ($first-char? (getter-item-first-char? (the item)))
+        (getter-item
+          $first-char?
+          (eol?-list-getter
+            (not? $first-char?)
+            (getter-item-getter $item))))))
+
+  (define digit
+    (map (?char char-numeric?) %string string->number))
 
   (define-rule-syntax (check-parses parser in out)
     (check (datum/annotation=? (parse-string (the parser) in) out)))
