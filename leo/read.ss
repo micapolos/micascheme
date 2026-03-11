@@ -66,8 +66,7 @@
             (cons
               '(".leo" . ".so")
               $library-extensions)))
-        body
-        ...)))
+        body ...)))
 
   ; Invoke lang library not, so it's loaded and cached using scheme reader, and not leo reader.
   (invoke-library '(leo lang))
