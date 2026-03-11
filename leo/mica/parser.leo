@@ -43,14 +43,15 @@ library
     list-string list subsequent-string
 
   define peculiar-identifier-string
-    one-of
-      "+"
-      "..."
-      string-append
-        "-"
-        or
-          optional string-append: ">", subsequent-list-string
-          ""
+    one-of: "+", "...", peculiar-dash-identifier-string
+
+  define peculiar-dash-identifier-string
+    string-append: "-", peculiar-dash-identifier-suffix-string
+
+  define peculiar-dash-identifier-suffix-string
+    or
+      optional string-append: ">", subsequent-list-string
+      ""
 
   define identifier-string
     one-of
