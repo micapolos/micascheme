@@ -20,6 +20,13 @@
 (check-parses string "a" "a")
 (check-parses string "ab\n\\" "ab\n\\")
 
+(check-parses (string) "" "")
+(check-parse-error (string) "a")
+
+(check-parses (string #\a #\b) "ab" "ab")
+(check-parse-error (string #\a #\b) "a")
+(check-parse-error (string #\a #\b) "abc")
+
 (check-parses #\a "a" #\a)
 (check-parses "" "" "")
 (check-parses "foo" "foo" "foo")

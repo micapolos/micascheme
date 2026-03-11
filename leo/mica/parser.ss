@@ -4,68 +4,69 @@
     special-atom)
   (import
     (prefix (micascheme) %)
+    (only (micascheme) define lambda read open-input-string always default)
     (mica parser)
     (leo char))
 
-  (%define constituent-string
-    (map (?char char-constituent?) %string))
+  (define constituent-char
+    (?char char-constituent?))
 
-  (%define special-initial-string
-    (map (?char char-special-initial?) %string))
+  (define special-initial-char
+    (?char char-special-initial?))
 
-  (%define special-subsequent-string
-    (map (?char char-special-subsequent?) %string))
+  (define special-subsequent-char
+    (?char char-special-subsequent?))
 
-  (%define digit-string
-    (map (?char char-digit?) %string))
+  (define digit-char
+    (?char char-digit?))
 
-  (%define initial-string
+  (define initial-string
     (one-of
-      constituent-string
-      special-initial-string
+      (string constituent-char)
+      (string special-initial-char)
       ; inline-hex-escape-string
       ))
 
-  (%define subsequent-category-string
-    (map (?char char-subsequent-category?) %string))
+  (define subsequent-category-char
+    (?char char-subsequent-category?))
 
-  (%define subsequent-char-string
+  (define subsequent-string
     (one-of
       initial-string
-      digit-string
-      subsequent-category-string
-      special-subsequent-string))
+      (string digit-char)
+      (string subsequent-category-char)
+      (string special-subsequent-char)))
 
-  (%define subsequent-string
-    (string-list->string (list subsequent-char-string)))
+  (define subsequent-list-string
+    (list-string (list subsequent-string)))
 
-  (%define peculiar-identifier-string
+  (define peculiar-identifier-string
     (one-of "+" "..."
       (string-append "-"
         (map
-          (optional (string-append ">" subsequent-string))
-          (%default "")))))
+          (optional (string-append ">" subsequent-list-string))
+          (default "")))))
 
-  (%define identifier-string
+  (define identifier-string
     (one-of
-      (string-append initial-string subsequent-string)
+      (string-append initial-string subsequent-list-string)
       peculiar-identifier-string))
 
-  (%define identifier
+  (define identifier
     (map identifier-string
-      (%lambda ($string)
-        (%read
-          (%open-input-string $string)))))
+      (lambda ($string)
+        (read
+          (open-input-string $string)))))
 
-  (%define special-atom
+  (define special-atom
     (prefixed #\#
       (one-of
-        (map #\t (%always #t))
-        (map #\f (%always #f))
+        (map #\t (always #t))
+        (map #\f (always #f))
         (map
           (prefixed #\\ identifier-string)
-          (%lambda ($string)
-            (%read
-              (%open-input-string
+          (lambda ($string)
+            (read
+              (open-input-string
                 (%string-append "#\\" $string))))))))
 )

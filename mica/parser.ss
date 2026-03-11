@@ -22,7 +22,7 @@
     string
     string-append
     list->string
-    string-list->string
+    list-string
     or-null
     one-of
     check-parses
@@ -61,12 +61,23 @@
   (define alphabetic-char (?char char-alphabetic?))
   (define numeric-char (?char char-numeric?))
 
-  (define string (getter-item char? string-getter))
+  ;(define string (getter-item char? string-getter))
   (define alphabetic-string
     (getter-item char-alphabetic? alphabetic-string-getter))
 
   (define numeric-string
     (getter-item char-numeric? numeric-string-getter))
+
+  (define-syntax (string $syntax)
+    (syntax-case $syntax ()
+      ; TODO: Update apply to allow zero arguments.
+      ((_)
+        #'(the ""))
+      ((_ ch ...)
+        #'(apply (%string (the ch) ...)))
+      (id
+        (identifier? #'id)
+        #'(getter-item char? string-getter))))
 
   (define-rules-syntaxes (keywords else)
     ((the ch)
@@ -151,7 +162,7 @@
       (apply (%string-append (the s) ...)))
     ((list->string l)
       (apply (%list->string l)))
-    ((string-list->string l)
+    ((list-string l)
       (map l
         (lambda ($strings)
           (%apply %string-append $strings)))))
