@@ -16,15 +16,15 @@
 (check-parse-error digit "")
 (check-parse-error digit "a")
 
-; (check-parses (category-char Lu Lo Nu) "a" #\a)
-; (check-parses (category-char Lu Lo Nu) "A" #\A)
-; (check-parses (category-char Lu Lo Nu) "1" #\1)
-; (check-parse-error (category-char Lu Lo Nu) " ")
+(check-parses (category-char Ll Lu Nd) "a" #\a)
+(check-parses (category-char Ll Lu Nd) "A" #\A)
+(check-parses (category-char Ll Lu Nd) "1" #\1)
+(check-parse-error (category-char Ll Lu Nd) " ")
 
-; (check-parses (range-char #\a #\z) "a" #\a)
-; (check-parses (range-char #\a #\z) "x" #\x)
-; (check-parses (range-char #\a #\z) "z" #\z)
-; (check-parse-error (range-char #\a #\z) "A")
+(check-parses (range-char #\a #\z) "a" #\a)
+(check-parses (range-char #\a #\z) "x" #\x)
+(check-parses (range-char #\a #\z) "z" #\z)
+(check-parse-error (range-char #\a #\z) "A")
 
 (check-parses string "" "")
 (check-parses string "a" "a")
