@@ -13,7 +13,7 @@ displayln comma-separated
   exclamated world
 displayln time lets-recursive
   fibonacci
-  number 40
+  number 45
   if
     less?: number, 2
     number
