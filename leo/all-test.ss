@@ -7,6 +7,7 @@
   (leo parser)
   (leo reader)
   (leo mica all)
+  (leo fragment)
   (leo getter)
   (leo writing-reader)
   (leo transform)
