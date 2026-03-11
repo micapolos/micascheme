@@ -4,6 +4,7 @@
     (micascheme)
     (leo expand)
     (leo read)
+    (leo path)
     (leo source-file-descriptor))
 
   (define-rule-syntax (leo body ...)
@@ -25,7 +26,7 @@
                 (apply $current-expand (leo-expand $form) $args)))
             (library-extensions
               (cons
-                '(".leo" . ".so")
+                `(,(string-append "." leo-extension) . ".so")
                 $library-extensions)))
           body ...))))
 )
