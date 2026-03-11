@@ -43,7 +43,8 @@
       (list->string %list->string)
       (apply %apply)
       (not %not)
-      (> %>))
+      (> %>)
+      (char %char))
     (getter))
 
   (define-keywords not >)
@@ -60,9 +61,6 @@
 
   (define eof
     (getter-item (lambda (_) #f) eof-getter))
-
-  (define char
-    (getter-item char? char-getter))
 
   (define (?char $test?)
     (getter-item $test? (test?-char-getter $test?)))
@@ -88,6 +86,16 @@
       (id
         (identifier? #'id)
         #'(getter-item char? string-getter))))
+
+  (define-syntax (char $syntax)
+    (syntax-case $syntax ()
+      ((_ ch)
+        #'(getter-item
+          (partial char=? (%char ch))
+          (exact-char-getter (%char ch))))
+      (id
+        (identifier? #'id)
+        #'(getter-item char? char-getter))))
 
   (define-rules-syntaxes (keywords else not >)
     ((the ch)

@@ -56,6 +56,10 @@
 (check-parse-error (string #\a #\b) "abc")
 
 (check-parses #\a "a" #\a)
+(check-parses (char a) "a" #\a)
+(check-parses (char colon) ":" #\:)
+(check-parses (char space) " " #\space)
+
 (check-parses "" "" "")
 (check-parses "foo" "foo" "foo")
 

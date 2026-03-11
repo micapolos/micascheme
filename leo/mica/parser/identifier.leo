@@ -7,24 +7,41 @@ library
 
   define letter-char
     one-of
-      range-char: #\a, #\z
-      range-char: #\A, #\Z
+      range: char a, char z
+      range: char A, char Z
 
-  define digit-char range-char: #\0 #\9
+  define digit-char range: char 0, char 9
 
   define constituent-char
     one-of
       letter-char
       first-char
-        > #\delete
-        not #\:
+        greater-than char delete
+        not char colon
         category-char: Lu, Ll, Lt, Lm, Lo, Mn, Nl, No, Pd, Pc, Po, Sc, Sm, Sk, So, Co
 
   define special-initial-char
-    one-of: #\!, #\$, #\%, #\&, #\*, #\/, #\<, #\=, #\>, #\?, #\^, #\_, #\~
+    one-of
+      char !
+      char $
+      char %
+      char &
+      char *
+      char /
+      char <
+      char =
+      char >
+      char ?
+      char ^
+      char _
+      char ~
 
   define special-subsequent-char
-    one-of: #\+, #\-, #\., #\@
+    one-of
+      char +
+      char -
+      char dot
+      char at
 
   define initial-string
     one-of

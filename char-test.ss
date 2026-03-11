@@ -9,3 +9,11 @@
 
 (check (char-space? #\space))
 (check (not (char-space? #\a)))
+
+(check (char=? (char colon) #\:))
+(check (char=? (char dot) #\.))
+(check (char=? (char at) #\@))
+(check (char=? (char space) #\space))
+(check (char=? (char a) #\a))
+(check (char=? (char 0) #\0))
+(check (char=? (char :) #\:))

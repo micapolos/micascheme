@@ -25,10 +25,27 @@
         (category-char Lu Ll Lt Lm Lo Mn Nl No Pd Pc Po Sc Sm Sk So Co))))
 
   (define special-initial-char
-    (one-of #\! #\$ #\% #\& #\* #\/ #\< #\= #\> #\? #\^ #\_ #\~))
+    (one-of
+      (char !)
+      (char $)
+      (char %)
+      (char &)
+      (char *)
+      (char /)
+      (char <)
+      (char =)
+      (char >)
+      (char ?)
+      (char ^)
+      (char _)
+      (char ~)))
 
   (define special-subsequent-char
-    (one-of #\+ #\- #\. #\@))
+    (one-of
+      (char +)
+      (char -)
+      (char dot)
+      (char at)))
 
   (define initial-string
     (one-of
