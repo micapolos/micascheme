@@ -18,9 +18,10 @@
   (define constituent-char
     (one-of
       letter-char
-      (first-char (> #\delete)
-        (first-char (not #\:)
-          (category-char Lu Ll Lt Lm Lo Mn Nl No Pd Pc Po Sc Sm Sk So Co)))))
+      (first-char
+        (> #\delete)
+        (not #\:)
+        (category-char Lu Ll Lt Lm Lo Mn Nl No Pd Pc Po Sc Sm Sk So Co))))
 
   (define special-initial-char
     (one-of #\! #\$ #\% #\& #\* #\/ #\< #\= #\> #\? #\^ #\_ #\~))

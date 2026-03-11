@@ -124,32 +124,23 @@
     ((char<= ch)
       (char? (datum ch))
       (?char (lambda ($char) (char<=? $char ch))))
-    ((first-char (> ch) parser)
+    ((char-test (> ch))
+      (lambda ($char)
+        (char>? $char ch)))
+    ((char-test (not ch ...))
+      (lambda ($char)
+        (and (%not (char=? $char ch)) ...)))
+    ((first-char test? ... parser)
       (lets
         ($parser (the parser))
         (getter-item
           (lambda ($char)
             (and
-              (char>? $char ch)
+              (app (char-test test?) $char) ...
               ((getter-item-first-char? $parser) $char)))
           (getter-switch peek-char/eof-getter
             ((char? $char)
-              (if (char>? $char ch)
-                (getter-item-getter parser)
-                (error-getter "unexpected char" $char)))
-            ((else $other)
-              (getter-item-getter parser))))))
-    ((first-char (not ch ...) parser)
-      (lets
-        ($parser (the parser))
-        (getter-item
-          (lambda ($char)
-            (and
-              (%not (char=? $char ch)) ...
-              ((getter-item-first-char? $parser) $char)))
-          (getter-switch peek-char/eof-getter
-            ((char? $char)
-              (if (and (%not (char=? $char ch)) ...)
+              (if (and (app (char-test test?) $char) ...)
                 (getter-item-getter parser)
                 (error-getter "unexpected char" $char)))
             ((else $other)
