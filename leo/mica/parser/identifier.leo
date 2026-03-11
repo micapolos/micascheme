@@ -1,5 +1,5 @@
 library
-  leo mica parser
+  leo mica parser identifier
   export identifier-string
   import
     leo lang
@@ -57,3 +57,9 @@ library
     one-of
       string-append: initial-string, subsequent-list-string
       peculiar-identifier-string
+
+  define identifier
+    map identifier-string
+      lambda
+        $string
+        read open-input-string $string
