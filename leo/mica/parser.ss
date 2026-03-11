@@ -40,22 +40,15 @@
     (string-list->string (list subsequent-char-string)))
 
   (%define peculiar-identifier-string
-    (one-of
-      "+"
-      "..."
-      (apply
-        (%string-append
-          "-"
-          (map
-            (optional (apply (%string-append ">" subsequent-string)))
-            (%default ""))))))
+    (one-of "+" "..."
+      (string-append "-"
+        (map
+          (optional (string-append ">" subsequent-string))
+          (%default "")))))
 
   (%define identifier-string
     (one-of
-      (apply
-        (%string-append
-          initial-string
-          subsequent-string))
+      (string-append initial-string subsequent-string)
       peculiar-identifier-string))
 
   (%define special-atom
