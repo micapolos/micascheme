@@ -1,6 +1,5 @@
 (library (leo read)
   (export
-    leo-read
     make-leo-read
     with-leo-read)
   (import
@@ -10,21 +9,6 @@
     (leo path)
     (leo expand)
     (leo source-file-descriptor))
-
-  (define (leo-read $port $sfd? $ann? $bfp?)
-    (lets
-      ((values $value $bfp $line $column)
-        (getter-get!
-          (or-eof-getter (if $ann? line-annotation-getter line-getter))
-          $port
-          ; TODO: Make it work without it.
-          (or $sfd? (source-file-descriptor "noname" 0))
-          0 ; indent
-          (or $bfp? 0)
-          0 ; line
-          0 ; column
-          ))
-      (values $value $bfp)))
 
   (define (make-leo-read $port $sfd $bfp)
     (lets
