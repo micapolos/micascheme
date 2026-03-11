@@ -1,11 +1,11 @@
 map
-  apply append
-    apply prepend
+  append
+    prepend
       optional one-of: '+', '-'
       non-empty-list numeric-char
-    map
-      optional apply prepend: '.', non-empty-list numeric-char
-      default null
+    or
+      optional prepend: '.', non-empty-list numeric-char
+      null
   ?filter
   list->string
   string->number
