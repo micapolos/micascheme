@@ -9,7 +9,8 @@
     (micascheme)
     (getter)
     (leo getter)
-    (leo path))
+    (leo path)
+    (leo source-file-descriptor))
 
   (define (leo-read $port $sfd? $ann? $bfp?)
     (lets
@@ -46,9 +47,6 @@
             (set! $line $new-line)
             (set! $column $new-column))
           $value))))
-
-  (define (source-file-descriptor-leo? $sfd)
-    (path-leo? (source-file-descriptor-path $sfd)))
 
   (define-rule-syntax (with-leo-read body ...)
     (parameterize

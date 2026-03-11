@@ -11,5 +11,6 @@
   (leo transform)
   (leo lang)
   (leo path)
+  (leo source-file-descriptor)
   (leo read)
   (leo load))
