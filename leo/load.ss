@@ -3,11 +3,11 @@
   (import
     (micascheme)
     (getter)
-    (leo read)
+    (leo leo)
     (leo getter))
 
   (define (load-leo-program $path)
-    (with-leo-read
+    (with-leo
       (eval
         `(top-level-program
           ,@(getter-load! line-annotations-getter $path))

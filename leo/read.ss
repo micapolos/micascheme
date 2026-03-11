@@ -1,7 +1,5 @@
 (library (leo read)
-  (export
-    make-leo-read
-    with-leo-read)
+  (export make-leo-read)
   (import
     (micascheme)
     (getter)
@@ -30,28 +28,4 @@
             (set! $line $new-line)
             (set! $column $new-column))
           $value))))
-
-  (define-rule-syntax (with-leo-read body ...)
-    (lets
-      ($make-read-handler (make-read-handler))
-      ($current-expand (current-expand))
-      ($library-extensions (library-extensions))
-      (parameterize
-        (
-          (make-read-handler
-            (lambda ($port $sfd $bfp)
-              (if (source-file-descriptor-leo? $sfd)
-                (make-leo-read $port $sfd $bfp)
-                ($make-read-handler $port $sfd $bfp))))
-          (current-expand
-            (lambda ($form . $args)
-              (apply $current-expand (leo-expand $form) $args)))
-          (library-extensions
-            (cons
-              '(".leo" . ".so")
-              $library-extensions)))
-        body ...)))
-
-  ; Invoke lang library not, so it's loaded and cached using scheme reader, and not leo reader.
-  (invoke-library '(leo lang))
 )
