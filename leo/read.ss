@@ -1,5 +1,7 @@
 (library (leo read)
-  (export leo-read)
+  (export
+    leo-read
+    make-leo-read)
   (import
     (micascheme)
     (getter)
@@ -15,9 +17,31 @@
           $port
           ; TODO: Make it work without it.
           (or $sfd? (source-file-descriptor "noname" 0))
-          0
+          0 ; indent
           (or $bfp? 0)
-          0
-          0))
+          0 ; line
+          0 ; column
+          ))
       (values $value $bfp)))
+
+  (define (make-leo-read $port $sfd $bfp)
+    (lets
+      ($line 0)
+      ($column 0)
+      (lambda ()
+        (lets
+          ((values $value $new-bfp $new-line $new-column)
+            (getter-get!
+              (or-eof-getter line-annotation-getter)
+              $port
+              $sfd
+              0 ; indent
+              $bfp
+              $line
+              $column))
+          (run
+            (set! $bfp $new-bfp)
+            (set! $line $new-line)
+            (set! $column $new-column))
+          $value))))
 )
