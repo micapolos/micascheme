@@ -62,6 +62,9 @@
       (first-number-char? $char)
       (first-string-char? $char)))
 
+  (define (first-special-atom-char? $char)
+    ((getter-item-first-char? %special-atom) $char))
+
   (define word-getter
     (getter-lets
       ($string (string-while-getter word-char?))
@@ -85,11 +88,15 @@
       (_ (exact-char-getter #\"))
       (getter $string)))
 
+  (define special-atom-getter
+    (getter-item-getter %special-atom))
+
   (define atom-getter
     (getter-switch peek-char-getter
       ((first-word-char? _) word-getter)
       ((first-number-char? _) number-getter)
       ((first-string-char? _) string-literal-getter)
+      ((first-special-atom-char? _) special-atom-getter)
       ((else $char) (error-getter "unexpected char" $char))))
 
   (define word-getter-item (getter-item first-word-char? word-getter))

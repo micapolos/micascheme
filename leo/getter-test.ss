@@ -14,7 +14,12 @@
 (check-get-raises atom-getter " foo bar")
 (check-get-raises atom-getter "() bar")
 (check-get-raises atom-getter "(foo) bar")
-(check-get-raises atom-getter "#t bar")
+
+(check-gets atom-getter "#t bar" #t 2)
+(check-gets atom-getter "#f bar" #f 2)
+
+(check-gets atom-getter "#\\a bar" #\a 3)
+(check-gets atom-getter "#\\space bar" #\space 7)
 
 ; TODO: These should fail
 ;(check-get-raises atom-getter "3.14 bar")
