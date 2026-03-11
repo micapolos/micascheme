@@ -1,6 +1,6 @@
 (library (leo mica parser)
   (export
-    identifier-string
+    identifier
     special-atom)
   (import
     (prefix (micascheme) %)
@@ -50,6 +50,12 @@
     (one-of
       (string-append initial-string subsequent-string)
       peculiar-identifier-string))
+
+  (%define identifier
+    (map identifier-string
+      (%lambda ($string)
+        (%read
+          (%open-input-string $string)))))
 
   (%define special-atom
     (prefixed #\#
