@@ -6,5 +6,5 @@
 
   (define (leo-expand $datum)
     (syntax->datum/annotation
-      (transform-lang (datum->syntax #'leo-expand $datum))))
+      (transform-leo (datum->syntax #'leo-expand $datum))))
 )

@@ -8,7 +8,7 @@
     transform-define
     transform-lambda
     transform-with
-    transform-lang)
+    transform-leo)
   (import (micascheme))
 
   (define (transform-name $syntax)
@@ -79,7 +79,7 @@
       ((_ x)
         #`(x))))
 
-  (define (transform-lang $syntax)
+  (define (transform-leo $syntax)
     (syntax-case $syntax (library import define lambda with top-level-program)
       (("noexpand" . x) $syntax)
       ((library . x) (transform-library $syntax))
