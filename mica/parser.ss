@@ -19,16 +19,23 @@
     list non-empty-list
     prepend
     append
+    string
+    string-append
+    list->string
+    string-list->string
     or-null
     one-of
     check-parses
     check-parse-error)
   (import
     (rename
-      (except (micascheme) apply map eof list)
+      (except (micascheme) map eof list)
       (string %string)
       (prepend %prepend)
-      (append %append))
+      (append %append)
+      (string-append %string-append)
+      (list->string %list->string)
+      (apply %apply))
     (getter))
 
   (define (parse-string $parser $string)
@@ -139,7 +146,15 @@
             (not? $first-char?)
             (getter-item-getter $item)))))
     ((non-empty-list item)
-      (apply (cons item (list item)))))
+      (apply (cons item (list item))))
+    ((string-append s ...)
+      (apply (%string-append (the s) ...)))
+    ((list->string l)
+      (apply (%list->string l)))
+    ((string-list->string l)
+      (map l
+        (lambda ($strings)
+          (%apply %string-append $strings)))))
 
   (define digit (map (?char char-numeric?) %string string->number))
 

@@ -23,7 +23,7 @@
     (one-of
       constituent-string
       special-initial-string
-      ;inline-hex-escape-string
+      ; inline-hex-escape-string
       ))
 
   (%define subsequent-category-string
@@ -37,10 +37,7 @@
       special-subsequent-string))
 
   (%define subsequent-string
-    (map
-      (list subsequent-char-string)
-      (%lambda ($strings)
-        (%apply %string-append $strings))))
+    (string-list->string (list subsequent-char-string)))
 
   (%define peculiar-identifier-string
     (one-of
