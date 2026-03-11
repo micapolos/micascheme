@@ -1,12 +1,16 @@
 (library (leo load)
-  (export leo-load)
+  (export load-leo-program)
   (import
     (micascheme)
     (getter)
+    (leo read)
     (leo getter))
 
-  (define (leo-load $path)
-    (eval
-      `(top-level-program ,@(getter-load! line-annotations-getter $path))
-      (copy-environment (scheme-environment) #t)))
+  (define (load-leo-program $path)
+    (with-leo-read
+      (eval
+        `(top-level-program
+          (import (leo lang))
+          ,@(getter-load! line-annotations-getter $path))
+        (copy-environment (scheme-environment) #t))))
 )

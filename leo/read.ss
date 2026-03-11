@@ -2,9 +2,7 @@
   (export
     leo-read
     make-leo-read
-    with-leo-read
-    leo-path
-    load-leo-program)
+    with-leo-read)
   (import
     (micascheme)
     (getter)
@@ -63,12 +61,4 @@
             (library-extensions))))
       body
       ...))
-
-  (define (load-leo-program $path)
-    (with-leo-read
-      (eval
-        `(top-level-program
-          (import (leo lang))
-          ,@(getter-load! line-annotations-getter $path))
-        (copy-environment (scheme-environment) #t))))
 )
