@@ -1,7 +1,8 @@
-(library (leo mica parser)
+(library (leo mica parser identifier)
   (export
     identifier
-    special-atom)
+    identifier-string
+    digit-char)
   (import
     (prefix (micascheme) %)
     (only (micascheme) define lambda read open-input-string always default)
@@ -63,16 +64,4 @@
       (lambda ($string)
         (read
           (open-input-string $string)))))
-
-  (define special-atom
-    (prefixed #\#
-      (one-of
-        (map #\t (always #t))
-        (map #\f (always #f))
-        (map
-          (prefixed #\\ (one-of (string digit-char) identifier-string))
-          (lambda ($string)
-            (read
-              (open-input-string
-                (%string-append "#\\" $string))))))))
 )

@@ -19,7 +19,8 @@
   (import
     (micascheme)
     (getter)
-    (prefix (leo mica parser) %))
+    (prefix (leo mica parser identifier) %)
+    (prefix (leo mica parser literal) %))
 
   (data*
     inline-style
@@ -63,7 +64,7 @@
       (first-string-char? $char)))
 
   (define (first-special-atom-char? $char)
-    ((getter-item-first-char? %special-atom) $char))
+    ((getter-item-first-char? %literal) $char))
 
   (define word-getter
     (getter-lets
@@ -89,7 +90,7 @@
       (getter $string)))
 
   (define special-atom-getter
-    (getter-item-getter %special-atom))
+    (getter-item-getter %literal))
 
   (define atom-getter
     (getter-switch peek-char-getter

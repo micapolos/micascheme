@@ -1,4 +1,4 @@
 (import (micascheme))
 
 (test
-  (leo mica parser))
+  (leo mica parser all))
