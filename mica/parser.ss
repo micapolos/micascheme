@@ -26,21 +26,25 @@
     string
     string-append
     list->string
+    first-char
+    not
     list-string
     or-null
     one-of
     check-parses
     check-parse-error)
   (import
-    (rename
-      (except (micascheme) map eof list)
+    (rename (except (micascheme) map eof list)
       (string %string)
       (prepend %prepend)
       (append %append)
       (string-append %string-append)
       (list->string %list->string)
-      (apply %apply))
+      (apply %apply)
+      (not %not))
     (getter))
+
+  (define-keywords not)
 
   (define (parse-string $parser $string)
     (lets
@@ -83,7 +87,7 @@
         (identifier? #'id)
         #'(getter-item char? string-getter))))
 
-  (define-rules-syntaxes (keywords else)
+  (define-rules-syntaxes (keywords else nots)
     ((the ch)
       (char? (datum ch))
       (getter-item
@@ -118,6 +122,21 @@
     ((char<= ch)
       (char? (datum ch))
       (?char (lambda ($char) (char<=? $char ch))))
+    ((first-char (not ch ...) parser)
+      (lets
+        ($parser (the parser))
+        (getter-item
+          (lambda ($char)
+            (and
+              (%not (char=? $char ch)) ...
+              ((getter-item-first-char? $parser) $char)))
+          (getter-switch peek-char/eof-getter
+            ((char? $char)
+              (if (and (%not (char=? $char ch)) ...)
+                (getter-item-getter parser)
+                (error-getter "unexpected char" $char)))
+            ((else $other)
+              (getter-item-getter parser))))))
     ((prefixed $prefix $item)
       (getter-item
         (getter-item-first-char? (the $prefix))
