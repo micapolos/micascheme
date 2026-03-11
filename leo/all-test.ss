@@ -10,5 +10,6 @@
   (leo writing-reader)
   (leo transform)
   (leo lang)
+  (leo path)
   (leo read)
   (leo load))

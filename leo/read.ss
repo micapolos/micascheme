@@ -8,7 +8,8 @@
   (import
     (micascheme)
     (getter)
-    (leo getter))
+    (leo getter)
+    (leo path))
 
   (define (leo-read $port $sfd? $ann? $bfp?)
     (lets
@@ -45,16 +46,6 @@
             (set! $line $new-line)
             (set! $column $new-column))
           $value))))
-
-  (define (leo-path $components)
-    (string-append
-      (apply string-append (intercalate (cons "leo" $components) "/"))
-      ".leo"))
-
-  (define leo-path-extension "leo")
-
-  (define (path-leo? $path)
-    (string=? (path-extension $path) leo-path-extension))
 
   (define (source-file-descriptor-leo? $sfd)
     (path-leo? (source-file-descriptor-path $sfd)))
