@@ -26,6 +26,14 @@
 (check-parses (range-char #\a #\z) "z" #\z)
 (check-parse-error (range-char #\a #\z) "A")
 
+(check-parses (char>= #\c) "c" #\c)
+(check-parses (char>= #\c) "d" #\d)
+(check-parse-error (char>= #\c) "b")
+
+(check-parses (char<= #\c) "c" #\c)
+(check-parses (char<= #\c) "b" #\b)
+(check-parse-error (char<= #\c) "d")
+
 (check-parses string "" "")
 (check-parses string "a" "a")
 (check-parses string "ab\n\\" "ab\n\\")

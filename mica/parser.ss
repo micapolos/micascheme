@@ -5,6 +5,8 @@
     char ?char
     category-char
     range-char
+    char>=
+    char<=
     whitespace-char
     alphabetic-char
     numeric-char
@@ -107,11 +109,15 @@
       (and (char? (datum from)) (char? (datum to)))
       (?char
         (lambda ($char)
-          (lets
-            ($integer (char->integer $char))
-            (and
-              (>= $integer (char->integer from))
-              (<= $integer (char->integer to)))))))
+          (and
+            (char>=? $char from)
+            (char<=? $char to)))))
+    ((char>= ch)
+      (char? (datum ch))
+      (?char (lambda ($char) (char>=? $char ch))))
+    ((char<= ch)
+      (char? (datum ch))
+      (?char (lambda ($char) (char<=? $char ch))))
     ((prefixed $prefix $item)
       (getter-item
         (getter-item-first-char? (the $prefix))
