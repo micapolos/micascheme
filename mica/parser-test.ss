@@ -21,6 +21,7 @@
 (check-parses string "ab\n\\" "ab\n\\")
 
 (check-parses #\a "a" #\a)
+(check-parses "" "" "")
 (check-parses "foo" "foo" "foo")
 
 (check-parses (prefixed "- " string) "- " "")
@@ -77,3 +78,16 @@
 (check-parses (list digit) "123" (%list 1 2 3))
 (check-parse-error (list digit) "a")
 (check-parse-error (list digit) "1a")
+
+(%lets
+  (number
+    (map
+      (apply %string-append
+        (one-of "+" "-" "")
+        (map (non-empty-list numeric-char) %list->string))
+      %string->number))
+  (%run
+    (check-parses number "123" 123)
+    (check-parses number "+123" 123)
+    (check-parses number "-123" -123)))
+

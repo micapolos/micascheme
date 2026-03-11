@@ -3,6 +3,9 @@
     parse-string
     eof
     char ?char
+    whitespace-char
+    alphabetic-char
+    numeric-char
     string
     alphabetic-string
     numeric-string
@@ -12,13 +15,14 @@
     indented
     optional
     map
-    list
+    apply
+    list non-empty-list
     one-of
     check-parses
     check-parse-error)
   (import
     (rename
-      (except (micascheme) map eof list)
+      (except (micascheme) apply map eof list)
       (string %string))
     (getter))
 
@@ -41,9 +45,11 @@
   (define (?char $test?)
     (getter-item $test? (test?-char-getter $test?)))
 
-  (define string
-    (getter-item char? string-getter))
+  (define whitespace-char (?char char-whitespace?))
+  (define alphabetic-char (?char char-alphabetic?))
+  (define numeric-char (?char char-numeric?))
 
+  (define string (getter-item char? string-getter))
   (define alphabetic-string
     (getter-item char-alphabetic? alphabetic-string-getter))
 
@@ -59,7 +65,9 @@
     ((the s)
       (string? (datum s))
       (if (string-empty? (datum s))
-        (syntax-error s "empty string")
+        (getter-item
+          (lambda (_) #t)
+          (exact-string-getter (datum s)))
         (getter-item
           (partial char=? (string-ref (datum s) 0))
           (exact-string-getter (datum s)))))
@@ -104,6 +112,12 @@
         (getter-map (getter-item-getter (the item)) fn)))
     ((map item fn fns ...)
       (map (map item fn) fns ...))
+    ((apply fn item items ...)
+      (getter-item
+        (getter-item-first-char? (the item))
+        (apply-getter fn
+          (getter-item-getter (the item))
+          (getter-item-getter (the items)) ...)))
     ((list item)
       (lets
         ($item (the item))
@@ -112,7 +126,9 @@
           $first-char?
           (eol?-list-getter
             (not? $first-char?)
-            (getter-item-getter $item))))))
+            (getter-item-getter $item)))))
+    ((non-empty-list item)
+      (apply cons item (list item))))
 
   (define digit (map (?char char-numeric?) %string string->number))
 
