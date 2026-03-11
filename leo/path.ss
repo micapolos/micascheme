@@ -1,8 +1,15 @@
 (library (leo path)
-  (export leo-extension leo-path path-leo?)
+  (export
+    leo-extension
+    leo-library-extensions
+    leo-path
+    path-leo?)
   (import (micascheme))
 
   (define leo-extension "leo")
+
+  (define leo-library-extensions
+    `((,(string-append "." leo-extension) . ".so")))
 
   (define (leo-path $components)
     (string-append

@@ -2,12 +2,12 @@
 
 (check
   (equal?
-    (leo-expand '(define (x 10)))
+    (leo-expand-once '(define (x 10)))
     '(define x 10)))
 
 (check
   (equal?
-    (leo-expand
+    (leo-expand-once
       '(library
         (foo (bar goo))
         (export a b c)
