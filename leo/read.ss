@@ -57,6 +57,7 @@
   (define-rule-syntax (with-leo-read body ...)
     (parameterize
       (
+        (optimize-level 3)
         (make-read-handler make-leo-read)
         (library-extensions '((".leo" . ".so"))))
       body

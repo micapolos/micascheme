@@ -15,8 +15,8 @@ displayln time lets-recursive
   fibonacci
   number 45
   if
-    less?: number, 2
+    fx-less?: number, 2
     number
-    add
-      fibonacci subtract: number, 1
-      fibonacci subtract: number, 2
+    fx-add/wraparound
+      fibonacci fx-subtract/wraparound: number, 1
+      fibonacci fx-subtract/wraparound: number, 2
