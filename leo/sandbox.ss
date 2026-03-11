@@ -13,17 +13,15 @@
 (pretty-print
   (getter-load! lines-getter "leo/samples/program.leo"))
 
+; TODO: Implement character literal!!!
+; (pretty-print
+;   (getter-load! lines-getter "leo/samples/parser.leo"))
+
 (eval
   (getter-load! line-annotation-getter "leo/samples/library.leo")
   (copy-environment (environment '(leo lang)) #t))
 
-(leo-load "leo/samples/program.leo")
-
-(import (leo term))
-(pretty-print (native 10))
-(pretty-print (application (native 20) (native 30)))
-(pretty-print (abstraction (lambda (x) x)))
-(pretty-print hello-world)
+(load-leo-program "leo/samples/program.leo")
 
 (pretty-print
   (eval
