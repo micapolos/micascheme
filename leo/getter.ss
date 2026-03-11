@@ -29,7 +29,7 @@
   (enum (style inline-style colon-style block-style))
 
   (define allowed-word-general-categories
-    '(Lu Ll Lt Lm Lo Sc Sm Sk So Pd Po))
+    '(Lu Ll Lt Lm Lo Nd Sc Sm Sk So Pd Po))
 
   (define disallowed-word-chars
     '(#\" #\' #\` #\, #\# #\:))
@@ -42,7 +42,9 @@
       (not (member $char disallowed-word-chars))))
 
   (define (first-word-char? $char)
-    (word-char? $char))
+    (and
+      (word-char? $char)
+      (not (char-numeric? $char))))
 
   (define (first-number-char? $char)
     (or
