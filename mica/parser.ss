@@ -2,13 +2,20 @@
   (export
     parse-string
     eof
-    char string
+    char
+    string
+    alphabetic-string
+    numeric-string
     the
     prefixed suffixed
+    indented
+    optional
+    map
+    one-of
     check-parses
     check-parse-error)
   (import
-    (except (micascheme) string eof)
+    (except (micascheme) string map eof)
     (getter))
 
   (define (parse-string $parser $string)
@@ -30,7 +37,13 @@
   (define string
     (getter-item char? string-getter))
 
-  (define-rules-syntax
+  (define alphabetic-string
+    (getter-item char-alphabetic? alphabetic-string-getter))
+
+  (define numeric-string
+    (getter-item char-numeric? numeric-string-getter))
+
+  (define-rules-syntaxes (keywords else)
     ((the ch)
       (char? (datum ch))
       (getter-item
@@ -43,22 +56,45 @@
         (getter-item
           (partial char=? (string-ref (datum s) 0))
           (exact-string-getter (datum s)))))
-    ((the x)
-      x))
-
-  (define-rule-syntax (prefixed $prefix $item)
-    (getter-item
-      (getter-item-first-char? (the $prefix))
-      (starting-getter
-        (getter-item-getter (the $prefix))
-        (getter-item-getter (the $item)))))
-
-  (define-rule-syntax (suffixed $item $suffix)
-    (getter-item
-      (getter-item-first-char? (the $item))
-      (ending-getter
-        (getter-item-getter (the $item))
-        (getter-item-getter (the $suffix)))))
+    ((the x) x)
+    ((prefixed $prefix $item)
+      (getter-item
+        (getter-item-first-char? (the $prefix))
+        (starting-getter
+          (getter-item-getter (the $prefix))
+          (getter-item-getter (the $item)))))
+    ((suffixed $item $suffix)
+      (getter-item
+        (getter-item-first-char? (the $item))
+        (ending-getter
+          (getter-item-getter (the $item))
+          (getter-item-getter (the $suffix)))))
+    ((indented $item)
+      (getter-item
+        (getter-item-first-char? (the $item))
+        (indented-getter (getter-item-getter (the $item)))))
+    ((optional $item)
+      (getter-item
+        (getter-item-first-char? $item)
+        (optional-getter
+          (getter-item-first-char? (the $item))
+          (getter-item-getter (the $item)))))
+    ((one-of first ... last)
+      (getter-item
+        (or?
+          (getter-item-first-char? first)
+          ...
+          (getter-item-first-char? last))
+        (getter-switch peek-char/eof-getter
+          (((getter-item-first-char? (the first)) _)
+            (getter-item-getter (the first)))
+          ...
+          ((else _)
+            (getter-item-getter (the last))))))
+    ((map item fn)
+      (getter-item
+        (getter-item-first-char? (the item))
+        (getter-map (getter-item-getter (the item)) fn))))
 
   (define-rule-syntax (check-parses parser in out)
     (check (datum/annotation=? (parse-string (the parser) in) out)))
