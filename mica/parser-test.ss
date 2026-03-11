@@ -3,6 +3,7 @@
   (mica parser))
 
 (check-parses eof "" %eof)
+(check-parse-error eof "a")
 
 (check-parses char "a" #\a)
 (check-parse-error char "")
