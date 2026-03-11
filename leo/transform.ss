@@ -7,7 +7,8 @@
     transform-library
     transform-define
     transform-lambda
-    transform-with)
+    transform-with
+    transform-lang)
   (import (micascheme))
 
   (define (transform-name $syntax)
@@ -54,6 +55,13 @@
           #,(transform-import #'imports)
           body ...))))
 
+  (define (transform-top-level-program $syntax)
+    (syntax-case $syntax ()
+      ((_ imports body ...)
+        #`(top-level-program
+          #,(transform-import #'imports)
+          body ...))))
+
   (define (transform-define $syntax)
     (syntax-case $syntax ()
       ((_ (id x))
@@ -70,4 +78,14 @@
     (syntax-case $syntax ()
       ((_ x)
         #`(x))))
+
+  (define (transform-lang $syntax)
+    (syntax-case $syntax (library import define lambda with top-level-program)
+      (("noexpand" . x) $syntax)
+      ((library . x) (transform-library $syntax))
+      ((import . x) (transform-import $syntax))
+      ((define . x) (transform-define $syntax))
+      ((lambda . x) (transform-lambda $syntax))
+      ((with . x) (transform-with $syntax))
+      ((top-level-program . x) (transform-top-level-program $syntax))))
 )

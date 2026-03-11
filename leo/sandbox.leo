@@ -1,4 +1,6 @@
-import leo math
+import
+  leo lang
+  leo math
 
 define hello "Hello"
 define world "world"

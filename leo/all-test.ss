@@ -9,6 +9,7 @@
   (leo getter)
   (leo writing-reader)
   (leo transform)
+  (leo expand)
   (leo lang)
   (leo path)
   (leo source-file-descriptor)

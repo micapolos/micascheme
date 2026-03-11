@@ -8,7 +8,11 @@
     (getter)
     (leo getter)
     (leo path)
-    (leo source-file-descriptor))
+    (leo expand)
+    (leo source-file-descriptor)
+    ; Force loading this library, so it won't be loaded again using leo reader
+    ; TODO: Is there a way to make it cleaner?
+    (only (leo lang)))
 
   (define (leo-read $port $sfd? $ann? $bfp?)
     (lets
@@ -55,6 +59,9 @@
             (if (source-file-descriptor-leo? $sfd)
               (make-leo-read $port $sfd $bfp)
               (default-make-read-handler $port $sfd $bfp))))
+        (current-expand
+          (lambda ($form . $args)
+            (apply sc-expand (leo-expand $form) $args)))
         (library-extensions
           (cons
             '(".leo" . ".so")
