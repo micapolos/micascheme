@@ -29,10 +29,11 @@
       (char-letter? $char)
       (and
         (> (char->integer $char) 127)
-        (memv (char-general-category $char) constituent-char-categories))))
+        (memv (char-general-category $char) constituent-char-categories)
+        (not (char=? $char #\:)))))
 
   (define special-initial-chars
-    (list #\! #\$ #\% #\& #\* #\/ #\: #\< #\= #\> #\? #\^ #\_ #\~))
+    (list #\! #\$ #\% #\& #\* #\/ #\< #\= #\> #\? #\^ #\_ #\~))
 
   (define (char-special-initial? $char)
     (memv $char special-initial-chars))
