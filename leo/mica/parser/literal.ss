@@ -2,7 +2,7 @@
   (export
     number
     string-literal
-    literal)
+    special-literal)
   (import
     (prefix (micascheme) %)
     (mica parser)
@@ -22,7 +22,7 @@
       #\"))
 
   ; TODO: Implement it properly
-  (%define literal
+  (%define special-literal
     (string->datum
       (string-append "#"
         (one-of

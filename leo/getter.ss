@@ -63,7 +63,7 @@
       (first-string-char? $char)))
 
   (define (first-special-atom-char? $char)
-    ((getter-item-first-char? %literal) $char))
+    ((getter-item-first-char? %special-literal) $char))
 
   (define word-getter
     (getter-item-getter %identifier))
@@ -85,7 +85,7 @@
       (getter $string)))
 
   (define special-atom-getter
-    (getter-item-getter %literal))
+    (getter-item-getter %special-literal))
 
   (define atom-getter
     (getter-switch peek-char-getter
