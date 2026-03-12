@@ -13,6 +13,9 @@
 
 (check-parses string-literal "\"\"" "")
 (check-parses string-literal "\"foo\"" "foo")
+(check-parses string-literal "\"foo bar\"" "foo bar")
+
+(check-parse-error string-literal "\"\n\"") ; TODO: escaping
 
 (check-parses special-literal "#t" #t)
 (check-parses special-literal "#f" #f)
