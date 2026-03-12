@@ -33,6 +33,21 @@
               (format " source: ~a (~a:~a)\n" $path $line $column))))
         "")))
 
+  (define-syntax (check-expr $syntax)
+    (syntax-case $syntax ()
+      ((_ expr)
+        #`(guard
+          ($exception
+            (else
+              (error `check
+                (format
+                  "\n~a thrown: ~a\n"
+                    #,(syntax->location-string #'expr)
+                    (with-output-to-string
+                      (lambda ()
+                        (display-condition $exception)))))))
+          expr))))
+
   (define-syntax check
     (lambda (stx)
       (syntax-case stx (not raises works)
@@ -57,7 +72,7 @@
         ((_ (not (pred arg ...)))
           (let*
             (
-              (args (syntax->list #`(arg ...)))
+              (args (syntax->list #`((check-expr arg) ...)))
               (tmps (generate-temporaries #`(arg ...)))
               (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
               (ann-string (syntax->location-string #'(arg ...))))
@@ -73,7 +88,7 @@
         ((_ (pred arg ...))
           (let*
             (
-              (args (syntax->list #`(arg ...)))
+              (args (syntax->list #`((check-expr arg) ...)))
               (tmps (generate-temporaries #`(arg ...)))
               (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
               (ann-string (syntax->location-string #'(arg ...))))
