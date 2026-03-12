@@ -13,6 +13,9 @@
 (check-gets line-getter ": 10\n" '(10) 5)
 (check-gets line-getter ": 10, 20\n" '(10 20) 9)
 
+(check-gets line-getter "foo :\n" '(foo ()) 6)
+(check-gets line-getter "foo bar :\n" '(foo (bar ())) 10)
+
 (check-get-raises line-getter "123 ")
 
 (check-gets lines-getter "" '() 0)
@@ -24,6 +27,7 @@
 (check-gets inline-getter "\"foo\"" "foo" 5)
 (check-gets inline-getter "foo" 'foo 3)
 (check-gets inline-getter "foo bar" '(foo bar) 7)
+(check-gets inline-getter "foo bar goo" '(foo (bar goo)) 11)
 (check-gets inline-getter "foo bar goo" '(foo (bar goo)) 11)
 
 (check-gets inline-getter "123 " 123 3)
