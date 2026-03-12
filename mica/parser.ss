@@ -309,5 +309,7 @@
       (check-parse-error parser in)))
 
   (define-rule-syntax (check-parser parser case ...)
-    (run (check-parser-case parser case) ...))
+    (lets
+      ($parser (the parser))
+      (run-void (check-parser-case $parser case) ...)))
 )
