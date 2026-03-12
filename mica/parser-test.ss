@@ -138,6 +138,17 @@
     (check-parse-error $parser "1")))
 
 (%lets
+  ($parser (separated ", " alphabetic-char))
+  (%run
+    (check-parses $parser "" (%list))
+    (check-parses $parser "a" (%list #\a))
+    (check-parses $parser "a, b" (%list #\a #\b))
+    (check-parses $parser "a, b, c" (%list #\a #\b #\c))
+    (check-parse-error $parser "a,")
+    (check-parse-error $parser "a, ")
+    (check-parse-error $parser "1")))
+
+(%lets
   (number
     (map
       (append

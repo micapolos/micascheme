@@ -18,6 +18,7 @@
     the
     prefixed suffixed wrapped
     non-empty-separated
+    separated
     indented
     optional
     map
@@ -241,6 +242,10 @@
         (prepend
           $item
           (list (prefixed (the separator) $item)))))
+    ((separated separator item)
+      (map
+        (optional (non-empty-separated separator item))
+        (default null)))
     ((string-append s ...)
       (apply (%string-append (the s) ...)))
     ((list->string l)
