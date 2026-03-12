@@ -57,6 +57,7 @@
       (else %else)
       (or %or)
       (null %null))
+    (keyword)
     (getter))
 
   (define-keywords not > else ok error)
@@ -96,7 +97,7 @@
       ((_ ch ...)
         #'(apply (%string (the ch) ...)))
       (id
-        (identifier? #'id)
+        (keyword? id)
         #'(getter-item char? string-getter))))
 
   (define-syntax (char $syntax)
@@ -106,12 +107,13 @@
           (partial char=? (%char ch))
           (exact-char-getter (%char ch))))
       (id
-        (identifier? #'id)
+        (keyword? id)
         #'(getter-item char? char-getter))))
 
   (define-syntax (null $syntax)
     (syntax-case $syntax ()
-      (id (identifier? #'id)
+      (id
+        (keyword? id)
         #'(return %null))))
 
   (define-rules-syntaxes (keywords else not >)

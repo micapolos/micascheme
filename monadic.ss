@@ -7,7 +7,8 @@
     (lets)
     (identifier)
     (switch)
-    (commented))
+    (commented)
+    (keyword))
 
   (commented
     (expects (id id-bind))
@@ -15,15 +16,15 @@
     (define-syntax (define-monadic $syntax)
       (syntax-case $syntax ()
         ((_ id)
-          (identifier? #'id)
+          (keyword? id)
           (lets
-            ($id-bind (identifier-append #'id #'id #'- #'bind))
-            ($id-map (identifier-append #'id #'id #'- #'map))
-            ($id-lets (identifier-append #'id #'id #'- #'lets))
-            ($id-switch (identifier-append #'id #'id #'- #'switch))
-            ($list->id (identifier-append #'id #'list #'-> #'id))
-            ($append-id (identifier-append #'id #'append #'- #'id))
-            ($apply-id (identifier-append #'id #'apply #'- #'id))
+            ($id-bind (keyword-append id id - bind))
+            ($id-map (keyword-append id id - map))
+            ($id-lets (keyword-append id id - lets))
+            ($id-switch (keyword-append id id - switch))
+            ($list->id (keyword-append id list -> id))
+            ($append-id (keyword-append id append - id))
+            ($apply-id (keyword-append id apply - id))
             #`(begin
               (define (#,$id-map x fn)
                 (#,$id-bind x (lambda (v) (id (fn v)))))

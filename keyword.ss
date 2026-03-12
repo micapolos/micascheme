@@ -1,5 +1,8 @@
 (library (keyword)
   (export
+    keyword
+    keyword?
+    keyword=?
     keyword-append
     keyword-replace)
   (import
@@ -7,8 +10,16 @@
     (syntax)
     (identifier))
 
-  (define-case-syntax (keyword-append tpl part ...)
-    (apply identifier-append #'tpl #'(part ...)))
+  (define-rule-syntax (keyword? x)
+    (identifier? #'x))
+
+  (define-rule-syntax (keyword x)
+    #'x)
+
+  (define keyword=? free-identifier=?)
+
+  (define-rule-syntax (keyword-append tpl part ...)
+    (identifier-append #'tpl #'part ...))
 
   (define-rule-syntax (keyword-replace old new body)
     (let-syntax
