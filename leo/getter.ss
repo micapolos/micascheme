@@ -87,9 +87,11 @@
     (apply-getter list line-annotation-getter))
 
   (define colon-line-annotations-getter
-    (ending-getter
-      (starting-getter space-getter inline-annotations-getter)
-      newline-getter))
+    (getter-switch char-getter
+      ((char-space? _)
+        (ending-getter inline-annotations-getter newline-getter))
+      ((char-newline? _)
+        (getter null))))
 
   (define newline-line-annotations-getter
     (indented-getter line-annotations-getter))
