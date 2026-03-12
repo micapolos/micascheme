@@ -3,29 +3,6 @@
   (getter)
   (leo getter))
 
-(check-get-raises atom-getter "")
-(check-gets atom-getter "foo" 'foo 3)
-(check-gets atom-getter "foo bar" 'foo 3)
-(check-gets atom-getter "123 bar" 123 3)
-(check-gets atom-getter "\"foo\" bar" "foo" 5)
-
-;(check-get-raises atom-getter "+123 bar")
-;(check-get-raises atom-getter "-123 bar")
-(check-get-raises atom-getter " foo bar")
-(check-get-raises atom-getter "() bar")
-(check-get-raises atom-getter "(foo) bar")
-
-(check-gets atom-getter "#t bar" #t 2)
-(check-gets atom-getter "#f bar" #f 2)
-
-(check-gets atom-getter "#\\a bar" #\a 3)
-(check-gets atom-getter "#\\space bar" #\space 7)
-
-; TODO: These should fail
-;(check-get-raises atom-getter "3.14 bar")
-;(check-get-raises atom-getter "foo-bar! bar")
-;(check-get-raises atom-getter "foo: bar")
-
 (check-gets line-getter "123\n" 123 4)
 (check-gets line-getter "\"foo\"\n" "foo" 6)
 (check-gets line-getter "foo\n" 'foo 4)
@@ -87,16 +64,16 @@
     (radius 10))
   52 5 0)
 
-; (check-gets
-;   line-getter
-;   (lines-string
-;     "point"
-;     ""
-;     "  x 10"
-;     ""
-;     ""
-;     "  y 20"
-;     ""
-;     "")
-;   '(point (x 10) (y 20))
-;   25 8 0)
+(check-gets
+  line-getter
+  (lines-string
+    "point"
+    ""
+    "  x 10"
+    ""
+    ""
+    "  y 20"
+    ""
+    "")
+  '(point (x 10) (y 20))
+  25 8 0)

@@ -1,10 +1,5 @@
 (library (leo getter)
   (export
-    word-getter
-    number-getter
-    string-literal-getter
-    atom-getter
-
     line-annotation-getter
     line-annotations-getter
 
@@ -19,6 +14,7 @@
   (import
     (micascheme)
     (getter)
+    (prefix (mica parser) %)
     (prefix (leo mica parser identifier) %)
     (prefix (leo mica parser literal) %))
 
@@ -28,81 +24,11 @@
     block-style
     (fragment style ref))
 
-  (enum (style inline-style colon-style block-style))
-
-  (define allowed-word-general-categories
-    '(Lu Ll Lt Lm Lo Nd Sc Sm Sk So Pd Po))
-
-  (define disallowed-word-chars
-    '(#\" #\' #\` #\, #\# #\:))
-
-  (define (word-char? $char)
-    (and
-      (member
-        (char-general-category $char)
-        allowed-word-general-categories)
-      (not (member $char disallowed-word-chars))))
-
-  (define (first-word-char? $char)
-    (getter-item-first-char? %identifier))
-
-  (define (first-number-char? $char)
-    (or
-      (char-numeric? $char)
-      ; (char=? $char #\+)
-      ; (char=? $char #\-)
-      ))
-
-  (define (first-string-char? $char)
-    (char=? $char #\"))
-
-  (define (first-atom-char? $char)
-    (or
-      (first-word-char? $char)
-      (first-number-char? $char)
-      (first-string-char? $char)))
-
-  (define (first-special-atom-char? $char)
-    ((getter-item-first-char? %special-literal) $char))
-
-  (define word-getter
-    (getter-item-getter %identifier))
-
-  ; TODO: negative, positive, floating-point
-  (define number-getter
-    (getter-lets
-      ($string (string-while-getter char-numeric?))
-      (if (string-empty? $string)
-        (error-getter "empty" 'number)
-        (getter (string->number $string)))))
-
-  ; TODO: escaping!!!
-  (define string-literal-getter
-    (getter-lets
-      (_ (exact-char-getter #\"))
-      ($string (string-while-getter (lambda ($char) (not (char=? $char #\")))))
-      (_ (exact-char-getter #\"))
-      (getter $string)))
-
-  (define special-atom-getter
-    (getter-item-getter %special-literal))
-
-  (define atom-getter
-    (getter-switch peek-char-getter
-      ((first-number-char? _) number-getter)
-      ((first-string-char? _) string-literal-getter)
-      ((first-special-atom-char? _) special-atom-getter)
-      ((first-word-char? _) word-getter)
-      ((else $char) (error-getter "unexpected char" $char))))
-
-  (define word-getter-item (getter-item first-word-char? word-getter))
-  (define number-getter-item (getter-item first-number-char? number-getter))
-  (define string-getter-item (getter-item first-string-char? string-literal-getter))
-  (define atom-getter-item (getter-item first-atom-char? atom-getter))
-  (define comma-separator-getter-item (getter-item char-comma? (exact-getter ", ")))
+  (define comma-separator-getter-item
+    (getter-item char-comma? (exact-getter ", ")))
 
   (define atom-annotation-getter
-    (annotation-getter atom-getter stripped-annotation))
+    (getter-item-getter (%annotation %literal)))
 
   (define line-annotation-getter
     (annotation-getter
