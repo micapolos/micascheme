@@ -8,7 +8,7 @@
     define-check-datum->
     check-datum=?
     check-equal?)
-  (import (scheme) (identifier))
+  (import (scheme) (identifier) (syntax))
 
   (define checking? (make-thread-parameter #f))
 
@@ -24,7 +24,7 @@
 
   (meta define (syntax->location-string $syntax)
     (let
-      (($annotation (syntax->annotation $syntax)))
+      (($annotation (syntax->last-annotation? $syntax)))
       (or
         (and $annotation
           (let
@@ -38,7 +38,7 @@
       (syntax-case stx (not raises works)
         ((_ (raises body))
           (let
-            ((ann-string (syntax->location-string stx)))
+            ((ann-string (syntax->location-string #'body)))
             #`(or
               (guard
                 ($exception (else #'(void)))
@@ -60,7 +60,7 @@
               (args (syntax->list #`(arg ...)))
               (tmps (generate-temporaries #`(arg ...)))
               (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
-              (ann-string (syntax->location-string stx)))
+              (ann-string (syntax->location-string #'(arg ...))))
             #`(parameterize ((checking? #t) (gensym-count 0))
               (let (#,@let-cases)
                 (or
@@ -76,7 +76,7 @@
               (args (syntax->list #`(arg ...)))
               (tmps (generate-temporaries #`(arg ...)))
               (let-cases (map (lambda (tmp arg) #`(#,tmp #,arg)) tmps args))
-              (ann-string (syntax->location-string stx)))
+              (ann-string (syntax->location-string #'(arg ...))))
             #`(parameterize ((checking? #t) (gensym-count 0))
               (let (#,@let-cases)
                 (or

@@ -54,7 +54,8 @@
     syntax-single
     get-property
     syntax->list*
-    syntax-unpack)
+    syntax-unpack
+    syntax->last-annotation?)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -416,4 +417,14 @@
       ((x ...) #'(x ...))
       ((x ... . y) (append #'(x ...) #'y))
       (x #'x)))
+
+  (define (syntax->last-annotation? $syntax)
+    (or
+      (syntax->annotation $syntax)
+      (syntax-case $syntax ()
+        ((a . b)
+          (or
+            (syntax->last-annotation? #'b)
+            (syntax->last-annotation? #'a)))
+        (else #f))))
 )
