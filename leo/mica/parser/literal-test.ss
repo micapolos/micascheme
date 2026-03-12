@@ -1,5 +1,6 @@
 (import
   (prefix (micascheme) %)
+  (only (micascheme) quote)
   (mica parser)
   (leo mica parser literal))
 
@@ -21,3 +22,9 @@
 (check-parses special-literal "#f" #f)
 (check-parses special-literal "#\\a" #\a)
 (check-parses special-literal "#\\space" #\space)
+
+(check-parses literal "123" 123)
+(check-parses literal "foo" 'foo)
+(check-parses literal "#t" #t)
+(check-parses literal "#\\space" #\space)
+(check-parse-error literal "(foo)")

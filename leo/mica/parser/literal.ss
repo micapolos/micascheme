@@ -2,7 +2,8 @@
   (export
     number
     string-literal
-    special-literal)
+    special-literal
+    literal)
   (import
     (prefix (micascheme) %)
     (mica parser)
@@ -31,4 +32,11 @@
             (one-of
               (string digit-char)
               identifier-string))))))
+
+  (%define literal
+    (one-of
+      number
+      identifier
+      string-literal
+      special-literal))
 )
