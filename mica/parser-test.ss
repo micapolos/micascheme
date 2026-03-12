@@ -155,6 +155,10 @@
     (check-parse-error $parser "a, ")
     (check-parse-error $parser "1")))
 
+
+(check-parses null "" %null)
+(check-parse-error null "a")
+
 (%lets
   (number
     (map
