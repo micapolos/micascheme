@@ -11,14 +11,12 @@
         (non-empty-list digit-char))))
 
   (%define literal
-    (prefixed #\#
-      (one-of
-        (map #\t (%always #t))
-        (map #\f (%always #f))
-        (map
-          (prefixed #\\ (one-of (string digit-char) identifier-string))
-          (%lambda ($string)
-            (%read
-              (%open-input-string
-                (%string-append "#\\" $string))))))))
+    (string->datum
+      (string-append "#"
+        (one-of
+          (one-of "t" "f")
+          (string-append "\\"
+            (one-of
+              (string digit-char)
+              identifier-string))))))
 )
