@@ -53,16 +53,10 @@
 
   (define rhs-line-annotations-getter
     (getter-switch char-getter
-      ((char-space? _)
-        (apply-getter list line-annotation-getter))
-      ((char-colon? _)
-        (ending-getter
-          (starting-getter space-getter inline-annotations-getter)
-          newline-getter))
-      ((char-newline? _)
-        (indented-getter line-annotations-getter))
-      ((else $char)
-        (error-getter "unexpected char" $char))))
+      ((char-space? _) space-line-annotations-getter)
+      ((char-colon? _) colon-line-annotations-getter)
+      ((char-newline? _) newline-line-annotations-getter)
+      ((else $char) (error-getter "unexpected char" $char))))
 
   (define inline-annotation-getter
     (getter-lets
@@ -88,6 +82,17 @@
     (non-empty-separated-getter
       inline-annotation-getter
       comma-separator-getter-item))
+
+  (define space-line-annotations-getter
+    (apply-getter list line-annotation-getter))
+
+  (define colon-line-annotations-getter
+    (ending-getter
+      (starting-getter space-getter inline-annotations-getter)
+      newline-getter))
+
+  (define newline-line-annotations-getter
+    (indented-getter line-annotations-getter))
 
   (define inlines-annotation-getter
     (annotation-getter inline-annotations-getter list-annotation))
