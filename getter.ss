@@ -70,6 +70,7 @@
     numeric-string-getter
 
     test-sfd
+    test-source-object
     check-gets
     check-get-raises
 
@@ -433,6 +434,9 @@
           $item-getter))))
 
   (define test-sfd (source-file-descriptor "test.txt" 0))
+
+  (define (test-source-object $bfp $efp)
+    (make-source-object test-sfd $bfp $efp))
 
   (define-rules-syntaxes
     ((check-gets getter string out)

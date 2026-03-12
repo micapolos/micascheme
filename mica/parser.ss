@@ -34,7 +34,8 @@
     or-null
     one-of
     check-parses
-    check-parse-error)
+    check-parse-error
+    annotation)
   (import
     (rename (except (micascheme) map eof list)
       (string %string)
@@ -220,7 +221,9 @@
             (not? $first-char?)
             (getter-item-getter $item)))))
     ((non-empty-list item)
-      (apply (cons item (list item))))
+      (lets
+        ($item (the item))
+        (prepend $item (list item))))
     ((string-append s ...)
       (apply (%string-append (the s) ...)))
     ((list->string l)
@@ -228,7 +231,15 @@
     ((list-string l)
       (map l
         (lambda ($strings)
-          (%apply %string-append $strings)))))
+          (%apply %string-append $strings))))
+    ((annotation item)
+      (lets
+        ($item item)
+        (getter-item
+          (getter-item-first-char? $item)
+          (annotation-getter
+            (getter-item-getter $item)
+            stripped-annotation)))))
 
   (define digit (map (?char char-numeric?) %string string->number))
 

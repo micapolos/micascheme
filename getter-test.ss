@@ -55,7 +55,7 @@
 (check-gets
   (annotation-getter string-getter stripped-annotation)
   "abc"
-  (stripped-annotation "abc" (make-source-object test-sfd 0 3))
+  (stripped-annotation "abc" (test-source-object 0 3))
   3)
 
 (check-gets
@@ -65,10 +65,10 @@
   "abc"
   (list-annotation
     (list
-      (stripped-annotation #\a (make-source-object test-sfd 0 1))
-      ( stripped-annotation #\b (make-source-object test-sfd 1 2))
-      (stripped-annotation #\c (make-source-object test-sfd 2 3)))
-    (make-source-object test-sfd 0 3))
+      (stripped-annotation #\a (test-source-object 0 1))
+      (stripped-annotation #\b (test-source-object 1 2))
+      (stripped-annotation #\c (test-source-object 2 3)))
+    (test-source-object 0 3))
   3)
 
 (check-gets eof?-getter "" #t 0)

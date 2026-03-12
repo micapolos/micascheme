@@ -1,7 +1,9 @@
 (import
   (prefix (micascheme) %)
   (only (micascheme) quote)
-  (mica parser))
+  (mica parser)
+  (getter)
+  (prefix (annotation) %))
 
 (check-parses eof "" %eof)
 (check-parse-error eof "a")
@@ -140,3 +142,6 @@
 
 (check-parses (string->datum string) "foo" 'foo)
 (check-parses (string->datum string) "(a b)" '(a b))
+
+(check-parses (annotation string) "foo"
+  (%stripped-annotation "foo" (test-source-object 0 3)))
