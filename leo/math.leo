@@ -4,7 +4,7 @@ library
     add, subtract, multiply, divide
     less?, less/equal?, greater?, greater/equal?
     fx-add/wraparound, fx-subtract/wraparound, fx-less?
-  import leo lang
+  import leo scheme
 
   define fx-add/wraparound fx+/wraparound
   define fx-subtract/wraparound fx-/wraparound

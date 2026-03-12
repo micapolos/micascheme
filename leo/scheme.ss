@@ -1,4 +1,4 @@
-(library (leo lang)
+(library (leo scheme)
   (export library import define lambda with)
   (import
     (except (micascheme)

@@ -12,7 +12,7 @@
   (leo writing-reader)
   (leo transform)
   (leo expand)
-  (leo lang)
+  (leo scheme)
   (leo path)
   (leo source-file-descriptor)
   (leo read)

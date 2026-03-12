@@ -23,7 +23,7 @@
 (displayln "--------------------------------------------")
 (eval
   (getter-load! line-annotation-getter "leo/samples/library.leo")
-  (copy-environment (environment '(leo lang)) #t))
+  (copy-environment (environment '(leo scheme)) #t))
 
 (displayln "--------------------------------------------")
 (load-leo-program "leo/samples/program.leo")

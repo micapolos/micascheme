@@ -6,7 +6,7 @@ library
     abstraction, abstraction?, abstraction-procedure
     hello-world
   import
-    leo lang
+    leo scheme
 
   data native ref
   data application: lhs, rhs

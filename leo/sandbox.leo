@@ -1,5 +1,5 @@
 import
-  leo lang
+  leo scheme
   leo math
 
 define hello "Hello"

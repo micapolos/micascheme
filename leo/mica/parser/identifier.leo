@@ -2,7 +2,7 @@ library
   leo mica parser identifier
   export identifier string
   import
-    leo lang
+    leo scheme
     mica parser
 
   define letter char

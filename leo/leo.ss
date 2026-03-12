@@ -9,7 +9,7 @@
 
   (define-rule-syntax (leo body ...)
     (begin
-      (invoke-library '(leo lang))
+      (invoke-library '(leo scheme))
       (parameterize
         (
           (make-read-handler make-leo-read)

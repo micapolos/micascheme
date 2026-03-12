@@ -1,4 +1,4 @@
-(import (leo lang))
+(import (leo scheme))
 
 (library (leo (foo bar))
   (export foo bar)
