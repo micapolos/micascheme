@@ -11,6 +11,7 @@
     getter-switch
     list->getter
     append-getter
+    replace-getter
     apply-getter
     error-getter
 

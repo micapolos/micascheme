@@ -59,6 +59,7 @@
     (getter-switch char-getter
       ((char-space? _) space-line-annotations-getter)
       ((char-colon? _) colon-line-annotations-getter)
+      ((char-comma? _) comma-line-annotations-getter)
       ((char-newline? _) newline-line-annotations-getter)
       ((else $char) (error-getter "unexpected char" $char))))
 
@@ -96,6 +97,9 @@
         (ending-getter inline-annotations-getter newline-getter))
       ((char-newline? _)
         (getter null))))
+
+  (define comma-line-annotations-getter
+    (replace-getter space-getter null))
 
   (define newline-line-annotations-getter
     (indented-getter line-annotations-getter))

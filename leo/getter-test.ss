@@ -16,6 +16,8 @@
 (check-gets line-getter "foo :\n" '(foo ()) 6)
 (check-gets line-getter "foo bar :\n" '(foo (bar ())) 10)
 
+(check-gets line-getter "foo, " 'foo 5)
+
 (check-get-raises line-getter "123 ")
 
 (check-gets lines-getter "" '() 0)

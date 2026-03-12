@@ -55,6 +55,10 @@
   (6 ("foo" "bar" "gar")))
 
 (check-counter
+  (replace-counter (counter "foo") "bar")
+  (1 "bar"))
+
+(check-counter
   (counter-switch (counter 12)
     ((number? $number) (counter (+ $number 1)))
     ((string? $string) (counter (string-append $string "!")))
