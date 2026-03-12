@@ -1,16 +1,9 @@
 library
   leo samples library
   export
-    native
-    native?
-    native-ref
-    application
-    application?
-    application-lhs
-    application-rhs
-    abstraction
-    abstraction?
-    abstraction-procedure
+    native, native?, native-ref
+    application, application?, application-lhs, application-rhs
+    abstraction, abstraction?, abstraction-procedure
     hello-world
   import
     leo lang

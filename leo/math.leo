@@ -1,17 +1,9 @@
 library
   leo math
   export
-    add
-    subtract
-    multiply
-    divide
-    less?
-    less/equal?
-    greater?
-    greater/equal?
-    fx-add/wraparound
-    fx-subtract/wraparound
-    fx-less?
+    add, subtract, multiply, divide
+    less?, less/equal?, greater?, greater/equal?
+    fx-add/wraparound, fx-subtract/wraparound, fx-less?
   import leo lang
 
   define fx-add/wraparound fx+/wraparound
