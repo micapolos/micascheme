@@ -150,3 +150,19 @@
 
 (check-parses (annotation string) "foo"
   (%stripped-annotation "foo" (test-source-object 0 3)))
+
+(%lets
+  ($parser
+    (switch alphabetic-char
+      (((%partial %char=? #\a) $a)
+        (prefixed "-1" (return $a)))
+      (((%partial %char=? #\b) $b)
+        (prefixed "-2" (return $b)))
+      ((else $other)
+        (prefixed "-3" (return $other)))))
+  (%run
+    (check-parses $parser "a-1" #\a)
+    (check-parses $parser "b-2" #\b)
+    (check-parses $parser "c-3" #\c)
+    (check-parses $parser "d-3" #\d)))
+

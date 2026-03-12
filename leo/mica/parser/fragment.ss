@@ -5,9 +5,9 @@
     (only (micascheme) define)
     (prefix (leo fragment) %)
     (mica parser)
-    (leo mica parser identifier))
+    (leo mica parser identifier)
+    (leo mica parser literal))
 
   (define (line-annotations-fragment $style)
-    (one-of
-      (annotation identifier)))
+    (annotation literal))
 )

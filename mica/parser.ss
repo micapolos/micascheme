@@ -1,6 +1,7 @@
 (library (mica parser)
   (export
     parse-string
+    return
     eof
     char ?char
     category-char
@@ -35,9 +36,11 @@
     one-of
     check-parses
     check-parse-error
-    annotation)
+    annotation
+    switch
+    else)
   (import
-    (rename (except (micascheme) map eof list)
+    (rename (except (micascheme) map eof list switch)
       (string %string)
       (prepend %prepend)
       (append %append)
@@ -46,10 +49,11 @@
       (apply %apply)
       (not %not)
       (> %>)
-      (char %char))
+      (char %char)
+      (else %else))
     (getter))
 
-  (define-keywords not >)
+  (define-keywords not > else)
 
   (define (parse-string $parser $string)
     (lets
@@ -100,6 +104,10 @@
         #'(getter-item char? char-getter))))
 
   (define-rules-syntaxes (keywords else not >)
+    ((return x)
+      (getter-item
+        (always #f)
+        (getter x)))
     ((the ch)
       (char? (datum ch))
       (getter-item
@@ -157,7 +165,7 @@
               (if (and (app (char-test test?) $char) ...)
                 (getter-item-getter parser)
                 (error-getter "unexpected char" $char)))
-            ((else $other)
+            ((%else $other)
               (getter-item-getter parser))))))
     ((prefixed $prefix $item)
       (getter-item
@@ -193,7 +201,7 @@
           (((getter-item-first-char? (the first)) _)
             (getter-item-getter (the first)))
           ...
-          ((else _)
+          ((%else _)
             (getter-item-getter (the last))))))
     ((map item fn)
       (getter-item
@@ -241,7 +249,16 @@
           (getter-item-first-char? $item)
           (annotation-getter
             (getter-item-getter $item)
-            stripped-annotation)))))
+            stripped-annotation))))
+    ((switch x ((pred? id) expr) ... ((else else-id) else-expr))
+      (lets
+        ($x (the x))
+        (getter-item
+          (getter-item-first-char? $x)
+          (getter-switch (getter-item-getter $x)
+            ((pred? id) (getter-item-getter (the expr)))
+            ...
+            ((%else else-id) (getter-item-getter (the else-expr))))))))
 
   (define digit (map (?char char-numeric?) %string string->number))
 
