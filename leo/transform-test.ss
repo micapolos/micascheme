@@ -113,9 +113,3 @@
         #'(lambda x y (+ x y))))
     (syntax->datum
       '(lambda (x y) (+ x y)))))
-
-(check
-  (equal?
-    (syntax->datum (transform-with #'(with newline)))
-    (syntax->datum '(newline))))
-
