@@ -120,6 +120,13 @@
     (map numeric-string %string->number))
   "123!")
 
+(%lets
+  ($parser (or (optional alphabetic-char) (optional (string numeric-char))))
+  (%run
+    (check-parses $parser "a" #\a)
+    (check-parses $parser "2" "2")
+    (check-parse-error $parser "+")))
+
 (check-parses (list digit) "" (%list))
 (check-parses (list digit) "1" (%list 1))
 (check-parses (list digit) "123" (%list 1 2 3))
@@ -155,9 +162,9 @@
         (prepend
           (optional (one-of #\+ #\-))
           (non-empty-list numeric-char))
-        (or-null
-          (optional
-            (prepend #\. (non-empty-list numeric-char)))))
+        (or
+          (optional (prepend #\. (non-empty-list numeric-char)))
+          null))
       %?filter
       %list->string
       %string->number))

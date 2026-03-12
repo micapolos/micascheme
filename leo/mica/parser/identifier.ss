@@ -67,9 +67,9 @@
   (define peculiar-identifier-string
     (one-of "+" "..."
       (string-append "-"
-        (map
+        (or
           (optional (string-append ">" subsequent-list-string))
-          (default "")))))
+          (return "")))))
 
   (define identifier-string
     (one-of

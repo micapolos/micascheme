@@ -2,6 +2,7 @@
   (export
     parse-string
     return
+    or
     eof
     char ?char
     category-char
@@ -12,6 +13,7 @@
     alphabetic-char
     numeric-char
     string
+    null
     alphabetic-string
     numeric-string
     digit
@@ -34,7 +36,6 @@
     not
     >
     list-string
-    or-null
     one-of
     check-parses
     check-parse-error
@@ -52,7 +53,9 @@
       (not %not)
       (> %>)
       (char %char)
-      (else %else))
+      (else %else)
+      (or %or)
+      (null %null))
     (getter))
 
   (define-keywords not > else)
@@ -105,6 +108,11 @@
         (identifier? #'id)
         #'(getter-item char? char-getter))))
 
+  (define-syntax (null $syntax)
+    (syntax-case $syntax ()
+      (id (identifier? #'id)
+        #'(return %null))))
+
   (define-rules-syntaxes (keywords else not >)
     ((return x)
       (getter-item
@@ -130,7 +138,7 @@
         (lambda ($char)
           (lets
             ($category (char-general-category $char))
-            (or (symbol=? $category 'cat) ...)))))
+            (%or (symbol=? $category 'cat) ...)))))
     ((range-char from to)
       (and (char? (datum from)) (char? (datum to)))
       (?char
@@ -221,8 +229,6 @@
       (apply (%prepend (the item) (the list))))
     ((append item ...)
       (apply (%append (the item) ...)))
-    ((or-null item)
-      (map (the item) (default null)))
     ((list item)
       (lets
         ($item (the item))
@@ -243,9 +249,24 @@
           $item
           (list (prefixed (the separator) $item)))))
     ((separated separator item)
-      (map
+      (or
         (optional (non-empty-separated separator item))
-        (default null)))
+        null))
+    ((or) (return #f))
+    ((or x1) x1)
+    ((or x1 x2)
+      (lets
+        ($x1 (the x1))
+        ($x2 (the x2))
+        (getter-item
+          (or?
+            (getter-item-first-char? $x1)
+            (getter-item-first-char? $x2))
+          (getter-switch (getter-item-getter $x1)
+            ((false? _) (getter-item-getter $x2))
+            ((%else $x1) (getter $x1))))))
+    ((or x1 x2 xs ...)
+      (or (or x1 x2) xs ...))
     ((string-append s ...)
       (apply (%string-append (the s) ...)))
     ((list->string l)
