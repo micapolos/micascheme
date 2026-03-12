@@ -17,6 +17,7 @@
     digit
     the
     prefixed suffixed wrapped
+    non-empty-separated
     indented
     optional
     map
@@ -234,6 +235,12 @@
       (lets
         ($item (the item))
         (prepend $item (list item))))
+    ((non-empty-separated separator item)
+      (lets
+        ($item (the item))
+        (prepend
+          $item
+          (list (prefixed (the separator) $item)))))
     ((string-append s ...)
       (apply (%string-append (the s) ...)))
     ((list->string l)
