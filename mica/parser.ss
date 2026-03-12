@@ -15,7 +15,7 @@
     numeric-string
     digit
     the
-    prefixed suffixed
+    prefixed suffixed wrapped
     indented
     optional
     map
@@ -171,6 +171,8 @@
         (ending-getter
           (getter-item-getter (the $item))
           (getter-item-getter (the $suffix)))))
+    ((wrapped $prefix $item $suffix)
+      (suffixed (prefixed $prefix $item) $suffix))
     ((indented $item)
       (getter-item
         (getter-item-first-char? (the $item))

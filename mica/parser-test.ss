@@ -75,6 +75,11 @@
 (check-parse-error (suffixed char "!") "")
 (check-parse-error (suffixed char "!") "ab!")
 
+(check-parses (wrapped "(" char ")") "(a)" #\a)
+(check-parse-error (wrapped "(" char ")") "a)")
+(check-parse-error (wrapped "(" char ")") "(a")
+(check-parse-error (wrapped "(" char ")") "a")
+
 (check-parses (optional alphabetic-string) "" #f)
 (check-parses (optional alphabetic-string) "abc" "abc")
 (check-parse-error (optional alphabetic-string) "ab1")

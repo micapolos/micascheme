@@ -15,3 +15,5 @@
 (check-parse-error number "-1") ; TODO: negative numbers
 (check-parse-error number "+1") ; TODO: positive numbers
 (check-parse-error number "3.14") ; TODO: float numbers
+
+(check-parses string-literal "\"\"" "")

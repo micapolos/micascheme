@@ -1,15 +1,27 @@
 (library (leo mica parser literal)
-  (export literal number)
+  (export
+    number
+    string-literal
+    literal)
   (import
     (prefix (micascheme) %)
     (mica parser)
     (leo mica parser identifier))
 
+  ; TODO: Implement it properly
   (%define number
     (string->datum
       (list->string
         (non-empty-list digit-char))))
 
+  ; TODO: Implement it properly
+  (%define string-literal
+    (wrapped
+      #\"
+      (list-string (list (string (first-char (not #\" #\newline) char))))
+      #\"))
+
+  ; TODO: Implement it properly
   (%define literal
     (string->datum
       (string-append "#"
