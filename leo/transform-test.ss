@@ -17,33 +17,48 @@
 
 (check
   (equal?
-    (syntax->datum (transform-spec #'foo))
+    (syntax->datum (transform-import-spec #'foo))
     (syntax->datum '(foo))))
 
 (check
   (equal?
-    (syntax->datum (transform-spec #'(foo bar)))
+    (syntax->datum (transform-import-spec #'(foo bar)))
     (syntax->datum '(foo bar))))
 
 (check
   (equal?
-    (syntax->datum (transform-spec #'(foo (bar goo))))
+    (syntax->datum (transform-import-spec #'(foo (bar goo))))
     (syntax->datum '(foo bar goo))))
 
 (check
   (equal?
-    (syntax->datum (transform-spec #'(rename (foo (bar goo)) (a %a) (b %b))))
-    (syntax->datum '(rename (foo bar goo) (a %a) (b %b)))))
+    (syntax->datum
+      (transform-import-spec
+        #'(rename
+          (a %a)
+          (b %b)
+          (foo (bar goo)))))
+    (syntax->datum
+      '(rename
+        (foo bar goo)
+        (a %a)
+        (b %b)))))
 
 (check
   (equal?
-    (syntax->datum (transform-spec #'(only (foo (bar goo)) a b)))
-    (syntax->datum '(only (foo bar goo) a b))))
+    (syntax->datum
+      (transform-import-spec
+        #'(only a b (foo (bar goo)))))
+    (syntax->datum
+      '(only (foo bar goo) a b))))
 
 (check
   (equal?
-    (syntax->datum (transform-spec #'(except (foo (bar goo)) a b)))
-    (syntax->datum '(except (foo bar goo) a b))))
+    (syntax->datum
+      (transform-import-spec
+        #'(except a b (foo (bar goo)))))
+    (syntax->datum
+      '(except (foo bar goo) a b))))
 
 (check
   (equal?
