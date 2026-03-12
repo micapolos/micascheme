@@ -5,197 +5,188 @@
   (getter)
   (prefix (annotation) %))
 
-(check-parses eof "" %eof)
-(check-parse-error eof "a")
+(check-parser eof
+  (ok "" %eof)
+  (error "a"))
 
-(check-parses char "a" #\a)
-(check-parse-error char "")
-(check-parse-error char "ab")
+(check-parser char
+  (ok "a" #\a)
+  (error "")
+  (error "ab"))
 
-(check-parses (?char %char-numeric?) "1" #\1)
-(check-parse-error (?char %char-numeric?) "a")
+(check-parser (?char %char-numeric?)
+  (ok "1" #\1)
+  (error "a"))
 
-(check-parses digit "1" 1)
-(check-parse-error digit "")
-(check-parse-error digit "a")
+(check-parser digit
+  (ok "1" 1)
+  (error "")
+  (error "a"))
 
-(check-parses (category-char Ll Lu Nd) "a" #\a)
-(check-parses (category-char Ll Lu Nd) "A" #\A)
-(check-parses (category-char Ll Lu Nd) "1" #\1)
-(check-parse-error (category-char Ll Lu Nd) " ")
+(check-parser (category-char Ll Lu Nd)
+  (ok "a" #\a)
+  (ok "A" #\A)
+  (ok "1" #\1)
+  (error " "))
 
-(check-parses (range-char #\a #\z) "a" #\a)
-(check-parses (range-char #\a #\z) "x" #\x)
-(check-parses (range-char #\a #\z) "z" #\z)
-(check-parse-error (range-char #\a #\z) "A")
+(check-parser (range-char #\a #\z)
+  (ok "a" #\a)
+  (ok "x" #\x)
+  (ok "z" #\z)
+  (error "A"))
 
-(check-parses (char>= #\c) "c" #\c)
-(check-parses (char>= #\c) "d" #\d)
-(check-parse-error (char>= #\c) "b")
+(check-parser (char>= #\c)
+  (ok "c" #\c)
+  (ok "d" #\d)
+  (error "b"))
 
-(check-parses (char<= #\c) "c" #\c)
-(check-parses (char<= #\c) "b" #\b)
-(check-parse-error (char<= #\c) "d")
+(check-parser (char<= #\c)
+  (ok "c" #\c)
+  (ok "b" #\b)
+  (error "d"))
 
-(%lets
-  ($parser (first-char (> #\a) (not #\c #\e) alphabetic-string))
-  (%run
-    (check-parse-error $parser "12")
-    (check-parse-error $parser "ab")
-    (check-parses $parser "bc" "bc")
-    (check-parse-error $parser "cd")
-    (check-parses $parser "de" "de")
-    (check-parse-error $parser "ef")))
+(check-parser (first-char (> #\a) (not #\c #\e) alphabetic-string)
+  (error "12")
+  (error "ab")
+  (ok "bc" "bc")
+  (error "cd")
+  (ok "de" "de")
+  (error "ef"))
 
-(check-parses string "" "")
-(check-parses string "a" "a")
-(check-parses string "ab\n\\" "ab\n\\")
+(check-parser string
+  (ok "" "")
+  (ok "a" "a")
+  (ok "ab\n\\" "ab\n\\"))
 
-(check-parses (string) "" "")
-(check-parse-error (string) "a")
+(check-parser (string)
+  (ok "" "")
+  (error "a"))
 
-(check-parses (string #\a #\b) "ab" "ab")
-(check-parse-error (string #\a #\b) "a")
-(check-parse-error (string #\a #\b) "abc")
+(check-parser (string #\a #\b)
+  (ok "ab" "ab")
+  (error "a")
+  (error "abc"))
 
-(check-parses #\a "a" #\a)
-(check-parses (char a) "a" #\a)
-(check-parses (char colon) ":" #\:)
-(check-parses (char space) " " #\space)
+(check-parser #\a (ok "a" #\a))
+(check-parser (char a) (ok "a" #\a))
+(check-parser (char colon) (ok ":" #\:))
+(check-parser (char space) (ok " " #\space))
 
-(check-parses "" "" "")
-(check-parses "foo" "foo" "foo")
+(check-parser "" (ok "" ""))
+(check-parser "foo" (ok "foo" "foo"))
 
-(check-parses (prefixed "- " string) "- " "")
-(check-parses (prefixed "- " string) "- abc" "abc")
-(check-parse-error (prefixed "- " string) "")
-(check-parse-error (prefixed "- " string) "-")
+(check-parser (prefixed "- " string)
+  (ok "- " "")
+  (ok "- abc" "abc")
+  (error "")
+  (error "-"))
 
-(check-parses (suffixed char "!") "a!" #\a)
-(check-parse-error (suffixed char "!") "")
-(check-parse-error (suffixed char "!") "ab!")
+(check-parser (suffixed char "!")
+  (ok "a!" #\a)
+  (error "")
+  (error "ab!"))
 
-(check-parses (wrapped "(" char ")") "(a)" #\a)
-(check-parse-error (wrapped "(" char ")") "a)")
-(check-parse-error (wrapped "(" char ")") "(a")
-(check-parse-error (wrapped "(" char ")") "a")
+(check-parser (wrapped "(" char ")")
+  (ok "(a)" #\a)
+  (error "a)")
+  (error "(a")
+  (error "a"))
 
-(check-parses (optional alphabetic-string) "" #f)
-(check-parses (optional alphabetic-string) "abc" "abc")
-(check-parse-error (optional alphabetic-string) "ab1")
+(check-parser (optional alphabetic-string)
+  (ok "" #f)
+  (ok "abc" "abc")
+  (error "ab1"))
 
-(check-parses (optional numeric-string) "" #f)
-(check-parses (optional numeric-string) "123" "123")
-(check-parse-error (optional numeric-string) "12a")
+(check-parser (optional numeric-string)
+  (ok "" #f)
+  (ok "123" "123")
+  (error "12a"))
 
 (check-parses (map numeric-string %string->number) "123" 123)
 (check-parses (map numeric-string %string->number %-) "123" -123)
 
-(check-parses (indented string) "" "")
-(check-parse-error (indented string) "abc")
-(check-parse-error (indented string) " abc")
-(check-parses (indented string) "  abc" "abc")
-(check-parses (indented string) "  abc\n" "abc\n")
-(check-parse-error (indented string) "  abc\n ")
-(check-parse-error (indented string) "  abc\n  ")
-(check-parses (indented string) "  abc\n  def" "abc\ndef")
+(check-parser (indented string)
+  (ok "" "")
+  (error "abc")
+  (error " abc")
+  (ok "  abc" "abc")
+  (ok "  abc\n" "abc\n")
+  (error "  abc\n ")
+  (error "  abc\n  ")
+  (ok "  abc\n  def" "abc\ndef"))
 
-(check-parses
-  (one-of
-    alphabetic-string
-    (map numeric-string %string->number))
-  "abc"
-  "abc")
+(check-parser (one-of alphabetic-string (map numeric-string %string->number))
+  (ok "abc" "abc")
+  (ok "123" 123)
+  (error "123!"))
 
-(check-parses
-  (one-of
-    alphabetic-string
-    (map numeric-string %string->number))
-  "123"
-  123)
+(check-parser (or (optional alphabetic-char) (optional (string numeric-char)))
+  (ok "a" #\a)
+  (ok "2" "2")
+  (error "+"))
 
-(check-parse-error
-  (one-of
-    alphabetic-string
-    (map numeric-string %string->number))
-  "123!")
+(check-parser (list digit)
+  (ok "" (%list))
+  (ok "1" (%list 1))
+  (ok "123" (%list 1 2 3))
+  (error "a")
+  (error "1a"))
 
-(%lets
-  ($parser (or (optional alphabetic-char) (optional (string numeric-char))))
-  (%run
-    (check-parses $parser "a" #\a)
-    (check-parses $parser "2" "2")
-    (check-parse-error $parser "+")))
+(check-parser (non-empty-separated ", " alphabetic-char)
+  (ok "a" (%list #\a))
+  (ok "a, b" (%list #\a #\b))
+  (ok "a, b, c" (%list #\a #\b #\c))
+  (error "")
+  (error "a,")
+  (error "a, ")
+  (error "1"))
 
-(check-parses (list digit) "" (%list))
-(check-parses (list digit) "1" (%list 1))
-(check-parses (list digit) "123" (%list 1 2 3))
-(check-parse-error (list digit) "a")
-(check-parse-error (list digit) "1a")
+(check-parser (separated ", " alphabetic-char)
+  (ok "" (%list))
+  (ok "a" (%list #\a))
+  (ok "a, b" (%list #\a #\b))
+  (ok "a, b, c" (%list #\a #\b #\c))
+  (error "a,")
+  (error "a, ")
+  (error "1"))
 
-(%lets
-  ($parser (non-empty-separated ", " alphabetic-char))
-  (%run
-    (check-parses $parser "a" (%list #\a))
-    (check-parses $parser "a, b" (%list #\a #\b))
-    (check-parses $parser "a, b, c" (%list #\a #\b #\c))
-    (check-parse-error $parser "")
-    (check-parse-error $parser "a,")
-    (check-parse-error $parser "a, ")
-    (check-parse-error $parser "1")))
+(check-parser null
+  (ok "" %null)
+  (error "a"))
 
-(%lets
-  ($parser (separated ", " alphabetic-char))
-  (%run
-    (check-parses $parser "" (%list))
-    (check-parses $parser "a" (%list #\a))
-    (check-parses $parser "a, b" (%list #\a #\b))
-    (check-parses $parser "a, b, c" (%list #\a #\b #\c))
-    (check-parse-error $parser "a,")
-    (check-parse-error $parser "a, ")
-    (check-parse-error $parser "1")))
+(check-parser
+  (map
+    (append
+      (prepend
+        (optional (one-of #\+ #\-))
+        (non-empty-list numeric-char))
+      (or
+        (optional (prepend #\. (non-empty-list numeric-char)))
+        null))
+    %?filter
+    %list->string
+    %string->number)
+  (ok "123" 123)
+  (ok "+123" 123)
+  (ok "-123" -123)
+  (ok "-123.45" -123.45))
 
+(check-parser (string->datum string)
+  (ok "foo" 'foo)
+  (ok "(a b)" '(a b)))
 
-(check-parses null "" %null)
-(check-parse-error null "a")
+(check-parser (annotation string)
+  (ok "foo" (%stripped-annotation "foo" (test-source-object 0 3))))
 
-(%lets
-  (number
-    (map
-      (append
-        (prepend
-          (optional (one-of #\+ #\-))
-          (non-empty-list numeric-char))
-        (or
-          (optional (prepend #\. (non-empty-list numeric-char)))
-          null))
-      %?filter
-      %list->string
-      %string->number))
-  (%run
-    (check-parses number "123" 123)
-    (check-parses number "+123" 123)
-    (check-parses number "-123" -123)
-    (check-parses number "-123.45" -123.45)))
-
-(check-parses (string->datum string) "foo" 'foo)
-(check-parses (string->datum string) "(a b)" '(a b))
-
-(check-parses (annotation string) "foo"
-  (%stripped-annotation "foo" (test-source-object 0 3)))
-
-(%lets
-  ($parser
-    (switch alphabetic-char
-      (((%partial %char=? #\a) $a)
-        (prefixed "-1" (return $a)))
-      (((%partial %char=? #\b) $b)
-        (prefixed "-2" (return $b)))
-      ((else $other)
-        (prefixed "-3" (return $other)))))
-  (%run
-    (check-parses $parser "a-1" #\a)
-    (check-parses $parser "b-2" #\b)
-    (check-parses $parser "c-3" #\c)
-    (check-parses $parser "d-3" #\d)))
-
+(check-parser
+  (switch alphabetic-char
+    (((%partial %char=? #\a) $a)
+      (prefixed "-1" (return $a)))
+    (((%partial %char=? #\b) $b)
+      (prefixed "-2" (return $b)))
+    ((else $other)
+      (prefixed "-3" (return $other))))
+  (ok "a-1" #\a)
+  (ok "b-2" #\b)
+  (ok "c-3" #\c)
+  (ok "d-3" #\d))

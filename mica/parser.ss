@@ -39,11 +39,12 @@
     one-of
     check-parses
     check-parse-error
+    check-parser ok error
     annotation
     switch
     else)
   (import
-    (rename (except (micascheme) map eof list switch)
+    (rename (except (micascheme) map eof list switch error)
       (string %string)
       (prepend %prepend)
       (append %append)
@@ -58,7 +59,7 @@
       (null %null))
     (getter))
 
-  (define-keywords not > else)
+  (define-keywords not > else ok error)
 
   (define (parse-string $parser $string)
     (lets
@@ -300,4 +301,13 @@
 
   (define-rule-syntax (check-parse-error parser in)
     (check (raises (parse-string (the parser) in))))
+
+  (define-rules-syntax (keywords ok error)
+    ((check-parser-case parser (ok in out))
+      (check-parses parser in out))
+    ((check-parser-case parser (error in))
+      (check-parse-error parser in)))
+
+  (define-rule-syntax (check-parser parser case ...)
+    (run (check-parser-case parser case) ...))
 )
