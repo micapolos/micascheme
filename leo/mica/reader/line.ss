@@ -16,11 +16,15 @@
       ($literal-annotation (annotation literal))
       (%switch (%annotation-stripped $literal-annotation)
         ((%symbol? _)
-          (switch rhs-line-annotations
-            ((%null? _)
-              (return $literal-annotation))
-            ((else $rhs-line-annotations)
-              (list-annotation (return (%cons $literal-annotation $rhs-line-annotations))))))
+          (lets
+            ($rhs-line-annotations rhs-line-annotations)
+            (%switch (%datum/annotation-stripped $rhs-line-annotations)
+              ((%null? _)
+                (return $literal-annotation))
+              ((%else _)
+                (list-annotation
+                  (return
+                    (%cons $literal-annotation $rhs-line-annotations)))))))
         ((%else _)
           (suffixed (return $literal-annotation) #\newline)))))
 
@@ -40,7 +44,7 @@
 
   (define colon-line-annotations
     (switch char
-      ;((%char-space? _) (suffixed inline-annotations #\newline))
+      ((%char-space? _) (suffixed line-annotations #\newline))
       ((%char-newline? _) newline-line-annotations)
       ((else $char) (error "unexpected char" $char))))
 
