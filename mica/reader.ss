@@ -1,6 +1,6 @@
 (library (mica reader)
   (export
-    parse-string
+    read-string
     return
     or
     eof
@@ -37,8 +37,8 @@
     >
     list-string
     one-of
-    check-parses
-    check-parse-error
+    check-reads
+    check-read-error
     check-reader ok error
     annotation
     switch
@@ -62,7 +62,7 @@
 
   (define-keywords not > else ok error)
 
-  (define (parse-string $reader $string)
+  (define (read-string $reader $string)
     (lets
       ((values $value $bfp $line $column)
         (getter-get!
@@ -298,17 +298,17 @@
 
   (define digit (map (?char char-numeric?) %string string->number))
 
-  (define-rule-syntax (check-parses reader in out)
-    (check (datum/annotation=? (parse-string (the reader) in) out)))
+  (define-rule-syntax (check-reads reader in out)
+    (check (datum/annotation=? (read-string (the reader) in) out)))
 
-  (define-rule-syntax (check-parse-error reader in)
-    (check (raises (parse-string (the reader) in))))
+  (define-rule-syntax (check-read-error reader in)
+    (check (raises (read-string (the reader) in))))
 
   (define-rules-syntax (keywords ok error)
     ((check-reader-case reader (ok in out))
-      (check-parses reader in out))
+      (check-reads reader in out))
     ((check-reader-case reader (error in))
-      (check-parse-error reader in)))
+      (check-read-error reader in)))
 
   (define-rule-syntax (check-reader reader case ...)
     (lets

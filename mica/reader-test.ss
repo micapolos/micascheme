@@ -102,8 +102,8 @@
   (ok "123" "123")
   (error "12a"))
 
-(check-parses (map numeric-string %string->number) "123" 123)
-(check-parses (map numeric-string %string->number %-) "123" -123)
+(check-reads (map numeric-string %string->number) "123" 123)
+(check-reads (map numeric-string %string->number %-) "123" -123)
 
 (check-reader (indented string)
   (ok "" "")
