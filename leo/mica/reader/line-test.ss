@@ -1,6 +1,6 @@
 (import
   (mica reader)
-  (only (micascheme) quote)
+  (only (micascheme) quote lines-string)
   (leo mica reader line))
 
 (check-reader line
@@ -34,47 +34,40 @@
   (error "foo:")
   (error "foo: ")
   (ok "foo:\n" 'foo)
-  ;(ok "foo: 10\n" '(foo 10))
-  ;(ok "foo: 10, 20\n" '(foo 10 20))
-  ;(ok "foo:\n  10\n" '(foo 10))
-  ;(ok "foo:\n  10\n  20\n" '(foo 10 20))
+  (ok "foo: 10\n" '(foo 10))
+  (ok "foo: 10, 20\n" '(foo 10 20))
+  (ok "foo:\n  10\n" '(foo 10))
+  (ok "foo:\n  10\n  20\n" '(foo 10 20)))
+
+(check-reader line
+  (ok
+    (lines-string
+      "point"
+      "  x 10"
+      "  y 20")
+    '(point (x 10) (y 20)))
+  (ok
+    (lines-string
+      "circle"
+      "  center point"
+      "    x 10"
+      "    y 10"
+      "  radius 10")
+    '(circle
+      (center
+        (point
+          (x 10)
+          (y 10)))
+      (radius 10)))
+  ; (ok
+  ;   (lines-string
+  ;     "point"
+  ;     ""
+  ;     "  x 10"
+  ;     ""
+  ;     ""
+  ;     "  y 20"
+  ;     ""
+  ;     "")
+  ;   '(point (x 10) (y 20)))
   )
-
-; (check-gets
-;   line-getter
-;   (lines-string
-;     "point"
-;     "  x 10"
-;     "  y 20")
-;   '(point (x 10) (y 20))
-;   20 3 0)
-
-; (check-gets
-;   line-getter
-;   (lines-string
-;     "circle"
-;     "  center point"
-;     "    x 10"
-;     "    y 10"
-;     "  radius 10")
-;   '(circle
-;     (center
-;       (point
-;         (x 10)
-;         (y 10)))
-;     (radius 10))
-;   52 5 0)
-
-; (check-gets
-;   line-getter
-;   (lines-string
-;     "point"
-;     ""
-;     "  x 10"
-;     ""
-;     ""
-;     "  y 20"
-;     ""
-;     "")
-;   '(point (x 10) (y 20))
-;   25 8 0)

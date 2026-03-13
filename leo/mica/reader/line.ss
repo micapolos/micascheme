@@ -28,6 +28,27 @@
         ((%else _)
           (suffixed (return $literal-annotation) #\newline)))))
 
+  (define inline-annotation
+    (lets
+      ($literal-annotation (annotation literal))
+      (%switch (%annotation-stripped $literal-annotation)
+        ((%symbol? $symbol)
+          (switch (optional char)
+            ((%false? _)
+              (return $literal-annotation))
+            ((%char-space? _)
+              (apply
+                (%append-annotation
+                  (return $literal-annotation)
+                  inline-annotation)))
+            ((else _)
+              (return $literal-annotation))))
+        ((%else _)
+          (return $literal-annotation)))))
+
+  (define inline-annotations
+    (non-empty-separated ", " inline-annotation))
+
   (define rhs-line-annotations
     (switch char
       ((%char-space? _) space-line-annotations)
@@ -44,7 +65,7 @@
 
   (define colon-line-annotations
     (switch char
-      ((%char-space? _) (suffixed line-annotations #\newline))
+      ((%char-space? _) (suffixed inline-annotations #\newline))
       ((%char-newline? _) newline-line-annotations)
       ((else $char) (error "unexpected char" $char))))
 

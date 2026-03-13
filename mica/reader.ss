@@ -219,7 +219,7 @@
         (indented-getter (getter-item-getter (the $item)))))
     ((optional $item)
       (getter-item
-        (getter-item-first-char? $item)
+        (getter-item-first-char? (the $item))
         (optional-getter
           (getter-item-first-char? (the $item))
           (getter-item-getter (the $item)))))
