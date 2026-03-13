@@ -19,6 +19,11 @@
   (error "")
   (error "ab"))
 
+(check-reader (replace char "foo")
+  (ok "a" "foo")
+  (error "")
+  (error "ab"))
+
 (check-reader (?char %char-numeric?)
   (ok "1" #\1)
   (error "a"))

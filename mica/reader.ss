@@ -2,6 +2,7 @@
   (export
     read-string
     return
+    replace
     or
     error
     eof
@@ -131,6 +132,14 @@
       (getter-item
         (always #f)
         (getter x)))
+    ((replace reader value)
+      (%lets
+        ($reader (the reader))
+        (getter-item
+          (getter-item-first-char? $reader)
+          (replace-getter
+            (getter-item-getter $reader)
+            value))))
     ((the ch)
       (char? (datum ch))
       (getter-item
