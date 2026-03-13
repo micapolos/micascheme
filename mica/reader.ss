@@ -50,6 +50,7 @@
     check-reader ok error
     annotation
     list-annotation
+    cons-annotation
     lets
     switch
     else)
@@ -68,7 +69,8 @@
       (or %or)
       (null %null)
       (lets %lets)
-      (list-annotation %list-annotation))
+      (list-annotation %list-annotation)
+      (cons-annotation %cons-annotation))
     (keyword)
     (getter))
 
@@ -350,6 +352,15 @@
           (annotation-getter
             (getter-item-getter $list)
             %list-annotation))))
+    ((cons-annotation a b)
+      (%lets
+        ($a (the a))
+        ($b (the b))
+        (getter-item
+          (getter-item-first-char? $a)
+          (cons-annotation-getter
+            (getter-item-getter $a)
+            (getter-item-getter $b)))))
     ((lets (id expr) (ids exprs) ... body)
       (%lets
         ($expr (the expr))

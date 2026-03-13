@@ -43,6 +43,7 @@
     string-while-getter
 
     annotation-getter
+    cons-annotation-getter
 
     skip-until-getter
     skip-newlines-getter
@@ -401,6 +402,17 @@
       ($sfd sfd-getter)
       (getter
         ($make-annotation $value
+          (make-source-object $sfd $bfp $efp)))))
+
+  (define (cons-annotation-getter $car-getter $cdr-getter)
+    (getter-lets
+      ($bfp bfp-getter)
+      ($car $car-getter)
+      ($cdr $cdr-getter)
+      ($efp bfp-getter)
+      ($sfd sfd-getter)
+      (getter
+        (cons-annotation $car $cdr
           (make-source-object $sfd $bfp $efp)))))
 
   (define (starting-getter $start-getter $getter)

@@ -5,11 +5,11 @@
     datum/annotation-expression
     datum/annotation
     fake-annotation
-    annotation-cons
     append-annotation
     annotation/eof-stripped
     stripped-annotation
     list-annotation
+    cons-annotation
     to-annotation
     datum/annotation=?
     annotation=?)
@@ -64,13 +64,13 @@
   (define (to-annotation $obj $source-object)
     (switch $obj
       ((annotation? $annotation) $annotation)
-      ((pair? $pair) (annotation-cons $source-object (car $pair) (cdr $pair)))
+      ((pair? $pair) (cons-annotation $source-object (car $pair) (cdr $pair)))
       ((else $other) (stripped-annotation $other $source-object))))
 
   (define (stripped-annotation $stripped $source-object)
     (make-annotation $stripped $source-object $stripped))
 
-  (define (annotation-cons $a $b $source-object)
+  (define (cons-annotation $a $b $source-object)
     (make-annotation
       (cons $a $b)
       $source-object

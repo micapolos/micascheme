@@ -74,7 +74,7 @@
 
 (check
   (annotation=?
-    (annotation-cons "foo" "bar" source-object-a)
+    (cons-annotation "foo" "bar" source-object-a)
     (make-annotation
       (cons "foo" "bar")
       source-object-a
@@ -82,7 +82,7 @@
 
 (check
   (annotation=?
-    (annotation-cons
+    (cons-annotation
       (make-annotation "foo" source-object-b "foo")
       (make-annotation "bar" source-object-c "bar")
       source-object-a)
