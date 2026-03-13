@@ -29,6 +29,7 @@
     apply
     string->datum
     list non-empty-list
+    skip-newlines
     prepend
     append
     string
@@ -223,6 +224,12 @@
         (optional-getter
           (getter-item-first-char? (the $item))
           (getter-item-getter (the $item)))))
+    ((skip-newlines x)
+      (%lets
+        ($x (the x))
+        (getter-item
+          (or? (getter-item-first-char? $x) char-newline?)
+          (skip-newlines-getter (getter-item-getter $x)))))
     ((one-of first ... last)
       (getter-item
         (or?

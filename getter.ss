@@ -295,8 +295,7 @@
 
   (define (skip-until-getter $test? $getter)
     (getter-switch peek-char/eof-getter
-      ((eof? $eof)
-        (getter $eof))
+      ((eof? $eof) $getter)
       (($test? _)
         (skip-char-getter (skip-until-getter $test? $getter)))
       ((else $char)

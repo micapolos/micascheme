@@ -58,7 +58,7 @@
       ((else $char) (error "unexpected char" $char))))
 
   (define line-annotations
-    (list line-annotation))
+    (list (skip-newlines line-annotation)))
 
   (define space-line-annotations
     (apply (%list line-annotation)))

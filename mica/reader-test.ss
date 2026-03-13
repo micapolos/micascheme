@@ -63,6 +63,15 @@
   (ok "de" "de")
   (error "ef"))
 
+(check-reader (skip-newlines alphabetic-string)
+  (ok "" "")
+  (ok "foo" "foo")
+  (ok "\nfoo" "foo")
+  (ok "\n\nfoo" "foo")
+  (error "123")
+  (error "\n123")
+  (error "\n\n123"))
+
 (check-reader string
   (ok "" "")
   (ok "a" "a")

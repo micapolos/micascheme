@@ -101,8 +101,8 @@
   '(#\a #\b)
   2)
 
-(check-gets (skip-until-getter char-whitespace? string-getter) "" eof 0)
-(check-gets (skip-until-getter char-whitespace? string-getter) "   " eof 3)
+(check-gets (skip-until-getter char-whitespace? string-getter) "" "" 0)
+(check-gets (skip-until-getter char-whitespace? string-getter) "   " "" 3)
 (check-gets (skip-until-getter char-whitespace? string-getter) "   foo" "foo" 6)
 
 (check-gets (string-while-getter char-alphabetic?) "" "" 0)

@@ -46,6 +46,7 @@
       "  x 10"
       "  y 20")
     '(point (x 10) (y 20)))
+
   (ok
     (lines-string
       "circle"
@@ -59,15 +60,13 @@
           (x 10)
           (y 10)))
       (radius 10)))
-  ; (ok
-  ;   (lines-string
-  ;     "point"
-  ;     ""
-  ;     "  x 10"
-  ;     ""
-  ;     ""
-  ;     "  y 20"
-  ;     ""
-  ;     "")
-  ;   '(point (x 10) (y 20)))
-  )
+
+  (ok
+    (lines-string
+      "point"
+      ""
+      "  x 10"
+      ""
+      ""
+      "  y 20")
+    '(point (x 10) (y 20))))
