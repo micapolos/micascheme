@@ -1,6 +1,10 @@
 (library (mica reader)
   (export
     read-string
+    read-port
+    read-source-file-descriptor
+    read-file
+
     return
     replace
     or
@@ -71,14 +75,30 @@
   (define-keywords not > else ok)
 
   (define (read-string $reader $string)
+    (read-port $reader (open-input-string $string) test-sfd 0))
+
+  (define (read-port $reader $port $sfd $bfp)
     (%lets
       ((values $value $bfp $line $column)
         (getter-get!
           (ending-getter (getter-item-getter $reader) eof-getter)
-          (open-input-string $string)
-          test-sfd
+          $port
+          $sfd
+          $bfp 0 0 0))
+      $value))
+
+  (define (read-source-file-descriptor $reader $sfd)
+    (%lets
+      ((values $value $bfp $line $column)
+        (getter-get!
+          (ending-getter (getter-item-getter $reader) eof-getter)
+          (open-source-file $sfd)
+          $sfd
           0 0 0 0))
       $value))
+
+  (define (read-file $reader $path)
+    (read-source-file-descriptor $reader (path->source-file-descriptor $path)))
 
   (define (error $message $datum)
     (getter-item
