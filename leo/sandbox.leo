@@ -3,22 +3,17 @@ import
   only
     less?, add, subtract
     from leo math
-
 define hello "Hello"
 define world "world"
-
 define
   exclamated string
   string-append: string, "!"
-
 define comma-separated lambda
   with: string-a, string-b
   string-append: string-a, ", ", string-b
-
 displayln comma-separated
   hello
   exclamated world
-
 displayln time let
   fibonacci
   : number 45
