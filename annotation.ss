@@ -70,11 +70,13 @@
   (define (stripped-annotation $stripped $source-object)
     (make-annotation $stripped $source-object $stripped))
 
-  (define (annotation-cons $source-object $a $b)
+  (define (annotation-cons $a $b $source-object)
     (make-annotation
-      (cons (datum/annotation-stripped $a) (datum/annotation-stripped $b))
+      (cons $a $b)
       $source-object
-      (cons $a $b)))
+      (cons
+        (datum/annotation-stripped $a)
+        (datum/annotation-stripped $b))))
 
   (define (list-annotation $list $source-object)
     (make-annotation

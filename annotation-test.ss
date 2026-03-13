@@ -2,6 +2,7 @@
 
 (define source-object-a (make-source-object (source-file-descriptor "a" 10) 20 30))
 (define source-object-b (make-source-object (source-file-descriptor "b" 10) 20 30))
+(define source-object-c (make-source-object (source-file-descriptor "c" 10) 20 30))
 
 (check (annotation? (datum/annotation 123)))
 
@@ -70,3 +71,24 @@
           (make-annotation "zar" source-object-a "zar"))
         source-object-a
         (list "foo" "bar")))))
+
+(check
+  (annotation=?
+    (annotation-cons "foo" "bar" source-object-a)
+    (make-annotation
+      (cons "foo" "bar")
+      source-object-a
+      (cons "foo" "bar"))))
+
+(check
+  (annotation=?
+    (annotation-cons
+      (make-annotation "foo" source-object-b "foo")
+      (make-annotation "bar" source-object-c "bar")
+      source-object-a)
+    (make-annotation
+      (cons
+        (make-annotation "foo" source-object-b "foo")
+        (make-annotation "bar" source-object-c "bar"))
+      source-object-a
+      (cons "foo" "bar"))))
