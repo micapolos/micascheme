@@ -1,4 +1,4 @@
 (import (micascheme))
 
 (test
-  (mica parser))
+  (mica reader))

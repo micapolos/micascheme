@@ -1,51 +1,51 @@
 (import
   (prefix (micascheme) %)
   (only (micascheme) quote)
-  (mica parser)
+  (mica reader)
   (getter)
   (prefix (annotation) %))
 
-(check-parser eof
+(check-reader eof
   (ok "" %eof)
   (error "a"))
 
-(check-parser char
+(check-reader char
   (ok "a" #\a)
   (error "")
   (error "ab"))
 
-(check-parser (?char %char-numeric?)
+(check-reader (?char %char-numeric?)
   (ok "1" #\1)
   (error "a"))
 
-(check-parser digit
+(check-reader digit
   (ok "1" 1)
   (error "")
   (error "a"))
 
-(check-parser (category-char Ll Lu Nd)
+(check-reader (category-char Ll Lu Nd)
   (ok "a" #\a)
   (ok "A" #\A)
   (ok "1" #\1)
   (error " "))
 
-(check-parser (range-char #\a #\z)
+(check-reader (range-char #\a #\z)
   (ok "a" #\a)
   (ok "x" #\x)
   (ok "z" #\z)
   (error "A"))
 
-(check-parser (char>= #\c)
+(check-reader (char>= #\c)
   (ok "c" #\c)
   (ok "d" #\d)
   (error "b"))
 
-(check-parser (char<= #\c)
+(check-reader (char<= #\c)
   (ok "c" #\c)
   (ok "b" #\b)
   (error "d"))
 
-(check-parser (first-char (> #\a) (not #\c #\e) alphabetic-string)
+(check-reader (first-char (> #\a) (not #\c #\e) alphabetic-string)
   (error "12")
   (error "ab")
   (ok "bc" "bc")
@@ -53,51 +53,51 @@
   (ok "de" "de")
   (error "ef"))
 
-(check-parser string
+(check-reader string
   (ok "" "")
   (ok "a" "a")
   (ok "ab\n\\" "ab\n\\"))
 
-(check-parser (string)
+(check-reader (string)
   (ok "" "")
   (error "a"))
 
-(check-parser (string #\a #\b)
+(check-reader (string #\a #\b)
   (ok "ab" "ab")
   (error "a")
   (error "abc"))
 
-(check-parser #\a (ok "a" #\a))
-(check-parser (char a) (ok "a" #\a))
-(check-parser (char colon) (ok ":" #\:))
-(check-parser (char space) (ok " " #\space))
+(check-reader #\a (ok "a" #\a))
+(check-reader (char a) (ok "a" #\a))
+(check-reader (char colon) (ok ":" #\:))
+(check-reader (char space) (ok " " #\space))
 
-(check-parser "" (ok "" ""))
-(check-parser "foo" (ok "foo" "foo"))
+(check-reader "" (ok "" ""))
+(check-reader "foo" (ok "foo" "foo"))
 
-(check-parser (prefixed "- " string)
+(check-reader (prefixed "- " string)
   (ok "- " "")
   (ok "- abc" "abc")
   (error "")
   (error "-"))
 
-(check-parser (suffixed char "!")
+(check-reader (suffixed char "!")
   (ok "a!" #\a)
   (error "")
   (error "ab!"))
 
-(check-parser (wrapped "(" char ")")
+(check-reader (wrapped "(" char ")")
   (ok "(a)" #\a)
   (error "a)")
   (error "(a")
   (error "a"))
 
-(check-parser (optional alphabetic-string)
+(check-reader (optional alphabetic-string)
   (ok "" #f)
   (ok "abc" "abc")
   (error "ab1"))
 
-(check-parser (optional numeric-string)
+(check-reader (optional numeric-string)
   (ok "" #f)
   (ok "123" "123")
   (error "12a"))
@@ -105,7 +105,7 @@
 (check-parses (map numeric-string %string->number) "123" 123)
 (check-parses (map numeric-string %string->number %-) "123" -123)
 
-(check-parser (indented string)
+(check-reader (indented string)
   (ok "" "")
   (error "abc")
   (error " abc")
@@ -115,24 +115,24 @@
   (error "  abc\n  ")
   (ok "  abc\n  def" "abc\ndef"))
 
-(check-parser (one-of alphabetic-string (map numeric-string %string->number))
+(check-reader (one-of alphabetic-string (map numeric-string %string->number))
   (ok "abc" "abc")
   (ok "123" 123)
   (error "123!"))
 
-(check-parser (or (optional alphabetic-char) (optional (string numeric-char)))
+(check-reader (or (optional alphabetic-char) (optional (string numeric-char)))
   (ok "a" #\a)
   (ok "2" "2")
   (error "+"))
 
-(check-parser (list digit)
+(check-reader (list digit)
   (ok "" (%list))
   (ok "1" (%list 1))
   (ok "123" (%list 1 2 3))
   (error "a")
   (error "1a"))
 
-(check-parser (non-empty-separated ", " alphabetic-char)
+(check-reader (non-empty-separated ", " alphabetic-char)
   (ok "a" (%list #\a))
   (ok "a, b" (%list #\a #\b))
   (ok "a, b, c" (%list #\a #\b #\c))
@@ -141,7 +141,7 @@
   (error "a, ")
   (error "1"))
 
-(check-parser (separated ", " alphabetic-char)
+(check-reader (separated ", " alphabetic-char)
   (ok "" (%list))
   (ok "a" (%list #\a))
   (ok "a, b" (%list #\a #\b))
@@ -150,11 +150,11 @@
   (error "a, ")
   (error "1"))
 
-(check-parser null
+(check-reader null
   (ok "" %null)
   (error "a"))
 
-(check-parser
+(check-reader
   (map
     (append
       (prepend
@@ -171,14 +171,14 @@
   (ok "-123" -123)
   (ok "-123.45" -123.45))
 
-(check-parser (string->datum string)
+(check-reader (string->datum string)
   (ok "foo" 'foo)
   (ok "(a b)" '(a b)))
 
-(check-parser (annotation string)
+(check-reader (annotation string)
   (ok "foo" (%stripped-annotation "foo" (test-source-object 0 3))))
 
-(check-parser
+(check-reader
   (switch alphabetic-char
     (((%partial %char=? #\a) $a)
       (prefixed "-1" (return $a)))

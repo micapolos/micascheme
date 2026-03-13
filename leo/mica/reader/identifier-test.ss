@@ -1,10 +1,10 @@
 (import
   (prefix (micascheme) %)
   (only (micascheme) quote)
-  (mica parser)
-  (leo mica parser identifier))
+  (mica reader)
+  (leo mica reader identifier))
 
-(check-parser identifier
+(check-reader identifier
   (ok "foo" 'foo)
   (ok "variable-1" 'variable-1)
   (ok "+" '+)

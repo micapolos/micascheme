@@ -1,4 +1,4 @@
-(library (mica parser)
+(library (mica reader)
   (export
     parse-string
     return
@@ -39,7 +39,7 @@
     one-of
     check-parses
     check-parse-error
-    check-parser ok error
+    check-reader ok error
     annotation
     switch
     else)
@@ -62,11 +62,11 @@
 
   (define-keywords not > else ok error)
 
-  (define (parse-string $parser $string)
+  (define (parse-string $reader $string)
     (lets
       ((values $value $bfp $line $column)
         (getter-get!
-          (ending-getter (getter-item-getter $parser) eof-getter)
+          (ending-getter (getter-item-getter $reader) eof-getter)
           (open-input-string $string)
           test-sfd
           0 0 0 0))
@@ -165,21 +165,21 @@
       (map s
         (lambda ($string)
           (read (open-input-string $string)))))
-    ((first-char test? ... parser)
+    ((first-char test? ... reader)
       (lets
-        ($parser (the parser))
+        ($reader (the reader))
         (getter-item
           (lambda ($char)
             (and
               (app (char-test test?) $char) ...
-              ((getter-item-first-char? $parser) $char)))
+              ((getter-item-first-char? $reader) $char)))
           (getter-switch peek-char/eof-getter
             ((char? $char)
               (if (and (app (char-test test?) $char) ...)
-                (getter-item-getter parser)
+                (getter-item-getter reader)
                 (error-getter "unexpected char" $char)))
             ((%else $other)
-              (getter-item-getter parser))))))
+              (getter-item-getter reader))))))
     ((prefixed $prefix $item)
       (getter-item
         (getter-item-first-char? (the $prefix))
@@ -298,20 +298,20 @@
 
   (define digit (map (?char char-numeric?) %string string->number))
 
-  (define-rule-syntax (check-parses parser in out)
-    (check (datum/annotation=? (parse-string (the parser) in) out)))
+  (define-rule-syntax (check-parses reader in out)
+    (check (datum/annotation=? (parse-string (the reader) in) out)))
 
-  (define-rule-syntax (check-parse-error parser in)
-    (check (raises (parse-string (the parser) in))))
+  (define-rule-syntax (check-parse-error reader in)
+    (check (raises (parse-string (the reader) in))))
 
   (define-rules-syntax (keywords ok error)
-    ((check-parser-case parser (ok in out))
-      (check-parses parser in out))
-    ((check-parser-case parser (error in))
-      (check-parse-error parser in)))
+    ((check-reader-case reader (ok in out))
+      (check-parses reader in out))
+    ((check-reader-case reader (error in))
+      (check-parse-error reader in)))
 
-  (define-rule-syntax (check-parser parser case ...)
+  (define-rule-syntax (check-reader reader case ...)
     (lets
-      ($parser (the parser))
-      (run-void (check-parser-case $parser case) ...)))
+      ($reader (the reader))
+      (run-void (check-reader-case $reader case) ...)))
 )

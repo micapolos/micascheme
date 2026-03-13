@@ -14,9 +14,9 @@
   (import
     (micascheme)
     (getter)
-    (prefix (mica parser) %)
-    (prefix (leo mica parser identifier) %)
-    (prefix (leo mica parser literal) %))
+    (prefix (mica reader) %)
+    (prefix (leo mica reader identifier) %)
+    (prefix (leo mica reader literal) %))
 
   (data*
     inline-style

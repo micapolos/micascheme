@@ -1,4 +1,4 @@
-(library (leo mica parser identifier)
+(library (leo mica reader identifier)
   (export
     identifier
     identifier-string
@@ -6,7 +6,7 @@
   (import
     (prefix (micascheme) %)
     (only (micascheme) define lambda read open-input-string always default)
-    (mica parser))
+    (mica reader))
 
   (define letter-char
     (one-of

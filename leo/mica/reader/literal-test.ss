@@ -1,10 +1,10 @@
 (import
   (prefix (micascheme) %)
   (only (micascheme) quote)
-  (mica parser)
-  (leo mica parser literal))
+  (mica reader)
+  (leo mica reader literal))
 
-(check-parser number
+(check-reader number
   (ok "0" 0)
   (ok "1" 1)
   (ok "123" 123)
@@ -13,19 +13,19 @@
   (error "+1") ; TODO: positive numbers
   (error "3.14")) ; TODO: float numbers
 
-(check-parser string-literal
+(check-reader string-literal
   (ok "\"\"" "")
   (ok "\"foo\"" "foo")
   (ok "\"foo bar\"" "foo bar")
   (error "\"\n\"")) ; TODO: escaping
 
-(check-parser special-literal
+(check-reader special-literal
   (ok "#t" #t)
   (ok "#f" #f)
   (ok "#\\a" #\a)
   (ok "#\\space" #\space))
 
-(check-parser literal
+(check-reader literal
   (ok "123" 123)
   (ok "foo" 'foo)
   (ok "#t" #t)

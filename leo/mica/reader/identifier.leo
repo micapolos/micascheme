@@ -1,9 +1,9 @@
 library
-  leo mica parser identifier
+  leo mica reader identifier
   export identifier string
   import
     leo scheme
-    mica parser
+    mica reader
 
   define letter char
     one of

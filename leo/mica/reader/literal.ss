@@ -1,4 +1,4 @@
-(library (leo mica parser literal)
+(library (leo mica reader literal)
   (export
     number
     string-literal
@@ -7,8 +7,8 @@
   (import
     (prefix (micascheme) %)
     (only (micascheme) define)
-    (mica parser)
-    (leo mica parser identifier))
+    (mica reader)
+    (leo mica reader identifier))
 
   ; TODO: Implement it properly
   (define number

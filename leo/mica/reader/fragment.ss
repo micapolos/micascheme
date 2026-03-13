@@ -1,12 +1,12 @@
-(library (leo mica parser fragment)
+(library (leo mica reader fragment)
   (export)
   (import
     (prefix (micascheme) %)
     (only (micascheme) define)
     (prefix (leo fragment) %)
-    (mica parser)
-    (leo mica parser identifier)
-    (leo mica parser literal))
+    (mica reader)
+    (leo mica reader identifier)
+    (leo mica reader literal))
 
   (define (line-annotations-fragment $style)
     (switch (annotation literal)
