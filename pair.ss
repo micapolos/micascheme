@@ -6,7 +6,8 @@
     map-car
     map-cdr
     with-car
-    with-cdr)
+    with-cdr
+    cons/identity)
   (import
     (scheme)
     (lets)
@@ -45,4 +46,7 @@
     (syntax-rules ()
       ((_ (id pair) body)
         (map-cdr (lambda (id) body) pair))))
+
+  (define (cons/identity $car $cdr)
+    (if (null? $cdr) $car (cons $car $cdr)))
 )

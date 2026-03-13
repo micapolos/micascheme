@@ -36,3 +36,6 @@
     ($car (cons "foo" "bar"))
     (string-append $car "!"))
   (cons "foo" "bar!"))
+
+(check-equal? (cons/identity "foo" '()) "foo")
+(check-equal? (cons/identity "foo" "bar") (cons "foo" "bar"))

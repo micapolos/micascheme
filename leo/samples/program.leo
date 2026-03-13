@@ -23,6 +23,7 @@ define hello-world
 displayln "=== This is produced by program.leo ==="
 
 display hello-world
-: newline
+:
+  newline
 
 displayln "=== End of program.leo ==="

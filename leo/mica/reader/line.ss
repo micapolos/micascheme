@@ -31,7 +31,9 @@
                   (return
                     (%cons $literal-annotation $rhs-line-annotations)))))))
         ((%else _)
-          (suffixed (return $literal-annotation) #\newline)))))
+          (map
+            (one-of #\newline ", ")
+            (%always $literal-annotation))))))
 
   (define inline-annotation
     (lets
@@ -70,7 +72,7 @@
 
   (define rhs-colon-line-annotations
     (switch char
-      ((%char-space? _) (suffixed inline-annotations #\newline))
+      ((%char-space? _) line-annotations)
       ((%char-newline? _) rhs-newline-line-annotations)
       ((else $char) (error "unexpected char" $char))))
 
