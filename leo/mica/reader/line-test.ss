@@ -11,6 +11,10 @@
 
   ; literal + space
   (ok "foo bar\n" '(foo bar))
+  (ok "123 bar\n" '(123 bar))
+  (ok "\"foo\" bar\n" '("foo" bar))
+
+  ; literal + space + space
   (ok "foo bar goo\n" '(foo (bar goo)))
   (ok "123 bar goo\n" '(123 (bar goo)))
 
