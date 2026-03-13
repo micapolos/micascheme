@@ -56,31 +56,31 @@
 
   (define rhs-line-annotations
     (switch char
-      ((%char-space? _) space-line-annotations)
-      ((%char-colon? _) colon-line-annotations)
-      ((%char-comma? _) comma-line-annotations)
-      ((%char-newline? _) newline-line-annotations)
+      ((%char-space? _) rhs-space-line-annotations)
+      ((%char-colon? _) rhs-colon-line-annotations)
+      ((%char-comma? _) rhs-comma-line-annotations)
+      ((%char-newline? _) rhs-newline-line-annotations)
       ((else $char) (error "unexpected char" $char))))
 
   (define line-annotations
     (reject?-list %char-newline? line-annotation))
 
-  (define space-line-annotations
+  (define rhs-space-line-annotations
     (apply (%list line-annotation)))
 
-  (define colon-line-annotations
+  (define rhs-colon-line-annotations
     (switch char
       ((%char-space? _) (suffixed inline-annotations #\newline))
-      ((%char-newline? _) newline-line-annotations)
+      ((%char-newline? _) rhs-newline-line-annotations)
       ((else $char) (error "unexpected char" $char))))
 
   (define colon-line-annotation
-    (list-annotation (prefixed #\: colon-line-annotations)))
+    (list-annotation (prefixed #\: rhs-colon-line-annotations)))
 
-  (define comma-line-annotations
+  (define rhs-comma-line-annotations
     (replace #\space %null))
 
-  (define newline-line-annotations
+  (define rhs-newline-line-annotations
     (indented line-annotations))
 
   (define line
