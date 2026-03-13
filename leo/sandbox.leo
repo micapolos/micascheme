@@ -19,9 +19,9 @@ displayln comma-separated
   hello
   exclamated world
 
-displayln time lets-recursive
+displayln time let
   fibonacci
-  number 45
+  : number 45
   if
     less?: number, 2
     number
