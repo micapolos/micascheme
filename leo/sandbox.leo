@@ -1,6 +1,8 @@
 import
   leo scheme
-  leo math
+  only
+    less?, add, subtract
+    from leo math
 
 define hello "Hello"
 define world "world"
