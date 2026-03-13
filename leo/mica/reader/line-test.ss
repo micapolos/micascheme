@@ -4,11 +4,15 @@
   (leo mica reader line))
 
 (check-reader line
+  ; literals
   (ok "123\n" 123)
   (ok "\"foo\"\n" "foo")
   (ok "foo\n" 'foo)
+
+  ; literal + space
   (ok "foo bar\n" '(foo bar))
   (ok "foo bar goo\n" '(foo (bar goo)))
+  (ok "123 bar goo\n" '(123 (bar goo)))
 
   (ok ":\n" '())
   (ok ": 10\n" '(10))

@@ -19,21 +19,14 @@
   (define literal-line-annotation
     (lets
       ($literal-annotation (annotation literal))
-      (%switch (%annotation-stripped $literal-annotation)
-        ((%symbol? _)
-          (lets
-            ($rhs-line-annotations rhs-line-annotations)
-            (%switch (%datum/annotation-stripped $rhs-line-annotations)
-              ((%null? _)
-                (return $literal-annotation))
-              ((%else _)
-                (list-annotation
-                  (return
-                    (%cons $literal-annotation $rhs-line-annotations)))))))
+      ($rhs-line-annotations rhs-line-annotations)
+      (%switch (%datum/annotation-stripped $rhs-line-annotations)
+        ((%null? _)
+          (return $literal-annotation))
         ((%else _)
-          (map
-            (one-of #\newline ", ")
-            (%always $literal-annotation))))))
+          (list-annotation
+            (return
+              (%cons $literal-annotation $rhs-line-annotations)))))))
 
   (define inline-annotation
     (lets
