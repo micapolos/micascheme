@@ -29,6 +29,7 @@
     apply
     string->datum
     list non-empty-list
+    reject?-list
     skip-newlines
     prepend
     append
@@ -266,6 +267,15 @@
           $first-char?
           (eol?-list-getter
             (not? $first-char?)
+            (getter-item-getter $item)))))
+    ((reject?-list reject? item)
+      (%lets
+        ($item (the item))
+        (getter-item
+          (or? reject? (getter-item-first-char? $item))
+          (reject?-accept?-list-getter
+            reject?
+            (getter-item-first-char? $item)
             (getter-item-getter $item)))))
     ((non-empty-list item)
       (%lets

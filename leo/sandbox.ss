@@ -6,6 +6,10 @@
 
 (displayln "--------------------------------------------")
 (pretty-print
+  (getter-load! lines-getter "leo/sandbox.leo"))
+
+(displayln "--------------------------------------------")
+(pretty-print
   (getter-load! lines-getter "leo/samples/example.leo"))
 
 (displayln "--------------------------------------------")

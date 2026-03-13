@@ -10,16 +10,16 @@
   (ok "foo bar\n" '(foo bar))
   (ok "foo bar goo\n" '(foo (bar goo)))
 
-  ; (ok ":\n" '())
-  ; (ok ": 10\n" '(10))
-  ; (ok ": 10, 20\n" '(10 20)))
+  (ok ":\n" '())
+  (ok ": 10\n" '(10))
+  (ok ": 10, 20\n" '(10 20))
 
-  ; (ok ":\n" '())
-  ; (ok ":\n  10\n" '(10))
-  ; (ok ":\n  10\n  20\n" '(10 20))
+  (ok ":\n" '())
+  (ok ":\n  10\n" '(10))
+  (ok ":\n  10\n  20\n" '(10 20))
 
-  ; (ok "foo :\n" '(foo ()))
-  ; (ok "foo bar :\n" '(foo (bar ()))))
+  (ok "foo :\n" '(foo ()))
+  (ok "foo bar :\n" '(foo (bar ())))
 
   (ok "foo, " 'foo)
   (error "123 "))
@@ -63,10 +63,19 @@
 
   (ok
     (lines-string
-      "point"
+      "circle"
       ""
-      "  x 10"
+      "  center point"
       ""
+      "    x 10"
       ""
-      "  y 20")
-    '(point (x 10) (y 20))))
+      "    y 10"
+      ""
+      "  radius 10"
+      "")
+    '(circle
+      (center
+        (point
+          (x 10)
+          (y 10)))
+      (radius 10))))

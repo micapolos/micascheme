@@ -151,6 +151,23 @@
 
 (lets
   ($getter
+    (reject?-accept?-list-getter
+      char-whitespace?
+      char-alphabetic?
+      (test?-char-getter char-alphabetic?)))
+  (run
+    (check-gets $getter "" '() 0)
+    (check-gets $getter "f" '(#\f) 1)
+    (check-gets $getter " f" '(#\f) 2)
+    (check-gets $getter "  f" '(#\f) 3)
+    (check-gets $getter "fo" '(#\f #\o) 2)
+    (check-gets $getter "f o" '(#\f #\o) 3)
+    (check-gets $getter "f  o" '(#\f #\o) 4)
+    (check-gets $getter "f  o " '(#\f #\o) 5)
+    (check-gets $getter "f  o  " '(#\f #\o) 6)))
+
+(lets
+  ($getter
     (separated-getter
       (getter-item char-alphabetic? (test?-char-getter char-alphabetic?))
       (getter-item char-comma? (exact-getter ", "))))

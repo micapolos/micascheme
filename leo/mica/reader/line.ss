@@ -12,6 +12,11 @@
     (leo mica reader literal))
 
   (define line-annotation
+    (one-of
+      colon-line-annotation
+      literal-line-annotation))
+
+  (define literal-line-annotation
     (lets
       ($literal-annotation (annotation literal))
       (%switch (%annotation-stripped $literal-annotation)
@@ -58,7 +63,7 @@
       ((else $char) (error "unexpected char" $char))))
 
   (define line-annotations
-    (list (skip-newlines line-annotation)))
+    (reject?-list %char-newline? line-annotation))
 
   (define space-line-annotations
     (apply (%list line-annotation)))
@@ -68,6 +73,9 @@
       ((%char-space? _) (suffixed inline-annotations #\newline))
       ((%char-newline? _) newline-line-annotations)
       ((else $char) (error "unexpected char" $char))))
+
+  (define colon-line-annotation
+    (list-annotation (prefixed #\: colon-line-annotations)))
 
   (define comma-line-annotations
     (replace #\space %null))

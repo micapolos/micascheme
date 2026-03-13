@@ -67,6 +67,9 @@
     eol?-list-getter
     list-getter
 
+    reject?-accept?-push-getter
+    reject?-accept?-list-getter
+
     alphabetic-string-getter
     numeric-string-getter
 
@@ -335,6 +338,33 @@
 
   (define numeric-string-getter
     (string-while-getter char-numeric?))
+
+  (define (reject?-accept?-push-getter $reject? $accept? $stack $getter)
+    (getter-switch peek-char/eof-getter
+      ((eof? _)
+        (getter $stack))
+      (($reject? _)
+        (getter-lets
+          (_ char-getter)
+          (reject?-accept?-push-getter
+            $reject?
+            $accept?
+            $stack
+            $getter)))
+      (($accept? _)
+        (getter-lets
+          ($value $getter)
+          (reject?-accept?-push-getter
+            $reject?
+            $accept?
+            (push $stack $value)
+            $getter)))
+      ((else _)
+        (getter $stack))))
+
+  (define (reject?-accept?-list-getter $reject? $accept? $getter)
+    (apply-getter reverse
+      (reject?-accept?-push-getter $reject? $accept? (stack) $getter)))
 
   (define (eol?-push-getter $eol? $stack $getter)
     (getter-switch peek-char/eof-getter

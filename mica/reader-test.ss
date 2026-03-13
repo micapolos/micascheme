@@ -151,6 +151,17 @@
   (error "a")
   (error "1a"))
 
+(check-reader (reject?-list %char-whitespace? alphabetic-char)
+  (ok "" '())
+  (ok "f" '(#\f))
+  (ok " f" '(#\f))
+  (ok "  f" '(#\f))
+  (ok "fo" '(#\f #\o))
+  (ok "f o" '(#\f #\o))
+  (ok "f  o" '(#\f #\o))
+  (ok "f  o " '(#\f #\o))
+  (ok "f  o  " '(#\f #\o)))
+
 (check-reader (non-empty-separated ", " alphabetic-char)
   (ok "a" (%list #\a))
   (ok "a, b" (%list #\a #\b))
