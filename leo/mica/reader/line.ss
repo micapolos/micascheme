@@ -58,7 +58,7 @@
     (switch char
       ((%char-space? _) rhs-space-line-annotations)
       ((%char-colon? _) rhs-colon-line-annotations)
-      ((%char-comma? _) rhs-comma-line-annotations)
+      ;((%char-comma? _) rhs-comma-line-annotations)
       ((%char-newline? _) rhs-newline-line-annotations)
       ((else $char) (error "unexpected char" $char))))
 

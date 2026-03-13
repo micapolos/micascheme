@@ -14,7 +14,8 @@
   (ok ": 10\n" '(10))
   (ok ": 10, 20\n" '(10 20))
   (ok ": 10, 20\n" '(10 20))
-  ;(ok ": foo\n" '(10 20))
+  (ok ": foo 10\n" '((foo 10)))
+  ;(ok ": foo, 10\n" '(foo 10))
 
   (ok ":\n" '())
   (ok ":\n  10\n" '(10))
@@ -23,7 +24,7 @@
   (ok "foo :\n" '(foo ()))
   (ok "foo bar :\n" '(foo (bar ())))
 
-  (ok "foo, " 'foo)
+  ;(ok "foo, " 'foo)
   (error "123 "))
 
 (check-reader lines
