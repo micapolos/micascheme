@@ -38,16 +38,6 @@
       ((annotation? $annotation) (annotation-expression $annotation))
       ((else $datum) $datum)))
 
-  (define (annotation-cons $car $cdr)
-    (make-annotation
-      (cons $car $cdr)
-      (append-source-object
-        (annotation-source $car)
-        (annotation-source $cdr))
-      (cons
-        (annotation-stripped $car)
-        (annotation-stripped $cdr))))
-
   (define (append-annotation $annotation . $annotations)
     (make-annotation
       (apply list
@@ -74,10 +64,17 @@
   (define (to-annotation $obj $source-object)
     (switch $obj
       ((annotation? $annotation) $annotation)
+      ((pair? $pair) (annotation-cons $source-object (car $pair) (cdr $pair)))
       ((else $other) (stripped-annotation $other $source-object))))
 
   (define (stripped-annotation $stripped $source-object)
     (make-annotation $stripped $source-object $stripped))
+
+  (define (annotation-cons $source-object $a $b)
+    (make-annotation
+      (cons (datum/annotation-stripped $a) (datum/annotation-stripped $b))
+      $source-object
+      (cons $a $b)))
 
   (define (list-annotation $list $source-object)
     (make-annotation
