@@ -4,7 +4,7 @@
     leo-expand)
   (import
     (micascheme)
-    (leo transform))
+    (only (leo transform) transform-leo))
 
   (define (leo-expand $datum . $args)
     (apply sc-expand

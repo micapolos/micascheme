@@ -1,13 +1,12 @@
 (library (leo scheme)
   (export library import define lambda)
   (import
-    (except (micascheme)
-      library import define lambda)
+    (except (micascheme) library import define lambda with from)
     (leo transform))
   (export
     (import
-      (except (micascheme)
-        library import define lambda)))
+      (except (micascheme) library import define lambda with from)
+      (only (leo transform) from with)))
 
   (define-syntax library transform-library)
   (define-syntax import transform-import)

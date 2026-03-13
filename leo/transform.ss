@@ -1,5 +1,6 @@
 (library (leo transform)
   (export
+    from with
     transform-name
     transform-export
     transform-import
@@ -10,8 +11,10 @@
     transform-lambda
     transform-leo)
   (import
-    (micascheme)
+    (except (micascheme) from with)
     (keyword))
+
+  (define-keywords from with)
 
   (define (transform-identifier $syntax)
     (syntax-case $syntax ()
@@ -63,20 +66,20 @@
         (transform-identifier #'id))))
 
   (define (transform-import-spec $syntax)
-    (syntax-case $syntax (except only rename prefix)
-      ((except id ... spec)
+    (syntax-case $syntax (except only rename prefix from)
+      ((except id ... (from spec))
         #`(except
           #,(transform-import-spec #'spec)
           #,@(map transform-identifier #'(id ...))))
-      ((only id ... spec)
+      ((only id ... (from spec))
         #`(only
           #,(transform-import-spec #'spec)
           #,@(map transform-identifier #'(id ...))))
-      ((rename rename-spec ... import-spec)
+      ((rename rename-spec ... (from import-spec))
         #`(rename
           #,(transform-import-spec #'import-spec)
           #,@(map transform-rename-spec #'(rename-spec ...))))
-      ((prefix (id import-spec))
+      ((prefix (id (from import-spec)))
         #`(prefix
           #,(transform-import-spec #'import-spec)
           #,(transform-identifier #'id)))
@@ -113,8 +116,8 @@
         (syntax-error $syntax "invalid define"))))
 
   (define (transform-lambda $syntax)
-    (syntax-case $syntax ()
-      ((_ param ... body)
+    (syntax-case $syntax (with)
+      ((_ (with param ...) body)
         #`(lambda (#,@(map transform-identifier #'(param ...))) body))
       (_
         (syntax-error $syntax "invalid lambda"))))

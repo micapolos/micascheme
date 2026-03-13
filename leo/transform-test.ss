@@ -1,4 +1,6 @@
-(import (micascheme) (leo transform))
+(import
+  (except (micascheme) with from)
+  (leo transform))
 
 (check
   (equal?
@@ -37,7 +39,7 @@
         #'(rename
           (a %a)
           (b %b)
-          (foo (bar goo)))))
+          (from (foo (bar goo))))))
     (syntax->datum
       '(rename
         (foo bar goo)
@@ -48,7 +50,7 @@
   (equal?
     (syntax->datum
       (transform-import-spec
-        #'(only a b (foo (bar goo)))))
+        #'(only a b (from (foo (bar goo))))))
     (syntax->datum
       '(only (foo bar goo) a b))))
 
@@ -56,14 +58,16 @@
   (equal?
     (syntax->datum
       (transform-import-spec
-        #'(except a b (foo (bar goo)))))
+        #'(except a b (from (foo (bar goo))))))
     (syntax->datum
       '(except (foo bar goo) a b))))
 
 (check
   (equal?
-    (syntax->datum (transform-export #'(export foo bar)))
-    (syntax->datum '(export foo bar))))
+    (syntax->datum
+      (transform-export #'(export foo bar)))
+    (syntax->datum
+      '(export foo bar))))
 
 (check
   (equal?
@@ -110,6 +114,6 @@
   (equal?
     (syntax->datum
       (transform-lambda
-        #'(lambda x y (+ x y))))
+        #'(lambda (with x y) (+ x y))))
     (syntax->datum
       '(lambda (x y) (+ x y)))))
