@@ -5,6 +5,11 @@
   (getter)
   (prefix (annotation) %))
 
+(check-reader (error "dupa" 123)
+  (error "")
+  (error "dupa")
+  (error "123"))
+
 (check-reader eof
   (ok "" %eof)
   (error "a"))
@@ -177,6 +182,15 @@
 
 (check-reader (annotation string)
   (ok "foo" (%stripped-annotation "foo" (test-source-object 0 3))))
+
+(check-reader (list-annotation (list (annotation char)))
+  (ok "foo"
+    (%list-annotation
+      (%list
+        (%stripped-annotation #\f (test-source-object 0 1))
+        (%stripped-annotation #\o (test-source-object 1 2))
+        (%stripped-annotation #\o (test-source-object 2 3)))
+      (test-source-object 0 3))))
 
 (check-reader
   (lets

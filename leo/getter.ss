@@ -40,12 +40,11 @@
             ($atom-annotation atom-annotation-getter)
             (switch (annotation-stripped $atom-annotation)
               ((symbol? $symbol)
-                (getter-lets
-                  (getter-switch rhs-line-annotations-getter
-                    ((null? _)
-                      (getter $atom-annotation))
-                    ((else $rhs-line-annotations)
-                      (getter (cons $atom-annotation $rhs-line-annotations))))))
+                (getter-switch rhs-line-annotations-getter
+                  ((null? _)
+                    (getter $atom-annotation))
+                  ((else $rhs-line-annotations)
+                    (getter (cons $atom-annotation $rhs-line-annotations)))))
               ((else _)
                 (ending-getter
                   (getter $atom-annotation)

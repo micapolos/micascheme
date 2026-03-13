@@ -3,6 +3,7 @@
     read-string
     return
     or
+    error
     eof
     char ?char
     category-char
@@ -41,6 +42,7 @@
     check-read-error
     check-reader ok error
     annotation
+    list-annotation
     lets
     switch
     else)
@@ -58,11 +60,12 @@
       (else %else)
       (or %or)
       (null %null)
-      (lets %lets))
+      (lets %lets)
+      (list-annotation %list-annotation))
     (keyword)
     (getter))
 
-  (define-keywords not > else ok error)
+  (define-keywords not > else ok)
 
   (define (read-string $reader $string)
     (%lets
@@ -73,6 +76,11 @@
           test-sfd
           0 0 0 0))
       $value))
+
+  (define (error $message $datum)
+    (getter-item
+      (always #f)
+      (error-getter $message $datum)))
 
   (define eof
     (getter-item (lambda (_) #f) eof-getter))
@@ -282,12 +290,20 @@
           (%apply %string-append $strings))))
     ((annotation item)
       (%lets
-        ($item item)
+        ($item (the item))
         (getter-item
           (getter-item-first-char? $item)
           (annotation-getter
             (getter-item-getter $item)
             stripped-annotation))))
+    ((list-annotation list)
+      (%lets
+        ($list (the list))
+        (getter-item
+          (getter-item-first-char? $list)
+          (annotation-getter
+            (getter-item-getter $list)
+            %list-annotation))))
     ((lets (id expr) (ids exprs) ... body)
       (%lets
         ($expr (the expr))
