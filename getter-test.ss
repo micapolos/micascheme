@@ -60,7 +60,7 @@
 
 (check-gets
   (annotation-getter
-    (list-of-getter (annotation-getter char-getter stripped-annotation))
+    (list-getter (annotation-getter char-getter stripped-annotation))
     list-annotation)
   "abc"
   (list-annotation
@@ -143,15 +143,15 @@
 (check-gets (optional-getter char-numeric? numeric-string-getter) "abc" #f)
 (check-gets (optional-getter char-numeric? numeric-string-getter) "123abc" "123")
 
-(check-gets (eol?-list-of-getter char-whitespace? (exact-string-getter "foo")) "" '() 0)
-(check-gets (eol?-list-of-getter char-whitespace? (exact-string-getter "foo")) " " '() 0)
-(check-gets (eol?-list-of-getter char-whitespace? (exact-string-getter "foo")) "foo" '("foo") 3)
-(check-gets (eol?-list-of-getter char-whitespace? (exact-string-getter "foo")) "foo bar" '("foo") 3)
-(check-gets (eol?-list-of-getter char-whitespace? (exact-string-getter "foo")) "foofoo bar" '("foo" "foo") 6)
+(check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "" '() 0)
+(check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) " " '() 0)
+(check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "foo" '("foo") 3)
+(check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "foo bar" '("foo") 3)
+(check-gets (eol?-list-getter char-whitespace? (exact-string-getter "foo")) "foofoo bar" '("foo" "foo") 6)
 
 (lets
   ($getter
-    (reject?-accept?-list-of-getter
+    (reject?-accept?-list-getter
       char-whitespace?
       char-alphabetic?
       (test?-char-getter char-alphabetic?)))

@@ -14,13 +14,13 @@
   (define number
     (string->datum
       (list->string
-        (non-empty-list-of digit-char))))
+        (non-empty-list digit-char))))
 
   ; TODO: Implement it properly
   (define string-literal
     (wrapped
       #\"
-      (list-string (list-of (string (first-char (not #\" #\newline) char))))
+      (list-string (list (string (first-char (not #\" #\newline) char))))
       #\"))
 
   ; TODO: Implement it properly
