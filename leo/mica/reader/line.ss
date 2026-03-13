@@ -58,7 +58,7 @@
       ((else $char) (error "unexpected char" $char))))
 
   (define line-annotations
-    (reject?-list %char-newline? line-annotation))
+    (reject?-list-of %char-newline? line-annotation))
 
   (define rhs-space-line-annotations
     (apply (%list line-annotation)))

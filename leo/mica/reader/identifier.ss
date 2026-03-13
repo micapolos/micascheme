@@ -62,7 +62,7 @@
       (string special-subsequent-char)))
 
   (define subsequent-list-string
-    (list-string (list subsequent-string)))
+    (list-string (list-of subsequent-string)))
 
   (define peculiar-identifier-string
     (one-of "+" "..."

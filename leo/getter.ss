@@ -80,7 +80,7 @@
           (getter $atom-annotation)))))
 
   (define line-annotations-getter
-    (reject?-accept?-list-getter
+    (reject?-accept?-list-of-getter
       char-newline?
       (getter-item-first-char? %literal)
       line-annotation-getter))

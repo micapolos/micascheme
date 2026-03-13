@@ -32,8 +32,8 @@
     map
     apply
     string->datum
-    list non-empty-list
-    reject?-list
+    list-of non-empty-list-of
+    reject?-list-of
     skip-newlines
     prepend
     append
@@ -281,34 +281,34 @@
       (apply (%prepend (the item) (the list))))
     ((append item ...)
       (apply (%append (the item) ...)))
-    ((list item)
+    ((list-of item)
       (%lets
         ($item (the item))
         ($first-char? (getter-item-first-char? (the item)))
         (getter-item
           $first-char?
-          (eol?-list-getter
+          (eol?-list-of-getter
             (not? $first-char?)
             (getter-item-getter $item)))))
-    ((reject?-list reject? item)
+    ((reject?-list-of reject? item)
       (%lets
         ($item (the item))
         (getter-item
           (or? reject? (getter-item-first-char? $item))
-          (reject?-accept?-list-getter
+          (reject?-accept?-list-of-getter
             reject?
             (getter-item-first-char? $item)
             (getter-item-getter $item)))))
-    ((non-empty-list item)
+    ((non-empty-list-of item)
       (%lets
         ($item (the item))
-        (prepend $item (list item))))
+        (prepend $item (list-of item))))
     ((non-empty-separated separator item)
       (%lets
         ($item (the item))
         (prepend
           $item
-          (list (prefixed (the separator) $item)))))
+          (list-of (prefixed (the separator) $item)))))
     ((separated separator item)
       (or
         (optional (non-empty-separated separator item))

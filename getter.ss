@@ -65,11 +65,11 @@
     eol?-push-getter
     push-getter
 
-    eol?-list-getter
-    list-getter
+    eol?-list-of-getter
+    list-of-getter
 
     reject?-accept?-push-getter
-    reject?-accept?-list-getter
+    reject?-accept?-list-of-getter
 
     alphabetic-string-getter
     numeric-string-getter
@@ -363,7 +363,7 @@
       ((else _)
         (getter $stack))))
 
-  (define (reject?-accept?-list-getter $reject? $accept? $getter)
+  (define (reject?-accept?-list-of-getter $reject? $accept? $getter)
     (apply-getter reverse
       (reject?-accept?-push-getter $reject? $accept? (stack) $getter)))
 
@@ -386,11 +386,11 @@
   (define (push-getter $stack $getter)
     (eol?-push-getter (lambda (_) #f) $stack $getter))
 
-  (define (eol?-list-getter $eol? $getter)
+  (define (eol?-list-of-getter $eol? $getter)
     (apply-getter reverse
       (eol?-push-getter $eol? (stack) $getter)))
 
-  (define (list-getter $getter)
+  (define (list-of-getter $getter)
     (apply-getter reverse
       (push-getter (stack) $getter)))
 
@@ -469,7 +469,7 @@
   (define (non-empty-separated-getter $item-getter $separator-getter-item)
     (apply-getter cons
       $item-getter
-      (eol?-list-getter
+      (eol?-list-of-getter
         (not? (getter-item-first-char? $separator-getter-item))
         (starting-getter
           (getter-item-getter $separator-getter-item)

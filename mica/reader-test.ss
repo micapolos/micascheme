@@ -144,14 +144,14 @@
   (ok "2" "2")
   (error "+"))
 
-(check-reader (list digit)
+(check-reader (list-of digit)
   (ok "" (%list))
   (ok "1" (%list 1))
   (ok "123" (%list 1 2 3))
   (error "a")
   (error "1a"))
 
-(check-reader (reject?-list %char-whitespace? alphabetic-char)
+(check-reader (reject?-list-of %char-whitespace? alphabetic-char)
   (ok "" '())
   (ok "f" '(#\f))
   (ok " f" '(#\f))
@@ -189,9 +189,9 @@
     (append
       (prepend
         (optional (one-of #\+ #\-))
-        (non-empty-list numeric-char))
+        (non-empty-list-of numeric-char))
       (or
-        (optional (prepend #\. (non-empty-list numeric-char)))
+        (optional (prepend #\. (non-empty-list-of numeric-char)))
         null))
     %?filter
     %list->string
@@ -208,7 +208,7 @@
 (check-reader (annotation string)
   (ok "foo" (%stripped-annotation "foo" (test-source-object 0 3))))
 
-(check-reader (list-annotation (list (annotation char)))
+(check-reader (list-annotation (list-of (annotation char)))
   (ok "foo"
     (%list-annotation
       (%list
