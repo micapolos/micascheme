@@ -179,6 +179,13 @@
   (ok "foo" (%stripped-annotation "foo" (test-source-object 0 3))))
 
 (check-reader
+  (lets
+    ($char #\a)
+    ($string "foo")
+    (return (%list $char $string)))
+  (ok "afoo" '(#\a "foo")))
+
+(check-reader
   (switch alphabetic-char
     (((%partial %char=? #\a) $a)
       (prefixed "-1" (return $a)))

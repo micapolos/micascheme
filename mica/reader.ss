@@ -41,6 +41,7 @@
     check-read-error
     check-reader ok error
     annotation
+    lets
     switch
     else)
   (import
@@ -56,14 +57,15 @@
       (char %char)
       (else %else)
       (or %or)
-      (null %null))
+      (null %null)
+      (lets %lets))
     (keyword)
     (getter))
 
   (define-keywords not > else ok error)
 
   (define (read-string $reader $string)
-    (lets
+    (%lets
       ((values $value $bfp $line $column)
         (getter-get!
           (ending-getter (getter-item-getter $reader) eof-getter)
@@ -139,7 +141,7 @@
     ((category-char cat ...)
       (?char
         (lambda ($char)
-          (lets
+          (%lets
             ($category (char-general-category $char))
             (%or (symbol=? $category 'cat) ...)))))
     ((range-char from to)
@@ -166,7 +168,7 @@
         (lambda ($string)
           (read (open-input-string $string)))))
     ((first-char test? ... reader)
-      (lets
+      (%lets
         ($reader (the reader))
         (getter-item
           (lambda ($char)
@@ -233,7 +235,7 @@
     ((append item ...)
       (apply (%append (the item) ...)))
     ((list item)
-      (lets
+      (%lets
         ($item (the item))
         ($first-char? (getter-item-first-char? (the item)))
         (getter-item
@@ -242,11 +244,11 @@
             (not? $first-char?)
             (getter-item-getter $item)))))
     ((non-empty-list item)
-      (lets
+      (%lets
         ($item (the item))
         (prepend $item (list item))))
     ((non-empty-separated separator item)
-      (lets
+      (%lets
         ($item (the item))
         (prepend
           $item
@@ -258,7 +260,7 @@
     ((or) (return #f))
     ((or x1) x1)
     ((or x1 x2)
-      (lets
+      (%lets
         ($x1 (the x1))
         ($x2 (the x2))
         (getter-item
@@ -279,15 +281,24 @@
         (lambda ($strings)
           (%apply %string-append $strings))))
     ((annotation item)
-      (lets
+      (%lets
         ($item item)
         (getter-item
           (getter-item-first-char? $item)
           (annotation-getter
             (getter-item-getter $item)
             stripped-annotation))))
+    ((lets (id expr) (ids exprs) ... body)
+      (%lets
+        ($expr (the expr))
+        (getter-item
+          (getter-item-first-char? $expr)
+          (getter-lets
+            (id (getter-item-getter $expr))
+            (ids (getter-item-getter (the exprs))) ...
+            (the (getter-item-getter body))))))
     ((switch x ((pred? id) expr) ... ((else else-id) else-expr))
-      (lets
+      (%lets
         ($x (the x))
         (getter-item
           (getter-item-first-char? $x)
@@ -311,7 +322,7 @@
       (check-read-error reader in)))
 
   (define-rule-syntax (check-reader reader case ...)
-    (lets
+    (%lets
       ($reader (the reader))
       (run-void (check-reader-case $reader case) ...)))
 )
