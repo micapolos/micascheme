@@ -1,15 +1,13 @@
 library
   leo samples library
   export
-    native, native?, native-ref
-    application, application?, application-lhs, application-rhs
-    abstraction, abstraction?, abstraction-procedure
+    hello
+    world
+    exclamate
+    comma-separated
     hello-world
   import
     leo scheme
-  data native ref
-  data application: lhs, rhs
-  data abstraction procedure
   define hello "Hello"
   define world "world"
   define exclamation "!"

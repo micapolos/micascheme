@@ -15,16 +15,16 @@ define comma-separated lambda
   with: string-a, string-b
   string-append: string-a, ", ", string-b
 
-displayln comma-separated
+pretty-print comma-separated
   hello
   exclamated world
 
-displayln time lets-recursive
-  fibonacci
-  number 45
-  if
-    less?: number, 2
-    number
-    add
-      fibonacci subtract: number, 1
-      fibonacci subtract: number, 2
+pretty-print time
+  let fibonacci
+    with number 45
+    if
+      less?: number, 2
+      number
+      add
+        fibonacci subtract: number, 1
+        fibonacci subtract: number, 2

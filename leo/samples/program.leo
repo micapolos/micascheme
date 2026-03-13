@@ -20,10 +20,6 @@ define hello-world
     hello
     exclamate world
 
-displayln "=== This is produced by program.leo ==="
-
-display hello-world
-:
-  newline
-
-displayln "=== End of program.leo ==="
+pretty-print "=== This is produced by program.leo ==="
+pretty-print hello-world
+pretty-print "=== End of program.leo ==="
