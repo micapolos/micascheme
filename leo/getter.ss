@@ -96,7 +96,7 @@
       ((char-space? _)
         (ending-getter inline-annotations-getter newline-getter))
       ((char-newline? _)
-        (getter null))))
+        newline-line-annotations-getter)))
 
   (define comma-line-annotations-getter
     (replace-getter space-getter null))

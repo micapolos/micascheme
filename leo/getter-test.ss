@@ -13,6 +13,10 @@
 (check-gets line-getter ": 10\n" '(10) 5)
 (check-gets line-getter ": 10, 20\n" '(10 20) 9)
 
+(check-gets line-getter ":\n" '() 2)
+(check-gets line-getter ":\n  10\n" '(10) 7)
+(check-gets line-getter ":\n  10\n  20\n" '(10 20) 12)
+
 (check-gets line-getter "foo :\n" '(foo ()) 6)
 (check-gets line-getter "foo bar :\n" '(foo (bar ())) 10)
 
