@@ -70,3 +70,14 @@
   (equal?
     (language-expand test-language "foo" (scheme-environment))
     `(missing foo)))
+
+(check
+  (works
+    (language-call (scheme-language "testss")
+      (lambda ()
+        (load "language-example.testss")))))
+
+(check
+  (works
+    (with-language (scheme-language "testss")
+      (load "language-example.testss"))))
