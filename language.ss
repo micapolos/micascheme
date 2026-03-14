@@ -73,17 +73,15 @@
           (lambda ()
             (switch ($read)
               ((eof? $eof) $eof)
-              ((else $value) (cons $extension $value))))))
+              ((else $value) (cons $language $value))))))
       (lambda ($datum $environment)
         (or
           (switch? $datum
             ((pair? $pair)
               (switch? (car $pair)
-                ((string? $string)
-                  (lets
-                    ($language (languages-extension-ref $languages $string))
-                    (language-expand $language (cdr $datum) $environment))))))
-          (throw languages-datum->language $languages $datum)))))
+                ((language? $language)
+                  (language-expand $language (cdr $datum) $environment)))))
+          (throw invalid-languages-datum $languages $datum)))))
 
   (define (language-append . $languages)
     (list->language $languages))

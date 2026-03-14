@@ -7,6 +7,7 @@
   (eof)
   (procedure)
   (string)
+  (annotation)
   (language))
 
 (define (make-test-language $extension . $extensions)
@@ -39,13 +40,19 @@
 (define test-language (make-test-language "testa" "testb"))
 (define list-language (language-append test-language scheme-language))
 
+; --- language?
+
 (check (language? test-language))
 (check (not (language? "language")))
+
+; --- language-extensions
 
 (check
   (equal?
     (language-extensions test-language)
     (list "testa" "testb")))
+
+; --- language-library-extensions
 
 (check
   (equal?
@@ -53,6 +60,8 @@
     '(
       (".testa" . ".so")
       (".testb" . ".so"))))
+
+; --- language-make-read
 
 (lets
   ($read
@@ -64,6 +73,8 @@
     (check (equal? ($read) '("foo" 13)))
     (check (equal? ($read) '("bar" 17)))
     (check (eof? ($read)))))
+
+; --- language-expand
 
 (check
   (equal?
@@ -80,11 +91,80 @@
     (language-expand test-language "foo" (scheme-environment))
     `(missing foo)))
 
+; --- language-append
+
+(lets
+  ($language (language-append test-language scheme-language))
+  (run
+    ; --- language-extensions
+    (check
+      (equal?
+        (language-extensions $language)
+        (list "testa" "testb" "ss" "sls" "scm" "sch")))
+
+    ; --- language-read .testa
+    (lets
+      ($sfd (source-file-descriptor "source.testa" 0))
+      ($read
+        (language-make-read $language
+          (open-input-string (lines-string "foo" "bar"))
+          $sfd
+          10))
+      (run
+        (check (equal? ($read) (list test-language "foo" 13)))
+        (check (equal? ($read) (list test-language "bar" 17)))
+        (check (eof? ($read)))))
+
+    ; --- language-read .ss
+    (lets
+      ($sfd (source-file-descriptor "source.ss" 0))
+      ($read
+        (language-make-read $language
+          (open-input-string (lines-string "foo" "bar"))
+          $sfd
+          10))
+      (run
+        (check
+          (datum/annotation=? ($read)
+            (cons
+              scheme-language
+              (stripped-annotation
+                'foo
+                (make-source-object $sfd 10 13)))))
+        (check
+          (datum/annotation=? ($read)
+            (cons
+              scheme-language
+              (stripped-annotation
+                'bar
+                (make-source-object $sfd 14 17)))))
+        (check (eof? ($read)))))
+
+    ; --- test-language expand
+    (check
+      (equal?
+        (language-expand $language
+          (cons test-language "string-append")
+          (scheme-environment))
+        `(value string-append)))
+
+    ; --- scheme-language expand
+    (check
+      (equal?
+        (language-expand $language
+          (cons scheme-language '(+ 2 2))
+          (scheme-environment))
+        '(($primitive 2 +) 2 2)))))
+
+; --- language-call
+
 (check
   (works
     (language-call scheme-language
       (lambda ()
         (load "language-example.ss")))))
+
+; --- with-language
 
 (check
   (works
