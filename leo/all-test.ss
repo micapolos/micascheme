@@ -16,4 +16,5 @@
   (leo path)
   (leo source-file-descriptor)
   (leo read)
+  (leo language)
   (leo load))
