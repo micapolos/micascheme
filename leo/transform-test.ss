@@ -91,29 +91,3 @@
         (export foo bar)
         (import (zoo zar zoo))
         a b c))))
-
-(check
-  (equal?
-    (syntax->datum
-      (transform-define
-        #'(define (x 10))))
-    (syntax->datum
-      '(define x 10))))
-
-(check
-  (equal?
-    (syntax->datum
-      (transform-define
-        #'(define (comma-separated x y)
-          (string-append x y))))
-    (syntax->datum
-      '(define (comma-separated x y)
-        (string-append x y)))))
-
-(check
-  (equal?
-    (syntax->datum
-      (transform-lambda
-        #'(lambda (with x y) (+ x y))))
-    (syntax->datum
-      '(lambda (x y) (+ x y)))))

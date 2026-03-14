@@ -2,7 +2,6 @@ import leo scheme
 
 define hello "Hello"
 define world "world"
-
 define
   exclamated string
   string-append: string, "!"

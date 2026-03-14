@@ -7,8 +7,6 @@
     transform-export-spec
     transform-import-spec
     transform-library
-    transform-define
-    transform-lambda
     transform-leo)
   (import
     (except (micascheme) from with)
@@ -106,29 +104,11 @@
       (_
         (syntax-error $syntax "invalid top level program"))))
 
-  (define (transform-define $syntax)
-    (syntax-case $syntax ()
-      ((_ (id x))
-        #`(define #,(transform-identifier #'id) x))
-      ((_ (id x ...) body)
-        #`(define (#,(transform-identifier #'id) x ...) body))
-      (_
-        (syntax-error $syntax "invalid define"))))
-
-  (define (transform-lambda $syntax)
-    (syntax-case $syntax (with)
-      ((_ (with param ...) body)
-        #`(lambda (#,@(map transform-identifier #'(param ...))) body))
-      (_
-        (syntax-error $syntax "invalid lambda"))))
-
   (define (transform-leo $syntax)
     (syntax-case $syntax (library import define lambda with top-level-program)
       (("noexpand" . x) $syntax)
       ((library . x) (transform-library $syntax))
       ((import . x) (transform-import $syntax))
-      ((define . x) (transform-define $syntax))
-      ((lambda . x) (transform-lambda $syntax))
       ((top-level-program . x) (transform-top-level-program $syntax))
-      (_ (syntax-error $syntax "invalid leo"))))
+      (_ $syntax)))
 )

@@ -13,7 +13,7 @@
     (begin
       (invoke-library '(leo scheme))
       (with-language
-        leo-language
-        ;(language-append leo-language scheme-language)
+        ;leo-language
+        (language-append leo-language scheme-language)
         x xs ...)))
 )

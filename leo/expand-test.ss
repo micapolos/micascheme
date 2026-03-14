@@ -2,8 +2,8 @@
 
 (check
   (equal?
-    (leo-expand-once '(define (x 10)))
-    '(define x 10)))
+    (leo-expand-once '(import (foo (bar goo))))
+    '(import (foo bar goo))))
 
 (check
   (equal?
