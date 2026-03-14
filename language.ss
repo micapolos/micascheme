@@ -83,7 +83,11 @@
             ((pair? $pair)
               (switch? (car $pair)
                 ((procedure? $procedure)
-                  (apply $procedure (cdr $datum) $environment $args)))))
+                  (apply $procedure (cdr $datum) $environment $args))
+                ((string? $string)
+                  (case $string
+                    (("noexpand") (cadr $datum))
+                    (else #f))))))
           (throw invalid-languages-datum $languages $datum)))))
 
   (define (language-append . $languages)
