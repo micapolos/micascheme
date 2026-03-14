@@ -1,5 +1,6 @@
 import leo scheme
 
+pretty-print quote calculating fibonacci 45
 pretty-print time
   let fibonacci
     with number 45

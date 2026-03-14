@@ -39,7 +39,7 @@
   (io)
   (keyword)
   (language)
-  (leo)
+  (leo-old)
   (leo-syntax)
   (leo2)
   (let)

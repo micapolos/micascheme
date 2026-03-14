@@ -1,6 +1,6 @@
 (import
   (except (micascheme) pair)
-  (leo)
+  (leo-old)
   (term)
   (compiler))
 
