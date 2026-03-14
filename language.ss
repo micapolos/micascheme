@@ -6,6 +6,7 @@
     language-make-read-procedure
     language-expand-procedure
 
+    scheme-language
     extension-language=?
 
     language-library-extension
@@ -14,6 +15,8 @@
   (import (scheme) (lets) (switch) (eof) (data))
 
   (data (language extension make-read-procedure expand-procedure))
+
+  (define scheme-language (language "ss" default-make-read-handler sc-expand))
 
   (define (extension-language=? $extension $language)
     (string=? $extension (language-extension $language)))
