@@ -12,5 +12,8 @@
   (define-rule-syntax (leo x xs ...)
     (begin
       (invoke-library '(leo scheme))
-      (with-language leo-language x xs ...)))
+      (with-language
+        leo-language
+        ;(language-append leo-language scheme-language)
+        x xs ...)))
 )

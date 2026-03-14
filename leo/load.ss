@@ -7,9 +7,5 @@
     (leo getter))
 
   (define (load-leo-program $path)
-    (leo
-      (eval
-        `(top-level-program
-          ,@(getter-load! line-annotations-getter $path))
-        (copy-environment (scheme-environment) #t))))
+    (leo (load-program $path)))
 )

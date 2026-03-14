@@ -77,13 +77,13 @@
                 (cons
                   (language-expand-procedure $language)
                   $value))))))
-      (lambda ($datum $environment)
+      (lambda ($datum $environment . $args)
         (or
           (switch? $datum
             ((pair? $pair)
               (switch? (car $pair)
                 ((procedure? $procedure)
-                  ($procedure (cdr $datum) $environment)))))
+                  (apply $procedure (cdr $datum) $environment $args)))))
           (throw invalid-languages-datum $languages $datum)))))
 
   (define (language-append . $languages)
