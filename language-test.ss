@@ -9,8 +9,9 @@
   (string)
   (language))
 
-(define test-language
-  (language "test"
+(define (make-test-language $extension . $extensions)
+  (language
+    (cons $extension $extensions)
     (lambda ($port $sfd $bfp)
       (make-read
         (lambda ($port $sfd $bfp)
@@ -35,15 +36,23 @@
             (else 'missing))
           $symbol)))))
 
+(define test-language (make-test-language "testa" "testb"))
+(define list-language (language-append test-language scheme-language))
+
 (check (language? test-language))
 (check (not (language? "language")))
 
-(check (string=? (language-extension test-language) "test"))
+(check
+  (equal?
+    (language-extensions test-language)
+    (list "testa" "testb")))
 
 (check
   (equal?
-    (language-library-extension test-language)
-    '(".test" . ".so")))
+    (language-library-extensions test-language)
+    '(
+      (".testa" . ".so")
+      (".testb" . ".so"))))
 
 (lets
   ($read
@@ -73,11 +82,11 @@
 
 (check
   (works
-    (language-call (scheme-language "testss")
+    (language-call scheme-language
       (lambda ()
-        (load "language-example.testss")))))
+        (load "language-example.ss")))))
 
 (check
   (works
-    (with-language (scheme-language "testss")
-      (load "language-example.testss"))))
+    (with-language scheme-language
+      (load "language-example.ss"))))

@@ -7,5 +7,5 @@
     (leo expand))
 
   (define leo-language
-    (language "leo" make-leo-read leo-expand))
+    (language (list "leo") make-leo-read leo-expand))
 )

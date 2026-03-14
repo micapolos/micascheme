@@ -7,7 +7,8 @@
     current-file-string
     pretty-print-current
     display-current
-    system0)
+    system0
+    library-extension)
   (import
     (scheme)
     (lets)
@@ -63,4 +64,7 @@
   (define (system0 $cmd)
     (unless (zero? (system $cmd))
       (throw system0 $cmd)))
+
+  (define (library-extension $extension)
+    (cons (string-append "." $extension) ".so"))
 )
