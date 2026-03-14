@@ -1,0 +1,2 @@
+(import (micascheme))
+(check (equal? (+ 2 2) 4))

@@ -16,7 +16,8 @@
 
   (data (language extension make-read-procedure expand-procedure))
 
-  (define scheme-language (language "ss" default-make-read-handler sc-expand))
+  (define (scheme-language $extension)
+    (language $extension default-make-read-handler sc-expand))
 
   (define (extension-language=? $extension $language)
     (string=? $extension (language-extension $language)))

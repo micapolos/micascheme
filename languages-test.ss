@@ -37,7 +37,7 @@
 
 (define test-language-a (test-language 'a))
 (define test-language-b (test-language 'b))
-(define test-languages (list test-language-a test-language-b))
+(define test-languages (list test-language-a test-language-b (scheme-language "testss")))
 
 ; --- languages-extension-ref?
 
@@ -50,7 +50,7 @@
 (check
   (equal?
     (languages-library-extensions test-languages)
-    '((".testa" . ".so") (".testb" . ".so"))))
+    '((".testa" . ".so") (".testb" . ".so") (".testss" . ".so"))))
 
 ; --- languages-make-read
 
@@ -149,6 +149,7 @@
     '(
       (".testa" . ".so")
       (".testb" . ".so")
+      (".testss" . ".so")
       (".ss" . ".so")
       (".java" . ".so"))))
 
@@ -158,7 +159,7 @@
   (works
     (languages-call test-languages
       (lambda ()
-        (load "language.testa"
+        (load "language-example.testa"
           (lambda ($datum)
             (check (equal? (car $datum) "testa"))
             (check (member (cadr $datum) (list "+" "-") ))
@@ -169,9 +170,15 @@
   (works
     (languages-call test-languages
       (lambda ()
-        (load "language.testb"
+        (load "language-example.testb"
           (lambda ($datum)
             (check (equal? (car $datum) "testb"))
             (check (member (cadr $datum) (list "fx+" "fx-")))
             (check (integer? (caddr $datum)))
             $datum))))))
+
+(check
+  (works
+    (languages-call test-languages
+      (lambda ()
+        (load "language-example.testss")))))
