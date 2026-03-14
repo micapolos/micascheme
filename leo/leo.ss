@@ -9,10 +9,8 @@
     (language)
     (leo language))
 
-  (define-rule-syntax (leo body ...)
+  (define-rule-syntax (leo x xs ...)
     (begin
       (invoke-library '(leo scheme))
-      (parameterize
-        ((current-languages (push (current-languages) leo-language)))
-        (with-current-languages body ...))))
+      (with-language leo-language x xs ...)))
 )
