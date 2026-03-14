@@ -14,7 +14,8 @@
     language-expand
 
     language-call
-    with-language)
+    with-language
+    define-language)
   (import
     (scheme)
     (lets)
@@ -54,4 +55,8 @@
   (define-rule-syntax (with-language language x xs ...)
     (language-call language
       (lambda () x xs ...)))
+
+  (define-rule-syntax (define-language id language)
+    (define-rule-syntax (id x xs (... ...))
+      (with-language language x xs (... ...))))
 )
