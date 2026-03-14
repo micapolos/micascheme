@@ -111,8 +111,16 @@
           $sfd
           10))
       (run
-        (check (equal? ($read) (list test-language "foo" 13)))
-        (check (equal? ($read) (list test-language "bar" 17)))
+        (check
+          (equal? ($read)
+            (cons
+              (language-expand-procedure test-language)
+              '("foo" 13))))
+        (check
+          (equal? ($read)
+            (cons
+              (language-expand-procedure test-language)
+              '("bar" 17))))
         (check (eof? ($read)))))
 
     ; --- language-read .ss
@@ -127,14 +135,14 @@
         (check
           (datum/annotation=? ($read)
             (cons
-              scheme-language
+              sc-expand
               (stripped-annotation
                 'foo
                 (make-source-object $sfd 10 13)))))
         (check
           (datum/annotation=? ($read)
             (cons
-              scheme-language
+              sc-expand
               (stripped-annotation
                 'bar
                 (make-source-object $sfd 14 17)))))
@@ -144,7 +152,9 @@
     (check
       (equal?
         (language-expand $language
-          (cons test-language "string-append")
+          (cons
+            (language-expand-procedure test-language)
+            "string-append")
           (scheme-environment))
         `(value string-append)))
 
@@ -152,7 +162,7 @@
     (check
       (equal?
         (language-expand $language
-          (cons scheme-language '(+ 2 2))
+          (cons sc-expand '(+ 2 2))
           (scheme-environment))
         '(($primitive 2 +) 2 2)))))
 
