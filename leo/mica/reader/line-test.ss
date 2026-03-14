@@ -40,6 +40,8 @@
   (ok "10\n" '(10))
   (ok "10\n20\n" '(10 20))
   (ok "foo\nfoo bar\n" '(foo (foo bar)))
+  (ok "\n\nfoo\n\nfoo bar\n\n" '(foo (foo bar)))
+  (ok "\n\nfoo 123\n\nfoo bar\n\n" '((foo 123) (foo bar)))
   ;(ok ": 10, 20\n: 30, 40\n" '((10 20) (30 40)))
   )
 
@@ -92,3 +94,21 @@
           (x 10)
           (y 10)))
       (radius 10))))
+
+(check-reader lines
+  (ok
+  (lines-string
+    "" ""
+    "define hello \"hello\""
+    "" ""
+    "define world \"world\""
+    ""
+    "define"
+    "  exclamate string"
+    "  string-append: string, \"!\""
+    "")
+  '(
+    (define (hello "hello"))
+    (define (world "world"))
+    (define (exclamate string)
+      (string-append string "!")))))
