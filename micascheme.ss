@@ -96,6 +96,8 @@
       (identifier)
       (indexed)
       (io)
+      (language)
+      (languages)
       (let)
       (lets)
       (rename (list) (bindable-list list))

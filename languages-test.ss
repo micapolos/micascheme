@@ -1,0 +1,158 @@
+(import (micascheme) (check) (languages))
+
+(define (test-language $id)
+  (language
+    (string-append "test" (symbol->string $id))
+    (lambda ($port $sfd $bfp)
+      (make-read
+        (lambda ($port $sfd $bfp)
+          (lets
+            ((values $value/eof $bfp)
+              (get-datum/annotations $port $sfd $bfp))
+            (switch $value/eof
+              ((eof? $eof)
+                (values $eof $bfp))
+              ((else $value)
+                (values
+                  (list (symbol->string (annotation-stripped $value)) $bfp)
+                  $bfp)))))
+         $port $sfd $bfp))
+    (lambda ($line $environment)
+      (switch $line
+        ((string-empty? _) '(void))
+        ((else $string)
+          (lets
+            ($symbol (string->symbol $string))
+            `(,$id ,$symbol ,(top-level-value $symbol $environment))))))))
+
+(define source-file-descriptor-a (source-file-descriptor "foo.testa" 0))
+(define source-file-descriptor-b (source-file-descriptor "foo.testb" 0))
+(define source-file-descriptor-c (source-file-descriptor "foo.testc" 0))
+
+(define test-language-a (test-language 'a))
+(define test-language-b (test-language 'b))
+(define test-languages (list test-language-a test-language-b))
+
+(define (a $id $value)
+  (check (equal? (top-level-value $id (scheme-environment)) $value)))
+
+(define (b $id $value)
+  (check (equal? (top-level-value $id (scheme-environment)) $value)))
+
+; --- languages-extension-ref?
+
+(check (equal? (languages-extension-ref? test-languages "testa") test-language-a))
+(check (equal? (languages-extension-ref? test-languages "testb") test-language-b))
+(check (equal? (languages-extension-ref? test-languages "testc") #f))
+
+; --- languages-library-extensions
+
+(check
+  (equal?
+    (languages-library-extensions test-languages)
+    '((".testa" . ".so") (".testb" . ".so"))))
+
+; --- languages-make-read
+
+(lets
+  ($read
+    (languages-make-read
+      test-languages
+      (open-input-string "+ -")
+      source-file-descriptor-a
+      10
+      (partial make-read get-datum/annotations)))
+  (run
+    (check (equal? ($read) '("testa" "+" 11)))
+    (check (equal? ($read) '("testa" "-" 13)))
+    (check (eof? ($read)))))
+
+(lets
+  ($read
+    (languages-make-read
+      test-languages
+      (open-input-string "+ -")
+      source-file-descriptor-b
+      10
+      (partial make-read get-datum/annotations)))
+  (run
+    (check (equal? ($read) '("testb" "+" 11)))
+    (check (equal? ($read) '("testb" "-" 13)))
+    (check (eof? ($read)))))
+
+(lets
+  ($read
+    (languages-make-read
+      test-languages
+      (open-input-string "+ -")
+      source-file-descriptor-c
+      10
+      (partial make-read get-datum/annotations)))
+  (run
+    (check
+      (annotation=? ($read)
+        (stripped-annotation '+ (make-source-object source-file-descriptor-c 10 11))))
+    (check
+      (annotation=? ($read)
+        (stripped-annotation '- (make-source-object source-file-descriptor-c 12 13))))
+    (check (eof? ($read)))))
+
+; --- languages-datum->language?-datum
+
+(check
+  (equal?
+    (values->list (languages-datum->language?-datum test-languages "foo"))
+    `(#f "foo")))
+
+(check
+  (equal?
+    (values->list (languages-datum->language?-datum test-languages '("testa" . "foo")))
+    `(,test-language-a "foo")))
+
+(check
+  (equal?
+    (values->list (languages-datum->language?-datum test-languages '("testb" . "foo")))
+    `(,test-language-b "foo")))
+
+(check
+  (equal?
+    (values->list (languages-datum->language?-datum test-languages '("testc" . "foo")))
+    `(#f ("testc" . "foo"))))
+
+; --- languages-expand
+
+(check
+  (equal?
+    (languages-expand test-languages '("testa" . "string-append") (scheme-environment))
+    `(a string-append ,string-append)))
+
+(check
+  (equal?
+    (languages-expand test-languages '("testb" . "string-append") (scheme-environment))
+    `(b string-append ,string-append)))
+
+(check
+  (equal?
+    (languages-expand test-languages '("testc" . "string-append") (scheme-environment))
+    `("testc" . "string-append")))
+
+; --- languages-make-library-extensions
+
+(check
+  (equal?
+    (languages-make-library-extensions test-languages '((".ss" . ".so") (".java" . ".so")))
+    '(
+      (".testa" . ".so")
+      (".testb" . ".so")
+      (".ss" . ".so")
+      (".java" . ".so"))))
+
+; --- languages-call
+
+; (check
+;   (equal?
+;     (languages-call test-languages
+;       (lambda ()
+;         (load "language.testa")
+;         "OK"))
+;     "OK"))

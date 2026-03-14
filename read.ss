@@ -1,11 +1,13 @@
 (library (read)
   (export
     path-source-file-descriptor
-    load-syntax-list)
+    load-syntax-list
+    make-read)
   (import
     (scheme)
     (lets)
     (switch)
+    (procedure)
     (stack))
 
   (define (push-read-syntax $stack $port $sfd $pos $id)
@@ -34,4 +36,12 @@
             (path-source-file-descriptor $path)
             0
             $id)))))
+
+  (define (make-read $read $port $sfd $bfp)
+    (lambda ()
+      (lets
+        ((values $value $new-bfp) ($read $port $sfd $bfp))
+        (run
+          (set! $bfp $new-bfp)
+          $value))))
 )

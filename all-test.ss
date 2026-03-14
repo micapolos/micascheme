@@ -38,6 +38,8 @@
   (int)
   (io)
   (keyword)
+  (language)
+  (languages)
   (leo)
   (leo-syntax)
   (leo2)

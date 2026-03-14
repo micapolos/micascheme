@@ -1,9 +1,13 @@
 (library (source-file-descriptor)
   (export
+    source-file-descriptor-extension
     source-file-descriptor=?
     path->source-file-descriptor
     load-datum/annotations)
   (import (chezscheme) (lets))
+
+  (define (source-file-descriptor-extension $sfd)
+    (path-extension (source-file-descriptor-path $sfd)))
 
   (define (source-file-descriptor=? $a $b)
     (and

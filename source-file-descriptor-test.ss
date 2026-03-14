@@ -4,6 +4,11 @@
   (source-file-descriptor))
 
 (check
+  (string=?
+    (source-file-descriptor-extension (source-file-descriptor "foo.leo" 3))
+    "leo"))
+
+(check
   (source-file-descriptor=?
     (source-file-descriptor "foo" 3)
     (source-file-descriptor "foo" 3)))

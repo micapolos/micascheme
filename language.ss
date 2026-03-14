@@ -1,0 +1,41 @@
+(library (language)
+  (export
+    language
+    language?
+    language-extension
+    language-make-read-procedure
+    language-expand-procedure
+
+    extension-language=?
+
+    language-library-extension
+    language-make-read
+    language-expand)
+  (import (scheme) (lets) (switch) (eof) (data))
+
+  (data (language extension make-read-procedure expand-procedure))
+
+  (define (extension-language=? $extension $language)
+    (string=? $extension (language-extension $language)))
+
+  (define (language-make-read $language $port $sfd $bfp)
+    (lets
+      ($read ((language-make-read-procedure $language) $port $sfd $bfp))
+      (lambda ()
+        (switch ($read)
+          ((eof? $eof) $eof)
+          ((else $value) (cons (language-extension $language) $value))))))
+
+  (define language-expand
+    (case-lambda
+      (($language $datum $environment)
+        ((language-expand-procedure $language) $datum $environment))
+      (($language $datum)
+        ((language-expand-procedure $language) $datum))))
+
+  (define (language-library-extension $language)
+    `(
+      ,(string-append "." (language-extension $language))
+      .
+      ".so"))
+)
