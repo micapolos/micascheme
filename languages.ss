@@ -7,7 +7,7 @@
     languages-expand
 
     languages-make-library-extensions
-    languages-make-read
+    languages-make-read-handler
     languages-make-expand
     languages-call
 

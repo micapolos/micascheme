@@ -29,7 +29,7 @@
                 ((top-level-bound? $symbol $environment) 'check-value)
                 ((top-level-syntax? $symbol $environment) 'check-syntax)
                 (else 'check-unbound))
-              $symbol)))))))
+              `',$symbol)))))))
 
 (define source-file-descriptor-a (source-file-descriptor "foo.testa" 0))
 (define source-file-descriptor-b (source-file-descriptor "foo.testb" 0))
@@ -124,12 +124,12 @@
 (check
   (equal?
     (languages-expand test-languages '("testa" "string-append" 123) (scheme-environment))
-    '(check-value string-append)))
+    '(check-value 'string-append)))
 
 (check
   (equal?
     (languages-expand test-languages '("testb" "string-append" 123) (scheme-environment))
-    '(check-value string-append)))
+    '(check-value 'string-append)))
 
 (check
   (equal?
@@ -152,6 +152,72 @@
       (".testss" . ".so")
       (".ss" . ".so")
       (".java" . ".so"))))
+
+; --- languages-make-read-handler
+
+(lets
+  ($read-handler
+    (languages-make-read-handler test-languages default-make-read-handler))
+  ($read
+    ($read-handler
+      (open-input-string "+ -")
+      source-file-descriptor-a
+      10))
+  (run
+    (check (equal? ($read) '("testa" "+" 11)))
+    (check (equal? ($read) '("testa" "-" 13)))
+    (check (eof? ($read)))))
+
+(lets
+  ($read-handler
+    (languages-make-read-handler test-languages default-make-read-handler))
+  ($read
+    ($read-handler
+      (open-input-string "+ -")
+      source-file-descriptor-c
+      10))
+  (run
+    (check
+      (annotation=? ($read)
+        (stripped-annotation '+ (make-source-object source-file-descriptor-c 10 11))))
+    (check
+      (annotation=? ($read)
+        (stripped-annotation '- (make-source-object source-file-descriptor-c 12 13))))
+    (check (eof? ($read)))))
+
+; --- languages-make-expand
+
+(check
+  (equal?
+    (app
+      (languages-make-expand test-languages sc-expand)
+      '("testa" "string-append" 123)
+      (interaction-environment))
+    '(check-value 'string-append)))
+
+(check
+  (equal?
+    (app
+      (languages-make-expand test-languages sc-expand)
+      '("testa" "cond" 123)
+      (interaction-environment))
+    '(check-syntax 'cond)))
+
+(check
+  (equal?
+    (app
+      (languages-make-expand test-languages sc-expand)
+      '("testc" "cond" 123)
+      (interaction-environment))
+    '("testc" "cond" 123)))
+
+(check
+  (equal?
+    (app
+      (languages-make-expand test-languages sc-expand)
+      '("testss" "cond" 123)
+      (interaction-environment))
+    '("cond" 123)))
 
 ; --- languages-call
 
@@ -181,4 +247,13 @@
   (works
     (languages-call test-languages
       (lambda ()
+        (load "language-example.testss")))))
+
+; --- call-with-current-languages
+
+(check
+  (works
+    (parameterize
+      ((current-languages test-languages))
+      (with-current-languages
         (load "language-example.testss")))))
