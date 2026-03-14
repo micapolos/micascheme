@@ -18,12 +18,18 @@
                   $bfp)))))
          $port $sfd $bfp))
     (lambda ($line $environment)
-      (switch $line
-        ((string-empty? _) '(void))
+      (switch (car $line)
+        ((string-empty? _)
+          '(void))
         ((else $string)
           (lets
             ($symbol (string->symbol $string))
-            `(,$id ,$symbol ,(top-level-value $symbol $environment))))))))
+            (list
+              (cond
+                ((top-level-bound? $symbol $environment) 'check-value)
+                ((top-level-syntax? $symbol $environment) 'check-syntax)
+                (else 'check-unbound))
+              $symbol)))))))
 
 (define source-file-descriptor-a (source-file-descriptor "foo.testa" 0))
 (define source-file-descriptor-b (source-file-descriptor "foo.testb" 0))
@@ -32,12 +38,6 @@
 (define test-language-a (test-language 'a))
 (define test-language-b (test-language 'b))
 (define test-languages (list test-language-a test-language-b))
-
-(define (a $id $value)
-  (check (equal? (top-level-value $id (scheme-environment)) $value)))
-
-(define (b $id $value)
-  (check (equal? (top-level-value $id (scheme-environment)) $value)))
 
 ; --- languages-extension-ref?
 
@@ -123,18 +123,23 @@
 
 (check
   (equal?
-    (languages-expand test-languages '("testa" . "string-append") (scheme-environment))
-    `(a string-append ,string-append)))
+    (languages-expand test-languages '("testa" "string-append" 123) (scheme-environment))
+    '(check-value string-append)))
 
 (check
   (equal?
-    (languages-expand test-languages '("testb" . "string-append") (scheme-environment))
-    `(b string-append ,string-append)))
+    (languages-expand test-languages '("testb" "string-append" 123) (scheme-environment))
+    '(check-value string-append)))
 
 (check
   (equal?
-    (languages-expand test-languages '("testc" . "string-append") (scheme-environment))
-    `("testc" . "string-append")))
+    (languages-expand test-languages '("testc" "string-append" 123) (scheme-environment))
+    `("testc" "string-append" 123)))
+
+(check
+  (equal?
+    (languages-expand test-languages '"string-append" (scheme-environment))
+    "string-append"))
 
 ; --- languages-make-library-extensions
 
@@ -149,10 +154,25 @@
 
 ; --- languages-call
 
-; (check
-;   (equal?
-;     (languages-call test-languages
-;       (lambda ()
-;         (load "language.testa")
-;         "OK"))
-;     "OK"))
+(check
+  (works
+    (languages-call test-languages
+      (lambda ()
+        (load "language.testa"
+          (lambda ($datum)
+            (check (equal? (car $datum) "testa"))
+            (check (member (cadr $datum) (list "+" "-") ))
+            (check (integer? (caddr $datum)))
+            $datum))))))
+
+
+(check
+  (works
+    (languages-call test-languages
+      (lambda ()
+        (load "language.testb"
+          (lambda ($datum)
+            (check (equal? (car $datum) "testb"))
+            (check (member (cadr $datum) (list "fx+" "fx-")))
+            (check (integer? (caddr $datum)))
+            $datum))))))

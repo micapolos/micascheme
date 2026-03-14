@@ -43,7 +43,12 @@
         ((false? _)
           ($default-make-read $port $sfd $bfp))
         ((else $language)
-          (language-make-read $language $port $sfd $bfp)))))
+          (lets
+            ($read (language-make-read $language $port $sfd $bfp))
+            (lambda ()
+              (switch ($read)
+                ((eof? $eof) $eof)
+                ((else $value) (cons (language-extension $language) $value)))))))))
 
   (define (languages-datum->language? $languages $datum)
     (switch? $datum

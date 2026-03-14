@@ -28,7 +28,12 @@
     (lambda ($line $environment)
       (lets
         ($symbol (string->symbol $line))
-        `(value ,$symbol ,(top-level-value $symbol $environment))))))
+        (list
+          (cond
+            ((top-level-bound? $symbol $environment) 'value)
+            ((top-level-syntax? $symbol $environment) 'syntax)
+            (else 'missing))
+          $symbol)))))
 
 (check (language? test-language))
 (check (not (language? "language")))
@@ -47,11 +52,21 @@
       (source-file-descriptor "source.test" 0)
       10))
   (run
-    (check (equal? ($read) '("test" "foo" 13)))
-    (check (equal? ($read) '("test" "bar" 17)))
+    (check (equal? ($read) '("foo" 13)))
+    (check (equal? ($read) '("bar" 17)))
     (check (eof? ($read)))))
 
 (check
   (equal?
     (language-expand test-language "string-append" (scheme-environment))
-    `(value string-append ,string-append)))
+    `(value string-append)))
+
+(check
+  (equal?
+    (language-expand test-language "if" (scheme-environment))
+    `(syntax if)))
+
+(check
+  (equal?
+    (language-expand test-language "foo" (scheme-environment))
+    `(missing foo)))

@@ -19,19 +19,14 @@
     (string=? $extension (language-extension $language)))
 
   (define (language-make-read $language $port $sfd $bfp)
-    (lets
-      ($read ((language-make-read-procedure $language) $port $sfd $bfp))
-      (lambda ()
-        (switch ($read)
-          ((eof? $eof) $eof)
-          ((else $value) (cons (language-extension $language) $value))))))
+    ((language-make-read-procedure $language) $port $sfd $bfp))
 
   (define language-expand
     (case-lambda
       (($language $datum $environment)
         ((language-expand-procedure $language) $datum $environment))
       (($language $datum)
-        ((language-expand-procedure $language) $datum))))
+        (language-expand $datum (interaction-environment)))))
 
   (define (language-library-extension $language)
     `(
