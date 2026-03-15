@@ -4,7 +4,8 @@
     string-empty?
     lines-string
     lines-string0
-    string->ascii)
+    string->ascii
+    datum->string)
   (import (scheme) (list) (list-syntax) (procedure) (char))
 
   (define (empty-string) "")
@@ -23,4 +24,7 @@
 
   (define (string->ascii $string)
     (u8-list->bytevector (map char->ascii (string->list $string))))
+
+  (define (datum->string $datum)
+    (format "~s" $datum))
 )
