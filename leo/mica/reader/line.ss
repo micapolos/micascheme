@@ -63,10 +63,9 @@
     (apply (%list line-annotation)))
 
   (define rhs-colon-line-annotations
-    (switch char
-      ((%char-space? _) line-annotations)
-      ((%char-newline? _) rhs-newline-line-annotations)
-      ((else $char) (error "unexpected char" $char))))
+    (one-of
+      (prefixed #\space line-annotations)
+      (prefixed #\newline rhs-newline-line-annotations)))
 
   (define colon-line-annotation
     (list-annotation (prefixed #\: rhs-colon-line-annotations)))
