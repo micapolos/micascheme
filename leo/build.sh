@@ -32,11 +32,13 @@ fi
 # 5. Setup build/release structure
 echo "Preparing environment for version: $VERSION"
 rm -rf build "$RELEASE_DIR_NAME"
-mkdir -p build/release/bin build/release/lib
+mkdir -p build/release/bin build/release/lib build/release/examples
 
 cp "$CS_BIN_DIR/scheme" build/release/bin/scheme
 cp "$CS_BOOT_DIR/petite.boot" build/release/lib/
 cp "$CS_BOOT_DIR/scheme.boot" build/release/lib/
+
+cp leo/examples/* build/release/examples/
 
 # 6. Run WPO compilation
 echo "Compiling Leo $VERSION with WPO..."
