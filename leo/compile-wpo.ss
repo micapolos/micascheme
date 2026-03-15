@@ -8,6 +8,10 @@
 (newline)
 (compile-program "leo/main.ss" "build/release/lib/leo.so")
 
+(display "Compiling whole library...")
+(newline)
+(compile-whole-library "leo/load.wpo" "build/release/lib/leo-load.so")
+
 (display "Compiling whole program...")
 (newline)
 (compile-whole-program "build/release/lib/leo.wpo" "build/release/lib/leo-wpo.so" #t)

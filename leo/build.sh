@@ -38,7 +38,7 @@ cp "$CS_BIN_DIR/scheme" build/release/bin/scheme
 cp "$CS_BOOT_DIR/petite.boot" build/release/lib/
 cp "$CS_BOOT_DIR/scheme.boot" build/release/lib/
 
-# 6. Run WPO compilation, it puts leo-wpo.ss in build/release/lib
+# 6. Run WPO compilation, it puts leo-wpo.so and leo-load.so in build/release/lib
 echo "Compiling Leo $VERSION with WPO..."
 ./build/release/bin/scheme \
     -b ./build/release/lib/petite.boot \
@@ -59,6 +59,7 @@ echo "Embedding binaries into C headers..."
 (cd "$CS_BOOT_DIR" && xxd -i "petite.boot") > build/petite_boot.h
 (cd "$CS_BOOT_DIR" && xxd -i "scheme.boot") > build/scheme_boot.h
 (cd "$LIB_DIR" && xxd -i "leo-wpo.so") > build/leo_wpo_so.h
+(cd "$LIB_DIR" && xxd -i "leo-load.so") > build/leo_load_so.h
 
 ZLIB_OBJS=$(ls "$CS_ZLIB_OBJ_DIR"/*.o | grep -vE "example.o|minigzip.o")
 LZ4_OBJS="$CS_LZ4_OBJ_DIR"/*.o

@@ -4,7 +4,7 @@
 // The xxd-generated headers from your build/ directory
 #include "petite_boot.h"
 #include "scheme_boot.h"
-#include "leo_wpo_so.h"
+#include "leo_load_so.h"
 
 int main(int argc, char *argv[]) {
     fprintf(stderr, "Startint LeoC...\n");
@@ -22,13 +22,13 @@ int main(int argc, char *argv[]) {
     // These must be registered BEFORE Sbuild_heap
     Sregister_boot_file_bytes("petite.boot", (void *)petite_boot, petite_boot_len);
     Sregister_boot_file_bytes("scheme.boot", (void *)scheme_boot, scheme_boot_len);
-    Sregister_boot_file_bytes("leo-wpo.so", (void *)leo_wpo_so, leo_wpo_so_len);
+    Sregister_boot_file_bytes("leo-load.so", (void *)leo_load_so, leo_load_so_len);
 
     // 3. Build the heap
     Sbuild_heap(NULL, NULL);
 
     // 4. Start
-    Scall1(Stop_level_value(Sstring_to_symbol("leo-start-path")), Sstring(argv[1]));
+    Scall1(Stop_level_value(Sstring_to_symbol("load-leo")), Sstring(argv[1]));
 
     // 5. Cleanup
     Sscheme_deinit();
