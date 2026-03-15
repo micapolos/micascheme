@@ -1,0 +1,9 @@
+#!/bin/bash
+# Get the directory where this script sits (dist/bin)
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Execute relative to that directory
+exec "$BIN_DIR/scheme" \
+  -b "$BIN_DIR/../lib/petite.boot" \
+  -b "$BIN_DIR/../lib/scheme.boot" \
+  --program "$BIN_DIR/../lib/leo-whole.so" "$@"

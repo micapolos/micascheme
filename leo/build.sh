@@ -10,27 +10,25 @@ if [ ! -f "$CS_BIN_DIR/scheme" ]; then
     cd deps/ChezScheme && ./configure && make && cd ../..
 fi
 
-# 3. Setup dist structure and copy engine components FIRST
+# 3. Setup dist structure
 echo "Preparing dist environment..."
 mkdir -p dist/bin dist/lib
 cp "$CS_BIN_DIR/scheme" dist/bin/scheme
 cp "$CS_BOOT_DIR/petite.boot" dist/lib/
 cp "$CS_BOOT_DIR/scheme.boot" dist/lib/
 
-# 4. Run WPO compilation using the 'dist' binaries
-echo "Compiling Leo with WPO using dist binaries..."
+# 4. Run WPO compilation
+echo "Compiling Leo with WPO..."
 ./dist/bin/scheme \
     -b ./dist/lib/petite.boot \
     -b ./dist/lib/scheme.boot \
     --program "leo/compile-wpo.ss"
 
-# 5. Move output to dist/lib and create wrapper
-mv ".dist/lib/leo-whole.so" dist/lib/
+# 5. Move output and copy your pre-written wrapper
+mv "dist/lib/leo-whole.so" dist/lib/ 2>/dev/null || true
 
-echo "Creating wrapper script..."
-echo '#!/bin/bash
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-exec "$DIR/bin/scheme" -b "$DIR/lib/petite.boot" -b "$DIR/lib/scheme.boot" --program "$DIR/lib/leo-whole.so" "$@"' > dist/leo
+echo "Copying wrapper from leo/leo.sh to dist/bin/leo..."
+cp leo/leo dist/bin/leo
+chmod +x dist/bin/leo
 
-chmod +x dist/leo
-echo "Done! Run with: ./dist/leo"
+echo "Done! Run with: ./dist/bin/leo"
