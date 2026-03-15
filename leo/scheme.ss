@@ -4,11 +4,12 @@
     define lambda
     let letrec let-values
     let* letrec* let*-values
-    let-syntax letrec-syntax)
+    let-syntax letrec-syntax
+    if then cond)
   (import
     (prefix (chezscheme) %)
     (only (chezscheme) export define-syntax)
-    (only (micascheme) define-rules-syntaxes keywords ...)
+    (only (micascheme) define-rules-syntaxes define-keywords keywords ...)
     (only (keyword) keyword?)
     (leo transform))
   (export
@@ -18,13 +19,16 @@
         define lambda
         let letrec let-values
         let* letrec* let*-values
-        let-syntax letrec-syntax)
+        let-syntax letrec-syntax
+        if cond)
       (only (leo transform) from with)))
 
   (define-syntax library transform-library)
   (define-syntax import transform-import)
 
-  (define-rules-syntaxes (keywords with)
+  (define-keywords then)
+
+  (define-rules-syntaxes (keywords with then %else %when)
     ((define (name x))
       (%define name x))
     ((define (name param ...) body ...)
@@ -49,5 +53,13 @@
     ((let-syntax (with binding ...) x xs ...)
       (%let-syntax (binding ...) x xs ...))
     ((letrec-syntax (with binding ...) x xs ...)
-      (%let-syntax (binding ...) x xs ...)))
+      (%let-syntax (binding ...) x xs ...))
+
+    ((if a (then b ...) (%else c ...))
+      (%if a (%begin b ...) (%begin c ...)))
+
+    ((cond (%when a b bs ...) ... (%else c cs ...))
+      (%cond (a b bs ...) ... (%else c cs ...)))
+    ((cond (%when a b bs ...) ...)
+      (%cond (a b bs ...) ...)))
 )
