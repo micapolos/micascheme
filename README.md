@@ -6,6 +6,8 @@ Chez scheme base library.
 
 ```
 git clone --depth 1 https://github.com/micapolos/micascheme.git
+cd micascheme
+git submodule update --init --recursive --depth 1
 ```
 
 ## Build Leo
