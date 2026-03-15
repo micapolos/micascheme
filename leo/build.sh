@@ -10,9 +10,11 @@ if [ ! -f "$CS_BIN_DIR/scheme" ]; then
     cd deps/ChezScheme && ./configure && make && cd ../..
 fi
 
-# 3. Setup dist structure
-echo "Preparing dist environment..."
-mkdir -p dist/bin dist/lib
+# 3. Setup dist and release structure
+echo "Preparing environment..."
+rm -rf dist release
+mkdir -p dist/bin dist/lib release
+
 cp "$CS_BIN_DIR/scheme" dist/bin/scheme
 cp "$CS_BOOT_DIR/petite.boot" dist/lib/
 cp "$CS_BOOT_DIR/scheme.boot" dist/lib/
@@ -24,11 +26,16 @@ echo "Compiling Leo with WPO..."
     -b ./dist/lib/scheme.boot \
     --program "leo/compile-wpo.ss"
 
-# 5. Move output and copy your pre-written wrapper
+# 5. Finalize structure
 mv "dist/lib/leo-whole.so" dist/lib/ 2>/dev/null || true
 
-echo "Copying wrapper from leo/leo.sh to dist/bin/leo..."
+echo "Copying wrapper from leo/leo to dist/bin/leo..."
 cp leo/leo dist/bin/leo
 chmod +x dist/bin/leo
 
-echo "Done! Run with: ./dist/bin/leo"
+# 6. Archive to release/ folder
+echo "Creating archive: release/leo-macos.tar.gz"
+# This preserves the 'dist' folder name inside the archive
+tar -czvf release/leo-macos.tar.gz dist
+
+echo "Done! Ready for release."

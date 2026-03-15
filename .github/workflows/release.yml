@@ -23,24 +23,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: deps/ChezScheme
-          key: ${{ runner.os }}-chez-${{ hashFiles('.gitmodules', 'leo/build.sh') }}
+          key: ${{ runner.os }}-chez-${{ hashFiles('deps/ChezScheme/s/**/*', 'deps/ChezScheme/c/**/*', 'deps/ChezScheme/m4/**/*') }}
 
       - name: Run Build Script
         run: ./leo/build.sh
-
-      - name: Archive Dist
-        run: |
-          # Create a versioned folder name (e.g., leo-v1.0.0 or leo-main)
-          RELEASE_NAME="leo-${{ github.ref_name }}"
-
-          # Rename the dist folder produced by build.sh
-          mv dist "$RELEASE_NAME"
-
-          # Archive it
-          tar -czvf leo-macos.tar.gz "$RELEASE_NAME"
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: leo-macos
-          path: leo-macos.tar.gz
+          path: release/leo-macos.tar.gz
