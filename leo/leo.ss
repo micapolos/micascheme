@@ -9,8 +9,6 @@
     (language)
     (leo language))
 
-  (define-rule-syntax (leo x xs ...)
-    (with-language
-      (language-append leo-language scheme-language)
-      x xs ...))
+  (define-language leo
+    (language-append leo-language scheme-language))
 )
