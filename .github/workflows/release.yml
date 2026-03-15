@@ -39,7 +39,10 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}
           files: build/*.tar.gz
-          body: "Release for version ${{ github.ref_name }}"
+          body: "Automated build from branch: ${{ github.ref_name }}"
+          overwrite_files: true
+          prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
