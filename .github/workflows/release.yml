@@ -42,20 +42,26 @@ jobs:
       - name: Package Release
         run: |
           mkdir -p dist/bin dist/lib
-          # Automatically find the arch folder (ta6le, ta6osx, etc.)
-          ARCH=$(ls deps/ChezScheme/boot | head -n 1)
 
-          cp deps/ChezScheme/bin/$ARCH/scheme dist/bin/micascheme-bin
-          cp deps/ChezScheme/boot/$ARCH/petite.boot dist/lib/
-          cp deps/ChezScheme/boot/$ARCH/scheme.boot dist/lib/
+          # Use find to locate the binary and boot files regardless of nesting
+          BINARY_PATH=$(find deps/ChezScheme -name scheme -type f -perm +111 | head -n 1)
+          PETITE_PATH=$(find deps/ChezScheme -name petite.boot | head -n 1)
+          SCHEME_PATH=$(find deps/ChezScheme -name scheme.boot | head -n 1)
 
-          # Add your wrapper script
+          cp "$BINARY_PATH" dist/bin/micascheme-bin
+          cp "$PETITE_PATH" dist/lib/
+          cp "$SCHEME_PATH" dist/lib/
+
+          # Add the wrapper
           echo '#!/bin/bash
           DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
           exec "$DIR/bin/micascheme-bin" -b "$DIR/lib/petite.boot" -b "$DIR/lib/scheme.boot" "$@"' > dist/micascheme
           chmod +x dist/micascheme
 
           tar -czvf micascheme-${{ runner.os }}.tar.gz dist/
+
+      - name: Locate Boot Files
+        run: find deps/ChezScheme -name "*.boot"
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
