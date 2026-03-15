@@ -1,5 +1,6 @@
 (library (leo scheme)
   (export
+    the
     library import
     define lambda
     let letrec let-values
@@ -34,6 +35,8 @@
   (define-keywords then)
 
   (define-rules-syntaxes (keywords with then %else %when %and)
+    ((the x ...)
+      (x ...))
     ((define (name x))
       (%define name x))
     ((define (name param ...) body ...)
