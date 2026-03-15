@@ -1,0 +1,54 @@
+name: Build and Release micascheme
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers when you push a tag like v1.0
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout micascheme
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive # This pulls your patched ChezScheme
+
+      - name: Install Dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y uuid-dev libncurses5-dev
+
+      - name: Build Patched ChezScheme
+        run: |
+          cd deps/ChezScheme
+          ./configure
+          make
+
+      - name: Package Release
+        run: |
+          mkdir -p dist/bin dist/lib
+          # Automatically find the arch folder (ta6le, ta6osx, etc.)
+          ARCH=$(ls deps/ChezScheme/boot | head -n 1)
+
+          cp deps/ChezScheme/bin/$ARCH/scheme dist/bin/micascheme-bin
+          cp deps/ChezScheme/boot/$ARCH/petite.boot dist/lib/
+          cp deps/ChezScheme/boot/$ARCH/scheme.boot dist/lib/
+
+          # Add your wrapper script
+          echo '#!/bin/bash
+          DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+          exec "$DIR/bin/micascheme-bin" -b "$DIR/lib/petite.boot" -b "$DIR/lib/scheme.boot" "$@"' > dist/micascheme
+          chmod +x dist/micascheme
+
+          tar -czvf micascheme-${{ runner.os }}.tar.gz dist/
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: micascheme-${{ runner.os }}
+          path: micascheme-${{ runner.os }}.tar.gz
