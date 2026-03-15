@@ -2,13 +2,16 @@
   (export
     path-source-file-descriptor
     load-syntax-list
-    make-read)
+    make-read
+    make-read-lambda)
   (import
     (scheme)
     (lets)
     (switch)
     (procedure)
-    (stack))
+    (stack)
+    (syntax)
+    (keyword))
 
   (define (push-read-syntax $stack $port $sfd $pos $id)
     (lets
@@ -44,4 +47,11 @@
         (run
           (set! $bfp $new-bfp)
           $value))))
+
+  (define-rule-syntax
+    (make-read-lambda (port sfd bfp) body ...)
+    (lambda (port sfd bfp)
+      (make-read
+        (lambda (port sfd bfp) body ...)
+        port sfd bfp)))
 )

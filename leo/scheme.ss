@@ -5,11 +5,14 @@
     let letrec let-values
     let* letrec* let*-values
     let-syntax letrec-syntax
-    if then cond)
+    if then cond
+    switch any?
+    make-read-lambda)
   (import
     (prefix (chezscheme) %)
     (only (chezscheme) export define-syntax)
     (only (micascheme) define-rules-syntaxes define-keywords keywords ...)
+    (prefix (only (micascheme) make-read-lambda switch) %)
     (only (keyword) keyword?)
     (leo transform))
   (export
@@ -26,15 +29,26 @@
   (define-syntax library transform-library)
   (define-syntax import transform-import)
 
+  (%define (any? _) #t)
+
   (define-keywords then)
 
-  (define-rules-syntaxes (keywords with then %else %when)
+  (define-rules-syntaxes (keywords with then %else %when %and)
     ((define (name x))
       (%define name x))
     ((define (name param ...) body ...)
       (%define (name param ...) body ...))
+
+    ((lambda (with param ... (%and list)) x xs ...)
+      (%lambda (param ... . list) x xs ...))
     ((lambda (with param ...) x xs ...)
       (%lambda (param ...) x xs ...))
+    ((lambda x xs ...)
+      (%lambda () x xs ...))
+
+    ((make-read-lambda (with param ...) x xs ...)
+      (%make-read-lambda (param ...) x xs ...))
+
     ((let (name (with binding ...) x xs ...))
       (keyword? name)
       (%let name (binding ...) x xs ...))
@@ -61,5 +75,8 @@
     ((cond (%when a b bs ...) ... (%else c cs ...))
       (%cond (a b bs ...) ... (%else c cs ...)))
     ((cond (%when a b bs ...) ...)
-      (%cond (a b bs ...) ...)))
+      (%cond (a b bs ...) ...))
+
+    ((switch x (%when (a b) c) ...)
+      (%switch x ((a b) c) ...)))
 )
