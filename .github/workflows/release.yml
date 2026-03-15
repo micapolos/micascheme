@@ -26,13 +26,7 @@ jobs:
           key: ${{ runner.os }}-chez-${{ hashFiles('deps/ChezScheme/s/**/*', 'deps/ChezScheme/c/**/*', 'deps/ChezScheme/m4/**/*') }}
 
       - name: Run Build Script
-        # If it's a tag, pass the tag name. Otherwise, pass nothing.
-        run: |
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            ./leo/build.sh "${{ github.ref_name }}"
-          else
-            ./leo/build.sh "latest"
-          fi
+        run: ./leo/build.sh "${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}"
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
