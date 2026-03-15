@@ -6,4 +6,4 @@ BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 exec "$BIN_DIR/scheme" \
   -b "$BIN_DIR/../lib/petite.boot" \
   -b "$BIN_DIR/../lib/scheme.boot" \
-  --program "$BIN_DIR/../lib/leo-wpo.so" "$@"
+  --program "$BIN_DIR/../lib/leo.so" "$@"

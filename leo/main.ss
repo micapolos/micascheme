@@ -1,2 +1,3 @@
-(import (leo start))
-(leo-start)
+(import (micascheme) (leo load))
+
+(for-each load-leo (command-line-arguments))

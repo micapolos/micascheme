@@ -38,12 +38,12 @@ cp "$CS_BIN_DIR/scheme" build/release/bin/scheme
 cp "$CS_BOOT_DIR/petite.boot" build/release/lib/
 cp "$CS_BOOT_DIR/scheme.boot" build/release/lib/
 
-# 6. Run WPO compilation, it puts leo-wpo.so and leo-load.so in build/release/lib
+# 6. Run WPO compilation
 echo "Compiling Leo $VERSION with WPO..."
 ./build/release/bin/scheme \
     -b ./build/release/lib/petite.boot \
     -b ./build/release/lib/scheme.boot \
-    --program "leo/compile-wpo.ss"
+    --program "leo/compile-wpo.ss" ./build/release/lib/leo.so
 
 if [ -f "leo/leo" ]; then
     echo "Copying wrapper to build/release/bin/leo..."
@@ -53,31 +53,6 @@ else
     echo "Error: Wrapper script 'leo/leo' not found!"
     exit 1
 fi
-
-# 7. Convert Binaries to C Headers (The missing link)
-echo "Embedding binaries into C headers..."
-(cd "$CS_BOOT_DIR" && xxd -i "petite.boot") > build/petite_boot.h
-(cd "$CS_BOOT_DIR" && xxd -i "scheme.boot") > build/scheme_boot.h
-(cd "$LIB_DIR" && xxd -i "leo-wpo.so") > build/leo_wpo_so.h
-(cd "$LIB_DIR" && xxd -i "leo-load.so") > build/leo_load_so.h
-
-ZLIB_OBJS=$(ls "$CS_ZLIB_OBJ_DIR"/*.o | grep -vE "example.o|minigzip.o")
-LZ4_OBJS="$CS_LZ4_OBJ_DIR"/*.o
-
-clang -O3 \
-    -I"$CS_BOOT_DIR" \
-    -I./build \
-    leo/main.c \
-    "$CS_C_DIR"/*.o \
-    $LZ4_OBJS \
-    $ZLIB_OBJS \
-    -liconv -lm -lncurses \
-    -o build/release/bin/leoc
-
-# 9. Optimization
-strip build/release/bin/leoc
-
-echo "Standalone build complete: build/release/bin/leoc"
 
 # 7. Archive logic
 echo "Creating distribution archive..."
