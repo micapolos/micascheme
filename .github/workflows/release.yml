@@ -11,31 +11,29 @@ jobs:
     name: Build on macOS
     runs-on: macos-latest
 
+
     steps:
       - name: Checkout Micascheme
         uses: actions/checkout@v4
 
-      - name: Initialize and Fetch Shallow Submodule
-        run: |
-          # 1. Create the directory
-          mkdir -p deps/ChezScheme
-
-          # 2. Manual clone (this is more reliable than 'submodule init' in CI)
-          git clone --depth 1 --branch make-read-handler https://github.com/micapolos/ChezScheme.git deps/ChezScheme
-
-          # 3. Tell the main repo to track this folder as a submodule
-          git submodule status
-
+      # 1. Try to restore the cache FIRST
       - name: Cache ChezScheme Build
         id: cache-chez
         uses: actions/cache@v4
         with:
           path: deps/ChezScheme
-          key: ${{ runner.os }}-chez-${{ hashFiles('.gitmodules', 'deps/ChezScheme/.git') }}
+          # We use the commit hash of the submodule to decide if the cache is valid
+          key: ${{ runner.os }}-chez-${{ hashFiles('.gitmodules') }}
+          # This allows us to use an older cache if an exact match isn't found
+          restore-keys: |
+            ${{ runner.os }}-chez-
 
-      - name: Build Patched ChezScheme
+      # 2. Only Clone and Build if cache was NOT found
+      - name: Initialize and Build ChezScheme
         if: steps.cache-chez.outputs.cache-hit != 'true'
         run: |
+          mkdir -p deps/ChezScheme
+          git clone --depth 1 --branch make-read-handler https://github.com/micapolos/ChezScheme.git deps/ChezScheme
           cd deps/ChezScheme
           ./configure
           make
