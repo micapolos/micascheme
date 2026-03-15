@@ -1,17 +1,15 @@
 library
-  leo math
+  leo examples math
   export
     add, subtract, multiply, divide
+    equal=?
     less?, less/equal?, greater?, greater/equal?
-    fx-add/wraparound, fx-subtract/wraparound, fx-less?
   import leo scheme
-  define fx-add/wraparound fx+/wraparound
-  define fx-subtract/wraparound fx-/wraparound
-  define fx-less? fx<
   define add +
   define subtract -
   define multiply *
   define divide /
+  define equal=? =
   define less? <
   define less/equal? <=
   define greater? >
