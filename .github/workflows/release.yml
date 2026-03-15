@@ -14,10 +14,14 @@ jobs:
         os: [ubuntu-latest, macos-latest]
 
     steps:
-      - name: Checkout micascheme
+      - name: Checkout Micascheme
         uses: actions/checkout@v4
-        with:
-          submodules: recursive # This pulls your patched ChezScheme
+
+      - name: Initialize and Fetch Shallow Submodule
+        run: |
+          git submodule init
+          # This tells Git to fetch ONLY the patch branch at depth 1
+          git submodule update --remote --depth 1
 
       - name: Install Dependencies (Linux)
         if: runner.os == 'Linux'
