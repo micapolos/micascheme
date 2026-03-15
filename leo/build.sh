@@ -9,7 +9,7 @@ ARCHIVE_NAME="leo-macos-$VERSION.tar.gz"
 # This checks if the ChezScheme directory is empty or missing
 if [ ! -f "deps/ChezScheme/configure" ]; then
     echo "Submodules missing. Initializing..."
-    git submodule update --init --recursive
+    git submodule update --init --recursive --depth=1
 fi
 
 # 3. Setup paths
