@@ -17,37 +17,46 @@ jobs:
 
       - name: Initialize and Build ChezScheme
         run: |
-          # 1. Clean and Clone
+          # 1. Clean and Clone the engine source
           rm -rf deps/ChezScheme
           mkdir -p deps/ChezScheme
           git clone --depth 1 --branch make-read-handler https://github.com/micapolos/ChezScheme.git deps/ChezScheme
 
-          # 2. Configure and Compile
+          # 2. Configure and Compile for Apple Silicon
           cd deps/ChezScheme
           ./configure
           make
 
-      - name: Package Leo
+      - name: Bootstrap Dist and Compile WPO
         run: |
+          # 1. Define hardcoded source paths
+          SRC_BIN="deps/ChezScheme/tarm64osx/bin/tarm64osx/scheme"
+          SRC_BOOT="deps/ChezScheme/tarm64osx/boot/tarm64osx"
+
+          # 2. Setup dist structure and copy engine components FIRST
+          echo "Preparing dist environment..."
           mkdir -p dist/bin dist/lib
+          cp "$SRC_BIN" dist/bin/scheme
+          cp "$SRC_BOOT/petite.boot" dist/lib/
+          cp "$SRC_BOOT/scheme.boot" dist/lib/
 
-          # Use find to locate files in the nested build tree
-          BINARY_PATH=$(find deps/ChezScheme -name scheme -type f -perm +111 | head -n 1)
-          PETITE_PATH=$(find deps/ChezScheme -name petite.boot | head -n 1)
-          SCHEME_PATH=$(find deps/ChezScheme -name scheme.boot | head -n 1)
+          # 3. Run WPO compilation using the 'dist' binaries
+          # This script handles placing leo-whole.so into dist/lib automatically
+          echo "Compiling Leo with WPO using dist binaries..."
+          ./dist/bin/scheme \
+              -b ./dist/lib/petite.boot \
+              -b ./dist/lib/scheme.boot \
+              --program "leo/compile-wpo.ss"
 
-          # Copy engine components
-          cp "$BINARY_PATH" dist/bin/leo-bin
-          cp "$PETITE_PATH" dist/lib/
-          cp "$SCHEME_PATH" dist/lib/
-
-          # Create the 'leo' wrapper script
+          # 4. Create the 'leo' wrapper script
+          echo "Creating wrapper script..."
           echo '#!/bin/bash
           DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-          exec "$DIR/bin/leo-bin" -b "$DIR/lib/petite.boot" -b "$DIR/lib/scheme.boot" "$@"' > dist/leo
+          exec "$DIR/bin/scheme" -b "$DIR/lib/petite.boot" -b "$DIR/lib/scheme.boot" --program "$DIR/lib/leo-whole.so" "$@"' > dist/leo
+
           chmod +x dist/leo
 
-          # Create the final archive
+          # 5. Create the final archive
           tar -czvf micascheme-macos.tar.gz dist/
 
       - name: Upload Artifacts

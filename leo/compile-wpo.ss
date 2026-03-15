@@ -4,5 +4,10 @@
 (compile-imported-libraries #t)
 (generate-wpo-files #t)
 
-(pretty-print (compile-program "leo/main.ss" "dist/lib/leo.so"))
-(pretty-print (compile-whole-program "dist/lib/leo.wpo" "dist/lib/leo" #t))
+(display "Compiling program...")
+(newline)
+(compile-program "leo/main.ss" "dist/lib/leo.so")
+
+(display "Compiling whole program...")
+(newline)
+(compile-whole-program "dist/lib/leo.wpo" "dist/lib/leo-whole.so" #t)
