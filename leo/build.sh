@@ -1,16 +1,21 @@
 #!/bin/bash
 
-# 1. Setup paths
+# 1. Parameterize Version (defaults to 'latest' if no argument is passed)
+VERSION="${1:-latest}"
+RELEASE_DIR="leo-macos-$VERSION"
+ARCHIVE_NAME="leo-macos-$VERSION.tar.gz"
+
+# 2. Setup paths
 CS_BIN_DIR="deps/ChezScheme/tarm64osx/bin/tarm64osx"
 CS_BOOT_DIR="deps/ChezScheme/tarm64osx/boot/tarm64osx"
 
-# 2. Build the engine if missing
+# 3. Build the engine if missing
 if [ ! -f "$CS_BIN_DIR/scheme" ]; then
     echo "ChezScheme binary not found. Building engine..."
     cd deps/ChezScheme && ./configure && make && cd ../..
 fi
 
-# 3. Setup dist structure
+# 4. Setup dist structure
 echo "Preparing dist environment..."
 rm -rf dist release
 mkdir -p dist/bin dist/lib release
@@ -19,30 +24,29 @@ cp "$CS_BIN_DIR/scheme" dist/bin/scheme
 cp "$CS_BOOT_DIR/petite.boot" dist/lib/
 cp "$CS_BOOT_DIR/scheme.boot" dist/lib/
 
-# 4. Run WPO compilation
-echo "Compiling Leo with WPO..."
+# 5. Run WPO compilation
+echo "Compiling Leo $VERSION with WPO..."
 ./dist/bin/scheme \
     -b ./dist/lib/petite.boot \
     -b ./dist/lib/scheme.boot \
     --program "leo/compile-wpo.ss"
 
-# 5. Finalize structure
+# 6. Finalize structure
 mv "dist/lib/leo-whole.so" dist/lib/ 2>/dev/null || true
 
 echo "Copying wrapper from leo/leo to dist/bin/leo..."
 cp leo/leo dist/bin/leo
 chmod +x dist/bin/leo
 
-# 6. Archive logic
-echo "Creating release archive..."
-# We create a temporary symlink called 'leo-macos' pointing to 'dist'
-# This allows tar to archive the folder under the new name without moving 'dist'
-ln -s dist leo-macos
+# 7. Archive logic with dynamic naming
+echo "Creating release archive: release/$ARCHIVE_NAME"
+# Create symlink with the versioned name pointing to dist
+ln -s dist "$RELEASE_DIR"
 
-# -h tells tar to follow the symlink so it archives the actual directory content
-tar -chzf release/leo-macos.tar.gz leo-macos
+# Archive following the symlink
+tar -chzf "release/$ARCHIVE_NAME" "$RELEASE_DIR"
 
-# Remove the temporary symlink
-rm leo-macos
+# Clean up symlink
+rm "$RELEASE_DIR"
 
-echo "Done! Archive created at: release/leo-macos.tar.gz"
+echo "Done! Archive created at: release/$ARCHIVE_NAME"
