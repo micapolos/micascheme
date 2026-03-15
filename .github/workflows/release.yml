@@ -1,67 +1,54 @@
 name: Build and Release micascheme
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build:
-    name: Build on macOS
+    name: Build Leo on macOS
     runs-on: macos-latest
-
 
     steps:
       - name: Checkout Micascheme
         uses: actions/checkout@v4
 
-      # 1. Try to restore the cache FIRST
-      - name: Cache ChezScheme Build
-        id: cache-chez
-        uses: actions/cache@v4
-        with:
-          path: deps/ChezScheme
-          # If .gitmodules hasn't changed, we trust the cache
-          key: ${{ runner.os }}-chez-${{ hashFiles('.gitmodules') }}
-
       - name: Initialize and Build ChezScheme
-        # This is the magic line: if cache exists, skip this whole block
-        if: steps.cache-chez.outputs.cache-hit != 'true'
         run: |
-          # Clean up just in case a partial directory exists
+          # 1. Clean and Clone
           rm -rf deps/ChezScheme
           mkdir -p deps/ChezScheme
-
           git clone --depth 1 --branch make-read-handler https://github.com/micapolos/ChezScheme.git deps/ChezScheme
 
+          # 2. Configure and Compile
           cd deps/ChezScheme
           ./configure
           make
 
-      - name: Package Release
+      - name: Package Leo
         run: |
           mkdir -p dist/bin dist/lib
 
-          # Use find to locate the binary and boot files regardless of nesting
+          # Use find to locate files in the nested build tree
           BINARY_PATH=$(find deps/ChezScheme -name scheme -type f -perm +111 | head -n 1)
           PETITE_PATH=$(find deps/ChezScheme -name petite.boot | head -n 1)
           SCHEME_PATH=$(find deps/ChezScheme -name scheme.boot | head -n 1)
 
-          cp "$BINARY_PATH" dist/bin/micascheme-bin
+          # Copy engine components
+          cp "$BINARY_PATH" dist/bin/leo-bin
           cp "$PETITE_PATH" dist/lib/
           cp "$SCHEME_PATH" dist/lib/
 
-          # Add the wrapper
+          # Create the 'leo' wrapper script
           echo '#!/bin/bash
           DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-          exec "$DIR/bin/micascheme-bin" -b "$DIR/lib/petite.boot" -b "$DIR/lib/scheme.boot" "$@"' > dist/micascheme
-          chmod +x dist/micascheme
+          exec "$DIR/bin/leo-bin" -b "$DIR/lib/petite.boot" -b "$DIR/lib/scheme.boot" "$@"' > dist/leo
+          chmod +x dist/leo
 
+          # Create the final archive
           tar -czvf micascheme-macos.tar.gz dist/
-
-      - name: Locate Boot Files
-        run: find deps/ChezScheme -name "*.boot"
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
