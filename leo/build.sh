@@ -1,78 +1,87 @@
 #!/bin/bash
 
-# 1. Parameterize Version
+# --- 1. Configuration & Versioning ---
 VERSION="${1:-latest}"
-RELEASE_DIR_NAME="leo-macos-$VERSION"
-ARCHIVE_NAME="leo-macos-$VERSION.tar.gz"
+MACHINE="tarm64osx"
 
-# 2. Ensure submodules are present
-# This checks if the ChezScheme directory is empty or missing
-if [ ! -f "deps/ChezScheme/configure" ]; then
+# Source Directories
+SRC_LEO_DIR="leo"
+DEPS_DIR="deps/ChezScheme"
+CS_MACHINE_DIR="$DEPS_DIR/$MACHINE"
+
+# Build/Release Directories
+BUILD_DIR="build"
+RELEASE_DIR="$BUILD_DIR/release"
+REL_BIN_DIR="$RELEASE_DIR/bin"
+REL_LIB_DIR="$RELEASE_DIR/lib"
+REL_EX_DIR="$RELEASE_DIR/examples"
+
+# Artifact Names
+RELEASE_NAME="leo-macos-$VERSION"
+ARCHIVE_NAME="$RELEASE_NAME.tar.gz"
+
+# --- 2. Internal ChezScheme Paths ---
+CS_BIN_DIR="$CS_MACHINE_DIR/bin/$MACHINE"
+CS_BOOT_DIR="$CS_MACHINE_DIR/boot/$MACHINE"
+
+# --- 3. Ensure Submodules & Build ChezScheme ---
+if [ ! -f "$DEPS_DIR/configure" ]; then
     echo "Submodules missing. Initializing..."
     git submodule update --init --recursive --depth=1
 fi
 
-# 3. Setup paths
-CS_BIN_DIR="deps/ChezScheme/tarm64osx/bin/tarm64osx"
-CS_BOOT_DIR="deps/ChezScheme/tarm64osx/boot/tarm64osx"
-CS_C_DIR="deps/ChezScheme/tarm64osx/c"
-CS_LZ4_OBJ_DIR="deps/ChezScheme/tarm64osx/lz4/lib"
-CS_ZLIB_OBJ_DIR="deps/ChezScheme/tarm64osx/zlib"
-LIB_DIR="build/release/lib"
-
-# 4. Build ChezScheme if missing
 if [ ! -f "$CS_BIN_DIR/scheme" ]; then
     echo "ChezScheme not found. Building..."
-    cd deps/ChezScheme
-    ./configure
-    make
-    cd ../..
+    (cd "$DEPS_DIR" && ./configure && make)
 fi
 
-# 5. Setup build/release structure
+# --- 4. Setup Build/Release Structure ---
 echo "Preparing environment for version: $VERSION"
-rm -rf build "$RELEASE_DIR_NAME"
-mkdir -p build/release/bin build/release/lib build/release/examples
+rm -rf "$BUILD_DIR" "$RELEASE_NAME"
+mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_EX_DIR"
 
-cp "$CS_BIN_DIR/scheme" build/release/bin/scheme
-cp "$CS_BOOT_DIR/petite.boot" build/release/lib/
-cp "$CS_BOOT_DIR/scheme.boot" build/release/lib/
+# Copy engine and boot files
+cp "$CS_BIN_DIR/scheme" "$REL_BIN_DIR/scheme"
+cp "$CS_BOOT_DIR/petite.boot" "$REL_LIB_DIR/"
+cp "$CS_BOOT_DIR/scheme.boot" "$REL_LIB_DIR/"
 
-cp leo/examples/* build/release/examples/
+# Copy examples
+cp "$SRC_LEO_DIR/examples"/* "$REL_EX_DIR/"
 
-# 6. Run WPO compilation
+# --- 5. Run WPO Compilation ---
 echo "Compiling Leo $VERSION with WPO..."
-./build/release/bin/scheme \
-    -b ./build/release/lib/petite.boot \
-    -b ./build/release/lib/scheme.boot \
-    --program "leo/compile-wpo.ss" ./build/release/lib/leo.so
+"$REL_BIN_DIR/scheme" \
+    -b "./$REL_LIB_DIR/petite.boot" \
+    -b "./$REL_LIB_DIR/scheme.boot" \
+    --program "$SRC_LEO_DIR/compile-wpo.ss" "$REL_LIB_DIR/leo.so"
 
-if [ -f "leo/leo" ]; then
-    echo "Copying wrapper to build/release/bin/leo..."
-    cp leo/leo build/release/bin/leo
-    chmod +x build/release/bin/leo
+# --- 6. Handle Wrapper Script ---
+if [ -f "$SRC_LEO_DIR/leo" ]; then
+    echo "Copying wrapper to $REL_BIN_DIR/leo..."
+    cp "$SRC_LEO_DIR/leo" "$REL_BIN_DIR/leo"
+    chmod +x "$REL_BIN_DIR/leo"
 else
-    echo "Error: Wrapper script 'leo/leo' not found!"
+    echo "Error: Wrapper script '$SRC_LEO_DIR/leo' not found!"
     exit 1
 fi
 
-# 7. Archive logic
+# --- 7. Archive Logic ---
 echo "Creating distribution archive..."
 
 # Create symlink so the folder name inside the tar is leo-macos-$VERSION
-ln -s build/release "$RELEASE_DIR_NAME"
+ln -s "$RELEASE_DIR" "$RELEASE_NAME"
 
 # Archive the symlink (dereferenced) into the build folder
-tar -chzf "build/$ARCHIVE_NAME" "$RELEASE_DIR_NAME"
+tar -chzf "$BUILD_DIR/$ARCHIVE_NAME" "$RELEASE_NAME"
 
 # Clean up the temporary symlink
-rm "$RELEASE_DIR_NAME"
+rm "$RELEASE_NAME"
 
-if [ -f "build/$ARCHIVE_NAME" ]; then
-    echo "Successfully created: build/$ARCHIVE_NAME"
+if [ -f "$BUILD_DIR/$ARCHIVE_NAME" ]; then
+    echo "Successfully created: $BUILD_DIR/$ARCHIVE_NAME"
 else
     echo "Archive creation failed!"
     exit 1
 fi
 
-echo "Done! Final release is in 'build/release' and archive is in 'build/'."
+echo "Done! Final release is in '$RELEASE_DIR' and archive is in '$BUILD_DIR/'."
