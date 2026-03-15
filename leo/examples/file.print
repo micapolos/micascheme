@@ -1,5 +1,5 @@
-=========================
-This is the first line to print.
-This is the second line to print.
-Does it look good?
-=========================
+========================================
+This is the program in the "print" language.
+The file extension for this language is ".print".
+This language simply prints its source code.
+========================================
