@@ -46,7 +46,7 @@ echo "Preparing environment for version: $VERSION"
 rm -rf "$BUILD_DIR" "$RELEASE_NAME"
 mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_SCHEME_BIN" "$REL_SCHEME_LIB" "$REL_EX_DIR"
 
-# Copy engine to its nested bin
+# Copy scheme to its nested bin
 cp "$CS_BIN_DIR/scheme" "$REL_SCHEME_BIN/scheme"
 
 # Copy boot files to their nested lib
