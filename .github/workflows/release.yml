@@ -10,6 +10,8 @@ jobs:
   build:
     name: Build Leo on macOS
     runs-on: macos-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -33,3 +35,11 @@ jobs:
         with:
           name: leo-macos
           path: build/*.tar.gz
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*.tar.gz
+          body: "Release for version ${{ github.ref_name }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
