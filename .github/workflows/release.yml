@@ -17,6 +17,7 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 1
+          submodules-fetch-depth: 1
 
       - name: Cache ChezScheme
         id: cache-chez
