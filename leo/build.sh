@@ -5,17 +5,27 @@ VERSION="${1:-latest}"
 RELEASE_DIR_NAME="leo-macos-$VERSION"
 ARCHIVE_NAME="leo-macos-$VERSION.tar.gz"
 
-# 2. Setup paths
+# 2. Ensure submodules are present
+# This checks if the ChezScheme directory is empty or missing
+if [ ! -f "deps/ChezScheme/configure" ]; then
+    echo "Submodules missing. Initializing..."
+    git submodule update --init --recursive
+fi
+
+# 3. Setup paths
 CS_BIN_DIR="deps/ChezScheme/tarm64osx/bin/tarm64osx"
 CS_BOOT_DIR="deps/ChezScheme/tarm64osx/boot/tarm64osx"
 
-# 3. Build the engine if missing
+# 4. Build ChezScheme if missing
 if [ ! -f "$CS_BIN_DIR/scheme" ]; then
-    echo "ChezScheme binary not found. Building engine..."
-    cd deps/ChezScheme && ./configure && make && cd ../..
+    echo "ChezScheme not found. Building..."
+    cd deps/ChezScheme
+    ./configure
+    make
+    cd ../..
 fi
 
-# 4. Setup build/release structure
+# 5. Setup build/release structure
 echo "Preparing environment for version: $VERSION"
 rm -rf build "$RELEASE_DIR_NAME"
 mkdir -p build/release/bin build/release/lib
@@ -24,7 +34,7 @@ cp "$CS_BIN_DIR/scheme" build/release/bin/scheme
 cp "$CS_BOOT_DIR/petite.boot" build/release/lib/
 cp "$CS_BOOT_DIR/scheme.boot" build/release/lib/
 
-# 5. Run WPO compilation
+# 6. Run WPO compilation
 echo "Compiling Leo $VERSION with WPO..."
 ./build/release/bin/scheme \
     -b ./build/release/lib/petite.boot \
