@@ -17,7 +17,6 @@ fi
 
 # 4. Setup build/release structure
 echo "Preparing environment for version: $VERSION"
-# Clean previous runs
 rm -rf build "$RELEASE_DIR_NAME"
 mkdir -p build/release/bin build/release/lib
 
@@ -32,9 +31,6 @@ echo "Compiling Leo $VERSION with WPO..."
     -b ./build/release/lib/scheme.boot \
     --program "leo/compile-wpo.ss"
 
-# 6. Finalize structure
-mv "build/release/lib/leo-whole.so" build/release/lib/ 2>/dev/null || true
-
 if [ -f "leo/leo" ]; then
     echo "Copying wrapper to build/release/bin/leo..."
     cp leo/leo build/release/bin/leo
@@ -48,7 +44,6 @@ fi
 echo "Creating distribution archive..."
 
 # Create symlink so the folder name inside the tar is leo-macos-$VERSION
-# We point it to the 'release' folder inside 'build'
 ln -s build/release "$RELEASE_DIR_NAME"
 
 # Archive the symlink (dereferenced) into the build folder

@@ -6,8 +6,8 @@
 
 (display "Compiling program...")
 (newline)
-(compile-program "leo/main.ss" "dist/lib/leo.so")
+(compile-program "leo/main.ss" "build/release/lib/leo.so")
 
 (display "Compiling whole program...")
 (newline)
-(compile-whole-program "dist/lib/leo.wpo" "dist/lib/leo-whole.so" #t)
+(compile-whole-program "build/release/lib/leo.wpo" "build/release/lib/leo-wpo.so" #t)
