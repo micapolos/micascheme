@@ -77,6 +77,8 @@
     ((cond (%when a b bs ...) ...)
       (%cond (a b bs ...) ...))
 
+    ((switch x (%when (a b) c) ... (%else d))
+      (%switch x ((a b) c) ... ((%else _) d)))
     ((switch x (%when (a b) c) ...)
       (%switch x ((a b) c) ...)))
 )
