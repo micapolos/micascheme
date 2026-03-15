@@ -3,16 +3,13 @@ name: Build and Release micascheme
 on:
   push:
     branches:
-      - main  # Now it triggers every time you 'git push origin main'
-  workflow_dispatch: # This adds a manual "Run" button in the GitHub UI
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
+    name: Build on macOS
+    runs-on: macos-latest
 
     steps:
       - name: Checkout Micascheme
@@ -29,23 +26,16 @@ jobs:
           # 3. Tell the main repo to track this folder as a submodule
           git submodule status
 
-      - name: Install Dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y uuid-dev libncurses5-dev
-
       - name: Cache ChezScheme Build
         id: cache-chez
         uses: actions/cache@v4
         with:
           path: deps/ChezScheme
-          # This key uses the specific commit hash of your submodule.
-          # If the submodule changes, the cache invalidates automatically.
           key: ${{ runner.os }}-chez-${{ hashFiles('.gitmodules', 'deps/ChezScheme/.git') }}
 
       - name: Build Patched ChezScheme
         if: steps.cache-chez.outputs.cache-hit != 'true'
         run: |
-          # This only runs if a cached version wasn't found
           cd deps/ChezScheme
           ./configure
           make
@@ -69,7 +59,7 @@ jobs:
           exec "$DIR/bin/micascheme-bin" -b "$DIR/lib/petite.boot" -b "$DIR/lib/scheme.boot" "$@"' > dist/micascheme
           chmod +x dist/micascheme
 
-          tar -czvf micascheme-${{ runner.os }}.tar.gz dist/
+          tar -czvf micascheme-macos.tar.gz dist/
 
       - name: Locate Boot Files
         run: find deps/ChezScheme -name "*.boot"
@@ -77,5 +67,5 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: micascheme-${{ runner.os }}
-          path: micascheme-${{ runner.os }}.tar.gz
+          name: micascheme-macos
+          path: micascheme-macos.tar.gz
