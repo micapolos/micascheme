@@ -20,8 +20,13 @@ jobs:
       - name: Initialize and Fetch Shallow Submodule
         run: |
           git submodule init
-          # This tells Git to fetch ONLY the patch branch at depth 1
-          git submodule update --remote --depth 1
+          # Manually fetch the specific branch to ensure the runner sees it
+          cd deps/ChezScheme
+          git fetch --depth 1 origin make-read-handler
+          git checkout make-read-handler
+          cd ../..
+          # Now sync the submodule state
+          git submodule update --init --recursive --depth 1
 
       - name: Install Dependencies (Linux)
         if: runner.os == 'Linux'
