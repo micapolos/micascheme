@@ -22,18 +22,19 @@ jobs:
         uses: actions/cache@v4
         with:
           path: deps/ChezScheme
-          # We use the commit hash of the submodule to decide if the cache is valid
+          # If .gitmodules hasn't changed, we trust the cache
           key: ${{ runner.os }}-chez-${{ hashFiles('.gitmodules') }}
-          # This allows us to use an older cache if an exact match isn't found
-          restore-keys: |
-            ${{ runner.os }}-chez-
 
-      # 2. Only Clone and Build if cache was NOT found
       - name: Initialize and Build ChezScheme
+        # This is the magic line: if cache exists, skip this whole block
         if: steps.cache-chez.outputs.cache-hit != 'true'
         run: |
+          # Clean up just in case a partial directory exists
+          rm -rf deps/ChezScheme
           mkdir -p deps/ChezScheme
+
           git clone --depth 1 --branch make-read-handler https://github.com/micapolos/ChezScheme.git deps/ChezScheme
+
           cd deps/ChezScheme
           ./configure
           make
