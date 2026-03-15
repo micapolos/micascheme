@@ -1,5 +1,4 @@
 *.so
 .DS_Store
 dist/
-deps/
 *.tar.gz
