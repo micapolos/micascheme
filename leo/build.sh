@@ -2,7 +2,7 @@
 
 # 1. Parameterize Version
 VERSION="${1:-latest}"
-RELEASE_DIR="leo-macos-$VERSION"
+RELEASE_DIR_NAME="leo-macos-$VERSION"
 ARCHIVE_NAME="leo-macos-$VERSION.tar.gz"
 
 # 2. Setup paths
@@ -12,56 +12,56 @@ CS_BOOT_DIR="deps/ChezScheme/tarm64osx/boot/tarm64osx"
 # 3. Build the engine if missing
 if [ ! -f "$CS_BIN_DIR/scheme" ]; then
     echo "ChezScheme binary not found. Building engine..."
-    # Ensure we are in the right spot to build
     cd deps/ChezScheme && ./configure && make && cd ../..
 fi
 
-# 4. Setup dist and release structure
+# 4. Setup build/release structure
 echo "Preparing environment for version: $VERSION"
-# Clean previous builds to prevent stale files in the archive
-rm -rf dist release "$RELEASE_DIR"
-mkdir -p dist/bin dist/lib release
+# Clean previous runs
+rm -rf build "$RELEASE_DIR_NAME"
+mkdir -p build/release/bin build/release/lib
 
-cp "$CS_BIN_DIR/scheme" dist/bin/scheme
-cp "$CS_BOOT_DIR/petite.boot" dist/lib/
-cp "$CS_BOOT_DIR/scheme.boot" dist/lib/
+cp "$CS_BIN_DIR/scheme" build/release/bin/scheme
+cp "$CS_BOOT_DIR/petite.boot" build/release/lib/
+cp "$CS_BOOT_DIR/scheme.boot" build/release/lib/
 
 # 5. Run WPO compilation
 echo "Compiling Leo $VERSION with WPO..."
-./dist/bin/scheme \
-    -b ./dist/lib/petite.boot \
-    -b ./dist/lib/scheme.boot \
+./build/release/bin/scheme \
+    -b ./build/release/lib/petite.boot \
+    -b ./build/release/lib/scheme.boot \
     --program "leo/compile-wpo.ss"
 
 # 6. Finalize structure
-# Ensure the WPO output is in lib/
-mv "dist/lib/leo-whole.so" dist/lib/ 2>/dev/null || true
+mv "build/release/lib/leo-whole.so" build/release/lib/ 2>/dev/null || true
 
-# Verify wrapper exists before copying
 if [ -f "leo/leo" ]; then
-    echo "Copying wrapper to dist/bin/leo..."
-    cp leo/leo dist/bin/leo
-    chmod +x dist/bin/leo
+    echo "Copying wrapper to build/release/bin/leo..."
+    cp leo/leo build/release/bin/leo
+    chmod +x build/release/bin/leo
 else
     echo "Error: Wrapper script 'leo/leo' not found!"
     exit 1
 fi
 
-# 7. Archive logic with dynamic naming
-echo "Creating release archive: release/$ARCHIVE_NAME"
+# 7. Archive logic
+echo "Creating distribution archive..."
 
-# Create symlink so 'tar' sees the folder name as leo-macos-$VERSION
-ln -s dist "$RELEASE_DIR"
+# Create symlink so the folder name inside the tar is leo-macos-$VERSION
+# We point it to the 'release' folder inside 'build'
+ln -s build/release "$RELEASE_DIR_NAME"
 
-# -h (dereference) ensures tar archives the folder the symlink points to
-tar -chzf "release/$ARCHIVE_NAME" "$RELEASE_DIR"
+# Archive the symlink (dereferenced) into the build folder
+tar -chzf "build/$ARCHIVE_NAME" "$RELEASE_DIR_NAME"
 
 # Clean up the temporary symlink
-rm "$RELEASE_DIR"
+rm "$RELEASE_DIR_NAME"
 
-if [ -f "release/$ARCHIVE_NAME" ]; then
-    echo "Done!"
+if [ -f "build/$ARCHIVE_NAME" ]; then
+    echo "Successfully created: build/$ARCHIVE_NAME"
 else
     echo "Archive creation failed!"
     exit 1
 fi
+
+echo "Done! Final release is in 'build/release' and archive is in 'build/'."
