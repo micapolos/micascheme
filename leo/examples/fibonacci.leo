@@ -1,12 +1,15 @@
-import leo scheme
+import
+  leo scheme
+  leo math
 
-pretty-print quote calculating fibonacci 45
+define n 45
+pretty-print quasiquote calculating fibonacci unquote n
 pretty-print time
   let fibonacci
-    with number 45
+    with number n
     if
-      <: number, 2
+      less?: number, 2
       number
-      +
-        fibonacci -: number, 1
-        fibonacci -: number, 2
+      add
+        fibonacci subtract: number, 1
+        fibonacci subtract: number, 2
