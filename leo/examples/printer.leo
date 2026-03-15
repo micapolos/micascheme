@@ -3,6 +3,7 @@ import
   language
   leo language
   leo examples math
+
 define-language
   printer
   language
@@ -23,4 +24,5 @@ define-language
       with: datum, and args
       displayln datum
       apply: sc-expand, #f, args
+
 printer load "leo/examples/file.print"
