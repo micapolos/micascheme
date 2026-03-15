@@ -10,8 +10,8 @@ if [ ! -f "$CS_BIN_DIR/scheme" ]; then
     cd deps/ChezScheme && ./configure && make && cd ../..
 fi
 
-# 3. Setup dist and release structure
-echo "Preparing environment..."
+# 3. Setup dist structure
+echo "Preparing dist environment..."
 rm -rf dist release
 mkdir -p dist/bin dist/lib release
 
@@ -33,9 +33,16 @@ echo "Copying wrapper from leo/leo to dist/bin/leo..."
 cp leo/leo dist/bin/leo
 chmod +x dist/bin/leo
 
-# 6. Archive to release/ folder
-echo "Creating archive: release/leo-macos.tar.gz"
-# This preserves the 'dist' folder name inside the archive
-tar -czvf release/leo-macos.tar.gz dist
+# 6. Archive logic
+echo "Creating release archive..."
+# We create a temporary symlink called 'leo-macos' pointing to 'dist'
+# This allows tar to archive the folder under the new name without moving 'dist'
+ln -s dist leo-macos
 
-echo "Done! Ready for release."
+# -h tells tar to follow the symlink so it archives the actual directory content
+tar -chzf release/leo-macos.tar.gz leo-macos
+
+# Remove the temporary symlink
+rm leo-macos
+
+echo "Done! Archive created at: release/leo-macos.tar.gz"

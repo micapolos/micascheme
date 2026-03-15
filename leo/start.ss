@@ -1,10 +1,13 @@
 (library (leo start)
   (export leo-start)
   (import
-    (chezscheme)
-    (leo load)
-    (leo path))
+    (micascheme)
+    (leo load))
 
   (define (leo-start)
-    (load-leo (leo-path (command-line-arguments))))
+    (switch (command-line-arguments)
+      ((null? _)
+        (displayln "error: missing .leo file path"))
+      ((else $args)
+        (load-leo (car $args)))))
 )
