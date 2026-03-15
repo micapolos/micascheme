@@ -1,4 +1,4 @@
-name: Build and Release micascheme
+name: Build and Release Leo
 
 on:
   workflow_dispatch:
