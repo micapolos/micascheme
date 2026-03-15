@@ -1,5 +1,5 @@
 *.so
 .DS_Store
 dist/
-deps/ChezScheme/
+deps/
 *.tar.gz
