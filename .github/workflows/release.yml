@@ -2,8 +2,9 @@ name: Build and Release micascheme
 
 on:
   push:
-    tags:
-      - 'v*' # Triggers when you push a tag like v1.0
+    branches:
+      - main  # Now it triggers every time you 'git push origin main'
+  workflow_dispatch: # This adds a manual "Run" button in the GitHub UI
 
 jobs:
   build:
@@ -19,14 +20,14 @@ jobs:
 
       - name: Initialize and Fetch Shallow Submodule
         run: |
-          git submodule init
-          # Manually fetch the specific branch to ensure the runner sees it
-          cd deps/ChezScheme
-          git fetch --depth 1 origin make-read-handler
-          git checkout make-read-handler
-          cd ../..
-          # Now sync the submodule state
-          git submodule update --init --recursive --depth 1
+          # 1. Create the directory
+          mkdir -p deps/ChezScheme
+
+          # 2. Manual clone (this is more reliable than 'submodule init' in CI)
+          git clone --depth 1 --branch make-read-handler https://github.com/micapolos/ChezScheme.git deps/ChezScheme
+
+          # 3. Tell the main repo to track this folder as a submodule
+          git submodule status
 
       - name: Install Dependencies (Linux)
         if: runner.os == 'Linux'
