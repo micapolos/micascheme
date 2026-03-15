@@ -14,6 +14,12 @@ BUILD_DIR="build"
 RELEASE_DIR="$BUILD_DIR/release"
 REL_BIN_DIR="$RELEASE_DIR/bin"
 REL_LIB_DIR="$RELEASE_DIR/lib"
+
+# The "Mini-Prefix" for the Scheme engine
+REL_SCHEME_ROOT="$REL_LIB_DIR/scheme"
+REL_SCHEME_BIN="$REL_SCHEME_ROOT/bin"
+REL_SCHEME_LIB="$REL_SCHEME_ROOT/lib"
+
 REL_EX_DIR="$RELEASE_DIR/examples"
 
 # Artifact Names
@@ -38,21 +44,24 @@ fi
 # --- 4. Setup Build/Release Structure ---
 echo "Preparing environment for version: $VERSION"
 rm -rf "$BUILD_DIR" "$RELEASE_NAME"
-mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_EX_DIR"
+mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_SCHEME_BIN" "$REL_SCHEME_LIB" "$REL_EX_DIR"
 
-# Copy engine and boot files
-cp "$CS_BIN_DIR/scheme" "$REL_BIN_DIR/scheme"
-cp "$CS_BOOT_DIR/petite.boot" "$REL_LIB_DIR/"
-cp "$CS_BOOT_DIR/scheme.boot" "$REL_LIB_DIR/"
+# Copy engine to its nested bin
+cp "$CS_BIN_DIR/scheme" "$REL_SCHEME_BIN/scheme"
+
+# Copy boot files to their nested lib
+cp "$CS_BOOT_DIR/petite.boot" "$REL_SCHEME_LIB/"
+cp "$CS_BOOT_DIR/scheme.boot" "$REL_SCHEME_LIB/"
 
 # Copy examples
 cp "$SRC_LEO_DIR/examples"/* "$REL_EX_DIR/"
 
 # --- 5. Run WPO Compilation ---
 echo "Compiling Leo $VERSION with WPO..."
-"$REL_BIN_DIR/scheme" \
-    -b "./$REL_LIB_DIR/petite.boot" \
-    -b "./$REL_LIB_DIR/scheme.boot" \
+# We run from the new nested bin path
+"$REL_SCHEME_BIN/scheme" \
+    -b "./$REL_SCHEME_LIB/petite.boot" \
+    -b "./$REL_SCHEME_LIB/scheme.boot" \
     --program "$SRC_LEO_DIR/compile-wpo.ss" "$REL_LIB_DIR/leo.so"
 
 # --- 6. Handle Wrapper Script ---
@@ -67,21 +76,8 @@ fi
 
 # --- 7. Archive Logic ---
 echo "Creating distribution archive..."
-
-# Create symlink so the folder name inside the tar is leo-macos-$VERSION
 ln -s "$RELEASE_DIR" "$RELEASE_NAME"
-
-# Archive the symlink (dereferenced) into the build folder
 tar -chzf "$BUILD_DIR/$ARCHIVE_NAME" "$RELEASE_NAME"
-
-# Clean up the temporary symlink
 rm "$RELEASE_NAME"
 
-if [ -f "$BUILD_DIR/$ARCHIVE_NAME" ]; then
-    echo "Successfully created: $BUILD_DIR/$ARCHIVE_NAME"
-else
-    echo "Archive creation failed!"
-    exit 1
-fi
-
-echo "Done! Final release is in '$RELEASE_DIR' and archive is in '$BUILD_DIR/'."
+echo "Done! Final release is in '$RELEASE_DIR'."

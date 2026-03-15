@@ -1,9 +1,13 @@
 #!/bin/bash
-# Get the directory where this script sits (dist/bin)
-BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Execute relative to that directory
-exec "$BIN_DIR/scheme" \
-  -b "$BIN_DIR/../lib/petite.boot" \
-  -b "$BIN_DIR/../lib/scheme.boot" \
-  --program "$BIN_DIR/../lib/leo.so" "$@"
+# Define paths relative to the wrapper in bin/
+SCHEME_BIN="$HERE/../lib/scheme/bin/scheme"
+SCHEME_LIB="$HERE/../lib/scheme/lib"
+LEO_SO="$HERE/../lib/leo.so"
+
+# Execute with explicit boot paths
+exec "$SCHEME_BIN" \
+    -b "$SCHEME_LIB/petite.boot" \
+    -b "$SCHEME_LIB/scheme.boot" \
+    --program "$LEO_SO" "$@"
