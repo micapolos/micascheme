@@ -2,4 +2,4 @@
 
 (optimize-level 3)
 (generate-wpo-files #t)
-(compile-program "leo/main.ss" "lib/micascheme.so")
+(compile-program "leo/main.ss" "dist/lib/leo.so")
