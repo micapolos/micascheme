@@ -26,12 +26,16 @@ jobs:
           key: ${{ runner.os }}-chez-${{ hashFiles('deps/ChezScheme/s/**/*', 'deps/ChezScheme/c/**/*', 'deps/ChezScheme/m4/**/*') }}
 
       - name: Run Build Script
-        # Passes the tag/branch name as the first argument to build.sh
-        run: ./leo/build.sh "${{ github.ref_name }}"
+        # If it's a tag, pass the tag name. Otherwise, pass nothing.
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            ./leo/build.sh "${{ github.ref_name }}"
+          else
+            ./leo/build.sh "latest"
+          fi
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: leo-macos
-          # Use a wildcard to find the versioned tarball
-          path: release/leo-macos-*.tar.gz
+          path: release/*.tar.gz
