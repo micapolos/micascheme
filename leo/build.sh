@@ -15,6 +15,10 @@ fi
 # 3. Setup paths
 CS_BIN_DIR="deps/ChezScheme/tarm64osx/bin/tarm64osx"
 CS_BOOT_DIR="deps/ChezScheme/tarm64osx/boot/tarm64osx"
+CS_C_DIR="deps/ChezScheme/tarm64osx/c"
+CS_LZ4_OBJ_DIR="deps/ChezScheme/tarm64osx/lz4/lib"
+CS_ZLIB_OBJ_DIR="deps/ChezScheme/tarm64osx/zlib"
+LIB_DIR="build/release/lib"
 
 # 4. Build ChezScheme if missing
 if [ ! -f "$CS_BIN_DIR/scheme" ]; then
@@ -34,7 +38,7 @@ cp "$CS_BIN_DIR/scheme" build/release/bin/scheme
 cp "$CS_BOOT_DIR/petite.boot" build/release/lib/
 cp "$CS_BOOT_DIR/scheme.boot" build/release/lib/
 
-# 6. Run WPO compilation
+# 6. Run WPO compilation, it puts leo-wpo.ss in build/release/lib
 echo "Compiling Leo $VERSION with WPO..."
 ./build/release/bin/scheme \
     -b ./build/release/lib/petite.boot \
@@ -49,6 +53,30 @@ else
     echo "Error: Wrapper script 'leo/leo' not found!"
     exit 1
 fi
+
+# 7. Convert Binaries to C Headers (The missing link)
+echo "Embedding binaries into C headers..."
+(cd "$CS_BOOT_DIR" && xxd -i "petite.boot") > build/petite_boot.h
+(cd "$CS_BOOT_DIR" && xxd -i "scheme.boot") > build/scheme_boot.h
+(cd "$LIB_DIR" && xxd -i "leo-wpo.so") > build/leo_wpo_so.h
+
+ZLIB_OBJS=$(ls "$CS_ZLIB_OBJ_DIR"/*.o | grep -vE "example.o|minigzip.o")
+LZ4_OBJS="$CS_LZ4_OBJ_DIR"/*.o
+
+clang -O3 \
+    -I"$CS_BOOT_DIR" \
+    -I./build \
+    leo/main.c \
+    "$CS_C_DIR"/*.o \
+    $LZ4_OBJS \
+    $ZLIB_OBJS \
+    -liconv -lm -lncurses \
+    -o build/release/bin/leoc
+
+# 9. Optimization
+strip build/release/bin/leoc
+
+echo "Standalone build complete: build/release/bin/leoc"
 
 # 7. Archive logic
 echo "Creating distribution archive..."
