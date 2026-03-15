@@ -50,12 +50,11 @@
     (non-empty-separated ", " inline-annotation))
 
   (define rhs-line-annotations
-    (switch char
-      ((%char-space? _) rhs-space-line-annotations)
-      ((%char-colon? _) rhs-colon-line-annotations)
-      ((%char-comma? _) rhs-comma-line-annotations)
-      ((%char-newline? _) rhs-newline-line-annotations)
-      ((else $char) (error "unexpected char" $char))))
+    (one-of
+      (prefixed #\space rhs-space-line-annotations)
+      (prefixed #\: rhs-colon-line-annotations)
+      (prefixed #\, rhs-comma-line-annotations)
+      (prefixed #\newline rhs-newline-line-annotations)))
 
   (define line-annotations
     (reject?-list %char-newline? line-annotation))
