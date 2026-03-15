@@ -5,7 +5,7 @@ Chez scheme base library.
 ## Clone
 
 ```
-git clone --recursive --depth 1 https://github.com/micapolos/micascheme.git
+git clone --depth 1 https://github.com/micapolos/micascheme.git
 ```
 
 ## Build Leo
