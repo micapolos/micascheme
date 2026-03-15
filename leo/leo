@@ -2,7 +2,6 @@
 LEO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIB_DIR="$LEO_DIR/../lib"
 
-# Execute with explicit boot paths
 exec "$LIB_DIR/scheme/bin/scheme" \
     -b "$LIB_DIR/scheme/lib/petite.boot" \
     -b "$LIB_DIR/scheme/lib/scheme.boot" \
