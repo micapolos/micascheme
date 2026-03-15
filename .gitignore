@@ -1,4 +1,5 @@
 *.so
+*.wpo
 .DS_Store
 dist/
 *.tar.gz

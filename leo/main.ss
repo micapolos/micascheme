@@ -1,6 +1,2 @@
-(import
-  (chezscheme)
-  (leo)
-  (leo path))
-
-(leo (load (leo-path (command-line-arguments))))
+(import (leo start))
+(leo-start)

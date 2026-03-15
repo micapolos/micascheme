@@ -100,7 +100,8 @@
       $value))
 
   (define (read-file $reader $path)
-    (read-source-file-descriptor $reader (path->source-file-descriptor $path)))
+    (read-source-file-descriptor $reader
+      (path->source-file-descriptor $path)))
 
   (define (error $message $datum)
     (getter-item
