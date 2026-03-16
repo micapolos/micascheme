@@ -31,7 +31,7 @@ REL_EX_DIR="$RELEASE_DIR/examples"
 mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_SCHEME_BIN" "$REL_SCHEME_LIB" "$REL_EX_DIR" "$REL_MICASCHEME_DIR"
 
 # Copy micascheme
-EXCLUDE_DIR=$(basename "$REL_MICASCHEME_DIR")
+EXCLUDE_DIR=$(basename "$BUILD_DIR")
 find . -maxdepth 1 ! -path . ! -path "./$EXCLUDE_DIR" -exec cp -R {} "$REL_MICASCHEME_DIR/" \;
 
 # --- 3. Ensure Submodules & Build ChezScheme ---
