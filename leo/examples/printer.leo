@@ -23,6 +23,6 @@ define-language
     lambda
       with: datum, list args
       displayln datum
-      apply: sc-expand, #f, args
+      apply: sc-expand, false, args
 
 printer load "leo/examples/file.print"

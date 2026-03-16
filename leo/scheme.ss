@@ -25,6 +25,7 @@
         let* letrec* let*-values
         let-syntax letrec-syntax
         if cond)
+      (only (micascheme) char true false)
       (only (leo transform) from with)))
 
   (define-syntax library transform-library)
