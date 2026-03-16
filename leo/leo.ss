@@ -1,11 +1,6 @@
 (library (leo leo)
   (export leo)
   (import
-    (micascheme)
-    (leo expand)
-    (leo read)
-    (leo path)
-    (leo source-file-descriptor)
     (language)
     (leo language))
 
