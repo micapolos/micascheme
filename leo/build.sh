@@ -28,6 +28,7 @@ REL_SCHEME_LIB="$REL_SCHEME_ROOT/lib"
 
 REL_EX_DIR="$RELEASE_DIR/examples"
 
+rm -rf "$BUILD_DIR"
 mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_SCHEME_BIN" "$REL_SCHEME_LIB" "$REL_EX_DIR" "$REL_MICASCHEME_DIR"
 
 # Copy micascheme
@@ -71,13 +72,6 @@ ARCHIVE_NAME="$RELEASE_NAME.tar.gz"
 
 # --- 4. Setup Build/Release Structure ---
 echo "Preparing environment for version: $VERSION"
-rm -rf "$BUILD_DIR" "$RELEASE_NAME"
-mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_SCHEME_BIN" "$REL_SCHEME_LIB" "$REL_EX_DIR" "$REL_MICASCHEME_DIR"
-
-# Copy micascheme
-cp -R * "$REL_MICASCHEME_DIR"
-rm -rf "$REL_MICASCHEME_DIR/deps"
-rm -rf "$REL_MICASCHEME_DIR/build"
 
 # Copy scheme to its nested bin
 cp "$CS_BIN_DIR/scheme" "$REL_SCHEME_BIN/scheme"
