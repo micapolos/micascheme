@@ -21,9 +21,6 @@ jobs:
           - os: linux
             arch: x64
             runner: ubuntu-latest
-          - os: linux
-            arch: arm64
-            runner: ubuntu-24.04-arm-64
 
     steps:
       - name: Checkout
@@ -36,7 +33,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libncurses5-dev libncursesw5-dev
+          sudo apt-get install -y libncurses5-dev libncursesw5-dev libx11-dev uuid-dev
 
       - name: Cache ChezScheme
         id: cache-chez
