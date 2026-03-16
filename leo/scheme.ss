@@ -8,14 +8,18 @@
     let-syntax letrec-syntax
     if then cond
     switch any?
-    make-read-lambda)
+    make-read-lambda
+    pretty-print)
   (import
     (prefix (chezscheme) %)
     (only (chezscheme) export define-syntax)
     (only (micascheme) define-rules-syntaxes define-keywords keywords ...)
     (prefix (only (micascheme) make-read-lambda switch) %)
     (only (keyword) keyword?)
-    (leo transform))
+    (leo transform)
+    (writing)
+    (leo reader)
+    (leo writing-reader))
   (export
     (import
       (except (chezscheme)
@@ -24,7 +28,7 @@
         let letrec let-values
         let* letrec* let*-values
         let-syntax letrec-syntax
-        if cond)
+        if cond pretty-print)
       (only (micascheme) char true false)
       (only (leo transform) from with)))
 
@@ -34,6 +38,12 @@
   (%define (any? _) #t)
 
   (define-keywords then)
+
+  (%define (pretty-print . $args)
+    (%display
+      (writing-string
+        (reader-end
+          (reader-read-list (writing-reader) $args)))))
 
   (define-rules-syntaxes (keywords with then %else %when %list)
     ((the x ...)
