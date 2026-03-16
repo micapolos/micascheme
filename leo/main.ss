@@ -1,6 +1,3 @@
-(import (micascheme) (leo load) (prefix (leo scheme) %))
-
-; Trigger anything from (leo scheme), so it's included
-(%any? #t)
+(import (leo scheme))
 
 (for-each load-leo (command-line-arguments))
