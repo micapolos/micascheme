@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build Leo on ${{ matrix.os }} / ${{ matrix.arch }}
-    runs-on: ${{ matrix.os }} / ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
 
     strategy:
       fail-fast: false
