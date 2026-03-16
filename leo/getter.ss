@@ -38,17 +38,11 @@
         ((else _)
           (getter-lets
             ($atom-annotation atom-annotation-getter)
-            (switch (annotation-stripped $atom-annotation)
-              ((symbol? $symbol)
-                (getter-switch rhs-line-annotations-getter
-                  ((null? _)
-                    (getter $atom-annotation))
-                  ((else $rhs-line-annotations)
-                    (getter (cons $atom-annotation $rhs-line-annotations)))))
-              ((else _)
-                (ending-getter
-                  (getter $atom-annotation)
-                  newline-getter))))))
+            (getter-switch rhs-line-annotations-getter
+              ((null? _)
+                (getter $atom-annotation))
+              ((else $rhs-line-annotations)
+                (getter (cons $atom-annotation $rhs-line-annotations)))))))
       (lambda ($line $source-object)
         (switch $line
           ((annotation? $line) $line)
