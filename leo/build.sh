@@ -30,7 +30,7 @@ REL_EX_DIR="$RELEASE_DIR/examples"
 mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_SCHEME_BIN" "$REL_SCHEME_LIB" "$REL_EX_DIR" "$REL_MICASCHEME_DIR"
 
 # Copy micascheme
-cp -R * "$REL_MICASCHEME_DIR"
+rsync -av --exclude="$REL_MICASCHEME_DIR" . "$REL_MICASCHEME_DIR/"
 
 # --- 3. Ensure Submodules & Build ChezScheme ---
 if [ ! -f "$DEPS_DIR/configure" ]; then
