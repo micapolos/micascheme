@@ -5,6 +5,7 @@
 # -u: exit on unset variables
 # -o pipefail: catch errors in pipelines (like find | grep)
 set -euo pipefail
+shopt -s extglob
 
 # --- 1. Configuration & Versioning ---
 VERSION="${1:-latest}"
@@ -30,7 +31,8 @@ REL_EX_DIR="$RELEASE_DIR/examples"
 mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_SCHEME_BIN" "$REL_SCHEME_LIB" "$REL_EX_DIR" "$REL_MICASCHEME_DIR"
 
 # Copy micascheme
-find . -maxdepth 1 ! -name "." ! -name "$REL_MICASCHEME_DIR" -exec cp -R {} "$REL_MICASCHEME_DIR" \;
+EXCLUDE_DIR=$(basename "$REL_MICASCHEME_DIR")
+find . -maxdepth 1 ! -path . ! -path "./$EXCLUDE_DIR" -exec cp -R {} "$REL_MICASCHEME_DIR/" \;
 
 # --- 3. Ensure Submodules & Build ChezScheme ---
 if [ ! -f "$DEPS_DIR/configure" ]; then
