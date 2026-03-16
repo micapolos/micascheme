@@ -46,7 +46,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: deps/ChezScheme
-          key: ${{ runner.os }}-chez-${{ hashFiles('deps/ChezScheme/s/**/*', 'deps/ChezScheme/c/**/*', 'deps/ChezScheme/m4/**/*') }}
+          key: ${{ runner.os }}-${{ matrix.arch }}-chez-${{ hashFiles('deps/ChezScheme/s/**/*', 'deps/ChezScheme/c/**/*', 'deps/ChezScheme/m4/**/*') }}
 
       - name: Run Build Script
         run: |
@@ -57,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           # Dynamic name based on the OS (e.g., leo-macos, leo-linux)
-          name: leo-${{ runner.os }}
+          name: leo-${{ matrix.os }}-${{ matrix.arch }}
           path: build/*.tar.gz
 
   release:
@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
 
     steps:
       - name: Download all artifacts
