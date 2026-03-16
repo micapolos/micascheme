@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Exit immediately if a command exits with a non-zero status.
+# -e: exit on error
+# -u: exit on unset variables
+# -o pipefail: catch errors in pipelines (like find | grep)
+set -euo pipefail
+
 # --- 1. Configuration & Versioning ---
 VERSION="${1:-latest}"
 
@@ -95,4 +101,4 @@ ln -s "$RELEASE_DIR" "$RELEASE_NAME"
 tar -chzf "$BUILD_DIR/$ARCHIVE_NAME" "$RELEASE_NAME"
 rm "$RELEASE_NAME"
 
-echo "Done! Final release is in '$RELEASE_DIR'."
+echo "Done! Final release: $BUILD_DIR/$ARCHIVE_NAME"
