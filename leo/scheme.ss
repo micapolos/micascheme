@@ -34,7 +34,7 @@
 
   (define-keywords then)
 
-  (define-rules-syntaxes (keywords with then %else %when %and)
+  (define-rules-syntaxes (keywords with then %else %when %list)
     ((the x ...)
       (x ...))
     ((define (name x))
@@ -42,8 +42,8 @@
     ((define (name param ...) body ...)
       (%define (name param ...) body ...))
 
-    ((lambda (with param ... (%and list)) x xs ...)
-      (%lambda (param ... . list) x xs ...))
+    ((lambda (with param ... (%list l)) x xs ...)
+      (%lambda (param ... . l) x xs ...))
     ((lambda (with param ...) x xs ...)
       (%lambda (param ...) x xs ...))
     ((lambda x xs ...)

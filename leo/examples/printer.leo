@@ -21,7 +21,7 @@ define-language
             string-append: number->string bfp, ": ", line
             add: bfp, string-length line, 1
     lambda
-      with: datum, and args
+      with: datum, list args
       displayln datum
       apply: sc-expand, #f, args
 
