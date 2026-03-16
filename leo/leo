@@ -1,5 +1,17 @@
 #!/bin/bash
-LEO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+SOURCE="${BASH_SOURCE[0]}"
+
+# Resolve symlink
+while [ -h "$SOURCE" ]; do
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  # If SOURCE was a relative symlink, resolve it relative to the path where the symlink sat
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+
+LEO_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
 BASE_DIR="$LEO_DIR/.."
 LIB_DIR="$BASE_DIR/lib"
 SCHEME_DIR="$LIB_DIR/scheme"
