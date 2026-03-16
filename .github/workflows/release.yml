@@ -12,9 +12,23 @@ jobs:
   build:
     name: Build Leo on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+
     strategy:
+      fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        include:
+          - os: macos
+            arch: arm64
+            runner: macos-14
+          - os: macos
+            arch: x64
+            runner: macos-13
+          - os: linux
+            arch: x64
+            runner: ubuntu-latest
+          - os: linux
+            arch: arm64
+            runner: ubuntu-24.04-arm-64
 
     steps:
       - name: Checkout
