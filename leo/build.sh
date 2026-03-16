@@ -33,7 +33,9 @@ mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_SCHEME_BIN" "$REL_SCHEME_LIB" "$REL
 
 # Copy micascheme
 EXCLUDE_DIR=$(basename "$BUILD_DIR")
-find . -maxdepth 1 ! -path . ! -path "./$EXCLUDE_DIR" -exec cp -R {} "$REL_MICASCHEME_DIR/" \;
+find . -maxdepth 1 ! -path . ! -path "./$EXCLUDE_DIR" ! -path $(basename "./$DEPS_DIR") -exec cp -R {} "$REL_MICASCHEME_DIR/" \;
+rm -rf "$REL_LIB_DIR/micascheme/deps"
+rm -rf "$REL_LIB_DIR/micascheme/.git"
 
 # --- 3. Ensure Submodules & Build ChezScheme ---
 if [ ! -f "$DEPS_DIR/configure" ]; then
