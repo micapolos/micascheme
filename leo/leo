@@ -5,5 +5,6 @@ LIB_DIR="$LEO_DIR/../lib"
 exec "$LIB_DIR/scheme/bin/scheme" \
     -b "$LIB_DIR/scheme/lib/petite.boot" \
     -b "$LIB_DIR/scheme/lib/scheme.boot" \
+    --libdirs "$LIB_DIR/micascheme" \
     --program "$LIB_DIR/leo.so" \
     "$@"

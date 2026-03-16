@@ -18,6 +18,7 @@ BUILD_DIR="build"
 RELEASE_DIR="$BUILD_DIR/release"
 REL_BIN_DIR="$RELEASE_DIR/bin"
 REL_LIB_DIR="$RELEASE_DIR/lib"
+REL_MICASCHEME_DIR="$REL_LIB_DIR/micascheme"
 
 # The "Mini-Prefix" for the Scheme engine
 REL_SCHEME_ROOT="$REL_LIB_DIR/scheme"
@@ -25,6 +26,11 @@ REL_SCHEME_BIN="$REL_SCHEME_ROOT/bin"
 REL_SCHEME_LIB="$REL_SCHEME_ROOT/lib"
 
 REL_EX_DIR="$RELEASE_DIR/examples"
+
+mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_SCHEME_BIN" "$REL_SCHEME_LIB" "$REL_EX_DIR" "$REL_MICASCHEME_DIR"
+
+# Copy micascheme
+cp -R * "$REL_MICASCHEME_DIR"
 
 # --- 3. Ensure Submodules & Build ChezScheme ---
 if [ ! -f "$DEPS_DIR/configure" ]; then
@@ -61,11 +67,15 @@ CS_BOOT_DIR="$CS_MACHINE_DIR/boot/$MACHINE"
 RELEASE_NAME="leo-$MACHINE-$VERSION"
 ARCHIVE_NAME="$RELEASE_NAME.tar.gz"
 
-
 # --- 4. Setup Build/Release Structure ---
 echo "Preparing environment for version: $VERSION"
 rm -rf "$BUILD_DIR" "$RELEASE_NAME"
-mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_SCHEME_BIN" "$REL_SCHEME_LIB" "$REL_EX_DIR"
+mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_SCHEME_BIN" "$REL_SCHEME_LIB" "$REL_EX_DIR" "$REL_MICASCHEME_DIR"
+
+# Copy micascheme
+cp -R * "$REL_MICASCHEME_DIR"
+rm -rf "$REL_MICASCHEME_DIR/deps"
+rm -rf "$REL_MICASCHEME_DIR/build"
 
 # Copy scheme to its nested bin
 cp "$CS_BIN_DIR/scheme" "$REL_SCHEME_BIN/scheme"
@@ -83,7 +93,9 @@ echo "Compiling Leo $VERSION with WPO..."
 "$REL_SCHEME_BIN/scheme" \
     -b "./$REL_SCHEME_LIB/petite.boot" \
     -b "./$REL_SCHEME_LIB/scheme.boot" \
-    --program "$SRC_LEO_DIR/compile-wpo.ss" "$REL_LIB_DIR/leo.so"
+    --libdirs "$REL_MICASCHEME_DIR" \
+    --program "$SRC_LEO_DIR/compile-wpo.ss" \
+    "$REL_LIB_DIR/leo.so"
 
 # --- 6. Handle Wrapper Script ---
 if [ -f "$SRC_LEO_DIR/leo" ]; then
