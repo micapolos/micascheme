@@ -2,7 +2,7 @@ import
   leo scheme
   language
   leo language
-  leo examples math
+  math
 
 define-language
   printer

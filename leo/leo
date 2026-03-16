@@ -1,10 +1,12 @@
 #!/bin/bash
 LEO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LIB_DIR="$LEO_DIR/../lib"
+BASE_DIR="$LEO_DIR/.."
+LIB_DIR="$BASE_DIR/lib"
+SCHEME_DIR="$LIB_DIR/scheme"
 
-exec "$LIB_DIR/scheme/bin/scheme" \
-    -b "$LIB_DIR/scheme/lib/petite.boot" \
-    -b "$LIB_DIR/scheme/lib/scheme.boot" \
-    --libdirs "$LIB_DIR/micascheme" \
+exec "$SCHEME_DIR/bin/scheme" \
+    -b "$SCHEME_DIR/lib/petite.boot" \
+    -b "$SCHEME_DIR/lib/scheme.boot" \
+    --libdirs ".:$LIB_DIR/micascheme" \
     --program "$LIB_DIR/leo.so" \
     "$@"

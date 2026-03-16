@@ -1,5 +1,5 @@
 import
   leo scheme
-  leo examples math
+  math
 
 pretty-print add: 2, 2

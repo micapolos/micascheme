@@ -1,5 +1,5 @@
 library
-  leo examples math
+  math
   export
     add, subtract, multiply, divide
     equal=?

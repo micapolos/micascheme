@@ -1,6 +1,6 @@
 import
   leo scheme
-  leo examples math
+  math
 
 define n 45
 
