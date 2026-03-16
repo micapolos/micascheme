@@ -20,10 +20,6 @@ REL_SCHEME_LIB="$REL_SCHEME_ROOT/lib"
 
 REL_EX_DIR="$RELEASE_DIR/examples"
 
-# Artifact Names
-RELEASE_NAME="leo-macos-$VERSION"
-ARCHIVE_NAME="$RELEASE_NAME.tar.gz"
-
 # --- 3. Ensure Submodules & Build ChezScheme ---
 if [ ! -f "$DEPS_DIR/configure" ]; then
     echo "Submodules missing. Initializing..."
@@ -46,6 +42,9 @@ MACHINE=$(get_machine_type)
 CS_MACHINE_DIR="$DEPS_DIR/$MACHINE"
 CS_BIN_DIR="$CS_MACHINE_DIR/bin/$MACHINE"
 CS_BOOT_DIR="$CS_MACHINE_DIR/boot/$MACHINE"
+
+RELEASE_NAME="leo-$MACHINE-$VERSION"
+ARCHIVE_NAME="$RELEASE_NAME.tar.gz"
 
 echo "Machine type: $MACHINE"
 
