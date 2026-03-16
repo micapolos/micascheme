@@ -2,12 +2,10 @@
 
 # --- 1. Configuration & Versioning ---
 VERSION="${1:-latest}"
-MACHINE="tarm64osx"
 
 # Source Directories
 SRC_LEO_DIR="leo"
 DEPS_DIR="deps/ChezScheme"
-CS_MACHINE_DIR="$DEPS_DIR/$MACHINE"
 
 # Build/Release Directories
 BUILD_DIR="build"
@@ -26,20 +24,30 @@ REL_EX_DIR="$RELEASE_DIR/examples"
 RELEASE_NAME="leo-macos-$VERSION"
 ARCHIVE_NAME="$RELEASE_NAME.tar.gz"
 
-# --- 2. Internal ChezScheme Paths ---
-CS_BIN_DIR="$CS_MACHINE_DIR/bin/$MACHINE"
-CS_BOOT_DIR="$CS_MACHINE_DIR/boot/$MACHINE"
-
 # --- 3. Ensure Submodules & Build ChezScheme ---
 if [ ! -f "$DEPS_DIR/configure" ]; then
     echo "Submodules missing. Initializing..."
     git submodule update --init --recursive --depth=1
 fi
 
-if [ ! -f "$CS_BIN_DIR/scheme" ]; then
+get_machine_type() {
+  find . -path "*/bin/*/scheme" 2>/dev/null | \
+  grep -v "pb/bin/pb/scheme" | \
+  head -n 1 | \
+  awk -F'/' '{print $(NF-1)}'
+}
+
+if [ -z $(get_machine_type) ]; then
     echo "ChezScheme not found. Building..."
     (cd "$DEPS_DIR" && ./configure && make)
 fi
+
+MACHINE=$(get_machine_type)
+CS_MACHINE_DIR="$DEPS_DIR/$MACHINE"
+CS_BIN_DIR="$CS_MACHINE_DIR/bin/$MACHINE"
+CS_BOOT_DIR="$CS_MACHINE_DIR/boot/$MACHINE"
+
+echo "Machine type: $MACHINE"
 
 # --- 4. Setup Build/Release Structure ---
 echo "Preparing environment for version: $VERSION"
