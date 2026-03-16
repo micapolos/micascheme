@@ -39,6 +39,15 @@ if [ -z $(get_machine_type) ]; then
 fi
 
 MACHINE=$(get_machine_type)
+
+if [ -z "$MACHINE" ]; then
+    echo "ERROR: Machine type could not be detected!"
+    ls -R deps/ChezScheme/bin 2>/dev/null
+    exit 1
+fi
+
+echo "Machine type: $MACHINE"
+
 CS_MACHINE_DIR="$DEPS_DIR/$MACHINE"
 CS_BIN_DIR="$CS_MACHINE_DIR/bin/$MACHINE"
 CS_BOOT_DIR="$CS_MACHINE_DIR/boot/$MACHINE"
@@ -46,7 +55,6 @@ CS_BOOT_DIR="$CS_MACHINE_DIR/boot/$MACHINE"
 RELEASE_NAME="leo-$MACHINE-$VERSION"
 ARCHIVE_NAME="$RELEASE_NAME.tar.gz"
 
-echo "Machine type: $MACHINE"
 
 # --- 4. Setup Build/Release Structure ---
 echo "Preparing environment for version: $VERSION"
