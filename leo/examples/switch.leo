@@ -8,16 +8,16 @@ define
     x
     when
       string? s
-      string-append: "string: ", s
+      string-append: "string ", s
     when
       number? n
       string-append
-        "number: "
+        "number "
         number->string n
     when
       any? x
       string-append
-        "something else: "
+        "other "
         format: "~s", x
 
 display to-string string-append: "Hello, ", "world!"
