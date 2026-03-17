@@ -18,6 +18,11 @@ define
         "something else: "
         format: "~s", x
 
-write to-string "jajko"
-write to-string 123
-write to-string char space
+display to-string "jajko"
+the newline
+
+display to-string 123
+the newline
+
+display to-string char space
+the newline
