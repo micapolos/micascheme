@@ -27,6 +27,7 @@
           (case (datum id)
             ((colon) #\:)
             ((dot) #\.)
+            ((comma) #\,)
             ((at) #\@)
             ((0 1 2 3 4 5 6 7 8 9)
               (integer->char (+ (char->integer #\0) (datum id))))
