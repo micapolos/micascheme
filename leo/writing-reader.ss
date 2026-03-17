@@ -17,6 +17,15 @@
     (reader
       (lambda ($literal)
         (push-writings-reader
+          ; todo
+          ;   write boolean as: #true, #false
+          ;   write char as: #char a, #char space
+          ;   write bytevector as #bytevector: 10, 20, 30
+          ;   potentially write string
+          ;     single line as #text this is my string
+          ;     multi line as #text
+          ;       This is a multiline string,
+          ;       and it's written in multiple lines.
           (push $writings (datum-writing $literal))
           $end))
       (lambda ($symbol)
