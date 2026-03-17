@@ -48,7 +48,12 @@
                         (display-condition $exception)))))))
           expr))))
 
-  (define-syntax check
+  (define-syntax (check $syntax)
+    (syntax-case $syntax ()
+      ((_ x ...)
+        #`(begin (check1 x) ...))))
+
+  (define-syntax check1
     (lambda (stx)
       (syntax-case stx (not raises works)
         ((_ (raises body))
