@@ -1,4 +1,6 @@
-import leo scheme
+import
+  leo scheme
+  only: datum->string, from micascheme
 
 define rest list
   "a"
