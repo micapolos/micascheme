@@ -14,7 +14,7 @@ displayln datum->string
   << string-append: >> "foo", >> "bar"
 
 displayln datum->string
-  << string-append: >> "foo", >> "bar", >>* rest
+  << string-append: >> "foo", >> "bar", >>... rest
 
 displayln datum->string syntax->datum
   ||| string-append: "foo", "bar"
@@ -23,4 +23,4 @@ displayln datum->string syntax->datum
   <<< string-append: >>> "foo", >>> "bar"
 
 displayln datum->string syntax->datum
-  <<< string-append: >>> "foo", >>> "bar", >>>* rest
+  <<< string-append: >>> "foo", >>> "bar", >>>... rest

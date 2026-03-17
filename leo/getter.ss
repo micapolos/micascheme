@@ -37,10 +37,10 @@
               (case $symbol
                 ((<<) 'quasiquote)
                 ((>>) 'unquote)
-                ((>>*) 'unquote-splicing)
+                ((>>...) 'unquote-splicing)
                 ((<<<) 'quasisyntax)
                 ((>>>) 'unsyntax)
-                ((>>>*) 'unsyntax-splicing)
+                ((>>>...) 'unsyntax-splicing)
                 (else
                   (case (symbol->string $symbol)
                     (("||") 'quote)
