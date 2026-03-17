@@ -26,6 +26,9 @@
           ;     multi line as #text
           ;       This is a multiline string,
           ;       and it's written in multiple lines.
+          ;   question
+          ;     is it possible to avoid using # as literal prefix?
+          ;     note that literals must have unique representation
           (push $writings (datum-writing $literal))
           $end))
       (lambda ($symbol)
