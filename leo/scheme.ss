@@ -11,7 +11,8 @@
     make-read-lambda
     write
     displayln
-    pretty-print)
+    pretty-print
+    define-language)
   (import
     (prefix (chezscheme) %)
     (only (chezscheme) export define-syntax)
@@ -19,6 +20,7 @@
     (prefix (only (micascheme) make-read-lambda switch) %)
     (only (keyword) keyword?)
     (leo transform)
+    (prefix (language) %)
     (writing)
     (leo reader)
     (leo writing-reader))
@@ -111,5 +113,8 @@
     ((switch x (%when (a b) c) ... (%else d))
       (%switch x ((a b) c) ... ((%else _) d)))
     ((switch x (%when (a b) c) ...)
-      (%switch x ((a b) c) ...)))
+      (%switch x ((a b) c) ...))
+
+    ((define-language (x l))
+      (%define-language x l)))
 )
