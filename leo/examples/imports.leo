@@ -1,5 +1,9 @@
 import
-  leo scheme
-  math
+  prefix % from leo scheme
+  rename
+    add dodaj
+    subtract odejmij
+    from only: add, subtract, from math
 
-write add: 2, 2
+%write dodaj: 2, 3
+%write odejmij: 5, 3
