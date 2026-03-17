@@ -23,6 +23,7 @@
     (prefix (language) %)
     (writing)
     (leo reader)
+    (leo datum)
     (leo writing-reader))
   (export
     (import
@@ -55,7 +56,7 @@
           (writing-string
             (reader-end
               (reader-read-list (writing-reader)
-                (%list x))))))))
+                (%list (->datum x)))))))))
 
   (%define (pretty-print . xs)
     (%for-each write xs))

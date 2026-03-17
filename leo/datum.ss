@@ -1,8 +1,8 @@
 (library (leo datum)
-  (export atom->datum)
+  (export ->datum)
   (import (micascheme))
 
-  (define (atom->datum $atom)
+  (define (->datum $atom)
     (switch $atom
       ((boolean? $boolean)
         (if $boolean 'true 'false))
@@ -20,14 +20,14 @@
                 (string->symbol $string))))))
       ((vector? $vector)
         `(vector
-          ,@(map atom->datum (vector->list $vector))))
+          ,@(map ->datum (vector->list $vector))))
       ((bytevector? $bytevector)
         `(bytevector
-          ,@(map atom->datum (bytevector->u8-list $bytevector))))
+          ,@(map ->datum (bytevector->u8-list $bytevector))))
       ((pair? $pair)
-        `(
-          ,(atom->datum (car $pair))
-          ,(atom->datum (cdr $pair))))
+        (cons
+          (->datum (car $pair))
+          (->datum (cdr $pair))))
       ((else $other)
         $other)))
 )
