@@ -1,37 +1,31 @@
 .TH LEO 1 "March 2026" "1.0" "Leo Language Manual"
 .SH NAME
-leo \- interpreter for the leo programming language
+leo \- high-performance JIT-based execution environment for the Leo language
 .SH SYNOPSIS
 .B leo
 [\fIfile.leo\fR ...]
 .SH DESCRIPTION
 .B leo
-is the command-line interface for executing scripts written in the leo language.
-It processes each provided source file in the order they appear on the command line.
+is the primary command-line interface for the Leo programming language. It
+functions as an interpreter that utilizes a Just-In-Time (JIT) compiler to
+dynamically optimize and execute code on the fly.
 .PP
-If no files are provided, it does nothing.
+Source files are processed sequentially. If no files are provided, the
+program exits without taking any action.
 .SH ARGUMENTS
 .TP
 .I file.leo
-The path to a source file ending in the .leo extension. The interpreter will
-load, parse, and execute the file before moving to the next argument.
+A source file to be executed. The VM will load and dynamically compile the
+contents for immediate execution.
 .SH EXIT STATUS
 .TP
 .B 0
-Success. All provided scripts were executed without unhandled exceptions.
+Success. All files were executed.
 .TP
 .B 1
-Failure. One or more scripts encountered a syntax error or a runtime crash.
-.SH EXAMPLES
-.B leo script.leo
-.IP
-Execute a single file.
-.PP
-.B leo main.leo utils.leo config.leo
-.IP
-Execute multiple files sequentially.
+Failure. A syntax error or runtime exception occurred.
 .SH SEE ALSO
-.BR python (1),
-.BR lua (1)
+.BR luajit (1),
+.BR node (1)
 .SH AUTHOR
 Developed by Michał Pociecha-Łoś.
