@@ -36,7 +36,7 @@
       (display-help)
       (start-non-empty (cdr $arguments)))
     ((filename . x)
-      (parameterize ((command-line-arguments (cdr (command-line-arguments))))
+      (parameterize ((command-line-arguments (cdr $arguments)))
         (load-leo #'filename)))
     (() (void))))
 
