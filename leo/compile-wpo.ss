@@ -1,6 +1,5 @@
 (import (chezscheme))
 
-(optimize-level 3)
 (compile-imported-libraries #t)
 (generate-wpo-files #t)
 
