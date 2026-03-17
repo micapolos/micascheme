@@ -35,15 +35,17 @@
           (lets
             ($symbol
               (case $symbol
-                ((!!) 'quote)
                 ((<<) 'quasiquote)
                 ((>>) 'unquote)
                 ((>>*) 'unquote-splicing)
-                ((!!!) 'syntax)
                 ((<<<) 'quasisyntax)
                 ((>>>) 'unsyntax)
                 ((>>>*) 'unsyntax-splicing)
-                (else $symbol)))
+                (else
+                  (case (symbol->string $symbol)
+                    (("||") 'quote)
+                    (("|||") 'syntax)
+                    (else $symbol)))))
             (getter
               (make-annotation
                 $symbol

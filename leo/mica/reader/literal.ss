@@ -3,6 +3,7 @@
     number
     string-literal
     special-literal
+    pipes
     literal)
   (import
     (prefix (micascheme) %)
@@ -34,10 +35,14 @@
               (string digit-char)
               identifier-string))))))
 
+  (define pipes
+    (map (non-empty-list #\|) %list->string %string->symbol))
+
   (define literal
     (one-of
       number
       identifier
       string-literal
-      special-literal))
+      special-literal
+      pipes))
 )

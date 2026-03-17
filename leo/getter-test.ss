@@ -20,12 +20,12 @@
 (check-gets line-getter "foo :\n" '(foo ()) 6)
 (check-gets line-getter "foo bar :\n" '(foo (bar ())) 10)
 
-(check-gets line-getter "!!\n" 'quote 3)
+(check-gets line-getter "||\n" 'quote 3)
 (check-gets line-getter "<<\n" 'quasiquote 3)
 (check-gets line-getter ">>\n" 'unquote 3)
 (check-gets line-getter ">>*\n" 'unquote-splicing 4)
 
-(check-gets line-getter "!!!\n" 'syntax 4)
+(check-gets line-getter "|||\n" 'syntax 4)
 (check-gets line-getter "<<<\n" 'quasisyntax 4)
 (check-gets line-getter ">>>\n" 'unsyntax 4)
 (check-gets line-getter ">>>*\n" 'unsyntax-splicing 5)
