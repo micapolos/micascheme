@@ -3,27 +3,40 @@
 leo \- high-performance JIT-based execution environment for the Leo language
 .SH SYNOPSIS
 .B leo
-[\fIfile.leo\fR ...]
+[\fIoptions\fR] [\fIfile\fR [\fIargs\fR]]
 .SH DESCRIPTION
 .B leo
 is the primary command-line interface for the Leo programming language. It
 functions as an interpreter that utilizes a Just-In-Time (JIT) compiler to
 dynamically optimize and execute code on the fly.
 .PP
-Source files are processed sequentially. If no files are provided, the
-program exits without taking any action.
+If a
+.I file
+is provided, it is executed with any subsequent
+.I args
+passed to the script. If no file is provided and no options are specified, the
+program exits.
+.SH OPTIONS
+.TP
+.BR \-v ", " \-\-version
+Show version information and exit.
+.TP
+.BR \-h ", " \-\-help
+Show a help message and exit.
 .SH ARGUMENTS
 .TP
-.I file.leo
-A source file to be executed. The VM will load and dynamically compile the
-contents for immediate execution.
+.I file
+The source file to be executed.
+.TP
+.I args
+Optional arguments passed directly to the script being executed.
 .SH EXIT STATUS
 .TP
 .B 0
-Success. All files were executed.
+Success. The file was executed or an information option was displayed.
 .TP
 .B 1
-Failure. A syntax error or runtime exception occurred.
+Failure. A syntax error, runtime exception, or invalid option occurred.
 .SH SEE ALSO
 .BR luajit (1),
 .BR node (1)
