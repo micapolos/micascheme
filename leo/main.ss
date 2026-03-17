@@ -7,9 +7,9 @@
 (define (start $arguments)
   (syntax-case $arguments ()
     (() (start-help $arguments))
-    (_ (start-non-empty $arguments))))
+    (_ (start-options $arguments))))
 
-(define (start-non-empty $arguments)
+(define (start-options $arguments)
   (syntax-case $arguments ()
     (("-v" . x)
       (start-version (datum x)))
@@ -25,7 +25,7 @@
 
 (define (start-version $arguments)
   (displayln (string-append "Leo " version))
-  (start-non-empty $arguments))
+  (start-options $arguments))
 
 (define (start-help $arguments)
   (display
@@ -35,7 +35,7 @@
       "Available options are:"
       "  -v, --version  show version information"
       "  -h, --help     show this help message"))
-  (start-non-empty $arguments))
+  (start-options $arguments))
 
 (define (start-file $file $arguments)
   (parameterize ((command-line-arguments $arguments))
