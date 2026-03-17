@@ -9,6 +9,7 @@
     if then cond
     switch any?
     make-read-lambda
+    write
     pretty-print)
   (import
     (prefix (chezscheme) %)
@@ -28,7 +29,7 @@
         let letrec let-values
         let* letrec* let*-values
         let-syntax letrec-syntax
-        if cond pretty-print)
+        if cond pretty-print write)
       (only (micascheme) char true false)
       (only (leo transform) from with)))
 
@@ -39,11 +40,20 @@
 
   (define-keywords then)
 
-  (%define (pretty-print . $args)
-    (%display
-      (writing-string
-        (reader-end
-          (reader-read-list (writing-reader) $args)))))
+  (%define write
+    (%case-lambda
+      ((x)
+        (write x (%current-output-port)))
+      ((x port)
+        ; TODO: Implement reader which would write directly to port.
+        (%put-string port
+          (writing-string
+            (reader-end
+              (reader-read-list (writing-reader)
+                (%list x))))))))
+
+  (%define (pretty-print . xs)
+    (%for-each write xs))
 
   (define-rules-syntaxes (keywords with then %else %when %list)
     ((the x ...)
