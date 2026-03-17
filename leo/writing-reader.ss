@@ -29,6 +29,7 @@
           ;   question
           ;     is it possible to avoid using # as literal prefix?
           ;     note that literals must have unique representation
+          ;     so we can not use plain symbols
           (push $writings (datum-writing $literal))
           $end))
       (lambda ($symbol)
