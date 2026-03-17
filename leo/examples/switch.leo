@@ -20,11 +20,6 @@ define
         "other "
         format: "~s", x
 
-display to-string string-append: "Hello, ", "world!"
-the newline
-
-display to-string add: 2, 2
-the newline
-
-display to-string cons: 10, 20
-the newline
+displayln to-string string-append: "Hello, ", "world!"
+displayln to-string add: 2, 2
+displayln to-string cons: 10, 20

@@ -10,6 +10,7 @@
     switch any?
     make-read-lambda
     write
+    displayln
     pretty-print)
   (import
     (prefix (chezscheme) %)
@@ -33,6 +34,8 @@
       (only (micascheme) char true false)
       (only (leo transform) from with)))
 
+  ; TODO: Implement this entire file in .leo
+
   (define-syntax library transform-library)
   (define-syntax import transform-import)
 
@@ -54,6 +57,10 @@
 
   (%define (pretty-print . xs)
     (%for-each write xs))
+
+  (%define (displayln x)
+    (%display x)
+    (%newline))
 
   (define-rules-syntaxes (keywords with then %else %when %list)
     ((the x ...)

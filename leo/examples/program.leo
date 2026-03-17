@@ -21,8 +21,5 @@ define hello-world
     exclamate world
 
 displayln "=== This is produced by program.leo ==="
-
-display hello-world
-the newline
-
+displayln hello-world
 displayln "=== End of program.leo ==="

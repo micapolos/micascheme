@@ -3,6 +3,7 @@ import
   language
   leo language
   math
+  eof
 
 define-language
   printer
