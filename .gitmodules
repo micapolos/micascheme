@@ -1,0 +1,4 @@
+[submodule "deps/ChezScheme"]
+	path = deps/ChezScheme
+	url = https://github.com/micapolos/ChezScheme.git
+	branch = make-read-handler

@@ -42,6 +42,7 @@ mkdir -p \
 # --- 3. Ensure Submodules & Build ChezScheme ---
 if [ ! -f "$DEPS_DIR/configure" ]; then
     echo "Submodules missing. Initializing..."
+    mkdir -p "deps"
     git submodule update --init --recursive --depth=1
 fi
 
@@ -54,7 +55,7 @@ get_machine_type() {
 
 if [ -z $(get_machine_type) ]; then
     echo "ChezScheme not found. Building..."
-    (cd "$DEPS_DIR" && ./configure && make && cd ../..)
+    (cd "$DEPS_DIR" && ./configure && make)
 fi
 
 MACHINE=$(get_machine_type)
