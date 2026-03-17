@@ -7,33 +7,33 @@ define rest list
   "b"
   "c"
 
-pretty-print datum->string
+displayln datum->string
   quote string-append
     "foo"
     "bar"
 
-pretty-print datum->string
+displayln datum->string
   quasiquote string-append
     unquote "foo"
     unquote "bar"
 
-pretty-print datum->string
+displayln datum->string
   quasiquote string-append
     unquote "foo"
     unquote "bar"
     unquote-splicing rest
 
-pretty-print datum->string syntax->datum
+displayln datum->string syntax->datum
   syntax string-append
     "foo"
     "bar"
 
-pretty-print datum->string syntax->datum
+displayln datum->string syntax->datum
   quasisyntax string-append
     unsyntax "foo"
     unsyntax "bar"
 
-pretty-print datum->string syntax->datum
+displayln datum->string syntax->datum
   quasisyntax string-append
     unsyntax "foo"
     unsyntax "bar"
