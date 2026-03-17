@@ -1,4 +1,6 @@
-import leo scheme
+import
+  leo scheme
+  math
 
 define
   to-string x
@@ -18,11 +20,11 @@ define
         "something else: "
         format: "~s", x
 
-display to-string "jajko"
+display to-string string-append: "Hello, ", "world!"
 the newline
 
-display to-string 123
+display to-string add: 2, 2
 the newline
 
-display to-string char space
+display to-string cons: 10, 20
 the newline
