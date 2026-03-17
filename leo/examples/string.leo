@@ -11,8 +11,7 @@ define comma-separated lambda
   with: string-a, string-b
   string-append
     string-a
-    string char comma
-    string char space
+    ", "
     string-b
 
 write comma-separated
