@@ -2,7 +2,7 @@ library
   math
   export
     add, subtract, multiply, divide
-    equal=?
+    number=?
     less?, less/equal?, greater?, greater/equal?
   import leo scheme
 
@@ -11,7 +11,7 @@ library
   define multiply *
   define divide /
 
-  define equal=? =
+  define number=? =
   define less? <
   define less/equal? <=
   define greater? >

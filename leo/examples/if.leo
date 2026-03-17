@@ -3,7 +3,7 @@ import
   math
 
 display if
-  eq?
+  number=?
     add: 2, 2
     4
   then "sigh... 2 + 2 = 4"
