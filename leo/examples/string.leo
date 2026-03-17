@@ -11,6 +11,6 @@ define comma-separated lambda
   with: string-a, string-b
   string-append: string-a, ", ", string-b
 
-pretty-print comma-separated
+write comma-separated
   hello
   exclamated world

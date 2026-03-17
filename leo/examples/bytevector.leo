@@ -1,3 +1,5 @@
-import leo scheme
+import
+  leo scheme
+  bytevector
 
-pretty-print u16-bytevector: 363, endianness little
+write u16-bytevector: 363, endianness little

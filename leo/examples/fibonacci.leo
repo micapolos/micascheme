@@ -4,9 +4,9 @@ import
 
 define n 45
 
-pretty-print quasiquote calculating fibonacci unquote n
+write quasiquote calculating fibonacci unquote n
 
-pretty-print time
+write time
   let fibonacci
     with number n
     if
