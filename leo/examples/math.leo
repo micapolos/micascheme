@@ -2,8 +2,7 @@ library
   math
   export
     add, subtract, multiply, divide
-    number=?
-    less?, less/equal?, greater?, greater/equal?
+    number=?, less?, less/equal?, greater?, greater/equal?
   import leo scheme
 
   define add +
