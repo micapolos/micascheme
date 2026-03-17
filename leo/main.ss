@@ -37,7 +37,7 @@
       (start-non-empty (cdr $arguments)))
     ((filename . x)
       (parameterize ((command-line-arguments (cdr $arguments)))
-        (load-leo #'filename)))
+        (load-leo (datum filename))))
     (() (void))))
 
 (start (command-line-arguments))
