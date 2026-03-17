@@ -21,7 +21,9 @@
           ;   write boolean as: #true, #false
           ;   write char as: #char a, #char space
           ;   write bytevector as #bytevector: 10, 20, 30
-          ;   potentially write multiline string as #string
+          ;   potentially write string
+          ;     single line as #string Hello, world!
+          ;     multi line as #string
           ;       This is a multiline string,
           ;       and it's written in multiple lines.
           ;   question
