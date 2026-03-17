@@ -1,6 +1,6 @@
 import leo scheme
 
-write quasiquote character literals unquote
+write << character literals >>
   char a
   char z
   char A

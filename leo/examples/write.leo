@@ -2,8 +2,8 @@ import
   leo scheme
   math
 
-write quasiquote circle
+write << circle
   radius 10
   center point
-    x unquote add: 2, 3
-    y unquote add: 10, 20
+    x >> add: 2, 3
+    y >> add: 10, 20
