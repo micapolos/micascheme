@@ -17,19 +17,6 @@
     (reader
       (lambda ($literal)
         (push-writings-reader
-          ; todo
-          ;   write boolean as: #true, #false
-          ;   write char as: #char a, #char space
-          ;   write bytevector as #bytevector: 10, 20, 30
-          ;   potentially write string
-          ;     single line as #string Hello, world!
-          ;     multi line as #string
-          ;       This is a multiline string,
-          ;       and it's written in multiple lines.
-          ;   question
-          ;     is it possible to avoid using # as literal prefix?
-          ;     note that literals must have unique representation
-          ;     so we can not use plain symbols
           (push $writings (datum-writing $literal))
           $end))
       (lambda ($symbol)

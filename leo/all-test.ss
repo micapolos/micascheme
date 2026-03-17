@@ -1,6 +1,7 @@
 (import (micascheme))
 
 (test
+  (leo datum)
   (leo compiler)
   (leo decompiler)
   (leo evaluator)
