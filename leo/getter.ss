@@ -35,9 +35,11 @@
           (lets
             ($symbol
               (case $symbol
+                ((!!) 'quote)
                 ((<<) 'quasiquote)
                 ((>>) 'unquote)
                 ((>>*) 'unquote-splicing)
+                ((!!!) 'syntax)
                 ((<<<) 'quasisyntax)
                 ((>>>) 'unsyntax)
                 ((>>>*) 'unsyntax-splicing)

@@ -12,6 +12,7 @@
   (ok "..." '...)
   (ok "->" '->)
   (ok "->foo" '->foo)
+  (ok "!!" '!!)
   (error ":")
   (error ":foo")
   (error "foo:bar")
