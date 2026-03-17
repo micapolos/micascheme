@@ -5,7 +5,6 @@ import
 define n 45
 
 write << calculating fibonacci >> n
-write || please wait ...
 
 time write << result is >>
   let fibonacci
