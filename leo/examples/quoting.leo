@@ -13,15 +13,15 @@ displayln datum->string
     "bar"
 
 displayln datum->string
-  quasiquote string-append
-    unquote "foo"
-    unquote "bar"
+  << string-append
+    >> "foo"
+    >> "bar"
 
 displayln datum->string
-  quasiquote string-append
-    unquote "foo"
-    unquote "bar"
-    unquote-splicing rest
+  << string-append
+    >> "foo"
+    >> "bar"
+    >>* rest
 
 displayln datum->string syntax->datum
   syntax string-append
@@ -29,12 +29,12 @@ displayln datum->string syntax->datum
     "bar"
 
 displayln datum->string syntax->datum
-  quasisyntax string-append
-    unsyntax "foo"
-    unsyntax "bar"
+  <<< string-append
+    >>> "foo"
+    >>> "bar"
 
 displayln datum->string syntax->datum
-  quasisyntax string-append
-    unsyntax "foo"
-    unsyntax "bar"
-    unsyntax-splicing rest
+  <<< string-append
+    >>> "foo"
+    >>> "bar"
+    >>>* rest

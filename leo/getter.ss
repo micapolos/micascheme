@@ -28,7 +28,27 @@
     (getter-item char-comma? (exact-getter ", ")))
 
   (define atom-annotation-getter
-    (getter-item-getter (%annotation %literal)))
+    (getter-lets
+      ($literal-annotation (getter-item-getter (%annotation %literal)))
+      (switch (annotation-stripped $literal-annotation)
+        ((symbol? $symbol)
+          (lets
+            ($symbol
+              (case $symbol
+                ((<<) 'quasiquote)
+                ((>>) 'unquote)
+                ((>>*) 'unquote-splicing)
+                ((<<<) 'quasisyntax)
+                ((>>>) 'unsyntax)
+                ((>>>*) 'unsyntax-splicing)
+                (else $symbol)))
+            (getter
+              (make-annotation
+                $symbol
+                (annotation-source $literal-annotation)
+                $symbol))))
+        ((else $other)
+          (getter $literal-annotation)))))
 
   (define line-annotation-getter
     (annotation-getter

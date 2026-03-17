@@ -4,7 +4,7 @@ import
 
 define n 45
 
-write quasiquote calculating fibonacci unquote n
+write << calculating fibonacci >> n
 
 write time
   let fibonacci
