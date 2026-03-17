@@ -19,6 +19,7 @@ BUILD_DIR="build"
 RELEASE_DIR="$BUILD_DIR/release"
 REL_BIN_DIR="$RELEASE_DIR/bin"
 REL_LIB_DIR="$RELEASE_DIR/lib"
+REL_MAN_DIR="$RELEASE_DIR/man"
 REL_MICASCHEME_DIR="$REL_LIB_DIR/micascheme"
 
 # The "Mini-Prefix" for the Scheme engine
@@ -29,7 +30,14 @@ REL_SCHEME_LIB="$REL_SCHEME_ROOT/lib"
 REL_EX_DIR="$RELEASE_DIR/examples"
 
 rm -rf "$BUILD_DIR"
-mkdir -p "$REL_BIN_DIR" "$REL_LIB_DIR" "$REL_SCHEME_BIN" "$REL_SCHEME_LIB" "$REL_EX_DIR" "$REL_MICASCHEME_DIR"
+mkdir -p \
+  "$REL_BIN_DIR" \
+  "$REL_LIB_DIR" \
+  "$REL_MAN_DIR" \
+  "$REL_SCHEME_BIN" \
+  "$REL_SCHEME_LIB" \
+  "$REL_EX_DIR" \
+  "$REL_MICASCHEME_DIR"
 
 # --- 3. Ensure Submodules & Build ChezScheme ---
 if [ ! -f "$DEPS_DIR/configure" ]; then
@@ -46,7 +54,7 @@ get_machine_type() {
 
 if [ -z $(get_machine_type) ]; then
     echo "ChezScheme not found. Building..."
-    (cd "$DEPS_DIR" && ./configure && make)
+    (cd "$DEPS_DIR" && ./configure && make && cd ../..)
 fi
 
 MACHINE=$(get_machine_type)
@@ -76,8 +84,9 @@ cp "$CS_BIN_DIR/scheme" "$REL_SCHEME_BIN/scheme"
 cp "$CS_BOOT_DIR/petite.boot" "$REL_SCHEME_LIB/"
 cp "$CS_BOOT_DIR/scheme.boot" "$REL_SCHEME_LIB/"
 
-# Copy examples
+# Copy examples and man pages
 cp "$SRC_LEO_DIR/examples"/* "$REL_EX_DIR/"
+cp "$SRC_LEO_DIR/man"/* "$REL_MAN_DIR/"
 
 # --- 5. Run WPO Compilation ---
 echo "Compiling Leo $VERSION with WPO..."
