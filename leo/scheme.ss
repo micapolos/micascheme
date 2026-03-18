@@ -12,10 +12,12 @@
     write
     displayln
     pretty-print
-    define-language)
+    define-language
+    define-syntax
+    syntax-case)
   (import
     (prefix (chezscheme) %)
-    (only (chezscheme) export define-syntax)
+    (only (chezscheme) export)
     (only (micascheme) define-rules-syntaxes define-keywords keywords ...)
     (prefix (only (micascheme) make-read-lambda switch) %)
     (only (keyword) keyword?)
@@ -33,14 +35,16 @@
         let letrec let-values
         let* letrec* let*-values
         let-syntax letrec-syntax
-        if cond pretty-print write)
-      (only (micascheme) char true false)
+        if cond pretty-print write
+        define-syntax
+        syntax-case)
+      (only (micascheme) char true false keywords)
       (only (leo transform) from with)))
 
   ; TODO: Implement this entire file in .leo
 
-  (define-syntax library transform-library)
-  (define-syntax import transform-import)
+  (%define-syntax library transform-library)
+  (%define-syntax import transform-import)
 
   (%define (any? _) #t)
 
@@ -65,7 +69,7 @@
     (%display x)
     (%newline))
 
-  (define-rules-syntaxes (keywords with then %else %when %list)
+  (define-rules-syntaxes (keywords with then %else %when %list keywords)
     ((the x ...)
       (x ...))
     ((define (name x))
@@ -79,6 +83,16 @@
       (%lambda (param ...) x xs ...))
     ((lambda x xs ...)
       (%lambda () x xs ...))
+
+    ((define-syntax (name x))
+      (%define-syntax name x))
+
+    ((define-syntax (name s) x xs ...)
+      (%define-syntax (name s) x xs ...))
+
+    ((syntax-case expr (keywords k ...) (%when pattern x xs ...) ...)
+      (%syntax-case expr (k ...)
+        (pattern x xs ...) ...))
 
     ((make-read-lambda (with param ...) x xs ...)
       (%make-read-lambda (param ...) x xs ...))

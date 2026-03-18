@@ -1,10 +1,10 @@
 (library (leo start)
   (export start)
   (import
-    (leo scheme)
+    (micascheme)
     (leo leo)
     (leo version)
-    (only (micascheme) lines-string))
+    (prefix (leo scheme) %))
 
   (define (start $arguments)
     (syntax-case $arguments ()
@@ -23,21 +23,24 @@
         (start-help (datum x)))
       ((file arg ...)
         (start-file (datum file) (datum (arg ...))))
-      (() (void))))
+      (()
+        (void))))
 
   (define (start-version $arguments)
-    (displayln (string-append "Leo " version))
-    (start-options $arguments))
+    (run
+      (displayln (string-append "Leo " version))
+      (start-options $arguments)))
 
   (define (start-help $arguments)
-    (display
-      (lines-string
-        "usage: leo [options] [file [args]]"
-        ""
-        "Available options are:"
-        "  -v, --version  show version information"
-        "  -h, --help     show this help message"))
-    (start-options $arguments))
+    (run
+      (display
+        (lines-string
+          "usage: leo [options] [file [args]]"
+          ""
+          "Available options are:"
+          "  -v, --version  show version information"
+          "  -h, --help     show this help message"))
+      (start-options $arguments)))
 
   (define (start-file $file $arguments)
     (parameterize ((command-line-arguments $arguments))
