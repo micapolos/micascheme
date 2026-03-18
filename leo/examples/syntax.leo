@@ -7,11 +7,6 @@ define remaining list
   syntax "gar"
   syntax "goo"
 
-displayln datum->string syntax->datum
-  syntax string-append: "foo", "bar"
-
-displayln datum->string syntax->datum
-  <<< string-append: >>> "foo", >>> "bar"
-
-displayln datum->string syntax->datum
-  <<< string-append: >>> "foo", >>> "bar", >>>... remaining
+write syntax string-append: "foo", "bar"
+write <<< this is quoted >>> string-append: "foo", "bar"
+write <<< this is quoted list >>>... list: "foo", "bar"
