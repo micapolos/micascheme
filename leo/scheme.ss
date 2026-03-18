@@ -14,6 +14,7 @@
     pretty-print
     define-language
     define-syntax
+    define-macro
     syntax-case)
   (import
     (prefix (chezscheme) %)
@@ -92,6 +93,14 @@
 
     ((syntax-case expr (keywords k ...) (%when pattern x xs ...) ...)
       (%syntax-case expr (k ...)
+        (pattern x xs ...) ...))
+
+    ((define-macro (keywords k ...) (%when pattern x xs ...) ...)
+      (define-rules-syntaxes (keywords k ...)
+        (pattern x xs ...) ...))
+
+    ((define-macro (%when pattern x xs ...) ...)
+      (define-rules-syntaxes
         (pattern x xs ...) ...))
 
     ((make-read-lambda (with param ...) x xs ...)
