@@ -1,6 +1,6 @@
 import leo scheme
 
-write << number >> list
+write << string >> list
   "this"
   "is"
   "a"
@@ -8,7 +8,7 @@ write << number >> list
   "of"
   "strings"
 
-write << string >> map
+write << number string >> map
   number->string
   list: 1, 2, 3, 4
 
@@ -18,6 +18,10 @@ write << odd? >> map
 
 write << odd >> filter
   odd?
+  iota 20
+
+write << even >> filter
+  even?
   iota 20
 
 define
