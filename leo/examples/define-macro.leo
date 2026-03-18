@@ -5,7 +5,7 @@ import
 define-macro
   when
     magic:
-    "zzz..."
+    quote void
   when
     magic: a
     subtract: 0, a

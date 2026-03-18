@@ -25,15 +25,9 @@
   (ok "#\\a" #\a)
   (ok "#\\space" #\space))
 
-(check-reader pipes
-  (ok "|" (%string->symbol "|"))
-  (ok "||" (%string->symbol "||"))
-  (ok "|||" (%string->symbol "|||")))
-
 (check-reader literal
   (ok "123" 123)
   (ok "foo" 'foo)
   (ok "#t" #t)
   (ok "#\\space" #\space)
-  (ok "|||" (%string->symbol "|||"))
   (error "(foo)"))

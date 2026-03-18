@@ -41,11 +41,7 @@
                 ((<<<) 'quasisyntax)
                 ((>>>) 'unsyntax)
                 ((>>>...) 'unsyntax-splicing)
-                (else
-                  (case (symbol->string $symbol)
-                    (("||") 'quote)
-                    (("|||") 'syntax)
-                    (else $symbol)))))
+                (else $symbol)))
             (getter
               (make-annotation
                 $symbol
