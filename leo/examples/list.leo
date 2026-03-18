@@ -21,11 +21,11 @@ write filter
   iota 20
 
 define
-  string-append-length a-string
+  string-append-length string
   string-append
-    a-string
+    string
     " ("
-    number->string string-length a-string
+    number->string string-length string
     ")"
 
 write map
