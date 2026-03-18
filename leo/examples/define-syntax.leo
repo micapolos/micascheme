@@ -6,7 +6,7 @@ define-syntax
   magic: input-syntax
   syntax-case
     input-syntax
-    keywords: ...
+    keywords: none
     when
       magic: a
       syntax subtract: 0, a
