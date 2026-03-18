@@ -25,9 +25,13 @@
         `(bytevector
           ,@(map ->datum (bytevector->u8-list $bytevector))))
       ((pair? $pair)
-        (cons
-          (->datum (car $pair))
-          (->datum (cdr $pair))))
+        (switch (car $pair)
+          ((symbol? $symbol)
+            (cons
+              (->datum (car $pair))
+              (->datum (cdr $pair))))
+          ((else $other)
+            `(list ,@(map* ->datum ->datum $pair)))))
       ((else $other)
         $other)))
 )

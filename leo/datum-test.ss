@@ -9,8 +9,10 @@
   (equal? (->datum 123) 123)
   (equal? (->datum "foo") "foo")
   (equal? (->datum '()) '())
-  (equal? (->datum '(#\a . #t)) '((char a) . true))
-  (equal? (->datum '(#\a #t)) '((char a) true))
+  (equal? (->datum '(1 2 3)) '(list 1 2 3))
+  (equal? (->datum '(foo bar)) '(foo bar))
+  (equal? (->datum '(#\a . #t)) '(list (char a) . true))
+  (equal? (->datum '(#\a #t)) '(list (char a) true))
   (equal?
     (->datum (vector 1 #\a #t))
     '(vector 1 (char a) true))
