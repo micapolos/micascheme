@@ -2,7 +2,7 @@
   (export start)
   (import
     (leo scheme)
-    (leo load)
+    (leo leo)
     (leo version)
     (only (micascheme) lines-string))
 
@@ -41,5 +41,5 @@
 
   (define (start-file $file $arguments)
     (parameterize ((command-line-arguments $arguments))
-      (load-leo $file)))
+      (leo (load $file))))
 )
