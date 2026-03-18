@@ -20,14 +20,16 @@ write filter
   odd?
   iota 20
 
+define
+  string-append-length a-string
+  string-append
+    a-string
+    " ("
+    number->string string-length a-string
+    ")"
+
 write map
-  lambda
-    with listed-string
-    string-append
-      listed-string
-      ", ("
-      number->string string-length listed-string
-      ")"
+  string-append-length
   list
     "this"
     "is"
