@@ -1,7 +1,6 @@
 import leo scheme
 
 write list: 1, 2, 3, 4
-
 write list
   "this"
   "is"
