@@ -4,7 +4,8 @@
     keyword?
     keyword=?
     keyword-append
-    keyword-replace)
+    keyword-replace
+    keyword...?)
   (import
     (scheme)
     (syntax)
@@ -32,4 +33,10 @@
             ((old . rest)
               #'(new . rest))))))
       body))
+
+  (define (identifier...? $id)
+    (free-identifier=? $id #'(... ...)))
+
+  (define-rule-syntax (keyword...? k)
+    (identifier...? #'k))
 )
