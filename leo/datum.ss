@@ -28,8 +28,8 @@
         (switch (car $pair)
           ((symbol? $symbol)
             (cons
-              (->datum (car $pair))
-              (->datum (cdr $pair))))
+              (->datum $symbol)
+              (map* ->datum ->datum (cdr $pair))))
           ((else $other)
             `(list ,@(map* ->datum ->datum $pair)))))
       ((else $other)
