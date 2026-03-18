@@ -63,7 +63,7 @@
           (getter-lets
             ($atom-annotation atom-annotation-getter)
             (getter-switch rhs-line-annotations-getter
-              ((null? _)
+              ((false? _)
                 (getter $atom-annotation))
               ((else $rhs-line-annotations)
                 (getter (cons $atom-annotation $rhs-line-annotations)))))))
@@ -76,9 +76,14 @@
     (getter-switch char-getter
       ((char-space? _) space-line-annotations-getter)
       ((char-colon? _) colon-line-annotations-getter)
-      ((char-comma? _) comma-line-annotations-getter)
-      ((char-newline? _) newline-line-annotations-getter)
+      ((char-comma? _) (non-null-getter comma-line-annotations-getter))
+      ((char-newline? _) (non-null-getter newline-line-annotations-getter))
       ((else $char) (error-getter "unexpected char" $char))))
+
+  (define (non-null-getter $list-getter)
+    (getter-switch $list-getter
+      ((null? _) (getter #f))
+      ((else $list) (getter $list))))
 
   (define inline-annotation-getter
     (getter-lets

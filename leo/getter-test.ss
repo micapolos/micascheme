@@ -60,7 +60,7 @@
 ; colon line
 (check-get-raises line-getter "foo:")
 (check-get-raises line-getter "foo: ")
-(check-gets line-getter "foo:\n" 'foo)
+(check-gets line-getter "foo:\n" '(foo))
 (check-gets line-getter "foo: 10\n" '(foo 10) 8)
 (check-gets line-getter "foo: 10, 20\n" '(foo 10 20) 12)
 (check-gets line-getter "foo:\n  10\n" '(foo 10) 10)
