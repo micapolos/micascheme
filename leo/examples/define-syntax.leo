@@ -3,10 +3,10 @@ import
   math
 
 define-syntax
-  magic: x
+  magic: input-syntax
   syntax-case
-    x
-    keywords: foo, bar
+    input-syntax
+    keywords: magic
     when
       magic: a
       syntax subtract: 0, a
