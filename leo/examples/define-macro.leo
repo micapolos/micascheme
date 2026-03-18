@@ -13,10 +13,10 @@ define-macro
     magic: a, b
     << two arguments add >> add: a, b
   when
-    magic: a, b, c
-    << three arguments append >> string-append: a, b, c
+    magic: a, ...
+    << more arguments append >> string-append: a, ...
 
 write magic:
 write magic: 10
 write magic: 10, 20
-write magic: "a", "b", "c"
+write magic: "a", "b", "c", "d", "e"
