@@ -28,7 +28,7 @@
 
   (define (start-version $arguments)
     (run
-      (displayln (string-append "Leo " version))
+      (displayln (string-append "Leo Scheme " version))
       (start-options $arguments)))
 
   (define (start-help $arguments)
