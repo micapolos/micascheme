@@ -43,6 +43,15 @@
       (_
         (syntax-error $syntax "invalid import"))))
 
+  (define (transform-mapping $syntax)
+    (syntax-case $syntax ()
+      ((from to)
+        #`(
+          #,(transform-identifier #'from)
+          #,(transform-identifier #'to)))
+      (_
+        (syntax-error $syntax "invalid mapping spec"))))
+
   (define (transform-rename-spec $syntax)
     (syntax-case $syntax ()
       ((from to)
@@ -73,12 +82,24 @@
         #`(only
           #,(transform-import-spec #'spec)
           #,@(map transform-identifier #'(id ...))))
-      ((rename rename-spec ... (from import-spec))
+      ((rename mapping ... (from import-spec))
         #`(rename
           #,(transform-import-spec #'import-spec)
-          #,@(map transform-rename-spec #'(rename-spec ...))))
+          #,@(map transform-mapping #'(mapping ...))))
+      ((alias mapping ... (from import-spec))
+        #`(alias
+          #,(transform-import-spec #'import-spec)
+          #,@(map transform-mapping #'(mapping ...))))
       ((prefix (id (from import-spec)))
         #`(prefix
+          #,(transform-import-spec #'import-spec)
+          #,(transform-identifier #'id)))
+      ((add-prefix (id (from import-spec)))
+        #`(add-prefix
+          #,(transform-import-spec #'import-spec)
+          #,(transform-identifier #'id)))
+      ((drop-prefix (id (from import-spec)))
+        #`(drop-prefix
           #,(transform-import-spec #'import-spec)
           #,(transform-identifier #'id)))
       (name

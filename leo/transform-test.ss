@@ -50,6 +50,20 @@
   (equal?
     (syntax->datum
       (transform-import-spec
+        #'(alias
+          (a %a)
+          (b %b)
+          (from (foo (bar goo))))))
+    (syntax->datum
+      '(alias
+        (foo bar goo)
+        (a %a)
+        (b %b)))))
+
+(check
+  (equal?
+    (syntax->datum
+      (transform-import-spec
         #'(only a b (from (foo (bar goo))))))
     (syntax->datum
       '(only (foo bar goo) a b))))
@@ -61,6 +75,30 @@
         #'(except a b (from (foo (bar goo))))))
     (syntax->datum
       '(except (foo bar goo) a b))))
+
+(check
+  (equal?
+    (syntax->datum
+      (transform-import-spec
+        #'(prefix (% (from (foo (bar goo)))))))
+    (syntax->datum
+      '(prefix (foo bar goo) %))))
+
+(check
+  (equal?
+    (syntax->datum
+      (transform-import-spec
+        #'(add-prefix (% (from (foo (bar goo)))))))
+    (syntax->datum
+      '(add-prefix (foo bar goo) %))))
+
+(check
+  (equal?
+    (syntax->datum
+      (transform-import-spec
+        #'(drop-prefix (% (from (foo (bar goo)))))))
+    (syntax->datum
+      '(drop-prefix (foo bar goo) %))))
 
 (check
   (equal?
