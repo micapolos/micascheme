@@ -9,6 +9,9 @@ todo
     quasi << thing >>
     un << thing >>
     un << thing >> splicing
+  when parentheses are working
+    remove << quoting >>
+    remove <<< quoting >>>
   comments
     line comment using colon
     structural using comment
