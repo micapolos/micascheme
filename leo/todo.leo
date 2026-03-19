@@ -28,4 +28,8 @@ todo
       optimization level 2
       optimication level 3
   rething reading and writing atoms
+  implement libraries matching r7rs standard like
+    leo base
+    leo string
+    etc ...
   documentation
