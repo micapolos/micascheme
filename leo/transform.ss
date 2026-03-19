@@ -63,9 +63,9 @@
 
   (define (transform-export-spec $syntax)
     (syntax-case $syntax (rename import)
-      ((rename spec ...)
+      ((rename mapping ...)
         #`(rename
-          #,@(map transform-rename-spec #'(spec ...))))
+          #,@(map transform-mapping #'(mapping ...))))
       ((import spec ...)
         #`(import
           #,@(map transform-import-spec #'(spec ...))))

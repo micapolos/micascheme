@@ -110,6 +110,29 @@
 (check
   (equal?
     (syntax->datum
+      (transform-export
+        #'(export
+          (rename (foo bar) (goo gar)))))
+    (syntax->datum
+      '(export
+        (rename
+          (foo bar)
+          (goo gar))))))
+
+(check
+  (equal?
+    (syntax->datum
+      (transform-export
+        #'(export
+          (import (foo (bar goo))))))
+    (syntax->datum
+      '(export
+        (import
+          (foo bar goo))))))
+
+(check
+  (equal?
+    (syntax->datum
       (transform-import
         #'(import foo (foo bar) (foo (bar goo)))))
     (syntax->datum
