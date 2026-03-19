@@ -16,7 +16,10 @@
         (lets
           ((values $value $new-bfp $new-line $new-column)
             (getter-get!
-              (or-eof-getter line-annotation-getter)
+              (or-eof-getter
+                (skip-until-getter
+                  char-newline?
+                  line-annotation-getter))
               $port
               $sfd
               0 ; indent
