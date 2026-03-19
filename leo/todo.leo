@@ -27,4 +27,5 @@ todo
     compile separate libraries for
       optimization level 2
       optimication level 3
+  rething reading and writing atoms
   documentation
