@@ -1,6 +1,6 @@
 (library (leo scheme)
   (export
-    the
+    null
     library import
     define lambda
     let letrec let-values
@@ -48,6 +48,7 @@
   (%define-syntax import transform-import)
 
   (%define (any? _) #t)
+  (%define null (%quote ()))
 
   (define-keywords then)
 
@@ -71,8 +72,6 @@
     (%newline))
 
   (define-rules-syntaxes (keywords with then %else %when %list keywords)
-    ((the x ...)
-      (x ...))
     ((define (name x))
       (%define name x))
     ((define (name param ... (l ellipses)) x xs ...)

@@ -11,20 +11,20 @@
               (->datum $symbol)
               (map* ->datum ->datum (cdr $pair))))
           ((else $other)
-            `(atom (list ,@(map* ->datum ->datum $pair))))))
+            `(the (list ,@(map* ->datum ->datum $pair))))))
       ((else $atom)
-        (atom->datum $atom))))
+        (the->datum $atom))))
 
-  (define (atom->datum $atom)
+  (define (the->datum $atom)
     (switch $atom
       ((symbol? $symbol) $symbol)
       ((number? $number) $number)
       ((string? $string) $string)
-      ((null? $null) '(atom null))
+      ((null? $null) '(the null))
       ((boolean? $boolean)
-        `(atom ,(if $boolean 'true 'false)))
+        `(the ,(if $boolean 'true 'false)))
       ((char? $char)
-        `(atom
+        `(the
           (char
             ,(lets
               ($string (format "~s" $char))
@@ -37,11 +37,11 @@
                 ((else _)
                   (string->symbol $string)))))))
       ((vector? $vector)
-        `(atom
+        `(the
           (vector
             ,@(map ->datum (vector->list $vector)))))
       ((bytevector? $bytevector)
-        `(atom
+        `(the
           (bytevector
             ,@(map ->datum (bytevector->u8-list $bytevector)))))
       ((else $other)
