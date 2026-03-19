@@ -13,3 +13,7 @@ todo
     line comment using colon
     structural using comment
     block using: comment, parentheses
+  customize remaining built-in syntaxes for leo
+    parameterize
+    cond
+    etc ...
