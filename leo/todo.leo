@@ -1,7 +1,7 @@
 todo
   custom read-handler
   custom write-handler
-  interactive mode
+  repl
   custom writer for
     exceptions
     records
@@ -17,3 +17,11 @@ todo
     parameterize
     cond
     etc ...
+  flags
+    library directories
+    optimization level
+  figure out how to
+    compile separate libraries for
+      optimization level 2
+      optimication level 3
+  documentation
