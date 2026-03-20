@@ -86,7 +86,10 @@
           (ending-getter (getter-item-getter $reader) eof-getter)
           $port
           $sfd
-          $bfp 0 0 0))
+          0 ; indent
+          $bfp
+          0
+          0))
       $value))
 
   (define (read-source-file-descriptor $reader $sfd)
