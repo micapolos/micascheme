@@ -28,7 +28,7 @@
         #`(#,(transform-identifier #'id)))))
 
   (define (transform-export $syntax)
-    (syntax-case (logging $syntax) ()
+    (syntax-case $syntax ()
       ((_ spec ...)
         #`(export
           #,@(map transform-export-spec #'(spec ...))))
@@ -36,7 +36,7 @@
         (syntax-error $syntax "invalid export"))))
 
   (define (transform-import $syntax)
-    (syntax-case (logging $syntax) ()
+    (syntax-case $syntax ()
       ((_ spec ...)
         #`(import
           #,@(map transform-import-spec #'(spec ...))))
