@@ -1,3 +1,5 @@
+v0.1.24
+  prints exceptions using leo syntax
 v0.1.23
   adds license
 v0.1.22
