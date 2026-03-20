@@ -2,5 +2,5 @@
   (export version)
   (import (micascheme))
 
-  (define version "v0.1.18")
+  (define version "v0.1.20")
 )
