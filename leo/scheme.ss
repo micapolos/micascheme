@@ -1,7 +1,7 @@
 (library (leo scheme)
   (export
     null
-    library import
+    library import export
     define lambda
     let letrec let-values
     let* letrec* let*-values
@@ -18,7 +18,6 @@
     syntax-case)
   (import
     (prefix (chezscheme) %)
-    (only (chezscheme) export)
     (only (micascheme) define-rules-syntaxes define-keywords keywords ...)
     (prefix (only (micascheme) make-read-lambda switch) %)
     (only (keyword) keyword? keyword...?)
@@ -28,10 +27,10 @@
     (leo reader)
     (leo datum)
     (leo writing-reader))
-  (export
+  (%export
     (import
       (except (chezscheme)
-        library import
+        library import export
         define lambda
         let letrec let-values
         let* letrec* let*-values
@@ -46,6 +45,7 @@
 
   (%define-syntax library transform-library)
   (%define-syntax import transform-import)
+  (%define-syntax export transform-export)
 
   (%define (any? _) #t)
   (%define null (%quote ()))
