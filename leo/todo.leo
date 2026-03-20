@@ -22,7 +22,7 @@ todo
     parameterize
     cond
     etc ...
-  flags
+  command line flags
     library directories
     optimization level
   figure out how to
