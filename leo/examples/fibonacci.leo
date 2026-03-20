@@ -2,7 +2,7 @@ import
   leo scheme
   math
 
-define n 45
+define n 10
 
 write << calculating fibonacci >> n
 
