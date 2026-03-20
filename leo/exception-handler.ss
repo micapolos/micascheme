@@ -1,9 +1,12 @@
 (library (leo exception-handler)
   (export leo-exception-handler)
   (import
-    (micascheme)
-    (condition))
+    (except (micascheme) write)
+    (condition)
+    (only (leo scheme) write))
 
   (define (leo-exception-handler $x)
-    (write (condition->datum $x)))
+    (run
+      (write `(error ,(condition->datum $x)))
+      (reset)))
 )

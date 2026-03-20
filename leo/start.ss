@@ -47,6 +47,7 @@
     (parameterize
       ((command-line-arguments $arguments))
       (leo
-        (parameterize ((base-exception-handler leo-exception-handler))
-          (load $file)))))
+        (with-exception-handler
+          leo-exception-handler
+          (lambda () (load $file))))))
 )
