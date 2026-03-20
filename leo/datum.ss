@@ -11,39 +11,38 @@
               (->datum $symbol)
               (map* ->datum ->datum (cdr $pair))))
           ((else $other)
-            `(the (list ,@(map* ->datum ->datum $pair))))))
+            `(: ,@(map* ->datum ->datum $pair)))))
       ((else $atom)
-        (the->datum $atom))))
+        (atom->datum $atom))))
 
-  (define (the->datum $atom)
+  (define (atom->datum $atom)
     (switch $atom
       ((symbol? $symbol) $symbol)
       ((number? $number) $number)
       ((string? $string) $string)
-      ((null? $null) '(the null))
+      ((null? $null) (string->symbol "#null"))
       ((boolean? $boolean)
-        `(the ,(if $boolean 'true 'false)))
+        (string->symbol (if $boolean "#true" "#false")))
       ((char? $char)
-        `(the
-          (char
-            ,(lets
-              ($string (format "~s" $char))
-              ($string (substring $string 2 (string-length $string)))
-              (switch (string-ref $string 0)
-                ((char-numeric? $char-numeric)
-                  (-
-                    (char->integer $char)
-                    (char->integer #\0)))
-                ((else _)
-                  (string->symbol $string)))))))
+        `(,(string->symbol "#char")
+          ,(lets
+            ($string (format "~s" $char))
+            ($string (substring $string 2 (string-length $string)))
+            (switch (string-ref $string 0)
+              ((char-numeric? $char-numeric)
+                (-
+                  (char->integer $char)
+                  (char->integer #\0)))
+              ((else _)
+                (string->symbol $string))))))
       ((vector? $vector)
-        `(the
-          (vector
-            ,@(map ->datum (vector->list $vector)))))
+        `(
+          ,(string->symbol "#vector")
+          ,@(map ->datum (vector->list $vector))))
       ((bytevector? $bytevector)
-        `(the
-          (bytevector
-            ,@(map ->datum (bytevector->u8-list $bytevector)))))
+        `(
+          ,(string->symbol "#bytevector")
+          ,@(map ->datum (bytevector->u8-list $bytevector))))
       ((else $other)
         $other)))
 )
