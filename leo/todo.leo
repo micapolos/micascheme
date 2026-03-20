@@ -8,6 +8,9 @@ todo
   custom writer for
     exceptions
     records
+  improve syntax-error messages
+    to include usage examples
+    make it automatic in define-rules-syntax
   parentheses reader for
     quasi << thing >>
     un << thing >>
