@@ -15,6 +15,7 @@
   (core)
   (commented)
   (compiler)
+  (condition)
   (current)
   (curry)
   (datum)
