@@ -1,4 +1,6 @@
 todo
+  fix read problem with: space, newline
+  read literals using keyword the
   custom read-handler
   custom write-handler
   repl
@@ -27,7 +29,6 @@ todo
     compile separate libraries for
       optimization level 2
       optimication level 3
-  rething reading and writing atoms
   implement libraries matching r7rs standard
     leo base
     leo string
