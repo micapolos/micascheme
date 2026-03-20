@@ -21,6 +21,13 @@
         (list (syntax->datum $syntax)))))
 
   (define (condition->datum $condition)
+    (lets
+      ($simple-conditions (simple-conditions $condition))
+      (case (length $simple-conditions)
+        ((1) (simple-condition->datum (car $simple-conditions)))
+        (else `(condition ,@(map simple-condition->datum $simple-conditions))))))
+
+  (define (simple-condition->datum $condition)
     (switch $condition
       ((i/o-invalid-position-error? $i/o-error)
         `(i/o-invalid-position ,(i/o-error-position $i/o-error)))

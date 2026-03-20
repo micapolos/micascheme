@@ -4,6 +4,7 @@
     (micascheme)
     (leo leo)
     (leo version)
+    (leo exception-handler)
     (prefix (leo scheme) %))
 
   (define (start $arguments)
@@ -43,6 +44,9 @@
       (start-options $arguments)))
 
   (define (start-file $file $arguments)
-    (parameterize ((command-line-arguments $arguments))
-      (leo (load $file))))
+    (parameterize
+      ((command-line-arguments $arguments))
+      (leo
+        (parameterize ((base-exception-handler leo-exception-handler))
+          (load $file)))))
 )
