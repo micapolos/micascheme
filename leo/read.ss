@@ -12,14 +12,18 @@
     (lets
       ($line 0)
       ($column 0)
+      ; Don't know why, but extracting this variable outside
+      ; of lambda helped to avoid call-with-values warning
+      ($getter
+        (or-eof-getter
+          (skip-until-getter
+            char-newline?
+            line-annotation-getter)))
       (lambda ()
         (lets
           ((values $value $new-bfp $new-line $new-column)
             (getter-get!
-              (or-eof-getter
-                (skip-until-getter
-                  char-newline?
-                  line-annotation-getter))
+              $getter
               $port
               $sfd
               0 ; indent

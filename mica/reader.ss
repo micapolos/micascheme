@@ -1,7 +1,7 @@
 (library (mica reader)
   (export
-    read-string
     read-port
+    read-string
     read-source-file-descriptor
     read-file
 
@@ -76,14 +76,12 @@
 
   (define-keywords not > else ok)
 
-  (define (read-string $reader $string)
-    (read-port $reader (open-input-string $string) test-sfd 0))
-
   (define (read-port $reader $port $sfd $bfp)
     (%lets
+      ($getter (ending-getter (getter-item-getter $reader) eof-getter))
       ((values $value $bfp $line $column)
         (getter-get!
-          (ending-getter (getter-item-getter $reader) eof-getter)
+          $getter
           $port
           $sfd
           0 ; indent
@@ -92,14 +90,24 @@
           0))
       $value))
 
+  (define (read-string $reader $string)
+    (read-port $reader (open-input-string $string) test-sfd 0))
+
   (define (read-source-file-descriptor $reader $sfd)
     (%lets
+      ; Don't know why, but extracting this variable outside
+      ; of lambda helped to avoid call-with-values warning
+      ($port (open-source-file $sfd))
+      ($getter (ending-getter (getter-item-getter $reader) eof-getter))
       ((values $value $bfp $line $column)
         (getter-get!
-          (ending-getter (getter-item-getter $reader) eof-getter)
-          (open-source-file $sfd)
+          $getter
+          $port
           $sfd
-          0 0 0 0))
+          0
+          0
+          0
+          0))
       $value))
 
   (define (read-file $reader $path)
