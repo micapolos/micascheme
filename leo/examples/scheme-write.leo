@@ -1,6 +1,4 @@
-import
-  leo scheme
-  leo expand
+import leo scheme
 
 define-macro
   when
@@ -18,3 +16,4 @@ scheme-write define
   string-append: x, ", ", y
 
 scheme-write if: 1, then 2, else 3
+
