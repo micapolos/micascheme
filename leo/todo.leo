@@ -33,7 +33,9 @@ todo
     compile separate libraries for
       optimization level 2
       optimication level 3
-  figure out whether we can avoid # prefix when writing atoms
+  figure out whether
+    we can avoid # prefix when writing atoms
+    maybe we can use one of: literal, atom
   implement libraries matching r7rs standard
     leo base
     leo string
