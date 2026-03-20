@@ -1,4 +1,4 @@
-v0.1.21
+v0.1.22
   adds this changelog
 v0.1.19
   fixes leo executable because of mysterious lambda arity mismatch
