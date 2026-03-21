@@ -21,6 +21,14 @@
   (define (datum-simplify $datum)
     (switch $datum
       ((pair? $pair)
+        `(
+          ,(car $datum)
+          ,@(map* datum-simplify-inner datum-simplify-inner (cdr $datum))))
+      ((else $other) $other)))
+
+  (define (datum-simplify-inner $datum)
+    (switch $datum
+      ((pair? $pair)
         `(,(car $datum) ...))
       ((else $other) $other)))
 
