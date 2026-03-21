@@ -4,6 +4,7 @@ todo
   custom read-handler
   custom write-handler
   repl
+  improve write to collapse sentences into single line
   make eval work
   custom writer for
     exceptions
