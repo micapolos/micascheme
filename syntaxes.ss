@@ -10,6 +10,7 @@
     (list)
     (lets)
     (pair)
+    (condition)
     (syntax-keywords))
   (export (import (syntax-keywords)))
 
@@ -24,7 +25,15 @@
                 #`(define-syntax #,$name
                   (lambda ($syntax)
                     (syntax-case $syntax ($literal ...)
-                      #,@$clauses)))))
+                      #,@$clauses
+                      (_
+                        (raise
+                          (condition
+                            (make-syntax-violation $syntax #f)
+                            (make-hint-condition
+                              `(
+                                #,(if (= (length $clauses) 1) #'valid-pattern #'valid-patterns)
+                                #,@(map syntax-car $clauses)))))))))))
             (group-by
               syntax-clause-id
               free-identifier=?
