@@ -55,33 +55,29 @@
 
 ; === atom-code?
 
-(check-code=? (atom-code? '()) "null")
-(check-code=? (atom-code? #f) "false")
-(check-code=? (atom-code? #t) "true")
+(check-code=? (atom-code? 'null) "null")
+(check-code=? (atom-code? 'false) "false")
+(check-code=? (atom-code? 'true) "true")
 (check-code=? (atom-code? 123) "123")
 (check-code=? (atom-code? 'foo) "foo")
 (check-code=? (atom-code? "foo") "\"foo\"")
-(check (false? (atom-code? #\a)))
+(check (false? (atom-code? '(foo))))
+(check (false? (atom-code? '(char a))))
 (check (false? (atom-code? '(foo . bar))))
-(check (false? (atom-code? (bytevector))))
-(check (false? (atom-code? (vector))))
+(check (false? (atom-code? '(bytevector 1 2 3))))
+(check (false? (atom-code? '(vector 1 2 3))))
 
 ; === limited-simple-code?
 
 (check
   (limited=? string=?
-    (limited-simple-string? #t 10)
-    (make-limited? "true" 9)))
+    (limited-simple-string? 'foo 10)
+    (make-limited? "foo" 9)))
 
 (check
   (limited=? string=?
-    (limited-simple-string? #\a 10)
-    (make-limited? "char a" 8)))
-
-(check
-  (limited=? string=?
-    (limited-simple-string? #\space 10)
-    (make-limited? "char space" 8)))
+    (limited-simple-string? '(foo) 10)
+    (make-limited? "foo" 9)))
 
 (check
   (limited=? string=?

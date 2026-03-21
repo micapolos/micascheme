@@ -45,24 +45,8 @@
 
   (define (atom-code? $datum)
     (switch $datum
-      ((pair? $pair)
-        #f)
-      ((null? _)
-        (atom-code? null-datum))
-      ((boolean? $boolean)
-        (atom-code?
-          (boolean->datum $boolean)))
-      ((char? $char)
-        (atom-code?
-          (char->datum $char)))
-      ((bytevector? $bytevector)
-        (atom-code?
-          (bytevector->datum $bytevector)))
-      ((vector? $vector)
-        (atom-code?
-          (vector->datum $vector)))
-      ((else $other)
-        (string-code (format "~s" $other)))))
+      ((pair? $pair) #f)
+      ((else $other) (string-code (format "~s" $other)))))
 
   (define (atom-code?-limiter $datum)
     (switch (atom-code? $datum)
@@ -72,13 +56,13 @@
   (define (simple-code?-limiter $datum)
     (limiter-switch (atom-code?-limiter $datum)
       ((false? _)
-        (switch? (->datum $datum)
+        (switch $datum
           ((pair? $pair)
             (limiter-lets?
               ($car-code (atom-code?-limiter (car $pair)))
               (switch (cdr $pair)
                 ((null? _)
-                  (limiter-using $car-code 0))
+                  (limiter $car-code))
                 ((pair? $cdr)
                   (limiter-lets?
                     ($cdr-code (simple-code?-limiter $cdr))
@@ -86,7 +70,9 @@
                 ((else $cdr)
                   (limiter-lets?
                     ($cdr-code (atom-code?-limiter $cdr))
-                    (limiter (code $car-code " . " $cdr-code)))))))))
+                    (limiter (code $car-code " . " $cdr-code)))))))
+          ((else _)
+            (limiter #f))))
       ((else $atom-code)
         (limiter $atom-code))))
 
