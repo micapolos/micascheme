@@ -19,6 +19,7 @@
       (("index ~s is not an exact nonnegative integer")
         `(not (nonnegative-integer (index ,(car $irritants)))))
       ; todo: cover all exceptions from ChezScheme
+      ; or implement smart translation from string to datum
       (else
         `(message
           (apply format $message $irritants)))))
