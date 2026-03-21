@@ -46,6 +46,7 @@
   (let)
   (lets)
   (limited)
+  (limiter)
   (list)
   (list-syntax)
   (literal)

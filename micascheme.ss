@@ -100,6 +100,7 @@
       (let)
       (lets)
       (limited)
+      (limiter)
       (rename (list) (bindable-list list))
       (list-syntax)
       (literal)
