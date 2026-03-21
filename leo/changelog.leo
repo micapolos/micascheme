@@ -1,5 +1,6 @@
 latest
   prints readable read errors
+  adds syntax logging
 v0.1.24
   prints exceptions using leo syntax
 v0.1.23
