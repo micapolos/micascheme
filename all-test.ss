@@ -45,7 +45,7 @@
   (leo2)
   (let)
   (lets)
-  (lim)
+  (limited)
   (list)
   (list-syntax)
   (literal)

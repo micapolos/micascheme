@@ -1,55 +1,55 @@
-(import (scheme) (check) (lim) (leo code))
+(import (scheme) (check) (limited) (leo code))
 
 (check
   (equal?
-    (lim+leo-length?
-      (make-lim? 10 2)
+    (limited-length+leo?
+      (make-limited? 10 2)
       '())
-    (make-lim? 10 2)))
+    (make-limited? 10 2)))
 
 (check
   (equal?
-    (lim+leo-length?
-      (make-lim? 10 2)
+    (limited-length+leo?
+      (make-limited? 10 2)
       "foo")
-    (make-lim? 11 1)))
+    (make-limited? 11 1)))
 
 (check
   (equal?
-    (lim+leo-length?
-      (make-lim? 10 2)
+    (limited-length+leo?
+      (make-limited? 10 2)
       '(foo bar))
-    (make-lim? 12 0)))
+    (make-limited? 12 0)))
 
 (check
   (not
-    (lim+leo-length?
-      (make-lim? 10 2)
+    (limited-length+leo?
+      (make-limited? 10 2)
       '(foo (bar goo)))))
 
 (check
   (equal?
-    (lim+leo-length?
-      (make-lim? 10 5)
+    (limited-length+leo?
+      (make-limited? 10 5)
       (bytevector 1 2 3))
-    (make-lim? 14 1)))
+    (make-limited? 14 1)))
 
 (check
   (not
-    (lim+leo-length?
-      (make-lim? 10 5)
+    (limited-length+leo?
+      (make-limited? 10 5)
       (bytevector 1 2 3 4 5))))
 
 (check
   (equal?
-    (lim+leo-length?
-      (make-lim? 10 5)
+    (limited-length+leo?
+      (make-limited? 10 5)
       (vector "foo" '(foo bar)))
-    (make-lim? 14 1)))
+    (make-limited? 14 1)))
 
 (check
   (not
-    (lim+leo-length?
-      (make-lim? 10 5)
+    (limited-length+leo?
+      (make-limited? 10 5)
       (vector "foo" '(foo bar) '(zoo zar)))))
 

@@ -1,30 +1,44 @@
 (library (leo code)
-  (export lim+leo-length?)
+  (export
+    limited-length+?
+    limited-length+leo?
+    limited-length+leos?)
   (import
     (micascheme)
     (leo datum)
     (code))
 
-  (define (lim+leo-length? $lim $leo)
+  (define (limited-length+? $limited-length $number)
+    (make-limited?
+      (+ (limited-ref $limited-length) $number)
+      (- (limited-limit $limited-length) $number)))
+
+  (define (limited-length+leo? $limited-length $leo)
     (switch $leo
-      ((null? _) $lim)
+      ((null? _) $limited-length)
       ((pair? $pair)
         (lets?
-          ($lim (lim+leo-length? $lim (car $pair)))
-          (lim+leo-length? $lim (cdr $pair))))
+          ($limited-length (limited-length+leo? $limited-length (car $pair)))
+          (limited-length+leo? $limited-length (cdr $pair))))
       ((char? $char)
-        (lim+? $lim 2))
+        (limited-length+? $limited-length 2))
       ((bytevector? $bytevector)
-        (lim+? $lim (+ (bytevector-length $bytevector) 1)))
+        (limited-length+? $limited-length
+          (+ (bytevector-length $bytevector) 1)))
       ((vector? $vector)
-        (fold-left
-          (lambda ($lim? $leo)
-            (and $lim?
-              (lim+leo-length? $lim? $leo)))
-          (lim+? $lim 1)
-          (vector->list $vector)))
+        (lets?
+          ($limited-length (limited-length+? $limited-length 1))
+          (limited-length+leos? $limited-length (vector->list $vector))))
       ((else $other)
-        (lim+? $lim 1))))
+        (limited-length+? $limited-length 1))))
+
+  (define (limited-length+leos? $limited-length $leos)
+    (fold-left
+      (lambda ($limited-length? $leo)
+        (and $limited-length?
+          (limited-length+leo? $limited-length? $leo)))
+      $limited-length
+      $leos))
 
   (define (leo-code $leo)
     (switch $leo

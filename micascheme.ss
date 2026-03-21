@@ -99,7 +99,7 @@
       (language)
       (let)
       (lets)
-      (lim)
+      (limited)
       (rename (list) (bindable-list list))
       (list-syntax)
       (literal)
