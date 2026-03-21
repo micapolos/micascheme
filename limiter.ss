@@ -6,6 +6,7 @@
     limiter-bind
     limiter-map
     limiter-lets
+    limiter-lets?
     limiter-switch
     list->limiter
     replace-limiter

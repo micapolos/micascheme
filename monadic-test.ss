@@ -47,6 +47,14 @@
   (3 "foobar"))
 
 (check-counter
+  (counter-lets?
+    ($foo (counter "foo"))
+    ($bar (counter #f))
+    ($foobar (counter (string-append $foo $bar)))
+    (counter $foobar))
+  (2 #f))
+
+(check-counter
   (list->counter (list (counter "foo") (counter "bar") (counter "gar")))
   (6 ("foo" "bar" "gar")))
 

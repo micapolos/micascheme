@@ -71,30 +71,21 @@
       ((else $code) (limiter-using $code 1))))
 
   (define (simple-code?-limiter $datum)
-    (limiter-lets
-      ($atom-code? (atom-code?-limiter $datum))
-        (switch $atom-code?
-          ((false? _)
-            (switch? (->datum $datum)
-              ((pair? $pair)
-                (limiter-lets
-                  ($atom-code? (atom-code?-limiter (car $pair)))
-                  (switch $atom-code?
-                    ((false? _)
-                      (limiter #f))
-                    ((else $car-code)
-                      (switch (cdr $pair)
-                        ((null? _)
-                          (limiter-using $car-code 0))
-                        ((else $cdr)
-                          (limiter-lets
-                            ($cdr-simple-code? (simple-code?-limiter $cdr))
-                            (switch $cdr-simple-code?
-                              ((false? _) (limiter #f))
-                              ((else $cdr-simple-code)
-                                (limiter (space-separated-code $car-code $cdr-simple-code)))))))))))))
-          ((else $atom-code)
-            (limiter $atom-code)))))
+    (limiter-switch (atom-code?-limiter $datum)
+      ((false? _)
+        (switch? (->datum $datum)
+          ((pair? $pair)
+            (limiter-lets?
+              ($car-code (atom-code?-limiter (car $pair)))
+              (switch (cdr $pair)
+                ((null? _)
+                  (limiter-using $car-code 0))
+                ((else $cdr)
+                  (limiter-lets?
+                    ($cdr-simple-code (simple-code?-limiter $cdr))
+                    (limiter (space-separated-code $car-code $cdr-simple-code)))))))))
+      ((else $atom-code)
+        (limiter $atom-code))))
 
   (define (limited-simple-code? $datum $limit)
     (limiter-apply (simple-code?-limiter $datum) $limit))
