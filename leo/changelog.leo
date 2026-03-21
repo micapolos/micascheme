@@ -1,4 +1,4 @@
-latest
+v0.1.25
   prints readable read errors
   adds syntax logging
 v0.1.24
