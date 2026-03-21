@@ -16,7 +16,7 @@
           (lambda ($lim? $line)
             (and $lim?
               (lim+line-length? $lim? $line)))
-          $lim
+          (lim+? $lim 1)
           (vector->list $vector)))
       ((else $other)
         (lim+? $lim 1))))

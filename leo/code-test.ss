@@ -33,3 +33,23 @@
       (make-lim? 10 5)
       (bytevector 1 2 3))
     (make-lim? 14 1)))
+
+(check
+  (not
+    (lim+line-length?
+      (make-lim? 10 5)
+      (bytevector 1 2 3 4 5))))
+
+(check
+  (equal?
+    (lim+line-length?
+      (make-lim? 10 5)
+      (vector "foo" '(foo bar)))
+    (make-lim? 14 1)))
+
+(check
+  (not
+    (lim+line-length?
+      (make-lim? 10 5)
+      (vector "foo" '(foo bar) '(zoo zar)))))
+
