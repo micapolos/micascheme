@@ -8,7 +8,7 @@
       ((pair? $pair)
         (lets?
           ($lim (lim+line-length? $lim (car $pair)))
-          (lim+? (lim+line-length? $lim (cdr $pair)))))
+          (lim+line-length? $lim (cdr $pair))))
       ((bytevector? $bytevector)
         (lim+? $lim (+ (bytevector-length $bytevector) 1)))
       ((vector? $vector)
