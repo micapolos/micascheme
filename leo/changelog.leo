@@ -1,3 +1,5 @@
+v0.1.26
+  improve exception messages
 v0.1.25
   prints readable read errors
   adds syntax logging
