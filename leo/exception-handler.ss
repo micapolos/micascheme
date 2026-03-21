@@ -7,6 +7,6 @@
 
   (define (leo-exception-handler $x)
     (run
-      (write `(error ,(condition->datum $x)))
+      (write `(exception ,(condition->datum $x)))
       (reset)))
 )

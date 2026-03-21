@@ -8,6 +8,7 @@
     (switch)
     (lets)
     (procedure)
+    (boolean)
     (lets)
     (list))
 
@@ -17,6 +18,12 @@
   (define-condition-type &hint &condition make-hint-condition hint-condition?
     (hint condition-hint))
 
+  (define (datum-simplify $datum)
+    (switch $datum
+      ((pair? $pair)
+        `(,(car $datum) ...))
+      ((else $other) $other)))
+
   (define (syntax->condition-datums $syntax)
     (switch (syntax->annotation $syntax)
       ((annotation? $annotation)
@@ -24,7 +31,7 @@
           ($source (annotation-source $annotation))
           ((values $path $line $column) (locate-source-object-source $source #t #t))
           `(
-            ,(syntax->datum $syntax)
+            ,(datum-simplify (syntax->datum $syntax))
             (in ,$path)
             (at
               (line ,$line)
@@ -64,8 +71,11 @@
             (condition-message $message-condition))))
       ((syntax-violation? $syntax-violation)
         `(syntax-violation
-          (form ,@(syntax->condition-datums (syntax-violation-form $syntax-violation)))
-          (subform ,@(syntax->condition-datums (syntax-violation-subform $syntax-violation)))))
+          ,@(syntax->condition-datums (syntax-violation-form $syntax-violation))
+          ,@(switch (syntax-violation-subform $syntax-violation)
+            ((false? _) '())
+            ((else $subform)
+              (list `(subform ,@(syntax->condition-datums $subform)))))))
       ((cause-condition? $cause-condition)
         `(cause ,(condition-cause $cause-condition)))
       ((hint-condition? $hint-condition)
