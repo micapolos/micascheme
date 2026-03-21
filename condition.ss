@@ -10,6 +10,7 @@
     (procedure)
     (boolean)
     (lets)
+    (system)
     (list))
 
   (define-condition-type &cause &condition make-cause-condition cause-condition?
@@ -68,15 +69,21 @@
       ((who-condition? $who-condition)
         `(who ,(condition-who $who-condition)))
       ((message-condition? $message-condition)
-        `(message
-          ,(if (exists format-condition? $simple-conditions)
-            (lets
-              ($message-condition (car (memp message-condition? $simple-conditions)))
-              ($irritants-condition (car (memp irritants-condition? $simple-conditions)))
-              (apply format
-                (condition-message $message-condition)
-                (condition-irritants $irritants-condition)))
-            (condition-message $message-condition))))
+        (if (exists format-condition? $simple-conditions)
+          (lets
+            ($message-condition (car (memp message-condition? $simple-conditions)))
+            ($irritants-condition (car (memp irritants-condition? $simple-conditions)))
+            ($message (condition-message $message-condition))
+            ($irritants (condition-irritants $irritants-condition))
+            (case $message
+              (("variable ~:s is not bound")
+                `(unbound (variable ,(car $irritants))))
+              (else
+                `(message
+                  ,(apply format
+                    (condition-message $message-condition)
+                    (condition-irritants $irritants-condition))))))
+          `(message ,(condition-message $message-condition))))
       ((syntax-violation? $syntax-violation)
         `(syntax-violation
           ,@(syntax->condition-datums (syntax-violation-form $syntax-violation))
@@ -93,8 +100,8 @@
       ((i/o-error? _) `i/o-error)
       ((i/o-write-error? _) `i/o-write-error)
       ((lexical-violation? _) `lexical-violation)
-      ((serious-condition? _) `serious)
       ((assertion-violation? _) `assertion-violation)
+      ((serious-condition? _) `serious)
       ((undefined-violation? _) `undefined-violation)
       ((error? _) `error)
       ((warning? _) `warning)

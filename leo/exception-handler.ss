@@ -6,7 +6,10 @@
     (only (leo scheme) write))
 
   (define (leo-exception-handler $x)
-    (run
-      (write `(exception ,(condition->datum $x)))
-      (reset)))
+    (lets
+      ($datum (condition->datum $x))
+      ($datum (if (and (pair? $datum) (equal? (car $datum) 'condition)) (cdr $datum) (list $datum)))
+        (run
+          (write `(exception ,$datum))
+          (reset))))
 )
