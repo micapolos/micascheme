@@ -114,10 +114,16 @@
     (read-source-file-descriptor $reader
       (path->source-file-descriptor $path)))
 
-  (define (error $cause $datum)
-    (getter-item
-      (always #f)
-      (error-getter $cause $datum)))
+  (define error
+    (case-lambda
+      (($cause $datum $hint)
+        (getter-item
+          (always #f)
+          (error-getter $cause $datum $hint)))
+      (($cause $datum)
+        (getter-item
+          (always #f)
+          (error-getter $cause $datum)))))
 
   (define eof
     (getter-item (lambda (_) #f) eof-getter))

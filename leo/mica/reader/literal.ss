@@ -39,5 +39,8 @@
       number
       identifier
       string-literal
-      special-literal))
+      special-literal
+      (error
+        (%quote (expected (one-of number identifier string special)))
+        (%quote (invalid literal)))))
 )
