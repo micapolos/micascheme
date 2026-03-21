@@ -11,6 +11,7 @@
     (boolean)
     (lets)
     (system)
+    (message-datum)
     (format-datum)
     (list))
 
@@ -90,14 +91,14 @@
 
       ; extend &condition
       ((message-condition? $message-condition)
-        (if (exists format-condition? $simple-conditions)
-          (lets
-            ($message-condition (car (memp message-condition? $simple-conditions)))
-            ($irritants-condition (car (memp irritants-condition? $simple-conditions)))
-            ($message (condition-message $message-condition))
-            ($irritants (condition-irritants $irritants-condition))
-            (apply format->datum $message $irritants))
-          `(message ,(condition-message $message-condition))))
+        (lets
+          ($message (condition-message $message-condition))
+          (switch (memp format-condition? $simple-conditions)
+            ((pair? $pair)
+              (apply format->datum $message
+                (condition-irritants (car (memp irritants-condition? $simple-conditions)))))
+            ((else _)
+              (message->datum $message)))))
       ((irritants-condition? $condition)
         (and
           (not (exists format-condition? $simple-conditions))

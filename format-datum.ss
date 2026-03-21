@@ -8,6 +8,8 @@
         `(unbound (variable ,(car $irritants))))
       (("~s is not a number")
         `(not (number ,(car $irritants))))
+      (("~s is not an integer")
+        `(not (integer ,(car $irritants))))
       (("~s is not a string")
         `(not (string ,(car $irritants))))
       (("~s is not a character")
@@ -22,6 +24,6 @@
       ; or implement smart translation from string to datum
       (else
         `(message
-          (apply format $message $irritants)))))
+          ,(apply format $message $irritants)))))
 
 )

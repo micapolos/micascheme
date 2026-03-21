@@ -6,5 +6,5 @@ displayln if
   number=?
     add: 2, 2
     4
-  then "sigh... 2 + 2 = 4"
-  else "WTF!!! 2 + 2 != 4"
+  "sigh... 2 + 2 = 4"
+  "WTF!!! 2 + 2 != 4"

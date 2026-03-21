@@ -130,8 +130,7 @@
     ((letrec-syntax (with binding ...) x xs ...)
       (%let-syntax (binding ...) x xs ...))
 
-    ((if a (then b ...) (%else c ...))
-      (%if a (%begin b ...) (%begin c ...)))
+    ((if a b c) (%if a b c))
 
     ((cond (%when a b bs ...) ... (%else c cs ...))
       (%cond (a b bs ...) ... (%else c cs ...)))
