@@ -26,3 +26,10 @@
     (lim+line-length?
       (make-lim? 10 2)
       '(foo (bar goo)))))
+
+(check
+  (equal?
+    (lim+line-length?
+      (make-lim? 10 5)
+      (bytevector 1 2 3))
+    (make-lim? 14 1)))
