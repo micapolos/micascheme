@@ -10,7 +10,7 @@
 
   (define letter-char
     (one-of
-      (range-char #\a #\z)
+      (range-char #\a #\y)
       (range-char #\A #\Z)))
 
   (define digit-char
