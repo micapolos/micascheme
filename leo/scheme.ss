@@ -143,8 +143,16 @@
     ((switch x (%when (a b) c) ...)
       (%switch x ((a b) c) ...))
 
-    ((logging x) (let (with (val x)) (write val) val))
-    ((logging label x) (let (with (val x)) (write (%list (%quote label) val)) val))
+    ((logging x)
+      (let
+        (with (val x))
+        (write val)
+        val))
+    ((logging label x)
+      (let
+        (with (val x))
+        (write (%list (%quote label) val))
+        val))
 
     ((define-language (x l))
       (%define-language x l)))
