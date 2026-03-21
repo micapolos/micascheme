@@ -1,5 +1,8 @@
 (library (condition)
-  (export condition->datum)
+  (export
+    &cause make-cause-condition cause-condition? condition-cause
+    &hint make-hint-condition hint-condition? condition-hint
+    condition->datum)
   (import
     (scheme)
     (switch)
@@ -7,6 +10,12 @@
     (procedure)
     (lets)
     (list))
+
+  (define-condition-type &cause &condition make-cause-condition cause-condition?
+    (cause condition-cause))
+
+  (define-condition-type &hint &condition make-hint-condition hint-condition?
+    (hint condition-hint))
 
   (define (syntax->condition-datums $syntax)
     (switch (syntax->annotation $syntax)
@@ -57,15 +66,19 @@
         `(syntax-violation
           (form ,@(syntax->condition-datums (syntax-violation-form $syntax-violation)))
           (subform ,@(syntax->condition-datums (syntax-violation-subform $syntax-violation)))))
+      ((cause-condition? $cause-condition)
+        `(cause ,(condition-cause $cause-condition)))
+      ((hint-condition? $hint-condition)
+        `(hint ,(condition-hint $hint-condition)))
       ((source-condition? $source-condition)
         `(source ,@(syntax->condition-datums (source-condition-form $source-condition))))
+      ((i/o-error? _) `i/o-error)
+      ((i/o-write-error? _) `i/o-write-error)
+      ((lexical-violation? _) `lexical-violation)
       ((serious-condition? _) `serious)
       ((assertion-violation? _) `assertion-violation)
       ((undefined-violation? _) `undefined-violation)
       ((error? _) `error)
       ((warning? _) `warning)
-      ((lexical-violation? _) `lexical-violation)
-      ((i/o-error? _) `i/o-error)
-      ((i/o-write-error? _) `i/o-write-error)
       ((else _) #f)))
 )

@@ -74,7 +74,10 @@
       ((char-colon? _) colon-line-annotations-getter)
       ((char-comma? _) (non-null-getter comma-line-annotations-getter))
       ((char-newline? _) (non-null-getter newline-line-annotations-getter))
-      ((else $char) (error-getter "unexpected char" $char))))
+      ((else $char) (error-getter
+        '(unexpected char)
+        $char
+        `(expected (one-of #\space #\: #\, #\newline))))))
 
   (define (non-null-getter $list-getter)
     (getter-switch $list-getter

@@ -20,28 +20,31 @@
       ((symbol? $symbol) $symbol)
       ((number? $number) $number)
       ((string? $string) $string)
-      ((null? $null) (string->symbol "#null"))
+      ((null? $null) (string->symbol "null"))
       ((boolean? $boolean)
-        (string->symbol (if $boolean "#true" "#false")))
+        (string->symbol (if $boolean "true" "false")))
       ((char? $char)
-        `(,(string->symbol "#char")
-          ,(lets
-            ($string (format "~s" $char))
-            ($string (substring $string 2 (string-length $string)))
-            (switch (string-ref $string 0)
-              ((char-numeric? $char-numeric)
-                (-
-                  (char->integer $char)
-                  (char->integer #\0)))
-              ((else _)
-                (string->symbol $string))))))
+        `(char
+          ,(case $char
+            ((#\space) 'space)
+            (else
+              (lets
+                ($string (format "~s" $char))
+                ($string (substring $string 2 (string-length $string)))
+                (switch (string-ref $string 0)
+                  ((char-numeric? $char-numeric)
+                    (-
+                      (char->integer $char)
+                      (char->integer #\0)))
+                  ((else _)
+                    (string->symbol $string))))))))
       ((vector? $vector)
         `(
-          ,(string->symbol "#vector")
+          ,(string->symbol "vector")
           ,@(map ->datum (vector->list $vector))))
       ((bytevector? $bytevector)
         `(
-          ,(string->symbol "#bytevector")
+          ,(string->symbol "bytevector")
           ,@(map ->datum (bytevector->u8-list $bytevector))))
       ((else $other)
         $other)))

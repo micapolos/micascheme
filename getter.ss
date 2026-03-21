@@ -101,6 +101,7 @@
     (eof)
     (system)
     (source-file-descriptor)
+    (condition)
     (predicate))
 
   (define indent-size 2)
@@ -142,20 +143,38 @@
 
   (define-monadic getter)
 
-  (define (raise-getter-error $message $datum $port $sfd $bfp)
-    (raise
-      (condition
-        (make-message-condition $message)
-        (make-i/o-read-error)
-        (make-source-condition
-          (make-annotation
-            $datum
-            (make-source-object $sfd $bfp $bfp)
-            $datum)))))
+  (define raise-getter-error
+    (case-lambda
+      (($cause $datum $port $sfd $bfp $hint)
+        (raise
+          (condition
+            (make-i/o-read-error)
+            (make-source-condition
+              (make-annotation
+                $datum
+                (make-source-object $sfd $bfp $bfp)
+                $datum))
+            (make-cause-condition $cause)
+            (make-hint-condition $hint))))
+      (($cause $datum $port $sfd $bfp)
+        (raise
+          (condition
+            (make-i/o-read-error)
+            (make-source-condition
+              (make-annotation
+                $datum
+                (make-source-object $sfd $bfp $bfp)
+                $datum))
+            (make-cause-condition $cause))))))
 
-  (define (error-getter $message $datum)
-    (getter ($port $sfd $indent $bfp $line $column)
-      (raise-getter-error $message $datum $port $sfd $bfp)))
+  (define error-getter
+    (case-lambda
+      (($cause $datum $hint)
+        (getter ($port $sfd $indent $bfp $line $column)
+          (raise-getter-error $cause $datum $port $sfd $bfp $hint)))
+      (($cause $datum)
+        (getter ($port $sfd $indent $bfp $line $column)
+          (raise-getter-error $cause $datum $port $sfd $bfp)))))
 
   (define sfd-getter
     (getter ($port $sfd $indent $bfp $line $column)
@@ -189,7 +208,9 @@
             ((zero? $column)
               (values $eof $bfp $line $column))
             ((<= $column $indent)
-              (raise-getter-error "invalid" 'indent $port $sfd $bfp))
+              (raise-getter-error
+                '(eof (inside indent))
+                $eof $port $sfd $bfp))
             (else
               (values $eof $bfp $line $column))))
         ((char-newline? $newline)
@@ -197,7 +218,9 @@
             ((zero? $column)
               (values (get-char $port) (+ $bfp 1) (+ $line 1) 0))
             ((<= $column $indent)
-              (raise-getter-error "invalid" 'indent $port $sfd $bfp))
+              (raise-getter-error
+                '(newline (after indent))
+                $newline $port $sfd $bfp))
             (else
               (values (get-char $port) (+ $bfp 1) (+ $line 1) 0))))
         ((else $char)
@@ -211,7 +234,10 @@
                 ((zero? (mod $column indent-size))
                   (values eof $bfp $line $column))
                 (else
-                  (raise-getter-error "invalid" 'indent $port $sfd $bfp))))
+                  (raise-getter-error
+                    '(invalid indent)
+                    $char $port $sfd $bfp
+                    '(indent (should (contain (exactly (two spaces)))))))))
             (else
               (values (get-char $port) (+ $bfp 1) $line (+ $column 1))))))))
 
@@ -223,7 +249,9 @@
             ((zero? $column)
               (values $eof $bfp $line $column))
             ((<= $column $indent)
-              (raise-getter-error "invalid" 'indent $port $sfd $bfp))
+              (raise-getter-error
+                '(eof (inside indent))
+                $eof $port $sfd $bfp))
             (else
               (values $eof $bfp $line $column))))
         ((char-newline? $newline)
@@ -231,7 +259,9 @@
             ((zero? $column)
               (values $newline $bfp $line $column))
             ((<= $column $indent)
-              (raise-getter-error "invalid" 'indent $port $sfd $bfp))
+              (raise-getter-error
+                '(newline (after indent))
+                $newline $port $sfd $bfp))
             (else
               (values $newline $bfp $line $column))))
         ((else $char)
@@ -245,14 +275,17 @@
                 ((zero? (mod $column indent-size))
                   (values eof $bfp $line $column))
                 (else
-                  (raise-getter-error "invalid" 'indent $port $sfd $bfp))))
+                  (raise-getter-error
+                    '(invalid indent)
+                    $char $port $sfd $bfp
+                    '(indent (should (contain (exactly (two spaces)))))))))
             (else
               (values $char $bfp $line $column)))))))
 
   (define eof-getter
     (getter-switch peek-char/eof-getter
       ((eof? $eof) (getter $eof))
-      ((else $char) (error-getter "expected eof, found" 'char))))
+      ((else $char) (error-getter '(expected eof) $char))))
 
   (define (or-eof-getter $getter)
     (getter-lets
@@ -265,12 +298,12 @@
     (getter-lets
       ($char/eof char/eof-getter)
       (switch $char/eof
-        ((eof? $eof) (error-getter "unexpected end of" 'file))
+        ((eof? $eof) (error-getter '(unexpected eof) $eof))
         ((else $char) (getter $char)))))
 
   (define peek-char-getter
     (getter-switch peek-char/eof-getter
-      ((eof? $eof) (error-getter "unexpected end of" 'file))
+      ((eof? $eof) (error-getter '(unexpected eof) $eof))
       ((else $char) (getter $char))))
 
   (define (exact-char-getter $exact-char)
@@ -278,7 +311,10 @@
       ($char char-getter)
       (if (char=? $char $exact-char)
         (getter $char)
-        (error-getter "unexpected char" $char))))
+        (error-getter
+          '(unexpected char)
+          $char
+          `(expected ,$exact-char)))))
 
   (define (exact-string-getter $string)
     (getter-lets
@@ -290,7 +326,7 @@
       ($char char-getter)
       (switch $char
         (($test? $char) (getter $char))
-        ((else $char) (error-getter "unexpected char" $char)))))
+        ((else $char) (error-getter '(unexpected char) $char)))))
 
   (define (skip-char-getter $getter)
     (getter-lets

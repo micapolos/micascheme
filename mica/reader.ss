@@ -114,10 +114,10 @@
     (read-source-file-descriptor $reader
       (path->source-file-descriptor $path)))
 
-  (define (error $message $datum)
+  (define (error $cause $datum)
     (getter-item
       (always #f)
-      (error-getter $message $datum)))
+      (error-getter $cause $datum)))
 
   (define eof
     (getter-item (lambda (_) #f) eof-getter))
@@ -232,7 +232,7 @@
             ((char? $char)
               (if (and (app (char-test test?) $char) ...)
                 (getter-item-getter reader)
-                (error-getter "unexpected char" $char)))
+                (error-getter '(unexpected char) $char)))
             ((%else $other)
               (getter-item-getter reader))))))
     ((prefixed $prefix $item)
