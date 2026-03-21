@@ -43,7 +43,6 @@
       $limited-length
       $leos))
 
-
   (define (atom-code? $datum)
     (switch $datum
       ((pair? $pair)
@@ -80,10 +79,14 @@
               (switch (cdr $pair)
                 ((null? _)
                   (limiter-using $car-code 0))
+                ((pair? $cdr)
+                  (limiter-lets?
+                    ($cdr-code (simple-code?-limiter $cdr))
+                    (limiter (code $car-code " " $cdr-code))))
                 ((else $cdr)
                   (limiter-lets?
-                    ($cdr-simple-code (simple-code?-limiter $cdr))
-                    (limiter (space-separated-code $car-code $cdr-simple-code)))))))))
+                    ($cdr-code (atom-code?-limiter $cdr))
+                    (limiter (code $car-code " . " $cdr-code)))))))))
       ((else $atom-code)
         (limiter $atom-code))))
 

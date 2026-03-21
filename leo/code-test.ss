@@ -88,6 +88,11 @@
     (limited-simple-string? '(foo bar) 10)
     (make-limited? "foo bar" 8)))
 
+(check
+  (limited=? string=?
+    (limited-simple-string? '(foo . bar) 10)
+    (make-limited? "foo . bar" 8)))
+
 ; (check
 ;   (limited=? string=?
 ;     (limited-simple-string? '(foo (bar goo)) 10)
