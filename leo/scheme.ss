@@ -15,11 +15,12 @@
     define-language
     define-syntax
     define-macro
-    syntax-case)
+    syntax-case
+    logging)
   (import
     (prefix (chezscheme) %)
     (only (micascheme) define-rules-syntaxes define-keywords keywords ...)
-    (prefix (only (micascheme) make-read-lambda switch) %)
+    (prefix (only (micascheme) make-read-lambda switch logging) %)
     (only (keyword) keyword? keyword...?)
     (leo transform)
     (prefix (language) %)
@@ -141,6 +142,8 @@
       (%switch x ((a b) c) ... ((%else _) d)))
     ((switch x (%when (a b) c) ...)
       (%switch x ((a b) c) ...))
+
+    ((logging x) (let (with (val x)) (write val) val))
 
     ((define-language (x l))
       (%define-language x l)))
