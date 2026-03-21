@@ -61,7 +61,7 @@
                 $simple-conditions)))))))
 
   (define (message-irritants->datum? $message $irritants)
-    (case (logging $message)
+    (case $message
       (("variable ~:s is not bound")
         `(unbound (variable ,(car $irritants))))
       (("~s is not a number")

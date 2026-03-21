@@ -10,6 +10,8 @@
       ($datum (condition->datum $x))
       ($datum (if (and (pair? $datum) (equal? (car $datum) 'condition)) (cdr $datum) (list $datum)))
         (run
-          (write `(exception ,$datum))
+          (write
+            `(exception ,$datum)
+            (console-error-port))
           (reset))))
 )
