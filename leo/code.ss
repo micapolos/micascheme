@@ -2,7 +2,10 @@
   (export
     limited-length+?
     limited-length+leo?
-    limited-length+leos?)
+    limited-length+leos?
+
+    atom-code?
+    limited-simple-string?)
   (import
     (micascheme)
     (leo datum)
@@ -40,23 +43,64 @@
       $limited-length
       $leos))
 
-  ; (define (inline-limited-code? $leo $limit)
-  ;   (switch $leo
-  ;     ((null? _)
-  ;       (make-limited?
-  ;         (code null-datum)
-  ;         1))
-  ;     ((boolean? $boolean)
-  ;       (leo-code (boolean->datum $boolean)))
-  ;     ((char? $char)
-  ;       (leo-code (char->datum $char)))
-  ;     ((pair? $pair)
-  ;       (switch $pair)
-  ;       (todo))
-  ;     ((bytevector? $bytevector)
-  ;       (leo-code (bytevector->datum $bytevector)))
-  ;     ((vector? $vector)
-  ;       (leo-code (vector->datum $vector)))
-  ;     ((else $other)
-  ;       (code (format "~s" $other)))))
+
+  (define (atom-code? $datum)
+    (switch $datum
+      ((pair? $pair)
+        #f)
+      ((null? _)
+        (atom-code? null-datum))
+      ((boolean? $boolean)
+        (atom-code?
+          (boolean->datum $boolean)))
+      ((char? $char)
+        (atom-code?
+          (char->datum $char)))
+      ((bytevector? $bytevector)
+        (atom-code?
+          (bytevector->datum $bytevector)))
+      ((vector? $vector)
+        (atom-code?
+          (vector->datum $vector)))
+      ((else $other)
+        (string-code (format "~s" $other)))))
+
+  (define (atom-code?-limiter $datum)
+    (switch (atom-code? $datum)
+      ((false? _) (limiter #f))
+      ((else $code) (limiter-using $code 1))))
+
+  (define (simple-code?-limiter $datum)
+    (limiter-lets
+      ($atom-code? (atom-code?-limiter $datum))
+        (switch $atom-code?
+          ((false? _)
+            (switch? (->datum $datum)
+              ((pair? $pair)
+                (limiter-lets
+                  ($atom-code? (atom-code?-limiter (car $pair)))
+                  (switch $atom-code?
+                    ((false? _)
+                      (limiter #f))
+                    ((else $car-code)
+                      (switch (cdr $pair)
+                        ((null? _)
+                          (limiter-using $car-code 0))
+                        ((else $cdr)
+                          (limiter-lets
+                            ($cdr-simple-code? (simple-code?-limiter $cdr))
+                            (switch $cdr-simple-code?
+                              ((false? _) (limiter #f))
+                              ((else $cdr-simple-code)
+                                (limiter (space-separated-code $car-code $cdr-simple-code)))))))))))))
+          ((else $atom-code)
+            (limiter $atom-code)))))
+
+  (define (limited-simple-code? $datum $limit)
+    (limiter-apply (simple-code?-limiter $datum) $limit))
+
+  (define (limited-simple-string? $datum $limit)
+    (lets?
+      ($limited (limited-simple-code? $datum $limit))
+      (limited-map $limited code-string)))
 )
