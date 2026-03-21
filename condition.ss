@@ -11,6 +11,7 @@
     (boolean)
     (lets)
     (system)
+    (format-datum)
     (list))
 
   (define-condition-type &cause &condition make-cause-condition cause-condition?
@@ -60,25 +61,6 @@
                 (partial simple-condition->datum? $simple-conditions)
                 $simple-conditions)))))))
 
-  (define (message-irritants->datum? $message $irritants)
-    (case $message
-      (("variable ~:s is not bound")
-        `(unbound (variable ,(car $irritants))))
-      (("~s is not a number")
-        `(not (number ,(car $irritants))))
-      (("~s is not a string")
-        `(not (string ,(car $irritants))))
-      (("~s is not a character")
-        `(not (character ,(car $irritants))))
-      (("index ~s is out of range for list ~s")
-        `(out-of-range
-          (index ,(car $irritants))
-          (list ,(cadr $irritants))))
-      (("index ~s is not an exact nonnegative integer")
-        `(not (nonnegative-integer (index ,(car $irritants)))))
-      ; todo: cover all exceptions from ChezScheme
-      (else #f)))
-
   (define (simple-condition->datum? $simple-conditions $condition)
     (switch $condition
       ; extend &io-error
@@ -114,12 +96,7 @@
             ($irritants-condition (car (memp irritants-condition? $simple-conditions)))
             ($message (condition-message $message-condition))
             ($irritants (condition-irritants $irritants-condition))
-            (or
-              (message-irritants->datum? $message $irritants)
-              `(message
-                ,(apply format
-                  (condition-message $message-condition)
-                  (condition-irritants $irritants-condition)))))
+            (apply format->datum $message $irritants))
           `(message ,(condition-message $message-condition))))
       ((irritants-condition? $condition)
         (and
