@@ -121,6 +121,10 @@
 (check-colon-line-code 3 '(foo bar gar) "foo: bar, gar")
 (check-colon-line-code 4 '((foo bar) (goo gar)) ": foo bar, goo gar")
 
+; (check-colon-line-code 6
+;   '(center (point (x 10) (y 20)))
+;   "center point: x 10, y 20")
+
 ; === block-code
 
 (check-block-code '() "#null")
@@ -148,3 +152,9 @@
   "#vector"
   "  foo: bar, goo"
   "  zoo: zar, zoo")
+
+; (check-block-code
+;   '(circle (radius 10) (center (point (x 10) (y 20))))
+;   "circle"
+;   "  radius 10"
+;   "  center point: x 10, y 20")
