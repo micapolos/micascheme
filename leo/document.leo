@@ -1,0 +1,16 @@
+library
+  leo document
+  export: document, example
+  import leo scheme
+
+  define-macro
+    when
+      document: x, ...
+      begin
+        pretty-print << x
+        ...
+    when
+      example: x, ...
+      << example
+        program: x, ...
+        result >> run: x, ...

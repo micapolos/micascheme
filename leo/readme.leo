@@ -1,6 +1,8 @@
-import leo scheme
+import
+  leo scheme
+  leo document
 
-pretty-print << readme
+document readme
   leo scheme programming language
 
   leo scheme is a programming language which uses indentation instead of parentheses

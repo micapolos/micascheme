@@ -19,8 +19,7 @@
     logging
 
     add subtract multiply divide
-    number=? less? less/equal? greater? greater/equal?
-    example)
+    number=? less? less/equal? greater? greater/equal?)
   (import
     (prefix (chezscheme) %)
     (only (micascheme) run define-rules-syntaxes define-keywords keywords ...)
@@ -172,12 +171,6 @@
         (with (val x))
         (write (%list (%quote label) val))
         val))
-
-    ((example x ...)
-      (%quasiquote
-        (example
-          (program x ...)
-          (result (%unquote (run x ...))))))
 
     ((define-language (x l))
       (%define-language x l)))
