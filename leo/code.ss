@@ -77,7 +77,7 @@
       (check-code=? (atom-code? in) out)
       (check (false? (atom-code? in)))))
 
-  ; === line-code ===
+  ; === line-code? ===
 
   (define null-line-code (code "#null"))
 
