@@ -25,21 +25,21 @@
 
   ; === atom-code? ===
 
-  (define null-atom-code? (code "#null"))
+  (define null-atom-code (code "#null"))
 
-  (define (boolean-atom-code? $boolean)
-    (boolean-line-code $boolean))
+  (define (boolean-atom-code $boolean)
+    (string-code (if $boolean "#true" "#false")))
 
-  (define (number-atom-code? $number)
-    (number-line-code $number))
+  (define (number-atom-code $number)
+    (string-code (number->string $number)))
 
   (define (char-atom-code? $char) #f)
 
-  (define (string-atom-code? $string)
-    (string-line-code $string))
+  (define (string-atom-code $string)
+    (string-code (format "~s" $string)))
 
-  (define (symbol-atom-code? $symbol)
-    (symbol-line-code $symbol))
+  (define (symbol-atom-code $symbol)
+    (string-code (format "~s" $symbol)))
 
   (define (bytevector-atom-code? $bytevector)
     (and
@@ -55,22 +55,22 @@
 
   (define (pair-atom-code? $pair) #f)
 
-  (define (other-atom-code? $other)
+  (define (other-atom-code $other)
     (other-line-code $other))
 
   (define (atom-code? $datum)
     (switch $datum
-      ((null? _) null-atom-code?)
-      ((boolean? $boolean) (boolean-atom-code? $boolean))
-      ((number? $number) (number-atom-code? $number))
+      ((null? _) null-atom-code)
+      ((boolean? $boolean) (boolean-atom-code $boolean))
+      ((number? $number) (number-atom-code $number))
       ((char? $char) (char-atom-code? $char))
-      ((string? $string) (string-atom-code? $string))
-      ((symbol? $symbol) (symbol-atom-code? $symbol))
+      ((string? $string) (string-atom-code $string))
+      ((symbol? $symbol) (symbol-atom-code $symbol))
       ((pair? $pair) (pair-atom-code? $pair))
       ((box? $box) (box-atom-code? $box))
       ((bytevector? $bytevector) (bytevector-atom-code? $bytevector))
       ((vector? $vector) (vector-atom-code? $vector))
-      ((else $other) (other-atom-code? $other))))
+      ((else $other) (other-atom-code $other))))
 
   (define-rule-syntax (check-atom-code? in out)
     (if out
@@ -82,10 +82,10 @@
   (define null-line-code (code "#null"))
 
   (define (boolean-line-code $boolean)
-    (string-code (if $boolean "#true" "#false")))
+    (boolean-atom-code $boolean))
 
   (define (number-line-code $number)
-    (string-code (number->string $number)))
+    (number-atom-code $number))
 
   (define (char-line-code $char)
     (string-code
@@ -95,10 +95,10 @@
           (substring $string 2 (string-length $string))))))
 
   (define (string-line-code $string)
-    (string-code (format "~s" $string)))
+    (string-atom-code $string))
 
   (define (symbol-line-code $symbol)
-    (string-code (format "~s" $symbol)))
+    (symbol-atom-code $symbol))
 
   (define (pair-line-code $pair)
     (lets
