@@ -38,7 +38,7 @@ leo/build.sh
 
 ### Download Releases
 
-You can find the latest stable versions and pre-built binaries here: [View Releases](https://www.google.com/search?q=https://github.com/micapolos/micascheme/releases)
+You can find the latest stable versions and pre-built binaries here: [View Releases](https://github.com/micapolos/micascheme/releases)
 
 Project Philosophy
 ------------------
@@ -62,8 +62,6 @@ Contributing & Support
 As this is a personal sandbox, the code is often experimental and evolving quickly. However, interest and feedback are always welcome:
 
 *   **Exploration:** Feel free to poke around the subfolders to see how the various libraries interact.
-
-*   **Issues:** If you find a bug or have a suggestion, especially regarding Leo syntax or the zx-next assembler, please open an issue on the [GitHub tracker](https://www.google.com/search?q=https://github.com/micapolos/micascheme/issues).
 
 *   **Support:** If you're using these tools for your own Spectrum Next projects or Scheme experiments, I'd love to hear about it!
 
