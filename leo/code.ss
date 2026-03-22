@@ -54,7 +54,7 @@
 
   (define (lines-code $lines)
     (switch-exhaustive $lines
-      ((null? _) (code "()"))
+      ((null? _) null-line-code)
       ((pair? $pair)
         (lets
           ($car-code (line-code (car $pair)))
