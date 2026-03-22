@@ -10,7 +10,9 @@ This repo is where I explore new ways of programming and interact with hardware.
 
 *   **([Leo Scheme](./leo)):** My primary focus—a programming language that brings the power of Scheme into a modern, indentation-based syntax. It’s designed for people who want the logic of Lisp without the "sea of parentheses."
 
-*   **zx-next:** Tools for the **ZX Spectrum Next**, including a specialized assembler. It's where high-level Scheme logic meets low-level retro-hardware.
+*   **([ZX Next](./zx-next)):** Tools for the **ZX Spectrum Next**, including a specialized assembler. It's where high-level Scheme logic meets low-level retro-hardware.
+
+* **[ASM tools](./asm):** A Scheme-based DSL for structured assembly. It currently supports **Z80** targets, allowing for high-level abstractions (like loops and conditionals) that compile directly into efficient machine instructions.
 
 *   **Base Libraries:** Various utilities and extensions for Chez Scheme that power the rest of the experiments in this sandbox.
 
@@ -38,7 +40,7 @@ leo/build.sh
 
 ### Download Releases
 
-You can find the latest stable versions and pre-built binaries here: [View Releases](https://github.com/micapolos/micascheme/releases)
+You can find the latest stable versions and pre-built binaries here: [View Releases](./releases)
 
 Project Philosophy
 ------------------
