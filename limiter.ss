@@ -23,6 +23,7 @@
     (list)
     (switch)
     (boolean)
+    (number)
     (monadic))
 
   (define-rules-syntaxes
@@ -49,7 +50,7 @@
       ((else $limited) (limited-ref $limited))))
 
   (define (limiter-unlimited-ref $limiter)
-    (limited-ref (limiter-apply $limiter +inf.0)))
+    (limited-ref (limiter-apply $limiter infinity)))
 
   (define (limiter-bind $limiter $fn)
     (limiter ($limit)

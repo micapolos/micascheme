@@ -14,7 +14,10 @@
     integer-wraparound
     integer+/wraparound
     integer-/wraparound
-    integer*/wraparound)
+    integer*/wraparound
+    infinity
+    positive-infinity
+    negative-infinity)
   (import (scheme) (syntax))
 
   (define pi (* (asin 1) 2))
@@ -61,6 +64,10 @@
 
   (define (!= a b)
     (not (= a b)))
+
+  (define infinity +inf.0)
+  (define positive-infinity infinity)
+  (define negative-infinity -inf.0)
 
   (define-rule-syntax (integer-mask size)
     (syntax-eval (- (bitwise-arithmetic-shift-left 1 size) 1)))

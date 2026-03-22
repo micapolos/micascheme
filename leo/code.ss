@@ -375,10 +375,6 @@
   (define-rule-syntax (check-colon-line-code-false? size in)
     (check (false? (limit-colon-line-code? size in))))
 
-  ; === block-line-code ===
-
-
-
   ; === block-code ===
 
   (define (limiter-line-code? $line-code?-limiter)
