@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.28
+    adds readme.leo file which is also a valid leo program
   v0.1.27
     improve printing
       write prints single line with parentheses
