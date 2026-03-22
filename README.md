@@ -15,7 +15,7 @@ This repo is where I explore new ways of programming and interact with hardware.
 
 *   **[ZX Next](./zx-next):** Tools for the **ZX Spectrum Next**, including a specialized assembler. It's where high-level Scheme logic meets low-level retro-hardware.
 
-* **[(ASM tools](./asm):** A Scheme-based DSL for structured assembly. It currently supports **Z80** targets, allowing for high-level abstractions (like loops and conditionals) that compile directly into efficient machine instructions.
+* **[ASM tools](./asm):** A Scheme-based DSL for structured assembly. It currently supports **Z80** targets, allowing for high-level abstractions (like loops and conditionals) that compile directly into efficient machine instructions.
 
 *   **Base Libraries:** Various utilities and extensions for Chez Scheme that power the rest of the experiments in this sandbox.
 
