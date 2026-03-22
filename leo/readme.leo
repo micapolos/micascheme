@@ -5,7 +5,7 @@ pretty-print << readme
 
   leo scheme is a programming language which uses indentation instead of parentheses
   this document is a valid leo scheme program
-  it uses << and >> to separate prose from executable logic
+  it uses << and >> to separate text from code
 
   quick start
     overview
