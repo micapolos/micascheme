@@ -44,7 +44,7 @@
               (->datum $symbol)
               (map* ->datum ->datum (cdr $pair))))
           ((else $other)
-            `(: ,@(map* ->datum ->datum $pair)))))
+            `(list ,@(map* ->datum ->datum $pair)))))
       ((else $atom)
         (atom->datum $atom))))
 
