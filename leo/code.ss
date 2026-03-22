@@ -210,7 +210,7 @@
 
   (define (pair-space-line-code?-limiter $pair)
     (limiter-lets?
-      ($car-code (space-line-code?-limiter (car $pair)))
+      ($car-code (limiter-using (atom-code? (car $pair)) 1))
       (switch (cdr $pair)
         ((null? _)
           (limiter #f))
@@ -312,7 +312,7 @@
 
   (define (pair-colon-line-code?-limiter $pair)
     (limiter-lets?
-      ($car-code (colon-line-code?-limiter (car $pair)))
+      ($car-code (limiter-using (atom-code? (car $pair)) 1))
       (switch (cdr $pair)
         ((null? _)
           (limiter #f))
@@ -382,43 +382,32 @@
     (newline-ended-code (symbol-line-code $symbol)))
 
   (define (pair-block-code $pair)
-    (lets
-      ($car-code (line-code (car $pair)))
-      (switch (cdr $pair)
-        ((null? _)
-          (code-in-round-brackets $car-code))
-        ((pair? $cdr-pair)
-          (switch (cdr $cdr-pair)
-            ((null? _)
-              (space-separated-code $car-code (line-code (car $cdr-pair))))
-            ((else $cdr-cdr)
-              (space-separated-code $car-code
-                (code-in-round-brackets (lines-code $cdr-pair))))))
-        ((else $cdr)
-          (code $car-code dot-code (line-code $cdr))))))
+    (switch (limiter-apply (pair-colon-line-code?-limiter $pair) line-limit)
+      ((false? _)
+        (switch (atom-code? (car $pair))
+          ((false? _)
+            (code ":" #\newline
+              (code-indent (list-block-code $pair))))
+          ((else $code)
+            (code $code ":" #\newline
+              (code-indent (list-block-code (cdr $pair)))))))
+      ((else $limited)
+        (newline-ended-code (limited-ref $limited)))))
 
-  (define (list-block-code $lines)
-    (switch-exhaustive $lines
-      ((null? _) (code))
-      ((pair? $pair)
-        (lets
-          ($car-code (line-code (car $pair)))
-          (switch (cdr $pair)
-            ((null? _)
-              $car-code)
-            ((pair? $cdr)
-              (code $car-code comma-code (lines-code $cdr)))
-            ((else $cdr)
-              (code $car-code dot-code (line-code $cdr))))))))
+  (define (list-block-code $list)
+    (list->code
+      (map*
+        block-code
+        (lambda ($item) (code ". " (block-code $item)))
+        $list)))
 
   (define (bytevector-block-code $bytevector)
     (switch (limiter-apply (bytevector-colon-line-code?-limiter $bytevector) line-limit)
       ((false? _)
         (code "#bytevector" #\newline
           (code-indent
-            (list->code
-              (map block-code
-                (bytevector->u8-list $bytevector))))))
+            (list-block-code
+              (bytevector->u8-list $bytevector)))))
       ((else $limited)
         (newline-ended-code (limited-ref $limited)))))
 
@@ -427,9 +416,8 @@
       ((false? _)
         (code "#vector" #\newline
           (code-indent
-            (list->code
-              (map block-code
-                (vector->list $vector))))))
+            (list-block-code
+              (vector->list $vector)))))
       ((else $limited)
         (newline-ended-code (limited-ref $limited)))))
 

@@ -84,6 +84,13 @@
 (check-space-line-code 1 "foo" "\"foo\"")
 (check-space-line-code 1 'foo "foo")
 
+(check-space-line-code 2 '(foo bar) "foo bar")
+(check-space-line-code 2 '(foo . bar) "foo . bar")
+(check-space-line-code 3 '(foo (bar goo)) "foo bar goo")
+(check-space-line-code 3 '(foo (bar goo)) "foo bar goo")
+(check-space-line-code-false? 3 '(foo))
+(check-space-line-code-false? 3 '(foo bar goo))
+
 (check-space-line-code 2 (box 1) "#box 1")
 (check-space-line-code 3 (box '(foo bar)) "#box foo bar")
 
@@ -95,13 +102,6 @@
 (check-space-line-code 3 (vector '(foo bar)) "#vector foo bar")
 (check-space-line-code-false? 3 (vector))
 (check-space-line-code-false? 3 (vector 1 2))
-
-(check-space-line-code 2 '(foo bar) "foo bar")
-(check-space-line-code 2 '(foo . bar) "foo . bar")
-(check-space-line-code 3 '(foo (bar goo)) "foo bar goo")
-(check-space-line-code 3 '(foo (bar goo)) "foo bar goo")
-(check-space-line-code-false? 3 '(foo))
-(check-space-line-code-false? 3 '(foo bar goo))
 
 ; === colon-line-code?-limiter
 
@@ -125,7 +125,8 @@
 (check-block-code #\a "#char a")
 (check-block-code "foo" "\"foo\"")
 (check-block-code 'foo "foo")
-;(check-block-code '(foo bar) "foo bar")
+(check-block-code '(foo bar) "foo bar")
+;(check-block-code '(foo bar gar) "foo bar")
 
 (check-block-code (bytevector) "#bytevector:")
 (check-block-code (bytevector 1 2 3) "#bytevector: 1, 2, 3")
