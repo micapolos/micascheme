@@ -89,6 +89,7 @@ cp "$CS_BOOT_DIR/scheme.boot" "$REL_SCHEME_LIB/"
 cp "$SRC_LEO_DIR/examples"/* "$REL_EX_DIR/"
 cp "$SRC_LEO_DIR/man"/* "$REL_MAN_DIR/"
 cp "$SRC_LEO_DIR/changelog.leo" "$RELEASE_DIR/"
+cp "$SRC_LEO_DIR/readme.leo" "$RELEASE_DIR/"
 
 # --- 5. Run WPO Compilation ---
 echo "Compiling Leo $VERSION with WPO..."
