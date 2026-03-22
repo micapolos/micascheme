@@ -1,6 +1,6 @@
 v0.1.27
   improve printing
-    write prints single line with paretheses
+    write prints single line with parentheses
     pretty-print prints indented code without parentheses
 v0.1.26
   improve exception messages
