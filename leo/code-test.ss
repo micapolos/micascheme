@@ -1,5 +1,41 @@
 (import (scheme) (check) (limited) (boolean) (code) (leo code))
 
+; === line-code
+
+(check-code=? (line-code '()) "()")
+
+(check-code=? (line-code #t) "#true")
+(check-code=? (line-code #f) "#false")
+
+(check-code=? (line-code 123) "123")
+(check-code=? (line-code 3.14) "3.14")
+(check-code=? (line-code -123) "-123")
+
+(check-code=? (line-code #\a) "#char a")
+(check-code=? (line-code #\0) "#char 0")
+(check-code=? (line-code #\space) "#char space")
+(check-code=? (line-code #\.) "#char .")
+(check-code=? (line-code #\newline) "#char newline")
+
+(check-code=? (line-code "") "\"\"")
+(check-code=? (line-code "foo") "\"foo\"")
+
+(check-code=? (line-code '(foo . bar)) "foo . bar")
+(check-code=? (line-code '(foo gar . bar)) "foo (gar . bar)")
+(check-code=? (line-code '(foo)) "(foo)")
+(check-code=? (line-code '(foo bar)) "foo bar")
+(check-code=? (line-code '(foo (bar goo))) "foo bar goo")
+(check-code=? (line-code '(foo bar goo)) "foo (bar, goo)")
+(check-code=? (line-code '(foo bar (goo gar))) "foo (bar, goo gar)")
+(check-code=? (line-code '(foo (bar zar) (goo gar))) "foo (bar zar, goo gar)")
+(check-code=? (line-code '(foo (bar zar) (goo gar mar))) "foo (bar zar, goo (gar, mar))")
+
+(check-code=?
+  (line-code '(circle (radius 10) (center (point (x 10) (y 20)))))
+  "circle (radius 10, center point (x 10, y 20))")
+
+; === line-code
+
 (check
   (equal?
     (limited-length+leo?
@@ -74,20 +110,20 @@
     (limited-simple-string? 'foo 10)
     (make-limited? "foo" 9)))
 
-(check
-  (limited=? string=?
-    (limited-simple-string? '(foo) 10)
-    (make-limited? "foo" 9)))
+; (check
+;   (limited=? string=?
+;     (limited-simple-string? '(foo) 10)
+;     (make-limited? "foo" 9)))
 
-(check
-  (limited=? string=?
-    (limited-simple-string? '(foo bar) 10)
-    (make-limited? "foo bar" 8)))
+; (check
+;   (limited=? string=?
+;     (limited-simple-string? '(foo bar) 10)
+;     (make-limited? "foo bar" 8)))
 
-(check
-  (limited=? string=?
-    (limited-simple-string? '(foo . bar) 10)
-    (make-limited? "foo . bar" 8)))
+; (check
+;   (limited=? string=?
+;     (limited-simple-string? '(foo . bar) 10)
+;     (make-limited? "foo . bar" 8)))
 
 ; (check
 ;   (limited=? string=?

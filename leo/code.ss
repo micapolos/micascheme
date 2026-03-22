@@ -1,5 +1,7 @@
 (library (leo code)
   (export
+    line-code
+
     limited-length+?
     limited-length+leo?
     limited-length+leos?
@@ -10,6 +12,69 @@
     (micascheme)
     (leo datum)
     (code))
+
+  (define null-line-code (code "()"))
+
+  (define (boolean-line-code $boolean)
+    (string-code (if $boolean "#true" "#false")))
+
+  (define (number-line-code $number)
+    (string-code (number->string $number)))
+
+  (define (char-line-code $char)
+    (string-code
+      (string-append "#char "
+        (lets
+          ($string (format "~s" $char))
+          (substring $string 2 (string-length $string))))))
+
+  (define (string-line-code $string)
+    (string-code (format "~s" $string)))
+
+  (define (symbol-line-code $symbol)
+    (string-code (format "~s" $symbol)))
+
+  (define (pair-line-code $pair)
+    (lets
+      ($car-code (line-code (car $pair)))
+      (switch (cdr $pair)
+        ((null? _)
+          (code "(" $car-code ")"))
+        ((pair? $cdr-pair)
+          (switch (cdr $cdr-pair)
+            ((null? _)
+              (code $car-code " " (line-code (car $cdr-pair))))
+            ((else $cdr-cdr)
+              (space-separated-code $car-code
+                (code-in-round-brackets (lines-code $cdr-pair))))))
+        ((else $cdr)
+          (code $car-code " . " (line-code $cdr))))))
+
+  (define (lines-code $lines)
+    (switch-exhaustive $lines
+      ((null? _) (code "()"))
+      ((pair? $pair)
+        (lets
+          ($car-code (line-code (car $pair)))
+          ($cdr (cdr $pair))
+          (switch (cdr $pair)
+            ((null? _)
+              $car-code)
+            ((pair? $cdr)
+              (code $car-code ", " (lines-code $cdr)))
+            ((else _)
+              (code $car-code " . " (line-code $cdr))))))))
+
+  (define (line-code $datum)
+    (switch $datum
+      ((null? _) null-line-code)
+      ((boolean? $boolean) (boolean-line-code $boolean))
+      ((number? $number) (number-line-code $number))
+      ((char? $char) (char-line-code $char))
+      ((string? $string) (string-line-code $string))
+      ((symbol? $symbol) (symbol-line-code $symbol))
+      ((pair? $pair) (pair-line-code $pair))
+      ((else $other) (string-code (format "~s" $other)))))
 
   (define (limited-length+? $limited-length $number)
     (make-limited?
@@ -62,7 +127,7 @@
               ($car-code (atom-code?-limiter (car $pair)))
               (switch (cdr $pair)
                 ((null? _)
-                  (limiter $car-code))
+                  (limiter (code "(" $car-code ")")))
                 ((pair? $cdr)
                   (limiter-lets?
                     ($cdr-code (simple-code?-limiter $cdr))
