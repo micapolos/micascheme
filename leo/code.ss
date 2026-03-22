@@ -19,8 +19,6 @@
 
   (define arrow-code (code "->"))
   (define comma-separator-code (code ", "))
-  (define arrow-separator-code (code " " arrow-code " "))
-
   (define pair-separator-code arrow-code)
 
   (define (pair-separated-code $car $cdr)
