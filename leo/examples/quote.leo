@@ -2,6 +2,6 @@ import
   leo scheme
   only: datum->string, from micascheme
 
-write quote string-append: "foo", "bar"
-write << this is quoted >> string-append: "foo", "bar"
-write << this is quoted list >>... list: "foo", "bar"
+pretty-print quote string-append: "foo", "bar"
+pretty-print << this is quoted >> string-append: "foo", "bar"
+pretty-print << this is quoted list >>... list: "foo", "bar"

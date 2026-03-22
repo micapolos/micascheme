@@ -7,6 +7,6 @@ define remaining list
   syntax "gar"
   syntax "goo"
 
-write syntax string-append: "foo", "bar"
-write <<< this is quoted >>> string-append: "foo", "bar"
-write <<< this is quoted list >>>... list: "foo", "bar"
+pretty-print syntax string-append: "foo", "bar"
+pretty-print <<< this is quoted >>> string-append: "foo", "bar"
+pretty-print <<< this is quoted list >>>... list: "foo", "bar"

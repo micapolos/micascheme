@@ -16,7 +16,7 @@ define-macro
     magic: a, ...
     << more arguments append >> string-append: a, ...
 
-write magic:
-write magic: 10
-write magic: 10, 20
-write magic: "a", "b", "c", "d", "e"
+pretty-print magic:
+pretty-print magic: 10
+pretty-print magic: 10, 20
+pretty-print magic: "a", "b", "c", "d", "e"

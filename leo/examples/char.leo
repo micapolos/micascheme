@@ -1,6 +1,6 @@
 import leo scheme
 
-write << character literals >>
+pretty-print << character literals >>
   char a
   char z
   char A

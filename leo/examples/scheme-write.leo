@@ -2,15 +2,15 @@ import leo scheme
 
 define-macro
   when
-    scheme-write id: xs, ...
+    scheme-pretty-print id: xs, ...
     displayln format
       "~s"
       syntax->datum apply
         top-level-syntax quote id
         list syntax id: xs, ...
 
-scheme-write define x 10
+scheme-pretty-print define x 10
 
-scheme-write define
+scheme-pretty-print define
   comma-separated: x, y
   string-append: x, ", ", y

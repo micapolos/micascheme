@@ -4,9 +4,9 @@ import
 
 define n 10
 
-write << calculating fibonacci >> n
+pretty-print << calculating fibonacci >> n
 
-time write << result is >>
+time pretty-print << result is >>
   let fibonacci
     with number n
     if

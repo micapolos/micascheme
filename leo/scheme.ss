@@ -58,15 +58,16 @@
       ((x)
         (write x (%current-output-port)))
       ((x port)
-        ; TODO: Implement reader which would write directly to port.
         (%put-string port
           (writing-string
             (reader-end
               (reader-read-list (writing-reader)
                 (%list (->datum x)))))))))
 
-  (%define (pretty-print . xs)
-    (%for-each write xs))
+  (%define pretty-print
+    (%case-lambda
+      ((x) (pretty-print x (%current-output-port)))
+      ((x port) (write x port))))
 
   (%define (displayln x)
     (%display x)

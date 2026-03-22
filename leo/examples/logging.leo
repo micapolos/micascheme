@@ -2,19 +2,19 @@ import
   leo scheme
   math
 
-write quote without logging
-write string-append
+pretty-print quote without logging
+pretty-print string-append
   "Hello, "
   "world!"
 newline:
 
-write quote with logging
-write string-append
+pretty-print quote with logging
+pretty-print string-append
   logging "Hello, "
   logging "world!"
 newline:
 
-write quote with logging and labels
-write string-append
+pretty-print quote with logging and labels
+pretty-print string-append
   logging: first, "Hello, "
   logging: second, "world!"

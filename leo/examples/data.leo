@@ -6,6 +6,6 @@ data abstraction procedure
 data application: lhs, rhs
 data variable index
 
-write application
+pretty-print application
   abstraction variable 0
   variable 0

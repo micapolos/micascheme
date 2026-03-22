@@ -10,7 +10,7 @@
       ($datum (condition->datum $x))
       ($datum (if (and (pair? $datum) (equal? (car $datum) 'condition)) (cdr $datum) (list $datum)))
         (run
-          (write
+          (pretty-print
             `(exception ,$datum)
             (console-error-port))
           (reset))))
