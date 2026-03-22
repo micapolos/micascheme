@@ -4,7 +4,9 @@ todo
   custom read-handler
   custom write-handler
   repl
-  improve write to collapse sentences into single line
+  improve printing
+    write should produce single line with parentheses
+    pretty-print should produce indented code without parentheses
   make eval work
   custom writer for
     exceptions
