@@ -1,24 +1,26 @@
 ```
-import leo scheme
+import
+  leo scheme
+  leo document
 
-pretty-print << readme
+document readme
   leo scheme programming language
 
   leo scheme is a programming language which uses indentation instead of parentheses
   this document is a valid leo scheme program
-  it uses << and >> to separate prose from executable logic
+  it uses << and >> to separate text from code
 
   quick start
     overview
       leo translates indentation into standard scheme s-expressions
       each indented block represents a new level of nesting
 
-    basic syntax >> run
+    basic syntax >> example
       define hello "Hello"
       define world "world"
       string-append: hello, ", ", world, "!"
 
-    functions >> run
+    functions >> example
       define
         exclamated s
         string-append: s, "!!!"
@@ -27,21 +29,21 @@ pretty-print << readme
         exclamated "LOL"
         exclamated "Wow"
 
-    control flow >> run
+    control flow >> example
       if
         greater?: 10, 5
-        quote 10 is greater than 5
-        quote 10 is not greater than 5
+        "obviously, 10 is greater than 5"
+        "What? 10 is not greater than 5?"
 
-    lists and maps >> run
+    lists and maps >> example
       define numbers list: 1, 2, 3, 4, 5, 6
 
-      << examples
+      << list examples
         numbers >> numbers
         number strings >> map: number->string, numbers
         odd numbers >> filter: odd?, numbers
 
-    lambdas >>
+    lambdas >> example
       map
         lambda
           with x
@@ -52,7 +54,7 @@ pretty-print << readme
             << as string >> number->string x
         list: 1, 2, 3, 4
 
-    macros >> run
+    macros >> example
       define-macro
         when
           my-macro s
