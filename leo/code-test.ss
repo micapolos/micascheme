@@ -1,5 +1,33 @@
 (import (scheme) (check) (limited) (boolean) (code) (leo code))
 
+; === atom-code?
+
+(check-atom-code? '() "#null")
+
+(check-atom-code? #t "#true")
+(check-atom-code? #f "#false")
+
+(check-atom-code? 123 "123")
+(check-atom-code? 3.14 "3.14")
+(check-atom-code? -123 "-123")
+
+(check-atom-code? #\a #f)
+
+(check-atom-code? "" "\"\"")
+(check-atom-code? "foo" "\"foo\"")
+
+(check-atom-code? 'foo "foo")
+(check-atom-code? '(foo bar) #f)
+(check-atom-code? '(foo . bar) #f)
+
+(check-atom-code? (box 123) #f)
+
+(check-atom-code? (bytevector) "#bytevector")
+(check-atom-code? (bytevector 1) #f)
+
+(check-atom-code? (vector) "#vector")
+(check-atom-code? (vector 1) #f)
+
 ; === line-code
 
 (check-code=? (line-code '()) "#null")
@@ -88,3 +116,27 @@
 (check-colon-line-code 7 (vector '(foo bar) '(goo gar) '(zoo zar)) "#vector: foo bar, goo gar, zoo zar")
 
 (check-colon-line-code-false? 4 (vector '(foo bar gar)))
+
+; === block-code
+
+(check-block-code '() "#null")
+(check-block-code #t "#true")
+(check-block-code 123 "123")
+(check-block-code #\a "#char a")
+(check-block-code "foo" "\"foo\"")
+(check-block-code 'foo "foo")
+;(check-block-code '(foo bar) "foo bar")
+
+(check-block-code (bytevector) "#bytevector:")
+(check-block-code (bytevector 1 2 3) "#bytevector: 1, 2, 3")
+(check-block-code
+  (bytevector 1 2 3 4 5 6 7 8 9 10)
+  "#bytevector" "  1" "  2" "  3" "  4" "  5" "  6" "  7" "  8" "  9" "  10")
+
+(check-block-code (vector) "#vector:")
+(check-block-code (vector 1 2 3) "#vector: 1, 2, 3")
+; (check-block-code
+;   (vector '(foo bar goo) '(zoo zar zoo))
+;   "#vector"
+;   "  foo: bar, goo"
+;   "  zoo: zar, zoo")

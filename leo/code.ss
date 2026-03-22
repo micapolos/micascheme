@@ -1,12 +1,17 @@
 (library (leo code)
   (export
+    atom-code?
+    check-atom-code?
+
     line-code
 
     check-space-line-code
     check-space-line-code-false?
 
     check-colon-line-code
-    check-colon-line-code-false?)
+    check-colon-line-code-false?
+
+    check-block-code)
   (import
     (micascheme)
     (leo datum)
@@ -18,6 +23,59 @@
   (define (dot-separated-code $car $cdr)
     (code $car dot-code $cdr))
 
+  ; === atom-code? ===
+
+  (define null-atom-code? (code "#null"))
+
+  (define (boolean-atom-code? $boolean)
+    (boolean-line-code $boolean))
+
+  (define (number-atom-code? $number)
+    (number-line-code $number))
+
+  (define (char-atom-code? $char) #f)
+
+  (define (string-atom-code? $string)
+    (string-line-code $string))
+
+  (define (symbol-atom-code? $symbol)
+    (symbol-line-code $symbol))
+
+  (define (bytevector-atom-code? $bytevector)
+    (and
+      (= (bytevector-length $bytevector) 0)
+      (code "#bytevector")))
+
+  (define (vector-atom-code? $vector)
+    (and
+      (= (vector-length $vector) 0)
+      (code "#vector")))
+
+  (define (box-atom-code? $box) #f)
+
+  (define (pair-atom-code? $pair) #f)
+
+  (define (other-atom-code? $other)
+    (other-line-code $other))
+
+  (define (atom-code? $datum)
+    (switch $datum
+      ((null? _) null-atom-code?)
+      ((boolean? $boolean) (boolean-atom-code? $boolean))
+      ((number? $number) (number-atom-code? $number))
+      ((char? $char) (char-atom-code? $char))
+      ((string? $string) (string-atom-code? $string))
+      ((symbol? $symbol) (symbol-atom-code? $symbol))
+      ((pair? $pair) (pair-atom-code? $pair))
+      ((box? $box) (box-atom-code? $box))
+      ((bytevector? $bytevector) (bytevector-atom-code? $bytevector))
+      ((vector? $vector) (vector-atom-code? $vector))
+      ((else $other) (other-atom-code? $other))))
+
+  (define-rule-syntax (check-atom-code? in out)
+    (if out
+      (check-code=? (atom-code? in) out)
+      (check (false? (atom-code? in)))))
 
   ; === line-code ===
 
@@ -300,4 +358,106 @@
 
   (define-rule-syntax (check-colon-line-code-false? size in)
     (check (false? (limit-colon-line-code? size in))))
+
+  ; === block-code ===
+
+  (define line-limit 7)
+
+  (define null-block-code
+    (newline-ended-code null-line-code))
+
+  (define (boolean-block-code $boolean)
+    (newline-ended-code (boolean-line-code $boolean)))
+
+  (define (number-block-code $number)
+    (newline-ended-code (number-line-code $number)))
+
+  (define (char-block-code $char)
+    (newline-ended-code (char-line-code $char)))
+
+  (define (string-block-code $string)
+    (newline-ended-code (string-line-code $string)))
+
+  (define (symbol-block-code $symbol)
+    (newline-ended-code (symbol-line-code $symbol)))
+
+  (define (pair-block-code $pair)
+    (lets
+      ($car-code (line-code (car $pair)))
+      (switch (cdr $pair)
+        ((null? _)
+          (code-in-round-brackets $car-code))
+        ((pair? $cdr-pair)
+          (switch (cdr $cdr-pair)
+            ((null? _)
+              (space-separated-code $car-code (line-code (car $cdr-pair))))
+            ((else $cdr-cdr)
+              (space-separated-code $car-code
+                (code-in-round-brackets (lines-code $cdr-pair))))))
+        ((else $cdr)
+          (code $car-code dot-code (line-code $cdr))))))
+
+  (define (list-block-code $lines)
+    (switch-exhaustive $lines
+      ((null? _) (code))
+      ((pair? $pair)
+        (lets
+          ($car-code (line-code (car $pair)))
+          (switch (cdr $pair)
+            ((null? _)
+              $car-code)
+            ((pair? $cdr)
+              (code $car-code comma-code (lines-code $cdr)))
+            ((else $cdr)
+              (code $car-code dot-code (line-code $cdr))))))))
+
+  (define (bytevector-block-code $bytevector)
+    (switch (limiter-apply (bytevector-colon-line-code?-limiter $bytevector) line-limit)
+      ((false? _)
+        (code "#bytevector" #\newline
+          (code-indent
+            (list->code
+              (map block-code
+                (bytevector->u8-list $bytevector))))))
+      ((else $limited)
+        (newline-ended-code (limited-ref $limited)))))
+
+  (define (vector-block-code $vector)
+    (switch (limiter-apply (vector-colon-line-code?-limiter $vector) line-limit)
+      ((false? _)
+        (code "#vector" #\newline
+          (code-indent
+            (list->code
+              (map block-code
+                (vector->list $vector))))))
+      ((else $limited)
+        (newline-ended-code (limited-ref $limited)))))
+
+  (define (box-block-code $box)
+    (switch (limiter-apply (box-colon-line-code?-limiter $box) line-limit)
+      ((false? _)
+        (space-separated-code "#box"
+          (block-code (unbox $box))))
+      ((else $limited)
+        (newline-ended-code (limited-ref $limited)))))
+
+  (define (other-block-code $other)
+    (newline-ended-code (string-code (format "~s" $other))))
+
+  (define (block-code $datum)
+    (switch $datum
+      ((null? _) null-block-code)
+      ((boolean? $boolean) (boolean-block-code $boolean))
+      ((number? $number) (number-block-code $number))
+      ((char? $char) (char-block-code $char))
+      ((string? $string) (string-block-code $string))
+      ((symbol? $symbol) (symbol-block-code $symbol))
+      ((pair? $pair) (pair-block-code $pair))
+      ((box? $box) (box-block-code $box))
+      ((bytevector? $bytevector) (bytevector-block-code $bytevector))
+      ((vector? $vector) (vector-block-code $vector))
+      ((else $other) (other-block-code $other))))
+
+  (define-rule-syntax (check-block-code in out ...)
+    (check-code=? (block-code in) (lines-string out ...)))
 )
