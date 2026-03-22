@@ -5,7 +5,7 @@ import
 document readme
   leo scheme programming language
 
-  leo scheme is a sialect of scheme which uses indentation instead of parentheses
+  leo scheme is a dialect of scheme which uses indentation instead of parentheses
   this document is a valid program in leo scheme
   to separate text from code it uses << and >> quotes
 
