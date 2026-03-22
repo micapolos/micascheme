@@ -14,7 +14,7 @@ document readme
       leo translates indentation into standard scheme s-expressions
       each indented block represents a new level of nesting
       text and code is separated using << and >> quotes
-      << example >> forms contain code snippets to execute
+      << example >> form contain code snippets to execute
 
     basic syntax >> example
       define hello "Hello"
