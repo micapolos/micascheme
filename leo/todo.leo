@@ -5,9 +5,8 @@ todo
   custom write-handler
   repl
   improve printing
-    write should produce single line with parentheses
-    pretty-print should produce indented code without parentheses
     use hash-prefixed literals only in write
+    use pretty literals in pretty-print
   make eval work
   custom writer for
     exceptions
