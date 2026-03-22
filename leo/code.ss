@@ -381,10 +381,8 @@
 
   ; === block-code ===
 
-  (define (limiter-line-code? $limiter)
-    (switch (limiter-apply $limiter line-limit)
-      ((false? _) #f)
-      ((else $limited) (limited-ref $limited))))
+  (define (limiter-line-code? $line-code?-limiter)
+    (limiter-ref? $line-code?-limiter line-limit))
 
   (define null-block-code
     (newline-ended-code null-line-code))
