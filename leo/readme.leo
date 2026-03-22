@@ -1,6 +1,7 @@
 leo scheme programming language
 
 programming language which uses indentation instead of parentheses
+this document is written using leo syntax
 
 quick start
   overview
