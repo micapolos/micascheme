@@ -35,6 +35,10 @@
   (1 "123"))
 
 (check-counter
+  (counter "foo")
+  (0 "foo"))
+
+(check-counter
   (counter-lets (counter "foo"))
   (0 "foo"))
 
@@ -105,3 +109,22 @@
     (counter "foo")
     (counter "bar"))
   (3 "foo"))
+
+(check-counter
+  (counter-and)
+  (0 #t))
+
+(check-counter
+  (counter-and
+    (counter "foo")
+    (counter "bar")
+    (counter "goo"))
+  (2 "goo"))
+
+(check-counter
+  (counter-and
+    (counter "foo")
+    (counter "bar")
+    (counter #f)
+    (counter #f))
+  (3 #f))

@@ -12,7 +12,7 @@
 
   (commented
     (expects (id id-bind))
-    (defines (id-map id-lets id-lets? id-switch list->id replace-id append-id apply-id id-or))
+    (defines (id-map id-lets id-lets? id-switch list->id replace-id append-id apply-id id-or id-and))
     (define-syntax (define-monadic $syntax)
       (syntax-case $syntax ()
         ((_ id)
@@ -28,6 +28,7 @@
             ($append-id (keyword-append id append - id))
             ($apply-id (keyword-append id apply - id))
             ($id-or (keyword-append id id - or))
+            ($id-and (keyword-append id id - and))
             #`(begin
               (define (#,$id-map x fn)
                 (#,$id-bind x (lambda (v) (id (fn v)))))
@@ -76,5 +77,14 @@
                     ($value? x)
                     (if $value?
                       (id $value?)
-                      (#,$id-or xs (... ...))))))))))))
+                      (#,$id-or xs (... ...))))))
+              (define-rules-syntax
+                ((#,$id-and) (id #t))
+                ((#,$id-and x) x)
+                ((#,$id-and x xs (... ...))
+                  (#,$id-lets
+                    ($value? x)
+                    (if $value?
+                      (#,$id-and xs (... ...))
+                      (id #f)))))))))))
 )
