@@ -29,8 +29,8 @@ pretty-print << readme
     control flow >> example
       if
         greater?: 10, 5
-        quote 10 is greater than 5
-        quote 10 is not greater than 5
+        "obviously, 10 is greater than 5"
+        "What? 10 is not greater than 5?"
 
     lists and maps >> example
       define numbers list: 1, 2, 3, 4, 5, 6
