@@ -372,6 +372,11 @@
 
   ; === block-code ===
 
+  (define (line-code?-limiter-code? $line-code?-limiter)
+    (switch (limiter-apply $line-code?-limiter line-limit)
+      ((false? _) #f)
+      ((else $limiter) (limited-ref $limiter))))
+
   (define line-limit 7)
 
   (define null-block-code
@@ -393,7 +398,7 @@
     (newline-ended-code (symbol-line-code $symbol)))
 
   (define (pair-block-code $pair)
-    (switch (limited-ref (limiter-apply (pair-colon-line-code?-limiter $pair) line-limit))
+    (switch (line-code?-limiter-code? (pair-colon-line-code?-limiter $pair))
       ((false? _)
         (switch (atom-code? (car $pair))
           ((false? _)
@@ -413,32 +418,32 @@
         $list)))
 
   (define (bytevector-block-code $bytevector)
-    (switch (limiter-apply (bytevector-colon-line-code?-limiter $bytevector) line-limit)
+    (switch (line-code?-limiter-code? (bytevector-colon-line-code?-limiter $bytevector))
       ((false? _)
         (code "#bytevector" #\newline
           (code-indent
             (list-block-code
               (bytevector->u8-list $bytevector)))))
-      ((else $limited)
-        (newline-ended-code (limited-ref $limited)))))
+      ((else $code)
+        (newline-ended-code $code))))
 
   (define (vector-block-code $vector)
-    (switch (limiter-apply (vector-colon-line-code?-limiter $vector) line-limit)
+    (switch (line-code?-limiter-code? (vector-colon-line-code?-limiter $vector))
       ((false? _)
         (code "#vector" #\newline
           (code-indent
             (list-block-code
               (vector->list $vector)))))
-      ((else $limited)
-        (newline-ended-code (limited-ref $limited)))))
+      ((else $code)
+        (newline-ended-code $code))))
 
   (define (box-block-code $box)
-    (switch (limiter-apply (box-colon-line-code?-limiter $box) line-limit)
+    (switch (line-code?-limiter-code? (box-colon-line-code?-limiter $box))
       ((false? _)
         (space-separated-code "#box"
           (block-code (unbox $box))))
-      ((else $limited)
-        (newline-ended-code (limited-ref $limited)))))
+      ((else $code)
+        (newline-ended-code $code))))
 
   (define (other-block-code $other)
     (newline-ended-code (string-code (format "~s" $other))))

@@ -143,8 +143,8 @@
 
 (check-block-code (vector) "#vector:")
 (check-block-code (vector 1 2 3) "#vector: 1, 2, 3")
-; (check-block-code
-;   (vector '(foo bar goo) '(zoo zar zoo))
-;   "#vector"
-;   "  foo: bar, goo"
-;   "  zoo: zar, zoo")
+(check-block-code
+  (vector '(foo bar goo) '(zoo zar zoo))
+  "#vector"
+  "  foo: bar, goo"
+  "  zoo: zar, zoo")
