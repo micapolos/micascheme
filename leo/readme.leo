@@ -59,6 +59,6 @@ pretty-print << readme
           my-macro: a, b
           +: a, b
 
-      << examples >>
-        my-macro "world"
-        my-macro: 10, 20
+      << examples
+        greeting >> my-macro "world"
+        addition >> my-macro: 10, 20
