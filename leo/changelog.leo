@@ -7,6 +7,7 @@ v0.1.26
 v0.1.25
   prints readable read errors
   adds syntax logging
+  drops: then, else, in if
 v0.1.24
   prints exceptions using leo syntax
 v0.1.23
