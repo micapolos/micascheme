@@ -7,6 +7,7 @@ todo
   improve printing
     write should produce single line with parentheses
     pretty-print should produce indented code without parentheses
+    use hash-prefixed literals only in write
   make eval work
   custom writer for
     exceptions
