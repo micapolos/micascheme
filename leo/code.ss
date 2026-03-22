@@ -17,13 +17,14 @@
     (leo datum)
     (code))
 
-  (define (space-ended-code $code) (code $code " "))
-  (define comma-code (code ", "))
   (define arrow-code (code "->"))
+  (define comma-separator-code (code ", "))
   (define arrow-separator-code (code " " arrow-code " "))
 
-  (define (arrow-separated-code $car $cdr)
-    (code $car arrow-separator-code $cdr))
+  (define pair-separator-code arrow-code)
+
+  (define (pair-separated-code $car $cdr)
+    (space-separated-code $car pair-separator-code $cdr))
 
   ; === atom-code? ===
 
@@ -116,7 +117,7 @@
               (space-separated-code $car-code
                 (code-in-round-brackets (lines-code $cdr-pair))))))
         ((else $cdr)
-          (arrow-separated-code $car-code (line-code $cdr))))))
+          (pair-separated-code $car-code (line-code $cdr))))))
 
   (define (lines-code $lines)
     (switch-exhaustive $lines
@@ -128,9 +129,9 @@
             ((null? _)
               $car-code)
             ((pair? $cdr)
-              (code $car-code comma-code (lines-code $cdr)))
+              (code $car-code comma-separator-code (lines-code $cdr)))
             ((else $cdr)
-              (arrow-separated-code $car-code (line-code $cdr))))))))
+              (pair-separated-code $car-code (line-code $cdr))))))))
 
   (define (bytevector-line-code $bytevector)
     (space-separated-code "#bytevector"
@@ -227,7 +228,7 @@
         ((else $cdr)
           (limiter-lets?
             ($cdr-code (space-line-code?-limiter $cdr))
-            (limiter (arrow-separated-code $car-code $cdr-code)))))))
+            (limiter (pair-separated-code $car-code $cdr-code)))))))
 
   (define (other-space-line-code-limiter $other)
     (limiter-using (other-line-code $other) 1))
@@ -302,12 +303,14 @@
             (list->limiter
               (map*
                 space-line-code?-limiter
-                (lambda ($item) (space-separated-code arrow-code (space-line-code?-limiter $item)))
+                (lambda ($item)
+                  (space-separated-code pair-separator-code
+                    (space-line-code?-limiter $item)))
                 $list)))
           (limiter
             (and
               (for-all identity $code?s)
-              (code ": " (list->code (intercalate $code?s comma-code)))))))))
+              (code ": " (list->code (intercalate $code?s comma-separator-code)))))))))
 
   (define (bytevector-colon-line-code?-limiter $bytevector)
     (switch (limiter-unlimited-ref (bytevector-space-line-code?-limiter $bytevector))
@@ -320,7 +323,7 @@
               (for-all identity $ref-code?s)
               (code $bytevector-code
                 (if (null? $ref-code?s) (code ":") (code ": "))
-                (list->code (intercalate $ref-code?s comma-code)))))))
+                (list->code (intercalate $ref-code?s comma-separator-code)))))))
       ((else _)
         (bytevector-space-line-code?-limiter $bytevector))))
 
@@ -335,7 +338,7 @@
               (for-all identity $ref-code?s)
               (code $vector-code
                 (if (null? $ref-code?s) (code ":") (code ": "))
-                (list->code (intercalate $ref-code?s comma-code)))))))
+                (list->code (intercalate $ref-code?s comma-separator-code)))))))
       ((else _)
         (vector-space-line-code?-limiter $vector))))
 
@@ -416,7 +419,7 @@
     (list->code
       (map*
         block-code
-        (lambda ($item) (space-separated-code arrow-code (block-code $item)))
+        (lambda ($item) (space-separated-code pair-separator-code (block-code $item)))
         $list)))
 
   (define (bytevector-block-code $bytevector)
