@@ -56,6 +56,9 @@
 (check-simple-line-code 1 "foo" "\"foo\"")
 (check-simple-line-code 1 'foo "foo")
 
+(check-simple-line-code 2 (box 1) "#box 1")
+(check-simple-line-code 3 (box '(foo bar)) "#box foo bar")
+
 (check-simple-line-code 2 (bytevector 1) "#bytevector 1")
 (check-simple-line-code-false? 1 (bytevector))
 (check-simple-line-code-false? 3 (bytevector 1 2))

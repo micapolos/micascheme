@@ -144,7 +144,7 @@
 
   (define (box-simple-line-code?-limiter $box)
     (limiter-lets?
-      ($box-code (limiter-using (code "#box" 1)))
+      ($box-code (limiter-using (code "#box") 1))
       ($ref-code (simple-line-code?-limiter (unbox $box)))
       (limiter (space-separated-code $box-code $ref-code))))
 
