@@ -37,10 +37,10 @@ document readme
     lists and maps >> example
       define numbers list: 1, 2, 3, 4, 5, 6
 
-      << list examples
-        numbers >> numbers
-        number strings >> map: number->string, numbers
-        odd numbers >> filter: odd?, numbers
+      << various examples
+        input >> numbers
+        mapped to strings >> map: number->string, numbers
+        filtered odd numbers >> filter: odd?, numbers
 
     lambdas >> example
       map
