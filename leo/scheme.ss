@@ -16,7 +16,10 @@
     define-syntax
     define-macro
     syntax-case
-    logging)
+    logging
+
+    add subtract multiply divide
+    number=? less? less/equal? greater? greater/equal?)
   (import
     (prefix (chezscheme) %)
     (only (micascheme) define-rules-syntaxes define-keywords keywords ...)
@@ -75,6 +78,18 @@
   (%define (displayln x)
     (%display x)
     (%newline))
+
+  ; TODO: Move it to a separate library
+  (%define add %+)
+  (%define subtract %-)
+  (%define multiply %*)
+  (%define divide %/)
+
+  (%define number=? %=)
+  (%define less? %<)
+  (%define less/equal? %<=)
+  (%define greater? %>)
+  (%define greater/equal? %>=)
 
   (define-rules-syntaxes (keywords with then %else %when %list keywords)
     ((define (name x))

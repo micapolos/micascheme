@@ -7,10 +7,10 @@ define-syntax
     keywords:
     when
       magic: a
-      syntax -: 0, a
+      syntax subtract: 0, a
     when
       magic: a, b
-      syntax +: a, b
+      syntax add: a, b
     when
       magic: a, b, c
       syntax string-append: a, b, c

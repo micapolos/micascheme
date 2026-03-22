@@ -8,8 +8,8 @@ time pretty-print << result is >>
   let fibonacci
     with number n
     if
-      <: number, 2
+      less?: number, 2
       number
-      +
-        fibonacci -: number, 1
-        fibonacci -: number, 2
+      add
+        fibonacci subtract: number, 1
+        fibonacci subtract: number, 2

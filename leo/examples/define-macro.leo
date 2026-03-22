@@ -9,7 +9,7 @@ define-macro
     string-append: "Hello, ", a, "!"
   when
     magic: a, b
-    +: a, b
+    add: a, b
   when
     magic: a, ...
     string-append: a, ...
