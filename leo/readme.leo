@@ -48,6 +48,7 @@ pretty-print << readme
             << original >> x
             << incremented >> +: x, 1
             << doubled >> *: x, 2
+            << as string >> number->string x
         list: 1, 2, 3, 4
 
     macros >> run
