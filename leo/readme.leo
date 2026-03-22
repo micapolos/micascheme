@@ -28,7 +28,7 @@ pretty-print << readme
 
     control flow >> run
       if
-        >: 10, 5
+        greater?: 10, 5
         quote 10 is greater than 5
         quote 10 is not greater than 5
 
@@ -46,8 +46,8 @@ pretty-print << readme
           with x
           list:
             << original >> x
-            << incremented >> +: x, 1
-            << doubled >> *: x, 2
+            << incremented >> add: x, 1
+            << doubled >> multiply: x, 2
             << as string >> number->string x
         list: 1, 2, 3, 4
 
@@ -58,7 +58,7 @@ pretty-print << readme
           string-append: "Hello, ", s, "!"
         when
           my-macro: a, b
-          +: a, b
+          add: a, b
 
       << examples
         greeting >> my-macro "world"
