@@ -21,7 +21,7 @@ pretty-print << readme
       define
         exclamated s
         string-append: s, "!!!"
-      << messages >>
+      << exclamated strings >>
         exclamated "Cool"
         exclamated "LOL"
         exclamated "Wow"
@@ -34,25 +34,21 @@ pretty-print << readme
 
     lists and maps >> run
       define numbers list: 1, 2, 3, 4, 5, 6
-      << examples
-        numbers >> numbers
-        strings >> map: number->string, numbers
-        odd numbers? >> filter: odd?, numbers
 
-    lambdas
-      doubled >> map
+      << list examples
+        numbers >> numbers
+        number strings >> map: number->string, numbers
+        odd numbers >> filter: odd?, numbers
+
+    lambdas >>
+      map
         lambda
           with x
-          *: x, 2
+          list:
+            << original >> x
+            << incremented >> +: x, 1
+            << doubled >> *: x, 2
         list: 1, 2, 3, 4
-
-      listed >>
-        map
-          lambda
-            with: n, s
-            string-append: number->string n, ": ", s
-          list: 1, 2, 3, 4
-          list: "apple", "orange", "pear", "plum"
 
     macros >> run
       define-macro
