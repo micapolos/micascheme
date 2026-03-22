@@ -1,6 +1,4 @@
-import
-  leo scheme
-  math
+import leo scheme
 
 define-syntax
   magic: input-syntax
@@ -9,10 +7,10 @@ define-syntax
     keywords:
     when
       magic: a
-      syntax subtract: 0, a
+      syntax -: 0, a
     when
       magic: a, b
-      syntax add: a, b
+      syntax +: a, b
     when
       magic: a, b, c
       syntax string-append: a, b, c

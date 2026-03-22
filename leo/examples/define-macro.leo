@@ -1,6 +1,4 @@
-import
-  leo scheme
-  math
+import leo scheme
 
 define-macro
   when
@@ -11,7 +9,7 @@ define-macro
     string-append: "Hello, ", a, "!"
   when
     magic: a, b
-    add: a, b
+    +: a, b
   when
     magic: a, ...
     string-append: a, ...

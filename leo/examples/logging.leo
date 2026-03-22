@@ -1,6 +1,4 @@
-import
-  leo scheme
-  math
+import leo scheme
 
 pretty-print quote without logging
 pretty-print string-append

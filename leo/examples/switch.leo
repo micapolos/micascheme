@@ -1,6 +1,4 @@
-import
-  leo scheme
-  math
+import leo scheme
 
 define
   to-string x
@@ -21,5 +19,5 @@ define
         format: "~s", x
 
 displayln to-string string-append: "Hello, ", "world!"
-displayln to-string add: 2, 2
+displayln to-string +: 2, 2
 displayln to-string cons: 10, 20

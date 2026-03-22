@@ -1,6 +1,5 @@
 import
   leo scheme
-  math
   only
     intercalate
     from micascheme
