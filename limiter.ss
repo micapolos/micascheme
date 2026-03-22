@@ -3,6 +3,8 @@
     limiter
     limiter-using
     limiter-apply
+    limiter-limited?
+    limiter-unlimited-ref
     limiter-bind
     limiter-map
     limiter-lets
@@ -36,6 +38,12 @@
 
   (define (limiter-apply $limiter $limit)
     ($limiter $limit))
+
+  (define (limiter-limited? $limiter $limit)
+    ($limiter $limit))
+
+  (define (limiter-unlimited-ref $limiter)
+    (limited-ref (limiter-apply $limiter +inf.0)))
 
   (define (limiter-bind $limiter $fn)
     (limiter ($limit)

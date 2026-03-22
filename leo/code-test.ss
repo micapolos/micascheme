@@ -117,6 +117,10 @@
 
 (check-colon-line-code-false? 4 (vector '(foo bar gar)))
 
+(check-colon-line-code 2 '(foo bar) "foo bar")
+(check-colon-line-code 3 '(foo bar gar) "foo: bar, gar")
+(check-colon-line-code 4 '((foo bar) (goo gar)) ": foo bar, goo gar")
+
 ; === block-code
 
 (check-block-code '() "#null")
@@ -126,7 +130,10 @@
 (check-block-code "foo" "\"foo\"")
 (check-block-code 'foo "foo")
 (check-block-code '(foo bar) "foo bar")
-;(check-block-code '(foo bar gar) "foo bar")
+(check-block-code '(foo bar gar) "foo: bar, gar")
+
+(check-block-code '((x 10 20) (y 30 40)) ":" "  x: 10, 20" "  y: 30, 40")
+(check-block-code '(foo (x 10 20) (y 30 40)) "foo" "  x: 10, 20" "  y: 30, 40")
 
 (check-block-code (bytevector) "#bytevector:")
 (check-block-code (bytevector 1 2 3) "#bytevector: 1, 2, 3")
