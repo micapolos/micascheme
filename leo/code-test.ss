@@ -47,31 +47,44 @@
   (line-code '(circle (radius 10) (center (point (x 10) (y 20)))))
   "circle (radius 10, center point (x 10, y 20))")
 
-; === limited-simple-line-code?
+; === space-line-code?-limiter
 
-(check-simple-line-code 1 '() "#null")
-(check-simple-line-code 1 #t "#true")
-(check-simple-line-code 1 123 "123")
-(check-simple-line-code 1 #\a "#char a")
-(check-simple-line-code 1 "foo" "\"foo\"")
-(check-simple-line-code 1 'foo "foo")
+(check-space-line-code 1 '() "#null")
+(check-space-line-code 1 #t "#true")
+(check-space-line-code 1 123 "123")
+(check-space-line-code 1 #\a "#char a")
+(check-space-line-code 1 "foo" "\"foo\"")
+(check-space-line-code 1 'foo "foo")
 
-(check-simple-line-code 2 (box 1) "#box 1")
-(check-simple-line-code 3 (box '(foo bar)) "#box foo bar")
+(check-space-line-code 2 (box 1) "#box 1")
+(check-space-line-code 3 (box '(foo bar)) "#box foo bar")
 
-(check-simple-line-code 2 (bytevector 1) "#bytevector 1")
-(check-simple-line-code-false? 1 (bytevector))
-(check-simple-line-code-false? 3 (bytevector 1 2))
+(check-space-line-code 2 (bytevector 1) "#bytevector 1")
+(check-space-line-code-false? 1 (bytevector))
+(check-space-line-code-false? 3 (bytevector 1 2))
 
-(check-simple-line-code 2 (vector 1) "#vector 1")
-(check-simple-line-code 3 (vector '(foo bar)) "#vector foo bar")
-(check-simple-line-code-false? 3 (vector))
-(check-simple-line-code-false? 3 (vector 1 2))
+(check-space-line-code 2 (vector 1) "#vector 1")
+(check-space-line-code 3 (vector '(foo bar)) "#vector foo bar")
+(check-space-line-code-false? 3 (vector))
+(check-space-line-code-false? 3 (vector 1 2))
 
-(check-simple-line-code 2 '(foo bar) "foo bar")
-(check-simple-line-code 2 '(foo . bar) "foo . bar")
-(check-simple-line-code 3 '(foo (bar goo)) "foo bar goo")
-(check-simple-line-code 3 '(foo (bar goo)) "foo bar goo")
-(check-simple-line-code-false? 3 '(foo))
-(check-simple-line-code-false? 3 '(foo bar goo))
+(check-space-line-code 2 '(foo bar) "foo bar")
+(check-space-line-code 2 '(foo . bar) "foo . bar")
+(check-space-line-code 3 '(foo (bar goo)) "foo bar goo")
+(check-space-line-code 3 '(foo (bar goo)) "foo bar goo")
+(check-space-line-code-false? 3 '(foo))
+(check-space-line-code-false? 3 '(foo bar goo))
 
+; === colon-line-code?-limiter
+
+(check-colon-line-code 1 (bytevector) "#bytevector:")
+(check-colon-line-code 2 (bytevector 1) "#bytevector 1")
+(check-colon-line-code 3 (bytevector 1 2) "#bytevector: 1, 2")
+(check-colon-line-code 4 (bytevector 1 2 3) "#bytevector: 1, 2, 3")
+
+(check-colon-line-code 1 (vector) "#vector:")
+(check-colon-line-code 3 (vector '(foo bar)) "#vector foo bar")
+(check-colon-line-code 5 (vector '(foo bar) '(goo gar)) "#vector: foo bar, goo gar")
+(check-colon-line-code 7 (vector '(foo bar) '(goo gar) '(zoo zar)) "#vector: foo bar, goo gar, zoo zar")
+
+(check-colon-line-code-false? 4 (vector '(foo bar gar)))

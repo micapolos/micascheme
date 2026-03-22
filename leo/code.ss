@@ -2,10 +2,11 @@
   (export
     line-code
 
-    limit-simple-line-code?
+    check-space-line-code
+    check-space-line-code-false?
 
-    check-simple-line-code
-    check-simple-line-code-false?)
+    check-colon-line-code
+    check-colon-line-code-false?)
   (import
     (micascheme)
     (leo datum)
@@ -16,6 +17,7 @@
 
   (define (dot-separated-code $car $cdr)
     (code $car dot-code $cdr))
+
 
   ; === line-code ===
 
@@ -104,53 +106,53 @@
       ((vector? $vector) (vector-line-code $vector))
       ((else $other) (other-line-code $other))))
 
-  ; === line-code-limiter ===
+  ; === space-line-code-limiter ===
 
-  (define null-simple-line-code-limiter
+  (define null-space-line-code-limiter
     (limiter-using null-line-code 1))
 
-  (define (boolean-simple-line-code-limiter $boolean)
+  (define (boolean-space-line-code-limiter $boolean)
     (limiter-using (boolean-line-code $boolean) 1))
 
-  (define (number-simple-line-code-limiter $number)
+  (define (number-space-line-code-limiter $number)
     (limiter-using (number-line-code $number) 1))
 
-  (define (char-simple-line-code-limiter $char)
+  (define (char-space-line-code-limiter $char)
     (limiter-using (char-line-code $char) 1))
 
-  (define (string-simple-line-code-limiter $string)
+  (define (string-space-line-code-limiter $string)
     (limiter-using (string-line-code $string) 1))
 
-  (define (symbol-simple-line-code-limiter $symbol)
+  (define (symbol-space-line-code-limiter $symbol)
     (limiter-using (symbol-line-code $symbol) 1))
 
-  (define (bytevector-simple-line-code?-limiter $bytevector)
+  (define (bytevector-space-line-code?-limiter $bytevector)
     (case (bytevector-length $bytevector)
       ((1)
         (limiter-lets?
           ($bytevector-code (limiter-using (code "#bytevector") 1))
-          ($byte-code (simple-line-code?-limiter (bytevector-u8-ref $bytevector 0)))
+          ($byte-code (space-line-code?-limiter (bytevector-u8-ref $bytevector 0)))
           (limiter (space-separated-code $bytevector-code $byte-code))))
       (else (limiter #f))))
 
-  (define (vector-simple-line-code?-limiter $vector)
+  (define (vector-space-line-code?-limiter $vector)
     (case (vector-length $vector)
       ((1)
         (limiter-lets?
           ($vector-code (limiter-using (code "#vector") 1))
-          ($ref-code (simple-line-code?-limiter (vector-ref $vector 0)))
+          ($ref-code (space-line-code?-limiter (vector-ref $vector 0)))
           (limiter (space-separated-code $vector-code $ref-code))))
       (else (limiter #f))))
 
-  (define (box-simple-line-code?-limiter $box)
+  (define (box-space-line-code?-limiter $box)
     (limiter-lets?
       ($box-code (limiter-using (code "#box") 1))
-      ($ref-code (simple-line-code?-limiter (unbox $box)))
+      ($ref-code (space-line-code?-limiter (unbox $box)))
       (limiter (space-separated-code $box-code $ref-code))))
 
-  (define (pair-simple-line-code?-limiter $pair)
+  (define (pair-space-line-code?-limiter $pair)
     (limiter-lets?
-      ($car-code (simple-line-code?-limiter (car $pair)))
+      ($car-code (space-line-code?-limiter (car $pair)))
       (switch (cdr $pair)
         ((null? _)
           (limiter #f))
@@ -158,42 +160,144 @@
           (switch (cdr $cdr)
             ((null? _)
               (limiter-lets?
-                ($cdr-code (simple-line-code?-limiter (car $cdr)))
+                ($cdr-code (space-line-code?-limiter (car $cdr)))
                 (limiter (space-separated-code $car-code $cdr-code))))
             ((else _)
               (limiter #f))))
         ((else $cdr)
           (limiter-lets?
-            ($cdr-code (simple-line-code?-limiter $cdr))
+            ($cdr-code (space-line-code?-limiter $cdr))
             (limiter (dot-separated-code $car-code $cdr-code)))))))
 
-  (define (other-simple-line-code-limiter $other)
+  (define (other-space-line-code-limiter $other)
     (limiter-using (other-line-code $other) 1))
 
-  (define (simple-line-code?-limiter $datum)
+  (define (space-line-code?-limiter $datum)
     (switch $datum
-      ((null? _) null-simple-line-code-limiter)
-      ((boolean? $boolean) (boolean-simple-line-code-limiter $boolean))
-      ((number? $number) (number-simple-line-code-limiter $number))
-      ((char? $char) (char-simple-line-code-limiter $char))
-      ((string? $string) (string-simple-line-code-limiter $string))
-      ((symbol? $symbol) (symbol-simple-line-code-limiter $symbol))
-      ((pair? $pair) (pair-simple-line-code?-limiter $pair))
-      ((box? $box) (box-simple-line-code?-limiter $box))
-      ((bytevector? $bytevector) (bytevector-simple-line-code?-limiter $bytevector))
-      ((vector? $vector) (vector-simple-line-code?-limiter $vector))
-      ((else $other) (other-simple-line-code-limiter $other))))
+      ((null? _) null-space-line-code-limiter)
+      ((boolean? $boolean) (boolean-space-line-code-limiter $boolean))
+      ((number? $number) (number-space-line-code-limiter $number))
+      ((char? $char) (char-space-line-code-limiter $char))
+      ((string? $string) (string-space-line-code-limiter $string))
+      ((symbol? $symbol) (symbol-space-line-code-limiter $symbol))
+      ((pair? $pair) (pair-space-line-code?-limiter $pair))
+      ((box? $box) (box-space-line-code?-limiter $box))
+      ((bytevector? $bytevector) (bytevector-space-line-code?-limiter $bytevector))
+      ((vector? $vector) (vector-space-line-code?-limiter $vector))
+      ((else $other) (other-space-line-code-limiter $other))))
 
-  (define (limit-simple-line-code? $limit $datum)
+  (define (limit-space-line-code? $limit $datum)
     (lets?
-      ($limited (limiter-apply (simple-line-code?-limiter $datum) $limit))
+      ($limited (limiter-apply (space-line-code?-limiter $datum) $limit))
       (limited-ref $limited)))
 
-  (define-rule-syntax (check-simple-line-code size in out)
+  (define-rule-syntax (check-space-line-code size in out)
     (begin
-      (check-code=? (limit-simple-line-code? size in) out)
-      (check (false? (limit-simple-line-code? (- size 1) in)))))
+      (check-code=? (limit-space-line-code? size in) out)
+      (check (false? (limit-space-line-code? (- size 1) in)))))
 
-  (define-rule-syntax (check-simple-line-code-false? size in)
-    (check (false? (limit-simple-line-code? size in))))
+  (define-rule-syntax (check-space-line-code-false? size in)
+    (check (false? (limit-space-line-code? size in))))
+
+  ; === colon-line-code-limiter ===
+
+  (define null-colon-line-code-limiter
+    null-space-line-code-limiter)
+
+  (define (boolean-colon-line-code-limiter $boolean)
+    (boolean-space-line-code-limiter $boolean))
+
+  (define (number-colon-line-code-limiter $number)
+    (number-space-line-code-limiter $number))
+
+  (define (char-colon-line-code-limiter $char)
+    (char-space-line-code-limiter $char))
+
+  (define (string-colon-line-code-limiter $string)
+    (string-space-line-code-limiter $string))
+
+  (define (symbol-colon-line-code-limiter $symbol)
+    (symbol-space-line-code-limiter $symbol))
+
+  (define (bytevector-colon-line-code?-limiter $bytevector)
+    (limiter-switch (bytevector-space-line-code?-limiter $bytevector)
+      ((false? _)
+        (limiter-lets
+          ($bytevector-code (limiter-using (code "#bytevector") 1))
+          ($ref-code?s (list->limiter (map space-line-code?-limiter (bytevector->u8-list $bytevector))))
+          (limiter
+            (and
+              (for-all identity $ref-code?s)
+              (code $bytevector-code
+                (if (null? $ref-code?s) (code ":") (code ": "))
+                (list->code (intercalate $ref-code?s comma-code)))))))
+      ((else $code)
+        (limiter $code))))
+
+  (define (vector-colon-line-code?-limiter $vector)
+    (limiter-switch (vector-space-line-code?-limiter $vector)
+      ((false? _)
+        (limiter-lets
+          ($vector-code (limiter-using (code "#vector") 1))
+          ($ref-code?s (list->limiter (map space-line-code?-limiter (vector->list $vector))))
+          (limiter
+            (and
+              (for-all identity $ref-code?s)
+              (code $vector-code
+                (if (null? $ref-code?s) (code ":") (code ": "))
+                (list->code (intercalate $ref-code?s comma-code)))))))
+      ((else $code)
+        (limiter $code))))
+
+  (define (box-colon-line-code?-limiter $box)
+    (box-space-line-code?-limiter $box))
+
+  (define (pair-colon-line-code?-limiter $pair)
+    (limiter-lets?
+      ($car-code (colon-line-code?-limiter (car $pair)))
+      (switch (cdr $pair)
+        ((null? _)
+          (limiter #f))
+        ((pair? $cdr)
+          (switch (cdr $cdr)
+            ((null? _)
+              (limiter-lets?
+                ($cdr-code (colon-line-code?-limiter (car $cdr)))
+                (limiter (space-separated-code $car-code $cdr-code))))
+            ((else _)
+              (limiter #f))))
+        ((else $cdr)
+          (limiter-lets?
+            ($cdr-code (colon-line-code?-limiter $cdr))
+            (limiter (dot-separated-code $car-code $cdr-code)))))))
+
+  (define (other-colon-line-code-limiter $other)
+    (limiter-using (other-line-code $other) 1))
+
+  (define (colon-line-code?-limiter $datum)
+    (switch $datum
+      ((null? _) null-colon-line-code-limiter)
+      ((boolean? $boolean) (boolean-colon-line-code-limiter $boolean))
+      ((number? $number) (number-colon-line-code-limiter $number))
+      ((char? $char) (char-colon-line-code-limiter $char))
+      ((string? $string) (string-colon-line-code-limiter $string))
+      ((symbol? $symbol) (symbol-colon-line-code-limiter $symbol))
+      ((pair? $pair) (pair-colon-line-code?-limiter $pair))
+      ((box? $box) (box-colon-line-code?-limiter $box))
+      ((bytevector? $bytevector) (bytevector-colon-line-code?-limiter $bytevector))
+      ((vector? $vector) (vector-colon-line-code?-limiter $vector))
+      ((else $other) (other-colon-line-code-limiter $other))))
+
+  (define (limit-colon-line-code? $limit $datum)
+    (lets?
+      ($limited (limiter-apply (colon-line-code?-limiter $datum) $limit))
+      (limited-ref $limited)))
+
+  (define-rule-syntax (check-colon-line-code size in out)
+    (begin
+      (check-code=? (limit-colon-line-code? size in) out)
+      (check (false? (limit-colon-line-code? (- size 1) in)))))
+
+  (define-rule-syntax (check-colon-line-code-false? size in)
+    (check (false? (limit-colon-line-code? size in))))
 )
