@@ -41,7 +41,7 @@
         if cond pretty-print write
         define-syntax
         syntax-case)
-      (only (micascheme) char true false keywords)
+      (only (micascheme) char true false keywords run)
       (only (leo transform) from with)))
 
   ; TODO: Implement this entire file in .leo

@@ -7,6 +7,6 @@
       (("misplaced aux keyword")
         `(misplaced (aux keyword)))
       (else
-        `(message $message))))
+        `(message ,$message))))
 
 )
