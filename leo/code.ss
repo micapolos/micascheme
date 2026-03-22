@@ -17,6 +17,8 @@
     (leo datum)
     (code))
 
+  (define line-limit 7)
+
   (define arrow-code (code "->"))
   (define comma-separator-code (code ", "))
   (define pair-separator-code arrow-code)
@@ -373,14 +375,16 @@
   (define-rule-syntax (check-colon-line-code-false? size in)
     (check (false? (limit-colon-line-code? size in))))
 
+  ; === block-line-code ===
+
+
+
   ; === block-code ===
 
-  (define (line-code?-limiter-code? $line-code?-limiter)
-    (switch (limiter-apply $line-code?-limiter line-limit)
+  (define (limiter-line-code? $limiter)
+    (switch (limiter-apply $limiter line-limit)
       ((false? _) #f)
-      ((else $limiter) (limited-ref $limiter))))
-
-  (define line-limit 7)
+      ((else $limited) (limited-ref $limited))))
 
   (define null-block-code
     (newline-ended-code null-line-code))
@@ -401,7 +405,7 @@
     (newline-ended-code (symbol-line-code $symbol)))
 
   (define (pair-block-code $pair)
-    (switch (line-code?-limiter-code? (pair-colon-line-code?-limiter $pair))
+    (switch (limiter-line-code? (pair-colon-line-code?-limiter $pair))
       ((false? _)
         (switch (atom-code? (car $pair))
           ((false? _)
@@ -421,7 +425,7 @@
         $list)))
 
   (define (bytevector-block-code $bytevector)
-    (switch (line-code?-limiter-code? (bytevector-colon-line-code?-limiter $bytevector))
+    (switch (limiter-line-code? (bytevector-colon-line-code?-limiter $bytevector))
       ((false? _)
         (code "#bytevector" #\newline
           (code-indent
@@ -431,7 +435,7 @@
         (newline-ended-code $code))))
 
   (define (vector-block-code $vector)
-    (switch (line-code?-limiter-code? (vector-colon-line-code?-limiter $vector))
+    (switch (limiter-line-code? (vector-colon-line-code?-limiter $vector))
       ((false? _)
         (code "#vector" #\newline
           (code-indent
@@ -441,7 +445,7 @@
         (newline-ended-code $code))))
 
   (define (box-block-code $box)
-    (switch (line-code?-limiter-code? (box-colon-line-code?-limiter $box))
+    (switch (limiter-line-code? (box-colon-line-code?-limiter $box))
       ((false? _)
         (space-separated-code "#box"
           (block-code (unbox $box))))
