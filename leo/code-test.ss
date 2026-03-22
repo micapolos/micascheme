@@ -48,8 +48,8 @@
 (check-code=? (line-code "") "\"\"")
 (check-code=? (line-code "foo") "\"foo\"")
 
-(check-code=? (line-code '(foo . bar)) "foo . bar")
-(check-code=? (line-code '(foo gar . bar)) "foo (gar . bar)")
+(check-code=? (line-code '(foo . bar)) "foo -> bar")
+(check-code=? (line-code '(foo gar . bar)) "foo (gar -> bar)")
 (check-code=? (line-code '(foo)) "(foo)")
 (check-code=? (line-code '(foo bar)) "foo bar")
 (check-code=? (line-code '(foo (bar goo))) "foo bar goo")
@@ -60,7 +60,7 @@
 
 (check-code=? (line-code (box 123)) "#box 123")
 (check-code=? (line-code (box '(foo bar))) "#box foo bar")
-(check-code=? (line-code (box '(foo . bar))) "#box foo . bar")
+(check-code=? (line-code (box '(foo . bar))) "#box foo -> bar")
 (check-code=? (line-code (box '(foo bar gar))) "#box foo (bar, gar)")
 
 (check-code=? (line-code (bytevector)) "#bytevector ()")
@@ -69,7 +69,7 @@
 (check-code=? (line-code (vector)) "#vector ()")
 (check-code=?
   (line-code (vector '() #t 123 #\a "foo" 'foo '(foo bar) '(foo . bar)))
-  "#vector (#null, #true, 123, #char a, \"foo\", foo, foo bar, foo . bar)")
+  "#vector (#null, #true, 123, #char a, \"foo\", foo, foo bar, foo -> bar)")
 
 (check-code=?
   (line-code '(circle (radius 10) (center (point (x 10) (y 20)))))
@@ -85,7 +85,7 @@
 (check-space-line-code 1 'foo "foo")
 
 (check-space-line-code 2 '(foo bar) "foo bar")
-(check-space-line-code 2 '(foo . bar) "foo . bar")
+(check-space-line-code 2 '(foo . bar) "foo -> bar")
 (check-space-line-code 3 '(foo (bar goo)) "foo bar goo")
 (check-space-line-code 3 '(foo (bar goo)) "foo bar goo")
 (check-space-line-code-false? 3 '(foo))

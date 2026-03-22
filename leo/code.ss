@@ -17,11 +17,13 @@
     (leo datum)
     (code))
 
+  (define (space-ended-code $code) (code $code " "))
   (define comma-code (code ", "))
-  (define dot-code (code " . "))
+  (define arrow-code (code "->"))
+  (define arrow-separator-code (code " " arrow-code " "))
 
-  (define (dot-separated-code $car $cdr)
-    (code $car dot-code $cdr))
+  (define (arrow-separated-code $car $cdr)
+    (code $car arrow-separator-code $cdr))
 
   ; === atom-code? ===
 
@@ -114,7 +116,7 @@
               (space-separated-code $car-code
                 (code-in-round-brackets (lines-code $cdr-pair))))))
         ((else $cdr)
-          (code $car-code dot-code (line-code $cdr))))))
+          (arrow-separated-code $car-code (line-code $cdr))))))
 
   (define (lines-code $lines)
     (switch-exhaustive $lines
@@ -128,7 +130,7 @@
             ((pair? $cdr)
               (code $car-code comma-code (lines-code $cdr)))
             ((else $cdr)
-              (code $car-code dot-code (line-code $cdr))))))))
+              (arrow-separated-code $car-code (line-code $cdr))))))))
 
   (define (bytevector-line-code $bytevector)
     (space-separated-code "#bytevector"
@@ -225,7 +227,7 @@
         ((else $cdr)
           (limiter-lets?
             ($cdr-code (space-line-code?-limiter $cdr))
-            (limiter (dot-separated-code $car-code $cdr-code)))))))
+            (limiter (arrow-separated-code $car-code $cdr-code)))))))
 
   (define (other-space-line-code-limiter $other)
     (limiter-using (other-line-code $other) 1))
@@ -300,7 +302,7 @@
             (list->limiter
               (map*
                 space-line-code?-limiter
-                (lambda ($item) (code ". " (space-line-code?-limiter $item)))
+                (lambda ($item) (space-separated-code arrow-code (space-line-code?-limiter $item)))
                 $list)))
           (limiter
             (and
@@ -414,7 +416,7 @@
     (list->code
       (map*
         block-code
-        (lambda ($item) (code ". " (block-code $item)))
+        (lambda ($item) (space-separated-code arrow-code (block-code $item)))
         $list)))
 
   (define (bytevector-block-code $bytevector)
