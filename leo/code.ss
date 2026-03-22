@@ -278,7 +278,7 @@
     (symbol-space-line-code-limiter $symbol))
 
   (define (pair-colon-line-code?-limiter $pair)
-    (switch (limited-ref (limiter-apply (pair-space-line-code?-limiter $pair) +inf.0))
+    (switch (limiter-unlimited-ref (pair-space-line-code?-limiter $pair))
       ((false? _)
         (switch (atom-code? (car $pair))
           ((false? _)
@@ -308,7 +308,7 @@
               (code ": " (list->code (intercalate $code?s comma-code)))))))))
 
   (define (bytevector-colon-line-code?-limiter $bytevector)
-    (switch (limited-ref (limiter-apply (bytevector-space-line-code?-limiter $bytevector) +inf.0))
+    (switch (limiter-unlimited-ref (bytevector-space-line-code?-limiter $bytevector))
       ((false? _)
         (limiter-lets
           ($bytevector-code (limiter-using (code "#bytevector") 1))
@@ -323,7 +323,7 @@
         (bytevector-space-line-code?-limiter $bytevector))))
 
   (define (vector-colon-line-code?-limiter $vector)
-    (switch (limited-ref (limiter-apply (vector-space-line-code?-limiter $vector) +inf.0))
+    (switch (limiter-unlimited-ref (vector-space-line-code?-limiter $vector))
       ((false? _)
         (limiter-lets
           ($vector-code (limiter-using (code "#vector") 1))
