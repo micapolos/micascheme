@@ -11,7 +11,7 @@
 
   (define comma-code (code ", "))
   (define dot-code (code " . "))
-  (define null-line-code (code "()"))
+  (define null-line-code (code "#null"))
 
   (define (boolean-line-code $boolean)
     (string-code (if $boolean "#true" "#false")))
@@ -50,7 +50,7 @@
 
   (define (lines-code $lines)
     (switch-exhaustive $lines
-      ((null? _) null-line-code)
+      ((null? _) (code))
       ((pair? $pair)
         (lets
           ($car-code (line-code (car $pair)))
@@ -62,6 +62,23 @@
             ((else $cdr)
               (code $car-code dot-code (line-code $cdr))))))))
 
+  (define (bytevector-line-code $bytevector)
+    (space-separated-code "#bytevector"
+      (code-in-round-brackets
+        (lines-code
+          (bytevector->u8-list $bytevector)))))
+
+  (define (vector-line-code $vector)
+    (space-separated-code "#vector"
+      (code-in-round-brackets
+        (lines-code
+          (vector->list $vector)))))
+
+  (define (box-line-code $box)
+    (space-separated-code "#box"
+      (line-code
+        (unbox $box))))
+
   (define (line-code $datum)
     (switch $datum
       ((null? _) null-line-code)
@@ -71,6 +88,9 @@
       ((string? $string) (string-line-code $string))
       ((symbol? $symbol) (symbol-line-code $symbol))
       ((pair? $pair) (pair-line-code $pair))
+      ((box? $box) (box-line-code $box))
+      ((bytevector? $bytevector) (bytevector-line-code $bytevector))
+      ((vector? $vector) (vector-line-code $vector))
       ((else $other) (string-code (format "~s" $other)))))
 
   (define (atom-code? $datum)

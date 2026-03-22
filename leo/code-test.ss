@@ -2,7 +2,7 @@
 
 ; === line-code
 
-(check-code=? (line-code '()) "()")
+(check-code=? (line-code '()) "#null")
 
 (check-code=? (line-code #t) "#true")
 (check-code=? (line-code #f) "#false")
@@ -29,6 +29,19 @@
 (check-code=? (line-code '(foo bar (goo gar))) "foo (bar, goo gar)")
 (check-code=? (line-code '(foo (bar zar) (goo gar))) "foo (bar zar, goo gar)")
 (check-code=? (line-code '(foo (bar zar) (goo gar mar))) "foo (bar zar, goo (gar, mar))")
+
+(check-code=? (line-code (box 123)) "#box 123")
+(check-code=? (line-code (box '(foo bar))) "#box foo bar")
+(check-code=? (line-code (box '(foo . bar))) "#box foo . bar")
+(check-code=? (line-code (box '(foo bar gar))) "#box foo (bar, gar)")
+
+(check-code=? (line-code (bytevector)) "#bytevector ()")
+(check-code=? (line-code (bytevector 1 2 3)) "#bytevector (1, 2, 3)")
+
+(check-code=? (line-code (vector)) "#vector ()")
+(check-code=?
+  (line-code (vector '() #t 123 #\a "foo" 'foo '(foo bar) '(foo . bar)))
+  "#vector (#null, #true, 123, #char a, \"foo\", foo, foo bar, foo . bar)")
 
 (check-code=?
   (line-code '(circle (radius 10) (center (point (x 10) (y 20)))))
