@@ -35,7 +35,7 @@ pretty-print << readme
     lists and maps >> run
       define numbers list: 1, 2, 3, 4, 5, 6
 
-      << list examples
+      << examples
         numbers >> numbers
         number strings >> map: number->string, numbers
         odd numbers >> filter: odd?, numbers
