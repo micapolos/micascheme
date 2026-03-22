@@ -14,9 +14,11 @@
     list->limiter
     replace-limiter
     append-limiter
-    apply-limiter)
+    apply-limiter
+    limiter-try)
   (import
     (scheme)
+    (syntax)
     (syntaxes)
     (limited)
     (lets)
@@ -57,6 +59,14 @@
       (lets?
         ($limited (limiter-apply $limiter $limit))
         (limiter-apply ($fn (limited-ref $limited)) (limited-limit $limited)))))
+
+  (define-rules-syntax
+    ((limiter-try) (limiter #f))
+    ((limiter-try x xs ...)
+      (limiter ($limit)
+        (switch (limiter-limited? x $limit)
+          ((false? _) (limiter-limited? (limiter-try xs ...) $limit))
+          ((else $limited) $limited)))))
 
   (define-monadic limiter)
 )
