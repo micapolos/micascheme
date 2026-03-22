@@ -6,14 +6,16 @@ import
 document readme
   leo scheme programming language
 
-  leo scheme is a programming language which uses indentation instead of parentheses
-  this document is a valid leo scheme program
-  it uses << and >> to separate text from code
+  leo scheme is a dialect of scheme which uses indentation instead of parentheses
+  this document is a valid program in leo scheme
+  it can be executed in command line with "leo readme.leo"
 
   quick start
     overview
       leo translates indentation into standard scheme s-expressions
       each indented block represents a new level of nesting
+      text and code is separated using << and >> quotes
+      << example >> form contain code snippets to execute
 
     basic syntax >> example
       define hello "Hello"
@@ -32,16 +34,16 @@ document readme
     control flow >> example
       if
         greater?: 10, 5
-        "obviously, 10 is greater than 5"
+        "Obviously, 10 is greater than 5."
         "What? 10 is not greater than 5?"
 
     lists and maps >> example
       define numbers list: 1, 2, 3, 4, 5, 6
 
-      << list examples
-        numbers >> numbers
-        number strings >> map: number->string, numbers
-        odd numbers >> filter: odd?, numbers
+      << various examples
+        input >> numbers
+        mapped to strings >> map: number->string, numbers
+        filtered odd numbers >> filter: odd?, numbers
 
     lambdas >> example
       map
