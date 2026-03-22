@@ -7,6 +7,7 @@ todo
   improve printing
     use hash-prefixed literals only in write
     use pretty literals in pretty-print
+    define write-indented? parameter to enable indented writing
   make eval work
   custom writer for
     exceptions
