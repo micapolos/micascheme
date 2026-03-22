@@ -22,13 +22,19 @@ Getting Started
 
 Since this project uses submodules to manage dependencies, make sure to initialize them when you clone:
 
-%%%bash git clone --depth 1 [https://github.com/micapolos/micascheme.git](https://github.com/micapolos/micascheme.git) cd micascheme git submodule update --init --recursive --depth 1 %%%
+```
+git clone --depth 1 https://github.com/micapolos/micascheme.git
+cd micascheme
+git submodule update --init --recursive --depth 1
+```
 
 ### Build Leo
 
 If you want to try out the Leo programming language right away, you can run the build script:
 
-%%%bash leo/build.sh %%%
+```
+leo/build.sh
+```
 
 ### Download Releases
 
@@ -60,7 +66,6 @@ As this is a personal sandbox, the code is often experimental and evolving quick
 *   **Issues:** If you find a bug or have a suggestion, especially regarding Leo syntax or the zx-next assembler, please open an issue on the [GitHub tracker](https://www.google.com/search?q=https://github.com/micapolos/micascheme/issues).
 
 *   **Support:** If you're using these tools for your own Spectrum Next projects or Scheme experiments, I'd love to hear about it!
-
 
 ### License
 
