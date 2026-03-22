@@ -1,6 +1,5 @@
 todo
   fix read problem with: space, newline
-  read literals using keyword the
   custom read-handler
   custom write-handler
   repl
