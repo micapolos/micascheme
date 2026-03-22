@@ -7,12 +7,14 @@ document readme
 
   leo scheme is a dialect of scheme which uses indentation instead of parentheses
   this document is a valid program in leo scheme
-  to separate text from code it uses << and >> quotes
+  it can be executed in command line with "leo readme.leo"
 
   quick start
     overview
       leo translates indentation into standard scheme s-expressions
       each indented block represents a new level of nesting
+      text and code is separated using << and >> quotes
+      << example >> forms contain code snippets to execute
 
     basic syntax >> example
       define hello "Hello"
