@@ -3,8 +3,8 @@ import leo scheme
 pretty-print << readme
   leo scheme programming language
 
-  programming language which uses indentation instead of parentheses
-  this document is a valid program in leo scheme
+  leo scheme is a programming language which uses indentation instead of parentheses
+  this document is a valid leo scheme program
   it uses quoting to separate prose from executable logic
 
   quick start
