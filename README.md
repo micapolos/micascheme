@@ -12,7 +12,7 @@ This repo is where I explore new ways of programming and interact with hardware.
 
     * **Releases (MacOS & Linux):** [Download Binaries](https://github.com/micapolos/micascheme/releases)
     * **Homebrew (MacOS):** `brew install micapolos/leo/leo`
-    * **[readme.leo](./readme.leo)**
+    * **Readme:** [readme.leo](./leo.readme.leo):** written in Leo Scheme
 
 *   **[ZX Next](./zx-next):** Tools for the **ZX Spectrum Next**, including a specialized assembler. It's where high-level Scheme logic meets low-level retro-hardware.
 
