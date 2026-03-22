@@ -13,6 +13,8 @@
     (leo datum)
     (code))
 
+  (define comma-code (code ", "))
+  (define dot-code (code " . "))
   (define null-line-code (code "()"))
 
   (define (boolean-line-code $boolean)
@@ -39,16 +41,16 @@
       ($car-code (line-code (car $pair)))
       (switch (cdr $pair)
         ((null? _)
-          (code "(" $car-code ")"))
+          (code-in-round-brackets $car-code))
         ((pair? $cdr-pair)
           (switch (cdr $cdr-pair)
             ((null? _)
-              (code $car-code " " (line-code (car $cdr-pair))))
+              (space-separated-code $car-code (line-code (car $cdr-pair))))
             ((else $cdr-cdr)
               (space-separated-code $car-code
                 (code-in-round-brackets (lines-code $cdr-pair))))))
         ((else $cdr)
-          (code $car-code " . " (line-code $cdr))))))
+          (code $car-code dot-code (line-code $cdr))))))
 
   (define (lines-code $lines)
     (switch-exhaustive $lines
@@ -60,9 +62,9 @@
             ((null? _)
               $car-code)
             ((pair? $cdr)
-              (code $car-code ", " (lines-code $cdr)))
+              (code $car-code comma-code (lines-code $cdr)))
             ((else $cdr)
-              (code $car-code " . " (line-code $cdr))))))))
+              (code $car-code dot-code (line-code $cdr))))))))
 
   (define (line-code $datum)
     (switch $datum
