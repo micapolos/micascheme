@@ -8,7 +8,7 @@ What's inside?
 
 This repo is where I explore new ways of programming and interact with hardware. The most significant projects here are:
 
-*   **Leo Scheme (/leo):** My primary focus—a programming language that brings the power of Scheme into a modern, indentation-based syntax. It’s designed for people who want the logic of Lisp without the "sea of parentheses."
+*   **([Leo Scheme](./leo)):** My primary focus—a programming language that brings the power of Scheme into a modern, indentation-based syntax. It’s designed for people who want the logic of Lisp without the "sea of parentheses."
 
 *   **zx-next:** Tools for the **ZX Spectrum Next**, including a specialized assembler. It's where high-level Scheme logic meets low-level retro-hardware.
 
