@@ -25,6 +25,8 @@
     (leo transform)
     (prefix (language) %)
     (writing)
+    (code)
+    (leo code)
     (leo reader)
     (leo datum)
     (leo writing-reader))
@@ -58,16 +60,17 @@
       ((x)
         (write x (%current-output-port)))
       ((x port)
+        (%put-string port (code-string (line-code x))))))
+
+  (%define pretty-print
+    (%case-lambda
+      ((x) (pretty-print x (%current-output-port)))
+      ((x port)
         (%put-string port
           (writing-string
             (reader-end
               (reader-read-list (writing-reader)
                 (%list (->datum x)))))))))
-
-  (%define pretty-print
-    (%case-lambda
-      ((x) (pretty-print x (%current-output-port)))
-      ((x port) (write x port))))
 
   (%define (displayln x)
     (%display x)

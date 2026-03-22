@@ -1,9 +1,9 @@
 (library (leo exception-handler)
   (export leo-exception-handler)
   (import
-    (except (micascheme) write)
+    (except (micascheme) pretty-print)
     (condition)
-    (only (leo scheme) write))
+    (only (leo scheme) pretty-print))
 
   (define (leo-exception-handler $x)
     (lets

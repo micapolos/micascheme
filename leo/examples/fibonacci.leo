@@ -11,7 +11,7 @@ time pretty-print << result is >>
     with number n
     if
       less?: number, 2
-      then number
-      else add
+      number
+      add
         fibonacci subtract: number, 1
         fibonacci subtract: number, 2
