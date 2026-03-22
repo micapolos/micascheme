@@ -87,3 +87,21 @@
     ((else $other) (counter (list $other))))
   (1 (#\space)))
 
+(check-counter
+  (counter-or)
+  (0 #f))
+
+(check-counter
+  (counter-or
+    (counter "foo")
+    (counter "bar")
+    (counter "goo"))
+  (1 "foo"))
+
+(check-counter
+  (counter-or
+    (counter #f)
+    (counter #f)
+    (counter "foo")
+    (counter "bar"))
+  (3 "foo"))
