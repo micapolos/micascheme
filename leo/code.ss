@@ -56,13 +56,12 @@
       ((pair? $pair)
         (lets
           ($car-code (line-code (car $pair)))
-          ($cdr (cdr $pair))
           (switch (cdr $pair)
             ((null? _)
               $car-code)
             ((pair? $cdr)
               (code $car-code ", " (lines-code $cdr)))
-            ((else _)
+            ((else $cdr)
               (code $car-code " . " (line-code $cdr))))))))
 
   (define (line-code $datum)
