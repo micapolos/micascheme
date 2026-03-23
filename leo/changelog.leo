@@ -1,6 +1,10 @@
 import leo scheme
 
 quote changelog
+  v0.1.32
+    improved
+      write prints indented with hashed atoms
+      pretty-print prints indented with pretty atoms
   v0.1.31
     fixed character range in literal parser
   v0.1.30
