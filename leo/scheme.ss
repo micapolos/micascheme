@@ -19,7 +19,8 @@
     logging
 
     add subtract multiply divide
-    number=? less? less/equal? greater? greater/equal?)
+    number=? less? less/equal? greater? greater/equal?
+    parameterize)
   (import
     (prefix (chezscheme) %)
     (only (micascheme) run define-rules-syntaxes define-keywords keywords ...)
@@ -43,7 +44,8 @@
         let-syntax letrec-syntax
         if cond pretty-print write
         define-syntax
-        syntax-case)
+        syntax-case
+        parameterize)
       (only (micascheme) char true false keywords run)
       (only (leo transform) from with)))
 
@@ -171,6 +173,9 @@
         (with (val x))
         (write (%list (%quote label) val))
         val))
+
+    ((parameterize (with binding ...) x xs ...)
+      (%parameterize (binding ...) x xs ...))
 
     ((define-language (x l))
       (%define-language x l)))
