@@ -22,6 +22,7 @@
     (code))
 
   (define code-pretty? (make-thread-parameter #f))
+  (define code-line-limit (make-thread-parameter 10))
 
   (define (primitive-string $string)
     (cond
@@ -34,7 +35,6 @@
   (define (primitive-code-limiter $string)
     (limiter-using (primitive-code $string) 1))
 
-  (define code-line-limit 10)
 
   (define arrow-code (code "->"))
   (define comma-separator-code (code ", "))
@@ -407,7 +407,7 @@
   ; === block-code ===
 
   (define (limiter-line-code? $line-code?-limiter)
-    (limiter-ref? $line-code?-limiter code-line-limit))
+    (limiter-ref? $line-code?-limiter (code-line-limit)))
 
   (define null-block-code
     (newline-ended-code null-line-code))

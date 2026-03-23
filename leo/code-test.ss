@@ -144,12 +144,15 @@
 (check-block-code 'foo "foo")
 (check-block-code '(foo bar) "foo bar")
 (check-block-code '(foo bar gar) "foo: bar, gar")
-(check-block-code '(1 2 3 4 5 6 7 8 9 10 11 12)
-  ":" "  1" "  2" "  3" "  4" "  5" "  6" "  7" "  8" "  9" "  10" "  11" "  12")
 
-; TODO: We want to wrap v11-v15 in a newline
-(check-block-code '(v1 (v2 (v3 (v4 (v5 (v6 (v7 (v8 (v9 (v10 (v12 (v13 (v14 v15)))))))))))))
-  "v1\n  v2\n    v3\n      v4\n        v5 v6 v7 v8 v9 v10 v12 v13 v14 v15")
+(parameterize ((code-line-limit 5))
+  ; TODO: We want items to be comma separated, 5 in each line
+  (check-block-code '(1 2 3 4 5 6 7 8 9 10)
+    ":" "  1" "  2" "  3" "  4" "  5" "  6" "  7" "  8" "  9" "  10")
+
+  ; TODO: We want to wrap v6-v10 in an intented newline
+  (check-block-code '(v1 (v2 (v3 (v4 (v5 (v6 (v7 (v8 (v9 v10)))))))))
+    "v1\n  v2\n    v3\n      v4\n        v5\n          v6 v7 v8 v9 v10"))
 
 (check-block-code '((x 10 20) (y 30 40)) ":" "  x: 10, 20" "  y: 30, 40")
 (check-block-code '(foo (x 10 20) (y 30 40)) "foo" "  x: 10, 20" "  y: 30, 40")
