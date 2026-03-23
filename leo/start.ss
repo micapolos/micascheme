@@ -22,6 +22,8 @@
         (start-help (datum x)))
       (("--help" . x)
         (start-help (datum x)))
+      (("--asm" . x)
+        (start-asm (datum x)))
       ((file arg ...)
         (start-file (datum file) (datum (arg ...))))
       (()
@@ -41,6 +43,10 @@
           "Available options are:"
           "  -v, --version  show version information"
           "  -h, --help     show this help message"))
+      (start-options $arguments)))
+
+  (define (start-asm $arguments)
+    (parameterize ((($primitive $assembly-output) #t))
       (start-options $arguments)))
 
   (define (start-file $file $arguments)
