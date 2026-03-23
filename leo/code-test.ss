@@ -152,7 +152,7 @@
 
   ; TODO: We want to wrap v6-v10 in an intented newline
   (check-block-code '(v1 (v2 (v3 (v4 (v5 (v6 (v7 (v8 (v9 v10)))))))))
-    "v1\n  v2\n    v3\n      v4\n        v5\n          v6 v7 v8 v9 v10"))
+     "v1 v2 v3 v4 v5 v6 v7 v8 v9 v10"))
 
 (check-block-code '((x 10 20) (y 30 40)) ":" "  x: 10, 20" "  y: 30, 40")
 (check-block-code '(foo (x 10 20) (y 30 40)) "foo" "  x: 10, 20" "  y: 30, 40")

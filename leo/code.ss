@@ -434,8 +434,13 @@
           ((symbol? $symbol)
             (lets
               ($symbol-code (symbol-atom-code $symbol))
-              (code $symbol-code #\newline
-                (code-indent (list-block-code (cdr $pair))))))
+              (switch (cdr $pair)
+                ((singleton-list? $cdr)
+                  (space-separated-code $symbol-code
+                    (block-code (car $cdr))))
+                ((else $cdr)
+                  (code $symbol-code #\newline
+                    (code-indent (list-block-code (cdr $pair))))))))
           ((else _)
             (code ":" #\newline
               (code-indent (list-block-code $pair))))))
