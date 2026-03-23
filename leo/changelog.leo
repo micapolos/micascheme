@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.31
+    fixed character range in literal parser
   v0.1.30
     adds simple leo document library for writing documents with code snippets
   v0.1.29
