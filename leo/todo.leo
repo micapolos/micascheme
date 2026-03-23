@@ -3,10 +3,7 @@ todo
   custom read-handler
   custom write-handler
   repl
-  improve printing
-    use hash-prefixed literals only in write
-    use pretty literals in pretty-print
-    define write-indented? parameter to enable indented writing
+  fix todo in leo code
   make eval work
   custom writer for
     exceptions
@@ -36,9 +33,6 @@ todo
     compile separate libraries for
       optimization level 2
       optimication level 3
-  figure out whether
-    we can avoid # prefix when writing atoms
-    maybe we can use one of: literal, atom
   implement libraries matching r7rs standard
     leo base
     leo string
