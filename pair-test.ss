@@ -6,6 +6,13 @@
 (check-equal? (null-or-pair? (cons 1 2)) #t)
 (check-equal? (null-or-pair? 123) #f)
 
+; === singleton-list? ===
+
+(check (singleton-list? '(foo)))
+(check (not (singleton-list? '())))
+(check (not (singleton-list? '(foo bar))))
+(check (not (singleton-list? '(foo . bar))))
+
 ; === pair-map ===
 
 (check

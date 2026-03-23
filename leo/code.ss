@@ -287,10 +287,17 @@
           ((false? _)
             (list-colon-line-code?-limiter $pair))
           ((else $car-code)
-            (limiter-lets?
-              ($car-code (limiter-using $car-code 1))
-              ($list-code (list-colon-line-code?-limiter (cdr $pair)))
-              (limiter (code $car-code $list-code))))))
+            (switch (cdr $pair)
+              ((singleton-list? $cdr)
+                (limiter-lets?
+                  ($car-code (limiter-using $car-code 1))
+                  ($cdr-code (colon-line-code?-limiter (car $cdr)))
+                  (limiter (space-separated-code $car-code $cdr-code))))
+              ((else $cdr)
+                (limiter-lets?
+                  ($car-code (limiter-using $car-code 1))
+                  ($cdr-code (list-colon-line-code?-limiter $cdr))
+                  (limiter (code $car-code $cdr-code))))))))
       ((else _)
         (pair-space-line-code?-limiter $pair))))
 

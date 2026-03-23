@@ -122,7 +122,7 @@
 (check-colon-line-code 4 '((foo bar) (goo gar)) ": foo bar, goo gar")
 
 (check-colon-line-code 5 '(point (x 10) (y 20)) "point: x 10, y 20")
-;(check-colon-line-code 6 '(center (point (x 10) (y 20))) "center point: x 10, y 20")
+(check-colon-line-code 6 '(center (point (x 10) (y 20))) "center point: x 10, y 20")
 
 ; === block-code
 
@@ -152,8 +152,8 @@
   "  foo: bar, goo"
   "  zoo: zar, zoo")
 
-; (check-block-code
-;   '(circle (radius 10) (center (point (x 10) (y 20))))
-;   "circle"
-;   "  radius 10"
-;   "  center point: x 10, y 20")
+(check-block-code
+  '(circle (radius 10) (center (point (x 10) (y 20))))
+  "circle"
+  "  radius 10"
+  "  center point: x 10, y 20")

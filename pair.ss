@@ -1,6 +1,7 @@
 (library (pair)
   (export
     null-or-pair?
+    singleton-list?
     pair
     pair-map
     map-car
@@ -15,6 +16,9 @@
 
   (define (null-or-pair? $obj)
     (or (null? $obj) (pair? $obj)))
+
+  (define (singleton-list? $obj)
+    (and (pair? $obj) (null? (cdr $obj))))
 
   (define pair cons)
 
