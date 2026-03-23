@@ -1,4 +1,10 @@
-(import (scheme) (check) (limited) (boolean) (code) (leo code))
+(import
+  (scheme)
+  (check)
+  (limited)
+  (boolean)
+  (code)
+  (leo code))
 
 ; === atom-code?
 
