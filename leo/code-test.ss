@@ -87,7 +87,7 @@
 (check-space-line-code 1 #t "#true")
 (check-space-line-code 1 123 "123")
 (check-space-line-code 1 #\a "#char a")
-(check-space-line-code 1 "foo" "\"foo\"")
+(check-space-line-code 1.5 "foo" "\"foo\"")
 (check-space-line-code 1 'foo "foo")
 
 (check-space-line-code 2 '(foo bar) "foo bar")
