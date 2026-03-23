@@ -23,6 +23,7 @@
 
   (define code-pretty? (make-thread-parameter #f))
   (define code-line-limit (make-thread-parameter 7))
+  (define code-string-limit (make-thread-parameter 1.5))
 
   (define (primitive-string $string)
     (cond
@@ -204,7 +205,7 @@
     (limiter-using (char-line-code $char) 1))
 
   (define (string-space-line-code-limiter $string)
-    (limiter-using (string-line-code $string) 1.5))
+    (limiter-using (string-line-code $string) (code-string-limit)))
 
   (define (symbol-space-line-code-limiter $symbol)
     (limiter-using (symbol-line-code $symbol) 1))
