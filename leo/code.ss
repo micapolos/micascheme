@@ -36,7 +36,6 @@
   (define (primitive-code-limiter $string)
     (limiter-using (primitive-code $string) 1))
 
-
   (define arrow-code (code "->"))
   (define comma-separator-code (code ", "))
   (define pair-separator-code arrow-code)
