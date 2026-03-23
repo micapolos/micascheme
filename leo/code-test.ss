@@ -126,6 +126,10 @@
 (check-colon-line-code 2 '(foo bar) "foo bar")
 (check-colon-line-code 3 '(foo bar gar) "foo: bar, gar")
 (check-colon-line-code 4 '((foo bar) (goo gar)) ": foo bar, goo gar")
+(check-colon-line-code 2 '(1 bar) "1 bar")
+(check-colon-line-code 3 '(1 foo bar) ": 1, foo, bar")
+; TODO: Fixit
+; (check-colon-line-code 4 '(foo bar ((gar zar))) "foo: bar, gar")
 
 (check-colon-line-code 5 '(point (x 10) (y 20)) "point: x 10, y 20")
 (check-colon-line-code 6 '(center (point (x 10) (y 20))) "center point: x 10, y 20")
@@ -140,6 +144,8 @@
 (check-block-code 'foo "foo")
 (check-block-code '(foo bar) "foo bar")
 (check-block-code '(foo bar gar) "foo: bar, gar")
+(check-block-code '(1 2 3 4 5 6 7 8 9 10)
+  ":" "  1" "  2" "  3" "  4" "  5" "  6" "  7" "  8" "  9" "  10")
 
 (check-block-code '((x 10 20) (y 30 40)) ":" "  x: 10, 20" "  y: 30, 40")
 (check-block-code '(foo (x 10 20) (y 30 40)) "foo" "  x: 10, 20" "  y: 30, 40")

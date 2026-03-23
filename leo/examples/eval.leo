@@ -1,7 +1,6 @@
 import
   leo scheme
   leo expand
-  math
   only
     comment
     from micascheme

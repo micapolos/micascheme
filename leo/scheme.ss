@@ -69,13 +69,11 @@
 
   (%define pretty-print
     (%case-lambda
-      ((x) (pretty-print x (%current-output-port)))
+      ((x)
+        (pretty-print x (%current-output-port)))
       ((x port)
-        (%put-string port
-          (writing-string
-            (reader-end
-              (reader-read-list (writing-reader)
-                (%list (->datum x)))))))))
+        (%parameterize ((code-pretty? #t))
+          (%put-string port (code-string (block-code x)))))))
 
   (%define (displayln x)
     (%display x)

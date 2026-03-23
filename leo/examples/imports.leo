@@ -3,7 +3,7 @@ import
   rename
     add dodaj
     subtract odejmij
-    from math
+    from leo scheme
 
 %pretty-print dodaj: 2, 3
 %pretty-print odejmij: 5, 3
