@@ -42,7 +42,8 @@
           ""
           "Available options are:"
           "  -v, --version  show version information"
-          "  -h, --help     show this help message"))
+          "  -h, --help     show this help message"
+          "  --asm          show assembly output"))
       (start-options $arguments)))
 
   (define (start-asm $arguments)
