@@ -144,8 +144,8 @@
 (check-block-code 'foo "foo")
 (check-block-code '(foo bar) "foo bar")
 (check-block-code '(foo bar gar) "foo: bar, gar")
-(check-block-code '(1 2 3 4 5 6 7 8 9 10)
-  ":" "  1" "  2" "  3" "  4" "  5" "  6" "  7" "  8" "  9" "  10")
+(check-block-code '(1 2 3 4 5 6 7 8 9 10 11 12)
+  ":" "  1" "  2" "  3" "  4" "  5" "  6" "  7" "  8" "  9" "  10" "  11" "  12")
 
 (check-block-code '((x 10 20) (y 30 40)) ":" "  x: 10, 20" "  y: 30, 40")
 (check-block-code '(foo (x 10 20) (y 30 40)) "foo" "  x: 10, 20" "  y: 30, 40")

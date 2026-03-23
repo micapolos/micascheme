@@ -1,6 +1,7 @@
 (library (leo code)
   (export
     code-pretty?
+    code-line-limit
 
     atom-code?
     check-atom-code?
@@ -33,7 +34,7 @@
   (define (primitive-code-limiter $string)
     (limiter-using (primitive-code $string) 1))
 
-  (define line-limit 7)
+  (define code-line-limit 10)
 
   (define arrow-code (code "->"))
   (define comma-separator-code (code ", "))
@@ -406,7 +407,7 @@
   ; === block-code ===
 
   (define (limiter-line-code? $line-code?-limiter)
-    (limiter-ref? $line-code?-limiter line-limit))
+    (limiter-ref? $line-code?-limiter code-line-limit))
 
   (define null-block-code
     (newline-ended-code null-line-code))
