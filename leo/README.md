@@ -69,7 +69,11 @@ define-macro
   when
     my-macro: a, b
     add: a, b
+  when
+    my-macro: a, ...
+    list: quote a, ...
 
 write my-macro "world"
 write my-macro: 10, 20
+write my-macro: apple, orange, banana
 ```

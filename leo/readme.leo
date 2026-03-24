@@ -70,4 +70,4 @@ document readme
       << examples
         greeting >> my-macro "world"
         addition >> my-macro: 10, 20
-        quoted list >> my-macro: apple, orange, banana, pear, ...
+        quoted list >> my-macro: apple, orange, banana
