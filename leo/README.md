@@ -96,9 +96,7 @@ write `this is quasiquote
 
 write `this is quasiquote with unquote` add: 2, 2
 
-define numbers list: 1, 2, 3, 4
-
-write `this is quasiquote with unquote-splicing`... numbers
+write `this is quasiquote with unquote-splicing`... list: 1, 2, 3, 4
 
 write `circle
   radius` sqrt 4
