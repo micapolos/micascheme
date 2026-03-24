@@ -49,6 +49,17 @@ write filter: odd?, numbers
 write fold-left: +, 0, numbers
 ```
 
+### Quoting
+```leo
+write 'this is quoted'
+write 'my lucky number is' string-length "bananas"
+write 'circle
+  radius' sqrt 4
+  center point
+    x' sin 10
+    y' cos 10
+```
+
 ### Macros
 ```leo
 define-macro
