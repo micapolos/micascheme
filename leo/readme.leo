@@ -19,7 +19,16 @@ document readme
     basic syntax >> example
       define hello "Hello"
       define world "world"
-      string-append: hello, ", ", world, "!"
+
+      define
+        exclamated s
+        string-append: s, "!"
+
+      define
+        comma-separated: a, b
+        string-append: a, ", ", b
+
+      exclamated comma-separated: hello, world
 
     functions >> example
       define

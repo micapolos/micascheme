@@ -15,18 +15,15 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 define hello "Hello"
 define world "world"
 
-write string-append: hello, ", ", world, "!"
-```
-
-### Functions
-```leo
 define
-  exclamated s
-  string-append: s, "!!!"
+  exclamated string
+  string-append: string, "!"
 
-write exclamated "Cool"
-write exclamated "LOL"
-write exclamated "Wow"
+define
+  comma-separated: first-string, second-string
+  string-append: first-string, ", ", second-string
+
+displayln exclamated comma-separated: hello, world
 ```
 
 ### Control Flow
