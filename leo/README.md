@@ -94,7 +94,7 @@ write 'this is quote
 
 write `this is quasiquote
 
-write `this is quasiquote with unquote` string-length "bananas"
+write `this is quasiquote with unquote` add: 2, 2
 
 define numbers list: 1, 2, 3, 4
 
