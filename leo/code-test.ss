@@ -58,6 +58,7 @@
 (check-code=? (line-code '(foo gar . bar)) "foo (gar -> bar)")
 (check-code=? (line-code '(foo)) "(foo)")
 (check-code=? (line-code '(foo bar)) "foo bar")
+(check-code=? (line-code '((foo bar))) "(foo bar)")
 (check-code=? (line-code '(foo (bar goo))) "foo bar goo")
 (check-code=? (line-code '(foo bar goo)) "foo (bar, goo)")
 (check-code=? (line-code '(foo bar (goo gar))) "foo (bar, goo gar)")
@@ -91,6 +92,7 @@
 (check-space-line-code 1 'foo "foo")
 
 (check-space-line-code 2 '(foo bar) "foo bar")
+(check-space-line-code-false? 2 '((foo bar)))
 (check-space-line-code 2 '(foo . bar) "foo -> bar")
 (check-space-line-code 3 '(foo (bar goo)) "foo bar goo")
 (check-space-line-code 3 '(foo (bar goo)) "foo bar goo")
@@ -128,8 +130,7 @@
 (check-colon-line-code 4 '((foo bar) (goo gar)) ": foo bar, goo gar")
 (check-colon-line-code 2 '(1 bar) "1 bar")
 (check-colon-line-code 3 '(1 foo bar) ": 1, foo, bar")
-; TODO: Fixit
-; (check-colon-line-code 4 '(foo bar ((gar zar))) "foo: bar, gar")
+(check-colon-line-code-false? 4 '(foo bar ((gar zar))))
 
 (check-colon-line-code 5 '(point (x 10) (y 20)) "point: x 10, y 20")
 (check-colon-line-code 6 '(center (point (x 10) (y 20))) "center point: x 10, y 20")
@@ -144,6 +145,10 @@
 (check-block-code 'foo "foo")
 (check-block-code '(foo bar) "foo bar")
 (check-block-code '(foo bar gar) "foo: bar, gar")
+(check-block-code '(foo bar ((gar zar)))
+  "foo"
+  "  bar"
+  "  : gar zar")
 
 (parameterize ((code-line-limit 5))
   ; TODO: We want items to be comma separated, 5 in each line
