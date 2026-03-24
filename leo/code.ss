@@ -59,25 +59,11 @@
   (define (number-atom-code $number)
     (string-code (number->string $number)))
 
-  (define (char-atom-code? $char) #f)
-
   (define (string-atom-code $string)
     (string-code (format "~s" $string)))
 
   (define (symbol-atom-code $symbol)
     (string-code (format "~s" $symbol)))
-
-  (define (bytevector-atom-code? $bytevector)
-    (and
-      (= (bytevector-length $bytevector) 0)
-      (primitive-code "bytevector")))
-
-  (define (vector-atom-code? $vector)
-    (and
-      (= (vector-length $vector) 0)
-      (primitive-code "vector")))
-
-  (define (box-atom-code? $box) #f)
 
   (define (pair-atom-code? $pair) #f)
 
@@ -94,13 +80,9 @@
       ((null? _) null-atom-code)
       ((boolean? $boolean) (boolean-atom-code $boolean))
       ((number? $number) (number-atom-code $number))
-      ((char? $char) (char-atom-code? $char))
       ((string? $string) (string-atom-code $string))
       ((symbol? $symbol) (symbol-atom-code $symbol))
       ((pair? $pair) (pair-atom-code? $pair))
-      ((box? $box) (box-atom-code? $box))
-      ((bytevector? $bytevector) (bytevector-atom-code? $bytevector))
-      ((vector? $vector) (vector-atom-code? $vector))
       ((sentence? $sentence) (sentence-atom-code? $sentence))
       ((else $other) (other-atom-code $other))))
 
@@ -118,15 +100,6 @@
 
   (define (number-line-code $number)
     (number-atom-code $number))
-
-  (define (char-line-code $char)
-    (string-code
-      (string-append
-        (primitive-string "char")
-        " "
-        (lets
-          ($string (format "~s" $char))
-          (substring $string 2 (string-length $string))))))
 
   (define (string-line-code $string)
     (string-atom-code $string))
@@ -164,25 +137,6 @@
             ((else $cdr)
               (pair-separated-code $car-code (line-code $cdr))))))))
 
-  (define (bytevector-line-code $bytevector)
-    (space-separated-code
-      (primitive-code "bytevector")
-      (code-in-round-brackets
-        (lines-code
-          (bytevector->u8-list $bytevector)))))
-
-  (define (vector-line-code $vector)
-    (space-separated-code
-      (primitive-code "vector")
-      (code-in-round-brackets
-        (lines-code
-          (vector->list $vector)))))
-
-  (define (box-line-code $box)
-    (space-separated-code
-      (primitive-code "box")
-      (line-code (unbox $box))))
-
   (define (sentence-line-code $sentence)
     (lets
       ($word-code (string-code (sentence-word $sentence)))
@@ -205,13 +159,9 @@
       ((null? _) null-line-code)
       ((boolean? $boolean) (boolean-line-code $boolean))
       ((number? $number) (number-line-code $number))
-      ((char? $char) (char-line-code $char))
       ((string? $string) (string-line-code $string))
       ((symbol? $symbol) (symbol-line-code $symbol))
       ((pair? $pair) (pair-line-code $pair))
-      ((box? $box) (box-line-code $box))
-      ((bytevector? $bytevector) (bytevector-line-code $bytevector))
-      ((vector? $vector) (vector-line-code $vector))
       ((sentence? $sentence) (sentence-line-code $sentence))
       ((else $other) (other-line-code $other))))
 
@@ -226,38 +176,11 @@
   (define (number-space-line-code-limiter $number)
     (limiter-using (number-line-code $number) 1))
 
-  (define (char-space-line-code-limiter $char)
-    (limiter-using (char-line-code $char) 1))
-
   (define (string-space-line-code-limiter $string)
     (limiter-using (string-line-code $string) (code-string-limit)))
 
   (define (symbol-space-line-code-limiter $symbol)
     (limiter-using (symbol-line-code $symbol) 1))
-
-  (define (bytevector-space-line-code?-limiter $bytevector)
-    (case (bytevector-length $bytevector)
-      ((1)
-        (limiter-lets?
-          ($bytevector-code (primitive-code-limiter "bytevector"))
-          ($byte-code (space-line-code?-limiter (bytevector-u8-ref $bytevector 0)))
-          (limiter (space-separated-code $bytevector-code $byte-code))))
-      (else (limiter #f))))
-
-  (define (vector-space-line-code?-limiter $vector)
-    (case (vector-length $vector)
-      ((1)
-        (limiter-lets?
-          ($vector-code (primitive-code-limiter "vector"))
-          ($ref-code (space-line-code?-limiter (vector-ref $vector 0)))
-          (limiter (space-separated-code $vector-code $ref-code))))
-      (else (limiter #f))))
-
-  (define (box-space-line-code?-limiter $box)
-    (limiter-lets?
-      ($box-code (primitive-code-limiter "box"))
-      ($ref-code (space-line-code?-limiter (unbox $box)))
-      (limiter (space-separated-code $box-code $ref-code))))
 
   (define (pair-space-line-code?-limiter $pair)
     (limiter-lets?
@@ -305,13 +228,9 @@
       ((null? _) null-space-line-code-limiter)
       ((boolean? $boolean) (boolean-space-line-code-limiter $boolean))
       ((number? $number) (number-space-line-code-limiter $number))
-      ((char? $char) (char-space-line-code-limiter $char))
       ((string? $string) (string-space-line-code-limiter $string))
       ((symbol? $symbol) (symbol-space-line-code-limiter $symbol))
       ((pair? $pair) (pair-space-line-code?-limiter $pair))
-      ((box? $box) (box-space-line-code?-limiter $box))
-      ((bytevector? $bytevector) (bytevector-space-line-code?-limiter $bytevector))
-      ((vector? $vector) (vector-space-line-code?-limiter $vector))
       ((sentence? $sentence) (sentence-space-line-code?-limiter $sentence))
       ((else $other) (other-space-line-code-limiter $other))))
 
@@ -338,9 +257,6 @@
 
   (define (number-colon-line-code-limiter $number)
     (number-space-line-code-limiter $number))
-
-  (define (char-colon-line-code-limiter $char)
-    (char-space-line-code-limiter $char))
 
   (define (string-colon-line-code-limiter $string)
     (string-space-line-code-limiter $string))
@@ -388,39 +304,6 @@
               (for-all identity $code?s)
               (code ": " (list->code (intercalate $code?s comma-separator-code)))))))))
 
-  (define (bytevector-colon-line-code?-limiter $bytevector)
-    (switch (limiter-unlimited-ref (bytevector-space-line-code?-limiter $bytevector))
-      ((false? _)
-        (limiter-lets
-          ($bytevector-code (primitive-code-limiter "bytevector"))
-          ($ref-code?s (list->limiter (map space-line-code?-limiter (bytevector->u8-list $bytevector))))
-          (limiter
-            (and
-              (for-all identity $ref-code?s)
-              (code $bytevector-code
-                (if (null? $ref-code?s) (code ":") (code ": "))
-                (list->code (intercalate $ref-code?s comma-separator-code)))))))
-      ((else _)
-        (bytevector-space-line-code?-limiter $bytevector))))
-
-  (define (vector-colon-line-code?-limiter $vector)
-    (switch (limiter-unlimited-ref (vector-space-line-code?-limiter $vector))
-      ((false? _)
-        (limiter-lets
-          ($vector-code (primitive-code-limiter "vector"))
-          ($ref-code?s (list->limiter (map space-line-code?-limiter (vector->list $vector))))
-          (limiter
-            (and
-              (for-all identity $ref-code?s)
-              (code $vector-code
-                (if (null? $ref-code?s) (code ":") (code ": "))
-                (list->code (intercalate $ref-code?s comma-separator-code)))))))
-      ((else _)
-        (vector-space-line-code?-limiter $vector))))
-
-  (define (box-colon-line-code?-limiter $box)
-    (box-space-line-code?-limiter $box))
-
   (define (sentence-colon-line-code?-limiter $sentence)
     (switch (limiter-unlimited-ref (sentence-space-line-code?-limiter $sentence))
       ((false? _)
@@ -446,13 +329,9 @@
       ((null? _) null-colon-line-code-limiter)
       ((boolean? $boolean) (boolean-colon-line-code-limiter $boolean))
       ((number? $number) (number-colon-line-code-limiter $number))
-      ((char? $char) (char-colon-line-code-limiter $char))
       ((string? $string) (string-colon-line-code-limiter $string))
       ((symbol? $symbol) (symbol-colon-line-code-limiter $symbol))
       ((pair? $pair) (pair-colon-line-code?-limiter $pair))
-      ((box? $box) (box-colon-line-code?-limiter $box))
-      ((bytevector? $bytevector) (bytevector-colon-line-code?-limiter $bytevector))
-      ((vector? $vector) (vector-colon-line-code?-limiter $vector))
       ((sentence? $sentence) (sentence-colon-line-code?-limiter $sentence))
       ((else $other) (other-colon-line-code-limiter $other))))
 
@@ -482,9 +361,6 @@
 
   (define (number-block-code $number)
     (newline-ended-code (number-line-code $number)))
-
-  (define (char-block-code $char)
-    (newline-ended-code (char-line-code $char)))
 
   (define (string-block-code $string)
     (newline-ended-code (string-line-code $string)))
@@ -519,38 +395,6 @@
         (lambda ($item) (space-separated-code pair-separator-code (block-code $item)))
         $list)))
 
-  (define (bytevector-block-code $bytevector)
-    (switch (limiter-line-code? (bytevector-colon-line-code?-limiter $bytevector))
-      ((false? _)
-        (code
-          (primitive-code "bytevector")
-          #\newline
-          (code-indent
-            (list-block-code
-              (bytevector->u8-list $bytevector)))))
-      ((else $code)
-        (newline-ended-code $code))))
-
-  (define (vector-block-code $vector)
-    (switch (limiter-line-code? (vector-colon-line-code?-limiter $vector))
-      ((false? _)
-        (code
-          (primitive-code "vector")
-          #\newline
-          (code-indent
-            (list-block-code
-              (vector->list $vector)))))
-      ((else $code)
-        (newline-ended-code $code))))
-
-  (define (box-block-code $box)
-    (switch (limiter-line-code? (box-colon-line-code?-limiter $box))
-      ((false? _)
-        (space-separated-code
-          (primitive-code "box")
-          (block-code (unbox $box))))
-      ((else $code)
-        (newline-ended-code $code))))
 
   (define (sentence-block-code $sentence)
     (switch (limiter-line-code? (sentence-colon-line-code?-limiter $sentence))
@@ -575,13 +419,9 @@
       ((null? _) null-block-code)
       ((boolean? $boolean) (boolean-block-code $boolean))
       ((number? $number) (number-block-code $number))
-      ((char? $char) (char-block-code $char))
       ((string? $string) (string-block-code $string))
       ((symbol? $symbol) (symbol-block-code $symbol))
       ((pair? $pair) (pair-block-code $pair))
-      ((box? $box) (box-block-code $box))
-      ((bytevector? $bytevector) (bytevector-block-code $bytevector))
-      ((vector? $vector) (vector-block-code $vector))
       ((sentence? $sentence) (sentence-block-code $sentence))
       ((else $other) (other-block-code $other))))
 
