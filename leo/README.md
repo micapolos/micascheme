@@ -53,14 +53,15 @@ write fold-left: +, 0, numbers
 ```leo
 write list
   char a
+  char z
   char A
+  char Z
   char 0
   char 9
   char space
   char newline
   char dot
   char semicolon
-  char integer 0
   char integer 128512
 ```
 

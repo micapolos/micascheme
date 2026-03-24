@@ -2,7 +2,7 @@ import leo scheme
 
 write char a
 
-write char a
+write char z
 
 write char A
 
