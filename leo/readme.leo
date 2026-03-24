@@ -52,6 +52,7 @@ document readme
         numbers >>... numbers
         strings >>... map: number->string, numbers
         odd numbers >>... filter: odd?, numbers
+        sum >> fold-left: +, 0, numbers
 
     macros >> example
       define-macro

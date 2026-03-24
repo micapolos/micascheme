@@ -46,6 +46,7 @@ define numbers : 1, 2, 3, 4, 5, 6
 write numbers
 write map: number->string, numbers
 write filter: odd?, numbers
+write fold-left: +, 0, numbers
 ```
 
 ### Macros
