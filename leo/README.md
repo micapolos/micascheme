@@ -31,11 +31,11 @@ write exclamated "Wow"
 
 ### Control Flow
 ```leo
-displayln
+write
   if
     greater?: 10, 5
-    "Obviously, 10 is greater than 5."
-    "What? 10 is not greater than 5?"
+    quote 10 is greater than 5
+    quote 10 is not greater than 5
 ```
 
 ### Lists and Maps
