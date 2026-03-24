@@ -4,9 +4,7 @@
     primitive-word
     sentence sentence? sentence-word sentence-args
     ->sentence?)
-  (import
-    (micascheme)
-    (leo word))
+  (import (micascheme))
 
   (data (sentence word args))
 
@@ -26,9 +24,10 @@
       ((pair? $pair)
         (switch? (car $pair)
           ((symbol? $symbol)
-            (sentence
-              (symbol->word $symbol)
-              (cdr $pair)))))
+            (sentence-resolve-quotes
+              (sentence
+                (symbol->string $symbol)
+                (cdr $pair))))))
       ((box? $box)
         (sentence
           (primitive-word "box")
@@ -41,4 +40,31 @@
         (sentence
           (primitive-word "vector")
           (vector->list $vector)))))
+
+  (define (sentence-resolve-quotes $sentence)
+    (or
+      (switch? (sentence-args $sentence)
+        ((singleton-list? $args)
+          (switch? (->sentence? (car $args))
+            ((sentence? $args-sentence)
+              (case (sentence-word $sentence)
+                (("quasiquote")
+                  (sentence-resolve-quotes
+                    (sentence
+                      (string-append "'" (sentence-word $args-sentence))
+                      (sentence-args $args-sentence))))
+                (else
+                  (case (sentence-word $args-sentence)
+                    (("unquote")
+                      (sentence-resolve-quotes
+                        (sentence
+                          (string-append (sentence-word $sentence) "'")
+                          (sentence-args $args-sentence))))
+                    (("unquote-splicing")
+                      (sentence-resolve-quotes
+                        (sentence
+                          (string-append (sentence-word $sentence) "'...")
+                          (sentence-args $args-sentence))))
+                    (else #f))))))))
+        $sentence))
 )

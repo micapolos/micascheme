@@ -50,7 +50,7 @@ document readme
           with x
           << mapping
             original >> x
-            ncremented >> add: x, 1
+            incremented >> add: x, 1
             doubled >> multiply: x, 2
             to string >> number->string x
         list: 1, 2, 3, 4

@@ -49,3 +49,19 @@
   (equal?
     (->sentence? (vector #\a #\space "foo"))
     (sentence "#vector" '(#\a #\space "foo"))))
+
+(check
+  (equal?
+    (->sentence? '`(foo bar))
+    (sentence "'foo" '(bar))))
+
+(check
+  (equal?
+    (->sentence? '`(foo ,bar))
+    (sentence "'foo'" '(bar))))
+
+(check
+  (equal?
+    (->sentence? '`(foo ,@bar))
+    (sentence "'foo'..." '(bar))))
+

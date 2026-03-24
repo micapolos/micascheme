@@ -11,7 +11,6 @@
   (leo fragment)
   (leo getter)
   (leo writing-reader)
-  (leo word)
   (leo sentence)
   (leo code)
   (leo transform)
