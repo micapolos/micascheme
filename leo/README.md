@@ -7,8 +7,6 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 ### Overview
 * **Indentation:** Leo translates indentation into standard Scheme s-expressions.
 * **Nesting:** Each indented block represents a new level of nesting.
-* **Quotes:** Text and code are separated using `<<` and `>>` quotes.
-* **Examples:** `example` forms contain code snippets to execute.
 
 ### Hello, Leo!
 ```leo
