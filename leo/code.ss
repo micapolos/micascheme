@@ -19,6 +19,7 @@
   (import
     (micascheme)
     (leo datum)
+    (leo sentence)
     (code))
 
   (define code-pretty? (make-thread-parameter #f))
@@ -26,9 +27,8 @@
   (define code-string-limit (make-thread-parameter 1.5))
 
   (define (primitive-string $string)
-    (cond
-      ((code-pretty?) $string)
-      (else (string-append "#" $string))))
+    (parameterize ((sentence-pretty? (code-pretty?)))
+      (primitive-word $string)))
 
   (define (primitive-code $string)
     (string-code (primitive-string $string)))
