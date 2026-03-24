@@ -10,7 +10,7 @@
     switch any?
     make-read-lambda
     write
-    displayln
+    display-line
     pretty-print
     define-language
     define-syntax
@@ -76,7 +76,7 @@
         (%parameterize ((code-pretty? #t))
           (%put-string port (code-string (leo-code x)))))))
 
-  (%define (displayln x)
+  (%define (display-line x)
     (%display x)
     (%newline))
 

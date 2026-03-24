@@ -10,7 +10,7 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 
 ### Hello, Leo!
 ```leo
-displayln "Hello, Leo!"
+display-line "Hello, Leo!"
 ```
 
 ### Definitions
@@ -26,15 +26,15 @@ define
   comma-separated: first-string, second-string
   string-append: first-string, ", ", second-string
 
-displayln exclamated comma-separated: hello, leo
+display-line exclamated comma-separated: hello, leo
 ```
 
 ### Control Flow
 ```leo
 if
   greater?: 10, 5
-  displayln "10 is greater than 5"
-  displayln "10 is not greater than 5"
+  display-line "10 is greater than 5"
+  display-line "10 is not greater than 5"
 ```
 
 ### Lists

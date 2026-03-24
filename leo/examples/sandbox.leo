@@ -17,6 +17,6 @@ define
     string-append
     intercalate: strings, ", "
 
-displayln string-append comma-separated
+display-line string-append comma-separated
   hello
   exclamated world

@@ -18,6 +18,6 @@ define
         "other "
         format: "~s", x
 
-displayln to-string string-append: "Hello, ", "world!"
-displayln to-string add: 2, 2
-displayln to-string cons: 10, 20
+display-line to-string string-append: "Hello, ", "world!"
+display-line to-string add: 2, 2
+display-line to-string cons: 10, 20

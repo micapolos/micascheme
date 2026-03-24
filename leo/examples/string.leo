@@ -14,6 +14,6 @@ define comma-separated lambda
     ", "
     string-b
 
-displayln comma-separated
+display-line comma-separated
   hello
   exclamated world

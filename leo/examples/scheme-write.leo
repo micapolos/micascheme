@@ -3,7 +3,7 @@ import leo scheme
 define-macro
   when
     scheme-write id: xs, ...
-    displayln format
+    display-line format
       "~s"
       syntax->datum apply
         top-level-syntax quote id
