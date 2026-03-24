@@ -33,10 +33,10 @@ displayln exclamated comma-separated: hello, leo
 
 ### Control Flow
 ```leo
-displayln if
+if
   greater?: 10, 5
-  "10 is greater than 5"
-  "10 is not greater than 5"
+  displayln "10 is greater than 5"
+  displayln "10 is not greater than 5"
 ```
 
 ### Lists
