@@ -43,6 +43,9 @@
   (define (pair-separated-code $car $cdr)
     (space-separated-code $car pair-separator-code $cdr))
 
+  (define (prepare $datum)
+    (or (->sentence? $datum) $datum))
+
   ; === atom-code? ===
 
   (define null-atom-code (primitive-code "null"))
@@ -75,6 +78,8 @@
 
   (define (pair-atom-code? $pair) #f)
 
+  (define (sentence-atom-code? $pair) #f)
+
   (define (other-atom-code $other)
     (other-line-code $other))
 
@@ -90,6 +95,7 @@
       ((box? $box) (box-atom-code? $box))
       ((bytevector? $bytevector) (bytevector-atom-code? $bytevector))
       ((vector? $vector) (vector-atom-code? $vector))
+      ((sentence? $sentence) (sentence-atom-code? $sentence))
       ((else $other) (other-atom-code $other))))
 
   (define-rule-syntax (check-atom-code? in out)
@@ -172,6 +178,12 @@
       (line-code
         (unbox $box))))
 
+  (define (sentence-line-code $sentence)
+    (space-separated-code
+      (string-code (sentence-word $sentence))
+      (code-in-round-brackets
+        (lines-code (sentence-args $sentence)))))
+
   (define (other-line-code $other)
     (string-code (format "~s" $other)))
 
@@ -187,6 +199,7 @@
       ((box? $box) (box-line-code $box))
       ((bytevector? $bytevector) (bytevector-line-code $bytevector))
       ((vector? $vector) (vector-line-code $vector))
+      ((sentence? $sentence) (sentence-line-code $sentence))
       ((else $other) (other-line-code $other))))
 
   ; === space-line-code-limiter ===
@@ -251,6 +264,17 @@
           (limiter-lets?
             ($cdr-code (space-line-code?-limiter $cdr))
             (limiter (pair-separated-code $car-code $cdr-code)))))))
+
+  (define (sentence-space-line-code?-limiter $sentence)
+    (lets
+      ($args (sentence-args $sentence))
+      (case (length $args)
+        ((1)
+          (limiter-lets?
+            ($word-code (limiter-using (string-code (sentence-word $sentence)) 1))
+            ($arg-code (space-line-code?-limiter (car $args)))
+            (limiter (space-separated-code $word-code $arg-code))))
+        (else (limiter #f)))))
 
   (define (other-space-line-code-limiter $other)
     (limiter-using (other-line-code $other) 1))
@@ -374,6 +398,21 @@
   (define (box-colon-line-code?-limiter $box)
     (box-space-line-code?-limiter $box))
 
+  (define (sentence-colon-line-code?-limiter $sentence)
+    (switch (limiter-unlimited-ref (sentence-space-line-code?-limiter $sentence))
+      ((false? _)
+        (limiter-lets
+          ($word-code (limiter-using (string-code (sentence-word $sentence )) 1))
+          ($arg-code?s (list->limiter (map space-line-code?-limiter (sentence-args $sentence))))
+          (limiter
+            (and
+              (for-all identity $arg-code?s)
+              (code $word-code
+                (if (null? $arg-code?s) (code ":") (code ": "))
+                (list->code (intercalate $arg-code?s comma-separator-code)))))))
+      ((else _)
+        (sentence-space-line-code?-limiter $sentence))))
+
   (define (other-colon-line-code-limiter $other)
     (limiter-using (other-line-code $other) 1))
 
@@ -484,6 +523,18 @@
         (space-separated-code
           (primitive-code "box")
           (block-code (unbox $box))))
+      ((else $code)
+        (newline-ended-code $code))))
+
+  (define (sentence-block-code $sentence)
+    (switch (limiter-line-code? (sentence-colon-line-code?-limiter $sentence))
+      ((false? _)
+        (code
+          (string-code (sentence-word $sentence))
+          #\newline
+          (code-indent
+            (list-block-code
+              (sentence-args $sentence)))))
       ((else $code)
         (newline-ended-code $code))))
 
