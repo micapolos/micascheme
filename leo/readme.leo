@@ -52,7 +52,7 @@ document readme
             original >> x
             ncremented >> add: x, 1
             doubled >> multiply: x, 2
-            as string >> number->string x
+            to string >> number->string x
         list: 1, 2, 3, 4
 
     macros >> example

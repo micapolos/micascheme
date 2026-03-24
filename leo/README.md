@@ -41,19 +41,19 @@ document readme
       define numbers list: 1, 2, 3, 4, 5, 6
 
       << various examples
-        input >> numbers
-        mapped to strings >> map: number->string, numbers
-        filtered odd numbers >> filter: odd?, numbers
+        input >>... numbers
+        mapped to strings >>... map: number->string, numbers
+        filtered odd numbers >>... filter: odd?, numbers
 
     lambdas >> example
-      map
+      << mapped >>... map
         lambda
           with x
-          list:
-            << original >> x
-            << incremented >> add: x, 1
-            << doubled >> multiply: x, 2
-            << as string >> number->string x
+          << mapping
+            original >> x
+            ncremented >> add: x, 1
+            doubled >> multiply: x, 2
+            to string >> number->string x
         list: 1, 2, 3, 4
 
     macros >> example
