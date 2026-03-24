@@ -1,5 +1,6 @@
 (library (leo code)
   (export
+    code-single-line?
     code-pretty?
     code-line-limit
 
@@ -22,6 +23,7 @@
     (leo sentence)
     (code))
 
+  (define code-single-line? (make-thread-parameter #f))
   (define code-pretty? (make-thread-parameter #f))
   (define code-line-limit (make-thread-parameter 7))
   (define code-string-limit (make-thread-parameter 1.5))
@@ -427,4 +429,7 @@
 
   (define-rule-syntax (check-block-code in out ...)
     (check-code=? (block-code in) (lines-string out ...)))
+
+  (define leo-code
+    (if (code-single-line?) line-code block-code))
 )
