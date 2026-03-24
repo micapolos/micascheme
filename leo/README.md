@@ -2,8 +2,6 @@
 
 Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 
----
-
 ## Quick Start
 
 ### Overview
