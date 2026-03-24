@@ -1,6 +1,11 @@
 import leo scheme
 
 quote changelog
+  v0.1.33
+    adds parameters
+      code-single-line?
+      code-pretty?
+      code-line-limit
   v0.1.32
     improved
       write prints indented with hashed atoms
