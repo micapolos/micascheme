@@ -18,7 +18,7 @@ displayln "Hello, Leo!"
 ### Definitions
 ```leo
 define hello "Hello"
-define world "world"
+define leo "Leo"
 
 define
   exclamated string
@@ -28,7 +28,7 @@ define
   comma-separated: first-string, second-string
   string-append: first-string, ", ", second-string
 
-displayln exclamated comma-separated: hello, world
+displayln exclamated comma-separated: hello, leo
 ```
 
 ### Control Flow

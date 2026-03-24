@@ -18,7 +18,7 @@ document readme
 
     definitions >> example
       define hello "Hello"
-      define world "world"
+      define leo "Leo"
 
       define
         exclamated s
@@ -28,7 +28,7 @@ document readme
         comma-separated: a, b
         string-append: a, ", ", b
 
-      exclamated comma-separated: hello, world
+      exclamated comma-separated: hello, leo
 
     functions >> example
       define
