@@ -44,7 +44,7 @@ define numbers list: 1, 2, 3, 4, 5, 6
 write numbers
 write map: number->string, numbers
 write filter: odd?, numbers
-write fold-left: +, 0, numbers
+write fold-left: add, 0, numbers
 ```
 
 ### Characters
@@ -66,7 +66,7 @@ write list
 
 ### Vectors
 ```leo
-define my-vector vector: "foo", #char a, 3.14
+define my-vector vector: "foo", char a, 3.14
 
 write my-vector
 write vector-length my-vector
