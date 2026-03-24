@@ -6,6 +6,6 @@ import
     from micascheme
 
 comment: why do we need leo-expand?
-pretty-print eval cons
+write eval cons
   leo-expand
   quote add: 2, 2

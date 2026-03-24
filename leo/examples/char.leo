@@ -1,18 +1,18 @@
 import leo scheme
 
-pretty-print char a
+write char a
 
-pretty-print char a
+write char a
 
-pretty-print char A
+write char A
 
-pretty-print char Z
+write char Z
 
-pretty-print char 0
+write char 0
 
-pretty-print char 9
+write char 9
 
-pretty-print char space
+write char space
 
-pretty-print char=?: char a, char space
-pretty-print char=?: char a, char a
+write char=?: char a, char space
+write char=?: char a, char a

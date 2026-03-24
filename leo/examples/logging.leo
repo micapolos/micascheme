@@ -1,16 +1,16 @@
 import leo scheme
 
-pretty-print quote without logging
-pretty-print string-append
+write quote without logging
+write string-append
   "Hello, "
   "world!"
 
-pretty-print quote with logging
-pretty-print string-append
+write quote with logging
+write string-append
   logging "Hello, "
   logging "world!"
 
-pretty-print quote with logging and labels
-pretty-print string-append
+write quote with logging and labels
+write string-append
   logging: first, "Hello, "
   logging: second, "world!"

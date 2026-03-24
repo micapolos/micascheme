@@ -65,7 +65,7 @@
       ((x)
         (write x (%current-output-port)))
       ((x port)
-        (%put-string port (code-string (line-code x))))))
+        (%put-string port (code-string (leo-code x))))))
 
   (%define pretty-print
     (%case-lambda
@@ -73,7 +73,7 @@
         (pretty-print x (%current-output-port)))
       ((x port)
         (%parameterize ((code-pretty? #t))
-          (%put-string port (code-string (block-code x)))))))
+          (%put-string port (code-string (leo-code x)))))))
 
   (%define (displayln x)
     (%display x)

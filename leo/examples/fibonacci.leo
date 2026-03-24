@@ -2,9 +2,9 @@ import leo scheme
 
 define n 10
 
-pretty-print << calculating fibonacci >> n
+write << calculating fibonacci >> n
 
-time pretty-print << result is >>
+time write << result is >>
   let fibonacci
     with number n
     if

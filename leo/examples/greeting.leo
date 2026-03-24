@@ -12,6 +12,6 @@ define
     from >> author
     to >> recipient
 
-pretty-print greeting "Alex Johnson"
-pretty-print greeting "John Appleseed"
-pretty-print greeting "Chris Parker"
+write greeting "Alex Johnson"
+write greeting "John Appleseed"
+write greeting "Chris Parker"

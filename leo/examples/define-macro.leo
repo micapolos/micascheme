@@ -14,7 +14,7 @@ define-macro
     magic: a, ...
     string-append: a, ...
 
-pretty-print magic:
-pretty-print magic: "world"
-pretty-print magic: 10, 20
-pretty-print magic: "a", "b", "c", "d", "e"
+write magic:
+write magic: "world"
+write magic: 10, 20
+write magic: "a", "b", "c", "d", "e"

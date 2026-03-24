@@ -16,7 +16,9 @@
     check-colon-line-code-false?
 
     block-code
-    check-block-code)
+    check-block-code
+
+    leo-code)
   (import
     (micascheme)
     (leo datum)
