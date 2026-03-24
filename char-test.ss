@@ -18,6 +18,7 @@
 (check (char=? (char 0) #\0))
 (check (char=? (char :) #\:))
 (check (char=? (char (integer 32)) #\space))
+(check (char=? (char (integer #x1F600)) #\😀))
 
 (check (equal? (char->datum #\a) 'a))
 (check (equal? (char->datum #\space) 'space))
@@ -26,3 +27,4 @@
 (check (equal? (char->datum #\;) 'semicolon))
 (check (equal? (char->datum #\x0) 'nul))
 (check (equal? (char->datum #\x1f) '(integer #x1f)))
+(check (equal? (char->datum #\x1F600) '😀))
