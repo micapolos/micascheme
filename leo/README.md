@@ -33,11 +33,10 @@ displayln exclamated comma-separated: hello, leo
 
 ### Control Flow
 ```leo
-write
-  if
-    greater?: 10, 5
-    quote 10 is greater than 5
-    quote 10 is not greater than 5
+write if
+  greater?: 10, 5
+  quote 10 is greater than 5
+  quote 10 is not greater than 5
 ```
 
 ### Lists
