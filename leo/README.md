@@ -49,6 +49,30 @@ write filter: odd?, numbers
 write fold-left: +, 0, numbers
 ```
 
+### Vectors
+```leo
+define my-vector vector: "foo", #char a, 3.14
+
+write my-vector
+write vector-length my-vector
+write vector-ref my-vector 1
+
+vector-set! my-vector 0 "bar"
+write my-vector
+```
+
+### Bytevectors
+```leo
+define my-bytevector bytevector: 10, 20, 30, 40
+
+write my-bytevector
+write bytevector-length my-bytevector
+write bytevector-ref my-bytevector 1
+
+bytevector-set! my-bytevector 1 50
+write my-bytevector
+```
+
 ### Quoting
 ```leo
 write 'this is quoted'
