@@ -10,7 +10,12 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 * **Quotes:** Text and code are separated using `<<` and `>>` quotes.
 * **Examples:** `example` forms contain code snippets to execute.
 
-### Basic Syntax
+### Hello
+```leo
+displayln "Hello, Leo!"
+```
+
+### Definitions
 ```leo
 define hello "Hello"
 define world "world"

@@ -16,7 +16,7 @@ document readme
       text and code is separated using << and >> quotes
       << example >> form contain code snippets to execute
 
-    basic syntax >> example
+    definitions >> example
       define hello "Hello"
       define world "world"
 
