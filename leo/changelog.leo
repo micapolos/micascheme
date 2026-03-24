@@ -1,6 +1,9 @@
 import leo scheme
 
 quote changelog
+  v0.1.34
+    improve writing quotes
+    improved readme
   v0.1.33
     adds parameters
       code-single-line?
