@@ -52,6 +52,16 @@
 
 (check
   (equal?
+    (->sentence? ''(foo))
+    (sentence "quote" '((foo)))))
+
+(check
+  (equal?
+    (->sentence? '`(foo))
+    (sentence "'foo" '())))
+
+(check
+  (equal?
     (->sentence? '`(foo bar))
     (sentence "'foo" '(bar))))
 
