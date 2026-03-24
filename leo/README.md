@@ -49,6 +49,15 @@ write filter: odd?, numbers
 write fold-left: +, 0, numbers
 ```
 
+### Characters
+```leo
+write char a
+write char 0
+write char space
+write char dot
+write char semicolon
+```
+
 ### Vectors
 ```leo
 define my-vector vector: "foo", #char a, 3.14
