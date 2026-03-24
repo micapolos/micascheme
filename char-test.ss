@@ -24,3 +24,5 @@
 (check (equal? (char->datum #\0) 0))
 (check (equal? (char->datum #\.) 'dot))
 (check (equal? (char->datum #\;) 'semicolon))
+(check (equal? (char->datum #\x0) 'nul))
+(check (equal? (char->datum #\x1f) #x1f))
