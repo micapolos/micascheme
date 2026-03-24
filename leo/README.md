@@ -90,13 +90,21 @@ write my-bytevector
 
 ### Quoting
 ```leo
-write 'this is quoted'
-write 'my lucky number is' string-length "bananas"
-write 'circle
-  radius' sqrt 4
+write 'this is quote
+
+write `this is quasiquote
+
+write `this is quasiquote with unquote` string-length "bananas"
+
+define numbers list: 1, 2, 3, 4
+
+write `this is quasiquote with unquote-splicing`... numbers
+
+write `circle
+  radius` sqrt 4
   center point
-    x' sin 10
-    y' cos 10
+    x` sin 10
+    y` cos 10
 ```
 
 ### Macros
