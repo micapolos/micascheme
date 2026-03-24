@@ -39,10 +39,10 @@ document readme
     lists and maps >> example
       define numbers list: 1, 2, 3, 4, 5, 6
 
-      << various examples
-        input >>... numbers
-        mapped to strings >>... map: number->string, numbers
-        filtered odd numbers >>... filter: odd?, numbers
+      << lists
+        numbers >>... numbers
+        strings >>... map: number->string, numbers
+        odd numbers >>... filter: odd?, numbers
 
     lambdas >> example
       << mapped >>... map
@@ -63,7 +63,11 @@ document readme
         when
           my-macro: a, b
           add: a, b
+        when
+          my-macro: a, ...
+          list: quote a, ...
 
       << examples
         greeting >> my-macro "world"
         addition >> my-macro: 10, 20
+        quoted list >> my-macro: apple, orange, banana, pear, ...
