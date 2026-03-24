@@ -49,7 +49,7 @@
         ($substring (substring $string 2 (string-length $string))))
       (case (string-ref $substring 0)
         ((#\x)
-          (string->number (string-append "#" $substring)))
+          `(integer ,(string->number (string-append "#" $substring))))
         (else
           (case $substring
             ((".") 'dot)
