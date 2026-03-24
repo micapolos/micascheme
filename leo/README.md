@@ -1,71 +1,77 @@
+# Leo Scheme Programming Language
+
+Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses. This document is a valid program in Leo Scheme. It can be executed in the command line with `leo readme.leo`.
+
+---
+
+## Quick Start
+
+### Overview
+* **Indentation:** Leo translates indentation into standard Scheme s-expressions.
+* **Nesting:** Each indented block represents a new level of nesting.
+* **Quotes:** Text and code are separated using `<<` and `>>` quotes.
+* **Examples:** `example` forms contain code snippets to execute.
+
+### Basic Syntax
+```leo
+define hello "Hello"
+define world "world"
+string-append: hello, ", ", world, "!"
 ```
-import
-  leo scheme
-  leo document
 
-document readme
-  leo scheme programming language
+### Functions
+```leo
+define
+  exclamated s
+  string-append: s, "!!!"
+<< exclamated strings >>
+  exclamated "Cool"
+  exclamated "LOL"
+  exclamated "Wow"
+```
 
-  leo scheme is a dialect of scheme which uses indentation instead of parentheses
-  this document is a valid program in leo scheme
-  it can be executed in command line with "leo readme.leo"
+### Control Flow
+```leo
+if
+  greater?: 10, 5
+  "Obviously, 10 is greater than 5."
+  "What? 10 is not greater than 5?"
+```
 
-  quick start
-    overview
-      leo translates indentation into standard scheme s-expressions
-      each indented block represents a new level of nesting
-      text and code is separated using << and >> quotes
-      << example >> form contain code snippets to execute
+### Lists and Maps
+```leo
+define numbers list: 1, 2, 3, 4, 5, 6
 
-    basic syntax >> example
-      define hello "Hello"
-      define world "world"
-      string-append: hello, ", ", world, "!"
+<< various examples
+  input >>... numbers
+  mapped to strings >>... map: number->string, numbers
+  filtered odd numbers >>... filter: odd?, numbers
+```
 
-    functions >> example
-      define
-        exclamated s
-        string-append: s, "!!!"
-      << exclamated strings >>
-        exclamated "Cool"
-        exclamated "LOL"
-        exclamated "Wow"
+### Lambdas
+```leo
+<< mapped >>... map
+  lambda
+    with x
+    << mapping
+      original >> x
+      ncremented >> add: x, 1
+      doubled >> multiply: x, 2
+      to string >> number->string x
+  list: 1, 2, 3, 4
+```
 
-    control flow >> example
-      if
-        greater?: 10, 5
-        "Obviously, 10 is greater than 5."
-        "What? 10 is not greater than 5?"
+### Macros
+```leo
+define-macro
+  when
+    my-macro s
+    string-append: "Hello, ", s, "!"
+  when
+    my-macro: a, b
+    add: a, b
 
-    lists and maps >> example
-      define numbers list: 1, 2, 3, 4, 5, 6
-
-      << various examples
-        input >>... numbers
-        mapped to strings >>... map: number->string, numbers
-        filtered odd numbers >>... filter: odd?, numbers
-
-    lambdas >> example
-      << mapped >>... map
-        lambda
-          with x
-          << mapping
-            original >> x
-            ncremented >> add: x, 1
-            doubled >> multiply: x, 2
-            to string >> number->string x
-        list: 1, 2, 3, 4
-
-    macros >> example
-      define-macro
-        when
-          my-macro s
-          string-append: "Hello, ", s, "!"
-        when
-          my-macro: a, b
-          add: a, b
-
-      << examples
-        greeting >> my-macro "world"
-        addition >> my-macro: 10, 20
+<< examples
+  greeting >> my-macro "world"
+  addition >> my-macro: 10, 20
 ```
