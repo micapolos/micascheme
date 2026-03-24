@@ -14,7 +14,8 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 ```leo
 define hello "Hello"
 define world "world"
-string-append: hello, ", ", world, "!"
+
+write string-append: hello, ", ", world, "!"
 ```
 
 ### Functions
@@ -22,33 +23,33 @@ string-append: hello, ", ", world, "!"
 define
   exclamated s
   string-append: s, "!!!"
-<< exclamated strings >>
-  exclamated "Cool"
-  exclamated "LOL"
-  exclamated "Wow"
+
+write exclamated "Cool"
+write exclamated "LOL"
+write exclamated "Wow"
 ```
 
 ### Control Flow
 ```leo
-if
-  greater?: 10, 5
-  "Obviously, 10 is greater than 5."
-  "What? 10 is not greater than 5?"
+displayln
+  if
+    greater?: 10, 5
+    "Obviously, 10 is greater than 5."
+    "What? 10 is not greater than 5?"
 ```
 
 ### Lists and Maps
 ```leo
 define numbers list: 1, 2, 3, 4, 5, 6
 
-<< various examples
-  input >>... numbers
-  mapped to strings >>... map: number->string, numbers
-  filtered odd numbers >>... filter: odd?, numbers
+write numbers
+write map: number->string, numbers
+write filter: odd?, numbers
 ```
 
 ### Lambdas
 ```leo
-<< mapped >>... map
+write map
   lambda
     with x
     << mapping
@@ -69,7 +70,6 @@ define-macro
     my-macro: a, b
     add: a, b
 
-<< examples
-  greeting >> my-macro "world"
-  addition >> my-macro: 10, 20
+write my-macro "world"
+write my-macro: 10, 20
 ```
