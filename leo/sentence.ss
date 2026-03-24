@@ -4,7 +4,9 @@
     primitive-word
     sentence sentence? sentence-word sentence-args
     ->sentence?)
-  (import (micascheme))
+  (import
+    (micascheme)
+    (leo word))
 
   (data (sentence word args))
 
@@ -25,7 +27,7 @@
         (switch? (car $pair)
           ((symbol? $symbol)
             (sentence
-              (symbol->string $symbol)
+              (symbol->word $symbol)
               (cdr $pair)))))
       ((box? $box)
         (sentence

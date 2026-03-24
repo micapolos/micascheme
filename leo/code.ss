@@ -28,7 +28,7 @@
   (define code-single-line? (make-thread-parameter #f))
   (define code-pretty? (make-thread-parameter #f))
   (define code-line-limit (make-thread-parameter 7))
-  (define code-string-limit (make-thread-parameter 1.5))
+  (define code-string-limit (make-thread-parameter 1))
 
   (define (primitive-string $string)
     (parameterize ((sentence-pretty? (code-pretty?)))
