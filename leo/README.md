@@ -1,6 +1,6 @@
 # Leo Scheme Programming Language
 
-Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses. This document is a valid program in Leo Scheme. It can be executed in the command line with `leo readme.leo`.
+Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 
 ---
 
