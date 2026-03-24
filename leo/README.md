@@ -38,7 +38,7 @@ write
     quote 10 is not greater than 5
 ```
 
-### Lists and Maps
+### Lists
 ```leo
 define numbers list: 1, 2, 3, 4, 5, 6
 
