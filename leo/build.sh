@@ -109,6 +109,8 @@ find . -name "*.so" \
   ! -path "./$DEPS_BASE/*" \
   | cpio -pdm "$REL_MICASCHEME_DIR/"
 
+cp "$SRC_LEO_DIR"/document.leo "$REL_MICASCHEME_DIR/leo"
+
 # --- 6. Handle Wrapper Script ---
 if [ -f "$SRC_LEO_DIR/leo" ]; then
     echo "Copying wrapper to $REL_BIN_DIR/leo..."
