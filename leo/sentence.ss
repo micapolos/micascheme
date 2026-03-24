@@ -2,10 +2,13 @@
   (export
     sentence-pretty?
     primitive-word
+    word word? word-string
     sentence sentence? sentence-word sentence-args
+    ->word?
     ->sentence?)
   (import (micascheme))
 
+  (data (word string))
   (data (sentence word args))
 
   (define sentence-pretty? (make-thread-parameter #f))
@@ -15,6 +18,11 @@
       ((sentence-pretty?) $string)
       (else (string-append "#" $string))))
 
+  (define (->word? $obj)
+    (switch? $obj
+      ((symbol? $symbol)
+        (word (symbol->string $symbol)))))
+
   (define (->sentence? $obj)
     (switch? $obj
       ((char? $char)
@@ -22,11 +30,11 @@
           (primitive-word "char")
           (list (char->datum $char))))
       ((pair? $pair)
-        (switch? (car $pair)
-          ((symbol? $symbol)
+        (switch? (->word? (car $pair))
+          ((word? $word)
             (sentence-resolve-quotes
               (sentence
-                (symbol->string $symbol)
+                (word-string $word)
                 (cdr $pair))))))
       ((box? $box)
         (sentence
