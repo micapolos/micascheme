@@ -63,6 +63,7 @@ write list
   char dot
   char semicolon
   char integer 128512
+  char 😀
 ```
 
 ### Vectors

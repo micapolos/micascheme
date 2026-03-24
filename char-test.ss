@@ -19,6 +19,7 @@
 (check (char=? (char :) #\:))
 (check (char=? (char (integer 32)) #\space))
 (check (char=? (char (integer #x1F600)) #\😀))
+(check (char=? (char 😀) #\😀))
 
 (check (equal? (char->datum #\a) 'a))
 (check (equal? (char->datum #\space) 'space))
