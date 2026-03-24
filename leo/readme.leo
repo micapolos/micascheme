@@ -44,17 +44,6 @@ document readme
         strings >>... map: number->string, numbers
         odd numbers >>... filter: odd?, numbers
 
-    lambdas >> example
-      << mapped >>... map
-        lambda
-          with x
-          << mapping
-            original >> x
-            incremented >> add: x, 1
-            doubled >> multiply: x, 2
-            to string >> number->string x
-        list: 1, 2, 3, 4
-
     macros >> example
       define-macro
         when

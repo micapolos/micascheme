@@ -47,19 +47,6 @@ write map: number->string, numbers
 write filter: odd?, numbers
 ```
 
-### Lambdas
-```leo
-write map
-  lambda
-    with x
-    << mapped
-      original >> x
-      incremented >> add: x, 1
-      doubled >> multiply: x, 2
-      to string >> number->string x
-  list: 1, 2, 3, 4
-```
-
 ### Macros
 ```leo
 define-macro
