@@ -41,7 +41,7 @@ displayln if
 
 ### Lists
 ```leo
-define numbers list: 1, 2, 3, 4, 5, 6
+define numbers : 1, 2, 3, 4, 5, 6
 
 write numbers
 write map: number->string, numbers
