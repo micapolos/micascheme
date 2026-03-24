@@ -45,7 +45,7 @@
       (char +)
       (char -)
       (char dot)
-      (char at)))
+      (char at-sign)))
 
   (define initial-string
     (one-of

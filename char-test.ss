@@ -12,7 +12,7 @@
 
 (check (char=? (char colon) #\:))
 (check (char=? (char dot) #\.))
-(check (char=? (char at) #\@))
+(check (char=? (char at-sign) #\@))
 (check (char=? (char space) #\space))
 (check (char=? (char a) #\a))
 (check (char=? (char 0) #\0))
