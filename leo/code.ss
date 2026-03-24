@@ -432,6 +432,6 @@
   (define-rule-syntax (check-block-code in out ...)
     (check-code=? (block-code in) (lines-string out ...)))
 
-  (define leo-code
-    (if (code-single-line?) line-code block-code))
+  (define (leo-code $datum)
+    ((if (code-single-line?) line-code block-code) $datum))
 )

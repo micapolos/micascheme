@@ -47,7 +47,8 @@
         syntax-case
         parameterize)
       (only (micascheme) integer char true false keywords run)
-      (only (leo transform) from with)))
+      (only (leo transform) from with)
+      (only (leo code) code-single-line? code-pretty? code-line-limit)))
 
   ; TODO: Implement this entire file in .leo
 

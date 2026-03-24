@@ -5,3 +5,12 @@ write << circle
   center point
     x >> add: 2, 3
     y >> add: 10, 20
+
+parameterize
+  with code-single-line? #t
+  write << circle
+    radius 10
+    center point
+      x >> add: 2, 3
+      y >> add: 10, 20
+  newline:
