@@ -17,3 +17,9 @@
 (check (char=? (char a) #\a))
 (check (char=? (char 0) #\0))
 (check (char=? (char :) #\:))
+
+(check (equal? (char->datum #\a) 'a))
+(check (equal? (char->datum #\space) 'space))
+(check (equal? (char->datum #\0) 0))
+(check (equal? (char->datum #\.) 'dot))
+(check (equal? (char->datum #\;) 'semicolon))

@@ -2,7 +2,7 @@
   (export
     null-datum
     boolean->datum
-    char->datum
+    char->leo-datum
     bytevector->datum
     vector->datum
     ->datum)
@@ -13,21 +13,8 @@
   (define (boolean->datum $boolean)
     (if $boolean 'true 'false))
 
-  (define (char->datum $char)
-    `(char
-      ,(case $char
-        ((#\space) 'space)
-        (else
-          (lets
-            ($string (format "~s" $char))
-            ($string (substring $string 2 (string-length $string)))
-            (switch (string-ref $string 0)
-              ((char-numeric? $char-numeric)
-                (-
-                  (char->integer $char)
-                  (char->integer #\0)))
-              ((else _)
-                (string->symbol $string))))))))
+  (define (char->leo-datum $char)
+    `(char ,(char->datum $char)))
 
   (define (bytevector->datum $bytevector)
     `(bytevector ,@(bytevector->u8-list $bytevector)))
@@ -55,7 +42,7 @@
       ((string? $string) $string)
       ((null? $null) null-datum)
       ((boolean? $boolean) (boolean->datum $boolean))
-      ((char? $char) (char->datum $char))
+      ((char? $char) (char->leo-datum $char))
       ((vector? $vector) (vector->datum $vector))
       ((bytevector? $bytevector) (bytevector->datum $bytevector))
       ((else $other) $other)))

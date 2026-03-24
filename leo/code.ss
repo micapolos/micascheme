@@ -44,7 +44,10 @@
     (space-separated-code $car pair-separator-code $cdr))
 
   (define (prepare $datum)
-    (or (->sentence? $datum) $datum))
+    (switch $datum
+      ((boolean? $datum) $datum)
+      ((else $other)
+        (or (->sentence? $other) $other))))
 
   ; === atom-code? ===
 
@@ -78,13 +81,16 @@
 
   (define (pair-atom-code? $pair) #f)
 
-  (define (sentence-atom-code? $pair) #f)
+  (define (sentence-atom-code? $sentence)
+    (and
+      (null? (sentence-args $sentence))
+      (string-code (sentence-word $sentence))))
 
   (define (other-atom-code $other)
     (other-line-code $other))
 
   (define (atom-code? $datum)
-    (switch $datum
+    (switch (prepare $datum)
       ((null? _) null-atom-code)
       ((boolean? $boolean) (boolean-atom-code $boolean))
       ((number? $number) (number-atom-code $number))
@@ -175,20 +181,27 @@
   (define (box-line-code $box)
     (space-separated-code
       (primitive-code "box")
-      (line-code
-        (unbox $box))))
+      (line-code (unbox $box))))
 
   (define (sentence-line-code $sentence)
-    (space-separated-code
-      (string-code (sentence-word $sentence))
-      (code-in-round-brackets
-        (lines-code (sentence-args $sentence)))))
+    (lets
+      ($word-code (string-code (sentence-word $sentence)))
+      (switch (sentence-args $sentence)
+        ((null? _)
+          (code-in-round-brackets $word-code))
+        ((singleton-list? $args)
+          (space-separated-code $word-code (line-code (car $args))))
+        ((pair? $args)
+          (space-separated-code $word-code
+            (code-in-round-brackets (lines-code $args))))
+        ((else $args)
+          (pair-separated-code $word-code (line-code $args))))))
 
   (define (other-line-code $other)
     (string-code (format "~s" $other)))
 
   (define (line-code $datum)
-    (switch $datum
+    (switch (prepare $datum)
       ((null? _) null-line-code)
       ((boolean? $boolean) (boolean-line-code $boolean))
       ((number? $number) (number-line-code $number))
@@ -266,21 +279,29 @@
             (limiter (pair-separated-code $car-code $cdr-code)))))))
 
   (define (sentence-space-line-code?-limiter $sentence)
-    (lets
-      ($args (sentence-args $sentence))
-      (case (length $args)
-        ((1)
+    (limiter-lets?
+      ($word-code (limiter-using (string-code (sentence-word $sentence)) 1))
+      (switch (sentence-args $sentence)
+        ((null? _)
+          (limiter #f))
+        ((pair? $cdr)
+          (switch (cdr $cdr)
+            ((null? _)
+              (limiter-lets?
+                ($cdr-code (space-line-code?-limiter (car $cdr)))
+                (limiter (space-separated-code $word-code $cdr-code))))
+            ((else _)
+              (limiter #f))))
+        ((else $cdr)
           (limiter-lets?
-            ($word-code (limiter-using (string-code (sentence-word $sentence)) 1))
-            ($arg-code (space-line-code?-limiter (car $args)))
-            (limiter (space-separated-code $word-code $arg-code))))
-        (else (limiter #f)))))
+            ($cdr-code (space-line-code?-limiter $cdr))
+            (limiter (pair-separated-code $word-code $cdr-code)))))))
 
   (define (other-space-line-code-limiter $other)
     (limiter-using (other-line-code $other) 1))
 
   (define (space-line-code?-limiter $datum)
-    (switch $datum
+    (switch (prepare $datum)
       ((null? _) null-space-line-code-limiter)
       ((boolean? $boolean) (boolean-space-line-code-limiter $boolean))
       ((number? $number) (number-space-line-code-limiter $number))
@@ -291,6 +312,7 @@
       ((box? $box) (box-space-line-code?-limiter $box))
       ((bytevector? $bytevector) (bytevector-space-line-code?-limiter $bytevector))
       ((vector? $vector) (vector-space-line-code?-limiter $vector))
+      ((sentence? $sentence) (sentence-space-line-code?-limiter $sentence))
       ((else $other) (other-space-line-code-limiter $other))))
 
   (define (limit-space-line-code? $limit $datum)
@@ -349,7 +371,7 @@
 
   (define (list-colon-line-code?-limiter $list)
     (switch $list
-      ((null? _) (code ":"))
+      ((null? _) (limiter (code ":")))
       ((else $list)
         (limiter-lets
           ($code?s
@@ -357,8 +379,9 @@
               (map*
                 space-line-code?-limiter
                 (lambda ($item)
-                  (space-separated-code pair-separator-code
-                    (space-line-code?-limiter $item)))
+                  (limiter-lets
+                    ($line-code (space-line-code?-limiter $item))
+                    (limiter (space-separated-code pair-separator-code $line-code))))
                 $list)))
           (limiter
             (and
@@ -402,14 +425,16 @@
     (switch (limiter-unlimited-ref (sentence-space-line-code?-limiter $sentence))
       ((false? _)
         (limiter-lets
-          ($word-code (limiter-using (string-code (sentence-word $sentence )) 1))
-          ($arg-code?s (list->limiter (map space-line-code?-limiter (sentence-args $sentence))))
-          (limiter
-            (and
-              (for-all identity $arg-code?s)
-              (code $word-code
-                (if (null? $arg-code?s) (code ":") (code ": "))
-                (list->code (intercalate $arg-code?s comma-separator-code)))))))
+          ($symbol-code (limiter-using (string-code (sentence-word $sentence)) 1))
+          (switch (sentence-args $sentence)
+            ((singleton-list? $cdr)
+              (limiter-lets?
+                ($cdr-code (colon-line-code?-limiter (car $cdr)))
+                (limiter (space-separated-code $symbol-code $cdr-code))))
+            ((else $cdr)
+              (limiter-lets?
+                ($cdr-code (list-colon-line-code?-limiter $cdr))
+                (limiter (code $symbol-code $cdr-code)))))))
       ((else _)
         (sentence-space-line-code?-limiter $sentence))))
 
@@ -417,7 +442,7 @@
     (limiter-using (other-line-code $other) 1))
 
   (define (colon-line-code?-limiter $datum)
-    (switch $datum
+    (switch (prepare $datum)
       ((null? _) null-colon-line-code-limiter)
       ((boolean? $boolean) (boolean-colon-line-code-limiter $boolean))
       ((number? $number) (number-colon-line-code-limiter $number))
@@ -428,6 +453,7 @@
       ((box? $box) (box-colon-line-code?-limiter $box))
       ((bytevector? $bytevector) (bytevector-colon-line-code?-limiter $bytevector))
       ((vector? $vector) (vector-colon-line-code?-limiter $vector))
+      ((sentence? $sentence) (sentence-colon-line-code?-limiter $sentence))
       ((else $other) (other-colon-line-code-limiter $other))))
 
   (define (limit-colon-line-code? $limit $datum)
@@ -529,12 +555,15 @@
   (define (sentence-block-code $sentence)
     (switch (limiter-line-code? (sentence-colon-line-code?-limiter $sentence))
       ((false? _)
-        (code
-          (string-code (sentence-word $sentence))
-          #\newline
-          (code-indent
-            (list-block-code
-              (sentence-args $sentence)))))
+        (lets
+          ($symbol-code (string-code (sentence-word $sentence)))
+          (switch (sentence-args $sentence)
+            ((singleton-list? $cdr)
+              (space-separated-code $symbol-code
+                (block-code (car $cdr))))
+            ((else $cdr)
+              (code $symbol-code #\newline
+                (code-indent (list-block-code $cdr)))))))
       ((else $code)
         (newline-ended-code $code))))
 
@@ -542,7 +571,7 @@
     (newline-ended-code (string-code (format "~s" $other))))
 
   (define (block-code $datum)
-    (switch $datum
+    (switch (prepare $datum)
       ((null? _) null-block-code)
       ((boolean? $boolean) (boolean-block-code $boolean))
       ((number? $number) (number-block-code $number))
@@ -553,6 +582,7 @@
       ((box? $box) (box-block-code $box))
       ((bytevector? $bytevector) (bytevector-block-code $bytevector))
       ((vector? $vector) (vector-block-code $vector))
+      ((sentence? $sentence) (sentence-block-code $sentence))
       ((else $other) (other-block-code $other))))
 
   (define-rule-syntax (check-block-code in out ...)

@@ -2,23 +2,28 @@
 
 (check
   (equal?
-    (->sentence? '(foo ()))
+    (->sentence? '(foo))
     (sentence "foo" '())))
 
 (check
   (equal?
-    (->sentence? '(foo (bar)))
+    (->sentence? '(foo ()))
+    (sentence "foo" '(()))))
+
+(check
+  (equal?
+    (->sentence? '(foo bar))
     (sentence "foo" '(bar))))
 
 (check
   (equal?
-    (->sentence? #\a)
-    (sentence "#char" '(a))))
+    (->sentence? '(foo (bar)))
+    (sentence "foo" '((bar)))))
 
 (check
   (equal?
-    (->sentence? #\space)
-    (sentence "#char" '(space))))
+    (->sentence? #\:)
+    (sentence "#char" '(colon))))
 
 (check
   (equal?

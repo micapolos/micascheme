@@ -20,20 +20,13 @@
       ((char? $char)
         (sentence
           (primitive-word "char")
-          (lets
-            ($string (format "~s" $char))
-            (list
-              (string->symbol
-                (substring $string 2
-                  (string-length $string)))))))
+          (list (char->datum $char))))
       ((pair? $pair)
         (switch? (car $pair)
           ((symbol? $symbol)
-            (switch? (cdr $pair)
-              ((singleton-list? $cdr)
-                (sentence
-                  (symbol->string $symbol)
-                  (car $cdr)))))))
+            (sentence
+              (symbol->string $symbol)
+              (cdr $pair)))))
       ((box? $box)
         (sentence
           (primitive-word "box")

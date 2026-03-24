@@ -48,7 +48,7 @@
 (check-code=? (line-code #\a) "#char a")
 (check-code=? (line-code #\0) "#char 0")
 (check-code=? (line-code #\space) "#char space")
-(check-code=? (line-code #\.) "#char .")
+(check-code=? (line-code #\.) "#char dot")
 (check-code=? (line-code #\newline) "#char newline")
 
 (check-code=? (line-code "") "\"\"")
@@ -69,10 +69,10 @@
 (check-code=? (line-code (box '(foo . bar))) "#box foo -> bar")
 (check-code=? (line-code (box '(foo bar gar))) "#box foo (bar, gar)")
 
-(check-code=? (line-code (bytevector)) "#bytevector ()")
+(check-code=? (line-code (bytevector)) "(#bytevector)")
 (check-code=? (line-code (bytevector 1 2 3)) "#bytevector (1, 2, 3)")
 
-(check-code=? (line-code (vector)) "#vector ()")
+(check-code=? (line-code (vector)) "(#vector)")
 (check-code=?
   (line-code (vector '() #t 123 #\a "foo" 'foo '(foo bar) '(foo . bar)))
   "#vector (#null, #true, 123, #char a, \"foo\", foo, foo bar, foo -> bar)")
@@ -86,7 +86,7 @@
 (check-space-line-code 1 '() "#null")
 (check-space-line-code 1 #t "#true")
 (check-space-line-code 1 123 "123")
-(check-space-line-code 1 #\a "#char a")
+(check-space-line-code 2 #\a "#char a")
 (check-space-line-code 1.5 "foo" "\"foo\"")
 (check-space-line-code 1 'foo "foo")
 
@@ -121,7 +121,7 @@
 (check-colon-line-code 5 (vector '(foo bar) '(goo gar)) "#vector: foo bar, goo gar")
 (check-colon-line-code 7 (vector '(foo bar) '(goo gar) '(zoo zar)) "#vector: foo bar, goo gar, zoo zar")
 
-(check-colon-line-code-false? 4 (vector '(foo bar gar)))
+(check-colon-line-code 4 (vector '(foo bar gar)) "#vector foo: bar, gar")
 
 (check-colon-line-code 2 '(foo bar) "foo bar")
 (check-colon-line-code 3 '(foo bar gar) "foo: bar, gar")

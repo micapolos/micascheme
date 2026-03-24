@@ -6,7 +6,8 @@
     char-comma?
     char-dot?
     char-colon?
-    char)
+    char
+    char->datum)
   (import
     (scheme)
     (syntax))
@@ -37,4 +38,29 @@
                   (string-append
                     "#\\"
                     (symbol->string (datum id)))))))))))
+
+  (define (char->datum $char)
+    (let*
+      (
+        ($string (format "~s" $char))
+        ($substring (substring $string 2 (string-length $string))))
+      (case $substring
+        ((".") 'dot)
+        ((",") 'comma)
+        ((":") 'colon)
+        ((";") 'semicolon)
+        (("|") 'pipe)
+        (("\\") 'backslash)
+        (("#") 'hash)
+        (("'") 'quote)
+        (("`") 'backtick)
+        (("\"") 'double-quote)
+        (("(") 'open-round-bracket)
+        ((")") 'close-round-bracket)
+        (("[") 'open-square-bracket)
+        (("]") 'close-square-bracket)
+        (else
+          (or
+            (string->number $substring)
+            (string->symbol $substring))))))
 )
