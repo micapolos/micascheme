@@ -46,7 +46,7 @@
         define-syntax
         syntax-case
         parameterize)
-      (only (micascheme) char true false keywords run)
+      (only (micascheme) integer char true false keywords run)
       (only (leo transform) from with)))
 
   ; TODO: Implement this entire file in .leo

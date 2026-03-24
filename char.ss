@@ -10,6 +10,7 @@
     char->datum)
   (import
     (scheme)
+    (integer)
     (syntax))
 
   (define (char->ascii $char)
@@ -22,7 +23,9 @@
   (define (char-colon? $char) (char=? $char #\:))
 
   (define-syntax (char $syntax)
-    (syntax-case $syntax ()
+    (syntax-case $syntax (integer)
+      ((_ (integer i))
+        (literal->syntax (integer->char (datum i))))
       ((_ id)
         (literal->syntax
           (case (datum id)

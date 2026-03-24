@@ -14,5 +14,7 @@ write char 9
 
 write char space
 
+write char integer 128512
+
 write char=?: char a, char space
 write char=?: char a, char a

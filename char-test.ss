@@ -1,4 +1,4 @@
-(import (scheme) (check) (char))
+(import (scheme) (check) (integer) (char))
 
 (check (equal? (char->ascii #\space) #x20))
 (check (equal? (char->ascii (integer->char #xff)) #xff))
@@ -17,6 +17,7 @@
 (check (char=? (char a) #\a))
 (check (char=? (char 0) #\0))
 (check (char=? (char :) #\:))
+(check (char=? (char (integer 32)) #\space))
 
 (check (equal? (char->datum #\a) 'a))
 (check (equal? (char->datum #\space) 'space))

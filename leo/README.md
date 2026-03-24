@@ -51,11 +51,17 @@ write fold-left: +, 0, numbers
 
 ### Characters
 ```leo
-write char a
-write char 0
-write char space
-write char dot
-write char semicolon
+write list
+  char a
+  char A
+  char 0
+  char 9
+  char space
+  char newline
+  char dot
+  char semicolon
+  char integer 0
+  char integer 128512
 ```
 
 ### Vectors

@@ -95,6 +95,7 @@
       (generate)
       (identifier)
       (indexed)
+      (integer)
       (io)
       (language)
       (let)
