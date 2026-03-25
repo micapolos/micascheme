@@ -56,22 +56,27 @@
           (switch? (->sentence? (car $args))
             ((sentence? $args-sentence)
               (case (sentence-word $sentence)
-                (("quasiquote")
+                (("quote")
                   (sentence-resolve-quotes
                     (sentence
                       (string-append "'" (sentence-word $args-sentence))
+                      (sentence-args $args-sentence))))
+                (("quasiquote")
+                  (sentence-resolve-quotes
+                    (sentence
+                      (string-append "`" (sentence-word $args-sentence))
                       (sentence-args $args-sentence))))
                 (else
                   (case (sentence-word $args-sentence)
                     (("unquote")
                       (sentence-resolve-quotes
                         (sentence
-                          (string-append (sentence-word $sentence) "'")
+                          (string-append (sentence-word $sentence) "`")
                           (sentence-args $args-sentence))))
                     (("unquote-splicing")
                       (sentence-resolve-quotes
                         (sentence
-                          (string-append (sentence-word $sentence) "'...")
+                          (string-append (sentence-word $sentence) "`...")
                           (sentence-args $args-sentence))))
                     (else #f))))))))
         $sentence))
