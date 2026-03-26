@@ -145,9 +145,10 @@
   (define (pair->sentence $pair)
     (switch (car $pair)
       ((symbol? $symbol)
-        (phrase-cons
-          (symbol->string $symbol)
-          (cdr $pair)))
+        (sentence-quotify
+          (phrase-cons
+            (symbol->string $symbol)
+            (cdr $pair))))
       ((else $other)
         (cons #f (cons $other (cdr $pair))))))
 
