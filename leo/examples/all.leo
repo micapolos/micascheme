@@ -26,7 +26,6 @@ load-leo
   library
   list
   logging
-  pretty-print
   program
   quote
   sandbox

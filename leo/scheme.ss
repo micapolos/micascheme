@@ -11,7 +11,6 @@
     make-read-lambda
     write write-line
     display-line
-    pretty-print
     define-language
     define-syntax
     define-macro
@@ -43,7 +42,7 @@
         let letrec let-values
         let* letrec* let*-values
         let-syntax letrec-syntax
-        if cond pretty-print write
+        if cond write
         define-syntax
         syntax-case
         parameterize)
@@ -67,24 +66,18 @@
       ((x)
         (write x (%current-output-port)))
       ((x port)
-        (%put-string port (code-string (block-code x))))))
+        (%parameterize ((primitive-string-pretty? #t))
+          (%put-string port (code-string (block-code x)))))))
 
   (%define write-line
     (%case-lambda
       ((x)
         (write-line x (%current-output-port)))
       ((x port)
-        (%let ((p port))
-          (%put-string p (code-string (line-code x)))
-          (%newline p)))))
-
-  (%define pretty-print
-    (%case-lambda
-      ((x)
-        (pretty-print x (%current-output-port)))
-      ((x port)
         (%parameterize ((primitive-string-pretty? #t))
-          (%put-string port (code-string (block-code x)))))))
+          (%let ((p port))
+            (%put-string p (code-string (line-code x)))
+            (%newline p))))))
 
   (%define (display-line x)
     (%display x)
