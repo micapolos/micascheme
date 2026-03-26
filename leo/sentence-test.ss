@@ -205,3 +205,17 @@
     (->sentence #'+)
     (phrase "#syntax" '(+))))
 
+(check
+  (equal?
+    (list->sentences 123)
+    "123"))
+
+(check
+  (equal?
+    (list->sentences '(1 2 3))
+    '("1" "2" "3")))
+
+(check
+  (equal?
+    (list->sentences '(1 2 . 3))
+    '("1" "2" . "3")))

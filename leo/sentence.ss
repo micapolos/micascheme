@@ -18,7 +18,8 @@
 
     sentence-quotify
 
-    ->sentence)
+    ->sentence
+    list->sentences)
   (import
     (micascheme)
     (procedure-name))
@@ -184,4 +185,7 @@
       ((syntax? $syntax) (syntax->sentence $syntax))
       ((record? $record) (record->sentence $record))
       ((else $other) (other->sentence $other))))
+
+  (define (list->sentences $list)
+    (map* ->sentence ->sentence $list))
 )
