@@ -31,6 +31,7 @@
     (writing)
     (code)
     (leo code)
+    (leo sentence)
     (leo reader)
     (leo datum)
     (leo writing-reader))
@@ -82,7 +83,7 @@
       ((x)
         (pretty-print x (%current-output-port)))
       ((x port)
-        (%parameterize ((code-pretty? #t))
+        (%parameterize ((primitive-string-pretty? #t))
           (%put-string port (code-string (block-code x)))))))
 
   (%define (display-line x)
