@@ -1,6 +1,6 @@
 (library (pair)
   (export
-    null-or-pair?
+    null/pair?
     singleton-list?
     pair
     pair-map
@@ -14,7 +14,7 @@
     (lets)
     (binder))
 
-  (define (null-or-pair? $obj)
+  (define (null/pair? $obj)
     (or (null? $obj) (pair? $obj)))
 
   (define (singleton-list? $obj)

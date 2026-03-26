@@ -156,12 +156,12 @@
 (check (syntax=? (syntax-update #'((a . b) (c . d)) #'a remove-fn) #'((c . d))))
 (check (syntax=? (syntax-update #'((a . b) (c . d) (a . g)) #'a remove-fn) #'((c . d) (a . g))))
 
-(define (update-or-new-fn $a) (if $a #`(updated #,$a) #'new))
-(check (syntax=? (syntax-update #'() #'a update-or-new-fn) #'((a . new))))
-(check (syntax=? (syntax-update #'((a . b)) #'a update-or-new-fn) #'((a . (updated b)))))
-(check (syntax=? (syntax-update #'((a . b) (c . d)) #'a update-or-new-fn) #'((a . (updated b)) (c . d))))
-(check (syntax=? (syntax-update #'((a . b) (c . d) (a . g)) #'a update-or-new-fn) #'((a . (updated b)) (c . d) (a . g))))
-(check (syntax=? (syntax-update #'((a . b)) #'e update-or-new-fn) #'((a . b) (e . new))))
+(define (update/new-fn $a) (if $a #`(updated #,$a) #'new))
+(check (syntax=? (syntax-update #'() #'a update/new-fn) #'((a . new))))
+(check (syntax=? (syntax-update #'((a . b)) #'a update/new-fn) #'((a . (updated b)))))
+(check (syntax=? (syntax-update #'((a . b) (c . d)) #'a update/new-fn) #'((a . (updated b)) (c . d))))
+(check (syntax=? (syntax-update #'((a . b) (c . d) (a . g)) #'a update/new-fn) #'((a . (updated b)) (c . d) (a . g))))
+(check (syntax=? (syntax-update #'((a . b)) #'e update/new-fn) #'((a . b) (e . new))))
 
 (check (syntax-false? #'#f))
 (check (not (syntax-false? #'#t)))

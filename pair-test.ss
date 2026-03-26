@@ -1,10 +1,10 @@
 (import (scheme) (check) (pair) (procedure))
 
-; === null-or-pair? ===
+; === null/pair? ===
 
-(check-equal? (null-or-pair? `()) #t)
-(check-equal? (null-or-pair? (cons 1 2)) #t)
-(check-equal? (null-or-pair? 123) #f)
+(check-equal? (null/pair? `()) #t)
+(check-equal? (null/pair? (cons 1 2)) #t)
+(check-equal? (null/pair? 123) #f)
 
 ; === singleton-list? ===
 

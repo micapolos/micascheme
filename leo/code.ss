@@ -68,7 +68,7 @@
       ($body-code
         (switch (phrase-body $phrase)
           ((singleton-list? _) $lines-code)
-          ((null-or-pair? _) (code-in-round-brackets $lines-code))
+          ((null/pair? _) (code-in-round-brackets $lines-code))
           ((else _) (space-separated-code pair-separator-code $lines-code))))
       (switch (phrase-string? $phrase)
         ((string? $string)

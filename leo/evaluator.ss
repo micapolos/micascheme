@@ -34,8 +34,8 @@
     (tuple (list $item ...)))
 
   (define (evaluate-list $values)
-    (bind-if null-or-pair?
-      (fold-while null-or-pair?
+    (bind-if null/pair?
+      (fold-while null/pair?
         (lambda ($stack $value)
           (switch (evaluate $value)
             ((evaluated? $evaluated) (push $stack $evaluated))
@@ -55,7 +55,7 @@
       ((string? $string)
         (evaluated $string (string-type)))
       ((tuple? $tuple)
-        (bind-if null-or-pair?
+        (bind-if null/pair?
           (evaluate-list (tuple-items $tuple))
           (lambda ($evaluated-list)
             (evaluated

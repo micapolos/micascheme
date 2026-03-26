@@ -153,13 +153,13 @@
       (syntax-selector $pattern)
       (syntax-error $pattern "pattern syntax error")))
 
-  (define (syntax-clause-or-rule-id $rule)
+  (define (syntax-clause/rule-id $rule)
     (syntax-case $rule ()
       (($pattern . $rest)
         (syntax-pattern-id #'$pattern))))
 
-  (define syntax-rule-id syntax-clause-or-rule-id)
-  (define syntax-clause-id syntax-clause-or-rule-id)
+  (define syntax-rule-id syntax-clause/rule-id)
+  (define syntax-clause-id syntax-clause/rule-id)
 
   (define-syntax (syntax-case-opt $syntax)
     (syntax-case $syntax ()
