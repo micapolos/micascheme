@@ -1,7 +1,8 @@
 (library (leo sentence)
   (export
-    phrase phrase? phrase-string? phrase-body
+    phrase-cons phrase? phrase-string? phrase-body
     sentence? sentence-switch
+    phrase sentence
 
     primitive-string-pretty?
     primitive-string
@@ -24,10 +25,16 @@
     (micascheme)
     (procedure-name))
 
-  (define phrase cons)
+  (define (phrase-cons word body) (cons word body))
   (define phrase? pair?)
   (define phrase-string? car)
   (define phrase-body cdr)
+
+  (define-rules-syntaxes
+    ((phrase (word x ...)) (phrase-cons word (list 'x ...)))
+    ((phrase (word x ... . tail)) (phrase-cons word (list* 'x ... 'tail)))
+    ((sentence (word . tail)) (phrase (word . tail)))
+    ((sentence word) word))
 
   (union (sentence string phrase))
 
@@ -51,7 +58,7 @@
   (define (quote-phrase? $quote $phrase)
     (lets?
       ($word (quote-string? $quote (phrase-string? $phrase)))
-      (cons $word (phrase-body $phrase))))
+      (phrase-cons $word (phrase-body $phrase))))
 
   (define (quote-sentence? $quote $sentence)
     (sentence-switch $sentence
@@ -67,7 +74,7 @@
   (define (unquote-phrase? $unquote $phrase)
     (lets?
       ($string (unquote-string? $unquote (phrase-string? $phrase)))
-      (cons $string (phrase-body $phrase))))
+      (phrase-cons $string (phrase-body $phrase))))
 
   (define (unquote-sentence? $unquote $sentence)
     (sentence-switch $sentence
@@ -76,26 +83,42 @@
 
   ; === quotify
 
+  (define (word-quote? $word)
+    (case $word
+      (("quote") "'")
+      (("quasiquote") "`")
+      (else #f)))
+
+  (define (word-unquote? $word)
+    (case $word
+      (("unquote") "`")
+      (("unquote-splicing") "`...")
+      (else #f)))
+
   (define (sentence-quotify $sentence)
     (sentence-switch $sentence
       ((string? $string) $string)
       ((phrase? $phrase)
-        (lets
-          ($string? (phrase-string? $phrase))
-          ($body-sentence (->sentence (phrase-body $phrase)))
-          (or
-            (case $string?
-              (("quote") (quote-sentence? "'" $body-sentence))
-              (("quasiquote") (quote-sentence? "`" $body-sentence))
-              (else
-                (switch $body-sentence
-                  ((string? _) #f)
-                  ((phrase? $body-phrase)
-                    (case (phrase-string? $phrase)
-                      (("unquote") (unquote-sentence? "`" $body-sentence))
-                      (("unquote-splicing") (unquote-sentence? "`..." $body-sentence))
-                      (else #f))))))
-            $phrase)))))
+        (or
+          (switch? (phrase-body $phrase)
+            ((singleton-list? $body)
+              (lets
+                ($body-sentence (->sentence (car $body)))
+                (switch (word-quote? (phrase-string? $phrase))
+                  ((string? $quote)
+                    (quote-sentence? $quote $body-sentence))
+                  ((else _)
+                    (switch? $body-sentence
+                      ((phrase? $body-phrase)
+                        (lets
+                          ($body-body (phrase-body $body-phrase))
+                          (switch? (word-unquote? (phrase-string? $body-phrase))
+                            ((string? $unquote)
+                              (unquote-sentence? $unquote
+                                (phrase-cons
+                                  (phrase-string? $phrase)
+                                  (phrase-body $body-phrase)))))))))))))
+            $phrase))))
 
   ; === ->sentence
 
@@ -109,7 +132,7 @@
     (number->string $number))
 
   (define (char->sentence $char)
-    (phrase
+    (phrase-cons
       (primitive-string "char")
       (list (char->datum $char))))
 
@@ -122,31 +145,31 @@
   (define (pair->sentence $pair)
     (switch (car $pair)
       ((symbol? $symbol)
-        (phrase
+        (phrase-cons
           (symbol->string $symbol)
           (cdr $pair)))
       ((else $other)
         (cons #f (cons $other (cdr $pair))))))
 
   (define (box->sentence $box)
-    (phrase
+    (phrase-cons
       (primitive-string "box")
       (list (unbox $box))))
 
   (define (bytevector->sentence $bytevector)
-    (phrase
+    (phrase-cons
       (primitive-string "bytevector")
       (bytevector->u8-list $bytevector)))
 
   (define (vector->sentence $vector)
-    (phrase
+    (phrase-cons
       (primitive-string "vector")
       (vector->list $vector)))
 
   (define (record->sentence $record)
     (lets
       ($rtd (record-rtd $record))
-      (phrase
+      (phrase-cons
         (primitive-string (symbol->string (record-type-name $rtd)))
         (map-with
           ($index (iota (vector-length (record-type-field-names $rtd))))
@@ -157,12 +180,12 @@
       ($word (primitive-string "procedure"))
       (switch (procedure-name? $procedure)
         ((symbol? $name)
-          (phrase $word `(,$name)))
+          (phrase-cons $word `(,$name)))
         ((else _) $word))))
 
   (define (syntax->sentence $syntax)
     ; TODO: Include annotation
-    (phrase
+    (phrase-cons
       (primitive-string "syntax")
       (list (syntax->datum $syntax))))
 

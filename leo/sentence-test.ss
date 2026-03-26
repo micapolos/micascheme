@@ -14,24 +14,24 @@
 (check (equal? (quote-string? "'" "foo") "'foo"))
 (check (equal? (quote-string? "'" #f) #f))
 
-(check (equal? (quote-phrase? "'" (phrase #f 123)) #f))
+(check (equal? (quote-phrase? "'" '(#f 123)) #f))
 
 (check
   (equal?
-    (quote-phrase? "'" (phrase "foo" 123))
-    (phrase "'foo" 123)))
+    (quote-phrase? "'" '("foo" 123))
+    '("'foo" 123)))
 
 (check
   (equal?
     (quote-sentence? "'" "foo")
     "'foo"))
 
-(check (equal? (quote-sentence? "'" (phrase #f 123)) #f))
+(check (equal? (quote-sentence? "'" '(#f 123)) #f))
 
 (check
   (equal?
-    (quote-sentence? "'" (phrase "foo" 123))
-    (phrase "'foo" 123)))
+    (quote-sentence? "'" '("foo" 123))
+    '("'foo" 123)))
 
 ; === unquote
 
@@ -40,36 +40,73 @@
 (check (equal? (unquote-string? "`" "foo") "foo`"))
 (check (equal? (unquote-string? "`" #f) #f))
 
-(check (equal? (unquote-phrase? "`" (phrase #f 123)) #f))
+(check (equal? (unquote-phrase? "`" '(#f 123)) #f))
 
 (check
   (equal?
-    (unquote-phrase? "`" (phrase "foo" 123))
-    (phrase "foo`" 123)))
+    (unquote-phrase? "`" '("foo" 123))
+    '("foo`" 123)))
 
 (check
   (equal?
     (unquote-sentence? "`" "foo")
     "foo`"))
 
-(check (equal? (unquote-sentence? "`" (phrase #f 123)) #f))
+(check (equal? (unquote-sentence? "`" '(#f 123)) #f))
 
 (check
   (equal?
-    (unquote-sentence? "`" (phrase "foo" 123))
-    (phrase "foo`" 123)))
+    (unquote-sentence? "`" '("foo" 123))
+    '("foo`" 123)))
 
-; === quotify
+; === quotify / quote
 
-(check (equal? (sentence-quotify "quote") "quote"))
-(check (equal? (sentence-quotify (phrase "quote" 'bar)) "'bar"))
-(check (equal? (sentence-quotify "quasiquote") "quasiquote"))
-(check (equal? (sentence-quotify (phrase "quasiquote" 'bar)) "`bar"))
+(check
+  (equal?
+    (sentence-quotify "quote")
+    "quote"))
 
-; (check (equal? (sentence-quotify "unquote") "unquote"))
-; (check (equal? (sentence-quotify (phrase "bar" (phrase "unquote" 'foo))) (phrase "bar`" 'foo)))
-; (check (equal? (sentence-quotify "quasiquote") "quasiquote"))
-; (check (equal? (sentence-quotify (phrase "quasiquote" 'bar)) "`bar"))
+(check
+  (equal?
+    (sentence-quotify '("quote" . bar))
+    '("quote" . bar)))
+
+(check
+  (equal?
+    (sentence-quotify '("quote" foo))
+    "'foo"))
+
+(check
+  (equal?
+    (sentence-quotify '("quote" foo bar))
+    '("quote" foo bar)))
+
+(check
+  (equal?
+    (sentence-quotify '("quote" (foo bar)))
+    '("'foo" bar)))
+
+(check
+  (equal?
+    (sentence-quotify '("quote" (foo (bar gar))))
+    '("'foo" (bar gar))))
+
+; === quotify / unquote
+
+(check
+  (equal?
+    (sentence-quotify "unquote")
+    "unquote"))
+
+(check
+  (equal?
+    (sentence-quotify '("bar" (unquote . foo)))
+    '("bar`" . foo)))
+
+(check
+  (equal?
+    (sentence-quotify '("bar" (unquote foo)))
+    '("bar`" foo)))
 
 ; === ->sentence
 
@@ -101,12 +138,12 @@
 (check
   (equal?
     (->sentence #\a)
-    (phrase "#char" '(a))))
+    '("#char" a)))
 
 (check
   (equal?
     (->sentence #\:)
-    (phrase "#char" '(colon))))
+    '("#char" colon)))
 
 (check
   (equal?
@@ -121,79 +158,79 @@
 (check
   (equal?
     (->sentence '(foo))
-    (phrase "foo" '())))
+    '("foo")))
 
 (check
   (equal?
     (->sentence '(foo ()))
-    (phrase "foo" '(()))))
+    '("foo" ())))
 
 (check
   (equal?
     (->sentence '(foo bar))
-    (phrase "foo" '(bar))))
+    '("foo" bar)))
 
 (check
   (equal?
     (->sentence '(foo (bar)))
-    (phrase "foo" '((bar)))))
+    '("foo" (bar))))
 
 (check
   (equal?
     (->sentence '(123))
-    (phrase #f '(123))))
+    '(#f 123)))
 
 (check
   (equal?
     (->sentence '(123 ()))
-    (phrase #f '(123 ()))))
+    '(#f 123 ())))
 
 (check
   (equal?
     (->sentence '(123 bar))
-    (phrase #f '(123 bar))))
+    '(#f 123 bar)))
 
 (check
   (equal?
     (->sentence '(123 (bar)))
-    (phrase #f '(123 (bar)))))
+    '(#f 123 (bar))))
 
 (check
   (equal?
     (->sentence (box 10))
-    (phrase "#box" '(10))))
+    '("#box" 10)))
 
 (check
   (equal?
     (->sentence (bytevector))
-    (phrase "#bytevector" '())))
+    '("#bytevector")))
 
 (check
   (equal?
     (->sentence (bytevector 1 2 3))
-    (phrase "#bytevector" '(1 2 3))))
+    '("#bytevector" 1 2 3)))
 
 (check
   (equal?
     (->sentence (vector))
-    (phrase "#vector" '())))
+    '("#vector")))
 
 (check
   (equal?
     (->sentence (vector #\a #\space "foo"))
-    (phrase "#vector" '(#\a #\space "foo"))))
+    '("#vector" #\a #\space "foo")))
 
 (data (point x y))
 
 (check
   (equal?
     (->sentence (point 10 20))
-    (phrase "#point" '(10 20))))
+    '("#point" 10 20)))
 
 (check
   (equal?
     (->sentence +)
-    (phrase "#procedure" '(+))))
+    '("#procedure" +)))
 
 (check
   (equal?
@@ -203,7 +240,7 @@
 (check
   (equal?
     (->sentence #'+)
-    (phrase "#syntax" '(+))))
+    '("#syntax" +)))
 
 (check
   (equal?
