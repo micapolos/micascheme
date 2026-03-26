@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.36
+    quotified writer
   v0.1.35
     improve: write, write-line
   v0.1.34
