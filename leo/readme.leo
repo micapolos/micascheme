@@ -54,6 +54,17 @@ document readme
         odd numbers >>... filter: odd?, numbers
         sum >> fold-left: +, 0, numbers
 
+    quoting >>
+      example quote this is a-quote
+      example << this is a-quasiquote
+      example << this is a-quasiquote with an-unquote >> add: 2, 2
+      example << this is a-quasiquote with an-unquote-splicing >>... list: 1, 2, 3, 4
+      example << circle
+        radius >> sqrt 4
+        center point
+          x >> sin 10
+          y >> cos 10
+
     macros >> example
       define-macro
         when
