@@ -28,10 +28,10 @@
 
 (check-atom-code? (box 123) #f)
 
-(check-atom-code? (bytevector) "#bytevector")
+(check-atom-code? (bytevector) #f)
 (check-atom-code? (bytevector 1) #f)
 
-(check-atom-code? (vector) "#vector")
+(check-atom-code? (vector) #f)
 (check-atom-code? (vector 1) #f)
 
 ; === line-code
@@ -56,7 +56,7 @@
 
 (check-code=? (line-code '(foo . bar)) "foo -> bar")
 (check-code=? (line-code '(foo gar . bar)) "foo (gar -> bar)")
-(check-code=? (line-code '(foo)) "(foo)")
+(check-code=? (line-code '(foo)) "foo ()")
 (check-code=? (line-code '(foo bar)) "foo bar")
 (check-code=? (line-code '((foo bar))) "(foo bar)")
 (check-code=? (line-code '(foo (bar goo))) "foo bar goo")
@@ -70,10 +70,10 @@
 (check-code=? (line-code (box '(foo . bar))) "#box foo -> bar")
 (check-code=? (line-code (box '(foo bar gar))) "#box foo (bar, gar)")
 
-(check-code=? (line-code (bytevector)) "(#bytevector)")
+(check-code=? (line-code (bytevector)) "#bytevector ()")
 (check-code=? (line-code (bytevector 1 2 3)) "#bytevector (1, 2, 3)")
 
-(check-code=? (line-code (vector)) "(#vector)")
+(check-code=? (line-code (vector)) "#vector ()")
 (check-code=?
   (line-code (vector '() #t 123 #\a "foo" 'foo '(foo bar) '(foo . bar)))
   "#vector (#null, #true, 123, #char a, \"foo\", foo, foo bar, foo -> bar)")
@@ -128,7 +128,7 @@
 (check-colon-line-code 2 '(foo bar) "foo bar")
 (check-colon-line-code 3 '(foo bar gar) "foo: bar, gar")
 (check-colon-line-code 4 '((foo bar) (goo gar)) ": foo bar, goo gar")
-(check-colon-line-code 2 '(1 bar) "1 bar")
+(check-colon-line-code 2 '(1 bar) ": 1, bar")
 (check-colon-line-code 3 '(1 foo bar) ": 1, foo, bar")
 (check-colon-line-code-false? 4 '(foo bar ((gar zar))))
 

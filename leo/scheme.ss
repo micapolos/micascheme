@@ -9,7 +9,7 @@
     if then cond
     switch any?
     make-read-lambda
-    write
+    write write-line
     display-line
     pretty-print
     define-language
@@ -48,7 +48,7 @@
         parameterize)
       (only (micascheme) integer char true false keywords run)
       (only (leo transform) from with)
-      (only (leo code) code-single-line? code-pretty? code-line-limit)))
+      (only (leo code) code-pretty? code-line-limit)))
 
   ; TODO: Implement this entire file in .leo
 
@@ -66,7 +66,16 @@
       ((x)
         (write x (%current-output-port)))
       ((x port)
-        (%put-string port (code-string (leo-code x))))))
+        (%put-string port (code-string (block-code x))))))
+
+  (%define write-line
+    (%case-lambda
+      ((x)
+        (write-line x (%current-output-port)))
+      ((x port)
+        (%let ((p port))
+          (%put-string p (code-string (line-code x)))
+          (%newline p)))))
 
   (%define pretty-print
     (%case-lambda
@@ -74,7 +83,7 @@
         (pretty-print x (%current-output-port)))
       ((x port)
         (%parameterize ((code-pretty? #t))
-          (%put-string port (code-string (leo-code x)))))))
+          (%put-string port (code-string (block-code x)))))))
 
   (%define (display-line x)
     (%display x)
