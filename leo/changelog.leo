@@ -1,8 +1,8 @@
 import leo scheme
 
 quote changelog
-  latest
-    write quotes instead of << and >>
+  v0.1.35
+    improve: write, write-line
   v0.1.34
     improve writing quotes
     improved readme
