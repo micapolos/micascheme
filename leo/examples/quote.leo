@@ -2,20 +2,22 @@ import
   leo scheme
   only: datum->string, from micascheme
 
-write 'string-append: "foo", "bar"
+write 'quoted string-append: "foo", "bar"
 
-write `this is quoted` string-append: "foo", "bar"
+write `quasiquoted and unquoted` string-append: "foo", "bar"
 
-write `this is quoted list`... list: "foo", "bar"
+write `quasiquoted and unquoted-splicing`... list: "foo", "bar"
 
-write `this is structural quoting circle
+write `circle
   radius` add: 10, 20
   center point
     x` sin 10
     y` cos 10
+  labels`... list: "nice", "looking", "circle"
 
-write '`this is structural quoting circle
+write 'quoted `circle
   radius` add: 10, 20
   center point
     x` sin 10
     y` cos 10
+  labels`... list: "nice", "looking", "circle"
