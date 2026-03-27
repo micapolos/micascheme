@@ -4,7 +4,9 @@ todo
   custom write-handler
   repl
   fix todo in leo code
-  fix: import, export, rename, and more
+  fix
+    import, export, rename, and more
+    in leo scheme
   make eval work
   custom writer for
     exceptions
