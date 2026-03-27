@@ -10,7 +10,7 @@
     switch any?
     make-read-lambda
     write write-line
-    open-list
+    list closed-list open-list
     display-line
     define-language
     define-syntax
@@ -45,7 +45,8 @@
         if cond write
         define-syntax
         syntax-case
-        parameterize)
+        parameterize
+        list)
       (only (micascheme) integer char true false keywords run)
       (only (leo transform) from with)
       (only (char) code)
@@ -94,9 +95,10 @@
   (%define greater? %>)
   (%define greater/equal? %>=)
 
+  (%define closed-list %list)
   (%define open-list %list*)
 
-  (define-rules-syntaxes (keywords with then %else %when %list keywords)
+  (define-rules-syntaxes (keywords with then %else %when %list %and keywords)
     ((define (name x))
       (%define name x))
     ((define (name param ... (l ellipses)) x xs ...)
@@ -166,6 +168,9 @@
       (%switch x ((a b) c) ... ((%else _) d)))
     ((switch x (%when (a b) c) ...)
       (%switch x ((a b) c) ...))
+
+    ((list xs ... (%and last)) (open-list xs ... last))
+    ((list xs ... ) (closed-list xs ...))
 
     ((logging x)
       (let

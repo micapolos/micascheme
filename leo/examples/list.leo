@@ -5,6 +5,29 @@ write `fruit` list
   "banana"
   "orange"
 
+write `fruit and animal` list
+  "apple"
+  "banana"
+  "orange"
+  and list
+    "cat"
+    "dog"
+    "tiger"
+
+write `closed` closed-list
+  "apple"
+  "banana"
+  "orange"
+
+write `open` open-list
+  "apple"
+  "banana"
+  "orange"
+  list
+    "cat"
+    "dog"
+    "tiger"
+
 write `number to string` map
   number->string
   list: 1, 2, 3, 4
