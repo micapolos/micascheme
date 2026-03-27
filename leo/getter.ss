@@ -50,19 +50,41 @@
         ((else $other)
           (getter $literal-annotation)))))
 
+  (define (char->quote? $quote)
+    (case $quote
+      ((#\') 'quote)
+      ((#\`) 'quasiquote)
+      (else #f)))
+
+  (define (quoted-getter $line-getter)
+    (getter-lets
+      ($char peek-char-getter)
+      (switch (char->quote? $char)
+        ((symbol? $symbol)
+          (getter-lets
+            ($quote-annotation
+              (annotation-getter
+                (replace-getter char-getter $symbol)
+                stripped-annotation))
+            ($line $line-getter)
+            (getter (list $quote-annotation $line))))
+        ((else _)
+          $line-getter))))
+
   (define line-annotation-getter
     (annotation-getter
-      (getter-switch peek-char-getter
-        ((char-colon? _)
-          (skip-char-getter colon-line-annotations-getter))
-        ((else _)
-          (getter-lets
-            ($atom-annotation atom-annotation-getter)
-            (getter-switch rhs-line-annotations-getter
-              ((false? _)
-                (getter $atom-annotation))
-              ((else $rhs-line-annotations)
-                (getter (cons $atom-annotation $rhs-line-annotations)))))))
+      (quoted-getter
+        (getter-switch peek-char-getter
+          ((char-colon? _)
+            (skip-char-getter colon-line-annotations-getter))
+          ((else _)
+            (getter-lets
+              ($atom-annotation atom-annotation-getter)
+              (getter-switch rhs-line-annotations-getter
+                ((false? _)
+                  (getter $atom-annotation))
+                ((else $rhs-line-annotations)
+                  (getter (cons $atom-annotation $rhs-line-annotations))))))))
       (lambda ($line $source-object)
         (switch $line
           ((annotation? $line) $line)

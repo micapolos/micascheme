@@ -64,6 +64,11 @@
 (check-gets line-getter "foo:\n  10\n" '(foo 10) 10)
 (check-gets line-getter "foo:\n  10\n  20\n" '(foo 10 20) 15)
 
+; quoting
+
+(check-gets line-getter "'foo\n" ''foo 5)
+(check-gets line-getter "`foo\n" '`foo 5)
+
 (check-gets
   line-getter
   (lines-string
