@@ -1,20 +1,11 @@
 import leo scheme
 
-write `strings` list
-  "this"
-  "is"
-  "a"
-  "list"
-  "of"
-  "strings"
+write `fruit` list
+  "apple"
+  "banana"
+  "orange"
 
-write `open strings` open-list
-  "list"
-  "of"
-  "strings"
-  'other-strings
-
-write `number string` map
+write `number to string` map
   number->string
   list: 1, 2, 3, 4
 
