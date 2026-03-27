@@ -7,21 +7,17 @@ todo
   make eval work
   custom writer for
     exceptions
-    records
   improve syntax-error messages
     to include usage examples
-    make it automatic in define-rules-syntax
   comments
     line comment using colon
     structural using comment
     block using: comment, parentheses
   customize remaining built-in syntaxes for leo
-    parameterize
-    cond
+    syntax-rules
     etc ...
   command line flags
     library directories
-    optimization level
   figure out how to
     compile separate libraries for
       optimization level 2
