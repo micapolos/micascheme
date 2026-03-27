@@ -60,7 +60,7 @@ write list
   char newline
   char dot
   char semicolon
-  char integer 128512
+  char code 128512
   char 😀
 ```
 

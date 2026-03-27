@@ -11,7 +11,9 @@
   (import
     (scheme)
     (integer)
-    (syntax))
+    (syntax)
+    (only (code) code))
+  (export (import (only (code) code)))
 
   (define (char->ascii $char)
     (bitwise-and #xff (char->integer $char)))
@@ -23,8 +25,8 @@
   (define (char-colon? $char) (char=? $char #\:))
 
   (define-syntax (char $syntax)
-    (syntax-case $syntax (integer)
-      ((_ (integer i))
+    (syntax-case $syntax (code)
+      ((_ (code i))
         (literal->syntax (integer->char (datum i))))
       ((_ id)
         (literal->syntax
@@ -61,7 +63,7 @@
         ($substring (substring $string 2 (string-length $string))))
       (case (string-ref $substring 0)
         ((#\x)
-          `(integer ,(string->number (string-append "#" $substring))))
+          `(code ,(string->number (string-append "#" $substring))))
         (else
           (case $substring
             ((".") 'dot)
