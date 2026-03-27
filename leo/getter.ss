@@ -97,7 +97,7 @@
         ((else _)
           (getter #f)))))
 
-  (define (quoted-getter $line-getter)
+  (define (quoted-annotation-getter $line-getter)
     (getter-switch quote-annotation?-getter
       ((annotation? $annotation)
         (getter-lets
@@ -108,19 +108,30 @@
       ((else _)
         $line-getter)))
 
-  (define (unquoted-getter $lines-getter)
+  (define (unquoted-annotations-getter $line-annotations-getter)
     (getter-switch unquote-annotation?-getter
       ((annotation? $annotation)
         (getter-lets
-          ($lines $lines-getter)
-          (annotation-getter
-            (getter (cons $annotation $lines))
-            list-annotation)))
+          ($line-annotations $line-annotations-getter)
+          ($quoted-annotations
+            (annotation-getter
+              (getter (cons $annotation $line-annotations))
+              list-annotation))
+          (getter (list $quoted-annotations))))
       ((else _)
-        $lines-getter)))
+        $line-annotations-getter)))
+
+  (define (unquoted-annotation-getter $line-annotation-getter)
+    (getter-lets
+      ($unquoted-annotations
+        (unquoted-annotations-getter
+          (getter-lets
+            ($line-annotation $line-annotation-getter)
+            (getter (list $line-annotation)))))
+      (getter (car $unquoted-annotations))))
 
   (define line-annotation-getter
-    (quoted-getter
+    (quoted-annotation-getter
       (getter-switch peek-char-getter
         ((char-colon? _)
           (annotation-getter
@@ -138,15 +149,16 @@
                   list-annotation))))))))
 
   (define rhs-line-annotations-getter
-    (getter-switch char-getter
-      ((char-space? _) space-line-annotations-getter)
-      ((char-colon? _) colon-line-annotations-getter)
-      ((char-comma? _) (non-null-getter comma-line-annotations-getter))
-      ((char-newline? _) (non-null-getter newline-line-annotations-getter))
-      ((else $char) (error-getter
-        '(unexpected char)
-        $char
-        `(expected (one-of #\space #\: #\, #\newline))))))
+    (unquoted-annotations-getter
+      (getter-switch char-getter
+        ((char-space? _) space-line-annotations-getter)
+        ((char-colon? _) colon-line-annotations-getter)
+        ((char-comma? _) (non-null-getter comma-line-annotations-getter))
+        ((char-newline? _) (non-null-getter newline-line-annotations-getter))
+        ((else $char) (error-getter
+          '(unexpected char)
+          $char
+          `(expected (one-of #\space #\: #\, #\newline)))))))
 
   (define (non-null-getter $list-getter)
     (getter-switch $list-getter
@@ -154,22 +166,29 @@
       ((else $list) (getter $list))))
 
   (define inline-annotation-getter
-    (quoted-getter
+    (quoted-annotation-getter
       (getter-lets
         ($atom-annotation atom-annotation-getter)
         (switch (annotation-stripped $atom-annotation)
           ((symbol? $symbol)
-            (getter-switch peek-char/eof-getter
-              ((eof? _)
-                (getter $atom-annotation))
-              ((char-space? _)
+            (getter-switch rhs-inline-annotation?-getter
+              ((annotation? $rhs-annotation)
                 (apply-getter append-annotation
                   (getter $atom-annotation)
-                  (skip-char-getter inline-annotation-getter)))
-              ((else $unexpected-char)
+                  (getter $rhs-annotation)))
+              ((else _)
                 (getter $atom-annotation))))
           ((else _)
             (getter $atom-annotation))))))
+
+  (define rhs-inline-annotation?-getter
+    (getter-switch peek-char/eof-getter
+      ((eof? _)
+        (getter #f))
+      ((char-space? _)
+        (skip-char-getter inline-annotation-getter))
+      ((else _)
+        (getter #f))))
 
   (define line-annotations-getter
     (reject?-accept?-list-getter
