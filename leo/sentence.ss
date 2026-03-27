@@ -4,9 +4,6 @@
     sentence? sentence-switch
     phrase sentence
 
-    primitive-string-pretty?
-    primitive-string
-
     quote-string
     quote-string?
     quote-phrase?
@@ -37,15 +34,6 @@
     ((sentence word) word))
 
   (union (sentence string phrase))
-
-  ; === primitive-string
-
-  (define primitive-string-pretty? (make-thread-parameter #f))
-
-  (define (primitive-string $string)
-    (cond
-      ((primitive-string-pretty?) $string)
-      (else (string-append "#" $string))))
 
   ; === quote / unquote
 
@@ -122,19 +110,16 @@
 
   ; === ->sentence
 
-  (define (null->sentence $null)
-    (primitive-string "null"))
+  (define (null->sentence _) "null")
 
   (define (boolean->sentence $boolean)
-    (primitive-string (if $boolean "true" "false")))
+    (if $boolean "true" "false"))
 
   (define (number->sentence $number)
     (number->string $number))
 
   (define (char->sentence $char)
-    (phrase-cons
-      (primitive-string "char")
-      (list (char->datum $char))))
+    (phrase-cons "char" (list (char->datum $char))))
 
   (define (string->sentence $string)
     (format "~s" $string))
@@ -150,37 +135,33 @@
             (symbol->string $symbol)
             (cdr $pair))))
       ((else $other)
-        (phrase-cons
-          (primitive-string "list")
+        (phrase-cons "list"
           (cons $other (cdr $pair))))))
 
   (define (box->sentence $box)
-    (phrase-cons
-      (primitive-string "box")
+    (phrase-cons "box"
       (list (unbox $box))))
 
   (define (bytevector->sentence $bytevector)
-    (phrase-cons
-      (primitive-string "bytevector")
+    (phrase-cons "bytevector"
       (bytevector->u8-list $bytevector)))
 
   (define (vector->sentence $vector)
-    (phrase-cons
-      (primitive-string "vector")
+    (phrase-cons "vector"
       (vector->list $vector)))
 
   (define (record->sentence $record)
     (lets
       ($rtd (record-rtd $record))
       (phrase-cons
-        (primitive-string (symbol->string (record-type-name $rtd)))
+        (symbol->string (record-type-name $rtd))
         (map-with
           ($index (iota (vector-length (record-type-field-names $rtd))))
           ((record-accessor $rtd $index) $record)))))
 
   (define (procedure->sentence $procedure)
     (lets
-      ($word (primitive-string "procedure"))
+      ($word "procedure")
       (switch (procedure-name? $procedure)
         ((symbol? $name)
           (phrase-cons $word `(,$name)))
@@ -188,8 +169,7 @@
 
   (define (syntax->sentence $syntax)
     ; TODO: Include annotation
-    (phrase-cons
-      (primitive-string "syntax")
+    (phrase-cons "syntax"
       (list (syntax->datum $syntax))))
 
   (define (other->sentence $other)

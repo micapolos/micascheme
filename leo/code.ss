@@ -26,12 +26,6 @@
   (define code-line-limit (make-thread-parameter 7))
   (define code-string-limit (make-thread-parameter 1))
 
-  (define (primitive-code $string)
-    (string-code (primitive-string $string)))
-
-  (define (primitive-code-limiter $string)
-    (limiter-using (primitive-code $string) 1))
-
   (define arrow-code (code "->"))
   (define comma-code (code ","))
   (define comma-separator-code (code ", "))

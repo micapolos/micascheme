@@ -1,12 +1,5 @@
 (import (micascheme) (leo sentence))
 
-; === primitive-string
-
-(check (equal? (primitive-string "foo") "#foo"))
-
-(parameterize ((primitive-string-pretty? #t))
-  (check (equal? (primitive-string "foo") "foo")))
-
 ; === quote
 
 (check (equal? (quote-string "'" "foo") "'foo"))
@@ -113,22 +106,22 @@
 (check
   (equal?
     (->sentence '())
-    "#null"))
+    "null"))
 
 (check
   (equal?
     (->sentence #t)
-    "#true"))
+    "true"))
 
 (check
   (equal?
     (->sentence #f)
-    "#false"))
+    "false"))
 
 (check
   (equal?
     (->sentence #f)
-    "#false"))
+    "false"))
 
 (check
   (equal?
@@ -138,12 +131,12 @@
 (check
   (equal?
     (->sentence #\a)
-    '("#char" a)))
+    '("char" a)))
 
 (check
   (equal?
     (->sentence #\:)
-    '("#char" colon)))
+    '("char" colon)))
 
 (check
   (equal?
@@ -178,69 +171,69 @@
 (check
   (equal?
     (->sentence '(123))
-    '("#list" 123)))
+    '("list" 123)))
 
 (check
   (equal?
     (->sentence '(123 ()))
-    '("#list" 123 ())))
+    '("list" 123 ())))
 
 (check
   (equal?
     (->sentence '(123 bar))
-    '("#list" 123 bar)))
+    '("list" 123 bar)))
 
 (check
   (equal?
     (->sentence '(123 (bar)))
-    '("#list" 123 (bar))))
+    '("list" 123 (bar))))
 
 (check
   (equal?
     (->sentence (box 10))
-    '("#box" 10)))
+    '("box" 10)))
 
 (check
   (equal?
     (->sentence (bytevector))
-    '("#bytevector")))
+    '("bytevector")))
 
 (check
   (equal?
     (->sentence (bytevector 1 2 3))
-    '("#bytevector" 1 2 3)))
+    '("bytevector" 1 2 3)))
 
 (check
   (equal?
     (->sentence (vector))
-    '("#vector")))
+    '("vector")))
 
 (check
   (equal?
     (->sentence (vector #\a #\space "foo"))
-    '("#vector" #\a #\space "foo")))
+    '("vector" #\a #\space "foo")))
 
 (data (point x y))
 
 (check
   (equal?
     (->sentence (point 10 20))
-    '("#point" 10 20)))
+    '("point" 10 20)))
 
 (check
   (equal?
     (->sentence +)
-    '("#procedure" +)))
+    '("procedure" +)))
 
 (check
   (equal?
     (->sentence (lambda (x) x))
-    "#procedure"))
+    "procedure"))
 
 (check
   (equal?
     (->sentence #'+)
-    '("#syntax" +)))
+    '("syntax" +)))
 
 (check
   (equal?

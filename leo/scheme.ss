@@ -66,18 +66,16 @@
       ((x)
         (write x (%current-output-port)))
       ((x port)
-        (%parameterize ((primitive-string-pretty? #t))
-          (%put-string port (code-string (block-code x)))))))
+        (%put-string port (code-string (block-code x))))))
 
   (%define write-line
     (%case-lambda
       ((x)
         (write-line x (%current-output-port)))
       ((x port)
-        (%parameterize ((primitive-string-pretty? #t))
-          (%let ((p port))
-            (%put-string p (code-string (line-code x)))
-            (%newline p))))))
+        (%let ((p port))
+          (%put-string p (code-string (line-code x)))
+          (%newline p)))))
 
   (%define (display-line x)
     (%display x)
