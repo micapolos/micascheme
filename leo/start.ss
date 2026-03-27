@@ -25,6 +25,8 @@
         (start-help (datum x)))
       (("--asm" . x)
         (start-asm (datum x)))
+      (("--optimize-level" . x)
+        (start-optimize-level (datum x)))
       ((file arg ...)
         (start-file (datum file) (datum (arg ...))))
       (()
@@ -42,14 +44,19 @@
           "usage: leo [options] [file [args]]"
           ""
           "Available options are:"
-          "  -v, --version  show version information"
-          "  -h, --help     show this help message"
-          "  --asm          show assembly output"))
+          "  -v  --version            show version information"
+          "  -h  --help               show this help message"
+          "      --asm                show assembly output"
+          "      --optimize-level n   set optimize level < 0 | 1 | 2 | 3 >"))
       (start-options $arguments)))
 
   (define (start-asm $arguments)
     (parameterize ((($primitive $assembly-output) #t))
       (start-options $arguments)))
+
+  (define (start-optimize-level $arguments)
+    (parameterize ((optimize-level (string->number (car $arguments))))
+      (start-options (cdr $arguments))))
 
   (define (start-file $file $arguments)
     (parameterize
