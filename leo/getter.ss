@@ -50,28 +50,32 @@
         ((else $other)
           (getter $literal-annotation)))))
 
-  (define (char->quote? $quote)
-    (case $quote
+  (define (char->quote? $char)
+    (case $char
       ((#\') 'quote)
       ((#\`) 'quasiquote)
       (else #f)))
 
-  (define (quoted-getter $line-getter)
+  (define quote-annotation?-getter
     (getter-lets
       ($char peek-char-getter)
       (switch (char->quote? $char)
         ((symbol? $symbol)
-          (getter-lets
-            ($quote-annotation
-              (annotation-getter
-                (replace-getter char-getter $symbol)
-                stripped-annotation))
-            ($line $line-getter)
-            (annotation-getter
-              (getter (list $quote-annotation $line))
-              list-annotation)))
-        ((else _)
-          $line-getter))))
+          (annotation-getter
+            (replace-getter char-getter $symbol)
+            stripped-annotation))
+        ((else _) (getter #f)))))
+
+  (define (quoted-getter $line-getter)
+    (getter-switch quote-annotation?-getter
+      ((annotation? $annotation)
+        (getter-lets
+          ($line $line-getter)
+          (annotation-getter
+            (getter (list $annotation $line))
+            list-annotation)))
+      ((else _)
+        $line-getter)))
 
   (define line-annotation-getter
     (quoted-getter
@@ -91,6 +95,11 @@
                   (getter (cons $atom-annotation $rhs-line-annotations))
                   list-annotation))))))))
 
+  (define (char->unquote? $char)
+    (case $char
+      ((#\`) 'unquote)
+      (else #f)))
+
   (define rhs-line-annotations-getter
     (getter-switch char-getter
       ((char-space? _) space-line-annotations-getter)
@@ -108,21 +117,22 @@
       ((else $list) (getter $list))))
 
   (define inline-annotation-getter
-    (getter-lets
-      ($atom-annotation atom-annotation-getter)
-      (switch (annotation-stripped $atom-annotation)
-        ((symbol? $symbol)
-          (getter-switch peek-char/eof-getter
-            ((eof? _)
-              (getter $atom-annotation))
-            ((char-space? _)
-              (apply-getter append-annotation
-                (getter $atom-annotation)
-                (skip-char-getter inline-annotation-getter)))
-            ((else $unexpected-char)
-              (getter $atom-annotation))))
-        ((else _)
-          (getter $atom-annotation)))))
+    (quoted-getter
+      (getter-lets
+        ($atom-annotation atom-annotation-getter)
+        (switch (annotation-stripped $atom-annotation)
+          ((symbol? $symbol)
+            (getter-switch peek-char/eof-getter
+              ((eof? _)
+                (getter $atom-annotation))
+              ((char-space? _)
+                (apply-getter append-annotation
+                  (getter $atom-annotation)
+                  (skip-char-getter inline-annotation-getter)))
+              ((else $unexpected-char)
+                (getter $atom-annotation))))
+          ((else _)
+            (getter $atom-annotation))))))
 
   (define line-annotations-getter
     (reject?-accept?-list-getter

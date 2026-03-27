@@ -69,6 +69,9 @@
 (check-gets line-getter "'foo\n" ''foo 5)
 (check-gets line-getter "`foo\n" '`foo 5)
 
+(check-gets inline-getter "'foo" ''foo 4)
+(check-gets inline-getter "`foo" '`foo 4)
+
 (check-gets
   line-getter
   (lines-string
