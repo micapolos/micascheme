@@ -1,30 +1,29 @@
 (library (leo sentence)
   (export
-    phrase-cons phrase? phrase-string? phrase-body
+    phrase-cons phrase? phrase-string phrase-body
     sentence? sentence-switch
     phrase sentence
 
     quote-string
-    quote-string?
     quote-phrase?
     quote-sentence?
 
     unquote-string
-    unquote-string?
     unquote-phrase?
     unquote-sentence?
 
     sentence-quotify
 
     ->sentence
-    list->sentences)
+    list->sentences
+    normalize-list)
   (import
     (micascheme)
     (procedure-name))
 
   (define (phrase-cons word body) (cons word body))
   (define phrase? pair?)
-  (define phrase-string? car)
+  (define phrase-string car)
   (define phrase-body cdr)
 
   (define-rules-syntaxes
@@ -40,13 +39,10 @@
   (define (quote-string $quote $string)
     (string-append $quote $string))
 
-  (define (quote-string? $quote $string?)
-    (and $string? (quote-string $quote $string?)))
-
   (define (quote-phrase? $quote $phrase)
-    (lets?
-      ($word (quote-string? $quote (phrase-string? $phrase)))
-      (phrase-cons $word (phrase-body $phrase))))
+    (phrase-cons
+      (quote-string $quote (phrase-string $phrase))
+      (phrase-body $phrase)))
 
   (define (quote-sentence? $quote $sentence)
     (sentence-switch $sentence
@@ -56,13 +52,10 @@
   (define (unquote-string $unquote $string)
     (string-append $string $unquote))
 
-  (define (unquote-string? $unquote $string?)
-    (and $string? (unquote-string $unquote $string?)))
-
   (define (unquote-phrase? $unquote $phrase)
-    (lets?
-      ($string (unquote-string? $unquote (phrase-string? $phrase)))
-      (phrase-cons $string (phrase-body $phrase))))
+    (phrase-cons
+      (unquote-string $unquote (phrase-string $phrase))
+      (phrase-body $phrase)))
 
   (define (unquote-sentence? $unquote $sentence)
     (sentence-switch $sentence
@@ -92,7 +85,7 @@
             ((singleton-list? $body)
               (lets
                 ($body-sentence (->sentence (car $body)))
-                (switch (begin-string? (phrase-string? $phrase))
+                (switch (begin-string? (phrase-string $phrase))
                   ((string? $quote)
                     (quote-sentence? $quote $body-sentence))
                   ((else _)
@@ -100,11 +93,11 @@
                       ((phrase? $body-phrase)
                         (lets
                           ($body-body (phrase-body $body-phrase))
-                          (switch? (end-string? (phrase-string? $body-phrase))
+                          (switch? (end-string? (phrase-string $body-phrase))
                             ((string? $unquote)
                               (unquote-sentence? $unquote
                                 (phrase-cons
-                                  (phrase-string? $phrase)
+                                  (phrase-string $phrase)
                                   (phrase-body $body-phrase)))))))))))))
             $phrase))))
 
@@ -133,10 +126,10 @@
         (sentence-quotify
           (phrase-cons
             (symbol->string $symbol)
-            (cdr $pair))))
+            (normalize-list (cdr $pair)))))
       ((else $other)
         (phrase-cons "list"
-          (cons $other (cdr $pair))))))
+          (normalize-list (cons $other (cdr $pair)))))))
 
   (define (box->sentence $box)
     (phrase-cons "box"
@@ -193,5 +186,14 @@
       ((else $other) (other->sentence $other))))
 
   (define (list->sentences $list)
-    (map* ->sentence ->sentence $list))
+    (map*
+      ->sentence
+      (lambda ($item) (list (phrase-cons "and" (list $item))))
+      $list))
+
+  (define (normalize-list $list)
+    (map*
+      identity
+      (lambda ($item) `((and ,$item)))
+      $list))
 )

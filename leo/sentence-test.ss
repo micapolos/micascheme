@@ -1,13 +1,20 @@
 (import (micascheme) (leo sentence))
 
+; === normalize-list
+
+(check
+  (equal?
+    (normalize-list '(1 2 3))
+    '(1 2 3)))
+
+(check
+  (equal?
+    (normalize-list '(1 2 . 3))
+    '(1 2 (and 3))))
+
 ; === quote
 
 (check (equal? (quote-string "'" "foo") "'foo"))
-
-(check (equal? (quote-string? "'" "foo") "'foo"))
-(check (equal? (quote-string? "'" #f) #f))
-
-(check (equal? (quote-phrase? "'" '(#f 123)) #f))
 
 (check
   (equal?
@@ -19,8 +26,6 @@
     (quote-sentence? "'" "foo")
     "'foo"))
 
-(check (equal? (quote-sentence? "'" '(#f 123)) #f))
-
 (check
   (equal?
     (quote-sentence? "'" '("foo" 123))
@@ -29,11 +34,6 @@
 ; === unquote
 
 (check (equal? (unquote-string "`" "foo") "foo`"))
-
-(check (equal? (unquote-string? "`" "foo") "foo`"))
-(check (equal? (unquote-string? "`" #f) #f))
-
-(check (equal? (unquote-phrase? "`" '(#f 123)) #f))
 
 (check
   (equal?
@@ -44,8 +44,6 @@
   (equal?
     (unquote-sentence? "`" "foo")
     "foo`"))
-
-(check (equal? (unquote-sentence? "`" '(#f 123)) #f))
 
 (check
   (equal?
@@ -94,7 +92,7 @@
 (check
   (equal?
     (sentence-quotify '("bar" (unquote . foo)))
-    '("bar`" . foo)))
+    '("bar`" (and foo))))
 
 (check
   (equal?
@@ -238,7 +236,7 @@
 (check
   (equal?
     (list->sentences 123)
-    "123"))
+    '(("and" 123))))
 
 (check
   (equal?
@@ -248,4 +246,4 @@
 (check
   (equal?
     (list->sentences '(1 2 . 3))
-    '("1" "2" . "3")))
+    '("1" "2" ("and" 3))))
