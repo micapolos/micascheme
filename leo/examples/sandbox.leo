@@ -12,7 +12,7 @@ define
   string-append: string, "!"
 
 define
-  comma-separated: strings ...
+  comma-separated: and strings
   apply
     string-append
     intercalate: strings, ", "

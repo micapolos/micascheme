@@ -29,15 +29,6 @@ document readme
 
       exclamated comma-separated: hello, leo
 
-    functions` example
-      define
-        exclamated s
-        string-append: s, "!!!"
-      `exclamated strings`
-        exclamated "Cool"
-        exclamated "LOL"
-        exclamated "Wow"
-
     control flow` example
       if
         greater?: 10, 5
