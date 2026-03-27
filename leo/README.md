@@ -96,7 +96,7 @@ write my-bytevector
 
 ### Quoting
 ```leo
-write 'quoted
+write 'quoted add: 2, 2
 
 write `quoted and unquoted` add: 2, 2
 
