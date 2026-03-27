@@ -14,7 +14,6 @@
     display-line
     define-language
     define-syntax
-    define-macro
     syntax-case
     logging
 
@@ -114,22 +113,23 @@
     ((lambda x xs ...)
       (%lambda () x xs ...))
 
+    ((define-syntax (keywords k ...) (%when pattern x xs ...) ...)
+      (define-rules-syntaxes (keywords k ...)
+        (pattern x xs ...) ...))
+
+    ((define-syntax (%when pattern x xs ...) ...)
+      (define-syntax (keywords) (%when pattern x xs ...) ...))
+
     ((define-syntax (name x))
+      (keyword? name)
       (%define-syntax name x))
 
     ((define-syntax (name s) x xs ...)
+      (keyword? name)
       (%define-syntax (name s) x xs ...))
 
     ((syntax-case expr (keywords k ...) (%when pattern x xs ...) ...)
       (%syntax-case expr (k ...)
-        (pattern x xs ...) ...))
-
-    ((define-macro (keywords k ...) (%when pattern x xs ...) ...)
-      (define-rules-syntaxes (keywords k ...)
-        (pattern x xs ...) ...))
-
-    ((define-macro (%when pattern x xs ...) ...)
-      (define-rules-syntaxes
         (pattern x xs ...) ...))
 
     ((make-read-lambda (with param ...) x xs ...)

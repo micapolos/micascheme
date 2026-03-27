@@ -64,8 +64,8 @@ document readme
           x` sin 10
           y` cos 10
 
-    macros` example
-      define-macro
+    define-syntax` example
+      define-syntax
         when
           my-macro s
           string-append: "Hello, ", s, "!"

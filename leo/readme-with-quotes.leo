@@ -56,7 +56,7 @@ document readme
         list: 1, 2, 3, 4
 
     macros' example
-      define-macro
+      define-syntax
         when
           my-macro s
           string-append: "Hello, ", s, "!"

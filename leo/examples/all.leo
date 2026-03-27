@@ -1,6 +1,6 @@
 import leo scheme
 
-define-macro
+define-syntax
   when
     load-leo: xs, ...
     begin
@@ -16,7 +16,7 @@ load-leo
   char
   command-line-arguments
   data
-  define-macro
+  define-syntax
   eval
   fibonacci
   greeting

@@ -105,7 +105,7 @@ write `deeply quoted circle
 
 ### Macros
 ```leo
-define-macro
+define-syntax
   when
     my-macro s
     string-append: "Hello, ", s, "!"

@@ -1,6 +1,6 @@
 import leo scheme
 
-define-macro
+define-syntax
   when
     scheme-write id: xs, ...
     display-line format
