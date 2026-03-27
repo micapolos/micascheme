@@ -9,7 +9,7 @@ quote changelog
   v0.1.38
     writer improvements
       remove hash prefixed primitives
-      write last element in improper list as 'and item
+      write last item in improper list as 'and item
   v0.1.37
     quotified reader
   v0.1.36
