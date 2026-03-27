@@ -178,22 +178,22 @@
 (check
   (equal?
     (->sentence '(123))
-    '(#f 123)))
+    '("#list" 123)))
 
 (check
   (equal?
     (->sentence '(123 ()))
-    '(#f 123 ())))
+    '("#list" 123 ())))
 
 (check
   (equal?
     (->sentence '(123 bar))
-    '(#f 123 bar)))
+    '("#list" 123 bar)))
 
 (check
   (equal?
     (->sentence '(123 (bar)))
-    '(#f 123 (bar))))
+    '("#list" 123 (bar))))
 
 (check
   (equal?

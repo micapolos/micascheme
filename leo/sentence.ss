@@ -150,7 +150,9 @@
             (symbol->string $symbol)
             (cdr $pair))))
       ((else $other)
-        (cons #f (cons $other (cdr $pair))))))
+        (phrase-cons
+          (primitive-string "list")
+          (cons $other (cdr $pair))))))
 
   (define (box->sentence $box)
     (phrase-cons
