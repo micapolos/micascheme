@@ -39,12 +39,18 @@ if
 
 ### Lists
 ```leo
-define numbers list: 1, 2, 3, 4, 5, 6
+define numbers list: 1, 2, 3
+define fruits list: 'apple, 'banana, 'orange
+define various list: true, char a, and numbers
 
-write numbers
-write map: number->string, numbers
-write filter: odd?, numbers
-write fold-left: add, 0, numbers
+write `lists
+  numbers` numbers
+  fruits` fruits
+  various` various
+  numbers and fruits` append: numbers, fruits
+  strings` map: number->string, numbers
+  odd numbers` filter: odd?, numbers
+  sum` fold-left: add, 0, numbers
 ```
 
 ### Characters

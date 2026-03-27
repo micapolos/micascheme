@@ -36,15 +36,18 @@ document readme
         "What? 10 is not greater than 5?"
 
     lists` example
-      define some-numbers list: 1, 2, 3
-      define more-numbers list: 4, 5, 6
-      define numbers list: 1, 2, 3, and more-numbers
+      define numbers list: 1, 2, 3
+      define fruits list: 'apple, 'banana, 'orange
+      define various list: true, char a, and numbers
 
       `lists
-        numbers`... numbers
-        strings`... map: number->string, numbers
-        odd numbers`... filter: odd?, numbers
-        sum` fold-left: +, 0, numbers
+        numbers` numbers
+        fruits` fruits
+        various` various
+        numbers and fruits` append: numbers, fruits
+        strings` map: number->string, numbers
+        odd numbers` filter: odd?, numbers
+        sum` fold-left: add, 0, numbers
 
     quoting`
       example 'this is a-quote
