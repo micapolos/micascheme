@@ -1,6 +1,9 @@
 import leo scheme
 
 quote changelog
+  v0.1.40
+    adds optimize-level command line flag
+    loads source files as programs which improves optimizations
   v0.1.39
     change variadic notation to: first, second, and others
   v0.1.38
