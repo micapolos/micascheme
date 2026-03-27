@@ -1,16 +1,16 @@
 (library (leo exception-handler)
   (export leo-exception-handler)
   (import
-    (except (micascheme) pretty-print)
+    (except (micascheme) write)
     (condition)
-    (only (leo scheme) pretty-print))
+    (only (leo scheme) write))
 
   (define (leo-exception-handler $x)
     (lets
       ($datum (condition->datum $x))
       ($datum (if (and (pair? $datum) (equal? (car $datum) 'condition)) (cdr $datum) (list $datum)))
         (run
-          (pretty-print
+          (write
             `(exception ,$datum)
             (console-error-port))
           (reset))))
