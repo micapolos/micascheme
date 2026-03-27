@@ -36,21 +36,11 @@
       ($literal-annotation (getter-item-getter (%annotation %literal)))
       (switch (annotation-stripped $literal-annotation)
         ((symbol? $symbol)
-          (lets
-            ($symbol
-              (case $symbol
-                ((<<) 'quasiquote)
-                ((>>) 'unquote)
-                ((>>...) 'unquote-splicing)
-                ((<<<) 'quasisyntax)
-                ((>>>) 'unsyntax)
-                ((>>>...) 'unsyntax-splicing)
-                (else $symbol)))
-            (getter
-              (make-annotation
-                $symbol
-                (annotation-source $literal-annotation)
-                $symbol))))
+          (getter
+            (make-annotation
+              $symbol
+              (annotation-source $literal-annotation)
+              $symbol)))
         ((else $other)
           (getter $literal-annotation)))))
 

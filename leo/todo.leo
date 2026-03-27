@@ -8,7 +8,6 @@ todo
   custom writer for
     exceptions
     records
-  replace << quoting >> with scheme quotes
   improve syntax-error messages
     to include usage examples
     make it automatic in define-rules-syntax

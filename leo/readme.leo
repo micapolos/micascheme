@@ -13,10 +13,9 @@ document readme
     overview
       leo translates indentation into standard scheme s-expressions
       each indented block represents a new level of nesting
-      text and code is separated using << and >> quotes
-      << example >> form contain code snippets to execute
+      `example` form contain code snippets to execute
 
-    definitions >> example
+    definitions` example
       define hello "Hello"
       define leo "Leo"
 
@@ -30,42 +29,42 @@ document readme
 
       exclamated comma-separated: hello, leo
 
-    functions >> example
+    functions` example
       define
         exclamated s
         string-append: s, "!!!"
-      << exclamated strings >>
+      `exclamated strings`
         exclamated "Cool"
         exclamated "LOL"
         exclamated "Wow"
 
-    control flow >> example
+    control flow` example
       if
         greater?: 10, 5
         "Obviously, 10 is greater than 5."
         "What? 10 is not greater than 5?"
 
-    lists >> example
+    lists` example
       define numbers list: 1, 2, 3, 4, 5, 6
 
-      << lists
-        numbers >>... numbers
-        strings >>... map: number->string, numbers
-        odd numbers >>... filter: odd?, numbers
-        sum >> fold-left: +, 0, numbers
+      `lists
+        numbers`... numbers
+        strings`... map: number->string, numbers
+        odd numbers`... filter: odd?, numbers
+        sum` fold-left: +, 0, numbers
 
-    quoting >>
-      example quote this is a-quote
-      example << this is a-quasiquote
-      example << this is a-quasiquote with an-unquote >> add: 2, 2
-      example << this is a-quasiquote with an-unquote-splicing >>... list: 1, 2, 3, 4
-      example << circle
-        radius >> sqrt 4
+    quoting`
+      example 'this is a-quote
+      example `this is a-quasiquote
+      example `this is a-quasiquote with an-unquote` add: 2, 2
+      example `this is a-quasiquote with an-unquote-splicing`... list: 1, 2, 3, 4
+      example `circle
+        radius` sqrt 4
         center point
-          x >> sin 10
-          y >> cos 10
+          x` sin 10
+          y` cos 10
 
-    macros >> example
+    macros` example
       define-macro
         when
           my-macro s
@@ -77,7 +76,7 @@ document readme
           my-macro: a, ...
           list: quote a, ...
 
-      << examples
-        greeting >> my-macro "world"
-        addition >> my-macro: 10, 20
-        quoted list >> my-macro: apple, orange, banana
+      `examples
+        greeting` my-macro "world"
+        addition` my-macro: 10, 20
+        quoted list` my-macro: apple, orange, banana
