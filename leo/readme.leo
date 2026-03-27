@@ -45,7 +45,9 @@ document readme
         "What? 10 is not greater than 5?"
 
     lists` example
-      define numbers list: 1, 2, 3, 4, 5, 6
+      define some-numbers list: 1, 2, 3
+      define more-numbers list: 4, 5, 6
+      define numbers list: 1, 2, 3, and more-numbers
 
       `lists
         numbers`... numbers
