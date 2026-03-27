@@ -92,11 +92,9 @@ write my-bytevector
 ```leo
 write 'quoted
 
-write `quasiquoted
+write `quoted and unquoted` add: 2, 2
 
-write `quasiquoted and unquoted` add: 2, 2
-
-write `quasiquoted and unquoted-splicing`... list: 1, 2, 3, 4
+write `quoted and unquoted as list`... list: 1, 2, 3, 4
 
 write `circle
   radius` sqrt 4
