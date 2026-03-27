@@ -107,16 +107,16 @@ write `deeply quoted circle
 ```leo
 define-syntax
   when
-    my-macro s
+    magic s
     string-append: "Hello, ", s, "!"
   when
-    my-macro: a, b
+    magic: a, b
     add: a, b
   when
-    my-macro: a, ...
+    magic: a, ...
     list: 'a, ...
 
-write my-macro "world"
-write my-macro: 10, 20
-write my-macro: apple, orange, banana
+write magic "world"
+write magic: 10, 20
+write magic: apple, orange, banana
 ```

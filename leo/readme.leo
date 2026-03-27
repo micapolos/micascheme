@@ -67,16 +67,16 @@ document readme
     define-syntax` example
       define-syntax
         when
-          my-macro s
+          magic s
           string-append: "Hello, ", s, "!"
         when
-          my-macro: a, b
+          magic: a, b
           add: a, b
         when
-          my-macro: a, ...
+          magic: a, ...
           list: 'a, ...
 
       `examples
-        greeting` my-macro "world"
-        addition` my-macro: 10, 20
-        quoted list` my-macro: apple, orange, banana
+        greeting` magic "world"
+        addition` magic: 10, 20
+        quoted list` magic: apple, orange, banana
