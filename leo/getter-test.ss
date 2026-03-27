@@ -3,6 +3,28 @@
   (getter)
   (leo getter))
 
+(check-gets quote-annotation?-getter "" #f 0)
+(check-gets quote-annotation?-getter "a" #f 0)
+
+(check-gets quote-annotation?-getter "'"
+  (stripped-annotation 'quote (test-source-object 0 1))
+  1)
+
+(check-gets quote-annotation?-getter "`"
+  (stripped-annotation 'quasiquote (test-source-object 0 1))
+  1)
+
+(check-gets unquote-annotation?-getter "" #f 0)
+(check-gets unquote-annotation?-getter "a" #f 0)
+
+(check-gets unquote-annotation?-getter "`"
+  (stripped-annotation 'unquote (test-source-object 0 1))
+  1)
+
+(check-gets unquote-annotation?-getter "`..."
+  (stripped-annotation 'unquote-splicing (test-source-object 0 4))
+  4)
+
 (check-gets line-getter "123\n" 123 4)
 (check-gets line-getter "\"foo\"\n" "foo" 6)
 (check-gets line-getter "foo\n" 'foo 4)
@@ -68,6 +90,7 @@
 
 (check-gets line-getter "'foo\n" ''foo 5)
 (check-gets line-getter "`foo\n" '`foo 5)
+;(check-gets line-getter "foo` bar\n" ''foo 5)
 
 (check-gets inline-getter "'foo" ''foo 4)
 (check-gets inline-getter "`foo" '`foo 4)

@@ -1,5 +1,8 @@
 (library (leo getter)
   (export
+    quote-annotation?-getter
+    unquote-annotation?-getter
+
     line-annotation-getter
     line-annotations-getter
 
@@ -13,6 +16,7 @@
     inlines-getter)
   (import
     (micascheme)
+    (symbol)
     (getter)
     (prefix (mica reader) %)
     (prefix (leo mica reader identifier) %)
@@ -56,15 +60,42 @@
       ((#\`) 'quasiquote)
       (else #f)))
 
+  (define (char->unquote? $char)
+    (case $char
+      ((#\`) 'unquote)
+      (else #f)))
+
   (define quote-annotation?-getter
     (getter-lets
-      ($char peek-char-getter)
+      ($char peek-char/eof-getter)
       (switch (char->quote? $char)
         ((symbol? $symbol)
           (annotation-getter
             (replace-getter char-getter $symbol)
             stripped-annotation))
         ((else _) (getter #f)))))
+
+  (define (unquote-splicing-getter $unquote)
+    (getter-lets
+      ($char peek-char/eof-getter)
+      (case $char
+        ((#\.)
+          (replace-getter
+            (exact-getter "...")
+            (symbol-append $unquote '- 'splicing)))
+        (else
+          (getter $unquote)))))
+
+  (define unquote-annotation?-getter
+    (getter-lets
+      ($char peek-char/eof-getter)
+      (switch (char->unquote? $char)
+        ((symbol? $symbol)
+          (annotation-getter
+            (skip-char-getter (unquote-splicing-getter $symbol))
+            stripped-annotation))
+        ((else _)
+          (getter #f)))))
 
   (define (quoted-getter $line-getter)
     (getter-switch quote-annotation?-getter
@@ -76,6 +107,17 @@
             list-annotation)))
       ((else _)
         $line-getter)))
+
+  (define (unquoted-getter $lines-getter)
+    (getter-switch unquote-annotation?-getter
+      ((annotation? $annotation)
+        (getter-lets
+          ($lines $lines-getter)
+          (annotation-getter
+            (getter (cons $annotation $lines))
+            list-annotation)))
+      ((else _)
+        $lines-getter)))
 
   (define line-annotation-getter
     (quoted-getter
@@ -94,11 +136,6 @@
                 (annotation-getter
                   (getter (cons $atom-annotation $rhs-line-annotations))
                   list-annotation))))))))
-
-  (define (char->unquote? $char)
-    (case $char
-      ((#\`) 'unquote)
-      (else #f)))
 
   (define rhs-line-annotations-getter
     (getter-switch char-getter
