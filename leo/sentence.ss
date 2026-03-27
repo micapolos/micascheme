@@ -83,13 +83,13 @@
 
   ; === quotify
 
-  (define (word-quote? $word)
+  (define (begin-string? $word)
     (case $word
       (("quote") "'")
       (("quasiquote") "`")
       (else #f)))
 
-  (define (word-unquote? $word)
+  (define (end-string? $word)
     (case $word
       (("unquote") "`")
       (("unquote-splicing") "`...")
@@ -104,7 +104,7 @@
             ((singleton-list? $body)
               (lets
                 ($body-sentence (->sentence (car $body)))
-                (switch (word-quote? (phrase-string? $phrase))
+                (switch (begin-string? (phrase-string? $phrase))
                   ((string? $quote)
                     (quote-sentence? $quote $body-sentence))
                   ((else _)
@@ -112,7 +112,7 @@
                       ((phrase? $body-phrase)
                         (lets
                           ($body-body (phrase-body $body-phrase))
-                          (switch? (word-unquote? (phrase-string? $body-phrase))
+                          (switch? (end-string? (phrase-string? $body-phrase))
                             ((string? $unquote)
                               (unquote-sentence? $unquote
                                 (phrase-cons
