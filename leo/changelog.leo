@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.37
+    quotified reader
   v0.1.36
     quotified writer
   v0.1.35
