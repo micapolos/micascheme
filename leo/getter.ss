@@ -67,28 +67,29 @@
                 (replace-getter char-getter $symbol)
                 stripped-annotation))
             ($line $line-getter)
-            (getter (list $quote-annotation $line))))
+            (annotation-getter
+              (getter (list $quote-annotation $line))
+              list-annotation)))
         ((else _)
           $line-getter))))
 
   (define line-annotation-getter
-    (annotation-getter
-      (quoted-getter
-        (getter-switch peek-char-getter
-          ((char-colon? _)
-            (skip-char-getter colon-line-annotations-getter))
-          ((else _)
-            (getter-lets
-              ($atom-annotation atom-annotation-getter)
-              (getter-switch rhs-line-annotations-getter
-                ((false? _)
-                  (getter $atom-annotation))
-                ((else $rhs-line-annotations)
-                  (getter (cons $atom-annotation $rhs-line-annotations))))))))
-      (lambda ($line $source-object)
-        (switch $line
-          ((annotation? $line) $line)
-          ((else $list) (list-annotation $list $source-object))))))
+    (quoted-getter
+      (getter-switch peek-char-getter
+        ((char-colon? _)
+          (annotation-getter
+            (skip-char-getter colon-line-annotations-getter)
+            list-annotation))
+        ((else _)
+          (getter-lets
+            ($atom-annotation atom-annotation-getter)
+            (getter-switch rhs-line-annotations-getter
+              ((false? _)
+                (getter $atom-annotation))
+              ((else $rhs-line-annotations)
+                (annotation-getter
+                  (getter (cons $atom-annotation $rhs-line-annotations))
+                  list-annotation))))))))
 
   (define rhs-line-annotations-getter
     (getter-switch char-getter
