@@ -10,6 +10,7 @@
     transform-leo)
   (import
     (except (micascheme) from with)
+    (condition)
     (keyword))
 
   (define-keywords from with)
@@ -28,20 +29,23 @@
         #`(#,(transform-identifier #'id)))))
 
   (define (transform-export $syntax)
-    (syntax-case $syntax ()
-      ((_ spec ...)
+    (syntax-case $syntax (export)
+      ((export spec ...)
         #`(export
           #,@(map transform-export-spec #'(spec ...))))
       (_
-        (syntax-error $syntax "invalid export"))))
+        (syntax-error $syntax "expected export"))))
 
   (define (transform-import $syntax)
-    (syntax-case $syntax ()
-      ((_ spec ...)
+    (syntax-case $syntax (import)
+      ((import spec ...)
         #`(import
           #,@(map transform-import-spec #'(spec ...))))
       (_
-        (syntax-error $syntax "invalid import"))))
+        (raise
+          (condition
+            (make-syntax-violation $syntax #f)
+            (make-cause-condition `(expected import)))))))
 
   (define (transform-mapping $syntax)
     (syntax-case $syntax ()
@@ -106,19 +110,19 @@
         (transform-name #'name))))
 
   (define (transform-library $syntax)
-    (syntax-case $syntax ()
-      ((_ name exports imports body ...)
+    (syntax-case $syntax (library)
+      ((library name exports imports body ...)
         #`(library
           #,(transform-name #'name)
           #,(transform-export #'exports)
           #,(transform-import #'imports)
           body ...))
       (_
-        (syntax-error $syntax "invalid library"))))
+        (syntax-error $syntax "expected library"))))
 
   (define (transform-top-level-program $syntax)
-    (syntax-case $syntax ()
-      ((_ imports body ...)
+    (syntax-case $syntax (top-level-program)
+      ((top-level-program imports body ...)
         #`(top-level-program
           #,(transform-import #'imports)
           body ...))

@@ -3,6 +3,7 @@
   (import
     (micascheme)
     (leo leo)
+    (leo load)
     (leo version)
     (leo exception-handler)
     (prefix (leo scheme) %))
@@ -56,5 +57,6 @@
       (leo
         (with-exception-handler
           leo-exception-handler
-          (lambda () (load $file))))))
+          (lambda ()
+            (load-leo-program $file))))))
 )

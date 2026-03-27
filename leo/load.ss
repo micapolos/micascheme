@@ -7,6 +7,7 @@
     (getter)
     (leo leo)
     (leo read)
+    (leo expand)
     (leo getter))
 
   (define (load-leo $path)
@@ -24,8 +25,7 @@
               (switch ($read)
                 ((eof? _)
                   (eval
-                    `(top-level-program ,@(reverse $list))
-                    (scheme-environment)))
+                    (cons leo-expand `(top-level-program ,@(reverse $list)))))
                 ((else $line)
                   ($loop (cons $line $list))))))))))
 )
