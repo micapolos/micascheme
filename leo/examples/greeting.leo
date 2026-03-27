@@ -7,10 +7,10 @@ define author "Michal Pociecha-Los"
 
 define
   greeting recipient
-  << greeting
-    using >> leo
-    from >> author
-    to >> recipient
+  `greeting
+    using` leo
+    from` author
+    to` recipient
 
 write greeting "Alex Johnson"
 write greeting "John Appleseed"

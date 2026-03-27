@@ -101,7 +101,7 @@
     (getter-switch quote-annotation?-getter
       ((annotation? $annotation)
         (getter-lets
-          ($line $line-getter)
+          ($line (quoted-annotation-getter $line-getter))
           (annotation-getter
             (getter (list $annotation $line))
             list-annotation)))
@@ -112,7 +112,7 @@
     (getter-switch unquote-annotation?-getter
       ((annotation? $annotation)
         (getter-lets
-          ($line-annotations $line-annotations-getter)
+          ($line-annotations (unquoted-annotations-getter $line-annotations-getter))
           ($quoted-annotations
             (annotation-getter
               (getter (cons $annotation $line-annotations))
@@ -121,14 +121,18 @@
       ((else _)
         $line-annotations-getter)))
 
-  (define (unquoted-annotation-getter $line-annotation-getter)
-    (getter-lets
-      ($unquoted-annotations
-        (unquoted-annotations-getter
-          (getter-lets
-            ($line-annotation $line-annotation-getter)
-            (getter (list $line-annotation)))))
-      (getter (car $unquoted-annotations))))
+  (define (unquoted-annotation?-getter $line-annotation?-getter)
+    (getter-switch unquote-annotation?-getter
+      ((annotation? $annotation)
+        (getter-switch (unquoted-annotation?-getter $line-annotation?-getter)
+          ((annotation? $line-annotation)
+            (annotation-getter
+              (getter (list $annotation $line-annotation))
+              list-annotation))
+          ((else _)
+            (error-getter '(unquoted nothing) 'unquote))))
+      ((else _)
+        $line-annotation?-getter)))
 
   (define line-annotation-getter
     (quoted-annotation-getter
@@ -182,18 +186,22 @@
             (getter $atom-annotation))))))
 
   (define rhs-inline-annotation?-getter
-    (getter-switch peek-char/eof-getter
-      ((eof? _)
-        (getter #f))
-      ((char-space? _)
-        (skip-char-getter inline-annotation-getter))
-      ((else _)
-        (getter #f))))
+    (unquoted-annotation?-getter
+      (getter-switch peek-char/eof-getter
+        ((eof? _)
+          (getter #f))
+        ((char-space? _)
+          (skip-char-getter inline-annotation-getter))
+        ((else _)
+          (getter #f)))))
 
   (define line-annotations-getter
     (reject?-accept?-list-getter
       char-newline?
-      (getter-item-first-char? %literal)
+      (lambda ($char)
+        (or
+          ((getter-item-first-char? %literal) $char)
+          (char->quote? $char)))
       line-annotation-getter))
 
   (define inline-annotations-getter

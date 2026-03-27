@@ -91,24 +91,30 @@
 (check-gets line-getter "'foo\n" ''foo 5)
 (check-gets line-getter "`foo\n" '`foo 5)
 
+(check-gets line-getter "''foo\n" '''foo 6)
+(check-gets line-getter "'`foo\n" ''`foo 6)
+
 (check-gets line-getter "foo`:\n" '(foo (unquote)))
 (check-gets line-getter "foo` 1\n" '(foo ,1))
+(check-gets line-getter "foo`` 1\n" '(foo ,,1))
 (check-gets line-getter "foo`: 1, 2\n" '(foo (unquote 1 2)))
 
 (check-gets line-getter "foo`...:\n" '(foo (unquote-splicing)))
 (check-gets line-getter "foo`... 123\n" '(foo ,@123))
+(check-gets line-getter "foo`...`... 123\n" '(foo ,@,@123))
 (check-gets line-getter "foo`...: 1, 2\n" '(foo (unquote-splicing 1 2)))
 
 (check-gets inline-getter "'foo" ''foo 4)
 (check-gets inline-getter "`foo" '`foo 4)
 
-; (check-gets inline-getter "foo`:" '(foo (unquote)))
-; (check-gets inline-getter "foo` 1" '(foo ,1))
-; (check-gets inline-getter "foo`: 1, 2" '(foo (unquote 1 2)))
+(check-get-raises inline-getter "foo`:")
+(check-gets inline-getter "foo` 1" '(foo ,1))
+(check-gets inline-getter "foo`` 1" '(foo ,,1))
+(check-get-raises inline-getter "foo`: 1, 2")
 
-; (check-gets inline-getter "foo`...:" '(foo (unquote-splicing)))
-; (check-gets inline-getter "foo`... 123" '(foo ,@123))
-; (check-gets inline-getter "foo`...: 1, 2" '(foo (unquote-splicing 1 2)))
+(check-get-raises inline-getter "foo`...:")
+(check-gets inline-getter "foo`... 123" '(foo ,@123))
+(check-get-raises inline-getter "foo`...: 1, 2")
 
 (check-gets
   line-getter

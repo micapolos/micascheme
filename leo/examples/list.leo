@@ -1,6 +1,6 @@
 import leo scheme
 
-write << string >> list
+write `string` list
   "this"
   "is"
   "a"
@@ -8,19 +8,19 @@ write << string >> list
   "of"
   "strings"
 
-write << number string >> map
+write `number string` map
   number->string
   list: 1, 2, 3, 4
 
-write << odd? >> map
+write `odd?` map
   odd?
   list: 1, 2, 3, 4
 
-write << odd >> filter
+write `odd` filter
   odd?
   iota 20
 
-write << even >> filter
+write `even` filter
   even?
   iota 20
 
@@ -32,7 +32,7 @@ define
     number->string string-length string
     ")"
 
-write << strings with length >> map
+write `strings with length` map
   string-append-length
   list
     "this"

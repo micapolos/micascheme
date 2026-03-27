@@ -1,13 +1,13 @@
 import leo scheme
 
-write << circle
+write `circle
   radius 10
   center point
-    x >> add: 2, 3
-    y >> add: 10, 20
+    x` add: 2, 3
+    y` add: 10, 20
 
-write-line << circle
+write-line `circle
   radius 10
   center point
-    x >> add: 2, 3
-    y >> add: 10, 20
+    x` add: 2, 3
+    y` add: 10, 20
