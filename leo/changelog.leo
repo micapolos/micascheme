@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.39
+    change variadic notation to: first, second, and others
   v0.1.38
     writer improvements
       remove hash prefixed primitives
