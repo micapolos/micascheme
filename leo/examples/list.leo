@@ -1,12 +1,18 @@
 import leo scheme
 
-write `string` list
+write `strings` list
   "this"
   "is"
   "a"
   "list"
   "of"
   "strings"
+
+write `open strings` open-list
+  "list"
+  "of"
+  "strings"
+  'other-strings
 
 write `number string` map
   number->string

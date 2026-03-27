@@ -10,6 +10,7 @@
     switch any?
     make-read-lambda
     write write-line
+    open-list
     display-line
     define-language
     define-syntax
@@ -92,6 +93,8 @@
   (%define less/equal? %<=)
   (%define greater? %>)
   (%define greater/equal? %>=)
+
+  (%define open-list %list*)
 
   (define-rules-syntaxes (keywords with then %else %when %list keywords)
     ((define (name x))
