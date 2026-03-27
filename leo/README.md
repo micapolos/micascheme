@@ -90,13 +90,13 @@ write my-bytevector
 
 ### Quoting
 ```leo
-write 'this is quoted
+write 'quoted
 
-write `this is quasiquoted
+write `quasiquoted
 
-write `this is quasiquoted and unquoted` add: 2, 2
+write `quasiquoted and unquoted` add: 2, 2
 
-write `this is quasiquoted and unquoted with splicing`... list: 1, 2, 3, 4
+write `quasiquoted and unquoted-splicing`... list: 1, 2, 3, 4
 
 write `circle
   radius` sqrt 4
