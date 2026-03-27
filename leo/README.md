@@ -94,7 +94,7 @@ write 'quoted
 
 write `quoted and unquoted` add: 2, 2
 
-write `quoted and unquoted as list`... list: 1, 2, 3, 4
+write `quoted and unquoted from list`... list: 1, 2, 3, 4
 
 write `deeply quoted circle
   radius` sqrt 4
