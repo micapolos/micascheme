@@ -10,6 +10,11 @@
 
   (define single-line-annotation
     (one-of
+      (list-annotation single-line-annotations)
+      single-line-basic-annotation))
+
+  (define single-line-basic-annotation
+    (one-of
       (lets
         ($identifier-annotation (annotation identifier))
         (switch (optional single-line-rhs-annotations)
@@ -27,9 +32,9 @@
   (define single-line-rhs-annotations
     (prefixed " "
       (one-of
-        (map single-line-annotation %list)
+        (map single-line-basic-annotation %list)
         single-line-annotations)))
 
   (define single-line-annotations
-    (wrapped "(" (separated ", " single-line-annotation) ")"))
+    (wrapped "(" (separated ", " single-line-basic-annotation) ")"))
 )
