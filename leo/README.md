@@ -6,7 +6,7 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 * [How the Syntax Works](#how-the-syntax-works)
 * [Testing](#testing)
 * [Definitions](#definitions)
-* [Local Bindings: Temporary Names](#local-bindings-temporary-names)
+* [Local Names](#local-names)
 * [Lists](#lists)
 * [Quoting](#quoting)
 * [Control Flow](#control-flow)
