@@ -3,26 +3,12 @@
 Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 
 * [Quick Start](#quick-start)
-  * [Hello, Leo!](#hello-leo)
-  * [How the Syntax Works](#how-the-syntax-works)
-    * [Structured Depth](#structured-depth)
-    * [The "Tall" Way](#the-tall-way-pure-indentation)
-    * [The "Medium" Way](#the-medium-way-using-spaces)
-    * [The "Wide" Way](#the-wide-way-colons-and-commas)
-    * [The "Single Line" Way](#the-single-line-way-parentheses)
+* [How the Syntax Works](#how-the-syntax-works)
 * [Testing](#testing)
 * [Definitions](#definitions)
-  * [Values](#values)
-  * [Functions](#functions)
 * [Local Bindings: Temporary Names](#local-bindings-temporary-names)
-  * [Basic Bindings (let)](#1-basic-bindings-let)
-  * [Sequential Bindings (let*)](#sequential-bindings-let)
 * [Lists](#lists)
 * [Quoting](#quoting)
-  * [The Single Quote (')](#1-the-single-quote-)
-  * [The Backtick (`)](#the-backtick-)
-  * [The Expansion (`...)](#the-expansion-)
-  * [Mixing Styles](#mixing-styles-in-complex-structures)
 * [Control Flow](#control-flow)
 * [Characters](#characters)
 * [Vectors](#vectors)
@@ -45,9 +31,7 @@ The `write` function takes a **quoted** `hello leo` **sentence**, and writes it 
 write 'hello leo
 ```
 
-### How the Syntax Works
-
-### How the Syntax Works
+## How the Syntax Works
 
 Leo Scheme replaces traditional parentheses with a clean combination of **indentation**, **spaces**, **colons** and **commas**. This creates a syntax that follows the **natural rules of written language**—much like a book or an essay, Leo uses spaces to separate "words" and punctuation to structure "sentences."
 
@@ -58,13 +42,13 @@ Leo Scheme replaces traditional parentheses with a clean combination of **indent
 
 Empty lines are perfectly fine—feel free to use them to breathe some space between different logical blocks of your code.
 
-#### Structured Depth
+### Structured Depth
 
 While natural written language is great for simple descriptions, it struggles to handle deep "nesting" (sentences within sentences within sentences) without becoming a confusing mess.
 
 Leo solves this by using **indentation**. By moving text two spaces to the right, you create a clear visual hierarchy that tells the computer exactly how deep a thought goes, keeping even the most complex structures easy to read.
 
-#### The "Tall" Way (Pure Indentation)
+### The "Tall" Way (Pure Indentation)
 
 Here is a "sentence" describing a circle with a radius of *10* and a center point at *(20, 30)* using only indentation. Notice how each new detail moves two spaces to the right, creating a clear hierarchy:
 
@@ -80,7 +64,7 @@ circle
         30
 ```
 
-#### The "Medium" Way (Using Spaces)
+### The "Medium" Way (Using Spaces)
 
 If a sentence only has one sub-sentence, you can save vertical space by putting it on the same line with a single space:
 
@@ -92,7 +76,7 @@ circle
     y 30
 ```
 
-#### The "Wide" Way (Colons and Commas)
+### The "Wide" Way (Colons and Commas)
 
 When you have multiple sub-sentences you want to fit onto a single line, use a colon followed by a space to start the list, and commas with spaces to separate them:
 
@@ -102,7 +86,7 @@ circle
   center point: x 20, y 30
 ```
 
-#### The "Single Line" Way (Parentheses)
+### The "Single Line" Way (Parentheses)
 
 While Leo is designed to be parenthesized-free, you can still use them if you absolutely need to fit an entire sentence onto one line (like in a terminal command). Just remember to put a space before the opening parenthesis.
 
@@ -112,7 +96,7 @@ _Note: This isn't the recommended style for writing your `.leo` files, but it's 
 circle (radius 10, center point (x 20, y 30))
 ```
 
-### Testing
+## Testing
 
 Leo Scheme has a built-in way to test code using the `check` keyword.
 In the example below, we are asking Leo to verify if the result of `add: 2, 2` is equal to `4`.
@@ -127,11 +111,11 @@ check equal?
 
 We will use this check pattern throughout the following sections to visualize the expected results of each example.
 
-### Definitions
+## Definitions
 
 In Leo, we use define to give names to things. You can think of this as creating nouns (values) or verbs (functions) that you can reuse throughout your program.
 
-#### Values
+### Values
 
 The simplest use of define is to save a piece of prose or a number for later. This keeps your code clean and avoids repeating yourself.
 
@@ -144,7 +128,7 @@ check equal?
   "Hello, Leo!"
 ```
 
-#### Functions
+### Functions
 
 When you want to define a new action (a function), you use an indented block.
 
@@ -168,15 +152,15 @@ check equal?
   "Hello, Leo!"
 ```
 
-### Local bindings: Temporary names
+## Local bindings: Temporary names
 
 Sometimes you need to give a name to a piece of prose just for a single calculation. In Leo, we use `let` and `let*` to create **local bindings**—names that exist only within that specific block of code.
 
-#### 1. Basic Bindings (`let`)
+### 1. Basic Bindings (`let`)
 
 Use `let` when you have several independent names you want to define at once before using them in an expression (the `in` part).
 
-#### Sequential Bindings (`let*`)
+### Sequential Bindings (`let*`)
 
 If one of your local names depends on a name you defined just a line above it, use `let*`. This tells Leo to define the names in order, allowing you to build complex sentences step-by-step.
 
@@ -199,7 +183,7 @@ check equal?
   "Hello, Leo!"
 ```
 
-### Lists
+## Lists
 
 ```leo
 define numbers list: 1, 2, 3
@@ -227,11 +211,11 @@ check equal?
   6
 ```
 
-### Quoting
+## Quoting
 
 In Scheme, "quoting" is how we tell the computer: "Don't run this code as a command; just treat it as a **sentence**." Leo offers three ways to do this, depending on how much of the sentence you want to "freeze."
 
-#### 1. The Single Quote (`'`)
+### 1. The Single Quote (`'`)
 
 The single quote is the simplest way to quote. It marks the **entire sentence** (and everything indented under it) as literal prose.
 
@@ -243,7 +227,7 @@ check equal?
   'add: 2, 2
 ```
 
-#### The Backtick (`` ` ``)
+### The Backtick (`` ` ``)
 
 Sometimes you only want to quote a specific word or part of a sentence while letting the rest run normally. A backtick appearing at the beginning of a word starts a quote and at the end of a word ends it.
 
@@ -255,7 +239,7 @@ check equal?
   'the result 4
 ```
 
-#### The Expansion (`` `... ``)
+### The Expansion (`` `... ``)
 
 If you want to quote a word but treat everything that follows it as a list of items, use the expansion quote (`` `... ``). This "closes" the quote but tells Leo to expand the right side of the sentence into a list.
 
@@ -265,7 +249,7 @@ check equal?
   'the results 1 2 3 4
 ```
 
-#### Mixing Styles in Complex Structures
+### Mixing Styles in Complex Structures
 
 You can combine these to handle complex data. In this circle example, we use backticks to quote words like `circle`, `radius`, `x`, and `y`, while allowing Leo to run functions like `sqrt` and `add` to fill in the actual values.
 
@@ -285,7 +269,7 @@ check equal?
 
 _For Scheme users: Leo's punctuation is a direct mapping of standard operators: `` ' `` acts as quote, while the backtick `` ` `` serves as a toggling `quasiquote` and `unquote`, and the ellipsis version `` `... `` functions as `unquote-splicing`._
 
-### Control Flow
+## Control Flow
 ```leo
 check equal?
   if
@@ -295,7 +279,7 @@ check equal?
   'ok
 ```
 
-### Characters
+## Characters
 ```leo
 char a
 char z
@@ -311,7 +295,7 @@ char code 128512
 char 😀
 ```
 
-### Vectors
+## Vectors
 ```leo
 define my-vector vector: "foo", char a, 3.14
 
@@ -329,7 +313,7 @@ check equal?
   "bar"
 ```
 
-### Bytevectors
+## Bytevectors
 ```leo
 define my-bytevector bytevector: 10, 20, 30, 40
 
@@ -347,7 +331,7 @@ check equal?
   50
 ```
 
-### Macros
+## Macros
 ```leo
 define-syntax
   when
