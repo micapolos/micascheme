@@ -35,7 +35,7 @@ We'll use that in the following sections to visualise expected results.
 
 ### Syntax
 
-Leo Scheme swaps traditional Lisp parentheses for a clean combination of **indentation**, **spaces**, **colons**, and **commas**. To keep things consistent, Leo uses exactly **2 spaces** per indentation level.
+Leo Scheme swaps traditional Scheme parentheses for a clean combination of **indentation**, **spaces**, **colons**, and **commas**. To keep things consistent, Leo uses exactly **2 spaces** per indentation level.
 
 > **Pro Tip:** Leo doesn't allow spaces at the end of a line. It's a good idea to configure your editor to "trim trailing whitespace" automatically so your code stays clean!
 
