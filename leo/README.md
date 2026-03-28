@@ -52,7 +52,7 @@ circle
 
 #### The "Wide" Way (Colons and Commas)
 
-When you have multiple sun-sentences you want to fit onto a single line, use a colon to start the list and commas to separate them:
+When you have multiple sub-sentences you want to fit onto a single line, use a colon to start the list and commas to separate them:
 
 ```leo
 circle
@@ -73,7 +73,9 @@ circle (radius 10, center point (x 20, y 30))
 ### Testing
 
 Leo Scheme has a built-in way to test code using the `check` keyword.
-Here, we're asking if the result of `add: 2, 2` is equal to `4`.
+In the example below, we are asking Leo to verify if the result of `add: 2, 2` is equal to `4`.
+If the results match, the test passes and the program continues smoothly.
+If they don't, the test fails and the program is interrupted—making it easy to catch bugs early!
 
 ```leo
 check equal?
@@ -81,7 +83,7 @@ check equal?
   4
 ```
 
-We'll use that in the following sections to visualise expected results.
+We will use this check pattern throughout the following sections to visualize the expected results of each example.
 
 ### Quoting
 
