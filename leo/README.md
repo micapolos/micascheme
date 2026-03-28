@@ -12,6 +12,8 @@ By swapping traditional parentheses for a natural system of **indentation** and 
 
 ---
 
+## Table of Contents
+
 * [Hello, Leo!](#hello-leo)
 * [How the Syntax Works](#how-the-syntax-works)
 * [Testing](#testing)
