@@ -265,7 +265,7 @@ In Scheme, "quoting" is how we tell the computer: "Don't run this code as a comm
 
 ### 1. The Single Quote (`'`)
 
-The single quote is the simplest way to quote. It marks the **entire sentence** (and everything indented under it) as literal prose.
+The single quote is the simplest way to quote. It marks the **entire sentence** including all its sub-sentences as literal prose.
 
 In this example, we aren't adding *2* and *2*; we are simply checking if the sentence itself matches another one.
 
@@ -297,9 +297,9 @@ check equal?
   'the results 1 2 3 4
 ```
 
-### Mixing Styles in Complex Structures
+### Mixing Styles in Complex Sentences
 
-You can combine these to handle complex data. In this circle example, we use backticks to quote words like `circle`, `radius`, `x`, and `y`, while allowing Leo to run functions like `sqrt` and `add` to fill in the actual values.
+You can combine these to handle complex sentences. In this example, we use backticks to quote words like `circle`, `radius`, `x`, and `y`, while allowing Leo to run functions like `sqrt` and `add` to fill in the actual values.
 
 ```leo
 check equal?
