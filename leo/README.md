@@ -24,7 +24,7 @@ Empty lines are perfectly fine—feel free to use them to breathe some space bet
 
 #### The "Tall" Way (Pure Indentation)
 
-Here is a sentence which describes a circle with a radius of *10* and a center point at *x: 20, y: 30* using only indentation. Notice how each new level of detail moves two spaces to the right:
+Here is a sentence which describes a circle with a radius of *10* and a center point at *(20, 30)* coordinates using only indentation. Notice how each new level of detail moves two spaces to the right:
 
 ```leo
 circle
