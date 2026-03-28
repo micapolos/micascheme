@@ -154,9 +154,9 @@ check equal?
   "Hello, Leo!"
 ```
 
-## Local bindings: Temporary names
+## Local names
 
-Sometimes you need to give a name to a piece of prose just for a single calculation. In Leo, we use `let` and `let*` to create **local bindings**—names that exist only within that specific block of code.
+Sometimes you need to give a name to a piece of prose just for a single calculation. In Leo, we use `let` and `let*` to create **local names** that exist only within that specific block of code.
 
 ### 1. Basic Bindings (`let`)
 
@@ -187,15 +187,37 @@ check equal?
 
 ## Lists
 
+In Leo, a `list` is a collection of items ordered in a single sequence. Because Leo is designed to read like a language, working with lists feels like building a long sentence out of individual words or smaller phrases.
+
+### Creating Lists
+You can mix and match different types of data—numbers, quoted prose (symbols), booleans, and even other lists—within a single collection.
+
 ```leo
 define numbers list: 1, 2, 3
 define fruits list: 'apple, 'banana, 'orange
 define various list: true, char a, and numbers
+```
 
+### The and Keyword (Splicing)
+
+A unique feature of Leo is the `and` keyword within a list. It doesn't just put a list inside another list; it "unpacks" or splices the items so they become part of the new list.
+
+```leo
 check equal?
   list: true, char a, and numbers
   list: true, char a, 1, 2, 3
+```
 
+#### Transforming and Filtering
+
+Leo provides powerful **verbs** to manipulate these lists:
+
+* **`append`**: Joins two lists into one long sequence.
+* **`map`**: Applies a transformation to every item in the list (e.g., turning numbers into strings).
+* **`filter`**: Keeps only the items that meet a certain condition (e.g., only `odd?` numbers).
+* **`fold-left`**: Combines all items in a list into a single value using a starting point (e.g., adding them all up starting from `0`).
+
+```leo
 check equal?
   append: numbers, fruits
   list: 1, 2, 3, 'apple, 'banana, 'orange
