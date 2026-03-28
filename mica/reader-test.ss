@@ -14,6 +14,11 @@
   (ok "" %eof)
   (error "a"))
 
+(check-reader (or-eof numeric-char)
+  (ok "1" #\1)
+  (ok "" %eof)
+  (error "a"))
+
 (check-reader char
   (ok "a" #\a)
   (error "")

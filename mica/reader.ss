@@ -1,6 +1,7 @@
 (library (mica reader)
   (export
     read-port
+    read-port-bfp
     read-string
     read-source-file-descriptor
     read-file
@@ -10,6 +11,7 @@
     or
     error
     eof
+    or-eof
     char ?char
     category-char
     range-char
@@ -96,6 +98,20 @@
           0
           0))
       $value))
+
+  (define (read-port-bfp $reader $port $sfd $bfp)
+    (%lets
+      ($getter (ending-getter (getter-item-getter $reader) eof-getter))
+      ((values $value $bfp $line $column)
+        (getter-get!
+          $getter
+          $port
+          $sfd
+          0 ; indent
+          $bfp
+          0
+          0))
+      (values $value $bfp)))
 
   (define (read-string $reader $string)
     (read-port $reader (open-input-string $string) test-sfd 0))
@@ -304,6 +320,15 @@
           ...
           ((%else _)
             (getter-item-getter (the last))))))
+    ((or-eof item)
+      (%lets
+        ($item (the item))
+        (getter-item
+          (lambda ($char/eof)
+            (or
+              (eof? $char/eof)
+              ((getter-item-first-char? $item) $char/eof)))
+          (or-eof-getter (getter-item-getter $item)))))
     ((map item fn)
       (getter-item
         (getter-item-first-char? (the item))

@@ -1,5 +1,6 @@
 (library (leo read)
   (export
+    leo-read-annotation
     leo-read
     make-leo-read)
   (import
@@ -7,13 +8,19 @@
     (getter)
     (leo getter)
     (leo path)
-    (only (mica reader) read-port)
-    (only (leo mica reader single-line) single-line-annotation)
+    (prefix (mica reader) %)
+    (prefix (leo mica reader single-line) %)
     (leo expand)
     (leo source-file-descriptor))
 
-  (define (leo-read $port $sfd $bfp)
-    (read-port single-line-annotation $port $sfd $bfp))
+  (define (leo-read-annotation $port $sfd $bfp)
+    (%read-port-bfp (%or-eof %single-line-annotation) $port $sfd $bfp))
+
+  (define (leo-read $port)
+    (lets
+      ((values $datum/eof $bfp)
+        (leo-read-annotation $port (source-file-descriptor "test.leo" 0) 0))
+      (datum/annotation-stripped $datum/eof)))
 
   (define (make-leo-read $port $sfd $bfp)
     (lets
