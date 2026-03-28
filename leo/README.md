@@ -35,6 +35,12 @@ display-line let
   hello "Hello"
   world "world"
   in string-append: hello, ", ", world, "!"
+
+display-line let*
+  hello "Hello"
+  world "world"
+  hello-world string-append: hello, ", ", world
+  in string-append: hello-world, "!"
 ```
 
 ### Control Flow
