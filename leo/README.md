@@ -29,6 +29,14 @@ define
 display-line exclamated comma-separated: hello, leo
 ```
 
+### Local bindings
+```leo
+display-line let
+  hello "Hello"
+  world "world"
+  in string-append: hello, ", ", world, "!"
+```
+
 ### Control Flow
 ```leo
 if
