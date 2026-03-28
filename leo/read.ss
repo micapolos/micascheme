@@ -15,7 +15,7 @@
     (leo source-file-descriptor))
 
   (define (leo-read-annotation $port $sfd $bfp)
-    (%read-port-bfp (%or-eof %single-line-annotation) $port $sfd $bfp))
+    (%read-port-bfp (%or-eof %single-line-annotation/eof) $port $sfd $bfp))
 
   (define (leo-read $port)
     (lets

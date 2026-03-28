@@ -1,6 +1,7 @@
 (library (leo mica reader single-line)
   (export
-    single-line-annotation)
+    single-line-annotation
+    single-line-annotation/eof)
   (import
     (prefix (micascheme) %)
     (only (micascheme) define)
@@ -14,6 +15,11 @@
       (one-of
         single-line-list-annotation
         single-line-non-list-annotation)))
+
+  (define single-line-annotation/eof
+    (suffixed
+      single-line-annotation
+      (or-eof (one-of #\space #\newline))))
 
   (define single-line-non-list-annotation
     (one-of

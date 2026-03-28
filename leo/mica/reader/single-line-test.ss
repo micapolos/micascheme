@@ -54,3 +54,16 @@
     "circle (radius 10, center point (x 20, y 30))"
     '(circle (radius 10) (center (point (x 20) (y 30))))))
 
+(check-reader (map single-line-annotation/eof %annotation-stripped)
+  (ok "123" 123)
+  (ok "123 " 123)
+  (ok "123\n" 123)
+  (ok "foo" 'foo)
+  (ok "foo\n" 'foo)
+  (ok "foo ()" '(foo))
+  (ok "foo () " '(foo))
+  (ok "foo ()\n" '(foo))
+
+  (ok
+    "circle (radius 10, center point (x 20, y 30))"
+    '(circle (radius 10) (center (point (x 20) (y 30))))))
