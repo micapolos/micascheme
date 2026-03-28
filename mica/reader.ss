@@ -101,7 +101,7 @@
 
   (define (read-port-bfp $reader $port $sfd $bfp)
     (%lets
-      ($getter (ending-getter (getter-item-getter $reader) eof-getter))
+      ($getter (getter-item-getter $reader))
       ((values $value $bfp $line $column)
         (getter-get!
           $getter
