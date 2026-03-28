@@ -2,7 +2,17 @@
   (export
     library import export top-level-program
     except only rename alias prefix add-prefix drop-prefix
-    from)
+    from
+
+    transform-identifier
+    transform-mapping
+    transform-name
+    transform-import-spec
+    transform-export-spec
+    transform-import
+    transform-export
+    transform-library
+    transform-top-level-program)
   (import
     (rename (micascheme)
       (import %import)
@@ -16,14 +26,16 @@
       (drop-prefix %drop-prefix)
       (library %library)
       (top-level-program %top-level-program)
-      (from %from))
+      (from %from)
+      (syntax-error %syntax-error))
+    (leo syntax-error)
     (keyword)
     (condition))
 
   (meta define (transform-identifier $syntax)
     (syntax-case $syntax ()
       (id (keyword? id) #'id)
-      (_ (syntax-error $syntax "invalid identifier"))))
+      (_ (syntax-error $syntax '(not keyword)))))
 
   (meta define (transform-mapping $syntax)
     (syntax-case $syntax ()
@@ -32,7 +44,7 @@
           #,(transform-identifier #'from)
           #,(transform-identifier #'to)))
       (_
-        (syntax-error $syntax "invalid mapping spec"))))
+        (syntax-error $syntax '(invalid mapping)))))
 
   (meta define (transform-name $syntax)
     (syntax-case $syntax ()
@@ -45,31 +57,31 @@
   (meta define (transform-import-spec $syntax)
     (syntax-case $syntax (except only rename alias prefix add-prefix drop-prefix from)
       ((except id ... (from spec))
-        #`(%except
+        #`(except
           #,(transform-import-spec #'spec)
           #,@(map transform-identifier #'(id ...))))
       ((only id ... (from spec))
-        #`(%only
+        #`(only
           #,(transform-import-spec #'spec)
           #,@(map transform-identifier #'(id ...))))
       ((rename mapping ... (from import-spec))
-        #`(%rename
+        #`(rename
           #,(transform-import-spec #'import-spec)
           #,@(map transform-mapping #'(mapping ...))))
       ((alias mapping ... (from import-spec))
-        #`(%alias
+        #`(alias
           #,(transform-import-spec #'import-spec)
           #,@(map transform-mapping #'(mapping ...))))
       ((prefix (id (from import-spec)))
-        #`(%prefix
+        #`(prefix
           #,(transform-import-spec #'import-spec)
           #,(transform-identifier #'id)))
       ((add-prefix (id (from import-spec)))
-        #`(%add-prefix
+        #`(add-prefix
           #,(transform-import-spec #'import-spec)
           #,(transform-identifier #'id)))
       ((drop-prefix (id (from import-spec)))
-        #`(%drop-prefix
+        #`(drop-prefix
           #,(transform-import-spec #'import-spec)
           #,(transform-identifier #'id)))
       (name
@@ -78,10 +90,10 @@
   (meta define (transform-export-spec $syntax)
     (syntax-case $syntax (rename import)
       ((rename mapping ...)
-        #`(%rename
+        #`(rename
           #,@(map transform-mapping #'(mapping ...))))
       ((import spec ...)
-        #`(%import
+        #`(import
           #,@(map transform-import-spec #'(spec ...))))
       (id
         (transform-identifier #'id))))
@@ -92,7 +104,7 @@
         #`(%export
           #,@(map transform-export-spec #'(spec ...))))
       (_
-        (syntax-error $syntax "expected export"))))
+        (syntax-error $syntax '(invalid export)))))
 
   (meta define (transform-import $syntax)
     (syntax-case $syntax (import)
@@ -105,15 +117,6 @@
             (make-syntax-violation $syntax #f)
             (make-cause-condition `(expected import)))))))
 
-  (meta define (transform-rename-spec $syntax)
-    (syntax-case $syntax ()
-      ((from to)
-        #`(
-          #,(transform-identifier #'from)
-          #,(transform-identifier #'to)))
-      (_
-        (syntax-error $syntax "invalid rename spec"))))
-
   (meta define (transform-library $syntax)
     (syntax-case $syntax (library)
       ((library name exports imports body ...)
@@ -123,7 +126,7 @@
           #,(transform-import #'imports)
           body ...))
       (_
-        (syntax-error $syntax "expected library"))))
+        (syntax-error $syntax '(invalid library)))))
 
   (meta define (transform-top-level-program $syntax)
     (syntax-case $syntax (top-level-program)
@@ -132,7 +135,7 @@
           #,(transform-import #'imports)
           body ...))
       (_
-        (syntax-error $syntax "invalid top level program"))))
+        (syntax-error $syntax '(invalid top-level-syntax)))))
 
   (define-keywords except only rename alias prefix add-prefix drop-prefix from)
 

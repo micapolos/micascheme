@@ -1,7 +1,6 @@
 (library (leo scheme)
   (export
     null
-    library import export
     define lambda
     let letrec let-values
     let* letrec* let*-values
@@ -36,8 +35,11 @@
     (leo writing-reader))
   (%export
     (import
+      (leo library)
       (except (chezscheme)
         library import export
+        top-level-program
+        except only rename alias prefix add-prefix drop-prefix
         define lambda
         let letrec let-values
         let* letrec* let*-values
@@ -48,15 +50,9 @@
         parameterize
         list)
       (only (micascheme) integer char true false keywords run)
-      (only (leo transform) from with)
+      (only (leo transform) with)
       (only (char) code)
       (only (leo code) code-pretty? code-line-limit)))
-
-  ; TODO: Implement this entire file in .leo
-
-  (%define-syntax library transform-library)
-  (%define-syntax import transform-import)
-  (%define-syntax export transform-export)
 
   (%define (any? _) #t)
   (%define null (%quote ()))

@@ -15,6 +15,7 @@
   (leo code)
   (leo transform)
   (leo library)
+  (leo syntax-error)
   (leo expand)
   (leo scheme)
   (leo path)
