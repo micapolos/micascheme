@@ -18,6 +18,7 @@
     (micascheme)
     (symbol)
     (getter)
+    (leo quotes)
     (prefix (mica reader) %)
     (prefix (leo mica reader identifier) %)
     (prefix (leo mica reader literal) %))
@@ -43,17 +44,6 @@
               $symbol)))
         ((else $other)
           (getter $literal-annotation)))))
-
-  (define (char->quote? $char)
-    (case $char
-      ((#\') 'quote)
-      ((#\`) 'quasiquote)
-      (else #f)))
-
-  (define (char->unquote? $char)
-    (case $char
-      ((#\`) 'unquote)
-      (else #f)))
 
   (define quote-annotation?-getter
     (getter-lets
