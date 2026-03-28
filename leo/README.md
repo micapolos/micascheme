@@ -7,6 +7,8 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 ### Overview
 * **Indentation:** Leo translates indentation into standard Scheme s-expressions.
 * **Nesting:** Each indented block represents a new level of nesting.
+* **Spaces:** Space opens a new level of nesting in the same line.
+* **Colon and commas:** Colon opens a new level of nesting in the same line with comma-separated items.
 
 ### Hello, Leo!
 
