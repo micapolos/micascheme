@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.41
+    implement forms: library, import, export, top-level-program
   v0.1.40
     adds optimize-level command line flag
     loads source files as programs which improves optimizations
