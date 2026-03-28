@@ -20,7 +20,7 @@ Leo Scheme swaps traditional Scheme parentheses for a clean combination of **ind
 
 One of the best ways to think about Leo is that it follows the **natural rules of written language**. Just like in a book or an essay, Leo uses spaces to separate "words" and punctuation to structure "sentences."
 
-* **Standard Spacing:** Use a space after a comma, a space after a colon, and a space before an opening parenthesis.
+* **Standard Spacing:** Use a space after a comma and a space after a colon.
 * **Indentation:** To keep things consistent, Leo uses exactly **2 spaces** per indentation level.
 * **Clean Lines:** Leo doesn't allow spaces at the end of a line. It's a good idea to configure your editor to "trim trailing whitespace" automatically!
 
