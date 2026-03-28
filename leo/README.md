@@ -145,7 +145,7 @@ check equal?
       y 70
 ```
 
-For Scheme users, Leo's punctuation is a direct mapping of standard operators: `` ' `` acts as quote, while the backtick `` ` `` serves as a toggling `quasiquote` and `unquote`, and the ellipsis version `` `... `` functions as `unquote-splicing`.
+_For Scheme users: Leo's punctuation is a direct mapping of standard operators: `` ' `` acts as quote, while the backtick `` ` `` serves as a toggling `quasiquote` and `unquote`, and the ellipsis version `` `... `` functions as `unquote-splicing`._
 
 ### Definitions
 ```leo
