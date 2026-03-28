@@ -1,0 +1,16 @@
+(import
+  (prefix (micascheme) %)
+  (only (micascheme) quote)
+  (mica reader)
+  (leo mica reader single-line))
+
+(check-reader (map single-line-annotation %annotation-stripped)
+  (ok "foo" 'foo)
+  (ok "123" 123)
+  (ok "\"foo\"" "foo")
+  (ok "foo bar" '(foo bar))
+  (ok "foo bar gar" '(foo (bar gar)))
+  (ok "foo ()" '(foo))
+  (ok "foo bar ()" '(foo (bar)))
+  (ok "foo (bar, gar)" '(foo bar gar))
+  )

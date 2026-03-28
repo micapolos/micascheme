@@ -144,6 +144,11 @@
   (ok "2" "2")
   (error "+"))
 
+(check-reader (cons alphabetic-char numeric-char)
+  (ok "a1" (%cons #\a #\1))
+  (error "a")
+  (error "a1b"))
+
 (check-reader (list digit)
   (ok "" (%list))
   (ok "1" (%list 1))

@@ -32,6 +32,7 @@
     map
     apply
     string->datum
+    cons
     list non-empty-list
     reject?-list
     skip-newlines
@@ -69,6 +70,7 @@
       (or %or)
       (null %null)
       (lets %lets)
+      (cons %cons)
       (list-annotation %list-annotation)
       (cons-annotation %cons-annotation))
     (keyword)
@@ -172,7 +174,7 @@
   (define-rules-syntaxes (keywords else not >)
     ((return x)
       (getter-item
-        (always #f)
+        (always #t)
         (getter x)))
     ((replace reader value)
       (%lets
@@ -299,6 +301,11 @@
       (apply (%prepend (the item) (the list))))
     ((append item ...)
       (apply (%append (the item) ...)))
+    ((cons car cdr)
+      (lets
+        ($car car)
+        ($cdr cdr)
+        (return (%cons $car $cdr))))
     ((list item)
       (%lets
         ($item (the item))
