@@ -91,13 +91,13 @@ We will use this check pattern throughout the following sections to visualize th
 
 ### Quoting
 
-In Scheme, "quoting" is how we tell the computer: "Don't run this code; just treat it as a piece of data." Leo offers three ways to do this, depending on how much of the "sentence" you want to freeze.
+In Scheme, "quoting" is how we tell the computer: "Don't run this code as a command; just treat it as a **sentence** (or **prose**)." Leo offers three ways to do this, depending on how much of the sentence you want to "freeze."
 
-#### The Single Quote (')
+#### 1. The Single Quote (`'`)
 
-The single quote is the simplest way to quote. It marks the entire sentence (and everything indented under it) as a literal piece of data.
+The single quote is the simplest way to quote. It marks the **entire sentence** (and everything indented under it) as literal prose.
 
-In this example, we aren't adding 2 and 2; we are simply checking if the "sentence" itself matches another one.
+In this example, we aren't adding *2* and *2*; we are simply checking if the sentence itself matches another one.
 
 ```leo
 check equal?
@@ -109,22 +109,22 @@ check equal?
 
 Sometimes you only want to quote a specific word or part of a sentence while letting the rest run normally. A backtick appearing at the beginning of a word starts a quote and at the end of a word ends it.
 
-Here, we quote the word `result`, but we let the `add: 2, 2` part actually calculate the number *4*.
+Here, we quote `the result`, but we let the `add: 2, 2` part actually calculate the number *4*.
 
 ```leo
 check equal?
-  `result` add: 2, 2
-  'result 4
+  `the result` add: 2, 2
+  'the result 4
 ```
 
 #### The Expansion (`` `... ``)
 
-If you want to quote a label but treat everything that follows it as a list of items, use the expansion quote (`` `... ``). This "closes" the quote but tells Leo to expand the right side of the sentence into a list.
+If you want to quote a word but treat everything that follows it as a list of items, use the expansion quote (`` `... ``). This "closes" the quote but tells Leo to expand the right side of the sentence into a list.
 
 ```leo
 check equal?
-  `results`... list: 1, 2, 3, 4
-  'results 1 2 3 4
+  `the results`... list: 1, 2, 3, 4
+  'the results 1 2 3 4
 ```
 
 #### Mixing Styles in Complex Structures
