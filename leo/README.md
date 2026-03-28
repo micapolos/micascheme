@@ -173,7 +173,7 @@ check equal?
 
 Sometimes you need to give a name to a piece of prose just for a single calculation. In Leo, we use `let` and `let*` to create **local names** that exist only within that specific block of code.
 
-### 1. Basic Bindings (`let`)
+### Basic Bindings (`let`)
 
 Use `let` when you have several independent names you want to define at once before using them in an expression (the `in` part).
 
@@ -263,7 +263,7 @@ check equal?
 
 In Scheme, "quoting" is how we tell the computer: "Don't run this code as a command; just treat it as a **sentence**." Leo offers three ways to do this, depending on how much of the sentence you want to "freeze."
 
-### 1. The Single Quote (`'`)
+### The Single Quote (`'`)
 
 The single quote is the simplest way to quote. It marks the **entire sentence** including all its sub-sentences as literal prose.
 
