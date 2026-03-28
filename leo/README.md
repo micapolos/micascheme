@@ -33,6 +33,52 @@ check equal?
 
 We'll use that in the following sections to visualise expected results.
 
+### Syntax
+
+Leo Scheme uses intentation, spaces, colons and commas instead of parentheses.
+Indentation consists of exactly 2 spaces.
+Spaces are not allowed at the end of line, so configure your editor to trim trailing spaces.
+Empty lines are valid, and can be used to separate logical blocks of code.
+
+The following sentence describes a circle with a radius of *10* and center point with *20* and *30* x/y coordinates:
+
+```leo
+circle
+  radius
+    10
+  center
+    point
+      x
+        20
+      y
+        30
+```
+
+If the sentence contains single sub-sentence, you can fit it into a single line using a *space*:
+
+```leo
+circle
+  radius 10
+  center point
+    x 20
+    y 30
+```
+
+If sentence consists of more than one sub-sentences, you can put them into a single line using colon and commas:
+
+```leo
+circle
+  radius 10
+  center point: x 20, y 30
+```
+
+You can still use parentheses to fit the entire sentence into a single line.
+However, this syntax is not recommended inside Leo Scheme programs, and is designed to be used in places where single-line is required.
+
+```leo
+circle (radius 10, center point (x 20, y 30))
+```
+
 ### Quoting
 ```leo
 check equal?
