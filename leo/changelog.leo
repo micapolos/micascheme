@@ -1,6 +1,9 @@
 import leo scheme
 
 quote changelog
+  v0.1.43
+    implements testing forms: test, check, raises, works
+    adds first batch of leo unit tests
   v0.1.42
     implement load function
     fix: let-values, let*-values

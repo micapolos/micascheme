@@ -8,6 +8,7 @@
 
   (define-rules-syntaxes
     ((check . x)
+      ; TODO: Remove exception handler when check raises readable leo exceptions
       (with-exception-handler
         (base-exception-handler)
         (lambda () (%check . x))))
