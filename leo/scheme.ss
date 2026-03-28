@@ -15,6 +15,7 @@
     define-syntax
     syntax-case
     logging
+    load
 
     add subtract multiply divide
     number=? less? less/equal? greater? greater/equal?
@@ -32,6 +33,7 @@
     (leo sentence)
     (leo reader)
     (leo datum)
+    (leo load)
     (leo writing-reader))
   (%export
     (import
@@ -40,6 +42,7 @@
         library import export
         top-level-program
         except only rename alias prefix add-prefix drop-prefix
+        load
         define lambda
         let letrec let-values
         let* letrec* let*-values
@@ -93,6 +96,8 @@
 
   (%define closed-list %list)
   (%define open-list %list*)
+
+  (%define load load-leo-program)
 
   (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values)
     ((define (name x))
