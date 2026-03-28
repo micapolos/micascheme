@@ -43,7 +43,7 @@ Empty lines are perfectly fine—feel free to use them to breathe some space bet
 
 #### The "Tall" Way (Pure Indentation)
 
-Here is how you describe a circle with a radius of *10* and a center point at *x: 20, y: 30* using only indentation. Notice how each new level of detail moves two spaces to the right:
+Here is a sentence which describes a circle with a radius of *10* and a center point at *x: 20, y: 30* using only indentation. Notice how each new level of detail moves two spaces to the right:
 
 ```leo
 circle
@@ -59,7 +59,7 @@ circle
 
 #### The "Medium" Way (Using Spaces)
 
-If a section only has one "sub-sentence" (one piece of information), you can save vertical space by putting it on the same line with a simple space:
+If a sentence only has one sub-sentence, you can save vertical space by putting it on the same line with a simple space:
 
 ```leo
 circle
@@ -71,7 +71,7 @@ circle
 
 #### The "Wide" Way (Colons and Commas)
 
-When you have multiple pieces of information you want to fit onto a single line, use a colon to start the list and commas to separate the items:
+When you have multiple sun-sentences you want to fit onto a single line, use a colon to start the list and commas to separate them:
 
 ```leo
 circle
@@ -81,7 +81,7 @@ circle
 
 #### The "Single Line" Way (Parentheses)
 
-While Leo is designed to be parenthesized-free, you can still use them if you absolutely need to fit an entire expression onto one line (like in a terminal command). Just remember to put a space before the opening parenthesis.
+While Leo is designed to be parenthesized-free, you can still use them if you absolutely need to fit an entire sentence onto one line (like in a terminal command). Just remember to put a space before the opening parenthesis.
 
 _Note: This isn't the recommended style for writing your .leo files, but it's there if you need it!_
 
