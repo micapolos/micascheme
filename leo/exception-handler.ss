@@ -6,17 +6,12 @@
     (only (leo scheme) write))
 
   (define (leo-exception-handler $x)
-    (cond
-      ((checking?)
-        ; TODO: Remove this hack when check raises readable exceptions
-        ((base-exception-handler) $x))
-      (else
-        (lets
-          ($datum (condition->datum $x))
-          ($datum (if (and (pair? $datum) (equal? (car $datum) 'condition)) (cdr $datum) (list $datum)))
-            (run
-              (write
-                `(exception ,$datum)
-                (console-error-port))
-              (reset))))))
+    (lets
+      ($datum (condition->datum $x))
+      ($datum (if (and (pair? $datum) (equal? (car $datum) 'condition)) (cdr $datum) (list $datum)))
+        (run
+          (write
+            `(exception ,$datum)
+            (console-error-port))
+          (reset))))
 )

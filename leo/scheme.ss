@@ -8,7 +8,6 @@
     if then cond
     switch any?
     make-read-lambda
-    write write-line
     list closed-list open-list
     display-line
     define-language
@@ -56,28 +55,14 @@
       (only (leo transform) with)
       (only (char) code)
       (leo check)
+      (leo write)
+      (leo test)
       (only (leo code) code-pretty? code-line-limit)))
 
   (%define (any? _) #t)
   (%define null (%quote ()))
 
   (define-keywords then)
-
-  (%define write
-    (%case-lambda
-      ((x)
-        (write x (%current-output-port)))
-      ((x port)
-        (%put-string port (code-string (block-code x))))))
-
-  (%define write-line
-    (%case-lambda
-      ((x)
-        (write-line x (%current-output-port)))
-      ((x port)
-        (%let ((p port))
-          (%put-string p (code-string (line-code x)))
-          (%newline p)))))
 
   (%define (display-line x)
     (%display x)

@@ -1,14 +1,12 @@
 (library (leo check)
-  (export checking? check)
+  (export check)
   (import
     (rename (micascheme)
-      (check %check)
-      (checking? %checking?)))
-
-  (define checking? (make-thread-parameter #f))
+      (check %check)))
 
   (define-rules-syntaxes
     ((check . x)
-      (meta-cond
-        ((checking?) (%check . x)))))
+      (with-exception-handler
+        (base-exception-handler)
+        (lambda () (%check . x)))))
 )

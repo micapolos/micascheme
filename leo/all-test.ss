@@ -13,6 +13,8 @@
   (leo writing-reader)
   (leo sentence)
   (leo code)
+  (leo write)
+  (leo test)
   (leo transform)
   (leo library)
   (leo syntax-error)

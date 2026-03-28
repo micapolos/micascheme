@@ -1,12 +1,11 @@
 (library (leo start)
   (export start)
   (import
-    (except (micascheme) checking?)
+    (micascheme)
     (leo leo)
     (leo load)
     (leo version)
     (leo exception-handler)
-    (only (leo check) checking?)
     (prefix (leo scheme) %))
 
   (define (start $arguments)
@@ -28,8 +27,6 @@
         (start-assembly-output (datum x)))
       (("--optimize-level" . x)
         (start-optimize-level (datum x)))
-      (("--check" . x)
-        (start-check (datum x)))
       ((file arg ...)
         (start-file (datum file) (datum (arg ...))))
       (()
@@ -49,17 +46,12 @@
           "Available options:"
           "  -v  --version            show version information"
           "  -h  --help               show this help message"
-          "      --check              run checks"
           "      --assembly-output    show assembly output"
           "      --optimize-level n   set optimize level < 0 | 1 | 2 | 3 >"))
       (start-options $arguments)))
 
   (define (start-assembly-output $arguments)
     (parameterize ((($primitive $assembly-output) #t))
-      (start-options $arguments)))
-
-  (define (start-check $arguments)
-    (parameterize ((checking? #t))
       (start-options $arguments)))
 
   (define (start-optimize-level $arguments)
