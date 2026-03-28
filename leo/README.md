@@ -32,6 +32,7 @@ Every journey starts with a friendly "Hello!".
 
 ```leo
 import leo scheme
+
 write 'hello leo
 ```
 
