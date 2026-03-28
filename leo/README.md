@@ -129,11 +129,11 @@ check equal?
 
 ### Functions
 
-When you want to define a new action (a function), you use an indented block.
+When you want to define a new action (a function), you use sub-sentences.
 
-The first indented sentence describes the "signature"—the name of the action and the inputs it needs.
+The first sub-sentence describes the "signature"—the name of the action and the inputs it needs.
 
-The following sentences are the "body"—the actual logic that runs.
+The following sub-sentences are the "body"—the actual logic that runs.
 
 In the example below, we define `exclamated` which takes a string and adds an exclamation mark to it. We also define `comma-separated` which takes two strings and joins them with a comma.
 
@@ -144,7 +144,10 @@ define
 
 define
   comma-separated: first-string, second-string
-  string-append: first-string, ", ", second-string
+  string-append
+    first-string
+    ", "
+    second-string
 
 check equal?
   exclamated comma-separated: "Hello", "Leo"
