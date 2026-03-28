@@ -84,7 +84,7 @@ circle
 
 ### The "Single Line" Way (Parentheses)
 
-While Leo is designed to be parenthesized-free, you can still use them if you absolutely need to fit an entire sentence onto one line (like in a terminal command). Just remember to put a space before the opening parenthesis.
+While Leo is designed to be parenthesized-free, you can still use them if you absolutely need to fit an entire sentence onto one line (like in a terminal command).
 
 _Note: This isn't the recommended style for writing your `.leo` files, but it's there if you need it!_
 
