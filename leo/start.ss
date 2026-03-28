@@ -49,7 +49,7 @@
           "Available options:"
           "  -v  --version            show version information"
           "  -h  --help               show this help message"
-          "      --check             evaluate checks"
+          "      --check              run checks"
           "      --assembly-output    show assembly output"
           "      --optimize-level n   set optimize level < 0 | 1 | 2 | 3 >"))
       (start-options $arguments)))
