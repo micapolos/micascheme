@@ -191,12 +191,21 @@ check equal?
 In Leo, a `list` is a collection of items ordered in a single sequence. Because Leo is designed to read like a language, working with lists feels like building a long sentence out of individual words or smaller phrases.
 
 ### Creating Lists
-You can mix and match different types of data—numbers, quoted prose (symbols), booleans, and even other lists—within a single collection.
+You can mix and match different types of data—numbers, sentences, strings, and even other lists—within a single collection.
 
 ```leo
-define numbers list: 1, 2, 3
-define fruits list: 'apple, 'banana, 'orange
-define various list: true, char a, and numbers
+define numbers list: 1, 2, 3, 4, 5
+
+define fruits list
+  'apple
+  'banana
+  'orange
+
+define various list
+  character A
+  "foo"
+  true
+  and numbers
 ```
 
 ### The and Keyword (Splicing)
@@ -205,8 +214,8 @@ A unique feature of Leo is the `and` keyword within a list. It doesn't just put 
 
 ```leo
 check equal?
-  list: true, char a, and numbers
-  list: true, char a, 1, 2, 3
+  list: true, character A, and numbers
+  list: true, character A, 1, 2, 3, 4, 5
 ```
 
 ### Transforming and Filtering
@@ -221,19 +230,19 @@ Leo provides powerful **verbs** to manipulate these lists:
 ```leo
 check equal?
   append: numbers, fruits
-  list: 1, 2, 3, 'apple, 'banana, 'orange
+  list: 1, 2, 3, 4, 5, 'apple, 'banana, 'orange
 
 check equal?
   map: number->string, numbers
-  list: "1", "2", "3"
+  list: "1", "2", "3", "4", "5"
 
 check equal?
   filter: odd?, numbers
-  list: 1, 3
+  list: 1, 3, 5
 
 check equal?
   fold-left: add, 0, numbers
-  6
+  19
 ```
 
 ## Quoting
