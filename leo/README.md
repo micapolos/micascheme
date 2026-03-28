@@ -10,6 +10,7 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 * [Lists](#lists)
 * [Quoting](#quoting)
 * [Control Flow](#control-flow)
+* [Strings](#strings)
 * [Characters](#characters)
 * [Vectors](#vectors)
 * [Bytevectors](#bytevectors)
@@ -306,6 +307,10 @@ check equal?
   'ok
 ```
 
+## Strings
+
+TODO
+
 ## Characters
 
 TODO
@@ -324,10 +329,6 @@ char semicolon
 char code 128512
 char 😀
 ```
-
-## Strings
-
-TODO
 
 ## Vectors
 
