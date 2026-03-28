@@ -8,9 +8,43 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 * **Indentation:** Leo translates indentation into standard Scheme s-expressions.
 * **Nesting:** Each indented block represents a new level of nesting.
 
-### Hello, Leo!
+### Hello, Leo Scheme!
 ```leo
-display-line "Hello, Leo!"
+display-line "Hello, Leo Scheme!"
+```
+
+### Checks
+```leo
+check equal?
+  add: 2, 2
+  4
+```
+
+### Quoting
+```leo
+check equal?
+  'add: 2, 2
+  'add: 2, 2
+
+check equal?
+  `result` add: 2, 2
+  'result 4
+
+check equal?
+  `results`... list: 1, 2, 3, 4
+  'results 1 2 3 4
+
+check equal?
+  `circle
+    radius` sqrt 4
+    center point
+      x` add: 10, 20
+      y` add: 30, 40
+  'circle
+    radius 2
+    center point
+      x 30
+      y 70
 ```
 
 ### Definitions
@@ -26,29 +60,37 @@ define
   comma-separated: first-string, second-string
   string-append: first-string, ", ", second-string
 
-display-line exclamated comma-separated: hello, leo
+check equal?
+  exclamated comma-separated: hello, leo
+  "Hello, world!"
 ```
 
 ### Local bindings
 ```leo
-display-line let
-  hello "Hello"
-  world "world"
-  in string-append: hello, ", ", world, "!"
+check equal?
+  let
+    hello "Hello"
+    world "world"
+    in string-append: hello, ", ", world, "!"
+  "Hello, world!"
 
-display-line let*
-  hello "Hello"
-  world "world"
-  hello-world string-append: hello, ", ", world
-  in string-append: hello-world, "!"
+check equal?
+  let*
+    hello "Hello"
+    world "world"
+    hello-world string-append: hello, ", ", world
+    in string-append: hello-world, "!"
+  "Hello, world!"
 ```
 
 ### Control Flow
 ```leo
-if
-  greater?: 10, 5
-  display-line "10 is greater than 5"
-  display-line "10 is not greater than 5"
+check equal?
+  if
+    greater?: 10, 5
+    'ten is greater than five
+    'ten is not greater than five
+  'ten is greater than five
 ```
 
 ### Lists
@@ -57,70 +99,77 @@ define numbers list: 1, 2, 3
 define fruits list: 'apple, 'banana, 'orange
 define various list: true, char a, and numbers
 
-write `lists
-  numbers` numbers
-  fruits` fruits
-  various` various
-  numbers and fruits` append: numbers, fruits
-  strings` map: number->string, numbers
-  odd numbers` filter: odd?, numbers
-  sum` fold-left: add, 0, numbers
+check equal?
+  list: true, char a, and numbers
+  list: true, char a, 1, 2, 3
+
+check equal?
+  append: numbers, fruits
+  list: 1, 2, 3, 'apple, 'banana, 'orange
+
+check equal?
+  map: number->string, numbers
+  list: "1", "2", "3"
+
+check equal?
+  filter: odd?, numbers
+  list: 1, 3
+
+check equal?
+  fold-left: add, 0, numbers
+  6
 ```
 
 ### Characters
 ```leo
-write list
-  char a
-  char z
-  char A
-  char Z
-  char 0
-  char 9
-  char space
-  char newline
-  char dot
-  char semicolon
-  char code 128512
-  char 😀
+char a
+char z
+char A
+char Z
+char 0
+char 9
+char space
+char newline
+char dot
+char semicolon
+char code 128512
+char 😀
 ```
 
 ### Vectors
 ```leo
 define my-vector vector: "foo", char a, 3.14
 
-write my-vector
-write vector-length my-vector
-write vector-ref: my-vector, 1
+check equal?
+  vector-length my-vector
+  3
+
+check equal?
+  vector-ref: my-vector, 0
+  "foo"
 
 vector-set!: my-vector, 0, "bar"
-write my-vector
+check equal?
+  vector-ref: my-vector, 0
+  "bar"
 ```
 
 ### Bytevectors
 ```leo
 define my-bytevector bytevector: 10, 20, 30, 40
 
-write my-bytevector
-write bytevector-length my-bytevector
-write bytevector-ref: my-bytevector, 1
+check equal?
+  bytevector-length my-bytevector
+  4
+
+check equal?
+  bytevector-ref: my-bytevector, 1
+  20
 
 bytevector-set!: my-bytevector, 1, 50
-write my-bytevector
-```
-
-### Quoting
-```leo
-write 'quoted add: 2, 2
-
-write `quoted and unquoted` add: 2, 2
-
-write `quoted and unquoted from list`... list: 1, 2, 3, 4
-
-write `deeply quoted circle
-  radius` sqrt 4
-  center point
-    x` sin 10
-    y` cos 10
+check equal?
+  bytevector-ref: my-bytevector, 1
+  50
 ```
 
 ### Macros
@@ -136,7 +185,15 @@ define-syntax
     magic: a, ...
     list: 'a, ...
 
-write magic "world"
-write magic: 10, 20
-write magic: apple, orange, banana
+check equal?
+  magic "world"
+  "Hello, world!"
+
+check equal?
+  magic: 10, 20
+  30
+
+check equal?
+  magic: apple, orange, banana
+  list: 'apple, 'orange, 'banana
 ```
