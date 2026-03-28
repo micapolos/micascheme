@@ -6,12 +6,14 @@
     (only (micascheme) define)
     (mica reader)
     (leo mica reader identifier)
-    (leo mica reader literal))
+    (leo mica reader literal)
+    (leo mica reader quoted))
 
   (define single-line-annotation
-    (one-of
-      single-line-list-annotation
-      single-line-non-list-annotation))
+    (begin-quoted-annotation
+      (one-of
+        single-line-list-annotation
+        single-line-non-list-annotation)))
 
   (define single-line-non-list-annotation
     (one-of
@@ -47,8 +49,9 @@
     (list-annotation single-line-annotations))
 
   (define single-line-rhs-annotations
-    (prefixed " "
-      (one-of
-        (map single-line-non-list-annotation %list)
-        single-line-annotations)))
+    (end-quoted-annotations
+      (prefixed " "
+        (one-of
+          (map single-line-non-list-annotation %list)
+          single-line-annotations))))
 )

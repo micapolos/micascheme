@@ -23,3 +23,16 @@
   (ok "`...1" ',@#\1)
   (ok "``1" ',,#\1)
   (ok "`...`...1" ',@,@#\1))
+
+(check-reader
+  (map
+    (end-quoted-annotations
+      (list-with
+        (annotation alphabetic-char)
+        (annotation numeric-char)))
+    (%lambda ($annotations)
+      (%map %annotation-stripped $annotations)))
+  (ok "a1" '(#\a #\1))
+  (ok "`a1" '((unquote #\a #\1)))
+  (ok "`...a1" '((unquote-splicing #\a #\1)))
+  (ok "``...a1" '((unquote (unquote-splicing #\a #\1)))))
