@@ -14,6 +14,7 @@
   (leo sentence)
   (leo code)
   (leo transform)
+  (leo library)
   (leo expand)
   (leo scheme)
   (leo path)
