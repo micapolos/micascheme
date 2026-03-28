@@ -148,6 +148,13 @@ check equal?
 _For Scheme users: Leo's punctuation is a direct mapping of standard operators: `` ' `` acts as quote, while the backtick `` ` `` serves as a toggling `quasiquote` and `unquote`, and the ellipsis version `` `... `` functions as `unquote-splicing`._
 
 ### Definitions
+
+In Leo, we use define to give names to things. You can think of this as creating nouns (values) or verbs (functions) that you can reuse throughout your program.
+
+#### Values
+
+The simplest use of define is to save a piece of prose or a number for later. This keeps your code clean and avoids repeating yourself.
+
 ```leo
 define hello "Hello"
 define leo "Leo"
@@ -156,6 +163,16 @@ check equal?
   string-append: hello, ", ", leo, "!"
   "Hello, Leo!"
 ```
+
+#### Functions
+
+When you want to define a new action (a function), you use an indented block.
+
+The first indented sentence describes the "signature"—the name of the action and the inputs it needs.
+
+The following sentences are the "body"—the actual logic that runs.
+
+In the example below, we define `exclamated` which takes a string and adds an exclamation mark to it. We also define `comma-separated` which takes two strings and joins them with a comma.
 
 ```leo
 define
