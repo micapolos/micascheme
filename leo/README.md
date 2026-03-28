@@ -89,6 +89,96 @@ check equal?
 
 We will use this check pattern throughout the following sections to visualize the expected results of each example.
 
+### Definitions
+
+In Leo, we use define to give names to things. You can think of this as creating nouns (values) or verbs (functions) that you can reuse throughout your program.
+
+#### Values
+
+The simplest use of define is to save a piece of prose or a number for later. This keeps your code clean and avoids repeating yourself.
+
+```leo
+define hello "Hello"
+define leo "Leo"
+
+check equal?
+  string-append: hello, ", ", leo, "!"
+  "Hello, Leo!"
+```
+
+#### Functions
+
+When you want to define a new action (a function), you use an indented block.
+
+The first indented sentence describes the "signature"—the name of the action and the inputs it needs.
+
+The following sentences are the "body"—the actual logic that runs.
+
+In the example below, we define `exclamated` which takes a string and adds an exclamation mark to it. We also define `comma-separated` which takes two strings and joins them with a comma.
+
+```leo
+define
+  exclamated string
+  string-append: string, "!"
+
+define
+  comma-separated: first-string, second-string
+  string-append: first-string, ", ", second-string
+
+check equal?
+  exclamated comma-separated: "Hello", "Leo"
+  "Hello, Leo!"
+```
+
+### Local bindings
+
+```leo
+check equal?
+  let
+    hello "Hello"
+    leo "Leo"
+    in string-append: hello, ", ", leo, "!"
+  "Hello, Leo!"
+```
+
+```leo
+check equal?
+  let*
+    hello "Hello"
+    leo "Leo"
+    hello-leo string-append: hello, ", ", leo
+    in string-append: hello-leo, "!"
+  "Hello, Leo!"
+```
+
+### Lists
+
+```leo
+define numbers list: 1, 2, 3
+define fruits list: 'apple, 'banana, 'orange
+define various list: true, char a, and numbers
+
+check equal?
+  list: true, char a, and numbers
+  list: true, char a, 1, 2, 3
+
+check equal?
+  append: numbers, fruits
+  list: 1, 2, 3, 'apple, 'banana, 'orange
+
+check equal?
+  map: number->string, numbers
+  list: "1", "2", "3"
+
+check equal?
+  filter: odd?, numbers
+  list: 1, 3
+
+check equal?
+  fold-left: add, 0, numbers
+  6
+```
+
 ### Quoting
 
 In Scheme, "quoting" is how we tell the computer: "Don't run this code as a command; just treat it as a **sentence** (or **prose**)." Leo offers three ways to do this, depending on how much of the sentence you want to "freeze."
@@ -147,67 +237,6 @@ check equal?
 
 _For Scheme users: Leo's punctuation is a direct mapping of standard operators: `` ' `` acts as quote, while the backtick `` ` `` serves as a toggling `quasiquote` and `unquote`, and the ellipsis version `` `... `` functions as `unquote-splicing`._
 
-### Definitions
-
-In Leo, we use define to give names to things. You can think of this as creating nouns (values) or verbs (functions) that you can reuse throughout your program.
-
-#### Values
-
-The simplest use of define is to save a piece of prose or a number for later. This keeps your code clean and avoids repeating yourself.
-
-```leo
-define hello "Hello"
-define leo "Leo"
-
-check equal?
-  string-append: hello, ", ", leo, "!"
-  "Hello, Leo!"
-```
-
-#### Functions
-
-When you want to define a new action (a function), you use an indented block.
-
-The first indented sentence describes the "signature"—the name of the action and the inputs it needs.
-
-The following sentences are the "body"—the actual logic that runs.
-
-In the example below, we define `exclamated` which takes a string and adds an exclamation mark to it. We also define `comma-separated` which takes two strings and joins them with a comma.
-
-```leo
-define
-  exclamated string
-  string-append: string, "!"
-
-define
-  comma-separated: first-string, second-string
-  string-append: first-string, ", ", second-string
-
-check equal?
-  exclamated comma-separated: "Hello", "Leo"
-  "Hello, Leo!"
-```
-
-### Local bindings
-```leo
-check equal?
-  let
-    hello "Hello"
-    leo "Leo"
-    in string-append: hello, ", ", leo, "!"
-  "Hello, Leo!"
-```
-
-```leo
-check equal?
-  let*
-    hello "Hello"
-    leo "Leo"
-    hello-leo string-append: hello, ", ", leo
-    in string-append: hello-leo, "!"
-  "Hello, Leo!"
-```
-
 ### Control Flow
 ```leo
 check equal?
@@ -216,33 +245,6 @@ check equal?
     'ok
     'error
   'ok
-```
-
-### Lists
-```leo
-define numbers list: 1, 2, 3
-define fruits list: 'apple, 'banana, 'orange
-define various list: true, char a, and numbers
-
-check equal?
-  list: true, char a, and numbers
-  list: true, char a, 1, 2, 3
-
-check equal?
-  append: numbers, fruits
-  list: 1, 2, 3, 'apple, 'banana, 'orange
-
-check equal?
-  map: number->string, numbers
-  list: "1", "2", "3"
-
-check equal?
-  filter: odd?, numbers
-  list: 1, 3
-
-check equal?
-  fold-left: add, 0, numbers
-  6
 ```
 
 ### Characters
