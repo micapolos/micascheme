@@ -35,12 +35,15 @@ We'll use that in the following sections to visualise expected results.
 
 ### Syntax
 
-Leo Scheme uses intentation, spaces, colons and commas instead of parentheses.
-Indentation consists of exactly 2 spaces.
-Spaces are not allowed at the end of line, so configure your editor to trim trailing spaces.
-Empty lines are valid, and can be used to separate logical blocks of code.
+Leo Scheme swaps traditional Lisp parentheses for a clean combination of **indentation**, **spaces**, **colons**, and **commas**. To keep things consistent, Leo uses exactly **2 spaces** per indentation level.
 
-The following sentence describes a circle with a radius of *10* and center point with *20* and *30* x/y coordinates:
+> **Pro Tip:** Leo doesn't allow spaces at the end of a line. It's a good idea to configure your editor to "trim trailing whitespace" automatically so your code stays clean!
+
+Empty lines are perfectly fine—feel free to use them to breathe some space between different logical blocks of your code.
+
+#### The "Tall" Way (Pure Indentation)
+
+Here is how you describe a circle with a radius of *10* and a center point at *x: 20, y: 30* using only indentation. Notice how each new level of detail moves two spaces to the right:
 
 ```leo
 circle
@@ -54,7 +57,9 @@ circle
         30
 ```
 
-If the sentence contains single sub-sentence, you can fit it into a single line using a *space*:
+#### The "Medium" Way (Using Spaces)
+
+If a section only has one "sub-sentence" (one piece of information), you can save vertical space by putting it on the same line with a simple space:
 
 ```leo
 circle
@@ -64,7 +69,9 @@ circle
     y 30
 ```
 
-If sentence consists of more than one sub-sentences, you can put them into a single line using colon and commas:
+#### The "Wide" Way (Colons and Commas)
+
+When you have multiple pieces of information you want to fit onto a single line, use a colon to start the list and commas to separate the items:
 
 ```leo
 circle
@@ -72,8 +79,11 @@ circle
   center point: x 20, y 30
 ```
 
-You can still use parentheses to fit the entire sentence into a single line.
-However, this syntax is not recommended inside Leo Scheme programs, and is designed to be used in places where single-line is required.
+#### The "Single Line" Way (Parentheses)
+
+While Leo is designed to be parenthesized-free, you can still use them if you absolutely need to fit an entire expression onto one line (like in a terminal command). Just remember to put a space before the opening parenthesis.
+
+_Note: This isn't the recommended style for writing your .leo files, but it's there if you need it!_
 
 ```leo
 circle (radius 10, center point (x 20, y 30))
