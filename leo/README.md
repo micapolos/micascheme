@@ -105,7 +105,7 @@ check equal?
   'add: 2, 2
 ```
 
-#### The Backtick (`)
+#### The Backtick (`` ` ``)
 
 Sometimes you only want to quote a specific word or part of a sentence while letting the rest run normally. A backtick appearing at the beginning of a word starts a quote and at the end of a word ends it.
 
@@ -117,9 +117,9 @@ check equal?
   'result 4
 ```
 
-#### The Expansion (`...)
+#### The Expansion (`` `... ``)
 
-If you want to quote a label but treat everything that follows it as a list of items, use the expansion quote (`...). This "closes" the quote but tells Leo to expand the right side of the sentence into a list.
+If you want to quote a label but treat everything that follows it as a list of items, use the expansion quote (`` `... ``). This "closes" the quote but tells Leo to expand the right side of the sentence into a list.
 
 ```leo
 check equal?
@@ -144,6 +144,8 @@ check equal?
       x 30
       y 70
 ```
+
+For Scheme users, Leo's punctuation is a direct mapping of standard operators: `` ' `` acts as quote, while the backtick `` ` `` serves as a toggling `quasiquote` and `unquote`, and the ellipsis version `` `... `` functions as `unquote-splicing`.
 
 ### Definitions
 ```leo
