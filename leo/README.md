@@ -39,7 +39,7 @@ write 'hello leo
 
 Before speaking, you must tell Leo which "vocabulary" to use. The `import` sentence at the top of your program brings in the standard vocabulary.
 
-The `write` function takes a **quoted sentence**—like `'hello leo`—and prints it to the screen.
+The `write` function takes a **quoted** `hello leo` **sentence** and prints it to the screen.
 
 *(We will explain that little single quote `'` in the **Quoting** section later!)*
 
