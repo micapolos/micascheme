@@ -15,8 +15,8 @@
 
   (define single-line-non-list-annotation
     (one-of
-      single-line-sentence-annotation
-      single-line-atom-annotation))
+      single-line-atom-annotation
+      single-line-sentence-annotation))
 
   (define single-line-sentence-annotation
     (lets
