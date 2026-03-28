@@ -6,7 +6,7 @@ By swapping traditional parentheses for a natural system of **indentation** and 
 ## Why choose Leo over standard Scheme?
 
 * **Readability First:** Say goodbye to "parenthesis counting." Leo’s structure mirrors the way we naturally write and organize thoughts, making your logic stand out rather than the syntax.
-* **Structured Depth:** While standard Scheme can become a "wall of brackets," Leo uses **2-space indentation** to create a clear visual hierarchy, helping you navigate complex nesting at a glance.
+* **Structured Depth:** While standard Scheme can become a "wall of brackets," Leo uses **indentation** to create a clear visual hierarchy, helping you navigate complex nesting at a glance.
 * **Minimalist Aesthetic:** Leo removes the visual "noise," allowing you to focus on the "verbs" (functions) and "nouns" (values) of your program.
 * **Fully Compatible:** Under the hood, Leo remains a true Scheme. You get all the power of first-class functions, recursion, and macros, just in a more elegant suit.
 
