@@ -18,13 +18,19 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 
 ## Hello, Leo!
 
-Every programming journey starts with a friendly "Hello!".
-In Leo Scheme, we use the `write` function to talk to the outside world.
-The `write` function takes a **quoted** `hello leo` **sentence**, and writes it to the screen.
+Every journey starts with a friendly "Hello!" In Leo, we use the `write` function to talk to the outside world.
 
-*(Don't worry about that little single quote `'` just yet; we will explain exactly how **Quoting** works in a later section!)*
+### The Import
+Before speaking, you must tell Leo which "vocabulary" to use. The `import` statement at the top of your file brings in the standard language rules.
+
+### Your First Sentence
+The `write` function takes a **quoted sentence**—like `'hello leo`—and prints it to the screen.
+
+*(We will explain that little single quote `'` in the **Quoting** section later!)*
 
 ```leo
+import leo scheme
+
 write 'hello leo
 ```
 
