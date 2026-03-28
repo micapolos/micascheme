@@ -28,7 +28,7 @@ Empty lines are perfectly fine—feel free to use them to breathe some space bet
 
 #### The "Tall" Way (Pure Indentation)
 
-If a sentence only has one sub-sentence, you can save vertical space by putting it on the same line using a single space, just like a normal sentence:
+Here is a "sentence" describing a circle with a radius of *10* and a center point at *(20, 30)* using only indentation. Notice how each new detail moves two spaces to the right, creating a clear hierarchy:
 
 ```leo
 circle
