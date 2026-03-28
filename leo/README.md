@@ -208,7 +208,7 @@ check equal?
   list: true, char a, 1, 2, 3
 ```
 
-#### Transforming and Filtering
+### Transforming and Filtering
 
 Leo provides powerful **verbs** to manipulate these lists:
 
@@ -294,6 +294,9 @@ check equal?
 _For Scheme users: Leo's punctuation is a direct mapping of standard operators: `` ' `` acts as quote, while the backtick `` ` `` serves as a toggling `quasiquote` and `unquote`, and the ellipsis version `` `... `` functions as `unquote-splicing`._
 
 ## Control Flow
+
+TODO
+
 ```leo
 check equal?
   if
@@ -304,6 +307,9 @@ check equal?
 ```
 
 ## Characters
+
+TODO
+
 ```leo
 char a
 char z
@@ -319,7 +325,14 @@ char code 128512
 char 😀
 ```
 
+## Strings
+
+TODO
+
 ## Vectors
+
+TODO
+
 ```leo
 define my-vector vector: "foo", char a, 3.14
 
@@ -338,6 +351,9 @@ check equal?
 ```
 
 ## Bytevectors
+
+TODO
+
 ```leo
 define my-bytevector bytevector: 10, 20, 30, 40
 
@@ -356,6 +372,9 @@ check equal?
 ```
 
 ## Macros
+
+TODO
+
 ```leo
 define-syntax
   when
