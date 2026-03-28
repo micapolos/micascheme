@@ -3,6 +3,7 @@
   (import
     (except (micascheme) test write)
     (leo write)
+    (leo load)
     (keyword))
 
   (define-rules-syntaxes
@@ -18,6 +19,6 @@
       (begin
         (begin
           (write '(testing x))
-          (load (test-path x)))
+          (load-leo-program (test-path x)))
         ...)))
 )
