@@ -40,3 +40,14 @@ check equal?
         string-append: hello, ", ", world
     string-append: hello-world, "!"
   "Hello, world!"
+
+check equal?
+  let fibonacci
+    with number 10
+    if
+      less?: number, 2
+      number
+      add
+        fibonacci subtract: number, 1
+        fibonacci subtract: number, 2
+  55
