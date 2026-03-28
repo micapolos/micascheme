@@ -14,6 +14,6 @@ check equal?
     lambda
       with port
       parameterize
-        with current-output-port port
-        document hello
+        current-output-port port
+        in document hello
   lines-string "hello"

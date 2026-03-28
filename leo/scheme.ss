@@ -1,6 +1,6 @@
 (library (leo scheme)
   (export
-    null
+    null in
     define lambda
     let letrec let-values
     let* letrec* let*-values
@@ -62,7 +62,7 @@
   (%define (any? _) #t)
   (%define null (%quote ()))
 
-  (define-keywords then)
+  (define-keywords then in)
 
   (%define (display-line x)
     (%display x)
@@ -169,7 +169,7 @@
         (write (%list (%quote label) val))
         val))
 
-    ((parameterize (with binding ...) x xs ...)
+    ((parameterize binding ... (in x xs ...))
       (%parameterize (binding ...) x xs ...))
 
     ((define-language (x l))
