@@ -12,7 +12,7 @@
 
   (define unquote
     (prefixed "`"
-      (switch (optional "...")
-        ((%false? _) (return (%quote unquote)))
-        ((else _) (return (%quote unquote-splicing))))))
+      (or
+        (optional (replace "..." (%quote unquote-splicing)))
+        (return (%quote unquote)))))
 )
