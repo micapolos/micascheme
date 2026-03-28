@@ -11,6 +11,7 @@
   (leo fragment)
   (leo getter)
   (leo writing-reader)
+  (leo quotes)
   (leo quotify)
   (leo code)
   (leo write)
