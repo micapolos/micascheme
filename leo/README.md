@@ -16,15 +16,19 @@ display-line "Hello, Leo!"
 
 ### Syntax
 
-Leo Scheme swaps traditional Scheme parentheses for a clean combination of **indentation**, **spaces**, **colons**, and **commas**. To keep things consistent, Leo uses exactly **2 spaces** per indentation level.
+Leo Scheme swaps traditional Scheme parentheses for a clean combination of **indentation**, **spaces**, **colons**, and **commas**.
 
-> **Pro Tip:** Leo doesn't allow spaces at the end of a line. It's a good idea to configure your editor to "trim trailing whitespace" automatically so your code stays clean!
+One of the best ways to think about Leo is that it follows the **natural rules of written language**. Just like in a book or an essay, Leo uses spaces to separate "words" and punctuation to structure "sentences."
+
+* **Standard Spacing:** Use a space after a comma, a space after a colon, and a space before an opening parenthesis.
+* **Indentation:** To keep things consistent, Leo uses exactly **2 spaces** per indentation level.
+* **Clean Lines:** Leo doesn't allow spaces at the end of a line. It's a good idea to configure your editor to "trim trailing whitespace" automatically!
 
 Empty lines are perfectly fine—feel free to use them to breathe some space between different logical blocks of your code.
 
 #### The "Tall" Way (Pure Indentation)
 
-Here is a sentence which describes a circle with a radius of *10* and a center point at *(20, 30)* coordinates using only indentation. Notice how each new level of detail moves two spaces to the right:
+If a sentence only has one sub-sentence, you can save vertical space by putting it on the same line using a single space, just like a normal sentence:
 
 ```leo
 circle
@@ -40,7 +44,7 @@ circle
 
 #### The "Medium" Way (Using Spaces)
 
-If a sentence only has one sub-sentence, you can save vertical space by putting it on the same line with a simple space:
+If a sentence only has one sub-sentence, you can save vertical space by putting it on the same line with a single space:
 
 ```leo
 circle
@@ -52,7 +56,7 @@ circle
 
 #### The "Wide" Way (Colons and Commas)
 
-When you have multiple sub-sentences you want to fit onto a single line, use a colon to start the list and commas to separate them:
+When you have multiple sub-sentences you want to fit onto a single line, use a colon followed by a space to start the list, and commas with spaces to separate them:
 
 ```leo
 circle
