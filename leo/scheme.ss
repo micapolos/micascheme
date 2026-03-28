@@ -29,7 +29,7 @@
     (writing)
     (code)
     (leo code)
-    (leo sentence)
+    (leo quotify)
     (leo reader)
     (leo datum)
     (leo load)

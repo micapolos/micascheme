@@ -19,7 +19,7 @@
   (import
     (micascheme)
     (leo datum)
-    (leo sentence)
+    (leo quotify)
     (code))
 
   (define code-pretty? (make-thread-parameter #f))

@@ -1,4 +1,4 @@
-(library (leo sentence)
+(library (leo quotify)
   (export
     phrase-cons phrase? phrase-string phrase-body
     sentence? sentence-switch
