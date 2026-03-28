@@ -2,6 +2,7 @@
   (export
     leo-read-annotation
     leo-read
+    leo-read-handler
     make-leo-read)
   (import
     (micascheme)
@@ -21,6 +22,11 @@
       ((values $datum/eof $bfp)
         (leo-read-annotation $port (source-file-descriptor "test.leo" 0) 0))
       (datum/annotation-stripped $datum/eof)))
+
+  (define (leo-read-handler $port $sfd? $ann? $bfp?)
+    (if (and $sfd? $ann? $bfp?)
+      (leo-read-annotation $port $sfd? $bfp?)
+      (values (leo-read $port) #f)))
 
   (define (make-leo-read $port $sfd $bfp)
     (lets
