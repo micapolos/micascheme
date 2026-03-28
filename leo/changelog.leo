@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.44
+    implements single-line reader to be used in repl
   v0.1.43
     implements testing forms: test, check, raises, works
     adds first batch of leo unit tests
