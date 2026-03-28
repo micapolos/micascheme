@@ -1,3 +1,3 @@
 import leo scheme
 
-load "hello.leo"
+check equal?: 2, 2

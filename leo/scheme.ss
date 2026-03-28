@@ -15,7 +15,7 @@
     define-syntax
     syntax-case
     logging
-    load
+    load load-program
 
     add subtract multiply divide
     number=? less? less/equal? greater? greater/equal?
@@ -42,7 +42,7 @@
         library import export
         top-level-program
         except only rename alias prefix add-prefix drop-prefix
-        load
+        load load-program
         define lambda
         let letrec let-values
         let* letrec* let*-values
@@ -55,6 +55,7 @@
       (only (micascheme) integer char true false keywords run)
       (only (leo transform) with)
       (only (char) code)
+      (leo check)
       (only (leo code) code-pretty? code-line-limit)))
 
   (%define (any? _) #t)
@@ -97,7 +98,8 @@
   (%define closed-list %list)
   (%define open-list %list*)
 
-  (%define load load-leo-program)
+  (%define load load-leo)
+  (%define load-program load-leo-program)
 
   (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values)
     ((define (name x))

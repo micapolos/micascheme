@@ -4,6 +4,7 @@ todo
   custom write-handler
   repl
   fix todo in leo code
+  fix check to raise proper exceptions with: cause, hint
   fix
     import, export, rename, and more
     in leo scheme
