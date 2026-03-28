@@ -2,29 +2,67 @@
 
 Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 
+* [Quick Start](#quick-start)
+  * [Hello, Leo!](#hello-leo)
+  * [How the Syntax Works](#how-the-syntax-works)
+    * [Structured Depth](#structured-depth)
+    * [The "Tall" Way](#the-tall-way-pure-indentation)
+    * [The "Medium" Way](#the-medium-way-using-spaces)
+    * [The "Wide" Way](#the-wide-way-colons-and-commas)
+    * [The "Single Line" Way](#the-single-line-way-parentheses)
+* [Testing](#testing)
+* [Definitions](#definitions)
+  * [Values](#values)
+  * [Functions](#functions)
+* [Local Bindings: Temporary Names](#local-bindings-temporary-names)
+  * [Basic Bindings (let)](#1-basic-bindings-let)
+  * [Sequential Bindings (let*)](#sequential-bindings-let)
+* [Lists](#lists)
+* [Quoting](#quoting)
+  * [The Single Quote (')](#1-the-single-quote-)
+  * [The Backtick (`)](#the-backtick-)
+  * [The Expansion (`...)](#the-expansion-)
+  * [Mixing Styles](#mixing-styles-in-complex-structures)
+* [Control Flow](#control-flow)
+* [Characters](#characters)
+* [Vectors](#vectors)
+* [Bytevectors](#bytevectors)
+* [Macros](#macros)
+
+---
+
 ## Quick Start
 
 ### Hello, Leo!
 
-Every programming journey starts with a friendly "Hello!".
-In Leo Scheme, we use the `display-line` function to talk to the outside world.
-It takes the text you give it and prints it to the screen, automatically adding a newline at the end so your terminal stays neat and organized for the next command.
+Every programming journey starts with a friendly "Hello!" In Leo Scheme, we use the `write` function to talk to the outside world.
+
+The `write` function takes a **quoted** `hello leo` **sentence**, and writes it to the screen.
+
+*(Don't worry about that little single quote `'` just yet; we will explain exactly how **Quoting** works in a later section!)*
 
 ```leo
-display-line "Hello, Leo!"
+write 'hello leo
 ```
 
-### Syntax
+### How the Syntax Works
 
-Leo swaps traditional Scheme parentheses for a clean combination of **indentation**, **spaces**, **colons**, and **commas**.
+### How the Syntax Works
 
-One of the best ways to think about Leo is that it follows the **natural rules of written language**. Just like in a book or an essay, Leo uses spaces to separate "words" and punctuation to structure "sentences."
+Leo Scheme replaces traditional parentheses with a clean combination of **indentation**, **spaces**, **colons** and **commas**. This creates a syntax that follows the **natural rules of written language**—much like a book or an essay, Leo uses spaces to separate "words" and punctuation to structure "sentences."
 
-* **Standard Spacing:** Use a space after a comma and a space after a colon.
-* **Indentation:** To keep things consistent, Leo uses exactly **2 spaces** per indentation level.
-* **Clean Lines:** Leo doesn't allow spaces at the end of a line. It's a good idea to configure your editor to "trim trailing whitespace" automatically!
+* **Standard Spacing:** Just like in prose, use a space after a comma, a space after a colon, and a space before an opening parenthesis.
+* **Indentation:** To keep your structure clear, Leo uses exactly **2 spaces** per indentation level.
+* **Parentheses:** While Leo focuses on indentation, you can still use **parentheses** whenever a single-line expression is required.
+* **Clean Lines:** Leo doesn't allow spaces at the end of a line. It’s a good idea to configure your editor to "trim trailing whitespace" automatically!
 
 Empty lines are perfectly fine—feel free to use them to breathe some space between different logical blocks of your code.
+
+#### Structured Depth
+
+While natural written language is great for simple descriptions, it struggles to handle deep "nesting" (sentences within sentences within sentences) without becoming a confusing mess.
+
+Leo solves this by using **indentation**. By moving text two spaces to the right, you create a clear visual hierarchy that tells the computer exactly how deep a thought goes, keeping even the most complex structures easy to read.
 
 #### The "Tall" Way (Pure Indentation)
 
@@ -68,7 +106,7 @@ circle
 
 While Leo is designed to be parenthesized-free, you can still use them if you absolutely need to fit an entire sentence onto one line (like in a terminal command). Just remember to put a space before the opening parenthesis.
 
-_Note: This isn't the recommended style for writing your .leo files, but it's there if you need it!_
+_Note: This isn't the recommended style for writing your `.leo` files, but it's there if you need it!_
 
 ```leo
 circle (radius 10, center point (x 20, y 30))
@@ -130,7 +168,17 @@ check equal?
   "Hello, Leo!"
 ```
 
-### Local bindings
+### Local bindings: Temporary names
+
+Sometimes you need to give a name to a piece of prose just for a single calculation. In Leo, we use `let` and `let*` to create **local bindings**—names that exist only within that specific block of code.
+
+#### 1. Basic Bindings (`let`)
+
+Use `let` when you have several independent names you want to define at once before using them in an expression (the `in` part).
+
+#### Sequential Bindings (`let*`)
+
+If one of your local names depends on a name you defined just a line above it, use `let*`. This tells Leo to define the names in order, allowing you to build complex sentences step-by-step.
 
 ```leo
 check equal?
@@ -181,7 +229,7 @@ check equal?
 
 ### Quoting
 
-In Scheme, "quoting" is how we tell the computer: "Don't run this code as a command; just treat it as a **sentence** (or **prose**)." Leo offers three ways to do this, depending on how much of the sentence you want to "freeze."
+In Scheme, "quoting" is how we tell the computer: "Don't run this code as a command; just treat it as a **sentence**." Leo offers three ways to do this, depending on how much of the sentence you want to "freeze."
 
 #### 1. The Single Quote (`'`)
 
