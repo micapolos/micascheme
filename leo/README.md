@@ -2,7 +2,7 @@
 
 Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 
-* [Quick Start](#quick-start)
+* [Hello, Leo!](#hello-leo)
 * [How the Syntax Works](#how-the-syntax-works)
 * [Testing](#testing)
 * [Definitions](#definitions)
@@ -17,9 +17,7 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 
 ---
 
-## Quick Start
-
-### Hello, Leo!
+## Hello, Leo!
 
 Every programming journey starts with a friendly "Hello!" In Leo Scheme, we use the `write` function to talk to the outside world.
 
