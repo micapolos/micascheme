@@ -21,7 +21,8 @@
     (leo quotes)
     (prefix (mica reader) %)
     (prefix (leo mica reader identifier) %)
-    (prefix (leo mica reader literal) %))
+    (prefix (leo mica reader literal) %)
+    (prefix (leo mica reader quotes) %))
 
   (data*
     inline-style
@@ -46,36 +47,10 @@
           (getter $literal-annotation)))))
 
   (define quote-annotation?-getter
-    (getter-lets
-      ($char peek-char/eof-getter)
-      (switch (char->quote? $char)
-        ((symbol? $symbol)
-          (annotation-getter
-            (replace-getter char-getter $symbol)
-            stripped-annotation))
-        ((else _) (getter #f)))))
-
-  (define (unquote-splicing-getter $unquote)
-    (getter-lets
-      ($char peek-char/eof-getter)
-      (case $char
-        ((#\.)
-          (replace-getter
-            (exact-getter "...")
-            (symbol-append $unquote '- 'splicing)))
-        (else
-          (getter $unquote)))))
+    (getter-item-getter (%optional (%annotation %quote))))
 
   (define unquote-annotation?-getter
-    (getter-lets
-      ($char peek-char/eof-getter)
-      (switch (char->unquote? $char)
-        ((symbol? $symbol)
-          (annotation-getter
-            (skip-char-getter (unquote-splicing-getter $symbol))
-            stripped-annotation))
-        ((else _)
-          (getter #f)))))
+    (getter-item-getter (%optional (%annotation %unquote))))
 
   (define (quoted-annotation-getter $line-getter)
     (getter-switch quote-annotation?-getter
