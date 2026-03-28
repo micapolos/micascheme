@@ -74,7 +74,7 @@ circle
 
 ### The "Wide" Way (Colons and Commas)
 
-When you have multiple sub-sentences you want to fit onto a single line, use a colon followed by a space to start the list, and commas with spaces to separate them:
+When you have multiple sub-sentences you want to fit onto a single line, use a colon to start the list, and commas to separate them:
 
 ```leo
 circle
