@@ -112,14 +112,14 @@ circle (radius 10, center point (x 20, y 30))
 ## Testing
 
 Leo Scheme has a built-in way to test code using the `check` keyword.
-In the example below, we are asking Leo to verify if the result of `add: 2, 2` is equal to `4`.
+In the example below, we are asking Leo to verify if the result of `add: 1, 2, 3, 4` is equal to `10`.
 If the results match, the test passes and the program continues smoothly.
 If they don't, the test fails and the program is interrupted—making it easy to catch bugs early!
 
 ```leo
 check equal?
-  add: 2, 2
-  4
+  add: 1, 2, 3, 4
+  10
 ```
 
 We will use this check pattern throughout the following sections to visualize the expected results of each example.
