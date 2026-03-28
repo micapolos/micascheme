@@ -16,4 +16,9 @@
     (check
       (annotation=? ($read)
         (stripped-annotation 'foo (make-source-object $sfd 4 7))))
-    (check (eof? ($read)))))
+    (check (eof? ($read)))
+
+    (check
+      (annotation=?
+        (leo-read (open-input-string "123") $sfd 0)
+        (stripped-annotation 123 (make-source-object $sfd 0 3))))))

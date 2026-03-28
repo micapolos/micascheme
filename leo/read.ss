@@ -1,12 +1,19 @@
 (library (leo read)
-  (export make-leo-read)
+  (export
+    leo-read
+    make-leo-read)
   (import
     (micascheme)
     (getter)
     (leo getter)
     (leo path)
+    (only (mica reader) read-port)
+    (only (leo mica reader single-line) single-line-annotation)
     (leo expand)
     (leo source-file-descriptor))
+
+  (define (leo-read $port $sfd $bfp)
+    (read-port single-line-annotation $port $sfd $bfp))
 
   (define (make-leo-read $port $sfd $bfp)
     (lets
