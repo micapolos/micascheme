@@ -53,7 +53,7 @@ Leo Scheme replaces traditional parentheses with a clean combination of **indent
 * **Parentheses:** While Leo focuses on indentation, you can still use **parentheses** whenever a single-line expression is required.
 * **Clean Lines:** Leo doesn't allow spaces at the end of a line. It’s a good idea to configure your editor to "trim trailing whitespace" automatically!
 
-Empty lines are perfectly fine—feel free to use them to breathe some space between paragraphs of your code.
+Empty lines are perfectly fine—feel free to use them to breathe some space between paragraphs of your program.
 
 ### Structured Depth
 
