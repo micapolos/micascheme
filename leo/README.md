@@ -9,31 +9,48 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 * **Nesting:** Each indented block represents a new level of nesting.
 
 ### Hello, Leo!
+
+Every programming journey starts with a friendly "Hello!".
+In Leo Scheme, we use the `display-line` function to talk to the outside world.
+It takes the text you give it and prints it to the screen, automatically adding a newline at the end so your terminal stays neat and organized for the next command.
+
 ```leo
 display-line "Hello, Leo!"
 ```
 
 ### Checks
+
+Leo Scheme has a built-in way to test code using the `check` keyword.
+Here, we're asking if the result of `add: 2, 2` is equal to `4`.
+
 ```leo
 check equal?
   add: 2, 2
   4
 ```
 
+We'll use that in the following sections to visualise expected results.
+
 ### Quoting
 ```leo
 check equal?
   'add: 2, 2
   'add: 2, 2
+```
 
+```leo
 check equal?
   `result` add: 2, 2
   'result 4
+```
 
+```leo
 check equal?
   `results`... list: 1, 2, 3, 4
   'results 1 2 3 4
+```
 
+```leo
 check equal?
   `circle
     radius` sqrt 4
@@ -52,6 +69,12 @@ check equal?
 define hello "Hello"
 define leo "Leo"
 
+check equal?
+  string-append: hello, ", ", leo, "!"
+  "Hello, Leo!"
+```
+
+```leo
 define
   exclamated string
   string-append: string, "!"
@@ -61,7 +84,7 @@ define
   string-append: first-string, ", ", second-string
 
 check equal?
-  exclamated comma-separated: hello, leo
+  exclamated comma-separated: "Hello", "Leo"
   "Hello, Leo!"
 ```
 
@@ -73,7 +96,9 @@ check equal?
     leo "Leo"
     in string-append: hello, ", ", leo, "!"
   "Hello, Leo!"
+```
 
+```leo
 check equal?
   let*
     hello "Hello"
