@@ -8,9 +8,9 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 * **Indentation:** Leo translates indentation into standard Scheme s-expressions.
 * **Nesting:** Each indented block represents a new level of nesting.
 
-### Hello, Leo Scheme!
+### Hello, Leo!
 ```leo
-display-line "Hello, Leo Scheme!"
+display-line "Hello, Leo!"
 ```
 
 ### Checks
@@ -62,7 +62,7 @@ define
 
 check equal?
   exclamated comma-separated: hello, leo
-  "Hello, world!"
+  "Hello, Leo!"
 ```
 
 ### Local bindings
@@ -70,17 +70,17 @@ check equal?
 check equal?
   let
     hello "Hello"
-    world "world"
-    in string-append: hello, ", ", world, "!"
-  "Hello, world!"
+    leo "Leo"
+    in string-append: hello, ", ", leo, "!"
+  "Hello, Leo!"
 
 check equal?
   let*
     hello "Hello"
-    world "world"
-    hello-world string-append: hello, ", ", world
-    in string-append: hello-world, "!"
-  "Hello, world!"
+    leo "Leo"
+    hello-leo string-append: hello, ", ", leo
+    in string-append: hello-leo, "!"
+  "Hello, Leo!"
 ```
 
 ### Control Flow
@@ -88,9 +88,9 @@ check equal?
 check equal?
   if
     greater?: 10, 5
-    'ten is greater than five
-    'ten is not greater than five
-  'ten is greater than five
+    'ok
+    'error
+  'ok
 ```
 
 ### Lists
@@ -186,8 +186,8 @@ define-syntax
     list: 'a, ...
 
 check equal?
-  magic "world"
-  "Hello, world!"
+  magic "Leo"
+  "Hello, Leo!"
 
 check equal?
   magic: 10, 20
