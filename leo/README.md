@@ -119,8 +119,10 @@ The simplest use of define is to save a piece of prose or a number for later. Th
 define hello "Hello"
 define leo "Leo"
 
+define hello-leo string-append: hello, ", ", leo, "!"
+
 check equal?
-  string-append: hello, ", ", leo, "!"
+  hello-leo
   "Hello, Leo!"
 ```
 
