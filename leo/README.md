@@ -202,10 +202,10 @@ define fruits list
   'orange
 
 define various list
+  123
   character A
   "foo"
   true
-  and numbers
 ```
 
 ### The and Keyword (Splicing)
@@ -222,7 +222,7 @@ check equal?
 
 Leo provides powerful **verbs** to manipulate these lists:
 
-* **`append`**: Joins two lists into one long sequence.
+* **`append`**: Joins any nubmer of lists into a single list.
 * **`map`**: Applies a transformation to every item in the list (e.g., turning numbers into strings).
 * **`filter`**: Keeps only the items that meet a certain condition (e.g., only `odd?` numbers).
 * **`fold-left`**: Combines all items in a list into a single value using a starting point (e.g., adding them all up starting from `0`).
@@ -242,7 +242,7 @@ check equal?
 
 check equal?
   fold-left: add, 0, numbers
-  19
+  15
 ```
 
 ## Quoting
