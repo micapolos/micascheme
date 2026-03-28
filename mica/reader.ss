@@ -19,6 +19,8 @@
     alphabetic-char
     numeric-char
     string
+    logging
+    lazy
     null
     alphabetic-string
     numeric-string
@@ -74,6 +76,7 @@
       (list %list)
       (cons %cons)
       (list-annotation %list-annotation)
+      (logging %logging)
       (cons-annotation %cons-annotation))
     (keyword)
     (getter))
@@ -201,6 +204,20 @@
           (partial char=? (string-ref (datum s) 0))
           (exact-string-getter (datum s)))))
     ((the x) x)
+    ((logging item)
+      (lets
+        ($item (the item))
+        (return (%logging $item))))
+    ((logging label item)
+      (lets
+        ($item (the item))
+        (return (%logging label $item))))
+    ((lazy item)
+      (%lets
+        ($lazy-item (lambda () (the item)))
+        (getter-item
+          (lambda ($char) ((getter-item-first-char? ($lazy-item)) $char))
+          (lazy-getter (lambda () (getter-item-getter ($lazy-item)))))))
     ((category-char cat ...)
       (?char
         (lambda ($char)

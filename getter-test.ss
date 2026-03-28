@@ -14,6 +14,8 @@
 (check-get-raises char-getter "")
 (check-gets char-getter "abc" #\a 1)
 
+(check-gets (lazy-getter (lambda () char-getter)) "abc" #\a 1)
+
 (check-get-raises (test?-char-getter char-numeric?) "")
 (check-get-raises (test?-char-getter char-numeric?) "a")
 (check-gets (test?-char-getter char-numeric?) "1" #\1 1)

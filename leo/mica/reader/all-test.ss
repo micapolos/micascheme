@@ -5,4 +5,5 @@
   (leo mica reader literal)
   (leo mica reader line)
   (leo mica reader quotes)
+  (leo mica reader quoted)
   (leo mica reader single-line))

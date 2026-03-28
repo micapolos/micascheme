@@ -47,10 +47,10 @@
           (getter $literal-annotation)))))
 
   (define quote-annotation?-getter
-    (getter-item-getter (%optional (%annotation %quote))))
+    (getter-item-getter (%optional (%annotation %begin-quote))))
 
   (define unquote-annotation?-getter
-    (getter-item-getter (%optional (%annotation %unquote))))
+    (getter-item-getter (%optional (%annotation %end-quote))))
 
   (define (quoted-annotation-getter $line-getter)
     (getter-switch quote-annotation?-getter

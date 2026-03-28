@@ -1,18 +1,18 @@
 (library (leo mica reader quotes)
-  (export quote unquote)
+  (export begin-quote end-quote)
   (import
     (prefix (micascheme) %)
-    (only (micascheme) define)
+    (only (micascheme) define quote)
     (mica reader))
 
-  (define quote
+  (define begin-quote
     (one-of
-      (replace "'" (%quote quote))
-      (replace "`" (%quote quasiquote))))
+      (replace "'" 'quote)
+      (replace "`" 'quasiquote)))
 
-  (define unquote
+  (define end-quote
     (prefixed "`"
       (or
-        (optional (replace "..." (%quote unquote-splicing)))
-        (return (%quote unquote)))))
+        (optional (replace "..." 'unquote-splicing))
+        (return 'unquote))))
 )

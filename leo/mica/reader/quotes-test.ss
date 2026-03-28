@@ -1,16 +1,17 @@
 (import
   (prefix (micascheme) %)
+  (only (micascheme) quote)
   (mica reader)
   (leo mica reader quotes))
 
-(check-reader quote
-  (ok "'" (%quote quote))
-  (ok "`" (%quote quasiquote))
+(check-reader begin-quote
+  (ok "'" 'quote)
+  (ok "`" 'quasiquote)
   (error ",")
   (error "''"))
 
-(check-reader unquote
-  (ok "`" (%quote unquote))
-  (ok "`..." (%quote unquote-splicing))
+(check-reader end-quote
+  (ok "`" 'unquote)
+  (ok "`..." 'unquote-splicing)
   (error ",")
   (error "``"))

@@ -19,6 +19,7 @@
     bfp-getter
     line-number-getter
     column-number-getter
+    lazy-getter
 
     indented-getter
     or-eof-getter
@@ -281,6 +282,10 @@
                     '(indent (should (contain (exactly (two spaces)))))))))
             (else
               (values $char $bfp $line $column)))))))
+
+  (define (lazy-getter $lazy-getter)
+    (getter ($port $sfd $indent $bfp $line $column)
+      (($lazy-getter) $port $sfd $indent $bfp $line $column)))
 
   (define eof-getter
     (getter-switch peek-char/eof-getter
