@@ -1,6 +1,9 @@
 import leo scheme
 
 quote changelog
+  v0.1.42
+    implement load function
+    fix: let-values, let*-values
   v0.1.41
     implement forms: library, import, export, top-level-program
   v0.1.40
