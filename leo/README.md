@@ -91,11 +91,25 @@ We will use this check pattern throughout the following sections to visualize th
 
 ### Quoting
 
+In Scheme, "quoting" is how we tell the computer: "Don't run this code; just treat it as a piece of data." Leo offers three ways to do this, depending on how much of the "sentence" you want to freeze.
+
+#### The Single Quote (')
+
+The single quote is the simplest way to quote. It marks the entire sentence (and everything indented under it) as a literal piece of data.
+
+In this example, we aren't adding 2 and 2; we are simply checking if the "sentence" itself matches another one.
+
 ```leo
 check equal?
   'add: 2, 2
   'add: 2, 2
 ```
+
+#### The Backtick (`)
+
+Sometimes you only want to quote a specific word or part of a sentence while letting the rest run normally. A backtick appearing at the beginning of a word starts a quote and at the end of a word ends it.
+
+Here, we quote the word `result`, but we let the `add: 2, 2` part actually calculate the number *4*.
 
 ```leo
 check equal?
@@ -103,11 +117,19 @@ check equal?
   'result 4
 ```
 
+#### The Expansion (`...)
+
+If you want to quote a label but treat everything that follows it as a list of items, use the expansion quote (`...). This "closes" the quote but tells Leo to expand the right side of the sentence into a list.
+
 ```leo
 check equal?
   `results`... list: 1, 2, 3, 4
   'results 1 2 3 4
 ```
+
+#### Mixing Styles in Complex Structures
+
+You can combine these to handle complex data. In this circle example, we use backticks to quote words like `circle`, `radius`, `x`, and `y`, while allowing Leo to run functions like `sqrt` and `add` to fill in the actual values.
 
 ```leo
 check equal?
