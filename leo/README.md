@@ -15,8 +15,6 @@ Leo Scheme is a dialect of Scheme which uses indentation instead of parentheses.
 * [Bytevectors](#bytevectors)
 * [Macros](#macros)
 
----
-
 ## Hello, Leo!
 
 Every programming journey starts with a friendly "Hello!" In Leo Scheme, we use the `write` function to talk to the outside world.
