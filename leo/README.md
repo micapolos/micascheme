@@ -126,7 +126,7 @@ We will use this check pattern throughout the following sections to visualize th
 
 ## Definitions
 
-In Leo, we use define to give names to things. You can think of this as creating nouns (values) or verbs (functions) that you can reuse throughout your program.
+In Leo, we use `define` to give names to things. You can think of this as creating nouns (values) or verbs (functions) that you can reuse throughout your program.
 
 ### Values
 
