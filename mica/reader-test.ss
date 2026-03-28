@@ -149,6 +149,11 @@
   (error "a")
   (error "a1b"))
 
+(check-reader (list-with digit alphabetic-char numeric-char)
+  (ok "1a1" (%list 1 #\a #\1))
+  (error "aa1")
+  (error "111"))
+
 (check-reader (list digit)
   (ok "" (%list))
   (ok "1" (%list 1))

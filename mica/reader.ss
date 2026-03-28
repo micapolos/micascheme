@@ -33,6 +33,7 @@
     apply
     string->datum
     cons
+    list-with
     list non-empty-list
     reject?-list
     skip-newlines
@@ -56,7 +57,7 @@
     switch
     else)
   (import
-    (rename (except (micascheme) map eof list switch error)
+    (rename (except (micascheme) map eof switch error)
       (string %string)
       (prepend %prepend)
       (append %append)
@@ -70,6 +71,7 @@
       (or %or)
       (null %null)
       (lets %lets)
+      (list %list)
       (cons %cons)
       (list-annotation %list-annotation)
       (cons-annotation %cons-annotation))
@@ -306,6 +308,8 @@
         ($car car)
         ($cdr cdr)
         (return (%cons $car $cdr))))
+    ((list-with item ...)
+      (apply (%list (the item) ...)))
     ((list item)
       (%lets
         ($item (the item))
