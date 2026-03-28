@@ -16,7 +16,7 @@
           ((%false? _)
             (return $identifier-annotation))
           ((else $annotations)
-            (list-annotation (return (%cons $identifier-annotation $annotations))))))
+            (list-annotation (cons (return $identifier-annotation) (return $annotations))))))
       (annotation number)
       (annotation string-literal)
       (annotation special-literal)))
