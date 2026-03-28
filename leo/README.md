@@ -20,19 +20,6 @@ It takes the text you give it and prints it to the screen, automatically adding 
 display-line "Hello, Leo!"
 ```
 
-### Checks
-
-Leo Scheme has a built-in way to test code using the `check` keyword.
-Here, we're asking if the result of `add: 2, 2` is equal to `4`.
-
-```leo
-check equal?
-  add: 2, 2
-  4
-```
-
-We'll use that in the following sections to visualise expected results.
-
 ### Syntax
 
 Leo Scheme swaps traditional Scheme parentheses for a clean combination of **indentation**, **spaces**, **colons**, and **commas**. To keep things consistent, Leo uses exactly **2 spaces** per indentation level.
@@ -89,7 +76,21 @@ _Note: This isn't the recommended style for writing your .leo files, but it's th
 circle (radius 10, center point (x 20, y 30))
 ```
 
+### Testing
+
+Leo Scheme has a built-in way to test code using the `check` keyword.
+Here, we're asking if the result of `add: 2, 2` is equal to `4`.
+
+```leo
+check equal?
+  add: 2, 2
+  4
+```
+
+We'll use that in the following sections to visualise expected results.
+
 ### Quoting
+
 ```leo
 check equal?
   'add: 2, 2
