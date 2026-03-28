@@ -24,9 +24,18 @@
       (datum/annotation-stripped $datum/eof)))
 
   (define (leo-read-handler $port $sfd? $ann? $bfp?)
-    (if (and $sfd? $ann? $bfp?)
-      (leo-read-annotation $port $sfd? $bfp?)
-      (values (leo-read $port) #f)))
+    (run
+      (pretty-print `(leo-read-handler ,$port ,$sfd? ,$ann? ,$bfp?))
+      (sleep (make-time 'time-duration 0 1))
+      (lets
+        ((values $datum/eof $bfp)
+          (leo-read-annotation
+            $port
+            (or $sfd? (source-file-descriptor "test.leo" 0))
+            (or $bfp? 0)))
+        (values
+          (if $ann? $datum/eof (datum/annotation-stripped (logging $datum/eof)))
+          $bfp))))
 
   (define (make-leo-read $port $sfd $bfp)
     (lets
