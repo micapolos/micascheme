@@ -38,7 +38,10 @@
         special-literal)))
 
   (define single-line-annotations
-    (wrapped "(" (separated ", " single-line-non-list-annotation) ")"))
+    (wrapped
+      "("
+      (separated ", " single-line-non-list-annotation)
+      ")"))
 
   (define single-line-list-annotation
     (list-annotation single-line-annotations))
