@@ -16,7 +16,7 @@ display-line "Hello, Leo!"
 
 ### Syntax
 
-Leo Scheme swaps traditional Scheme parentheses for a clean combination of **indentation**, **spaces**, **colons**, and **commas**.
+Leo swaps traditional Scheme parentheses for a clean combination of **indentation**, **spaces**, **colons**, and **commas**.
 
 One of the best ways to think about Leo is that it follows the **natural rules of written language**. Just like in a book or an essay, Leo uses spaces to separate "words" and punctuation to structure "sentences."
 
