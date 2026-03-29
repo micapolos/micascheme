@@ -61,7 +61,7 @@
     switch
     else)
   (import
-    (rename (except (micascheme) map eof switch error)
+    (rename (micascheme)
       (string %string)
       (prepend %prepend)
       (append %append)
@@ -79,6 +79,13 @@
       (cons %cons)
       (list-annotation %list-annotation)
       (logging %logging)
+      (flatten %flatten)
+      (switch %switch)
+      (null? %null?)
+      (map %map)
+      (always %always)
+      (error %error)
+      (eof %eof)
       (cons-annotation %cons-annotation))
     (keyword)
     (getter))
@@ -141,11 +148,11 @@
     (case-lambda
       (($cause $datum $hint)
         (getter-item
-          (always #f)
+          (%always #f)
           (error-getter $cause $datum $hint)))
       (($cause $datum)
         (getter-item
-          (always #f)
+          (%always #f)
           (error-getter $cause $datum)))))
 
   (define eof (getter-item eof? eof-getter))
@@ -199,7 +206,7 @@
   (define-rules-syntaxes (keywords else not >)
     ((return x)
       (getter-item
-        (always #t)
+        (%always #t)
         (getter x)))
     ((replace reader value)
       (%lets
