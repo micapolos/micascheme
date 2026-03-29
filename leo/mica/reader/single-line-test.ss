@@ -1,6 +1,6 @@
 (import
   (prefix (micascheme) %)
-  (only (micascheme) quote)
+  (only (micascheme) quote quasiquote unquote unquote-splicing)
   (mica reader)
   (leo mica reader single-line))
 
@@ -47,7 +47,7 @@
   ; end-quote
   (ok "foo` bar" '(foo ,bar))
   (ok "foo`... bar" '(foo ,@bar))
-  (ok "foo`... (bar, gar)" '(foo (unquote-splicing bar gar)))
+  (ok "foo`... (bar, gar)" '(foo ,@bar ,@gar))
   (ok "foo``... bar" '(foo ,,@bar))
 
   (ok

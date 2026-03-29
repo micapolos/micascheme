@@ -24,13 +24,21 @@
   (define (end-quoted-annotation $annotation)
     (quoted-annotation end-quote $annotation))
 
-  (define (end-quoted-annotations $annotations)
+  (define (quoted-annotations $quote $annotations)
     (or
       (optional
-        (list
-          (list-annotation
-            (cons
-              (annotation end-quote)
-              (end-quoted-annotations $annotations)))))
+        (lets
+          ($end-quote-annotation (annotation $quote))
+          ($annotations (lazy (end-quoted-annotations $annotations)))
+          (return
+            (%map
+              (%lambda ($annotation)
+                (%list-annotation
+                  (%list $end-quote-annotation $annotation)
+                  (%annotation-source $end-quote-annotation)))
+              $annotations))))
       $annotations))
+
+  (define (end-quoted-annotations $annotations)
+    (quoted-annotations end-quote $annotations))
 )

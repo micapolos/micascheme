@@ -1,6 +1,6 @@
 (import
   (prefix (micascheme) %)
-  (only (micascheme) quote)
+  (only (micascheme) quote quasiquote unquote unquote-splicing)
   (mica reader)
   (leo mica reader quoted))
 
@@ -28,12 +28,12 @@
   (map
     (end-quoted-annotations
       (list (annotation alphabetic-char)))
-    (%lambda ($annotations)
-      (%map %annotation-stripped $annotations)))
+    (%lambda ($annotation)
+      (%map %annotation-stripped $annotation)))
   (ok "a" '(#\a))
-  (ok "`a" '((unquote #\a)))
-  (ok "`...a" '((unquote-splicing #\a)))
-  (ok "``...a" '((unquote (unquote-splicing #\a)))))
+  (ok "`a" '(,#\a))
+  (ok "`...a" '(,@#\a))
+  (ok "``...a" '(,,@#\a)))
 
 (check-reader
   (map
@@ -41,9 +41,9 @@
       (list
         (annotation alphabetic-char)
         (annotation numeric-char)))
-    (%lambda ($annotations)
-      (%map %annotation-stripped $annotations)))
+    (%lambda ($annotation)
+      (%map %annotation-stripped $annotation)))
   (ok "a1" '(#\a #\1))
-  (ok "`a1" '((unquote #\a #\1)))
-  (ok "`...a1" '((unquote-splicing #\a #\1)))
-  (ok "``...a1" '((unquote (unquote-splicing #\a #\1)))))
+  (ok "`a1" '(,#\a ,#\1))
+  (ok "`...a1" '(,@#\a ,@#\1))
+  (ok "``...a1" '(,,@#\a ,,@#\1)))
