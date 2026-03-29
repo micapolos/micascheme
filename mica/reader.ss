@@ -148,22 +148,26 @@
           (always #f)
           (error-getter $cause $datum)))))
 
-  (define eof
-    (getter-item (lambda (_) #f) eof-getter))
+  (define eof (getter-item eof? eof-getter))
 
   (define (?char $test?)
-    (getter-item $test? (test?-char-getter $test?)))
+    (getter-item
+      (and? (not? eof?) $test?)
+      (test?-char-getter $test?)))
 
   (define whitespace-char (?char char-whitespace?))
   (define alphabetic-char (?char char-alphabetic?))
   (define numeric-char (?char char-numeric?))
 
-  ;(define string (getter-item char? string-getter))
   (define alphabetic-string
-    (getter-item char-alphabetic? alphabetic-string-getter))
+    (getter-item
+      (and? (not? eof?) char-alphabetic?)
+      alphabetic-string-getter))
 
   (define numeric-string
-    (getter-item char-numeric? numeric-string-getter))
+    (getter-item
+      (and? (not? eof?) char-numeric?)
+      numeric-string-getter))
 
   (define-syntax (string $syntax)
     (syntax-case $syntax ()
@@ -201,23 +205,29 @@
       (%lets
         ($reader (the reader))
         (getter-item
-          (getter-item-first-char? $reader)
+          (getter-item-first-char/eof? $reader)
           (replace-getter
             (getter-item-getter $reader)
             value))))
     ((the ch)
       (char? (datum ch))
       (getter-item
-        (partial char=? (datum ch))
+        (lambda ($char/eof)
+          (and
+            (char? $char/eof)
+            (char=? $char/eof (datum ch))))
         (exact-char-getter (datum ch))))
     ((the s)
       (string? (datum s))
       (if (string-empty? (datum s))
         (getter-item
-          (lambda (_) #f)
+          eof?
           (exact-string-getter (datum s)))
         (getter-item
-          (partial char=? (string-ref (datum s) 0))
+          (lambda ($char/eof)
+            (and
+              (char? $char/eof)
+              (char=? $char/eof (string-ref (datum s) 0))))
           (exact-string-getter (datum s)))))
     ((the x) x)
     ((logging item)
@@ -232,7 +242,8 @@
       (%lets
         ($lazy-item (lambda () (the item)))
         (getter-item
-          (lambda ($char) ((getter-item-first-char? ($lazy-item)) $char))
+          (lambda ($char/eof)
+            ((getter-item-first-char/eof? ($lazy-item)) $char/eof))
           (lazy-getter (lambda () (getter-item-getter ($lazy-item)))))))
     ((category-char cat ...)
       (?char
@@ -267,10 +278,10 @@
       (%lets
         ($reader (the reader))
         (getter-item
-          (lambda ($char)
+          (lambda ($char/eof)
             (and
-              (app (char-test test?) $char) ...
-              ((getter-item-first-char? $reader) $char)))
+              (app (char-test test?) $char/eof) ...
+              ((getter-item-first-char/eof? $reader) $char/eof)))
           (getter-switch peek-char/eof-getter
             ((char? $char)
               (if (and (app (char-test test?) $char) ...)
@@ -280,13 +291,13 @@
               (getter-item-getter reader))))))
     ((prefixed $prefix $item)
       (getter-item
-        (getter-item-first-char? (the $prefix))
+        (getter-item-first-char/eof? (the $prefix))
         (starting-getter
           (getter-item-getter (the $prefix))
           (getter-item-getter (the $item)))))
     ((suffixed $item $suffix)
       (getter-item
-        (getter-item-first-char? (the $item))
+        (getter-item-first-char/eof? (the $item))
         (ending-getter
           (getter-item-getter (the $item))
           (getter-item-getter (the $suffix)))))
@@ -294,28 +305,28 @@
       (suffixed (prefixed $prefix $item) $suffix))
     ((indented $item)
       (getter-item
-        (getter-item-first-char? (the $item))
+        (getter-item-first-char/eof? (the $item))
         (indented-getter (getter-item-getter (the $item)))))
     ((optional $item)
       (getter-item
-        (getter-item-first-char? (the $item))
+        (getter-item-first-char/eof? (the $item))
         (optional-getter
-          (getter-item-first-char? (the $item))
+          (getter-item-first-char/eof? (the $item))
           (getter-item-getter (the $item)))))
     ((skip-newlines x)
       (%lets
         ($x (the x))
         (getter-item
-          (or? (getter-item-first-char? $x) char-newline?)
+          (or? (getter-item-first-char/eof? $x) char-newline?)
           (skip-newlines-getter (getter-item-getter $x)))))
     ((one-of first ... last)
       (getter-item
         (or?
-          (getter-item-first-char? (the first))
+          (getter-item-first-char/eof? (the first))
           ...
-          (getter-item-first-char? (the last)))
+          (getter-item-first-char/eof? (the last)))
         (getter-switch peek-char/eof-getter
-          (((getter-item-first-char? (the first)) _)
+          (((getter-item-first-char/eof? (the first)) _)
             (getter-item-getter (the first)))
           ...
           ((%else _)
@@ -327,17 +338,17 @@
           (lambda ($char/eof)
             (or
               (eof? $char/eof)
-              ((getter-item-first-char? $item) $char/eof)))
+              ((getter-item-first-char/eof? $item) $char/eof)))
           (or-eof-getter (getter-item-getter $item)))))
     ((map item fn)
       (getter-item
-        (getter-item-first-char? (the item))
+        (getter-item-first-char/eof? (the item))
         (getter-map (getter-item-getter (the item)) fn)))
     ((map item fn fns ...)
       (map (map item fn) fns ...))
     ((apply (fn item items ...))
       (getter-item
-        (getter-item-first-char? (the item))
+        (getter-item-first-char/eof? (the item))
         (apply-getter fn
           (getter-item-getter (the item))
           (getter-item-getter (the items)) ...)))
@@ -355,20 +366,20 @@
     ((list item)
       (%lets
         ($item (the item))
-        ($first-char? (getter-item-first-char? (the item)))
+        ($first-char/eof? (getter-item-first-char/eof? (the item)))
         (getter-item
-          $first-char?
+          $first-char/eof?
           (eol?-list-getter
-            (not? $first-char?)
+            (not? $first-char/eof?)
             (getter-item-getter $item)))))
     ((reject?-list reject? item)
       (%lets
         ($item (the item))
         (getter-item
-          (or? reject? (getter-item-first-char? $item))
+          (or? reject? (getter-item-first-char/eof? $item))
           (reject?-accept?-list-getter
             reject?
-            (getter-item-first-char? $item)
+            (getter-item-first-char/eof? $item)
             (getter-item-getter $item)))))
     ((non-empty-list item)
       (%lets
@@ -392,8 +403,8 @@
         ($x2 (the x2))
         (getter-item
           (or?
-            (getter-item-first-char? $x1)
-            (getter-item-first-char? $x2))
+            (getter-item-first-char/eof? $x1)
+            (getter-item-first-char/eof? $x2))
           (getter-switch (getter-item-getter $x1)
             ((false? _) (getter-item-getter $x2))
             ((%else $x1) (getter $x1))))))
@@ -411,7 +422,7 @@
       (%lets
         ($item (the item))
         (getter-item
-          (getter-item-first-char? $item)
+          (getter-item-first-char/eof? $item)
           (annotation-getter
             (getter-item-getter $item)
             stripped-annotation))))
@@ -419,7 +430,7 @@
       (%lets
         ($list (the list))
         (getter-item
-          (getter-item-first-char? $list)
+          (getter-item-first-char/eof? $list)
           (annotation-getter
             (getter-item-getter $list)
             %list-annotation))))
@@ -428,7 +439,7 @@
         ($a (the a))
         ($b (the b))
         (getter-item
-          (getter-item-first-char? $a)
+          (getter-item-first-char/eof? $a)
           (cons-annotation-getter
             (getter-item-getter $a)
             (getter-item-getter $b)))))
@@ -436,7 +447,7 @@
       (%lets
         ($expr (the expr))
         (getter-item
-          (getter-item-first-char? $expr)
+          (getter-item-first-char/eof? $expr)
           (getter-lets
             (id (getter-item-getter $expr))
             (ids (getter-item-getter (the exprs))) ...
@@ -445,7 +456,7 @@
       (%lets
         ($x (the x))
         (getter-item
-          (getter-item-first-char? $x)
+          (getter-item-first-char/eof? $x)
           (getter-switch (getter-item-getter $x)
             ((pred? id) (getter-item-getter (the expr)))
             ...

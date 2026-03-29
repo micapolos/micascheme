@@ -6,6 +6,7 @@
   (annotation)
   (char)
   (lets)
+  (predicate)
   (procedure))
 
 (check-gets char/eof-getter "" eof 0)
@@ -171,8 +172,8 @@
 (lets
   ($getter
     (separated-getter
-      (getter-item char-alphabetic? (test?-char-getter char-alphabetic?))
-      (getter-item char-comma? (exact-getter ", "))))
+      (getter-item (and? (not? eof?) char-alphabetic?) (test?-char-getter char-alphabetic?))
+      (getter-item (and? (not? eof?) char-comma?) (exact-getter ", "))))
   (run
     (check-gets $getter "" (list))
     (check-gets $getter "," (list) 0)
@@ -188,7 +189,7 @@
   ($getter
     (non-empty-separated-getter
       (test?-char-getter char-alphabetic?)
-      (getter-item char-comma? (exact-getter ", "))))
+      (getter-item (and? (not? eof?) char-comma?) (exact-getter ", "))))
   (run
     (check-get-raises $getter "")
     (check-get-raises $getter ",")

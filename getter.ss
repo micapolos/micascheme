@@ -83,7 +83,7 @@
     getter-item
     getter-item?
     getter-item-getter
-    getter-item-first-char?)
+    getter-item-first-char/eof?)
   (import
     (scheme)
     (data)
@@ -480,18 +480,17 @@
   (define comma-getter (exact-getter #\,))
   (define colon-getter (exact-getter #\:))
 
-  (define (optional-getter $first-char? $getter)
+  (define (optional-getter $first-char/eof? $getter)
     (getter-switch peek-char/eof-getter
-      ((eof? _) (getter #f))
-      (($first-char? $first-char) $getter)
+      (($first-char/eof? $first-char/eof) $getter)
       ((else _) (getter #f))))
 
   ; predicate for first char and the getter itself.
-  (data (getter-item first-char? getter))
+  (data (getter-item first-char/eof? getter))
 
   (define (optional-item-getter $item)
     (optional-getter
-      (getter-item-first-char? $item)
+      (getter-item-first-char/eof? $item)
       (getter-item-getter $item)))
 
   (define (separated-getter $getter-item $separator-getter-item)
@@ -511,7 +510,7 @@
     (apply-getter cons
       $item-getter
       (eol?-list-getter
-        (not? (getter-item-first-char? $separator-getter-item))
+        (not? (getter-item-first-char/eof? $separator-getter-item))
         (starting-getter
           (getter-item-getter $separator-getter-item)
           $item-getter))))

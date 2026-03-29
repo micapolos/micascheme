@@ -153,10 +153,13 @@
   (define line-annotations-getter
     (reject?-accept?-list-getter
       char-newline?
-      (lambda ($char)
-        (or
-          ((getter-item-first-char? %literal) $char)
-          (char->quote? $char)))
+      (lambda ($char/eof)
+        (switch $char/eof
+          ((eof? _) #f)
+          ((else $char)
+            (or
+              ((getter-item-first-char/eof? %literal) $char)
+              (char->quote? $char)))))
       line-annotation-getter))
 
   (define inline-annotations-getter
