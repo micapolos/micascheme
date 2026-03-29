@@ -13,7 +13,7 @@
     (or
       (optional
         (list-annotation
-          (list-with
+          (list
             (annotation $quote)
             (lazy (quoted-annotation $quote $annotation)))))
       $annotation))
@@ -27,7 +27,7 @@
   (define (end-quoted-annotations $annotations)
     (or
       (optional
-        (list-with
+        (list
           (list-annotation
             (cons
               (annotation end-quote)

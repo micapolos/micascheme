@@ -37,7 +37,7 @@
     apply
     string->datum
     cons
-    list-with
+    list
     list-of non-empty-list-of
     reject?-list-of
     skip-newlines
@@ -361,7 +361,7 @@
         ($car car)
         ($cdr cdr)
         (return (%cons $car $cdr))))
-    ((list-with item ...)
+    ((list item ...)
       (apply (%list (the item) ...)))
     ((list-of item)
       (%lets

@@ -27,7 +27,7 @@
 (check-reader
   (map
     (end-quoted-annotations
-      (list-with (annotation alphabetic-char)))
+      (list (annotation alphabetic-char)))
     (%lambda ($annotations)
       (%map %annotation-stripped $annotations)))
   (ok "a" '(#\a))
@@ -38,7 +38,7 @@
 (check-reader
   (map
     (end-quoted-annotations
-      (list-with
+      (list
         (annotation alphabetic-char)
         (annotation numeric-char)))
     (%lambda ($annotations)
