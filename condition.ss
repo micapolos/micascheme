@@ -40,13 +40,18 @@
       ((annotation? $annotation)
         (lets
           ($source (annotation-source $annotation))
-          ((values $path $line $column) (locate-source-object-source $source #t #t))
-          `(
-            ,(datum-simplify (syntax->datum $syntax))
-            (in ,$path)
-            (at
-              (line ,$line)
-              (column ,$column)))))
+          (switch (values->list (locate-source-object-source $source #t #t))
+            ((null? _)
+              (list (syntax->datum $syntax)))
+            ((else $values)
+              (lets
+                ((values $path $line $column) (apply values $values))
+                `(
+                  ,(datum-simplify (syntax->datum $syntax))
+                  (in ,$path)
+                  (at
+                    (line ,$line)
+                    (column ,$column))))))))
       ((else _)
         (list (syntax->datum $syntax)))))
 
