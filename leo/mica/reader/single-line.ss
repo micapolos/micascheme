@@ -1,6 +1,7 @@
 (library (leo mica reader single-line)
   (export
     single-line-annotation
+    single-line-annotations
     single-line-annotation/eof)
   (import
     (prefix (micascheme) %)

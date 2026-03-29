@@ -22,15 +22,9 @@
     (prefix (mica reader) %)
     (prefix (leo mica reader identifier) %)
     (prefix (leo mica reader literal) %)
+    (prefix (leo mica reader single-line) %)
     (prefix (leo mica reader quotes) %)
     (prefix (leo mica reader quoted) %))
-
-
-  (data*
-    inline-style
-    colon-style
-    block-style
-    (fragment style ref))
 
   (define comma-separator-getter-item
     (getter-item char-comma? (exact-getter ", ")))
@@ -87,6 +81,10 @@
         ((char-colon? _)
           (annotation-getter
             (skip-char-getter colon-line-annotations-getter)
+            list-annotation))
+        (((partial char=? #\() _)
+          (annotation-getter
+            (getter-item-getter %single-line-annotations)
             list-annotation))
         ((else _)
           (getter-lets
@@ -160,7 +158,11 @@
       comma-separator-getter-item))
 
   (define space-line-annotations-getter
-    (apply-getter list line-annotation-getter))
+    (getter-switch peek-char-getter
+      (((partial char=? #\() _)
+        (getter-item-getter %single-line-annotations))
+      ((else _)
+        (apply-getter list line-annotation-getter))))
 
   (define colon-line-annotations-getter
     (getter-switch char-getter

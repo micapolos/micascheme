@@ -35,6 +35,10 @@
 (check-gets line-getter ": 10\n" '(10) 5)
 (check-gets line-getter ": 10, 20\n" '(10 20) 9)
 
+(check-gets line-getter "()" '() 2)
+(check-gets line-getter "(10)" '(10) 4)
+(check-gets line-getter "(10, 20)" '(10 20) 8)
+
 (check-gets line-getter ":\n" '() 2)
 (check-gets line-getter ":\n  10\n" '(10) 7)
 (check-gets line-getter ":\n  10\n  20\n" '(10 20) 12)
@@ -77,6 +81,11 @@
 (check-gets line-getter "foo: 10, 20\n" '(foo 10 20) 12)
 (check-gets line-getter "foo:\n  10\n" '(foo 10) 10)
 (check-gets line-getter "foo:\n  10\n  20\n" '(foo 10 20) 15)
+
+; parentheses
+(check-gets line-getter "foo ()\n" '(foo) 6)
+(check-gets line-getter "foo (10)\n" '(foo 10) 8)
+(check-gets line-getter "foo (10, 20)\n" '(foo 10 20) 12)
 
 ; quoting
 
