@@ -9,22 +9,21 @@
     (mica reader)
     (leo mica reader quotes))
 
+  (define (quoted-annotation $quote $annotation)
+    (list-annotation (list-with (annotation $quote) $annotation)))
+
   (define (begin-quoted-annotation $annotation)
     (or
       (optional
-        (list-annotation
-          (list-with
-            (annotation begin-quote)
-            (lazy (begin-quoted-annotation $annotation)))))
+        (quoted-annotation begin-quote
+          (lazy (begin-quoted-annotation $annotation))))
       $annotation))
 
   (define (end-quoted-annotation $annotation)
     (or
       (optional
-        (list-annotation
-          (list-with
-            (annotation end-quote)
-            (lazy (end-quoted-annotation $annotation)))))
+        (quoted-annotation end-quote
+          (lazy (end-quoted-annotation $annotation))))
       $annotation))
 
   (define (end-quoted-annotations $annotations)
