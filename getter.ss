@@ -201,6 +201,9 @@
     (getter ($port $sfd $indent $bfp $line $column)
       (getter-get! $getter $port $sfd (+ $indent indent-size) $bfp $line $column)))
 
+  (define (get-char/trace $port)
+    (get-char $port))
+
   (define char/eof-getter
     (getter ($port $sfd $indent $bfp $line $column)
       (switch (peek-char $port)
@@ -217,20 +220,20 @@
         ((char-newline? $newline)
           (cond
             ((zero? $column)
-              (values (get-char $port) (+ $bfp 1) (+ $line 1) 0))
+              (values (get-char/trace $port) (+ $bfp 1) (+ $line 1) 0))
             ((<= $column $indent)
               (raise-getter-error
                 '(newline (after indent))
                 $newline $port $sfd $bfp))
             (else
-              (values (get-char $port) (+ $bfp 1) (+ $line 1) 0))))
+              (values (get-char/trace $port) (+ $bfp 1) (+ $line 1) 0))))
         ((else $char)
           (cond
             ((< $column $indent)
               (cond
                 ((char=? $char #\space)
                   (getter-get!
-                    (run (get-char $port) char/eof-getter)
+                    (run (get-char/trace $port) char/eof-getter)
                     $port $sfd $indent (+ $bfp 1) $line (+ $column 1)))
                 ((zero? (mod $column indent-size))
                   (values eof $bfp $line $column))
@@ -240,7 +243,7 @@
                     $char $port $sfd $bfp
                     '(indent (should (contain (exactly (two spaces)))))))))
             (else
-              (values (get-char $port) (+ $bfp 1) $line (+ $column 1))))))))
+              (values (get-char/trace $port) (+ $bfp 1) $line (+ $column 1))))))))
 
   (define peek-char/eof-getter
     (getter ($port $sfd $indent $bfp $line $column)
@@ -271,7 +274,7 @@
               (cond
                 ((char=? $char #\space)
                   (getter-get!
-                    (run (get-char $port) peek-char/eof-getter)
+                    (run (get-char/trace $port) peek-char/eof-getter)
                     $port $sfd $indent (+ $bfp 1) $line (+ $column 1)))
                 ((zero? (mod $column indent-size))
                   (values eof $bfp $line $column))
