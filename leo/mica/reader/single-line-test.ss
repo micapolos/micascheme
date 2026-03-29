@@ -56,12 +56,11 @@
 
 (check-reader (map single-line-annotation/eof %annotation-stripped)
   (ok "123" 123)
-  (ok "123 " 123)
+  (ok "\n123" 123)
   (ok "123\n" 123)
   (ok "foo" 'foo)
   (ok "foo\n" 'foo)
   (ok "foo ()" '(foo))
-  (ok "foo () " '(foo))
   (ok "foo ()\n" '(foo))
 
   (ok

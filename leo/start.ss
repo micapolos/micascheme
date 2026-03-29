@@ -5,12 +5,13 @@
     (leo leo)
     (leo load)
     (leo version)
+    (leo repl)
     (leo exception-handler)
     (prefix (leo scheme) %))
 
   (define (start $arguments)
     (syntax-case $arguments ()
-      (() (start-help $arguments))
+      (() (leo-repl))
       (_ (start-options $arguments))))
 
   (define (start-options $arguments)

@@ -17,9 +17,10 @@
         single-line-non-list-annotation)))
 
   (define single-line-annotation/eof
-    (suffixed
-      single-line-annotation
-      (or-eof (one-of #\space #\newline))))
+    (skip-newlines
+      (suffixed
+        single-line-annotation
+        (one-of eof #\newline))))
 
   (define single-line-non-list-annotation
     (one-of

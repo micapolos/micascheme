@@ -57,7 +57,8 @@
       (leo check)
       (leo write)
       (leo test)
-      (only (leo code) code-pretty? code-line-limit)))
+      (only (leo code) code-pretty? code-line-limit)
+      (rename (leo version) (version leo-version))))
 
   (%define (any? _) #t)
   (%define null (%quote ()))

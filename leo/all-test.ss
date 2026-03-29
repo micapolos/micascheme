@@ -15,6 +15,7 @@
   (leo quotify)
   (leo code)
   (leo write)
+  (leo repl)
   (leo test)
   (leo transform)
   (leo library)
