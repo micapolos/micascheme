@@ -5,10 +5,13 @@
     (only (leo read) leo-read)
     (leo exception-handler)
     (leo condition)
+    (leo version)
     (only (leo write) write))
 
   (define (leo-repl)
     (run
+      (displayln (string-append "Leo Scheme Version " version))
+      (newline)
       (eval '(import (leo scheme)))
       (loop)))
 
@@ -28,7 +31,8 @@
             (write-condition $condition)
             (loop)))
         (switch (leo-read (console-input-port))
-          ((eof? _) (void))
+          ((eof? _)
+            (newline))
           ((else $datum)
             (let (($evaled (eval $datum)))
               (write $evaled (console-output-port))

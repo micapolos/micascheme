@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.45
+    implement basic repl using single-line reader
   v0.1.44
     implements single-line reader to be used in repl
   v0.1.43
