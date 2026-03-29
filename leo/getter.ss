@@ -22,7 +22,9 @@
     (prefix (mica reader) %)
     (prefix (leo mica reader identifier) %)
     (prefix (leo mica reader literal) %)
-    (prefix (leo mica reader quotes) %))
+    (prefix (leo mica reader quotes) %)
+    (prefix (leo mica reader quoted) %))
+
 
   (data*
     inline-style
@@ -52,29 +54,19 @@
   (define unquote-annotation?-getter
     (getter-item-getter (%optional (%annotation %end-quote))))
 
-  (define (quoted-annotation-getter $line-getter)
-    (getter-switch quote-annotation?-getter
-      ((annotation? $annotation)
-        (getter-lets
-          ($line (quoted-annotation-getter $line-getter))
-          (annotation-getter
-            (getter (list $annotation $line))
-            list-annotation)))
-      ((else _)
-        $line-getter)))
+  (define (quoted-annotation-getter $line-annotation-getter)
+    (getter-item-getter
+      (%begin-quoted-annotation
+        (getter-item
+          (always #f)
+          $line-annotation-getter))))
 
   (define (unquoted-annotations-getter $line-annotations-getter)
-    (getter-switch unquote-annotation?-getter
-      ((annotation? $annotation)
-        (getter-lets
-          ($line-annotations (unquoted-annotations-getter $line-annotations-getter))
-          ($quoted-annotations
-            (annotation-getter
-              (getter (cons $annotation $line-annotations))
-              list-annotation))
-          (getter (list $quoted-annotations))))
-      ((else _)
-        $line-annotations-getter)))
+    (getter-item-getter
+      (%end-quoted-annotations
+        (getter-item
+          (always #f)
+          $line-annotations-getter))))
 
   (define (unquoted-annotation?-getter $line-annotation?-getter)
     (getter-switch unquote-annotation?-getter
