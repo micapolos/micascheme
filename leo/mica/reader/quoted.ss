@@ -1,7 +1,6 @@
 (library (leo mica reader quoted)
   (export
     begin-quoted-annotation
-    end-quoted-annotation
     end-quoted-annotations)
   (import
     (prefix (micascheme) %)
@@ -20,9 +19,6 @@
 
   (define (begin-quoted-annotation $annotation)
     (quoted-annotation begin-quote $annotation))
-
-  (define (end-quoted-annotation $annotation)
-    (quoted-annotation end-quote $annotation))
 
   (define (quoted-annotations $quote $annotations)
     (or
