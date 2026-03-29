@@ -38,8 +38,8 @@
     string->datum
     cons
     list-with
-    list non-empty-list
-    reject?-list
+    list-of non-empty-list-of
+    reject?-list-of
     skip-newlines
     prepend
     append
@@ -363,7 +363,7 @@
         (return (%cons $car $cdr))))
     ((list-with item ...)
       (apply (%list (the item) ...)))
-    ((list item)
+    ((list-of item)
       (%lets
         ($item (the item))
         ($first-char/eof? (getter-item-first-char/eof? (the item)))
@@ -372,7 +372,7 @@
           (eol?-list-getter
             (not? $first-char/eof?)
             (getter-item-getter $item)))))
-    ((reject?-list reject? item)
+    ((reject?-list-of reject? item)
       (%lets
         ($item (the item))
         (getter-item
@@ -381,16 +381,16 @@
             reject?
             (getter-item-first-char/eof? $item)
             (getter-item-getter $item)))))
-    ((non-empty-list item)
+    ((non-empty-list-of item)
       (%lets
         ($item (the item))
-        (prepend $item (list item))))
+        (prepend $item (list-of item))))
     ((non-empty-separated separator item)
       (%lets
         ($item (the item))
         (prepend
           $item
-          (list (prefixed (the separator) $item)))))
+          (list-of (prefixed (the separator) $item)))))
     ((separated separator item)
       (or
         (optional (non-empty-separated separator item))
