@@ -8,7 +8,7 @@ check equal?
   "Hello, world!"
 
 check equal?
-  let*
+  let-sequential
     hello "Hello"
     world "world"
     hello-world string-append: hello, ", ", world
@@ -27,7 +27,7 @@ check equal?
   "Hello, world!"
 
 check equal?
-  let*-values
+  let-sequential-values
     with
       values: hello, world
       values: "Hello", "world"

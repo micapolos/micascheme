@@ -2,9 +2,9 @@
   (export
     null in
     define lambda
-    let letrec let-values
-    let* letrec* let*-values
-    let-syntax letrec-syntax
+    let let-recursive let-values
+    let-sequential let-sequential-recursive let-sequential-values
+    let-syntax let-recursive-syntax
     if then cond
     switch any?
     make-read-lambda
@@ -131,17 +131,17 @@
       (%let (binding ...) x xs ...))
     ((let-values (with (%values id ...) expr) ... (in x xs ...))
       (%let-values (((id ...) expr) ...) x xs ...))
-    ((let* binding ... (in x xs ...))
+    ((let-sequential binding ... (in x xs ...))
       (%let* (binding ...) x xs ...))
-    ((let*-values (with (%values id ...) expr) ... (in x xs ...))
+    ((let-sequential-values (with (%values id ...) expr) ... (in x xs ...))
       (%let*-values (((id ...) expr) ...) x xs ...))
-    ((letrec binding ... (in x xs ...))
+    ((let-recursive binding ... (in x xs ...))
       (%letrec (binding ...) x xs ...))
-    ((letrec* binding ... (in x xs ...))
+    ((let-sequential-recursive binding ... (in x xs ...))
       (%letrec* (binding ...) x xs ...))
     ((let-syntax binding ... (in x xs ...))
       (%let-syntax (binding ...) x xs ...))
-    ((letrec-syntax binding ... (in x xs ...))
+    ((let-recursive-syntax binding ... (in x xs ...))
       (%let-syntax (binding ...) x xs ...))
 
     ((if a b c) (%if a b c))
