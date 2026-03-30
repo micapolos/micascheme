@@ -388,18 +388,18 @@ TODO
 TODO
 
 ```leo
-char a
-char z
-char A
-char Z
-char 0
-char 9
-char space
-char newline
-char dot
-char semicolon
-char code 128512
-char 😀
+character a
+character z
+character A
+character Z
+character 0
+character 9
+character space
+character newline
+character dot
+character semicolon
+character code 128512
+character 😀
 ```
 
 ## Vectors
@@ -407,7 +407,7 @@ char 😀
 TODO
 
 ```leo
-define my-vector vector: "foo", char a, 3.14
+define my-vector vector: "foo", character a, 3.14
 
 check equal?
   vector-length my-vector
