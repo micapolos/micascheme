@@ -1,7 +1,9 @@
 import leo scheme
 
 quote changelog
-  v0.50
+  v0.1.51
+    implements: eval, repl
+  v0.1.50
     unified define forms
   v0.1.49
     unified let forms
