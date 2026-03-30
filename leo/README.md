@@ -378,9 +378,9 @@ TODO
 check equal?
   if
     greater?: 10, 5
-    'ok
-    'error
-  'ok
+    'that is what I expected
+    'it does not seem right
+  'that is what I expected
 ```
 
 ## Strings
