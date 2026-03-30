@@ -3,7 +3,7 @@ library
   export: document, example
   import leo scheme
 
-  define-syntax
+  define syntax
     when
       document: x, ...
       begin: write `x, ...

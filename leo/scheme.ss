@@ -3,6 +3,7 @@
     null in
     define lambda
     named recursive sequential
+    syntax-case
     let
     if then cond
     switch any?
@@ -10,8 +11,6 @@
     list closed-list open-list
     display-line
     define-language
-    define-syntax
-    syntax-case
     logging
     load load-program
 
@@ -32,6 +31,7 @@
     (leo reader)
     (leo datum)
     (leo load)
+    (leo write)
     (leo writing-reader))
   (%export
     (import
@@ -86,7 +86,26 @@
   (%define load load-leo)
   (%define load-program load-leo-program)
 
-  (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values in named recursive sequential syntax)
+  (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values in named recursive sequential %syntax)
+    ((define (%syntax (keywords k ...) (%when pattern x xs ...) ...))
+      (define-rules-syntaxes (keywords k ...)
+        (pattern x xs ...) ...))
+
+    ((define (%syntax (%when pattern x xs ...) ...))
+      (define (%syntax (keywords) (%when pattern x xs ...) ...)))
+
+    ((define (%syntax (name x)))
+      (keyword? name)
+      (%define-syntax name x))
+
+    ((define (%syntax (name s) x xs ...))
+      (keyword? name)
+      (%define-syntax (name s) x xs ...))
+
+    ((syntax-case expr (keywords k ...) (%when pattern x xs ...) ...)
+      (%syntax-case expr (k ...)
+        (pattern x xs ...) ...))
+
     ((define (name x))
       (%define name x))
     ((define (name param ... (%and last)) x xs ...)
@@ -101,25 +120,6 @@
     ((lambda x xs ...)
       (%lambda () x xs ...))
 
-    ((define-syntax (keywords k ...) (%when pattern x xs ...) ...)
-      (define-rules-syntaxes (keywords k ...)
-        (pattern x xs ...) ...))
-
-    ((define-syntax (%when pattern x xs ...) ...)
-      (define-syntax (keywords) (%when pattern x xs ...) ...))
-
-    ((define-syntax (name x))
-      (keyword? name)
-      (%define-syntax name x))
-
-    ((define-syntax (name s) x xs ...)
-      (keyword? name)
-      (%define-syntax (name s) x xs ...))
-
-    ((syntax-case expr (keywords k ...) (%when pattern x xs ...) ...)
-      (%syntax-case expr (k ...)
-        (pattern x xs ...) ...))
-
     ((make-read-lambda (with param ...) x xs ...)
       (%make-read-lambda (param ...) x xs ...))
 
@@ -131,11 +131,11 @@
       (%let*-values (((id ...) expr) ...) x xs ...))
     ((let (sequential binding ... (in x xs ...)))
       (%let* (binding ...) x xs ...))
-    ((let (recursive (syntax binding ... (in x xs ...))))
+    ((let (recursive (%syntax binding ... (in x xs ...))))
       (%let-syntax (binding ...) x xs ...))
     ((let (recursive binding ... (in x xs ...)))
       (%letrec (binding ...) x xs ...))
-    ((let (syntax binding ... (in x xs ...)))
+    ((let (%syntax binding ... (in x xs ...)))
       (%let-syntax (binding ...) x xs ...))
     ((let (name binding ... (in x xs ...)))
       (keyword? name)
@@ -160,14 +160,16 @@
 
     ((logging x)
       (let
-        (with (val x))
-        (write val)
-        val))
+        (val x)
+        (in
+          (write val)
+          val)))
     ((logging label x)
       (let
-        (with (val x))
-        (write (%list (%quote label) val))
-        val))
+        (val x)
+        (in
+          (write (%list (%quote label) val))
+          val)))
 
     ((parameterize binding ... (in x xs ...))
       (%parameterize (binding ...) x xs ...))
