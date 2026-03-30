@@ -29,11 +29,11 @@ library
     when
       char-ready? port
       let
-        c peek-char port
+        peeked-char peek-char port
         in unless
           or
-            eof-object? c
-            char=?: c, char newline
+            eof-object? peeked-char
+            char=?: peeked-char, char newline
           read-char port
           clear-input-line port
 
@@ -48,10 +48,10 @@ library
     display string-append: ansi-purple-string, ">>>", ansi-black-string, " "
     flush-output-port:
     guard
-      $condition
+      raised-condition
         else
           let
-            $prefixed-port
+            prefixed-port
               make-prefixed-textual-output-port
                 console-output-port:
                 string-append: ansi-cyan-string, "<<<", ansi-bright-red-string, " "
@@ -59,8 +59,8 @@ library
               clear-input-line console-input-port:
               flush-output-port:
               display ansi-bright-red-string
-              write-condition: $condition, $prefixed-port
-              flush-output-port $prefixed-port
+              write-condition: raised-condition, prefixed-port
+              flush-output-port prefixed-port
               display ansi-black-string
               loop:
       switch
@@ -74,7 +74,7 @@ library
           any? _
           let
             with
-              values: $annotation/eof, _
+              values: leo-annotation/eof, _
               leo-read-annotation
                 make-prefixed-textual-input-port
                   console-input-port:
@@ -83,15 +83,15 @@ library
                 source-file-descriptor: "repl", 0
                 0
             in switch
-              $annotation/eof
+              leo-annotation/eof
               when
                 eof? _
                 newline:
               when
-                any? $annotation
+                any? leo-annotation
                 let
-                  $evaled eval $annotation
-                  $prefixed-port
+                  evaluated eval leo-annotation
+                  prefixed-port
                     make-prefixed-textual-output-port
                       console-output-port:
                       string-append: ansi-cyan-string, "<<<", ansi-black-string, " "
@@ -99,8 +99,8 @@ library
                     flush-output-port:
                     unless
                       equal?
-                        $evaled
+                        evaluated
                         void:
-                      write: $evaled, $prefixed-port
-                      flush-output-port $prefixed-port
+                      write: evaluated, prefixed-port
+                      flush-output-port prefixed-port
                       loop:
