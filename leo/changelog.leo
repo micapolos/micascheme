@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.49
+    improve let forms
   v0.1.48
     fix exception printing in repl
   v0.1.47
