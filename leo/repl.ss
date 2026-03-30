@@ -42,12 +42,11 @@
               (loop)))
           ((else _)
             (switch
-              (parameterize ((getter-prompt ""))
-                (leo-read
-                  (make-prefixed-textual-input-port
-                    (console-input-port)
-                    "\x1b;[35m...\x1b;[0m "
-                    (console-output-port))))
+              (leo-read
+                (make-prefixed-textual-input-port
+                  (console-input-port)
+                  "\x1b;[35m...\x1b;[0m "
+                  (console-output-port)))
               ((eof? _)
                 (newline))
               ((else $datum)
