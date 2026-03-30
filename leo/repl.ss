@@ -31,7 +31,9 @@
         ($condition
           (else
             (clear-input-line (console-input-port))
+            (display "\x1b;[91m")
             (write-condition $condition)
+            (display "\x1b;[0m")
             (loop)))
         (switch (peek-char (console-input-port))
           (((and? (not? eof?) char-newline?) _)
