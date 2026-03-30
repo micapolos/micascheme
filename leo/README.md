@@ -82,7 +82,7 @@ write 'hello leo
 
 ### Explanation
 
-The `write` function takes a **quoted** 'hello leo **sentence** and prints it to the screen.
+The `write` function takes a **quoted** `hello leo` **sentence** and prints it to the screen.
 
 *(We will explain that little single quote `'` in the **Quoting** section later!)*
 
