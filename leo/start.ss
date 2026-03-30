@@ -5,13 +5,12 @@
     (leo leo)
     (leo load)
     (leo version)
-    (leo repl)
     (leo exception-handler)
     (prefix (leo scheme) %))
 
   (define (start $arguments)
     (syntax-case $arguments ()
-      (() (leo-repl))
+      (() (start-repl))
       (_ (start-options $arguments))))
 
   (define (start-options $arguments)
@@ -67,4 +66,13 @@
           leo-exception-handler
           (lambda ()
             (load-leo-program $file))))))
+
+  (define (start-repl)
+    (leo
+      (eval
+        (cons
+          sc-expand
+          '(let ()
+            (import (leo repl))
+            (leo-repl))))))
 )

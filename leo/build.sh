@@ -110,6 +110,7 @@ find . -name "*.so" \
   | cpio -pdm "$REL_MICASCHEME_DIR/"
 
 cp "$SRC_LEO_DIR"/document.leo "$REL_MICASCHEME_DIR/leo"
+cp "$SRC_LEO_DIR"/repl.leo "$REL_MICASCHEME_DIR/leo"
 
 # --- 6. Handle Wrapper Script ---
 if [ -f "$SRC_LEO_DIR/leo" ]; then
