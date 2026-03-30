@@ -1,6 +1,9 @@
 import leo scheme
 
 quote changelog
+  v0.1.46
+    implement multi-line repl
+    make reader accept parentheses
   v0.1.45
     implement basic repl using single-line reader
   v0.1.44
