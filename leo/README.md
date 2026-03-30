@@ -83,9 +83,8 @@ The `write` function takes a **quoted** `hello leo` **sentence** and prints it t
 
 Leo Scheme replaces traditional parentheses with a clean combination of **indentation**, **spaces**, **colons** and **commas**. This creates a syntax that follows the **natural rules of written language**—much like a book or an essay, Leo uses spaces to separate "words" and punctuation to structure "sentences."
 
-* **Standard Spacing:** Just like in prose, use a space after a comma, a space after a colon, and a space before an opening parenthesis.
+* **Standard Spacing:** Just like in prose, use a space after a comma or colon.
 * **Indentation:** To keep your structure clear, Leo uses exactly **2 spaces** per indentation level.
-* **Parentheses:** While Leo focuses on indentation, you can still use **parentheses** whenever a single-line expression is required.
 * **Clean Lines:** Leo doesn't allow spaces at the end of a line. It’s a good idea to configure your editor to "trim trailing whitespace" automatically!
 
 Empty lines are perfectly fine—feel free to use them to breathe some space between paragraphs of your program.
@@ -151,7 +150,7 @@ Here is that same circle sentence written in its most concise form:
 
 While Leo is designed to be parenthesized-free, you can still use them if you absolutely need to fit an entire sentence onto one line (like in a terminal command).
 
-_Note: This isn't the recommended style for writing your `.leo` files, but it's there if you need it!_
+_Note: This isn't the recommended style for writing your `.leo` files, but it's there if you need it! Always remember to put a space before an opening parenthesis, and ensure there are no spaces on the inner sides of the parentheses (just as you would when writing regular text)._
 
 ```leo
 'circle (radius 10, center point (x 20, y 30))
