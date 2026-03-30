@@ -195,8 +195,7 @@ If one of your local names depends on a name you defined just a line above it, u
 check equal?
   let sequential
     hello "Hello"
-    leo "Leo"
-    hello-leo string-append: hello, ", ", leo
+    hello-leo string-append: hello, ", Leo"
     in string-append: hello-leo, "!"
   "Hello, Leo!"
 ```
