@@ -26,6 +26,80 @@ By swapping traditional parentheses for a natural system of **indentation** and 
 * [Bytevectors](#bytevectors)
 * [Macros](#macros)
 
+
+Plaintext
+# Leo Scheme Programming Language
+
+Leo Scheme is a friendly, modern dialect of Scheme designed for humans who love the power of Scheme but prefer the clarity of a clean page.
+By swapping traditional parentheses for a natural system of **indentation** and **punctuation**, Leo turns dense code into readable prose.
+
+## Why choose Leo over standard Scheme?
+
+* **Readability First:** Say goodbye to "parenthesis counting." Leo’s structure mirrors the way we naturally write and organize thoughts, making your logic stand out rather than the syntax.
+* **Structured Depth:** While standard Scheme can become a "wall of brackets," Leo uses **indentation** to create a clear visual hierarchy, helping you navigate complex nesting at a glance.
+* **Minimalist Aesthetic:** Leo removes the visual "noise," allowing you to focus on the "verbs" (functions) and "nouns" (values) of your program.
+* **Fully Compatible:** Under the hood, Leo remains a true Scheme. You get all the power of first-class functions, recursion, and macros, just in a more elegant suit.
+
+## Table of Contents
+
+* [Getting Started](#getting-started)
+* [Hello, Leo!](#hello-leo)
+* [How the Syntax Works](#how-the-syntax-works)
+* [Testing](#testing)
+* [Definitions](#definitions)
+* [Local Names](#local-names)
+* [Lists](#lists)
+* [Quoting](#quoting)
+* [Control Flow](#control-flow)
+* [Strings](#strings)
+* [Characters](#characters)
+* [Vectors](#vectors)
+* [Bytevectors](#bytevectors)
+* [Macros](#macros)
+
+## Getting Started
+
+Before writing your first program, you need to install Leo Scheme and learn how to run your code.
+
+### Installation
+
+You can grab the latest releases for macOS and Linux directly from GitHub, or use Homebrew if you are on macOS.
+
+#### Direct Download
+Download the appropriate binary for your system from the official releases:
+> [GitHub Releases](https://github.com/micapolos/micascheme/releases)
+
+#### Using Homebrew (macOS)
+If you use Homebrew, you can install Leo by tapping the repository and installing the package:
+
+```bash
+brew install micapolos/leo/leo
+```
+
+### Running Leo
+
+There are two primary ways to run Leo code: interactively via the REPL, or by executing a saved script file.
+
+#### The REPL (Interactive Mode)
+
+To experiment with Leo in real-time, you can start a Read-Eval-Print Loop (REPL). Simply type `leo` in your terminal without any arguments.
+
+Once inside the REPL, you can type Leo expressions. Because Leo uses indentation to define blocks of code:
+* **Pressing Enter once** allows you to continue typing multi-line indented blocks without executing them yet.
+* **Pressing Enter twice** tells the REPL you are done with the expression and evaluates the code.
+
+To exit the REPL, use `Ctrl+D`.
+
+#### 2. Running an Input File
+
+For larger projects, you will want to write your code in a text file (usually with a `.leo` extension) and run it all at once.
+
+To run a script, pass the filename as an argument to the `leo` command:
+
+```bash
+leo script.leo
+```
+
 ## Hello, Leo!
 
 Every journey starts with a friendly "Hello!".
