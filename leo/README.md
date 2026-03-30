@@ -206,10 +206,7 @@ define
 
 define
   comma-separated: first-string, second-string
-  string-append
-    first-string
-    ", "
-    second-string
+  string-append: first-string, ", ", second-string
 
 check equal?
   exclamated comma-separated: "Hello", "Leo"
