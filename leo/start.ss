@@ -70,8 +70,7 @@
   (define (start-repl)
     (leo
       (eval
-        (cons
-          sc-expand
+        (cons sc-expand
           '(let ()
             (import (leo repl))
             (leo-repl))))))

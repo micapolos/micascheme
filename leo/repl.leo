@@ -19,12 +19,9 @@ library
     with-exception-handler
       leo-exception-handler
       lambda
-        with:
         display-line string-append: "Leo Scheme ", version
         newline:
-        eval cons
-          leo-expand
-          'import leo scheme
+        eval 'import leo scheme
         loop:
 
   define
@@ -93,9 +90,7 @@ library
               when
                 any? $annotation
                 let
-                  $evaled eval cons
-                    leo-expand
-                    $annotation
+                  $evaled eval $annotation
                   $prefixed-port
                     make-prefixed-textual-output-port
                       console-output-port:

@@ -5,6 +5,7 @@
     named recursive sequential
     syntax-case
     let
+    eval
     if then cond
     switch any?
     make-read-lambda
@@ -32,6 +33,7 @@
     (leo datum)
     (leo load)
     (leo write)
+    (leo expand)
     (leo writing-reader))
   (%export
     (import
@@ -45,7 +47,7 @@
         let letrec let-values
         let* letrec* let*-values
         let-syntax letrec-syntax
-        if cond write
+        if cond write eval
         define-syntax
         syntax-case
         parameterize
@@ -85,6 +87,15 @@
 
   (%define load load-leo)
   (%define load-program load-leo-program)
+
+  (%define eval
+    (%case-lambda
+      ((x)
+        (eval x (%interaction-environment)))
+      ((x env)
+        (%eval
+          (%cons leo-expand x)
+          env))))
 
   (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values in named recursive sequential %syntax)
     ((define (%syntax (keywords k ...) (%when pattern x xs ...) ...))

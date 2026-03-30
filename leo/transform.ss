@@ -13,7 +13,9 @@
     (condition)
     (keyword))
 
-  (define-keywords from with)
+  (define-keywords from)
+
+  (define-rule-syntax (with x xs ...) (x xs ...))
 
   (define (transform-identifier $syntax)
     (syntax-case $syntax ()
