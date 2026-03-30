@@ -59,12 +59,12 @@
           (always #f)
           $line-annotation-getter))))
 
-  (define (unquoted-annotations-getter $line-annotations-getter)
+  (define (unquoted-annotations?-getter $line-annotations?-getter)
     (getter-item-getter
-      (%end-quoted-annotations
+      (%end-quoted-annotations?
         (getter-item
           (always #f)
-          $line-annotations-getter))))
+          $line-annotations?-getter))))
 
   (define (unquoted-annotation?-getter $line-annotation?-getter)
     (getter-switch unquote-annotation?-getter
@@ -102,7 +102,7 @@
                   list-annotation))))))))
 
   (define rhs-line-annotations?-getter
-    (unquoted-annotations-getter
+    (unquoted-annotations?-getter
       (getter-switch char-getter
         ((char-space? _) space-line-annotations-getter)
         ((char-colon? _) colon-line-annotations-getter)
