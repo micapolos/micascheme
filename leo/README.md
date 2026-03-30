@@ -33,7 +33,7 @@ Every journey starts with a friendly "Hello!".
 ```leo
 import leo scheme
 
-write 'hello leo
+write `hello leo`
 ```
 
 ### Explanation
@@ -42,7 +42,7 @@ Before speaking, you must tell Leo which "vocabulary" to use. The `import` sente
 
 The `write` function takes a **quoted** `hello leo` **sentence** and prints it to the screen.
 
-*(We will explain that little single quote `'` in the **Quoting** section later!)*
+*(We will explain that little single quote `` ` `` in the **Quoting** section later!)*
 
 ## How the Syntax Works
 
