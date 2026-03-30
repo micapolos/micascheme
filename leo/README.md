@@ -322,6 +322,10 @@ In this example, we aren't adding *2* and *2*; we are simply checking if the sen
 check equal?
   'add: 2, 2
   'add: 2, 2
+
+check not equal?
+  'add: 2, 2
+  4
 ```
 
 ### The Backtick (`` ` ``)
@@ -332,8 +336,8 @@ Here, we quote `the result`, but we let the `add: 2, 2` part actually calculate 
 
 ```leo
 check equal?
-  `the result` add: 2, 2
-  'the result 4
+  `number` add: 2, 2
+  'number 4
 ```
 
 ### The Expansion (`` `... ``)
@@ -342,8 +346,8 @@ If you want to quote a word but treat everything that follows it as a list of it
 
 ```leo
 check equal?
-  `the results`... list: 1, 2, 3, 4
-  'the results 1 2 3 4
+  `numbers`... list: 1, 2, 3, 4
+  'numbers 1 2 3 4
 ```
 
 ### Mixing Styles in Complex Sentences
