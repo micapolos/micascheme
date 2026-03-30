@@ -80,13 +80,11 @@ Every journey starts with a friendly "Hello!".
 write 'hello leo
 ```
 
-> **Note**: Leo Scheme fully supports traditional strings using double quotes like "Hello, Leo!". However, because Leo is a language designed to easily read and manipulate its own code, we use quoting instead! This isn't just for typing text—it is a powerful feature that allows the language to treat code and data as the same thing, which we will dive into later.
-
 ### Explanation
 
 The `write` function takes a **quoted** `hello leo` **sentence** and prints it to the screen.
 
-*(We will explain that little single quote `'` in the **Quoting** section later!)*
+> **Note**: Leo Scheme fully supports traditional strings using double quotes like "Hello, Leo!". However, because Leo is a language designed to easily read and manipulate its own code, we use quoting instead! This isn't just for typing text—it is a powerful feature that allows the language to treat code and data as the same thing, which we will dive into later.
 
 ## How the Syntax Works
 
