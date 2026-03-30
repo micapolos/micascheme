@@ -25,7 +25,7 @@
       (optional
         (lets
           ($end-quote-annotation (annotation $quote))
-          ($annotations (lazy (end-quoted-annotations $annotations)))
+          ($annotations (lazy (quoted-annotations $quote $annotations)))
           (return
             (%map
               (%lambda ($annotation)
