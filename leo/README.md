@@ -105,10 +105,10 @@ Leo solves this by using **indentation**. By moving text two spaces to the right
 
 ### The "Tall" Way (Pure Indentation)
 
-Here is a "sentence" describing a circle with a radius of *10* and a center point at *(20, 30)* using only indentation. Notice how each new detail moves two spaces to the right, creating a clear hierarchy:
+Here is a "sentence" describing a circle with a radius of *10* and a center point at *(20, 30)* using only indentation. We use quoting to treat that sentence as data, and not as code to be executed. Notice how each new detail moves two spaces to the right, creating a clear visual hierarchy:
 
 ```leo
-circle
+'circle
   radius
     10
   center
@@ -124,7 +124,7 @@ circle
 If a sentence only has one sub-sentence, you can save vertical space by putting it on the same line with a single space:
 
 ```leo
-circle
+'circle
   radius 10
   center point
     x 20
@@ -136,7 +136,7 @@ circle
 When you have multiple sub-sentences you want to fit onto a single line, use a colon to start the list, and commas to separate them:
 
 ```leo
-circle
+'circle
   radius 10
   center point: x 20, y 30
 ```
@@ -148,7 +148,7 @@ While Leo is designed to be parenthesized-free, you can still use them if you ab
 _Note: This isn't the recommended style for writing your `.leo` files, but it's there if you need it!_
 
 ```leo
-circle (radius 10, center point (x 20, y 30))
+'circle (radius 10, center point (x 20, y 30))
 ```
 
 ## Testing
