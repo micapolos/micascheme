@@ -5,4 +5,5 @@ test
   leo parameterize
   leo bytevector
   leo document
+  leo eval
   leo repl
