@@ -16,12 +16,13 @@
     (leo source-file-descriptor))
 
   (define (leo-read-annotation $port $sfd $bfp)
-    (%read-port-bfp
-      (%or-eof
-        (%suffixed
-          (getter-item (always #t) line-annotation-getter)
-          "\n"))
-      $port $sfd $bfp))
+    (parameterize ((leo-getter-empty-lines? #f))
+      (%read-port-bfp
+        (%or-eof
+          (%suffixed
+            (getter-item (always #t) line-annotation-getter)
+            "\n"))
+        $port $sfd $bfp)))
 
   (define (leo-read $port)
     (lets

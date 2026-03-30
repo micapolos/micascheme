@@ -7,6 +7,7 @@
     (leo condition)
     (leo version)
     (getter)
+    (port)
     (leo getter)
     (only (leo write) write))
 
@@ -15,42 +16,16 @@
       (displayln (string-append "Leo Scheme Version " version))
       (newline)
       (eval '(import (leo scheme)))
-      (parameterize ((leo-getter-empty-lines? #f))
-        (loop))))
+      (loop)))
 
   (define (clear-input-line port)
     (let ([c (read-char port)])
       (unless (or (eof-object? c) (char=? c #\newline))
         (clear-input-line port))))
 
-  (define (make-prefixed-output-port $port $prefix)
-    (let ((new-line? #t))
-      (define (maybe-write-prefix)
-        (when new-line?
-          (display $prefix $port)
-          (set! new-line? #f)))
-
-      (define (write! str start count)
-        (let loop ((i start) (written 0))
-          (if (< i (+ start count))
-              (let ([char (string-ref str i)])
-                (maybe-write-prefix)
-                (write-char char $port)
-                (when (char=? char #\newline)
-                  (set! new-line? #t))
-                (loop (+ i 1) (+ written 1)))
-              written)))
-
-      (make-custom-textual-output-port
-        (string-append "prefixed-" (port-name $port))
-        write!
-        (lambda () (port-position $port))
-        (lambda ($position) (set-port-position! $port $position))
-        (lambda () (close-port $port)))))
-
   (define (loop)
     (run
-      (display "> ")
+      (display "\x1b;[35m>>>\x1b;[0m ")
       (flush-output-port)
       (guard
         ($condition
@@ -64,12 +39,23 @@
               (get-char (console-input-port))
               (loop)))
           ((else _)
-            (switch (parameterize ((getter-prompt ". ")) (leo-read (console-input-port)))
+            (switch
+              (parameterize ((getter-prompt ""))
+                (leo-read
+                  (make-prefixed-textual-input-port
+                    (console-input-port)
+                    "\x1b;[35m...\x1b;[0m "
+                    (console-output-port))))
               ((eof? _)
                 (newline))
               ((else $datum)
-                (let (($evaled (eval $datum)))
+                (let
+                  (($evaled (eval $datum))
+                    ($prefixed-port (make-prefixed-textual-output-port (console-output-port) "\x1b;[36m<<<\x1b;[0m ")))
                   (newline)
-                  (write $evaled (console-output-port))
+                  (flush-output-port)
+                  (unless (equal? $evaled (void))
+                    (write $evaled $prefixed-port)
+                    (flush-output-port $prefixed-port))
                   (loop)))))))))
 )

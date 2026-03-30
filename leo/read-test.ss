@@ -20,7 +20,7 @@
 
     (check
       (annotation=?
-        (car (values->list (leo-read-annotation (open-input-string "123\n") $sfd 0)))
+        (car (values->list (leo-read-annotation (open-input-string "123\n\n") $sfd 0)))
         (stripped-annotation 123 (make-source-object $sfd 0 3))))
 
     (check
@@ -30,7 +30,7 @@
 
     (check
       (equal?
-        (leo-read (open-input-string "123\n"))
+        (leo-read (open-input-string "123\n\n"))
         123))
 
     (check
