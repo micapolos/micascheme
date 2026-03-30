@@ -15,7 +15,8 @@
             (equal? (car $datum) 'condition))
           (cdr $datum)
           (list $datum)))
-      (write
-        `(exception ,$datum)
-        $port)))
+      (parameterize ((print-gensym #f))
+        (write
+          $datum
+          $port))))
 )
