@@ -5,7 +5,7 @@
     (condition)
     (leo write))
 
-  (define (write-condition $condition)
+  (define (write-condition $condition $port)
     (lets
       ($datum (condition->datum $condition))
       ($datum
@@ -17,5 +17,5 @@
           (list $datum)))
       (write
         `(exception ,$datum)
-        (console-error-port))))
+        $port)))
 )

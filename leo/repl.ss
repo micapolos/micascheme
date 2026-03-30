@@ -19,9 +19,11 @@
       (loop)))
 
   (define (clear-input-line port)
-    (let ([c (read-char port)])
-      (unless (or (eof-object? c) (char=? c #\newline))
-        (clear-input-line port))))
+    (when (char-ready? port)
+      (let ((c (peek-char port)))
+        (unless (or (eof-object? c) (char=? c #\newline))
+          (read-char port) ; Consume the character we just peeked at!
+          (clear-input-line port)))))
 
   (define (loop)
     (run
@@ -30,11 +32,19 @@
       (guard
         ($condition
           (else
-            (clear-input-line (console-input-port))
-            (display "\x1b;[91m")
-            (write-condition $condition)
-            (display "\x1b;[0m")
-            (loop)))
+            (let
+              (
+                ($prefixed-port
+                  (make-prefixed-textual-output-port
+                    (console-output-port)
+                    "\x1b;[36m<<<\x1b;[91m ")))
+              (clear-input-line (console-input-port))
+              (flush-output-port)
+              (display "\x1b;[91m")
+              (write-condition $condition $prefixed-port)
+              (flush-output-port $prefixed-port))
+              (display "\x1b;[0m")
+              (loop)))
         (switch (peek-char (console-input-port))
           (((and? (not? eof?) char-newline?) _)
             (run
@@ -51,8 +61,12 @@
                 (newline))
               ((else $datum)
                 (let
-                  (($evaled (eval $datum))
-                    ($prefixed-port (make-prefixed-textual-output-port (console-output-port) "\x1b;[36m<<<\x1b;[0m ")))
+                  (
+                    ($evaled (eval $datum))
+                    ($prefixed-port
+                      (make-prefixed-textual-output-port
+                        (console-output-port)
+                        "\x1b;[36m<<<\x1b;[0m ")))
                   (flush-output-port)
                   (unless (equal? $evaled (void))
                     (write $evaled $prefixed-port)
