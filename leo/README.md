@@ -12,36 +12,6 @@ By swapping traditional parentheses for a natural system of **indentation** and 
 
 ## Table of Contents
 
-* [Hello, Leo!](#hello-leo)
-* [How the Syntax Works](#how-the-syntax-works)
-* [Testing](#testing)
-* [Definitions](#definitions)
-* [Local Names](#local-names)
-* [Lists](#lists)
-* [Quoting](#quoting)
-* [Control Flow](#control-flow)
-* [Strings](#strings)
-* [Characters](#characters)
-* [Vectors](#vectors)
-* [Bytevectors](#bytevectors)
-* [Macros](#macros)
-
-
-Plaintext
-# Leo Scheme Programming Language
-
-Leo Scheme is a friendly, modern dialect of Scheme designed for humans who love the power of Scheme but prefer the clarity of a clean page.
-By swapping traditional parentheses for a natural system of **indentation** and **punctuation**, Leo turns dense code into readable prose.
-
-## Why choose Leo over standard Scheme?
-
-* **Readability First:** Say goodbye to "parenthesis counting." Leo’s structure mirrors the way we naturally write and organize thoughts, making your logic stand out rather than the syntax.
-* **Structured Depth:** While standard Scheme can become a "wall of brackets," Leo uses **indentation** to create a clear visual hierarchy, helping you navigate complex nesting at a glance.
-* **Minimalist Aesthetic:** Leo removes the visual "noise," allowing you to focus on the "verbs" (functions) and "nouns" (values) of your program.
-* **Fully Compatible:** Under the hood, Leo remains a true Scheme. You get all the power of first-class functions, recursion, and macros, just in a more elegant suit.
-
-## Table of Contents
-
 * [Getting Started](#getting-started)
 * [Hello, Leo!](#hello-leo)
 * [How the Syntax Works](#how-the-syntax-works)
