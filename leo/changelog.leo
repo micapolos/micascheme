@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.52
+    add missing library ansi-string
   v0.1.51
     implements: eval, repl
   v0.1.50
