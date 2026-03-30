@@ -31,16 +31,9 @@ By swapping traditional parentheses for a natural system of **indentation** and 
 
 Before writing your first program, you need to install Leo Scheme and learn how to run your code.
 
-### Installation
+Grab the latest macOS or Linux binaries directly from the [GitHub Releases](https://github.com/micapolos/micascheme/releases).
 
-You can grab the latest releases for macOS and Linux directly from GitHub, or use Homebrew if you are on macOS.
-
-#### Direct Download
-Download the appropriate binary for your system from the official releases:
-> [GitHub Releases](https://github.com/micapolos/micascheme/releases)
-
-#### Using Homebrew (macOS)
-If you use Homebrew, you can install Leo by tapping the repository and installing the package:
+If you are on *macOS* and use *Homebrew*, you can install it by running:
 
 ```bash
 brew install micapolos/leo/leo
