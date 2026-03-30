@@ -105,7 +105,7 @@ Leo solves this by using **indentation**. By moving text two spaces to the right
 
 ### The "Tall" Way (Pure Indentation)
 
-Here is a "sentence" describing a circle with a radius of *10* and a center point at *(20, 30)* using only indentation. We use quoting to treat that sentence as data, and not as code to be executed. Notice how each new detail moves two spaces to the right, creating a clear visual hierarchy:
+Here is a "sentence" describing a circle with a radius of *10* and a center point at *(20, 30)* using only indentation. We use `quote` to treat that sentence as data, and not as code to be executed. Notice how each new detail moves two spaces to the right, creating a clear visual hierarchy:
 
 ```leo
 quote
