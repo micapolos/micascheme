@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.47
+    fix unnecesary newline in repl
   v0.1.46
     implement multi-line repl
     make reader accept parentheses
