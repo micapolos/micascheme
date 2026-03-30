@@ -70,6 +70,8 @@ To run a script, pass the filename as an argument to the `leo` command:
 leo script.leo
 ```
 
+> **Note:** For a script file to be valid, it must begin with an `import` sentence to load the base language, such as `import leo scheme`.
+
 ## Hello, Leo!
 
 Every journey starts with a friendly "Hello!".
