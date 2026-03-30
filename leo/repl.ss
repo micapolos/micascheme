@@ -53,7 +53,6 @@
                 (let
                   (($evaled (eval $datum))
                     ($prefixed-port (make-prefixed-textual-output-port (console-output-port) "\x1b;[36m<<<\x1b;[0m ")))
-                  ;(newline)
                   (flush-output-port)
                   (unless (equal? $evaled (void))
                     (write $evaled $prefixed-port)
