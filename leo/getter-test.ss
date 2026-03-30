@@ -154,3 +154,13 @@
     "")
   '(point (x 10) (y 20))
   24 7 0)
+
+(parameterize ((leo-getter-empty-lines? #f))
+  (check-gets
+    line-getter
+    (lines-string
+      "point"
+      ""
+      "  x 10")
+    'point
+    6 1 0))

@@ -83,7 +83,9 @@
     getter-item
     getter-item?
     getter-item-getter
-    getter-item-first-char/eof?)
+    getter-item-first-char/eof?
+
+    getter-prompt)
   (import
     (scheme)
     (data)
@@ -104,6 +106,8 @@
     (source-file-descriptor)
     (condition)
     (predicate))
+
+  (define getter-prompt (make-thread-parameter ""))
 
   (define indent-size 2)
 
@@ -202,7 +206,14 @@
       (getter-get! $getter $port $sfd (+ $indent indent-size) $bfp $line $column)))
 
   (define (get-char/trace $port)
-    (get-char $port))
+    (switch (get-char $port)
+      ((eof? $eof) $eof)
+      ((char-newline? $newline)
+        (run
+          (display (getter-prompt))
+          (flush-output-port)
+          $newline))
+      ((else $char) $char)))
 
   (define char/eof-getter
     (getter ($port $sfd $indent $bfp $line $column)

@@ -9,13 +9,19 @@
     (getter)
     (leo getter)
     (leo path)
+    (getter)
     (prefix (mica reader) %)
     (prefix (leo mica reader single-line) %)
     (leo expand)
     (leo source-file-descriptor))
 
   (define (leo-read-annotation $port $sfd $bfp)
-    (%read-port-bfp (%or-eof %single-line-annotation/eof) $port $sfd $bfp))
+    (%read-port-bfp
+      (%or-eof
+        (%suffixed
+          (getter-item (always #t) line-annotation-getter)
+          "\n"))
+      $port $sfd $bfp))
 
   (define (leo-read $port)
     (lets

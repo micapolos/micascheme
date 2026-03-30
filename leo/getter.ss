@@ -13,7 +13,9 @@
     lines-getter
 
     inline-getter
-    inlines-getter)
+    inlines-getter
+
+    leo-getter-empty-lines?)
   (import
     (micascheme)
     (symbol)
@@ -25,6 +27,8 @@
     (prefix (leo mica reader single-line) %)
     (prefix (leo mica reader quotes) %)
     (prefix (leo mica reader quoted) %))
+
+  (define leo-getter-empty-lines? (make-thread-parameter #t))
 
   (define comma-separator-getter-item
     (getter-item char-comma? (exact-getter ", ")))
@@ -89,7 +93,7 @@
         ((else _)
           (getter-lets
             ($atom-annotation atom-annotation-getter)
-            (getter-switch rhs-line-annotations-getter
+            (getter-switch rhs-line-annotations?-getter
               ((false? _)
                 (getter $atom-annotation))
               ((else $rhs-line-annotations)
@@ -97,7 +101,7 @@
                   (getter (cons $atom-annotation $rhs-line-annotations))
                   list-annotation))))))))
 
-  (define rhs-line-annotations-getter
+  (define rhs-line-annotations?-getter
     (unquoted-annotations-getter
       (getter-switch char-getter
         ((char-space? _) space-line-annotations-getter)
@@ -142,7 +146,10 @@
 
   (define line-annotations-getter
     (reject?-accept?-list-getter
-      char-newline?
+      (lambda ($char)
+        (if (leo-getter-empty-lines?)
+          (char-newline? $char)
+          #f))
       (lambda ($char/eof)
         (switch $char/eof
           ((eof? _) #f)
