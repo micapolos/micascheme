@@ -2,7 +2,7 @@
   (export leo-repl)
   (import
     (except (micascheme) write)
-    (only (leo read) leo-read)
+    (only (leo read) leo-read-annotation)
     (leo exception-handler)
     (leo condition)
     (leo version)
@@ -51,25 +51,29 @@
               (get-char (console-input-port))
               (loop)))
           ((else _)
-            (switch
-              (leo-read
-                (make-prefixed-textual-input-port
-                  (console-input-port)
-                  "\x1b;[35m...\x1b;[0m "
-                  (console-output-port)))
-              ((eof? _)
-                (newline))
-              ((else $datum)
-                (let
-                  (
-                    ($evaled (eval $datum))
-                    ($prefixed-port
-                      (make-prefixed-textual-output-port
-                        (console-output-port)
-                        "\x1b;[36m<<<\x1b;[0m ")))
-                  (flush-output-port)
-                  (unless (equal? $evaled (void))
-                    (write $evaled $prefixed-port)
-                    (flush-output-port $prefixed-port))
-                  (loop)))))))))
+            (lets
+              ((values $annotation/eof _)
+                (leo-read-annotation
+                  (make-prefixed-textual-input-port
+                    (console-input-port)
+                    "\x1b;[35m...\x1b;[0m "
+                    (console-output-port))
+                  (source-file-descriptor "repl" 0)
+                  0))
+              (switch $annotation/eof
+                ((eof? _)
+                  (newline))
+                ((else $annotation)
+                  (let
+                    (
+                      ($evaled (eval $annotation))
+                      ($prefixed-port
+                        (make-prefixed-textual-output-port
+                          (console-output-port)
+                          "\x1b;[36m<<<\x1b;[0m ")))
+                    (flush-output-port)
+                    (unless (equal? $evaled (void))
+                      (write $evaled $prefixed-port)
+                      (flush-output-port $prefixed-port))
+                    (loop))))))))))
 )
