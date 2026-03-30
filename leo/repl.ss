@@ -13,7 +13,7 @@
 
   (define (leo-repl)
     (run
-      (displayln (string-append "Leo Scheme Version " version))
+      (displayln (string-append "Leo Scheme " version))
       (newline)
       (eval '(import (leo scheme)))
       (loop)))
