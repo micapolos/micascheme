@@ -171,15 +171,11 @@ check equal?
 
 ## Local names
 
-Sometimes you need to give a name to a piece of prose just for a single calculation. In Leo, we use the `let` to create local names that exist only within that specific block of code. Whether you need simple parallel bindings or step-by-step sequential evaluation, these constructs keep your definitions scoped exactly where you need them.
+Sometimes you need to give a name to a piece of prose just for a single calculation. In Leo, we use the `let` word to create local names that exist only `in` specific block of code. Whether you need simple parallel bindings, step-by-step sequential or recursive evaluation, these constructs keep your definitions scoped exactly where you need them.
 
 ### Basic Bindings (`let`)
 
 Use `let` when you have several independent names you want to define at once before using them in an expression (the `in` part).
-
-### Sequential Bindings (`let sequential`)
-
-If one of your local names depends on a name you defined just a line above it, use `let-sequential`. This tells Leo to define the names in order, allowing you to build complex sentences step-by-step.
 
 ```leo
 check equal?
@@ -190,6 +186,11 @@ check equal?
   "Hello, Leo!"
 ```
 
+### Sequential Bindings (`let sequential`)
+
+If one of your local names depends on a name you defined just a line above it, use `let-sequential`. This tells Leo to define the names in order, allowing you to build complex sentences step-by-step.
+
+
 ```leo
 check equal?
   let sequential
@@ -199,6 +200,11 @@ check equal?
     in string-append: hello-leo, "!"
   "Hello, Leo!"
 ```
+
+### Recursive Bindings
+
+TODO
+
 
 ## Lists
 
