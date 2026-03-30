@@ -7,14 +7,14 @@ write
     in string-append: hello, ", ", world, "!"
 
 write
-  let-sequential
+  let sequential
     hello "Hello"
     world "world"
     hello-world string-append: hello, ", ", world
     in string-append: hello-world, "!"
 
 write
-  let-values
+  let
     with
       values: hello, world
       values: "hello", "world"
@@ -24,7 +24,7 @@ write
     in string-append: hello, comma, world, exclamation
 
 write
-  let-sequential-values
+  let sequential
     with
       values: hello, world
       values: "hello", "world"

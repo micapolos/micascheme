@@ -2,9 +2,8 @@
   (export
     null in
     define lambda
-    let let-recursive let-values
-    let-sequential let-sequential-recursive let-sequential-values
-    let-syntax let-recursive-syntax
+    named recursive sequential
+    let
     if then cond
     switch any?
     make-read-lambda
@@ -63,7 +62,7 @@
   (%define (any? _) #t)
   (%define null (%quote ()))
 
-  (define-keywords then in)
+  (define-keywords then in named recursive sequential)
 
   (%define (display-line x)
     (%display x)
@@ -87,7 +86,7 @@
   (%define load load-leo)
   (%define load-program load-leo-program)
 
-  (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values in)
+  (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values in named recursive sequential syntax)
     ((define (name x))
       (%define name x))
     ((define (name param ... (%and last)) x xs ...)
@@ -124,25 +123,25 @@
     ((make-read-lambda (with param ...) x xs ...)
       (%make-read-lambda (param ...) x xs ...))
 
+    ((let (with (%values id ...) expr) ... (in x xs ...))
+      (%let-values (((id ...) expr) ...) x xs ...))
+    ((let (sequential (recursive binding ... (in x xs ...))))
+      (%letrec* (binding ...) x xs ...))
+    ((let (sequential (with (%values id ...) expr) ... (in x xs ...)))
+      (%let*-values (((id ...) expr) ...) x xs ...))
+    ((let (sequential binding ... (in x xs ...)))
+      (%let* (binding ...) x xs ...))
+    ((let (recursive (syntax binding ... (in x xs ...))))
+      (%let-syntax (binding ...) x xs ...))
+    ((let (recursive binding ... (in x xs ...)))
+      (%letrec (binding ...) x xs ...))
+    ((let (syntax binding ... (in x xs ...)))
+      (%let-syntax (binding ...) x xs ...))
     ((let (name binding ... (in x xs ...)))
       (keyword? name)
       (%let name (binding ...) x xs ...))
     ((let binding ... (in x xs ...))
       (%let (binding ...) x xs ...))
-    ((let-values (with (%values id ...) expr) ... (in x xs ...))
-      (%let-values (((id ...) expr) ...) x xs ...))
-    ((let-sequential binding ... (in x xs ...))
-      (%let* (binding ...) x xs ...))
-    ((let-sequential-values (with (%values id ...) expr) ... (in x xs ...))
-      (%let*-values (((id ...) expr) ...) x xs ...))
-    ((let-recursive binding ... (in x xs ...))
-      (%letrec (binding ...) x xs ...))
-    ((let-sequential-recursive binding ... (in x xs ...))
-      (%letrec* (binding ...) x xs ...))
-    ((let-syntax binding ... (in x xs ...))
-      (%let-syntax (binding ...) x xs ...))
-    ((let-recursive-syntax binding ... (in x xs ...))
-      (%let-syntax (binding ...) x xs ...))
 
     ((if a b c) (%if a b c))
 
