@@ -405,7 +405,7 @@ check equal?
 TODO
 
 ```leo
-define-syntax
+define syntax
   when
     magic s
     string-append: "Hello, ", s, "!"

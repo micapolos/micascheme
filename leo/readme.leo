@@ -60,8 +60,8 @@ document readme
           x` sin 10
           y` cos 10
 
-    define-syntax` example
-      define-syntax
+    define syntax` example
+      define syntax
         when
           magic s
           string-append: "Hello, ", s, "!"
