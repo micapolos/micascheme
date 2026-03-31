@@ -25,7 +25,7 @@ library
         loop:
 
   define
-    clear-input-line port
+    read-until-newline port
     when
       char-ready? port
       let
@@ -35,7 +35,7 @@ library
             eof-object? peeked-char
             char=?: peeked-char, char newline
           read-char port
-          clear-input-line port
+          read-until-newline port
 
   define
     char/eof-newline? char/eof
@@ -56,7 +56,7 @@ library
                 console-output-port:
                 string-append: ansi-cyan-string, "<<<", ansi-bright-red-string, " "
             in
-              clear-input-line console-input-port:
+              read-until-newline console-input-port:
               flush-output-port:
               display ansi-bright-red-string
               write-condition: raised-condition, prefixed-port
