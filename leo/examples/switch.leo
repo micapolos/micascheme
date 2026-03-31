@@ -2,21 +2,19 @@ import leo scheme
 
 define lambda
   to-string x
-  switch
-    x
+  switch x
     when
-      string? s
-      string-append: "string ", s
+      string string?
+      string-append: "string ", string
     when
-      number? n
+      number number?
       string-append
         "number "
-        number->string n
-    when
-      any? x
+        number->string number
+    else other
       string-append
         "other "
-        format: "~s", x
+        format: "~s", other
 
 display-line to-string string-append: "Hello, ", "world!"
 display-line to-string add: 2, 2

@@ -7,7 +7,7 @@
     let
     eval
     if then cond
-    switch any?
+    any?
     make-read-lambda
     list closed-list open-list
     display-line
@@ -21,7 +21,7 @@
   (import
     (prefix (chezscheme) %)
     (only (micascheme) run define-rules-syntaxes define-keywords keywords ...)
-    (prefix (only (micascheme) make-read-lambda switch logging) %)
+    (prefix (only (micascheme) make-read-lambda logging) %)
     (only (keyword) keyword? keyword...?)
     (leo transform)
     (prefix (language) %)
@@ -59,6 +59,7 @@
       (leo write)
       (leo test)
       (leo document)
+      (leo switch)
       (void)
       (only (leo code) code-pretty? code-line-limit)
       (rename (leo version) (version leo-version))))
@@ -172,11 +173,6 @@
       (%cond (a b bs ...) ... (%else c cs ...)))
     ((cond (%when a b bs ...) ...)
       (%cond (a b bs ...) ...))
-
-    ((switch x (%when (a b) c) ... (%else d))
-      (%switch x ((a b) c) ... ((%else _) d)))
-    ((switch x (%when (a b) c) ...)
-      (%switch x ((a b) c) ...))
 
     ((list xs ... (%and last)) (open-list xs ... last))
     ((list xs ... ) (closed-list xs ...))
