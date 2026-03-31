@@ -4,6 +4,8 @@ library
     rename %textual textual
     textual?
     textual-current-put-procedure
+    char->textual
+    string->textual
     put-textual
     textual-string
     list->textual
@@ -28,18 +30,24 @@ library
 
       when
         %textual char: x, xs, ...
-        %textual
-          with port
-          put-char
-            port
-            char: x, xs, ...
+        char->textual char: x, xs, ...
 
       when
         %textual x
         string? datum x
-        %textual
-          with port
-          put-string: port, x
+        string->textual x
+
+    lambda
+      char->textual char
+      %textual
+        with port
+        put-char: port, char
+
+    lambda
+      string->textual string
+      %textual
+        with port
+        put-string: port, string
 
     lambda
       put-textual: port, textual

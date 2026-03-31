@@ -12,6 +12,14 @@ check equal?
   "foo"
 
 check equal?
+  textual-string char->textual string-ref: "abc", 0
+  "a"
+
+check equal?
+  textual-string string->textual string-append: "foo", "bar"
+  "foobar"
+
+check equal?
   textual-string textual
     with port
     put-string: port, "foo"
