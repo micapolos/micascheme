@@ -14,9 +14,9 @@ leo/man/leo.1
 Push to github:
 
 ```
-gp v0.1.xx
-git tag v0.1.xx
-git push origin v0.1.55
+gp v0.0.xx
+git tag v0.0.xx
+git push origin v0.0.xx
 ```
 
 Wait until release is complete on Github: https://github.com/micapolos/micascheme/releases.

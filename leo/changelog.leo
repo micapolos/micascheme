@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.56
+    run repl only with no command line args
   v0.1.55
     make leo boot file to improve start time
   v0.1.54
