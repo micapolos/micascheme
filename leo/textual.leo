@@ -2,7 +2,7 @@ library
   leo textual
   export
     rename %textual textual
-    textual-current-put
+    textual-current-put-procedure
     textual?
     put-textual
     textual-string
@@ -13,7 +13,7 @@ library
     leo current
     data
 
-  data textual current-put
+  data textual current-put-procedure
 
   define
     syntax
@@ -44,7 +44,7 @@ library
     lambda
       put-textual: port, textual
       current-ref current-lets
-        put textual-current-put textual
+        put textual-current-put-procedure textual
         current put port
 
     lambda
@@ -62,7 +62,7 @@ library
           lambda
             with current-put
             with: current-ref current-put, port
-          map: textual-current-put, textual-list
+          map: textual-current-put-procedure, textual-list
 
     lambda
       textual-append and textual-list
