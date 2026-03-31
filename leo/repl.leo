@@ -5,6 +5,7 @@ library
     ansi-string
     getter
     port
+    void
     leo scheme
     leo exception-handler
     leo condition
@@ -12,7 +13,7 @@ library
     leo expand
     leo getter
     only: leo-read-annotation, from leo read
-    only: eof?, char-newline?, void?, from micascheme
+    only: eof?, char-newline?, from micascheme
 
   define
     repl:
