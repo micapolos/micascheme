@@ -99,6 +99,7 @@
   (value)
   (variable)
   (vector)
+  (void)
   (writer)
   (writing)
   (z80)

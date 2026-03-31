@@ -12,7 +12,7 @@ library
     leo expand
     leo getter
     only: leo-read-annotation, from leo read
-    only: eof?, char-newline?, from micascheme
+    only: eof?, char-newline?, void?, from micascheme
 
   define
     repl:
@@ -98,9 +98,7 @@ library
                   in
                     flush-output-port:
                     unless
-                      equal?
-                        evaluated
-                        void:
+                      void? evaluated
                       write: evaluated, prefixed-port
                       flush-output-port prefixed-port
                       loop:

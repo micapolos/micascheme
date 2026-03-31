@@ -130,5 +130,6 @@
       (top-level)
       (union)
       (variable)
-      (vector)))
+      (vector)
+      (void)))
 )
