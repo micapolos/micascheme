@@ -4,21 +4,21 @@ import
   leo current
 
 check equal?
-  current-ref current-textual-string textual char a
+  textual-string textual char a
   "a"
 
 check equal?
-  current-ref current-textual-string textual "foo"
+  textual-string textual "foo"
   "foo"
 
 check equal?
-  current-ref current-textual-string textual
+  textual-string textual
     with port
     put-string: port, "foo"
   "foo"
 
 check equal?
-  current-ref current-textual-string list->textual list
+  textual-string list->textual list
     textual "Hello"
     textual ", "
     textual "Leo"
@@ -26,7 +26,7 @@ check equal?
   "Hello, Leo!"
 
 check equal?
-  current-ref current-textual-string textual-append
+  textual-string textual-append
     textual "Hello"
     textual ", "
     textual "Leo"
