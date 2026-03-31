@@ -28,6 +28,8 @@
         (start-assembly-output (datum x)))
       (("--optimize-level" . x)
         (start-optimize-level (datum x)))
+      (("--startup-reference-time-ms" . x)
+        (start-startup-reference-time-ms (datum x)))
       ((file arg ...)
         (start-file (datum file) (datum (arg ...))))
       (()
@@ -58,6 +60,23 @@
   (define (start-optimize-level $arguments)
     (parameterize ((optimize-level (string->number (car $arguments))))
       (start-options (cdr $arguments))))
+
+  (define (start-startup-reference-time-ms $arguments)
+    (lets
+      ($reference-time-ms?
+        (string->number (car $arguments)))
+      ($reference-time-ms
+        (or $reference-time-ms?
+          (throw 'reference-time-ms-not-number)))
+      ($time (current-time))
+      ($time-ms
+        (+
+          (* (time-second $time) 1000)
+          (div (time-nanosecond $time) 1000000)))
+      ($startup-time-ms (- $time-ms $reference-time-ms))
+      (run
+        (displayln (format "Startup time: ~sms" $startup-time-ms))
+        (start-options (cdr $arguments)))))
 
   (define (start-file $file $arguments)
     (parameterize
