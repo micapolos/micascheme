@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.55
+    make leo boot file to improve start time
   v0.1.54
     build leo with
       optimize-level 3
