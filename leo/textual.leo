@@ -2,8 +2,8 @@ library
   leo textual
   export
     rename %textual textual
-    textual-current-put-procedure
     textual?
+    textual-current-put-procedure
     put-textual
     textual-string
     list->textual
