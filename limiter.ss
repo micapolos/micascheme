@@ -6,7 +6,6 @@
     limiter-ref?
     limiter-limited?
     limiter-unlimited-ref
-    limiter-bind
     limiter-map
     limiter-lets
     limiter-lets?
@@ -33,15 +32,21 @@
       (lambda ($limit) limited?-body))
     ((limiter $value)
       (limiter ($limit)
-        (make-limited? $value $limit))))
+        (make-limited? $value $limit)))
+    ((limiter-let1 (val expr) body)
+      (limiter ($limit)
+        (lets?
+          ($limited (limiter-apply expr $limit))
+          (lets
+            (val (limited-ref $limited))
+            (limiter-apply body (limited-limit $limited))))))
+    ((limiter-apply limiter limit)
+      (limiter limit)))
 
   (define (limiter-using $value $used)
     (limiter ($limit)
       (make-limited? $value
         (- $limit $used))))
-
-  (define (limiter-apply $limiter $limit)
-    ($limiter $limit))
 
   (define (limiter-limited? $limiter $limit)
     ($limiter $limit))
@@ -53,12 +58,6 @@
 
   (define (limiter-unlimited-ref $limiter)
     (limited-ref (limiter-apply $limiter infinity)))
-
-  (define (limiter-bind $limiter $fn)
-    (limiter ($limit)
-      (lets?
-        ($limited (limiter-apply $limiter $limit))
-        (limiter-apply ($fn (limited-ref $limited)) (limited-limit $limited)))))
 
   (define-rules-syntax
     ((limiter-try) (limiter #f))

@@ -39,11 +39,11 @@
   (define (solver-solve $solver)
     (solver-apply $solver '()))
 
-  (define (solver-bind $solver $fn)
+  (define-rule-syntax (solver-let1 (val expr) body)
     (solver ($solutions)
       (lets
-        ((values $solutions $value) (solver-apply $solver $solutions))
-        (solver-apply ($fn $value) $solutions))))
+        ((values $solutions val) (solver-apply expr $solutions))
+        (solver-apply body $solutions))))
 
   (define-monadic solver)
 

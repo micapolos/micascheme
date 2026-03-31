@@ -4,7 +4,6 @@ library
     rename %current current
     current?
     current-ref
-    current-bind
     current-map
     current-lets
     current-lets?
@@ -27,15 +26,15 @@ library
       when
         %current: x, xs, ...
         current lambda: x, xs, ...
+      when
+        current-let1: val expr, body
+        %current let
+          val current-ref expr
+          in current-ref body
 
     lambda
       current-ref $current
       with current-procedure $current
 
-    lambda
-      current-bind: $current, $binder
-      %current let
-        $ref current-ref $current
-        in current-ref with: $binder, $ref
 
   define-monadic current

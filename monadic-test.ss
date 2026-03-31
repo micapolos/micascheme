@@ -16,11 +16,11 @@
 (define (counter-run-from $counter $count)
   ($counter $count))
 
-(define (counter-bind $counter $fn)
+(define-rule-syntax (counter-let1 (val expr) body)
   (lambda ($count)
     (lets
-      ((values $count $value) (counter-run-from $counter $count))
-      (counter-run-from ($fn $value) (+ $count 1)))))
+      ((values $count val) (counter-run-from expr $count))
+      (counter-run-from body (+ $count 1)))))
 
 (define-rule-syntax (check-counter counter out)
   (check

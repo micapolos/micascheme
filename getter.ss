@@ -5,7 +5,6 @@
     getter-load!
 
     getter
-    getter-bind
     getter-map
     getter-lets
     getter-switch
@@ -133,14 +132,13 @@
       (exact-char-getter ch))
     ((exact-getter s)
       (string? (datum s))
-      (exact-string-getter s)))
-
-  (define (getter-bind $getter $fn)
-    (getter ($port $sfd $indent $bfp $line $column)
-      (lets
-        ((values $value $bfp $line $column)
-          (getter-get! $getter $port $sfd $indent $bfp $line $column))
-        (getter-get! ($fn $value) $port $sfd $indent $bfp $line $column))))
+      (exact-string-getter s))
+    ((getter-let1 (val expr) body)
+      (getter ($port $sfd $indent $bfp $line $column)
+        (lets
+          ((values val $bfp $line $column)
+            (getter-get! expr $port $sfd $indent $bfp $line $column))
+          (getter-get! body $port $sfd $indent $bfp $line $column)))))
 
   (define-monadic getter)
 
