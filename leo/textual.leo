@@ -43,9 +43,9 @@ library
 
     lambda
       put-textual: port, textual
-      current-ref current-lets
-        put textual-current-put-procedure textual
-        current put port
+      with
+        current-ref textual-current-put-procedure textual
+        port
 
     lambda
       textual-string: textual
