@@ -19,7 +19,9 @@ git tag v0.1.xx
 git push origin v0.1.55
 ```
 
-Wait until release is complete on Github, and then:
+Wait until release is complete on Github: https://github.com/micapolos/micascheme/releases.
+
+Update Homebrew:
 
 ```
 cd ../homebrew-leo
