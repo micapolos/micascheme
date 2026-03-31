@@ -3,6 +3,7 @@ library
   export
     rename %textual textual
     textual?
+    put-textual
     textual-string
     list->textual
     textual-append
@@ -40,10 +41,17 @@ library
           put-string: port, x
 
     lambda
-      textual-string: textual
+      put-textual: port, textual
       current-ref current-lets
         put textual-current-put textual
-        current call-with-string-output-port put
+        current put port
+
+    lambda
+      textual-string: textual
+      call-with-string-output-port
+        lambda
+          with port
+          put-textual: port, textual
 
     lambda
       list->textual textual-list
