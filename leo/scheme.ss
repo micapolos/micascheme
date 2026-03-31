@@ -59,6 +59,7 @@
       (leo write)
       (leo test)
       (leo document)
+      (void)
       (only (leo code) code-pretty? code-line-limit)
       (rename (leo version) (version leo-version))))
 

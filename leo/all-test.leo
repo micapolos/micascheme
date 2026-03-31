@@ -5,6 +5,7 @@ test
   leo lambda
   leo let
   leo with
+  leo switch
   leo pair
   leo list
   leo parameterize
