@@ -20,7 +20,6 @@ RELEASE_DIR="$BUILD_DIR/release"
 REL_BIN_DIR="$RELEASE_DIR/bin"
 REL_LIB_DIR="$RELEASE_DIR/lib"
 REL_MAN_DIR="$RELEASE_DIR/man"
-REL_MICASCHEME_DIR="$REL_LIB_DIR/micascheme"
 
 # The "Mini-Prefix" for the Scheme engine
 REL_SCHEME_ROOT="$REL_LIB_DIR/scheme"
@@ -36,8 +35,7 @@ mkdir -p \
   "$REL_MAN_DIR" \
   "$REL_SCHEME_BIN" \
   "$REL_SCHEME_LIB" \
-  "$REL_EX_DIR" \
-  "$REL_MICASCHEME_DIR"
+  "$REL_EX_DIR"
 
 # --- 3. Ensure Submodules & Build ChezScheme ---
 if [ ! -f "$DEPS_DIR/configure" ]; then
@@ -99,18 +97,6 @@ echo "Compiling Leo $VERSION with WPO..."
     -b "./$REL_SCHEME_LIB/scheme.boot" \
     --program "$SRC_LEO_DIR/compile-wpo.ss" \
     "$REL_LIB_DIR/leo.so"
-
-# Copy micascheme .so libraries
-EXCLUDE_DIR=$(basename "$BUILD_DIR")
-DEPS_BASE=$(basename "$DEPS_DIR")
-
-find . -name "*.so" \
-  ! -path "./$EXCLUDE_DIR/*" \
-  ! -path "./$DEPS_BASE/*" \
-  | cpio -pdm "$REL_MICASCHEME_DIR/"
-
-cp "$SRC_LEO_DIR"/document.leo "$REL_MICASCHEME_DIR/leo"
-cp "$SRC_LEO_DIR"/repl.leo "$REL_MICASCHEME_DIR/leo"
 
 # --- 6. Handle Wrapper Script ---
 if [ -f "$SRC_LEO_DIR/leo" ]; then

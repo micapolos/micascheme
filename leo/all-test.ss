@@ -25,4 +25,6 @@
   (leo source-file-descriptor)
   (leo read)
   (leo language)
-  (leo load))
+  (leo load)
+  (leo document)
+  (leo repl))

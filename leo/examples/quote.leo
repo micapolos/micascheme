@@ -1,6 +1,4 @@
-import
-  leo scheme
-  only: datum->string, from micascheme
+import leo scheme
 
 write 'quoted string-append: "foo", "bar"
 

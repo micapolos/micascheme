@@ -9,8 +9,6 @@ test
   leo list
   leo parameterize
   leo bytevector
-  leo document
   leo eval
-  leo repl
   leo current
   leo textual
