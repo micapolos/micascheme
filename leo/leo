@@ -7,6 +7,5 @@ SCHEME_DIR="$LIB_DIR/scheme"
 exec "$SCHEME_DIR/bin/scheme" \
     -b "$SCHEME_DIR/lib/petite.boot" \
     -b "$SCHEME_DIR/lib/scheme.boot" \
-    --libdirs ".:$LIB_DIR/micascheme" \
     --program "$LIB_DIR/leo.so" \
     "$@"

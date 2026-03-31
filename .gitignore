@@ -1,5 +1,6 @@
 *.so
 *.wpo
+*.boot
 .DS_Store
 build/
 *.tar.gz
