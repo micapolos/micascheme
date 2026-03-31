@@ -10,7 +10,7 @@
     getter-lets
     getter-switch
     list->getter
-    append-getter
+    getter-append
     replace-getter
     apply-getter
     error-getter

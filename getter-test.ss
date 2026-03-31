@@ -99,7 +99,7 @@
 (check-gets peek-char/eof-getter "abc" #\a 0)
 
 (check-gets
-  (append-getter char/eof-getter char/eof-getter)
+  (getter-append char/eof-getter char/eof-getter)
   "abc"
   '(#\a #\b)
   2)
@@ -119,9 +119,9 @@
 (check-gets line-number-getter "" 1 0 0 0)
 (check-gets column-number-getter "" 1 0 0 0)
 
-(check-gets (append-getter string-getter bfp-getter) "ab\ncd\ne" (list "ab\ncd\ne" 7) 7 2 1)
-(check-gets (append-getter string-getter line-number-getter) "ab\ncd\ne" (list "ab\ncd\ne" 3) 7 2 1)
-(check-gets (append-getter string-getter column-number-getter) "ab\ncd\ne" (list "ab\ncd\ne" 2) 7 2 1)
+(check-gets (getter-append string-getter bfp-getter) "ab\ncd\ne" (list "ab\ncd\ne" 7) 7 2 1)
+(check-gets (getter-append string-getter line-number-getter) "ab\ncd\ne" (list "ab\ncd\ne" 3) 7 2 1)
+(check-gets (getter-append string-getter column-number-getter) "ab\ncd\ne" (list "ab\ncd\ne" 2) 7 2 1)
 
 (check-gets (starting-getter (exact-getter #\<) char-getter) "<b" #\b 2)
 (check-gets (starting-getter (exact-getter #\<) char-getter) "<bc" #\b 2)

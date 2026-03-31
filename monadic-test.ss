@@ -63,7 +63,7 @@
   (6 ("foo" "bar" "gar")))
 
 (check-counter
-  (append-counter (counter "foo") (counter "bar") (counter "gar"))
+  (counter-append (counter "foo") (counter "bar") (counter "gar"))
   (6 ("foo" "bar" "gar")))
 
 (check-counter

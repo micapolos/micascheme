@@ -13,7 +13,7 @@
     limiter-switch
     list->limiter
     replace-limiter
-    append-limiter
+    limiter-append
     apply-limiter
     limiter-try)
   (import

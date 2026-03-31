@@ -12,3 +12,4 @@ test
   leo document
   leo eval
   leo repl
+  leo current
