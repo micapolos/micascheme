@@ -3,6 +3,8 @@ library
   export repl
   import
     ansi-string
+    char
+    eof
     getter
     port
     void
@@ -12,8 +14,7 @@ library
     leo version
     leo expand
     leo getter
-    only: leo-read-annotation, from leo read
-    only: eof?, char-newline?, from micascheme
+    leo read
 
   define
     repl:
