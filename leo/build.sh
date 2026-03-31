@@ -96,7 +96,7 @@ echo "Compiling Leo $VERSION with WPO..."
     -b "./$REL_SCHEME_LIB/petite.boot" \
     -b "./$REL_SCHEME_LIB/scheme.boot" \
     --program "$SRC_LEO_DIR/compile-wpo.ss" \
-    "$REL_LIB_DIR/leo.so"
+    "$REL_LIB_DIR/leo.boot"
 
 # --- 6. Handle Wrapper Script ---
 if [ -f "$SRC_LEO_DIR/leo" ]; then

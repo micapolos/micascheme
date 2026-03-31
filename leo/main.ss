@@ -1,3 +1,3 @@
 (import (scheme) (leo start))
-
-(start (command-line-arguments))
+(suppress-greeting #t)
+(scheme-start (lambda args (start args)))
