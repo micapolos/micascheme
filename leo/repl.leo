@@ -1,21 +1,21 @@
 library
   leo repl
-  export leo-repl
+  export repl
   import
+    ansi-string
+    getter
+    port
     leo scheme
-    only: leo-read-annotation, from leo read
     leo exception-handler
     leo condition
     leo version
     leo expand
-    getter
-    port
     leo getter
-    ansi-string
+    only: leo-read-annotation, from leo read
     only: eof?, char-newline?, from micascheme
 
   define
-    leo-repl:
+    repl:
     with-exception-handler
       leo-exception-handler
       lambda

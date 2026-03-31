@@ -73,5 +73,5 @@
         (cons sc-expand
           '(let ()
             (import (leo repl))
-            (leo-repl))))))
+            (repl))))))
 )
