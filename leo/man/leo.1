@@ -14,8 +14,9 @@ If a
 .I file
 is provided, it is executed with any subsequent
 .I args
-passed to the script. If no file is provided and no options are specified, the
-program exits.
+passed to the script. If no file is provided and no options are specified,
+.B leo
+starts an interactive Read-Eval-Print Loop (REPL) session.
 .SH OPTIONS
 .TP
 .BR \-v ", " \-\-version
@@ -33,11 +34,11 @@ Optional arguments passed directly to the script being executed.
 .SH EXIT STATUS
 .TP
 .B 0
-Success. The file was executed or an information option was displayed.
+Success. The file or REPL session executed successfully, or an informational option was displayed.
 .TP
 .B 1
 Failure. A syntax error, runtime exception, or invalid option occurred.
 .SH SEE ALSO
-.BR scheme (1),
+.BR scheme (1)
 .SH AUTHOR
 Developed by Michał Pociecha-Łoś.
