@@ -12,11 +12,11 @@
 
 (display "Compiling whole program...")
 (newline)
-(compile-whole-program "leo/main.wpo" "leo/leo.so" #t)
+(compile-whole-program "leo/main.wpo" "leo/main-wpo.so" #t)
 
 (display "Making boot file...")
 (newline)
 (make-boot-file
   (car (command-line-arguments))
   (list "scheme" "petite")
-  "leo/leo.so")
+  "leo/main-wpo.so")

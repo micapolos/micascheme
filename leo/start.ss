@@ -34,7 +34,7 @@
       ((file arg ...)
         (start-file (datum file) (datum (arg ...))))
       (()
-        (repl))))
+        (void))))
 
   (define (start-version $arguments)
     (run
