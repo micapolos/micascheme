@@ -1,10 +1,11 @@
 (library (leo start)
   (export start)
   (import
-    (micascheme)
+    (except (micascheme) eval)
     (leo leo)
     (leo load)
     (leo version)
+    (leo expand)
     (leo exception-handler)
     (prefix (leo scheme) %))
 
@@ -69,9 +70,8 @@
 
   (define (start-repl)
     (leo
-      (eval
-        (cons sc-expand
-          '(let ()
-            (import (leo repl))
-            (repl))))))
+      (%eval
+        '(begin
+          (import (leo repl))
+          (repl)))))
 )

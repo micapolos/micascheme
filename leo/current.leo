@@ -31,10 +31,8 @@ library
         %current let
           val current-ref expr
           in current-ref body
-
-    lambda
-      current-ref $current
-      with current-procedure $current
-
+      when
+        current-ref $current
+        with current-procedure $current
 
   define-monadic current
