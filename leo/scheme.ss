@@ -1,7 +1,7 @@
 (library (leo scheme)
   (export
     null in
-    define lambda
+    define lambda value
     named recursive sequential
     syntax-case
     let
@@ -64,7 +64,7 @@
   (%define (any? _) #t)
   (%define null (%quote ()))
 
-  (define-keywords then in named recursive sequential)
+  (define-keywords then in named recursive sequential value)
 
   (%define (display-line x)
     (%display x)
@@ -97,7 +97,16 @@
           (%cons leo-expand x)
           env))))
 
-  (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values in named recursive sequential %syntax)
+  (define-rules-syntaxes (keywords value lambda with then %else %when %list %and keywords %values in named recursive sequential %syntax)
+    ((define-1 (value (name x)))
+      (keyword? name)
+      (%define name x))
+
+    ((define-1 (lambda (name param ... (%and last)) x xs ...))
+      (%define (name param ... . last) x xs ...))
+    ((define-1 (lambda (name param ...) x xs ...))
+      (%define (name param ...) x xs ...))
+
     ((define-1 (%syntax (keywords k ...) (%when pattern x xs ...) ...))
       (define-rules-syntaxes (keywords k ...)
         (pattern x xs ...) ...))
@@ -113,14 +122,8 @@
       (keyword? name)
       (%define-syntax (name s) x xs ...))
 
-    ((define-1 (lambda (name param ... (%and last)) x xs ...))
-      (%define (name param ... . last) x xs ...))
-    ((define-1 (lambda (name param ...) x xs ...))
-      (%define (name param ...) x xs ...))
-
     ((define-1 (name x))
-      (keyword? name)
-      (%define name x))
+      (define-1 (value (name x))))
 
     ((define x ...)
       (%begin
