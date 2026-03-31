@@ -16,7 +16,7 @@ library
     leo getter
     leo read
 
-  define
+  define lambda
     repl:
     with-exception-handler
       leo-exception-handler
@@ -26,7 +26,7 @@ library
         eval 'import leo scheme
         loop:
 
-  define
+  define lambda
     read-until-newline port
     when
       char-ready? port
@@ -39,13 +39,13 @@ library
           read-char port
           read-until-newline port
 
-  define
+  define lambda
     char/eof-newline? char/eof
     and
       not eof? char/eof
       char-newline? char/eof
 
-  define
+  define lambda
     loop:
     display string-append: ansi-purple-string, ">>>", ansi-black-string, " "
     flush-output-port:

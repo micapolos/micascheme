@@ -5,7 +5,7 @@ import
 define leo string-append: "Leo ", version
 define author "Michal Pociecha-Los"
 
-define
+define lambda
   greeting recipient
   `greeting
     using` leo

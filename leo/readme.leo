@@ -19,11 +19,11 @@ document readme
       define hello "Hello"
       define leo "Leo"
 
-      define
+      define lambda
         exclamated s
         string-append: s, "!"
 
-      define
+      define lambda
         comma-separated: a, b
         string-append: a, ", ", b
 

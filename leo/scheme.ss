@@ -98,31 +98,38 @@
           env))))
 
   (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values in named recursive sequential %syntax)
-    ((define (%syntax (keywords k ...) (%when pattern x xs ...) ...))
+    ((define-1 (%syntax (keywords k ...) (%when pattern x xs ...) ...))
       (define-rules-syntaxes (keywords k ...)
         (pattern x xs ...) ...))
 
-    ((define (%syntax (%when pattern x xs ...) ...))
+    ((define-1 (%syntax (%when pattern x xs ...) ...))
       (define (%syntax (keywords) (%when pattern x xs ...) ...)))
 
-    ((define (%syntax (name x)))
+    ((define-1 (%syntax (name x)))
       (keyword? name)
       (%define-syntax name x))
 
-    ((define (%syntax (name s) x xs ...))
+    ((define-1 (%syntax (name s) x xs ...))
       (keyword? name)
       (%define-syntax (name s) x xs ...))
+
+    ((define-1 (lambda (name param ... (%and last)) x xs ...))
+      (%define (name param ... . last) x xs ...))
+    ((define-1 (lambda (name param ...) x xs ...))
+      (%define (name param ...) x xs ...))
+
+    ((define-1 (name x))
+      (keyword? name)
+      (%define name x))
+
+    ((define x ...)
+      (%begin
+        (define-1 x)
+        ...))
 
     ((syntax-case expr (keywords k ...) (%when pattern x xs ...) ...)
       (%syntax-case expr (k ...)
         (pattern x xs ...) ...))
-
-    ((define (name x))
-      (%define name x))
-    ((define (name param ... (%and last)) x xs ...)
-      (%define (name param ... . last) x xs ...))
-    ((define (name param ...) x xs ...)
-      (%define (name param ...) x xs ...))
 
     ((lambda (with param ... (%and last)) x xs ...)
       (%lambda (param ... . last) x xs ...))

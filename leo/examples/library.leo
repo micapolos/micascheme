@@ -1,5 +1,5 @@
 library
-  leo samples library
+  leo examples library
   export
     hello
     world
@@ -13,11 +13,11 @@ library
   define world "world"
   define exclamation "!"
 
-  define
+  define lambda
     exclamate string
     string-append: string, exclamation
 
-  define
+  define lambda
     comma-separated: string-a, string-b
     string-append: string-a, string-b
 

@@ -200,11 +200,11 @@ The following sub-sentences are the "body"—the actual logic that runs.
 In the example below, we define `exclamated` which takes a string and adds an exclamation mark to it. We also define `comma-separated` which takes two strings and joins them with a comma.
 
 ```leo
-define
+define lambda
   exclamated string
   string-append: string, "!"
 
-define
+define lambda
   comma-separated: first-string, second-string
   string-append: first-string, ", ", second-string
 

@@ -3,12 +3,12 @@ import leo scheme
 define hello "Hello"
 define world "world"
 
-define
+define lambda
   exclamated string
   string-append: string, "!"
 
-define comma-separated lambda
-  with: string-a, string-b
+define lambda
+  comma-separated: string-a, string-b
   string-append
     string-a
     ", "

@@ -7,11 +7,11 @@ import
 define hello "Hello"
 define world "world"
 
-define
+define lambda
   exclamated string
   string-append: string, "!"
 
-define
+define lambda
   comma-separated: and strings
   apply
     string-append

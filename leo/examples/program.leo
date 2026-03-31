@@ -4,12 +4,12 @@ define hello "Hello"
 define world "world"
 define exclamation "!"
 
-define
+define lambda
   exclamate string
   string-append: string, exclamation
 
-define comma-separated lambda
-  with: string-a, string-b
+define lambda
+  comma-separated: string-a, string-b
   string-append
     string-a
     ", "
