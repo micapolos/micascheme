@@ -1,6 +1,10 @@
 import leo scheme
 
 quote changelog
+  v0.1.54
+    build leo with
+      optimize-level 3
+      no inspector information
   v0.1.53
     add startup-reference-time-ms flag to measure startup time
     bundle repl in release
