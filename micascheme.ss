@@ -71,6 +71,7 @@
         define-syntax
         type-descriptor)
       (annotation)
+      (ansi-string)
       (binary)
       (binder)
       (blob)

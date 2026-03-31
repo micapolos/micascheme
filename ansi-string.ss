@@ -5,7 +5,7 @@
     ansi-purple-string
     ansi-cyan-string
     ansi-bright-red-string)
-  (import (micascheme))
+  (import (scheme))
 
   (define (ansi-string $number)
     (string-append
