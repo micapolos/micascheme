@@ -1,6 +1,10 @@
 import leo scheme
 
 quote changelog
+  v0.1.53
+    add startup-reference-time-ms flag to measure startup time
+    bundle repl in release
+    do not bundle micascheme in release
   v0.1.52
     add missing library ansi-string
   v0.1.51
