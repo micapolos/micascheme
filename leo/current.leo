@@ -25,8 +25,8 @@ library
   define
     syntax
       when
-        %current body
-        current lambda body
+        %current: x, xs, ...
+        current lambda: x, xs, ...
 
     lambda
       current-ref $current

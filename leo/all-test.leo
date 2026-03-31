@@ -13,3 +13,4 @@ test
   leo eval
   leo repl
   leo current
+  leo textual
