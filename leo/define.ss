@@ -1,19 +1,21 @@
 (library (leo define)
-  (export define value)
+  (export define value record union)
   (import
     (rename
       (except (scheme) lambda)
       (define %define))
+    (rename (data) (data %data))
+    (rename (union) (union %union))
     (leo lambda)
     (syntax-keywords)
     (keyword)
     (syntax)
     (syntaxes))
 
-  (define-keywords value)
+  (define-keywords value record union)
 
   (define-rules-syntaxes
-    (keywords value lambda syntax and when keywords)
+    (keywords value lambda syntax and when keywords record union)
 
     ((define-1 (value (id x)))
       (%define id x))
@@ -38,6 +40,12 @@
     ((define-1 (syntax (id s) x xs ...))
       (keyword? id)
       (define-syntax (id s) x xs ...))
+
+    ((define-1 (record . x))
+      (%data . x))
+
+    ((define-1 (union . x))
+      (%union . x))
 
     ((define-1 (id x))
       (keyword? id)

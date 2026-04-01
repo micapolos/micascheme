@@ -35,6 +35,9 @@ define
       string-magic: a, ...
       string-append: a, ..., "!"
 
+  record point: x, y
+  union id: number, string
+
 check equal?: zero, 0
 check equal?: one, 1
 check equal?: two, 2
@@ -59,3 +62,17 @@ check equal?
 check equal?
   string-magic: "foo", "bar"
   "foobar!"
+
+check record? point: 10, 20
+
+check equal?
+  point-x point: 10, 20
+  10
+
+check equal?
+  point-y point: 10, 20
+  20
+
+check id? 123
+check id? "foo"
+check not id? 'foo
