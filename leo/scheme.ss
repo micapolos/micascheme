@@ -5,7 +5,6 @@
     any?
     make-read-lambda
     define-language
-    logging
     load load-program)
   (import
     (prefix (scheme) %)
@@ -97,19 +96,6 @@
 
     ((make-read-lambda (with param ...) x xs ...)
       (%make-read-lambda (param ...) x xs ...))
-
-    ((logging x)
-      (let
-        (val x)
-        (in
-          (write val)
-          val)))
-    ((logging label x)
-      (let
-        (val x)
-        (in
-          (write (%list (%quote label) val))
-          val)))
 
     ((define-language (x l))
       (%define-language x l)))

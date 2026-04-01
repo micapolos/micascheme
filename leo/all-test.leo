@@ -11,6 +11,7 @@ test
   leo math
   leo pair
   leo list
+  leo logging
   leo parameterize
   leo bytevector
   leo eval
