@@ -14,6 +14,6 @@ define lambda
     ", "
     string-b
 
-display-line comma-separated
+display comma-separated
   hello
   exclamated world

@@ -1,11 +1,11 @@
 import leo scheme
 
 check equal?
-  list:
+  with list
   null
 
 check equal?
-  closed-list:
+  with closed-list
   null
 
 check equal?
@@ -20,7 +20,7 @@ check equal?
   open-list: 1, 2, 3
   list: 1, 2, and 3
 
-check list? closed-list:
+check list? with closed-list
 check list? closed-list: 1, 2, 3
 
 check not list? open-list: 1

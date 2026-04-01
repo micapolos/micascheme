@@ -4,5 +4,5 @@
   (leo getter)
   (leo load))
 
-(display-line "--- leo/examples/program.leo")
+(display "--- leo/examples/program.leo")
 (pretty-print (getter-load! lines-getter "leo/examples/program.leo"))

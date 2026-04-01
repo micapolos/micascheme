@@ -1,5 +1,7 @@
 (library (leo quotify)
   (export
+    quotify-for-display?
+
     phrase-cons phrase? phrase-string phrase-body
     sentence? sentence-switch
     phrase sentence
@@ -20,6 +22,8 @@
   (import
     (micascheme)
     (procedure-name))
+
+  (define quotify-for-display? (make-thread-parameter #f))
 
   (define (phrase-cons word body) (cons word body))
   (define phrase? pair?)
@@ -112,10 +116,14 @@
     (number->string $number))
 
   (define (char->sentence $char)
-    (phrase-cons "char" (list (char->datum $char))))
+    (if (quotify-for-display?)
+      (string $char)
+      (phrase-cons "char" (list (char->datum $char)))))
 
   (define (string->sentence $string)
-    (format "~s" $string))
+    (if (quotify-for-display?)
+      $string
+      (format "~s" $string)))
 
   (define (symbol->sentence $symbol)
     (format "~s" $symbol))

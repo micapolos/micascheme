@@ -138,8 +138,20 @@
 
 (check
   (equal?
+    (parameterize ((quotify-for-display? #t))
+      (->sentence #\a))
+    "a"))
+
+(check
+  (equal?
     (->sentence "foo")
     "\"foo\""))
+
+(check
+  (equal?
+    (parameterize ((quotify-for-display? #t))
+      (->sentence "foo"))
+    "foo"))
 
 (check
   (equal?

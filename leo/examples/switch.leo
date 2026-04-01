@@ -16,6 +16,6 @@ define lambda
         "other "
         format: "~s", other
 
-display-line to-string string-append: "Hello, ", "world!"
-display-line to-string add: 2, 2
-display-line to-string cons: 10, 20
+display to-string string-append: "Hello, ", "world!"
+display to-string add: 2, 2
+display to-string cons: 10, 20

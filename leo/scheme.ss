@@ -6,7 +6,6 @@
     any?
     make-read-lambda
     list closed-list open-list
-    display-line
     define-language
     logging
     load load-program
@@ -39,7 +38,7 @@
     (import
       (leo library)
       (except (chezscheme)
-        library import export
+        library import export display display-string
         top-level-program
         except only rename alias prefix add-prefix drop-prefix
         load load-program
@@ -69,16 +68,13 @@
       (leo define)
       (leo let)
       (leo switch)
+      (leo display)
       (void)
       (only (leo code) code-pretty? code-line-limit)
       (rename (leo version) (version leo-version))))
 
   (%define (any? _) #t)
   (%define null (%quote ()))
-
-  (%define (display-line x)
-    (%display x)
-    (%newline))
 
   ; TODO: Move it to a separate library
   (%define add %+)

@@ -12,8 +12,8 @@ check equal?
     first-parameter "Hello"
     second-parameter "world"
     in string-append
-      first-parameter:
+      with first-parameter
       ", "
-      second-parameter:
+      with second-parameter
       "!"
   "Hello, world!"

@@ -3,7 +3,7 @@ import leo scheme
 define bytevector-16-32 bytevector: 16, 32
 
 check equal?
-  bytevector-length bytevector:
+  bytevector-length with bytevector
   0
 
 check equal?
