@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.60
+    fix a bug in repl which exited after evaluating void
   v0.1.59
     remove display-line
     rewrite display to use write with special string and char handling
