@@ -2,6 +2,7 @@ import
   except: if, from scheme
   leo check
   leo if
+  leo then
 
 check equal?
   if

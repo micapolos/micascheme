@@ -1,12 +1,11 @@
 (library (leo if)
-  (export if then)
+  (export if)
   (import
     (rename (scheme) (if %if))
     (syntax-keywords)
     (syntax)
+    (leo then)
     (syntaxes))
-
-  (define-keywords then)
 
   (define-rules-syntax
     (keywords then else)

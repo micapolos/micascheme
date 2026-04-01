@@ -1,4 +1,12 @@
-import leo scheme
+import
+  except: let, if, from scheme
+  leo let
+  leo in
+  leo with
+  leo check
+  leo recursive
+  leo sequential
+  leo if
 
 check equal?
   let
@@ -41,9 +49,9 @@ check equal?
   let fibonacci
     number 10
     in if
-      less?: number, 2
+      <: number, 2
       number
-      add
-        fibonacci subtract: number, 1
-        fibonacci subtract: number, 2
+      +
+        fibonacci -: number, 1
+        fibonacci -: number, 2
   55

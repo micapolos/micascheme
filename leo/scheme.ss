@@ -1,9 +1,7 @@
 (library (leo scheme)
   (export
-    null in
-    named recursive sequential
+    null
     syntax-case
-    let
     eval
     any?
     make-read-lambda
@@ -34,6 +32,8 @@
     (leo load)
     (leo write)
     (leo expand)
+    (leo let)
+    (leo in)
     (leo writing-reader))
   (%export
     (import
@@ -55,14 +55,19 @@
       (only (micascheme) integer char true false keywords run)
       (only (syntax-keywords) keywords)
       (only (char) code)
+      (leo in)
+      (leo recursive)
+      (leo sequential)
       (leo with)
       (leo check)
       (leo write)
       (leo test)
       (leo if)
+      (leo then)
       (leo document)
       (leo lambda)
       (leo define)
+      (leo let)
       (leo switch)
       (void)
       (only (leo code) code-pretty? code-line-limit)
@@ -70,8 +75,6 @@
 
   (%define (any? _) #t)
   (%define null (%quote ()))
-
-  (define-keywords then in named recursive sequential)
 
   (%define (display-line x)
     (%display x)
@@ -104,33 +107,13 @@
           (%cons leo-expand x)
           env))))
 
-  (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values in named recursive sequential %syntax)
+  (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values in recursive sequential %syntax)
     ((syntax-case expr (keywords k ...) (%when pattern x xs ...) ...)
       (%syntax-case expr (k ...)
         (pattern x xs ...) ...))
 
     ((make-read-lambda (with param ...) x xs ...)
       (%make-read-lambda (param ...) x xs ...))
-
-    ((let (with (%values id ...) expr) ... (in x xs ...))
-      (%let-values (((id ...) expr) ...) x xs ...))
-    ((let (sequential (recursive binding ... (in x xs ...))))
-      (%letrec* (binding ...) x xs ...))
-    ((let (sequential (with (%values id ...) expr) ... (in x xs ...)))
-      (%let*-values (((id ...) expr) ...) x xs ...))
-    ((let (sequential binding ... (in x xs ...)))
-      (%let* (binding ...) x xs ...))
-    ((let (recursive (%syntax binding ... (in x xs ...))))
-      (%let-syntax (binding ...) x xs ...))
-    ((let (recursive binding ... (in x xs ...)))
-      (%letrec (binding ...) x xs ...))
-    ((let (%syntax binding ... (in x xs ...)))
-      (%let-syntax (binding ...) x xs ...))
-    ((let (name binding ... (in x xs ...)))
-      (keyword? name)
-      (%let name (binding ...) x xs ...))
-    ((let binding ... (in x xs ...))
-      (%let (binding ...) x xs ...))
 
     ((list xs ... (%and last)) (open-list xs ... last))
     ((list xs ... ) (closed-list xs ...))
