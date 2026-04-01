@@ -211,7 +211,7 @@
               (values $eof $bfp $line $column))
             ((<= $column $indent)
               (raise-getter-error
-                '(eof (inside indent))
+                '(unfinished indentation)
                 $eof $port $sfd $bfp))
             (else
               (values $eof $bfp $line $column))))
@@ -221,7 +221,7 @@
               (values (get-char/trace $port) (+ $bfp 1) (+ $line 1) 0))
             ((<= $column $indent)
               (raise-getter-error
-                '(newline (after indent))
+                '(newline (after indentation))
                 $newline $port $sfd $bfp))
             (else
               (values (get-char/trace $port) (+ $bfp 1) (+ $line 1) 0))))
@@ -237,9 +237,8 @@
                   (values eof $bfp $line $column))
                 (else
                   (raise-getter-error
-                    '(invalid indent)
-                    $char $port $sfd $bfp
-                    '(indent (should (contain (exactly (two spaces)))))))))
+                    '(indentation (should (contain (exactly (two spaces)))))
+                    $char $port $sfd $bfp))))
             (else
               (values (get-char/trace $port) (+ $bfp 1) $line (+ $column 1))))))))
 
@@ -252,7 +251,7 @@
               (values $eof $bfp $line $column))
             ((<= $column $indent)
               (raise-getter-error
-                '(eof (inside indent))
+                '(unfinished indentation)
                 $eof $port $sfd $bfp))
             (else
               (values $eof $bfp $line $column))))
@@ -262,7 +261,7 @@
               (values $newline $bfp $line $column))
             ((<= $column $indent)
               (raise-getter-error
-                '(newline (after indent))
+                '(newline (after indentation))
                 $newline $port $sfd $bfp))
             (else
               (values $newline $bfp $line $column))))
@@ -278,9 +277,8 @@
                   (values eof $bfp $line $column))
                 (else
                   (raise-getter-error
-                    '(invalid indent)
-                    $char $port $sfd $bfp
-                    '(indent (should (contain (exactly (two spaces)))))))))
+                    '(indentation (should (contain (exactly (two spaces)))))
+                    $char $port $sfd $bfp))))
             (else
               (values $char $bfp $line $column)))))))
 
