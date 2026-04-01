@@ -94,6 +94,6 @@
                     (unless
                       (void? evaluated)
                       (write evaluated prefixed-port)
-                      (flush-output-port prefixed-port)
-                      (loop)))))))))))
+                      (flush-output-port prefixed-port))
+                    (loop))))))))))
 )
