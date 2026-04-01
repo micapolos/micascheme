@@ -5,7 +5,6 @@
     syntax-case
     let
     eval
-    cond
     any?
     make-read-lambda
     list closed-list open-list
@@ -48,7 +47,7 @@
         let letrec let-values
         let* letrec* let*-values
         let-syntax letrec-syntax
-        if cond write eval
+        if write eval
         define-syntax
         syntax-case
         parameterize
@@ -132,11 +131,6 @@
       (%let name (binding ...) x xs ...))
     ((let binding ... (in x xs ...))
       (%let (binding ...) x xs ...))
-
-    ((cond (%when a b bs ...) ... (%else c cs ...))
-      (%cond (a b bs ...) ... (%else c cs ...)))
-    ((cond (%when a b bs ...) ...)
-      (%cond (a b bs ...) ...))
 
     ((list xs ... (%and last)) (open-list xs ... last))
     ((list xs ... ) (closed-list xs ...))

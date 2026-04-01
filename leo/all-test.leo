@@ -6,6 +6,7 @@ test
   leo define
   leo let
   leo if
+  leo cond
   leo switch
   leo pair
   leo list
