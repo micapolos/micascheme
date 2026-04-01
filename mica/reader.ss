@@ -337,7 +337,7 @@
           ...
           ((%else $char/eof)
             (error-getter
-              '(expected (one-of x ...))
+              '(expected (one (of x ...)))
               $char/eof)))))
     ((or-eof item)
       (%lets

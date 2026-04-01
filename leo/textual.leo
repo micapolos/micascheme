@@ -35,7 +35,9 @@ library
       when
         %textual x
         string? datum x
-        string->textual x
+        %textual
+          with port
+          put-string: port, x
 
     lambda
       char->textual char
@@ -49,7 +51,7 @@ library
         with port
         put-string: port, string
 
-    lambda
+    syntax when
       put-textual: port, textual
       with
         current-ref textual-current-put-procedure textual
