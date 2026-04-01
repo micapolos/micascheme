@@ -1,10 +1,10 @@
 import leo scheme
 
 test
-  leo define
-  leo lambda
-  leo let
   leo with
+  leo lambda
+  leo define
+  leo let
   leo switch
   leo pair
   leo list

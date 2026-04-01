@@ -1,7 +1,28 @@
-import leo scheme
+import
+  except: lambda, from scheme
+  leo check
+  leo with
+  leo lambda
+
+check procedure? lambda 123
+
+check procedure?
+  lambda
+    with x
+    x
+
+check procedure?
+  lambda
+    with: x, y, z
+    z
+
+check procedure?
+  lambda
+    with: x, y, and z
+    z
 
 check equal?
-  with: lambda 123
+  with lambda 123
   123
 
 check equal?

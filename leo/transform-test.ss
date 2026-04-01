@@ -1,5 +1,6 @@
 (import
   (except (micascheme) with from)
+  (leo with)
   (leo transform))
 
 (check

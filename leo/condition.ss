@@ -13,8 +13,8 @@
           (and
             (pair? $datum)
             (equal? (car $datum) 'condition))
-          (cdr $datum)
-          (list $datum)))
+          `(error ,@(cdr $datum))
+          $datum))
       (parameterize ((print-gensym #f))
         (write
           $datum

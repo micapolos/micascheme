@@ -1,7 +1,6 @@
 (library (leo scheme)
   (export
     null in
-    define lambda value
     named recursive sequential
     syntax-case
     let
@@ -31,6 +30,8 @@
     (leo quotify)
     (leo reader)
     (leo datum)
+    (leo with)
+    (leo lambda)
     (leo load)
     (leo write)
     (leo expand)
@@ -53,12 +54,15 @@
         parameterize
         list)
       (only (micascheme) integer char true false keywords run)
-      (only (leo transform) with)
+      (only (syntax-keywords) keywords)
       (only (char) code)
+      (leo with)
       (leo check)
       (leo write)
       (leo test)
       (leo document)
+      (leo lambda)
+      (leo define)
       (leo switch)
       (void)
       (only (leo code) code-pretty? code-line-limit)
@@ -67,7 +71,7 @@
   (%define (any? _) #t)
   (%define null (%quote ()))
 
-  (define-keywords then in named recursive sequential value)
+  (define-keywords then in named recursive sequential)
 
   (%define (display-line x)
     (%display x)
@@ -100,49 +104,10 @@
           (%cons leo-expand x)
           env))))
 
-  (define-rules-syntaxes (keywords value lambda with then %else %when %list %and keywords %values in named recursive sequential %syntax)
-    ((define-1 (value (name x)))
-      (keyword? name)
-      (%define name x))
-
-    ((define-1 (lambda (name param ... (%and last)) x xs ...))
-      (%define (name param ... . last) x xs ...))
-    ((define-1 (lambda (name param ...) x xs ...))
-      (%define (name param ...) x xs ...))
-
-    ((define-1 (%syntax (keywords k ...) (%when pattern x xs ...) ...))
-      (define-rules-syntaxes (keywords k ...)
-        (pattern x xs ...) ...))
-
-    ((define-1 (%syntax (%when pattern x xs ...) ...))
-      (define (%syntax (keywords) (%when pattern x xs ...) ...)))
-
-    ((define-1 (%syntax (name x)))
-      (keyword? name)
-      (%define-syntax name x))
-
-    ((define-1 (%syntax (name s) x xs ...))
-      (keyword? name)
-      (%define-syntax (name s) x xs ...))
-
-    ((define-1 (name x))
-      (define-1 (value (name x))))
-
-    ((define x ...)
-      (%begin
-        (define-1 x)
-        ...))
-
+  (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values in named recursive sequential %syntax)
     ((syntax-case expr (keywords k ...) (%when pattern x xs ...) ...)
       (%syntax-case expr (k ...)
         (pattern x xs ...) ...))
-
-    ((lambda (with param ... (%and last)) x xs ...)
-      (%lambda (param ... . last) x xs ...))
-    ((lambda (with param ...) x xs ...)
-      (%lambda (param ...) x xs ...))
-    ((lambda x xs ...)
-      (%lambda () x xs ...))
 
     ((make-read-lambda (with param ...) x xs ...)
       (%make-read-lambda (param ...) x xs ...))

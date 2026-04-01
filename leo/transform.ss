@@ -1,6 +1,6 @@
 (library (leo transform)
   (export
-    from with
+    from
     transform-name
     transform-export
     transform-import
@@ -10,12 +10,11 @@
     transform-leo)
   (import
     (except (micascheme) from with)
+    (leo with)
     (condition)
     (keyword))
 
   (define-keywords from)
-
-  (define-rule-syntax (with x xs ...) (x xs ...))
 
   (define (transform-identifier $syntax)
     (syntax-case $syntax ()
