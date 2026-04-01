@@ -61,32 +61,36 @@
     switch
     else)
   (import
-    (rename (micascheme)
+    (rename (scheme)
       (string %string)
-      (prepend %prepend)
       (append %append)
       (string-append %string-append)
       (list->string %list->string)
       (apply %apply)
       (not %not)
       (> %>)
-      (char %char)
       (else %else)
       (or %or)
-      (null %null)
-      (lets %lets)
       (list %list)
       (cons %cons)
-      (list-annotation %list-annotation)
-      (logging %logging)
-      (flatten %flatten)
-      (switch %switch)
       (null? %null?)
       (map %map)
-      (always %always)
-      (error %error)
-      (eof %eof)
-      (cons-annotation %cons-annotation))
+      (error %error))
+    (prefix (eof) %)
+    (prefix (procedure) %)
+    (prefix (annotation) %)
+    (prefix (system) %)
+    (prefix (lets) %)
+    (prefix (list) %)
+    (prefix (char) %)
+    (prefix (switch) %)
+    (prefix (string) %)
+    (prefix (boolean) %)
+    (check)
+    (predicate)
+    (syntax)
+    (syntaxes)
+    (source-file-descriptor)
     (keyword)
     (getter))
 
@@ -155,11 +159,11 @@
           (%always #f)
           (error-getter $cause $datum)))))
 
-  (define eof (getter-item eof? eof-getter))
+  (define eof (getter-item %eof? eof-getter))
 
   (define (?char $test?)
     (getter-item
-      (and? (not? eof?) $test?)
+      (and? (not? %eof?) $test?)
       (test?-char-getter $test?)))
 
   (define whitespace-char (?char char-whitespace?))
@@ -168,12 +172,12 @@
 
   (define alphabetic-string
     (getter-item
-      (and? (not? eof?) char-alphabetic?)
+      (and? (not? %eof?) char-alphabetic?)
       alphabetic-string-getter))
 
   (define numeric-string
     (getter-item
-      (and? (not? eof?) char-numeric?)
+      (and? (not? %eof?) char-numeric?)
       numeric-string-getter))
 
   (define-syntax (string $syntax)
@@ -191,7 +195,7 @@
     (syntax-case $syntax ()
       ((_ ch)
         #'(getter-item
-          (partial char=? (%char ch))
+          (%partial char=? (%char ch))
           (exact-char-getter (%char ch))))
       (id
         (keyword? id)
@@ -226,9 +230,9 @@
         (exact-char-getter (datum ch))))
     ((the s)
       (string? (datum s))
-      (if (string-empty? (datum s))
+      (if (%string-empty? (datum s))
         (getter-item
-          eof?
+          %eof?
           (exact-string-getter (datum s)))
         (getter-item
           (lambda ($char/eof)
@@ -287,11 +291,11 @@
         (getter-item
           (lambda ($char/eof)
             (and
-              (app (char-test test?) $char/eof) ...
+              ((char-test test?) $char/eof) ...
               ((getter-item-first-char/eof? $reader) $char/eof)))
           (getter-switch peek-char/eof-getter
             ((char? $char)
-              (if (and (app (char-test test?) $char) ...)
+              (if (and ((char-test test?) $char) ...)
                 (getter-item-getter reader)
                 (error-getter '(unexpected char) $char)))
             ((%else $other)
@@ -324,7 +328,7 @@
       (%lets
         ($x (the x))
         (getter-item
-          (or? (getter-item-first-char/eof? $x) char-newline?)
+          (or? (getter-item-first-char/eof? $x) %char-newline?)
           (skip-newlines-getter (getter-item-getter $x)))))
     ((one-of x ...)
       (getter-item
@@ -345,7 +349,7 @@
         (getter-item
           (lambda ($char/eof)
             (or
-              (eof? $char/eof)
+              (%eof? $char/eof)
               ((getter-item-first-char/eof? $item) $char/eof)))
           (or-eof-getter (getter-item-getter $item)))))
     ((map item fn)
@@ -414,7 +418,7 @@
             (getter-item-first-char/eof? $x1)
             (getter-item-first-char/eof? $x2))
           (getter-switch (getter-item-getter $x1)
-            ((false? _) (getter-item-getter $x2))
+            ((%false? _) (getter-item-getter $x2))
             ((%else $x1) (getter $x1))))))
     ((or x1 x2 xs ...)
       (or (or x1 x2) xs ...))
@@ -433,7 +437,7 @@
           (getter-item-first-char/eof? $item)
           (annotation-getter
             (getter-item-getter $item)
-            stripped-annotation))))
+            %stripped-annotation))))
     ((list-annotation list)
       (%lets
         ($list (the list))
@@ -473,7 +477,7 @@
   (define digit (map (?char char-numeric?) %string string->number))
 
   (define-rule-syntax (check-reads reader in out)
-    (check (datum/annotation=? (read-string (the reader) in) out)))
+    (check (%datum/annotation=? (read-string (the reader) in) out)))
 
   (define-rule-syntax (check-read-error reader in)
     (check (raises (read-string (the reader) in))))
@@ -487,5 +491,5 @@
   (define-rule-syntax (check-reader reader case ...)
     (%lets
       ($reader (the reader))
-      (run-void (check-reader-case $reader case) ...)))
+      (%run (check-reader-case $reader case) ...)))
 )

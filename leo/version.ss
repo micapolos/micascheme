@@ -1,6 +1,6 @@
 (library (leo version)
   (export version)
-  (import (micascheme))
+  (import (scheme))
 
   (define version "v0.1.60")
 )

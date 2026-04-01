@@ -5,26 +5,25 @@
     special-literal
     literal)
   (import
-    (prefix (micascheme) %)
-    (only (micascheme) define)
+    (prefix (scheme) %)
     (mica reader)
     (leo mica reader identifier))
 
   ; TODO: Implement it properly
-  (define number
+  (%define number
     (string->datum
       (list->string
         (non-empty-list-of digit-char))))
 
   ; TODO: Implement it properly
-  (define string-literal
+  (%define string-literal
     (wrapped
       #\"
       (list-string (list-of (string (first-char (not #\" #\newline) char))))
       #\"))
 
   ; TODO: Implement it properly
-  (define special-literal
+  (%define special-literal
     (string->datum
       (string-append "#"
         (one-of
@@ -34,7 +33,7 @@
               (string digit-char)
               identifier-string))))))
 
-  (define literal
+  (%define literal
     (one-of
       number
       identifier

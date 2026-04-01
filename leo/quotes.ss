@@ -2,7 +2,7 @@
   (export
     char->quote?
     char->unquote?)
-  (import (micascheme))
+  (import (scheme))
 
   (define (char->quote? $char)
     (case $char

@@ -1,7 +1,7 @@
 (library (leo language)
   (export leo-language)
   (import
-    (micascheme)
+    (scheme)
     (language)
     (leo read)
     (leo expand))

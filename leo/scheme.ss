@@ -14,9 +14,13 @@
     number=? less? less/equal? greater? greater/equal?
     parameterize)
   (import
-    (prefix (chezscheme) %)
-    (only (micascheme) run define-rules-syntaxes define-keywords keywords ...)
-    (prefix (only (micascheme) make-read-lambda logging) %)
+    (prefix (scheme) %)
+    (only (scheme) ...)
+    (syntax-keywords)
+    (keyword)
+    (syntax)
+    (syntaxes)
+    (prefix (system) %)
     (only (keyword) keyword? keyword...?)
     (leo transform)
     (prefix (language) %)
@@ -51,9 +55,11 @@
         syntax-case
         parameterize
         list)
-      (only (micascheme) integer char true false keywords run)
-      (only (syntax-keywords) keywords)
-      (only (char) code)
+      (char)
+      (keyword)
+      (syntaxes)
+      (syntax-keywords)
+      (boolean)
       (leo in)
       (leo recursive)
       (leo sequential)
@@ -103,7 +109,7 @@
           (%cons leo-expand x)
           env))))
 
-  (define-rules-syntaxes (keywords with then %else %when %list %and keywords %values in recursive sequential %syntax)
+  (define-rules-syntaxes (keywords with then %else %when %list %and %values in recursive sequential %syntax)
     ((syntax-case expr (keywords k ...) (%when pattern x xs ...) ...)
       (%syntax-case expr (k ...)
         (pattern x xs ...) ...))

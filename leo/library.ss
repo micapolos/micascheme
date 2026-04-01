@@ -14,7 +14,7 @@
     transform-library
     transform-top-level-program)
   (import
-    (rename (micascheme)
+    (rename (scheme)
       (import %import)
       (export %export)
       (except %except)
@@ -26,10 +26,10 @@
       (drop-prefix %drop-prefix)
       (library %library)
       (top-level-program %top-level-program)
-      (from %from)
       (syntax-error %syntax-error))
     (leo syntax-error)
     (keyword)
+    (syntax)
     (condition))
 
   (meta define (transform-identifier $syntax)

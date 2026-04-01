@@ -9,7 +9,8 @@
     transform-library
     transform-leo)
   (import
-    (except (micascheme) from with)
+    (scheme)
+    (syntax)
     (leo with)
     (condition)
     (keyword))

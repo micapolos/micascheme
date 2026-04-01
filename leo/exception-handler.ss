@@ -1,11 +1,10 @@
 (library (leo exception-handler)
   (export leo-exception-handler)
   (import
-    (micascheme)
+    (scheme)
     (leo condition))
 
   (define (leo-exception-handler $condition)
-    (run
-      (write-condition $condition (console-output-port))
-      (reset)))
+    (write-condition $condition (console-output-port))
+    (reset))
 )

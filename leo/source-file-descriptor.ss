@@ -1,7 +1,7 @@
 (library (leo source-file-descriptor)
   (export source-file-descriptor-leo?)
   (import
-    (micascheme)
+    (scheme)
     (leo path))
 
   (define (source-file-descriptor-leo? $sfd)

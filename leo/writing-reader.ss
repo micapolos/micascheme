@@ -3,9 +3,12 @@
     writing-reader
 		script-string)
 	(import
-		(micascheme)
+		(scheme)
 		(writing)
-		(leo reader))
+		(leo reader)
+    (stack)
+    (procedure)
+    (syntax))
 
   (define (symbol-writing $symbol)
     (string-writing (symbol->string $symbol)))

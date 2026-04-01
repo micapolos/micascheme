@@ -6,7 +6,11 @@
     bytevector->datum
     vector->datum
     ->datum)
-  (import (micascheme))
+  (import
+    (scheme)
+    (char)
+    (switch)
+    (list))
 
   (define null-datum 'null)
 

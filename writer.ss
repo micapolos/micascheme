@@ -7,7 +7,13 @@
     indented-writer
     trim-end-writer
     do-writer-string)
-  (import (micascheme))
+  (import
+    (scheme)
+    (data)
+    (procedure)
+    (syntax)
+    (stack)
+    (lets))
 
   (data (writer value write-char-proc))
 

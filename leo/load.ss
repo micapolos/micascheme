@@ -3,7 +3,11 @@
     load-leo
     load-leo-program)
   (import
-    (micascheme)
+    (scheme)
+    (lets)
+    (switch)
+    (eof)
+    (read)
     (getter)
     (leo leo)
     (leo read)

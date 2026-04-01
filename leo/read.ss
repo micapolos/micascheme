@@ -5,7 +5,13 @@
     leo-read-handler
     make-leo-read)
   (import
-    (micascheme)
+    (scheme)
+    (procedure)
+    (lets)
+    (read)
+    (annotation)
+    (system)
+    (char)
     (getter)
     (leo getter)
     (leo path)

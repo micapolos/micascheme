@@ -1,7 +1,9 @@
 (library (leo write)
   (export write write-line)
   (import
-    (except (micascheme) write)
+    (except (scheme) write)
+    (lets)
+    (procedure)
     (code)
     (leo code))
 

@@ -17,7 +17,14 @@
 
     leo-getter-empty-lines?)
   (import
-    (micascheme)
+    (scheme)
+    (char)
+    (switch)
+    (procedure)
+    (annotation)
+    (boolean)
+    (eof)
+    (list)
     (symbol)
     (getter)
     (leo quotes)

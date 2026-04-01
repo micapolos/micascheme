@@ -1,9 +1,9 @@
 (library (leo syntax-error)
   (export syntax-error)
   (import
-    (rename (micascheme)
-      (syntax-error %syntax-error))
-    (condition))
+    (rename (scheme) (syntax-error %syntax-error))
+    (condition)
+    (syntaxes))
 
   (define-rules-syntax
     ((syntax-error stx)

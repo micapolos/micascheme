@@ -1,7 +1,8 @@
 (library (leo condition)
   (export write-condition)
   (import
-    (except (micascheme) write)
+    (except (scheme) write)
+    (lets)
     (condition)
     (leo write))
 

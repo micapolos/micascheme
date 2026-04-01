@@ -4,12 +4,12 @@
     end-quoted-annotations
     end-quoted-annotations?)
   (import
-    (prefix (micascheme) %)
-    (only (micascheme) define)
+    (prefix (scheme) %)
+    (prefix (annotation) %)
     (mica reader)
     (leo mica reader quotes))
 
-  (define (quoted-annotation $quote $annotation)
+  (%define (quoted-annotation $quote $annotation)
     (or
       (optional
         (list-annotation
@@ -18,10 +18,10 @@
             (lazy (quoted-annotation $quote $annotation)))))
       $annotation))
 
-  (define (begin-quoted-annotation $annotation)
+  (%define (begin-quoted-annotation $annotation)
     (quoted-annotation begin-quote $annotation))
 
-  (define (quoted-annotations $quote $annotations)
+  (%define (quoted-annotations $quote $annotations)
     (or
       (optional
         (lets
@@ -36,7 +36,7 @@
               $annotations))))
       $annotations))
 
-  (define (quoted-annotations? $quote $annotations?)
+  (%define (quoted-annotations? $quote $annotations?)
     (or
       (optional
         (lets
@@ -52,9 +52,9 @@
                 $annotations?)))))
       $annotations?))
 
-  (define (end-quoted-annotations $annotations)
+  (%define (end-quoted-annotations $annotations)
     (quoted-annotations end-quote $annotations))
 
-  (define (end-quoted-annotations? $annotations?)
+  (%define (end-quoted-annotations? $annotations?)
     (quoted-annotations? end-quote $annotations?))
 )

@@ -10,7 +10,9 @@
 		writing-append
 		writing-indent)
 	(import
-		(micascheme)
+		(scheme)
+		(data)
+		(procedure)
 		(writer))
 
 	(data (writing writer-write-proc))

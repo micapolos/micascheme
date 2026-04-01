@@ -1,7 +1,9 @@
 (library (leo check)
   (export check raises works)
   (import
-    (rename (micascheme)
+    (scheme)
+    (syntaxes)
+    (rename (check)
       (check %check)
       (raises %raises)
       (works %works)))

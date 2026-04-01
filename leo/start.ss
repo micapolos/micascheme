@@ -1,7 +1,12 @@
 (library (leo start)
   (export start)
   (import
-    (except (micascheme) eval)
+    (except (scheme) eval)
+    (lets)
+    (procedure)
+    (system)
+    (string)
+    (throw)
     (leo leo)
     (leo load)
     (leo version)
@@ -37,22 +42,21 @@
         (void))))
 
   (define (start-version $arguments)
-    (run
-      (displayln (string-append "Leo Scheme " version))
-      (start-options $arguments)))
+    (display (string-append "Leo Scheme " version))
+    (newline)
+    (start-options $arguments))
 
   (define (start-help $arguments)
-    (run
-      (display
-        (lines-string
-          "usage: leo [options] [file [args]]"
-          ""
-          "Available options:"
-          "  -v  --version            show version information"
-          "  -h  --help               show this help message"
-          "      --assembly-output    show assembly output"
-          "      --optimize-level n   set optimize level < 0 | 1 | 2 | 3 >"))
-      (start-options $arguments)))
+    (display
+      (lines-string
+        "usage: leo [options] [file [args]]"
+        ""
+        "Available options:"
+        "  -v  --version            show version information"
+        "  -h  --help               show this help message"
+        "      --assembly-output    show assembly output"
+        "      --optimize-level n   set optimize level < 0 | 1 | 2 | 3 >"))
+    (start-options $arguments))
 
   (define (start-assembly-output $arguments)
     (parameterize ((($primitive $assembly-output) #t))

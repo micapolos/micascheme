@@ -17,9 +17,20 @@
     block-code
     check-block-code)
   (import
-    (micascheme)
+    (scheme)
+    (check)
     (leo datum)
     (leo quotify)
+    (syntax)
+    (lets)
+    (switch)
+    (pair)
+    (list)
+    (limiter)
+    (string)
+    (limited)
+    (boolean)
+    (procedure)
     (code))
 
   (define code-pretty? (make-thread-parameter #f))

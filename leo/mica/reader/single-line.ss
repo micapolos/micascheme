@@ -4,31 +4,31 @@
     single-line-annotations
     single-line-annotation/eof)
   (import
-    (prefix (micascheme) %)
-    (only (micascheme) define)
+    (prefix (scheme) %)
+    (prefix (boolean) %)
     (mica reader)
     (leo mica reader identifier)
     (leo mica reader literal)
     (leo mica reader quoted))
 
-  (define single-line-annotation
+  (%define single-line-annotation
     (begin-quoted-annotation
       (one-of
         single-line-list-annotation
         single-line-non-list-annotation)))
 
-  (define single-line-annotation/eof
+  (%define single-line-annotation/eof
     (skip-newlines
       (suffixed
         single-line-annotation
         (one-of eof #\newline))))
 
-  (define single-line-non-list-annotation
+  (%define single-line-non-list-annotation
     (one-of
       single-line-atom-annotation
       single-line-sentence-annotation))
 
-  (define single-line-sentence-annotation
+  (%define single-line-sentence-annotation
     (lets
       ($identifier-annotation (annotation identifier))
       (switch (optional single-line-rhs-annotations)
@@ -40,23 +40,23 @@
               (return $identifier-annotation)
               (return $annotations)))))))
 
-  (define single-line-atom-annotation
+  (%define single-line-atom-annotation
     (annotation
       (one-of
         number
         string-literal
         special-literal)))
 
-  (define single-line-annotations
+  (%define single-line-annotations
     (wrapped
       "("
       (separated ", " single-line-non-list-annotation)
       ")"))
 
-  (define single-line-list-annotation
+  (%define single-line-list-annotation
     (list-annotation single-line-annotations))
 
-  (define single-line-rhs-annotations
+  (%define single-line-rhs-annotations
     (end-quoted-annotations
       (prefixed " "
         (one-of

@@ -4,7 +4,9 @@
     leo-library-extensions
     leo-path
     path-leo?)
-  (import (micascheme))
+  (import
+    (scheme)
+    (list))
 
   (define leo-extension "leo")
 

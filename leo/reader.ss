@@ -10,7 +10,12 @@
     reader-map
     list-reader)
   (import 
-    (micascheme))
+    (scheme)
+    (data)
+    (switch)
+    (syntax)
+    (procedure)
+    (stack))
 
   (data (reader append-fn begin-fn end-fn))
 

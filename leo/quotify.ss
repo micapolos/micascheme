@@ -20,8 +20,18 @@
     list->sentences
     normalize-list)
   (import
-    (micascheme)
-    (procedure-name))
+    (scheme)
+    (procedure-name)
+    (syntaxes)
+    (union)
+    (switch)
+    (pair)
+    (lets)
+    (char)
+    (syntax)
+    (procedure)
+    (list)
+    (list-syntax))
 
   (define quotify-for-display? (make-thread-parameter #f))
 

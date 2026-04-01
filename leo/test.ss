@@ -1,10 +1,11 @@
 (library (leo test)
   (export test-path test)
   (import
-    (except (micascheme) test write)
+    (except (scheme) write)
     (leo write)
     (leo load)
-    (keyword))
+    (keyword)
+    (syntaxes))
 
   (define-rules-syntaxes
     ((test-path (id x))

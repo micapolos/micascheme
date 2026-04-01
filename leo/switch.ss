@@ -1,8 +1,11 @@
 (library (leo switch)
   (export switch)
   (import
-    (rename (micascheme) (switch %switch))
-    (keyword))
+    (scheme)
+    (rename (switch) (switch %switch))
+    (keyword)
+    (procedure)
+    (syntaxes))
 
   (define-rules-syntaxes
     (keywords when else)
