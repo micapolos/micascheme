@@ -6,6 +6,7 @@
     char-comma?
     char-dot?
     char-colon?
+    char-left-parenthesis?
     char
     char->datum)
   (import
@@ -23,6 +24,7 @@
   (define (char-comma? $char) (char=? $char #\,))
   (define (char-dot? $char) (char=? $char #\.))
   (define (char-colon? $char) (char=? $char #\:))
+  (define (char-left-parenthesis? $char) (char=? $char (char left-parenthesis)))
 
   (define-syntax (char $syntax)
     (syntax-case $syntax (code)

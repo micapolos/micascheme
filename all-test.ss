@@ -120,6 +120,7 @@
   (simplang all)
   (sjasm all)
   (syntax all)
+  (terminal)
   (tico all)
   (typed all)
   (typed-scheme all)

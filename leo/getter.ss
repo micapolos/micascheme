@@ -86,14 +86,14 @@
           (annotation-getter
             (skip-char-getter colon-line-annotations-getter)
             list-annotation))
-        (((partial char=? #\() _)
+        ((char-left-parenthesis? _)
           (annotation-getter
             (getter-item-getter %single-line-annotations)
             list-annotation))
         ((else _)
           (getter-lets
             ($atom-annotation atom-annotation-getter)
-            (getter-switch rhs-line-annotations?-getter
+            (getter-switch (rhs-line-annotations?-getter (symbol? (annotation-stripped $atom-annotation)))
               ((false? _)
                 (getter $atom-annotation))
               ((else $rhs-line-annotations)
@@ -101,13 +101,16 @@
                   (getter (cons $atom-annotation $rhs-line-annotations))
                   list-annotation))))))))
 
-  (define rhs-line-annotations?-getter
+  (define (rhs-line-annotations?-getter $symbol?)
     (unquoted-annotations?-getter
       (getter-switch char-getter
         ((char-space? _) space-line-annotations-getter)
         ((char-colon? _) colon-line-annotations-getter)
         ((char-comma? _) (non-null-getter comma-line-annotations-getter))
-        ((char-newline? _) (non-null-getter newline-line-annotations-getter))
+        ((char-newline? _)
+          (if $symbol?
+            (non-null-getter newline-line-annotations-getter)
+            (getter #f)))
         ((else $char) (error-getter
           '(unexpected char)
           $char

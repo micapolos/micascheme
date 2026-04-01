@@ -19,9 +19,7 @@
     (parameterize ((leo-getter-empty-lines? #f))
       (%read-port-bfp
         (%or-eof
-          (%suffixed
-            (getter-item (always #t) line-annotation-getter)
-            "\n"))
+          (getter-item (always #t) line-annotation-getter))
         $port $sfd $bfp)))
 
   (define (leo-read $port)
