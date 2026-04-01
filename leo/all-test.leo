@@ -15,3 +15,4 @@ test
   leo eval
   leo current
   leo textual
+  leo display
