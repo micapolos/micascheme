@@ -1,6 +1,9 @@
 import leo scheme
 
 quote changelog
+  v0.1.58
+    fix parser to handle newline correctly
+    fix repl to commit after newline if possible
   v0.1.57
     improve core forms: define, lambda, if, cond, switch
   v0.1.56
