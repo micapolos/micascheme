@@ -1,4 +1,10 @@
-import leo scheme
+import
+  except: define, parameterize, from scheme
+  leo define
+  leo check
+  leo in
+  leo with
+  leo parameterize
 
 define first-parameter make-thread-parameter #f
 define second-parameter make-thread-parameter #f

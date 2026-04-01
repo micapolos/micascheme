@@ -1,4 +1,8 @@
-import leo scheme
+import
+  leo check
+  leo list
+  leo with
+  only: equal?, and, list?, not, from scheme
 
 check equal?
   with list

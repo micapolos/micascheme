@@ -1,16 +1,12 @@
 (library (leo scheme)
   (export
-    null
     syntax-case
     eval
     any?
     make-read-lambda
-    list closed-list open-list
     define-language
     logging
-    load load-program
-
-    parameterize)
+    load load-program)
   (import
     (prefix (scheme) %)
     (only (scheme) ...)
@@ -74,15 +70,13 @@
       (leo switch)
       (leo math)
       (leo display)
+      (leo list)
+      (leo parameterize)
       (void)
       (only (leo code) code-pretty? code-line-limit)
       (rename (leo version) (version leo-version))))
 
   (%define (any? _) #t)
-  (%define null (%quote ()))
-
-  (%define closed-list %list)
-  (%define open-list %list*)
 
   (%define load load-leo)
   (%define load-program load-leo-program)
@@ -104,9 +98,6 @@
     ((make-read-lambda (with param ...) x xs ...)
       (%make-read-lambda (param ...) x xs ...))
 
-    ((list xs ... (%and last)) (open-list xs ... last))
-    ((list xs ... ) (closed-list xs ...))
-
     ((logging x)
       (let
         (val x)
@@ -119,9 +110,6 @@
         (in
           (write (%list (%quote label) val))
           val)))
-
-    ((parameterize binding ... (in x xs ...))
-      (%parameterize (binding ...) x xs ...))
 
     ((define-language (x l))
       (%define-language x l)))
