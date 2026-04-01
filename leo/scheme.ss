@@ -10,8 +10,6 @@
     logging
     load load-program
 
-    add subtract multiply divide
-    number=? less? less/equal? greater? greater/equal?
     parameterize)
   (import
     (prefix (scheme) %)
@@ -74,6 +72,7 @@
       (leo define)
       (leo let)
       (leo switch)
+      (leo math)
       (leo display)
       (void)
       (only (leo code) code-pretty? code-line-limit)
@@ -81,18 +80,6 @@
 
   (%define (any? _) #t)
   (%define null (%quote ()))
-
-  ; TODO: Move it to a separate library
-  (%define add %+)
-  (%define subtract %-)
-  (%define multiply %*)
-  (%define divide %/)
-
-  (%define number=? %=)
-  (%define less? %<)
-  (%define less/equal? %<=)
-  (%define greater? %>)
-  (%define greater/equal? %>=)
 
   (%define closed-list %list)
   (%define open-list %list*)

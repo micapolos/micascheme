@@ -8,6 +8,7 @@ test
   leo if
   leo cond
   leo switch
+  leo math
   leo pair
   leo list
   leo parameterize
