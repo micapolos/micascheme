@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.61
+    shrink release size
   v0.1.60
     fix a bug in repl which exited after evaluating void
   v0.1.59
