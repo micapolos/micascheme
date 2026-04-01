@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.57
+    improve core forms: define, lambda, if, cond, switch
   v0.1.56
     run repl only with no command line args
   v0.1.55
