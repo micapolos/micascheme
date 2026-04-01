@@ -1,6 +1,10 @@
 import leo scheme
 
 quote changelog
+  v0.1.59
+    remove display-line
+    rewrite display to use write with special string and char handling
+    add display-string
   v0.1.58
     fix parser to handle newline correctly
     fix repl to commit after newline if possible
