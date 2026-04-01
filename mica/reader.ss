@@ -326,18 +326,17 @@
         (getter-item
           (or? (getter-item-first-char/eof? $x) char-newline?)
           (skip-newlines-getter (getter-item-getter $x)))))
-    ((one-of first ... last)
+    ((one-of x ...)
       (getter-item
         (or?
-          (getter-item-first-char/eof? (the first))
-          ...
-          (getter-item-first-char/eof? (the last)))
+          (getter-item-first-char/eof? (the x))
+          ...)
         (getter-switch peek-char/eof-getter
-          (((getter-item-first-char/eof? (the first)) _)
-            (getter-item-getter (the first)))
+          (((getter-item-first-char/eof? (the x)) _)
+            (getter-item-getter (the x)))
           ...
-          ((%else _)
-            (getter-item-getter (the last))))))
+          ((%else $char/eof)
+            (error-getter '(unexpected char) $char/eof)))))
     ((or-eof item)
       (%lets
         ($item (the item))
