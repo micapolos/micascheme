@@ -5,7 +5,7 @@
     syntax-case
     let
     eval
-    if then cond
+    cond
     any?
     make-read-lambda
     list closed-list open-list
@@ -60,6 +60,7 @@
       (leo check)
       (leo write)
       (leo test)
+      (leo if)
       (leo document)
       (leo lambda)
       (leo define)
@@ -131,8 +132,6 @@
       (%let name (binding ...) x xs ...))
     ((let binding ... (in x xs ...))
       (%let (binding ...) x xs ...))
-
-    ((if a b c) (%if a b c))
 
     ((cond (%when a b bs ...) ... (%else c cs ...))
       (%cond (a b bs ...) ... (%else c cs ...)))

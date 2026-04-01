@@ -5,6 +5,7 @@ test
   leo lambda
   leo define
   leo let
+  leo if
   leo switch
   leo pair
   leo list
