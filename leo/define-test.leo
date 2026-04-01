@@ -23,8 +23,17 @@ define
 
   syntax
     when
-      add: a, b
+      number-magic: a
+      +: a, 1
+    when
+      number-magic: a, b
       +: a, b
+    when
+      number-magic: a, ...
+      *: a, ...
+    when
+      string-magic: a, ...
+      string-append: a, ..., "!"
 
 check equal?: zero, 0
 check equal?: one, 1
@@ -36,5 +45,17 @@ check equal?
   230
 
 check equal?
-  add: 10, 20
+  number-magic: 10
+  11
+
+check equal?
+  number-magic: 10, 20
   30
+
+check equal?
+  number-magic: 10, 20, 30
+  6000
+
+check equal?
+  string-magic: "foo", "bar"
+  "foobar!"
