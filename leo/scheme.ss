@@ -70,6 +70,7 @@
       (leo list)
       (leo parameterize)
       (leo syntax-case)
+      (leo eval)
       (void)
       (only (leo code) code-pretty? code-line-limit)
       (rename (leo version) (version leo-version))))
