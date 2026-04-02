@@ -47,7 +47,6 @@ define
       mutable field-4
       mutable: field-5, record-1-field-5, record-1-field-5-set!
 
-
   record type
     record-2: make-record-2, record-2?
     fields
