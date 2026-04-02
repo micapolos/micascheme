@@ -20,11 +20,14 @@
     ((define-1 (value (id x)))
       (%define id x))
 
-    ((define-1 (lambda (name param ... (and last)) x xs ...))
-      (%define (name param ... . last) x xs ...))
+    ((define-1 (lambda (id x xs ...)))
+      (%define (id) x xs ...))
 
-    ((define-1 (lambda (name param ...) x xs ...))
-      (%define (name param ...) x xs ...))
+    ((define-1 (lambda (id param ... (and last)) x xs ...))
+      (%define (id param ... . last) x xs ...))
+
+    ((define-1 (lambda (id param ...) x xs ...))
+      (%define (id param ...) x xs ...))
 
     ((define-1 (syntax (keywords k ...) (when pattern x xs ...) ...))
       (define-rules-syntaxes (keywords k ...)
