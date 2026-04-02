@@ -38,6 +38,25 @@ define
       string-magic: a, ...
       string-append: a, ..., "!"
 
+  record type
+    record-1
+    fields
+      field-1
+      immutable field-2
+      immutable: field-3, record-1-field-3
+      mutable field-4
+      mutable: field-5, record-1-field-5, record-1-field-5-set!
+
+
+  record type
+    record-2: make-record-2, record-2?
+    fields
+      field-1
+      immutable field-2
+      immutable: field-3, record-2-field-3
+      mutable field-4
+      mutable: field-5, record-2-field-5, record-2-field-5-set!
+
   record point: x, y
   union id: number, string
 
