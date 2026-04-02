@@ -95,7 +95,7 @@ echo "Compiling Leo $VERSION with WPO..."
 "$REL_SCHEME_BIN/scheme" \
     -b "./$REL_SCHEME_LIB/petite.boot" \
     -b "./$REL_SCHEME_LIB/scheme.boot" \
-    --program "$SRC_LEO_DIR/compile-wpo.ss" \
+    --program "$SRC_LEO_DIR/compile-boot-file.ss" \
     "$REL_LIB_DIR/leo.boot"
 
 # --- 6. Handle Wrapper Script ---
