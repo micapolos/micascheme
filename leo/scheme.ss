@@ -1,36 +1,8 @@
 (library (leo scheme)
+  (export)
+  (import (scheme))
   (export
-    make-read-lambda
-    define-language
-    load load-program)
-  (import
-    (prefix (scheme) %)
-    (only (scheme) ...)
-    (syntax-keywords)
-    (keyword)
-    (syntax)
-    (syntaxes)
-    (prefix (system) %)
-    (only (keyword) keyword? keyword...?)
-    (leo transform)
-    (prefix (language) %)
-    (writing)
-    (code)
-    (leo code)
-    (leo quotify)
-    (leo reader)
-    (leo datum)
-    (leo with)
-    (leo lambda)
-    (leo load)
-    (leo write)
-    (leo expand)
-    (leo let)
-    (leo in)
-    (leo writing-reader))
-  (%export
     (import
-      (leo library)
       (except (chezscheme)
         library import export display display-string
         top-level-program
@@ -45,6 +17,7 @@
         syntax-case
         parameterize
         list)
+      (leo library)
       (char)
       (keyword)
       (syntaxes)
@@ -71,16 +44,10 @@
       (leo syntax-case)
       (leo eval)
       (void)
+      (rename (leo load)
+        (load-leo load)
+        (load-leo-program load-program))
       (only (leo code) code-pretty? code-line-limit)
-      (rename (leo version) (version leo-version))))
-
-  (%define load load-leo)
-  (%define load-program load-leo-program)
-
-  (define-rules-syntaxes (keywords with then %else %when %list %and %values in recursive sequential %syntax)
-    ((make-read-lambda (with param ...) x xs ...)
-      (%make-read-lambda (param ...) x xs ...))
-
-    ((define-language (x l))
-      (%define-language x l)))
+      (rename (leo version)
+        (version leo-version))))
 )
