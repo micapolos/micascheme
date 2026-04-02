@@ -1,4 +1,10 @@
-import leo scheme
+import
+  leo check
+  leo eval
+  leo let
+  leo in
+  leo math
+  only: equal?, environment, quote, from scheme
 
 check equal?
   eval

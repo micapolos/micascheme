@@ -1,6 +1,5 @@
 (library (leo scheme)
   (export
-    eval
     any?
     make-read-lambda
     define-language
@@ -79,15 +78,6 @@
 
   (%define load load-leo)
   (%define load-program load-leo-program)
-
-  (%define eval
-    (%case-lambda
-      ((x)
-        (eval x (%interaction-environment)))
-      ((x env)
-        (%eval
-          (%cons leo-expand x)
-          env))))
 
   (define-rules-syntaxes (keywords with then %else %when %list %and %values in recursive sequential %syntax)
     ((make-read-lambda (with param ...) x xs ...)
