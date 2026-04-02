@@ -1,6 +1,5 @@
 (library (leo scheme)
   (export
-    syntax-case
     eval
     any?
     make-read-lambda
@@ -71,6 +70,7 @@
       (leo display)
       (leo list)
       (leo parameterize)
+      (leo syntax-case)
       (void)
       (only (leo code) code-pretty? code-line-limit)
       (rename (leo version) (version leo-version))))
@@ -90,10 +90,6 @@
           env))))
 
   (define-rules-syntaxes (keywords with then %else %when %list %and %values in recursive sequential %syntax)
-    ((syntax-case expr (keywords k ...) (%when pattern x xs ...) ...)
-      (%syntax-case expr (k ...)
-        (pattern x xs ...) ...))
-
     ((make-read-lambda (with param ...) x xs ...)
       (%make-read-lambda (param ...) x xs ...))
 

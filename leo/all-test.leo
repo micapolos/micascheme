@@ -18,3 +18,4 @@ test
   leo current
   leo textual
   leo display
+  leo syntax-case
