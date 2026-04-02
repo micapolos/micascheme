@@ -2,15 +2,15 @@ library
   leo examples library
   export
     hello
-    world
+    leo
     exclamate
     comma-separated
-    hello-world
+    hello-leo
   import
     leo scheme
 
   define hello "Hello"
-  define world "world"
+  define leo "Leo"
   define exclamation "!"
 
   define lambda
@@ -21,5 +21,5 @@ library
     comma-separated: string-a, string-b
     string-append: string-a, string-b
 
-  define hello-world
-    comma-separated: hello, exclamate world
+  define hello-leo
+    comma-separated: hello, exclamate leo

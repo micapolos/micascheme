@@ -3,32 +3,32 @@ import leo scheme
 write
   let
     hello "Hello"
-    world "world"
-    in string-append: hello, ", ", world, "!"
+    leo "Leo"
+    in string-append: hello, ", ", leo, "!"
 
 write
   let sequential
     hello "Hello"
-    world "world"
-    hello-world string-append: hello, ", ", world
-    in string-append: hello-world, "!"
+    leo "Leo"
+    hello-leo string-append: hello, ", ", leo
+    in string-append: hello-leo, "!"
 
 write
   let
     with
-      values: hello, world
-      values: "hello", "world"
+      values: hello, leo
+      values: "hello", "Leo"
     with
       values: comma, exclamation
       values: ", ", "!"
-    in string-append: hello, comma, world, exclamation
+    in string-append: hello, comma, leo, exclamation
 
 write
   let sequential
     with
-      values: hello, world
-      values: "hello", "world"
+      values: hello, leo
+      values: "hello", "Leo"
     with
-      values hello-world
-      string-append: hello, ", ", world
-    in string-append: hello-world, "!"
+      values hello-leo
+      string-append: hello, ", ", leo
+    in string-append: hello-leo, "!"

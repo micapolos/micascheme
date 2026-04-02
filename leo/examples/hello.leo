@@ -1,3 +1,3 @@
 import leo scheme
 
-display "Hello, world!"
+display "Hello, Leo!"

@@ -1,7 +1,7 @@
 import leo scheme
 
 define hello "Hello"
-define world "world"
+define leo "Leo"
 define exclamation "!"
 
 define lambda
@@ -15,11 +15,11 @@ define lambda
     ", "
     string-b
 
-define hello-world
+define hello-leo
   comma-separated
     hello
-    exclamate world
+    exclamate leo
 
 display "=== This is produced by program.leo ==="
-display hello-world
+display hello-leo
 display "=== End of program.leo ==="
