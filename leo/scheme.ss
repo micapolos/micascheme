@@ -1,6 +1,5 @@
 (library (leo scheme)
   (export
-    any?
     make-read-lambda
     define-language
     load load-program)
@@ -74,8 +73,6 @@
       (void)
       (only (leo code) code-pretty? code-line-limit)
       (rename (leo version) (version leo-version))))
-
-  (%define (any? _) #t)
 
   (%define load load-leo)
   (%define load-program load-leo-program)
