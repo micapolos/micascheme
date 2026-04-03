@@ -4,18 +4,22 @@
     (rename
       (except (scheme) lambda)
       (define %define))
+    (only (chezscheme) define-property)
     (rename (data) (data %data))
     (rename (union) (union %union))
     (leo lambda)
     (syntax-keywords)
     (keyword)
     (syntax)
-    (syntaxes))
+    (syntaxes)
+    (leo getter-leo)
+    (leo setter!)
+    (leo maker))
 
   (define-keywords value record union type)
 
   (define-rules-syntaxes
-    (keywords value lambda syntax and when keywords record type union)
+    (keywords getter setter! maker value lambda syntax and when keywords record type union)
 
     ((define-1 (value (id x)))
       (%define id x))
@@ -43,6 +47,15 @@
     ((define-1 (syntax (id s) x xs ...))
       (keyword? id)
       (define-syntax (id s) x xs ...))
+
+    ((define-1 (getter (id proc)))
+      (define-property id getter proc))
+
+    ((define-1 (setter! (id proc)))
+      (define-property id setter! proc))
+
+    ((define-1 (maker (id proc)))
+      (define-property id maker proc))
 
     ((define-1 (record (type (id . x))))
       (keyword? id)

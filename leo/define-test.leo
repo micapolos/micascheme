@@ -1,9 +1,12 @@
 import
-  except: define, lambda, from scheme
+  except: define, lambda, cond, from scheme
   leo check
   leo lambda
   leo define
   leo with
+  leo cond
+  leo getter-leo
+  leo get
 
 define
   lambda make-zero 0
@@ -62,6 +65,18 @@ define
   record point: x, y
   union id: number, string
 
+  getter string lambda
+    with identifier
+    cond
+      when
+        symbol=?: syntax->datum identifier, 'size
+        syntax string-length
+      when
+        free-identifier=?: identifier, syntax number
+        syntax string->number
+      else
+        syntax-error identifier
+
 check equal?: zero, 0
 check equal?: one, 1
 check equal?: two, 2
@@ -102,3 +117,11 @@ check equal?
 check id? 123
 check id? "foo"
 check not id? 'foo
+
+check equal?
+  getter string size
+  string-length
+
+check equal?
+  getter string number
+  string->number
