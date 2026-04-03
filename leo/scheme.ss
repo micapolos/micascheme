@@ -16,7 +16,8 @@
         define-syntax
         syntax-case
         parameterize
-        list)
+        list
+        predicate set!)
       (leo library)
       (char)
       (keyword)
@@ -46,6 +47,14 @@
       (leo syntax-case)
       (leo eval)
       (leo logging)
+      (leo maker)
+      (leo make)
+      (leo predicate)
+      (leo is?)
+      (leo getter-leo)
+      (leo get)
+      (leo setter!)
+      (leo set!)
       (void)
       (rename (leo load)
         (load-leo load)

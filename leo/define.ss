@@ -2,7 +2,7 @@
   (export define value record union type)
   (import
     (rename
-      (except (scheme) lambda)
+      (except (scheme) lambda predicate)
       (define %define))
     (only (chezscheme) define-property)
     (rename (data) (data %data))
@@ -12,14 +12,15 @@
     (keyword)
     (syntax)
     (syntaxes)
+    (leo maker)
+    (leo predicate)
     (leo getter-leo)
-    (leo setter!)
-    (leo maker))
+    (leo setter!))
 
   (define-keywords value record union type)
 
   (define-rules-syntaxes
-    (keywords getter setter! maker value lambda syntax and when keywords record type union)
+    (keywords getter setter! maker predicate value lambda syntax and when keywords record type union)
 
     ((define-1 (value (id x)))
       (%define id x))
@@ -56,6 +57,9 @@
 
     ((define-1 (maker (id proc)))
       (define-property id maker proc))
+
+    ((define-1 (predicate (id proc)))
+      (define-property id predicate proc))
 
     ((define-1 (record (type (id . x))))
       (keyword? id)
