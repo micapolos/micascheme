@@ -38,6 +38,9 @@ define
       string-magic: a, ...
       string-append: a, ..., "!"
 
+  record type simple-record
+    fields: a, b
+
   record type
     record-1
     fields
