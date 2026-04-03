@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  latest
+    implement: predicate, is?
   v0.1.64
     implement logging
     implement property support
