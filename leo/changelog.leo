@@ -1,8 +1,11 @@
 import leo scheme
 
 quote changelog
-  latest
+  v0.1.64
     implement logging
+    implement property support
+      maker, getter, setter!
+      make, get, set!, ref
   v0.1.63
     implement: todo, comment
   v0.1.62
