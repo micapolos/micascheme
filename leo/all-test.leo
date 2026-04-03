@@ -9,9 +9,11 @@ test
   leo cond
   leo switch
   leo is?
+  leo getter-leo
   leo get
-  leo ref
+  leo setter!
   leo set!
+  leo ref
   leo math
   leo pair
   leo list

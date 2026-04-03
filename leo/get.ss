@@ -2,12 +2,9 @@
   (export get)
   (import
     (scheme)
-    (identifier))
+    (leo getter-leo)
+    (syntax))
 
-  (define-syntax (get $syntax)
-    (syntax-case $syntax ()
-      ((_ (target (id expr ...)))
-        #`(
-          #,(identifier-append #'target #'target #'- #'id)
-          expr ...))))
+  (define-rule-syntax (get (target (id expr ...)))
+    ((getter (target id)) expr ...))
 )

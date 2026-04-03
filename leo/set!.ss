@@ -2,17 +2,15 @@
   (export set!)
   (import
     (rename (scheme) (set! %set!))
-    (identifier)
-    (keyword))
+    (leo setter!)
+    (keyword)
+    (syntaxes))
 
-  (define-syntax (set! $syntax)
-    (syntax-case $syntax ()
-      ((_ (target (id expr ...)))
-        (keyword? id)
-        #`(
-          #,(identifier-append #'target #'target #'- #'id #'- #'set!)
-          expr ...))
-      ((_ (id expr))
-        (keyword? id)
-        #`(%set! id expr))))
+  (define-rules-syntax
+    ((set! (target (id expr ...)))
+      (and (keyword? target) (keyword? id))
+      ((setter! (target id)) expr ...))
+    ((set! (id expr))
+      (keyword? id)
+      (%set! id expr)))
 )
