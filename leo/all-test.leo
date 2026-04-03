@@ -21,3 +21,4 @@ test
   leo syntax-case
   leo todo
   leo comment
+  leo logging

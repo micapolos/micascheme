@@ -45,6 +45,7 @@
       (leo parameterize)
       (leo syntax-case)
       (leo eval)
+      (leo logging)
       (void)
       (rename (leo load)
         (load-leo load)

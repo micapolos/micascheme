@@ -1,30 +1,23 @@
 (library (leo logging)
   (export logging)
   (import
-    (rename
-      (except (scheme) write let)
-      (list %list))
+    (except (scheme) let write)
     (syntaxes)
     (leo let)
+    (leo in)
     (leo write))
 
-  (define null '())
-  (define closed-list %list)
-  (define open-list list*)
-
   (define-rules-syntax
-    (keywords and)
-
+    ((logging (label x))
+      (let
+        (val x)
+        (in
+          (write `(label ,val))
+          val)))
     ((logging x)
       (let
         (val x)
         (in
           (write val)
-          val)))
-    ((logging label x)
-      (let
-        (val x)
-        (in
-          (write `(label ,val))
           val))))
 )
