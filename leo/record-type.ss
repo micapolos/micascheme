@@ -2,6 +2,7 @@
   (export
     record-field-index
     record-type-maker
+    record-type-predicate
     record-type-getter
     record-type-setter!)
   (import
@@ -25,6 +26,9 @@
 
   (define (record-type-maker $rtd)
     (record-constructor $rtd))
+
+  (define (record-type-predicate $rtd)
+    (record-predicate $rtd))
 
   (define (record-type-getter $rtd)
     (lambda ($identifier)

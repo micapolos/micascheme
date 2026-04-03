@@ -10,7 +10,7 @@ test
   leo switch
   leo maker
   leo make
-  leo is?-tester
+  leo predicate
   leo is?
   leo getter-leo
   leo get

@@ -12,6 +12,7 @@ let sequential
       'x
       'immutable y
   point-maker record-type-maker point-record-type
+  point-predicate record-type-predicate point-record-type
   point-getter record-type-getter point-record-type
   point-setter! record-type-setter! point-record-type
   point with: record-constructor point-record-type, 10, 20
@@ -21,6 +22,16 @@ let sequential
     check eq?
       record-type with: point-maker, 10, 20
       point-record-type
+
+    check procedure? point-predicate
+
+    check equal?
+      with: point-predicate, point
+      true
+
+    check equal?
+      with: point-predicate, 'other
+      false
 
     check equal?
       record-field-index: point-record-type, syntax x

@@ -1,5 +1,5 @@
 import
-  scheme
+  except: predicate, from scheme
   boolean
   leo check
   leo is?
