@@ -1,5 +1,5 @@
 (library (leo define)
-  (export define value record union type)
+  (export define value union type)
   (import
     (rename
       (except (scheme) lambda predicate)
@@ -12,12 +12,13 @@
     (keyword)
     (syntax)
     (syntaxes)
+    (leo record)
     (leo maker)
     (leo predicate)
     (leo getter-leo)
     (leo setter!))
 
-  (define-keywords value record union type)
+  (define-keywords value union type)
 
   (define-rules-syntaxes
     (keywords getter setter! maker predicate value lambda syntax and when keywords record type union)

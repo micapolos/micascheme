@@ -1,5 +1,5 @@
 import
-  except: define, lambda, cond, from scheme
+  except: define, lambda, cond, predicate, from scheme
   leo check
   leo lambda
   leo define
@@ -7,6 +7,8 @@ import
   leo cond
   leo getter-leo
   leo get
+  leo predicate
+  leo record
 
 define
   lambda make-zero 0

@@ -55,6 +55,7 @@
       (leo get)
       (leo setter!)
       (leo set!)
+      (leo record)
       (void)
       (rename (leo load)
         (load-leo load)
