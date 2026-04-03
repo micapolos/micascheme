@@ -8,6 +8,10 @@ test
   leo if
   leo cond
   leo switch
+  leo is?
+  leo get
+  leo ref
+  leo set!
   leo math
   leo pair
   leo list
