@@ -35,6 +35,7 @@
       (leo then)
       (leo document)
       (leo lambda)
+      (leo definer)
       (leo define)
       (leo let)
       (leo switch)
