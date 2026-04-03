@@ -1,6 +1,11 @@
 import leo scheme
 
 quote changelog
+  v0.1.62
+    implement
+      define record
+      define record type
+      define union
   v0.1.61
     shrink release size
   v0.1.60
