@@ -8,7 +8,8 @@ test
   leo if
   leo cond
   leo switch
-  leo is?
+  leo maker
+  leo make
   leo getter-leo
   leo get
   leo setter!
