@@ -11,17 +11,17 @@
     (procedure)
     (leo syntax-error))
 
-  (define (record-field-index $rtd $field-id)
+  (define (record-field-index $rtd $field-identifier)
     (lets
       ($record-symbol (record-type-name $rtd))
-      ($field-symbol (syntax->datum $field-id))
+      ($field-symbol (syntax->datum $field-identifier))
       (switch (find-index (partial symbol=? $field-symbol) (vector->list (record-type-field-names $rtd)))
         ((integer? $index) $index)
         ((else _)
-          (syntax-error $field-id
+          (syntax-error $field-identifier
             `(undefined (field (,$record-symbol ,$field-symbol))))))))
 
   (define (record-type-getter $rtd)
-    (lambda ($id)
-      (record-accessor $rtd (record-field-index $rtd $id))))
+    (lambda ($identifier)
+      (record-accessor $rtd (record-field-index $rtd $identifier))))
 )
