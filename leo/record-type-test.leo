@@ -5,8 +5,11 @@ import
 let sequential
   point-record-type make-record-type
     "point"
-    list: 'x, 'y
+    list
+      'x
+      'immutable y
   point-getter record-type-getter point-record-type
+  point-setter! record-type-setter! point-record-type
   point with: record-constructor point-record-type, 10, 20
   in
     check equal?
@@ -26,3 +29,13 @@ let sequential
       20
     check raises
       point-getter syntax z
+
+    check procedure? point-setter! syntax x
+    check raises point-setter! syntax y
+    check raises point-setter! syntax z
+
+    with: point-setter! syntax x, point, 30
+    check equal?
+      with: point-getter syntax x, point
+      30
+
