@@ -27,6 +27,7 @@
     (list)
     (symbol)
     (getter)
+    (system)
     (leo quotes)
     (prefix (mica reader) %)
     (prefix (leo mica reader identifier) %)

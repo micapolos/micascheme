@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  latest
+    implement logging
   v0.1.63
     implement: todo, comment
   v0.1.62

@@ -22,6 +22,7 @@
 
     indented-getter
     or-eof-getter
+    logging-getter
 
     skip-char-getter
 
@@ -473,6 +474,16 @@
       ($value $getter)
       (_ $end-getter)
       (getter $value)))
+
+  (define-rules-syntax
+    ((logging-getter x)
+      (getter-lets
+        (v x)
+        (getter (logging v))))
+    ((logging-getter label x)
+      (getter-lets
+        (v x)
+        (getter (logging label v)))))
 
   (define newline-getter (exact-getter #\newline))
   (define space-getter (exact-getter #\space))
