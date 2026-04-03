@@ -10,6 +10,8 @@ test
   leo switch
   leo maker
   leo make
+  leo is?-tester
+  leo is?
   leo getter-leo
   leo get
   leo setter!

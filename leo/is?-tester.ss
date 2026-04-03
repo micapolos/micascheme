@@ -1,0 +1,15 @@
+(library (leo is?-tester)
+  (export is?-tester)
+  (import
+    (scheme)
+    (identifier))
+
+  (define-syntax (is?-tester $syntax)
+    (lambda (lookup?)
+      (syntax-case $syntax ()
+        ((_ id)
+          (lookup? #'id #'is?-tester)
+          (lookup? #'id #'is?-tester))
+        ((_ id)
+          (identifier-append #'id #'id #'?)))))
+)
