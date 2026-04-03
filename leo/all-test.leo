@@ -3,6 +3,7 @@ import leo scheme
 test
   leo with
   leo lambda
+  leo definer
   leo define
   leo let
   leo if

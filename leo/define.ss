@@ -2,8 +2,9 @@
   (export define value union type)
   (import
     (rename
-      (except (scheme) lambda predicate)
-      (define %define))
+      (except (scheme) predicate)
+      (define %define)
+      (lambda %lambda))
     (only (chezscheme) define-property)
     (rename (data) (data %data))
     (rename (union) (union %union))
@@ -19,6 +20,20 @@
     (leo setter!))
 
   (define-keywords value union type)
+
+  (define-syntax (define-custom $syntax)
+    (%lambda ($lookup)
+      (syntax-case $syntax ()
+        ((_ (id . x))
+          (and
+            (keyword? id)
+            (guard
+              (_ (else #f))
+              ($lookup #'id #'definer)))
+          ($lookup #'id #'definer))
+        ((_ (id x))
+          (keyword? id)
+          #'(%define id x)))))
 
   (define-rules-syntaxes
     (keywords getter setter! maker predicate value lambda syntax and when keywords record type union)
@@ -75,9 +90,8 @@
     ((define-1 (union . x))
       (%union . x))
 
-    ((define-1 (id x))
-      (keyword? id)
-      (define-1 (value (id x))))
+    ((define-1 . x)
+      (define-custom . x))
 
     ((define x ...)
       (begin
