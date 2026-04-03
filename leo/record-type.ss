@@ -1,6 +1,7 @@
 (library (leo record-type)
   (export
     record-field-index
+    record-type-maker
     record-type-getter
     record-type-setter!)
   (import
@@ -21,6 +22,9 @@
         ((else _)
           (syntax-error $field-identifier
             `(undefined (field (,$record-symbol ,$field-symbol))))))))
+
+  (define (record-type-maker $rtd)
+    (record-constructor $rtd))
 
   (define (record-type-getter $rtd)
     (lambda ($identifier)

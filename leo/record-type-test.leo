@@ -1,6 +1,9 @@
 import
   leo scheme
   leo record-type
+  rename
+    record-type-descriptor record-type
+    from only: record-type-descriptor, from chezscheme csv7
 
 let sequential
   point-record-type make-record-type
@@ -8,10 +11,17 @@ let sequential
     list
       'x
       'immutable y
+  point-maker record-type-maker point-record-type
   point-getter record-type-getter point-record-type
   point-setter! record-type-setter! point-record-type
   point with: record-constructor point-record-type, 10, 20
   in
+    check procedure? point-maker
+
+    check eq?
+      record-type with: point-maker, 10, 20
+      point-record-type
+
     check equal?
       record-field-index: point-record-type, syntax x
       0
@@ -20,6 +30,10 @@ let sequential
       1
     check raises
       record-field-index: point-record-type, syntax z
+
+    check procedure? point-getter syntax x
+    check procedure? point-getter syntax y
+    check raises point-getter syntax z
 
     check equal?
       with: point-getter syntax x, point
