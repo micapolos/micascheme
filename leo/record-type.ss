@@ -1,5 +1,6 @@
 (library (leo record-type)
   (export
+    record-field-index
     record-type-getter)
   (import
     (except (chezscheme) let syntax-error)
@@ -10,15 +11,17 @@
     (procedure)
     (leo syntax-error))
 
+  (define (record-field-index $rtd $field-id)
+    (lets
+      ($record-symbol (record-type-name $rtd))
+      ($field-symbol (syntax->datum $field-id))
+      (switch (find-index (partial symbol=? $field-symbol) (vector->list (record-type-field-names $rtd)))
+        ((integer? $index) $index)
+        ((else _)
+          (syntax-error $field-id
+            `(undefined (field (,$record-symbol ,$field-symbol))))))))
+
   (define (record-type-getter $rtd)
     (lambda ($id)
-      (lets
-        ($record-symbol (record-type-name $rtd))
-        ($field-symbol (syntax->datum $id))
-        (switch (find-index (partial symbol=? $field-symbol) (vector->list (record-type-field-names $rtd)))
-          ((integer? $index)
-            (record-accessor $rtd $index))
-          ((else _)
-            (syntax-error $id
-              `(undefined (field (,$record-symbol ,$field-symbol)))))))))
+      (record-accessor $rtd (record-field-index $rtd $id))))
 )
