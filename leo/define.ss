@@ -36,6 +36,7 @@
           #'(%define id x)))))
 
   (define-rules-syntaxes
+    ; (todo define all of these using definer)
     (keywords getter setter! maker predicate value lambda syntax and when keywords record type union)
 
     ((define-1 (value (id x)))
