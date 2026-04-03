@@ -40,6 +40,7 @@
       (leo math)
       (leo display)
       (leo list)
+      (leo todo)
       (leo parameterize)
       (leo syntax-case)
       (leo eval)

@@ -19,3 +19,4 @@ test
   leo textual
   leo display
   leo syntax-case
+  leo todo
