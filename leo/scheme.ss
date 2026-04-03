@@ -41,6 +41,7 @@
       (leo display)
       (leo list)
       (leo todo)
+      (leo comment)
       (leo parameterize)
       (leo syntax-case)
       (leo eval)

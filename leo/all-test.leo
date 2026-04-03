@@ -20,3 +20,4 @@ test
   leo display
   leo syntax-case
   leo todo
+  leo comment
