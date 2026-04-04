@@ -4,5 +4,5 @@
     (scheme)
     (syntax))
 
-  (define-rule-syntax (todo x ...) (begin))
+  (define-rule-syntax (todo x ...) (void))
 )
