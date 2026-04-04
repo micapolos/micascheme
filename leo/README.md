@@ -455,19 +455,13 @@ By default, record fields cannot be changed after the record is created.
 ```leo
 define record point: x, y
 
-define my-point
-  point: x 10, y 20
+define my-point point: x 10, y 20
 
 check point? my-point
 check not point? "not a point"
 
-check equal?
-  point-x my-point
-  10
-
-check equal?
-  point-y my-point
-  20
+check equal?: point x my-point, 10
+check equal?: point y my-point, 20
 ```
 
 ### Mutable
@@ -479,18 +473,16 @@ define record point
   mutable x
   mutable y
 
-define my-point
-  make point: 10, 20
+define my-point point: x 10, x 20
 
-check equal?
-  get point x my-point
-  10
+check equal?: point x my-point, 10
+check equal?: point y my-point, 20
 
-set! point x: my-point, 30
+point set! x: my-point, 110
+point set! y: my-point, 120
 
-check equal?
-  get point x my-point
-  30
+check equal?: point x my-point, 110
+check equal?: point y my-point, 120
 ```
 
 ### Typed
