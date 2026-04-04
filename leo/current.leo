@@ -21,18 +21,17 @@ library
 
   data current procedure
 
-  define
-    syntax
-      when
-        %current: x, xs, ...
-        current lambda: x, xs, ...
-      when
-        current-let1: val expr, body
-        %current let
-          val current-ref expr
-          in current-ref body
-      when
-        current-ref $current
-        with current-procedure $current
+  define-syntax
+    when
+      %current: x, xs, ...
+      current lambda: x, xs, ...
+    when
+      current-let1: val expr, body
+      %current let
+        val current-ref expr
+        in current-ref body
+    when
+      current-ref $current
+      with current-procedure $current
 
   define-monadic current

@@ -5,23 +5,13 @@ test
   leo lambda
   leo definer
   leo define
-  leo adjectival
-  leo adjective
+  leo define-syntax
+  leo field-spec
+  leo define-record
   leo let
   leo if
   leo cond
   leo switch
-  leo maker
-  leo make
-  leo predicate
-  leo is?
-  leo getter-leo
-  leo get
-  leo setter!
-  leo set!
-  leo ref
-  leo field-spec
-  leo define-record
   leo math
   leo pair
   leo list

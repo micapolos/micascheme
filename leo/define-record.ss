@@ -12,11 +12,6 @@
     (list)
     (list-syntax)
     (leo define)
-    (leo maker)
-    (leo predicate)
-    (leo getter-leo)
-    (leo setter!)
-    (leo definer)
     (leo field-spec)
     (leo syntax-error))
 
