@@ -25,6 +25,7 @@ check procedure? color-red
 check procedure? color-green
 check procedure? color-blue
 
+comment constructor
 let
   test-point x-y->point: 10, 20
   test-color red-green-blue->color: 10, 20, 30
@@ -49,7 +50,7 @@ let
     check equal?: color-green test-color, 120
     check equal?: color-blue test-color, 130
 
-comment macro constructor
+comment macro
 let
   test-point point: x 10, y 20
   test-color color: red 10, green 20, blue 30
