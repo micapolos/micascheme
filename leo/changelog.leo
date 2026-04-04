@@ -1,8 +1,8 @@
 import leo scheme
 
 quote changelog
-  latest
-    implement record
+  v0.1.66
+    implement define record
   v0.1.65
     implement: predicate, is?, definer
   v0.1.64
