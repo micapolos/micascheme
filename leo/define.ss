@@ -95,16 +95,6 @@
     ((define-1 (predicate (id proc)))
       (define-property id predicate proc))
 
-    ; ((define-1 (record (type (id . x))))
-    ;   (keyword? id)
-    ;   (define-record-type id . x))
-
-    ; ((define-1 (record (type . x)))
-    ;   (define-record-type . x))
-
-    ; ((define-1 (record . x))
-    ;   (%data . x))
-
     ((define-1 (union . x))
       (%union . x))
 
