@@ -444,24 +444,59 @@ check equal?
 
 ## Records
 
+### Immutable
+
 ```leo
 define record point: x, y
 
-let
-  my-point make point: 10, 20
-  in
-    check equal?
-      is? point my-point
-      true
-    check equal?
-      is? point "not a point"
-      false
-    check equal?
-      get point x my-point
-      10
-    check equal?
-      get point y my-point
-      20
+define my-point
+  make point: 10, 20
+
+check equal?
+  is? point my-point
+  true
+
+check equal?
+  is? point "not a point"
+  false
+
+check equal?
+  get point x my-point
+  10
+
+check equal?
+  get point y my-point
+  20
+```
+
+### Mutable
+
+```leo
+define record point
+  mutable x
+  mutable y
+
+define my-point
+  make point: 10, 20
+
+check equal?
+  get point x my-point
+  10
+
+set! point x: my-point, 30
+
+check equal?
+  get point x my-point
+  30
+```
+
+### Typed
+
+```leo
+define record color
+  mutable unsigned-8 red
+  mutable unsigned-8 green
+  mutable unsigned-8 blue
 ```
 
 ## Macros

@@ -38,6 +38,3 @@ let
     todo implement
       set! color red: test-color, 255
       check equal?: get color red test-color, 255
-
-
-
