@@ -3,12 +3,12 @@ import leo scheme
 test
   leo with
   leo lambda
+  leo let
   leo definer
   leo define
   leo define-syntax
   leo field-spec
   leo define-record
-  leo let
   leo if
   leo cond
   leo switch

@@ -2,33 +2,37 @@ import leo scheme
 
 write
   let
-    hello "Hello"
-    leo "Leo"
-    in string-append: hello, ", ", leo, "!"
+    with
+      hello "Hello"
+      leo "Leo"
+    string-append: hello, ", ", leo, "!"
 
 write
-  let sequential
-    hello "Hello"
-    leo "Leo"
-    hello-leo string-append: hello, ", ", leo
-    in string-append: hello-leo, "!"
+  let*
+    with
+      hello "Hello"
+      leo "Leo"
+      hello-leo string-append: hello, ", ", leo
+    string-append: hello-leo, "!"
 
 write
-  let
+  let-values
     with
-      values: hello, leo
-      values: "hello", "Leo"
-    with
-      values: comma, exclamation
-      values: ", ", "!"
-    in string-append: hello, comma, leo, exclamation
+      with
+        values: hello, leo
+        values: "hello", "Leo"
+      with
+        values: comma, exclamation
+        values: ", ", "!"
+    string-append: hello, comma, leo, exclamation
 
 write
-  let sequential
+  let*-values
     with
-      values: hello, leo
-      values: "hello", "Leo"
-    with
-      values hello-leo
-      string-append: hello, ", ", leo
-    in string-append: hello-leo, "!"
+      with
+        values: hello, leo
+        values: "hello", "Leo"
+      with
+        values hello-leo
+        string-append: hello, ", ", leo
+    string-append: hello-leo, "!"

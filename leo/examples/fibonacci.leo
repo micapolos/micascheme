@@ -6,8 +6,8 @@ write `calculating fibonacci` n
 
 time write `result is`
   let fibonacci
-    number n
-    in if
+    with number n
+    if
       less?: number, 2
       number
       add

@@ -1,54 +1,57 @@
 import
-  except: let, if, from scheme
+  only
+    equal?, string-append, =, <, +, -, values
+    from scheme
   leo let
-  leo in
   leo with
   leo check
-  leo recursive
-  leo sequential
   leo if
 
 check equal?
   let
-    hello "Hello"
-    world "world"
-    in string-append: hello, ", ", world, "!"
+    with
+      hello "Hello"
+      world "world"
+    string-append: hello, ", ", world, "!"
   "Hello, world!"
 
 check equal?
-  let sequential
-    hello "Hello"
-    world "world"
-    hello-world string-append: hello, ", ", world
-    in string-append: hello-world, "!"
+  let*
+    with
+      hello "Hello"
+      world "world"
+      hello-world string-append: hello, ", ", world
+    string-append: hello-world, "!"
   "Hello, world!"
 
 check equal?
-  let
+  let-values
     with
-      values: hello, world
-      values: "Hello", "world"
-    with
-      values: comma, exclamation
-      values: ", ", "!"
-    in string-append: hello, comma, world, exclamation
+      with
+        values: hello, world
+        values: "Hello", "world"
+      with
+        values: comma, exclamation
+        values: ", ", "!"
+    string-append: hello, comma, world, exclamation
   "Hello, world!"
 
 check equal?
-  let sequential
+  let*-values
     with
-      values: hello, world
-      values: "Hello", "world"
-    with
-      values hello-world
-      string-append: hello, ", ", world
-    in string-append: hello-world, "!"
+      with
+        values: hello, world
+        values: "Hello", "world"
+      with
+        values hello-world
+        string-append: hello, ", ", world
+    string-append: hello-world, "!"
   "Hello, world!"
 
 check equal?
   let fibonacci
-    number 10
-    in if
+    with number 10
+    if
       <: number, 2
       number
       +

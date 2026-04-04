@@ -1,23 +1,17 @@
 (library (leo logging)
   (export logging)
   (import
-    (except (scheme) let write)
+    (only (scheme) let quasiquote unquote)
     (syntaxes)
-    (leo let)
-    (leo in)
     (leo write))
 
   (define-rules-syntax
     ((logging (label x))
-      (let
-        (val x)
-        (in
-          (write `(label ,val))
-          val)))
+      (let ((val x))
+        (write `(label ,val))
+        val))
     ((logging x)
-      (let
-        (val x)
-        (in
-          (write val)
-          val))))
+      (let ((val x))
+        (write val)
+        val)))
 )
