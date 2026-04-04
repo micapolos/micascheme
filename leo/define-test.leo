@@ -3,6 +3,8 @@ import
   leo check
   leo define
 
+define something
+
 define zero 0
 
 define
