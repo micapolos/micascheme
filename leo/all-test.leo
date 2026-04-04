@@ -18,7 +18,6 @@ test
   leo setter!
   leo set!
   leo ref
-  leo record-type
   leo record
   leo math
   leo pair

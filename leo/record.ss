@@ -14,7 +14,6 @@
     (leo getter-leo)
     (leo setter!)
     (leo field-spec)
-    (leo record-type)
     (leo syntax-error))
 
   (define-keyword record)
