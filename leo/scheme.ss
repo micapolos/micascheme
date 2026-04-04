@@ -58,6 +58,7 @@
       (leo set!)
       (leo ref)
       (leo record)
+      (only (leo adjective) adjective adjectives adjective?)
       (void)
       (rename (leo load)
         (load-leo load)
