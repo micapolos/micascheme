@@ -1,6 +1,15 @@
 import leo scheme
 
 quote changelog
+  v0.1.67
+    remove experimental grammar rules
+      define lambda
+      define syntax
+      define record
+    use plain scheme syntax
+      define
+      define-syntax
+      define-record
   v0.1.66
     implement define record
   v0.1.65
