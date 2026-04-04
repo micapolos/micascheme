@@ -44,7 +44,7 @@ write `even` filter
   even?
   iota 20
 
-define lambda
+define
   string-append-length string
   string-append
     string

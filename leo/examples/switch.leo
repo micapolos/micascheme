@@ -1,6 +1,6 @@
 import leo scheme
 
-define lambda
+define
   to-string x
   switch x
     when

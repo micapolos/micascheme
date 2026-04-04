@@ -13,11 +13,11 @@ library
   define leo "Leo"
   define exclamation "!"
 
-  define lambda
+  define
     exclamate string
     string-append: string, exclamation
 
-  define lambda
+  define
     comma-separated: string-a, string-b
     string-append: string-a, string-b
 

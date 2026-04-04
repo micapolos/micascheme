@@ -15,5 +15,5 @@ write string-append
 write 'with logging and labels
 
 write string-append
-  logging: first, "Hello, "
-  logging: second, "Leo!"
+  logging first "Hello, "
+  logging second "Leo!"
