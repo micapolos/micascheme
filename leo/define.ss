@@ -18,7 +18,8 @@
     (leo maker)
     (leo predicate)
     (leo getter-leo)
-    (leo setter!))
+    (leo setter!)
+    (leo adjective))
 
   (define-keywords value union type)
 
@@ -34,10 +35,13 @@
 
   (define-rules-syntaxes
     ; (todo define all of these using definer)
-    (keywords definer getter setter! maker predicate value lambda syntax and when keywords type union)
+    (keywords definer adjective getter setter! maker predicate value lambda syntax and when keywords type union)
 
     ((define-1 (definer (id x)))
       (define-property id definer x))
+
+    ((define-1 (adjective id))
+      (define-adjective id))
 
     ((define-1 (value (id x)))
       (%define id x))

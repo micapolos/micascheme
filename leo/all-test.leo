@@ -5,6 +5,8 @@ test
   leo lambda
   leo definer
   leo define
+  leo adjectival
+  leo adjective
   leo let
   leo if
   leo cond
