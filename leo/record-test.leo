@@ -30,12 +30,14 @@ let
   test-point x-y->point: 10, 20
   test-color red-green-blue->color: 10, 20, 30
   in
+    check record-type-descriptor? point-type
     check record? test-point
     check point? test-point
     check not point? test-color
     check equal?: point-x test-point, 10
     check equal?: point-y test-point, 20
 
+    check record-type-descriptor? color-type
     check record? test-color
     check color? test-color
     check not color? test-point
