@@ -45,10 +45,12 @@
       (define-property id definer x))
 
     ((define-1 (adjective id))
-      (define-adjective id))
+      (begin
+        (define-keyword id)
+        (define-property id adjective #t)))
 
     ((define-1 (adjectives id ...))
-      (define-adjectives id ...))
+      (begin (define (adjective id)) ...))
 
     ((define-1 (value (id x)))
       (%define id x))

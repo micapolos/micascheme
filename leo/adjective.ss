@@ -3,9 +3,7 @@
     adjective
     adjectives
     adjective?
-    identifier-adjective?
-    define-adjective
-    define-adjectives)
+    identifier-adjective?)
   (import
     (except (scheme) syntax-error)
     (syntax)
@@ -31,12 +29,4 @@
             (and
               (keyword? x)
               (identifier-adjective? lookup? #'x)))))))
-
-  (define-rule-syntax (define-adjective x)
-    (begin
-      (define-keyword x)
-      (define-property x adjective #t)))
-
-  (define-rule-syntax (define-adjectives x ...)
-    (begin (define-adjective x) ...))
 )
