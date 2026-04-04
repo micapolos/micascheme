@@ -19,8 +19,6 @@ test
   leo parameterize
   leo bytevector
   leo eval
-  leo current
-  leo textual
   leo display
   leo syntax-case
   leo todo
