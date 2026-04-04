@@ -5,6 +5,7 @@ import
   leo record
   leo let
   leo in
+  leo adjective
   leo comment
 
 define record point: x, y
