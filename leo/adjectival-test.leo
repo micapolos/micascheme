@@ -18,6 +18,42 @@ define lambda
 check syntax=?
   transform-adjectival
     identifier-adjective?
+    syntax my number
+  syntax my-number
+
+check syntax=?
+  transform-adjectival
+    identifier-adjective?
+    syntax my lucky number
+  syntax my-lucky-number
+
+check syntax=?
+  transform-adjectival
+    identifier-adjective?
+    syntax my very lucky number
+  syntax my-very-lucky-number
+
+check syntax=?
+  transform-adjectival
+    identifier-adjective?
+    syntax his number
+  syntax his number
+
+check syntax=?
+  transform-adjectival
+    identifier-adjective?
+    syntax my unlucky number
+  syntax my-unlucky number
+
+check syntax=?
+  transform-adjectival
+    identifier-adjective?
+    syntax my very unlucky number add: 1, 2
+  syntax my-very-unlucky number add: 1, 2
+
+check syntax=?
+  transform-adjectival
+    identifier-adjective?
     syntax my number add: 1, 2
   syntax my-number add: 1, 2
 
