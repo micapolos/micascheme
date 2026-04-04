@@ -6,14 +6,14 @@
 
   (define (field-spec-normalize spec)
     (syntax-case spec (immutable mutable)
-      ((class type name)
+      ((class (type name))
         (syntax->datum #'(class type name)))
       ((immutable name)
-        (field-spec-normalize #'(immutable ptr name)))
+        (field-spec-normalize #'(immutable (ptr name))))
       ((mutable name)
-        (field-spec-normalize #'(mutable ptr name)))
+        (field-spec-normalize #'(mutable (ptr name))))
       ((type name)
-        (field-spec-normalize #'(immutable type name)))
+        (field-spec-normalize #'(immutable (type name))))
       ((name)
         (field-spec-normalize #'(ptr name)))
       (id
