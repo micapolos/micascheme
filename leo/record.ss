@@ -3,6 +3,7 @@
   (import
     (except (scheme) predicate syntax-error define)
     (syntax)
+    (syntaxes)
     (procedure)
     (lets)
     (keyword)
@@ -76,8 +77,20 @@
                     #`(record-accessor record-type #,(literal->syntax index)))
                   #,@(map-with (index mutable-field-indices)
                     #`(record-mutator record-type #,(literal->syntax index))))))
-            (define-rule-syntax (id #,@params)
-              (#,make-id #,@variable-ids)))))))
+            (define-rules-syntax
+              (keywords #,@field-ids set!)
+              ((id #,@params)
+                (#,make-id #,@variable-ids))
+              #,@(map-with
+                (field-id field-ids)
+                (getter-id getter-ids)
+                #`((id (#,field-id rec))
+                  (#,getter-id rec)))
+              #,@(map-with
+                (field-id mutable-field-ids)
+                (setter-id setter-ids)
+                #`((id (set! (#,field-id rec x)))
+                  (#,setter-id rec x)))))))))
 
   ; TODO: hash and equal procedures
 

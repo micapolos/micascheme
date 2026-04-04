@@ -448,14 +448,6 @@ Records in Leo are custom data structures that group related fields together.
 
 * **`define record`**: Defines a new record type. Fields are `immutable` by default, but can be marked as `mutable`. You can also optionally specify types for the fields.
 
-* **`make`**: Instantiates a new record.
-
-* **`is?`**: A predicate that checks if a value is a specific record.
-
-* **`get`**: Retrieves the value of a specific field from a record.
-
-* **`set!`**: Updates the value of a mutable field in a record.
-
 ### Immutable
 
 By default, record fields cannot be changed after the record is created.
@@ -464,22 +456,17 @@ By default, record fields cannot be changed after the record is created.
 define record point: x, y
 
 define my-point
-  make point: 10, 20
+  point: x 10, y 20
+
+check point? my-point
+check not point? "not a point"
 
 check equal?
-  is? point my-point
-  true
-
-check equal?
-  is? point "not a point"
-  false
-
-check equal?
-  get point x my-point
+  point-x my-point
   10
 
 check equal?
-  get point y my-point
+  point-y my-point
   20
 ```
 
