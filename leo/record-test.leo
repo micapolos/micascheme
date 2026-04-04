@@ -1,5 +1,6 @@
 import
-  except: let, from scheme
+  except: define, let, from scheme
+  leo define
   leo check
   leo record
   leo let
@@ -9,7 +10,7 @@ import
   leo get
   boolean
 
-leo-define-record point: x, y
+define record point: x, y
 
 let
   test-point make point: 10, 20

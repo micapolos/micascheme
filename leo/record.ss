@@ -3,16 +3,18 @@
     record
     leo-define-record)
   (import
-    (except (scheme) predicate syntax-error)
+    (except (scheme) predicate syntax-error define)
     (syntax)
     (procedure)
     (lets)
     (keyword)
     (system)
+    (leo define)
     (leo maker)
     (leo predicate)
     (leo getter-leo)
     (leo setter!)
+    (leo definer)
     (leo field-spec)
     (leo syntax-error))
 
@@ -70,4 +72,10 @@
                       (syntax-error field-id
                         `(undefined (id ,field-name)))))))))))))
   ; TODO: hash and equal procedures, setters
+
+  (define
+    (definer
+      (record
+        (lambda ($syntax)
+          #`(leo-define-record . #,$syntax)))))
 )

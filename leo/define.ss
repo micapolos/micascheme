@@ -15,7 +15,6 @@
     (syntaxes)
     (leo lookup)
     (leo definer)
-    (leo record)
     (leo maker)
     (leo predicate)
     (leo getter-leo)
@@ -27,19 +26,17 @@
     (%lambda (lookup?)
       (syntax-case $syntax ()
         ((_ (id . x))
-          (and
-            (keyword? id)
-            (safe-lookup? lookup? #'id #'definer))
-          (lookup? #'id #'definer))
+          (safe-lookup? lookup? #'id #'definer)
+          ((lookup? #'id #'definer) #'x))
         ((_ (id x))
           (keyword? id)
           #'(%define id x)))))
 
   (define-rules-syntaxes
     ; (todo define all of these using definer)
-    (keywords definer getter setter! maker predicate value lambda syntax and when keywords record type union)
+    (keywords definer getter setter! maker predicate value lambda syntax and when keywords type union)
 
-    ((define-1 (definer . x))
+    ((define-1 (definer (id x)))
       (define-property id definer x))
 
     ((define-1 (value (id x)))
@@ -81,15 +78,15 @@
     ((define-1 (predicate (id proc)))
       (define-property id predicate proc))
 
-    ((define-1 (record (type (id . x))))
-      (keyword? id)
-      (define-record-type id . x))
+    ; ((define-1 (record (type (id . x))))
+    ;   (keyword? id)
+    ;   (define-record-type id . x))
 
-    ((define-1 (record (type . x)))
-      (define-record-type . x))
+    ; ((define-1 (record (type . x)))
+    ;   (define-record-type . x))
 
-    ((define-1 (record . x))
-      (%data . x))
+    ; ((define-1 (record . x))
+    ;   (%data . x))
 
     ((define-1 (union . x))
       (%union . x))

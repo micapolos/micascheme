@@ -1,5 +1,5 @@
 import
-  except: define, define-record, lambda, cond, predicate, from scheme
+  except: define, lambda, cond, predicate, from scheme
   leo check
   leo lambda
   leo define
@@ -8,7 +8,6 @@ import
   leo getter-leo
   leo get
   leo predicate
-  leo record
 
 define
   lambda make-zero 0
@@ -43,28 +42,6 @@ define
       string-magic: a, ...
       string-append: a, ..., "!"
 
-  record type simple-record
-    fields: a, b
-
-  record type
-    record-1
-    fields
-      field-1
-      immutable field-2
-      immutable: field-3, record-1-field-3
-      mutable field-4
-      mutable: field-5, record-1-field-5, record-1-field-5-set!
-
-  record type
-    record-2: make-record-2, record-2?
-    fields
-      field-1
-      immutable field-2
-      immutable: field-3, record-2-field-3
-      mutable field-4
-      mutable: field-5, record-2-field-5, record-2-field-5-set!
-
-  record point: x, y
   union id: number, string
 
   getter string lambda
@@ -105,16 +82,6 @@ check equal?
 check equal?
   string-magic: "foo", "bar"
   "foobar!"
-
-check record? point: 10, 20
-
-check equal?
-  point-x point: 10, 20
-  10
-
-check equal?
-  point-y point: 10, 20
-  20
 
 check id? 123
 check id? "foo"
