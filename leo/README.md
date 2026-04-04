@@ -25,6 +25,7 @@ By swapping traditional parentheses for a natural system of **indentation** and 
 * [Characters](#characters)
 * [Vectors](#vectors)
 * [Bytevectors](#bytevectors)
+* [Records](#records)
 * [Macros](#macros)
 
 ## Getting Started
@@ -439,6 +440,28 @@ bytevector-set!: my-bytevector, 1, 50
 check equal?
   bytevector-ref: my-bytevector, 1
   50
+```
+
+## Records
+
+```leo
+define record point: x, y
+
+let
+  my-point make point: 10, 20
+  in
+    check equal?
+      is? point my-point
+      true
+    check equal?
+      is? point "not a point"
+      false
+    check equal?
+      get point x my-point
+      10
+    check equal?
+      get point y my-point
+      20
 ```
 
 ## Macros
