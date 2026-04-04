@@ -1,8 +1,9 @@
 (library (leo adjective)
   (export
     adjective
+    adjectives
     adjective?
-    adjective-keyword?
+    identifier-adjective?
     define-adjective
     define-adjectives)
   (import
@@ -17,19 +18,19 @@
     (leo lookup)
     (leo syntax-error))
 
-  (define-keyword adjective)
+  (define-keywords adjective adjectives)
 
-  (define-rule-syntax (adjective-keyword? lookup? k)
-    (and
-      (keyword k)
-      (not-false? (safe-lookup? lookup? #'k #'adjective))))
+  (meta define (identifier-adjective? lookup? identifier)
+    (not-false? (safe-lookup? lookup? identifier #'adjective)))
 
   (define-syntax (adjective? stx)
     (lambda (lookup?)
       (syntax-case stx ()
         ((_ x)
           (literal->syntax
-            (adjective-keyword? lookup? x))))))
+            (and
+              (keyword? x)
+              (identifier-adjective? lookup? #'x)))))))
 
   (define-rule-syntax (define-adjective x)
     (begin

@@ -8,6 +8,7 @@ import
   leo getter-leo
   leo get
   leo predicate
+  leo adjective
 
 define
   lambda make-zero 0
@@ -56,6 +57,10 @@ define
       else
         syntax-error identifier
 
+  adjectives: my, very, lucky
+
+  my lucky number +: 3, 4
+
 check equal?: zero, 0
 check equal?: one, 1
 check equal?: two, 2
@@ -94,3 +99,7 @@ check equal?
 check equal?
   getter string number
   string->number
+
+check equal?
+  my-lucky-number
+  7

@@ -13,13 +13,15 @@
     (keyword)
     (syntax)
     (syntaxes)
+    (procedure)
     (leo lookup)
     (leo definer)
     (leo maker)
     (leo predicate)
     (leo getter-leo)
     (leo setter!)
-    (leo adjective))
+    (leo adjective)
+    (leo adjectival))
 
   (define-keywords value union type)
 
@@ -29,22 +31,24 @@
         ((_ (id . x))
           (safe-lookup? lookup? #'id #'definer)
           ((lookup? #'id #'definer) #'x))
-        ((_ (id . x))
-          (safe-lookup? lookup? #'id #'adjective)
-          ((lookup? #'id #'definer) #'x))
-        ((_ (id x))
-          (keyword? id)
-          #'(%define id x)))))
+        ((_ x)
+          (syntax-case (transform-adjectival (partial identifier-adjective? lookup?) #'x) ()
+            ((id x)
+              (keyword? id)
+              #'(%define id x)))))))
 
   (define-rules-syntaxes
     ; (todo define all of these using definer)
-    (keywords definer adjective getter setter! maker predicate value lambda syntax and when keywords type union)
+    (keywords adjective adjectives definer getter setter! maker predicate value lambda syntax and when keywords type union)
 
     ((define-1 (definer (id x)))
       (define-property id definer x))
 
     ((define-1 (adjective id))
       (define-adjective id))
+
+    ((define-1 (adjectives id ...))
+      (define-adjectives id ...))
 
     ((define-1 (value (id x)))
       (%define id x))
