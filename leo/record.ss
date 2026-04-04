@@ -69,5 +69,5 @@
                     (else
                       (syntax-error field-id
                         `(undefined (id ,field-name)))))))))))))
-  ; TODO: hash and equal procedures
+  ; TODO: hash and equal procedures, setters
 )
