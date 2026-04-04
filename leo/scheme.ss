@@ -15,7 +15,7 @@
         if write eval
         define-syntax
         syntax-case
-        parameterize
+        parameterize define-record
         list
         predicate set!)
       (leo library)
@@ -57,7 +57,7 @@
       (leo setter!)
       (leo set!)
       (leo ref)
-      (leo record)
+      (leo define-record)
       (only (leo adjective) adjective adjectives adjective?)
       (void)
       (rename (leo load)

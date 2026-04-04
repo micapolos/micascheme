@@ -21,7 +21,7 @@ test
   leo set!
   leo ref
   leo field-spec
-  leo record
+  leo define-record
   leo math
   leo pair
   leo list

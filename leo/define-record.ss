@@ -1,7 +1,7 @@
-(library (leo record)
-  (export record)
+(library (leo define-record)
+  (export define-record)
   (import
-    (except (scheme) predicate syntax-error define)
+    (except (scheme) predicate syntax-error define define-record)
     (syntax)
     (syntaxes)
     (procedure)
@@ -20,9 +20,7 @@
     (leo field-spec)
     (leo syntax-error))
 
-  (define-keyword record)
-
-  (define-syntax (leo-define-record $syntax)
+  (define-syntax (define-record $syntax)
     (syntax-case $syntax ()
       ((_ id)
         (keyword? id)
@@ -59,7 +57,7 @@
           (params (map syntax-append field-ids variable-ids))
           (fields-id (apply identifier-append #'id (intercalate field-ids #'-)))
           (record-type-id (identifier-append #'id #'id #'- #'type))
-          (make-id (identifier-append #'id fields-id #'-> #'id))
+          (make-id (identifier-append #'id #'make #'- #'id))
           (predicate-id (identifier-append #'id #'id #'?))
           #`(begin
             (define-values
@@ -91,12 +89,4 @@
                 (setter-id setter-ids)
                 #`((id (set! (#,field-id rec x)))
                   (#,setter-id rec x)))))))))
-
-  ; TODO: hash and equal procedures
-
-  (define
-    (definer
-      (record
-        (lambda ($syntax)
-          #`(leo-define-record . #,$syntax)))))
 )
