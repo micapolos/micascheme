@@ -2,7 +2,8 @@
   (export definer)
   (import
     (except (scheme) syntax-error)
-    (leo syntax-error))
+    (leo syntax-error)
+    (syntax))
 
   (define-syntax (definer $syntax)
     (lambda (lookup?)

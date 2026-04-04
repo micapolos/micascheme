@@ -1,5 +1,5 @@
 import
-  except: define, lambda, cond, predicate, from scheme
+  except: define, define-record, lambda, cond, predicate, from scheme
   leo check
   leo lambda
   leo define

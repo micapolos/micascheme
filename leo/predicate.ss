@@ -8,7 +8,9 @@
     (lambda (lookup?)
       (syntax-case $syntax ()
         ((_ id)
-          (lookup? #'id #'predicate)
+          (guard
+            (condition ((syntax-violation? condition) #f))
+            (lookup? #'id #'predicate))
           (lookup? #'id #'predicate))
         ((_ id)
           (identifier-append #'id #'id #'?)))))

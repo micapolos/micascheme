@@ -13,6 +13,7 @@
     (keyword)
     (syntax)
     (syntaxes)
+    (leo definer)
     (leo record)
     (leo maker)
     (leo predicate)
@@ -37,7 +38,10 @@
 
   (define-rules-syntaxes
     ; (todo define all of these using definer)
-    (keywords getter setter! maker predicate value lambda syntax and when keywords record type union)
+    (keywords definer getter setter! maker predicate value lambda syntax and when keywords record type union)
+
+    ((define-1 (definer . x))
+      (define-property id definer x))
 
     ((define-1 (value (id x)))
       (%define id x))
