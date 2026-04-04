@@ -1,7 +1,5 @@
 (library (leo record)
-  (export
-    record
-    leo-define-record)
+  (export record)
   (import
     (except (scheme) predicate syntax-error define)
     (syntax)
