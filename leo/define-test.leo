@@ -59,7 +59,7 @@ define
 
   adjectives: my, very, lucky
 
-  my lucky number +: 3, 4
+  my very lucky number +: 3, 4
 
 check equal?: zero, 0
 check equal?: one, 1
@@ -101,5 +101,9 @@ check equal?
   string->number
 
 check equal?
-  my-lucky-number
+  my-very-lucky-number
+  7
+
+check equal?
+  my very lucky number
   7

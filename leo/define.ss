@@ -46,7 +46,11 @@
 
     ((define-1 (adjective id))
       (begin
-        (define-keyword id)
+        (define-syntax (id stx)
+          (%lambda (lookup?)
+            (transform-adjectival
+              (partial identifier-adjective? lookup?)
+              stx)))
         (define-property id adjective #t)))
 
     ((define-1 (adjectives id ...))
