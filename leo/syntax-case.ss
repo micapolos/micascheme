@@ -2,6 +2,7 @@
   (export syntax-case)
   (import
     (rename (scheme) (syntax-case %syntax-case))
+    (keyword)
     (syntax-keywords)
     (syntaxes))
 
@@ -9,5 +10,7 @@
     (keywords keywords when)
     ((syntax-case expr (keywords k ...) (when pattern x xs ...) ...)
       (%syntax-case expr (k ...)
-        (pattern x xs ...) ...)))
+        (pattern x xs ...) ...))
+    ((syntax-case expr . x)
+      (syntax-case expr (keywords) . x)))
 )
