@@ -5,11 +5,7 @@ import
   leo record
   leo let
   leo in
-  leo make
-  leo is?
-  leo get
-  leo todo
-  boolean
+  leo comment
 
 define record point: x, y
 
@@ -18,23 +14,51 @@ define record color
   mutable unsigned-8 green
   mutable unsigned-8 blue
 
-let
-  test-point make point: 10, 20
-  in
-    check equal?: is? point test-point, true
-    check equal?: is? color test-point, false
-    check equal?: get point x test-point, 10
-    check equal?: get point y test-point, 20
+check procedure? x-y->point
+check procedure? point?
+check procedure? point-x
+check procedure? point-y
+
+check procedure? red-green-blue->color
+check procedure? color?
+check procedure? color-red
+check procedure? color-green
+check procedure? color-blue
 
 let
-  test-color make color: 10, 20, 30
+  test-point x-y->point: 10, 20
+  test-color red-green-blue->color: 10, 20, 30
   in
-    check equal?: is? color test-color, true
-    check equal?: is? point test-color, false
-    check equal?: get color red test-color, 10
-    check equal?: get color green test-color, 20
-    check equal?: get color blue test-color, 30
+    check record? test-point
+    check point? test-point
+    check not point? test-color
+    check equal?: point-x test-point, 10
+    check equal?: point-y test-point, 20
 
-    todo implement
-      set! color red: test-color, 255
-      check equal?: get color red test-color, 255
+    check record? test-color
+    check color? test-color
+    check not color? test-point
+    check equal?: color-red test-color, 10
+    check equal?: color-green test-color, 20
+    check equal?: color-blue test-color, 30
+
+    color-red-set!: test-color, 110
+    color-green-set!: test-color, 120
+    color-blue-set!: test-color, 130
+    check equal?: color-red test-color, 110
+    check equal?: color-green test-color, 120
+    check equal?: color-blue test-color, 130
+
+comment macro constructor
+let
+  test-point point: x 10, y 20
+  test-color color: red 10, green 20, blue 30
+  in
+    check point? test-point
+    check equal?: point-x test-point, 10
+    check equal?: point-y test-point, 20
+
+    check color? test-color
+    check equal?: color-red test-color, 10
+    check equal?: color-green test-color, 20
+    check equal?: color-blue test-color, 30

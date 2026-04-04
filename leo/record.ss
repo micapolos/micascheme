@@ -7,6 +7,9 @@
     (lets)
     (keyword)
     (system)
+    (identifier)
+    (list)
+    (list-syntax)
     (leo define)
     (leo maker)
     (leo predicate)
@@ -32,44 +35,51 @@
           (field-classes (map car field-specs))
           (field-types (map cadr field-specs))
           (field-names (map caddr field-specs))
-          (record-type-id (car (generate-temporaries '(record-type))))
-          (make-id (car (generate-temporaries '(make))))
-          (predicate-id (car (generate-temporaries '(is?))))
-          (field-ids (generate-temporaries field-names))
+          (field-indices (iota field-count))
+          (mutable-field-indices
+            (?filter
+              (map-with
+                (field-class field-classes)
+                (field-index field-indices)
+                (and (symbol=? field-class 'mutable) field-index))))
+          (mutable-field-names
+            (map (partial list-ref field-names) mutable-field-indices))
+          (field-ids (map (partial datum->syntax #'id) field-names))
+          (mutable-field-ids (map (partial datum->syntax #'id) mutable-field-names))
+          (getter-ids
+            (map-with
+              (field-id field-ids)
+              (identifier-append #'id #'id #'- field-id)))
+          (setter-ids
+            (map-with
+              (field-id mutable-field-ids)
+              (identifier-append #'id #'id #'- field-id #'- #'set!)))
+          (variable-ids (generate-temporaries field-ids))
+          (params (map syntax-append field-ids variable-ids))
+          (fields-id (apply identifier-append #'id (intercalate field-ids #'-)))
+          (record-type-id (identifier-append #'id #'id #'- #'type))
+          (make-id (identifier-append #'id fields-id #'-> #'id))
+          (predicate-id (identifier-append #'id #'id #'?))
           #`(begin
             (define-values
-              (#,record-type-id #,make-id #,predicate-id #,@field-ids)
+              (#,record-type-id #,make-id #,predicate-id #,@getter-ids #,@setter-ids)
               (lets
                 (record-type
                   (make-record-type
                     #,(literal->syntax name)
                     '(#,@(map literal->syntax field-specs))))
-                (apply values
+                (values
                   record-type
                   (record-constructor record-type)
                   (record-predicate record-type)
-                  (map
-                    (partial record-accessor record-type)
-                    (iota #,(literal->syntax field-count))))))
-            (define-keyword id)
-            (define-property id maker #'#,make-id)
-            (define-property id predicate #'#,predicate-id)
-            (define-property id getter
-              (lambda (field-id)
-                (lets
-                  (field-name (syntax->datum field-id))
-                  (case field-name
-                    #,@(map
-                      (lambda (field-name field-id)
-                        #`(
-                          (#,(literal->syntax field-name))
-                          #'#,field-id))
-                      field-names
-                      field-ids)
-                    (else
-                      (syntax-error field-id
-                        `(undefined (id ,field-name)))))))))))))
-  ; TODO: hash and equal procedures, setters
+                  #,@(map-with (index field-indices)
+                    #`(record-accessor record-type #,(literal->syntax index)))
+                  #,@(map-with (index mutable-field-indices)
+                    #`(record-mutator record-type #,(literal->syntax index))))))
+            (define-rule-syntax (id #,@params)
+              (#,make-id #,@variable-ids)))))))
+
+  ; TODO: hash and equal procedures
 
   (define
     (definer
