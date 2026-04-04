@@ -13,6 +13,7 @@
     (keyword)
     (syntax)
     (syntaxes)
+    (leo lookup)
     (leo definer)
     (leo record)
     (leo maker)
@@ -23,15 +24,13 @@
   (define-keywords value union type)
 
   (define-syntax (define-custom $syntax)
-    (%lambda ($lookup)
+    (%lambda (lookup?)
       (syntax-case $syntax ()
         ((_ (id . x))
           (and
             (keyword? id)
-            (guard
-              (_ (else #f))
-              ($lookup #'id #'definer)))
-          ($lookup #'id #'definer))
+            (safe-lookup? lookup? #'id #'definer))
+          (lookup? #'id #'definer))
         ((_ (id x))
           (keyword? id)
           #'(%define id x)))))

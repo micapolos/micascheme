@@ -2,13 +2,14 @@
   (export setter!)
   (import
     (scheme)
-    (identifier))
+    (identifier)
+    (leo lookup))
 
   (define-syntax (setter! $syntax)
     (lambda (lookup?)
       (syntax-case $syntax ()
         ((_ (target id))
-          (lookup? #'target #'setter!)
+          (safe-lookup? lookup? #'target #'setter!)
           ((lookup? #'target #'setter!) #'id))
         ((_ (target id))
           (identifier-append #'target #'target #'- #'id #'- #'set!)))))

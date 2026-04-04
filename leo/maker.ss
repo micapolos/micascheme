@@ -2,15 +2,14 @@
   (export maker)
   (import
     (scheme)
-    (identifier))
+    (identifier)
+    (leo lookup))
 
   (define-syntax (maker $syntax)
     (lambda (lookup?)
       (syntax-case $syntax ()
         ((_ id)
-          (guard
-            (condition ((syntax-violation? condition) #f))
-            (lookup? #'id #'maker))
+          (safe-lookup? lookup? #'id #'maker)
           (lookup? #'id #'maker))
         ((_ id)
           (identifier-append #'id #'make #'- #'id)))))
