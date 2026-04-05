@@ -10,6 +10,7 @@ test
   leo define-record
   leo if
   leo cond
+  leo case
   leo switch
   leo math
   leo pair

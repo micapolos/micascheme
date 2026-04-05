@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.70
+    implement case form
   v0.1.69
     zero argument define with
   v0.1.68

@@ -12,6 +12,7 @@
         let letrec let-values
         let* letrec* let*-values
         let-syntax letrec-syntax
+        case
         if write eval
         define-syntax
         syntax-case
@@ -29,6 +30,7 @@
       (leo sequential)
       (leo with)
       (leo check)
+      (leo case)
       (leo write)
       (leo test)
       (leo if)
