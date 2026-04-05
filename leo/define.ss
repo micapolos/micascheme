@@ -4,12 +4,16 @@
     (rename (scheme) (define %define))
     (syntax-keywords)
     (keyword)
+    (leo with)
     (syntax)
     (syntaxes))
 
   (define-rules-syntaxes
-    (keywords and keywords)
+    (keywords with and keywords)
 
+    ((define (with id) . x)
+      (keyword? id)
+      (define (id) . x))
     ((define (id params ... (and param)) x xs ...)
       (keyword? id)
       (%define (id params ... . param) x xs ...))

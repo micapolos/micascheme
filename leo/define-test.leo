@@ -2,10 +2,15 @@ import
   except: define, from scheme
   leo check
   leo define
+  leo with
 
 define something
 
-define zero 0
+define
+  with make-zero
+  0
+
+define zero with make-zero
 
 define
   increment x
