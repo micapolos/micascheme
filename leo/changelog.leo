@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.68
+    map define-record to chezscheme syntax
   v0.1.67
     remove experimental grammar rules
       define lambda
