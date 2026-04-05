@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.69
+    zero argument define with
   v0.1.68
     map define-record to chezscheme syntax
   v0.1.67
