@@ -1,15 +1,17 @@
 import
   only
-    equal?, not, procedure?, record?, record-type-descriptor?
+    equal?, not, procedure?
+    record?, record-type-descriptor?, record-type-descriptor
+    immutable, mutable
     from scheme
   leo check
   leo with
   leo let
   leo define-record
 
-define-record point: x, y
+define-record point with: x, y
 
-define-record color
+define-record color with
   mutable unsigned-8 red
   mutable unsigned-8 green
   mutable unsigned-8 blue
@@ -29,14 +31,14 @@ let
   with
     test-point make-point: 10, 20
     test-color make-color: 10, 20, 30
-  check record-type-descriptor? point-type
+  check record-type-descriptor? record-type-descriptor point
   check record? test-point
   check point? test-point
   check not point? test-color
   check equal?: point-x test-point, 10
   check equal?: point-y test-point, 20
 
-  check record-type-descriptor? color-type
+  check record-type-descriptor? record-type-descriptor color
   check record? test-color
   check color? test-color
   check not color? test-point
@@ -44,9 +46,9 @@ let
   check equal?: color-green test-color, 20
   check equal?: color-blue test-color, 30
 
-  color-red-set!: test-color, 110
-  color-green-set!: test-color, 120
-  color-blue-set!: test-color, 130
+  set-color-red!: test-color, 110
+  set-color-green!: test-color, 120
+  set-color-blue!: test-color, 130
   check equal?: color-red test-color, 110
   check equal?: color-green test-color, 120
   check equal?: color-blue test-color, 130

@@ -7,7 +7,6 @@ test
   leo definer
   leo define
   leo define-syntax
-  leo field-spec
   leo define-record
   leo if
   leo cond
