@@ -1,7 +1,7 @@
 (library (source-object)
   (export
     source-object=?
-    append-source-object)
+    source-object-append)
   (import
     (chezscheme)
     (source-file-descriptor))
@@ -25,7 +25,7 @@
         (source-object-column $b))))
 
 
-  (define (append-source-object $source-object . $source-objects)
+  (define (source-object-append $source-object . $source-objects)
     (make-source-object
       (source-object-sfd $source-object)
       (apply min (map source-object-bfp (cons $source-object $source-objects)))

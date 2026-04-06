@@ -41,7 +41,7 @@
 
 (check
   (source-object=?
-    (append-source-object
+    (source-object-append
       (make-source-object
         (source-file-descriptor "foo" 3)
         10 20)

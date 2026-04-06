@@ -43,7 +43,7 @@
       (apply list
         (annotation-expression $annotation)
         (map annotation-expression $annotations))
-      (apply append-source-object
+      (apply source-object-append
         (annotation-source $annotation)
         (map annotation-source $annotations))
       (apply list

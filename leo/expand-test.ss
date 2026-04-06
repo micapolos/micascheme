@@ -1,12 +1,12 @@
 (import (micascheme) (leo expand))
 
 (check
-  (equal?
+  (syntax=?
     (leo-expand-once '(import (foo (bar goo))))
     '(import (foo bar goo))))
 
 (check
-  (equal?
+  (syntax=?
     (leo-expand-once
       '(library
         (foo (bar goo))
