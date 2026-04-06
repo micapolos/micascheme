@@ -5,6 +5,27 @@ import
 
 check equal?
   case
+    1
+    when: 1, "one"
+    when: 2, "two"
+  "one"
+
+check equal?
+  case
+    2
+    when: 1, "one"
+    when: 2, "two"
+  "two"
+
+check equal?
+  case
+    2
+    when: 1, "one"
+    else "two"
+  "two"
+
+check equal?
+  case
     3
     when
       values: 1, 2, 3, 4, 5
