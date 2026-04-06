@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.73
+    implement: define-ftype, ftype-ref, ftype*-ref
   v0.1.72
     do not optimize and strip debug information
     read parenthesised lines
