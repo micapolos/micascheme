@@ -6,6 +6,8 @@
     literal)
   (import
     (prefix (scheme) %)
+    (prefix (predicate) %)
+    (prefix (char) %)
     (mica reader)
     (leo mica reader identifier))
 
@@ -30,7 +32,8 @@
           (one-of "t" "f")
           (string-append "\\"
             (one-of
-              (string digit-char)
+              (map (?char (%not? %char-alphabetic?)) %string)
+              (map (cons #\x (non-empty-list-of (?char %char-hex?))) %list->string)
               identifier-string))))))
 
   (%define literal

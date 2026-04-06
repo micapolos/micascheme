@@ -6,13 +6,16 @@
     char-comma?
     char-dot?
     char-colon?
+    char-semicolon?
     char-left-parenthesis?
+    char-hex?
     char
     char->datum)
   (import
     (scheme)
     (integer)
     (syntax)
+    (lets)
     (only (code) code))
   (export (import (only (code) code)))
 
@@ -24,7 +27,14 @@
   (define (char-comma? $char) (char=? $char #\,))
   (define (char-dot? $char) (char=? $char #\.))
   (define (char-colon? $char) (char=? $char #\:))
+  (define (char-semicolon? $char) (char=? $char #\;))
   (define (char-left-parenthesis? $char) (char=? $char (char left-parenthesis)))
+  (define (char-hex? $char)
+    (or
+      (char-numeric? $char)
+      (and
+        (char-ci>=? $char #\a)
+        (char-ci<=? $char #\f))))
 
   (define-syntax (char $syntax)
     (syntax-case $syntax (code)

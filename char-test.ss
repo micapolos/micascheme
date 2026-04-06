@@ -29,3 +29,11 @@
 (check (equal? (char->datum #\x0) 'nul))
 (check (equal? (char->datum #\x1f) '(code #x1f)))
 (check (equal? (char->datum #\x1F600) '😀))
+
+(check (char-hex? #\0))
+(check (char-hex? #\9))
+(check (char-hex? #\a))
+(check (char-hex? #\A))
+(check (char-hex? #\f))
+(check (char-hex? #\F))
+(check (not (char-hex? #\g)))
