@@ -5,6 +5,7 @@ todo
   repl
   fix todo in leo code
   fix check to raise proper exceptions with: cause, hint
+  fix leo-load-program to not drop annotations
   fix
     import, export, rename, and more
     in leo scheme
