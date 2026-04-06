@@ -1,6 +1,9 @@
 import leo scheme
 
 quote changelog
+  v0.1.71
+    fixes define-syntax
+    fixes colon parser
   v0.1.70
     implement case form
   v0.1.69
