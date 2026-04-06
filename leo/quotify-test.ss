@@ -108,6 +108,11 @@
 
 (check
   (equal?
+    (->sentence (void))
+    '("void")))
+
+(check
+  (equal?
     (->sentence #t)
     "true"))
 

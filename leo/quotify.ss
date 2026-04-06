@@ -31,7 +31,8 @@
     (syntax)
     (procedure)
     (list)
-    (list-syntax))
+    (list-syntax)
+    (void))
 
   (define quotify-for-display? (make-thread-parameter #f))
 
@@ -119,6 +120,9 @@
 
   (define (null->sentence _) "null")
 
+  (define (void->sentence _)
+    (phrase-cons "void" '()))
+
   (define (boolean->sentence $boolean)
     (if $boolean "true" "false"))
 
@@ -189,6 +193,7 @@
   (define (->sentence $obj)
     (switch $obj
       ((null? $null) (null->sentence $null))
+      ((void? $void) (void->sentence $void))
       ((boolean? $boolean) (boolean->sentence $boolean))
       ((number? $number) (number->sentence $number))
       ((string? $string) (string->sentence $string))
