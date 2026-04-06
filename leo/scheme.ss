@@ -12,7 +12,7 @@
         let letrec let-values
         let* letrec* let*-values
         let-syntax letrec-syntax
-        case
+        case cond
         if write eval
         define-syntax
         define-ftype
@@ -34,6 +34,7 @@
       (leo with)
       (leo check)
       (leo case)
+      (leo cond)
       (leo write)
       (leo test)
       (leo if)

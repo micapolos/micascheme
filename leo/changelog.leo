@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.76
+    implement cond
   v0.1.75
     fix problem with missing source positions in syntax errors
   v0.1.74
