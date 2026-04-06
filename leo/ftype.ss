@@ -7,14 +7,20 @@
     ftype-&ref
     ftype*-&ref
     ftype-any-ref
-    ftype*-any-ref)
+    ftype*-any-ref
+    ftype-set!
+    ftype*-set!
+    ftype-any-set!
+    ftype*-any-set!)
   (import
     (rename
       (except (scheme) syntax-error)
       (define-ftype %define-ftype)
       (ftype-ref %ftype-ref)
       (ftype-&ref %ftype-&ref)
-      (ftype-any-ref %ftype-any-ref))
+      (ftype-any-ref %ftype-any-ref)
+      (ftype-set! %ftype-set!)
+      (ftype-any-set! %ftype-any-set!))
     (keyword)
     (syntax)
     (syntaxes)
@@ -46,4 +52,14 @@
       (%ftype-any-ref ftype-name (a ...) x))
     ((ftype*-any-ref ftype-name x offset a ...)
       (%ftype-any-ref ftype-name (a ...) x offset)))
+
+  (define-rules-syntaxes
+    ((ftype-set! ftype-name x a ... expr)
+      (%ftype-set! ftype-name (a ...) x expr))
+    ((ftype*-set! ftype-name x index a ... expr)
+      (%ftype-set! ftype-name (a ...) x index expr))
+    ((ftype-any-set! ftype-name x a ... expr)
+      (%ftype-any-set! ftype-name (a ...) x expr))
+    ((ftype*-any-set! ftype-name x offset a ... expr)
+      (%ftype-any-set! ftype-name (a ...) x offset expr)))
 )

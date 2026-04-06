@@ -17,13 +17,14 @@ define-ftype
 check equal?: ftype-sizeof point, 2
 
 define bytevector make-immobile-bytevector *: ftype-sizeof point, 2
-bytevector-u8-set!: bytevector, 0, 10
-bytevector-u8-set!: bytevector, 1, 20
-bytevector-u8-set!: bytevector, 2, 30
-bytevector-u8-set!: bytevector, 3, 40
 
 define point-pointer
   make-ftype-pointer: point, object->reference-address bytevector
+
+ftype-set!: point, point-pointer, x, 10
+ftype-set!: point, point-pointer, y, 20
+ftype*-set!: point, point-pointer, 1, x, 30
+ftype*-set!: point, point-pointer, 1, y, 40
 
 check equal?
   ftype-ref: point, point-pointer, x

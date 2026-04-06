@@ -15,7 +15,9 @@
         case
         if write eval
         define-syntax
-        define-ftype ftype-ref ftype-&ref ftype-any-ref
+        define-ftype
+        ftype-ref ftype-&ref ftype-any-ref
+        ftype-set! ftype-any-set!
         syntax-case
         parameterize define-record define-syntax
         list
