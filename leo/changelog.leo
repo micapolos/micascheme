@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.78
+    write ftype-pointer as sexpr
   v0.1.77
     implement escaped char reader
   v0.1.76
