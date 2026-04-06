@@ -1,6 +1,9 @@
 import leo scheme
 
 quote changelog
+  v0.1.72
+    do not optimize and strip debug information
+    read parenthesised lines
   v0.1.71
     fixes define-syntax
     fixes colon parser

@@ -131,19 +131,23 @@
 
   (define inline-annotation-getter
     (quoted-annotation-getter
-      (getter-lets
-        ($atom-annotation atom-annotation-getter)
-        (switch (annotation-stripped $atom-annotation)
-          ((symbol? $symbol)
-            (getter-switch rhs-inline-annotation?-getter
-              ((annotation? $rhs-annotation)
-                (apply-getter append-annotation
-                  (getter $atom-annotation)
-                  (getter $rhs-annotation)))
+      (getter-switch peek-char-getter
+        ((char-left-parenthesis? _)
+          (getter-item-getter %single-line-annotation))
+        ((else _)
+          (getter-lets
+            ($atom-annotation atom-annotation-getter)
+            (switch (annotation-stripped $atom-annotation)
+              ((symbol? $symbol)
+                (getter-switch rhs-inline-annotation?-getter
+                  ((annotation? $rhs-annotation)
+                    (apply-getter append-annotation
+                      (getter $atom-annotation)
+                      (getter $rhs-annotation)))
+                  ((else _)
+                    (getter $atom-annotation))))
               ((else _)
-                (getter $atom-annotation))))
-          ((else _)
-            (getter $atom-annotation))))))
+                (getter $atom-annotation))))))))
 
   (define rhs-inline-annotation?-getter
     (unquoted-annotation?-getter
@@ -168,6 +172,7 @@
             (or
               ((getter-item-first-char/eof? %literal) $char)
               (char-colon? $char)
+              (char-left-parenthesis? $char)
               (char->quote? $char)))))
       line-annotation-getter))
 

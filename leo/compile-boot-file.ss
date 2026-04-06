@@ -3,8 +3,6 @@
 (suppress-greeting #t)
 (compile-imported-libraries #t)
 (generate-wpo-files #t)
-(optimize-level 3)
-(generate-inspector-information #f)
 
 (display "Compiling program...")
 (newline)
