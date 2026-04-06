@@ -167,6 +167,7 @@
           ((else $char)
             (or
               ((getter-item-first-char/eof? %literal) $char)
+              (char-colon? $char)
               (char->quote? $char)))))
       line-annotation-getter))
 

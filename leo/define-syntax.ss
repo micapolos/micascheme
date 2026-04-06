@@ -1,7 +1,8 @@
 (library (leo define-syntax)
   (export define-syntax)
   (import
-    (except (scheme) define-syntax)
+    (rename (scheme)
+      (define-syntax %define-syntax))
     (syntax-keywords)
     (keyword)
     (syntax)
@@ -19,9 +20,9 @@
 
     ((define-syntax (id x))
       (keyword? id)
-      (define-syntax id x))
+      (%define-syntax id x))
 
     ((define-syntax (id s) x xs ...)
       (keyword? id)
-      (define-syntax (id s) x xs ...)))
+      (%define-syntax (id s) x xs ...)))
 )
