@@ -264,3 +264,15 @@
   (equal?
     (list->sentences '(1 2 . 3))
     '("1" "2" ("and" 3))))
+
+(let ()
+  (define-ftype point (struct (x unsigned-8) (y unsigned-8)))
+  (define point-bytevector (bytevector 10 20))
+  (define point-ftype-pointer
+    (make-ftype-pointer point
+      (object->reference-address point-bytevector)))
+  (check
+    (equal?
+      (->sentence point-ftype-pointer)
+      '("point" (struct (x 10) (y 20))))))
+

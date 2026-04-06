@@ -165,6 +165,11 @@
     (phrase-cons "vector"
       (vector->list $vector)))
 
+  (define (ftype-pointer->sentence $ftype-pointer)
+    (phrase-cons
+      (symbol->string (record-type-name (record-rtd $ftype-pointer)))
+      (list (ftype-pointer->sexpr $ftype-pointer))))
+
   (define (record->sentence $record)
     (lets
       ($rtd (record-rtd $record))
@@ -205,6 +210,7 @@
       ((vector? $vector) (vector->sentence $vector))
       ((procedure? $procedure) (procedure->sentence $procedure))
       ((syntax? $syntax) (syntax->sentence $syntax))
+      ((ftype-pointer? $ftype-pointer) (ftype-pointer->sentence $ftype-pointer))
       ((record? $record) (record->sentence $record))
       ((else $other) (other->sentence $other))))
 
