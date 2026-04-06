@@ -24,3 +24,6 @@ test
   leo todo
   leo comment
   leo logging
+  leo transform-ftype
+  leo define-ftype
+  leo ftype-ref

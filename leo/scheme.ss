@@ -15,6 +15,7 @@
         case
         if write eval
         define-syntax
+        define-ftype ftype-ref
         syntax-case
         parameterize define-record define-syntax
         list
@@ -52,6 +53,8 @@
       (leo logging)
       (leo define-record)
       (leo define-syntax)
+      (leo define-ftype)
+      (leo ftype-ref)
       (void)
       (rename (leo load)
         (load-leo load)

@@ -2,7 +2,7 @@
   (export
     keyword
     keyword?
-    keyword=?
+    free-keyword?
     keyword-append
     keyword-replace
     keyword...?)
@@ -17,7 +17,10 @@
   (define-rule-syntax (keyword x)
     #'x)
 
-  (define keyword=? free-identifier=?)
+  (define-rule-syntax (free-keyword? x)
+    (and
+      (keyword? x)
+      (free-identifier=? #'x (literal->syntax 'x))))
 
   (define-rule-syntax (keyword-append tpl part ...)
     (identifier-append #'tpl #'part ...))
