@@ -66,7 +66,6 @@
       (only (procedure) partial)
       (char)
       (void)
-      (only (syntax) syntax=?)
       (syntax-keywords)
       (only (syntax) define-keyword define-keywords)
       (rename (leo load)
