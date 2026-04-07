@@ -21,7 +21,8 @@
         syntax-case
         parameterize define-record define-syntax
         list
-        predicate set!)
+        predicate set!
+        syntax-error)
       (leo library)
       (char)
       (keyword)
@@ -57,6 +58,7 @@
       (leo define-record)
       (leo define-syntax)
       (leo ftype)
+      (leo syntax-error)
       (void)
       (rename (leo load)
         (load-leo load)
