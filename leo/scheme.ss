@@ -16,6 +16,7 @@
         if write eval
         define-syntax
         define-ftype
+        define-property
         ftype-ref ftype-&ref ftype-any-ref
         ftype-set! ftype-any-set!
         syntax-case
@@ -58,6 +59,7 @@
       (leo logging)
       (leo define-record)
       (leo define-syntax)
+      (leo define-property)
       (leo ftype)
       (leo syntax-error)
       (leo meta)
