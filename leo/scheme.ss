@@ -22,7 +22,8 @@
         parameterize define-record define-syntax
         list
         predicate set!
-        syntax-error)
+        syntax-error
+        meta)
       (leo library)
       (char)
       (keyword)
@@ -59,7 +60,13 @@
       (leo define-syntax)
       (leo ftype)
       (leo syntax-error)
+      (leo meta)
+      (keyword)
+      (eof)
+      (only (procedure) partial)
       (void)
+      (syntax-keywords)
+      (only (syntax) define-keyword define-keywords)
       (rename (leo load)
         (load-leo load)
         (load-leo-program load-program))

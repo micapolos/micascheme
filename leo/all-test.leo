@@ -26,3 +26,4 @@ test
   leo logging
   leo transform-ftype
   leo ftype
+  leo meta
