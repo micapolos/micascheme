@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.80
+    implement define-property
   v0.1.79
     add support for: partial, keywords, char, eof
   v0.1.78
