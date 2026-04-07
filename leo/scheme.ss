@@ -64,6 +64,7 @@
       (keyword)
       (eof)
       (only (procedure) partial)
+      (char)
       (void)
       (syntax-keywords)
       (only (syntax) define-keyword define-keywords)
