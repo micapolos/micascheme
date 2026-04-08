@@ -66,6 +66,7 @@
       (keyword)
       (eof)
       (only (procedure) partial)
+      (only (identifier) identifier-append)
       (char)
       (void)
       (syntax-keywords)
