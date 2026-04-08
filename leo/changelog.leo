@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.81
+    fixes free-keyword?
   v0.1.80
     implement define-property
   v0.1.79
