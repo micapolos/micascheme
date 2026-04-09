@@ -70,7 +70,12 @@
       (char)
       (void)
       (syntax-keywords)
-      (only (syntax) define-keyword define-keywords)
+      (rename
+        (only (syntax)
+          define-keyword
+          define-keywords
+          syntax=?)
+        (syntax=? free-syntax=?))
       (rename (leo load)
         (load-leo load)
         (load-leo-program load-program))
