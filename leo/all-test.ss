@@ -11,7 +11,7 @@
   (leo getter)
   (leo writing-reader)
   (leo quotes)
-  (leo quotify)
+  (leo sentence)
   (leo code)
   (leo write)
   (leo test)

@@ -20,7 +20,7 @@
     (scheme)
     (check)
     (leo datum)
-    (leo quotify)
+    (leo sentence)
     (syntax)
     (lets)
     (switch)

@@ -1,4 +1,4 @@
-(library (leo quotify)
+(library (leo sentence)
   (export
     quotify-for-display?
 

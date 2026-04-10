@@ -1,4 +1,4 @@
-(import (micascheme) (leo quotify))
+(import (micascheme) (leo sentence))
 
 ; === normalize-list
 

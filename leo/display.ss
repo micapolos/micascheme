@@ -5,7 +5,7 @@
       (except (scheme) display write)
       (display-string %display-string))
     (leo write)
-    (leo quotify))
+    (leo sentence))
 
   (define display
     (case-lambda
