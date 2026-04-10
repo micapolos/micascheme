@@ -94,20 +94,44 @@
     (->sentence '())
     '("written" "null")))
 
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence '())
+      "null")))
+
 (check
   (equal?
     (->sentence (void))
     '("written" "void")))
+
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence (void))
+      "void")))
 
 (check
   (equal?
     (->sentence #t)
     '("written" "true")))
 
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence #t)
+      "true")))
+
 (check
   (equal?
     (->sentence #f)
     '("written" "false")))
+
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence #f)
+      "false")))
 
 (check
   (equal?
@@ -119,10 +143,22 @@
     (->sentence #\a)
     '("written" ("char" "a"))))
 
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence #\a)
+      '("char" "a"))))
+
 (check
   (equal?
     (->sentence #\:)
     '("written" ("char" "colon"))))
+
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence #\:)
+      '("char" "colon"))))
 
 (check
   (equal?
@@ -186,10 +222,37 @@
     (->sentence '(123 (bar)))
     '("written" ("list" "123" ("bar")))))
 
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence '(123))
+      '("list" "123")))
+
+  (check
+    (equal?
+      (->sentence '(123 ()))
+      '("list" "123" "null")))
+
+  (check
+    (equal?
+      (->sentence '(123 bar))
+      '("list" "123" "bar")))
+
+  (check
+    (equal?
+      (->sentence '(123 (bar)))
+      '("list" "123" ("bar")))))
+
 (check
   (equal?
     (->sentence (box 10))
     '("written" ("box" "10"))))
+
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence (box 10))
+      '("box" "10"))))
 
 (check
   (equal?
@@ -200,6 +263,17 @@
   (equal?
     (->sentence (bytevector 1 2 3))
     '("written" ("bytevector" "1" "2" "3"))))
+
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence (bytevector))
+      '("bytevector")))
+
+  (check
+    (equal?
+      (->sentence (bytevector 1 2 3))
+      '("bytevector" "1" "2" "3"))))
 
 (check
   (equal?
@@ -215,6 +289,20 @@
         ("written" ("char" "space") )
         "\"foo\""))))
 
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence (vector))
+      '("vector")))
+
+  (check
+    (equal?
+      (->sentence (vector #\a #\space "foo"))
+      '("vector"
+        ("char" "a")
+        ("char" "space")
+        "\"foo\""))))
+
 (data (point x y))
 
 (check
@@ -222,25 +310,55 @@
     (->sentence (point 10 20))
     '("written" ("record" ("point" "10" "20")))))
 
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence (point 10 20))
+      '("point" "10" "20"))))
+
 (check
   (equal?
     (->sentence +)
     '("written" ("procedure" "+"))))
+
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence +)
+      '("procedure" "+"))))
 
 (check
   (equal?
     (->sentence (lambda (x) x))
     '("written" "procedure")))
 
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence (lambda (x) x))
+      '"procedure")))
+
 (check
   (equal?
     (->sentence #'+)
     '("written" ("syntax" "+"))))
 
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence #'+)
+      '("syntax" "+"))))
+
 (check
   (equal?
     (list->sentences 123)
     '(("written" ("and" "123")))))
+
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (list->sentences 123)
+      '(("and" "123")))))
 
 (check
   (equal?
@@ -252,6 +370,12 @@
     (list->sentences '(1 2 . 3))
     '("1" "2" ("written" ("and" "3")))))
 
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (list->sentences '(1 2 . 3))
+      '("1" "2" ("and" "3")))))
+
 (let ()
   (define-ftype point (struct (x unsigned-8) (y unsigned-8)))
   (define point-bytevector (bytevector 10 20))
@@ -261,5 +385,11 @@
   (check
     (equal?
       (->sentence point-ftype-pointer)
-      '("written" ("ftype" ("point" ("struct" ("x" "10") ("y" "20"))))))))
+      '("written" ("ftype" ("point" ("struct" ("x" "10") ("y" "20")))))))
+
+  (parameterize ((skip-written? #t))
+    (check
+      (equal?
+        (->sentence point-ftype-pointer)
+        '("point" ("struct" ("x" "10") ("y" "20")))))))
 

@@ -1,6 +1,7 @@
 (library (leo sentence)
   (export
     quotify-for-display?
+    skip-written?
 
     phrase-cons phrase? phrase-string phrase-body
     sentence? sentence-switch
@@ -34,6 +35,7 @@
     (void))
 
   (define quotify-for-display? (make-thread-parameter #f))
+  (define skip-written? (make-thread-parameter #f))
 
   (define (phrase-cons word body) (cons word body))
   (define phrase? pair?)
@@ -118,7 +120,9 @@
   ; === ->sentence
 
   (define (sentence-written $sentence)
-    `("written" ,$sentence))
+    (cond
+      ((skip-written?) $sentence)
+      (else `("written" ,$sentence))))
 
   (define (null->sentence _)
     (sentence-written "null"))
@@ -173,23 +177,29 @@
 
   (define (ftype-pointer->sentence $ftype-pointer)
     (sentence-written
-      `("ftype"
-        (
-          ,(symbol->string (record-type-name (record-rtd $ftype-pointer)))
-          ,(->sentence (ftype-pointer->sexpr $ftype-pointer))))))
+      (lets
+        ($sentence
+          `(
+            ,(symbol->string (record-type-name (record-rtd $ftype-pointer)))
+            ,(->sentence (ftype-pointer->sexpr $ftype-pointer))))
+        (cond
+          ((skip-written?) $sentence)
+          (else `("ftype" ,$sentence))))))
 
   (define (record->sentence $record)
     (lets
       ($rtd (record-rtd $record))
-      (sentence-written
-        `("record"
-          (
-            ,(symbol->string (record-type-name $rtd))
-            .
-            ,(list->sentences
-              (map-with
-                ($index (iota (vector-length (record-type-field-names $rtd))))
-                ((record-accessor $rtd $index) $record))))))))
+      ($sentence
+        `(
+          ,(symbol->string (record-type-name $rtd))
+          .
+          ,(list->sentences
+            (map-with
+              ($index (iota (vector-length (record-type-field-names $rtd))))
+              ((record-accessor $rtd $index) $record)))))
+      (cond
+        ((skip-written?) $sentence)
+        (else (sentence-written `("record" ,$sentence))))))
 
   (define (procedure->sentence $procedure)
     (sentence-written
