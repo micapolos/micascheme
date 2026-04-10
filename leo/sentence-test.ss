@@ -75,12 +75,12 @@
 (check
   (equal?
     (sentence-quotify '("quote" (foo bar)))
-    '("'foo" bar)))
+    '("'foo" "bar")))
 
 (check
   (equal?
     (sentence-quotify '("quote" (foo (bar gar))))
-    '("'foo" (bar gar))))
+    '("'foo" ("bar" "gar"))))
 
 ; === quotify / unquote
 
@@ -92,12 +92,12 @@
 (check
   (equal?
     (sentence-quotify '("bar" (unquote . foo)))
-    '("bar`" (and foo))))
+    '("bar`" ("and" "foo"))))
 
 (check
   (equal?
     (sentence-quotify '("bar" (unquote foo)))
-    '("bar`" foo)))
+    '("bar`" "foo")))
 
 ; === ->sentence
 
@@ -134,12 +134,12 @@
 (check
   (equal?
     (->sentence #\a)
-    '("char" a)))
+    '("char" "a")))
 
 (check
   (equal?
     (->sentence #\:)
-    '("char" colon)))
+    '("char" "colon")))
 
 (check
   (equal?
@@ -171,42 +171,42 @@
 (check
   (equal?
     (->sentence '(foo ()))
-    '("foo" ())))
+    '("foo" "null")))
 
 (check
   (equal?
     (->sentence '(foo bar))
-    '("foo" bar)))
+    '("foo" "bar")))
 
 (check
   (equal?
     (->sentence '(foo (bar)))
-    '("foo" (bar))))
+    '("foo" ("bar"))))
 
 (check
   (equal?
     (->sentence '(123))
-    '("list" 123)))
+    '("list" "123")))
 
 (check
   (equal?
     (->sentence '(123 ()))
-    '("list" 123 ())))
+    '("list" "123" "null")))
 
 (check
   (equal?
     (->sentence '(123 bar))
-    '("list" 123 bar)))
+    '("list" "123" "bar")))
 
 (check
   (equal?
     (->sentence '(123 (bar)))
-    '("list" 123 (bar))))
+    '("list" "123" ("bar"))))
 
 (check
   (equal?
     (->sentence (box 10))
-    '("box" 10)))
+    '("box" "10")))
 
 (check
   (equal?
@@ -216,7 +216,7 @@
 (check
   (equal?
     (->sentence (bytevector 1 2 3))
-    '("bytevector" 1 2 3)))
+    '("bytevector" "1" "2" "3")))
 
 (check
   (equal?
@@ -226,19 +226,19 @@
 (check
   (equal?
     (->sentence (vector #\a #\space "foo"))
-    '("vector" #\a #\space "foo")))
+    '("vector" ("char" "a") ("char" "space") "\"foo\"")))
 
 (data (point x y))
 
 (check
   (equal?
     (->sentence (point 10 20))
-    '("point" 10 20)))
+    '("point" "10" "20")))
 
 (check
   (equal?
     (->sentence +)
-    '("procedure" +)))
+    '("procedure" "+")))
 
 (check
   (equal?
@@ -248,12 +248,12 @@
 (check
   (equal?
     (->sentence #'+)
-    '("syntax" +)))
+    '("syntax" "+")))
 
 (check
   (equal?
     (list->sentences 123)
-    '(("and" 123))))
+    '(("and" "123"))))
 
 (check
   (equal?
@@ -263,7 +263,7 @@
 (check
   (equal?
     (list->sentences '(1 2 . 3))
-    '("1" "2" ("and" 3))))
+    '("1" "2" ("and" "3"))))
 
 (let ()
   (define-ftype point (struct (x unsigned-8) (y unsigned-8)))
@@ -274,5 +274,5 @@
   (check
     (equal?
       (->sentence point-ftype-pointer)
-      '("point" (struct (x 10) (y 20))))))
+      '("point" ("struct" ("x" "10") ("y" "20"))))))
 

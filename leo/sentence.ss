@@ -121,7 +121,7 @@
   (define (null->sentence _) "null")
 
   (define (void->sentence _)
-    (phrase-cons "void" '()))
+    '("void"))
 
   (define (boolean->sentence $boolean)
     (if $boolean "true" "false"))
@@ -132,7 +132,7 @@
   (define (char->sentence $char)
     (if (quotify-for-display?)
       (string $char)
-      (phrase-cons "char" (list (char->datum $char)))))
+      `("char" ,(->sentence (char->datum $char)))))
 
   (define (string->sentence $string)
     (if (quotify-for-display?)
@@ -146,51 +146,49 @@
     (switch (car $pair)
       ((symbol? $symbol)
         (sentence-quotify
-          (phrase-cons
-            (symbol->string $symbol)
-            (normalize-list (cdr $pair)))))
+          `(
+            ,(symbol->string $symbol)
+            .
+            ,(list->sentences (normalize-list (cdr $pair))))))
       ((else $other)
-        (phrase-cons "list"
-          (normalize-list (cons $other (cdr $pair)))))))
+        `("list" . ,(list->sentences (normalize-list (cons $other (cdr $pair))))))))
 
   (define (box->sentence $box)
-    (phrase-cons "box"
-      (list (unbox $box))))
+    `("box"
+      ,(->sentence (unbox $box))))
 
   (define (bytevector->sentence $bytevector)
-    (phrase-cons "bytevector"
-      (bytevector->u8-list $bytevector)))
+    `("bytevector" . ,(list->sentences (bytevector->u8-list $bytevector))))
 
   (define (vector->sentence $vector)
-    (phrase-cons "vector"
-      (vector->list $vector)))
+    `("vector" . ,(list->sentences (vector->list $vector))))
 
   (define (ftype-pointer->sentence $ftype-pointer)
-    (phrase-cons
-      (symbol->string (record-type-name (record-rtd $ftype-pointer)))
-      (list (ftype-pointer->sexpr $ftype-pointer))))
+    `(
+      ,(symbol->string (record-type-name (record-rtd $ftype-pointer)))
+      ,(->sentence (ftype-pointer->sexpr $ftype-pointer))))
 
   (define (record->sentence $record)
     (lets
       ($rtd (record-rtd $record))
-      (phrase-cons
-        (symbol->string (record-type-name $rtd))
-        (map-with
-          ($index (iota (vector-length (record-type-field-names $rtd))))
-          ((record-accessor $rtd $index) $record)))))
+      `(
+        ,(symbol->string (record-type-name $rtd))
+        .
+        ,(list->sentences
+          (map-with
+            ($index (iota (vector-length (record-type-field-names $rtd))))
+            ((record-accessor $rtd $index) $record))))))
 
   (define (procedure->sentence $procedure)
     (lets
       ($word "procedure")
       (switch (procedure-name? $procedure)
-        ((symbol? $name)
-          (phrase-cons $word `(,$name)))
+        ((symbol? $name) `(,$word ,(->sentence $name)))
         ((else _) $word))))
 
   (define (syntax->sentence $syntax)
     ; TODO: Include annotation
-    (phrase-cons "syntax"
-      (list (syntax->datum $syntax))))
+    `("syntax" ,(->sentence (syntax->datum $syntax))))
 
   (define (other->sentence $other)
     (format "#<~s>" $other))
@@ -217,7 +215,7 @@
   (define (list->sentences $list)
     (map*
       ->sentence
-      (lambda ($item) (list (phrase-cons "and" (list $item))))
+      (lambda ($item) (list `("and" ,(->sentence $item))))
       $list))
 
   (define (normalize-list $list)
