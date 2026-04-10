@@ -1,17 +1,5 @@
 (import (micascheme) (leo sentence))
 
-; === normalize-list
-
-(check
-  (equal?
-    (normalize-list '(1 2 3))
-    '(1 2 3)))
-
-(check
-  (equal?
-    (normalize-list '(1 2 . 3))
-    '(1 2 (and 3))))
-
 ; === quote
 
 (check (equal? (quote-string "'" "foo") "'foo"))
@@ -92,7 +80,7 @@
 (check
   (equal?
     (sentence-quotify '("bar" (unquote . foo)))
-    '("bar`" ("and" "foo"))))
+    '("bar`" ("written" ("and" "foo")))))
 
 (check
   (equal?
@@ -104,27 +92,22 @@
 (check
   (equal?
     (->sentence '())
-    "null"))
+    '("written" "null")))
 
 (check
   (equal?
     (->sentence (void))
-    '("void")))
+    '("written" "void")))
 
 (check
   (equal?
     (->sentence #t)
-    "true"))
+    '("written" "true")))
 
 (check
   (equal?
     (->sentence #f)
-    "false"))
-
-(check
-  (equal?
-    (->sentence #f)
-    "false"))
+    '("written" "false")))
 
 (check
   (equal?
@@ -134,12 +117,12 @@
 (check
   (equal?
     (->sentence #\a)
-    '("char" "a")))
+    '("written" ("char" "a"))))
 
 (check
   (equal?
     (->sentence #\:)
-    '("char" "colon")))
+    '("written" ("char" "colon"))))
 
 (check
   (equal?
@@ -171,7 +154,7 @@
 (check
   (equal?
     (->sentence '(foo ()))
-    '("foo" "null")))
+    '("foo" ("written" "null"))))
 
 (check
   (equal?
@@ -186,74 +169,78 @@
 (check
   (equal?
     (->sentence '(123))
-    '("list" "123")))
+    '("written" ("list" "123"))))
 
 (check
   (equal?
     (->sentence '(123 ()))
-    '("list" "123" "null")))
+    '("written" ("list" "123" ("written" "null")))))
 
 (check
   (equal?
     (->sentence '(123 bar))
-    '("list" "123" "bar")))
+    '("written" ("list" "123" "bar"))))
 
 (check
   (equal?
     (->sentence '(123 (bar)))
-    '("list" "123" ("bar"))))
+    '("written" ("list" "123" ("bar")))))
 
 (check
   (equal?
     (->sentence (box 10))
-    '("box" "10")))
+    '("written" ("box" "10"))))
 
 (check
   (equal?
     (->sentence (bytevector))
-    '("bytevector")))
+    '("written" ("bytevector"))))
 
 (check
   (equal?
     (->sentence (bytevector 1 2 3))
-    '("bytevector" "1" "2" "3")))
+    '("written" ("bytevector" "1" "2" "3"))))
 
 (check
   (equal?
     (->sentence (vector))
-    '("vector")))
+    '("written" ("vector"))))
 
 (check
   (equal?
     (->sentence (vector #\a #\space "foo"))
-    '("vector" ("char" "a") ("char" "space") "\"foo\"")))
+    '("written"
+      ("vector"
+        ("written" ("char" "a"))
+        ("written" ("char" "space") )
+        "\"foo\""))))
 
 (data (point x y))
 
 (check
   (equal?
     (->sentence (point 10 20))
-    '("point" "10" "20")))
+    '("written" ("record" ("point" "10" "20")))))
 
 (check
   (equal?
     (->sentence +)
-    '("procedure" "+")))
+    '("written" ("procedure" "+"))))
 
 (check
   (equal?
     (->sentence (lambda (x) x))
-    "procedure"))
+    '("written" "procedure")))
 
 (check
   (equal?
     (->sentence #'+)
-    '("syntax" "+")))
+    '("written" ("syntax" "+"))))
 
 (check
   (equal?
     (list->sentences 123)
-    '(("and" "123"))))
+    '(("written" ("and" "123")))))
 
 (check
   (equal?
@@ -263,7 +250,7 @@
 (check
   (equal?
     (list->sentences '(1 2 . 3))
-    '("1" "2" ("and" "3"))))
+    '("1" "2" ("written" ("and" "3")))))
 
 (let ()
   (define-ftype point (struct (x unsigned-8) (y unsigned-8)))
@@ -274,5 +261,5 @@
   (check
     (equal?
       (->sentence point-ftype-pointer)
-      '("point" ("struct" ("x" "10") ("y" "20"))))))
+      '("written" ("ftype" ("point" ("struct" ("x" "10") ("y" "20"))))))))
 

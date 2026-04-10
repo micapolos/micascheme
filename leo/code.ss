@@ -30,6 +30,7 @@
     (string)
     (limited)
     (boolean)
+    (system)
     (procedure)
     (code))
 
@@ -47,10 +48,13 @@
 
   (define (phrase-atom-code? $pair) #f)
 
-  (define (atom-code? $datum)
-    (sentence-switch (->sentence $datum)
+  (define (sentence-atom-code? $sentence)
+    (sentence-switch $sentence
       ((string? $string) (string-code $string))
       ((phrase? $phrase) (phrase-atom-code? $phrase))))
+
+  (define (atom-code? $datum)
+    (sentence-atom-code? (->sentence $datum)))
 
   (define-rule-syntax (check-atom-code? in out)
     (if out

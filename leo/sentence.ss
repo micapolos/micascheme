@@ -17,8 +17,7 @@
     sentence-quotify
 
     ->sentence
-    list->sentences
-    normalize-list)
+    list->sentences)
   (import
     (scheme)
     (procedure-name)
@@ -118,13 +117,17 @@
 
   ; === ->sentence
 
-  (define (null->sentence _) "null")
+  (define (sentence-written $sentence)
+    `("written" ,$sentence))
+
+  (define (null->sentence _)
+    (sentence-written "null"))
 
   (define (void->sentence _)
-    '("void"))
+    (sentence-written "void"))
 
   (define (boolean->sentence $boolean)
-    (if $boolean "true" "false"))
+    (sentence-written (if $boolean "true" "false")))
 
   (define (number->sentence $number)
     (number->string $number))
@@ -132,7 +135,9 @@
   (define (char->sentence $char)
     (if (quotify-for-display?)
       (string $char)
-      `("char" ,(->sentence (char->datum $char)))))
+      (sentence-written
+        `("char"
+          ,(->sentence (char->datum $char))))))
 
   (define (string->sentence $string)
     (if (quotify-for-display?)
@@ -149,46 +154,54 @@
           `(
             ,(symbol->string $symbol)
             .
-            ,(list->sentences (normalize-list (cdr $pair))))))
+            ,(list->sentences (cdr $pair)))))
       ((else $other)
-        `("list" . ,(list->sentences (normalize-list (cons $other (cdr $pair))))))))
+        (sentence-written `("list" . ,(list->sentences (cons $other (cdr $pair))))))))
 
   (define (box->sentence $box)
-    `("box"
-      ,(->sentence (unbox $box))))
+    (sentence-written
+      `("box"
+        ,(->sentence (unbox $box)))))
 
   (define (bytevector->sentence $bytevector)
-    `("bytevector" . ,(list->sentences (bytevector->u8-list $bytevector))))
+    (sentence-written
+      `("bytevector" . ,(list->sentences (bytevector->u8-list $bytevector)))))
 
   (define (vector->sentence $vector)
-    `("vector" . ,(list->sentences (vector->list $vector))))
+    (sentence-written
+      `("vector" . ,(list->sentences (vector->list $vector)))))
 
   (define (ftype-pointer->sentence $ftype-pointer)
-    `(
-      ,(symbol->string (record-type-name (record-rtd $ftype-pointer)))
-      ,(->sentence (ftype-pointer->sexpr $ftype-pointer))))
+    (sentence-written
+      `("ftype"
+        (
+          ,(symbol->string (record-type-name (record-rtd $ftype-pointer)))
+          ,(->sentence (ftype-pointer->sexpr $ftype-pointer))))))
 
   (define (record->sentence $record)
     (lets
       ($rtd (record-rtd $record))
-      `(
-        ,(symbol->string (record-type-name $rtd))
-        .
-        ,(list->sentences
-          (map-with
-            ($index (iota (vector-length (record-type-field-names $rtd))))
-            ((record-accessor $rtd $index) $record))))))
+      (sentence-written
+        `("record"
+          (
+            ,(symbol->string (record-type-name $rtd))
+            .
+            ,(list->sentences
+              (map-with
+                ($index (iota (vector-length (record-type-field-names $rtd))))
+                ((record-accessor $rtd $index) $record))))))))
 
   (define (procedure->sentence $procedure)
-    (lets
-      ($word "procedure")
-      (switch (procedure-name? $procedure)
-        ((symbol? $name) `(,$word ,(->sentence $name)))
-        ((else _) $word))))
+    (sentence-written
+      (lets
+        ($word "procedure")
+        (switch (procedure-name? $procedure)
+          ((symbol? $name) `(,$word ,(->sentence $name)))
+          ((else _) $word)))))
 
   (define (syntax->sentence $syntax)
     ; TODO: Include annotation
-    `("syntax" ,(->sentence (syntax->datum $syntax))))
+    (sentence-written `("syntax" ,(->sentence (syntax->datum $syntax)))))
 
   (define (other->sentence $other)
     (format "#<~s>" $other))
@@ -215,12 +228,6 @@
   (define (list->sentences $list)
     (map*
       ->sentence
-      (lambda ($item) (list `("and" ,(->sentence $item))))
-      $list))
-
-  (define (normalize-list $list)
-    (map*
-      identity
-      (lambda ($item) `((and ,$item)))
+      (lambda ($item) (list (sentence-written `("and" ,(->sentence $item)))))
       $list))
 )
