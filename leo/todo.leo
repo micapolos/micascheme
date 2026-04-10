@@ -1,22 +1,14 @@
 todo
-  fix read problem with: space, newline
   custom read-handler
   custom write-handler
-  repl
-  fix todo in leo code
   fix check to raise proper exceptions with: cause, hint
-  fix leo-load-program to not drop annotations
+  implement parser for written form
   fix
     import, export, rename, and more
     in leo scheme
   make eval work
-  custom writer for
-    exceptions
-  improve syntax-error messages
-    to include usage examples
   comments
     line comment using colon
-    structural using comment
     block using: comment, parentheses
   customize remaining built-in syntaxes for leo
     syntax-rules
