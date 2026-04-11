@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.84
+    add missing set!
   v0.1.83
     differentiate between
       write which is complement to read
