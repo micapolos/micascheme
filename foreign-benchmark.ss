@@ -5,10 +5,11 @@
 
 (let*
   (
-    (int-size 4)
-    (bytevector-ref bytevector-u32-native-ref)
-    (bytevector-set! bytevector-u32-native-set!)
-    ($foreign-type 'unsigned-32)
+    (int-size 8)
+    (mask #xfffffffffffffff)
+    (bytevector-ref bytevector-s64-native-ref)
+    (bytevector-set! bytevector-s64-native-set!)
+    ($foreign-type 'iptr)
     ($size (string->number (car (command-line-arguments))))
     ($bytevector (make-immobile-bytevector (fx*/wraparound $size int-size) 0))
     ($address (object->reference-address $bytevector)))
@@ -24,9 +25,11 @@
           (else
             (let (($new-index (fx-/wraparound $index int-size)))
               (bytevector-set! $bytevector $new-index
-                (fx+/wraparound
-                  (bytevector-ref $bytevector $index)
-                  1))
+                (logand
+                  (fx*/wraparound
+                    (bytevector-ref $bytevector $index)
+                    123)
+                  mask))
               (loop $new-index)))))))
   (newline)
 
@@ -42,8 +45,10 @@
           (else
             (let (($new-index (fx-/wraparound $index int-size)))
               (foreign-set! $foreign-type $address $new-index
-                (fx+/wraparound
-                  (foreign-ref $foreign-type $address $index)
-                  1))
+                (logand
+                  (fx*/wraparound
+                    (foreign-ref $foreign-type $address $index)
+                    123)
+                  mask))
               (loop $new-index)))))))
   (newline))
