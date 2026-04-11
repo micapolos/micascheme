@@ -1,22 +1,22 @@
-(import (except (scheme) write) (check) (leo write))
+(import (scheme) (check) (leo print))
 
 (check
   (equal?
     (call-with-string-output-port
       (lambda ($port)
-        (write '(hello world) $port)))
+        (print '(hello world) $port)))
     "hello world\n"))
 
 (check
   (equal?
     (call-with-string-output-port
       (lambda ($port)
-        (write-line '(hello world) $port)))
+        (print-line '(hello world) $port)))
     "hello world\n"))
 
 (check
   (equal?
     (call-with-string-output-port
       (lambda ($port)
-        (write-line '() $port)))
-    "written null\n"))
+        (print-line '() $port)))
+    "null\n"))

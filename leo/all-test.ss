@@ -14,6 +14,7 @@
   (leo sentence)
   (leo code)
   (leo write)
+  (leo print)
   (leo test)
   (leo transform)
   (leo library)
