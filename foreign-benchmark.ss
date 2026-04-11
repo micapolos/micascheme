@@ -1,0 +1,49 @@
+(import
+  (scheme)
+  (foreign)
+  (syntaxes))
+
+(let*
+  (
+    (int-size 4)
+    (bytevector-ref bytevector-u32-native-ref)
+    (bytevector-set! bytevector-u32-native-set!)
+    ($foreign-type 'unsigned-32)
+    ($size (string->number (car (command-line-arguments))))
+    ($bytevector (make-immobile-bytevector (fx*/wraparound $size int-size) 0))
+    ($address (object->reference-address $bytevector)))
+  (display "Bytevector\n")
+  (bytevector-set! $bytevector (fx*/wraparound (fx-/wraparound $size 1) int-size) 1)
+  (write
+    (time
+      (let loop
+        (($index (fx*/wraparound (fx-/wraparound $size 1) int-size)))
+        (cond
+          ((fxzero? $index)
+            (bytevector-ref $bytevector $index))
+          (else
+            (let (($new-index (fx-/wraparound $index int-size)))
+              (bytevector-set! $bytevector $new-index
+                (fx+/wraparound
+                  (bytevector-ref $bytevector $index)
+                  1))
+              (loop $new-index)))))))
+  (newline)
+
+  (display "Foreign\n")
+  (bytevector-set! $bytevector (fx*/wraparound (fx-/wraparound $size 1) int-size) 1)
+  (write
+    (time
+      (let loop
+        (($index (fx* (fx-/wraparound $size 1) int-size)))
+        (cond
+          ((fxzero? $index)
+            (foreign-ref $foreign-type $address $index))
+          (else
+            (let (($new-index (fx-/wraparound $index int-size)))
+              (foreign-set! $foreign-type $address $new-index
+                (fx+/wraparound
+                  (foreign-ref $foreign-type $address $index)
+                  1))
+              (loop $new-index)))))))
+  (newline))
