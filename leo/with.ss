@@ -7,8 +7,8 @@
 
   (define-rules-syntax
     (keywords implicit)
-    ((with (implicit id ids ...) x xs ...)
-      (with-implicit (id ids ...) x xs ...))
+    ((with (implicit template-id ids ...) x xs ...)
+      (with-implicit (template-id ids ...) x xs ...))
     ((with x ...)
       (x ...)))
 )
