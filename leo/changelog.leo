@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.85
+    with implicit
   v0.1.84
     add missing set!
   v0.1.83
