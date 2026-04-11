@@ -66,6 +66,7 @@
       (leo syntax-error)
       (leo meta)
       (keyword)
+      (fixnum)
       (eof)
       (only (procedure) partial)
       (only (identifier) identifier-append)
