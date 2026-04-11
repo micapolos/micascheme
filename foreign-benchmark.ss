@@ -8,6 +8,8 @@
 ; is access using s64 / iptr and truncating to 60-bits ignoring the sign.
 ; but optimize-level must be 3 for foreign access to work.
 ; with optimize-level 2 it's 10x slower than bytevector
+; so, for scheme runtime it's better operate on bytevectors
+; and use foreign interface with c.
 
 (let*
   (
