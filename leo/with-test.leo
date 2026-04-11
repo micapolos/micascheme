@@ -10,4 +10,3 @@ check equal?
 check equal?
   with: string-append, "foo", "bar"
   "foobar"
-
