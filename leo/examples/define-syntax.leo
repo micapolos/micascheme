@@ -1,6 +1,6 @@
 import leo scheme
 
-define-syntax
+define-syntax rules
   when
     magic: a
     subtract: 0, a

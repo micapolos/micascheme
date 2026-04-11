@@ -28,7 +28,6 @@
       (leo library)
       (char)
       (keyword)
-      (syntaxes)
       (syntax-keywords)
       (boolean)
       (leo in)
