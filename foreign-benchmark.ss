@@ -3,6 +3,10 @@
   (foreign)
   (syntaxes))
 
+; conclusion
+; the fastest way to access memory on 64-bit architecture
+; is access using s64 / iptr and truncating to 60-bits ignoring the sign.
+
 (let*
   (
     (int-size 8)
