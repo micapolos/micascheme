@@ -42,6 +42,7 @@
       (leo print)
       (leo test)
       (leo if)
+      (leo set)
       (leo then)
       (leo document)
       (leo lambda)

@@ -9,6 +9,7 @@ test
   leo define-syntax
   leo define-record
   leo define-property
+  leo set
   leo if
   leo cond
   leo case
