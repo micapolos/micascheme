@@ -2,5 +2,5 @@
   (export version)
   (import (scheme))
 
-  (define version "v0.1.86")
+  (define version "v0.1.87")
 )
