@@ -1,6 +1,6 @@
 import leo scheme
 
-write bytevector
+print bytevector
   10, 20, 30
   40, 50, 60
   128

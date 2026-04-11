@@ -1,19 +1,19 @@
 import leo scheme
 
-write 'without logging
+print 'without logging
 
-write string-append
+print string-append
   "Hello, "
   "Leo!"
 
-write 'with logging
+print 'with logging
 
-write string-append
+print string-append
   logging "Hello, "
   logging "Leo!"
 
-write 'with logging and labels
+print 'with logging and labels
 
-write string-append
+print string-append
   logging first "Hello, "
   logging second "Leo!"

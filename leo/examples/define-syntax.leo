@@ -11,6 +11,6 @@ define-syntax
     magic: a, b, c
     string-append: a, b, c
 
-write `single argument` magic 10
-write `two arguments` magic: 10, 20
-write `three arguments` magic: "1", "2", "3"
+print `single argument` magic 10
+print `two arguments` magic: 10, 20
+print `three arguments` magic: "1", "2", "3"

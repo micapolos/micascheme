@@ -1,6 +1,6 @@
 import leo scheme
 
-write open-list
+print open-list
   "apple"
   "banana"
   "orange"

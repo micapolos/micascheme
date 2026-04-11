@@ -13,6 +13,6 @@ define
     from` author
     to` recipient
 
-write greeting "Alex Johnson"
-write greeting "John Appleseed"
-write greeting "Chris Parker"
+print greeting "Alex Johnson"
+print greeting "John Appleseed"
+print greeting "Chris Parker"

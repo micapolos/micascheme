@@ -5,6 +5,6 @@ import
     subtract odejmij
     from leo scheme
 
-%write dodaj: 2, 3
-%write odejmij: 5, 3
-%write multiply: 2, 3
+%print dodaj: 2, 3
+%print odejmij: 5, 3
+%print multiply: 2, 3

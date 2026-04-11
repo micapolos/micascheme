@@ -39,6 +39,7 @@
       (leo case)
       (leo cond)
       (leo write)
+      (leo print)
       (leo test)
       (leo if)
       (leo then)
