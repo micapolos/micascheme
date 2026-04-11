@@ -1,6 +1,10 @@
 import leo scheme
 
 quote changelog
+  v0.1.83
+    differentiate between
+      write which is complement to read
+      print designed to produce readable sentences
   v0.1.82
     implements free-syntax=?
   v0.1.81
