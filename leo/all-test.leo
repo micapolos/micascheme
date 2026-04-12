@@ -20,7 +20,7 @@ test
   leo math
   leo pair
   leo list
-  leo logging
+  leo printing
   leo parameterize
   leo bytevector
   leo eval
@@ -28,7 +28,6 @@ test
   leo syntax-case
   leo todo
   leo comment
-  leo logging
   leo transform-ftype
   leo ftype
   leo meta

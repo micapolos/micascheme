@@ -60,7 +60,7 @@
       (leo parameterize)
       (leo syntax-case)
       (leo eval)
-      (leo logging)
+      (leo printing)
       (leo define-record)
       (leo define-syntax)
       (leo define-property)

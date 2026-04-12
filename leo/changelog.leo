@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.92
+    add printing syntax
   v0.1.91
     adds: assert, assertion-violation
   v0.1.90
