@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.90
+    use colon instead of written list
   v0.1.89
     guard
   v0.1.88
