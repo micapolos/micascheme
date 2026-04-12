@@ -21,7 +21,7 @@
         ftype-set! ftype-any-set!
         syntax-case
         parameterize define-record define-syntax
-        list
+        list identifier-syntax
         predicate set!
         syntax-error
         meta)
@@ -63,6 +63,7 @@
       (leo define-property)
       (leo ftype)
       (leo syntax-error)
+      (leo identifier-syntax)
       (leo meta)
       (keyword)
       (fixnum)
