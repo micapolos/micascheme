@@ -1,6 +1,7 @@
 import leo scheme
 
 test
+  leo assert
   leo with
   leo lambda
   leo let
