@@ -13,6 +13,7 @@ test
   leo set
   leo if
   leo cond
+  leo guard
   leo case
   leo switch
   leo math
