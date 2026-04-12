@@ -2,7 +2,7 @@ todo
   custom read-handler
   custom write-handler
   fix check to raise proper exceptions with: cause, hint
-  implement parser for written form
+  reading and writing of pairs and improper lists
   fix
     import, export, rename, and more
     in leo scheme
