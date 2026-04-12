@@ -205,43 +205,43 @@
 (check
   (equal?
     (->sentence '(123))
-    '("written" ("list" "123"))))
+    '(":" "123")))
 
 (check
   (equal?
     (->sentence '(123 ()))
-    '("written" ("list" "123" ("written" "null")))))
+    '(":" "123" ("written" "null"))))
 
 (check
   (equal?
     (->sentence '(123 bar))
-    '("written" ("list" "123" "bar"))))
+    '(":" "123" "bar")))
 
 (check
   (equal?
     (->sentence '(123 (bar)))
-    '("written" ("list" "123" ("bar")))))
+    '(":" "123" ("bar"))))
 
 (parameterize ((skip-written? #t))
   (check
     (equal?
       (->sentence '(123))
-      '("list" "123")))
+      '(":" "123")))
 
   (check
     (equal?
       (->sentence '(123 ()))
-      '("list" "123" "null")))
+      '(":" "123" "null")))
 
   (check
     (equal?
       (->sentence '(123 bar))
-      '("list" "123" "bar")))
+      '(":" "123" "bar")))
 
   (check
     (equal?
       (->sentence '(123 (bar)))
-      '("list" "123" ("bar")))))
+      '(":" "123" ("bar")))))
 
 (check
   (equal?

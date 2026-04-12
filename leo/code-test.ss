@@ -58,7 +58,7 @@
 (check-code=? (line-code '(foo gar . bar)) "foo (gar, written and bar)")
 (check-code=? (line-code '(foo)) "foo ()")
 (check-code=? (line-code '(foo bar)) "foo bar")
-(check-code=? (line-code '((foo bar))) "written list foo bar")
+(check-code=? (line-code '((foo bar))) ": foo bar")
 (check-code=? (line-code '(foo (bar goo))) "foo bar goo")
 (check-code=? (line-code '(foo bar goo)) "foo (bar, goo)")
 (check-code=? (line-code '(foo bar (goo gar))) "foo (bar, goo gar)")
@@ -146,18 +146,18 @@
 (check-block-code '(foo bar) "foo bar")
 (check-block-code '(foo bar gar) "foo: bar, gar")
 (check-block-code '(foo bar ((gar zar)))
-  "foo: bar, written list gar zar")
+  "foo: bar, : gar zar")
 
 (parameterize ((code-line-limit 5))
   ; TODO: We want items to be comma separated, 5 in each line
   (check-block-code '(1 2 3 4 5 6 7 8 9 10)
-    "written list" "  1" "  2" "  3" "  4" "  5" "  6" "  7" "  8" "  9" "  10")
+    ":" "  1" "  2" "  3" "  4" "  5" "  6" "  7" "  8" "  9" "  10")
 
   ; TODO: We want to wrap v6-v10 in an intented newline
   (check-block-code '(v1 (v2 (v3 (v4 (v5 (v6 (v7 (v8 (v9 v10)))))))))
      "v1 v2 v3 v4 v5 v6 v7 v8 v9 v10"))
 
-(check-block-code '((x 10 20) (y 30 40)) "written list" "  x: 10, 20" "  y: 30, 40")
+(check-block-code '((x 10 20) (y 30 40)) ":" "  x: 10, 20" "  y: 30, 40")
 (check-block-code '(foo (x 10 20) (y 30 40)) "foo" "  x: 10, 20" "  y: 30, 40")
 
 (check-block-code (bytevector) "written bytevector:")
