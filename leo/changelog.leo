@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.88
+    identifier-syntax
   v0.1.87
     define-syntax: rules, case
   v0.1.86
