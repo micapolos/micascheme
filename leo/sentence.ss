@@ -189,14 +189,17 @@
   (define (record->sentence $record)
     (lets
       ($rtd (record-rtd $record))
+      ($name (symbol->string (record-type-name $rtd)))
       ($sentence
-        `(
-          ,(symbol->string (record-type-name $rtd))
-          .
-          ,(list->sentences
-            (map-with
-              ($index (iota (vector-length (record-type-field-names $rtd))))
-              ((record-accessor $rtd $index) $record)))))
+        (if (zero? (vector-length (record-type-field-names $rtd)))
+          $name
+          `(
+            ,(symbol->string (record-type-name $rtd))
+            .
+            ,(list->sentences
+              (map-with
+                ($index (iota (vector-length (record-type-field-names $rtd))))
+                ((record-accessor $rtd $index) $record))))))
       (cond
         ((skip-written?) $sentence)
         (else (sentence-written `("record" ,$sentence))))))

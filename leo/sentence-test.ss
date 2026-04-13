@@ -303,6 +303,13 @@
         ("char" "space")
         "\"foo\""))))
 
+(data marker)
+
+(check
+  (equal?
+    (->sentence marker)
+    '("written" ("record" "marker"))))
+
 (data (point x y))
 
 (check
