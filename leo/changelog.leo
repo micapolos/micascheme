@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.93
+    data make constructor
   v0.1.92
     add printing syntax
   v0.1.91
