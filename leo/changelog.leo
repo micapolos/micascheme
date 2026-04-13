@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.95
+    fix writer for record with no fields
   v0.1.94
     switch? form
   v0.1.93
