@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.94
+    switch? form
   v0.1.93
     data make constructor
   v0.1.92
