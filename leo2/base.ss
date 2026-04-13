@@ -4,6 +4,7 @@
   (export
     (import
       (except (micascheme)
+        make-error
         compile
         expand
         atom?

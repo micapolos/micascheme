@@ -46,7 +46,7 @@
     type-matches? types-match?
     types-match
 
-    make-list-of
+    make-list-of-type
     make-struct-type
 
     type-line
@@ -256,7 +256,7 @@
       ((else $other)
         (throw type-value $other))))
 
-  (define (make-list-of $arity $item-type)
+  (define (make-list-of-type $arity $item-type)
     (arrow
       (make-list $arity $item-type)
       (list (list-of $item-type))))

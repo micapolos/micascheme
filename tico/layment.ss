@@ -5,7 +5,7 @@
     test-layment
     test-parameter-layment
 
-    make-layment
+    make-layout-layment
     empty-layment
     literal->layment
     variable-layment
@@ -40,19 +40,19 @@
   (data (layment layout compilation))
 
   (define-rule-syntax (test-layment $name)
-    (make-layment
+    (make-layout-layment
       (simple-layout)
       (test-compilation $name)))
 
   (define-rule-syntax (test-parameter-layment $name)
-    (make-layment
+    (make-layout-layment
       (simple-layout)
       (test-parameter-compilation $name)))
 
   (define (empty-layment)
     (layment (empty-layout) #f))
 
-  (define-case-syntax (make-layment $layout $body)
+  (define-case-syntax (make-layout-layment $layout $body)
     (lets
       ($var (generate-temporary))
       #`(lets
@@ -66,11 +66,11 @@
       (literal->compilation $literal)))
 
   (define (variable-layment $layout $datum $index)
-    (make-layment $layout
+    (make-layout-layment $layout
       (variable-compilation $datum $index)))
 
   (define (layout-datum->layment $layout $datum)
-    (make-layment $layout (datum->compilation $datum)))
+    (make-layout-layment $layout (datum->compilation $datum)))
 
   (define (bindings-layout-datum->layment $binding-layments $layout $datum)
     (layment $layout
@@ -99,7 +99,7 @@
         (layout-application
           (layment-layout $target)
           (map layment-layout $args)))
-      (make-layment $layout
+      (make-layout-layment $layout
         (compilation-application
           (layout-arity $layout)
           (layment-compilation $target)
@@ -112,7 +112,7 @@
       $body-layments))
 
   (define (scope-layment-abstraction $scope $param-layments $body-layments)
-    (make-layment
+    (make-layout-layment
       (layout-abstraction
         (map layment-layout $param-layments)
         (map layment-layout $body-layments))
@@ -122,11 +122,11 @@
         (map layment-compilation $body-layments))))
 
   (define (parameter-layment $layout $datum)
-    (make-layment $layout
+    (make-layout-layment $layout
       (parameter-compilation $datum)))
 
   (define (generate-parameter-layment $layout)
-    (make-layment $layout
+    (make-layout-layment $layout
       (generate-parameter-compilation)))
 
   (define (layment-parameter $layment)
@@ -135,12 +135,12 @@
       (compilation-parameter (layment-compilation $layment))))
 
   (define (layment-variable $layment $index)
-    (make-layment
+    (make-layout-layment
       (layment-layout $layment)
       (compilation-variable (layment-compilation $layment) $index)))
 
   (define (layment-args $layments)
-    (make-layment
+    (make-layout-layment
       (layout-args
         (map layment-layout $layments))
       (compilation-args
@@ -148,7 +148,7 @@
           (map layment-compilation $layments)))))
 
   (define (layment-struct $name $field-layments)
-    (make-layment
+    (make-layout-layment
       (layout-struct $name
         (map layment-layout $field-layments))
       (compilation-struct $name
@@ -159,7 +159,7 @@
     (lets
       ($layout (layment-layout $layment))
       ($layout-field (layout-ref $layout $index))
-      (make-layment
+      (make-layout-layment
         (layout-field-layout $layout-field)
         (compilation-ref
           (struct-layout-size $layout)

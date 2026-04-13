@@ -2,7 +2,7 @@
   (export
     type?
 
-    (rename (make-primitive-type primitive-type))
+    (rename (%make-primitive-type primitive-type))
     primitive-type?
     primitive-type-gensym
     primitive-type-datum
@@ -82,13 +82,13 @@
       pair?
       symbol?))
 
-  (define make-primitive-type
+  (define %make-primitive-type
     (case-lambda
       (($gensym $datum)
         (primitive-type $gensym $datum))))
 
   (define-rule-syntax (gentype datum)
-    (make-primitive-type (gensym) 'datum))
+    (%make-primitive-type (gensym) 'datum))
 
   (define-syntax (define-type $syntax)
     (syntax-case $syntax ()

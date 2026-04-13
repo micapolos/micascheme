@@ -10,7 +10,7 @@
     empty-struct-layout
     struct-layout-reverse
     struct-layout+layout
-    make-struct-layout
+    make-struct-list-layout
 
     layout-empty?
     layout-not-empty?
@@ -89,7 +89,7 @@
             (push $fields (layout-field $layout $size))
             (+ $size 1))))))
 
-  (define (make-struct-layout $layouts)
+  (define (make-struct-list-layout $layouts)
     (fold-left
       struct-layout+layout
       empty-struct-layout
@@ -100,8 +100,8 @@
 
   (define (layout-abstraction $param-layouts $body-layouts)
     (lambda-layout
-      (make-struct-layout $param-layouts)
-      (make-struct-layout $body-layouts)))
+      (make-struct-list-layout $param-layouts)
+      (make-struct-list-layout $body-layouts)))
 
   (define (layout-application $target $args)
     (switch $target
@@ -124,7 +124,7 @@
         $layouts)))
 
   (define (layout-struct $name $field-layouts)
-    (make-struct-layout (reverse $field-layouts)))
+    (make-struct-list-layout (reverse $field-layouts)))
 
   (define (layout-ref $layout $index)
     (list-ref

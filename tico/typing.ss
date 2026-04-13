@@ -96,7 +96,7 @@
 
   (define (static-typing $type)
     (typing $type
-      (make-layment
+      (make-layout-layment
         (type->layout $type)
         (throw not-static))))
 
@@ -320,7 +320,7 @@
 
   (define (type-compilation->layment $type $compilation)
     (typing $type
-      (make-layment
+      (make-layout-layment
         (type->layout $type)
         $compilation)))
 

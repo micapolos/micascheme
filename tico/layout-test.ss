@@ -63,7 +63,7 @@
         (layout-field (simple-layout) 2))
       3)))
 
-; --- make-struct-layout
+; --- make-struct-list-layout
 
 (check
   (equal?
@@ -72,7 +72,7 @@
 
 (check
   (equal?
-    (make-struct-layout
+    (make-struct-list-layout
       (stack
         (simple-layout)
         (empty-layout)
@@ -94,8 +94,8 @@
       (list (empty-layout) (simple-layout))
       (list (simple-layout)))
     (lambda-layout
-      (make-struct-layout (list (empty-layout) (simple-layout)))
-      (make-struct-layout (list (simple-layout))))))
+      (make-struct-list-layout (list (empty-layout) (simple-layout)))
+      (make-struct-list-layout (list (simple-layout))))))
 
 ; --- layout-application
 
@@ -104,9 +104,9 @@
     (layout-application
       (lambda-layout
         (list (empty-layout) (simple-layout))
-        (make-struct-layout (stack (simple-layout))))
+        (make-struct-list-layout (stack (simple-layout))))
       (list (empty-layout) (simple-layout)))
-    (make-struct-layout (stack (simple-layout)))))
+    (make-struct-list-layout (stack (simple-layout)))))
 
 ; --- type->layout
 

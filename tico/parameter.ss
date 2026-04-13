@@ -1,6 +1,6 @@
 (library (tico parameter)
   (export parameter parameter?)
-  (import (micascheme))
+  (import (except (micascheme) make-parameter))
 
   (data (parameter))
 )

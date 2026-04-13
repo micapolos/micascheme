@@ -12,14 +12,14 @@
 (check
   (equal?
     (test-layment foo)
-    (make-layment
+    (make-layout-layment
       (simple-layout)
       (test-compilation foo))))
 
 (check
   (equal?
     (test-parameter-layment foo)
-    (make-layment
+    (make-layout-layment
       (simple-layout)
       (test-parameter-compilation foo))))
 
@@ -44,10 +44,10 @@
   (equal?
     (bindings-layout-datum->layment
       (stack
-        (make-layment (simple-layout) (constant-compilation 'foo (constant "foo")))
-        (make-layment (empty-layout) (constant-compilation 'foo (constant "foo")))
-        (make-layment (simple-layout) (parameter-compilation 'foo))
-        (make-layment (simple-layout) (constant-compilation 'bar (constant "bar"))))
+        (make-layout-layment (simple-layout) (constant-compilation 'foo (constant "foo")))
+        (make-layout-layment (empty-layout) (constant-compilation 'foo (constant "foo")))
+        (make-layout-layment (simple-layout) (parameter-compilation 'foo))
+        (make-layout-layment (simple-layout) (constant-compilation 'bar (constant "bar"))))
       (simple-layout)
       '(string-append foo bar))
     (layment
@@ -61,13 +61,13 @@
 
 (check
   (equal?
-    (make-layment (empty-layout)
+    (make-layout-layment (empty-layout)
       (throw error))
     (layment (empty-layout) #f)))
 
 (check
   (equal?
-    (make-layment (simple-layout)
+    (make-layout-layment (simple-layout)
       (literal->compilation "foo"))
     (layment
       (simple-layout)
@@ -106,7 +106,7 @@
         (literal->layment "foo")
         (empty-layment)
         (literal->layment "bar")))
-    (make-layment
+    (make-layout-layment
       (simple-layout)
       (compilation-application
         (arity 1)
@@ -122,16 +122,16 @@
     (layment-application
       (layment-abstraction
         (list
-          (make-layment (simple-layout) (parameter-compilation 'v1))
-          (make-layment (simple-layout) (parameter-compilation 'v2)))
+          (make-layout-layment (simple-layout) (parameter-compilation 'v1))
+          (make-layout-layment (simple-layout) (parameter-compilation 'v2)))
         (list
-          (make-layment
+          (make-layout-layment
             (simple-layout)
             (variable-compilation 'v1 0))))
       (list
         (literal->layment "foo")
         (literal->layment "bar")))
-    (make-layment
+    (make-layout-layment
       (layout-application
         (layout-abstraction
           (list (simple-layout) (simple-layout))
@@ -156,7 +156,7 @@
   (equal?
     (layment-args
       (list))
-    (make-layment
+    (make-layout-layment
       (layout-args (list))
       (throw error))))
 
@@ -167,7 +167,7 @@
         (literal->layment 128)
         (empty-layment)
         (variable-layment (simple-layout) 'foo 1)))
-    (make-layment
+    (make-layout-layment
       (layout-args
         (list
           (literal->layout 128)
@@ -183,7 +183,7 @@
 (check
   (equal?
     (layment-struct 'foo (list))
-    (make-layment
+    (make-layout-layment
       (layout-struct 'foo (list))
       (throw error))))
 
@@ -194,7 +194,7 @@
         (literal->layment 128)
         (empty-layment)
         (literal->layment "foo")))
-    (make-layment
+    (make-layout-layment
       (layout-struct 'foo
         (list
           (literal->layout 128)
@@ -225,7 +225,7 @@
               (empty-layout)
               (literal->layout "bar")))
           2))
-      (make-layment
+      (make-layout-layment
         (layout-field-layout $layout-field)
         (compilation-ref
           2
@@ -242,7 +242,7 @@
     (with-tmps
       (layment-parameter (literal->layment "foo")))
     (with-tmps
-      (make-layment
+      (make-layout-layment
         (layment-layout (literal->layment "foo"))
         (compilation-parameter
           (layment-compilation (literal->layment "foo")))))))

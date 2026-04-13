@@ -67,7 +67,7 @@
 
     proc-scope-specialize?
     proc-scope-type-substitute)
-  (import (micascheme))
+  (import (except (micascheme) make-record-type))
 
   (data in-variance)
   (data out-variance)

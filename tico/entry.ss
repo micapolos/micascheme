@@ -46,7 +46,7 @@
       ($body-compilation (layment-compilation $body-layment))
       (typing
         (typing-type $body-typing)
-        (make-layment
+        (make-layout-layment
           (layment-layout $body-layment)
           (compilation
             (arity 1)

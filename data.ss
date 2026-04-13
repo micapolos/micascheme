@@ -24,14 +24,16 @@
             (name-string (symbol->string (datum name)))
             (name-syntax (datum->syntax #'id name-string))
             (constructor-identifier #'name)
+            (make-identifier (identifier-append #'name #'make #'- #'name))
             (predicate-identifier (identifier-append #'name #'name #'?))
-            #`(define-values (#,constructor-identifier #,predicate-identifier)
+            #`(define-values (#,constructor-identifier #,make-identifier #,predicate-identifier)
               (let ((rtd (make-record-type #,name-syntax '())))
                 (record-writer rtd
                   (lambda (record port wr)
                     (display #,name-syntax port)))
                 rtd-body ...
                 (values
+                  ((record-constructor rtd))
                   ((record-constructor rtd))
                   (record-predicate rtd))))))
         ((id (name field ... . list-field))
@@ -127,6 +129,8 @@
                     (record-constructor #,rtd-name)))
                 #`(begin
                   (define name
+                    (record-constructor #,rtd-name))
+                  (define #,make-name
                     (record-constructor #,rtd-name))))
               (define #,predicate-name
                 (record-predicate #,rtd-name))
