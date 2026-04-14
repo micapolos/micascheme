@@ -1,6 +1,6 @@
 import leo scheme
 
-define n 10
+define n string->number car with command-line-arguments
 
 print `calculating fibonacci` n
 
@@ -8,8 +8,8 @@ time print `result is`
   let fibonacci
     with number n
     if
-      less?: number, 2
+      fx<: number, 2
       number
-      add
-        fibonacci subtract: number, 1
-        fibonacci subtract: number, 2
+      fx+/wraparound
+        fibonacci fx-/wraparound: number, 1
+        fibonacci fx-/wraparound: number, 2
