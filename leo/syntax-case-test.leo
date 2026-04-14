@@ -50,3 +50,21 @@ check syntax=?
       magic: a, b
       syntax two: a, b
   syntax two: "foo", "bar"
+
+check syntax=?
+  syntax-case?
+    syntax magic: "foo"
+    keywords: magic
+    when
+      magic a
+      syntax one a
+  syntax one "foo"
+
+check equal?
+  syntax-case?
+    syntax magic: "foo", "bar"
+    keywords: magic
+    when
+      magic a
+      syntax one a
+  #f
