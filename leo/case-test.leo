@@ -2,6 +2,8 @@ import
   only: equal?, values, when, else, from scheme
   leo check
   leo case
+  leo let
+  leo with
 
 check equal?
   case
@@ -59,3 +61,10 @@ check equal?
       "other"
   "other"
 
+let
+  with one 1
+  check equal?
+    case one
+      when: 1, "one"
+      when: 2, "two"
+    "one"

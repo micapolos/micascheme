@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  latest
+    case with inline expr
   v0.1.96
     leo base library
   v0.1.95

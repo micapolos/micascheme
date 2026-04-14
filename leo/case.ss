@@ -2,10 +2,15 @@
   (export case)
   (import
     (rename (scheme) (case %case))
-    (syntaxes))
+    (syntaxes)
+    (keyword))
 
   (define-rules-syntax
     (keywords when else values)
+
+    ((case (id . x))
+      (keyword? id)
+      (case id . x))
 
     ((case expr (when (values v ...) x xs ...) ... (else e es ...))
       (%case expr ((v ...) x xs ...) ... (else e es ...)))
