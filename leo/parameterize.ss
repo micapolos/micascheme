@@ -9,6 +9,6 @@
   (define-rules-syntax
     (keywords in)
 
-    ((parameterize binding ... (in x xs ...))
-      (%parameterize (binding ...) x xs ...)))
+    ((parameterize (id expr) ... (in x xs ...))
+      (%parameterize ((id expr) ...) x xs ...)))
 )
