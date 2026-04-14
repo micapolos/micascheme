@@ -1,7 +1,7 @@
 import leo scheme
 
 quote changelog
-  latest
+  v0.1.100
     improved forms: let, with-syntax, with-identifier
   v0.1.99
     syntax-case?
