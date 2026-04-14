@@ -451,15 +451,15 @@ Records in Leo are custom data structures that group related fields together.
 By default, record fields cannot be changed after the record is created.
 
 ```leo
-define record point: x, y
+define-record point: x, y
 
-define my-point point: x 10, y 20
+define my-point make-point: x 10, y 20
 
 check point? my-point
 check not point? "not a point"
 
-check equal?: point x my-point, 10
-check equal?: point y my-point, 20
+check equal?: point-x my-point, 10
+check equal?: point-y my-point, 20
 ```
 
 ### Mutable
@@ -467,20 +467,20 @@ check equal?: point y my-point, 20
 To allow fields to be updated, prefix them with the `mutable` keyword during definition.
 
 ```leo
-define record point
+define-record point
   mutable x
   mutable y
 
-define my-point point: x 10, x 20
+define my-point make-point: x 10, x 20
 
-check equal?: point x my-point, 10
-check equal?: point y my-point, 20
+check equal?: point-x my-point, 10
+check equal?: point-y my-point, 20
 
-point set! x: my-point, 110
-point set! y: my-point, 120
+point set-point-x!: my-point, 110
+point set-point-y!: my-point, 120
 
-check equal?: point x my-point, 110
-check equal?: point y my-point, 120
+check equal?: point-x my-point, 110
+check equal?: point-y my-point, 120
 ```
 
 ### Typed
@@ -488,7 +488,7 @@ check equal?: point y my-point, 120
 You can optionally enforce types on record fields.
 
 ```leo
-define record color
+define-record color
   mutable unsigned-8 red
   mutable unsigned-8 green
   mutable unsigned-8 blue
@@ -499,7 +499,7 @@ define record color
 TODO
 
 ```leo
-define syntax
+define-syntax rules
   when
     magic s
     string-append: "Hello, ", s, "!"

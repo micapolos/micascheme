@@ -6,8 +6,8 @@ print `calculating fibonacci` n
 
 time print `result is`
   let fibonacci
-    with number n
-    if
+    number n
+    in if
       fx<: number, 2
       number
       fx+/wraparound
