@@ -19,4 +19,7 @@ todo
     leo base
     leo string
     etc ...
+  replace
+    cause-condition, hint-condition
+    with causes-condition
   documentation
