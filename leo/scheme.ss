@@ -4,7 +4,7 @@
   (export
     (import
       (except (chezscheme)
-        assert assertion-violation
+        assert error assertion-violation
         library import export display display-string
         top-level-program
         except only rename alias prefix add-prefix drop-prefix
@@ -31,7 +31,7 @@
       (keyword)
       (syntax-keywords)
       (boolean)
-      (leo assert)
+      (leo error)
       (leo in)
       (leo recursive)
       (leo sequential)

@@ -1,7 +1,8 @@
 import leo scheme
 
 quote changelog
-  latest
+  v0.1.97
+    new forms: error
     optimize core forms for simple usage: case, if, syntax-case
   v0.1.96
     leo base library

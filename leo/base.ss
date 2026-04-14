@@ -14,7 +14,7 @@
       (leo then)
       (leo cond)
       (leo case)
-      (leo assert)
+      (leo error)
       (leo then)
       (leo with)
 
