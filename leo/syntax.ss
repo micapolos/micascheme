@@ -1,13 +1,14 @@
 (library
   (leo syntax)
-  (export with-syntax)
+  (export match with-syntax with-identifier)
   (import
     (rename (scheme)
       (with-syntax %with-syntax)
       (with-implicit %with-implicit))
-    (leo with)
+    (leo in)
     (keyword)
     (syntax-keywords)
+    (syntax)
     (syntaxes))
   (export
     (import
@@ -25,8 +26,13 @@
           define-keywords)
         (syntax=? free-syntax=?))))
 
+  (define-keyword match)
+
   (define-rules-syntaxes
-    (keywords with)
-    ((with-syntax (with (pattern expr) ...) x xs ...)
-      (%with-syntax ((pattern expr) ...) x xs ...)))
+    (keywords match in)
+    ((with-syntax (match pattern expr) ... (in x xs ...))
+      (%with-syntax ((pattern expr) ...) x xs ...))
+    ((with-identifier (id expr) ... (in x xs ...))
+      (for-all identifier? #'(id ...))
+      (%with-syntax ((id expr) ...) x xs ...)))
 )

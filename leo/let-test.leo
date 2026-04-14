@@ -6,6 +6,7 @@ import
   leo with
   leo check
   leo if
+  leo in
 
 check equal?
   let
@@ -16,12 +17,18 @@ check equal?
   "Hello, world!"
 
 check equal?
+  let
+    hello "Hello"
+    world "world"
+    in string-append: hello, ", ", world, "!"
+  "Hello, world!"
+
+check equal?
   let*
-    with
-      hello "Hello"
-      world "world"
-      hello-world string-append: hello, ", ", world
-    string-append: hello-world, "!"
+    hello "Hello"
+    world "world"
+    hello-world string-append: hello, ", ", world
+    in string-append: hello-world, "!"
   "Hello, world!"
 
 check equal?
@@ -52,6 +59,17 @@ check equal?
   let fibonacci
     with number 10
     if
+      <: number, 2
+      number
+      +
+        fibonacci -: number, 1
+        fibonacci -: number, 2
+  55
+
+check equal?
+  let fibonacci
+    number 10
+    in if
       <: number, 2
       number
       +
