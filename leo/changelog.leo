@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.98
+    add forms: with-syntax, with-implicit
   v0.1.97
     new forms: error
     optimize core forms for simple usage: case, if, syntax-case
