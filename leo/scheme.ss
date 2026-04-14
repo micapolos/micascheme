@@ -25,6 +25,7 @@
         list identifier-syntax
         predicate set!
         syntax-error
+        with-syntax
         meta)
       (leo library)
       (char)

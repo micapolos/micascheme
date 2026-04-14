@@ -32,5 +32,4 @@ test
   leo transform-ftype
   leo ftype
   leo meta
-  leo with-implicit
   leo base
