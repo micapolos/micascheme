@@ -1,12 +1,12 @@
 (library (leo condition)
-  (export write-condition)
+  (export print-condition)
   (import
-    (except (scheme) write)
+    (scheme)
     (lets)
     (condition)
-    (leo write))
+    (leo print))
 
-  (define (write-condition $condition $port)
+  (define (print-condition $condition $port)
     (lets
       ($datum (condition->datum $condition))
       ($datum
@@ -17,7 +17,7 @@
           `(error ,@(cdr $datum))
           $datum))
       (parameterize ((print-gensym #f))
-        (write
+        (print
           $datum
           $port))))
 )

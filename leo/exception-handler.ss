@@ -5,6 +5,6 @@
     (leo condition))
 
   (define (leo-exception-handler $condition)
-    (write-condition $condition (console-output-port))
+    (print-condition $condition (console-output-port))
     (reset))
 )

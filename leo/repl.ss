@@ -61,7 +61,7 @@
               (read-until-newline (console-input-port))
               (flush-output-port)
               (display ansi-bright-red-string)
-              (write-condition raised-condition prefixed-port)
+              (print-condition raised-condition prefixed-port)
               (flush-output-port prefixed-port)
               (display ansi-black-string)
               (loop)))))

@@ -25,6 +25,7 @@ test
   leo bytevector
   leo eval
   leo display
+  leo syntax
   leo syntax-case
   leo todo
   leo comment
@@ -32,3 +33,4 @@ test
   leo ftype
   leo meta
   leo with-implicit
+  leo base
