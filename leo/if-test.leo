@@ -1,8 +1,10 @@
 import
-  except: if, from scheme
+  only: equal?, else, from scheme
   leo check
   leo if
   leo then
+  leo let
+  leo with
 
 check equal?
   if
@@ -30,3 +32,12 @@ check equal?
       40
       "not OK"
   "OK"
+
+let
+  with true? 12
+  check equal?
+    if true?
+      then "true"
+      else "false"
+    "true"
+

@@ -2,7 +2,7 @@ import leo scheme
 
 quote changelog
   latest
-    case with inline expr
+    optimize core forms for simple usage: case, if, syntax-case
   v0.1.96
     leo base library
   v0.1.95
