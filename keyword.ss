@@ -2,28 +2,33 @@
   (export
     keyword
     keyword?
+    keywords?
     free-keyword?
+    free-keywords?
     keyword-append
     keyword-replace
     keyword...?)
   (import
     (scheme)
     (syntax)
+    (syntaxes)
     (identifier))
 
-  (define-rule-syntax (keyword? x)
-    (identifier? #'x))
-
-  (define-rule-syntax (keyword x)
-    #'x)
-
-  (define-rule-syntax (free-keyword? x)
-    (and
-      (keyword? x)
-      (free-identifier=? #'x (datum->syntax #'x 'x))))
-
-  (define-rule-syntax (keyword-append tpl part ...)
-    (identifier-append #'tpl #'part ...))
+  (define-rules-syntaxes
+    ((keyword x)
+      #'x)
+    ((keyword? x)
+      (identifier? #'x))
+    ((keywords? x ...)
+      (begin (keyword? x) ...))
+    ((free-keyword? x)
+      (and
+        (keyword? x)
+        (free-identifier=? #'x (datum->syntax #'x 'x))))
+    ((free-keywords? x ...)
+      (begin (free-keyword? x) ...))
+    ((keyword-append tpl part ...)
+      (identifier-append #'tpl #'part ...)))
 
   (define-rule-syntax (keyword-replace old new body)
     (let-syntax

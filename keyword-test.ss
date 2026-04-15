@@ -6,6 +6,9 @@
 (check (equal? (keyword? 123) #f))
 (check (equal? (keyword? '(foo bar)) #f))
 
+(check (equal? (keywords? foo bar) #t))
+(check (equal? (keywords? foo 123) #f))
+
 (check (free-identifier=? (keyword-append here +) (keyword +)))
 (check (free-identifier=? (keyword-append here string - append) (keyword string-append)))
 
