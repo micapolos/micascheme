@@ -38,3 +38,11 @@ check free-syntax=?
     bar syntax gar
     in syntax foo bar
   syntax goo gar
+
+
+check free-syntax=?
+  with-identifier*
+    foo syntax goo
+    bar syntax foo
+    in syntax foo bar
+  syntax goo goo
