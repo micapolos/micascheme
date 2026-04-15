@@ -23,3 +23,19 @@ todo
     cause-condition, hint-condition
     with causes-condition
   documentation
+  consider this when reading quasiquotes
+    every quasiquote must have a closing unquote at every leaf
+    examples
+      `quoted sentence`
+      `circle
+        radius` 10
+        center point
+          x` 20
+          y` 30
+          z undefined`
+    do not read 'quote symbol as quote
+    let it be explicit like syntax
+    rename
+      quasiquote to begin-quote
+      unquote to end-quote
+      unquote-splicing to end-quote-splicing
