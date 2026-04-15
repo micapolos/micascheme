@@ -1,9 +1,9 @@
 import leo scheme
 
 quote changelog
-  v0.1.101
+  v0.1.102
     write non-null list terminator using trailing dot
-    new forms: keywords?, free-keywords?
+    new forms: keywords?, free-keywords?, with-syntax*, with-identifier*
   v0.1.100
     improved forms: let, with-syntax, with-identifier
   v0.1.99
