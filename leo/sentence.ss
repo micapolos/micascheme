@@ -239,8 +239,5 @@
       ((else $other) (other->sentence $other))))
 
   (define (list->sentences $list)
-    (map*
-      ->sentence
-      (lambda ($item) (list (sentence-written `("and" ,(->sentence $item)))))
-      $list))
+    (map* ->sentence ->sentence $list))
 )

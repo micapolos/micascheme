@@ -80,7 +80,7 @@
 (check
   (equal?
     (sentence-quotify '("bar" (unquote . foo)))
-    '("bar`" ("written" ("and" "foo")))))
+    '("bar`" . "foo")))
 
 (check
   (equal?
@@ -359,13 +359,13 @@
 (check
   (equal?
     (list->sentences 123)
-    '(("written" ("and" "123")))))
+    "123"))
 
 (parameterize ((skip-written? #t))
   (check
     (equal?
       (list->sentences 123)
-      '(("and" "123")))))
+      "123")))
 
 (check
   (equal?
@@ -375,13 +375,13 @@
 (check
   (equal?
     (list->sentences '(1 2 . 3))
-    '("1" "2" ("written" ("and" "3")))))
+    '("1" "2" . "3")))
 
 (parameterize ((skip-written? #t))
   (check
     (equal?
       (list->sentences '(1 2 . 3))
-      '("1" "2" ("and" "3")))))
+      '("1" "2" . "3"))))
 
 (let ()
   (define-ftype point (struct (x unsigned-8) (y unsigned-8)))

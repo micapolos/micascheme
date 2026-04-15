@@ -54,8 +54,8 @@
 (check-code=? (line-code "") "\"\"")
 (check-code=? (line-code "foo") "\"foo\"")
 
-(check-code=? (line-code '(foo . bar)) "foo written and bar")
-(check-code=? (line-code '(foo gar . bar)) "foo (gar, written and bar)")
+(check-code=? (line-code '(foo . bar)) "foo bar.")
+(check-code=? (line-code '(foo gar . bar)) "foo (gar, bar.)")
 (check-code=? (line-code '(foo)) "foo ()")
 (check-code=? (line-code '(foo bar)) "foo bar")
 (check-code=? (line-code '((foo bar))) ": foo bar")
@@ -67,7 +67,7 @@
 
 (check-code=? (line-code (box 123)) "written box 123")
 (check-code=? (line-code (box '(foo bar))) "written box foo bar")
-(check-code=? (line-code (box '(foo . bar))) "written box foo written and bar")
+(check-code=? (line-code (box '(foo . bar))) "written box foo bar.")
 (check-code=? (line-code (box '(foo bar gar))) "written box foo (bar, gar)")
 
 (check-code=? (line-code (bytevector)) "written bytevector ()")
@@ -76,7 +76,7 @@
 (check-code=? (line-code (vector)) "written vector ()")
 (check-code=?
   (line-code (vector '() #t 123 #\a "foo" 'foo '(foo bar) '(foo . bar)))
-  "written vector (written null, written true, 123, written char a, \"foo\", foo, foo bar, foo written and bar)")
+  "written vector (written null, written true, 123, written char a, \"foo\", foo, foo bar, foo bar.)")
 
 (check-code=?
   (line-code '(circle (radius 10) (center (point (x 10) (y 20)))))
@@ -93,9 +93,10 @@
 
 (check-space-line-code 2 '(foo bar) "foo bar")
 (check-space-line-code-false? 2 '((foo bar)))
-(check-space-line-code-false? 2 '(foo . bar))
+(check-space-line-code 2 '(foo . bar) "foo bar.")
+(check-space-line-code-false? 3 '(foo bar . gar))
 (check-space-line-code 3 '(foo (bar goo)) "foo bar goo")
-(check-space-line-code 3 '(foo (bar goo)) "foo bar goo")
+(check-space-line-code 3 '(foo (bar . goo)) "foo bar goo.")
 (check-space-line-code-false? 3 '(foo))
 (check-space-line-code-false? 3 '(foo bar goo))
 
@@ -126,7 +127,13 @@
 (check-colon-line-code 5 (vector '(foo bar gar)) "written vector foo: bar, gar")
 
 (check-colon-line-code 2 '(foo bar) "foo bar")
+(check-colon-line-code 2 '(foo . bar) "foo bar.")
 (check-colon-line-code 3 '(foo bar gar) "foo: bar, gar")
+(check-colon-line-code 3 '(foo bar . gar) "foo: bar, gar.")
+(check-colon-line-code 4 '(foo (bar . gar) zar) "foo: bar gar., zar")
+(check-colon-line-code 4 '(foo (bar . gar) . zar) "foo: bar gar., zar.")
+(check-colon-line-code 5 '(foo (bar . gar) (zar . tar)) "foo: bar gar., zar tar.")
+(check-colon-line-code-false? 5 '(foo (bar gar . zar) var))
 (check-colon-line-code-false? 4 '((foo bar) (goo gar)))
 (check-colon-line-code-false? 2 '(1 bar))
 (check-colon-line-code-false? 3 '(1 foo bar))
@@ -144,7 +151,9 @@
 (check-block-code "foo" "\"foo\"")
 (check-block-code 'foo "foo")
 (check-block-code '(foo bar) "foo bar")
+(check-block-code '(foo . bar) "foo bar.")
 (check-block-code '(foo bar gar) "foo: bar, gar")
+(check-block-code '(foo bar . gar) "foo: bar, gar.")
 (check-block-code '(foo bar ((gar zar)))
   "foo: bar, : gar zar")
 
@@ -156,6 +165,46 @@
   ; TODO: We want to wrap v6-v10 in an intented newline
   (check-block-code '(v1 (v2 (v3 (v4 (v5 (v6 (v7 (v8 (v9 v10)))))))))
      "v1 v2 v3 v4 v5 v6 v7 v8 v9 v10"))
+
+(parameterize ((code-line-limit 3))
+  (check-block-code '(foo 1 2)
+    "foo: 1, 2")
+  (check-block-code '(foo 1 2 3)
+    "foo"
+    "  1"
+    "  2"
+    "  3")
+  (check-block-code '(foo 1 . 2)
+    "foo: 1, 2.")
+  (check-block-code '(foo 1 2 . 3)
+    "foo"
+    "  1"
+    "  2"
+    "  3."))
+
+(parameterize ((code-line-limit 6))
+  (check-block-code '(foo (a1 a2) (b1 b2))
+    "foo: a1 a2, b1 b2")
+  (check-block-code '(foo (a1 a2) (b1 b2) (c1 c2))
+    "foo"
+    "  a1 a2"
+    "  b1 b2"
+    "  c1 c2")
+  (check-block-code '(foo (a1 . a2) (b1 . b2))
+    "foo: a1 a2., b1 b2.")
+  (check-block-code '(foo (a1 . a2) (b1 . b2) (c1 . c2))
+    "foo"
+    "  a1 a2."
+    "  b1 b2."
+    "  c1 c2.")
+  (check-block-code '(foo (a1 a2) (b1 b2) . c1)
+    "foo: a1 a2, b1 b2, c1.")
+  (check-block-code '(foo (a1 . a2) (b1 . b2) c1 . c2)
+    "foo"
+    "  a1 a2."
+    "  b1 b2."
+    "  c1"
+    "  c2."))
 
 (check-block-code '((x 10 20) (y 30 40)) ":" "  x: 10, 20" "  y: 30, 40")
 (check-block-code '(foo (x 10 20) (y 30 40)) "foo" "  x: 10, 20" "  y: 30, 40")
