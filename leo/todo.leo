@@ -2,7 +2,7 @@ todo
   custom read-handler
   custom write-handler
   fix check to raise proper exceptions with: cause, hint
-  read and write importer lists using dot at the end
+  read non-null terminated lists using trailing dot
   fix
     import, export, rename, and more
     in leo scheme

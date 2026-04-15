@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  latest
+    write non-null list terminator using trailing dot
   v0.1.100
     improved forms: let, with-syntax, with-identifier
   v0.1.99
