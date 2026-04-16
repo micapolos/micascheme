@@ -80,6 +80,7 @@
   (sequential-syntax)
   (sequential)
   (source-file-descriptor)
+  (source)
   (source-object)
   (stack)
   (string)

@@ -118,6 +118,7 @@
       (random)
       (read)
       (source-file-descriptor)
+      (source)
       (source-object)
       (stack)
       (string)
