@@ -14,12 +14,12 @@ print `fruit and animal` list
     "dog"
     "tiger"
 
-print `closed` closed-list
+print `closed` list
   "apple"
   "banana"
   "orange"
 
-print `open` open-list
+print `open` list*
   "apple"
   "banana"
   "orange"
