@@ -1,6 +1,9 @@
 import leo scheme
 
 quote changelog
+  v0.1.105
+    print multiple values in repl
+    remove: closed-list, open-list
   v0.1.104
     repl: use print, instead of write
   v0.1.103
