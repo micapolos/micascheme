@@ -3,6 +3,9 @@ todo
   custom write-handler
   fix check to raise proper exceptions with: cause, hint
   read non-null terminated lists using trailing dot
+  repl
+    do not assume single evaluated value
+    print all values
   fix
     import, export, rename, and more
     in leo scheme
