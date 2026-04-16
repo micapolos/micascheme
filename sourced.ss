@@ -5,6 +5,7 @@
     (data)
     (switch)
     (lets)
+    (list)
     (syntax))
 
   (define-syntax (sourced $syntax)
@@ -14,7 +15,12 @@
           ((values $path $line $column)
             (switch (syntax->annotation #'x)
               ((annotation? $annotation)
-                (locate-source-object-source (annotation-source $annotation) #t #t))
+                (switch
+                  (values->list
+                    (locate-source-object-source
+                      (annotation-source $annotation) #t #t))
+                  ((null? _) (values #f #f #f))
+                  ((else $list) (apply values $list))))
               ((else _)
                 (values #f #f #f))))
           #`(values x 'x
