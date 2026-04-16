@@ -22,7 +22,7 @@
         ftype-set! ftype-any-set!
         syntax-case
         parameterize define-record define-syntax
-        list identifier-syntax
+        identifier-syntax
         predicate set!
         syntax-error
         with-syntax
