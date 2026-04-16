@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.104
+    repl: use print, instead of write
   v0.1.103
     new form: sourced
   v0.1.102

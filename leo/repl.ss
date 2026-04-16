@@ -2,7 +2,7 @@
   (leo repl)
   (export repl)
   (import
-    (except (scheme) write)
+    (scheme)
     (ansi-string)
     (char)
     (eof)
@@ -15,7 +15,7 @@
     (leo exception-handler)
     (leo condition)
     (leo version)
-    (leo write)
+    (leo print)
     (leo expand)
     (leo getter)
     (leo read))
@@ -93,7 +93,7 @@
                     (flush-output-port)
                     (unless
                       (void? evaluated)
-                      (write evaluated prefixed-port)
+                      (print evaluated prefixed-port)
                       (flush-output-port prefixed-port))
                     (loop))))))))))
 )
