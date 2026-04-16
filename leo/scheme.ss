@@ -69,6 +69,7 @@
       (leo syntax-error)
       (leo identifier-syntax)
       (leo meta)
+      (sourced)
       (keyword)
       (fixnum)
       (eof)
