@@ -11,6 +11,7 @@
     (void)
     (switch)
     (lets)
+    (list)
     (procedure)
     (leo exception-handler)
     (leo condition)
@@ -84,16 +85,14 @@
               ((eof? _) (newline))
               ((else leo-annotation)
                 (lets
-                  (evaluated (eval leo-annotation))
+                  (evaluated-list (values->list (eval leo-annotation)))
                   (prefixed-port
                     (make-prefixed-textual-output-port
                       (console-output-port)
                       (string-append ansi-cyan-string "<<<" ansi-black-string " ")))
                   (run
                     (flush-output-port)
-                    (unless
-                      (void? evaluated)
-                      (print evaluated prefixed-port)
-                      (flush-output-port prefixed-port))
+                    (for-each (lambda (x) (print x prefixed-port)) evaluated-list)
+                    (flush-output-port prefixed-port)
                     (loop))))))))))
 )
