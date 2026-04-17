@@ -13,16 +13,17 @@
     (condition))
 
   (define-rules-syntaxes
-    ((error cause)
+    ((error causes ...)
       (raise
         (condition
           (make-error)
-          (make-cause-condition cause))))
-    ((assertion-violation cause)
+          (make-cause-condition causes)
+          ...)))
+    ((assertion-violation causes ...)
       (raise
         (condition
           (make-assertion-violation)
-          (make-cause-condition cause))))
+          (make-cause-condition causes) ...)))
     ((assert expr)
       (unless expr
         (assertion-violation 'expr))))

@@ -14,7 +14,7 @@
           (and
             (pair? $datum)
             (equal? (car $datum) 'condition))
-          `(error ,@(cdr $datum))
+          `(raised ,@(cdr $datum))
           $datum))
       (parameterize ((print-gensym #f))
         (print
