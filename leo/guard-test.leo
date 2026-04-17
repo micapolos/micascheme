@@ -4,76 +4,71 @@ import
     from scheme
   leo check
   leo guard
+  leo in
 
 check equal?
   guard
-    x
-      when
-        number? x
-        +: x, 1
-      when
-        string? x
-        string-append: x, "!"
-    10
+    when
+      n number?
+      +: n, 1
+    when
+      s string?
+      string-append: s, "!"
+    in 10
   10
 
 check equal?
   guard
-    x
-      when
-        number? x
-        +: x, 1
-      when
-        string? x
-        string-append: x, "!"
-    "foo"
+    when
+      n number?
+      +: n, 1
+    when
+      s string?
+      string-append: s, "!"
+    in "foo"
   "foo"
 
 check equal?
   guard
-    x
-      when
-        number? x
-        +: x, 1
-      when
-        string? x
-        string-append: x, "!"
-    raise 20
+    when
+      n number?
+      +: n, 1
+    when
+      s string?
+      string-append: s, "!"
+    in raise 20
   21
 
 check equal?
   guard
-    x
-      when
-        number? x
-        +: x, 1
-      when
-        string? x
-        string-append: x, "!"
-    raise "foo"
+    when
+      n number?
+      +: n, 1
+    when
+      s string?
+      string-append: s, "!"
+    in raise "foo"
   "foo!"
 
 check raises
   guard
-    x
-      when
-        number? x
-        +: x, 1
-      when
-        string? x
-        string-append: x, "!"
-    raise #\a
+    when
+      n number?
+      +: n, 1
+    when
+      s string?
+      string-append: s, "!"
+    in raise #\a
 
 check equal?
   guard
-    x
-      when
-        number? x
-        +: x, 1
-      when
-        string? x
-        string-append: x, "!"
-      else
-        `other` x
-    raise #\a
+    when
+      n number?
+      +: n, 1
+    when
+      s string?
+      string-append: s, "!"
+    else x
+      `other` x
+    in raise #\a
   'other #\a
