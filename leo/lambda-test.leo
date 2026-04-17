@@ -1,5 +1,5 @@
 import
-  except: lambda, from scheme
+  except: lambda, case-lambda, from scheme
   leo check
   leo with
   leo lambda

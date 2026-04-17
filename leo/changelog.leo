@@ -1,6 +1,9 @@
 import leo scheme
 
 quote changelog
+  v0.1.110
+    case lambda
+    improved forms: error, assertion-violation
   v0.1.109
     improved form guard
   v0.1.108

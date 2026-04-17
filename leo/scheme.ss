@@ -9,7 +9,7 @@
         top-level-program
         except only rename alias prefix add-prefix drop-prefix
         load load-program
-        define lambda
+        define lambda case-lambda
         let letrec let-values
         let* letrec* let*-values
         let-syntax letrec-syntax
