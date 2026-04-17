@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.108
+    improve sourced form
   v0.1.107
     fix sourced
   v0.1.106
