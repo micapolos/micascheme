@@ -1,6 +1,6 @@
 (import (scheme) (check) (sourced) (list))
 
-(check
-  (equal?
-    (values->list (sourced (+ 2 2)))
-    '(4 (+ 2 2) "sourced-test.ss" 5 28)))
+(let-values (((procedure datum sources) (sourced (+ 2 2))))
+  (check (equal? (procedure) 4))
+  (check (equal? datum '(+ 2 2)))
+  (check (equal? sources '((path "sourced-test.ss") (at (line 3) (column 50))))))

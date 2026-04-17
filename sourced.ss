@@ -8,23 +8,31 @@
     (list)
     (syntax))
 
+  ; returns three values:
+  ; - procedure which would return sourced expression
+  ; - the sourced expression as datum
+  ; - a list of source annotations, potentially empty if no information is available
   (define-syntax (sourced $syntax)
     (syntax-case $syntax ()
-      ((_ x)
+      ((_ expr)
         (lets
-          ((values $path $line $column)
-            (switch (syntax->annotation #'x)
+          ($sources
+            (switch? (syntax->annotation #'expr)
               ((annotation? $annotation)
-                (switch
-                  (values->list
+                (call-with-values
+                  (lambda ()
                     (locate-source-object-source
                       (annotation-source $annotation) #t #t))
-                  ((null? _) (values #f #f #f))
-                  ((else $list) (apply values $list))))
-              ((else _)
-                (values #f #f #f))))
-          #`(values x 'x
-            #,(literal->syntax $path)
-            #,(literal->syntax $line)
-            #,(literal->syntax $column))))))
+                  (case-lambda
+                    (() '())
+                    (($path $line $column)
+                      `(
+                        (path ,$path)
+                        (at
+                          (line ,$line)
+                          (column ,$column)))))))))
+          #`(values
+            (lambda () expr)
+            'expr
+            '#,(datum->syntax #'sourced $sources))))))
 )
