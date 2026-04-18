@@ -72,6 +72,7 @@
       (sourced)
       (keyword)
       (fixnum)
+      (predicate)
       (eof)
       (only (procedure) partial)
       (only (identifier) identifier-append)
