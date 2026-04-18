@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.114
+    syntax-rules
   v0.1.113
     define-record keywords: required, optional, options
   v0.1.112
