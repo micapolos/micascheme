@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.112
+    fix define-record
   v0.1.111
     predicates: and?, or?, not?
   v0.1.110
