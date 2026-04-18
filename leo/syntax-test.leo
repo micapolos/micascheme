@@ -4,6 +4,8 @@ import
   leo check
   leo define-syntax
   leo syntax-case
+  leo with
+  syntax-keywords
 
 check syntax? syntax 10
 
@@ -46,3 +48,28 @@ check free-syntax=?
     bar syntax foo
     in syntax foo bar
   syntax goo goo
+
+check free-syntax=?
+  with
+    syntax-rules
+      when
+        foo a
+        box a
+      when
+        foo: a, b
+        cons: a, b
+    syntax foo 10
+  syntax box 10
+
+check free-syntax=?
+  with
+    syntax-rules
+      when
+        foo a
+        box a
+      when
+        foo: a, b
+        cons: a, b
+    syntax foo: 10, 20
+  syntax cons: 10, 20
+

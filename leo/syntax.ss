@@ -5,12 +5,15 @@
     with-syntax
     with-syntax*
     with-identifier
-    with-identifier*)
+    with-identifier*
+    syntax-rules)
   (import
     (rename (scheme)
       (with-syntax %with-syntax)
-      (with-implicit %with-implicit))
+      (with-implicit %with-implicit)
+      (syntax-rules %syntax-rules))
     (leo in)
+    (leo with)
     (keyword)
     (syntax-keywords)
     (syntax)
@@ -34,7 +37,7 @@
   (define-keyword match)
 
   (define-rules-syntaxes
-    (keywords match in)
+    (keywords keywords match in when)
 
     ((with-syntax (match pattern expr) ... (in x xs ...))
       (%with-syntax ((pattern expr) ...) x xs ...))
@@ -51,5 +54,11 @@
     ((with-identifier* (in x xs ...)) (begin x xs ...))
     ((with-identifier* (id expr) rest ... (in x xs ...))
       (keyword? id)
-      (with-identifier (id expr) (in (with-identifier* rest ... (in x xs ...))))))
+      (with-identifier (id expr) (in (with-identifier* rest ... (in x xs ...)))))
+
+    ((syntax-rules (keywords ks ...) (when pattern x xs ...) ...)
+      (%syntax-rules (ks ...) (pattern x xs ...) ...))
+
+    ((syntax-rules (when pattern x xs ...) ...)
+      (syntax-rules (keywords) (when pattern x xs ...) ...)))
 )

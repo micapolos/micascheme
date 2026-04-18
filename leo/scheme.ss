@@ -23,7 +23,7 @@
         parameterize define-record define-syntax
         identifier-syntax
         set!
-        syntax-error
+        syntax-error syntax-rules
         with-syntax
         meta)
       (leo library)
@@ -78,7 +78,6 @@
       (only (identifier) identifier-append)
       (char)
       (void)
-      (syntax-keywords)
       (leo syntax)
       (rename (leo load)
         (load-leo load)
