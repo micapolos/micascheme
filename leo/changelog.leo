@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.111
+    predicates: and?, or?, not?
   v0.1.110
     case lambda
     improved forms: error, assertion-violation
