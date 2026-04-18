@@ -226,22 +226,22 @@
   (check
     (equal?
       (->sentence '(123))
-      '(":" "123")))
+      '("list:" "123")))
 
   (check
     (equal?
       (->sentence '(123 ()))
-      '(":" "123" "null")))
+      '("list:" "123" "null")))
 
   (check
     (equal?
       (->sentence '(123 bar))
-      '(":" "123" "bar")))
+      '("list:" "123" "bar")))
 
   (check
     (equal?
       (->sentence '(123 (bar)))
-      '(":" "123" ("bar")))))
+      '("list:" "123" ("bar")))))
 
 (check
   (equal?

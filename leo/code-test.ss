@@ -133,6 +133,11 @@
 (check-colon-line-code 4 '(foo (bar . gar) zar) "foo: bar gar., zar")
 (check-colon-line-code 4 '(foo (bar . gar) . zar) "foo: bar gar., zar.")
 (check-colon-line-code 5 '(foo (bar . gar) (zar . tar)) "foo: bar gar., zar tar.")
+
+(check-colon-line-code 2 '() "written null")
+(check-colon-line-code 2 '(1) ": 1")
+(check-colon-line-code 3 '(1 2) ":: 1, 2")  ; WTF?
+
 (check-colon-line-code-false? 5 '(foo (bar gar . zar) var))
 (check-colon-line-code-false? 4 '((foo bar) (goo gar)))
 (check-colon-line-code-false? 2 '(1 bar))
@@ -156,6 +161,7 @@
 (check-block-code '(foo bar . gar) "foo: bar, gar.")
 (check-block-code '(foo bar ((gar zar)))
   "foo: bar, : gar zar")
+(check-block-code '(1 2 3) ":: 1, 2, 3")
 
 (parameterize ((code-line-limit 5))
   ; TODO: We want items to be comma separated, 5 in each line

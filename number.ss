@@ -17,7 +17,8 @@
     integer*/wraparound
     infinity
     positive-infinity
-    negative-infinity)
+    negative-infinity
+    number+digit)
   (import (scheme) (syntax))
 
   (define pi (* (asin 1) 2))
@@ -83,4 +84,7 @@
 
   (define-rule-syntax (integer*/wraparound size a b)
     (integer-wraparound size (* a b)))
+
+  (define (number+digit number digit)
+    (+ (* number 10) digit))
 )

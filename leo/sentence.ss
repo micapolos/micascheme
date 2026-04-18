@@ -160,7 +160,9 @@
             .
             ,(list->sentences (cdr $pair)))))
       ((else $other)
-        `(":" . ,(list->sentences (cons $other (cdr $pair)))))))
+        `(
+          ,(if (skip-written?) "list:" ":")
+          . ,(list->sentences (cons $other (cdr $pair)))))))
 
   (define (box->sentence $box)
     (sentence-written
