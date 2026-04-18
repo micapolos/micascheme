@@ -9,6 +9,7 @@
     syntax-rules
     pattern-id
     clause-id
+    clause->rule
     group-clauses)
   (import
     (rename (scheme)
@@ -74,6 +75,13 @@
   (define (clause-id clause)
     (syntax-case clause (when)
       ((when pattern . x) (pattern-id #'pattern))))
+
+  (define (clause->rule clause)
+    (syntax-case clause (when)
+      ((when pattern body)
+        #'(when pattern #'body))
+      ((when pattern fender body)
+        #'(when pattern fender #'body))))
 
   (define (group-clauses stx)
     (syntax-case stx ()

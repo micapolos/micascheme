@@ -94,6 +94,24 @@ check free-syntax=?
   syntax foo
 
 check free-syntax=?
+  clause->rule syntax when
+    foo: x, y
+    goo gar
+  syntax when
+    foo: x, y
+    syntax goo gar
+
+check free-syntax=?
+  clause->rule syntax when
+    foo: x, y
+    keyword? foo
+    goo gar
+  syntax when
+    foo: x, y
+    keyword? foo
+    syntax goo gar
+
+check free-syntax=?
   group-clauses syntax :
     when
       foo
