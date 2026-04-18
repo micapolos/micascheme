@@ -14,34 +14,35 @@
     (prefix (only (scheme) define-record) %)
     (syntax)
     (syntax-keywords)
+    (keywords)
     (syntaxes)
     (system)
     (leo with)
     (leo transform))
 
   (define-syntax (define-record stx)
-    (syntax-case stx (with)
-      ((define-record (name (with required-fields ...)))
-        #'(define-record (name (with required-fields ...) (with))))
+    (syntax-case stx (parent required optional options)
+      ((define-record (name (required required-fields ...) (optional optional-fields ...)))
+        #'(define-record (name (required required-fields ...) (optional optional-fields ...) (options))))
 
-      ((define-record (name (with required-fields ...) (with optional-fields ...)))
-        #'(define-record (name (with required-fields ...) (with optional-fields ...) (with))))
-
-      ((define-record (name (with required-fields ...) (with optional-fields ...) (with options ...)))
+      ((define-record (name (required required-fields ...) (optional optional-fields ...) (options opts ...)))
         #`(%define-record name
           (#,@(map transform-name #'(required-fields ...)))
           (#,@(map transform-name #'(optional-fields ...)))
-          (options ...)))
+          (opts ...)))
 
-      ((define-record (name (parent (with required-fields ...))))
-        #'(define-record (name (parent (with required-fields ...) (with)))))
+      ((define-record (name (parent p) required-fields ...))
+        #'(define-record (name (parent p) (required required-fields ...) (optional))))
 
-      ((define-record (name (parent (with required-fields ...) (with optional-fields ...))))
-        #'(define-record (name (parent (with required-fields ...) (with optional-fields ...) (with)))))
+      ((define-record (name (parent p) (required required-fields ...) (optional optional-fields ...)))
+        #'(define-record (name (parent p) (required required-fields ...) (optional optional-fields ...) (options))))
 
-      ((define-record (name (parent (with required-fields ...) (with optional-fields ...) (with options ...))))
+      ((define-record (name (parent p) (required required-fields ...) (optional optional-fields ...) (options opts ...)))
         #'(%define-record name parent
           (#,@(map transform-name #'(required-fields ...)))
           (#,@(map transform-name #'(optional-fields ...)))
-          (options ...)))))
+          (opts ...)))
+
+      ((define-record (name required-fields ...))
+        #'(define-record (name (required required-fields ...) (optional))))))
 )

@@ -5,14 +5,15 @@ import
     immutable, mutable
     constructor, predicate, prefix
     from scheme
+  keywords
   leo check
   leo with
   leo let
   leo define-record
 
-define-record point with: x, y
+define-record point: x, y
 
-define-record color with
+define-record color
   mutable unsigned-8 red
   mutable unsigned-8 green
   mutable unsigned-8 blue
@@ -55,12 +56,12 @@ let
   check equal?: color-blue test-color, 130
 
 define-record rgb-record
-  with
+  required
     mutable unsigned-8 red
     mutable unsigned-8 green
     mutable unsigned-8 blue
-  with:
-  with
+  optional:
+  options
     constructor make-rgb
     predicate rgb?
     prefix "rgb-"
