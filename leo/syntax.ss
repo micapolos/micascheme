@@ -6,7 +6,10 @@
     with-syntax*
     with-identifier
     with-identifier*
-    syntax-rules)
+    syntax-rules
+    pattern-id
+    clause-id
+    group-clauses)
   (import
     (rename (scheme)
       (with-syntax %with-syntax)
@@ -17,6 +20,7 @@
     (keyword)
     (syntax-keywords)
     (syntax)
+    (list)
     (syntaxes))
   (export
     (import
@@ -61,4 +65,18 @@
 
     ((syntax-rules (when pattern x xs ...) ...)
       (syntax-rules (keywords) (when pattern x xs ...) ...)))
+
+  (define (pattern-id pattern)
+    (syntax-case pattern ()
+      (id (keyword? id) #'id)
+      ((id . x) (keyword? id) #'id)))
+
+  (define (clause-id clause)
+    (syntax-case clause (when)
+      ((when pattern . x) (pattern-id #'pattern))))
+
+  (define (group-clauses stx)
+    (syntax-case stx ()
+      ((clause ...)
+        (group-by clause-id free-identifier=? #'(clause ...)))))
 )

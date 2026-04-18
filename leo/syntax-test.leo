@@ -73,3 +73,46 @@ check free-syntax=?
     syntax foo: 10, 20
   syntax cons: 10, 20
 
+check free-syntax=?
+  pattern-id syntax foo
+  syntax foo
+
+check free-syntax=?
+  pattern-id syntax foo: x, y
+  syntax foo
+
+check free-syntax=?
+  clause-id syntax when
+    foo
+    goo gar
+  syntax foo
+
+check free-syntax=?
+  clause-id syntax when
+    foo: x, y
+    goo gar
+  syntax foo
+
+check free-syntax=?
+  group-clauses syntax :
+    when
+      foo
+      goo gar
+    when
+      foo: x, y
+      goo gar
+    when
+      bar: x, y, z
+      moo mar
+  syntax :
+    foo
+      when
+        foo
+        goo gar
+      when
+        foo: x, y
+        goo gar
+    bar
+      when
+        bar: x, y, z
+        moo mar
