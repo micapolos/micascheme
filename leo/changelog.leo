@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.113
+    define-record keywords: required, optional, options
   v0.1.112
     fix define-record
   v0.1.111
