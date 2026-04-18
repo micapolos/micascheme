@@ -94,7 +94,7 @@ check free-syntax=?
   syntax foo
 
 check free-syntax=?
-  clause->rule syntax when
+  rule->clause syntax when
     foo: x, y
     goo gar
   syntax when
@@ -102,7 +102,7 @@ check free-syntax=?
     syntax goo gar
 
 check free-syntax=?
-  clause->rule syntax when
+  rule->clause syntax when
     foo: x, y
     keyword? foo
     goo gar
