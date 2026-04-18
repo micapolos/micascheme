@@ -9,6 +9,7 @@
       quasisyntax
       unsyntax
       unsyntax-splicing
+      constructor predicate prefix
       ...)
     (prefix (only (scheme) define-record) %)
     (syntax)
@@ -30,7 +31,7 @@
         #`(%define-record name
           (#,@(map transform-name #'(required-fields ...)))
           (#,@(map transform-name #'(optional-fields ...)))
-          (#,@(map transform-name #'(options ...)))))
+          (options ...)))
 
       ((define-record (name (parent (with required-fields ...))))
         #'(define-record (name (parent (with required-fields ...) (with)))))
@@ -42,5 +43,5 @@
         #'(%define-record name parent
           (#,@(map transform-name #'(required-fields ...)))
           (#,@(map transform-name #'(optional-fields ...)))
-          (#,@(map transform-name #'(options ...)))))))
+          (options ...)))))
 )

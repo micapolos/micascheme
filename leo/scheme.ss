@@ -7,7 +7,6 @@
         assert error assertion-violation
         library import export display display-string
         top-level-program
-        except only rename alias prefix add-prefix drop-prefix
         load load-program
         define lambda case-lambda
         let letrec let-values
@@ -23,7 +22,7 @@
         syntax-case
         parameterize define-record define-syntax
         identifier-syntax
-        predicate set!
+        set!
         syntax-error
         with-syntax
         meta)

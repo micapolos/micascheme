@@ -1,7 +1,6 @@
 (library (leo library)
   (export
     library import export top-level-program
-    except only rename alias prefix add-prefix drop-prefix
     from
 
     transform-identifier
@@ -17,13 +16,6 @@
     (rename (scheme)
       (import %import)
       (export %export)
-      (except %except)
-      (only %only)
-      (rename %rename)
-      (alias %alias)
-      (prefix %prefix)
-      (add-prefix %add-prefix)
-      (drop-prefix %drop-prefix)
       (library %library)
       (top-level-program %top-level-program)
       (syntax-error %syntax-error))
@@ -137,7 +129,7 @@
       (_
         (syntax-error $syntax '(invalid top-level-syntax)))))
 
-  (define-keywords except only rename alias prefix add-prefix drop-prefix from)
+  (define-keywords from)
 
   (define-syntax library transform-library)
   (define-syntax import transform-import)

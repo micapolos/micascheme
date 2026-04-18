@@ -3,6 +3,7 @@ import
     equal?, not, procedure?
     record?, record-type-descriptor?, record-type-descriptor
     immutable, mutable
+    constructor, predicate, prefix
     from scheme
   leo check
   leo with
@@ -52,3 +53,14 @@ let
   check equal?: color-red test-color, 110
   check equal?: color-green test-color, 120
   check equal?: color-blue test-color, 130
+
+define-record rgb-record
+  with
+    mutable unsigned-8 red
+    mutable unsigned-8 green
+    mutable unsigned-8 blue
+  with:
+  with
+    constructor make-rgb
+    predicate rgb?
+    prefix "rgb-"
