@@ -5,7 +5,6 @@
 (check (equal? (identifiers? #'(foo 123)) #f))
 
 (define-keyword foo)
-(check (raises foo))
 
 (check (syntax-null? #'()))
 (check (not (syntax-null? #'(1))))

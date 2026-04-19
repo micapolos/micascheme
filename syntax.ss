@@ -124,8 +124,11 @@
               $case ...))))))
 
   (define-rule-syntax (define-keyword aux)
-    (define-rule-syntax aux
-      (syntax-error #'aux "misplaced aux keyword")))
+    (define-syntax (aux stx)
+      (syntax-case stx ()
+        (id
+          (identifier? #'id)
+          (syntax-error #'id "misplaced keyword")))))
 
   (define-rule-syntax (define-keywords aux ...)
     (begin (define-keyword aux) ...))
