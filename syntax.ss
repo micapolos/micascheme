@@ -55,7 +55,8 @@
     get-property
     syntax->list*
     syntax-unpack
-    syntax->last-annotation?)
+    syntax->last-annotation?
+    property-ref?)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -430,4 +431,11 @@
             (syntax->last-annotation? #'b)
             (syntax->last-annotation? #'a)))
         (else #f))))
+
+  (define-syntax (property-ref? stx)
+    (syntax-case stx ()
+      ((_ lookup? id key)
+        #'(guard
+          (exception ((syntax-violation? exception) #f))
+          (lookup? #'id #'key)))))
 )

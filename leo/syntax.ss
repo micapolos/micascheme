@@ -35,7 +35,8 @@
           syntax?
           syntax=?
           define-keyword
-          define-keywords)
+          define-keywords
+          property-ref?)
         (syntax=? free-syntax=?))))
 
   (define-rules-syntaxes
