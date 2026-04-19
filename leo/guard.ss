@@ -4,7 +4,7 @@
     (rename (scheme) (guard %guard))
     (syntax-keywords)
     (syntaxes)
-    (leo in))
+    (leo keywords))
 
   (define-rules-syntax
     (keywords when else in)

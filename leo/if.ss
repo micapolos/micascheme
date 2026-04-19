@@ -5,7 +5,7 @@
     (syntax-keywords)
     (keyword)
     (syntax)
-    (leo then)
+    (leo keywords)
     (syntaxes))
 
   (define-rules-syntax

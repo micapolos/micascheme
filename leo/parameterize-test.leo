@@ -2,7 +2,7 @@ import
   except: define, parameterize, from scheme
   leo define
   leo check
-  leo in
+  leo keywords
   leo with
   leo parameterize
 

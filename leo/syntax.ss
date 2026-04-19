@@ -1,7 +1,6 @@
 (library
   (leo syntax)
   (export
-    match
     with-syntax
     with-syntax*
     with-identifier
@@ -16,7 +15,7 @@
       (with-syntax %with-syntax)
       (with-implicit %with-implicit)
       (syntax-rules %syntax-rules))
-    (leo in)
+    (leo keywords)
     (leo with)
     (keyword)
     (syntax-keywords)
@@ -38,8 +37,6 @@
           define-keyword
           define-keywords)
         (syntax=? free-syntax=?))))
-
-  (define-keyword match)
 
   (define-rules-syntaxes
     (keywords keywords match in when)

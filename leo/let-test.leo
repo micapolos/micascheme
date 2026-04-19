@@ -6,7 +6,7 @@ import
   leo with
   leo check
   leo if
-  leo in
+  leo keywords
 
 check equal?
   let

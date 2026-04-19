@@ -4,7 +4,7 @@ import
     from scheme
   leo check
   leo guard
-  leo in
+  leo keywords
 
 check equal?
   guard

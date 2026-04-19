@@ -5,6 +5,7 @@ import
   leo define-syntax
   leo syntax-case
   leo with
+  leo keywords
   syntax-keywords
 
 check syntax? syntax 10

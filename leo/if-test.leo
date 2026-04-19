@@ -2,7 +2,7 @@ import
   only: equal?, else, from scheme
   leo check
   leo if
-  leo then
+  leo keywords
   leo let
   leo with
 

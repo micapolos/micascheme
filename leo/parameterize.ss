@@ -3,7 +3,7 @@
   (import
     (rename (scheme)
       (parameterize %parameterize))
-    (leo in)
+    (leo keywords)
     (syntaxes))
 
   (define-rules-syntax

@@ -15,7 +15,7 @@
       (letrec-syntax %letrec-syntax))
     (syntax-keywords)
     (leo with)
-    (leo in)
+    (leo keywords)
     (keyword)
     (syntax)
     (syntaxes))
