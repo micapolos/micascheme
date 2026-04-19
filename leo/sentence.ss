@@ -28,6 +28,7 @@
     (pair)
     (lets)
     (char)
+    (eof)
     (syntax)
     (procedure)
     (list)
@@ -169,6 +170,9 @@
       `("box"
         ,(->sentence (unbox $box)))))
 
+  (define (eof->sentence $eof)
+    (sentence-written "eof"))
+
   (define (bytevector->sentence $bytevector)
     (sentence-written
       `("bytevector" . ,(list->sentences (bytevector->u8-list $bytevector)))))
@@ -232,6 +236,7 @@
       ((pair? $pair) (pair->sentence $pair))
       ((char? $char) (char->sentence $char))
       ((box? $box) (box->sentence $box))
+      ((eof? $eof) (eof->sentence $eof))
       ((bytevector? $bytevector) (bytevector->sentence $bytevector))
       ((vector? $vector) (vector->sentence $vector))
       ((procedure? $procedure) (procedure->sentence $procedure))

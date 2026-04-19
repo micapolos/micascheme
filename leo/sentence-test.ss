@@ -256,6 +256,17 @@
 
 (check
   (equal?
+    (->sentence eof)
+    '("written" "eof")))
+
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence eof)
+      "eof")))
+
+(check
+  (equal?
     (->sentence (bytevector))
     '("written" ("bytevector"))))
 
