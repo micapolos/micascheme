@@ -9,7 +9,7 @@
     (syntax))
 
   ; returns three values:
-  ; - procedure which would return sourced expression
+  ; - procedure which returns result of sourced expression
   ; - the sourced expression as datum
   ; - a list of source annotations, potentially empty if no information is available
   (define-syntax (sourced $syntax)
