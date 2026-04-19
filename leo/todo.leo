@@ -6,6 +6,10 @@ todo
   fix
     import, export, rename, and more
     in leo scheme
+  update syntax forms
+    use match instead of when
+    use where for fenders
+    use in for body
   make eval work
   line comment using colon
   syntax-rules
