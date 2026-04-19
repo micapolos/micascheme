@@ -1,7 +1,7 @@
 import leo scheme
 
 quote changelog
-  latest
+  v0.1.116
     fix eof sentence
     fix define-keyword
   v0.1.115
