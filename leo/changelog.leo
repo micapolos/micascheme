@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  latest
+    fix eof sentence
   v0.1.115
     functions: pattern-in, clause-id, rule->clause, group-clauses
   v0.1.114
