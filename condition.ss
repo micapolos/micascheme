@@ -80,6 +80,7 @@
       ((i/o-error? _) `i/o-error)
 
       ; extend &violation
+      ((undefined-violation? _) `undefined-violation)
       ((assertion-violation? _) `assertion-violation)
       ((lexical-violation? _) `lexical-violation)
       ((syntax-violation? $syntax-violation)
@@ -91,7 +92,7 @@
               (list `(subform ,@(syntax->condition-datums $subform)))))))
 
       ; extend &serious
-      ((violation? _) `undefined-violation)
+      ((violation? _) `violation)
       ((error? _) `error)
 
       ; extend &condition
