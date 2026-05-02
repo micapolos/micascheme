@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.121
+    pretty-write list
   v0.1.120
     fix printing of non-sentences
   v0.1.119
