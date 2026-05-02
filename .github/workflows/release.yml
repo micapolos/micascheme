@@ -5,12 +5,11 @@ on:
   push:
     branches:
       - main
-    # ONLY trigger on main if the submodule or build logic changes
     paths:
       - 'deps/ChezScheme/**'
       - 'leo/build.sh'
     tags:
-      - 'v*' # Tags ALWAYS trigger to ensure a release is created
+      - 'v*'
 
 jobs:
   build:
@@ -32,8 +31,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: false # Clean slate for cache
+          submodules: false
           fetch-depth: 1
+          # Blobless clone for the main repository
+          filter: blob:none
 
       - name: Install Dependencies (Linux)
         if: runner.os == 'Linux'
@@ -44,7 +45,6 @@ jobs:
       - name: Get ChezScheme Submodule Commit
         id: submodule-sha
         run: |
-          # Pulls the SHA directly from the Git index
           echo "sha=$(git ls-tree HEAD deps/ChezScheme | awk '{print $3}')" >> $GITHUB_OUTPUT
 
       - name: Cache ChezScheme
@@ -53,7 +53,6 @@ jobs:
         with:
           path: deps/ChezScheme
           key: ${{ runner.os }}-${{ matrix.arch }}-chez-${{ steps.submodule-sha.outputs.sha }}
-          # Fallback to the most recent build for this OS if the SHA changed
           restore-keys: |
             ${{ runner.os }}-${{ matrix.arch }}-chez-
 
@@ -61,15 +60,18 @@ jobs:
         if: steps.cache-chez.outputs.cache-hit != 'true'
         run: |
           echo "Cache missed! Building ChezScheme..."
-          git submodule update --init --recursive deps/ChezScheme
+          git submodule sync deps/ChezScheme
+          # Initialize with both depth=1 and blobless filter
+          git submodule update --init --recursive --depth 1 --filter=blob:none deps/ChezScheme
           cd deps/ChezScheme
           ./configure
           make
 
       - name: Run Build Script
         run: |
-          # Ensure submodule is initialized if we had a cache hit
-          git submodule update --init --recursive
+          # Sync and update even on cache hit to keep git index valid
+          git submodule sync
+          git submodule update --init --recursive --depth 1 --filter=blob:none
           chmod +x ./leo/build.sh
           ./leo/build.sh "${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}"
 
@@ -85,7 +87,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    # Don't create releases for pushes to main, only for Tags or Manual runs
     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
 
     steps:
