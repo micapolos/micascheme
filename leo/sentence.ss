@@ -107,32 +107,37 @@
         ((string=? $word? "unquote-splicing") "'.")
         (else #f))))
 
+  (define (string-quotify $string)
+    $string)
+
+  (define (phrase-quotify $phrase)
+    (lets
+      ($word? (phrase-string? $phrase))
+      ($body (map* sentence-quotify sentence-quotify (phrase-body $phrase)))
+      (or
+        (switch? $body
+          ((singleton-list? $body)
+            (lets
+              ($body-sentence (car $body))
+              (switch (begin-string? $word?)
+                ((string? $quote)
+                  (quote-sentence? $word? $quote $body-sentence))
+                ((else _)
+                  (switch? $body-sentence
+                    ((phrase? $body-phrase)
+                      (lets
+                        ($body-word? (phrase-string? $body-phrase))
+                        ($body-body (phrase-body $body-phrase))
+                        (switch? (end-string? $body-word?)
+                          ((string? $unquote)
+                            (unquote-sentence? $word? $unquote
+                              (phrase-cons $word? $body-body))))))))))))
+          (phrase-cons $word? $body))))
+
   (define (sentence-quotify $sentence)
     (sentence-switch $sentence
-      ((string? $string) $string)
-      ((phrase? $phrase)
-        (lets
-          ($word? (phrase-string? $phrase))
-          ($body (map* sentence-quotify sentence-quotify (phrase-body $phrase)))
-          (or
-            (switch? $body
-              ((singleton-list? $body)
-                (lets
-                  ($body-sentence (car $body))
-                  (switch (begin-string? $word?)
-                    ((string? $quote)
-                      (quote-sentence? $word? $quote $body-sentence))
-                    ((else _)
-                      (switch? $body-sentence
-                        ((phrase? $body-phrase)
-                          (lets
-                            ($body-word? (phrase-string? $body-phrase))
-                            ($body-body (phrase-body $body-phrase))
-                            (switch? (end-string? $body-word?)
-                              ((string? $unquote)
-                                (unquote-sentence? $word? $unquote
-                                  (phrase-cons $word? $body-body))))))))))))
-              (phrase-cons $word? $body))))))
+      ((string? $string) (string-quotify $string))
+      ((phrase? $phrase) (phrase-quotify $phrase))))
 
   ; === ->sentence
 
