@@ -136,7 +136,7 @@
           (- $depth 1)
           (string-append $string "'")))))
 
-  ; TODO: make it prettier.
+  ; TODO: make it prettier
   (define (depth/phrase-quotify $depth $phrase)
     (lets
       ($word? (phrase-string? $phrase))
