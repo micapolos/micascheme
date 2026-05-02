@@ -26,6 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          # Turn off automatic submodule handling to allow manual filtering
           submodules: false
           fetch-depth: 1
 
@@ -35,11 +36,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libncurses5-dev libncursesw5-dev libx11-dev uuid-dev
 
-      - name: Initialize ChezScheme Submodule (Strictly Minimal)
+      - name: Initialize ChezScheme Submodule (Filtered)
         run: |
+          # Sync and update with the specific optimization flags you requested
           git submodule sync deps/ChezScheme
-          # We use -c fetch.tagOpt=--no-tags to force Git to ignore tags during the recursive fetch
-          git -c fetch.tagOpt=--no-tags submodule update --init --force --depth=1 --recursive --filter=blob:none --single-branch deps/ChezScheme
+          git submodule update --init --force --depth=1 --recursive --filter=blob:none deps/ChezScheme
 
       - name: Get ChezScheme Submodule Commit
         id: submodule-sha
@@ -65,8 +66,6 @@ jobs:
 
       - name: Run Build Script
         run: |
-          # Apply the same tag-blocking logic here
-          git -c fetch.tagOpt=--no-tags submodule update --init --force --depth=1 --recursive --filter=blob:none --single-branch
           chmod +x ./leo/build.sh
           ./leo/build.sh "${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}"
 
