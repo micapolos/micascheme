@@ -38,8 +38,8 @@ jobs:
       - name: Initialize ChezScheme Submodule (Strictly Minimal)
         run: |
           git submodule sync deps/ChezScheme
-          # Swapped --no-tags for --single-branch to accommodate your Git version
-          git submodule update --init --force --depth=1 --recursive --filter=blob:none --single-branch deps/ChezScheme
+          # We use -c fetch.tagOpt=--no-tags to force Git to ignore tags during the recursive fetch
+          git -c fetch.tagOpt=--no-tags submodule update --init --force --depth=1 --recursive --filter=blob:none --single-branch deps/ChezScheme
 
       - name: Get ChezScheme Submodule Commit
         id: submodule-sha
@@ -65,8 +65,8 @@ jobs:
 
       - name: Run Build Script
         run: |
-          # Apply the same single-branch logic here
-          git submodule update --init --force --depth=1 --recursive --filter=blob:none --single-branch
+          # Apply the same tag-blocking logic here
+          git -c fetch.tagOpt=--no-tags submodule update --init --force --depth=1 --recursive --filter=blob:none --single-branch
           chmod +x ./leo/build.sh
           ./leo/build.sh "${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}"
 
