@@ -236,53 +236,27 @@
 (check
   (equal?
     (->sentence '(123))
-    '(":" "123")))
+    '(#f "123")))
 
 (check
   (equal?
     (->sentence '(123 ()))
-    '(":" "123" ("written" "null"))))
+    '(#f "123" ("written" "null"))))
 
 (check
   (equal?
     (->sentence '(123 bar))
-    '(":" "123" "bar")))
+    '(#f "123" "bar")))
 
 (check
   (equal?
     (->sentence '(123 (bar)))
-    '(":" "123" ("bar"))))
+    '(#f "123" ("bar"))))
 
 (check
   (equal?
     (->sentence '((quote a)))
-    '(":" ("quote" "a"))))
-
-(parameterize ((skip-written? #t))
-  (check
-    (equal?
-      (->sentence '(123))
-      '("list:" "123")))
-
-  (check
-    (equal?
-      (->sentence '(123 ()))
-      '("list:" "123" "null")))
-
-  (check
-    (equal?
-      (->sentence '(123 bar))
-      '("list:" "123" "bar")))
-
-  (check
-    (equal?
-      (->sentence '(123 (bar)))
-      '("list:" "123" ("bar"))))
-
-  (check
-    (equal?
-      (->sentence '((quote a)))
-      '("list:" ("quote" "a")))))
+    '(#f ("quote" "a"))))
 
 (check
   (equal?

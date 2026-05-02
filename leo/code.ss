@@ -80,9 +80,11 @@
           ((singleton-list? _) $lines-code)
           ((null/pair? _) (code-in-round-brackets $lines-code))
           ((else _) $lines-code)))
-      (space-separated-code
-        (string-code (phrase-string $phrase))
-        $body-code)))
+      (switch (phrase-string? $phrase)
+        ((string? $string)
+          (space-separated-code (string-code $string) $body-code))
+        ((else _)
+          (code-in-round-brackets $lines-code)))))
 
   (define (lines-code $lines)
     (list->code
@@ -113,19 +115,23 @@
     (limiter-using (string-line-code $string) (code-string-limit)))
 
   (define (phrase-space-line-code?-limiter $phrase)
-    (limiter-lets?
-      ($string-code (limiter-using (string-atom-code (phrase-string $phrase)) 1))
-      (switch (phrase-body $phrase)
-        ((singleton-list? $list)
-          (limiter-lets?
-            ($cdr-code (sentence-space-line-code?-limiter (car $list)))
-            (limiter (space-separated-code $string-code $cdr-code))))
-        ((null/pair? _)
-          (limiter #f))
-        ((else $terminator)
-          (limiter-lets?
-            ($code (sentence-space-line-code?-limiter $terminator))
-            (limiter (space-separated-code $string-code (terminator-code $code))))))))
+    (switch (phrase-string? $phrase)
+      ((string? $word)
+        (limiter-lets?
+          ($string-code (limiter-using (string-atom-code $word) 1))
+          (switch (phrase-body $phrase)
+            ((singleton-list? $list)
+              (limiter-lets?
+                ($cdr-code (sentence-space-line-code?-limiter (car $list)))
+                (limiter (space-separated-code $string-code $cdr-code))))
+            ((null/pair? _)
+              (limiter #f))
+            ((else $terminator)
+              (limiter-lets?
+                ($code (sentence-space-line-code?-limiter $terminator))
+                (limiter (space-separated-code $string-code (terminator-code $code))))))))
+      ((else _)
+        (limiter #f))))
 
   (define (sentence-space-line-code?-limiter $sentence)
     (sentence-switch $sentence
@@ -157,7 +163,7 @@
     (switch (limiter-unlimited-ref (phrase-space-line-code?-limiter $phrase))
       ((false? _)
         (limiter-lets
-          ($string-code (limiter-using (string-atom-code (phrase-string $phrase)) 1))
+          ($string-code (limiter-using (string-atom-code (or (phrase-string? $phrase) ":")) 1))
           (switch (phrase-body $phrase)
             ((singleton-list? $list)
               (limiter-lets?
@@ -232,7 +238,7 @@
     (switch (limiter-line-code? (phrase-colon-line-code?-limiter $phrase))
       ((false? _)
         (lets
-          ($string-code (string-atom-code (phrase-string $phrase)))
+          ($string-code (string-atom-code (or (phrase-string? $phrase) ":")))
           (switch (phrase-body $phrase)
             ((singleton-list? $cdr)
               (space-separated-code $string-code

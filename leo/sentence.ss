@@ -3,7 +3,7 @@
     quotify-for-display?
     skip-written?
 
-    phrase-cons phrase? phrase-string phrase-body
+    phrase-cons phrase? phrase-string? phrase-body
     sentence? sentence-switch
     phrase sentence
 
@@ -43,7 +43,6 @@
 
   (define (phrase-cons word body) (cons word body))
   (define phrase? pair?)
-  (define phrase-string car)
   (define phrase-string? car)
   (define phrase-body cdr)
 
@@ -95,17 +94,19 @@
 
   ; === quotify
 
-  (define (begin-string? $word)
-    (cond
-      ((string=? $word "quote") "'")
-      ((string=? $word "quasiquote") "`")
-      (else #f)))
+  (define (begin-string? $word?)
+    (and $word?
+      (cond
+        ((string=? $word? "quote") "'")
+        ((string=? $word? "quasiquote") "`")
+        (else #f))))
 
-  (define (end-string? $word)
-    (cond
-      ((string=? $word "unquote") "`")
-      ((string=? $word "unquote-splicing") "`...")
-      (else #f)))
+  (define (end-string? $word?)
+    (and $word?
+      (cond
+        ((string=? $word? "unquote") "`")
+        ((string=? $word? "unquote-splicing") "`...")
+        (else #f))))
 
   (define (sentence-quotify $sentence)
     (sentence-switch $sentence
@@ -177,7 +178,7 @@
           ,(list->sentences (cdr $pair))))
       ((else $other)
         `(
-          ,(if (skip-written?) "list:" ":")
+          #f
           . ,(list->sentences (cons $other (cdr $pair)))))))
 
   (define (box->sentence $box)

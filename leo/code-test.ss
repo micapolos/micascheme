@@ -58,7 +58,7 @@
 (check-code=? (line-code '(foo gar . bar)) "foo (gar, bar.)")
 (check-code=? (line-code '(foo)) "foo ()")
 (check-code=? (line-code '(foo bar)) "foo bar")
-(check-code=? (line-code '((foo bar))) ": foo bar")
+(check-code=? (line-code '((foo bar))) "(foo bar)")
 (check-code=? (line-code '(foo (bar goo))) "foo bar goo")
 (check-code=? (line-code '(foo bar goo)) "foo (bar, goo)")
 (check-code=? (line-code '(foo bar (goo gar))) "foo (bar, goo gar)")
@@ -160,7 +160,9 @@
 (check-block-code '(foo bar gar) "foo: bar, gar")
 (check-block-code '(foo bar . gar) "foo: bar, gar.")
 (check-block-code '(foo bar ((gar zar)))
-  "foo: bar, : gar zar")
+  "foo"
+  "  bar"
+  "  : gar zar")
 (check-block-code '(1 2 3) ":: 1, 2, 3")
 
 (parameterize ((code-line-limit 5))
