@@ -9,10 +9,9 @@
     (begin-quoted-annotation (annotation numeric-char))
     %annotation-stripped)
   (ok "1" #\1)
-  (ok "'1" ''#\1)
-  (ok "''1" '''#\1)
   (ok "`1" '`#\1)
-  (ok "``1" '``#\1))
+  (ok "``1" '``#\1)
+  (error "'1"))
 
 (check-reader
   (end-quoted-annotations null)

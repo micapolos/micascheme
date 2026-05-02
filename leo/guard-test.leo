@@ -71,4 +71,4 @@ check equal?
     else x
       `other` x
     in raise #\a
-  'other #\a
+  `other #\a

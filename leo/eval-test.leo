@@ -5,15 +5,15 @@ import
   leo with
   leo math
   only
-    equal?, environment, quote
+    equal?, environment, quasiquote
     from scheme
 
 check equal?
   eval
-    'let
+    `let
       with
         x 10
         y 20
       add: x, y
-    environment 'leo scheme
+    environment `leo scheme
   30

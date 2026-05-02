@@ -7,7 +7,6 @@
 
   (%define begin-quote
     (one-of
-      (replace "'" 'quote)
       (replace "`" 'quasiquote)))
 
   (%define end-quote

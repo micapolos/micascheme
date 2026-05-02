@@ -1,5 +1,5 @@
 import
-  only: equal?, call-with-string-output-port, quote, from scheme
+  only: equal?, call-with-string-output-port, quasiquote, from scheme
   only: lines-string, from string
   leo check
   leo with
@@ -9,7 +9,7 @@ import
 check equal?
   call-with-string-output-port lambda
     with port
-    display: 'hello world, port
+    display: `hello world, port
   lines-string "hello world"
 
 check equal?

@@ -29,7 +29,7 @@ check equal?
   "foo!"
 
 check void? switch
-  'foo
+  `foo
   when
     number number?
     +: number, 1
@@ -91,7 +91,7 @@ check equal?
 
 check equal?
   switch?
-    'foo
+    `foo
     when
       number number?
       +: number, 1

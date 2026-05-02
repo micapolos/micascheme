@@ -5,8 +5,8 @@
   (leo mica reader quotes))
 
 (check-reader begin-quote
-  (ok "'" 'quote)
   (ok "`" 'quasiquote)
+  (error "'")
   (error ",")
   (error "''"))
 

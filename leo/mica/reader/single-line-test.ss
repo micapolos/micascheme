@@ -40,9 +40,8 @@
   (ok "foo (bar, gar)" '(foo bar gar))
 
   ; begin-quote
-  (ok "'foo" ''foo)
   (ok "`foo" '`foo)
-  (ok "'`'foo" ''`'foo)
+  (error "'foo")
 
   ; end-quote
   (ok "foo` bar" '(foo ,bar))

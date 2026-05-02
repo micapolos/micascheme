@@ -5,10 +5,7 @@
 
 (check-gets quote-annotation?-getter "" #f 0)
 (check-gets quote-annotation?-getter "a" #f 0)
-
-(check-gets quote-annotation?-getter "'"
-  (stripped-annotation 'quote (test-source-object 0 1))
-  1)
+(check-gets quote-annotation?-getter "'" #f 0)
 
 (check-gets quote-annotation?-getter "`"
   (stripped-annotation 'quasiquote (test-source-object 0 1))
@@ -96,11 +93,8 @@
 
 ; quoting
 
-(check-gets line-getter "'foo\n" ''foo 5)
 (check-gets line-getter "`foo\n" '`foo 5)
-
-(check-gets line-getter "''foo\n" '''foo 6)
-(check-gets line-getter "'`foo\n" ''`foo 6)
+(check-get-raises line-getter "'foo\n")
 
 (check-gets line-getter "foo`:\n" '(foo))
 (check-gets line-getter "foo` 1\n" '(foo ,1))
@@ -112,8 +106,8 @@
 (check-gets line-getter "foo`...`... 123\n" '(foo ,@,@123))
 (check-gets line-getter "foo`...: 1, 2\n" '(foo ,@1 ,@2))
 
-(check-gets inline-getter "'foo" ''foo 4)
 (check-gets inline-getter "`foo" '`foo 4)
+(check-get-raises inline-getter "'foo")
 
 (check-get-raises inline-getter "foo`:")
 (check-gets inline-getter "foo` 1" '(foo ,1))
