@@ -1,6 +1,9 @@
 import leo scheme
 
 quote changelog
+  v0.1.122
+    remove reader and writer extension for quote form
+    unify reader and writer for: quasiquote, unquote, unquote-splicing
   v0.1.121
     pretty-write list
   v0.1.120
