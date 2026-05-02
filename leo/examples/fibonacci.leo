@@ -2,9 +2,9 @@ import leo scheme
 
 define n string->number car with command-line-arguments
 
-print `calculating fibonacci` n
+print 'calculating fibonacci' n
 
-time print `result is`
+time print 'result is'
   let fibonacci
     number n
     in if

@@ -304,42 +304,42 @@ check equal?
 
 In Scheme, "quoting" is how we tell the computer: "Don't run this code as a command; just treat it as a **sentence**." Leo offers three ways to do this, depending on how much of the sentence you want to "freeze."
 
-### The Single Quote (`'`)
+### The `quote` word
 
-The single quote is the simplest way to quote. It marks the **entire sentence** including all its sub-sentences as literal prose.
+The `quote` word is the simplest way to quote. It marks the **entire sentence** including all its sub-sentences as literal prose.
 
 In this example, we aren't adding *2* and *2*; we are simply checking if the sentence itself matches another one.
 
 ```leo
 check equal?
-  'add: 2, 2
-  'add: 2, 2
+  quote add: 2, 2
+  quote add: 2, 2
 
 check not equal?
-  'add: 2, 2
+  quote add: 2, 2
   4
 ```
 
-### The Backtick (`` ` ``)
+### The quote symbol (`` ' ``)
 
-Sometimes you only want to quote a specific word or part of a sentence while letting the rest run normally. A backtick appearing at the beginning of a word starts a quote and at the end of a word ends it.
+Sometimes you only want to quote a specific word or part of a sentence while letting the rest run normally. A quote symbol appearing at the beginning of a word starts a quote and at the end of a word ends it.
 
 Here, we quote `the result`, but we let the `add: 2, 2` part actually calculate the number *4*.
 
 ```leo
 check equal?
-  `number` add: 2, 2
-  'number 4
+  'number' add: 2, 2
+  quote number 4
 ```
 
-### The Expansion (`` `... ``)
+### The Expansion (`` '. ``)
 
-If you want to quote a word but treat everything that follows it as a list of items, use the expansion quote (`` `... ``). This "closes" the quote but tells Leo to expand the right side of the sentence into a list.
+If you want to quote a word but treat everything that follows it as a list of items, use the expansion quote (`` '. ``). This "closes" the quote but tells Leo to expand the right side of the sentence into a list.
 
 ```leo
 check equal?
-  `numbers`... list: 1, 2, 3, 4
-  'numbers 1 2 3 4
+  'numbers'. list: 1, 2, 3, 4
+  quote numbers 1 2 3 4
 ```
 
 ### Mixing Styles in Complex Sentences
@@ -348,19 +348,19 @@ You can combine these to handle complex sentences. In this example, we use backt
 
 ```leo
 check equal?
-  `circle
-    radius` sqrt 4
-    center point
-      x` add: 10, 20
-      y` add: 30, 40
   'circle
+    radius' sqrt 4
+    center point
+      x' add: 10, 20
+      y' add: 30, 40
+  quote circle
     radius 2
     center point
       x 30
       y 70
 ```
 
-_For Scheme users: Leo's punctuation is a direct mapping of standard operators: `` ' `` acts as quote, while the backtick `` ` `` serves as a toggling `quasiquote` and `unquote`, and the ellipsis version `` `... `` functions as `unquote-splicing`._
+_For Scheme users: Leo's punctuation is a direct mapping of standard operators: the quote `` ' `` serves as a toggling `quasiquote` and `unquote`, and the ellipsis version `` '. `` functions as `unquote-splicing`._
 
 ## Control Flow
 

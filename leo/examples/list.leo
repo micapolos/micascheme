@@ -1,11 +1,11 @@
 import leo scheme
 
-print `fruit` list
+print 'fruit' list
   "apple"
   "banana"
   "orange"
 
-print `fruit and animal` list
+print 'fruit and animal' list
   "apple"
   "banana"
   "orange"
@@ -14,12 +14,12 @@ print `fruit and animal` list
     "dog"
     "tiger"
 
-print `closed` list
+print 'closed' list
   "apple"
   "banana"
   "orange"
 
-print `open` list*
+print 'open' list*
   "apple"
   "banana"
   "orange"
@@ -28,19 +28,19 @@ print `open` list*
     "dog"
     "tiger"
 
-print `number to string` map
+print 'number to string' map
   number->string
   list: 1, 2, 3, 4
 
-print `odd?` map
+print 'odd?'' map
   odd?
   list: 1, 2, 3, 4
 
-print `odd` filter
+print 'odd' filter
   odd?
   iota 20
 
-print `even` filter
+print 'even' filter
   even?
   iota 20
 
@@ -52,7 +52,7 @@ define
     number->string string-length string
     ")"
 
-print `strings with length` map
+print 'strings with length' map
   string-append-length
   list
     "this"
