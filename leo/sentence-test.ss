@@ -125,7 +125,7 @@
     (->sentence '())
     '("written" "null")))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence '())
@@ -136,7 +136,7 @@
     (->sentence (void))
     '("written" "void")))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence (void))
@@ -147,7 +147,7 @@
     (->sentence #t)
     '("written" "true")))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence #t)
@@ -158,7 +158,7 @@
     (->sentence #f)
     '("written" "false")))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence #f)
@@ -174,7 +174,7 @@
     (->sentence #\a)
     '("written" ("char" "a"))))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence #\a)
@@ -185,7 +185,7 @@
     (->sentence #\:)
     '("written" ("char" "colon"))))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence #\:)
@@ -258,7 +258,7 @@
     (->sentence '((quote a)))
     '(#f ("quote" "a"))))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence '(123))
@@ -289,7 +289,7 @@
     (->sentence (box 10))
     '("written" ("box" "10"))))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence (box 10))
@@ -300,7 +300,7 @@
     (->sentence eof)
     '("written" "eof")))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence eof)
@@ -316,7 +316,7 @@
     (->sentence (bytevector 1 2 3))
     '("written" ("bytevector" "1" "2" "3"))))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence (bytevector))
@@ -341,7 +341,7 @@
         ("written" ("char" "space") )
         "\"foo\""))))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence (vector))
@@ -369,7 +369,7 @@
     (->sentence (point 10 20))
     '("written" ("record" ("point" "10" "20")))))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence (point 10 20))
@@ -380,7 +380,7 @@
     (->sentence +)
     '("written" ("procedure" "+"))))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence +)
@@ -391,7 +391,7 @@
     (->sentence (lambda (x) x))
     '("written" "procedure")))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence (lambda (x) x))
@@ -402,7 +402,7 @@
     (->sentence #'+)
     '("written" ("syntax" "+"))))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (->sentence #'+)
@@ -413,7 +413,7 @@
     (list->sentences 123)
     "123"))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (list->sentences 123)
@@ -429,7 +429,7 @@
     (list->sentences '(1 2 . 3))
     '("1" "2" . "3")))
 
-(parameterize ((skip-written? #t))
+(parameterize ((pretty-write? #t))
   (check
     (equal?
       (list->sentences '(1 2 . 3))
@@ -446,7 +446,7 @@
       (->sentence point-ftype-pointer)
       '("written" ("ftype" ("point" ("struct" ("x" "10") ("y" "20")))))))
 
-  (parameterize ((skip-written? #t))
+  (parameterize ((pretty-write? #t))
     (check
       (equal?
         (->sentence point-ftype-pointer)

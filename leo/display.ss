@@ -12,7 +12,7 @@
       ((object)
         (display object (current-output-port)))
       ((object port)
-        (parameterize ((quotify-for-display? #t) (skip-written? #t))
+        (parameterize ((quotify-for-display? #t) (pretty-write? #t))
           (write object port)))))
 
   (define display-string %display-string)

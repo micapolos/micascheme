@@ -13,7 +13,7 @@
       ((x)
         (print x (current-output-port)))
       ((x port)
-        (parameterize ((skip-written? #t))
+        (parameterize ((pretty-write? #t))
           (put-string port (code-string (block-code x)))))))
 
   (define print-line
@@ -23,7 +23,7 @@
       ((x port)
         (lets
           ($port port)
-          (parameterize ((skip-written? #t))
+          (parameterize ((pretty-write? #t))
             (put-string $port (code-string (line-code x)))
             (newline $port))))))
 )

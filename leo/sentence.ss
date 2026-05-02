@@ -1,7 +1,7 @@
 (library (leo sentence)
   (export
     quotify-for-display?
-    skip-written?
+    pretty-write?
 
     phrase-cons phrase? phrase-string? phrase-body
     sentence? sentence-switch
@@ -39,7 +39,7 @@
     (void))
 
   (define quotify-for-display? (make-thread-parameter #f))
-  (define skip-written? (make-thread-parameter #f))
+  (define pretty-write? (make-thread-parameter #f))
 
   (define (phrase-cons word body) (cons word body))
   (define phrase? pair?)
@@ -139,7 +139,7 @@
 
   (define (sentence-written $sentence)
     (cond
-      ((skip-written?) $sentence)
+      ((pretty-write?) $sentence)
       (else `("written" ,$sentence))))
 
   (define (null->sentence _)
@@ -178,7 +178,7 @@
           ,(list->sentences (cdr $pair))))
       ((else $other)
         `(
-          ,(if (skip-written?) "list" #f)
+          ,(if (pretty-write?) "list" #f)
           .
           ,(list->sentences (cons $other (cdr $pair)))))))
 
@@ -206,7 +206,7 @@
             ,(symbol->string (record-type-name (record-rtd $ftype-pointer)))
             ,(->sentence (ftype-pointer->sexpr $ftype-pointer))))
         (cond
-          ((skip-written?) $sentence)
+          ((pretty-write?) $sentence)
           (else `("ftype" ,$sentence))))))
 
   (define (record->sentence $record)
@@ -224,7 +224,7 @@
                 ($index (iota (vector-length (record-type-field-names $rtd))))
                 ((record-accessor $rtd $index) $record))))))
       (cond
-        ((skip-written?) $sentence)
+        ((pretty-write?) $sentence)
         (else (sentence-written `("record" ,$sentence))))))
 
   (define (procedure->sentence $procedure)
