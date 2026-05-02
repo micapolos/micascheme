@@ -47,28 +47,33 @@
 
 (check
   (equal?
-    (sentence-quotify '("quote" . bar))
-    '("quote" . bar)))
+    (sentence-quotify '("quote" . "bar"))
+    '("quote" . "bar")))
 
 (check
   (equal?
-    (sentence-quotify '("quote" foo))
+    (sentence-quotify '("quote" "foo"))
     "'foo"))
 
 (check
   (equal?
-    (sentence-quotify '("quote" foo bar))
-    '("quote" foo bar)))
+    (sentence-quotify '("quote" "foo" "bar"))
+    '("quote" "foo" "bar")))
 
 (check
   (equal?
-    (sentence-quotify '("quote" (foo bar)))
+    (sentence-quotify '("quote" ("foo" "bar")))
     '("'foo" "bar")))
 
 (check
   (equal?
-    (sentence-quotify '("quote" (foo (bar gar))))
+    (sentence-quotify '("quote" ("foo" ("bar" "gar"))))
     '("'foo" ("bar" "gar"))))
+
+(check
+  (equal?
+    (sentence-quotify '("quote" ("quote" "a")))
+    "''a"))
 
 ; === quotify / unquote
 
@@ -79,12 +84,12 @@
 
 (check
   (equal?
-    (sentence-quotify '("bar" (unquote . foo)))
+    (sentence-quotify '("bar" ("unquote" . "foo")))
     '("bar`" . "foo")))
 
 (check
   (equal?
-    (sentence-quotify '("bar" (unquote foo)))
+    (sentence-quotify '("bar" ("unquote" "foo")))
     '("bar`" "foo")))
 
 ; === ->sentence
@@ -222,6 +227,11 @@
     (->sentence '(123 (bar)))
     '(":" "123" ("bar"))))
 
+(check
+  (equal?
+    (->sentence '((quote a)))
+    '(":" ("quote" "a"))))
+
 (parameterize ((skip-written? #t))
   (check
     (equal?
@@ -241,7 +251,12 @@
   (check
     (equal?
       (->sentence '(123 (bar)))
-      '("list:" "123" ("bar")))))
+      '("list:" "123" ("bar"))))
+
+  (check
+    (equal?
+      (->sentence '((quote a)))
+      '("list:" ("quote" "a")))))
 
 (check
   (equal?
@@ -410,9 +425,3 @@
       (equal?
         (->sentence point-ftype-pointer)
         '("point" ("struct" ("x" "10") ("y" "20")))))))
-
-; FIXIT: This is clearly wrong.
-(check
-  (equal?
-    (->sentence (quote (quote a)))
-    "'\"a\""))

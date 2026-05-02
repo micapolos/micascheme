@@ -33,6 +33,7 @@
     (procedure)
     (list)
     (list-syntax)
+    (system)
     (void))
 
   (define quotify-for-display? (make-thread-parameter #f))
@@ -98,10 +99,10 @@
       ((string? $string) $string)
       ((phrase? $phrase)
         (or
-          (switch? (phrase-body $phrase)
+          (switch? (map* sentence-quotify sentence-quotify (phrase-body $phrase))
             ((singleton-list? $body)
               (lets
-                ($body-sentence (->sentence (car $body)))
+                ($body-sentence (car $body))
                 (switch (begin-string? (phrase-string $phrase))
                   ((string? $quote)
                     (quote-sentence? $quote $body-sentence))
@@ -116,7 +117,9 @@
                                 (phrase-cons
                                   (phrase-string $phrase)
                                   (phrase-body $body-phrase)))))))))))))
-            $phrase))))
+            (phrase-cons
+              (sentence-quotify (phrase-string $phrase))
+              (map* sentence-quotify sentence-quotify (phrase-body $phrase)))))))
 
   ; === ->sentence
 
@@ -155,11 +158,10 @@
   (define (pair->sentence $pair)
     (switch (car $pair)
       ((symbol? $symbol)
-        (sentence-quotify
-          `(
-            ,(symbol->string $symbol)
-            .
-            ,(list->sentences (cdr $pair)))))
+        `(
+          ,(symbol->string $symbol)
+          .
+          ,(list->sentences (cdr $pair))))
       ((else $other)
         `(
           ,(if (skip-written?) "list:" ":")
