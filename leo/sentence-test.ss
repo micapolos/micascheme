@@ -73,13 +73,28 @@
 
 (check
   (equal?
+    (sentence-quotify "quasiquote")
+    "quasiquote"))
+
+(check
+  (equal?
     (sentence-quotify '("quote" . "bar"))
     '("quote" . "bar")))
 
 (check
   (equal?
+    (sentence-quotify '("quasiquote" . "bar"))
+    '("quasiquote" . "bar")))
+
+(check
+  (equal?
     (sentence-quotify '("quote" "foo"))
-    "'foo"))
+    '("quote" "foo")))
+
+(check
+  (equal?
+    (sentence-quotify '("quasiquote" "foo"))
+    "`foo"))
 
 (check
   (equal?
@@ -88,18 +103,38 @@
 
 (check
   (equal?
+    (sentence-quotify '("quasiquote" "foo" "bar"))
+    '("quasiquote" "foo" "bar")))
+
+(check
+  (equal?
     (sentence-quotify '("quote" ("foo" "bar")))
-    '("'foo" "bar")))
+    '("quote" ("foo" "bar"))))
+
+(check
+  (equal?
+    (sentence-quotify '("quasiquote" ("foo" "bar")))
+    '("`foo" "bar")))
 
 (check
   (equal?
     (sentence-quotify '("quote" ("foo" ("bar" "gar"))))
-    '("'foo" ("bar" "gar"))))
+    '("quote" ("foo" ("bar" "gar")))))
+
+(check
+  (equal?
+    (sentence-quotify '("quasiquote" ("foo" ("bar" "gar"))))
+    '("`foo" ("bar" "gar"))))
 
 (check
   (equal?
     (sentence-quotify '("quote" ("quote" "a")))
-    "''a"))
+    '("quote" ("quote" "a"))))
+
+(check
+  (equal?
+    (sentence-quotify '("quasiquote" ("quasiquote" "a")))
+    "``a"))
 
 ; === quotify / unquote
 
@@ -110,13 +145,28 @@
 
 (check
   (equal?
+    (sentence-quotify "unquote-splicing")
+    "unquote-splicing"))
+
+(check
+  (equal?
     (sentence-quotify '("bar" ("unquote" . "foo")))
     '("bar`" . "foo")))
 
 (check
   (equal?
+    (sentence-quotify '("bar" ("unquote-splicing" . "foo")))
+    '("bar`..." . "foo")))
+
+(check
+  (equal?
     (sentence-quotify '("bar" ("unquote" "foo")))
     '("bar`" "foo")))
+
+(check
+  (equal?
+    (sentence-quotify '("bar" ("unquote-splicing" "foo")))
+    '("bar`..." "foo")))
 
 ; === ->sentence
 

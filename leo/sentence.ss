@@ -97,7 +97,6 @@
   (define (begin-string? $word?)
     (and $word?
       (cond
-        ((string=? $word? "quote") "'")
         ((string=? $word? "quasiquote") "`")
         (else #f))))
 
