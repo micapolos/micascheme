@@ -3,11 +3,6 @@ name: Build and Release Leo
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-    paths:
-      - 'deps/ChezScheme/**'
-      - 'leo/build.sh'
     tags:
       - 'v*'
 
@@ -31,10 +26,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: false
+          submodules: recursive
           fetch-depth: 1
-          # Blobless clone for the main repository
-          filter: blob:none
 
       - name: Install Dependencies (Linux)
         if: runner.os == 'Linux'
@@ -45,7 +38,7 @@ jobs:
       - name: Get ChezScheme Submodule Commit
         id: submodule-sha
         run: |
-          echo "sha=$(git ls-tree HEAD deps/ChezScheme | awk '{print $3}')" >> $GITHUB_OUTPUT
+          echo "sha=$(git submodule status deps/ChezScheme | awk '{print $1}' | sed 's/[^a-zA-Z0-9]//g')" >> $GITHUB_OUTPUT
 
       - name: Cache ChezScheme
         id: cache-chez
@@ -59,19 +52,13 @@ jobs:
       - name: Build ChezScheme (Only if cache missed)
         if: steps.cache-chez.outputs.cache-hit != 'true'
         run: |
-          echo "Cache missed! Building ChezScheme..."
-          git submodule sync deps/ChezScheme
-          # Initialize with both depth=1 and blobless filter
-          git submodule update --init --recursive --depth 1 --filter=blob:none deps/ChezScheme
+          echo "Cache missed or files changed! Compiling ChezScheme..."
           cd deps/ChezScheme
           ./configure
           make
 
       - name: Run Build Script
         run: |
-          # Sync and update even on cache hit to keep git index valid
-          git submodule sync
-          git submodule update --init --recursive --depth 1 --filter=blob:none
           chmod +x ./leo/build.sh
           ./leo/build.sh "${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}"
 
@@ -87,7 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
 
     steps:
       - name: Download all artifacts
