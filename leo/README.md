@@ -332,13 +332,13 @@ check equal?
   quote number 4
 ```
 
-### The Expansion (`` '. ``)
+### The Expansion (`` '... ``)
 
-If you want to quote a word but treat everything that follows it as a list of items, use the expansion quote (`` '. ``). This "closes" the quote but tells Leo to expand the right side of the sentence into a list.
+If you want to quote a word but treat everything that follows it as a list of items, use the expansion quote (`` '... ``). This "closes" the quote but tells Leo to expand the right side of the sentence into a list.
 
 ```leo
 check equal?
-  'numbers'. list: 1, 2, 3, 4
+  'numbers'... list: 1, 2, 3, 4
   quote numbers 1 2 3 4
 ```
 
@@ -360,7 +360,7 @@ check equal?
       y 70
 ```
 
-_For Scheme users: Leo's punctuation is a direct mapping of standard operators: the quote `` ' `` serves as a toggling `quasiquote` and `unquote`, and the ellipsis version `` '. `` functions as `unquote-splicing`._
+_For Scheme users: Leo's punctuation is a direct mapping of standard operators: the quote `` ' `` serves as a toggling `quasiquote` and `unquote`, and the ellipsis version `` '... `` functions as `unquote-splicing`._
 
 ## Control Flow
 

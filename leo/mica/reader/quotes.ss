@@ -12,6 +12,6 @@
   (%define end-quote
     (prefixed "'"
       (or
-        (optional (replace "." 'unquote-splicing))
+        (optional (replace "..." 'unquote-splicing))
         (return 'unquote))))
 )

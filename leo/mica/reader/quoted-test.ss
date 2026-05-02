@@ -17,8 +17,8 @@
   (end-quoted-annotations null)
   (ok "" '())
   (ok "'" '())
-  (ok "'." '())
-  (ok "''." '()))
+  (ok "'..." '())
+  (ok "''..." '()))
 
 (check-reader
   (map
@@ -28,8 +28,8 @@
       (%map %annotation-stripped $annotation)))
   (ok "a" '(#\a))
   (ok "'a" '(,#\a))
-  (ok "'.a" '(,@#\a))
-  (ok "''.a" '(,,@#\a)))
+  (ok "'...a" '(,@#\a))
+  (ok "''...a" '(,,@#\a)))
 
 (check-reader
   (map
@@ -41,5 +41,5 @@
       (%map %annotation-stripped $annotation)))
   (ok "a1" '(#\a #\1))
   (ok "'a1" '(,#\a ,#\1))
-  (ok "'.a1" '(,@#\a ,@#\1))
-  (ok "''.a1" '(,,@#\a ,,@#\1)))
+  (ok "'...a1" '(,@#\a ,@#\1))
+  (ok "''...a1" '(,,@#\a ,,@#\1)))

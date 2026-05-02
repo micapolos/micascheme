@@ -12,7 +12,7 @@
 
 (check-reader end-quote
   (ok "'" 'unquote)
-  (ok "'." 'unquote-splicing)
+  (ok "'..." 'unquote-splicing)
   (error ",")
   (error "`")
   (error "``"))
