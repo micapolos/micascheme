@@ -4,39 +4,65 @@
 
 (check (equal? (quote-string "'" "foo") "'foo"))
 
-(check
-  (equal?
-    (quote-phrase? "'" '("foo" 123))
-    '("'foo" 123)))
+(check (equal? (quote-string? "quote" "'" "foo") "'foo"))
+(check (equal? (quote-string? "quote" "'" #f) "quote"))
 
 (check
   (equal?
-    (quote-sentence? "'" "foo")
+    (quote-phrase? "quote" "'" '("foo" "123"))
+    '("'foo" "123")))
+
+(check
+  (equal?
+    (quote-phrase? "quote" "'" '(#f "123"))
+    '("quote" "123")))
+
+(check
+  (equal?
+    (quote-sentence? "quote" "'" "foo")
     "'foo"))
 
 (check
   (equal?
-    (quote-sentence? "'" '("foo" 123))
-    '("'foo" 123)))
+    (quote-sentence? "quote" "'" '("foo" "123"))
+    '("'foo" "123")))
+
+(check
+  (equal?
+    (quote-sentence? "quote" "'" '(#f "123"))
+    '("quote" "123")))
 
 ; === unquote
 
 (check (equal? (unquote-string "`" "foo") "foo`"))
 
-(check
-  (equal?
-    (unquote-phrase? "`" '("foo" 123))
-    '("foo`" 123)))
+(check (equal? (unquote-string? "unquote" "`" "foo") "foo`"))
+(check (equal? (unquote-string? "unquote" "`" #f) "unquote"))
 
 (check
   (equal?
-    (unquote-sentence? "`" "foo")
+    (unquote-phrase? "unquote" "`" '("foo" "123"))
+    '("foo`" "123")))
+
+(check
+  (equal?
+    (unquote-phrase? "unquote" "`" '(#f "123"))
+    '("unquote" "123")))
+
+(check
+  (equal?
+    (unquote-sentence? "unquote" "`" "foo")
     "foo`"))
 
 (check
   (equal?
-    (unquote-sentence? "`" '("foo" 123))
-    '("foo`" 123)))
+    (unquote-sentence? "unquote" "`" '("foo" "123"))
+    '("foo`" "123")))
+
+(check
+  (equal?
+    (unquote-sentence? "unquote" "`" '(#f "123"))
+    '("unquote" "123")))
 
 ; === quotify / quote
 
