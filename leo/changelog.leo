@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.120
+    fix printing of non-sentences
   v0.1.119
     fix printing of quoted lists
   v0.1.118
