@@ -3,8 +3,14 @@ name: Build and Release Leo
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
+    # ONLY trigger on main if the submodule or build logic changes
+    paths:
+      - 'deps/ChezScheme/**'
+      - 'leo/build.sh'
     tags:
-      - 'v*'
+      - 'v*' # Tags ALWAYS trigger to ensure a release is created
 
 jobs:
   build:
@@ -26,7 +32,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false # Clean slate for cache
           fetch-depth: 1
 
       - name: Install Dependencies (Linux)
@@ -38,7 +44,8 @@ jobs:
       - name: Get ChezScheme Submodule Commit
         id: submodule-sha
         run: |
-          echo "sha=$(git submodule status deps/ChezScheme | awk '{print $1}' | sed 's/[^a-zA-Z0-9]//g')" >> $GITHUB_OUTPUT
+          # Pulls the SHA directly from the Git index
+          echo "sha=$(git ls-tree HEAD deps/ChezScheme | awk '{print $3}')" >> $GITHUB_OUTPUT
 
       - name: Cache ChezScheme
         id: cache-chez
@@ -46,19 +53,23 @@ jobs:
         with:
           path: deps/ChezScheme
           key: ${{ runner.os }}-${{ matrix.arch }}-chez-${{ steps.submodule-sha.outputs.sha }}
+          # Fallback to the most recent build for this OS if the SHA changed
           restore-keys: |
             ${{ runner.os }}-${{ matrix.arch }}-chez-
 
       - name: Build ChezScheme (Only if cache missed)
         if: steps.cache-chez.outputs.cache-hit != 'true'
         run: |
-          echo "Cache missed or files changed! Compiling ChezScheme..."
+          echo "Cache missed! Building ChezScheme..."
+          git submodule update --init --recursive deps/ChezScheme
           cd deps/ChezScheme
           ./configure
           make
 
       - name: Run Build Script
         run: |
+          # Ensure submodule is initialized if we had a cache hit
+          git submodule update --init --recursive
           chmod +x ./leo/build.sh
           ./leo/build.sh "${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}"
 
@@ -74,7 +85,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
+    # Don't create releases for pushes to main, only for Tags or Manual runs
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Download all artifacts
