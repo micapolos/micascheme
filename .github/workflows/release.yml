@@ -3,8 +3,6 @@ name: Build and Release Leo
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main  # This "primes" the cache so tags can inherit it
     tags:
       - 'v*'
 
@@ -28,8 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # We don't pull submodules yet to keep the path clean for the cache
-          submodules: false
+          submodules: recursive
           fetch-depth: 1
 
       - name: Install Dependencies (Linux)
@@ -41,8 +38,7 @@ jobs:
       - name: Get ChezScheme Submodule Commit
         id: submodule-sha
         run: |
-          # Robust way to get the SHA without needing the files on disk
-          echo "sha=$(git ls-tree HEAD deps/ChezScheme | awk '{print $3}')" >> $GITHUB_OUTPUT
+          echo "sha=$(git submodule status deps/ChezScheme | awk '{print $1}' | sed 's/[^a-zA-Z0-9]//g')" >> $GITHUB_OUTPUT
 
       - name: Cache ChezScheme
         id: cache-chez
@@ -56,17 +52,13 @@ jobs:
       - name: Build ChezScheme (Only if cache missed)
         if: steps.cache-chez.outputs.cache-hit != 'true'
         run: |
-          echo "Cache missed! Initializing submodule and compiling..."
-          git submodule update --init --recursive deps/ChezScheme
+          echo "Cache missed or files changed! Compiling ChezScheme..."
           cd deps/ChezScheme
           ./configure
           make
 
       - name: Run Build Script
         run: |
-          # Ensure submodules are at least initialized if we had a cache hit
-          # (This is a fast no-op if they are already there)
-          git submodule update --init --recursive
           chmod +x ./leo/build.sh
           ./leo/build.sh "${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}"
 
@@ -82,7 +74,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    # Only run release logic for tags or manual dispatch
     if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
 
     steps:
