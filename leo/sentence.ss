@@ -82,15 +82,15 @@
   ; === quotify
 
   (define (begin-string? $word)
-    (case $word
-      (("quote") "'")
-      (("quasiquote") "`")
+    (case (string->symbol $word)
+      ((quote) "'")
+      ((quasiquote) "`")
       (else #f)))
 
   (define (end-string? $word)
-    (case $word
-      (("unquote") "`")
-      (("unquote-splicing") "`...")
+    (case (string->symbol $word)
+      ((unquote) "`")
+      ((unquote-splicing) "`...")
       (else #f)))
 
   (define (sentence-quotify $sentence)
