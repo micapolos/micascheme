@@ -9,7 +9,7 @@ import
 check equal?
   call-with-string-output-port lambda
     with port
-    display: `hello world, port
+    display: 'hello world, port
   lines-string "hello world"
 
 check equal?

@@ -7,11 +7,11 @@
 
   (%define begin-quote
     (one-of
-      (replace "`" 'quasiquote)))
+      (replace "'" 'quasiquote)))
 
   (%define end-quote
-    (prefixed "`"
+    (prefixed "'"
       (or
-        (optional (replace "..." 'unquote-splicing))
+        (optional (replace "." 'unquote-splicing))
         (return 'unquote))))
 )

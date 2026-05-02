@@ -40,14 +40,14 @@
   (ok "foo (bar, gar)" '(foo bar gar))
 
   ; begin-quote
-  (ok "`foo" '`foo)
-  (error "'foo")
+  (ok "'foo" '`foo)
+  (error "`foo")
 
   ; end-quote
-  (ok "foo` bar" '(foo ,bar))
-  (ok "foo`... bar" '(foo ,@bar))
-  (ok "foo`... (bar, gar)" '(foo ,@bar ,@gar))
-  (ok "foo``... bar" '(foo ,,@bar))
+  (ok "foo' bar" '(foo ,bar))
+  (ok "foo'. bar" '(foo ,@bar))
+  (ok "foo'. (bar, gar)" '(foo ,@bar ,@gar))
+  (ok "foo''. bar" '(foo ,,@bar))
 
   (ok
     "circle (radius 10, center point (x 20, y 30))"

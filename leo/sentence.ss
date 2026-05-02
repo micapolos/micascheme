@@ -97,14 +97,14 @@
   (define (begin-string? $word?)
     (and $word?
       (cond
-        ((string=? $word? "quasiquote") "`")
+        ((string=? $word? "quasiquote") "'")
         (else #f))))
 
   (define (end-string? $word?)
     (and $word?
       (cond
-        ((string=? $word? "unquote") "`")
-        ((string=? $word? "unquote-splicing") "`...")
+        ((string=? $word? "unquote") "'")
+        ((string=? $word? "unquote-splicing") "'.")
         (else #f))))
 
   (define (sentence-quotify $sentence)

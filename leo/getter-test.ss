@@ -5,22 +5,22 @@
 
 (check-gets quote-annotation?-getter "" #f 0)
 (check-gets quote-annotation?-getter "a" #f 0)
-(check-gets quote-annotation?-getter "'" #f 0)
+(check-gets quote-annotation?-getter "`" #f 0)
 
-(check-gets quote-annotation?-getter "`"
+(check-gets quote-annotation?-getter "'"
   (stripped-annotation 'quasiquote (test-source-object 0 1))
   1)
 
 (check-gets unquote-annotation?-getter "" #f 0)
 (check-gets unquote-annotation?-getter "a" #f 0)
 
-(check-gets unquote-annotation?-getter "`"
+(check-gets unquote-annotation?-getter "'"
   (stripped-annotation 'unquote (test-source-object 0 1))
   1)
 
-(check-gets unquote-annotation?-getter "`..."
-  (stripped-annotation 'unquote-splicing (test-source-object 0 4))
-  4)
+(check-gets unquote-annotation?-getter "'."
+  (stripped-annotation 'unquote-splicing (test-source-object 0 2))
+  2)
 
 (check-gets line-getter "123\n" 123 4)
 (check-gets line-getter "\"foo\"\n" "foo" 6)
@@ -93,30 +93,30 @@
 
 ; quoting
 
-(check-gets line-getter "`foo\n" '`foo 5)
-(check-get-raises line-getter "'foo\n")
+(check-gets line-getter "'foo\n" '`foo 5)
+(check-get-raises line-getter "`foo\n")
 
-(check-gets line-getter "foo`:\n" '(foo))
-(check-gets line-getter "foo` 1\n" '(foo ,1))
-(check-gets line-getter "foo`` 1\n" '(foo ,,1))
-(check-gets line-getter "foo`: 1, 2\n" '(foo ,1 ,2))
+(check-gets line-getter "foo':\n" '(foo))
+(check-gets line-getter "foo' 1\n" '(foo ,1))
+(check-gets line-getter "foo'' 1\n" '(foo ,,1))
+(check-gets line-getter "foo': 1, 2\n" '(foo ,1 ,2))
 
-(check-gets line-getter "foo`...:\n" '(foo))
-(check-gets line-getter "foo`... 123\n" '(foo ,@123))
-(check-gets line-getter "foo`...`... 123\n" '(foo ,@,@123))
-(check-gets line-getter "foo`...: 1, 2\n" '(foo ,@1 ,@2))
+(check-gets line-getter "foo'.:\n" '(foo))
+(check-gets line-getter "foo'. 123\n" '(foo ,@123))
+(check-gets line-getter "foo'.'. 123\n" '(foo ,@,@123))
+(check-gets line-getter "foo'.: 1, 2\n" '(foo ,@1 ,@2))
 
-(check-gets inline-getter "`foo" '`foo 4)
-(check-get-raises inline-getter "'foo")
+(check-gets inline-getter "'foo" '`foo 4)
+(check-get-raises inline-getter "`foo")
 
-(check-get-raises inline-getter "foo`:")
-(check-gets inline-getter "foo` 1" '(foo ,1))
-(check-gets inline-getter "foo`` 1" '(foo ,,1))
-(check-get-raises inline-getter "foo`: 1, 2")
+(check-get-raises inline-getter "foo':")
+(check-gets inline-getter "foo' 1" '(foo ,1))
+(check-gets inline-getter "foo'' 1" '(foo ,,1))
+(check-get-raises inline-getter "foo': 1, 2")
 
-(check-get-raises inline-getter "foo`...:")
-(check-gets inline-getter "foo`... 123" '(foo ,@123))
-(check-get-raises inline-getter "foo`...: 1, 2")
+(check-get-raises inline-getter "foo'.:")
+(check-gets inline-getter "foo'. 123" '(foo ,@123))
+(check-get-raises inline-getter "foo'.: 1, 2")
 
 (check-gets
   line-getter

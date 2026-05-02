@@ -9,16 +9,16 @@
     (begin-quoted-annotation (annotation numeric-char))
     %annotation-stripped)
   (ok "1" #\1)
-  (ok "`1" '`#\1)
-  (ok "``1" '``#\1)
-  (error "'1"))
+  (ok "'1" '`#\1)
+  (ok "''1" '``#\1)
+  (error "`1"))
 
 (check-reader
   (end-quoted-annotations null)
   (ok "" '())
-  (ok "`" '())
-  (ok "`..." '())
-  (ok "``..." '()))
+  (ok "'" '())
+  (ok "'." '())
+  (ok "''." '()))
 
 (check-reader
   (map
@@ -27,9 +27,9 @@
     (%lambda ($annotation)
       (%map %annotation-stripped $annotation)))
   (ok "a" '(#\a))
-  (ok "`a" '(,#\a))
-  (ok "`...a" '(,@#\a))
-  (ok "``...a" '(,,@#\a)))
+  (ok "'a" '(,#\a))
+  (ok "'.a" '(,@#\a))
+  (ok "''.a" '(,,@#\a)))
 
 (check-reader
   (map
@@ -40,6 +40,6 @@
     (%lambda ($annotation)
       (%map %annotation-stripped $annotation)))
   (ok "a1" '(#\a #\1))
-  (ok "`a1" '(,#\a ,#\1))
-  (ok "`...a1" '(,@#\a ,@#\1))
-  (ok "``...a1" '(,,@#\a ,,@#\1)))
+  (ok "'a1" '(,#\a ,#\1))
+  (ok "'.a1" '(,@#\a ,@#\1))
+  (ok "''.a1" '(,,@#\a ,,@#\1)))

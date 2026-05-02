@@ -69,6 +69,6 @@ check equal?
       s string?
       string-append: s, "!"
     else x
-      `other` x
+      'other' x
     in raise #\a
-  `other #\a
+  'other #\a

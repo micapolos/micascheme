@@ -5,13 +5,14 @@
   (leo mica reader quotes))
 
 (check-reader begin-quote
-  (ok "`" 'quasiquote)
-  (error "'")
+  (ok "'" 'quasiquote)
+  (error "`")
   (error ",")
   (error "''"))
 
 (check-reader end-quote
-  (ok "`" 'unquote)
-  (ok "`..." 'unquote-splicing)
+  (ok "'" 'unquote)
+  (ok "'." 'unquote-splicing)
   (error ",")
+  (error "`")
   (error "``"))
