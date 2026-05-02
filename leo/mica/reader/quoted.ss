@@ -1,5 +1,6 @@
 (library (leo mica reader quoted)
   (export
+    depth->unquoted
     begin-quoted-annotation
     end-quoted-annotations
     end-quoted-annotations?)
@@ -8,6 +9,11 @@
     (prefix (annotation) %)
     (mica reader)
     (leo mica reader quotes))
+
+  (%define (depth->unquoted $depth $item)
+    (%if (%zero? $depth)
+      $item
+      (suffixed (depth->unquoted (%- $depth 1) $item) #\')))
 
   (%define (quoted-annotation $quote $annotation)
     (or

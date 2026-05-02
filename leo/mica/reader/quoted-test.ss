@@ -5,6 +5,32 @@
   (leo mica reader quoted))
 
 (check-reader
+  (depth->unquoted 0 alphabetic-char)
+  (ok "a" #\a)
+  (error "'")
+  (error "a'")
+  (error "ab")
+  (error "1'"))
+
+(check-reader
+  (depth->unquoted 1 alphabetic-char)
+  (ok "a'" #\a)
+  (error "'")
+  (error "a")
+  (error "ab")
+  (error "1"))
+
+(check-reader
+  (depth->unquoted 2 alphabetic-char)
+  (ok "a''" #\a)
+  (error "'")
+  (error "a")
+  (error "a'")
+  (error "a'''")
+  (error "ab''")
+  (error "1"))
+
+(check-reader
   (map
     (begin-quoted-annotation (annotation numeric-char))
     %annotation-stripped)
