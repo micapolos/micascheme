@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  v0.1.119
+    fix printing of quoted lists
   v0.1.118
     improves core error messages
   v0.1.117
