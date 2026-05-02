@@ -28,6 +28,7 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 1
+          filter: blob:none
 
       - name: Install Dependencies (Linux)
         if: runner.os == 'Linux'
