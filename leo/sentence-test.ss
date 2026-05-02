@@ -411,3 +411,8 @@
         (->sentence point-ftype-pointer)
         '("point" ("struct" ("x" "10") ("y" "20")))))))
 
+; FIXIT: This is clearly wrong.
+(check
+  (equal?
+    (->sentence (quote (quote a)))
+    "'\"a\""))
