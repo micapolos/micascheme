@@ -258,6 +258,32 @@
     (->sentence '((quote a)))
     '(#f ("quote" "a"))))
 
+(parameterize ((skip-written? #t))
+  (check
+    (equal?
+      (->sentence '(123))
+      '("list" "123")))
+
+  (check
+    (equal?
+      (->sentence '(123 ()))
+      '("list" "123" "null")))
+
+  (check
+    (equal?
+      (->sentence '(123 bar))
+      '("list" "123" "bar")))
+
+  (check
+    (equal?
+      (->sentence '(123 (bar)))
+      '("list" "123" ("bar"))))
+
+  (check
+    (equal?
+      (->sentence '((quote a)))
+      '("list" ("quote" "a")))))
+
 (check
   (equal?
     (->sentence (box 10))
