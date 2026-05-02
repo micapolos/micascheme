@@ -18,6 +18,7 @@
     unquote-sentence?
 
     sentence-quotify
+    depth/sentence-quotify
 
     ->sentence
     list->sentences)
@@ -45,6 +46,25 @@
   (define phrase? pair?)
   (define phrase-string? car)
   (define phrase-body cdr)
+
+  (define (phrase-simple-body? $phrase)
+    (switch? (phrase-body $phrase)
+      ((singleton-list? $list) (car $list))))
+
+  (define (sentence-simple-body? $sentence)
+    (switch? $sentence
+      ((phrase? $phrase)
+        (phrase-simple-body? $phrase))))
+
+  (define (string?/phrase-simple-body? $string? $phrase)
+    (and
+      (equal? $string? (phrase-string? $phrase))
+      (phrase-simple-body? $phrase)))
+
+  (define (string?/sentence-simple-body? $string? $sentence)
+    (switch? $sentence
+      ((phrase? $phrase)
+        (string?/phrase-simple-body? $string? $phrase))))
 
   (define-rules-syntaxes
     ((phrase (word x ...)) (phrase-cons word (list 'x ...)))
@@ -107,37 +127,62 @@
         ((string=? $word? "unquote-splicing") "'.")
         (else #f))))
 
-  (define (string-quotify $string)
-    $string)
+  (define (depth/string-quotify $depth $string)
+    (cond
+      ((zero? $depth)
+        $string)
+      (else
+        (depth/string-quotify
+          (- $depth 1)
+          (string-append $string "'")))))
 
-  (define (phrase-quotify $phrase)
+  (define (depth/phrase-quotify $depth $phrase)
     (lets
       ($word? (phrase-string? $phrase))
-      ($body (map* sentence-quotify sentence-quotify (phrase-body $phrase)))
-      (or
-        (switch? $body
-          ((singleton-list? $body)
-            (lets
-              ($body-sentence (car $body))
-              (switch (begin-string? $word?)
-                ((string? $quote)
-                  (quote-sentence? $word? $quote $body-sentence))
-                ((else _)
-                  (switch? $body-sentence
-                    ((phrase? $body-phrase)
-                      (lets
-                        ($body-word? (phrase-string? $body-phrase))
-                        ($body-body (phrase-body $body-phrase))
-                        (switch? (end-string? $body-word?)
-                          ((string? $unquote)
-                            (unquote-sentence? $word? $unquote
-                              (phrase-cons $word? $body-body))))))))))))
-          (phrase-cons $word? $body))))
+      ($body (phrase-body $phrase))
+      (cond
+        (
+          (and
+            (equal? $word? "quasiquote")
+            (singleton-list? $body))
+          (quote-sentence? $word? "'"
+            (depth/sentence-quotify (+ $depth 1) (car $body))))
+        (
+          (and
+            $word?
+            (not (zero? $depth))
+            (for-all* (partial string?/sentence-simple-body? "unquote") $body))
+          (phrase-cons
+            (unquote-string "'" $word?)
+            (map*
+              (partial depth/sentence-quotify (- $depth 1))
+              (partial depth/sentence-quotify (- $depth 1))
+              (map* sentence-simple-body? sentence-simple-body? $body))))
+        (
+          (and
+            $word?
+            (not (zero? $depth))
+            (for-all* (partial string?/sentence-simple-body? "unquote-splicing") $body))
+          (phrase-cons
+            (unquote-string "'..." $word?)
+            (map*
+              (partial depth/sentence-quotify (- $depth 1))
+              (partial depth/sentence-quotify (- $depth 1))
+              (map* sentence-simple-body? sentence-simple-body? $body))))
+        (else
+          (phrase-cons $word?
+            (map*
+              (partial depth/sentence-quotify $depth)
+              (partial depth/sentence-quotify $depth)
+              $body))))))
+
+  (define (depth/sentence-quotify $depth $sentence)
+    (sentence-switch $sentence
+      ((string? $string) (depth/string-quotify $depth $string))
+      ((phrase? $phrase) (depth/phrase-quotify $depth $phrase))))
 
   (define (sentence-quotify $sentence)
-    (sentence-switch $sentence
-      ((string? $string) (string-quotify $string))
-      ((phrase? $phrase) (phrase-quotify $phrase))))
+    (depth/sentence-quotify 0 $sentence))
 
   ; === ->sentence
 

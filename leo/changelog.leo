@@ -1,6 +1,8 @@
 import leo scheme
 
 quote changelog
+  latest
+    trailing unquote writer
   v0.1.123
     reader and writer for unquote-splicing
   v0.1.122
