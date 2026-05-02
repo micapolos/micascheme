@@ -43,6 +43,9 @@
 
   (define (terminator-code $code) (code $code "."))
 
+  (define (->code-sentence $datum)
+    (sentence-quotify (->sentence $datum)))
+
   ; === atom-code? ===
 
   (define (string-atom-code $string)
@@ -56,7 +59,7 @@
       ((phrase? $phrase) (phrase-atom-code? $phrase))))
 
   (define (atom-code? $datum)
-    (sentence-atom-code? (->sentence $datum)))
+    (sentence-atom-code? (->code-sentence $datum)))
 
   (define-rule-syntax (check-atom-code? in out)
     (if out
@@ -102,7 +105,7 @@
         (list (terminator-code (sentence-line-code $sentence))))))
 
   (define (line-code $datum)
-    (sentence-line-code (->sentence $datum)))
+    (sentence-line-code (->code-sentence $datum)))
 
   ; === space-line-code-limiter ===
 
@@ -130,7 +133,7 @@
       ((phrase? $phrase) (phrase-space-line-code?-limiter $phrase))))
 
   (define (space-line-code?-limiter $datum)
-    (sentence-space-line-code?-limiter (->sentence $datum)))
+    (sentence-space-line-code?-limiter (->code-sentence $datum)))
 
   (define (limit-space-line-code? $limit $datum)
     (lets?
@@ -202,7 +205,7 @@
             (limiter (terminator-code $code)))))))
 
   (define (colon-line-code?-limiter $datum)
-    (sentence-colon-line-code?-limiter (->sentence $datum)))
+    (sentence-colon-line-code?-limiter (->code-sentence $datum)))
 
   (define (limit-colon-line-code? $limit $datum)
     (lets?
@@ -267,7 +270,7 @@
               (sentence-block-code $sentence)))))))
 
   (define (block-code $datum)
-    (sentence-block-code (->sentence $datum)))
+    (sentence-block-code (->code-sentence $datum)))
 
   (define-rule-syntax (check-block-code in out ...)
     (check-code=? (block-code in) (lines-string out ...)))
