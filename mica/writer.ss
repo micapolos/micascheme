@@ -4,17 +4,21 @@
     null-writer
     char->writer
     string->writer
-    ?char-writer
     char-writer
     string-writer
+    number-writer
+    writer-filter
+    writer-map
     or-writer
-    writer/value->string
+    writer-string
     check-writer)
   (import
     (scheme)
     (lets)
+    (data)
     (switch)
     (boolean)
+    (predicate)
     (code)
     (check)
     (throw)
@@ -22,57 +26,50 @@
     (procedure)
     (syntaxes))
 
-  (define (writer/value->code-box? $writer $value)
-    ($writer $value))
+  (data (writer predicate code-procedure))
 
-  (define (writer/value->code $writer $value)
-    (switch (writer/value->code-box? $writer $value)
-      ((box? $box) (unbox $box))
-      ((else _) (throw writer/value->code $writer $value))))
+  (define (writer-test? $writer $value)
+    ((writer-predicate $writer) $value))
 
-  (define (writer/value->string $writer $value)
-    (code-string (writer/value->code $writer $value)))
+  (define (writer-code $writer $value)
+    ((writer-code-procedure $writer) $value))
+
+  (define (writer-string $writer $value)
+    (code-string (writer-code $writer $value)))
 
   (define null-writer
-    (lambda ($value)
-      (and
-        (null? $value)
-        (box (empty-code)))))
-
-  (define (char->writer $char)
-    (lambda ($value)
-      (and
-        (equal? $value $char)
-        (box (char-code $char)))))
-
-  (define (string->writer $string)
-    (lambda ($value)
-      (and
-        (equal? $value $string)
-        (box (string-code $string)))))
+    (make-writer null? (always (empty-code))))
 
   (define char-writer
-    (lambda ($value)
-      (switch? $value
-        ((char? $char)
-          (box (char-code $char))))))
+    (make-writer char? char-code))
 
   (define string-writer
-    (lambda ($value)
-      (switch? $value
-        ((string? $string)
-          (box (string-code $string))))))
+    (make-writer string? string-code))
 
-  (define (?char-writer $test?)
-    (lambda ($value)
-      (switch? $value
-        ((char? $char)
-          (and
-            ($test? $char)
-            (box (char-code $char)))))))
+  (define (char->writer $char)
+    (make-writer
+      (partial equal? $char)
+      (always (char-code $char))))
 
-  (define alphabetic-char-writer (?char-writer char-alphabetic?))
-  (define numeric-char-writer (?char-writer char-numeric?))
+  (define (string->writer $string)
+    (make-writer
+      (partial equal? $string)
+      (always (string-code $string))))
+
+  (define number-writer
+    (make-writer number?
+      (dot string-code number->string)))
+
+  (define (writer-filter $predicate $writer)
+    (make-writer
+      (and? (writer-predicate $writer) $predicate)
+      (writer-code-procedure $writer)))
+
+  (define (writer-map $predicate $transform $writer)
+    (make-writer
+      $predicate
+      (lambda ($value)
+        (writer-code $writer ($transform $value)))))
 
   (define-rules-syntaxes (keywords)
     ((%writer ch)
@@ -81,22 +78,31 @@
     ((%writer str)
       (string? (datum str))
       (string->writer str))
-    ((%writer x) x)
     ((or-writer)
-      (lambda (_) #f))
-    ((or-writer x xs ...)
+      (make-writer
+        (always #f)
+        (always (empty-code))))
+    ((or-writer x) x)
+    ((or-writer x y xs ...)
       (lets
-        ($writer (%writer x))
-        (lambda ($value)
-          (or
-            (writer/value->code-box? $writer $value)
-            (writer/value->code-box? (or-writer xs ...) $value)))))
+        ($x x)
+        ($y y)
+        ($x-predicate (writer-predicate $x))
+        ($y-predicate (writer-predicate $y))
+        ($x-code (writer-code-procedure $x))
+        ($y-code (writer-code-procedure $y))
+        (or-writer
+          (make-writer
+            (or? $x-predicate $y-predicate)
+            (lambda ($value)
+              (if ($x-predicate $value) ($x-code $value) ($y-code $value))))
+          xs ...)))
     ((check-writer-rule wr (writes val str))
       (free-keyword? writes)
-      (check (equal? (writer/value->string wr val) str)))
-    ((check-writer-rule wr (raises val))
-      (free-keyword? raises)
-      (check (raises (writer/value->string wr val))))
+      (check (equal? (writer-string wr val) str)))
+    ((check-writer-rule wr (rejects val ...))
+      (free-keyword? rejects)
+      (begin (check (not (writer-test? wr val))) ...))
     ((check-writer wr rule ...)
       (lets
         ($writer wr)

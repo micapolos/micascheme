@@ -3,4 +3,4 @@
 (test
   (mica reader)
   (mica writer)
-  (mica textual))
+  (mica codec))
