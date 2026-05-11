@@ -17,7 +17,7 @@
       ((_ expr)
         (lets
           ($sources
-            (switch? (syntax->annotation #'expr)
+            (switch (syntax->annotation #'expr)
               ((annotation? $annotation)
                 (call-with-values
                   (lambda ()
@@ -30,7 +30,8 @@
                         (path ,$path)
                         (at
                           (line ,$line)
-                          (column ,$column)))))))))
+                          (column ,$column)))))))
+              ((else _) '())))
           #`(values
             (lambda () expr)
             'expr
