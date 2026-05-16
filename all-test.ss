@@ -31,6 +31,7 @@
   (from)
   (fstack)
   (function)
+  (functor)
   (get)
   (getter)
   (identifier)
