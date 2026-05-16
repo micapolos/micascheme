@@ -1,12 +1,16 @@
 (library (leo mica reader quoted)
   (export
     depth->unquoted
+    depth-quoted-annotation
+    depth-unquoted-annotations
+    depth-unquoted-annotations?
     begin-quoted-annotation
     end-quoted-annotations
     end-quoted-annotations?)
   (import
     (prefix (scheme) %)
     (prefix (annotation) %)
+    (prefix (procedure) %)
     (mica reader)
     (leo mica reader quotes))
 
@@ -15,24 +19,33 @@
       $item
       (suffixed (depth->unquoted (%- $depth 1) $item) #\')))
 
-  (%define (quoted-annotation $quote $annotation)
+  (%define (depth-quoted-annotation $depth $quote $depth->annotation)
     (or
       (optional
         (list-annotation
           (list
             (annotation $quote)
-            (lazy (quoted-annotation $quote $annotation)))))
-      $annotation))
+            (lazy
+              (depth-quoted-annotation
+                (%+ $depth 1)
+                $quote
+                $depth->annotation)))))
+      ($depth->annotation $depth)))
 
   (%define (begin-quoted-annotation $annotation)
-    (quoted-annotation begin-quote $annotation))
+    (depth-quoted-annotation 0 begin-quote (%always $annotation)))
 
-  (%define (quoted-annotations $quote $annotations)
+  (%define (depth-unquoted-annotations $depth $unquote $depth->annotations)
     (or
       (optional
         (lets
-          ($end-quote-annotation (annotation $quote))
-          ($annotations (lazy (quoted-annotations $quote $annotations)))
+          ($end-quote-annotation (annotation $unquote))
+          ($annotations
+            (lazy
+              (depth-unquoted-annotations
+                (%- $depth 1)
+                $unquote
+                $depth->annotations)))
           (return
             (%map
               (%lambda ($annotation)
@@ -40,14 +53,22 @@
                   (%list $end-quote-annotation $annotation)
                   (%annotation-source $end-quote-annotation)))
               $annotations))))
-      $annotations))
+      ($depth->annotations $depth)))
 
-  (%define (quoted-annotations? $quote $annotations?)
+  (%define (end-quoted-annotations $annotations)
+    (depth-unquoted-annotations 0 end-quote (%always $annotations)))
+
+  (%define (depth-unquoted-annotations? $depth $unquote $depth->annotations?)
     (or
       (optional
         (lets
-          ($end-quote-annotation (annotation $quote))
-          ($annotations? (lazy (quoted-annotations? $quote $annotations?)))
+          ($end-quote-annotation (annotation $unquote))
+          ($annotations?
+            (lazy
+              (depth-unquoted-annotations?
+                (%- $depth 1)
+                $unquote
+                $depth->annotations?)))
           (return
             (%and $annotations?
               (%map
@@ -56,11 +77,8 @@
                     (%list $end-quote-annotation $annotation)
                     (%annotation-source $end-quote-annotation)))
                 $annotations?)))))
-      $annotations?))
-
-  (%define (end-quoted-annotations $annotations)
-    (quoted-annotations end-quote $annotations))
+      ($depth->annotations? $depth)))
 
   (%define (end-quoted-annotations? $annotations?)
-    (quoted-annotations? end-quote $annotations?))
+    (depth-unquoted-annotations? 0 end-quote (%always $annotations?)))
 )

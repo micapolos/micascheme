@@ -2,7 +2,8 @@
   (prefix (micascheme) %)
   (only (micascheme) quote quasiquote unquote unquote-splicing)
   (mica reader)
-  (leo mica reader quoted))
+  (leo mica reader quoted)
+  (leo mica reader quotes))
 
 (check-reader
   (depth->unquoted 0 alphabetic-char)
@@ -32,11 +33,15 @@
 
 (check-reader
   (map
-    (begin-quoted-annotation (annotation numeric-char))
+    (depth-quoted-annotation 0 begin-quote
+      (%lambda ($depth)
+        (depth->unquoted $depth (annotation numeric-char))))
     %annotation-stripped)
   (ok "1" #\1)
-  (ok "'1" '`#\1)
-  (ok "''1" '``#\1)
+  (ok "'1'" '`#\1)
+  (ok "''1''" '``#\1)
+  (error "'1")
+  (error "''1")
   (error "`1"))
 
 (check-reader
