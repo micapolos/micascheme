@@ -45,6 +45,7 @@
   (ok "''1'...'..." '``#\1)
   (error "'1")
   (error "''1")
+  (error "''1'")
   (error "`1"))
 
 (check-reader
