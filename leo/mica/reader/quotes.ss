@@ -6,8 +6,7 @@
     (mica reader))
 
   (%define begin-quote
-    (one-of
-      (replace "'" 'quasiquote)))
+    (replace "'" 'quasiquote))
 
   (%define end-quote
     (prefixed "'"
