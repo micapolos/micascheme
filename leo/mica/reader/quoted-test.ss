@@ -6,7 +6,7 @@
   (leo mica reader quotes))
 
 (check-reader
-  (depth->unquoted 0 alphabetic-char)
+  (depth->unquoted 0 end-quote alphabetic-char)
   (ok "a" #\a)
   (error "'")
   (error "a'")
@@ -14,7 +14,7 @@
   (error "1'"))
 
 (check-reader
-  (depth->unquoted 1 alphabetic-char)
+  (depth->unquoted 1 end-quote alphabetic-char)
   (ok "a'" #\a)
   (error "'")
   (error "a")
@@ -22,7 +22,7 @@
   (error "1"))
 
 (check-reader
-  (depth->unquoted 2 alphabetic-char)
+  (depth->unquoted 2 end-quote alphabetic-char)
   (ok "a''" #\a)
   (error "'")
   (error "a")
@@ -35,11 +35,14 @@
   (map
     (depth-quoted-annotation 0 begin-quote
       (%lambda ($depth)
-        (depth->unquoted $depth (annotation numeric-char))))
+        (depth->unquoted $depth end-quote (annotation numeric-char))))
     %annotation-stripped)
   (ok "1" #\1)
   (ok "'1'" '`#\1)
+  (ok "'1'..." '`#\1)
   (ok "''1''" '``#\1)
+  (ok "''1'...'" '``#\1)
+  (ok "''1'...'..." '``#\1)
   (error "'1")
   (error "''1")
   (error "`1"))

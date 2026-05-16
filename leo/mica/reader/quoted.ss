@@ -14,10 +14,10 @@
     (mica reader)
     (leo mica reader quotes))
 
-  (%define (depth->unquoted $depth $item)
+  (%define (depth->unquoted $depth $unquote $item)
     (%if (%zero? $depth)
       $item
-      (suffixed (depth->unquoted (%- $depth 1) $item) #\')))
+      (suffixed (depth->unquoted (%- $depth 1) $unquote $item) $unquote)))
 
   (%define (depth-quoted-annotation $depth $quote $depth->annotation)
     (or
