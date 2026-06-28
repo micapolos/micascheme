@@ -9,6 +9,7 @@
     once-proc
     checking-once
     app
+    app-ordered
     values-app
     partial
     partial-flip
@@ -70,6 +71,12 @@
 
   (define-rule-syntax (app $fn $arg ...)
     ($fn $arg ...))
+
+  (define-syntax (app-ordered $syntax)
+    (syntax-case $syntax ()
+      ((_ fn expr ...)
+        (with-syntax (((var ...) (generate-temporaries #'(expr ...))))
+          #'(let* ((var expr) ...) (fn var ...))))))
 
   (define-syntax (values-app $syntax)
     (syntax-case $syntax ()

@@ -67,6 +67,7 @@
     dedup
     dedup-reversed
 
+    move-n
     length<=)
 
   (import
@@ -496,4 +497,12 @@
         (and
           (> n 0)
           (length<= (cdr pair) (- n 1))))))
+
+  (define (move-n $acc $list $n)
+    (if (zero? $n)
+      (values $acc $list)
+      (move-n
+        (cons (car $list) $acc)
+        (cdr $list)
+        (- $n 1))))
 )

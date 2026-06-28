@@ -41,6 +41,20 @@
     (app (lambda (x y) (string-append x y)) "foo" "bar")
     "foobar"))
 
+; === app-ordered ===
+
+(let
+  (($xs (list)))
+  (check
+    (equal?
+      (app-ordered string-append
+        (let ((x "1")) (set! $xs (cons x $xs)) x)
+        (let ((x "2")) (set! $xs (cons x $xs)) x)
+        (let ((x "3")) (set! $xs (cons x $xs)) x))
+      "123"))
+  (check (equal? $xs (list "3" "2" "1"))))
+
+
 ; === values-app ===
 
 (check
