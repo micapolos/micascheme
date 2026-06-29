@@ -2,7 +2,13 @@
   (export
     u8= u8+ u8- u8*
     u16= u16+ u16-
-    u8-ref u8-set!)
+    u8-ref u8-set!
+
+    sf?
+    zf?
+    pv?
+    cf?
+    scf!)
   (import
     (scheme)
     (syntax)
@@ -16,6 +22,18 @@
 
   (define (u8-set! $addr $u8)
     (bytevector-u8-set! memory-bytevector (fxand $addr #x3fff) $u8))
+
+  (define flags-box (box #x00))
+
+  (define (flags) (unbox flags-box))
+  (define (set-flags! $flags) (set-box! flags-box $flags))
+
+  (define (sf?) (not (zero? (fxand (flags) #b10000000))))
+  (define (zf?) (not (zero? (fxand (flags) #b01000000))))
+  (define (pv?) (not (zero? (fxand (flags) #b00000100))))
+  (define (cf?) (not (zero? (fxand (flags) #b00000001))))
+
+  (define (scf!) (set-flags! (fxior (flags) #b00000001)))
 
   (define-rules-syntaxes
     (u8-false 0)
