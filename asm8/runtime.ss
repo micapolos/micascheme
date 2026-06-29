@@ -6,6 +6,7 @@
     (scheme)
     (syntax)
     (syntaxes))
+  (export (import (values)))
 
   (define memory-bytevector (make-bytevector #x4000))
 
@@ -19,7 +20,7 @@
     (u8-false 0)
     (u8-true 1)
     ((u8-result x)
-      (fxand #xff))
+      (fxand x #xff))
     ((u8-unop op x)
       (u8-result (op x)))
     ((u8-binop op x y)

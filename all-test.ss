@@ -106,6 +106,7 @@
   (writer)
   (writing)
   (z80)
+  (asm8 all)
   (asm all)
   (c all)
   (emu all)

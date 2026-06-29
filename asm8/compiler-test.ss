@@ -73,7 +73,7 @@
           (values-append
             (1
               (with-values 30 ($1)
-                (values-append (1 (+ $1 $2)))))))))))
+                (values-append (1 (+ $2 $1)))))))))))
 
 (set! var-count 0)
 (check
@@ -109,7 +109,7 @@
               (with-values 20 ($1)
                 (values-append
                   (2
-                    (div/rem $1 $2)))))))))))
+                    (div/rem $2 $1)))))))))))
 
 (set! var-count 0)
 (check
@@ -164,12 +164,10 @@
                 (2
                   (with-values 4 ($1)
                     (values-append
-                      (2 (div/rem $1 $2)))))))
+                      (2 (div/rem $2 $1)))))))
             ($3 $4)
             (values-append
               (1 $3)
               (1 (inc $4))))
           ($5 $6)
           (values-append (1 (+ $5 $6))))))))
-
-

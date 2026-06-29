@@ -3,7 +3,8 @@
     entry entry? entry-arity entry-expr
     op op? op-arg-count op-result-count op-expr-proc
     compile-op
-    compile-ops)
+    compile-ops
+    compile-stack)
   (import
     (scheme)
     (data)
@@ -46,11 +47,19 @@
                         $slack-vars)
                       (
                         ,$result-count
-                        ,(apply $body-proc (append $vars $args)))))))))))))
+                        ,(apply $body-proc (append $args $vars)))))))))))))
 
   (define (compile-ops $gen $stack $ops)
     (fold-left
       (partial compile-op $gen)
       $stack
       $ops))
+
+  ; TODO: order!!! Implement using pop-n
+  (define (compile-stack $stack)
+    `(values-append
+      ,@(map
+        (lambda ($entry)
+          `(,(entry-arity $entry) ,(entry-expr $entry)))
+        (reverse $stack))))
 )
