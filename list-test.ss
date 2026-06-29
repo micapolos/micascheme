@@ -621,6 +621,6 @@
 
 (check
   (equal?
-    (values->list (move-n '(a b c) '(d e f) 2))
+    (values->list (list-move '(a b c) '(d e f) 2))
     '((e d a b c) (f))))
 

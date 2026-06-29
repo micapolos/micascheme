@@ -69,7 +69,7 @@
     dedup
     dedup-reversed
 
-    move-n
+    list-move
     length<=)
 
   (import
@@ -200,7 +200,7 @@
       (else (and (pair? $list) (list-drop (cdr $list) (- $count 1))))))
 
   (define (list-take $list $count)
-    (let-values ((($moved _) (move-n '() $list $count)))
+    (let-values ((($moved _) (list-move '() $list $count)))
       (reverse $moved)))
 
   (define (list-set $list $index $obj)
@@ -504,10 +504,10 @@
           (> n 0)
           (length<= (cdr pair) (- n 1))))))
 
-  (define (move-n $acc $list $n)
+  (define (list-move $acc $list $n)
     (if (zero? $n)
       (values $acc $list)
-      (move-n
+      (list-move
         (cons (car $list) $acc)
         (cdr $list)
         (- $n 1))))
