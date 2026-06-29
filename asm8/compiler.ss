@@ -10,7 +10,8 @@
     (list)
     (stack)
     (syntax)
-    (syntaxes))
+    (syntaxes)
+    (system))
 
   (data (entry arity expr))
   (data (op arg-count result-count expr-proc))
@@ -51,6 +52,7 @@
                       (values #,@(apply append $tmpss))))))))))))
 
   (define (compile-op $gen $stack $op)
+    ;(pretty-print `(compile-op ,$stack ,$op))
     (lets
       ((op $arg-count $result-count $body-proc) $op)
       (cond
@@ -62,7 +64,7 @@
             ($stack (cdr $stack))
             ($arg-count (- $arg-count $entry-arity))
             ($slack-count (- (min $arg-count 0)))
-            ($vars (map (lambda (_) ($gen)) (iota $entry-arity)))
+            ($entry-vars (map (lambda (_) ($gen)) (iota $entry-arity)))
             (compile-op
               $gen
               $stack
@@ -70,12 +72,12 @@
                 (max $arg-count 0)
                 (+ $slack-count $result-count)
                 (lambda $args
-                  `(smart-bind ,$entry-expr ,$vars
+                  `(smart-bind ,$entry-expr ,$entry-vars
                     (smart-values
                       ,@(map
                         (lambda ($var) `(1 ,$var))
-                        (list-take $vars $slack-count))
+                        (list-take $entry-vars $slack-count))
                       (
                         ,$result-count
-                        ,(apply $body-proc (append $vars $args)))))))))))))
+                        ,(apply $body-proc (append $entry-vars $args)))))))))))))
 )

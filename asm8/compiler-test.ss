@@ -114,10 +114,13 @@
 ;   (equal?
 ;     (compile-op
 ;       gen
-;       (stack (entry 2 '(values 10 20)))
-;       op-inc)
+;       (stack (entry 5 '(values 1 2 3 4 5)))
+;       op+)
 ;     (stack
-;       (entry 1
-;         '(smart-bind (values 10 20) ($1 $2)
-;           (smart-values 1
-;             (+ $1 $2)))))))
+;       (entry 4
+;         '(smart-bind
+;           (values 1 2 3 4 5)
+;           ($1 $2 $3 $4 $5)
+;           (smart-values
+;             (3 $1 $2 $3)
+;             (1 (+ $4 $5))))))))
