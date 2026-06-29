@@ -17,12 +17,12 @@
   (data (op arg-count result-count expr-proc))
 
   (define-rules-syntax
-    ((smart-bind expr () body)
-      (let () expr body))
-    ((smart-bind expr (v) body)
-      (let ((v expr)) body))
-    ((smart-bind expr (v vs ...) body)
-      (let-values (((v vs ...) expr)) body)))
+    ((smart-bind expr () x xs ...)
+      (let () expr x xs ...))
+    ((smart-bind expr (v) x xs ...)
+      (let ((v expr)) x xs ...))
+    ((smart-bind expr (v vs ...) x xs ...)
+      (let-values (((v vs ...) expr)) x xs ...)))
 
   (define-syntax (smart-values $syntax)
     (syntax-case $syntax ()
