@@ -65,6 +65,7 @@
             ($arg-count (- $arg-count $entry-arity))
             ($slack-count (- (min $arg-count 0)))
             ($entry-vars (ordered-map (lambda (_) ($gen)) (iota $entry-arity)))
+            ((values $slack-vars $vars) (list-split $entry-vars $slack-count))
             (compile-op
               $gen
               $stack
@@ -75,12 +76,9 @@
                   `(smart-bind ,$entry-expr ,$entry-vars
                     (smart-values
                       ,@(map
-                        (lambda ($var) `(1 ,$var))
-                        (list-take $entry-vars $slack-count))
+                        (lambda ($slack-var) `(1 ,$slack-var))
+                        $slack-vars)
                       (
                         ,$result-count
-                        ,(apply $body-proc
-                          (append
-                            (list-drop $entry-vars $slack-count)
-                            $args)))))))))))))
+                        ,(apply $body-proc (append $vars $args)))))))))))))
 )
