@@ -109,18 +109,20 @@
             (1
               (+ $1 $2))))))))
 
-; (set! var-count 0)
-; (check
-;   (equal?
-;     (compile-op
-;       gen
-;       (stack (entry 5 '(values 1 2 3 4 5)))
-;       op+)
-;     (stack
-;       (entry 4
-;         '(smart-bind
-;           (values 1 2 3 4 5)
-;           ($1 $2 $3 $4 $5)
-;           (smart-values
-;             (3 $1 $2 $3)
-;             (1 (+ $4 $5))))))))
+(set! var-count 0)
+(check
+  (equal?
+    (compile-op
+      gen
+      (stack (entry 5 '(values 1 2 3 4 5)))
+      op+)
+    (stack
+      (entry 4
+        '(smart-bind
+          (values 1 2 3 4 5)
+          ($1 $2 $3 $4 $5)
+          (smart-values
+            (1 $1)
+            (1 $2)
+            (1 $3)
+            (1 (+ $4 $5))))))))

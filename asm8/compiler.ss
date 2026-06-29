@@ -64,7 +64,7 @@
             ($stack (cdr $stack))
             ($arg-count (- $arg-count $entry-arity))
             ($slack-count (- (min $arg-count 0)))
-            ($entry-vars (map (lambda (_) ($gen)) (iota $entry-arity)))
+            ($entry-vars (ordered-map (lambda (_) ($gen)) (iota $entry-arity)))
             (compile-op
               $gen
               $stack
@@ -79,5 +79,8 @@
                         (list-take $entry-vars $slack-count))
                       (
                         ,$result-count
-                        ,(apply $body-proc (append $entry-vars $args)))))))))))))
+                        ,(apply $body-proc
+                          (append
+                            (list-drop $entry-vars $slack-count)
+                            $args)))))))))))))
 )
