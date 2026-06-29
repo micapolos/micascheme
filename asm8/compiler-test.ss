@@ -6,22 +6,23 @@
   (set! var-count (+ var-count 1))
   (string->symbol (string-append "$" (number->string var-count))))
 
+(define (op-push $x) (op 0 1 (lambda () $x)))
+(define op-log (op 1 0 (lambda ($0) `(log ,$0))))
+(define op-inc (op 1 1 (lambda ($0) `(inc ,$0))))
+(define op+ (op 2 1 (lambda ($0 $1) `(+ ,$0 ,$1))))
+(define op-div/rem (op 2 2 (lambda ($0 $1) `(div/rem ,$0 ,$1))))
+
 (set! var-count 0)
 (check
   (equal?
-    (compile-op gen (list) 0 (lambda () 10) 1)
+    (compile-op gen (stack) (op-push 10))
     (stack
       (entry 1 10))))
 
 (set! var-count 0)
 (check
   (equal?
-    (compile-op
-      gen
-      (stack (entry 1 10))
-      1
-      (lambda (v0) `(inc ,v0))
-      1)
+    (compile-op gen (stack (entry 1 10)) op-inc)
     (stack
       (entry 1
         '(smart-let 10 ($1)
@@ -33,9 +34,7 @@
     (compile-op
       gen
       (stack (entry 1 10))
-      1
-      (lambda (v0) `(log ,v0))
-      0)
+      op-log)
     (stack
       (entry 0
         '(smart-let 10 ($1)
@@ -49,9 +48,7 @@
       (stack
         (entry 1 10)
         (entry 1 20))
-      2
-      (lambda (v0 v1) `(+ ,v0 ,v1))
-      1)
+      op+)
     (stack
       (entry 1
         '(smart-let 10 ($2)
@@ -68,9 +65,7 @@
       (stack
         (entry 1 10)
         (entry 0 '(void)))
-      1
-      (lambda (v0) `(inc ,v0))
-      1)
+      op-inc)
     (stack
       (entry 1
         '(smart-let 10 ($1)
@@ -86,9 +81,7 @@
       (stack
         (entry 1 10)
         (entry 1 20))
-      2
-      (lambda (v0 v1) `(div/rem ,v0 ,v1))
-      2)
+      op-div/rem)
     (stack
       (entry 2
         '(smart-let 10 ($2)
@@ -103,9 +96,7 @@
     (compile-op
       gen
       (stack (entry 2 '(values 10 20)))
-      2
-      (lambda (v0 v1) `(+ ,v0 ,v1))
-      1)
+      op+)
     (stack
       (entry 1
         '(smart-let (values 10 20) ($1 $2)
@@ -118,9 +109,7 @@
 ;     (compile-op
 ;       gen
 ;       (stack (entry 2 '(values 10 20)))
-;       1
-;       (lambda (v0) `(inc ,v0))
-;       1)
+;       op-inc)
 ;     (stack
 ;       (entry 1
 ;         '(smart-let (values 10 20) ($1 $2)
