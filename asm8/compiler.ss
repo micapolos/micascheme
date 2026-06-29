@@ -25,26 +25,30 @@
 
   (define-syntax (smart-values $syntax)
     (syntax-case $syntax ()
-      ((_ x ... arity expr)
+      ((_ (arity expr) ...)
         (lets
-          ($xs #'(x ...))
-          ($x-arity (length $xs))
-          ($arity (datum arity))
-          (case $arity
-            ((0)
-              (case $x-arity
-                ((0) #'(void))
-                ((1) (car $xs))
-                (else #'(values x ...))))
-            ((1)
-              (case $x-arity
-                ((0) #'expr)
-                (else #'(values x ... expr))))
+          ($arities (datum (arity ...)))
+          ($exprs #'(expr ...))
+          (case (length $exprs)
+            ((0) #'(void))
+            ((1) (car $exprs))
             (else
-              (lets
-                ($tmps (generate-temporaries (iota $arity)))
-                #`(smart-let expr #,$tmps
-                  (values x ... #,@$tmps)))))))))
+              (cond
+                ((for-all (lambda ($arity) (= $arity 1)) $arities)
+                  #`(values #,@$exprs))
+                (else
+                  (lets
+                    ($tmpss
+                      (map
+                        (lambda ($arity) (generate-temporaries (iota $arity)))
+                        $arities))
+                    #`(let-values
+                      #,(map
+                        (lambda ($tmps $expr)
+                          #`(#,$tmps #,$expr))
+                        $tmpss
+                        $exprs)
+                      (values #,@(apply append $tmpss))))))))))))
 
   (define (compile-op $gen $stack $op)
     (lets
@@ -68,7 +72,10 @@
                 (lambda $args
                   `(smart-let ,$entry-expr ,$vars
                     (smart-values
-                      ,@(list-take $vars $slack-count)
-                      ,$result-count
-                      ,(apply $body-proc (append $vars $args))))))))))))
+                      ,@(map
+                        (lambda ($var) `(1 ,$var))
+                        (list-take $vars $slack-count))
+                      (
+                        ,$result-count
+                        ,(apply $body-proc (append $vars $args)))))))))))))
 )

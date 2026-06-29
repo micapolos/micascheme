@@ -26,7 +26,8 @@
     (stack
       (entry 1
         '(smart-let 10 ($1)
-          (smart-values 1 (inc $1)))))))
+          (smart-values
+            (1 (inc $1))))))))
 
 (set! var-count 0)
 (check
@@ -38,7 +39,8 @@
     (stack
       (entry 0
         '(smart-let 10 ($1)
-          (smart-values 0 (log $1)))))))
+          (smart-values
+            (0 (log $1))))))))
 
 (set! var-count 0)
 (check
@@ -52,10 +54,10 @@
     (stack
       (entry 1
         '(smart-let 10 ($2)
-          (smart-values 1
-            (smart-let 20 ($1)
-              (smart-values 1
-                (+ $1 $2)))))))))
+          (smart-values
+            (1
+              (smart-let 20 ($1)
+                (smart-values (1 (+ $1 $2)))))))))))
 
 (set! var-count 0)
 (check
@@ -69,9 +71,10 @@
     (stack
       (entry 1
         '(smart-let 10 ($1)
-          (smart-values 1
-            (smart-let (void) ()
-              (smart-values 1 (inc $1)))))))))
+          (smart-values
+            (1
+              (smart-let (void) ()
+                (smart-values (1 (inc $1)))))))))))
 
 (set! var-count 0)
 (check
@@ -85,10 +88,12 @@
     (stack
       (entry 2
         '(smart-let 10 ($2)
-          (smart-values 2
-            (smart-let 20 ($1)
-              (smart-values 2
-                (div/rem $1 $2)))))))))
+          (smart-values
+            (2
+              (smart-let 20 ($1)
+                (smart-values
+                  (2
+                    (div/rem $1 $2)))))))))))
 
 (set! var-count 0)
 (check
@@ -100,8 +105,9 @@
     (stack
       (entry 1
         '(smart-let (values 10 20) ($1 $2)
-          (smart-values 1
-            (+ $1 $2)))))))
+          (smart-values
+            (1
+              (+ $1 $2))))))))
 
 ; (set! var-count 0)
 ; (check
