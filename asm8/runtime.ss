@@ -1,6 +1,7 @@
 (library (asm8 runtime)
   (export
     u8= u8+ u8- u8*
+    u16= u16+ u16-
     u8-ref u8-set!)
   (import
     (scheme)
@@ -19,6 +20,7 @@
   (define-rules-syntaxes
     (u8-false 0)
     (u8-true 1)
+
     ((u8-result x)
       (fxand x #xff))
     ((u8-unop op x)
@@ -34,5 +36,20 @@
     ((u8-eqz x)
       (if (zero? x) u8-true u8-false))
     ((u8= x y)
-      (u8-eqz (fxxor x y))))
+      (u8-eqz (fxxor x y)))
+
+    ((u16-result x)
+      (fxand x #xffff))
+    ((u16-unop op x)
+      (u16-result (op x)))
+    ((u16-binop op x y)
+      (u16-result (op x y)))
+    ((u16+ x y)
+      (u8-binop fx+/wraparound x y))
+    ((u16- x y)
+      (u8-binop fx-/wraparound x y))
+    ((u16-zero? x)
+      (if (zero? x) u16-true u16-false))
+    ((u16= x y)
+      (u16-eqz (fxxor x y))))
 )
