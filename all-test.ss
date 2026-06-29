@@ -99,6 +99,7 @@
   (typed)
   (u8)
   (value)
+  (values)
   (variable)
   (vector)
   (void)

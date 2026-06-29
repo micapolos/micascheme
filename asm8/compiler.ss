@@ -2,7 +2,7 @@
   (export
     entry entry? entry-arity entry-expr
     op op? op-arg-count op-result-count op-expr-proc
-    smart-bind smart-values compile-op)
+    with-values values-append compile-op)
   (import
     (scheme)
     (data)
@@ -11,45 +11,10 @@
     (stack)
     (syntax)
     (syntaxes)
-    (system))
+    (values))
 
   (data (entry arity expr))
   (data (op arg-count result-count expr-proc))
-
-  (define-rules-syntax
-    ((smart-bind expr () x xs ...)
-      (let () expr x xs ...))
-    ((smart-bind expr (v) x xs ...)
-      (let ((v expr)) x xs ...))
-    ((smart-bind expr (v vs ...) x xs ...)
-      (let-values (((v vs ...) expr)) x xs ...)))
-
-  (define-syntax (smart-values $syntax)
-    (syntax-case $syntax ()
-      ((_ (arity expr) ...)
-        (lets
-          ($arities (datum (arity ...)))
-          ($exprs #'(expr ...))
-          (case (length $exprs)
-            ((0) #'(void))
-            ((1) (car $exprs))
-            (else
-              (cond
-                ((for-all (lambda ($arity) (= $arity 1)) $arities)
-                  #`(values #,@$exprs))
-                (else
-                  (lets
-                    ($tmpss
-                      (map
-                        (lambda ($arity) (generate-temporaries (iota $arity)))
-                        $arities))
-                    #`(let-values
-                      #,(map
-                        (lambda ($tmps $expr)
-                          #`(#,$tmps #,$expr))
-                        $tmpss
-                        $exprs)
-                      (values #,@(apply append $tmpss))))))))))))
 
   (define (compile-op $gen $stack $op)
     (lets
@@ -72,8 +37,8 @@
                 (max $arg-count 0)
                 (+ $slack-count $result-count)
                 (lambda $args
-                  `(smart-bind ,$entry-expr ,$entry-vars
-                    (smart-values
+                  `(with-values ,$entry-expr ,$entry-vars
+                    (values-append
                       ,@(map
                         (lambda ($slack-var) `(1 ,$slack-var))
                         $slack-vars)

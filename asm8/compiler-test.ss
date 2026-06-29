@@ -25,8 +25,8 @@
     (compile-op gen (stack (entry 1 10)) op-inc)
     (stack
       (entry 1
-        '(smart-bind 10 ($1)
-          (smart-values
+        '(with-values 10 ($1)
+          (values-append
             (1 (inc $1))))))))
 
 (set! var-count 0)
@@ -38,8 +38,8 @@
       op-log)
     (stack
       (entry 0
-        '(smart-bind 10 ($1)
-          (smart-values
+        '(with-values 10 ($1)
+          (values-append
             (0 (log $1))))))))
 
 (set! var-count 0)
@@ -53,11 +53,11 @@
       op+)
     (stack
       (entry 1
-        '(smart-bind 10 ($2)
-          (smart-values
+        '(with-values 10 ($2)
+          (values-append
             (1
-              (smart-bind 20 ($1)
-                (smart-values (1 (+ $1 $2)))))))))))
+              (with-values 20 ($1)
+                (values-append (1 (+ $1 $2)))))))))))
 
 (set! var-count 0)
 (check
@@ -70,11 +70,11 @@
       op-inc)
     (stack
       (entry 1
-        '(smart-bind 10 ($1)
-          (smart-values
+        '(with-values 10 ($1)
+          (values-append
             (1
-              (smart-bind (void) ()
-                (smart-values (1 (inc $1)))))))))))
+              (with-values (void) ()
+                (values-append (1 (inc $1)))))))))))
 
 (set! var-count 0)
 (check
@@ -87,11 +87,11 @@
       op-div/rem)
     (stack
       (entry 2
-        '(smart-bind 10 ($2)
-          (smart-values
+        '(with-values 10 ($2)
+          (values-append
             (2
-              (smart-bind 20 ($1)
-                (smart-values
+              (with-values 20 ($1)
+                (values-append
                   (2
                     (div/rem $1 $2)))))))))))
 
@@ -104,8 +104,8 @@
       op+)
     (stack
       (entry 1
-        '(smart-bind (values 10 20) ($1 $2)
-          (smart-values
+        '(with-values (values 10 20) ($1 $2)
+          (values-append
             (1
               (+ $1 $2))))))))
 
@@ -118,10 +118,10 @@
       op+)
     (stack
       (entry 4
-        '(smart-bind
+        '(with-values
           (values 1 2 3 4 5)
           ($1 $2 $3 $4 $5)
-          (smart-values
+          (values-append
             (1 $1)
             (1 $2)
             (1 $3)

@@ -131,6 +131,7 @@
       (throw)
       (top-level)
       (union)
+      (values)
       (variable)
       (vector)
       (void)))
