@@ -1,11 +1,17 @@
 (library (asm8 compiler)
-  (export smart-let smart-values compile-op)
+  (export
+    entry entry? entry-arity entry-expr
+    smart-let smart-values compile-op)
   (import
     (scheme)
+    (data)
     (lets)
     (list)
+    (stack)
     (syntax)
     (syntaxes))
+
+  (data (entry arity expr))
 
   (define-rules-syntax
     ((smart-let expr () body)
@@ -41,15 +47,11 @@
   (define (compile-op $gen $stack $arg-count $body-proc $result-count)
     (cond
       ((zero? $arg-count)
-        (cons
-          (cons $result-count ($body-proc))
-          $stack))
+        (push $stack (entry $result-count ($body-proc))))
       (else
         (lets
-          ($entry (car $stack))
+          ((entry $entry-arity $entry-expr) (car $stack))
           ($stack (cdr $stack))
-          ($entry-arity (car $entry))
-          ($entry-body (cdr $entry))
           ($arg-count (- $arg-count $entry-arity))
           ($slack-count (- (min $arg-count 0)))
           ($vars (map (lambda (_) ($gen)) (iota $entry-arity)))
@@ -58,7 +60,7 @@
             $stack
             (max $arg-count 0)
             (lambda $args
-              `(smart-let ,$entry-body ,$vars
+              `(smart-let ,$entry-expr ,$vars
                 (smart-values
                   ,@(list-take $vars $slack-count)
                   ,$result-count
