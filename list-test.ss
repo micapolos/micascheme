@@ -617,10 +617,17 @@
 (check (length<= '(a b) 2))
 (check (length<= '(a b) 3))
 
-; === move-n
+; === list-move
 
 (check
   (equal?
     (values->list (list-move '(a b c) '(d e f) 2))
     '((e d a b c) (f))))
+
+; === list-split
+
+(check
+  (equal?
+    (values->list (list-split '(a b c d e) 2))
+    '((a b) (c d e))))
 

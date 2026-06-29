@@ -70,6 +70,7 @@
     dedup-reversed
 
     list-move
+    list-split
     length<=)
 
   (import
@@ -511,4 +512,8 @@
         (cons (car $list) $acc)
         (cdr $list)
         (- $n 1))))
+
+  (define (list-split $list $n)
+    (let-values ((($a $b) (list-move '() $list $n)))
+      (values (reverse $a) $b)))
 )
