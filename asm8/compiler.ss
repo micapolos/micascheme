@@ -50,7 +50,7 @@
 
   (define (compile-ops $gen $stack $ops)
     (fold-left
-      (partial compile-op $stack)
+      (partial compile-op $gen)
       $stack
       $ops))
 )

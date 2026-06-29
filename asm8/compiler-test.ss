@@ -15,17 +15,28 @@
 (set! var-count 0)
 (check
   (equal?
-    (compile-op gen (stack) (op-push 10))
+    (compile-op gen
+      (stack
+        (entry 1 10)
+        (entry 1 20))
+      (op-push 30))
     (stack
-      (entry 1 10))))
+      (entry 1 10)
+      (entry 1 20)
+      (entry 1 30))))
 
 (set! var-count 0)
 (check
   (equal?
-    (compile-op gen (stack (entry 1 10)) op-inc)
+    (compile-op gen
+      (stack
+        (entry 1 10)
+        (entry 1 20))
+      op-inc)
     (stack
+      (entry 1 10)
       (entry 1
-        '(with-values 10 ($1)
+        '(with-values 20 ($1)
           (values-append
             (1 (inc $1))))))))
 
@@ -34,11 +45,14 @@
   (equal?
     (compile-op
       gen
-      (stack (entry 1 10))
+      (stack
+        (entry 1 10)
+        (entry 1 20))
       op-log)
     (stack
+      (entry 1 10)
       (entry 0
-        '(with-values 10 ($1)
+        '(with-values 20 ($1)
           (values-append
             (0 (log $1))))))))
 
@@ -49,14 +63,16 @@
       gen
       (stack
         (entry 1 10)
-        (entry 1 20))
+        (entry 1 20)
+        (entry 1 30))
       op+)
     (stack
+      (entry 1 10)
       (entry 1
-        '(with-values 10 ($2)
+        '(with-values 20 ($2)
           (values-append
             (1
-              (with-values 20 ($1)
+              (with-values 30 ($1)
                 (values-append (1 (+ $1 $2)))))))))))
 
 (set! var-count 0)
@@ -127,17 +143,33 @@
             (1 $3)
             (1 (+ $4 $5))))))))
 
-; (set! var-count 0)
-; (check
-;   (equal?
-;     (compile-ops
-;       gen
-;       (stack)
-;       (list
-;         (op-push 30)
-;         (op-push 4)
-;         op-div/rem
-;         op-inc
-;         op+))
-;     (stack
-;       (entry 1 'todo))))
+(set! var-count 0)
+(check
+  (equal?
+    (compile-ops
+      gen
+      (stack)
+      (list
+        (op-push 30)
+        (op-push 4)
+        op-div/rem
+        op-inc
+        op+))
+    (stack
+      (entry 1
+        '(with-values
+          (with-values
+            (with-values 30 ($2)
+              (values-append
+                (2
+                  (with-values 4 ($1)
+                    (values-append
+                      (2 (div/rem $1 $2)))))))
+            ($3 $4)
+            (values-append
+              (1 $3)
+              (1 (inc $4))))
+          ($5 $6)
+          (values-append (1 (+ $5 $6))))))))
+
+
