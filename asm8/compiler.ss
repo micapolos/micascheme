@@ -52,7 +52,6 @@
                       (values #,@(apply append $tmpss))))))))))))
 
   (define (compile-op $gen $stack $op)
-    ;(pretty-print `(compile-op ,$stack ,$op))
     (lets
       ((op $arg-count $result-count $body-proc) $op)
       (cond
