@@ -126,3 +126,18 @@
             (1 $2)
             (1 $3)
             (1 (+ $4 $5))))))))
+
+; (set! var-count 0)
+; (check
+;   (equal?
+;     (compile-ops
+;       gen
+;       (stack)
+;       (list
+;         (op-push 30)
+;         (op-push 4)
+;         op-div/rem
+;         op-inc
+;         op+))
+;     (stack
+;       (entry 1 'todo))))

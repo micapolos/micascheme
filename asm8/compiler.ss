@@ -2,13 +2,15 @@
   (export
     entry entry? entry-arity entry-expr
     op op? op-arg-count op-result-count op-expr-proc
-    with-values values-append compile-op)
+    compile-op
+    compile-ops)
   (import
     (scheme)
     (data)
     (lets)
     (list)
     (stack)
+    (procedure)
     (syntax)
     (syntaxes)
     (values))
@@ -45,4 +47,10 @@
                       (
                         ,$result-count
                         ,(apply $body-proc (append $vars $args)))))))))))))
+
+  (define (compile-ops $gen $stack $ops)
+    (fold-left
+      (partial compile-op $stack)
+      $stack
+      $ops))
 )
